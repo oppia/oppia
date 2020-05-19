@@ -29,8 +29,9 @@ require(
 require(
   'pages/topics-and-skills-dashboard-page/' +
   'topics-and-skills-dashboard-page.service');
-import { TopicsAndSkillsDashboardPageConstants } from
-  'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.constants';
+// import { TopicsAndSkillsDashboardPageConstants } from
+//   'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.constants';
+require('pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.constants.ajs.ts');
 require('components/entity-creation-services/skill-creation.service.ts');
 require('components/entity-creation-services/topic-creation.service.ts');
 require('components/rubrics-editor/rubrics-editor.directive.ts');
@@ -47,6 +48,8 @@ require('services/alerts.service.ts');
 require(
   'pages/topics-and-skills-dashboard-page/' +
   'topics-and-skills-dashboard-page.constants.ajs.ts');
+require(
+  'components/forms/custom-forms-directives/select2-dropdown.directive.ts');
 
 angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
   'UrlInterpolationService', function(
@@ -62,31 +65,29 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
       controller: [
         '$http', '$rootScope', '$scope', '$uibModal', '$window',
         'AlertsService', 'RubricObjectFactory', 'SkillCreationService',
-        'TopicCreationService', 'TopicsAndSkillsDashboardBackendApiService',
-        'TopicsAndSkillsDashboardPageService',
-        'UrlInterpolationService',
         'SkillObjectFactory', 'TopicCreationService',
         'TopicsAndSkillsDashboardBackendApiService', 'UrlInterpolationService',
+        'TopicsAndSkillsDashboardPageService',
         'EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED',
         'EVENT_TYPE_SKILL_CREATION_ENABLED',
         'EVENT_TYPE_TOPIC_CREATION_ENABLED',
         'FATAL_ERROR_CODES', 'SKILL_DIFFICULTIES',
         'MAX_CHARS_IN_SKILL_DESCRIPTION', 'SKILL_DESCRIPTION_STATUS_VALUES',
+        'TOPIC_CATEGORIES', 'ESortOptions', 'EPublishedOptions',
         function(
             $http, $rootScope, $scope, $uibModal, $window,
             AlertsService, RubricObjectFactory, SkillCreationService,
             SkillObjectFactory, TopicCreationService,
             TopicsAndSkillsDashboardBackendApiService, UrlInterpolationService,
-            TopicCreationService, TopicsAndSkillsDashboardBackendApiService,
             TopicsAndSkillsDashboardPageService,
-            UrlInterpolationService,
             EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED,
             EVENT_TYPE_SKILL_CREATION_ENABLED,
             EVENT_TYPE_TOPIC_CREATION_ENABLED,
             FATAL_ERROR_CODES, SKILL_DIFFICULTIES,
-            MAX_CHARS_IN_SKILL_DESCRIPTION, SKILL_DESCRIPTION_STATUS_VALUES) {
+            MAX_CHARS_IN_SKILL_DESCRIPTION, SKILL_DESCRIPTION_STATUS_VALUES,
+            TOPIC_CATEGORIES, ESortOptions, EPublishedOptions) {
           var ctrl = this;
-          var _initDashboard = function(stayInSameTab) {
+          ctrl._initDashboard = function(stayInSameTab) {
             TopicsAndSkillsDashboardBackendApiService.fetchDashboardData().then(
               function(response) {
                 ctrl.totalTopicSummaries = response.data.topic_summary_dicts;
@@ -119,7 +120,9 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
                       name: `flash${i + 1}`,
                       version,
                       // eslint-disable-next-line max-len
-                      description: "Well this is the first topic of mathematics that we are going to learn. It's gonna be so much fun.",
+                      description: "Well this is the first topic of mathematics that we are going to learn. It's gonna be so much fun.l this is the first " +
+                          "topic of mathematics that we are gl this is the first topic of mathematics that we are going to learn. It's gonna be so much fun." +
+                          "oing to learn. It's gonna be so much fun.",
                       subtopic_count: 0,
                       language_code: languageCode,
                       $$hashKey: 'object:63',
@@ -141,9 +144,9 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
                     });
                   }
                 };
-                console.log(ctrl.totalTopicSummaries);
-                // populateDummyTopics();
+
                 ctrl.totalCount = ctrl.topicSummaries.length;
+                ctrl.currentCount = ctrl.totalCount;
                 ctrl.activeTab = ctrl.TAB_NAME_TOPICS;
                 ctrl.paginationHandler(0);
                 ctrl.editableTopicSummaries = ctrl.topicSummaries.filter(
@@ -184,16 +187,6 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
             );
           };
 
-          ctrl.isTopicTabHelpTextVisible = function() {
-            return (
-              (ctrl.topicSummaries.length === 0) &&
-              (ctrl.untriagedSkillSummaries.length > 0));
-          };
-          ctrl.isSkillsTabHelpTextVisible = function() {
-            return (
-              (ctrl.untriagedSkillSummaries.length === 0) &&
-              (ctrl.topicSummaries.length > 0));
-          };
           ctrl.setActiveTab = function(tabName) {
             ctrl.activeTab = tabName;
             if (ctrl.activeTab === ctrl.TAB_NAME_TOPICS) {
@@ -204,26 +197,6 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
           };
           ctrl.createTopic = function() {
             TopicCreationService.createNewTopic();
-          };
-          ctrl.createTopicSkill = function() {
-            $uibModal.open({
-              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/topics-and-skills-dashboard-page/templates/' +
-                  'create-new-topic-or-skill-modal.template.html'),
-              backdrop: 'static',
-              controller: [
-                '$scope', '$uibModalInstance',
-                function($scope, $uibModalInstance) {
-                  $scope.userCanCreateTopic = ctrl.userCanCreateTopic;
-                  $scope.userCanCreateSkill = ctrl.userCanCreateSkill;
-
-                  $scope.createTopic = ctrl.createTopic;
-                  $scope.createSkill = ctrl.createSkill;
-                  $scope.cancel = function() {
-                    $uibModalInstance.dismiss('cancel');
-                  };
-                }]
-            });
           };
           ctrl.createSkill = function() {
             var rubrics = [
@@ -310,54 +283,82 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
           };
           ctrl.paginationHandler = function(e) {
             if (ctrl.activeTab === ctrl.TAB_NAME_TOPICS) {
-              ctrl.totalCount = ctrl.totalTopicSummaries.length;
               ctrl.topicPageNumber = e;
               ctrl.pageNumber = ctrl.topicPageNumber;
-              ctrl.topicSummaries =
-                  ctrl.totalTopicSummaries.slice(e * 10, (e + 1) * 10);
+              ctrl.displayedTopicSummaries =
+                  ctrl.topicSummaries.slice(
+                    e * ctrl.itemsPerPage, (e + 1) * ctrl.itemsPerPage);
             } else if (ctrl.activeTab === ctrl.TAB_NAME_UNTRIAGED_SKILLS) {
               ctrl.totalCount = ctrl.totalUntriagedSkillSummaries.length;
               ctrl.skillPageNumber = e;
               ctrl.pageNumber = ctrl.skillPageNumber;
               ctrl.untriagedSkillSummaries =
-                  ctrl.totalUntriagedSkillSummaries.slice(e * 10, (e + 1) * 10);
+                  ctrl.totalUntriagedSkillSummaries.slice(
+                    e * ctrl.itemsPerPage, (e + 1) * ctrl.itemsPerPage);
+            }
+          };
+          ctrl.changePage = function(str) {
+            ctrl.lastPage = Number(ctrl.totalCount / ctrl.itemsPerPage);
+            if (str === ctrl.PREV_PAGE && ctrl.pageNumber >= 1) {
+              ctrl.paginationHandler(ctrl.pageNumber - 1);
+            } else if (str === ctrl.NEXT_PAGE &&
+                ctrl.pageNumber < ctrl.lastPage) {
+              ctrl.paginationHandler(ctrl.pageNumber + 1);
             }
           };
           ctrl.applyFilters = function() {
-            console.log(ctrl.filterOptions);
             ctrl.topicSummaries = (
               TopicsAndSkillsDashboardPageService.getFilteredTopics(
                 ctrl.totalTopicSummaries, ctrl.filterOptions));
+            ctrl.displayedTopicSummaries =
+                ctrl.topicSummaries.slice(0, (1) * ctrl.itemsPerPage);
+            ctrl.currentCount = ctrl.topicSummaries.length;
+            ctrl.pageNumber = 0;
           };
           ctrl.resetFilters = function() {
-            console.log('Reset called');
             ctrl.topicSummaries = ctrl.totalTopicSummaries;
+            ctrl.currentCount = ctrl.totalCount;
             ctrl.filterOptions = {
               sort: '',
               keywords: '',
               category: '',
               status: '',
             };
+            ctrl.paginationHandler(0);
           };
+          ctrl.itemsPerPageHandler = function() {
+            ctrl.paginationHandler(0);
+          };
+          ctrl.createTopicSkill = function() {
+            if (ctrl.activeTab === ctrl.TAB_NAME_TOPICS) {
+              ctrl.createTopic();
+            } else if (ctrl.activeTab === ctrl.TAB_NAME_UNTRIAGED_SKILLS) {
+              ctrl.createSkill();
+            }
+          };
+
           ctrl.$onInit = function() {
             ctrl.TAB_NAME_TOPICS = 'topics';
+            ctrl.NEXT_PAGE = 'next_page';
+            ctrl.PREV_PAGE = 'prev_page';
             ctrl.TAB_NAME_UNTRIAGED_SKILLS = 'untriagedSkills';
             ctrl.TAB_NAME_UNPUBLISHED_SKILLS = 'unpublishedSkills';
             ctrl.pageNumber = 0;
             ctrl.topicPageNumber = 0;
+            ctrl.itemsPerPage = 10;
             ctrl.skillPageNumber = 0;
+            ctrl.selectedIndex = null;
+            ctrl.itemsPerPageChoice = [10, 15, 20];
             ctrl.filterOptions = {
               sort: '',
               keywords: '',
               category: '',
               status: '',
             };
+            ctrl.categories = TOPIC_CATEGORIES;
+            ctrl.sortOptions = (ESortOptions);
+            ctrl.statusOptions = (EPublishedOptions);
 
-
-            ctrl.sortOptions = (
-              TopicsAndSkillsDashboardPageConstants.ESortOptions);
-            ctrl.statusOptions = (
-              TopicsAndSkillsDashboardPageConstants.EPublishedOptions);
             ctrl.repeater = function(range) {
               var arr = [];
               for (var i = 0; i < range; i++) {
@@ -368,13 +369,13 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
             $scope.$on(
               EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED, function(
                   evt, stayInSameTab) {
-                _initDashboard(stayInSameTab);
+                ctrl._initDashboard(stayInSameTab);
               }
             );
             // The _initDashboard function is written separately since it is
             // also called in $scope.$on when some external events are
             // triggered.
-            _initDashboard(false);
+            ctrl._initDashboard(false);
           };
         }
       ]

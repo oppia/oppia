@@ -35,10 +35,12 @@ export class TopicCreationBackendApiService {
   _createTopic(
       successCallback: (value?: Object | PromiseLike<Object>) => void,
       errorCallback:(reason?: any) => void,
-      topicName, abbreviatedTopicName): void {
+      {name, abbreviatedTopicName, category, description}): void {
     let postData: ITopicCreationBackend = {
-      name: topicName,
-      abbreviated_name: abbreviatedTopicName
+      name,
+      abbreviated_name: abbreviatedTopicName,
+      category,
+      description,
     };
     this.http.post(
       '/topic_editor_handler/create_new', postData).toPromise()
@@ -56,9 +58,9 @@ export class TopicCreationBackendApiService {
   }
 
   createTopic(
-      topicName: string, abbreviatedTopicName: string): PromiseLike<Object> {
+      topicObject): PromiseLike<Object> {
     return new Promise((resolve, reject) => {
-      this._createTopic(resolve, reject, topicName, abbreviatedTopicName);
+      this._createTopic(resolve, reject, topicObject);
     });
   }
 }

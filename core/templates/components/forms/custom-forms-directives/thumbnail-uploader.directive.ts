@@ -26,6 +26,9 @@ require('services/alerts.service.ts');
 require('services/context.service.ts');
 require('services/csrf-token.service.ts');
 require('services/image-upload-helper.service.ts');
+require(
+  'pages/topics-and-skills-dashboard-page/' +
+    'topics-and-skills-dashboard-page.service');
 
 angular.module('oppia').directive('thumbnailUploader', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -49,13 +52,14 @@ angular.module('oppia').directive('thumbnailUploader', [
         'thumbnail-uploader.directive.html'),
       controller: ['$rootScope', '$scope', '$uibModal',
         'AlertsService', 'ContextService', 'CsrfTokenService',
-        'ImageUploadHelperService',
+        'ImageUploadHelperService', 'TopicsAndSkillsDashboardPageService',
         function($rootScope, $scope, $uibModal,
             AlertsService, ContextService, CsrfTokenService,
-            ImageUploadHelperService) {
+            ImageUploadHelperService, TopicsAndSkillsDashboardPageService) {
           var placeholderImageDataUrl = (
             UrlInterpolationService.getStaticImageUrl(
               '/icons/story-image-icon.png'));
+          var entityId = null;
           var uploadedImage = null;
           $scope.thumbnailIsLoading = false;
           // $watch is required here to update the thumbnail image
@@ -69,14 +73,18 @@ angular.module('oppia').directive('thumbnailUploader', [
           // 1. Initial render of the page containing this directive.
           // 2. When a thumbnail is uploaded.
           // 3. When a saved draft is discarded.
-          $scope.$watch('getFilename()', function(filename) {
+          $scope.$watch('getFilename()', (filename) => {
             if (filename) {
-              $scope.editableThumbnailDataUrl = (
+              var entityType = ContextService.getEntityType();
+              if (entityType === 'topics_and_skills_dashboard') {
+                entityType = 'topic';
+              }
+                $scope.editableThumbnailDataUrl = (
                 ImageUploadHelperService
                   .getTrustedResourceUrlForThumbnailFilename(
                     $scope.getFilename(),
-                    ContextService.getEntityType(),
-                    ContextService.getEntityId()));
+                    entityType,
+                    entityId || ContextService.getEntityId()));
               uploadedImage = $scope.editableThumbnailDataUrl;
             } else {
               $scope.editableThumbnailDataUrl = placeholderImageDataUrl;
@@ -135,13 +143,23 @@ angular.module('oppia').directive('thumbnailUploader', [
               }));
               var imageUploadUrlTemplate = '/createhandler/imageupload/' +
                 '<entity_type>/<entity_id>';
-              CsrfTokenService.getTokenAsync().then(function(token) {
+              CsrfTokenService.getTokenAsync().then(async(token) => {
                 form.append('csrf_token', token);
+                var entityType = ContextService.getEntityType();
+
+                if (entityType === 'topics_and_skills_dashboard') {
+                  console.log('Called thumbnail api');
+                  await TopicsAndSkillsDashboardPageService.getNewTopicId().then((res) => {
+                    entityId = res;
+                  });
+                  entityType = 'topic';
+                }
+
                 $.ajax({
                   url: UrlInterpolationService.interpolateUrl(
                     imageUploadUrlTemplate, {
-                      entity_type: ContextService.getEntityType(),
-                      entity_id: ContextService.getEntityId()
+                      entity_type: entityType,
+                      entity_id: entityId || ContextService.getEntityId()
                     }
                   ),
                   data: form,
@@ -158,8 +176,9 @@ angular.module('oppia').directive('thumbnailUploader', [
                   $scope.editableThumbnailDataUrl = (
                     ImageUploadHelperService
                       .getTrustedResourceUrlForThumbnailFilename(
-                        data.filename, ContextService.getEntityType(),
-                        ContextService.getEntityId()));
+                        data.filename, entityType,
+                        entityId || ContextService.getEntityId()));
+                  console.log('Url is ', $scope.editableThumbnailDataUrl );
                   callback();
                 }).fail(function(data) {
                   // Remove the XSSI prefix.
@@ -296,6 +315,7 @@ angular.module('oppia').directive('thumbnailUploader', [
                   ImageUploadHelperService.generateImageFilename(
                     dimensions.height, dimensions.width, 'svg'));
                 saveThumbnailImageData(data.newThumbnailDataUrl, function() {
+                  console.log('Inside callback');
                   uploadedImage = data.newThumbnailDataUrl;
                   $scope.updateFilename(tempImageName);
                   saveThumbnailBgColor(data.newBgColor);

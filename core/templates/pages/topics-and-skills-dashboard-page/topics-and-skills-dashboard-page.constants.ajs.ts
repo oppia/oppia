@@ -39,3 +39,13 @@ angular.module('oppia').constant(
 angular.module('oppia').constant(
   'SKILL_DESCRIPTION_STATUS_VALUES',
   TopicsAndSkillsDashboardPageConstants.SKILL_DESCRIPTION_STATUS_VALUES);
+
+angular.module('oppia').constant(
+  'TOPIC_CATEGORIES',
+  TopicsAndSkillsDashboardPageConstants.TOPIC_CATEGORIES);
+angular.module('oppia').constant(
+  'ESortOptions',
+  TopicsAndSkillsDashboardPageConstants.ESortOptions);
+angular.module('oppia').constant(
+  'EPublishedOptions',
+  TopicsAndSkillsDashboardPageConstants.EPublishedOptions);

@@ -22,6 +22,12 @@ require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 require('services/alerts.service.ts');
 require(
   'components/forms/custom-forms-directives/thumbnail-uploader.directive.ts');
+require('services/image-upload-helper.service.ts');
+require(
+  'components/forms/custom-forms-directives/select2-dropdown.directive.ts');
+require('domain/topic/topic-update.service.ts');
+// require(
+//     'components/forms/custom-forms-directives/select2-dropdown.directive.ts');
 
 // TODO(#9186): Change variable name to 'constants' once this file
 // is migrated to Angular.
@@ -30,14 +36,18 @@ const topicConstants = require('constants.ts');
 angular.module('oppia').factory('TopicCreationService', [
   '$rootScope', '$uibModal', '$window', 'AlertsService',
   'TopicCreationBackendApiService', 'UrlInterpolationService',
+  'TopicUpdateService',
   'EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED',
-  'MAX_CHARS_IN_TOPIC_NAME', function(
+  'MAX_CHARS_IN_TOPIC_NAME', 'MAX_CHARS_IN_TOPIC_DESCRIPTION', 'TOPIC_CATEGORIES', function(
       $rootScope, $uibModal, $window, AlertsService,
       TopicCreationBackendApiService, UrlInterpolationService,
+      TopicUpdateService,
       EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED,
-      MAX_CHARS_IN_TOPIC_NAME) {
+      MAX_CHARS_IN_TOPIC_NAME, MAX_CHARS_IN_TOPIC_DESCRIPTION, TOPIC_CATEGORIES) {
     var TOPIC_EDITOR_URL_TEMPLATE = '/topic_editor/<topic_id>';
     var topicCreationInProgress = false;
+    var newTopicId = 'topic1234';
+
 
     return {
       createNewTopic: function() {
@@ -51,34 +61,56 @@ angular.module('oppia').factory('TopicCreationService', [
           backdrop: true,
           controller: [
             '$scope', '$uibModalInstance', 'TopicEditorStateService',
+            'ALL_CATEGORIES',
             function($scope, $uibModalInstance, TopicEditorStateService) {
+              $scope.idHasLoaded = false;
+              $scope.newTopicId = newTopicId;
+              $scope.pageHasLoaded = false;
               $scope.topic = TopicEditorStateService.getTopic();
               $scope.topicRights = TopicEditorStateService.getTopicRights();
               $scope.topicNameEditorIsShown = false;
               $scope.editableName = $scope.topic.getName();
               $scope.editableAbbreviatedName = $scope.topic.getAbbreviatedName();
               $scope.editableDescription = $scope.topic.getDescription();
+              $scope.categoryObject = {
+                category: ''
+              };
               $scope.allowedBgColors = (
                 topicConstants.ALLOWED_THUMBNAIL_BG_COLORS.topic);
-
+              $scope.categories = TOPIC_CATEGORIES;
               $scope.editableDescriptionIsEmpty = (
                 $scope.editableDescription === '');
               $scope.topicDescriptionChanged = false;
-
-              $scope.topicName = '';
-              $scope.abbreviatedTopicName = '';
+              $scope.topicObject = {
+                name: '',
+                category: '',
+                description: '',
+              };
+              $scope.updateTopicThumbnailFilename = function(newThumbnailFilename) {
+                if (newThumbnailFilename === $scope.topic.getThumbnailFilename()) {
+                  return;
+                }
+                TopicUpdateService.setTopicThumbnailFilename(
+                  $scope.topic, newThumbnailFilename);
+              };
+              $scope.updateTopicThumbnailBgColor = function(newThumbnailBgColor) {
+                if (newThumbnailBgColor === $scope.topic.getThumbnailBgColor()) {
+                  return;
+                }
+                TopicUpdateService.setTopicThumbnailBgColor(
+                  $scope.topic, newThumbnailBgColor);
+              };
               $scope.MAX_CHARS_IN_TOPIC_NAME = MAX_CHARS_IN_TOPIC_NAME;
+              $scope.MAX_CHARS_IN_TOPIC_DESCRIPTION = MAX_CHARS_IN_TOPIC_DESCRIPTION;
               // No need for a length check below since the topic name input
               // field in the HTML file has the maxlength attribute which
               // disallows the user from entering more than the valid length.
               $scope.isTopicNameValid = function() {
                 return $scope.topicName !== '';
               };
-              $scope.save = function(topicName, abbreviatedTopicName) {
-                $uibModalInstance.close({
-                  topicName: topicName,
-                  abbreviatedTopicName: abbreviatedTopicName
-                });
+              $scope.pageHasLoaded = true;
+              $scope.save = function() {
+                $uibModalInstance.close($scope.topicObject);
               };
               $scope.cancel = function() {
                 $uibModalInstance.dismiss('cancel');
@@ -87,10 +119,10 @@ angular.module('oppia').factory('TopicCreationService', [
           ]
         });
 
-        modalInstance.result.then(function(topic) {
-          if (topic.topicName === '') {
-            throw new Error('Topic name cannot be empty');
-          }
+        modalInstance.result.then(function(topicObject) {
+          // if (topic.topicName === '') {
+          //   throw new Error('Topic name cannot be empty');
+          // }
           topicCreationInProgress = true;
           AlertsService.clearWarnings();
           // $window.open has to be initialized separately since if the 'open
@@ -101,7 +133,7 @@ angular.module('oppia').factory('TopicCreationService', [
           // and filled with URL once the details are fetched from the backend.
           var newTab = $window.open();
           TopicCreationBackendApiService.createTopic(
-            topic.topicName, topic.abbreviatedTopicName).then(
+            topicObject).then(
             function(response) {
               $rootScope.$broadcast(
                 EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED);

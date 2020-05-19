@@ -1,15 +1,15 @@
 <md-card layout="row" class="list-view-item">
   <table class="dashboard-table">
     <colgroup>
-      <col style="width: 8%;">
+      <col style="width: 5%;">
       <col style="width: 35%;">
-      <col style="width: 12%;">
-      <col style="width: 12%;">
-      <col style="width: 12%;">
+      <col style="width: 10%;">
+      <col style="width: 10%;">
+      <col style="width: 10%;">
       <col style="width: 12%;">
     </colgroup>
     <tr>
-      <th ng-repeat="key in TOPIC_HEADINGS"
+      <th ng-repeat="key in $ctrl.TOPIC_HEADINGS"
           class="dashboard-table-headings">
         <p ng-if="key === 'index'"></p>
         <p ng-if="key === 'name'" id="dashboard-table-headings-details">Details</p>
@@ -21,58 +21,52 @@
     </tr>
     <tr ng-repeat="topic in getTopicSummaries() track by $index" class="list-item">
       <td>
-        <[$index+1]>.
+        <[($index + 1 + (getPageNumber()*getItemsPerPage()))]>.
       </td>
       <td>
-        <a class="list-summary protractor-test-topics-list-item">
-          <span class="protractor-test-topic-name"> <[topic.name]> </span>
-          <span> <[topic.description]> </span>
-        </a>
+        <div class="list-summary list-summary-name protractor-test-topics-list-item">
+          <div class="protractor-test-topic-name"><span class="topic-name"><[topic.name]></span></div>
+          <div class="protractor-test-topic-category"><span class="topic-category"><[topic.category]></span></div>
+          <div class="protractor-test-topic-description"><span class="topic-description"><[topic.description]></span></div>
+        </div>
       </td>
-      <td class="text-center">
-        <a class="list-summary">
+      <td>
+        <p class="text-center list-summary">
           <span> <[topic.subtopic_count]> </span>
-        </a>
+        </p>
       </td>
-      <td class="text-center">
-        <a class="list-summary" uib-dropdown>
+      <td >
+        <p class="list-summary text-center" uib-dropdown>
           <span> <[topic.total_skill_count]> </span>
-          <div ng-show="topic.uncategorized_skill_count"
+          <div ng-show="$ctrl.topic.uncategorized_skill_count"
                class="oppia-editor-warnings-indicator oppia-editor-warnings-error-color"
                uib-tooltip="This topic has <[topic.uncategorized_skill_count]> uncategorized skill<[topic.uncategorized_skill_count > 1 ? 's' : '']>." tooltip-placement="bottom">
             <span class="oppia-editor-warnings-count">
               &nbsp;!
             </span>
           </div>
-        </a>
+        </p>
       </td>
-      <td class="text-center">
-        <a class="list-summary">
+      <td>
+        <p class="text-center list-summary">
           <span> <[topic.canonical_story_count]> </span>
-        </a>
+        </p>
       </td>
-      <td class="text-center">
-        <a class="list-summary">
-          <span ng-if="topic.is_published"> Published </span>
-          <span ng-if="!topic.is_published"> Not Published </span>
-          <span class="fas fa-ellipsis-v" ng-click="enableEditOptions()"></span>
-          <div ng-if="showEditOptions">
-            <a ng-href="<[getTopicEditorUrl(topic.id)]>" ng-click="selectTopic(topic.id)" >
+      <td class="text-center topic-list-status">
+          <span class="topic-list-status-text" ng-if="$ctrl.topic.is_published"> Published </span>
+          <span class="topic-list-status-text" ng-if="!$ctrl.topic.is_published"> Not Published </span>
+          <p class="fas fa-ellipsis-v" ng-mouseover="$ctrl.enableEditOptions(topic.id)"></p>
+          <div ng-if="$ctrl.showEditOptions(topic.id)" class="topic-edit-options" ng-mouseleave="$ctrl.enableEditOptions(null)">
+            <a class="topic-edit-options-edit" ng-href="<[$ctrl.getTopicEditorUrl(topic.id)]>">
               <i class="fa fa-pen"></i>
               <span>Edit</span>
             </a>
-            <a ng-if="canDeleteTopic()" ng-click="deleteTopic(topic.id)">
+            <a ng-if="canDeleteTopic()" ng-click="$ctrl.deleteTopic(topic.id)">
               <i class="fas fa-trash-alt"></i>
               <span >Delete</span>
             </a>
           </div>
-        </a>
       </td>
-<!--      <td class="delete-icon">-->
-<!--        <a ng-if="canDeleteTopic()" ng-click="deleteTopic(topic.id)" class="protractor-test-delete-topic-button list-summary">-->
-<!--          <span class="fas fa-trash-alt"></span>-->
-<!--        </a>-->
-<!--      </td>-->
     </tr>
   </table>
 </md-card>
@@ -87,6 +81,40 @@
   topics-list .dashboard-table {
     font-size: 15px;
     width: 100%;
+  }
+  topics-list .topic-list-status {
+    position: relative;
+  }
+  topics-list .topic-list-status-text {
+    display: inline-block;
+    width: 90%;
+    text-align: right;
+  }
+  topics-list .topic-edit-options {
+    background-color: white;
+    border: 1px solid black;
+    display: flex;
+    flex-wrap: wrap;
+    position: absolute;
+    width: 120px;
+    left: 0;
+    top: 10px;
+  }
+  topics-list .topic-edit-options a {
+    display: block;
+    padding: 5px;
+    width: 100%;
+    text-align: left;
+    text-decoration: none;
+  }
+  topics-list .topic-edit-options-edit {
+    border-bottom: 1px solid black;
+  }
+  topics-list .topic-edit-options a:hover,
+  topics-list .topic-edit-options a:visited {
+    color: inherit;
+    background-color: #e6e6e6;
+    text-decoration: none;
   }
 
   topics-list .dashboard-table .dashboard-table-headings {
@@ -103,7 +131,18 @@
     width: 100%;
     text-align: left;
   }
-
+  topics-list .topic-name {
+    font-size: 17px;
+    font-weight: bold;
+  }
+  topics-list .topic-category {
+    margin: 4px 0;
+    font-size: 15px;
+    text-transform: uppercase;
+  }
+  topics-list .topic-description {
+    font-size: 15px;
+  }
   topics-list .list-summary,
   topics-list .list-summary:active,
   topics-list .list-summary:visited {
@@ -114,7 +153,7 @@
   }
 
   topics-list .list-item {
-    height: 120px;
+    height: 140px;
     vertical-align: baseline;
     text-align: left;
   }
@@ -123,21 +162,8 @@
     padding-top: 15px;
   }
 
-  topics-list .delete-icon {
-    border-bottom: 1px solid #fff;
-    padding-left: 0.8vw;
-  }
-
-  topics-list .list-item:hover .delete-icon {
-    background-color: #fff;
-  }
-
   topics-list .list-item:not(:last-child) {
     border-bottom: 1px solid #bbb;
-  }
-
-  topics-list .list-item:hover {
-    background-color: #ededed;
   }
 
   topics-list .oppia-editor-warnings-indicator {

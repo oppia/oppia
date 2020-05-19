@@ -42,7 +42,9 @@ require(
   'components/common-layout-directives/common-elements/' +
   'alert-message.directive.ts');
 require('components/button-directives/create-activity-button.directive.ts');
-
+require(
+  'pages/topics-and-skills-dashboard-page/' +
+    'topics-and-skills-dashboard-page.service');
 require('components/forms/custom-forms-directives/object-editor.directive.ts');
 require(
   'components/common-layout-directives/common-elements/' +
@@ -105,7 +107,7 @@ angular.module('oppia').config([
       'StateImprovementSuggestionService', 'StateObjectFactory',
       'StatesObjectFactory', 'TextInputRulesService', 'UrlInterpolationService',
       'UrlService', 'UserInfoObjectFactory', 'UtilsService',
-      'ValidatorsService', 'WindowDimensionsService', 'WindowRef'];
+      'ValidatorsService', 'WindowDimensionsService', 'WindowRef', 'TopicsAndSkillsDashboardPageService'];
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       if (servicesToProvide.includes(key)) {
         $provide.value(key, value);

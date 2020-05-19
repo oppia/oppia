@@ -305,6 +305,9 @@ import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory';
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
+import {TopicsAndSkillsDashboardPageService} from 'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.service';
+import {SkillCreationBackendApiService} from "domain/skill/skill-creation-backend-api.service";
+import {TopicCreationBackendApiService} from "domain/topic/topic-creation-backend-api.service";
 
 @Injectable({
   providedIn: 'root'
@@ -316,6 +319,7 @@ export class UpgradedServices {
 
     // Topological level: 0.
     upgradedServices['AngularNameService'] = new AngularNameService();
+    upgradedServices['TopicsAndSkillsDashboardPageService'] = new TopicsAndSkillsDashboardPageService();
     upgradedServices['AnswerClassificationResultObjectFactory'] =
       new AnswerClassificationResultObjectFactory();
     upgradedServices['AnswerGroupsCacheService'] =
@@ -438,6 +442,8 @@ export class UpgradedServices {
     // Topological level: 1.
     upgradedServices['AlertsService'] = new AlertsService(
       upgradedServices['LoggerService']);
+    upgradedServices['SkillCreationBackendApiService'] = new SkillCreationBackendApiService(upgradedServices['HttpClient']);
+    upgradedServices['TopicCreationBackendApiService'] = new TopicCreationBackendApiService(upgradedServices['TopicCreationBackendApiService']);
     upgradedServices['BrowserCheckerService'] = new BrowserCheckerService(
       upgradedServices['WindowRef']);
     upgradedServices['ContinueValidationService'] =

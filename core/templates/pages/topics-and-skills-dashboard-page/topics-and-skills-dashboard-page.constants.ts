@@ -18,14 +18,14 @@
 
 enum ESortOptions {
   IncreasingCreatedOn = 'Newly Created',
-      DescresingCreatedOn = 'Oldest Created',
-      IncreasingUpdatedOn = 'Recently Updated',
-      DecresingUpdatedOn = 'Least Updated',
+  DecreasingCreatedOn = 'Oldest Created',
+  IncreasingUpdatedOn = 'Recently Updated',
+  DecreasingUpdatedOn = 'Least Updated',
 }
 
 enum EPublishedOptions {
     Published = 'Published',
-    NotPublished = 'NotPublished'
+    NotPublished = 'Not Published'
 }
 
 export class TopicsAndSkillsDashboardPageConstants {
@@ -41,7 +41,7 @@ export class TopicsAndSkillsDashboardPageConstants {
     STATUS_CHANGED: 'changed',
     STATUS_DISABLED: 'disabled'
   };
-
+  public static TOPIC_CATEGORIES = ['Mathematics'];
   public static ESortOptions = ESortOptions;
   public static EPublishedOptions = EPublishedOptions;
 }

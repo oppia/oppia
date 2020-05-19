@@ -72,7 +72,7 @@ CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC = 'remove_skill_id_from_subtopic'
 CMD_UPDATE_TOPIC_PROPERTY = 'update_topic_property'
 CMD_UPDATE_SUBTOPIC_PROPERTY = 'update_subtopic_property'
 
-CMD_MIGRATE_SUBTOPIC_SCHEMA_TO_LATEST_VERSION = 'migrate_subtopic_schema_to_latest_version' # pylint: disable=line-too-long
+CMD_MIGRATE_SUBTOPIC_SCHEMA_TO_LATEST_VERSION = 'migrate_subtopic_schema_to_latest_version'  # pylint: disable=line-too-long
 
 
 class TopicChange(change_domain.BaseChange):
@@ -441,7 +441,8 @@ class Topic(python_utils.OBJECT):
 
     def __init__(
             self, topic_id, name, abbreviated_name, thumbnail_filename,
-            thumbnail_bg_color, description, canonical_story_references,
+            thumbnail_bg_color, description, category,
+            canonical_story_references,
             additional_story_references, uncategorized_skill_ids,
             subtopics, subtopic_schema_version,
             next_subtopic_id, language_code, version,
@@ -486,7 +487,9 @@ class Topic(python_utils.OBJECT):
         self.thumbnail_filename = thumbnail_filename
         self.thumbnail_bg_color = thumbnail_bg_color
         self.canonical_name = name.lower()
+        print 'here fails', name
         self.description = description
+        self.category = category
         self.canonical_story_references = canonical_story_references
         self.additional_story_references = additional_story_references
         self.uncategorized_skill_ids = uncategorized_skill_ids
@@ -494,10 +497,11 @@ class Topic(python_utils.OBJECT):
         self.subtopic_schema_version = subtopic_schema_version
         self.next_subtopic_id = next_subtopic_id
         self.language_code = language_code
+        self.version = version
+        self.story_reference_schema_version = story_reference_schema_version
         self.created_on = created_on
         self.last_updated = last_updated
         self.version = version
-        self.story_reference_schema_version = story_reference_schema_version
 
     def to_dict(self):
         """Returns a dict representing this Topic domain object.
@@ -512,6 +516,7 @@ class Topic(python_utils.OBJECT):
             'thumbnail_filename': self.thumbnail_filename,
             'thumbnail_bg_color': self.thumbnail_bg_color,
             'description': self.description,
+            'category': self.category,
             'canonical_story_references': [
                 reference.to_dict()
                 for reference in self.canonical_story_references
@@ -660,7 +665,7 @@ class Topic(python_utils.OBJECT):
             list(StoryReference). The list of StoryReference objects in topic.
         """
         return (
-            self.canonical_story_references + self.additional_story_references)
+                self.canonical_story_references + self.additional_story_references)
 
     def get_additional_story_ids(self, include_only_published=False):
         """Returns a list of additional story ids that are part of the topic.
@@ -800,6 +805,11 @@ class Topic(python_utils.OBJECT):
                 'Topic description should be at most %d characters, '
                 'received %s.' % (description_limit, self.description))
 
+        if not isinstance(self.category, python_utils.BASESTRING):
+            raise utils.ValidationError(
+                'Expected category to be a string, received %s'
+                % self.category)
+
         if not isinstance(self.subtopics, list):
             raise utils.ValidationError(
                 'Expected subtopics to be a list, received %s'
@@ -889,7 +899,7 @@ class Topic(python_utils.OBJECT):
                 % self.uncategorized_skill_ids)
 
     @classmethod
-    def create_default_topic(cls, topic_id, name, abbreviated_name):
+    def create_default_topic(cls, topic_id, name, abbreviated_name, description, category):
         """Returns a topic domain object with default values. This is for
         the frontend where a default blank topic would be shown to the user
         when the topic is created for the first time.
@@ -898,13 +908,16 @@ class Topic(python_utils.OBJECT):
             topic_id: str. The unique id of the topic.
             name: str. The initial name for the topic.
             abbreviated_name: str. The abbreviated name for the topic.
+            category: str. The category for the topic.
+            description: str. The description for the topic.
 
         Returns:
             Topic. The Topic domain object with the default values.
         """
+        print name
         return cls(
             topic_id, name, abbreviated_name, None, None,
-            feconf.DEFAULT_TOPIC_DESCRIPTION, [], [], [], [],
+            description, category, [], [], [], [],
             feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION, 1,
             constants.DEFAULT_LANGUAGE_CODE, 0,
             feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION)
@@ -1282,6 +1295,7 @@ class TopicSummary(python_utils.OBJECT):
 
     def __init__(
             self, topic_id, name, canonical_name, language_code, description,
+            category,
             version, canonical_story_count, additional_story_count,
             uncategorized_skill_count, subtopic_count, total_skill_count,
             topic_model_created_on, topic_model_last_updated):
@@ -1311,6 +1325,7 @@ class TopicSummary(python_utils.OBJECT):
         self.id = topic_id
         self.name = name
         self.description = description
+        self.category = category
         self.canonical_name = canonical_name
         self.language_code = language_code
         self.version = version
@@ -1338,6 +1353,11 @@ class TopicSummary(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Expected description to be a string, received %s'
                 % self.description)
+
+        if not isinstance(self.category, python_utils.BASESTRING):
+            raise utils.ValidationError(
+                'Expected category to be a string, received %s'
+                % self.category)
 
         if not isinstance(self.canonical_name, python_utils.BASESTRING):
             raise utils.ValidationError('Canonical name should be a string.')
@@ -1420,6 +1440,7 @@ class TopicSummary(python_utils.OBJECT):
             'name': self.name,
             'language_code': self.language_code,
             'description': self.description,
+            'category': self.category,
             'version': self.version,
             'canonical_story_count': self.canonical_story_count,
             'additional_story_count': self.additional_story_count,

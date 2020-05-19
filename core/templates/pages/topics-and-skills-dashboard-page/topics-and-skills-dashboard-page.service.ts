@@ -16,14 +16,14 @@ export class TopicsAndSkillsDashboardPageService {
     if (keywords) {
       filteredTopics = topicsArray.filter((topic) => {
         return (
-          topic.name.includes(keywords) ||
-          topic.description.includes(keywords));
+          topic.name.toLowerCase().includes(keywords.toLowerCase()) ||
+          topic.description.toLowerCase().includes(keywords.toLowerCase()));
       });
     }
 
     if (category) {
       filteredTopics = filteredTopics.filter((topic) => {
-        return topic.language_code === category;
+        return TopicsAndSkillsDashboardPageConstants.TOPIC_CATEGORIES.includes(topic.category);
       });
     }
 
@@ -45,7 +45,7 @@ export class TopicsAndSkillsDashboardPageService {
           filteredTopics.sort((a, b) => (
             b.topic_model_created_on - a.topic_model_created_on));
           break;
-        case ESortOptions.DecresingUpdatedOn:
+        case ESortOptions.DecreasingUpdatedOn:
           filteredTopics.sort((a, b) =>
             -(b.topic_model_created_on - a.topic_model_created_on));
           break;
@@ -53,7 +53,7 @@ export class TopicsAndSkillsDashboardPageService {
           filteredTopics.sort((a, b) =>
             (b.topic_model_last_updated - a.topic_model_last_updated));
           break;
-        case ESortOptions.DescresingCreatedOn:
+        case ESortOptions.DecreasingCreatedOn:
           filteredTopics.sort((a, b) =>
             -(b.topic_model_last_updated - a.topic_model_last_updated));
       }
@@ -61,7 +61,6 @@ export class TopicsAndSkillsDashboardPageService {
     return filteredTopics;
   }
 }
-
 
 angular.module('oppia').factory(
   'TopicsAndSkillsDashboardPageService',

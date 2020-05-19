@@ -3,51 +3,57 @@
     New Topic
   </h3>
 </div>
-<div>
-  <div>
-    <div><span>Category</span></div>
-    <select>Hello</select>
-  </div>
-  <div>
-    <div><span>Name</span></div>
-    <input type="text" placeholder="Enter topic name">
-  </div>
-  <div>
-    <div><span>Description</span></div>
-    <textarea rows="3" cols="50" type="text" placeholder="Enter description">
-    </textarea>
-  </div>
-  <div>
-    <label class="form-heading-1">Topic Thumbnail</label>
-    <thumbnail-uploader disabled="!topicRights.canEditTopic()"
-                        filename="topic.getThumbnailFilename()"
-                        update-filename="updateTopicThumbnailFilename"
-                        bg-color="topic.getThumbnailBgColor()"
-                        update-bg-color="updateTopicThumbnailBgColor"
-                        allowed-bg-colors="allowedBgColors"
-                        aspect-ratio="'4:3'"
-                        preview-title="editableName"
-                        preview-description=""
-                        preview-description-bg-color="'#2F6687'"
-                        preview-footer="topic.getCanonicalStoryIds().length + ' Lessons'">
-    </thumbnail-uploader>
-  </div>
-</div>
-
-<form ng-submit="save(topicName, abbreviatedTopicName)">
-  <div class="modal-body new-topic-name-editor">
-    <div class="form-group row" ng-class="{'has-error': !isTopicNameValid()}">
-      <label class="col-sm-6 col-form-label">Enter a name for the topic: &nbsp;</label>
-      <div class="col-sm-6 topic-name-field">
-        <input class="form-control protractor-test-new-topic-name-field" ng-model="topicName" maxlength="<[MAX_CHARS_IN_TOPIC_NAME]>" autofocus>
-        <span class="oppia-input-box-subtitle">
-          <i>
-            Topic name should be at most <[MAX_CHARS_IN_TOPIC_NAME]> characters.
-          </i>
-        </span>
+<form ng-submit="save()">
+  <div class="modal-body create-new-topic-form">
+    <div class="create-new-topic-input-field">
+      <div><span class="create-new-topic-input-label">Category</span></div>
+      <div ng-if="pageHasLoaded">
+        <select2-dropdown
+                item="topicObject.category"
+                choices="categories"
+                on-selection-change="saveCategory(topicObject.category)"
+                placeholder="Choose a category"
+                width="60%"
+        ></select2-dropdown>
       </div>
     </div>
+    <div class="create-new-topic-input-field" ng-class="{'has-error': !isTopicNameValid()}">
+      <div><span class="create-new-topic-input-label">Name</span></div>
+      <input class="protractor-test-new-topic-name-field" ng-model="topicObject.name" maxlength="<[MAX_CHARS_IN_TOPIC_NAME]>">
+      <div class="oppia-input-box-subtitle">
+        <i>
+          Topic name should be at most <[MAX_CHARS_IN_TOPIC_NAME]> characters.
+        </i>
+      </div>
+      </div>
+    <div class="create-new-topic-input-field">
+      <div><span class="create-new-topic-input-label">Description</span></div>
+      <textarea rows="4" cols="50" placeholder="Enter description" maxlength="<[MAX_CHARS_IN_TOPIC_DESCRIPTION]>"
+                ng-model="topicObject.description">
+      </textarea>
+      <div class="oppia-input-box-subtitle">
+      <i>
+        Topic name should be at most <[MAX_CHARS_IN_TOPIC_DESCRIPTION]> characters.
+      </i>
+    </div>
+    </div>
+    <div class="create-new-topic-input-field">
+        <label class="create-new-topic-input-label">Topic Thumbnail</label>
+        <thumbnail-uploader
+                filename="topic.getThumbnailFilename()"
+                update-filename="updateTopicThumbnailFilename"
+                bg-color="topic.getThumbnailBgColor()"
+                update-bg-color="updateTopicThumbnailBgColor"
+                allowed-bg-colors="allowedBgColors"
+                aspect-ratio="'4:3'"
+                preview-title="editableName"
+                preview-description=""
+                preview-description-bg-color="'#2F6687'"
+                >
+        </thumbnail-uploader>
+      </div>
   </div>
+
   <div class="modal-footer">
     <button class="btn btn-secondary" ng-click="cancel()" type="button">Cancel</button>
     <button class="btn btn-success protractor-test-confirm-topic-creation-button" type="submit" ng-disabled="!isTopicNameValid()">
@@ -56,16 +62,27 @@
   </div>
 </form>
 <style>
-  .new-topic-name-editor .form-text {
-    margin-left: 37.5%;
-    margin-top: -3%;
+  .create-new-topic-input-field {
+     margin: 10px 0;
   }
-  .new-topic-name-editor .topic-name-field {
-    height: 35px;
-    margin-left: -15%;
+  .create-new-topic-input-field input, .create-new-topic-input-field textarea,.create-new-topic-input-field select {
+    border: 1px solid #b9b5b5;
+    border-radius: 5px;
+  }
+  .create-new-topic-input-label {
+    font-weight: bold;
   }
 
-  .new-topic-name-editor input {
-    width: 130%;
-  }
+  /*.new-topic-name-editor .form-text {*/
+  /*  margin-left: 37.5%;*/
+  /*  margin-top: -3%;*/
+  /*}*/
+  /*.new-topic-name-editor .topic-name-field {*/
+  /*  height: 35px;*/
+  /*  margin-left: -15%;*/
+  /*}*/
+
+  /*.new-topic-name-editor input {*/
+  /*  width: 100%;*/
+  /*}*/
 </style>

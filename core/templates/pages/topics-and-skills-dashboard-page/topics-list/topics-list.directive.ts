@@ -34,39 +34,34 @@ angular.module('oppia').directive('topicsList', [
       restrict: 'E',
       scope: {
         getTopicSummaries: '&topicSummaries',
+        getPageNumber: '&pageNumber',
+        getItemsPerPage: '&itemsPerPage',
         canDeleteTopic: '&userCanDeleteTopic',
         selectedTopicIds: '='
       },
+      controllerAs: '$ctrl',
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/topics-and-skills-dashboard-page/topics-list/' +
         'topics-list.directive.html'),
       controller: [
-        '$scope', '$uibModal', '$rootScope', 'EditableTopicBackendApiService',
+        '$uibModal', '$rootScope', 'EditableTopicBackendApiService',
         'AlertsService', 'EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED',
         function(
-            $scope, $uibModal, $rootScope, EditableTopicBackendApiService,
+            $uibModal, $rootScope, EditableTopicBackendApiService,
             AlertsService, EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED) {
           var ctrl = this;
-          $scope.getTopicEditorUrl = function(topicId) {
+          ctrl.getTopicEditorUrl = function(topicId) {
             return '/topic_editor/' + topicId;
           };
-
-          $scope.selectTopic = function(topicId) {
-            if ($scope.selectedTopicIds) {
-              if ($scope.selectedTopicIds.indexOf(topicId) === -1) {
-                $scope.selectedTopicIds.push(topicId);
-              }
-            }
+          ctrl.showEditOptions = function(topicId) {
+            return ctrl.selectedIndex === topicId;
           };
 
-          $scope.enableEditOptions = function() {
-            console.log('Setting to true');
-            console.log($scope.showEditOptions);
-            $scope.showEditOptions = true;
-            console.log($scope.showEditOptions);
+          ctrl.enableEditOptions = function(topicId) {
+            ctrl.selectedIndex = topicId;
           };
 
-          $scope.deleteTopic = function(topicId) {
+          ctrl.deleteTopic = function(topicId) {
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/topics-and-skills-dashboard-page/templates/' +
@@ -92,10 +87,10 @@ angular.module('oppia').directive('topicsList', [
           };
 
           ctrl.$onInit = function() {
-            $scope.showEditOptions = false;
+            ctrl.selectedIndex = null;
             // As additional stories are not supported initially, it's not
             // being shown, for now.
-            $scope.TOPIC_HEADINGS = [
+            ctrl.TOPIC_HEADINGS = [
               'index', 'name', 'canonical_story_count', 'subtopic_count',
               'skill_count', 'topic_status'
             ];
