@@ -20,8 +20,10 @@ import 'core-js/es7/reflect';
 import 'zone.js';
 
 angular.module('oppia', [
-  'headroom', require('angular-cookies'), 'ngTouch', 'ngSanitize',
-  'pascalprecht.translate', 'toastr', 'ui.bootstrap'
+  'dndLists', 'headroom', 'infinite-scroll', 'ngAnimate',
+  'ngAudio', require('angular-cookies'), 'ngJoyRide', 'ngMaterial',
+  'ngSanitize', 'ngTouch', 'pascalprecht.translate',
+  'toastr', 'ui.bootstrap', 'ui.sortable', 'ui.tree', 'ui.validate',
 ]);
 
 import { Component, NgModule, StaticProvider } from '@angular/core';
