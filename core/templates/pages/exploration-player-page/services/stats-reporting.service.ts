@@ -62,36 +62,37 @@ export class StatsReportingService {
       private siteAnalyticsService: SiteAnalyticsService,
       private stopwatchObjectFactory: StopwatchObjectFactory,
       private urlInterpolationService: UrlInterpolationService) {
-    this.editorPreviewMode = (
+    StatsReportingService.editorPreviewMode = (
       this.contextService.isInExplorationEditorPage());
-    this.questionPlayerMode = this.contextService.isInQuestionPlayerMode();
+    StatsReportingService.questionPlayerMode = (
+      this.contextService.isInQuestionPlayerMode());
     this.refreshAggregatedStats();
   }
 
-  explorationId: string = null;
-  explorationTitle: string = null;
-  explorationVersion: number = null;
-  sessionId: string = null;
-  stateStopwatch: Stopwatch = null;
-  optionalCollectionId: string = null;
-  statesVisited: Set<string> = new Set();
-  explorationStarted: boolean = false;
-  explorationActuallyStarted: boolean = false;
-  explorationIsComplete: boolean = false;
-  currentStateName: string = null;
-  nextExpId: string = null;
-  previousStateName: string = null;
-  nextStateName: string = null;
-  private editorPreviewMode: boolean = null;
-  private questionPlayerMode: boolean = null;
+  static explorationId: string = null;
+  static explorationTitle: string = null;
+  static explorationVersion: number = null;
+  static sessionId: string = null;
+  static stateStopwatch: Stopwatch = null;
+  static optionalCollectionId: string = null;
+  static statesVisited: Set<string> = new Set();
+  static explorationStarted: boolean = false;
+  static explorationActuallyStarted: boolean = false;
+  static explorationIsComplete: boolean = false;
+  static currentStateName: string = null;
+  static nextExpId: string = null;
+  static previousStateName: string = null;
+  static nextStateName: string = null;
+  private static editorPreviewMode: boolean = null;
+  private static questionPlayerMode: boolean = null;
 
   // The following dict will contain all stats data accumulated over the
   // interval time and will be reset when the dict is sent to backend for
   // recording.
-  aggregatedStats: IAggregatedStats = null;
+  static aggregatedStats: IAggregatedStats = null;
 
   private refreshAggregatedStats(): void {
-    this.aggregatedStats = {
+    StatsReportingService.aggregatedStats = {
       num_starts: 0,
       num_completions: 0,
       num_actual_starts: 0,
@@ -100,10 +101,12 @@ export class StatsReportingService {
   }
 
   private createDefaultStateStatsMappingIfMissing(stateName: string): void {
-    if (this.aggregatedStats.state_stats_mapping.hasOwnProperty(stateName)) {
+    if (
+      StatsReportingService.aggregatedStats.state_stats_mapping.hasOwnProperty(
+        stateName)) {
       return;
     }
-    this.aggregatedStats.state_stats_mapping[stateName] = {
+    StatsReportingService.aggregatedStats.state_stats_mapping[stateName] = {
       total_answers_count: 0,
       useful_feedback_count: 0,
       total_hit_count: 0,
@@ -118,22 +121,27 @@ export class StatsReportingService {
     try {
       return this.urlInterpolationService.interpolateUrl(
         ExplorationPlayerConstants.STATS_REPORTING_URLS[urlIdentifier], {
-          exploration_id: this.explorationId
+          exploration_id: StatsReportingService.explorationId
         });
     } catch (e) {
       var additionalInfo = ('\nUndefined exploration id error debug logs:' +
         '\nThe event being recorded: ' + urlIdentifier +
         '\nExploration ID: ' + this.contextService.getExplorationId()
       );
-      if (this.currentStateName) {
-        additionalInfo += ('\nCurrent State name: ' + this.currentStateName);
+      if (StatsReportingService.currentStateName) {
+        additionalInfo += (
+          '\nCurrent State name: ' + StatsReportingService.currentStateName);
       }
-      if (this.nextExpId) {
-        additionalInfo += ('\nRefresher exp id: ' + this.nextExpId);
+      if (StatsReportingService.nextExpId) {
+        additionalInfo += (
+          '\nRefresher exp id: ' + StatsReportingService.nextExpId);
       }
-      if (this.previousStateName && this.nextStateName) {
-        additionalInfo += ('\nOld State name: ' + this.previousStateName +
-          '\nNew State name: ' + this.nextStateName);
+      if (
+        StatsReportingService.previousStateName &&
+        StatsReportingService.nextStateName) {
+        additionalInfo += (
+          '\nOld State name: ' + StatsReportingService.previousStateName +
+          '\nNew State name: ' + StatsReportingService.nextStateName);
       }
       e.message += additionalInfo;
       throw e;
@@ -141,7 +149,8 @@ export class StatsReportingService {
   }
 
   private startStatsTimer(): void {
-    if (!this.editorPreviewMode && !this.questionPlayerMode ) {
+    if (!StatsReportingService.editorPreviewMode &&
+      !StatsReportingService.questionPlayerMode ) {
       setInterval(() => this.postStatsToBackend(), 300000);
     }
   }
@@ -150,13 +159,13 @@ export class StatsReportingService {
   // when a learner starts an exploration, when a learner completes an
   // exploration and also every five minutes.
   private postStatsToBackend(): void {
-    if (this.explorationIsComplete) {
+    if (StatsReportingService.explorationIsComplete) {
       return;
     }
     // TODO(#8038): Move this into a backend-api.service.
     this.http.post(this.getFullStatsUrl('STATS_EVENTS'), {
-      aggregated_stats: this.aggregatedStats,
-      exp_version: this.explorationVersion
+      aggregated_stats: StatsReportingService.aggregatedStats,
+      exp_version: StatsReportingService.explorationVersion
     });
     this.refreshAggregatedStats();
   }
@@ -165,12 +174,12 @@ export class StatsReportingService {
       newExplorationId: string, newExplorationTitle: string,
       newExplorationVersion: number, newSessionId: string,
       collectionId: string): void {
-    this.explorationId = newExplorationId;
-    this.explorationTitle = newExplorationTitle;
-    this.explorationVersion = newExplorationVersion;
-    this.sessionId = newSessionId;
-    this.stateStopwatch = this.stopwatchObjectFactory.create();
-    this.optionalCollectionId = collectionId;
+    StatsReportingService.explorationId = newExplorationId;
+    StatsReportingService.explorationTitle = newExplorationTitle;
+    StatsReportingService.explorationVersion = newExplorationVersion;
+    StatsReportingService.sessionId = newSessionId;
+    StatsReportingService.stateStopwatch = this.stopwatchObjectFactory.create();
+    StatsReportingService.optionalCollectionId = collectionId;
     this.refreshAggregatedStats();
     this.startStatsTimer();
   }
@@ -179,90 +188,94 @@ export class StatsReportingService {
   // The type of params is declared as Object since it can vary depending
   // on the stateName.
   recordExplorationStarted(stateName: string, params: Object): void {
-    if (this.explorationStarted) {
+    if (StatsReportingService.explorationStarted) {
       return;
     }
-    this.aggregatedStats.num_starts += 1;
+    StatsReportingService.aggregatedStats.num_starts += 1;
 
     this.createDefaultStateStatsMappingIfMissing(stateName);
-    this.aggregatedStats.state_stats_mapping[stateName].total_hit_count += 1;
-    this.aggregatedStats.state_stats_mapping[stateName].first_hit_count += 1;
+    StatsReportingService.aggregatedStats.state_stats_mapping[
+      stateName].total_hit_count += 1;
+    StatsReportingService.aggregatedStats.state_stats_mapping[
+      stateName].first_hit_count += 1;
 
     this.postStatsToBackend();
 
-    this.currentStateName = stateName;
+    StatsReportingService.currentStateName = stateName;
     // TODO(#8038): Move this into a backend-api.service.
     this.http.post(this.getFullStatsUrl('EXPLORATION_STARTED'), {
       params: params,
-      session_id: this.sessionId,
+      session_id: StatsReportingService.sessionId,
       state_name: stateName,
-      version: this.explorationVersion
+      version: StatsReportingService.explorationVersion
     });
 
     // TODO(#8038): Move this into a backend-api.service.
     this.http.post(this.getFullStatsUrl('STATE_HIT'), {
       client_time_spent_in_secs: 0.0,
-      exploration_version: this.explorationVersion,
+      exploration_version: StatsReportingService.explorationVersion,
       new_state_name: stateName,
       old_params: params,
-      session_id: this.sessionId,
+      session_id: StatsReportingService.sessionId,
     });
 
     this.messengerService.sendMessage(
       this.messengerService.EXPLORATION_LOADED, {
-        explorationVersion: this.explorationVersion,
-        explorationTitle: this.explorationTitle
+        explorationVersion: StatsReportingService.explorationVersion,
+        explorationTitle: StatsReportingService.explorationTitle
       });
 
-    this.statesVisited.add(stateName);
+    StatsReportingService.statesVisited.add(stateName);
     this.siteAnalyticsService.registerNewCard(1);
 
-    this.stateStopwatch.reset();
-    this.explorationStarted = true;
+    StatsReportingService.stateStopwatch.reset();
+    StatsReportingService.explorationStarted = true;
   }
 
   recordExplorationActuallyStarted(stateName: string): void {
-    if (this.explorationActuallyStarted) {
+    if (StatsReportingService.explorationActuallyStarted) {
       return;
     }
-    this.aggregatedStats.num_actual_starts += 1;
-    this.currentStateName = stateName;
+    StatsReportingService.aggregatedStats.num_actual_starts += 1;
+    StatsReportingService.currentStateName = stateName;
     // TODO(#8038): Move this into a backend-api.service.
     this.http.post(this.getFullStatsUrl('EXPLORATION_ACTUALLY_STARTED'), {
-      exploration_version: this.explorationVersion,
+      exploration_version: StatsReportingService.explorationVersion,
       state_name: stateName,
-      session_id: this.sessionId
+      session_id: StatsReportingService.sessionId
     });
 
     this.playthroughService.recordExplorationStartAction(stateName);
-    this.explorationActuallyStarted = true;
+    StatsReportingService.explorationActuallyStarted = true;
   }
 
   recordSolutionHit(stateName: string): void {
     this.createDefaultStateStatsMappingIfMissing(stateName);
-    this.aggregatedStats.state_stats_mapping[
+    StatsReportingService.aggregatedStats.state_stats_mapping[
       stateName].num_times_solution_viewed += 1;
-    this.currentStateName = stateName;
+    StatsReportingService.currentStateName = stateName;
     // TODO(#8038): Move this into a backend-api.service.
     this.http.post(this.getFullStatsUrl('SOLUTION_HIT'), {
-      exploration_version: this.explorationVersion,
+      exploration_version: StatsReportingService.explorationVersion,
       state_name: stateName,
-      session_id: this.sessionId,
-      time_spent_in_state_secs: this.stateStopwatch.getTimeInSecs()
+      session_id: StatsReportingService.sessionId,
+      time_spent_in_state_secs: (
+        StatsReportingService.stateStopwatch.getTimeInSecs())
     });
   }
 
   recordLeaveForRefresherExp(
       stateName: string, refresherExpId: string): void {
-    this.currentStateName = stateName;
-    this.nextExpId = refresherExpId;
+    StatsReportingService.currentStateName = stateName;
+    StatsReportingService.nextExpId = refresherExpId;
     // TODO(#8038): Move this into a backend-api.service.
     this.http.post(this.getFullStatsUrl('LEAVE_FOR_REFRESHER_EXP'), {
-      exploration_version: this.explorationVersion,
+      exploration_version: StatsReportingService.explorationVersion,
       refresher_exp_id: refresherExpId,
       state_name: stateName,
-      session_id: this.sessionId,
-      time_spent_in_state_secs: this.stateStopwatch.getTimeInSecs()
+      session_id: StatsReportingService.sessionId,
+      time_spent_in_state_secs: (
+        StatsReportingService.stateStopwatch.getTimeInSecs())
     });
   }
 
@@ -273,75 +286,80 @@ export class StatsReportingService {
       oldStateName: string, newStateName: string, answer: string,
       oldParams: Object, isFirstHit: boolean): void {
     this.createDefaultStateStatsMappingIfMissing(newStateName);
-    this.aggregatedStats.state_stats_mapping[
+    StatsReportingService.aggregatedStats.state_stats_mapping[
       newStateName].total_hit_count += 1;
     if (isFirstHit) {
-      this.aggregatedStats.state_stats_mapping[
+      StatsReportingService.aggregatedStats.state_stats_mapping[
         newStateName].first_hit_count += 1;
     }
 
-    this.previousStateName = oldStateName;
-    this.nextStateName = newStateName;
+    StatsReportingService.previousStateName = oldStateName;
+    StatsReportingService.nextStateName = newStateName;
     // TODO(#8038): Move this into a backend-api.service.
     this.http.post(this.getFullStatsUrl('STATE_HIT'), {
       // This is the time spent since the last submission.
-      client_time_spent_in_secs: this.stateStopwatch.getTimeInSecs(),
-      exploration_version: this.explorationVersion,
+      client_time_spent_in_secs: (
+        StatsReportingService.stateStopwatch.getTimeInSecs()),
+      exploration_version: StatsReportingService.explorationVersion,
       new_state_name: newStateName,
       old_params: oldParams,
-      session_id: this.sessionId,
+      session_id: StatsReportingService.sessionId,
     });
 
     // Broadcast information about the state transition to listeners.
     this.messengerService.sendMessage(
       this.messengerService.STATE_TRANSITION, {
-        explorationVersion: this.explorationVersion,
+        explorationVersion: StatsReportingService.explorationVersion,
         jsonAnswer: JSON.stringify(answer),
         newStateName: newStateName,
         oldStateName: oldStateName,
         paramValues: oldParams
       });
 
-    if (!this.statesVisited.has(newStateName)) {
-      this.statesVisited.add(newStateName);
-      this.siteAnalyticsService.registerNewCard(this.statesVisited.size);
+    if (!StatsReportingService.statesVisited.has(newStateName)) {
+      StatsReportingService.statesVisited.add(newStateName);
+      this.siteAnalyticsService.registerNewCard(
+        StatsReportingService.statesVisited.size);
     }
 
-    this.stateStopwatch.reset();
+    StatsReportingService.stateStopwatch.reset();
   }
 
   recordStateCompleted(stateName: string): void {
     this.createDefaultStateStatsMappingIfMissing(stateName);
-    this.aggregatedStats.state_stats_mapping[stateName].num_completions += 1;
+    StatsReportingService.aggregatedStats.state_stats_mapping[
+      stateName].num_completions += 1;
 
-    this.currentStateName = stateName;
+    StatsReportingService.currentStateName = stateName;
     // TODO(#8038): Move this into a backend-api.service.
     this.http.post(this.getFullStatsUrl('STATE_COMPLETED'), {
-      exp_version: this.explorationVersion,
+      exp_version: StatsReportingService.explorationVersion,
       state_name: stateName,
-      session_id: this.sessionId,
-      time_spent_in_state_secs: this.stateStopwatch.getTimeInSecs()
+      session_id: StatsReportingService.sessionId,
+      time_spent_in_state_secs: (
+        StatsReportingService.stateStopwatch.getTimeInSecs())
     });
   }
 
   // The type of params is declared as Object since it can vary depending
   // on the stateName.
   recordExplorationCompleted(stateName: string, params: Object): void {
-    this.aggregatedStats.num_completions += 1;
-    this.currentStateName = stateName;
+    StatsReportingService.aggregatedStats.num_completions += 1;
+    StatsReportingService.currentStateName = stateName;
     // TODO(#8038): Move this into a backend-api.service.
     this.http.post(this.getFullStatsUrl('EXPLORATION_COMPLETED'), {
-      client_time_spent_in_secs: this.stateStopwatch.getTimeInSecs(),
-      collection_id: this.optionalCollectionId,
+      client_time_spent_in_secs: (
+        StatsReportingService.stateStopwatch.getTimeInSecs()),
+      collection_id: StatsReportingService.optionalCollectionId,
       params: params,
-      session_id: this.sessionId,
+      session_id: StatsReportingService.sessionId,
       state_name: stateName,
-      version: this.explorationVersion
+      version: StatsReportingService.explorationVersion
     });
 
     this.messengerService.sendMessage(
       this.messengerService.EXPLORATION_COMPLETED, {
-        explorationVersion: this.explorationVersion,
+        explorationVersion: StatsReportingService.explorationVersion,
         paramValues: params
       });
 
@@ -349,10 +367,10 @@ export class StatsReportingService {
 
     this.postStatsToBackend();
     this.playthroughService.recordExplorationQuitAction(
-      stateName, this.stateStopwatch.getTimeInSecs());
+      stateName, StatsReportingService.stateStopwatch.getTimeInSecs());
 
     this.playthroughService.recordPlaythrough(true);
-    this.explorationIsComplete = true;
+    StatsReportingService.explorationIsComplete = true;
   }
 
   // The type of params is declared as Object since it can vary depending
@@ -362,20 +380,21 @@ export class StatsReportingService {
       answerGroupIndex: number, ruleIndex: number,
       classificationCategorization: string, feedbackIsUseful: boolean): void {
     this.createDefaultStateStatsMappingIfMissing(stateName);
-    this.aggregatedStats.state_stats_mapping[
+    StatsReportingService.aggregatedStats.state_stats_mapping[
       stateName].total_answers_count += 1;
     if (feedbackIsUseful) {
-      this.aggregatedStats.state_stats_mapping[
+      StatsReportingService.aggregatedStats.state_stats_mapping[
         stateName].useful_feedback_count += 1;
     }
-    this.currentStateName = stateName;
+    StatsReportingService.currentStateName = stateName;
     // TODO(#8038): Move this into a backend-api.service.
     this.http.post(this.getFullStatsUrl('ANSWER_SUBMITTED'), {
       answer: answer,
       params: params,
-      version: this.explorationVersion,
-      session_id: this.sessionId,
-      client_time_spent_in_secs: this.stateStopwatch.getTimeInSecs(),
+      version: StatsReportingService.explorationVersion,
+      session_id: StatsReportingService.sessionId,
+      client_time_spent_in_secs: (
+        StatsReportingService.stateStopwatch.getTimeInSecs()),
       old_state_name: stateName,
       answer_group_index: answerGroupIndex,
       rule_spec_index: ruleIndex,
@@ -386,21 +405,22 @@ export class StatsReportingService {
   // The type of params is declared as Object since it can vary depending
   // on the stateName.
   recordMaybeLeaveEvent(stateName: string, params: Object): void {
-    this.currentStateName = stateName;
+    StatsReportingService.currentStateName = stateName;
     // TODO(#8038): Move this into a backend-api.service.
     this.http.post(this.getFullStatsUrl('EXPLORATION_MAYBE_LEFT'), {
-      client_time_spent_in_secs: this.stateStopwatch.getTimeInSecs(),
-      collection_id: this.optionalCollectionId,
+      client_time_spent_in_secs: (
+        StatsReportingService.stateStopwatch.getTimeInSecs()),
+      collection_id: StatsReportingService.optionalCollectionId,
       params: params,
-      session_id: this.sessionId,
+      session_id: StatsReportingService.sessionId,
       state_name: stateName,
-      version: this.explorationVersion
+      version: StatsReportingService.explorationVersion
     });
 
     this.postStatsToBackend();
 
     this.playthroughService.recordExplorationQuitAction(
-      stateName, this.stateStopwatch.getTimeInSecs());
+      stateName, StatsReportingService.stateStopwatch.getTimeInSecs());
     this.playthroughService.recordPlaythrough(false);
   }
 
@@ -409,7 +429,7 @@ export class StatsReportingService {
       interactionId: string, answer: string, feedback: string): void {
     this.playthroughService.recordAnswerSubmitAction(
       stateName, destStateName, interactionId, answer, feedback,
-      this.stateStopwatch.getTimeInSecs());
+      StatsReportingService.stateStopwatch.getTimeInSecs());
   }
 }
 angular.module('oppia').factory('StatsReportingService',

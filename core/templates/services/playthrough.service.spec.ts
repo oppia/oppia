@@ -144,7 +144,7 @@ describe('PlaythroughService', () => {
         playthroughService.recordPlaythrough(false);
 
         let postData = {
-          playthrough_data: playthroughService.playthrough.toBackendDict(),
+          playthrough_data: PlaythroughService.playthrough.toBackendDict(),
           issue_schema_version: 1,
           playthrough_id: null
         };
@@ -172,7 +172,7 @@ describe('PlaythroughService', () => {
         playthroughService.recordPlaythrough(false);
 
         let postData = {
-          playthrough_data: playthroughService.playthrough.toBackendDict(),
+          playthrough_data: PlaythroughService.playthrough.toBackendDict(),
           issue_schema_version: 1,
           playthrough_id: null
         };
@@ -216,7 +216,7 @@ describe('PlaythroughService', () => {
         playthroughService.recordPlaythrough(false);
 
         let postData = {
-          playthrough_data: playthroughService.playthrough.toBackendDict(),
+          playthrough_data: PlaythroughService.playthrough.toBackendDict(),
           issue_schema_version: 1,
           playthrough_id: null
         };
@@ -263,7 +263,7 @@ describe('PlaythroughService', () => {
         playthroughService.recordPlaythrough(false);
 
         let postData = {
-          playthrough_data: playthroughService.playthrough.toBackendDict(),
+          playthrough_data: PlaythroughService.playthrough.toBackendDict(),
           issue_schema_version: 1,
           playthrough_id: null
         };
