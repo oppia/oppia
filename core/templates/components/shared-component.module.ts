@@ -28,6 +28,7 @@ import { BackgroundBannerComponent } from
 @NgModule({
   imports: [CommonModule],
   declarations: [BackgroundBannerComponent],
+  entryComponents: [BackgroundBannerComponent],
   exports: [BackgroundBannerComponent]
 })
 
