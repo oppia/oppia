@@ -23,13 +23,13 @@ var forms = require(process.cwd() + '/core/tests/protractor_utils/forms.js');
 //   'title': a string
 //   'content': a function that gives rich text editing instructions
 var customizeComponent = async function(modal, tabArray) {
-  var listEditor = forms.ListEditor(modal);
+  var listEditor = await forms.ListEditor(modal);
 
   await listEditor.setLength(tabArray.length);
   for (var i = 0; i < tabArray.length; i++) {
     var dictionaryEditor = await listEditor.editItem(i, 'Dictionary');
-    await dictionaryEditor.editEntry(0, 'UnicodeString')
-      .setValue(tabArray[i].title);
+    unicodeEditor = await dictionaryEditor.editEntry(0, 'UnicodeString');
+    await unicodeEditor.setValue(tabArray[i].title);
     var richTextEditor = await dictionaryEditor.editEntry(1, 'RichText');
     await richTextEditor.clear();
     await tabArray[i].content(richTextEditor);

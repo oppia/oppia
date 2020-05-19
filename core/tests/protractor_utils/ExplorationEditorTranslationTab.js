@@ -28,60 +28,47 @@ var ExplorationEditorTranslationTab = function() {
   var translationWelcomeModal = element(
     by.css('.protractor-test-translation-tab-welcome-modal'));
 
-  this.exitTutorial = function() {
+  this.exitTutorial = async function() {
     // If the translation welcome modal shows up, exit it.
-    translationWelcomeModal.isPresent().then(function(isVisible) {
-      waitFor.visibilityOf(dismissWelcomeModalButton,
-        'Welcome modal not becoming visible').then(
-        () => {
-          waitFor.elementToBeClickable(
-            dismissWelcomeModalButton,
-            'Welcome modal is taking too long to appear');
-          dismissWelcomeModalButton.click();
-        },
-        (err) => {
-          // Since the welcome modal appears only once, the wait for its
-          // visibilty will only resolve once and timeout the other times.
-          // This is just an empty error function to catch the timeouts that
-          // happen when the the welcome modal has been dismissed once. If
-          // this is not present then protractor uses the default error
-          // function which is not appropriate in this case as this is not an
-          // error.
-        }
-      );
-    });
+    var isVisible = await translationWelcomeModal.isPresent();
+    if (isVisible) {
+      await waitFor.visibilityOf(
+        dismissWelcomeModalButton, 'Welcome modal not becoming visible');
+      await waitFor.elementToBeClickable(
+        dismissWelcomeModalButton,
+        'Welcome modal is taking too long to appear');
+      await dismissWelcomeModalButton.click();
+    }
 
-    waitFor.invisibilityOf(
+    await waitFor.invisibilityOf(
       translationWelcomeModal,
       'Translation welcome modal takes too long to disappear');
 
     // Otherwise, if the translation tutorial shows up, exit it.
-    element.all(by.css('.skipBtn')).then(function(buttons) {
-      if (buttons.length === 1) {
-        buttons[0].click();
-      } else if (buttons.length !== 0) {
-        throw new Error(
-          'Expected to find at most one \'exit tutorial\' button');
-      }
-    });
+    var buttons = await element.all(by.css('.skipBtn'));
+    if (buttons.length === 1) {
+      await buttons[0].click();
+    } else if (buttons.length !== 0) {
+      throw new Error(
+        'Expected to find at most one \'exit tutorial\' button');
+    }
   };
 
-  this.finishTutorial = function() {
+  this.finishTutorial = async function() {
     // Finish the tutorial.
     var finishTutorialButton = element.all(by.buttonText('Finish'));
-    waitFor.elementToBeClickable(
-      finishTutorialButton.first(),
+    await waitFor.elementToBeClickable(
+      await finishTutorialButton.first(),
       'Finish Tutorial Stage button is not clickable');
-    finishTutorialButton.then(function(buttons) {
-      if (buttons.length === 1) {
-        buttons[0].click();
-      } else {
-        throw new Error('There is more than 1 Finish button!');
-      }
-    });
+    var buttons = await finishTutorialButton;
+    if (buttons.length === 1) {
+      await buttons[0].click();
+    } else {
+      throw new Error('There is more than 1 Finish button!');
+    }
   };
 
-  this.playTutorial = function() {
+  this.playTutorial = async function() {
     var tutorialTabHeadings = [
       'Translations In Oppia',
       'Choose Language',
@@ -90,35 +77,35 @@ var ExplorationEditorTranslationTab = function() {
       'Recording Audio',
       'Re-record/Re-upload audio'
     ];
-    tutorialTabHeadings.forEach(function(heading) {
+    for (const heading of tutorialTabHeadings) {
       var tutorialTabHeadingElement = element(by.cssContainingText(
         '.popover-title', heading));
-      waitFor.visibilityOf(
-        tutorialTabHeadingElement, 'Tutorial: ' + heading + 'is not visible');
+      await waitFor.visibilityOf(
+        tutorialTabHeadingElement, 'Tutorial: ' + heading + ' is not visible');
       // Progress to the next instruction in the tutorial.
       var nextTutorialStageButton = element.all(by.css('.nextBtn'));
-      waitFor.elementToBeClickable(
-        nextTutorialStageButton.first(),
+      await waitFor.elementToBeClickable(
+        await nextTutorialStageButton.first(),
         'Next Tutorial Stage button is not clickable');
-      nextTutorialStageButton.then(function(buttons) {
-        if (buttons.length === 1) {
-          buttons[0].click();
-          waitFor.invisibilityOf(
-            tutorialTabHeadingElement,
-            'Tutorial stage takes too long to disappear');
-        } else {
-          throw new Error('There is more than one Next button!');
-        }
-      });
-    });
+      var buttons = await nextTutorialStageButton;
+      if (buttons.length === 1) {
+        await buttons[0].click();
+        await waitFor.invisibilityOf(
+          tutorialTabHeadingElement,
+          'Tutorial stage takes too long to disappear');
+      } else {
+        throw new Error('There is more than one Next button!');
+      }
+    }
   };
 
-  this.startTutorial = function() {
-    waitFor.visibilityOf(
+  this.startTutorial = async function() {
+    await waitFor.visibilityOf(
       translationWelcomeModal,
       'Translation welcome modal takes too long to appear');
-    element(by.css('.protractor-test-translation-tab-start-tutorial')).click();
-    waitFor.visibilityOf(
+    await element(by.css(
+      '.protractor-test-translation-tab-start-tutorial')).click();
+    await waitFor.visibilityOf(
       element(by.css('.ng-joyride-title')),
       'Translation tutorial modal takes too long to appear');
   };
@@ -213,8 +200,8 @@ var ExplorationEditorTranslationTab = function() {
   var translationHintText = function(index) {
     return element(by.css('.protractor-test-hint-' + index + '-text'));
   };
-  var _selectLanguage = function(language) {
-    element(
+  var _selectLanguage = async function(language) {
+    await element(
       by.css('.protractor-test-translation-language-selector')
     ).element(
       by.cssContainingText('option', language)
@@ -288,24 +275,24 @@ var ExplorationEditorTranslationTab = function() {
     waitFor.pageToFullyLoad();
   };
 
-  this.setTranslation = function(richTextInstructions) {
-    waitFor.elementToBeClickable(
+  this.setTranslation = async function(richTextInstructions) {
+    await waitFor.elementToBeClickable(
       editTranslationButtton,
       'editTranslationButtton taking too long to appear to set content');
-    editTranslationButtton.click();
+    await editTranslationButtton.click();
     var stateTranslationEditorTag = element(
       by.tagName('state-translation-editor'));
     var stateTranslationEditor = stateTranslationEditorTag.element(
       by.css('.protractor-test-state-translation-editor'));
-    waitFor.visibilityOf(
+    await waitFor.visibilityOf(
       stateTranslationEditor,
       'stateTranslationEditor taking too long to appear to set content');
-    var richTextEditor = forms.RichTextEditor(stateTranslationEditor);
-    richTextEditor.clear();
-    richTextInstructions(richTextEditor);
-    expect(saveTranslationButton.isDisplayed()).toBe(true);
-    saveTranslationButton.click();
-    waitFor.invisibilityOf(
+    var richTextEditor = await forms.RichTextEditor(stateTranslationEditor);
+    await richTextEditor.clear();
+    await richTextInstructions(richTextEditor);
+    expect(await saveTranslationButton.isDisplayed()).toBe(true);
+    await saveTranslationButton.click();
+    await waitFor.invisibilityOf(
       saveTranslationButton,
       'State translation editor takes too long to disappear');
   };
@@ -388,141 +375,145 @@ var ExplorationEditorTranslationTab = function() {
       });
   };
 
-  this.expectTranslationToMatch = function(richTextInstructions) {
-    forms.expectRichText(translationDisplay).toMatch(richTextInstructions);
+  this.expectTranslationToMatch = async function(richTextInstructions) {
+    await forms.expectRichText(translationDisplay).toMatch(
+      richTextInstructions);
   };
 
-  this.switchToVoiceoverMode = function() {
-    waitFor.elementToBeClickable(
+  this.switchToVoiceoverMode = async function() {
+    await waitFor.elementToBeClickable(
       voiceoverModeButton,
       'Voiceover Mode switch is taking too long to appear');
-    voiceoverModeButton.click();
-    waitFor.pageToFullyLoad();
+    await voiceoverModeButton.click();
+    await waitFor.pageToFullyLoad();
   };
 
-  this.switchToTranslationMode = function() {
-    waitFor.elementToBeClickable(
+  this.switchToTranslationMode = async function() {
+    await waitFor.elementToBeClickable(
       translationModeButton,
       'Translation Mode switch is taking too long to appear');
-    translationModeButton.click();
-    waitFor.pageToFullyLoad();
+    await translationModeButton.click();
+    await waitFor.pageToFullyLoad();
   };
 
-  this.expectToBeInTranslationMode = function() {
-    expect(languageSelectorLabelElement.getText()).toBe(
+  this.expectToBeInTranslationMode = async function() {
+    expect(await languageSelectorLabelElement.getText()).toBe(
       'Translations for language:');
-    expect(progressBarLabelElement.getText()).toBe(
+    expect(await progressBarLabelElement.getText()).toBe(
       'Exploration translation progress:');
-    expect(translationModeButton.getAttribute('class')).toMatch(
+    expect(await translationModeButton.getAttribute('class')).toMatch(
       'oppia-active-mode');
-    expect(voiceoverModeButton.getAttribute('class')).not.toMatch(
+    expect(await voiceoverModeButton.getAttribute('class')).not.toMatch(
       'oppia-active-mode');
   };
 
-  this.expectToBeInVoiceoverMode = function() {
-    expect(languageSelectorLabelElement.getText()).toBe(
+  this.expectToBeInVoiceoverMode = async function() {
+    expect(await languageSelectorLabelElement.getText()).toBe(
       'Voiceovers for language:');
-    expect(progressBarLabelElement.getText()).toBe(
+    expect(await progressBarLabelElement.getText()).toBe(
       'Exploration voiceover progress:');
-    expect(translationModeButton.getAttribute('class')).not.toMatch(
+    expect(await translationModeButton.getAttribute('class')).not.toMatch(
       'oppia-active-mode');
-    expect(voiceoverModeButton.getAttribute('class')).toMatch(
+    expect(await voiceoverModeButton.getAttribute('class')).toMatch(
       'oppia-active-mode');
   };
 
-  this.expectContentTabContentToMatch = function(content) {
-    waitFor.elementToBeClickable(
+  this.expectContentTabContentToMatch = async function(content) {
+    await waitFor.elementToBeClickable(
       contentTabButton, 'Content Tab button is not clickable');
-    contentTabButton.click();
-    expect(contentTabText.getText()).toMatch(content);
+    await contentTabButton.click();
+    expect(await contentTabText.getText()).toMatch(content);
   };
 
-  this.expectFeedbackTabContentsToMatch = function(contents) {
-    waitFor.elementToBeClickable(
+  this.expectFeedbackTabContentsToMatch = async function(contents) {
+    await waitFor.elementToBeClickable(
       feedbackTabButton, 'Feedback Tab button is not clickable');
-    feedbackTabButton.click();
-    expect(feedbackList.count()).toEqual(contents.length);
+    await feedbackTabButton.click();
+    expect(await feedbackList.count()).toEqual(contents.length);
     for (var index in contents) {
-      translationFeedback(index).click();
-      expect(translationFeedbackText(index).getText()).toMatch(contents[index]);
+      await translationFeedback(index).click();
+      expect(await translationFeedbackText(index).getText()).toMatch(
+        contents[index]);
     }
   };
 
-  this.expectHintsTabContentsToMatch = function(contents) {
-    waitFor.elementToBeClickable(
+  this.expectHintsTabContentsToMatch = async function(contents) {
+    await waitFor.elementToBeClickable(
       hintsTabButton, 'Hints Tab button is not clickable');
-    hintsTabButton.click();
+    await hintsTabButton.click();
     for (var index in contents) {
-      translationHint(index).click();
-      expect(translationHintText(index).getText()).toMatch(contents[index]);
+      await translationHint(index).click();
+      expect(await translationHintText(index).getText()).toMatch(
+        contents[index]);
     }
   };
 
-  this.expectSolutionTabContentToMatch = function(content) {
-    waitFor.elementToBeClickable(
+  this.expectSolutionTabContentToMatch = async function(content) {
+    await waitFor.elementToBeClickable(
       solutionTabButton, 'Solution Tab button is not clickable');
-    solutionTabButton.click();
-    expect(solutionTabText.getText()).toMatch(content);
+    await solutionTabButton.click();
+    expect(await solutionTabText.getText()).toMatch(content);
   };
 
-  this.expectNumericalStatusToMatch = function(content) {
-    expect(numericalStatus.getText()).toMatch(content);
+  this.expectNumericalStatusToMatch = async function(content) {
+    expect(await numericalStatus.getText()).toMatch(content);
   };
 
-  this.expectNumericalStatusAccessibilityToMatch = function(content) {
-    expect(numericalStatus.getAttribute('aria-label')).toMatch(content);
+  this.expectNumericalStatusAccessibilityToMatch = async function(content) {
+    expect(await numericalStatus.getAttribute('aria-label')).toMatch(content);
   };
 
-  this.expectContentAccessibilityToMatch = function(content) {
-    expect(translationTabContentAccessibility.getAttribute(
+  this.expectContentAccessibilityToMatch = async function(content) {
+    expect(await translationTabContentAccessibility.getAttribute(
       'aria-label')).toMatch(content);
   };
 
-  this.expectFeedbackAccessibilityToMatch = function(content) {
-    expect(translationTabFeedbackAccessibility.getAttribute(
+  this.expectFeedbackAccessibilityToMatch = async function(content) {
+    expect(await translationTabFeedbackAccessibility.getAttribute(
       'aria-label')).toMatch(content);
   };
 
-  this.expectHintAccessibilityToMatch = function(content) {
-    expect(translationTabHintAccessibility.getAttribute(
+  this.expectHintAccessibilityToMatch = async function(content) {
+    expect(await translationTabHintAccessibility.getAttribute(
       'aria-label')).toMatch(content);
   };
 
-  this.expectSolutionAccessibilityToMatch = function(content) {
-    expect(translationTabSolutionAccessibility.getAttribute(
+  this.expectSolutionAccessibilityToMatch = async function(content) {
+    expect(await translationTabSolutionAccessibility.getAttribute(
       'aria-label')).toMatch(content);
   };
 
-  this.expectStartRecordingAccessibilityToMatch = function(content) {
-    expect(translationTabStartRecordingAccessibility.getAttribute(
+  this.expectStartRecordingAccessibilityToMatch = async function(content) {
+    expect(await translationTabStartRecordingAccessibility.getAttribute(
       'aria-label')).toMatch(content);
   };
 
-  this.expectUploadRecordingAccessibilityToMatch = function(content) {
-    expect(translationTabUploadRecordingAccessibility.getAttribute(
+  this.expectUploadRecordingAccessibilityToMatch = async function(content) {
+    expect(await translationTabUploadRecordingAccessibility.getAttribute(
       'aria-label')).toMatch(content);
   };
 
-  this.expectPlayRecordingAccessibilityToMatch = function(content) {
-    expect(translationTabPlayRecordingAccessibility.getAttribute(
+  this.expectPlayRecordingAccessibilityToMatch = async function(content) {
+    expect(await translationTabPlayRecordingAccessibility.getAttribute(
       'aria-label')).toMatch(content);
   };
 
-  this.changeLanguage = function(language) {
-    _selectLanguage(language);
-    waitFor.pageToFullyLoad();
+  this.changeLanguage = async function(language) {
+    await _selectLanguage(language);
+    await waitFor.pageToFullyLoad();
   };
 
-  this.expectSelectedLanguageToBe = function(language) {
-    expect(selectedLanguageElement.getText()).toMatch(language);
+  this.expectSelectedLanguageToBe = async function(language) {
+    expect(await selectedLanguageElement.getText()).toMatch(language);
   };
 
-  this.navigateToFeedbackTab = function() {
-    waitFor.elementToBeClickable(
+  this.navigateToFeedbackTab = async function() {
+    await general.scrollToTop();
+    await waitFor.elementToBeClickable(
       feedbackTabButton,
       'Feedback tab of translation page is not clickable');
-    feedbackTabButton.click();
-    waitFor.pageToFullyLoad();
+    await feedbackTabButton.click();
+    await waitFor.pageToFullyLoad();
   };
 
   this.expectFeedbackTabToBeActive = function() {
@@ -530,44 +521,42 @@ var ExplorationEditorTranslationTab = function() {
     ).toEqual(element(by.css('.oppia-active-translation-tab'))[0]);
   };
 
-  this.moveToState = function(targetName) {
-    general.scrollToTop();
-    stateNodes.map(function(stateElement) {
+  this.moveToState = async function(targetName) {
+    await general.scrollToTop();
+    var listOfNames = await stateNodes.map(function(stateElement) {
       return stateNodeLabel(stateElement).getText();
-    }).then(function(listOfNames) {
-      var matched = false;
-      for (var i = 0; i < listOfNames.length; i++) {
-        if (listOfNames[i] === targetName) {
-          stateNodes.get(i).click();
-          matched = true;
-        }
-      }
-      if (!matched) {
-        throw new Error(
-          'State ' + targetName + ' not found by editorTranslationTab.' +
-          'moveToState.');
-      }
     });
+    var matched = false;
+    for (var i = 0; i < listOfNames.length; i++) {
+      if (listOfNames[i] === targetName) {
+        await stateNodes.get(i).click();
+        matched = true;
+      }
+    }
+    if (!matched) {
+      throw new Error(
+        'State ' + targetName + ' not found by editorTranslationTab.' +
+        'moveToState.');
+    }
   };
 
-  this.expectCorrectStatusColor = function(stateName, expectedColor) {
-    stateNodes.map(function(stateElement) {
-      return stateNodeLabel(stateElement).getText();
-    }).then(function(listOfNames) {
-      var matched = false;
-      for (var i = 0; i < listOfNames.length; i++) {
-        if (listOfNames[i] === stateName) {
-          expect(stateBackgroundNodes.get(i).getCssValue('fill')).toBe(
-            expectedColor);
-          matched = true;
-        }
-      }
-      if (!matched) {
-        throw new Error(
-          'State ' + targetName +
-          ' not found by editorTranslationTab.expectCorrectStatusColor.');
-      }
+  this.expectCorrectStatusColor = async function(stateName, expectedColor) {
+    var listOfNames = await stateNodes.map(async function(stateElement) {
+      return await stateNodeLabel(stateElement).getText();
     });
+    var matched = false;
+    for (var i = 0; i < listOfNames.length; i++) {
+      if (listOfNames[i] === stateName) {
+        expect(await stateBackgroundNodes.get(i).getCssValue('fill')).toBe(
+          expectedColor);
+        matched = true;
+      }
+    }
+    if (!matched) {
+      throw new Error(
+        'State ' + targetName +
+        ' not found by editorTranslationTab.expectCorrectStatusColor.');
+    }
   };
 };
 exports.ExplorationEditorTranslationTab = ExplorationEditorTranslationTab;

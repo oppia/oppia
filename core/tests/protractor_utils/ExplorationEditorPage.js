@@ -264,11 +264,11 @@ var ExplorationEditorPage = function() {
       navigateToStatsTabButton, 'Stats tab is not clickable');
     await navigateToStatsTabButton.click();
   };
-  this.navigateToTranslationTab = function() {
-    waitFor.elementToBeClickable(
+  this.navigateToTranslationTab = async function() {
+    await waitFor.elementToBeClickable(
       navigateToTranslationTabButton, 'Translation tab is not clickable');
-    navigateToTranslationTabButton.click();
-    waitFor.pageToFullyLoad();
+    await navigateToTranslationTabButton.click();
+    await waitFor.pageToFullyLoad();
   };
 };
 
