@@ -18,12 +18,14 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // library-page.controller.ts is upgraded to Angular 8.
+import { ClassroomBackendApiService } from
+  'domain/classroom/classroom-backend-api.service';
 import { LearnerDashboardActivityIdsObjectFactory } from
   'domain/learner_dashboard/LearnerDashboardActivityIdsObjectFactory';
+import { UpgradedServices } from 'services/UpgradedServices';
+import { UserInfoObjectFactory } from 'domain/user/UserInfoObjectFactory';
 import { WindowDimensionsService } from
   'services/contextual/window-dimensions.service';
-import { UserInfoObjectFactory } from 'domain/user/UserInfoObjectFactory';
-import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
 import { TranslatorProviderForTests } from 'tests/test.extras';
@@ -65,6 +67,7 @@ describe('Library controller', function() {
       $provide.value('WindowDimensionsService', new WindowDimensionsService(
         new WindowRef()
       ));
+      $provide.value('ClassroomBackendApiService', ClassroomBackendApiService);
       $provide.value('UserInfoObjectFactory', new UserInfoObjectFactory());
       $provide.value('PageTitleService', {
         setPageTitle(title) {
