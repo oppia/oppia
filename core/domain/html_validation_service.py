@@ -880,6 +880,26 @@ def get_filename_with_dimensions(old_filename, exp_id):
     return new_filename
 
 
+def add_svg_filename_to_math_rte_components(html_string):
+
+    soup = bs4.BeautifulSoup(
+        html_string.encode(encoding='utf-8'), 'html.parser')
+    for math in soup.findAll(name='oppia-noninteractive-math'):
+        if math.has_attr('raw_latex-with-value'):
+            raw_latex = json.loads(unescape_html(math['raw_latex-with-value']))
+            # Generate an SVG file and filename from the given Latex string.
+            math_expression_contents_dict = {
+                'raw_latex': raw_latex,
+                'svg_filename': ''
+            }
+            # Delete the attribute raw_latex-with-value.
+            del math['raw_latex-with-value']
+            # Add the new attribute math_expression_contents-with-value.
+            math['math_content-with-value'] = escape_html(
+                json.dumps(math_expression_contents_dict, sort_keys=True))
+    return python_utils.UNICODE(soup).replace('<br/>', '<br>')
+
+
 def get_invalid_svg_tags_and_attrs(svg_string):
     """Returns a set of all invalid tags and attributes for the provided SVG.
 

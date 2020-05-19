@@ -40,7 +40,6 @@ from core.platform import models
 import feconf
 import python_utils
 import utils
-
 (exp_models,) = models.Registry.import_models([models.NAMES.exploration])
 
 
@@ -2415,6 +2414,15 @@ class Exploration(python_utils.OBJECT):
 
 
     @classmethod
+    def _convert_states_v33_dict_to_v34_dict(cls, states_dict):
+
+        for key, state_dict in states_dict.items():
+            states_dict[key] = state_domain.State.convert_html_fields_in_state(
+                state_dict, html_validation_service.add_svg_filename_to_math_rte_components)
+
+        return states_dict
+
+    @classmethod
     def update_states_from_model(
             cls, versioned_exploration_states, current_states_schema_version,
             exploration_id):
@@ -2449,7 +2457,7 @@ class Exploration(python_utils.OBJECT):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 38
+    CURRENT_EXP_SCHEMA_VERSION = 39
     LAST_UNTITLED_SCHEMA_VERSION = 9
 
     @classmethod
@@ -3344,6 +3352,16 @@ class Exploration(python_utils.OBJECT):
 
         return exploration_dict
 
+    @classmethod
+    def _convert_v38_dict_to_v39_dict(cls, exploration_dict):
+
+        exploration_dict['schema_version'] = 39
+
+        exploration_dict['states'] = cls._convert_states_v33_dict_to_v34_dict(
+            exploration_dict['states'])
+        exploration_dict['states_schema_version'] = 34
+
+        return exploration_dict
 
     @classmethod
     def _migrate_to_latest_yaml_version(
@@ -3567,6 +3585,11 @@ class Exploration(python_utils.OBJECT):
             exploration_dict = cls._convert_v37_dict_to_v38_dict(
                 exploration_dict)
             exploration_schema_version = 38
+
+        if exploration_schema_version == 38:
+            exploration_dict = cls._convert_v38_dict_to_v39_dict(
+                exploration_dict)
+            exploration_schema_version = 39
 
         return (exploration_dict, initial_schema_version)
 
