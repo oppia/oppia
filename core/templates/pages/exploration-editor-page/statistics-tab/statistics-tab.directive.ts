@@ -70,7 +70,7 @@ angular.module('oppia').directive('statisticsTab', [
             StatesObjectFactory, UrlInterpolationService,
             IMPROVE_TYPE_INCOMPLETE) {
           const ctrl = this;
-          const newCompletionRatePieChartOptions = (title: string) => ({
+          const newCompletionRatePieChartOptions = title => ({
             chartAreaWidth: 240,
             colors: ['#d8d8d8', '#008808', 'blue'],
             height: 270,
@@ -148,7 +148,7 @@ angular.module('oppia').directive('statisticsTab', [
             });
           };
 
-          ctrl.onClickStateInStatsGraph = (stateName: string) => {
+          ctrl.onClickStateInStatsGraph = stateName => {
             if (!ctrl.stateStatsModalIsOpen) {
               ctrl.stateStatsModalIsOpen = true;
               ctrl.showStateStatsModal(
