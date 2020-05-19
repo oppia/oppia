@@ -177,13 +177,11 @@ angular.module('oppia').directive('statisticsTab', [
                 controller: [
                   '$controller', '$scope', '$uibModalInstance', '$filter',
                   'customizationArgs', 'stateName', 'stateStats',
-                  'improvementType', 'visualizationsInfo',
-                  'HtmlEscaperService',
+                  'improvementType', 'visualizationsInfo', 'HtmlEscaperService',
                   function(
                       $controller, $scope, $uibModalInstance, $filter,
                       customizationArgs, stateName, stateStats,
-                      improvementType, visualizationsInfo,
-                      HtmlEscaperService) {
+                      improvementType, visualizationsInfo, HtmlEscaperService) {
                     $controller('ConfirmOrCancelModalController', {
                       $scope: $scope,
                       $uibModalInstance: $uibModalInstance,
