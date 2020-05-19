@@ -62,26 +62,26 @@ describe('Pencil Code Editor Validation Service', () => {
       initial_code: '# Add the initial code snippet here.↵',
     };
     let id = 'feedback_1';
-    let answer_html = '<p>Hello</p>';
-    let content_html = '';
-    let training_data = [];
-    let outcome_for_answer = outcomeObjectFactory.createNew(
-      stateName, id, answer_html, training_data);
+    let answerHtml = '<p>Hello</p>';
+    let contentHtml = '';
+    let trainingData = [];
+    let outcomeForAnswer = outcomeObjectFactory.createNew(
+      stateName, id, answerHtml, trainingData);
     let outcome = outcomeObjectFactory.createNew(
-      stateName, id, content_html, training_data);
+      stateName, id, contentHtml, trainingData);
     let rule = ruleObjectFactory.createNew('CodeEquals', { x: 'hello'});
     let answer = answerGroupObjectFactory.createNew(
-      [rule], outcome_for_answer, [], null);
-    let answer_groups = [answer];
+      [rule], outcomeForAnswer, [], null);
+    let answerGroups = [answer];
     let output = pcevs.getAllWarnings(
-      stateName, customizationArgs, answer_groups, outcome);
+      stateName, customizationArgs, answerGroups, outcome);
     let feedback_not_added = 'Please add feedback for the user ' +
     'in the [All other answers] rule.';
     expect(output[0].message).toBe(feedback_not_added);
    
     let feedbackHtml = '<p>wrong</p>';
     let feedbackOutcome = outcomeObjectFactory.createNew(
-      stateName, id, feedbackHtml, training_data);
+      stateName, id, feedbackHtml, trainingData);
     let feedbackRule = ruleObjectFactory.createNew('CodeEquals', { x: 'hello'});
     let feedbackAnswer = answerGroupObjectFactory.createNew(
       [feedbackRule], feedbackOutcome, [], null);
