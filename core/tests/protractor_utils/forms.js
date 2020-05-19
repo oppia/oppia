@@ -53,19 +53,25 @@ var GraphEditor = function(graphInputContainer) {
       by.css('.protractor-test-Add-Node-button'));
     await addNodeButton.click();
     // Offsetting from the graph container.
-    await browser.actions()
-      .mouseMove(graphInputContainer, {x: xOffset, y: yOffset})
-      .click()
-      .perform();
+    await browser.actions().mouseMove(
+      graphInputContainer, {x: xOffset, y: yOffset}).perform();
+    await browser.actions().click().perform();
   };
 
   var createEdge = async function(vertexIndex1, vertexIndex2) {
     var addEdgeButton = graphInputContainer.element(
       by.css('.protractor-test-Add-Edge-button'));
     await addEdgeButton.click();
-    await browser.actions()
-      .dragAndDrop(vertexElement(vertexIndex1), vertexElement(vertexIndex2))
-      .perform();
+    await browser.actions().mouseMove(
+      vertexElement(vertexIndex1)).perform();
+    await browser.actions().mouseDown().perform();
+    await browser.actions().mouseMove(
+      vertexElement(vertexIndex2)).perform();
+    await browser.actions().mouseUp().perform();
+    // await browser.actions()
+    //   .dragAndDrop(
+    //     vertexElement(vertexIndex1),
+    //     vertexElement(vertexIndex2)).perform();
   };
   return {
     setValue: async function(graphDict) {
@@ -99,7 +105,7 @@ var GraphEditor = function(graphInputContainer) {
       if (nodeCoordinatesList) {
         // Expecting total no. of vertices on the graph matches with the given
         // dict's vertices.
-        for (var i = 0; i < nodeCoordinatesList.count(); i++) {
+        for (var i = 0; i < nodeCoordinatesList.length; i++) {
           expect(await vertexElement(i).isDisplayed()).toBe(true);
         }
       }
@@ -108,7 +114,7 @@ var GraphEditor = function(graphInputContainer) {
         // dict's edges.
         var allEdgesElement = await element.all(by.css(
           '.protractor-test-graph-edge'));
-        expect(allEdges.length).toEqual(edgesList.length);
+        expect(allEdgesElement.length).toEqual(edgesList.length);
       }
     }
   };
@@ -513,7 +519,7 @@ var RichTextChecker = async function(arrayOfElems, arrayOfTexts, fullText) {
     // Additional arguments may be sent to this function, and they will be
     // passed on to the relevant RTE component editor.
     readRteComponent: async function(componentName) {
-      var elem = arrayOfElems[arrayPointer];
+      var elem = await arrayOfElems.get(arrayPointer);
       expect(await elem.getTagName()).
         toBe('oppia-noninteractive-' + componentName.toLowerCase());
       expect(await elem.getText()).toBe(arrayOfTexts[arrayPointer]);
