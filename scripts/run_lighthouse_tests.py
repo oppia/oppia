@@ -25,9 +25,11 @@ import python_utils
 from scripts import common
 from . import install_third_party_libs
 
+
 def setup_and_install_dependencies():
     """Run the setup and installation scripts."""
     install_third_party_libs.main()
+
 
 def delete_reports():
     """manually delete lighthouse reports to handle
