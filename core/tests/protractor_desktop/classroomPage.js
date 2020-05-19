@@ -22,19 +22,27 @@ var users = require('../protractor_utils/users.js');
 var waitFor = require('../protractor_utils/waitFor.js');
 var workflow = require('../protractor_utils/workflow.js');
 
+var AdminPage = require('../protractor_utils/AdminPage.js');
 var ClassroomPage = require('../protractor_utils/ClassroomPage.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
 
 describe('Classroom page functionality', function() {
+  var adminPage = null;
   var classroomPage = null;
   var libraryPage = null;
 
   beforeAll(async function() {
+    adminPage = new AdminPage.AdminPage();
     classroomPage = new ClassroomPage.ClassroomPage();
     libraryPage = new LibraryPage.LibraryPage();
 
     await users.createAndLoginAdminUser(
       'creator@classroomPage.com', 'creatorClassroomPage');
+    await adminPage.editConfigProperty(
+      'Show classroom components.',
+      'Boolean', async function(elem) {
+        await elem.setValue(true);
+      });
   });
 
   beforeEach(async function() {

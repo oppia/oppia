@@ -44,6 +44,11 @@ describe('Classroom page functionality', function() {
 
     await users.createAndLoginAdminUser(
       'creator@classroomPage.com', 'creatorClassroomPage');
+    await adminPage.editConfigProperty(
+      'Show classroom components.',
+      'Boolean', async function(elem) {
+        await elem.setValue(true)
+      });
   });
 
   beforeEach(async function() {
