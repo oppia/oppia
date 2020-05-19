@@ -310,12 +310,24 @@ class Question(python_utils.OBJECT):
         return question_state_dict
 
     @classmethod
-    def _convert_states_v33_dict_to_v34_dict(cls, question_state_dict):
+    def _convert_state_v33_dict_to_v34_dict(cls, question_state_dict):
+        """Converts from version 33 to 34. Version 33 adds a new
+        attribute math RTEs. The new attribute has an additional field to
+        for storing SVG filenames.
 
+        Args:
+            question_state_dict: dict. A dict where each key-value pair
+                represents respectively, a state name and a dict used to
+                initialize a State domain object.
+
+        Returns:
+            dict. The converted question_state_dict.
+        """
         question_state_dict = state_domain.State.convert_html_fields_in_state(
-            question_state_dict, html_validation_service.add_svg_filename_to_math_rte_components)
+            question_state_dict,
+            html_validation_service.add_svg_filename_to_math_rte_components)
 
-        return states_dict
+        return question_state_dict
 
     @classmethod
     def update_state_from_model(

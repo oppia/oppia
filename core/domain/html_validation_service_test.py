@@ -1467,6 +1467,59 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                     exp_id, test_case['html_content']),
                 test_case['expected_output'])
 
+
+    def test_add_svg_filename_to_math_rte_components(self):
+        test_cases = [{
+            'html_content': (
+                '<p>Feedback</p><oppia-noninteractive-math '
+                'raw_latex-with-value="&amp;quot;+,-,-,+&amp;quot;">'
+                '</oppia-noninteractive-math>'
+            ),
+            'expected_output': (
+                '<p>Feedback</p><oppia-noninteractive-'
+                'math math_content-with-value="{&amp;quot'
+                ';raw_latex&amp;quot;: &amp;quot;+,-,-,+'
+                '&amp;quot;, &amp;quot;svg_filename&amp;'
+                'quot;: &amp;quot;&amp;quot;}"></oppia-noninteractive-math>'
+            )
+        }, {
+            'html_content': (
+                '<oppia-noninteractive-math raw_latex-with-value='
+                '"&amp;quot;+,+,+,+&amp;quot;">'
+                '</oppia-noninteractive-math>'
+            ),
+            'expected_output': (
+                '<oppia-noninteractive-math math_content-with-'
+                'value="{&amp;quot;raw_latex&amp;quot;: &amp;'
+                'quot;+,+,+,+&amp;quot;, &amp;quot;'
+                'svg_filename&amp;quot;: &amp;quot;&amp;'
+                'quot;}"></oppia-noninteractive-math>'
+            )
+        }, {
+            'html_content': (
+                '<oppia-noninteractive-math raw_latex-with-value='
+                '"&amp;quot;(x - a_1)(x - a_2)(x - a_3)...(x - '
+                'a_n)&amp;quot;"></oppia-noninteractive-math>'
+            ),
+            'expected_output': (
+                '<oppia-noninteractive-math math_content-with-'
+                'value="{&amp;quot;raw_latex&amp;quot;: &amp;'
+                'quot;(x - a_1)(x - a_2)(x - a_3)...(x - a_n)'
+                '&amp;quot;, &amp;quot;svg_filename&amp;quot;'
+                ': &amp;quot;&amp;quot;}"></oppia-noninteractive-math>'
+            )
+        }, {
+            'html_content': (''),
+            'expected_output': ('')
+        }]
+
+        for test_case in test_cases:
+            self.assertEqual(
+                html_validation_service.add_svg_filename_to_math_rte_components(
+                    test_case['html_content']),
+                test_case['expected_output'])
+
+
     def test_regenerate_image_filename_using_dimensions(self):
         regenerated_name = (
             html_validation_service.regenerate_image_filename_using_dimensions(
