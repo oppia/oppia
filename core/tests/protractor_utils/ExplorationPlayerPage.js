@@ -165,27 +165,27 @@ var ExplorationPlayerPage = function() {
     await gotItButton.click();
   };
 
-  this.clickConfirmRedirectionButton = function() {
-    waitFor.elementToBeClickable(
+  this.clickConfirmRedirectionButton = async function() {
+    await waitFor.elementToBeClickable(
       confirmRedirectionButton,
       '"Confirm Redirect" button takes too long to be clickable');
-    confirmRedirectionButton.click();
-    waitFor.pageToFullyLoad();
+    await confirmRedirectionButton.click();
+    await waitFor.pageToFullyLoad();
   };
 
-  this.clickCancelRedirectionButton = function() {
-    waitFor.elementToBeClickable(
+  this.clickCancelRedirectionButton = async function() {
+    await waitFor.elementToBeClickable(
       cancelRedirectionButton,
       '"Cancel Redirect" button takes too long to be clickable');
-    cancelRedirectionButton.click();
+    await cancelRedirectionButton.click();
   };
 
-  this.clickOnReturnToParentButton = function() {
-    waitFor.elementToBeClickable(
+  this.clickOnReturnToParentButton = async function() {
+    await waitFor.elementToBeClickable(
       returnToParentButton,
       '"Return to Parent" button takes too long to be clickable');
-    returnToParentButton.click();
-    waitFor.pageToFullyLoad();
+    await returnToParentButton.click();
+    await waitFor.pageToFullyLoad();
   };
 
   this.clickOnCloseSuggestionModalButton = async function() {

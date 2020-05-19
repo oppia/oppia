@@ -130,7 +130,7 @@ var CreatorDashboardPage = function() {
 
   this.editExploration = async function(explorationTitle) {
     var elems = await _getExplorationElements(explorationTitle);
-    if (elems.length === 0) {
+    if (await elems.length === 0) {
       throw new Error(
         'Could not find exploration tile with name ' + explorationTitle);
     }
