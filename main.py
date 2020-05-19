@@ -698,6 +698,9 @@ URLS = MAPREDUCE_HANDLERS + [
         feconf.VALIDATE_STORY_EXPLORATIONS_URL_PREFIX,
         story_editor.ValidateExplorationsHandler),
 
+    get_redirect_route(
+        '/classroom_page_status_handler', classroom.ClassroomPageStatusHandler),
+
     get_redirect_route(r'/emaildashboard', email_dashboard.EmailDashboardPage),
     get_redirect_route(
         r'/emaildashboarddatahandler',

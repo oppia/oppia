@@ -32,7 +32,8 @@ class ClassroomPage(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
 
-        if not constants.ENABLE_NEW_STRUCTURE_PLAYERS:
+        if not constants.ENABLE_NEW_STRUCTURE_PLAYERS or not (
+                config_domain.CLASSROOM_PAGE_IS_SHOWN.value):
             raise self.PageNotFoundException
 
         self.render_template('classroom-page.mainpage.html')
@@ -72,3 +73,19 @@ class ClassroomDataHandler(base.BaseHandler):
             'topic_summary_dicts': topic_summary_dicts
         })
         self.render_json(self.values)
+
+
+class ClassroomPageStatusHandler(base.BaseHandler):
+    """The handler for checking whether the classroom page is shown."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    # This prevents partially logged in user from being logged out
+    # during user registration.
+    REDIRECT_UNFINISHED_SIGNUPS = False
+
+    @acl_decorators.open_access
+    def get(self):
+        self.render_json({
+            'classroom_page_is_shown': (
+                config_domain.CLASSROOM_PAGE_IS_SHOWN.value)
+        })

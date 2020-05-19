@@ -44,6 +44,9 @@ describe('Classroom page functionality', function() {
 
     users.createAndLoginAdminUser(
       'creator@classroomPage.com', 'creatorClassroomPage');
+    adminPage.editConfigProperty(
+      'Show classroom components.',
+      'Boolean', (elem) => elem.setValue(true));
   });
 
   beforeEach(function() {

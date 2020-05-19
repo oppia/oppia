@@ -341,3 +341,7 @@ ALWAYS_ASK_LEARNERS_FOR_ANSWER_DETAILS = ConfigProperty(
     'always_ask_learners_for_answer_details', BOOL_SCHEMA,
     'Always ask learners for answer details. For testing -- do not use',
     False)
+
+CLASSROOM_PAGE_IS_SHOWN = ConfigProperty(
+    'classroom_page_is_shown', BOOL_SCHEMA,
+    'Show classroom components.', False)

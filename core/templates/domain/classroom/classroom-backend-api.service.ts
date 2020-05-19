@@ -67,9 +67,31 @@ export class ClassroomBackendApiService {
     });
   }
 
+  _fetchClassroomPageIsShownStatus(
+      successCallback: (value?: Object | PromiseLike<Object>) => void,
+      errorCallback: (reason?: any) => void): void {
+    const classroomStatusHandlerUrl = '/classroom_page_status_handler';
+
+    this.http.get(classroomStatusHandlerUrl).toPromise().then((data: any) => {
+      if (successCallback) {
+        successCallback(data.classroom_page_is_shown);
+      }
+    }, (error: any) => {
+      if (errorCallback) {
+        errorCallback(error);
+      }
+    });
+  }
+
   fetchClassroomData(classroomName: string): Promise<Object> {
     return new Promise((resolve, reject) => {
       this._fetchClassroomData(classroomName, resolve, reject);
+    });
+  }
+
+  fetchClassroomPageIsShownStatus(): Promise<Object> {
+    return new Promise((resolve, reject) => {
+      this._fetchClassroomPageIsShownStatus(resolve, reject);
     });
   }
 }

@@ -49,7 +49,12 @@
           <li class="nav-item"> <a ng-keydown="$ctrl.onMenuKeypress($event, 'aboutMenu', {tab: $ctrl.ACTION_CLOSE})" class="dropdown-item nav-link oppia-navbar-tab-content" href="https://oppiafoundation.org/volunteer" target="_blank" rel="noopener" translate="I18N_TOPNAV_GET_INVOLVED"></a></li>
         </ul>
       </li>
-      <li ng-if="SHOW_CLASSROOM_CALLOUT" ng-class="{'open' : $ctrl.activeMenuName === 'classroomMenu'}" uib-dropdown ng-show="$ctrl.navElementsVisibilityStatus.I18N_TOPNAV_CLASSROOM" aria-hidden="false" class="nav-item  oppia-navbar-clickable-dropdown protractor-test-classroom-oppia-list-item">
+      <li ng-if="$ctrl.CLASSROOM_PAGE_IS_SHOWN"
+          ng-class="{'open' : $ctrl.activeMenuName === 'classroomMenu'}"
+          uib-dropdown
+          ng-show="$ctrl.navElementsVisibilityStatus.I18N_TOPNAV_CLASSROOM"
+          aria-hidden="false"
+          class="nav-item  oppia-navbar-clickable-dropdown protractor-test-classroom-oppia-list-item">
         <a ng-keydown="$ctrl.onMenuKeypress($event, 'classroomMenu', {shiftTab: $ctrl.ACTION_CLOSE, enter: $ctrl.ACTION_OPEN})" class="nav-link oppia-navbar-tab dropdown-toggle"
            role="menuitem"
            aria-haspopup="true"
