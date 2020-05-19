@@ -29,6 +29,8 @@ from core.platform import models
 from core.tests import test_utils
 import feconf
 
+from google.appengine.ext import ndb
+
 (
     activity_models, base_models,
     collection_models, exp_models,
@@ -1844,6 +1846,13 @@ class BaseModelsUserIdsHaveUserSettingsVerificationJobTests(
              .entity_classes_to_map_over())
 
 
+class MockGeneralFeedbackThreadUserModel(
+        feedback_models.GeneralFeedbackThreadUserModel):
+    """Mock GeneralFeedbackThreadUserModel so that it allows empty user_id."""
+
+    user_id = ndb.StringProperty(required=False, indexed=True)
+
+
 class ModelsUserIdsHaveUserSettingsVerificationJobTests(
         test_utils.GenericTestBase):
     """Tests for ModelsUserIdsHaveUserSettingsVerificationJob."""
@@ -1931,10 +1940,6 @@ class ModelsUserIdsHaveUserSettingsVerificationJobTests(
             id='type.id.generated',
             thread_id='thread_id',
             message_id=2).put()
-        feedback_models.GeneralFeedbackThreadUserModel(
-            id='%s.thread_id' % self.USER_1_USER_ID,
-            user_id=self.USER_1_USER_ID,
-            thread_id='thread_id').put()
         topic_models.TopicRightsModel.put_multi([
             topic_models.TopicRightsModel(
                 id='topic_1_id',
@@ -1944,7 +1949,21 @@ class ModelsUserIdsHaveUserSettingsVerificationJobTests(
                 id='topic_2_id',
                 manager_ids=[feconf.SYSTEM_COMMITTER_ID])])
 
-        output = self._run_one_off_job()
+        with self.swap(
+            feedback_models, 'GeneralFeedbackThreadUserModel',
+            MockGeneralFeedbackThreadUserModel
+        ):
+            feedback_models.GeneralFeedbackThreadUserModel(
+                id='%s.thread_id' % self.USER_1_USER_ID,
+                user_id=self.USER_1_USER_ID,
+                thread_id='thread_id').put()
+            feedback_models.GeneralFeedbackThreadUserModel(
+                id='%s.thread_id' % None,
+                user_id=None,
+                thread_id='thread_id').put()
+
+            output = self._run_one_off_job()
+
         self.assertItemsEqual([
             ['SUCCESS - UserSettingsModel', 3],
             ['FAILURE - CompletedActivitiesModel', [self.USER_1_GAE_ID]],
@@ -1955,7 +1974,9 @@ class ModelsUserIdsHaveUserSettingsVerificationJobTests(
             ['FAILURE - UserContributionScoringModel',
              ['%s.%s' % ('category', self.USER_2_GAE_ID)]],
             ['SUCCESS_NONE - GeneralFeedbackMessageModel', 1],
-            ['SUCCESS - GeneralFeedbackThreadUserModel', 1],
+            ['SUCCESS - MockGeneralFeedbackThreadUserModel', 1],
+            ['FAILURE_NONE - MockGeneralFeedbackThreadUserModel',
+             ['None.thread_id']],
             ['FAILURE - TopicRightsModel', ['topic_1_id']],
             ['SUCCESS - TopicRightsModel', 1],
         ], output)

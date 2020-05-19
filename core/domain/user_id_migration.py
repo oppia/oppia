@@ -708,8 +708,8 @@ class BaseModelsUserIdsHaveUserSettingsVerificationJob(
               base_models.USER_ID_MIGRATION_POLICY.COPY_AND_UPDATE_ONE_FIELD):
             if model.user_id is None:
                 yield ('FAILURE_NONE - %s' % model_class.__name__, model.id)
-            if (BaseModelsUserIdsHaveUserSettingsVerificationJob
-                    ._check_id_and_user_id_exist(model.id, model.user_id)):
+            elif (BaseModelsUserIdsHaveUserSettingsVerificationJob
+                  ._check_id_and_user_id_exist(model.id, model.user_id)):
                 yield ('SUCCESS - %s' % model_class.__name__, model.id)
             else:
                 yield ('FAILURE - %s' % model_class.__name__, model.id)
