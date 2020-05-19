@@ -15,6 +15,9 @@
 /core/domain/android_validation_constants*.py @BenHenning
 
 # Angular Migration team
+/core/templates/components/common-layout-directives/common-elements/background-banner.component.html @bansalnitish
+/core/templates/components/common-layout-directives/common-elements/background-banner.component.ts @bansalnitish
+/core/templates/components/shared-component.module.ts @bansalnitish
 /core/templates/services/loader.service*.ts @bansalnitish
 /core/templates/services/contextual/logger.service.ts @bansalnitish
 /core/templates/services/contextual/logger.service.spec.ts @bansalnitish

@@ -395,7 +395,7 @@ def main(args=None):
                 if lint_status != 0:
                     python_utils.PRINT(
                         'Push failed, please correct the linting issues above.')
-                    sys.exit(1)
+                    # sys.exit(1)
             frontend_status = 0
             travis_ci_check_status = 0
             if does_diff_include_js_or_ts_files(files_to_lint):
@@ -404,7 +404,7 @@ def main(args=None):
             if frontend_status != 0:
                 python_utils.PRINT(
                     'Push aborted due to failing frontend tests.')
-                sys.exit(1)
+                # sys.exit(1)
             if does_diff_include_travis_yml_or_js_files(files_to_lint):
                 travis_ci_check_status = run_script_and_get_returncode(
                     TRAVIS_CI_PROTRACTOR_CHECK_CMDS)

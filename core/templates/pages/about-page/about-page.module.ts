@@ -25,7 +25,7 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { RequestInterceptor } from 'services/request-interceptor.service';
-
+import { SharedComponentsModule } from 'components/shared-component.module';
 // This component is needed to force-bootstrap Angular at the beginning of the
 // app.
 @Component({
@@ -43,7 +43,8 @@ import { ObjectsDomainConstants } from
 @NgModule({
   imports: [
     BrowserModule,
-    HttpClientModule
+    HttpClientModule,
+    SharedComponentsModule
   ],
   declarations: [
     ServiceBootstrapComponent
