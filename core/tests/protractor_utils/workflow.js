@@ -204,62 +204,62 @@ var createAndPublishTwoCardExploration = async function(
 // Role management (state editor settings tab)
 
 // Here, 'roleName' is the user-visible form of the role name (e.g. 'Manager').
-var _addExplorationRole = function(roleName, username) {
-  element(by.css('.protractor-test-edit-roles')).click();
-  element(by.css('.protractor-test-role-username')).sendKeys(username);
-  element(by.css('.protractor-test-role-select')).
+var _addExplorationRole = async function(roleName, username) {
+  await element(by.css('.protractor-test-edit-roles')).click();
+  await element(by.css('.protractor-test-role-username')).sendKeys(username);
+  await element(by.css('.protractor-test-role-select')).
     element(by.cssContainingText('option', roleName)).click();
-  element(by.css('.protractor-test-save-role')).click();
+  await element(by.css('.protractor-test-save-role')).click();
 };
 
-var addExplorationManager = function(username) {
-  _addExplorationRole('Manager', username);
+var addExplorationManager = async function(username) {
+  await _addExplorationRole('Manager', username);
 };
 
-var addExplorationCollaborator = function(username) {
-  _addExplorationRole('Collaborator', username);
+var addExplorationCollaborator = async function(username) {
+  await _addExplorationRole('Collaborator', username);
 };
 
-var addExplorationVoiceArtist = function(username) {
-  _addExplorationRole('Voice Artist', username);
+var addExplorationVoiceArtist = async function(username) {
+  await _addExplorationRole('Voice Artist', username);
 };
 
-var addExplorationPlaytester = function(username) {
-  _addExplorationRole('Playtester', username);
+var addExplorationPlaytester = async function(username) {
+  await _addExplorationRole('Playtester', username);
 };
 
 // Here, roleName is the server-side form of the name (e.g. 'owner').
-var _getExplorationRoles = function(roleName) {
+var _getExplorationRoles = async function(roleName) {
   var itemName = roleName + 'Name';
   var listName = roleName + 'Names';
-  return element.all(by.repeater(
+  return await element.all(by.repeater(
     itemName + ' in $ctrl.ExplorationRightsService.' + listName +
     ' track by $index'
-  )).map(function(elem) {
-    return elem.getText();
+  )).map(async function(elem) {
+    return await elem.getText();
   });
 };
 
-var getExplorationManagers = function() {
-  return _getExplorationRoles('owner');
+var getExplorationManagers = async function() {
+  return await _getExplorationRoles('owner');
 };
 
-var getExplorationCollaborators = function() {
-  return _getExplorationRoles('editor');
+var getExplorationCollaborators = async function() {
+  return await _getExplorationRoles('editor');
 };
 
-var getExplorationVoiceArtists = function() {
-  return _getExplorationRoles('voiceArtist');
+var getExplorationVoiceArtists = async function() {
+  return await _getExplorationRoles('voiceArtist');
 };
 
-var getExplorationPlaytesters = function() {
-  return _getExplorationRoles('viewer');
+var getExplorationPlaytesters = async function() {
+  return await _getExplorationRoles('viewer');
 };
 
 var createSkillAndAssignTopic = function(
     skillDescription, material, topicName) {
-  var topicsAndSkillsDashboardPage =
-      new TopicsAndSkillsDashboardPage.TopicsAndSkillsDashboardPage();
+  var topicsAndSkillsDashboardPage = (
+    new TopicsAndSkillsDashboardPage.TopicsAndSkillsDashboardPage());
   topicsAndSkillsDashboardPage.get();
   topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
     skillDescription, material, true);
