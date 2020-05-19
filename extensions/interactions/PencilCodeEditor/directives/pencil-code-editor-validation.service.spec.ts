@@ -56,35 +56,33 @@ describe('Pencil Code Editor Validation Service', () => {
       .toEqual(array);
   });
 
-  it('should evaluate all the warnings.', () => {
-    let array = [];
+  it('should evaluate all the feedbacks warnings.', () => {
     let stateName = 'Introduction';
     let customizationArgs = {
       initial_code: '# Add the initial code snippet here.↵',
     };
-    let id = 'default_outcome';
-    let html = '';
-    let Outcome = outcomeObjectFactory.createNew(stateName, id, html, array);
-    let Rule = ruleObjectFactory.createNew('CodeEquals', { x: 'hello'});
-    let answer = answerGroupObjectFactory.createNew([Rule], Outcome, [], null);
-    let answerGroups = [answer];
+    let id = 'feedback_1';
+    let answer_html = '<p>Hello</p>';
+    let content_html = '';
+    let training_data = []
+    let outcome_for_answer = outcomeObjectFactory.createNew(stateName, id, answer_html, training_data);
+    let outcome = outcomeObjectFactory.createNew(stateName, id, content_html, training_data);
+    let rule = ruleObjectFactory.createNew('CodeEquals', { x: 'hello'});
+    let answer = answerGroupObjectFactory.createNew([rule], outcome_for_answer, [], null);
+    let answer_groups = [answer];
     let output = pcevs.getAllWarnings(
-      stateName, customizationArgs, answerGroups, Outcome);
-    let MessageOne = 'Please specify what ' +
-    'Oppia should do in answer group 1.';
-    let MessageTwo = 'Please add feedback for the user ' +
+      stateName, customizationArgs, answer_groups, outcome);
+    let feedback_not_added = 'Please add feedback for the user ' +
     'in the [All other answers] rule.';
-    expect(output[0].message).toBe(MessageOne);
-    expect(output[1].message).toBe(MessageTwo);
-    html = '<p>wrongs</p>';
-    Outcome = outcomeObjectFactory.createNew(stateName, id, html, array);
-    Rule = ruleObjectFactory.createNew('CodeEquals', { x: 'hello'});
-    answer = answerGroupObjectFactory.createNew([Rule], Outcome, [], null);
-    answerGroups = [answer];
-    output = pcevs.getAllWarnings(
-      stateName, customizationArgs, answerGroups, Outcome);
-    expect(pcevs.getAllWarnings(
-      stateName, customizationArgs, answerGroups,
-      Outcome)).toEqual(array);
+    expect(output[0].message).toBe(feedback_not_added);
+    let feedback_html = '<p>wrong</p>';
+    let feedback_utcome = outcomeObjectFactory.createNew(stateName, id, feedback_html, training_data);
+    let feeback_rule = ruleObjectFactory.createNew('CodeEquals', { x: 'hello'});
+    let feedback_answer = answerGroupObjectFactory.createNew([feeback_rule], feedback_utcome, [], null);
+    let feedback_answer_groups = [feedback_answer];
+    let feedback_output = pcevs.getAllWarnings(
+      stateName, customizationArgs, feedback_answer_groups, feedback_utcome);
+    let feedback_added = [];
+    expect(feedback_output).toEqual(feedback_added);
   });
 });

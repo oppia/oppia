@@ -28,6 +28,14 @@ describe('Exploration Automatic Text To Speech Service', function() {
   let eattss = null;
 
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(function() {
+    angular.mock.module(function($provide) {
+      $provide.value('ExplorationDataService', {
+        autosaveChangeList: function() {}
+      });
+    });
+  });
+  beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
@@ -51,9 +59,22 @@ describe('Exploration Automatic Text To Speech Service', function() {
     expect(eattss.isAutomaticTextToSpeechEnabled()).toBe(false);
   });
 
-  it('should call the saveDisplayedValue function', function() {
-    spyOn(eattss, 'saveDisplayedValue');
+  it('should toggle the Automatic Text-to-speech', function() {
+    var isValidSpy = spyOn(
+      eattss, '_isValid').and.callThrough();
+
+    expect(eattss.isAutomaticTextToSpeechEnabled()).toBeFalsy();
+    
+    eattss.toggleAutomaticTextToSpeech();
+    expect(eattss.isAutomaticTextToSpeechEnabled()).toBe(true);
+    
+    eattss.toggleAutomaticTextToSpeech();
+    expect(eattss.isAutomaticTextToSpeechEnabled()).toBe(false);
+    
+    spyOn(eattss, 'saveDisplayedValue')
     eattss.toggleAutomaticTextToSpeech();
     expect(eattss.saveDisplayedValue).toHaveBeenCalled();
+    
+    expect(isValidSpy).toHaveBeenCalledTimes(2);
   });
 });
