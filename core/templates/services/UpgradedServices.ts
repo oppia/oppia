@@ -286,6 +286,8 @@ import { StateSolicitAnswerDetailsService } from
 import { StateSolutionService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-solution.service';
+import { StateTopAnswersStatsBackendApiService } from
+  'services/state-top-answers-stats-backend-api.service';
 import { StateWrittenTranslationsService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-written-translations.service';
@@ -781,6 +783,10 @@ export class UpgradedServices {
         upgradedServices['AudioTranslationLanguageService']);
     upgradedServices['StoryViewerBackendApiService'] =
       new StoryViewerBackendApiService(
+        upgradedServices['UrlInterpolationService'],
+        upgradedServices['HttpClient']);
+    upgradedServices['StateTopAnswersStatsBackendApiService'] =
+      new StateTopAnswersStatsBackendApiService(
         upgradedServices['UrlInterpolationService'],
         upgradedServices['HttpClient']);
     upgradedServices['TextInputPredictionService'] =
