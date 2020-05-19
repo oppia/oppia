@@ -881,6 +881,17 @@ def get_filename_with_dimensions(old_filename, exp_id):
 
 
 def add_svg_filename_to_math_rte_components(html_string):
+    """Replaces the attribute raw_latex-with-value in all Math RTE tags with
+    a new attribute math_content-with-value. The new attribute has an additional
+    field for storing SVG filenames.
+
+    Args:
+        html_string: str. HTML string to modify.
+
+    Returns:
+        str. Updated HTML string with all Math RTE tags having the new
+        attribute.
+    """
 
     soup = bs4.BeautifulSoup(
         html_string.encode(encoding='utf-8'), 'html.parser')
