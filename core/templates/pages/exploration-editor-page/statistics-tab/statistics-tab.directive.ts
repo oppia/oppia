@@ -36,7 +36,7 @@ require('services/alerts.service.ts');
 require('services/compute-graph.service.ts');
 require('services/date-time-format.service.ts');
 require('services/exploration-features.service.ts');
-require('services/state-rules-stats.service.ts');
+require('services/state-interaction-stats.service.ts');
 require('visualizations/oppia-visualization-bar-chart.directive.ts');
 require(
   'visualizations/oppia-visualization-enumerated-frequency-table.directive.ts');
@@ -60,17 +60,17 @@ angular.module('oppia').directive('statisticsTab', [
         'DateTimeFormatService', 'ExplorationDataService',
         'ExplorationFeaturesService', 'ExplorationStatesService',
         'ReadOnlyExplorationBackendApiService', 'RouterService',
-        'StateImprovementSuggestionService', 'StateRulesStatsService',
-        'StatesObjectFactory', 'UrlInterpolationService',
-        'IMPROVE_TYPE_INCOMPLETE',
+        'StateImprovementSuggestionService',
+        'StateInteractionStatsService', 'StatesObjectFactory',
+        'UrlInterpolationService', 'IMPROVE_TYPE_INCOMPLETE',
         function(
             $http, $scope, $uibModal, AlertsService, ComputeGraphService,
             DateTimeFormatService, ExplorationDataService,
             ExplorationFeaturesService, ExplorationStatesService,
             ReadOnlyExplorationBackendApiService, RouterService,
-            StateImprovementSuggestionService, StateRulesStatsService,
-            StatesObjectFactory, UrlInterpolationService,
-            IMPROVE_TYPE_INCOMPLETE) {
+            StateImprovementSuggestionService,
+            StateInteractionStatsService, StatesObjectFactory,
+            UrlInterpolationService, IMPROVE_TYPE_INCOMPLETE) {
           var ctrl = this;
           var _EXPLORATION_STATS_VERSION_ALL = 'all';
           var stateStatsModalIsOpen = false;
@@ -142,9 +142,9 @@ angular.module('oppia').directive('statisticsTab', [
           ctrl.showStateStatsModal = function(stateName, improvementType) {
             AlertsService.clearWarnings();
 
-            StateRulesStatsService.computeStateRulesStats(
+            StateInteractionStatsService.computeStats(
               ExplorationStatesService.getState(stateName)
-            ).then(function(stateRulesStats) {
+            ).then(stats => {
               $uibModal.open({
                 templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                   '/pages/exploration-editor-page/statistics-tab/templates/' +
@@ -161,7 +161,7 @@ angular.module('oppia').directive('statisticsTab', [
                     return improvementType;
                   },
                   visualizationsInfo: function() {
-                    return stateRulesStats.visualizations_info;
+                    return stats.visualizations_info;
                   }
                 },
                 controller: [
