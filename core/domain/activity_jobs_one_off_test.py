@@ -39,8 +39,13 @@ import python_utils
 
 gae_search_services = models.Registry.import_search_services()
 
-(collection_models, exp_models) = models.Registry.import_models(
-    [models.NAMES.collection, models.NAMES.exploration])
+(
+    collection_models, exp_models,
+    question_models, skill_models,
+    story_models, topic_models) = models.Registry.import_models([
+        models.NAMES.collection, models.NAMES.exploration,
+        models.NAMES.question, models.NAMES.skill,
+        models.NAMES.story, models.NAMES.topic])
 
 
 class ActivityContributorsSummaryOneOffJobTests(test_utils.GenericTestBase):
@@ -523,161 +528,175 @@ class OneOffReindexActivitiesJobTests(test_utils.GenericTestBase):
                 'key', 'value'))
 
 
-class ReplaceAdminIdOneOffJobTests(test_utils.GenericTestBase):
+class RemoveCommitUsernamesOneOffJobTests(test_utils.GenericTestBase):
 
     USER_1_ID = 'user_1_id'
 
     def _run_one_off_job(self):
         """Runs the one-off MapReduce job."""
-        job_id = activity_jobs_one_off.ReplaceAdminIdOneOffJob.create_new()
-        activity_jobs_one_off.ReplaceAdminIdOneOffJob.enqueue(job_id)
+        job_id = (
+            activity_jobs_one_off.RemoveCommitUsernamesOneOffJob.create_new())
+        activity_jobs_one_off.RemoveCommitUsernamesOneOffJob.enqueue(job_id)
         self.assertEqual(
             self.count_jobs_in_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
         self.process_and_flush_pending_tasks()
         stringified_output = (
-            activity_jobs_one_off.ReplaceAdminIdOneOffJob.get_output(job_id))
+            activity_jobs_one_off.RemoveCommitUsernamesOneOffJob
+            .get_output(job_id))
         eval_output = [ast.literal_eval(stringified_item) for
                        stringified_item in stringified_output]
         return eval_output
 
-    def test_one_snapshot_model_wrong(self):
-        exp_models.ExplorationRightsSnapshotMetadataModel(
-            id='exp_1_id',
-            committer_id='Admin',
+    def test_one_commit_model(self):
+        collection_models.CollectionCommitLogEntryModel(
+            id='commit_id',
+            user_id='committer_id',
+            collection_id='col_id',
             commit_type='create',
-            commit_message='commit message 2',
-            commit_cmds=[{'cmd': 'some_command'}]).put()
+            commit_message='Message',
+            commit_cmds=[],
+            version=1,
+            post_commit_status='public',
+            post_commit_community_owned=False,
+            post_commit_is_private=False
+        ).put()
 
         output = self._run_one_off_job()
-        self.assertIn(['SUCCESS-RENAMED-SNAPSHOT', ['exp_1_id']], output)
+        self.assertItemsEqual(
+            [['SUCCESS - CollectionCommitLogEntryModel', 1]], output)
 
-        migrated_model = (
-            exp_models.ExplorationRightsSnapshotMetadataModel.get_by_id(
-                'exp_1_id'))
-        self.assertEqual(
-            migrated_model.committer_id, feconf.SYSTEM_COMMITTER_ID)
+        self.assertIsNone(
+            collection_models.CollectionCommitLogEntryModel
+            .get_by_id('commit_id').username)
 
-    def test_one_snapshot_model_correct(self):
-        exp_models.ExplorationRightsSnapshotMetadataModel(
-            id='exp_1_id',
-            committer_id=self.USER_1_ID,
+    def test_multiple_commits_model(self):
+        collection_models.CollectionCommitLogEntryModel(
+            id='commit_id',
+            user_id='committer_id',
+            collection_id='col_id',
             commit_type='create',
-            commit_message='commit message 2',
-            commit_cmds=[{'cmd': 'some_command'}]).put()
+            commit_message='Message',
+            commit_cmds=[],
+            version=1,
+            post_commit_status='public',
+            post_commit_community_owned=False,
+            post_commit_is_private=False
+        ).put()
+        exp_models.ExplorationCommitLogEntryModel(
+            id='commit_id',
+            user_id='committer_id',
+            exploration_id='exp_id',
+            commit_type='create',
+            commit_message='Message',
+            commit_cmds=[],
+            version=1,
+            post_commit_status='public',
+            post_commit_community_owned=False,
+            post_commit_is_private=False
+        ).put()
+        exp_models.ExplorationCommitLogEntryModel(
+            id='commit_id',
+            user_id='committer_id',
+            exploration_id='exp_id',
+            commit_type='create',
+            commit_message='Message',
+            commit_cmds=[],
+            version=1,
+            post_commit_status='public',
+            post_commit_community_owned=False,
+            post_commit_is_private=False
+        ).put()
+        question_models.QuestionCommitLogEntryModel(
+            id='commit_id',
+            user_id='committer_id',
+            question_id='que_id',
+            commit_type='create',
+            commit_message='Message',
+            commit_cmds=[],
+            version=1,
+            post_commit_status='public',
+            post_commit_community_owned=False,
+            post_commit_is_private=False
+        ).put()
+        skill_models.SkillCommitLogEntryModel(
+            id='commit_id',
+            user_id='committer_id',
+            skill_id='ski_id',
+            commit_type='create',
+            commit_message='Message',
+            commit_cmds=[],
+            version=1,
+            post_commit_status='public',
+            post_commit_community_owned=False,
+            post_commit_is_private=False
+        ).put()
+        story_models.StoryCommitLogEntryModel(
+            id='commit_id',
+            user_id='committer_id',
+            story_id='sto_id',
+            commit_type='create',
+            commit_message='Message',
+            commit_cmds=[],
+            version=1,
+            post_commit_status='public',
+            post_commit_community_owned=False,
+            post_commit_is_private=False
+        ).put()
+        topic_models.TopicCommitLogEntryModel(
+            id='commit_id',
+            user_id='committer_id',
+            topic_id='top_id',
+            commit_type='create',
+            commit_message='Message',
+            commit_cmds=[],
+            version=1,
+            post_commit_status='public',
+            post_commit_community_owned=False,
+            post_commit_is_private=False
+        ).put()
+        topic_models.SubtopicPageCommitLogEntryModel(
+            id='commit_id',
+            user_id='committer_id',
+            subtopic_page_id='sto_id',
+            commit_type='create',
+            commit_message='Message',
+            commit_cmds=[],
+            version=1,
+            post_commit_status='public',
+            post_commit_community_owned=False,
+            post_commit_is_private=False
+        ).put()
 
         output = self._run_one_off_job()
-        self.assertIn(['SUCCESS-KEPT-SNAPSHOT', 1], output)
+        self.assertItemsEqual([
+            ['SUCCESS - CollectionCommitLogEntryModel', 1],
+            ['SUCCESS - ExplorationCommitLogEntryModel', 1],
+            ['SUCCESS - QuestionCommitLogEntryModel', 1],
+            ['SUCCESS - SkillCommitLogEntryModel', 1],
+            ['SUCCESS - StoryCommitLogEntryModel', 1],
+            ['SUCCESS - TopicCommitLogEntryModel', 1],
+            ['SUCCESS - SubtopicPageCommitLogEntryModel', 1],
+        ], output)
 
-        migrated_model = (
-            exp_models.ExplorationRightsSnapshotMetadataModel.get_by_id(
-                'exp_1_id'))
-        self.assertEqual(migrated_model.committer_id, self.USER_1_ID)
-
-    def test_one_commit_model_wrong(self):
-        exp_models.ExplorationCommitLogEntryModel(
-            id='exp_1_id-1',
-            exploration_id='exp_1_id',
-            user_id='Admin',
-            username='Admin',
-            commit_type='create',
-            commit_message='commit message 2',
-            commit_cmds=[{'cmd': 'some_command'}],
-            post_commit_status='public').put()
-
-        output = self._run_one_off_job()
-        self.assertIn(['SUCCESS-RENAMED-COMMIT', ['exp_1_id-1']], output)
-
-        migrated_model = (
-            exp_models.ExplorationCommitLogEntryModel.get_by_id('exp_1_id-1'))
-        self.assertEqual(migrated_model.user_id, feconf.SYSTEM_COMMITTER_ID)
-
-    def test_one_commit_model_correct(self):
-        exp_models.ExplorationCommitLogEntryModel(
-            id='exp_1_id-1',
-            exploration_id='exp_1_id',
-            user_id=self.USER_1_ID,
-            username='user',
-            commit_type='create',
-            commit_message='commit message 2',
-            commit_cmds=[{'cmd': 'some_command'}],
-            post_commit_status='public').put()
-
-        output = self._run_one_off_job()
-        self.assertIn(['SUCCESS-KEPT-COMMIT', 1], output)
-
-        migrated_model = (
-            exp_models.ExplorationCommitLogEntryModel.get_by_id('exp_1_id-1'))
-        self.assertEqual(migrated_model.user_id, self.USER_1_ID)
-
-    def test_multiple(self):
-        exp_models.ExplorationRightsSnapshotMetadataModel(
-            id='exp_1_id-1',
-            committer_id='Admin',
-            commit_type='create',
-            commit_message='commit message 2',
-            commit_cmds=[{'cmd': 'some_command'}]).put()
-        exp_models.ExplorationRightsSnapshotMetadataModel(
-            id='exp_1_id-2',
-            committer_id=self.USER_1_ID,
-            commit_type='create',
-            commit_message='commit message 2',
-            commit_cmds=[{'cmd': 'some_command'}]).put()
-        exp_models.ExplorationCommitLogEntryModel(
-            id='exp_1_id-1',
-            exploration_id='exp_1_id',
-            user_id='Admin',
-            username='Admin',
-            commit_type='create',
-            commit_message='commit message 2',
-            commit_cmds=[{'cmd': 'some_command'}],
-            post_commit_status='public').put()
-        exp_models.ExplorationCommitLogEntryModel(
-            id='exp_1_id-2',
-            exploration_id='exp_1_id',
-            user_id='Admin',
-            username='Admin',
-            commit_type='create',
-            commit_message='commit message 2',
-            commit_cmds=[{'cmd': 'some_command'}],
-            post_commit_status='public').put()
-        exp_models.ExplorationCommitLogEntryModel(
-            id='exp_1_id-3',
-            exploration_id='exp_1_id',
-            user_id=self.USER_1_ID,
-            username='user',
-            commit_type='create',
-            commit_message='commit message 2',
-            commit_cmds=[{'cmd': 'some_command'}],
-            post_commit_status='public').put()
-
-        output = self._run_one_off_job()
-        self.assertIn(
-            ['SUCCESS-RENAMED-SNAPSHOT', ['exp_1_id-1']], output)
-        self.assertIn(['SUCCESS-KEPT-SNAPSHOT', 1], output)
-        self.assertIn(
-            ['SUCCESS-RENAMED-COMMIT', ['exp_1_id-1', 'exp_1_id-2']], output)
-        self.assertIn(['SUCCESS-KEPT-COMMIT', 1], output)
-
-        migrated_model = (
-            exp_models.ExplorationRightsSnapshotMetadataModel.get_by_id(
-                'exp_1_id-1'))
-        self.assertEqual(
-            migrated_model.committer_id, feconf.SYSTEM_COMMITTER_ID)
-        migrated_model = (
-            exp_models.ExplorationRightsSnapshotMetadataModel.get_by_id(
-                'exp_1_id-2'))
-        self.assertEqual(migrated_model.committer_id, self.USER_1_ID)
-
-        migrated_model = (
-            exp_models.ExplorationCommitLogEntryModel.get_by_id(
-                'exp_1_id-1'))
-        self.assertEqual(migrated_model.user_id, feconf.SYSTEM_COMMITTER_ID)
-        migrated_model = (
-            exp_models.ExplorationCommitLogEntryModel.get_by_id(
-                'exp_1_id-2'))
-        self.assertEqual(migrated_model.user_id, feconf.SYSTEM_COMMITTER_ID)
-        migrated_model = (
-            exp_models.ExplorationCommitLogEntryModel.get_by_id(
-                'exp_1_id-3'))
-        self.assertEqual(migrated_model.user_id, self.USER_1_ID)
+        self.assertIsNone(
+            collection_models.CollectionCommitLogEntryModel
+            .get_by_id('commit_id').username)
+        self.assertIsNone(
+            exp_models.ExplorationCommitLogEntryModel
+            .get_by_id('commit_id').username)
+        self.assertIsNone(
+            question_models.QuestionCommitLogEntryModel
+            .get_by_id('commit_id').username)
+        self.assertIsNone(
+            skill_models.SkillCommitLogEntryModel
+            .get_by_id('commit_id').username)
+        self.assertIsNone(
+            story_models.StoryCommitLogEntryModel
+            .get_by_id('commit_id').username)
+        self.assertIsNone(
+            topic_models.TopicCommitLogEntryModel
+            .get_by_id('commit_id').username)
+        self.assertIsNone(
+            topic_models.SubtopicPageCommitLogEntryModel
+            .get_by_id('commit_id').username)

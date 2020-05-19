@@ -26,10 +26,14 @@ from core.domain import exp_services
 from core.domain import search_services
 
 from core.platform import models
-import feconf
 
-(collection_models, exp_models) = models.Registry.import_models(
-    [models.NAMES.collection, models.NAMES.exploration])
+(
+    collection_models, exp_models,
+    question_models, skill_models,
+    story_models, topic_models) = models.Registry.import_models([
+        models.NAMES.collection, models.NAMES.exploration,
+        models.NAMES.question, models.NAMES.skill,
+        models.NAMES.story, models.NAMES.topic])
 
 
 class ActivityContributorsSummaryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
@@ -132,37 +136,31 @@ class IndexAllActivitiesJobManager(jobs.BaseMapReduceOneOffJobManager):
         pass
 
 
-class ReplaceAdminIdOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """Job that replaces the usage of 'Admin' in ExplorationCommitLogEntryModel
-    and ExplorationRightsSnapshotMetadataModel.
+class RemoveCommitUsernamesOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """Job that sets the username in *CommitLogEntryModels to None in order to
+    remove it from the datastore.
     """
 
     @classmethod
     def entity_classes_to_map_over(cls):
-        return [exp_models.ExplorationRightsSnapshotMetadataModel,
-                exp_models.ExplorationCommitLogEntryModel]
+        return [
+            collection_models.CollectionCommitLogEntryModel,
+            exp_models.ExplorationCommitLogEntryModel,
+            question_models.QuestionCommitLogEntryModel,
+            skill_models.SkillCommitLogEntryModel,
+            story_models.StoryCommitLogEntryModel,
+            topic_models.TopicCommitLogEntryModel,
+            topic_models.SubtopicPageCommitLogEntryModel
+        ]
 
     @staticmethod
-    def map(model):
-        if isinstance(model, exp_models.ExplorationRightsSnapshotMetadataModel):
-            if model.committer_id == 'Admin':
-                model.committer_id = feconf.SYSTEM_COMMITTER_ID
-                model.put(update_last_updated_time=False)
-                yield ('SUCCESS-RENAMED-SNAPSHOT', model.id)
-            else:
-                yield ('SUCCESS-KEPT-SNAPSHOT', model.id)
-        else:
-            if model.user_id == 'Admin':
-                model.user_id = feconf.SYSTEM_COMMITTER_ID
-                model.put(update_last_updated_time=False)
-                yield ('SUCCESS-RENAMED-COMMIT', model.id)
-            else:
-                yield ('SUCCESS-KEPT-COMMIT', model.id)
+    def map(commit_model):
+        commit_model.username = None
+        commit_model.put(update_last_updated_time=False)
+        class_name = commit_model.__class__.__name__
+        yield ('SUCCESS - %s' % class_name, commit_model.id)
 
     @staticmethod
     def reduce(key, values):
         """Implements the reduce function for this job."""
-        if key.startswith('SUCCESS-KEPT'):
-            yield (key, len(values))
-        else:
-            yield (key, values)
+        yield (key, len(values))

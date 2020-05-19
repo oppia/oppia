@@ -386,8 +386,6 @@ class BaseCommitLogEntryModel(BaseModel):
 
     # The id of the user.
     user_id = ndb.StringProperty(indexed=True, required=True)
-    # The username of the user, at the time of the edit.
-    username = ndb.StringProperty(indexed=True, required=True)
     # The type of the commit: 'create', 'revert', 'edit', 'delete'.
     commit_type = ndb.StringProperty(indexed=True, required=True)
     # The commit message.
@@ -405,6 +403,9 @@ class BaseCommitLogEntryModel(BaseModel):
     post_commit_is_private = ndb.BooleanProperty(indexed=True)
     # The version number of the model after this commit.
     version = ndb.IntegerProperty()
+
+    # DEPRECATED in v2.9.4. Do not use.
+    username = ndb.StringProperty(indexed=True, required=False)
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -430,9 +431,8 @@ class BaseCommitLogEntryModel(BaseModel):
 
     @classmethod
     def create(
-            cls, entity_id, version, committer_id, committer_username,
-            commit_type, commit_message, commit_cmds, status,
-            community_owned):
+            cls, entity_id, version, committer_id, commit_type, commit_message,
+            commit_cmds, status, community_owned):
         """This method returns an instance of the CommitLogEntryModel for a
         construct with the common fields filled.
 
@@ -442,8 +442,6 @@ class BaseCommitLogEntryModel(BaseModel):
                 the story_id for a story, etc.).
             version: int. The version number of the model after the commit.
             committer_id: str. The user_id of the user who committed the
-                change.
-            committer_username: str. The username of the user who committed the
                 change.
             commit_type: str. The type of commit. Possible values are in
                 core.storage.base_models.COMMIT_TYPE_CHOICES.
@@ -464,7 +462,6 @@ class BaseCommitLogEntryModel(BaseModel):
         return cls(
             id=cls._get_instance_id(entity_id, version),
             user_id=committer_id,
-            username=committer_username,
             commit_type=commit_type,
             commit_message=commit_message,
             commit_cmds=commit_cmds,
