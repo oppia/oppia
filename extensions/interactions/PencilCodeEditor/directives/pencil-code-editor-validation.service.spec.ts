@@ -75,10 +75,10 @@ describe('Pencil Code Editor Validation Service', () => {
     let answerGroups = [answer];
     let output = pcevs.getAllWarnings(
       stateName, customizationArgs, answerGroups, outcome);
-    let feedback_not_added = 'Please add feedback for the user ' +
+    let feedbackNotAdded = 'Please add feedback for the user ' +
     'in the [All other answers] rule.';
-    expect(output[0].message).toBe(feedback_not_added);
-   
+    expect(output[0].message).toBe(feedbackNotAdded);
+
     let feedbackHtml = '<p>wrong</p>';
     let feedbackOutcome = outcomeObjectFactory.createNew(
       stateName, id, feedbackHtml, trainingData);
