@@ -520,7 +520,9 @@
 
 # Frontend unit tests
 /core/templates/**/*.spec.ts @marianazangrossi
+/core/templates/**/*Spec.ts @marianazangrossi
 /extensions/**/*.spec.ts @marianazangrossi
+/extensions/**/*Spec.ts @marianazangrossi
 
 # Draft version upgrade.
 /core/domain/draft_upgrade_services*.py @DubeySandeep

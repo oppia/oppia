@@ -108,7 +108,7 @@ def _is_path_contains_frontend_specs(path_to_check):
     Returns:
         bool. Whether the given path contains all spec files.
     """
-    return '*.spec.ts' in path_to_check
+    return '*.spec.ts' in path_to_check or '*Spec.ts' in path_to_check
 
 
 def check_for_important_patterns_at_bottom_of_codeowners(important_patterns):
