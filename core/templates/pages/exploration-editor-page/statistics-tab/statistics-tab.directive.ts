@@ -160,11 +160,7 @@ angular.module('oppia').directive('statisticsTab', [
             const state = ExplorationStatesService.getState(stateName);
             AlertsService.clearWarnings();
 
-            Promise.all([
-              loadLatestExploration(),
-              StateInteractionStatsService.computeStats(state),
-            ]).then(response => {
-              const stats = response[1];
+            StateInteractionStatsService.computeStats(state).then(stats => {
               $uibModal.open({
                 templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                   '/pages/exploration-editor-page/statistics-tab/templates/' +
