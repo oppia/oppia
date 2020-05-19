@@ -64,17 +64,17 @@ describe('Exploration Automatic Text To Speech Service', function() {
       eattss, '_isValid').and.callThrough();
 
     expect(eattss.isAutomaticTextToSpeechEnabled()).toBeFalsy();
-    
+
     eattss.toggleAutomaticTextToSpeech();
     expect(eattss.isAutomaticTextToSpeechEnabled()).toBe(true);
-    
+
     eattss.toggleAutomaticTextToSpeech();
     expect(eattss.isAutomaticTextToSpeechEnabled()).toBe(false);
-    
-    spyOn(eattss, 'saveDisplayedValue')
+
+    spyOn(eattss, 'saveDisplayedValue');
     eattss.toggleAutomaticTextToSpeech();
     expect(eattss.saveDisplayedValue).toHaveBeenCalled();
-    
+
     expect(isValidSpy).toHaveBeenCalledTimes(2);
   });
 });
