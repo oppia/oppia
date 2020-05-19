@@ -107,6 +107,10 @@ var TIME_HEIGHT_CHANGE_MSEC = 500;
 var TIME_FADEIN_MSEC = 100;
 var TIME_NUM_CARDS_CHANGE_MSEC = 500;
 
+interface ConversationSkinCustomScope extends ng.IScope {
+  directiveTemplate?: string;
+}
+
 angular.module('oppia').animation(
   '.conversation-skin-animate-tutor-card-on-narrow', function() {
     var tutorCardLeft, tutorCardWidth, tutorCardHeight, oppiaAvatarLeft;
@@ -326,7 +330,7 @@ angular.module('oppia').directive('conversationSkin', [
       scope: {
         getQuestionPlayerConfig: '&questionPlayerConfig',
       },
-      link: function(scope: ICustomScope) {
+      link: function(scope: ConversationSkinCustomScope) {
         var isIframed = UrlService.isIframed();
         scope.directiveTemplate = isIframed ?
           UrlInterpolationService.getDirectiveTemplateUrl(
