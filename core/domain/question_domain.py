@@ -24,6 +24,7 @@ import datetime
 from constants import constants
 from core.domain import change_domain
 from core.domain import html_cleaner
+from core.domain import html_validation_service
 from core.domain import interaction_registry
 from core.domain import state_domain
 from core.platform import models
@@ -307,6 +308,14 @@ class Question(python_utils.OBJECT):
             })
 
         return question_state_dict
+
+    @classmethod
+    def _convert_states_v33_dict_to_v34_dict(cls, question_state_dict):
+
+        question_state_dict = state_domain.State.convert_html_fields_in_state(
+            question_state_dict, html_validation_service.add_svg_filename_to_math_rte_components)
+
+        return states_dict
 
     @classmethod
     def update_state_from_model(
