@@ -38,7 +38,6 @@
     "@types/selenium-webdriver": "^4.0.0",
     "@typescript-eslint/eslint-plugin": "^2.3.0",
     "@typescript-eslint/parser": "^2.3.0",
-    "angular2-template-loader": "^0.6.2",
     "ajv": "^6.10.0",
     "babel-eslint": "^10.0.1",
     "browserstack-local": "^1.4.2",

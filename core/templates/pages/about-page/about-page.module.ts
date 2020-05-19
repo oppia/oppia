@@ -19,6 +19,11 @@
 import 'core-js/es7/reflect';
 import 'zone.js';
 
+angular.module('oppia', [
+  'headroom', require('angular-cookies'), 'ngTouch', 'ngSanitize',
+  'pascalprecht.translate', 'toastr', 'ui.bootstrap'
+]);
+
 import { Component, NgModule, StaticProvider } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';
@@ -79,17 +84,12 @@ const downgradedModule = downgradeModule(bootstrapFn);
 
 declare var angular: ng.IAngularStatic;
 
-angular.module('oppia', [
-  'dndLists', 'headroom', 'infinite-scroll', 'ngAnimate',
-  'ngAudio', require('angular-cookies'), 'ngJoyRide', 'ngMaterial',
-  'ngSanitize', 'ngTouch', 'pascalprecht.translate',
-  'toastr', 'ui.bootstrap', 'ui.sortable', 'ui.tree', 'ui.validate',
-  downgradedModule
-])
+angular.module('oppia').requires.push(downgradedModule);
+
+angular.module('oppia').directive(
   // This directive is the downgraded version of the Angular component to
   // bootstrap the Angular 8.
-  .directive(
-    'serviceBootstrap',
-    downgradeComponent({
-      component: ServiceBootstrapComponent
-    }) as angular.IDirectiveFactory);
+  'serviceBootstrap',
+  downgradeComponent({
+    component: ServiceBootstrapComponent
+  }) as angular.IDirectiveFactory);
