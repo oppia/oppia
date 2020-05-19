@@ -39,4 +39,5 @@ export class BackgroundBannerComponent implements OnInit {
 }
 
 angular.module('oppia').directive(
-  'backgroundBannerMig',downgradeComponent({component: BackgroundBannerComponent}));
+  'backgroundBannerMig', downgradeComponent(
+    {component: BackgroundBannerComponent}));
