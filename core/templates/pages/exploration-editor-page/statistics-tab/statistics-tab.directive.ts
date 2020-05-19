@@ -225,13 +225,13 @@ angular.module('oppia').directive('statisticsTab', [
                     ];
 
                     $scope.visualizationsHtml = visualizationsInfo.map(info => {
-                      const visualizationElement = $(
+                      const vizElement = $(
                         '<oppia-visualization-' +
                         $filter('camelCaseToHyphens')(info.id) + '/>');
 
-                      const addAttr = (key, val) => visualizationElement.attr(
-                        $filter('camelCaseToHyphens')(key),
-                        HtmlEscaperService.objToEscapedJson(val));
+                      const addAttr = (camelCaseName, value) => vizElement.attr(
+                        $filter('camelCaseToHyphens')(camelCaseName),
+                        HtmlEscaperService.objToEscapedJson(value));
 
                       addAttr('escapedData', info.data);
                       addAttr('escapedOptions', info.options);
@@ -243,7 +243,7 @@ angular.module('oppia').directive('statisticsTab', [
                         addAttr(name + 'WithValue', arg.value);
                       });
 
-                      return visualizationElement.get(0).outerHTML;
+                      return vizElement.get(0).outerHTML;
                     }).join('');
 
                     $scope.navigateToStateEditor = () => {
