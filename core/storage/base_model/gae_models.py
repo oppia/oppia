@@ -761,7 +761,8 @@ class VersionedModel(BaseModel):
         Raises:
             Exception: This model instance has been already deleted.
         """
-        versioned_models = cls.get_multi(entity_ids)
+        versioned_models = cls.get_multi(
+            entity_ids, include_deleted=force_deletion)
         if force_deletion:
             all_models_metadata_keys = []
             all_models_content_keys = []

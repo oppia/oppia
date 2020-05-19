@@ -335,11 +335,17 @@ class GaeIdNotInModelsVerificationJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def verify_user_id_correct(user_id):
-        """Verify that the user ID is in a correct format.
+        """Verify that the user ID is in a valid format, meaning that it is
+        formed from lower case letters, starts with 'uid_' and is
+        USER_ID_LENGTH long.
+
         Args:
             user_id: str. The user ID to be checked.
+
         Returns:
-            bool. True when the ID is in a correct format, False otherwise.
+            bool. Whether the ID is in a valid format, meaning that it is
+            formed from lower case letters, starts with 'uid_' and is
+            USER_ID_LENGTH long.
         """
         return all((
             user_id.islower(),

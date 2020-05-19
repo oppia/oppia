@@ -121,9 +121,13 @@ def _hard_delete_explorations_and_collections(pending_deletion_model):
         pending_deletion_model: PendingDeletionRequestModel.
     """
     exp_services.delete_explorations(
-        pending_deletion_model.id, pending_deletion_model.exploration_ids)
+        pending_deletion_model.id,
+        pending_deletion_model.exploration_ids,
+        force_deletion=True)
     collection_services.delete_collections(
-        pending_deletion_model.id, pending_deletion_model.collection_ids)
+        pending_deletion_model.id,
+        pending_deletion_model.collection_ids,
+        force_deletion=True)
 
 
 def _generate_activity_to_user_ids_mapping(activity_ids):
@@ -165,7 +169,7 @@ def _delete_story_models(pending_deletion_model):
             _generate_activity_to_user_ids_mapping(story_ids))
         pending_deletion_model.put()
 
-    def _pseudonymize_models(story_related_models, user_id):
+    def _pseudonymize_models(story_related_models, pseudonymized_user_id):
         """Pseudonymize user ID fields in the models.
 
         Args:
@@ -177,7 +181,7 @@ def _delete_story_models(pending_deletion_model):
             model for model in story_related_models
             if isinstance(model, story_models.StorySnapshotMetadataModel)]
         for metadata_model in metadata_models:
-            metadata_model.committer_id = user_id
+            metadata_model.committer_id = pseudonymized_user_id
         story_models.StorySnapshotMetadataModel.put_multi(
             metadata_models, update_last_updated_time=False)
 
@@ -185,12 +189,13 @@ def _delete_story_models(pending_deletion_model):
             model for model in story_related_models
             if isinstance(model, story_models.StoryCommitLogEntryModel)]
         for commit_log_model in commit_log_models:
-            commit_log_model.user_id = user_id
+            commit_log_model.user_id = pseudonymized_user_id
             commit_log_model.username = 'ANONYMOUS'
         story_models.StoryCommitLogEntryModel.put_multi(
             commit_log_models, update_last_updated_time=False)
 
-    for story_id, user_id in pending_deletion_model.story_mappings.items():
+    story_mappings = pending_deletion_model.story_mappings
+    for story_id, pseudonymized_user_id in story_mappings.items():
         story_related_models = [
             model for model in metadata_models
             if model.get_unversioned_instance_id() == story_id]
@@ -201,7 +206,7 @@ def _delete_story_models(pending_deletion_model):
             transaction_services.run_in_transaction(
                 _pseudonymize_models,
                 story_related_models[i:i + MAX_NUMBER_OF_OPS_IN_TRANSACTION],
-                user_id)
+                pseudonymized_user_id)
 
 
 def _verify_user_models_deleted(user_id):
