@@ -54,7 +54,7 @@ import utils
 MAX_SYSTEM_RECOMMENDATIONS = 4
 
 
-def _does_exploration_exists(exploration_id, version, collection_id):
+def _does_exploration_exist(exploration_id, version, collection_id):
     """Returns if an exploration exists.
 
     Args:
@@ -105,7 +105,7 @@ class ExplorationEmbedPage(base.BaseHandler):
                 self.request.get('iframed')):
             self.iframed = True
 
-        if not _does_exploration_exists(exploration_id, version, collection_id):
+        if not _does_exploration_exist(exploration_id, version, collection_id):
             raise self.PageNotFoundException
 
         self.iframed = True
@@ -141,7 +141,7 @@ class ExplorationPage(base.BaseHandler):
         else:
             collection_id = self.request.get('collection_id')
 
-        if not _does_exploration_exists(exploration_id, version, collection_id):
+        if not _does_exploration_exist(exploration_id, version, collection_id):
             raise self.PageNotFoundException
 
         self.render_template('exploration-player-page.mainpage.html')
