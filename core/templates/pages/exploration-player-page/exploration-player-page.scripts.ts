@@ -21,7 +21,7 @@
 require('pages/exploration-player-page/exploration-player-page.module.ts');
 require('App.ts');
 
-require('pages/exploration-player-page/exploration-player-page.controller.ts');
+require('pages/exploration-player-page/exploration-player-page.component.ts');
 require(
   'pages/exploration-player-page/layout-directives/' +
   'exploration-footer.directive.ts');
