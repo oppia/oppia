@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Lighthouse checks and store reports script."""
+"""This script performs lighthouse checks and creates lighthouse reports."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
@@ -27,19 +27,19 @@ from . import install_third_party_libs
 
 
 def setup_and_install_dependencies():
-    """Run the setup and installation scripts."""
+    """Runs the setup and installation scripts."""
     install_third_party_libs.main()
 
 
 def delete_reports():
-    """manually delete lighthouse reports to handle
-    lighthouse ci bug where html reports aren't deleted.
+    """Deletes the .lighthouse ci folder to handle a bug where
+    lighthouse html reports are never deleted.
     """
     shutil.rmtree('.lighthouseci')
 
 
 def run_lighthouse_checks():
-    """Runs the lighthouserc.js config with bash command lhci autorun."""
+    """Runs the lighthhouse checks through the lighthouserc.json config."""
     node_path = os.path.join(common.NODE_PATH, 'bin', 'node')
     lhci_path = os.path.join(
         'node_modules', '@lhci', 'cli', 'src', 'cli.js')
