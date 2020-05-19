@@ -41,7 +41,6 @@ angular.module('oppia').directive('skillEditorNavbar', [
             $scope, $uibModal, AlertsService, UndoRedoService,
             SkillEditorStateService, SkillEditorRoutingService) {
           var ctrl = this;
-          ctrl.subscriptions = [];
           $scope.getActiveTabName = function() {
             return SkillEditorRoutingService.getActiveTabName();
           };

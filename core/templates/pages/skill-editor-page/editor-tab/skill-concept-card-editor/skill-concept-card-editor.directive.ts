@@ -59,7 +59,7 @@ angular.module('oppia').directive('skillConceptCardEditor', [
         '$scope', '$filter', '$uibModal',
         function($scope, $filter, $uibModal) {
           var ctrl = this;
-          ctrl.parentSubscription = new Subscription();
+          ctrl.directiveSubscriptons = new Subscription();
           var initBindableFieldsDict = function() {
             $scope.bindableFieldsDict = {
               displayedConceptCardExplanation:
@@ -186,7 +186,7 @@ angular.module('oppia').directive('skillConceptCardEditor', [
             $scope.dragDotsImgUrl = UrlInterpolationService.getStaticImageUrl(
               '/general/drag_dots.png');
             initBindableFieldsDict();
-            ctrl.parentSubscription.add(
+            ctrl.directiveSubscriptons.add(
               SkillEditorStateService.getSkillReinitializedSubject().subscribe(
                 () => initBindableFieldsDict())
             );
@@ -216,7 +216,7 @@ angular.module('oppia').directive('skillConceptCardEditor', [
           };
 
           $scope.$on('$destroy', function() {
-            ctrl.parentSubscription.unsubscribe();
+            ctrl.directiveSubscriptons.unsubscribe();
           });
         }
       ]
