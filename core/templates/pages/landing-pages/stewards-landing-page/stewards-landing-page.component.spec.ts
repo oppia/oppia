@@ -23,7 +23,8 @@ import { UrlService } from
   'services/contextual/url.service';
 
 require(
-  'pages/landing-pages/stewards-landing-page/stewards-landing-page.component.ts');
+  'pages/landing-pages/stewards-landing-page/' +
+  'stewards-landing-page.component.ts');
 
 describe('Stewards Landing Page', function() {
   var $scope = null, ctrl = null;

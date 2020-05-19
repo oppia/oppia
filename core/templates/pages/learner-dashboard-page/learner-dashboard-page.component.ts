@@ -68,8 +68,7 @@ angular.module('oppia').component('learnerDashboardPage', {
         DateTimeFormatService, FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS,
         FeedbackThreadSummaryObjectFactory,
         FeedbackMessageSummaryObjectFactory,
-        SuggestionModalForLearnerDashboardService, UserService
-      ) {
+        SuggestionModalForLearnerDashboardService, UserService) {
       var ctrl = this;
       var threadIndex = null;
 
@@ -605,7 +604,7 @@ angular.module('oppia').component('learnerDashboardPage', {
       };
     }
   ]
-  }).animation('.menu-sub-section', function() {
+}).animation('.menu-sub-section', function() {
   var NG_HIDE_CLASS = 'ng-hide';
   return {
     beforeAddClass: function(element, className, done) {

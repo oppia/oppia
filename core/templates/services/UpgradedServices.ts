@@ -38,7 +38,8 @@ import { AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { AnswerStatsObjectFactory } from
   'domain/exploration/AnswerStatsObjectFactory';
-import { AudioFileObjectFactory } from 'domain/utilities/AudioFileObjectFactory';
+import { AudioFileObjectFactory } from
+  'domain/utilities/AudioFileObjectFactory';
 import { AudioLanguageObjectFactory } from
   'domain/utilities/AudioLanguageObjectFactory';
 import { AudioTranslationLanguageService } from
@@ -190,6 +191,7 @@ import { ParamTypeObjectFactory } from
 import { PencilCodeEditorRulesService } from
   'interactions/PencilCodeEditor/directives/pencil-code-editor-rules.service';
 import { PlayerCorrectnessFeedbackEnabledService } from
+  // eslint-disable-next-line max-len
   'pages/exploration-player-page/services/player-correctness-feedback-enabled.service';
 import { PlayerPositionService } from
   'pages/exploration-player-page/services/player-position.service';
@@ -296,7 +298,8 @@ import { StopwatchObjectFactory } from
   'domain/utilities/StopwatchObjectFactory';
 import { StoryNodeObjectFactory } from
   'domain/story/StoryNodeObjectFactory';
-import { StoryContentsObjectFactory } from 'domain/story/StoryContentsObjectFactory';
+import { StoryContentsObjectFactory } from
+  'domain/story/StoryContentsObjectFactory';
 import { StoryObjectFactory } from 'domain/story/StoryObjectFactory';
 import { StoryPlaythroughObjectFactory } from
   'domain/story_viewer/StoryPlaythroughObjectFactory';
@@ -304,7 +307,8 @@ import { StoryReferenceObjectFactory } from
   'domain/topic/StoryReferenceObjectFactory';
 import { StorySummaryObjectFactory } from
   'domain/story/StorySummaryObjectFactory';
-import { StoryViewerBackendApiService } from 'domain/story_viewer/story-viewer-backend-api.service';
+import { StoryViewerBackendApiService } from
+  'domain/story_viewer/story-viewer-backend-api.service';
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
 import { SubtopicObjectFactory } from 'domain/topic/SubtopicObjectFactory';
@@ -697,8 +701,9 @@ export class UpgradedServices {
       new SubtopicPageContentsObjectFactory(
         upgradedServices['RecordedVoiceoversObjectFactory'],
         upgradedServices['SubtitledHtmlObjectFactory']);
-    upgradedServices['SubtopicPageObjectFactory'] = new SubtopicPageObjectFactory(
-      upgradedServices['SubtopicPageContentsObjectFactory']);
+    upgradedServices['SubtopicPageObjectFactory'] =
+      new SubtopicPageObjectFactory(
+        upgradedServices['SubtopicPageContentsObjectFactory']);
     upgradedServices['SuggestionThreadObjectFactory'] =
       new SuggestionThreadObjectFactory(
         upgradedServices['SuggestionObjectFactory'],
@@ -776,8 +781,8 @@ export class UpgradedServices {
         upgradedServices['ValidatorsService']);
     upgradedServices['SkillRightsBackendApiService'] =
       new SkillRightsBackendApiService(
-      upgradedServices['HttpClient'],
-      upgradedServices['UrlInterpolationService']);
+        upgradedServices['HttpClient'],
+        upgradedServices['UrlInterpolationService']);
     upgradedServices['StateCardObjectFactory'] =
       new StateCardObjectFactory(
         upgradedServices['AudioTranslationLanguageService']);

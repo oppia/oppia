@@ -101,7 +101,7 @@ angular.module('oppia').config([
       'DateTimeFormatService', 'DebouncerService', 'DeviceInfoService',
       'DocumentAttributeCustomizationService', 'EditabilityService',
       'EditorFirstTimeEventsService', 'EmailDashboardDataService',
-      'ExplorationFeaturesBackendApiService', 'ExplorationFeaturesService', 
+      'ExplorationFeaturesBackendApiService', 'ExplorationFeaturesService',
       'ExplorationHtmlFormatterService', 'ExplorationObjectFactory',
       'ExpressionParserService', 'ExpressionSyntaxTreeService',
       'ExtensionTagAssemblerService', 'ExtractImageFilenamesFromStateService',
