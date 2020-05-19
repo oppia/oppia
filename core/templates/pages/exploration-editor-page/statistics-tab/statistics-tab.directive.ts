@@ -160,15 +160,19 @@ angular.module('oppia').directive('statisticsTab', [
             const state = ExplorationStatesService.getState(stateName);
             AlertsService.clearWarnings();
 
-            StateInteractionStatsService.computeStats(state).then(stats => {
+            Promise.all([
+              loadLatestExploration(),
+              StateInteractionStatsService.computeStats(state),
+            ]).then(response => {
+              const stats = response[1];
               $uibModal.open({
                 templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                   '/pages/exploration-editor-page/statistics-tab/templates/' +
                   'state-stats-modal.template.html'),
                 backdrop: true,
                 resolve: {
-                  customizationArgs: () => Object.entries(
-                    state.interaction.customizationArgs),
+                  customizationArgs: (
+                    () => Object.entries(state.interaction.customizationArgs)),
                   improvementType: () => improvementType,
                   stateName: () => stateName,
                   stateStats: () => ctrl.stateStats[stateName],
@@ -238,7 +242,8 @@ angular.module('oppia').directive('statisticsTab', [
                         addAttr(
                           'addressedInfoIsSupported',
                           info.addressed_info_is_supported);
-                        customizationArgs.forEach((name, arg) => {
+                        customizationArgs.forEach(argDefinition => {
+                          const [name, arg] = argDefinition;
                           addAttr(name + 'WithValue', arg.value);
                         });
 
