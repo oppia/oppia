@@ -308,7 +308,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'practice-session-page.controller.ts',
     'practice-tab.directive.ts',
     'preferences-page.controller.ts',
-    'pretest-question-backend-api.service.ts',
     'preview-tab.directive.ts',
     'profile-link-image.directive.ts',
     'profile-link-text.directive.ts',
