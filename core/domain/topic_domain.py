@@ -47,6 +47,7 @@ TOPIC_PROPERTY_ABBREVIATED_NAME = 'abbreviated_name'
 TOPIC_PROPERTY_THUMBNAIL_FILENAME = 'thumbnail_filename'
 TOPIC_PROPERTY_THUMBNAIL_BG_COLOR = 'thumbnail_bg_color'
 TOPIC_PROPERTY_DESCRIPTION = 'description'
+TOPIC_PROPERTY_CATEGORY = 'category'
 TOPIC_PROPERTY_CANONICAL_STORY_REFERENCES = 'canonical_story_references'
 TOPIC_PROPERTY_ADDITIONAL_STORY_REFERENCES = 'additional_story_references'
 TOPIC_PROPERTY_LANGUAGE_CODE = 'language_code'
@@ -72,7 +73,7 @@ CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC = 'remove_skill_id_from_subtopic'
 CMD_UPDATE_TOPIC_PROPERTY = 'update_topic_property'
 CMD_UPDATE_SUBTOPIC_PROPERTY = 'update_subtopic_property'
 
-CMD_MIGRATE_SUBTOPIC_SCHEMA_TO_LATEST_VERSION = 'migrate_subtopic_schema_to_latest_version'  # pylint: disable=line-too-long
+CMD_MIGRATE_SUBTOPIC_SCHEMA_TO_LATEST_VERSION = 'migrate_subtopic_schema_to_latest_version' # pylint: disable=line-too-long
 
 
 class TopicChange(change_domain.BaseChange):
@@ -102,6 +103,7 @@ class TopicChange(change_domain.BaseChange):
     TOPIC_PROPERTIES = (
         TOPIC_PROPERTY_NAME, TOPIC_PROPERTY_ABBREVIATED_NAME,
         TOPIC_PROPERTY_DESCRIPTION,
+        TOPIC_PROPERTY_CATEGORY,
         TOPIC_PROPERTY_CANONICAL_STORY_REFERENCES,
         TOPIC_PROPERTY_ADDITIONAL_STORY_REFERENCES,
         TOPIC_PROPERTY_LANGUAGE_CODE,
@@ -458,6 +460,7 @@ class Topic(python_utils.OBJECT):
             thumbnail_bg_color: str|None. The thumbnail background color of the
                 topic.
             description: str. The description of the topic.
+            category: str. The category of the topic.
             canonical_story_references: list(StoryReference). A set of story
                 reference objects representing the canonical stories that are
                 part of this topic.
@@ -487,7 +490,6 @@ class Topic(python_utils.OBJECT):
         self.thumbnail_filename = thumbnail_filename
         self.thumbnail_bg_color = thumbnail_bg_color
         self.canonical_name = name.lower()
-        print 'here fails', name
         self.description = description
         self.category = category
         self.canonical_story_references = canonical_story_references
@@ -497,11 +499,10 @@ class Topic(python_utils.OBJECT):
         self.subtopic_schema_version = subtopic_schema_version
         self.next_subtopic_id = next_subtopic_id
         self.language_code = language_code
-        self.version = version
-        self.story_reference_schema_version = story_reference_schema_version
         self.created_on = created_on
         self.last_updated = last_updated
         self.version = version
+        self.story_reference_schema_version = story_reference_schema_version
 
     def to_dict(self):
         """Returns a dict representing this Topic domain object.
@@ -665,7 +666,7 @@ class Topic(python_utils.OBJECT):
             list(StoryReference). The list of StoryReference objects in topic.
         """
         return (
-                self.canonical_story_references + self.additional_story_references)
+            self.canonical_story_references + self.additional_story_references)
 
     def get_additional_story_ids(self, include_only_published=False):
         """Returns a list of additional story ids that are part of the topic.
@@ -899,7 +900,8 @@ class Topic(python_utils.OBJECT):
                 % self.uncategorized_skill_ids)
 
     @classmethod
-    def create_default_topic(cls, topic_id, name, abbreviated_name, description, category):
+    def create_default_topic(
+            cls, topic_id, name, abbreviated_name, description, category):
         """Returns a topic domain object with default values. This is for
         the frontend where a default blank topic would be shown to the user
         when the topic is created for the first time.
@@ -914,7 +916,6 @@ class Topic(python_utils.OBJECT):
         Returns:
             Topic. The Topic domain object with the default values.
         """
-        print name
         return cls(
             topic_id, name, abbreviated_name, None, None,
             description, category, [], [], [], [],
@@ -1295,8 +1296,7 @@ class TopicSummary(python_utils.OBJECT):
 
     def __init__(
             self, topic_id, name, canonical_name, language_code, description,
-            category,
-            version, canonical_story_count, additional_story_count,
+            category, version, canonical_story_count, additional_story_count,
             uncategorized_skill_count, subtopic_count, total_skill_count,
             topic_model_created_on, topic_model_last_updated):
         """Constructs a TopicSummary domain object.
@@ -1307,6 +1307,7 @@ class TopicSummary(python_utils.OBJECT):
             canonical_name: str. The canonical name (lowercase) of the topic.
             language_code: str. The language code of the topic.
             description: str. The description of the topic.
+            category: str. The category of the topic.
             version: int. The version of the topic.
             canonical_story_count: int. The number of canonical stories present
                 in the topic.

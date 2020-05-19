@@ -22,8 +22,9 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
 export interface ITopicCreationBackend {
-  'abbreviated_name': string;
   name: string;
+  category: string;
+  description: string;
 }
 
 @Injectable({
@@ -35,10 +36,9 @@ export class TopicCreationBackendApiService {
   _createTopic(
       successCallback: (value?: Object | PromiseLike<Object>) => void,
       errorCallback:(reason?: any) => void,
-      {name, abbreviatedTopicName, category, description}): void {
+      {name, category, description}): void {
     let postData: ITopicCreationBackend = {
       name,
-      abbreviated_name: abbreviatedTopicName,
       category,
       description,
     };

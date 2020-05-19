@@ -14,7 +14,7 @@
 
 
 /**
- * @fileoverview Unit tests for the topics and skills dashboard page.
+ * @fileoverview Unit tests for the topics and skills dashboard directive.
  */
 
 import { UpgradedServices } from 'services/UpgradedServices';
@@ -40,6 +40,7 @@ describe('Topics List Directive', function() {
     directive = $injector.get('topicsListDirective')[0];
     ctrl = $injector.instantiate(directive.controller, {
       $rootScope: $scope,
+      $scope: $scope,
       $uibModal,
     });
   }));
@@ -53,6 +54,7 @@ describe('Topics List Directive', function() {
     expect(ctrl.selectedIndex).toEqual(null);
     expect(ctrl.TOPIC_HEADINGS).toEqual(topicHeadings);
   });
+
   it('should return topic editor url', function() {
     const topicId1 = 'uXcdsad3f42';
     const topicId2 = 'aEdf44DGfre';
@@ -61,6 +63,7 @@ describe('Topics List Directive', function() {
     expect(ctrl.getTopicEditorUrl(topicId2)).toEqual(
       '/topic_editor/aEdf44DGfre');
   });
+
   it('should select and show edit options for a topic', function() {
     const topicId1 = 'uXcdsad3f42';
     const topicId2 = 'aEdf44DGfre';
@@ -79,6 +82,7 @@ describe('Topics List Directive', function() {
     expect(ctrl.showEditOptions(topicId1)).toEqual(false);
     expect(ctrl.showEditOptions(topicId2)).toEqual(false);
   });
+
   it('should delete a topic', function() {
     var modalSpy = spyOn($uibModal, 'open').and.callThrough();
     ctrl.deleteTopic('dskfm4');

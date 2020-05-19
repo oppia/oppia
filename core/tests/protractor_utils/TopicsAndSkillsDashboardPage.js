@@ -39,7 +39,18 @@ var TopicsAndSkillsDashboardPage = function() {
     by.css('.protractor-test-topics-list-item'));
   var skillsListItems = element.all(
     by.css('.protractor-test-skills-list-item'));
-  var topicNameField = element(by.css('.protractor-test-new-topic-name-field'));
+  var topicNameField = element(by.css(
+    '.protractor-test-new-topic-name-field'));
+  var topicDescriptionField = element(by.css(
+    '.protractor-test-new-topic-description-field'));
+  var topicCategoryField = element(by.css(
+    '.protractor-test-new-topic-category-field'));
+  var topicFilterKeywordField = element(by.css(
+    '.protractor-test-topic-filter-keyword'));
+  var topicFilterCategoryField = element(by.css(
+    '.protractor-test-topic-filter-category'));
+  var topicResetFilters = element(by.css(
+    'protractor-test-topic-filter-reset'));
   var skillNameField = element(
     by.css('.protractor-test-new-skill-description-field')
   );
@@ -138,7 +149,8 @@ var TopicsAndSkillsDashboardPage = function() {
     });
   };
 
-  this.createTopic = function(topicName, shouldCloseTopicEditor) {
+  this.createTopic = function(
+      topicName, description, category, shouldCloseTopicEditor) {
     var initialHandles = [];
     return browser.getAllWindowHandles().then(function(handles) {
       initialHandles = handles;
@@ -150,6 +162,8 @@ var TopicsAndSkillsDashboardPage = function() {
       createTopicButton.click();
 
       topicNameField.sendKeys(topicName);
+      topicDescriptionField.sendKeys(description);
+      topicCategoryField.sendKeys(category);
       confirmTopicCreationButton.click();
 
       waitFor.newTabToBeCreated(
@@ -166,6 +180,25 @@ var TopicsAndSkillsDashboardPage = function() {
         });
       });
     });
+  };
+  this.filterTopicsByKeyword = function(keyword) {
+    waitFor.visibilityOf(
+      topicFilterKeywordField,
+      'Topic Dashboard filters taking too long to appear.');
+    topicFilterKeywordField.click();
+    topicFilterKeywordField.sendKeys(keyword);
+  };
+  this.filterTopicsByCategory = function(keyword) {
+    waitFor.visibilityOf(
+      topicFilterKeywordField,
+      'Topic Dashboard filters taking too long to appear.');
+    topicFilterKeywordField.click();
+    topicFilterCategoryField.sendKeys(keyword);
+  };
+  this.resetTopicFilters = function() {
+    waitFor.visibilityOf(
+      topicResetFilters, 'Reset button taking too long to be clickable');
+    topicResetFilters.click();
   };
 
   this.deleteTopicWithIndex = function(index) {

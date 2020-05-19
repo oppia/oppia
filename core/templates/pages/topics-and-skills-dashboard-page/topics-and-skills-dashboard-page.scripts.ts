@@ -15,7 +15,6 @@
 /**
  * @fileoverview Directive scripts for the topics and skills dashboard.
  */
-// require('interactions/codemirrorRequires.ts');
 
 // The module needs to be loaded before everything else since it defines the
 // main module the elements are attached to.

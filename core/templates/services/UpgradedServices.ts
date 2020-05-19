@@ -205,6 +205,8 @@ import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 import { SVMPredictionService } from 'classifiers/svm-prediction.service';
 import { SidebarStatusService } from 'domain/sidebar/sidebar-status.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
+import { SkillCreationBackendApiService } from
+  'domain/skill/skill-creation-backend-api.service';
 import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
 import { SkillSummaryObjectFactory } from
   'domain/skill/SkillSummaryObjectFactory';
@@ -286,6 +288,11 @@ import { ThreadMessageSummaryObjectFactory } from
 import { ThreadStatusDisplayService } from
   // eslint-disable-next-line max-len
   'pages/exploration-editor-page/feedback-tab/services/thread-status-display.service';
+import { TopicsAndSkillsDashboardPageService } from
+  // eslint-disable-next-line max-len
+  'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.service';
+import { TopicCreationBackendApiService } from
+  'domain/topic/topic-creation-backend-api.service';
 import { TopicObjectFactory } from 'domain/topic/TopicObjectFactory';
 import { TopicRightsObjectFactory } from
   'domain/topic/TopicRightsObjectFactory';
@@ -313,9 +320,6 @@ import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory';
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
-import {TopicsAndSkillsDashboardPageService} from 'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.service';
-import {SkillCreationBackendApiService} from "domain/skill/skill-creation-backend-api.service";
-import {TopicCreationBackendApiService} from "domain/topic/topic-creation-backend-api.service";
 
 @Injectable({
   providedIn: 'root'
@@ -327,7 +331,6 @@ export class UpgradedServices {
 
     // Topological level: 0.
     upgradedServices['AngularNameService'] = new AngularNameService();
-    upgradedServices['TopicsAndSkillsDashboardPageService'] = new TopicsAndSkillsDashboardPageService();
     upgradedServices['AnswerClassificationResultObjectFactory'] =
       new AnswerClassificationResultObjectFactory();
     upgradedServices['AnswerGroupsCacheService'] =
@@ -430,6 +433,8 @@ export class UpgradedServices {
     upgradedServices['ThreadStatusDisplayService'] =
       new ThreadStatusDisplayService();
     upgradedServices['Title'] = new Title({});
+    upgradedServices['TopicsAndSkillsDashboardPageService'] =
+        new TopicsAndSkillsDashboardPageService();
     upgradedServices['TopicRightsObjectFactory'] =
       new TopicRightsObjectFactory();
     upgradedServices['TopicSummaryObjectFactory'] =
@@ -452,8 +457,6 @@ export class UpgradedServices {
     // Topological level: 1.
     upgradedServices['AlertsService'] = new AlertsService(
       upgradedServices['LoggerService']);
-    upgradedServices['SkillCreationBackendApiService'] = new SkillCreationBackendApiService(upgradedServices['HttpClient']);
-    upgradedServices['TopicCreationBackendApiService'] = new TopicCreationBackendApiService(upgradedServices['TopicCreationBackendApiService']);
     upgradedServices['BrowserCheckerService'] = new BrowserCheckerService(
       upgradedServices['WindowRef']);
     upgradedServices['ContinueValidationService'] =
@@ -508,6 +511,8 @@ export class UpgradedServices {
     upgradedServices['RecordedVoiceoversObjectFactory'] =
       new RecordedVoiceoversObjectFactory(
         upgradedServices['VoiceoverObjectFactory']);
+    upgradedServices['SkillCreationBackendApiService'] =
+        new SkillCreationBackendApiService(upgradedServices['HttpClient']);
     upgradedServices['SVMPredictionService'] = new SVMPredictionService(
       upgradedServices['PredictionResultObjectFactory']);
     upgradedServices['SiteAnalyticsService'] = new SiteAnalyticsService(
@@ -530,6 +535,9 @@ export class UpgradedServices {
     upgradedServices['ThreadMessageObjectFactory'] =
       new ThreadMessageObjectFactory(
         upgradedServices['ThreadMessageSummaryObjectFactory']);
+    upgradedServices['TopicCreationBackendApiService'] =
+        new TopicCreationBackendApiService(
+          upgradedServices['TopicCreationBackendApiService']);
     upgradedServices['UrlService'] = new UrlService(
       upgradedServices['WindowRef']);
     upgradedServices['WindowDimensionsService'] = new WindowDimensionsService(

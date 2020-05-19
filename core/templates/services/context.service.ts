@@ -169,21 +169,17 @@ export class ContextService {
     }
     let pathnameArray = this.urlService.getPathname().split('/');
     let hashValues = this.urlService.getHash().split('#');
-    console.log(pathnameArray);
     for (let i = 0; i < pathnameArray.length; i++) {
       if (pathnameArray[i] === 'create' || pathnameArray[i] === 'explore' ||
           (pathnameArray[i] === 'embed' &&
               pathnameArray[i + 1] === 'exploration')) {
         return AppConstants.ENTITY_TYPE.EXPLORATION;
       }
-      if (pathnameArray[i] === 'topic_editor' ) {
+      if (pathnameArray[i] === 'topic_editor') {
         if (hashValues.length >= 2 && hashValues[1] === '/questions') {
           return AppConstants.ENTITY_TYPE.QUESTION;
         }
         return AppConstants.ENTITY_TYPE.TOPIC;
-      }
-      if (pathnameArray[i] === 'topics_and_skills_dashboard') {
-        return 'topics_and_skills_dashboard';
       }
       if (pathnameArray[i] === 'subtopic') {
         return AppConstants.ENTITY_TYPE.SUBTOPIC;

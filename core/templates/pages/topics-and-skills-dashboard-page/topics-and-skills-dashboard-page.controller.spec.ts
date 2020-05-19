@@ -12,13 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {UpgradedServices} from 'services/UpgradedServices';
-
 /**
  * @fileoverview Unit tests for the topics and skills dashboard page.
  */
 
-fdescribe('Topics and Skills Dashboard Page', function() {
+import { UpgradedServices } from 'services/UpgradedServices';
+
+describe('Topics and Skills Dashboard Page', function() {
   var $scope, ctrl;
   var $httpBackend = null;
   var $uibModal = null;
@@ -83,8 +83,8 @@ fdescribe('Topics and Skills Dashboard Page', function() {
     enum ESortOptions {
       IncreasingCreatedOn = 'Newly Created',
       DecreasingCreatedOn = 'Oldest Created',
-      IncreasingUpdatedOn = 'Recently Updated',
-      DecreasingUpdatedOn = 'Least Updated',
+      IncreasingUpdatedOn = 'Most Recently Updated',
+      DecreasingUpdatedOn = 'Least Recently Updated',
     }
 
     enum EPublishedOptions {

@@ -59,7 +59,7 @@ describe('Topic editor functionality', function() {
     var EDITED_TOPIC_NAME = 'TASEFUF_1 edited';
     topicsAndSkillsDashboardPage.get();
     topicsAndSkillsDashboardPage.createTopic(TOPIC_NAME, false);
-    NEW_TOPIC_NAME = EDITED_TOPIC_NAME;
+    var NEW_TOPIC_NAME = EDITED_TOPIC_NAME;
     topicsAndSkillsDashboardPage.get();
     topicsAndSkillsDashboardPage.editTopic(TOPIC_NAME);
     topicEditorPage.changeTopicName(NEW_TOPIC_NAME);

@@ -30,7 +30,6 @@ from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
 import feconf
-import utils
 
 
 class TopicsAndSkillsDashboardPage(base.BaseHandler):
@@ -87,16 +86,16 @@ class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
                 mergeable_skill_summary_dicts.append(skill_summary_dict)
 
         can_delete_topic = (
-                role_services.ACTION_DELETE_TOPIC in self.user.actions)
+            role_services.ACTION_DELETE_TOPIC in self.user.actions)
 
         can_create_topic = (
-                role_services.ACTION_CREATE_NEW_TOPIC in self.user.actions)
+            role_services.ACTION_CREATE_NEW_TOPIC in self.user.actions)
 
         can_delete_skill = (
-                role_services.ACTION_DELETE_ANY_SKILL in self.user.actions)
+            role_services.ACTION_DELETE_ANY_SKILL in self.user.actions)
 
         can_create_skill = (
-                role_services.ACTION_CREATE_NEW_SKILL in self.user.actions)
+            role_services.ACTION_CREATE_NEW_SKILL in self.user.actions)
 
         self.values.update({
             'untriaged_skill_summary_dicts': untriaged_skill_summary_dicts,
@@ -127,7 +126,7 @@ class NewTopicHandler(base.BaseHandler):
                 'Invalid topic name, received %s.' % name)
         new_topic_id = topic_services.get_new_topic_id()
         topic = topic_domain.Topic.create_default_topic(
-            new_topic_id, name, '', description, category)
+            new_topic_id, name, abbreviated_name, description, category)
         topic_services.save_new_topic(self.user_id, topic)
 
         self.render_json({

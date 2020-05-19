@@ -206,7 +206,6 @@ angular.module('oppia').directive('tutorCard', [
             $scope.waitingForOppiaFeedback = false;
             $scope.windowDimensionsService = WindowDimensionsService;
             $scope.isIframed = UrlService.isIframed();
-            console.log($scope.getDisplayedCard());
             $scope.isAudioBarExpandedOnMobileDevice = function() {
               return (
                 DeviceInfoService.isMobileDevice() &&

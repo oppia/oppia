@@ -44,10 +44,10 @@ angular.module('oppia').directive('topicsList', [
         '/pages/topics-and-skills-dashboard-page/topics-list/' +
         'topics-list.directive.html'),
       controller: [
-        '$uibModal', '$rootScope', 'EditableTopicBackendApiService',
+        '$scope', '$uibModal', '$rootScope', 'EditableTopicBackendApiService',
         'AlertsService', 'EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED',
         function(
-            $uibModal, $rootScope, EditableTopicBackendApiService,
+            $scope, $uibModal, $rootScope, EditableTopicBackendApiService,
             AlertsService, EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED) {
           var ctrl = this;
           ctrl.getTopicEditorUrl = function(topicId) {
@@ -59,6 +59,12 @@ angular.module('oppia').directive('topicsList', [
 
           ctrl.enableEditOptions = function(topicId) {
             ctrl.selectedIndex = topicId;
+          };
+
+          ctrl.getSerialNumber = function(index) {
+            var serialNumber = (
+              index + 1 + ($scope.getPageNumber() * $scope.getItemsPerPage()));
+            return serialNumber;
           };
 
           ctrl.deleteTopic = function(topicId) {

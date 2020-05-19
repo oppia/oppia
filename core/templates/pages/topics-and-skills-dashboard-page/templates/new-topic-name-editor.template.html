@@ -8,13 +8,13 @@
     <div class="create-new-topic-input-field">
       <div><span class="create-new-topic-input-label">Category</span></div>
       <div ng-if="pageHasLoaded">
-        <select2-dropdown
-                item="topicObject.category"
-                choices="categories"
-                on-selection-change="saveCategory(topicObject.category)"
-                placeholder="Choose a category"
-                width="60%"
-        ></select2-dropdown>
+        <select2-dropdown class = "protractor-test-new-topic-category-field"
+                          item="topicObject.category"
+                          choices="categories"
+                          on-selection-change="saveCategory(topicObject.category)"
+                          placeholder="Choose a category"
+                          width="60%">
+        </select2-dropdown>
       </div>
     </div>
     <div class="create-new-topic-input-field" ng-class="{'has-error': !isTopicNameValid()}">
@@ -25,38 +25,38 @@
           Topic name should be at most <[MAX_CHARS_IN_TOPIC_NAME]> characters.
         </i>
       </div>
-      </div>
+    </div>
     <div class="create-new-topic-input-field">
       <div><span class="create-new-topic-input-label">Description</span></div>
-      <textarea rows="4" cols="50" placeholder="Enter description" maxlength="<[MAX_CHARS_IN_TOPIC_DESCRIPTION]>"
+      <textarea class="protractor-test-new-topic-description-field"
+                rows="4" cols="50" placeholder="Enter description"
+                maxlength="<[MAX_CHARS_IN_TOPIC_DESCRIPTION]>"
                 ng-model="topicObject.description">
       </textarea>
       <div class="oppia-input-box-subtitle">
-      <i>
-        Topic name should be at most <[MAX_CHARS_IN_TOPIC_DESCRIPTION]> characters.
-      </i>
-    </div>
+        <i>
+          Topic name should be at most <[MAX_CHARS_IN_TOPIC_DESCRIPTION]> characters.
+        </i>
+      </div>
     </div>
     <div class="create-new-topic-input-field">
-        <label class="create-new-topic-input-label">Topic Thumbnail</label>
-        <thumbnail-uploader
-                filename="topic.getThumbnailFilename()"
-                update-filename="updateTopicThumbnailFilename"
-                bg-color="topic.getThumbnailBgColor()"
-                update-bg-color="updateTopicThumbnailBgColor"
-                allowed-bg-colors="allowedBgColors"
-                aspect-ratio="'4:3'"
-                preview-title="editableName"
-                preview-description=""
-                preview-description-bg-color="'#2F6687'"
-                >
-        </thumbnail-uploader>
-      </div>
+      <label class="create-new-topic-input-label">Topic Thumbnail</label>
+      <thumbnail-uploader filename="topic.getThumbnailFilename()"
+                          update-filename="updateTopicThumbnailFilename"
+                          bg-color="topic.getThumbnailBgColor()"
+                          update-bg-color="updateTopicThumbnailBgColor"
+                          allowed-bg-colors="allowedBgColors"
+                          aspect-ratio="'4:3'"
+                          preview-title="editableName"
+                          preview-description=""
+                          preview-description-bg-color="'#2F6687'">
+      </thumbnail-uploader>
+    </div>
   </div>
 
   <div class="modal-footer">
     <button class="btn btn-secondary" ng-click="cancel()" type="button">Cancel</button>
-    <button class="btn btn-success protractor-test-confirm-topic-creation-button" type="submit" ng-disabled="!isTopicNameValid()">
+    <button class="btn btn-success protractor-test-confirm-topic-creation-button" type="submit" ng-disabled="!isTopicValid()">
       <span>Create Topic</span>
     </button>
   </div>
@@ -72,17 +72,4 @@
   .create-new-topic-input-label {
     font-weight: bold;
   }
-
-  /*.new-topic-name-editor .form-text {*/
-  /*  margin-left: 37.5%;*/
-  /*  margin-top: -3%;*/
-  /*}*/
-  /*.new-topic-name-editor .topic-name-field {*/
-  /*  height: 35px;*/
-  /*  margin-left: -15%;*/
-  /*}*/
-
-  /*.new-topic-name-editor input {*/
-  /*  width: 100%;*/
-  /*}*/
 </style>

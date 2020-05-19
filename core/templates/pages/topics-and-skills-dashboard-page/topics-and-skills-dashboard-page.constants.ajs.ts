@@ -44,8 +44,8 @@ angular.module('oppia').constant(
   'TOPIC_CATEGORIES',
   TopicsAndSkillsDashboardPageConstants.TOPIC_CATEGORIES);
 angular.module('oppia').constant(
-  'ESortOptions',
-  TopicsAndSkillsDashboardPageConstants.ESortOptions);
+  'E_SORT_OPTIONS',
+  TopicsAndSkillsDashboardPageConstants.E_SORT_OPTIONS);
 angular.module('oppia').constant(
-  'EPublishedOptions',
-  TopicsAndSkillsDashboardPageConstants.EPublishedOptions);
+  'E_PUBLISHED_OPTIONS',
+  TopicsAndSkillsDashboardPageConstants.E_PUBLISHED_OPTIONS);

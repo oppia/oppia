@@ -2,7 +2,8 @@
 <div class="oppia-topics-and-skills-dashboard" style="position: relative;">
   <div>
     <h2 class="dashboard-title" translate="I18N_DASHBOARD_TOPICS_AND_SKILLS_DASHBOARD"
-        ng-if="($ctrl.totalTopicSummaries.length === 0 && $ctrl.untriagedSkillSummaries.length === 0)"></h2>
+        ng-if="($ctrl.totalTopicSummaries.length === 0 && $ctrl.untriagedSkillSummaries.length === 0)">
+    </h2>
     <div class="create-buttons" ng-if="!($ctrl.topicSummaries.length === 0 && $ctrl.untriagedSkillSummaries.length === 0)">
       <button ng-click="$ctrl.createTopic()" ng-if="$ctrl.userCanCreateTopic"
               class="btn oppia-navbar-button oppia-transition-200">
@@ -46,12 +47,12 @@
                 </select>
               </div>
               <div>
-                <i class="fa fa-angle-left" ng-click="$ctrl.changePage($ctrl.PREV_PAGE)"></i>
+                <i class="fa fa-angle-left topic-pagination-arrow" ng-click="$ctrl.changePage($ctrl.PREV_PAGE)"></i>
                 <span class="dashboard-list-pagination-value" ng-repeat="n in $ctrl.repeater($ctrl.currentCount/$ctrl.itemsPerPage)" ng-click="$ctrl.paginationHandler($index)">
                   <span ng-if="$ctrl.pageNumber===$index" class="dashboard-list-pagination-active"><[$index+1]></span>
                   <span ng-if="$ctrl.pageNumber!==$index"><[$index+1]></span>
                 </span>
-                <i class="fa fa-angle-right" ng-click="$ctrl.changePage($ctrl.NEXT_PAGE)"></i>
+                <i class="fa fa-angle-right topic-pagination-arrow" ng-click="$ctrl.changePage($ctrl.NEXT_PAGE)"></i>
               </div>
             </div>
           </div>
@@ -101,14 +102,14 @@
           <div class="topic-skill-filter-content">
             <div class="topic-skill-filter-header">
               <span class="topic-skill-filter-heading">Filter</span>
-              <span class="topic-skill-filter-reset" ng-click="$ctrl.resetFilters()">Reset</span>
+              <span class="topic-skill-filter-reset protractor-test-topic-filter-reset" ng-click="$ctrl.resetFilters()">Reset</span>
             </div>
             <div class="topic-skill-filter-row">
               <div class="topic-skill-filter-key">
                 <span>keywords</span>
               </div>
               <div class="topic-skill-filter-value">
-                <input type="text" ng-change="$ctrl.applyFilters()" ng-model="$ctrl.filterOptions.keywords">
+                <input type="text" ng-change="$ctrl.applyFilters()" ng-model="$ctrl.filterOptions.keywords" class="protractor-test-topic-filter-keyword">
               </div>
             </div>
             <div class="topic-skill-filter-row">
@@ -128,14 +129,12 @@
                 <span>Category</span>
               </div>
               <div class="topic-skill-filter-value">
-                <select class="form-control"
+                <select class="form-control protractor-test-topic-filter-category"
                         ng-model="$ctrl.filterOptions.category"
                         ng-options="item for item in $ctrl.categories"
-                        ng-change="$ctrl.applyFilters()"
-                        >
+                        ng-change="$ctrl.applyFilters()">
                 </select>
-              <div></div>
-            </div>
+              </div>
             </div>
             <div class="topic-skill-filter-row">
               <div class="topic-skill-filter-key">
@@ -149,10 +148,10 @@
                 </select>
               </div>
             </div>
+          </div>
         </div>
       </div>
     </div>
-  </div>
   </div>
 
   <div class="col-sm-8 intro-card-wrapper" ng-if="($ctrl.totalTopicSummaries.length === 0 && $ctrl.untriagedSkillSummaries.length === 0)">
@@ -174,6 +173,7 @@
       </button>
     </blockquote>
   </div>
+</div>
 <style>
   .oppia-topics-and-skills-dashboard .intro-card-wrapper {
     margin: 0 auto;
@@ -286,6 +286,9 @@
     display: inline-block;
     text-align: right;
     width: 25%;
+  }
+  .oppia-topics-and-skills-dashboard .topic-pagination-arrow {
+    cursor: pointer;
   }
   .oppia-topics-and-skills-dashboard .dashboard-list-header {
     display: flex;

@@ -87,7 +87,7 @@ def main(args=None):
         cmd = [
             os.path.join(common.NODE_MODULES_PATH, 'karma', 'bin', 'karma'),
             'start', os.path.join('core', 'tests', 'karma.conf.ts')]
-    print cmd
+
     task = subprocess.Popen(cmd, stdout=subprocess.PIPE)
     out, _ = task.communicate()
     task.wait()

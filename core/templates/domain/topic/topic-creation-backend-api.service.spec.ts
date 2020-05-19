@@ -30,8 +30,9 @@ describe('Topic creation backend api service', () => {
   let httpTestingController: HttpTestingController = null;
   let topicCreationBackendApiService: TopicCreationBackendApiService = null;
   let postData: ITopicCreationBackend = {
-    abbreviated_name: 'topic-abbr-name',
-    name: 'topic-name'
+    name: 'topic-name',
+    category: 'Mathematics',
+    description: 'Description'
   };
 
   beforeEach(() => {
@@ -59,8 +60,11 @@ describe('Topic creation backend api service', () => {
     fakeAsync(() => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
-      topicCreationBackendApiService.createTopic(
-        'topic-name', 'topic-abbr-name').then(
+      topicCreationBackendApiService.createTopic({
+        name: 'topic-name',
+        category: 'Mathematics',
+        description: 'Description'
+      }).then(
         successHandler);
       let req = httpTestingController.expectOne(
         '/topic_editor_handler/create_new');
@@ -76,8 +80,11 @@ describe('Topic creation backend api service', () => {
     fakeAsync(() => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
-      topicCreationBackendApiService.createTopic(
-        'topic-name', 'topic-abbr-name').then(
+      topicCreationBackendApiService.createTopic({
+        name: 'topic-name',
+        category: 'Mathematics',
+        description: 'Description'
+      }).then(
         successHandler, failHandler);
       const errorResponse = new HttpErrorResponse({
         error: 'test 404 error',

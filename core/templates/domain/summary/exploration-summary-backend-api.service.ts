@@ -52,8 +52,6 @@ angular.module('oppia').factory('ExplorationSummaryBackendApiService', [
             includePrivateExplorations)
         }
       }).then(function(response) {
-        console.log('Exploration Summary Backend APi Service');
-        console.log(response);
         var summaries = angular.copy(response.data.summaries);
         if (successCallback) {
           if (summaries === null) {

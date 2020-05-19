@@ -21,7 +21,7 @@
     </tr>
     <tr ng-repeat="topic in getTopicSummaries() track by $index" class="list-item">
       <td>
-        <[($index + 1 + (getPageNumber()*getItemsPerPage()))]>.
+        <[$ctrl.getSerialNumber($index)]>
       </td>
       <td>
         <div class="list-summary list-summary-name protractor-test-topics-list-item">
@@ -53,19 +53,19 @@
         </p>
       </td>
       <td class="text-center topic-list-status">
-          <span class="topic-list-status-text" ng-if="$ctrl.topic.is_published"> Published </span>
-          <span class="topic-list-status-text" ng-if="!$ctrl.topic.is_published"> Not Published </span>
-          <p class="fas fa-ellipsis-v" ng-mouseover="$ctrl.enableEditOptions(topic.id)"></p>
-          <div ng-if="$ctrl.showEditOptions(topic.id)" class="topic-edit-options" ng-mouseleave="$ctrl.enableEditOptions(null)">
-            <a class="topic-edit-options-edit" ng-href="<[$ctrl.getTopicEditorUrl(topic.id)]>">
-              <i class="fa fa-pen"></i>
-              <span>Edit</span>
-            </a>
-            <a ng-if="canDeleteTopic()" ng-click="$ctrl.deleteTopic(topic.id)">
-              <i class="fas fa-trash-alt"></i>
-              <span >Delete</span>
-            </a>
-          </div>
+        <span class="topic-list-status-text" ng-if="$ctrl.topic.is_published"> Published </span>
+        <span class="topic-list-status-text" ng-if="!$ctrl.topic.is_published"> Not Published </span>
+        <p class="fas fa-ellipsis-v" ng-mouseover="$ctrl.enableEditOptions(topic.id)"></p>
+        <div ng-if="$ctrl.showEditOptions(topic.id)" class="topic-edit-options" ng-mouseleave="$ctrl.enableEditOptions(null)">
+          <a class="topic-edit-options-edit" ng-href="<[$ctrl.getTopicEditorUrl(topic.id)]>">
+            <i class="fa fa-pen"></i>
+            <span>Edit</span>
+          </a>
+          <a ng-if="canDeleteTopic()" ng-click="$ctrl.deleteTopic(topic.id)">
+            <i class="fas fa-trash-alt"></i>
+            <span >Delete</span>
+          </a>
+        </div>
       </td>
     </tr>
   </table>
@@ -111,6 +111,7 @@
     border-bottom: 1px solid black;
   }
   topics-list .topic-edit-options a:hover,
+  topics-list .topic-edit-options a:active,
   topics-list .topic-edit-options a:visited {
     color: inherit;
     background-color: #e6e6e6;
