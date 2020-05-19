@@ -532,7 +532,7 @@ class VoiceoverDurationSecondsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         exploration_states_unchanged_count = 0
         exploration_states_failed_count = 0
         for state, state_value in item.states.items():
-            is_state_changed = False
+            state_is_changed = False
             voiceovers_mapping = (state_value['recorded_voiceovers']
                                   ['voiceovers_mapping'])
             language_codes_to_audio_metadata = voiceovers_mapping.values()
@@ -558,7 +558,7 @@ class VoiceoverDurationSecondsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                             # metadata.
                             audio_metadata['duration_secs'] = (
                                 audio.info.length)
-                            is_state_changed = True
+                            state_is_changed = True
                             exploration_states_changed_count += 1
                         except Exception as e:
                             logging.error(
@@ -570,7 +570,7 @@ class VoiceoverDurationSecondsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                             exploration_states_failed_count += 1
                     else:
                         exploration_states_unchanged_count += 1
-            if is_state_changed:
+            if state_is_changed:
                 # Create commits to update the exploration.
                 # Only when the state is changed.
                 commit_cmds.append(exp_domain.ExplorationChange({
