@@ -108,7 +108,7 @@ angular.module('oppia').directive('statisticsTab', [
                   num_actual_starts: numActualStarts,
                   num_completions: numCompletions,
                   num_starts: numStarts,
-                  state_stats: stateStats,
+                  state_stats_mapping: stateStats,
                 } = response.data;
 
                 ctrl.stateStats = stateStats;
