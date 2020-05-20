@@ -91,7 +91,7 @@ angular.module('oppia').directive('explorationEditorTab', [
           };
           ctrl.getStateContentSaveButtonPlaceholder = function() {
             return 'Save Content';
-          }
+          };
 
           ctrl.addState = function(newStateName) {
             ExplorationStatesService.addState(newStateName, null);

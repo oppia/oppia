@@ -150,4 +150,3 @@ angular.module('oppia').directive('questionMisconceptionEditor', [
       ]
     };
   }]);
-  
