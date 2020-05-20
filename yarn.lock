@@ -5532,7 +5532,7 @@ jquery@^3.4.0:
   resolved "https://registry.yarnpkg.com/jquery/-/jquery-3.5.1.tgz#d7b4d08e1bfdb86ad2f1a3d039ea17304717abb5"
   integrity sha512-XwIBPqcMn57FxfT+Go5pzySnm4KWkT1Tv7gjrpT1srtf8Weynl6R273VJ5GjkRb51IzMp5nbaPjJXMWeju2MKg==
 
-js-library-detector@^5.4.0, js-library-detector@^5.5.0:
+js-library-detector@^5.4.0:
   version "5.9.0"
   resolved "https://registry.yarnpkg.com/js-library-detector/-/js-library-detector-5.9.0.tgz#ad0add7f4991424326895b273e774876555d0e1b"
   integrity sha512-0wYHRVJv8uVsylJhfQQaH2vOBYGehyZyJbtaHuchoTP3Mb6hqYvrA0hoMQ1ZhARLHzHJMbMc/nCr4D3pTNSCgw==
@@ -5906,44 +5906,6 @@ lighthouse@5.5.0:
     semver "^5.3.0"
     speedline-core "1.4.2"
     third-party-web "^0.8.2"
-    update-notifier "^2.5.0"
-    ws "3.3.2"
-    yargs "3.32.0"
-    yargs-parser "7.0.0"
-
-lighthouse@^5.6.0:
-  version "5.6.0"
-  resolved "https://registry.yarnpkg.com/lighthouse/-/lighthouse-5.6.0.tgz#2182e0d9bc79783bc9d801dd5099a33526dabdd0"
-  integrity sha512-PQYeK6/P0p/JxP/zq8yfcPmuep/aeib5ykROTgzDHejMiuzYdD6k6MaSCv0ncwK+lj+Ld67Az+66rHqiPKHc6g==
-  dependencies:
-    axe-core "3.3.0"
-    chrome-launcher "^0.11.2"
-    configstore "^3.1.1"
-    cssstyle "1.2.1"
-    details-element-polyfill "^2.4.0"
-    http-link-header "^0.8.0"
-    inquirer "^3.3.0"
-    intl "^1.2.5"
-    intl-messageformat "^4.4.0"
-    intl-pluralrules "^1.0.3"
-    jpeg-js "0.1.2"
-    js-library-detector "^5.5.0"
-    jsonld "^1.5.0"
-    jsonlint-mod "^1.7.5"
-    lighthouse-logger "^1.2.0"
-    lodash.isequal "^4.5.0"
-    lodash.set "^4.3.2"
-    lookup-closest-locale "6.0.4"
-    metaviewport-parser "0.2.0"
-    mkdirp "0.5.1"
-    open "^6.4.0"
-    parse-cache-control "1.0.1"
-    raven "^2.2.1"
-    rimraf "^2.6.1"
-    robots-parser "^2.0.1"
-    semver "^5.3.0"
-    speedline-core "1.4.2"
-    third-party-web "^0.11.0"
     update-notifier "^2.5.0"
     ws "3.3.2"
     yargs "3.32.0"
@@ -9066,11 +9028,6 @@ text-table@^0.2.0:
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/text-table/-/text-table-0.2.0.tgz#7f5ee823ae805207c00af2df4a84ec3fcfa570b4"
   integrity sha1-f17oI66AUgfACvLfSoTsP8+lcLQ=
-
-third-party-web@^0.11.0:
-  version "0.11.1"
-  resolved "https://registry.yarnpkg.com/third-party-web/-/third-party-web-0.11.1.tgz#4b5b176f0014be696002c104d76f40692318aec9"
-  integrity sha512-PBS478cWhvCM8seuloomV5lGHvu2qMOCj8gq8wKOApdfAaGh9l2rYZkdsBDaQyQg/6plov3uodc6sZ/3c1lu/g==
 
 third-party-web@^0.8.2:
   version "0.8.2"
