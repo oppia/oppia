@@ -78,9 +78,15 @@ require(
 require(
   'components/forms/schema-viewers/schema-based-primitive-viewer.directive.ts');
 require(
-  'components/forms/schema-viewers/schema-based-unicode-viewer.directive.ts');
+  'components/forms/schema-viewers/schema-based-unicode-viewer.directive.SkillMasteryModalControllerts');
 require('components/question-directives/question-player/' +
   'question-player.constants.ajs.ts');
+require(
+  'components/question-directives/question-player/' +
+  'question-player-concept-card-modal.controller.ts');
+require(
+  'components/question-directives/question-player/' +
+  'skill-mastery-modal.controller.ts');
 require('filters/string-utility-filters/normalize-whitespace.filter.ts');
 // ^^^ this block of requires should be removed ^^^
 
@@ -233,36 +239,11 @@ angular.module('oppia').directive('questionPlayer', [
                 '/components/concept-card/concept-card-modal.template.html'
               ),
               backdrop: true,
-              controller: [
-                '$controller', '$scope', '$uibModalInstance', '$window',
-                'UrlService',
-                function(
-                    $controller, $scope, $uibModalInstance, $window,
-                    UrlService) {
-                  $controller('ConfirmOrCancelModalController', {
-                    $scope: $scope,
-                    $uibModalInstance: $uibModalInstance
-                  });
-                  $scope.skillIds = skillIds;
-                  $scope.skills = skills;
-                  $scope.index = 0;
-                  $scope.modalHeader = $scope.skills[$scope.index];
-                  $scope.isInTestMode = true;
-
-                  $scope.isLastConceptCard = function() {
-                    return $scope.index === $scope.skills.length - 1;
-                  };
-
-                  $scope.goToNextConceptCard = function() {
-                    $scope.index++;
-                    $scope.modalHeader = $scope.skills[$scope.index];
-                  };
-
-                  $scope.retryTest = function() {
-                    $window.location.replace(UrlService.getPathname());
-                  };
-                }
-              ]
+              resolve: {
+                skills: skills,
+                skillIds: skillIds
+              },
+              controller: 'QuestionPlayerConceptCardModalController'
             }).result.then(function() {}, function() {
               // Note to developers:
               // This callback is triggered when the Cancel button is clicked.
@@ -529,25 +510,15 @@ angular.module('oppia').directive('questionPlayer', [
                 '/components/question-directives/question-player/' +
                 'skill-mastery-modal.template.html'),
               backdrop: true,
-              controller: [
-                '$controller', '$scope', '$uibModalInstance',
-                function(
-                    $controller, $scope, $uibModalInstance) {
-                  $controller('ConfirmOrCancelModalController', {
-                    $scope: $scope,
-                    $uibModalInstance: $uibModalInstance
-                  });
-                  $scope.skillId = skillId;
-                  $scope.userIsLoggedIn = ctrl.userIsLoggedIn;
-                  if ($scope.userIsLoggedIn) {
-                    $scope.masteryChange = ctrl.masteryPerSkillMapping[skillId];
-                  }
-
-                  $scope.openConceptCardModal = function(skillId) {
-                    openConceptCardModal([skillId]);
-                  };
-                }
-              ]
+              resolve: {
+                masteryPerSkillMapping: ctrl.masteryPerSkillMapping,
+                openConceptCardModal: function(arg) {
+                  openConceptCardModal(arg);
+                },
+                skillId: skillId,
+                userIsLoggedIn: ctrl.userIsLoggedIn,
+              },
+              controller: 'SkillMasteryModalController'
             }).result.then(function() {}, function() {
               // Note to developers:
               // This callback is triggered when the Cancel button is clicked.
