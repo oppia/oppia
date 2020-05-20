@@ -59,6 +59,8 @@ describe('Topics and skills dashboard functionality', function() {
 
     topicsAndSkillsDashboardPage.get();
     topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(1);
+    topicsAndSkillsDashboardPage.deleteTopicWithIndex(0);
+    topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(0);
   });
 
   it('should filter the topics', function() {
@@ -74,21 +76,18 @@ describe('Topics and skills dashboard functionality', function() {
 
     topicsAndSkillsDashboardPage.filterTopicsByKeyword('alp');
     topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(1);
+    topicsAndSkillsDashboardPage.resetTopicFilters();
 
     topicsAndSkillsDashboardPage.filterTopicsByKeyword('be');
     topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(1);
+    topicsAndSkillsDashboardPage.resetTopicFilters();
 
     topicsAndSkillsDashboardPage.filterTopicsByKeyword('gamma');
     topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(0);
-
     topicsAndSkillsDashboardPage.resetTopicFilters();
+
     topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(2);
 
-    topicsAndSkillsDashboardPage.filterTopicsByCategory('Mathematics');
-    topicsAndSkillsDashboardPage.filterTopicsByKeyword('alp');
-    topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(1);
-    topicsAndSkillsDashboardPage.resetTopicFilters();
-    topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(2);
     topicsAndSkillsDashboardPage.filterTopicsByCategory('Mathematics');
     topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(2);
   });

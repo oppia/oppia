@@ -29,7 +29,7 @@ require('services/image-upload-helper.service.ts');
 
 // TODO(#9186): Change variable name to 'constants' once this file
 // is migrated to Angular.
-const topicConstants = require('constants.ts');
+const topicConstants2 = require('constants.ts');
 
 angular.module('oppia').factory('TopicCreationService', [
   '$rootScope', '$uibModal', '$window', 'AlertsService',
@@ -71,7 +71,7 @@ angular.module('oppia').factory('TopicCreationService', [
                 $scope.topic.getAbbreviatedName());
               $scope.editableDescription = $scope.topic.getDescription();
               $scope.allowedBgColors = (
-                topicConstants.ALLOWED_THUMBNAIL_BG_COLORS.topic);
+                topicConstants2.ALLOWED_THUMBNAIL_BG_COLORS.topic);
               $scope.categories = TOPIC_CATEGORIES;
               $scope.editableDescriptionIsEmpty = (
                 $scope.editableDescription === '');

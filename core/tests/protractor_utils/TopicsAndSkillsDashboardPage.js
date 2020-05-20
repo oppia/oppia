@@ -29,8 +29,6 @@ var TopicsAndSkillsDashboardPage = function() {
     by.css('.protractor-test-skill-description'));
   var createTopicButton = element(
     by.css('.protractor-test-create-topic-button'));
-  var deleteTopicButtons = element.all(
-    by.css('.protractor-test-delete-topic-button'));
   var createSkillButton = element(
     by.css('.protractor-test-create-skill-button'));
   var deleteSkillButtons = element.all(
@@ -50,7 +48,7 @@ var TopicsAndSkillsDashboardPage = function() {
   var topicFilterCategoryField = element(by.css(
     '.protractor-test-topic-filter-category'));
   var topicResetFilters = element(by.css(
-    'protractor-test-topic-filter-reset'));
+    '.protractor-test-topic-filter-reset'));
   var skillNameField = element(
     by.css('.protractor-test-new-skill-description-field')
   );
@@ -160,10 +158,11 @@ var TopicsAndSkillsDashboardPage = function() {
         createTopicButton,
         'Create Topic button takes too long to be clickable');
       createTopicButton.click();
-
       topicNameField.sendKeys(topicName);
       topicDescriptionField.sendKeys(description);
-      topicCategoryField.sendKeys(category);
+      // topicCategoryField.first().click();
+      topicCategoryField.click();
+      browser.driver.switchTo().activeElement().sendKeys(category + '\n');
       confirmTopicCreationButton.click();
 
       waitFor.newTabToBeCreated(
@@ -202,19 +201,26 @@ var TopicsAndSkillsDashboardPage = function() {
   };
 
   this.deleteTopicWithIndex = function(index) {
-    deleteTopicButtons.then(function(elems) {
-      waitFor.elementToBeClickable(
-        elems[0],
-        'Delete Topic button takes too long to be clickable');
-      elems[0].click();
+    // Update this
 
+    waitFor.visibilityOf(element(by.css('.protractor-test-topics-table')),
+      'Topic Names taking too long to appear.');
+    element.all(
+      by.css('.protractor-test-topic-edit-box')).then((elems) => {
+      var deleteTopicButton = element(
+        by.css('.protractor-test-delete-topic-button'));
+      var topicEditOptionBox = elems[index];
+      browser.actions().mouseMove(topicEditOptionBox).perform();
+      waitFor.elementToBeClickable(
+        deleteTopicButton,
+        'Delete Topic button takes too long to be clickable');
+      deleteTopicButton.click();
       waitFor.elementToBeClickable(
         confirmTopicDeletionButton,
         'Confirm Delete Topic button takes too long to be clickable');
       confirmTopicDeletionButton.click();
+      waitFor.pageToFullyLoad();
     });
-
-    waitFor.pageToFullyLoad();
   };
 
   this.deleteSkillWithIndex = function(index) {

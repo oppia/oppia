@@ -900,8 +900,29 @@ class Topic(python_utils.OBJECT):
                 % self.uncategorized_skill_ids)
 
     @classmethod
-    def create_default_topic(
-            cls, topic_id, name, abbreviated_name, description, category):
+    def create_topic_from_data(
+            cls, topic_id, name, description, category):
+        """Returns a topic domain object with the provided values. This is for
+        the frontend where a topic is created for the first time.
+
+        Args:
+            topic_id: str. The unique id of the topic.
+            name: str. The initial name for the topic.
+            category: str. The category for the topic.
+            description: str. The description for the topic.
+
+        Returns:
+            Topic. The Topic domain object with the default values.
+        """
+        return cls(
+            topic_id, name, '', None, None,
+            description, category, [], [], [], [],
+            feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION, 1,
+            constants.DEFAULT_LANGUAGE_CODE, 0,
+            feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION)
+
+    @classmethod
+    def create_default_topic(cls, topic_id, name, abbreviated_name):
         """Returns a topic domain object with default values. This is for
         the frontend where a default blank topic would be shown to the user
         when the topic is created for the first time.
@@ -910,16 +931,14 @@ class Topic(python_utils.OBJECT):
             topic_id: str. The unique id of the topic.
             name: str. The initial name for the topic.
             abbreviated_name: str. The abbreviated name for the topic.
-            category: str. The category for the topic.
-            description: str. The description for the topic.
 
         Returns:
             Topic. The Topic domain object with the default values.
         """
         return cls(
             topic_id, name, abbreviated_name, None, None,
-            description, category, [], [], [], [],
-            feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION, 1,
+            feconf.DEFAULT_TOPIC_DESCRIPTION, feconf.DEFAULT_TOPIC_CATEGORY,
+            [], [], [], [], feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION, 1,
             constants.DEFAULT_LANGUAGE_CODE, 0,
             feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION)
 

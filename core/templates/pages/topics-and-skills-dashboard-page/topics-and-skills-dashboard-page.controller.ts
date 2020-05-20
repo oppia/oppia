@@ -242,7 +242,8 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
             }
           };
           ctrl.changePage = function(str) {
-            ctrl.lastPage = parseInt(ctrl.totalCount / ctrl.itemsPerPage);
+            ctrl.lastPage = parseInt(
+              String(ctrl.totalCount / ctrl.itemsPerPage));
             if (str === ctrl.PREV_PAGE && ctrl.pageNumber >= 1) {
               ctrl.paginationHandler(ctrl.pageNumber - 1);
             } else if (str === ctrl.NEXT_PAGE &&
