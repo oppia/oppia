@@ -92,30 +92,26 @@ var TopicsAndSkillsDashboardPage = function() {
     await waitFor.pageToFullyLoad();
   };
 
-  this.mergeSkillWithIndexToSkillWithIndex = (
-    function(oldSkillIndex, newSkillIndex) {
-      mergeSkillsButtons.then(function(elems) {
-        elems[oldSkillIndex].click();
-        skillsListItems.then(function(skills) {
-          skills[newSkillIndex].click();
-          confirmSkillsMergeButton.click();
-        });
-      });
-    });
+  this.mergeSkillWithIndexToSkillWithIndex = async function(
+      oldSkillIndex, newSkillIndex) {
+    var elems = await mergeSkillsButtons;
+    await elems[oldSkillIndex].click();
+    var skills = await skillsListItems;
+    await skills[newSkillIndex].click();
+    await confirmSkillsMergeButton.click();
+  };
 
   this.navigateToTopicWithIndex = async function(index) {
     var elems = await topicsListItems;
     await elems[index].click();
   };
 
-  this.assignSkillWithIndexToTopic = function(index, topicIndex) {
-    assignSkillToTopicButtons.then(function(elems) {
-      elems[index].click();
-      topicsListItems.then(function(topics) {
-        topics[index].click();
-        confirmMoveButton.click();
-      });
-    });
+  this.assignSkillWithIndexToTopic = async function(index, topicIndex) {
+    var elems = await assignSkillToTopicButtons;
+    await elems[index].click();
+    var topics = await topicsListItems;
+    await topics[index].click();
+    await confirmMoveButton.click();
   };
 
   this.assignSkillWithIndexToTopicByTopicName = function(
@@ -164,102 +160,92 @@ var TopicsAndSkillsDashboardPage = function() {
     return await waitFor.pageToFullyLoad();
   };
 
-  this.deleteTopicWithIndex = function(index) {
-    deleteTopicButtons.then(function(elems) {
-      waitFor.elementToBeClickable(
-        elems[0],
-        'Delete Topic button takes too long to be clickable');
-      elems[0].click();
+  this.deleteTopicWithIndex = async function(index) {
+    var elems = await deleteTopicButtons;
+    await waitFor.elementToBeClickable(
+      elems[0],
+      'Delete Topic button takes too long to be clickable');
+    await elems[0].click();
 
-      waitFor.elementToBeClickable(
-        confirmTopicDeletionButton,
-        'Confirm Delete Topic button takes too long to be clickable');
-      confirmTopicDeletionButton.click();
-    });
-
-    waitFor.pageToFullyLoad();
+    await waitFor.elementToBeClickable(
+      confirmTopicDeletionButton,
+      'Confirm Delete Topic button takes too long to be clickable');
+    await confirmTopicDeletionButton.click();
+    await waitFor.pageToFullyLoad();
   };
 
-  this.deleteSkillWithIndex = function(index) {
-    deleteSkillButtons.then(function(elems) {
-      waitFor.elementToBeClickable(
-        elems[0],
-        'Delete skill button takes too long to be clickable');
-      elems[0].click();
-
-      waitFor.elementToBeClickable(
-        confirmSkillDeletionButton,
-        'Confirm Delete Skill button takes too long to be clickable');
-      confirmSkillDeletionButton.click();
-    });
-
-    waitFor.pageToFullyLoad();
+  this.deleteSkillWithIndex = async function(index) {
+    var elems = await deleteSkillButtons;
+    await waitFor.elementToBeClickable(
+      elems[0],
+      'Delete skill button takes too long to be clickable');
+    await elems[0].click();
+    await waitFor.elementToBeClickable(
+      confirmSkillDeletionButton,
+      'Confirm Delete Skill button takes too long to be clickable');
+    await confirmSkillDeletionButton.click();
+    await waitFor.pageToFullyLoad();
   };
 
   this.createSkillWithDescriptionAndExplanation = async function(
       description, reviewMaterial, shouldCloseSkillEditor) {
     var initialHandles = [];
-    return browser.getAllWindowHandles().then(function(handles) {
-      initialHandles = handles;
-      return browser.getWindowHandle();
-    }).then(function(parentHandle) {
-      waitFor.elementToBeClickable(
-        createSkillButton,
-        'Create Skill button takes too long to be clickable');
-      createSkillButton.click();
+    var handles = await browser.getAllWindowHandles();
+    initialHandles = handles;
+    var parentHandle = await browser.getWindowHandle();
+    await waitFor.elementToBeClickable(
+      createSkillButton,
+      'Create Skill button takes too long to be clickable');
+    await createSkillButton.click();
 
-      skillNameField.sendKeys(description);
-      editConceptCardExplanationButton.click();
+    await skillNameField.sendKeys(description);
+    await editConceptCardExplanationButton.click();
 
-      var editor = element(by.css('.protractor-test-concept-card-text'));
-      waitFor.visibilityOf(
-        editor, 'Explanation Editor takes too long to appear');
+    var editor = element(by.css('.protractor-test-concept-card-text'));
+    await waitFor.visibilityOf(
+      editor, 'Explanation Editor takes too long to appear');
 
-      browser.switchTo().activeElement().sendKeys(reviewMaterial);
+    await browser.switchTo().activeElement().sendKeys(reviewMaterial);
 
-      waitFor.elementToBeClickable(
-        saveConceptCardExplanationButton,
-        'Save Concept Card Explanation button takes too long to be clickable');
-      saveConceptCardExplanationButton.click();
-      waitFor.invisibilityOf(
-        editor, 'Explanation Editor takes too long to close');
+    await waitFor.elementToBeClickable(
+      saveConceptCardExplanationButton,
+      'Save Concept Card Explanation button takes too long to be clickable');
+    await saveConceptCardExplanationButton.click();
+    await waitFor.invisibilityOf(
+      editor, 'Explanation Editor takes too long to close');
 
-      skillEditorPage.addRubricExplanationForDifficulty(
-        'Easy', 'Explanation for easy difficulty.');
-      skillEditorPage.addRubricExplanationForDifficulty(
-        'Medium', 'Explanation for medium difficulty.');
-      skillEditorPage.addRubricExplanationForDifficulty(
-        'Hard', 'Explanation for hard difficulty.');
+    await skillEditorPage.addRubricExplanationForDifficulty(
+      'Easy', 'Explanation for easy difficulty.');
+    await skillEditorPage.addRubricExplanationForDifficulty(
+      'Medium', 'Explanation for medium difficulty.');
+    await skillEditorPage.addRubricExplanationForDifficulty(
+      'Hard', 'Explanation for hard difficulty.');
 
-      waitFor.elementToBeClickable(
-        confirmSkillCreationButton,
-        'Create skill button takes too long to be clickable');
-      confirmSkillCreationButton.click();
+    await waitFor.elementToBeClickable(
+      confirmSkillCreationButton,
+      'Create skill button takes too long to be clickable');
+    await confirmSkillCreationButton.click();
 
-      waitFor.newTabToBeCreated(
-        'Creating skill takes too long', '/skill_editor/');
-      return browser.getAllWindowHandles().then(function(handles) {
-        var newHandle = handles.filter(
-          handle => initialHandles.indexOf(handle) === -1)[0];
-        browser.switchTo().window(newHandle).then(function() {
-          if (shouldCloseSkillEditor) {
-            browser.driver.close();
-            return browser.switchTo().window(parentHandle);
-          }
-          return waitFor.pageToFullyLoad();
-        });
-      });
-    });
+    await waitFor.newTabToBeCreated(
+      'Creating skill takes too long', '/skill_editor/');
+    handles = await browser.getAllWindowHandles();
+    var newHandle = handles.filter(
+      handle => initialHandles.indexOf(handle) === -1)[0];
+    await browser.switchTo().window(newHandle);
+    if (shouldCloseSkillEditor) {
+      await browser.driver.close();
+      await browser.switchTo().window(parentHandle);
+    }
+    await waitFor.pageToFullyLoad();
   };
 
-  this.navigateToUnusedSkillsTab = function() {
-    unusedSkillsTabButton.click();
+  this.navigateToUnusedSkillsTab = async function() {
+    await unusedSkillsTabButton.click();
   };
 
-  this.expectNumberOfTopicsToBe = function(number) {
-    topicsListItems.then(function(elems) {
-      expect(elems.length).toBe(number);
-    });
+  this.expectNumberOfTopicsToBe = async function(number) {
+    var elems = await topicsListItems;
+    expect(elems.length).toBe(number);
   };
 
   this.expectTopicNameToBe = function(topicName, index) {
@@ -288,10 +274,9 @@ var TopicsAndSkillsDashboardPage = function() {
     });
   };
 
-  this.expectNumberOfSkillsToBe = function(number) {
-    skillsListItems.then(function(elems) {
-      expect(elems.length).toBe(number);
-    });
+  this.expectNumberOfSkillsToBe = async function(number) {
+    var elems = await skillsListItems;
+    expect(elems.length).toBe(number);
   };
 
   this.searchSkillByName = function(name) {

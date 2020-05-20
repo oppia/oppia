@@ -103,22 +103,23 @@ var SkillEditorPage = function() {
     return waitFor.pageToFullyLoad();
   };
 
-  this.addRubricExplanationForDifficulty = function(difficulty, explanation) {
+  this.addRubricExplanationForDifficulty = async function(
+      difficulty, explanation) {
     var addRubricExplanationButton = element(
       by.css('.protractor-test-add-explanation-button-' + difficulty));
-    waitFor.elementToBeClickable(
+    await waitFor.elementToBeClickable(
       addRubricExplanationButton,
       'Add Rubric Explanation button takes too long to be clickable');
-    addRubricExplanationButton.click();
+    await addRubricExplanationButton.click();
     var editor = element(
       by.css('.protractor-test-rubric-explanation-text'));
-    waitFor.visibilityOf(
+    await waitFor.visibilityOf(
       editor, 'Rubric explanation editor takes too long to appear');
-    browser.switchTo().activeElement().sendKeys(explanation);
-    waitFor.elementToBeClickable(
+    await browser.switchTo().activeElement().sendKeys(explanation);
+    await waitFor.elementToBeClickable(
       saveRubricExplanationButton,
       'Save Rubric Explanation button takes too long to be clickable');
-    saveRubricExplanationButton.click();
+    await saveRubricExplanationButton.click();
   };
 
   this.deleteRubricExplanationWithIndex = function(difficulty, explIndex) {
@@ -186,24 +187,24 @@ var SkillEditorPage = function() {
     });
   };
 
-  this.saveQuestion = function() {
-    saveQuestionButton.click();
-    return waitFor.pageToFullyLoad();
+  this.saveQuestion = async function() {
+    await saveQuestionButton.click();
+    await waitFor.pageToFullyLoad();
   };
 
-  this.moveToQuestionsTab = function() {
-    waitFor.elementToBeClickable(
+  this.moveToQuestionsTab = async function() {
+    await waitFor.elementToBeClickable(
       questionsTab,
       'Questions tab button takes too long to be clickable');
-    questionsTab.click();
+    await questionsTab.click();
   };
 
-  this.clickCreateQuestionButton = function() {
-    createQuestionButton.click();
+  this.clickCreateQuestionButton = async function() {
+    await createQuestionButton.click();
   };
 
-  this.confirmSkillDifficulty = function() {
-    confirmSkillDifficultyButton.click();
+  this.confirmSkillDifficulty = async function() {
+    await confirmSkillDifficultyButton.click();
   };
 
   this.changeSkillDescription = function(description) {
