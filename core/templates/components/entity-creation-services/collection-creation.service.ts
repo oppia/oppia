@@ -69,7 +69,7 @@ export class CollectionCreationService {
                 collection_id: response.collectionId
               }
             );
-            CollectionCreationService.collectionCreationInProgress = false;
+          CollectionCreationService.collectionCreationInProgress = false;
         }, 150);
       }, () => {
         this.loaderService.hideLoadingScreen();
