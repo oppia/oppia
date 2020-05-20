@@ -103,6 +103,7 @@ describe('Topics and skills dashboard functionality', function() {
       topicsAndSkillsDashboardPage.get();
       topicsAndSkillsDashboardPage.navigateToUnusedSkillsTab();
       topicsAndSkillsDashboardPage.mergeSkillWithIndexToSkillWithIndex(0, 0);
+      topicsAndSkillsDashboardPage.get();
       topicsAndSkillsDashboardPage.navigateToTopicWithIndex(0);
       topicEditorPage.moveToQuestionsTab();
       topicEditorPage.expectNumberOfQuestionsForSkillWithDescriptionToBe(
