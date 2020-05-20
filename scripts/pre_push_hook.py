@@ -348,14 +348,13 @@ def does_diff_include_js_or_ts_files(files_to_lint):
 
 
 def does_diff_include_ts_files(files_to_lint):
-    """Returns true if diff includes JavaScript or TypeScript files.
+    """Returns true if diff includes TypeScript files.
 
     Args:
         files_to_lint: list(str). List of files to be linted.
 
     Returns:
-        bool. Whether the diff contains changes in any JavaScript or TypeScript
-            files.
+        bool. Whether the diff contains changes in any TypeScript files.
     """
 
     for filename in files_to_lint:
