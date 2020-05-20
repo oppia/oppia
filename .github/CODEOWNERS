@@ -294,15 +294,16 @@
 /core/templates/components/score-ring/ @vinitamurthi
 /core/templates/components/skill-mastery/ @sophiewu6 @vinitamurthi
 /core/templates/components/skills-mastery-list/ @sophiewu6 @vinitamurthi
+/core/templates/components/question-directives/modal-templates/ @aks681 @vinitamurthi
+/core/templates/components/question-directives/question-editor/ @aks681 @vinitamurthi
+/core/templates/components/question-directives/question-misconception-editor/ @aks681 @kevintab95
+/core/templates/components/question-directives/question-player/ @vinitamurthi
+/core/templates/components/question-directives/questions-list/ @aks681 @vinitamurthi
 /core/templates/domain/question/ @aks681 @vinitamurthi
 /core/templates/domain/review_test/ @nishantwrp @sophiewu6 @vinitamurthi
 /core/templates/pages/practice-session-page/ @vinitamurthi
 /core/templates/pages/review-test-page/ @sophiewu6 @vinitamurthi
 /core/templates/services/questions-list.service*.ts @sophiewu6 @vinitamurthi
-/core/templates/components/question-directives/question-editor/ @aks681 @vinitamurthi
-/core/templates/components/question-directives/questions-list/ @aks681 @vinitamurthi
-/core/templates/components/question-directives/modal-templates/ @aks681 @vinitamurthi
-/core/templates/components/question-directives/question-player/ @vinitamurthi
 
 # Readme
 /core/README.md @ankita240796

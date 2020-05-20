@@ -319,8 +319,17 @@ angular.module('oppia').directive('stateResponses', [
                     COMPONENT_NAME_FEEDBACK, INTERACTION_SPECS) {
                   $scope.feedbackEditorIsOpen = false;
                   $scope.addState = addState;
-                  $scope.questionModeEnabled =
-                    StateEditorService.isInQuestionMode();
+                  $scope.questionModeEnabled = (
+                    StateEditorService.isInQuestionMode());
+                  $scope.updateAnswerGroupFeedback = function(outcome) {
+                    $scope.openFeedbackEditor();
+                    $scope.tmpOutcome.feedback = outcome.feedback;
+                  };
+                  $scope.updateTaggedMisconception = function(
+                      misconceptionId, skillId) {
+                    $scope.tmpTaggedSkillMisconceptionId = (
+                      `${skillId}-${misconceptionId}`);
+                  };
                   $scope.openFeedbackEditor = function() {
                     $scope.feedbackEditorIsOpen = true;
                   };
@@ -339,6 +348,7 @@ angular.module('oppia').directive('stateResponses', [
                   $scope.tmpOutcome = OutcomeObjectFactory.createNew(
                     $scope.questionModeEnabled ? null : stateName,
                     feedbackContentId, '', []);
+                  $scope.tmpTaggedSkillMisconceptionId = null;
 
                   $scope.isSelfLoopWithNoFeedback = function(tmpOutcome) {
                     return (
@@ -357,6 +367,8 @@ angular.module('oppia').directive('stateResponses', [
                     $uibModalInstance.close({
                       tmpRule: angular.copy($scope.tmpRule),
                       tmpOutcome: angular.copy($scope.tmpOutcome),
+                      tmpTaggedSkillMisconceptionId: (
+                        $scope.tmpTaggedSkillMisconceptionId),
                       reopen: reopen
                     });
                   };
@@ -370,7 +382,8 @@ angular.module('oppia').directive('stateResponses', [
             }).result.then(function(result) {
               // Create a new answer group.
               $scope.answerGroups.push(AnswerGroupObjectFactory.createNew(
-                [result.tmpRule], result.tmpOutcome, [], null));
+                [result.tmpRule], result.tmpOutcome, [],
+                result.tmpTaggedSkillMisconceptionId));
               ResponsesService.save(
                 $scope.answerGroups, $scope.defaultOutcome,
                 function(newAnswerGroups, newDefaultOutcome) {
