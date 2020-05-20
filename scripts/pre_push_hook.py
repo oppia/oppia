@@ -399,8 +399,10 @@ def main(args=None):
                         'Push failed, please correct the linting issues above.')
                     sys.exit(1)
 
-            typescript_check_status = run_script_and_get_returncode(
-                TYPESCRIPT_CHECKS_CMD)
+            typescript_check_status = 0
+            if does_diff_include_js_or_ts_files(files_to_lint):
+                typescript_check_status = run_script_and_get_returncode(
+                    TYPESCRIPT_CHECKS_CMD)
             if typescript_check_status != 0:
                 python_utils.PRINT(
                     'Push aborted due to failing typescript checks.')
