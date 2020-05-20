@@ -26,10 +26,12 @@ import { IRuleBackendDict, Rule, RuleObjectFactory } from
   'domain/exploration/RuleObjectFactory';
 
 export interface IAnswerGroupBackendDict {
+  /* eslint-disable camelcase */
   rule_specs: IRuleBackendDict[];
   outcome: IOutcomeBackendDict;
   training_data: object[];
   tagged_skill_misconception_id: string;
+  /* eslint-enable camelcase */
 }
 
 export class AnswerGroup {

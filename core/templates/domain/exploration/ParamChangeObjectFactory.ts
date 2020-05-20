@@ -36,9 +36,11 @@ var DEFAULT_CUSTOMIZATION_ARGS = {
 };
 
 export interface IParamChangeBackendDict {
+  /* eslint-disable camelcase */
   customization_args: ICustomizationArgs;
   generator_id: string;
   name: string;
+  /* eslint-enable camelcase */
 }
 
 export class ParamChange {

@@ -17,11 +17,6 @@
  * CustomizationArgs domain objects.
  */
 
-// TODO(brianrodri): Customization args have barely any type-info because their
-// values depend on the interaction. We might be able to introduce type-info by
-// making these types generic w/ an Interaction sub-class as a type argument,
-// but that would take significant refactoring.
-
 export interface ICustomizationArg {
   value: object;
 }
@@ -29,3 +24,10 @@ export interface ICustomizationArg {
 export interface ICustomizationArgs {
   [name: string]: ICustomizationArg
 };
+
+// TODO(brianrodri): Create a proper CustomizationArgs class. Currently, these
+// instances have no type-info because their values depend on the interaction.
+//
+// We might be able to introduce type-info by making these types generic w/ an
+// Interaction sub-class as a type argument, but that would take significant
+// refactoring.

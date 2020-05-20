@@ -27,12 +27,14 @@ import { IParamChangeBackendDict } from
   'domain/exploration/ParamChangeObjectFactory';
 
 export interface IOutcomeBackendDict {
+  /* eslint-disable camelcase */
   dest: string;
   feedback: ISubtitledHtmlBackendDict;
   labelled_as_correct: boolean;
   param_changes: IParamChangeBackendDict;
   refresher_exploration_id: string;
   missing_prerequisite_skill_id: string;
+  /* eslint-enable camelcase */
 }
 
 export class Outcome {

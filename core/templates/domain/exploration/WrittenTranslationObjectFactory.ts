@@ -21,8 +21,10 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 export interface IWrittenTranslationBackendDict {
+  /* eslint-disable camelcase */
   html: string;
   needs_update: boolean;
+  /* eslint-enable camelcase */
 }
 
 export class WrittenTranslation {

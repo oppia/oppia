@@ -37,6 +37,7 @@ import {
 const constants = require('constants.ts');
 
 export interface IStateBackendDict {
+  /* eslint-disable camelcase */
   classifier_model_id: string;
   content: ISubtitledHtmlBackendDict;
   interaction: IInteractionBackendDict;
@@ -44,6 +45,7 @@ export interface IStateBackendDict {
   recorded_voiceovers: IRecordedVoiceoversBackendDict;
   solicit_answer_details: boolean;
   written_translations: IWrittenTranslationsBackendDict;
+  /* eslint-enable camelcase */
 }
 
 export class State {

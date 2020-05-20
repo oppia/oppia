@@ -25,7 +25,9 @@ import {
 } from 'domain/exploration/SubtitledHtmlObjectFactory';
 
 export interface IHintBackendDict {
+  /* eslint-disable camelcase */
   hint_content: ISubtitledHtmlBackendDict;
+  /* eslint-enable camelcase */
 }
 
 export class Hint {

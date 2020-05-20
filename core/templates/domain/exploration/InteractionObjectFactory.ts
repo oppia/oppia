@@ -33,6 +33,7 @@ import { ICustomizationArgs } from
   'domain/state/CustomizationArgsObjectFactory';
 
 export interface IInteractionBackendDict {
+  /* eslint-disable camelcase */
   id: string;
   customization_args: ICustomizationArgs;
   answer_groups: IAnswerGroupBackendDict[];
@@ -40,6 +41,7 @@ export interface IInteractionBackendDict {
   confirmed_unclassified_answers: IAnswerGroupBackendDict[];
   hints: IHintBackendDict[];
   solution: ISolutionBackendDict;
+  /* eslint-enable camelcase */
 }
 
 export class Interaction {
