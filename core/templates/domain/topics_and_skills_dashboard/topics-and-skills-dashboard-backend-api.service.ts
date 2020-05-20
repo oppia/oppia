@@ -55,6 +55,7 @@ import { TopicsAndSkillsDashboardDomainConstants } from
   }
 
   interface ITopicsAndSkillsDashboardDataBackendDict {
+    /* eslint-disable camelcase */
     untriaged_skill_summary_dicts: ISkillSummaryBackendDict[];
     mergeable_skill_summary_dicts: ISkillSummaryBackendDict[];
     topic_summary_dicts: ITopicSummaryBackendDict[];
@@ -62,6 +63,7 @@ import { TopicsAndSkillsDashboardDomainConstants } from
     can_create_topic: boolean;
     can_delete_skill: boolean;
     can_create_Skill: boolean;
+    /* eslint-enable camelcase */
   }
 
 @Injectable({
