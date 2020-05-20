@@ -508,15 +508,12 @@ class ExplorationCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
         self.assertEqual(len(results), 1)
 
     def test_get_multi(self):
-        commit1 = (
-            exp_models.ExplorationCommitLogEntryModel.create(
-                'a', 1, 'committer_id', 'username', 'msg',
-                'create', [{}],
-                constants.ACTIVITY_STATUS_PRIVATE, False))
-        commit2 = (
-            exp_models.ExplorationCommitLogEntryModel.create(
-                'a', 2, 'committer_id', 'msg', 'create', [{}],
-                constants.ACTIVITY_STATUS_PUBLIC, False))
+        commit1 = exp_models.ExplorationCommitLogEntryModel.create(
+            'a', 1, 'committer_id', 'msg', 'create', [{}],
+            constants.ACTIVITY_STATUS_PRIVATE, False)
+        commit2 = exp_models.ExplorationCommitLogEntryModel.create(
+            'a', 2, 'committer_id', 'msg', 'create', [{}],
+            constants.ACTIVITY_STATUS_PUBLIC, False)
         commit1.exploration_id = 'a'
         commit2.exploration_id = 'a'
         commit1.put()
