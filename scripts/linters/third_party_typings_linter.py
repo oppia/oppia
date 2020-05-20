@@ -29,42 +29,44 @@ from . import linter_utils
 _MANIFEST_JSON_FILE_PATH = os.path.join(os.getcwd(), 'manifest.json')
 _PACKAGE_JSON_FILE_PATH = os.path.join(os.getcwd(), 'package.json')
 _TYPE_DEFS_FILE_EXTENSION_LENGTH = len('.d.ts')
+_DEPENDENCY_SOURCE_MANIFEST = 'manifest.json'
+_DEPENDENCY_SOURCE_PACKAGE = 'package.json'
 
 THIRD_PARTY_LIBS = [
     {
         'name': 'Guppy',
         'dependency_key': 'guppy',
-        'dependency_source': 'manifest.json',
+        'dependency_source': _DEPENDENCY_SOURCE_MANIFEST,
         'type_defs_filename_prefix': 'guppy-defs-'
     },
     {
         'name': 'Skulpt',
         'dependency_key': 'skulpt-dist',
-        'dependency_source': 'manifest.json',
+        'dependency_source': _DEPENDENCY_SOURCE_MANIFEST,
         'type_defs_filename_prefix': 'skulpt-defs-'
     },
     {
         'name': 'Math Expressions',
         'dependency_key': 'mathExpressions',
-        'dependency_source': 'manifest.json',
+        'dependency_source': _DEPENDENCY_SOURCE_MANIFEST,
         'type_defs_filename_prefix': 'math-expressions-defs-'
     },
     {
         'name': 'MIDI',
         'dependency_key': 'midiJs',
-        'dependency_source': 'manifest.json',
+        'dependency_source': _DEPENDENCY_SOURCE_MANIFEST,
         'type_defs_filename_prefix': 'midi-defs-'
     },
     {
         'name': 'Wavesurfer',
         'dependency_key': 'wavesurfer.js',
-        'dependency_source': 'package.json',
+        'dependency_source': _DEPENDENCY_SOURCE_PACKAGE,
         'type_defs_filename_prefix': 'wavesurfer-defs-'
     },
     {
         'name': 'Nerdamer',
         'dependency_key': 'nerdamer',
-        'dependency_source': 'package.json',
+        'dependency_source': _DEPENDENCY_SOURCE_PACKAGE,
         'type_defs_filename_prefix': 'nerdamer-defs-'
     }
 ]
@@ -89,17 +91,16 @@ def check_third_party_libs_type_defs(verbose_mode_enabled):
             package = json.load(f)['dependencies']
 
         files_in_typings_dir = os.listdir(
-            os.path.join(os.getcwd(), 'typings')
-        )
+            os.path.join(os.getcwd(), 'typings'))
 
         for third_party_lib in THIRD_PARTY_LIBS:
             lib_dependency_source = third_party_lib['dependency_source']
 
-            if lib_dependency_source == 'manifest.json':
+            if lib_dependency_source == _DEPENDENCY_SOURCE_MANIFEST:
                 lib_version = (
                     manifest[third_party_lib['dependency_key']]['version'])
 
-            elif lib_dependency_source == 'package.json':
+            elif lib_dependency_source == _DEPENDENCY_SOURCE_PACKAGE:
                 lib_version = package[third_party_lib['dependency_key']]
 
                 if lib_version[0] == '^':
@@ -111,21 +112,18 @@ def check_third_party_libs_type_defs(verbose_mode_enabled):
 
             files_with_prefix_name = [
                 file_name for file_name in files_in_typings_dir
-                if file_name.startswith(prefix_name)
-            ]
+                if file_name.startswith(prefix_name)]
 
             if len(files_with_prefix_name) > 1:
                 python_utils.PRINT(
                     'There are multiple type definitions for %s in the typings '
-                    'dir.' % third_party_lib['name']
-                )
+                    'dir.' % third_party_lib['name'])
                 python_utils.PRINT('')
                 failed = True
             elif len(files_with_prefix_name) == 0:
                 python_utils.PRINT(
                     'There are no type definitions for %s in the typings '
-                    'dir.' % third_party_lib['name']
-                )
+                    'dir.' % third_party_lib['name'])
                 python_utils.PRINT('')
                 failed = True
             else:
