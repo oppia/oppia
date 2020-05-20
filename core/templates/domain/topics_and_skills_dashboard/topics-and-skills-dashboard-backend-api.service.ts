@@ -24,18 +24,59 @@ import { TopicsAndSkillsDashboardDomainConstants } from
   // eslint-disable-next-line max-len
   '../topics_and_skills_dashboard/topics-and-skills-dashboard-domain.constants';
 
+  interface ITopicSummaryBackendDict {
+    /* eslint-disable camelcase */
+    id: string;
+    name: string;
+    language_code: string;
+    description: string;
+    version: number;
+    canonical_story_count: number;
+    additional_story_count: number;
+    uncategorized_skill_count: number;
+    subtopic_count: number;
+    total_skill_count: number;
+    topic_model_created_on: number;
+    topic_model_last_updated: number;
+    /* eslint-enable camelcase */
+  }
+
+  interface ISkillSummaryBackendDict {
+    /* eslint-disable camelcase */
+    id: string;
+    description: string;
+    language_code: string;
+    version: number;
+    misconception_count: number;
+    worked_examples_count: number;
+    skill_model_created_on: number;
+    skill_model_last_updated: number;
+    /* eslint-enable camelcase */
+  }
+
+  interface ITopicsAndSkillsDashboardDataBackendDict {
+    untriaged_skill_summary_dicts: ISkillSummaryBackendDict[];
+    mergeable_skill_summary_dicts: ISkillSummaryBackendDict[];
+    topic_summary_dicts: ITopicSummaryBackendDict[];
+    can_delete_topic: boolean;
+    can_create_topic: boolean;
+    can_delete_skill: boolean;
+    can_create_Skill: boolean;
+  }
 
 @Injectable({
   providedIn: 'root'
 })
+
 export class TopicsAndSkillsDashboardBackendApiService {
   constructor(private http: HttpClient) {}
 
-  fetchDashboardData(): Promise<any> {
-    return this.http.get('/topics_and_skills_dashboard/data').toPromise();
+  fetchDashboardData(): Promise<ITopicsAndSkillsDashboardDataBackendDict> {
+    return this.http.get<ITopicsAndSkillsDashboardDataBackendDict>(
+      '/topics_and_skills_dashboard/data').toPromise();
   }
 
-  mergeSkills(oldSkillId, newSkillId): Promise<void> {
+  mergeSkills(oldSkillId:string, newSkillId:string): Promise<void> {
     let mergeSkillsData = {
       old_skill_id: oldSkillId,
       new_skill_id: newSkillId

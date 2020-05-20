@@ -85,10 +85,10 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
                     return summary.can_edit_topic === true;
                   }
                 );
-                ctrl.untriagedSkillSummaries =
-                  response.untriaged_skill_summary_dicts;
-                ctrl.mergeableSkillSummaries =
-                  response.mergeable_skill_summary_dicts;
+                ctrl.untriagedSkillSummaries = (
+                  response.untriaged_skill_summary_dicts);
+                ctrl.mergeableSkillSummaries = (
+                  response.mergeable_skill_summary_dicts);
                 if (!stayInSameTab || !ctrl.activeTab) {
                   ctrl.activeTab = ctrl.TAB_NAME_TOPICS;
                 }
