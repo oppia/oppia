@@ -19,45 +19,47 @@ workflows:
 
     jobs:
       - setup
-      - lint_tests:
-          requires:
-            - setup
-      - frontend_tests:
-          requires:
-            - setup
-      - typescript_tests:
-          requires:
-            - frontend_tests
-      - backend_tests:
-          requires:
-            - frontend_tests
-      - e2e_file_upload_features:
-          requires:
-            - typescript_tests
+      # - lint_tests:
+      #     requires:
+      #       - setup
+      # - frontend_tests:
+      #     requires:
+      #       - setup
+      # - typescript_tests:
+      #     requires:
+      #       - frontend_tests
+      # - backend_tests:
+      #     requires:
+      #       - frontend_tests
+      # - e2e_file_upload_features:
+      #     requires:
+      #       - typescript_tests
       - e2e_navigation:
           requires:
-            - typescript_tests
+      #       - typescript_tests
+            - setup
       - e2e_classroom_page:
           requires:
-            - e2e_file_upload_features
-      - e2e_topic_and_story_editor:
-          requires:
-            - e2e_file_upload_features
-      - e2e_accessibility:
-          requires:
-            - e2e_navigation
-      - e2e_admin:
-          requires:
-            - e2e_navigation
+      #       - e2e_file_upload_features
+            - setup
+      # - e2e_topic_and_story_editor:
+      #     requires:
+      #       - e2e_file_upload_features
+      # - e2e_accessibility:
+      #     requires:
+      #       - e2e_navigation
+      # - e2e_admin:
+      #     requires:
+      #       - e2e_navigation
       - e2e_embedding:
           requires:
             - e2e_navigation
-      - e2e_library:
-          requires:
-            - e2e_navigation
-      - e2e_users:
-          requires:
-          - e2e_navigation
+      # - e2e_library:
+      #     requires:
+      #       - e2e_navigation
+      # - e2e_users:
+      #     requires:
+      #     - e2e_navigation
 
 var_for_docker_image: &docker_image circleci/python:2.7.17-browsers
 
@@ -305,6 +307,13 @@ jobs:
           name: Run e2e classroom page test
           command: |
             python -m scripts.run_e2e_tests --skip-install --skip-build --suite="classroomPageFileUploadFeatures"
+      # Remove once e2e_file_upload_features has been migrated
+      - persist_to_workspace:
+          root: /home/circleci/
+          paths:
+            - oppia/assets/hashes.json
+            - oppia/third_party/generated/
+            - oppia/webpack_bundles
 
   e2e_topic_and_story_editor:
     <<: *job_defaults
