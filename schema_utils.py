@@ -185,6 +185,30 @@ def get_validator(validator_id):
     return _Validators.get(validator_id)
 
 
+def contains_balanced_brackets(expression):
+    """Checks if the given expression contains a balanced bracket sequence.
+
+    Args:
+        expression: str. A math expression (algebraic/numeric).
+
+    Returns:
+        bool. Whether the given expression contains a balanced
+            bracket sequence.
+    """
+    openers, closers = '({[', ')}]'
+    stack = []
+    for character in expression:
+        if character in openers:
+            stack.append(character)
+        elif character in closers:
+            if len(stack) == 0:
+                return False
+            top_element = stack.pop()
+            if openers.index(top_element) != closers.index(character):
+                return False
+    return len(stack) == 0
+
+
 class Normalizers(python_utils.OBJECT):
     """Various normalizers.
 
@@ -387,3 +411,89 @@ class _Validators(python_utils.OBJECT):
             bool. Whether the given object is a valid email.
         """
         return bool(re.search(r'^[\w\.\+\-]+\@[\w]+\.[a-z]{2,3}$', obj))
+
+    @staticmethod
+    def is_valid_expression(obj, algebraic=True):
+        """Checks if the given  obj (a string) represents a valid algebraic or
+        numeric expression.
+
+        Args:
+            obj: str. The given expression.
+            algebraic: bool. True if the given expression is algebraic
+            else numeric.
+
+        Returns:
+            bool. Whether the given object is a valid expression.
+        """
+        valid_expression = True
+        valid_characters = '({[]})+-/*^.'
+
+        # Expression should not contain invalid characters.
+        for character in obj:
+            if character not in valid_characters and not bool(
+                    re.match(r'[a-zA-Z0-9]', character)):
+                valid_expression = False
+                break
+
+        # Algebraic expressions should contain at least one latin letter and
+        # numeric expressions should contain none.
+        if algebraic:
+            valid_expression &= bool(re.search(r'[a-zA-Z]+', obj))
+        else:
+            valid_expression &= not bool(re.search(r'[a-zA-Z]+', obj))
+
+        # Expression should contain a balanced bracket sequence.
+        valid_expression &= contains_balanced_brackets(obj)
+
+        # Expression should not contain multiple operators consecutively.
+        valid_operators = valid_characters[6:]
+        valid_expression &= not any(
+            obj[i] in valid_operators and obj[i - 1] in valid_operators for i in
+            python_utils.RANGE(1, len(obj)))
+
+        # Expression should not be an equation or inequality.
+        valid_expression &= not bool(re.search(r'(=|<|>)+', obj))
+
+        return valid_expression
+
+    @staticmethod
+    def is_each_element_a_single_latin_letter(obj):
+        """Returns True iff all elements of the given object (a list) are
+        singular latin letters (uppercase or lowercase).
+
+        Args:
+            obj: list(*). A list of strings.
+
+        Returns:
+            bool. Whether the given object has all latin letters.
+        """
+        for ele in obj:
+            if not bool(re.search(r'[a-zA-Z]+', ele)) or len(ele) != 1:
+                return False
+        return True
+
+    @staticmethod
+    def is_valid_math_equation(obj):
+        """Checks if the given  obj (a string) represents a valid math equation.
+
+        Args:
+            obj: str. A string.
+
+        Returns:
+            bool. Whether the given object is a valid math equation.
+        """
+        if obj.count('=') != 1:
+            return False
+
+        is_valid_expression = get_validator('is_valid_expression')
+        lhs, rhs = obj.split('=')
+
+        # Both sides have to be valid expressions and at least one of them has
+        # to be a valid algebraic expression.
+        if is_valid_expression(lhs) and is_valid_expression(rhs):
+            return True
+        if is_valid_expression(lhs) and is_valid_expression(rhs, False):
+            return True
+        if is_valid_expression(lhs, False) and is_valid_expression(rhs):
+            return True
+        return False

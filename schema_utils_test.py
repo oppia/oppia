@@ -151,6 +151,7 @@ VALIDATOR_SPECS = {
             }
         },
         'is_uniquified': {},
+        'is_each_element_a_single_latin_letter': {}
     },
     SCHEMA_TYPE_UNICODE: {
         'matches_regex': {
@@ -164,6 +165,12 @@ VALIDATOR_SPECS = {
         'is_nonempty': {},
         'is_regex': {},
         'is_valid_email': {},
+        'is_valid_expression': {
+            'algebraic': {
+                'type': SCHEMA_TYPE_BOOL
+            }
+        },
+        'is_valid_math_equation': {}
     },
 }
 
@@ -473,6 +480,84 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
         """
         with self.assertRaises(Exception):
             schema_utils.get_validator('some invalid validator method name')
+
+    def test_is_valid_algebraic_expression_validator(self):
+        """Tests for the is_valid_expression static method with
+        algebraic type.
+        """
+        is_valid_expression = schema_utils.get_validator('is_valid_expression')
+
+        self.assertTrue(is_valid_expression('a+b'))
+        self.assertTrue(is_valid_expression('1+(2*a)'))
+        self.assertTrue(is_valid_expression('(a+b)'))
+        self.assertTrue(is_valid_expression('{a+(b-c)}'))
+        self.assertTrue(is_valid_expression('(a)/((b)/(c))'))
+        self.assertTrue(is_valid_expression('{a+(b-[c])-(d^4)}'))
+        self.assertTrue(is_valid_expression('a+(-3)'))
+
+        self.assertFalse(is_valid_expression('a_b'))
+        self.assertFalse(is_valid_expression('~/'))
+        # This is a numeric expression not algebraic.
+        self.assertFalse(is_valid_expression('1+2'))
+        self.assertFalse(is_valid_expression('a*b)'))
+        self.assertFalse(is_valid_expression('(a}+{b)'))
+        self.assertFalse(is_valid_expression('{a+b)(c}'))
+        self.assertFalse(is_valid_expression('a**b'))
+        self.assertFalse(is_valid_expression('(a)^/(b)'))
+        self.assertFalse(is_valid_expression('a+-3'))
+        self.assertFalse(is_valid_expression('a=b'))
+        self.assertFalse(is_valid_expression('a<b'))
+        self.assertFalse(is_valid_expression('a>b'))
+        self.assertFalse(is_valid_expression('a<=b'))
+        self.assertFalse(is_valid_expression('a>=b'))
+
+    def test_is_valid_numeric_expression_validator(self):
+        """Tests for the is_valid_expression static method with numeric type."""
+        is_valid_expression = schema_utils.get_validator('is_valid_expression')
+
+        self.assertTrue(is_valid_expression('3+2', False))
+        self.assertTrue(is_valid_expression('3+2^3', False))
+        self.assertTrue(is_valid_expression('(5-2^[6+3])', False))
+        self.assertTrue(is_valid_expression('(-5)^(-1)/2', False))
+
+        self.assertFalse(is_valid_expression('3+2*a', False))
+        self.assertFalse(is_valid_expression('(3+2]', False))
+        self.assertFalse(is_valid_expression('3!2', False))
+        self.assertFalse(is_valid_expression('3-+2', False))
+        self.assertFalse(is_valid_expression('3-5=(-2)', False))
+
+    def test_is_each_element_a_single_latin_letter(self):
+        """Tests for the is_each_element_a_single_latin_letter static method."""
+        is_each_element_a_single_latin_letter = schema_utils.get_validator(
+            'is_each_element_a_single_latin_letter')
+
+        self.assertTrue(is_each_element_a_single_latin_letter([]))
+        self.assertTrue(is_each_element_a_single_latin_letter(['a', 'z']))
+        self.assertTrue(is_each_element_a_single_latin_letter(['a', 'Z']))
+        self.assertTrue(is_each_element_a_single_latin_letter(['A', 'Z']))
+
+        self.assertFalse(is_each_element_a_single_latin_letter(['A', '']))
+        self.assertFalse(is_each_element_a_single_latin_letter(['a', '1']))
+        self.assertFalse(is_each_element_a_single_latin_letter(['A', 'Bc']))
+        self.assertFalse(is_each_element_a_single_latin_letter(['.', '2']))
+
+    def test_is_valid_math_equation_validator(self):
+        """Tests for the is_valid_math_equation static method."""
+        is_valid_math_equation = schema_utils.get_validator(
+            'is_valid_math_equation')
+
+        self.assertTrue(is_valid_math_equation('a+b=c'))
+        self.assertTrue(is_valid_math_equation('a+b=0'))
+        self.assertTrue(is_valid_math_equation('0=a+b'))
+        self.assertTrue(is_valid_math_equation('(a/b)+c=(4^3)*a'))
+
+        self.assertFalse(is_valid_math_equation('a+b<=0'))
+        self.assertFalse(is_valid_math_equation('a+b>=0'))
+        self.assertFalse(is_valid_math_equation('a+b<0'))
+        self.assertFalse(is_valid_math_equation('a+b>0'))
+        self.assertFalse(is_valid_math_equation('5+3=8'))
+        self.assertFalse(is_valid_math_equation('(a+(b)=0'))
+        self.assertFalse(is_valid_math_equation('a+b=c:)'))
 
 
 class SchemaNormalizationUnitTests(test_utils.GenericTestBase):

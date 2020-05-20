@@ -1035,3 +1035,70 @@ class DragAndDropPositiveInt(BaseObject):
     default_value = 1
 
     SCHEMA = PositiveInt.SCHEMA
+
+
+class AlgebraicExpression(BaseObject):
+    """Class for algebraic expressions. Stores a unicode string representing a
+    valid algebraic expression.
+    """
+
+    description = 'A unicode string for an algebraic expression.'
+    default_value = 'a'
+
+    SCHEMA = {
+        'type': 'unicode',
+        'validators': [{
+            'id': 'is_valid_expression',
+            'algebraic': True
+        }]
+    }
+
+
+class SetOfPlaceholders(BaseObject):
+    """Class for set of placeholders. Placeholders are latin letters that are
+    used in Math Interactions.
+    """
+
+    description = 'A set (a list with unique elements) of placeholders.'
+    default_value = []
+
+    SCHEMA = {
+        'type': 'list',
+        'items': UnicodeString.SCHEMA,
+        'validators': [{
+            'id': 'is_uniquified'
+        }, {
+            'id': 'is_each_element_a_single_latin_letter'
+        }]
+    }
+
+
+class MathEquation(BaseObject):
+    """Class for math equations. Stores a unicode string representing a
+    valid math equation.
+    """
+
+    description = 'A unicode string for a math equation.'
+    default_value = 'a=b'
+
+    SCHEMA = {
+        'type': 'unicode',
+        'validators': [{
+            'id': 'is_valid_math_equation'
+        }]
+    }
+
+
+class PositionOfTerms(BaseObject):
+    """Class for position of terms. Denotes the position of terms relative to
+    the equals sign in a math equation.
+    """
+
+    description = (
+        'The position of terms relative to the equals sign in a math equation.')
+    default_value = 'both'
+
+    SCHEMA = {
+        'type': 'unicode',
+        'choices': ['lhs', 'rhs', 'both', 'irrelevant']
+    }
