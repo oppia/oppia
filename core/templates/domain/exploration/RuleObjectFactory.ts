@@ -20,7 +20,7 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-export interface IBackendRuleDict {
+export interface IRuleBackendDict {
   inputs: IRuleInput,
   'rule_type': string
 }
@@ -38,7 +38,7 @@ export class Rule {
     this.type = type;
     this.inputs = inputs;
   }
-  toBackendDict(): IBackendRuleDict {
+  toBackendDict(): IRuleBackendDict {
     return {
       rule_type: this.type,
       inputs: this.inputs
@@ -54,7 +54,7 @@ export class RuleObjectFactory {
     return new Rule(type, inputs);
   }
 
-  createFromBackendDict(ruleDict: IBackendRuleDict): Rule {
+  createFromBackendDict(ruleDict: IRuleBackendDict): Rule {
     return new Rule(ruleDict.rule_type, ruleDict.inputs);
   }
 }

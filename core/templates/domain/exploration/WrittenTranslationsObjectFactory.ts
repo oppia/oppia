@@ -20,28 +20,40 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { WrittenTranslationObjectFactory } from
-  'domain/exploration/WrittenTranslationObjectFactory';
+import {
+  IWrittenTranslationBackendDict,
+  WrittenTranslation, WrittenTranslationObjectFactory
+} from 'domain/exploration/WrittenTranslationObjectFactory';
+
+type TranslationsMapping = {
+  [content_id: string]: {[lang_code: string]: WrittenTranslation}
+};
+
+type ITranslationMappingBackendDict = {
+  [content_id: string]: {[lang_code: string]: IWrittenTranslationBackendDict}
+};
+
+export interface IWrittenTranslationsBackendDict {
+  translations_mapping: TranslationsMapping;
+}
 
 export class WrittenTranslations {
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'translationsMapping' is a dict with underscore_cased keys
-  // which give tslint errors against underscore_casing in favor of camelCasing.
-  translationsMapping: any;
-  _writtenTranslationObjectFactory: WrittenTranslationObjectFactory;
-  constructor(translationsMapping: any, writtenTranslationObjectFactory: any) {
+  private writtenTranslationObjectFactory: WrittenTranslationObjectFactory;
+  translationsMapping: TranslationsMapping;
+
+  constructor(
+      translationsMapping: TranslationsMapping,
+      writtenTranslationObjectFactory: WrittenTranslationObjectFactory) {
     this.translationsMapping = translationsMapping;
-    this._writtenTranslationObjectFactory = writtenTranslationObjectFactory;
+    this.writtenTranslationObjectFactory = writtenTranslationObjectFactory;
   }
 
   getAllContentId(): string[] {
     return Object.keys(this.translationsMapping);
   }
 
-  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
-  // 'any' because the return type is a dict whose exact type needs to be
-  // found by doing a good research.
-  getWrittenTranslation(contentId: string, langCode: string): any {
+  getWrittenTranslation(
+      contentId: string, langCode: string): WrittenTranslation {
     return this.translationsMapping[contentId][langCode];
   }
 
@@ -95,7 +107,7 @@ export class WrittenTranslations {
       throw new Error('Trying to add duplicate language code.');
     }
     writtenTranslations[languageCode] = (
-      this._writtenTranslationObjectFactory.createNew(html));
+      this.writtenTranslationObjectFactory.createNew(html));
   }
 
   updateWrittenTranslationHtml(
@@ -114,10 +126,7 @@ export class WrittenTranslations {
     writtenTranslations[languageCode].toggleNeedsUpdateAttribute();
   }
 
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because the return type is a dict with underscore_cased keys which
-  // give tslint errors against underscore_casing in favor of camelCasing.
-  toBackendDict(): any {
+  toBackendDict(): IWrittenTranslationsBackendDict {
     var translationsMappingDict = {};
     for (var contentId in this.translationsMapping) {
       var languageToWrittenTranslation = this.translationsMapping[contentId];
@@ -140,24 +149,20 @@ export class WrittenTranslationsObjectFactory {
   constructor(
     private writtenTranslationObjectFactory: WrittenTranslationObjectFactory) {}
 
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'writtenTranslationsDict' is a dict with underscore_cased
-  // keys which give tslint errors against underscore_casing in favor of
-  // camelCasing.
-  createFromBackendDict(writtenTranslationsDict: any): WrittenTranslations {
-    var translationsMapping = {};
-    Object.keys(writtenTranslationsDict.translations_mapping).forEach(
-      (contentId) => {
-        translationsMapping[contentId] = {};
-        var languageCodeToWrittenTranslationDict = (
-          writtenTranslationsDict.translations_mapping[contentId]);
-        Object.keys(languageCodeToWrittenTranslationDict).forEach(
-          (langCode) => {
-            translationsMapping[contentId][langCode] = (
-              this.writtenTranslationObjectFactory.createFromBackendDict(
-                languageCodeToWrittenTranslationDict[langCode]));
-          });
-      });
+  createFromBackendDict(
+      writtenTranslationsDict:
+        IWrittenTranslationsBackendDict): WrittenTranslations {
+    var translationsMapping: TranslationsMapping = {};
+    for (const contentId in writtenTranslationsDict.translations_mapping) {
+      translationsMapping[contentId] = {};
+      var languageCodeToWrittenTranslationDict = (
+        writtenTranslationsDict.translations_mapping[contentId]);
+      for (const langCode in languageCodeToWrittenTranslationDict) {
+        translationsMapping[contentId][langCode] = (
+          this.writtenTranslationObjectFactory.createFromBackendDict(
+            languageCodeToWrittenTranslationDict[langCode]));
+      };
+    };
     return new WrittenTranslations(
       translationsMapping, this.writtenTranslationObjectFactory);
   }

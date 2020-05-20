@@ -26,47 +26,40 @@ import { ExplorationHtmlFormatterService } from
   'services/exploration-html-formatter.service';
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
 import { HtmlEscaperService } from 'services/html-escaper.service';
+import { Interaction } from 'domain/exploration/InteractionObjectFactory';
 import { LoggerService } from 'services/contextual/logger.service';
 import { NumberWithUnitsObjectFactory } from
   'domain/objects/NumberWithUnitsObjectFactory';
-import { SubtitledHtml, SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
+import {
+  ISubtitledHtmlBackendDict, SubtitledHtml, SubtitledHtmlObjectFactory
+} from 'domain/exploration/SubtitledHtmlObjectFactory';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory.ts';
 
-export interface ExplanationBackendDict {
-  /* eslint-disable camelcase */
-  content_id: string;
-  /* eslint-enable camelcase */
-  html: string;
-}
-
-export interface SolutionBackendDict {
+export interface ISolutionBackendDict {
   /* eslint-disable camelcase */
   answer_is_exclusive: boolean;
-  correct_answer: string;
+  correct_answer: any;
+  explanation: ISubtitledHtmlBackendDict;
   /* eslint-enable camelcase */
-  explanation: ExplanationBackendDict;
 }
 
 export class Solution {
-  ehfs: ExplorationHtmlFormatterService;
-  shof: SubtitledHtmlObjectFactory;
+  private explorationHtmlFormatterService: ExplorationHtmlFormatterService;
   answerIsExclusive: boolean;
   correctAnswer: any;
   explanation: SubtitledHtml;
+
   constructor(
-      ehfs: ExplorationHtmlFormatterService,
-      shof: SubtitledHtmlObjectFactory,
-      answerisexclusive: boolean, correctanswer: any,
+      explorationHtmlFormatterService: ExplorationHtmlFormatterService,
+      answerIsExclusive: boolean, correctAnswer: any,
       explanation: SubtitledHtml) {
-    this.ehfs = ehfs;
-    this.shof = shof;
-    this.answerIsExclusive = answerisexclusive;
-    this.correctAnswer = correctanswer;
+    this.explorationHtmlFormatterService = explorationHtmlFormatterService;
+    this.answerIsExclusive = answerIsExclusive;
+    this.correctAnswer = correctAnswer;
     this.explanation = explanation;
   }
 
-  toBackendDict(): SolutionBackendDict {
+  toBackendDict(): ISolutionBackendDict {
     return {
       answer_is_exclusive: this.answerIsExclusive,
       correct_answer: this.correctAnswer,
@@ -115,11 +108,11 @@ export class Solution {
   setExplanation(explanation: SubtitledHtml): void {
     this.explanation = explanation;
   }
-  // TODO(#7165): Replace any with correct type.
-  getOppiaShortAnswerResponseHtml(interaction: any) {
+
+  getOppiaShortAnswerResponseHtml(interaction: Interaction) {
     return {
       prefix: (this.answerIsExclusive ? 'The only' : 'One'),
-      answer: this.ehfs.getShortAnswerHtml(
+      answer: this.explorationHtmlFormatterService.getShortAnswerHtml(
         this.correctAnswer, interaction.id, interaction.customizationArgs)};
   }
 
@@ -133,35 +126,27 @@ export class Solution {
 })
 export class SolutionObjectFactory {
   constructor(
-    private shof: SubtitledHtmlObjectFactory,
-    private ehfs: ExplorationHtmlFormatterService) {}
-  createFromBackendDict(solutionBackendDict: SolutionBackendDict): Solution {
-  /* eslint-enable dot-notation */
+    private subtitledHtmlObjectFactory: SubtitledHtmlObjectFactory,
+    private explorationHtmlFormatterService: ExplorationHtmlFormatterService) {}
+
+  createFromBackendDict(solutionBackendDict: ISolutionBackendDict): Solution {
     return new Solution(
-      this.ehfs,
-      this.shof,
+      this.explorationHtmlFormatterService,
       solutionBackendDict.answer_is_exclusive,
       solutionBackendDict.correct_answer,
-      this.shof.createFromBackendDict(
+      this.subtitledHtmlObjectFactory.createFromBackendDict(
         solutionBackendDict.explanation));
   }
 
-  // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
-  /* eslint-disable dot-notation */
   createNew(
-  /* eslint-enable dot-notation */
       answerIsExclusive: boolean, correctAnswer: any, explanationHtml: string,
       explanationId: string): Solution {
     return new Solution(
-      this.ehfs,
-      this.shof,
-      answerIsExclusive,
-      correctAnswer,
-      this.shof.createDefault(
+      this.explorationHtmlFormatterService, answerIsExclusive, correctAnswer,
+      this.subtitledHtmlObjectFactory.createDefault(
         explanationHtml, explanationId));
   }
 }
-
 
 angular.module('oppia').factory(
   'SolutionObjectFactory',

@@ -20,10 +20,17 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { Outcome, OutcomeObjectFactory } from
+import { IOutcomeBackendDict, Outcome, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
-import { Rule, RuleObjectFactory } from
+import { IRuleBackendDict, Rule, RuleObjectFactory } from
   'domain/exploration/RuleObjectFactory';
+
+export interface IAnswerGroupBackendDict {
+  rule_specs: IRuleBackendDict[];
+  outcome: IOutcomeBackendDict;
+  training_data: object[];
+  tagged_skill_misconception_id: string;
+}
 
 export class AnswerGroup {
   rules: Rule[];
@@ -69,8 +76,8 @@ export class AnswerGroupObjectFactory {
   // TODO(#7165): Replace 'any' with the exact type. This has been typed
   // as 'any' since 'ruleBackendDicts' is a complex object with elements as keys
   // having varying types. An exact type needs tobe found.
-  generateRulesFromBackend(ruleBackendDicts: any) {
-    return ruleBackendDicts.map((ruleBackendDict: any) => {
+  generateRulesFromBackend(ruleBackendDicts: IRuleBackendDict[]) {
+    return ruleBackendDicts.map(ruleBackendDict => {
       return this.ruleObjectFactory.createFromBackendDict(ruleBackendDict);
     });
   }
@@ -89,7 +96,8 @@ export class AnswerGroupObjectFactory {
   // TODO(#7176): Replace 'any' with the exact type. This has been kept as
   // 'any' because 'answerGroupBackendDict' is a dict with underscore_cased keys
   // which give tslint errors against underscore_casing in favor of camelCasing.
-  createFromBackendDict(answerGroupBackendDict: any): AnswerGroup {
+  createFromBackendDict(
+      answerGroupBackendDict: IAnswerGroupBackendDict): AnswerGroup {
     return new AnswerGroup(
       this.generateRulesFromBackend(answerGroupBackendDict.rule_specs),
       this.outcomeObjectFactory.createFromBackendDict(

@@ -19,7 +19,7 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { StateObjectFactory } from 'domain/state/StateObjectFactory';
+import { State, StateObjectFactory } from 'domain/state/StateObjectFactory';
 
 const INTERACTION_SPECS = require('interactions/interaction_specs.json');
 
@@ -31,7 +31,7 @@ export class States {
     this._states = states;
   }
 
-  getState(stateName: string): any {
+  getState(stateName: string): State {
     return this._states[stateName];
   }
 
@@ -148,10 +148,8 @@ export class States {
 })
 export class StatesObjectFactory {
   constructor(private stateObject: StateObjectFactory) {}
-  // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
-  /* eslint-disable dot-notation */
+
   createFromBackendDict(statesBackendDict: any): States {
-  /* eslint-enable dot-notation */
     var stateObjectsDict = {};
     for (var stateName in statesBackendDict) {
       stateObjectsDict[stateName] = this.stateObject.createFromBackendDict(

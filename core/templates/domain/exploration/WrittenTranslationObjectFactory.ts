@@ -20,6 +20,11 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
+export interface IWrittenTranslationBackendDict {
+  html: string;
+  needs_update: boolean;
+}
+
 export class WrittenTranslation {
   html: string;
   needsUpdate: boolean;

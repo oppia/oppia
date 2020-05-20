@@ -20,18 +20,31 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import { AppConstants } from 'app.constants';
-import { InteractionObjectFactory } from
+import { IInteractionBackendDict, InteractionObjectFactory } from
   'domain/exploration/InteractionObjectFactory';
 import { ParamChangesObjectFactory } from
   'domain/exploration/ParamChangesObjectFactory';
-import { RecordedVoiceoversObjectFactory } from
+import { IParamChangeBackendDict } from
+  'domain/exploration/ParamChangeObjectFactory';
+import { IRecordedVoiceoversBackendDict, RecordedVoiceoversObjectFactory } from
   'domain/exploration/RecordedVoiceoversObjectFactory';
-import { SubtitledHtmlObjectFactory } from
+import { ISubtitledHtmlBackendDict, SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
-import { WrittenTranslationsObjectFactory } from
-  'domain/exploration/WrittenTranslationsObjectFactory';
+import {
+  IWrittenTranslationsBackendDict, WrittenTranslationsObjectFactory
+} from 'domain/exploration/WrittenTranslationsObjectFactory';
 
 const constants = require('constants.ts');
+
+export interface IStateBackendDict {
+  classifier_model_id: string;
+  content: ISubtitledHtmlBackendDict;
+  interaction: IInteractionBackendDict;
+  param_changes: IParamChangeBackendDict[];
+  recorded_voiceovers: IRecordedVoiceoversBackendDict;
+  solicit_answer_details: boolean;
+  written_translations: IWrittenTranslationsBackendDict;
+}
 
 export class State {
   name;

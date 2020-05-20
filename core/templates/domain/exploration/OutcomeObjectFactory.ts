@@ -20,8 +20,20 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-import { SubtitledHtml, SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
+import {
+  ISubtitledHtmlBackendDict, SubtitledHtml, SubtitledHtmlObjectFactory
+} from 'domain/exploration/SubtitledHtmlObjectFactory';
+import { IParamChangeBackendDict } from
+  'domain/exploration/ParamChangeObjectFactory';
+
+export interface IOutcomeBackendDict {
+  dest: string;
+  feedback: ISubtitledHtmlBackendDict;
+  labelled_as_correct: boolean;
+  param_changes: IParamChangeBackendDict;
+  refresher_exploration_id: string;
+  missing_prerequisite_skill_id: string;
+}
 
 export class Outcome {
   dest: string;
@@ -102,10 +114,7 @@ export class OutcomeObjectFactory {
       null);
   }
 
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'outcomeDict' is a dict with underscore_cased keys
-  // which give tslint errors against underscore_casing in favor of camelCasing.
-  createFromBackendDict(outcomeDict: any): Outcome {
+  createFromBackendDict(outcomeDict: IOutcomeBackendDict): Outcome {
     return new Outcome(
       outcomeDict.dest,
       this.subtitledHtmlObjectFactory.createFromBackendDict(

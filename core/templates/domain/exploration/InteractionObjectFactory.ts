@@ -21,12 +21,26 @@ import { Injectable } from '@angular/core';
 
 import cloneDeep from 'lodash/cloneDeep';
 
-import { AnswerGroupObjectFactory } from
+import { IAnswerGroupBackendDict, AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
-import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
-import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
-import { SolutionObjectFactory } from
+import { IHintBackendDict, HintObjectFactory } from
+  'domain/exploration/HintObjectFactory';
+import { IOutcomeBackendDict, OutcomeObjectFactory } from
+  'domain/exploration/OutcomeObjectFactory';
+import { ISolutionBackendDict, SolutionObjectFactory } from
   'domain/exploration/SolutionObjectFactory';
+import { ICustomizationArgs } from
+  'domain/state/CustomizationArgsObjectFactory';
+
+export interface IInteractionBackendDict {
+  id: string;
+  customization_args: ICustomizationArgs;
+  answer_groups: IAnswerGroupBackendDict[];
+  default_outcome: IOutcomeBackendDict;
+  confirmed_unclassified_answers: IAnswerGroupBackendDict[];
+  hints: IHintBackendDict[];
+  solution: ISolutionBackendDict;
+}
 
 export class Interaction {
   answerGroups;
@@ -153,5 +167,5 @@ export class InteractionObjectFactory {
 }
 
 angular.module('oppia').factory(
-  'InteractionObjectFactory', downgradeInjectable(
-    InteractionObjectFactory));
+  'InteractionObjectFactory',
+  downgradeInjectable(InteractionObjectFactory));

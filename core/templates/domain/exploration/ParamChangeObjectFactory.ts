@@ -22,6 +22,9 @@ import cloneDeep from 'lodash/cloneDeep';
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
+import { ICustomizationArgs } from
+  'domain/state/CustomizationArgsObjectFactory';
+
 var DEFAULT_CUSTOMIZATION_ARGS = {
   Copier: {
     parse_with_jinja: true,
@@ -31,6 +34,12 @@ var DEFAULT_CUSTOMIZATION_ARGS = {
     list_of_values: ['sample value']
   }
 };
+
+export interface IParamChangeBackendDict {
+  customization_args: ICustomizationArgs;
+  generator_id: string;
+  name: string;
+}
 
 export class ParamChange {
   // TODO(#7176): Replace 'any' with the exact type. This has been kept as
@@ -67,11 +76,8 @@ export class ParamChange {
   providedIn: 'root'
 })
 export class ParamChangeObjectFactory {
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'paramChangeBackendDict' is a dict with underscore_cased keys
-  // which give tslint errors against underscore_casing in favor of camelCasing.
   createFromBackendDict(
-      paramChangeBackendDict: any): ParamChange {
+      paramChangeBackendDict: IParamChangeBackendDict): ParamChange {
     return new ParamChange(
       paramChangeBackendDict.customization_args,
       paramChangeBackendDict.generator_id,
