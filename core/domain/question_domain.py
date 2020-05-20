@@ -311,7 +311,7 @@ class Question(python_utils.OBJECT):
 
     @classmethod
     def _convert_state_v33_dict_to_v34_dict(cls, question_state_dict):
-        """Converts from version 33 to 34. Version 33 adds a new
+        """Converts from version 33 to 34. Version 34 adds a new
         attribute math RTEs. The new attribute has an additional field to
         for storing SVG filenames.
 
@@ -325,7 +325,7 @@ class Question(python_utils.OBJECT):
         """
         question_state_dict = state_domain.State.convert_html_fields_in_state(
             question_state_dict,
-            html_validation_service.add_svg_filename_to_math_rte_components)
+            html_validation_service.add_math_content_to_math_rte_components)
 
         return question_state_dict
 

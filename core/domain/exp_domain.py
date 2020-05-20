@@ -40,6 +40,7 @@ from core.platform import models
 import feconf
 import python_utils
 import utils
+
 (exp_models,) = models.Registry.import_models([models.NAMES.exploration])
 
 
@@ -2414,7 +2415,7 @@ class Exploration(python_utils.OBJECT):
 
     @classmethod
     def _convert_states_v33_dict_to_v34_dict(cls, states_dict):
-        """Converts from version 33 to 34. Version 33 adds a new
+        """Converts from version 33 to 34. Version 34 adds a new
         attribute math RTEs. The new attribute has an additional field to
         for storing SVG filenames.
 
@@ -2430,7 +2431,7 @@ class Exploration(python_utils.OBJECT):
         for key, state_dict in states_dict.items():
             states_dict[key] = state_domain.State.convert_html_fields_in_state(
                 state_dict,
-                html_validation_service.add_svg_filename_to_math_rte_components)
+                html_validation_service.add_math_content_to_math_rte_components)
 
         return states_dict
 
@@ -3345,7 +3346,7 @@ class Exploration(python_utils.OBJECT):
     @classmethod
     def _convert_v37_dict_to_v38_dict(cls, exploration_dict):
         """Converts a v37 exploration dict into a v38 exploration dict.
-        adds a new customization arg to MultipleChoiceInput which allows
+        Adds a new customization arg to MultipleChoiceInput which allows
         answer choices to be shuffled.
 
         Args:
@@ -3367,7 +3368,7 @@ class Exploration(python_utils.OBJECT):
     @classmethod
     def _convert_v38_dict_to_v39_dict(cls, exploration_dict):
         """Converts a v38 exploration dict into a v39 exploration dict.
-        adds a new attribute math RTEs. The new attribute has an additional
+        Adds a new attribute math RTEs. The new attribute has an additional
         field to for storing SVG filenames..
 
         Args:

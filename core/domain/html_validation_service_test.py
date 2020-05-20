@@ -1468,7 +1468,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 test_case['expected_output'])
 
 
-    def test_add_svg_filename_to_math_rte_components(self):
+    def test_add_math_content_to_math_rte_components(self):
         test_cases = [{
             'html_content': (
                 '<p>Feedback</p><oppia-noninteractive-math '
@@ -1515,7 +1515,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
 
         for test_case in test_cases:
             self.assertEqual(
-                html_validation_service.add_svg_filename_to_math_rte_components(
+                html_validation_service.add_math_content_to_math_rte_components(
                     test_case['html_content']),
                 test_case['expected_output'])
 
