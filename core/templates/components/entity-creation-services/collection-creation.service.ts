@@ -17,12 +17,10 @@
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { Location } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
 import { AlertsService } from 'services/alerts.service';
-import { CollectionCreationBackendService, CollectionCreationResponse } from
+import { CollectionCreationBackendService, ICollectionCreationResponse } from
   'components/entity-creation-services/collection-creation-backend-api.service';
 import { LoaderService } from 'services/loader.service.ts';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
@@ -34,12 +32,13 @@ import { WindowRef } from 'services/contextual/window-ref.service';
   providedIn: 'root'
 })
 export class CollectionCreationService {
-  private collectionCreationInProgress: boolean = false;
+  // TODO(#9154): Remove static when migration is complete.
+  static collectionCreationInProgress: boolean = false;
 
   constructor(
-    private backendService: CollectionCreationBackendService,
+    private collectionCreationBackendService: CollectionCreationBackendService,
     private alertsService: AlertsService,
-    private analyticsService: SiteAnalyticsService,
+    private siteAnalyticsService: SiteAnalyticsService,
     private urlInterpolationService: UrlInterpolationService,
     private loaderService: LoaderService,
     private windowRef: WindowRef) {
@@ -49,18 +48,18 @@ export class CollectionCreationService {
       '/collection_editor/create/<collection_id>');
 
   createNewCollection(): void {
-    if (this.collectionCreationInProgress) {
+    if (CollectionCreationService.collectionCreationInProgress) {
       return;
     }
 
-    this.collectionCreationInProgress = true;
+    CollectionCreationService.collectionCreationInProgress = true;
     this.alertsService.clearWarnings();
 
     this.loaderService.showLoadingScreen('Creating collection');
 
-    this.backendService.createCollection()
-      .then((response: CollectionCreationResponse) => {
-        this.analyticsService.registerCreateNewCollectionEvent(
+    this.collectionCreationBackendService.createCollection()
+      .then((response: ICollectionCreationResponse) => {
+        this.siteAnalyticsService.registerCreateNewCollectionEvent(
           response.collectionId);
 
         setTimeout(() => {
@@ -70,9 +69,11 @@ export class CollectionCreationService {
                 collection_id: response.collectionId
               }
             );
+            CollectionCreationService.collectionCreationInProgress = false;
         }, 150);
       }, () => {
         this.loaderService.hideLoadingScreen();
+        CollectionCreationService.collectionCreationInProgress = false;
       });
   }
 }

@@ -49,7 +49,7 @@ export class CollectionCreationBackendService {
   }
 }
 
-export interface CollectionCreationResponse {
+export interface ICollectionCreationResponse {
   collectionId: string
 }
 

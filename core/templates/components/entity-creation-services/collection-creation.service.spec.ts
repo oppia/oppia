@@ -31,13 +31,11 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 
 describe('Collection Creation service', () => {
   let collectionCreationService: CollectionCreationService = null;
-  let alertsService: AlertsService = null;
   let loaderService: LoaderService = null;
   let analyticsService: SiteAnalyticsService = null;
   let windowRef: WindowRef = null;
   let httpTestingController: HttpTestingController;
   let SAMPLE_COLLECTION_ID = 'hyuy4GUlvTqJ';
-  let SUCCESS_STATUS_CODE = 200;
   let ERROR_STATUS_CODE = 500;
 
   beforeEach(() => {
@@ -48,7 +46,6 @@ describe('Collection Creation service', () => {
     });
 
     collectionCreationService = TestBed.get(CollectionCreationService);
-    alertsService = TestBed.get(AlertsService);
     loaderService = TestBed.get(LoaderService);
     analyticsService = TestBed.get(SiteAnalyticsService);
     windowRef = TestBed.get(WindowRef);
@@ -82,7 +79,6 @@ describe('Collection Creation service', () => {
       flushMicrotasks();
       tick(150);
 
-      expect(alertsService.clearWarnings).toHaveBeenCalled();
       expect(loaderService.showLoadingScreen)
         .toHaveBeenCalledWith('Creating collection');
       expect(analyticsService.registerCreateNewCollectionEvent)
@@ -137,8 +133,6 @@ describe('Collection Creation service', () => {
       flushMicrotasks();
       tick(150);
 
-      expect(alertsService.clearWarnings)
-        .toHaveBeenCalledTimes(1);
       expect(loaderService.showLoadingScreen)
         .toHaveBeenCalledTimes(1);
       expect(analyticsService.registerCreateNewCollectionEvent)
