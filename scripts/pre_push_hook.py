@@ -333,7 +333,7 @@ def does_diff_include_js_or_ts_files(diff_files):
     """Returns true if diff includes JavaScript or TypeScript files.
 
     Args:
-        diff_files: list(str). List of files to be linted.
+        diff_files: list(str). List of files changed.
 
     Returns:
         bool. Whether the diff contains changes in any JavaScript or TypeScript
@@ -350,7 +350,7 @@ def does_diff_include_ts_files(diff_files):
     """Returns true if diff includes TypeScript files.
 
     Args:
-        diff_files: list(str). List of files to be linted.
+        diff_files: list(str). List of files changed.
 
     Returns:
         bool. Whether the diff contains changes in any TypeScript files.
@@ -366,7 +366,7 @@ def does_diff_include_travis_yml_or_js_files(diff_files):
     """Returns true if diff includes .travis.yml or Javascript files.
 
     Args:
-        diff_files: list(str). List of files to be linted.
+        diff_files: list(str). List of files changed.
 
     Returns:
         bool. Whether the diff contains changes in travis.yml or
