@@ -31,6 +31,8 @@ import { AngularNameService } from
   'pages/exploration-editor-page/services/angular-name.service';
 import { AnswerClassificationResultObjectFactory } from
   'domain/classifier/AnswerClassificationResultObjectFactory';
+import { AnswerClassificationService } from
+  'pages/exploration-player-page/services/answer-classification.service';
 import { AnswerGroupsCacheService } from
   // eslint-disable-next-line max-len
   'pages/exploration-editor-page/editor-tab/services/answer-groups-cache.service';
@@ -40,6 +42,7 @@ import { AnswerStatsObjectFactory } from
   'domain/exploration/AnswerStatsObjectFactory';
 import { AudioFileObjectFactory } from
   'domain/utilities/AudioFileObjectFactory';
+import { AppService } from 'services/app.service';
 import { AudioLanguageObjectFactory } from
   'domain/utilities/AudioLanguageObjectFactory';
 import { AudioTranslationLanguageService } from
@@ -141,6 +144,9 @@ import { ImprovementActionButtonObjectFactory } from
 import { ImprovementsService } from 'services/improvements.service';
 import { InteractionObjectFactory } from
   'domain/exploration/InteractionObjectFactory';
+import { InteractionRulesRegistryService } from
+  'services/interaction-rules-registry.service';
+import { InteractionSpecsService } from 'services/interaction-specs.service';
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
 import { LearnerActionObjectFactory } from
   'domain/statistics/LearnerActionObjectFactory';
@@ -275,6 +281,8 @@ import { StateImprovementSuggestionService } from
 import { StateInteractionIdService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-interaction-id.service';
+import { StateInteractionStatsService } from
+  'services/state-interaction-stats.service';
 import { StateObjectFactory } from 'domain/state/StateObjectFactory';
 import { StatePropertyService } from
   // eslint-disable-next-line max-len
@@ -385,6 +393,7 @@ export class UpgradedServices {
     upgradedServices['AnswerStatsObjectFactory'] =
       new AnswerStatsObjectFactory();
     upgradedServices['AudioFileObjectFactory'] = new AudioFileObjectFactory();
+    upgradedServices['AppService'] = new AppService();
     upgradedServices['AudioLanguageObjectFactory'] =
       new AudioLanguageObjectFactory();
     upgradedServices['AudioTranslationManagerService'] =
@@ -436,6 +445,7 @@ export class UpgradedServices {
     upgradedServices['ImprovementActionButtonObjectFactory'] =
       new ImprovementActionButtonObjectFactory();
     upgradedServices['ImprovementsService'] = new ImprovementsService();
+    upgradedServices['InteractionSpecsService'] = new InteractionSpecsService();
     upgradedServices['LearnerActionObjectFactory'] =
       new LearnerActionObjectFactory();
     upgradedServices['LearnerAnswerDetailsObjectFactory'] =
@@ -722,6 +732,26 @@ export class UpgradedServices {
       upgradedServices['NormalizeWhitespacePipe']);
 
     // Topological level: 3.
+    upgradedServices['InteractionRulesRegistryService'] =
+      new InteractionRulesRegistryService(
+        upgradedServices['CodeReplRulesService'],
+        upgradedServices['ContinueRulesService'],
+        upgradedServices['DragAndDropSortInputRulesService'],
+        upgradedServices['EndExplorationRulesService'],
+        upgradedServices['FractionInputRulesService'],
+        upgradedServices['GraphInputRulesService'],
+        upgradedServices['ImageClickInputRulesService'],
+        upgradedServices['InteractiveMapRulesService'],
+        upgradedServices['ItemSelectionInputRulesService'],
+        upgradedServices['LogicProofRulesService'],
+        upgradedServices['MathExpressionInputRulesService'],
+        upgradedServices['MultipleChoiceInputRulesService'],
+        upgradedServices['MusicNotesInputRulesService'],
+        upgradedServices['NumberWithUnitsRulesService'],
+        upgradedServices['NumericInputRulesService'],
+        upgradedServices['PencilCodeEditorRulesService'],
+        upgradedServices['SetInputRulesService'],
+        upgradedServices['TextInputRulesService']);
     upgradedServices['AudioTranslationLanguageService'] =
       new AudioTranslationLanguageService(
         upgradedServices['BrowserCheckerService'],
@@ -825,6 +855,14 @@ export class UpgradedServices {
         upgradedServices['UrlInterpolationService']);
 
     // Topological level: 5.
+    upgradedServices['AnswerClassificationService'] =
+      new AnswerClassificationService(
+        upgradedServices['AlertsService'],
+        upgradedServices['AnswerClassificationResultObjectFactory'],
+        upgradedServices['AppService'],
+        upgradedServices['InteractionSpecsService'],
+        upgradedServices['PredictionAlgorithmRegistryService'],
+        upgradedServices['StateClassifierMappingService']);
     upgradedServices['InteractionObjectFactory'] = new InteractionObjectFactory(
       upgradedServices['AnswerGroupObjectFactory'],
       upgradedServices['HintObjectFactory'],
@@ -846,6 +884,15 @@ export class UpgradedServices {
       upgradedServices['RecordedVoiceoversObjectFactory'],
       upgradedServices['SubtitledHtmlObjectFactory'],
       upgradedServices['WrittenTranslationsObjectFactory']);
+    upgradedServices['StateInteractionStatsService'] =
+      new StateInteractionStatsService(
+        upgradedServices['AngularNameService'],
+        upgradedServices['AnswerClassificationService'],
+        upgradedServices['ContextService'],
+        upgradedServices['FractionObjectFactory'],
+        upgradedServices['HttpClient'],
+        upgradedServices['InteractionRulesRegistryService'],
+        upgradedServices['UrlInterpolationService']);
 
     // Topological level: 7.
     upgradedServices['StatesObjectFactory'] = new StatesObjectFactory(
