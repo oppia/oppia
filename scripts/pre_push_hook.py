@@ -65,9 +65,9 @@ FRONTEND_TEST_CMDS = [
     PYTHON_CMD, '-m', 'scripts.run_frontend_tests', '--check_coverage']
 TRAVIS_CI_PROTRACTOR_CHECK_CMDS = [
     PYTHON_CMD, '-m', 'scripts.check_e2e_tests_are_captured_in_ci']
-GIT_IS_DIRTY_CMD = 'git status --porcelain --untracked-files=no'
-TYPESCRIPT_CHECKS_CMD = [
+TYPESCRIPT_CHECKS_CMDS = [
     PYTHON_CMD, '-m', 'scripts.typescript_checks']
+GIT_IS_DIRTY_CMD = 'git status --porcelain --untracked-files=no'
 
 
 class ChangedBranch(python_utils.OBJECT):
@@ -346,6 +346,22 @@ def does_diff_include_js_or_ts_files(files_to_lint):
             return True
     return False
 
+def does_diff_include_ts_files(files_to_lint):
+    """Returns true if diff includes JavaScript or TypeScript files.
+
+    Args:
+        files_to_lint: list(str). List of files to be linted.
+
+    Returns:
+        bool. Whether the diff contains changes in any JavaScript or TypeScript
+            files.
+    """
+
+    for filename in files_to_lint:
+        if filename.endswith('.ts'):
+            return True
+    return False
+
 
 def does_diff_include_travis_yml_or_js_files(files_to_lint):
     """Returns true if diff includes .travis.yml or Javascript files.
@@ -399,11 +415,11 @@ def main(args=None):
                         'Push failed, please correct the linting issues above.')
                     sys.exit(1)
 
-            typescript_check_status = 0
-            if does_diff_include_js_or_ts_files(files_to_lint):
-                typescript_check_status = run_script_and_get_returncode(
-                    TYPESCRIPT_CHECKS_CMD)
-            if typescript_check_status != 0:
+            typescript_checks_status = 0
+            if does_diff_include_ts_files(files_to_lint):
+                typescript_checks_status = run_script_and_get_returncode(
+                    TYPESCRIPT_CHECKS_CMDS)
+            if typescript_checks_status != 0:
                 python_utils.PRINT(
                     'Push aborted due to failing typescript checks.')
                 sys.exit(1)
