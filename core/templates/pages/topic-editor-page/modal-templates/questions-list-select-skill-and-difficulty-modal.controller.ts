@@ -13,7 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for select skill and difficulty modal.
+ * @fileoverview Controller for questions list select skill and
+ * difficulty modal.
  */
 
 require(
@@ -22,7 +23,8 @@ require(
 
 require('domain/skill/SkillDifficultyObjectFactory.ts');
 
-angular.module('oppia').controller('SelectSkillAndDifficultyModalController', [
+angular.module('oppia').controller(
+  'QuestionsListSelectSkillAndDifficultyModalController', [
   '$controller', '$scope', '$uibModalInstance', 'SkillDifficultyObjectFactory',
   'DEFAULT_SKILL_DIFFICULTY', 'MODE_SELECT_DIFFICULTY', 'MODE_SELECT_SKILL',
   'allSkillSummaries', 'countOfSkillsToPrioritize', 'currentMode',
