@@ -346,6 +346,7 @@ def does_diff_include_js_or_ts_files(files_to_lint):
             return True
     return False
 
+
 def does_diff_include_ts_files(files_to_lint):
     """Returns true if diff includes JavaScript or TypeScript files.
 
