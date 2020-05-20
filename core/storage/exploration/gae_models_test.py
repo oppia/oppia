@@ -463,8 +463,7 @@ class ExplorationCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
 
     def test_has_reference_to_user_id(self):
         commit = exp_models.ExplorationCommitLogEntryModel.create(
-            'b', 0, 'committer_id', 'username', 'msg',
-            'create', [{}],
+            'b', 0, 'committer_id', 'msg', 'create', [{}],
             constants.ACTIVITY_STATUS_PUBLIC, False)
         commit.exploration_id = 'b'
         commit.put()
@@ -478,13 +477,11 @@ class ExplorationCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
     def test_get_all_non_private_commits(self):
         private_commit = (
             exp_models.ExplorationCommitLogEntryModel.create(
-                'a', 1, 'committer_id', 'username', 'msg',
-                'create', [{}],
+                'a', 1, 'committer_id', 'msg', 'create', [{}],
                 constants.ACTIVITY_STATUS_PRIVATE, False))
         public_commit = (
             exp_models.ExplorationCommitLogEntryModel.create(
-                'b', 1, 'committer_id', 'username', 'msg',
-                'create', [{}],
+                'b', 1, 'committer_id', 'msg', 'create', [{}],
                 constants.ACTIVITY_STATUS_PUBLIC, False))
         private_commit.exploration_id = 'a'
         public_commit.exploration_id = 'b'
@@ -518,8 +515,7 @@ class ExplorationCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
                 constants.ACTIVITY_STATUS_PRIVATE, False))
         commit2 = (
             exp_models.ExplorationCommitLogEntryModel.create(
-                'a', 2, 'committer_id', 'username', 'msg',
-                'create', [{}],
+                'a', 2, 'committer_id', 'msg', 'create', [{}],
                 constants.ACTIVITY_STATUS_PUBLIC, False))
         commit1.exploration_id = 'a'
         commit2.exploration_id = 'a'

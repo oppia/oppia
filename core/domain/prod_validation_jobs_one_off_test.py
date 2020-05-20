@@ -1834,8 +1834,7 @@ class CollectionCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
     def test_invalid_collection_version_in_model_id(self):
         model_with_invalid_version_in_id = (
             collection_models.CollectionCommitLogEntryModel.create(
-                '0', 3, self.owner_id, self.OWNER_USERNAME, 'edit',
-                'msg', [{}],
+                '0', 3, self.owner_id, 'edit', 'msg', [{}],
                 constants.ACTIVITY_STATUS_PUBLIC, False))
         model_with_invalid_version_in_id.collection_id = '0'
         model_with_invalid_version_in_id.put()
@@ -4297,8 +4296,7 @@ class ExplorationCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
     def test_invalid_exploration_version_in_model_id(self):
         model_with_invalid_version_in_id = (
             exp_models.ExplorationCommitLogEntryModel.create(
-                '0', 3, self.owner_id, self.OWNER_USERNAME, 'edit',
-                'msg', [{}],
+                '0', 3, self.owner_id, 'edit', 'msg', [{}],
                 constants.ACTIVITY_STATUS_PUBLIC, False))
         model_with_invalid_version_in_id.exploration_id = '0'
         model_with_invalid_version_in_id.put()
@@ -6362,8 +6360,7 @@ class QuestionCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
     def test_invalid_question_version_in_model_id(self):
         model_with_invalid_version_in_id = (
             question_models.QuestionCommitLogEntryModel.create(
-                '0', 3, self.owner_id, self.OWNER_USERNAME, 'edit',
-                'msg', [{}],
+                '0', 3, self.owner_id, 'edit', 'msg', [{}],
                 constants.ACTIVITY_STATUS_PUBLIC, False))
         model_with_invalid_version_in_id.question_id = '0'
         model_with_invalid_version_in_id.put()
@@ -7589,8 +7586,7 @@ class SkillCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
     def test_invalid_skill_version_in_model_id(self):
         model_with_invalid_version_in_id = (
             skill_models.SkillCommitLogEntryModel.create(
-                '0', 3, self.owner_id, self.OWNER_USERNAME, 'edit',
-                'msg', [{}],
+                '0', 3, self.owner_id, 'edit', 'msg', [{}],
                 constants.ACTIVITY_STATUS_PUBLIC, False))
         model_with_invalid_version_in_id.skill_id = '0'
         model_with_invalid_version_in_id.put()
@@ -8457,8 +8453,7 @@ class StoryCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
     def test_invalid_story_version_in_model_id(self):
         model_with_invalid_version_in_id = (
             story_models.StoryCommitLogEntryModel.create(
-                '0', 3, self.owner_id, self.OWNER_USERNAME, 'edit',
-                'msg', [{}],
+                '0', 3, self.owner_id, 'edit', 'msg', [{}],
                 constants.ACTIVITY_STATUS_PUBLIC, False))
         model_with_invalid_version_in_id.story_id = '0'
         model_with_invalid_version_in_id.put()
@@ -10352,8 +10347,7 @@ class TopicCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
     def test_invalid_topic_version_in_model_id(self):
         model_with_invalid_version_in_id = (
             topic_models.TopicCommitLogEntryModel.create(
-                '0', 3, self.owner_id, self.OWNER_USERNAME, 'edit',
-                'msg', [{}],
+                '0', 3, self.owner_id, 'edit', 'msg', [{}],
                 constants.ACTIVITY_STATUS_PUBLIC, False))
         model_with_invalid_version_in_id.topic_id = '0'
         model_with_invalid_version_in_id.put()
@@ -11434,8 +11428,7 @@ class SubtopicPageCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
     def test_invalid_topic_version_in_model_id(self):
         model_with_invalid_version_in_id = (
             topic_models.SubtopicPageCommitLogEntryModel.create(
-                '0-1', 3, self.owner_id, self.OWNER_USERNAME, 'edit',
-                'msg', [{}],
+                '0-1', 3, self.owner_id, 'edit', 'msg', [{}],
                 constants.ACTIVITY_STATUS_PUBLIC, False))
         model_with_invalid_version_in_id.subtopic_page_id = '0-1'
         model_with_invalid_version_in_id.put()

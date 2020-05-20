@@ -422,7 +422,7 @@ class CollectionCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
 
     def test_has_reference_to_user_id(self):
         commit = collection_models.CollectionCommitLogEntryModel.create(
-            'b', 0, 'committer_id', 'username', 'msg', 'create', [{}],
+            'b', 0, 'committer_id', 'msg', 'create', [{}],
             constants.ACTIVITY_STATUS_PUBLIC, False)
         commit.collection_id = 'b'
         commit.put()
@@ -435,12 +435,10 @@ class CollectionCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
 
     def test_get_all_non_private_commits(self):
         private_commit = collection_models.CollectionCommitLogEntryModel.create(
-            'a', 0, 'committer_id', 'username', 'msg',
-            'create', [{}],
+            'a', 0, 'committer_id', 'msg', 'create', [{}],
             constants.ACTIVITY_STATUS_PRIVATE, False)
         public_commit = collection_models.CollectionCommitLogEntryModel.create(
-            'b', 0, 'committer_id', 'username', 'msg',
-            'create', [{}],
+            'b', 0, 'committer_id', 'msg', 'create', [{}],
             constants.ACTIVITY_STATUS_PUBLIC, False)
         private_commit.collection_id = 'a'
         public_commit.collection_id = 'b'
