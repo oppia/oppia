@@ -404,9 +404,6 @@ class BaseCommitLogEntryModel(BaseModel):
     # The version number of the model after this commit.
     version = ndb.IntegerProperty()
 
-    # DEPRECATED in v2.9.4. Do not use.
-    username = ndb.StringProperty(indexed=True, required=False)
-
     @classmethod
     def has_reference_to_user_id(cls, user_id):
         """Check whether BaseCommitLogEntryModel references user.

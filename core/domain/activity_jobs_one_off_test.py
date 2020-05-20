@@ -37,15 +37,12 @@ from core.tests import test_utils
 import feconf
 import python_utils
 
+from google.appengine.ext import ndb
+
 gae_search_services = models.Registry.import_search_services()
 
-(
-    collection_models, exp_models,
-    question_models, skill_models,
-    story_models, topic_models) = models.Registry.import_models([
-        models.NAMES.collection, models.NAMES.exploration,
-        models.NAMES.question, models.NAMES.skill,
-        models.NAMES.story, models.NAMES.topic])
+(collection_models, exp_models) = models.Registry.import_models(
+    [models.NAMES.collection, models.NAMES.exploration])
 
 
 class ActivityContributorsSummaryOneOffJobTests(test_utils.GenericTestBase):
@@ -528,6 +525,13 @@ class OneOffReindexActivitiesJobTests(test_utils.GenericTestBase):
                 'key', 'value'))
 
 
+class MockCollectionCommitLogEntryModel(
+        collection_models.CollectionCommitLogEntryModel):
+    """Mock CollectionCommitLogEntryModel so that it allows to set username."""
+
+    username = ndb.StringProperty(indexed=True, required=False)
+
+
 class RemoveCommitUsernamesOneOffJobTests(test_utils.GenericTestBase):
 
     USER_1_ID = 'user_1_id'
@@ -548,155 +552,72 @@ class RemoveCommitUsernamesOneOffJobTests(test_utils.GenericTestBase):
                        stringified_item in stringified_output]
         return eval_output
 
-    def test_one_commit_model(self):
-        collection_models.CollectionCommitLogEntryModel(
-            id='commit_id',
-            user_id='committer_id',
-            collection_id='col_id',
-            commit_type='create',
-            commit_message='Message',
-            commit_cmds=[],
-            version=1,
-            post_commit_status='public',
-            post_commit_community_owned=False,
-            post_commit_is_private=False
-        ).put()
+    def test_one_commit_model_with_username(self):
+        with self.swap(
+            collection_models, 'CollectionCommitLogEntryModel',
+            MockCollectionCommitLogEntryModel
+        ):
+            original_commit_model = (
+                collection_models.CollectionCommitLogEntryModel(
+                    id='id',
+                    user_id='committer_id',
+                    username='username',
+                    collection_id='col_id',
+                    commit_type='create',
+                    commit_message='Message',
+                    commit_cmds=[],
+                    version=1,
+                    post_commit_status='public',
+                    post_commit_community_owned=False,
+                    post_commit_is_private=False
+                )
+            )
+            original_commit_model.put()
+
+            # pylint: disable=protected-access
+            self.assertIsNotNone(original_commit_model.username)
+            self.assertIn('username', original_commit_model._values)
+            self.assertIn('username', original_commit_model._properties)
+
+            output = self._run_one_off_job()
+            self.assertItemsEqual(
+                [['SUCCESS_REMOVED - MockCollectionCommitLogEntryModel', 1]],
+                output)
+
+            migrated_commit_model = (
+                collection_models.CollectionCommitLogEntryModel.get_by_id('id'))
+            self.assertIsNone(migrated_commit_model.username)
+            self.assertNotIn('username', migrated_commit_model._values)
+            self.assertNotIn('username', migrated_commit_model._properties)
+            # pylint: enable=protected-access
+
+    def test_one_commit_model_without_username(self):
+        original_commit_model = (
+            collection_models.CollectionCommitLogEntryModel(
+                id='id',
+                user_id='committer_id',
+                collection_id='col_id',
+                commit_type='create',
+                commit_message='Message',
+                commit_cmds=[],
+                version=1,
+                post_commit_status='public',
+                post_commit_community_owned=False,
+                post_commit_is_private=False
+            )
+        )
+        original_commit_model.put()
+
+        # pylint: disable=protected-access
+        self.assertNotIn('username', original_commit_model._values)
+        self.assertNotIn('username', original_commit_model._properties)
 
         output = self._run_one_off_job()
         self.assertItemsEqual(
-            [['SUCCESS - CollectionCommitLogEntryModel', 1]], output)
+            [['SUCCESS_ALREADY_REMOVED - CollectionCommitLogEntryModel', 1]],
+            output)
 
-        self.assertIsNone(
-            collection_models.CollectionCommitLogEntryModel
-            .get_by_id('commit_id').username)
-
-    def test_multiple_commits_model(self):
-        collection_models.CollectionCommitLogEntryModel(
-            id='commit_id',
-            user_id='committer_id',
-            collection_id='col_id',
-            commit_type='create',
-            commit_message='Message',
-            commit_cmds=[],
-            version=1,
-            post_commit_status='public',
-            post_commit_community_owned=False,
-            post_commit_is_private=False
-        ).put()
-        exp_models.ExplorationCommitLogEntryModel(
-            id='commit_id',
-            user_id='committer_id',
-            exploration_id='exp_id',
-            commit_type='create',
-            commit_message='Message',
-            commit_cmds=[],
-            version=1,
-            post_commit_status='public',
-            post_commit_community_owned=False,
-            post_commit_is_private=False
-        ).put()
-        exp_models.ExplorationCommitLogEntryModel(
-            id='commit_id',
-            user_id='committer_id',
-            exploration_id='exp_id',
-            commit_type='create',
-            commit_message='Message',
-            commit_cmds=[],
-            version=1,
-            post_commit_status='public',
-            post_commit_community_owned=False,
-            post_commit_is_private=False
-        ).put()
-        question_models.QuestionCommitLogEntryModel(
-            id='commit_id',
-            user_id='committer_id',
-            question_id='que_id',
-            commit_type='create',
-            commit_message='Message',
-            commit_cmds=[],
-            version=1,
-            post_commit_status='public',
-            post_commit_community_owned=False,
-            post_commit_is_private=False
-        ).put()
-        skill_models.SkillCommitLogEntryModel(
-            id='commit_id',
-            user_id='committer_id',
-            skill_id='ski_id',
-            commit_type='create',
-            commit_message='Message',
-            commit_cmds=[],
-            version=1,
-            post_commit_status='public',
-            post_commit_community_owned=False,
-            post_commit_is_private=False
-        ).put()
-        story_models.StoryCommitLogEntryModel(
-            id='commit_id',
-            user_id='committer_id',
-            story_id='sto_id',
-            commit_type='create',
-            commit_message='Message',
-            commit_cmds=[],
-            version=1,
-            post_commit_status='public',
-            post_commit_community_owned=False,
-            post_commit_is_private=False
-        ).put()
-        topic_models.TopicCommitLogEntryModel(
-            id='commit_id',
-            user_id='committer_id',
-            topic_id='top_id',
-            commit_type='create',
-            commit_message='Message',
-            commit_cmds=[],
-            version=1,
-            post_commit_status='public',
-            post_commit_community_owned=False,
-            post_commit_is_private=False
-        ).put()
-        topic_models.SubtopicPageCommitLogEntryModel(
-            id='commit_id',
-            user_id='committer_id',
-            subtopic_page_id='sto_id',
-            commit_type='create',
-            commit_message='Message',
-            commit_cmds=[],
-            version=1,
-            post_commit_status='public',
-            post_commit_community_owned=False,
-            post_commit_is_private=False
-        ).put()
-
-        output = self._run_one_off_job()
-        self.assertItemsEqual([
-            ['SUCCESS - CollectionCommitLogEntryModel', 1],
-            ['SUCCESS - ExplorationCommitLogEntryModel', 1],
-            ['SUCCESS - QuestionCommitLogEntryModel', 1],
-            ['SUCCESS - SkillCommitLogEntryModel', 1],
-            ['SUCCESS - StoryCommitLogEntryModel', 1],
-            ['SUCCESS - TopicCommitLogEntryModel', 1],
-            ['SUCCESS - SubtopicPageCommitLogEntryModel', 1],
-        ], output)
-
-        self.assertIsNone(
-            collection_models.CollectionCommitLogEntryModel
-            .get_by_id('commit_id').username)
-        self.assertIsNone(
-            exp_models.ExplorationCommitLogEntryModel
-            .get_by_id('commit_id').username)
-        self.assertIsNone(
-            question_models.QuestionCommitLogEntryModel
-            .get_by_id('commit_id').username)
-        self.assertIsNone(
-            skill_models.SkillCommitLogEntryModel
-            .get_by_id('commit_id').username)
-        self.assertIsNone(
-            story_models.StoryCommitLogEntryModel
-            .get_by_id('commit_id').username)
-        self.assertIsNone(
-            topic_models.TopicCommitLogEntryModel
-            .get_by_id('commit_id').username)
-        self.assertIsNone(
-            topic_models.SubtopicPageCommitLogEntryModel
-            .get_by_id('commit_id').username)
+        migrated_commit_model = (
+            collection_models.CollectionCommitLogEntryModel.get_by_id('id'))
+        self.assertNotIn('username', migrated_commit_model._values)
+        self.assertNotIn('username', migrated_commit_model._properties)

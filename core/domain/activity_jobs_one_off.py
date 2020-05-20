@@ -155,10 +155,19 @@ class RemoveCommitUsernamesOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def map(commit_model):
-        commit_model.username = None
-        commit_model.put(update_last_updated_time=False)
         class_name = commit_model.__class__.__name__
-        yield ('SUCCESS - %s' % class_name, commit_model.id)
+        # This is an only way to remove the field from the model,
+        # see https://stackoverflow.com/a/15116016/3688189 and
+        # https://stackoverflow.com/a/12701172/3688189.
+        # pylint: disable=protected-access
+        if 'username' in commit_model._values:
+            del commit_model._values['username']
+            del commit_model._properties['username']
+            commit_model.put()
+            yield ('SUCCESS_REMOVED - %s' % class_name, commit_model.id)
+        else:
+            yield ('SUCCESS_ALREADY_REMOVED - %s' % class_name, commit_model.id)
+        # pylint: enable=protected-access
 
     @staticmethod
     def reduce(key, values):
