@@ -5282,8 +5282,5 @@ export = {
   // Used to disable account data export until it is fully implemented.
   "ENABLE_ACCOUNT_EXPORT": false,
 
-  // Used to hide the callout to classroom until it is ready.
-  "SHOW_CLASSROOM_CALLOUT": false,
-
   "DEV_MODE": true
 };

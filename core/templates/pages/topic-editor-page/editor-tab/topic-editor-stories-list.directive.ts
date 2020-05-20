@@ -16,6 +16,9 @@
  * @fileoverview Controller for the stories list viewer.
  */
 
+require(
+  'components/common-layout-directives/common-elements/' +
+  'confirm-or-cancel-modal.controller.ts');
 require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/topic/editable-topic-backend-api.service.ts');
 require('domain/topic/topic-update.service.ts');
@@ -54,14 +57,7 @@ angular.module('oppia').directive('storiesList', [
                   '/pages/topic-editor-page/modal-templates/' +
                   'topic-save-pending-changes-modal.template.html'),
                 backdrop: true,
-                controller: [
-                  '$scope', '$uibModalInstance',
-                  function($scope, $uibModalInstance) {
-                    $scope.cancel = function() {
-                      $uibModalInstance.dismiss('cancel');
-                    };
-                  }
-                ]
+                controller: 'ConfirmOrCancelModalController'
               }).result.then(function() {}, function() {
                 // Note to developers:
                 // This callback is triggered when the Cancel button is clicked.
@@ -77,25 +73,13 @@ angular.module('oppia').directive('storiesList', [
           };
 
           $scope.deleteCanonicalStory = function(storyId) {
-            var modalInstance = $uibModal.open({
+            $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/topic-editor-page/modal-templates/' +
                 'delete-story-modal.template.html'),
               backdrop: true,
-              controller: [
-                '$scope', '$uibModalInstance',
-                function($scope, $uibModalInstance) {
-                  $scope.confirmDeletion = function() {
-                    $uibModalInstance.close();
-                  };
-                  $scope.cancel = function() {
-                    $uibModalInstance.dismiss('cancel');
-                  };
-                }
-              ]
-            });
-
-            modalInstance.result.then(function() {
+              controller: 'ConfirmOrCancelModalController'
+            }).result.then(function() {
               TopicUpdateService.removeCanonicalStory(
                 $scope.getTopic(), storyId);
               for (var i = 0; i < $scope.storySummaries.length; i++) {
@@ -103,7 +87,7 @@ angular.module('oppia').directive('storiesList', [
                   $scope.storySummaries.splice(i, 1);
                 }
               }
-            }).result.then(function() {}, function() {
+            }, function() {
               // Note to developers:
               // This callback is triggered when the Cancel button is clicked.
               // No further action is needed.
