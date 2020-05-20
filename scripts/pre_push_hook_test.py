@@ -64,15 +64,15 @@ class PrePushHookTests(test_utils.GenericTestBase):
         def mock_start_linter(unused_files_to_lint):
             return self.linter_code
         self.does_diff_include_js_or_ts_files = False
-        def mock_does_diff_include_js_or_ts_files(unused_files_to_lint):
+        def mock_does_diff_include_js_or_ts_files(unused_diff_files):
             return self.does_diff_include_js_or_ts_files
         self.does_diff_include_ts_files = False
-        def mock_does_diff_include_ts_files(unused_files_to_lint):
+        def mock_does_diff_include_ts_files(unused_diff_files):
             return self.does_diff_include_ts_files
 
         self.does_diff_include_travis_yml_or_js_files = False
         def mock_does_diff_include_travis_yml_or_js_files(
-                unused_files_to_lint):
+                unused_diff_files):
             return self.does_diff_include_travis_yml_or_js_files
 
         self.popen_swap = self.swap(subprocess, 'Popen', mock_popen)

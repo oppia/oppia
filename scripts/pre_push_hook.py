@@ -329,51 +329,52 @@ def install_hook():
         raise ValueError(err_chmod_cmd)
 
 
-def does_diff_include_js_or_ts_files(files_to_lint):
+def does_diff_include_js_or_ts_files(diff_files):
     """Returns true if diff includes JavaScript or TypeScript files.
 
     Args:
-        files_to_lint: list(str). List of files to be linted.
+        diff_files: list(str). List of files to be linted.
 
     Returns:
         bool. Whether the diff contains changes in any JavaScript or TypeScript
             files.
     """
 
-    for filename in files_to_lint:
+    for filename in diff_files:
         if filename.endswith('.ts') or filename.endswith('.js'):
             return True
     return False
 
 
-def does_diff_include_ts_files(files_to_lint):
+def does_diff_include_ts_files(diff_files):
     """Returns true if diff includes TypeScript files.
 
     Args:
-        files_to_lint: list(str). List of files to be linted.
+        diff_files: list(str). List of files to be linted.
 
     Returns:
         bool. Whether the diff contains changes in any TypeScript files.
     """
 
-    for filename in files_to_lint:
+    for filename in diff_files:
+        print(filename)
         if filename.endswith('.ts'):
             return True
     return False
 
 
-def does_diff_include_travis_yml_or_js_files(files_to_lint):
+def does_diff_include_travis_yml_or_js_files(diff_files):
     """Returns true if diff includes .travis.yml or Javascript files.
 
     Args:
-        files_to_lint: list(str). List of files to be linted.
+        diff_files: list(str). List of files to be linted.
 
     Returns:
         bool. Whether the diff contains changes in travis.yml or
         Javascript files.
     """
 
-    for filename in files_to_lint:
+    for filename in diff_files:
         if filename.endswith('.js') or filename.endswith('.travis.yml'):
             return True
     return False
