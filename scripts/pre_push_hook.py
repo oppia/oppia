@@ -340,8 +340,8 @@ def does_diff_include_js_or_ts_files(diff_files):
             files.
     """
 
-    for filename in diff_files:
-        if filename.endswith('.ts') or filename.endswith('.js'):
+    for file_path in diff_files:
+        if file_path.endswith('.ts') or file_path.endswith('.js'):
             return True
     return False
 
@@ -356,8 +356,8 @@ def does_diff_include_ts_files(diff_files):
         bool. Whether the diff contains changes in any TypeScript files.
     """
 
-    for filename in diff_files:
-        if filename.endswith('.ts'):
+    for file_path in diff_files:
+        if file_path.endswith('.ts'):
             return True
     return False
 
@@ -373,8 +373,8 @@ def does_diff_include_travis_yml_or_js_files(diff_files):
         Javascript files.
     """
 
-    for filename in diff_files:
-        if filename.endswith('.js') or filename.endswith('.travis.yml'):
+    for file_path in diff_files:
+        if file_path.endswith('.js') or file_path.endswith('.travis.yml'):
             return True
     return False
 
@@ -408,7 +408,6 @@ def main(args=None):
             if not modified_files and not files_to_lint:
                 continue
             if files_to_lint:
-                print(files_to_lint)
                 lint_status = start_linter(files_to_lint)
                 if lint_status != 0:
                     python_utils.PRINT(
