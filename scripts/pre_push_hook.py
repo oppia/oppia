@@ -66,7 +66,8 @@ FRONTEND_TEST_CMDS = [
 TRAVIS_CI_PROTRACTOR_CHECK_CMDS = [
     PYTHON_CMD, '-m', 'scripts.check_e2e_tests_are_captured_in_ci']
 GIT_IS_DIRTY_CMD = 'git status --porcelain --untracked-files=no'
-
+TYPESCRIPT_CHECKS_CMD = [
+    PYTHON_CMD, '-m', 'scripts.typescript_checks']
 
 class ChangedBranch(python_utils.OBJECT):
     """Context manager class that changes branch when there are modified files
@@ -397,8 +398,8 @@ def main(args=None):
                         'Push failed, please correct the linting issues above.')
                     sys.exit(1)
 
-            # Typescript checks
-            typescript_check_status = start_python_script('typescript_checks')
+            typescript_check_status = run_script_and_get_returncode(
+                TYPESCRIPT_CHECKS_CMD)
             if typescript_check_status != 0:
                 sys.exit(1)
 
