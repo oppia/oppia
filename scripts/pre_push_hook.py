@@ -65,8 +65,7 @@ FRONTEND_TEST_CMDS = [
     PYTHON_CMD, '-m', 'scripts.run_frontend_tests', '--check_coverage']
 TRAVIS_CI_PROTRACTOR_CHECK_CMDS = [
     PYTHON_CMD, '-m', 'scripts.check_e2e_tests_are_captured_in_ci']
-TYPESCRIPT_CHECKS_CMDS = [
-    PYTHON_CMD, '-m', 'scripts.typescript_checks']
+TYPESCRIPT_CHECKS_CMDS = [PYTHON_CMD, '-m', 'scripts.typescript_checks']
 GIT_IS_DIRTY_CMD = 'git status --porcelain --untracked-files=no'
 
 
