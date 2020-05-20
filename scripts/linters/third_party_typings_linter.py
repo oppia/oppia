@@ -136,7 +136,8 @@ def check_third_party_libs_type_defs(verbose_mode_enabled):
                     python_utils.PRINT(
                         'Type definitions for %s are not up to date. The '
                         'current version of %s is %s and the type definitions '
-                        'are for version %s.' % (
+                        'are for version %s. Please refer typings/README.md '
+                        'for more details.' % (
                             third_party_lib['name'], third_party_lib['name'],
                             lib_version, type_defs_version))
                     python_utils.PRINT('')
