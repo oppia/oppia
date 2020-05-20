@@ -321,6 +321,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'question-creation.service.ts',
     'question-difficulty-selector.directive.ts',
     'question-editor.directive.ts',
+    'question-misconception-editor.directive.ts',
     'question-opportunities.directive.ts',
     'question-player-engine.service.ts',
     'question-player.directive.ts',
