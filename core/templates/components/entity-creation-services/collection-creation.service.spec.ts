@@ -58,7 +58,6 @@ describe('Collection Creation service', () => {
 
   it('should successfully create a collection and navigate to collection',
     fakeAsync(() => {
-      spyOn(alertsService, 'clearWarnings').and.callThrough();
       spyOn(loaderService, 'showLoadingScreen').and.callThrough();
       spyOn(analyticsService, 'registerCreateNewCollectionEvent')
         .and.callThrough();
@@ -111,7 +110,6 @@ describe('Collection Creation service', () => {
 
   it('should not be able to be used while in progress',
     fakeAsync(() => {
-      spyOn(alertsService, 'clearWarnings').and.callThrough();
       spyOn(loaderService, 'showLoadingScreen').and.callThrough();
       spyOn(analyticsService, 'registerCreateNewCollectionEvent')
         .and.callThrough();
