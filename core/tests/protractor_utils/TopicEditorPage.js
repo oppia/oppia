@@ -132,15 +132,14 @@ var TopicEditorPage = function() {
       publishTopicButton, 'Topic is taking too long to publish.');
   };
 
-  this.expectNumberOfQuestionsForSkillWithDescriptionToBe = function(
+  this.expectNumberOfQuestionsForSkillWithDescriptionToBe = async function(
       count, skillDescription) {
-    selectSkillDropdown.click();
-    element(by.css('option[label="' + skillDescription + '"]')).click();
-    waitFor.visibilityOf(
+    await selectSkillDropdown.click();
+    await element(by.css('option[label="' + skillDescription + '"]')).click();
+    await waitFor.visibilityOf(
       questionItem, 'Question takes too long to appear');
-    questionItems.then(function(items) {
-      expect(items.length).toEqual(count);
-    });
+    var items = await questionItems;
+    expect(items.length).toEqual(count);
   };
 
   this.saveQuestion = function() {
@@ -159,8 +158,8 @@ var TopicEditorPage = function() {
     });
   };
 
-  this.moveToQuestionsTab = function() {
-    questionsTabButton.click();
+  this.moveToQuestionsTab = async function() {
+    await questionsTabButton.click();
   };
 
   this.expectSubtopicPageContentsToMatch = function(contents) {
@@ -198,10 +197,9 @@ var TopicEditorPage = function() {
     });
   };
 
-  this.expectNumberOfUncategorizedSkillsToBe = function(count) {
-    uncategorizedSkillItems.then(function(items) {
-      expect(items.length).toEqual(1);
-    });
+  this.expectNumberOfUncategorizedSkillsToBe = async function(count) {
+    var items = await uncategorizedSkillItems;
+    expect(items.length).toEqual(1);
   };
 
   this.deleteSubtopicWithIndex = function(index) {
@@ -264,8 +262,8 @@ var TopicEditorPage = function() {
     expect(skillNamesElems.count()).toEqual(skillNames.length);
   };
 
-  this.moveToSubtopicsTab = function() {
-    subtopicsTabButton.click();
+  this.moveToSubtopicsTab = async function() {
+    await subtopicsTabButton.click();
   };
 
   this.expectNumberOfStoriesToBe = function(count) {
