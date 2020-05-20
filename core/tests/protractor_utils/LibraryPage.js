@@ -98,8 +98,8 @@ var LibraryPage = function() {
     await languageSelector.selectValues(languages);
   };
 
-  this.deselectLanguages = function(languages) {
-    languageSelector.deselectValues(languages);
+  this.deselectLanguages = async function(languages) {
+    await languageSelector.deselectValues(languages);
   };
 
   this.expectCurrentLanguageSelectionToBe = async function(expectedLanguages) {
@@ -110,8 +110,8 @@ var LibraryPage = function() {
     await categorySelector.selectValues(categories);
   };
 
-  this.deselectCategories = function(categories) {
-    categorySelector.deselectValues(categories);
+  this.deselectCategories = async function(categories) {
+    await categorySelector.deselectValues(categories);
   };
 
   this.expectCurrentCategorySelectionToBe = async function(
@@ -119,8 +119,8 @@ var LibraryPage = function() {
     await categorySelector.expectCurrentSelectionToBe(expectedCategories);
   };
 
-  this.expectMainHeaderTextToBe = function(expectedHeaderText) {
-    expect(mainHeader.getText()).toEqual(expectedHeaderText);
+  this.expectMainHeaderTextToBe = async function(expectedHeaderText) {
+    expect(await mainHeader.getText()).toEqual(expectedHeaderText);
   };
 
   this.expectExplorationToBeVisible = async function(name) {
@@ -128,10 +128,9 @@ var LibraryPage = function() {
     expect(elems.length).not.toBe(0);
   };
 
-  this.expectExplorationToBeHidden = function(name) {
-    _getExplorationElements(name).then(function(elems) {
-      expect(elems.length).toBe(0);
-    });
+  this.expectExplorationToBeHidden = async function(name) {
+    var elems = await _getExplorationElements(name);
+    expect(elems.length).toBe(0);
   };
 
   this.playCollection = async function(collectionName) {
@@ -158,12 +157,10 @@ var LibraryPage = function() {
     await waitFor.pageToFullyLoad();
   };
 
-  this.getExplorationObjective = function(name) {
-    return _getExplorationElements(name).then(function(elems) {
-      return elems[0].element(by.css(
-        '.protractor-test-exp-summary-tile-objective'
-      )).getText();
-    });
+  this.getExplorationObjective = async function(name) {
+    var elems = await _getExplorationElements(name);
+    return await elems[0].element(by.css(
+      '.protractor-test-exp-summary-tile-objective')).getText();
   };
 
   this.expectExplorationRatingToEqual = function(name, ratingValue) {

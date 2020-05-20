@@ -78,8 +78,8 @@ var createAndLoginUser = async function(email, username) {
 var createModerator = async function(email, username) {
   await login(email, true);
   await _completeSignup(username);
-  adminPage.get();
-  adminPage.updateRole(username, 'moderator');
+  await adminPage.get();
+  await adminPage.updateRole(username, 'moderator');
   await logout();
 };
 
