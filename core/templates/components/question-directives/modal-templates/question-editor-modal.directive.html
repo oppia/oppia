@@ -28,12 +28,12 @@
                    can-edit-question="canEditQuestion"
                    question-changed="questionChanged">
   </question-editor>
-  <div class="alert alert-danger" ng-if="validationError">
-    <[validationError]>
+  <div class="alert alert-danger" ng-if="validationError || (question.getStateData().interaction.id && isSaveButtonDisabled())">
+    <[validationError || isSaveButtonDisabled()]>
     <span class="oppia-transition-200"
           ng-click="removeErrors()"
           style="float: right;">
-      <i class="material-icons md-18">&#xE5CD;</i>
+      <i ng-show="validationError" class="material-icons md-18">&#xE5CD;</i>
     </span>
   </div>
 </div>
