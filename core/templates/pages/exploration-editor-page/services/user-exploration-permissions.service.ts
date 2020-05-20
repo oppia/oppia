@@ -24,8 +24,6 @@ import { Injectable } from '@angular/core';
 import { ContextService } from 'services/context.service';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
-import { ExplorationEditorPageConstants } from
-  'pages/exploration-editor-page/exploration-editor-page.constants';
 
 @Injectable({
   providedIn: 'root'
