@@ -69,6 +69,7 @@ GIT_IS_DIRTY_CMD = 'git status --porcelain --untracked-files=no'
 TYPESCRIPT_CHECKS_CMD = [
     PYTHON_CMD, '-m', 'scripts.typescript_checks']
 
+
 class ChangedBranch(python_utils.OBJECT):
     """Context manager class that changes branch when there are modified files
     that need to be linted. It does not change branch when modified files are
@@ -401,6 +402,8 @@ def main(args=None):
             typescript_check_status = run_script_and_get_returncode(
                 TYPESCRIPT_CHECKS_CMD)
             if typescript_check_status != 0:
+                python_utils.PRINT(
+                    'Push aborted due to failing typescript checks.')
                 sys.exit(1)
 
             frontend_status = 0
