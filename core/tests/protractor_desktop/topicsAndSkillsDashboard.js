@@ -108,6 +108,7 @@ describe('Topics and skills dashboard functionality', function() {
     await topicsAndSkillsDashboardPage.navigateToUnusedSkillsTab();
     await topicsAndSkillsDashboardPage.mergeSkillWithIndexToSkillWithIndex(
       0, 0);
+    await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.navigateToTopicWithIndex(0);
     await topicEditorPage.moveToQuestionsTab();
     await topicEditorPage.expectNumberOfQuestionsForSkillWithDescriptionToBe(
