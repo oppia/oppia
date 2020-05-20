@@ -396,6 +396,12 @@ def main(args=None):
                     python_utils.PRINT(
                         'Push failed, please correct the linting issues above.')
                     sys.exit(1)
+
+            # Typescript checks
+            typescript_check_status = start_python_script('typescript_checks')
+            if typescript_check_status != 0:
+                sys.exit(1)
+
             frontend_status = 0
             travis_ci_check_status = 0
             if does_diff_include_js_or_ts_files(files_to_lint):
