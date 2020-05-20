@@ -371,12 +371,14 @@ def remove_updates_and_delete_branch(repo_fork, target_branch):
 
 
 def create_branch(
-        repo_fork, target_branch, github_username,
+        repo, repo_fork, target_branch, github_username,
         current_release_version_number):
     """Creates a new branch with updates to AUTHORS, CHANGELOG,
     CONTRIBUTORS and about-page.
 
     Args:
+        repo: github.Repository.Repository. The PyGithub object for the
+            original repo.
         repo_fork: github.Repository.Repository. The PyGithub object for the
             forked repo.
         target_branch: str. The name of the target branch.
@@ -386,7 +388,7 @@ def create_branch(
     python_utils.PRINT(
         'Creating new branch with updates to AUTHORS, CONTRIBUTORS, '
         'CHANGELOG and about-page...')
-    sb = repo_fork.get_branch('develop')
+    sb = repo.get_branch('develop')
     repo_fork.create_git_ref(
         ref='refs/heads/%s' % target_branch, sha=sb.commit.sha)
 
@@ -565,7 +567,7 @@ def main():
     common.ask_user_to_confirm(message)
 
     create_branch(
-        repo_fork, target_branch, github_username,
+        repo, repo_fork, target_branch, github_username,
         current_release_version_number)
 
 
