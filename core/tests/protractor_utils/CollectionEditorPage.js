@@ -91,7 +91,7 @@ var CollectionEditorPage = function() {
       if (isEnabled) {
         addExplorationButton.click();
       } else {
-        throw Error ('Add Exploration Button is not clickable');
+        throw new Error ('Add Exploration Button is not clickable');
       }
     });
   };

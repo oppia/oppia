@@ -61,6 +61,8 @@ describe('Story object factory', () => {
   it('should be able to create an interstitial story object', () => {
     var story = storyObjectFactory.createInterstitialStory();
     expect(story.getId()).toEqual(null);
+    expect(story.getThumbnailFilename()).toEqual(null);
+    expect(story.getThumbnailBgColor()).toEqual(null);
     expect(story.getTitle()).toEqual('Story title loading');
     expect(story.getDescription()).toEqual('Story description loading');
     expect(story.getLanguageCode()).toBe('en');
@@ -71,6 +73,14 @@ describe('Story object factory', () => {
 
   it('should correctly validate a valid story', () => {
     expect(_sampleStory.validate()).toEqual([]);
+  });
+
+  it('should correctly prepublish validate a story', () => {
+    expect(_sampleStory.prepublishValidate()).toEqual([
+      'Story should have a thumbnail.']);
+    _sampleStory.setThumbnailFilename('image.png');
+    _sampleStory.setThumbnailBgColor('#F8BF74');
+    expect(_sampleStory.prepublishValidate()).toEqual([]);
   });
 
   it('should correctly validate a story', () => {

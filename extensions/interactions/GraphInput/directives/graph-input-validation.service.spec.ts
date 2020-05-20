@@ -113,7 +113,8 @@ describe('GraphInputValidationService', () => {
     expect(() => {
       validatorService.getAllWarnings(
         currentState, {}, answerGroups, goodDefaultOutcome);
-    }).toThrow('Expected customization arguments to have properties: ' +
+    }).toThrowError(
+      'Expected customization arguments to have properties: ' +
       'graph, canEditEdgeWeight, canEditVertexLabel');
   });
 

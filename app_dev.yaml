@@ -209,17 +209,6 @@ handlers:
     X-Xss-Protection: "1; mode=block"
   secure: always
   expiration: "0"
-- url: /splash
-  static_files: webpack_bundles/splash-page.mainpage.html
-  upload: webpack_bundles/splash-page.mainpage.html
-  http_headers:
-    Pragma: no-cache
-    Strict-Transport-Security: "max-age=31536000; includeSubDomains"
-    X-Content-Type-Options: "nosniff"
-    X-Frame-Options: "DENY"
-    X-Xss-Protection: "1; mode=block"
-  secure: always
-  expiration: "0"
 - url: /teach
   static_files: webpack_bundles/teach-page.mainpage.html
   upload: webpack_bundles/teach-page.mainpage.html
@@ -430,6 +419,5 @@ skip_files:
 - third_party/static/MathJax-2.7.5/test/
 - third_party/static/MathJax-2.7.5/unpacked/
 - third_party/static/messageformat-2.0.5/
-- third_party/static/ng-img-crop-0.3.2/
 - third_party/static/nginfinitescroll-1.0.0/
 - third_party/static/popperJs-1.15.0/

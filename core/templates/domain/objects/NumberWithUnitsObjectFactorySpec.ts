@@ -131,44 +131,44 @@ describe('NumberWithUnitsObjectFactory', () => {
     it('should throw errors for invalid number with units', () => {
       expect(() => {
         nwuof.fromRawInputString('3* kg');
-      }).toThrow(new Error(errors.INVALID_VALUE));
+      }).toThrowError(errors.INVALID_VALUE);
       expect(() => {
         nwuof.fromRawInputString('$ 3*');
-      }).toThrow(new Error(errors.INVALID_VALUE));
+      }).toThrowError(errors.INVALID_VALUE);
       expect(() => {
         nwuof.fromRawInputString('Rs 3^');
-      }).toThrow(new Error(errors.INVALID_VALUE));
+      }).toThrowError(errors.INVALID_VALUE);
       expect(() => {
         nwuof.fromRawInputString('3# m/s');
-      }).toThrow(new Error(errors.INVALID_VALUE));
+      }).toThrowError(errors.INVALID_VALUE);
       expect(() => {
         nwuof.fromRawInputString('3 $');
-      }).toThrow(new Error(errors.INVALID_CURRENCY_FORMAT));
+      }).toThrowError(errors.INVALID_CURRENCY_FORMAT);
       expect(() => {
         nwuof.fromRawInputString('Rs5');
-      }).toThrow(new Error(errors.INVALID_CURRENCY));
+      }).toThrowError(errors.INVALID_CURRENCY);
       expect(() => {
         nwuof.fromRawInputString('$');
-      }).toThrow(new Error(errors.INVALID_CURRENCY));
+      }).toThrowError(errors.INVALID_CURRENCY);
       expect(() => {
         nwuof.fromRawInputString('kg 2 s^2');
-      }).toThrow(new Error(errors.INVALID_CURRENCY));
+      }).toThrowError(errors.INVALID_CURRENCY);
       expect(() => {
         nwuof.fromRawInputString('2 m/s#');
-      }).toThrow(new Error(errors.INVALID_UNIT_CHARS));
+      }).toThrowError(errors.INVALID_UNIT_CHARS);
       expect(() => {
         nwuof.fromRawInputString('@ 2');
-      }).toThrow(new Error(errors.INVALID_CURRENCY));
+      }).toThrowError(errors.INVALID_CURRENCY);
       expect(() => {
         nwuof.fromRawInputString('2 / 3 kg&^-2');
-      }).toThrow(new Error(errors.INVALID_UNIT_CHARS));
+      }).toThrowError(errors.INVALID_UNIT_CHARS);
       expect(() => {
         nwuof.fromRawInputString('2 m**2');
-      }).toThrow(new Error('SyntaxError: Unexpected "*" in "m**2" at index 2'));
+      }).toThrowError('SyntaxError: Unexpected "*" in "m**2" at index 2');
       expect(() => {
         nwuof.fromRawInputString('2 kg / m^(2)');
-      }).toThrow(new Error('SyntaxError: In "kg / m^(2)", "^" must be ' +
-      'followed by a floating-point number'));
+      }).toThrowError('SyntaxError: In "kg / m^(2)", "^" must be ' +
+      'followed by a floating-point number');
     });
   });
 });

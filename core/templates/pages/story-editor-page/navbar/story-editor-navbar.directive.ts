@@ -15,7 +15,9 @@
 /**
  * @fileoverview Directive for the navbar of the story editor.
  */
-
+require(
+  'components/common-layout-directives/common-elements/' +
+  'confirm-or-cancel-modal.controller.ts');
 require(
   'components/common-layout-directives/common-elements/' +
   'loading-dots.directive.ts');
@@ -61,7 +63,8 @@ angular.module('oppia').directive('storyEditorNavbar', [
           $scope.getTotalWarningsCount = function() {
             return (
               $scope.validationIssues.length +
-              $scope.explorationValidationIssues.length);
+              $scope.explorationValidationIssues.length +
+              $scope.prepublishValidationIssues.length);
           };
 
           $scope.isStorySaveable = function() {
@@ -84,6 +87,19 @@ angular.module('oppia').directive('storyEditorNavbar', [
 
           var _validateStory = function() {
             $scope.validationIssues = $scope.story.validate();
+            _validateExplorations();
+            var nodes = $scope.story.getStoryContents().getNodes();
+            var storyPrepublishValidationIssues = (
+              $scope.story.prepublishValidate());
+            var nodePrepublishValidationIssues = (
+              [].concat.apply([], nodes.map(
+                (node) => node.prepublishValidate())));
+            $scope.prepublishValidationIssues = (
+              storyPrepublishValidationIssues.concat(
+                nodePrepublishValidationIssues));
+          };
+
+          var _validateExplorations = function() {
             var nodes = $scope.story.getStoryContents().getNodes();
             var explorationIds = [];
 
@@ -113,25 +129,13 @@ angular.module('oppia').directive('storyEditorNavbar', [
           };
 
           $scope.saveChanges = function() {
-            var modalInstance = $uibModal.open({
+            $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/story-editor-page/modal-templates/' +
                 'story-editor-save-modal.template.html'),
               backdrop: true,
-              controller: [
-                '$scope', '$uibModalInstance',
-                function($scope, $uibModalInstance) {
-                  $scope.save = function(commitMessage) {
-                    $uibModalInstance.close(commitMessage);
-                  };
-                  $scope.cancel = function() {
-                    $uibModalInstance.dismiss('cancel');
-                  };
-                }
-              ]
-            });
-
-            modalInstance.result.then(function(commitMessage) {
+              controller: 'ConfirmOrCancelModalController'
+            }).result.then(function(commitMessage) {
               StoryEditorStateService.saveStory(commitMessage);
             }, function() {
               // Note to developers:
@@ -164,6 +168,7 @@ angular.module('oppia').directive('storyEditorNavbar', [
             $scope.isStoryPublished = StoryEditorStateService.isStoryPublished;
             $scope.isSaveInProgress = StoryEditorStateService.isSavingStory;
             $scope.validationIssues = [];
+            $scope.prepublishValidationIssues = [];
             $scope.$on(EVENT_STORY_INITIALIZED, _validateStory);
             $scope.$on(EVENT_STORY_REINITIALIZED, _validateStory);
             $scope.$on(

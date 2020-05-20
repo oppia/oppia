@@ -88,14 +88,14 @@ export class RecordedVoiceovers {
 
   addContentId(contentId: string): void {
     if (this.voiceoversMapping.hasOwnProperty(contentId)) {
-      throw Error('Trying to add duplicate content id.');
+      throw new Error('Trying to add duplicate content id.');
     }
     this.voiceoversMapping[contentId] = {};
   }
 
   deleteContentId(contentId: string): void {
     if (!this.voiceoversMapping.hasOwnProperty(contentId)) {
-      throw Error('Unable to find the given content id.');
+      throw new Error('Unable to find the given content id.');
     }
     delete this.voiceoversMapping[contentId];
   }
@@ -105,7 +105,7 @@ export class RecordedVoiceovers {
       fileSizeBytes: number, durationSecs: number): void {
     var languageCodeToVoiceover = this.voiceoversMapping[contentId];
     if (languageCodeToVoiceover.hasOwnProperty(languageCode)) {
-      throw Error('Trying to add duplicate language code.');
+      throw new Error('Trying to add duplicate language code.');
     }
     languageCodeToVoiceover[languageCode] =
       this._voiceoverObjectFactory.createNew(filename,
@@ -115,7 +115,7 @@ export class RecordedVoiceovers {
   deleteVoiceover(contentId: string, languageCode: string): void {
     var languageCodeToVoiceover = this.voiceoversMapping[contentId];
     if (!languageCodeToVoiceover.hasOwnProperty(languageCode)) {
-      throw Error(
+      throw new Error(
         'Trying to remove non-existing translation for language code ' +
         languageCode);
     }

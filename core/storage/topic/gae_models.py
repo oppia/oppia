@@ -57,6 +57,8 @@ class TopicModel(base_models.VersionedModel):
     abbreviated_name = ndb.StringProperty(indexed=True, default='')
     # The thumbnail filename of the topic.
     thumbnail_filename = ndb.StringProperty(indexed=True)
+    # The thumbnail background color of the topic.
+    thumbnail_bg_color = ndb.StringProperty(indexed=True)
     # The description of the topic.
     description = ndb.TextProperty(indexed=False)
     # This consists of the list of objects referencing canonical stories that
@@ -227,6 +229,8 @@ class TopicSummaryModel(base_models.BaseModel):
     canonical_name = ndb.StringProperty(required=True, indexed=True)
     # The ISO 639-1 code for the language this topic is written in.
     language_code = ndb.StringProperty(required=True, indexed=True)
+    # The description of the topic.
+    description = ndb.TextProperty(indexed=False)
 
     # Time when the topic model was last updated (not to be
     # confused with last_updated, which is the time when the

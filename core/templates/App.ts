@@ -16,57 +16,60 @@
  * @fileoverview Initialization and basic configuration for the Oppia module.
  */
 
-require('directives/focus-on.directive.ts');
+require('app.constants.ajs.ts');
 
-require('pages/Base.ts');
-
-require('services/context.service.ts');
-require('services/csrf-token.service.ts');
-require('services/navigation.service.ts');
-require('services/debouncer.service.ts');
-require('services/date-time-format.service.ts');
-require('services/id-generation.service.ts');
-require('services/html-escaper.service.ts');
-require('services/translation-file-hash-loader.service.ts');
-require('services/rte-helper.service.ts');
-require('services/state-rules-stats.service.ts');
-require('services/construct-translation-ids.service.ts');
-require('services/user.service.ts');
-require('services/promo-bar.service.ts');
-require('services/contextual/device-info.service.ts');
-require('services/contextual/url.service.ts');
-require('services/stateful/focus-manager.service.ts');
-require('services/site-analytics.service.ts');
-
+require('components/button-directives/create-activity-button.directive.ts');
+require('components/button-directives/social-buttons.directive.ts');
 require(
   'components/common-layout-directives/common-elements/' +
   'alert-message.directive.ts');
-require('components/button-directives/create-activity-button.directive.ts');
-
-require('components/forms/custom-forms-directives/object-editor.directive.ts');
 require(
   'components/common-layout-directives/common-elements/' +
   'promo-bar.directive.ts');
 require(
   'components/common-layout-directives/navigation-bars/' +
   'side-navigation-bar.directive.ts');
-require('components/button-directives/social-buttons.directive.ts');
 require(
   'components/common-layout-directives/navigation-bars/' +
   'top-navigation-bar.directive.ts');
+require('components/forms/custom-forms-directives/object-editor.directive.ts');
+
+require('directives/focus-on.directive.ts');
 
 require('domain/user/UserInfoObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
 
-require('app.constants.ajs.ts');
+require('pages/Base.ts');
+
+require('services/construct-translation-ids.service.ts');
+require('services/context.service.ts');
+require('services/contextual/device-info.service.ts');
+require('services/contextual/url.service.ts');
+require('services/csrf-token.service.ts');
+require('services/date-time-format.service.ts');
+require('services/debouncer.service.ts');
+require('services/html-escaper.service.ts');
+require('services/id-generation.service.ts');
+require('services/interaction-rules-registry.service.ts');
+require('services/navigation.service.ts');
+require('services/promo-bar.service.ts');
+require('services/rte-helper.service.ts');
+require('services/site-analytics.service.ts');
+require('services/state-interaction-stats.service.ts');
+require('services/stateful/focus-manager.service.ts');
+require('services/translation-file-hash-loader.service.ts');
+require('services/user.service.ts');
 
 require('google-analytics.initializer.ts');
 
 // The following file uses constants in app.constants.ts and hence needs to be
-// loaded after app.constants.ts
+// loaded *after* app.constants.ts
 require('I18nFooter.ts');
 
 require('Polyfills.ts');
+
+// Default to passive event listeners.
+require('default-passive-events');
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
@@ -77,10 +80,10 @@ const sourceMappedStackTrace = require('sourcemapped-stacktrace');
 
 angular.module('oppia').config([
   '$compileProvider', '$cookiesProvider', '$httpProvider',
-  '$interpolateProvider', '$locationProvider', '$provide',
+  '$interpolateProvider', '$locationProvider', '$provide', '$sanitizeProvider',
   function(
       $compileProvider, $cookiesProvider, $httpProvider,
-      $interpolateProvider, $locationProvider, $provide) {
+      $interpolateProvider, $locationProvider, $provide, $sanitizeProvider) {
     var ugs = new UpgradedServices();
     // We need to provide these services and pipes separately since they are
     // used in the directives imported in this file and cannot be
@@ -88,21 +91,24 @@ angular.module('oppia').config([
     var servicesToProvide = [
       'AlertsService', 'BackgroundMaskService', 'BrowserCheckerService',
       'CodeReplRulesService', 'CollectionCreationBackendService',
-      'ContextService', 'CsrfTokenService',
-      'DateTimeFormatService', 'DebouncerService', 'DeviceInfoService',
+      'ContextService', 'CsrfTokenService', 'DateTimeFormatService',
+      'DebouncerService', 'DeviceInfoService',
       'DocumentAttributeCustomizationService',
       'ExplorationHtmlFormatterService', 'ExplorationObjectFactory',
       'ExpressionParserService', 'ExtensionTagAssemblerService',
-      'ExtractImageFilenamesFromStateService',
-      'HtmlEscaperService', 'IdGenerationService', 'InteractionObjectFactory',
-      'LoggerService', 'MetaTagCustomizationService', 'NormalizeWhitespacePipe',
+      'ExtractImageFilenamesFromStateService', 'HtmlEscaperService',
+      'IdGenerationService', 'InteractionObjectFactory',
+      'InteractionRulesRegistryService', 'LoaderService', 'LoggerService',
+      'MetaTagCustomizationService', 'NormalizeWhitespacePipe',
+      'NormalizeWhitespacePunctuationAndCasePipe',
       'PencilCodeEditorRulesService', 'SidebarStatusService',
       'SiteAnalyticsService', 'SkillObjectFactory', 'SolutionObjectFactory',
       'StateCardObjectFactory', 'StateImprovementSuggestionService',
-      'StateObjectFactory', 'StatesObjectFactory', 'TextInputRulesService',
-      'UrlInterpolationService', 'UrlService', 'UserInfoObjectFactory',
-      'UtilsService', 'ValidatorsService', 'WindowDimensionsService',
-      'WindowRef'];
+      'StateInteractionStatsService', 'StateObjectFactory',
+      'StatesObjectFactory', 'TextInputRulesService', 'UrlInterpolationService',
+      'UrlService', 'UserInfoObjectFactory', 'UtilsService',
+      'ValidatorsService', 'WindowDimensionsService', 'WindowRef'
+    ];
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       if (servicesToProvide.includes(key)) {
         $provide.value(key, value);
@@ -129,6 +135,8 @@ angular.module('oppia').config([
     if (window.location.pathname === '/search/find') {
       $locationProvider.html5Mode(true);
     }
+
+    $sanitizeProvider.enableSvg(true);
 
     // Prevent storing duplicate cookies for translation language.
     $cookiesProvider.defaults.path = '/';
@@ -265,14 +273,6 @@ angular.module('oppia').factory('$exceptionHandler', [
       // because -1 is the status code for aborted requests.
       if (UNHANDLED_REJECTION_STATUS_CODE_REGEX.test(exception)) {
         return;
-      }
-      // Exceptions are expected to be of Error type. If an error is thrown
-      // with a primitive data type, it must be converted to an Error object
-      // so that the error gets logged correctly.
-      // This check can be removed once all the manually thrown exceptions
-      // are converted to Error objects (see #8456).
-      if (!(exception instanceof Error)) {
-        exception = new Error(exception);
       }
       var tploadStatusCode = exception.message.match(TPLOAD_STATUS_CODE_REGEX);
       // Suppress tpload errors which occur with p1 of -1 in the error URL

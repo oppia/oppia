@@ -34,10 +34,10 @@ angular.module('oppia').directive('moderatorPage', [
         '/pages/moderator-page/moderator-page.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$http', '$rootScope', 'AlertsService', 'DateTimeFormatService',
+        '$http', 'AlertsService', 'DateTimeFormatService', 'LoaderService',
         'ThreadMessageObjectFactory',
         function(
-            $http, $rootScope, AlertsService, DateTimeFormatService,
+            $http, AlertsService, DateTimeFormatService, LoaderService,
             ThreadMessageObjectFactory) {
           var ctrl = this;
           ctrl.getDatetimeAsString = function(millisSinceEpoch) {
@@ -78,7 +78,7 @@ angular.module('oppia').directive('moderatorPage', [
           };
 
           ctrl.$onInit = function() {
-            $rootScope.loadingMessage = 'Loading';
+            LoaderService.showLoadingScreen('Loading');
             ctrl.allCommits = [];
             ctrl.allFeedbackMessages = [];
             // Map of exploration ids to objects containing a single key: title.
@@ -121,7 +121,7 @@ angular.module('oppia').directive('moderatorPage', [
                 }
               }
               ctrl.allCommits = data.results;
-              $rootScope.loadingMessage = '';
+              LoaderService.hideLoadingScreen();
             });
 
             $http.get('/recent_feedback_messages').then(function(response) {

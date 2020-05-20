@@ -94,7 +94,7 @@ describe('Skill update service', function() {
 
     var rubricDict = {
       difficulty: skillDifficulties[0],
-      explanation: 'explanation'
+      explanations: ['explanation']
     };
 
     var example1 = {
@@ -249,17 +249,18 @@ describe('Skill update service', function() {
     var skill = SkillObjectFactory.createFromBackendDict(skillDict);
     expect(skill.getRubrics().length).toEqual(1);
     SkillUpdateService.updateRubricForDifficulty(
-      skill, skillDifficulties[0], 'new explanation');
+      skill, skillDifficulties[0], ['new explanation 1', 'new explanation 2']);
     expect(UndoRedoService.getCommittableChangeList()).toEqual([{
       cmd: 'update_rubrics',
       difficulty: skillDifficulties[0],
-      explanation: 'new explanation'
+      explanations: ['new explanation 1', 'new explanation 2']
     }]);
     expect(skill.getRubrics().length).toEqual(1);
-    expect(skill.getRubrics()[0].getExplanation()).toEqual('new explanation');
+    expect(skill.getRubrics()[0].getExplanations()).toEqual([
+      'new explanation 1', 'new explanation 2']);
     UndoRedoService.undoChange(skill);
     expect(skill.getRubrics().length).toEqual(1);
-    expect(skill.getRubrics()[0].getExplanation()).toEqual('explanation');
+    expect(skill.getRubrics()[0].getExplanations()).toEqual(['explanation']);
   });
 
   it('should update the name of a misconception', function() {

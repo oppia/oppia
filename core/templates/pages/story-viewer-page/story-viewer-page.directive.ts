@@ -45,11 +45,11 @@ angular.module('oppia').directive('storyViewerPage', [
       controllerAs: '$ctrl',
       controller: [
         '$anchorScroll', '$location', '$rootScope', '$window', 'AlertsService',
-        'PageTitleService', 'StoryPlaythroughObjectFactory',
+        'PageTitleService', 'LoaderService', 'StoryPlaythroughObjectFactory',
         'StoryViewerBackendApiService', 'UrlService', 'FATAL_ERROR_CODES',
         function(
             $anchorScroll, $location, $rootScope, $window, AlertsService,
-            PageTitleService, StoryPlaythroughObjectFactory,
+            PageTitleService, LoaderService, StoryPlaythroughObjectFactory,
             StoryViewerBackendApiService, UrlService, FATAL_ERROR_CODES) {
           var ctrl = this;
           ctrl.getStaticImageUrl = function(imagePath) {
@@ -255,7 +255,7 @@ angular.module('oppia').directive('storyViewerPage', [
 
           ctrl.$onInit = function() {
             ctrl.storyIsLoaded = false;
-            $rootScope.loadingMessage = 'Loading';
+            LoaderService.showLoadingScreen('Loading');
             var storyId = UrlService.getStoryIdFromViewerUrl();
             StoryViewerBackendApiService.fetchStoryData(storyId).then(
               function(storyDataDict) {
@@ -277,7 +277,7 @@ angular.module('oppia').directive('storyViewerPage', [
                     getExplorationSummaryObject();
                 ctrl.thumbnailBgColor = firstChapterSummary.thumbnail_bg_color;
                 ctrl.thumbnailIconUrl = firstChapterSummary.thumbnail_icon_url;
-                $rootScope.loadingMessage = '';
+                LoaderService.hideLoadingScreen();
                 ctrl.generatePathParameters();
                 // TODO(#8521): Remove the use of $rootScope.$apply()
                 // once the directive is migrated to angular
