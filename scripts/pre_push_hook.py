@@ -357,7 +357,6 @@ def does_diff_include_ts_files(diff_files):
     """
 
     for filename in diff_files:
-        print(filename)
         if filename.endswith('.ts'):
             return True
     return False
@@ -409,6 +408,7 @@ def main(args=None):
             if not modified_files and not files_to_lint:
                 continue
             if files_to_lint:
+                print(files_to_lint)
                 lint_status = start_linter(files_to_lint)
                 if lint_status != 0:
                     python_utils.PRINT(
