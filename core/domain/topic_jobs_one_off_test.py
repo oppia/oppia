@@ -134,7 +134,7 @@ class TopicMigrationOneOffJobTests(test_utils.GenericTestBase):
         # Generate topic with old(v1) subtopic data.
         self.save_new_topic_with_subtopic_schema_v1(
             self.TOPIC_ID, self.albert_id, 'A name', 'abbrev',
-            'a name', '', 'Image.svg', '#C6DCDA', [], [], [], 2)
+            'a name', '', '', 'Image.svg', '#C6DCDA', [], [], [], 2)
         topic_model = (
             topic_models.TopicModel.get(self.TOPIC_ID))
         self.assertEqual(topic_model.subtopic_schema_version, 1)
@@ -186,7 +186,7 @@ class TopicMigrationOneOffJobTests(test_utils.GenericTestBase):
         # The topic model created will be invalid due to invalid language code.
         self.save_new_topic_with_subtopic_schema_v1(
             self.TOPIC_ID, self.albert_id, 'A name', 'abbrev',
-            'a name', '', 'Image.svg', '#C6DCDA', [], [], [], 2,
+            'a name', '', '', 'Image.svg', '#C6DCDA', [], [], [], 2,
             language_code='invalid_language_code')
 
         job_id = (
