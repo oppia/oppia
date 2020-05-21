@@ -88,6 +88,11 @@ def try_upgrading_draft_to_exp_version(
 class DraftUpgradeUtil(python_utils.OBJECT):
     """Wrapper class that contains util functions to upgrade drafts."""
 
+
+    @classmethod
+    def _convert_states_v33_dict_to_v34_dict(cls, draft_change_list):
+        return draft_change_list
+
     @classmethod
     def _convert_states_v32_dict_to_v33_dict(cls, draft_change_list):
         """Converts draft change list from state version 32 to 33. State
