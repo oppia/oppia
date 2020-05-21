@@ -17,6 +17,10 @@
  */
 
 require(
+  'components/common-layout-directives/common-elements/' +
+  'confirm-or-cancel-modal.controller.ts');
+
+require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
 require('domain/editor/undo_redo/question-undo-redo.service.ts');

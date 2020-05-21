@@ -16,6 +16,10 @@
  * @fileoverview Controller for skill mastery modal.
  */
 
+require(
+  'components/common-layout-directives/common-elements/' +
+  'confirm-or-cancel-modal.controller.ts');
+
 angular.module('oppia').controller('SkillMasteryModalController', [
   '$controller', '$scope', '$uibModalInstance', 'masteryPerSkillMapping',
   'openConceptCardModal', 'skillId', 'userIsLoggedIn',
