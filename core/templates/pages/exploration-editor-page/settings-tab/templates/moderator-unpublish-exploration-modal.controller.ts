@@ -20,26 +20,27 @@ require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
 
-angular.module('oppia').controller('ModeratorUnpublishExplorationModalController', [
-  '$controller', '$scope', '$uibModalInstance',
-  'draftEmailBody',
-  function($controller, $scope, $uibModalInstance,
-      draftEmailBody) {
-    $controller('ConfirmOrCancelModalController', {
-      $scope: $scope,
-      $uibModalInstance: $uibModalInstance
-    });
+angular.module('oppia').controller(
+  'ModeratorUnpublishExplorationModalController', [
+    '$controller', '$scope', '$uibModalInstance',
+    'draftEmailBody',
+    function($controller, $scope, $uibModalInstance,
+        draftEmailBody) {
+      $controller('ConfirmOrCancelModalController', {
+        $scope: $scope,
+        $uibModalInstance: $uibModalInstance
+      });
 
-    $scope.willEmailBeSent = Boolean(draftEmailBody);
-    $scope.emailBody = draftEmailBody;
+      $scope.willEmailBeSent = Boolean(draftEmailBody);
+      $scope.emailBody = draftEmailBody;
 
-    if ($scope.willEmailBeSent) {
-      $scope.EMAIL_BODY_SCHEMA = {
-        type: 'unicode',
-        ui_config: {
-          rows: 20
-        }
-      };
+      if ($scope.willEmailBeSent) {
+        $scope.EMAIL_BODY_SCHEMA = {
+          type: 'unicode',
+          ui_config: {
+            rows: 20
+          }
+        };
+      }
     }
-  }
-]);
+  ]);

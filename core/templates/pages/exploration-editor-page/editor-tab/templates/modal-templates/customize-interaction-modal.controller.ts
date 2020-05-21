@@ -21,8 +21,8 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
   'EditorFirstTimeEventsService',
   'InteractionDetailsCacheService',
   'StateCustomizationArgsService', 'StateEditorService',
-  'StateInteractionIdService', 'StateSolutionService',
-  'UrlInterpolationService', 'ALLOWED_INTERACTION_CATEGORIES',
+  'StateInteractionIdService', 'UrlInterpolationService',
+  'ALLOWED_INTERACTION_CATEGORIES',
   'ALLOWED_QUESTION_INTERACTION_CATEGORIES',
   'INTERACTION_SPECS',
   function(
@@ -30,8 +30,8 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
       EditorFirstTimeEventsService,
       InteractionDetailsCacheService,
       StateCustomizationArgsService, StateEditorService,
-      StateInteractionIdService, StateSolutionService,
-      UrlInterpolationService, ALLOWED_INTERACTION_CATEGORIES,
+      StateInteractionIdService, UrlInterpolationService,
+      ALLOWED_INTERACTION_CATEGORIES,
       ALLOWED_QUESTION_INTERACTION_CATEGORIES,
       INTERACTION_SPECS) {
     $controller('ConfirmOrCancelModalController', {

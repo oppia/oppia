@@ -25,74 +25,76 @@ require('domain/skill/SkillDifficultyObjectFactory.ts');
 
 angular.module('oppia').controller(
   'QuestionsListSelectSkillAndDifficultyModalController', [
-  '$controller', '$scope', '$uibModalInstance', 'SkillDifficultyObjectFactory',
-  'DEFAULT_SKILL_DIFFICULTY', 'MODE_SELECT_DIFFICULTY', 'MODE_SELECT_SKILL',
-  'allSkillSummaries', 'countOfSkillsToPrioritize', 'currentMode',
-  'linkedSkillsWithDifficulty', 'skillIdToRubricsObject',
-  function(
-      $controller, $scope, $uibModalInstance, SkillDifficultyObjectFactory,
-      DEFAULT_SKILL_DIFFICULTY, MODE_SELECT_DIFFICULTY, MODE_SELECT_SKILL,
-      allSkillSummaries, countOfSkillsToPrioritize, currentMode,
-      linkedSkillsWithDifficulty, skillIdToRubricsObject) {
-    $controller('ConfirmOrCancelModalController', {
-      $scope: $scope,
-      $uibModalInstance: $uibModalInstance
-    });
+    '$controller', '$scope', '$uibModalInstance',
+    'SkillDifficultyObjectFactory', 'DEFAULT_SKILL_DIFFICULTY',
+    'MODE_SELECT_DIFFICULTY', 'MODE_SELECT_SKILL',
+    'allSkillSummaries', 'countOfSkillsToPrioritize', 'currentMode',
+    'linkedSkillsWithDifficulty', 'skillIdToRubricsObject',
+    function(
+        $controller, $scope, $uibModalInstance,
+        SkillDifficultyObjectFactory, DEFAULT_SKILL_DIFFICULTY,
+        MODE_SELECT_DIFFICULTY, MODE_SELECT_SKILL,
+        allSkillSummaries, countOfSkillsToPrioritize, currentMode,
+        linkedSkillsWithDifficulty, skillIdToRubricsObject) {
+      $controller('ConfirmOrCancelModalController', {
+        $scope: $scope,
+        $uibModalInstance: $uibModalInstance
+      });
 
-    var init = function() {
-      $scope.countOfSkillsToPrioritize =
-        countOfSkillsToPrioritize;
-      $scope.instructionMessage = (
-        'Select the skill(s) to link the question to:');
-      $scope.currentMode = currentMode;
-      $scope.linkedSkillsWithDifficulty =
-        linkedSkillsWithDifficulty;
-      $scope.skillSummaries = allSkillSummaries;
-      $scope.skillSummariesInitial = [];
-      $scope.skillSummariesFinal = [];
+      var init = function() {
+        $scope.countOfSkillsToPrioritize =
+          countOfSkillsToPrioritize;
+        $scope.instructionMessage = (
+          'Select the skill(s) to link the question to:');
+        $scope.currentMode = currentMode;
+        $scope.linkedSkillsWithDifficulty =
+          linkedSkillsWithDifficulty;
+        $scope.skillSummaries = allSkillSummaries;
+        $scope.skillSummariesInitial = [];
+        $scope.skillSummariesFinal = [];
 
-      for (var idx in allSkillSummaries) {
-        if (idx < countOfSkillsToPrioritize) {
-          $scope.skillSummariesInitial.push(
-            allSkillSummaries[idx]);
-        } else {
-          $scope.skillSummariesFinal.push(
-            allSkillSummaries[idx]);
+        for (var idx in allSkillSummaries) {
+          if (idx < countOfSkillsToPrioritize) {
+            $scope.skillSummariesInitial.push(
+              allSkillSummaries[idx]);
+          } else {
+            $scope.skillSummariesFinal.push(
+              allSkillSummaries[idx]);
+          }
         }
-      }
-      $scope.skillIdToRubricsObject = skillIdToRubricsObject;
-    };
+        $scope.skillIdToRubricsObject = skillIdToRubricsObject;
+      };
 
-    $scope.selectOrDeselectSkill = function(summary) {
-      if (!summary.isSelected) {
-        $scope.linkedSkillsWithDifficulty.push(
-          SkillDifficultyObjectFactory.create(
-            summary.id, summary.description,
-            DEFAULT_SKILL_DIFFICULTY));
-        summary.isSelected = true;
-      } else {
-        var idIndex = $scope.linkedSkillsWithDifficulty.map(
-          function(linkedSkillWithDifficulty) {
-            return linkedSkillWithDifficulty.getId();
-          }).indexOf(summary.id);
-        $scope.linkedSkillsWithDifficulty.splice(idIndex, 1);
-        summary.isSelected = false;
-      }
-    };
+      $scope.selectOrDeselectSkill = function(summary) {
+        if (!summary.isSelected) {
+          $scope.linkedSkillsWithDifficulty.push(
+            SkillDifficultyObjectFactory.create(
+              summary.id, summary.description,
+              DEFAULT_SKILL_DIFFICULTY));
+          summary.isSelected = true;
+        } else {
+          var idIndex = $scope.linkedSkillsWithDifficulty.map(
+            function(linkedSkillWithDifficulty) {
+              return linkedSkillWithDifficulty.getId();
+            }).indexOf(summary.id);
+          $scope.linkedSkillsWithDifficulty.splice(idIndex, 1);
+          summary.isSelected = false;
+        }
+      };
 
-    $scope.goToSelectSkillView = function() {
-      $scope.currentMode = MODE_SELECT_SKILL;
-    };
+      $scope.goToSelectSkillView = function() {
+        $scope.currentMode = MODE_SELECT_SKILL;
+      };
 
-    $scope.goToNextStep = function() {
-      $scope.currentMode = MODE_SELECT_DIFFICULTY;
-    };
+      $scope.goToNextStep = function() {
+        $scope.currentMode = MODE_SELECT_DIFFICULTY;
+      };
 
-    $scope.startQuestionCreation = function() {
-      $uibModalInstance.close($scope.linkedSkillsWithDifficulty);
-    };
+      $scope.startQuestionCreation = function() {
+        $uibModalInstance.close($scope.linkedSkillsWithDifficulty);
+      };
 
-    init();
-  }
-]);
+      init();
+    }
+  ]);
 

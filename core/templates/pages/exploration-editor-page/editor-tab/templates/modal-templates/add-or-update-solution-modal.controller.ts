@@ -34,7 +34,7 @@ require(
   'state-solution.service.ts');
 require('services/context.service.ts');
 require('services/exploration-html-formatter.service.ts');
-  
+
 angular.module('oppia').controller('AddOrUpdateSolutionModalController', [
   '$controller', '$scope', '$uibModalInstance', 'ContextService',
   'CurrentInteractionService', 'ExplorationHtmlFormatterService',

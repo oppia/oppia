@@ -39,4 +39,5 @@ angular.module('oppia').controller('UploadActivityModalController', [
       $uibModalInstance.dismiss('cancel');
       AlertsService.clearWarnings();
     };
-}]);
+  }
+]);

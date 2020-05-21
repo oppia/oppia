@@ -20,36 +20,36 @@ require('services/suggestion-modal.service.ts');
 
 angular.module('oppia').controller(
   'TranslationSuggestionReviewModalController', [
-  '$scope', '$uibModalInstance', 'SuggestionModalService',
-  'reviewable', 'translationHtml', 'contentHtml',
-  function($scope, $uibModalInstance, SuggestionModalService,
-      reviewable, translationHtml, contentHtml) {
-    $scope.translationHtml = translationHtml;
-    $scope.contentHtml = contentHtml;
-    $scope.reviewable = reviewable;
-    $scope.commitMessage = '';
-    $scope.reviewMessage = '';
+    '$scope', '$uibModalInstance', 'SuggestionModalService',
+    'reviewable', 'translationHtml', 'contentHtml',
+    function($scope, $uibModalInstance, SuggestionModalService,
+        reviewable, translationHtml, contentHtml) {
+      $scope.translationHtml = translationHtml;
+      $scope.contentHtml = contentHtml;
+      $scope.reviewable = reviewable;
+      $scope.commitMessage = '';
+      $scope.reviewMessage = '';
 
-    $scope.accept = function() {
-      SuggestionModalService.acceptSuggestion(
-        $uibModalInstance,
-        {
-          action: SuggestionModalService.ACTION_ACCEPT_SUGGESTION,
-          commitMessage: $scope.commitMessage,
-          reviewMessage: $scope.reviewMessage
-        });
-    };
+      $scope.accept = function() {
+        SuggestionModalService.acceptSuggestion(
+          $uibModalInstance,
+          {
+            action: SuggestionModalService.ACTION_ACCEPT_SUGGESTION,
+            commitMessage: $scope.commitMessage,
+            reviewMessage: $scope.reviewMessage
+          });
+      };
 
-    $scope.reject = function() {
-      SuggestionModalService.rejectSuggestion(
-        $uibModalInstance,
-        {
-          action: SuggestionModalService.ACTION_REJECT_SUGGESTION,
-          reviewMessage: $scope.reviewMessage
-        });
-    };
-    $scope.cancel = function() {
-      SuggestionModalService.cancelSuggestion($uibModalInstance);
-    };
-  }
-]);
+      $scope.reject = function() {
+        SuggestionModalService.rejectSuggestion(
+          $uibModalInstance,
+          {
+            action: SuggestionModalService.ACTION_REJECT_SUGGESTION,
+            reviewMessage: $scope.reviewMessage
+          });
+      };
+      $scope.cancel = function() {
+        SuggestionModalService.cancelSuggestion($uibModalInstance);
+      };
+    }
+  ]);

@@ -28,52 +28,51 @@ require('services/alerts.service.ts');
 
 angular.module('oppia').controller(
   'QuestionsOpportunitiesSelectSkillAndDifficultyModalController', [
-  '$controller', '$scope', '$uibModalInstance', 'AlertsService',
-  'SkillBackendApiService', 'SkillDifficultyObjectFactory',
-  'SkillObjectFactory', 'DEFAULT_SKILL_DIFFICULTY', 'MODE_SELECT_DIFFICULTY',
-  'skillId',
-  function($controller, $scope, $uibModalInstance, AlertsService,
-      SkillBackendApiService, SkillDifficultyObjectFactory,
-      SkillObjectFactory, DEFAULT_SKILL_DIFFICULTY, MODE_SELECT_DIFFICULTY,
-      skillId) {
-    $controller('ConfirmOrCancelModalController', {
-      $scope: $scope,
-      $uibModalInstance: $uibModalInstance
-    });
-    const init = function() {
-      $scope.instructionMessage = (
-        'Select the skill(s) to link the question to:');
-      $scope.currentMode = MODE_SELECT_DIFFICULTY;
-      SkillBackendApiService.fetchSkill(skillId)
-        .then(function(backendSkillObject) {
-          $scope.skill =
-            SkillObjectFactory.createFromBackendDict(
-              backendSkillObject.skill);
-          $scope.linkedSkillsWithDifficulty = [
-            SkillDifficultyObjectFactory.create(
-              skillId, $scope.skill.getDescription(),
-              DEFAULT_SKILL_DIFFICULTY)
-          ];
-          $scope.skillIdToRubricsObject = {};
-          $scope.skillIdToRubricsObject[skillId] =
-            $scope.skill.getRubrics();
-        }, function(error) {
-          AlertsService.addWarning(
-            `Error populating skill: ${error}.`);
-        });
-    };
-
-    $scope.startQuestionCreation = function() {
-      const result = {
-        skill: $scope.skill,
-        skillDifficulty:
-          parseFloat(
-            $scope.linkedSkillsWithDifficulty[0].getDifficulty())
+    '$controller', '$scope', '$uibModalInstance', 'AlertsService',
+    'SkillBackendApiService', 'SkillDifficultyObjectFactory',
+    'SkillObjectFactory', 'DEFAULT_SKILL_DIFFICULTY', 'MODE_SELECT_DIFFICULTY',
+    'skillId',
+    function($controller, $scope, $uibModalInstance, AlertsService,
+        SkillBackendApiService, SkillDifficultyObjectFactory,
+        SkillObjectFactory, DEFAULT_SKILL_DIFFICULTY, MODE_SELECT_DIFFICULTY,
+        skillId) {
+      $controller('ConfirmOrCancelModalController', {
+        $scope: $scope,
+        $uibModalInstance: $uibModalInstance
+      });
+      const init = function() {
+        $scope.instructionMessage = (
+          'Select the skill(s) to link the question to:');
+        $scope.currentMode = MODE_SELECT_DIFFICULTY;
+        SkillBackendApiService.fetchSkill(skillId)
+          .then(function(backendSkillObject) {
+            $scope.skill =
+              SkillObjectFactory.createFromBackendDict(
+                backendSkillObject.skill);
+            $scope.linkedSkillsWithDifficulty = [
+              SkillDifficultyObjectFactory.create(
+                skillId, $scope.skill.getDescription(),
+                DEFAULT_SKILL_DIFFICULTY)
+            ];
+            $scope.skillIdToRubricsObject = {};
+            $scope.skillIdToRubricsObject[skillId] =
+              $scope.skill.getRubrics();
+          }, function(error) {
+            AlertsService.addWarning(
+              `Error populating skill: ${error}.`);
+          });
       };
-      $uibModalInstance.close(result);
-    };
 
-    init();
-  }
-]);
+      $scope.startQuestionCreation = function() {
+        const result = {
+          skill: $scope.skill,
+          skillDifficulty:
+            parseFloat(
+              $scope.linkedSkillsWithDifficulty[0].getDifficulty())
+        };
+        $uibModalInstance.close(result);
+      };
 
+      init();
+    }
+  ]);

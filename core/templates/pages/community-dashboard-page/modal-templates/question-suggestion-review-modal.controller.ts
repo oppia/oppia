@@ -20,9 +20,12 @@ require('services/suggestion-modal.service.ts');
 
 angular.module('oppia').controller('QuestionSuggestionReviewModalController', [
   '$scope', '$uibModalInstance', 'SuggestionModalService',
-  'SKILL_DIFFICULTY_LABEL_TO_FLOAT', 'authorName', 'question', 'reviewable',
-  function($scope, $uibModalInstance, SuggestionModalService,
-    SKILL_DIFFICULTY_LABEL_TO_FLOAT, authorName, contentHtml, question, questionHeader, reviewable, skillDifficulty, skillRubrics) {
+  'SKILL_DIFFICULTY_LABEL_TO_FLOAT', 'authorName', 'contentHtml', 'question',
+  'questionHeader', 'reviewable', 'skillDifficulty', 'skillRubrics',
+  function(
+      $scope, $uibModalInstance, SuggestionModalService,
+      SKILL_DIFFICULTY_LABEL_TO_FLOAT, authorName, contentHtml, question,
+      questionHeader, reviewable, skillDifficulty, skillRubrics) {
     const init = () => {
       $scope.authorName = authorName;
       $scope.contentHtml = contentHtml;

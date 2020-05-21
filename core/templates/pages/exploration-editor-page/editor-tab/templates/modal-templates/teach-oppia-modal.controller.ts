@@ -33,16 +33,16 @@ require('domain/utilities/url-interpolation.service.ts');
 require(
   'pages/exploration-editor-page/editor-tab/training-panel/' +
   'training-data.service.ts');
-  require(
-    'pages/exploration-editor-page/editor-tab/training-panel/' +
-    'training-modal.service.ts');
+require(
+  'pages/exploration-editor-page/editor-tab/training-panel/' +
+  'training-modal.service.ts');
 require(
   'pages/exploration-player-page/services/answer-classification.service.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require('services/alerts.service.ts');
 require('services/context.service.ts');
 require('services/exploration-html-formatter.service.ts');
-  
+
 angular.module('oppia').controller('TeachOppiaModalController', [
   '$controller', '$filter', '$http', '$injector', '$log',
   '$scope', '$uibModalInstance', 'AlertsService',
