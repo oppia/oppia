@@ -28,18 +28,19 @@ import python_utils
 from . import linter_utils
 from . import third_party_typings_linter
 
+
 class ThirdPartyTypingsLinterTests(test_utils.GenericTestBase):
     """Tests for the third_party_typings_linter."""
 
     def setUp(self):
         super(ThirdPartyTypingsLinterTests, self).setUp()
         self.verbose_mode_enabled = False
-        self.manifest_file = python_utils.string_io(buffer_value=
-            '{\"dependencies\":{\"frontend\":{\"guppy\":{\"version\": \"0.1\"}'
+        self.manifest_file = python_utils.string_io(
+            buffer_value='{\"dependencies\":{\"frontend\":{\"guppy\":{\"version\": \"0.1\"}'
             ',\"skulpt-dist\":{\"version\": \"0.2\"},\"mathExpressions\":'
             '{\"version\": \"0.3\"},\"midiJs\":{\"version\": \"0.4\"}}}}')
-        self.package_file = python_utils.string_io(buffer_value=
-            '{\"dependencies\":{\"wavesurfer.js\":\"0.5\",'
+        self.package_file = python_utils.string_io(
+            buffer_value='{\"dependencies\":{\"wavesurfer.js\":\"0.5\",'
             '\"nerdamer\":\"^0.6\"}}')
         self.files_in_typings_dir = [
             'guppy-defs-0.1.d.ts',
