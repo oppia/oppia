@@ -113,6 +113,7 @@
     "lodash": "^4.17.14",
     "mathjs": "^6.6.4",
     "moment": "^2.24.0",
+    "nerdamer": "1.1.4",
     "wavesurfer.js": "3.3.3"
   }
 }
