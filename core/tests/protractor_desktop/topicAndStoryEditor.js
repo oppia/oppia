@@ -202,7 +202,7 @@ describe('Topic editor functionality', function() {
   });
 });
 
-fdescribe('Chapter editor functionality', function() {
+describe('Chapter editor functionality', function() {
   var topicsAndSkillsDashboardPage = null;
   var topicEditorPage = null;
   var storyEditorPage = null;
