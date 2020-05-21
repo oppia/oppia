@@ -35,7 +35,7 @@ describe('Voiceover upload features', function() {
   var explorationEditorTranslationTab = null;
   var explorationEditorSettingsTab = null;
 
-  beforeAll(async function() {
+  beforeAll(async(done) => {
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
@@ -52,11 +52,13 @@ describe('Voiceover upload features', function() {
       'This is the first card.'
     ));
     await explorationEditorMainTab.setInteraction('EndExploration');
+    done();
   });
 
-  beforeEach(async function() {
+  beforeEach(async(done) => {
     await explorationEditorPage.navigateToTranslationTab();
     await explorationEditorTranslationTab.exitTutorial();
+    done();
   });
 
   it('should upload an audio file', async function() {

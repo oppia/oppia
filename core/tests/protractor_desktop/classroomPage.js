@@ -31,7 +31,7 @@ describe('Classroom page functionality', function() {
   var classroomPage = null;
   var libraryPage = null;
 
-  beforeAll(async function() {
+  beforeAll(async(done) => {
     adminPage = new AdminPage.AdminPage();
     classroomPage = new ClassroomPage.ClassroomPage();
     libraryPage = new LibraryPage.LibraryPage();
@@ -41,11 +41,13 @@ describe('Classroom page functionality', function() {
     await adminPage.editConfigProperty(
       'Show classroom components.',
       'Boolean', async(elem) => await elem.setValue(true));
+    done();
   });
 
-  beforeEach(async function() {
+  beforeEach(async(done) => {
     await browser.driver.get('about:blank');
     await users.login('creator@classroomPage.com');
+    done();
   });
 
   it('should search for explorations from classroom page', async function() {
