@@ -260,7 +260,6 @@
 	"I18N_SIGNUP_EMAIL_PREFERENCES_EXPLAIN": "Bạn có thể thay đổi email bất cứ lúc nào.",
 	"I18N_SIGNUP_ERROR_MUST_AGREE_TO_TERMS": "Để có thể sử dụng trang, bạn cần phải đồng ý với các điều khoản của chúng tôi.",
 	"I18N_SIGNUP_ERROR_NO_USERNAME": "Hãy điền tên tài khoản vào",
-	"I18N_SIGNUP_ERROR_USERNAME_MORE_50_CHARS": "Tên Tài Khoản Tối Đa Chỉ Có Thể Chứa 50 Ký Tự",
 	"I18N_SIGNUP_ERROR_USERNAME_NOT_AVAILABLE": "Tên Tài Khoản Này Hiện Không Sử Dụng Được.",
 	"I18N_SIGNUP_ERROR_USERNAME_ONLY_ALPHANUM": "Tên Tài Khoản Chỉ Có Thể Chứa Ký Tự Trong Bảng Chữ Cái.",
 	"I18N_SIGNUP_ERROR_USERNAME_TAKEN": "Xin lỗi bạn, tên tài khoản này đã có người sữ dụng.",
