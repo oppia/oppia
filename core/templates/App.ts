@@ -274,9 +274,10 @@ angular.module('oppia').factory('$exceptionHandler', [
       if (UNHANDLED_REJECTION_STATUS_CODE_REGEX.test(exception)) {
         return;
       }
-      // If an error is encountered in the AngularJS process manager
-      // it checks the data type for the error. If it satifies the conditions
-      // below, it calls the exceptionHandler with an error message parameter.
+      // If an unhandled rejection is encountered in the AngularJS promise
+      // manager, it checks the data type of the rejection value. If it
+      // satifies the conditions below, it calls the exceptionHandler with an
+      // error message parameter.
       // 1. It is an instance of Error type.
       // 2. It is an Error Object.
       // 3. It is Exception Object.
@@ -286,8 +287,8 @@ angular.module('oppia').factory('$exceptionHandler', [
       // eslint-disable-next-line max-len
       // see: https://github.com/angular/angular.js/blob/2dfb6b4af62d750032c91fd86dc1f8d684d179c6/src/ng/q.js#L388
       // Otherwise, it will call the exceptionHandler without a message
-      // parameter. In order to preserve the original stacktrace, we wrap the
-      // exception in an error object.
+      // parameter. In order to preserve the original stacktrace, we wrap such
+      // exceptions in an error object.
       if (exception.message === undefined) {
         exception = new Error(exception);
       }
