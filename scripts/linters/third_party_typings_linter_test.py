@@ -34,11 +34,11 @@ class ThirdPartyTypingsLinterTests(test_utils.GenericTestBase):
     def setUp(self):
         super(ThirdPartyTypingsLinterTests, self).setUp()
         self.verbose_mode_enabled = False
-        self.manifest_file = python_utils.string_io(
+        self.manifest_file = python_utils.string_io(buffer_value=
             '{\"dependencies\":{\"frontend\":{\"guppy\":{\"version\": \"0.1\"}'
             ',\"skulpt-dist\":{\"version\": \"0.2\"},\"mathExpressions\":'
             '{\"version\": \"0.3\"},\"midiJs\":{\"version\": \"0.4\"}}}}')
-        self.package_file = python_utils.string_io(
+        self.package_file = python_utils.string_io(buffer_value=
             '{\"dependencies\":{\"wavesurfer.js\":\"0.5\",'
             '\"nerdamer\":\"^0.6\"}}')
         self.files_in_typings_dir = [
@@ -51,9 +51,9 @@ class ThirdPartyTypingsLinterTests(test_utils.GenericTestBase):
         ]
         self.print_arr = []
         def mock_open_file(path, unused_permissions):
-            if path == third_party_typings_linter._MANIFEST_JSON_FILE_PATH:
+            if path == third_party_typings_linter.MANIFEST_JSON_FILE_PATH:
                 return self.manifest_file
-            elif path == third_party_typings_linter._PACKAGE_JSON_FILE_PATH:
+            elif path == third_party_typings_linter.PACKAGE_JSON_FILE_PATH:
                 return self.package_file
         def mock_listdir(unused_path):
             return self.files_in_typings_dir
