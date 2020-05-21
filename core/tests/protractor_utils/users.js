@@ -40,7 +40,7 @@ var login = async function(email, isSuperAdmin = false) {
 var logout = async function() {
   var driver = browser.driver;
   await driver.get(general.SERVER_URL_PREFIX + general.LOGIN_URL_SUFFIX);
-  await driver.findElement(protractor.By.id('submit-logout')).click();
+  await (await driver.findElement(protractor.By.id('submit-logout'))).click();
 };
 
 // The user needs to log in immediately before this method is called. Note

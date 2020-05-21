@@ -148,12 +148,13 @@ var LibraryPage = function() {
   this.playExploration = async function(explorationName) {
     await waitFor.pageToFullyLoad();
     await waitFor.visibilityOf(
-      allExplorationSummaryTile.first(),
+      await allExplorationSummaryTile.first(),
       'Library Page does not have any explorations');
+
+    var explorationCard = await allExplorationsTitled(explorationName).first();
     await waitFor.visibilityOf(
-      allExplorationsTitled(explorationName).first(),
-      'Unable to find exploration ' + explorationName);
-    await allExplorationsTitled(explorationName).first().click();
+      explorationCard, 'Unable to find exploration ' + explorationName);
+    await explorationCard.click();
     await waitFor.pageToFullyLoad();
   };
 

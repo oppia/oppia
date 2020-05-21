@@ -21,6 +21,8 @@ var objects = require(process.cwd() + '/extensions/objects/protractor.js');
 var waitFor = require(
   process.cwd() + '/core/tests/protractor_utils/waitFor.js');
 
+var continueButton = element(by.css('.protractor-test-continue-button'));
+
 var customizeInteraction = async function(elem, buttonText) {
   if (buttonText) {
     await objects.UnicodeStringEditor(
@@ -30,13 +32,10 @@ var customizeInteraction = async function(elem, buttonText) {
 };
 
 var expectInteractionDetailsToMatch = async function(elem, buttonText) {
-  expect(
-    await element(by.css('.protractor-test-continue-button')).getText()
-  ).toBe(buttonText.toUpperCase());
+  expect(await continueButton.getText()).toBe(buttonText.toUpperCase());
 };
 
 var submitAnswer = async function() {
-  var continueButton = element(by.css('.protractor-test-continue-button'));
   await waitFor.elementToBeClickable(
     continueButton, 'Continue button is not clickable');
   await continueButton.click();

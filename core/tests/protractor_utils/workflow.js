@@ -181,25 +181,25 @@ var createAndPublishTwoCardExploration = async function(
   await createExploration();
   var explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
   var explorationEditorMainTab = explorationEditorPage.getMainTab();
-  explorationEditorMainTab.setContent(forms.toRichText('card 1'));
-  explorationEditorMainTab.setInteraction('Continue');
-  explorationEditorMainTab.getResponseEditor('default').setDestination(
-    'second card', true, null
-  );
-  explorationEditorMainTab.moveToState('second card');
-  explorationEditorMainTab.setContent(forms.toRichText('card 2'));
-  explorationEditorMainTab.setInteraction('EndExploration');
+  await explorationEditorMainTab.setContent(await forms.toRichText('card 1'));
+  await explorationEditorMainTab.setInteraction('Continue');
+  var responseEditor = await explorationEditorMainTab.getResponseEditor(
+    'default');
+  await responseEditor.setDestination('second card', true, null);
+  await explorationEditorMainTab.moveToState('second card');
+  await explorationEditorMainTab.setContent(await forms.toRichText('card 2'));
+  await explorationEditorMainTab.setInteraction('EndExploration');
 
   var explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
-  explorationEditorPage.navigateToSettingsTab();
-  explorationEditorSettingsTab.setTitle(title);
-  explorationEditorSettingsTab.setCategory(category);
-  explorationEditorSettingsTab.setObjective(objective);
+  await explorationEditorPage.navigateToSettingsTab();
+  await explorationEditorSettingsTab.setTitle(title);
+  await explorationEditorSettingsTab.setCategory(category);
+  await explorationEditorSettingsTab.setObjective(objective);
   if (language) {
-    explorationEditorSettingsTab.setLanguage(language);
+    await explorationEditorSettingsTab.setLanguage(language);
   }
-  explorationEditorPage.saveChanges();
-  publishExploration();
+  await explorationEditorPage.saveChanges();
+  await publishExploration();
 };
 
 // Role management (state editor settings tab)

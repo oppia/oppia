@@ -23,6 +23,8 @@ var CreatorDashboardPage = function() {
   var CREATOR_DASHBOARD_URL = '/creator_dashboard';
   var activityCreationModal = element(
     by.css('.protractor-test-creation-modal'));
+  var allExplorationCards = element.all(
+    by.css('.protractor-test-exploration-dashboard-card'));
   var explorationFeedbackCount =
     element(by.css('.protractor-test-exp-summary-tile-open-feedback'));
   var explorationDashboardCard =
@@ -44,14 +46,10 @@ var CreatorDashboardPage = function() {
   var openFeedbacks = element(by.css('.protractor-test-oppia-open-feedback'));
   var subscribers = element(by.css('.protractor-test-oppia-total-subscribers'));
 
-  // Returns a promise of all explorations with the given name.
+  // Returns all exploration card elements with the given name.
   var _getExplorationElements = async function(explorationTitle) {
-    await waitFor.visibilityOf(
-      element(by.css('.protractor-test-exploration-dashboard-card')));
-    var allExplorationDashboardCard = element.all(
-      by.css('.protractor-test-exploration-dashboard-card'));
-    var tiles = await allExplorationDashboardCard;
-    return await tiles.filter(async function(tile) {
+    await waitFor.visibilityOf(explorationDashboardCard);
+    return await allExplorationCards.filter(async function(tile) {
       var text = await tile.getText();
       // Tile text contains title, possibly followed by newline and text
       return (
@@ -251,14 +249,13 @@ var CreatorDashboardPage = function() {
     return expSummaryRowViewsElements;
   };
 
-  this.expectToHaveExplorationCard = function(explorationName) {
-    _getExplorationElements(explorationName).then(function(elems) {
-      if (elems.length === 0) {
-        throw new Error(
-          'Could not find exploration title with name ' + explorationTitle);
-      }
-      expect(elems.length).toBeGreaterThanOrEqual(1);
-    });
+  this.expectToHaveExplorationCard = async function(explorationName) {
+    var explorationCards = await _getExplorationElements(explorationName);
+    if (explorationCards.length === 0) {
+      throw new Error(
+        'Could not find exploration title with name ' + explorationTitle);
+    }
+    expect(explorationCards.length).toBeGreaterThanOrEqual(1);
   };
 };
 
