@@ -445,11 +445,13 @@ def _print_errors_stacktrace(errors_stacktrace):
     """Print errors stacktrace caught during linter execution.
 
     Args:
-        errors_stacktrace: list(str). List of error stacktrace of linter output.
+        errors_stacktrace: list(str). List of error stacktrace of lint
+            execution failure.
     """
     python_utils.PRINT('')
-    python_utils.PRINT('Unable to run the complete lint test, please check '
-                       'the following stack trace and fix the errors:')
+    python_utils.PRINT(
+        'Unable to run the complete lint test, please check '
+        'the following stack trace and fix the errors:')
     python_utils.PRINT('+--------------------------+')
     for stacktrace in errors_stacktrace:
         python_utils.PRINT(stacktrace)
@@ -554,11 +556,11 @@ def main(args=None):
     _print_complete_summary_of_lint_messages(lint_messages)
 
     errors_stacktrace = concurrent_task_utils.ALL_ERRORS
-    if len(errors_stacktrace) != 0:
+    if not errors_stacktrace:
         _print_errors_stacktrace(errors_stacktrace)
 
     if any([message.startswith(_MESSAGE_TYPE_FAILED) for message in
-            lint_messages]) or len(errors_stacktrace) != 0:
+            lint_messages]) or not errors_stacktrace:
         python_utils.PRINT('---------------------------')
         python_utils.PRINT('Checks Not Passed.')
         python_utils.PRINT('---------------------------')
