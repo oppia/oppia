@@ -50,7 +50,6 @@ describe('Classroom page functionality', function() {
   });
 
   beforeEach(async function() {
-    await browser.driver.get('about:blank');
     await users.login('creator@classroomPage.com');
   });
 
