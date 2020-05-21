@@ -29,6 +29,7 @@ from core.domain import fs_domain
 from core.domain import fs_services
 from core.domain import rte_component_registry
 from core.platform import models
+from extensions.objects.models import objects
 
 import feconf
 import python_utils
@@ -878,6 +879,39 @@ def get_filename_with_dimensions(old_filename, exp_id):
     new_filename = regenerate_image_filename_using_dimensions(
         old_filename, height, width)
     return new_filename
+
+
+def add_math_content_to_math_rte_components(html_string):
+    """Replaces the attribute raw_latex-with-value in all Math RTE tags with
+    a new attribute math_content-with-value. The new attribute has an additional
+    field for storing SVG filenames.The field for SVG filename will be empty
+
+    Args:
+        html_string: str. HTML string to modify.
+
+    Returns:
+        str. Updated HTML string with all Math RTE tags having the new
+        attribute.
+    """
+
+    soup = bs4.BeautifulSoup(
+        html_string.encode(encoding='utf-8'), 'html.parser')
+    for math in soup.findAll(name='oppia-noninteractive-math'):
+        if math.has_attr('raw_latex-with-value'):
+            raw_latex = json.loads(unescape_html(math['raw_latex-with-value']))
+            math_content_dict = {
+                'raw_latex': raw_latex,
+                'svg_filename': ''
+            }
+            # Normalize and validate the value before adding to the math tag.
+            normalized_math_content_dict = (
+                objects.MathExpressionContent.normalize(math_content_dict))
+            # Delete the attribute raw_latex-with-value.
+            del math['raw_latex-with-value']
+            # Add the new attribute math_expression_contents-with-value.
+            math['math_content-with-value'] = escape_html(
+                json.dumps(normalized_math_content_dict, sort_keys=True))
+    return python_utils.UNICODE(soup).replace('<br/>', '<br>')
 
 
 def get_invalid_svg_tags_and_attrs(svg_string):

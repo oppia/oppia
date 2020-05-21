@@ -2112,6 +2112,19 @@ class State(python_utils.OBJECT):
                             answer_group_index]['rule_specs'][
                                 rule_spec_index]['inputs']['x'][x_index] = (
                                     conversion_fn(x))
+
+        if 'written_translations' in state_dict.keys():
+            for (content_id, language_code_to_written_translation) in (
+                    state_dict['written_translations'][
+                        'translations_mapping'].items()):
+                for language_code in (
+                        language_code_to_written_translation.keys()):
+                    state_dict['written_translations']['translations_mapping'][
+                        content_id][language_code]['html'] = conversion_fn(
+                            state_dict['written_translations'][
+                                'translations_mapping'][content_id][
+                                    language_code]['html'])
+
         for hint_index, hint in enumerate(
                 state_dict['interaction']['hints']):
             hint_html = hint['hint_content']['html']

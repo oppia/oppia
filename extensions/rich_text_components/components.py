@@ -44,7 +44,7 @@ class BaseRteComponent(python_utils.OBJECT):
         'html': objects.Html,
         'Filepath': objects.Filepath,
         'SanitizedUrl': objects.SanitizedUrl,
-        'MathLatexString': objects.MathLatexString,
+        'MathExpressionContent': objects.MathExpressionContent,
         'ListOfTabs': objects.ListOfTabs,
         'int': objects.Int,
         'bool': objects.Boolean,

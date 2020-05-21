@@ -520,6 +520,66 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
     def test_convert_html_fields_in_state(self):
         """Test conversion of html strings in state."""
+
+        written_translations_dict = {
+            'translations_mapping': {
+                'content1': {
+                    'en': {
+                        'html': (
+                            'hello<oppia-noninteractive-math raw_latex-with-'
+                            'value="&amp;quot;+,-,-,+&amp;quot;"></oppia-noni'
+                            'nteractive-math>'
+                        ),
+                        'needs_update': True
+                    },
+                    'hi': {
+                        'html': 'Hey!',
+                        'needs_update': False
+                    }
+                },
+                'feedback_1': {
+                    'hi': {
+                        'html': 'Testing!',
+                        'needs_update': False
+                    },
+                    'en': {
+                        'html': 'hello!',
+                        'needs_update': False
+                    }
+                }
+            }
+        }
+        written_translations_dict_math = {
+            'translations_mapping': {
+                'content1': {
+                    'en': {
+                        'html': (
+                            'hello<oppia-noninteractive-math math_content-wit'
+                            'h-value="{&amp;quot;raw_latex&amp;quot;: &amp;quo'
+                            't;+,-,-,+&amp;quot;, &amp;quot;svg_filename&amp;q'
+                            'uot;: &amp;quot;&amp;quot;}"></oppia-noninteracti'
+                            've-math>'
+                        ),
+                        'needs_update': True
+                    },
+                    'hi': {
+                        'html': 'Hey!',
+                        'needs_update': False
+                    }
+                },
+                'feedback_1': {
+                    'hi': {
+                        'html': 'Testing!',
+                        'needs_update': False
+                    },
+                    'en': {
+                        'html': 'hello!',
+                        'needs_update': False
+                    }
+                }
+            }
+        }
+
         state_dict = {
             'content': {
                 'content_id': 'content', 'html': 'Hello!'
@@ -551,6 +611,73 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'id': None,
                 'hints': []
             }
+        }
+        state_dict_with_wrtten_transalation = {
+            'content': {
+                'content_id': 'content', 'html': 'Hello!'
+            },
+            'param_changes': [],
+            'content_ids_to_audio_translations': {'content': {}},
+            'solicit_answer_details': False,
+            'classifier_model_id': None,
+            'interaction': {
+                'solution': None,
+                'answer_groups': [],
+                'default_outcome': {
+                    'param_changes': [], 'feedback': {
+                        'content_id': 'default_outcome', 'html': (
+                            '<p><oppia-noninteractive-image filepath'
+                            '-with-value="&amp;quot;random.png&amp;'
+                            'quot;"></oppia-noninteractive-image>'
+                            'Hello this is test case to check '
+                            'image tag inside p tag</p>'
+                        )
+                    },
+                    'dest': 'Introduction',
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None,
+                    'labelled_as_correct': False
+                },
+                'customization_args': {},
+                'confirmed_unclassified_answers': [],
+                'id': None,
+                'hints': []
+            },
+            'written_translations': written_translations_dict
+        }
+
+        state_dict_with_converted_wrtten_transalation = {
+            'content': {
+                'content_id': 'content', 'html': 'Hello!'
+            },
+            'param_changes': [],
+            'content_ids_to_audio_translations': {'content': {}},
+            'solicit_answer_details': False,
+            'classifier_model_id': None,
+            'interaction': {
+                'solution': None,
+                'answer_groups': [],
+                'default_outcome': {
+                    'param_changes': [], 'feedback': {
+                        'content_id': 'default_outcome', 'html': (
+                            '<p><oppia-noninteractive-image filepath'
+                            '-with-value="&amp;quot;random.png&amp;'
+                            'quot;"></oppia-noninteractive-image>'
+                            'Hello this is test case to check '
+                            'image tag inside p tag</p>'
+                        )
+                    },
+                    'dest': 'Introduction',
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None,
+                    'labelled_as_correct': False
+                },
+                'customization_args': {},
+                'confirmed_unclassified_answers': [],
+                'id': None,
+                'hints': []
+            },
+            'written_translations': written_translations_dict_math
         }
 
         state_dict_in_textangular = {
@@ -678,6 +805,13 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 state_domain.State.convert_html_fields_in_state(
                     state_dict, add_dimensions_to_image_tags),
                 state_dict_with_image_dimensions)
+
+        self.assertEqual(
+            state_domain.State.convert_html_fields_in_state(
+                state_dict_with_wrtten_transalation,
+                html_validation_service.
+                add_math_content_to_math_rte_components),
+            state_dict_with_converted_wrtten_transalation)
 
     def test_subtitled_html_validation_with_invalid_html_type(self):
         """Test validation of subtitled HTML with invalid html type."""
