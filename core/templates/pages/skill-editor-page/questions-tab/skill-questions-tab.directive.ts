@@ -61,7 +61,7 @@ angular.module('oppia').directive('questionsTab', [
             StateEditorService, QuestionUndoRedoService, UndoRedoService,
             NUM_QUESTIONS_PER_PAGE) {
           var ctrl = this;
-          ctrl.directiveSubscriptons = new Subscription();
+          ctrl.directiveSubscriptions = new Subscription();
           var _init = function() {
             $scope.skill = SkillEditorStateService.getSkill();
             $scope.getQuestionSummariesAsync =
@@ -76,18 +76,18 @@ angular.module('oppia').directive('questionsTab', [
           };
           ctrl.$onInit = function() {
             _init();
-            ctrl.directiveSubscriptons.add(
+            ctrl.directiveSubscriptions.add(
               SkillEditorStateService.getSkillInitializedSubject().subscribe(
                 () => _init())
             );
-            ctrl.directiveSubscriptons.add(
+            ctrl.directiveSubscriptions.add(
               SkillEditorStateService.getSkillReinitializedSubject().subscribe(
                 () => _init())
             );
           };
 
           $scope.$on('$destroy', function() {
-            ctrl.directiveSubscriptons.unsubscribe();
+            ctrl.directiveSubscriptions.unsubscribe();
           });
         }
       ]

@@ -46,11 +46,12 @@ angular.module('oppia').directive('skillMisconceptionsEditor', [
         '$scope', '$filter', '$uibModal', '$rootScope',
         'MisconceptionObjectFactory',
         'MAX_CHARS_IN_MISCONCEPTION_NAME',
-        function( $scope, $filter, $uibModal, $rootScope,
+        function(
+            $scope, $filter, $uibModal, $rootScope,
             MisconceptionObjectFactory,
             MAX_CHARS_IN_MISCONCEPTION_NAME) {
           var ctrl = this;
-          ctrl.directiveSubscriptons = new Subscription();
+          ctrl.directiveSubscriptions = new Subscription();
           $scope.isEditable = function() {
             return true;
           };
@@ -163,14 +164,14 @@ angular.module('oppia').directive('skillMisconceptionsEditor', [
           ctrl.$onInit = function() {
             $scope.skill = SkillEditorStateService.getSkill();
             $scope.misconceptions = $scope.skill.getMisconceptions();
-            ctrl.directiveSubscriptons.add(
+            ctrl.directiveSubscriptions.add(
               SkillEditorStateService.getSkillReinitializedSubject().subscribe(
                 () => $scope.misconceptions = $scope.skill.getMisconceptions())
             );
           };
 
           $scope.$on('$destroy', function() {
-            ctrl.directiveSubscriptons.unsubscribe();
+            ctrl.directiveSubscriptions.unsubscribe();
           });
         }]
     };
