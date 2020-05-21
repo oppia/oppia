@@ -556,11 +556,11 @@ def main(args=None):
     _print_complete_summary_of_lint_messages(lint_messages)
 
     errors_stacktrace = concurrent_task_utils.ALL_ERRORS
-    if not errors_stacktrace:
+    if errors_stacktrace:
         _print_errors_stacktrace(errors_stacktrace)
 
     if any([message.startswith(_MESSAGE_TYPE_FAILED) for message in
-            lint_messages]) or not errors_stacktrace:
+            lint_messages]) or errors_stacktrace:
         python_utils.PRINT('---------------------------')
         python_utils.PRINT('Checks Not Passed.')
         python_utils.PRINT('---------------------------')
