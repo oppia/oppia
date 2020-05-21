@@ -47,7 +47,7 @@ describe('Topics and skills dashboard functionality', function() {
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
     users.createAdmin('creator@topicsAndSkillsDashboard.com',
-      'creatorTopicsAndSkillsDashboard');
+      'creatorTopicsAndSkillsDB');
   });
 
   beforeEach(function() {

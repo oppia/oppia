@@ -99,6 +99,18 @@ def _is_path_ignored(path_to_check):
     return subprocess.call(command) == 0
 
 
+def _is_path_contains_frontend_specs(path_to_check):
+    """Checks whether if a path contains all spec files.
+
+    Args:
+        path_to_check: str. A path to a file or a dir.
+
+    Returns:
+        bool. Whether the given path contains all spec files.
+    """
+    return '*.spec.ts' in path_to_check or '*Spec.ts' in path_to_check
+
+
 def check_for_important_patterns_at_bottom_of_codeowners(important_patterns):
     """Checks that the most important patterns are at the bottom
     of the CODEOWNERS file.
@@ -205,15 +217,18 @@ def check_codeowner_file(verbose_mode_enabled):
                             % (CODEOWNER_FILEPATH, line_num + 1))
                         failed = True
 
-                    # The double asterisks pattern is supported by the
-                    # CODEOWNERS syntax but not the glob in Python 2.
-                    # The following condition checks this.
-                    if '**' in line_in_concern:
-                        python_utils.PRINT(
-                            '%s --> Pattern on line %s is invalid. '
-                            '\'**\' wildcard not allowed' % (
-                                CODEOWNER_FILEPATH, line_num + 1))
-                        failed = True
+                    # The double asterisks should be allowed only when path
+                    # includes all the frontend spec files.
+                    if not _is_path_contains_frontend_specs(line_in_concern):
+                        # The double asterisks pattern is supported by the
+                        # CODEOWNERS syntax but not the glob in Python 2.
+                        # The following condition checks this.
+                        if '**' in line_in_concern:
+                            python_utils.PRINT(
+                                '%s --> Pattern on line %s is invalid. '
+                                '\'**\' wildcard not allowed' % (
+                                    CODEOWNER_FILEPATH, line_num + 1))
+                            failed = True
                     # Adjustments to the dir paths in CODEOWNERS syntax
                     # for glob-style patterns to match correctly.
                     if line_in_concern.endswith('/'):
@@ -227,12 +242,15 @@ def check_codeowner_file(verbose_mode_enabled):
                     # be changed to './' for glob patterns to match
                     # correctly.
                     line_in_concern = line_in_concern.replace('/', './', 1)
-                    if not glob.glob(line_in_concern):
-                        python_utils.PRINT(
-                            '%s --> Pattern on line %s doesn\'t match '
-                            'any file or directory' % (
-                                CODEOWNER_FILEPATH, line_num + 1))
-                        failed = True
+                    # The checking for path existence won't happen if the path
+                    # is getting all the frontend spec files.
+                    if not _is_path_contains_frontend_specs(line_in_concern):
+                        if not glob.glob(line_in_concern):
+                            python_utils.PRINT(
+                                '%s --> Pattern on line %s doesn\'t match '
+                                'any file or directory' % (
+                                    CODEOWNER_FILEPATH, line_num + 1))
+                            failed = True
                     # The following list is being populated with the
                     # paths in the CODEOWNERS file with the removal of the
                     # leading '/' to aid in the glob pattern matching in
