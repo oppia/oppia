@@ -21,7 +21,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import multiprocessing
 import os
-import sys
 
 from core.tests import test_utils
 import python_utils
@@ -91,13 +90,13 @@ class CodeOwnerLinterTests(test_utils.GenericTestBase):
         def mock_listdir(unused_root):
             return ['scripts/linter', 'core/tests', '.coverage']
         def mock_isdir(unused_path):
-            True
+            return True
 
         listdir_swap = self.swap(os, 'listdir', mock_listdir)
         isdir_swap = self.swap(os.path, 'isdir', mock_isdir)
 
         with listdir_swap, isdir_swap:
-            filepaths = codeowner_linter._walk_with_gitignore(
+            filepaths = codeowner_linter.walk_with_gitignore(
                 '.', 'third_party/*')
             filepaths_list = list(filepaths)
             self.assertEqual(
@@ -105,31 +104,27 @@ class CodeOwnerLinterTests(test_utils.GenericTestBase):
 
     def test_is_path_ignored(self):
         path_to_check = '.coverage'
-        is_ignored = codeowner_linter._is_path_ignored(path_to_check)
+        is_ignored = codeowner_linter.is_path_ignored(path_to_check)
         self.assertTrue(is_ignored)
 
     def test_path_is_not_ignored(self):
         path_to_check = 'scripts/linter'
-        is_ignored = codeowner_linter._is_path_ignored(path_to_check)
+        is_ignored = codeowner_linter.is_path_ignored(path_to_check)
         self.assertFalse(is_ignored)
 
     def test_check_for_important_patterns_at_the_bottom_of_codeowner(self):
         with self.print_swap:
-            failed, summary_messages = (
-                (
-            (
-        codeowner_linter.check_for_important_patterns_at_bottom_of_codeowners(
-                codeowner_linter.CODEOWNER_IMPORTANT_PATHS))))
+            failed, _ = (
+                codeowner_linter.check_for_important_patterns_at_bottom_of_codeowners( # pylint: disable=line-too-long
+                    codeowner_linter.CODEOWNER_IMPORTANT_PATHS))
             self.assertFalse(failed)
 
     def test_extra_important_patterns_in_the_codeowner_file(self):
         with self.print_swap:
             failed, summary_messages = (
-                (
-            (
-        codeowner_linter.check_for_important_patterns_at_bottom_of_codeowners(
-                codeowner_linter.CODEOWNER_IMPORTANT_PATHS +
-                ['.coverage']))))
+                codeowner_linter.check_for_important_patterns_at_bottom_of_codeowners( # pylint: disable=line-too-long
+                    codeowner_linter.CODEOWNER_IMPORTANT_PATHS +
+                    ['.coverage']))
             self.assertTrue(failed)
             error_messages = [
                 '.github/CODEOWNERS --> Rule .coverage is not present in the '
@@ -142,11 +137,9 @@ class CodeOwnerLinterTests(test_utils.GenericTestBase):
     def test_duplicate_important_patterns_at_the_bottom_of_codeowners(self):
         with self.print_swap:
             failed, summary_messages = (
-                (
-            (
-        codeowner_linter.check_for_important_patterns_at_bottom_of_codeowners(
-                codeowner_linter.CODEOWNER_IMPORTANT_PATHS +
-                ['/.github/']))))
+                codeowner_linter.check_for_important_patterns_at_bottom_of_codeowners( # pylint: disable=line-too-long
+                    codeowner_linter.CODEOWNER_IMPORTANT_PATHS +
+                    ['/.github/']))
             self.assertTrue(failed)
             error_messages = [
                 '.github/CODEOWNERS --> Duplicate pattern(s) found in critical '
@@ -176,17 +169,15 @@ class CodeOwnerLinterTests(test_utils.GenericTestBase):
 
         with self.print_swap, codeowner_important_paths_swap:
             failed, summary_messages = (
-                (
-            (
-        codeowner_linter.check_for_important_patterns_at_bottom_of_codeowners(
-                mock_codeowner_important_paths[:-1]))))
+                codeowner_linter.check_for_important_patterns_at_bottom_of_codeowners( # pylint: disable=line-too-long
+                    mock_codeowner_important_paths[:-1]))
             self.assertTrue(failed)
             error_messages = [
                 'scripts/linters/pre_commit_linter.py --> Duplicate pattern(s) '
                 'found in CODEOWNER_IMPORTANT_PATHS list.']
             self.assertEqual(error_messages, summary_messages)
 
-    def test_duplicate_important_patterns_in_list(self):
+    def test_extra_important_patterns_in_important_pattern_list(self):
         mock_codeowner_important_paths = [
             '/core/controllers/acl_decorators*.py',
             '/core/controllers/base*.py',
@@ -208,13 +199,12 @@ class CodeOwnerLinterTests(test_utils.GenericTestBase):
 
         with self.print_swap, codeowner_important_paths_swap:
             failed, summary_messages = (
-                (
-            (
-        codeowner_linter.check_for_important_patterns_at_bottom_of_codeowners(
-                mock_codeowner_important_paths[:-1]))))
+                codeowner_linter.check_for_important_patterns_at_bottom_of_codeowners( # pylint: disable=line-too-long
+                    mock_codeowner_important_paths[:-1]))
             self.assertTrue(failed)
             error_messages = [
-                '.github/CODEOWNERS --> Rule \'/.github/\' is not present in the \'Critical files\' '
+                '.github/CODEOWNERS --> Rule \'/.github/\' is not present in '
+                'the \'Critical files\' '
                 'section. Please place it under the \'Critical files\' '
                 'section since it is an important rule. Alternatively please '
                 'remove it from the \'CODEOWNER_IMPORTANT_PATHS\' list in '
@@ -253,7 +243,7 @@ class CodeOwnerLinterTests(test_utils.GenericTestBase):
             self.assertTrue(
                 appears_in_linter_stdout(
                     ['Pattern on line 544 is invalid. Use '
-                    'full path relative to the root directory'],
+                     'full path relative to the root directory'],
                     summary_messages))
 
     def test_check_codeowner_file_with_wildcard(self):
@@ -267,7 +257,7 @@ class CodeOwnerLinterTests(test_utils.GenericTestBase):
             self.assertTrue(
                 appears_in_linter_stdout(
                     ['Pattern on line 543 is invalid. '
-                    '\'**\' wildcard not allowed'],
+                     '\'**\' wildcard not allowed'],
                     summary_messages))
 
     def test_check_codeowner_file_with_no_valid_match(self):
@@ -281,7 +271,7 @@ class CodeOwnerLinterTests(test_utils.GenericTestBase):
             self.assertTrue(
                 appears_in_linter_stdout(
                     ['Pattern on line 437 doesn\'t match '
-                    'any file or directory'],
+                     'any file or directory'],
                     summary_messages))
 
     def test_check_codeowner_file_with_no_match_in_codeowners_file(self):

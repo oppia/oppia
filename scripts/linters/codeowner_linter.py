@@ -51,7 +51,7 @@ CODEOWNER_IMPORTANT_PATHS = [
     '/.github/']
 
 
-def _walk_with_gitignore(root, exclude_dirs):
+def walk_with_gitignore(root, exclude_dirs):
     """A walk function similar to os.walk but this would ignore the files and
     directories which is not tracked by git. Also, this will ignore the
     directories mentioned in exclude_dirs.
@@ -70,19 +70,19 @@ def _walk_with_gitignore(root, exclude_dirs):
         else:
             file_paths.append(os.path.join(root, name))
 
-    yield [file_path for file_path in file_paths if not _is_path_ignored(
+    yield [file_path for file_path in file_paths if not is_path_ignored(
         file_path)]
 
     for dir_path in dirs:
         # Adding "/" in the end of the dir path according to the git dir path
         # structure.
-        if (not _is_path_ignored(dir_path + '/')) and (
+        if (not is_path_ignored(dir_path + '/')) and (
                 dir_path not in exclude_dirs):
-            for x in _walk_with_gitignore(dir_path, exclude_dirs):
+            for x in walk_with_gitignore(dir_path, exclude_dirs):
                 yield x
 
 
-def _is_path_ignored(path_to_check):
+def is_path_ignored(path_to_check):
     """Checks whether the given path is ignored by git.
 
     Args:
@@ -263,7 +263,7 @@ def check_codeowner_file(file_cache, verbose_mode_enabled):
 
         # Checks that every file (except those under the dir represented by
         # the dir_patterns) is covered under CODEOWNERS.
-        for file_paths in _walk_with_gitignore('.', dir_patterns):
+        for file_paths in walk_with_gitignore('.', dir_patterns):
             for file_path in file_paths:
                 match = False
                 for file_pattern in file_patterns:
