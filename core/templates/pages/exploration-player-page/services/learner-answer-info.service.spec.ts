@@ -20,12 +20,13 @@
 // the code corresponding to the spec is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
 
-require('domain/exploration/OutcomeObjectFactory.ts');
-require(
-  'pages/exploration-player-page/services/learner-answer-info.service.ts');
-require('domain/state/StateObjectFactory.ts');
+import { LearnerAnswerInfoService } from
+  'pages/exploration-player-page/services/learner-answer-info.service.ts';
+import { OutcomeObjectFactory } from
+  'domain/exploration/OutcomeObjectFactory.ts';
+import { StateObjectFactory } from 'domain/state/StateObjectFactory.ts';
 
-describe('Learner answer info service', function() {
+describe('Learner answer info service', () => {
   var sof = null;
   var oof = null;
   var acrof = null;
@@ -172,7 +173,7 @@ describe('Learner answer info service', function() {
     spyOn(Math, 'random').and.returnValue(0);
   }));
 
-  describe('.initLearnerAnswerInfo', function() {
+  describe('.initLearnerAnswerInfo', () => {
     beforeEach(function() {
       LearnerAnswerInfoService.initLearnerAnswerInfoService(
         '10', firstState, mockAnswer, mockInteractionRulesService, false);
@@ -195,7 +196,7 @@ describe('Learner answer info service', function() {
     });
   });
 
-  describe('learner answer info service', function() {
+  describe('learner answer info service', () => {
     beforeEach(function() {
       LearnerAnswerInfoService.initLearnerAnswerInfoService(
         '10', firstState, mockAnswer, mockInteractionRulesService, false);
@@ -216,7 +217,7 @@ describe('Learner answer info service', function() {
 
   describe(
     'should not ask for answer details for trivial interaction ids',
-    function() {
+    () => {
       beforeEach(function() {
         firstState.interaction.id = 'EndExploration';
         LearnerAnswerInfoService.initLearnerAnswerInfoService(
@@ -230,7 +231,7 @@ describe('Learner answer info service', function() {
     });
 
   describe('init learner answer info service with solicit answer details false',
-    function() {
+    () => {
       beforeEach(function() {
         firstState.solicitAnswerDetails = false;
         LearnerAnswerInfoService.initLearnerAnswerInfoService(
@@ -243,7 +244,7 @@ describe('Learner answer info service', function() {
     });
 
 
-  describe('.recordLearnerAnswerInfo', function() {
+  describe('.recordLearnerAnswerInfo', () => {
     beforeEach(function() {
       LearnerAnswerInfoService.initLearnerAnswerInfoService(
         '10', firstState, mockAnswer, mockInteractionRulesService, false);
@@ -258,7 +259,7 @@ describe('Learner answer info service', function() {
     });
   });
 
-  describe('learner answer info service', function() {
+  describe('learner answer info service', () => {
     beforeEach(function() {
       LearnerAnswerInfoService.initLearnerAnswerInfoService(
         '10', firstState, mockAnswer, mockInteractionRulesService, false);
@@ -276,7 +277,7 @@ describe('Learner answer info service', function() {
     });
   });
 
-  describe('return html from the service', function() {
+  describe('return html from the service', () => {
     it('should return solicit answer details question', function() {
       expect(
         LearnerAnswerInfoService.getSolicitAnswerDetailsQuestion()).toEqual(

@@ -15,126 +15,149 @@
 /**
  * @fileoverview Service for learner answer info.
  */
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
-require(
-  'pages/exploration-player-page/services/answer-classification.service.ts');
-require('domain/statistics/learner-answer-details-backend-api.service.ts');
+import { AnswerClassificationService } from
+  'pages/exploration-player-page/services/answer-classification.service.ts';
+import { LearnerAnswerDetailsBackendApiService } from
+  'domain/statistics/learner-answer-details-backend-api.service.ts';
+import { State } from 'domain/state/StateObjectFactory.ts';
 
-angular.module('oppia').factory('LearnerAnswerInfoService', [
-  'AnswerClassificationService', 'LearnerAnswerDetailsBackendApiService',
-  'INTERACTION_IDS_WITHOUT_ANSWER_DETAILS',
-  function(
-      AnswerClassificationService, LearnerAnswerDetailsBackendApiService,
-      INTERACTION_IDS_WITHOUT_ANSWER_DETAILS) {
-    var submittedAnswerInfoCount = 0;
-    var currentEntityId = null;
-    var stateName = null;
-    var interactionId = null;
-    var currentAnswer = null;
-    var currentInteractionRulesService = null;
-    var canAskLearnerForAnswerInfo = false;
-    var visitedStates = [];
-    var probabilityIndexes = {
-      // The probability that a request for explanation of the answer that is
-      // submitted by the learner. There are three different probabilities
-      // based on the outcome of the answer.
-      // The probability index when the outcome is equal to the default outcome
-      // for an interaction.
-      typeA: 0.25,
-      // The probability index when the outcome is marked as correct i.e
-      // labelled_as_correct property is true.
-      typeB: 0.10,
-      // The probability index when the outcome is not the default outcome
-      // and it is not marked as correct i.e. it is any general outcome.
-      typeC: 0.05
-    };
+interface ProbabilityIndexes {
+  typeA: number;
+  typeB: number;
+  typeC: number;
+}
 
-    var getRandomProbabilityIndex = function() {
-      var min = 0;
-      var max = 100;
-      return (Math.floor(Math.random() * (max - min + 1) ) + min) / 100;
-    };
+@Injectable({
+  providedIn: 'root'
+})
+export class LearnerAnswerInfoService {
+  constructor(
+    private answerClassificationService: AnswerClassificationService,
+    private learnerAnswerDetailsBackendApiService:
+      LearnerAnswerDetailsBackendApiService) {}
 
-    return {
-      initLearnerAnswerInfoService: function(
-          entityId, state, answer, interactionRulesService,
-          alwaysAskLearnerForAnswerInfo) {
-        currentEntityId = entityId;
-        currentAnswer = answer;
-        currentInteractionRulesService = interactionRulesService;
-        stateName = state.name;
-        interactionId = state.interaction.id;
-        var defaultOutcome = state.interaction.defaultOutcome;
+  INTERACTION_IDS_WITHOUT_ANSWER_DETAILS;
 
-        if (submittedAnswerInfoCount === 2) {
-          return;
-        }
+  submittedAnswerInfoCount: number = 0;
+  currentEntityId: string = null;
+  stateName: string = null;
+  interactionId: string = null;
+  currentAnswer: string = null;
+  currentInteractionRulesService: State = null;
+  canAskLearnerForAnswerInfo: boolean = false;
+  visitedStates: string[] = [];
+  probabilityIndexes: ProbabilityIndexes = {
+    // The probability that a request for explanation of the answer that is
+    // submitted by the learner. There are three different probabilities
+    // based on the outcome of the answer.
+    // The probability index when the outcome is equal to the default outcome
+    // for an interaction.
+    typeA: 0.25,
+    // The probability index when the outcome is marked as correct i.e
+    // labelled_as_correct property is true.
+    typeB: 0.10,
+    // The probability index when the outcome is not the default outcome
+    // and it is not marked as correct i.e. it is any general outcome.
+    typeC: 0.05
+  };
 
-        if (!state.solicitAnswerDetails) {
-          return;
-        }
+  private getRandomProbabilityIndex(): number {
+    var min = 0;
+    var max = 100;
+    return (Math.floor(Math.random() * (max - min + 1) ) + min) / 100;
+  };
 
-        if (INTERACTION_IDS_WITHOUT_ANSWER_DETAILS.indexOf(
-          interactionId) !== -1) {
-          return;
-        }
+  initLearnerAnswerInfoService(
+      entityId: string, state: State, answer: string,
+      interactionRulesService: any, alwaysAskLearnerForAnswerInfo: boolean): void {
+    this.currentEntityId = entityId;
+    this.currentAnswer = answer;
+    this.currentInteractionRulesService = interactionRulesService;
+    this.stateName = state.name;
+    this.interactionId = state.interaction.id;
+    var defaultOutcome = state.interaction.defaultOutcome;
 
-        if (visitedStates.indexOf(stateName) !== -1) {
-          return;
-        }
+    if (this.submittedAnswerInfoCount === 2) {
+      return;
+    }
 
-        if (alwaysAskLearnerForAnswerInfo === true) {
-          canAskLearnerForAnswerInfo = true;
-          return;
-        }
+    if (!state.solicitAnswerDetails) {
+      return;
+    }
 
-        var classificationResult = (
-          AnswerClassificationService.getMatchingClassificationResult(
-            stateName, state.interaction, answer,
-            interactionRulesService));
-        var outcome = classificationResult.outcome;
-        var thresholdProbabilityIndex = null;
-        var randomProbabilityIndex = getRandomProbabilityIndex();
-        if (outcome === defaultOutcome) {
-          thresholdProbabilityIndex = probabilityIndexes.typeA;
-        } else if (outcome.labelledAsCorrect) {
-          thresholdProbabilityIndex = probabilityIndexes.typeB;
-        } else {
-          thresholdProbabilityIndex = probabilityIndexes.typeC;
-        }
-        canAskLearnerForAnswerInfo = (
-          randomProbabilityIndex <= thresholdProbabilityIndex);
-      },
-      resetSubmittedAnswerInfoCount: function() {
-        submittedAnswerInfoCount = 0;
-      },
-      recordLearnerAnswerInfo: function(answerDetails) {
-        LearnerAnswerDetailsBackendApiService.recordLearnerAnswerDetails(
-          currentEntityId, stateName, interactionId, currentAnswer,
-          answerDetails);
-        submittedAnswerInfoCount++;
-        visitedStates.push(stateName);
-        canAskLearnerForAnswerInfo = false;
-      },
-      canAskLearnerForAnswerInfo: function() {
-        return canAskLearnerForAnswerInfo;
-      },
-      getCurrentAnswer: function() {
-        return currentAnswer;
-      },
-      getCurrentInteractionRulesService: function() {
-        return currentInteractionRulesService;
-      },
-      getSolicitAnswerDetailsQuestion: function() {
-        var el = $('<p>');
-        el.attr('translate', 'I18N_SOLICIT_ANSWER_DETAILS_QUESTION');
-        return ($('<span>').append(el)).html();
-      },
-      getSolicitAnswerDetailsFeedback: function() {
-        var el = $('<p>');
-        el.attr('translate', 'I18N_SOLICIT_ANSWER_DETAILS_FEEDBACK');
-        return ($('<span>').append(el)).html();
-      }
-    };
+    if (this.INTERACTION_IDS_WITHOUT_ANSWER_DETAILS.indexOf(
+      this.interactionId) !== -1) {
+      return;
+    }
+
+    if (this.visitedStates.indexOf(this.stateName) !== -1) {
+      return;
+    }
+
+    if (alwaysAskLearnerForAnswerInfo === true) {
+      this.canAskLearnerForAnswerInfo = true;
+      return;
+    }
+
+    var classificationResult = (
+      this.answerClassificationService.getMatchingClassificationResult(
+        this.stateName, state.interaction, answer,
+        interactionRulesService));
+    var outcome = classificationResult.outcome;
+    var thresholdProbabilityIndex = null;
+    var randomProbabilityIndex = this.getRandomProbabilityIndex();
+    if (outcome === defaultOutcome) {
+      thresholdProbabilityIndex = this.probabilityIndexes.typeA;
+    } else if (outcome.labelledAsCorrect) {
+      thresholdProbabilityIndex = this.probabilityIndexes.typeB;
+    } else {
+      thresholdProbabilityIndex = this.probabilityIndexes.typeC;
+    }
+    this.canAskLearnerForAnswerInfo = (
+      randomProbabilityIndex <= thresholdProbabilityIndex);
   }
-]);
+
+  resetSubmittedAnswerInfoCount(): void {
+    this.submittedAnswerInfoCount = 0;
+  }
+
+  recordLearnerAnswerInfo(answerDetails): void {
+    this.learnerAnswerDetailsBackendApiService.recordLearnerAnswerDetails(
+      this.currentEntityId, this.stateName, this.interactionId,
+      this.currentAnswer, answerDetails);
+    this.submittedAnswerInfoCount++;
+    this.visitedStates.push(this.stateName);
+    this.canAskLearnerForAnswerInfo = false;
+  }
+
+  canAskLearnerForAnswerInfo(): boolean {
+    return this.canAskLearnerForAnswerInfo;
+  }
+
+  getCurrentAnswer(): string {
+    return currentAnswer;
+  }
+
+  getCurrentInteractionRulesService(): any {
+    return currentInteractionRulesService;
+  }
+
+  getSolicitAnswerDetailsQuestion(): any {
+    var el = $('<p>');
+    el.attr('translate', 'I18N_SOLICIT_ANSWER_DETAILS_QUESTION');
+    return ($('<span>').append(el)).html();
+  }
+
+  getSolicitAnswerDetailsFeedback(): any {
+    var el = $('<p>');
+    el.attr('translate', 'I18N_SOLICIT_ANSWER_DETAILS_FEEDBACK');
+    return ($('<span>').append(el)).html();
+  }
+
+}
+angular.module('oppia').factory(
+  'LearnerAnswerInfoService',
+  downgradeInjectable(LearnerAnswerInfoService));
