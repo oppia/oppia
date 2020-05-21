@@ -119,7 +119,7 @@ def cancel_operation():
         'The name of an operation is listed in the field called "name". '
         'Check the example here: https://stackoverflow.com/a/53630367 for '
         'details.\n')
-    operation_name = python_utils.INPUT()
+    operation_name = python_utils.INPUT().strip()
     common.run_cmd([
         GCLOUD_PATH, 'datastore', 'operations', 'cancel', operation_name])
 
