@@ -75,7 +75,7 @@ angular.module('oppia').directive('skillDescriptionEditor', [
             $scope.skillRights = SkillEditorStateService.getSkillRights();
             $scope.errorMsg = '';
             ctrl.directiveSubscriptions.add(
-              SkillEditorStateService.getSkillReinitializedSubject().subscribe(
+              SkillEditorStateService.getSkillChangedSubject().subscribe(
                 () => $scope.tmpSkillDescription = $scope.skill.getDescription()
               )
             );
