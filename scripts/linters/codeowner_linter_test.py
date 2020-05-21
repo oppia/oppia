@@ -88,19 +88,20 @@ class CodeOwnerLinterTests(test_utils.GenericTestBase):
 
     def test_walk_with_gitignore(self):
         def mock_listdir(unused_root):
-            return ['scripts/linter', 'core/tests', '.coverage']
-        def mock_isdir(unused_path):
-            return True
+            return [
+                'scripts', 'core', '.coverage', 'linters',
+                'pre_commit_linter.py']
 
         listdir_swap = self.swap(os, 'listdir', mock_listdir)
-        isdir_swap = self.swap(os.path, 'isdir', mock_isdir)
 
-        with listdir_swap, isdir_swap:
+        with listdir_swap:
             filepaths = codeowner_linter.walk_with_gitignore(
-                '.', 'third_party/*')
+                '.', ['third_party/*'])
             filepaths_list = list(filepaths)
-            self.assertEqual(
-                ['./scripts/linter', './core/tests'], filepaths_list[0])
+            self.assertFalse(appears_in_linter_stdout(
+                ['./.coverage'], filepaths_list))
+            self.assertTrue(appears_in_linter_stdout(
+                ['./scripts/linters/pre_commit_linter.py'], filepaths_list))
 
     def test_is_path_ignored(self):
         path_to_check = '.coverage'
@@ -108,7 +109,7 @@ class CodeOwnerLinterTests(test_utils.GenericTestBase):
         self.assertTrue(is_ignored)
 
     def test_path_is_not_ignored(self):
-        path_to_check = 'scripts/linter'
+        path_to_check = 'scripts/linters'
         is_ignored = codeowner_linter.is_path_ignored(path_to_check)
         self.assertFalse(is_ignored)
 
@@ -229,7 +230,7 @@ class CodeOwnerLinterTests(test_utils.GenericTestBase):
             self.assertFalse(all_checks_passed(summary_messages))
             self.assertTrue(
                 appears_in_linter_stdout(
-                    ['Pattern on line 545 doesn\'t have codeowner'],
+                    ['Pattern on line 544 doesn\'t have codeowner'],
                     summary_messages))
 
     def test_check_codeowner_file_without_full_file_path(self):
@@ -242,7 +243,7 @@ class CodeOwnerLinterTests(test_utils.GenericTestBase):
             self.assertFalse(all_checks_passed(summary_messages))
             self.assertTrue(
                 appears_in_linter_stdout(
-                    ['Pattern on line 544 is invalid. Use '
+                    ['Pattern on line 543 is invalid. Use '
                      'full path relative to the root directory'],
                     summary_messages))
 
@@ -256,7 +257,7 @@ class CodeOwnerLinterTests(test_utils.GenericTestBase):
             self.assertFalse(all_checks_passed(summary_messages))
             self.assertTrue(
                 appears_in_linter_stdout(
-                    ['Pattern on line 543 is invalid. '
+                    ['Pattern on line 542 is invalid. '
                      '\'**\' wildcard not allowed'],
                     summary_messages))
 
@@ -270,7 +271,7 @@ class CodeOwnerLinterTests(test_utils.GenericTestBase):
             self.assertFalse(all_checks_passed(summary_messages))
             self.assertTrue(
                 appears_in_linter_stdout(
-                    ['Pattern on line 437 doesn\'t match '
+                    ['Pattern on line 436 doesn\'t match '
                      'any file or directory'],
                     summary_messages))
 
