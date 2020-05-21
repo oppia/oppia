@@ -78,7 +78,7 @@ require(
 require(
   'components/forms/schema-viewers/schema-based-primitive-viewer.directive.ts');
 require(
-  'components/forms/schema-viewers/schema-based-unicode-viewer.directive.SkillMasteryModalControllerts');
+  'components/forms/schema-viewers/schema-based-unicode-viewer.directive.ts');
 require('components/question-directives/question-player/' +
   'question-player.constants.ajs.ts');
 require(

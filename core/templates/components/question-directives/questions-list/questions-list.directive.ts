@@ -40,7 +40,7 @@ require(
   'question-editor-modal.controller.ts');
 require(
   'pages/topic-editor-page/modal-templates/' +
-  'questions-listselect-skill-and-difficulty-modal.controller.ts');
+  'questions-list-select-skill-and-difficulty-modal.controller.ts');
 
 require('components/entity-creation-services/question-creation.service.ts');
 require('domain/editor/undo_redo/undo-redo.service.ts');
