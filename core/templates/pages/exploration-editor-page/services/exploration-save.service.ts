@@ -384,9 +384,7 @@ angular.module('oppia').factory('ExplorationSaveService', [
               isExplorationPrivate: function() {
                 return ExplorationRightsService.isPrivate();
               },
-              diffData: function() {
-                return diffData;
-              }
+              diffData: diffData
             },
             windowClass: 'oppia-save-exploration-modal',
             controller: 'ExplorationSaveModalController'
