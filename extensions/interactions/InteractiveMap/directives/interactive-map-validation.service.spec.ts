@@ -55,7 +55,7 @@ describe('InteractiveMapValidationService', () => {
       dest: 'Second State',
       feedback: {
         html: '',
-        audio_translations: {}
+        content_id: null
       },
       labelled_as_correct: false,
       param_changes: [],
@@ -84,7 +84,7 @@ describe('InteractiveMapValidationService', () => {
         }
       })],
       goodDefaultOutcome,
-      false,
+      [],
       null
     )];
   });

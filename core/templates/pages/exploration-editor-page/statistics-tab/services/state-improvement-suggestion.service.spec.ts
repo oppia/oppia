@@ -23,7 +23,8 @@ import { CamelCaseToHyphensPipe } from
 import { StateImprovementSuggestionService, StateStats } from
   // eslint-disable-next-line max-len
   'pages/exploration-editor-page/statistics-tab/services/state-improvement-suggestion.service';
-import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
+import { StateBackendDictMapping, StatesObjectFactory } from
+  'domain/exploration/StatesObjectFactory';
 
 describe('StateImprovementSuggestionService', () => {
   // TODO(bhenning): These tests were ported from the backend tests. More tests
@@ -34,7 +35,7 @@ describe('StateImprovementSuggestionService', () => {
     let ssof: StatesObjectFactory;
 
     // A self-looping state.
-    var statesDict1 = {
+    var statesDict1: StateBackendDictMapping = {
       state: {
         content: {
           content_id: 'content',
@@ -58,7 +59,8 @@ describe('StateImprovementSuggestionService', () => {
               },
               labelled_as_correct: false,
               param_changes: [],
-              refresher_exploration_id: null
+              refresher_exploration_id: null,
+              missing_prerequisite_skill_id: null
             },
             rule_specs: [{
               inputs: {
@@ -66,6 +68,8 @@ describe('StateImprovementSuggestionService', () => {
               },
               rule_type: 'Equals'
             }],
+            training_data: [],
+            tagged_skill_misconception_id: null
           }],
           default_outcome: {
             dest: 'state',
@@ -73,9 +77,15 @@ describe('StateImprovementSuggestionService', () => {
               content_id: 'default_outcome',
               html: ''
             },
-            param_changes: []
+            param_changes: [],
+            labelled_as_correct: false,
+            refresher_exploration_id: null,
+            missing_prerequisite_skill_id: null
           },
-          hints: []
+          hints: [],
+          solution: null,
+          customization_args: {},
+          confirmed_unclassified_answers: [],
         },
         param_changes: [],
         solicit_answer_details: false,
@@ -85,13 +95,15 @@ describe('StateImprovementSuggestionService', () => {
             default_outcome: {},
             feedback_1: {}
           }
-        }
+        },
+        classifier_model_id: null
       }
     };
 
     // A non-looping state.
-    var statesDict2 = {
+    var statesDict2: StateBackendDictMapping = {
       initial: {
+        classifier_model_id: null,
         content: {
           content_id: 'content',
           html: 'content'
@@ -114,14 +126,17 @@ describe('StateImprovementSuggestionService', () => {
               },
               labelled_as_correct: false,
               param_changes: [],
-              refresher_exploration_id: null
+              refresher_exploration_id: null,
+              missing_prerequisite_skill_id: null
             },
             rule_specs: [{
               inputs: {
                 x: 10
               },
               rule_type: 'Equals'
-            }]
+            }],
+            training_data: [],
+            tagged_skill_misconception_id: null
           }],
           default_outcome: {
             dest: 'end',
@@ -129,9 +144,15 @@ describe('StateImprovementSuggestionService', () => {
               content_id: 'default_outcome',
               html: ''
             },
-            param_changes: []
+            param_changes: [],
+            labelled_as_correct: false,
+            refresher_exploration_id: null,
+            missing_prerequisite_skill_id: null
           },
-          hints: []
+          hints: [],
+          solution: null,
+          customization_args: {},
+          confirmed_unclassified_answers: [],
         },
         param_changes: [],
         solicit_answer_details: false,
@@ -166,14 +187,17 @@ describe('StateImprovementSuggestionService', () => {
               },
               labelled_as_correct: false,
               param_changes: [],
-              refresher_exploration_id: null
+              refresher_exploration_id: null,
+              missing_prerequisite_skill_id: null,
             },
             rule_specs: [{
               inputs: {
                 x: 10
               },
               rule_type: 'Equals'
-            }]
+            }],
+            training_data: [],
+            tagged_skill_misconception_id: null
           }],
           default_outcome: {
             dest: null,
@@ -181,9 +205,15 @@ describe('StateImprovementSuggestionService', () => {
               content_id: 'default_outcome',
               html: ''
             },
-            param_changes: []
+            param_changes: [],
+            labelled_as_correct: false,
+            refresher_exploration_id: null,
+            missing_prerequisite_skill_id: null,
           },
-          hints: []
+          hints: [],
+          solution: null,
+          customization_args: {},
+          confirmed_unclassified_answers: [],
         },
         param_changes: [],
         solicit_answer_details: false,
@@ -194,11 +224,12 @@ describe('StateImprovementSuggestionService', () => {
             feedback_1: {}
           }
         },
+        classifier_model_id: null,
       }
     };
 
     // 2 states that are both self-looping
-    var statesDict3 = {
+    var statesDict3: StateBackendDictMapping = {
       'State 1': {
         content: {
           content_id: 'content',
@@ -222,14 +253,17 @@ describe('StateImprovementSuggestionService', () => {
               },
               labelled_as_correct: false,
               param_changes: [],
-              refresher_exploration_id: null
+              refresher_exploration_id: null,
+              missing_prerequisite_skill_id: null,
             },
             rule_specs: [{
               inputs: {
                 x: 10
               },
               rule_type: 'Equals'
-            }]
+            }],
+            training_data: [],
+            tagged_skill_misconception_id: null
           }],
           default_outcome: {
             dest: 'State 1',
@@ -237,9 +271,15 @@ describe('StateImprovementSuggestionService', () => {
               content_id: 'default_outcome',
               html: ''
             },
-            param_changes: []
+            param_changes: [],
+            labelled_as_correct: false,
+            refresher_exploration_id: null,
+            missing_prerequisite_skill_id: null,
           },
-          hints: []
+          hints: [],
+          solution: null,
+          customization_args: {},
+          confirmed_unclassified_answers: [],
         },
         param_changes: [],
         solicit_answer_details: false,
@@ -250,6 +290,7 @@ describe('StateImprovementSuggestionService', () => {
             feedback_1: {}
           }
         },
+        classifier_model_id: null
       },
       'State 2': {
         content: {
@@ -274,8 +315,11 @@ describe('StateImprovementSuggestionService', () => {
               },
               labelled_as_correct: false,
               param_changes: [],
-              refresher_exploration_id: null
+              refresher_exploration_id: null,
+              missing_prerequisite_skill_id: null,
             },
+            training_data: [],
+            tagged_skill_misconception_id: null,
             rule_specs: [{
               inputs: {
                 x: 10
@@ -289,9 +333,15 @@ describe('StateImprovementSuggestionService', () => {
               content_id: 'default_outcome',
               html: ''
             },
-            param_changes: []
+            param_changes: [],
+            labelled_as_correct: false,
+            refresher_exploration_id: null,
+            missing_prerequisite_skill_id: null,
           },
-          hints: []
+          hints: [],
+          solution: null,
+          customization_args: {},
+          confirmed_unclassified_answers: [],
         },
         param_changes: [],
         solicit_answer_details: false,
@@ -302,8 +352,10 @@ describe('StateImprovementSuggestionService', () => {
             feedback_1: {}
           }
         },
+        classifier_model_id: null
       }
     };
+
     interface InteractionType {
       interaction: {
         // eslint-disable-next-line camelcase
@@ -312,6 +364,7 @@ describe('StateImprovementSuggestionService', () => {
         }
       }
     }
+
     var _createState = (destStateName: string): InteractionType => {
       // Only a partial state definition is needed for these tests.
       if (destStateName) {

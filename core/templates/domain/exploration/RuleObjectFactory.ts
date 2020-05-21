@@ -21,23 +21,21 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 export interface IRuleBackendDict {
+  /* eslint-disable camelcase */
   inputs: IRuleInput,
-  'rule_type': string
+  rule_type: string
+  /* eslint-enable camelcase */
 }
+
 // The rule inputs are dependent on the 'type' of rule
 // that's why 'any' is used here
 export interface IRuleInput {
-  [propName: string]: any;
+  [name: string]: any;
 }
 
 export class Rule {
-  type: string;
-  inputs: IRuleInput;
+  constructor(public type: string, public inputs: IRuleInput) {}
 
-  constructor(type: string, inputs: IRuleInput) {
-    this.type = type;
-    this.inputs = inputs;
-  }
   toBackendDict(): IRuleBackendDict {
     return {
       rule_type: this.type,

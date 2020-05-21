@@ -53,29 +53,15 @@ export interface IStateBackendDict {
 }
 
 export class State {
-  name: string;
-  classifierModelId: string;
-  content: SubtitledHtml;
-  interaction: Interaction;
-  paramChanges: ParamChange[];
-  recordedVoiceovers: RecordedVoiceovers;
-  solicitAnswerDetails: boolean;
-  writtenTranslations: WrittenTranslations;
-
   constructor(
-      name: string, classifierModelId: string, content: SubtitledHtml,
-      interaction: Interaction, paramChanges: ParamChange[],
-      recordedVoiceovers: RecordedVoiceovers, solicitAnswerDetails: boolean,
-      writtenTranslations: WrittenTranslations) {
-    this.name = name;
-    this.classifierModelId = classifierModelId;
-    this.content = content;
-    this.interaction = interaction;
-    this.paramChanges = paramChanges;
-    this.recordedVoiceovers = recordedVoiceovers;
-    this.solicitAnswerDetails = solicitAnswerDetails;
-    this.writtenTranslations = writtenTranslations;
-  }
+      public name: string,
+      public classifierModelId: string,
+      public content: SubtitledHtml,
+      public interaction: Interaction,
+      public paramChanges: ParamChange[],
+      public recordedVoiceovers: RecordedVoiceovers,
+      public solicitAnswerDetails: boolean,
+      public writtenTranslations: WrittenTranslations) {}
 
   setName(newName: string): void {
     this.name = newName;
@@ -112,11 +98,11 @@ export class State {
 })
 export class StateObjectFactory {
   constructor(
-    private interactionObject: InteractionObjectFactory,
-    private paramchangesObject: ParamChangesObjectFactory,
-    private recordedVoiceoversObject: RecordedVoiceoversObjectFactory,
-    private subtitledHtmlObject: SubtitledHtmlObjectFactory,
-    private writtenTranslationsObject: WrittenTranslationsObjectFactory) {}
+      private interactionObject: InteractionObjectFactory,
+      private paramchangesObject: ParamChangesObjectFactory,
+      private recordedVoiceoversObject: RecordedVoiceoversObjectFactory,
+      private subtitledHtmlObject: SubtitledHtmlObjectFactory,
+      private writtenTranslationsObject: WrittenTranslationsObjectFactory) {}
 
   createDefaultState(newStateName: string): State {
     var newStateTemplate = constants.NEW_STATE_TEMPLATE;

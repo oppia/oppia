@@ -18,12 +18,21 @@
  */
 
 export interface ICustomizationArg {
-  value: object;
+  /* eslint-disable camelcase */
+  // NOTE TO DEVELOPERS: These types *must* be any because the type can't be
+  // determined by an instance alone; the associated interaction is required as
+  // well.
+  value?: any;
+  list_of_values?: any[];
+  parse_with_jinja?: boolean;
+  /* eslint-enable camelcase */
 }
 
 export interface ICustomizationArgs {
-  [name: string]: ICustomizationArg
-};
+  /* eslint-disable camelcase */
+  [name: string]: ICustomizationArg;
+  /* eslint-enable camelcase */
+}
 
 // TODO(brianrodri): Create a proper CustomizationArgs class. Currently, these
 // instances have no type-info because their values depend on the interaction.

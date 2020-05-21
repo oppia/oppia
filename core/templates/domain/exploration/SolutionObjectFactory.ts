@@ -38,26 +38,17 @@ import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory.ts';
 export interface ISolutionBackendDict {
   /* eslint-disable camelcase */
   answer_is_exclusive: boolean;
-  correct_answer: any;
+  correct_answer;
   explanation: ISubtitledHtmlBackendDict;
   /* eslint-enable camelcase */
 }
 
 export class Solution {
-  private explorationHtmlFormatterService: ExplorationHtmlFormatterService;
-  answerIsExclusive: boolean;
-  correctAnswer: any;
-  explanation: SubtitledHtml;
-
   constructor(
-      explorationHtmlFormatterService: ExplorationHtmlFormatterService,
-      answerIsExclusive: boolean, correctAnswer: any,
-      explanation: SubtitledHtml) {
-    this.explorationHtmlFormatterService = explorationHtmlFormatterService;
-    this.answerIsExclusive = answerIsExclusive;
-    this.correctAnswer = correctAnswer;
-    this.explanation = explanation;
-  }
+      private explorationHtmlFormatterService: ExplorationHtmlFormatterService,
+      public answerIsExclusive: boolean,
+      public correctAnswer,
+      public explanation: SubtitledHtml) {}
 
   toBackendDict(): ISolutionBackendDict {
     return {
@@ -101,7 +92,7 @@ export class Solution {
       '". ' + explanation + '.');
   }
 
-  setCorrectAnswer(correctAnswer: any): void {
+  setCorrectAnswer(correctAnswer): void {
     this.correctAnswer = correctAnswer;
   }
 
@@ -139,7 +130,7 @@ export class SolutionObjectFactory {
   }
 
   createNew(
-      answerIsExclusive: boolean, correctAnswer: any, explanationHtml: string,
+      answerIsExclusive: boolean, correctAnswer, explanationHtml: string,
       explanationId: string): Solution {
     return new Solution(
       this.explorationHtmlFormatterService, answerIsExclusive, correctAnswer,

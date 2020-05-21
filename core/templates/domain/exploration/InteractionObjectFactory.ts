@@ -21,13 +21,13 @@ import { Injectable } from '@angular/core';
 
 import cloneDeep from 'lodash/cloneDeep';
 
-import { IAnswerGroupBackendDict, AnswerGroupObjectFactory } from
+import { IAnswerGroupBackendDict, AnswerGroup, AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
-import { IHintBackendDict, HintObjectFactory } from
+import { IHintBackendDict, Hint, HintObjectFactory } from
   'domain/exploration/HintObjectFactory';
-import { IOutcomeBackendDict, OutcomeObjectFactory } from
+import { IOutcomeBackendDict, Outcome, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
-import { ISolutionBackendDict, SolutionObjectFactory } from
+import { ISolutionBackendDict, Solution, SolutionObjectFactory } from
   'domain/exploration/SolutionObjectFactory';
 import { ICustomizationArgs } from
   'domain/state/CustomizationArgsObjectFactory';
@@ -45,50 +45,40 @@ export interface IInteractionBackendDict {
 }
 
 export class Interaction {
-  answerGroups;
-  confirmedUnclassifiedAnswers;
-  customizationArgs;
-  defaultOutcome;
-  hints;
-  id;
-  solution;
   constructor(
-      answerGroups, confirmedUnclassifiedAnswers, customizationArgs,
-      defaultOutcome, hints, id, solution) {
-    this.answerGroups = answerGroups;
-    this.confirmedUnclassifiedAnswers = confirmedUnclassifiedAnswers;
-    this.customizationArgs = customizationArgs;
-    this.defaultOutcome = defaultOutcome;
-    this.hints = hints;
-    this.id = id;
-    this.solution = solution;
-  }
+      public answerGroups: AnswerGroup[],
+      public confirmedUnclassifiedAnswers: IAnswerGroupBackendDict[],
+      public customizationArgs: ICustomizationArgs,
+      public defaultOutcome: Outcome,
+      public hints: Hint[],
+      public id: string,
+      public solution: Solution) {}
 
   setId(newValue: string): void {
     this.id = newValue;
   }
-  // TODO(#7165): Replace any with exact type.
-  setAnswerGroups(newValue: any): void {
+
+  setAnswerGroups(newValue: AnswerGroup[]): void {
     this.answerGroups = newValue;
   }
-  // TODO(#7165): Replace any with exact type.
-  setDefaultOutcome(newValue: any): void {
+
+  setDefaultOutcome(newValue: Outcome): void {
     this.defaultOutcome = newValue;
   }
-  // TODO(#7165): Replace any with exact type.
-  setCustomizationArgs(newValue: any): void {
+
+  setCustomizationArgs(newValue: ICustomizationArgs): void {
     this.customizationArgs = newValue;
   }
-  // TODO(#7165): Replace any with exact type.
-  setSolution(newValue: any): void {
+
+  setSolution(newValue: Solution): void {
     this.solution = newValue;
   }
-  // TODO(#7165): Replace any with exact type.
-  setHints(newValue: any): void {
+
+  setHints(newValue: Hint[]): void {
     this.hints = newValue;
   }
-  // TODO(#7165): Replace any with exact type.
-  copy(otherInteraction: any): void {
+
+  copy(otherInteraction: Interaction): void {
     this.answerGroups = cloneDeep(otherInteraction.answerGroups);
     this.confirmedUnclassifiedAnswers =
       cloneDeep(otherInteraction.confirmedUnclassifiedAnswers);
@@ -98,19 +88,16 @@ export class Interaction {
     this.id = cloneDeep(otherInteraction.id);
     this.solution = cloneDeep(otherInteraction.solution);
   }
-  // TODO(#7165): Replace any with exact type.
-  toBackendDict(): any {
+
+  toBackendDict(): IInteractionBackendDict {
     return {
-      answer_groups: this.answerGroups.map(function(answerGroup) {
-        return answerGroup.toBackendDict();
-      }),
+      answer_groups: (
+        this.answerGroups.map(answerGroup => answerGroup.toBackendDict())),
       confirmed_unclassified_answers: this.confirmedUnclassifiedAnswers,
       customization_args: this.customizationArgs,
-      default_outcome:
-        this.defaultOutcome ? this.defaultOutcome.toBackendDict() : null,
-      hints: this.hints.map(function(hint) {
-        return hint.toBackendDict();
-      }),
+      default_outcome: (
+        this.defaultOutcome ? this.defaultOutcome.toBackendDict() : null),
+      hints: this.hints.map(hint => hint.toBackendDict()),
       id: this.id,
       solution: this.solution ? this.solution.toBackendDict() : null
     };
@@ -122,22 +109,22 @@ export class Interaction {
 })
 export class InteractionObjectFactory {
   constructor(
-    private answerGroupFactory: AnswerGroupObjectFactory,
-    private hintFactory: HintObjectFactory,
-    private solutionFactory: SolutionObjectFactory,
-    private outcomeFactory: OutcomeObjectFactory) {}
-  // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
-  /* eslint-disable dot-notation */
-  // TODO(#7165): Replace any with exact type.
-  createFromBackendDict(interactionDict: any): Interaction {
-  /* eslint-enable dot-notation */
-    var defaultOutcome;
-    if (interactionDict.default_outcome) {
-      defaultOutcome = this.outcomeFactory.createFromBackendDict(
-        interactionDict.default_outcome);
-    } else {
-      defaultOutcome = null;
-    }
+      private answerGroupFactory: AnswerGroupObjectFactory,
+      private hintFactory: HintObjectFactory,
+      private solutionFactory: SolutionObjectFactory,
+      private outcomeFactory: OutcomeObjectFactory) {}
+
+  createFromBackendDict(interactionDict: IInteractionBackendDict): Interaction {
+    const defaultOutcome = (
+      interactionDict.default_outcome ?
+        this.outcomeFactory.createFromBackendDict(
+          interactionDict.default_outcome) :
+        null);
+    const solution = (
+      interactionDict.solution ?
+        this.generateSolutionFromBackend(interactionDict.solution) :
+        null);
+
     return new Interaction(
       this.generateAnswerGroupsFromBackend(interactionDict.answer_groups),
       interactionDict.confirmed_unclassified_answers,
@@ -145,25 +132,22 @@ export class InteractionObjectFactory {
       defaultOutcome,
       this.generateHintsFromBackend(interactionDict.hints),
       interactionDict.id,
-      interactionDict.solution ? (
-        this.generateSolutionFromBackend(interactionDict.solution)) : null);
+      solution);
   }
-  // TODO(#7165): Replace any with exact type.
-  generateAnswerGroupsFromBackend(answerGroupBackendDicts: any) {
-    return answerGroupBackendDicts.map((
-        answerGroupBackendDict) => {
-      return this.answerGroupFactory.createFromBackendDict(
-        answerGroupBackendDict);
-    });
+
+  generateAnswerGroupsFromBackend(
+      answerGroupBackendDicts: IAnswerGroupBackendDict[]) {
+    return answerGroupBackendDicts.map(
+      backendDict => this.answerGroupFactory.createFromBackendDict(backendDict)
+    );
   }
-  // TODO(#7165): Replace any with exact type.
-  generateHintsFromBackend(hintBackendDicts: any) {
-    return hintBackendDicts.map((hintBackendDict) => {
-      return this.hintFactory.createFromBackendDict(hintBackendDict);
-    });
+
+  generateHintsFromBackend(hintBackendDicts: IHintBackendDict[]) {
+    return hintBackendDicts.map(
+      backendDict => this.hintFactory.createFromBackendDict(backendDict));
   }
-  // TODO(#7165): Replace any with exact type.
-  generateSolutionFromBackend(solutionBackendDict: any) {
+
+  generateSolutionFromBackend(solutionBackendDict: ISolutionBackendDict) {
     return this.solutionFactory.createFromBackendDict(solutionBackendDict);
   }
 }

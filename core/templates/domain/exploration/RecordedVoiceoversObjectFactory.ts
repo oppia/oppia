@@ -25,8 +25,8 @@ import { VoiceoverObjectFactory, IVoiceoverDict, Voiceover } from
 
 export interface IRecordedVoiceoversBackendDict {
   'voiceovers_mapping': {
-    [propName: string]: {
-      [propName: string]: IVoiceoverDict
+    [contentId: string]: {
+      [langCode: string]: IVoiceoverDict
     }
   }
 }
@@ -38,26 +38,21 @@ export interface IVoice {
 }
 
 export interface IVoiceoverMapping {
-  [propName: string]: {
-    [propName: string]: Voiceover
+  [contentId: string]: {
+    [langCode: string]: Voiceover
   }
 }
 
 export class RecordedVoiceovers {
-  voiceoversMapping: IVoiceoverMapping;
-  _voiceoverObjectFactory: VoiceoverObjectFactory;
   constructor(
-      voiceoversMapping: IVoiceoverMapping,
-      voiceoverObjectFactory: VoiceoverObjectFactory) {
-    this.voiceoversMapping = voiceoversMapping;
-    this._voiceoverObjectFactory = voiceoverObjectFactory;
-  }
+      public voiceoversMapping: IVoiceoverMapping,
+      private voiceoverObjectFactory: VoiceoverObjectFactory) {}
 
   getAllContentId(): string[] {
     return Object.keys(this.voiceoversMapping);
   }
 
-  getBindableVoiceovers(contentId: string): {[propName: string]: IVoice} {
+  getBindableVoiceovers(contentId: string): {[langCode: string]: IVoice} {
     return this.voiceoversMapping[contentId];
   }
 
@@ -66,8 +61,8 @@ export class RecordedVoiceovers {
   }
 
   markAllVoiceoversAsNeedingUpdate(contentId: string): void {
-    var languageCodeToVoiceover = this.voiceoversMapping[contentId];
-    for (var languageCode in languageCodeToVoiceover) {
+    const languageCodeToVoiceover = this.voiceoversMapping[contentId];
+    for (const languageCode in languageCodeToVoiceover) {
       languageCodeToVoiceover[languageCode].markAsNeedingUpdate();
     }
   }
@@ -81,8 +76,8 @@ export class RecordedVoiceovers {
   }
 
   hasUnflaggedVoiceovers(contentId: string): boolean {
-    var languageCodeToVoiceover = this.voiceoversMapping[contentId];
-    for (var languageCode in languageCodeToVoiceover) {
+    const languageCodeToVoiceover = this.voiceoversMapping[contentId];
+    for (const languageCode in languageCodeToVoiceover) {
       if (!languageCodeToVoiceover[languageCode].needsUpdate) {
         return true;
       }
@@ -107,17 +102,17 @@ export class RecordedVoiceovers {
   addVoiceover(
       contentId: string, languageCode: string, filename: string,
       fileSizeBytes: number, durationSecs: number): void {
-    var languageCodeToVoiceover = this.voiceoversMapping[contentId];
+    const languageCodeToVoiceover = this.voiceoversMapping[contentId];
     if (languageCodeToVoiceover.hasOwnProperty(languageCode)) {
       throw new Error('Trying to add duplicate language code.');
     }
     languageCodeToVoiceover[languageCode] =
-      this._voiceoverObjectFactory.createNew(filename,
+      this.voiceoverObjectFactory.createNew(filename,
         fileSizeBytes, durationSecs);
   }
 
   deleteVoiceover(contentId: string, languageCode: string): void {
-    var languageCodeToVoiceover = this.voiceoversMapping[contentId];
+    const languageCodeToVoiceover = this.voiceoversMapping[contentId];
     if (!languageCodeToVoiceover.hasOwnProperty(languageCode)) {
       throw new Error(
         'Trying to remove non-existing translation for language code ' +
@@ -127,25 +122,22 @@ export class RecordedVoiceovers {
   }
 
   toggleNeedsUpdateAttribute(contentId: string, languageCode: string): void {
-    var languageCodeToVoiceover = this.voiceoversMapping[contentId];
+    const languageCodeToVoiceover = this.voiceoversMapping[contentId];
     languageCodeToVoiceover[languageCode].toggleNeedsUpdateAttribute();
   }
 
-
   toBackendDict(): IRecordedVoiceoversBackendDict {
-    var voiceoversMappingDict = {};
-    for (var contentId in this.voiceoversMapping) {
-      var languageCodeToVoiceover = this.voiceoversMapping[contentId];
-      var languageCodeToVoiceoverDict = {};
+    const voiceoversMappingDict = {};
+    for (const contentId in this.voiceoversMapping) {
+      const languageCodeToVoiceover = this.voiceoversMapping[contentId];
+      const languageCodeToVoiceoverDict = {};
       Object.keys(languageCodeToVoiceover).forEach(function(lang) {
         languageCodeToVoiceoverDict[lang] = (
           languageCodeToVoiceover[lang].toBackendDict());
       });
       voiceoversMappingDict[contentId] = languageCodeToVoiceoverDict;
     }
-    return {
-      voiceovers_mapping: voiceoversMappingDict
-    };
+    return { voiceovers_mapping: voiceoversMappingDict };
   }
 }
 
@@ -156,20 +148,22 @@ export class RecordedVoiceoversObjectFactory {
   constructor(private voiceoverObjectFactory: VoiceoverObjectFactory) {}
 
   createFromBackendDict(
-      recordedVoiceoversDict: IRecordedVoiceoversBackendDict):
-        RecordedVoiceovers {
-    var voiceoversMapping = {};
-    var voiceoversMappingDict = recordedVoiceoversDict.voiceovers_mapping;
-    Object.keys(voiceoversMappingDict).forEach((contentId) => {
-      var languageCodeToVoiceoverDict = voiceoversMappingDict[contentId];
-      var languageCodeToVoiceover = {};
-      Object.keys(languageCodeToVoiceoverDict).forEach((langCode) => {
+      recordedVoiceoversDict:
+        IRecordedVoiceoversBackendDict): RecordedVoiceovers {
+    const voiceoversMapping = {};
+    const voiceoversMappingEntries = (
+      Object.entries(recordedVoiceoversDict.voiceovers_mapping));
+
+    for (const [contentId, langCodeToVoiceover] of voiceoversMappingEntries) {
+      const languageCodeToVoiceover = {};
+      const langCodeToVoiceoverEntries = Object.entries(langCodeToVoiceover);
+
+      for (const [langCode, voiceoverDict] of langCodeToVoiceoverEntries) {
         languageCodeToVoiceover[langCode] = (
-          this.voiceoverObjectFactory.createFromBackendDict(
-            languageCodeToVoiceoverDict[langCode]));
-      });
+          this.voiceoverObjectFactory.createFromBackendDict(voiceoverDict));
+      }
       voiceoversMapping[contentId] = languageCodeToVoiceover;
-    });
+    }
 
     return new RecordedVoiceovers(
       voiceoversMapping, this.voiceoverObjectFactory);

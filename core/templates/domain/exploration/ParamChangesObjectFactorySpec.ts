@@ -25,7 +25,7 @@ import { ParamChangesObjectFactory } from
 
 describe('ParamChanges Object Factory', () => {
   let pcsof: ParamChangesObjectFactory;
-  const cArgs = {
+  const customizationArg = {
     parse_with_jinja: true,
     value: ''
   };
@@ -43,24 +43,26 @@ describe('ParamChanges Object Factory', () => {
     () => {
       let paramName = 'param_1';
       let paramName2 = 'param_2';
-      let backendList = [{
-        customization_args: cArgs,
-        generator_id: gId,
-        name: paramName
-      },
-      {
-        customization_args: cArgs,
-        generator_id: gId,
-        name: paramName2
-      }];
+      let backendList = [
+        {
+          customization_args: { [gId]: customizationArg },
+          generator_id: gId,
+          name: paramName
+        },
+        {
+          customization_args: { [gId]: customizationArg },
+          generator_id: gId,
+          name: paramName2
+        }
+      ];
 
       let testOutcome: ParamChange[] = pcsof.createFromBackendList(backendList);
 
       expect(testOutcome.length).toBe(2);
-      expect(testOutcome[0].customizationArgs).toEqual(cArgs);
+      expect(testOutcome[0].customizationArg).toEqual(customizationArg);
       expect(testOutcome[0].generatorId).toBe(gId);
       expect(testOutcome[0].name).toBe(paramName);
-      expect(testOutcome[1].customizationArgs).toEqual(cArgs);
+      expect(testOutcome[1].customizationArg).toEqual(customizationArg);
       expect(testOutcome[1].generatorId).toBe(gId);
       expect(testOutcome[1].name).toBe(paramName2);
     }

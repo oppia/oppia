@@ -31,42 +31,26 @@ export interface IOutcomeBackendDict {
   dest: string;
   feedback: ISubtitledHtmlBackendDict;
   labelled_as_correct: boolean;
-  param_changes: IParamChangeBackendDict;
+  param_changes: IParamChangeBackendDict[];
   refresher_exploration_id: string;
   missing_prerequisite_skill_id: string;
   /* eslint-enable camelcase */
 }
 
 export class Outcome {
-  dest: string;
-  feedback: SubtitledHtml;
-  labelledAsCorrect: boolean;
-  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'paramChanges' is an array with complex dicts whose exact
-  // type needs to be determined.
-  paramChanges: any;
-  refresherExplorationId: string;
-  missingPrerequisiteSkillId: string;
   constructor(
-      dest: string, feedback: SubtitledHtml, labelledAsCorrect: boolean,
-      paramChanges: any, refresherExplorationId: string,
-      missingPrerequisiteSkillId: string) {
-    this.dest = dest;
-    this.feedback = feedback;
-    this.labelledAsCorrect = labelledAsCorrect;
-    this.paramChanges = paramChanges;
-    this.refresherExplorationId = refresherExplorationId;
-    this.missingPrerequisiteSkillId = missingPrerequisiteSkillId;
-  }
+      public dest: string,
+      public feedback: SubtitledHtml,
+      public labelledAsCorrect: boolean,
+      public paramChanges: IParamChangeBackendDict[],
+      public refresherExplorationId: string,
+      public missingPrerequisiteSkillId: string) {}
 
   setDestination(newValue: string): void {
     this.dest = newValue;
   }
 
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because the return type is a dict with underscore_cased keys
-  // which give tslint errors against underscore_casing in favor of camelCasing.
-  toBackendDict(): any {
+  toBackendDict(): IOutcomeBackendDict {
     return {
       dest: this.dest,
       feedback: this.feedback.toBackendDict(),
@@ -100,27 +84,20 @@ export class Outcome {
 export class OutcomeObjectFactory {
   constructor(private subtitledHtmlObjectFactory: SubtitledHtmlObjectFactory) {}
 
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because the return type is a dict with underscore_cased keys
-  // which give tslint errors against underscore_casing in favor of camelCasing.
   createNew(
       dest: string, feedbackTextId: string, feedbackText: string,
-      paramChanges: any): Outcome {
-    return new Outcome(
-      dest,
-      this.subtitledHtmlObjectFactory.createDefault(
-        feedbackText, feedbackTextId),
-      false,
-      paramChanges,
-      null,
-      null);
+      paramChanges: IParamChangeBackendDict[]): Outcome {
+    const feedback = this.subtitledHtmlObjectFactory.createDefault(
+      feedbackText, feedbackTextId);
+    return new Outcome(dest, feedback, false, paramChanges, null, null);
   }
 
   createFromBackendDict(outcomeDict: IOutcomeBackendDict): Outcome {
+    const feedback = this.subtitledHtmlObjectFactory.createFromBackendDict(
+      outcomeDict.feedback);
     return new Outcome(
       outcomeDict.dest,
-      this.subtitledHtmlObjectFactory.createFromBackendDict(
-        outcomeDict.feedback),
+      feedback,
       outcomeDict.labelled_as_correct,
       outcomeDict.param_changes,
       outcomeDict.refresher_exploration_id,

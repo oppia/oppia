@@ -23,30 +23,15 @@ import { UtilsService } from 'services/utils.service';
 import isEqual from 'lodash/isEqual';
 
 export class LostChange {
-  cmd: string;
-  stateName: string;
-  newStateName: string;
-  oldStateName: string;
-  // TODO(#7176): Replace 'any' with the exact type.
-  newValue: any;
-  oldValue: any;
-  propertyName: string;
-  utilsService: UtilsService;
-
-  // TODO(#7176): Replace 'any' with the exact type.
   constructor(
-      utilsService: UtilsService, cmd: string, newStateName: string,
-      oldStateName: string, stateName: string, newValue: any, oldValue: any,
-      propertyName: string) {
-    this.utilsService = utilsService;
-    this.cmd = cmd;
-    this.newStateName = newStateName;
-    this.oldStateName = oldStateName;
-    this.stateName = stateName;
-    this.newValue = newValue;
-    this.oldValue = oldValue;
-    this.propertyName = propertyName;
-  }
+      private utilsService: UtilsService,
+      public cmd: string,
+      public newStateName: string,
+      public oldStateName: string,
+      public stateName: string,
+      public newValue: any,
+      public oldValue: any,
+      public propertyName: string) {}
 
   // An edit is represented either as an object or an array. If it's an
   // object, then simply return that object. In case of an array, return

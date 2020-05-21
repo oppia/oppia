@@ -26,33 +26,28 @@ export interface ISubtitledHtmlBackendDict {
 }
 
 export class SubtitledHtml {
-  _html: string;
-  _contentId: string;
-  constructor(html: string, contentId: string) {
-    this._html = html;
-    this._contentId = contentId;
-  }
+  constructor(private html: string, private contentId: string) {}
 
   getHtml(): string {
-    return this._html;
+    return this.html;
   }
 
   getContentId(): string {
-    return this._contentId;
+    return this.contentId;
   }
 
   setHtml(newHtml: string): void {
-    this._html = newHtml;
+    this.html = newHtml;
   }
 
   hasNoHtml(): boolean {
-    return !this._html;
+    return !this.html;
   }
 
   toBackendDict(): ISubtitledHtmlBackendDict {
     return {
-      html: this._html,
-      content_id: this._contentId
+      html: this.html,
+      content_id: this.contentId
     };
   }
 

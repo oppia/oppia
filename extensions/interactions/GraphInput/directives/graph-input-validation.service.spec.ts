@@ -55,7 +55,7 @@ describe('GraphInputValidationService', () => {
       dest: 'Second State',
       feedback: {
         html: '',
-        audio_translations: {}
+        content_id: null
       },
       labelled_as_correct: false,
       param_changes: [],
@@ -96,7 +96,7 @@ describe('GraphInputValidationService', () => {
         rule_type: 'IsIsomorphicTo'
       })],
       goodDefaultOutcome,
-      false,
+      [],
       null
     );
     answerGroups = [answerGroup, cloneDeep(answerGroup)];

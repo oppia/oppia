@@ -58,8 +58,8 @@ describe('NumericInputValidationService', () => {
     goodDefaultOutcome = oof.createFromBackendDict({
       dest: 'Second State',
       feedback: {
-        audio_translations: {},
-        html: ''
+        html: '',
+        content_id: null
       },
       labelled_as_correct: false,
       param_changes: [],
@@ -88,7 +88,7 @@ describe('NumericInputValidationService', () => {
     answerGroups = [agof.createNew(
       [equalsZeroRule, betweenNegativeOneAndOneRule],
       goodDefaultOutcome,
-      false,
+      [],
       null
     )];
   });

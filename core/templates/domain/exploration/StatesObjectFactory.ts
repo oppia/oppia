@@ -19,50 +19,54 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { State, StateObjectFactory } from 'domain/state/StateObjectFactory';
+import { IStateBackendDict, State, StateObjectFactory } from
+  'domain/state/StateObjectFactory';
+import { IVoice } from 'domain/exploration/RecordedVoiceoversObjectFactory';
 
 const INTERACTION_SPECS = require('interactions/interaction_specs.json');
 
+export type StateMapping = {[stateName: string]: State};
+export type StateBackendDictMapping = {[stateName: string]: IStateBackendDict};
+
 export class States {
-  _stateObject;
-  _states;
-  constructor(stateObject: StateObjectFactory, states: any) {
-    this._stateObject = stateObject;
-    this._states = states;
-  }
+  constructor(
+      private stateObjectFactory: StateObjectFactory,
+      private states: StateMapping) {}
 
   getState(stateName: string): State {
-    return this._states[stateName];
+    return this.states[stateName];
   }
 
-  // TODO(tjiang11): Remove getStateObjects() and replace calls
-  // with an object to represent data to be manipulated inside
-  // ExplorationDiffService.
-
-  getStateObjects(): any {
-    return this._states;
+  // TODO(tjiang11): Remove getStateObjects() and replace calls with an object
+  // to represent data to be manipulated inside ExplorationDiffService.
+  getStateObjects(): StateMapping {
+    return this.states;
   }
+
   addState(newStateName: string): void {
-    this._states[newStateName] = this._stateObject.createDefaultState(
-      newStateName);
+    this.states[newStateName] = (
+      this.stateObjectFactory.createDefaultState(newStateName));
   }
-  setState(stateName: string, stateData: any): void {
-    // We use the copy method defined in the StateObjectFactory to make
-    // sure that this._states[stateName] remains a State object as opposed to
-    // Object.assign(..) which returns an object with the content of stateData.
-    this._states[stateName].copy(stateData);
+
+  setState(stateName: string, otherState: State): void {
+    // We use the copy method defined in the StateObjectFactory to make sure
+    // that this.states[stateName] remains a State object as opposed to
+    // Object.assign(..) which returns an object with the content of otherState.
+    this.states[stateName].copy(otherState);
   }
+
   hasState(stateName: string): boolean {
-    return this._states.hasOwnProperty(stateName);
+    return this.states.hasOwnProperty(stateName);
   }
+
   deleteState(deleteStateName: string): void {
-    delete this._states[deleteStateName];
-    for (var otherStateName in this._states) {
-      var interaction = this._states[otherStateName].interaction;
-      var groups = interaction.answerGroups;
-      for (var i = 0; i < groups.length; i++) {
-        if (groups[i].outcome.dest === deleteStateName) {
-          groups[i].outcome.dest = otherStateName;
+    delete this.states[deleteStateName];
+
+    for (const otherStateName in this.states) {
+      const interaction = this.states[otherStateName].interaction;
+      for (const group of interaction.answerGroups) {
+        if (group.outcome.dest === deleteStateName) {
+          group.outcome.dest = otherStateName;
         }
       }
       if (interaction.defaultOutcome) {
@@ -72,17 +76,17 @@ export class States {
       }
     }
   }
-  renameState(oldStateName: string, newStateName: string): void {
-    this._states[newStateName] = this._states[oldStateName];
-    this._states[newStateName].setName(newStateName);
-    delete this._states[oldStateName];
 
-    for (var otherStateName in this._states) {
-      var interaction = this._states[otherStateName].interaction;
-      var groups = interaction.answerGroups;
-      for (var i = 0; i < groups.length; i++) {
-        if (groups[i].outcome.dest === oldStateName) {
-          groups[i].outcome.dest = newStateName;
+  renameState(oldStateName: string, newStateName: string): void {
+    this.states[newStateName] = this.states[oldStateName];
+    this.states[newStateName].setName(newStateName);
+    delete this.states[oldStateName];
+
+    for (const otherStateName in this.states) {
+      const interaction = this.states[otherStateName].interaction;
+      for (const group of interaction.answerGroups) {
+        if (group.outcome.dest === oldStateName) {
+          group.outcome.dest = newStateName;
         }
       }
       if (interaction.defaultOutcome) {
@@ -92,13 +96,15 @@ export class States {
       }
     }
   }
-  getStateNames(): Array<string> {
-    return Object.keys(this._states);
+
+  getStateNames(): string[] {
+    return Object.keys(this.states);
   }
-  getFinalStateNames(): Array<string> {
-    var finalStateNames = [];
-    for (var stateName in this._states) {
-      var interaction = this._states[stateName].interaction;
+
+  getFinalStateNames(): string[] {
+    const finalStateNames = [];
+    for (const stateName in this.states) {
+      const interaction = this.states[stateName].interaction;
       if (interaction.id && INTERACTION_SPECS[interaction.id].is_terminal) {
         finalStateNames.push(stateName);
       }
@@ -106,38 +112,33 @@ export class States {
     return finalStateNames;
   }
 
-  getAllVoiceoverLanguageCodes(): Array<string> {
-    var allAudioLanguageCodes = [];
-    for (var stateName in this._states) {
-      var state = this._states[stateName];
-      var contentIdsList = state.recordedVoiceovers.getAllContentId();
-      contentIdsList.forEach(function(contentId) {
-        var audioLanguageCodes = (
-          state.recordedVoiceovers.getVoiceoverLanguageCodes(contentId));
-        audioLanguageCodes.forEach(function(languageCode) {
-          if (allAudioLanguageCodes.indexOf(languageCode) === -1) {
-            allAudioLanguageCodes.push(languageCode);
-          }
-        });
-      });
+  getAllVoiceoverLanguageCodes(): Set<string> {
+    const allAudioLanguageCodes = new Set<string>();
+    for (const stateName of this.getStateNames()) {
+      const recordedVoiceovers = this.getState(stateName).recordedVoiceovers;
+      for (const contentId of recordedVoiceovers.getAllContentId()) {
+        const audioLanguageCodes = (
+          recordedVoiceovers.getVoiceoverLanguageCodes(contentId));
+        for (const langCode of audioLanguageCodes) {
+          allAudioLanguageCodes.add(langCode);
+        }
+      }
     }
     return allAudioLanguageCodes;
   }
 
-  getAllVoiceovers(languageCode: string): any {
-    var allAudioTranslations = {};
-    for (var stateName in this._states) {
-      var state = this._states[stateName];
-      allAudioTranslations[stateName] = [];
-      var contentIdsList = state.recordedVoiceovers.getAllContentId();
-      contentIdsList.forEach(function(contentId) {
-        var audioTranslations = (
-          state.recordedVoiceovers.getBindableVoiceovers(contentId));
-        if (audioTranslations.hasOwnProperty(languageCode)) {
-          allAudioTranslations[stateName].push(
-            audioTranslations[languageCode]);
+  getAllVoiceovers(langCode: string): Map<string, IVoice[]> {
+    const allAudioTranslations = new Map<string, IVoice[]>();
+    for (const stateName of this.getStateNames()) {
+      const recordedVoiceovers = this.getState(stateName).recordedVoiceovers;
+      allAudioTranslations.set(stateName, []);
+      for (const contentId of recordedVoiceovers.getAllContentId()) {
+        const audioTranslations = (
+          recordedVoiceovers.getBindableVoiceovers(contentId));
+        if (audioTranslations.hasOwnProperty(langCode)) {
+          allAudioTranslations.get(stateName).push(audioTranslations[langCode]);
         }
-      });
+      }
     }
     return allAudioTranslations;
   }
@@ -147,15 +148,16 @@ export class States {
   providedIn: 'root'
 })
 export class StatesObjectFactory {
-  constructor(private stateObject: StateObjectFactory) {}
+  constructor(private stateObjectFactory: StateObjectFactory) {}
 
-  createFromBackendDict(statesBackendDict: any): States {
-    var stateObjectsDict = {};
-    for (var stateName in statesBackendDict) {
-      stateObjectsDict[stateName] = this.stateObject.createFromBackendDict(
-        stateName, statesBackendDict[stateName]);
+  createFromBackendDict(statesBackendDict: StateBackendDictMapping): States {
+    const stateObjectsDict = {};
+    for (const stateName in statesBackendDict) {
+      stateObjectsDict[stateName] = (
+        this.stateObjectFactory.createFromBackendDict(
+          stateName, statesBackendDict[stateName]));
     }
-    return new States(this.stateObject, stateObjectsDict);
+    return new States(this.stateObjectFactory, stateObjectsDict);
   }
 }
 

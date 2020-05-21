@@ -24,12 +24,8 @@ import { CamelCaseToHyphensPipe } from
 import { ExtensionTagAssemblerService } from
   'services/extension-tag-assembler.service';
 import { HtmlEscaperService } from 'services/html-escaper.service';
-
-interface InteractionArgs {
-  choices: {
-    value: string;
-  };
-}
+import { ICustomizationArgs } from
+  'domain/state/CustomizationArgsObjectFactory';
 
 // A service that provides a number of utility functions useful to both the
 // editor and player.
@@ -38,9 +34,10 @@ interface InteractionArgs {
 })
 export class ExplorationHtmlFormatterService {
   constructor(
-    private camelCaseToHyphens: CamelCaseToHyphensPipe,
-    private extensionTagAssembler: ExtensionTagAssemblerService,
-    private htmlEscaper: HtmlEscaperService) {}
+      private camelCaseToHyphensPipe: CamelCaseToHyphensPipe,
+      private extensionTagAssemblerService: ExtensionTagAssemblerService,
+      private htmlEscaperService: HtmlEscaperService) {}
+
   /**
    * @param {string} interactionId - The interaction id.
    * @param {object} interactionCustomizationArgSpecs - The various
@@ -59,14 +56,15 @@ export class ExplorationHtmlFormatterService {
       interactionId: string, interactionCustomizationArgSpecs: object,
       parentHasLastAnswerProperty: boolean,
       labelForFocusTarget: string): string {
-    var htmlInteractionId = this.camelCaseToHyphens.transform(interactionId);
-    var element = $('<oppia-interactive-' + htmlInteractionId + '>');
+    const htmlInteractionId = (
+      this.camelCaseToHyphensPipe.transform(interactionId));
+    const element = (
+      this.extensionTagAssemblerService.formatCustomizationArgAttrs(
+        $('<oppia-interactive-' + htmlInteractionId + '>'),
+        interactionCustomizationArgSpecs));
 
-    element = (
-      this.extensionTagAssembler.formatCustomizationArgAttrs(
-        element, interactionCustomizationArgSpecs));
-    element.attr('last-answer', parentHasLastAnswerProperty ?
-      'lastAnswer' : 'null');
+    element.attr(
+      'last-answer', parentHasLastAnswerProperty ? 'lastAnswer' : 'null');
     if (labelForFocusTarget) {
       element.attr('label-for-focus-target', labelForFocusTarget);
     }
@@ -75,42 +73,38 @@ export class ExplorationHtmlFormatterService {
 
   getAnswerHtml(
       answer: string, interactionId: string,
-      interactionCustomizationArgs: InteractionArgs): string {
+      interactionCustomizationArgs: ICustomizationArgs): string {
     // TODO(sll): Get rid of this special case for multiple choice.
-    var interactionChoices = null;
-    if (interactionCustomizationArgs.choices) {
-      interactionChoices = interactionCustomizationArgs.choices.value;
-    }
+    const choices = (
+      interactionCustomizationArgs.choices ?
+      interactionCustomizationArgs.choices.value : null);
 
-    var el = $(
-      '<oppia-response-' + this.camelCaseToHyphens.transform(
-        interactionId) + '>');
-    el.attr('answer', this.htmlEscaper.objToEscapedJson(answer));
-    if (interactionChoices) {
-      el.attr('choices', this.htmlEscaper.objToEscapedJson(
-        interactionChoices));
+    const el = $(
+      '<oppia-response-' +
+      this.camelCaseToHyphensPipe.transform(interactionId) + '>');
+    el.attr('answer', this.htmlEscaperService.objToEscapedJson(answer));
+    if (choices) {
+      el.attr('choices', this.htmlEscaperService.objToEscapedJson(choices));
     }
-    return ($('<div>').append(el)).html();
+    return $('<div>').append(el).html();
   }
 
   getShortAnswerHtml(
       answer: string, interactionId: string,
-      interactionCustomizationArgs: InteractionArgs) : string {
+      interactionCustomizationArgs: ICustomizationArgs): string {
     // TODO(sll): Get rid of this special case for multiple choice.
-    var interactionChoices = null;
-    if (interactionCustomizationArgs.choices) {
-      interactionChoices = interactionCustomizationArgs.choices.value;
-    }
+    const choices = (
+      interactionCustomizationArgs.choices ?
+      interactionCustomizationArgs.choices.value : null);
 
-    var el = $(
-      '<oppia-short-response-' + this.camelCaseToHyphens.transform(
-        interactionId) + '>');
-    el.attr('answer', this.htmlEscaper.objToEscapedJson(answer));
-    if (interactionChoices) {
-      el.attr('choices', this.htmlEscaper.objToEscapedJson(
-        interactionChoices));
+    const el = $(
+      '<oppia-short-response-' +
+      this.camelCaseToHyphensPipe.transform(interactionId) + '>');
+    el.attr('answer', this.htmlEscaperService.objToEscapedJson(answer));
+    if (choices) {
+      el.attr('choices', this.htmlEscaperService.objToEscapedJson(choices));
     }
-    return ($('<span>').append(el)).html();
+    return $('<span>').append(el).html();
   }
 }
 

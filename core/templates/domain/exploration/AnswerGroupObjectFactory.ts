@@ -35,31 +35,15 @@ export interface IAnswerGroupBackendDict {
 }
 
 export class AnswerGroup {
-  rules: Rule[];
-  outcome: Outcome;
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'trainingData' is an array of dicts with underscore_cased
-  // keys which give tslint errors against underscore_casing in favor of
-  // camelCasing.
-  trainingData: any;
-  taggedSkillMisconceptionId: string;
   constructor(
-      rules: Rule[], outcome: Outcome, trainingData: any,
-      taggedSkillMisconceptionId: string) {
-    this.rules = rules;
-    this.outcome = outcome;
-    this.trainingData = trainingData;
-    this.taggedSkillMisconceptionId = taggedSkillMisconceptionId;
-  }
+      public rules: Rule[],
+      public outcome: Outcome,
+      public trainingData: object[],
+      public taggedSkillMisconceptionId: string) {}
 
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because the return type is a dict with underscore_cased keys
-  // which give tslint errors against underscore_casing in favor of camelCasing.
-  toBackendDict(): any {
+  toBackendDict(): IAnswerGroupBackendDict {
     return {
-      rule_specs: this.rules.map((rule: Rule) => {
-        return rule.toBackendDict();
-      }),
+      rule_specs: this.rules.map(rule => rule.toBackendDict()),
       outcome: this.outcome.toBackendDict(),
       training_data: this.trainingData,
       tagged_skill_misconception_id: this.taggedSkillMisconceptionId
@@ -72,32 +56,21 @@ export class AnswerGroup {
 })
 export class AnswerGroupObjectFactory {
   constructor(
-    private outcomeObjectFactory: OutcomeObjectFactory,
-    private ruleObjectFactory: RuleObjectFactory) {}
+      private outcomeObjectFactory: OutcomeObjectFactory,
+      private ruleObjectFactory: RuleObjectFactory) {}
 
-  // TODO(#7165): Replace 'any' with the exact type. This has been typed
-  // as 'any' since 'ruleBackendDicts' is a complex object with elements as keys
-  // having varying types. An exact type needs tobe found.
   generateRulesFromBackend(ruleBackendDicts: IRuleBackendDict[]) {
-    return ruleBackendDicts.map(ruleBackendDict => {
-      return this.ruleObjectFactory.createFromBackendDict(ruleBackendDict);
-    });
+    return ruleBackendDicts.map(
+      backendDict => this.ruleObjectFactory.createFromBackendDict(backendDict));
   }
 
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'trainingData' is an array of dicts with underscore_cased
-  // keys which give tslint errors against underscore_casing in favor of
-  // camelCasing.
   createNew(
-      rules: Rule[], outcome: Outcome, trainingData: any,
+      rules: Rule[], outcome: Outcome, trainingData: object[],
       taggedSkillMisconceptionId: string): AnswerGroup {
     return new AnswerGroup(
       rules, outcome, trainingData, taggedSkillMisconceptionId);
   }
 
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'answerGroupBackendDict' is a dict with underscore_cased keys
-  // which give tslint errors against underscore_casing in favor of camelCasing.
   createFromBackendDict(
       answerGroupBackendDict: IAnswerGroupBackendDict): AnswerGroup {
     return new AnswerGroup(

@@ -28,28 +28,25 @@ export interface IWrittenTranslationBackendDict {
 }
 
 export class WrittenTranslation {
-  html: string;
-  needsUpdate: boolean;
-  constructor(html: string, needsUpdate: boolean) {
-    this.html = html;
-    this.needsUpdate = needsUpdate;
-  }
+  constructor(public html: string, public needsUpdate: boolean) {}
+
   getHtml(): string {
     return this.html;
   }
+
   setHtml(html: string): void {
     this.html = html;
   }
+
   markAsNeedingUpdate(): void {
     this.needsUpdate = true;
   }
+
   toggleNeedsUpdateAttribute(): void {
     this.needsUpdate = !this.needsUpdate;
   }
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because the return type is a dict with underscore_cased keys which
-  // gives tslint errors against underscore_casing in favor of camelCasing.
-  toBackendDict(): any {
+
+  toBackendDict(): IWrittenTranslationBackendDict {
     return {
       html: this.html,
       needs_update: this.needsUpdate
@@ -64,14 +61,11 @@ export class WrittenTranslationObjectFactory {
   createNew(html: string): WrittenTranslation {
     return new WrittenTranslation(html, false);
   }
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'translationBackendDict' is a dict with underscore_cased keys
-  // which gives tslint errors against underscore_casing in favor of
-  // camelCasing.
-  createFromBackendDict(translationBackendDict: any) {
+
+  createFromBackendDict(
+      translationBackendDict: IWrittenTranslationBackendDict) {
     return new WrittenTranslation(
-      translationBackendDict.html,
-      translationBackendDict.needs_update);
+      translationBackendDict.html, translationBackendDict.needs_update);
   }
 }
 

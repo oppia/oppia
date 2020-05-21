@@ -31,15 +31,10 @@ export interface IHintBackendDict {
 }
 
 export class Hint {
-  hintContent: SubtitledHtml;
-  constructor(hintContent: SubtitledHtml) {
-    this.hintContent = hintContent;
-  }
+  constructor(public hintContent: SubtitledHtml) {}
 
   toBackendDict(): IHintBackendDict {
-    return {
-      hint_content: this.hintContent.toBackendDict()
-    };
+    return { hint_content: this.hintContent.toBackendDict() };
   }
 }
 
@@ -49,10 +44,6 @@ export class Hint {
 export class HintObjectFactory {
   constructor(private subtitledHtmlObjectFactory: SubtitledHtmlObjectFactory) {}
 
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'hintBackendDict' is a dict with underscore_cased
-  // keys which give tslint errors against underscore_casing in favor of
-  // camelCasing.
   createFromBackendDict(hintBackendDict: IHintBackendDict): Hint {
     return new Hint(
       this.subtitledHtmlObjectFactory.createFromBackendDict(

@@ -22,10 +22,10 @@ import cloneDeep from 'lodash/cloneDeep';
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-import { ICustomizationArgs } from
+import { ICustomizationArg, ICustomizationArgs } from
   'domain/state/CustomizationArgsObjectFactory';
 
-var DEFAULT_CUSTOMIZATION_ARGS = {
+var DEFAULT_CUSTOMIZATION_ARGS: ICustomizationArgs = {
   Copier: {
     parse_with_jinja: true,
     value: '5'
@@ -44,32 +44,21 @@ export interface IParamChangeBackendDict {
 }
 
 export class ParamChange {
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'customizationArgs' is a dict with possible underscore_cased
-  // keys which give tslint errors against underscore_casing in favor of
-  // camelCasing.
-  customizationArgs: any;
-  generatorId: string;
-  name: string;
+  constructor(
+      public customizationArg: ICustomizationArg,
+      public generatorId: string,
+      public name: string) {}
 
-  constructor(customizationArgs: any, generatorId: string, name: string) {
-    this.customizationArgs = customizationArgs;
-    this.generatorId = generatorId;
-    this.name = name;
-  }
-
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because the return type is a dict with underscore_cased keys which
-  // give tslint errors against underscore_casing in favor of camelCasing.
-  toBackendDict(): any {
+  toBackendDict(): IParamChangeBackendDict {
     return {
-      customization_args: this.customizationArgs,
+      customization_args: {[this.generatorId]: this.customizationArg},
       generator_id: this.generatorId,
       name: this.name
     };
   }
+
   resetCustomizationArgs(): void {
-    this.customizationArgs = cloneDeep(
+    this.customizationArg = cloneDeep(
       DEFAULT_CUSTOMIZATION_ARGS[this.generatorId]);
   }
 }
@@ -86,10 +75,8 @@ export class ParamChangeObjectFactory {
       paramChangeBackendDict.name);
   }
   createEmpty(paramName: string): ParamChange {
-    return new ParamChange({
-      parse_with_jinja: true,
-      value: ''
-    }, 'Copier', paramName);
+    return new ParamChange(
+      {parse_with_jinja: true, value: ''}, 'Copier', paramName);
   }
   createDefault(paramName: string): ParamChange {
     return new ParamChange(

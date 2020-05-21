@@ -20,14 +20,14 @@
 export interface IConceptCardBackendDict {
   explanation: ISubtitledHtmlBackendDict,
   'worked_examples': Array<IWorkedExampleBackendDict>,
-  'recorded_voiceovers': IRecordedVoiceOverBackendDict
+  'recorded_voiceovers': IRecordedVoiceoversBackendDict
 }
 
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 import { AppConstants } from 'app.constants';
 import { RecordedVoiceovers, RecordedVoiceoversObjectFactory,
-  IRecordedVoiceOverBackendDict } from
+  IRecordedVoiceoversBackendDict } from
   'domain/exploration/RecordedVoiceoversObjectFactory';
 import {
   SubtitledHtml, SubtitledHtmlObjectFactory, ISubtitledHtmlBackendDict } from

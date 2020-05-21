@@ -61,6 +61,7 @@
     "core/templates/domain/skill/MisconceptionObjectFactorySpec.ts",
     "core/templates/domain/skill/skill-creation-backend-api.service.ts",
     "core/templates/domain/skill/skill-mastery-backend-api.service.ts",
+    "core/templates/domain/state/CustomizationArgsObjectFactory.ts",
     "core/templates/domain/state/StateObjectFactory.ts",
     "core/templates/domain/state_card/StateCardObjectFactory.ts",
     "core/templates/domain/statistics/LearnerActionObjectFactory.ts",
