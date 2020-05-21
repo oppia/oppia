@@ -62,6 +62,7 @@ ONE_OFF_JOB_MANAGERS = [
     question_jobs_one_off.QuestionMigrationOneOffJob,
     recommendations_jobs_one_off.ExplorationRecommendationsOneOffJob,
     skill_jobs_one_off.SkillMigrationOneOffJob,
+    stats_jobs_one_off.ExplorationMissingStatsAudit,
     stats_jobs_one_off.PlaythroughAudit,
     stats_jobs_one_off.RecomputeStatisticsOneOffJob,
     stats_jobs_one_off.RecomputeStatisticsValidationCopyOneOffJob,
@@ -71,6 +72,7 @@ ONE_OFF_JOB_MANAGERS = [
     stats_jobs_one_off.StatisticsAuditV2,
     stats_jobs_one_off.StatisticsAudit,
     story_jobs_one_off.StoryMigrationOneOffJob,
+    topic_jobs_one_off.RemoveDeletedSkillsFromTopicOneOffJob,
     topic_jobs_one_off.TopicMigrationOneOffJob,
     user_id_migration.AddAllUserIdsSnapshotContentVerificationJob,
     user_id_migration.AddAllUserIdsSnapshotMetadataVerificationJob,
@@ -101,6 +103,7 @@ ONE_OFF_JOB_MANAGERS = [
 AUDIT_JOB_MANAGERS = [
     prod_validation_jobs_one_off.ActivityReferencesModelAuditOneOffJob,
     prod_validation_jobs_one_off.RoleQueryAuditModelAuditOneOffJob,
+    prod_validation_jobs_one_off.UsernameChangeAuditModelAuditOneOffJob,
     prod_validation_jobs_one_off.ClassifierTrainingJobModelAuditOneOffJob,
     (
         prod_validation_jobs_one_off

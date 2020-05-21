@@ -18,7 +18,9 @@
 
 require('components/ck-editor-helpers/ck-editor-4-rte.directive.ts');
 require('components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts');
-
+require(
+  'components/common-layout-directives/common-elements/' +
+  'confirm-or-cancel-modal.controller.ts');
 require('pages/exploration-player-page/services/exploration-engine.service.ts');
 require('pages/exploration-player-page/services/player-position.service.ts');
 require('pages/exploration-player-page/services/player-transcript.service.ts');
@@ -104,14 +106,7 @@ angular.module('oppia').factory('SuggestionModalForExplorationPlayerService', [
             'learner-suggestion-submitted-modal.template.html'),
           backdrop: true,
           resolve: {},
-          controller: [
-            '$scope', '$uibModalInstance',
-            function($scope, $uibModalInstance) {
-              $scope.close = function() {
-                $uibModalInstance.dismiss();
-              };
-            }
-          ]
+          controller: 'ConfirmOrCancelModalController'
         }).result.then(function() {}, function() {
           // Note to developers:
           // This callback is triggered when the Cancel button is clicked.
