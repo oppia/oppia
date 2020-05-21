@@ -491,7 +491,6 @@
 	"I18N_SIGNUP_EMAIL_PREFERENCES_EXPLAIN": "Tzemreḍ ad tbeddleḍ aɣewwaṛ-a melmi tebɣiḍ seg usebter-ik n yismenyifen.",
 	"I18N_SIGNUP_ERROR_MUST_AGREE_TO_TERMS": "Akken ad tbeddleḍ isniram ɣef usmel-a, yessefk ad tqebleḍ tiwtilin n usmel.",
 	"I18N_SIGNUP_ERROR_NO_USERNAME": "Sekcem isem n useqdac.",
-	"I18N_SIGNUP_ERROR_USERNAME_MORE_50_CHARS": "Isem n useqdac yezmer ad yegber armi d 50 n yisekkilen.",
 	"I18N_SIGNUP_ERROR_USERNAME_NOT_AVAILABLE": "Isem n useqdac ulac-it.",
 	"I18N_SIGNUP_ERROR_USERNAME_ONLY_ALPHANUM": "Ismawen n useqdac yessefk kan ad gebren isekkilen d yimḍanen.",
 	"I18N_SIGNUP_ERROR_USERNAME_TAKEN": "Suref-aɣ, isem-a n useqdac yella yakan.",

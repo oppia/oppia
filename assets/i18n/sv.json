@@ -414,7 +414,6 @@
 	"I18N_SIGNUP_EMAIL_PREFERENCES_EXPLAIN": "Du kan ändra denna inställning när som helst i dina inställningar.",
 	"I18N_SIGNUP_ERROR_MUST_AGREE_TO_TERMS": "För att redigera utforskningar på denna webbplats måste du samtycka till webbplatsens villkor.",
 	"I18N_SIGNUP_ERROR_NO_USERNAME": "Skriv in ett meddelande.",
-	"I18N_SIGNUP_ERROR_USERNAME_MORE_50_CHARS": "Ett användarnamn kan ha högst 50 tecken.",
 	"I18N_SIGNUP_ERROR_USERNAME_NOT_AVAILABLE": "Detta användarnamn finns inte.",
 	"I18N_SIGNUP_ERROR_USERNAME_ONLY_ALPHANUM": "Användarnamn kan endast bestå av alfanumeriska tecken.",
 	"I18N_SIGNUP_ERROR_USERNAME_TAKEN": "Tyvärr, detta användarnamn är redan taget.",

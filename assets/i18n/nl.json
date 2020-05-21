@@ -266,7 +266,6 @@
 	"I18N_SIGNUP_EMAIL_PREFERENCES_EXPLAIN": "U kunt deze instelling op elk gewenst moment wijzigen in uw voorkeuren.",
 	"I18N_SIGNUP_ERROR_MUST_AGREE_TO_TERMS": "Om verkenningen op deze site te bewerken, dient u akkoord te gaan met de voorwaarden van de website.",
 	"I18N_SIGNUP_ERROR_NO_USERNAME": "Kies een gebruikersnaam.",
-	"I18N_SIGNUP_ERROR_USERNAME_MORE_50_CHARS": "Een gebruikersnaam kan maximaal 50 tekens bevatten.",
 	"I18N_SIGNUP_ERROR_USERNAME_NOT_AVAILABLE": "Deze gebruikersnaam is niet beschikbaar.",
 	"I18N_SIGNUP_ERROR_USERNAME_ONLY_ALPHANUM": "Gebruikersnamen kunnen alleen alfanumerieke tekens bevatten.",
 	"I18N_SIGNUP_ERROR_USERNAME_TAKEN": "Deze gebruikersnaam bestaat al.",

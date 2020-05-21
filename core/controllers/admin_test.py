@@ -18,6 +18,8 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import logging
+import math
+import time
 
 from constants import constants
 from core import jobs
@@ -47,8 +49,10 @@ from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
 import feconf
 
-(exp_models, job_models, opportunity_models,) = models.Registry.import_models(
-    [models.NAMES.exploration, models.NAMES.job, models.NAMES.opportunity])
+(exp_models, job_models, opportunity_models, audit_models) = (
+    models.Registry.import_models(
+        [models.NAMES.exploration, models.NAMES.job, models.NAMES.opportunity,
+         models.NAMES.audit]))
 
 BOTH_MODERATOR_AND_ADMIN_EMAIL = 'moderator.and.admin@example.com'
 BOTH_MODERATOR_AND_ADMIN_USERNAME = 'moderatorandadm1n'
@@ -1109,16 +1113,164 @@ class SendDummyMailTest(test_utils.GenericTestBase):
 
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
             generated_response = self.post_json(
-                '/sendDummyMailToAdminHandler', payload={},
+                '/senddummymailtoadminhandler', payload={},
                 csrf_token=csrf_token, expected_status_int=200)
             self.assertEqual(generated_response, {})
 
         with self.swap(feconf, 'CAN_SEND_EMAILS', False):
             generated_response = self.post_json(
-                '/sendDummyMailToAdminHandler', payload={},
+                '/senddummymailtoadminhandler', payload={},
                 csrf_token=csrf_token, expected_status_int=400)
             self.assertEqual(
                 generated_response['error'], 'This app cannot send emails.')
+
+
+class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
+    """Tests for updating usernames."""
+    OLD_USERNAME = 'oldUsername'
+    NEW_USERNAME = 'newUsername'
+
+    def setUp(self):
+        super(UpdateUsernameHandlerTest, self).setUp()
+        self.signup(self.ADMIN_EMAIL, self.OLD_USERNAME)
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+
+    def test_update_username_with_none_new_username(self):
+        csrf_token = self.get_new_csrf_token()
+
+        response = self.put_json(
+            '/updateusernamehandler',
+            payload={
+                'old_username': self.OLD_USERNAME,
+                'new_username': None},
+            csrf_token=csrf_token,
+            expected_status_int=400)
+        self.assertEqual(
+            response['error'], 'Invalid request: A new username must be '
+            'specified.')
+
+    def test_update_username_with_none_old_username(self):
+        csrf_token = self.get_new_csrf_token()
+
+        response = self.put_json(
+            '/updateusernamehandler',
+            payload={
+                'old_username': None,
+                'new_username': self.NEW_USERNAME},
+            csrf_token=csrf_token,
+            expected_status_int=400)
+        self.assertEqual(
+            response['error'], 'Invalid request: The old username must be '
+            'specified.')
+
+    def test_update_username_with_non_string_new_username(self):
+        csrf_token = self.get_new_csrf_token()
+
+        response = self.put_json(
+            '/updateusernamehandler',
+            payload={
+                'old_username': self.OLD_USERNAME,
+                'new_username': 123},
+            csrf_token=csrf_token,
+            expected_status_int=400)
+        self.assertEqual(
+            response['error'], 'Expected new username to be a unicode '
+            'string, received 123')
+
+    def test_update_username_with_non_string_old_username(self):
+        csrf_token = self.get_new_csrf_token()
+
+        response = self.put_json(
+            '/updateusernamehandler',
+            payload={
+                'old_username': 123,
+                'new_username': self.NEW_USERNAME},
+            csrf_token=csrf_token,
+            expected_status_int=400)
+        self.assertEqual(
+            response['error'], 'Expected old username to be a unicode '
+            'string, received 123')
+
+    def test_update_username_with_long_new_username(self):
+        long_username = 'a' * (constants.MAX_USERNAME_LENGTH + 1)
+        csrf_token = self.get_new_csrf_token()
+
+        response = self.put_json(
+            '/updateusernamehandler',
+            payload={
+                'old_username': self.OLD_USERNAME,
+                'new_username': long_username},
+            csrf_token=csrf_token,
+            expected_status_int=400)
+        self.assertEqual(
+            response['error'], 'Expected new username to be less than %s '
+            'characters, received %s' % (
+                constants.MAX_USERNAME_LENGTH,
+                long_username))
+
+    def test_update_username_with_nonexistent_old_username(self):
+        non_existent_username = 'invalid'
+        csrf_token = self.get_new_csrf_token()
+
+        response = self.put_json(
+            '/updateusernamehandler',
+            payload={
+                'old_username': non_existent_username,
+                'new_username': self.NEW_USERNAME},
+            csrf_token=csrf_token,
+            expected_status_int=400)
+        self.assertEqual(response['error'], 'Invalid username: invalid')
+
+    def test_update_username_with_new_username_already_taken(self):
+        csrf_token = self.get_new_csrf_token()
+
+        response = self.put_json(
+            '/updateusernamehandler',
+            payload={
+                'old_username': self.OLD_USERNAME,
+                'new_username': self.OLD_USERNAME},
+            csrf_token=csrf_token,
+            expected_status_int=400)
+        self.assertEqual(response['error'], 'Username already taken.')
+
+    def test_update_username(self):
+        user_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        self.put_json(
+            '/updateusernamehandler',
+            payload={
+                'old_username': self.OLD_USERNAME,
+                'new_username': self.NEW_USERNAME},
+            csrf_token=csrf_token)
+        self.assertEqual(user_services.get_username(user_id), self.NEW_USERNAME)
+
+    def test_update_username_creates_audit_model(self):
+        user_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        time_of_query = time.time()
+
+        self.put_json(
+            '/updateusernamehandler',
+            payload={
+                'old_username': self.OLD_USERNAME,
+                'new_username': self.NEW_USERNAME},
+            csrf_token=csrf_token)
+
+        self.assertTrue(
+            audit_models.UsernameChangeAuditModel.has_reference_to_user_id(
+                user_id))
+
+        model_id = '%s.%s' % (user_id, int(math.floor(time_of_query)))
+
+        username_change_audit_model = (
+            audit_models.UsernameChangeAuditModel.get(model_id))
+
+        self.assertEqual(username_change_audit_model.committer_id, user_id)
+        self.assertEqual(
+            username_change_audit_model.old_username, self.OLD_USERNAME)
+        self.assertEqual(
+            username_change_audit_model.new_username, self.NEW_USERNAME)
 
 
 class AddCommunityReviewerHandlerTest(test_utils.GenericTestBase):

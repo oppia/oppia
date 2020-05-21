@@ -125,9 +125,9 @@ describe('Signup controller', function() {
 
     it('should show warning if username is too long', function() {
       ctrl.updateWarningText(
-        'abcdefghijklmnopqrstuvwxyzyxwvutsrqponmlkjihgfedcba');
+        'abcdefghijklmnopqrstuvwxyzyxwvu');
       expect(ctrl.warningI18nCode).toEqual(
-        'I18N_SIGNUP_ERROR_USERNAME_MORE_50_CHARS');
+        'I18N_SIGNUP_ERROR_USERNAME_TOO_LONG');
     });
 
     it('should show warning if username has non-alphanumeric characters',

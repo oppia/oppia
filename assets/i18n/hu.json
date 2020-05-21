@@ -284,7 +284,6 @@
 	"I18N_SIGNUP_EMAIL_PREFERENCES_EXPLAIN": "Ezt a beállítást bármikor módosíthatod a Beállítások oldalon.",
 	"I18N_SIGNUP_ERROR_MUST_AGREE_TO_TERMS": "Ahhoz, hogy módosíthasd a felfedezéseket, el kell fogadnod a felhasználási feltételeket.",
 	"I18N_SIGNUP_ERROR_NO_USERNAME": "Kérjük, válassz felhasználónevet.",
-	"I18N_SIGNUP_ERROR_USERNAME_MORE_50_CHARS": "A felhasználónév maximum 50 karakter lehet.",
 	"I18N_SIGNUP_ERROR_USERNAME_NOT_AVAILABLE": "Ez a felhasználói név már foglalt.",
 	"I18N_SIGNUP_ERROR_USERNAME_ONLY_ALPHANUM": "A felhasználónevek csak alfanumerikus karaktereket tartalmazhatnak.",
 	"I18N_SIGNUP_ERROR_USERNAME_TAKEN": "Sajnáljuk, ez a felhasználónév már foglalt.",

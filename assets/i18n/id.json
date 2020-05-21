@@ -281,7 +281,6 @@
 	"I18N_SIGNUP_EMAIL_PREFERENCES_EXPLAIN": "Anda dapat mengganti pengaturan ini kapan saja dari halaman Preferensi anda.",
 	"I18N_SIGNUP_ERROR_MUST_AGREE_TO_TERMS": "Agar dapat mengubah eksplorasi di situs ini, anda harus menyetujui ketentuan situs ini.",
 	"I18N_SIGNUP_ERROR_NO_USERNAME": "Masukkan username.",
-	"I18N_SIGNUP_ERROR_USERNAME_MORE_50_CHARS": "Username hanya boleh memiliki maksimal 50 karakter.",
 	"I18N_SIGNUP_ERROR_USERNAME_NOT_AVAILABLE": "Username ini tidak tersedia.",
 	"I18N_SIGNUP_ERROR_USERNAME_ONLY_ALPHANUM": "Username hanya boleh menggunakan karakter alfanumerik.",
 	"I18N_SIGNUP_ERROR_USERNAME_TAKEN": "Maaf, username ini telah terpakai.",

@@ -99,6 +99,7 @@ ONE_OFF_JOB_MANAGERS = [
 AUDIT_JOB_MANAGERS = [
     prod_validation_jobs_one_off.ActivityReferencesModelAuditOneOffJob,
     prod_validation_jobs_one_off.RoleQueryAuditModelAuditOneOffJob,
+    prod_validation_jobs_one_off.UsernameChangeAuditModelAuditOneOffJob,
     prod_validation_jobs_one_off.ClassifierTrainingJobModelAuditOneOffJob,
     (
         prod_validation_jobs_one_off

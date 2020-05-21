@@ -455,7 +455,6 @@
 	"I18N_SIGNUP_EMAIL_PREFERENCES_EXPLAIN": "Du kannst diese Einstellung jederzeit auf deiner Einstellungsseite ändern.",
 	"I18N_SIGNUP_ERROR_MUST_AGREE_TO_TERMS": "Um Erforschungen auf dieser Website bearbeiten zu können, musst du den Websitebedingungen zustimmen.",
 	"I18N_SIGNUP_ERROR_NO_USERNAME": "Bitte einen Benutzernamen eingeben.",
-	"I18N_SIGNUP_ERROR_USERNAME_MORE_50_CHARS": "Ein Benutzername kann höchstens 50 Zeichen enthalten.",
 	"I18N_SIGNUP_ERROR_USERNAME_NOT_AVAILABLE": "Dieser Benutzername ist nicht verfügbar.",
 	"I18N_SIGNUP_ERROR_USERNAME_ONLY_ALPHANUM": "Benutzernamen können nur alphanumerische Zeichen enthalten.",
 	"I18N_SIGNUP_ERROR_USERNAME_TAKEN": "Dieser Benutzername ist leider bereits vergeben.",

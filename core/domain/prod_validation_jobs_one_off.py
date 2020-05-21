@@ -787,6 +787,22 @@ class RoleQueryAuditModelValidator(BaseModelValidator):
         return {'user_ids': (user_models.UserSettingsModel, [item.user_id])}
 
 
+class UsernameChangeAuditModelValidator(BaseModelValidator):
+    """Class for validating UsernameChangeAuditModels."""
+
+    @classmethod
+    def _get_model_id_regex(cls, item):
+        # Valid id: [committer_id].[timestamp_in_sec]
+        # committer_id refers to the user that is making the change.
+        regex_string = '^%s\\.\\d+$' % item.committer_id
+        return regex_string
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {'committer_ids': (
+            user_models.UserSettingsModel, [item.committer_id])}
+
+
 class ClassifierTrainingJobModelValidator(BaseModelValidator):
     """Class for validating ClassifierTrainingJobModels."""
 
@@ -4881,6 +4897,7 @@ class PendingDeletionRequestModelValidator(BaseUserModelValidator):
 MODEL_TO_VALIDATOR_MAPPING = {
     activity_models.ActivityReferencesModel: ActivityReferencesModelValidator,
     audit_models.RoleQueryAuditModel: RoleQueryAuditModelValidator,
+    audit_models.UsernameChangeAuditModel: UsernameChangeAuditModelValidator,
     classifier_models.ClassifierTrainingJobModel: (
         ClassifierTrainingJobModelValidator),
     classifier_models.TrainingJobExplorationMappingModel: (
@@ -5092,6 +5109,14 @@ class RoleQueryAuditModelAuditOneOffJob(ProdValidationAuditOneOffJob):
     @classmethod
     def entity_classes_to_map_over(cls):
         return [audit_models.RoleQueryAuditModel]
+
+
+class UsernameChangeAuditModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates UsernameChangeAuditModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [audit_models.UsernameChangeAuditModel]
 
 
 class ClassifierTrainingJobModelAuditOneOffJob(ProdValidationAuditOneOffJob):

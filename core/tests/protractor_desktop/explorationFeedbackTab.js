@@ -62,10 +62,10 @@ describe('ExplorationFeedback', function() {
       'learnerExplorationFeedback');
     users.createUser(
       'user3@ExplorationFeedback.com',
-      'creatorExplorationFeedbackStatusChange');
+      'creatorExplorationFBStatChange');
     users.createUser(
       'user4@ExplorationFeedback.com',
-      'learnerExplorationFeedbackStatusChange');
+      'learnerExplorationFBStatChange');
     users.createUser(
       'user5@ExplorationFeedback.com',
       'creatorFeedback');
@@ -267,7 +267,7 @@ describe('Suggestions on Explorations', function() {
       'authorExplorationSuggestions');
     users.createUser(
       'user2@ExplorationSuggestions.com',
-      'suggesterExplorationSuggestions');
+      'suggesterExpSuggestions');
     users.createUser(
       'user3@ExplorationSuggestions.com',
       'studentExplorationSuggestions');

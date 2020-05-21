@@ -349,7 +349,6 @@
 	"I18N_SIGNUP_EMAIL_PREFERENCES_EXPLAIN": "আপনি আপনার পছন্দসমূহের পৃষ্ঠা থেকে যে কোনো সময়ে এই সেটিং পরিবর্তন করতে পারবেন।",
 	"I18N_SIGNUP_ERROR_MUST_AGREE_TO_TERMS": "এই সাইটের অন্বেষণ সম্পাদনা করতে হলে, আপনাকে সাইটের শর্তাবলীর সাথে সম্মত হতে হবে।",
 	"I18N_SIGNUP_ERROR_NO_USERNAME": "অনুগ্রহপূর্বক একটি ব্যবহারকারী নাম দিন।",
-	"I18N_SIGNUP_ERROR_USERNAME_MORE_50_CHARS": "একটি ব্যবহারকারী নামে সর্বোচ্চ ৫০টি অক্ষর থাকতে পারবে।",
 	"I18N_SIGNUP_ERROR_USERNAME_NOT_AVAILABLE": "এই ব্যবহারকারী নাম উপলবদ্ধ নয়।",
 	"I18N_SIGNUP_ERROR_USERNAME_ONLY_ALPHANUM": "ব্যবহারকারী নামে শুধুমাত্র আলফানিউমেরিক অক্ষর থাকতে পারবে।",
 	"I18N_SIGNUP_ERROR_USERNAME_TAKEN": "দুঃখিত, এই ব্যবহারকারী নাম ইতিমধ্যে নিয়ে নেয়া হয়েছে।",

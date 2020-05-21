@@ -312,7 +312,6 @@
 	"I18N_SIGNUP_EMAIL_PREFERENCES_EXPLAIN": "この設定は個人設定ページからいつでも変更できます。",
 	"I18N_SIGNUP_ERROR_MUST_AGREE_TO_TERMS": "このサイトの探検を編集するには、規約に同意する必要があります。",
 	"I18N_SIGNUP_ERROR_NO_USERNAME": "ユーザー名を入力してください。",
-	"I18N_SIGNUP_ERROR_USERNAME_MORE_50_CHARS": "ユーザー名は最大50文字です。",
 	"I18N_SIGNUP_ERROR_USERNAME_NOT_AVAILABLE": "このユーザー名は使用できません。",
 	"I18N_SIGNUP_ERROR_USERNAME_ONLY_ALPHANUM": "ユーザー名は英数字のみです。",
 	"I18N_SIGNUP_ERROR_USERNAME_TAKEN": "残念ながら、このユーザー名はすでに使用されています。",

@@ -467,7 +467,6 @@
 	"I18N_SIGNUP_EMAIL_PREFERENCES_EXPLAIN": "Pode alterar esta definição a qualquer altura, na sua página de preferências.",
 	"I18N_SIGNUP_ERROR_MUST_AGREE_TO_TERMS": "Para alterar as explorações tem de concordar com as condições de utilização deste sítio da Internet.",
 	"I18N_SIGNUP_ERROR_NO_USERNAME": "Introduza um nome de utilizador, por favor.",
-	"I18N_SIGNUP_ERROR_USERNAME_MORE_50_CHARS": "Um nome de utilizador pode ter no máximo 50 caracteres.",
 	"I18N_SIGNUP_ERROR_USERNAME_NOT_AVAILABLE": "Este nome de utilizador não está disponível.",
 	"I18N_SIGNUP_ERROR_USERNAME_ONLY_ALPHANUM": "Os nomes de utilizador só podem ter caracteres alfanuméricos.",
 	"I18N_SIGNUP_ERROR_USERNAME_TAKEN": "Lamentamos, mas este nome de utilizador já está a ser utilizado.",

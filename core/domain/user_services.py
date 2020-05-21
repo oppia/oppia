@@ -23,7 +23,9 @@ import datetime
 import hashlib
 import imghdr
 import logging
+import math
 import re
+import time
 
 from constants import constants
 from core.domain import role_services
@@ -36,9 +38,9 @@ import utils
 from google.appengine.api import urlfetch
 
 current_user_services = models.Registry.import_current_user_services()
-(user_models,) = models.Registry.import_models([models.NAMES.user])
+(user_models, audit_models) = models.Registry.import_models(
+    [models.NAMES.user, models.NAMES.audit])
 
-MAX_USERNAME_LENGTH = 50
 # Size (in px) of the gravatar being retrieved.
 GRAVATAR_SIZE_PX = 150
 # Data url for images/avatar/user_blue_72px.png.
@@ -275,10 +277,10 @@ class UserSettings(python_utils.OBJECT):
         """
         if not username:
             raise utils.ValidationError('Empty username supplied.')
-        elif len(username) > MAX_USERNAME_LENGTH:
+        elif len(username) > constants.MAX_USERNAME_LENGTH:
             raise utils.ValidationError(
                 'A username can have at most %s characters.'
-                % MAX_USERNAME_LENGTH)
+                % constants.MAX_USERNAME_LENGTH)
         elif not re.match(feconf.ALPHANUMERIC_REGEX, username):
             raise utils.ValidationError(
                 'Usernames can only have alphanumeric characters.')
@@ -877,8 +879,6 @@ def get_usernames(user_ids):
     return usernames
 
 
-# NB: If we ever allow usernames to change, update the
-# config_domain.BANNED_USERNAMES property.
 def set_username(user_id, new_username):
     """Updates the username of the user with the given user_id.
 
@@ -2002,3 +2002,19 @@ def get_community_reviewer_usernames(review_category, language_code=None):
         raise Exception('Invalid review category: %s' % review_category)
 
     return get_usernames(reviewer_ids)
+
+
+def log_username_change(committer_id, old_username, new_username):
+    """Stores the query to role structure in UsernameChangeAuditModel.
+
+    Args:
+        committer_id: str. The ID of the user that is making the change.
+        old_username: str. The current username that is being changed.
+        new_username: str. The new username that the current one is being
+            changed to.
+    """
+    model_id = '%s.%s' % (committer_id, int(math.floor(time.time())))
+
+    audit_models.UsernameChangeAuditModel(
+        id=model_id, committer_id=committer_id, old_username=old_username,
+        new_username=new_username).put()

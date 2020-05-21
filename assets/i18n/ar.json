@@ -491,7 +491,6 @@
 	"I18N_SIGNUP_EMAIL_PREFERENCES_EXPLAIN": "يمكنك تغيير هذا الإعداد في أي وقت من صفحة تفضيلات الخاصة بك.",
 	"I18N_SIGNUP_ERROR_MUST_AGREE_TO_TERMS": "لتعديل الاستكشافات في هذا الموقع; ستحتاج إلى الموافقة على شروط الموقع.",
 	"I18N_SIGNUP_ERROR_NO_USERNAME": "الرجاء إدخال اسم مستخدم.",
-	"I18N_SIGNUP_ERROR_USERNAME_MORE_50_CHARS": "اسم مستخدم يمكن أن يتكون من 50 حرفا كحد أقصى.",
 	"I18N_SIGNUP_ERROR_USERNAME_NOT_AVAILABLE": "اسم المستخدم هذا غير متوفر.",
 	"I18N_SIGNUP_ERROR_USERNAME_ONLY_ALPHANUM": "يمكن لأسماء المستخدمين أن تتكون من أحرف أبجدية فقط.",
 	"I18N_SIGNUP_ERROR_USERNAME_TAKEN": "عذرا، اسم المستخدم هذا مسجل بالفعل.",

@@ -225,7 +225,6 @@
 	"I18N_SIGNUP_EMAIL_PREFERENCES": "Настройки электронной почты",
 	"I18N_SIGNUP_EMAIL_PREFERENCES_EXPLAIN": "Вы можете изменить этот параметр в любое время со страницы ваших предпочтений.",
 	"I18N_SIGNUP_ERROR_NO_USERNAME": "Пожалуйста, введите имя пользователя.",
-	"I18N_SIGNUP_ERROR_USERNAME_MORE_50_CHARS": "Имя пользователя может иметь не более 50 символов.",
 	"I18N_SIGNUP_ERROR_USERNAME_NOT_AVAILABLE": "Это имя пользователя не доступно.",
 	"I18N_SIGNUP_FIELD_REQUIRED": "Это поле обязательно для заполнения.",
 	"I18N_SIGNUP_LOADING": "Загрузка",
