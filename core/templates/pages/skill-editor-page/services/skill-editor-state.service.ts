@@ -197,7 +197,7 @@ angular.module('oppia').factory('SkillEditorStateService', [
         return true;
       },
 
-      getskillChangedSubject: function() {
+      getSkillChangedSubject: function() {
         return skillChangedSubject;
       },
 
