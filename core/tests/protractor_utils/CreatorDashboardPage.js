@@ -30,6 +30,8 @@ var CreatorDashboardPage = function() {
   var explorationDashboardCard =
     element(by.css('.protractor-test-exploration-dashboard-card'));
   var collectionCard = element(by.css('.protractor-test-collection-card'));
+  var collectionEditorContainer = element(
+    by.css('.collection-editor-cards-container'));
   var subscriptionTab = element(by.css('.protractor-test-subscription-tab'));
   var createActivityButton =
     element(by.css('.protractor-test-create-activity'));
@@ -91,6 +93,7 @@ var CreatorDashboardPage = function() {
       'Create Collection button takes too long to be clickable');
     await createCollectionButton.click();
     await waitFor.pageToFullyLoad();
+    await waitFor.visibilityOf(collectionEditorContainer);
   };
 
   this.clickCreateExplorationButton = async function() {
