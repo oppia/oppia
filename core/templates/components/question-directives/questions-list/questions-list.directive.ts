@@ -592,6 +592,9 @@ angular.module('oppia').directive('questionsList', [
                           $scope.selectedSkillId = null;
                           $scope.countOfSkillsToPrioritize =
                             skillsInSameTopicCount;
+                          $scope.preModalCloseHook = function() {
+                            $scope.save();
+                          };
                           $scope.save = function() {
                             for (var idx in sortedSkillSummaries) {
                               if (
