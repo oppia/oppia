@@ -21,7 +21,6 @@ require(
   'state-editor.service.ts');
 require('domain/editor/undo_redo/question-undo-redo.service.ts');
 require('domain/skill/MisconceptionObjectFactory.ts');
-require('domain/skill/SkillObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require(
   'pages/community-dashboard-page/services/' +

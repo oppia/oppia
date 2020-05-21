@@ -16,6 +16,10 @@
  * @fileoverview Controller for change question difficulty modal.
  */
 
+require(
+  'components/common-layout-directives/common-elements/' +
+  'confirm-or-cancel-modal.controller.ts');
+
 angular.module('oppia').controller('ChangeQuestionDifficultyModalController', [
   '$controller', '$scope', '$uibModalInstance', 'linkedSkillsWithDifficulty',
   'skillIdToRubricsObject',

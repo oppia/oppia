@@ -16,6 +16,8 @@
  * @fileoverview Controller for upload activity modal.
  */
 
+require('services/alerts.service.ts');
+
 angular.module('oppia').controller('UploadActivityModalController', [
   '$scope', '$uibModalInstance', 'AlertsService',
   function($scope, $uibModalInstance, AlertsService) {

@@ -20,6 +20,15 @@ require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
 
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-editor.service.ts');
+require('domain/exploration/OutcomeObjectFactory.ts');
+require('domain/exploration/RuleObjectFactory.ts');
+require(
+  'pages/exploration-editor-page/services/editor-first-time-events.service.ts');
+require('services/generate-content-id.service.ts');
+
 angular.module('oppia').controller('AddAnswerGroupModalController', [
   '$controller', '$scope', '$uibModalInstance', 'EditorFirstTimeEventsService',
   'GenerateContentIdService', 'OutcomeObjectFactory', 'RuleObjectFactory',

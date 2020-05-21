@@ -13,8 +13,12 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for question palyer concept card modal.
+ * @fileoverview Controller for question player concept card modal.
  */
+
+require(
+  'components/common-layout-directives/common-elements/' +
+  'confirm-or-cancel-modal.controller.ts');
 
 require('services/contextual/url.service.ts');
 

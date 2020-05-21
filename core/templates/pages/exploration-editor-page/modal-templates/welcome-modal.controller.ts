@@ -20,6 +20,10 @@ require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
 
+require('domain/utilities/url-interpolation.service.ts');
+require('services/context.service.ts');
+require('services/site-analytics.service.ts');
+
 angular.module('oppia').controller('WelcomeModalController', [
   '$controller', '$scope', '$uibModalInstance',
   'ContextService', 'SiteAnalyticsService', 'UrlInterpolationService',

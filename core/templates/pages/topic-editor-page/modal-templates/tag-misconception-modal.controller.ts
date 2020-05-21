@@ -20,6 +20,10 @@ require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
 
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-editor.service.ts');
+
 angular.module('oppia').controller('TagMisconceptionModalController', [
   '$controller', '$scope', '$uibModalInstance', 'StateEditorService',
   function($controller, $scope, $uibModalInstance, StateEditorService) {

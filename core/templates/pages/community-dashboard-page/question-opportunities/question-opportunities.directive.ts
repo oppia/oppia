@@ -35,7 +35,6 @@ require(
 require(
   'components/question-directives/questions-list/' +
   'questions-list.constants.ajs.ts');
-
 require('directives/angular-html-bind.directive.ts');
 require('directives/mathjax-bind.directive.ts');
 require('domain/editor/undo_redo/question-undo-redo.service.ts');

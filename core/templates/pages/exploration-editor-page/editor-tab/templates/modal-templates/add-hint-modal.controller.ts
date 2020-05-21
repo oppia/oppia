@@ -20,6 +20,13 @@ require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
 
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-hints.service.ts');
+require('domain/exploration/HintObjectFactory.ts');
+require('services/generate-content-id.service.ts');
+require('services/context.service.ts');
+
 angular.module('oppia').controller('AddHintModalController', [
   '$controller', '$scope', '$uibModalInstance', 'ContextService',
   'GenerateContentIdService', 'HintObjectFactory', 'StateHintsService',

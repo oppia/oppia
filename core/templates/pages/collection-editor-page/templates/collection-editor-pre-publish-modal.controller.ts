@@ -20,6 +20,11 @@ require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
 
+require('domain/collection/collection-update.service.ts');
+require(
+  'pages/collection-editor-page/services/collection-editor-state.service.ts');
+require('services/alerts.service.ts');
+
 angular.module('oppia').controller(
   'CollectionEditorPrePublishModalController', [
     '$controller', '$scope', '$uibModalInstance', 'AlertsService',
