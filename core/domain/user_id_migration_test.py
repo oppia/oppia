@@ -1071,7 +1071,6 @@ class ModelsUserIdsHaveUserSettingsExplorationsVerificationJobTests(
         exp_models.ExplorationCommitLogEntryModel(
             id='exp_1_id_1',
             user_id=self.USER_1_GAE_ID,
-            username=self.USER_1_USERNAME,
             commit_type='create',
             commit_message='commit message 2',
             commit_cmds=[{'cmd': 'some_command'}],
@@ -1083,7 +1082,6 @@ class ModelsUserIdsHaveUserSettingsExplorationsVerificationJobTests(
         exp_models.ExplorationCommitLogEntryModel(
             id='exp_2_id_1',
             user_id=self.USER_1_USER_ID,
-            username=self.USER_1_USERNAME,
             commit_type='create',
             commit_message='commit message 2',
             commit_cmds=[{'cmd': 'some_command'}],
@@ -1095,7 +1093,6 @@ class ModelsUserIdsHaveUserSettingsExplorationsVerificationJobTests(
         exp_models.ExplorationCommitLogEntryModel(
             id='exp_3_id_1',
             user_id=feconf.SYSTEM_COMMITTER_ID,
-            username=feconf.SYSTEM_COMMITTER_ID,
             commit_type='create',
             commit_message='commit message 2',
             commit_cmds=[{'cmd': 'some_command'}],

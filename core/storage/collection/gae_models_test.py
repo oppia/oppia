@@ -464,8 +464,7 @@ class CollectionCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
             'a', 0, 'committer_id', 'msg', 'create', [{}],
             constants.ACTIVITY_STATUS_PRIVATE, False)
         public_commit = collection_models.CollectionCommitLogEntryModel.create(
-            'b', 0, 'committer_id', 'username', 'msg',
-            'create', [{}],
+            'b', 0, 'committer_id', 'msg', 'create', [{}],
             constants.ACTIVITY_STATUS_PUBLIC, False)
         # We need to manually set collection_id as it is a property of
         # CollectionCommitLogEntryModel only and create() does not accept
