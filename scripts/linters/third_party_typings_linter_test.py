@@ -19,7 +19,6 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import io
 import os
 
 from core.tests import test_utils
@@ -35,11 +34,11 @@ class ThirdPartyTypingsLinterTests(test_utils.GenericTestBase):
     def setUp(self):
         super(ThirdPartyTypingsLinterTests, self).setUp()
         self.verbose_mode_enabled = False
-        self.manifest_file = io.StringIO(
+        self.manifest_file = python_utils.string_io(
             '{\"dependencies\":{\"frontend\":{\"guppy\":{\"version\": \"0.1\"}'
             ',\"skulpt-dist\":{\"version\": \"0.2\"},\"mathExpressions\":'
             '{\"version\": \"0.3\"},\"midiJs\":{\"version\": \"0.4\"}}}}')
-        self.package_file = io.StringIO(
+        self.package_file = python_utils.string_io(
             '{\"dependencies\":{\"wavesurfer.js\":\"0.5\",'
             '\"nerdamer\":\"^0.6\"}}')
         self.files_in_typings_dir = [
