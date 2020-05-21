@@ -20,9 +20,17 @@ require('base-components/base-content.directive.ts');
 require(
   'components/common-layout-directives/common-elements/' +
   'background-banner.directive.ts');
+require(
+  'pages/topics-and-skills-dashboard-page/skills-list/' +
+  'skills-list.directive.ts');
+require(
+  'pages/topics-and-skills-dashboard-page/topics-list/' +
+  'topics-list.directive.ts');
+
 require('components/entity-creation-services/skill-creation.service.ts');
 require('components/entity-creation-services/topic-creation.service.ts');
 require('components/rubrics-editor/rubrics-editor.directive.ts');
+
 require('domain/skill/RubricObjectFactory.ts');
 require('domain/skill/SkillObjectFactory.ts');
 require(
@@ -115,7 +123,8 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
                   EVENT_TYPE_SKILL_CREATION_ENABLED, ctrl.userCanCreateSkill);
                 ctrl.userCanDeleteTopic = response.data.can_delete_topic;
                 ctrl.userCanDeleteSkill = response.data.can_delete_skill;
-                if (ctrl.topicSummaries.length === 0 &&
+                  $rootScope.$apply();
+                  if (ctrl.topicSummaries.length === 0 &&
                     ctrl.untriagedSkillSummaries.length !== 0) {
                   ctrl.activeTab = ctrl.TAB_NAME_UNTRIAGED_SKILLS;
                 }
