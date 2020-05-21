@@ -22,8 +22,8 @@ import { Injectable } from '@angular/core';
 
 export interface IRuleBackendDict {
   /* eslint-disable camelcase */
-  inputs: IRuleInput,
-  rule_type: string
+  inputs: IRuleInput;
+  rule_type: string;
   /* eslint-enable camelcase */
 }
 

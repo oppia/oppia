@@ -22,31 +22,43 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { UtilsService } from 'services/utils.service';
 import isEqual from 'lodash/isEqual';
 
+export interface ILostChangeBackendDict {
+  /* eslint-disable camelcase */
+  cmd: string;
+  new_state_name?: string;
+  old_state_name?: string;
+  state_name?: string;
+  new_value?: any;
+  old_value?: any;
+  property_name?: string;
+  /* eslint-enable camelcase */
+}
+
 export class LostChange {
   constructor(
       private utilsService: UtilsService,
       public cmd: string,
-      public newStateName: string,
-      public oldStateName: string,
-      public stateName: string,
-      public newValue: any,
-      public oldValue: any,
-      public propertyName: string) {}
+      public newStateName?: string,
+      public oldStateName?: string,
+      public stateName?: string,
+      public newValue?: any,
+      public oldValue?: any,
+      public propertyName?: string) {}
 
   // An edit is represented either as an object or an array. If it's an
   // object, then simply return that object. In case of an array, return
   // the last item.
-  // TODO(#7176): Replace 'any' with the exact type.
-  getStatePropertyValue(statePropertyValue: Array<string> | Object): any {
+  getStatePropertyValue(
+      statePropertyValue: string[] | object): string | object {
     return Array.isArray(statePropertyValue) ?
       statePropertyValue[statePropertyValue.length - 1] : statePropertyValue;
   }
 
-  isEndingExploration() {
+  isEndingExploration(): boolean {
     return this.oldValue === null && this.newValue === 'EndExploration';
   }
 
-  isAddingInteraction() {
+  isAddingInteraction(): boolean {
     return this.oldValue === null && this.newValue !== 'EndExploration';
   }
 
@@ -58,38 +70,31 @@ export class LostChange {
     return this.utilsService.isEmpty(this.newValue);
   }
 
-  isOutcomeFeedbackEqual() {
-    if (this.newValue.outcome && this.newValue.outcome.feedback &&
-      this.oldValue.outcome && this.oldValue.outcome.feedback) {
-      return (
-        this.newValue.outcome.feedback.getHtml() ===
-        this.oldValue.outcome.feedback.getHtml());
-    }
-    return false;
+  isOutcomeFeedbackEqual(): boolean {
+    const newFeedback = this.newValue.outcome && this.newValue.outcome.feedback;
+    const oldFeedback = this.oldValue.outcome && this.oldValue.outcome.feedback;
+    return (
+      oldFeedback && newFeedback &&
+      newFeedback.getHtml() === oldFeedback.getHtml());
   }
 
-  isOutcomeDestEqual() {
-    if (this.newValue.outcome && this.oldValue.outcome) {
-      return (
-        this.oldValue.outcome.dest === this.newValue.outcome.dest);
-    }
-    return false;
+  isOutcomeDestEqual(): boolean {
+    return (
+      this.newValue.outcome && this.oldValue.outcome &&
+      this.oldValue.outcome.dest === this.newValue.outcome.dest);
   }
 
-  isDestEqual() {
+  isDestEqual(): boolean {
     return this.oldValue.dest === this.newValue.dest;
   }
 
-  isFeedbackEqual() {
-    if (this.newValue.feedback && this.oldValue.feedback) {
-      return (
-        this.newValue.feedback.getHtml() ===
-        this.oldValue.feedback.getHtml());
-    }
-    return false;
+  isFeedbackEqual(): boolean {
+    return (
+      this.newValue.feedback && this.oldValue.feedback &&
+      this.newValue.feedback.getHtml() === this.oldValue.feedback.getHtml());
   }
 
-  isRulesEqual() {
+  isRulesEqual(): boolean {
     return isEqual(this.newValue.rules, this.oldValue.rules);
   }
 
@@ -97,28 +102,26 @@ export class LostChange {
   // 'default_outcome' has been added, edited or deleted.
   // Returns - 'addded', 'edited' or 'deleted' accordingly.
   getRelativeChangeToGroups(): string {
-    let result = '';
-
     if (Array.isArray(this.newValue) && Array.isArray(this.oldValue)) {
       if (this.newValue.length > this.oldValue.length) {
-        result = 'added';
+        return 'added';
       } else if (this.newValue.length === this.oldValue.length) {
-        result = 'edited';
+        return 'edited';
       } else {
-        result = 'deleted';
+        return 'deleted';
       }
     } else {
       if (!this.utilsService.isEmpty(this.oldValue)) {
         if (!this.utilsService.isEmpty(this.newValue)) {
-          result = 'edited';
+          return 'edited';
         } else {
-          result = 'deleted';
+          return 'deleted';
         }
       } else if (!this.utilsService.isEmpty(this.newValue)) {
-        result = 'added';
+        return 'added';
       }
     }
-    return result;
+    return '';
   }
 }
 
@@ -126,18 +129,13 @@ export class LostChange {
   providedIn: 'root'
 })
 export class LostChangeObjectFactory {
-  constructor(private utilsService: UtilsService) {
-    // createNew function needs to be binded because it's used a lot in
-    // calbacks and then `this` would refer to window instead of the service
-    // itself.
-    this.createNew = this.createNew.bind(this);
-  }
+  constructor(private utilsService: UtilsService) {}
 
   /**
    * @param {String} lostChangeDict - the name of the type to fetch.
    * @returns {LostChange} - The associated type, if any.
    */
-  createNew(lostChangeDict) {
+  createNew(lostChangeDict: ILostChangeBackendDict): LostChange {
     return new LostChange(
       this.utilsService,
       lostChangeDict.cmd,

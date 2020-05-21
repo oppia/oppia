@@ -21,7 +21,7 @@ import { Injectable } from '@angular/core';
 
 import { IStateBackendDict, State, StateObjectFactory } from
   'domain/state/StateObjectFactory';
-import { IVoice } from 'domain/exploration/RecordedVoiceoversObjectFactory';
+import { Voiceover } from 'domain/exploration/VoiceoverObjectFactory';
 
 const INTERACTION_SPECS = require('interactions/interaction_specs.json');
 
@@ -112,7 +112,7 @@ export class States {
     return finalStateNames;
   }
 
-  getAllVoiceoverLanguageCodes(): Set<string> {
+  getAllVoiceoverLanguageCodes(): string[] {
     const allAudioLanguageCodes = new Set<string>();
     for (const stateName of this.getStateNames()) {
       const recordedVoiceovers = this.getState(stateName).recordedVoiceovers;
@@ -124,11 +124,11 @@ export class States {
         }
       }
     }
-    return allAudioLanguageCodes;
+    return Array.from(allAudioLanguageCodes);
   }
 
-  getAllVoiceovers(langCode: string): Map<string, IVoice[]> {
-    const allAudioTranslations = new Map<string, IVoice[]>();
+  getAllVoiceovers(langCode: string): Map<string, Voiceover[]> {
+    const allAudioTranslations = new Map<string, Voiceover[]>();
     for (const stateName of this.getStateNames()) {
       const recordedVoiceovers = this.getState(stateName).recordedVoiceovers;
       allAudioTranslations.set(stateName, []);

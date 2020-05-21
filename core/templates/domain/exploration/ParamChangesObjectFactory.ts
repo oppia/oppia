@@ -32,8 +32,7 @@ export class ParamChangesObjectFactory {
   createFromBackendList(
       paramChangeBackendList: IParamChangeBackendDict[]): ParamChange[] {
     return paramChangeBackendList.map(
-      backendDict => this.paramChangeObjectFactory.createFromBackendDict(
-        backendDict));
+      dict => this.paramChangeObjectFactory.createFromBackendDict(dict));
   }
 }
 

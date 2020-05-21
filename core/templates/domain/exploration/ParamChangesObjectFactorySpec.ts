@@ -24,7 +24,6 @@ import { ParamChangesObjectFactory } from
   'domain/exploration/ParamChangesObjectFactory';
 
 describe('ParamChanges Object Factory', () => {
-  let pcsof: ParamChangesObjectFactory;
   const customizationArg = {
     parse_with_jinja: true,
     value: ''
@@ -32,11 +31,7 @@ describe('ParamChanges Object Factory', () => {
   const gId = 'Copier';
 
   beforeEach(() => {
-    TestBed.configureTestingModule({
-      providers: [ParamChangesObjectFactory]
-    });
-
-    pcsof = TestBed.get(ParamChangesObjectFactory);
+    this.pcsof = TestBed.get(ParamChangesObjectFactory);
   });
 
   it('should create a ParamChange array from a list of dictionaries',
@@ -56,7 +51,8 @@ describe('ParamChanges Object Factory', () => {
         }
       ];
 
-      let testOutcome: ParamChange[] = pcsof.createFromBackendList(backendList);
+      let testOutcome: ParamChange[] = (
+        this.pcsof.createFromBackendList(backendList));
 
       expect(testOutcome.length).toBe(2);
       expect(testOutcome[0].customizationArg).toEqual(customizationArg);

@@ -16,29 +16,25 @@
  * @fileoverview Factory for creating new frontend instances of
  * Voiceover domain objects.
  */
-export interface IVoiceoverDict {
-  'duration_secs': number;
-  filename: string;
-  'file_size_bytes': number;
-  'needs_update': boolean;
-}
 
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-export class Voiceover {
+export interface IVoiceoverBackendDict {
+  /* eslint-disable camelcase */
   filename: string;
-  fileSizeBytes: number;
-  needsUpdate: boolean;
-  durationSecs: number;
+  file_size_bytes: number;
+  needs_update: boolean;
+  duration_secs: number;
+  /* eslint-enable camelcase */
+}
 
-  constructor(filename: string, fileSizeBytes: number, needsUpdate: boolean,
-      durationSecs: number) {
-    this.filename = filename;
-    this.fileSizeBytes = fileSizeBytes;
-    this.needsUpdate = needsUpdate;
-    this.durationSecs = durationSecs;
-  }
+export class Voiceover {
+  constructor(
+      public filename: string,
+      public fileSizeBytes: number,
+      public needsUpdate: boolean,
+      public durationSecs: number) {}
 
   markAsNeedingUpdate(): void {
     this.needsUpdate = true;
@@ -53,7 +49,7 @@ export class Voiceover {
     return this.fileSizeBytes / NUM_BYTES_IN_MB;
   }
 
-  toBackendDict(): IVoiceoverDict {
+  toBackendDict(): IVoiceoverBackendDict {
     return {
       filename: this.filename,
       file_size_bytes: this.fileSizeBytes,
@@ -67,13 +63,14 @@ export class Voiceover {
   providedIn: 'root'
 })
 export class VoiceoverObjectFactory {
-  createNew(filename: string, fileSizeBytes: number,
+  createNew(
+      filename: string, fileSizeBytes: number,
       durationSecs: number): Voiceover {
     return new Voiceover(filename, fileSizeBytes, false, durationSecs);
   }
 
   createFromBackendDict(
-      translationBackendDict: IVoiceoverDict): Voiceover {
+      translationBackendDict: IVoiceoverBackendDict): Voiceover {
     return new Voiceover(
       translationBackendDict.filename,
       translationBackendDict.file_size_bytes,

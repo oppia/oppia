@@ -702,8 +702,12 @@ export class UpgradedServices {
         upgradedServices['CodeReplPredictionService'],
         upgradedServices['TextInputPredictionService']);
     upgradedServices['SolutionObjectFactory'] = new SolutionObjectFactory(
-      upgradedServices['SubtitledHtmlObjectFactory'],
-      upgradedServices['ExplorationHtmlFormatterService']);
+      upgradedServices['ConvertToPlainTextPipe'],
+      upgradedServices['ExplorationHtmlFormatterService'],
+      upgradedServices['FractionObjectFactory'],
+      upgradedServices['HtmlEscaperService'],
+      upgradedServices['NumberWithUnitsObjectFactory'],
+      upgradedServices['SubtitledHtmlObjectFactory']);
     upgradedServices['StateCardObjectFactory'] = new StateCardObjectFactory(
       upgradedServices['AudioTranslationLanguageService']);
 

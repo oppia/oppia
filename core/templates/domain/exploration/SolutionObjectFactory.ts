@@ -45,7 +45,11 @@ export interface ISolutionBackendDict {
 
 export class Solution {
   constructor(
+      private convertToPlainTextPipe: ConvertToPlainTextPipe,
       private explorationHtmlFormatterService: ExplorationHtmlFormatterService,
+      private fractionObjectFactory: FractionObjectFactory,
+      private htmlEscaperService: HtmlEscaperService,
+      private numberWithUnitsObjectFactory: NumberWithUnitsObjectFactory,
       public answerIsExclusive: boolean,
       public correctAnswer,
       public explanation: SubtitledHtml) {}
@@ -59,8 +63,7 @@ export class Solution {
   }
 
   getSummary(interactionId: string): string {
-    var solutionType = (
-      this.answerIsExclusive ? 'The only' : 'One');
+    const solutionType = this.answerIsExclusive ? 'The only' : 'One';
     var correctAnswer = null;
     if (interactionId === 'GraphInput') {
       correctAnswer = '[Graph]';
@@ -74,22 +77,19 @@ export class Solution {
     } else if (interactionId === 'LogicProof') {
       correctAnswer = this.correctAnswer.correct;
     } else if (interactionId === 'FractionInput') {
-      correctAnswer = (new FractionObjectFactory()).fromDict(
-        this.correctAnswer).toString();
+      correctAnswer = (
+        this.fractionObjectFactory.fromDict(this.correctAnswer).toString());
     } else if (interactionId === 'NumberWithUnits') {
-      correctAnswer = (new NumberWithUnitsObjectFactory(
-        new UnitsObjectFactory(), new FractionObjectFactory())).fromDict(
+      correctAnswer = this.numberWithUnitsObjectFactory.fromDict(
         this.correctAnswer).toString();
     } else {
       correctAnswer = (
-        (new HtmlEscaperService(new LoggerService())).objToEscapedJson(
-          this.correctAnswer));
+        this.htmlEscaperService.objToEscapedJson(this.correctAnswer));
     }
-    var explanation = (
-      (new ConvertToPlainTextPipe()).transform(this.explanation.getHtml()));
-    return (
-      solutionType + ' solution is "' + correctAnswer +
-      '". ' + explanation + '.');
+
+    const explanation = (
+      this.convertToPlainTextPipe.transform(this.explanation.getHtml()));
+    return `${solutionType} solution is "${correctAnswer}". ${explanation}.`;
   }
 
   setCorrectAnswer(correctAnswer): void {
@@ -117,12 +117,20 @@ export class Solution {
 })
 export class SolutionObjectFactory {
   constructor(
-    private subtitledHtmlObjectFactory: SubtitledHtmlObjectFactory,
-    private explorationHtmlFormatterService: ExplorationHtmlFormatterService) {}
+      private convertToPlainTextPipe: ConvertToPlainTextPipe,
+      private explorationHtmlFormatterService: ExplorationHtmlFormatterService,
+      private fractionObjectFactory: FractionObjectFactory,
+      private htmlEscaperService: HtmlEscaperService,
+      private numberWithUnitsObjectFactory: NumberWithUnitsObjectFactory,
+      private subtitledHtmlObjectFactory: SubtitledHtmlObjectFactory) {}
 
   createFromBackendDict(solutionBackendDict: ISolutionBackendDict): Solution {
     return new Solution(
+      this.convertToPlainTextPipe,
       this.explorationHtmlFormatterService,
+      this.fractionObjectFactory,
+      this.htmlEscaperService,
+      this.numberWithUnitsObjectFactory,
       solutionBackendDict.answer_is_exclusive,
       solutionBackendDict.correct_answer,
       this.subtitledHtmlObjectFactory.createFromBackendDict(
@@ -133,7 +141,12 @@ export class SolutionObjectFactory {
       answerIsExclusive: boolean, correctAnswer, explanationHtml: string,
       explanationId: string): Solution {
     return new Solution(
-      this.explorationHtmlFormatterService, answerIsExclusive, correctAnswer,
+      this.convertToPlainTextPipe,
+      this.explorationHtmlFormatterService,
+      this.fractionObjectFactory,
+      this.htmlEscaperService,
+      this.numberWithUnitsObjectFactory,
+      answerIsExclusive, correctAnswer,
       this.subtitledHtmlObjectFactory.createDefault(
         explanationHtml, explanationId));
   }

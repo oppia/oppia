@@ -21,25 +21,25 @@ import { Injectable } from '@angular/core';
 
 import cloneDeep from 'lodash/cloneDeep';
 
-import { IAnswerGroupBackendDict, AnswerGroup, AnswerGroupObjectFactory } from
+import { AnswerGroup, AnswerGroupObjectFactory, IAnswerGroupBackendDict } from
   'domain/exploration/AnswerGroupObjectFactory';
-import { IHintBackendDict, Hint, HintObjectFactory } from
+import { Hint, HintObjectFactory, IHintBackendDict } from
   'domain/exploration/HintObjectFactory';
+import { ICustomizationArgs } from
+  'domain/state/CustomizationArgsObjectFactory';
 import { IOutcomeBackendDict, Outcome, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
 import { ISolutionBackendDict, Solution, SolutionObjectFactory } from
   'domain/exploration/SolutionObjectFactory';
-import { ICustomizationArgs } from
-  'domain/state/CustomizationArgsObjectFactory';
 
 export interface IInteractionBackendDict {
   /* eslint-disable camelcase */
-  id: string;
-  customization_args: ICustomizationArgs;
   answer_groups: IAnswerGroupBackendDict[];
-  default_outcome: IOutcomeBackendDict;
   confirmed_unclassified_answers: IAnswerGroupBackendDict[];
+  customization_args: ICustomizationArgs;
+  default_outcome: IOutcomeBackendDict;
   hints: IHintBackendDict[];
+  id: string;
   solution: ISolutionBackendDict;
   /* eslint-enable camelcase */
 }
@@ -49,10 +49,10 @@ export class Interaction {
       public answerGroups: AnswerGroup[],
       public confirmedUnclassifiedAnswers: IAnswerGroupBackendDict[],
       public customizationArgs: ICustomizationArgs,
-      public defaultOutcome: Outcome,
+      public defaultOutcome: Outcome | null,
       public hints: Hint[],
       public id: string,
-      public solution: Solution) {}
+      public solution: Solution | null) {}
 
   setId(newValue: string): void {
     this.id = newValue;
@@ -96,10 +96,10 @@ export class Interaction {
       confirmed_unclassified_answers: this.confirmedUnclassifiedAnswers,
       customization_args: this.customizationArgs,
       default_outcome: (
-        this.defaultOutcome ? this.defaultOutcome.toBackendDict() : null),
+        this.defaultOutcome && this.defaultOutcome.toBackendDict()),
       hints: this.hints.map(hint => hint.toBackendDict()),
       id: this.id,
-      solution: this.solution ? this.solution.toBackendDict() : null
+      solution: this.solution && this.solution.toBackendDict()
     };
   }
 }
@@ -114,41 +114,40 @@ export class InteractionObjectFactory {
       private solutionFactory: SolutionObjectFactory,
       private outcomeFactory: OutcomeObjectFactory) {}
 
-  createFromBackendDict(interactionDict: IInteractionBackendDict): Interaction {
-    const defaultOutcome = (
-      interactionDict.default_outcome ?
-        this.outcomeFactory.createFromBackendDict(
-          interactionDict.default_outcome) :
-        null);
-    const solution = (
-      interactionDict.solution ?
-        this.generateSolutionFromBackend(interactionDict.solution) :
-        null);
-
+  createFromBackendDict(backendDict: IInteractionBackendDict): Interaction {
     return new Interaction(
-      this.generateAnswerGroupsFromBackend(interactionDict.answer_groups),
-      interactionDict.confirmed_unclassified_answers,
-      interactionDict.customization_args,
-      defaultOutcome,
-      this.generateHintsFromBackend(interactionDict.hints),
-      interactionDict.id,
-      solution);
+      this.generateAnswerGroupsFromBackend(backendDict.answer_groups),
+      backendDict.confirmed_unclassified_answers,
+      backendDict.customization_args,
+      this.generateOutcomeFromBackend(backendDict.default_outcome),
+      this.generateHintsFromBackend(backendDict.hints),
+      backendDict.id,
+      this.generateSolutionFromBackend(backendDict.solution));
   }
 
-  generateAnswerGroupsFromBackend(
-      answerGroupBackendDicts: IAnswerGroupBackendDict[]) {
+  private generateAnswerGroupsFromBackend(
+      answerGroupBackendDicts: IAnswerGroupBackendDict[]): AnswerGroup[] {
     return answerGroupBackendDicts.map(
       backendDict => this.answerGroupFactory.createFromBackendDict(backendDict)
     );
   }
 
-  generateHintsFromBackend(hintBackendDicts: IHintBackendDict[]) {
+  private generateOutcomeFromBackend(
+      outcomeBackendDict: IOutcomeBackendDict): Outcome {
+    return outcomeBackendDict ?
+      this.outcomeFactory.createFromBackendDict(outcomeBackendDict) : null;
+  }
+
+  private generateHintsFromBackend(
+      hintBackendDicts: IHintBackendDict[]): Hint[] {
     return hintBackendDicts.map(
       backendDict => this.hintFactory.createFromBackendDict(backendDict));
   }
 
-  generateSolutionFromBackend(solutionBackendDict: ISolutionBackendDict) {
-    return this.solutionFactory.createFromBackendDict(solutionBackendDict);
+  private generateSolutionFromBackend(
+      solutionBackendDict: ISolutionBackendDict): Solution {
+    return solutionBackendDict ?
+      this.solutionFactory.createFromBackendDict(solutionBackendDict) : null;
   }
 }
 

@@ -59,11 +59,6 @@ export class AnswerGroupObjectFactory {
       private outcomeObjectFactory: OutcomeObjectFactory,
       private ruleObjectFactory: RuleObjectFactory) {}
 
-  generateRulesFromBackend(ruleBackendDicts: IRuleBackendDict[]) {
-    return ruleBackendDicts.map(
-      backendDict => this.ruleObjectFactory.createFromBackendDict(backendDict));
-  }
-
   createNew(
       rules: Rule[], outcome: Outcome, trainingData: object[],
       taggedSkillMisconceptionId: string): AnswerGroup {
@@ -74,7 +69,8 @@ export class AnswerGroupObjectFactory {
   createFromBackendDict(
       answerGroupBackendDict: IAnswerGroupBackendDict): AnswerGroup {
     return new AnswerGroup(
-      this.generateRulesFromBackend(answerGroupBackendDict.rule_specs),
+      answerGroupBackendDict.rule_specs.map(
+        dict => this.ruleObjectFactory.createFromBackendDict(dict)),
       this.outcomeObjectFactory.createFromBackendDict(
         answerGroupBackendDict.outcome),
       answerGroupBackendDict.training_data,

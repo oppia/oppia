@@ -74,10 +74,12 @@ export class ParamChangeObjectFactory {
       paramChangeBackendDict.generator_id,
       paramChangeBackendDict.name);
   }
+
   createEmpty(paramName: string): ParamChange {
     return new ParamChange(
       {parse_with_jinja: true, value: ''}, 'Copier', paramName);
   }
+
   createDefault(paramName: string): ParamChange {
     return new ParamChange(
       cloneDeep(DEFAULT_CUSTOMIZATION_ARGS.Copier), 'Copier', paramName);

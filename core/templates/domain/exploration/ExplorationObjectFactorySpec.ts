@@ -176,34 +176,37 @@ describe('Exploration object factory', () => {
 
   it('should correctly get all audio translations by language code',
     () => {
-      expect(exploration.getAllVoiceovers('hi-en')).toEqual({
-        'first state': [vof.createFromBackendDict({
-          filename: 'myfile3.mp3',
-          file_size_bytes: 430000,
-          needs_update: false,
-          duration_secs: 2.1
-        })],
-        'second state': [vof.createFromBackendDict({
-          filename: 'myfile2.mp3',
-          file_size_bytes: 120000,
-          needs_update: false,
-          duration_secs: 1.2
-        })]
-      });
-      expect(exploration.getAllVoiceovers('en')).toEqual({
-        'first state': [vof.createFromBackendDict({
-          filename: 'myfile1.mp3',
-          file_size_bytes: 210000,
-          needs_update: false,
-          duration_secs: 4.3
-        })],
-        'second state': []
-      });
+      expect(exploration.getAllVoiceovers('hi-en'))
+        .toEqual(new Map(Object.entries({
+          'first state': [vof.createFromBackendDict({
+            filename: 'myfile3.mp3',
+            file_size_bytes: 430000,
+            needs_update: false,
+            duration_secs: 2.1
+          })],
+          'second state': [vof.createFromBackendDict({
+            filename: 'myfile2.mp3',
+            file_size_bytes: 120000,
+            needs_update: false,
+            duration_secs: 1.2
+          })]
+        })));
+      expect(exploration.getAllVoiceovers('en'))
+        .toEqual(new Map(Object.entries({
+          'first state': [vof.createFromBackendDict({
+            filename: 'myfile1.mp3',
+            file_size_bytes: 210000,
+            needs_update: false,
+            duration_secs: 4.3
+          })],
+          'second state': []
+        })));
 
-      expect(exploration.getAllVoiceovers('hi')).toEqual({
-        'first state': [],
-        'second state': []
-      });
+      expect(exploration.getAllVoiceovers('hi'))
+        .toEqual(new Map(Object.entries({
+          'first state': [],
+          'second state': []
+        })));
     });
 
   it('should correctly get the voiceovers from a language code in' +

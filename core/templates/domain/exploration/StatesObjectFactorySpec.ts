@@ -397,7 +397,7 @@ describe('States object factory', () => {
     it('should correctly get all audio translations in states', () => {
       var statesWithAudio = ssof.createFromBackendDict(statesWithAudioDict);
       expect(statesWithAudio.getAllVoiceovers('hi-en'))
-        .toEqual({
+        .toEqual(new Map(Object.entries({
           'first state': [vof.createFromBackendDict({
             filename: 'myfile3.mp3',
             file_size_bytes: 0.8,
@@ -415,7 +415,7 @@ describe('States object factory', () => {
             needs_update: false,
             duration_secs: 0.8
           })]
-        });
+        })));
     });
   });
 });

@@ -17,60 +17,50 @@
  * concept card. In the backend, this is referred to as SkillContents.
  */
 
-export interface IConceptCardBackendDict {
-  explanation: ISubtitledHtmlBackendDict,
-  'worked_examples': Array<IWorkedExampleBackendDict>,
-  'recorded_voiceovers': IRecordedVoiceoversBackendDict
-}
-
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
+
 import { AppConstants } from 'app.constants';
-import { RecordedVoiceovers, RecordedVoiceoversObjectFactory,
-  IRecordedVoiceoversBackendDict } from
-  'domain/exploration/RecordedVoiceoversObjectFactory';
 import {
-  SubtitledHtml, SubtitledHtmlObjectFactory, ISubtitledHtmlBackendDict } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
+  IRecordedVoiceoversBackendDict,
+  RecordedVoiceovers, RecordedVoiceoversObjectFactory
+} from 'domain/exploration/RecordedVoiceoversObjectFactory';
 import {
-  WorkedExample, WorkedExampleObjectFactory, IWorkedExampleBackendDict } from
-  'domain/skill/WorkedExampleObjectFactory';
+  ISubtitledHtmlBackendDict, SubtitledHtml, SubtitledHtmlObjectFactory
+} from 'domain/exploration/SubtitledHtmlObjectFactory';
+import {
+  IWorkedExampleBackendDict, WorkedExample, WorkedExampleObjectFactory
+} from 'domain/skill/WorkedExampleObjectFactory';
+
+export interface IConceptCardBackendDict {
+  /* eslint-disable camelcase */
+  explanation: ISubtitledHtmlBackendDict,
+  worked_examples: IWorkedExampleBackendDict[],
+  recorded_voiceovers: IRecordedVoiceoversBackendDict
+  /* eslint-enable camelcase */
+}
 
 export class ConceptCard {
-  _explanation: SubtitledHtml;
-  _workedExamples: Array<WorkedExample>;
-  _recordedVoiceovers: RecordedVoiceovers;
-
   constructor(
-      explanation: SubtitledHtml, workedExamples: Array<WorkedExample>,
-      recordedVoiceovers: RecordedVoiceovers) {
-    this._explanation = explanation;
-    this._workedExamples = workedExamples;
-    this._recordedVoiceovers = recordedVoiceovers;
-  }
+      private explanation: SubtitledHtml,
+      private workedExamples: WorkedExample[],
+      private recordedVoiceovers: RecordedVoiceovers) {}
 
   toBackendDict(): IConceptCardBackendDict {
     return {
-      explanation: this._explanation.toBackendDict(),
-      worked_examples: this._workedExamples.map(
-        (workedExample: WorkedExample) => {
-          return workedExample.toBackendDict();
-        }),
-      recorded_voiceovers: this._recordedVoiceovers.toBackendDict()
+      explanation: this.explanation.toBackendDict(),
+      worked_examples: this.workedExamples.map(e => e.toBackendDict()),
+      recorded_voiceovers: this.recordedVoiceovers.toBackendDict()
     };
   }
 
-  _getElementsInFirstSetButNotInSecond(setA: Set<string>,
-      setB: Set<string>): Array<string> {
-    let diffList = Array.from(setA).filter((element) => {
-      return !setB.has(element);
-    });
-    return diffList;
+  private getSetDifference(setA: Set<string>, setB: Set<string>): string[] {
+    return Array.from(setA).filter(e => !setB.has(e));
   }
 
-  _extractAvailableContentIdsFromWorkedExamples(
-      workedExamples: Array<WorkedExample>): Set<string> {
-    let contentIds: Set<string> = new Set();
+  private getAvailableContentIdsFromWorkedExamples(
+      workedExamples: WorkedExample[]): Set<string> {
+    const contentIds: Set<string> = new Set();
     workedExamples.forEach((workedExample: WorkedExample) => {
       contentIds.add(workedExample.getQuestion().getContentId());
       contentIds.add(workedExample.getExplanation().getContentId());
@@ -79,41 +69,39 @@ export class ConceptCard {
   }
 
   getExplanation(): SubtitledHtml {
-    return this._explanation;
+    return this.explanation;
   }
 
   setExplanation(explanation: SubtitledHtml): void {
-    this._explanation = explanation;
+    this.explanation = explanation;
   }
 
-  getWorkedExamples(): Array<WorkedExample> {
-    return this._workedExamples.slice();
+  getWorkedExamples(): WorkedExample[] {
+    return this.workedExamples.slice();
   }
 
-  setWorkedExamples(workedExamples: Array<WorkedExample>): void {
-    let oldContentIds = this._extractAvailableContentIdsFromWorkedExamples(
-      this._workedExamples);
+  setWorkedExamples(newWorkedExamples: WorkedExample[]): void {
+    const oldContentIds = this.getAvailableContentIdsFromWorkedExamples(
+      this.workedExamples);
 
-    this._workedExamples = workedExamples.slice();
+    this.workedExamples = newWorkedExamples.slice();
+    const newContentIds = this.getAvailableContentIdsFromWorkedExamples(
+      this.workedExamples);
 
-    let newContentIds = this._extractAvailableContentIdsFromWorkedExamples(
-      this._workedExamples);
-
-    let contentIdsToDelete = this._getElementsInFirstSetButNotInSecond(
-      oldContentIds, newContentIds);
-    let contentIdsToAdd = this._getElementsInFirstSetButNotInSecond(
-      newContentIds, oldContentIds);
-
-    for (let i = 0; i < contentIdsToDelete.length; i++) {
-      this._recordedVoiceovers.deleteContentId(contentIdsToDelete[i]);
+    const contentIdsToDelete = (
+      this.getSetDifference(oldContentIds, newContentIds));
+    for (const contentIdToDelete of contentIdsToDelete) {
+      this.recordedVoiceovers.deleteContentId(contentIdToDelete);
     }
-    for (let i = 0; i < contentIdsToAdd.length; i++) {
-      this._recordedVoiceovers.addContentId(contentIdsToAdd[i]);
+
+    const contentIdsToAdd = this.getSetDifference(newContentIds, oldContentIds);
+    for (const contentIdToAdd of contentIdsToAdd) {
+      this.recordedVoiceovers.addContentId(contentIdToAdd);
     }
   }
 
   getRecordedVoiceovers(): RecordedVoiceovers {
-    return this._recordedVoiceovers;
+    return this.recordedVoiceovers;
   }
 }
 
@@ -127,8 +115,8 @@ export class ConceptCardObjectFactory {
           RecordedVoiceoversObjectFactory,
       private workedExampleObjectFactory: WorkedExampleObjectFactory) {}
 
-  _generateWorkedExamplesFromBackendDict(
-      workedExampleDicts): Array<WorkedExample> {
+  private generateWorkedExamplesFromBackendDict(
+      workedExampleDicts): WorkedExample[] {
     return workedExampleDicts.map(
       (workedExampleDict: IWorkedExampleBackendDict) => {
         return this.workedExampleObjectFactory.createFromBackendDict(
@@ -139,7 +127,7 @@ export class ConceptCardObjectFactory {
   // Create an interstitial concept card that would be displayed in the
   // editor until the actual skill is fetched from the backend.
   createInterstitialConceptCard(): ConceptCard {
-    let recordedVoiceoversDict = {
+    const recordedVoiceoversDict = {
       voiceovers_mapping: {
         COMPONENT_NAME_EXPLANATION: {}
       }
@@ -158,7 +146,7 @@ export class ConceptCardObjectFactory {
     return new ConceptCard(
       this.subtitledHtmlObjectFactory.createFromBackendDict(
         conceptCardBackendDict.explanation),
-      this._generateWorkedExamplesFromBackendDict(
+      this.generateWorkedExamplesFromBackendDict(
         conceptCardBackendDict.worked_examples),
       this.recordedVoiceoversObjectFactory.createFromBackendDict(
         conceptCardBackendDict.recorded_voiceovers));
