@@ -78,18 +78,35 @@ var TopicsAndSkillsDashboardPage = function() {
   );
 
   // Returns a promise of all topics with the given name.
-  var _getTopicElements = function(topicName) {
-    return topicsListItems.filter(function(name) {
-      return name.element(by.css('.protractor-test-topic-name')).getText().then(
-        function(elementTopicName) {
-          return (topicName === elementTopicName);
-        });
-    });
+  var _getTopicElements = async function(topicName) {
+    topicsListElems = [];
+    topicsList = await topicsListItems;
+    for (var i = 0; i < topicsList.length; i++) {
+      var name = await topicsList[i].element(
+        by.css('.protractor-test-topic-name')).getText();
+      if (name === topicName) {
+        topicsListElems.push(topicsList[i]);
+      }
+    }
+    return topicsListElems;
   };
 
   this.get = async function() {
-    await browser.get(DASHBOARD_URL);
+    await browser.get('/');
+    var profileDropdown = element(
+      by.css('.protractor-test-profile-dropdown'));
+    await browser.ExpectedConditions.elementToBeClickable(
+      profileDropdown, 'Could not click profile dropdown');
+    await profileDropdown.click();
+    var topicsAndSkillsDashboardLink = element(by.css(
+      '.protractor-test-topics-and-skills-dashboard-link'));
+    await waitFor.elementToBeClickable(
+      topicsAndSkillsDashboardLink,
+      'Could not click on the topics and skills dashboard link');
+    await topicsAndSkillsDashboardLink.click();
     await waitFor.pageToFullyLoad();
+    expect(await browser.getCurrentUrl()).toEqual(
+      'http://localhost:9001/topics_and_skills_dashboard');
   };
 
   this.mergeSkillWithIndexToSkillWithIndex = async function(
@@ -114,23 +131,17 @@ var TopicsAndSkillsDashboardPage = function() {
     await confirmMoveButton.click();
   };
 
-  this.assignSkillWithIndexToTopicByTopicName = function(
+  this.assignSkillWithIndexToTopicByTopicName = async function(
       skillIndex, topicName) {
-    assignSkillToTopicButtons.then(function(elems) {
-      elems[skillIndex].click();
-      topicNamesInTopicSelectModal.then(function(topics) {
-        for (var i = 0; i < topics.length; i++) {
-          (function(topic) {
-            topic.getText().then(function(isTarget) {
-              if (isTarget === topicName) {
-                topic.click();
-                confirmMoveButton.click();
-              }
-            });
-          })(topics[i]);
-        }
-      });
-    });
+    await assignSkillToTopicButtons.get(skillIndex).click();
+    var topicRows = await topicNamesInTopicSelectModal;
+    for (var i = 0; i < topicRows.length; i++) {
+      var isTarget = await topicRows[i].getText();
+      if (isTarget === topicName) {
+        await topicRows[i].click();
+        await confirmMoveButton.click();
+      }
+    }
   };
 
   this.createTopic = async function(topicName, shouldCloseTopicEditor) {
@@ -248,30 +259,26 @@ var TopicsAndSkillsDashboardPage = function() {
     expect(elems.length).toBe(number);
   };
 
-  this.expectTopicNameToBe = function(topicName, index) {
-    topicNames.then(function(elems) {
-      expect(elems[index].getText()).toEqual(topicName);
-    });
+  this.expectTopicNameToBe = async function(topicName, index) {
+    expect(await topicNames.get(index).getText()).toEqual(topicName);
   };
 
-  this.editTopic = function(topicName) {
-    waitFor.elementToBeClickable(
+  this.editTopic = async function(topicName) {
+    await waitFor.elementToBeClickable(
       topicsTabButton, 'Unable to click on topics tab.');
-    _getTopicElements(topicName).then(function(topicElements) {
-      if (topicElements.length === 0) {
-        throw new Error('Could not find topic tile with name ' + topicName);
-      }
-      waitFor.elementToBeClickable(
-        topicElements[0], 'Unable to click on topic: ' + topicName);
-      topicElements[0].click();
-      waitFor.pageToFullyLoad();
-    });
+    var topicElements = await _getTopicElements(topicName);
+    if (topicElements.length === 0) {
+      throw new Error('Could not find topic tile with name ' + topicName);
+    }
+    await waitFor.elementToBeClickable(
+      topicElements[0], 'Unable to click on topic: ' + topicName);
+    await topicElements[0].click();
+    await waitFor.pageToFullyLoad();
   };
 
-  this.expectSkillDescriptionToBe = function(description, index) {
-    skillDescriptions.then(function(elems) {
-      expect(elems[index].getText()).toEqual(description);
-    });
+  this.expectSkillDescriptionToBe = async function(description, index) {
+    var elems = await skillDescriptions;
+    expect(await elems[index].getText()).toEqual(description);
   };
 
   this.expectNumberOfSkillsToBe = async function(number) {
@@ -279,11 +286,11 @@ var TopicsAndSkillsDashboardPage = function() {
     expect(elems.length).toBe(number);
   };
 
-  this.searchSkillByName = function(name) {
-    waitFor.visibilityOf(
+  this.searchSkillByName = async function(name) {
+    await waitFor.visibilityOf(
       searchSkillInput,
       'searchSkillInput takes too long to be visible.');
-    searchSkillInput.sendKeys(name);
+    await searchSkillInput.sendKeys(name);
   };
 };
 

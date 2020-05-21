@@ -156,7 +156,7 @@ var createAndPublishExploration = async function(
   await explorationEditorSettingsTab.setCategory(category);
   await explorationEditorSettingsTab.setObjective(objective);
   if (language) {
-    explorationEditorSettingsTab.setLanguage(language);
+    await explorationEditorSettingsTab.setLanguage(language);
   }
   await explorationEditorPage.saveChanges();
   await publishExploration();
@@ -257,17 +257,17 @@ var getExplorationPlaytesters = async function() {
   return await _getExplorationRoles('viewer');
 };
 
-var createSkillAndAssignTopic = function(
+var createSkillAndAssignTopic = async function(
     skillDescription, material, topicName) {
   var topicsAndSkillsDashboardPage = (
     new TopicsAndSkillsDashboardPage.TopicsAndSkillsDashboardPage());
-  topicsAndSkillsDashboardPage.get();
-  topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
+  await topicsAndSkillsDashboardPage.get();
+  await topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
     skillDescription, material, true);
-  topicsAndSkillsDashboardPage.get();
-  topicsAndSkillsDashboardPage.navigateToUnusedSkillsTab();
-  topicsAndSkillsDashboardPage.searchSkillByName(skillDescription);
-  topicsAndSkillsDashboardPage.assignSkillWithIndexToTopicByTopicName(
+  await topicsAndSkillsDashboardPage.get();
+  await topicsAndSkillsDashboardPage.navigateToUnusedSkillsTab();
+  await topicsAndSkillsDashboardPage.searchSkillByName(skillDescription);
+  await topicsAndSkillsDashboardPage.assignSkillWithIndexToTopicByTopicName(
     0, topicName);
 };
 
