@@ -30,8 +30,8 @@ var customizeComponent = async function(modal, text, skillDescription) {
 };
 
 var expectComponentDetailsToMatch = async function(elem, text, reviewMaterial) {
-  var link = await elem.element(by.tagName('a')).getText();
-  expect(link).toBe(text);
+  var link = await elem.element(by.tagName('a'));
+  expect(await link.getText()).toBe(text);
   await link.click();
   await forms.expectRichText(
     element(by.css('.protractor-test-concept-card-explanation'))
