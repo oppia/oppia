@@ -211,68 +211,68 @@ var ExplorationEditorTranslationTab = function() {
     return nodeElement.element(by.css('.protractor-test-node-label'));
   };
 
-  this.deleteAudioRecord = function() {
-    waitFor.elementToBeClickable(
+  this.deleteAudioRecord = async function() {
+    await waitFor.elementToBeClickable(
       deleteRecordButton,
       'Delete Record button is not clickable');
-    deleteRecordButton.click();
-    waitFor.elementToBeClickable(
+    await deleteRecordButton.click();
+    await waitFor.elementToBeClickable(
       confirmDeleteRecordButton,
       'The confirm record deletion button is not clickable');
-    confirmDeleteRecordButton.click();
-    waitFor.pageToFullyLoad();
+    await confirmDeleteRecordButton.click();
+    await waitFor.pageToFullyLoad();
   };
 
-  this.uploadAudioRecord = function(audioPath) {
-    waitFor.elementToBeClickable(
+  this.uploadAudioRecord = async function(audioPath) {
+    await waitFor.elementToBeClickable(
       uploadAudioButton,
       'Audio Record button is not clickable');
-    uploadAudioButton.click();
+    await uploadAudioButton.click();
     absPath = path.resolve(__dirname, audioPath);
-    waitFor.visibilityOf(
+    await waitFor.visibilityOf(
       audioUploadInput,
       'Audio upload input field is not visible');
     return audioUploadInput.sendKeys(absPath);
   };
 
-  this.saveAudioRecord = function() {
-    waitFor.elementToBeClickable(
+  this.saveAudioRecord = async function() {
+    await waitFor.elementToBeClickable(
       saveUploadedAudioButton,
       'Save uploaded audio button is not clickable');
-    saveUploadedAudioButton.click();
-    waitFor.pageToFullyLoad();
+    await saveUploadedAudioButton.click();
+    await waitFor.pageToFullyLoad();
   };
 
-  this.addAudioRecord = function() {
-    waitFor.elementToBeClickable(
+  this.addAudioRecord = async function() {
+    await waitFor.elementToBeClickable(
       startRecordButton,
       'Add Record button is not clickable');
-    startRecordButton.click();
-    waitFor.pageToFullyLoad();
+    await startRecordButton.click();
+    await waitFor.pageToFullyLoad();
   };
 
-  this.stopAudioRecord = function() {
-    waitFor.elementToBeClickable(
+  this.stopAudioRecord = async function() {
+    await waitFor.elementToBeClickable(
       stopRecordButton,
       'Stop Record button is not clickable');
-    stopRecordButton.click();
-    waitFor.pageToFullyLoad();
+    await stopRecordButton.click();
+    await waitFor.pageToFullyLoad();
   };
 
-  this.confirmAudioRecord = function() {
-    waitFor.elementToBeClickable(
+  this.confirmAudioRecord = async function() {
+    await waitFor.elementToBeClickable(
       confirmRecordButton,
       'Confirm record addition is not clickable');
-    confirmRecordButton.click();
-    waitFor.pageToFullyLoad();
+    await confirmRecordButton.click();
+    await waitFor.pageToFullyLoad();
   };
 
-  this.playAudioRecord = function() {
-    waitFor.elementToBeClickable(
+  this.playAudioRecord = async function() {
+    await waitFor.elementToBeClickable(
       playRecordButton,
       'Play Record button is not clickable');
-    playRecordButton.click();
-    waitFor.pageToFullyLoad();
+    await playRecordButton.click();
+    await waitFor.pageToFullyLoad();
   };
 
   this.setTranslation = async function(richTextInstructions) {
@@ -297,82 +297,79 @@ var ExplorationEditorTranslationTab = function() {
       'State translation editor takes too long to disappear');
   };
 
-  this.expectSaveUploadedAudioButtonToBeDisabled = function() {
-    expect(saveUploadedAudioButton.getAttribute('disabled')).toBe('true');
+  this.expectSaveUploadedAudioButtonToBeDisabled = async function() {
+    expect(await saveUploadedAudioButton.getAttribute('disabled')).toBe(
+      'true');
   };
 
-  this.uploadAudio = function(relativePathOfAudioToUpload) {
+  this.uploadAudio = async function(relativePathOfAudioToUpload) {
     var audioAbsolutePath = path.resolve(
       __dirname, relativePathOfAudioToUpload);
-    audioUploadInput.sendKeys(audioAbsolutePath);
-    waitFor.elementToBeClickable(
+    await audioUploadInput.sendKeys(audioAbsolutePath);
+    await waitFor.elementToBeClickable(
       saveUploadedAudioButton, 'Save button is not clickable');
-    saveUploadedAudioButton.click();
-    waitFor.invisibilityOf(saveUploadedAudioButton,
+    await saveUploadedAudioButton.click();
+    await waitFor.invisibilityOf(saveUploadedAudioButton,
       'Upload Audio modal takes too long to disappear');
   };
 
-  this.expectWrongFileType = function(relativePathOfAudioToUpload) {
+  this.expectWrongFileType = async function(relativePathOfAudioToUpload) {
     var audioAbsolutePath = path.resolve(
       __dirname, relativePathOfAudioToUpload);
-    audioUploadInput.sendKeys(audioAbsolutePath);
-    expect(element(by.css('div.error-message')).getText())
+    await audioUploadInput.sendKeys(audioAbsolutePath);
+    expect(await element(by.css('div.error-message')).getText())
       .toContain('This file is not recognized as an audio file.');
   };
 
-  this.expectAudioOverFiveMinutes = function(relativePathOfAudioToUpload) {
+  this.expectAudioOverFiveMinutes = async function(
+      relativePathOfAudioToUpload) {
     var audioAbsolutePath = path.resolve(
       __dirname, relativePathOfAudioToUpload);
-    audioUploadInput.sendKeys(audioAbsolutePath);
-    waitFor.elementToBeClickable(
+    await audioUploadInput.sendKeys(audioAbsolutePath);
+    await waitFor.elementToBeClickable(
       saveUploadedAudioButton, 'Save button is not clickable');
-    saveUploadedAudioButton.click();
-    waitFor.visibilityOf(audioOverFiveMinutesErrorMessageElement,
+    await saveUploadedAudioButton.click();
+    await waitFor.visibilityOf(audioOverFiveMinutesErrorMessageElement,
       'Error element is not visible');
-    expect(audioOverFiveMinutesErrorMessageElement.getText()).toContain(
+    await expect(audioOverFiveMinutesErrorMessageElement.getText()).toContain(
       'Audio files must be under 300 seconds in length.');
   };
 
-  this.openUploadAudioModal = function() {
-    waitFor.elementToBeClickable(
+  this.openUploadAudioModal = async function() {
+    await waitFor.elementToBeClickable(
       uploadAudioButton, 'Upload Audio button is not clickable');
-    uploadAudioButton.click();
+    await uploadAudioButton.click();
   };
 
-  this.closeUploadAudioModal = function() {
-    waitFor.elementToBeClickable(
+  this.closeUploadAudioModal = async function() {
+    await waitFor.elementToBeClickable(
       closeAudioUploaderModalButton,
       'Close audio uploader modal button is not clickable');
-    closeAudioUploaderModalButton.click();
+    await closeAudioUploaderModalButton.click();
   };
 
-  this.playOrPauseAudioFile = function() {
-    waitFor.visibilityOf(
+  this.playOrPauseAudioFile = async function() {
+    await waitFor.visibilityOf(
       playPauseAudioButton,
       'Play or pause audio button is taking too long to appear');
-    playPauseAudioButton.click();
-    return this._isAudioPlaying();
+    await playPauseAudioButton.click();
+    return await this._isAudioPlaying();
   };
 
-  this._isAudioPlaying = function() {
-    return audioMaterialSliderDiv.getAttribute('aria-valuenow')
-      .then(function(firstValue) {
-        return new Promise(function(resolve, reject) {
-          setTimeout(function() {
-            resolve(firstValue);
-          }, 2000);
-        });
-      }).then(function(firstValue) {
-        return audioMaterialSliderDiv.getAttribute('aria-valuenow')
-          .then(function(secondValue) {
-            if (firstValue && secondValue) {
-              return +firstValue < +secondValue;
-            }
-            return false;
-          });
-      }).then(function(isPlaying) {
-        return isPlaying;
-      });
+  this._isAudioPlaying = async function() {
+    var firstValue = await audioMaterialSliderDiv.getAttribute(
+      'aria-valuenow');
+    firstValue = await new Promise(function(resolve, reject) {
+      setTimeout(function() {
+        resolve(firstValue);
+      }, 2000);
+    });
+    var secondValue = await audioMaterialSliderDiv.getAttribute(
+      'aria-valuenow');
+    if (firstValue && secondValue) {
+      return +firstValue < +secondValue;
+    }
+    return false;
   };
 
   this.expectTranslationToMatch = async function(richTextInstructions) {

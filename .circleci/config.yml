@@ -31,21 +31,20 @@ workflows:
       # - backend_tests:
       #     requires:
       #       - frontend_tests
-      # - e2e_file_upload_features:
-      #     requires:
+      - e2e_file_upload_features:
+          requires:
       #       - typescript_tests
+              - setup
       - e2e_navigation:
           requires:
       #       - typescript_tests
             - setup
       - e2e_classroom_page:
           requires:
-      #       - e2e_file_upload_features
-            - setup
+            - e2e_file_upload_features
       - e2e_topic_and_story_editor:
           requires:
-      #       - e2e_file_upload_features
-              - setup
+            - e2e_file_upload_features
       # - e2e_accessibility:
       #     requires:
       #       - e2e_navigation
