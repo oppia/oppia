@@ -23,10 +23,10 @@ import io
 import os
 
 from core.tests import test_utils
-from . import linter_utils
 
 import python_utils
 
+from . import linter_utils
 from . import third_party_typings_linter
 
 class ThirdPartyTypingsLinterTests(test_utils.GenericTestBase):

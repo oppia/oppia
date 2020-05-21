@@ -26,8 +26,8 @@ import sys
 import python_utils
 from . import linter_utils
 
-_MANIFEST_JSON_FILE_PATH = os.path.join(os.getcwd(), 'manifest.json')
-_PACKAGE_JSON_FILE_PATH = os.path.join(os.getcwd(), 'package.json')
+MANIFEST_JSON_FILE_PATH = os.path.join(os.getcwd(), 'manifest.json')
+PACKAGE_JSON_FILE_PATH = os.path.join(os.getcwd(), 'package.json')
 _TYPE_DEFS_FILE_EXTENSION_LENGTH = len('.d.ts')
 _DEPENDENCY_SOURCE_MANIFEST = 'manifest.json'
 _DEPENDENCY_SOURCE_PACKAGE = 'package.json'
@@ -84,10 +84,10 @@ def check_third_party_libs_type_defs(verbose_mode_enabled):
         failed = False
         summary_messages = []
 
-        with python_utils.open_file(_MANIFEST_JSON_FILE_PATH, 'r') as f:
+        with python_utils.open_file(MANIFEST_JSON_FILE_PATH, 'r') as f:
             manifest = json.load(f)['dependencies']['frontend']
 
-        with python_utils.open_file(_PACKAGE_JSON_FILE_PATH, 'r') as f:
+        with python_utils.open_file(PACKAGE_JSON_FILE_PATH, 'r') as f:
             package = json.load(f)['dependencies']
 
         files_in_typings_dir = os.listdir(
