@@ -305,6 +305,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'playthrough-issues.directive.ts',
     'playthrough.service.ts',
     'Polyfills.ts',
+    'position-of-terms-editor.directive.ts',
     'practice-session-page.controller.ts',
     'practice-tab.directive.ts',
     'preferences-page.controller.ts',
