@@ -21,9 +21,9 @@ require('services/suggestion-modal.service.ts');
 angular.module('oppia').controller(
   'TranslationSuggestionReviewModalController', [
     '$scope', '$uibModalInstance', 'SuggestionModalService',
-    'reviewable', 'translationHtml', 'contentHtml',
+    'contentHtml', 'reviewable', 'translationHtml',
     function($scope, $uibModalInstance, SuggestionModalService,
-        reviewable, translationHtml, contentHtml) {
+        contentHtml, reviewable, translationHtml) {
       $scope.translationHtml = translationHtml;
       $scope.contentHtml = contentHtml;
       $scope.reviewable = reviewable;

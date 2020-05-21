@@ -26,10 +26,10 @@ require(
 require('pages/exploration-editor-page/services/graph-data.service.ts');
 
 angular.module('oppia').controller('ExplorationGraphModalController', [
-  '$controller', '$scope', '$uibModalInstance', 'StateEditorService',
-  'GraphDataService', 'isEditable',
-  function($controller, $scope, $uibModalInstance, StateEditorService,
-      GraphDataService, isEditable) {
+  '$controller', '$scope', '$uibModalInstance', 'GraphDataService',
+  'StateEditorService', 'isEditable',
+  function($controller, $scope, $uibModalInstance, GraphDataService,
+      StateEditorService, isEditable) {
     $controller('ConfirmOrCancelModalController', {
       $scope: $scope,
       $uibModalInstance: $uibModalInstance

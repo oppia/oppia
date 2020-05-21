@@ -23,11 +23,11 @@ require(
 angular.module('oppia').controller('AddHintModalController', [
   '$controller', '$scope', '$uibModalInstance', 'ContextService',
   'GenerateContentIdService', 'HintObjectFactory', 'StateHintsService',
-  'COMPONENT_NAME_HINT', 'existingHintsContentIds',
+  'existingHintsContentIds', 'COMPONENT_NAME_HINT',
   function(
       $controller, $scope, $uibModalInstance, ContextService,
       GenerateContentIdService, HintObjectFactory, StateHintsService,
-      COMPONENT_NAME_HINT, existingHintsContentIds) {
+      existingHintsContentIds, COMPONENT_NAME_HINT) {
     $controller('ConfirmOrCancelModalController', {
       $scope: $scope,
       $uibModalInstance: $uibModalInstance

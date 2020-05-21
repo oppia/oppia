@@ -51,7 +51,7 @@ angular.module('oppia').directive(
         'TranslationLanguageService', 'UserService',
         function(
             $rootScope, $scope, $uibModal,
-            ContributionOpportunitiesService,
+            ContributionOpportunitiesService, TranslateTextService,
             TranslationLanguageService, UserService) {
           var ctrl = this;
           var userIsLoggedIn = false;

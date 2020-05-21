@@ -23,13 +23,15 @@ require(
 angular.module('oppia').controller('AddAnswerGroupModalController', [
   '$controller', '$scope', '$uibModalInstance', 'EditorFirstTimeEventsService',
   'GenerateContentIdService', 'OutcomeObjectFactory', 'RuleObjectFactory',
-  'StateEditorService', 'COMPONENT_NAME_FEEDBACK', 'INTERACTION_SPECS',
-  'addState', 'currentInteractionId', 'existingContentIds', 'stateName',
+  'StateEditorService', 'addState', 'currentInteractionId',
+  'existingContentIds', 'stateName', 'COMPONENT_NAME_FEEDBACK',
+  'INTERACTION_SPECS',
   function(
       $controller, $scope, $uibModalInstance, EditorFirstTimeEventsService,
       GenerateContentIdService, OutcomeObjectFactory, RuleObjectFactory,
-      StateEditorService, COMPONENT_NAME_FEEDBACK, INTERACTION_SPECS,
-      addState, currentInteractionId, existingContentIds, stateName) {
+      StateEditorService, addState, currentInteractionId,
+      existingContentIds, stateName, COMPONENT_NAME_FEEDBACK,
+      INTERACTION_SPECS) {
     $controller('ConfirmOrCancelModalController', {
       $scope: $scope,
       $uibModalInstance: $uibModalInstance

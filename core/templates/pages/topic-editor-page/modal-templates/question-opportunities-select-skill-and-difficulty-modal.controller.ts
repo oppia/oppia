@@ -30,12 +30,12 @@ angular.module('oppia').controller(
   'QuestionsOpportunitiesSelectSkillAndDifficultyModalController', [
     '$controller', '$scope', '$uibModalInstance', 'AlertsService',
     'SkillBackendApiService', 'SkillDifficultyObjectFactory',
-    'SkillObjectFactory', 'DEFAULT_SKILL_DIFFICULTY', 'MODE_SELECT_DIFFICULTY',
-    'skillId',
+    'SkillObjectFactory', 'skillId', 'DEFAULT_SKILL_DIFFICULTY',
+    'MODE_SELECT_DIFFICULTY',
     function($controller, $scope, $uibModalInstance, AlertsService,
         SkillBackendApiService, SkillDifficultyObjectFactory,
-        SkillObjectFactory, DEFAULT_SKILL_DIFFICULTY, MODE_SELECT_DIFFICULTY,
-        skillId) {
+        SkillObjectFactory, skillId, DEFAULT_SKILL_DIFFICULTY,
+        MODE_SELECT_DIFFICULTY) {
       $controller('ConfirmOrCancelModalController', {
         $scope: $scope,
         $uibModalInstance: $uibModalInstance

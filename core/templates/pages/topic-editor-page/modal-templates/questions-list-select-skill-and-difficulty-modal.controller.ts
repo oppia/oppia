@@ -26,16 +26,16 @@ require('domain/skill/SkillDifficultyObjectFactory.ts');
 angular.module('oppia').controller(
   'QuestionsListSelectSkillAndDifficultyModalController', [
     '$controller', '$scope', '$uibModalInstance',
-    'SkillDifficultyObjectFactory', 'DEFAULT_SKILL_DIFFICULTY',
+    'SkillDifficultyObjectFactory', 'allSkillSummaries',
+    'countOfSkillsToPrioritize', 'currentMode', 'linkedSkillsWithDifficulty',
+    'skillIdToRubricsObject', 'DEFAULT_SKILL_DIFFICULTY',
     'MODE_SELECT_DIFFICULTY', 'MODE_SELECT_SKILL',
-    'allSkillSummaries', 'countOfSkillsToPrioritize', 'currentMode',
-    'linkedSkillsWithDifficulty', 'skillIdToRubricsObject',
     function(
         $controller, $scope, $uibModalInstance,
-        SkillDifficultyObjectFactory, DEFAULT_SKILL_DIFFICULTY,
-        MODE_SELECT_DIFFICULTY, MODE_SELECT_SKILL,
-        allSkillSummaries, countOfSkillsToPrioritize, currentMode,
-        linkedSkillsWithDifficulty, skillIdToRubricsObject) {
+        SkillDifficultyObjectFactory, allSkillSummaries,
+        countOfSkillsToPrioritize, currentMode, linkedSkillsWithDifficulty,
+        skillIdToRubricsObject, DEFAULT_SKILL_DIFFICULTY,
+        MODE_SELECT_DIFFICULTY, MODE_SELECT_SKILL,) {
       $controller('ConfirmOrCancelModalController', {
         $scope: $scope,
         $uibModalInstance: $uibModalInstance

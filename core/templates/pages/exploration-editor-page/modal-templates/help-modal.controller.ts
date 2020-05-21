@@ -20,11 +20,9 @@ require('services/context.service.ts');
 require('services/site-analytics.service.ts');
 
 angular.module('oppia').controller('HelpModalController', [
-  '$scope', '$uibModalInstance',
-  'SiteAnalyticsService', 'ContextService',
+  '$scope', '$uibModalInstance', 'ContextService', 'SiteAnalyticsService',
   function(
-      $scope, $uibModalInstance,
-      SiteAnalyticsService, ContextService) {
+      $scope, $uibModalInstance, ContextService, SiteAnalyticsService) {
     var EDITOR_TUTORIAL_MODE = 'editor';
     var TRANSLATION_TUTORIAL_MODE = 'translation';
     var explorationId = (

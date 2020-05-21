@@ -20,10 +20,10 @@ require('services/contextual/url.service.ts');
 
 angular.module('oppia').controller('QuestionPlayerConceptCardModalController', [
   '$controller', '$scope', '$uibModalInstance', '$window',
-  'UrlService', 'skills', 'skillIds',
+  'UrlService', 'skillIds', 'skills',
   function(
       $controller, $scope, $uibModalInstance, $window,
-      UrlService, skills, skillIds) {
+      UrlService, skillIds, skills) {
     $controller('ConfirmOrCancelModalController', {
       $scope: $scope,
       $uibModalInstance: $uibModalInstance

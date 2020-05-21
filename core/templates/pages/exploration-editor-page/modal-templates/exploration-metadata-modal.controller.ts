@@ -34,15 +34,17 @@ require('services/alerts.service.ts');
 
 angular.module('oppia').controller('ExplorationMetadataModalController', [
   '$controller', '$scope', '$timeout', '$uibModalInstance',
-  'AlertsService', 'ExplorationObjectiveService', 'ExplorationTitleService',
-  'ExplorationCategoryService', 'ExplorationStatesService',
-  'ExplorationLanguageCodeService', 'ExplorationTagsService',
-  'ALL_CATEGORIES', 'DEFAULT_LANGUAGE_CODE', 'TAG_REGEX',
+  'AlertsService', 'ExplorationCategoryService',
+  'ExplorationLanguageCodeService', 'ExplorationObjectiveService',
+  'ExplorationStatesService', 'ExplorationTagsService',
+  'ExplorationTitleService', 'ALL_CATEGORIES', 'DEFAULT_LANGUAGE_CODE',
+  'TAG_REGEX',
   function($controller, $scope, $timeout, $uibModalInstance,
-      AlertsService, ExplorationObjectiveService, ExplorationTitleService,
-      ExplorationCategoryService, ExplorationStatesService,
-      ExplorationLanguageCodeService, ExplorationTagsService,
-      ALL_CATEGORIES, DEFAULT_LANGUAGE_CODE, TAG_REGEX) {
+      AlertsService, ExplorationCategoryService,
+      ExplorationLanguageCodeService, ExplorationObjectiveService,
+      ExplorationStatesService, ExplorationTagsService,
+      ExplorationTitleService, ALL_CATEGORIES, DEFAULT_LANGUAGE_CODE,
+      TAG_REGEX) {
     $controller('ConfirmOrCancelModalController', {
       $scope: $scope,
       $uibModalInstance: $uibModalInstance

@@ -62,8 +62,7 @@ angular.module('oppia').directive('questionOpportunities', [
       controllerAs: '$ctrl',
       controller: [
         '$rootScope', '$uibModal', 'AlertsService',
-        'ContributionOpportunitiesService',
-        'QuestionObjectFactory',
+        'ContributionOpportunitiesService', 'QuestionObjectFactory',
         'QuestionUndoRedoService',
         function(
             $rootScope, $uibModal, AlertsService,

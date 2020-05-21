@@ -28,11 +28,11 @@ require('services/alerts.service.ts');
 
 angular.module('oppia').controller('TranslationModalController', [
   '$controller', '$scope', '$uibModalInstance', 'AlertsService',
-  'TranslationLanguageService', 'TranslateTextService', 'opportunity',
+  'TranslateTextService', 'TranslationLanguageService', 'opportunity',
   'userIsLoggedIn',
   function(
       $controller, $scope, $uibModalInstance, AlertsService,
-      TranslationLanguageService, TranslateTextService, opportunity,
+      TranslateTextService, TranslationLanguageService, opportunity,
       userIsLoggedIn) {
     $controller('ConfirmOrCancelModalController', {
       $scope: $scope,

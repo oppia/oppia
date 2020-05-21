@@ -22,9 +22,9 @@ require(
 
 angular.module('oppia').controller('WelcomeModalController', [
   '$controller', '$scope', '$uibModalInstance',
-  'SiteAnalyticsService', 'ContextService', 'UrlInterpolationService',
+  'ContextService', 'SiteAnalyticsService', 'UrlInterpolationService',
   function($controller, $scope, $uibModalInstance,
-      SiteAnalyticsService, ContextService, UrlInterpolationService) {
+      ContextService, SiteAnalyticsService, UrlInterpolationService) {
     $controller('ConfirmOrCancelModalController', {
       $scope: $scope,
       $uibModalInstance: $uibModalInstance

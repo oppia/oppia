@@ -24,12 +24,12 @@ angular.module('oppia').controller(
     '$scope', '$uibModalInstance', 'EditabilityService',
     'SuggestionModalService', 'currentContent',
     'newContent', 'suggestionIsHandled', 'suggestionIsValid',
-    'suggestionStatus', 'unsavedChangesExist', 'threadUibModalInstance',
+    'suggestionStatus', 'threadUibModalInstance', 'unsavedChangesExist',
     function(
         $scope, $uibModalInstance, EditabilityService,
         SuggestionModalService, currentContent,
         newContent, suggestionIsHandled, suggestionIsValid,
-        suggestionStatus, unsavedChangesExist, threadUibModalInstance) {
+        suggestionStatus, threadUibModalInstance, unsavedChangesExist) {
       $scope.isNotHandled = !suggestionIsHandled;
       $scope.canEdit = EditabilityService.isEditable();
       $scope.commitMessage = '';

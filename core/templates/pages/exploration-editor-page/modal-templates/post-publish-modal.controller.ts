@@ -24,11 +24,11 @@ require('domain/utilities/url-interpolation.service.ts');
 require('services/context.service.ts');
 
 angular.module('oppia').controller('PostPublishModalController', [
-  '$controller', '$scope', '$window', '$uibModalInstance',
+  '$controller', '$scope', '$uibModalInstance', '$window',
   'ContextService', 'UrlInterpolationService',
   'DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR',
   function(
-      $controller, $scope, $window, $uibModalInstance,
+      $controller, $scope, $uibModalInstance, $window,
       ContextService, UrlInterpolationService,
       DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR) {
     $controller('ConfirmOrCancelModalController', {
