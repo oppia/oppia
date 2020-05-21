@@ -258,10 +258,10 @@ jobs:
       - merge_target_branch
       - attach_workspace:
           at: /home/circleci/
-      # - run:
-      #     name: Run e2e users test
-      #     command: |
-      #       python -m scripts.run_e2e_tests --skip-install --skip-build --suite="users" --prod_env
+      - run:
+          name: Run e2e users test
+          command: |
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="users" --prod_env
       - run:
           name: Run e2e profile features test
           command: |
