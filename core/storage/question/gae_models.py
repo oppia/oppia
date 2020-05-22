@@ -354,6 +354,16 @@ class QuestionSkillLinkModel(base_models.BaseModel):
 
         question_skill_link_mapping = {}
 
+        # For fetching the questions randomly we have used a random offset.
+        # But this is a temporary solution since this method scales linearly.
+        # Other alternative methods were:
+        # 1) Using a random id in question id filter
+        # 2) Adding an additional column that can be filtered upon.
+        # But these methods are not viable because google datastore limit
+        # inequality filter to atmost one. So we can't filter on both
+        # question_id and difficulty. Please refer to this thread for further
+        # information. https://github.com/oppia/oppia/pull/9061 .
+
         def get_offset(query):
             """Helper function to get the offset."""
             question_count = query.count()
@@ -383,7 +393,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
                     new_question_skill_link_models, question_count_per_skill)
             else:
                 # Fetch QuestionSkillLinkModels with difficulty smaller than
-                # requested difficulty and sort them by decreasing difficulty.
+                # requested difficulty.
                 easier_questions_query = query.filter(
                     cls.skill_difficulty < difficulty_requested)
                 easier_question_skill_link_models = (
@@ -407,8 +417,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
                         easier_question_skill_link_models)
                 else:
                     # Fetch QuestionSkillLinkModels with difficulty larger than
-                    # requested difficulty and sort them by increasing
-                    # difficulty.
+                    # requested difficulty.
                     new_question_skill_link_models.extend(
                         easier_question_skill_link_models)
                     harder_questions_query = query.filter(
