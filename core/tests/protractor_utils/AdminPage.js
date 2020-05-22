@@ -151,57 +151,54 @@ var AdminPage = function() {
     }
   };
 
-  this.startOneOffJob = function(jobName) {
-    this._startOneOffJob(jobName, 0);
+  this.startOneOffJob = async function(jobName) {
+    await this._startOneOffJob(jobName, 0);
   };
 
-  this._startOneOffJob = function(jobName, i) {
-    waitFor.visibilityOf(oneOffJobRows.first(),
+  this._startOneOffJob = async function(jobName, i) {
+    await waitFor.visibilityOf(oneOffJobRows.first(),
       'Starting one off jobs taking too long to appear.');
-    oneOffJobRows.get(i).getText().then((text) => {
-      if (text.toLowerCase().startsWith(jobName.toLowerCase())) {
-        oneOffJobRows.get(i).element(
+    var text = await (await oneOffJobRows.get(i)).getText();
+    if (text.toLowerCase().startsWith(jobName.toLowerCase())) {
+        await (await oneOffJobRows.get(i)).element(
           by.css('.protractor-test-one-off-jobs-start-btn')).click();
-      } else {
-        this._startOneOffJob(jobName, ++i);
-      }
-    });
+    } else {
+      await this._startOneOffJob(jobName, ++i);
+    }
   };
 
-  this.stopOneOffJob = function(jobName) {
-    this._stopOneOffJob(jobName, 0);
+  this.stopOneOffJob = async function(jobName) {
+    await this._stopOneOffJob(jobName, 0);
   };
 
-  this._stopOneOffJob = function(jobName, i) {
-    unfinishedOneOffJobRows.get(i).getText().then((text) => {
-      if (text.toLowerCase().startsWith(jobName.toLowerCase())) {
-        unfinishedOneOffJobRows.get(i).element(
+  this._stopOneOffJob = async function(jobName, i) {
+    var text = await (await unfinishedOneOffJobRows.get(i)).getText();
+    if (text.toLowerCase().startsWith(jobName.toLowerCase())) {
+      await (await unfinishedOneOffJobRows.get(i)).element(
           by.css('.protractor-test-one-off-jobs-stop-btn')).click();
-      } else {
-        this._stopOneOffJob(jobName, ++i);
-      }
-    });
+    } else {
+      await this._stopOneOffJob(jobName, ++i);
+    }
   };
 
-  this.expectNumberOfRunningOneOffJobs = function(count) {
-    element.all(by.css(
-      '.protractor-test-unfinished-one-off-jobs-id')).count().then((len) =>{
-      expect(len).toEqual(count);
-    });
+  this.expectNumberOfRunningOneOffJobs = async function(count) {
+    var len = await element.all(by.css(
+      '.protractor-test-unfinished-one-off-jobs-id')).count();
+    expect(len).toEqual(count);
   };
 
-  this.expectJobToBeRunning = function(jobName) {
-    browser.refresh();
-    waitFor.pageToFullyLoad();
-    waitFor.visibilityOf(element(
+  this.expectJobToBeRunning = async function(jobName) {
+    await browser.refresh();
+    await waitFor.pageToFullyLoad();
+    await waitFor.visibilityOf(element(
       by.css('.protractor-test-unfinished-jobs-card')),
     'Unfinished Jobs taking too long to appear');
-    let unfinishedJobs = unfinishedOffJobIDs.filter((element) => {
-      return element.getText().then((job) => {
-        return job.toLowerCase().startsWith(jobName.toLowerCase());
+    let unfinishedJobs = unfinishedOffJobIDs.filter(
+      async function (element) {
+        var text = await element.getText();
+        return text.toLowerCase().startsWith(jobName.toLowerCase());
       });
-    });
-    unfinishedJobs.get(0).getText((job) => {
+    await (await unfinishedJobs.get(0)).getText((job) => {
       expect(job.toLowerCase().startsWith(jobName.toLowerCase())).toBeTrue();
     });
   };
@@ -224,46 +221,48 @@ var AdminPage = function() {
       'Could not set role successfully');
   };
 
-  this.getUsersAsssignedToRole = function(role) {
-    waitFor.visibilityOf(roleDropdown,
+  this.getUsersAsssignedToRole = async function(role) {
+    await waitFor.visibilityOf(roleDropdown,
       'View role dropdown taking too long to be visible');
-    roleDropdown.sendKeys('By Role');
+    await roleDropdown.sendKeys('By Role');
 
-    roleValueOption.click();
-    roleValueOption.sendKeys(role);
+    await roleValueOption.click();
+    await roleValueOption.sendKeys(role);
 
-    viewRoleButton.click();
+    await viewRoleButton.click();
   };
 
-  this.viewRolesbyUsername = function(username) {
-    waitFor.visibilityOf(roleDropdown,
+  this.viewRolesbyUsername = async function(username) {
+    await waitFor.visibilityOf(roleDropdown,
       'View role dropdown taking too long to be visible');
-    roleDropdown.sendKeys('By Username');
+    await roleDropdown.sendKeys('By Username');
 
-    roleUsernameOption.click();
-    roleUsernameOption.sendKeys(username);
+    await roleUsernameOption.click();
+    await roleUsernameOption.sendKeys(username);
 
-    viewRoleButton.click();
+    await viewRoleButton.click();
   };
 
-  this.expectUsernamesToMatch = function(expectedUsernamesArray) {
+  this.expectUsernamesToMatch = async function(expectedUsernamesArray) {
     var foundUsersArray = [];
-    element.all(by.css('.protractor-test-roles-result-rows'))
-      .map(function(elm) {
-        return elm.getText();
-      })
-      .then(function(texts) {
-        texts.forEach(function(name) {
-          foundUsersArray.push(name);
-        });
-        expect(foundUsersArray.length).toEqual(expectedUsernamesArray.length);
+    var usernames = await element.all(by.css('.protractor-test-roles-result-rows'))
+      .map(async function(elm) {
+        var text = await elm.getText();
+        return text;
+    });
 
-        expectedUsernamesArray.sort();
-        foundUsersArray.sort();
-        foundUsersArray.forEach(function(name, ind) {
-          expect(name).toEqual(expectedUsernamesArray[ind]);
-        });
-      });
+    for (i = 0; i < usernames.length; i++) {
+      var name = usernames[i];
+      foundUsersArray.push(name);
+    };
+    expect(foundUsersArray.length).toEqual(expectedUsernamesArray.length);
+
+    expectedUsernamesArray.sort();
+    foundUsersArray.sort();
+    for (j = 0; j < foundUsersArray.length; j++) {
+      var name = foundUsersArray[j];
+      expect(name).toEqual(expectedUsernamesArray[j]);
+    }
   };
 };
 
