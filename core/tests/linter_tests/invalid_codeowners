@@ -22,8 +22,8 @@
 /core/templates/services/request-interceptor.service*.ts @bansalnitish
 /typings/ @ankita240796
 /tsconfig.json @ankita240796
-
-
+/core/templates/**/*.spec.ts @marianazangrossi
+/core/templates/**/*Spec.ts @marianazangrossi
 # Answer classification team.
 /core/controllers/classifier*.py @prasanna08
 /core/domain/classifier*.py @prasanna08

@@ -113,6 +113,22 @@ class CodeOwnerLinterTests(test_utils.GenericTestBase):
         is_ignored = codeowner_linter.is_path_ignored(path_to_check)
         self.assertFalse(is_ignored)
 
+    def test_is_path_contains_frontend_specs(self):
+        is_contain_frontend_spec_1 = (
+            codeowner_linter.is_path_contains_frontend_specs(
+                '/core/templates/**/*.spec.ts'))
+        is_contain_frontend_spec_2 = (
+            codeowner_linter.is_path_contains_frontend_specs(
+                '/core/templates/**/*Spec.ts'))
+        self.assertTrue(is_contain_frontend_spec_1)
+        self.assertTrue(is_contain_frontend_spec_2)
+
+    def test_is_path_not_contains_frontend_specs(self):
+        is_contain_frontend_spec = (
+            codeowner_linter.is_path_contains_frontend_specs(
+                '/core/templates/**/*.ts'))
+        self.assertFalse(is_contain_frontend_spec)
+
     def test_check_for_important_patterns_at_the_bottom_of_codeowner(self):
         with self.print_swap:
             failed, _ = (
@@ -281,7 +297,7 @@ class CodeOwnerLinterTests(test_utils.GenericTestBase):
 
         with self.print_swap, codeowner_swap:
             summary_messages = (
-                codeowner_linter.check_codeowner_file(FILE_CACHE, False))
+                codeowner_linter.check_codeowner_file(FILE_CACHE, True))
             self.assertFalse(all_checks_passed(summary_messages))
             self.assertTrue(
                 appears_in_linter_stdout(

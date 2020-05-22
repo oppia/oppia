@@ -99,7 +99,7 @@ def is_path_ignored(path_to_check):
     return subprocess.call(command) == 0
 
 
-def _is_path_contains_frontend_specs(path_to_check):
+def is_path_contains_frontend_specs(path_to_check):
     """Checks whether if a path contains all spec files.
 
     Args:
@@ -233,7 +233,7 @@ def check_codeowner_file(file_cache, verbose_mode_enabled):
 
                     # The double asterisks should be allowed only when path
                     # includes all the frontend spec files.
-                    if not _is_path_contains_frontend_specs(line_in_concern):
+                    if not is_path_contains_frontend_specs(line_in_concern):
                         # The double asterisks pattern is supported by the
                         # CODEOWNERS syntax but not the glob in Python 2.
                         # The following condition checks this.
@@ -260,7 +260,7 @@ def check_codeowner_file(file_cache, verbose_mode_enabled):
                     line_in_concern = line_in_concern.replace('/', './', 1)
                     # The checking for path existence won't happen if the path
                     # is getting all the frontend spec files.
-                    if not _is_path_contains_frontend_specs(line_in_concern):
+                    if not is_path_contains_frontend_specs(line_in_concern):
                         if not glob.glob(line_in_concern):
                             summary_message = (
                                 '%s --> Pattern on line %s doesn\'t match '
