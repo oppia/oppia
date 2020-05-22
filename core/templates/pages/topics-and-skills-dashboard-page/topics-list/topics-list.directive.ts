@@ -61,10 +61,10 @@ angular.module('oppia').directive('topicsList', [
             ctrl.selectedIndex = topicId;
           };
 
-          ctrl.getSerialNumber = function(index) {
-            var serialNumber = (
-              index + 1 + ($scope.getPageNumber() * $scope.getItemsPerPage()));
-            return serialNumber;
+          ctrl.getSerialNumberForTopic = function(topicIndex) {
+            var topicSerialNumber = (
+              topicIndex + (ctrl.getPageNumber() * ctrl.getItemsPerPage()));
+            return (topicSerialNumber + 1);
           };
 
           ctrl.deleteTopic = function(topicId) {
@@ -93,6 +93,8 @@ angular.module('oppia').directive('topicsList', [
           };
 
           ctrl.$onInit = function() {
+            ctrl.getPageNumber = $scope.getPageNumber;
+            ctrl.getItemsPerPage = $scope.getItemsPerPage;
             ctrl.selectedIndex = null;
             // As additional stories are not supported initially, it's not
             // being shown, for now.

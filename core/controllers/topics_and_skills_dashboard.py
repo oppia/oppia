@@ -116,6 +116,7 @@ class NewTopicHandler(base.BaseHandler):
     def post(self):
         """Handles POST requests."""
         name = self.payload.get('name')
+        abbreviated_name = self.payload.get('abbreviated_name')
         description = self.payload.get('description')
         category = self.payload.get('category')
         try:
@@ -124,8 +125,8 @@ class NewTopicHandler(base.BaseHandler):
             raise self.InvalidInputException(
                 'Invalid topic name, received %s.' % name)
         new_topic_id = topic_services.get_new_topic_id()
-        topic = topic_domain.Topic.create_topic_from_data(
-            new_topic_id, name, description, category)
+        topic = topic_domain.Topic.create_default_topic(
+            new_topic_id, name, abbreviated_name, description, category)
         topic_services.save_new_topic(self.user_id, topic)
 
         self.render_json({

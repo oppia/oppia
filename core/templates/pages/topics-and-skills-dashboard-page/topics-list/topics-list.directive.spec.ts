@@ -18,12 +18,18 @@
  */
 
 import { UpgradedServices } from 'services/UpgradedServices';
+import {AlertsService} from 'services/alerts.service';
 
 describe('Topics List Directive', function() {
   var $uibModal = null;
   var $scope;
   var ctrl;
+  var $q = null;
+  var $httpBackend = null;
+  var $rootScope = null;
   var directive;
+  var AlertsService;
+
   beforeEach(angular.mock.module('oppia'));
 
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -35,9 +41,12 @@ describe('Topics List Directive', function() {
 
   beforeEach(angular.mock.inject(function($injector) {
     $uibModal = $injector.get('$uibModal');
-    var $rootScope = $injector.get('$rootScope');
+    $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
+    $httpBackend = $injector.get('$httpBackend');
     directive = $injector.get('topicsListDirective')[0];
+    $q = $injector.get('$q');
+    AlertsService = $injector.get('AlertsService');
     ctrl = $injector.instantiate(directive.controller, {
       $rootScope: $scope,
       $scope: $scope,
@@ -83,9 +92,58 @@ describe('Topics List Directive', function() {
     expect(ctrl.showEditOptions(topicId2)).toEqual(false);
   });
 
-  it('should delete a topic', function() {
+  it('should open the delete topic modal', function() {
     var modalSpy = spyOn($uibModal, 'open').and.callThrough();
     ctrl.deleteTopic('dskfm4');
     expect(modalSpy).toHaveBeenCalled();
+  });
+
+  it('should return serial number for topic', function() {
+    ctrl.getPageNumber = function() {
+      return 0;
+    };
+    ctrl.getItemsPerPage = function() {
+      return 10;
+    };
+    expect(ctrl.getSerialNumberForTopic(2)).toEqual(3);
+    ctrl.getPageNumber = function() {
+      return 3;
+    };
+    ctrl.getItemsPerPage = function() {
+      return 15;
+    };
+    expect(ctrl.getSerialNumberForTopic(2)).toEqual(48);
+  });
+
+  it('should delete the topic ', function() {
+    spyOn($uibModal, 'open').and.returnValue({
+      result: $q.resolve()
+    });
+    spyOn($rootScope, '$broadcast');
+
+    var topicId = 'CdjnJUE332dd';
+    var url = `/topic_editor_handler/data/${topicId}`;
+    $httpBackend.expectDELETE(url).respond(200);
+    ctrl.deleteTopic(topicId);
+
+    $httpBackend.flush();
+    expect($rootScope.$broadcast).toHaveBeenCalledWith(
+      'topicsAndSkillsDashboardReinitialized');
+  });
+
+  it('should delete the topic failed', function() {
+    spyOn($uibModal, 'open').and.returnValue({
+      result: $q.resolve()
+    });
+    var alertSpy = spyOn(AlertsService, 'addWarning').and.callThrough();
+
+    var topicId = 'CdjnJUE332dd';
+    var url = `/topic_editor_handler/data/${topicId}`;
+    $httpBackend.expectDELETE(url).respond(400);
+    ctrl.deleteTopic(topicId);
+    $httpBackend.flush();
+
+    expect(alertSpy).toHaveBeenCalledWith(
+      'There was an error when deleting the topic.');
   });
 });

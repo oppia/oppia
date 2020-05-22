@@ -34,7 +34,7 @@ require('components/rubrics-editor/rubrics-editor.directive.ts');
 require('domain/skill/RubricObjectFactory.ts');
 require('domain/skill/SkillObjectFactory.ts');
 require(
-    // eslint-disable-next-line max-len
+  // eslint-disable-next-line max-len
   'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require(

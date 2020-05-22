@@ -472,7 +472,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'topics-and-skills-dashboard-navbar-breadcrumb.directive.ts',
     'topics-and-skills-dashboard-navbar.directive.ts',
     'topics-and-skills-dashboard-page.controller.ts',
-    'topics-list.directive.ts',
     'training-panel.directive.ts',
     'translate-text.service.ts',
     'translation-file-hash-loader.service.ts',

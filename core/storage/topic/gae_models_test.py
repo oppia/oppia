@@ -70,6 +70,8 @@ class TopicModelUnitTests(test_utils.GenericTestBase):
             id=self.TOPIC_ID,
             name=self.TOPIC_NAME,
             abbreviated_name='abbrev',
+            description='description',
+            category='Mathematics',
             canonical_name=self.TOPIC_CANONICAL_NAME,
             subtopic_schema_version=feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION,
             story_reference_schema_version=(
@@ -101,7 +103,9 @@ class TopicModelUnitTests(test_utils.GenericTestBase):
         topic = topic_domain.Topic.create_default_topic(
             topic_id=self.TOPIC_ID,
             name=self.TOPIC_NAME,
-            abbreviated_name='abbrev'
+            abbreviated_name='abbrev',
+            description='description',
+            category='Mathematics'
         )
         topic_services.save_new_topic(feconf.SYSTEM_COMMITTER_ID, topic)
         self.assertEqual(

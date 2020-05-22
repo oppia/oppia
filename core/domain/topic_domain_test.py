@@ -38,7 +38,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.signup('a@example.com', 'A')
         self.signup('b@example.com', 'B')
         self.topic = topic_domain.Topic.create_default_topic(
-            self.topic_id, 'Name', 'abbrev')
+            self.topic_id, 'Name', 'abbrev', 'description', 'Mathematics')
         self.topic.subtopics = [
             topic_domain.Subtopic(
                 1, 'Title', ['skill_id_1'], 'image.svg',
@@ -54,15 +54,15 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
     def test_create_default_topic(self):
         """Tests the create_default_topic() function."""
         topic = topic_domain.Topic.create_default_topic(
-            self.topic_id, 'Name', 'abbrev')
+            self.topic_id, 'Name', 'abbrev', 'description', 'Mathematics')
         expected_topic_dict = {
             'id': self.topic_id,
             'name': 'Name',
             'abbreviated_name': 'abbrev',
-            'category': feconf.DEFAULT_TOPIC_CATEGORY,
+            'category': 'Mathematics',
             'thumbnail_filename': None,
             'thumbnail_bg_color': None,
-            'description': feconf.DEFAULT_TOPIC_DESCRIPTION,
+            'description': 'description',
             'canonical_story_references': [],
             'additional_story_references': [],
             'uncategorized_skill_ids': [],
@@ -75,32 +75,6 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             'version': 0
         }
         self.assertEqual(topic.to_dict(), expected_topic_dict)
-
-    def test_create_topic_from_data(self):
-        """Tests the create_topic_from_data() function."""
-        topic = topic_domain.Topic.create_topic_from_data(
-            self.topic_id, 'Name', 'description1', 'cat1')
-        expected_topic_dict = {
-            'id': self.topic_id,
-            'name': 'Name',
-            'abbreviated_name': '',
-            'category': 'cat1',
-            'thumbnail_filename': None,
-            'thumbnail_bg_color': None,
-            'description': 'description1',
-            'canonical_story_references': [],
-            'additional_story_references': [],
-            'uncategorized_skill_ids': [],
-            'subtopics': [],
-            'next_subtopic_id': 1,
-            'language_code': constants.DEFAULT_LANGUAGE_CODE,
-            'subtopic_schema_version': feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION,
-            'story_reference_schema_version': (
-                feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION),
-            'version': 0
-        }
-        self.assertEqual(topic.to_dict(), expected_topic_dict)
-
 
     def test_get_all_skill_ids(self):
         self.topic.uncategorized_skill_ids = ['skill_id_2', 'skill_id_3']
