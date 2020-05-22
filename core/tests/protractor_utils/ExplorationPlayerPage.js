@@ -82,10 +82,9 @@ var ExplorationPlayerPage = function() {
 
   var audioBar = element(
     by.css('.protractor-test-audio-bar'));
-  //var currentValue = null;
   var audioSelect = element(
     by.css('.audio-language-select'));
-  
+
   this.clickAudioBar = function() {
     waitFor.elementToBeClickable(audioBar,
       'Audio bar taking too long to be clickable');
@@ -106,7 +105,7 @@ var ExplorationPlayerPage = function() {
     expect(pauseBtn.isPresent()).toBeTruthy();
   };
 
-  this.pauseAudio = function() { 
+  this.pauseAudio = function() {
     var pauseBtn = element(
       by.css('.fa-pause-circle'));
     waitFor.elementToBeClickable(pauseBtn,
@@ -114,54 +113,15 @@ var ExplorationPlayerPage = function() {
     pauseBtn.click();
   };
 
-
   this.expectAudioToBePaused = function() {
     var playBtn = element(
       by.css('.fa-play-circle'));
     expect(playBtn.isPresent()).toBeTruthy();
   };
 
-  /*
-  this.forwardAudio = function() { 
-    var audioSlider = element(
-      by.css('.md-slider-wrapper'));
-    currentValue = audioSlider.getAttribute('aria-valuenow');
-    var fwdButton = element(
-      by.css('.audio-undo-icon-forward'));
-    waitFor.elementToBeClickable(fwdButton,
-      'Forward Button taking too long to be clickable');
-    fwdButton.click();
-  };
-
-  this.expectAudioToBeForwarded = function() {
-    var audioSlider = element(
-      by.css('.md-slider-wrapper'));
-    var theVal = audioSlider.getAttribute('aria-valuenow');
-    expect(theVal < currentValue).toBeTruthy();
-  };
-
-  this.rewindAudio = function() {
-    var audioSlider = element(
-      by.css('.md-slider-wrapper'));
-    currentValue = audioSlider.getAttribute('aria-valuenow');
-    var rewindButton = element(
-      by.css('.audio-undo-icon-forward'));
-    waitFor.elementToBeClickable(rewindButton,
-      'Rewind Button taking too long to be clickable');
-    rewindButton.click();
-  };
-
-  this.expectAudioToBeRewinded = function() {
-    var audioSlider = element(
-      by.css('.md-slider-wrapper'));
-    var theVal = audioSlider.getAttribute('aria-valuenow');
-    expect(theVal > currentValue).toBeTruthy();
-  };
-  */
-
   this.changeLanguage = function(lang) {
     audioSelect.value = lang;
-  }
+  };
 
   this.clickThroughToNextCard = function() {
     waitFor.elementToBeClickable(

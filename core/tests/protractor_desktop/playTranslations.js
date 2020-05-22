@@ -25,9 +25,9 @@ var ExplorationEditorPage =
     require('../protractor_utils/ExplorationEditorPage.js');
 var CreatorDashboardPage =
     require('../protractor_utils/CreatorDashboardPage.js');
-var ExplorationPlayerPage = 
+var ExplorationPlayerPage =
     require('../protractor_utils/ExplorationPlayerPage.js');
-var LibraryPage = 
+var LibraryPage =
     require('../protractor_utils/LibraryPage.js');
 
 describe('Test Translations', function() {
@@ -99,7 +99,6 @@ describe('Test Translations', function() {
     explorationEditorTranslationTab.uploadAudio(
       '../data/cafe.mp3');
     explorationEditorPage.saveChanges('Added another translation');
-    //workflow.publishExploration();
     libraryPage.get();
     libraryPage.playExploration('Test Translations');
     browser.refresh();
@@ -111,5 +110,4 @@ describe('Test Translations', function() {
     explorationPlayerPage.playAudio();
     explorationPlayerPage.expectAudioToBePlaying();
   });
-
 });
