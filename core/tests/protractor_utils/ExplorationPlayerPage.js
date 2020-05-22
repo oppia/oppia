@@ -248,7 +248,7 @@ var ExplorationPlayerPage = function() {
   };
 
   this.expectExplorationRatingOnInformationCardToEqual = async function(
-    ratingValue) {
+      ratingValue) {
     await explorationInfoIcon.click();
     var value = await infoCardRating.getText();
     expect(value).toBe(ratingValue);

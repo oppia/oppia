@@ -98,8 +98,8 @@ var AdminPage = function() {
           await general.acceptAlert();
           // Time is needed for the reloading to complete.
           await waitFor.textToBePresentInElement(
-              statusMessage, 'Data reloaded successfully.',
-              'Exploration could not be reloaded');
+            statusMessage, 'Data reloaded successfully.',
+            'Exploration could not be reloaded');
           return true;
         }
       });
