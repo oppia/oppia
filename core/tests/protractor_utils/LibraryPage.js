@@ -164,20 +164,18 @@ var LibraryPage = function() {
       '.protractor-test-exp-summary-tile-objective')).getText();
   };
 
-  this.expectExplorationRatingToEqual = function(name, ratingValue) {
-    _getExplorationElements(name).then(function(elems) {
-      waitFor.visibilityOf(elems[0], 'Rating card takes too long to appear');
-      elems[0].element(by.css(
-        '.protractor-test-exp-summary-tile-rating'
-      )).getText().then(function(value) {
-        expect(value).toBe(ratingValue);
-      });
-    });
+  this.expectExplorationRatingToEqual = async function(name, ratingValue) {
+    var elems = await _getExplorationElements(name);
+    await waitFor.visibilityOf(
+      elems[0], 'Rating card takes too long to appear');
+    var value = await elems[0].element(by.css(
+      '.protractor-test-exp-summary-tile-rating')).getText();
+    expect(value).toBe(ratingValue);
   };
 
-  this.clickCreateActivity = function() {
-    createActivityButton.click();
-    waitFor.pageToFullyLoad();
+  this.clickCreateActivity = async function() {
+    await createActivityButton.click();
+    await waitFor.pageToFullyLoad();
   };
 
   this.clickExplorationObjective = async function() {
