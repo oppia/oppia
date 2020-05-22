@@ -308,7 +308,6 @@
 	"I18N_SIGNUP_EMAIL_PREFERENCES_EXPLAIN": "Puedes camudar esta configuración en cualquier momentu dende la páxina de Preferencies.",
 	"I18N_SIGNUP_ERROR_MUST_AGREE_TO_TERMS": "Pa poder editar les esploraciones d'esti sitiu, tienes d'aceptar les condiciones del mesmu.",
 	"I18N_SIGNUP_ERROR_NO_USERNAME": "Escribe un nome d'usuariu.",
-	"I18N_SIGNUP_ERROR_USERNAME_MORE_50_CHARS": "Un nome d'usuariu puede tener 50 caráuteres como muncho.",
 	"I18N_SIGNUP_ERROR_USERNAME_NOT_AVAILABLE": "El nome d'usuariu nun ta disponible.",
 	"I18N_SIGNUP_ERROR_USERNAME_ONLY_ALPHANUM": "Los nomes d'usuariu namái pueden contener caráuteres alfanuméricos.",
 	"I18N_SIGNUP_ERROR_USERNAME_TAKEN": "Sentímoslo, esti usuariu yá ta siendo utilizáu.",
