@@ -216,10 +216,10 @@ describe('Static Pages Tour', function() {
   });
 
   it('visits the Welcome Guide Page', function() {
-    browser.get('/welcome_guide');
-    waitFor.pageToFullyLoad();
+    element(by.css('.protractor-test-welcome-guide-page')).click();
+    waitFor.visibilityOf(element(by.css(".oppia-welcome-guide-top-section")));
     expect(element(
-      by.css('.protractor-test-welcome-guide-page')).isPresent()).toBe(true);
+      by.css('.oppia-welcome-guide-top-section')).isPresent()).toBe(true);
   });
 
   it('shows the error page when an incorrect url is given', function() {
