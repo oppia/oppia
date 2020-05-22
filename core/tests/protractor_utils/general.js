@@ -21,8 +21,8 @@ var ExplorationEditorPage = require(
   '../protractor_utils/ExplorationEditorPage.js');
 var waitFor = require('./waitFor.js');
 
-var scrollToTop = function() {
-  browser.executeScript('window.scrollTo(0,0);');
+var scrollToTop = async function() {
+  await browser.executeScript('window.scrollTo(0,0);');
 };
 
 // We will report all console logs of level greater than this.
@@ -95,51 +95,52 @@ var getExplorationIdFromPlayer = async function() {
 };
 
 // The explorationId here should be a string, not a promise.
-var openEditor = function(explorationId) {
-  browser.get(EDITOR_URL_SLICE + explorationId);
-  waitFor.pageToFullyLoad();
+var openEditor = async function(explorationId) {
+  await browser.get(EDITOR_URL_SLICE + explorationId);
+  await waitFor.pageToFullyLoad();
   var explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
   var explorationEditorMainTab = explorationEditorPage.getMainTab();
-  explorationEditorMainTab.exitTutorial();
+  await explorationEditorMainTab.exitTutorial();
 };
 
-var openPlayer = function(explorationId) {
-  browser.get(PLAYER_URL_SLICE + explorationId);
-  waitFor.pageToFullyLoad();
+var openPlayer = async function(explorationId) {
+  await browser.get(PLAYER_URL_SLICE + explorationId);
+  await waitFor.pageToFullyLoad();
 };
 
 // Takes the user from an exploration editor to its player.
 // NOTE: we do not use the preview button because that will open a new window.
-var moveToPlayer = function() {
-  getExplorationIdFromEditor().then(openPlayer);
+var moveToPlayer = async function() {
+  var explorationId = await getExplorationIdFromEditor();
+  await openPlayer(explorationId);
 };
 
 // Takes the user from the exploration player to its editor.
-var moveToEditor = function() {
-  getExplorationIdFromPlayer().then(openEditor);
+var moveToEditor = async function() {
+  var explorationId = await getExplorationIdFromPlayer();
+  await openEditor(explorationId);
 };
 
-var expect404Error = function() {
-  expect(element(by.css('.protractor-test-error-container')).getText()).
+var expect404Error = async function() {
+  expect(await element(by.css('.protractor-test-error-container')).getText()).
     toMatch('Error 404');
 };
 
 // Checks no untranslated values are shown in the page.
-var ensurePageHasNoTranslationIds = function() {
+var ensurePageHasNoTranslationIds = async function() {
   // The use of the InnerHTML is hacky, but is faster than checking each
   // individual component that contains text.
-  element(by.css('.oppia-base-container')).getAttribute('innerHTML').then(
-    function(promiseValue) {
-      // First remove all the attributes translate and variables that are
-      // not displayed
-      var REGEX_TRANSLATE_ATTR = new RegExp('translate="I18N_', 'g');
-      var REGEX_NG_VARIABLE = new RegExp('<\\[\'I18N_', 'g');
-      var REGEX_NG_TOP_NAV_VISIBILITY =
-        new RegExp('ng-show="\\$ctrl.navElementsVisibilityStatus.I18N_', 'g');
-      expect(promiseValue.replace(REGEX_TRANSLATE_ATTR, '')
-        .replace(REGEX_NG_VARIABLE, '')
-        .replace(REGEX_NG_TOP_NAV_VISIBILITY, '')).not.toContain('I18N');
-    });
+  var promiseValue = await element(by.css(
+    '.oppia-base-container')).getAttribute('innerHTML');
+  // First remove all the attributes translate and variables that are
+  // not displayed
+  var REGEX_TRANSLATE_ATTR = new RegExp('translate="I18N_', 'g');
+  var REGEX_NG_VARIABLE = new RegExp('<\\[\'I18N_', 'g');
+  var REGEX_NG_TOP_NAV_VISIBILITY = (
+    new RegExp('ng-show="\\$ctrl.navElementsVisibilityStatus.I18N_', 'g'));
+  expect(promiseValue.replace(REGEX_TRANSLATE_ATTR, '')
+    .replace(REGEX_NG_VARIABLE, '')
+    .replace(REGEX_NG_TOP_NAV_VISIBILITY, '')).not.toContain('I18N');
 };
 
 var acceptAlert = async function() {

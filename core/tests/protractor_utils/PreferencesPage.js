@@ -56,8 +56,8 @@ var PreferencesPage = function() {
   var profilePhotoUploadError = element(
     by.css('.protractor-test-upload-error'));
 
-  this.expectUploadError = function() {
-    expect(profilePhotoUploadError.isDisplayed()).toBe(true);
+  this.expectUploadError = async function() {
+    expect(await profilePhotoUploadError.isDisplayed()).toBe(true);
   };
 
   this.uploadProfilePhoto = async function(imgPath) {
@@ -66,7 +66,7 @@ var PreferencesPage = function() {
 
   this.submitProfilePhoto = async function(imgPath) {
     return await workflow.submitImage(
-     profilePhotoClickable, profilePhotoCropper, imgPath);
+      profilePhotoClickable, profilePhotoCropper, imgPath);
   };
 
   this.getProfilePhotoSource = async function() {
@@ -81,7 +81,7 @@ var PreferencesPage = function() {
 
   this.get = async function() {
     await browser.get(USER_PREFERENCES_URL);
-    //return await waitFor.pageToFullyLoad();
+    await waitFor.pageToFullyLoad();
   };
 
   this.toggleEditorRoleEmailsCheckbox = async function() {
@@ -96,9 +96,8 @@ var PreferencesPage = function() {
     await systemLanguageSelector.click();
     var options = element.all(by.css('.select2-dropdown li')).filter(
       async function(elem) {
-        return await elem.getText().then(function(text) {
-          return text === language;
-        });
+        var text = await elem.getText();
+        return text === language;
       });
     await options.first().click();
   };
@@ -107,9 +106,8 @@ var PreferencesPage = function() {
     await preferredAudioLanguageSelector.click();
     var correctOptions = languageOptionsList.all(by.tagName('li')).filter(
       async function(elem) {
-        return await elem.getText().then(function(text) {
-          return text === language;
-        });
+        var text = await elem.getText();
+        return text === language;
       });
     await correctOptions.first().click();
   };
@@ -123,10 +121,9 @@ var PreferencesPage = function() {
 
   this.setUserInterests = async function(interests) {
     await userInterestsInput.click();
-    await interests.forEach(async function(interest) {
-      await userInterestsInput.sendKeys(interest);
-      await userInterestsInput.sendKeys(protractor.Key.RETURN);
-    });
+    await Promise.all(interests.map(async function(interest) {
+      await userInterestsInput.sendKeys(interest, protractor.Key.RETURN);
+    }));
   };
 
   this.isFeedbackEmailsCheckboxSelected = async function() {

@@ -38,100 +38,107 @@ describe('Topics and skills dashboard functionality', function() {
   var explorationEditorMainTab = null;
 
   beforeAll(async function() {
-    topicsAndSkillsDashboardPage =
-      new TopicsAndSkillsDashboardPage.TopicsAndSkillsDashboardPage();
-    skillEditorPage =
-      new SkillEditorPage.SkillEditorPage();
-    topicEditorPage =
-      new TopicEditorPage.TopicEditorPage();
+    topicsAndSkillsDashboardPage = (
+      new TopicsAndSkillsDashboardPage.TopicsAndSkillsDashboardPage());
+    skillEditorPage = new SkillEditorPage.SkillEditorPage();
+    topicEditorPage = new TopicEditorPage.TopicEditorPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
-    await users.createAdmin('creator@topicsAndSkillsDashboard.com',
-      'creatorTopicsAndSkillsDashboard');
+    await users.createAdmin(
+      'creator@topicsAndSkillsDashboard.com',
+      'creatorTopicsAndSkillsDB');
   });
 
   beforeEach(async function() {
     await users.login('creator@topicsAndSkillsDashboard.com');
-    topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.get();
   });
 
   it('should add a new topic to list', async function() {
-    topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(0);
-    topicsAndSkillsDashboardPage.createTopic('Topic 1', true);
+    await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(0);
+    await topicsAndSkillsDashboardPage.createTopic('Topic 1', true);
 
-    topicsAndSkillsDashboardPage.get();
-    topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(1);
+    await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(1);
   });
 
   it('should move published skill to unused skills section', async function() {
-    topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
-      'Skill 2', 'Concept card explanation', true);
-    topicsAndSkillsDashboardPage.get();
-    topicsAndSkillsDashboardPage.navigateToUnusedSkillsTab();
-    topicsAndSkillsDashboardPage.expectNumberOfSkillsToBe(1);
+    await topicsAndSkillsDashboardPage
+      .createSkillWithDescriptionAndExplanation(
+        'Skill 2', 'Concept card explanation', true);
+    await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.navigateToUnusedSkillsTab();
+    await topicsAndSkillsDashboardPage.expectNumberOfSkillsToBe(1);
   });
 
   it('should move skill to a topic', async function() {
-    topicsAndSkillsDashboardPage.navigateToUnusedSkillsTab();
-    topicsAndSkillsDashboardPage.assignSkillWithIndexToTopic(0, 0);
-    topicsAndSkillsDashboardPage.get();
-    topicsAndSkillsDashboardPage.navigateToTopicWithIndex(0);
-    topicEditorPage.moveToSubtopicsTab();
-    topicEditorPage.expectNumberOfUncategorizedSkillsToBe(1);
+    await topicsAndSkillsDashboardPage.navigateToUnusedSkillsTab();
+    await topicsAndSkillsDashboardPage.assignSkillWithIndexToTopic(0, 0);
+    await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.navigateToTopicWithIndex(0);
+    await topicEditorPage.moveToSubtopicsTab();
+    await topicEditorPage.expectNumberOfUncategorizedSkillsToBe(1);
   });
 
   it('should merge an outside skill with one in a topic', async function() {
     var handle = await browser.getWindowHandle();
-    topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
-      'Skill to be merged', 'Concept card explanation', false);
-    skillEditorPage.moveToQuestionsTab();
-    skillEditorPage.clickCreateQuestionButton();
-    skillEditorPage.confirmSkillDifficulty();
-    explorationEditorMainTab.setContent(forms.toRichText('Question 1'));
-    explorationEditorMainTab.setInteraction('TextInput', 'Placeholder', 5);
-    explorationEditorMainTab.addResponse(
-      'TextInput', forms.toRichText('Correct Answer'), null, false,
+    await topicsAndSkillsDashboardPage
+      .createSkillWithDescriptionAndExplanation(
+        'Skill to be merged', 'Concept card explanation', false);
+    await skillEditorPage.moveToQuestionsTab();
+    await skillEditorPage.clickCreateQuestionButton();
+    await skillEditorPage.confirmSkillDifficulty();
+    await explorationEditorMainTab.setContent(
+      await forms.toRichText('Question 1'));
+    await explorationEditorMainTab.setInteraction(
+      'TextInput', 'Placeholder', 5);
+    await explorationEditorMainTab.addResponse(
+      'TextInput', await forms.toRichText('Correct Answer'), null, false,
       'FuzzyEquals', 'correct');
-    explorationEditorMainTab.getResponseEditor(0).markAsCorrect();
-    explorationEditorMainTab.addHint('Hint 1');
-    explorationEditorMainTab.addSolution('TextInput', {
+    var responseEditor = await explorationEditorMainTab.getResponseEditor(0);
+    await responseEditor.markAsCorrect();
+    await explorationEditorMainTab.addHint('Hint 1');
+    await explorationEditorMainTab.addSolution('TextInput', {
       correctAnswer: 'correct',
       explanation: 'It is correct'
     });
-    skillEditorPage.saveQuestion();
-    general.closeCurrentTabAndSwitchTo(handle);
-    topicsAndSkillsDashboardPage.get();
-    topicsAndSkillsDashboardPage.navigateToUnusedSkillsTab();
-    topicsAndSkillsDashboardPage.mergeSkillWithIndexToSkillWithIndex(0, 0);
-    topicsAndSkillsDashboardPage.navigateToTopicWithIndex(0);
-    topicEditorPage.moveToQuestionsTab();
-    topicEditorPage.expectNumberOfQuestionsForSkillWithDescriptionToBe(
+    await skillEditorPage.saveQuestion();
+    await general.closeCurrentTabAndSwitchTo(handle);
+    await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.navigateToUnusedSkillsTab();
+    await topicsAndSkillsDashboardPage.mergeSkillWithIndexToSkillWithIndex(
+      0, 0);
+    await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.navigateToTopicWithIndex(0);
+    await topicEditorPage.moveToQuestionsTab();
+    await topicEditorPage.expectNumberOfQuestionsForSkillWithDescriptionToBe(
       1, 'Skill 2');
   });
 
   it('should remove a skill from list once deleted', async function() {
-    topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
-      'Skill to be deleted', 'Concept card explanation', true);
-    topicsAndSkillsDashboardPage.get();
-    topicsAndSkillsDashboardPage.navigateToUnusedSkillsTab();
-    topicsAndSkillsDashboardPage.expectNumberOfSkillsToBe(1);
-    topicsAndSkillsDashboardPage.deleteSkillWithIndex(0);
+    await topicsAndSkillsDashboardPage
+      .createSkillWithDescriptionAndExplanation(
+        'Skill to be deleted', 'Concept card explanation', true);
+    await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.navigateToUnusedSkillsTab();
+    await topicsAndSkillsDashboardPage.expectNumberOfSkillsToBe(1);
+    await topicsAndSkillsDashboardPage.deleteSkillWithIndex(0);
 
-    topicsAndSkillsDashboardPage.get();
-    topicsAndSkillsDashboardPage.navigateToUnusedSkillsTab();
-    topicsAndSkillsDashboardPage.expectNumberOfSkillsToBe(0);
+    await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.navigateToUnusedSkillsTab();
+    await topicsAndSkillsDashboardPage.expectNumberOfSkillsToBe(0);
   });
 
   it('should remove a topic from list once deleted', async function() {
-    topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(1);
-    topicsAndSkillsDashboardPage.deleteTopicWithIndex(0);
+    await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(1);
+    await topicsAndSkillsDashboardPage.deleteTopicWithIndex(0);
 
-    topicsAndSkillsDashboardPage.get();
-    topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(0);
+    await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(0);
   });
 
   afterEach(async function() {
-    general.checkForConsoleErrors([]);
+    await general.checkForConsoleErrors([]);
     await users.logout();
   });
 });

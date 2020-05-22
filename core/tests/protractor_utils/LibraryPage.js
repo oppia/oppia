@@ -70,7 +70,8 @@ var LibraryPage = function() {
 
     // get function is a zero-based index.
     var searchInput = (
-      browser.isMobile ? searchInputs.get(1) : searchInputs.first());
+      browser.isMobile ? await searchInputs.get(1) :
+      await searchInputs.first());
     await searchInput.clear();
     await searchInput.sendKeys(searchQuery);
   };
@@ -97,8 +98,8 @@ var LibraryPage = function() {
     await languageSelector.selectValues(languages);
   };
 
-  this.deselectLanguages = function(languages) {
-    languageSelector.deselectValues(languages);
+  this.deselectLanguages = async function(languages) {
+    await languageSelector.deselectValues(languages);
   };
 
   this.expectCurrentLanguageSelectionToBe = async function(expectedLanguages) {
@@ -109,8 +110,8 @@ var LibraryPage = function() {
     await categorySelector.selectValues(categories);
   };
 
-  this.deselectCategories = function(categories) {
-    categorySelector.deselectValues(categories);
+  this.deselectCategories = async function(categories) {
+    await categorySelector.deselectValues(categories);
   };
 
   this.expectCurrentCategorySelectionToBe = async function(
@@ -118,8 +119,8 @@ var LibraryPage = function() {
     await categorySelector.expectCurrentSelectionToBe(expectedCategories);
   };
 
-  this.expectMainHeaderTextToBe = function(expectedHeaderText) {
-    expect(mainHeader.getText()).toEqual(expectedHeaderText);
+  this.expectMainHeaderTextToBe = async function(expectedHeaderText) {
+    expect(await mainHeader.getText()).toEqual(expectedHeaderText);
   };
 
   this.expectExplorationToBeVisible = async function(name) {
@@ -127,10 +128,9 @@ var LibraryPage = function() {
     expect(elems.length).not.toBe(0);
   };
 
-  this.expectExplorationToBeHidden = function(name) {
-    _getExplorationElements(name).then(function(elems) {
-      expect(elems.length).toBe(0);
-    });
+  this.expectExplorationToBeHidden = async function(name) {
+    var elems = await _getExplorationElements(name);
+    expect(elems.length).toBe(0);
   };
 
   this.playCollection = async function(collectionName) {
@@ -148,21 +148,20 @@ var LibraryPage = function() {
   this.playExploration = async function(explorationName) {
     await waitFor.pageToFullyLoad();
     await waitFor.visibilityOf(
-      allExplorationSummaryTile.first(),
+      await allExplorationSummaryTile.first(),
       'Library Page does not have any explorations');
+
+    var explorationCard = await allExplorationsTitled(explorationName).first();
     await waitFor.visibilityOf(
-      allExplorationsTitled(explorationName).first(),
-      'Unable to find exploration ' + explorationName);
-    await allExplorationsTitled(explorationName).first().click();
+      explorationCard, 'Unable to find exploration ' + explorationName);
+    await explorationCard.click();
     await waitFor.pageToFullyLoad();
   };
 
-  this.getExplorationObjective = function(name) {
-    return _getExplorationElements(name).then(function(elems) {
-      return elems[0].element(by.css(
-        '.protractor-test-exp-summary-tile-objective'
-      )).getText();
-    });
+  this.getExplorationObjective = async function(name) {
+    var elems = await _getExplorationElements(name);
+    return await elems[0].element(by.css(
+      '.protractor-test-exp-summary-tile-objective')).getText();
   };
 
   this.expectExplorationRatingToEqual = function(name, ratingValue) {
@@ -181,11 +180,11 @@ var LibraryPage = function() {
     waitFor.pageToFullyLoad();
   };
 
-  this.clickExplorationObjective = function() {
-    waitFor.elementToBeClickable(
+  this.clickExplorationObjective = async function() {
+    await waitFor.elementToBeClickable(
       explorationObjective,
       'Exploration Objective takes too long to be clickable');
-    explorationObjective.click();
+    await explorationObjective.click();
   };
 
   this.findExploration = async function(explorationTitle) {

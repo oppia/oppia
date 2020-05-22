@@ -20,55 +20,15 @@ var waitFor = require('../protractor_utils/waitFor.js');
 var ThanksPage = require('../protractor_utils/ThanksPage.js');
 var GetStartedPage = require('../protractor_utils/GetStartedPage.js');
 
-describe('Oppia static pages tour', function() {
-  var thanksPage = null;
-
-  beforeEach(async function() {
-    await browser.driver.get('about:blank');
-    await browser.get(general.SERVER_URL_PREFIX);
-    await waitFor.pageToFullyLoad();
-  });
-
-  it('visits the links in About dropdown', async function() {
-    var LINKS_CLASS_NAMES = [
-      '.protractor-test-about-link',
-      '.protractor-test-get-started-link',
-      '.protractor-test-playbook-link'
-    ];
-
-    for (i = 0; i++; i < LINKS_CLASS_NAMES.length) {
-      var className = LINKS_CLASS_NAMES[i];
-      var dropdown = element(by.css('.protractor-test-about-oppia-list-item'));
-      await browser.actions().mouseMove(dropdown).perform();
-      await dropdown.element(by.css(className)).click();
-      await waitFor.pageToFullyLoad();
-    }
-  });
-
-  it('visits the donate link', async function() {
-    await element(by.css('.protractor-test-donate-link')).click();
-    await waitFor.pageToFullyLoad();
-  });
-
-  it('visits the thanks for donating page', async function() {
-    thanksPage = new ThanksPage.ThanksPage();
-    thanksPage.get();
-    await waitFor.pageToFullyLoad();
-  });
-
-  it('visits the terms page', async function() {
-    browser.ignoresynchronisation = true;
-    await element(by.css('.protractor-test-terms-link')).click();
-    await waitFor.pageToFullyLoad();
-  });
-
-  it('visits the privacy page', async function() {
-    await element(by.css('.protractor-test-privacy-policy-link')).click();
-    await waitFor.pageToFullyLoad();
-  });
-
+describe('Oppia landing pages tour', function() {
   it('visits the Fractions landing page', async function() {
     await browser.get('/fractions');
+    await waitFor.pageToFullyLoad();
+
+    await browser.get('/learn/maths/fractions');
+    await waitFor.pageToFullyLoad();
+
+    await browser.get('/math/fractions');
     await waitFor.pageToFullyLoad();
   });
 
@@ -97,18 +57,8 @@ describe('Oppia static pages tour', function() {
     await waitFor.pageToFullyLoad();
   });
 
-  afterEach(function() {
-    general.checkForConsoleErrors([
-      // TODO(Jacob): Remove when
-      // https://code.google.com/p/google-cast-sdk/issues/detail?id=309 is fixed
-      'cast_sender.js - Failed to load resource: net::ERR_FAILED',
-      'Uncaught ReferenceError: ytcfg is not defined',
-      // TODO(pranavsid98): This error is caused by the upgrade from Chrome 60
-      // to Chrome 61. Chrome version at time of recording this is 61.0.3163.
-      'chrome-extension://invalid/ - Failed to load resource: net::ERR_FAILED',
-      'Error parsing header X-XSS-Protection: 1; mode=block; ' +
-      'report=https:\/\/www.google.com\/appserve\/security-bugs\/log\/youtube:',
-    ]);
+  afterEach(async function() {
+    await general.checkForConsoleErrors([]);
   });
 });
 

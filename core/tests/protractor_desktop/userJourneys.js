@@ -37,7 +37,7 @@ var _selectLanguage = async function(language) {
   await element(by.css('.protractor-test-i18n-language-selector'))
     .element(by.cssContainingText('option', language)).click();
   // Wait for the language-change request to reach the backend.
-  waitFor.pageToFullyLoad();
+  await waitFor.pageToFullyLoad();
 };
 
 
@@ -45,7 +45,7 @@ describe('Basic user journeys', function() {
   describe('Account creation', function() {
     var libraryPage = null;
 
-    beforeEach(async function() {
+    beforeAll(async function() {
       libraryPage = new LibraryPage.LibraryPage();
     });
 
@@ -54,11 +54,11 @@ describe('Basic user journeys', function() {
         'ordinaryuser@userManagement.com', 'ordinaryUserManagement');
 
       await users.login('ordinaryuser@userManagement.com');
-      libraryPage.get();
-      general.checkForConsoleErrors([]);
+      await libraryPage.get();
+      await general.checkForConsoleErrors([]);
 
       await browser.get(general.MODERATOR_URL_SUFFIX);
-      general.checkForConsoleErrors([
+      await general.checkForConsoleErrors([
         'Failed to load resource: the server responded with a status of 401']);
       await users.logout();
     });
@@ -71,18 +71,18 @@ describe('Basic user journeys', function() {
       await browser.get(general.MODERATOR_URL_SUFFIX);
       var profileDropdown = element(
         by.css('.protractor-test-profile-dropdown'));
-      waitFor.elementToBeClickable(
+      await waitFor.elementToBeClickable(
         profileDropdown, 'Could not click profile dropdown');
       await profileDropdown.click();
       await users.logout();
-      general.checkForConsoleErrors([]);
+      await general.checkForConsoleErrors([]);
     });
 
     // Usernames containing "admin" are not permitted.
     it('should create admins', async function() {
       await users.createAdmin(
         'admin@userManagement.com', 'adm1nUserManagement');
-      general.checkForConsoleErrors([]);
+      await general.checkForConsoleErrors([]);
     });
   });
 });
@@ -116,86 +116,90 @@ describe('Site language', function() {
     await users.createUser('langCreator@explorations.com', CREATOR_USERNAME);
     await users.createAndLoginAdminUser(
       'testlangadm@collections.com', 'testlangadm');
-    adminPage.get();
-    adminPage.updateRole(EDITOR_USERNAME, 'collection editor');
+    await adminPage.get();
+    await adminPage.updateRole(EDITOR_USERNAME, 'collection editor');
     await users.logout();
 
     await users.login('langCreator@explorations.com');
     await workflow.createExploration();
     firstExplorationId = await general.getExplorationIdFromEditor();
-    explorationEditorMainTab.setContent(forms.toRichText('Language Test'));
-    explorationEditorMainTab.setInteraction('NumericInput');
-    explorationEditorMainTab.addResponse(
-      'NumericInput', forms.toRichText('Nice!!'),
+    await explorationEditorMainTab.setContent(
+      await forms.toRichText('Language Test'));
+    await explorationEditorMainTab.setInteraction('NumericInput');
+    await explorationEditorMainTab.addResponse(
+      'NumericInput', await forms.toRichText('Nice!!'),
       'END', true, 'IsLessThanOrEqualTo', 0);
-    explorationEditorMainTab.getResponseEditor('default').setFeedback(
-      forms.toRichText('Ok!!'));
-    explorationEditorMainTab.moveToState('END');
-    explorationEditorMainTab.setContent(forms.toRichText('END'));
-    explorationEditorMainTab.setInteraction('EndExploration');
+    var responseEditor = await explorationEditorMainTab.getResponseEditor(
+      'default');
+    await responseEditor.setFeedback(await forms.toRichText('Ok!!'));
+    await explorationEditorMainTab.moveToState('END');
+    await explorationEditorMainTab.setContent(await forms.toRichText('END'));
+    await explorationEditorMainTab.setInteraction('EndExploration');
 
     // Save changes.
     var title = 'Language Test';
     var category = 'Languages';
     var objective = 'To test site language.';
-    explorationEditorPage.navigateToSettingsTab();
-    explorationEditorSettingsTab.setTitle(title);
-    explorationEditorSettingsTab.setCategory(category);
-    explorationEditorSettingsTab.setObjective(objective);
-    explorationEditorPage.saveChanges('Done!');
+    await explorationEditorPage.navigateToSettingsTab();
+    await explorationEditorSettingsTab.setTitle(title);
+    await explorationEditorSettingsTab.setCategory(category);
+    await explorationEditorSettingsTab.setObjective(objective);
+    await explorationEditorPage.saveChanges('Done!');
 
     // Publish changes.
-    workflow.publishExploration();
+    await workflow.publishExploration();
     await users.logout();
 
     await users.login('lang@collections.com');
-    creatorDashboardPage.get();
-    creatorDashboardPage.clickCreateActivityButton();
-    creatorDashboardPage.clickCreateCollectionButton();
+    await creatorDashboardPage.get();
+    await creatorDashboardPage.clickCreateActivityButton();
+    await creatorDashboardPage.clickCreateCollectionButton();
+    await waitFor.pageToFullyLoad();
     var url = await browser.getCurrentUrl();
     var pathname = url.split('/');
+
     // in the url a # is added at the end that is not part of collection ID
     collectionId = pathname[5].slice(0, -1);
     // Add existing explorations.
-    collectionEditorPage.addExistingExploration(firstExplorationId);
-    collectionEditorPage.saveDraft();
-    collectionEditorPage.closeSaveModal();
-    collectionEditorPage.publishCollection();
-    collectionEditorPage.setTitle('Test Collection');
-    collectionEditorPage.setObjective('This is the test collection.');
-    collectionEditorPage.setCategory('Algebra');
-    collectionEditorPage.saveChanges();
+    await collectionEditorPage.addExistingExploration(firstExplorationId);
+    await collectionEditorPage.saveDraft();
+    await collectionEditorPage.closeSaveModal();
+    await collectionEditorPage.publishCollection();
+    await collectionEditorPage.setTitle('Test Collection');
+    await collectionEditorPage.setObjective('This is the test collection.');
+    await collectionEditorPage.setCategory('Algebra');
+    await collectionEditorPage.saveChanges();
     await users.logout();
   });
 
   beforeEach(async function() {
     // Starting language is English
     await browser.get('/about');
-    waitFor.pageToFullyLoad();
+    await waitFor.pageToFullyLoad();
     await _selectLanguage('English');
-    libraryPage.get();
-    libraryPage.expectMainHeaderTextToBe(
+    await libraryPage.get();
+    await libraryPage.expectMainHeaderTextToBe(
       'Imagine what you could learn today...');
   });
 
   it('should change after selecting a different language', async function() {
     await browser.get('/about');
-    waitFor.pageToFullyLoad();
+    await waitFor.pageToFullyLoad();
     await _selectLanguage('Español');
 
-    libraryPage.get();
-    libraryPage.expectMainHeaderTextToBe(
+    await libraryPage.get();
+    await libraryPage.expectMainHeaderTextToBe(
       'Imagina lo que podrías aprender hoy...');
-    general.ensurePageHasNoTranslationIds();
+    await general.ensurePageHasNoTranslationIds();
   });
 
   it('should use language selected in the Preferences page.', async function() {
     await users.createUser('varda@example.com', 'Varda');
     await users.login('varda@example.com');
-    preferencesPage.get();
-    preferencesPage.selectSystemLanguage('Español');
-    preferencesPage.expectPageHeaderToBe('Preferencias');
-    general.ensurePageHasNoTranslationIds();
+    await preferencesPage.get();
+    await preferencesPage.selectSystemLanguage('Español');
+    await preferencesPage.expectPageHeaderToBe('Preferencias');
+    await general.ensurePageHasNoTranslationIds();
     await users.logout();
   });
 
@@ -203,14 +207,14 @@ describe('Site language', function() {
     async function() {
       await users.createUser('audioPlayer@example.com', 'audioPlayer');
       await users.login('audioPlayer@example.com');
-      preferencesPage.get();
-      preferencesPage.expectPreferredAudioLanguageNotToBe('Chinese');
-      preferencesPage.selectPreferredAudioLanguage('Chinese');
+      await preferencesPage.get();
+      await preferencesPage.expectPreferredAudioLanguageNotToBe('Chinese');
+      await preferencesPage.selectPreferredAudioLanguage('Chinese');
       // TODO(DubeySandeep): Add the test to check preferred audio language
       // choice gets reflected to the exploration player. This can be done once
       // we will finalize a way to upload an audio file in e2e test.
-      preferencesPage.expectPreferredAudioLanguageToBe('Chinese');
-      general.ensurePageHasNoTranslationIds();
+      await preferencesPage.expectPreferredAudioLanguageToBe('Chinese');
+      await general.ensurePageHasNoTranslationIds();
       await users.logout();
     });
 
@@ -219,16 +223,16 @@ describe('Site language', function() {
       await users.createUser('feanor@example.com', 'Feanor');
       await users.login('feanor@example.com');
       await browser.get('/about');
-      waitFor.pageToFullyLoad();
+      await waitFor.pageToFullyLoad();
       await _selectLanguage('Español');
-      libraryPage.get();
-      libraryPage.expectMainHeaderTextToBe(
+      await libraryPage.get();
+      await libraryPage.expectMainHeaderTextToBe(
         'Imagina lo que podrías aprender hoy...');
 
       // The preference page shows the last selected language
-      preferencesPage.get();
-      preferencesPage.expectPreferredSiteLanguageToBe('Español');
-      general.ensurePageHasNoTranslationIds();
+      await preferencesPage.get();
+      await preferencesPage.expectPreferredSiteLanguageToBe('Español');
+      await general.ensurePageHasNoTranslationIds();
       await users.logout();
     }
   );
@@ -239,43 +243,43 @@ describe('Site language', function() {
     waitFor.pageToFullyLoad();
     await _selectLanguage('Español');
 
-    general.openEditor(firstExplorationId);
+    await general.openEditor(firstExplorationId);
 
     // Spanish is still selected.
-    var placeholder = element(by.css('.protractor-test-float-form-input'))
+    var placeholder = await element(by.css('.protractor-test-float-form-input'))
       .getAttribute('placeholder');
     expect(placeholder).toEqual('Ingresa un número');
-    general.ensurePageHasNoTranslationIds();
+    await general.ensurePageHasNoTranslationIds();
     await users.logout();
   });
 
   it('should not change in exploration and collection player for guest users',
     async function() {
       await browser.get('/about');
-      waitFor.pageToFullyLoad();
+      await waitFor.pageToFullyLoad();
       await _selectLanguage('Español');
 
       // Checking collection player page.
       await browser.get('/collection/' + collectionId);
-      waitFor.pageToFullyLoad();
-      expect(element(by.css('.oppia-share-collection-footer')).getText())
+      await waitFor.pageToFullyLoad();
+      expect(await element(by.css('.oppia-share-collection-footer')).getText())
         .toEqual('COMPARTIR ESTA COLECCIÓN');
-      general.ensurePageHasNoTranslationIds();
+      await general.ensurePageHasNoTranslationIds();
 
       // Checking exploration player page.
       await browser.get('/explore/' + firstExplorationId);
-      waitFor.pageToFullyLoad();
-      expect(element(by.css('.author-profile-text')).getText())
+      await waitFor.pageToFullyLoad();
+      expect(await element(by.css('.author-profile-text')).getText())
         .toEqual('PERFILES DE AUTORES');
-      general.ensurePageHasNoTranslationIds();
+      await general.ensurePageHasNoTranslationIds();
     }
   );
 
   afterEach(async function() {
     // Reset language back to English
     await browser.get('/about');
-    waitFor.pageToFullyLoad();
+    await waitFor.pageToFullyLoad();
     await _selectLanguage('English');
-    general.checkForConsoleErrors([]);
+    await general.checkForConsoleErrors([]);
   });
 });

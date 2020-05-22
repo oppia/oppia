@@ -53,19 +53,25 @@ var GraphEditor = function(graphInputContainer) {
       by.css('.protractor-test-Add-Node-button'));
     await addNodeButton.click();
     // Offsetting from the graph container.
-    await browser.actions()
-      .mouseMove(graphInputContainer, {x: xOffset, y: yOffset})
-      .click()
-      .perform();
+    await browser.actions().mouseMove(
+      graphInputContainer, {x: xOffset, y: yOffset}).perform();
+    await browser.actions().click().perform();
   };
 
   var createEdge = async function(vertexIndex1, vertexIndex2) {
     var addEdgeButton = graphInputContainer.element(
       by.css('.protractor-test-Add-Edge-button'));
     await addEdgeButton.click();
-    await browser.actions()
-      .dragAndDrop(vertexElement(vertexIndex1), vertexElement(vertexIndex2))
-      .perform();
+    await browser.actions().mouseMove(
+      vertexElement(vertexIndex1)).perform();
+    await browser.actions().mouseDown().perform();
+    await browser.actions().mouseMove(
+      vertexElement(vertexIndex2)).perform();
+    await browser.actions().mouseUp().perform();
+    // await browser.actions()
+    //   .dragAndDrop(
+    //     vertexElement(vertexIndex1),
+    //     vertexElement(vertexIndex2)).perform();
   };
   return {
     setValue: async function(graphDict) {
@@ -99,7 +105,7 @@ var GraphEditor = function(graphInputContainer) {
       if (nodeCoordinatesList) {
         // Expecting total no. of vertices on the graph matches with the given
         // dict's vertices.
-        for (var i = 0; i < nodeCoordinatesList.count(); i++) {
+        for (var i = 0; i < nodeCoordinatesList.length; i++) {
           expect(await vertexElement(i).isDisplayed()).toBe(true);
         }
       }
@@ -108,7 +114,7 @@ var GraphEditor = function(graphInputContainer) {
         // dict's edges.
         var allEdgesElement = await element.all(by.css(
           '.protractor-test-graph-edge'));
-        expect(allEdges.length).toEqual(edgesList.length);
+        expect(allEdgesElement.length).toEqual(edgesList.length);
       }
     }
   };
@@ -177,18 +183,19 @@ var RealEditor = function(elem) {
 
 var RichTextEditor = async function(elem) {
   // Set focus in the RTE.
-  await elem.all(by.css('.oppia-rte')).first().click();
+  await (await elem.all(by.css('.oppia-rte')).first()).click();
 
   var _appendContentText = async function(text) {
-    await elem.all(by.css('.oppia-rte')).first().sendKeys(text);
+    await (await elem.all(by.css('.oppia-rte')).first()).sendKeys(text);
   };
   var _clickToolbarButton = async function(buttonName) {
     await elem.element(by.css('.' + buttonName)).click();
   };
   var _clearContent = async function() {
-    expect(await elem.all(by.css('.oppia-rte')).first().isPresent()).toBe(
-      true);
-    await elem.all(by.css('.oppia-rte')).first().clear();
+    expect(
+      await (await elem.all(by.css('.oppia-rte')).first()).isPresent()
+    ).toBe(true);
+    await (await elem.all(by.css('.oppia-rte')).first()).clear();
   };
 
   return {
@@ -439,17 +446,15 @@ var expectRichText = function(elem) {
         // applying .getText() while the RichTextChecker is running would be
         // asynchronous and so not allow us to update the textPointer
         // synchronously.
-        return await entry.getText(function(text) {
-          return text;
-        });
+        return await entry.getText();
       });
     // We re-derive the array of elements as we need it too.
-    var arrayOfElements = await elem.all(by.xpath(XPATH_SELECTOR));
+    var arrayOfElements = elem.all(by.xpath(XPATH_SELECTOR));
     var fullText = await elem.getText();
-    var checker = RichTextChecker(
+    var checker = await RichTextChecker(
       arrayOfElements, arrayOfTexts, fullText);
     await richTextInstructions(checker);
-    checker.expectEnd();
+    await checker.expectEnd();
   };
   return {
     toMatch: toMatch,
@@ -470,8 +475,8 @@ var expectRichText = function(elem) {
 // 'fullText': a string consisting of all the visible text in the rich text
 //   area (including both element and text nodes, so more than just the
 //   concatenation of arrayOfTexts), e.g. 'textbold'.
-var RichTextChecker = function(arrayOfElems, arrayOfTexts, fullText) {
-  expect(arrayOfElems.length).toEqual(arrayOfTexts.length);
+var RichTextChecker = async function(arrayOfElems, arrayOfTexts, fullText) {
+  expect(await arrayOfElems.count()).toEqual(arrayOfTexts.length);
   // These are shared by the returned functions, and records how far through
   // the child elements and text of the rich text area checking has gone. The
   // arrayPointer traverses both arrays simultaneously.
@@ -484,10 +489,10 @@ var RichTextChecker = function(arrayOfElems, arrayOfTexts, fullText) {
 
   var _readFormattedText = async function(text, tagName) {
     expect(
-      await arrayOfElems[arrayPointer].getTagName()
+      await (await arrayOfElems.get(arrayPointer)).getTagName()
     ).toBe(tagName);
     expect(
-      await arrayOfElems[arrayPointer].getAttribute('innerHTML')
+      await (await arrayOfElems.get(arrayPointer)).getAttribute('innerHTML')
     ).toBe(text);
     expect(arrayOfTexts[arrayPointer]).toEqual(text);
     arrayPointer = arrayPointer + 1;
@@ -514,7 +519,7 @@ var RichTextChecker = function(arrayOfElems, arrayOfTexts, fullText) {
     // Additional arguments may be sent to this function, and they will be
     // passed on to the relevant RTE component editor.
     readRteComponent: async function(componentName) {
-      var elem = arrayOfElems[arrayPointer];
+      var elem = await arrayOfElems.get(arrayPointer);
       expect(await elem.getTagName()).
         toBe('oppia-noninteractive-' + componentName.toLowerCase());
       expect(await elem.getText()).toBe(arrayOfTexts[arrayPointer]);
@@ -532,8 +537,8 @@ var RichTextChecker = function(arrayOfElems, arrayOfTexts, fullText) {
       arrayPointer = arrayPointer + 1;
       justPassedRteComponent = true;
     },
-    expectEnd: function() {
-      expect(arrayPointer).toBe(arrayOfElems.length);
+    expectEnd: async function() {
+      expect(arrayPointer).toBe(await arrayOfElems.count());
     }
   };
 };
@@ -621,8 +626,7 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
       await _compareTextAndHighlightingFromLine(
         largestLineNumber,
         scrollTo + CODEMIRROR_SCROLL_AMOUNT_IN_PIXELS,
-        compareDicti
-      );
+        compareDict);
     } else {
       for (var lineNumber in compareDict) {
         if (compareDict[lineNumber].checked !== true) {

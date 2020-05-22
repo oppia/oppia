@@ -19,42 +19,44 @@ workflows:
 
     jobs:
       - setup
-      - lint_tests:
-          requires:
-            - setup
-      - frontend_tests:
-          requires:
-            - setup
-      - typescript_tests:
-          requires:
-            - frontend_tests
-      - backend_tests:
-          requires:
-            - frontend_tests
+      # - lint_tests:
+      #     requires:
+      #       - setup
+      # - frontend_tests:
+      #     requires:
+      #       - setup
+      # - typescript_tests:
+      #     requires:
+      #       - frontend_tests
+      # - backend_tests:
+      #     requires:
+      #       - frontend_tests
       - e2e_file_upload_features:
           requires:
-            - typescript_tests
+      #       - typescript_tests
+              - setup
       - e2e_navigation:
           requires:
-            - typescript_tests
+      #       - typescript_tests
+            - setup
       - e2e_classroom_page:
           requires:
             - e2e_file_upload_features
       - e2e_topic_and_story_editor:
           requires:
             - e2e_file_upload_features
-      - e2e_accessibility:
-          requires:
-            - e2e_navigation
-      - e2e_admin:
-          requires:
-            - e2e_navigation
+      # - e2e_accessibility:
+      #     requires:
+      #       - e2e_navigation
+      # - e2e_admin:
+      #     requires:
+      #       - e2e_navigation
       - e2e_embedding:
           requires:
             - e2e_navigation
-      - e2e_library:
-          requires:
-            - e2e_navigation
+      # - e2e_library:
+      #     requires:
+      #       - e2e_navigation
       - e2e_users:
           requires:
           - e2e_navigation
@@ -109,9 +111,9 @@ jobs:
       - run:
           name: Install dependencies
           command: python -m scripts.install_third_party_libs
-      - run:
-          name: Check that all e2e test files are captured in protractor.conf.js
-          command: python -m scripts.check_e2e_tests_are_captured_in_ci
+      # - run:
+      #     name: Check that all e2e test files are captured in protractor.conf.js
+      #     command: python -m scripts.check_e2e_tests_are_captured_in_ci
       - persist_to_workspace:
           root: /home/circleci/
           paths:
@@ -264,14 +266,14 @@ jobs:
           name: Run e2e profile features test
           command: |
             python -m scripts.run_e2e_tests --skip-install --skip-build --suite="profileFeatures" --prod_env
-      - run:
-          name: Run e2e profile menu test
-          command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="profileMenu" --prod_env
-      - run:
-          name: Run e2e preferences test
-          command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="preferences" --prod_env
+      # - run:
+      #     name: Run e2e profile menu test
+      #     command: |
+      #       python -m scripts.run_e2e_tests --skip-install --skip-build --suite="profileMenu" --prod_env
+      # - run:
+      #     name: Run e2e preferences test
+      #     command: |
+      #       python -m scripts.run_e2e_tests --skip-install --skip-build --suite="preferences" --prod_env
 
   # Non-prod e2e Tests
   # The following tests must be run in a non-production environment because they are uploading files.
@@ -305,6 +307,13 @@ jobs:
           name: Run e2e classroom page test
           command: |
             python -m scripts.run_e2e_tests --skip-install --skip-build --suite="classroomPageFileUploadFeatures"
+      # Remove once e2e_file_upload_features has been migrated
+      - persist_to_workspace:
+          root: /home/circleci/
+          paths:
+            - oppia/assets/hashes.json
+            - oppia/third_party/generated/
+            - oppia/webpack_bundles
 
   e2e_topic_and_story_editor:
     <<: *job_defaults

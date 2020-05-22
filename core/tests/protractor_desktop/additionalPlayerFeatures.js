@@ -58,14 +58,6 @@ describe('Full exploration editor', function() {
 
     explorationEditorMainTab = explorationEditorPage.getMainTab();
     explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
-
-    await users.createAndLoginAdminUser(
-      'superUser@stateEditor.com', 'superUser');
-    // TODO(#7569): Change this test to work with the improvements tab.
-    adminPage.editConfigProperty(
-      'Exposes the Improvements Tab for creators in the exploration editor',
-      'Boolean', (elem) => elem.setValue(false));
-    await users.logout();
   });
 
   it('should walk through the tutorial when user repeatedly clicks Next',
@@ -74,10 +66,10 @@ describe('Full exploration editor', function() {
         'userTutorial@stateEditor.com', 'userTutorialStateEditor');
       await users.login('userTutorial@stateEditor.com');
 
-      workflow.createExplorationAndStartTutorial();
-      explorationEditorMainTab.startTutorial();
-      explorationEditorMainTab.playTutorial();
-      explorationEditorMainTab.finishTutorial();
+      await workflow.createExplorationAndStartTutorial();
+      await explorationEditorMainTab.startTutorial();
+      await explorationEditorMainTab.playTutorial();
+      await explorationEditorMainTab.finishTutorial();
       await users.logout();
     }
   );
@@ -92,14 +84,14 @@ describe('Full exploration editor', function() {
       const EXPLORATION_CATEGORY = 'Mathematics';
       const EXPLORATION_LANGUAGE = 'Deutsch';
       const EXPLORATION_TAGS = ['maths', 'english', 'fractions', 'addition'];
-      workflow.createAddExpDetailsAndPublishExp(
+      await workflow.createAddExpDetailsAndPublishExp(
         EXPLORATION_TITLE,
         EXPLORATION_CATEGORY,
         EXPLORATION_OBJECTIVE,
         EXPLORATION_LANGUAGE,
         EXPLORATION_TAGS);
-      explorationEditorPage.navigateToSettingsTab();
-      explorationEditorPage.verifyExplorationSettingFields(
+      await explorationEditorPage.navigateToSettingsTab();
+      await explorationEditorPage.verifyExplorationSettingFields(
         EXPLORATION_TITLE,
         EXPLORATION_CATEGORY,
         EXPLORATION_OBJECTIVE,
@@ -114,7 +106,7 @@ describe('Full exploration editor', function() {
     await users.createUser(
       'creator@editorAndPlayer.com', 'creatorEditorAndPlayer');
     await users.login('creator@editorAndPlayer.com');
-    workflow.createAndPublishExploration(
+    await workflow.createAndPublishExploration(
       'Fractions',
       'Mathematics',
       EXPLORATION_OBJECTIVE,
@@ -122,26 +114,26 @@ describe('Full exploration editor', function() {
     await users.logout();
     await users.createUser('learner@editorAndPlayer.com', 'learner');
     await users.login('learner@editorAndPlayer.com');
-    libraryPage.get();
-    libraryPage.clickExplorationObjective();
-    explorationPlayerPage.reportExploration();
+    await libraryPage.get();
+    await libraryPage.clickExplorationObjective();
+    await explorationPlayerPage.reportExploration();
   });
 
   it('should let learners suggest changes to an exploration', async function() {
     await users.createUser(
       'creator2@editorAndPlayer.com', 'creator2EditorAndPlayer');
     await users.login('creator2@editorAndPlayer.com');
-    workflow.createAndPublishExploration('Adding Fractions', 'Mathematics',
-      'Let us learn how to add fractions', 'English');
+    await workflow.createAndPublishExploration('Adding Fractions',
+      'Mathematics', 'Let us learn how to add fractions', 'English');
     await users.logout();
 
     await users.createUser('learner2@editorAndPlayer.com', 'learner2');
     await users.login('learner2@editorAndPlayer.com');
-    libraryPage.get();
-    libraryPage.findExploration('Adding Fractions');
-    libraryPage.playExploration('Adding Fractions');
-    explorationPlayerPage.clickSuggestChangesButton();
-    explorationPlayerPage.fillAndSubmitSuggestion(
+    await libraryPage.get();
+    await libraryPage.findExploration('Adding Fractions');
+    await libraryPage.playExploration('Adding Fractions');
+    await explorationPlayerPage.clickSuggestChangesButton();
+    await explorationPlayerPage.fillAndSubmitSuggestion(
       'Lets test the suggestion feature', 'Oh wow, It works!');
     await users.logout();
   });
@@ -150,40 +142,38 @@ describe('Full exploration editor', function() {
     await users.createUser('user2@editorAndPlayer.com', 'user2EditorAndPlayer');
     await users.login('user2@editorAndPlayer.com');
     await workflow.createExploration();
-    explorationEditorMainTab.setStateName('card 1');
-    explorationEditorMainTab.setContent(forms.toRichText('this is card 1'));
-    explorationEditorMainTab.setInteraction('Continue');
-    explorationEditorMainTab.getResponseEditor('default').setDestination(
-      'card 2', true, null);
+    await explorationEditorMainTab.setStateName('card 1');
+    await explorationEditorMainTab.setContent(
+      await forms.toRichText('this is card 1'));
+    await explorationEditorMainTab.setInteraction('Continue');
+    await (
+      await explorationEditorMainTab.getResponseEditor('default')
+    ).setDestination('card 2', true, null);
 
-    explorationEditorMainTab.moveToState('card 2');
-    explorationEditorMainTab.setContent(forms.toRichText(
+    await explorationEditorMainTab.moveToState('card 2');
+    await explorationEditorMainTab.setContent(await forms.toRichText(
       'this is card 2 with non-inline interaction'));
-    explorationEditorMainTab.setInteraction(
+    await explorationEditorMainTab.setInteraction(
       'LogicProof',
       '', '', 'from p we have p');
-    explorationEditorMainTab.addResponse(
-      'LogicProof', forms.toRichText('Great'), 'final card', true, 'Correct');
+    await explorationEditorMainTab.addResponse(
+      'LogicProof', await forms.toRichText('Great'),
+      'final card', true, 'Correct');
 
     // Setup a terminating state.
-    explorationEditorMainTab.moveToState('final card');
-    explorationEditorMainTab.setInteraction('EndExploration');
-    explorationEditorPage.saveChanges();
+    await explorationEditorMainTab.moveToState('final card');
+    await explorationEditorMainTab.setInteraction('EndExploration');
+    await explorationEditorPage.saveChanges();
 
-    general.moveToPlayer();
-    explorationPlayerPage.submitAnswer('Continue');
-    element.all(
-      by.css('.protractor-test-back-button')).then(function(buttons) {
-      expect(buttons.length).toBe(1);
-    });
-    explorationPlayerPage.submitAnswer('LogicProof');
-    element.all(
-      by.css('.protractor-test-back-button')).then(function(buttons) {
-      expect(buttons.length).toBe(0);
-    });
+    await general.moveToPlayer();
+    await explorationPlayerPage.submitAnswer('Continue');
+    var buttons = element.all(by.css('.protractor-test-back-button'));
+    expect(await buttons.count()).toBe(1);
+    await explorationPlayerPage.submitAnswer('LogicProof');
+    expect(await buttons.count()).toBe(0);
 
-    explorationPlayerPage.clickThroughToNextCard();
-    explorationPlayerPage.expectExplorationToBeOver();
+    await explorationPlayerPage.clickThroughToNextCard();
+    await explorationPlayerPage.expectExplorationToBeOver();
     await users.logout();
   });
 
@@ -192,20 +182,20 @@ describe('Full exploration editor', function() {
     await users.createUser('user1@editorAndPlayer.com', 'user1EditorAndPlayer');
     await users.login('user1@editorAndPlayer.com');
 
-    workflow.createAndPublishExploration(
+    await workflow.createAndPublishExploration(
       'Parent Exploration 1',
       'Algebra',
       'This is the topmost parent exploration.');
     var parentId1 = await general.getExplorationIdFromEditor();
 
-    workflow.createAndPublishExploration(
+    await workflow.createAndPublishExploration(
       'Parent Exploration 2',
       'Algebra',
       'This is the second parent exploration to which refresher ' +
       'exploration redirects.');
     var parentId2 = await general.getExplorationIdFromEditor();
 
-    workflow.createAndPublishExploration(
+    await workflow.createAndPublishExploration(
       'Refresher Exploration',
       'Algebra',
       'This is the most basic refresher exploration');
@@ -215,14 +205,14 @@ describe('Full exploration editor', function() {
     await browser.get(
       '/explore/' + refresherExplorationId + '?parent=' + parentId1 +
       '&parent=' + parentId2);
-    waitFor.pageToFullyLoad();
+    await waitFor.pageToFullyLoad();
 
-    explorationPlayerPage.clickOnReturnToParentButton();
+    await explorationPlayerPage.clickOnReturnToParentButton();
 
     var url = await browser.getCurrentUrl();
     var currentExplorationId = url.split('/')[4].split('?')[0];
     expect(currentExplorationId).toBe(parentId2);
-    explorationPlayerPage.clickOnReturnToParentButton();
+    await explorationPlayerPage.clickOnReturnToParentButton();
 
     url = await browser.getCurrentUrl();
     currentExplorationId = url.split('/')[4];
@@ -235,124 +225,135 @@ describe('Full exploration editor', function() {
     await users.createAndLoginAdminUser('testadm@collections.com', 'testadm');
 
     // Create Parent Exploration not added to collection.
-    creatorDashboardPage.get();
-    creatorDashboardPage.clickCreateActivityButton();
-    creatorDashboardPage.clickCreateExplorationButton();
-    explorationEditorMainTab.exitTutorial();
-    explorationEditorPage.navigateToSettingsTab();
-    explorationEditorSettingsTab.setTitle(
+    await creatorDashboardPage.get();
+    await creatorDashboardPage.clickCreateActivityButton();
+    await creatorDashboardPage.clickCreateExplorationButton();
+    await explorationEditorMainTab.exitTutorial();
+    await explorationEditorPage.navigateToSettingsTab();
+    await explorationEditorSettingsTab.setTitle(
       'Parent Exploration not in collection');
-    explorationEditorSettingsTab.setCategory('Algebra');
-    explorationEditorSettingsTab.setObjective('This is a parent exploration');
-    explorationEditorPage.navigateToMainTab();
-    explorationEditorMainTab.setContent(forms.toRichText(
-      'Parent Exploration Content'));
-    explorationEditorMainTab.setInteraction(
+    await explorationEditorSettingsTab.setCategory('Algebra');
+    await explorationEditorSettingsTab.setObjective(
+      'This is a parent exploration');
+    await explorationEditorPage.navigateToMainTab();
+    await explorationEditorMainTab.setContent(
+      await forms.toRichText('Parent Exploration Content'));
+    await explorationEditorMainTab.setInteraction(
       'MultipleChoiceInput',
-      [forms.toRichText('Correct'), forms.toRichText('Incorrect')]);
-    explorationEditorMainTab.addResponse(
+      [await forms.toRichText('Correct'), await forms.toRichText('Incorrect')]);
+    await explorationEditorMainTab.addResponse(
       'MultipleChoiceInput', null, 'card 2', true,
       'Equals', 'Correct');
-    var responseEditor = explorationEditorMainTab.getResponseEditor('default');
-    responseEditor.setFeedback(forms.toRichText('try again'));
-    explorationEditorMainTab.moveToState('card 2');
-    explorationEditorMainTab.setInteraction('EndExploration');
-    explorationEditorPage.saveChanges();
-    workflow.publishExploration();
+    var responseEditor = await explorationEditorMainTab.getResponseEditor(
+      'default');
+    await responseEditor.setFeedback(await forms.toRichText('try again'));
+    await explorationEditorMainTab.moveToState('card 2');
+    await explorationEditorMainTab.setInteraction('EndExploration');
+    await explorationEditorPage.saveChanges();
+    await workflow.publishExploration();
 
     // Create Parent Exploration added in collection.
-    creatorDashboardPage.get();
-    creatorDashboardPage.clickCreateActivityButton();
-    creatorDashboardPage.clickCreateExplorationButton();
-    explorationEditorMainTab.exitTutorial();
-    explorationEditorPage.navigateToSettingsTab();
-    explorationEditorSettingsTab.setTitle('Parent Exploration in collection');
-    explorationEditorSettingsTab.setCategory('Algebra');
-    explorationEditorSettingsTab.setObjective('This is a parent exploration');
-    explorationEditorPage.navigateToMainTab();
-    explorationEditorMainTab.setContent(forms.toRichText(
+    await creatorDashboardPage.get();
+    await creatorDashboardPage.clickCreateActivityButton();
+    await creatorDashboardPage.clickCreateExplorationButton();
+    await explorationEditorMainTab.exitTutorial();
+    await explorationEditorPage.navigateToSettingsTab();
+    await explorationEditorSettingsTab.setTitle(
+      'Parent Exploration in collection');
+    await explorationEditorSettingsTab.setCategory('Algebra');
+    await explorationEditorSettingsTab.setObjective(
+      'This is a parent exploration');
+    await explorationEditorPage.navigateToMainTab();
+    await explorationEditorMainTab.setContent(await forms.toRichText(
       'Parent Exploration Content'));
-    explorationEditorMainTab.setInteraction(
+    await explorationEditorMainTab.setInteraction(
       'MultipleChoiceInput',
-      [forms.toRichText('Correct'), forms.toRichText('Incorrect')]);
-    explorationEditorMainTab.addResponse(
+      [await forms.toRichText('Correct'), await forms.toRichText('Incorrect')]);
+    await explorationEditorMainTab.addResponse(
       'MultipleChoiceInput', null, 'card 2', true,
       'Equals', 'Correct');
-    responseEditor = explorationEditorMainTab.getResponseEditor('default');
-    responseEditor.setFeedback(forms.toRichText('try again'));
-    explorationEditorMainTab.moveToState('card 2');
-    explorationEditorMainTab.setInteraction('EndExploration');
-    explorationEditorPage.saveChanges();
-    workflow.publishExploration();
+    responseEditor = await explorationEditorMainTab.getResponseEditor(
+      'default');
+    await responseEditor.setFeedback(await forms.toRichText('try again'));
+    await explorationEditorMainTab.moveToState('card 2');
+    await explorationEditorMainTab.setInteraction('EndExploration');
+    await explorationEditorPage.saveChanges();
+    await workflow.publishExploration();
 
     // Create Refresher Exploration.
-    creatorDashboardPage.get();
-    creatorDashboardPage.clickCreateActivityButton();
-    creatorDashboardPage.clickCreateExplorationButton();
-    explorationEditorMainTab.exitTutorial();
-    explorationEditorPage.navigateToSettingsTab();
-    explorationEditorSettingsTab.setTitle('Refresher Exploration');
-    explorationEditorSettingsTab.setCategory('Algebra');
-    explorationEditorSettingsTab.setObjective(
+    await creatorDashboardPage.get();
+    await creatorDashboardPage.clickCreateActivityButton();
+    await creatorDashboardPage.clickCreateExplorationButton();
+    await explorationEditorMainTab.exitTutorial();
+    await explorationEditorPage.navigateToSettingsTab();
+    await explorationEditorSettingsTab.setTitle('Refresher Exploration');
+    await explorationEditorSettingsTab.setCategory('Algebra');
+    await explorationEditorSettingsTab.setObjective(
       'This is the refresher exploration');
-    explorationEditorPage.navigateToMainTab();
-    explorationEditorMainTab.setContent(forms.toRichText(
+    await explorationEditorPage.navigateToMainTab();
+    await explorationEditorMainTab.setContent(await forms.toRichText(
       'Refresher Exploration Content'));
-    explorationEditorMainTab.setInteraction('EndExploration');
-    explorationEditorPage.saveChanges();
-    workflow.publishExploration();
+    await explorationEditorMainTab.setInteraction('EndExploration');
+    await explorationEditorPage.saveChanges();
+    await workflow.publishExploration();
     // Add refresher exploration's Id to both parent explorations.
     var refresherExplorationId = await general.getExplorationIdFromEditor();
-    creatorDashboardPage.get();
-    creatorDashboardPage.editExploration('Parent Exploration in collection');
-    responseEditor = explorationEditorMainTab.getResponseEditor('default');
-    responseEditor.setDestination(null, false, refresherExplorationId);
-    explorationEditorPage.saveChanges('Add Refresher Exploration Id');
+    await creatorDashboardPage.get();
+    await creatorDashboardPage.editExploration(
+      'Parent Exploration in collection');
+    responseEditor = await explorationEditorMainTab.getResponseEditor(
+      'default');
+    await responseEditor.setDestination(null, false, refresherExplorationId);
+    await explorationEditorPage.saveChanges('Add Refresher Exploration Id');
 
-    creatorDashboardPage.get();
-    creatorDashboardPage.editExploration(
+    await creatorDashboardPage.get();
+    await creatorDashboardPage.editExploration(
       'Parent Exploration not in collection');
-    responseEditor = explorationEditorMainTab.getResponseEditor('default');
-    responseEditor.setDestination(null, false, refresherExplorationId);
-    explorationEditorPage.saveChanges('Add Refresher Exploration Id');
+    responseEditor = await explorationEditorMainTab.getResponseEditor(
+      'default');
+    await responseEditor.setDestination(null, false, refresherExplorationId);
+    await explorationEditorPage.saveChanges('Add Refresher Exploration Id');
 
     // Create collection and add created exploration.
-    creatorDashboardPage.get();
-    creatorDashboardPage.clickCreateActivityButton();
-    creatorDashboardPage.clickCreateCollectionButton();
-    collectionEditorPage.searchForAndAddExistingExploration(
+    await creatorDashboardPage.get();
+    await creatorDashboardPage.clickCreateActivityButton();
+    await creatorDashboardPage.clickCreateCollectionButton();
+    await collectionEditorPage.searchForAndAddExistingExploration(
       'Parent Exploration in collection');
-    collectionEditorPage.saveDraft();
-    collectionEditorPage.closeSaveModal();
-    collectionEditorPage.publishCollection();
-    collectionEditorPage.setTitle('Test Collection');
-    collectionEditorPage.setObjective('This is a test collection.');
-    collectionEditorPage.setCategory('Algebra');
-    collectionEditorPage.saveChanges();
+    await collectionEditorPage.saveDraft();
+    await collectionEditorPage.closeSaveModal();
+    await collectionEditorPage.publishCollection();
+    await collectionEditorPage.setTitle('Test Collection');
+    await collectionEditorPage.setObjective('This is a test collection.');
+    await collectionEditorPage.setCategory('Algebra');
+    await collectionEditorPage.saveChanges();
 
     // Play-test exploration and visit the refresher exploration.
-    libraryPage.get();
-    libraryPage.findExploration('Parent Exploration not in collection');
-    libraryPage.playExploration('Parent Exploration not in collection');
-    explorationPlayerPage.submitAnswer('MultipleChoiceInput', 'Incorrect');
-    explorationPlayerPage.clickConfirmRedirectionButton();
-    explorationPlayerPage.expectExplorationNameToBe(
+    await libraryPage.get();
+    await libraryPage.findExploration('Parent Exploration not in collection');
+    await libraryPage.playExploration('Parent Exploration not in collection');
+    await explorationPlayerPage.submitAnswer(
+      'MultipleChoiceInput', 'Incorrect');
+    await explorationPlayerPage.clickConfirmRedirectionButton();
+    await explorationPlayerPage.expectExplorationNameToBe(
       'Refresher Exploration');
-    explorationPlayerPage.clickOnReturnToParentButton();
-    explorationPlayerPage.submitAnswer('MultipleChoiceInput', 'Incorrect');
-    explorationPlayerPage.clickCancelRedirectionButton();
-    explorationPlayerPage.expectContentToMatch(
-      forms.toRichText('Parent Exploration Content'));
-    explorationPlayerPage.submitAnswer('MultipleChoiceInput', 'Correct');
+    await explorationPlayerPage.clickOnReturnToParentButton();
+    await explorationPlayerPage.submitAnswer(
+      'MultipleChoiceInput', 'Incorrect');
+    await explorationPlayerPage.clickCancelRedirectionButton();
+    await explorationPlayerPage.expectContentToMatch(
+      await forms.toRichText('Parent Exploration Content'));
+    await explorationPlayerPage.submitAnswer('MultipleChoiceInput', 'Correct');
 
-    libraryPage.get();
-    libraryPage.findCollection('Test Collection');
-    libraryPage.playCollection('Test Collection');
+    await libraryPage.get();
+    await libraryPage.findCollection('Test Collection');
+    await libraryPage.playCollection('Test Collection');
     // Click first exploration in collection.
     await element.all(by.css(
       '.protractor-test-collection-exploration')).first().click();
-    explorationPlayerPage.submitAnswer('MultipleChoiceInput', 'Incorrect');
-    explorationPlayerPage.clickConfirmRedirectionButton();
+    await explorationPlayerPage.submitAnswer(
+      'MultipleChoiceInput', 'Incorrect');
+    await explorationPlayerPage.clickConfirmRedirectionButton();
     // Check the current url to see if collection_id is present in it.
     var url = await browser.getCurrentUrl();
     var pathname = url.split('/');
@@ -368,46 +369,55 @@ describe('Full exploration editor', function() {
       await users.login('user4@editorAndPlayer.com');
 
       await workflow.createExploration();
-      explorationEditorMainTab.setStateName('card 1');
-      explorationEditorMainTab.setContent(forms.toRichText('this is card 1'));
-      explorationEditorMainTab.setInteraction('NumericInput');
-      explorationEditorMainTab.addResponse(
+      await explorationEditorMainTab.setStateName('card 1');
+      await explorationEditorMainTab.setContent(
+        await forms.toRichText('this is card 1'));
+      await explorationEditorMainTab.setInteraction('NumericInput');
+      await explorationEditorMainTab.addResponse(
         'NumericInput', null, 'final card', true, 'Equals', 21);
-      explorationEditorMainTab.getResponseEditor(0).setDestination(
-        'card 2', true, null);
+      await (
+        await explorationEditorMainTab.getResponseEditor(0)
+      ).setDestination('card 2', true, null);
 
-      explorationEditorMainTab.moveToState('card 2');
-      explorationEditorMainTab.setContent(forms.toRichText(
-        'this is card 2 with previous answer {{answer}}'));
-      explorationEditorMainTab.setInteraction(
+      await explorationEditorMainTab.moveToState('card 2');
+      await explorationEditorMainTab.setContent(
+        await forms.toRichText(
+          'this is card 2 with previous answer {{answer}}'));
+      await explorationEditorMainTab.setInteraction(
         'MultipleChoiceInput',
-        [forms.toRichText('return'), forms.toRichText('complete')]);
-      explorationEditorMainTab.addResponse(
+        [
+          await forms.toRichText('return'),
+          await forms.toRichText('complete')
+        ]
+      );
+      await explorationEditorMainTab.addResponse(
         'MultipleChoiceInput', null, 'card 1', false,
         'Equals', 'return');
-      explorationEditorMainTab.getResponseEditor('default').setDestination(
-        'final card', false, null);
+      await (
+        await explorationEditorMainTab.getResponseEditor('default')
+      ).setDestination('final card', false, null);
       // Setup a terminating state.
-      explorationEditorMainTab.moveToState('final card');
-      explorationEditorMainTab.setInteraction('EndExploration');
-      explorationEditorPage.saveChanges();
+      await explorationEditorMainTab.moveToState('final card');
+      await explorationEditorMainTab.setInteraction('EndExploration');
+      await explorationEditorPage.saveChanges();
 
-      general.moveToPlayer();
-      explorationPlayerPage.expectContentToMatch(
-        forms.toRichText('this is card 1'));
-      explorationPlayerPage.submitAnswer('NumericInput', 19);
-      explorationPlayerPage.submitAnswer('NumericInput', 21);
-      explorationPlayerPage.expectContentToMatch(forms.toRichText(
-        'this is card 2 with previous answer 21'));
-      explorationPlayerPage.submitAnswer('MultipleChoiceInput', 'return');
-      explorationPlayerPage.expectContentToMatch(forms.toRichText(
-        'this is card 1'));
-      explorationPlayerPage.submitAnswer('NumericInput', 21);
-      explorationPlayerPage.expectContentToMatch(forms.toRichText(
-        'this is card 2 with previous answer 21'));
-      explorationPlayerPage.expectExplorationToNotBeOver();
-      explorationPlayerPage.submitAnswer('MultipleChoiceInput', 'complete');
-      explorationPlayerPage.expectExplorationToBeOver();
+      await general.moveToPlayer();
+      await explorationPlayerPage.expectContentToMatch(
+        await forms.toRichText('this is card 1'));
+      await explorationPlayerPage.submitAnswer('NumericInput', 19);
+      await explorationPlayerPage.submitAnswer('NumericInput', 21);
+      await explorationPlayerPage.expectContentToMatch(
+        await forms.toRichText('this is card 2 with previous answer 21'));
+      await explorationPlayerPage.submitAnswer('MultipleChoiceInput', 'return');
+      await explorationPlayerPage.expectContentToMatch(
+        await forms.toRichText('this is card 1'));
+      await explorationPlayerPage.submitAnswer('NumericInput', 21);
+      await explorationPlayerPage.expectContentToMatch(
+        await forms.toRichText('this is card 2 with previous answer 21'));
+      await explorationPlayerPage.expectExplorationToNotBeOver();
+      await explorationPlayerPage.submitAnswer(
+        'MultipleChoiceInput', 'complete');
+      await explorationPlayerPage.expectExplorationToBeOver();
       await users.logout();
     });
 
@@ -420,35 +430,36 @@ describe('Full exploration editor', function() {
     await users.login('user1@hintsAndSolutions.com');
     await workflow.createExploration();
 
-    explorationEditorMainTab.setStateName('Introduction');
-    explorationEditorMainTab.setContent(
-      forms.toRichText('What language is Oppia?'));
-    explorationEditorMainTab.setInteraction('TextInput');
-    explorationEditorMainTab.addResponse(
-      'TextInput', forms.toRichText('Good job'), 'End', true, 'Equals',
-      'Finnish');
-    explorationEditorMainTab.getResponseEditor('default').setFeedback(
-      forms.toRichText('Try again'));
-    explorationEditorMainTab.addHint('Try language of Finland');
-    explorationEditorMainTab.addSolution('TextInput', {
+    await explorationEditorMainTab.setStateName('Introduction');
+    await explorationEditorMainTab.setContent(
+      await forms.toRichText('What language is Oppia?'));
+    await explorationEditorMainTab.setInteraction('TextInput');
+    await explorationEditorMainTab.addResponse(
+      'TextInput', await forms.toRichText('Good job'),
+      'End', true, 'Equals', 'Finnish');
+    await (
+      await explorationEditorMainTab.getResponseEditor('default')
+    ).setFeedback(await forms.toRichText('Try again'));
+    await explorationEditorMainTab.addHint('Try language of Finland');
+    await explorationEditorMainTab.addSolution('TextInput', {
       correctAnswer: 'Finnish',
       explanation: 'Finland language'
     });
-    explorationEditorMainTab.moveToState('End');
-    explorationEditorMainTab.setInteraction('EndExploration');
-    explorationEditorPage.saveChanges();
-    general.moveToPlayer();
-    explorationPlayerPage.expectContentToMatch(
-      forms.toRichText('What language is Oppia?'));
-    explorationPlayerPage.submitAnswer('TextInput', 'Roman');
-    explorationPlayerPage.viewHint();
-    explorationPlayerPage.submitAnswer('TextInput', 'Greek');
+    await explorationEditorMainTab.moveToState('End');
+    await explorationEditorMainTab.setInteraction('EndExploration');
+    await explorationEditorPage.saveChanges();
+    await general.moveToPlayer();
+    await explorationPlayerPage.expectContentToMatch(
+      await forms.toRichText('What language is Oppia?'));
+    await explorationPlayerPage.submitAnswer('TextInput', 'Roman');
+    await explorationPlayerPage.viewHint();
+    await explorationPlayerPage.submitAnswer('TextInput', 'Greek');
 
-    explorationPlayerPage.viewSolution();
-    explorationPlayerPage.expectExplorationToNotBeOver();
-    explorationPlayerPage.submitAnswer('TextInput', 'Finnish');
-    explorationPlayerPage.clickThroughToNextCard();
-    explorationPlayerPage.expectExplorationToBeOver();
+    await explorationPlayerPage.viewSolution();
+    await explorationPlayerPage.expectExplorationToNotBeOver();
+    await explorationPlayerPage.submitAnswer('TextInput', 'Finnish');
+    await explorationPlayerPage.clickThroughToNextCard();
+    await explorationPlayerPage.expectExplorationToBeOver();
     await users.logout();
   });
 
@@ -459,56 +470,56 @@ describe('Full exploration editor', function() {
     await users.login('user9@editorAndPlayer.com');
     // Publish new exploration.
     await workflow.createExploration();
-    explorationEditorMainTab.setContent(
-      forms.toRichText('You should recommend this exploration'));
-    explorationEditorMainTab.setInteraction('EndExploration');
+    await explorationEditorMainTab.setContent(
+      await forms.toRichText('You should recommend this exploration'));
+    await explorationEditorMainTab.setInteraction('EndExploration');
     var explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
-    explorationEditorPage.navigateToSettingsTab();
-    explorationEditorSettingsTab.setTitle('Recommended Exploration 1');
-    explorationEditorSettingsTab.setCategory('Algorithm');
-    explorationEditorSettingsTab.setObjective('To be recommended');
-    explorationEditorPage.navigateToMainTab();
-    explorationEditorPage.saveChanges();
-    workflow.publishExploration();
+    await explorationEditorPage.navigateToSettingsTab();
+    await explorationEditorSettingsTab.setTitle('Recommended Exploration 1');
+    await explorationEditorSettingsTab.setCategory('Algorithm');
+    await explorationEditorSettingsTab.setObjective('To be recommended');
+    await explorationEditorPage.navigateToMainTab();
+    await explorationEditorPage.saveChanges();
+    await workflow.publishExploration();
     await users.logout();
 
     await users.login('user10@editorAndPlayer.com');
-    libraryPage.get();
-    libraryPage.findExploration('Recommended Exploration 1');
-    libraryPage.playExploration('Recommended Exploration 1');
+    await libraryPage.get();
+    await libraryPage.findExploration('Recommended Exploration 1');
+    await libraryPage.playExploration('Recommended Exploration 1');
     // Using the Id from Player and create a new exploration
     // and add the Id as suggestion.
     var recommendedExplorationId = await general.getExplorationIdFromPlayer();
     await workflow.createExploration();
-    explorationEditorMainTab.setContent(
-      forms.toRichText('I want to recommend an exploration at the end'));
-    explorationEditorMainTab.setInteraction(
+    await explorationEditorMainTab.setContent(
+      await forms.toRichText('I want to recommend an exploration at the end'));
+    await explorationEditorMainTab.setInteraction(
       'EndExploration', [recommendedExplorationId]);
-    explorationEditorPage.navigateToSettingsTab();
-    explorationEditorSettingsTab.setTitle(
+    await explorationEditorPage.navigateToSettingsTab();
+    await explorationEditorSettingsTab.setTitle(
       'Exploration with Recommendation');
-    explorationEditorSettingsTab.setCategory('Algorithm');
-    explorationEditorSettingsTab.setObjective(
+    await explorationEditorSettingsTab.setCategory('Algorithm');
+    await explorationEditorSettingsTab.setObjective(
       'To display recommended exploration');
-    explorationEditorPage.navigateToMainTab();
-    explorationEditorPage.saveChanges();
-    workflow.publishExploration();
+    await explorationEditorPage.navigateToMainTab();
+    await explorationEditorPage.saveChanges();
+    await workflow.publishExploration();
 
     // Play-test the exploration and visit the recommended exploration
-    libraryPage.get();
-    libraryPage.findExploration('Exploration with Recommendation');
-    libraryPage.playExploration('Exploration with Recommendation');
+    await libraryPage.get();
+    await libraryPage.findExploration('Exploration with Recommendation');
+    await libraryPage.playExploration('Exploration with Recommendation');
     var recommendedExplorationTile = element(
       by.css('.protractor-test-exp-summary-tile-title'));
-    expect(recommendedExplorationTile.getText())
+    expect(await recommendedExplorationTile.getText())
       .toEqual('Recommended Exploration 1');
     await recommendedExplorationTile.click();
-    explorationPlayerPage.expectExplorationNameToBe(
+    await explorationPlayerPage.expectExplorationNameToBe(
       'Recommended Exploration 1');
     await users.logout();
   });
 
-  afterEach(function() {
-    general.checkForConsoleErrors([]);
+  afterEach(async function() {
+    await general.checkForConsoleErrors([]);
   });
 });
