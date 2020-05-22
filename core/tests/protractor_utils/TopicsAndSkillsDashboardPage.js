@@ -160,7 +160,6 @@ var TopicsAndSkillsDashboardPage = function() {
       createTopicButton.click();
       topicNameField.sendKeys(topicName);
       topicDescriptionField.sendKeys(description);
-      // topicCategoryField.first().click();
       topicCategoryField.click();
       browser.driver.switchTo().activeElement().sendKeys(category + '\n');
       confirmTopicCreationButton.click();
@@ -201,8 +200,6 @@ var TopicsAndSkillsDashboardPage = function() {
   };
 
   this.deleteTopicWithIndex = function(index) {
-    // Update this
-
     waitFor.visibilityOf(element(by.css('.protractor-test-topics-table')),
       'Topic Names taking too long to appear.');
     element.all(

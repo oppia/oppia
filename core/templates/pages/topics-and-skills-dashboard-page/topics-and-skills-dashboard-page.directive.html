@@ -48,7 +48,7 @@
               </div>
               <div>
                 <i class="fa fa-angle-left topic-pagination-arrow" ng-click="$ctrl.changePage($ctrl.PREV_PAGE)"></i>
-                <span class="dashboard-list-pagination-value" ng-repeat="n in $ctrl.repeater($ctrl.currentCount/$ctrl.itemsPerPage)" ng-click="$ctrl.paginationHandler($index)">
+                <span class="dashboard-list-pagination-value" ng-repeat="n in $ctrl.generateIndexNumbersTillRange($ctrl.currentCount/$ctrl.itemsPerPage)" ng-click="$ctrl.paginationHandler($index)">
                   <span ng-if="$ctrl.pageNumber===$index" class="dashboard-list-pagination-active"><[$index+1]></span>
                   <span ng-if="$ctrl.pageNumber!==$index"><[$index+1]></span>
                 </span>

@@ -293,6 +293,9 @@ import { TopicsAndSkillsDashboardPageService } from
   'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.service';
 import { TopicCreationBackendApiService } from
   'domain/topic/topic-creation-backend-api.service';
+import { TopicsAndSkillsDashboardBackendApiService } from
+  // eslint-disable-next-line max-len
+  'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 import { TopicObjectFactory } from 'domain/topic/TopicObjectFactory';
 import { TopicRightsObjectFactory } from
   'domain/topic/TopicRightsObjectFactory';
@@ -535,9 +538,12 @@ export class UpgradedServices {
     upgradedServices['ThreadMessageObjectFactory'] =
       new ThreadMessageObjectFactory(
         upgradedServices['ThreadMessageSummaryObjectFactory']);
+    upgradedServices['TopicsAndSkillsDashboardBackendApiService'] =
+        new TopicsAndSkillsDashboardBackendApiService(
+          upgradedServices['HttpClient']);
     upgradedServices['TopicCreationBackendApiService'] =
         new TopicCreationBackendApiService(
-          upgradedServices['TopicCreationBackendApiService']);
+          upgradedServices['HttpClient']);
     upgradedServices['UrlService'] = new UrlService(
       upgradedServices['WindowRef']);
     upgradedServices['WindowDimensionsService'] = new WindowDimensionsService(

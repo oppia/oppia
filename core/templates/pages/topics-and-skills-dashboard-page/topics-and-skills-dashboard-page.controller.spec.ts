@@ -23,6 +23,8 @@ describe('Topics and Skills Dashboard Page', function() {
   var $httpBackend = null;
   var $uibModal = null;
   var directive;
+  var $rootScope;
+  var $q;
   var TOPICS_AND_SKILLS_DASHBOARD_DATA_URL =
       '/topics_and_skills_dashboard/data';
   var SAMPLE_TOPIC_ID = 'hyuy4GUlvTqJ';
@@ -40,7 +42,11 @@ describe('Topics and Skills Dashboard Page', function() {
       topic_model_last_updated: 1466178759209.839
     }],
     skill_summary_dicts: [],
-    untriaged_skill_summary_dicts: [],
+    untriaged_skill_summary_dicts: [{
+      id: SAMPLE_TOPIC_ID,
+      name: 'Sample Name',
+      language_code: 'en'
+    }],
     can_create_topic: true,
     can_create_skill: true
   };
@@ -51,27 +57,51 @@ describe('Topics and Skills Dashboard Page', function() {
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
     }
+    $provide.factory(
+      'SkillCreationBackendApiService', ['$http', $http => {
+        return {
+          createSkill: () => $http.post(
+            '/skill_editor_handler/create_new')
+        };
+      }]);
+
+    $provide.factory(
+      'TopicsAndSkillsDashboardBackendApiService', ['$http', $http => {
+        return {
+          fetchDashboardData: () => $http.get(
+            '/topics_and_skills_dashboard/data')
+        };
+      }]);
   }));
 
-  beforeEach(angular.mock.inject(function($injector, $rootScope, $controller) {
+  beforeEach(angular.mock.inject(function($injector, $controller) {
     $httpBackend = $injector.get('$httpBackend');
+    $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
     $uibModal = $injector.get('$uibModal');
     $httpBackend = $injector.get('$httpBackend');
+    $q = $injector.get('$q');
+
     directive = $injector.get('topicsAndSkillsDashboardPageDirective')[0];
     ctrl = $injector.instantiate(directive.controller, {
-      $scope: $scope
+      $scope: $scope,
     });
     ctrl.$onInit();
+    $httpBackend.expect('GET', TOPICS_AND_SKILLS_DASHBOARD_DATA_URL).respond(
+      sampleDataResults);
+    $httpBackend.flush();
   }));
 
+  afterEach(function() {
+    $httpBackend.verifyNoOutstandingRequest();
+    $httpBackend.verifyNoOutstandingExpectation();
+  });
 
-  it('should initialize the variables', () => {
+  it('Should init the dashboard and fetch data', function() {
     const filterOptions = {sort: '',
       keywords: '',
       category: '',
       status: ''};
-    expect(2).toEqual(2);
     expect(ctrl.pageNumber).toEqual(0);
     expect(ctrl.topicPageNumber).toEqual(0);
     expect(ctrl.itemsPerPage).toEqual(10);
@@ -93,27 +123,18 @@ describe('Topics and Skills Dashboard Page', function() {
     }
     expect(ctrl.sortOptions).toEqual(ESortOptions);
     expect(ctrl.statusOptions).toEqual(EPublishedOptions);
-  });
 
-  it('Should init the dashboard and fetch data', function() {
-    $httpBackend.expect('GET', TOPICS_AND_SKILLS_DASHBOARD_DATA_URL).respond(
-      sampleDataResults);
-    ctrl._initDashboard(false);
-    $httpBackend.flush();
     expect(ctrl.activeTab).toEqual('topics');
     expect(ctrl.totalTopicSummaries).toEqual(
       sampleDataResults.topic_summary_dicts);
-    expect(ctrl.untriagedSkillSummaries).toEqual([]);
+    expect(ctrl.untriagedSkillSummaries).toEqual(
+      sampleDataResults.untriaged_skill_summary_dicts);
     expect(ctrl.totalCount).toEqual(1);
     expect(ctrl.userCanCreateTopic).toEqual(true);
     expect(ctrl.userCanCreateSkill).toEqual(true);
   });
 
   it('should set the active tab', function() {
-    $httpBackend.expect('GET', TOPICS_AND_SKILLS_DASHBOARD_DATA_URL).respond(
-      sampleDataResults);
-    ctrl._initDashboard(false);
-    $httpBackend.flush();
     expect(ctrl.activeTab).toEqual('topics');
     ctrl.setActiveTab(ctrl.TAB_NAME_UNTRIAGED_SKILLS);
     expect(ctrl.activeTab).toEqual('untriagedSkills');
@@ -122,10 +143,6 @@ describe('Topics and Skills Dashboard Page', function() {
   });
 
   it('should paginate', function() {
-    $httpBackend.expect('GET', TOPICS_AND_SKILLS_DASHBOARD_DATA_URL).respond(
-      sampleDataResults);
-    ctrl._initDashboard(false);
-    $httpBackend.flush();
     expect(ctrl.topicPageNumber).toEqual(0);
     expect(ctrl.pageNumber).toEqual(0);
     ctrl.paginationHandler(4);
@@ -144,13 +161,10 @@ describe('Topics and Skills Dashboard Page', function() {
     ctrl.createSkill();
     expect(modalSpy).toHaveBeenCalled();
   });
+
   it('should navigate the page', function() {
     var totalCount = 50;
     var itemsPerPage = 10;
-    $httpBackend.expect('GET', TOPICS_AND_SKILLS_DASHBOARD_DATA_URL).respond(
-      sampleDataResults);
-    ctrl._initDashboard(false);
-    $httpBackend.flush();
 
     expect(ctrl.activeTab).toEqual('topics');
 
@@ -195,5 +209,10 @@ describe('Topics and Skills Dashboard Page', function() {
     ctrl.filterOptions.status = 'status1';
     ctrl.resetFilters();
     expect(ctrl.filterOptions).toEqual(filterOptions);
+  });
+
+  it('should return number from 1 to range', function() {
+    var array = ctrl.generateIndexNumbersTillRange(5);
+    expect(array).toEqual([0, 1, 2, 3, 4]);
   });
 });

@@ -34,9 +34,8 @@ require('components/rubrics-editor/rubrics-editor.directive.ts');
 require('domain/skill/RubricObjectFactory.ts');
 require('domain/skill/SkillObjectFactory.ts');
 require(
-  'domain/topics_and_skills_dashboard/' +
-  'topics-and-skills-dashboard-backend-api.service.ts'
-);
+    // eslint-disable-next-line max-len
+  'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require(
   'pages/topics-and-skills-dashboard-page/skills-list/' +
@@ -91,11 +90,22 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
             MAX_CHARS_IN_SKILL_DESCRIPTION, SKILL_DESCRIPTION_STATUS_VALUES,
             TOPIC_CATEGORIES, E_SORT_OPTIONS, E_PUBLISHED_OPTIONS) {
           var ctrl = this;
-          ctrl._initDashboard = function(stayInSameTab) {
+          var _initDashboard = function(stayInSameTab) {
             TopicsAndSkillsDashboardBackendApiService.fetchDashboardData().then(
               function(response) {
-                ctrl.totalTopicSummaries = response.data.topic_summary_dicts;
-                ctrl.topicSummaries = response.data.topic_summary_dicts;
+                // The following condition is required for Karma testing. The
+                // Angular HttpClient returns an Observable which when converted
+                // to a promise does not have the 'data' key but the AngularJS
+                // mocks of services using HttpClient use $http which return
+                // promise and the content is contained in the 'data' key.
+                // Therefore the following condition checks for presence of
+                // 'response.data' which would be the case in AngularJS testing
+                // but assigns 'response' if the former is not present which is
+                // the case with HttpClient.
+                var responseData = response.data ? response.data : response;
+
+                ctrl.totalTopicSummaries = responseData.topic_summary_dicts;
+                ctrl.topicSummaries = responseData.topic_summary_dicts;
 
                 ctrl.totalCount = ctrl.topicSummaries.length;
                 ctrl.currentCount = ctrl.totalCount;
@@ -107,24 +117,24 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
                   }
                 );
                 ctrl.untriagedSkillSummaries =
-                  response.data.untriaged_skill_summary_dicts;
+                    responseData.untriaged_skill_summary_dicts;
                 ctrl.totalUntriagedSkillSummaries =
                     ctrl.untriagedSkillSummaries;
                 ctrl.mergeableSkillSummaries =
-                  response.data.mergeable_skill_summary_dicts;
+                    responseData.mergeable_skill_summary_dicts;
                 if (!stayInSameTab || !ctrl.activeTab) {
                   ctrl.activeTab = ctrl.TAB_NAME_TOPICS;
                 }
-                ctrl.userCanCreateTopic = response.data.can_create_topic;
-                ctrl.userCanCreateSkill = response.data.can_create_skill;
+                ctrl.userCanCreateTopic = responseData.can_create_topic;
+                ctrl.userCanCreateSkill = responseData.can_create_skill;
                 $rootScope.$broadcast(
                   EVENT_TYPE_TOPIC_CREATION_ENABLED, ctrl.userCanCreateTopic);
                 $rootScope.$broadcast(
                   EVENT_TYPE_SKILL_CREATION_ENABLED, ctrl.userCanCreateSkill);
-                ctrl.userCanDeleteTopic = response.data.can_delete_topic;
-                ctrl.userCanDeleteSkill = response.data.can_delete_skill;
-                  $rootScope.$apply();
-                  if (ctrl.topicSummaries.length === 0 &&
+                ctrl.userCanDeleteTopic = responseData.can_delete_topic;
+                ctrl.userCanDeleteSkill = responseData.can_delete_skill;
+                $rootScope.$apply();
+                if (ctrl.topicSummaries.length === 0 &&
                     ctrl.untriagedSkillSummaries.length !== 0) {
                   ctrl.activeTab = ctrl.TAB_NAME_UNTRIAGED_SKILLS;
                 }
@@ -293,6 +303,7 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
 
           ctrl.$onInit = function() {
             ctrl.TAB_NAME_TOPICS = 'topics';
+            ctrl.activeTab = ctrl.TAB_NAME_TOPICS;
             ctrl.NEXT_PAGE = 'next_page';
             ctrl.PREV_PAGE = 'prev_page';
             ctrl.TAB_NAME_UNTRIAGED_SKILLS = 'untriagedSkills';
@@ -313,7 +324,7 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
             ctrl.sortOptions = (E_SORT_OPTIONS);
             ctrl.statusOptions = (E_PUBLISHED_OPTIONS);
 
-            ctrl.repeater = function(range) {
+            ctrl.generateIndexNumbersTillRange = function(range) {
               var arr = [];
               for (var i = 0; i < range; i++) {
                 arr.push(i);
@@ -323,13 +334,13 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
             $scope.$on(
               EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED, function(
                   evt, stayInSameTab) {
-                ctrl._initDashboard(stayInSameTab);
+                _initDashboard(stayInSameTab);
               }
             );
             // The _initDashboard function is written separately since it is
             // also called in $scope.$on when some external events are
             // triggered.
-            ctrl._initDashboard(false);
+            _initDashboard(false);
           };
         }
       ]
