@@ -364,7 +364,7 @@ def check_travis_and_circleci_tests(current_branch_name):
             'not match the latest commit on Oppia repo.')
 
     python_utils.PRINT('\nEnter your GitHub username.\n')
-    github_username = python_utils.INPUT().lower()
+    github_username = python_utils.INPUT().lower().strip()
 
     travis_url = 'https://travis-ci.org/%s/oppia/branches' % github_username
     circleci_url = 'https://circleci.com/gh/%s/workflows/oppia' % (
