@@ -24,7 +24,7 @@ import { ParamChangesObjectFactory } from
   'domain/exploration/ParamChangesObjectFactory';
 
 describe('ParamChanges Object Factory', () => {
-  const customizationArg = {
+  const customizationArgs = {
     parse_with_jinja: true,
     value: ''
   };
@@ -40,12 +40,12 @@ describe('ParamChanges Object Factory', () => {
       let paramName2 = 'param_2';
       let backendList = [
         {
-          customization_args: { [gId]: customizationArg },
+          customization_args: customizationArgs,
           generator_id: gId,
           name: paramName
         },
         {
-          customization_args: { [gId]: customizationArg },
+          customization_args: customizationArgs,
           generator_id: gId,
           name: paramName2
         }
@@ -55,10 +55,10 @@ describe('ParamChanges Object Factory', () => {
         this.pcsof.createFromBackendList(backendList));
 
       expect(testOutcome.length).toBe(2);
-      expect(testOutcome[0].customizationArg).toEqual(customizationArg);
+      expect(testOutcome[0].customizationArg).toEqual(customizationArgs);
       expect(testOutcome[0].generatorId).toBe(gId);
       expect(testOutcome[0].name).toBe(paramName);
-      expect(testOutcome[1].customizationArg).toEqual(customizationArg);
+      expect(testOutcome[1].customizationArg).toEqual(customizationArgs);
       expect(testOutcome[1].generatorId).toBe(gId);
       expect(testOutcome[1].name).toBe(paramName2);
     }

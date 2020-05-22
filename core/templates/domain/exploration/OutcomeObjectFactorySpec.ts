@@ -69,10 +69,7 @@ describe('Outcome object factory', () => {
 
       expect(testOutcome.toBackendDict()).toEqual({
         dest: 'A',
-        feedback: {
-          html: undefined,
-          content_id: undefined
-        },
+        feedback: { content_id: 'feedback_1', html: 'Html' },
         labelled_as_correct: true,
         param_changes: [],
         refresher_exploration_id: '1',

@@ -71,16 +71,20 @@ export class LostChange {
   }
 
   isOutcomeFeedbackEqual(): boolean {
-    const newFeedback = this.newValue.outcome && this.newValue.outcome.feedback;
-    const oldFeedback = this.oldValue.outcome && this.oldValue.outcome.feedback;
+    const newFeedback = (
+      this.newValue.outcome && this.newValue.outcome.feedback) || null;
+    const oldFeedback = (
+      this.oldValue.outcome && this.oldValue.outcome.feedback) || null;
     return (
-      oldFeedback && newFeedback &&
+      oldFeedback !== null && newFeedback !== null &&
       newFeedback.getHtml() === oldFeedback.getHtml());
   }
 
   isOutcomeDestEqual(): boolean {
+    const newOutcome = this.newValue.outcome || null;
+    const oldOutcome = this.oldValue.outcome || null;
     return (
-      this.newValue.outcome && this.oldValue.outcome &&
+      newOutcome !== null && oldOutcome !== null &&
       this.oldValue.outcome.dest === this.newValue.outcome.dest);
   }
 
@@ -89,8 +93,10 @@ export class LostChange {
   }
 
   isFeedbackEqual(): boolean {
+    const newFeedback = this.newValue.feedback || null;
+    const oldFeedback = this.oldValue.feedback || null;
     return (
-      this.newValue.feedback && this.oldValue.feedback &&
+      newFeedback !== null && oldFeedback !== null &&
       this.newValue.feedback.getHtml() === this.oldValue.feedback.getHtml());
   }
 

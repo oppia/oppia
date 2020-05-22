@@ -6,7 +6,7 @@
 //
 //      http://www.apache.org/licenses/LICENSE-2.0
 //
-// Unless required by applicable law or agreed to in writing, software
+// Unless required by applicable law or agreed to in writing, this.software
 // distributed under the License is distributed on an "AS-IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
@@ -15,10 +15,14 @@
 /**
  * @fileoverview Unit tests for StateObjectFactory.
  */
+
+import { TestBed } from '@angular/core/testing';
+
 import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
+import { ConvertToPlainTextPipe } from
+  'filters/string-utility-filters/convert-to-plain-text.pipe';
 import { StateObjectFactory } from 'domain/state/StateObjectFactory';
-import { TestBed } from '@angular/core/testing';
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
 import { InteractionObjectFactory } from
@@ -33,22 +37,20 @@ import { WrittenTranslationsObjectFactory } from
 const constants = require('constants.ts');
 
 describe('State Object Factory', () => {
-  let sof, shof, iof, pcof, rvof, wtof;
-  let stateObject;
   const oldNewStateTemplate = constants.NEW_STATE_TEMPLATE;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [CamelCaseToHyphensPipe]
+      providers: [CamelCaseToHyphensPipe, ConvertToPlainTextPipe]
     });
-    sof = TestBed.get(StateObjectFactory);
-    shof = TestBed.get(SubtitledHtmlObjectFactory);
-    iof = TestBed.get(InteractionObjectFactory);
-    pcof = TestBed.get(ParamChangesObjectFactory);
-    rvof = TestBed.get(RecordedVoiceoversObjectFactory);
-    wtof = TestBed.get(WrittenTranslationsObjectFactory);
+    this.sof = TestBed.get(StateObjectFactory);
+    this.shof = TestBed.get(SubtitledHtmlObjectFactory);
+    this.iof = TestBed.get(InteractionObjectFactory);
+    this.pcof = TestBed.get(ParamChangesObjectFactory);
+    this.rvof = TestBed.get(RecordedVoiceoversObjectFactory);
+    this.wtof = TestBed.get(WrittenTranslationsObjectFactory);
 
-    stateObject = {
+    this.stateObject = {
       classifier_model_id: null,
       content: {
         html: '',
@@ -152,9 +154,9 @@ describe('State Object Factory', () => {
   });
 
   it('should create a new state object from backend dict', () => {
-    const stateObjectBackend = sof.createFromBackendDict(
-      'State name', stateObject);
-    expect(stateObjectBackend.toBackendDict()).toEqual(stateObject);
+    this.stateObjectBackend = this.sof.createFromBackendDict(
+      'State name', this.stateObject);
+    expect(this.stateObjectBackend.toBackendDict()).toEqual(this.stateObject);
   });
 
   it('should correctly create a state object when param_changes length ' +
@@ -167,41 +169,43 @@ describe('State Object Factory', () => {
       generator_id: 'Copier',
       name: 'Param change 1',
     }];
-    stateObject.param_changes = paramChanges;
-    const stateObjectBackend = sof.createFromBackendDict(
-      'State name', stateObject);
+    this.stateObject.param_changes = paramChanges;
+    this.stateObjectBackend = this.sof.createFromBackendDict(
+      'State name', this.stateObject);
 
-    expect(stateObjectBackend.toBackendDict()).toEqual({
-      ...stateObject,
-      // Overrides the param_changes from stateObject
+    expect(this.stateObjectBackend.toBackendDict()).toEqual({
+      ...this.stateObject,
+      // Overrides the param_changes from this.stateObject
       param_changes: paramChanges
     });
   });
 
   it('should create a default state object', () => {
     const stateName = 'Default state';
-    const stateObjectDefault = sof.createDefaultState(stateName);
-    stateObject.interaction.default_outcome.dest = stateName;
+    this.stateObjectDefault = this.sof.createDefaultState(stateName);
+    this.stateObject.interaction.default_outcome.dest = stateName;
 
-    expect(stateObjectDefault.toBackendDict()).toEqual(stateObject);
+    expect(this.stateObjectDefault.toBackendDict()).toEqual(this.stateObject);
   });
 
   it('should set a new name for state object', () => {
     const stateName = 'New name';
-    const stateObjectDefault = sof.createFromBackendDict(
-      'Default state', stateObject);
+    this.stateObjectDefault = this.sof.createFromBackendDict(
+      'Default state', this.stateObject);
 
-    stateObjectDefault.setName(stateName);
-    expect(stateObjectDefault.name).toBe(stateName);
+    this.stateObjectDefault.setName(stateName);
+    expect(this.stateObjectDefault.name).toBe(stateName);
   });
 
   it('should copy a state object', () => {
-    const otherState = sof.createFromBackendDict('Other state', stateObject);
-    const stateObjectDefault = sof.createFromBackendDict('', stateObject);
+    const otherState = (
+      this.sof.createFromBackendDict('Other state', this.stateObject));
+    this.stateObjectDefault = (
+      this.sof.createFromBackendDict('', this.stateObject));
 
-    stateObjectDefault.copy(otherState);
+    this.stateObjectDefault.copy(otherState);
 
-    expect(stateObjectDefault).toEqual(otherState);
-    expect(stateObjectDefault.name).toEqual('Other state');
+    expect(this.stateObjectDefault).toEqual(otherState);
+    expect(this.stateObjectDefault.name).toEqual('Other state');
   });
 });

@@ -41,9 +41,8 @@ export interface IWrittenTranslationsBackendDict {
 
 export class WrittenTranslations {
   constructor(
-      public translationsMapping: TranslationsMapping,
-      private writtenTranslationObjectFactory:
-        WrittenTranslationObjectFactory) {}
+      private writtenTranslationObjectFactory: WrittenTranslationObjectFactory,
+      public translationsMapping: TranslationsMapping) {}
 
   getAllContentId(): string[] {
     return Object.keys(this.translationsMapping);
@@ -55,21 +54,21 @@ export class WrittenTranslations {
   }
 
   markAllTranslationsAsNeedingUpdate(contentId: string): void {
-    const langCodeToWrittenTranslation = this.translationsMapping[contentId];
-    for (const langCode in langCodeToWrittenTranslation) {
-      langCodeToWrittenTranslation[langCode].markAsNeedingUpdate();
+    const translationsByLangCode = this.translationsMapping[contentId];
+    for (const translation of Object.values(translationsByLangCode)) {
+      translation.markAsNeedingUpdate();
     }
   }
 
   getTranslationsLanguageCodes(contentId: string): string[] {
-    return Object.keys(this.translationsMapping[contentId]);
+    const translationsByLangCode = this.translationsMapping[contentId];
+    return translationsByLangCode ? Object.keys(translationsByLangCode) : [];
   }
 
   hasWrittenTranslation(contentId: string, langCode: string): boolean {
-    if (!this.translationsMapping.hasOwnProperty(contentId)) {
-      return false;
-    }
-    return this.getTranslationsLanguageCodes(contentId).includes(langCode);
+    return (
+      this.translationsMapping.hasOwnProperty(contentId) &&
+      this.translationsMapping[contentId].hasOwnProperty(langCode));
   }
 
   hasUnflaggedWrittenTranslations(contentId: string): boolean {
@@ -93,42 +92,44 @@ export class WrittenTranslations {
 
   addWrittenTranslation(
       contentId: string, langCode: string, html: string): void {
-    const writtenTranslations = this.translationsMapping[contentId];
-    if (writtenTranslations.hasOwnProperty(langCode)) {
+    const translationsByLangCode = this.translationsMapping[contentId];
+    if (translationsByLangCode.hasOwnProperty(langCode)) {
       throw new Error('Trying to add duplicate language code.');
     }
-    writtenTranslations[langCode] = (
+    translationsByLangCode[langCode] = (
       this.writtenTranslationObjectFactory.createNew(html));
   }
 
   updateWrittenTranslationHtml(
       contentId: string, langCode: string, html: string): void {
-    const writtenTranslations = this.translationsMapping[contentId];
-    if (!writtenTranslations.hasOwnProperty(langCode)) {
+    const translationsByLangCode = this.translationsMapping[contentId];
+    if (!translationsByLangCode.hasOwnProperty(langCode)) {
       throw new Error('Unable to find the given language code.');
     }
-    writtenTranslations[langCode].setHtml(html);
+    translationsByLangCode[langCode].setHtml(html);
     // Marking translation updated.
-    writtenTranslations[langCode].needsUpdate = false;
+    translationsByLangCode[langCode].needsUpdate = false;
   }
 
   toggleNeedsUpdateAttribute(contentId: string, langCode: string): void {
-    const writtenTranslations = this.translationsMapping[contentId];
-    writtenTranslations[langCode].toggleNeedsUpdateAttribute();
+    this.translationsMapping[contentId][langCode].toggleNeedsUpdateAttribute();
   }
 
   toBackendDict(): IWrittenTranslationsBackendDict {
-    const translationsMappingDict = {};
-    for (const contentId in this.translationsMapping) {
-      const langToWrittenTranslation = this.translationsMapping[contentId];
-      const langToWrittenTranslationDict = {};
-      for (const langCode in langToWrittenTranslation) {
-        langToWrittenTranslationDict[langCode] = (
-          langToWrittenTranslation[langCode].toBackendDict());
+    const translationEntries = Object.entries(this.translationsMapping);
+
+    const translationBackendDictMapping: ITranslationMappingBackendDict = {};
+    for (const [contentId, translationsByLangCode] of translationEntries) {
+      const translationsByLangCodeEntries = (
+        Object.entries(translationsByLangCode));
+
+      translationBackendDictMapping[contentId] = {};
+      for (const [langCode, translation] of translationsByLangCodeEntries) {
+        translationBackendDictMapping[contentId][langCode] = (
+          translation.toBackendDict());
       }
-      translationsMappingDict[contentId] = langToWrittenTranslationDict;
     }
-    return {translations_mapping: translationsMappingDict};
+    return {translations_mapping: translationBackendDictMapping};
   }
 }
 
@@ -155,11 +156,11 @@ export class WrittenTranslationsObjectFactory {
       }
     }
     return new WrittenTranslations(
-      translationsMapping, this.writtenTranslationObjectFactory);
+      this.writtenTranslationObjectFactory, translationsMapping);
   }
 
   createEmpty(): WrittenTranslations {
-    return new WrittenTranslations({}, this.writtenTranslationObjectFactory);
+    return new WrittenTranslations(this.writtenTranslationObjectFactory, {});
   }
 }
 

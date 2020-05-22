@@ -45,20 +45,20 @@ export interface IParamChangeBackendDict {
 
 export class ParamChange {
   constructor(
-      public customizationArg: ICustomizationArg,
+      public customizationArgs: ICustomizationArg,
       public generatorId: string,
       public name: string) {}
 
   toBackendDict(): IParamChangeBackendDict {
     return {
-      customization_args: {[this.generatorId]: this.customizationArg},
+      customization_args: {[this.generatorId]: this.customizationArgs},
       generator_id: this.generatorId,
       name: this.name
     };
   }
 
   resetCustomizationArgs(): void {
-    this.customizationArg = cloneDeep(
+    this.customizationArgs = cloneDeep(
       DEFAULT_CUSTOMIZATION_ARGS[this.generatorId]);
   }
 }

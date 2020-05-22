@@ -20,10 +20,8 @@ import { ParamChangeObjectFactory } from
   'domain/exploration/ParamChangeObjectFactory';
 
 describe('Param Change Object Factory', () => {
-  let pcof;
-
   beforeEach(() => {
-    pcof = new ParamChangeObjectFactory();
+    this.pcof = new ParamChangeObjectFactory();
   });
 
   it('should create a param change object from backend dict', () => {
@@ -36,7 +34,7 @@ describe('Param Change Object Factory', () => {
       name: 'Param change from backend'
     };
     const paramChangeObject = (
-      pcof.createFromBackendDict(sampleData));
+      this.pcof.createFromBackendDict(sampleData));
 
     expect(paramChangeObject.toBackendDict()).toEqual(sampleData);
   });
@@ -52,7 +50,7 @@ describe('Param Change Object Factory', () => {
       name: 'Reset copier custom customization args'
     };
     const paramChangeObject = (
-      pcof.createFromBackendDict(sampleData));
+      this.pcof.createFromBackendDict(sampleData));
     paramChangeObject.resetCustomizationArgs();
 
     expect(paramChangeObject.toBackendDict()).toEqual({
@@ -76,7 +74,7 @@ describe('Param Change Object Factory', () => {
       name: 'Reset random selector custom customization args'
     };
     const paramChangeObject = (
-      pcof.createFromBackendDict(sampleData));
+      this.pcof.createFromBackendDict(sampleData));
     paramChangeObject.resetCustomizationArgs();
 
     expect(paramChangeObject.toBackendDict()).toEqual({
@@ -90,7 +88,7 @@ describe('Param Change Object Factory', () => {
 
   it('should create an empty param change object', () => {
     const emptyParamChangeObject = (
-      pcof.createEmpty('param'));
+      this.pcof.createEmpty('param'));
 
     expect(emptyParamChangeObject.toBackendDict()).toEqual({
       customization_args: {
@@ -104,7 +102,7 @@ describe('Param Change Object Factory', () => {
 
   it('should create a default param change object', () => {
     const emptyParamChangeObject = (
-      pcof.createDefault('param'));
+      this.pcof.createDefault('param'));
 
     expect(emptyParamChangeObject.toBackendDict()).toEqual({
       customization_args: {

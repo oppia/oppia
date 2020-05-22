@@ -72,6 +72,8 @@ import { ConceptCardObjectFactory } from
 import { ContextService } from 'services/context.service';
 import { ContinueValidationService } from
   'interactions/Continue/directives/continue-validation.service';
+import { ConvertToPlainTextPipe } from
+  'filters/string-utility-filters/convert-to-plain-text.pipe';
 import { CountVectorizerService } from 'classifiers/count-vectorizer.service';
 import { CreatorDashboardBackendApiService } from
   'domain/creator_dashboard/creator-dashboard-backend-api.service';
@@ -345,6 +347,7 @@ export class UpgradedServices {
     upgradedServices['ClassifierObjectFactory'] = new ClassifierObjectFactory();
     upgradedServices['CodeNormalizerService'] = new CodeNormalizerService();
     upgradedServices['ComputeGraphService'] = new ComputeGraphService();
+    upgradedServices['ConvertToPlainTextPipe'] = new ConvertToPlainTextPipe();
     upgradedServices['CountVectorizerService'] = new CountVectorizerService();
     upgradedServices['CsrfTokenService'] = new CsrfTokenService();
     upgradedServices['DateTimeFormatService'] = new DateTimeFormatService();
@@ -364,6 +367,7 @@ export class UpgradedServices {
     upgradedServices['ExplorationFeaturesService'] =
       new ExplorationFeaturesService();
     upgradedServices['ExpressionParserService'] = new ExpressionParserService();
+    upgradedServices['FormatTimePipe'] = new FormatTimePipe();
     upgradedServices['FractionObjectFactory'] = new FractionObjectFactory();
     upgradedServices['GenerateContentIdService'] =
       new GenerateContentIdService();
