@@ -33,6 +33,8 @@ require('pages/skill-editor-page/services/skill-editor-state.service.ts');
 
 require('pages/skill-editor-page/skill-editor-page.constants.ajs.ts');
 
+import { Subscription } from 'rxjs';
+
 angular.module('oppia').directive('skillMisconceptionsEditor', [
   'SkillEditorStateService', 'SkillUpdateService', 'UrlInterpolationService',
   function(
@@ -45,13 +47,14 @@ angular.module('oppia').directive('skillMisconceptionsEditor', [
         'skill-misconceptions-editor.directive.html'),
       controller: [
         '$scope', '$filter', '$uibModal', '$rootScope',
-        'MisconceptionObjectFactory', 'EVENT_SKILL_REINITIALIZED',
+        'MisconceptionObjectFactory',
         'MAX_CHARS_IN_MISCONCEPTION_NAME',
         function(
             $scope, $filter, $uibModal, $rootScope,
-            MisconceptionObjectFactory, EVENT_SKILL_REINITIALIZED,
+            MisconceptionObjectFactory,
             MAX_CHARS_IN_MISCONCEPTION_NAME) {
           var ctrl = this;
+          ctrl.directiveSubscriptions = new Subscription();
           $scope.isEditable = function() {
             return true;
           };
@@ -166,10 +169,15 @@ angular.module('oppia').directive('skillMisconceptionsEditor', [
           ctrl.$onInit = function() {
             $scope.skill = SkillEditorStateService.getSkill();
             $scope.misconceptions = $scope.skill.getMisconceptions();
-            $scope.$on(EVENT_SKILL_REINITIALIZED, function() {
-              $scope.misconceptions = $scope.skill.getMisconceptions();
-            });
+            ctrl.directiveSubscriptions.add(
+              SkillEditorStateService.getSkillChangedSubject().subscribe(
+                () => $scope.misconceptions = $scope.skill.getMisconceptions())
+            );
           };
+
+          $scope.$on('$destroy', function() {
+            ctrl.directiveSubscriptions.unsubscribe();
+          });
         }]
     };
   }
