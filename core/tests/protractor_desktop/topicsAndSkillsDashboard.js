@@ -47,7 +47,7 @@ describe('Topics and skills dashboard functionality', function() {
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
     users.createAdmin('creator@topicsAndSkillsDashboard.com',
-      'creatorTopicsAndSkillsDashboard');
+      'creatorTopicsAndSkillsDB');
   });
 
   beforeEach(function() {
@@ -103,6 +103,7 @@ describe('Topics and skills dashboard functionality', function() {
       topicsAndSkillsDashboardPage.get();
       topicsAndSkillsDashboardPage.navigateToUnusedSkillsTab();
       topicsAndSkillsDashboardPage.mergeSkillWithIndexToSkillWithIndex(0, 0);
+      topicsAndSkillsDashboardPage.get();
       topicsAndSkillsDashboardPage.navigateToTopicWithIndex(0);
       topicEditorPage.moveToQuestionsTab();
       topicEditorPage.expectNumberOfQuestionsForSkillWithDescriptionToBe(
