@@ -171,11 +171,7 @@ class EmailDashboardResultPage(base.BaseHandler):
             raise self.UnauthorizedUserException(
                 '%s is not an authorized user for this query.' % self.user_id)
 
-        self.values.update({
-            'query_id': query_id,
-        })
-        self.render_template(
-            'email-dashboard-result.mainpage.html')
+        self.render_template('email-dashboard-result.mainpage.html')
 
     @acl_decorators.can_manage_email_dashboard
     def post(self, query_id):

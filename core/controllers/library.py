@@ -143,14 +143,6 @@ class LibraryGroupPage(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-
-        self.values.update({
-            'meta_description': (
-                feconf.LIBRARY_GROUP_PAGE_DESCRIPTION),
-            'has_fully_registered': bool(
-                self.user_id and
-                user_services.has_fully_registered(self.user_id)),
-        })
         self.render_template('library-page.mainpage.html')
 
 

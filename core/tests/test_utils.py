@@ -29,6 +29,7 @@ import os
 import unittest
 
 from constants import constants
+from core.controllers import base
 from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import exp_domain
@@ -56,7 +57,6 @@ import utils
 from google.appengine.api import apiproxy_stub
 from google.appengine.api import apiproxy_stub_map
 from google.appengine.api import mail
-import jinja2
 import webtest
 
 (exp_models, question_models, skill_models, story_models, topic_models,) = (
@@ -124,28 +124,26 @@ def get_filepath_from_filename(filename, rootdir):
     return filepath
 
 
-def mock_get_template(unused_self, filename):
-    """Mock for get_template function of jinja2 Environment. This mock is
-    required for backend tests since we do not have webpack compilation
-    before backend tests. The folder to search templates is webpack_bundles
-    which is generated after webpack compilation. Since this folder will be
-    missing, get_template function will return a TemplateNotFound error. So,
-    we use a mock for get_template which returns the html file from the source
-    directory instead.
+def mock_load_template(filename):
+    """Mock for load_template function. This mock is required for backend tests
+    since we do not have webpack compilation before backend tests. The folder
+    to search templates is webpack_bundles which is generated after webpack
+    compilation. Since this folder will be missing, load_template function will
+    return an error. So, we use a mock for load_template which returns the html
+    file from the source directory instead.
 
     Args:
-        unused_self: jinja2.environment.Environment. The Environment instance.
         filename: str. The name of the file for which template is
             to be returned.
 
     Returns:
-        jinja2.environment.Template. The template for the given file.
+        str. The contents of the given file.
     """
     filepath = get_filepath_from_filename(
         filename, os.path.join('core', 'templates', 'pages'))
     with python_utils.open_file(filepath, 'r') as f:
         file_content = f.read()
-    return jinja2.environment.Template(file_content)
+    return file_content
 
 
 class URLFetchServiceMock(apiproxy_stub.APIProxyStub):
@@ -653,7 +651,7 @@ tags: []
         # is only produced after webpack compilation which is not performed
         # during backend tests.
         with self.swap(
-            jinja2.environment.Environment, 'get_template', mock_get_template):
+            base, 'load_template', mock_load_template):
             response = self.testapp.get(
                 url, params, expect_errors=expect_errors,
                 status=expected_status_int)
@@ -743,7 +741,7 @@ tags: []
         # is only produced after webpack compilation which is not performed
         # during backend tests.
         with self.swap(
-            jinja2.environment.Environment, 'get_template', mock_get_template):
+            base, 'load_template', mock_load_template):
             response = self.testapp.get(url, params, expect_errors=True)
 
         self.assertIn(response.status_int, expected_status_int_list)

@@ -60,8 +60,6 @@ class PracticeSessionsPageDataHandler(base.BaseHandler):
         for skill in skills:
             skill_descriptions[skill.id] = skill.description
 
-        topic_name = topic.name
-
         self.values.update({
             'topic_name': topic.name,
             'skill_descriptions': skill_descriptions

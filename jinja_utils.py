@@ -21,7 +21,6 @@ import copy
 import json
 import logging
 import math
-import os
 
 import jinja2
 from jinja2 import meta
@@ -67,24 +66,6 @@ JINJA_FILTERS = {
     'js_string': _js_string_filter,
     'log2_floor': _log2_floor_filter,
 }
-
-
-def get_jinja_env(dir_path):
-    """Loads the correct jinja2 template environment.
-
-    Args:
-        dir_path: str. The directory path where the loader looks up the
-            templates.
-
-    Returns:
-        Environment. The template environment.
-    """
-    loader = jinja2.FileSystemLoader(os.path.join(
-        os.path.dirname(__file__), dir_path))
-    env = jinja2.Environment(autoescape=True, loader=loader)
-
-    env.filters.update(JINJA_FILTERS)
-    return env
 
 
 def parse_string(string, params, autoescape=True):
