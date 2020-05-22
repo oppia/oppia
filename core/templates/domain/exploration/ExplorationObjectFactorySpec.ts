@@ -20,6 +20,8 @@ import { TestBed } from '@angular/core/testing';
 
 import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
+import { ConvertToPlainTextPipe } from
+  'filters/string-utility-filters/convert-to-plain-text.pipe';
 import { ExplorationObjectFactory } from
   'domain/exploration/ExplorationObjectFactory';
 import { StateObjectFactory } from 'domain/state/StateObjectFactory';
@@ -41,7 +43,7 @@ describe('Exploration object factory', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [CamelCaseToHyphensPipe]
+      providers: [CamelCaseToHyphensPipe, ConvertToPlainTextPipe]
     });
     eof = TestBed.get(ExplorationObjectFactory);
     sof = TestBed.get(StateObjectFactory);

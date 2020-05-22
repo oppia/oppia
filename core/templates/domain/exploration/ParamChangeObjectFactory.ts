@@ -22,22 +22,22 @@ import cloneDeep from 'lodash/cloneDeep';
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-import { ICustomizationArg, ICustomizationArgs } from
-  'domain/state/CustomizationArgsObjectFactory';
+interface IParamCustomizationArgs {
+  /* eslint-disable camelcase */
+  value?: any;
+  list_of_values?: any[];
+  parse_with_jinja?: boolean;
+  /* eslint-enable camelcase */
+}
 
-var DEFAULT_CUSTOMIZATION_ARGS: ICustomizationArgs = {
-  Copier: {
-    parse_with_jinja: true,
-    value: '5'
-  },
-  RandomSelector: {
-    list_of_values: ['sample value']
-  }
-};
+const DEFAULT_CUSTOMIZATION_ARGS = new Map<string, IParamCustomizationArgs>([
+  ['Copier', { parse_with_jinja: true, value: '5' }],
+  ['RandomSelector', { list_of_values: ['sample value'] }],
+]);
 
 export interface IParamChangeBackendDict {
   /* eslint-disable camelcase */
-  customization_args: ICustomizationArgs;
+  customization_args: IParamCustomizationArgs;
   generator_id: string;
   name: string;
   /* eslint-enable camelcase */
@@ -45,21 +45,21 @@ export interface IParamChangeBackendDict {
 
 export class ParamChange {
   constructor(
-      public customizationArgs: ICustomizationArg,
+      public customizationArgs: IParamCustomizationArgs,
       public generatorId: string,
       public name: string) {}
 
   toBackendDict(): IParamChangeBackendDict {
     return {
-      customization_args: {[this.generatorId]: this.customizationArgs},
+      customization_args: this.customizationArgs,
       generator_id: this.generatorId,
       name: this.name
     };
   }
 
   resetCustomizationArgs(): void {
-    this.customizationArgs = cloneDeep(
-      DEFAULT_CUSTOMIZATION_ARGS[this.generatorId]);
+    this.customizationArgs = (
+      cloneDeep(DEFAULT_CUSTOMIZATION_ARGS.get(this.generatorId)));
   }
 }
 
@@ -82,7 +82,7 @@ export class ParamChangeObjectFactory {
 
   createDefault(paramName: string): ParamChange {
     return new ParamChange(
-      cloneDeep(DEFAULT_CUSTOMIZATION_ARGS.Copier), 'Copier', paramName);
+      cloneDeep(DEFAULT_CUSTOMIZATION_ARGS.get('Copier')), 'Copier', paramName);
   }
 }
 

@@ -55,10 +55,10 @@ describe('ParamChanges Object Factory', () => {
         this.pcsof.createFromBackendList(backendList));
 
       expect(testOutcome.length).toBe(2);
-      expect(testOutcome[0].customizationArg).toEqual(customizationArgs);
+      expect(testOutcome[0].customizationArgs).toEqual(customizationArgs);
       expect(testOutcome[0].generatorId).toBe(gId);
       expect(testOutcome[0].name).toBe(paramName);
-      expect(testOutcome[1].customizationArg).toEqual(customizationArgs);
+      expect(testOutcome[1].customizationArgs).toEqual(customizationArgs);
       expect(testOutcome[1].generatorId).toBe(gId);
       expect(testOutcome[1].name).toBe(paramName2);
     }

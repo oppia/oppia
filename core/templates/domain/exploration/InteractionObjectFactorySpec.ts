@@ -22,6 +22,8 @@ import { AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
+import { ConvertToPlainTextPipe } from
+  'filters/string-utility-filters/convert-to-plain-text.pipe';
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
 import { InteractionObjectFactory } from
   'domain/exploration/InteractionObjectFactory';
@@ -44,7 +46,7 @@ describe('Interaction object factory', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [CamelCaseToHyphensPipe]
+      providers: [CamelCaseToHyphensPipe, ConvertToPlainTextPipe]
     });
     iof = TestBed.get(InteractionObjectFactory);
     oof = TestBed.get(OutcomeObjectFactory);

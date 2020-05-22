@@ -25,6 +25,8 @@ import { AnswerClassificationService } from
 import { AppService } from 'services/app.service';
 import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
+import { ConvertToPlainTextPipe } from
+  'filters/string-utility-filters/convert-to-plain-text.pipe';
 import { ExplorationPlayerConstants } from
   'pages/exploration-player-page/exploration-player-page.constants';
 import { InteractionSpecsService } from 'services/interaction-specs.service';
@@ -38,7 +40,9 @@ import { StateObjectFactory } from 'domain/state/StateObjectFactory';
 
 describe('Answer Classification Service', () => {
   beforeEach(() => {
-    TestBed.configureTestingModule({providers: [CamelCaseToHyphensPipe]});
+    TestBed.configureTestingModule({
+      providers: [CamelCaseToHyphensPipe, ConvertToPlainTextPipe]
+    });
 
     this.acrof = TestBed.get(AnswerClassificationResultObjectFactory);
     this.acs = TestBed.get(AnswerClassificationService);

@@ -23,18 +23,14 @@ import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory';
 
 describe('Written Translations Object Factory', () => {
-  let writtenTranslationsObjectFactory;
-  let writtenTranslationObjectFactory;
-  let writtenTranslationsBackendDict;
-
   beforeEach(() => {
-    writtenTranslationsObjectFactory = TestBed.get(
+    this.writtenTranslationsObjectFactory = TestBed.get(
       WrittenTranslationsObjectFactory);
-    writtenTranslationObjectFactory = TestBed.get(
+    this.writtenTranslationObjectFactory = TestBed.get(
       WrittenTranslationObjectFactory);
 
-    writtenTranslationsBackendDict = (
-      writtenTranslationsObjectFactory.createFromBackendDict({
+    this.writtenTranslationsBackendDict = (
+      this.writtenTranslationsObjectFactory.createFromBackendDict({
         translations_mapping: {
           content_1: {
             'hi-en': {
@@ -47,7 +43,7 @@ describe('Written Translations Object Factory', () => {
   });
 
   it('should create a written translations object from backend dict', () => {
-    expect(writtenTranslationsBackendDict.toBackendDict())
+    expect(this.writtenTranslationsBackendDict.toBackendDict())
       .toEqual({
         translations_mapping: {
           content_1: {
@@ -62,49 +58,49 @@ describe('Written Translations Object Factory', () => {
 
   it('should create an empty written translations object', () => {
     const emptyWrittenTranslationsObject = (
-      writtenTranslationsObjectFactory.createEmpty());
+      this.writtenTranslationsObjectFactory.createEmpty());
     expect(emptyWrittenTranslationsObject.getAllContentId()).toEqual([]);
   });
 
   it('should add and delete contents from a written translations object',
     () => {
-      expect(writtenTranslationsBackendDict.getAllContentId()).toEqual([
+      expect(this.writtenTranslationsBackendDict.getAllContentId()).toEqual([
         'content_1']);
-      writtenTranslationsBackendDict.addContentId('content_2');
-      expect(writtenTranslationsBackendDict.getAllContentId()).toEqual([
+      this.writtenTranslationsBackendDict.addContentId('content_2');
+      expect(this.writtenTranslationsBackendDict.getAllContentId()).toEqual([
         'content_1', 'content_2']);
       expect(() => {
-        writtenTranslationsBackendDict.addContentId('content_2');
+        this.writtenTranslationsBackendDict.addContentId('content_2');
       }).toThrowError('Trying to add duplicate content id.');
-      expect(writtenTranslationsBackendDict.getAllContentId()).toEqual([
+      expect(this.writtenTranslationsBackendDict.getAllContentId()).toEqual([
         'content_1', 'content_2']);
 
-      writtenTranslationsBackendDict.deleteContentId('content_2');
-      expect(writtenTranslationsBackendDict.getAllContentId()).toEqual([
+      this.writtenTranslationsBackendDict.deleteContentId('content_2');
+      expect(this.writtenTranslationsBackendDict.getAllContentId()).toEqual([
         'content_1']);
       expect(() => {
-        writtenTranslationsBackendDict.deleteContentId('content_2');
+        this.writtenTranslationsBackendDict.deleteContentId('content_2');
       }).toThrowError('Unable to find the given content id.');
-      expect(writtenTranslationsBackendDict.getAllContentId()).toEqual([
+      expect(this.writtenTranslationsBackendDict.getAllContentId()).toEqual([
         'content_1']);
     });
 
   it('should add translation in a written translations object', () => {
     expect(() => {
-      writtenTranslationsBackendDict.addWrittenTranslation(
+      this.writtenTranslationsBackendDict.addWrittenTranslation(
         'content_1', 'hi-en', 'This is a HTML text');
     }).toThrowError('Trying to add duplicate language code.');
 
-    writtenTranslationsBackendDict.addWrittenTranslation(
+    this.writtenTranslationsBackendDict.addWrittenTranslation(
       'content_1', 'en', 'English HTML');
-    expect(writtenTranslationsBackendDict
+    expect(this.writtenTranslationsBackendDict
       .getTranslationsLanguageCodes('content_1')).toEqual(['hi-en', 'en']);
   });
 
   it('should update the html language code of a written translations object',
     () => {
-      const writtenTranslationsBackendDict = (
-        writtenTranslationsObjectFactory.createFromBackendDict({
+      const this.writtenTranslationsBackendDict = (
+        this.writtenTranslationsObjectFactory.createFromBackendDict({
           translations_mapping: {
             content_1: {
               'hi-en': {
@@ -115,53 +111,53 @@ describe('Written Translations Object Factory', () => {
           }
         }));
 
-      expect(writtenTranslationsBackendDict.hasWrittenTranslation(
+      expect(this.writtenTranslationsBackendDict.hasWrittenTranslation(
         'content_1', 'hi-en')).toBe(true);
-      writtenTranslationsBackendDict.updateWrittenTranslationHtml(
+      this.writtenTranslationsBackendDict.updateWrittenTranslationHtml(
         'content_1', 'hi-en', '<p>This is the new HTML</p>');
-      expect(writtenTranslationsBackendDict.getWrittenTranslation(
+      expect(this.writtenTranslationsBackendDict.getWrittenTranslation(
         'content_1', 'hi-en')).toEqual(
-        writtenTranslationObjectFactory.createFromBackendDict({
+        this.writtenTranslationObjectFactory.createFromBackendDict({
           html: '<p>This is the new HTML</p>',
           needs_update: false
         }));
 
       expect(() => {
-        writtenTranslationsBackendDict.updateWrittenTranslationHtml(
+        this.writtenTranslationsBackendDict.updateWrittenTranslationHtml(
           'content_1', 'en', 'This is the new HTML');
       }).toThrowError('Unable to find the given language code.');
-      expect(writtenTranslationsBackendDict.hasWrittenTranslation('en'))
+      expect(this.writtenTranslationsBackendDict.hasWrittenTranslation('en'))
         .toBe(false);
     });
 
   it('should toggle needs_update for a language code', () => {
-    writtenTranslationsBackendDict.toggleNeedsUpdateAttribute(
+    this.writtenTranslationsBackendDict.toggleNeedsUpdateAttribute(
       'content_1', 'hi-en');
-    expect(writtenTranslationsBackendDict.getWrittenTranslation(
+    expect(this.writtenTranslationsBackendDict.getWrittenTranslation(
       'content_1', 'hi-en')).toEqual(
-      writtenTranslationObjectFactory.createFromBackendDict({
+      this.writtenTranslationObjectFactory.createFromBackendDict({
         html: '',
         needs_update: true
       }));
-    expect(writtenTranslationsBackendDict.hasUnflaggedWrittenTranslations(
+    expect(this.writtenTranslationsBackendDict.hasUnflaggedWrittenTranslations(
       'content_1')).toBe(false);
 
-    writtenTranslationsBackendDict.toggleNeedsUpdateAttribute(
+    this.writtenTranslationsBackendDict.toggleNeedsUpdateAttribute(
       'content_1', 'hi-en');
-    expect(writtenTranslationsBackendDict.getWrittenTranslation(
+    expect(this.writtenTranslationsBackendDict.getWrittenTranslation(
       'content_1', 'hi-en')).toEqual(
-      writtenTranslationObjectFactory.createFromBackendDict({
+      this.writtenTranslationObjectFactory.createFromBackendDict({
         html: '',
         needs_update: false
       }));
-    expect(writtenTranslationsBackendDict.hasUnflaggedWrittenTranslations(
+    expect(this.writtenTranslationsBackendDict.hasUnflaggedWrittenTranslations(
       'content_1')).toBe(true);
   });
 
   it('should set needs_update to true in all translations from a content',
     () => {
-      const writtenTranslationsBackendDict = (
-        writtenTranslationsObjectFactory.createFromBackendDict({
+      const this.writtenTranslationsBackendDict = (
+        this.writtenTranslationsObjectFactory.createFromBackendDict({
           translations_mapping: {
             content_1: {
               'hi-en': {
@@ -176,21 +172,21 @@ describe('Written Translations Object Factory', () => {
           }
         }));
 
-      writtenTranslationsBackendDict.markAllTranslationsAsNeedingUpdate(
+      this.writtenTranslationsBackendDict.markAllTranslationsAsNeedingUpdate(
         'content_1');
-      expect(writtenTranslationsBackendDict.getWrittenTranslation(
+      expect(this.writtenTranslationsBackendDict.getWrittenTranslation(
         'content_1', 'hi-en')).toEqual(
-        writtenTranslationObjectFactory.createFromBackendDict({
+        this.writtenTranslationObjectFactory.createFromBackendDict({
           html: 'This is the old HTML',
           needs_update: true
         }));
-      expect(writtenTranslationsBackendDict.getWrittenTranslation(
+      expect(this.writtenTranslationsBackendDict.getWrittenTranslation(
         'content_1', 'en')).toEqual(
-        writtenTranslationObjectFactory.createFromBackendDict({
+        this.writtenTranslationObjectFactory.createFromBackendDict({
           html: '',
           needs_update: true
         }));
-      expect(writtenTranslationsBackendDict.hasUnflaggedWrittenTranslations(
+      expect(this.writtenTranslationsBackendDict.hasUnflaggedWrittenTranslations(
         'content_1')).toBe(false);
     });
 });

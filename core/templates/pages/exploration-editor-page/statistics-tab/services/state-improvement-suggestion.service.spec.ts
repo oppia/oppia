@@ -20,6 +20,8 @@ import { TestBed } from '@angular/core/testing';
 
 import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
+import { ConvertToPlainTextPipe } from
+  'filters/string-utility-filters/convert-to-plain-text.pipe';
 import { StateImprovementSuggestionService, StateStats } from
   // eslint-disable-next-line max-len
   'pages/exploration-editor-page/statistics-tab/services/state-improvement-suggestion.service';
@@ -403,7 +405,7 @@ describe('StateImprovementSuggestionService', () => {
 
     beforeEach(() => {
       TestBed.configureTestingModule({
-        providers: [CamelCaseToHyphensPipe]
+        providers: [CamelCaseToHyphensPipe, ConvertToPlainTextPipe]
       });
       siss = TestBed.get(StateImprovementSuggestionService);
       ssof = TestBed.get(StatesObjectFactory);
