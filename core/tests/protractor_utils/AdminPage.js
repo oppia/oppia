@@ -160,8 +160,8 @@ var AdminPage = function() {
       'Starting one off jobs taking too long to appear.');
     var text = await (await oneOffJobRows.get(i)).getText();
     if (text.toLowerCase().startsWith(jobName.toLowerCase())) {
-        await (await oneOffJobRows.get(i)).element(
-          by.css('.protractor-test-one-off-jobs-start-btn')).click();
+      await (await oneOffJobRows.get(i)).element(
+        by.css('.protractor-test-one-off-jobs-start-btn')).click();
     } else {
       await this._startOneOffJob(jobName, ++i);
     }
@@ -175,7 +175,7 @@ var AdminPage = function() {
     var text = await (await unfinishedOneOffJobRows.get(i)).getText();
     if (text.toLowerCase().startsWith(jobName.toLowerCase())) {
       await (await unfinishedOneOffJobRows.get(i)).element(
-          by.css('.protractor-test-one-off-jobs-stop-btn')).click();
+        by.css('.protractor-test-one-off-jobs-stop-btn')).click();
     } else {
       await this._stopOneOffJob(jobName, ++i);
     }
@@ -194,7 +194,7 @@ var AdminPage = function() {
       by.css('.protractor-test-unfinished-jobs-card')),
     'Unfinished Jobs taking too long to appear');
     let unfinishedJobs = unfinishedOffJobIDs.filter(
-      async function (element) {
+      async function(element) {
         var text = await element.getText();
         return text.toLowerCase().startsWith(jobName.toLowerCase());
       });
@@ -247,16 +247,17 @@ var AdminPage = function() {
 
   this.expectUsernamesToMatch = async function(expectedUsernamesArray) {
     var foundUsersArray = [];
-    var usernames = await element.all(by.css('.protractor-test-roles-result-rows'))
+    var usernames = await element.all(
+      by.css('.protractor-test-roles-result-rows'))
       .map(async function(elm) {
         var text = await elm.getText();
         return text;
-    });
+      });
 
     for (i = 0; i < usernames.length; i++) {
       var name = usernames[i];
       foundUsersArray.push(name);
-    };
+    }
     expect(foundUsersArray.length).toEqual(expectedUsernamesArray.length);
 
     expectedUsernamesArray.sort();
