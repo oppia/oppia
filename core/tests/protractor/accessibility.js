@@ -30,18 +30,18 @@ describe('screenreader and keyboard user accessibility features', function() {
   });
 
   it('should skip to the main content element', async function() {
-    libraryPage.get();
-    browser.actions().sendKeys(protractor.Key.TAB).perform();
+    await libraryPage.get();
+    await browser.actions().sendKeys(protractor.Key.TAB).perform();
     var skipLink = element(by.css('.protractor-test-skip-link'));
-    waitFor.elementToBeClickable(skipLink, 'Could not click skip link');
+    await waitFor.elementToBeClickable(skipLink, 'Could not click skip link');
     await skipLink.click();
     var mainContent = element(by.css('.protractor-test-main-content'));
     expect(await mainContent.getAttribute('id')).toEqual(
       await browser.driver.switchTo().activeElement().getAttribute('id'));
   });
 
-  afterEach(function() {
-    general.checkForConsoleErrors([]);
+  afterEach(async function() {
+    await general.checkForConsoleErrors([]);
   });
 });
 
@@ -52,6 +52,6 @@ describe('Cache Slugs', function() {
       var expectedErrors = [
         'http://localhost:9001/build/fail/logo/288x128_logo_white.png'
       ];
-      general.checkConsoleErrorsExist(expectedErrors);
+      await general.checkConsoleErrorsExist(expectedErrors);
     });
 });
