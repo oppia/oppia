@@ -13,6 +13,7 @@ var suites = {
 
     // Unfortunately, adding more than one file to a test suite results in
     // severe instability as of Chromedriver 2.38 (Chrome 66).
+    
     accessibility: [
       'protractor/accessibility.js'
     ],
@@ -97,6 +98,10 @@ var suites = {
       'protractor_desktop/navigation.js'
     ],
 
+    playTranslations: [
+      'protractor_desktop/playTranslations.js'
+    ],
+
     preferences: [
       'protractor_desktop/preferences.js'
     ],
@@ -136,6 +141,7 @@ var suites = {
     users: [
       'protractor_desktop/userJourneys.js',
     ],
+    
   };
 
 // A reference configuration file.
