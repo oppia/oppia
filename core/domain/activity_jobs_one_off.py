@@ -160,9 +160,10 @@ class RemoveCommitUsernamesOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         # see https://stackoverflow.com/a/15116016/3688189 and
         # https://stackoverflow.com/a/12701172/3688189.
         # pylint: disable=protected-access
-        if 'username' in commit_model._values:
-            del commit_model._values['username']
+        if 'username' in commit_model._properties:
             del commit_model._properties['username']
+            if 'username' in commit_model._values:
+                del commit_model._values['username']
             commit_model.put()
             yield ('SUCCESS_REMOVED - %s' % class_name, commit_model.id)
         else:

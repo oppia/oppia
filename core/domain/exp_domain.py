@@ -36,7 +36,6 @@ from core.domain import html_validation_service
 from core.domain import interaction_registry
 from core.domain import param_domain
 from core.domain import state_domain
-from core.domain import user_services
 from core.platform import models
 import feconf
 import python_utils
@@ -266,7 +265,6 @@ class ExplorationCommitLogEntry(python_utils.OBJECT):
         """
         return {
             'last_updated': utils.get_time_in_millisecs(self.last_updated),
-            'username': user_services.get_username(self.user_id),
             'exploration_id': self.exploration_id,
             'commit_type': self.commit_type,
             'commit_message': self.commit_message,
