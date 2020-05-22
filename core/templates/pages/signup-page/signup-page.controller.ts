@@ -17,7 +17,9 @@
  */
 
 require('base-components/base-content.directive.ts');
-
+require(
+  'components/common-layout-directives/common-elements/' +
+  'confirm-or-cancel-modal.controller.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('services/alerts.service.ts');
 require('services/id-generation.service.ts');
@@ -25,6 +27,7 @@ require('services/site-analytics.service.ts');
 require('services/user.service.ts');
 require('services/contextual/url.service.ts');
 require('services/stateful/focus-manager.service.ts');
+require('constants.ts');
 
 angular.module('oppia').directive('signupPage', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -39,14 +42,15 @@ angular.module('oppia').directive('signupPage', [
         '$http', '$timeout', '$uibModal', 'AlertsService',
         'FocusManagerService', 'LoaderService', 'SiteAnalyticsService',
         'UrlInterpolationService', 'UrlService', 'DASHBOARD_TYPE_CREATOR',
-        'DASHBOARD_TYPE_LEARNER', 'SITE_NAME',
+        'DASHBOARD_TYPE_LEARNER', 'SITE_NAME', 'MAX_USERNAME_LENGTH',
         function(
             $http, $timeout, $uibModal, AlertsService,
             FocusManagerService, LoaderService, SiteAnalyticsService,
             UrlInterpolationService, UrlService, DASHBOARD_TYPE_CREATOR,
-            DASHBOARD_TYPE_LEARNER, SITE_NAME) {
+            DASHBOARD_TYPE_LEARNER, SITE_NAME, MAX_USERNAME_LENGTH) {
           var ctrl = this;
           var _SIGNUP_DATA_URL = '/signuphandler/data';
+          ctrl.MAX_USERNAME_LENGTH = MAX_USERNAME_LENGTH;
           ctrl.isFormValid = function() {
             return (
               ctrl.hasAgreedToLatestTerms &&
@@ -62,14 +66,19 @@ angular.module('oppia').directive('signupPage', [
               backdrop: true,
               resolve: {},
               controller: [
-                '$scope', '$uibModalInstance', 'SITE_NAME',
-                function($scope, $uibModalInstance, SITE_NAME) {
+                '$controller', '$scope', '$uibModalInstance', 'SITE_NAME',
+                function($controller, $scope, $uibModalInstance, SITE_NAME) {
+                  $controller('ConfirmOrCancelModalController', {
+                    $scope: $scope,
+                    $uibModalInstance: $uibModalInstance
+                  });
                   $scope.siteName = SITE_NAME;
-                  $scope.close = function() {
-                    $uibModalInstance.dismiss('cancel');
-                  };
                 }
               ]
+            }).result.then(function() {}, function() {
+              // Note to developers:
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
             });
           };
 
@@ -102,8 +111,8 @@ angular.module('oppia').directive('signupPage', [
               ctrl.warningI18nCode = 'I18N_SIGNUP_ERROR_NO_USERNAME';
             } else if (username.indexOf(' ') !== -1) {
               ctrl.warningI18nCode = 'I18N_SIGNUP_ERROR_USERNAME_WITH_SPACES';
-            } else if (username.length > 50) {
-              ctrl.warningI18nCode = 'I18N_SIGNUP_ERROR_USERNAME_MORE_50_CHARS';
+            } else if (username.length > ctrl.MAX_USERNAME_LENGTH) {
+              ctrl.warningI18nCode = 'I18N_SIGNUP_ERROR_USERNAME_TOO_LONG';
             } else if (!alphanumeric.test(username)) {
               ctrl.warningI18nCode = 'I18N_SIGNUP_ERROR_USERNAME_ONLY_ALPHANUM';
             } else if (admin.test(username)) {
@@ -172,7 +181,7 @@ angular.module('oppia').directive('signupPage', [
 
             ctrl.submissionInProcess = true;
             $http.post(_SIGNUP_DATA_URL, requestParams).then(function() {
-              window.location = window.decodeURIComponent(
+              window.location.href = window.decodeURIComponent(
                 UrlService.getUrlParams().return_url);
             }, function(rejection) {
               if (
