@@ -69,6 +69,7 @@ describe('App', function() {
         }
       });
   });
+
   describe('Exception Handler', function() {
     beforeEach(angular.mock.module('oppia'));
     beforeEach(angular.mock.module('oppia', function($provide) {
@@ -90,6 +91,7 @@ describe('App', function() {
       spyOn($log, 'error');
       spyOn(sourceMappedStackTrace, 'mapStackTrace');
     }));
+
     it('should handle non-Error type exceptions gracefully', function() {
       var testException = (error, regex) => {
         $exceptionHandler(error);
@@ -108,6 +110,7 @@ describe('App', function() {
       }, /^Error: \[object Object\]/);
       testException({}, /^Error: \[object Object\]/);
     });
+
     it('should handle Error type exceptions correctly', function() {
       var expectedError = new Error('something');
       $exceptionHandler(expectedError);
@@ -116,11 +119,13 @@ describe('App', function() {
         jasmine.any(Function));
       expect($log.error).toHaveBeenCalledWith(expectedError);
     });
+
     it('should ignore exceptions with status code -1', function() {
       $exceptionHandler('Possibly unhandled rejection: { "status":-1 }');
       expect(sourceMappedStackTrace.mapStackTrace).not.toHaveBeenCalled();
       expect($log.error).not.toHaveBeenCalled();
     });
+
     it('should ignore $templateRequest:tpload error with status code -1',
       function() {
         $exceptionHandler('[$templateRequest:tpload]?p1=-1&p2=');
