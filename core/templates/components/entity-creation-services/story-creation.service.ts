@@ -44,7 +44,7 @@ angular.module('oppia').factory('StoryCreationService', [
             '/pages/topic-editor-page/modal-templates/' +
             'new-story-title-editor.template.html'),
           backdrop: true,
-          controller: 'NewStoryTitleEditorController'
+          controller: 'NewStoryTitleEditorModalController'
         }).result.then(function(storyTitle) {
           if (storyTitle === '') {
             throw new Error('Story title cannot be empty');
