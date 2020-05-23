@@ -48,15 +48,15 @@ workflows:
       - e2e_accessibility:
           requires:
             - e2e_navigation
-      # - e2e_admin:
-      #     requires:
-      #       - e2e_navigation
+      - e2e_admin:
+          requires:
+            - e2e_navigation
       - e2e_embedding:
           requires:
             - e2e_navigation
-      # - e2e_library:
-      #     requires:
-      #       - e2e_navigation
+      - e2e_library:
+          requires:
+            - e2e_navigation
       - e2e_users:
           requires:
           - e2e_navigation
