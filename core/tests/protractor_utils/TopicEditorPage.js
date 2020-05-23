@@ -165,7 +165,7 @@ var TopicEditorPage = function() {
   };
 
   this.expectTitleOfSubtopicWithIndexToMatch = async function(title, index) {
-    expect(subtopicTitles.get(index).getText()).toEqual(title);
+    expect(await subtopicTitles.get(index).getText()).toEqual(title);
   };
 
   this.changeSubtopicTitle = async function(title) {
@@ -173,8 +173,8 @@ var TopicEditorPage = function() {
     await subtopicTitleField.sendKeys(title);
   };
 
-  this.saveSubtopic = function() {
-    saveSubtopicButton.click();
+  this.saveSubtopic = async function() {
+    await saveSubtopicButton.click();
   };
 
   this.changeSubtopicPageContents = async function(richTextInstructions) {
@@ -288,9 +288,9 @@ var TopicEditorPage = function() {
     await waitFor.pageToFullyLoad();
   };
 
-  this.changeTopicName = function(newName) {
-    topicNameField.clear();
-    topicNameField.sendKeys(newName);
+  this.changeTopicName = async function(newName) {
+    await topicNameField.clear();
+    await topicNameField.sendKeys(newName);
   };
 
   this.expectTopicNameToBe = async function(name) {
