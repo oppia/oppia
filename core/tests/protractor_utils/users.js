@@ -29,12 +29,12 @@ var login = async function(email, isSuperAdmin = false) {
   var driver = browser.driver;
   await driver.get(general.SERVER_URL_PREFIX + general.LOGIN_URL_SUFFIX);
 
-  await driver.findElement(protractor.By.name('email')).clear();
-  await driver.findElement(protractor.By.name('email')).sendKeys(email);
+  await (await driver.findElement(protractor.By.name('email'))).clear();
+  await (await driver.findElement(protractor.By.name('email'))).sendKeys(email);
   if (isSuperAdmin) {
-    await driver.findElement(protractor.By.name('admin')).click();
+    await (await driver.findElement(protractor.By.name('admin'))).click();
   }
-  await driver.findElement(protractor.By.id('submit-login')).click();
+  await (await driver.findElement(protractor.By.id('submit-login'))).click();
 };
 
 var logout = async function() {

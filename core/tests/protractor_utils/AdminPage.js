@@ -128,9 +128,9 @@ var AdminPage = function() {
     await waitFor.pageToFullyLoad();
   };
 
-  this.getJobsTab = function() {
-    browser.get(ADMIN_URL_SUFFIX + '#/jobs');
-    return waitFor.pageToFullyLoad();
+  this.getJobsTab = async function() {
+    await browser.get(ADMIN_URL_SUFFIX + '#/jobs');
+    await waitFor.pageToFullyLoad();
   };
 
   this.editConfigProperty = async function(
@@ -156,7 +156,7 @@ var AdminPage = function() {
   };
 
   this._startOneOffJob = async function(jobName, i) {
-    await waitFor.visibilityOf(oneOffJobRows.first(),
+    await waitFor.visibilityOf(await oneOffJobRows.first(),
       'Starting one off jobs taking too long to appear.');
     var text = await (await oneOffJobRows.get(i)).getText();
     if (text.toLowerCase().startsWith(jobName.toLowerCase())) {
@@ -198,9 +198,9 @@ var AdminPage = function() {
         var text = await element.getText();
         return text.toLowerCase().startsWith(jobName.toLowerCase());
       });
-    await (await unfinishedJobs.get(0)).getText((job) => {
-      expect(job.toLowerCase().startsWith(jobName.toLowerCase())).toBeTrue();
-    });
+    var unfinishedJobName = await (await unfinishedJobs.get(0)).getText();
+    expect(unfinishedJobName.toLowerCase().startsWith(
+      jobName.toLowerCase())).toEqual(true);
   };
 
   this.updateRole = async function(name, newRole) {
@@ -214,6 +214,7 @@ var AdminPage = function() {
     await updateFormName.sendKeys(name);
     var roleOption = roleSelect.element(
       by.cssContainingText('option', newRole));
+    waitFor.visibilityOf(roleOption, 'Admin role option is not visible');
     await roleOption.click();
     await updateFormSubmit.click();
     await waitFor.visibilityOf(
