@@ -19,6 +19,7 @@
 require('third-party-imports/ckeditor.import.ts');
 require('services/context.service.ts');
 require('services/rte-helper.service.ts');
+require('constants.ts');
 
 interface UiConfig {
   (): UiConfig;
@@ -32,8 +33,8 @@ interface CkeditorCustomScope extends ng.IScope {
 }
 
 angular.module('oppia').directive('ckEditor4Rte', [
-  'ContextService', 'RteHelperService',
-  function(ContextService, RteHelperService) {
+  'ContextService', 'RteHelperService', 'ENABLE_LITERALLYCANVAS_EDITOR',
+  function(ContextService, RteHelperService, ENABLE_LITERALLYCANVAS_EDITOR) {
     return {
       restrict: 'E',
       scope: {
@@ -52,6 +53,11 @@ angular.module('oppia').directive('ckEditor4Rte', [
         var canReferToSkills = ContextService.canEntityReferToSkills();
 
         _RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
+          if (componentDefn.id === 'svgeditor') {
+            if (!ENABLE_LITERALLYCANVAS_EDITOR) {
+              return;
+            }
+          }
           if (!((scope.uiConfig() &&
             scope.uiConfig().hide_complex_extensions &&
             componentDefn.isComplex) ||

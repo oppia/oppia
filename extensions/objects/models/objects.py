@@ -447,6 +447,16 @@ class Filepath(BaseObject):
     SCHEMA = UnicodeString.SCHEMA
 
 
+class LiterallyCanvasDiagram(BaseObject):
+    """A string represent a filename of the saved
+    svg file created using literallyCanvas.
+    """
+
+    description = 'A string representing the saved svg filename'
+
+    SCHEMA = UnicodeString.SCHEMA
+
+
 class CheckedProof(BaseObject):
     """A proof attempt and any errors it makes."""
 

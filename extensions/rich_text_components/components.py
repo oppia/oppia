@@ -46,6 +46,7 @@ class BaseRteComponent(python_utils.OBJECT):
         'SanitizedUrl': objects.SanitizedUrl,
         'MathLatexString': objects.MathLatexString,
         'ListOfTabs': objects.ListOfTabs,
+        'LiterallyCanvasDiagram': objects.Filepath,
         'int': objects.Int,
         'bool': objects.Boolean,
         'SkillSelector': objects.SkillSelector
@@ -115,6 +116,19 @@ class Image(BaseRteComponent):
         super(Image, cls).validate(value_dict)
         filename_re = r'^[A-Za-z0-9+/_-]*\.((png)|(jpeg)|(gif)|(jpg))$'
         filepath = value_dict['filepath-with-value']
+        if not re.match(filename_re, filepath):
+            raise Exception('Invalid filepath')
+
+
+class Svgeditor(BaseRteComponent):
+    """Class for Svgeditor component."""
+
+    @classmethod
+    def validate(cls, value_dict):
+        """Validates Svgeditor component."""
+        super(Svgeditor, cls).validate(value_dict)
+        filename_re = r'^[A-Za-z0-9+/_-]*\.(svg)$'
+        filepath = value_dict['svg_filepath-with-value']
         if not re.match(filename_re, filepath):
             raise Exception('Invalid filepath')
 
