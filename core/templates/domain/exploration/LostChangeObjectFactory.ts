@@ -71,21 +71,20 @@ export class LostChange {
   }
 
   isOutcomeFeedbackEqual(): boolean {
-    const newFeedback = (
-      this.newValue.outcome && this.newValue.outcome.feedback) || null;
-    const oldFeedback = (
-      this.oldValue.outcome && this.oldValue.outcome.feedback) || null;
-    return (
-      oldFeedback !== null && newFeedback !== null &&
-      newFeedback.getHtml() === oldFeedback.getHtml());
+    if (this.newValue.outcome && this.newValue.outcome.feedback &&
+        this.oldValue.outcome && this.oldValue.outcome.feedback) {
+      return (
+        this.newValue.outcome.feedback.getHtml() ===
+        this.oldValue.outcome.feedback.getHtml());
+    }
+    return false;
   }
 
   isOutcomeDestEqual(): boolean {
-    const newOutcome = this.newValue.outcome || null;
-    const oldOutcome = this.oldValue.outcome || null;
-    return (
-      newOutcome !== null && oldOutcome !== null &&
-      this.oldValue.outcome.dest === this.newValue.outcome.dest);
+    if (this.newValue.outcome && this.oldValue.outcome) {
+      return this.oldValue.outcome.dest === this.newValue.outcome.dest;
+    }
+    return false;
   }
 
   isDestEqual(): boolean {
@@ -93,11 +92,11 @@ export class LostChange {
   }
 
   isFeedbackEqual(): boolean {
-    const newFeedback = this.newValue.feedback || null;
-    const oldFeedback = this.oldValue.feedback || null;
-    return (
-      newFeedback !== null && oldFeedback !== null &&
-      this.newValue.feedback.getHtml() === this.oldValue.feedback.getHtml());
+    if (this.newValue.feedback && this.oldValue.feedback) {
+      return (
+        this.newValue.feedback.getHtml() === this.oldValue.feedback.getHtml());
+    }
+    return false;
   }
 
   isRulesEqual(): boolean {
@@ -108,26 +107,28 @@ export class LostChange {
   // 'default_outcome' has been added, edited or deleted.
   // Returns - 'addded', 'edited' or 'deleted' accordingly.
   getRelativeChangeToGroups(): string {
+    let result = '';
+
     if (Array.isArray(this.newValue) && Array.isArray(this.oldValue)) {
       if (this.newValue.length > this.oldValue.length) {
-        return 'added';
+        result = 'added';
       } else if (this.newValue.length === this.oldValue.length) {
-        return 'edited';
+        result = 'edited';
       } else {
-        return 'deleted';
+        result = 'deleted';
       }
     } else {
       if (!this.utilsService.isEmpty(this.oldValue)) {
         if (!this.utilsService.isEmpty(this.newValue)) {
-          return 'edited';
+          result = 'edited';
         } else {
-          return 'deleted';
+          result = 'deleted';
         }
       } else if (!this.utilsService.isEmpty(this.newValue)) {
-        return 'added';
+        result = 'added';
       }
     }
-    return '';
+    return result;
   }
 }
 
