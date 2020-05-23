@@ -21,4 +21,5 @@
 require('pages/about-page/about-page.module.ts');
 require('App.ts');
 
+require('pages/about-page/about-page.controller.ts');
 require('base-components/base-content.directive.ts');
