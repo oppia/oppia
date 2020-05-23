@@ -274,7 +274,7 @@ class PretestHandler(base.BaseHandler):
             question_services.get_questions_by_skill_ids(
                 feconf.NUM_PRETEST_QUESTIONS,
                 story.get_prerequisite_skill_ids_for_exp_id(exploration_id),
-                False)
+                True)
         )
         question_dicts = [question.to_dict() for question in pretest_questions]
 

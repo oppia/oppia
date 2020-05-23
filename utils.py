@@ -258,24 +258,6 @@ def get_random_choice(alist):
     return alist[index]
 
 
-def get_random_sample(alist, sample_length):
-    """Gets a random sample from a list.
-
-    Args:
-       alist: list(*). Input to get a random sample.
-       sample_length: int. Length of the random sample.
-
-    Returns:
-       list(*). Random sample choosen from the passed input list.
-    """
-    assert isinstance(alist, list) and len(alist) > 0
-    assert (isinstance(sample_length, int) and sample_length > 0 and
-            sample_length <= len(alist))
-
-    sample_list = random.sample(alist, sample_length)
-    return sample_list
-
-
 def convert_png_binary_to_data_url(content):
     """Converts a png image string (represented by 'content') to a data URL.
 

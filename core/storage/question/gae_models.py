@@ -359,10 +359,11 @@ class QuestionSkillLinkModel(base_models.BaseModel):
         # Other alternative methods were:
         # 1) Using a random id in question id filter
         # 2) Adding an additional column that can be filtered upon.
-        # But these methods are not viable because google datastore limit
-        # inequality filter to atmost one. So we can't filter on both
-        # question_id and difficulty. Please refer to this thread for further
-        # information. https://github.com/oppia/oppia/pull/9061 .
+        # But these methods are not viable because google datastore limits
+        # each query to have at most one inequality filter. So we can't filter
+        # on both question_id and difficulty. Just noting, for posterity, that
+        # the thread is continued
+        # https://github.com/oppia/oppia/pull/9061#issuecomment-629765809 .
 
         def get_offset(query):
             """Helper function to get the offset."""
@@ -389,7 +390,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
                     new_question_skill_link_models.remove(model)
 
             if len(new_question_skill_link_models) >= question_count_per_skill:
-                new_question_skill_link_models = utils.get_random_sample(
+                new_question_skill_link_models = utils.random.sample(
                     new_question_skill_link_models, question_count_per_skill)
             else:
                 # Fetch QuestionSkillLinkModels with difficulty smaller than
@@ -408,7 +409,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
                     len(easier_question_skill_link_models) -
                     question_count_per_skill)
                 if question_extra_count >= 0:
-                    easier_question_skill_link_models = utils.get_random_sample(
+                    easier_question_skill_link_models = utils.random.sample(
                         easier_question_skill_link_models,
                         question_count_per_skill -
                         len(new_question_skill_link_models)
@@ -437,7 +438,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
                         question_count_per_skill)
                     if question_extra_count >= 0:
                         harder_question_skill_link_models = (
-                            utils.get_random_sample(
+                            utils.random.sample(
                                 harder_question_skill_link_models,
                                 question_count_per_skill -
                                 len(new_question_skill_link_models)
@@ -506,14 +507,21 @@ class QuestionSkillLinkModel(base_models.BaseModel):
                 if model.question_id in existing_question_ids:
                     new_question_skill_link_models.remove(model)
             if len(new_question_skill_link_models) > question_count_per_skill:
-                new_question_skill_link_models = utils.get_random_sample(
+                sampled_question_skill_link_models = utils.random.sample(
                     new_question_skill_link_models,
                     question_count_per_skill
                 )
+            else:
+                sampled_question_skill_link_models = (
+                    new_question_skill_link_models)
 
-            question_skill_link_models.extend(new_question_skill_link_models)
-            existing_question_ids.extend(
-                [model.question_id for model in new_question_skill_link_models])
+
+            question_skill_link_models.extend(
+                sampled_question_skill_link_models)
+            existing_question_ids.extend([
+                model.question_id for model in (
+                    sampled_question_skill_link_models)
+            ])
 
         return question_skill_link_models
 
