@@ -31,8 +31,8 @@ describe('User Exploration Permissions Service', () => {
   let contextService: ContextService = null;
   let httpTestingController: HttpTestingController = null;
 
-  var sampleExplorationId = 'sample-exploration';
-  var samplePermissionsData = {
+  let sampleExplorationId = 'sample-exploration';
+  let samplePermissionsData = {
     canEdit: false,
     canVoiceOver: true,
   };

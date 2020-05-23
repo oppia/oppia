@@ -37,7 +37,7 @@ export class UserExplorationPermissionsService {
   static permissionsPromise: Promise<object> = null;
   getPermissionsAsync(): Promise<object> {
     if (!UserExplorationPermissionsService.permissionsPromise) {
-      var explorationPermissionsUrl = this.urlInterpolationService
+      let explorationPermissionsUrl = this.urlInterpolationService
         .interpolateUrl( '/createhandler/permissions/<exploration_id>', {
           exploration_id: this.contextService.getExplorationId()
         });
