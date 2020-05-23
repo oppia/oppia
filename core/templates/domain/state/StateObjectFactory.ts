@@ -37,7 +37,7 @@ import {
 import { ParamChangesObjectFactory } from
   'domain/exploration/ParamChangesObjectFactory';
 
-import constants from 'assets/constants';
+const constants = require('constants.ts');
 
 export interface IStateBackendDict {
   /* eslint-disable camelcase */
