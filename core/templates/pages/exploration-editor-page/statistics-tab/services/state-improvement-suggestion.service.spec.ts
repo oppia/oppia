@@ -22,11 +22,11 @@ import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
 import { ConvertToPlainTextPipe } from
   'filters/string-utility-filters/convert-to-plain-text.pipe';
+import { StateBackendDictMapping, StatesObjectFactory } from
+  'domain/exploration/StatesObjectFactory';
 import { StateImprovementSuggestionService, StateStats } from
   // eslint-disable-next-line max-len
   'pages/exploration-editor-page/statistics-tab/services/state-improvement-suggestion.service';
-import { StateBackendDictMapping, StatesObjectFactory } from
-  'domain/exploration/StatesObjectFactory';
 
 describe('StateImprovementSuggestionService', () => {
   // TODO(bhenning): These tests were ported from the backend tests. More tests

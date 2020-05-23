@@ -21,8 +21,6 @@ import { Injectable } from '@angular/core';
 
 import { IInteractionBackendDict, Interaction, InteractionObjectFactory } from
   'domain/exploration/InteractionObjectFactory';
-import { ParamChangesObjectFactory } from
-  'domain/exploration/ParamChangesObjectFactory';
 import { IParamChangeBackendDict, ParamChange } from
   'domain/exploration/ParamChangeObjectFactory';
 import {
@@ -36,8 +34,10 @@ import {
   IWrittenTranslationsBackendDict, WrittenTranslations,
   WrittenTranslationsObjectFactory
 } from 'domain/exploration/WrittenTranslationsObjectFactory';
+import { ParamChangesObjectFactory } from
+  'domain/exploration/ParamChangesObjectFactory';
 
-const constants = require('constants.ts');
+import constants from 'assets/constants';
 
 export interface IStateBackendDict {
   /* eslint-disable camelcase */

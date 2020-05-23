@@ -116,12 +116,9 @@ export class ConceptCardObjectFactory {
       private workedExampleObjectFactory: WorkedExampleObjectFactory) {}
 
   private generateWorkedExamplesFromBackendDict(
-      workedExampleDicts): WorkedExample[] {
-    return workedExampleDicts.map(
-      (workedExampleDict: IWorkedExampleBackendDict) => {
-        return this.workedExampleObjectFactory.createFromBackendDict(
-          workedExampleDict);
-      });
+      workedExampleBackendDicts: IWorkedExampleBackendDict[]): WorkedExample[] {
+    return workedExampleBackendDicts.map(
+      dict => this.workedExampleObjectFactory.createFromBackendDict(dict));
   }
 
   // Create an interstitial concept card that would be displayed in the

@@ -63,7 +63,8 @@ export class WrittenTranslationObjectFactory {
   }
 
   createFromBackendDict(
-      translationBackendDict: IWrittenTranslationBackendDict) {
+      translationBackendDict:
+        IWrittenTranslationBackendDict): WrittenTranslation {
     return new WrittenTranslation(
       translationBackendDict.html, translationBackendDict.needs_update);
   }
