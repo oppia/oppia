@@ -29,23 +29,25 @@ var SubscriptionDashboardPage = function() {
     await waitFor.pageToFullyLoad();
   };
 
-  this.expectSubscriptionFirstNameToMatch = function(name) {
-    waitFor.visibilityOf(
-      subscriptionName.first(), 'First Subscriber Name is not visible');
-    expect(subscriptionName.first().getText()).toMatch(name);
+  this.expectSubscriptionFirstNameToMatch = async function(name) {
+    var firstSubscriberNameElem = await subscriptionName.first();
+    await waitFor.visibilityOf(
+      firstSubscriberNameElem, 'First Subscriber Name is not visible');
+    expect(await firstSubscriberNameElem.getText()).toMatch(name);
   };
 
-  this.expectSubscriptionLastNameToMatch = function(name) {
-    waitFor.visibilityOf(
-      subscriptionName.last(), 'Last Subscriber Name is not visible');
-    expect(subscriptionName.last().getText()).toMatch(name);
+  this.expectSubscriptionLastNameToMatch = async function(name) {
+    var lastSubscriberNameElem = await subscriptionName.last();
+    await waitFor.visibilityOf(
+      lastSubscriberNameElem, 'Last Subscriber Name is not visible');
+    expect(await lastSubscriberNameElem.getText()).toMatch(name);
   };
 
-  this.expectSubscriptionCountToEqual = function(value) {
+  this.expectSubscriptionCountToEqual = async function(value) {
     waitFor.visibilityOf(
-      subscriptionName.first(),
+      await subscriptionName.first(),
       'Subscriber Name Card takes too long to appear');
-    expect(subscriptionName.count()).toEqual(value);
+    expect(await subscriptionName.count()).toEqual(value);
   };
 
   this.navigateToSubscriptionButton = async function() {

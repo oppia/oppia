@@ -109,7 +109,7 @@ var CreatorDashboardPage = function() {
       createNewExplorationButton,
       'Create Exploration button on the creator' +
       'dashboard page takes too long to be clickable');
-    createNewExplorationButton.click();
+    await createNewExplorationButton.click();
     await waitFor.pageToFullyLoad();
   };
 
@@ -117,7 +117,7 @@ var CreatorDashboardPage = function() {
     await waitFor.elementToBeClickable(
       collectionCard,
       'Collection Card tab takes too long to be clickable');
-    collectionCard.click();
+    await collectionCard.click();
     await waitFor.pageToFullyLoad();
   };
 
@@ -125,13 +125,13 @@ var CreatorDashboardPage = function() {
     await waitFor.elementToBeClickable(
       subscriptionTab,
       'Subscription Dashboard tab takes too long to be clickable');
-    subscriptionTab.click();
+    await subscriptionTab.click();
     await waitFor.pageToFullyLoad();
   };
 
   this.editExploration = async function(explorationTitle) {
     var elems = await _getExplorationElements(explorationTitle);
-    if (await elems.length === 0) {
+    if (elems.length === 0) {
       throw new Error(
         'Could not find exploration tile with name ' + explorationTitle);
     }
@@ -147,31 +147,31 @@ var CreatorDashboardPage = function() {
   this.getAverageRating = async function() {
     await waitFor.visibilityOf(
       averageRating, 'Unable to find average rating');
-    return averageRating.getText();
+    return await averageRating.getText();
   };
 
   this.getTotalPlays = async function() {
     await waitFor.visibilityOf(
       totalPlays, 'Unable to find total plays');
-    return totalPlays.getText();
+    return await totalPlays.getText();
   };
 
   this.getOpenFeedbacks = async function() {
     await waitFor.visibilityOf(
       openFeedbacks, 'Unable to find open feedbacks count');
-    return openFeedbacks.getText();
+    return await openFeedbacks.getText();
   };
 
   this.getSubscribers = async function() {
     await waitFor.visibilityOf(
       subscribers, 'Unable to find subscribers count');
-    return subscribers.getText();
+    return await subscribers.getText();
   };
 
   this.getListView = async function() {
     await waitFor.visibilityOf(
       listViewButton, 'Unable to find list view button');
-    listViewButton.click();
+    await listViewButton.click();
   };
 
   // Returns titles of each explorations in grid view.
@@ -179,7 +179,8 @@ var CreatorDashboardPage = function() {
     var expSummaryTileTitleElements = element.all(
       by.css('.protractor-test-exp-summary-tile-title'));
     await waitFor.visibilityOf(
-      expSummaryTileTitleElements.first(), 'Unable to find exploration titles');
+      await expSummaryTileTitleElements.first(),
+      'Unable to find exploration titles');
     return expSummaryTileTitleElements;
   };
 
@@ -188,7 +189,7 @@ var CreatorDashboardPage = function() {
     var expSummaryTileRatingElements = element.all(
       by.css('.protractor-test-exp-summary-tile-rating'));
     await waitFor.visibilityOf(
-      expSummaryTileRatingElements.first(),
+      await expSummaryTileRatingElements.first(),
       'Unable to find exploration ratings');
     return expSummaryTileRatingElements;
   };
@@ -198,7 +199,7 @@ var CreatorDashboardPage = function() {
     var expSummaryTileFeedbackElements = element.all(
       by.css('.protractor-test-exp-summary-tile-open-feedback'));
     await waitFor.visibilityOf(
-      expSummaryTileFeedbackElements.first(),
+      await expSummaryTileFeedbackElements.first(),
       'Unable to find exploration feedbacks');
     return expSummaryTileFeedbackElements;
   };
@@ -208,7 +209,7 @@ var CreatorDashboardPage = function() {
     var expSummaryTileViewsElements = element.all(
       by.css('.protractor-test-exp-summary-tile-num-views'));
     await waitFor.visibilityOf(
-      expSummaryTileViewsElements.first(),
+      await expSummaryTileViewsElements.first(),
       'Unable to find exploration views');
     return expSummaryTileViewsElements;
   };
@@ -218,7 +219,8 @@ var CreatorDashboardPage = function() {
     var expSummaryRowTitleElements = element.all(
       by.css('.protractor-test-exp-summary-row-title'));
     await waitFor.visibilityOf(
-      expSummaryRowTitleElements.first(), 'Unable to find exploration titles');
+      await expSummaryRowTitleElements.first(),
+      'Unable to find exploration titles');
     return expSummaryRowTitleElements;
   };
 
@@ -227,7 +229,7 @@ var CreatorDashboardPage = function() {
     var expSummaryRowRatingElements = element.all(
       by.css('.protractor-test-exp-summary-row-rating'));
     await waitFor.visibilityOf(
-      expSummaryRowRatingElements.first(),
+      await expSummaryRowRatingElements.first(),
       'Unable to find exploration ratings');
     return expSummaryRowRatingElements;
   };
@@ -237,7 +239,7 @@ var CreatorDashboardPage = function() {
     var expSummaryRowFeedbackElements = element.all(
       by.css('.protractor-test-exp-summary-row-open-feedback'));
     await waitFor.visibilityOf(
-      expSummaryRowFeedbackElements.first(),
+      await expSummaryRowFeedbackElements.first(),
       'Unable to find exploration feedbacks');
     return expSummaryRowFeedbackElements;
   };
@@ -247,7 +249,7 @@ var CreatorDashboardPage = function() {
     var expSummaryRowViewsElements = element.all(
       by.css('.protractor-test-exp-summary-row-num-views'));
     await waitFor.visibilityOf(
-      expSummaryRowViewsElements.first(),
+      await expSummaryRowViewsElements.first(),
       'Unable to find exploration views');
     return expSummaryRowViewsElements;
   };
