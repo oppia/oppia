@@ -236,5 +236,7 @@ describe('Chapter editor functionality', function() {
       defaultThumbnailImageSrc);
   });
 
-  afterAll(async() => await users.logout());
+  afterAll(async function() {
+    await users.logout();
+  });
 });

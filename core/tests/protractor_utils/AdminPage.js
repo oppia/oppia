@@ -88,22 +88,22 @@ var AdminPage = function() {
 
     // The name should be as given in the admin page (including '.yaml' if
     // necessary).
-    this.reloadExploration = function(name) {
-      this.get();
-      explorationElements.map(function(explorationElement) {
-        getExplorationTitleElement(explorationElement)
-          .getText().then(function(title) {
-          // We use match here in case there is whitespace around the name
-            if (title.match(name)) {
-              getExplorationElementReloadButton(explorationElement).click();
-              general.acceptAlert();
-              // Time is needed for the reloading to complete.
-              waitFor.textToBePresentInElement(
-                statusMessage, 'Data reloaded successfully.',
-                'Exploration could not be reloaded');
-              return true;
-            }
-          });
+    this.reloadExploration = async function(name) {
+      await this.get();
+      explorationElements.map(async function(explorationElement) {
+        var title = await getExplorationTitleElement(explorationElement)
+          .getText();
+
+        // We use match here in case there is whitespace around the name
+        if (title.match(name)) {
+          await getExplorationElementReloadButton(explorationElement).click();
+          await general.acceptAlert();
+          // Time is needed for the reloading to complete.
+          await waitFor.textToBePresentInElement(
+            statusMessage, 'Data reloaded successfully.',
+            'Exploration could not be reloaded');
+          return true;
+        }
       });
     };
   }
@@ -130,9 +130,9 @@ var AdminPage = function() {
     await waitFor.pageToFullyLoad();
   };
 
-  this.getJobsTab = function() {
-    browser.get(ADMIN_URL_SUFFIX + '#/jobs');
-    return waitFor.pageToFullyLoad();
+  this.getJobsTab = async function() {
+    await browser.get(ADMIN_URL_SUFFIX + '#/jobs');
+    await waitFor.pageToFullyLoad();
   };
 
   this.editConfigProperty = async function(
@@ -158,7 +158,7 @@ var AdminPage = function() {
   };
 
   this._startOneOffJob = async function(jobName, i) {
-    await waitFor.visibilityOf(oneOffJobRows.first(),
+    await waitFor.visibilityOf(await oneOffJobRows.first(),
       'Starting one off jobs taking too long to appear.');
     var text = await (await oneOffJobRows.get(i)).getText();
     if (text.toLowerCase().startsWith(jobName.toLowerCase())) {
@@ -200,9 +200,9 @@ var AdminPage = function() {
         var text = await element.getText();
         return text.toLowerCase().startsWith(jobName.toLowerCase());
       });
-    await (await unfinishedJobs.get(0)).getText((job) => {
-      expect(job.toLowerCase().startsWith(jobName.toLowerCase())).toBeTrue();
-    });
+    var unfinishedJobName = await (await unfinishedJobs.get(0)).getText();
+    expect(unfinishedJobName.toLowerCase().startsWith(
+      jobName.toLowerCase())).toEqual(true);
   };
 
   this.updateRole = async function(name, newRole) {
@@ -216,6 +216,7 @@ var AdminPage = function() {
     await updateFormName.sendKeys(name);
     var roleOption = roleSelect.element(
       by.cssContainingText('option', newRole));
+    waitFor.visibilityOf(roleOption, 'Admin role option is not visible');
     await roleOption.click();
     await updateFormSubmit.click();
     await waitFor.visibilityOf(

@@ -35,7 +35,7 @@ describe('Voiceover upload features', function() {
   var explorationEditorTranslationTab = null;
   var explorationEditorSettingsTab = null;
 
-  beforeAll(async(done) => {
+  beforeAll(async function(done) {
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
@@ -55,7 +55,7 @@ describe('Voiceover upload features', function() {
     done();
   });
 
-  beforeEach(async(done) => {
+  beforeEach(async function(done) {
     await explorationEditorPage.navigateToTranslationTab();
     await explorationEditorTranslationTab.exitTutorial();
     done();

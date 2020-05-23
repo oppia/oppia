@@ -61,13 +61,13 @@ var submitAnswer = async function(elem, answer) {
 var answerObjectType = 'NonnegativeInt';
 
 var testSuite = [{
-  interactionArguments: [[async(editor) => {
+  interactionArguments: [[async function(editor) {
     await editor.appendBoldText('right');
-  }, async(editor) => {
+  }, async function(editor) {
     await editor.appendItalicText('wrong1');
-  }, async(editor) => {
+  }, async function(editor) {
     await editor.appendItalicText('wrong2');
-  }, async(editor) => {
+  }, async function(editor) {
     await editor.appendItalicText('wrong3');
   }]],
   ruleArguments: ['Equals', ['right']],

@@ -75,7 +75,7 @@ describe('Admin Page', function() {
     await adminPage.expectNumberOfRunningOneOffJobs(0);
   });
 
-  afterEach(function() {
-    general.checkForConsoleErrors([]);
+  afterEach(async function() {
+    await general.checkForConsoleErrors([]);
   });
 });

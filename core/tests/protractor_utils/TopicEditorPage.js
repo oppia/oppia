@@ -36,8 +36,12 @@ var TopicEditorPage = function() {
 
   var topicNameField = element(
     by.css('.protractor-test-topic-name-field'));
+  var topicNameHeading = element(
+    by.css('.protractor-test-topic-name-heading'));
   var topicDescriptionField = element(
     by.css('.protractor-test-topic-description-field'));
+  var topicDescriptionHeading = element(
+    by.css('.protractor-test-topic-description-heading'));
   var saveTopicButton = element(
     by.css('.protractor-test-save-topic-button'));
   var publishTopicButton = element(
@@ -165,7 +169,7 @@ var TopicEditorPage = function() {
   };
 
   this.expectTitleOfSubtopicWithIndexToMatch = async function(title, index) {
-    expect(subtopicTitles.get(index).getText()).toEqual(title);
+    expect(await subtopicTitles.get(index).getText()).toEqual(title);
   };
 
   this.changeSubtopicTitle = async function(title) {
@@ -173,8 +177,8 @@ var TopicEditorPage = function() {
     await subtopicTitleField.sendKeys(title);
   };
 
-  this.saveSubtopic = function() {
-    saveSubtopicButton.click();
+  this.saveSubtopic = async function() {
+    await saveSubtopicButton.click();
   };
 
   this.changeSubtopicPageContents = async function(richTextInstructions) {
@@ -288,9 +292,10 @@ var TopicEditorPage = function() {
     await waitFor.pageToFullyLoad();
   };
 
-  this.changeTopicName = function(newName) {
-    topicNameField.clear();
-    topicNameField.sendKeys(newName);
+  this.changeTopicName = async function(newName) {
+    await topicNameField.clear();
+    await topicNameField.sendKeys(newName);
+    await topicNameHeading.click();
   };
 
   this.expectTopicNameToBe = async function(name) {
@@ -300,6 +305,7 @@ var TopicEditorPage = function() {
   this.changeTopicDescription = async function(newDescription) {
     await topicDescriptionField.clear();
     await topicDescriptionField.sendKeys(newDescription);
+    await topicDescriptionHeading.click();
   };
 
   this.expectTopicDescriptionToBe = async function(description) {

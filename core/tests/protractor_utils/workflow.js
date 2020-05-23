@@ -292,18 +292,14 @@ var submitImage = async function(
   await waitFor.visibilityOf(
     imageClickableElement,
     'Image element is taking too long to appear.');
-  return await this.uploadImage(
-    imageClickableElement, imgPath).then(async function() {
-    await waitFor.visibilityOf(
-      imageContainer, 'Image container is taking too long to appear');
-  }).then(async function() {
-    await imageSubmitButton.click();
-  }).then(async function() {
-    await waitFor.invisibilityOf(
-      imageUploadInput,
-      'Image uploader is taking too long to disappear');
-    return await waitFor.pageToFullyLoad();
-  });
+  await this.uploadImage(imageClickableElement, imgPath);
+  await waitFor.visibilityOf(
+    imageContainer, 'Image container is taking too long to appear');
+  await imageSubmitButton.click();
+  await waitFor.invisibilityOf(
+    imageUploadInput,
+    'Image uploader is taking too long to disappear');
+  return await waitFor.pageToFullyLoad();
 };
 
 exports.getImageSource = getImageSource;

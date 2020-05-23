@@ -56,7 +56,9 @@ describe('Exploration translation and voiceover tab', function() {
     // TODO(#7569): Change this test to work with the improvements tab.
     await adminPage.editConfigProperty(
       'Exposes the Improvements Tab for creators in the exploration editor',
-      'Boolean', async(elem) => await elem.setValue(false));
+      'Boolean', async function(elem) {
+        await elem.setValue(false);
+      });
     await users.login('user@editorTab.com');
     await workflow.createExploration();
 

@@ -247,11 +247,11 @@ var ExplorationPlayerPage = function() {
     ).toBe(name);
   };
 
-  this.expectExplorationRatingOnInformationCardToEqual = function(ratingValue) {
-    explorationInfoIcon.click();
-    infoCardRating.getText().then(function(value) {
-      expect(value).toBe(ratingValue);
-    });
+  this.expectExplorationRatingOnInformationCardToEqual = async function(
+      ratingValue) {
+    await explorationInfoIcon.click();
+    var value = await infoCardRating.getText();
+    expect(value).toBe(ratingValue);
   };
 
   this.rateExploration = async function(ratingValue) {

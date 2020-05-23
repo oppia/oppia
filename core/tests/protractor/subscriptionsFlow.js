@@ -33,7 +33,7 @@ describe('Subscriptions functionality', function() {
   var preferencesPage = null;
   var subscriptionDashboardPage = null;
 
-  beforeEach(async function() {
+  beforeEach(function() {
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
     preferencesPage = new PreferencesPage.PreferencesPage();
     subscriptionDashboardPage = (
@@ -51,15 +51,15 @@ describe('Subscriptions functionality', function() {
     await users.createUser(
       'learner1@subscriptions.com', 'learner1subscriptions');
     await users.login('learner1@subscriptions.com');
-    subscriptionDashboardPage.navigateToUserSubscriptionPage(
+    await subscriptionDashboardPage.navigateToUserSubscriptionPage(
       'creator1Idsubscriptions');
-    subscriptionDashboardPage.navigateToSubscriptionButton();
-    subscriptionDashboardPage.navigateToUserSubscriptionPage(
+    await subscriptionDashboardPage.navigateToSubscriptionButton();
+    await subscriptionDashboardPage.navigateToUserSubscriptionPage(
       'creator2Idsubscriptions');
-    subscriptionDashboardPage.navigateToSubscriptionButton();
-    preferencesPage.get();
-    preferencesPage.expectDisplayedFirstSubscriptionToBe('creator...');
-    preferencesPage.expectDisplayedLastSubscriptionToBe('creator...');
+    await subscriptionDashboardPage.navigateToSubscriptionButton();
+    await preferencesPage.get();
+    await preferencesPage.expectDisplayedFirstSubscriptionToBe('creator...');
+    await preferencesPage.expectDisplayedLastSubscriptionToBe('creator...');
     await users.logout();
 
     // Create a learner who subscribes to creator1Id and unsubscribes from the
@@ -67,44 +67,47 @@ describe('Subscriptions functionality', function() {
     await users.createUser(
       'learner2@subscriptions.com', 'learner2subscriptions');
     await users.login('learner2@subscriptions.com');
-    subscriptionDashboardPage.navigateToUserSubscriptionPage(
+    await subscriptionDashboardPage.navigateToUserSubscriptionPage(
       'creator1Idsubscriptions');
-    subscriptionDashboardPage.navigateToSubscriptionButton();
-    subscriptionDashboardPage.navigateToUserSubscriptionPage(
+    await subscriptionDashboardPage.navigateToSubscriptionButton();
+    await subscriptionDashboardPage.navigateToUserSubscriptionPage(
       'creator2Idsubscriptions');
 
     // Subscribe and then unsubscribe from the same user.
-    subscriptionDashboardPage.navigateToSubscriptionButton();
-    subscriptionDashboardPage.navigateToSubscriptionButton();
-    preferencesPage.get();
-    preferencesPage.expectSubscriptionCountToEqual(1);
-    preferencesPage.expectDisplayedFirstSubscriptionToBe('creator...');
+    await subscriptionDashboardPage.navigateToSubscriptionButton();
+    await subscriptionDashboardPage.navigateToSubscriptionButton();
+    await preferencesPage.get();
+    await preferencesPage.expectSubscriptionCountToEqual(1);
+    await preferencesPage.expectDisplayedFirstSubscriptionToBe('creator...');
     await users.logout();
 
     // Verify there are 2 subscribers.
     await users.login('creator1Id@subscriptions.com');
     // Go to the creator_dashboard.
-    creatorDashboardPage.get();
-    creatorDashboardPage.clickCreateNewExplorationButton();
-    creatorDashboardPage.get();
-    creatorDashboardPage.navigateToSubscriptionDashboard();
-    subscriptionDashboardPage.expectSubscriptionFirstNameToMatch('learner...');
-    subscriptionDashboardPage.expectSubscriptionLastNameToMatch('learner...');
+    await creatorDashboardPage.get();
+    await creatorDashboardPage.clickCreateNewExplorationButton();
+    await creatorDashboardPage.get();
+    await creatorDashboardPage.navigateToSubscriptionDashboard();
+    await subscriptionDashboardPage.expectSubscriptionFirstNameToMatch(
+      'learner...');
+    await subscriptionDashboardPage.expectSubscriptionLastNameToMatch(
+      'learner...');
     await users.logout();
 
     // Verify there are 1 subscriber.
     await users.login('creator2Id@subscriptions.com');
     // Go to the creator_dashboard.
-    creatorDashboardPage.get();
-    creatorDashboardPage.clickCreateNewExplorationButton();
-    creatorDashboardPage.get();
-    creatorDashboardPage.navigateToSubscriptionDashboard();
-    subscriptionDashboardPage.expectSubscriptionCountToEqual(1);
-    subscriptionDashboardPage.expectSubscriptionLastNameToMatch('learner...');
+    await creatorDashboardPage.get();
+    await creatorDashboardPage.clickCreateNewExplorationButton();
+    await creatorDashboardPage.get();
+    await creatorDashboardPage.navigateToSubscriptionDashboard();
+    await subscriptionDashboardPage.expectSubscriptionCountToEqual(1);
+    await subscriptionDashboardPage.expectSubscriptionLastNameToMatch(
+      'learner...');
     await users.logout();
   });
 
-  afterEach(function() {
-    general.checkForConsoleErrors([]);
+  afterEach(async function() {
+    await general.checkForConsoleErrors([]);
   });
 });
