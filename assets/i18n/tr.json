@@ -491,7 +491,6 @@
 	"I18N_SIGNUP_EMAIL_PREFERENCES_EXPLAIN": "Bu ayarları istediğin zaman Tercihler sayfandan değiştirebilirsin.",
 	"I18N_SIGNUP_ERROR_MUST_AGREE_TO_TERMS": "Sitedeki konu anlatımlarını düzenleyebilmek için, sitenin kullanım koşullarını kabul etmelisin.",
 	"I18N_SIGNUP_ERROR_NO_USERNAME": "Lütfen bir kullanıcı adı girin.",
-	"I18N_SIGNUP_ERROR_USERNAME_MORE_50_CHARS": "Kullanıcı adı en fazla 50 karakter içerebilir.",
 	"I18N_SIGNUP_ERROR_USERNAME_NOT_AVAILABLE": "Bu kullanıcı adı geçersiz.",
 	"I18N_SIGNUP_ERROR_USERNAME_ONLY_ALPHANUM": "Kullanıcı adları sadece alfanümerik karakterler içerebilir.",
 	"I18N_SIGNUP_ERROR_USERNAME_TAKEN": "Üzgünüm, bu kullanıcı adı zaten kullanılmakta.",
