@@ -19,6 +19,12 @@
 require('domain/utilities/url-interpolation.service.ts');
 require('services/id-generation.service.ts');
 
+interface ImageUploaderCustomScope extends ng.IScope {
+  errorMessage?: string;
+  onFileChanged?: (file: File, fileName?: string) => void;
+  fileInputClassName?: string;
+}
+
 angular.module('oppia').directive('imageUploader', [
   'IdGenerationService', 'UrlInterpolationService',
   function(IdGenerationService, UrlInterpolationService) {
@@ -33,7 +39,7 @@ angular.module('oppia').directive('imageUploader', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/forms/custom-forms-directives/' +
         'image-uploader.directive.html'),
-      link: function(scope: ICustomScope, elt) {
+      link: function(scope: ImageUploaderCustomScope, elt) {
         var onDragEnd = function(e) {
           e.preventDefault();
           $('.image-uploader-drop-area').removeClass(
