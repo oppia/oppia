@@ -277,6 +277,10 @@ jobs:
           name: Run e2e file upload features test
           command: |
             python -m scripts.run_e2e_tests --skip-install --suite="fileUploadFeatures"
+      - run:
+          name: Run e2e play translations tesst
+          command: |
+            python -m scripts.run_e2e_tests --skip-install --suite="playTranslations"
       - persist_to_workspace:
           root: /home/circleci/
           paths:

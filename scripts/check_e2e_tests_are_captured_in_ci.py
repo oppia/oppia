@@ -29,10 +29,16 @@ import utils
 # One is extra (ie. (full: [*.js])) and three other test suites are
 # are being run by CircleCI.
 TEST_SUITES_NOT_RUN_ON_TRAVIS = [
+<<<<<<< HEAD
     'full', 'adminPage', 'accessibility', 'classroomPage',
     'classroomPageFileUploadFeatures', 'collections', 'embedding',
     'fileUploadFeatures', 'library', 'navigation', 'preferences',
     'profileFeatures', 'profileMenu', 'publication', 'subscriptions',
+=======
+    'full', 'adminPage', 'accessibility', 'classroomPageFileUploadFeatures',
+    'embedding', 'fileUploadFeatures', 'library', 'navigation',
+    'playTranslations', 'preferences', 'profileFeatures', 'profileMenu',
+>>>>>>> Added e2e test to .circleci and added .protractor-test classes for buttons
     'topicAndStoryEditorFileUploadFeatures', 'users']
 
 TRAVIS_CI_FILE_PATH = os.path.join(os.getcwd(), '.travis.yml')
