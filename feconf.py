@@ -183,7 +183,7 @@ CURRENT_STATE_SCHEMA_VERSION = 34
 CURRENT_COLLECTION_SCHEMA_VERSION = 6
 
 # The current version of story contents dict in the story schema.
-CURRENT_STORY_CONTENTS_SCHEMA_VERSION = 3
+CURRENT_STORY_CONTENTS_SCHEMA_VERSION = 4
 
 # The current version of skill contents dict in the skill schema.
 CURRENT_SKILL_CONTENTS_SCHEMA_VERSION = 1
@@ -201,7 +201,7 @@ CURRENT_SUBTOPIC_SCHEMA_VERSION = 2
 CURRENT_STORY_REFERENCE_SCHEMA_VERSION = 1
 
 # The current version of page_contents dict in the subtopic page schema.
-CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION = 1
+CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION = 2
 
 # This value should be updated in the event of any
 # StateAnswersModel.submitted_answer_list schema change.

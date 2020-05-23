@@ -22,6 +22,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from constants import constants
 from core.domain import change_domain
 from core.domain import state_domain
+from core.domain import html_validation_service
 from core.platform import models
 import feconf
 import python_utils
@@ -218,6 +219,17 @@ class SubtopicPage(python_utils.OBJECT):
             SubtopicPageContents.create_default_subtopic_page_contents(),
             feconf.CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION,
             constants.DEFAULT_LANGUAGE_CODE, 0)
+
+    @classmethod
+    def _convert_page_contents_v1_dict_to_v2_dict(cls, page_contents_dict):
+
+        import json
+        print("****************************************************************\n")
+        print("in _convert_page_contents_v1_dict_to_v2s_dict")
+        print(json.dumps(page_contents_dict))
+        page_contents_dict['subtitled_html']['html'] = html_validation_service.add_math_content_to_math_rte_components(page_contents_dict['subtitled_html']['html'])
+        return page_contents_dict
+
 
     @classmethod
     def update_page_contents_from_model(

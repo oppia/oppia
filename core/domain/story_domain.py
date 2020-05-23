@@ -24,6 +24,7 @@ from constants import constants
 from core.domain import android_validation_constants
 from core.domain import change_domain
 from core.domain import html_cleaner
+from core.domain import html_validation_service
 import feconf
 import python_utils
 import utils
@@ -961,6 +962,17 @@ class Story(python_utils.OBJECT):
         for node in story_contents_dict['nodes']:
             node['description'] = ''
         return story_contents_dict
+    @classmethod
+    def _convert_story_contents_v3_dict_to_v4_dict(cls, story_contents_dict):
+        import json
+        print("****************************************************************\n")
+        print("in _convert_story_contents_v3_dict_to_v4_dict")
+        print(json.dumps(story_contents_dict))
+
+        for node in story_contents_dict['nodes']:
+            node['outline'] = html_validation_service.add_math_content_to_math_rte_components(node['outline'])
+        return story_contents_dict
+
 
     @classmethod
     def update_story_contents_from_model(
