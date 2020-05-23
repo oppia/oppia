@@ -22,6 +22,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import datetime
 import threading
 import time
+import traceback
 import python_utils
 
 LOG_LOCK = threading.Lock()
@@ -49,6 +50,7 @@ class TaskThread(threading.Thread):
         self.func = func
         self.output = None
         self.exception = None
+        self.stacktrace = None
         self.verbose = verbose
         self.name = name
         self.semaphore = semaphore
@@ -65,6 +67,7 @@ class TaskThread(threading.Thread):
                 (self.name, time.time() - self.start_time), show_time=True)
         except Exception as e:
             self.exception = e
+            self.stacktrace = traceback.format_exc()
             if 'KeyboardInterrupt' not in python_utils.convert_to_bytes(
                     self.exception.args[0]):
                 log(e)
@@ -87,7 +90,7 @@ def _check_all_tasks(tasks):
             ))
 
         if task.exception:
-            ALL_ERRORS.append(task.exception)
+            ALL_ERRORS.append(task.stacktrace)
 
     if running_tasks_data:
         log('----------------------------------------')
