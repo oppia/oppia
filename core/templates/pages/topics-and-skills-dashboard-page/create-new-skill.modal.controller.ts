@@ -20,12 +20,12 @@
 require('domain/utilities/url-interpolation.service.ts');
 
 angular.module('oppia').controller('CreateNewSkillModal', [
-  '$scope', '$uibModalInstance', 'SkillCreationService', 'RubricObjectFactory',
-  'SkillObjectFactory', 'SKILL_DIFFICULTIES',
-  'MAX_CHARS_IN_SKILL_DESCRIPTION', 'SKILL_DESCRIPTION_STATUS_VALUES',
-  function($scope, $uibModalInstance, SkillCreationService, RubricObjectFactory,
-      SkillObjectFactory, SKILL_DIFFICULTIES,
-      MAX_CHARS_IN_SKILL_DESCRIPTION, SKILL_DESCRIPTION_STATUS_VALUES) {
+  '$scope', '$uibModalInstance', 'RubricObjectFactory', 'SkillCreationService',
+  'SkillObjectFactory', 'MAX_CHARS_IN_SKILL_DESCRIPTION',
+  'SKILL_DESCRIPTION_STATUS_VALUES', 'SKILL_DIFFICULTIES',
+  function($scope, $uibModalInstance, RubricObjectFactory, SkillCreationService,
+      SkillObjectFactory, MAX_CHARS_IN_SKILL_DESCRIPTION,
+      SKILL_DESCRIPTION_STATUS_VALUES, SKILL_DIFFICULTIES) {
     var rubrics = [
       RubricObjectFactory.create(SKILL_DIFFICULTIES[0], []),
       RubricObjectFactory.create(SKILL_DIFFICULTIES[1], ['']),

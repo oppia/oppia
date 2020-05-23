@@ -23,7 +23,7 @@ import { TopicsAndSkillsDashboardPageConstants } from
   // eslint-disable-next-line max-len
   'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.constants';
 import { DashboardFilter } from
-  'domain/topics_and_skills_dashboard/FilterObjectFactory';
+  'domain/topics_and_skills_dashboard/DashboardFilterObjectFactory';
 
 @Injectable({
   providedIn: 'root'
