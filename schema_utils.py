@@ -414,47 +414,45 @@ class _Validators(python_utils.OBJECT):
 
     @staticmethod
     def is_valid_expression(obj, algebraic=True):
-        """Checks if the given  obj (a string) represents a valid algebraic or
+        """Checks if the given  obj(a string) represents a valid algebraic or
         numeric expression.
 
         Args:
             obj: str. The given expression.
             algebraic: bool. True if the given expression is algebraic
-            else numeric.
+                else numeric.
 
         Returns:
             bool. Whether the given object is a valid expression.
         """
-        valid_expression = True
-        valid_characters = '({[]})+-/*^.'
+        valid_characters = '+-/*^.'
+        valid_brackets = '({[]})'
 
         # Expression should not contain invalid characters.
         for character in obj:
-            if character not in valid_characters and not bool(
+            if character not in valid_characters + valid_brackets and not bool(
                     re.match(r'[a-zA-Z0-9]', character)):
-                valid_expression = False
-                break
+                return False
 
         # Algebraic expressions should contain at least one latin letter and
         # numeric expressions should contain none.
         if algebraic:
-            valid_expression &= bool(re.search(r'[a-zA-Z]+', obj))
+            if not bool(re.search(r'[a-zA-Z]+', obj)):
+                return False
         else:
-            valid_expression &= not bool(re.search(r'[a-zA-Z]+', obj))
+            if bool(re.search(r'[a-zA-Z]+', obj)):
+                return False
 
         # Expression should contain a balanced bracket sequence.
-        valid_expression &= contains_balanced_brackets(obj)
+        if not contains_balanced_brackets(obj):
+            return False
 
         # Expression should not contain multiple operators consecutively.
-        valid_operators = valid_characters[6:]
-        valid_expression &= not any(
-            obj[i] in valid_operators and obj[i - 1] in valid_operators for i in
-            python_utils.RANGE(1, len(obj)))
+        for i in python_utils.RANGE(1, len(obj)):
+            if obj[i] in valid_characters and obj[i - 1] in valid_characters:
+                return False
 
-        # Expression should not be an equation or inequality.
-        valid_expression &= not bool(re.search(r'(=|<|>)+', obj))
-
-        return valid_expression
+        return True
 
     @staticmethod
     def is_each_element_a_single_latin_letter(obj):
@@ -467,14 +465,14 @@ class _Validators(python_utils.OBJECT):
         Returns:
             bool. Whether the given object has all latin letters.
         """
-        for ele in obj:
-            if not bool(re.search(r'[a-zA-Z]+', ele)) or len(ele) != 1:
+        for elem in obj:
+            if not bool(re.search(r'[a-zA-Z]+', elem)) or len(elem) != 1:
                 return False
         return True
 
     @staticmethod
     def is_valid_math_equation(obj):
-        """Checks if the given  obj (a string) represents a valid math equation.
+        """Checks if the given  obj(a string) represents a valid math equation.
 
         Args:
             obj: str. A string.
