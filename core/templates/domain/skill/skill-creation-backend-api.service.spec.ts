@@ -69,12 +69,12 @@ describe('Skill creation backend api service', () => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
       skillCreationBackendApiService.createSkill(
-        'test-description', rubricDict, 'test_dictionary', ['test_id']
+        'test-description', rubricDict, 'test_dictionary', ['test_id'], []
       ).then(successHandler);
       let req = httpTestingController.expectOne(
         '/skill_editor_handler/create_new');
       expect(req.request.method).toEqual('POST');
-      expect(req.request.body).toEqual(postData);
+      expect(req.request.body.get('payload')).toEqual(JSON.stringify(postData));
       req.flush(postData);
       flushMicrotasks();
       expect(successHandler).toHaveBeenCalled();
@@ -86,7 +86,7 @@ describe('Skill creation backend api service', () => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
       skillCreationBackendApiService.createSkill(
-        'test-description', rubricDict, 'test_dictionary', ['test_id']
+        'test-description', rubricDict, 'test_dictionary', ['test_id'], []
       ).then(successHandler, failHandler);
       let errorResponse = new HttpErrorResponse({
         error: 'test 404 error',
@@ -97,7 +97,7 @@ describe('Skill creation backend api service', () => {
         '/skill_editor_handler/create_new');
       req.error(new ErrorEvent('Error'), errorResponse);
       expect(req.request.method).toEqual('POST');
-      expect(req.request.body).toEqual(postData);
+      expect(req.request.body.get('payload')).toEqual(JSON.stringify(postData));
       flushMicrotasks();
       expect(failHandler).toHaveBeenCalled();
       expect(successHandler).not.toHaveBeenCalled();

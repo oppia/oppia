@@ -18,8 +18,7 @@
 
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
-
-import { CsrfTokenService } from 'services/csrf-token.service';
+import { HttpClient } from '@angular/common/http';
 
 export interface IRubricBackend {
   difficulty: string,
@@ -43,7 +42,7 @@ export interface IImageData {
   providedIn: 'root'
 })
 export class SkillCreationBackendApiService {
-  constructor(private csrfTokenService: CsrfTokenService) {}
+  constructor(private http: HttpClient) {}
 
   /**
    * Sends POST request to create skill.
@@ -66,47 +65,33 @@ export class SkillCreationBackendApiService {
       errorCallback:(reason?: any) => void,
       description: string, rubrics: IRubricBackend, explanation: string,
       linkedTopicIds: string[], imagesData: IImageData[]): void {
-    let filenames = imagesData.map(obj => obj.filename);
     let postData:ISkillCreationBackend = {
       description: description,
       linked_topic_ids: linkedTopicIds,
       explanation_dict: explanation,
-      rubrics: rubrics,
-      filenames: filenames
+      rubrics: rubrics
     };
-    var form = new FormData();
-    form.append('payload', JSON.stringify(postData));
+    let body = new FormData();
+    body.append('payload', JSON.stringify(postData));
+    let filenames = imagesData.map(obj => obj.filename);
     let imageBlobs = imagesData.map(obj => obj.imageBlob);
     for (let idx in imageBlobs) {
-      form.append(filenames[idx], imageBlobs[idx]);
+      body.append(filenames[idx], imageBlobs[idx]);
     }
-    this.csrfTokenService.initializeToken();
-    this.csrfTokenService.getTokenAsync().then(function(token) {
-      form.append('csrf_token', token);
-      $.ajax({
-        url: '/skill_editor_handler/create_new',
-        data: form,
-        processData: false,
-        contentType: false,
-        type: 'POST',
-        dataFilter: function(data) {
-          // Remove the XSSI prefix.
-          var transformedData = data.substring(5);
-          return JSON.parse(transformedData);
-        },
-        dataType: 'text'
-      }).done((response: { skillId: string }) => {
+
+    this.http.post(
+      '/skill_editor_handler/create_new', body).toPromise()
+      .then((response: { skillId: string }) => {
         if (successCallback) {
           successCallback({
             skillId: response.skillId
           });
         }
-      }).fail((errorResponse) => {
+      }, (errorResponse) => {
         if (errorCallback) {
-          errorCallback(errorResponse);
+          errorCallback(errorResponse.body);
         }
       });
-    });
   }
 
   createSkill(description: string, rubrics: IRubricBackend,
