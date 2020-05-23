@@ -42,22 +42,22 @@ describe('PlaythroughService', () => {
       TestBed.get(ExplorationFeaturesService);
   });
 
-  // describe('.initSession()', () => {
-  //   it('stores the correct values', () => {
-  //     this.expId = 'expId';
-  //     this.expVersion = 1;
-  //     this.playthroughRecordingProbability = 1.0;
+  describe('.initSession()', () => {
+    it('stores the correct values', () => {
+      this.expId = 'expId';
+      this.expVersion = 1;
+      this.playthroughRecordingProbability = 1.0;
 
-  //     playthroughService.initSession(
-  //       this.expId, this.expVersion, this.playthroughRecordingProbability);
+      playthroughService.initSession(
+        this.expId, this.expVersion, this.playthroughRecordingProbability);
 
-  //     var playthrough = playthroughService.getPlaythrough();
-  //     expect(playthrough.expId).toEqual(this.expId);
-  //     expect(playthrough.expVersion).toEqual(this.expVersion);
-  //     expect(playthrough.actions).toEqual([]);
-  //     expect(playthrough.issueCustomizationArgs).toEqual({});
-  //   });
-  // });
+      var playthrough = playthroughService.getPlaythrough();
+      expect(playthrough.expId).toEqual(this.expId);
+      expect(playthrough.expVersion).toEqual(this.expVersion);
+      expect(playthrough.actions).toEqual([]);
+      expect(playthrough.issueCustomizationArgs).toEqual({});
+    });
+  });
 
   describe('recording exploration playthroughs', () => {
     beforeEach(() => {
