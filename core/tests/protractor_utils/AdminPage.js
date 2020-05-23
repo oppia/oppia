@@ -73,12 +73,14 @@ var AdminPage = function() {
       );
     };
 
-    this.reloadCollection = function(collectionId) {
+    this.reloadCollection = async function(collectionId) {
       this.get();
-      reloadCollectionButtons.get(collectionId).click();
-      general.acceptAlert();
+      await (
+        await reloadCollectionButtons.get(collectionId)
+      ).click();
+      await general.acceptAlert();
       // Time is needed for the reloading to complete.
-      waitFor.textToBePresentInElement(
+      await waitFor.textToBePresentInElement(
         statusMessage, 'Data reloaded successfully.',
         'Collection could not be reloaded');
       return true;

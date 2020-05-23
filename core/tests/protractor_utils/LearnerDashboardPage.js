@@ -64,44 +64,44 @@ var LearnerDashboardPage = function() {
     await playLaterSection.click();
   };
 
-  this.navigateToCompletedSection = function() {
-    waitFor.elementToBeClickable(
+  this.navigateToCompletedSection = async function() {
+    await waitFor.elementToBeClickable(
       completedSection, 'Completed tab takes too long to be clickable');
-    completedSection.click();
+    await completedSection.click();
   };
 
-  this.navigateToInCompleteSection = function() {
-    waitFor.elementToBeClickable(
+  this.navigateToInCompleteSection = async function() {
+    await waitFor.elementToBeClickable(
       incompleteSection, 'In Progress tab takes too long to be clickable');
-    incompleteSection.click();
+    await incompleteSection.click();
   };
 
-  this.navigateToIncompleteCollectionsSection = function() {
-    waitFor.elementToBeClickable(
+  this.navigateToIncompleteCollectionsSection = async function() {
+    await waitFor.elementToBeClickable(
       incompleteCollectionsSection,
       'Incomplete Collection Section tab takes too long to be clickable');
-    incompleteCollectionsSection.click();
+    await incompleteCollectionsSection.click();
   };
 
-  this.navigateToIncompleteExplorationsSection = function() {
-    waitFor.elementToBeClickable(
+  this.navigateToIncompleteExplorationsSection = async function() {
+    await waitFor.elementToBeClickable(
       incompleteExplorationsSection,
       'Incomplete Collection Section tab takes too long to be clickable');
-    incompleteExplorationsSection.click();
+    await incompleteExplorationsSection.click();
   };
 
-  this.navigateToCompletedCollectionsSection = function() {
-    waitFor.elementToBeClickable(
+  this.navigateToCompletedCollectionsSection = async function() {
+    await waitFor.elementToBeClickable(
       completedCollectionsSection,
       'Completed Collection Section tab takes too long to be clickable');
-    completedCollectionsSection.click();
+    await completedCollectionsSection.click();
   };
 
-  this.navigateToCompletedExplorationsSection = function() {
-    waitFor.elementToBeClickable(
+  this.navigateToCompletedExplorationsSection = async function() {
+    await waitFor.elementToBeClickable(
       completedExplorationsSection,
       'Completed Collection Section tab takes too long to be clickable');
-    completedExplorationsSection.click();
+    await completedExplorationsSection.click();
   };
 
   this.navigateToFeedbackSection = async function() {
@@ -131,12 +131,12 @@ var LearnerDashboardPage = function() {
       });
   };
 
-  this.expectTitleOfCollectionSummaryTileToMatch = function(title) {
+  this.expectTitleOfCollectionSummaryTileToMatch = async function(title) {
     var collectionTitle = element(by.cssContainingText(
       '.protractor-test-collection-summary-tile-title', title));
-    waitFor.visibilityOf(
+    await waitFor.visibilityOf(
       collectionTitle, 'Unable to find collection ' + title);
-    expect(collectionTitle.isDisplayed()).toBe(true);
+    expect(await collectionTitle.isDisplayed()).toBe(true);
   };
 
   this.expectTitleOfExplorationSummaryTileToBeHidden = function(title) {
@@ -185,31 +185,31 @@ var LearnerDashboardPage = function() {
     expect(await feedbackMessage.first().getText()).toMatch(message);
   };
 
-  this.checkIncompleteExplorationSection = function(explorationTitle) {
-    this.navigateToInCompleteSection();
-    this.navigateToIncompleteExplorationsSection();
-    this.expectTitleOfExplorationSummaryTileToMatch(
+  this.checkIncompleteExplorationSection = async function(explorationTitle) {
+    await this.navigateToInCompleteSection();
+    await this.navigateToIncompleteExplorationsSection();
+    await this.expectTitleOfExplorationSummaryTileToMatch(
       explorationTitle);
   };
 
-  this.checkCompleteExplorationSection = function(explorationTitle) {
-    this.navigateToCompletedSection();
-    this.navigateToCompletedExplorationsSection();
-    this.expectTitleOfExplorationSummaryTileToMatch(
+  this.checkCompleteExplorationSection = async function(explorationTitle) {
+    await this.navigateToCompletedSection();
+    await this.navigateToCompletedExplorationsSection();
+    await this.expectTitleOfExplorationSummaryTileToMatch(
       explorationTitle);
   };
 
-  this.checkIncompleteCollectionSection = function(collectionTitle) {
-    this.navigateToInCompleteSection();
-    this.navigateToIncompleteCollectionsSection();
-    this.expectTitleOfCollectionSummaryTileToMatch(
+  this.checkIncompleteCollectionSection = async function(collectionTitle) {
+    await this.navigateToInCompleteSection();
+    await this.navigateToIncompleteCollectionsSection();
+    await this.expectTitleOfCollectionSummaryTileToMatch(
       collectionTitle);
   };
 
-  this.checkCompleteCollectionSection = function(collectionTitle) {
-    this.navigateToCompletedSection();
-    this.navigateToCompletedCollectionsSection();
-    this.expectTitleOfCollectionSummaryTileToMatch(
+  this.checkCompleteCollectionSection = async function(collectionTitle) {
+    await this.navigateToCompletedSection();
+    await this.navigateToCompletedCollectionsSection();
+    await this.expectTitleOfCollectionSummaryTileToMatch(
       collectionTitle);
   };
 };

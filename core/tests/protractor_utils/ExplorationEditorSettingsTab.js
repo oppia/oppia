@@ -90,17 +90,17 @@ var ExplorationEditorSettingsTab = function() {
     saveParamChangesButton.click();
   };
 
-  this.deleteExploration = function() {
-    waitFor.elementToBeClickable(deleteExplorationButton,
+  this.deleteExploration = async function() {
+    await waitFor.elementToBeClickable(deleteExplorationButton,
       'Delete Exploration button is not clickable');
-    deleteExplorationButton.click();
-    waitFor.elementToBeClickable(confirmDeleteExplorationButton,
+    await deleteExplorationButton.click();
+    await waitFor.elementToBeClickable(confirmDeleteExplorationButton,
       'Confirm Delete Exploration button is not clickable');
-    confirmDeleteExplorationButton.click();
-    waitFor.invisibilityOf(confirmDeleteExplorationButton,
+    await confirmDeleteExplorationButton.click();
+    await waitFor.invisibilityOf(confirmDeleteExplorationButton,
       'Delete Exploration modal takes too long to disappear');
     // Returning to /creator_dashboard.
-    waitFor.pageToFullyLoad();
+    await waitFor.pageToFullyLoad();
   };
 
   this.enableParameters = function() {

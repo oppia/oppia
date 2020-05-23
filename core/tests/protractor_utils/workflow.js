@@ -89,15 +89,15 @@ var createExplorationAndStartTutorial = async function() {
 /**
  * Only Admin users can create collections.
  */
-var createCollectionAsAdmin = function() {
+var createCollectionAsAdmin = async function() {
   var creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage;
-  creatorDashboardPage.get();
-  creatorDashboardPage.clickCreateActivityButton();
+  await creatorDashboardPage.get();
+  await creatorDashboardPage.clickCreateActivityButton();
   var activityCreationModal = element(
     by.css('.protractor-test-creation-modal'));
-  waitFor.visibilityOf(
+  await waitFor.visibilityOf(
     activityCreationModal, 'Activity Creation modal takes too long to appear');
-  creatorDashboardPage.clickCreateCollectionButton();
+  await creatorDashboardPage.clickCreateCollectionButton();
 };
 
 /**
