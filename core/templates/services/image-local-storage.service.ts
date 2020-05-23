@@ -25,7 +25,7 @@ angular.module('oppia').factory('ImageLocalStorageService', [
     var storedImageFilenames = [];
     // According to https://en.wikipedia.org/wiki/Web_storage, 5MB is the
     // minimum limit, for all browsers, per hostname, that can be stored in
-    // localStorage and 100kB is the max size limit for uploaded images, hence
+    // sessionStorage and 100kB is the max size limit for uploaded images, hence
     // the limit below.
     var MAX_IMAGES_STORABLE = 5 * 1024 / 100;
 
@@ -62,7 +62,7 @@ angular.module('oppia').factory('ImageLocalStorageService', [
         storedImageFilenames.splice(index, 1);
       },
 
-      getAndFlushStoredImagesData: function() {
+      getStoredImagesData: function() {
         var returnData = [];
         for (var idx in storedImageFilenames) {
           returnData.push({
@@ -71,9 +71,12 @@ angular.module('oppia').factory('ImageLocalStorageService', [
               sessionStorage.getItem(storedImageFilenames[idx]))
           });
         }
-        storedImageFilenames.length = 0;
-        sessionStorage.clear();
         return returnData;
+      },
+
+      flushStoredImagesData: function() {
+        sessionStorage.clear();
+        storedImageFilenames.length = 0;
       }
     };
   }

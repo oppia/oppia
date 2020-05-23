@@ -39,6 +39,7 @@ require(
 );
 require('domain/utilities/url-interpolation.service.ts');
 require('services/alerts.service.ts');
+require('services/image-local-storage.service.ts');
 
 require(
   'pages/topics-and-skills-dashboard-page/' +
@@ -57,7 +58,7 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
       controllerAs: '$ctrl',
       controller: [
         '$http', '$rootScope', '$scope', '$uibModal', '$window',
-        'AlertsService', 'ContextService',
+        'AlertsService', 'ContextService', 'ImageLocalStorageService',
         'RubricObjectFactory', 'SkillCreationService',
         'SkillObjectFactory', 'TopicCreationService',
         'TopicsAndSkillsDashboardBackendApiService', 'UrlInterpolationService',
@@ -68,7 +69,7 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
         'MAX_CHARS_IN_SKILL_DESCRIPTION', 'SKILL_DESCRIPTION_STATUS_VALUES',
         function(
             $http, $rootScope, $scope, $uibModal, $window,
-            AlertsService, ContextService,
+            AlertsService, ContextService, ImageLocalStorageService,
             RubricObjectFactory, SkillCreationService,
             SkillObjectFactory, TopicCreationService,
             TopicsAndSkillsDashboardBackendApiService, UrlInterpolationService,
@@ -209,6 +210,7 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
                   };
 
                   $scope.cancel = function() {
+                    ImageLocalStorageService.flushStoredImagesData();
                     SkillCreationService.resetSkillDescriptionStatusMarker();
                     $uibModalInstance.dismiss('cancel');
                   };

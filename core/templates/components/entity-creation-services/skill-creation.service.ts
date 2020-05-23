@@ -78,7 +78,7 @@ angular.module('oppia').factory('SkillCreationService', [
         // as soon as the user clicks the 'Create' button and filled with URL
         // once the details are fetched from the backend.
         var newTab = $window.open();
-        var imagesData = ImageLocalStorageService.getAndFlushStoredImagesData();
+        var imagesData = ImageLocalStorageService.getStoredImagesData();
         SkillCreationBackendApiService.createSkill(
           description, rubrics, explanation, linkedTopicIds, imagesData)
           .then(function(response) {
@@ -86,6 +86,7 @@ angular.module('oppia').factory('SkillCreationService', [
               $rootScope.$broadcast(
                 EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED, true);
               skillCreationInProgress = false;
+              ImageLocalStorageService.flushStoredImagesData();
               newTab.location.href = UrlInterpolationService.interpolateUrl(
                 CREATE_NEW_SKILL_URL_TEMPLATE, {
                   skill_id: response.skillId

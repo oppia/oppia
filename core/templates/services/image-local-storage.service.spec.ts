@@ -63,6 +63,9 @@ describe('ImageLocalStorageService', function() {
     ImageLocalStorageService.saveImage('filename 3', sampleImageData);
     ImageLocalStorageService.deleteImage('filename 2');
     expect(
-      ImageLocalStorageService.getAndFlushStoredImagesData().length).toEqual(2);
+      ImageLocalStorageService.getStoredImagesData().length).toEqual(2);
+    ImageLocalStorageService.flushStoredImagesData();
+    expect(
+      ImageLocalStorageService.getStoredImagesData().length).toEqual(0);
   });
 });
