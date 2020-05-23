@@ -7020,12 +7020,13 @@ class SkillModelValidatorTests(test_utils.GenericTestBase):
             })
         )
 
-        misconception = skill_domain.Misconception(
-            misconception_dict[0],
-            misconception_dict['name'],
-            misconception_dict['<p>notes</p>'],
-            misconception_dict['<p>default_feedback</p>'],
-            misconception_dict[True])
+        misconception_dict = {
+            'id': 0, 'name': 'name', 'notes': '<p>notes</p>',
+            'feedback': '<p>default_feedback</p>',
+            'must_be_addressed': True}
+
+        misconception = skill_domain.Misconception.from_dict(
+            misconception_dict)
 
         for index, skill in enumerate(skills):
             skill.language_code = language_codes[index]
@@ -7245,12 +7246,13 @@ class SkillSnapshotMetadataModelValidatorTests(
             })
         )
 
-        misconception = skill_domain.Misconception(
-            misconception_dict[0],
-            misconception_dict['name'],
-            misconception_dict['<p>notes</p>'],
-            misconception_dict['<p>default_feedback</p>'],
-            misconception_dict[True])
+        misconception_dict = {
+            'id': 0, 'name': 'name', 'notes': '<p>notes</p>',
+            'feedback': '<p>default_feedback</p>',
+            'must_be_addressed': True}
+
+        misconception = skill_domain.Misconception.from_dict(
+            misconception_dict)
 
         for index, skill in enumerate(skills):
             skill.language_code = language_codes[index]
@@ -7445,12 +7447,14 @@ class SkillSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
                 }
             })
         )
-        misconception = skill_domain.Misconception(
-            misconception_dict[0],
-            misconception_dict['name'],
-            misconception_dict['<p>notes</p>'],
-            misconception_dict['<p>default_feedback</p>'],
-            misconception_dict[True])
+        
+        misconception_dict = {
+            'id': 0, 'name': 'name', 'notes': '<p>notes</p>',
+            'feedback': '<p>default_feedback</p>',
+            'must_be_addressed': True}
+
+        misconception = skill_domain.Misconception.from_dict(
+            misconception_dict)
 
         for index, skill in enumerate(skills):
             skill.language_code = language_codes[index]
@@ -7595,12 +7599,14 @@ class SkillCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 }
             })
         )
-        misconception = skill_domain.Misconception(
-            misconception_dict[0],
-            misconception_dict['name'],
-            misconception_dict['<p>notes</p>'],
-            misconception_dict['<p>default_feedback</p>'],
-            misconception_dict[True])
+        
+        misconception_dict = {
+            'id': 0, 'name': 'name', 'notes': '<p>notes</p>',
+            'feedback': '<p>default_feedback</p>',
+            'must_be_addressed': True}
+
+        misconception = skill_domain.Misconception.from_dict(
+            misconception_dict)
 
         for index, skill in enumerate(skills):
             skill.language_code = language_codes[index]
@@ -7833,12 +7839,14 @@ class SkillSummaryModelValidatorTests(test_utils.GenericTestBase):
                 }
             })
         )
-        misconception = skill_domain.Misconception(
-            misconception_dict[0],
-            misconception_dict['name'],
-            misconception_dict['<p>notes</p>'],
-            misconception_dict['<p>default_feedback</p>'],
-            misconception_dict[True])
+        
+        misconception_dict = {
+            'id': 0, 'name': 'name', 'notes': '<p>notes</p>',
+            'feedback': '<p>default_feedback</p>',
+            'must_be_addressed': True}
+
+        misconception = skill_domain.Misconception.from_dict(
+            misconception_dict)
 
         for index, skill in enumerate(skills):
             skill.language_code = language_codes[index]
