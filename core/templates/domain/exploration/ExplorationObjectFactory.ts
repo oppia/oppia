@@ -20,36 +20,66 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import cloneDeep from 'lodash/cloneDeep';
-
 import { AppConstants } from 'app.constants';
+import { ICustomizationArgs } from
+  'domain/state/CustomizationArgsObjectFactory';
+import { IParamChangeBackendDict, ParamChange } from
+  'domain/exploration/ParamChangeObjectFactory';
+import { IParamSpecsBackendDict, ParamSpecs, ParamSpecsObjectFactory } from
+  'domain/exploration/ParamSpecsObjectFactory';
+import { Interaction } from 'domain/exploration/InteractionObjectFactory';
 import { LoggerService } from 'services/contextual/logger.service';
 import { ParamChangesObjectFactory } from
   'domain/exploration/ParamChangesObjectFactory';
-import { ParamSpecsObjectFactory } from
-  'domain/exploration/ParamSpecsObjectFactory';
-import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
+import { State } from 'domain/state/StateObjectFactory';
+import { StateBackendDictMapping, States, StatesObjectFactory } from
+  'domain/exploration/StatesObjectFactory';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
+import { Voiceover } from 'domain/exploration/VoiceoverObjectFactory';
+import { VoiceoverByLanguageCode } from
+  'domain/exploration/RecordedVoiceoversObjectFactory';
+
+import cloneDeep from 'lodash/cloneDeep';
 
 const INTERACTION_SPECS = require('interactions/interaction_specs.json');
 
+export interface IExplorationBackendDict {
+  /* eslint-disable camelcase */
+  author_notes: string;
+  auto_tts_enabled: boolean;
+  blurb: string;
+  category: string;
+  correctness_feedback_enabled: boolean;
+  id: string;
+  init_state_name: string;
+  language_code: string;
+  objective: string;
+  param_changes: IParamChangeBackendDict[];
+  param_specs: IParamSpecsBackendDict;
+  states: StateBackendDictMapping;
+  states_schema_version: number;
+  tags: string[];
+  title: string;
+  /* eslint-enable camelcase */
+}
+
 export class Exploration {
   constructor(
+      private loggerService: LoggerService,
       private urlInterpolationService: UrlInterpolationService,
       public initStateName: string,
-      public paramChanges: any,
-      public paramSpecs: any,
-      public states: any,
+      public paramChanges: ParamChange[],
+      public paramSpecs: ParamSpecs,
+      public states: States,
       public title: string,
-      public languageCode: string,
-      public loggerService: LoggerService) {}
+      public languageCode: string) {}
 
   // Instance methods
   isStateTerminal(stateName: string): boolean {
     return (
       stateName && this.getInteractionId(stateName) &&
-        INTERACTION_SPECS[this.getInteractionId(stateName)].is_terminal);
+      INTERACTION_SPECS[this.getInteractionId(stateName)].is_terminal);
   }
 
   // TODO(#7165): Replace any with exact type
@@ -65,11 +95,10 @@ export class Exploration {
       customizationArgs.recommendedExplorationIds.value : null;
   }
 
-  // TODO(#7165): Replace any with exact type
-  getInteraction(stateName: string): any {
+  getInteraction(stateName: string): Interaction {
     let state = this.states.getState(stateName);
     if (!state) {
-      this.logger.error('Invalid state name: ' + stateName);
+      this.loggerService.error('Invalid state name: ' + stateName);
       return null;
     }
     return state.interaction;
@@ -83,8 +112,7 @@ export class Exploration {
     return interaction.id;
   }
 
-  // TODO(#7165): Replace any with exact type
-  getInteractionCustomizationArgs(stateName: string): any {
+  getInteractionCustomizationArgs(stateName: string): ICustomizationArgs {
     let interaction = this.getInteraction(stateName);
     if (interaction === null) {
       return null;
@@ -101,12 +129,10 @@ export class Exploration {
     let interactionId = this.getInteractionId(stateName);
     return (
         interactionId ?
-            INTERACTION_SPECS[interactionId].narrow_instructions :
-            '');
+            INTERACTION_SPECS[interactionId].narrow_instructions : '');
   }
 
-  // TODO(#7165): Replace any with exact type
-  getInteractionThumbnailSrc(stateName: string): any {
+  getInteractionThumbnailSrc(stateName: string): string {
     // TODO(sll): unify this with the 'choose interaction' modal in
     // state_editor_interaction.html.
     let interactionId = this.getInteractionId(stateName);
@@ -123,19 +149,19 @@ export class Exploration {
     // possible in the learner view.
     return (
       !interactionId ||
-        INTERACTION_SPECS[interactionId].display_mode ===
-        AppConstants.INTERACTION_DISPLAY_MODE_INLINE);
+      INTERACTION_SPECS[interactionId].display_mode ===
+      AppConstants.INTERACTION_DISPLAY_MODE_INLINE);
   }
-  // TODO(#7165): Replace any with exact type
-  getStates(): any {
+
+  getStates(): States {
     return cloneDeep(this.states);
   }
-  // TODO(#7165): Replace any with exact type
-  getState(stateName: string): any {
+
+  getState(stateName: string): State {
     return this.states.getState(stateName);
   }
-  // TODO(#7165): Replace any with exact type
-  getInitialState(): any {
+
+  getInitialState(): State {
     return this.getState(this.initStateName);
   }
 
@@ -146,24 +172,22 @@ export class Exploration {
   getUninterpolatedContentHtml(stateName: string): string {
     return this.getState(stateName).content.getHtml();
   }
-  // TODO(#7165): Replace any with exact type
-  getVoiceovers(stateName: string): any {
+
+  getVoiceovers(stateName: string): VoiceoverByLanguageCode {
     let state = this.getState(stateName);
     if (!state) {
-      this.logger.error('Invalid state name: ' + stateName);
+      this.loggerService.error('Invalid state name: ' + stateName);
       return null;
     }
     let recordedVoiceovers = state.recordedVoiceovers;
     let contentId = state.content.getContentId();
-    return recordedVoiceovers.getBindableVoiceovers(
-      contentId);
+    return recordedVoiceovers.getBindableVoiceovers(contentId);
   }
-  // TODO(#7165): Replace any with exact type
-  getVoiceover(
-      stateName: string, languageCode: string): any {
+
+  getVoiceover(stateName: string, languageCode: string): Voiceover {
     let state = this.getState(stateName);
     if (!state) {
-      this.logger.error('Invalid state name: ' + stateName);
+      this.loggerService.error('Invalid state name: ' + stateName);
       return null;
     }
     let recordedVoiceovers = state.recordedVoiceovers;
@@ -171,8 +195,8 @@ export class Exploration {
     const voiceovers = recordedVoiceovers.getVoiceover(contentId, languageCode);
     return voiceovers || null;
   }
-  // TODO(#7165): Replace any with exact type
-  getAllVoiceovers(languageCode: string): any {
+
+  getAllVoiceovers(languageCode: string): {[stateName: string]: Voiceover[]} {
     return this.states.getAllVoiceovers(languageCode);
   }
 
@@ -180,7 +204,7 @@ export class Exploration {
     return this.languageCode;
   }
 
-  getAllVoiceoverLanguageCodes(): Array<string> {
+  getAllVoiceoverLanguageCodes(): string[] {
     return this.states.getAllVoiceoverLanguageCodes();
   }
 }
@@ -189,16 +213,17 @@ export class Exploration {
   providedIn: 'root'
 })
 export class ExplorationObjectFactory {
-  constructor(private logger: LoggerService,
-              private paramChangesObjectFactory: ParamChangesObjectFactory,
-              private paramSpecsObjectFactory: ParamSpecsObjectFactory,
-              private statesObjectFactory: StatesObjectFactory,
-              private urlInterpolationService: UrlInterpolationService) {}
+  constructor(
+      private loggerService: LoggerService,
+      private paramChangesObjectFactory: ParamChangesObjectFactory,
+      private paramSpecsObjectFactory: ParamSpecsObjectFactory,
+      private statesObjectFactory: StatesObjectFactory,
+      private urlInterpolationService: UrlInterpolationService) {}
 
-  // TODO(#7165): Replace any with exact type
-  createFromBackendDict(explorationBackendDict: any): Exploration {
-    /* eslint-enable dot-notation */
+  createFromBackendDict(
+      explorationBackendDict: IExplorationBackendDict): Exploration {
     return new Exploration(
+      this.loggerService,
       this.urlInterpolationService,
       explorationBackendDict.init_state_name,
       this.paramChangesObjectFactory.createFromBackendList(
@@ -208,8 +233,7 @@ export class ExplorationObjectFactory {
       this.statesObjectFactory.createFromBackendDict(
         explorationBackendDict.states),
       explorationBackendDict.title,
-      explorationBackendDict.language_code,
-      this.logger);
+      explorationBackendDict.language_code);
   }
 }
 

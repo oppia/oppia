@@ -23,10 +23,12 @@ import { Injectable } from '@angular/core';
 import { IVoiceoverBackendDict, VoiceoverObjectFactory, Voiceover } from
   'domain/exploration/VoiceoverObjectFactory';
 
+export interface VoiceoverByLanguageCode {
+  [langCode: string]: Voiceover;
+}
+
 export interface VoiceoverMapping {
-  [contentId: string]: {
-    [langCode: string]: Voiceover;
-  }
+  [contentId: string]: VoiceoverByLanguageCode;
 }
 
 export interface IVoiceoverBackendDictMapping {
@@ -50,7 +52,7 @@ export class RecordedVoiceovers {
     return Object.keys(this.voiceoversMapping);
   }
 
-  getBindableVoiceovers(contentId: string): {[langCode: string]: Voiceover} {
+  getBindableVoiceovers(contentId: string): VoiceoverByLanguageCode {
     return this.voiceoversMapping[contentId];
   }
 

@@ -23,20 +23,18 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { ParamType, ParamTypeObjectFactory } from
   'domain/exploration/ParamTypeObjectFactory';
 
+export interface IParamSpecBackendDict {
+  /* eslint-disable camelcase */
+  obj_type: string;
+  /* eslint-enable camelcase */
+}
+
 export class ParamSpec {
-  _objType: ParamType;
-  /**
-   * @constructor
-   * @param {!ParamType} objType - The type of the parameter.
-   */
-  constructor(objType: ParamType) {
-    /** @member {ParamType} */
-    this._objType = objType;
-  }
+  constructor(private objType: ParamType) {}
 
   /** @returns {ParamType} - The type name of the parameter. */
   getType(): ParamType {
-    return this._objType;
+    return this.objType;
   }
 
   // TODO(#7176): Replace 'any' with the exact type. This has been kept as
@@ -46,7 +44,7 @@ export class ParamSpec {
   /** @returns {{obj_type: String}} - Basic dict for backend consumption. */
   toBackendDict(): any {
     return {
-      obj_type: this._objType.getName(),
+      obj_type: this.objType.getName(),
     };
   }
 }
@@ -56,21 +54,14 @@ export class ParamSpec {
 })
 export class ParamSpecObjectFactory {
   constructor(private paramTypeObjectFactory: ParamTypeObjectFactory) {}
-  /**
-   * @param {!{obj_type: String}} paramSpecBackendDict - Basic dict from
-   *    backend.
-   * @returns {ParamSpec} - A new ParamSpec instance.
-   */
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'paramSpecBackendDict' is a dict with underscore_cased
-  // keys which give tslint errors against underscore_casing in favor of
-  // camelCasing.
-  createFromBackendDict(paramSpecBackendDict: any): ParamSpec {
-    return new ParamSpec(this.paramTypeObjectFactory.getTypeFromBackendName(
-      paramSpecBackendDict.obj_type));
+
+  createFromBackendDict(
+      paramSpecBackendDict: IParamSpecBackendDict): ParamSpec {
+    return new ParamSpec(
+      this.paramTypeObjectFactory.getTypeFromBackendName(
+        paramSpecBackendDict.obj_type));
   }
 
-  /** @returns {ParamSpec} - A default instance for ParamSpec. */
   createDefault(): ParamSpec {
     return new ParamSpec(this.paramTypeObjectFactory.getDefaultType());
   }
