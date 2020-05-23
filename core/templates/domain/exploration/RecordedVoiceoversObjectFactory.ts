@@ -142,24 +142,18 @@ export class RecordedVoiceoversObjectFactory {
   constructor(private voiceoverObjectFactory: VoiceoverObjectFactory) {}
 
   createFromBackendDict(
-      recordedVoiceoversDict:
-        IRecordedVoiceoversBackendDict): RecordedVoiceovers {
-    const voiceoversMapping: VoiceoverMapping = {};
-    const voiceoversMappingEntries = (
-      Object.entries(recordedVoiceoversDict.voiceovers_mapping));
-
-    for (const [contentId, voiceoversByLangCode] of voiceoversMappingEntries) {
-      const voiceoversByLangCodeEntries = Object.entries(voiceoversByLangCode);
-
-      voiceoversMapping[contentId] = {};
-      for (const [langCode, voiceoverDict] of voiceoversByLangCodeEntries) {
-        voiceoversMapping[contentId][langCode] = (
-          this.voiceoverObjectFactory.createFromBackendDict(voiceoverDict));
+      backendDict: IRecordedVoiceoversBackendDict): RecordedVoiceovers {
+    const voiceoverMapping: VoiceoverMapping = {};
+    for (const contentId in backendDict.voiceovers_mapping) {
+      voiceoverMapping[contentId] = {};
+      for (const langCode in backendDict.voiceovers_mapping[contentId]) {
+        voiceoverMapping[contentId][langCode] = (
+          this.voiceoverObjectFactory.createFromBackendDict(
+            backendDict.voiceovers_mapping[contentId][langCode]));
       }
     }
-
     return new RecordedVoiceovers(
-      this.voiceoverObjectFactory, voiceoversMapping);
+      this.voiceoverObjectFactory, voiceoverMapping);
   }
 
   createEmpty(): RecordedVoiceovers {
