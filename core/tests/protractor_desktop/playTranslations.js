@@ -97,7 +97,7 @@ describe('Test Translations', function() {
     explorationEditorTranslationTab.changeLanguage('Arabic');
     explorationEditorTranslationTab.openUploadAudioModal();
     explorationEditorTranslationTab.uploadAudio(
-      '../data/cafe.mp3');
+      '../data/ambient-noise.mp3');
     explorationEditorPage.saveChanges('Added another translation');
     libraryPage.get();
     libraryPage.playExploration('Test Translations');

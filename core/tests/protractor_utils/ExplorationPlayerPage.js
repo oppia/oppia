@@ -83,7 +83,7 @@ var ExplorationPlayerPage = function() {
   var audioBar = element(
     by.css('.protractor-test-audio-bar'));
   var audioSelect = element(
-    by.css('.audio-language-select'));
+    by.css('.protractor-test-audio-lang-select'));
 
   this.clickAudioBar = function() {
     waitFor.elementToBeClickable(audioBar,
@@ -93,7 +93,7 @@ var ExplorationPlayerPage = function() {
 
   this.playAudio = function() {
     var playBtn = element(
-      by.css('.fa-play-circle'));
+      by.css('.protractor-test-play-circle'));
     waitFor.elementToBeClickable(playBtn,
       'Play button taking too long to be clickable');
     playBtn.click();
@@ -101,13 +101,13 @@ var ExplorationPlayerPage = function() {
 
   this.expectAudioToBePlaying = function() {
     var pauseBtn = element(
-      by.css('.fa-pause-circle'));
+      by.css('.protractor-test-pause-circle'));
     expect(pauseBtn.isPresent()).toBeTruthy();
   };
 
   this.pauseAudio = function() {
     var pauseBtn = element(
-      by.css('.fa-pause-circle'));
+      by.css('.protractor-test-pause-circle'));
     waitFor.elementToBeClickable(pauseBtn,
       'Pause button taking too long to be clickable');
     pauseBtn.click();
@@ -115,7 +115,7 @@ var ExplorationPlayerPage = function() {
 
   this.expectAudioToBePaused = function() {
     var playBtn = element(
-      by.css('.fa-play-circle'));
+      by.css('.protractor-test-play-circle'));
     expect(playBtn.isPresent()).toBeTruthy();
   };
 
