@@ -47,7 +47,7 @@ describe('rich-text components', function() {
 
     await workflow.createExploration();
 
-    await explorationEditorMainTab.setContent(async(richTextEditor) => {
+    await explorationEditorMainTab.setContent(async function(richTextEditor) {
       await richTextEditor.appendBoldText('bold');
       await richTextEditor.appendPlainText(' ');
       // TODO(Jacob): add test for image RTE component
@@ -73,7 +73,7 @@ describe('rich-text components', function() {
     await explorationEditorPage.navigateToPreviewTab();
 
     await explorationPlayerPage.expectContentToMatch(
-      async(richTextChecker) => {
+      async function(richTextChecker) {
         await richTextChecker.readBoldText('bold');
         await richTextChecker.readPlainText(' ');
         await richTextChecker.readRteComponent(
@@ -100,7 +100,7 @@ describe('rich-text components', function() {
   // and tabs. Previous attempts at such a test intermittently fail with the
   // rich-text checker unable to read the formatted text.
 
-  afterEach(async() => {
+  afterEach(async function() {
     await general.checkForConsoleErrors([
       // TODO(pranavsid98): This error is caused by the upgrade from Chrome 60
       // to Chrome 61. Chrome version at time of recording this is 61.0.3163.
@@ -293,7 +293,7 @@ describe('Interactions', function() {
     await users.logout();
   });
 
-  afterEach(async() => {
+  afterEach(async function() {
     await general.checkForConsoleErrors([]);
   });
 });

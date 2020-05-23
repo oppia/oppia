@@ -89,26 +89,26 @@ var submitAnswer = async function(elem, answer) {
 
 var interactionArgumentsArray = [
   [
-    async(editor) => {
+    async function(editor) {
       await editor.appendBoldText('answer1');
     },
-    async(editor) => {
+    async function(editor) {
       await editor.appendItalicText('answer2');
     },
-    async(editor) => {
+    async function(editor) {
       await editor.appendPlainText('answer3');
     }
   ], 3];
 
 var interactionDetailsArray = [
   [
-    async(checker) => {
+    async function(checker) {
       await checker.readBoldText('answer1');
     },
-    async(checker) => {
+    async function(checker) {
       await checker.readItalicText('answer2');
     },
-    async(checker) => {
+    async function(checker) {
       checker.readPlainText('answer3');
     }
   ]

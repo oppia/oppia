@@ -51,7 +51,7 @@ describe('Library index page', function() {
     await adminPage.editConfigProperty(
       'Exposes the Improvements Tab for creators in the exploration editor',
       'Boolean',
-      async(elem) => {
+      async function(elem) {
         await elem.setValue(false);
       });
     await users.logout();
@@ -211,7 +211,9 @@ describe('Library index page', function() {
     await general.ensurePageHasNoTranslationIds();
   });
 
-  afterEach(async() => await general.checkForConsoleErrors([]));
+  afterEach(async function() {
+    await general.checkForConsoleErrors([]);
+  });
 });
 
 
@@ -314,7 +316,7 @@ describe('Permissions for private explorations', function() {
     await users.logout();
   });
 
-  afterEach(async() => {
+  afterEach(async function() {
     await general.checkForConsoleErrors([
       'Failed to load resource: the server responded with a status of 404'
     ]);

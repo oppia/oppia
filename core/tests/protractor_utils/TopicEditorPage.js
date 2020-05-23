@@ -36,8 +36,12 @@ var TopicEditorPage = function() {
 
   var topicNameField = element(
     by.css('.protractor-test-topic-name-field'));
+  var topicNameHeading = element(
+    by.css('.protractor-test-topic-name-heading'));
   var topicDescriptionField = element(
     by.css('.protractor-test-topic-description-field'));
+  var topicDescriptionHeading = element(
+    by.css('.protractor-test-topic-description-heading'));
   var saveTopicButton = element(
     by.css('.protractor-test-save-topic-button'));
   var publishTopicButton = element(
@@ -291,6 +295,7 @@ var TopicEditorPage = function() {
   this.changeTopicName = async function(newName) {
     await topicNameField.clear();
     await topicNameField.sendKeys(newName);
+    await topicNameHeading.click();
   };
 
   this.expectTopicNameToBe = async function(name) {
@@ -300,6 +305,7 @@ var TopicEditorPage = function() {
   this.changeTopicDescription = async function(newDescription) {
     await topicDescriptionField.clear();
     await topicDescriptionField.sendKeys(newDescription);
+    await topicDescriptionHeading.click();
   };
 
   this.expectTopicDescriptionToBe = async function(description) {
