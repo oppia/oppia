@@ -43,8 +43,8 @@ export interface IRecordedVoiceoversBackendDict {
 
 export class RecordedVoiceovers {
   constructor(
-      public voiceoversMapping: VoiceoverMapping,
-      private voiceoverObjectFactory: VoiceoverObjectFactory) {}
+      private voiceoverObjectFactory: VoiceoverObjectFactory,
+      public voiceoversMapping: VoiceoverMapping) {}
 
   getAllContentId(): string[] {
     return Object.keys(this.voiceoversMapping);
@@ -59,10 +59,8 @@ export class RecordedVoiceovers {
   }
 
   markAllVoiceoversAsNeedingUpdate(contentId: string): void {
-    const langCodeToVoiceover = this.voiceoversMapping[contentId];
-    for (const langCode in langCodeToVoiceover) {
-      langCodeToVoiceover[langCode].markAsNeedingUpdate();
-    }
+    Object.values(this.voiceoversMapping[contentId])
+      .forEach(voiceover => voiceover.markAsNeedingUpdate());
   }
 
   getVoiceoverLanguageCodes(contentId: string): string[] {
@@ -70,17 +68,14 @@ export class RecordedVoiceovers {
   }
 
   hasVoiceovers(contentId: string): boolean {
-    return this.getVoiceoverLanguageCodes(contentId).length > 0;
+    return (
+      this.voiceoversMapping[contentId] &&
+      this.getVoiceoverLanguageCodes(contentId).length > 0);
   }
 
   hasUnflaggedVoiceovers(contentId: string): boolean {
-    const langCodeToVoiceover = this.voiceoversMapping[contentId];
-    for (const langCode in langCodeToVoiceover) {
-      if (!langCodeToVoiceover[langCode].needsUpdate) {
-        return true;
-      }
-    }
-    return false;
+    return Object.values(this.voiceoversMapping[contentId])
+      .some(voiceover => !voiceover.needsUpdate);
   }
 
   addContentId(contentId: string): void {
@@ -100,40 +95,39 @@ export class RecordedVoiceovers {
   addVoiceover(
       contentId: string, langCode: string, filename: string,
       fileSizeBytes: number, durationSecs: number): void {
-    const langCodeToVoiceover = this.voiceoversMapping[contentId];
-    if (langCodeToVoiceover.hasOwnProperty(langCode)) {
+    const voiceoversByLangCode = this.voiceoversMapping[contentId];
+    if (voiceoversByLangCode.hasOwnProperty(langCode)) {
       throw new Error('Trying to add duplicate language code.');
     }
-    langCodeToVoiceover[langCode] =
-      this.voiceoverObjectFactory.createNew(filename,
-        fileSizeBytes, durationSecs);
+    voiceoversByLangCode[langCode] = this.voiceoverObjectFactory.createNew(
+      filename, fileSizeBytes, durationSecs);
   }
 
   deleteVoiceover(contentId: string, langCode: string): void {
-    const langCodeToVoiceover = this.voiceoversMapping[contentId];
-    if (!langCodeToVoiceover.hasOwnProperty(langCode)) {
+    const voiceoversByLangCode = this.voiceoversMapping[contentId];
+    if (!voiceoversByLangCode.hasOwnProperty(langCode)) {
       throw new Error(
         'Trying to remove non-existing translation for language code ' +
         langCode);
     }
-    delete langCodeToVoiceover[langCode];
+    delete voiceoversByLangCode[langCode];
   }
 
   toggleNeedsUpdateAttribute(contentId: string, langCode: string): void {
-    const langCodeToVoiceover = this.voiceoversMapping[contentId];
-    langCodeToVoiceover[langCode].toggleNeedsUpdateAttribute();
+    const voiceoversByLangCode = this.voiceoversMapping[contentId];
+    voiceoversByLangCode[langCode].toggleNeedsUpdateAttribute();
   }
 
   toBackendDict(): IRecordedVoiceoversBackendDict {
     const voiceoversMappingDict = {};
     for (const contentId in this.voiceoversMapping) {
-      const langCodeToVoiceover = this.voiceoversMapping[contentId];
-      const langCodeToVoiceoverDict = {};
-      Object.keys(langCodeToVoiceover).forEach(function(lang) {
-        langCodeToVoiceoverDict[lang] = (
-          langCodeToVoiceover[lang].toBackendDict());
+      const voiceoversByLangCode = this.voiceoversMapping[contentId];
+      const voiceoversByLangCodeDict = {};
+      Object.keys(voiceoversByLangCode).forEach(function(lang) {
+        voiceoversByLangCodeDict[lang] = (
+          voiceoversByLangCode[lang].toBackendDict());
       });
-      voiceoversMappingDict[contentId] = langCodeToVoiceoverDict;
+      voiceoversMappingDict[contentId] = voiceoversByLangCodeDict;
     }
     return { voiceovers_mapping: voiceoversMappingDict };
   }
@@ -152,22 +146,22 @@ export class RecordedVoiceoversObjectFactory {
     const voiceoversMappingEntries = (
       Object.entries(recordedVoiceoversDict.voiceovers_mapping));
 
-    for (const [contentId, langCodeToVoiceover] of voiceoversMappingEntries) {
-      const langCodeToVoiceoverEntries = Object.entries(langCodeToVoiceover);
+    for (const [contentId, voiceoversByLangCode] of voiceoversMappingEntries) {
+      const voiceoversByLangCodeEntries = Object.entries(voiceoversByLangCode);
 
       voiceoversMapping[contentId] = {};
-      for (const [langCode, voiceoverDict] of langCodeToVoiceoverEntries) {
+      for (const [langCode, voiceoverDict] of voiceoversByLangCodeEntries) {
         voiceoversMapping[contentId][langCode] = (
           this.voiceoverObjectFactory.createFromBackendDict(voiceoverDict));
       }
     }
 
     return new RecordedVoiceovers(
-      voiceoversMapping, this.voiceoverObjectFactory);
+      this.voiceoverObjectFactory, voiceoversMapping);
   }
 
   createEmpty(): RecordedVoiceovers {
-    return new RecordedVoiceovers({}, this.voiceoverObjectFactory);
+    return new RecordedVoiceovers(this.voiceoverObjectFactory, {});
   }
 }
 

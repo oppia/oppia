@@ -99,7 +99,7 @@ describe('Written Translations Object Factory', () => {
 
   it('should update the html language code of a written translations object',
     () => {
-      const this.writtenTranslationsBackendDict = (
+      this.writtenTranslationsBackendDict = (
         this.writtenTranslationsObjectFactory.createFromBackendDict({
           translations_mapping: {
             content_1: {
@@ -156,7 +156,7 @@ describe('Written Translations Object Factory', () => {
 
   it('should set needs_update to true in all translations from a content',
     () => {
-      const this.writtenTranslationsBackendDict = (
+      this.writtenTranslationsBackendDict = (
         this.writtenTranslationsObjectFactory.createFromBackendDict({
           translations_mapping: {
             content_1: {
