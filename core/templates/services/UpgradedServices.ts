@@ -115,7 +115,6 @@ import { ExtractImageFilenamesFromStateService } from
   'pages/exploration-player-page/services/extract-image-filenames-from-state.service';
 import { FeedbackThreadObjectFactory } from
   'domain/feedback_thread/FeedbackThreadObjectFactory';
-import { FormatTimePipe } from 'filters/format-timer.pipe';
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
 import { GenerateContentIdService } from 'services/generate-content-id.service';
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
@@ -367,7 +366,6 @@ export class UpgradedServices {
     upgradedServices['ExplorationFeaturesService'] =
       new ExplorationFeaturesService();
     upgradedServices['ExpressionParserService'] = new ExpressionParserService();
-    upgradedServices['FormatTimePipe'] = new FormatTimePipe();
     upgradedServices['FractionObjectFactory'] = new FractionObjectFactory();
     upgradedServices['GenerateContentIdService'] =
       new GenerateContentIdService();
