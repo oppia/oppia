@@ -99,8 +99,8 @@ angular.module('oppia').controller('QuestionEditorModalController', [
             'select-skill-modal.template.html'),
         backdrop: true,
         resolve: {
-          skillsInSameTopicCount: skillsInSameTopicCount,
-          sortedSkillSummaries: sortedSkillSummaries,
+          skillsInSameTopicCount: () => skillsInSameTopicCount,
+          sortedSkillSummaries: () => sortedSkillSummaries,
         },
         controller: 'SelectSkillModalController'
       }).result.then(function(summary) {

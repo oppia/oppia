@@ -311,10 +311,10 @@ angular.module('oppia').directive('stateResponses', [
               // Clicking outside this modal should not dismiss it.
               backdrop: 'static',
               resolve: {
-                addState: addState,
-                currentInteractionId: currentInteractionId,
-                existingContentIds: existingContentIds,
-                stateName: stateName
+                addState: () => addState,
+                currentInteractionId: () => currentInteractionId,
+                existingContentIds: () => existingContentIds,
+                stateName: () => stateName,
               },
               controller: 'AddAnswerGroupModalController'
             }).result.then(function(result) {

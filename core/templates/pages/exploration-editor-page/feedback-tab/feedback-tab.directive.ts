@@ -101,7 +101,6 @@ angular.module('oppia').directive('feedbackTab', [
                 '/pages/exploration-editor-page/feedback-tab/templates/' +
                 'create-feedback-thread-modal.template.html'),
               backdrop: true,
-              resolve: {},
               controller: 'CreateFeedbackThreadModalController'
             }).result.then(result => ThreadDataService.createNewThreadAsync(
               result.newThreadSubject, result.newThreadText)

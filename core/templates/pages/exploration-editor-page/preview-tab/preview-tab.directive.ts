@@ -119,7 +119,7 @@ angular.module('oppia').directive('previewTab', [
               backdrop: 'static',
               windowClass: 'oppia-preview-set-params-modal',
               resolve: {
-                manualParamChanges: manualParamChanges
+                manualParamChanges: () => manualParamChanges
               },
               controller: 'PreviewSetParametersModalController'
             }).result.then(function() {

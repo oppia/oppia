@@ -139,7 +139,7 @@ angular.module('oppia').directive('stateHintsEditor', [
                 'modal-templates/add-hint-modal.template.html'),
               backdrop: 'static',
               resolve: {
-                existingHintsContentIds: existingHintsContentIds
+                existingHintsContentIds: () => existingHintsContentIds
               },
               controller: 'AddHintModalController'
             }).result.then(function(result) {

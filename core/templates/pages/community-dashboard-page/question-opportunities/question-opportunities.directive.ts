@@ -135,11 +135,11 @@ angular.module('oppia').directive('questionOpportunities', [
               backdrop: 'static',
               keyboard: false,
               resolve: {
-                question: question,
-                questionId: questionId,
-                questionStateData: questionStateData,
-                skill: skill,
-                skillDifficulty: skillDifficulty
+                question: () => question,
+                questionId: () => questionId,
+                questionStateData: () => questionStateData,
+                skill: () => skill,
+                skillDifficulty: () => skillDifficulty
               },
               controller: 'QuestionSuggestionEditorModalController'
             }).result.then(function() {}, function() {

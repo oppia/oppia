@@ -430,7 +430,7 @@ angular.module('oppia').factory('ExplorationStatesService', [
             'modal-templates/confirm-delete-state-modal.template.html'),
           backdrop: true,
           resolve: {
-            deleteStateName: deleteStateName
+            deleteStateName: () => deleteStateName
           },
           controller: 'ConfirmDeleteStateModalController'
         }).result.then(function() {

@@ -240,8 +240,8 @@ angular.module('oppia').directive('questionPlayer', [
               ),
               backdrop: true,
               resolve: {
-                skills: skills,
-                skillIds: skillIds
+                skills: () => skills,
+                skillIds: () => skillIds,
               },
               controller: 'QuestionPlayerConceptCardModalController'
             }).result.then(function() {}, function() {
@@ -511,12 +511,12 @@ angular.module('oppia').directive('questionPlayer', [
                 'skill-mastery-modal.template.html'),
               backdrop: true,
               resolve: {
-                masteryPerSkillMapping: ctrl.masteryPerSkillMapping,
-                openConceptCardModal: function(arg) {
+                masteryPerSkillMapping: () => ctrl.masteryPerSkillMapping,
+                openConceptCardModal: (arg) => {
                   openConceptCardModal(arg);
                 },
-                skillId: skillId,
-                userIsLoggedIn: ctrl.userIsLoggedIn,
+                skillId: () => skillId,
+                userIsLoggedIn: () => ctrl.userIsLoggedIn,
               },
               controller: 'SkillMasteryModalController'
             }).result.then(function() {}, function() {

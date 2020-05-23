@@ -243,11 +243,11 @@ angular.module('oppia').directive('questionsList', [
                 'select-skill-and-difficulty-modal.template.html'),
               backdrop: true,
               resolve: {
-                allSkillSummaries: allSkillSummaries,
-                countOfSkillsToPrioritize: countOfSkillsToPrioritize,
-                currentMode: currentMode,
-                linkedSkillsWithDifficulty: linkedSkillsWithDifficulty,
-                skillIdToRubricsObject: skillIdToRubricsObject
+                allSkillSummaries: () => allSkillSummaries,
+                countOfSkillsToPrioritize: () => countOfSkillsToPrioritize,
+                currentMode: () => currentMode,
+                linkedSkillsWithDifficulty: () => linkedSkillsWithDifficulty,
+                skillIdToRubricsObject: () => skillIdToRubricsObject
               },
               controller: 'QuestionsListSelectSkillAndDifficultyModalController'
             }).result.then(function(linkedSkillsWithDifficulty) {
@@ -398,8 +398,8 @@ angular.module('oppia').directive('questionsList', [
                 'change-question-difficulty-modal.template.html'),
               backdrop: true,
               resolve: {
-                linkedSkillsWithDifficulty: linkedSkillsWithDifficulty,
-                skillIdToRubricsObject: skillIdToRubricsObject
+                linkedSkillsWithDifficulty: () => linkedSkillsWithDifficulty,
+                skillIdToRubricsObject: () => skillIdToRubricsObject
               },
               controller: 'ChangeQuestionDifficultyModalController'
             }).result.then(function(linkedSkillsWithDifficulty) {
@@ -461,14 +461,14 @@ angular.module('oppia').directive('questionsList', [
               backdrop: 'static',
               keyboard: false,
               resolve: {
-                associatedSkillSummaries: associatedSkillSummaries,
-                canEditQuestion: canEditQuestion,
-                groupedSkillSummaries: groupedSkillSummaries,
-                misconceptionsBySkill: misconceptionsBySkill,
-                newQuestionIsBeingCreated: newQuestionIsBeingCreated,
-                question: question,
-                questionId: questionId,
-                questionStateData: questionStateData
+                associatedSkillSummaries: () => associatedSkillSummaries,
+                canEditQuestion: () => canEditQuestion,
+                groupedSkillSummaries: () => groupedSkillSummaries,
+                misconceptionsBySkill: () => misconceptionsBySkill,
+                newQuestionIsBeingCreated: () => newQuestionIsBeingCreated,
+                question: () => question,
+                questionId: () => questionId,
+                questionStateData: () => questionStateData
               },
               controller: 'QuestionEditorModalController',
             }).result.then(function(modalObject) {

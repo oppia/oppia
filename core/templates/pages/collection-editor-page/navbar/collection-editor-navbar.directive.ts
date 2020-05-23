@@ -126,7 +126,7 @@ angular.module('oppia').directive('collectionEditorNavbar', [
                 'collection-editor-save-modal.directive.html'),
               backdrop: true,
               resolve: {
-                isPrivate: isPrivate
+                isPrivate: () => isPrivate
               },
               controller: 'CollectionEditorSaveModalController'
             }).result.then(function(commitMessage) {

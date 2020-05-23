@@ -75,8 +75,8 @@ angular.module('oppia').directive('skillsMasteryList', [
               ),
               backdrop: true,
               resolve: {
-                skillDescription: skillDescription,
-                skillId: skillId
+                skillDescription: () => skillDescription,
+                skillId: () => skillId
               },
               controller: 'SkillsMasteryListConceptCardModal'
             }).result.then(function() {}, function() {
