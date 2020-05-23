@@ -54,7 +54,8 @@ describe('Topic editor functionality', function() {
       'creator@topicEditor.com', 'creatorTopicEditor');
     browser.getWindowHandle().then(function(handle) {
       topicsAndSkillsDashboardPage.get();
-      topicsAndSkillsDashboardPage.createTopic('Topic 1', false);
+      topicsAndSkillsDashboardPage.createTopic('Topic 1',
+        'Description', 'Mathematics', false);
       browser.getCurrentUrl().then(function(url) {
         topicId = url.split('/')[4];
         general.closeCurrentTabAndSwitchTo(handle);
@@ -170,8 +171,11 @@ describe('Topic editor functionality', function() {
     topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
       'Skill 2', 'Concept card explanation', true);
     var TOPIC_NAME = 'TASE2';
+    var TOPIC_DESCRIPTION = 'TASE2 description';
+    var TOPIC_CATEGORY = 'Mathematics';
     topicsAndSkillsDashboardPage.get();
-    topicsAndSkillsDashboardPage.createTopic(TOPIC_NAME, false);
+    topicsAndSkillsDashboardPage.createTopic(TOPIC_NAME,
+      TOPIC_DESCRIPTION, TOPIC_CATEGORY, false);
     topicsAndSkillsDashboardPage.get();
     topicsAndSkillsDashboardPage.navigateToUnusedSkillsTab();
     topicsAndSkillsDashboardPage.assignSkillWithIndexToTopicByTopicName(
@@ -259,7 +263,9 @@ describe('Chapter editor functionality', function() {
     browser.getWindowHandle().then(function(handle) {
       dummyExplorationIds = createDummyExplorations(3);
       topicsAndSkillsDashboardPage.get();
-      topicsAndSkillsDashboardPage.createTopic(topicName, false);
+      topicsAndSkillsDashboardPage.createTopic(topicName,
+        'Description', 'Mathematics', false);
+
       topicEditorPage.createStory('Story 0');
       browser.getCurrentUrl().then(function(url) {
         storyId = url.split('/')[4];

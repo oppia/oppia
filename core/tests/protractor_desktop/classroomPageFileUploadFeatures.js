@@ -56,7 +56,8 @@ describe('Classroom page functionality', function() {
   it('should add a new published topic to the Math classroom', function() {
     browser.getWindowHandle().then(function(handle) {
       topicsAndSkillsDashboardPage.get();
-      topicsAndSkillsDashboardPage.createTopic('Topic 1', false);
+      topicsAndSkillsDashboardPage.createTopic('Topic 1',
+        'Description', 'Mathematics', false);
       topicEditorPage.submitTopicThumbnail('../data/test_svg.svg');
       topicEditorPage.saveTopic('Added thumbnail.');
       browser.getCurrentUrl().then(function(url) {

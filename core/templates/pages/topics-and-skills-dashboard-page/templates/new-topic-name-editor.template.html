@@ -11,7 +11,6 @@
         <select2-dropdown class = "protractor-test-new-topic-category-field"
                           item="topicObject.category"
                           choices="categories"
-                          on-selection-change="saveCategory(topicObject.category)"
                           placeholder="Choose a category"
                           width="60%">
         </select2-dropdown>
@@ -41,14 +40,8 @@
     </div>
     <div class="create-new-topic-input-field">
       <label class="create-new-topic-input-label">Topic Thumbnail</label>
-      <thumbnail-uploader filename="topic.getThumbnailFilename()"
-                          update-filename="updateTopicThumbnailFilename"
-                          bg-color="topic.getThumbnailBgColor()"
-                          update-bg-color="updateTopicThumbnailBgColor"
-                          allowed-bg-colors="allowedBgColors"
-                          aspect-ratio="'4:3'"
-                          preview-title="editableName"
-                          preview-description=""
+      <thumbnail-uploader aspect-ratio="'4:3'"
+                          disabled="true"
                           preview-description-bg-color="'#2F6687'">
       </thumbnail-uploader>
     </div>

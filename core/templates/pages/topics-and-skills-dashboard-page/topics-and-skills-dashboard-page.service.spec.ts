@@ -19,16 +19,20 @@
 import { TopicsAndSkillsDashboardPageService } from
   // eslint-disable-next-line max-len
   'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.service';
+import { DashboardFilterObjectFactory } from
+  'domain/topics_and_skills_dashboard/DashboardFilterObjectFactory';
 
 describe('Topic and Skill dashboard page service', () => {
   let tsds: TopicsAndSkillsDashboardPageService = null;
+  let dfof: DashboardFilterObjectFactory = null;
 
   beforeEach(() => {
     tsds = new TopicsAndSkillsDashboardPageService();
+    dfof = new DashboardFilterObjectFactory();
   });
 
   it('should filter the topics', () => {
-    let topic1 = {
+    const topic1 = {
       topic_model_created_on: 1581839432987.596,
       uncategorized_skill_count: 0,
       canonical_story_count: 0,
@@ -82,13 +86,8 @@ describe('Topic and Skill dashboard page service', () => {
       language_code: 'en',
       $$hashKey: 'object:63',
     };
-    let topicsArray = [topic1, topic2, topic3];
-    let filterOptions = {
-      sort: '',
-      keywords: '',
-      category: '',
-      status: '',
-    };
+    const topicsArray = [topic1, topic2, topic3];
+    let filterOptions = dfof.createDefault();
     let filteredArray = tsds.getFilteredTopics(topicsArray, filterOptions);
     expect(filteredArray).toEqual(topicsArray);
 

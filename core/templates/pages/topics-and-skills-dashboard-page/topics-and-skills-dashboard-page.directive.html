@@ -43,12 +43,12 @@
               <div>
                 <select ng-options="choice as choice for choice in $ctrl.itemsPerPageChoice"
                         ng-model="$ctrl.itemsPerPage"
-                        ng-change="$ctrl.itemsPerPageHandler()">
+                        ng-change="$ctrl.changeItemsPerPage()">
                 </select>
               </div>
               <div>
                 <i class="fa fa-angle-left topic-pagination-arrow" ng-click="$ctrl.changePage($ctrl.PREV_PAGE)"></i>
-                <span class="dashboard-list-pagination-value" ng-repeat="n in $ctrl.generateIndexNumbersTillRange($ctrl.currentCount/$ctrl.itemsPerPage)" ng-click="$ctrl.paginationHandler($index)">
+                <span class="dashboard-list-pagination-value" ng-repeat="n in $ctrl.generateIndexNumbersTillRange($ctrl.currentCount/$ctrl.itemsPerPage)" ng-click="$ctrl.paginate($index)">
                   <span ng-if="$ctrl.pageNumber===$index" class="dashboard-list-pagination-active"><[$index+1]></span>
                   <span ng-if="$ctrl.pageNumber!==$index"><[$index+1]></span>
                 </span>
@@ -92,10 +92,15 @@
             <span class="skill-count-value"><[$ctrl.totalUntriagedSkillSummaries.length]></span>
             <span class="skill-count-text">Skills</span>
           </div>
-          <div class="create-topic-skill" ng-click="$ctrl.createTopicSkill()">
-            <i class="fa fa-plus-circle"></i>
-            <span ng-if="$ctrl.activeTab===$ctrl.TAB_NAME_TOPICS" >Create New Topic</span>
-            <span ng-if="!($ctrl.activeTab===$ctrl.TAB_NAME_TOPICS)">Create New Skill</span>
+          <div class="create-topic-skill">
+            <div ng-if="$ctrl.activeTab===$ctrl.TAB_NAME_TOPICS"  ng-click="$ctrl.createTopic()">
+              <i class="fa fa-plus-circle"></i>
+              <span>Create New Topic</span>
+            </div>
+            <div ng-if="!($ctrl.activeTab===$ctrl.TAB_NAME_TOPICS)"  ng-click="$ctrl.createSkill()">
+              <i class="fa fa-plus-circle"></i>
+              <span>Create New Skill</span>
+            </div>
           </div>
         </div>
         <div class="topic-skill-filter">
@@ -109,7 +114,7 @@
                 <span>keywords</span>
               </div>
               <div class="topic-skill-filter-value">
-                <input type="text" ng-change="$ctrl.applyFilters()" ng-model="$ctrl.filterOptions.keywords" class="protractor-test-topic-filter-keyword">
+                <input type="text" ng-change="$ctrl.applyFilters()" ng-model="$ctrl.filterObject.keywords" class="protractor-test-topic-filter-keyword">
               </div>
             </div>
             <div class="topic-skill-filter-row">
@@ -118,7 +123,7 @@
               </div>
               <div class="topic-skill-filter-value">
                 <select class="form-control protractor-test-select-skill-dropdown"
-                        ng-model="$ctrl.filterOptions.status"
+                        ng-model="$ctrl.filterObject.status"
                         ng-options="item for item in $ctrl.statusOptions"
                         ng-change="$ctrl.applyFilters()">
                 </select>
@@ -130,7 +135,7 @@
               </div>
               <div class="topic-skill-filter-value">
                 <select class="form-control protractor-test-topic-filter-category"
-                        ng-model="$ctrl.filterOptions.category"
+                        ng-model="$ctrl.filterObject.category"
                         ng-options="item for item in $ctrl.categories"
                         ng-change="$ctrl.applyFilters()">
                 </select>
@@ -142,7 +147,7 @@
               </div>
               <div class="topic-skill-filter-value">
                 <select class="form-control protractor-test-select-skill-dropdown"
-                        ng-model="$ctrl.filterOptions.sort"
+                        ng-model="$ctrl.filterObject.sort"
                         ng-options="item for item in $ctrl.sortOptions"
                         ng-change="$ctrl.applyFilters()">
                 </select>

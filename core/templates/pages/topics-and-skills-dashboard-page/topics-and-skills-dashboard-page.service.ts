@@ -22,13 +22,15 @@ import { Injectable } from '@angular/core';
 import { TopicsAndSkillsDashboardPageConstants } from
   // eslint-disable-next-line max-len
   'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.constants';
+import { DashboardFilter } from
+  'domain/topics_and_skills_dashboard/FilterObjectFactory';
 
 @Injectable({
   providedIn: 'root'
 })
 export class TopicsAndSkillsDashboardPageService {
-  getFilteredTopics(topicsArray, properties) {
-    const {sort, keywords, category, status} = properties;
+  getFilteredTopics(topicsArray, filterObject: DashboardFilter) {
+    const {sort, keywords, category, status} = filterObject;
     let ESortOptions = TopicsAndSkillsDashboardPageConstants.E_SORT_OPTIONS;
     let EPublishedOptions = (
       TopicsAndSkillsDashboardPageConstants.E_PUBLISHED_OPTIONS);

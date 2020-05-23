@@ -76,6 +76,10 @@ import { CountVectorizerService } from 'classifiers/count-vectorizer.service';
 import { CreatorDashboardBackendApiService } from
   'domain/creator_dashboard/creator-dashboard-backend-api.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
+import { DashboardFilterObjectFactory } from
+  'domain/topics_and_skills_dashboard/DashboardFilterObjectFactory';
+import { DashboardTopicObjectFactory } from
+  'domain/topics_and_skills_dashboard/DashboardTopicObjectFactory';
 import { DateTimeFormatService } from 'services/date-time-format.service';
 import { DebouncerService } from 'services/debouncer.service';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
@@ -374,6 +378,10 @@ export class UpgradedServices {
     upgradedServices['ExplorationFeaturesService'] =
       new ExplorationFeaturesService();
     upgradedServices['ExpressionParserService'] = new ExpressionParserService();
+    upgradedServices['DashboardFilterObjectFactory'] =
+        new DashboardFilterObjectFactory();
+    upgradedServices['DashboardTopicObjectFactory'] =
+        new DashboardTopicObjectFactory();
     upgradedServices['FractionObjectFactory'] = new FractionObjectFactory();
     upgradedServices['GenerateContentIdService'] =
       new GenerateContentIdService();

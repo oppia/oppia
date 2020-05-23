@@ -56,9 +56,12 @@ describe('Topic editor functionality', function() {
   it('should edit topic name, thumbnail and description ' +
     'correctly', function() {
     var TOPIC_NAME = 'TASEFUF_1';
+    var TOPIC_DESCRIPTION = 'TASEFUF_1 description';
+    var TOPIC_CATEGORY = 'Mathematics';
     var EDITED_TOPIC_NAME = 'TASEFUF_1 edited';
     topicsAndSkillsDashboardPage.get();
-    topicsAndSkillsDashboardPage.createTopic(TOPIC_NAME, false);
+    topicsAndSkillsDashboardPage.createTopic(TOPIC_NAME,
+      TOPIC_DESCRIPTION, TOPIC_CATEGORY, true);
     var NEW_TOPIC_NAME = EDITED_TOPIC_NAME;
     topicsAndSkillsDashboardPage.get();
     topicsAndSkillsDashboardPage.editTopic(TOPIC_NAME);
@@ -84,8 +87,12 @@ describe('Topic editor functionality', function() {
 
   it('should edit subtopic page contents correctly', function() {
     var TOPIC_NAME = 'TASEFUF_2';
+    var TOPIC_DESCRIPTION = 'TASEFUF_2 description';
+    var TOPIC_CATEGORY = 'Mathematics';
+
     var defaultThumbnailImageSrc = null;
-    topicsAndSkillsDashboardPage.createTopic(TOPIC_NAME, false);
+    topicsAndSkillsDashboardPage.createTopic(TOPIC_NAME,
+      TOPIC_DESCRIPTION, TOPIC_CATEGORY, false);
     topicEditorPage.getTopicThumbnailSource().then(function(name) {
       defaultThumbnailImageSrc = name;
     });
@@ -130,8 +137,14 @@ describe('Topic editor functionality', function() {
 
   it('should publish and unpublish a story correctly', function() {
     var TOPIC_NAME = 'TASEFUF_3';
+    var TOPIC_DESCRIPTION = 'TASEFUF_3 description';
+    var TOPIC_CATEGORY = 'Mathematics';
+
     var defaultThumbnailImageSrc = null;
-    topicsAndSkillsDashboardPage.createTopic(TOPIC_NAME, false);
+    topicsAndSkillsDashboardPage.createTopic(TOPIC_NAME,
+      TOPIC_DESCRIPTION, TOPIC_CATEGORY, false);
+
+
 
     topicEditorPage.expectNumberOfStoriesToBe(0);
     topicEditorPage.createStory('Story Title');
@@ -217,7 +230,8 @@ describe('Chapter editor functionality', function() {
   it('should create a basic chapter with a thumbnail.', function() {
     topicsAndSkillsDashboardPage.get();
     var defaultThumbnailImageSrc = null;
-    topicsAndSkillsDashboardPage.createTopic(TOPIC_NAME, false);
+    topicsAndSkillsDashboardPage.createTopic(TOPIC_NAME,
+      'Topic description', 'Mathematics', false);
     topicEditorPage.getTopicThumbnailSource().then(function(name) {
       defaultThumbnailImageSrc = name;
     });

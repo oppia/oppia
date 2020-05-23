@@ -27,21 +27,16 @@ require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 require('services/alerts.service.ts');
 require('services/image-upload-helper.service.ts');
 
-// TODO(#9186): Change variable name to 'constants' once this file
-// is migrated to Angular.
-const topicConstants2 = require('constants.ts');
 
 angular.module('oppia').factory('TopicCreationService', [
   '$rootScope', '$uibModal', '$window', 'AlertsService',
-  'TopicCreationBackendApiService', 'TopicUpdateService',
-  'UrlInterpolationService',
+  'TopicCreationBackendApiService', 'UrlInterpolationService',
   'EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED',
   'MAX_CHARS_IN_TOPIC_DESCRIPTION', 'MAX_CHARS_IN_TOPIC_NAME',
   'TOPIC_CATEGORIES',
   function(
       $rootScope, $uibModal, $window, AlertsService,
-      TopicCreationBackendApiService, TopicUpdateService,
-      UrlInterpolationService,
+      TopicCreationBackendApiService, UrlInterpolationService,
       EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED,
       MAX_CHARS_IN_TOPIC_DESCRIPTION, MAX_CHARS_IN_TOPIC_NAME,
       TOPIC_CATEGORIES) {
@@ -61,17 +56,12 @@ angular.module('oppia').factory('TopicCreationService', [
           controller: [
             '$scope', '$uibModalInstance', 'TopicEditorStateService',
             function($scope, $uibModalInstance, TopicEditorStateService) {
-              $scope.idHasLoaded = false;
               $scope.pageHasLoaded = false;
               $scope.topic = TopicEditorStateService.getTopic();
               $scope.topicRights = TopicEditorStateService.getTopicRights();
               $scope.topicNameEditorIsShown = false;
               $scope.editableName = $scope.topic.getName();
-              $scope.editableAbbreviatedName = (
-                $scope.topic.getAbbreviatedName());
               $scope.editableDescription = $scope.topic.getDescription();
-              $scope.allowedBgColors = (
-                topicConstants2.ALLOWED_THUMBNAIL_BG_COLORS.topic);
               $scope.categories = TOPIC_CATEGORIES;
               $scope.editableDescriptionIsEmpty = (
                 $scope.editableDescription === '');
@@ -80,24 +70,6 @@ angular.module('oppia').factory('TopicCreationService', [
                 name: '',
                 category: '',
                 description: '',
-              };
-              $scope.updateTopicThumbnailFilename = function(
-                  newThumbnailFilename) {
-                if (newThumbnailFilename ===
-                    $scope.topic.getThumbnailFilename()) {
-                  return;
-                }
-                TopicUpdateService.setTopicThumbnailFilename(
-                  $scope.topic, newThumbnailFilename);
-              };
-              $scope.updateTopicThumbnailBgColor = function(
-                  newThumbnailBgColor) {
-                if (newThumbnailBgColor ===
-                    $scope.topic.getThumbnailBgColor()) {
-                  return;
-                }
-                TopicUpdateService.setTopicThumbnailBgColor(
-                  $scope.topic, newThumbnailBgColor);
               };
               $scope.MAX_CHARS_IN_TOPIC_NAME = MAX_CHARS_IN_TOPIC_NAME;
               $scope.MAX_CHARS_IN_TOPIC_DESCRIPTION = (
