@@ -24,19 +24,16 @@ import { WrittenTranslationObjectFactory } from
 
 describe('Written Translations Object Factory', () => {
   beforeEach(() => {
-    this.writtenTranslationsObjectFactory = TestBed.get(
-      WrittenTranslationsObjectFactory);
-    this.writtenTranslationObjectFactory = TestBed.get(
-      WrittenTranslationObjectFactory);
+    this.writtenTranslationsObjectFactory = (
+      TestBed.get(WrittenTranslationsObjectFactory));
+    this.writtenTranslationObjectFactory = (
+      TestBed.get(WrittenTranslationObjectFactory));
 
     this.writtenTranslationsBackendDict = (
       this.writtenTranslationsObjectFactory.createFromBackendDict({
         translations_mapping: {
           content_1: {
-            'hi-en': {
-              html: '',
-              needs_update: false
-            }
+            'hi-en': { html: '', needs_update: false }
           }
         }
       }));
@@ -47,10 +44,7 @@ describe('Written Translations Object Factory', () => {
       .toEqual({
         translations_mapping: {
           content_1: {
-            'hi-en': {
-              html: '',
-              needs_update: false
-            }
+            'hi-en': { html: '', needs_update: false }
           }
         }
       });
@@ -64,25 +58,25 @@ describe('Written Translations Object Factory', () => {
 
   it('should add and delete contents from a written translations object',
     () => {
-      expect(this.writtenTranslationsBackendDict.getAllContentId()).toEqual([
-        'content_1']);
+      expect(this.writtenTranslationsBackendDict.getAllContentId()).toEqual(
+        ['content_1']);
       this.writtenTranslationsBackendDict.addContentId('content_2');
-      expect(this.writtenTranslationsBackendDict.getAllContentId()).toEqual([
-        'content_1', 'content_2']);
+      expect(this.writtenTranslationsBackendDict.getAllContentId()).toEqual(
+        ['content_1', 'content_2']);
       expect(() => {
         this.writtenTranslationsBackendDict.addContentId('content_2');
       }).toThrowError('Trying to add duplicate content id.');
-      expect(this.writtenTranslationsBackendDict.getAllContentId()).toEqual([
-        'content_1', 'content_2']);
+      expect(this.writtenTranslationsBackendDict.getAllContentId()).toEqual(
+        ['content_1', 'content_2']);
 
       this.writtenTranslationsBackendDict.deleteContentId('content_2');
-      expect(this.writtenTranslationsBackendDict.getAllContentId()).toEqual([
-        'content_1']);
+      expect(this.writtenTranslationsBackendDict.getAllContentId()).toEqual(
+        ['content_1']);
       expect(() => {
         this.writtenTranslationsBackendDict.deleteContentId('content_2');
       }).toThrowError('Unable to find the given content id.');
-      expect(this.writtenTranslationsBackendDict.getAllContentId()).toEqual([
-        'content_1']);
+      expect(this.writtenTranslationsBackendDict.getAllContentId()).toEqual(
+        ['content_1']);
     });
 
   it('should add translation in a written translations object', () => {
@@ -133,25 +127,33 @@ describe('Written Translations Object Factory', () => {
   it('should toggle needs_update for a language code', () => {
     this.writtenTranslationsBackendDict.toggleNeedsUpdateAttribute(
       'content_1', 'hi-en');
-    expect(this.writtenTranslationsBackendDict.getWrittenTranslation(
-      'content_1', 'hi-en')).toEqual(
-      this.writtenTranslationObjectFactory.createFromBackendDict({
-        html: '',
-        needs_update: true
-      }));
-    expect(this.writtenTranslationsBackendDict.hasUnflaggedWrittenTranslations(
-      'content_1')).toBe(false);
+    expect(
+      this.writtenTranslationsBackendDict.getWrittenTranslation(
+        'content_1', 'hi-en'))
+      .toEqual(
+        this.writtenTranslationObjectFactory.createFromBackendDict({
+          html: '',
+          needs_update: true
+        }));
+    expect(
+      this.writtenTranslationsBackendDict.hasUnflaggedWrittenTranslations(
+        'content_1'))
+      .toBe(false);
 
     this.writtenTranslationsBackendDict.toggleNeedsUpdateAttribute(
       'content_1', 'hi-en');
-    expect(this.writtenTranslationsBackendDict.getWrittenTranslation(
-      'content_1', 'hi-en')).toEqual(
-      this.writtenTranslationObjectFactory.createFromBackendDict({
-        html: '',
-        needs_update: false
-      }));
-    expect(this.writtenTranslationsBackendDict.hasUnflaggedWrittenTranslations(
-      'content_1')).toBe(true);
+    expect(
+      this.writtenTranslationsBackendDict.getWrittenTranslation(
+        'content_1', 'hi-en'))
+      .toEqual(
+        this.writtenTranslationObjectFactory.createFromBackendDict({
+          html: '',
+          needs_update: false
+        }));
+    expect(
+      this.writtenTranslationsBackendDict.hasUnflaggedWrittenTranslations(
+        'content_1'))
+      .toBe(true);
   });
 
   it('should set needs_update to true in all translations from a content',
@@ -160,33 +162,33 @@ describe('Written Translations Object Factory', () => {
         this.writtenTranslationsObjectFactory.createFromBackendDict({
           translations_mapping: {
             content_1: {
-              'hi-en': {
-                html: 'This is the old HTML',
-                needs_update: false
-              },
-              en: {
-                html: '',
-                needs_update: false
-              }
+              'hi-en': { html: 'This is the old HTML', needs_update: false },
+              en: { html: '', needs_update: false }
             }
           }
         }));
 
       this.writtenTranslationsBackendDict.markAllTranslationsAsNeedingUpdate(
         'content_1');
-      expect(this.writtenTranslationsBackendDict.getWrittenTranslation(
-        'content_1', 'hi-en')).toEqual(
-        this.writtenTranslationObjectFactory.createFromBackendDict({
-          html: 'This is the old HTML',
-          needs_update: true
-        }));
-      expect(this.writtenTranslationsBackendDict.getWrittenTranslation(
-        'content_1', 'en')).toEqual(
-        this.writtenTranslationObjectFactory.createFromBackendDict({
-          html: '',
-          needs_update: true
-        }));
-      expect(this.writtenTranslationsBackendDict.hasUnflaggedWrittenTranslations(
-        'content_1')).toBe(false);
+      expect(
+        this.writtenTranslationsBackendDict.getWrittenTranslation(
+          'content_1', 'hi-en'))
+        .toEqual(
+          this.writtenTranslationObjectFactory.createFromBackendDict({
+            html: 'This is the old HTML',
+            needs_update: true
+          }));
+      expect(
+        this.writtenTranslationsBackendDict.getWrittenTranslation(
+          'content_1', 'en'))
+        .toEqual(
+          this.writtenTranslationObjectFactory.createFromBackendDict({
+            html: '',
+            needs_update: true
+          }));
+      expect(
+        this.writtenTranslationsBackendDict.hasUnflaggedWrittenTranslations(
+          'content_1'))
+        .toBe(false);
     });
 });
