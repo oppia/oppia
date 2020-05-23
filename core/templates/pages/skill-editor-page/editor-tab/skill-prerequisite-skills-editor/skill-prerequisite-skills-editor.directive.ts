@@ -15,6 +15,10 @@
 /**
  * @fileoverview Directive for the skill prerequisite skills editor.
  */
+
+require(
+  'components/common-layout-directives/common-elements/' +
+  'confirm-or-cancel-modal.controller.ts');
 require(
   'components/skill-selector/skill-selector.directive.ts');
 require('domain/skill/skill-update.service.ts');
@@ -36,11 +40,9 @@ angular.module('oppia').directive('skillPrerequisiteSkillsEditor', [
         'skill-prerequisite-skills-editor/' +
         'skill-prerequisite-skills-editor.directive.html'),
       controller: [
-        '$scope', '$filter', '$uibModal', '$rootScope',
-        'EVENT_SKILL_REINITIALIZED', 'AlertsService',
+        '$scope', '$filter', '$uibModal', 'AlertsService',
         function(
-            $scope, $filter, $uibModal, $rootScope,
-            EVENT_SKILL_REINITIALIZED, AlertsService) {
+            $scope, $filter, $uibModal, AlertsService) {
           var ctrl = this;
           var groupedSkillSummaries =
             SkillEditorStateService.getGroupedSkillSummaries();
@@ -61,27 +63,24 @@ angular.module('oppia').directive('skillPrerequisiteSkillsEditor', [
             var sortedSkillSummaries = groupedSkillSummaries.current.concat(
               groupedSkillSummaries.others);
 
-            var modalInstance = $uibModal.open({
+            $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/components/skill-selector/select-skill-modal.template.html'),
               backdrop: true,
               controller: [
-                '$scope', '$uibModalInstance',
-                function($scope, $uibModalInstance) {
+                '$controller', '$scope', '$uibModalInstance',
+                function($controller, $scope, $uibModalInstance) {
+                  $controller('ConfirmOrCancelModalController', {
+                    $scope: $scope,
+                    $uibModalInstance: $uibModalInstance
+                  });
+
                   $scope.skillSummaries = sortedSkillSummaries;
                   $scope.selectedSkillId = null;
                   $scope.countOfSkillsToPrioritize = skillsInSameTopicCount;
-                  $scope.save = function() {
-                    $uibModalInstance.close($scope.selectedSkillId);
-                  };
-                  $scope.cancel = function() {
-                    $uibModalInstance.dismiss('cancel');
-                  };
                 }
               ]
-            });
-
-            modalInstance.result.then(function(skillId) {
+            }).result.then(function(skillId) {
               if (skillId === $scope.skill.getId()) {
                 AlertsService.addInfoMessage(
                   'A skill cannot be a prerequisite of itself', 5000);
