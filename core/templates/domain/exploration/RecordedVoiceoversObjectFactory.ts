@@ -54,10 +54,6 @@ export class RecordedVoiceovers {
     return this.voiceoversMapping[contentId];
   }
 
-  getVoiceover(contentId: string, langCode: string): Voiceover {
-    return this.voiceoversMapping[contentId][langCode];
-  }
-
   markAllVoiceoversAsNeedingUpdate(contentId: string): void {
     Object.values(this.voiceoversMapping[contentId])
       .forEach(voiceover => voiceover.markAsNeedingUpdate());
@@ -71,6 +67,16 @@ export class RecordedVoiceovers {
     return (
       this.voiceoversMapping[contentId] &&
       this.getVoiceoverLanguageCodes(contentId).length > 0);
+  }
+
+  hasVoiceover(contentId: string, langCode: string): boolean {
+    return (
+      this.voiceoversMapping.hasOwnProperty(contentId) &&
+      this.voiceoversMapping[contentId].hasOwnProperty(langCode));
+  }
+
+  getVoiceover(contentId: string, langCode: string): Voiceover {
+    return this.voiceoversMapping[contentId][langCode];
   }
 
   hasUnflaggedVoiceovers(contentId: string): boolean {
@@ -95,41 +101,37 @@ export class RecordedVoiceovers {
   addVoiceover(
       contentId: string, langCode: string, filename: string,
       fileSizeBytes: number, durationSecs: number): void {
-    const voiceoversByLangCode = this.voiceoversMapping[contentId];
-    if (voiceoversByLangCode.hasOwnProperty(langCode)) {
+    if (this.hasVoiceover(contentId, langCode)) {
       throw new Error('Trying to add duplicate language code.');
     }
-    voiceoversByLangCode[langCode] = this.voiceoverObjectFactory.createNew(
-      filename, fileSizeBytes, durationSecs);
+    this.voiceoversMapping[contentId][langCode] = (
+      this.voiceoverObjectFactory.createNew(
+        filename, fileSizeBytes, durationSecs));
   }
 
   deleteVoiceover(contentId: string, langCode: string): void {
-    const voiceoversByLangCode = this.voiceoversMapping[contentId];
-    if (!voiceoversByLangCode.hasOwnProperty(langCode)) {
+    if (!this.hasVoiceover(contentId, langCode)) {
       throw new Error(
         'Trying to remove non-existing translation for language code ' +
         langCode);
     }
-    delete voiceoversByLangCode[langCode];
+    delete this.voiceoversMapping[contentId][langCode];
   }
 
   toggleNeedsUpdateAttribute(contentId: string, langCode: string): void {
-    const voiceoversByLangCode = this.voiceoversMapping[contentId];
-    voiceoversByLangCode[langCode].toggleNeedsUpdateAttribute();
+    this.getVoiceover(contentId, langCode).toggleNeedsUpdateAttribute();
   }
 
   toBackendDict(): IRecordedVoiceoversBackendDict {
-    const voiceoversMappingDict = {};
+    const voiceoverBackendDictsMapping = {};
     for (const contentId in this.voiceoversMapping) {
-      const voiceoversByLangCode = this.voiceoversMapping[contentId];
-      const voiceoversByLangCodeDict = {};
-      Object.keys(voiceoversByLangCode).forEach(function(lang) {
-        voiceoversByLangCodeDict[lang] = (
-          voiceoversByLangCode[lang].toBackendDict());
-      });
-      voiceoversMappingDict[contentId] = voiceoversByLangCodeDict;
+      voiceoverBackendDictsMapping[contentId] = {};
+      for (const langCode in this.voiceoversMapping[contentId]) {
+        voiceoverBackendDictsMapping[contentId][langCode] = (
+          this.voiceoversMapping[contentId][langCode].toBackendDict());
+      }
     }
-    return { voiceovers_mapping: voiceoversMappingDict };
+    return { voiceovers_mapping: voiceoverBackendDictsMapping };
   }
 }
 
