@@ -20,7 +20,6 @@
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
 import { LoggerService } from 'services/contextual/logger.service';
