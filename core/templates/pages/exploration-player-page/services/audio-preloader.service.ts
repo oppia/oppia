@@ -54,7 +54,7 @@ angular.module('oppia').factory('AudioPreloaderService', [
       var allAudioTranslations = _exploration.getAllVoiceovers(
         languageCode);
       stateNamesInBfsOrder.forEach(function(stateName) {
-        var allAudioTranslationsForState = allAudioTranslations.get(stateName);
+        var allAudioTranslationsForState = allAudioTranslations[stateName];
         allAudioTranslationsForState.forEach(function(audioTranslation) {
           audioFilenames.push(audioTranslation.filename);
         });

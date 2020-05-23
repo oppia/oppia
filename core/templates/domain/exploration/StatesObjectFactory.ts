@@ -114,31 +114,24 @@ export class States {
 
   getAllVoiceoverLanguageCodes(): string[] {
     const allAudioLanguageCodes = new Set<string>();
-    for (const stateName of this.getStateNames()) {
-      const recordedVoiceovers = this.getState(stateName).recordedVoiceovers;
-      for (const contentId of recordedVoiceovers.getAllContentId()) {
-        const audioLanguageCodes = (
-          recordedVoiceovers.getVoiceoverLanguageCodes(contentId));
-        for (const langCode of audioLanguageCodes) {
-          allAudioLanguageCodes.add(langCode);
-        }
+    for (const state of Object.values(this.states)) {
+      for (const contentId of state.recordedVoiceovers.getAllContentId()) {
+        state.recordedVoiceovers.getVoiceoverLanguageCodes(contentId)
+          .forEach(langCode => allAudioLanguageCodes.add(langCode));
       }
     }
     return Array.from(allAudioLanguageCodes);
   }
 
-  getAllVoiceovers(langCode: string): Map<string, Voiceover[]> {
-    const allAudioTranslations = new Map<string, Voiceover[]>();
-    for (const stateName of this.getStateNames()) {
-      const recordedVoiceovers = this.getState(stateName).recordedVoiceovers;
-      allAudioTranslations.set(stateName, []);
-      for (const contentId of recordedVoiceovers.getAllContentId()) {
-        const audioTranslations = (
-          recordedVoiceovers.getBindableVoiceovers(contentId));
-        if (audioTranslations.hasOwnProperty(langCode)) {
-          allAudioTranslations.get(stateName).push(audioTranslations[langCode]);
-        }
-      }
+  getAllVoiceovers(langCode: string): {[stateName: string]: Voiceover[]} {
+    const allAudioTranslations = {};
+    for (const [stateName, state] of Object.entries(this.states)) {
+      const recordedVoiceovers = state.recordedVoiceovers;
+      allAudioTranslations[stateName] = recordedVoiceovers.getAllContentId()
+        .filter(
+          contentId => recordedVoiceovers.hasVoiceover(contentId, langCode))
+        .map(
+          contentId => recordedVoiceovers.getVoiceover(contentId, langCode));
     }
     return allAudioTranslations;
   }
@@ -151,13 +144,12 @@ export class StatesObjectFactory {
   constructor(private stateObjectFactory: StateObjectFactory) {}
 
   createFromBackendDict(statesBackendDict: StateBackendDictMapping): States {
-    const stateObjectsDict = {};
-    for (const stateName in statesBackendDict) {
-      stateObjectsDict[stateName] = (
-        this.stateObjectFactory.createFromBackendDict(
-          stateName, statesBackendDict[stateName]));
+    const stateMapping = {};
+    for (const [stateName, backendDict] of Object.entries(statesBackendDict)) {
+      stateMapping[stateName] = (
+        this.stateObjectFactory.createFromBackendDict(stateName, backendDict));
     }
-    return new States(this.stateObjectFactory, stateObjectsDict);
+    return new States(this.stateObjectFactory, stateMapping);
   }
 }
 

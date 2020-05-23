@@ -35,28 +35,15 @@ import { UrlInterpolationService } from
 const INTERACTION_SPECS = require('interactions/interaction_specs.json');
 
 export class Exploration {
-  initStateName;
-  paramChanges;
-  paramSpecs;
-  states;
-  title;
-  languageCode;
-  logger: LoggerService;
-  urlInterpolationService: UrlInterpolationService;
-  // TODO(#7165): Replace any with exact type.
   constructor(
-      initStateName: string, paramChanges: any, paramSpecs: any, states: any,
-      title: string, languageCode: string, loggerService: LoggerService,
-      urlInterpolationService: UrlInterpolationService) {
-    this.initStateName = initStateName;
-    this.paramChanges = paramChanges;
-    this.paramSpecs = paramSpecs;
-    this.states = states;
-    this.title = title;
-    this.languageCode = languageCode;
-    this.logger = loggerService;
-    this.urlInterpolationService = urlInterpolationService;
-  }
+      private urlInterpolationService: UrlInterpolationService,
+      public initStateName: string,
+      public paramChanges: any,
+      public paramSpecs: any,
+      public states: any,
+      public title: string,
+      public languageCode: string,
+      public loggerService: LoggerService) {}
 
   // Instance methods
   isStateTerminal(stateName: string): boolean {
@@ -212,6 +199,7 @@ export class ExplorationObjectFactory {
   createFromBackendDict(explorationBackendDict: any): Exploration {
     /* eslint-enable dot-notation */
     return new Exploration(
+      this.urlInterpolationService,
       explorationBackendDict.init_state_name,
       this.paramChangesObjectFactory.createFromBackendList(
         explorationBackendDict.param_changes),
@@ -221,7 +209,7 @@ export class ExplorationObjectFactory {
         explorationBackendDict.states),
       explorationBackendDict.title,
       explorationBackendDict.language_code,
-      this.logger, this.urlInterpolationService);
+      this.logger);
   }
 }
 
