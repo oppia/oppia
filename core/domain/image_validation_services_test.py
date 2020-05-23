@@ -37,7 +37,7 @@ class ImageValidationServiceTests(test_utils.GenericTestBase):
             self.raw_image = f.read()
 
     def _assert_validation_error(
-        self, image, filename, expected_error_substring):
+            self, image, filename, expected_error_substring):
         """Checks that the image passes validation."""
         with self.assertRaisesRegexp(
             utils.ValidationError, expected_error_substring):
