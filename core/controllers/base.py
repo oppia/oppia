@@ -28,14 +28,12 @@ import sys
 import time
 import traceback
 
-from constants import constants
+import backports.functools_lru_cache
 from core.domain import config_domain
 from core.domain import config_services
-from core.domain import rights_manager
 from core.domain import user_services
 from core.platform import models
 import feconf
-import jinja_utils
 import python_utils
 import utils
 
@@ -70,6 +68,22 @@ def _clear_login_cookies(response_headers):
             datetime.timedelta(seconds=ONE_DAY_AGO_IN_SECS)
         ).strftime('%a, %d %b %Y %H:%M:%S GMT')
         response_headers.add_header(*cookie.output().split(b': ', 1))
+
+
+@backports.functools_lru_cache.lru_cache(maxsize=128)
+def load_template(filename):
+    """Return the HTML file contents at filepath.
+
+    Args:
+        filename: str. Name of the requested HTML file.
+
+    Returns:
+        str. The HTML file content.
+    """
+    filepath = os.path.join(feconf.FRONTEND_TEMPLATES_DIR, filename)
+    with python_utils.open_file(filepath, 'r') as f:
+        html_text = f.read()
+    return html_text
 
 
 class LogoutPage(webapp2.RequestHandler):
@@ -124,15 +138,6 @@ class BaseHandler(webapp2.RequestHandler):
     PUT_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     DELETE_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    @webapp2.cached_property
-    def jinja2_env(self):
-        """Returns a Jinja2 environment cached for frontend templates.
-
-        Returns:
-            Environment. A Jinja2 environment object used to load templates.
-        """
-        return jinja_utils.get_jinja_env(feconf.FRONTEND_TEMPLATES_DIR)
-
     def __init__(self, request, response):  # pylint: disable=super-init-not-called
         # Set self.request, self.response and self.app.
         self.initialize(request, response)
@@ -183,7 +188,7 @@ class BaseHandler(webapp2.RequestHandler):
         self.is_super_admin = (
             current_user_services.is_current_user_super_admin())
 
-        self.values['iframed'] = False
+        self.iframed = False
         self.values['is_moderator'] = user_services.is_at_least_moderator(
             self.user_id)
         self.values['is_admin'] = user_services.is_admin(self.user_id)
@@ -327,36 +332,6 @@ class BaseHandler(webapp2.RequestHandler):
                 SAMEORIGIN: The template can only be displayed in a frame
                     on the same origin as the page itself.
         """
-        values = self.values
-
-        scheme, netloc, path, _, _ = python_utils.url_split(self.request.uri)
-
-        values.update({
-            'DEV_MODE': constants.DEV_MODE,
-            'DOMAIN_URL': '%s://%s' % (scheme, netloc),
-            'ACTIVITY_STATUS_PRIVATE': (
-                rights_manager.ACTIVITY_STATUS_PRIVATE),
-            'ACTIVITY_STATUS_PUBLIC': (
-                rights_manager.ACTIVITY_STATUS_PUBLIC),
-            # The 'path' variable starts with a forward slash.
-            'FULL_URL': '%s://%s%s' % (scheme, netloc, path),
-        })
-
-        if 'status_code' not in values:
-            values['status_code'] = 200
-
-        if 'meta_name' not in values:
-            values['meta_name'] = 'Personalized Online Learning from Oppia'
-
-        if 'meta_description' not in values:
-            values['meta_description'] = (
-                'Oppia is a free, open-source learning platform. Join the '
-                'community to create or try an exploration today!')
-
-        # Create a new csrf token for inclusion in HTML responses. This assumes
-        # that tokens generated in one handler will be sent back to a handler
-        # with the same page name.
-
         self.response.cache_control.no_cache = True
         self.response.cache_control.must_revalidate = True
         self.response.headers[b'Strict-Transport-Security'] = (
@@ -376,8 +351,7 @@ class BaseHandler(webapp2.RequestHandler):
         self.response.expires = 'Mon, 01 Jan 1990 00:00:00 GMT'
         self.response.pragma = 'no-cache'
 
-        self.response.write(
-            self.jinja2_env.get_template(filepath).render(**values))
+        self.response.write(load_template(filepath))
 
     def _render_exception_json_or_html(self, return_type, values):
         """Renders an error page, or an error JSON response.
@@ -389,13 +363,11 @@ class BaseHandler(webapp2.RequestHandler):
 
         method = self.request.environ['REQUEST_METHOD']
 
-        if return_type == feconf.HANDLER_TYPE_HTML and (
-                method == 'GET'):
+        if return_type == feconf.HANDLER_TYPE_HTML and method == 'GET':
             self.values.update(values)
-            if 'iframed' in self.values and self.values['iframed']:
+            if self.iframed:
                 self.render_template(
-                    'error-iframed.mainpage.html',
-                    iframe_restriction=None)
+                    'error-iframed.mainpage.html', iframe_restriction=None)
             else:
                 self.render_template(
                     'error-page-%s.mainpage.html' % values['status_code'])
