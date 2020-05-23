@@ -22,7 +22,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import fs_services
-from core.domain import image_validation_service
+from core.domain import image_validation_services
 from core.domain import question_services
 from core.domain import role_services
 from core.domain import skill_domain
@@ -32,6 +32,7 @@ from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
 import feconf
+import utils
 
 
 class TopicsAndSkillsDashboardPage(base.BaseHandler):
@@ -143,7 +144,6 @@ class NewSkillHandler(base.BaseHandler):
         linked_topic_ids = self.payload.get('linked_topic_ids')
         explanation_dict = self.payload.get('explanation_dict')
         rubrics = self.payload.get('rubrics')
-        filenames = self.payload.get('filenames')
 
         if not isinstance(rubrics, list):
             raise self.InvalidInputException('Rubrics should be a list.')
@@ -176,19 +176,20 @@ class NewSkillHandler(base.BaseHandler):
         skill.update_explanation(
             state_domain.SubtitledHtml.from_dict(explanation_dict))
 
-        filenames_in_skill = skill.get_all_image_filenames_during_creation()
-        if filenames != filenames_in_skill:
-            raise self.InvalidInputException(
-                'The filenames sent don\'t match the images in the skill.')
+        image_filenames = skill_services.get_image_filenames_from_skill(skill)
+
         skill_services.save_new_skill(self.user_id, skill)
 
-        for filename in filenames:
+        for filename in image_filenames:
             image = self.request.get(filename)
+            if not image:
+                raise self.InvalidInputException(
+                    'No image data provided for file with name %s' % filename)
             try:
                 file_format = (
-                    image_validation_service.validate_image_and_filename(
+                    image_validation_services.validate_image_and_filename(
                         image, filename))
-            except Exception as e:
+            except utils.ValidationError as e:
                 raise self.InvalidInputException(e)
             image_is_compressible = (
                 file_format in feconf.COMPRESSIBLE_IMAGE_FORMATS)

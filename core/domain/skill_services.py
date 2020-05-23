@@ -20,6 +20,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import copy
 import logging
 
+from core.domain import html_cleaner
 from core.domain import opportunity_services
 from core.domain import role_services
 from core.domain import skill_domain
@@ -340,6 +341,31 @@ def get_skill_summary_from_model(skill_summary_model):
         skill_summary_model.skill_model_created_on,
         skill_summary_model.skill_model_last_updated
     )
+
+
+def get_image_filenames_from_skill(skill):
+    """Get the image filenames from the skill.
+
+    Args:
+        skill: Skill. The skill itself.
+
+    Returns:
+       list(str). List containing the name of the image files in skill.
+    """
+    filenames = []
+
+    html_list = skill.get_all_html_content_strings()
+    rte_components_in_skill = []
+    for html_string in html_list:
+        rte_components_in_skill.extend(
+            html_cleaner.get_rte_components(html_string))
+
+    for rte_comp in rte_components_in_skill:
+        if 'id' in rte_comp and rte_comp['id'] == 'oppia-noninteractive-image':
+            filenames.append(
+                rte_comp['customization_args']['filepath-with-value'])
+
+    return filenames
 
 
 def get_skill_by_id(skill_id, strict=True, version=None):

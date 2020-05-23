@@ -436,7 +436,7 @@
 /core/templates/services/image-local-storage*.ts @DubeySandeep
 /core/templates/services/rte-helper.service*.ts @aks681 @kevintab95
 /core/templates/services/rte-helper-modal.controller*.ts @aks681 @kevintab95
-/core/domain/image_validation_service*.py @DubeySandeep
+/core/domain/image_validation_services*.py @DubeySandeep
 /core/domain/rte_component_registry*.py @vojtechjelinek
 /extensions/ckeditor_plugins/ @vojtechjelinek
 /extensions/rich_text_components/ @vojtechjelinek

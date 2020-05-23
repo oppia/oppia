@@ -31,7 +31,7 @@ from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import fs_domain
 from core.domain import fs_services
-from core.domain import image_validation_service
+from core.domain import image_validation_services
 from core.domain import question_services
 from core.domain import rights_manager
 from core.domain import search_services
@@ -634,9 +634,9 @@ class ImageUploadHandler(EditorHandler):
             filename_prefix = self._FILENAME_PREFIX
 
         try:
-            file_format = image_validation_service.validate_image_and_filename(
+            file_format = image_validation_services.validate_image_and_filename(
                 raw, filename)
-        except Exception as e:
+        except utils.ValidationError as e:
             raise self.InvalidInputException(e)
 
         file_system_class = fs_services.get_entity_file_system_class()

@@ -35,9 +35,11 @@ angular.module('oppia').directive('filepathEditor', [
   '$sce', 'AlertsService', 'AssetsBackendApiService', 'ContextService',
   'CsrfTokenService', 'ImageLocalStorageService', 'ImagePreloaderService',
   'ImageUploadHelperService', 'UrlInterpolationService',
+  'IMAGE_SAVE_DESTINATION_LOCAL_STORAGE',
   function($sce, AlertsService, AssetsBackendApiService, ContextService,
       CsrfTokenService, ImageLocalStorageService, ImagePreloaderService,
-      ImageUploadHelperService, UrlInterpolationService) {
+      ImageUploadHelperService, UrlInterpolationService,
+      IMAGE_SAVE_DESTINATION_LOCAL_STORAGE) {
     return {
       restrict: 'E',
       scope: {},
@@ -347,7 +349,9 @@ angular.module('oppia').directive('filepathEditor', [
         };
 
         var getTrustedResourceUrlForImageFileName = function(imageFileName) {
-          if (ContextService.areImagesSavedInLocalStorage()) {
+          if (
+            ContextService.getImageSaveDestination() ===
+            IMAGE_SAVE_DESTINATION_LOCAL_STORAGE) {
             var imageUrl = ImageLocalStorageService.getObjectUrlForImage(
               imageFileName);
             return $sce.trustAsResourceUrl(imageUrl);
@@ -358,10 +362,11 @@ angular.module('oppia').directive('filepathEditor', [
               ctrl.entityType, ctrl.entityId, encodedFilepath));
         };
 
-        ctrl.resetFilePathEditor = function(deleteImageFromLocalStorage) {
+        ctrl.resetFilePathEditor = function() {
           if (
-            deleteImageFromLocalStorage &&
-            ContextService.areImagesSavedInLocalStorage()) {
+            ctrl.data.metadata.savedImageFilename &&
+            ContextService.getImageSaveDestination() ===
+            IMAGE_SAVE_DESTINATION_LOCAL_STORAGE) {
             ImageLocalStorageService.deleteImage(
               ctrl.data.metadata.savedImageFilename);
           }
@@ -697,7 +702,7 @@ angular.module('oppia').directive('filepathEditor', [
         };
 
         ctrl.discardUploadedFile = function() {
-          ctrl.resetFilePathEditor(false);
+          ctrl.resetFilePathEditor();
         };
 
         ctrl.saveUploadedFile = function() {
@@ -774,7 +779,7 @@ angular.module('oppia').directive('filepathEditor', [
               AlertsService.addWarning('Could not get resampled file.');
               return;
             }
-            ctrl.saveImage(dimensions, resampledFile);
+            ctrl.saveImage(dimensions, resampledFile, 'png');
           }
         };
 
@@ -803,8 +808,10 @@ angular.module('oppia').directive('filepathEditor', [
         };
 
         ctrl.saveImage = function(
-            dimensions, resampledFile, imageType = 'png') {
-          if (ContextService.areImagesSavedInLocalStorage()) {
+            dimensions, resampledFile, imageType) {
+          if (
+            ContextService.getImageSaveDestination() ===
+            IMAGE_SAVE_DESTINATION_LOCAL_STORAGE) {
             ctrl.saveImageToLocalStorage(dimensions, resampledFile, imageType);
           } else {
             ctrl.postImageToServer(dimensions, resampledFile, imageType);
@@ -930,7 +937,6 @@ angular.module('oppia').directive('filepathEditor', [
 
           ctrl.entityId = ContextService.getEntityId();
           ctrl.entityType = ContextService.getEntityType();
-          ctrl.resetFilePathEditor(false);
 
           window.addEventListener('mouseup', function(e) {
             e.preventDefault();

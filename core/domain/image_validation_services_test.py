@@ -19,7 +19,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import os
 
-from core.domain import image_validation_service
+from core.domain import image_validation_services
 from core.tests import test_utils
 
 import feconf
@@ -41,7 +41,7 @@ class ImageValidationServiceTests(test_utils.GenericTestBase):
         """Checks that the image passes validation."""
         with self.assertRaisesRegexp(
             utils.ValidationError, expected_error_substring):
-            image_validation_service.validate_image_and_filename(
+            image_validation_services.validate_image_and_filename(
                 image, filename)
 
     def test_image_validation_checks(self):

@@ -30,11 +30,13 @@ require('services/image-local-storage.service.ts');
 angular.module('oppia').directive('oppiaNoninteractiveImage', [
   'AssetsBackendApiService', 'ContextService',
   'HtmlEscaperService', 'ImageLocalStorageService', 'ImagePreloaderService',
-  'UrlInterpolationService', 'ENTITY_TYPE', 'LOADING_INDICATOR_URL',
+  'UrlInterpolationService', 'ENTITY_TYPE',
+  'IMAGE_SAVE_DESTINATION_LOCAL_STORAGE', 'LOADING_INDICATOR_URL',
   function(
       AssetsBackendApiService, ContextService,
       HtmlEscaperService, ImageLocalStorageService, ImagePreloaderService,
-      UrlInterpolationService, ENTITY_TYPE, LOADING_INDICATOR_URL) {
+      UrlInterpolationService, ENTITY_TYPE,
+      IMAGE_SAVE_DESTINATION_LOCAL_STORAGE, LOADING_INDICATOR_URL) {
     return {
       restrict: 'E',
       scope: {},
@@ -96,7 +98,9 @@ angular.module('oppia').directive('oppiaNoninteractiveImage', [
             // don't have loading indicator or try again for showing images in
             // this case. So we directly assign the url to the imageUrl.
             try {
-              if (ContextService.areImagesSavedInLocalStorage()) {
+              if (
+                ContextService.getImageSaveDestination() ===
+                IMAGE_SAVE_DESTINATION_LOCAL_STORAGE) {
                 ctrl.imageUrl = ImageLocalStorageService.getObjectUrlForImage(
                   ctrl.filepath);
               } else {

@@ -151,7 +151,7 @@
       "pageYOffset", "parent", "print", "removeEventListener", "resizeBy",
       "resizeTo", "screen", "screenLeft", "screenTop", "screenX", "screenY",
       "scroll", "scrollbars", "scrollBy", "scrollTo", "scrollX", "scrollY",
-      "self", "sessionStorage", "status", "statusbar", "stop",
+      "self", "status", "statusbar", "stop",
       "toolbar", "top"],
     "no-tabs": "error",
     "no-useless-escape": "off",

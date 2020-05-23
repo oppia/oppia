@@ -22,16 +22,18 @@ require('services/image-upload-helper.service.ts');
 angular.module('oppia').factory('ImageLocalStorageService', [
   'AlertsService', 'ImageUploadHelperService', function(
       AlertsService, ImageUploadHelperService) {
-    var imagesStored = [];
+    var storedImageFilenames = [];
     // According to https://en.wikipedia.org/wiki/Web_storage, 5MB is the
-    // minimum limit, for all browsers, that can be stored in localStorage.
-    var imageStorageLimit = 5 * 1024 / 100;
+    // minimum limit, for all browsers, per hostname, that can be stored in
+    // localStorage and 100kB is the max size limit for uploaded images, hence
+    // the limit below.
+    var MAX_IMAGES_STORABLE = 5 * 1024 / 100;
 
     return {
       getObjectUrlForImage: function(filename) {
         var urlCreator = window.URL || window.webkitURL;
         var imageBlob = ImageUploadHelperService.convertImageDataToImageFile(
-          window.localStorage.getItem(filename));
+          sessionStorage.getItem(filename));
         return urlCreator.createObjectURL(imageBlob);
       },
 
@@ -41,7 +43,7 @@ angular.module('oppia').factory('ImageLocalStorageService', [
        * @param {string} rawImage - Raw base64/URLEncoded data of the image.
        */
       saveImage: function(filename, rawImage) {
-        if (imagesStored.length + 1 > imageStorageLimit) {
+        if (storedImageFilenames.length + 1 > MAX_IMAGES_STORABLE) {
           // Since the service is going to be used in the create modal for
           // entities, more images can be added after entity creation, when
           // local storage would no longer be used.
@@ -50,26 +52,27 @@ angular.module('oppia').factory('ImageLocalStorageService', [
             'creation.');
           return;
         }
-        window.localStorage.setItem(filename, rawImage);
-        imagesStored.push(filename);
+        sessionStorage.setItem(filename, rawImage);
+        storedImageFilenames.push(filename);
       },
 
       deleteImage: function(filename) {
-        window.localStorage.removeItem(filename);
-        var index = imagesStored.indexOf(filename);
-        imagesStored.splice(index, 1);
+        sessionStorage.removeItem(filename);
+        var index = storedImageFilenames.indexOf(filename);
+        storedImageFilenames.splice(index, 1);
       },
 
       getAndFlushStoredImagesData: function() {
         var returnData = [];
-        for (var idx in imagesStored) {
+        for (var idx in storedImageFilenames) {
           returnData.push({
-            filename: imagesStored[idx],
+            filename: storedImageFilenames[idx],
             imageBlob: ImageUploadHelperService.convertImageDataToImageFile(
-              window.localStorage.getItem(imagesStored[idx]))
+              sessionStorage.getItem(storedImageFilenames[idx]))
           });
         }
-        imagesStored.length = 0;
+        storedImageFilenames.length = 0;
+        sessionStorage.clear();
         return returnData;
       }
     };

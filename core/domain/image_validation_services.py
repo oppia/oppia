@@ -24,8 +24,9 @@ from core.domain import html_validation_service
 import feconf
 import utils
 
+
 def validate_image_and_filename(raw_image, filename):
-    """Validates the image data received from the frontend.
+    """Validates the image data and its filename.
 
     Args:
         raw_image: str. The image content.
