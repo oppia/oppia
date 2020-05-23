@@ -73,7 +73,7 @@ export class PlaythroughService {
     static cstTracker: boolean = false;
 
     private removeOldQuitAction(): void {
-      var quitAction = PlaythroughService.playthrough.actions[
+      let quitAction = PlaythroughService.playthrough.actions[
         PlaythroughService.playthrough.actions.length - 1];
       // After the second quit action is recorded, the first quit is removed
       // using this method. This ensures that there are only two quit actions
@@ -135,10 +135,10 @@ export class PlaythroughService {
         ServicesConstants.NUM_REPEATED_CYCLES_THRESHOLD) {
         if (PlaythroughService.visitedStates.indexOf(destStateName) !== -1) {
           // Cycle identified.
-          var cycleStartIndex = PlaythroughService.visitedStates.indexOf(
+          let cycleStartIndex = PlaythroughService.visitedStates.indexOf(
             destStateName);
           PlaythroughService.visitedStates.push(destStateName);
-          var cycleString = PlaythroughService.visitedStates.slice(
+          let cycleString = PlaythroughService.visitedStates.slice(
             cycleStartIndex, PlaythroughService.visitedStates.length
           ).toString();
           if (PlaythroughService.cycleIdentifier.cycle === cycleString) {
@@ -175,7 +175,7 @@ export class PlaythroughService {
       // issues to be recorded in case of multiple issues is captured. This
       // follows MultipleIncorrectSubmissionsIssue ->
       // CyclicStateTransitionsIssue -> EarlyQuitIssue.
-      var timeSpentInExpInSecs = (
+      let timeSpentInExpInSecs = (
         PlaythroughService.expStopwatch.getTimeInSecs());
       if (this.isMultipleIncorrectSubmissionsIssue()) {
         PlaythroughService.playthrough.issueType = (
@@ -215,9 +215,9 @@ export class PlaythroughService {
     }
 
     private storePlaythrough(isNewPlaythrough: boolean): void {
-      var playthroughId = (
+      let playthroughId = (
         isNewPlaythrough ? null : PlaythroughService.playthrough.playthroughId);
-      var promise = this.http.post(this.getFullPlaythroughUrl(), {
+      let promise = this.http.post(this.getFullPlaythroughUrl(), {
         playthrough_data: PlaythroughService.playthrough.toBackendDict(),
         issue_schema_version: ServicesConstants.CURRENT_ISSUE_SCHEMA_VERSION,
         playthrough_id: playthroughId
@@ -278,7 +278,7 @@ export class PlaythroughService {
       if (this.isPlaythroughDiscarded()) {
         return;
       }
-      var expStartLearnerAction = this.learnerActionObjectFactory.createNew(
+      let expStartLearnerAction = this.learnerActionObjectFactory.createNew(
         AppConstants.ACTION_TYPE_EXPLORATION_START,
         {
           state_name: {
@@ -335,7 +335,7 @@ export class PlaythroughService {
           ServicesConstants.CURRENT_ACTION_SCHEMA_VERSION
         ));
 
-      var didNotMoveToNextState = (destStateName === stateName);
+      let didNotMoveToNextState = (destStateName === stateName);
       if (didNotMoveToNextState) {
         this.incrementIncorrectAnswerInMultipleIncorrectIssueTracker();
       } else {

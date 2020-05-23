@@ -55,7 +55,7 @@ interface IMessageValidatorsType {
   explorationCompleted(): boolean;
 }
 
-interface GetPayloadType {
+interface IGetPayloadType {
   heightChange(data: IHeightChangeData): IHeightChangeData;
   explorationLoaded(data: IExplorationLoadedData): IExplorationLoadedData;
   stateTransition(data: IStateTransitionData): IStateTransitionData;
@@ -101,7 +101,7 @@ export class MessengerService {
     }
   };
 
-  getPayload: GetPayloadType = {
+  getPayload: IGetPayloadType = {
     heightChange(data: IHeightChangeData): IHeightChangeData {
       return {
         height: data.height,
@@ -147,26 +147,26 @@ export class MessengerService {
 
     // Only send a message to the parent if the oppia window is iframed and
     // a hash is passed in.
-    var window = this.windowRef.nativeWindow;
-    var rawHash = window.location.hash.substring(1);
+    let window = this.windowRef.nativeWindow;
+    let rawHash = window.location.hash.substring(1);
     if (window.parent !== window && rawHash &&
         this.MESSAGE_VALIDATORS.hasOwnProperty(messageTitle)) {
       // Protractor tests may prepend a / to this hash, which we remove:
-      var hash =
+      let hash =
         (rawHash.charAt(0) === '/') ? rawHash.substring(1) : rawHash;
-      var hashParts = hash.split('&');
-      var hashDict = {
+      let hashParts = hash.split('&');
+      let hashDict = {
         version: null,
         secret: null,
         tagid: null
       };
-      for (var i = 0; i < hashParts.length; i++) {
+      for (let i = 0; i < hashParts.length; i++) {
         if (hashParts[i].indexOf('=') === -1) {
           this.loggerService.error('Invalid hash for embedding: ' + hash);
           return;
         }
 
-        var separatorLocation = hashParts[i].indexOf('=');
+        let separatorLocation = hashParts[i].indexOf('=');
         hashDict[hashParts[i].substring(0, separatorLocation)] = (
           hashParts[i].substring(separatorLocation + 1));
       }
@@ -179,7 +179,7 @@ export class MessengerService {
       if (this.SUPPORTED_HASHDICT_VERSIONS.has(hashDict.version)) {
         this.loggerService.info('Posting message to parent: ' + messageTitle);
 
-        var payload = this.getPayload[messageTitle](messageData);
+        let payload = this.getPayload[messageTitle](messageData);
         if (!this.MESSAGE_VALIDATORS[messageTitle](payload)) {
           this.loggerService.error('Error validating payload: ' + payload);
           return;
@@ -187,7 +187,7 @@ export class MessengerService {
 
         this.loggerService.info(payload);
 
-        var objToSendToParent = {
+        let objToSendToParent = {
           title: messageTitle,
           payload: payload,
           sourceTagId: null,

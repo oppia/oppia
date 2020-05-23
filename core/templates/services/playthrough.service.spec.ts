@@ -51,7 +51,7 @@ describe('PlaythroughService', () => {
       playthroughService.initSession(
         this.expId, this.expVersion, this.playthroughRecordingProbability);
 
-      var playthrough = playthroughService.getPlaythrough();
+      let playthrough = playthroughService.getPlaythrough();
       expect(playthrough.expId).toEqual(this.expId);
       expect(playthrough.expVersion).toEqual(this.expVersion);
       expect(playthrough.actions).toEqual([]);
@@ -75,8 +75,8 @@ describe('PlaythroughService', () => {
       it('adds a learner action object to the actions array', () => {
         playthroughService.recordExplorationStartAction('initStateName1');
 
-        var playthrough = playthroughService.getPlaythrough();
-        var actionSchemaVersion = 1;
+        let playthrough = playthroughService.getPlaythrough();
+        let actionSchemaVersion = 1;
         expect(playthrough.actions).toEqual([
           learnerActionObjectFactory.createNew('ExplorationStart', {
             state_name: {value: 'initStateName1'},
@@ -90,8 +90,8 @@ describe('PlaythroughService', () => {
         playthroughService.recordAnswerSubmitAction(
           'stateName1', 'stateName2', 'TextInput', 'Hello', 'Try again', 30);
 
-        var playthrough = playthroughService.getPlaythrough();
-        var actionSchemaVersion = 1;
+        let playthrough = playthroughService.getPlaythrough();
+        let actionSchemaVersion = 1;
         expect(playthrough.actions).toEqual([
           learnerActionObjectFactory.createNew('AnswerSubmit', {
             state_name: {value: 'stateName1'},
@@ -109,8 +109,8 @@ describe('PlaythroughService', () => {
       it('adds a learner action object to the actions array', () => {
         playthroughService.recordExplorationQuitAction('stateName1', 120);
 
-        var playthrough = playthroughService.getPlaythrough();
-        var actionSchemaVersion = 1;
+        let playthrough = playthroughService.getPlaythrough();
+        let actionSchemaVersion = 1;
         expect(playthrough.actions).toEqual([
           learnerActionObjectFactory.createNew('ExplorationQuit', {
             state_name: {value: 'stateName1'},
@@ -136,7 +136,7 @@ describe('PlaythroughService', () => {
 
         playthroughService.recordPlaythrough(false);
 
-        var playthrough = playthroughService.getPlaythrough();
+        let playthrough = playthroughService.getPlaythrough();
         expect(playthrough.issueType).toEqual('MultipleIncorrectSubmissions');
         expect(playthrough.issueCustomizationArgs).toEqual({
           state_name: {value: 'stateName1'},
@@ -152,7 +152,7 @@ describe('PlaythroughService', () => {
 
         playthroughService.recordPlaythrough(false);
 
-        var playthrough = playthroughService.getPlaythrough();
+        let playthrough = playthroughService.getPlaythrough();
         expect(playthrough.issueType).toEqual('EarlyQuit');
         // We don't check the time spent issue customization arg because it is
         // flaky between tests.
@@ -184,7 +184,7 @@ describe('PlaythroughService', () => {
 
         playthroughService.recordPlaythrough(false);
 
-        var playthrough = playthroughService.getPlaythrough();
+        let playthrough = playthroughService.getPlaythrough();
         expect(playthrough.issueType).toEqual('CyclicStateTransitions');
         expect(playthrough.issueCustomizationArgs).toEqual({
           state_names: {
@@ -219,7 +219,7 @@ describe('PlaythroughService', () => {
 
         playthroughService.recordPlaythrough(false);
 
-        var playthrough = playthroughService.getPlaythrough();
+        let playthrough = playthroughService.getPlaythrough();
         expect(playthrough.issueType).toEqual('CyclicStateTransitions');
         // The cycle is stateName2->stateName3->stateName2.
         expect(playthrough.issueCustomizationArgs).toEqual({
@@ -244,7 +244,7 @@ describe('PlaythroughService', () => {
         'stateName1', 'stateName2', 'TextInput', 'Hello', 'Try again', 30);
       playthroughService.recordExplorationQuitAction('stateName1', 120);
 
-      var playthrough = playthroughService.getPlaythrough();
+      let playthrough = playthroughService.getPlaythrough();
       expect(playthrough.actions).toEqual([]);
     });
   });
