@@ -26,19 +26,17 @@ import { ExplorationHtmlFormatterService } from
   'services/exploration-html-formatter.service';
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
 import { HtmlEscaperService } from 'services/html-escaper.service';
-import { Interaction } from 'domain/exploration/InteractionObjectFactory';
-import { LoggerService } from 'services/contextual/logger.service';
-import { NumberWithUnitsObjectFactory } from
-  'domain/objects/NumberWithUnitsObjectFactory';
 import {
   ISubtitledHtmlBackendDict, SubtitledHtml, SubtitledHtmlObjectFactory
 } from 'domain/exploration/SubtitledHtmlObjectFactory';
-import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory.ts';
+import { Interaction } from 'domain/exploration/InteractionObjectFactory';
+import { NumberWithUnitsObjectFactory } from
+  'domain/objects/NumberWithUnitsObjectFactory';
 
 export interface ISolutionBackendDict {
   /* eslint-disable camelcase */
   answer_is_exclusive: boolean;
-  correct_answer;
+  correct_answer: any;
   explanation: ISubtitledHtmlBackendDict;
   /* eslint-enable camelcase */
 }
@@ -51,7 +49,7 @@ export class Solution {
       private htmlEscaperService: HtmlEscaperService,
       private numberWithUnitsObjectFactory: NumberWithUnitsObjectFactory,
       public answerIsExclusive: boolean,
-      public correctAnswer,
+      public correctAnswer: any,
       public explanation: SubtitledHtml) {}
 
   toBackendDict(): ISolutionBackendDict {
@@ -92,7 +90,7 @@ export class Solution {
     return `${solutionType} solution is "${correctAnswer}". ${explanation}.`;
   }
 
-  setCorrectAnswer(correctAnswer): void {
+  setCorrectAnswer(correctAnswer: any): void {
     this.correctAnswer = correctAnswer;
   }
 
@@ -138,7 +136,7 @@ export class SolutionObjectFactory {
   }
 
   createNew(
-      answerIsExclusive: boolean, correctAnswer, explanationHtml: string,
+      answerIsExclusive: boolean, correctAnswer: any, explanationHtml: string,
       explanationId: string): Solution {
     return new Solution(
       this.convertToPlainTextPipe,
