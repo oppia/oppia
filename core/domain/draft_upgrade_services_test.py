@@ -120,6 +120,106 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             msg='Current schema version is %d but DraftUpgradeUtil.%s is '
             'unimplemented.' % (state_schema_version, conversion_fn_name))
 
+    def test_convert_states_v33_dict_to_v34_dict(self):
+        html = ('<p>Value</p><oppia-noninteractive-math ' +
+                'raw_latex-with-value="&amp;quot;+,-,-,+&amp;quot' +
+                ';"></oppia-noninteractive-math>')
+
+        expected_html = ('<p>Value</p><oppia-noninteractive-' +
+                         'math math_content-with-value="{&amp;quot' +
+                         ';raw_latex&amp;quot;: &amp;quot;+,-,-,+' +
+                         '&amp;quot;, &amp;quot;svg_filename&amp;' +
+                         'quot;: &amp;quot;&amp;quot;}"></oppia' +
+                         '-noninteractive-math>')
+
+        draft_change_list = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'state1',
+                'property_name': 'widget_customization_args',
+                'new_value': {
+                    'choices': {
+                        'value': [
+                            html,
+                            '<p>2</p>',
+                            '<p>3</p>',
+                            '<p>4</p>'
+                        ]
+                    },
+                    'showChoicesInShuffledOrder': {
+                        'value': False
+                    }
+                }
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'state2',
+                'property_name': 'widget_customization_args',
+                'new_value': {
+                    'choices': {
+                        'value': [
+                            '<p>1</p>',
+                            '<p>2</p>',
+                            html,
+                            '<p>4</p>'
+                        ]
+                    },
+                    'maxAllowableSelectionCount': {
+                        'value': 1
+                    },
+                    'minAllowableSelectionCount': {
+                        'value': 1
+                    }
+                }
+            })]
+        expected_draft_change_list = (
+            draft_upgrade_services.DraftUpgradeUtil._convert_states_v33_dict_to_v34_dict(  # pylint: disable=protected-access,line-too-long
+                draft_change_list))
+        self.assertEqual(
+            expected_draft_change_list[1].to_dict(),
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'state_name': 'state2',
+                    'property_name': 'widget_customization_args',
+                    'new_value': {
+                        'choices': {
+                            'value': [
+                                '<p>1</p>',
+                                '<p>2</p>',
+                                expected_html,
+                                '<p>4</p>'
+                            ]
+                        },
+                        'maxAllowableSelectionCount': {
+                            'value': 1
+                        },
+                        'minAllowableSelectionCount': {
+                            'value': 1
+                        }
+                    }
+                }).to_dict())
+
+        self.assertEqual(
+            expected_draft_change_list[0].to_dict(),
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'state1',
+                'property_name': 'widget_customization_args',
+                'new_value': {
+                    'choices': {
+                        'value': [
+                            expected_html,
+                            '<p>2</p>',
+                            '<p>3</p>',
+                            '<p>4</p>'
+                        ]
+                    },
+                    'showChoicesInShuffledOrder': {
+                        'value': False
+                    }
+                }
+            }).to_dict())
+
     def test_convert_states_v32_dict_to_v33_dict(self):
         draft_change_list = [
             exp_domain.ExplorationChange({
