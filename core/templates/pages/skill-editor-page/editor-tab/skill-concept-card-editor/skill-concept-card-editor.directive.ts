@@ -42,6 +42,8 @@ require('services/generate-content-id.service.ts');
 
 require('pages/skill-editor-page/skill-editor-page.constants.ajs.ts');
 
+import { Subscription } from 'rxjs';
+
 angular.module('oppia').directive('skillConceptCardEditor', [
   'GenerateContentIdService', 'SkillEditorStateService', 'SkillUpdateService',
   'SubtitledHtmlObjectFactory', 'UrlInterpolationService',
@@ -57,9 +59,10 @@ angular.module('oppia').directive('skillConceptCardEditor', [
         '/pages/skill-editor-page/editor-tab/skill-concept-card-editor/' +
         'skill-concept-card-editor.directive.html'),
       controller: [
-        '$scope', '$filter', '$uibModal', 'EVENT_SKILL_REINITIALIZED',
-        function($scope, $filter, $uibModal, EVENT_SKILL_REINITIALIZED) {
+        '$scope', '$filter', '$uibModal',
+        function($scope, $filter, $uibModal) {
           var ctrl = this;
+          ctrl.directiveSubscriptions = new Subscription();
           var initBindableFieldsDict = function() {
             $scope.bindableFieldsDict = {
               displayedConceptCardExplanation:
@@ -177,9 +180,10 @@ angular.module('oppia').directive('skillConceptCardEditor', [
             $scope.dragDotsImgUrl = UrlInterpolationService.getStaticImageUrl(
               '/general/drag_dots.png');
             initBindableFieldsDict();
-            $scope.$on(EVENT_SKILL_REINITIALIZED, function() {
-              initBindableFieldsDict();
-            });
+            ctrl.directiveSubscriptions.add(
+              SkillEditorStateService.getSkillChangedSubject().subscribe(
+                () => initBindableFieldsDict())
+            );
 
             // When the page is scrolled so that the top of the page is above
             // the browser viewport, there are some bugs in the positioning of
@@ -204,6 +208,10 @@ angular.module('oppia').directive('skillConceptCardEditor', [
               }
             };
           };
+
+          $scope.$on('$destroy', function() {
+            ctrl.directiveSubscriptions.unsubscribe();
+          });
         }
       ]
     };

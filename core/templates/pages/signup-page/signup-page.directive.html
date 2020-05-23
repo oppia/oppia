@@ -15,9 +15,7 @@ link before completing the signup process, they will be logged out.
             <input type="text" ng-model="$ctrl.username" id="username" class="form-control protractor-test-username-input" ng-blur="$ctrl.onUsernameInputFormBlur($ctrl.username)" ng-change="$ctrl.updateWarningText($ctrl.username)" ng-trim="false" focus-on="usernameInputField" style="width: 260px;" autofocus="true">
             <span class="form-text" style="font-size: 0.8em;" translate="I18N_SIGNUP_USERNAME_EXPLANATION"></span>
             <div style="height: 18px; width: 550px;">
-              <span style="color: red; font-size: 0.8em;" aria-live="assertive" ng-show="$ctrl.blurredAtLeastOnce">
-                <[$ctrl.warningI18nCode | translate]>
-              </span>
+              <p style="color: red; font-size: 0.8em;" aria-live="assertive" ng-show="$ctrl.blurredAtLeastOnce" translate="<[$ctrl.warningI18nCode]>" translate-values="{maxUsernameLength: $ctrl.MAX_USERNAME_LENGTH}"></p>
             </div>
           </div>
         </div>
