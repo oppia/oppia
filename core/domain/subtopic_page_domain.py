@@ -21,8 +21,8 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from constants import constants
 from core.domain import change_domain
-from core.domain import state_domain
 from core.domain import html_validation_service
+from core.domain import state_domain
 from core.platform import models
 import feconf
 import python_utils
@@ -222,12 +222,35 @@ class SubtopicPage(python_utils.OBJECT):
 
     @classmethod
     def _convert_page_contents_v1_dict_to_v2_dict(cls, page_contents_dict):
+        """Converts v1 SubtopicPage Contents schema to the v2 schema.
+        v2 schema introduces the new schema for Math RTEs.
 
-        import json
-        print("****************************************************************\n")
-        print("in _convert_page_contents_v1_dict_to_v2s_dict")
-        print(json.dumps(page_contents_dict))
-        page_contents_dict['subtitled_html']['html'] = html_validation_service.add_math_content_to_math_rte_components(page_contents_dict['subtitled_html']['html'])
+        Args:
+            page_contents_dict: dict. A dict used to initialize a SubtopicPage
+                 domain object.
+
+        Returns:
+            dict. The converted page_contents_dict.
+        """
+
+        for (content_id, language_code_to_written_translation) in (
+                page_contents_dict['written_translations'][
+                    'translations_mapping'].items()):
+            for language_code in (
+                    language_code_to_written_translation.keys()):
+                page_contents_dict['written_translations'][
+                    'translations_mapping'][content_id][language_code][
+                        'html'] = (
+                            html_validation_service.
+                            add_math_content_to_math_rte_components(
+                                page_contents_dict['written_translations'][
+                                    'translations_mapping'][content_id][
+                                        language_code]['html']))
+
+        page_contents_dict['subtitled_html']['html'] = (
+            html_validation_service.
+            add_math_content_to_math_rte_components(
+                page_contents_dict['subtitled_html']['html']))
         return page_contents_dict
 
 

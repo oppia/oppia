@@ -135,24 +135,6 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
         draft_change_list = [
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                'state_name': 'state1',
-                'property_name': 'widget_customization_args',
-                'new_value': {
-                    'choices': {
-                        'value': [
-                            html,
-                            '<p>2</p>',
-                            '<p>3</p>',
-                            '<p>4</p>'
-                        ]
-                    },
-                    'showChoicesInShuffledOrder': {
-                        'value': False
-                    }
-                }
-            }),
-            exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'state_name': 'state2',
                 'property_name': 'widget_customization_args',
                 'new_value': {
@@ -171,53 +153,133 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                         'value': 1
                     }
                 }
+            }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name': 'answer_groups',
+                'state_name': 'State 1',
+                'new_value': {
+                    'rule_specs': [{
+                        'rule_type': 'Equals',
+                        'inputs': {'x': [
+                            html
+                        ]}
+                    }, {
+                        'rule_type': 'Equals',
+                        'inputs': {'x': 1}
+                    }, {
+                        'rule_type': 'HasElementXAtPositionY',
+                        'inputs': {'x': html,
+                                   'y': 2}
+                    }, {
+                        'rule_type': 'IsEqualToOrdering',
+                        'inputs': {'x': [[html]]}
+                    }, {
+                        'rule_type': 'HasElementXBeforeElementY',
+                        'inputs': {'x': html,
+                                   'y': html}
+                    }, {
+                        'rule_type': 'IsEqualToOrderingWithOneItemAtIncorrectPosition',  # pylint: disable=protected-access,line-too-long
+                        'inputs': {'x': [[html]]}
+                    }],
+                    'outcome': {
+                        'dest': 'Introduction',
+                        'feedback': {
+                            'content_id': 'feedback',
+                            'html': html
+                        },
+                        'param_changes': [],
+                        'labelled_as_correct': False,
+                        'refresher_exploration_id': None,
+                        'missing_prerequisite_skill_id': None
+                    },
+                    'training_data': [],
+                    'tagged_skill_misconception_id': None
+                }
+            }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Intro',
+                'property_name': 'content',
+                'new_value': html
             })]
         expected_draft_change_list = (
             draft_upgrade_services.DraftUpgradeUtil._convert_states_v33_dict_to_v34_dict(  # pylint: disable=protected-access,line-too-long
                 draft_change_list))
         self.assertEqual(
-            expected_draft_change_list[1].to_dict(),
-                exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'state_name': 'state2',
-                    'property_name': 'widget_customization_args',
-                    'new_value': {
-                        'choices': {
-                            'value': [
-                                '<p>1</p>',
-                                '<p>2</p>',
-                                expected_html,
-                                '<p>4</p>'
-                            ]
-                        },
-                        'maxAllowableSelectionCount': {
-                            'value': 1
-                        },
-                        'minAllowableSelectionCount': {
-                            'value': 1
-                        }
-                    }
-                }).to_dict())
-
-        self.assertEqual(
             expected_draft_change_list[0].to_dict(),
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                'state_name': 'state1',
+                'state_name': 'state2',
                 'property_name': 'widget_customization_args',
                 'new_value': {
                     'choices': {
                         'value': [
-                            expected_html,
+                            '<p>1</p>',
                             '<p>2</p>',
-                            '<p>3</p>',
+                            expected_html,
                             '<p>4</p>'
                         ]
                     },
-                    'showChoicesInShuffledOrder': {
-                        'value': False
+                    'maxAllowableSelectionCount': {
+                        'value': 1
+                    },
+                    'minAllowableSelectionCount': {
+                        'value': 1
                     }
                 }
+            }).to_dict())
+
+        self.assertEqual(
+            expected_draft_change_list[1].to_dict(),
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name': 'answer_groups',
+                'state_name': 'State 1',
+                'new_value': {
+                    'rule_specs': [{
+                        'rule_type': 'Equals',
+                        'inputs': {'x': [
+                            expected_html
+                        ]}
+                    }, {
+                        'rule_type': 'Equals',
+                        'inputs': {'x': 1}
+                    }, {
+                        'rule_type': 'HasElementXAtPositionY',
+                        'inputs': {'x': expected_html,
+                                   'y': 2}
+                    }, {
+                        'rule_type': 'IsEqualToOrdering',
+                        'inputs': {'x': [[expected_html]]}
+                    }, {
+                        'rule_type': 'HasElementXBeforeElementY',
+                        'inputs': {'x': expected_html,
+                                   'y': expected_html}
+                    }, {
+                        'rule_type': 'IsEqualToOrderingWithOneItemAtIncorrectPosition',  # pylint: disable=protected-access,line-too-long
+                        'inputs': {'x': [[expected_html]]}
+                    }],
+                    'outcome': {
+                        'dest': 'Introduction',
+                        'feedback': {
+                            'content_id': 'feedback',
+                            'html': expected_html
+                        },
+                        'param_changes': [],
+                        'labelled_as_correct': False,
+                        'refresher_exploration_id': None,
+                        'missing_prerequisite_skill_id': None
+                    },
+                    'training_data': [],
+                    'tagged_skill_misconception_id': None
+                }
+            }).to_dict())
+        self.assertEqual(
+            expected_draft_change_list[2].to_dict(),
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Intro',
+                'property_name': 'content',
+                'new_value': expected_html
             }).to_dict())
 
     def test_convert_states_v32_dict_to_v33_dict(self):
