@@ -96,8 +96,8 @@ describe('Library pages tour', function() {
       'library/recently_published');
   });
 
-  afterEach(function() {
-    general.checkForConsoleErrors([]);
+  afterEach(async function() {
+    await general.checkForConsoleErrors([]);
   });
 });
 
@@ -180,7 +180,7 @@ describe('Rating', function() {
     }
   });
 
-  afterEach(function() {
-    general.checkForConsoleErrors([]);
+  afterEach(async function() {
+    await general.checkForConsoleErrors([]);
   });
 });
