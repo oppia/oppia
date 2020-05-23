@@ -257,6 +257,17 @@ export class PlaythroughService {
       PlaythroughService.playthrough = this.playthroughObjectFactory.createNew(
         null, explorationId, explorationVersion, null, {}, []);
       PlaythroughService.expStopwatch = this.stopwatchObjectFactory.create();
+      PlaythroughService.multipleIncorrectStateName = {
+        state_name: null,
+        num_times_incorrect: null
+      };
+      PlaythroughService.cycleIdentifier = {
+        cycle: null,
+        num_cycles: null
+      };
+      PlaythroughService.visitedStates = [];
+      PlaythroughService.misTracker = false;
+      PlaythroughService.cstTracker = false;
     }
 
     getPlaythrough(): Playthrough {
