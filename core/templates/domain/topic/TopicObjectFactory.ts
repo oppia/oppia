@@ -24,9 +24,11 @@ import cloneDeep from 'lodash/cloneDeep';
 
 import { SkillSummary, SkillSummaryObjectFactory } from
   'domain/skill/SkillSummaryObjectFactory';
-import { IStoryReferenceBackendDict, StoryReference,
-  StoryReferenceObjectFactory } from
-  'domain/topic/StoryReferenceObjectFactory';
+import {
+  IStoryReferenceBackendDict,
+  StoryReference,
+  StoryReferenceObjectFactory
+} from 'domain/topic/StoryReferenceObjectFactory';
 import {
   ISkillIdToDescriptionMap,
   Subtopic,
