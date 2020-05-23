@@ -1,4 +1,4 @@
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,14 +13,19 @@
 // limitations under the License.
 
 /**
- * @fileoverview Constants for the skill editor page.
+ * @fileoverview Service for querying the shared constants of the Oppia module.
  */
 
-// TODO(#7092): Delete this file once migration is complete and these AngularJS
-// equivalents of the Angular constants are no longer needed.
-import { SkillEditorPageConstants } from
-  'pages/skill-editor-page/skill-editor-page.constants';
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
-angular.module('oppia').constant(
-  'SKILL_RIGHTS_URL_TEMPLATE',
-  SkillEditorPageConstants.SKILL_RIGHTS_URL_TEMPLATE);
+import { AppConstants } from 'app.constants';
+
+@Injectable({providedIn: 'root'})
+export class AppService {
+  isMachineLearningClassificationEnabled(): boolean {
+    return AppConstants.ENABLE_ML_CLASSIFIERS;
+  }
+}
+
+angular.module('oppia').factory('AppService', downgradeInjectable(AppService));
