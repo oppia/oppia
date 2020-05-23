@@ -16,6 +16,10 @@
  * @fileoverview Service for detecting spamming behavior from the learner.
  */
 
+require(
+  'components/common-layout-directives/common-elements/' +
+  'confirm-or-cancel-modal.controller.ts');
+
 angular.module('oppia').factory('FatigueDetectionService', [
   '$uibModal', function($uibModal) {
     // 4 submissions in under 10 seconds triggers modal.
@@ -45,13 +49,11 @@ angular.module('oppia').factory('FatigueDetectionService', [
             'take-break-modal.template.html'),
           backdrop: 'static',
           resolve: {},
-          controller: [
-            '$scope', '$uibModalInstance',
-            function($scope, $uibModalInstance) {
-              $scope.okay = function() {
-                $uibModalInstance.close('okay');
-              };
-            }]
+          controller: 'ConfirmOrCancelModalController'
+        }).result.then(function() {}, function() {
+          // Note to developers:
+          // This callback is triggered when the Cancel button is clicked.
+          // No further action is needed.
         });
       },
       reset: function() {
