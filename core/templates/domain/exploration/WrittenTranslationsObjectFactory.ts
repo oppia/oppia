@@ -20,9 +20,11 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { ITranslationBackendDict, WrittenTranslation,
-  WrittenTranslationObjectFactory } from
-  'domain/exploration/WrittenTranslationObjectFactory';
+import {
+  ITranslationBackendDict,
+  WrittenTranslation,
+  WrittenTranslationObjectFactory
+} from 'domain/exploration/WrittenTranslationObjectFactory';
 
 interface IWrittenTranslationsBackendDict {
   'translations_mapping': {

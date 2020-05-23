@@ -21,7 +21,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 export interface ITranslationBackendDict {
-  html: string;
+  'html': string;
   'needs_update': boolean;
 }
 

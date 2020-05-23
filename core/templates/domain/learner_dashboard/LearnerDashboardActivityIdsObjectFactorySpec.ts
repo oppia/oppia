@@ -16,9 +16,10 @@
  * @fileoverview Tests for LearnerDashboardActivityIdsObjectFactory.
  */
 
-import { ILearnerDashboardActivityIdsDict,
-  LearnerDashboardActivityIdsObjectFactory } from
-  'domain/learner_dashboard/LearnerDashboardActivityIdsObjectFactory';
+import {
+  ILearnerDashboardActivityIdsDict,
+  LearnerDashboardActivityIdsObjectFactory
+} from 'domain/learner_dashboard/LearnerDashboardActivityIdsObjectFactory';
 
 describe('Learner dashboard activity ids object factory', () => {
   let learnerDashboardActivityIdsObjectFactory:

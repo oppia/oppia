@@ -21,7 +21,7 @@ import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
 interface IFeedbackThreadSummaryBackendDict {
-  status: string;
+  'status': string;
   'original_author_id': string;
   'last_updated_msecs': number;
   'last_message_text': string;

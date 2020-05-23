@@ -22,11 +22,11 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 
 interface IFeedbackMessageSummaryBackendDict {
   'message_id': number;
-  text: string;
+  'text': string;
   'updated_status': string;
   'suggestion_html': string;
   'current_content_html': string;
-  description: string;
+  'description': string;
   'author_username': string;
   'author_picture_data_url': string;
   'created_on_msecs': number;

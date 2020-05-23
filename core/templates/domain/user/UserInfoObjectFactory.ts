@@ -27,8 +27,8 @@ interface IUserInfoBackendDict {
   'is_topic_manager': boolean;
   'can_create_collections': boolean;
   'preferred_site_language_code': string;
-  username: string;
-  email: string;
+  'username': string;
+  'email': string;
   'user_is_logged_in': boolean;
 }
 

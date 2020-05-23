@@ -28,7 +28,7 @@ import { IStoryNodeBackendDict, StoryNode, StoryNodeObjectFactory } from
 interface IStoryContentsBackendDict {
   'initial_node_id': string;
   'next_node_id': string;
-  nodes: IStoryNodeBackendDict[];
+  'nodes': IStoryNodeBackendDict[];
 }
 
 export class StoryContents {

@@ -21,8 +21,8 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 interface ITopicSummaryBackendDict {
-  id: string;
-  name: string;
+  'id': string;
+  'name': string;
   'canonical_story_count': number;
   'subtopic_count': number;
   'total_skill_count': number;

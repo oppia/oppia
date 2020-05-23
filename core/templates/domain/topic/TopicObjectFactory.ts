@@ -27,22 +27,25 @@ import { SkillSummary, SkillSummaryObjectFactory } from
 import { IStoryReferenceBackendDict, StoryReference,
   StoryReferenceObjectFactory } from
   'domain/topic/StoryReferenceObjectFactory';
-import { ISkillIdToDescriptionMap, Subtopic,
-  ISubtopicBackendDict, SubtopicObjectFactory } from
-  'domain/topic/SubtopicObjectFactory';
+import {
+  ISkillIdToDescriptionMap,
+  Subtopic,
+  ISubtopicBackendDict,
+  SubtopicObjectFactory
+} from 'domain/topic/SubtopicObjectFactory';
 
 interface ITopicBackendDict {
-  id: string;
-  name: string;
+  'id': string;
+  'name': string;
   'abbreviated_name': string;
-  description: string;
+  'description': string;
   'language_code': string;
   'uncategorized_skill_ids': string[];
   'next_subtopic_id': number;
-  version: number;
+  'version': number;
   'thumbnail_filename': string;
   'thumbnail_bg_color': string;
-  subtopics: ISubtopicBackendDict[];
+  'subtopics': ISubtopicBackendDict[];
   'canonical_story_references': IStoryReferenceBackendDict[];
   'additional_story_references': IStoryReferenceBackendDict[];
 }

@@ -24,8 +24,8 @@ import { SkillSummary, SkillSummaryObjectFactory } from
   'domain/skill/SkillSummaryObjectFactory';
 
 export interface ISubtopicBackendDict {
-  id: number;
-  title: string;
+  'id': number;
+  'title': string;
   'skill_ids': string[];
   'thumbnail_filename': string;
   'thumbnail_bg_color': string;

@@ -24,13 +24,13 @@ import { StoryEditorPageConstants } from
   'pages/story-editor-page/story-editor-page.constants';
 
 export interface IStoryNodeBackendDict {
-  id: string;
-  title: string;
-  description: string;
+  'id': string;
+  'title': string;
+  'description': string;
   'destination_node_ids': string[];
   'prerequisite_skill_ids': string[];
   'acquired_skill_ids': string[];
-  outline: string;
+  'outline': string;
   'outline_is_finalized': boolean;
   'exploration_id': string;
   'thumbnail_bg_color': string;

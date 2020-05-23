@@ -29,7 +29,7 @@ interface IThreadMessageBackendDict {
   'entity_type': string;
   'entity_id': string;
   'message_id': number;
-  text: string;
+  'text': string;
   'updated_status': string;
   'updated_subject': string;
 }
