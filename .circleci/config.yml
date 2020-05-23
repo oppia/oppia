@@ -111,9 +111,9 @@ jobs:
       - run:
           name: Install dependencies
           command: python -m scripts.install_third_party_libs
-      # - run:
-      #     name: Check that all e2e test files are captured in protractor.conf.js
-      #     command: python -m scripts.check_e2e_tests_are_captured_in_ci
+      - run:
+          name: Check that all e2e test files are captured in protractor.conf.js
+          command: python -m scripts.check_e2e_tests_are_captured_in_ci
       - persist_to_workspace:
           root: /home/circleci/
           paths:
@@ -307,13 +307,6 @@ jobs:
           name: Run e2e classroom page test
           command: |
             python -m scripts.run_e2e_tests --skip-install --skip-build --suite="classroomPageFileUploadFeatures"
-      # Remove once e2e_file_upload_features has been migrated
-      - persist_to_workspace:
-          root: /home/circleci/
-          paths:
-            - oppia/assets/hashes.json
-            - oppia/third_party/generated/
-            - oppia/webpack_bundles
 
   e2e_topic_and_story_editor:
     <<: *job_defaults
