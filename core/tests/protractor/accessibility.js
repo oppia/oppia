@@ -37,7 +37,8 @@ describe('screenreader and keyboard user accessibility features', function() {
     await skipLink.click();
     var mainContent = element(by.css('.protractor-test-main-content'));
     expect(await mainContent.getAttribute('id')).toEqual(
-      await browser.driver.switchTo().activeElement().getAttribute('id'));
+      await (await browser.driver.switchTo().activeElement())
+        .getAttribute('id'));
   });
 
   afterEach(async function() {
@@ -52,6 +53,6 @@ describe('Cache Slugs', function() {
       var expectedErrors = [
         'http://localhost:9001/build/fail/logo/288x128_logo_white.png'
       ];
-      await general.checkConsoleErrorsExist(expectedErrors);
+      await general.checkForConsoleErrors(expectedErrors);
     });
 });

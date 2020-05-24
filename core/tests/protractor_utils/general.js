@@ -165,24 +165,23 @@ var _getUniqueLogMessages = function(logs) {
   return Object.keys(logsDict);
 };
 
-var checkConsoleErrorsExist = function(expectedErrors) {
+var checkConsoleErrorsExist = async function(expectedErrors) {
   // Checks that browser logs match entries in expectedErrors array.
-  browser.manage().logs().get('browser').then(function(browserLogs) {
-    // Some browsers such as chrome raise two errors for a missing resource.
-    // To keep consistent behaviour across browsers, we keep only the logs
-    // that have a unique value for their message attribute.
-    var uniqueLogMessages = _getUniqueLogMessages(browserLogs);
-    expect(uniqueLogMessages.length).toBe(expectedErrors.length);
-    for (var i = 0; i < expectedErrors.length; i++) {
-      var errorPresent = false;
-      for (var j = 0; j < uniqueLogMessages.length; j++) {
-        if (uniqueLogMessages[j].match(expectedErrors[i])) {
-          errorPresent = true;
-        }
+  var browserLogs = await browser.manage().logs().get('browser');
+  // Some browsers such as chrome raise two errors for a missing resource.
+  // To keep consistent behaviour across browsers, we keep only the logs
+  // that have a unique value for their message attribute.
+  var uniqueLogMessages = _getUniqueLogMessages(browserLogs);
+  expect(uniqueLogMessages.length).toBe(expectedErrors.length);
+  for (var i = 0; i < expectedErrors.length; i++) {
+    var errorPresent = false;
+    for (var j = 0; j < uniqueLogMessages.length; j++) {
+      if (uniqueLogMessages[j].match(expectedErrors[i])) {
+        errorPresent = true;
       }
-      expect(errorPresent).toBe(true);
     }
-  });
+    expect(errorPresent).toBe(true);
+  }
 };
 
 var goToHomePage = async function() {
