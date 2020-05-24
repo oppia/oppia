@@ -253,8 +253,8 @@ angular.module('oppia').config(['toastrConfig', function(toastrConfig) {
 // spread over multiple lines. The errored file may be viewed on the
 // browser console where the line number should match.
 angular.module('oppia').factory('$exceptionHandler', [
-  '$log', 'CsrfTokenService', 'DEV_MODE',
-  function($log, CsrfTokenService, DEV_MODE) {
+  '$log', 'CsrfTokenService', 'UtilsService', 'DEV_MODE',
+  function($log, CsrfTokenService, UtilsService, DEV_MODE) {
     var MIN_TIME_BETWEEN_ERRORS_MSEC = 5000;
     // Refer: https://docs.angularjs.org/guide/migration#-templaterequest-
     // The tpload error namespace has changed in Angular v1.7.
@@ -273,6 +273,35 @@ angular.module('oppia').factory('$exceptionHandler', [
       // because -1 is the status code for aborted requests.
       if (UNHANDLED_REJECTION_STATUS_CODE_REGEX.test(exception)) {
         return;
+      }
+      // According to AngularJS breaking change commit:
+      // eslint-disable-next-line max-len
+      // https://github.com/angular/angular.js/commit/c9dffde1cb167660120753181cb6d01dc1d1b3d0
+      // Unhandled rejected promises will be logged to $exceptionHandler.
+      // If an unhandled rejected promise is encountered by $q, the data
+      // type of the rejection value is checked. If the value is an Error,
+      // $exceptionHandler is called with the Error as the first argument
+      // and a message string as the second argument.
+      // If the rejection value is not an Error, $exceptionHandler is called
+      // with the rejection value as the argument. In order to log the error
+      // correctly on StackDriver and to preserve the original stacktrace, we
+      // wrap such exceptions in an error object.
+      // eslint-disable-next-line max-len
+      // see: https://github.com/angular/angular.js/blob/2dfb6b4af62d750032c91fd86dc1f8d684d179c6/src/ng/q.js#L388
+      if (!UtilsService.isError(exception)) {
+        // The Error.stack property provides a meaningful stacktrace of the
+        // exception. Different browsers set this value at different times.
+        // Modern browsers such as Chrome, Firefox, Edge set this value when
+        // an Error object is created. Older browsers like IE 10 & 11 set this
+        // value only when the Error is thrown. To ensure that the stack
+        // property is populated we use try/catch.
+        // eslint-disable-next-line max-len
+        // see: https://web.archive.org/web/20140210004225/http://msdn.microsoft.com/en-us/library/windows/apps/hh699850.aspx
+        try {
+          throw new Error(exception);
+        } catch (error) {
+          exception = error;
+        }
       }
       var tploadStatusCode = exception.message.match(TPLOAD_STATUS_CODE_REGEX);
       // Suppress tpload errors which occur with p1 of -1 in the error URL
