@@ -45,7 +45,7 @@ describe('Story contents object factory', () => {
           outline: 'Outline',
           exploration_id: null,
           outline_is_finalized: false,
-          thumbnail_bg_color: 'white',
+          thumbnail_bg_color: '#a33f40',
           thumbnail_filename: 'filename'
         }, {
           id: 'node_2',
@@ -57,7 +57,7 @@ describe('Story contents object factory', () => {
           outline: 'Outline 2',
           exploration_id: 'exp_1',
           outline_is_finalized: true,
-          thumbnail_bg_color: 'white',
+          thumbnail_bg_color: '#a33f40',
           thumbnail_filename: 'filename'
         }],
       next_node_id: 'node_3'
