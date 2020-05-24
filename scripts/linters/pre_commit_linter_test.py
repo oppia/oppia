@@ -33,8 +33,6 @@ LINTER_TESTS_DIR = os.path.join(os.getcwd(), 'core', 'tests', 'linter_tests')
 
 # HTML filepaths.
 VALID_HTML_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'valid.html')
-INVALID_INDENTATION_HTML_FILEPATH = os.path.join(
-    LINTER_TESTS_DIR, 'invalid_indentation.html')
 INVALID_NG_TEMPLATE_HTML_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_ng_template.html')
 INVALID_TRAILING_WHITESPACE_HTML_FILEPATH = os.path.join(
@@ -244,18 +242,6 @@ class HTMLLintTests(LintTests):
             pre_commit_linter.main(args=['--path=%s' % VALID_HTML_FILEPATH])
         self.assertTrue(all_checks_passed(self.linter_stdout))
         self.assertTrue('SUCCESS   HTML linting passed' in self.linter_stdout)
-
-    def test_invalid_indentation(self):
-        with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-            with self.install_swap:
-                pre_commit_linter.main(
-                    args=['--path=%s' % INVALID_INDENTATION_HTML_FILEPATH])
-        self.assertFalse(all_checks_passed(self.linter_stdout))
-        self.assertTrue(
-            appears_in_linter_stdout(
-                ['Indentation for end tag content on line 13 does not match the'
-                 ' indentation of the start tag content on line 11'],
-                self.linter_stdout))
 
     def test_invalid_ng_template(self):
         with self.print_swap, self.sys_swap, self.check_codeowner_swap:

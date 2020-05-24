@@ -244,7 +244,7 @@ class HTMLLintChecksManager(python_utils.OBJECT):
         verbose_mode_enabled: bool. True if verbose mode is enabled.
     """
     def __init__(
-            self, files_to_lint, file_cache, verbose_mode_enabled):
+            self, files_to_lint, file_cache, verbose_mode_enabled, debug=False):
         """Constructs a HTMLLintChecksManager object.
 
         Args:
@@ -252,10 +252,12 @@ class HTMLLintChecksManager(python_utils.OBJECT):
             file_cache: object(FileCache). Provides thread-safe access to cached
                 file content.
             verbose_mode_enabled: bool. True if verbose mode is enabled.
+            debug: bool. Print tag_stack if set to True.
         """
         self.files_to_lint = files_to_lint
         self.file_cache = file_cache
         self.verbose_mode_enabled = verbose_mode_enabled
+        self.debug = debug
 
     @property
     def html_filepaths(self):
@@ -267,7 +269,7 @@ class HTMLLintChecksManager(python_utils.OBJECT):
         """Return all filepaths."""
         return self.html_filepaths
 
-    def _check_html_tags_and_attributes(self, debug=False):
+    def _check_html_tags_and_attributes(self):
         """This function checks the indentation of lines in HTML files."""
 
         if self.verbose_mode_enabled:
@@ -284,7 +286,7 @@ class HTMLLintChecksManager(python_utils.OBJECT):
             for filepath in html_files_to_lint:
                 file_content = self.file_cache.read(filepath)
                 file_lines = self.file_cache.readlines(filepath)
-                parser = CustomHTMLParser(filepath, file_lines, debug)
+                parser = CustomHTMLParser(filepath, file_lines, self.debug)
                 parser.feed(file_content)
 
                 if len(parser.tag_stack) != 0:
