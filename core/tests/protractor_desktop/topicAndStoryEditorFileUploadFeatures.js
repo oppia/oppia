@@ -59,9 +59,8 @@ describe('Topic editor functionality', function() {
     var TOPIC_DESCRIPTION = 'TASEFUF_1 description';
     var TOPIC_CATEGORY = 'Mathematics';
     var EDITED_TOPIC_NAME = 'TASEFUF_1 edited';
-    topicsAndSkillsDashboardPage.get();
     topicsAndSkillsDashboardPage.createTopic(TOPIC_NAME,
-      TOPIC_DESCRIPTION, TOPIC_CATEGORY, true);
+      TOPIC_DESCRIPTION, TOPIC_CATEGORY, false);
     var NEW_TOPIC_NAME = EDITED_TOPIC_NAME;
     topicsAndSkillsDashboardPage.get();
     topicsAndSkillsDashboardPage.editTopic(TOPIC_NAME);

@@ -25,9 +25,9 @@
       </td>
       <td>
         <div class="list-summary list-summary-name protractor-test-topics-list-item">
-          <div class="protractor-test-topic-name"><span class="topic-name"><[topic.name]></span></div>
-          <div class="protractor-test-topic-category"><span class="topic-category"><[topic.category]></span></div>
-          <div class="protractor-test-topic-description"><span class="topic-description"><[topic.description]></span></div>
+          <div><span class="topic-name protractor-test-topic-name"><[topic.name]></span></div>
+          <div><span class="topic-category protractor-test-topic-category"><[topic.category]></span></div>
+          <div><span class="topic-description protractor-test-topic-description"><[topic.description]></span></div>
         </div>
       </td>
       <td>
@@ -57,7 +57,7 @@
         <span class="topic-list-status-text" ng-if="!$ctrl.topic.is_published"> Not Published </span>
         <p class="fas fa-ellipsis-v protractor-test-topic-edit-box" ng-mouseover="$ctrl.enableEditOptions(topic.id)"></p>
         <div ng-if="$ctrl.showEditOptions(topic.id)" class="topic-edit-options" ng-mouseleave="$ctrl.enableEditOptions(null)">
-          <a class="topic-edit-options-edit" ng-href="<[$ctrl.getTopicEditorUrl(topic.id)]>">
+          <a class="topic-edit-options-edit protractor-test-edit-topic-button" ng-href="<[$ctrl.getTopicEditorUrl(topic.id)]>">
             <i class="fa fa-pen"></i>
             <span>Edit</span>
           </a>

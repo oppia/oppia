@@ -82,13 +82,13 @@ describe('Topics and skills dashboard functionality', function() {
     topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(1);
     topicsAndSkillsDashboardPage.resetTopicFilters();
 
+    topicsAndSkillsDashboardPage.filterTopicsByCategory('Mathematics');
+    topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(2);
+
     topicsAndSkillsDashboardPage.filterTopicsByKeyword('gamma');
     topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(0);
     topicsAndSkillsDashboardPage.resetTopicFilters();
 
-    topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(2);
-
-    topicsAndSkillsDashboardPage.filterTopicsByCategory('Mathematics');
     topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(2);
   });
 

@@ -33,6 +33,7 @@ var TopicsAndSkillsDashboardPage = function() {
     by.css('.protractor-test-create-skill-button'));
   var deleteSkillButtons = element.all(
     by.css('.protractor-test-delete-skill-button'));
+  var topicsTable = element(by.css('.protractor-test-topics-table'));
   var topicsListItems = element.all(
     by.css('.protractor-test-topics-list-item'));
   var skillsListItems = element.all(
@@ -113,8 +114,19 @@ var TopicsAndSkillsDashboardPage = function() {
     });
 
   this.navigateToTopicWithIndex = function(index) {
-    topicsListItems.then(function(elems) {
-      elems[index].click();
+    waitFor.visibilityOf(topicsTable,
+      'Topic table taking too long to appear.');
+    element.all(
+      by.css('.protractor-test-topic-edit-box')).then((elems) => {
+      var editTopicButton = element(
+        by.css('.protractor-test-edit-topic-button'));
+      var topicEditOptionBox = elems[index];
+      browser.actions().mouseMove(topicEditOptionBox).perform();
+      waitFor.elementToBeClickable(
+        editTopicButton,
+        'Edit Topic button takes too long to be clickable');
+      editTopicButton.click();
+      waitFor.pageToFullyLoad();
     });
   };
 
@@ -200,8 +212,8 @@ var TopicsAndSkillsDashboardPage = function() {
   };
 
   this.deleteTopicWithIndex = function(index) {
-    waitFor.visibilityOf(element(by.css('.protractor-test-topics-table')),
-      'Topic Names taking too long to appear.');
+    waitFor.visibilityOf(topicsTable,
+      'Topic table taking too long to appear.');
     element.all(
       by.css('.protractor-test-topic-edit-box')).then((elems) => {
       var deleteTopicButton = element(
@@ -309,16 +321,16 @@ var TopicsAndSkillsDashboardPage = function() {
   };
 
   this.editTopic = function(topicName) {
-    waitFor.elementToBeClickable(
-      topicsTabButton, 'Unable to click on topics tab.');
-    _getTopicElements(topicName).then(function(topicElements) {
-      if (topicElements.length === 0) {
-        throw new Error('Could not find topic tile with name ' + topicName);
-      }
-      waitFor.elementToBeClickable(
-        topicElements[0], 'Unable to click on topic: ' + topicName);
-      topicElements[0].click();
-      waitFor.pageToFullyLoad();
+    waitFor.visibilityOf(topicsTable,
+      'Topic table taking too long to appear.');
+    topicNames.then((topics)=> {
+      topics.forEach((topic, index) => {
+        topic.getText().then((name) => {
+          if (topicName === name) {
+            this.navigateToTopicWithIndex(index);
+          }
+        });
+      });
     });
   };
 
