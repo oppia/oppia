@@ -35,10 +35,10 @@
     </div>
   </div>
   <div class="list-group" style="width:30%; padding-left:20px">
-    <md-card ng-if="allowSkillsFromOtherTopics" style="padding-left:10px" layout="row" class="list-view-item">
+    <md-card ng-if="canAllowSkillsFromOtherTopics()" style="padding-left:10px" layout="row" class="list-view-item">
       <label>Filter By Topics</label>
     </md-card>
-    <div ng-if="allowSkillsFromOtherTopics" style="max-height: 25vh; overflow-y: auto;">
+    <div ng-if="canAllowSkillsFromOtherTopics()" style="max-height: 25vh; overflow-y: auto;">
       <md-card class="list-view-item ">
         <md-checkbox style="margin-left:10px" ng-repeat="topic in topicFilterList" ng-model="topic.checked" ng-change="updateSkillsListOnTopicFilterChange()"><[topic.topicName]></md-checkbox>
       </md-card>

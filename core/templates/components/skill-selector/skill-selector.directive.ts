@@ -42,8 +42,6 @@ angular.module('oppia').directive('selectSkill', [
           ctrl.$onInit = function() {
             $scope.selectedSkill = null;
             $scope.categorizedSkills = $scope.getCategorizedSkills();
-            $scope.allowSkillsFromOtherTopics = (
-              $scope.canAllowSkillsFromOtherTopics());
             $scope.checkIfEmpty = function(skills) {
               return (skills.length === 0);
             };
