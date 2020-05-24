@@ -23,6 +23,7 @@ import { AnswerClassificationService } from
 import { LearnerAnswerDetailsBackendApiService } from
   'domain/statistics/learner-answer-details-backend-api.service.ts';
 import { State } from 'domain/state/StateObjectFactory.ts';
+const constants = require('constants.ts');
 
 interface ProbabilityIndexes {
   typeA: number;
@@ -39,7 +40,8 @@ export class LearnerAnswerInfoService {
     private learnerAnswerDetailsBackendApiService:
       LearnerAnswerDetailsBackendApiService) {}
 
-  INTERACTION_IDS_WITHOUT_ANSWER_DETAILS;
+  INTERACTION_IDS_WITHOUT_ANSWER_DETAILS =
+    constants.INTERACTION_IDS_WITHOUT_ANSWER_DETAILS;
 
   submittedAnswerInfoCount: number = 0;
   currentEntityId: string = null;
@@ -138,20 +140,20 @@ export class LearnerAnswerInfoService {
   }
 
   getCurrentAnswer(): string {
-    return currentAnswer;
+    return this.currentAnswer;
   }
 
   getCurrentInteractionRulesService(): any {
-    return currentInteractionRulesService;
+    return this.currentInteractionRulesService;
   }
 
-  getSolicitAnswerDetailsQuestion(): any {
+  getSolicitAnswerDetailsQuestion(): string {
     var el = $('<p>');
     el.attr('translate', 'I18N_SOLICIT_ANSWER_DETAILS_QUESTION');
     return ($('<span>').append(el)).html();
   }
 
-  getSolicitAnswerDetailsFeedback(): any {
+  getSolicitAnswerDetailsFeedback(): string {
     var el = $('<p>');
     el.attr('translate', 'I18N_SOLICIT_ANSWER_DETAILS_FEEDBACK');
     return ($('<span>').append(el)).html();
