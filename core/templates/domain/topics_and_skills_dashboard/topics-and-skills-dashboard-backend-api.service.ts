@@ -22,15 +22,17 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TopicsAndSkillsDashboardDomainConstants } from
   // eslint-disable-next-line max-len
-  '../topics_and_skills_dashboard/topics-and-skills-dashboard-domain.constants';
+  'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-domain.constants';
 
-  interface ITopicSummaryBackendDict {
+export interface ITopicSummaryBackendDict {
     /* eslint-disable camelcase */
     id: string;
     name: string;
+    category: string;
     language_code: string;
     description: string;
     version: number;
+    is_published: boolean;
     canonical_story_count: number;
     additional_story_count: number;
     uncategorized_skill_count: number;

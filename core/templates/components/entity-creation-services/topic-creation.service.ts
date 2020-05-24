@@ -21,12 +21,12 @@ require(
 require(
   'components/forms/custom-forms-directives/thumbnail-uploader.directive.ts');
 require('domain/topic/topic-update.service.ts');
+require('domain/topics_and_skills_dashboard/DashboardFilterObjectFactory');
 require('domain/utilities/url-interpolation.service.ts');
 require('domain/topic/topic-creation-backend-api.service.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 require('services/alerts.service.ts');
 require('services/image-upload-helper.service.ts');
-
 
 angular.module('oppia').factory('TopicCreationService', [
   '$rootScope', '$uibModal', '$window', 'AlertsService',
@@ -54,40 +54,16 @@ angular.module('oppia').factory('TopicCreationService', [
             'new-topic-name-editor.template.html'),
           backdrop: true,
           controller: [
-            '$scope', '$uibModalInstance', 'TopicEditorStateService',
-            function($scope, $uibModalInstance, TopicEditorStateService) {
-              $scope.pageHasLoaded = false;
-              $scope.topic = TopicEditorStateService.getTopic();
-              $scope.topicRights = TopicEditorStateService.getTopicRights();
-              $scope.topicNameEditorIsShown = false;
-              $scope.editableName = $scope.topic.getName();
-              $scope.editableDescription = $scope.topic.getDescription();
+            '$scope', '$uibModalInstance', 'DashboardTopicObjectFactory',
+            function($scope, $uibModalInstance, DashboardTopicObjectFactory) {
               $scope.categories = TOPIC_CATEGORIES;
-              $scope.editableDescriptionIsEmpty = (
-                $scope.editableDescription === '');
-              $scope.topicDescriptionChanged = false;
-              $scope.topicObject = {
-                name: '',
-                category: '',
-                description: '',
-              };
+              $scope.topic = DashboardTopicObjectFactory.createDefault();
               $scope.MAX_CHARS_IN_TOPIC_NAME = MAX_CHARS_IN_TOPIC_NAME;
               $scope.MAX_CHARS_IN_TOPIC_DESCRIPTION = (
                 MAX_CHARS_IN_TOPIC_DESCRIPTION);
-              // No need for a length check below since the topic name input
-              // field in the HTML file has the maxlength attribute which
-              // disallows the user from entering more than the valid length.
-              $scope.isTopicValid = function() {
-                for (let key in $scope.topicObject) {
-                  if (!$scope.topicObject[key]) {
-                    return false;
-                  }
-                }
-                return true;
-              };
-              $scope.pageHasLoaded = true;
+
               $scope.save = function() {
-                $uibModalInstance.close($scope.topicObject);
+                $uibModalInstance.close($scope.topic);
               };
               $scope.cancel = function() {
                 $uibModalInstance.dismiss('cancel');
@@ -96,16 +72,11 @@ angular.module('oppia').factory('TopicCreationService', [
           ]
         });
 
-        modalInstance.result.then(function(topicObject) {
-          if (topicObject.name === '') {
-            throw new Error('Topic name cannot be empty');
+        modalInstance.result.then(function(topic) {
+          if (!topic.isValid()) {
+            throw new Error('Topic fields can not be empty');
           }
-          if (topicObject.description === '') {
-            throw new Error('Topic description cannot be empty');
-          }
-          if (topicObject.category === '') {
-            throw new Error('Topic category cannot be empty');
-          }
+
           topicCreationInProgress = true;
           AlertsService.clearWarnings();
           // $window.open has to be initialized separately since if the 'open
@@ -116,7 +87,7 @@ angular.module('oppia').factory('TopicCreationService', [
           // and filled with URL once the details are fetched from the backend.
           var newTab = $window.open();
           TopicCreationBackendApiService.createTopic(
-            topicObject).then(
+            topic).then(
             function(response) {
               $rootScope.$broadcast(
                 EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED);

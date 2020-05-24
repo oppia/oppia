@@ -295,8 +295,6 @@ DEFAULT_SKILL_EXPLANATION_CONTENT_ID = 'explanation'
 
 # Default description for a newly-minted topic.
 DEFAULT_TOPIC_DESCRIPTION = ''
-# Default category for a newly-minted topic.
-DEFAULT_TOPIC_CATEGORY = ''
 # Default abbreviated name for a newly-minted topic.
 DEFAULT_ABBREVIATED_TOPIC_NAME = ''
 # Default content id for the subtopic page's content.

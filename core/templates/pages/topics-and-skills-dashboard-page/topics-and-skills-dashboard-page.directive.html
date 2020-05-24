@@ -47,12 +47,12 @@
                 </select>
               </div>
               <div>
-                <i class="fa fa-angle-left topic-pagination-arrow" ng-click="$ctrl.changePage($ctrl.PREV_PAGE)"></i>
-                <span class="dashboard-list-pagination-value" ng-repeat="n in $ctrl.generateIndexNumbersTillRange($ctrl.currentCount/$ctrl.itemsPerPage)" ng-click="$ctrl.paginate($index)">
+                <i class="fa fa-angle-left topic-pagination-arrow" ng-click="$ctrl.changePageByOne($ctrl.MOVE_TO_PREV_PAGE)"></i>
+                <span class="dashboard-list-pagination-value" ng-repeat="n in $ctrl.generateNumbersTillRange($ctrl.currentCount/$ctrl.itemsPerPage)" ng-click="$ctrl.changePage($index)">
                   <span ng-if="$ctrl.pageNumber===$index" class="dashboard-list-pagination-active"><[$index+1]></span>
                   <span ng-if="$ctrl.pageNumber!==$index"><[$index+1]></span>
                 </span>
-                <i class="fa fa-angle-right topic-pagination-arrow" ng-click="$ctrl.changePage($ctrl.NEXT_PAGE)"></i>
+                <i class="fa fa-angle-right topic-pagination-arrow" ng-click="$ctrl.changePageByOne($ctrl.MOVE_TO_NEXT_PAGE)"></i>
               </div>
             </div>
           </div>

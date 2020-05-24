@@ -17,18 +17,18 @@
  * @fileoverview Unit tests for the topics and skills dashboard directive.
  */
 
+import { AlertsService } from 'services/alerts.service';
 import { UpgradedServices } from 'services/UpgradedServices';
-import {AlertsService} from 'services/alerts.service';
 
 describe('Topics List Directive', function() {
   var $uibModal = null;
-  var $scope;
-  var ctrl;
+  var $scope = null;
+  var ctrl = null;
   var $q = null;
   var $httpBackend = null;
   var $rootScope = null;
-  var directive;
-  var AlertsService;
+  var directive = null;
+  var AlertsService = null;
 
   beforeEach(angular.mock.module('oppia'));
 
@@ -138,7 +138,7 @@ describe('Topics List Directive', function() {
     var alertSpy = spyOn(AlertsService, 'addWarning').and.callThrough();
 
     var topicId = 'CdjnJUE332dd';
-    var url = `/topic_editor_handler/data/${topicId}`;
+    var url = '/topic_editor_handler/data/CdjnJUE332dd';
     $httpBackend.expectDELETE(url).respond(400);
     ctrl.deleteTopic(topicId);
     $httpBackend.flush();

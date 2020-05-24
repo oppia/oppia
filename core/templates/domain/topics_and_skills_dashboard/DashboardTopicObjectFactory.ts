@@ -24,13 +24,19 @@ export class DashboardTopic {
     name: string;
     category: string;
     description: string;
-
-    constructor(category, keywords, sort) {
+    /**
+     * @param {String} category - category of the topic
+     * @param {String} name - name of the topic
+     * @param {String} description - description of the topic
+     */
+    constructor(category, name, description) {
       this.category = category;
-      this.name = keywords;
-      this.description = sort;
+      this.name = name;
+      this.description = description;
     }
-
+    /**
+     * @returns {Boolean} - A boolean indicating if the topic is valid
+     */
     isValid(): boolean {
       return !(!this.name || !this.category || !this.description);
     }
@@ -40,6 +46,9 @@ export class DashboardTopic {
   providedIn: 'root'
 })
 export class DashboardTopicObjectFactory {
+  /**
+    * @returns {DashboardTopic} - A new DashboardTopic instance
+    */
   createDefault(): DashboardTopic {
     return new DashboardTopic(
       '', '', '');

@@ -25,14 +25,21 @@ export class DashboardFilter {
     keywords: string;
     sort: string;
     status: string;
-
+    /**
+     * @param {String} category - category to filter
+     * @param {String} keywords - keywords to filter
+     * @param {String} sort - sort by filter value
+     * @param {String} status - status to filter
+     */
     constructor(category, keywords, sort, status) {
       this.category = category;
       this.keywords = keywords;
       this.sort = sort;
       this.status = status;
     }
-
+    /**
+     * Resets the filter object values
+     */
     reset(): void {
       this.category = '';
       this.keywords = '';
@@ -45,6 +52,9 @@ export class DashboardFilter {
   providedIn: 'root'
 })
 export class DashboardFilterObjectFactory {
+  /**
+     * @returns {DashboardFilter} - A new DashboardFilter instance
+     */
   createDefault(): DashboardFilter {
     return new DashboardFilter(
       '', '', '', '');

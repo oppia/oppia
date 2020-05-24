@@ -265,7 +265,6 @@ describe('Chapter editor functionality', function() {
       topicsAndSkillsDashboardPage.get();
       topicsAndSkillsDashboardPage.createTopic(topicName,
         'Description', 'Mathematics', false);
-
       topicEditorPage.createStory('Story 0');
       browser.getCurrentUrl().then(function(url) {
         storyId = url.split('/')[4];

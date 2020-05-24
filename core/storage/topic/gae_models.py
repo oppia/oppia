@@ -61,7 +61,7 @@ class TopicModel(base_models.VersionedModel):
     thumbnail_bg_color = ndb.StringProperty(indexed=True)
     # The description of the topic.
     description = ndb.TextProperty(indexed=False)
-    # The category this exploration belongs to.
+    # The category this topic belongs to.
     category = ndb.StringProperty(required=True, indexed=True)
     # This consists of the list of objects referencing canonical stories that
     # are part of this topic.

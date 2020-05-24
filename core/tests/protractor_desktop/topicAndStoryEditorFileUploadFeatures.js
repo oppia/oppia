@@ -138,12 +138,10 @@ describe('Topic editor functionality', function() {
     var TOPIC_NAME = 'TASEFUF_3';
     var TOPIC_DESCRIPTION = 'TASEFUF_3 description';
     var TOPIC_CATEGORY = 'Mathematics';
-
     var defaultThumbnailImageSrc = null;
+
     topicsAndSkillsDashboardPage.createTopic(TOPIC_NAME,
       TOPIC_DESCRIPTION, TOPIC_CATEGORY, false);
-
-
 
     topicEditorPage.expectNumberOfStoriesToBe(0);
     topicEditorPage.createStory('Story Title');

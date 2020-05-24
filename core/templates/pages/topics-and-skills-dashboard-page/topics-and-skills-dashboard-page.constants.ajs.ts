@@ -41,11 +41,8 @@ angular.module('oppia').constant(
   TopicsAndSkillsDashboardPageConstants.SKILL_DESCRIPTION_STATUS_VALUES);
 
 angular.module('oppia').constant(
-  'TOPIC_CATEGORIES',
-  TopicsAndSkillsDashboardPageConstants.TOPIC_CATEGORIES);
+  'TOPIC_SORT_OPTIONS',
+  TopicsAndSkillsDashboardPageConstants.TOPIC_SORT_OPTIONS);
 angular.module('oppia').constant(
-  'E_SORT_OPTIONS',
-  TopicsAndSkillsDashboardPageConstants.E_SORT_OPTIONS);
-angular.module('oppia').constant(
-  'E_PUBLISHED_OPTIONS',
-  TopicsAndSkillsDashboardPageConstants.E_PUBLISHED_OPTIONS);
+  'TOPIC_PUBLISHED_OPTIONS',
+  TopicsAndSkillsDashboardPageConstants.TOPIC_PUBLISHED_OPTIONS);

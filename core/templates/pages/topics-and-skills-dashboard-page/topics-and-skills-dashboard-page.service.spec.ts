@@ -16,11 +16,11 @@
  * @fileoverview Unit tests for TopicsAndSkillsDashboardPageService.
  */
 
+import { DashboardFilterObjectFactory } from
+  'domain/topics_and_skills_dashboard/DashboardFilterObjectFactory';
 import { TopicsAndSkillsDashboardPageService } from
   // eslint-disable-next-line max-len
   'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.service';
-import { DashboardFilterObjectFactory } from
-  'domain/topics_and_skills_dashboard/DashboardFilterObjectFactory';
 
 describe('Topic and Skill dashboard page service', () => {
   let tsds: TopicsAndSkillsDashboardPageService = null;
@@ -125,5 +125,10 @@ describe('Topic and Skill dashboard page service', () => {
     filterOptions.category = 'Mathematics';
     filteredArray = tsds.getFilteredTopics(topicsArray, filterOptions);
     expect(filteredArray).toEqual([topic1, topic2]);
+
+    filterOptions.sort = 'Invalid sort value';
+    expect(() => {
+      tsds.getFilteredTopics(topicsArray, filterOptions);
+    }).toThrowError('Invalid filter by sort value provided.');
   });
 });

@@ -191,6 +191,7 @@ var TopicsAndSkillsDashboardPage = function() {
       });
     });
   };
+
   this.filterTopicsByKeyword = function(keyword) {
     waitFor.visibilityOf(
       topicFilterKeywordField,
@@ -198,6 +199,7 @@ var TopicsAndSkillsDashboardPage = function() {
     topicFilterKeywordField.click();
     topicFilterKeywordField.sendKeys(keyword);
   };
+
   this.filterTopicsByCategory = function(keyword) {
     waitFor.visibilityOf(
       topicFilterKeywordField,
@@ -205,6 +207,7 @@ var TopicsAndSkillsDashboardPage = function() {
     topicFilterKeywordField.click();
     topicFilterCategoryField.sendKeys(keyword);
   };
+
   this.resetTopicFilters = function() {
     waitFor.visibilityOf(
       topicResetFilters, 'Reset button taking too long to be clickable');

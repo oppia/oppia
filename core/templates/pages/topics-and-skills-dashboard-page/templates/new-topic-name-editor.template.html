@@ -7,9 +7,9 @@
   <div class="modal-body create-new-topic-form">
     <div class="create-new-topic-input-field">
       <div><span class="create-new-topic-input-label">Category</span></div>
-      <div ng-if="pageHasLoaded">
+      <div>
         <select2-dropdown class = "protractor-test-new-topic-category-field"
-                          item="topicObject.category"
+                          item="topic.category"
                           choices="categories"
                           placeholder="Choose a category"
                           width="60%">
@@ -18,7 +18,7 @@
     </div>
     <div class="create-new-topic-input-field" ng-class="{'has-error': !isTopicNameValid()}">
       <div><span class="create-new-topic-input-label">Name</span></div>
-      <input class="protractor-test-new-topic-name-field" ng-model="topicObject.name" maxlength="<[MAX_CHARS_IN_TOPIC_NAME]>">
+      <input class="protractor-test-new-topic-name-field" ng-model="topic.name" maxlength="<[MAX_CHARS_IN_TOPIC_NAME]>">
       <div class="oppia-input-box-subtitle">
         <i>
           Topic name should be at most <[MAX_CHARS_IN_TOPIC_NAME]> characters.
@@ -30,7 +30,7 @@
       <textarea class="protractor-test-new-topic-description-field"
                 rows="4" cols="50" placeholder="Enter description"
                 maxlength="<[MAX_CHARS_IN_TOPIC_DESCRIPTION]>"
-                ng-model="topicObject.description">
+                ng-model="topic.description">
       </textarea>
       <div class="oppia-input-box-subtitle">
         <i>
@@ -49,7 +49,7 @@
 
   <div class="modal-footer">
     <button class="btn btn-secondary" ng-click="cancel()" type="button">Cancel</button>
-    <button class="btn btn-success protractor-test-confirm-topic-creation-button" type="submit" ng-disabled="!isTopicValid()">
+    <button class="btn btn-success protractor-test-confirm-topic-creation-button" type="submit" ng-disabled="!topic.isValid()">
       <span>Create Topic</span>
     </button>
   </div>

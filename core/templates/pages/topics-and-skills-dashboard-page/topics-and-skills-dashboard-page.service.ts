@@ -19,21 +19,31 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
+import { DashboardFilter } from
+  'domain/topics_and_skills_dashboard/DashboardFilterObjectFactory';
+import { ITopicSummaryBackendDict } from
+  // eslint-disable-next-line max-len
+  'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 import { TopicsAndSkillsDashboardPageConstants } from
   // eslint-disable-next-line max-len
   'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.constants';
-import { DashboardFilter } from
-  'domain/topics_and_skills_dashboard/DashboardFilterObjectFactory';
 
 @Injectable({
   providedIn: 'root'
 })
 export class TopicsAndSkillsDashboardPageService {
-  getFilteredTopics(topicsArray, filterObject: DashboardFilter) {
+  /**
+   * @param {Array} topicsArray - The original topics array
+   * @param {DashboardFilter} filterObject - the filter object values
+   * @returns {Array} filteredTopics - The filtered Topics array
+   */
+  getFilteredTopics(
+      topicsArray: Array<ITopicSummaryBackendDict>,
+      filterObject: DashboardFilter): Array<ITopicSummaryBackendDict> {
     const {sort, keywords, category, status} = filterObject;
-    let ESortOptions = TopicsAndSkillsDashboardPageConstants.E_SORT_OPTIONS;
+    let ESortOptions = TopicsAndSkillsDashboardPageConstants.TOPIC_SORT_OPTIONS;
     let EPublishedOptions = (
-      TopicsAndSkillsDashboardPageConstants.E_PUBLISHED_OPTIONS);
+      TopicsAndSkillsDashboardPageConstants.TOPIC_PUBLISHED_OPTIONS);
     let filteredTopics = topicsArray;
     if (keywords) {
       filteredTopics = topicsArray.filter((topic) => {
@@ -80,6 +90,9 @@ export class TopicsAndSkillsDashboardPageService {
         case ESortOptions.DecreasingCreatedOn:
           filteredTopics.sort((a, b) =>
             -(b.topic_model_last_updated - a.topic_model_last_updated));
+          break;
+        default:
+          throw new Error('Invalid filter by sort value provided.');
       }
     }
     return filteredTopics;

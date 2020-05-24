@@ -19,21 +19,22 @@
 import { UpgradedServices } from 'services/UpgradedServices';
 
 describe('Topics and Skills Dashboard Page', function() {
-  var $scope, ctrl;
+  var $scope = null, ctrl = null;
   var $httpBackend = null;
   var $uibModal = null;
-  var directive;
-  var $rootScope;
-  var $q;
-  var DashboardFilterObjectFactory;
+  var directive = null;
+  var $rootScope = null;
+  var $q = null;
+  var DashboardFilterObjectFactory = null;
   var TOPICS_AND_SKILLS_DASHBOARD_DATA_URL =
       '/topics_and_skills_dashboard/data';
   var SAMPLE_TOPIC_ID = 'hyuy4GUlvTqJ';
-  var AlertsService;
+  var AlertsService = null;
   var sampleDataResults = {
     topic_summary_dicts: [{
       id: SAMPLE_TOPIC_ID,
       name: 'Sample Name',
+      category: 'Mathematics',
       language_code: 'en',
       version: 1,
       canonical_story_count: 3,
@@ -105,6 +106,7 @@ describe('Topics and Skills Dashboard Page', function() {
     $httpBackend.expect('GET', TOPICS_AND_SKILLS_DASHBOARD_DATA_URL).respond(
       sampleDataResults);
     $httpBackend.flush();
+
     const filterObject = DashboardFilterObjectFactory.createDefault();
     expect(ctrl.pageNumber).toEqual(0);
     expect(ctrl.topicPageNumber).toEqual(0);
@@ -133,7 +135,7 @@ describe('Topics and Skills Dashboard Page', function() {
       sampleDataResults.topic_summary_dicts);
     expect(ctrl.untriagedSkillSummaries).toEqual(
       sampleDataResults.untriaged_skill_summary_dicts);
-    expect(ctrl.totalCount).toEqual(1);
+    expect(ctrl.totalEntityCountToDisplay).toEqual(1);
     expect(ctrl.userCanCreateTopic).toEqual(true);
     expect(ctrl.userCanCreateSkill).toEqual(true);
   });
@@ -149,13 +151,13 @@ describe('Topics and Skills Dashboard Page', function() {
     expect(ctrl.activeTab).toEqual('topics');
   });
 
-  it('should paginate', function() {
+  it('should goToPageNumber', function() {
     $httpBackend.expect('GET', TOPICS_AND_SKILLS_DASHBOARD_DATA_URL).respond(
       sampleDataResults);
     $httpBackend.flush();
     expect(ctrl.topicPageNumber).toEqual(0);
     expect(ctrl.pageNumber).toEqual(0);
-    ctrl.paginate(4);
+    ctrl.goToPageNumber(4);
     expect(ctrl.topicPageNumber).toEqual(4);
     expect(ctrl.pageNumber).toEqual(4);
   });
@@ -169,7 +171,7 @@ describe('Topics and Skills Dashboard Page', function() {
     expect(modalSpy).toHaveBeenCalled();
   });
 
-  it('should create open Create Skill modal', function() {
+  it('should open Create Skill Modal', function() {
     $httpBackend.expect('GET', TOPICS_AND_SKILLS_DASHBOARD_DATA_URL).respond(
       sampleDataResults);
     $httpBackend.flush();
@@ -178,38 +180,56 @@ describe('Topics and Skills Dashboard Page', function() {
     expect(modalSpy).toHaveBeenCalled();
   });
 
+  it('should call the skill creation service', function() {
+    $httpBackend.expect('GET', TOPICS_AND_SKILLS_DASHBOARD_DATA_URL).respond(
+      sampleDataResults);
+    $httpBackend.flush();
+
+    spyOn($uibModal, 'open').and.returnValue({
+      result: $q.resolve({
+        description: 'Description',
+        rubrics: 'Easy',
+        explanation: 'Explanation'
+      })
+    });
+
+    $httpBackend.expectPOST('/skill_editor_handler/create_new').respond(200);
+    ctrl.createSkill();
+    $httpBackend.flush();
+  });
+
   it('should navigate the page', function() {
     $httpBackend.expect('GET', TOPICS_AND_SKILLS_DASHBOARD_DATA_URL).respond(
       sampleDataResults);
     $httpBackend.flush();
-    var totalCount = 50;
+    var totalEntityCountToDisplay = 50;
     var itemsPerPage = 10;
 
     expect(ctrl.activeTab).toEqual('topics');
 
-    ctrl.totalCount = totalCount;
+    ctrl.totalEntityCountToDisplay = totalEntityCountToDisplay;
     ctrl.itemsPerPage = itemsPerPage;
 
     expect(ctrl.topicPageNumber).toEqual(0);
     expect(ctrl.pageNumber).toEqual(0);
 
-    ctrl.changePage('next_page');
+    ctrl.changePageByOne('next_page');
     expect(ctrl.topicPageNumber).toEqual(1);
     expect(ctrl.pageNumber).toEqual(1);
 
-    ctrl.changePage('next_page');
+    ctrl.changePageByOne('next_page');
     expect(ctrl.topicPageNumber).toEqual(2);
     expect(ctrl.pageNumber).toEqual(2);
 
-    ctrl.changePage('prev_page');
+    ctrl.changePageByOne('prev_page');
     expect(ctrl.topicPageNumber).toEqual(1);
     expect(ctrl.pageNumber).toEqual(1);
 
-    ctrl.changePage('prev_page');
+    ctrl.changePageByOne('prev_page');
     expect(ctrl.topicPageNumber).toEqual(0);
     expect(ctrl.pageNumber).toEqual(0);
 
-    ctrl.changePage('prev_page');
+    ctrl.changePageByOne('prev_page');
     expect(ctrl.topicPageNumber).toEqual(0);
     expect(ctrl.pageNumber).toEqual(0);
   });
@@ -232,7 +252,7 @@ describe('Topics and Skills Dashboard Page', function() {
     $httpBackend.expect('GET', TOPICS_AND_SKILLS_DASHBOARD_DATA_URL).respond(
       sampleDataResults);
     $httpBackend.flush();
-    var array = ctrl.generateIndexNumbersTillRange(5);
+    var array = ctrl.generateNumbersTillRange(5);
     expect(array).toEqual([0, 1, 2, 3, 4]);
   });
 
@@ -320,11 +340,12 @@ describe('Topics and Skills Dashboard Page', function() {
       expect(ctrl.activeTab).toEqual('untriagedSkills');
     });
 
-  it('should call paginate when changeItemsPerPage is called', function() {
-    var paginateSpy = spyOn(ctrl, 'paginate');
-    ctrl.changeItemsPerPage();
-    expect(paginateSpy).toHaveBeenCalledWith(0);
-  });
+  it('should call goToPageNumber when changeItemsPerPage is called',
+    function() {
+      var changePageSpy = spyOn(ctrl, 'goToPageNumber');
+      ctrl.changeItemsPerPage();
+      expect(changePageSpy).toHaveBeenCalledWith(0);
+    });
 
   it('should call initDashboard on reinitialized event', function() {
     $httpBackend.expect('GET', TOPICS_AND_SKILLS_DASHBOARD_DATA_URL).respond(
@@ -333,23 +354,5 @@ describe('Topics and Skills Dashboard Page', function() {
     var initDashboardSpy = spyOn(ctrl, '_initDashboard');
     $rootScope.$broadcast('topicsAndSkillsDashboardReinitialized');
     expect(initDashboardSpy).toHaveBeenCalled();
-  });
-
-  it('should call the skill creation service', function() {
-    $httpBackend.expect('GET', TOPICS_AND_SKILLS_DASHBOARD_DATA_URL).respond(
-      sampleDataResults);
-    $httpBackend.flush();
-
-    spyOn($uibModal, 'open').and.returnValue({
-      result: $q.resolve({
-        description: 'Description',
-        rubrics: 'Easy',
-        explanation: 'Explanation'
-      })
-    });
-
-    $httpBackend.expectPOST('/skill_editor_handler/create_new').respond(200);
-    ctrl.createSkill();
-    $httpBackend.flush();
   });
 });
