@@ -85,6 +85,7 @@ export class RequestInterceptor implements HttpInterceptor {
               if (!(request.body instanceof FormData)) {
                 var body = new FormData();
                 body.append('payload', JSON.stringify(request.body));
+                // @ts-ignore
                 request.body = body;
               }
               request.body.append('csrf_token', token);
