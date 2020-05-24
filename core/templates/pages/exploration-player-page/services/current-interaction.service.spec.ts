@@ -43,7 +43,7 @@ describe('Current Interaction Service', () => {
 
   it('should properly register onSubmitFn and submitAnswerFn', () => {
     let answerState = null;
-    let dummyOnSubmitFn = function(answer, interactionRulesService) {
+    let dummyOnSubmitFn = (answer, interactionRulesService) => {
       answerState = answer;
     };
 
@@ -52,7 +52,7 @@ describe('Current Interaction Service', () => {
     expect(answerState).toEqual(DUMMY_ANSWER);
 
     answerState = null;
-    let dummySubmitAnswerFn = function() {
+    let dummySubmitAnswerFn = () => {
       currentInteractionService.onSubmit(DUMMY_ANSWER, null);
     };
     currentInteractionService.registerCurrentInteraction(
@@ -62,10 +62,10 @@ describe('Current Interaction Service', () => {
   });
 
   it('should properly register validityCheckFn', () => {
-    let dummyValidityCheckFn = function() {
+    let dummyValidityCheckFn = () => {
       return false;
     };
-    let dummySubmitAnswerFn = function() {
+    let dummySubmitAnswerFn = () => {
       return false;
     };
     currentInteractionService.registerCurrentInteraction(
@@ -75,7 +75,7 @@ describe('Current Interaction Service', () => {
   });
 
   it('should handle case where validityCheckFn is null', () => {
-    let dummySubmitAnswerFn = function() {
+    let dummySubmitAnswerFn = () => {
       return false;
     };
     currentInteractionService.registerCurrentInteraction(
@@ -92,17 +92,17 @@ describe('Current Interaction Service', () => {
   it('should properly register and clear presubmit hooks', () => {
     let hookStateA = 0;
     let hookStateB = 1;
-    let hookA = function() {
+    let hookA = () => {
       hookStateA = hookStateA + 1;
     };
-    let hookB = function() {
+    let hookB = () => {
       hookStateB = hookStateB * 3;
     };
 
     currentInteractionService.registerPresubmitHook(hookA);
     currentInteractionService.registerPresubmitHook(hookB);
 
-    currentInteractionService.setOnSubmitFn(function() {});
+    currentInteractionService.setOnSubmitFn(() => {});
     currentInteractionService.onSubmit(null, null);
 
     expect(hookStateA).toEqual(1);
