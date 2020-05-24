@@ -279,7 +279,7 @@ class UsernameLengthAuditOneOffJobTests(test_utils.GenericTestBase):
     USER_2_EMAIL = '2@example.com'
     USER_2_USERNAME = '123456789123456789124'
     USER_3_EMAIL = '3@example.com'
-    USER_3_USERNAME = '123456789123456789123456789123456789'
+    USER_3_USERNAME = 'a' * 30
     USER_4_EMAIL = '4@example.com'
     # Username 4 length is 20, so it shouldn't be in the output.
     USER_4_USERNAME = '12345678912345678912'
@@ -302,7 +302,7 @@ class UsernameLengthAuditOneOffJobTests(test_utils.GenericTestBase):
 
         expected_output = [u'[u\'Length: 21\', u"Usernames: [\'%s\', \'%s\']"]'
                            % (self.USER_1_USERNAME, self.USER_2_USERNAME),
-                           u'[u\'Length: 36\', u"Usernames: [\'%s\']"]'
+                           u'[u\'Length: 30\', u"Usernames: [\'%s\']"]'
                            % self.USER_3_USERNAME]
 
         actual_output = self._run_one_off_job()
