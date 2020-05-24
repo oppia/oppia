@@ -270,9 +270,9 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
             csrf_token=csrf_token,
             expected_status_int=400)
 
-        self.assertEqual(
-            response_dict['error'],
-            'No image data provided for file with name img.svg')
+        self.assertIn(
+            'No image data provided for file with name img.svg',
+            response_dict['error'])
 
         large_image = '<svg><path d="%s" /></svg>' % (
             'M150 0 L75 200 L225 200 Z ' * 4000)
@@ -283,9 +283,9 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
                 ('img.svg', 'img.svg', large_image),
             ), expected_status_int=400)
 
-        self.assertEqual(
-            response_dict['error'],
-            'Image exceeds file size limit of 100 KB.')
+        self.assertIn(
+            'Image exceeds file size limit of 100 KB.',
+            response_dict['error'])
         self.logout()
 
     def test_skill_creation_with_valid_images(self):

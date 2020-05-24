@@ -182,6 +182,9 @@ class NewSkillHandler(base.BaseHandler):
 
         skill_services.save_new_skill(self.user_id, skill)
 
+        image_validation_error_message_suffix = (
+            'Please go to oppia.org/skill_editor/%s to edit '
+            'the image.' % skill.id)
         for filename in image_filenames:
             image = self.request.get(filename)
             if not image:
@@ -189,12 +192,14 @@ class NewSkillHandler(base.BaseHandler):
                     'Image not provided for file with name %s when the skill '
                     'with id %s was created.' % (filename, skill.id))
                 raise self.InvalidInputException(
-                    'No image data provided for file with name %s' % filename)
+                    'No image data provided for file with name %s. %s'
+                    % (filename, image_validation_error_message_suffix))
             try:
                 file_format = (
                     image_validation_services.validate_image_and_filename(
                         image, filename))
             except utils.ValidationError as e:
+                e = '%s %s' % (e, image_validation_error_message_suffix)
                 raise self.InvalidInputException(e)
             image_is_compressible = (
                 file_format in feconf.COMPRESSIBLE_IMAGE_FORMATS)

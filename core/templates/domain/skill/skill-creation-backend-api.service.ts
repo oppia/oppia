@@ -88,7 +88,7 @@ export class SkillCreationBackendApiService {
         }
       }, (errorResponse) => {
         if (errorCallback) {
-          errorCallback(errorResponse.body);
+          errorCallback(errorResponse.error.error);
         }
       });
   }

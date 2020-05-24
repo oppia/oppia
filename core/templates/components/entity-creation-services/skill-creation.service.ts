@@ -92,6 +92,8 @@ angular.module('oppia').factory('SkillCreationService', [
                   skill_id: response.skillId
                 });
             }, 150);
+          }, function(errorMessage) {
+            AlertsService.addWarning(errorMessage);
           });
       }
     };

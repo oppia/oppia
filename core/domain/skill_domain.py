@@ -911,7 +911,8 @@ class Skill(python_utils.OBJECT):
         versioned_rubrics['rubrics'] = updated_rubrics
 
     def get_all_html_content_strings(self):
-        """Returns all the field values in the skill that has html content.
+        """Returns all html strings that are part of the skill
+        (or any of its subcomponents).
 
         Returns:
             list(str). The list of html contents.
