@@ -72,6 +72,25 @@
   </div>
 </md-card>
 
+<md-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
+  <h3>Update username</h3>
+  <div class="oppia-query-form">
+    <form class="form" ng-submit="$ctrl.updateUsername()">
+      <div class="form-group row">
+        <label>Old username:</label>
+        <input type="text" ng-model="$ctrl.oldUsername" required="true">
+      </div>
+      <div class="form-group row">
+        <label>New username:</label>
+        <input type="text" ng-model="$ctrl.newUsername" required="true" maxlength="<[$ctrl.MAX_USERNAME_LENGTH]>">
+      </div>
+      <div class="form-group row">
+        <input type="submit" value="Update">
+      </div>
+    </form>
+  </div>
+</md-card>
+
 <style>
   .oppia-admin-page-card {
     max-width: 700px
