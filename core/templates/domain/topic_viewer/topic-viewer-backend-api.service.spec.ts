@@ -67,6 +67,7 @@ describe('Topic viewer backend API service', () => {
     sampleDataResults = {
       topic_name: 'topic_name',
       topic_id: 'topic_id',
+      topic_description: 'Topic description',
       canonical_story_dicts: [{
         id: '0',
         title: 'Story Title',

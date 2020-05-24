@@ -1,45 +1,88 @@
-<background-banner></background-banner>
 <div class="oppia-topic-viewer-container" style="position: relative;">
-  <div class="oppia-topic-name">
-    <[$ctrl.topicName]>
-  </div>
   <div class="oppia-topic-viewer-tabs-container">
     <ul class="topic-viewer-tabs">
-      <li ng-class="{'topic-viewer-tabs-active': $ctrl.activeTab === 'story'}">
-        <a class="topic-viewer-tabs-text"
-           ng-click="$ctrl.setActiveTab('story')"
-           translate="I18N_TOPIC_VIEWER_PLAY">
-        </a>
+      <li ng-class="{'topic-viewer-tabs-active': $ctrl.activeTab === 'info'}">
+        <div style="padding-top: 20px" class="topic-viewer-tabs-text" ng-click="$ctrl.setActiveTab('info')">
+          <span class="material-icons tab-icon"> info_outline </span>
+          <a class="tab-title"
+             translate="I18N_TOPIC_VIEWER_INFO">
+          </a>
+        </div>
       </li>
-      <li ng-class="{'topic-viewer-tabs-active': $ctrl.activeTab === 'practice'}" ng-show="$ctrl.trainTabShouldBeDisplayed">
-        <a class="topic-viewer-tabs-text"
-           ng-click="$ctrl.setActiveTab('practice')"
-           translate="I18N_TOPIC_VIEWER_TRAIN">
-        </a>
+      <li ng-class="{'topic-viewer-tabs-active': $ctrl.activeTab === 'story'}">
+        <div class="topic-viewer-tabs-text" ng-click="$ctrl.setActiveTab('story')">
+          <img class="tab-icon icon-rotate" ng-src="<[$ctrl.getStaticImageUrl('/general/collection_paw.svg')]>" height="50">
+          <a class="tab-title"
+             translate="I18N_TOPIC_VIEWER_LESSONS">
+          </a>
+        </div>
+      </li>
+      <li ng-class="{'topic-viewer-tabs-active': $ctrl.activeTab === 'practice'}">
+        <div style="padding-top: 20px" class="topic-viewer-tabs-text" ng-click="$ctrl.setActiveTab('practice')">
+          <span class="fas fa-brain tab-icon"></span>
+          <a class="tab-title"
+             translate="I18N_TOPIC_VIEWER_PRACTICE">
+          </a>
+        </div>
       </li>
       <li ng-class="{'topic-viewer-tabs-active': $ctrl.activeTab === 'subtopics'}">
-        <a class="topic-viewer-tabs-text"
-           ng-click="$ctrl.setActiveTab('subtopics')"
-           translate="I18N_TOPIC_VIEWER_REVIEW">
-        </a>
+        <div style="padding-top: 20px" class="topic-viewer-tabs-text" ng-click="$ctrl.setActiveTab('subtopics')">
+          <span class="fas fa-book-open tab-icon"></span>
+          <a class="tab-title"
+             translate="I18N_TOPIC_VIEWER_REVISION">
+          </a>
+        </div>
       </li>
     </ul>
   </div>
-  <div ng-if="$ctrl.activeTab === 'story'" class="oppia-story-tab">
-    <stories-list canonical-stories-list="$ctrl.canonicalStoriesList"></stories-list>
-  </div>
-  <div ng-if="$ctrl.activeTab === 'practice'" class="oppia-practice-tab">
-    <practice-tab topic-name="$ctrl.topicName"></practice-tab>
-    <skills-mastery-list degrees-of-mastery="$ctrl.degreesOfMastery" skill-descriptions="$ctrl.skillDescriptions"></skills-mastery-list>
-  </div>
-  <div ng-if="$ctrl.activeTab === 'subtopics'" class="oppia-subtopics-tab">
-    <subtopics-list subtopics-list="$ctrl.subtopics"></subtopics-list>
+  <background-banner></background-banner>
+  <div ng-if="!$ctrl.topicIsLoading">
+    <div ng-if="$ctrl.activeTab === 'info'" class="tab-content">
+      <topic-info-tab topic-name="$ctrl.topicName"
+                      topic-description="$ctrl.topicDescription">
+      </topic-info-tab>
+    </div>
+    <div ng-if="$ctrl.activeTab === 'story'" class="tab-content">
+      <stories-list canonical-stories-list="$ctrl.canonicalStoriesList"></stories-list>
+    </div>
+    <div ng-if="$ctrl.activeTab === 'practice'" class="oppia-practice-tab">
+      <practice-tab topic-name="$ctrl.topicName"></practice-tab>
+      <skills-mastery-list degrees-of-mastery="$ctrl.degreesOfMastery" skill-descriptions="$ctrl.skillDescriptions"></skills-mastery-list>
+    </div>
+    <div ng-if="$ctrl.activeTab === 'subtopics'" class="oppia-subtopics-tab">
+      <subtopics-list subtopics-list="$ctrl.subtopics"></subtopics-list>
+    </div>
   </div>
 </div>
 <style>
   .oppia-topic-viewer-tabs-container {
+    background-color: #439788;
     margin: 0 auto;
-    width: 60%;
+    width: 100%;
+  }
+
+  .oppia-topic-viewer-tabs-container  .icon-rotate {
+    -webkit-transform: rotate(285deg);
+    -moz-transform: rotate(285deg);
+    -o-transform: rotate(285deg);
+    -ms-transform: rotate(285deg);
+    transform: rotate(285deg);
+  }
+
+  .oppia-topic-viewer-tabs-container .material-icons {
+    padding-bottom: 8px;
+  }
+
+  .oppia-topic-viewer-tabs-container .fas {
+    padding-bottom: 8px;
+  }
+
+  .oppia-topic-viewer-tabs-container .topic-viewer-tabs .tab-icon {
+    display: block;
+    font-size: 2em;
+    margin-left: auto;
+    margin-right: auto;
+    width: 50%;
   }
 
   .oppia-topic-viewer-tabs-container .topic-viewer-tabs {
@@ -47,8 +90,10 @@
     display: flex;
     flex-wrap: wrap;
     margin-bottom: 0;
+    margin-left: 20vw;
+    margin-right: 20vw;
     padding-left: 0;
-    padding-top: 50px;
+    padding-top: 20px;
     text-align: center;
   }
 
@@ -61,23 +106,26 @@
   }
 
   .oppia-topic-viewer-tabs-container .topic-viewer-tabs .topic-viewer-tabs-text {
-    color: #009688;
-    font-size: 1em;
+    color: white;
+    cursor: pointer;
     padding: 10px;
+    width: 100%;
+  }
+
+  .oppia-topic-viewer-tabs-container .topic-viewer-tabs .topic-viewer-tabs-text .tab-title {
+    font-size: 1em;
     text-decoration: none;
     text-transform: uppercase;
-    width: 100%;
   }
 
   .oppia-topic-viewer-tabs-container .topic-viewer-tabs-active .topic-viewer-tabs-text,
   .oppia-topic-viewer-tabs-container .topic-viewer-tabs-active .topic-viewer-tabs-text:hover {
-    border-bottom: 4px solid #009688;
-    color: #009688;
-    margin-left: 7.5px;
+    color: white;
+    border-bottom: 4px solid white;
   }
 
   .oppia-topic-viewer-tabs-container .topic-viewer-tabs .topic-viewer-tabs-text:hover {
-    color: #009688;
+    color: white;
     font-size: 1em;
     padding: 10px;
     text-decoration: none;
@@ -87,10 +135,11 @@
 
   .oppia-topic-viewer-tabs-container .topic-viewer-tabs .topic-viewer-tabs-text:hover,
   .oppia-topic-viewer-tabs-container .topic-viewer-tabs .topic-viewer-tabs-text:focus {
+    outline: 0;
     text-decoration: none;
   }
 
-  @media(max-width: 815px) {
+  @media(max-width: 360px) {
     .oppia-topic-viewer-tabs-container .topic-viewer-tabs {
       justify-content: center;
     }
@@ -100,7 +149,7 @@
     }
   }
 
-  .oppia-story-tab, .oppia-subtopics-tab {
+  .oppia-topic-viewer-container .tab-content {
     margin: 0 auto;
     width: max-content;
   }
@@ -111,18 +160,9 @@
     max-width: 800px;
   }
 
-  .oppia-topic-viewer-container .oppia-topic-name {
-    color: #01645c;
-    font-family: 'Capriola', 'Roboto', Arial, sans-serif;
-    font-size: 3em;
-    margin-top: 0;
-    margin-bottom: 25px;
-    padding-top: 66.5px;
-    text-align: center;
-  }
   .oppia-topic-viewer-container {
     color: black;
-    font-family: 'Roboto', Arial, sans-serif;
+    font-family: 'Capriola', 'Roboto', Arial, sans-serif;
     margin: 0 auto;
     text-decoration: none;
   }
@@ -144,12 +184,9 @@
 
   .oppia-topic-viewer-tabs-active .oppia-topic-viewer-tabs-text,
   .oppia-topic-viewer-tabs-active .oppia-topic-viewer-tabs-text:hover {
-    background-color: #e7e7e2;
-    border-top: 4px solid #009688;
-    color: #009688;
+    border-bottom: 4px solid white;
   }
   .oppia-topic-viewer-tabs {
-    background-color: #7e7e7e;
     margin: 0 auto 0 10%;
     display: inline-block;
   }
@@ -158,37 +195,5 @@
     text-transform: uppercase;
     width: 100%;
     text-shadow: 0.5px 0.5px 0.5px #e7e7e2;
-  }
-  @media(max-width: 925px) {
-    .oppia-topic-viewer-tabs {
-      margin: 0 auto;
-    }
-    .oppia-topic-viewer-container .oppia-topic-viewer-tabs {
-      justify-content: center;
-    }
-    .oppia-topic-viewer-container .oppia-topic-viewer-tabs li {
-      width: auto;
-    }
-    .oppia-topic-viewer-container {
-      max-width: 95%;
-    }
-  }
-
-  @media(max-width: 649px) {
-    .oppia-topic-viewer-tabs-container {
-      width: 100%;
-    }
-    stories-list {
-      display: inline-grid;
-    }
-  }
-
-  @media(max-width: 426px) {
-    .oppia-topic-viewer-tabs span {
-      width: auto;
-    }
-    .oppia-topic-viewer-container .oppia-topic-viewer-tabs {
-      max-width: 280px;
-    }
   }
 </style>

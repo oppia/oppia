@@ -36,6 +36,7 @@ describe('Topic Data Object Factory', () => {
     let sampleTopicDataDict = {
       topic_name: 'topic_name',
       topic_id: 'topic_id',
+      topic_description: 'Topic description',
       canonical_story_dicts: [{
         id: '0',
         title: 'Story Title',
@@ -71,8 +72,10 @@ describe('Topic Data Object Factory', () => {
       sampleTopicDataDict);
   });
 
-  it('should return correct values of topic name and id', () => {
+  it('should return correct values of topic name, description and id', () => {
     expect(_sampleReadOnlyTopic.getTopicName()).toEqual('topic_name');
+    expect(
+      _sampleReadOnlyTopic.getTopicDescription()).toEqual('Topic description');
     expect(_sampleReadOnlyTopic.getTopicId()).toEqual('topic_id');
     expect(_sampleReadOnlyTopic.getTrainTabShouldBeDisplayed()).toEqual(false);
   });

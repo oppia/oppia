@@ -21,6 +21,7 @@ require(
   'components/common-layout-directives/common-elements/' +
   'background-banner.directive.ts');
 require('components/skills-mastery-list/skills-mastery-list.directive.ts');
+require('pages/topic-viewer-page/info-tab/topic-info-tab.directive.ts');
 require(
   'pages/topic-viewer-page/stories-list/' +
   'topic-viewer-stories-list.directive.ts');
@@ -54,20 +55,26 @@ angular.module('oppia').directive('topicViewerPage', [
           ctrl.setActiveTab = function(newActiveTabName) {
             ctrl.activeTab = newActiveTabName;
           };
+          ctrl.getStaticImageUrl = function(imagePath) {
+            return UrlInterpolationService.getStaticImageUrl(imagePath);
+          };
           ctrl.checkMobileView = function() {
             return (WindowDimensionsService.getWidth() < 500);
           };
           ctrl.$onInit = function() {
             ctrl.canonicalStoriesList = [];
-            ctrl.setActiveTab('story');
+            ctrl.setActiveTab('info');
             ctrl.topicName = UrlService.getTopicNameFromLearnerUrl();
 
             PageTitleService.setPageTitle(ctrl.topicName + ' - Oppia');
 
             LoaderService.showLoadingScreen('Loading');
+            ctrl.topicIsLoading = true;
             TopicViewerBackendApiService.fetchTopicData(ctrl.topicName).then(
               function(readOnlyTopic) {
                 ctrl.topicId = readOnlyTopic.getTopicId();
+                ctrl.topicName = readOnlyTopic.getTopicName();
+                ctrl.topicDescription = readOnlyTopic.getTopicDescription();
                 ctrl.canonicalStoriesList = (
                   readOnlyTopic.getCanonicalStorySummaries());
                 ctrl.degreesOfMastery = readOnlyTopic.getDegreesOfMastery();
@@ -76,6 +83,7 @@ angular.module('oppia').directive('topicViewerPage', [
                 LoaderService.hideLoadingScreen();
                 ctrl.trainTabShouldBeDisplayed = (
                   readOnlyTopic.getTrainTabShouldBeDisplayed());
+                ctrl.topicIsLoading = false;
                 // TODO(#8521): Remove the use of $rootScope.$apply()
                 // once the controller is migrated to angular.
                 $rootScope.$apply();
