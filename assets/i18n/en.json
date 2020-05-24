@@ -547,6 +547,7 @@
     "I18N_TEACH_PAGE_TAB_PARTICIPATION_PLAYBOOK": "Participation Playbook",
     "I18N_TEACH_PAGE_TAB_TEACH_WITH_OPPIA": "Teach with Oppia",
     "I18N_TOPIC_SUMMARY_TILE_LESSONS": "{lessonCount, plural, =1{1 lesson} other{# lessons}}",
+    "I18N_TOPIC_VIEWER_DESCRIPTION": "Description",
     "I18N_TOPIC_VIEWER_INFO": "Info",
     "I18N_TOPIC_VIEWER_LESSONS": "Lessons",
     "I18N_TOPIC_VIEWER_PRACTICE": "Practice",

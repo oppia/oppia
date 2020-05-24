@@ -39,7 +39,9 @@
   <div ng-if="!$ctrl.topicIsLoading">
     <div ng-if="$ctrl.activeTab === 'info'" class="tab-content">
       <topic-info-tab topic-name="$ctrl.topicName"
-                      topic-description="$ctrl.topicDescription">
+                      topic-description="$ctrl.topicDescription"
+                      story-count="$ctrl.canonicalStoriesList.length"
+                      subtopic-count="$ctrl.subtopics.length">
       </topic-info-tab>
     </div>
     <div ng-if="$ctrl.activeTab === 'story'" class="tab-content">
@@ -57,6 +59,7 @@
 <style>
   .oppia-topic-viewer-tabs-container {
     background-color: #439788;
+    font-family: 'Capriola', 'Roboto', Arial, sans-serif;
     margin: 0 auto;
     width: 100%;
   }
@@ -162,7 +165,6 @@
 
   .oppia-topic-viewer-container {
     color: black;
-    font-family: 'Capriola', 'Roboto', Arial, sans-serif;
     margin: 0 auto;
     text-decoration: none;
   }

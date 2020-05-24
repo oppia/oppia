@@ -35,7 +35,6 @@ angular.module('oppia').directive('topicInfoTab', ['UrlInterpolationService',
       controllerAs: '$ctrl',
       controller: ['WindowDimensionsService', '$scope',
         function(WindowDimensionsService, $scope) {
-          var ctrl = this;
         }
       ]
     };
