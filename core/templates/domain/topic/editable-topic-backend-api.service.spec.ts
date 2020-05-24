@@ -192,7 +192,7 @@ describe('Editable topic backend API service', () => {
       let topic = null;
 
       editableTopicBackendApiService.fetchTopic('0').then(
-        (data: {[key: string]: string}) => {
+        (data: {[key: string]: Object}) => {
           topic = data.topicDict;
         });
       let req = httpTestingController.expectOne(
