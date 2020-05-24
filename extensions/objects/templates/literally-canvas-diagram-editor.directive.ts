@@ -36,17 +36,23 @@ angular.module('oppia').directive('literallyCanvasDiagramEditor', [
         ctrl.maxDiagramWidth = 491;
         ctrl.maxDiagramHeight = 551;
         ctrl.diagramWidth = 450;
+        ctrl.currentDiagramWidth = 450;
         ctrl.diagramHeight = 350;
+        ctrl.currentDiagramHeight = 350;
         ctrl.data = {};
         ctrl.onWidthInputBlur = function() {
           if (ctrl.diagramWidth < ctrl.maxDiagramWidth) {
-            ctrl.lc.setImageSize(ctrl.diagramWidth, ctrl.diagramHeight);
+            ctrl.currentDiagramWidth = ctrl.diagramWidth;
+            ctrl.lc.setImageSize(
+              ctrl.currentDiagramWidth, ctrl.currentDiagramHeight);
           }
         };
 
         ctrl.onHeightInputBlur = function() {
           if (ctrl.diagramHeight < ctrl.maxDiagramHeight) {
-            ctrl.lc.setImageSize(ctrl.diagramWidth, ctrl.diagramHeight);
+            ctrl.currentDiagramHeight = ctrl.diagramHeight;
+            ctrl.lc.setImageSize(
+              ctrl.currentDiagramWidth, ctrl.currentDiagramHeight);
           }
         };
 
