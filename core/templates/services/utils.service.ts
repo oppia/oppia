@@ -83,6 +83,21 @@ export class UtilsService {
     }
     return true;
   }
+
+  // Determines if the provided value is an Error.
+  // Loosely based on https://www.npmjs.com/package/iserror
+  /**
+   * @param {Object} value - the object to be checked.
+   * @return {boolean} - true if value is an Error object, false otherwise.
+   */
+  isError(value: Object): boolean {
+    switch (Object.prototype.toString.call(value)) {
+      case '[object Error]': return true;
+      case '[object Exception]': return true;
+      case '[object DOMException]': return true;
+      default: return value instanceof Error;
+    }
+  }
 }
 
 angular.module('oppia').factory(
