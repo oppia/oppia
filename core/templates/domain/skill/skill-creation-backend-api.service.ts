@@ -29,8 +29,7 @@ export interface ISkillCreationBackend {
   description: string,
   'explanation_dict': string,
   'linked_topic_ids': string[],
-  rubrics: IRubricBackend,
-  filenames: string[]
+  rubrics: IRubricBackend
 }
 
 export interface IImageData {

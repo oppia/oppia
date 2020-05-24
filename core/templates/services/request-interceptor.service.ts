@@ -78,7 +78,7 @@ export class RequestInterceptor implements HttpInterceptor {
     if (request.body) {
       return from(this.csrf.getTokenAsync())
         .pipe(
-          switchMap(token => {
+          switchMap((token: string) => {
             if (request.method === 'POST' || request.method === 'PUT') {
               // If the body of the http request created is already in formData
               // form, just add the required fields for the request and pass it
