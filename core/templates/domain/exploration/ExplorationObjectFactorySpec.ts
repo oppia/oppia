@@ -24,14 +24,14 @@ import { ConvertToPlainTextPipe } from
   'filters/string-utility-filters/convert-to-plain-text.pipe';
 import { ExplorationObjectFactory } from
   'domain/exploration/ExplorationObjectFactory';
-import { StateObjectFactory } from 'domain/state/StateObjectFactory';
-import { VoiceoverObjectFactory } from
-  'domain/exploration/VoiceoverObjectFactory';
+import { IStateBackendDict } from 'domain/state/StateObjectFactory';
 import { InteractionObjectFactory } from
   'domain/exploration/InteractionObjectFactory';
 import { LoggerService } from 'services/contextual/logger.service';
-import { IStateBackendDict } from 'domain/state/StateObjectFactory';
+import { StateObjectFactory } from 'domain/state/StateObjectFactory';
 import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
+import { VoiceoverObjectFactory } from
+  'domain/exploration/VoiceoverObjectFactory';
 
 describe('Exploration object factory', () => {
   beforeEach(() => {
