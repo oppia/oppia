@@ -17,7 +17,6 @@
  */
 
 require('domain/utilities/url-interpolation.service.ts');
-require('services/contextual/window-dimensions.service.ts');
 
 angular.module('oppia').directive('topicInfoTab', ['UrlInterpolationService',
   function(UrlInterpolationService) {
@@ -33,9 +32,6 @@ angular.module('oppia').directive('topicInfoTab', ['UrlInterpolationService',
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/topic-viewer-page/info-tab/topic-info-tab.directive.html'),
       controllerAs: '$ctrl',
-      controller: ['WindowDimensionsService', '$scope',
-        function(WindowDimensionsService, $scope) {
-        }
-      ]
+      controller: [function() {}]
     };
   }]);
