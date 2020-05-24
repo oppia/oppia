@@ -20,8 +20,8 @@ require('services/alerts.service.ts');
 require('services/image-upload-helper.service.ts');
 
 angular.module('oppia').factory('ImageLocalStorageService', [
-  'AlertsService', 'ImageUploadHelperService', function(
-      AlertsService, ImageUploadHelperService) {
+  '$window', 'AlertsService', 'ImageUploadHelperService', function(
+      $window, AlertsService, ImageUploadHelperService) {
     var storedImageFilenames = [];
     // According to https://en.wikipedia.org/wiki/Web_storage, 5MB is the
     // minimum limit, for all browsers, per hostname, that can be stored in
@@ -33,7 +33,7 @@ angular.module('oppia').factory('ImageLocalStorageService', [
       getObjectUrlForImage: function(filename) {
         var urlCreator = window.URL || window.webkitURL;
         var imageBlob = ImageUploadHelperService.convertImageDataToImageFile(
-          sessionStorage.getItem(filename));
+          $window.sessionStorage.getItem(filename));
         return urlCreator.createObjectURL(imageBlob);
       },
 
@@ -52,12 +52,12 @@ angular.module('oppia').factory('ImageLocalStorageService', [
             'creation.');
           return;
         }
-        sessionStorage.setItem(filename, rawImage);
+        $window.sessionStorage.setItem(filename, rawImage);
         storedImageFilenames.push(filename);
       },
 
       deleteImage: function(filename) {
-        sessionStorage.removeItem(filename);
+        $window.sessionStorage.removeItem(filename);
         var index = storedImageFilenames.indexOf(filename);
         storedImageFilenames.splice(index, 1);
       },
@@ -68,14 +68,14 @@ angular.module('oppia').factory('ImageLocalStorageService', [
           returnData.push({
             filename: storedImageFilenames[idx],
             imageBlob: ImageUploadHelperService.convertImageDataToImageFile(
-              sessionStorage.getItem(storedImageFilenames[idx]))
+              $window.sessionStorage.getItem(storedImageFilenames[idx]))
           });
         }
         return returnData;
       },
 
       flushStoredImagesData: function() {
-        sessionStorage.clear();
+        $window.sessionStorage.clear();
         storedImageFilenames.length = 0;
       }
     };

@@ -21,6 +21,7 @@ import { UpgradedServices } from 'services/UpgradedServices';
 require('services/image-local-storage.service.ts');
 
 describe('ImageLocalStorageService', function() {
+  var AlertsService = null;
   var ImageLocalStorageService = null;
   var sampleImageData = 'data:image/png;base64,xyz';
   var imageFilename = 'filename';
@@ -40,6 +41,7 @@ describe('ImageLocalStorageService', function() {
 
   beforeEach(angular.mock.inject(function($injector) {
     ImageLocalStorageService = $injector.get('ImageLocalStorageService');
+    AlertsService = $injector.get('AlertsService');
   }));
 
   it(
@@ -68,4 +70,16 @@ describe('ImageLocalStorageService', function() {
     expect(
       ImageLocalStorageService.getStoredImagesData().length).toEqual(0);
   });
+
+  it(
+    'should show error message if number of stored images crosses ' +
+    'limit', function() {
+      for (var i = 0; i <= 50; i++) {
+        ImageLocalStorageService.saveImage('filename' + i, sampleImageData);
+      }
+      expect(AlertsService.messages.length).toEqual(0);
+      ImageLocalStorageService.saveImage('filename51', sampleImageData);
+      expect(AlertsService.messages.length).toEqual(1);
+    }
+  );
 });
