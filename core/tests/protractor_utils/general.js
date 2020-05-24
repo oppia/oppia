@@ -145,7 +145,7 @@ var ensurePageHasNoTranslationIds = async function() {
 
 var acceptAlert = async function() {
   await waitFor.alertToBePresent();
-  await browser.switchTo().alert().accept();
+  await (await browser.switchTo().alert()).accept();
   await waitFor.pageToFullyLoad();
 };
 
