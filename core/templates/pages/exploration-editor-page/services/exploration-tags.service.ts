@@ -24,6 +24,11 @@ angular.module('oppia').factory('ExplorationTagsService', [
   function(ExplorationPropertyService, TAG_REGEX) {
     var child = Object.create(ExplorationPropertyService);
     child.propertyName = 'tags';
+    /**
+      *@param {string} value - tag array to be normalized
+      *(white spaces removed and '+' replaced with ' ')
+      *@return {string} -normalized array
+    */
     child._normalize = function(value) {
       for (var i = 0; i < value.length; i++) {
         value[i] = value[i].trim().replace(/\s+/g, ' ');
@@ -31,6 +36,10 @@ angular.module('oppia').factory('ExplorationTagsService', [
       // TODO(sll): Prevent duplicate tags from being added.
       return value;
     };
+    /**
+      *@param {string} value -tag array to be matched with TAG_REGEX
+      *@return {boolean} -whether or not all tags match TAG_REGEX
+    */
     child._isValid = function(value) {
       // Every tag should match the TAG_REGEX.
       for (var i = 0; i < value.length; i++) {
