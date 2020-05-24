@@ -1,15 +1,13 @@
+# NOTE TO DEVELOPERS: Procedure for picking code owners:
+# Codeowners should be one of the team leads from this page:
+# https://github.com/oppia/oppia/projects
+
 # Per-directory ownership and automatic assignment for pull requests.
 
 # The paths to the directory/files must be relative to the location of this
 # file. Wildcards such as '**', '!' are not allowed. Only glob style patterns
 # are allowed. For information about supported glob patterns please refer
 # https://docs.python.org/2/library/glob.html.
-
-# Note: The e2e test files are owned by both the dev workflow and QA teams.
-# - The QA team will do an initial review to verify the PR's test coverage. They
-#   will then ask the dev workflow team for a final review.
-# - The dev workflow team will review the code quality to see if the e2e tests
-#   can be optimized further.
 
 # Android team
 /core/domain/android_validation_constants*.py @BenHenning
@@ -551,9 +549,5 @@
 /yarn.lock @vojtechjelinek @kevinlee12
 /scripts/install_third_party_libs.py @vojtechjelinek @kevinlee12
 /.github/* @kevinlee12
-
-# Procedure for picking code owners:
-# Codeowners should be selected based on speciality from the following list:
-# https://github.com/oppia/oppia/projects
 /.github/CODEOWNERS @DubeySandeep
 /.github/stale.yml @ankita240796
