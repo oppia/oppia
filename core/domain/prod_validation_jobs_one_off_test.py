@@ -7448,7 +7448,7 @@ class SkillSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
             })
         )
 
-            misconception_dict = {
+        misconception_dict = {
             'id': 0, 'name': 'name', 'notes': '<p>notes</p>',
             'feedback': '<p>default_feedback</p>',
             'must_be_addressed': True}
