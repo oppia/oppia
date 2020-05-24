@@ -550,4 +550,6 @@
 /package.json @vojtechjelinek @kevinlee12
 /yarn.lock @vojtechjelinek @kevinlee12
 /scripts/install_third_party_libs.py @vojtechjelinek @kevinlee12
-/.github/ @kevinlee12
+/.github/* @kevinlee12
+/.github/CODEOWNERS @DubeySandeep
+/.github/stale.yml @ankita240796
