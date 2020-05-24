@@ -2428,6 +2428,23 @@ oppia-parameter {
   width: 400px;
   min-width: 200px;
 }
+.skill-select-modal .modal-xl {
+  width: 1000px;
+}
+@media (min-width: 768px) {
+  .skill-select-modal .modal-xl {
+    width: 1000px;
+    margin: 1.75rem auto;
+  }
+}
+
+@media (max-width: 576px) {
+  .skill-select-modal .modal-xl {
+    max-width: 500px;
+    margin: 1.75rem auto;
+  }
+}
+
 .oppia-save-exploration-wide-modal .modal-dialog {
   max-width: 1200px;
   width: 90%;

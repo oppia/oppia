@@ -42,15 +42,15 @@ angular.module('oppia').directive('selectSkill', [
           ctrl.$onInit = function() {
             $scope.selectedSkill = null;
             $scope.categorizedSkills = $scope.getCategorizedSkills();
-            $scope.allowSkillsFromOtherTopics =
-              $scope.canAllowSkillsFromOtherTopics();
+            $scope.allowSkillsFromOtherTopics = (
+              $scope.canAllowSkillsFromOtherTopics());
             $scope.checkIfEmpty = function(skills) {
               return (skills.length === 0);
             };
-            $scope.skillChanged = function() {
+            $scope.setSelectedSkillId = function() {
               $scope.selectedSkillId = $scope.selectedSkill;
             };
-            $scope.isUntriagedSkills = function(topicName) {
+            $scope.hasUntriagedSkills = function(topicName) {
               return (topicName === 'untriaged_skills');
             };
             $scope.topicFilterList = [];
@@ -92,8 +92,8 @@ angular.module('oppia').directive('selectSkill', [
                     }
                     var categorizedSkills = $scope.getCategorizedSkills();
                     var subTopicName = subTopics[i].subTopicName;
-                    updatedSkillsDict[topicName][subTopicName] =
-                      categorizedSkills[topicName][subTopicName];
+                    updatedSkillsDict[topicName][subTopicName] = (
+                      categorizedSkills[topicName][subTopicName]);
                     isAnySubTopicChecked = true;
                   }
                 }
@@ -106,8 +106,8 @@ angular.module('oppia').directive('selectSkill', [
                   if ($scope.topicFilterList[i].checked) {
                     var categorizedSkills = $scope.getCategorizedSkills();
                     var topicName:string = $scope.topicFilterList[i].topicName;
-                    updatedSkillsDict[topicName] =
-                      categorizedSkills[topicName];
+                    updatedSkillsDict[topicName] = (
+                      categorizedSkills[topicName]);
                     isAnyTopicChecked = true;
                   }
                 }
@@ -132,8 +132,8 @@ angular.module('oppia').directive('selectSkill', [
               for (var i = 0; i < $scope.topicFilterList.length; i++) {
                 if ($scope.topicFilterList[i].checked) {
                   var topicName = $scope.topicFilterList[i].topicName;
-                  updatedSubTopicFilterList[topicName] =
-                    angular.copy(intialSubTopicFilterDict[topicName]);
+                  updatedSubTopicFilterList[topicName] = (
+                    angular.copy(intialSubTopicFilterDict[topicName]));
                   isAnyTopicChecked = true;
                 }
               }
@@ -142,8 +142,8 @@ angular.module('oppia').directive('selectSkill', [
                 // display subtopics from all the topics in the subtopic filter.
                 for (var topic in intialSubTopicFilterDict) {
                   if (!$scope.subTopicFilterDict.hasOwnProperty(topic)) {
-                    $scope.subTopicFilterDict[topic] =
-                      angular.copy(intialSubTopicFilterDict[topic]);
+                    $scope.subTopicFilterDict[topic] = (
+                      angular.copy(intialSubTopicFilterDict[topic]));
                   }
                 }
               } else {

@@ -5,8 +5,8 @@
       <input type="text" class="form-control protractor-test-skill-name-input" placeholder="Enter a skill name" ng-model="skillFilterText" autofocus>
     </md-card>
     <div style="max-height: 50vh; overflow-y: auto;">
-      <md-radio-group ng-model="selectedSkill" ng-change="skillChanged()">
-        <md-card ng-if="!isUntriagedSkills(topicName)" ng-repeat="(topicName, subtopics) in categorizedSkills" class="list-view-item">
+      <md-radio-group ng-model="selectedSkill" ng-change="setSelectedSkillId()">
+        <md-card ng-if="!hasUntriagedSkills(topicName)" ng-repeat="(topicName, subtopics) in categorizedSkills" class="list-view-item">
           <md-card layout="row" class="list-view-item">
             <h2><label style="padding-left:10px"><[topicName]></label></h2>
           </md-card>
@@ -19,7 +19,7 @@
             </md-card>
           </div>
         </md-card>
-        <md-card ng-if="isUntriagedSkills(topicName)" ng-repeat="(topicName, skills) in categorizedSkills" class="list-view-item">
+        <md-card ng-if="hasUntriagedSkills(topicName)" ng-repeat="(topicName, skills) in categorizedSkills" class="list-view-item">
           <md-card layout="row" class="list-view-item">
             <h2><label style="padding-left:10px"><[topicName]></label></h2>
           </md-card>

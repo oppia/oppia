@@ -52,7 +52,7 @@ angular.module('oppia').directive('skillPrerequisiteSkillsEditor', [
           var categorizedSkills = null;
           TopicsAndSkillsDashboardBackendApiService.fetchDashboardData().then(
             function(response) {
-              categorizedSkills = response.data.categorized_skills_dict;
+              categorizedSkills = response.categorized_skills_dict;
             });
           var groupedSkillSummaries =
             SkillEditorStateService.getGroupedSkillSummaries();
@@ -91,7 +91,8 @@ angular.module('oppia').directive('skillPrerequisiteSkillsEditor', [
                   $scope.categorizedSkills = categorizedSkills;
                   $scope.allowSkillsFromOtherTopics = true;
                 }
-              ], windowClass: 'skill-select-modal'
+              ], windowClass: 'skill-select-modal',
+              size: 'xl'
             }).result.then(function(skillId) {
               if (skillId === $scope.skill.getId()) {
                 AlertsService.addInfoMessage(

@@ -180,7 +180,8 @@ angular.module('oppia').directive('skillsList', [
                       });
                   };
                 }
-              ], windowClass: 'skill-select-modal'
+              ], windowClass: 'skill-select-modal',
+              size: 'xl'
             }).result.then(function(result) {
               var skill = result.skill;
               var supersedingSkillId = result.supersedingSkillId;
