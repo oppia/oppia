@@ -29,7 +29,7 @@ export interface IAnswerGroupBackendDict {
   /* eslint-disable camelcase */
   rule_specs: IRuleBackendDict[];
   outcome: IOutcomeBackendDict;
-  training_data: object[];
+  training_data: any;
   tagged_skill_misconception_id: string;
   /* eslint-enable camelcase */
 }
@@ -38,7 +38,7 @@ export class AnswerGroup {
   constructor(
       public rules: Rule[],
       public outcome: Outcome,
-      public trainingData: object[],
+      public trainingData: any,
       public taggedSkillMisconceptionId: string) {}
 
   toBackendDict(): IAnswerGroupBackendDict {
@@ -60,7 +60,7 @@ export class AnswerGroupObjectFactory {
       private ruleObjectFactory: RuleObjectFactory) {}
 
   createNew(
-      rules: Rule[], outcome: Outcome, trainingData: object[],
+      rules: Rule[], outcome: Outcome, trainingData: any,
       taggedSkillMisconceptionId: string): AnswerGroup {
     return new AnswerGroup(
       rules, outcome, trainingData, taggedSkillMisconceptionId);

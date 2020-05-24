@@ -22,8 +22,10 @@ import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
 import { ConvertToPlainTextPipe } from
   'filters/string-utility-filters/convert-to-plain-text.pipe';
-import { StateObjectFactory } from 'domain/state/StateObjectFactory';
-import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
+import { IStateBackendDict, StateObjectFactory } from
+  'domain/state/StateObjectFactory';
+import { StateBackendDictMapping, StatesObjectFactory } from
+  'domain/exploration/StatesObjectFactory';
 import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory';
 
@@ -31,18 +33,16 @@ const constants = require('constants.ts');
 
 describe('States object factory', () => {
   describe('StatesObjectFactory', () => {
-    var scope, sof, ssof, statesDict, statesWithAudioDict, vof;
-    const oldNewStateTemplate = constants.NEW_STATE_TEMPLATE;
-
     beforeEach(() => {
       TestBed.configureTestingModule({
         providers: [CamelCaseToHyphensPipe, ConvertToPlainTextPipe]
       });
-      ssof = TestBed.get(StatesObjectFactory);
-      sof = TestBed.get(StateObjectFactory);
-      vof = TestBed.get(VoiceoverObjectFactory);
 
-      statesDict = {
+      this.ssof = TestBed.get(StatesObjectFactory);
+      this.sof = TestBed.get(StateObjectFactory);
+      this.vof = TestBed.get(VoiceoverObjectFactory);
+
+      this.statesDict = <StateBackendDictMapping>{
         'first state': {
           content: {
             content_id: 'content',
@@ -66,7 +66,8 @@ describe('States object factory', () => {
                 },
                 labelled_as_correct: false,
                 param_changes: [],
-                refresher_exploration_id: null
+                refresher_exploration_id: null,
+                missing_prerequisite_skill_id: null
               },
               rule_specs: [{
                 inputs: {
@@ -74,6 +75,8 @@ describe('States object factory', () => {
                 },
                 rule_type: 'Equals'
               }],
+              training_data: null,
+              tagged_skill_misconception_id: null,
             }],
             default_outcome: {
               dest: 'default',
@@ -82,10 +85,14 @@ describe('States object factory', () => {
                 html: ''
               },
               labelled_as_correct: false,
-              param_changes: []
+              param_changes: [],
+              refresher_exploration_id: null,
+              missing_prerequisite_skill_id: null
             },
             hints: [],
-            solution: null
+            solution: null,
+            confirmed_unclassified_answers: null,
+            customization_args: null
           },
           param_changes: [],
           solicit_answer_details: false,
@@ -96,10 +103,11 @@ describe('States object factory', () => {
               feedback_1: {}
             }
           },
+          classifier_model_id: null
         }
       };
 
-      statesWithAudioDict = {
+      this.statesWithAudioDict = <StateBackendDictMapping>{
         'first state': {
           content: {
             content_id: 'content',
@@ -177,14 +185,17 @@ describe('States object factory', () => {
                 },
                 labelled_as_correct: false,
                 param_changes: [],
-                refresher_exploration_id: null
+                refresher_exploration_id: null,
+                missing_prerequisite_skill_id: null
               },
               rule_specs: [{
                 inputs: {
                   x: 20
                 },
                 rule_type: 'Equals'
-              }]
+              }],
+              tagged_skill_misconception_id: null,
+              training_data: null
             }],
             confirmed_unclassified_answers: [],
             customization_args: {},
@@ -195,7 +206,9 @@ describe('States object factory', () => {
                 html: '<p>Feedback</p>'
               },
               labelled_as_correct: false,
-              param_changes: []
+              param_changes: [],
+              refresher_exploration_id: null,
+              missing_prerequisite_skill_id: null
             },
             hints: [{
               hint_content: {
@@ -208,7 +221,8 @@ describe('States object factory', () => {
                 html: '<p>Here is another hint.</p>'
               }
             }],
-            id: 'TextInput'
+            id: 'TextInput',
+            solution: null
           },
           param_changes: [],
           solicit_answer_details: false,
@@ -220,7 +234,8 @@ describe('States object factory', () => {
               hint_1: {},
               hint_2: {}
             }
-          }
+          },
+          classifier_model_id: null
         },
         'second state': {
           content: {
@@ -259,7 +274,9 @@ describe('States object factory', () => {
                 html: ''
               },
               labelled_as_correct: false,
-              param_changes: []
+              param_changes: [],
+              refresher_exploration_id: null,
+              missing_prerequisite_skill_id: null
             },
             hints: [],
             solution: {
@@ -279,13 +296,15 @@ describe('States object factory', () => {
               content: {},
               default_outcome: {}
             }
-          }
+          },
+          classifier_model_id: null
         }
       };
     });
 
     beforeAll(() => {
-      constants.NEW_STATE_TEMPLATE = {
+      this.NEW_STATE_TEMPLATE = constants.NEW_STATE_TEMPLATE;
+      constants.NEW_STATE_TEMPLATE = <IStateBackendDict>{
         classifier_model_id: null,
         content: {
           content_id: 'content',
@@ -335,14 +354,14 @@ describe('States object factory', () => {
     });
 
     afterAll(() => {
-      constants.NEW_STATE_TEMPLATE = oldNewStateTemplate;
+      constants.NEW_STATE_TEMPLATE = this.NEW_STATE_TEMPLATE;
     });
 
     it('should create a new state given a state name', () => {
-      var newStates = ssof.createFromBackendDict(statesDict);
+      var newStates = this.ssof.createFromBackendDict(this.statesDict);
       newStates.addState('new state');
       expect(newStates.getState('new state')).toEqual(
-        sof.createFromBackendDict('new state', {
+        this.sof.createFromBackendDict('new state', {
           classifier_model_id: null,
           content: {
             content_id: 'content',
@@ -391,27 +410,29 @@ describe('States object factory', () => {
     });
 
     it('should correctly get all audio language codes in states', () => {
-      var statesWithAudio = ssof.createFromBackendDict(statesWithAudioDict);
+      var statesWithAudio = (
+        this.ssof.createFromBackendDict(this.statesWithAudioDict));
       expect(statesWithAudio.getAllVoiceoverLanguageCodes())
         .toEqual(['en', 'hi-en', 'he', 'zh', 'es', 'cs', 'de']);
     });
 
     it('should correctly get all audio translations in states', () => {
-      var statesWithAudio = ssof.createFromBackendDict(statesWithAudioDict);
+      var statesWithAudio = (
+        this.ssof.createFromBackendDict(this.statesWithAudioDict));
       expect(statesWithAudio.getAllVoiceovers('hi-en'))
         .toEqual(new Map(Object.entries({
-          'first state': [vof.createFromBackendDict({
+          'first state': [this.vof.createFromBackendDict({
             filename: 'myfile3.mp3',
             file_size_bytes: 0.8,
             needs_update: false,
             duration_secs: 0.8
-          }), vof.createFromBackendDict({
+          }), this.vof.createFromBackendDict({
             filename: 'myfile8.mp3',
             file_size_bytes: 1.2,
             needs_update: false,
             duration_secs: 1.2
           })],
-          'second state': [vof.createFromBackendDict({
+          'second state': [this.vof.createFromBackendDict({
             filename: 'myfile2.mp3',
             file_size_bytes: 0.8,
             needs_update: false,

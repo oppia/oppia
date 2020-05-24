@@ -24,7 +24,7 @@ import { CamelCaseToHyphensPipe } from
 import { ConvertToPlainTextPipe } from
   'filters/string-utility-filters/convert-to-plain-text.pipe';
 import { ContextService } from 'services/context.service';
-import { ExplorationObjectFactory } from
+import { ExplorationObjectFactory, IExplorationBackendDict } from
   'domain/exploration/ExplorationObjectFactory';
 import { ExtractImageFilenamesFromStateService } from
   // eslint-disable-next-line max-len
@@ -32,22 +32,18 @@ import { ExtractImageFilenamesFromStateService } from
 
 
 describe('Extracting Image file names in the state service', () => {
-  let eifss: ExtractImageFilenamesFromStateService;
-  let eof: ExplorationObjectFactory;
-  let ecs: ContextService;
-  let explorationDict;
-  let ImageFilenamesInExploration;
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [CamelCaseToHyphensPipe, ConvertToPlainTextPipe]
     });
-    eof = TestBed.get(ExplorationObjectFactory);
-    ecs = TestBed.get(ContextService);
-    eifss = TestBed.get(ExtractImageFilenamesFromStateService);
-    spyOn(ecs, 'getExplorationId').and.returnValue('1');
+    this.eof = TestBed.get(ExplorationObjectFactory);
+    this.cs = TestBed.get(ContextService);
+    this.eifss = TestBed.get(ExtractImageFilenamesFromStateService);
+    spyOn(this.cs, 'getExplorationId').and.returnValue('1');
 
-    explorationDict = {
-      id: 1,
+    this.explorationDict = <IExplorationBackendDict>{
+      id: '1',
+      language_code: 'en',
       title: 'My Title',
       category: 'Art',
       objective: 'Your objective',
@@ -77,7 +73,10 @@ describe('Extracting Image file names in the state service', () => {
                 html: ''
               },
               dest: 'State 3',
-              param_changes: []
+              param_changes: [],
+              labelled_as_correct: false,
+              refresher_exploration_id: null,
+              missing_prerequisite_skill_id: null
             },
             confirmed_unclassified_answers: [],
             customization_args: {
@@ -154,7 +153,11 @@ describe('Extracting Image file names in the state service', () => {
               feedback: {
                 content_id: 'default_outcome',
                 html: 'Try Again!'
-              }
+              },
+              param_changes: [],
+              labelled_as_correct: false,
+              refresher_exploration_id: null,
+              missing_prerequisite_skill_id: null
             },
             confirmed_unclassified_answers: [],
             customization_args: {
@@ -171,7 +174,6 @@ describe('Extracting Image file names in the state service', () => {
             },
             answer_groups: [
               {
-                labelled_as_correct: false,
                 outcome: {
                   dest: 'State 4',
                   feedback: {
@@ -182,7 +184,9 @@ describe('Extracting Image file names in the state service', () => {
                           '</oppia-noninteractive-image></p>'
                   },
                   param_changes: [],
-                  refresher_exploration_id: null
+                  labelled_as_correct: false,
+                  refresher_exploration_id: null,
+                  missing_prerequisite_skill_id: null
                 },
                 rule_specs: [
                   {
@@ -191,10 +195,11 @@ describe('Extracting Image file names in the state service', () => {
                     },
                     rule_type: 'Equals'
                   }
-                ]
+                ],
+                training_data: null,
+                tagged_skill_misconception_id: null
               },
               {
-                labelled_as_correct: false,
                 outcome: {
                   dest: 'State 5',
                   feedback: {
@@ -202,7 +207,9 @@ describe('Extracting Image file names in the state service', () => {
                     html: "Let's go to state 5 ImageAndRegion"
                   },
                   param_changes: [],
-                  refresher_exploration_id: null
+                  labelled_as_correct: false,
+                  refresher_exploration_id: null,
+                  missing_prerequisite_skill_id: null
                 },
                 rule_specs: [
                   {
@@ -211,7 +218,9 @@ describe('Extracting Image file names in the state service', () => {
                     },
                     rule_type: 'Equals'
                   }
-                ]
+                ],
+                training_data: null,
+                tagged_skill_misconception_id: null
               }
             ],
             hints: [],
@@ -251,12 +260,15 @@ describe('Extracting Image file names in the state service', () => {
                 html: '<p>Try Again! <oppia-noninteractive-image' +
                       'filepath-with-value="&amp;quot;' +
                       's4DefaultOutcomeFeedback.png&amp;quot;">' +
-                      '</oppia-noninteractive-image></p>'
+                      '</oppia-noninteractive-image></p>',
               },
+              param_changes: [],
+              labelled_as_correct: false,
+              refresher_exploration_id: null,
+              missing_prerequisite_skill_id: null,
               dest: 'State 4',
-              param_changes: []
             },
-            confirmed_unclassifies_answers: [],
+            confirmed_unclassified_answers: [],
             customization_args: {
               minAllowableSelectionCount: {
                 value: 1
@@ -278,7 +290,6 @@ describe('Extracting Image file names in the state service', () => {
             solution: null,
             answer_groups: [
               {
-                labelled_as_correct: false,
                 outcome: {
                   dest: 'State 6',
                   feedback: {
@@ -286,7 +297,9 @@ describe('Extracting Image file names in the state service', () => {
                     html: "It is choice number 1. Let's go to the Text Input"
                   },
                   param_changes: [],
-                  refresher_exploration_id: null
+                  labelled_as_correct: false,
+                  refresher_exploration_id: null,
+                  missing_prerequisite_skill_id: null,
                 },
                 rule_specs: [
                   {
@@ -299,10 +312,11 @@ describe('Extracting Image file names in the state service', () => {
                     },
                     rule_type: 'Equals'
                   }
-                ]
+                ],
+                training_data: null,
+                tagged_skill_misconception_id: null
               },
               {
-                labelled_as_correct: true,
                 outcome: {
                   dest: 'State 1',
                   feedback: {
@@ -310,7 +324,9 @@ describe('Extracting Image file names in the state service', () => {
                     html: 'It is choice number 2'
                   },
                   param_changes: [],
-                  refresher_exploration_id: null
+                  labelled_as_correct: false,
+                  refresher_exploration_id: null,
+                  missing_prerequisite_skill_id: null,
                 },
                 rule_specs: [
                   {
@@ -323,7 +339,9 @@ describe('Extracting Image file names in the state service', () => {
                     },
                     rule_type: 'Equals'
                   }
-                ]
+                ],
+                training_data: null,
+                tagged_skill_misconception_id: null
               }
             ]
           },
@@ -335,7 +353,8 @@ describe('Extracting Image file names in the state service', () => {
               feedback_1: {},
               feedback_2: {}
             }
-          }
+          },
+          classifier_model_id: null
         },
         'State 5': {
           classifier_model_id: null,
@@ -363,11 +382,14 @@ describe('Extracting Image file names in the state service', () => {
               feedback: {
                 content_id: 'content',
                 html: 'Try Again!'
-              }
+              },
+              param_changes: [],
+              labelled_as_correct: false,
+              refresher_exploration_id: null,
+              missing_prerequisite_skill_id: null,
             },
             answer_groups: [
               {
-                labelled_as_correct: false,
                 outcome: {
                   dest: 'State 5',
                   feedback: {
@@ -375,17 +397,20 @@ describe('Extracting Image file names in the state service', () => {
                     html: '<p>That is the class definition. Try again.</p>'
                   },
                   param_changes: [],
-                  refresher_exploration_id: null
+                  labelled_as_correct: false,
+                  refresher_exploration_id: null,
+                  missing_prerequisite_skill_id: null,
                 },
                 rule_specs: [{
                   inputs: {
                     x: 'classdef'
                   },
                   rule_type: 'IsInRegion'
-                }]
+                }],
+                training_data: null,
+                tagged_skill_misconception_id: null
               },
               {
-                labelled_as_correct: false,
                 outcome: {
                   dest: 'State 5',
                   feedback: {
@@ -393,36 +418,42 @@ describe('Extracting Image file names in the state service', () => {
                     html: '<p>That is a function, which is close to what you' +
                           'are looking for. Try again!</p>'
                   },
+                  labelled_as_correct: false,
                   param_changes: [],
-                  refresher_exploration_id: null
+                  refresher_exploration_id: null,
+                  missing_prerequisite_skill_id: null
                 },
                 rule_specs: [{
                   inputs: {
                     x: 'instancefunc'
                   },
                   rule_type: 'IsInRegion'
-                }]
+                }],
+                training_data: null,
+                tagged_skill_misconception_id: null
               },
               {
-                labelled_as_correct: false,
                 outcome: {
                   dest: 'State 5',
                   feedback: {
                     content_id: 'feeedback_3',
                     html: '<p>That is the class docstring. Try again.</p>'
                   },
+                  labelled_as_correct: false,
                   param_changes: [],
-                  refresher_exploration_id: null
+                  refresher_exploration_id: null,
+                  missing_prerequisite_skill_id: null
                 },
                 rule_specs: [{
                   inputs: {
                     x: 'docstring'
                   },
                   rule_type: 'IsInRegion'
-                }]
+                }],
+                training_data: null,
+                tagged_skill_misconception_id: null
               },
               {
-                labelled_as_correct: false,
                 outcome: {
                   dest: 'State 5',
                   feedback: {
@@ -430,18 +461,21 @@ describe('Extracting Image file names in the state service', () => {
                     html: "<p>That's a classmethod. It does execute code," +
                           "but it doesn't construct anything. Try again!</p>"
                   },
+                  labelled_as_correct: false,
                   param_changes: [],
-                  refresher_exploration_id: null
+                  refresher_exploration_id: null,
+                  missing_prerequisite_skill_id: null
                 },
                 rule_specs: [{
                   inputs: {
                     x: 'classfunc'
                   },
                   rule_type: 'IsInRegion'
-                }]
+                }],
+                training_data: null,
+                tagged_skill_misconception_id: null
               },
               {
-                labelled_as_correct: false,
                 outcome: {
                   dest: 'State 1',
                   feedback: {
@@ -449,15 +483,19 @@ describe('Extracting Image file names in the state service', () => {
                     html: '<p>You found it! This is the code responsible for' +
                           'constructing a new class object.</p>'
                   },
+                  labelled_as_correct: false,
                   param_changes: [],
-                  refresher_exploration_id: null
+                  refresher_exploration_id: null,
+                  missing_prerequisite_skill_id: null
                 },
                 rule_specs: [{
                   inputs: {
                     x: 'ctor'
                   },
                   rule_type: 'IsInRegion'
-                }]
+                }],
+                training_data: null,
+                tagged_skill_misconception_id: null
               }
             ],
             customization_args: {
@@ -562,7 +600,8 @@ describe('Extracting Image file names in the state service', () => {
               },
               labelled_as_correct: false,
               param_changes: [],
-              refresher_exploration_id: null
+              refresher_exploration_id: null,
+              missing_prerequisite_skill_id: null
             },
             confirmed_unclassified_answers: [],
             customization_args: {
@@ -588,8 +627,11 @@ describe('Extracting Image file names in the state service', () => {
                 },
                 labelled_as_correct: false,
                 param_changes: [],
-                refresher_exploration_id: null
-              }
+                refresher_exploration_id: null,
+                missing_prerequisite_skill_id: null
+              },
+              training_data: null,
+              tagged_skill_misconception_id: null
             }, {
               rule_specs: [{
                 inputs: {
@@ -605,8 +647,11 @@ describe('Extracting Image file names in the state service', () => {
                 },
                 labelled_as_correct: false,
                 param_changes: [],
-                refresher_exploration_id: null
-              }
+                refresher_exploration_id: null,
+                missing_prerequisite_skill_id: null
+              },
+              training_data: null,
+              tagged_skill_misconception_id: null
             }],
             hints: [{
               hint_content: {
@@ -646,7 +691,7 @@ describe('Extracting Image file names in the state service', () => {
       version: 1
     };
 
-    ImageFilenamesInExploration = {
+    this.imageFilenamesInExploration = {
       'State 1': [],
       'State 3': [],
       'State 4': ['s4Content.png', 's4Choice1.png', 's4Choice2.png',
@@ -658,17 +703,16 @@ describe('Extracting Image file names in the state service', () => {
     };
   });
 
-  it('should get all the filenames of the images in a state',
-    () => {
-      let exploration = eof.createFromBackendDict(explorationDict);
-      let states = exploration.getStates();
-      let stateNames = states.getStateNames();
-      stateNames.forEach((statename) => {
-        let filenamesInState = (
-          eifss.getImageFilenamesInState(states.getState(statename)));
-        filenamesInState.forEach(function(filename) {
-          expect(ImageFilenamesInExploration[statename]).toContain(filename);
-        });
+  it('should get all the filenames of the images in a state', () => {
+    let exploration = this.eof.createFromBackendDict(this.explorationDict);
+    let states = exploration.getStates();
+    let stateNames = states.getStateNames();
+    stateNames.forEach((statename) => {
+      let filenamesInState = (
+        this.eifss.getImageFilenamesInState(states.getState(statename)));
+      filenamesInState.forEach(function(filename) {
+        expect(this.imageFilenamesInExploration[statename]).toContain(filename);
       });
     });
+  });
 });
