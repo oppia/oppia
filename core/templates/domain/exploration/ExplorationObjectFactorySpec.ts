@@ -77,7 +77,7 @@ describe('Exploration object factory', () => {
         default_outcome: {
           dest: 'new state',
           param_changes: [],
-          feedback: null,
+          feedback: { html: '', content_id: null },
           labelled_as_correct: false,
           refresher_exploration_id: null,
           missing_prerequisite_skill_id: null
@@ -122,7 +122,7 @@ describe('Exploration object factory', () => {
         default_outcome: {
           dest: 'new state',
           param_changes: [],
-          feedback: null,
+          feedback: { html: '', content_id: null },
           labelled_as_correct: false,
           refresher_exploration_id: null,
           missing_prerequisite_skill_id: null

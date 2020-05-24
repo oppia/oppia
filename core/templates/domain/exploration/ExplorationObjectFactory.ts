@@ -34,7 +34,7 @@ import { LoggerService } from 'services/contextual/logger.service';
 import { ParamChangesObjectFactory } from
   'domain/exploration/ParamChangesObjectFactory';
 import { State } from 'domain/state/StateObjectFactory';
-import { StateBackendDictMapping, States, StatesObjectFactory } from
+import { StatesBackendDictMapping, States, StatesObjectFactory } from
   'domain/exploration/StatesObjectFactory';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
@@ -55,7 +55,7 @@ export interface IExplorationBackendDict {
   objective: string;
   param_changes: IParamChangeBackendDict[];
   param_specs: IParamSpecsBackendDict;
-  states: StateBackendDictMapping;
+  states: StatesBackendDictMapping;
   states_schema_version: number;
   tags: string[];
   title: string;
@@ -111,7 +111,7 @@ export class Exploration {
 
   getInteractionCustomizationArgs(stateName: string): ICustomizationArgs {
     const interaction = this.getInteraction(stateName);
-    return interaction ? interaction.customizationArgs : null;
+    return interaction !== null ? interaction.customizationArgs : null;
   }
 
   getInteractionInstructions(stateName: string): string {

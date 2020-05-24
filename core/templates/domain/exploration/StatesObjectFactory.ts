@@ -26,7 +26,7 @@ import { Voiceover } from 'domain/exploration/VoiceoverObjectFactory';
 const INTERACTION_SPECS = require('interactions/interaction_specs.json');
 
 export type StateMapping = {[stateName: string]: State};
-export type StateBackendDictMapping = {[stateName: string]: IStateBackendDict};
+export type StatesBackendDictMapping = {[stateName: string]: IStateBackendDict};
 
 export class States {
   constructor(
@@ -143,7 +143,7 @@ export class States {
 export class StatesObjectFactory {
   constructor(private stateObjectFactory: StateObjectFactory) {}
 
-  createFromBackendDict(statesBackendDict: StateBackendDictMapping): States {
+  createFromBackendDict(statesBackendDict: StatesBackendDictMapping): States {
     const stateMapping = {};
     for (const [stateName, backendDict] of Object.entries(statesBackendDict)) {
       stateMapping[stateName] = (

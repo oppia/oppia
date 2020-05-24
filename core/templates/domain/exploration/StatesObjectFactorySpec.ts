@@ -24,7 +24,7 @@ import { ConvertToPlainTextPipe } from
   'filters/string-utility-filters/convert-to-plain-text.pipe';
 import { IStateBackendDict, StateObjectFactory } from
   'domain/state/StateObjectFactory';
-import { StateBackendDictMapping, StatesObjectFactory } from
+import { StatesBackendDictMapping, StatesObjectFactory } from
   'domain/exploration/StatesObjectFactory';
 import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory';
@@ -42,7 +42,7 @@ describe('States object factory', () => {
       this.sof = TestBed.get(StateObjectFactory);
       this.vof = TestBed.get(VoiceoverObjectFactory);
 
-      this.statesDict = <StateBackendDictMapping>{
+      this.statesDict = <StatesBackendDictMapping>{
         'first state': {
           content: {
             content_id: 'content',
@@ -107,7 +107,7 @@ describe('States object factory', () => {
         }
       };
 
-      this.statesWithAudioDict = <StateBackendDictMapping>{
+      this.statesWithAudioDict = <StatesBackendDictMapping>{
         'first state': {
           content: {
             content_id: 'content',

@@ -22,7 +22,7 @@ import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
 import { ConvertToPlainTextPipe } from
   'filters/string-utility-filters/convert-to-plain-text.pipe';
-import { StateBackendDictMapping, StatesObjectFactory } from
+import { StatesBackendDictMapping, StatesObjectFactory } from
   'domain/exploration/StatesObjectFactory';
 import { StateImprovementSuggestionService, StateStats } from
   // eslint-disable-next-line max-len
@@ -37,7 +37,7 @@ describe('StateImprovementSuggestionService', () => {
     let ssof: StatesObjectFactory;
 
     // A self-looping state.
-    var statesDict1: StateBackendDictMapping = {
+    var statesDict1: StatesBackendDictMapping = {
       state: {
         content: {
           content_id: 'content',
@@ -103,7 +103,7 @@ describe('StateImprovementSuggestionService', () => {
     };
 
     // A non-looping state.
-    var statesDict2: StateBackendDictMapping = {
+    var statesDict2: StatesBackendDictMapping = {
       initial: {
         classifier_model_id: null,
         content: {
