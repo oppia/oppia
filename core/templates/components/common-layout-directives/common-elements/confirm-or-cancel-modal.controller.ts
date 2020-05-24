@@ -20,10 +20,7 @@
 angular.module('oppia').controller('ConfirmOrCancelModalController', [
   '$scope', '$uibModalInstance',
   function($scope, $uibModalInstance) {
-    $scope.confirm = function(value, preModalCloseHook) {
-      if (preModalCloseHook !== undefined) {
-        preModalCloseHook();
-      }
+    $scope.confirm = function(value) {
       $uibModalInstance.close(value);
     };
 

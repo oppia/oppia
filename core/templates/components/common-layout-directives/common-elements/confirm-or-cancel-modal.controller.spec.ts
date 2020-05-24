@@ -40,18 +40,6 @@ describe('Confirm Or Cancel Modal Controller', function() {
     expect($uibModalInstance.close).toHaveBeenCalledWith(message);
   });
 
-  it('should close modal with the correct value using preModalCloseHook',
-    function() {
-      var valueInController = 'skillId1';
-      var valueInpreModalCloseHook = 'skillSuammry';
-      var preModalCloseHook = function() {
-        $uibModalInstance.close(valueInpreModalCloseHook);
-      };
-      $scope.confirm(valueInController, preModalCloseHook);
-      expect($uibModalInstance.close).toHaveBeenCalledWith(
-        valueInpreModalCloseHook);
-    });
-
   it('should dismiss modal', function() {
     $scope.cancel();
     expect($uibModalInstance.dismiss).toHaveBeenCalledWith('cancel');
