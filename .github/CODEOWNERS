@@ -551,5 +551,9 @@
 /yarn.lock @vojtechjelinek @kevinlee12
 /scripts/install_third_party_libs.py @vojtechjelinek @kevinlee12
 /.github/* @kevinlee12
+
+# Procedure for picking code owners:
+# Codeowners should be selected based on speciality from the following list:
+# https://github.com/oppia/oppia/projects
 /.github/CODEOWNERS @DubeySandeep
 /.github/stale.yml @ankita240796
