@@ -22,6 +22,9 @@ require(
   'loading-dots.directive.ts');
 require(
   'components/version-diff-visualization/codemirror-mergeview.directive.ts');
+require(
+  'pages/exploration-editor-page/modal-templates/' +
+  'state-diff-modal.controller.ts');
 
 require('domain/utilities/url-interpolation.service.ts');
 

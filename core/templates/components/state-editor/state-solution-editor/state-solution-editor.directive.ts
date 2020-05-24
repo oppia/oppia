@@ -24,6 +24,9 @@ require(
   'components/state-directives/response-header/response-header.directive.ts');
 require(
   'components/state-directives/solution-editor/solution-editor.directive.ts');
+require(
+  'pages/exploration-editor-page/editor-tab/templates/modal-templates/' +
+  'add-or-update-solution-modal.controller.ts');
 
 require('domain/exploration/SolutionObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
