@@ -7447,8 +7447,8 @@ class SkillSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
                 }
             })
         )
-        
-        misconception_dict = {
+
+            misconception_dict = {
             'id': 0, 'name': 'name', 'notes': '<p>notes</p>',
             'feedback': '<p>default_feedback</p>',
             'must_be_addressed': True}
@@ -7599,7 +7599,7 @@ class SkillCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 }
             })
         )
-        
+
         misconception_dict = {
             'id': 0, 'name': 'name', 'notes': '<p>notes</p>',
             'feedback': '<p>default_feedback</p>',
@@ -7839,7 +7839,7 @@ class SkillSummaryModelValidatorTests(test_utils.GenericTestBase):
                 }
             })
         )
-        
+
         misconception_dict = {
             'id': 0, 'name': 'name', 'notes': '<p>notes</p>',
             'feedback': '<p>default_feedback</p>',

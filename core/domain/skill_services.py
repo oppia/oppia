@@ -510,7 +510,7 @@ def apply_change_list(skill_id, change_list, committer_id):
                     skill.update_worked_examples(worked_examples_list)
             elif change.cmd == skill_domain.CMD_ADD_SKILL_MISCONCEPTION:
                 misconception = skill_domain.Misconception.from_dict(
-                            change.new_misconception_dict)
+                    change.new_misconception_dict)
                 skill.add_misconception(misconception)
             elif change.cmd == skill_domain.CMD_DELETE_SKILL_MISCONCEPTION:
                 skill.delete_misconception(change.misconception_id)
