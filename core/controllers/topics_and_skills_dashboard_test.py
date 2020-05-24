@@ -244,7 +244,7 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
         csrf_token = self.get_new_csrf_token()
         explanation_html = (
             '<oppia-noninteractive-image filepath-with-value='
-            '"&quot;img.png&quot;" caption-with-value="&quot;&quot;" '
+            '"&quot;img.svg&quot;" caption-with-value="&quot;&quot;" '
             'alt-with-value="&quot;Image&quot;"></oppia-noninteractive-image>'
         )
         rubrics = [{
@@ -272,7 +272,20 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
 
         self.assertEqual(
             response_dict['error'],
-            'No image data provided for file with name img.png')
+            'No image data provided for file with name img.svg')
+
+        large_image = '<svg><path d="%s" /></svg>' % (
+            'M150 0 L75 200 L225 200 Z ' * 4000)
+        response_dict = self.post_json(
+            self.url, post_data,
+            csrf_token=csrf_token,
+            upload_files=(
+                ('img.svg', 'img.svg', large_image),
+            ), expected_status_int=400)
+
+        self.assertEqual(
+            response_dict['error'],
+            'Image exceeds file size limit of 100 KB.')
         self.logout()
 
     def test_skill_creation_with_valid_images(self):

@@ -19,6 +19,8 @@ are created.
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import logging
+
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import fs_services
@@ -183,6 +185,9 @@ class NewSkillHandler(base.BaseHandler):
         for filename in image_filenames:
             image = self.request.get(filename)
             if not image:
+                logging.error(
+                    'Image not provided for file with name %s when the skill '
+                    'with id %s was created.' % (filename, skill.id))
                 raise self.InvalidInputException(
                     'No image data provided for file with name %s' % filename)
             try:
