@@ -428,6 +428,28 @@ class VersionedModelTests(test_utils.GenericTestBase):
             'model_id1'):
             model1.get_snapshots_metadata('model_id1', [10])
 
+    def test_get_version(self):
+        model1 = TestVersionedModel(id='model_id1')
+        model1.commit(feconf.SYSTEM_COMMITTER_ID, '', [])
+        model1.commit(feconf.SYSTEM_COMMITTER_ID, '', [])
+
+        version_model = TestVersionedModel.get_version('model_id1', 2)
+        self.assertEqual(version_model.version, 2)
+
+        version_model = (
+            TestVersionedModel.get_version('nonexistent_id1', 4, strict=False))
+        self.assertIsNone(version_model)
+
+        with self.assertRaises(base_models.BaseModel.EntityNotFoundError):
+            TestVersionedModel.get_version('nonexistent_id1', 4, strict=True)
+
+        version_model = (
+            TestVersionedModel.get_version('model_id1', 4, strict=False))
+        self.assertIsNone(version_model)
+
+        with self.assertRaises(base_models.BaseModel.EntityNotFoundError):
+            TestVersionedModel.get_version('model_id1', 4, strict=True)
+
     def test_get_multi_versions(self):
         model1 = TestVersionedModel(id='model_id1')
         model1.commit(feconf.SYSTEM_COMMITTER_ID, '', [])
