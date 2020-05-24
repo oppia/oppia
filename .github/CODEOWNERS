@@ -1,13 +1,17 @@
-# NOTE TO DEVELOPERS: Procedure for picking code owners:
-# Codeowners should be one of the team leads from this page:
-# https://github.com/oppia/oppia/projects
-
 # Per-directory ownership and automatic assignment for pull requests.
 
 # The paths to the directory/files must be relative to the location of this
 # file. Wildcards such as '**', '!' are not allowed. Only glob style patterns
 # are allowed. For information about supported glob patterns please refer
 # https://docs.python.org/2/library/glob.html.
+
+# IMPORTANT NOTE TO DEVELOPERS:
+# - When assigning codeowners for new files, please do so by picking an
+#   appropriate team lead from this page:
+#   https://github.com/oppia/oppia/projects
+# - You do not need to assign yourself as a codeowner (unless you are a project
+#   lead listed on the page above).
+
 
 # Android team
 /core/domain/android_validation_constants*.py @BenHenning
