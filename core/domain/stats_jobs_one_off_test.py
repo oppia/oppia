@@ -1642,7 +1642,7 @@ class ExplorationMissingStatsAuditOneOffJobTests(OneOffJobTestBase):
         self.save_new_default_exploration('ID', 'owner_id')
 
         self.assertItemsEqual(self.run_one_off_job(), [
-            ['EXPECTED', '1 ExplorationStats model present'],
+            ['EXPECTED', '1 ExplorationStats model is valid'],
         ])
 
     def test_success_when_several_stats_model_exists(self):
@@ -1651,7 +1651,7 @@ class ExplorationMissingStatsAuditOneOffJobTests(OneOffJobTestBase):
         self.save_new_default_exploration('ID3', 'owner_id')
 
         self.assertItemsEqual(self.run_one_off_job(), [
-            ['EXPECTED', '3 ExplorationStats models present'],
+            ['EXPECTED', '3 ExplorationStats models are valid'],
         ])
 
     def test_error_when_stats_model_is_missing(self):
@@ -1685,7 +1685,7 @@ class ExplorationMissingStatsAuditOneOffJobTests(OneOffJobTestBase):
             exp_services.update_exploration('owner_id', 'ID', None, 'noop')
 
         self.assertItemsEqual(self.run_one_off_job(), [
-            ['EXPECTED', '1 ExplorationStats model present'],
+            ['EXPECTED', '1 ExplorationStats model is valid'],
             ['UNEXPECTED',
              'ExplorationStats for Exploration "ID" missing at versions: 1, 3'],
         ])
@@ -1701,7 +1701,7 @@ class ExplorationMissingStatsAuditOneOffJobTests(OneOffJobTestBase):
             stats.put()
 
         self.assertItemsEqual(self.run_one_off_job(), [
-            ['EXPECTED', '1 ExplorationStats model present'],
+            ['EXPECTED', '1 ExplorationStats model is valid'],
             ['UNEXPECTED',
              'ExplorationStats for Exploration "ID" deleted at versions: 1, 3'],
         ])
@@ -1729,7 +1729,7 @@ class ExplorationMissingStatsAuditOneOffJobTests(OneOffJobTestBase):
         self.assertItemsEqual(self.run_one_off_job(), [
             ['UNEXPECTED',
              'ExplorationStats "ID" v1 does not have stats for card "%s", but '
-             'it appears in version: 1.' % (feconf.DEFAULT_INIT_STATE_NAME)]
+             'card appears in version: 1.' % (feconf.DEFAULT_INIT_STATE_NAME)]
         ])
 
     def test_error_when_stats_for_state_does_not_exist(self):
@@ -1742,7 +1742,7 @@ class ExplorationMissingStatsAuditOneOffJobTests(OneOffJobTestBase):
         self.assertItemsEqual(self.run_one_off_job(), [
             ['UNEXPECTED',
              'ExplorationStats "ID" v1 has stats for card "Unknown State", but '
-             'it never existed.']
+             'card never existed.']
         ])
 
     def test_error_when_stats_for_state_no_longer_exists(self):
@@ -1753,31 +1753,32 @@ class ExplorationMissingStatsAuditOneOffJobTests(OneOffJobTestBase):
         stats.put()
 
         self.assertItemsEqual(self.run_one_off_job(), [
+            ['EXPECTED', '1 ExplorationStats model is valid'],
             ['UNEXPECTED',
              'ExplorationStats "ID" v2 does not have stats for card "%s", but '
-             'it appears in version: 1.' % (feconf.DEFAULT_INIT_STATE_NAME)]
+             'card appears in versions: 1, 2.' % feconf.DEFAULT_INIT_STATE_NAME]
         ])
 
     def test_error_when_stats_for_state_once_existed(self):
         self.save_new_linear_exp_with_state_names_and_interactions(
             'ID', 'owner_id',
-            ['State A', 'State B', 'State C'],
+            ['State ①', 'State ②', 'State ③'],
             ['TextInput', 'TextInput', 'EndExploration'])
         exp_services.update_exploration('owner_id', 'ID', None, 'noop') # v2
         exp_services.update_exploration( # v3
             'owner_id', 'ID', [
                 exp_domain.ExplorationChange(
-                    {'cmd': 'delete_state', 'state_name': 'State B'})
-            ], 'Delete State B')
+                    {'cmd': 'delete_state', 'state_name': 'State ②'})
+            ], 'Delete State ②')
 
         stats = stats_models.ExplorationStatsModel.get_model('ID', 3)
-        stats.state_stats_mapping['State B'] = (
+        stats.state_stats_mapping['State ②'] = (
             stats_domain.StateStats.create_default().to_dict())
         stats.put()
 
         self.assertItemsEqual(self.run_one_off_job(), [
-            ['EXPECTED', '2 ExplorationStats models present'],
+            ['EXPECTED', '2 ExplorationStats models are valid'],
             ['UNEXPECTED',
-             'ExplorationStats "ID" v3 has stats for card "State B", but it '
+             'ExplorationStats "ID" v3 has stats for card "State ②", but card '
              'only appears in versions: 1, 2.']
         ])

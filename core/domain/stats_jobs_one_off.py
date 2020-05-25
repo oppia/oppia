@@ -1380,7 +1380,7 @@ class ExplorationMissingStatsAudit(jobs.BaseMapReduceOneOffJobManager):
 
     STATUS_DELETED_KEY = 'deleted'
     STATUS_MISSING_KEY = 'missing'
-    STATUS_PRESENT_KEY = 'present'
+    STATUS_VALID_KEY = 'valid'
     STATUS_STATES_MISSING_KEY = 'missing state'
     STATUS_STATES_UNKNOWN_KEY = 'unknown state'
 
@@ -1432,7 +1432,7 @@ class ExplorationMissingStatsAudit(jobs.BaseMapReduceOneOffJobManager):
                         python_utils.UNICODE(v) for v in sorted(
                             state_name_version_appearances[state_name]))
                     yield (
-                        status_key,
+                        status_key.encode('utf-8'),
                         (exp.id, exp.version, versions_with_state_as_strs))
 
                 for state_name in exp_stats_state_names - exp_state_names:
@@ -1443,29 +1443,30 @@ class ExplorationMissingStatsAudit(jobs.BaseMapReduceOneOffJobManager):
                         python_utils.UNICODE(v) for v in sorted(
                             state_name_version_appearances[state_name]))
                     yield (
-                        status_key,
+                        status_key.encode('utf-8'),
                         (exp.id, exp.version, versions_with_state_as_strs))
 
                 if exp_state_names == exp_stats_state_names:
                     yield (
-                        ExplorationMissingStatsAudit.STATUS_PRESENT_KEY,
+                        ExplorationMissingStatsAudit.STATUS_VALID_KEY,
                         (exp.id, exp.version))
 
     @staticmethod
     def reduce(status, exp_detail_strs):
-        if status == ExplorationMissingStatsAudit.STATUS_PRESENT_KEY:
+        status = status.decode('utf-8')
+        if status == ExplorationMissingStatsAudit.STATUS_VALID_KEY:
             yield (
                 ExplorationMissingStatsAudit.JOB_RESULT_EXPECTED,
-                '%d ExplorationStats %s present' % (
+                '%d ExplorationStats %s valid' % (
                     len(exp_detail_strs),
-                    'models' if len(exp_detail_strs) > 1 else 'model'))
+                    'models are' if len(exp_detail_strs) > 1 else 'model is'))
             return
 
         elif ExplorationMissingStatsAudit.STATUS_STATES_MISSING_KEY in status:
             state_name = status.rsplit(':', 1)[-1]
             for exp_id, exp_version, versions_with_state_as_strs in (
                     ast.literal_eval(s) for s in exp_detail_strs):
-                error_str = 'but it appears in version%s: %s' % (
+                error_str = 'but card appears in version%s: %s' % (
                     's' if len(versions_with_state_as_strs) > 1 else '',
                     ', '.join(versions_with_state_as_strs))
                 yield (
@@ -1479,11 +1480,11 @@ class ExplorationMissingStatsAudit(jobs.BaseMapReduceOneOffJobManager):
             for exp_id, exp_version, versions_with_state_as_strs in (
                     ast.literal_eval(s) for s in exp_detail_strs):
                 if versions_with_state_as_strs:
-                    error_str = 'but it only appears in version%s: %s' % (
+                    error_str = 'but card only appears in version%s: %s' % (
                         's' if len(versions_with_state_as_strs) > 1 else '',
                         ', '.join(versions_with_state_as_strs))
                 else:
-                    error_str = 'but it never existed'
+                    error_str = 'but card never existed'
                 yield (
                     ExplorationMissingStatsAudit.JOB_RESULT_UNEXPECTED,
                     'ExplorationStats "%s" v%s has stats for card "%s", %s.' % (
