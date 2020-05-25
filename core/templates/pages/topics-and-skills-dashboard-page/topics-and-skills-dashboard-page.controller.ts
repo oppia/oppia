@@ -79,27 +79,28 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
           var _initDashboard = function(stayInSameTab) {
             TopicsAndSkillsDashboardBackendApiService.fetchDashboardData().then(
               function(response) {
-                ctrl.topicSummaries = response.data.topic_summary_dicts;
+                ctrl.topicSummaries = response.topic_summary_dicts;
                 ctrl.editableTopicSummaries = ctrl.topicSummaries.filter(
                   function(summary) {
                     return summary.can_edit_topic === true;
                   }
                 );
-                ctrl.untriagedSkillSummaries =
-                  response.data.untriaged_skill_summary_dicts;
-                ctrl.mergeableSkillSummaries =
-                  response.data.mergeable_skill_summary_dicts;
+                ctrl.untriagedSkillSummaries = (
+                  response.untriaged_skill_summary_dicts);
+                ctrl.mergeableSkillSummaries = (
+                  response.mergeable_skill_summary_dicts);
                 if (!stayInSameTab || !ctrl.activeTab) {
                   ctrl.activeTab = ctrl.TAB_NAME_TOPICS;
                 }
-                ctrl.userCanCreateTopic = response.data.can_create_topic;
-                ctrl.userCanCreateSkill = response.data.can_create_skill;
+                ctrl.userCanCreateTopic = response.can_create_topic;
+                ctrl.userCanCreateSkill = response.can_create_skill;
                 $rootScope.$broadcast(
                   EVENT_TYPE_TOPIC_CREATION_ENABLED, ctrl.userCanCreateTopic);
                 $rootScope.$broadcast(
                   EVENT_TYPE_SKILL_CREATION_ENABLED, ctrl.userCanCreateSkill);
-                ctrl.userCanDeleteTopic = response.data.can_delete_topic;
-                ctrl.userCanDeleteSkill = response.data.can_delete_skill;
+                ctrl.userCanDeleteTopic = response.can_delete_topic;
+                ctrl.userCanDeleteSkill = response.can_delete_skill;
+                $rootScope.$apply();
                 if (ctrl.topicSummaries.length === 0 &&
                     ctrl.untriagedSkillSummaries.length !== 0) {
                   ctrl.activeTab = ctrl.TAB_NAME_UNTRIAGED_SKILLS;

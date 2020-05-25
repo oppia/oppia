@@ -371,7 +371,6 @@
 	"I18N_SIGNUP_EMAIL_PREFERENCES_EXPLAIN": "Puedes cambiar esta configuración en cualquier momento desde la página Preferencias.",
 	"I18N_SIGNUP_ERROR_MUST_AGREE_TO_TERMS": "Para poder editar las exploraciones de este sitio, debes aceptar los términos del mismo.",
 	"I18N_SIGNUP_ERROR_NO_USERNAME": "Por favor ingresa un usuario.",
-	"I18N_SIGNUP_ERROR_USERNAME_MORE_50_CHARS": "El usuario puede tener hasta 50 caracteres.",
 	"I18N_SIGNUP_ERROR_USERNAME_NOT_AVAILABLE": "El usuario seleccionado no está disponible.",
 	"I18N_SIGNUP_ERROR_USERNAME_ONLY_ALPHANUM": "El usuario puede contener sólo caracteres alfanuméricos.",
 	"I18N_SIGNUP_ERROR_USERNAME_TAKEN": "Lo sentimos, este usuario ya está siendo utilizado.",

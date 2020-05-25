@@ -19,14 +19,17 @@
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/admin-page/services/admin-task-manager.service.ts');
 
+require('constants.ts');
 require('pages/admin-page/admin-page.constants.ajs.ts');
 
 angular.module('oppia').directive('adminMiscTab', [
   '$http', '$window', 'AdminTaskManagerService', 'UrlInterpolationService',
   'ADMIN_HANDLER_URL', 'ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL',
+  'MAX_USERNAME_LENGTH',
   function(
       $http, $window, AdminTaskManagerService, UrlInterpolationService,
-      ADMIN_HANDLER_URL, ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL) {
+      ADMIN_HANDLER_URL, ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL,
+      MAX_USERNAME_LENGTH) {
     return {
       restrict: 'E',
       scope: {},
@@ -41,11 +44,14 @@ angular.module('oppia').directive('adminMiscTab', [
         var DATA_EXTRACTION_QUERY_HANDLER_URL = (
           '/explorationdataextractionhandler');
         var SEND_DUMMY_MAIL_HANDLER_URL = (
-          '/sendDummyMailToAdminHandler');
+          '/senddummymailtoadminhandler');
+        var UPDATE_USERNAME_HANDLER_URL = '/updateusernamehandler';
         var INTERACTIONS_BY_ID_HANDLER_URL = '/interactionsbyexplorationid';
 
         var irreversibleActionMessage = (
           'This action is irreversible. Are you sure?');
+
+        ctrl.MAX_USERNAME_LENGTH = MAX_USERNAME_LENGTH;
 
         ctrl.clearSearchIndex = function() {
           if (AdminTaskManagerService.isTaskRunning()) {
@@ -170,6 +176,23 @@ angular.module('oppia').directive('adminMiscTab', [
             ctrl.setStatusMessage(
               'Server error: ' + errorResponse.data.error);
           });
+          
+        ctrl.updateUsername = function() {
+          ctrl.setStatusMessage('Updating username...');
+          $http.put(
+            UPDATE_USERNAME_HANDLER_URL, {
+              old_username: ctrl.oldUsername,
+              new_username: ctrl.newUsername
+            }).then(
+            function(response) {
+              ctrl.setStatusMessage(
+                'Successfully renamed ' + ctrl.oldUsername + ' to ' +
+                  ctrl.newUsername + '!');
+            }, function(errorResponse) {
+              ctrl.setStatusMessage(
+                'Server error: ' + errorResponse.data.error);
+            }
+          );
         };
 
         ctrl.submitQuery = function() {
@@ -200,12 +223,16 @@ angular.module('oppia').directive('adminMiscTab', [
           ctrl.numAnswers = 0;
           ctrl.showDataExtractionQueryStatus = false;
         };
+        
         ctrl.$onInit = function() {
           ctrl.topicIdForRegeneratingOpportunities = null;
           ctrl.regenerationMessage = null;
           ctrl.explorationInteractionIds = [];
+          ctrl.oldUsername = null;
+          ctrl.newUsername = null;
         };
-      }]
+      };
+    }]
     };
   }
 ]);
