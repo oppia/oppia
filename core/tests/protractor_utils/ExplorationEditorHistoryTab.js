@@ -94,7 +94,7 @@ var ExplorationEditorHistoryTab = function() {
           v1Position);
         var historyCheckboxAtv2 = await historyCheckboxSelector.get(
           v2Position);
-        
+
         expect(await historyCheckboxAtv1.isDisplayed()).toBe(true);
         await historyCheckboxAtv1.click();
 
