@@ -146,7 +146,7 @@ export class Exploration {
       interactionId ? (
         INTERACTION_SPECS[interactionId].display_mode ===
           AppConstants.INTERACTION_DISPLAY_MODE_INLINE) :
-        false);
+        true);
   }
 
   getStates(): States {
