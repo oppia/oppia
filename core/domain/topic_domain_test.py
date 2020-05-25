@@ -139,7 +139,6 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(all_story_references[2].story_id, 'story_id_2')
         self.assertEqual(all_story_references[3].story_id, 'story_id_3')
 
-
     def test_add_canonical_story(self):
         self.topic.canonical_story_references = [
             topic_domain.StoryReference.create_default_story_reference(
@@ -400,7 +399,11 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
 
     def test_category_validation(self):
         self.topic.category = 10
-        self._assert_validation_error('Expected category to be a string')
+        self._assert_validation_error('Expected topic category to be a string,'
+                                      ' received 10')
+        self.topic.category = 'Category1'
+        self._assert_validation_error('Expected topic category to be a'
+                                      ' valid category, received Category1')
 
     def test_next_subtopic_id_validation(self):
         self.topic.next_subtopic_id = '1'
@@ -934,7 +937,7 @@ class TopicSummaryTests(test_utils.GenericTestBase):
             'id': 'topic_id',
             'name': 'name',
             'description': 'topic description',
-            'category': 'topic category',
+            'category': 'Mathematics',
             'language_code': 'en',
             'version': 1,
             'canonical_story_count': 1,
@@ -948,7 +951,7 @@ class TopicSummaryTests(test_utils.GenericTestBase):
 
         self.topic_summary = topic_domain.TopicSummary(
             'topic_id', 'name', 'name', 'en', 'topic description',
-            'topic category', 1, 1, 1, 1, 1, 1, current_time,
+            'Mathematics', 1, 1, 1, 1, 1, 1, current_time,
             current_time)
 
     def test_topic_summary_gets_created(self):
@@ -981,7 +984,15 @@ class TopicSummaryTests(test_utils.GenericTestBase):
         self.topic_summary.category = 8
         with self.assertRaisesRegexp(
             utils.ValidationError,
-            'Expected category to be a string, received 8'):
+            'Expected topic category to be a string, received 8'):
+            self.topic_summary.validate()
+
+    def test_validation_fails_with_unallowed_category(self):
+        self.topic_summary.category = 'Category1'
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected topic category to be a valid'
+            ' category, received Category1'):
             self.topic_summary.validate()
 
     def test_validation_fails_with_invalid_canonical_name(self):

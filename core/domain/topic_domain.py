@@ -808,12 +808,12 @@ class Topic(python_utils.OBJECT):
 
         if not isinstance(self.category, python_utils.BASESTRING):
             raise utils.ValidationError(
-                'Expected category to be a string, received %s'
+                'Expected topic category to be a string, received %s'
                 % self.category)
 
         if self.category not in constants.ALLOWED_TOPIC_CATEGORIES:
             raise utils.ValidationError(
-                'Expected the topic category to be a valid'
+                'Expected topic category to be a valid'
                 ' category, received %s' % self.category)
 
         if not isinstance(self.subtopics, list):
@@ -1362,8 +1362,13 @@ class TopicSummary(python_utils.OBJECT):
 
         if not isinstance(self.category, python_utils.BASESTRING):
             raise utils.ValidationError(
-                'Expected category to be a string, received %s'
+                'Expected topic category to be a string, received %s'
                 % self.category)
+
+        if self.category not in constants.ALLOWED_TOPIC_CATEGORIES:
+            raise utils.ValidationError(
+                'Expected topic category to be a valid'
+                ' category, received %s' % self.category)
 
         if not isinstance(self.canonical_name, python_utils.BASESTRING):
             raise utils.ValidationError('Canonical name should be a string.')
