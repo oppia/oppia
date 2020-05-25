@@ -1025,7 +1025,7 @@ class Skill(python_utils.OBJECT):
         """Adds a new misconception to the skill.
 
         Args:
-            misconception: domain object. The misconception to be added.
+            misconception: Misconception. The misconception to be added.
         """
 
         self.misconceptions.append(misconception)
