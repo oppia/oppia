@@ -5711,7 +5711,7 @@ neo-async@^2.5.0, neo-async@^2.6.0, neo-async@^2.6.1:
   resolved "https://registry.yarnpkg.com/neo-async/-/neo-async-2.6.1.tgz#ac27ada66167fa8849a6addd837f6b189ad2081c"
   integrity sha512-iyam8fBuCUpWeKPGpaNMetEocMt364qkCsfL9JuhjXX6dRnguRVOfk2GZaDpPjcOKiiXCPINZC1GczQ7iTq3Zw==
 
-nerdamer@1.1.4:
+nerdamer@^1.1.4:
   version "1.1.4"
   resolved "https://registry.yarnpkg.com/nerdamer/-/nerdamer-1.1.4.tgz#73fab1a2c916f73c370083f92a139154abc40351"
   integrity sha512-DeieCS4JVIJRNmBwzqeJPjVSf6yUfrd/TladKCp+9XjREXHMlF1FAXgk0Sr3xrgEKu4I8k1BtPqaFPs4JbwlCg==
@@ -8410,7 +8410,7 @@ watchpack@^1.6.1:
     graceful-fs "^4.1.2"
     neo-async "^2.5.0"
 
-wavesurfer.js@3.3.3:
+wavesurfer.js@^3.3.3:
   version "3.3.3"
   resolved "https://registry.yarnpkg.com/wavesurfer.js/-/wavesurfer.js-3.3.3.tgz#9b16a62335c6bd13a3d55deb895a336d027ccb51"
   integrity sha512-meko20S9in+V5xBLSVV/9uYVBSbx5AsJNkAslZ+a5yYIeFGYwcCo4Yd1sUpSGaiNnyflzrJwC7x7TdJFYrdT8w==
