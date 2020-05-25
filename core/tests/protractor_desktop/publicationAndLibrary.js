@@ -224,7 +224,7 @@ describe('Permissions for private explorations', function() {
   var explorationPlayerPage = null;
   var libraryPage = null;
 
-  beforeEach(async function() {
+  beforeEach(function() {
     libraryPage = new LibraryPage.LibraryPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();

@@ -41,7 +41,7 @@ describe('Exploration history', function() {
   var COLOR_UNCHANGED = 'rgb(245, 245, 220)';
   var COLOR_RENAMED_UNCHANGED = 'rgb(255, 215, 0)';
 
-  beforeEach(async function() {
+  beforeEach(function() {
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorHistoryTab = explorationEditorPage.getHistoryTab();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
@@ -590,7 +590,7 @@ describe('Exploration history', function() {
       color: COLOR_UNCHANGED
     }];
     await explorationEditorPage.navigateToHistoryTab();
-    historyGraph = await explorationEditorHistoryTab.getHistoryGraph();
+    var historyGraph = await explorationEditorHistoryTab.getHistoryGraph();
     await historyGraph.selectTwoVersions(2, 3);
     await historyGraph.expectHistoryStatesToMatch(expectedHistoryStates);
     await historyGraph.expectNumberOfLinksToMatch(2, 0, 0);

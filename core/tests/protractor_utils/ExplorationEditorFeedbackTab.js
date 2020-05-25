@@ -35,6 +35,8 @@ var ExplorationEditorFeedbackTab = function() {
   var feedbackResponseTextArea = element(
     by.css('.protractor-test-feedback-response-textarea'));
   var suggestionRowClassName = '.protractor-test-oppia-feedback-tab-row';
+  var feedbackSubjectClassName = (
+    '.protractor-test-exploration-feedback-subject');
   var suggestionCommitMessageInput = element(
     by.css('.protractor-test-suggestion-commit-message'));
   var suggestionReviewMessageInput = element(
@@ -57,17 +59,11 @@ var ExplorationEditorFeedbackTab = function() {
    * Workflows
    */
   this.acceptSuggestion = async function(suggestionDescription) {
-    var rows = await element.all(by.css(suggestionRowClassName));
-    var matchingSuggestionRows = [];
-    for (var i = 0; i < rows.length; i++) {
-      var subject = await rows[i].element(
-        by.css('.protractor-test-exploration-feedback-subject')).getText();
-      if (suggestionDescription.indexOf(subject) !== -1) {
-        matchingSuggestionRows.push(await rows[i]);
-      }
-    }
-    expect(await matchingSuggestionRows[0].isDisplayed()).toBe(true);
-    await matchingSuggestionRows[0].click();
+    var matchingRow = element(by.cssContainingText(
+      `${suggestionRowClassName} ${feedbackSubjectClassName}`,
+      suggestionDescription));
+    expect(await matchingRow.isDisplayed()).toBe(true);
+    await matchingRow.click();
     expect(await viewSuggestionButton.isDisplayed()).toBe(true);
     await viewSuggestionButton.click();
     expect(await acceptSuggestionButton.isDisplayed()).toBe(true);
@@ -87,9 +83,12 @@ var ExplorationEditorFeedbackTab = function() {
     await waitFor.visibilityOf(
       element.all(by.css(suggestionRowClassName)).first(),
       'No suggestion threads are visible');
-    var rows = await element.all(by.css(suggestionRowClassName));
-    for (var i = 0; i < rows.length; i++) {
-      var subject = await explorationFeedbackSubject.getText();
+    var rows = element.all(by.css(suggestionRowClassName));
+    var rowCount = await rows.count();
+    for (var i = 0; i < rowCount; i++) {
+      var row = await rows.get(i);
+      var subject = (
+        await row.element(by.css(feedbackSubjectClassName)).getText());
       threads.push(subject);
     }
     return threads;
@@ -104,9 +103,11 @@ var ExplorationEditorFeedbackTab = function() {
     await waitFor.visibilityOf(
       element.all(by.css(suggestionRowClassName)).first(),
       'No feedback messages are visible.');
-    var rows = await element.all(by.css(suggestionRowClassName));
-    for (var i = 0; i < rows.length; i++) {
-      await rows[i].click();
+    var rows = element.all(by.css(suggestionRowClassName));
+    var rowCount = await rows.count();
+    for (var i = 0; i < rowCount; i++) {
+      var row = await rows.get(i);
+      await row.click();
       await waitFor.visibilityOf(
         explorationFeedback, 'Feedback message text is not visible');
       var message = await explorationFeedback.getText();
@@ -117,17 +118,11 @@ var ExplorationEditorFeedbackTab = function() {
   };
 
   this.rejectSuggestion = async function(suggestionDescription) {
-    var rows = await element.all(by.css(suggestionRowClassName));
-    var matchingSuggestionRows = [];
-    for (var i = 0; i < rows.length; i++) {
-      var subject = await rows[i].element(
-        by.css('.protractor-test-exploration-feedback-subject')).getText();
-      if (suggestionDescription.indexOf(subject) !== -1) {
-        matchingSuggestionRows.push(await rows[i]);
-      }
-    }
-    expect(await matchingSuggestionRows[0].isDisplayed()).toBe(true);
-    await matchingSuggestionRows[0].click();
+    var matchingRow = element(by.cssContainingText(
+      `${suggestionRowClassName} ${feedbackSubjectClassName}`,
+      suggestionDescription));
+    expect(await matchingRow.isDisplayed()).toBe(true);
+    await matchingRow.click();
     expect(await viewSuggestionButton.isDisplayed()).toBe(true);
     await viewSuggestionButton.click();
     expect(await rejectSuggestionButton.isDisplayed()).toBe(true);

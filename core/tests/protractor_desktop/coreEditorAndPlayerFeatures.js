@@ -99,7 +99,7 @@ describe('Enable correctness feedback and set correctness', function() {
     await explorationEditorMainTab.addResponse(
       'MultipleChoiceInput', await forms.toRichText('Good!'),
       'End', true, 'Equals', 'Correct!');
-    responseEditor = await explorationEditorMainTab.getResponseEditor(
+    var responseEditor = await explorationEditorMainTab.getResponseEditor(
       'default');
     await responseEditor.setFeedback(await forms.toRichText('Wrong!'));
     await explorationEditorMainTab.moveToState('End');
@@ -274,7 +274,6 @@ describe('Core exploration functionality', function() {
     explorationEditorMainTab = explorationEditorPage.getMainTab();
     explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
-    await browser.driver.get('about:blank');
     await users.createUser(
       `user${userNumber}@stateEditor.com`, `user${userNumber}StateEditor`);
     await users.login(`user${userNumber}@stateEditor.com`);

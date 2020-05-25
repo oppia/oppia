@@ -45,7 +45,7 @@ describe('Basic user journeys', function() {
   describe('Account creation', function() {
     var libraryPage = null;
 
-    beforeAll(async function() {
+    beforeAll(function() {
       libraryPage = new LibraryPage.LibraryPage();
     });
 
@@ -157,7 +157,6 @@ describe('Site language', function() {
     await waitFor.pageToFullyLoad();
     var url = await browser.getCurrentUrl();
     var pathname = url.split('/');
-
     // in the url a # is added at the end that is not part of collection ID
     collectionId = pathname[5].slice(0, -1);
     // Add existing explorations.
@@ -240,7 +239,7 @@ describe('Site language', function() {
   it('should not change in an exploration', async function() {
     await users.login('langCreator@explorations.com', true);
     await browser.get('/about');
-    waitFor.pageToFullyLoad();
+    await waitFor.pageToFullyLoad();
     await _selectLanguage('Español');
 
     await general.openEditor(firstExplorationId);

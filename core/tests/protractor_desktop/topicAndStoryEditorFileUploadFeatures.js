@@ -82,7 +82,6 @@ describe('Topic editor functionality', function() {
 
   it('should edit subtopic page contents correctly', async function() {
     var TOPIC_NAME = 'TASEFUF_2';
-    var defaultThumbnailSrc = null;
     await topicsAndSkillsDashboardPage.createTopic(TOPIC_NAME, false);
     var defaultThumbnailSrc = (
       await topicEditorPage.getTopicThumbnailSource());
@@ -123,7 +122,6 @@ describe('Topic editor functionality', function() {
 
   it('should publish and unpublish a story correctly', async function() {
     var TOPIC_NAME = 'TASEFUF_3';
-    var defaultThumbnailImageSrc = null;
     await topicsAndSkillsDashboardPage.createTopic(TOPIC_NAME, false);
 
     await topicEditorPage.expectNumberOfStoriesToBe(0);
@@ -133,7 +131,8 @@ describe('Topic editor functionality', function() {
     await topicEditorPage.expectNumberOfStoriesToBe(1);
     await topicEditorPage.expectStoryPublicationStatusToBe('No', 0);
     await topicEditorPage.navigateToStoryWithIndex(0);
-    defaultThumbnailImageSrc = await storyEditorPage.getStoryThumbnailSource();
+    var defaultThumbnailImageSrc = (
+      await storyEditorPage.getStoryThumbnailSource());
     await storyEditorPage.submitStoryThumbnail('../data/test_svg.svg');
     expect(await storyEditorPage.getStoryThumbnailSource()).not.toEqual(
       defaultThumbnailImageSrc);

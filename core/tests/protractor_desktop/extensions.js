@@ -34,7 +34,7 @@ describe('rich-text components', function() {
   var explorationEditorMainTab = null;
   var explorationPlayerPage = null;
 
-  beforeEach(async function() {
+  beforeEach(function() {
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
@@ -59,14 +59,12 @@ describe('rich-text components', function() {
       // and click on them.
       await richTextEditor.addRteComponent(
         'Collapsible', 'title', await forms.toRichText('inner'));
-      let content1 = await forms.toRichText('contents 1');
-      let content2 = await forms.toRichText('contents 2');
       await richTextEditor.addRteComponent('Tabs', [{
         title: 'title 1',
-        content: content1
+        content: await forms.toRichText('contents 1')
       }, {
         title: 'title 1',
-        content: content2
+        content: await forms.toRichText('contents 2')
       }]);
     });
 

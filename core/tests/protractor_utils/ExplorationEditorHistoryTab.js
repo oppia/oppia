@@ -90,13 +90,16 @@ var ExplorationEditorHistoryTab = function() {
         var v1Position = totalVersionNumber - versionNumber1;
         var v2Position = totalVersionNumber - versionNumber2;
 
-        expect(await historyCheckboxSelector.get(v1Position).isDisplayed())
-          .toBe(true);
-        await historyCheckboxSelector.get(v1Position).click();
+        var historyCheckboxAtv1 = await historyCheckboxSelector.get(
+          v1Position);
+        var historyCheckboxAtv2 = await historyCheckboxSelector.get(
+          v2Position);
+        
+        expect(await historyCheckboxAtv1.isDisplayed()).toBe(true);
+        await historyCheckboxAtv1.click();
 
-        expect(await historyCheckboxSelector.get(v2Position).isDisplayed())
-          .toBe(true);
-        await historyCheckboxSelector.get(v2Position).click();
+        expect(await historyCheckboxAtv2.isDisplayed()).toBe(true);
+        await historyCheckboxAtv2.click();
       },
       /*
        * This method selects two version's checkboxes to be compared
@@ -110,13 +113,16 @@ var ExplorationEditorHistoryTab = function() {
         var v1Position = totalVersionNumber - versionNumber1;
         var v2Position = totalVersionNumber - versionNumber2;
 
-        expect(await historyCheckboxSelector.get(v1Position).isDisplayed())
-          .toBe(true);
-        await historyCheckboxSelector.get(v1Position).click();
+        var historyCheckboxAtv1 = await historyCheckboxSelector.get(
+          v1Position);
+        var historyCheckboxAtv2 = await historyCheckboxSelector.get(
+          v2Position);
 
-        expect(await historyCheckboxSelector.get(v2Position).isDisplayed())
-          .toBe(true);
-        await historyCheckboxSelector.get(v2Position).click();
+        expect(await historyCheckboxAtv1.isDisplayed()).toBe(true);
+        await historyCheckboxAtv1.click();
+
+        expect(await historyCheckboxAtv2.isDisplayed()).toBe(true);
+        await historyCheckboxAtv2.click();
         // Click button to show graph.
         expect(await showHistoryGraphButton.isDisplayed()).toBe(true);
         await showHistoryGraphButton.click();
@@ -238,7 +244,9 @@ var ExplorationEditorHistoryTab = function() {
     var versionNumber = await historyCheckboxSelector.count();
     // Note: there is no 'revert' link next to the current version
     versionPosition = versionNumber - version - 1;
-    await revertVersionButton.get(versionPosition).click();
+    var revertVersionButtonForSelectedPosition = revertVersionButton.get(
+      versionPosition);
+    await revertVersionButtonForSelectedPosition.click();
     await confirmRevertVersionButton.click();
   };
 };

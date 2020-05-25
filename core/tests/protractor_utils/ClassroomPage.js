@@ -30,8 +30,7 @@ var ClassroomPage = function() {
   };
 
   this.expectNumberOfTopicsToBe = async function(count) {
-    var topics = await topicSummaryTiles;
-    expect(topics.length).toEqual(count);
+    expect(await topicSummaryTiles.count()).toEqual(count);
   };
 };
 

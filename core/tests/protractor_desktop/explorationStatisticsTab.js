@@ -69,9 +69,8 @@ describe('Issues visualization', function() {
     await workflow.createExplorationAsAdmin();
     await explorationEditorMainTab.exitTutorial();
 
-    var expId;
     var url = await browser.getCurrentUrl();
-    expId = url.split('/')[4].slice(0, -1);
+    var expId = url.split('/')[4].slice(0, -1);
 
     await explorationEditorPage.navigateToSettingsTab();
     await explorationEditorSettingsTab.setTitle(EXPLORATION_TITLE);
@@ -132,13 +131,6 @@ describe('Issues visualization', function() {
       'The probability of recording playthroughs', 'Real',
       async function(elem) {
         await elem.setValue(1.0);
-      });
-    // TODO(#7569): Change this test to work with the improvements tab.
-    await adminPage.editConfigProperty(
-      'Exposes the Improvements Tab for creators in the exploration editor.',
-      'Boolean',
-      async function(elem) {
-        await elem.setValue(false);
       });
   });
 

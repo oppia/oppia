@@ -162,17 +162,17 @@ describe('Embedding', function() {
         general.SERVER_URL_PREFIX + general.SCRIPTS_URL_SLICE +
         TEST_PAGES[i].filename);
 
-      await driver.findElement(by.css(
+      await (await driver.findElement(by.css(
         '.protractor-test-exploration-id-input-field')
-      ).sendKeys(explorationId);
+      )).sendKeys(explorationId);
 
-      await driver.findElement(by.css(
+      await (await driver.findElement(by.css(
         '.protractor-test-exploration-id-submit-button')
-      ).click();
+      )).click();
 
       // Test of standard loading (new and old versions).
       await browser.switchTo().frame(
-        driver.findElement(
+        await driver.findElement(
           by.css('.protractor-test-standard > iframe')));
       await playCountingExploration(3);
       await browser.switchTo().defaultContent();
@@ -185,7 +185,7 @@ describe('Embedding', function() {
       }
 
       await browser.switchTo().frame(
-        driver.findElement(
+        await driver.findElement(
           by.css('.protractor-test-old-version > iframe')));
       await playCountingExploration(2);
       await browser.switchTo().defaultContent();
@@ -247,26 +247,20 @@ describe('Embedding', function() {
           general.SERVER_URL_PREFIX + general.SCRIPTS_URL_SLICE +
           'embedding_tests_dev_i18n_0.0.1.html');
 
-        await driver.findElement(by.css(
+        await (await driver.findElement(by.css(
           '.protractor-test-exploration-id-input-field')
-        ).sendKeys(explorationId);
+        )).sendKeys(explorationId);
 
-        await driver.findElement(by.css(
+        await (await driver.findElement(by.css(
           '.protractor-test-exploration-id-submit-button')
-        ).click();
+        )).click();
 
-        await browser.switchTo().frame(driver.findElement(
+        await browser.switchTo().frame(await driver.findElement(
           by.css('.protractor-test-embedded-exploration > iframe')));
         await waitFor.pageToFullyLoad();
 
-        // TODO(#7622): Remove this sleep. Remove the todo in
-        // scripts/linters/pre_commit_linter.py pointing to the same issue This
-        // sleep was placed here as a temporary measure because the wait in the
-        // line above does not wait for the iframe to load fully.
-        await browser.sleep(6000);
-
-        expect(await driver.findElement(
-          by.css('.protractor-test-float-form-input')).getAttribute(
+        expect(await (await driver.findElement(
+          by.css('.protractor-test-float-form-input'))).getAttribute(
           'placeholder')).toBe(expectedPlaceholder);
         await browser.switchTo().defaultContent();
       };
