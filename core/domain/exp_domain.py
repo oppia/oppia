@@ -2427,7 +2427,6 @@ class Exploration(python_utils.OBJECT):
         Returns:
             dict. The converted states_dict.
         """
-
         for key, state_dict in states_dict.items():
             states_dict[key] = state_domain.State.convert_html_fields_in_state(
                 state_dict,
@@ -3369,7 +3368,7 @@ class Exploration(python_utils.OBJECT):
     def _convert_v38_dict_to_v39_dict(cls, exploration_dict):
         """Converts a v38 exploration dict into a v39 exploration dict.
         Adds a new attribute math RTEs. The new attribute has an additional
-        field to for storing SVG filenames..
+        field to for storing SVG filenames.
 
         Args:
             exploration_dict: dict. The dict representation of an exploration
@@ -3379,7 +3378,6 @@ class Exploration(python_utils.OBJECT):
             dict. The dict representation of the Exploration domain object,
             following schema version v39.
         """
-
         exploration_dict['schema_version'] = 39
 
         exploration_dict['states'] = cls._convert_states_v33_dict_to_v34_dict(

@@ -24,7 +24,6 @@ import logging
 from core.domain import exp_domain
 from core.domain import html_validation_service
 from core.platform import models
-
 import python_utils
 import utils
 
@@ -168,9 +167,6 @@ def try_upgrading_draft_to_exp_version(
     return draft_change_list
 
 
-
-
-
 class DraftUpgradeUtil(python_utils.OBJECT):
     """Wrapper class that contains util functions to upgrade drafts."""
 
@@ -273,8 +269,6 @@ class DraftUpgradeUtil(python_utils.OBJECT):
                             add_math_content_to_math_rte_components(
                                 change.new_value))
                     })
-
-
         return draft_change_list
 
     @classmethod

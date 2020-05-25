@@ -1467,7 +1467,6 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                     exp_id, test_case['html_content']),
                 test_case['expected_output'])
 
-
     def test_add_math_content_to_math_rte_components(self):
         test_cases = [{
             'html_content': (
@@ -1518,7 +1517,6 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 html_validation_service.add_math_content_to_math_rte_components(
                     test_case['html_content']),
                 test_case['expected_output'])
-
 
     def test_regenerate_image_filename_using_dimensions(self):
         regenerated_name = (

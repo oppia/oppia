@@ -253,7 +253,6 @@ class SubtopicPage(python_utils.OBJECT):
                 page_contents_dict['subtitled_html']['html']))
         return page_contents_dict
 
-
     @classmethod
     def update_page_contents_from_model(
             cls, versioned_page_contents, current_version):

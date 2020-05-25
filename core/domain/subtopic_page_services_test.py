@@ -33,11 +33,6 @@ import feconf
     models.NAMES.base_model, models.NAMES.topic])
 
 
-# TODO(lilithxxx): Remove this mock class and the migrate_page_contents tests
-# once the actual functions for page content migrations are implemented.
-# See issue: https://github.com/oppia/oppia/issues/7009.
-
-
 class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
     """Tests for topic domain objects."""
     user_id = 'user_id'
@@ -319,18 +314,18 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
         }
 
         subtopic_page_id = topic_models.SubtopicPageModel.get_new_id('')
-        subtopic_page_model2 = topic_models.SubtopicPageModel(
+        subtopic_page_model = topic_models.SubtopicPageModel(
             id=subtopic_page_id,
             topic_id=self.TOPIC_ID,
             page_contents=page_contents_dict,
             page_contents_schema_version=1,
             language_code='en'
         )
-        self.assertEqual(subtopic_page_model2.page_contents_schema_version, 1)
+        self.assertEqual(subtopic_page_model.page_contents_schema_version, 1)
 
         with current_schema_version_swap, subtopic_page_swap:
             subtopic_page = subtopic_page_services.get_subtopic_page_from_model(
-                subtopic_page_model2)
+                subtopic_page_model)
 
         self.assertEqual(subtopic_page.page_contents_schema_version, 2)
         self.assertEqual(

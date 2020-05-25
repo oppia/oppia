@@ -1189,8 +1189,6 @@ class SkillMigrationTests(test_utils.GenericTestBase):
         with current_schema_version_swap:
             skill = skill_services.get_skill_from_model(model)
 
-
-
         self.assertEqual(skill.misconceptions_schema_version, 3)
         self.assertEqual(skill.misconceptions[0].must_be_addressed, True)
         self.assertEqual(skill.misconceptions[0].notes, expected_html)
@@ -1204,7 +1202,6 @@ class SkillMigrationTests(test_utils.GenericTestBase):
         html = ('<p>Value</p><oppia-noninteractive-math ' +
                 'raw_latex-with-value="&amp;quot;+,-,-,+&amp;quot' +
                 ';"></oppia-noninteractive-math>')
-
         expected_html = ('<p>Value</p><oppia-noninteractive-' +
                          'math math_content-with-value="{&amp;quot' +
                          ';raw_latex&amp;quot;: &amp;quot;+,-,-,+' +

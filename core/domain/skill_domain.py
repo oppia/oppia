@@ -927,7 +927,6 @@ class Skill(python_utils.OBJECT):
         misconception_dict['feedback'] = (
             html_validation_service.add_math_content_to_math_rte_components(
                 misconception_dict['feedback']))
-
         return misconception_dict
 
     @classmethod

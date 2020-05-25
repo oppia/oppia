@@ -982,7 +982,6 @@ class Story(python_utils.OBJECT):
                 add_math_content_to_math_rte_components(node['outline']))
         return story_contents_dict
 
-
     @classmethod
     def update_story_contents_from_model(
             cls, versioned_story_contents, current_version):
