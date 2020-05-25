@@ -51,7 +51,6 @@ angular.module('oppia').directive('storySummaryTile', [
           };
 
           ctrl.showAllChapters = function() {
-            ctrl.stopWatcherOnHeight = true;
             ctrl.initialCount = ctrl.chaptersDisplayed;
             ctrl.chaptersDisplayed = ctrl.nodeCount;
           };
