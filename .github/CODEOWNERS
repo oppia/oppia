@@ -5,11 +5,13 @@
 # are allowed. For information about supported glob patterns please refer
 # https://docs.python.org/2/library/glob.html.
 
-# Note: The e2e test files are owned by both the dev workflow and QA teams.
-# - The QA team will do an initial review to verify the PR's test coverage. They
-#   will then ask the dev workflow team for a final review.
-# - The dev workflow team will review the code quality to see if the e2e tests
-#   can be optimized further.
+# IMPORTANT NOTE TO DEVELOPERS:
+# - When assigning codeowners for new files, please do so by picking an
+#   appropriate team lead from this page:
+#   https://github.com/oppia/oppia/projects
+# - You do not need to assign yourself as a codeowner (unless you are a project
+#   lead listed on the page above).
+
 
 # Android team
 /core/domain/android_validation_constants*.py @BenHenning
@@ -551,3 +553,5 @@
 /yarn.lock @vojtechjelinek @kevinlee12
 /scripts/install_third_party_libs.py @vojtechjelinek @kevinlee12
 /.github/ @kevinlee12
+/.github/CODEOWNERS @DubeySandeep
+/.github/stale.yml @ankita240796
