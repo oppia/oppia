@@ -76,6 +76,8 @@ import { CountVectorizerService } from 'classifiers/count-vectorizer.service';
 import { CreatorDashboardBackendApiService } from
   'domain/creator_dashboard/creator-dashboard-backend-api.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
+import { CurrentInteractionService } from
+  'pages/exploration-player-page/services/current-interaction.service';
 import { DashboardFilterObjectFactory } from
   'domain/topics_and_skills_dashboard/DashboardFilterObjectFactory';
 import { DashboardTopicObjectFactory } from
@@ -678,6 +680,11 @@ export class UpgradedServices {
         upgradedServices['HttpClient']));
     upgradedServices['CreatorDashboardBackendApiService'] =
       new CreatorDashboardBackendApiService(upgradedServices['HttpClient']);
+    upgradedServices['CurrentInteractionService'] =
+      new CurrentInteractionService(
+        upgradedServices['ContextService'],
+        upgradedServices['PlayerPositionService'],
+        upgradedServices['PlayerTranscriptService']);
     upgradedServices['EmailDashboardDataService'] =
       new EmailDashboardDataService(upgradedServices['HttpClient']);
     upgradedServices['ExplorationHtmlFormatterService'] =
