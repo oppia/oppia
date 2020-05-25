@@ -1533,6 +1533,33 @@ class SnapshotsMetadataUserIdMigrationJobTests(test_utils.GenericTestBase):
             rights_commit_model.commit_cmds[0]['assignee_id'],
             feconf.MIGRATION_BOT_USER_ID)
 
+    def test_migrate_collection_rights_snapshot_model_missing_commit(self):
+        collection_models.CollectionRightsSnapshotMetadataModel(
+            id='col_1_id-1',
+            committer_id=self.USER_1_GAE_ID,
+            commit_type='edit',
+            commit_message='commit message 2',
+            commit_cmds=[{
+                'cmd': rights_manager.CMD_CHANGE_ROLE,
+                'assignee_id': self.USER_1_GAE_ID,
+                'old_role': rights_manager.ROLE_NONE,
+                'new_role': rights_manager.ROLE_EDITOR}]
+        ).put()
+
+        output = self._run_one_off_job()
+        self.assertEqual(
+            output, [
+                ['SUCCESS_MISSING_COMMIT - '
+                 'CollectionRightsSnapshotMetadataModel',
+                 ['col_1_id-1']]])
+
+        rights_snapshot_model = (
+            collection_models.CollectionRightsSnapshotMetadataModel.get_by_id(
+                'col_1_id-1'))
+        self.assertEqual(
+            rights_snapshot_model.commit_cmds[0]['assignee_id'],
+            self.USER_1_USER_ID)
+
     def test_migrate_collection_rights_snapshot_model_wrong_id(self):
         collection_models.CollectionRightsSnapshotMetadataModel(
             id='col_1_id-1',
@@ -1699,6 +1726,31 @@ class SnapshotsMetadataUserIdMigrationJobTests(test_utils.GenericTestBase):
                 'rights-top_1_id-1'))
         self.assertEqual(
             rights_commit_model.commit_cmds[0]['removed_user_id'],
+            self.USER_1_USER_ID)
+
+    def test_migrate_topic_rights_snapshot_model_missing_commit(self):
+        topic_models.TopicRightsSnapshotMetadataModel(
+            id='top_1_id-1',
+            committer_id=self.USER_1_GAE_ID,
+            commit_type='edit',
+            commit_message='commit message 2',
+            commit_cmds=[{
+                'cmd': topic_domain.CMD_REMOVE_MANAGER_ROLE,
+                'removed_user_id': self.USER_1_GAE_ID}]
+        ).put()
+
+        output = self._run_one_off_job()
+        self.assertEqual(
+            output, [
+                ['SUCCESS_MISSING_COMMIT - '
+                 'TopicRightsSnapshotMetadataModel',
+                 ['top_1_id-1']]])
+
+        rights_snapshot_model = (
+            topic_models.TopicRightsSnapshotMetadataModel.get_by_id(
+                'top_1_id-1'))
+        self.assertEqual(
+            rights_snapshot_model.commit_cmds[0]['removed_user_id'],
             self.USER_1_USER_ID)
 
 

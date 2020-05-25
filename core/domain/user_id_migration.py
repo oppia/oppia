@@ -455,6 +455,10 @@ class SnapshotsMetadataUserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
             snapshot_model: CollectionRightsSnapshotMetadataModel. The model
                 that contains the old user IDs.
             commit_model_class: class. The type of the commit log model.
+
+        Returns:
+            (str, str) or None. If the commit log model is not found return
+            output that can be yielded by map.
         """
         if are_commit_cmds_role_change(snapshot_model.commit_cmds):
             snapshot_commit_cmd = snapshot_model.commit_cmds[0]
@@ -465,6 +469,12 @@ class SnapshotsMetadataUserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
                 'rights-%s-%s' % (
                     snapshot_model.get_unversioned_instance_id(),
                     snapshot_model.get_version_string()))
+            if commit_log_model is None:
+                snapshot_model.put(update_last_updated_time=False)
+                snapshot_class_name = snapshot_model.__class__.__name__
+                return (
+                    'SUCCESS_MISSING_COMMIT - %s' % snapshot_class_name,
+                    snapshot_model.id)
             commit_log_commit_cmd = commit_log_model.commit_cmds[0]
             commit_log_commit_cmd['assignee_id'] = (
                 get_user_id_corresponding_to_gae_id(
@@ -476,6 +486,7 @@ class SnapshotsMetadataUserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
                 commit_log_model.put(update_last_updated_time=False)
 
             transaction_services.run_in_transaction(_put_both_models)
+            return None
 
     @staticmethod
     def _migrate_topic(snapshot_model):
@@ -485,6 +496,10 @@ class SnapshotsMetadataUserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
         Args:
             snapshot_model: TopicRightsSnapshotMetadataModel. The model
                 that contains the old user IDs.
+
+        Returns:
+            (str, str) or None. If the commit log model is not found return
+            output that can be yielded by map.
         """
         if are_commit_cmds_role_change(snapshot_model.commit_cmds):
             commit_cmd = snapshot_model.commit_cmds[0]
@@ -501,6 +516,12 @@ class SnapshotsMetadataUserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
                     'rights-%s-%s' % (
                         snapshot_model.get_unversioned_instance_id(),
                         snapshot_model.get_version_string())))
+            if commit_log_model is None:
+                snapshot_model.put(update_last_updated_time=False)
+                return (
+                    'SUCCESS_MISSING_COMMIT - TopicRightsSnapshotMetadataModel',
+                    snapshot_model.id
+                )
             commit_cmd = commit_log_model.commit_cmds[0]
             if commit_cmd['cmd'] == topic_domain.CMD_CHANGE_ROLE:
                 commit_cmd['assignee_id'] = (
@@ -540,29 +561,31 @@ class SnapshotsMetadataUserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
             if isinstance(
                     snapshot_model,
                     collection_models.CollectionRightsSnapshotMetadataModel):
-                SnapshotsMetadataUserIdMigrationJob._migrate_model(
+                output = SnapshotsMetadataUserIdMigrationJob._migrate_model(
                     snapshot_model,
                     collection_models.CollectionCommitLogEntryModel)
             elif isinstance(
                     snapshot_model,
                     exp_models.ExplorationRightsSnapshotMetadataModel):
-                SnapshotsMetadataUserIdMigrationJob._migrate_model(
+                output = SnapshotsMetadataUserIdMigrationJob._migrate_model(
                     snapshot_model,
                     exp_models.ExplorationCommitLogEntryModel)
             elif isinstance(
                     snapshot_model,
                     topic_models.TopicRightsSnapshotMetadataModel):
-                SnapshotsMetadataUserIdMigrationJob._migrate_topic(
+                output = SnapshotsMetadataUserIdMigrationJob._migrate_topic(
                     snapshot_model)
+            if output:
+                yield output
+            else:
+                yield ('SUCCESS - %s' % class_name, snapshot_model.id)
         except MissingUserException as e:
             yield ('FAILURE - %s' % class_name, e)
-        else:
-            yield ('SUCCESS - %s' % class_name, snapshot_model.id)
 
     @staticmethod
     def reduce(key, ids):
         """Implements the reduce function for this job."""
-        if key.startswith('SUCCESS'):
+        if key.startswith('SUCCESS - '):
             yield (key, len(ids))
         else:
             yield (key, ids)
