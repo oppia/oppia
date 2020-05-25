@@ -24,7 +24,7 @@ import { SkillSummaryObjectFactory } from
   'domain/skill/SkillSummaryObjectFactory';
 import { SubtopicObjectFactory } from 'domain/topic/SubtopicObjectFactory';
 
-describe('Topic Data Object Factory', () => {
+describe('Read only topic object Factory', () => {
   let readOnlyTopicObjectFactory: ReadOnlyTopicObjectFactory = null;
   let _sampleReadOnlyTopic: ReadOnlyTopic = null;
 
@@ -41,14 +41,18 @@ describe('Topic Data Object Factory', () => {
         id: '0',
         title: 'Story Title',
         description: 'Story Description',
-        node_count: 1,
+        node_titles: ['Chapter 1'],
+        thumbnail_filename: 'image.svg',
+        thumbnail_bg_color: '#F8BF74',
         published: true
       }],
       additional_story_dicts: [{
         id: '1',
         title: 'Story Title',
         description: 'Story Description',
-        node_count: 1,
+        node_titles: ['Chapter 1'],
+        thumbnail_filename: 'image.svg',
+        thumbnail_bg_color: '#F8BF74',
         published: true
       }],
       uncategorized_skill_ids: ['skill_id_1'],
@@ -112,8 +116,8 @@ describe('Topic Data Object Factory', () => {
       .toEqual('Story Title');
     expect(_sampleReadOnlyTopic.getCanonicalStorySummaries()[0]
       .getDescription()).toEqual('Story Description');
-    expect(_sampleReadOnlyTopic.getCanonicalStorySummaries()[0].getNodeCount())
-      .toEqual(1);
+    expect(_sampleReadOnlyTopic.getCanonicalStorySummaries()[0].getNodeTitles())
+      .toEqual(['Chapter 1']);
   });
 
   it('should return correct values of additional stories', () => {
@@ -124,7 +128,7 @@ describe('Topic Data Object Factory', () => {
     expect(_sampleReadOnlyTopic.getAdditionalStorySummaries()[0]
       .getDescription()).toEqual('Story Description');
     expect(_sampleReadOnlyTopic.getAdditionalStorySummaries()[0]
-      .getNodeCount()).toEqual(1);
+      .getNodeTitles()).toEqual(['Chapter 1']);
   });
 
   it('should return the correct value of degrees for skills', () => {

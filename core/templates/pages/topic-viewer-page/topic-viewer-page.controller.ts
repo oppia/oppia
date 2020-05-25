@@ -62,7 +62,7 @@ angular.module('oppia').directive('topicViewerPage', [
             return (WindowDimensionsService.getWidth() < 500);
           };
           ctrl.$onInit = function() {
-            ctrl.canonicalStoriesList = [];
+            ctrl.canonicalStorySummaries = [];
             ctrl.setActiveTab('info');
             ctrl.topicName = UrlService.getTopicNameFromLearnerUrl();
 
@@ -75,7 +75,7 @@ angular.module('oppia').directive('topicViewerPage', [
                 ctrl.topicId = readOnlyTopic.getTopicId();
                 ctrl.topicName = readOnlyTopic.getTopicName();
                 ctrl.topicDescription = readOnlyTopic.getTopicDescription();
-                ctrl.canonicalStoriesList = (
+                ctrl.canonicalStorySummaries = (
                   readOnlyTopic.getCanonicalStorySummaries());
                 ctrl.degreesOfMastery = readOnlyTopic.getDegreesOfMastery();
                 ctrl.subtopics = readOnlyTopic.getSubtopics();

@@ -16,7 +16,6 @@
  * @fileoverview Directive for the stories list.
  */
 
-require('components/summary-tile/story-summary-tile.directive.ts');
 require('pages/practice-session-page/practice-session-page.constants.ajs.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('services/contextual/window-dimensions.service.ts');

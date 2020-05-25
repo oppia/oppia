@@ -143,14 +143,16 @@ export class ReadOnlyTopicObjectFactory {
         topicDataDict.canonical_story_dicts.map(
           (storyDict: any) => {
             return new StorySummary(
-              storyDict.id, storyDict.title, storyDict.node_count,
+              storyDict.id, storyDict.title, storyDict.node_titles,
+              storyDict.thumbnail_filename, storyDict.thumbnail_bg_color,
               storyDict.description, true);
           });
     let additionalStories: Array<StorySummary> =
         topicDataDict.additional_story_dicts.map(
           (storyDict: any) => {
             return new StorySummary(
-              storyDict.id, storyDict.title, storyDict.node_count,
+              storyDict.id, storyDict.title, storyDict.node_titles,
+              storyDict.thumbnail_filename, storyDict.thumbnail_bg_color,
               storyDict.description, true);
           });
     return new ReadOnlyTopic(

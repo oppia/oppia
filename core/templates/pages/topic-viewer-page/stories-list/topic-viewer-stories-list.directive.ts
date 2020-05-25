@@ -24,18 +24,19 @@ angular.module('oppia').directive('storiesList', ['UrlInterpolationService',
   function(UrlInterpolationService) {
     return {
       restrict: 'E',
-      scope: {
-        getCanonicalStories: '&canonicalStoriesList',
+      scope: {},
+      bindToController: {
+        getCanonicalStorySummaries: '&canonicalStorySummaries',
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/topic-viewer-page/stories-list/' +
         'topic-viewer-stories-list.directive.html'),
+      controllerAs: '$ctrl',
       controller: ['$scope',
         function($scope) {
           var ctrl = this;
 
           ctrl.$onInit = function() {
-            $scope.canonicalStories = $scope.getCanonicalStories();
           };
         }
       ]

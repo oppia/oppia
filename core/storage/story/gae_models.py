@@ -200,7 +200,11 @@ class StorySummaryModel(base_models.BaseModel):
     # model was created).
     story_model_created_on = ndb.DateTimeProperty(required=True, indexed=True)
     # The number of nodes that are part of this story.
-    node_count = ndb.IntegerProperty(required=True, indexed=True)
+    node_titles = ndb.StringProperty(repeated=True, indexed=False)
+    # The thumbnail filename of the story.
+    thumbnail_filename = ndb.StringProperty(indexed=True)
+    # The thumbnail background color of the story.
+    thumbnail_bg_color = ndb.StringProperty(indexed=True)
     version = ndb.IntegerProperty(required=True)
 
     @staticmethod

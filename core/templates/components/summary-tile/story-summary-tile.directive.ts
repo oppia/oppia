@@ -16,8 +16,14 @@
  * @fileoverview Component for a canonical story tile.
  */
 
+require(
+  'components/summary-tile/' +
+  'story-summary-tile-displayed-chapters-calculator.directive.ts');
+
 require('domain/utilities/url-interpolation.service.ts');
 require('domain/topic_viewer/topic-viewer-domain.constants.ajs.ts');
+require('services/assets-backend-api.service.ts');
+require('services/contextual/window-dimensions.service.ts');
 
 angular.module('oppia').directive('storySummaryTile', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -25,25 +31,46 @@ angular.module('oppia').directive('storySummaryTile', [
       restrict: 'E',
       scope: {},
       bindToController: {
-        getStoryId: '&storyId',
-        getStoryTitle: '&title',
-        getStoryDescription: '&description',
+        getStorySummary: '&storySummary'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/summary-tile/story-summary-tile.directive.html'),
       controllerAs: '$ctrl',
-      controller: ['STORY_VIEWER_URL_TEMPLATE',
-        function(STORY_VIEWER_URL_TEMPLATE) {
+      controller: [
+        'AssetsBackendApiService', 'WindowDimensionsService',
+        'ENTITY_TYPE', 'STORY_VIEWER_URL_TEMPLATE',
+        function(
+            AssetsBackendApiService, WindowDimensionsService,
+            ENTITY_TYPE, STORY_VIEWER_URL_TEMPLATE) {
           var ctrl = this;
           ctrl.getStoryLink = function() {
             return UrlInterpolationService.interpolateUrl(
               STORY_VIEWER_URL_TEMPLATE, {
-                story_id: ctrl.getStoryId()
+                story_id: ctrl.getStorySummary().getId()
               });
           };
 
-          ctrl.getStaticImageUrl = function(imagePath) {
-            return UrlInterpolationService.getStaticImageUrl(imagePath);
+          ctrl.showAllChapters = function() {
+            ctrl.stopWatcherOnHeight = true;
+            ctrl.initialCount = ctrl.chaptersDisplayed;
+            ctrl.chaptersDisplayed = ctrl.nodeCount;
+          };
+
+          ctrl.hideExtraChapters = function() {
+            ctrl.chaptersDisplayed = ctrl.initialCount;
+          };
+
+          ctrl.$onInit = function() {
+            ctrl.nodeCount = ctrl.getStorySummary().getNodeTitles().length;
+            ctrl.showButton = false;
+            ctrl.referenceHeight = (
+              angular.element('.story-thumbnail')[0].offsetHeight);
+            ctrl.chaptersDisplayed = (
+              ctrl.getStorySummary().getNodeTitles().length);
+            ctrl.thumbnailUrl = (
+              AssetsBackendApiService.getThumbnailUrlForPreview(
+                ENTITY_TYPE.STORY, ctrl.getStorySummary().getId(),
+                ctrl.getStorySummary().getThumbnailFilename()));
           };
         }
       ]

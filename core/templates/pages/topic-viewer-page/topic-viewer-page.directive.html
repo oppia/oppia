@@ -2,8 +2,8 @@
   <div class="oppia-topic-viewer-tabs-container">
     <ul class="topic-viewer-tabs">
       <li ng-class="{'topic-viewer-tabs-active': $ctrl.activeTab === 'info'}">
-        <div style="padding-top: 20px" class="topic-viewer-tabs-text" ng-click="$ctrl.setActiveTab('info')">
-          <span class="material-icons tab-icon"> info_outline </span>
+        <div class="topic-viewer-tabs-text" ng-click="$ctrl.setActiveTab('info')">
+          <img class="tab-icon" ng-src="<[$ctrl.getStaticImageUrl('/icons/info_24px.svg')]>" height="45">
           <a class="tab-title"
              translate="I18N_TOPIC_VIEWER_INFO">
           </a>
@@ -11,23 +11,23 @@
       </li>
       <li ng-class="{'topic-viewer-tabs-active': $ctrl.activeTab === 'story'}">
         <div class="topic-viewer-tabs-text" ng-click="$ctrl.setActiveTab('story')">
-          <img class="tab-icon icon-rotate" ng-src="<[$ctrl.getStaticImageUrl('/general/collection_paw.svg')]>" height="50">
+          <img class="tab-icon" ng-src="<[$ctrl.getStaticImageUrl('/icons/play_icon_24px.svg')]>" height="45">
           <a class="tab-title"
              translate="I18N_TOPIC_VIEWER_LESSONS">
           </a>
         </div>
       </li>
       <li ng-class="{'topic-viewer-tabs-active': $ctrl.activeTab === 'practice'}">
-        <div style="padding-top: 20px" class="topic-viewer-tabs-text" ng-click="$ctrl.setActiveTab('practice')">
-          <span class="fas fa-brain tab-icon"></span>
+        <div class="topic-viewer-tabs-text" ng-click="$ctrl.setActiveTab('practice')">
+          <img class="tab-icon" ng-src="<[$ctrl.getStaticImageUrl('/icons/train_icon_24px.svg')]>" height="45">
           <a class="tab-title"
              translate="I18N_TOPIC_VIEWER_PRACTICE">
           </a>
         </div>
       </li>
       <li ng-class="{'topic-viewer-tabs-active': $ctrl.activeTab === 'subtopics'}">
-        <div style="padding-top: 20px" class="topic-viewer-tabs-text" ng-click="$ctrl.setActiveTab('subtopics')">
-          <span class="fas fa-book-open tab-icon"></span>
+        <div class="topic-viewer-tabs-text" ng-click="$ctrl.setActiveTab('subtopics')">
+          <img class="tab-icon" ng-src="<[$ctrl.getStaticImageUrl('/icons/review_icon_24px.svg')]>" height="45">
           <a class="tab-title"
              translate="I18N_TOPIC_VIEWER_REVISION">
           </a>
@@ -40,12 +40,12 @@
     <div ng-if="$ctrl.activeTab === 'info'" class="tab-content">
       <topic-info-tab topic-name="$ctrl.topicName"
                       topic-description="$ctrl.topicDescription"
-                      story-count="$ctrl.canonicalStoriesList.length"
+                      story-count="$ctrl.canonicalStorySummaries.length"
                       subtopic-count="$ctrl.subtopics.length">
       </topic-info-tab>
     </div>
     <div ng-if="$ctrl.activeTab === 'story'" class="tab-content">
-      <stories-list canonical-stories-list="$ctrl.canonicalStoriesList"></stories-list>
+      <stories-list canonical-story-summaries="$ctrl.canonicalStorySummaries"></stories-list>
     </div>
     <div ng-if="$ctrl.activeTab === 'practice'" class="oppia-practice-tab">
       <practice-tab topic-name="$ctrl.topicName"></practice-tab>
@@ -64,27 +64,12 @@
     width: 100%;
   }
 
-  .oppia-topic-viewer-tabs-container  .icon-rotate {
-    -webkit-transform: rotate(285deg);
-    -moz-transform: rotate(285deg);
-    -o-transform: rotate(285deg);
-    -ms-transform: rotate(285deg);
-    transform: rotate(285deg);
-  }
-
-  .oppia-topic-viewer-tabs-container .material-icons {
-    padding-bottom: 8px;
-  }
-
-  .oppia-topic-viewer-tabs-container .fas {
-    padding-bottom: 8px;
-  }
-
   .oppia-topic-viewer-tabs-container .topic-viewer-tabs .tab-icon {
     display: block;
     font-size: 2em;
     margin-left: auto;
     margin-right: auto;
+    padding-bottom: 7px;
     width: 50%;
   }
 
