@@ -884,7 +884,8 @@ def get_filename_with_dimensions(old_filename, exp_id):
 def add_math_content_to_math_rte_components(html_string):
     """Replaces the attribute raw_latex-with-value in all Math RTE tags with
     a new attribute math_content-with-value. The new attribute has an additional
-    field for storing SVG filenames.The field for SVG filename will be empty
+    field for storing SVG filenames.The field for SVG filename will be an empty
+    string.
 
     Args:
         html_string: str. HTML string to modify.
@@ -911,6 +912,8 @@ def add_math_content_to_math_rte_components(html_string):
             # Add the new attribute math_expression_contents-with-value.
             math['math_content-with-value'] = escape_html(
                 json.dumps(normalized_math_content_dict, sort_keys=True))
+    # Beautiful soup replaces <br> with </br> tag, but for passing the
+    # textangular migration we should have only <br> tags and no </br> .
     return python_utils.UNICODE(soup).replace('<br/>', '<br>')
 
 

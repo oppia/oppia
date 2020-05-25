@@ -3369,7 +3369,7 @@ class Exploration(python_utils.OBJECT):
     def _convert_v38_dict_to_v39_dict(cls, exploration_dict):
         """Converts a v38 exploration dict into a v39 exploration dict.
         Adds a new attribute math RTEs. The new attribute has an additional
-        field to for storing SVG filenames..
+        field to for storing SVG filenames.
 
         Args:
             exploration_dict: dict. The dict representation of an exploration
