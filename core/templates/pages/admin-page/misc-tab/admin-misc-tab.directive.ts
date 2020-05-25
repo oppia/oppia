@@ -176,7 +176,8 @@ angular.module('oppia').directive('adminMiscTab', [
             ctrl.setStatusMessage(
               'Server error: ' + errorResponse.data.error);
           });
-          
+        };
+
         ctrl.updateUsername = function() {
           ctrl.setStatusMessage('Updating username...');
           $http.put(
@@ -223,7 +224,7 @@ angular.module('oppia').directive('adminMiscTab', [
           ctrl.numAnswers = 0;
           ctrl.showDataExtractionQueryStatus = false;
         };
-        
+
         ctrl.$onInit = function() {
           ctrl.topicIdForRegeneratingOpportunities = null;
           ctrl.regenerationMessage = null;
@@ -231,8 +232,7 @@ angular.module('oppia').directive('adminMiscTab', [
           ctrl.oldUsername = null;
           ctrl.newUsername = null;
         };
-      };
-    }]
+      }]
     };
   }
 ]);

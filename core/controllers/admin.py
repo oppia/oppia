@@ -856,9 +856,10 @@ class SendDummyMailToAdminHandler(base.BaseHandler):
             raise self.InvalidInputException('This app cannot send emails.')
 
 
-<<<<<<< HEAD
 class InteractionsByExplorationIdHandler(base.BaseHandler):
-    """Handler to retrive the list of interactions used in an exploration."""
+    """Handler for admin to retrive the list of interactions used in
+    an exploration.
+    """
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_access_admin_page
@@ -879,7 +880,8 @@ class InteractionsByExplorationIdHandler(base.BaseHandler):
             exploration.states.values() if state.interaction.id is not None
         }
         self.render_json({'interactions': list(interaction_ids)})
-=======
+
+
 class UpdateUsernameHandler(base.BaseHandler):
     """Handler for renaming usernames."""
 
@@ -923,4 +925,3 @@ class UpdateUsernameHandler(base.BaseHandler):
         user_services.log_username_change(
             self.user_id, old_username, new_username)
         self.render_json({})
->>>>>>> develop

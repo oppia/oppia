@@ -725,7 +725,7 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/senddummymailtoadminhandler', admin.SendDummyMailToAdminHandler),
     get_redirect_route(
         r'/interactionsbyexplorationid',
-        admin.InteractionsByExplorationIdHandler),    
+        admin.InteractionsByExplorationIdHandler),
     get_redirect_route(r'/updateusernamehandler', admin.UpdateUsernameHandler),
     get_redirect_route(r'/frontend_errors', FrontendErrorHandler),
     get_redirect_route(r'/logout', base.LogoutPage),
