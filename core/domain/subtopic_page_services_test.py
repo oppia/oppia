@@ -233,15 +233,109 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
         subtopic_page_swap = self.swap(
             subtopic_page_domain, 'SubtopicPage',
             subtopic_page_domain.SubtopicPage)
-        subtopic_page_model = topic_models.SubtopicPageModel.get(
-            self.subtopic_page_id)
-        self.assertEqual(subtopic_page_model.page_contents_schema_version, 2)
+        html = ('<p>Value</p><oppia-noninteractive-math ' +
+                'raw_latex-with-value="&amp;quot;+,-,-,+&amp;quot' +
+                ';"></oppia-noninteractive-math>')
+
+        expected_html = ('<p>Value</p><oppia-noninteractive-' +
+                         'math math_content-with-value="{&amp;quot' +
+                         ';raw_latex&amp;quot;: &amp;quot;+,-,-,+' +
+                         '&amp;quot;, &amp;quot;svg_filename&amp;' +
+                         'quot;: &amp;quot;&amp;quot;}"></oppia' +
+                         '-noninteractive-math>')
+        written_translations_dict = {
+            'translations_mapping': {
+                'content1': {
+                    'en': {
+                        'html': html,
+                        'needs_update': True
+                    },
+                    'hi': {
+                        'html': 'Hey!',
+                        'needs_update': False
+                    }
+                },
+                'feedback_1': {
+                    'hi': {
+                        'html': 'Testing!',
+                        'needs_update': False
+                    },
+                    'en': {
+                        'html': 'hello!',
+                        'needs_update': False
+                    }
+                }
+            }
+        }
+        written_translations_dict_math = {
+            'translations_mapping': {
+                'content1': {
+                    'en': {
+                        'html': expected_html,
+                        'needs_update': True
+                    },
+                    'hi': {
+                        'html': 'Hey!',
+                        'needs_update': False
+                    }
+                },
+                'feedback_1': {
+                    'hi': {
+                        'html': 'Testing!',
+                        'needs_update': False
+                    },
+                    'en': {
+                        'html': 'hello!',
+                        'needs_update': False
+                    }
+                }
+            }
+        }
+        recorded_voiceovers = {
+            'voiceovers_mapping': {
+                'content': {
+                    'en': {
+                        'filename': 'test.mp3',
+                        'file_size_bytes': 100,
+                        'needs_update': False,
+                        'duration_secs': 7.213
+                    }
+                }
+            }
+        }
+        page_contents_dict = {
+            'subtitled_html': {
+                'content_id': 'content', 'html': html
+            },
+            'recorded_voiceovers': recorded_voiceovers,
+            'written_translations': written_translations_dict
+        }
+        expected_page_contents_dict = {
+            'subtitled_html': {
+                'content_id': 'content', 'html': expected_html
+            },
+            'recorded_voiceovers': recorded_voiceovers,
+            'written_translations': written_translations_dict_math
+        }
+
+        subtopic_page_id = topic_models.SubtopicPageModel.get_new_id('')
+        subtopic_page_model2 = topic_models.SubtopicPageModel(
+            id=subtopic_page_id,
+            topic_id=self.TOPIC_ID,
+            page_contents=page_contents_dict,
+            page_contents_schema_version=1,
+            language_code='en'
+        )
+        self.assertEqual(subtopic_page_model2.page_contents_schema_version, 1)
 
         with current_schema_version_swap, subtopic_page_swap:
             subtopic_page = subtopic_page_services.get_subtopic_page_from_model(
-                subtopic_page_model)
+                subtopic_page_model2)
 
         self.assertEqual(subtopic_page.page_contents_schema_version, 2)
+        self.assertEqual(
+            subtopic_page.page_contents.to_dict(), expected_page_contents_dict)
+
 
     def test_cannot_migrate_page_contents_to_latest_schema_with_invalid_version(
             self):
