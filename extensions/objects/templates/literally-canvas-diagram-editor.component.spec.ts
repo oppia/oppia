@@ -17,14 +17,12 @@
  */
 
 describe('LiterallyCanvasDiagramEditor', function() {
-  var $componentController, LCDiagramEditorCtrl;
+  var LCDiagramEditorCtrl = null;
 
   beforeEach(angular.mock.module('oppia'));
 
-  beforeEach(angular.mock.inject(function(_$componentController_) {
-    $componentController = _$componentController_;
-    LCDiagramEditorCtrl = $componentController(
-      'literallyCanvasDiagramEditor', null, {});
+  beforeEach(angular.mock.inject(function($componentController) {
+    LCDiagramEditorCtrl = $componentController('literallyCanvasDiagramEditor');
     var mockDocument = document.createElement('div');
     mockDocument.setAttribute('id', 'lc');
     document.getElementById = jasmine.createSpy(
