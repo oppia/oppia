@@ -143,8 +143,8 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
                 component_id)
             self.assertTrue(self._is_camel_cased(component_id))
 
-            # Disabled for svgeditor, will be removed in
-            # second part of milestone 1 after the directives is added.
+            # TODO(#9356): Remove this if condition once the Svgeditor
+            # directves is created in the second part of 1st milestone.
             if component_id == 'Svgeditor':
                 continue
 
@@ -203,8 +203,8 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
 
         rtc_ts_filenames = []
         for component_id in feconf.ALLOWED_RTE_EXTENSIONS:
-            # Disabled for svgeditor, will be removed in
-            # second part of milestone 1 after the directives is added.
+            # TODO(#9356): Remove this if condition once the Svgeditor
+            # directves is created in the second part of 1st milestone.
             if component_id == 'Svgeditor':
                 continue
             component_dir = os.path.join(

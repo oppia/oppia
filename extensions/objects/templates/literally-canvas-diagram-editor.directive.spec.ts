@@ -17,29 +17,19 @@
  */
 
 describe('LiterallyCanvasDiagramEditor', function() {
-  var $componentController, LCDiagramEditorCtrl, $timeout;
-  var mockLiterallyCanvas = {
-    setImageSize: function(width, height) {
-      var text = 'The updated diagram width is ' + width +
-      ' and height is ' + height;
-      return text;
-    }
-  };
-
+  var $componentController, LCDiagramEditorCtrl;
 
   beforeEach(angular.mock.module('oppia'));
-
-  beforeEach(angular.mock.inject(function($injector) {
-    $timeout = $injector.get('$timeout');
-  }));
 
   beforeEach(angular.mock.inject(function(_$componentController_) {
     $componentController = _$componentController_;
     LCDiagramEditorCtrl = $componentController(
       'literallyCanvasDiagramEditor', null, {});
+    var mockDocument = document.createElement('div');
+    mockDocument.setAttribute('id', 'lc');
+    document.getElementById = jasmine.createSpy(
+      'HTML element').and.returnValue(mockDocument);
     LCDiagramEditorCtrl.$onInit();
-    $timeout.flush();
-    LCDiagramEditorCtrl.lc = mockLiterallyCanvas;
   }));
 
   it('should update diagram size', function() {
@@ -49,8 +39,10 @@ describe('LiterallyCanvasDiagramEditor', function() {
     LCDiagramEditorCtrl.diagramHeight = height;
     LCDiagramEditorCtrl.onWidthInputBlur();
     expect(LCDiagramEditorCtrl.currentDiagramWidth).toBe(100);
+    expect(LCDiagramEditorCtrl.lc.width).toBe(100);
     LCDiagramEditorCtrl.onHeightInputBlur();
     expect(LCDiagramEditorCtrl.currentDiagramHeight).toBe(100);
+    expect(LCDiagramEditorCtrl.lc.height).toBe(100);
   });
 
   it('should return information on diagram size', function() {
@@ -59,11 +51,11 @@ describe('LiterallyCanvasDiagramEditor', function() {
     var helpText = 'This diagram has a maximum dimension of ' +
     maxDiagramWidth + 'px X ' + maxDiagramHeight +
     'px to ensure that it fits in the card.';
-    expect(LCDiagramEditorCtrl.getDiagramSizeHelp()).toBe(helpText);
+    expect(LCDiagramEditorCtrl.getDiagramSizeInfo()).toBe(helpText);
   });
 
   it('should validate data', function() {
-    // Will be implimented once the data is saved.
+    // Will be implemented once the data is saved.
     expect(LCDiagramEditorCtrl.validate()).toBe(false);
   });
 });

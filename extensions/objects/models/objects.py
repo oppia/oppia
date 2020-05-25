@@ -448,7 +448,7 @@ class Filepath(BaseObject):
 
 
 class LiterallyCanvasDiagram(BaseObject):
-    """A string represent a filename of the saved
+    """A string representing a filename of the saved
     svg file created using literallyCanvas.
     """
 

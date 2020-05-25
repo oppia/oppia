@@ -49,6 +49,7 @@ angular.module('oppia').factory('LiterallyCanvasHelperService', [
     };
     return {
       rectangleSVGRenderer: function(shape) {
+        // This function converts a rectangle shape object to the rect tag.
         var height, width, x, x1, x2, y, y1, y2, id;
         x1 = shape.x;
         y1 = shape.y;
@@ -70,6 +71,7 @@ angular.module('oppia').factory('LiterallyCanvasHelperService', [
       },
 
       ellipseSVGRenderer: function(shape) {
+        // This function converts a ellipse shape object to the ellipse tag.
         var centerX, centerY, halfHeight, halfWidth, id;
         halfWidth = Math.floor(shape.width / 2);
         halfHeight = Math.floor(shape.height / 2);
@@ -84,6 +86,7 @@ angular.module('oppia').factory('LiterallyCanvasHelperService', [
       },
 
       lineSVGRenderer: function(shape) {
+        // This function converts a line shape object to the line tag.
         var arrowWidth, capString, dashString, x1, x2, y1, y2, id;
         dashString = shape.dash ? ('stroke-dasharray="' +
         (shape.dash.join(', ')) + '"') : '';
@@ -118,6 +121,7 @@ angular.module('oppia').factory('LiterallyCanvasHelperService', [
       },
 
       linepathSVGRenderer: function(shape) {
+        // This function converts a linepath shape object to the polyline tag.
         var id = 'linepath-' + shape.id;
         return ('<polyline id="' + id + '" fill="none" points="' +
         (shape.smoothedPoints.map(function(p) {
@@ -130,6 +134,7 @@ angular.module('oppia').factory('LiterallyCanvasHelperService', [
       },
 
       polygonSVGRenderer: function(shape) {
+        // This function converts a polygon shape object to the polygon tag.
         if (shape.isClosed) {
           var id = 'polygon-closed-' + shape.id;
           return ('<polygon id="' + id + '" fill="' + shape.fillColor +
@@ -157,6 +162,7 @@ angular.module('oppia').factory('LiterallyCanvasHelperService', [
       },
 
       textSVGRenderer: function(shape) {
+        // This function converts a text shape object to the text tag.
         var heightString, textSplitOnLines, widthString, id;
         widthString = shape.forcedWidth ? ('width="' + shape.forcedWidth +
         'px"') : '';
