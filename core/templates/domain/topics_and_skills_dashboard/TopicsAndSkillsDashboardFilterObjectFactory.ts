@@ -20,47 +20,48 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-export class DashboardFilter {
-    category: string;
-    keywords: string;
-    sort: string;
-    status: string;
-    /**
+export class TopicsAndSkillsDashboardFilter {
+  category: string;
+  keyword: string;
+  sort: string;
+  status: string;
+  /**
      * @param {String} category - category to filter
-     * @param {String} keywords - keywords to filter
+     * @param {String} keyword - keyword to filter
      * @param {String} sort - sort by filter value
      * @param {String} status - status to filter
      */
-    constructor(category, keywords, sort, status) {
-      this.category = category;
-      this.keywords = keywords;
-      this.sort = sort;
-      this.status = status;
-    }
-    /**
+  constructor(category, keyword, sort, status) {
+    this.category = category;
+    this.keyword = keyword;
+    this.sort = sort;
+    this.status = status;
+  }
+  /**
      * Resets the filter object values
      */
-    reset(): void {
-      this.category = '';
-      this.keywords = '';
-      this.sort = '';
-      this.status = '';
-    }
+  reset(): void {
+    this.category = '';
+    this.keyword = '';
+    this.sort = '';
+    this.status = '';
+  }
 }
 
 @Injectable({
   providedIn: 'root'
 })
-export class DashboardFilterObjectFactory {
+export class TopicsAndSkillsDashboardFilterObjectFactory {
   /**
-     * @returns {DashboardFilter} - A new DashboardFilter instance
-     */
-  createDefault(): DashboardFilter {
-    return new DashboardFilter(
+   * @returns {TopicsAndSkillsDashboardFilter} - A new
+   * TopicsAndSkillsDashboardFilter instance
+   */
+  createDefault(): TopicsAndSkillsDashboardFilter {
+    return new TopicsAndSkillsDashboardFilter(
       '', '', '', '');
   }
 }
 
 angular.module('oppia').factory(
-  'DashboardFilterObjectFactory',
-  downgradeInjectable(DashboardFilterObjectFactory));
+  'TopicsAndSkillsDashboardFilterObjectFactory',
+  downgradeInjectable(TopicsAndSkillsDashboardFilterObjectFactory));

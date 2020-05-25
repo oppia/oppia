@@ -43,7 +43,7 @@ export class TopicsAndSkillsDashboardPageConstants {
     STATUS_CHANGED: 'changed',
     STATUS_DISABLED: 'disabled'
   };
-  public static TOPIC_CATEGORIES = constants.TOPIC_CATEGORIES;
+  public static ALLOWED_TOPIC_CATEGORIES = constants.ALLOWED_TOPIC_CATEGORIES;
   public static TOPIC_SORT_OPTIONS = ETopicSortOptions;
   public static TOPIC_PUBLISHED_OPTIONS = ETopicPublishedOptions;
 }

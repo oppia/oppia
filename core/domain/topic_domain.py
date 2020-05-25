@@ -811,7 +811,7 @@ class Topic(python_utils.OBJECT):
                 'Expected category to be a string, received %s'
                 % self.category)
 
-        if self.category not in constants.TOPIC_CATEGORIES:
+        if self.category not in constants.ALLOWED_TOPIC_CATEGORIES:
             raise utils.ValidationError(
                 'Expected the topic category to be a valid'
                 ' category, received %s' % self.category)

@@ -22,8 +22,8 @@ import { HttpClientTestingModule, HttpTestingController }
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { CsrfTokenService } from 'services/csrf-token.service';
-import { DashboardTopic, DashboardTopicObjectFactory } from
-  'domain/topics_and_skills_dashboard/DashboardTopicObjectFactory';
+import { NewlyCreatedTopic, NewlyCreatedTopicObjectFactory } from
+  'domain/topics_and_skills_dashboard/NewlyCreatedTopicObjectFactory';
 import { TopicCreationBackendApiService, ITopicCreationBackend } from
   'domain/topic/topic-creation-backend-api.service.ts';
 
@@ -31,8 +31,8 @@ describe('Topic creation backend api service', () => {
   let csrfService: CsrfTokenService = null;
   let httpTestingController: HttpTestingController = null;
   let topicCreationBackendApiService: TopicCreationBackendApiService = null;
-  let dashboardTopicObjectFactory: DashboardTopicObjectFactory = null;
-  let topic: DashboardTopic = null;
+  let newlyCreatedTopicObjectFactory: NewlyCreatedTopicObjectFactory = null;
+  let topic: NewlyCreatedTopic = null;
   let postData: ITopicCreationBackend = {
     name: 'topic-name',
     category: 'Mathematics',
@@ -47,10 +47,11 @@ describe('Topic creation backend api service', () => {
 
     csrfService = TestBed.get(CsrfTokenService);
     httpTestingController = TestBed.get(HttpTestingController);
-    dashboardTopicObjectFactory = TestBed.get(DashboardTopicObjectFactory);
+    newlyCreatedTopicObjectFactory = TestBed.get(
+      NewlyCreatedTopicObjectFactory);
     topicCreationBackendApiService = TestBed.get(
       TopicCreationBackendApiService);
-    topic = dashboardTopicObjectFactory.createDefault();
+    topic = newlyCreatedTopicObjectFactory.createDefault();
     topic.name = 'topic-name';
     topic.category = 'Mathematics';
     topic.description = 'Description';

@@ -25,7 +25,7 @@ describe('Topics and Skills Dashboard Page', function() {
   var directive = null;
   var $rootScope = null;
   var $q = null;
-  var DashboardFilterObjectFactory = null;
+  var TopicsAndSkillsDashboardFilterObjectFactory = null;
   var TOPICS_AND_SKILLS_DASHBOARD_DATA_URL =
       '/topics_and_skills_dashboard/data';
   var SAMPLE_TOPIC_ID = 'hyuy4GUlvTqJ';
@@ -87,8 +87,8 @@ describe('Topics and Skills Dashboard Page', function() {
     $httpBackend = $injector.get('$httpBackend');
     AlertsService = $injector.get('AlertsService');
     $q = $injector.get('$q');
-    DashboardFilterObjectFactory = $injector.get(
-      'DashboardFilterObjectFactory');
+    TopicsAndSkillsDashboardFilterObjectFactory = $injector.get(
+      'TopicsAndSkillsDashboardFilterObjectFactory');
 
     directive = $injector.get('topicsAndSkillsDashboardPageDirective')[0];
     ctrl = $injector.instantiate(directive.controller, {
@@ -102,12 +102,13 @@ describe('Topics and Skills Dashboard Page', function() {
     $httpBackend.verifyNoOutstandingExpectation();
   });
 
-  it('Should init the dashboard and fetch data', function() {
+  it('should init the dashboard and fetch data', function() {
     $httpBackend.expect('GET', TOPICS_AND_SKILLS_DASHBOARD_DATA_URL).respond(
       sampleDataResults);
     $httpBackend.flush();
 
-    const filterObject = DashboardFilterObjectFactory.createDefault();
+    const filterObject =
+        TopicsAndSkillsDashboardFilterObjectFactory.createDefault();
     expect(ctrl.pageNumber).toEqual(0);
     expect(ctrl.topicPageNumber).toEqual(0);
     expect(ctrl.itemsPerPage).toEqual(10);
@@ -238,10 +239,11 @@ describe('Topics and Skills Dashboard Page', function() {
     $httpBackend.expect('GET', TOPICS_AND_SKILLS_DASHBOARD_DATA_URL).respond(
       sampleDataResults);
     $httpBackend.flush();
-    const filterObject = DashboardFilterObjectFactory.createDefault();
+    const filterObject = (
+      TopicsAndSkillsDashboardFilterObjectFactory.createDefault());
     expect(ctrl.filterObject).toEqual(filterObject);
     ctrl.filterObject.sort = 'sort1';
-    ctrl.filterObject.keywords = 'keywords1';
+    ctrl.filterObject.keyword = 'keyword1';
     ctrl.filterObject.category = 'category1';
     ctrl.filterObject.status = 'status1';
     ctrl.resetFilters();
@@ -276,7 +278,8 @@ describe('Topics and Skills Dashboard Page', function() {
       is_published: true, name: 'Gamma', category: 'Mathematics',
       description: 'Gamma description',
     };
-    ctrl.filterObject = DashboardFilterObjectFactory.createDefault();
+    ctrl.filterObject = (
+      TopicsAndSkillsDashboardFilterObjectFactory.createDefault());
     ctrl.totalTopicSummaries = [topic1, topic2, topic3, topic4];
 
     ctrl.applyFilters();
@@ -292,7 +295,7 @@ describe('Topics and Skills Dashboard Page', function() {
     expect(ctrl.currentCount).toEqual(2);
     expect(ctrl.pageNumber).toEqual(0);
 
-    ctrl.filterObject.keywords = 'gamm';
+    ctrl.filterObject.keyword = 'gamm';
     ctrl.applyFilters();
     expect(ctrl.topicSummaries).toEqual([topic4]);
     expect(ctrl.displayedTopicSummaries).toEqual([topic4]);
@@ -340,10 +343,10 @@ describe('Topics and Skills Dashboard Page', function() {
       expect(ctrl.activeTab).toEqual('untriagedSkills');
     });
 
-  it('should call goToPageNumber when changeItemsPerPage is called',
+  it('should call goToPageNumber when refreshPagination is called',
     function() {
       var changePageSpy = spyOn(ctrl, 'goToPageNumber');
-      ctrl.changeItemsPerPage();
+      ctrl.refreshPagination();
       expect(changePageSpy).toHaveBeenCalledWith(0);
     });
 

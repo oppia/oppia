@@ -50,23 +50,47 @@ angular.module('oppia').directive('topicsList', [
             $scope, $uibModal, $rootScope, EditableTopicBackendApiService,
             AlertsService, EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED) {
           var ctrl = this;
+          /**
+           * @param {String} topicId - ID of the topic.
+           * @returns {String} Url of the topic editor with the
+           * topic iD provided in the args.
+           */
           ctrl.getTopicEditorUrl = function(topicId) {
             return '/topic_editor/' + topicId;
           };
+
+          /**
+           * @param {String} topicId - ID of the topic.
+           * @returns {Boolean} Returns true for the topic whose
+           * edit options should be shown.
+           */
           ctrl.showEditOptions = function(topicId) {
             return ctrl.selectedIndex === topicId;
           };
 
+          /**
+           * @param {String} topicId - ID of the topic.
+           */
           ctrl.enableEditOptions = function(topicId) {
             ctrl.selectedIndex = topicId;
           };
 
+          /**
+           ** @param {Number} topicIndex - Index of the topic in
+           * the topicSummaries.
+           * @returns {Number} The calculated serial number
+           * of the topic taking into consideration the current page
+           * number and the items being displayed per page.
+           */
           ctrl.getSerialNumberForTopic = function(topicIndex) {
             var topicSerialNumber = (
               topicIndex + (ctrl.getPageNumber() * ctrl.getItemsPerPage()));
             return (topicSerialNumber + 1);
           };
 
+          /**
+           * @param {String} topicId - ID of the topic
+           */
           ctrl.deleteTopic = function(topicId) {
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(

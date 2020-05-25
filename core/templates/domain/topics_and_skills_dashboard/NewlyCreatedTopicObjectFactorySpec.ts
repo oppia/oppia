@@ -14,19 +14,19 @@
 
 
 /**
- * @fileoverview Unit tests for DashboardTopicObjectFactory.
+ * @fileoverview Unit tests for NewlyCreatedTopicObjectFactory.
  */
 
-import { DashboardTopic, DashboardTopicObjectFactory } from
-  'domain/topics_and_skills_dashboard/DashboardTopicObjectFactory';
+import { NewlyCreatedTopic, NewlyCreatedTopicObjectFactory } from
+  'domain/topics_and_skills_dashboard/NewlyCreatedTopicObjectFactory';
 
-describe('Dashboard Topic Object Factory', () => {
-  let dashboardTopicObjectFactory: DashboardTopicObjectFactory = null;
-  let topic: DashboardTopic = null;
+describe('Newly Created Topic Object Factory', () => {
+  let newlyCreatedTopicObjectFactory: NewlyCreatedTopicObjectFactory = null;
+  let topic: NewlyCreatedTopic = null;
 
   beforeEach(() => {
-    dashboardTopicObjectFactory = new DashboardTopicObjectFactory();
-    topic = dashboardTopicObjectFactory.createDefault();
+    newlyCreatedTopicObjectFactory = new NewlyCreatedTopicObjectFactory();
+    topic = newlyCreatedTopicObjectFactory.createDefault();
   });
 
   it('should create a new default topic for the topics dashboard', () => {

@@ -20,7 +20,7 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-export class DashboardTopic {
+export class NewlyCreatedTopic {
     name: string;
     category: string;
     description: string;
@@ -45,16 +45,16 @@ export class DashboardTopic {
 @Injectable({
   providedIn: 'root'
 })
-export class DashboardTopicObjectFactory {
+export class NewlyCreatedTopicObjectFactory {
   /**
-    * @returns {DashboardTopic} - A new DashboardTopic instance
+    * @returns {NewlyCreatedTopic} - A new NewlyCreatedTopic instance
     */
-  createDefault(): DashboardTopic {
-    return new DashboardTopic(
+  createDefault(): NewlyCreatedTopic {
+    return new NewlyCreatedTopic(
       '', '', '');
   }
 }
 
 angular.module('oppia').factory(
-  'DashboardTopicObjectFactory',
-  downgradeInjectable(DashboardTopicObjectFactory));
+  'NewlyCreatedTopicObjectFactory',
+  downgradeInjectable(NewlyCreatedTopicObjectFactory));

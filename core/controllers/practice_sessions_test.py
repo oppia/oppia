@@ -60,7 +60,7 @@ class BasePracticeSessionsControllerTests(test_utils.GenericTestBase):
 
         self.topic = topic_domain.Topic.create_default_topic(
             self.topic_id_1, 'private_topic_name', 'abbrev',
-            description='description', category='Mathematics')
+            'description', 'Mathematics')
         self.topic.thumbnail_filename = 'Topic.svg'
         self.topic.thumbnail_bg_color = (
             constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0])

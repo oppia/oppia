@@ -16,19 +16,20 @@
  * @fileoverview Unit tests for TopicsAndSkillsDashboardPageService.
  */
 
-import { DashboardFilterObjectFactory } from
-  'domain/topics_and_skills_dashboard/DashboardFilterObjectFactory';
+import { TopicsAndSkillsDashboardFilterObjectFactory } from
+  // eslint-disable-next-line max-len
+  'domain/topics_and_skills_dashboard/TopicsAndSkillsDashboardFilterObjectFactory';
 import { TopicsAndSkillsDashboardPageService } from
   // eslint-disable-next-line max-len
   'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.service';
 
 describe('Topic and Skill dashboard page service', () => {
   let tsds: TopicsAndSkillsDashboardPageService = null;
-  let dfof: DashboardFilterObjectFactory = null;
+  let dfof: TopicsAndSkillsDashboardFilterObjectFactory = null;
 
   beforeEach(() => {
     tsds = new TopicsAndSkillsDashboardPageService();
-    dfof = new DashboardFilterObjectFactory();
+    dfof = new TopicsAndSkillsDashboardFilterObjectFactory();
   });
 
   it('should filter the topics', () => {
@@ -91,11 +92,11 @@ describe('Topic and Skill dashboard page service', () => {
     let filteredArray = tsds.getFilteredTopics(topicsArray, filterOptions);
     expect(filteredArray).toEqual(topicsArray);
 
-    filterOptions.keywords = 'alp';
+    filterOptions.keyword = 'alp';
     filteredArray = tsds.getFilteredTopics(topicsArray, filterOptions);
     expect(filteredArray).toEqual([topic1]);
 
-    filterOptions.keywords = '';
+    filterOptions.keyword = '';
     filterOptions.status = 'Published';
     filteredArray = tsds.getFilteredTopics(topicsArray, filterOptions);
     expect(filteredArray).toEqual([topic1, topic3]);

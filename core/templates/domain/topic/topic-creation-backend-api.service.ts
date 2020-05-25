@@ -21,8 +21,8 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
-import { DashboardTopic } from
-  'domain/topics_and_skills_dashboard/DashboardTopicObjectFactory';
+import { NewlyCreatedTopic } from
+  'domain/topics_and_skills_dashboard/NewlyCreatedTopicObjectFactory';
 
 export interface ITopicCreationBackend {
   name: string;
@@ -39,7 +39,7 @@ export class TopicCreationBackendApiService {
   _createTopic(
       successCallback: (value?: Object | PromiseLike<Object>) => void,
       errorCallback:(reason?: any) => void,
-      topic: DashboardTopic): void {
+      topic: NewlyCreatedTopic): void {
     let postData: ITopicCreationBackend = {
       name: topic.name,
       category: topic.category,
@@ -61,7 +61,7 @@ export class TopicCreationBackendApiService {
   }
 
   createTopic(
-      topic: DashboardTopic): PromiseLike<Object> {
+      topic: NewlyCreatedTopic): PromiseLike<Object> {
     return new Promise((resolve, reject) => {
       this._createTopic(resolve, reject, topic);
     });

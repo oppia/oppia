@@ -115,23 +115,24 @@ describe('Topics List Directive', function() {
     expect(ctrl.getSerialNumberForTopic(2)).toEqual(48);
   });
 
-  it('should delete the topic success', function() {
-    spyOn($uibModal, 'open').and.returnValue({
-      result: $q.resolve()
+  it('should reinitialize the page after successfully deleting the topic',
+    function() {
+      spyOn($uibModal, 'open').and.returnValue({
+        result: $q.resolve()
+      });
+      spyOn($rootScope, '$broadcast');
+
+      var topicId = 'CdjnJUE332dd';
+      var url = `/topic_editor_handler/data/${topicId}`;
+      $httpBackend.expectDELETE(url).respond(200);
+      ctrl.deleteTopic(topicId);
+
+      $httpBackend.flush();
+      expect($rootScope.$broadcast).toHaveBeenCalledWith(
+        'topicsAndSkillsDashboardReinitialized');
     });
-    spyOn($rootScope, '$broadcast');
 
-    var topicId = 'CdjnJUE332dd';
-    var url = `/topic_editor_handler/data/${topicId}`;
-    $httpBackend.expectDELETE(url).respond(200);
-    ctrl.deleteTopic(topicId);
-
-    $httpBackend.flush();
-    expect($rootScope.$broadcast).toHaveBeenCalledWith(
-      'topicsAndSkillsDashboardReinitialized');
-  });
-
-  it('should delete the topic failed', function() {
+  it('should show the warning if deleting a topic failed', function() {
     spyOn($uibModal, 'open').and.returnValue({
       result: $q.resolve()
     });

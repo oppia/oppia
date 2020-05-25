@@ -43,7 +43,7 @@
               <div>
                 <select ng-options="choice as choice for choice in $ctrl.itemsPerPageChoice"
                         ng-model="$ctrl.itemsPerPage"
-                        ng-change="$ctrl.changeItemsPerPage()">
+                        ng-change="$ctrl.refreshPagination()">
                 </select>
               </div>
               <div>
@@ -114,7 +114,7 @@
                 <span>keywords</span>
               </div>
               <div class="topic-skill-filter-value">
-                <input type="text" ng-change="$ctrl.applyFilters()" ng-model="$ctrl.filterObject.keywords" class="protractor-test-topic-filter-keyword">
+                <input type="text" ng-change="$ctrl.applyFilters()" ng-model="$ctrl.filterObject.keyword" class="protractor-test-topic-filter-keyword">
               </div>
             </div>
             <div class="topic-skill-filter-row">

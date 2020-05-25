@@ -234,7 +234,7 @@ class TopicSummaryModel(base_models.BaseModel):
     # The description of the topic.
     description = ndb.TextProperty(indexed=False)
 
-    # The category this exploration belongs to.
+    # The category this topic belongs to.
     category = ndb.StringProperty(required=True, indexed=True)
 
     # Time when the topic model was last updated (not to be

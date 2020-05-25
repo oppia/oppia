@@ -78,10 +78,11 @@ import { CreatorDashboardBackendApiService } from
 import { CsrfTokenService } from 'services/csrf-token.service';
 import { CurrentInteractionService } from
   'pages/exploration-player-page/services/current-interaction.service';
-import { DashboardFilterObjectFactory } from
-  'domain/topics_and_skills_dashboard/DashboardFilterObjectFactory';
-import { DashboardTopicObjectFactory } from
-  'domain/topics_and_skills_dashboard/DashboardTopicObjectFactory';
+import { TopicsAndSkillsDashboardFilterObjectFactory } from
+  // eslint-disable-next-line max-len
+  'domain/topics_and_skills_dashboard/TopicsAndSkillsDashboardFilterObjectFactory';
+import { NewlyCreatedTopicObjectFactory } from
+  'domain/topics_and_skills_dashboard/NewlyCreatedTopicObjectFactory';
 import { DateTimeFormatService } from 'services/date-time-format.service';
 import { DebouncerService } from 'services/debouncer.service';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
@@ -380,10 +381,10 @@ export class UpgradedServices {
     upgradedServices['ExplorationFeaturesService'] =
       new ExplorationFeaturesService();
     upgradedServices['ExpressionParserService'] = new ExpressionParserService();
-    upgradedServices['DashboardFilterObjectFactory'] =
-        new DashboardFilterObjectFactory();
-    upgradedServices['DashboardTopicObjectFactory'] =
-        new DashboardTopicObjectFactory();
+    upgradedServices['TopicsAndSkillsDashboardFilterObjectFactory'] =
+        new TopicsAndSkillsDashboardFilterObjectFactory();
+    upgradedServices['NewlyCreatedTopicObjectFactory'] =
+        new NewlyCreatedTopicObjectFactory();
     upgradedServices['FractionObjectFactory'] = new FractionObjectFactory();
     upgradedServices['GenerateContentIdService'] =
       new GenerateContentIdService();

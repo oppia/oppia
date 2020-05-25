@@ -19,8 +19,9 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { DashboardFilter } from
-  'domain/topics_and_skills_dashboard/DashboardFilterObjectFactory';
+import { TopicsAndSkillsDashboardFilter } from
+  // eslint-disable-next-line max-len
+  'domain/topics_and_skills_dashboard/TopicsAndSkillsDashboardFilterObjectFactory';
 import { ITopicSummaryBackendDict } from
   // eslint-disable-next-line max-len
   'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
@@ -34,30 +35,33 @@ import { TopicsAndSkillsDashboardPageConstants } from
 export class TopicsAndSkillsDashboardPageService {
   /**
    * @param {Array} topicsArray - The original topics array
-   * @param {DashboardFilter} filterObject - the filter object values
+   * @param {TopicsAndSkillsDashboardFilter} filterObject -
+   * the filter object values
    * @returns {Array} filteredTopics - The filtered Topics array
    */
   getFilteredTopics(
       topicsArray: Array<ITopicSummaryBackendDict>,
-      filterObject: DashboardFilter): Array<ITopicSummaryBackendDict> {
-    const {sort, keywords, category, status} = filterObject;
+      filterObject: TopicsAndSkillsDashboardFilter):
+      Array<ITopicSummaryBackendDict> {
+    const {sort, keyword, category, status} = filterObject;
     let ESortOptions = TopicsAndSkillsDashboardPageConstants.TOPIC_SORT_OPTIONS;
     let EPublishedOptions = (
       TopicsAndSkillsDashboardPageConstants.TOPIC_PUBLISHED_OPTIONS);
     let filteredTopics = topicsArray;
-    if (keywords) {
+    if (keyword) {
       filteredTopics = topicsArray.filter((topic) => {
         return (
-          topic.name.toLowerCase().includes(keywords.toLowerCase()) ||
-          topic.description.toLowerCase().includes(keywords.toLowerCase()));
+          topic.name.toLowerCase().includes(keyword.toLowerCase()) ||
+          topic.description.toLowerCase().includes(keyword.toLowerCase()));
       });
     }
 
     if (category) {
       filteredTopics = filteredTopics.filter((topic) => {
         return (
-          TopicsAndSkillsDashboardPageConstants.TOPIC_CATEGORIES.includes(
-            topic.category));
+          TopicsAndSkillsDashboardPageConstants.ALLOWED_TOPIC_CATEGORIES
+            .includes(
+              topic.category));
       });
     }
 
