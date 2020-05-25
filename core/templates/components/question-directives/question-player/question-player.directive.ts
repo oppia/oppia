@@ -18,6 +18,9 @@
 
 require('components/ck-editor-helpers/ck-editor-4-rte.directive.ts');
 require('components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts');
+require(
+  'components/common-layout-directives/common-elements/' +
+  'confirm-or-cancel-modal.controller.ts');
 require('directives/angular-html-bind.directive.ts');
 require('directives/mathjax-bind.directive.ts');
 require('filters/convert-unicode-with-params-to-html.filter.ts');
@@ -237,11 +240,15 @@ angular.module('oppia').directive('questionPlayer', [
               ),
               backdrop: true,
               controller: [
-                '$scope', '$uibModalInstance', '$window',
+                '$controller', '$scope', '$uibModalInstance', '$window',
                 'UrlService',
                 function(
-                    $scope, $uibModalInstance, $window,
+                    $controller, $scope, $uibModalInstance, $window,
                     UrlService) {
+                  $controller('ConfirmOrCancelModalController', {
+                    $scope: $scope,
+                    $uibModalInstance: $uibModalInstance
+                  });
                   $scope.skillIds = skillIds;
                   $scope.skills = skills;
                   $scope.index = 0;
@@ -250,10 +257,6 @@ angular.module('oppia').directive('questionPlayer', [
 
                   $scope.isLastConceptCard = function() {
                     return $scope.index === $scope.skills.length - 1;
-                  };
-
-                  $scope.closeModal = function() {
-                    $uibModalInstance.dismiss('cancel');
                   };
 
                   $scope.goToNextConceptCard = function() {
@@ -267,8 +270,9 @@ angular.module('oppia').directive('questionPlayer', [
                 }
               ]
             }).result.then(function() {}, function() {
-              // This callback is triggered when the Cancel button is
-              // clicked. No further action is needed.
+              // Note to developers:
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
             });
           };
 
@@ -532,18 +536,18 @@ angular.module('oppia').directive('questionPlayer', [
                 'skill-mastery-modal.template.html'),
               backdrop: true,
               controller: [
-                '$scope', '$uibModalInstance',
+                '$controller', '$scope', '$uibModalInstance',
                 function(
-                    $scope, $uibModalInstance) {
+                    $controller, $scope, $uibModalInstance) {
+                  $controller('ConfirmOrCancelModalController', {
+                    $scope: $scope,
+                    $uibModalInstance: $uibModalInstance
+                  });
                   $scope.skillId = skillId;
                   $scope.userIsLoggedIn = ctrl.userIsLoggedIn;
                   if ($scope.userIsLoggedIn) {
                     $scope.masteryChange = ctrl.masteryPerSkillMapping[skillId];
                   }
-
-                  $scope.closeModal = function() {
-                    $uibModalInstance.dismiss('cancel');
-                  };
 
                   $scope.openConceptCardModal = function(skillId) {
                     openConceptCardModal([skillId]);
@@ -551,8 +555,9 @@ angular.module('oppia').directive('questionPlayer', [
                 }
               ]
             }).result.then(function() {}, function() {
-              // This callback is triggered when the Cancel button is
-              // clicked. No further action is needed.
+              // Note to developers:
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
             });
           };
 

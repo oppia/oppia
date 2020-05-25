@@ -17,6 +17,9 @@
  * editor.
  */
 
+require(
+  'components/common-layout-directives/common-elements/' +
+  'confirm-or-cancel-modal.controller.ts');
 require('directives/angular-html-bind.directive.ts');
 
 require('domain/exploration/SubtitledHtmlObjectFactory.ts');
@@ -196,7 +199,7 @@ angular.module('oppia').directive('stateInteractionEditor', [
                 backdrop: true,
                 resolve: {},
                 controller: [
-                  '$injector', '$scope', '$uibModalInstance',
+                  '$controller', '$injector', '$scope', '$uibModalInstance',
                   'EditorFirstTimeEventsService',
                   'InteractionDetailsCacheService',
                   'StateCustomizationArgsService', 'StateEditorService',
@@ -205,7 +208,7 @@ angular.module('oppia').directive('stateInteractionEditor', [
                   'ALLOWED_QUESTION_INTERACTION_CATEGORIES',
                   'INTERACTION_SPECS',
                   function(
-                      $injector, $scope, $uibModalInstance,
+                      $controller, $injector, $scope, $uibModalInstance,
                       EditorFirstTimeEventsService,
                       InteractionDetailsCacheService,
                       StateCustomizationArgsService, StateEditorService,
@@ -213,6 +216,10 @@ angular.module('oppia').directive('stateInteractionEditor', [
                       UrlInterpolationService, ALLOWED_INTERACTION_CATEGORIES,
                       ALLOWED_QUESTION_INTERACTION_CATEGORIES,
                       INTERACTION_SPECS) {
+                    $controller('ConfirmOrCancelModalController', {
+                      $scope: $scope,
+                      $uibModalInstance: $uibModalInstance
+                    });
                     EditorFirstTimeEventsService
                       .registerFirstClickAddInteractionEvent();
 
@@ -381,14 +388,6 @@ angular.module('oppia').directive('stateInteractionEditor', [
                         .registerFirstSaveInteractionEvent();
                       $uibModalInstance.close();
                     };
-
-                    $scope.okay = function() {
-                      $uibModalInstance.close('okay');
-                    };
-
-                    $scope.cancel = function() {
-                      $uibModalInstance.dismiss('cancel');
-                    };
                   }
                 ]
               }).result.then(
@@ -406,18 +405,7 @@ angular.module('oppia').directive('stateInteractionEditor', [
                 '/pages/exploration-editor-page/editor-tab/templates/' +
                 'modal-templates/delete-interaction-modal.template.html'),
               backdrop: true,
-              controller: [
-                '$scope', '$uibModalInstance', function(
-                    $scope, $uibModalInstance) {
-                  $scope.reallyDelete = function() {
-                    $uibModalInstance.close();
-                  };
-                  $scope.cancel = function() {
-                    $uibModalInstance.dismiss('cancel');
-                    AlertsService.clearWarnings();
-                  };
-                }
-              ]
+              controller: 'ConfirmOrCancelModalController'
             }).result.then(function() {
               StateInteractionIdService.displayed = null;
               StateCustomizationArgsService.displayed = {};
@@ -441,9 +429,7 @@ angular.module('oppia').directive('stateInteractionEditor', [
               $scope.recomputeGraph();
               _updateInteractionPreviewAndAnswerChoices();
             }, function() {
-              // Note to developers:
-              // This callback is triggered when the Cancel button is clicked.
-              // No further action is needed.
+              AlertsService.clearWarnings();
             });
           };
           ctrl.$onInit = function() {

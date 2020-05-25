@@ -44,6 +44,9 @@ describe('Classroom page functionality', function() {
 
     users.createAndLoginAdminUser(
       'creator@classroomPage.com', 'creatorClassroomPage');
+    adminPage.editConfigProperty(
+      'Show classroom components.',
+      'Boolean', (elem) => elem.setValue(true));
   });
 
   beforeEach(function() {
@@ -66,12 +69,12 @@ describe('Classroom page functionality', function() {
             elem.editItem(0, 'Dictionary').editEntry(1, 'List').addItem(
               'Unicode').setValue(topicId);
           });
-        classroomPage.get('Math');
+        classroomPage.get('math');
         classroomPage.expectNumberOfTopicsToBe(0);
         topicsAndSkillsDashboardPage.get();
         topicsAndSkillsDashboardPage.navigateToTopicWithIndex(0);
         topicEditorPage.publishTopic();
-        classroomPage.get('Math');
+        classroomPage.get('math');
         classroomPage.expectNumberOfTopicsToBe(1);
         users.logout();
       });

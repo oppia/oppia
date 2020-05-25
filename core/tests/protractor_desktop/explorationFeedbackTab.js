@@ -62,10 +62,10 @@ describe('ExplorationFeedback', function() {
       'learnerExplorationFeedback');
     users.createUser(
       'user3@ExplorationFeedback.com',
-      'creatorExplorationFeedbackStatusChange');
+      'creatorExplorationFBStatChange');
     users.createUser(
       'user4@ExplorationFeedback.com',
-      'learnerExplorationFeedbackStatusChange');
+      'learnerExplorationFBStatChange');
     users.createUser(
       'user5@ExplorationFeedback.com',
       'creatorFeedback');
@@ -75,11 +75,6 @@ describe('ExplorationFeedback', function() {
     users.createAndLoginAdminUser(
       'user7@ExplorationFeedback.com',
       'superUserExplorationFeedback');
-    adminPage.editConfigProperty(
-      'Exposes the Improvements Tab for creators in the exploration editor.',
-      'Boolean', function(elem) {
-        elem.setValue(false);
-      });
   });
 
   it('should add feedback to an exploration', function() {
@@ -272,18 +267,13 @@ describe('Suggestions on Explorations', function() {
       'authorExplorationSuggestions');
     users.createUser(
       'user2@ExplorationSuggestions.com',
-      'suggesterExplorationSuggestions');
+      'suggesterExpSuggestions');
     users.createUser(
       'user3@ExplorationSuggestions.com',
       'studentExplorationSuggestions');
     users.createAndLoginAdminUser(
       'user4@ExplorationSuggestions.com',
       'configExplorationSuggestions');
-    adminPage.editConfigProperty(
-      'Exposes the Improvements Tab for creators in the exploration editor.',
-      'Boolean', function(elem) {
-        elem.setValue(false);
-      });
   });
 
   it('accepts & rejects a suggestion on a published exploration', function() {

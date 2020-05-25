@@ -20,7 +20,7 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 
 describe('Topic Landing Page', function() {
   var $scope = null, ctrl = null;
-  var $timeout = null;
+  var $timeout = null, $window = null;
   var SiteAnalyticsService = null;
   var windowRef = new WindowRef();
 
@@ -33,6 +33,7 @@ describe('Topic Landing Page', function() {
   }));
   beforeEach(angular.mock.inject(function($injector) {
     $timeout = $injector.get('$timeout');
+    $window = $injector.get('$window');
     SiteAnalyticsService = $injector.get('SiteAnalyticsService');
 
     var $rootScope = $injector.get('$rootScope');
@@ -46,12 +47,12 @@ describe('Topic Landing Page', function() {
   it('should get information from topic identified at pathname', function() {
     spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
       location: {
-        pathname: '/path/maths/ratios'
+        pathname: '/math/ratios'
       }
     });
     ctrl.$onInit();
 
-    expect(ctrl.subject).toBe('maths');
+    expect(ctrl.subject).toBe('math');
     expect(ctrl.topicTitle).toBe('Ratios');
     expect(ctrl.lessons).toEqual([
       'What is a Ratio?',
@@ -76,13 +77,13 @@ describe('Topic Landing Page', function() {
   it('should get video url', function() {
     spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
       location: {
-        pathname: '/path/maths/ratios'
+        pathname: '/math/ratios'
       }
     });
     ctrl.$onInit();
 
     expect(ctrl.getVideoUrl()).toBe(
-      '/assets/videos/landing/maths/ratios/ratios_video.mp4');
+      '/assets/videos/landing/math/ratios/ratios_video.mp4');
   });
 
   it('should not get video url if it does not exist', function() {
@@ -96,7 +97,7 @@ describe('Topic Landing Page', function() {
     var nativeWindowSpy = spyOnProperty(windowRef, 'nativeWindow');
     nativeWindowSpy.and.returnValue({
       location: {
-        pathname: '/path/maths/ratios'
+        pathname: '/math/ratios'
       }
     });
     var analyticsSpy = spyOn(
@@ -125,7 +126,7 @@ describe('Topic Landing Page', function() {
     ctrl.onClickLearnMoreButton();
     $timeout.flush(150);
 
-    expect(windowRef.nativeWindow.location).toBe('/splash');
+    expect(windowRef.nativeWindow.location).toBe('/');
   });
 
   it('should click exploration lessons button', function() {
@@ -136,5 +137,18 @@ describe('Topic Landing Page', function() {
     $timeout.flush(150);
 
     expect(windowRef.nativeWindow.location).toBe('/library');
+  });
+
+  it('should have a tagline in the page title', function() {
+    spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
+      location: {
+        pathname: '/math/fractions'
+      }
+    });
+    ctrl.$onInit();
+    $timeout(() => {
+      expect($window.document.title).toBe('Fractions | ' +
+        'Add, Subtract, Multiply and Divide | Oppia');
+    }, 150, false);
   });
 });

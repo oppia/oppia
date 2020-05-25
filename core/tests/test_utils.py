@@ -29,6 +29,7 @@ import os
 import unittest
 
 from constants import constants
+from core.controllers import base
 from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import exp_domain
@@ -56,7 +57,6 @@ import utils
 from google.appengine.api import apiproxy_stub
 from google.appengine.api import apiproxy_stub_map
 from google.appengine.api import mail
-import jinja2
 import webtest
 
 (exp_models, question_models, skill_models, story_models, topic_models,) = (
@@ -124,28 +124,26 @@ def get_filepath_from_filename(filename, rootdir):
     return filepath
 
 
-def mock_get_template(unused_self, filename):
-    """Mock for get_template function of jinja2 Environment. This mock is
-    required for backend tests since we do not have webpack compilation
-    before backend tests. The folder to search templates is webpack_bundles
-    which is generated after webpack compilation. Since this folder will be
-    missing, get_template function will return a TemplateNotFound error. So,
-    we use a mock for get_template which returns the html file from the source
-    directory instead.
+def mock_load_template(filename):
+    """Mock for load_template function. This mock is required for backend tests
+    since we do not have webpack compilation before backend tests. The folder
+    to search templates is webpack_bundles which is generated after webpack
+    compilation. Since this folder will be missing, load_template function will
+    return an error. So, we use a mock for load_template which returns the html
+    file from the source directory instead.
 
     Args:
-        unused_self: jinja2.environment.Environment. The Environment instance.
         filename: str. The name of the file for which template is
             to be returned.
 
     Returns:
-        jinja2.environment.Template. The template for the given file.
+        str. The contents of the given file.
     """
     filepath = get_filepath_from_filename(
         filename, os.path.join('core', 'templates', 'pages'))
     with python_utils.open_file(filepath, 'r') as f:
         file_content = f.read()
-    return jinja2.environment.Template(file_content)
+    return file_content
 
 
 class URLFetchServiceMock(apiproxy_stub.APIProxyStub):
@@ -402,6 +400,23 @@ class TestBase(unittest.TestCase):
         'next_node_id': 'node_2'
     }
 
+    VERSION_3_STORY_CONTENTS_DICT = {
+        'nodes': [{
+            'outline': u'',
+            'exploration_id': None,
+            'destination_node_ids': [],
+            'outline_is_finalized': False,
+            'acquired_skill_ids': [],
+            'id': 'node_1',
+            'title': 'Chapter 1',
+            'description': '',
+            'prerequisite_skill_ids': [],
+            'thumbnail_filename': None,
+            'thumbnail_bg_color': None}],
+        'initial_node_id': 'node_1',
+        'next_node_id': 'node_2'
+    }
+
     VERSION_1_SUBTOPIC_DICT = {
         'skill_ids': ['skill_1'],
         'id': 1,
@@ -636,7 +651,7 @@ tags: []
         # is only produced after webpack compilation which is not performed
         # during backend tests.
         with self.swap(
-            jinja2.environment.Environment, 'get_template', mock_get_template):
+            base, 'load_template', mock_load_template):
             response = self.testapp.get(
                 url, params, expect_errors=expect_errors,
                 status=expected_status_int)
@@ -726,7 +741,7 @@ tags: []
         # is only produced after webpack compilation which is not performed
         # during backend tests.
         with self.swap(
-            jinja2.environment.Environment, 'get_template', mock_get_template):
+            base, 'load_template', mock_load_template):
             response = self.testapp.get(url, params, expect_errors=True)
 
         self.assertIn(response.status_int, expected_status_int_list)
@@ -1683,11 +1698,11 @@ tags: []
         else:
             skill.rubrics = [
                 skill_domain.Rubric(
-                    constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
+                    constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
                 skill_domain.Rubric(
-                    constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
+                    constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
                 skill_domain.Rubric(
-                    constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
+                    constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
         skill.language_code = language_code
         skill.version = 0
         skill_services.save_new_skill(owner_id, skill)
@@ -1732,20 +1747,12 @@ tags: []
             language_code: str. The ISO 639-1 code for the language this
                 skill is written in.
         """
-        if rubrics is None:
-            rubrics = [
-                skill_domain.Rubric(
-                    constants.SKILL_DIFFICULTIES[0], '<p>Explanation 1</p>'),
-                skill_domain.Rubric(
-                    constants.SKILL_DIFFICULTIES[1], '<p>Explanation 2</p>'),
-                skill_domain.Rubric(
-                    constants.SKILL_DIFFICULTIES[2], '<p>Explanation 3</p>')]
         skill_model = skill_models.SkillModel(
             id=skill_id,
             description=description,
             language_code=language_code,
             misconceptions=misconceptions,
-            rubrics=[rubric.to_dict() for rubric in rubrics],
+            rubrics=rubrics,
             skill_contents=skill_contents,
             next_misconception_id=next_misconception_id,
             misconceptions_schema_version=misconceptions_schema_version,

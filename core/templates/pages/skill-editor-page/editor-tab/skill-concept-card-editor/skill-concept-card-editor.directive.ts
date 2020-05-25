@@ -17,6 +17,9 @@
  */
 
 require(
+  'components/common-layout-directives/common-elements/' +
+  'confirm-or-cancel-modal.controller.ts');
+require(
   'components/state-directives/answer-group-editor/' +
   'summary-list-header.directive.ts');
 require(
@@ -39,6 +42,8 @@ require('services/generate-content-id.service.ts');
 
 require('pages/skill-editor-page/skill-editor-page.constants.ajs.ts');
 
+import { Subscription } from 'rxjs';
+
 angular.module('oppia').directive('skillConceptCardEditor', [
   'GenerateContentIdService', 'SkillEditorStateService', 'SkillUpdateService',
   'SubtitledHtmlObjectFactory', 'UrlInterpolationService',
@@ -54,9 +59,10 @@ angular.module('oppia').directive('skillConceptCardEditor', [
         '/pages/skill-editor-page/editor-tab/skill-concept-card-editor/' +
         'skill-concept-card-editor.directive.html'),
       controller: [
-        '$scope', '$filter', '$uibModal', 'EVENT_SKILL_REINITIALIZED',
-        function($scope, $filter, $uibModal, EVENT_SKILL_REINITIALIZED) {
+        '$scope', '$filter', '$uibModal',
+        function($scope, $filter, $uibModal) {
           var ctrl = this;
+          ctrl.directiveSubscriptions = new Subscription();
           var initBindableFieldsDict = function() {
             $scope.bindableFieldsDict = {
               displayedConceptCardExplanation:
@@ -94,18 +100,8 @@ angular.module('oppia').directive('skillConceptCardEditor', [
                 '/pages/skill-editor-page/modal-templates/' +
                 'delete-worked-example-modal.directive.html'),
               backdrop: 'static',
-              controller: [
-                '$scope', '$uibModalInstance',
-                function($scope, $uibModalInstance) {
-                  $scope.confirm = function() {
-                    $uibModalInstance.close();
-                  };
-
-                  $scope.cancel = function() {
-                    $uibModalInstance.dismiss('cancel');
-                  };
-                }]
-            }).result.then(function(result) {
+              controller: 'ConfirmOrCancelModalController'
+            }).result.then(function() {
               SkillUpdateService.deleteWorkedExample($scope.skill, index);
               $scope.bindableFieldsDict.displayedWorkedExamples =
                 $scope.skill.getConceptCard().getWorkedExamples();
@@ -128,8 +124,13 @@ angular.module('oppia').directive('skillConceptCardEditor', [
                 'add-worked-example-modal.directive.html'),
               backdrop: 'static',
               controller: [
-                '$scope', '$uibModalInstance',
-                function($scope, $uibModalInstance) {
+                '$controller', '$scope', '$uibModalInstance',
+                function($controller, $scope, $uibModalInstance) {
+                  $controller('ConfirmOrCancelModalController', {
+                    $scope: $scope,
+                    $uibModalInstance: $uibModalInstance
+                  });
+
                   $scope.WORKED_EXAMPLE_FORM_SCHEMA = {
                     type: 'html',
                     ui_config: {}
@@ -145,10 +146,6 @@ angular.module('oppia').directive('skillConceptCardEditor', [
                       workedExampleExplanationHtml:
                         $scope.tmpWorkedExampleExplanationHtml
                     });
-                  };
-
-                  $scope.cancel = function() {
-                    $uibModalInstance.dismiss('cancel');
                   };
                 }
               ]
@@ -183,9 +180,10 @@ angular.module('oppia').directive('skillConceptCardEditor', [
             $scope.dragDotsImgUrl = UrlInterpolationService.getStaticImageUrl(
               '/general/drag_dots.webp');
             initBindableFieldsDict();
-            $scope.$on(EVENT_SKILL_REINITIALIZED, function() {
-              initBindableFieldsDict();
-            });
+            ctrl.directiveSubscriptions.add(
+              SkillEditorStateService.getSkillChangedSubject().subscribe(
+                () => initBindableFieldsDict())
+            );
 
             // When the page is scrolled so that the top of the page is above
             // the browser viewport, there are some bugs in the positioning of
@@ -210,6 +208,10 @@ angular.module('oppia').directive('skillConceptCardEditor', [
               }
             };
           };
+
+          $scope.$on('$destroy', function() {
+            ctrl.directiveSubscriptions.unsubscribe();
+          });
         }
       ]
     };
