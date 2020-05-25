@@ -269,6 +269,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             gravatar = f.read()
         with self.urlfetch_mock(content=gravatar):
             profile_picture = user_services.fetch_gravatar(user_email)
+            print("-----------",expected_gravatar_filepath,"-----------")
             gravatar_data_url = utils.convert_png_to_data_url(
                 expected_gravatar_filepath)
             self.assertEqual(profile_picture, gravatar_data_url)
