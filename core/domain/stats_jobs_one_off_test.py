@@ -1719,3 +1719,65 @@ class ExplorationMissingStatsAuditOneOffJobTests(OneOffJobTestBase):
             'owner_id', feconf.COMMIT_MESSAGE_EXPLORATION_DELETED)
 
         self.assertItemsEqual(self.run_one_off_job(), [])
+
+    def test_error_when_stats_for_state_is_missing(self):
+        self.save_new_default_exploration('ID', 'owner_id')
+        stats = stats_models.ExplorationStatsModel.get_model('ID', 1)
+        del stats.state_stats_mapping[feconf.DEFAULT_INIT_STATE_NAME]
+        stats.put()
+
+        self.assertItemsEqual(self.run_one_off_job(), [
+            ['UNEXPECTED',
+             'ExplorationStats "ID" v1 does not have stats for card "%s", but '
+             'it appears in version: 1.' % (feconf.DEFAULT_INIT_STATE_NAME)]
+        ])
+
+    def test_error_when_stats_for_state_does_not_exist(self):
+        self.save_new_default_exploration('ID', 'owner_id')
+        stats = stats_models.ExplorationStatsModel.get_model('ID', 1)
+        stats.state_stats_mapping['Unknown State'] = (
+            stats_domain.StateStats.create_default().to_dict())
+        stats.put()
+
+        self.assertItemsEqual(self.run_one_off_job(), [
+            ['UNEXPECTED',
+             'ExplorationStats "ID" v1 has stats for card "Unknown State", but '
+             'it never existed.']
+        ])
+
+    def test_error_when_stats_for_state_no_longer_exists(self):
+        self.save_new_default_exploration('ID', 'owner_id')
+        exp_services.update_exploration('owner_id', 'ID', None, 'noop') # v2
+        stats = stats_models.ExplorationStatsModel.get_model('ID', 2)
+        del stats.state_stats_mapping[feconf.DEFAULT_INIT_STATE_NAME]
+        stats.put()
+
+        self.assertItemsEqual(self.run_one_off_job(), [
+            ['UNEXPECTED',
+             'ExplorationStats "ID" v2 does not have stats for card "%s", but '
+             'it appears in version: 1.' % (feconf.DEFAULT_INIT_STATE_NAME)]
+        ])
+
+    def test_error_when_stats_for_state_once_existed(self):
+        self.save_new_linear_exp_with_state_names_and_interactions(
+            'ID', 'owner_id',
+            ['State A', 'State B', 'State C'],
+            ['TextInput', 'TextInput', 'EndExploration'])
+        exp_services.update_exploration('owner_id', 'ID', None, 'noop') # v2
+        exp_services.update_exploration( # v3
+            'owner_id', 'ID', [
+                exp_domain.ExplorationChange(
+                    {'cmd': 'delete_state', 'state_name': 'State B'})
+            ], 'Delete State B')
+
+        stats = stats_models.ExplorationStatsModel.get_model('ID', 3)
+        stats.state_stats_mapping['State B'] = (
+            stats_domain.StateStats.create_default().to_dict())
+        stats.put()
+
+        self.assertItemsEqual(self.run_one_off_job(), [
+            ['EXPECTED', '2 ExplorationStats models present'],
+            ['UNEXPECTED',
+             'ExplorationStats "ID" v3 has stats for card "State B", but it '
+             'only appears in versions: 1, 2.']
+        ])
