@@ -1,4 +1,4 @@
-// Copyright 2018 The Oppia Authors. All Rights Reserved.
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -26,11 +26,11 @@ export class TopicsAndSkillsDashboardFilter {
   sort: string;
   status: string;
   /**
-     * @param {String} category - category to filter
-     * @param {String} keyword - keyword to filter
-     * @param {String} sort - sort by filter value
-     * @param {String} status - status to filter
-     */
+   * @param {String} category - category to filter
+   * @param {String} keyword - keyword to filter
+   * @param {String} sort - sort by filter value
+   * @param {String} status - status to filter
+   */
   constructor(category, keyword, sort, status) {
     this.category = category;
     this.keyword = keyword;
@@ -38,8 +38,8 @@ export class TopicsAndSkillsDashboardFilter {
     this.status = status;
   }
   /**
-     * Resets the filter object values
-     */
+   * Resets the filter object values
+   */
   reset(): void {
     this.category = '';
     this.keyword = '';
@@ -57,8 +57,7 @@ export class TopicsAndSkillsDashboardFilterObjectFactory {
    * TopicsAndSkillsDashboardFilter instance
    */
   createDefault(): TopicsAndSkillsDashboardFilter {
-    return new TopicsAndSkillsDashboardFilter(
-      '', '', '', '');
+    return new TopicsAndSkillsDashboardFilter('', '', '', '');
   }
 }
 

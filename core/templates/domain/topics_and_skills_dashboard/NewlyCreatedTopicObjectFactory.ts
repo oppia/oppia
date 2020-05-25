@@ -47,8 +47,8 @@ export class NewlyCreatedTopic {
 })
 export class NewlyCreatedTopicObjectFactory {
   /**
-    * @returns {NewlyCreatedTopic} - A new NewlyCreatedTopic instance
-    */
+   * @returns {NewlyCreatedTopic} - A new NewlyCreatedTopic instance
+   */
   createDefault(): NewlyCreatedTopic {
     return new NewlyCreatedTopic(
       '', '', '');

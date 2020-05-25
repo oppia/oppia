@@ -78,9 +78,6 @@ import { CreatorDashboardBackendApiService } from
 import { CsrfTokenService } from 'services/csrf-token.service';
 import { CurrentInteractionService } from
   'pages/exploration-player-page/services/current-interaction.service';
-import { TopicsAndSkillsDashboardFilterObjectFactory } from
-  // eslint-disable-next-line max-len
-  'domain/topics_and_skills_dashboard/TopicsAndSkillsDashboardFilterObjectFactory';
 import { NewlyCreatedTopicObjectFactory } from
   'domain/topics_and_skills_dashboard/NewlyCreatedTopicObjectFactory';
 import { DateTimeFormatService } from 'services/date-time-format.service';
@@ -295,19 +292,22 @@ import { ThreadMessageSummaryObjectFactory } from
 import { ThreadStatusDisplayService } from
   // eslint-disable-next-line max-len
   'pages/exploration-editor-page/feedback-tab/services/thread-status-display.service';
-import { TopicsAndSkillsDashboardPageService } from
+import { TopicsAndSkillsDashboardFilterObjectFactory } from
   // eslint-disable-next-line max-len
-  'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.service';
+  'domain/topics_and_skills_dashboard/TopicsAndSkillsDashboardFilterObjectFactory';
 import { TopicCreationBackendApiService } from
   'domain/topic/topic-creation-backend-api.service';
-import { TopicsAndSkillsDashboardBackendApiService } from
-  // eslint-disable-next-line max-len
-  'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 import { TopicObjectFactory } from 'domain/topic/TopicObjectFactory';
 import { TopicRightsObjectFactory } from
   'domain/topic/TopicRightsObjectFactory';
 import { TopicSummaryObjectFactory } from
   'domain/topic/TopicSummaryObjectFactory';
+import { TopicsAndSkillsDashboardBackendApiService } from
+  // eslint-disable-next-line max-len
+  'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
+import { TopicsAndSkillsDashboardPageService } from
+  // eslint-disable-next-line max-len
+  'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.service';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
@@ -381,8 +381,6 @@ export class UpgradedServices {
     upgradedServices['ExplorationFeaturesService'] =
       new ExplorationFeaturesService();
     upgradedServices['ExpressionParserService'] = new ExpressionParserService();
-    upgradedServices['TopicsAndSkillsDashboardFilterObjectFactory'] =
-        new TopicsAndSkillsDashboardFilterObjectFactory();
     upgradedServices['NewlyCreatedTopicObjectFactory'] =
         new NewlyCreatedTopicObjectFactory();
     upgradedServices['FractionObjectFactory'] = new FractionObjectFactory();
@@ -447,6 +445,8 @@ export class UpgradedServices {
     upgradedServices['ThreadStatusDisplayService'] =
       new ThreadStatusDisplayService();
     upgradedServices['Title'] = new Title({});
+    upgradedServices['TopicsAndSkillsDashboardFilterObjectFactory'] =
+        new TopicsAndSkillsDashboardFilterObjectFactory();
     upgradedServices['TopicsAndSkillsDashboardPageService'] =
         new TopicsAndSkillsDashboardPageService();
     upgradedServices['TopicRightsObjectFactory'] =
