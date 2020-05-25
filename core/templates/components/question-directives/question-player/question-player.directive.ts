@@ -89,7 +89,7 @@ require(
   'attribution-guide.directive.ts');
 require(
   'components/common-layout-directives/common-elements/' +
-  'background-banner.directive.ts');
+  'background-banner.component.ts');
 require('components/concept-card/concept-card.directive.ts');
 require('components/skill-mastery/skill-mastery.directive.ts');
 require(

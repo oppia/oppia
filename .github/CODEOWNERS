@@ -17,6 +17,7 @@
 /core/domain/android_validation_constants*.py @BenHenning
 
 # Angular Migration team
+/core/templates/components/shared-component.module.ts @bansalnitish
 /core/templates/services/loader.service*.ts @bansalnitish
 /core/templates/services/contextual/logger.service.ts @bansalnitish
 /core/templates/services/contextual/logger.service.spec.ts @bansalnitish
@@ -185,8 +186,8 @@
 /core/templates/components/common-layout-directives/common-elements/alert-message.directive.ts @ankita240796
 /core/templates/components/common-layout-directives/common-elements/attribution-guide.directive.html @ankita240796
 /core/templates/components/common-layout-directives/common-elements/attribution-guide.directive.ts @ankita240796
-/core/templates/components/common-layout-directives/common-elements/background-banner.directive.ts @ankita240796
-/core/templates/components/common-layout-directives/common-elements/background-banner.directive.html @ankita240796
+/core/templates/components/common-layout-directives/common-elements/background-banner.component.ts @ankita240796
+/core/templates/components/common-layout-directives/common-elements/background-banner.component.html @ankita240796
 /core/templates/components/common-layout-directives/common-elements/confirm-or-cancel-modal.controller*.ts @marianazangrossi
 /core/templates/components/common-layout-directives/common-elements/lazy-loading.directive.html @ankita240796
 /core/templates/components/common-layout-directives/common-elements/lazy-loading.directive.ts @ankita240796

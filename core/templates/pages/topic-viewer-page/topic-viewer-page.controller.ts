@@ -19,7 +19,7 @@
 require('base-components/base-content.directive.ts');
 require(
   'components/common-layout-directives/common-elements/' +
-  'background-banner.directive.ts');
+  'background-banner.component.ts');
 require('components/skills-mastery-list/skills-mastery-list.directive.ts');
 require(
   'pages/topic-viewer-page/stories-list/' +

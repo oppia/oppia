@@ -19,6 +19,13 @@
 import 'core-js/es7/reflect';
 import 'zone.js';
 
+angular.module('oppia', [
+  'dndLists', 'headroom', 'infinite-scroll', 'ngAnimate',
+  'ngAudio', require('angular-cookies'), 'ngJoyRide', 'ngMaterial',
+  'ngSanitize', 'ngTouch', 'pascalprecht.translate',
+  'toastr', 'ui.bootstrap', 'ui.sortable', 'ui.tree', 'ui.validate'
+]);
+
 import { BrowserModule } from '@angular/platform-browser';
 import { Component, NgModule, StaticProvider } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
@@ -43,11 +50,13 @@ import { QuestionPlayerConstants } from
   'components/question-directives/question-player/question-player.constants';
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { ServicesConstants } from 'services/services.constants';
+import { SharedComponentsModule } from 'components/shared-component.module';
 
 @NgModule({
   imports: [
     BrowserModule,
-    HttpClientModule
+    HttpClientModule,
+    SharedComponentsModule
   ],
   declarations: [
     ServiceBootstrapComponent
@@ -85,17 +94,12 @@ const downgradedModule = downgradeModule(bootstrapFn);
 
 declare var angular: ng.IAngularStatic;
 
-angular.module('oppia', [
-  'dndLists', 'headroom', 'infinite-scroll', 'ngAnimate',
-  'ngAudio', require('angular-cookies'), 'ngJoyRide', 'ngMaterial',
-  'ngSanitize', 'ngTouch', 'pascalprecht.translate',
-  'toastr', 'ui.bootstrap', 'ui.sortable', 'ui.tree', 'ui.validate',
-  downgradedModule
-])
+angular.module('oppia').requires.push(downgradedModule);
+
+angular.module('oppia').directive(
   // This directive is the downgraded version of the Angular component to
   // bootstrap the Angular 8.
-  .directive(
-    'serviceBootstrap',
-    downgradeComponent({
-      component: ServiceBootstrapComponent
-    }) as angular.IDirectiveFactory);
+  'serviceBootstrap',
+  downgradeComponent({
+    component: ServiceBootstrapComponent
+  }) as angular.IDirectiveFactory);

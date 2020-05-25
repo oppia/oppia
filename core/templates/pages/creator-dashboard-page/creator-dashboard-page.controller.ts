@@ -22,7 +22,7 @@ require(
   'sharing-links.directive.ts');
 require(
   'components/common-layout-directives/common-elements/' +
-  'background-banner.directive.ts');
+  'background-banner.component.ts');
 require('components/summary-tile/collection-summary-tile.directive.ts');
 require(
   'pages/exploration-editor-page/feedback-tab/thread-table/' +
