@@ -1465,9 +1465,8 @@ class ExplorationMissingStatsAudit(jobs.BaseMapReduceOneOffJobManager):
             state_name = status.rsplit(':', 1)[-1]
             for exp_id, exp_version, versions_with_state_as_strs in (
                     ast.literal_eval(s) for s in exp_detail_strs):
-                error_str = 'but it appears in %s: %s' % (
-                    'versions'
-                    if len(versions_with_state_as_strs) > 1 else 'version',
+                error_str = 'but it appears in version%s: %s' % (
+                    's' if len(versions_with_state_as_strs) > 1 else '',
                     ', '.join(versions_with_state_as_strs))
                 yield (
                     ExplorationMissingStatsAudit.JOB_RESULT_UNEXPECTED,
@@ -1480,9 +1479,8 @@ class ExplorationMissingStatsAudit(jobs.BaseMapReduceOneOffJobManager):
             for exp_id, exp_version, versions_with_state_as_strs in (
                     ast.literal_eval(s) for s in exp_detail_strs):
                 if versions_with_state_as_strs:
-                    error_str = 'but it only appears in %s: %s' % (
-                        'versions'
-                        if len(versions_with_state_as_strs) > 1 else 'version',
+                    error_str = 'but it only appears in version%s: %s' % (
+                        's' if len(versions_with_state_as_strs) > 1 else '',
                         ', '.join(versions_with_state_as_strs))
                 else:
                     error_str = 'but it never existed'
