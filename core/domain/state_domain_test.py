@@ -194,7 +194,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             init_state.get_content_html('hint_1'), '<p>Changed hint one</p>')
 
-    def test_android_validation(self):
+    def test_rte_content_validation_for_android(self):
         exploration = exp_domain.Exploration.create_default_exploration('0')
 
         init_state = exploration.states[exploration.init_state_name]
@@ -298,6 +298,58 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     '</oppia-noninteractive-link></p>')
             }))
         self.assertTrue(init_state.is_rte_content_supported_on_android())
+        init_state.update_content(
+            state_domain.SubtitledHtml.from_dict({
+                'content_id': 'content',
+                'html': (
+                    '<p><oppia-noninteractive-skillreview>'
+                    '</oppia-noninteractive-skillreview></p>')
+            }))
+        self.assertTrue(init_state.is_rte_content_supported_on_android())
+
+    def test_interaction_validation_for_android(self):
+        exploration = exp_domain.Exploration.create_default_exploration('0')
+
+        init_state = exploration.states[exploration.init_state_name]
+        # Valid interactions.
+        init_state.update_interaction_id('Continue')
+        self.assertTrue(init_state.interaction.is_supported_on_android_app())
+        init_state.update_interaction_id('DragAndDropSortInput')
+        self.assertTrue(init_state.interaction.is_supported_on_android_app())
+        init_state.update_interaction_id('EndExploration')
+        self.assertTrue(init_state.interaction.is_supported_on_android_app())
+        init_state.update_interaction_id('FractionInput')
+        self.assertTrue(init_state.interaction.is_supported_on_android_app())
+        init_state.update_interaction_id('ItemSelectionInput')
+        self.assertTrue(init_state.interaction.is_supported_on_android_app())
+        init_state.update_interaction_id('MultipleChoiceInput')
+        self.assertTrue(init_state.interaction.is_supported_on_android_app())
+        init_state.update_interaction_id('NumberWithUnits')
+        self.assertTrue(init_state.interaction.is_supported_on_android_app())
+        init_state.update_interaction_id('NumericInput')
+        self.assertTrue(init_state.interaction.is_supported_on_android_app())
+        init_state.update_interaction_id('TextInput')
+        self.assertTrue(init_state.interaction.is_supported_on_android_app())
+
+        # Invalid interactions.
+        init_state.update_interaction_id('CodeRepl')
+        self.assertFalse(init_state.interaction.is_supported_on_android_app())
+        init_state.update_interaction_id('GraphInput')
+        self.assertFalse(init_state.interaction.is_supported_on_android_app())
+        init_state.update_interaction_id('ImageClickInput')
+        self.assertFalse(init_state.interaction.is_supported_on_android_app())
+        init_state.update_interaction_id('InteractiveMap')
+        self.assertFalse(init_state.interaction.is_supported_on_android_app())
+        init_state.update_interaction_id('LogicProof')
+        self.assertFalse(init_state.interaction.is_supported_on_android_app())
+        init_state.update_interaction_id('MathExpressionInput')
+        self.assertFalse(init_state.interaction.is_supported_on_android_app())
+        init_state.update_interaction_id('MusicNotesInput')
+        self.assertFalse(init_state.interaction.is_supported_on_android_app())
+        init_state.update_interaction_id('PencilCodeEditor')
+        self.assertFalse(init_state.interaction.is_supported_on_android_app())
+        init_state.update_interaction_id('SetInput')
+        self.assertFalse(init_state.interaction.is_supported_on_android_app())
 
     def test_get_content_html_with_invalid_content_id_raise_error(self):
         exploration = exp_domain.Exploration.create_default_exploration('0')
