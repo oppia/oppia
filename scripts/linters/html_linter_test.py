@@ -43,12 +43,14 @@ INVALID_QUOTES_HTML_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_quotes.html')
 INVALID_ALIGNMENT_HTML_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_alignment_of_tags.html')
-INVALID_MISSING_TAG_HTML_FILEPATH = os.path.join(
-    LINTER_TESTS_DIR, 'invalid_missing_tag.html')
+INVALID_MISSING_HTML_TAG_HTML_FILEPATH = os.path.join(
+    LINTER_TESTS_DIR, 'invalid_missing_html_tag.html')
 INVALID_TAG_MISMATCH_HTML_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_tag_mismatch.html')
 INVALID_MISMATCH_INDENTATION_HTML_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_mismatch_indentation.html')
+INVALID_MISMATCHED_TAGS_HTML_FILEPATH = os.path.join(
+    LINTER_TESTS_DIR, 'invalid_mismatched_tags.html')
 
 
 def appears_in_linter_stdout(phrases, linter_stdout):
@@ -112,8 +114,8 @@ class CustomHTMLParserTests(test_utils.GenericTestBase):
                 debug=True).perform_all_lint_checks()
         self.assertTrue(
             appears_in_linter_stdout(
-                ['Indentation for end tag content on line 13 does not match the'
-                 ' indentation of the start tag content on line 11'],
+                ['Expected indentation of 10, found indentation of 12 for '
+                 'classroom-page tag on line 13'],
                 self.linter_stdout))
 
     def test_custom_linter_with_invalid_quotes(self):
@@ -139,13 +141,13 @@ class CustomHTMLParserTests(test_utils.GenericTestBase):
                  'leftmost attribute on line 11'],
                 self.linter_stdout))
 
-    def test_custom_linter_with_missing_tag(self):
+    def test_custom_linter_with_invalid_tags(self):
         with self.print_swap:
             with self.assertRaises(html_linter.TagMismatchException) as e:
                 html_linter.HTMLLintChecksManager(
-                    [INVALID_MISSING_TAG_HTML_FILEPATH], FILE_CACHE, True,
+                    [INVALID_MISMATCHED_TAGS_HTML_FILEPATH], FILE_CACHE, True,
                     debug=True).perform_all_lint_checks()
-        self.assertTrue('Error in line 13 of file' in e.exception.message)
+        self.assertTrue('Error in line 2 of file' in e.exception.message)
 
     def test_custom_linter_with_tag_mismatch(self):
         with self.print_swap:
@@ -165,6 +167,14 @@ class CustomHTMLParserTests(test_utils.GenericTestBase):
                 ['Indentation for end tag content on line 17 does not match the'
                  ' indentation of the start tag content on line 11'],
                 self.linter_stdout))
+
+    def test_custom_without_html_end_tag(self):
+        with self.print_swap:
+            with self.assertRaises(html_linter.TagMismatchException) as e:
+                html_linter.HTMLLintChecksManager(
+                    [INVALID_MISSING_HTML_TAG_HTML_FILEPATH], FILE_CACHE, True,
+                    debug=True).perform_all_lint_checks()
+        self.assertTrue('Error in file' in e.exception.message)
 
     def test_third_party_linter_with_verbose_mode_enabled(self):
         with self.print_swap:

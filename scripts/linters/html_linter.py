@@ -133,12 +133,12 @@ class CustomHTMLParser(html.parser.HTMLParser):
             # Therefore the check should run only for those
             # attributes which have a value.
             if value:
-                expected_value = '"' + value + '"'
-
                 # &quot; is rendered as a double quote by the parser.
                 if '&quot;' in starttag_text:
+                    expected_value = value
                     rendered_text = starttag_text.replace('&quot;', '"')
                 else:
+                    expected_value = '"' + value + '"'
                     rendered_text = starttag_text
 
                 if not expected_value in rendered_text:
