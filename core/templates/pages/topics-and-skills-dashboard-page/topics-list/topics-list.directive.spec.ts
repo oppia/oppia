@@ -115,7 +115,7 @@ describe('Topics List Directive', function() {
     expect(ctrl.getSerialNumberForTopic(2)).toEqual(48);
   });
 
-  it('should delete the topic ', function() {
+  it('should delete the topic success', function() {
     spyOn($uibModal, 'open').and.returnValue({
       result: $q.resolve()
     });

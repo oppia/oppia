@@ -76,7 +76,6 @@ angular.module('oppia').factory('TopicCreationService', [
           if (!topic.isValid()) {
             throw new Error('Topic fields can not be empty');
           }
-
           topicCreationInProgress = true;
           AlertsService.clearWarnings();
           // $window.open has to be initialized separately since if the 'open

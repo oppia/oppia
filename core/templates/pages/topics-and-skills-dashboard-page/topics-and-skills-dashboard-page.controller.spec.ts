@@ -79,7 +79,7 @@ describe('Topics and Skills Dashboard Page', function() {
       }]);
   }));
 
-  beforeEach(angular.mock.inject(function($injector, $controller) {
+  beforeEach(angular.mock.inject(function($injector) {
     $httpBackend = $injector.get('$httpBackend');
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
@@ -151,7 +151,7 @@ describe('Topics and Skills Dashboard Page', function() {
     expect(ctrl.activeTab).toEqual('topics');
   });
 
-  it('should goToPageNumber', function() {
+  it('should go to Page Number', function() {
     $httpBackend.expect('GET', TOPICS_AND_SKILLS_DASHBOARD_DATA_URL).respond(
       sampleDataResults);
     $httpBackend.flush();
@@ -162,7 +162,7 @@ describe('Topics and Skills Dashboard Page', function() {
     expect(ctrl.pageNumber).toEqual(4);
   });
 
-  it('should open call createTopic Service ', function() {
+  it('should open the create Topic Modal', function() {
     $httpBackend.expect('GET', TOPICS_AND_SKILLS_DASHBOARD_DATA_URL).respond(
       sampleDataResults);
     $httpBackend.flush();
@@ -248,7 +248,7 @@ describe('Topics and Skills Dashboard Page', function() {
     expect(ctrl.filterObject).toEqual(filterObject);
   });
 
-  it('should return number from 1 to range', function() {
+  it('should return number from 1 to the range specified', function() {
     $httpBackend.expect('GET', TOPICS_AND_SKILLS_DASHBOARD_DATA_URL).respond(
       sampleDataResults);
     $httpBackend.flush();
