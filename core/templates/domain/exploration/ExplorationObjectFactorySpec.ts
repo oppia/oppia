@@ -339,7 +339,6 @@ describe('Exploration object factory', () => {
   it('should correctly check when an exploration has inline display mode',
     () => {
       expect(this.exploration.isInteractionInline('1st state')).toBeTrue();
-      expect(this.exploration.isInteractionInline('1st state')).toBeTrue();
 
       expect(this.exploration.isInteractionInline('invalid state')).toBeTrue();
       expect(this.lsErrorSpy)

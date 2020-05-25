@@ -262,11 +262,11 @@ describe('Extracting Image file names in the state service', () => {
                       's4DefaultOutcomeFeedback.png&amp;quot;">' +
                       '</oppia-noninteractive-image></p>',
               },
+              dest: 'State 4',
               param_changes: [],
               labelled_as_correct: false,
               refresher_exploration_id: null,
               missing_prerequisite_skill_id: null,
-              dest: 'State 4',
             },
             confirmed_unclassified_answers: [],
             customization_args: {
@@ -324,7 +324,7 @@ describe('Extracting Image file names in the state service', () => {
                     html: 'It is choice number 2'
                   },
                   param_changes: [],
-                  labelled_as_correct: false,
+                  labelled_as_correct: true,
                   refresher_exploration_id: null,
                   missing_prerequisite_skill_id: null,
                 },
@@ -418,8 +418,8 @@ describe('Extracting Image file names in the state service', () => {
                     html: '<p>That is a function, which is close to what you' +
                           'are looking for. Try again!</p>'
                   },
-                  labelled_as_correct: false,
                   param_changes: [],
+                  labelled_as_correct: false,
                   refresher_exploration_id: null,
                   missing_prerequisite_skill_id: null
                 },
@@ -707,11 +707,11 @@ describe('Extracting Image file names in the state service', () => {
     let exploration = this.eof.createFromBackendDict(this.explorationDict);
     let states = exploration.getStates();
     let stateNames = states.getStateNames();
-    stateNames.forEach((statename) => {
+    stateNames.forEach((stateName: string) => {
       let filenamesInState = (
-        this.eifss.getImageFilenamesInState(states.getState(statename)));
-      filenamesInState.forEach(function(filename) {
-        expect(this.imageFilenamesInExploration[statename]).toContain(filename);
+        this.eifss.getImageFilenamesInState(states.getState(stateName)));
+      filenamesInState.forEach((filename: string) => {
+        expect(this.imageFilenamesInExploration[stateName]).toContain(filename);
       });
     });
   });

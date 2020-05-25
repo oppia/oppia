@@ -420,7 +420,7 @@ describe('States object factory', () => {
       var statesWithAudio = (
         this.ssof.createFromBackendDict(this.statesWithAudioDict));
       expect(statesWithAudio.getAllVoiceovers('hi-en'))
-        .toEqual(new Map(Object.entries({
+        .toEqual({
           'first state': [this.vof.createFromBackendDict({
             filename: 'myfile3.mp3',
             file_size_bytes: 0.8,
@@ -438,7 +438,7 @@ describe('States object factory', () => {
             needs_update: false,
             duration_secs: 0.8
           })]
-        })));
+        });
     });
   });
 });

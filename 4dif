@@ -143,9 +143,9 @@ export class Exploration {
     // error message associated with it is displayed in the most compact way
     // possible in the learner view.
     return (
-      interactionId ? (
+      interactionId ?
         INTERACTION_SPECS[interactionId].display_mode ===
-          AppConstants.INTERACTION_DISPLAY_MODE_INLINE) :
+          AppConstants.INTERACTION_DISPLAY_MODE_INLINE :
         false);
   }
 
