@@ -2112,6 +2112,44 @@ class State(python_utils.OBJECT):
                             answer_group_index]['rule_specs'][
                                 rule_spec_index]['inputs']['x'][x_index] = (
                                     conversion_fn(x))
+            if state_dict['interaction']['id'] == 'DragAndDropSortInput':
+                for rule_spec_index, rule_spec in enumerate(
+                        answer_group['rule_specs']):
+                    if rule_spec['rule_type'] == 'HasElementXAtPositionY':
+                        x = state_dict['interaction']['answer_groups'][
+                            answer_group_index]['rule_specs'][
+                                rule_spec_index]['inputs']['x']
+                        state_dict['interaction']['answer_groups'][
+                            answer_group_index]['rule_specs'][
+                                rule_spec_index]['inputs']['x'] = (
+                                    conversion_fn(x))
+                    elif rule_spec['rule_type'] == 'IsEqualToOrdering':
+                        for x_index, x in enumerate(rule_spec['inputs']['x']):
+                            state_dict['interaction']['answer_groups'][
+                                answer_group_index]['rule_specs'][
+                                    rule_spec_index]['inputs']['x'][
+                                        x_index][0] = conversion_fn(x[0])
+                    elif rule_spec['rule_type'] == 'HasElementXBeforeElementY':
+                        x = state_dict['interaction']['answer_groups'][
+                            answer_group_index]['rule_specs'][
+                                rule_spec_index]['inputs']['x']
+                        state_dict['interaction']['answer_groups'][
+                            answer_group_index]['rule_specs'][
+                                rule_spec_index]['inputs']['x'] = (
+                                    conversion_fn(x))
+                        y = state_dict['interaction']['answer_groups'][
+                            answer_group_index]['rule_specs'][
+                                rule_spec_index]['inputs']['y']
+                        state_dict['interaction']['answer_groups'][
+                            answer_group_index]['rule_specs'][
+                                rule_spec_index]['inputs']['y'] = (
+                                    conversion_fn(y))
+                    elif rule_spec['rule_type'] == 'IsEqualToOrderingWithOneItemAtIncorrectPosition': # pylint: disable=protected-access,line-too-long
+                        for x_index, x in enumerate(rule_spec['inputs']['x']):
+                            state_dict['interaction']['answer_groups'][
+                                answer_group_index]['rule_specs'][
+                                    rule_spec_index]['inputs']['x'][
+                                        x_index][0] = conversion_fn(x[0])
 
         if 'written_translations' in state_dict.keys():
             for (content_id, language_code_to_written_translation) in (
@@ -2138,7 +2176,8 @@ class State(python_utils.OBJECT):
                 conversion_fn(solution_html))
 
         if state_dict['interaction']['id'] in (
-                'ItemSelectionInput', 'MultipleChoiceInput'):
+                'ItemSelectionInput', 'MultipleChoiceInput',
+                'DragAndDropSortInput'):
             for value_index, value in enumerate(
                     state_dict['interaction']['customization_args'][
                         'choices']['value']):

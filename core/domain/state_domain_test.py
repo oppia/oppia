@@ -520,16 +520,21 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
     def test_convert_html_fields_in_state(self):
         """Test conversion of html strings in state."""
-
-        written_translations_dict = {
+        html_with_old_math_schema = ('<p>Value</p><oppia-noninteractive-' +
+                                     'math raw_latex-with-value="&amp;quot' +
+                                     ';+,-,-,+&amp;quot;"></oppia-nonintera' +
+                                     'ctive-math>')
+        html_with_new_math_schema = ('<p>Value</p><oppia-noninteractive-' +
+                                     'math math_content-with-value="{&amp;' +
+                                     'quot;raw_latex&amp;quot;: &amp;quot' +
+                                     ';+,-,-,+&amp;quot;, &amp;quot;' +
+                                     'svg_filename&amp;quot;: &amp;quot;&amp' +
+                                     ';quot;}"></oppia-noninteractive-math>')
+        written_translations_dict_with_old_math_schema = {
             'translations_mapping': {
                 'content1': {
                     'en': {
-                        'html': (
-                            'hello<oppia-noninteractive-math raw_latex-with-'
-                            'value="&amp;quot;+,-,-,+&amp;quot;"></oppia-noni'
-                            'nteractive-math>'
-                        ),
+                        'html': html_with_old_math_schema,
                         'needs_update': True
                     },
                     'hi': {
@@ -539,7 +544,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 },
                 'feedback_1': {
                     'hi': {
-                        'html': 'Testing!',
+                        'html': html_with_old_math_schema,
                         'needs_update': False
                     },
                     'en': {
@@ -549,17 +554,11 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 }
             }
         }
-        written_translations_dict_math = {
+        written_translations_dict_with_new_math_schema = {
             'translations_mapping': {
                 'content1': {
                     'en': {
-                        'html': (
-                            'hello<oppia-noninteractive-math math_content-wit'
-                            'h-value="{&amp;quot;raw_latex&amp;quot;: &amp;quo'
-                            't;+,-,-,+&amp;quot;, &amp;quot;svg_filename&amp;q'
-                            'uot;: &amp;quot;&amp;quot;}"></oppia-noninteracti'
-                            've-math>'
-                        ),
+                        'html': html_with_new_math_schema,
                         'needs_update': True
                     },
                     'hi': {
@@ -569,7 +568,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 },
                 'feedback_1': {
                     'hi': {
-                        'html': 'Testing!',
+                        'html': html_with_new_math_schema,
                         'needs_update': False
                     },
                     'en': {
@@ -612,7 +611,77 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'hints': []
             }
         }
-        state_dict_with_wrtten_transalation = {
+        answer_group_dict_with_old_math_schema = {
+            'outcome': {
+                'dest': 'Introduction',
+                'feedback': {
+                    'content_id': 'feedback_1',
+                    'html': '<p>Feedback</p>'
+                },
+                'labelled_as_correct': False,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'rule_specs': [{
+                'inputs': {
+                    'x': [[html_with_old_math_schema]]
+                },
+                'rule_type': 'IsEqualToOrdering'
+            }, {
+                'rule_type': 'HasElementXAtPositionY',
+                'inputs': {'x': html_with_old_math_schema,
+                           'y': 2}
+            }, {
+                'rule_type': 'IsEqualToOrdering',
+                'inputs': {'x': [[html_with_old_math_schema]]}
+            }, {
+                'rule_type': 'HasElementXBeforeElementY',
+                'inputs': {'x': html_with_old_math_schema,
+                           'y': html_with_old_math_schema}
+            }, {
+                'rule_type': 'IsEqualToOrderingWithOneItemAtIncorrectPosition',  # pylint: disable=protected-access,line-too-long
+                'inputs': {'x': [[html_with_old_math_schema]]}
+            }],
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }
+        answer_group_dict_with_new_math_schema = {
+            'outcome': {
+                'dest': 'Introduction',
+                'feedback': {
+                    'content_id': 'feedback_1',
+                    'html': '<p>Feedback</p>'
+                },
+                'labelled_as_correct': False,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'rule_specs': [{
+                'inputs': {
+                    'x': [[html_with_new_math_schema]]
+                },
+                'rule_type': 'IsEqualToOrdering'
+            }, {
+                'rule_type': 'HasElementXAtPositionY',
+                'inputs': {'x': html_with_new_math_schema,
+                           'y': 2}
+            }, {
+                'rule_type': 'IsEqualToOrdering',
+                'inputs': {'x': [[html_with_new_math_schema]]}
+            }, {
+                'rule_type': 'HasElementXBeforeElementY',
+                'inputs': {'x': html_with_new_math_schema,
+                           'y': html_with_new_math_schema}
+            }, {
+                'rule_type': 'IsEqualToOrderingWithOneItemAtIncorrectPosition',  # pylint: disable=protected-access,line-too-long
+                'inputs': {'x': [[html_with_new_math_schema]]}
+            }],
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }
+        state_dict_with_old_math_schema = {
             'content': {
                 'content_id': 'content', 'html': 'Hello!'
             },
@@ -622,7 +691,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'classifier_model_id': None,
             'interaction': {
                 'solution': None,
-                'answer_groups': [],
+                'answer_groups': [answer_group_dict_with_old_math_schema],
                 'default_outcome': {
                     'param_changes': [], 'feedback': {
                         'content_id': 'default_outcome', 'html': (
@@ -638,15 +707,25 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     'missing_prerequisite_skill_id': None,
                     'labelled_as_correct': False
                 },
-                'customization_args': {},
+                'customization_args': {
+                    'choices': {
+                        'value': [
+                            html_with_old_math_schema,
+                            '<p>2</p>',
+                            '<p>3</p>',
+                            '<p>4</p>'
+                        ]
+                    }
+                },
                 'confirmed_unclassified_answers': [],
-                'id': None,
+                'id': 'DragAndDropSortInput',
                 'hints': []
             },
-            'written_translations': written_translations_dict
+            'written_translations': (
+                written_translations_dict_with_old_math_schema)
         }
 
-        state_dict_with_converted_wrtten_transalation = {
+        state_dict_with_new_math_schema = {
             'content': {
                 'content_id': 'content', 'html': 'Hello!'
             },
@@ -656,7 +735,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'classifier_model_id': None,
             'interaction': {
                 'solution': None,
-                'answer_groups': [],
+                'answer_groups': [answer_group_dict_with_new_math_schema],
                 'default_outcome': {
                     'param_changes': [], 'feedback': {
                         'content_id': 'default_outcome', 'html': (
@@ -672,12 +751,22 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     'missing_prerequisite_skill_id': None,
                     'labelled_as_correct': False
                 },
-                'customization_args': {},
+                'customization_args': {
+                    'choices': {
+                        'value': [
+                            html_with_new_math_schema,
+                            '<p>2</p>',
+                            '<p>3</p>',
+                            '<p>4</p>'
+                        ]
+                    }
+                },
                 'confirmed_unclassified_answers': [],
-                'id': None,
+                'id': 'DragAndDropSortInput',
                 'hints': []
             },
-            'written_translations': written_translations_dict_math
+            'written_translations': (
+                written_translations_dict_with_new_math_schema)
         }
 
         state_dict_in_textangular = {
@@ -808,10 +897,10 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             state_domain.State.convert_html_fields_in_state(
-                state_dict_with_wrtten_transalation,
+                state_dict_with_old_math_schema,
                 html_validation_service.
                 add_math_content_to_math_rte_components),
-            state_dict_with_converted_wrtten_transalation)
+            state_dict_with_new_math_schema)
 
     def test_subtitled_html_validation_with_invalid_html_type(self):
         """Test validation of subtitled HTML with invalid html type."""
