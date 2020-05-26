@@ -115,21 +115,23 @@ describe('Topics and Skills Dashboard Page', function() {
     expect(ctrl.skillPageNumber).toEqual(0);
     expect(ctrl.selectedIndex).toEqual(null);
     expect(ctrl.itemsPerPageChoice).toEqual([10, 15, 20]);
-    expect(ctrl.categories).toEqual(['Mathematics']);
+    expect(ctrl.categories).toEqual(['Any', 'Mathematics']);
     expect(ctrl.filterObject).toEqual(filterObject);
-    enum ESortOptions {
+    enum ETopicSortOptions {
+      Any = 'Any',
       IncreasingCreatedOn = 'Newly Created',
       DecreasingCreatedOn = 'Oldest Created',
       IncreasingUpdatedOn = 'Most Recently Updated',
       DecreasingUpdatedOn = 'Least Recently Updated',
     }
 
-    enum EPublishedOptions {
+    enum ETopicPublishedOptions {
+      Any = 'Any',
       Published = 'Published',
       NotPublished = 'Not Published'
     }
-    expect(ctrl.sortOptions).toEqual(ESortOptions);
-    expect(ctrl.statusOptions).toEqual(EPublishedOptions);
+    expect(ctrl.sortOptions).toEqual(ETopicSortOptions);
+    expect(ctrl.statusOptions).toEqual(ETopicPublishedOptions);
 
     expect(ctrl.activeTab).toEqual('topics');
     expect(ctrl.totalTopicSummaries).toEqual(

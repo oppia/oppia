@@ -16,8 +16,8 @@
  * @fileoverview Unit tests for TopicsAndSkillsDashboardPageService.
  */
 
-import { ETopicPublishedOptions, ETopicSortOptions} from
-  // eslint-disable-next-line max-len
+import { ETopicPublishedOptions, ETopicSortOptions } from
+// eslint-disable-next-line max-len
   'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.constants';
 import { TopicsAndSkillsDashboardFilterObjectFactory } from
   // eslint-disable-next-line max-len
@@ -108,7 +108,7 @@ describe('Topic and Skill dashboard page service', () => {
     filteredArray = tsds.getFilteredTopics(topicsArray, filterOptions);
     expect(filteredArray).toEqual([topic2]);
 
-    filterOptions.status = null;
+    filterOptions.status = ETopicPublishedOptions.Any;
     filterOptions.sort = ETopicSortOptions.IncreasingUpdatedOn;
     filteredArray = tsds.getFilteredTopics(topicsArray, filterOptions);
     expect(filteredArray).toEqual([topic3, topic2, topic1]);
@@ -125,7 +125,7 @@ describe('Topic and Skill dashboard page service', () => {
     filteredArray = tsds.getFilteredTopics(topicsArray, filterOptions);
     expect(filteredArray).toEqual([topic1, topic2, topic3]);
 
-    filterOptions.sort = null;
+    filterOptions.sort = ETopicSortOptions.Any;
     filterOptions.category = 'Mathematics';
     filteredArray = tsds.getFilteredTopics(topicsArray, filterOptions);
     expect(filteredArray).toEqual([topic1, topic2]);

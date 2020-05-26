@@ -46,10 +46,10 @@ export class TopicsAndSkillsDashboardFilter {
    * Resets the filter object values
    */
   reset(): void {
-    this.category = '';
+    this.category = 'Any';
     this.keyword = '';
-    this.sort = null;
-    this.status = null;
+    this.sort = ETopicSortOptions.Any;
+    this.status = ETopicPublishedOptions.Any;
   }
 }
 
@@ -62,7 +62,8 @@ export class TopicsAndSkillsDashboardFilterObjectFactory {
    * TopicsAndSkillsDashboardFilter instance
    */
   createDefault(): TopicsAndSkillsDashboardFilter {
-    return new TopicsAndSkillsDashboardFilter('', '', null, null);
+    return new TopicsAndSkillsDashboardFilter(
+      'Any', '', ETopicSortOptions.Any, ETopicPublishedOptions.Any);
   }
 }
 

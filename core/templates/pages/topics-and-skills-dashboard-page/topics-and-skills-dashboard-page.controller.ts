@@ -261,9 +261,13 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
             ctrl.itemsPerPageChoice = [10, 15, 20];
             ctrl.filterObject = (
               TopicsAndSkillsDashboardFilterObjectFactory.createDefault());
-            ctrl.categories = ALLOWED_TOPIC_CATEGORIES;
-            ctrl.sortOptions = (TOPIC_SORT_OPTIONS);
-            ctrl.statusOptions = (TOPIC_PUBLISHED_OPTIONS);
+            ctrl.categories = angular.copy(ALLOWED_TOPIC_CATEGORIES);
+            // Adding this since karma tests were adding Any for every it block
+            if (!ctrl.categories.includes('Any')) {
+              ctrl.categories.unshift('Any');
+            }
+            ctrl.sortOptions = TOPIC_SORT_OPTIONS;
+            ctrl.statusOptions = TOPIC_PUBLISHED_OPTIONS;
 
             ctrl.generateNumbersTillRange = function(range) {
               var arr = [];

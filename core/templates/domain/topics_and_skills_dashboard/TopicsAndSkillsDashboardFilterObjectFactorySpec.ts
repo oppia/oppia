@@ -16,13 +16,15 @@
  * @fileoverview Unit tests for TopicsAndSkillsDashboardFilterObjectFactory.
  */
 
-import { TopicsAndSkillsDashboardFilter,
+import { ETopicPublishedOptions, ETopicSortOptions } from
+  // eslint-disable-next-line max-len
+  'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.constants';
+
+import {
+  TopicsAndSkillsDashboardFilter,
   TopicsAndSkillsDashboardFilterObjectFactory } from
   // eslint-disable-next-line max-len
   'domain/topics_and_skills_dashboard/TopicsAndSkillsDashboardFilterObjectFactory';
-import { ETopicPublishedOptions, ETopicSortOptions}
-  // eslint-disable-next-line max-len
-  from 'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.constants';
 
 describe('Topics And Skills Dashboard Filter Object', () => {
   let topicsAndSkillsDashboardFilterObjectFactory:
@@ -36,16 +38,16 @@ describe('Topics And Skills Dashboard Filter Object', () => {
   });
 
   it('should create a new dashboard filter object', () => {
-    expect(filter.category).toEqual('');
-    expect(filter.sort).toEqual(null);
-    expect(filter.status).toEqual(null);
+    expect(filter.category).toEqual('Any');
+    expect(filter.sort).toEqual(ETopicSortOptions.Any);
+    expect(filter.status).toEqual(ETopicPublishedOptions.Any);
     expect(filter.keyword).toEqual('');
   });
 
   it('should reset values of the filter', () => {
-    expect(filter.category).toEqual('');
-    expect(filter.sort).toEqual(null);
-    expect(filter.status).toEqual(null);
+    expect(filter.category).toEqual('Any');
+    expect(filter.sort).toEqual(ETopicSortOptions.Any);
+    expect(filter.status).toEqual(ETopicPublishedOptions.Any);
     expect(filter.keyword).toEqual('');
 
     const category = 'Mathematics';
@@ -64,9 +66,9 @@ describe('Topics And Skills Dashboard Filter Object', () => {
     expect(filter.keyword).toEqual(keywords);
 
     filter.reset();
-    expect(filter.category).toEqual('');
-    expect(filter.sort).toEqual(null);
-    expect(filter.status).toEqual(null);
+    expect(filter.category).toEqual('Any');
+    expect(filter.sort).toEqual(ETopicSortOptions.Any);
+    expect(filter.status).toEqual(ETopicPublishedOptions.Any);
     expect(filter.keyword).toEqual('');
   });
 });

@@ -22,6 +22,7 @@ import { Injectable } from '@angular/core';
 import { ITopicSummaryBackendDict } from
   // eslint-disable-next-line max-len
   'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
+// eslint-disable-next-line max-len
 import { TopicsAndSkillsDashboardFilter } from
   // eslint-disable-next-line max-len
   'domain/topics_and_skills_dashboard/TopicsAndSkillsDashboardFilterObjectFactory';
@@ -43,7 +44,6 @@ export class TopicsAndSkillsDashboardPageService {
       topicsArray: Array<ITopicSummaryBackendDict>,
       filterObject: TopicsAndSkillsDashboardFilter):
       Array<ITopicSummaryBackendDict> {
-    // const {sort, category, status} = filterObject;
     let ESortOptions = TopicsAndSkillsDashboardPageConstants.TOPIC_SORT_OPTIONS;
     let EPublishedOptions = (
       TopicsAndSkillsDashboardPageConstants.TOPIC_PUBLISHED_OPTIONS);
@@ -58,14 +58,14 @@ export class TopicsAndSkillsDashboardPageService {
       });
     }
 
-    if (filterObject.category) {
+    if (filterObject.category !== 'Any') {
       filteredTopics = filteredTopics.filter((topic) => {
         return (
           filterObject.category === topic.category);
       });
     }
 
-    if (filterObject.status) {
+    if (filterObject.status !== EPublishedOptions.Any) {
       filteredTopics = filteredTopics.filter((topic) => {
         if (filterObject.status === EPublishedOptions.Published &&
             topic.is_published) {
@@ -79,7 +79,7 @@ export class TopicsAndSkillsDashboardPageService {
       });
     }
 
-    if (filterObject.sort) {
+    if (filterObject.sort !== ESortOptions.Any) {
       switch (filterObject.sort) {
         case ESortOptions.IncreasingUpdatedOn:
           filteredTopics.sort((a, b) => (

@@ -19,6 +19,7 @@
 const constants = require('constants.ts');
 
 export enum ETopicSortOptions {
+  Any = 'Any',
   IncreasingCreatedOn = 'Newly Created',
   DecreasingCreatedOn = 'Oldest Created',
   IncreasingUpdatedOn = 'Most Recently Updated',
@@ -26,6 +27,7 @@ export enum ETopicSortOptions {
 }
 
 export enum ETopicPublishedOptions {
+  Any = 'Any',
   Published = 'Published',
   NotPublished = 'Not Published'
 }
