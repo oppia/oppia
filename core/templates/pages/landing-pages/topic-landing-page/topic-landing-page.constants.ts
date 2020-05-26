@@ -46,14 +46,14 @@ export class TopicLandingPageConstants {
       'Oppia\'s lessons tell stories using video and images to ' +
       'help learners apply math concepts in everyday life.'),
     imageFilename: 'fun_storytelling.png',
-    imageAlt: ''
+    imageAlt: 'Storytelling lessons presentation.'
   }, {
     title: 'Accessible lessons',
     description: (
       'Our lessons come with audio translations in different ' +
       'languages, require little bandwidth, and are mobile friendly.'),
     imageFilename: 'accessible_lessons.png',
-    imageAlt: ''
+    imageAlt: 'Lesson accessibility presentation.'
   }, {
     title: 'Suitable for all',
     description: (
@@ -61,6 +61,6 @@ export class TopicLandingPageConstants {
       'learning the meaning of equal parts, to comparing fractions ' +
       '- Oppia has you covered.'),
     imageFilename: 'suitable_for_all.png',
-    imageAlt: ''
+    imageAlt: 'Lesson viewers and learners.'
   }];
 }

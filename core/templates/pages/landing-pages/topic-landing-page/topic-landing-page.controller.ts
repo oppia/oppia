@@ -17,9 +17,6 @@
  */
 
 require('base-components/base-content.directive.ts');
-require(
-  'components/common-layout-directives/common-elements/' +
-  'background-banner.component.ts');
 
 require('domain/utilities/url-interpolation.service.ts');
 require('services/page-title.service.ts');
@@ -80,7 +77,10 @@ angular.module('oppia').directive('topicLandingPage', [
             topicData = TOPIC_LANDING_PAGE_DATA[subjectName][topicName];
             ctrl.topicTitle = topicData.topicTitle;
             ctrl.lessonsQualities = LESSON_QUALITIES_DATA;
-            ctrl.lessonsInDevicesImageSrc = (
+            ctrl.backgroundBannerUrl = (
+              UrlInterpolationService.getStaticImageUrl(
+                '/background/bannerB.svg'));
+            ctrl.lessonInDevicesImageSrc = (
               UrlInterpolationService.getStaticImageUrl(
                 UrlInterpolationService.interpolateUrl(
                   '/landing/<subject>/<topic>/<filename>', {
