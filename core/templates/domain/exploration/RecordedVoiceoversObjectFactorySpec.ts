@@ -243,9 +243,8 @@ describe('RecordedVoiceovers object factory', () => {
   });
 
   it('should throw error when deleting non-existent voiceover', () => {
-    expect(() => rv.deleteVoiceover('content', 'zz')).toThrow(
-      new Error(
-        'Trying to remove non-existing translation for language code zz')
+    expect(() => rv.deleteVoiceover('content', 'zz')).toThrowError(
+      'Trying to remove non-existing translation for language code zz'
     );
   });
 
