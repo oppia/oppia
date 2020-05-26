@@ -20,8 +20,9 @@ describe('LiterallyCanvasDiagramEditor', function() {
   var LCDiagramEditorCtrl = null;
   var mockLiterallyCanvas = {
     setImageSize: function(width, height) {
-      var text = 'The updated diagram width is ' + width +
-      ' and height is ' + height;
+      var text = (
+        'The updated diagram width is ' + width +
+        ' and height is ' + height);
       return text;
     }
   };

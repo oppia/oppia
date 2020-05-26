@@ -26,13 +26,14 @@ angular.module('oppia').component('literallyCanvasDiagramEditor', {
     'LiterallyCanvasHelperService', function(LiterallyCanvasHelperService) {
       const ctrl = this;
       // These max width and height paramameters were determined by manual
-      // testing and reference from image upload rte.
+      // testing and reference from OUTPUT_IMAGE_MAX_WIDTH_PX in
+      // filepath-editor file.
       var MAX_DIAGRAM_WIDTH = 491;
       var MAX_DIAGRAM_HEIGHT = 551;
       var DEFAULT_STROKE_WIDTH = 2;
       var ALLOWED_STROKE_WIDTHS = [1, 2, 3, 5, 30];
       // Dynamically assign a unique id to each lc editor to avoid clashes
-      // when there is multiple rtes in the same page.
+      // when there are multiple RTEs in the same page.
       ctrl.lcID = 'lc' + Math.floor(Math.random() * 100000).toString();
       ctrl.diagramWidth = 450;
       ctrl.currentDiagramWidth = 450;
@@ -64,7 +65,8 @@ angular.module('oppia').component('literallyCanvasDiagramEditor', {
       };
 
       ctrl.validate = function(data) {
-        // TODO(#9357): Will be implemented once data is saved.
+        // TODO(#9357): Will be implemented once the svg data saving
+        // functionality is implemented.
         return false;
       };
 
@@ -90,8 +92,8 @@ angular.module('oppia').component('literallyCanvasDiagramEditor', {
             defaultStrokeWidth: DEFAULT_STROKE_WIDTH,
             strokeWidths: ALLOWED_STROKE_WIDTHS,
             // Eraser tool is removed because svgRenderer has not been
-            // implemented in LiterallyCanvas. Can include once it is
-            // implemented.
+            // implemented in LiterallyCanvas and it can be included once
+            // svgRenderer function is implemented.
             tools: [
               LC.tools.Pencil,
               LC.tools.Line,

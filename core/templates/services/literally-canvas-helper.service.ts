@@ -16,6 +16,8 @@
  * @fileoverview LiterallyCanvas editor helper service.
  */
 
+// TODO(#9186): Change variable name to 'constants' once this file
+// is migrated to Angular.
 const CONSTANTS = require('constants.ts');
 
 angular.module('oppia').factory('LiterallyCanvasHelperService', [
@@ -78,6 +80,9 @@ angular.module('oppia').factory('LiterallyCanvasHelperService', [
             valid = false;
           }
         });
+        if (!valid) {
+          throw new Error('Invalid tag or attribute in svg.');
+        }
         return valid;
       },
       rectangleSVGRenderer: function(shape) {
@@ -111,7 +116,9 @@ angular.module('oppia').factory('LiterallyCanvasHelperService', [
         }
         rect.setAttribute('stroke-width', shape.strokeWidth);
         var rectTag = rect.outerHTML;
-        return this.isSVGTagValid(rectTag) ? rectTag : '';
+        if (this.isSVGTagValid(rectTag)) {
+          return rectTag;
+        }
       },
 
       ellipseSVGRenderer: function(shape) {
@@ -137,7 +144,9 @@ angular.module('oppia').factory('LiterallyCanvasHelperService', [
         }
         ellipse.setAttribute('stroke-width', shape.strokeWidth);
         var ellipseTag = ellipse.outerHTML;
-        return this.isSVGTagValid(ellipseTag) ? ellipseTag : '';
+        if (this.isSVGTagValid(ellipseTag)) {
+          return ellipseTag;
+        }
       },
 
       lineSVGRenderer: function(shape) {
@@ -188,7 +197,9 @@ angular.module('oppia').factory('LiterallyCanvasHelperService', [
               arrowWidth, shape.color, 'position1'));
         }
         var gTag = g.outerHTML;
-        return this.isSVGTagValid(gTag) ? gTag : '';
+        if (this.isSVGTagValid(gTag)) {
+          return gTag;
+        }
       },
 
       linepathSVGRenderer: function(shape) {
@@ -212,7 +223,9 @@ angular.module('oppia').factory('LiterallyCanvasHelperService', [
         linepath.setAttribute('stroke-linecap', 'round');
         linepath.setAttribute('stroke-width', shape.points[0].size);
         var linepathTag = linepath.outerHTML;
-        return this.isSVGTagValid(linepathTag) ? linepathTag : '';
+        if (this.isSVGTagValid(linepathTag)) {
+          return linepathTag;
+        }
       },
 
       polygonSVGRenderer: function(shape) {
@@ -236,7 +249,9 @@ angular.module('oppia').factory('LiterallyCanvasHelperService', [
           }
           polygon.setAttribute('stroke-width', shape.strokeWidth);
           var polygonTag = polygon.outerHTML;
-          return this.isSVGTagValid(polygonTag) ? polygonTag : '';
+          if (this.isSVGTagValid(polygonTag)) {
+            return polygonTag;
+          }
         } else {
           var id = 'polygon-open-' + shape.id;
           var g = document.createElement('g');
@@ -268,7 +283,9 @@ angular.module('oppia').factory('LiterallyCanvasHelperService', [
           g.appendChild(polyline1);
           g.appendChild(polyline2);
           var gTag = g.outerHTML;
-          return this.isSVGTagValid(gTag) ? gTag : '';
+          if (this.isSVGTagValid(gTag)) {
+            return gTag;
+          }
         }
       },
 
@@ -301,7 +318,9 @@ angular.module('oppia').factory('LiterallyCanvasHelperService', [
           text.appendChild(tspan);
         }
         var textTag = text.outerHTML;
-        return this.isSVGTagValid(textTag) ? textTag : '';
+        if (this.isSVGTagValid(textTag)) {
+          return textTag;
+        }
       }
     };
   }

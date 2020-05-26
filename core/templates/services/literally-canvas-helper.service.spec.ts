@@ -271,7 +271,26 @@ describe('LiterallyCanvasHelperService', function() {
   });
 
   it('should fail svg validation', function() {
-    var svgTag = '<svg xmlns="http://www.w3.org/2000/svg" width="450" height="350" viewBox="0 0 450 350"> <rect width="450" height="350" x="0" y="0" fill="transparent" /> <g transform="translate(0, 0)"> <rect id="rectangle-cd0a7974-e7da-d040-90b3-47bc4737a744" x="44" y="55.125" widht="72" height="55" stroke="hsla(0, 0%, 0%, 1)" fill="hsla(0, 0%, 100%, 1)" stroke-width="2"></rect> </g><script src="evil.com"></script> </svg>';
-    expect(LiterallyCanvasHelperService.isSVGTagValid(svgTag)).toBe(false);
+    var validSvgTag = '<svg width="100" height="100"><rect id="rectangle-de5' +
+    '69866-9c11-b553-f5b7-4194e2380d9f" x="143" y="97" width="12" height="29' +
+    '" stroke="hsla(0, 0%, 0%, 1)" fill="hsla(0, 0%, 100%, 1)" stroke-width=' +
+    '"1"></rect></svg>';
+    expect(LiterallyCanvasHelperService.isSVGTagValid(validSvgTag)).toBe(true);
+
+    var invalidSvgAttribute = '<svg widht="100" height="100"><rect id="recta' +
+    'ngle-de569866-9c11-b553-f5b7-4194e2380d9f" x="143" y="97" width="12" he' +
+    'ight="29" stroke="hsla(0, 0%, 0%, 1)" fill="hsla(0, 0%, 100%, 1)" strok' +
+    'e-width="1"></rect></svg>';
+    expect(() => {
+      LiterallyCanvasHelperService.isSVGTagValid(invalidSvgAttribute);
+    }).toThrowError('Invalid tag or attribute in svg.');
+
+    var invalidSvgTag = '<svg width="100" height="100"><rect id="rectangle-d' +
+    'e569866-9c11-b553-f5b7-4194e2380d9f" x="143" y="97" width="12" height="' +
+    '29" stroke="hsla(0, 0%, 0%, 1)" fill="hsla(0, 0%, 100%, 1)" stroke-widt' +
+    'h="1"></rect><script src="evil.com"></script></svg>';
+    expect(() => {
+      LiterallyCanvasHelperService.isSVGTagValid(invalidSvgTag);
+    }).toThrowError('Invalid tag or attribute in svg.');
   });
 });
