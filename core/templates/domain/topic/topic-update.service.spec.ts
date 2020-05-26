@@ -357,7 +357,7 @@ describe('Topic update service', function() {
    *    setSubtopicThumbnailFilename
    *    setSubtopicThumbnailBgColor
    *  on set/unset and backend change dict
-   * Does not cover (done below):
+   * Does not cover (done further below):
    *  setSubtopicPageContentsHtml
    *  setSubtopicPageContentsAudio
    */
@@ -386,6 +386,15 @@ describe('Topic update service', function() {
 
     let newValue = 'new unique value';
 
+    it(`should not create a backend change dict for changing subtopic ${id} ` +
+    'when the subtopic does not exist',
+    function() {
+      expect(function() {
+        TopicUpdateService[setter](_sampleTopic, 10, 'whatever');
+      }).toThrowError('Subtopic doesn\'t exist');
+      expect(UndoRedoService.getCommittableChangeList()).toEqual([]);
+    });
+
     it(`should set/unset changes to a subtopic\'s ${id}`, function() {
       expect(_sampleTopic.getSubtopics()[subtopic - 1][getter]())
         .toEqual(oldValue);
@@ -410,15 +419,6 @@ describe('Topic update service', function() {
         }]);
       }
     );
-  });
-
-  it('should not create a backend change dict for changing subtopic title ' +
-    'when an error is encountered',
-  function() {
-    expect(function() {
-      TopicUpdateService.setSubtopicTitle(_sampleTopic, 10, 'title2');
-    }).toThrowError('Subtopic doesn\'t exist');
-    expect(UndoRedoService.getCommittableChangeList()).toEqual([]);
   });
 
   it('should add/remove a subtopic', function() {
@@ -492,7 +492,17 @@ describe('Topic update service', function() {
     expect(UndoRedoService.getCommittableChangeList()).toEqual([]);
   });
 
-  it('should move a skill id to a subtopic', function() {
+
+  it('should not create a backend change dict for moving subtopic' +
+  'when error is thrown',
+  function() {
+    expect(function() {
+      TopicUpdateService.moveSkillToSubtopic(_sampleTopic, 1, null, undefined);
+    }).toThrowError('New subtopic cannot be null');
+    expect(UndoRedoService.getCommittableChangeList()).toEqual([]);
+  });
+
+  it('should move/undo move a skill id to a subtopic', function() {
     expect(_sampleTopic.getUncategorizedSkillSummaries()).toEqual([
       _firstSkillSummary
     ]);
@@ -506,12 +516,39 @@ describe('Topic update service', function() {
       _secondSkillSummary, _firstSkillSummary
     ]);
 
+    /** Undo back to uncategorized */
     UndoRedoService.undoChange(_sampleTopic);
     expect(_sampleTopic.getUncategorizedSkillSummaries()).toEqual([
       _firstSkillSummary
     ]);
     expect(_sampleTopic.getSubtopics()[0].getSkillSummaries()).toEqual([
       _secondSkillSummary
+    ]);
+
+    /**
+     * Undo back to old subtopic
+     *  Move to _sampleTopic, move to _sampleTopic2, then undo
+     */
+    TopicUpdateService.addSubtopic(_sampleTopic, 'Title 2');
+
+    TopicUpdateService.moveSkillToSubtopic(
+      _sampleTopic, null, 1, _firstSkillSummary);
+    expect(_sampleTopic.getUncategorizedSkillSummaries()).toEqual([]);
+    expect(_sampleTopic.getSubtopics()[0].getSkillSummaries()).toEqual([
+      _secondSkillSummary, _firstSkillSummary
+    ]);
+
+    TopicUpdateService.moveSkillToSubtopic(
+      _sampleTopic, 1, 2, _firstSkillSummary);
+    expect(_sampleTopic.getSubtopics()[0].getSkillSummaries()).toEqual(
+      [_secondSkillSummary]);
+    expect(_sampleTopic.getSubtopics()[1].getSkillSummaries()).toEqual(
+      [_firstSkillSummary]);
+
+    UndoRedoService.undoChange(_sampleTopic);
+    expect(_sampleTopic.getUncategorizedSkillSummaries()).toEqual([]);
+    expect(_sampleTopic.getSubtopics()[0].getSkillSummaries()).toEqual([
+      _secondSkillSummary, _firstSkillSummary
     ]);
   });
 
@@ -578,6 +615,40 @@ describe('Topic update service', function() {
       cmd: 'move_skill_id_to_subtopic',
       old_subtopic_id: 1,
       new_subtopic_id: 2,
+      skill_id: 'skill_2'
+    }]);
+  });
+
+  it('should properly decrement subtopic ids of moved subtopics ' +
+  'when a newly created subtopic is deleted', function() {
+    TopicUpdateService.addSubtopic(_sampleTopic, 'Title 2');
+    TopicUpdateService.addSubtopic(_sampleTopic, 'Title 3');
+    TopicUpdateService.addSubtopic(_sampleTopic, 'Title 4');
+
+    TopicUpdateService.moveSkillToSubtopic(
+      _sampleTopic, 1, 3, _secondSkillSummary
+    );
+    TopicUpdateService.moveSkillToSubtopic(
+      _sampleTopic, 3, 4, _secondSkillSummary
+    );
+    TopicUpdateService.deleteSubtopic(_sampleTopic, 2);
+    expect(UndoRedoService.getCommittableChangeList()).toEqual([{
+      cmd: 'add_subtopic',
+      title: 'Title 3',
+      subtopic_id: 2
+    }, {
+      cmd: 'add_subtopic',
+      title: 'Title 4',
+      subtopic_id: 3
+    }, {
+      cmd: 'move_skill_id_to_subtopic',
+      old_subtopic_id: 1,
+      new_subtopic_id: 2,
+      skill_id: 'skill_2'
+    }, {
+      cmd: 'move_skill_id_to_subtopic',
+      old_subtopic_id: 2,
+      new_subtopic_id: 3,
       skill_id: 'skill_2'
     }]);
   });
@@ -745,6 +816,72 @@ describe('Topic update service', function() {
       }]);
     }
   );
+
+  it('should set/unset changes to a subtopic page\'s audio data', function() {
+    var newRecordedVoiceoversDict = {
+      voiceovers_mapping: {
+        content: {
+          en: {
+            filename: 'test_2.mp3',
+            file_size_bytes: 1000,
+            needs_update: false,
+            duration_secs: 1.0
+          }
+        }
+      }
+    };
+    var newVoiceovers = recordedVoiceoversObjectFactory.createFromBackendDict(
+      newRecordedVoiceoversDict);
+
+    expect(_sampleSubtopicPage.getPageContents().toBackendDict()).toEqual({
+      subtitled_html: {
+        html: 'test content',
+        content_id: 'content'
+      },
+      recorded_voiceovers: {
+        voiceovers_mapping: {
+          content: {
+            en: {
+              filename: 'test.mp3',
+              file_size_bytes: 100,
+              needs_update: false,
+              duration_secs: 0.1
+            }
+          }
+        }
+      }
+    });
+
+    TopicUpdateService.setSubtopicPageContentsAudio(
+      _sampleSubtopicPage, 1, newVoiceovers);
+    expect(_sampleSubtopicPage.getPageContents().toBackendDict()).toEqual({
+      subtitled_html: {
+        html: 'test content',
+        content_id: 'content'
+      },
+      recorded_voiceovers: newRecordedVoiceoversDict
+    });
+
+    UndoRedoService.undoChange(_sampleSubtopicPage);
+    expect(_sampleSubtopicPage.getPageContents().toBackendDict()).toEqual({
+      subtitled_html: {
+        html: 'test content',
+        content_id: 'content'
+      },
+      recorded_voiceovers: {
+        voiceovers_mapping: {
+          content: {
+            en: {
+              filename: 'test.mp3',
+              file_size_bytes: 100,
+              needs_update: false,
+              duration_secs: 0.1
+            }
+          }
+        }
+      }
+    });
+  });
 
   it('should create a proper backend change dict for changing subtopic ' +
      'page audio data',
