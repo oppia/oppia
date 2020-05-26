@@ -330,7 +330,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'rating-display.directive.ts',
     'read-only-collection-backend-api.service.ts',
     'real-editor.directive.ts',
-    'RecordedVoiceoversObjectFactory.ts',
     'refresher-exploration-confirmation-modal.service.ts',
     'remove-duplicates-in-array.pipe.ts',
     'request-interceptor.service.ts',
