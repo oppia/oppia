@@ -296,7 +296,6 @@
 	"I18N_SIGNUP_EMAIL": "Email",
 	"I18N_SIGNUP_EMAIL_PREFERENCES": "Preferenze di posta elettronica",
 	"I18N_SIGNUP_ERROR_NO_USERNAME": "Per favore, inserisci un nome utente.",
-	"I18N_SIGNUP_ERROR_USERNAME_MORE_50_CHARS": "Un nome utente può contenere fino a 50 caratteri.",
 	"I18N_SIGNUP_ERROR_USERNAME_NOT_AVAILABLE": "Questo nome utente non è disponibile.",
 	"I18N_SIGNUP_ERROR_USERNAME_ONLY_ALPHANUM": "I nomi utente possono contenere soltanto caratteri alfanumerici.",
 	"I18N_SIGNUP_ERROR_USERNAME_TAKEN": "Spiacenti, questo nome utente è stato già utilizzato.",
