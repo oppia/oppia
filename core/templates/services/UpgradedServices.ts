@@ -76,6 +76,8 @@ import { CountVectorizerService } from 'classifiers/count-vectorizer.service';
 import { CreatorDashboardBackendApiService } from
   'domain/creator_dashboard/creator-dashboard-backend-api.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
+import { CurrentInteractionService } from
+  'pages/exploration-player-page/services/current-interaction.service';
 import { DateTimeFormatService } from 'services/date-time-format.service';
 import { DebouncerService } from 'services/debouncer.service';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
@@ -650,6 +652,11 @@ export class UpgradedServices {
         upgradedServices['HttpClient']));
     upgradedServices['CreatorDashboardBackendApiService'] =
       new CreatorDashboardBackendApiService(upgradedServices['HttpClient']);
+    upgradedServices['CurrentInteractionService'] =
+      new CurrentInteractionService(
+        upgradedServices['ContextService'],
+        upgradedServices['PlayerPositionService'],
+        upgradedServices['PlayerTranscriptService']);
     upgradedServices['EmailDashboardDataService'] =
       new EmailDashboardDataService(upgradedServices['HttpClient']);
     upgradedServices['ExplorationHtmlFormatterService'] =

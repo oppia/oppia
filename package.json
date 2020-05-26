@@ -69,6 +69,7 @@
     "karma-ng-html2js-preprocessor": "^1.0.0",
     "karma-webpack": "^4.0.0-rc.3",
     "loader-utils": "^2.0.0",
+    "@lhci/cli": "^0.3.12",
     "postcss-loader": "3.0.0",
     "postcss-syntax": "^0.36.2",
     "protractor": "^5.4.2",
@@ -113,7 +114,7 @@
     "lodash": "^4.17.14",
     "mathjs": "^6.6.4",
     "moment": "^2.24.0",
-    "nerdamer": "1.1.4",
-    "wavesurfer.js": "3.3.3"
+    "nerdamer": "^1.1.4",
+    "wavesurfer.js": "^3.3.3"
   }
 }
