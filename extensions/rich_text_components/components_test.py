@@ -117,6 +117,10 @@ class ComponentValidationUnitTests(test_utils.GenericTestBase):
         self.check_validation(
             components.Link, valid_items, invalid_items)
 
+    # TODO(donosco98): Add validations for svg_filename field and add proper
+    # values in the tests.
+    # see https://github.com/oppia/oppia/issues/9379
+
     def test_math_validation(self):
         """Tests collapsible component validation."""
         valid_items = [{
