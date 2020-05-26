@@ -123,7 +123,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'drag-and-drop-sort-input-validation.service.ts',
     'early-quit-issue.directive.ts',
     'editable-collection-backend-api.service.ts',
-    'editable-exploration-backend-api.service.ts',
     'editable-story-backend-api.service.ts',
     'editor-navbar-breadcrumb.directive.ts',
     'editor-navigation.directive.ts',
