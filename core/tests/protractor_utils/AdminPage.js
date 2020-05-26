@@ -216,7 +216,7 @@ var AdminPage = function() {
     await updateFormName.sendKeys(name);
     var roleOption = roleSelect.element(
       by.cssContainingText('option', newRole));
-    waitFor.visibilityOf(roleOption, 'Admin role option is not visible');
+    await waitFor.visibilityOf(roleOption, 'Admin role option is not visible');
     await roleOption.click();
     await updateFormSubmit.click();
     await waitFor.visibilityOf(
