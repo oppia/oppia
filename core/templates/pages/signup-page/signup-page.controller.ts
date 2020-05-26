@@ -18,8 +18,10 @@
 
 require('base-components/base-content.directive.ts');
 require(
-  'components/common-layout-directives/common-elements/' +
-  'confirm-or-cancel-modal.controller.ts');
+  'pages/signup-page/modal-templates/licence-explanation-modal.controller.ts');
+require(
+  'pages/signup-page/modal-templates/licence-explanation-modal.controller.ts');
+
 require('domain/utilities/url-interpolation.service.ts');
 require('services/alerts.service.ts');
 require('services/id-generation.service.ts');
@@ -64,17 +66,7 @@ angular.module('oppia').directive('signupPage', [
                 '/pages/signup-page/modal-templates/' +
                 'licence-explanation-modal.template.directive.html'),
               backdrop: true,
-              resolve: {},
-              controller: [
-                '$controller', '$scope', '$uibModalInstance', 'SITE_NAME',
-                function($controller, $scope, $uibModalInstance, SITE_NAME) {
-                  $controller('ConfirmOrCancelModalController', {
-                    $scope: $scope,
-                    $uibModalInstance: $uibModalInstance
-                  });
-                  $scope.siteName = SITE_NAME;
-                }
-              ]
+              controller: 'LicenseExplanationModalController'
             }).result.then(function() {}, function() {
               // Note to developers:
               // This callback is triggered when the Cancel button is clicked.
@@ -200,27 +192,7 @@ angular.module('oppia').directive('signupPage', [
               backdrop: 'static',
               keyboard: false,
               resolve: {},
-              controller: [
-                '$scope', '$uibModalInstance', 'SiteAnalyticsService',
-                'UserService', '$window',
-                function($scope, $uibModalInstance, SiteAnalyticsService,
-                    UserService, $window) {
-                  $scope.continueRegistration = function() {
-                    UserService.getLoginUrlAsync().then(
-                      function(loginUrl) {
-                        if (loginUrl) {
-                          $timeout(function() {
-                            $window.location = loginUrl;
-                          }, 150);
-                        } else {
-                          $window.location.reload();
-                        }
-                      }
-                    );
-                    $uibModalInstance.dismiss('cancel');
-                  };
-                }
-              ]
+              controller: 'RegistrationSessionExpiredModalController'
             });
           };
           ctrl.$onInit = function() {
