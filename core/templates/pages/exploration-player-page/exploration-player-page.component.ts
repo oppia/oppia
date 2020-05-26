@@ -22,7 +22,7 @@ require(
   'attribution-guide.directive.ts');
 require(
   'components/common-layout-directives/common-elements/' +
-  'background-banner.directive.ts');
+  'background-banner.component.ts');
 require(
   'components/forms/schema-based-editors/schema-based-editor.directive.ts');
 require(
