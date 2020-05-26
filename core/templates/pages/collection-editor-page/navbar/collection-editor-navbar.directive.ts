@@ -23,7 +23,7 @@ require(
   'confirm-or-cancel-modal.controller.ts');
 require(
   'components/common-layout-directives/common-elements/' +
-  'loading-dots.directive.ts');
+  'loading-dots.component.ts');
 
 require('domain/collection/collection-rights-backend-api.service.ts');
 require('domain/collection/collection-update.service.ts');

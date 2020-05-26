@@ -22,7 +22,7 @@ require(
   'confirm-or-cancel-modal.controller.ts');
 require(
   'components/common-layout-directives/common-elements/' +
-  'loading-dots.directive.ts');
+  'loading-dots.component.ts');
 require(
   'components/version-diff-visualization/codemirror-mergeview.directive.ts');
 

@@ -198,7 +198,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'list-of-sets-of-html-strings-editor.directive.ts',
     'list-of-tabs-editor.directive.ts',
     'list-of-unicode-string-editor.directive.ts',
-    'loading-dots.directive.ts',
     'logic-demo-test.controller.ts',
     'logic-error-category-editor.directive.ts',
     'logic-question-editor.directive.ts',

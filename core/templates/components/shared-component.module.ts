@@ -23,13 +23,14 @@ import { CommonModule } from '@angular/common';
 
 import { BackgroundBannerComponent } from
   './common-layout-directives/common-elements/background-banner.component';
-
+import { LoadingDotsComponent } from
+  './common-layout-directives/common-elements/loading-dots.component';
 
 @NgModule({
   imports: [CommonModule],
-  declarations: [BackgroundBannerComponent],
-  entryComponents: [BackgroundBannerComponent],
-  exports: [BackgroundBannerComponent]
+  declarations: [BackgroundBannerComponent, LoadingDotsComponent],
+  entryComponents: [BackgroundBannerComponent, LoadingDotsComponent],
+  exports: [BackgroundBannerComponent, LoadingDotsComponent]
 })
 
 export class SharedComponentsModule { }
