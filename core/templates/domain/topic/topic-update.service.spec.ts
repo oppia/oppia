@@ -56,6 +56,7 @@ describe('Topic update service', function() {
   var subtitledHtmlObjectFactory = null;
   var subtopicPageObjectFactory = null;
   var UndoRedoService = null;
+  var _sampleTopicBackendObject = null;
   var _sampleTopic = null;
   var _firstSkillSummary = null;
   var _secondSkillSummary = null;
@@ -112,7 +113,7 @@ describe('Topic update service', function() {
     UndoRedoService = $injector.get('UndoRedoService');
     skillSummaryObjectFactory = $injector.get('SkillSummaryObjectFactory');
 
-    var sampleTopicBackendObject = {
+    _sampleTopicBackendObject = {
       topicDict: {
         id: 'sample_topic_id',
         name: 'Topic name',
@@ -173,8 +174,8 @@ describe('Topic update service', function() {
     _sampleSubtopicPage = subtopicPageObjectFactory.createFromBackendDict(
       sampleSubtopicPageObject);
     _sampleTopic = TopicObjectFactory.create(
-      sampleTopicBackendObject.topicDict,
-      sampleTopicBackendObject.skillIdToDescriptionDict);
+      _sampleTopicBackendObject.topicDict,
+      _sampleTopicBackendObject.skillIdToDescriptionDict);
   }));
 
   it('should remove/add an additional story id from/to a topic',
@@ -275,69 +276,141 @@ describe('Topic update service', function() {
     expect(UndoRedoService.getCommittableChangeList()).toEqual([]);
   });
 
-  it('should set/unset changes to a topic\'s name', function() {
-    expect(_sampleTopic.getName()).toEqual('Topic name');
-    TopicUpdateService.setTopicName(_sampleTopic, 'new name');
-    expect(_sampleTopic.getName()).toEqual('new name');
 
-    UndoRedoService.undoChange(_sampleTopic);
-    expect(_sampleTopic.getName()).toEqual('Topic name');
+  /**
+   * Test coverage for:
+   *  setTopicName
+   *  setTopicDescription
+   *  setAbbreviatedTopicName
+   *  setTopicThumbnailFilename
+   *  setTopicThumbnailBgColor
+   *  setTopicLanguageCode
+   * on set/unset and backend change dict
+   */
+  [{
+    id: 'name',
+    getter: 'getName',
+    setter: 'setTopicName',
+    oldValue: 'Topic name'
+  },
+  {
+    id: 'description',
+    getter: 'getDescription',
+    setter: 'setTopicDescription',
+    oldValue: 'Topic description'
+  },
+  {
+    id: 'abbreviated_name',
+    getter: 'getAbbreviatedName',
+    setter: 'setAbbreviatedTopicName',
+    oldValue: undefined
+  },
+  {
+    id: 'thumbnail_filename',
+    getter: 'getThumbnailFilename',
+    setter: 'setTopicThumbnailFilename',
+    oldValue: undefined
+  },
+  {
+    id: 'thumbnail_bg_color',
+    getter: 'getThumbnailBgColor',
+    setter: 'setTopicThumbnailBgColor',
+    oldValue: undefined
+  },
+  {
+    id: 'language_code',
+    getter: 'getLanguageCode',
+    setter: 'setTopicLanguageCode',
+    oldValue: 'en',
+    overrideNewValue: 'fi'
+  }].forEach(function(test) {
+    const { id, getter, setter, oldValue, overrideNewValue } = test;
+
+    let newValue = overrideNewValue || 'new unique value';
+
+    it(`should set/unset changes to a topic's ${id}`, function() {
+      expect(_sampleTopic[getter]()).toEqual(oldValue);
+      TopicUpdateService[setter](_sampleTopic, newValue);
+      expect(_sampleTopic[getter]()).toEqual(newValue);
+
+      UndoRedoService.undoChange(_sampleTopic);
+      expect(_sampleTopic[getter]()).toEqual(oldValue);
+    });
+
+    it(`should create a proper backend change dict for changing ${id}`,
+      function() {
+        TopicUpdateService[setter](_sampleTopic, newValue);
+        expect(UndoRedoService.getCommittableChangeList()).toEqual([{
+          cmd: 'update_topic_property',
+          property_name: id,
+          new_value: newValue,
+          old_value: (oldValue === undefined) ? null : oldValue
+        }]);
+      }
+    );
   });
 
-  it('should create a proper backend change dict for changing names',
-    function() {
-      TopicUpdateService.setTopicName(_sampleTopic, 'new name');
-      expect(UndoRedoService.getCommittableChangeList()).toEqual([{
-        cmd: 'update_topic_property',
-        property_name: 'name',
-        new_value: 'new name',
-        old_value: 'Topic name'
-      }]);
-    }
-  );
 
-  it('should set/unset changes to a topic\'s description', function() {
-    expect(_sampleTopic.getDescription()).toEqual('Topic description');
-    TopicUpdateService.setTopicDescription(_sampleTopic, 'new description');
-    expect(_sampleTopic.getDescription()).toEqual('new description');
+  /**
+   * Coverage for:
+   *    setSubtopicTitle
+   *    setSubtopicThumbnailFilename
+   *    setSubtopicThumbnailBgColor
+   *  on set/unset and backend change dict
+   * Does not cover (done below):
+   *  setSubtopicPageContentsHtml
+   *  setSubtopicPageContentsAudio
+   */
+  [{
+    id: 'title',
+    subtopic: 1,
+    getter: 'getTitle',
+    setter: 'setSubtopicTitle',
+    oldValue: 'Title',
+  },
+  {
+    id: 'thumbnail_filename',
+    subtopic: 1,
+    getter: 'getThumbnailFilename',
+    setter: 'setSubtopicThumbnailFilename',
+    oldValue: undefined,
+  },
+  {
+    id: 'thumbnail_bg_color',
+    subtopic: 1,
+    getter: 'getThumbnailBgColor',
+    setter: 'setSubtopicThumbnailBgColor',
+    oldValue: undefined,
+  }].forEach(function(test) {
+    const { id, getter, setter, oldValue, subtopic } = test;
 
-    UndoRedoService.undoChange(_sampleTopic);
-    expect(_sampleTopic.getDescription()).toEqual('Topic description');
+    let newValue = 'new unique value';
+
+    it(`should set/unset changes to a subtopic\'s ${id}`, function() {
+      expect(_sampleTopic.getSubtopics()[subtopic - 1][getter]())
+        .toEqual(oldValue);
+      TopicUpdateService[setter](_sampleTopic, subtopic, newValue);
+      expect(_sampleTopic.getSubtopics()[subtopic - 1][getter]())
+        .toEqual(newValue);
+
+      UndoRedoService.undoChange(_sampleTopic);
+      expect(_sampleTopic.getSubtopics()[subtopic - 1][getter]())
+        .toEqual(oldValue);
+    });
+
+    it(`should create a proper backend change dict for changing subtopic ${id}`,
+      function() {
+        TopicUpdateService[setter](_sampleTopic, subtopic, newValue);
+        expect(UndoRedoService.getCommittableChangeList()).toEqual([{
+          cmd: 'update_subtopic_property',
+          subtopic_id: subtopic,
+          property_name: id,
+          new_value: newValue,
+          old_value: oldValue
+        }]);
+      }
+    );
   });
-
-  it('should create a proper backend change dict for changing descriptions',
-    function() {
-      TopicUpdateService.setTopicDescription(_sampleTopic, 'new description');
-      expect(UndoRedoService.getCommittableChangeList()).toEqual([{
-        cmd: 'update_topic_property',
-        property_name: 'description',
-        new_value: 'new description',
-        old_value: 'Topic description'
-      }]);
-    }
-  );
-
-  it('should set/unset changes to a subtopic\'s title', function() {
-    expect(_sampleTopic.getSubtopics()[0].getTitle()).toEqual('Title');
-    TopicUpdateService.setSubtopicTitle(_sampleTopic, 1, 'new title');
-    expect(_sampleTopic.getSubtopics()[0].getTitle()).toEqual('new title');
-
-    UndoRedoService.undoChange(_sampleTopic);
-    expect(_sampleTopic.getSubtopics()[0].getTitle()).toEqual('Title');
-  });
-
-  it('should create a proper backend change dict for changing subtopic title',
-    function() {
-      TopicUpdateService.setSubtopicTitle(_sampleTopic, 1, 'new title');
-      expect(UndoRedoService.getCommittableChangeList()).toEqual([{
-        cmd: 'update_subtopic_property',
-        subtopic_id: 1,
-        property_name: 'title',
-        new_value: 'new title',
-        old_value: 'Title'
-      }]);
-    }
-  );
 
   it('should not create a backend change dict for changing subtopic title ' +
     'when an error is encountered',
@@ -580,27 +653,6 @@ describe('Topic update service', function() {
     }).toThrowError('The given skill doesn\'t exist in the subtopic');
     expect(UndoRedoService.getCommittableChangeList()).toEqual([]);
   });
-
-  it('should set/unset changes to a topic\'s language code', function() {
-    expect(_sampleTopic.getLanguageCode()).toEqual('en');
-    TopicUpdateService.setTopicLanguageCode(_sampleTopic, 'fi');
-    expect(_sampleTopic.getLanguageCode()).toEqual('fi');
-
-    UndoRedoService.undoChange(_sampleTopic);
-    expect(_sampleTopic.getLanguageCode()).toEqual('en');
-  });
-
-  it('should create a proper backend change dict for changing language codes',
-    function() {
-      TopicUpdateService.setTopicLanguageCode(_sampleTopic, 'fi');
-      expect(UndoRedoService.getCommittableChangeList()).toEqual([{
-        cmd: 'update_topic_property',
-        property_name: 'language_code',
-        new_value: 'fi',
-        old_value: 'en'
-      }]);
-    }
-  );
 
   it('should set/unset changes to a subtopic page\'s page content', function() {
     var newSampleSubtitledHtmlDict = {
