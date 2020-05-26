@@ -72,8 +72,15 @@ export class ExplorationRecommendationsService {
       ExplorationRecommendationsService.isInEditorPage && (
         this.contextService.getEditorTabContext() ===
         ServicesConstants.EXPLORATION_EDITOR_TAB_CONTEXT.PREVIEW));
-    ExplorationRecommendationsService.explorationId = (
-      this.contextService.getExplorationId());
+
+    // This check is to ensure getExplorationId method won't be called
+    // when ExplorationRecommendationsService is called on UpgradedServices
+    // and then throw an error.
+    if (this.contextService.getPageContext() !== 'other' &&
+        this.contextService.getEditorTabContext() !== null) {
+      ExplorationRecommendationsService.explorationId = (
+        this.contextService.getExplorationId());
+    }
   }
   static isIframed: boolean = null;
   static isInEditorPage: boolean = null;
