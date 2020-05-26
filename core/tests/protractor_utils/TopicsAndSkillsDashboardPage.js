@@ -80,9 +80,10 @@ var TopicsAndSkillsDashboardPage = function() {
   // Returns a promise of all topics with the given name.
   var _getTopicElements = async function(topicName) {
     topicsListElems = [];
-    topicsList = await topicsListItems;
-    for (var i = 0; i < topicsList.length; i++) {
-      var name = await topicsList[i].element(
+    topicsListCount = await topicsListItems.count();
+    for (var i = 0; i < topicsListCount; i++) {
+      var topicElem = await topicsList.get(i);
+      var name = await topicElem.element(
         by.css('.protractor-test-topic-name')).getText();
       if (name === topicName) {
         topicsListElems.push(topicsList[i]);
@@ -95,7 +96,7 @@ var TopicsAndSkillsDashboardPage = function() {
     await browser.get('/');
     var profileDropdown = element(
       by.css('.protractor-test-profile-dropdown'));
-    await browser.ExpectedConditions.elementToBeClickable(
+    await waitFor.elementToBeClickable(
       profileDropdown, 'Could not click profile dropdown');
     await profileDropdown.click();
     var topicsAndSkillsDashboardLink = element(by.css(
@@ -216,7 +217,7 @@ var TopicsAndSkillsDashboardPage = function() {
     await waitFor.visibilityOf(
       editor, 'Explanation Editor takes too long to appear');
 
-    await browser.switchTo().activeElement().sendKeys(reviewMaterial);
+    await (await browser.switchTo().activeElement()).sendKeys(reviewMaterial);
 
     await waitFor.elementToBeClickable(
       saveConceptCardExplanationButton,

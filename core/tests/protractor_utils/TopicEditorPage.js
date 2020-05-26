@@ -193,12 +193,11 @@ var TopicEditorPage = function() {
   };
 
   this.expectNumberOfUncategorizedSkillsToBe = async function(count) {
-    var items = await uncategorizedSkillItems;
-    expect(items.length).toEqual(1);
+    expect(await uncategorizedSkillItems.count()).toEqual(count);
   };
 
   this.deleteSubtopicWithIndex = async function(index) {
-    await deleteSubtopicButtons.get(index).click();
+    await (await deleteSubtopicButtons.get(index)).click();
   };
 
   this.expectNumberOfSubtopicsToBe = async function(count) {
@@ -226,7 +225,7 @@ var TopicEditorPage = function() {
     var subtopicCol = await subtopicColumns.get(fromSubtopicIndex);
     skillNamesElems = await subtopicCol.all(
       by.css('.protractor-test-assigned-skill-card-text'));
-    var toMove = skillNamesElems[skillCardIndex];
+    var toMove = skillNamesElems.get(skillCardIndex);
     var target = subtopicColumns.get(toSubtopicIndex);
     await dragAndDrop(toMove, target);
   };

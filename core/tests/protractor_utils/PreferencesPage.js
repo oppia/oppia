@@ -94,7 +94,7 @@ var PreferencesPage = function() {
 
   this.selectSystemLanguage = async function(language) {
     await systemLanguageSelector.click();
-    var options = element.all(by.css('.select2-dropdown li')).filter(
+    var options = await element.all(by.css('.select2-dropdown li')).filter(
       async function(elem) {
         var text = await elem.getText();
         return text === language;
@@ -104,7 +104,7 @@ var PreferencesPage = function() {
 
   this.selectPreferredAudioLanguage = async function(language) {
     await preferredAudioLanguageSelector.click();
-    var correctOptions = languageOptionsList.all(by.tagName('li')).filter(
+    var correctOptions = await languageOptionsList.all(by.tagName('li')).filter(
       async function(elem) {
         var text = await elem.getText();
         return text === language;

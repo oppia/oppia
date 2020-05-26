@@ -68,10 +68,6 @@ var GraphEditor = function(graphInputContainer) {
     await browser.actions().mouseMove(
       vertexElement(vertexIndex2)).perform();
     await browser.actions().mouseUp().perform();
-    // await browser.actions()
-    //   .dragAndDrop(
-    //     vertexElement(vertexIndex1),
-    //     vertexElement(vertexIndex2)).perform();
   };
   return {
     setValue: async function(graphDict) {
@@ -112,9 +108,9 @@ var GraphEditor = function(graphInputContainer) {
       if (edgesList) {
         // Expecting total no. of edges on the graph matches with the given
         // dict's edges.
-        var allEdgesElement = await element.all(by.css(
+        var allEdgesElement = element.all(by.css(
           '.protractor-test-graph-edge'));
-        expect(allEdgesElement.length).toEqual(edgesList.length);
+        expect(await allEdgesElement.count()).toEqual(edgesList.length);
       }
     }
   };

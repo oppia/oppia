@@ -101,7 +101,7 @@ var createCollectionAsAdmin = async function() {
 };
 
 /**
- * Creating exploration for Admin await users.
+ * Creating exploration for Admin users.
  */
 var createExplorationAsAdmin = async function() {
   var creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage;
