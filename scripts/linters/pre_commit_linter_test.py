@@ -90,8 +90,6 @@ INVALID_THROW_WITH_STRING_FILEPATH = os.path.join(
 
 # PY filepaths.
 VALID_PY_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'valid.py')
-INVALID_IMPORT_FILEPATH = os.path.join(
-    LINTER_TESTS_DIR, 'invalid_import_order.py')
 INVALID_ITERKEY_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_iterkeys.py')
 INVALID_ITERVALUES_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_itervalues.py')
@@ -635,18 +633,6 @@ class PythonLintTests(LintTests):
                 ['SUCCESS   1 Python files linted'],
                 self.linter_stdout)
             )
-
-    def test_invalid_import_order(self):
-        with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-            with self.install_swap:
-                pre_commit_linter.main(
-                    args=['--path=%s' % INVALID_IMPORT_FILEPATH])
-        self.assertFalse(all_checks_passed(self.linter_stdout))
-        self.assertTrue(
-            appears_in_linter_stdout(
-                ['FAILED   Import order checks failed, file imports should be '
-                 'alphabetized, see affect files above.'],
-                self.linter_stdout))
 
     def test_invalid_author(self):
         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
