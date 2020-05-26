@@ -47,13 +47,13 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
             'destination_node_ids': [],
             'exploration_id': None,
             'id': 'node_1',
-            'outline': ('<p>Value</p><oppia-noninteractive-' +
-                        'math math_content-with-value="{&amp;quot' +
-                        ';raw_latex&amp;quot;: &amp;quot;+,-,-,+' +
-                        '&amp;quot;, &amp;quot;svg_filename&amp;' +
-                        'quot;: &amp;quot;&amp;quot;}"></oppia' +
-                        '-noninteractive-math>'
-                       ),
+            'outline': (
+                '<p>Value</p><oppia-noninteractive-' +
+                'math math_content-with-value="{&amp;quot' +
+                ';raw_latex&amp;quot;: &amp;quot;+,-,-,+' +
+                '&amp;quot;, &amp;quot;svg_filename&amp;' +
+                'quot;: &amp;quot;&amp;quot;}"></oppia' +
+                '-noninteractive-math>'),
             'outline_is_finalized': False,
             'prerequisite_skill_ids': [],
             'description': '',
@@ -177,10 +177,10 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
                     'destination_node_ids': [],
                     'exploration_id': None,
                     'id': 'node_1',
-                    'outline': ('<p>Value</p><oppia-noninteractive-math raw_l' +
-                                'atex-with-value="&amp;quot;+,-,-,+&amp;quot' +
-                                ';"></oppia-noninteractive-math>'
-                               ),
+                    'outline': (
+                        '<p>Value</p><oppia-noninteractive-math raw_l' +
+                        'atex-with-value="&amp;quot;+,-,-,+&amp;quot' +
+                        ';"></oppia-noninteractive-math>'),
                     'outline_is_finalized': False,
                     'prerequisite_skill_ids': [],
                     'title': 'Chapter 1'

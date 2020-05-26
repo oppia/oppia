@@ -232,21 +232,12 @@ class SubtopicPage(python_utils.OBJECT):
         Returns:
             dict. The converted page_contents_dict.
         """
-
-        for (content_id, language_code_to_written_translation) in (
-                page_contents_dict['written_translations'][
-                    'translations_mapping'].items()):
-            for language_code in (
-                    language_code_to_written_translation.keys()):
-                page_contents_dict['written_translations'][
-                    'translations_mapping'][content_id][language_code][
-                        'html'] = (
-                            html_validation_service.
-                            add_math_content_to_math_rte_components(
-                                page_contents_dict['written_translations'][
-                                    'translations_mapping'][content_id][
-                                        language_code]['html']))
-
+        page_contents_dict['written_translations'] = (
+            html_validation_service.
+            convert_html_fields_in_written_translations(
+                page_contents_dict['written_translations'],
+                html_validation_service.
+                add_math_content_to_math_rte_components))
         page_contents_dict['subtitled_html']['html'] = (
             html_validation_service.
             add_math_content_to_math_rte_components(

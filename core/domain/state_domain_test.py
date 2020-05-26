@@ -520,16 +520,17 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
     def test_convert_html_fields_in_state(self):
         """Test conversion of html strings in state."""
-        html_with_old_math_schema = ('<p>Value</p><oppia-noninteractive-' +
-                                     'math raw_latex-with-value="&amp;quot' +
-                                     ';+,-,-,+&amp;quot;"></oppia-nonintera' +
-                                     'ctive-math>')
-        html_with_new_math_schema = ('<p>Value</p><oppia-noninteractive-' +
-                                     'math math_content-with-value="{&amp;' +
-                                     'quot;raw_latex&amp;quot;: &amp;quot' +
-                                     ';+,-,-,+&amp;quot;, &amp;quot;' +
-                                     'svg_filename&amp;quot;: &amp;quot;&amp' +
-                                     ';quot;}"></oppia-noninteractive-math>')
+        html_with_old_math_schema = (
+            '<p>Value</p><oppia-noninteractive-' +
+            'math raw_latex-with-value="&amp;quot' +
+            ';+,-,-,+&amp;quot;"></oppia-noninteractive-math>')
+        html_with_new_math_schema = (
+            '<p>Value</p><oppia-noninteractive-' +
+            'math math_content-with-value="{&amp;' +
+            'quot;raw_latex&amp;quot;: &amp;quot' +
+            ';+,-,-,+&amp;quot;, &amp;quot;' +
+            'svg_filename&amp;quot;: &amp;quot;&amp' +
+            ';quot;}"></oppia-noninteractive-math>')
         written_translations_dict_with_old_math_schema = {
             'translations_mapping': {
                 'content1': {

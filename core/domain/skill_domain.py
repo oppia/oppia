@@ -816,19 +816,12 @@ class Skill(python_utils.OBJECT):
         skill_contents_dict['explanation']['html'] = (
             html_validation_service.add_math_content_to_math_rte_components(
                 skill_contents_dict['explanation']['html']))
-        for (content_id, language_code_to_written_translation) in (
-                skill_contents_dict['written_translations'][
-                    'translations_mapping'].items()):
-            for language_code in (
-                    language_code_to_written_translation.keys()):
-                skill_contents_dict['written_translations'][
-                    'translations_mapping'][content_id][language_code][
-                        'html'] = (
-                            html_validation_service.
-                            add_math_content_to_math_rte_components(
-                                skill_contents_dict['written_translations'][
-                                    'translations_mapping'][content_id][
-                                        language_code]['html']))
+        skill_contents_dict['written_translations'] = (
+            html_validation_service.
+            convert_html_fields_in_written_translations(
+                skill_contents_dict['written_translations'],
+                html_validation_service.
+                add_math_content_to_math_rte_components))
 
         for value_index, value in enumerate(
                 skill_contents_dict['worked_examples']):

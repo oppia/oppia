@@ -323,10 +323,11 @@ class Question(python_utils.OBJECT):
         Returns:
             dict. The converted question_state_dict.
         """
-        question_state_dict = state_domain.State.convert_html_fields_in_state(
-            question_state_dict,
-            html_validation_service.add_math_content_to_math_rte_components)
-
+        question_state_dict = (
+            state_domain.State.convert_html_fields_in_state(
+                question_state_dict,
+                html_validation_service.
+                add_math_content_to_math_rte_components))
         return question_state_dict
 
     @classmethod

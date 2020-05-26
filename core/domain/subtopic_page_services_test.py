@@ -228,16 +228,16 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
         subtopic_page_swap = self.swap(
             subtopic_page_domain, 'SubtopicPage',
             subtopic_page_domain.SubtopicPage)
-        html = ('<p>Value</p><oppia-noninteractive-math ' +
-                'raw_latex-with-value="&amp;quot;+,-,-,+&amp;quot' +
-                ';"></oppia-noninteractive-math>')
-
-        expected_html = ('<p>Value</p><oppia-noninteractive-' +
-                         'math math_content-with-value="{&amp;quot' +
-                         ';raw_latex&amp;quot;: &amp;quot;+,-,-,+' +
-                         '&amp;quot;, &amp;quot;svg_filename&amp;' +
-                         'quot;: &amp;quot;&amp;quot;}"></oppia' +
-                         '-noninteractive-math>')
+        html = (
+            '<p>Value</p><oppia-noninteractive-math ' +
+            'raw_latex-with-value="&amp;quot;+,-,-,+&amp;quot' +
+            ';"></oppia-noninteractive-math>')
+        expected_html = (
+            '<p>Value</p><oppia-noninteractive-' +
+            'math math_content-with-value="{&amp;quot' +
+            ';raw_latex&amp;quot;: &amp;quot;+,-,-,+' +
+            '&amp;quot;, &amp;quot;svg_filename&amp;' +
+            'quot;: &amp;quot;&amp;quot;}"></oppia-noninteractive-math>')
         written_translations_dict = {
             'translations_mapping': {
                 'content1': {

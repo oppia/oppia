@@ -28,6 +28,7 @@ from constants import constants
 from core.domain import android_validation_constants
 from core.domain import customization_args_util
 from core.domain import html_cleaner
+from core.domain import html_validation_service
 from core.domain import interaction_registry
 from core.domain import param_domain
 import feconf
@@ -2093,95 +2094,42 @@ class State(python_utils.OBJECT):
         state_dict['content']['html'] = (
             conversion_fn(state_dict['content']['html']))
         if state_dict['interaction']['default_outcome']:
-            interaction_feedback_html = state_dict[
-                'interaction']['default_outcome']['feedback']['html']
-            state_dict['interaction']['default_outcome']['feedback'][
-                'html'] = conversion_fn(interaction_feedback_html)
+            state_dict['interaction']['default_outcome'] = (
+                html_validation_service.
+                convert_html_fields_in_default_outcome(
+                    state_dict['interaction']['default_outcome'],
+                    conversion_fn))
 
         for answer_group_index, answer_group in enumerate(
                 state_dict['interaction']['answer_groups']):
-            answer_group_html = answer_group['outcome']['feedback']['html']
-            state_dict['interaction']['answer_groups'][
-                answer_group_index]['outcome']['feedback']['html'] = (
-                    conversion_fn(answer_group_html))
-            if state_dict['interaction']['id'] == 'ItemSelectionInput':
-                for rule_spec_index, rule_spec in enumerate(
-                        answer_group['rule_specs']):
-                    for x_index, x in enumerate(rule_spec['inputs']['x']):
-                        state_dict['interaction']['answer_groups'][
-                            answer_group_index]['rule_specs'][
-                                rule_spec_index]['inputs']['x'][x_index] = (
-                                    conversion_fn(x))
-            if state_dict['interaction']['id'] == 'DragAndDropSortInput':
-                for rule_spec_index, rule_spec in enumerate(
-                        answer_group['rule_specs']):
-                    if rule_spec['rule_type'] == 'HasElementXAtPositionY':
-                        x = state_dict['interaction']['answer_groups'][
-                            answer_group_index]['rule_specs'][
-                                rule_spec_index]['inputs']['x']
-                        state_dict['interaction']['answer_groups'][
-                            answer_group_index]['rule_specs'][
-                                rule_spec_index]['inputs']['x'] = (
-                                    conversion_fn(x))
-                    elif rule_spec['rule_type'] == 'IsEqualToOrdering':
-                        for x_index, x in enumerate(rule_spec['inputs']['x']):
-                            state_dict['interaction']['answer_groups'][
-                                answer_group_index]['rule_specs'][
-                                    rule_spec_index]['inputs']['x'][
-                                        x_index][0] = conversion_fn(x[0])
-                    elif rule_spec['rule_type'] == 'HasElementXBeforeElementY':
-                        x = state_dict['interaction']['answer_groups'][
-                            answer_group_index]['rule_specs'][
-                                rule_spec_index]['inputs']['x']
-                        state_dict['interaction']['answer_groups'][
-                            answer_group_index]['rule_specs'][
-                                rule_spec_index]['inputs']['x'] = (
-                                    conversion_fn(x))
-                        y = state_dict['interaction']['answer_groups'][
-                            answer_group_index]['rule_specs'][
-                                rule_spec_index]['inputs']['y']
-                        state_dict['interaction']['answer_groups'][
-                            answer_group_index]['rule_specs'][
-                                rule_spec_index]['inputs']['y'] = (
-                                    conversion_fn(y))
-                    elif rule_spec['rule_type'] == 'IsEqualToOrderingWithOneItemAtIncorrectPosition': # pylint: disable=protected-access,line-too-long
-                        for x_index, x in enumerate(rule_spec['inputs']['x']):
-                            state_dict['interaction']['answer_groups'][
-                                answer_group_index]['rule_specs'][
-                                    rule_spec_index]['inputs']['x'][
-                                        x_index][0] = conversion_fn(x[0])
+            state_dict['interaction']['answer_groups'][answer_group_index] = (
+                html_validation_service.convert_html_fields_in_answer_group(
+                    answer_group, conversion_fn))
 
         if 'written_translations' in state_dict.keys():
-            for (content_id, language_code_to_written_translation) in (
-                    state_dict['written_translations'][
-                        'translations_mapping'].items()):
-                for language_code in (
-                        language_code_to_written_translation.keys()):
-                    state_dict['written_translations']['translations_mapping'][
-                        content_id][language_code]['html'] = conversion_fn(
-                            state_dict['written_translations'][
-                                'translations_mapping'][content_id][
-                                    language_code]['html'])
+            state_dict['written_translations'] = (
+                html_validation_service.
+                convert_html_fields_in_written_translations(
+                    state_dict['written_translations'], conversion_fn))
 
-        for hint_index, hint in enumerate(
-                state_dict['interaction']['hints']):
-            hint_html = hint['hint_content']['html']
-            state_dict['interaction']['hints'][hint_index][
-                'hint_content']['html'] = conversion_fn(hint_html)
+        state_dict['interaction']['hints'] = (
+            html_validation_service.
+            convert_html_fields_in_hints(
+                state_dict['interaction']['hints'], conversion_fn))
 
         if state_dict['interaction']['solution']:
-            solution_html = state_dict[
-                'interaction']['solution']['explanation']['html']
-            state_dict['interaction']['solution']['explanation']['html'] = (
-                conversion_fn(solution_html))
+            state_dict['interaction']['solution'] = (
+                html_validation_service.
+                convert_html_fields_in_solution(
+                    state_dict['interaction']['solution'], conversion_fn))
 
         if state_dict['interaction']['id'] in (
                 'ItemSelectionInput', 'MultipleChoiceInput',
                 'DragAndDropSortInput'):
-            for value_index, value in enumerate(
-                    state_dict['interaction']['customization_args'][
-                        'choices']['value']):
-                state_dict['interaction']['customization_args'][
-                    'choices']['value'][value_index] = conversion_fn(value)
+            state_dict['interaction']['customization_args'] = (
+                html_validation_service.
+                convert_html_fields_in_customization_args(
+                    state_dict['interaction']['customization_args'],
+                    conversion_fn))
 
         return state_dict

@@ -32,87 +32,6 @@ import utils
 ])
 
 
-def check_for_html_in_rule_specs_and_convert(rule_spec):
-    """Checks whether the rule_spec args of an answer group has
-    HTML string and converts it.
-
-    Args:
-        rule_spec: dict. the rule_spec to be converted.
-
-    Returns:
-        rule_spec. dict. the converted rule_spec.
-    """
-    if rule_spec['rule_type'] == 'HasElementXAtPositionY':
-        rule_spec['inputs']['x'] = (
-            html_validation_service.add_math_content_to_math_rte_components(
-                rule_spec['inputs']['x']))
-    elif rule_spec['rule_type'] == 'HasElementXBeforeElementY':
-        rule_spec['inputs']['x'] = (
-            html_validation_service.add_math_content_to_math_rte_components(
-                rule_spec['inputs']['x']))
-        rule_spec['inputs']['y'] = (
-            html_validation_service.add_math_content_to_math_rte_components(
-                rule_spec['inputs']['y']))
-    elif rule_spec['rule_type'] == 'IsEqualToOrdering':
-        for value_index, value in enumerate(rule_spec['inputs']['x']):
-            rule_spec['inputs']['x'][value_index][0] = (
-                html_validation_service.
-                add_math_content_to_math_rte_components(value[0]))
-    elif (rule_spec['rule_type'] ==
-          'IsEqualToOrderingWithOneItemAtIncorrectPosition'):
-        for value_index, value in enumerate(rule_spec['inputs']['x']):
-            rule_spec['inputs']['x'][value_index][0] = (
-                html_validation_service.
-                add_math_content_to_math_rte_components(value[0]))
-    elif rule_spec['rule_type'] == 'Equals':
-        if isinstance(rule_spec['inputs']['x'], list):
-            for value_index, value in enumerate(rule_spec['inputs']['x']):
-                rule_spec['inputs']['x'][value_index] = (
-                    html_validation_service.
-                    add_math_content_to_math_rte_components(value))
-    return rule_spec
-
-
-def convert_html_fields_in_customization_args(cust_arg):
-    """Checks whether the customization args of an interaction has
-    HTML string and converts the HTML.
-
-    Args:
-        cust_arg: dict. The customization Arg of the interaction in
-            draft_change.
-
-    Returns:
-        cust_arg. dict. The converted customization Arg of the interaction in
-            draft_change.
-    """
-    if cust_arg is not None:
-        if 'choices' in cust_arg.keys():
-            for value_index, value in enumerate(
-                    cust_arg['choices']['value']):
-                cust_arg['choices']['value'][value_index] = (
-                    html_validation_service.
-                    add_math_content_to_math_rte_components(value))
-    return cust_arg
-
-
-def convert_html_fields_in_draft_change_answer_groups(answer_groups):
-    """Converts the HTML in a draft_change answer group.
-
-    Args:
-        answer_groups: list. The list of answer groups in a draft_change.
-
-    Returns:
-        answer_groups. list. The converted answer groups in a draft_change.
-    """
-    answer_groups['outcome']['feedback']['html'] = (
-        html_validation_service.add_math_content_to_math_rte_components(
-            answer_groups['outcome']['feedback']['html']))
-    for rule_spec_index, rule_spec in enumerate(answer_groups['rule_specs']):
-        answer_groups['rule_specs'][rule_spec_index] = (
-            check_for_html_in_rule_specs_and_convert(rule_spec))
-    return answer_groups
-
-
 def try_upgrading_draft_to_exp_version(
         draft_change_list, current_draft_version, to_exp_version, exp_id):
     """Try upgrading a list of ExplorationChange domain objects to match the
@@ -192,8 +111,11 @@ class DraftUpgradeUtil(python_utils.OBJECT):
                         exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS),
                     'state_name': change.state_name,
                     'new_value': (
-                        convert_html_fields_in_draft_change_answer_groups(
-                            change.new_value))
+                        [html_validation_service.
+                         convert_html_fields_in_answer_group(
+                             answer_group, html_validation_service.
+                             add_math_content_to_math_rte_components)
+                         for answer_group in change.new_value])
                 })
             elif (change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY and
                   change.property_name ==
@@ -204,8 +126,11 @@ class DraftUpgradeUtil(python_utils.OBJECT):
                         exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS),
                     'state_name': change.state_name,
                     'new_value': (
+                        html_validation_service.
                         convert_html_fields_in_customization_args(
-                            change.new_value))
+                            change.new_value,
+                            html_validation_service.
+                            add_math_content_to_math_rte_components))
                 })
             elif (change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY and
                   change.property_name ==
@@ -220,6 +145,70 @@ class DraftUpgradeUtil(python_utils.OBJECT):
                         add_math_content_to_math_rte_components(
                             change.new_value))
                 })
+            elif (change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY and
+                  change.property_name ==
+                  exp_domain.STATE_PROPERTY_WRITTEN_TRANSLATIONS):
+                draft_change_list[i] = exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name': (
+                        exp_domain.STATE_PROPERTY_WRITTEN_TRANSLATIONS),
+                    'state_name': change.state_name,
+                    'new_value': (
+                        html_validation_service.
+                        convert_html_fields_in_written_translations(
+                            change.new_value,
+                            html_validation_service.
+                            add_math_content_to_math_rte_components))
+                })
+
+            elif (change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY and
+                  change.property_name ==
+                  exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME):
+                draft_change_list[i] = exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name': (
+                        exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME),
+                    'state_name': change.state_name,
+                    'new_value': (
+                        html_validation_service.
+                        convert_html_fields_in_default_outcome(
+                            change.new_value,
+                            html_validation_service.
+                            add_math_content_to_math_rte_components))
+                })
+
+            elif (change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY and
+                  change.property_name ==
+                  exp_domain.STATE_PROPERTY_INTERACTION_HINTS):
+                draft_change_list[i] = exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name': (
+                        exp_domain.STATE_PROPERTY_INTERACTION_HINTS),
+                    'state_name': change.state_name,
+                    'new_value': (
+                        html_validation_service.
+                        convert_html_fields_in_hints(
+                            change.new_value,
+                            html_validation_service.
+                            add_math_content_to_math_rte_components))
+                })
+
+            elif (change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY and
+                  change.property_name ==
+                  exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION):
+                draft_change_list[i] = exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name': (
+                        exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION),
+                    'state_name': change.state_name,
+                    'new_value': (
+                        html_validation_service.
+                        convert_html_fields_in_solution(
+                            change.new_value,
+                            html_validation_service.
+                            add_math_content_to_math_rte_components))
+                })
+
         return draft_change_list
 
     @classmethod

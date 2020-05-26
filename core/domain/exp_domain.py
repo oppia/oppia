@@ -2428,10 +2428,11 @@ class Exploration(python_utils.OBJECT):
             dict. The converted states_dict.
         """
         for key, state_dict in states_dict.items():
-            states_dict[key] = state_domain.State.convert_html_fields_in_state(
-                state_dict,
-                html_validation_service.add_math_content_to_math_rte_components)
-
+            states_dict[key] = (
+                state_domain.State.convert_html_fields_in_state(
+                    state_dict,
+                    html_validation_service.
+                    add_math_content_to_math_rte_components))
         return states_dict
 
     @classmethod

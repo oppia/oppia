@@ -977,9 +977,10 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
 
     def test_migrate_question_state_from_v33_to_v34(self):
 
-        feedback_html = ('<p>Feedback</p><oppia-noninteractive-math ' +
-                         'raw_latex-with-value="&amp;quot;+,-,-,+&amp;quot' +
-                         ';"></oppia-noninteractive-math>')
+        feedback_html = (
+            '<p>Feedback</p><oppia-noninteractive-math ' +
+            'raw_latex-with-value="&amp;quot;+,-,-,+&amp;quot' +
+            ';"></oppia-noninteractive-math>')
         answer_group = {
             'outcome': {
                 'dest': 'abc',
@@ -1049,23 +1050,26 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             'solicit_answer_details': False,
             'classifier_model_id': None
         }
-        expected_feeedback_html = ('<p>Feedback</p><oppia-noninteractive-' +
-                                   'math math_content-with-value="{&amp;quot' +
-                                   ';raw_latex&amp;quot;: &amp;quot;+,-,-,+' +
-                                   '&amp;quot;, &amp;quot;svg_filename&amp;' +
-                                   'quot;: &amp;quot;&amp;quot;}"></oppia' +
-                                   '-noninteractive-math>')
+        expected_feeedback_html = (
+            '<p>Feedback</p><oppia-noninteractive-' +
+            'math math_content-with-value="{&amp;quot' +
+            ';raw_latex&amp;quot;: &amp;quot;+,-,-,+' +
+            '&amp;quot;, &amp;quot;svg_filename&amp;' +
+            'quot;: &amp;quot;&amp;quot;}"></oppia' +
+            '-noninteractive-math>')
 
-        question_model = question_models.QuestionModel(
-            id='question_id',
-            question_state_data=question_state_dict,
-            language_code='en',
-            version=0,
-            linked_skill_ids=['skill_id'],
-            question_state_data_schema_version=33)
-        commit_cmd = question_domain.QuestionChange({
-            'cmd': question_domain.CMD_CREATE_NEW
-        })
+        question_model = (
+            question_models.QuestionModel(
+                id='question_id',
+                question_state_data=question_state_dict,
+                language_code='en',
+                version=0,
+                linked_skill_ids=['skill_id'],
+                question_state_data_schema_version=33))
+        commit_cmd = (
+            question_domain.QuestionChange({
+                'cmd': question_domain.CMD_CREATE_NEW
+            }))
         commit_cmd_dicts = [commit_cmd.to_dict()]
         question_model.commit(
             'user_id_admin', 'question model created', commit_cmd_dicts)
