@@ -195,7 +195,7 @@ var AdminPage = function() {
     await waitFor.visibilityOf(element(
       by.css('.protractor-test-unfinished-jobs-card')),
     'Unfinished Jobs taking too long to appear');
-    let unfinishedJobs = unfinishedOffJobIDs.filter(
+    let unfinishedJobs = await unfinishedOffJobIDs.filter(
       async function(element) {
         var text = await element.getText();
         return text.toLowerCase().startsWith(jobName.toLowerCase());
