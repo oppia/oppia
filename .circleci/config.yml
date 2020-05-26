@@ -19,24 +19,26 @@ workflows:
 
     jobs:
       - setup
-      - lint_tests:
-          requires:
-            - setup
-      - frontend_tests:
-          requires:
-            - setup
-      - typescript_tests:
-          requires:
-            - frontend_tests
-      - backend_tests:
-          requires:
-            - frontend_tests
+      # - lint_tests:
+      #     requires:
+      #       - setup
+      # - frontend_tests:
+      #     requires:
+      #       - setup
+      # - typescript_tests:
+      #     requires:
+      #       - frontend_tests
+      # - backend_tests:
+      #     requires:
+      #       - frontend_tests
       - e2e_file_upload_features:
           requires:
-            - typescript_tests
+      #       - typescript_tests
+              - setup
       - e2e_navigation:
           requires:
-            - typescript_tests
+      #       - typescript_tests
+            - setup
       - e2e_classroom_page:
           requires:
             - e2e_file_upload_features

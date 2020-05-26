@@ -24,8 +24,8 @@ var until = protractor.ExpectedConditions;
 // mobile device.
 var DEFAULT_WAIT_TIME_MSECS = browser.isMobile ? 20000 : 10000;
 
-var alertToBePresent = function() {
-  return browser.wait(
+var alertToBePresent = async function() {
+  await browser.wait(
     until.alertIsPresent(), DEFAULT_WAIT_TIME_MSECS,
     'Alert box took too long to appear.');
 };
@@ -34,8 +34,8 @@ var alertToBePresent = function() {
  * @param {Object} element - Clickable element such as button, link or tab.
  * @param {string} errorMessage - Error message when element is not clickable.
  */
-var elementToBeClickable = function(element, errorMessage) {
-  return browser.wait(
+var elementToBeClickable = async function(element, errorMessage) {
+  await browser.wait(
     until.elementToBeClickable(element), DEFAULT_WAIT_TIME_MSECS, errorMessage);
 };
 
@@ -44,21 +44,21 @@ var elementToBeClickable = function(element, errorMessage) {
  *                           have height or width.
  * @param {string} errorMessage - Error message when element is still visible.
  */
-var invisibilityOf = function(element, errorMessage) {
-  return browser.wait(
+var invisibilityOf = async function(element, errorMessage) {
+  await browser.wait(
     until.invisibilityOf(element), DEFAULT_WAIT_TIME_MSECS, errorMessage);
 };
 
 /**
  * Consider adding this method after each browser.get() call.
  */
-var pageToFullyLoad = function() {
+var pageToFullyLoad = async function() {
   // Completely wait for page to load to avoid XMLHTTPReq error on page refresh:
   // https://github.com/angular/angular.js/issues/14219#issuecomment-251605766
   // and browser.waitForAngular's flakiness
   // https://github.com/angular/protractor/issues/2954.
   var loadingMessage = element(by.css('[ng-show="loadingMessage"]'));
-  return browser.driver.wait(until.invisibilityOf(loadingMessage), 15000,
+  await browser.driver.wait(until.invisibilityOf(loadingMessage), 15000,
     'Page takes more than 15 secs to load');
 };
 
@@ -68,8 +68,8 @@ var pageToFullyLoad = function() {
  * @param {string} errorMessage - Error message when element does not contain
  *                                provided text.
  */
-var textToBePresentInElement = function(element, text, errorMessage) {
-  return browser.wait(
+var textToBePresentInElement = async function(element, text, errorMessage) {
+  await browser.wait(
     until.textToBePresentInElement(element, text), DEFAULT_WAIT_TIME_MSECS,
     errorMessage);
 };
@@ -79,26 +79,28 @@ var textToBePresentInElement = function(element, text, errorMessage) {
  *                           height and width that is greater than 0.
  * @param {string} errorMessage - Error message when element is invisible.
  */
-var visibilityOf = function(element, errorMessage) {
-  return browser.wait(
+var visibilityOf = async function(element, errorMessage) {
+  await browser.wait(
     until.visibilityOf(element), DEFAULT_WAIT_TIME_MSECS, errorMessage);
 };
 
 /**
 * Wait for new tab is opened
 */
-var newTabToBeCreated = function(errorMessage, urlToMatch) {
+var newTabToBeCreated = async function(errorMessage, urlToMatch) {
   var currentHandles = [];
 
-  return browser.wait(function() {
-    return browser.driver.getAllWindowHandles().then(function(handles) {
-      browser.waitForAngularEnabled(false);
-      return browser.switchTo().window(handles.pop()).then(function() {
-        return browser.getCurrentUrl().then(function(url) {
-          browser.waitForAngularEnabled(true);
-          return url.match(urlToMatch);
-        });
-      });
+  await browser.wait(function() {
+    return browser.driver.getAllWindowHandles().then(async function(handles) {
+      await browser.waitForAngularEnabled(false);
+      return await browser.switchTo().window(await handles.pop()).then(
+        async function() {
+          return await browser.getCurrentUrl().then(async function(url) {
+            await browser.waitForAngularEnabled(true);
+            return await url.match(urlToMatch);
+          });
+        }
+      );
     });
   }, DEFAULT_WAIT_TIME_MSECS, errorMessage);
 };
