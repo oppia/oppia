@@ -38,11 +38,10 @@ var ExplorationEditorTranslationTab = function() {
         dismissWelcomeModalButton,
         'Welcome modal is taking too long to appear');
       await dismissWelcomeModalButton.click();
+      await waitFor.invisibilityOf(
+        translationWelcomeModal,
+        'Translation welcome modal takes too long to disappear');
     }
-
-    await waitFor.invisibilityOf(
-      translationWelcomeModal,
-      'Translation welcome modal takes too long to disappear');
 
     // Otherwise, if the translation tutorial shows up, exit it.
     var buttons = element.all(by.css('.skipBtn'));
