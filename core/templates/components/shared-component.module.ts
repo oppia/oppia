@@ -21,15 +21,17 @@ import 'zone.js';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
+import { AttributionGuideComponent } from
+  './common-layout-directives/common-elements/attribution-guide.component';
 import { BackgroundBannerComponent } from
   './common-layout-directives/common-elements/background-banner.component';
 
 
 @NgModule({
   imports: [CommonModule],
-  declarations: [BackgroundBannerComponent],
-  entryComponents: [BackgroundBannerComponent],
-  exports: [BackgroundBannerComponent]
+  declarations: [AttributionGuideComponent, BackgroundBannerComponent],
+  entryComponents: [AttributionGuideComponent, BackgroundBannerComponent],
+  exports: [AttributionGuideComponent, BackgroundBannerComponent]
 })
 
 export class SharedComponentsModule { }
