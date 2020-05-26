@@ -22,7 +22,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import collections
 import copy
 import logging
-import re
 
 from constants import constants
 from core.domain import android_validation_constants
@@ -393,32 +392,33 @@ class InteractionInstance(python_utils.OBJECT):
 
         return True
 
-    def is_rte_content_supported_on_android(self, regex):
+    def is_rte_content_supported_on_android(self, whitelist_checker):
         """Determines whether the RTE content in interaction answer groups,
         hints and solution is supported by Android app.
 
         Args:
-            regex: SRE_Pattern. The invalid regex pattern.
+            whitelist_checker: function. Function to check whether the RTE tags
+                in the html string are whitelisted.
 
         Returns:
             bool. Whether the RTE content is valid.
         """
         for answer_group in self.answer_groups:
-            if regex.search(answer_group.outcome.feedback.html):
+            if whitelist_checker(answer_group.outcome.feedback.html):
                 return False
 
         if (
                 self.default_outcome and self.default_outcome.feedback and
-                regex.search(self.default_outcome.feedback.html)):
+                whitelist_checker(self.default_outcome.feedback.html)):
             return False
 
         for hint in self.hints:
-            if regex.search(hint.hint_content.html):
+            if whitelist_checker(hint.hint_content.html):
                 return False
 
         if (
                 self.solution and self.solution.explanation and
-                regex.search(self.solution.explanation.html)):
+                whitelist_checker(self.solution.explanation.html)):
             return False
 
         return True
@@ -1568,15 +1568,28 @@ class State(python_utils.OBJECT):
         Returns:
             bool. Whether the RTE components in the state is valid.
         """
-        regex_string = r'oppia-noninteractive-'
-        regex_string += (
-            '|'.join(android_validation_constants.INVALID_RTE_COMPONENTS))
-        regex_string = regex_string[:-1]
-        regex = re.compile(regex_string)
-        if self.content and regex.search(self.content.html):
+        def whitelist_checker(html):
+            """Checks if the provided html string contains only whitelisted
+            RTE tags.
+
+            Args:
+                html: str. The html string.
+
+            Returns:
+                bool. Whether all RTE tags in the html are whitelisted.
+            """
+            rte_prefix = 'oppia-noninteractive-'
+            components = set([
+                rte['id'].replace(rte_prefix, '') for rte in html_cleaner
+                .get_rte_components(html)])
+            return any(components.difference(
+                android_validation_constants.VALID_RTE_COMPONENTS))
+
+        if self.content and whitelist_checker(self.content.html):
             return False
 
-        return self.interaction.is_rte_content_supported_on_android(regex)
+        return self.interaction.is_rte_content_supported_on_android(
+            whitelist_checker)
 
     def get_training_data(self):
         """Retrieves training data from the State domain object.

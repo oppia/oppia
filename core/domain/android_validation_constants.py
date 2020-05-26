@@ -26,12 +26,11 @@ VALID_INTERACTION_IDS = [
     'Continue', 'DragAndDropSortInput', 'EndExploration', 'FractionInput',
     'ItemSelectionInput', 'MultipleChoiceInput', 'NumericInput',
     'NumberWithUnits', 'TextInput'
-    ]
+]
 
 SUPPORTED_LANGUAGES = ['en']
 
-INVALID_RTE_COMPONENTS = [
-    'collapsible', 'math', 'tabs', 'video']
+VALID_RTE_COMPONENTS = ['image', 'link', 'skillreview']
 
 # If any of the following values are changed, edit the corresponding value in
 # app.constants.ts as well.
