@@ -393,35 +393,35 @@ class InteractionInstance(python_utils.OBJECT):
         return True
 
     def is_rte_content_supported_on_android(
-            self, require_component_names_to_match):
+            self, require_valid_component_names):
         """Determines whether the RTE content in interaction answer groups,
         hints and solution is supported by Android app.
 
         Args:
-            require_component_names_to_match: function. Function to check
+            require_valid_component_names: function. Function to check
                 whether the RTE tags in the html string are whitelisted.
 
         Returns:
             bool. Whether the RTE content is valid.
         """
         for answer_group in self.answer_groups:
-            if require_component_names_to_match(
+            if require_valid_component_names(
                     answer_group.outcome.feedback.html):
                 return False
 
         if (
                 self.default_outcome and self.default_outcome.feedback and
-                require_component_names_to_match(
+                require_valid_component_names(
                     self.default_outcome.feedback.html)):
             return False
 
         for hint in self.hints:
-            if require_component_names_to_match(hint.hint_content.html):
+            if require_valid_component_names(hint.hint_content.html):
                 return False
 
         if (
                 self.solution and self.solution.explanation and
-                require_component_names_to_match(
+                require_valid_component_names(
                     self.solution.explanation.html)):
             return False
 
@@ -1572,7 +1572,7 @@ class State(python_utils.OBJECT):
         Returns:
             bool. Whether the RTE components in the state is valid.
         """
-        def require_component_names_to_match(html):
+        def require_valid_component_names(html):
             """Checks if the provided html string contains only whitelisted
             RTE tags.
 
@@ -1589,12 +1589,12 @@ class State(python_utils.OBJECT):
             return any(component_names.difference(
                 android_validation_constants.VALID_RTE_COMPONENTS))
 
-        if self.content and require_component_names_to_match(
+        if self.content and require_valid_component_names(
                 self.content.html):
             return False
 
         return self.interaction.is_rte_content_supported_on_android(
-            require_component_names_to_match)
+            require_valid_component_names)
 
     def get_training_data(self):
         """Retrieves training data from the State domain object.
