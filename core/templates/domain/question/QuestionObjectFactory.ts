@@ -119,15 +119,18 @@ angular.module('oppia').factory('QuestionObjectFactory', [
         }
       });
       if (pendingMisconceptionNamesToTag.length > 0) {
-        var returnString = 'Click on (or create) an answer ' +
-          'that is neither marked correct nor is a default answer (marked ' +
-          'above as [All other answers]) and tag the following misconceptions' +
-          ' to that answer group:';
+        var returnString = 'Remaining misconceptions that need to be ' +
+          'addressed:';
+        var misconceptionsUnorderedListElement = document.createElement('ul');
         pendingMisconceptionNamesToTag.forEach(function(misconceptionName) {
-          returnString = returnString + ' ' + misconceptionName + ',';
+          var misconceptionNameListElement = document.createElement('li');
+          misconceptionNameListElement.appendChild(
+            document.createTextNode(misconceptionName));
+            misconceptionsUnorderedListElement.appendChild(
+              misconceptionNameListElement);
         });
-        returnString = returnString.slice(0, -1);
-        return returnString;
+        return (
+          `${returnString} ${misconceptionsUnorderedListElement.outerHTML}`);
       }
       return false;
     };

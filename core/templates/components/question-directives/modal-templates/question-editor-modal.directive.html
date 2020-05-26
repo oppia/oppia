@@ -29,7 +29,7 @@
                    question-changed="questionChanged">
   </question-editor>
   <div class="alert alert-danger" ng-if="validationError || (question.getStateData().interaction.id && isSaveButtonDisabled())">
-    <[validationError || isSaveButtonDisabled()]>
+    <angular-html-bind html-data="validationError || isSaveButtonDisabled()"></angular-html-bind>
     <span class="oppia-transition-200"
           ng-click="removeErrors()"
           style="float: right;">

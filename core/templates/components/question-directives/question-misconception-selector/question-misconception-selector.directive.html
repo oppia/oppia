@@ -1,0 +1,23 @@
+Selected Misconception: <[selectedMisconception.getName()]>
+<div ng-repeat="(skillId, misconceptions) in misconceptionsBySkill">
+  <div ng-repeat="misconception in misconceptions">
+    <button class="btn btn-secondary misconception-button" style="width: 100%" ng-click="selectMisconception(misconception, skillId)">
+      <b style="display: inline;"><[!misconception.isMandatory() ? ' (Optional) ' : '']><[misconception.getName()]>:</b>
+      <angular-html-bind class="misconception-feedback-container" html-data="misconception.getFeedback()">
+      </angular-html-bind>
+    </button>
+    <div ng-if="selectedMisconceptionSkillId === skillId && selectedMisconception.getId() === misconception.getId()">
+      <label class="misconception-label"> Note to creators: </label>
+      <angular-html-bind html-data="misconception.getNotes()">
+      </angular-html-bind>
+      <label class="misconception-label"> Misconception Feedback: </label>
+      <angular-html-bind html-data="misconception.getFeedback()">
+      </angular-html-bind>
+    </div>
+  </div>
+</div>
+<span ng-click="toggleMisconceptionFeedbackUsage()" aria-hidden="true">
+  <i ng-if="!misconceptionFeedbackIsUsed" class="material-icons md-18 misconception-feedback-usage-checkbox">&#xE835;</i>
+  <i ng-if="misconceptionFeedbackIsUsed" class="material-icons md-18 misconception-feedback-usage-checkbox">&#xE834;</i>
+  Use misconception feedback as answer group feedback.
+</span>

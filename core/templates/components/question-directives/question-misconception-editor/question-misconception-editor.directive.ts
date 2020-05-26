@@ -90,7 +90,7 @@ angular.module('oppia').directive('questionMisconceptionEditor', [
                     StateEditorService.getMisconceptionsBySkill());
                   $scope.selectedMisconception = null;
                   $scope.selectedMisconceptionSkillId = null;
-                  $scope.misconceptionFeedbackIsUsed = false;
+                  $scope.misconceptionFeedbackIsUsed = true;
 
                   $scope.selectMisconception = function(
                       misconception, skillId) {
