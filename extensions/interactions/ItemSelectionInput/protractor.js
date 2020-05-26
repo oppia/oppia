@@ -54,11 +54,12 @@ var customizeInteraction = async function(
 // function would be readPlainText).
 var expectInteractionDetailsToMatch = async function(
     elem, richTextInstructionsArray) {
-  var optionElements = await elem.all(
+  var optionElements = elem.all(
     by.repeater('choice in $ctrl.choices track by $index'));
-  expect(optionElements.length).toEqual(richTextInstructionsArray.length);
-  for (var i = 0; i < optionElements.length; i++) {
-    await forms.expectRichText(optionElements[i].element(by.css(
+  var optionsCount = await optionElements.count();
+  expect(optionsCount).toEqual(richTextInstructionsArray.length);
+  for (var i = 0; i < optionsCount; i++) {
+    await forms.expectRichText((await optionElements.get(i)).element(by.css(
       '.protractor-test-item-selection-option'
     ))).toMatch(richTextInstructionsArray[i]);
   }

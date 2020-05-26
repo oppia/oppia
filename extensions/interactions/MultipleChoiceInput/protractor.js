@@ -38,8 +38,8 @@ var expectInteractionDetailsToMatch = async function(
     elem, richTextInstructionsArray) {
   var optionElements = elem.all(
     by.css('.protractor-test-multiple-choice-option-container'));
-  var optionsCount = optionElements.count();
-  expect(await optionsCount).toEqual(richTextInstructionsArray.length);
+  var optionsCount = await optionElements.count();
+  expect(optionsCount).toEqual(richTextInstructionsArray.length);
   var promises = [];
   for (var i = 0; i < optionsCount; i++) {
     promises.push(await (await optionElements.get(i)).element(by.css(
