@@ -56,7 +56,6 @@ describe('Topic update service', function() {
   var subtitledHtmlObjectFactory = null;
   var subtopicPageObjectFactory = null;
   var UndoRedoService = null;
-  var _sampleTopicBackendObject = null;
   var _sampleTopic = null;
   var _firstSkillSummary = null;
   var _secondSkillSummary = null;
@@ -113,7 +112,7 @@ describe('Topic update service', function() {
     UndoRedoService = $injector.get('UndoRedoService');
     skillSummaryObjectFactory = $injector.get('SkillSummaryObjectFactory');
 
-    _sampleTopicBackendObject = {
+    var sampleTopicBackendObject = {
       topicDict: {
         id: 'sample_topic_id',
         name: 'Topic name',
@@ -174,8 +173,8 @@ describe('Topic update service', function() {
     _sampleSubtopicPage = subtopicPageObjectFactory.createFromBackendDict(
       sampleSubtopicPageObject);
     _sampleTopic = TopicObjectFactory.create(
-      _sampleTopicBackendObject.topicDict,
-      _sampleTopicBackendObject.skillIdToDescriptionDict);
+      sampleTopicBackendObject.topicDict,
+      sampleTopicBackendObject.skillIdToDescriptionDict);
   }));
 
   it('should remove/add an additional story id from/to a topic',
