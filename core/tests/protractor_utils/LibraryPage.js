@@ -52,13 +52,14 @@ var LibraryPage = function() {
 
   // Returns a promise of all explorations with the given name.
   var _getExplorationElements = async function(name) {
-    return element.all(by.css('.protractor-test-exp-summary-tile')).filter(
-      async function(tile) {
-        var tileTitle = await tile.element(
-          by.css('.protractor-test-exp-summary-tile-title')).getText();
-        return (tileTitle === name);
-      }
-    );
+    return await element.all(
+      by.css('.protractor-test-exp-summary-tile')).filter(
+        async function(tile) {
+          var tileTitle = await tile.element(
+            by.css('.protractor-test-exp-summary-tile-title')).getText();
+          return (tileTitle === name);
+        }
+      );
   };
 
   var _submitSearchQuery = async function(searchQuery) {
