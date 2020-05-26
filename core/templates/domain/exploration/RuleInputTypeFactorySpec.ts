@@ -104,6 +104,7 @@ describe('RuleInputTypeFactory', () => {
 
   it('should correctly indentify notes', () => {
     let outputGraph = ruleInputTypeFactory.notesInstance(inputGraph);
+    let outputEmptyArray = ruleInputTypeFactory.notesInstance([]);
     let outputNotes = ruleInputTypeFactory.notesInstance(inputNotes);
     let outputFraction = ruleInputTypeFactory.notesInstance(inputFraction);
     let outputNumberWithUnits = ruleInputTypeFactory.notesInstance(
@@ -118,6 +119,7 @@ describe('RuleInputTypeFactory', () => {
       inputnumberArray);
 
     expect(outputGraph).toEqual(undefined);
+    expect(outputEmptyArray).toEqual([]);
     expect(outputNotes).toEqual([{
       readableNoteName: 'E4',
       noteDuration: {

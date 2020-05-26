@@ -25,6 +25,10 @@ export interface IUnitsBackendDict {
   units: Array<IUnit>;
 }
 
+interface UnitsDict {
+  [unit: string]: number;
+}
+
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
@@ -127,8 +131,8 @@ export class UnitsObjectFactory {
     return unitsWithMultiplier;
   }
 
-  convertUnitDictToList(unitDict: any): IUnit[] {
-    var unitList = [];
+  convertUnitDictToList(unitDict: UnitsDict): IUnit[] {
+    var unitList: IUnit[] = [];
     for (var key in unitDict) {
       unitList.push({unit: key, exponent: unitDict[key]});
     }

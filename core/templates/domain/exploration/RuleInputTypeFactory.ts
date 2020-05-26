@@ -26,8 +26,9 @@ import { IFractionDict } from
   'domain/objects/FractionObjectFactory.ts';
 /* eslint-disable max-len */
 import { INote } from 'extensions/interactions/MusicNotesInput/directives/music-notes-input-rules.service';
-import { IGraphBackendDict } from 'extensions/interactions/GraphInput/directives/graph-detail.service';
 /* eslint-enable max-len */
+import { IGraphBackendDict } from
+  'extensions/interactions/GraphInput/directives/graph-detail.service';
 
 @Injectable({
   providedIn: 'root'
