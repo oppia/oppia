@@ -369,11 +369,6 @@ var ExplorationEditorTranslationTab = function() {
   this._isAudioPlaying = async function() {
     var firstValue = await audioMaterialSliderDiv.getAttribute(
       'aria-valuenow');
-    firstValue = await new Promise(function(resolve, reject) {
-      setTimeout(function() {
-        resolve(firstValue);
-      }, 2000);
-    });
     var secondValue = await audioMaterialSliderDiv.getAttribute(
       'aria-valuenow');
     if (firstValue && secondValue) {
