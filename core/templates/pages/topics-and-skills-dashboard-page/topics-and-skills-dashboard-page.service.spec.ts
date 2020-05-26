@@ -16,6 +16,9 @@
  * @fileoverview Unit tests for TopicsAndSkillsDashboardPageService.
  */
 
+import { ETopicPublishedOptions, ETopicSortOptions} from
+  // eslint-disable-next-line max-len
+  'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.constants';
 import { TopicsAndSkillsDashboardFilterObjectFactory } from
   // eslint-disable-next-line max-len
   'domain/topics_and_skills_dashboard/TopicsAndSkillsDashboardFilterObjectFactory';
@@ -97,36 +100,38 @@ describe('Topic and Skill dashboard page service', () => {
     expect(filteredArray).toEqual([topic1]);
 
     filterOptions.keyword = '';
-    filterOptions.status = 'Published';
+    filterOptions.status = ETopicPublishedOptions.Published;
     filteredArray = tsds.getFilteredTopics(topicsArray, filterOptions);
     expect(filteredArray).toEqual([topic1, topic3]);
 
-    filterOptions.status = 'Not Published';
+    filterOptions.status = ETopicPublishedOptions.NotPublished;
     filteredArray = tsds.getFilteredTopics(topicsArray, filterOptions);
     expect(filteredArray).toEqual([topic2]);
 
-    filterOptions.status = '';
-    filterOptions.sort = 'Most Recently Updated';
+    filterOptions.status = null;
+    filterOptions.sort = ETopicSortOptions.IncreasingUpdatedOn;
     filteredArray = tsds.getFilteredTopics(topicsArray, filterOptions);
     expect(filteredArray).toEqual([topic3, topic2, topic1]);
 
-    filterOptions.sort = 'Least Recently Updated';
+    filterOptions.sort = ETopicSortOptions.DecreasingUpdatedOn;
     filteredArray = tsds.getFilteredTopics(topicsArray, filterOptions);
     expect(filteredArray).toEqual([topic1, topic2, topic3]);
 
-    filterOptions.sort = 'Newly Created';
+    filterOptions.sort = ETopicSortOptions.IncreasingCreatedOn;
     filteredArray = tsds.getFilteredTopics(topicsArray, filterOptions);
     expect(filteredArray).toEqual([topic3, topic2, topic1]);
 
-    filterOptions.sort = 'Oldest Created';
+    filterOptions.sort = ETopicSortOptions.DecreasingCreatedOn;
     filteredArray = tsds.getFilteredTopics(topicsArray, filterOptions);
     expect(filteredArray).toEqual([topic1, topic2, topic3]);
 
-    filterOptions.sort = '';
+    filterOptions.sort = null;
     filterOptions.category = 'Mathematics';
     filteredArray = tsds.getFilteredTopics(topicsArray, filterOptions);
     expect(filteredArray).toEqual([topic1, topic2]);
 
+    // @ts-ignore
+    // since sort is an ENUM, we can't assign any random value
     filterOptions.sort = 'Invalid sort value';
     expect(() => {
       tsds.getFilteredTopics(topicsArray, filterOptions);

@@ -20,16 +20,21 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
+import { ETopicPublishedOptions, ETopicSortOptions } from
+  // eslint-disable-next-line max-len
+  'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.constants';
+
 export class TopicsAndSkillsDashboardFilter {
   category: string;
   keyword: string;
-  sort: string;
-  status: string;
+  sort: ETopicSortOptions;
+  status: ETopicPublishedOptions;
+
   /**
-   * @param {String} category - category to filter
-   * @param {String} keyword - keyword to filter
-   * @param {String} sort - sort by filter value
-   * @param {String} status - status to filter
+   * @param {String} category - category to filter for.
+   * @param {String} keyword - keyword to filter for.
+   * @param {ETopicSortOptions} sort - Enum, allowed sort-by values.
+   * @param {ETopicPublishedOptions} status - Enum. allowed status values.
    */
   constructor(category, keyword, sort, status) {
     this.category = category;
@@ -43,8 +48,8 @@ export class TopicsAndSkillsDashboardFilter {
   reset(): void {
     this.category = '';
     this.keyword = '';
-    this.sort = '';
-    this.status = '';
+    this.sort = null;
+    this.status = null;
   }
 }
 
@@ -57,7 +62,7 @@ export class TopicsAndSkillsDashboardFilterObjectFactory {
    * TopicsAndSkillsDashboardFilter instance
    */
   createDefault(): TopicsAndSkillsDashboardFilter {
-    return new TopicsAndSkillsDashboardFilter('', '', '', '');
+    return new TopicsAndSkillsDashboardFilter('', '', null, null);
   }
 }
 

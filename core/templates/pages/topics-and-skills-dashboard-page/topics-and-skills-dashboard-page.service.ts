@@ -43,42 +43,44 @@ export class TopicsAndSkillsDashboardPageService {
       topicsArray: Array<ITopicSummaryBackendDict>,
       filterObject: TopicsAndSkillsDashboardFilter):
       Array<ITopicSummaryBackendDict> {
-    const {sort, keyword, category, status} = filterObject;
+    // const {sort, category, status} = filterObject;
     let ESortOptions = TopicsAndSkillsDashboardPageConstants.TOPIC_SORT_OPTIONS;
     let EPublishedOptions = (
       TopicsAndSkillsDashboardPageConstants.TOPIC_PUBLISHED_OPTIONS);
     let filteredTopics = topicsArray;
-    if (keyword) {
+    if (filterObject.keyword) {
       filteredTopics = topicsArray.filter((topic) => {
         return (
-          topic.name.toLowerCase().includes(keyword.toLowerCase()) ||
-          topic.description.toLowerCase().includes(keyword.toLowerCase()));
+          topic.name.toLowerCase().includes(
+            filterObject.keyword.toLowerCase()) ||
+          topic.description.toLowerCase().includes(
+            filterObject.keyword.toLowerCase()));
       });
     }
 
-    if (category) {
+    if (filterObject.category) {
       filteredTopics = filteredTopics.filter((topic) => {
         return (
-          TopicsAndSkillsDashboardPageConstants.ALLOWED_TOPIC_CATEGORIES
-            .includes(
-              topic.category));
+          filterObject.category === topic.category);
       });
     }
 
-    if (status) {
+    if (filterObject.status) {
       filteredTopics = filteredTopics.filter((topic) => {
-        if (status === EPublishedOptions.Published && topic.is_published) {
+        if (filterObject.status === EPublishedOptions.Published &&
+            topic.is_published) {
           return true;
         } else if (
-          status === EPublishedOptions.NotPublished && !topic.is_published) {
+          filterObject.status === EPublishedOptions.NotPublished &&
+            !topic.is_published) {
           return true;
         }
         return false;
       });
     }
 
-    if (sort) {
-      switch (sort) {
+    if (filterObject.sort) {
+      switch (filterObject.sort) {
         case ESortOptions.IncreasingUpdatedOn:
           filteredTopics.sort((a, b) => (
             b.topic_model_created_on - a.topic_model_created_on));

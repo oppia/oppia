@@ -18,16 +18,16 @@
 
 const constants = require('constants.ts');
 
-enum ETopicSortOptions {
+export enum ETopicSortOptions {
   IncreasingCreatedOn = 'Newly Created',
   DecreasingCreatedOn = 'Oldest Created',
   IncreasingUpdatedOn = 'Most Recently Updated',
   DecreasingUpdatedOn = 'Least Recently Updated',
 }
 
-enum ETopicPublishedOptions {
-    Published = 'Published',
-    NotPublished = 'Not Published'
+export enum ETopicPublishedOptions {
+  Published = 'Published',
+  NotPublished = 'Not Published'
 }
 
 export class TopicsAndSkillsDashboardPageConstants {

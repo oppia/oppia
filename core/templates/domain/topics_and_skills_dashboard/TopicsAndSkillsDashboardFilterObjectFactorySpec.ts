@@ -16,11 +16,13 @@
  * @fileoverview Unit tests for TopicsAndSkillsDashboardFilterObjectFactory.
  */
 
-import {
-  TopicsAndSkillsDashboardFilter,
+import { TopicsAndSkillsDashboardFilter,
   TopicsAndSkillsDashboardFilterObjectFactory } from
   // eslint-disable-next-line max-len
   'domain/topics_and_skills_dashboard/TopicsAndSkillsDashboardFilterObjectFactory';
+import { ETopicPublishedOptions, ETopicSortOptions}
+  // eslint-disable-next-line max-len
+  from 'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.constants';
 
 describe('Topics And Skills Dashboard Filter Object', () => {
   let topicsAndSkillsDashboardFilterObjectFactory:
@@ -35,15 +37,15 @@ describe('Topics And Skills Dashboard Filter Object', () => {
 
   it('should create a new dashboard filter object', () => {
     expect(filter.category).toEqual('');
-    expect(filter.sort).toEqual('');
-    expect(filter.status).toEqual('');
+    expect(filter.sort).toEqual(null);
+    expect(filter.status).toEqual(null);
     expect(filter.keyword).toEqual('');
   });
 
   it('should reset values of the filter', () => {
     expect(filter.category).toEqual('');
-    expect(filter.sort).toEqual('');
-    expect(filter.status).toEqual('');
+    expect(filter.sort).toEqual(null);
+    expect(filter.status).toEqual(null);
     expect(filter.keyword).toEqual('');
 
     const category = 'Mathematics';
@@ -52,8 +54,8 @@ describe('Topics And Skills Dashboard Filter Object', () => {
     const keywords = 'Key1';
 
     filter.category = category;
-    filter.sort = sort;
-    filter.status = status;
+    filter.sort = ETopicSortOptions.IncreasingCreatedOn;
+    filter.status = ETopicPublishedOptions.Published;
     filter.keyword = keywords;
 
     expect(filter.category).toEqual(category);
@@ -63,8 +65,8 @@ describe('Topics And Skills Dashboard Filter Object', () => {
 
     filter.reset();
     expect(filter.category).toEqual('');
-    expect(filter.sort).toEqual('');
-    expect(filter.status).toEqual('');
+    expect(filter.sort).toEqual(null);
+    expect(filter.status).toEqual(null);
     expect(filter.keyword).toEqual('');
   });
 });

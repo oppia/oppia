@@ -99,6 +99,8 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
           ctrl._initDashboard = function(stayInSameTab) {
             TopicsAndSkillsDashboardBackendApiService.fetchDashboardData().then(
               function(response) {
+                // TODO(#9364): Remove the following line once this file and
+                // the corresponding spec file is upgraded to Angular 8.
                 // The following condition is required for Karma testing. The
                 // Angular HttpClient returns an Observable which when converted
                 // to a promise does not have the 'data' key but the AngularJS
@@ -230,7 +232,7 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
             ctrl.displayedTopicSummaries =
                 ctrl.topicSummaries.slice(0, ctrl.itemsPerPage);
             ctrl.currentCount = ctrl.topicSummaries.length;
-            ctrl.pageNumber = 0;
+            ctrl.goToPageNumber(0);
           };
 
           ctrl.resetFilters = function() {

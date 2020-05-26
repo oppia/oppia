@@ -45,17 +45,24 @@ angular.module('oppia').directive('topicsList', [
         'topics-list.directive.html'),
       controller: [
         '$scope', '$uibModal', '$rootScope', 'EditableTopicBackendApiService',
-        'AlertsService', 'EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED',
+        'AlertsService', 'UrlInterpolationService',
+        'EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED',
         function(
             $scope, $uibModal, $rootScope, EditableTopicBackendApiService,
-            AlertsService, EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED) {
+            AlertsService, UrlInterpolationService,
+            EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED) {
           var ctrl = this;
           /**
            * @param {String} topicId - ID of the topic.
            * @returns {String} Url of the topic editor with the
-           * topic iD provided in the args.
+           * topic ID provided in the args.
            */
           ctrl.getTopicEditorUrl = function(topicId) {
+            var TOPIC_EDITOR_URL_TEMPLATE = '/topic_editor/<topic_id>';
+            UrlInterpolationService.interpolateUrl(
+              TOPIC_EDITOR_URL_TEMPLATE, {
+                topic_id: topicId
+              });
             return '/topic_editor/' + topicId;
           };
 

@@ -21,25 +21,25 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 export class NewlyCreatedTopic {
-    name: string;
-    category: string;
-    description: string;
-    /**
-     * @param {String} category - category of the topic
-     * @param {String} name - name of the topic
-     * @param {String} description - description of the topic
-     */
-    constructor(category, name, description) {
-      this.category = category;
-      this.name = name;
-      this.description = description;
-    }
-    /**
-     * @returns {Boolean} - A boolean indicating if the topic is valid
-     */
-    isValid(): boolean {
-      return !(!this.name || !this.category || !this.description);
-    }
+  name: string;
+  category: string;
+  description: string;
+  /**
+   * @param {String} category - category of the topic
+   * @param {String} name - name of the topic
+   * @param {String} description - description of the topic
+   */
+  constructor(category, name, description) {
+    this.category = category;
+    this.name = name;
+    this.description = description;
+  }
+  /**
+   * @returns {Boolean} - A boolean indicating if the topic is valid
+   */
+  isValid(): boolean {
+    return !(!this.name || !this.category || !this.description);
+  }
 }
 
 @Injectable({

@@ -242,10 +242,10 @@ describe('Topics and Skills Dashboard Page', function() {
     const filterObject = (
       TopicsAndSkillsDashboardFilterObjectFactory.createDefault());
     expect(ctrl.filterObject).toEqual(filterObject);
-    ctrl.filterObject.sort = 'sort1';
+    ctrl.filterObject.sort = 'Newly Created';
     ctrl.filterObject.keyword = 'keyword1';
     ctrl.filterObject.category = 'category1';
-    ctrl.filterObject.status = 'status1';
+    ctrl.filterObject.status = 'Published';
     ctrl.resetFilters();
     expect(ctrl.filterObject).toEqual(filterObject);
   });
