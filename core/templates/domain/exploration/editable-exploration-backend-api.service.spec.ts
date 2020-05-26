@@ -271,4 +271,32 @@ describe('Editable exploration backend API service', function() {
       expect(ReadOnlyExplorationBackendApiService.isCached('0')).toBe(false);
     }
   );
+
+  it('should use the rejection handler if the backend request failed',
+    function() {
+      var successHandler = jasmine.createSpy('success');
+      var failHandler = jasmine.createSpy('fail');
+
+      var exploration = null;
+
+      $httpBackend.expect('GET', '/createhandler/data/0')
+        .respond(sampleDataResults);
+
+      EditableExplorationBackendApiService.fetchExploration('0')
+        .then(function(data) {
+          exploration = data;
+        });
+      $httpBackend.flush();
+
+      $httpBackend.expect('DELETE', '/createhandler/data/0').respond(
+        500, 'Error deleting exploration 1.');
+      EditableExplorationBackendApiService
+        .deleteExploration(exploration.exploration_id)
+        .then(successHandler, failHandler);
+      $httpBackend.flush();
+
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith('Error deleting exploration 1.');
+    }
+  );
 });
