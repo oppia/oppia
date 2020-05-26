@@ -53,6 +53,25 @@ SCHEMA_TYPE_INT = 'int'
 SCHEMA_TYPE_LIST = 'list'
 SCHEMA_TYPE_UNICODE = 'unicode'
 
+OPERATOR_PRECEDENCE = {
+    '+': 1,
+    '-': 1, # Binary subtraction.
+    '~': 1, # Unary negation.
+    '*': 2,
+    '/': 2,
+    '^': 3
+}
+
+GREEK_LETTERS = {
+    'alpha': 'a',
+    'beta': 'b',
+    'gamma': 'c',
+    'delta': 'd',
+    'epsilon': 'e',
+    'pi': 'p',
+    'omega': 'o',
+}
+
 
 def normalize_against_schema(obj, schema, apply_custom_validators=True):
     """Validate the given object using the schema, normalizing if necessary.
@@ -185,6 +204,29 @@ def get_validator(validator_id):
     return _Validators.get(validator_id)
 
 
+def is_numeric_operand(string):
+    """Checks if the given string represents a valid number.
+
+    Args:
+        string: str. The operand to be validated.
+
+    Returns:
+        bool. Whether the given string is a valid numeric operand.
+    """
+    try:
+        float(string)
+        return True
+    except ValueError:
+        return False
+
+
+# Given string must be a singular english alphabet or a valid greek letter.
+IS_ALGEBRAIC_OPERAND = lambda string: (
+    (string.isalpha() and len(string) == 1) or string in GREEK_LETTERS.keys())
+
+IS_OPERAND = lambda c: is_numeric_operand(c) or IS_ALGEBRAIC_OPERAND(c)
+
+
 def contains_balanced_brackets(expression):
     """Checks if the given expression contains a balanced bracket sequence.
 
@@ -207,6 +249,159 @@ def contains_balanced_brackets(expression):
             if openers.index(top_element) != closers.index(character):
                 return False
     return len(stack) == 0
+
+
+def tokenize(expression):
+    """Tokenizes the given math expression into separate components.
+
+    Args:
+        expression: str. A math expression (algebraic/numeric).
+
+    Returns:
+        list. A list of tokens present in the expression.
+    """
+
+    # Removing whitespace.
+    expression = expression.replace(' ', '')
+
+    # Replacing greek letters with corresponding symbols.
+    for letter in GREEK_LETTERS:
+        expression = expression.replace(letter, GREEK_LETTERS[letter])
+
+    # Replacing all parenthesis with () since once the balance is validated, the
+    # type of parenthesis makes no difference for syntactic validation.
+    expression = expression.replace('{', '(')
+    expression = expression.replace('}', ')')
+    expression = expression.replace('[', '(')
+    expression = expression.replace(']', ')')
+
+    tokens = []
+
+    i = 0
+    while i < len(expression):
+        current_token = []
+        # If character is a numeric operand, add all following numbers to the
+        # current token.
+        while is_numeric_operand(expression[i]) or expression[i] == '.':
+            current_token.append(expression[i])
+            i += 1
+            if i == len(expression):
+                break
+
+        if len(current_token) != 0:
+            tokens.append(''.join(current_token))
+        else:
+            if IS_ALGEBRAIC_OPERAND(expression[i]):
+                tokens.append(expression[i])
+            else:
+                # This is required to signify the distinction between the unary
+                # negation operation and the binary subtraction operation.
+                # For unary negation: The negative sign must be followed by an
+                # operand and preceded by a '(' or must be the first character.
+                # otherwise its binary subtraction.
+                if expression[i] == '-' and i < len(expression) - 1:
+                    if (i == 0 or expression[i - 1] == '(') and IS_OPERAND(
+                            expression[i + 1]):
+                        tokens.append('~')
+                    else:
+                        tokens.append('-')
+                else:
+                    tokens.append(expression[i])
+            i += 1
+
+    return tokens
+
+
+def infix_to_postfix(expression):
+    """Converts the given infix notation to postfix using the
+    Shunting-Yard algorithm. This function expects the given expression to have
+    valid bracket sequence.
+
+    Args:
+        expression: str. A math expression (algebraic/numeric).
+
+    Returns:
+        list. The postfix notation of the given expression.
+    """
+    postfix_expression, stack = [], []
+
+    tokens = tokenize(expression)
+
+    for token in tokens:
+        if IS_OPERAND(token):
+            postfix_expression.append(token)
+        elif token in OPERATOR_PRECEDENCE.keys():
+            while True:
+                if len(stack) == 0:
+                    stack.append(token)
+                    break
+
+                top_char = stack[-1]
+
+                if top_char == '(':
+                    stack.append(token)
+                    break
+                else:
+                    if OPERATOR_PRECEDENCE[token] > OPERATOR_PRECEDENCE[
+                            top_char]:
+                        stack.append(token)
+                        break
+                    else:
+                        postfix_expression.append(stack.pop())
+        elif token == '(':
+            stack.append(token)
+        elif token == ')':
+            top_char = stack.pop()
+            while top_char != '(':
+                postfix_expression.append(top_char)
+                top_char = stack.pop()
+        else:
+            # The token is invalid.
+            return ['Invalid expression.']
+
+    while len(stack):
+        postfix_expression.append(stack.pop())
+
+    return postfix_expression
+
+
+def is_valid_postfix_expression(tokenized_expression):
+    """Checks if the given postfix expression is syntactically valid.
+    Evaluates the expression based on the operators present. For every operator,
+    there must be at least two operands preceding it, except with the unary
+    negation operator which requires at least one operand preceding it.
+
+    Args:
+        tokenized_expression: list. Tokenized postfix notation of the
+            math expression.
+
+    Returns:
+        bool. Whether the given postfix notation is syntactically valid.
+    """
+    if tokenized_expression == ['Invalid expression.']:
+        return False
+
+    stack = []
+
+    for token in tokenized_expression:
+        if IS_OPERAND(token):
+            stack.append(token)
+        else:
+            # If operator is unary negation, there must be at least one operand
+            # in the stack, otherwise there must be at least two, both of which
+            # will be replaced by the result of their operation with the
+            # operand.
+            if token == '~':
+                if len(stack) < 1:
+                    return False
+            else:
+                if len(stack) < 2:
+                    return False
+                stack.pop()
+                stack[-1] = 'X'
+
+    # In the end, the stack should only contain the resultant value, an operand.
+    return len(stack) == 1 and stack[0].isalnum()
 
 
 class Normalizers(python_utils.OBJECT):
@@ -413,9 +608,10 @@ class _Validators(python_utils.OBJECT):
         return bool(re.search(r'^[\w\.\+\-]+\@[\w]+\.[a-z]{2,3}$', obj))
 
     @staticmethod
-    def is_valid_expression(obj, algebraic=True):
+    def is_valid_asciimath_expression(obj, algebraic=True):
         """Checks if the given  obj(a string) represents a valid algebraic or
-        numeric expression.
+        numeric expression. The expression should be in the ASCIIMath format.
+        More info: http://asciimath.org/
 
         Args:
             obj: str. The given expression.
@@ -425,13 +621,12 @@ class _Validators(python_utils.OBJECT):
         Returns:
             bool. Whether the given object is a valid expression.
         """
-        valid_characters = '+-/*^.'
-        valid_brackets = '({[]})'
 
-        # Expression should not contain invalid characters.
+        # Expression should not contain any invalid characters.
         for character in obj:
-            if character not in valid_characters + valid_brackets and not bool(
-                    re.match(r'[a-zA-Z0-9]', character)):
+            if not bool(re.match(
+                    r'(\s|\d|\w|\.|\(|\)|\{|\}|\[|\]|\-|\+|\*|\/|\^)',
+                    character)):
                 return False
 
         # Algebraic expressions should contain at least one latin letter and
@@ -447,32 +642,29 @@ class _Validators(python_utils.OBJECT):
         if not contains_balanced_brackets(obj):
             return False
 
-        # Expression should not contain multiple operators consecutively.
-        for i in python_utils.RANGE(1, len(obj)):
-            if obj[i] in valid_characters and obj[i - 1] in valid_characters:
-                return False
+        # Expression should be syntactically valid.
+        postfix_expression = infix_to_postfix(obj)
+        return is_valid_postfix_expression(postfix_expression)
 
-        return True
 
     @staticmethod
-    def is_each_element_a_single_latin_letter(obj):
+    def contains_valid_latin_letters(obj):
         """Returns True iff all elements of the given object (a list) are
-        singular latin letters (uppercase or lowercase).
+        valid latin letters.
 
         Args:
             obj: list(*). A list of strings.
 
         Returns:
-            bool. Whether the given object has all latin letters.
+            bool. Whether the given object contains valid latin letters.
         """
-        for elem in obj:
-            if not bool(re.search(r'[a-zA-Z]+', elem)) or len(elem) != 1:
-                return False
-        return True
+        return all(IS_ALGEBRAIC_OPERAND(elem) for elem in obj)
 
     @staticmethod
     def is_valid_math_equation(obj):
         """Checks if the given  obj(a string) represents a valid math equation.
+        The expression should be in the ASCIIMath format.
+        More info: http://asciimath.org/
 
         Args:
             obj: str. A string.
@@ -483,15 +675,19 @@ class _Validators(python_utils.OBJECT):
         if obj.count('=') != 1:
             return False
 
-        is_valid_expression = get_validator('is_valid_expression')
+        is_valid_asciimath_expression = get_validator(
+            'is_valid_asciimath_expression')
         lhs, rhs = obj.split('=')
 
         # Both sides have to be valid expressions and at least one of them has
         # to be a valid algebraic expression.
-        if is_valid_expression(lhs) and is_valid_expression(rhs):
+        if is_valid_asciimath_expression(lhs) and is_valid_asciimath_expression(
+                rhs):
             return True
-        if is_valid_expression(lhs) and is_valid_expression(rhs, False):
+        if is_valid_asciimath_expression(lhs) and is_valid_asciimath_expression(
+                rhs, False):
             return True
-        if is_valid_expression(lhs, False) and is_valid_expression(rhs):
+        if is_valid_asciimath_expression(lhs, False) and (
+                is_valid_asciimath_expression(rhs)):
             return True
         return False

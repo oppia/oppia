@@ -1048,7 +1048,7 @@ class AlgebraicExpression(BaseObject):
     SCHEMA = {
         'type': 'unicode',
         'validators': [{
-            'id': 'is_valid_expression',
+            'id': 'is_valid_asciimath_expression',
             'algebraic': True
         }]
     }
@@ -1068,7 +1068,7 @@ class SetOfPlaceholders(BaseObject):
         'validators': [{
             'id': 'is_uniquified'
         }, {
-            'id': 'is_each_element_a_single_latin_letter'
+            'id': 'contains_valid_latin_letters'
         }]
     }
 
