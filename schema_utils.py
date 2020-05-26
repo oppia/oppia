@@ -391,10 +391,7 @@ def is_valid_postfix_expression(tokenized_expression):
             # in the stack, otherwise there must be at least two, both of which
             # will be replaced by the result of their operation with the
             # operand.
-            if token == '~':
-                if len(stack) < 1:
-                    return False
-            else:
+            if token != '~':
                 if len(stack) < 2:
                     return False
                 stack.pop()
