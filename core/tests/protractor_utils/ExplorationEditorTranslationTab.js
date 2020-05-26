@@ -32,17 +32,26 @@ var ExplorationEditorTranslationTab = function() {
     // If the translation welcome modal shows up, exit it.
     var isVisible = await translationWelcomeModal.isPresent();
     if (isVisible) {
-      await waitFor.visibilityOf(
-        dismissWelcomeModalButton, 'Welcome modal not becoming visible');
-      await waitFor.elementToBeClickable(
-        dismissWelcomeModalButton,
-        'Welcome modal is taking too long to appear');
-      await dismissWelcomeModalButton.click();
+      try {
+        await waitFor.visibilityOf(
+          dismissWelcomeModalButton, 'Welcome modal not becoming visible');
+        await waitFor.elementToBeClickable(
+          dismissWelcomeModalButton,
+          'Welcome modal is taking too long to appear');
+        await dismissWelcomeModalButton.click();
+        await waitFor.invisibilityOf(
+          translationWelcomeModal,
+          'Translation welcome modal takes too long to disappear');
+      } catch (e) {
+        // Since the welcome modal appears only once, the wait for its
+        // visibilty will only resolve once and timeout the other times.
+        // This is just an empty error function to catch the timeouts that
+        // happen when the the welcome modal has been dismissed once. If
+        // this is not present then protractor uses the default error
+        // function which is not appropriate in this case as this is not an
+        // error.
+      }
     }
-
-    await waitFor.invisibilityOf(
-      translationWelcomeModal,
-      'Translation welcome modal takes too long to disappear');
 
     // Otherwise, if the translation tutorial shows up, exit it.
     var buttons = element.all(by.css('.skipBtn'));
@@ -61,9 +70,9 @@ var ExplorationEditorTranslationTab = function() {
     await waitFor.elementToBeClickable(
       await finishTutorialButton.first(),
       'Finish Tutorial Stage button is not clickable');
-    var buttons = await finishTutorialButton;
-    if (buttons.length === 1) {
-      await buttons[0].click();
+    var buttons = finishTutorialButton;
+    if (await buttons.count() === 1) {
+      await (await buttons.get(0)).click();
     } else {
       throw new Error('There is more than 1 Finish button!');
     }
@@ -88,9 +97,9 @@ var ExplorationEditorTranslationTab = function() {
       await waitFor.elementToBeClickable(
         await nextTutorialStageButton.first(),
         'Next Tutorial Stage button is not clickable');
-      var buttons = await nextTutorialStageButton;
-      if (buttons.length === 1) {
-        await buttons[0].click();
+      var buttons = nextTutorialStageButton;
+      if (await buttons.count() === 1) {
+        await (await buttons.get(0)).click();
         await waitFor.invisibilityOf(
           tutorialTabHeadingElement,
           'Tutorial stage takes too long to disappear');
@@ -233,7 +242,7 @@ var ExplorationEditorTranslationTab = function() {
     await waitFor.visibilityOf(
       audioUploadInput,
       'Audio upload input field is not visible');
-    return audioUploadInput.sendKeys(absPath);
+    await audioUploadInput.sendKeys(absPath);
   };
 
   this.saveAudioRecord = async function() {
@@ -360,11 +369,6 @@ var ExplorationEditorTranslationTab = function() {
   this._isAudioPlaying = async function() {
     var firstValue = await audioMaterialSliderDiv.getAttribute(
       'aria-valuenow');
-    firstValue = await new Promise(function(resolve, reject) {
-      setTimeout(function() {
-        resolve(firstValue);
-      }, 2000);
-    });
     var secondValue = await audioMaterialSliderDiv.getAttribute(
       'aria-valuenow');
     if (firstValue && secondValue) {
@@ -521,8 +525,8 @@ var ExplorationEditorTranslationTab = function() {
 
   this.moveToState = async function(targetName) {
     await general.scrollToTop();
-    var listOfNames = await stateNodes.map(function(stateElement) {
-      return stateNodeLabel(stateElement).getText();
+    var listOfNames = await stateNodes.map(async function(stateElement) {
+      return await stateNodeLabel(stateElement).getText();
     });
     var matched = false;
     for (var i = 0; i < listOfNames.length; i++) {

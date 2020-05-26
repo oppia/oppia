@@ -149,7 +149,7 @@ var LearnerDashboardPage = function() {
   this.expectTitleOfExplorationSummaryTileToMatch = async function(title) {
     // This explorationTitleArray is an Array but it will have only one element
     // that is the exploration with the title passed as a parameter
-    var explorationTitleArray = element.all(
+    var explorationTitleArray = await element.all(
       by.css('.protractor-test-exp-summary-tile-title')).filter(
       async function(elem) {
         var text = await elem.getText();

@@ -28,7 +28,7 @@ var customizeComponent = async function(modal, tabArray) {
   await listEditor.setLength(tabArray.length);
   for (var i = 0; i < tabArray.length; i++) {
     var dictionaryEditor = await listEditor.editItem(i, 'Dictionary');
-    unicodeEditor = await dictionaryEditor.editEntry(0, 'UnicodeString');
+    var unicodeEditor = await dictionaryEditor.editEntry(0, 'UnicodeString');
     await unicodeEditor.setValue(tabArray[i].title);
     var richTextEditor = await dictionaryEditor.editEntry(1, 'RichText');
     await richTextEditor.clear();
@@ -37,16 +37,17 @@ var customizeComponent = async function(modal, tabArray) {
 };
 
 var expectComponentDetailsToMatch = async function(elem, tabArray) {
-  var titleElems = await elem.element(by.tagName('ul')).all(by.tagName('li'));
-  expect(titleElems.length).toEqual(tabArray.length);
-  var contentElems = await elem.element(by.css('.tab-content'))
-    .all(by.xpath('./*'));
+  var titleElems = elem.element(by.tagName('ul')).all(by.tagName('li'));
+  expect(await titleElems.count()).toEqual(tabArray.length);
+  var contentElems = elem.element(by.css('.tab-content')).all(by.xpath('./*'));
+
   for (var i = 0; i < tabArray.length; i++) {
     // Click on each tab in turn to check its contents
-    expect(await titleElems[i].getText()).toMatch(tabArray[i].title);
-    await titleElems[i].click();
-    await forms.expectRichText(
-      contentElems[i].element(by.css('.protractor-test-tab-content'))
+    expect(await (await titleElems.get(i)).getText()).toMatch(
+      tabArray[i].title);
+    await (await titleElems.get(i)).click();
+    await forms.expectRichText((await contentElems.get(i)).element(
+      by.css('.protractor-test-tab-content'))
     ).toMatch(tabArray[i].content);
   }
 };

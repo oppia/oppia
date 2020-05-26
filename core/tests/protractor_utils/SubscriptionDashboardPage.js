@@ -44,7 +44,7 @@ var SubscriptionDashboardPage = function() {
   };
 
   this.expectSubscriptionCountToEqual = async function(value) {
-    waitFor.visibilityOf(
+    await waitFor.visibilityOf(
       await subscriptionName.first(),
       'Subscriber Name Card takes too long to appear');
     expect(await subscriptionName.count()).toEqual(value);

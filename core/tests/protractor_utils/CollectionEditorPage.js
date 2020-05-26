@@ -70,15 +70,16 @@ var CollectionEditorPage = function() {
       addExplorationButton, 'Unable to find exploration: ' + query);
 
     var matched = false;
-    var dropdownResultElements = await element.all(by.css('.dropdown-menu'));
-    await dropdownResultElements.forEach(
-      async function(dropdownResult) {
-        var dropdownResultText = await dropdownResult.getText();
-        if (dropdownResultText.indexOf(query) >= 0) {
-          await dropdownResult.click();
-          matched = true;
-        }
-      });
+    var dropdownResultElements = element.all(by.css('.dropdown-menu'));
+    var dropdownResultCount = await dropdownResultElements.count();
+    for (var i = 0; i < dropdownResultCount; i++) {
+      var dropdownResult = await dropdownResultElements.get(i);
+      var dropdownResultText = await dropdownResult.getText();
+      if (dropdownResultText.indexOf(query) >= 0) {
+        await dropdownResult.click();
+        matched = true;
+      }
+    }
     if (!matched) {
       // Press Tab to fill in the default result should one appear when
       // none of the answer matches the given query.

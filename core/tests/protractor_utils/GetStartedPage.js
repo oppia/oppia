@@ -23,7 +23,7 @@ var GetStartedPage = function() {
 
   this.get = async function() {
     await browser.get(GET_STARTED_PAGE_URL);
-    return waitFor.pageToFullyLoad();
+    await waitFor.pageToFullyLoad();
   };
 
   this.getMetaTagContent = async function(name, type) {

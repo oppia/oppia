@@ -195,7 +195,7 @@ var AdminPage = function() {
     await waitFor.visibilityOf(element(
       by.css('.protractor-test-unfinished-jobs-card')),
     'Unfinished Jobs taking too long to appear');
-    let unfinishedJobs = unfinishedOffJobIDs.filter(
+    let unfinishedJobs = await unfinishedOffJobIDs.filter(
       async function(element) {
         var text = await element.getText();
         return text.toLowerCase().startsWith(jobName.toLowerCase());
@@ -216,7 +216,7 @@ var AdminPage = function() {
     await updateFormName.sendKeys(name);
     var roleOption = roleSelect.element(
       by.cssContainingText('option', newRole));
-    waitFor.visibilityOf(roleOption, 'Admin role option is not visible');
+    await waitFor.visibilityOf(roleOption, 'Admin role option is not visible');
     await roleOption.click();
     await updateFormSubmit.click();
     await waitFor.visibilityOf(
