@@ -68,6 +68,11 @@ var ExplorationEditorPage = function() {
     .first();
 
   /*
+   * Non-Interactive elements
+   */
+  var loadingModal = element(by.css('.protractor-test-loading-modal'));
+
+  /*
    * Buttons
    */
   var confirmDiscardChangesButton = element(
@@ -215,6 +220,8 @@ var ExplorationEditorPage = function() {
     await saveDiscardToggleButton.click();
     await discardChangesButton.click();
     await confirmDiscardChangesButton.click();
+    await waitFor.invisibilityOf(loadingModal,
+      'Loading modal taking too long to disappear');
     // Expect editor page to completely reload.
     await waitFor.pageToFullyLoad();
   };
