@@ -18,6 +18,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
+import random
 import types
 
 from constants import constants
@@ -427,30 +428,41 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
              questionskilllink_model3, questionskilllink_model4,
              questionskilllink_model5, questionskilllink_model6,
              questionskilllink_model7, questionskilllink_model8])
+        def mock_random_sample(alist, num):
+            if num >= len(alist):
+                return alist
+            alist.sort(key=lambda x: x.question_id)
+            return alist[:num]
+
+        sample_swap = self.swap(random, 'sample', mock_random_sample)
         utils.random.seed(1)
-        question_skill_links_1 = (
-            question_models.QuestionSkillLinkModel.
-            get_question_skill_links_based_on_difficulty_equidistributed_by_skill( # pylint: disable=line-too-long
-                3, ['skill_id1'], 0.6
+        with sample_swap:
+            question_skill_links_1 = (
+                question_models.QuestionSkillLinkModel.
+                get_question_skill_links_based_on_difficulty_equidistributed_by_skill( # pylint: disable=line-too-long
+                    3, ['skill_id1'], 0.6
+                )
             )
-        )
-        utils.random.seed(2)
-        question_skill_links_2 = (
-            question_models.QuestionSkillLinkModel.
-            get_question_skill_links_based_on_difficulty_equidistributed_by_skill( # pylint: disable=line-too-long
-                3, ['skill_id1'], 0.6
-            )
-        )
         self.assertEqual(len(question_skill_links_1), 3)
-        self.assertEqual(len(question_skill_links_2), 3)
         self.assertEqual(
             question_skill_links_1,
-            [questionskilllink_model2, questionskilllink_model4,
-             questionskilllink_model6])
+            [questionskilllink_model1, questionskilllink_model2,
+             questionskilllink_model3])
+
+        sample_swap = self.swap(random, 'sample', mock_random_sample)
+        utils.random.seed(2)
+        with sample_swap:
+            question_skill_links_2 = (
+                question_models.QuestionSkillLinkModel.
+                get_question_skill_links_based_on_difficulty_equidistributed_by_skill( # pylint: disable=line-too-long
+                    3, ['skill_id1'], 0.6
+                )
+            )
+        self.assertEqual(len(question_skill_links_1), 3)
         self.assertEqual(
             question_skill_links_2,
-            [questionskilllink_model2, questionskilllink_model6,
-             questionskilllink_model7])
+            [questionskilllink_model2, questionskilllink_model3,
+             questionskilllink_model4])
         self.assertNotEqual(question_skill_links_1, question_skill_links_2)
 
     def test_request_too_many_skills_raises_error_when_fetch_by_difficulty(
@@ -595,30 +607,40 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
              questionskilllink_model3, questionskilllink_model4,
              questionskilllink_model5, questionskilllink_model6,
              questionskilllink_model7, questionskilllink_model8])
+        def mock_random_sample(alist, num):
+            if num >= len(alist):
+                return alist
+            alist.sort(key=lambda x: x.question_id)
+            return alist[:num]
+
+        sample_swap = self.swap(random, 'sample', mock_random_sample)
         utils.random.seed(1)
-        question_skill_links_1 = (
-            question_models.QuestionSkillLinkModel.
-            get_question_skill_links_equidistributed_by_skill(
-                3, ['skill_id1']
+        with sample_swap:
+            question_skill_links_1 = (
+                question_models.QuestionSkillLinkModel.
+                get_question_skill_links_equidistributed_by_skill(
+                    3, ['skill_id1']
+                )
             )
-        )
-        utils.random.seed(3)
-        question_skill_links_2 = (
-            question_models.QuestionSkillLinkModel.
-            get_question_skill_links_equidistributed_by_skill(
-                3, ['skill_id1']
-            )
-        )
         self.assertEqual(len(question_skill_links_1), 3)
-        self.assertEqual(len(question_skill_links_2), 3)
         self.assertEqual(
             question_skill_links_1,
-            [questionskilllink_model6, questionskilllink_model4,
-             questionskilllink_model2])
+            [questionskilllink_model1, questionskilllink_model2,
+             questionskilllink_model3])
+        sample_swap = self.swap(random, 'sample', mock_random_sample)
+        utils.random.seed(2)
+        with sample_swap:
+            question_skill_links_2 = (
+                question_models.QuestionSkillLinkModel.
+                get_question_skill_links_equidistributed_by_skill(
+                    3, ['skill_id1']
+                )
+            )
+        self.assertEqual(len(question_skill_links_2), 3)
         self.assertEqual(
             question_skill_links_2,
-            [questionskilllink_model4, questionskilllink_model2,
-             questionskilllink_model3])
+            [questionskilllink_model2, questionskilllink_model3,
+             questionskilllink_model4])
         self.assertNotEqual(question_skill_links_1, question_skill_links_2)
 
     def test_request_too_many_skills_raises_error(self):

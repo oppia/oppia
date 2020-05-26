@@ -18,6 +18,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import math
+import random
 
 from constants import constants
 from core.platform import models
@@ -390,7 +391,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
                     new_question_skill_link_models.remove(model)
 
             if len(new_question_skill_link_models) >= question_count_per_skill:
-                new_question_skill_link_models = utils.random.sample(
+                new_question_skill_link_models = random.sample(
                     new_question_skill_link_models, question_count_per_skill)
             else:
                 # Fetch QuestionSkillLinkModels with difficulty smaller than
@@ -409,7 +410,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
                     len(easier_question_skill_link_models) -
                     question_count_per_skill)
                 if question_extra_count >= 0:
-                    easier_question_skill_link_models = utils.random.sample(
+                    easier_question_skill_link_models = random.sample(
                         easier_question_skill_link_models,
                         question_count_per_skill -
                         len(new_question_skill_link_models)
@@ -438,7 +439,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
                         question_count_per_skill)
                     if question_extra_count >= 0:
                         harder_question_skill_link_models = (
-                            utils.random.sample(
+                            random.sample(
                                 harder_question_skill_link_models,
                                 question_count_per_skill -
                                 len(new_question_skill_link_models)
@@ -507,7 +508,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
                 if model.question_id in existing_question_ids:
                     new_question_skill_link_models.remove(model)
             if len(new_question_skill_link_models) > question_count_per_skill:
-                sampled_question_skill_link_models = utils.random.sample(
+                sampled_question_skill_link_models = random.sample(
                     new_question_skill_link_models,
                     question_count_per_skill
                 )
