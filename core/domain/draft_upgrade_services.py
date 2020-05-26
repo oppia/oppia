@@ -183,92 +183,43 @@ class DraftUpgradeUtil(python_utils.OBJECT):
             list(ExplorationChange). The converted draft_change_list.
         """
         for i, change in enumerate(draft_change_list):
-            if change.old_value is not None:
-                if (change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY and
-                        change.property_name ==
-                        exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
-                    draft_change_list[i] = exp_domain.ExplorationChange({
-                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                        'property_name': (
-                            exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS), # pylint: disable=line-too-long
-                        'state_name': change.state_name,
-                        'new_value': (
-                            convert_html_fields_in_draft_change_answer_groups(
-                                change.new_value)),
-                        'old_value': (
-                            convert_html_fields_in_draft_change_answer_groups(
-                                change.old_value))
-                    })
-                elif (change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY and
-                      change.property_name ==
-                      exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS):
-                    draft_change_list[i] = exp_domain.ExplorationChange({
-                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                        'property_name': (
-                            exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS),
-                        'state_name': change.state_name,
-                        'new_value': (
-                            convert_html_fields_in_customization_args(
-                                change.new_value)),
-                        'old_value': (
-                            convert_html_fields_in_customization_args(
-                                change.old_value))
-                    })
-                elif (change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY and
-                      change.property_name ==
-                      exp_domain.STATE_PROPERTY_CONTENT):
-                    draft_change_list[i] = exp_domain.ExplorationChange({
-                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                        'property_name': (
-                            exp_domain.STATE_PROPERTY_CONTENT),
-                        'state_name': change.state_name,
-                        'new_value': (
-                            html_validation_service.
-                            add_math_content_to_math_rte_components(
-                                change.new_value)),
-                        'old_value': (
-                            html_validation_service.
-                            add_math_content_to_math_rte_components(
-                                change.old_value))
-                    })
-            elif change.old_value is None:
-                if (change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY and
-                        change.property_name ==
-                        exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
-                    draft_change_list[i] = exp_domain.ExplorationChange({
-                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                        'property_name': (
-                            exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS), # pylint: disable=line-too-long
-                        'state_name': change.state_name,
-                        'new_value': (
-                            convert_html_fields_in_draft_change_answer_groups(
-                                change.new_value))
-                    })
-                elif (change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY and
-                      change.property_name ==
-                      exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS):
-                    draft_change_list[i] = exp_domain.ExplorationChange({
-                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                        'property_name': (
-                            exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS),
-                        'state_name': change.state_name,
-                        'new_value': (
-                            convert_html_fields_in_customization_args(
-                                change.new_value))
-                    })
-                elif (change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY and
-                      change.property_name ==
-                      exp_domain.STATE_PROPERTY_CONTENT):
-                    draft_change_list[i] = exp_domain.ExplorationChange({
-                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                        'property_name': (
-                            exp_domain.STATE_PROPERTY_CONTENT),
-                        'state_name': change.state_name,
-                        'new_value': (
-                            html_validation_service.
-                            add_math_content_to_math_rte_components(
-                                change.new_value))
-                    })
+            if (change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY and
+                    change.property_name ==
+                    exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
+                draft_change_list[i] = exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name': (
+                        exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS),
+                    'state_name': change.state_name,
+                    'new_value': (
+                        convert_html_fields_in_draft_change_answer_groups(
+                            change.new_value))
+                })
+            elif (change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY and
+                  change.property_name ==
+                  exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS):
+                draft_change_list[i] = exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name': (
+                        exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS),
+                    'state_name': change.state_name,
+                    'new_value': (
+                        convert_html_fields_in_customization_args(
+                            change.new_value))
+                })
+            elif (change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY and
+                  change.property_name ==
+                  exp_domain.STATE_PROPERTY_CONTENT):
+                draft_change_list[i] = exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name': (
+                        exp_domain.STATE_PROPERTY_CONTENT),
+                    'state_name': change.state_name,
+                    'new_value': (
+                        html_validation_service.
+                        add_math_content_to_math_rte_components(
+                            change.new_value))
+                })
         return draft_change_list
 
     @classmethod
