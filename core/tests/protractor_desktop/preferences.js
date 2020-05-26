@@ -31,16 +31,11 @@ describe('Preferences', function() {
     await users.createUser('eve@preferences.com', 'evePreferences');
     await users.login('eve@preferences.com');
     await preferencesPage.get();
-    await waitFor.pageToFullyLoad();
-
-    expect(await preferencesPage.getProfilePhotoSource())
-      .not
-      .toEqual(
-        await preferencesPage.submitProfilePhoto('../data/img.png')
-          .then(async function() {
-            return await preferencesPage.getProfilePhotoSource();
-          })
-      );
+    var defaultProfilePhotoSource = (
+      await preferencesPage.getProfilePhotoSource());
+    await preferencesPage.submitProfilePhoto('../data/img.png');
+    expect(defaultProfilePhotoSource).not.toEqual(
+      await preferencesPage.getProfilePhotoSource());
   });
 
   it('should show an error if uploaded photo is too large', async function() {

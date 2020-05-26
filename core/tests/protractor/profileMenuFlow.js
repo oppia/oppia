@@ -105,7 +105,7 @@ describe('Profile menu flow', function() {
       await learnerDashboardPage.get();
       var profileDropdown = element(by.css(
         '.protractor-test-profile-dropdown'));
-      waitFor.elementToBeClickable(
+      await waitFor.elementToBeClickable(
         profileDropdown, 'Could not click profile dropdown');
       await profileDropdown.click();
 
