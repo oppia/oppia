@@ -25,6 +25,7 @@ import { IWarning, baseInteractionValidationService } from
   'interactions/base-interaction-validation.service';
 import { Outcome } from
   'domain/exploration/OutcomeObjectFactory';
+import { RuleInputTypeFactory } from 'domain/exploration/RuleInputTypeFactory';
 
 import { AppConstants } from 'app.constants';
 
@@ -34,7 +35,8 @@ import { AppConstants } from 'app.constants';
 export class MathExpressionInputValidationService {
   constructor(
       private baseInteractionValidationServiceInstance:
-        baseInteractionValidationService) {}
+        baseInteractionValidationService,
+      private ruleInputTypeFactory: RuleInputTypeFactory) {}
 
   // TODO(#7176): Replace 'any' with the exact type. This has been kept as
   // 'any' because 'customizationArgs' is a dict with possible underscore_cased
@@ -66,7 +68,8 @@ export class MathExpressionInputValidationService {
       var rules = answerGroups[i].rules;
       for (var j = 0; j < rules.length; j++) {
         try {
-          MathExpression.fromLatex(rules[j].inputs.x);
+          MathExpression.fromLatex(this.ruleInputTypeFactory.stringInstance(
+            rules[j].inputs.x));
         } catch (e) {
           warningsList.push({
             type: AppConstants.WARNING_TYPES.CRITICAL,

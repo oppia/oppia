@@ -25,6 +25,7 @@ import { IWarning, baseInteractionValidationService } from
   'interactions/base-interaction-validation.service';
 import { Outcome } from
   'domain/exploration/OutcomeObjectFactory';
+import { RuleInputTypeFactory } from 'domain/exploration/RuleInputTypeFactory';
 
 import { AppConstants } from 'app.constants';
 
@@ -34,7 +35,8 @@ import { AppConstants } from 'app.constants';
 export class GraphInputValidationService {
   constructor(
       private baseInteractionValidationServiceInstance:
-        baseInteractionValidationService) {}
+        baseInteractionValidationService,
+      private ruleInputTypeFactory: RuleInputTypeFactory) {}
 
   VERTICES_LIMIT = 50;
 
@@ -99,11 +101,12 @@ export class GraphInputValidationService {
       var rules = answerGroups[i].rules;
       for (var j = 0; j < rules.length; j++) {
         var rule = rules[j];
+        var gInputs = this.ruleInputTypeFactory.graphInstance(rule.inputs.g);
         try {
           if (rule.type === 'HasGraphProperty') {
             continue;
           } else if (rule.type === 'IsIsomorphicTo' &&
-              rule.inputs.g.vertices.length > ISOMORPHISM_VERTICES_LIMIT) {
+              gInputs.vertices.length > ISOMORPHISM_VERTICES_LIMIT) {
             warningsList.push({
               type: AppConstants.WARNING_TYPES.CRITICAL,
               message: (
@@ -112,7 +115,7 @@ export class GraphInputValidationService {
                 'of ' + ISOMORPHISM_VERTICES_LIMIT +
                 ' for isomorphism check.')
             });
-          } else if (rule.inputs.g.vertices.length > this.VERTICES_LIMIT) {
+          } else if (gInputs.vertices.length > this.VERTICES_LIMIT) {
             warningsList.push({
               type: AppConstants.WARNING_TYPES.CRITICAL,
               message: (

@@ -27,6 +27,7 @@ import { NumericInputValidationService } from
 import { Outcome, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
 import { Rule, RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
+import { RuleInputTypeFactory } from 'domain/exploration/RuleInputTypeFactory';
 
 import { AppConstants } from 'app.constants';
 import { WARNING_TYPES_CONSTANT } from 'app-type.constants';
@@ -44,7 +45,7 @@ describe('NumericInputValidationService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [NumericInputValidationService]
+      providers: [NumericInputValidationService, RuleInputTypeFactory]
     });
 
     validatorService = TestBed.get(NumericInputValidationService);

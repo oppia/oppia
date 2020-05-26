@@ -25,6 +25,7 @@ import { IWarning, baseInteractionValidationService } from
   'interactions/base-interaction-validation.service';
 import { Outcome } from
   'domain/exploration/OutcomeObjectFactory';
+import { RuleInputTypeFactory } from 'domain/exploration/RuleInputTypeFactory';
 
 import { AppConstants } from 'app.constants';
 
@@ -34,7 +35,8 @@ import { AppConstants } from 'app.constants';
 export class ItemSelectionInputValidationService {
   constructor(
       private baseInteractionValidationServiceInstance:
-        baseInteractionValidationService) {}
+        baseInteractionValidationService,
+      private ruleInputTypeFactory: RuleInputTypeFactory) {}
 
   // TODO(#7176): Replace 'any' with the exact type. This has been kept as
   // 'any' because 'customizationArgs' is a dict with possible underscore_cased
@@ -142,7 +144,8 @@ export class ItemSelectionInputValidationService {
       answerGroups.forEach((answerGroup, answerIndex) => {
         var rules = answerGroup.rules;
         rules.forEach((rule, ruleIndex) => {
-          var ruleInputs = rule.inputs.x;
+          var ruleInputs = this.ruleInputTypeFactory.stringArrayInstance(
+            rule.inputs.x);
           ruleInputs.forEach((ruleInput) => {
             var choiceIndex = answerChoiceToIndex[ruleInput];
             if (rule.type === 'Equals') {
@@ -190,7 +193,8 @@ export class ItemSelectionInputValidationService {
     answerGroups.forEach((answerGroup, answerIndex) => {
       var rules = answerGroup.rules;
       rules.forEach((rule, ruleIndex) => {
-        var ruleInputs = rule.inputs.x;
+        var ruleInputs = this.ruleInputTypeFactory.stringArrayInstance(
+          rule.inputs.x);
         ruleInputs.forEach((ruleInput) => {
           if (rule.type === 'IsProperSubsetOf') {
             if (ruleInputs.length < 2) {

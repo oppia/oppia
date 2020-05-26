@@ -27,6 +27,7 @@ import { ItemSelectionInputValidationService } from
 import { Outcome, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
+import { RuleInputTypeFactory } from 'domain/exploration/RuleInputTypeFactory';
 
 import { AppConstants } from 'app.constants';
 
@@ -50,7 +51,7 @@ describe('ItemSelectionInputValidationService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [ItemSelectionInputValidationService]
+      providers: [ItemSelectionInputValidationService, RuleInputTypeFactory]
     });
 
     validatorService = TestBed.get(ItemSelectionInputValidationService);
