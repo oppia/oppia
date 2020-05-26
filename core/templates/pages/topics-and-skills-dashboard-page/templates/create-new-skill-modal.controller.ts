@@ -20,6 +20,9 @@ require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
 
+require('components/entity-creation-services/skill-creation.service.ts');
+require('domain/skill/SkillObjectFactory.ts');
+
 angular.module('oppia').controller('CreateNewSkillModalController', [
   '$controller', '$scope', '$uibModalInstance', 'SkillCreationService',
   'SkillObjectFactory', 'rubrics', 'MAX_CHARS_IN_SKILL_DESCRIPTION',

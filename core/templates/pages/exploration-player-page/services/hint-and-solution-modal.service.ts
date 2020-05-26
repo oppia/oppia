@@ -60,7 +60,7 @@ angular.module('oppia').factory('HintAndSolutionModalService', [
             'pages/exploration-player-page/templates/' +
             'hint-and-solution-modal.template.html'),
           backdrop: 'static',
-          controller: 'DisplayHintModalController'
+          controller: 'DisplaySolutionModalController'
         });
       },
       displaySolutionInterstitialModal: function() {
