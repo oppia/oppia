@@ -16,11 +16,6 @@
  * @fileoverview Directive for the correctness footer in the exploration player.
  */
 
-angular.module('oppia').directive('correctnessFooter', [
-  function() {
-    return {
-      restrict: 'E',
-      scope: {},
-      template: require('./correctness-footer.directive.html')
-    };
-  }]);
+angular.module('oppia').component('correctnessFooter', {
+  template: require('./correctness-footer.directive.html')
+});

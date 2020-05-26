@@ -25,9 +25,3 @@ require(
 require(
   'interactions/EndExploration/directives/' +
   'oppia-interactive-end-exploration.directive.ts');
-require(
-  'interactions/EndExploration/directives/' +
-  'oppia-response-end-exploration.directive.ts');
-require(
-  'interactions/EndExploration/directives/' +
-  'oppia-short-response-end-exploration.directive.ts');

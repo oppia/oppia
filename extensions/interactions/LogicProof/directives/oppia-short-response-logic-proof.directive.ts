@@ -20,20 +20,14 @@ require('filters/string-utility-filters/truncate-at-first-line.filter.ts');
 
 require('services/html-escaper.service.ts');
 
-angular.module('oppia').directive('oppiaShortResponseLogicProof', [
-  'HtmlEscaperService', function(HtmlEscaperService) {
-    return {
-      restrict: 'E',
-      scope: {},
-      bindToController: {},
-      template: require('./logic-proof-short-response.directive.html'),
-      controllerAs: '$ctrl',
-      controller: ['$attrs', function($attrs) {
-        var ctrl = this;
-        ctrl.$onInit = function() {
-          ctrl.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
-        };
-      }]
-    };
-  }
-]);
+angular.module('oppia').component('oppiaShortResponseLogicProof', {
+  template: require('./logic-proof-short-response.directive.html'),
+  controller: [
+    '$attrs', 'HtmlEscaperService',
+    function($attrs, HtmlEscaperService) {
+      var ctrl = this;
+      ctrl.$onInit = function() {
+        ctrl.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
+      };
+    }]
+});

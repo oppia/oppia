@@ -17,16 +17,11 @@
  * editor.
  */
 
-angular.module('oppia').directive('continueButton', [
-  function() {
-    return {
-      restrict: 'E',
-      scope: {
-        onClickContinueButton: '&',
-        isLearnAgainButton: '&',
-        focusLabel: '@'
-      },
-      template: require('./continue-button.directive.html')
-    };
-  }
-]);
+angular.module('oppia').component('continueButton', {
+  bindings: {
+    onClickContinueButton: '&',
+    isLearnAgainButton: '&',
+    focusLabel: '@'
+  },
+  template: require('./continue-button.directive.html')
+});

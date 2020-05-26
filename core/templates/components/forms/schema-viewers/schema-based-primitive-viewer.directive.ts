@@ -16,22 +16,14 @@
  * @fileoverview Directive for a schema-based viewer for primitive types.
  */
 
-require('domain/utilities/url-interpolation.service.ts');
-
-angular.module('oppia').directive('schemaBasedPrimitiveViewer', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
-    return {
-      scope: {
-        localValue: '='
-      },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/forms/schema-viewers/' +
-        'schema-based-primitive-viewer.directive.html'),
-      restrict: 'E',
-      controller: ['$scope', function($scope) {
-        $scope.isExpression = function(value) {
-          return angular.isString(value);
-        };
-      }]
+angular.module('oppia').component('schemaBasedPrimitiveViewer', {
+  bindings: {
+    localValue: '='
+  },
+  template: require('./schema-based-primitive-viewer.directive.html'),
+  controller: ['$scope', function($scope) {
+    $scope.isExpression = function(value) {
+      return angular.isString(value);
     };
-  }]);
+  }]
+});

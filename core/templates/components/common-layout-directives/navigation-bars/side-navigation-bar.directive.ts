@@ -18,22 +18,17 @@
 
 require('domain/utilities/url-interpolation.service.ts');
 
-angular.module('oppia').directive('sideNavigationBar', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
-    return {
-      restrict: 'E',
-      scope: {},
-      bindToController: {},
-      template: require('./side-navigation-bar.directive.html'),
-      controllerAs: '$ctrl',
-      controller: ['$window', function($window) {
-        var ctrl = this;
-        ctrl.getStaticImageUrl = function(imagePath) {
-          return UrlInterpolationService.getStaticImageUrl(imagePath);
-        };
-        ctrl.$onInit = function() {
-          ctrl.currentUrl = $window.location.pathname;
-        };
-      }]
-    };
-  }]);
+angular.module('oppia').component('sideNavigationBar', {
+  template: require('./side-navigation-bar.directive.html'),
+  controller: [
+    '$window', 'UrlInterpolationService',
+    function($window, UrlInterpolationService) {
+      var ctrl = this;
+      ctrl.getStaticImageUrl = function(imagePath) {
+        return UrlInterpolationService.getStaticImageUrl(imagePath);
+      };
+      ctrl.$onInit = function() {
+        ctrl.currentUrl = $window.location.pathname;
+      };
+    }]
+});

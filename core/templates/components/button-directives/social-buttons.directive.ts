@@ -18,19 +18,14 @@
 
 require('domain/utilities/url-interpolation.service.ts');
 
-angular.module('oppia').directive('socialButtons', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
-    return {
-      restrict: 'E',
-      scope: {},
-      bindToController: {},
-      template: require('./social-buttons.directive.html'),
-      controllerAs: '$ctrl',
-      controller: [function() {
-        var ctrl = this;
-        ctrl.getStaticImageUrl = function(imagePath) {
-          return UrlInterpolationService.getStaticImageUrl(imagePath);
-        };
-      }]
-    };
-  }]);
+angular.module('oppia').component('socialButtons', {
+  template: require('./social-buttons.directive.html'),
+  controller: [
+    'UrlInterpolationService',
+    function(UrlInterpolationService) {
+      var ctrl = this;
+      ctrl.getStaticImageUrl = function(imagePath) {
+        return UrlInterpolationService.getStaticImageUrl(imagePath);
+      };
+    }]
+});

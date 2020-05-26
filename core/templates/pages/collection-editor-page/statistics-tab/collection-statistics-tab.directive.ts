@@ -16,18 +16,6 @@
  * @fileoverview Controller for the statistics tab of the collection editor.
  */
 
-require('domain/utilities/url-interpolation.service.ts');
-
-angular.module('oppia').directive('collectionStatisticsTab', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
-    return {
-      restrict: 'E',
-      scope: {},
-      bindToController: {},
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/collection-editor-page/statistics-tab/' +
-        'collection-statistics-tab.directive.html'),
-      controllerAs: '$ctrl',
-      controller: [function() {}]
-    };
-  }]);
+angular.module('oppia').component('collectionStatisticsTab', {
+  template: require('./collection-statistics-tab.directive.html'),
+});

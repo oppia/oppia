@@ -18,20 +18,14 @@
 
 require('services/html-escaper.service.ts');
 
-angular.module('oppia').directive('oppiaResponseLogicProof', [
-  'HtmlEscaperService', function(HtmlEscaperService) {
-    return {
-      restrict: 'E',
-      scope: {},
-      bindToController: {},
-      template: require('./logic-proof-response.directive.html'),
-      controllerAs: '$ctrl',
-      controller: ['$attrs', function($attrs) {
-        var ctrl = this;
-        ctrl.$onInit = function() {
-          ctrl.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
-        };
-      }]
-    };
-  }
-]);
+angular.module('oppia').component('oppiaResponseLogicProof', {
+  template: require('./logic-proof-response.directive.html'),
+  controller: [
+    '$attrs', 'HtmlEscaperService',
+    function($attrs, HtmlEscaperService) {
+      var ctrl = this;
+      ctrl.$onInit = function() {
+        ctrl.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
+      };
+    }]
+});

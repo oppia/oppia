@@ -17,19 +17,6 @@
  * is in production mode.
  */
 
-require('domain/utilities/url-interpolation.service.ts');
-
-angular.module('oppia').directive('adminProdModeActivitiesTab', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
-    return {
-      restrict: 'E',
-      scope: {},
-      bindToController: {},
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/admin-page/activities-tab/' +
-        'admin-prod-mode-activities-tab.directive.html'),
-      controllerAs: '$ctrl',
-      controller: [function() {}]
-    };
-  }
-]);
+angular.module('oppia').component('adminProdModeActivitiesTab', {
+  template: require('./admin-prod-mode-activities-tab.directive.html'),
+});

@@ -16,18 +16,7 @@
  * @fileoverview Controller for the navbar breadcrumb of the collection editor.
  */
 
-require('domain/utilities/url-interpolation.service.ts');
-
-angular.module('oppia').directive('topicsAndSkillsDashboardNavbarBreadcrumb', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
-    return {
-      restrict: 'E',
-      scope: {},
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/topics-and-skills-dashboard-page/navbar/' +
-        'topics-and-skills-dashboard-navbar-breadcrumb.directive.html'),
-      controller: [
-        function() {}
-      ]
-    };
-  }]);
+angular.module('oppia').component('topicsAndSkillsDashboardNavbarBreadcrumb', {
+  template: require(
+    './topics-and-skills-dashboard-navbar-breadcrumb.directive.html'),
+});

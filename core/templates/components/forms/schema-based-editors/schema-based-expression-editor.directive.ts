@@ -16,18 +16,14 @@
  * @fileoverview Directive for a schema-based editor for expressions.
  */
 
-angular.module('oppia').directive('schemaBasedExpressionEditor', [
-  function() {
-    return {
-      scope: {
-        localValue: '=',
-        isDisabled: '&',
-        // TODO(sll): Currently only takes a string which is either 'bool',
-        // 'int' or 'float'. May need to generalize.
-        outputType: '&',
-        labelForFocusTarget: '&'
-      },
-      template: require('./schema-based-expression-editor.directive.html'),
-      restrict: 'E'
-    };
-  }]);
+angular.module('oppia').component('schemaBasedExpressionEditor', {
+  bindings: {
+    localValue: '=',
+    isDisabled: '&',
+    // TODO(sll): Currently only takes a string which is either 'bool',
+    // 'int' or 'float'. May need to generalize.
+    outputType: '&',
+    labelForFocusTarget: '&'
+  },
+  template: require('./schema-based-expression-editor.directive.html'),
+});

@@ -16,18 +16,11 @@
  * @fileoverview Directive for a schema-based editor for booleans.
  */
 
-angular.module('oppia').directive('schemaBasedBoolEditor', [
-  function() {
-    return {
-      restrict: 'E',
-      scope: {},
-      bindToController: {
-        localValue: '=',
-        isDisabled: '&',
-        labelForFocusTarget: '&'
-      },
-      template: require('./schema-based-bool-editor.directive.html'),
-      controllerAs: '$ctrl',
-      controller: [function() {}]
-    };
-  }]);
+angular.module('oppia').component('schemaBasedBoolEditor', {
+  bindings: {
+    localValue: '=',
+    isDisabled: '&',
+    labelForFocusTarget: '&'
+  },
+  template: require('./schema-based-bool-editor.directive.html'),
+});

@@ -19,19 +19,12 @@
 require('components/ck-editor-helpers/ck-editor-4-rte.directive.ts');
 require('components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts');
 
-angular.module('oppia').directive('schemaBasedHtmlEditor', [
-  function() {
-    return {
-      restrict: 'E',
-      scope: {},
-      bindToController: {
-        localValue: '=',
-        isDisabled: '&',
-        labelForFocusTarget: '&',
-        uiConfig: '&'
-      },
-      template: require('./schema-based-html-editor.directive.html'),
-      controllerAs: '$ctrl',
-      controller: [function() {}]
-    };
-  }]);
+angular.module('oppia').component('schemaBasedHtmlEditor', {
+  bindings: {
+    localValue: '=',
+    isDisabled: '&',
+    labelForFocusTarget: '&',
+    uiConfig: '&'
+  },
+  template: require('./schema-based-html-editor.directive.html'),
+});
