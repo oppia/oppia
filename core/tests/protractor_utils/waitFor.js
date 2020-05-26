@@ -46,7 +46,8 @@ var elementToBeClickable = async function(element, errorMessage) {
  */
 var invisibilityOf = async function(element, errorMessage) {
   await browser.wait(
-    until.invisibilityOf(element), DEFAULT_WAIT_TIME_MSECS, errorMessage);
+    await until.invisibilityOf(element),
+    DEFAULT_WAIT_TIME_MSECS, errorMessage);
 };
 
 /**
