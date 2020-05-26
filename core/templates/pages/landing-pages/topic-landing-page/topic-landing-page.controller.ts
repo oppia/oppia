@@ -41,87 +41,59 @@ angular.module('oppia').directive('topicLandingPage', [
       controller: [
         '$filter', '$timeout', 'PageTitleService',
         'SiteAnalyticsService', 'UrlInterpolationService', 'WindowRef',
-        'TOPIC_LANDING_PAGE_DATA',
+        'LESSON_QUALITIES_DATA', 'TOPIC_LANDING_PAGE_DATA',
         function(
             $filter, $timeout, PageTitleService,
             SiteAnalyticsService, UrlInterpolationService, WindowRef,
-            TOPIC_LANDING_PAGE_DATA) {
+            LESSON_QUALITIES_DATA, TOPIC_LANDING_PAGE_DATA) {
           var ctrl = this;
-          var pathArray, topic, topicData, landingPageData, assetsPathFormat;
-          var getImageData = function(index) {
-            var imageKey = 'image_' + index;
-            if (landingPageData[imageKey]) {
-              var imagePath = UrlInterpolationService.interpolateUrl(
-                angular.copy(assetsPathFormat), {
-                  subject: ctrl.subject,
-                  topic: topic,
-                  file_name: landingPageData[imageKey].file_name
-                });
-              return {
-                src: UrlInterpolationService.getStaticImageUrl(imagePath),
-                alt: landingPageData[imageKey].alt
-              };
-            }
-          };
+          var topicData = null;
 
-          ctrl.getVideoUrl = function() {
-            if (landingPageData && landingPageData.video) {
-              var videoPath = UrlInterpolationService.interpolateUrl(
-                angular.copy(assetsPathFormat), {
-                  subject: ctrl.subject,
-                  topic: topic,
-                  file_name: landingPageData.video
-                });
-              return UrlInterpolationService.getStaticVideoUrl(videoPath);
-            } else {
-              throw new Error(
-                'There is no video data available for this landing page.');
-            }
+          ctrl.getLessonQualityImageSrc = function(filename) {
+            return UrlInterpolationService.getStaticImageUrl(
+              UrlInterpolationService.interpolateUrl(
+                '/landing/<filename>', {filename: filename}));
           };
 
           ctrl.onClickGetStartedButton = function() {
-            var collectionId = topicData.collection_id;
+            var collectionId = topicData.collectionId;
             SiteAnalyticsService.registerOpenCollectionFromLandingPageEvent(
               collectionId);
             $timeout(function() {
               WindowRef.nativeWindow.location = UrlInterpolationService
-                .interpolateUrl('/collection/<collection_id>', {
-                  collection_id: collectionId
+                .interpolateUrl('/collection/<collectionId>', {
+                  collectionId: collectionId
                 });
             }, 150);
           };
 
           ctrl.onClickLearnMoreButton = function() {
             $timeout(function() {
-              WindowRef.nativeWindow.location = '/';
-            }, 150);
-          };
-
-          ctrl.onClickExploreLessonsButton = function() {
-            $timeout(function() {
               WindowRef.nativeWindow.location = '/library';
             }, 150);
           };
-          ctrl.$onInit = function() {
-            pathArray = WindowRef.nativeWindow.location.pathname.split('/');
-            ctrl.subject = pathArray[1];
-            topic = pathArray[2];
-            topicData = TOPIC_LANDING_PAGE_DATA[ctrl.subject][topic];
-            landingPageData = topicData.page_data;
-            ctrl.topicTitle = topicData.topic_title;
-            ctrl.lessons = landingPageData.lessons;
-            assetsPathFormat = '/landing/<subject>/<topic>/<file_name>';
 
+          ctrl.$onInit = function() {
+            var pathArray = WindowRef.nativeWindow.location.pathname.split('/');
+            var subjectName = pathArray[1];
+            var topicName = pathArray[2];
+            topicData = TOPIC_LANDING_PAGE_DATA[subjectName][topicName];
+            ctrl.topicTitle = topicData.topicTitle;
+            ctrl.lessonsQualities = LESSON_QUALITIES_DATA;
+            ctrl.lessonsInDevicesImageSrc = (
+              UrlInterpolationService.getStaticImageUrl(
+                UrlInterpolationService.interpolateUrl(
+                  '/landing/<subject>/<topic>/<filename>', {
+                    subject: subjectName,
+                    topic: topicName,
+                    filename: 'lesson_in_devices.png'
+                  })));
             var pageTitle = (
               ctrl.topicTitle + ' | ' +
-              (topicData.topic_tagline.length !== 0 ?
-                topicData.topic_tagline + ' | ' : '') +
+              (topicData.topicTagline.length !== 0 ?
+                topicData.topicTagline + ' | ' : '') +
               'Oppia');
             PageTitleService.setPageTitle(pageTitle);
-            ctrl.bookImageUrl = UrlInterpolationService.getStaticImageUrl(
-              '/splash/books.svg');
-            ctrl.image1 = getImageData(1);
-            ctrl.image2 = getImageData(2);
           };
         }
       ]

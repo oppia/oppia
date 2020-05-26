@@ -25,4 +25,6 @@ import { TopicLandingPageConstants } from
 // AVAILABLE_LANDING_PAGES constant defined in feconf.py file.
 
 angular.module('oppia').constant(
+  'LESSON_QUALITIES_DATA', TopicLandingPageConstants.LESSON_QUALITIES_DATA);
+angular.module('oppia').constant(
   'TOPIC_LANDING_PAGE_DATA', TopicLandingPageConstants.TOPIC_LANDING_PAGE_DATA);
