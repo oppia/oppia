@@ -48,11 +48,8 @@ describe('Preferences', function() {
     await users.login('lou@preferences.com');
     await preferencesPage.get();
     await waitFor.pageToFullyLoad();
-    await preferencesPage.uploadProfilePhoto(
-      '../data/dummyLargeImage.jpg')
-      .then(async function() {
-        await preferencesPage.expectUploadError();
-      });
+    await preferencesPage.uploadProfilePhoto('../data/dummyLargeImage.jpg');
+    await preferencesPage.expectUploadError();
   });
 
   it('should change editor role email checkbox value', async function() {

@@ -47,7 +47,7 @@ describe('Full exploration editor', function() {
   var creatorDashboardPage = null;
   var libraryPage = null;
 
-  beforeAll(async function() {
+  beforeAll(function() {
     adminPage = new AdminPage.AdminPage();
     collectionEditorPage = new CollectionEditorPage.CollectionEditorPage();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
