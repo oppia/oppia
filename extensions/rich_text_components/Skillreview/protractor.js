@@ -30,7 +30,7 @@ var customizeComponent = async function(modal, text, skillDescription) {
 };
 
 var expectComponentDetailsToMatch = async function(elem, text, reviewMaterial) {
-  var link = await elem.element(by.tagName('a'));
+  var link = elem.element(by.tagName('a'));
   expect(await link.getText()).toBe(text);
   await link.click();
   await forms.expectRichText(

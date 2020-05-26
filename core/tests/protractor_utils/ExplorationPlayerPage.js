@@ -255,11 +255,11 @@ var ExplorationPlayerPage = function() {
   };
 
   this.rateExploration = async function(ratingValue) {
-    var elements = await ratingStars;
+    var elements = ratingStars;
     await waitFor.elementToBeClickable(
-      elements[ratingValue - 1],
+      await elements.get(ratingValue - 1),
       'Rating Star takes too long to be clickable');
-    await elements[ratingValue - 1].click();
+    await (await elements.get(ratingValue - 1)).click();
     await waitFor.elementToBeClickable(
       feedbackCloseButton, 'Close Feedback button is not clickable');
     await feedbackCloseButton.click();

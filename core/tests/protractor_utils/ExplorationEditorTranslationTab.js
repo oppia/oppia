@@ -61,9 +61,9 @@ var ExplorationEditorTranslationTab = function() {
     await waitFor.elementToBeClickable(
       await finishTutorialButton.first(),
       'Finish Tutorial Stage button is not clickable');
-    var buttons = await finishTutorialButton;
-    if (buttons.length === 1) {
-      await buttons[0].click();
+    var buttons = finishTutorialButton;
+    if (await buttons.count() === 1) {
+      await (await buttons.get(0)).click();
     } else {
       throw new Error('There is more than 1 Finish button!');
     }
@@ -88,9 +88,9 @@ var ExplorationEditorTranslationTab = function() {
       await waitFor.elementToBeClickable(
         await nextTutorialStageButton.first(),
         'Next Tutorial Stage button is not clickable');
-      var buttons = await nextTutorialStageButton;
-      if (buttons.length === 1) {
-        await buttons[0].click();
+      var buttons = nextTutorialStageButton;
+      if (await buttons.count() === 1) {
+        await (await buttons.get(0)).click();
         await waitFor.invisibilityOf(
           tutorialTabHeadingElement,
           'Tutorial stage takes too long to disappear');
@@ -233,7 +233,7 @@ var ExplorationEditorTranslationTab = function() {
     await waitFor.visibilityOf(
       audioUploadInput,
       'Audio upload input field is not visible');
-    return audioUploadInput.sendKeys(absPath);
+    await audioUploadInput.sendKeys(absPath);
   };
 
   this.saveAudioRecord = async function() {
@@ -521,8 +521,8 @@ var ExplorationEditorTranslationTab = function() {
 
   this.moveToState = async function(targetName) {
     await general.scrollToTop();
-    var listOfNames = await stateNodes.map(function(stateElement) {
-      return stateNodeLabel(stateElement).getText();
+    var listOfNames = await stateNodes.map(async function(stateElement) {
+      return await stateNodeLabel(stateElement).getText();
     });
     var matched = false;
     for (var i = 0; i < listOfNames.length; i++) {
