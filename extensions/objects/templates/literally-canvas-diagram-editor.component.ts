@@ -27,7 +27,8 @@ angular.module('oppia').component('literallyCanvasDiagramEditor', {
       const ctrl = this;
       // These max width and height paramameters were determined by manual
       // testing and reference from OUTPUT_IMAGE_MAX_WIDTH_PX in
-      // filepath-editor file.
+      // filepath-editor file so that the created diagram fits the card
+      // content.
       var MAX_DIAGRAM_WIDTH = 491;
       var MAX_DIAGRAM_HEIGHT = 551;
       var DEFAULT_STROKE_WIDTH = 2;
