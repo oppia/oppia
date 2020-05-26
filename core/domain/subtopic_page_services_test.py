@@ -331,7 +331,6 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             subtopic_page.page_contents.to_dict(), expected_page_contents_dict)
 
-
     def test_cannot_migrate_page_contents_to_latest_schema_with_invalid_version(
             self):
         current_schema_version_swap = self.swap(

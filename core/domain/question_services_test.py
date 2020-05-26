@@ -976,7 +976,6 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         self.assertEqual(cust_args['showChoicesInShuffledOrder']['value'], True)
 
     def test_migrate_question_state_from_v33_to_v34(self):
-
         feedback_html = (
             '<p>Feedback</p><oppia-noninteractive-math ' +
             'raw_latex-with-value="&amp;quot;+,-,-,+&amp;quot' +

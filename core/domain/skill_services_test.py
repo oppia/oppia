@@ -1009,8 +1009,7 @@ class SkillMasteryServicesUnitTests(test_utils.GenericTestBase):
             self.SKILL_IDS.remove(skill_id)
         self.assertEqual(arranged_filtered_skill_ids, self.SKILL_IDS)
 
-
-
+        
 class SkillMigrationTests(test_utils.GenericTestBase):
 
     def test_migrate_skill_contents_to_latest_schema(self):
