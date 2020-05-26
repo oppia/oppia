@@ -45,10 +45,11 @@ var ExplorationEditorTranslationTab = function() {
       'Translation welcome modal takes too long to disappear');
 
     // Otherwise, if the translation tutorial shows up, exit it.
-    var buttons = await element.all(by.css('.skipBtn'));
-    if (buttons.length === 1) {
-      await buttons[0].click();
-    } else if (buttons.length !== 0) {
+    var buttons = element.all(by.css('.skipBtn'));
+    if (await buttons.count() === 1) {
+      var skipButton = await button.get(0);
+      await skipButton.click();
+    } else if (await buttons.count() > 1) {
       throw new Error(
         'Expected to find at most one \'exit tutorial\' button');
     }
