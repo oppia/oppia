@@ -18,16 +18,24 @@
 
 describe('LiterallyCanvasDiagramEditor', function() {
   var LCDiagramEditorCtrl = null;
+  var mockLiterallyCanvas = {
+    setImageSize: function(width, height) {
+      var text = 'The updated diagram width is ' + width +
+      ' and height is ' + height;
+      return text;
+    }
+  };
 
   beforeEach(angular.mock.module('oppia'));
 
   beforeEach(angular.mock.inject(function($componentController) {
     LCDiagramEditorCtrl = $componentController('literallyCanvasDiagramEditor');
     var mockDocument = document.createElement('div');
-    mockDocument.setAttribute('id', 'lc');
+    mockDocument.setAttribute('id', LCDiagramEditorCtrl.lcID);
     document.getElementById = jasmine.createSpy(
       'HTML element').and.returnValue(mockDocument);
     LCDiagramEditorCtrl.$onInit();
+    LCDiagramEditorCtrl.lc = mockLiterallyCanvas;
   }));
 
   it('should update diagram size', function() {
@@ -37,18 +45,17 @@ describe('LiterallyCanvasDiagramEditor', function() {
     LCDiagramEditorCtrl.diagramHeight = height;
     LCDiagramEditorCtrl.onWidthInputBlur();
     expect(LCDiagramEditorCtrl.currentDiagramWidth).toBe(100);
-    expect(LCDiagramEditorCtrl.lc.width).toBe(100);
     LCDiagramEditorCtrl.onHeightInputBlur();
     expect(LCDiagramEditorCtrl.currentDiagramHeight).toBe(100);
-    expect(LCDiagramEditorCtrl.lc.height).toBe(100);
   });
 
   it('should return information on diagram size', function() {
     var maxDiagramWidth = 491;
     var maxDiagramHeight = 551;
-    var helpText = 'This diagram has a maximum dimension of ' +
-    maxDiagramWidth + 'px X ' + maxDiagramHeight +
-    'px to ensure that it fits in the card.';
+    var helpText = (
+      'This diagram has a maximum dimension of ' +
+      maxDiagramWidth + 'px X ' + maxDiagramHeight +
+      'px to ensure that it fits in the card.');
     expect(LCDiagramEditorCtrl.getDiagramSizeInfo()).toBe(helpText);
   });
 

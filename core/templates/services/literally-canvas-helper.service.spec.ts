@@ -38,8 +38,8 @@ describe('LiterallyCanvasHelperService', function() {
       id: 'de569866-9c11-b553-f5b7-4194e2380d9f'
     };
     var actualSvgTag = '<rect id="rectangle-de569866-9c11-b553-f5b7-4194e23' +
-    '80d9f" x="143" y="97" width="12" height="29" stroke="hsla(0, 0%, 0%, 1)' +
-    '" fill="hsla(0, 0%, 100%, 1)" stroke-width="1" />';
+    '80d9f" x="143" y="97" width="12" height="29" stroke="hsla(0, 0%, 0%, 1' +
+    ')" fill="hsla(0, 0%, 100%, 1)" stroke-width="1"></rect>';
     var svgTag = null;
     svgTag = (
       LiterallyCanvasHelperService.rectangleSVGRenderer(rectShape)
@@ -58,9 +58,9 @@ describe('LiterallyCanvasHelperService', function() {
       fillColor: 'hsla(0, 0%, 100%, 1)',
       id: '4343fcbf-b1e9-3c6d-fcc8-809c00c6ba9b'
     };
-    var renderedSvgTag = '<ellipse id="ellipse-4343fcbf-b1e9-3c6d-fcc8-' +
-    '809c00c6ba9b" cx="75.5" cy="99.5" rx="15" ry="22" stroke="hsla(0, 0%, ' +
-    '0%, 1)" fill="hsla(0, 0%, 100%, 1)" stroke-width="2" />';
+    var renderedSvgTag = '<ellipse id="ellipse-4343fcbf-b1e9-3c6d-fcc8-809c0' +
+    '0c6ba9b" cx="75.5" cy="99.5" rx="15" ry="22" stroke="hsla(0, 0%, 0%, 1)' +
+    '" fill="hsla(0, 0%, 100%, 1)" stroke-width="2"></ellipse>';
     var svgTag = null;
     svgTag = (
       LiterallyCanvasHelperService.ellipseSVGRenderer(ellipseShape)
@@ -75,8 +75,6 @@ describe('LiterallyCanvasHelperService', function() {
       text: 'hello',
       color: 'hsla(0, 0%, 0%, 1)',
       font: '18px \"Helvetica Neue\",Helvetica,Arial,sans-serif',
-      forcedWidth: 0,
-      forcedHeight: 0,
       v: 1,
       id: '90ee8761-dd62-9d70-b61a-02e6fec487e9'
     };
@@ -89,21 +87,18 @@ describe('LiterallyCanvasHelperService', function() {
       },
       color: 'hsla(0, 0%, 0%, 1)',
       font: '18px \"Helvetica Neue\",Helvetica,Arial,sans-serif',
-      forcedWidth: 15,
-      forcedHeight: 15,
       v: 1,
       id: '90ee8761-dd62-b61a-9d70-02e6fec487e9'
     };
-    var renderedSvgTag1 = '<text id="text-90ee8761-dd62-9d70-b61a-02e6fec' +
-    '487e9" x="72.5" y="142.5"   fill="hsla(0, 0%, 0%, 1)" ' +
-    'style="font: 18px \"Helvetica Neue\",Helvetica,Arial,sans-serif;">' +
-    ' <tspan x="72.5" dy="0" alignment-baseline="text-before-edge"> hello' +
-    ' </tspan> </text>';
+    var renderedSvgTag1 = '<text id="text-90ee8761-dd62-9d70-b61a-02e6fec487' +
+    'e9" x="72.5" y="142.5" fill="hsla(0, 0%, 0%, 1)" style="font: 18px &quo' +
+    't;Helvetica Neue&quot;, Helvetica, Arial, sans-serif;"><tspan x="72.5" ' +
+    'dy="0" alignment-baseline="text-before-edge">hello</tspan></text>';
     var renderedSvgTag2 = '<text id="text-90ee8761-dd62-b61a-9d70-02e6fec487' +
-    'e9" x="72.5" y="142.5" width="15px" height="15px" fill="hsla(0, 0%, 0%,' +
-    ' 1)" style="font: 18px "Helvetica Neue",Helvetica,Arial,sans-serif;"> <' +
-    'tspan x="72.5" dy="0" alignment-baseline="text-before-edge"> hello </ts' +
-    'pan> </text>';
+    'e9" x="72.5" y="142.5" fill="hsla(0, 0%, 0%, 1)"' +
+    ' style="font: 18px &quot;Helvetica Neue&quot;, Helvetica, Arial, sans-s' +
+    'erif;"><tspan x="72.5" dy="0" alignment-baseline="text-before-edge">hel' +
+    'lo</tspan></text>';
     var svgTag = null;
     svgTag = (
       LiterallyCanvasHelperService.textSVGRenderer(textShape1)
@@ -131,15 +126,15 @@ describe('LiterallyCanvasHelperService', function() {
       ],
       id: 'dfee1d2f-4959-8371-b036-a30b2982bb20'
     };
-    var renderedSvgTag = '<g id="line-dfee1d2f-4959-8371-b036-a30b2982bb20"' +
-    ' > <line x1="21" y1="105" x2="44" y2="98" stroke-dasharray="4, 8" strok' +
-    'e-linecap="round" stroke="hsla(0, 0%, 0%, 1)" stroke-width="1" /> <poly' +
-    'gon id="position0" fill="hsla(0, 0%, 0%, 1)" stroke="none" points="20.2' +
-    '7209596054326,102.60831529892785 16.21663059785571,106.45580807891348 2' +
-    '1.72790403945674,107.39168470107215" /><polygon id="position1" fill="hs' +
-    'la(0, 0%, 0%, 1)" stroke="none" points="44.72790403945674,100.391684701' +
-    '07215 48.78336940214429,96.54419192108652 43.27209596054326,95.60831529' +
-    '892785" /> </g>';
+    var renderedSvgTag = '<g id="line-dfee1d2f-4959-8371-b036-a30b2982bb20">' +
+    '<line x1="21" y1="105" x2="44" y2="98" stroke="hsla(0, 0%, 0%, 1)" fill' +
+    '="undefined" stroke-width="1" stroke-linecap="round" stroke-dasharray="' +
+    '4, 8"></line><polygon id="position0" stroke="node" fill="hsla(0, 0%, 0%' +
+    ', 1)" points="20.27209596054326,102.60831529892785 16.21663059785571,10' +
+    '6.45580807891348 21.72790403945674,107.39168470107215"></polygon><polyg' +
+    'on id="position1" stroke="node" fill="hsla(0, 0%, 0%, 1)" points="44.72' +
+    '790403945674,100.39168470107215 48.78336940214429,96.54419192108652 43.' +
+    '27209596054326,95.60831529892785"></polygon></g>';
     var svgTag = null;
     svgTag = (
       LiterallyCanvasHelperService.lineSVGRenderer(lineShape)
@@ -181,7 +176,7 @@ describe('LiterallyCanvasHelperService', function() {
     };
     var renderedSvgTag = '<polyline id="linepath-e09d8a59-88d2-1714-b721-032' +
     'dc017b81d" fill="none" points="57,170 65.5,176.5" stroke="hsla(0, 0%, 0' +
-    '%, 1)" stroke-linecap="round" stroke-width="2" />';
+    '%, 1)" stroke-linecap="round" stroke-width="2"></polyline>';
     var svgTag = null;
     svgTag = (
       LiterallyCanvasHelperService.linepathSVGRenderer(linepathShape)
@@ -258,12 +253,12 @@ describe('LiterallyCanvasHelperService', function() {
     };
     var closedSvgTag = '<polygon id="polygon-closed-89874c6a-1e67-a13d-d4e4-' +
     '6fa1cabbbc58" fill="hsla(0, 0%, 100%, 1)" points="146,108 72.5,174.5 15' +
-    '6,208 220,149" stroke="hsla(0, 0%, 0%, 1)" stroke-width="2" />';
+    '6,208 220,149" stroke="hsla(0, 0%, 0%, 1)" stroke-width="2"></polygon>';
     var openSvgTag = '<g id="polygon-open-89874c6a-1e67-d4e4-a13d-6fa1cabbbc' +
-    '58" > <polyline fill="hsla(0, 0%, 100%, 1)" points="146.5,108.5 72,174 ' +
-    '156,208 220,149" stroke="none" /> <polyline fill="none" points="146.5,1' +
-    '08.5 72,174 156,208 220,149" stroke="hsla(0, 0%, 0%, 1)" stroke-width="' +
-    '2" /> </g>';
+    '58"><polyline fill="hsla(0, 0%, 100%, 1)" points="146.5,108.5 72,174 15' +
+    '6,208 220,149" stroke="none"></polyline><polyline fill="none" points="1' +
+    '46.5,108.5 72,174 156,208 220,149" stroke="hsla(0, 0%, 0%, 1)" stroke-w' +
+    'idth="2"></polyline></g>';
     var svgTag = null;
     svgTag = (
       LiterallyCanvasHelperService.polygonSVGRenderer(closedPolygonShape)
@@ -273,5 +268,10 @@ describe('LiterallyCanvasHelperService', function() {
       LiterallyCanvasHelperService.polygonSVGRenderer(openPolygonShape)
     );
     expect(svgTag).toBe(openSvgTag);
+  });
+
+  it('should fail svg validation', function() {
+    var svgTag = '<svg xmlns="http://www.w3.org/2000/svg" width="450" height="350" viewBox="0 0 450 350"> <rect width="450" height="350" x="0" y="0" fill="transparent" /> <g transform="translate(0, 0)"> <rect id="rectangle-cd0a7974-e7da-d040-90b3-47bc4737a744" x="44" y="55.125" widht="72" height="55" stroke="hsla(0, 0%, 0%, 1)" fill="hsla(0, 0%, 100%, 1)" stroke-width="2"></rect> </g><script src="evil.com"></script> </svg>';
+    expect(LiterallyCanvasHelperService.isSVGTagValid(svgTag)).toBe(false);
   });
 });

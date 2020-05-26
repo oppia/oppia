@@ -25,10 +25,15 @@ angular.module('oppia').component('literallyCanvasDiagramEditor', {
   controller: [
     'LiterallyCanvasHelperService', function(LiterallyCanvasHelperService) {
       const ctrl = this;
+      // These max width and height paramameters were determined by manual
+      // testing and reference from image upload rte.
       var MAX_DIAGRAM_WIDTH = 491;
       var MAX_DIAGRAM_HEIGHT = 551;
       var DEFAULT_STROKE_WIDTH = 2;
-      var STROKE_WIDTH = [1, 2, 3, 5, 30];
+      var ALLOWED_STROKE_WIDTHS = [1, 2, 3, 5, 30];
+      // Dynamically assign a unique id to each lc editor to avoid clashes
+      // when there is multiple rtes in the same page.
+      ctrl.lcID = 'lc' + Math.floor(Math.random() * 100000).toString();
       ctrl.diagramWidth = 450;
       ctrl.currentDiagramWidth = 450;
       ctrl.diagramHeight = 350;
@@ -53,12 +58,13 @@ angular.module('oppia').component('literallyCanvasDiagramEditor', {
       ctrl.getDiagramSizeInfo = function() {
         var maxWidth = MAX_DIAGRAM_WIDTH;
         var maxHeight = MAX_DIAGRAM_HEIGHT;
-        return 'This diagram has a maximum dimension of ' + maxWidth +
-        'px X ' + maxHeight + 'px to ensure that it fits in the card.';
+        return (
+          'This diagram has a maximum dimension of ' + maxWidth +
+          'px X ' + maxHeight + 'px to ensure that it fits in the card.');
       };
 
       ctrl.validate = function(data) {
-        // Will be implemented once data is saved.
+        // TODO(#9357): Will be implemented once data is saved.
         return false;
       };
 
@@ -75,26 +81,28 @@ angular.module('oppia').component('literallyCanvasDiagramEditor', {
           'Polygon', LiterallyCanvasHelperService.polygonSVGRenderer);
         LC.defineSVGRenderer(
           'Text', LiterallyCanvasHelperService.textSVGRenderer);
-        ctrl.lc = LC.init(document.getElementById('lc'), {
-          imageSize: {
-            width: ctrl.diagramWidth, height: ctrl.diagramHeight},
-          imageURLPrefix: '/assets/literallyCanvas/img',
-          toolbarPosition: 'bottom',
-          defaultStrokeWidth: DEFAULT_STROKE_WIDTH,
-          strokeWidths: STROKE_WIDTH,
-          // Eraser tool is removed because svgRenderer has not been
-          // implimented in LiterallyCanvas. Can include once it is
-          // implimented.
-          tools: [
-            LC.tools.Pencil,
-            LC.tools.Line,
-            LC.tools.Ellipse,
-            LC.tools.Rectangle,
-            LC.tools.Text,
-            LC.tools.Polygon,
-            LC.tools.Pan,
-            LC.tools.Eyedropper
-          ]
+        angular.element(document).ready(function() {
+          ctrl.lc = LC.init(document.getElementById(ctrl.lcID), {
+            imageSize: {
+              width: ctrl.diagramWidth, height: ctrl.diagramHeight},
+            imageURLPrefix: '/third_party/static/literallycanvas-0.5.2/lib/img',
+            toolbarPosition: 'bottom',
+            defaultStrokeWidth: DEFAULT_STROKE_WIDTH,
+            strokeWidths: ALLOWED_STROKE_WIDTHS,
+            // Eraser tool is removed because svgRenderer has not been
+            // implemented in LiterallyCanvas. Can include once it is
+            // implemented.
+            tools: [
+              LC.tools.Pencil,
+              LC.tools.Line,
+              LC.tools.Ellipse,
+              LC.tools.Rectangle,
+              LC.tools.Text,
+              LC.tools.Polygon,
+              LC.tools.Pan,
+              LC.tools.Eyedropper
+            ]
+          });
         });
       };
     }

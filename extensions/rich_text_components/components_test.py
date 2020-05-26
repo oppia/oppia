@@ -292,7 +292,7 @@ class ComponentE2eTests(test_utils.GenericTestBase):
                 text_inside_constant = text_inside_constant[
                     text_inside_constant.find(',') + 1:]
 
-        # Disabled for svgeditor, will be removed in second
-        # part of milestone 1 after e2e tests are added.
+        # TODO(#9356): Add svgeditor to validations once the e2e tests for it
+        # is created in the 2nd milestone.
         actual_components.remove('Svgeditor')
         self.assertEqual(set(actual_components), set(rte_components_with_test))

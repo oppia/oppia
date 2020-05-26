@@ -16,6 +16,7 @@
  * @fileoverview LiterallyCanvas editor helper service.
  */
 
+const CONSTANTS = require('constants.ts');
 
 angular.module('oppia').factory('LiterallyCanvasHelperService', [
   function() {
@@ -41,13 +42,44 @@ angular.module('oppia').factory('LiterallyCanvasHelperService', [
         length = length || width;
         const points = getPoints(x, y, angle, width, length);
 
-        return ('<polygon id="' + position + '" fill="' + color + '" ' +
-        'stroke="none" points="' + (points.map(function(p) {
+        var polygon = document.createElement('polygon');
+        var pointsString = points.map(function(p) {
           return p.x + ',' + p.y;
-        }).join(' ')) + '" />');
+        }).join(' ');
+        var attributes = {
+          id: position,
+          stroke: 'node',
+          fill: color,
+          points: pointsString
+        };
+        for (var attrName in attributes) {
+          polygon.setAttribute(attrName, attributes[attrName]);
+        }
+        return polygon;
       }
     };
     return {
+      isSVGTagValid: function(svgString) {
+        var domParser = new DOMParser();
+        var doc = domParser.parseFromString(svgString, 'image/svg+xml');
+        var allowedTags = Object.keys(CONSTANTS.SVG_ATTRS_WHITELIST);
+        var nodeTagName = null;
+        var valid = true;
+        doc.querySelectorAll('*').forEach((node) => {
+          nodeTagName = node.tagName.toLowerCase();
+          if (allowedTags.indexOf(nodeTagName) !== -1) {
+            for (var i = 0; i < node.attributes.length; i++) {
+              if (CONSTANTS.SVG_ATTRS_WHITELIST[nodeTagName].indexOf(
+                node.attributes[i].name.toLowerCase()) === -1) {
+                valid = false;
+              }
+            }
+          } else {
+            valid = false;
+          }
+        });
+        return valid;
+      },
       rectangleSVGRenderer: function(shape) {
         // This function converts a rectangle shape object to the rect tag.
         var height, width, x, x1, x2, y, y1, y2, id;
@@ -64,10 +96,22 @@ angular.module('oppia').factory('LiterallyCanvasHelperService', [
           y += 0.5;
         }
         id = 'rectangle-' + shape.id;
-        return ('<rect id="' + id + '" x="' + x + '" y="' + y + '" width="' +
-        width + '" height="' + height + '" stroke="' + shape.strokeColor +
-        '" fill="' + shape.fillColor + '" stroke-width="' + shape.strokeWidth +
-        '" />');
+        var rect = document.createElement('rect');
+        var attributes = {
+          id: id,
+          x: x,
+          y: y,
+          width: width,
+          height: height,
+          stroke: shape.strokeColor,
+          fill: shape.fillColor,
+        };
+        for (var attrName in attributes) {
+          rect.setAttribute(attrName, attributes[attrName]);
+        }
+        rect.setAttribute('stroke-width', shape.strokeWidth);
+        var rectTag = rect.outerHTML;
+        return this.isSVGTagValid(rectTag) ? rectTag : '';
       },
 
       ellipseSVGRenderer: function(shape) {
@@ -78,19 +122,27 @@ angular.module('oppia').factory('LiterallyCanvasHelperService', [
         centerX = shape.x + halfWidth;
         centerY = shape.y + halfHeight;
         id = 'ellipse-' + shape.id;
-        return ('<ellipse id="' + id + '" cx="' + centerX + '" cy="' +
-        centerY + '" rx="' + (Math.abs(halfWidth)) + '" ry="' +
-        (Math.abs(halfHeight)) + '" stroke="' + shape.strokeColor +
-        '" fill="' + shape.fillColor + '" stroke-width="' + shape.strokeWidth +
-        '" />');
+        var ellipse = document.createElement('ellipse');
+        var attributes = {
+          id: id,
+          cx: centerX,
+          cy: centerY,
+          rx: Math.abs(halfWidth),
+          ry: Math.abs(halfHeight),
+          stroke: shape.strokeColor,
+          fill: shape.fillColor,
+        };
+        for (var attrName in attributes) {
+          ellipse.setAttribute(attrName, attributes[attrName]);
+        }
+        ellipse.setAttribute('stroke-width', shape.strokeWidth);
+        var ellipseTag = ellipse.outerHTML;
+        return this.isSVGTagValid(ellipseTag) ? ellipseTag : '';
       },
 
       lineSVGRenderer: function(shape) {
         // This function converts a line shape object to the line tag.
-        var arrowWidth, capString, dashString, x1, x2, y1, y2, id;
-        dashString = shape.dash ? ('stroke-dasharray="' +
-        (shape.dash.join(', ')) + '"') : '';
-        capString = '';
+        var arrowWidth, x1, x2, y1, y2, id;
         arrowWidth = Math.max(shape.strokeWidth * 2.2, 5);
         x1 = shape.x1;
         x2 = shape.x2;
@@ -102,88 +154,154 @@ angular.module('oppia').factory('LiterallyCanvasHelperService', [
           y1 += 0.5;
           y2 += 0.5;
         }
+        id = 'line-' + shape.id;
+        var g = document.createElement('g');
+        g.setAttribute('id', id);
+        var line = document.createElement('line');
+        var attributes = {
+          x1: x1,
+          y1: y1,
+          x2: x2,
+          y2: y2,
+          stroke: shape.color,
+          fill: shape.fillColor,
+        };
+        for (var attrName in attributes) {
+          line.setAttribute(attrName, attributes[attrName]);
+        }
+        line.setAttribute('stroke-width', shape.strokeWidth);
+        line.setAttribute('stroke-linecap', shape.capStyle);
+        if (shape.dash) {
+          line.setAttribute('stroke-dasharray', shape.dash.join(', '));
+        }
+        g.appendChild(line);
         if (shape.endCapShapes[0]) {
-          capString += arrow.svg(
-            x1, y1, Math.atan2(y1 - y2, x1 - x2),
-            arrowWidth, shape.color, 'position0');
+          g.appendChild(
+            arrow.svg(
+              x1, y1, Math.atan2(y1 - y2, x1 - x2),
+              arrowWidth, shape.color, 'position0'));
         }
         if (shape.endCapShapes[1]) {
-          capString += arrow.svg(
-            x2, y2, Math.atan2(y2 - y1, x2 - x1),
-            arrowWidth, shape.color, 'position1');
+          g.appendChild(
+            arrow.svg(
+              x2, y2, Math.atan2(y2 - y1, x2 - x1),
+              arrowWidth, shape.color, 'position1'));
         }
-        id = 'line-' + shape.id;
-        return ('<g id="' + id + '" > <line x1="' + x1 + '" y1="' + y1 +
-        '" x2="' + x2 + '" y2="' + y2 + '" ' + dashString +
-        ' stroke-linecap="' + shape.capStyle + '" stroke="' + shape.color +
-        '" stroke-width="' + shape.strokeWidth + '" /> ' +
-        capString + ' </g>');
+        var gTag = g.outerHTML;
+        return this.isSVGTagValid(gTag) ? gTag : '';
       },
 
       linepathSVGRenderer: function(shape) {
         // This function converts a linepath shape object to the polyline tag.
         var id = 'linepath-' + shape.id;
-        return ('<polyline id="' + id + '" fill="none" points="' +
-        (shape.smoothedPoints.map(function(p) {
+        var linepath = document.createElement('polyline');
+        var pointsString = shape.smoothedPoints.map(function(p) {
           var offset;
           offset = p.size % 2 === 0 ? 0.0 : 0.5;
           return (p.x + offset) + ',' + (p.y + offset);
-        }).join(' ')) + '" stroke="' + shape.points[0].color +
-        '" stroke-linecap="round" stroke-width="' + shape.points[0].size +
-        '" />');
+        }).join(' ');
+        var attributes = {
+          id: id,
+          fill: 'none',
+          points: pointsString,
+          stroke: shape.points[0].color
+        };
+        for (var attrName in attributes) {
+          linepath.setAttribute(attrName, attributes[attrName]);
+        }
+        linepath.setAttribute('stroke-linecap', 'round');
+        linepath.setAttribute('stroke-width', shape.points[0].size);
+        var linepathTag = linepath.outerHTML;
+        return this.isSVGTagValid(linepathTag) ? linepathTag : '';
       },
 
       polygonSVGRenderer: function(shape) {
         // This function converts a polygon shape object to the polygon tag.
         if (shape.isClosed) {
           var id = 'polygon-closed-' + shape.id;
-          return ('<polygon id="' + id + '" fill="' + shape.fillColor +
-          '" points="' + (shape.points.map(function(p) {
+          var polygon = document.createElement('polygon');
+          var pointsString = shape.points.map(function(p) {
             var offset;
             offset = p.size % 2 === 0 ? 0.0 : 0.5;
             return (p.x + offset) + ',' + (p.y + offset);
-          }).join(' ')) + '" stroke="' + shape.strokeColor +
-          '" stroke-width="' + shape.strokeWidth + '" />');
+          }).join(' ');
+          var attributes = {
+            id: id,
+            fill: shape.fillColor,
+            points: pointsString,
+            stroke: shape.strokeColor,
+          };
+          for (var attrName in attributes) {
+            polygon.setAttribute(attrName, attributes[attrName]);
+          }
+          polygon.setAttribute('stroke-width', shape.strokeWidth);
+          var polygonTag = polygon.outerHTML;
+          return this.isSVGTagValid(polygonTag) ? polygonTag : '';
         } else {
           var id = 'polygon-open-' + shape.id;
-          return ('<g id="' + id + '" > <polyline fill="' + shape.fillColor +
-          '" points="' + (shape.points.map(function(p) {
+          var g = document.createElement('g');
+          g.setAttribute('id', id);
+          var polyline1 = document.createElement('polyline');
+          var polyline2 = document.createElement('polyline');
+          var pointsString = shape.points.map(function(p) {
             var offset;
             offset = p.size % 2 === 0 ? 0.0 : 0.5;
             return (p.x + offset) + ',' + (p.y + offset);
-          }).join(' ')) + '" stroke="none" /> <polyline fill="none" points="' +
-          (shape.points.map(function(p) {
-            var offset;
-            offset = p.size % 2 === 0 ? 0.0 : 0.5;
-            return (p.x + offset) + ',' + (p.y + offset);
-          }).join(' ')) + '" stroke="' + shape.strokeColor +
-          '" stroke-width="' + shape.strokeWidth + '" /> </g>');
+          }).join(' ');
+          var attributes1 = {
+            fill: shape.fillColor,
+            points: pointsString,
+            stroke: 'none'
+          };
+          var attributes2 = {
+            fill: 'none',
+            points: pointsString,
+            stroke: shape.strokeColor,
+          };
+          for (var attrName in attributes1) {
+            polyline1.setAttribute(attrName, attributes1[attrName]);
+          }
+          for (var attrName in attributes2) {
+            polyline2.setAttribute(attrName, attributes2[attrName]);
+          }
+          polyline2.setAttribute('stroke-width', shape.strokeWidth);
+          g.appendChild(polyline1);
+          g.appendChild(polyline2);
+          var gTag = g.outerHTML;
+          return this.isSVGTagValid(gTag) ? gTag : '';
         }
       },
 
       textSVGRenderer: function(shape) {
         // This function converts a text shape object to the text tag.
-        var heightString, textSplitOnLines, widthString, id;
-        widthString = shape.forcedWidth ? ('width="' + shape.forcedWidth +
-        'px"') : '';
-        heightString = shape.forcedHeight ? ('height="' + shape.forcedHeight +
-        'px"') : '';
+        var textSplitOnLines, id;
         textSplitOnLines = shape.text.split(/\r\n|\r|\n/g);
         if (shape.renderer) {
           textSplitOnLines = shape.renderer.lines;
         }
         id = 'text-' + shape.id;
-        return ('<text id="' + id + '" x="' + shape.x + '" y="' + shape.y +
-        '" ' + widthString + ' ' + heightString + ' fill="' + shape.color +
-        '" style="font: ' + shape.font + ';"> ' +
-        (textSplitOnLines.map((function(_this) {
-          return function(line, i) {
-            var dy;
-            dy = i === 0 ? 0 : '1.2em';
-            return ('<tspan x="' + shape.x + '" dy="' + dy +
-            '" alignment-baseline="text-before-edge"> ' + line + ' </tspan>');
-          };
-        })(this)).join(' ')) + ' </text>');
+        var text = document.createElement('text');
+        var attributes = {
+          id: id,
+          x: shape.x,
+          y: shape.y,
+          fill: shape.color
+        };
+        for (var attrName in attributes) {
+          text.setAttribute(attrName, attributes[attrName]);
+        }
+        text.style.font = shape.font;
+        for (var i = 0; i < textSplitOnLines.length; i++) {
+          var tspan = document.createElement('tspan');
+          var dy = i === 0 ? '0' : '1.2em';
+          tspan.setAttribute('x', shape.x);
+          tspan.setAttribute('dy', dy);
+          tspan.setAttribute('alignment-baseline', 'text-before-edge');
+          tspan.innerText = textSplitOnLines[i];
+          text.appendChild(tspan);
+        }
+        var textTag = text.outerHTML;
+        return this.isSVGTagValid(textTag) ? textTag : '';
       }
     };
   }

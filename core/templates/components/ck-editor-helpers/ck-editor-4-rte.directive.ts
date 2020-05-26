@@ -53,6 +53,8 @@ angular.module('oppia').directive('ckEditor4Rte', [
         var canReferToSkills = ContextService.canEntityReferToSkills();
 
         _RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
+          // TODO(#9358): Remove the if condition once the svgeditor is
+          // available for the users.
           if (componentDefn.id === 'svgeditor') {
             if (!ENABLE_LITERALLYCANVAS_EDITOR) {
               return;
