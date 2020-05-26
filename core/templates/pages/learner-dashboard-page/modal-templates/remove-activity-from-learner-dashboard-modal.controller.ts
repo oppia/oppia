@@ -25,16 +25,16 @@ require('domain/utilities/url-interpolation.service.ts');
 angular.module('oppia').controller(
   'RemoveActivityFromLearnerDashboardModalController', [
     '$controller', '$http', '$scope', '$uibModalInstance',
-    'UrlInterpolationService', 'ACTIVITY_TYPE_COLLECTION',
+    'UrlInterpolationService', 'activity', 'sectionNameI18nId',
+    'subsectionName', 'ACTIVITY_TYPE_COLLECTION',
     'ACTIVITY_TYPE_EXPLORATION', 'LEARNER_DASHBOARD_SECTION_I18N_IDS',
-    'LEARNER_DASHBOARD_SUBSECTION_I18N_IDS', 'activity', 'subsectionName',
-    'sectionNameI18nId',
+    'LEARNER_DASHBOARD_SUBSECTION_I18N_IDS',
     function(
         $controller, $http, $scope, $uibModalInstance,
-        UrlInterpolationService, ACTIVITY_TYPE_COLLECTION,
+        UrlInterpolationService, activity, sectionNameI18nId,
+        subsectionName, ACTIVITY_TYPE_COLLECTION,
         ACTIVITY_TYPE_EXPLORATION, LEARNER_DASHBOARD_SECTION_I18N_IDS,
-        LEARNER_DASHBOARD_SUBSECTION_I18N_IDS,
-        activity, subsectionName, sectionNameI18nId) {
+        LEARNER_DASHBOARD_SUBSECTION_I18N_IDS) {
       $controller('ConfirmOrCancelModalController', {
         $scope: $scope,
         $uibModalInstance: $uibModalInstance

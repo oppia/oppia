@@ -21,11 +21,11 @@ require(
   'confirm-or-cancel-modal.controller.ts');
 
 angular.module('oppia').controller('NewChapterTitleModalController', [
-  '$controller', '$scope', '$uibModalInstance',
-  'MAX_CHARS_IN_CHAPTER_TITLE', 'nodeTitles',
+  '$controller', '$scope', '$uibModalInstance', 'nodeTitles',
+  'MAX_CHARS_IN_CHAPTER_TITLE',
   function(
-      $controller, $scope, $uibModalInstance,
-      MAX_CHARS_IN_CHAPTER_TITLE, nodeTitles) {
+      $controller, $scope, $uibModalInstance, nodeTitles,
+      MAX_CHARS_IN_CHAPTER_TITLE) {
     $controller('ConfirmOrCancelModalController', {
       $scope: $scope,
       $uibModalInstance: $uibModalInstance

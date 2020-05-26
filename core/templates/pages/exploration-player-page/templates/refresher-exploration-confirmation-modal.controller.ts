@@ -29,9 +29,10 @@ angular.module('oppia').controller(
     '$controller', '$scope', '$timeout', '$uibModalInstance', '$window',
     'ExplorationEngineService', 'UrlInterpolationService', 'UrlService',
     'redirectConfirmationCallback', 'refresherExplorationId',
-    function($controller, $scope, $timeout, $uibModalInstance, $window,
-      ExplorationEngineService, UrlInterpolationService, UrlService,
-      redirectConfirmationCallback, refresherExplorationId) {
+    function(
+        $controller, $scope, $timeout, $uibModalInstance, $window,
+        ExplorationEngineService, UrlInterpolationService, UrlService,
+        redirectConfirmationCallback, refresherExplorationId) {
       $controller('ConfirmOrCancelModalController', {
         $scope: $scope,
         $uibModalInstance: $uibModalInstance

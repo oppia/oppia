@@ -21,11 +21,11 @@ require(
   'confirm-or-cancel-modal.controller.ts');
 
 angular.module('oppia').controller('NewSubtopicTitleModalController', [
-  '$controller', '$scope', '$uibModalInstance', 'MAX_CHARS_IN_SUBTOPIC_TITLE',
-  'subtopicTitles',
+  '$controller', '$scope', '$uibModalInstance', 'subtopicTitles',
+  'MAX_CHARS_IN_SUBTOPIC_TITLE',
   function(
-      $controller, $scope, $uibModalInstance, MAX_CHARS_IN_SUBTOPIC_TITLE,
-      subtopicTitles) {
+      $controller, $scope, $uibModalInstance, subtopicTitles,
+      MAX_CHARS_IN_SUBTOPIC_TITLE) {
     $controller('ConfirmOrCancelModalController', {
       $scope: $scope,
       $uibModalInstance: $uibModalInstance

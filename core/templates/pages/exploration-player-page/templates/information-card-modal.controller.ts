@@ -27,13 +27,13 @@ require('services/date-time-format.service.ts');
 angular.module('oppia').controller('InformationCardModalController', [
   '$controller', '$scope', '$uibModalInstance',
   'DateTimeFormatService', 'RatingComputationService',
-  'UrlInterpolationService', 'DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR',
-  'expInfo',
+  'UrlInterpolationService', 'expInfo',
+  'DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR',
   function(
       $controller, $scope, $uibModalInstance,
       DateTimeFormatService, RatingComputationService,
-      UrlInterpolationService, DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR,
-      expInfo) {
+      UrlInterpolationService, expInfo,
+      DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR) {
     $controller('ConfirmOrCancelModalController', {
       $scope: $scope,
       $uibModalInstance: $uibModalInstance

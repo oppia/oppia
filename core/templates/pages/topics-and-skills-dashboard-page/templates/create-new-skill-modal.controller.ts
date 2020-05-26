@@ -22,12 +22,12 @@ require(
 
 angular.module('oppia').controller('CreateNewSkillModalController', [
   '$controller', '$scope', '$uibModalInstance', 'SkillCreationService',
-  'SkillObjectFactory', 'MAX_CHARS_IN_SKILL_DESCRIPTION',
-  'SKILL_DESCRIPTION_STATUS_VALUES', 'rubrics',
+  'SkillObjectFactory', 'rubrics', 'MAX_CHARS_IN_SKILL_DESCRIPTION',
+  'SKILL_DESCRIPTION_STATUS_VALUES',
   function(
       $controller, $scope, $uibModalInstance, SkillCreationService,
-      SkillObjectFactory, MAX_CHARS_IN_SKILL_DESCRIPTION,
-      SKILL_DESCRIPTION_STATUS_VALUES, rubrics) {
+      SkillObjectFactory, rubrics, MAX_CHARS_IN_SKILL_DESCRIPTION,
+      SKILL_DESCRIPTION_STATUS_VALUES) {
     $controller('ConfirmOrCancelModalController', {
       $scope: $scope,
       $uibModalInstance: $uibModalInstance

@@ -24,14 +24,14 @@ require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 
 angular.module('oppia').controller('SubtopicEditorModalController', [
   '$controller', '$scope', '$uibModalInstance', 'TopicEditorStateService',
-  'EVENT_SUBTOPIC_PAGE_LOADED', 'MAX_CHARS_IN_SUBTOPIC_TITLE',
   'editableThumbnailBgColor', 'editableThumbnailFilename',
   'editableTitle', 'subtopic', 'subtopicTitles',
+  'EVENT_SUBTOPIC_PAGE_LOADED', 'MAX_CHARS_IN_SUBTOPIC_TITLE',
   function(
       $controller, $scope, $uibModalInstance, TopicEditorStateService,
-      EVENT_SUBTOPIC_PAGE_LOADED, MAX_CHARS_IN_SUBTOPIC_TITLE,
       editableThumbnailBgColor, editableThumbnailFilename,
-      editableTitle, subtopic, subtopicTitles) {
+      editableTitle, subtopic, subtopicTitles,
+      EVENT_SUBTOPIC_PAGE_LOADED, MAX_CHARS_IN_SUBTOPIC_TITLE) {
     $controller('ConfirmOrCancelModalController', {
       $scope: $scope,
       $uibModalInstance: $uibModalInstance
