@@ -392,33 +392,37 @@ class InteractionInstance(python_utils.OBJECT):
 
         return True
 
-    def is_rte_content_supported_on_android(self, whitelist_checker):
+    def is_rte_content_supported_on_android(
+            self, require_component_names_to_match):
         """Determines whether the RTE content in interaction answer groups,
         hints and solution is supported by Android app.
 
         Args:
-            whitelist_checker: function. Function to check whether the RTE tags
-                in the html string are whitelisted.
+            require_component_names_to_match: function. Function to check
+                whether the RTE tags in the html string are whitelisted.
 
         Returns:
             bool. Whether the RTE content is valid.
         """
         for answer_group in self.answer_groups:
-            if whitelist_checker(answer_group.outcome.feedback.html):
+            if require_component_names_to_match(
+                    answer_group.outcome.feedback.html):
                 return False
 
         if (
                 self.default_outcome and self.default_outcome.feedback and
-                whitelist_checker(self.default_outcome.feedback.html)):
+                require_component_names_to_match(
+                    self.default_outcome.feedback.html)):
             return False
 
         for hint in self.hints:
-            if whitelist_checker(hint.hint_content.html):
+            if require_component_names_to_match(hint.hint_content.html):
                 return False
 
         if (
                 self.solution and self.solution.explanation and
-                whitelist_checker(self.solution.explanation.html)):
+                require_component_names_to_match(
+                    self.solution.explanation.html)):
             return False
 
         return True
@@ -1568,7 +1572,7 @@ class State(python_utils.OBJECT):
         Returns:
             bool. Whether the RTE components in the state is valid.
         """
-        def whitelist_checker(html):
+        def require_component_names_to_match(html):
             """Checks if the provided html string contains only whitelisted
             RTE tags.
 
@@ -1578,18 +1582,19 @@ class State(python_utils.OBJECT):
             Returns:
                 bool. Whether all RTE tags in the html are whitelisted.
             """
-            rte_prefix = 'oppia-noninteractive-'
-            components = set([
-                rte['id'].replace(rte_prefix, '') for rte in html_cleaner
-                .get_rte_components(html)])
-            return any(components.difference(
+            component_name_prefix = 'oppia-noninteractive-'
+            component_names = set([
+                component['id'].replace(component_name_prefix, '')
+                for component in html_cleaner.get_rte_components(html)])
+            return any(component_names.difference(
                 android_validation_constants.VALID_RTE_COMPONENTS))
 
-        if self.content and whitelist_checker(self.content.html):
+        if self.content and require_component_names_to_match(
+                self.content.html):
             return False
 
         return self.interaction.is_rte_content_supported_on_android(
-            whitelist_checker)
+            require_component_names_to_match)
 
     def get_training_data(self):
         """Retrieves training data from the State domain object.
