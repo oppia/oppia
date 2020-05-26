@@ -24,6 +24,9 @@ require(
   'pages/topics-and-skills-dashboard-page/skills-list/' +
   'skills-list.directive.ts');
 require(
+  'pages/topics-and-skills-dashboard-page/templates/' +
+  'create-new-skill-modal.controller.ts');
+require(
   'pages/topics-and-skills-dashboard-page/topics-list/' +
   'topics-list.directive.ts');
 
@@ -56,25 +59,23 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
         'topics-and-skills-dashboard-page.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$http', '$rootScope', '$scope', '$uibModal', '$window',
+        '$rootScope', '$scope', '$uibModal',
         'AlertsService', 'RubricObjectFactory', 'SkillCreationService',
-        'SkillObjectFactory', 'TopicCreationService',
+        'TopicCreationService',
         'TopicsAndSkillsDashboardBackendApiService', 'UrlInterpolationService',
         'EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED',
         'EVENT_TYPE_SKILL_CREATION_ENABLED',
         'EVENT_TYPE_TOPIC_CREATION_ENABLED',
         'FATAL_ERROR_CODES', 'SKILL_DIFFICULTIES',
-        'MAX_CHARS_IN_SKILL_DESCRIPTION', 'SKILL_DESCRIPTION_STATUS_VALUES',
         function(
-            $http, $rootScope, $scope, $uibModal, $window,
+            $rootScope, $scope, $uibModal,
             AlertsService, RubricObjectFactory, SkillCreationService,
-            SkillObjectFactory, TopicCreationService,
+            TopicCreationService,
             TopicsAndSkillsDashboardBackendApiService, UrlInterpolationService,
             EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED,
             EVENT_TYPE_SKILL_CREATION_ENABLED,
             EVENT_TYPE_TOPIC_CREATION_ENABLED,
-            FATAL_ERROR_CODES, SKILL_DIFFICULTIES,
-            MAX_CHARS_IN_SKILL_DESCRIPTION, SKILL_DESCRIPTION_STATUS_VALUES) {
+            FATAL_ERROR_CODES, SKILL_DIFFICULTIES) {
           var ctrl = this;
           var _initDashboard = function(stayInSameTab) {
             TopicsAndSkillsDashboardBackendApiService.fetchDashboardData().then(
@@ -143,77 +144,15 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
                 '/pages/topics-and-skills-dashboard-page/templates/' +
                 'create-new-skill-modal.template.html'),
               backdrop: 'static',
-              controller: [
-                '$scope', '$uibModalInstance',
-                function($scope, $uibModalInstance) {
-                  $scope.newSkillDescription = '';
-                  $scope.rubrics = rubrics;
-                  $scope.errorMsg = '';
-                  $scope.bindableDict = {
-                    displayedConceptCardExplanation: ''
-                  };
-                  $scope.MAX_CHARS_IN_SKILL_DESCRIPTION = (
-                    MAX_CHARS_IN_SKILL_DESCRIPTION);
-                  var newExplanationObject = null;
-
-                  $scope.$watch('newSkillDescription', function() {
-                    if (
-                      SkillCreationService.getSkillDescriptionStatus() !==
-                      SKILL_DESCRIPTION_STATUS_VALUES.STATUS_DISABLED) {
-                      var initParagraph = document.createElement('p');
-                      var explanations = $scope.rubrics[1].getExplanations();
-                      var newExplanation = document.createTextNode(
-                        $scope.newSkillDescription);
-                      initParagraph.appendChild(newExplanation);
-                      explanations[0] = initParagraph.outerHTML;
-                      $scope.rubrics[1].setExplanations(explanations);
-                      SkillCreationService.markChangeInSkillDescription();
-                    }
-                  });
-
-                  $scope.onSaveExplanation = function(explanationObject) {
-                    newExplanationObject = explanationObject.toBackendDict();
-                    $scope.bindableDict.displayedConceptCardExplanation =
-                      explanationObject.getHtml();
-                  };
-
-                  $scope.onSaveRubric = function(difficulty, explanations) {
-                    for (var idx in $scope.rubrics) {
-                      if ($scope.rubrics[idx].getDifficulty() === difficulty) {
-                        $scope.rubrics[idx].setExplanations(explanations);
-                      }
-                    }
-                  };
-
-                  $scope.resetErrorMsg = function() {
-                    $scope.errorMsg = '';
-                  };
-
-                  $scope.createNewSkill = function() {
-                    if (
-                      !SkillObjectFactory.hasValidDescription(
-                        $scope.newSkillDescription)) {
-                      $scope.errorMsg = (
-                        'Please use a non-empty description consisting of ' +
-                        'alphanumeric characters, spaces and/or hyphens.');
-                      return;
-                    }
-                    $uibModalInstance.close({
-                      description: $scope.newSkillDescription,
-                      rubrics: $scope.rubrics,
-                      explanation: newExplanationObject
-                    });
-                  };
-
-                  $scope.cancel = function() {
-                    SkillCreationService.resetSkillDescriptionStatusMarker();
-                    $uibModalInstance.dismiss('cancel');
-                  };
-                }
-              ]
+              resolve: {
+                rubrics: () => rubrics
+              },
+              controller: 'CreateNewSkillModalController'
             }).result.then(function(result) {
               SkillCreationService.createNewSkill(
                 result.description, result.rubrics, result.explanation, []);
+            }, function() {
+              SkillCreationService.resetSkillDescriptionStatusMarker();
             });
           };
           ctrl.$onInit = function() {
