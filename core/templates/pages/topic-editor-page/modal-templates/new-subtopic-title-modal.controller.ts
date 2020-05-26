@@ -24,8 +24,8 @@ angular.module('oppia').controller('NewSubtopicTitleModalController', [
   '$controller', '$scope', '$uibModalInstance', 'MAX_CHARS_IN_SUBTOPIC_TITLE',
   'subtopicTitles',
   function(
-    $controller, $scope, $uibModalInstance, MAX_CHARS_IN_SUBTOPIC_TITLE,
-        subtopicTitles) {
+      $controller, $scope, $uibModalInstance, MAX_CHARS_IN_SUBTOPIC_TITLE,
+      subtopicTitles) {
     $controller('ConfirmOrCancelModalController', {
       $scope: $scope,
       $uibModalInstance: $uibModalInstance

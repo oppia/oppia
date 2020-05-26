@@ -18,16 +18,17 @@
 
 require('services/suggestion-modal.service.ts');
 
-angular.module('oppia').controller('LearnerDashboardSuggestionModalController', [
-  '$scope', '$uibModalInstance', 'SuggestionModalService',
-  'description', 'newContent', 'oldContent',
-  function($scope, $uibModalInstance, SuggestionModalService,
-      description, newContent, oldContent) {
-    $scope.newContent = newContent;
-    $scope.oldContent = oldContent;
-    $scope.description = description;
-    $scope.cancel = function() {
-      SuggestionModalService.cancelSuggestion($uibModalInstance);
-    };
-  }
-]);
+angular.module('oppia').controller(
+  'LearnerDashboardSuggestionModalController', [
+    '$scope', '$uibModalInstance', 'SuggestionModalService',
+    'description', 'newContent', 'oldContent',
+    function($scope, $uibModalInstance, SuggestionModalService,
+        description, newContent, oldContent) {
+      $scope.newContent = newContent;
+      $scope.oldContent = oldContent;
+      $scope.description = description;
+      $scope.cancel = function() {
+        SuggestionModalService.cancelSuggestion($uibModalInstance);
+      };
+    }
+  ]);

@@ -31,7 +31,7 @@ angular.module('oppia').controller('InformationCardModalController', [
   'expInfo',
   function(
       $controller, $scope, $uibModalInstance,
-      DateTimeFormatService, RatingComputationService, expInfo,
+      DateTimeFormatService, RatingComputationService,
       UrlInterpolationService, DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR,
       expInfo) {
     $controller('ConfirmOrCancelModalController', {
