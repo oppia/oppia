@@ -58,12 +58,12 @@
 
 
 # Community contribution project
-/core/controllers/community_dashboard*.py @DubeySandeep @sagangwee
-/core/domain/opportunity*.py @DubeySandeep @sagangwee
-/core/domain/voiceover_services*.py @DubeySandeep @sagangwee
-/core/storage/opportunity/ @DubeySandeep @sagangwee
-/core/templates/domain/opportunity @DubeySandeep @sagangwee
-/core/templates/pages/community-dashboard-page/ @DubeySandeep @sagangwee
+/core/controllers/community_dashboard*.py @sagangwee
+/core/domain/opportunity*.py @sagangwee
+/core/domain/voiceover_services*.py @sagangwee
+/core/storage/opportunity/ @sagangwee
+/core/templates/domain/opportunity/ @sagangwee
+/core/templates/pages/community-dashboard-page/ @sagangwee
 
 
 # Core documentation
