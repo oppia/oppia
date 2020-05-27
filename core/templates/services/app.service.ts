@@ -13,21 +13,19 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for non strict validation fail modal.
+ * @fileoverview Service for querying the shared constants of the Oppia module.
  */
-angular.module('oppia').controller('NonStrictValidationFailModalController', [
-  '$scope', '$timeout', '$uibModalInstance', 'WindowRef',
-  function(
-      $scope, $timeout, $uibModalInstance, WindowRef) {
-    var _refreshPage = function(delay) {
-      $timeout(function() {
-        WindowRef.nativeWindow.location.reload();
-      }, delay);
-    };
 
-    $scope.closeAndRefresh = function() {
-      $uibModalInstance.dismiss('cancel');
-      _refreshPage(20);
-    };
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
+
+import { AppConstants } from 'app.constants';
+
+@Injectable({providedIn: 'root'})
+export class AppService {
+  isMachineLearningClassificationEnabled(): boolean {
+    return AppConstants.ENABLE_ML_CLASSIFIERS;
   }
-]);
+}
+
+angular.module('oppia').factory('AppService', downgradeInjectable(AppService));

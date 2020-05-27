@@ -18,6 +18,9 @@
 
 require(
   'components/common-layout-directives/common-elements/' +
+  'confirm-or-cancel-modal.controller.ts');
+require(
+  'components/common-layout-directives/common-elements/' +
   'loading-dots.directive.ts');
 
 require('domain/editor/undo_redo/undo-redo.service.ts');
@@ -35,17 +38,11 @@ angular.module('oppia').directive('skillEditorNavbar', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/skill-editor-page/navbar/skill-editor-navbar.directive.html'),
       controller: [
-        '$scope', '$uibModal', '$window', 'AlertsService',
-        'UndoRedoService', 'SkillEditorStateService',
-        'SkillEditorRoutingService',
-        'EVENT_SKILL_INITIALIZED', 'EVENT_SKILL_REINITIALIZED',
-        'EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED',
+        '$scope', '$uibModal', 'AlertsService', 'UndoRedoService',
+        'SkillEditorStateService', 'SkillEditorRoutingService',
         function(
-            $scope, $uibModal, $window, AlertsService,
-            UndoRedoService, SkillEditorStateService,
-            SkillEditorRoutingService,
-            EVENT_SKILL_INITIALIZED, EVENT_SKILL_REINITIALIZED,
-            EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED) {
+            $scope, $uibModal, AlertsService, UndoRedoService,
+            SkillEditorStateService, SkillEditorRoutingService) {
           var ctrl = this;
           $scope.getActiveTabName = function() {
             return SkillEditorRoutingService.getActiveTabName();
@@ -76,14 +73,7 @@ angular.module('oppia').directive('skillEditorNavbar', [
                   '/pages/skill-editor-page/modal-templates/' +
                   'save-pending-changes-modal.directive.html'),
                 backdrop: true,
-                controller: [
-                  '$scope', '$uibModalInstance',
-                  function($scope, $uibModalInstance) {
-                    $scope.cancel = function() {
-                      $uibModalInstance.dismiss('cancel');
-                    };
-                  }
-                ]
+                controller: 'ConfirmOrCancelModalController'
               }).result.then(null, function() {
                 // Note to developers:
                 // This callback is triggered when the Cancel button is clicked.
@@ -94,45 +84,29 @@ angular.module('oppia').directive('skillEditorNavbar', [
             }
           };
 
-          var _validateSkill = function() {
-            $scope.validationIssues = $scope.skill.getValidationIssues();
-          };
-
           $scope.discardChanges = function() {
             UndoRedoService.clearChanges();
-            SkillEditorStateService.loadSkill($scope.skill.getId());
+            SkillEditorStateService.loadSkill(ctrl.skill.getId());
           };
 
           $scope.getWarningsCount = function() {
-            return $scope.validationIssues.length;
+            return ctrl.skill.getValidationIssues().length;
           };
 
           $scope.isSkillSaveable = function() {
             return (
               $scope.getChangeListCount() > 0 &&
-              $scope.validationIssues.length === 0);
+              ctrl.skill.getValidationIssues().length === 0);
           };
 
           $scope.saveChanges = function() {
-            var modalInstance = $uibModal.open({
+            $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/skill-editor-page/modal-templates/' +
                 'skill-editor-save-modal.directive.html'),
               backdrop: true,
-              controller: [
-                '$scope', '$uibModalInstance',
-                function($scope, $uibModalInstance) {
-                  $scope.save = function(commitMessage) {
-                    $uibModalInstance.close(commitMessage);
-                  };
-                  $scope.cancel = function() {
-                    $uibModalInstance.dismiss('cancel');
-                  };
-                }
-              ]
-            });
-
-            modalInstance.result.then(function(commitMessage) {
+              controller: 'ConfirmOrCancelModalController'
+            }).result.then(function(commitMessage) {
               SkillEditorStateService.saveSkill(commitMessage);
               AlertsService.addSuccessMessage('Changes Saved.');
             }, function() {
@@ -143,12 +117,7 @@ angular.module('oppia').directive('skillEditorNavbar', [
           };
 
           ctrl.$onInit = function() {
-            $scope.skill = SkillEditorStateService.getSkill();
-            $scope.validationIssues = [];
-            $scope.$on(EVENT_SKILL_INITIALIZED, _validateSkill);
-            $scope.$on(EVENT_SKILL_REINITIALIZED, _validateSkill);
-            $scope.$on(
-              EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED, _validateSkill);
+            ctrl.skill = SkillEditorStateService.getSkill();
           };
         }]
     };
