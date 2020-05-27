@@ -32,8 +32,8 @@ describe('LiterallyCanvasDiagramEditor', function() {
     LCDiagramEditorCtrl = $componentController('literallyCanvasDiagramEditor');
     var mockDocument = document.createElement('div');
     mockDocument.setAttribute('id', LCDiagramEditorCtrl.lcID);
-    document.getElementById = jasmine.createSpy(
-      'HTML element').and.returnValue(mockDocument);
+    var $document = angular.element(document);
+    $document.find('body').append(mockDocument.outerHTML);
     LCDiagramEditorCtrl.$onInit();
     LCDiagramEditorCtrl.lc = mockLiterallyCanvas;
   }));

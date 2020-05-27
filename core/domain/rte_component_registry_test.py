@@ -144,7 +144,7 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
             self.assertTrue(self._is_camel_cased(component_id))
 
             # TODO(#9356): Remove this if condition once the Svgeditor
-            # directive are created in the second part of 1st milestone.
+            # directive is created in the second part of 1st milestone.
             if component_id == 'Svgeditor':
                 continue
 

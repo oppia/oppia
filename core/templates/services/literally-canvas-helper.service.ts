@@ -22,27 +22,24 @@ const CONSTANTS = require('constants.ts');
 
 angular.module('oppia').factory('LiterallyCanvasHelperService', [
   function() {
-    const getPoints = (x, y, angle, width, length) => [
+    const getPoints = (x, y, angle, width) => [
       {
         x: x + (Math.cos(angle + Math.PI / 2) * width) / 2,
         y: y + (Math.sin(angle + Math.PI / 2) * width) / 2,
       },
       {
-        x: x + Math.cos(angle) * length,
-        y: y + Math.sin(angle) * length,
+        x: x + Math.cos(angle) * width,
+        y: y + Math.sin(angle) * width,
       },
       {
         x: x + (Math.cos(angle - Math.PI / 2) * width) / 2,
         y: y + (Math.sin(angle - Math.PI / 2) * width) / 2,
       },
     ];
+
     const arrow = {
-      svg(x, y, angle, width, color, position, length = null) {
-        if (length === null) {
-          length = 0;
-        }
-        length = length || width;
-        const points = getPoints(x, y, angle, width, length);
+      svg(x, y, angle, width, color, position) {
+        const points = getPoints(x, y, angle, width);
 
         var polygon = document.createElement('polygon');
         var pointsString = points.map(function(p) {
@@ -60,6 +57,7 @@ angular.module('oppia').factory('LiterallyCanvasHelperService', [
         return polygon;
       }
     };
+
     return {
       isSVGTagValid: function(svgString) {
         var domParser = new DOMParser();
@@ -314,7 +312,7 @@ angular.module('oppia').factory('LiterallyCanvasHelperService', [
           tspan.setAttribute('x', shape.x);
           tspan.setAttribute('dy', dy);
           tspan.setAttribute('alignment-baseline', 'text-before-edge');
-          tspan.innerText = textSplitOnLines[i];
+          tspan.textContent = textSplitOnLines[i];
           text.appendChild(tspan);
         }
         var textTag = text.outerHTML;
