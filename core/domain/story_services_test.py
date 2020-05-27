@@ -1044,8 +1044,11 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 'new_value': {
                     'content_id': 'content',
                     'html': (
-                        '<p><oppia-noninteractive-collapsible>'
-                        '</oppia-noninteractive-collapsible></p>')
+                        '<oppia-noninteractive-collapsible content-with-value='
+                        '"&amp;quot;&amp;lt;p&amp;gt;Hello&amp;lt;/p&amp;gt;'
+                        '&amp;quot;" heading-with-value="&amp;quot;'
+                        'SubCollapsible&amp;quot;">'
+                        '</oppia-noninteractive-collapsible>')
                 }
             })],
             'Updated State Content.')

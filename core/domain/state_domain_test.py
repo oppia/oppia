@@ -194,7 +194,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             init_state.get_content_html('hint_1'), '<p>Changed hint one</p>')
 
-    def test_android_validation(self):
+    def test_rte_content_validation_for_android(self):
         exploration = exp_domain.Exploration.create_default_exploration('0')
 
         init_state = exploration.states[exploration.init_state_name]
@@ -205,7 +205,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'explanation': {
                 'content_id': 'solution',
                 'html': (
-                    '<p><oppia-noninteractive-math>'
+                    '<p><oppia-noninteractive-math '
+                    'raw_latex-with-value="&amp;quot;\\frac{x}{y}&amp;quot;">'
                     '</oppia-noninteractive-math></p>')
             },
         }
@@ -220,8 +221,11 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         hints_list.append(
             state_domain.Hint(
                 state_domain.SubtitledHtml(
-                    'hint_1', '<p><oppia-noninteractive-collapsible>'
-                    '</oppia-noninteractive-collapsible></p>'
+                    'hint_1',
+                    '<oppia-noninteractive-collapsible content-with-value='
+                    '"&amp;quot;&amp;lt;p&amp;gt;Hello&amp;lt;/p&amp;gt;&amp;'
+                    'quot;" heading-with-value="&amp;quot;SubCollapsible&amp;'
+                    'quot;"></oppia-noninteractive-collapsible><p>&nbsp;</p>'
                 )
             )
         )
@@ -234,7 +238,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         default_outcome = state_domain.Outcome(
             'Introduction', state_domain.SubtitledHtml(
                 'default_outcome', (
-                    '<p><oppia-noninteractive-math>'
+                    '<p><oppia-noninteractive-math '
+                    'raw_latex-with-value="&amp;quot;\\frac{x}{y}&amp;quot;">'
                     '</oppia-noninteractive-math></p>')),
             False, [], None, None
         )
@@ -251,11 +256,12 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'feedback': {
                     'content_id': 'feedback_1',
                     'html': (
-                        '<p><oppia-noninteractive-tabs tab_contents-with-value='
-                        '"{"title": "Hint introduction", "content": "This set '
-                        'of tabs shows some hints. Click on the other tabs to '
-                        'display the relevant hints."}">'
-                        '</oppia-noninteractive-tabs> Other Text </p>')
+                        '<oppia-noninteractive-tabs tab_contents-with-value'
+                        '=\"[{&amp;quot;content&amp;quot;:&amp;quot;&amp;lt;p'
+                        '&amp;gt;&amp;lt;i&amp;gt;lorem ipsum&amp;lt;/i&amp;'
+                        'gt;&amp;lt;/p&amp;gt;&amp;quot;,&amp;quot;title&amp;'
+                        'quot;:&amp;quot;hello&amp;quot;}]\">'
+                        '</oppia-noninteractive-tabs>')
                 },
                 'labelled_as_correct': False,
                 'param_changes': [],
@@ -276,7 +282,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             [answer_group_dict])
         self.assertFalse(init_state.is_rte_content_supported_on_android())
         answer_group_dict['outcome']['feedback']['html'] = (
-            '<p><oppia-noninteractive-image>'
+            '<p><oppia-noninteractive-image caption-with-value="&amp;quot;'
+            '&amp;quot;" filepath-with-value="&amp;quot;startBlue.png&amp;'
+            'quot;" alt-with-value="&amp;quot;&amp;quot;">'
             '</oppia-noninteractive-image></p>')
         init_state.update_interaction_answer_groups(
             [answer_group_dict])
@@ -286,18 +294,77 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             state_domain.SubtitledHtml.from_dict({
                 'content_id': 'content',
                 'html': (
-                    '<p><oppia-noninteractive-tabs>'
-                    '</oppia-noninteractive-tabs></p>')
+                    '<oppia-noninteractive-tabs tab_contents-with-value'
+                    '=\"[{&amp;quot;content&amp;quot;:&amp;quot;&amp;lt;p'
+                    '&amp;gt;&amp;lt;i&amp;gt;lorem ipsum&amp;lt;/i&amp;'
+                    'gt;&amp;lt;/p&amp;gt;&amp;quot;,&amp;quot;title&amp;'
+                    'quot;:&amp;quot;hello&amp;quot;}]\">'
+                    '</oppia-noninteractive-tabs>')
             }))
         self.assertFalse(init_state.is_rte_content_supported_on_android())
         init_state.update_content(
             state_domain.SubtitledHtml.from_dict({
                 'content_id': 'content',
                 'html': (
-                    '<p><oppia-noninteractive-link>'
-                    '</oppia-noninteractive-link></p>')
+                    '<p><oppia-noninteractive-link text-with-value="'
+                    '&amp;quot;What is a link?&amp;quot;" url-with-'
+                    'value="&amp;quot;htt://link.com&amp'
+                    ';quot;"></oppia-noninteractive-link></p>')
             }))
         self.assertTrue(init_state.is_rte_content_supported_on_android())
+        init_state.update_content(
+            state_domain.SubtitledHtml.from_dict({
+                'content_id': 'content',
+                'html': (
+                    '<p><oppia-noninteractive-skillreview text-with-value="'
+                    '&amp;quot;&amp;quot;" skill_id-with-value="&amp;quot;'
+                    '&amp;quot;"></oppia-noninteractive-skillreview></p>')
+            }))
+        self.assertTrue(init_state.is_rte_content_supported_on_android())
+
+    def test_interaction_validation_for_android(self):
+        exploration = exp_domain.Exploration.create_default_exploration('0')
+
+        init_state = exploration.states[exploration.init_state_name]
+        # Valid interactions.
+        init_state.update_interaction_id('Continue')
+        self.assertTrue(init_state.interaction.is_supported_on_android_app())
+        init_state.update_interaction_id('DragAndDropSortInput')
+        self.assertTrue(init_state.interaction.is_supported_on_android_app())
+        init_state.update_interaction_id('EndExploration')
+        self.assertTrue(init_state.interaction.is_supported_on_android_app())
+        init_state.update_interaction_id('FractionInput')
+        self.assertTrue(init_state.interaction.is_supported_on_android_app())
+        init_state.update_interaction_id('ItemSelectionInput')
+        self.assertTrue(init_state.interaction.is_supported_on_android_app())
+        init_state.update_interaction_id('MultipleChoiceInput')
+        self.assertTrue(init_state.interaction.is_supported_on_android_app())
+        init_state.update_interaction_id('NumberWithUnits')
+        self.assertTrue(init_state.interaction.is_supported_on_android_app())
+        init_state.update_interaction_id('NumericInput')
+        self.assertTrue(init_state.interaction.is_supported_on_android_app())
+        init_state.update_interaction_id('TextInput')
+        self.assertTrue(init_state.interaction.is_supported_on_android_app())
+
+        # Invalid interactions.
+        init_state.update_interaction_id('CodeRepl')
+        self.assertFalse(init_state.interaction.is_supported_on_android_app())
+        init_state.update_interaction_id('GraphInput')
+        self.assertFalse(init_state.interaction.is_supported_on_android_app())
+        init_state.update_interaction_id('ImageClickInput')
+        self.assertFalse(init_state.interaction.is_supported_on_android_app())
+        init_state.update_interaction_id('InteractiveMap')
+        self.assertFalse(init_state.interaction.is_supported_on_android_app())
+        init_state.update_interaction_id('LogicProof')
+        self.assertFalse(init_state.interaction.is_supported_on_android_app())
+        init_state.update_interaction_id('MathExpressionInput')
+        self.assertFalse(init_state.interaction.is_supported_on_android_app())
+        init_state.update_interaction_id('MusicNotesInput')
+        self.assertFalse(init_state.interaction.is_supported_on_android_app())
+        init_state.update_interaction_id('PencilCodeEditor')
+        self.assertFalse(init_state.interaction.is_supported_on_android_app())
+        init_state.update_interaction_id('SetInput')
+        self.assertFalse(init_state.interaction.is_supported_on_android_app())
 
     def test_get_content_html_with_invalid_content_id_raise_error(self):
         exploration = exp_domain.Exploration.create_default_exploration('0')
