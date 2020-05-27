@@ -1040,6 +1040,8 @@ class DragAndDropPositiveInt(BaseObject):
 class AlgebraicExpression(BaseObject):
     """Class for algebraic expressions. Stores a unicode string representing a
     valid algebraic expression.
+    The expression should be in the ASCIIMath format.
+    More info: http://asciimath.org/
     """
 
     description = 'A unicode string for an algebraic expression.'
@@ -1057,6 +1059,9 @@ class AlgebraicExpression(BaseObject):
 class SetOfPlaceholders(BaseObject):
     """Class for set of placeholders. Placeholders are latin letters that are
     used in Math Interactions.
+    A placeholder could be an english alphabet (uppercase/lowercase) or a greek
+    letter represented as a single word. Valid greek letters are present in the
+    GREEK_LETTERS constant in schema_utils.py.
     """
 
     description = 'A set (a list with unique elements) of placeholders.'
@@ -1075,7 +1080,8 @@ class SetOfPlaceholders(BaseObject):
 
 class MathEquation(BaseObject):
     """Class for math equations. Stores a unicode string representing a
-    valid math equation.
+    valid math equation. The expression should be in the ASCIIMath format.
+    More info: http://asciimath.org/
     """
 
     description = 'A unicode string for a math equation.'
