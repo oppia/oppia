@@ -52,7 +52,8 @@ describe('Subtopic data object factory', () => {
                 en: {
                   filename: 'test.mp3',
                   file_size_bytes: 100,
-                  needs_update: false
+                  needs_update: false,
+                  duration_secs: 10
                 }
               }
             }
@@ -78,7 +79,8 @@ describe('Subtopic data object factory', () => {
                 en: {
                   filename: 'test.mp3',
                   file_size_bytes: 100,
-                  needs_update: false
+                  needs_update: false,
+                  duration_secs: 10
                 }
               }
             }

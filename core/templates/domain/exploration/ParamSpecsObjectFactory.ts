@@ -21,26 +21,28 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-import { ParamSpec } from 'domain/exploration/ParamSpecObjectFactory';
-import { ParamSpecObjectFactory } from
+import { IParamSpecBackendDict, ParamSpec, ParamSpecObjectFactory } from
   'domain/exploration/ParamSpecObjectFactory';
 
+interface IParamSpecsBackendDict {
+  [paramName: string]: IParamSpecBackendDict;
+}
+
+interface IParamDict {
+  [paramName: string]: ParamSpec;
+}
+
 export class ParamSpecs {
-  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
-  // 'any' because '_paramDict' is initialized as '{}' and that does not match
-  // with the actual type of 'paramDict'.
-  _paramDict: any;
+  _paramDict: IParamDict;
   _paramSpecObjectFactory: ParamSpecObjectFactory;
+
   /**
    * @constructor
    * @param {Object.<String, ParamSpec>} paramDict - params and their specs
    *    for this object will hold.
    */
-  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'paramDict' is initialized as '{}' and that does not match
-  // with the actual type of 'paramDict'.
   constructor(
-      paramDict: any, paramSpecObjectFactory: ParamSpecObjectFactory) {
+      paramDict: IParamDict, paramSpecObjectFactory: ParamSpecObjectFactory) {
     /** @member {Object.<String, ParamSpec>} */
     this._paramDict = paramDict;
     this._paramSpecObjectFactory = paramSpecObjectFactory;
@@ -57,10 +59,7 @@ export class ParamSpecs {
   /**
    * @returns {Object.<String, ParamSpec>} - the map of params to their specs.
    */
-  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
-  // 'any' because '_paramDict' is initialized as '{}' and that does not match
-  // with the actual type of 'paramDict'.
-  getParamDict(): any {
+  getParamDict(): IParamDict {
     return this._paramDict;
   }
 
@@ -90,10 +89,7 @@ export class ParamSpecs {
    * @callback callback - Is passed the name and corresponding ParamSpec of
    *    each parameter in the specs.
    */
-  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'callback' is a method can vary. A definite type needs to
-  // be found and assigned.
-  forEach(callback: any): void {
+  forEach(callback: Function): void {
     var that = this;
     this.getParamNames().forEach((paramName) => {
       callback(paramName, that.getParamSpec(paramName));
@@ -104,10 +100,7 @@ export class ParamSpecs {
    * @returns {Object.<String, {obj_type: String}>} - Basic dict for backend
    *    consumption.
    */
-  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'paramSpecsBackendDict' is initialized as '{}' and that does
-  // not match with the actual type of 'paramDict'.
-  toBackendDict(): any {
+  toBackendDict(): IParamSpecsBackendDict {
     var paramSpecsBackendDict = {};
     this.forEach((paramName, paramSpec) => {
       paramSpecsBackendDict[paramName] = paramSpec.toBackendDict();
@@ -128,10 +121,8 @@ export class ParamSpecsObjectFactory {
    * @returns {ParamSpecs} - An instance with properties from the backend
    *    dict.
    */
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'paramSpecsBackendDict' is a dict with underscore_cased keys
-  // which give tslint errors against underscore_casing in favor of camelCasing.
-  createFromBackendDict(paramSpecsBackendDict: any): ParamSpecs {
+  createFromBackendDict(
+      paramSpecsBackendDict: IParamSpecsBackendDict): ParamSpecs {
     var paramDict = {};
     Object.keys(paramSpecsBackendDict).forEach((paramName) => {
       paramDict[paramName] = this.paramSpecObjectFactory.createFromBackendDict(

@@ -23,11 +23,7 @@ export interface IRecordedVoiceOverBackendDict {
     }
   }
 }
-export interface IVoice {
-  filename: string;
-  fileSizeBytes: number;
-  needsUpdate: boolean;
-}
+
 export interface IVoiceoverMapping {
   [propName: string]: {
     [propName: string]: Voiceover
@@ -53,11 +49,11 @@ export class RecordedVoiceovers {
     return Object.keys(this.voiceoversMapping);
   }
 
-  getBindableVoiceovers(contentId: string): {[propName: string]: IVoice} {
+  getBindableVoiceovers(contentId: string): {[propName: string]: Voiceover} {
     return this.voiceoversMapping[contentId];
   }
 
-  getVoiceover(contentId: string, langCode: string): IVoice {
+  getVoiceover(contentId: string, langCode: string): Voiceover {
     return this.voiceoversMapping[contentId][langCode];
   }
 
