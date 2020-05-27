@@ -18,7 +18,7 @@
 
 require(
   'pages/exploration-player-page/learner-experience/' +
-  'continue-button.directive.ts');
+  'continue-button.component.ts');
 
 require('domain/utilities/browser-checker.service.ts');
 require(

@@ -23,5 +23,5 @@ angular.module('oppia').component('continueButton', {
     isLearnAgainButton: '&',
     focusLabel: '@'
   },
-  template: require('./continue-button.directive.html')
+  template: require('./continue-button.component.html')
 });
