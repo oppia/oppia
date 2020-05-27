@@ -25,5 +25,5 @@ angular.module('oppia').component('schemaBasedExpressionEditor', {
     outputType: '&',
     labelForFocusTarget: '&'
   },
-  template: require('./schema-based-expression-editor.directive.html'),
+  template: require('./schema-based-expression-editor.component.html'),
 });
