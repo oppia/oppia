@@ -16,24 +16,17 @@
  * @fileoverview Factory for creating new frontend instances of
  * RecordedVoiceovers domain objects.
  */
-
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-
-import { IVoiceoverBackendDict, VoiceoverObjectFactory, Voiceover } from
-  'domain/exploration/VoiceoverObjectFactory';
-
-export interface VoiceoverByLanguageCode {
-  [langCode: string]: Voiceover;
+export interface IRecordedVoiceOverBackendDict {
+  'voiceovers_mapping': {
+    [propName: string]: {
+      [propName: string]: IVoiceoverDict
+    }
+  }
 }
 
-export interface VoiceoverMapping {
-  [contentId: string]: VoiceoverByLanguageCode;
-}
-
-export interface IVoiceoverBackendDictMapping {
-  [contentId: string]: {
-    [langCode: string]: IVoiceoverBackendDict;
+export interface IVoiceoverMapping {
+  [propName: string]: {
+    [propName: string]: Voiceover
   }
 }
 
@@ -52,8 +45,12 @@ export class RecordedVoiceovers {
     return Object.keys(this.voiceoversMapping);
   }
 
-  getBindableVoiceovers(contentId: string): VoiceoverByLanguageCode {
+  getBindableVoiceovers(contentId: string): {[propName: string]: Voiceover} {
     return this.voiceoversMapping[contentId];
+  }
+
+  getVoiceover(contentId: string, langCode: string): Voiceover {
+    return this.voiceoversMapping[contentId][langCode];
   }
 
   markAllVoiceoversAsNeedingUpdate(contentId: string): void {

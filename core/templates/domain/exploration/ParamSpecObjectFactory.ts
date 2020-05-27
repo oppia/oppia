@@ -24,9 +24,7 @@ import { ParamType, ParamTypeObjectFactory } from
   'domain/exploration/ParamTypeObjectFactory';
 
 export interface IParamSpecBackendDict {
-  /* eslint-disable camelcase */
-  obj_type: string;
-  /* eslint-enable camelcase */
+  'obj_type': string;
 }
 
 export class ParamSpec {
@@ -37,12 +35,8 @@ export class ParamSpec {
     return this.objType;
   }
 
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because the return type is a dict with underscore_cased
-  // keys which give tslint errors against underscore_casing in favor of
-  // camelCasing.
   /** @returns {{obj_type: String}} - Basic dict for backend consumption. */
-  toBackendDict(): any {
+  toBackendDict(): IParamSpecBackendDict {
     return {
       obj_type: this.objType.getName(),
     };
@@ -54,12 +48,15 @@ export class ParamSpec {
 })
 export class ParamSpecObjectFactory {
   constructor(private paramTypeObjectFactory: ParamTypeObjectFactory) {}
-
+  /**
+   * @param {!{obj_type: String}} paramSpecBackendDict - Basic dict from
+   *    backend.
+   * @returns {ParamSpec} - A new ParamSpec instance.
+   */
   createFromBackendDict(
       paramSpecBackendDict: IParamSpecBackendDict): ParamSpec {
-    return new ParamSpec(
-      this.paramTypeObjectFactory.getTypeFromBackendName(
-        paramSpecBackendDict.obj_type));
+    return new ParamSpec(this.paramTypeObjectFactory.getTypeFromBackendName(
+      paramSpecBackendDict.obj_type));
   }
 
   createDefault(): ParamSpec {

@@ -21,10 +21,8 @@ import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
 export interface ISubtitledHtmlBackendDict {
-  /* eslint-disable camelcase */
-  content_id: string;
-  html: string;
-  /* eslint-enable camelcase */
+  'content_id': string;
+  'html': string;
 }
 
 export class SubtitledHtml {

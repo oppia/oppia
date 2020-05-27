@@ -24,25 +24,39 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { IParamSpecBackendDict, ParamSpec, ParamSpecObjectFactory } from
   'domain/exploration/ParamSpecObjectFactory';
 
-export interface IParamSpecsBackendDict {
+interface IParamSpecsBackendDict {
   [paramName: string]: IParamSpecBackendDict;
 }
 
-export interface ParamSpecDict {
+interface IParamDict {
   [paramName: string]: ParamSpec;
 }
 
 export class ParamSpecs {
+  _paramDict: IParamDict;
+  _paramSpecObjectFactory: ParamSpecObjectFactory;
+
+  /**
+   * @constructor
+   * @param {Object.<String, ParamSpec>} paramDict - params and their specs
+   *    for this object will hold.
+   */
   constructor(
-      private paramSpecObjectFactory: ParamSpecObjectFactory,
-      private paramDict: ParamSpecDict) {}
+      paramDict: IParamDict, paramSpecObjectFactory: ParamSpecObjectFactory) {
+    /** @member {Object.<String, ParamSpec>} */
+    this._paramDict = paramDict;
+    this._paramSpecObjectFactory = paramSpecObjectFactory;
+  }
 
   getParamSpec(paramName: string): ParamSpec {
     return this.paramDict[paramName];
   }
 
-  getParamDict(): ParamSpecDict {
-    return this.paramDict;
+  /**
+   * @returns {Object.<String, ParamSpec>} - the map of params to their specs.
+   */
+  getParamDict(): IParamDict {
+    return this._paramDict;
   }
 
   getParamNames(): string[] {
@@ -66,16 +80,22 @@ export class ParamSpecs {
    * @callback callback - Passed the name and corresponding ParamSpec of each
    *   parameter in the specs.
    */
-  forEach(callback: any): void {
-    Object.keys(this.paramDict).forEach(
-      paramName => callback(paramName, this.paramDict[paramName]));
+  forEach(callback: Function): void {
+    var that = this;
+    this.getParamNames().forEach((paramName) => {
+      callback(paramName, that.getParamSpec(paramName));
+    });
   }
 
+  /**
+   * @returns {Object.<String, {obj_type: String}>} - Basic dict for backend
+   *    consumption.
+   */
   toBackendDict(): IParamSpecsBackendDict {
-    const paramSpecsBackendDict = {};
-    for (const [name, spec] of Object.entries(this.paramDict)) {
-      paramSpecsBackendDict[name] = spec.toBackendDict();
-    }
+    var paramSpecsBackendDict = {};
+    this.forEach((paramName, paramSpec) => {
+      paramSpecsBackendDict[paramName] = paramSpec.toBackendDict();
+    });
     return paramSpecsBackendDict;
   }
 }
@@ -86,7 +106,14 @@ export class ParamSpecs {
 export class ParamSpecsObjectFactory {
   constructor(private paramSpecObjectFactory: ParamSpecObjectFactory) {}
 
-  createFromBackendDict(backendDict: IParamSpecsBackendDict): ParamSpecs {
+  /**
+   * @param {!Object.<String, {obj_type: String}>} paramSpecsBackendDict -
+   *    Basic dict of backend representation.
+   * @returns {ParamSpecs} - An instance with properties from the backend
+   *    dict.
+   */
+  createFromBackendDict(
+      paramSpecsBackendDict: IParamSpecsBackendDict): ParamSpecs {
     var paramDict = {};
     for (const [paramName, paramBackendDict] of Object.entries(backendDict)) {
       paramDict[paramName] = (

@@ -21,20 +21,22 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import {
-  ISubtitledHtmlBackendDict, SubtitledHtml, SubtitledHtmlObjectFactory
+  ISubtitledHtmlBackendDict,
+  SubtitledHtml,
+  SubtitledHtmlObjectFactory
 } from 'domain/exploration/SubtitledHtmlObjectFactory';
 
-export interface IHintBackendDict {
-  /* eslint-disable camelcase */
-  hint_content: ISubtitledHtmlBackendDict;
-  /* eslint-enable camelcase */
+interface IHintBackendDict {
+  'hint_content': ISubtitledHtmlBackendDict;
 }
 
 export class Hint {
   constructor(public hintContent: SubtitledHtml) {}
 
   toBackendDict(): IHintBackendDict {
-    return { hint_content: this.hintContent.toBackendDict() };
+    return {
+      hint_content: this.hintContent.toBackendDict()
+    };
   }
 }
 
