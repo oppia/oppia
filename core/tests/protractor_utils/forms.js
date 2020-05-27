@@ -360,24 +360,26 @@ var MultiSelectEditor = function(elem) {
     await elem.element(by.css(
       '.protractor-test-search-bar-dropdown-toggle')).click();
 
-    var filteredElements = (
-      await elem.element(
-        by.css('.protractor-test-search-bar-dropdown-menu')).all(
-        by.tagName('span')).filter(async function(choiceElem) {
+    var allElements = elem.all(
+      by.css('.protractor-test-search-bar-dropdown-menu span'));
+    var filteredElements = await allElements.filter(
+      async function(choiceElem) {
         var choiceText = await choiceElem.getText();
         return texts.indexOf(choiceText) !== -1;
-      }));
-    if (filteredElements.length !== texts.length) {
+      });
+    var filteredElementsCount = await filteredElements.length;
+    if (filteredElementsCount !== texts.length) {
       throw (
         'Could not toggle element selection. Values requested: ' + texts +
-      '. Found ' + filteredElements.length + ' matching elements.');
+      '. Found ' + filteredElementsCount + ' matching elements.');
     }
 
-    for (var i = 0; i < filteredElements.length; i++) {
+    for (var i = 0; i < filteredElementsCount; i++) {
     // Check that, before toggling, the element is in the correct state.
-      expect(await filteredElements[i].getAttribute('class')).toMatch(
+      var filteredElement = await filteredElements[i];
+      expect(await filteredElement.getAttribute('class')).toMatch(
         expectedClassBeforeToggle);
-      await filteredElements[i].click();
+      await filteredElement.click();
     }
 
     // Close the dropdown menu at the end.
