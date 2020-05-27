@@ -16,64 +16,66 @@
  * @fileoverview Unit tests for the UserExplorationPermissionsService.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
+import { HttpErrorResponse } from '@angular/common/http';
+import { HttpClientTestingModule, HttpTestingController }
+  from '@angular/common/http/testing';
+import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-require(
-  'pages/exploration-editor-page/services/' +
-  'user-exploration-permissions.service.ts');
-require('services/context.service.ts');
-require('services/contextual/url.service.ts');
+import { ContextService } from
+  'services/context.service';
+import { UserExplorationPermissionsService } from
+  'pages/exploration-editor-page/services/user-exploration-permissions.service';
 
-describe('User Exploration Permissions Service', function() {
-  var ueps, ContextService, UrlService, $httpBackend;
-  var sampleExplorationId = 'sample-exploration';
-  var samplePermissionsData = {
+describe('User Exploration Permissions Service', () => {
+  let ueps: UserExplorationPermissionsService = null;
+  let contextService: ContextService = null;
+  let httpTestingController: HttpTestingController = null;
+
+  let sampleExplorationId = 'sample-exploration';
+  let samplePermissionsData = {
     canEdit: false,
     canVoiceOver: true,
   };
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
 
-  beforeEach(angular.mock.inject(function($injector) {
-    ueps = $injector.get('UserExplorationPermissionsService');
-    $httpBackend = $injector.get('$httpBackend');
+  beforeEach(angular.mock.inject(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule]
+    });
 
-    ContextService = $injector.get('ContextService');
-    UrlService = $injector.get('UrlService');
-    spyOn(ContextService, 'getExplorationId').and.returnValue(
+    httpTestingController = TestBed.get(HttpTestingController);
+    ueps = TestBed.get(UserExplorationPermissionsService);
+    contextService = TestBed.get(ContextService);
+    spyOn(contextService, 'getExplorationId').and.returnValue(
       sampleExplorationId);
+    UserExplorationPermissionsService.permissionsPromise = null;
   }));
 
-  it('should fetch the correct data', function() {
-    $httpBackend.expect(
-      'GET', '/createhandler/permissions/' + sampleExplorationId).respond(
-      200, samplePermissionsData);
+  afterEach(()=> {
+    httpTestingController.verify();
+  });
 
+  it('should fetch the correct data', fakeAsync(() => {
     ueps.getPermissionsAsync().then(function(response) {
       expect(response).toEqual(samplePermissionsData);
     });
-  });
 
-  it('should cache rights data', function() {
-    $httpBackend.expect(
-      'GET', '/createhandler/permissions/' + sampleExplorationId).respond(
-      200, samplePermissionsData);
+    let req = httpTestingController.expectOne(
+      '/createhandler/permissions/' + sampleExplorationId);
+    expect(req.request.method).toEqual('GET');
+    req.flush(samplePermissionsData);
+    flushMicrotasks();
+  }));
+
+  it('should cache rights data', fakeAsync(() => {
     ueps.getPermissionsAsync();
-    $httpBackend.flush();
+    let req = httpTestingController.expectOne(
+      '/createhandler/permissions/' + sampleExplorationId);
+    expect(req.request.method).toEqual('GET');
+    req.flush(samplePermissionsData);
+    flushMicrotasks();
 
-    $httpBackend.when(
-      'GET', '/createhandler/permissions/' + sampleExplorationId).respond(
-      200, {canEdit: true, canVoiceOver: false});
     ueps.getPermissionsAsync();
-
-    expect($httpBackend.flush).toThrowError('No pending request to flush !');
-  });
+    httpTestingController.expectNone(
+      '/createhandler/permissions/' + sampleExplorationId);
+  }));
 });

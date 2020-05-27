@@ -16,35 +16,41 @@
  * @fileoverview A service that fetches and stores the permissions
  * of a user for a particular exploration.
  */
-require('domain/utilities/url-interpolation.service.ts');
-require('services/context.service.ts');
-require('services/contextual/url.service.ts');
 
-require(
-  'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
 
-angular.module('oppia').factory('UserExplorationPermissionsService', [
-  '$http', 'ContextService', 'UrlInterpolationService',
-  function(
-      $http, ContextService, UrlInterpolationService) {
-    var permissionsPromise = null;
+import { ContextService } from 'services/context.service';
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
 
-    return {
-      getPermissionsAsync: function() {
-        if (!permissionsPromise) {
-          var explorationPermissionsUrl = UrlInterpolationService
-            .interpolateUrl( '/createhandler/permissions/<exploration_id>', {
-              exploration_id: ContextService.getExplorationId()
-            });
+@Injectable({
+  providedIn: 'root'
+})
+export class UserExplorationPermissionsService {
+  constructor(
+    private contextService: ContextService,
+    private http: HttpClient,
+    private urlInterpolationService: UrlInterpolationService) {}
 
-          permissionsPromise = $http.get(explorationPermissionsUrl).then(
-            function(response) {
-              return response.data;
-            }
-          );
-        }
-        return permissionsPromise;
-      }
-    };
+  static permissionsPromise: Promise<object> = null;
+  getPermissionsAsync(): Promise<object> {
+    if (!UserExplorationPermissionsService.permissionsPromise) {
+      let explorationPermissionsUrl = this.urlInterpolationService
+        .interpolateUrl( '/createhandler/permissions/<exploration_id>', {
+          exploration_id: this.contextService.getExplorationId()
+        });
+
+      UserExplorationPermissionsService.permissionsPromise = (
+        this.http.get(explorationPermissionsUrl).toPromise().then(
+          (response) => {
+            return response;
+          }
+        ));
+    }
+    return UserExplorationPermissionsService.permissionsPromise;
   }
-]);
+}
+angular.module('oppia').factory('UserExplorationPermissionsService',
+  downgradeInjectable(UserExplorationPermissionsService));
