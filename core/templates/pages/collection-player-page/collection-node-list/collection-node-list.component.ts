@@ -22,5 +22,5 @@ angular.module('oppia').component('collectionNodeList', {
     getCollectionId: '&collectionId',
     getCollectionNodes: '&collectionNodes'
   },
-  templateUrl: require('./collection-node-list.component.html'),
+  template: require('./collection-node-list.component.html'),
 });
