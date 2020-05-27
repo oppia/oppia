@@ -21,46 +21,46 @@
 // in via initArgs.
 
 angular.module('oppia').directive('positionOfTermsEditor', [
-    function() {
-      return {
-        restrict: 'E',
-        scope: {},
-        bindToController: {
-          value: '='
-        },
-        template: require('./position-of-terms-editor.directive.html'),
-        controllerAs: '$ctrl',
-        controller: ['$scope', function($scope) {
-          var ctrl = this;
-          ctrl.$onInit = function() {
-            $scope.$watch('$ctrl.localValue.position', function() {
-              ctrl.value = ctrl.localValue.position.name;
-            });
-            ctrl.alwaysEditable = true;
-            ctrl.positionOfTerms = [{
-              name: 'lhs',
-              humanReadable: 'on LHS'
-            }, {
-              name: 'rhs',
-              humanReadable: 'on RHS'
-            }, {
-              name: 'both',
-              humanReadable: 'on both sides'
-            }, {
-              name: 'irrelevant',
-              humanReadable: 'with reordering allowed around ='
-            }];
-  
-            ctrl.localValue = {
-              position: ctrl.positionOfTerms[0]
-            };
-            for (var i = 0; i < ctrl.positionOfTerms.length; i++) {
-              if (ctrl.positionOfTerms[i].name === ctrl.value) {
-                ctrl.localValue.position = ctrl.positionOfTerms[i];
-              }
-            }
+  function() {
+    return {
+      restrict: 'E',
+      scope: {},
+      bindToController: {
+        value: '='
+      },
+      template: require('./position-of-terms-editor.directive.html'),
+      controllerAs: '$ctrl',
+      controller: ['$scope', function($scope) {
+        var ctrl = this;
+        ctrl.$onInit = function() {
+          $scope.$watch('$ctrl.localValue.position', function() {
+            ctrl.value = ctrl.localValue.position.name;
+          });
+          ctrl.alwaysEditable = true;
+
+          ctrl.positionOfTerms = [{
+            name: 'lhs',
+            humanReadableName: 'on LHS'
+          }, {
+            name: 'rhs',
+            humanReadableName: 'on RHS'
+          }, {
+            name: 'both',
+            humanReadableName: 'on both sides'
+          }, {
+            name: 'irrelevant',
+            humanReadableName: 'with reordering allowed around ='
+          }];
+
+          ctrl.localValue = {
+            position: ctrl.positionOfTerms[2]
           };
-        }]
-      };
-    }]);
-  
+          for (var i = 0; i < ctrl.positionOfTerms.length; i++) {
+            if (ctrl.positionOfTerms[i].name === ctrl.value) {
+              ctrl.localValue.position = ctrl.positionOfTerms[i];
+            }
+          }
+        };
+      }]
+    };
+  }]);
