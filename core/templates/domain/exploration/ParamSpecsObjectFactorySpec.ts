@@ -39,6 +39,19 @@ describe('ParamSpecs', () => {
     emptyParamSpecs = paramSpecsObjectFactory.createFromBackendDict({});
   });
 
+  it('should be iterable with forEach', () => {
+    const spy = jasmine.createSpy();
+
+    const paramSpec = paramSpecObjectFactory.createDefault();
+    const paramSpecs = paramSpecsObjectFactory.createFromBackendDict({
+      [paramName]: paramSpec.toBackendDict()
+    });
+
+    paramSpecs.forEach(spy);
+
+    expect(spy).toHaveBeenCalledWith(paramName, paramSpec);
+  });
+
   it('should be undefined for missing param names', () => {
     expect(emptyParamSpecs.getParamDict()[paramName]).not.toBeDefined();
     expect(emptyParamSpecs.getParamSpec(paramName)).not.toBeDefined();
