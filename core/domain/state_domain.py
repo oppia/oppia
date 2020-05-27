@@ -1931,7 +1931,7 @@ class State(python_utils.OBJECT):
                 raise Exception(
                     'Expected solution to be a list, received %s'
                     % solution_list)
-            solution_dict = solution_list[0]       
+            solution_dict = solution_list[0]  
             self.interaction.solution = Solution.from_dict(
                 self.interaction.id, solution_dict)
             new_content_id_list.append(
