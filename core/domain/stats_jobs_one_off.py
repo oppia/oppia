@@ -23,7 +23,6 @@ import ast
 import collections
 import copy
 import datetime
-import gc
 
 from core import jobs
 from core.domain import config_domain
@@ -1452,7 +1451,7 @@ class ExplorationMissingStatsAudit(jobs.BaseMapReduceOneOffJobManager):
 
                 if exp_states == exp_stats_states:
                     key = ExplorationMissingStatsAudit.STATUS_VALID_KEY
-                    yield (key.encode('utf-8'), exp_model.version)
+                    yield (key, exp_model.version)
 
     @staticmethod
     def reduce(encoded_key, str_escaped_values):
