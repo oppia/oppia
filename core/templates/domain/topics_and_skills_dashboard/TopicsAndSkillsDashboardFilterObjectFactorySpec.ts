@@ -38,16 +38,16 @@ describe('Topics And Skills Dashboard Filter Object', () => {
   });
 
   it('should create a new dashboard filter object', () => {
-    expect(filter.category).toEqual('Any');
-    expect(filter.sort).toEqual(ETopicSortOptions.Any);
-    expect(filter.status).toEqual(ETopicPublishedOptions.Any);
+    expect(filter.category).toEqual('All');
+    expect(filter.sort).toEqual(ETopicSortOptions.IncreasingCreatedOn);
+    expect(filter.status).toEqual(ETopicPublishedOptions.All);
     expect(filter.keyword).toEqual('');
   });
 
   it('should reset values of the filter', () => {
-    expect(filter.category).toEqual('Any');
-    expect(filter.sort).toEqual(ETopicSortOptions.Any);
-    expect(filter.status).toEqual(ETopicPublishedOptions.Any);
+    expect(filter.category).toEqual('All');
+    expect(filter.sort).toEqual(ETopicSortOptions.IncreasingCreatedOn);
+    expect(filter.status).toEqual(ETopicPublishedOptions.All);
     expect(filter.keyword).toEqual('');
 
     const category = 'Mathematics';
@@ -66,9 +66,9 @@ describe('Topics And Skills Dashboard Filter Object', () => {
     expect(filter.keyword).toEqual(keywords);
 
     filter.reset();
-    expect(filter.category).toEqual('Any');
-    expect(filter.sort).toEqual(ETopicSortOptions.Any);
-    expect(filter.status).toEqual(ETopicPublishedOptions.Any);
+    expect(filter.category).toEqual('All');
+    expect(filter.sort).toEqual(ETopicSortOptions.IncreasingCreatedOn);
+    expect(filter.status).toEqual(ETopicPublishedOptions.All);
     expect(filter.keyword).toEqual('');
   });
 });

@@ -33,8 +33,9 @@ export class TopicsAndSkillsDashboardFilter {
   /**
    * @param {String} category - category to filter for.
    * @param {String} keyword - keyword to filter for.
-   * @param {ETopicSortOptions} sort - Enum, allowed sort-by values.
-   * @param {ETopicPublishedOptions} status - Enum. allowed status values.
+   * @param {ETopicSortOptions} sort - One of the values in ETopicSortOptions.
+   * @param {ETopicPublishedOptions} status - One of the values
+   * in ETopicPublishedOptions.
    */
   constructor(category, keyword, sort, status) {
     this.category = category;
@@ -46,10 +47,10 @@ export class TopicsAndSkillsDashboardFilter {
    * Resets the filter object values
    */
   reset(): void {
-    this.category = 'Any';
+    this.category = 'All';
     this.keyword = '';
-    this.sort = ETopicSortOptions.Any;
-    this.status = ETopicPublishedOptions.Any;
+    this.sort = ETopicSortOptions.IncreasingCreatedOn;
+    this.status = ETopicPublishedOptions.All;
   }
 }
 
@@ -63,7 +64,8 @@ export class TopicsAndSkillsDashboardFilterObjectFactory {
    */
   createDefault(): TopicsAndSkillsDashboardFilter {
     return new TopicsAndSkillsDashboardFilter(
-      'Any', '', ETopicSortOptions.Any, ETopicPublishedOptions.Any);
+      'All', '', ETopicSortOptions.IncreasingCreatedOn,
+      ETopicPublishedOptions.All);
   }
 }
 
