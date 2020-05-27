@@ -766,8 +766,6 @@ def convert_html_fields_in_answer_group(answer_group, conversion_fn):
     Returns:
         answer_group. dict. The converted answer group dict.
     """
-    import json
-
     answer_group['outcome']['feedback']['html'] = (
         conversion_fn(answer_group['outcome']['feedback']['html']))
     for rule_spec_index, rule_spec in enumerate(answer_group['rule_specs']):
@@ -790,7 +788,7 @@ def convert_html_fields_in_answer_group(answer_group, conversion_fn):
         elif rule_spec['rule_type'] == 'Equals':
             if isinstance(rule_spec['inputs']['x'], list):
                 for value_index, value in enumerate(rule_spec['inputs']['x']):
-                    if isinstance(value, basestring):
+                    if isinstance(value, python_utils.BASESTRING):
                         answer_group['rule_specs'][rule_spec_index]['inputs'][
                             'x'][value_index] = conversion_fn(value)
     return answer_group
