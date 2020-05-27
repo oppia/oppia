@@ -39,6 +39,7 @@
     "@typescript-eslint/eslint-plugin": "^2.3.0",
     "@typescript-eslint/parser": "^2.3.0",
     "ajv": "^6.10.0",
+    "angular2-template-loader": "^0.6.2",
     "babel-eslint": "^10.0.1",
     "browserstack-local": "^1.4.2",
     "cache-loader": "^4.1.0",
