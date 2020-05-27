@@ -273,7 +273,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'oppia-short-response-image-click-input.directive.ts',
     'oppia-short-response-interactive-map.directive.ts',
     'oppia-short-response-item-selection-input.directive.ts',
-    'oppia-short-response-logic-proof.directive.ts',
+    'oppia-short-response-logic-proof.component.ts',
     'oppia-short-response-math-expression-input.directive.ts',
     'oppia-short-response-multiple-choice-input.directive.ts',
     'oppia-short-response-music-notes-input.directive.ts',

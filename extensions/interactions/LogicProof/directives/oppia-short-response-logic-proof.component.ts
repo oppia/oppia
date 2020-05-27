@@ -21,7 +21,7 @@ require('filters/string-utility-filters/truncate-at-first-line.filter.ts');
 require('services/html-escaper.service.ts');
 
 angular.module('oppia').component('oppiaShortResponseLogicProof', {
-  template: require('./logic-proof-short-response.directive.html'),
+  template: require('./logic-proof-short-response.component.html'),
   controller: [
     '$attrs', 'HtmlEscaperService',
     function($attrs, HtmlEscaperService) {

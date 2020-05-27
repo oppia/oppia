@@ -30,4 +30,4 @@ require(
   'oppia-response-logic-proof.component.ts');
 require(
   'interactions/LogicProof/directives/' +
-  'oppia-short-response-logic-proof.directive.ts');
+  'oppia-short-response-logic-proof.component.ts');
