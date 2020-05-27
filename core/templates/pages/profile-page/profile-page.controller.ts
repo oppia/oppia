@@ -88,7 +88,7 @@ angular.module('oppia').directive('profilePage', [
                     if (exploration1.playthroughs > exploration2.playthroughs) {
                       return 1;
                     } else if (
-                      exploration1.playthroughs > exploration2.playthroughs) {
+                      exploration1.playthroughs === exploration2.playthroughs) {
                       return 0;
                     } else {
                       return -1;

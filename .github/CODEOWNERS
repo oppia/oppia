@@ -484,7 +484,7 @@
 
 
 # Speed Improvement team.
-/app_dev.yaml @jameesjohn @vojtechjelinek
+/app_dev.yaml @vojtechjelinek
 /core/templates/google-analytics.initializer.ts @jameesjohn @vojtechjelinek
 /core/templates/base-components/ @jameesjohn @vojtechjelinek
 /core/templates/pages/Base.ts @jameesjohn @vojtechjelinek
