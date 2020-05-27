@@ -58,12 +58,12 @@
 
 
 # Community contribution project
-/core/controllers/community_dashboard*.py @DubeySandeep @sagangwee
-/core/domain/opportunity*.py @DubeySandeep @sagangwee
-/core/domain/voiceover_services*.py @DubeySandeep @sagangwee
-/core/storage/opportunity/ @DubeySandeep @sagangwee
-/core/templates/domain/opportunity @DubeySandeep @sagangwee
-/core/templates/pages/community-dashboard-page/ @DubeySandeep @sagangwee
+/core/controllers/community_dashboard*.py @sagangwee
+/core/domain/opportunity*.py @sagangwee
+/core/domain/voiceover_services*.py @sagangwee
+/core/storage/opportunity/ @sagangwee
+/core/templates/domain/opportunity/ @sagangwee
+/core/templates/pages/community-dashboard-page/ @sagangwee
 
 
 # Core documentation
@@ -484,7 +484,7 @@
 
 
 # Speed Improvement team.
-/app_dev.yaml @jameesjohn @vojtechjelinek
+/app_dev.yaml @vojtechjelinek
 /core/templates/google-analytics.initializer.ts @jameesjohn @vojtechjelinek
 /core/templates/base-components/ @jameesjohn @vojtechjelinek
 /core/templates/pages/Base.ts @jameesjohn @vojtechjelinek
@@ -496,6 +496,8 @@
 /core/templates/services/csrf-token.service*.ts @jameesjohn @vojtechjelinek
 /core/templates/third-party-imports/ @nishantwrp @vojtechjelinek
 /jinja_utils*.py @jameesjohn @vojtechjelinek
+/.lighthouserc.json @jimbyo @jameesjohn @vojtechjelinek
+/scripts/run_lighthouse_tests.py @jameesjohn @jimbyo @vojtechjelinek
 /webpack.common.config.ts @jameesjohn @vojtechjelinek
 /webpack.common.macros.ts @jameesjohn @vojtechjelinek
 /webpack.dev.config.ts @jameesjohn @vojtechjelinek
