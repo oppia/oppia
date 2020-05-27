@@ -1217,7 +1217,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 'content_id': 'solution',
                 'html': '<p>hello_world is a string</p>'
             },
-        } 
+        }
         init_state.update_interaction_solution([solution])
 
         self.assertEqual(exploration.get_content_count(), 7)
@@ -1932,6 +1932,7 @@ class YamlCreationUnitTests(test_utils.GenericTestBase):
 
         # Verify SAMPLE_UNTITLED_YAML_CONTENT can be converted to an exploration
         # without error.
+        
         exp_domain.Exploration.from_untitled_yaml(
             'exp4', 'Title', 'Category', self.SAMPLE_UNTITLED_YAML_CONTENT)
 
