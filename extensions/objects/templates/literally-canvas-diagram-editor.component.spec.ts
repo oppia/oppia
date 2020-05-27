@@ -1,4 +1,4 @@
-// Copyright 2014 The Oppia Authors. All Rights Reserved.
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -28,7 +28,6 @@ describe('LiterallyCanvasDiagramEditor', function() {
   };
 
   beforeEach(angular.mock.module('oppia'));
-
   beforeEach(angular.mock.inject(function($componentController) {
     LCDiagramEditorCtrl = $componentController('literallyCanvasDiagramEditor');
     var mockDocument = document.createElement('div');
@@ -40,14 +39,14 @@ describe('LiterallyCanvasDiagramEditor', function() {
   }));
 
   it('should update diagram size', function() {
-    var width = 100;
-    var height = 100;
-    LCDiagramEditorCtrl.diagramWidth = width;
-    LCDiagramEditorCtrl.diagramHeight = height;
+    var WIDHT = 100;
+    var HEIGHT = 100;
+    LCDiagramEditorCtrl.diagramWidth = WIDHT;
+    LCDiagramEditorCtrl.diagramHeight = HEIGHT;
     LCDiagramEditorCtrl.onWidthInputBlur();
-    expect(LCDiagramEditorCtrl.currentDiagramWidth).toBe(100);
+    expect(LCDiagramEditorCtrl.currentDiagramWidth).toBe(WIDHT);
     LCDiagramEditorCtrl.onHeightInputBlur();
-    expect(LCDiagramEditorCtrl.currentDiagramHeight).toBe(100);
+    expect(LCDiagramEditorCtrl.currentDiagramHeight).toBe(HEIGHT);
   });
 
   it('should return information on diagram size', function() {

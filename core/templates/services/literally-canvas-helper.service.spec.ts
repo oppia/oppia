@@ -1,4 +1,4 @@
-// Copyright 2014 The Oppia Authors. All Rights Reserved.
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@ describe('LiterallyCanvasHelperService', function() {
   var LiterallyCanvasHelperService = null;
 
   beforeEach(angular.mock.module('oppia'));
-
   beforeEach(angular.mock.inject(function($injector) {
     LiterallyCanvasHelperService = $injector.get(
       'LiterallyCanvasHelperService');
@@ -42,8 +41,7 @@ describe('LiterallyCanvasHelperService', function() {
     ')" fill="hsla(0, 0%, 100%, 1)" stroke-width="1"></rect>';
     var svgTag = null;
     svgTag = (
-      LiterallyCanvasHelperService.rectangleSVGRenderer(rectShape)
-    );
+      LiterallyCanvasHelperService.rectangleSVGRenderer(rectShape));
     expect(svgTag).toBe(actualSvgTag);
   });
 
@@ -63,8 +61,7 @@ describe('LiterallyCanvasHelperService', function() {
     '" fill="hsla(0, 0%, 100%, 1)" stroke-width="2"></ellipse>';
     var svgTag = null;
     svgTag = (
-      LiterallyCanvasHelperService.ellipseSVGRenderer(ellipseShape)
-    );
+      LiterallyCanvasHelperService.ellipseSVGRenderer(ellipseShape));
     expect(svgTag).toBe(renderedSvgTag);
   });
 
@@ -99,15 +96,12 @@ describe('LiterallyCanvasHelperService', function() {
     ' style="font: 18px &quot;Helvetica Neue&quot;, Helvetica, Arial, sans-s' +
     'erif;"><tspan x="72.5" dy="0" alignment-baseline="text-before-edge">hel' +
     'lo</tspan></text>';
-    var svgTag = null;
-    svgTag = (
-      LiterallyCanvasHelperService.textSVGRenderer(textShape1)
-    );
-    expect(svgTag).toBe(renderedSvgTag1);
-    svgTag = (
-      LiterallyCanvasHelperService.textSVGRenderer(textShape2)
-    );
-    expect(svgTag).toBe(renderedSvgTag2);
+    var svgTag1 = (
+      LiterallyCanvasHelperService.textSVGRenderer(textShape1));
+    expect(svgTag1).toBe(renderedSvgTag1);
+    var svgTag2 = (
+      LiterallyCanvasHelperService.textSVGRenderer(textShape2));
+    expect(svgTag2).toBe(renderedSvgTag2);
   });
 
   it('should convert a line shapeobject to svg tag', function() {
@@ -137,8 +131,7 @@ describe('LiterallyCanvasHelperService', function() {
     '27209596054326,95.60831529892785"></polygon></g>';
     var svgTag = null;
     svgTag = (
-      LiterallyCanvasHelperService.lineSVGRenderer(lineShape)
-    );
+      LiterallyCanvasHelperService.lineSVGRenderer(lineShape));
     expect(svgTag).toBe(renderedSvgTag);
   });
 
@@ -179,8 +172,7 @@ describe('LiterallyCanvasHelperService', function() {
     '%, 1)" stroke-linecap="round" stroke-width="2"></polyline>';
     var svgTag = null;
     svgTag = (
-      LiterallyCanvasHelperService.linepathSVGRenderer(linepathShape)
-    );
+      LiterallyCanvasHelperService.linepathSVGRenderer(linepathShape));
     expect(svgTag).toBe(renderedSvgTag);
   });
 
@@ -259,15 +251,12 @@ describe('LiterallyCanvasHelperService', function() {
     '6,208 220,149" stroke="none"></polyline><polyline fill="none" points="1' +
     '46.5,108.5 72,174 156,208 220,149" stroke="hsla(0, 0%, 0%, 1)" stroke-w' +
     'idth="2"></polyline></g>';
-    var svgTag = null;
-    svgTag = (
-      LiterallyCanvasHelperService.polygonSVGRenderer(closedPolygonShape)
-    );
-    expect(svgTag).toBe(closedSvgTag);
-    svgTag = (
-      LiterallyCanvasHelperService.polygonSVGRenderer(openPolygonShape)
-    );
-    expect(svgTag).toBe(openSvgTag);
+    var svgTag1 = (
+      LiterallyCanvasHelperService.polygonSVGRenderer(closedPolygonShape));
+    expect(svgTag1).toBe(closedSvgTag);
+    var svgTag2 = (
+      LiterallyCanvasHelperService.polygonSVGRenderer(openPolygonShape));
+    expect(svgTag2).toBe(openSvgTag);
   });
 
   it('should fail svg validation', function() {
