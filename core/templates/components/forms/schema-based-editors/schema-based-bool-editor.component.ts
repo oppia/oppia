@@ -22,5 +22,5 @@ angular.module('oppia').component('schemaBasedBoolEditor', {
     isDisabled: '&',
     labelForFocusTarget: '&'
   },
-  template: require('./schema-based-bool-editor.directive.html'),
+  template: require('./schema-based-bool-editor.component.html'),
 });
