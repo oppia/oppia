@@ -21,7 +21,7 @@ require(
 require(
   'components/forms/schema-viewers/schema-based-dict-viewer.directive.ts');
 require(
-  'components/forms/schema-viewers/schema-based-html-viewer.directive.ts');
+  'components/forms/schema-viewers/schema-based-html-viewer.component.ts');
 require(
   'components/forms/schema-viewers/schema-based-list-viewer.directive.ts');
 require(

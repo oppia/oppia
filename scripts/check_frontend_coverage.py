@@ -351,7 +351,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'schema-based-expression-editor.directive.ts',
     'schema-based-float-editor.directive.ts',
     'schema-based-html-editor.directive.ts',
-    'schema-based-html-viewer.directive.ts',
+    'schema-based-html-viewer.component.ts',
     'schema-based-int-editor.directive.ts',
     'schema-based-list-editor.directive.ts',
     'schema-based-list-viewer.directive.ts',

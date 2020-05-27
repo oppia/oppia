@@ -20,5 +20,5 @@ angular.module('oppia').component('schemaBasedHtmlViewer', {
   bindings: {
     localValue: '='
   },
-  template: require('./schema-based-html-viewer.directive.html')
+  template: require('./schema-based-html-viewer.component.html')
 });
