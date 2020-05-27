@@ -1929,10 +1929,6 @@ class YamlCreationUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(exploration2.states), 2)
         yaml_content_2 = exploration2.to_yaml()
         self.assertEqual(yaml_content_2, yaml_content)
-
-        # Verify SAMPLE_UNTITLED_YAML_CONTENT can be converted to an exploration
-        # without error.
-        
         exp_domain.Exploration.from_untitled_yaml(
             'exp4', 'Title', 'Category', self.SAMPLE_UNTITLED_YAML_CONTENT)
 
