@@ -102,15 +102,22 @@ def get_suggestion_from_model(suggestion_model):
     Returns:
         Suggestion. The corresponding Suggestion domain object.
     """
+
     suggestion_domain_class = (
         suggestion_registry.SUGGESTION_TYPES_TO_DOMAIN_CLASSES[
             suggestion_model.suggestion_type])
-    return suggestion_domain_class(
+    suggestion_domain = suggestion_domain_class(
         suggestion_model.id, suggestion_model.target_id,
         suggestion_model.target_version_at_submission,
         suggestion_model.status, suggestion_model.author_id,
         suggestion_model.final_reviewer_id, suggestion_model.change_cmd,
         suggestion_model.score_category, suggestion_model.last_updated)
+    import json
+    print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$\n")
+    print("in get_suggestion_from_model")
+    print(json.dumps(suggestion_domain.to_dict(), indent=4))
+
+    return suggestion_domain
 
 
 def get_suggestion_by_id(suggestion_id):
