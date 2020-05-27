@@ -435,8 +435,11 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
             return alist[:num]
 
         sample_swap = self.swap(random, 'sample', mock_random_sample)
-        utils.random.seed(1)
-        with sample_swap:
+
+        def mock_random_int(upper_bound):
+            return 1 if upper_bound > 1 else 0
+        random_int_swap = self.swap(utils, 'get_random_int', mock_random_int)
+        with sample_swap, random_int_swap:
             question_skill_links_1 = (
                 question_models.QuestionSkillLinkModel.
                 get_question_skill_links_based_on_difficulty_equidistributed_by_skill( # pylint: disable=line-too-long
@@ -446,24 +449,8 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(question_skill_links_1), 3)
         self.assertEqual(
             question_skill_links_1,
-            [questionskilllink_model1, questionskilllink_model2,
-             questionskilllink_model3])
-
-        sample_swap = self.swap(random, 'sample', mock_random_sample)
-        utils.random.seed(2)
-        with sample_swap:
-            question_skill_links_2 = (
-                question_models.QuestionSkillLinkModel.
-                get_question_skill_links_based_on_difficulty_equidistributed_by_skill( # pylint: disable=line-too-long
-                    3, ['skill_id1'], 0.6
-                )
-            )
-        self.assertEqual(len(question_skill_links_1), 3)
-        self.assertEqual(
-            question_skill_links_2,
             [questionskilllink_model2, questionskilllink_model3,
              questionskilllink_model4])
-        self.assertNotEqual(question_skill_links_1, question_skill_links_2)
 
     def test_request_too_many_skills_raises_error_when_fetch_by_difficulty(
             self):
@@ -614,8 +601,10 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
             return alist[:num]
 
         sample_swap = self.swap(random, 'sample', mock_random_sample)
-        utils.random.seed(1)
-        with sample_swap:
+        def mock_random_int(upper_bound):
+            return 1 if upper_bound > 1 else 0
+        random_int_swap = self.swap(utils, 'get_random_int', mock_random_int)
+        with sample_swap, random_int_swap:
             question_skill_links_1 = (
                 question_models.QuestionSkillLinkModel.
                 get_question_skill_links_equidistributed_by_skill(
@@ -625,23 +614,8 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(question_skill_links_1), 3)
         self.assertEqual(
             question_skill_links_1,
-            [questionskilllink_model1, questionskilllink_model2,
-             questionskilllink_model3])
-        sample_swap = self.swap(random, 'sample', mock_random_sample)
-        utils.random.seed(2)
-        with sample_swap:
-            question_skill_links_2 = (
-                question_models.QuestionSkillLinkModel.
-                get_question_skill_links_equidistributed_by_skill(
-                    3, ['skill_id1']
-                )
-            )
-        self.assertEqual(len(question_skill_links_2), 3)
-        self.assertEqual(
-            question_skill_links_2,
             [questionskilllink_model2, questionskilllink_model3,
              questionskilllink_model4])
-        self.assertNotEqual(question_skill_links_1, question_skill_links_2)
 
     def test_request_too_many_skills_raises_error(self):
         skill_ids = ['skill_id%s' % number for number in python_utils.RANGE(25)]

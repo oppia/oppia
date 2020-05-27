@@ -240,7 +240,8 @@ def get_random_int(upper_bound):
     """
     assert upper_bound >= 0 and isinstance(upper_bound, int)
 
-    return random.randrange(0, stop=upper_bound)
+    generator = random.SystemRandom()
+    return generator.randrange(0, stop=upper_bound)
 
 
 def get_random_choice(alist):

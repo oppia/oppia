@@ -362,9 +362,9 @@ class QuestionSkillLinkModel(base_models.BaseModel):
         # 2) Adding an additional column that can be filtered upon.
         # But these methods are not viable because google datastore limits
         # each query to have at most one inequality filter. So we can't filter
-        # on both question_id and difficulty. Just noting, for posterity, that
-        # the thread is continued
-        # https://github.com/oppia/oppia/pull/9061#issuecomment-629765809 .
+        # on both question_id and difficulty. Please see
+        # https://github.com/oppia/oppia/pull/9061#issuecomment-629765809
+        # for more details.
 
         def get_offset(query):
             """Helper function to get the offset."""
