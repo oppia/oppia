@@ -90,7 +90,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'collection-permissions-card.directive.ts',
     'collection-player-page.directive.ts',
     'collection-settings-tab.directive.ts',
-    'collection-statistics-tab.directive.ts',
+    'collection-statistics-tab.component.ts',
     'collection-summary-tile.directive.ts',
     'collection-update.service.ts',
     'CollectionNodeObjectFactory.ts',

@@ -17,5 +17,5 @@
  */
 
 angular.module('oppia').component('collectionStatisticsTab', {
-  template: require('./collection-statistics-tab.directive.html'),
+  template: require('./collection-statistics-tab.component.html'),
 });
