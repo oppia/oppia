@@ -74,7 +74,8 @@ export class LearnerAnswerInfoService {
 
   initLearnerAnswerInfoService(
       entityId: string, state: State, answer: string,
-      interactionRulesService: any, alwaysAskLearnerForAnswerInfo: boolean): void {
+      interactionRulesService: any,
+      alwaysAskLearnerForAnswerInfo: boolean): void {
     this.currentEntityId = entityId;
     this.currentAnswer = answer;
     this.currentInteractionRulesService = interactionRulesService;

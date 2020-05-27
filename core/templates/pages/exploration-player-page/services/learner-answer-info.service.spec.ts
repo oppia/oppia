@@ -33,32 +33,27 @@ import { OutcomeObjectFactory } from
 import { State, StateObjectFactory } from 'domain/state/StateObjectFactory.ts';
 import { UpgradedServices } from 'services/UpgradedServices';
 
-describe('Learner answer info service', () => {
+fdescribe('Learner answer info service', () => {
   let sof: StateObjectFactory = null;
   let oof: OutcomeObjectFactory = null;
   let acrof: AnswerClassificationResultObjectFactory = null;
-  var stateDict = null;
+  let stateDict: any = null;
   let firstState: State = null;
   let secondState: State = null;
   let thirdState: State = null;
   let mockAnswer: string = null;
-  var mockInteractionRulesService = null;
+  let mockInteractionRulesService: any = null;
   let ladbas: LearnerAnswerDetailsBackendApiService = null;
   let learnerAnswerInfoService: LearnerAnswerInfoService = null;
   let answerClassificationService: AnswerClassificationService = null;
-  var DEFAULT_OUTCOME_CLASSIFICATION;
-
+  let DEFAULT_OUTCOME_CLASSIFICATION;
+  /*
   beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-
     $provide.value('AnswerClassificationService', {
       getMatchingClassificationResult: function() {},
     });
   }));
-
+  */
   beforeEach(() => {
     stateDict = {
       content: {
@@ -177,51 +172,48 @@ describe('Learner answer info service', () => {
     // canAskLearnerAnswerInfo which is a boolean variable as true as every
     // probability index is greater than 0.
     spyOn(Math, 'random').and.returnValue(0);
+    console.log(learnerAnswerInfoService);
   });
 
-  describe('.initLearnerAnswerInfo', () => {
+  fdescribe('.initLearnerAnswerInfo', () => {
     beforeEach(() => {
       learnerAnswerInfoService.initLearnerAnswerInfoService(
         '10', firstState, mockAnswer, mockInteractionRulesService, false);
     });
 
-    it('should return can ask learner for answer info true', function() {
-      expect(learnerAnswerInfoService.canAskLearnerForAnswerInfo()).toEqual(
-        true);
+    fit('should return can ask learner for answer info true', function() {
+      expect(learnerAnswerInfoService.canAskLearnerForAnswerInfo()).toBe(true);
     });
 
-    it('should return current answer', function() {
+    fit('should return current answer', function() {
       expect(learnerAnswerInfoService.getCurrentAnswer()).toEqual(
         'This is my answer');
     });
 
-    it('should return current interaction rules service', function() {
+    fit('should return current interaction rules service', function() {
       expect(
         learnerAnswerInfoService.getCurrentInteractionRulesService()).toEqual(
         mockInteractionRulesService);
     });
   });
 
-  describe('learner answer info service', () => {
+  fdescribe('learner answer info service', () => {
     beforeEach(() => {
       learnerAnswerInfoService.initLearnerAnswerInfoService(
         '10', firstState, mockAnswer, mockInteractionRulesService, false);
     });
 
-    it('should not ask for answer details for same state', function() {
-      expect(learnerAnswerInfoService.canAskLearnerForAnswerInfo()).toEqual(
-        true);
+    fit('should not ask for answer details for same state', function() {
+      expect(learnerAnswerInfoService.canAskLearnerForAnswerInfo()).toBe(true);
       learnerAnswerInfoService.recordLearnerAnswerInfo('My answer details');
-      expect(learnerAnswerInfoService.canAskLearnerForAnswerInfo()).toEqual(
-        false);
+      expect(learnerAnswerInfoService.canAskLearnerForAnswerInfo()).toBe(false);
       learnerAnswerInfoService.initLearnerAnswerInfoService(
         '10', firstState, mockAnswer, mockInteractionRulesService, false);
-      expect(learnerAnswerInfoService.canAskLearnerForAnswerInfo()).toEqual(
-        false);
+      expect(learnerAnswerInfoService.canAskLearnerForAnswerInfo()).toBe(false);
     });
   });
 
-  describe(
+  fdescribe(
     'should not ask for answer details for trivial interaction ids',
     () => {
       beforeEach(() => {
@@ -230,33 +222,33 @@ describe('Learner answer info service', () => {
           '10', firstState, mockAnswer, mockInteractionRulesService, false);
       });
 
-      it('should return can ask learner for answer info false', function() {
-        expect(learnerAnswerInfoService.canAskLearnerForAnswerInfo()).toEqual(
+      fit('should return can ask learner for answer info false', function() {
+        expect(learnerAnswerInfoService.canAskLearnerForAnswerInfo()).toBe(
           false);
       });
     });
 
-  describe('init learner answer info service with solicit answer details false',
+  fdescribe('init learner answer info service with solicit answer details false',
     () => {
       beforeEach(() => {
         firstState.solicitAnswerDetails = false;
         learnerAnswerInfoService.initLearnerAnswerInfoService(
           '10', firstState, mockAnswer, mockInteractionRulesService, false);
       });
-      it('should return can ask learner for answer info false', function() {
-        expect(learnerAnswerInfoService.canAskLearnerForAnswerInfo()).toEqual(
+      fit('should return can ask learner for answer info false', function() {
+        expect(learnerAnswerInfoService.canAskLearnerForAnswerInfo()).toBe(
           false);
       });
     });
 
 
-  describe('.recordLearnerAnswerInfo', () => {
+  fdescribe('.recordLearnerAnswerInfo', () => {
     beforeEach(() => {
       learnerAnswerInfoService.initLearnerAnswerInfoService(
         '10', firstState, mockAnswer, mockInteractionRulesService, false);
     });
 
-    it('should record learner answer details', function() {
+    fit('should record learner answer details', function() {
       spyOn(ladbas, 'recordLearnerAnswerDetails');
       learnerAnswerInfoService.recordLearnerAnswerInfo('My details');
       expect(
@@ -265,7 +257,7 @@ describe('Learner answer info service', () => {
     });
   });
 
-  describe('learner answer info service', () => {
+  fdescribe('learner answer info service', () => {
     beforeEach(() => {
       learnerAnswerInfoService.initLearnerAnswerInfoService(
         '10', firstState, mockAnswer, mockInteractionRulesService, false);
@@ -275,22 +267,21 @@ describe('Learner answer info service', () => {
       learnerAnswerInfoService.recordLearnerAnswerInfo('My details 1');
     });
 
-    it('should not record answer details more than two times', function() {
+    fit('should not record answer details more than two times', function() {
       learnerAnswerInfoService.initLearnerAnswerInfoService(
         '10', thirdState, mockAnswer, mockInteractionRulesService, false);
-      expect(learnerAnswerInfoService.canAskLearnerForAnswerInfo()).toEqual(
-        false);
+      expect(learnerAnswerInfoService.canAskLearnerForAnswerInfo()).toBe(false);
     });
   });
 
-  describe('return html from the service', () => {
-    it('should return solicit answer details question', function() {
+  fdescribe('return html from the service', () => {
+    fit('should return solicit answer details question', function() {
       expect(
         learnerAnswerInfoService.getSolicitAnswerDetailsQuestion()).toEqual(
         '<p translate="I18N_SOLICIT_ANSWER_DETAILS_QUESTION"></p>');
     });
 
-    it('should return solicit answer details feedback', function() {
+    fit('should return solicit answer details feedback', function() {
       expect(
         learnerAnswerInfoService.getSolicitAnswerDetailsFeedback()).toEqual(
         '<p translate="I18N_SOLICIT_ANSWER_DETAILS_FEEDBACK"></p>');
