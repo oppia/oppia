@@ -515,8 +515,8 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             rubrics=[],
             next_misconception_id=0,
             misconceptions_schema_version=0,
-            rubric_schema_version=1,
-            skill_contents_schema_version=1,
+            rubric_schema_version=3,
+            skill_contents_schema_version=2,
             all_questions_merged=False
         )
         commit_cmd_dicts = [commit_cmd.to_dict()]
@@ -540,9 +540,9 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             misconceptions=[],
             rubrics=[],
             next_misconception_id=0,
-            misconceptions_schema_version=1,
+            misconceptions_schema_version=2,
             rubric_schema_version=0,
-            skill_contents_schema_version=1,
+            skill_contents_schema_version=2,
             all_questions_merged=False
         )
         commit_cmd_dicts = [commit_cmd.to_dict()]
@@ -1010,18 +1010,6 @@ class SkillMasteryServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(arranged_filtered_skill_ids, self.SKILL_IDS)
 
 
-# TODO(lilithxxx): Remove this mock class and tests for the mock skill
-# migrations once the actual functions are implemented.
-# See issue: https://github.com/oppia/oppia/issues/7009.
-class MockSkillObject(skill_domain.Skill):
-    """Mocks Skill domain object."""
-
-    @classmethod
-    def _convert_skill_contents_v1_dict_to_v2_dict(cls, skill_contents):
-        """Converts v1 skill_contents dict to v2."""
-        return skill_contents
-
-
 class SkillMigrationTests(test_utils.GenericTestBase):
 
     def test_migrate_skill_contents_to_latest_schema(self):
@@ -1029,26 +1017,93 @@ class SkillMigrationTests(test_utils.GenericTestBase):
             'cmd': skill_domain.CMD_CREATE_NEW
         })
         explanation_content_id = feconf.DEFAULT_SKILL_EXPLANATION_CONTENT_ID
+        html = (
+            '<p>Value</p><oppia-noninteractive-math ' +
+            'raw_latex-with-value="&amp;quot;+,-,-,+&amp;quot' +
+            ';"></oppia-noninteractive-math>')
+
+        expected_html = (
+            '<p>Value</p><oppia-noninteractive-' +
+            'math math_content-with-value="{&amp;quot' +
+            ';raw_latex&amp;quot;: &amp;quot;+,-,-,+' +
+            '&amp;quot;, &amp;quot;svg_filename&amp;' +
+            'quot;: &amp;quot;&amp;quot;}"></oppia' +
+            '-noninteractive-math>')
+
+        written_translations_dict = {
+            'translations_mapping': {
+                'content1': {
+                    'en': {
+                        'html': '',
+                        'needs_update': True
+                    },
+                    'hi': {
+                        'html': 'Hey!',
+                        'needs_update': False
+                    }
+                }
+            }
+        }
+        written_translations_dict_math = {
+            'translations_mapping': {
+                'content1': {
+                    'en': {
+                        'html': expected_html,
+                        'needs_update': True
+                    },
+                    'hi': {
+                        'html': 'Hey!',
+                        'needs_update': False
+                    }
+                }
+            }
+        }
+        worked_example_dict = {
+            'question': {
+                'content_id': 'question1',
+                'html': ''
+            },
+            'explanation': {
+                'content_id': 'explanation1',
+                'html': ''
+            }
+        }
+        worked_example_dict_math = {
+            'question': {
+                'content_id': 'question1',
+                'html': expected_html
+            },
+            'explanation': {
+                'content_id': 'explanation1',
+                'html': expected_html
+            }
+        }
+
         skill_contents = skill_domain.SkillContents(
             state_domain.SubtitledHtml(
-                explanation_content_id, feconf.DEFAULT_SKILL_EXPLANATION), [],
+                explanation_content_id, ''),
+            [skill_domain.WorkedExample.from_dict(worked_example_dict)],
             state_domain.RecordedVoiceovers.from_dict({
                 'voiceovers_mapping': {
                     explanation_content_id: {}
                 }
             }),
-            state_domain.WrittenTranslations.from_dict({
-                'translations_mapping': {
-                    explanation_content_id: {}
-                }
-            }))
+            state_domain.WrittenTranslations.from_dict(
+                written_translations_dict))
+        skill_contents_dict = skill_contents.to_dict()
+        skill_contents_dict['explanation']['html'] = html
+        skill_contents_dict['written_translations'][
+            'translations_mapping']['content1']['en']['html'] = html
+        skill_contents_dict['worked_examples'][0]['question']['html'] = html
+        skill_contents_dict['worked_examples'][0]['explanation']['html'] = html
+
         model = skill_models.SkillModel(
             id='skill_id',
             description='description',
             language_code='en',
             misconceptions=[],
             rubrics=[],
-            skill_contents=skill_contents.to_dict(),
+            skill_contents=skill_contents_dict,
             next_misconception_id=1,
             misconceptions_schema_version=1,
             rubric_schema_version=1,
@@ -1059,7 +1114,7 @@ class SkillMigrationTests(test_utils.GenericTestBase):
         model.commit(
             'user_id_admin', 'skill model created', commit_cmd_dicts)
 
-        swap_skill_object = self.swap(skill_domain, 'Skill', MockSkillObject)
+        swap_skill_object = self.swap(skill_domain, 'Skill', skill_domain.Skill)
         current_schema_version_swap = self.swap(
             feconf, 'CURRENT_SKILL_CONTENTS_SCHEMA_VERSION', 2)
 
@@ -1068,11 +1123,34 @@ class SkillMigrationTests(test_utils.GenericTestBase):
 
         self.assertEqual(skill.skill_contents_schema_version, 2)
 
+        self.assertEqual(
+            (skill.skill_contents.to_dict())['explanation']['html'],
+            expected_html)
+        self.assertEqual(
+            (skill.skill_contents.to_dict())['written_translations'],
+            written_translations_dict_math)
+        self.assertEqual(
+            (skill.skill_contents.to_dict())['worked_examples'][0],
+            worked_example_dict_math)
+
     def test_migrate_misconceptions_to_latest_schema(self):
         commit_cmd = skill_domain.SkillChange({
             'cmd': skill_domain.CMD_CREATE_NEW
         })
         explanation_content_id = feconf.DEFAULT_SKILL_EXPLANATION_CONTENT_ID
+        html = (
+            '<p>Value</p><oppia-noninteractive-math ' +
+            'raw_latex-with-value="&amp;quot;+,-,-,+&amp;quot' +
+            ';"></oppia-noninteractive-math>')
+
+        expected_html = (
+            '<p>Value</p><oppia-noninteractive-' +
+            'math math_content-with-value="{&amp;quot' +
+            ';raw_latex&amp;quot;: &amp;quot;+,-,-,+' +
+            '&amp;quot;, &amp;quot;svg_filename&amp;' +
+            'quot;: &amp;quot;&amp;quot;}"></oppia' +
+            '-noninteractive-math>')
+
         skill_contents = skill_domain.SkillContents(
             state_domain.SubtitledHtml(
                 explanation_content_id, feconf.DEFAULT_SKILL_EXPLANATION), [],
@@ -1093,8 +1171,8 @@ class SkillMigrationTests(test_utils.GenericTestBase):
             misconceptions=[{
                 'id': 1,
                 'name': 'name',
-                'notes': 'notes',
-                'feedback': 'default_feedback'
+                'notes': html,
+                'feedback': html
             }],
             rubrics=[],
             skill_contents=skill_contents.to_dict(),
@@ -1109,19 +1187,32 @@ class SkillMigrationTests(test_utils.GenericTestBase):
             'user_id_admin', 'skill model created', commit_cmd_dicts)
 
         current_schema_version_swap = self.swap(
-            feconf, 'CURRENT_MISCONCEPTIONS_SCHEMA_VERSION', 2)
+            feconf, 'CURRENT_MISCONCEPTIONS_SCHEMA_VERSION', 3)
 
         with current_schema_version_swap:
             skill = skill_services.get_skill_from_model(model)
 
-        self.assertEqual(skill.misconceptions_schema_version, 2)
+        self.assertEqual(skill.misconceptions_schema_version, 3)
         self.assertEqual(skill.misconceptions[0].must_be_addressed, True)
+        self.assertEqual(skill.misconceptions[0].notes, expected_html)
+        self.assertEqual(skill.misconceptions[0].feedback, expected_html)
 
     def test_migrate_rubrics_to_latest_schema(self):
         commit_cmd = skill_domain.SkillChange({
             'cmd': skill_domain.CMD_CREATE_NEW
         })
         explanation_content_id = feconf.DEFAULT_SKILL_EXPLANATION_CONTENT_ID
+        html = (
+            '<p>Value</p><oppia-noninteractive-math ' +
+            'raw_latex-with-value="&amp;quot;+,-,-,+&amp;quot' +
+            ';"></oppia-noninteractive-math>')
+        expected_html = (
+            '<p>Value</p><oppia-noninteractive-' +
+            'math math_content-with-value="{&amp;quot' +
+            ';raw_latex&amp;quot;: &amp;quot;+,-,-,+' +
+            '&amp;quot;, &amp;quot;svg_filename&amp;' +
+            'quot;: &amp;quot;&amp;quot;}"></oppia' +
+            '-noninteractive-math>')
         skill_contents = skill_domain.SkillContents(
             state_domain.SubtitledHtml(
                 explanation_content_id, feconf.DEFAULT_SKILL_EXPLANATION), [],
@@ -1143,36 +1234,37 @@ class SkillMigrationTests(test_utils.GenericTestBase):
             misconceptions=[],
             rubrics=[{
                 'difficulty': 'Easy',
-                'explanation': 'Easy explanation'
+                'explanations': ['Easy explanation']
             }, {
                 'difficulty': 'Medium',
-                'explanation': 'Medium explanation'
+                'explanations': ['Medium explanation']
             }, {
                 'difficulty': 'Hard',
-                'explanation': 'Hard explanation'
+                'explanations': ['Hard explanation', html]
             }],
             skill_contents=skill_contents.to_dict(),
             next_misconception_id=1,
             misconceptions_schema_version=1,
-            rubric_schema_version=1,
-            skill_contents_schema_version=1,
+            rubric_schema_version=2,
+            skill_contents_schema_version=2,
             all_questions_merged=False
         )
         commit_cmd_dicts = [commit_cmd.to_dict()]
         model.commit(
             'user_id_admin', 'skill model created', commit_cmd_dicts)
 
-        swap_skill_object = self.swap(skill_domain, 'Skill', MockSkillObject)
+        swap_skill_object = self.swap(skill_domain, 'Skill', skill_domain.Skill)
         current_schema_version_swap = self.swap(
-            feconf, 'CURRENT_RUBRIC_SCHEMA_VERSION', 2)
+            feconf, 'CURRENT_RUBRIC_SCHEMA_VERSION', 3)
 
         with swap_skill_object, current_schema_version_swap:
             skill = skill_services.get_skill_from_model(model)
 
-        self.assertEqual(skill.rubric_schema_version, 2)
+        self.assertEqual(skill.rubric_schema_version, 3)
         self.assertEqual(skill.rubrics[0].difficulty, 'Easy')
         self.assertEqual(skill.rubrics[0].explanations, ['Easy explanation'])
         self.assertEqual(skill.rubrics[1].difficulty, 'Medium')
         self.assertEqual(skill.rubrics[1].explanations, ['Medium explanation'])
         self.assertEqual(skill.rubrics[2].difficulty, 'Hard')
-        self.assertEqual(skill.rubrics[2].explanations, ['Hard explanation'])
+        self.assertEqual(
+            skill.rubrics[2].explanations, ['Hard explanation', expected_html])

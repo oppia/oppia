@@ -1044,8 +1044,11 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 'new_value': {
                     'content_id': 'content',
                     'html': (
-                        '<p><oppia-noninteractive-collapsible>'
-                        '</oppia-noninteractive-collapsible></p>')
+                        '<oppia-noninteractive-collapsible content-with-value='
+                        '"&amp;quot;&amp;lt;p&amp;gt;Hello&amp;lt;/p&amp;gt;'
+                        '&amp;quot;" heading-with-value="&amp;quot;'
+                        'SubCollapsible&amp;quot;">'
+                        '</oppia-noninteractive-collapsible>')
                 }
             })],
             'Updated State Content.')
@@ -1786,11 +1789,11 @@ class StoryContentsMigrationTests(test_utils.GenericTestBase):
         )
 
         current_schema_version_swap = self.swap(
-            feconf, 'CURRENT_STORY_CONTENTS_SCHEMA_VERSION', 3)
+            feconf, 'CURRENT_STORY_CONTENTS_SCHEMA_VERSION', 4)
 
         with current_schema_version_swap:
             story = story_fetchers.get_story_from_model(story_model)
 
-        self.assertEqual(story.story_contents_schema_version, 3)
+        self.assertEqual(story.story_contents_schema_version, 4)
         self.assertEqual(
-            story.story_contents.to_dict(), self.VERSION_3_STORY_CONTENTS_DICT)
+            story.story_contents.to_dict(), self.VERSION_4_STORY_CONTENTS_DICT)

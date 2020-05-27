@@ -22,12 +22,12 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import collections
 import copy
 import logging
-import re
 
 from constants import constants
 from core.domain import android_validation_constants
 from core.domain import customization_args_util
 from core.domain import html_cleaner
+from core.domain import html_validation_service
 from core.domain import interaction_registry
 from core.domain import param_domain
 import feconf
@@ -393,32 +393,37 @@ class InteractionInstance(python_utils.OBJECT):
 
         return True
 
-    def is_rte_content_supported_on_android(self, regex):
+    def is_rte_content_supported_on_android(
+            self, require_valid_component_names):
         """Determines whether the RTE content in interaction answer groups,
         hints and solution is supported by Android app.
 
         Args:
-            regex: SRE_Pattern. The invalid regex pattern.
+            require_valid_component_names: function. Function to check
+                whether the RTE tags in the html string are whitelisted.
 
         Returns:
             bool. Whether the RTE content is valid.
         """
         for answer_group in self.answer_groups:
-            if regex.search(answer_group.outcome.feedback.html):
+            if require_valid_component_names(
+                    answer_group.outcome.feedback.html):
                 return False
 
         if (
                 self.default_outcome and self.default_outcome.feedback and
-                regex.search(self.default_outcome.feedback.html)):
+                require_valid_component_names(
+                    self.default_outcome.feedback.html)):
             return False
 
         for hint in self.hints:
-            if regex.search(hint.hint_content.html):
+            if require_valid_component_names(hint.hint_content.html):
                 return False
 
         if (
                 self.solution and self.solution.explanation and
-                regex.search(self.solution.explanation.html)):
+                require_valid_component_names(
+                    self.solution.explanation.html)):
             return False
 
         return True
@@ -1568,15 +1573,29 @@ class State(python_utils.OBJECT):
         Returns:
             bool. Whether the RTE components in the state is valid.
         """
-        regex_string = r'oppia-noninteractive-'
-        regex_string += (
-            '|'.join(android_validation_constants.INVALID_RTE_COMPONENTS))
-        regex_string = regex_string[:-1]
-        regex = re.compile(regex_string)
-        if self.content and regex.search(self.content.html):
+        def require_valid_component_names(html):
+            """Checks if the provided html string contains only whitelisted
+            RTE tags.
+
+            Args:
+                html: str. The html string.
+
+            Returns:
+                bool. Whether all RTE tags in the html are whitelisted.
+            """
+            component_name_prefix = 'oppia-noninteractive-'
+            component_names = set([
+                component['id'].replace(component_name_prefix, '')
+                for component in html_cleaner.get_rte_components(html)])
+            return any(component_names.difference(
+                android_validation_constants.VALID_RTE_COMPONENTS))
+
+        if self.content and require_valid_component_names(
+                self.content.html):
             return False
 
-        return self.interaction.is_rte_content_supported_on_android(regex)
+        return self.interaction.is_rte_content_supported_on_android(
+            require_valid_component_names)
 
     def get_training_data(self):
         """Retrieves training data from the State domain object.
@@ -2093,43 +2112,42 @@ class State(python_utils.OBJECT):
         state_dict['content']['html'] = (
             conversion_fn(state_dict['content']['html']))
         if state_dict['interaction']['default_outcome']:
-            interaction_feedback_html = state_dict[
-                'interaction']['default_outcome']['feedback']['html']
-            state_dict['interaction']['default_outcome']['feedback'][
-                'html'] = conversion_fn(interaction_feedback_html)
+            state_dict['interaction']['default_outcome'] = (
+                html_validation_service.
+                convert_html_fields_in_default_outcome(
+                    state_dict['interaction']['default_outcome'],
+                    conversion_fn))
 
         for answer_group_index, answer_group in enumerate(
                 state_dict['interaction']['answer_groups']):
-            answer_group_html = answer_group['outcome']['feedback']['html']
-            state_dict['interaction']['answer_groups'][
-                answer_group_index]['outcome']['feedback']['html'] = (
-                    conversion_fn(answer_group_html))
-            if state_dict['interaction']['id'] == 'ItemSelectionInput':
-                for rule_spec_index, rule_spec in enumerate(
-                        answer_group['rule_specs']):
-                    for x_index, x in enumerate(rule_spec['inputs']['x']):
-                        state_dict['interaction']['answer_groups'][
-                            answer_group_index]['rule_specs'][
-                                rule_spec_index]['inputs']['x'][x_index] = (
-                                    conversion_fn(x))
-        for hint_index, hint in enumerate(
-                state_dict['interaction']['hints']):
-            hint_html = hint['hint_content']['html']
-            state_dict['interaction']['hints'][hint_index][
-                'hint_content']['html'] = conversion_fn(hint_html)
+            state_dict['interaction']['answer_groups'][answer_group_index] = (
+                html_validation_service.convert_html_fields_in_answer_group(
+                    answer_group, conversion_fn))
+
+        if 'written_translations' in state_dict.keys():
+            state_dict['written_translations'] = (
+                html_validation_service.
+                convert_html_fields_in_written_translations(
+                    state_dict['written_translations'], conversion_fn))
+
+        state_dict['interaction']['hints'] = (
+            html_validation_service.
+            convert_html_fields_in_hints(
+                state_dict['interaction']['hints'], conversion_fn))
 
         if state_dict['interaction']['solution']:
-            solution_html = state_dict[
-                'interaction']['solution']['explanation']['html']
-            state_dict['interaction']['solution']['explanation']['html'] = (
-                conversion_fn(solution_html))
+            state_dict['interaction']['solution'] = (
+                html_validation_service.
+                convert_html_fields_in_solution(
+                    state_dict['interaction']['solution'], conversion_fn))
 
         if state_dict['interaction']['id'] in (
-                'ItemSelectionInput', 'MultipleChoiceInput'):
-            for value_index, value in enumerate(
-                    state_dict['interaction']['customization_args'][
-                        'choices']['value']):
-                state_dict['interaction']['customization_args'][
-                    'choices']['value'][value_index] = conversion_fn(value)
+                'ItemSelectionInput', 'MultipleChoiceInput',
+                'DragAndDropSortInput'):
+            state_dict['interaction']['customization_args'] = (
+                html_validation_service.
+                convert_html_fields_in_customization_args(
+                    state_dict['interaction']['customization_args'],
+                    conversion_fn))
 
         return state_dict
