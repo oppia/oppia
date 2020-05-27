@@ -19,7 +19,7 @@
 require('services/html-escaper.service.ts');
 
 angular.module('oppia').component('oppiaResponseLogicProof', {
-  template: require('./logic-proof-response.directive.html'),
+  template: require('./logic-proof-response.component.html'),
   controller: [
     '$attrs', 'HtmlEscaperService',
     function($attrs, HtmlEscaperService) {

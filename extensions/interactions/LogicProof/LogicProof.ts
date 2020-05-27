@@ -27,7 +27,7 @@ require(
   'oppia-interactive-logic-proof.directive.ts');
 require(
   'interactions/LogicProof/directives/' +
-  'oppia-response-logic-proof.directive.ts');
+  'oppia-response-logic-proof.component.ts');
 require(
   'interactions/LogicProof/directives/' +
   'oppia-short-response-logic-proof.directive.ts');
