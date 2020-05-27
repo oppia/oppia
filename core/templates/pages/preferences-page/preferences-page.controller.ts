@@ -16,8 +16,6 @@
  * @fileoverview Data and controllers for the Oppia 'edit preferences' page.
  */
 
-import Cropper from 'cropperjs';
-
 require('cropperjs/dist/cropper.min.css');
 
 require('base-components/base-content.directive.ts');

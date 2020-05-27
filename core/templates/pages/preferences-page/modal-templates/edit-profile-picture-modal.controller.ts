@@ -16,6 +16,10 @@
  * @fileoverview Controller for edit profile picture modal.
  */
 
+import Cropper from 'cropperjs';
+
+require('cropperjs/dist/cropper.min.css');
+
 require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
