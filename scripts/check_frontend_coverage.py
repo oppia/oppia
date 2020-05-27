@@ -111,7 +111,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'convert-to-plain-text.pipe.ts',
     'coord-two-dim-editor.directive.ts',
     'copier.directive.ts',
-    'correctness-footer.directive.ts',
+    'correctness-footer.component.ts',
     'create-activity-button.directive.ts',
     'creator-dashboard-page.controller.ts',
     'csrf-token.service.ts',

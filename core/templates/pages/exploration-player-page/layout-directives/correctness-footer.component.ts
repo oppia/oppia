@@ -17,5 +17,5 @@
  */
 
 angular.module('oppia').component('correctnessFooter', {
-  template: require('./correctness-footer.directive.html')
+  template: require('./correctness-footer.component.html')
 });
