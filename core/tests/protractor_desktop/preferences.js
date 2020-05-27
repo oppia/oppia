@@ -34,8 +34,8 @@ describe('Preferences', function() {
     var defaultProfilePhotoSource = (
       await preferencesPage.getProfilePhotoSource());
     await preferencesPage.submitProfilePhoto('../data/img.png');
-    expect(defaultProfilePhotoSource).not.toEqual(
-      await preferencesPage.getProfilePhotoSource());
+    var newProfilePhotoSource = await preferencesPage.getProfilePhotoSource();
+    expect(defaultProfilePhotoSource).not.toEqual(newProfilePhotoSource);
   });
 
   it('should show an error if uploaded photo is too large', async function() {
