@@ -1398,7 +1398,7 @@ class ExplorationMissingStatsAudit(jobs.BaseMapReduceOneOffJobManager):
 
         exp_versions = list(python_utils.RANGE(1, model.version + 1))
 
-        exps = exp_fetchers.get_multiple_explorations_by_version(
+        exps = exp_models.ExplorationModel.get_multi_versions(
             model.id, exp_versions)
         exp_stats_models = stats_models.ExplorationStatsModel.get_multi(
             [stats_models.ExplorationStatsModel.get_entity_id(model.id, version)
