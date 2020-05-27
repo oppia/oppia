@@ -716,7 +716,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         init_state.update_interaction_answer_groups(answer_groups_list)
         init_state.update_interaction_default_outcome(default_outcome)
         exploration.validate()
-        sol ={
+        sol = {
             'answer_is_exclusive': True,
             'correct_answer': 'hello_world!',
             'explanation': {

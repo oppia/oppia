@@ -199,7 +199,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         init_state = exploration.states[exploration.init_state_name]
         init_state.update_interaction_id('TextInput')
-        solution_list = [ {
+        solution_list = [{
             'answer_is_exclusive': False,
             'correct_answer': 'helloworld!',
             'explanation': {
@@ -209,7 +209,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     'raw_latex-with-value="&amp;quot;\\frac{x}{y}&amp;quot;">'
                     '</oppia-noninteractive-math></p>')
             },
-        } ]
+        }]
 
         init_state.update_interaction_solution(solution_list)
         self.assertFalse(init_state.is_rte_content_supported_on_android())
@@ -433,14 +433,14 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         ]
         init_state.update_interaction_hints(hints_list)
 
-        solution_list = [ {
+        solution_list = [{
             'answer_is_exclusive': False,
             'correct_answer': 'helloworld!',
             'explanation': {
                 'content_id': 'solution',
                 'html': '<p>hello_world is a string</p>'
             },
-        } ]
+        }]
 
         init_state.update_interaction_solution(solution_list)
 
@@ -861,14 +861,14 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         ]
         init_state.update_interaction_hints(hints_list)
 
-        solution_list = [ {
+        solution_list = [{
             'answer_is_exclusive': False,
             'correct_answer': 'helloworld!',
             'explanation': {
                 'content_id': 'solution',
                 'html': '<p>hello_world is a string</p>'
             },
-        } ]
+        }]
 
         init_state.update_interaction_solution(solution_list)
         exploration.validate()
@@ -929,14 +929,14 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 state_domain.Solution.from_dict(
                     init_state.interaction.id, solution))
 
-        solution_list = [ {
+        solution_list = [{
             'answer_is_exclusive': False,
             'correct_answer': 'hello_world!',
             'explanation': {
                 'content_id': 'solution',
                 'html': '<p>hello_world is a string</p>'
             }
-        } ]
+        }]
         init_state.update_interaction_solution(solution_list)
         exploration.validate()
 
@@ -975,14 +975,14 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         # Solution should be set to None as default.
         self.assertEqual(exploration.init_state.interaction.solution, None)
 
-        solution = [ {
+        solution = [{
             'answer_is_exclusive': False,
             'correct_answer': 'hello_world!',
             'explanation': {
                 'content_id': 'solution',
                 'html': '<p>hello_world is a string</p>'
             }
-        } ]
+        }]
         hints_list = [
             state_domain.Hint(
                 state_domain.SubtitledHtml('hint_1', '')
@@ -993,14 +993,14 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         exploration.init_state.update_interaction_solution(solution)
         exploration.validate()
 
-        solution_list = [ {
+        solution_list = [{
             'answer_is_exclusive': 1,
             'correct_answer': 'hello_world!',
             'explanation': {
                 'content_id': 'solution',
                 'html': '<p>hello_world is a string</p>'
             }
-        } ]
+        }]
 
         exploration.init_state.update_interaction_solution(solution_list)
         with self.assertRaisesRegexp(
@@ -1096,17 +1096,16 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         hints_list = [state_domain.Hint(subtitled_html)]
 
         exploration.init_state.interaction.hints = hints_list
-        solution_list = [ {
+        solution_list = [{
             'answer_is_exclusive': True,
             'correct_answer': 'hello_world!',
             'explanation': {
                 'content_id': 'solution',
                 'html': '<p>hello_world is a string</p>'
             }
-        } ]
+        }]
 
         exploration.init_state.update_interaction_solution(solution_list)
-        solution=solution_list[0]
         exploration.init_state.update_content(
             state_domain.SubtitledHtml.from_dict({
                 'content_id': 'solution',
@@ -1321,21 +1320,22 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     'hint_1', '<p>Hello, this is html1 for state2</p>')
             )
         ]
-        solution = [ {
+        solution = [{
             'answer_is_exclusive': True,
             'correct_answer': u'hello_world!',
             'explanation': {
                 'content_id': 'solution',
                 'html': u'<p>hello_world is a string</p>'
             }
-        } ]
+        }]
 
         exploration.init_state.update_interaction_hints(hints_list)
         exploration.init_state.update_interaction_solution(solution)
 
         with self.assertRaisesRegexp(
             Exception, 'Expected solution to be a list'):
-            exploration.init_state.update_interaction_solution('invalid solution')
+            exploration.init_state.update_interaction_solution(
+                'invalid solution')
 
     def test_update_interaction_solution_with_no_solution(self):
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
