@@ -138,6 +138,8 @@ var TopicEditorPage = function() {
 
   this.expectNumberOfQuestionsForSkillWithDescriptionToBe = async function(
       count, skillDescription) {
+    await waitFor.elementToBeClickable(
+      selectSkillDropdown, 'Skill select dropdown takes too long to appear.');
     await selectSkillDropdown.click();
     await element(by.css('option[label="' + skillDescription + '"]')).click();
     await waitFor.visibilityOf(
@@ -160,6 +162,9 @@ var TopicEditorPage = function() {
   };
 
   this.moveToQuestionsTab = async function() {
+    await waitFor.elementToBeClickable(
+      questionsTabButton,
+      'Questions tab button takes too long to be clickable');
     await questionsTabButton.click();
   };
 
@@ -223,10 +228,10 @@ var TopicEditorPage = function() {
   this.dragSkillBetweenSubtopics = async function(
       fromSubtopicIndex, skillCardIndex, toSubtopicIndex) {
     var subtopicCol = await subtopicColumns.get(fromSubtopicIndex);
-    skillNamesElems = await subtopicCol.all(
+    skillNamesElems = subtopicCol.all(
       by.css('.protractor-test-assigned-skill-card-text'));
-    var toMove = skillNamesElems.get(skillCardIndex);
-    var target = subtopicColumns.get(toSubtopicIndex);
+    var toMove = await skillNamesElems.get(skillCardIndex);
+    var target = await subtopicColumns.get(toSubtopicIndex);
     await dragAndDrop(toMove, target);
   };
 

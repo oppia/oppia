@@ -140,6 +140,7 @@ var TopicsAndSkillsDashboardPage = function() {
       if (isTarget === topicName) {
         await topicElem.click();
         await confirmMoveButton.click();
+        break;
       }
     }
   };

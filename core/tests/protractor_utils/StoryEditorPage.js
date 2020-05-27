@@ -398,7 +398,7 @@ var StoryEditorPage = function() {
     var warningElemCount = await warningTextElements.count();
     matchFound = false;
     for (var i = 0; i < warningElemCount; i++) {
-      var text = await (await elems.get(i)).getText();
+      var text = await (await warningTextElements.get(i)).getText();
       if (warning.test(text)) {
         matchFound = true;
       }
