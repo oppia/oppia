@@ -17,7 +17,6 @@
 """Tests for one off statistics jobs."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import division  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
@@ -1793,7 +1792,7 @@ class ExplorationMissingStatsAuditOneOffJobTests(OneOffJobTestBase):
         new_schema = self.swap(feconf, 'CURRENT_STATE_SCHEMA_VERSION', 25)
         schema_update_failure = self.swap(
             exp_domain.Exploration, '_convert_states_v24_dict_to_v25_dict',
-            classmethod(lambda *_: 1 / 0))
+            classmethod(lambda *_: python_utils.divide(1, 0)))
 
         with new_schema, schema_update_failure:
             self.assertItemsEqual(self.run_one_off_job(), [
