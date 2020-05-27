@@ -149,13 +149,9 @@ var LearnerDashboardPage = function() {
   this.expectTitleOfExplorationSummaryTileToMatch = async function(title) {
     // This explorationTitleArray is an Array but it will have only one element
     // that is the exploration with the title passed as a parameter
-    var explorationTitleArray = await element.all(
-      by.css('.protractor-test-exp-summary-tile-title')).filter(
-      async function(elem) {
-        var text = await elem.getText();
-        return text === title;
-      });
-    expect(await explorationTitleArray.first().getText()).toMatch(title);
+    var explorationTitle = element(
+      by.cssContainingText('.protractor-test-exp-summary-tile-title', title));
+    expect(await explorationTitle.getText()).toMatch(title);
   };
 
   this.expectSubscriptionFirstNameToMatch = async function(name) {

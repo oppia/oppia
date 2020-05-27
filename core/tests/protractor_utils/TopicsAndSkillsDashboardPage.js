@@ -135,7 +135,7 @@ var TopicsAndSkillsDashboardPage = function() {
     await (await assignSkillToTopicButtons.get(skillIndex)).click();
     var topicRowsCount = await topicNamesInTopicSelectModal.count();
     for (var i = 0; i < topicRowsCount; i++) {
-      var topicElem = await topicRows.get(i);
+      var topicElem = await topicNamesInTopicSelectModal.get(i);
       var isTarget = await topicElem.getText();
       if (isTarget === topicName) {
         await topicElem.click();

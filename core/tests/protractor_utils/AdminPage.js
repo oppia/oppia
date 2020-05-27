@@ -43,8 +43,8 @@ var AdminPage = function() {
   var oneOffJobRows = element.all(by.css('.protractor-test-one-off-jobs-rows'));
   var unfinishedOneOffJobRows = element.all(by.css(
     '.protractor-test-unfinished-one-off-jobs-rows'));
-  var unfinishedOffJobIDs = element.all(by.css(
-    '.protractor-test-unfinished-one-off-jobs-id'));
+  var unfinishedOffJobIDClassName = (
+    '.protractor-test-unfinished-one-off-jobs-id');
 
   // The reload functions are used for mobile testing
   // done via Browserstack. These functions may cause
@@ -195,12 +195,10 @@ var AdminPage = function() {
     await waitFor.visibilityOf(element(
       by.css('.protractor-test-unfinished-jobs-card')),
     'Unfinished Jobs taking too long to appear');
-    let unfinishedJobs = await unfinishedOffJobIDs.filter(
-      async function(element) {
-        var text = await element.getText();
-        return text.toLowerCase().startsWith(jobName.toLowerCase());
-      });
-    var unfinishedJobName = await (await unfinishedJobs.get(0)).getText();
+    let regex = new RegExp(`^${jobName.toLowerCase()}.*`, 'i');
+    let unfinishedJob = element(
+      by.cssContainingText(unfinishedOffJobIDClassName, regex));
+    var unfinishedJobName = await unfinishedJob.getText();
     expect(unfinishedJobName.toLowerCase().startsWith(
       jobName.toLowerCase())).toEqual(true);
   };

@@ -126,15 +126,13 @@ angular.module('oppia').directive('profilePage', [
                   );
                 } else {
                   if (!ctrl.isAlreadySubscribed) {
-                    ctrl.isAlreadySubscribed = true;
                     $http.post('/subscribehandler', {
                       creator_username: data.profile_username
-                    });
+                    }).then(() => ctrl.isAlreadySubscribed = true);
                   } else {
-                    ctrl.isAlreadySubscribed = false;
                     $http.post('/unsubscribehandler', {
                       creator_username: data.profile_username
-                    });
+                    }).then(() => ctrl.isAlreadySubscribed = false);
                   }
                   ctrl.updateSubscriptionButtonPopoverText();
                 }

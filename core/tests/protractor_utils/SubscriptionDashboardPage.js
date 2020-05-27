@@ -23,6 +23,7 @@ var SubscriptionDashboardPage = function() {
     by.css('.protractor-test-subscription-button'));
   var subscriptionName = element.all(
     by.css('.protractor-test-subscription-name'));
+  var unsubscribeLabel = element(by.css('.protractor-test-unsubscribe-label'));
 
   this.navigateToUserSubscriptionPage = async function(userName) {
     await browser.get('/profile/' + userName);
@@ -54,6 +55,9 @@ var SubscriptionDashboardPage = function() {
     await waitFor.elementToBeClickable(
       subscriptionButton, 'Subscription button is not clickable');
     await subscriptionButton.click();
+    await waitFor.visibilityOf(
+      unsubscribeLabel,
+      'Unsubscribe button is not visible.');
   };
 };
 

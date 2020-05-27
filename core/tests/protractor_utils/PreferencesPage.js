@@ -94,22 +94,16 @@ var PreferencesPage = function() {
 
   this.selectSystemLanguage = async function(language) {
     await systemLanguageSelector.click();
-    var options = await element.all(by.css('.select2-dropdown li')).filter(
-      async function(elem) {
-        var text = await elem.getText();
-        return text === language;
-      });
-    await options.first().click();
+    var option = element(
+      by.cssContainingText('.select2-dropdown li', language));
+    await option.click();
   };
 
   this.selectPreferredAudioLanguage = async function(language) {
     await preferredAudioLanguageSelector.click();
-    var correctOptions = await languageOptionsList.all(by.tagName('li')).filter(
-      async function(elem) {
-        var text = await elem.getText();
-        return text === language;
-      });
-    await correctOptions.first().click();
+    var correctOption = element(
+      by.cssContainingText('.select2-results li', language));
+    await correctOption.click();
   };
 
   this.setUserBio = async function(bio) {

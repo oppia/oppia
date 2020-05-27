@@ -88,7 +88,7 @@
               popover-append-to-body
               popover-trigger="mouseenter">
         <span translate="I18N_SUBSCRIBE_BUTTON_TEXT" ng-if="!$ctrl.isAlreadySubscribed"></span>
-        <span translate="I18N_UNSUBSCRIBE_BUTTON_TEXT" ng-if="$ctrl.isAlreadySubscribed"></span>
+        <span class="protractor-test-unsubscribe-label" translate="I18N_UNSUBSCRIBE_BUTTON_TEXT" ng-if="$ctrl.isAlreadySubscribed"></span>
       </button>
     </div>
   </md-card>

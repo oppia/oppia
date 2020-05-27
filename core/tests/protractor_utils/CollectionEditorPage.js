@@ -70,15 +70,12 @@ var CollectionEditorPage = function() {
       addExplorationButton, 'Unable to find exploration: ' + query);
 
     var matched = false;
-    var dropdownResultElements = element.all(by.css('.dropdown-menu'));
-    var dropdownResultCount = await dropdownResultElements.count();
-    for (var i = 0; i < dropdownResultCount; i++) {
-      var dropdownResult = await dropdownResultElements.get(i);
-      var dropdownResultText = await dropdownResult.getText();
-      if (dropdownResultText.indexOf(query) >= 0) {
-        await dropdownResult.click();
-        matched = true;
-      }
+    var dropdownResultElement = element(
+      by.cssContainingText('.dropdown-menu', new RegExp(query)));
+    debugger;
+    if (await dropdownResultElement.isPresent()) {
+      await dropdownResultElement.click();
+      matched = true;
     }
     if (!matched) {
       // Press Tab to fill in the default result should one appear when
