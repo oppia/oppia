@@ -17,5 +17,5 @@
  */
 
 angular.module('oppia').component('lazyLoading', {
-  template: require('./lazy-loading.directive.html'),
+  template: require('./lazy-loading.component.html'),
 });
