@@ -115,7 +115,7 @@ var SkillEditorPage = function() {
       by.css('.protractor-test-rubric-explanation-text'));
     await waitFor.visibilityOf(
       editor, 'Rubric explanation editor takes too long to appear');
-    await browser.switchTo().activeElement().sendKeys(explanation);
+    await (await browser.switchTo().activeElement()).sendKeys(explanation);
     await waitFor.elementToBeClickable(
       saveRubricExplanationButton,
       'Save Rubric Explanation button takes too long to be clickable');
@@ -129,11 +129,10 @@ var SkillEditorPage = function() {
     // index.
     var editRubricExplanationButtons = element.all(
       by.css('.protractor-test-edit-rubric-explanation-' + difficulty));
-    var buttons = await editRubricExplanationButtons;
+    var button = await editRubricExplanationButtons.get(explIndex);
     await waitFor.elementToBeClickable(
-      buttons[explIndex],
-      'Edit Rubric Explanation button takes too long to be clickable');
-    await buttons[explIndex].click();
+      button, 'Edit Rubric Explanation button takes too long to be clickable');
+    await button.click();
     var editor = element(
       by.css('.protractor-test-rubric-explanation-text'));
     await waitFor.visibilityOf(
@@ -156,7 +155,7 @@ var SkillEditorPage = function() {
       by.css('.protractor-test-rubric-explanation-text'));
     await waitFor.visibilityOf(
       editor, 'Rubric explanation editor takes too long to appear');
-    await browser.switchTo().activeElement().sendKeys(explanation);
+    await (await browser.switchTo().activeElement()).sendKeys(explanation);
     await waitFor.elementToBeClickable(
       saveRubricExplanationButton,
       'Save Rubric Explanation button takes too long to be clickable');
@@ -167,12 +166,10 @@ var SkillEditorPage = function() {
       difficulty, explanations) {
     var rubricExplanationsForDifficulty = element.all(
       by.css('.protractor-test-rubric-explanation-' + difficulty));
-    var explanationCounter = 0;
-    var explanationElements = await rubricExplanationsForDifficulty;
-    for (var idx in explanationElements) {
-      var text = await rubricExplanationsForDifficulty.get(idx).getText();
-      expect(text).toMatch(explanations[explanationCounter]);
-      explanationCounter++;
+    var explanationCount = await rubricExplanationsForDifficulty.count();
+    for (var i = 0; i < explanationCount; i++) {
+      var text = await (await rubricExplanationsForDifficulty.get(i)).getText();
+      expect(text).toMatch(explanations[i]);
     }
   };
 
@@ -230,7 +227,7 @@ var SkillEditorPage = function() {
     await waitFor.visibilityOf(
       editor, 'Explanation Editor takes too long to appear');
 
-    await browser.switchTo().activeElement().sendKeys(explanation);
+    await (await browser.switchTo().activeElement()).sendKeys(explanation);
 
     await waitFor.elementToBeClickable(
       saveConceptCardExplanationButton,

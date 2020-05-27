@@ -132,12 +132,13 @@ var TopicsAndSkillsDashboardPage = function() {
 
   this.assignSkillWithIndexToTopicByTopicName = async function(
       skillIndex, topicName) {
-    await assignSkillToTopicButtons.get(skillIndex).click();
-    var topicRows = await topicNamesInTopicSelectModal;
-    for (var i = 0; i < topicRows.length; i++) {
-      var isTarget = await topicRows[i].getText();
+    await (await assignSkillToTopicButtons.get(skillIndex)).click();
+    var topicRowsCount = await topicNamesInTopicSelectModal.count();
+    for (var i = 0; i < topicRowsCount; i++) {
+      var topicElem = await topicRows.get(i);
+      var isTarget = await topicElem.getText();
       if (isTarget === topicName) {
-        await topicRows[i].click();
+        await topicElem.click();
         await confirmMoveButton.click();
       }
     }
@@ -254,8 +255,7 @@ var TopicsAndSkillsDashboardPage = function() {
   };
 
   this.expectNumberOfTopicsToBe = async function(number) {
-    var elems = await topicsListItems;
-    expect(elems.length).toBe(number);
+    expect(await topicsListItems.count()).toBe(number);
   };
 
   this.expectTopicNameToBe = async function(topicName, index) {

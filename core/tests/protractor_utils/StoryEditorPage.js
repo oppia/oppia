@@ -394,11 +394,11 @@ var StoryEditorPage = function() {
   };
 
   this.expectWarningInIndicator = async function(warning) {
-    await browser.actions().mouseMove(warningIndicator).perform();
-    var elems = await warningTextElements;
+    await (await browser.actions().mouseMove(warningIndicator)).perform();
+    var warningElemCount = await warningTextElements.count();
     matchFound = false;
-    for (var i = 0; i < elems.length; i++) {
-      var text = await elems[0].getText();
+    for (var i = 0; i < warningElemCount; i++) {
+      var text = await (await elems.get(i)).getText();
       if (warning.test(text)) {
         matchFound = true;
       }
