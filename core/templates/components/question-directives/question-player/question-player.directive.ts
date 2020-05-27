@@ -57,7 +57,7 @@ require(
   'schema-based-float-editor.directive.ts');
 require(
   'components/forms/schema-based-editors/' +
-  'schema-based-html-editor.directive.ts');
+  'schema-based-html-editor.component.ts');
 require(
   'components/forms/schema-based-editors/schema-based-int-editor.directive.ts');
 require(

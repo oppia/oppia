@@ -26,5 +26,5 @@ angular.module('oppia').component('schemaBasedHtmlEditor', {
     labelForFocusTarget: '&',
     uiConfig: '&'
   },
-  template: require('./schema-based-html-editor.directive.html'),
+  template: require('./schema-based-html-editor.component.html'),
 });
