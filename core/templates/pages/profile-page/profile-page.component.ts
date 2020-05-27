@@ -80,7 +80,7 @@ angular.module('oppia').component('profilePage', {
                 if (exploration1.playthroughs > exploration2.playthroughs) {
                   return 1;
                 } else if (
-                  exploration1.playthroughs > exploration2.playthroughs) {
+                  exploration1.playthroughs === exploration2.playthroughs) {
                   return 0;
                 } else {
                   return -1;
@@ -90,94 +90,6 @@ angular.module('oppia').component('profilePage', {
               }
             }
           );
-
-          ctrl.userNotLoggedIn = !data.username;
-
-          ctrl.isAlreadySubscribed = data.is_already_subscribed;
-          ctrl.isUserVisitingOwnProfile = data.is_user_visiting_own_profile;
-
-          ctrl.subscriptionButtonPopoverText = '';
-
-          ctrl.currentPageNumber = 0;
-          ctrl.PAGE_SIZE = 6;
-          ctrl.startingExplorationNumber = 1;
-          ctrl.endingExplorationNumber = 6;
-          ctrl.Math = window.Math;
-          ctrl.profileIsOfCurrentUser = data.profile_is_of_current_user;
-
-          ctrl.changeSubscriptionStatus = function() {
-            if (ctrl.userNotLoggedIn) {
-              UserService.getLoginUrlAsync().then(
-                function(loginUrl) {
-                  if (loginUrl) {
-                    window.location.href = loginUrl;
-                  } else {
-                    $window.location.reload();
-                  }
-                }
-              );
-            } else {
-              if (!ctrl.isAlreadySubscribed) {
-                ctrl.isAlreadySubscribed = true;
-                $http.post('/subscribehandler', {
-                  creator_username: data.profile_username
-                });
-              } else {
-                ctrl.isAlreadySubscribed = false;
-                $http.post('/unsubscribehandler', {
-                  creator_username: data.profile_username
-                });
-              }
-              ctrl.updateSubscriptionButtonPopoverText();
-            }
-          };
-
-          ctrl.updateSubscriptionButtonPopoverText = function() {
-            if (ctrl.userNotLoggedIn) {
-              ctrl.subscriptionButtonPopoverText = (
-                'Log in or sign up to subscribe to your ' +
-                'favorite creators.');
-            } else if (ctrl.isAlreadySubscribed) {
-              ctrl.subscriptionButtonPopoverText = (
-                'Unsubscribe to stop receiving email notifications ' +
-                'regarding new explorations published by ' +
-                ctrl.username.value + '.');
-            } else {
-              ctrl.subscriptionButtonPopoverText = (
-                'Receive email notifications, whenever ' +
-                ctrl.username.value + ' publishes a new exploration.');
-            }
-          };
-          ctrl.updateSubscriptionButtonPopoverText();
-
-          ctrl.goToPreviousPage = function() {
-            if (ctrl.currentPageNumber === 0) {
-              $log.error('Error: cannot decrement page');
-            } else {
-              ctrl.currentPageNumber--;
-              ctrl.startingExplorationNumber = (
-                ctrl.currentPageNumber * ctrl.PAGE_SIZE + 1
-              );
-              ctrl.endingExplorationNumber = (
-                (ctrl.currentPageNumber + 1) * ctrl.PAGE_SIZE
-              );
-            }
-          };
-          ctrl.goToNextPage = function() {
-            if ((ctrl.currentPageNumber + 1) * ctrl.PAGE_SIZE >= (
-              data.edited_exp_summary_dicts.length)) {
-              $log.error('Error: Cannot increment page');
-            } else {
-              ctrl.currentPageNumber++;
-              ctrl.startingExplorationNumber = (
-                ctrl.currentPageNumber * ctrl.PAGE_SIZE + 1
-              );
-              ctrl.endingExplorationNumber = (
-                Math.min(ctrl.numUserPortfolioExplorations,
-                  (ctrl.currentPageNumber + 1) * ctrl.PAGE_SIZE)
-              );
-            }
-          };
 
           ctrl.getExplorationsToDisplay = function() {
             ctrl.explorationsOnPage = [];
