@@ -166,6 +166,7 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
         'excluded_files': (
             'core/templates/pages/exploration-player-page/'
             'FeedbackPopupDirective.js',
+            re.compile(r'*.component.ts')
         ),
         'excluded_dirs': (
             'extensions/answer_summarizers/',
