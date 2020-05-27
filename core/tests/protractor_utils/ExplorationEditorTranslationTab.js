@@ -30,27 +30,24 @@ var ExplorationEditorTranslationTab = function() {
 
   this.exitTutorial = async function() {
     // If the translation welcome modal shows up, exit it.
-    var isVisible = await translationWelcomeModal.isPresent();
-    if (isVisible) {
-      try {
-        await waitFor.visibilityOf(
-          dismissWelcomeModalButton, 'Welcome modal not becoming visible');
-        await waitFor.elementToBeClickable(
-          dismissWelcomeModalButton,
-          'Welcome modal is taking too long to appear');
-        await dismissWelcomeModalButton.click();
-        await waitFor.invisibilityOf(
-          translationWelcomeModal,
-          'Translation welcome modal takes too long to disappear');
-      } catch (e) {
-        // Since the welcome modal appears only once, the wait for its
-        // visibilty will only resolve once and timeout the other times.
-        // This is just an empty error function to catch the timeouts that
-        // happen when the the welcome modal has been dismissed once. If
-        // this is not present then protractor uses the default error
-        // function which is not appropriate in this case as this is not an
-        // error.
-      }
+    try {
+      await waitFor.visibilityOf(
+        dismissWelcomeModalButton, 'Welcome modal not becoming visible');
+      await waitFor.elementToBeClickable(
+        dismissWelcomeModalButton,
+        'Welcome modal is taking too long to appear');
+      await dismissWelcomeModalButton.click();
+      await waitFor.invisibilityOf(
+        translationWelcomeModal,
+        'Translation welcome modal takes too long to disappear');
+    } catch (e) {
+      // Since the welcome modal appears only once, the wait for its
+      // visibilty will only resolve once and timeout the other times.
+      // This is just an empty error function to catch the timeouts that
+      // happen when the the welcome modal has been dismissed once. If
+      // this is not present then protractor uses the default error
+      // function which is not appropriate in this case as this is not an
+      // error.
     }
 
     // Otherwise, if the translation tutorial shows up, exit it.
@@ -369,6 +366,7 @@ var ExplorationEditorTranslationTab = function() {
   this._isAudioPlaying = async function() {
     var firstValue = await audioMaterialSliderDiv.getAttribute(
       'aria-valuenow');
+    await browser.sleep(10);
     var secondValue = await audioMaterialSliderDiv.getAttribute(
       'aria-valuenow');
     if (firstValue && secondValue) {
