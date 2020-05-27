@@ -19,7 +19,7 @@
 require('domain/utilities/url-interpolation.service.ts');
 
 angular.module('oppia').component('sideNavigationBar', {
-  template: require('./side-navigation-bar.directive.html'),
+  template: require('./side-navigation-bar.component.html'),
   controller: [
     '$window', 'UrlInterpolationService',
     function($window, UrlInterpolationService) {
