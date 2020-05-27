@@ -33,20 +33,9 @@ interface IParamDict {
 }
 
 export class ParamSpecs {
-  _paramDict: IParamDict;
-  _paramSpecObjectFactory: ParamSpecObjectFactory;
-
-  /**
-   * @constructor
-   * @param {Object.<String, ParamSpec>} paramDict - params and their specs
-   *    for this object will hold.
-   */
   constructor(
-      paramDict: IParamDict, paramSpecObjectFactory: ParamSpecObjectFactory) {
-    /** @member {Object.<String, ParamSpec>} */
-    this._paramDict = paramDict;
-    this._paramSpecObjectFactory = paramSpecObjectFactory;
-  }
+      private paramSpecObjectFactory: ParamSpecObjectFactory,
+      private paramDict: IParamDict) {}
 
   getParamSpec(paramName: string): ParamSpec {
     return this.paramDict[paramName];
@@ -56,7 +45,7 @@ export class ParamSpecs {
    * @returns {Object.<String, ParamSpec>} - the map of params to their specs.
    */
   getParamDict(): IParamDict {
-    return this._paramDict;
+    return this.paramDict;
   }
 
   getParamNames(): string[] {
@@ -81,10 +70,8 @@ export class ParamSpecs {
    *   parameter in the specs.
    */
   forEach(callback: Function): void {
-    var that = this;
-    this.getParamNames().forEach((paramName) => {
-      callback(paramName, that.getParamSpec(paramName));
-    });
+    Object.entries(this.paramDict).forEach(
+      ([paramName, paramSpec]) => callback(paramName, paramSpec));
   }
 
   /**
@@ -93,7 +80,7 @@ export class ParamSpecs {
    */
   toBackendDict(): IParamSpecsBackendDict {
     var paramSpecsBackendDict = {};
-    this.forEach((paramName, paramSpec) => {
+    Object.entries(this.paramDict).forEach(([paramName, paramSpec]) => {
       paramSpecsBackendDict[paramName] = paramSpec.toBackendDict();
     });
     return paramSpecsBackendDict;
@@ -112,8 +99,7 @@ export class ParamSpecsObjectFactory {
    * @returns {ParamSpecs} - An instance with properties from the backend
    *    dict.
    */
-  createFromBackendDict(
-      paramSpecsBackendDict: IParamSpecsBackendDict): ParamSpecs {
+  createFromBackendDict(backendDict: IParamSpecsBackendDict): ParamSpecs {
     var paramDict = {};
     for (const [paramName, paramBackendDict] of Object.entries(backendDict)) {
       paramDict[paramName] = (
