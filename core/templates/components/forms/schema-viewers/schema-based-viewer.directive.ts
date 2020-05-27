@@ -25,7 +25,7 @@ require(
 require(
   'components/forms/schema-viewers/schema-based-list-viewer.directive.ts');
 require(
-  'components/forms/schema-viewers/schema-based-primitive-viewer.directive.ts');
+  'components/forms/schema-viewers/schema-based-primitive-viewer.component.ts');
 require(
   'components/forms/schema-viewers/schema-based-unicode-viewer.directive.ts');
 

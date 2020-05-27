@@ -20,7 +20,7 @@ angular.module('oppia').component('schemaBasedPrimitiveViewer', {
   bindings: {
     localValue: '='
   },
-  template: require('./schema-based-primitive-viewer.directive.html'),
+  template: require('./schema-based-primitive-viewer.component.html'),
   controller: ['$scope', function($scope) {
     $scope.isExpression = function(value) {
       return angular.isString(value);
