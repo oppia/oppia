@@ -16,6 +16,13 @@
  * @fileoverview Factory for creating new frontend instances of
  * RecordedVoiceovers domain objects.
  */
+
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
+
+import { VoiceoverObjectFactory, IVoiceoverDict, Voiceover } from
+  'domain/exploration/VoiceoverObjectFactory';
+
 export interface IRecordedVoiceOverBackendDict {
   'voiceovers_mapping': {
     [propName: string]: {
