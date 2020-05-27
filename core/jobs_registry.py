@@ -37,6 +37,7 @@ from core.domain import topic_jobs_one_off
 from core.domain import user_id_migration
 from core.domain import user_jobs_continuous
 from core.domain import user_jobs_one_off
+from core.domain import suggestion_jobs_one_off
 import python_utils
 
 # List of all manager classes for one-off batch jobs for which to show controls
@@ -52,6 +53,7 @@ ONE_OFF_JOB_MANAGERS = [
     exp_jobs_one_off.ExplorationMigrationJobManager,
     exp_jobs_one_off.ExplorationValidityJobManager,
     exp_jobs_one_off.HintsAuditOneOffJob,
+    suggestion_jobs_one_off.SuggestionAuditOneOffJob,
     exp_jobs_one_off.ItemSelectionInteractionOneOffJob,
     exp_jobs_one_off.ViewableExplorationsAuditJob,
     exp_jobs_one_off.ExplorationContentValidationJobForCKEditor,
