@@ -81,7 +81,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'collection-editor-state.service.ts',
     'collection-editor-tab.directive.ts',
     'collection-footer.directive.ts',
-    'collection-history-tab.directive.ts',
+    'collection-history-tab.component.ts',
     'collection-local-nav.directive.ts',
     'collection-navbar.directive.ts',
     'collection-node-creator.directive.ts',

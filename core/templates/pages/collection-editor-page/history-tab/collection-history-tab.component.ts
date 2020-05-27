@@ -17,5 +17,5 @@
  */
 
 angular.module('oppia').component('collectionHistoryTab', {
-  template: require('./collection-history-tab.directive.html'),
+  template: require('./collection-history-tab.component.html'),
 });

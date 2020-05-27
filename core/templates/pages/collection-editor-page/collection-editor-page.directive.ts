@@ -20,7 +20,7 @@ require(
   'pages/collection-editor-page/editor-tab/collection-editor-tab.directive.ts');
 require(
   'pages/collection-editor-page/history-tab/' +
-  'collection-history-tab.directive.ts');
+  'collection-history-tab.component.ts');
 require(
   'pages/collection-editor-page/settings-tab/' +
   'collection-settings-tab.directive.ts');
