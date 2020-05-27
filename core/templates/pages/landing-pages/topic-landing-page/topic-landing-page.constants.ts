@@ -29,12 +29,12 @@ export class TopicLandingPageConstants {
       },
       'negative-numbers': {
         topicTitle: 'Negative Numbers',
-        topicTagline: '',
+        topicTagline: 'Add, Subtract, Multiply and Divide',
         collectionId: 'GdYIgsfRZwG7'
       },
       ratios: {
         topicTitle: 'Ratios',
-        topicTagline: '',
+        topicTagline: 'Equivalent Ratios, Combining Ratios',
         collectionId: '53gXGLIR044l'
       }
     }
@@ -46,14 +46,14 @@ export class TopicLandingPageConstants {
       'Oppia\'s lessons tell stories using video and images to ' +
       'help learners apply math concepts in everyday life.'),
     imageFilename: 'fun_storytelling.png',
-    imageAlt: 'Storytelling lessons presentation.'
+    imageAlt: 'An image of a lesson journey illustrated on top of an open book.'
   }, {
     title: 'Accessible lessons',
     description: (
       'Our lessons come with audio translations in different ' +
       'languages, require little bandwidth, and are mobile friendly.'),
     imageFilename: 'accessible_lessons.png',
-    imageAlt: 'Lesson accessibility presentation.'
+    imageAlt: 'A speaker emitting sound next to text and a Play button.'
   }, {
     title: 'Suitable for all',
     description: (
@@ -61,6 +61,6 @@ export class TopicLandingPageConstants {
       'learning the meaning of equal parts, to comparing fractions ' +
       '- Oppia has you covered.'),
     imageFilename: 'suitable_for_all.png',
-    imageAlt: 'Lesson viewers and learners.'
+    imageAlt: 'A selection of characters from the lessons.'
   }];
 }

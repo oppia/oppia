@@ -88,12 +88,8 @@ angular.module('oppia').directive('topicLandingPage', [
                     topic: topicName,
                     filename: 'lesson_in_devices.png'
                   })));
-            var pageTitle = (
-              ctrl.topicTitle + ' | ' +
-              (topicData.topicTagline.length !== 0 ?
-                topicData.topicTagline + ' | ' : '') +
-              'Oppia');
-            PageTitleService.setPageTitle(pageTitle);
+            PageTitleService.setPageTitle(
+              [ctrl.topicTitle, topicData.topicTagline, 'Oppia'].join(' | '));
           };
         }
       ]
