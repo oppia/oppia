@@ -165,6 +165,8 @@ var ExplorationEditorTranslationTab = function() {
   var selectedLanguageElement = element(
     by.css('.protractor-test-translation-language-selector')).element(
     by.css('option:checked'));
+  var languageSelectorElement = element(
+    by.css('.protractor-test-translation-language-selector'));
   var languageSelectorLabelElement = element(
     by.css('.protractor-test-language-selector-label'));
   var progressBarLabelElement = element(
@@ -208,11 +210,11 @@ var ExplorationEditorTranslationTab = function() {
     return element(by.css('.protractor-test-hint-' + index + '-text'));
   };
   var _selectLanguage = async function(language) {
-    await element(
-      by.css('.protractor-test-translation-language-selector')
-    ).element(
-      by.cssContainingText('option', language)
-    ).click();
+    await waitFor.visibilityOf(
+      languageSelectorElement,
+      'Language selector takes too long to appear.')
+    await languageSelectorElement.element(
+      by.cssContainingText('option', language)).click();
   };
   var stateNodeLabel = function(nodeElement) {
     return nodeElement.element(by.css('.protractor-test-node-label'));
