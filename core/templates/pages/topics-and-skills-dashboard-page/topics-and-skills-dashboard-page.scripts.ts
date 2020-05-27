@@ -25,7 +25,7 @@ require('App.ts');
 
 require(
   'pages/topics-and-skills-dashboard-page/navbar/' +
-  'topics-and-skills-dashboard-navbar-breadcrumb.directive.ts'
+  'topics-and-skills-dashboard-navbar-breadcrumb.component.ts'
 );
 require(
   'pages/topics-and-skills-dashboard-page/navbar/' +

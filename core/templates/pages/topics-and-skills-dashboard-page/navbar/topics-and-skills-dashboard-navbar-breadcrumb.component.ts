@@ -18,5 +18,5 @@
 
 angular.module('oppia').component('topicsAndSkillsDashboardNavbarBreadcrumb', {
   template: require(
-    './topics-and-skills-dashboard-navbar-breadcrumb.directive.html'),
+    './topics-and-skills-dashboard-navbar-breadcrumb.component.html'),
 });
