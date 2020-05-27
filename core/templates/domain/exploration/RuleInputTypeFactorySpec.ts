@@ -74,7 +74,7 @@ describe('RuleInputTypeFactory', () => {
     inputnumberArray = [0];
   });
 
-  it('should correctly indentify graph', () => {
+  it('should correctly identify graph', () => {
     let outputGraph = ruleInputTypeFactory.graphInstance(inputGraph);
     let outputNotes = ruleInputTypeFactory.graphInstance(inputNotes);
     let outputFraction = ruleInputTypeFactory.graphInstance(inputFraction);
@@ -102,7 +102,7 @@ describe('RuleInputTypeFactory', () => {
     expect(outputnumberArray).toEqual(undefined);
   });
 
-  it('should correctly indentify notes', () => {
+  it('should correctly identify notes', () => {
     let outputGraph = ruleInputTypeFactory.notesInstance(inputGraph);
     let outputEmptyArray = ruleInputTypeFactory.notesInstance([]);
     let outputNotes = ruleInputTypeFactory.notesInstance(inputNotes);
@@ -136,7 +136,7 @@ describe('RuleInputTypeFactory', () => {
     expect(outputnumberArray).toEqual(undefined);
   });
 
-  it('should correctly indentify fraction', () => {
+  it('should correctly identify fraction', () => {
     let outputGraph = ruleInputTypeFactory.fractionInstance(inputGraph);
     let outputNotes = ruleInputTypeFactory.fractionInstance(inputNotes);
     let outputFraction = ruleInputTypeFactory.fractionInstance(inputFraction);
@@ -167,7 +167,7 @@ describe('RuleInputTypeFactory', () => {
     expect(outputnumberArray).toEqual(undefined);
   });
 
-  it('should correctly indentify number with units', () => {
+  it('should correctly identify number with units', () => {
     let outputGraph = ruleInputTypeFactory.numberWithUnitsInstance(inputGraph);
     let outputNotes = ruleInputTypeFactory.numberWithUnitsInstance(inputNotes);
     let outputFraction = ruleInputTypeFactory.numberWithUnitsInstance(
@@ -214,7 +214,7 @@ describe('RuleInputTypeFactory', () => {
     expect(outputnumberArray).toEqual(undefined);
   });
 
-  it('should correctly indentify string', () => {
+  it('should correctly identify string', () => {
     let outputGraph = ruleInputTypeFactory.stringInstance(inputGraph);
     let outputNotes = ruleInputTypeFactory.stringInstance(inputNotes);
     let outputFraction = ruleInputTypeFactory.stringInstance(
@@ -243,7 +243,7 @@ describe('RuleInputTypeFactory', () => {
     expect(outputnumberArray).toEqual(undefined);
   });
 
-  it('should correctly indentify number', () => {
+  it('should correctly identify number', () => {
     let outputGraph = ruleInputTypeFactory.numberInstance(inputGraph);
     let outputNotes = ruleInputTypeFactory.numberInstance(inputNotes);
     let outputFraction = ruleInputTypeFactory.numberInstance(
@@ -272,7 +272,7 @@ describe('RuleInputTypeFactory', () => {
     expect(outputnumberArray).toEqual(undefined);
   });
 
-  it('should correctly indentify string array', () => {
+  it('should correctly identify string array', () => {
     let outputGraph = ruleInputTypeFactory.stringArrayInstance(inputGraph);
     let outputNotes = ruleInputTypeFactory.stringArrayInstance(inputNotes);
     let outputFraction = ruleInputTypeFactory.stringArrayInstance(
@@ -301,7 +301,7 @@ describe('RuleInputTypeFactory', () => {
     expect(outputnumberArray).toEqual(undefined);
   });
 
-  it('should correctly indentify string array array', () => {
+  it('should correctly identify string array array', () => {
     let outputGraph = ruleInputTypeFactory.stringArrayArrayInstance(inputGraph);
     let outputNotes = ruleInputTypeFactory.stringArrayArrayInstance(inputNotes);
     let outputFraction = ruleInputTypeFactory.stringArrayArrayInstance(
@@ -330,7 +330,7 @@ describe('RuleInputTypeFactory', () => {
     expect(outputnumberArray).toEqual(undefined);
   });
 
-  it('should correctly indentify number array', () => {
+  it('should correctly identify number array', () => {
     let outputGraph = ruleInputTypeFactory.numberArrayInstance(inputGraph);
     let outputNotes = ruleInputTypeFactory.numberArrayInstance(inputNotes);
     let outputFraction = ruleInputTypeFactory.numberArrayInstance(
