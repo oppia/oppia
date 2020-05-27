@@ -17,5 +17,5 @@
  */
 
 angular.module('oppia').component('loadingDots', {
-  template: require('./loading-dots.directive.html'),
+  template: require('./loading-dots.component.html'),
 });

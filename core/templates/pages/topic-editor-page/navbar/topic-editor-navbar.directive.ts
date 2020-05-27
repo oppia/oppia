@@ -21,7 +21,7 @@ require(
   'confirm-or-cancel-modal.controller.ts');
 require(
   'components/common-layout-directives/common-elements/' +
-  'loading-dots.directive.ts');
+  'loading-dots.component.ts');
 
 require('domain/classroom/classroom-domain.constants.ajs.ts');
 require('domain/editor/undo_redo/undo-redo.service.ts');
