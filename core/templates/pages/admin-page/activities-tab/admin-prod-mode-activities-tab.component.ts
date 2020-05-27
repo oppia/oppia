@@ -13,19 +13,10 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the social buttons displayed in footer.
+ * @fileoverview Directive for the activities tab in the admin panel when Oppia
+ * is in production mode.
  */
 
-require('domain/utilities/url-interpolation.service.ts');
-
-angular.module('oppia').component('socialButtons', {
-  template: require('./social-buttons.directive.html'),
-  controller: [
-    'UrlInterpolationService',
-    function(UrlInterpolationService) {
-      var ctrl = this;
-      ctrl.getStaticImageUrl = function(imagePath) {
-        return UrlInterpolationService.getStaticImageUrl(imagePath);
-      };
-    }]
+angular.module('oppia').component('adminProdModeActivitiesTab', {
+  template: require('./admin-prod-mode-activities-tab.component.html'),
 });
