@@ -102,13 +102,13 @@ describe('Topic and Skill dashboard page service', () => {
     filterOptions.keyword = '';
     filterOptions.status = ETopicPublishedOptions.Published;
     filteredArray = tsds.getFilteredTopics(topicsArray, filterOptions);
-    expect(filteredArray).toEqual([topic1, topic3]);
+    expect(filteredArray).toEqual([topic3, topic1]);
 
     filterOptions.status = ETopicPublishedOptions.NotPublished;
     filteredArray = tsds.getFilteredTopics(topicsArray, filterOptions);
     expect(filteredArray).toEqual([topic2]);
 
-    filterOptions.status = ETopicPublishedOptions.Any;
+    filterOptions.status = ETopicPublishedOptions.All;
     filterOptions.sort = ETopicSortOptions.IncreasingUpdatedOn;
     filteredArray = tsds.getFilteredTopics(topicsArray, filterOptions);
     expect(filteredArray).toEqual([topic3, topic2, topic1]);
@@ -125,10 +125,10 @@ describe('Topic and Skill dashboard page service', () => {
     filteredArray = tsds.getFilteredTopics(topicsArray, filterOptions);
     expect(filteredArray).toEqual([topic1, topic2, topic3]);
 
-    filterOptions.sort = ETopicSortOptions.Any;
+    filterOptions.sort = ETopicSortOptions.IncreasingCreatedOn;
     filterOptions.category = 'Mathematics';
     filteredArray = tsds.getFilteredTopics(topicsArray, filterOptions);
-    expect(filteredArray).toEqual([topic1, topic2]);
+    expect(filteredArray).toEqual([topic2, topic1]);
 
     // @ts-ignore
     // since sort is an ENUM, we can't assign any random value

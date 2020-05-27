@@ -145,6 +145,7 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
                     ctrl.untriagedSkillSummaries.length !== 0) {
                   ctrl.activeTab = ctrl.TAB_NAME_UNTRIAGED_SKILLS;
                 }
+                ctrl.applyFilters();
                 $rootScope.$apply();
               },
               function(errorResponse) {
@@ -208,6 +209,7 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
                     pageNumber * ctrl.itemsPerPage,
                     (pageNumber + 1) * ctrl.itemsPerPage);
             }
+            ctrl.applyFilters();
           };
           /**
            * @param {String} direction - Direction, whether to change the
@@ -262,9 +264,10 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
             ctrl.filterObject = (
               TopicsAndSkillsDashboardFilterObjectFactory.createDefault());
             ctrl.categories = angular.copy(ALLOWED_TOPIC_CATEGORIES);
-            // Adding this since karma tests were adding Any for every it block
-            if (!ctrl.categories.includes('Any')) {
-              ctrl.categories.unshift('Any');
+            // Adding this since karma tests were adding 'All' for
+            // every it block.
+            if (!ctrl.categories.includes('All')) {
+              ctrl.categories.unshift('All');
             }
             ctrl.sortOptions = TOPIC_SORT_OPTIONS;
             ctrl.statusOptions = TOPIC_PUBLISHED_OPTIONS;

@@ -53,19 +53,19 @@ export class TopicsAndSkillsDashboardPageService {
         return (
           topic.name.toLowerCase().includes(
             filterObject.keyword.toLowerCase()) ||
-          topic.description.toLowerCase().includes(
-            filterObject.keyword.toLowerCase()));
+            topic.description.toLowerCase().includes(
+              filterObject.keyword.toLowerCase()));
       });
     }
 
-    if (filterObject.category !== 'Any') {
+    if (filterObject.category !== 'All') {
       filteredTopics = filteredTopics.filter((topic) => {
         return (
           filterObject.category === topic.category);
       });
     }
 
-    if (filterObject.status !== EPublishedOptions.Any) {
+    if (filterObject.status !== EPublishedOptions.All) {
       filteredTopics = filteredTopics.filter((topic) => {
         if (filterObject.status === EPublishedOptions.Published &&
             topic.is_published) {
@@ -79,28 +79,27 @@ export class TopicsAndSkillsDashboardPageService {
       });
     }
 
-    if (filterObject.sort !== ESortOptions.Any) {
-      switch (filterObject.sort) {
-        case ESortOptions.IncreasingUpdatedOn:
-          filteredTopics.sort((a, b) => (
-            b.topic_model_created_on - a.topic_model_created_on));
-          break;
-        case ESortOptions.DecreasingUpdatedOn:
-          filteredTopics.sort((a, b) =>
-            -(b.topic_model_created_on - a.topic_model_created_on));
-          break;
-        case ESortOptions.IncreasingCreatedOn:
-          filteredTopics.sort((a, b) =>
-            (b.topic_model_last_updated - a.topic_model_last_updated));
-          break;
-        case ESortOptions.DecreasingCreatedOn:
-          filteredTopics.sort((a, b) =>
-            -(b.topic_model_last_updated - a.topic_model_last_updated));
-          break;
-        default:
-          throw new Error('Invalid filter by sort value provided.');
-      }
+    switch (filterObject.sort) {
+      case ESortOptions.IncreasingUpdatedOn:
+        filteredTopics.sort((a, b) => (
+          b.topic_model_created_on - a.topic_model_created_on));
+        break;
+      case ESortOptions.DecreasingUpdatedOn:
+        filteredTopics.sort((a, b) =>
+          -(b.topic_model_created_on - a.topic_model_created_on));
+        break;
+      case ESortOptions.IncreasingCreatedOn:
+        filteredTopics.sort((a, b) =>
+          (b.topic_model_last_updated - a.topic_model_last_updated));
+        break;
+      case ESortOptions.DecreasingCreatedOn:
+        filteredTopics.sort((a, b) =>
+          -(b.topic_model_last_updated - a.topic_model_last_updated));
+        break;
+      default:
+        throw new Error('Invalid filter by sort value provided.');
     }
+
     return filteredTopics;
   }
 }
