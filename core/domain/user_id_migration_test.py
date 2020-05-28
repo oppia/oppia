@@ -72,13 +72,26 @@ class HelperFunctionsTests(test_utils.GenericTestBase):
             email='some.different@email.cz'
         ).put()
 
+    def test_verify_user_id_correct(self):
+        self.assertTrue(
+            user_id_migration.verify_user_id_correct('uid_' + 'a' * 32))
+        self.assertFalse(
+            user_id_migration.verify_user_id_correct('uid_' + 'a' * 31 + 'A'))
+        self.assertFalse(
+            user_id_migration.verify_user_id_correct('uid_' + 'a' * 31))
+        self.assertFalse(user_id_migration.verify_user_id_correct('a' * 36))
+
     def test_replace_gae_ids(self):
         self.assertEqual(
             user_id_migration.get_user_ids_corresponding_to_gae_ids(
                 [self.USER_1_GAE_ID, self.USER_2_GAE_ID, self.USER_3_GAE_ID]),
             [self.USER_1_USER_ID, self.USER_2_USER_ID, self.USER_3_USER_ID]
         )
-        with self.assertRaises(user_id_migration.MissingUserException):
+        with self.assertRaises(user_id_migration.AlreadyMigratedUserExceptionn):
+            user_id_migration.get_user_ids_corresponding_to_gae_ids(
+                [self.USER_1_USER_ID, 'nonexistent_gae_id'])
+
+        with self.assertRaises(user_id_migration.MissingUserExceptio):
             user_id_migration.get_user_ids_corresponding_to_gae_ids(
                 [self.USER_1_GAE_ID, 'nonexistent_gae_id'])
 
@@ -94,6 +107,11 @@ class HelperFunctionsTests(test_utils.GenericTestBase):
                 self.USER_1_GAE_ID),
             self.USER_1_USER_ID
         )
+
+        with self.assertRaises(user_id_migration.AlreadyMigratedUserException):
+            user_id_migration.get_user_id_corresponding_to_gae_id(
+                self.USER_1_USER_ID)
+
         with self.assertRaises(user_id_migration.MissingUserException):
             user_id_migration.get_user_id_corresponding_to_gae_id(
                 'nonexistent_gae_id')
@@ -1031,11 +1049,11 @@ class UserIdMigrationJobTests(test_utils.GenericTestBase):
 class SnapshotsContentUserIdMigrationJobTests(test_utils.GenericTestBase):
     """Tests for SnapshotsUserIdMigrationJobTests."""
     SNAPSHOT_ID = '2'
-    USER_1_USER_ID = 'user_id_1'
+    USER_1_USER_ID = 'uid_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
     USER_1_GAE_ID = 'gae_id_1'
-    USER_2_USER_ID = 'user_id_2'
+    USER_2_USER_ID = 'uid_bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb'
     USER_2_GAE_ID = 'gae_id_2'
-    USER_3_USER_ID = 'user_id_3'
+    USER_3_USER_ID = 'uid_cccccccccccccccccccccccccccccccc'
     USER_3_GAE_ID = 'gae_id_3'
     WRONG_GAE_ID = 'wrong_id'
 
@@ -1357,10 +1375,272 @@ class SnapshotsContentUserIdMigrationJobTests(test_utils.GenericTestBase):
              [self.WRONG_GAE_ID]],
             output)
 
+    def test_idempotent_change_model_not_migrated(self):
+        original_rights_model_1 = collection_models.CollectionRightsModel(
+            id='instance_1_id',
+            owner_ids=[self.USER_1_GAE_ID, self.USER_2_GAE_ID],
+            editor_ids=[self.USER_1_GAE_ID, feconf.SYSTEM_COMMITTER_ID],
+            voice_artist_ids=[self.USER_1_GAE_ID, self.USER_2_GAE_ID],
+            viewer_ids=[self.USER_1_GAE_ID, self.USER_3_GAE_ID],
+            community_owned=False,
+            status=constants.ACTIVITY_STATUS_PUBLIC,
+            viewable_if_private=False,
+            first_published_msec=0.0)
+        collection_models.CollectionRightsSnapshotContentModel(
+            id='instance_1_id',
+            content=original_rights_model_1.to_dict()).put()
+        original_rights_model_2 = collection_models.CollectionRightsModel(
+            id='instance_2_id',
+            owner_ids=[self.USER_1_GAE_ID, self.USER_2_GAE_ID],
+            editor_ids=[self.USER_1_GAE_ID, feconf.SYSTEM_COMMITTER_ID],
+            voice_artist_ids=[self.USER_1_GAE_ID, self.USER_2_GAE_ID],
+            viewer_ids=[self.USER_1_GAE_ID, self.USER_3_GAE_ID],
+            community_owned=False,
+            status=constants.ACTIVITY_STATUS_PUBLIC,
+            viewable_if_private=False,
+            first_published_msec=0.0)
+        collection_models.CollectionRightsSnapshotContentModel(
+            id='instance_2_id',
+            content=original_rights_model_2.to_dict()).put()
+
+        output = self._run_one_off_job()
+        self.assertItemsEqual(
+            output, [['SUCCESS - CollectionRightsSnapshotContentModel', 2]])
+
+        original_rights_model_1 = collection_models.CollectionRightsModel(
+            id='instance_1_id',
+            owner_ids=[self.USER_1_GAE_ID, self.USER_2_GAE_ID],
+            editor_ids=[self.USER_1_GAE_ID, feconf.SYSTEM_COMMITTER_ID],
+            voice_artist_ids=[self.USER_1_GAE_ID, self.USER_2_GAE_ID],
+            viewer_ids=[self.USER_1_GAE_ID, self.USER_3_GAE_ID],
+            community_owned=False,
+            status=constants.ACTIVITY_STATUS_PUBLIC,
+            viewable_if_private=False,
+            first_published_msec=0.0)
+        collection_models.CollectionRightsSnapshotContentModel(
+            id='instance_1_id',
+            content=original_rights_model_1.to_dict()).put()
+        original_rights_model_2 = collection_models.CollectionRightsModel(
+            id='instance_2_id',
+            owner_ids=[self.USER_1_GAE_ID, self.USER_2_GAE_ID],
+            editor_ids=[self.USER_1_GAE_ID, feconf.SYSTEM_COMMITTER_ID],
+            voice_artist_ids=[self.USER_1_GAE_ID, self.USER_2_GAE_ID],
+            viewer_ids=[self.USER_1_GAE_ID, self.USER_3_GAE_ID],
+            community_owned=False,
+            status=constants.ACTIVITY_STATUS_PUBLIC,
+            viewable_if_private=False,
+            first_published_msec=0.0)
+        collection_models.CollectionRightsSnapshotContentModel(
+            id='instance_2_id',
+            content=original_rights_model_2.to_dict()).put()
+
+        output = self._run_one_off_job()
+        self.assertItemsEqual(
+            output, [['SUCCESS - CollectionRightsSnapshotContentModel', 2]])
+
+        migrated_rights_snapshot_model_1 = (
+            collection_models.CollectionRightsSnapshotContentModel.get_by_id(
+                'instance_1_id'))
+        migrated_rights_model_1 = collection_models.CollectionRightsModel(
+            **migrated_rights_snapshot_model_1.content)
+        self.assertEqual(
+            [self.USER_1_USER_ID, self.USER_2_USER_ID],
+            migrated_rights_model_1.owner_ids)
+        self.assertEqual(
+            [self.USER_1_USER_ID, feconf.SYSTEM_COMMITTER_ID],
+            migrated_rights_model_1.editor_ids)
+        self.assertEqual(
+            [self.USER_1_USER_ID, self.USER_2_USER_ID],
+            migrated_rights_model_1.voice_artist_ids)
+        self.assertEqual(
+            [self.USER_1_USER_ID, self.USER_3_USER_ID],
+            migrated_rights_model_1.viewer_ids)
+
+        migrated_rights_snapshot_model_2 = (
+            collection_models.CollectionRightsSnapshotContentModel.get_by_id(
+                'instance_2_id'))
+        migrated_rights_model_2 = collection_models.CollectionRightsModel(
+            **migrated_rights_snapshot_model_2.content)
+        self.assertEqual(
+            [self.USER_1_USER_ID, self.USER_2_USER_ID],
+            migrated_rights_model_2.owner_ids)
+        self.assertEqual(
+            [self.USER_1_USER_ID, feconf.SYSTEM_COMMITTER_ID],
+            migrated_rights_model_2.editor_ids)
+        self.assertEqual(
+            [self.USER_1_USER_ID, self.USER_2_USER_ID],
+            migrated_rights_model_2.voice_artist_ids)
+        self.assertEqual(
+            [self.USER_1_USER_ID, self.USER_3_USER_ID],
+            migrated_rights_model_2.viewer_ids)
+
+    def test_idempotent_change_model_half_migrated(self):
+        original_rights_model_1 = collection_models.CollectionRightsModel(
+            id='instance_1_id',
+            owner_ids=[self.USER_1_GAE_ID, self.USER_2_GAE_ID],
+            editor_ids=[self.USER_1_GAE_ID, feconf.SYSTEM_COMMITTER_ID],
+            voice_artist_ids=[self.USER_1_GAE_ID, self.USER_2_GAE_ID],
+            viewer_ids=[self.USER_1_GAE_ID, self.USER_3_GAE_ID],
+            community_owned=False,
+            status=constants.ACTIVITY_STATUS_PUBLIC,
+            viewable_if_private=False,
+            first_published_msec=0.0)
+        collection_models.CollectionRightsSnapshotContentModel(
+            id='instance_1_id',
+            content=original_rights_model_1.to_dict()).put()
+        original_rights_model_2 = collection_models.CollectionRightsModel(
+            id='instance_2_id',
+            owner_ids=[self.USER_1_GAE_ID, self.USER_2_GAE_ID],
+            editor_ids=[self.USER_1_GAE_ID, feconf.SYSTEM_COMMITTER_ID],
+            voice_artist_ids=[self.USER_1_GAE_ID, self.USER_2_GAE_ID],
+            viewer_ids=[self.USER_1_GAE_ID, self.USER_3_GAE_ID],
+            community_owned=False,
+            status=constants.ACTIVITY_STATUS_PUBLIC,
+            viewable_if_private=False,
+            first_published_msec=0.0)
+        collection_models.CollectionRightsSnapshotContentModel(
+            id='instance_2_id',
+            content=original_rights_model_2.to_dict()).put()
+
+        output = self._run_one_off_job()
+        self.assertItemsEqual(
+            output, [['SUCCESS - CollectionRightsSnapshotContentModel', 2]])
+
+        original_rights_model_2 = collection_models.CollectionRightsModel(
+            id='instance_2_id',
+            owner_ids=[self.USER_1_GAE_ID, self.USER_2_GAE_ID],
+            editor_ids=[self.USER_1_GAE_ID, feconf.SYSTEM_COMMITTER_ID],
+            voice_artist_ids=[self.USER_1_GAE_ID, self.USER_2_GAE_ID],
+            viewer_ids=[self.USER_1_GAE_ID, self.USER_3_GAE_ID],
+            community_owned=False,
+            status=constants.ACTIVITY_STATUS_PUBLIC,
+            viewable_if_private=False,
+            first_published_msec=0.0)
+        collection_models.CollectionRightsSnapshotContentModel(
+            id='instance_2_id',
+            content=original_rights_model_2.to_dict()).put()
+
+        output = self._run_one_off_job()
+        self.assertItemsEqual(
+            output,
+            [['SUCCESS - CollectionRightsSnapshotContentModel', 1],
+             ['SUCCESS_ALREADY_MIGRATED - CollectionRightsSnapshotContentModel',
+              1]])
+
+        migrated_rights_snapshot_model_1 = (
+            collection_models.CollectionRightsSnapshotContentModel.get_by_id(
+                'instance_1_id'))
+        migrated_rights_model_1 = collection_models.CollectionRightsModel(
+            **migrated_rights_snapshot_model_1.content)
+        self.assertEqual(
+            [self.USER_1_USER_ID, self.USER_2_USER_ID],
+            migrated_rights_model_1.owner_ids)
+        self.assertEqual(
+            [self.USER_1_USER_ID, feconf.SYSTEM_COMMITTER_ID],
+            migrated_rights_model_1.editor_ids)
+        self.assertEqual(
+            [self.USER_1_USER_ID, self.USER_2_USER_ID],
+            migrated_rights_model_1.voice_artist_ids)
+        self.assertEqual(
+            [self.USER_1_USER_ID, self.USER_3_USER_ID],
+            migrated_rights_model_1.viewer_ids)
+
+        migrated_rights_snapshot_model_2 = (
+            collection_models.CollectionRightsSnapshotContentModel.get_by_id(
+                'instance_2_id'))
+        migrated_rights_model_2 = collection_models.CollectionRightsModel(
+            **migrated_rights_snapshot_model_2.content)
+        self.assertEqual(
+            [self.USER_1_USER_ID, self.USER_2_USER_ID],
+            migrated_rights_model_2.owner_ids)
+        self.assertEqual(
+            [self.USER_1_USER_ID, feconf.SYSTEM_COMMITTER_ID],
+            migrated_rights_model_2.editor_ids)
+        self.assertEqual(
+            [self.USER_1_USER_ID, self.USER_2_USER_ID],
+            migrated_rights_model_2.voice_artist_ids)
+        self.assertEqual(
+            [self.USER_1_USER_ID, self.USER_3_USER_ID],
+            migrated_rights_model_2.viewer_ids)
+
+    def test_idempotent_change_model_all_migrated(self):
+        original_rights_model_1 = collection_models.CollectionRightsModel(
+            id='instance_1_id',
+            owner_ids=[self.USER_1_GAE_ID, self.USER_2_GAE_ID],
+            editor_ids=[self.USER_1_GAE_ID, feconf.SYSTEM_COMMITTER_ID],
+            voice_artist_ids=[self.USER_1_GAE_ID, self.USER_2_GAE_ID],
+            viewer_ids=[self.USER_1_GAE_ID, self.USER_3_GAE_ID],
+            community_owned=False,
+            status=constants.ACTIVITY_STATUS_PUBLIC,
+            viewable_if_private=False,
+            first_published_msec=0.0)
+        collection_models.CollectionRightsSnapshotContentModel(
+            id='instance_1_id',
+            content=original_rights_model_1.to_dict()).put()
+        original_rights_model_2 = collection_models.CollectionRightsModel(
+            id='instance_2_id',
+            owner_ids=[self.USER_1_GAE_ID, self.USER_2_GAE_ID],
+            editor_ids=[self.USER_1_GAE_ID, feconf.SYSTEM_COMMITTER_ID],
+            voice_artist_ids=[self.USER_1_GAE_ID, self.USER_2_GAE_ID],
+            viewer_ids=[self.USER_1_GAE_ID, self.USER_3_GAE_ID],
+            community_owned=False,
+            status=constants.ACTIVITY_STATUS_PUBLIC,
+            viewable_if_private=False,
+            first_published_msec=0.0)
+        collection_models.CollectionRightsSnapshotContentModel(
+            id='instance_2_id',
+            content=original_rights_model_2.to_dict()).put()
+
+        output = self._run_one_off_job()
+        self.assertItemsEqual(
+            output, [['SUCCESS - CollectionRightsSnapshotContentModel', 2]])
+
+        output = self._run_one_off_job()
+        self.assertItemsEqual(
+            output,
+            [['SUCCESS_ALREADY_MIGRATED - CollectionRightsSnapshotContentModel',
+              2]])
+
+        migrated_rights_snapshot_model_1 = (
+            collection_models.CollectionRightsSnapshotContentModel.get_by_id(
+                'instance_1_id'))
+        migrated_rights_model_1 = collection_models.CollectionRightsModel(
+            **migrated_rights_snapshot_model_1.content)
+        self.assertEqual(
+            [self.USER_1_USER_ID, self.USER_2_USER_ID],
+            migrated_rights_model_1.owner_ids)
+        self.assertEqual(
+            [self.USER_1_USER_ID, feconf.SYSTEM_COMMITTER_ID],
+            migrated_rights_model_1.editor_ids)
+        self.assertEqual(
+            [self.USER_1_USER_ID, self.USER_2_USER_ID],
+            migrated_rights_model_1.voice_artist_ids)
+        self.assertEqual(
+            [self.USER_1_USER_ID, self.USER_3_USER_ID],
+            migrated_rights_model_1.viewer_ids)
+
+        migrated_rights_snapshot_model_2 = (
+            collection_models.CollectionRightsSnapshotContentModel.get_by_id(
+                'instance_2_id'))
+        migrated_rights_model_2 = collection_models.CollectionRightsModel(
+            **migrated_rights_snapshot_model_2.content)
+        self.assertEqual(
+            [self.USER_1_USER_ID, self.USER_2_USER_ID],
+            migrated_rights_model_2.owner_ids)
+        self.assertEqual(
+            [self.USER_1_USER_ID, feconf.SYSTEM_COMMITTER_ID],
+            migrated_rights_model_2.editor_ids)
+        self.assertEqual(
+            [self.USER_1_USER_ID, self.USER_2_USER_ID],
+            migrated_rights_model_2.voice_artist_ids)
+        self.assertEqual(
+            [self.USER_1_USER_ID, self.USER_3_USER_ID],
+            migrated_rights_model_2.viewer_ids)
+
 
 class SnapshotsMetadataUserIdMigrationJobTests(test_utils.GenericTestBase):
     """Tests for SnapshotsUserIdMigrationJobTests."""
-    USER_1_USER_ID = 'user_id_1'
+    USER_1_USER_ID = 'uid_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
     USER_1_GAE_ID = 'gae_id_1'
     WRONG_GAE_ID = 'wrong_id'
 
@@ -1753,6 +2033,353 @@ class SnapshotsMetadataUserIdMigrationJobTests(test_utils.GenericTestBase):
             rights_snapshot_model.commit_cmds[0]['removed_user_id'],
             self.USER_1_USER_ID)
 
+    def test_idempotent_change_model_not_migrated(self):
+        collection_models.CollectionRightsSnapshotMetadataModel(
+            id='col_1_id-1',
+            committer_id=self.USER_1_GAE_ID,
+            commit_type='edit',
+            commit_message='commit message 2',
+            commit_cmds=[{
+                'cmd': rights_manager.CMD_CHANGE_ROLE,
+                'assignee_id': self.USER_1_GAE_ID,
+                'old_role': rights_manager.ROLE_NONE,
+                'new_role': rights_manager.ROLE_EDITOR}]
+        ).put()
+        collection_models.CollectionCommitLogEntryModel(
+            id='rights-col_1_id-1',
+            user_id=self.USER_1_GAE_ID,
+            username='user',
+            collection_id='col_1_id',
+            commit_type='edit',
+            commit_message='commit message 2',
+            commit_cmds=[{
+                'cmd': rights_manager.CMD_CHANGE_ROLE,
+                'assignee_id': self.USER_1_GAE_ID,
+                'old_role': rights_manager.ROLE_NONE,
+                'new_role': rights_manager.ROLE_EDITOR}],
+            version=1,
+            post_commit_status='public'
+        ).put()
+        collection_models.CollectionRightsSnapshotMetadataModel(
+            id='col_2_id-1',
+            committer_id=self.USER_1_GAE_ID,
+            commit_type='edit',
+            commit_message='commit message 2',
+            commit_cmds=[{
+                'cmd': rights_manager.CMD_CHANGE_ROLE,
+                'assignee_id': self.USER_1_GAE_ID,
+                'old_role': rights_manager.ROLE_NONE,
+                'new_role': rights_manager.ROLE_EDITOR}]
+        ).put()
+        collection_models.CollectionCommitLogEntryModel(
+            id='rights-col_2_id-1',
+            user_id=self.USER_1_GAE_ID,
+            username='user',
+            collection_id='col_1_id',
+            commit_type='edit',
+            commit_message='commit message 2',
+            commit_cmds=[{
+                'cmd': rights_manager.CMD_CHANGE_ROLE,
+                'assignee_id': self.USER_1_GAE_ID,
+                'old_role': rights_manager.ROLE_NONE,
+                'new_role': rights_manager.ROLE_EDITOR}],
+            version=1,
+            post_commit_status='public'
+        ).put()
+
+        output = self._run_one_off_job()
+        self.assertItemsEqual(
+            output, [['SUCCESS - CollectionRightsSnapshotMetadataModel', 2]])
+
+        collection_models.CollectionRightsSnapshotMetadataModel(
+            id='col_1_id-1',
+            committer_id=self.USER_1_GAE_ID,
+            commit_type='edit',
+            commit_message='commit message 2',
+            commit_cmds=[{
+                'cmd': rights_manager.CMD_CHANGE_ROLE,
+                'assignee_id': self.USER_1_GAE_ID,
+                'old_role': rights_manager.ROLE_NONE,
+                'new_role': rights_manager.ROLE_EDITOR}]
+        ).put()
+        collection_models.CollectionCommitLogEntryModel(
+            id='rights-col_1_id-1',
+            user_id=self.USER_1_GAE_ID,
+            username='user',
+            collection_id='col_1_id',
+            commit_type='edit',
+            commit_message='commit message 2',
+            commit_cmds=[{
+                'cmd': rights_manager.CMD_CHANGE_ROLE,
+                'assignee_id': self.USER_1_GAE_ID,
+                'old_role': rights_manager.ROLE_NONE,
+                'new_role': rights_manager.ROLE_EDITOR}],
+            version=1,
+            post_commit_status='public'
+        ).put()
+        collection_models.CollectionRightsSnapshotMetadataModel(
+            id='col_2_id-1',
+            committer_id=self.USER_1_GAE_ID,
+            commit_type='edit',
+            commit_message='commit message 2',
+            commit_cmds=[{
+                'cmd': rights_manager.CMD_CHANGE_ROLE,
+                'assignee_id': self.USER_1_GAE_ID,
+                'old_role': rights_manager.ROLE_NONE,
+                'new_role': rights_manager.ROLE_EDITOR}]
+        ).put()
+        collection_models.CollectionCommitLogEntryModel(
+            id='rights-col_2_id-1',
+            user_id=self.USER_1_GAE_ID,
+            username='user',
+            collection_id='col_1_id',
+            commit_type='edit',
+            commit_message='commit message 2',
+            commit_cmds=[{
+                'cmd': rights_manager.CMD_CHANGE_ROLE,
+                'assignee_id': self.USER_1_GAE_ID,
+                'old_role': rights_manager.ROLE_NONE,
+                'new_role': rights_manager.ROLE_EDITOR}],
+            version=1,
+            post_commit_status='public'
+        ).put()
+
+        output = self._run_one_off_job()
+        self.assertItemsEqual(
+            output, [['SUCCESS - CollectionRightsSnapshotMetadataModel', 2]])
+
+        rights_snapshot_model = (
+            collection_models.CollectionRightsSnapshotMetadataModel.get_by_id(
+                'col_1_id-1'))
+        self.assertEqual(
+            rights_snapshot_model.commit_cmds[0]['assignee_id'],
+            self.USER_1_USER_ID)
+        rights_commit_model = (
+            collection_models.CollectionCommitLogEntryModel.get_by_id(
+                'rights-col_1_id-1'))
+        self.assertEqual(
+            rights_commit_model.commit_cmds[0]['assignee_id'],
+            self.USER_1_USER_ID)
+        rights_snapshot_model = (
+            collection_models.CollectionRightsSnapshotMetadataModel.get_by_id(
+                'col_2_id-1'))
+        self.assertEqual(
+            rights_snapshot_model.commit_cmds[0]['assignee_id'],
+            self.USER_1_USER_ID)
+        rights_commit_model = (
+            collection_models.CollectionCommitLogEntryModel.get_by_id(
+                'rights-col_2_id-1'))
+        self.assertEqual(
+            rights_commit_model.commit_cmds[0]['assignee_id'],
+            self.USER_1_USER_ID)
+
+    def test_idempotent_change_model_half_migrated(self):
+        collection_models.CollectionRightsSnapshotMetadataModel(
+            id='col_1_id-1',
+            committer_id=self.USER_1_GAE_ID,
+            commit_type='edit',
+            commit_message='commit message 2',
+            commit_cmds=[{
+                'cmd': rights_manager.CMD_CHANGE_ROLE,
+                'assignee_id': self.USER_1_GAE_ID,
+                'old_role': rights_manager.ROLE_NONE,
+                'new_role': rights_manager.ROLE_EDITOR}]
+        ).put()
+        collection_models.CollectionCommitLogEntryModel(
+            id='rights-col_1_id-1',
+            user_id=self.USER_1_GAE_ID,
+            username='user',
+            collection_id='col_1_id',
+            commit_type='edit',
+            commit_message='commit message 2',
+            commit_cmds=[{
+                'cmd': rights_manager.CMD_CHANGE_ROLE,
+                'assignee_id': self.USER_1_GAE_ID,
+                'old_role': rights_manager.ROLE_NONE,
+                'new_role': rights_manager.ROLE_EDITOR}],
+            version=1,
+            post_commit_status='public'
+        ).put()
+        collection_models.CollectionRightsSnapshotMetadataModel(
+            id='col_2_id-1',
+            committer_id=self.USER_1_GAE_ID,
+            commit_type='edit',
+            commit_message='commit message 2',
+            commit_cmds=[{
+                'cmd': rights_manager.CMD_CHANGE_ROLE,
+                'assignee_id': self.USER_1_GAE_ID,
+                'old_role': rights_manager.ROLE_NONE,
+                'new_role': rights_manager.ROLE_EDITOR}]
+        ).put()
+        collection_models.CollectionCommitLogEntryModel(
+            id='rights-col_2_id-1',
+            user_id=self.USER_1_GAE_ID,
+            username='user',
+            collection_id='col_1_id',
+            commit_type='edit',
+            commit_message='commit message 2',
+            commit_cmds=[{
+                'cmd': rights_manager.CMD_CHANGE_ROLE,
+                'assignee_id': self.USER_1_GAE_ID,
+                'old_role': rights_manager.ROLE_NONE,
+                'new_role': rights_manager.ROLE_EDITOR}],
+            version=1,
+            post_commit_status='public'
+        ).put()
+
+        output = self._run_one_off_job()
+        self.assertItemsEqual(
+            output, [['SUCCESS - CollectionRightsSnapshotMetadataModel', 2]])
+
+        collection_models.CollectionRightsSnapshotMetadataModel(
+            id='col_1_id-1',
+            committer_id=self.USER_1_GAE_ID,
+            commit_type='edit',
+            commit_message='commit message 2',
+            commit_cmds=[{
+                'cmd': rights_manager.CMD_CHANGE_ROLE,
+                'assignee_id': self.USER_1_GAE_ID,
+                'old_role': rights_manager.ROLE_NONE,
+                'new_role': rights_manager.ROLE_EDITOR}]
+        ).put()
+        collection_models.CollectionCommitLogEntryModel(
+            id='rights-col_1_id-1',
+            user_id=self.USER_1_GAE_ID,
+            username='user',
+            collection_id='col_1_id',
+            commit_type='edit',
+            commit_message='commit message 2',
+            commit_cmds=[{
+                'cmd': rights_manager.CMD_CHANGE_ROLE,
+                'assignee_id': self.USER_1_GAE_ID,
+                'old_role': rights_manager.ROLE_NONE,
+                'new_role': rights_manager.ROLE_EDITOR}],
+            version=1,
+            post_commit_status='public'
+        ).put()
+
+        output = self._run_one_off_job()
+        self.assertItemsEqual(
+            output,
+            [['SUCCESS - CollectionRightsSnapshotMetadataModel', 1],
+             ['SUCCESS_ALREADY_MIGRATED - '
+              'CollectionRightsSnapshotMetadataModel', 1]])
+
+        rights_snapshot_model = (
+            collection_models.CollectionRightsSnapshotMetadataModel.get_by_id(
+                'col_1_id-1'))
+        self.assertEqual(
+            rights_snapshot_model.commit_cmds[0]['assignee_id'],
+            self.USER_1_USER_ID)
+        rights_commit_model = (
+            collection_models.CollectionCommitLogEntryModel.get_by_id(
+                'rights-col_1_id-1'))
+        self.assertEqual(
+            rights_commit_model.commit_cmds[0]['assignee_id'],
+            self.USER_1_USER_ID)
+        rights_snapshot_model = (
+            collection_models.CollectionRightsSnapshotMetadataModel.get_by_id(
+                'col_2_id-1'))
+        self.assertEqual(
+            rights_snapshot_model.commit_cmds[0]['assignee_id'],
+            self.USER_1_USER_ID)
+        rights_commit_model = (
+            collection_models.CollectionCommitLogEntryModel.get_by_id(
+                'rights-col_2_id-1'))
+        self.assertEqual(
+            rights_commit_model.commit_cmds[0]['assignee_id'],
+            self.USER_1_USER_ID)
+
+    def test_idempotent_change_model_all_migrated(self):
+        collection_models.CollectionRightsSnapshotMetadataModel(
+            id='col_1_id-1',
+            committer_id=self.USER_1_GAE_ID,
+            commit_type='edit',
+            commit_message='commit message 2',
+            commit_cmds=[{
+                'cmd': rights_manager.CMD_CHANGE_ROLE,
+                'assignee_id': self.USER_1_GAE_ID,
+                'old_role': rights_manager.ROLE_NONE,
+                'new_role': rights_manager.ROLE_EDITOR}]
+        ).put()
+        collection_models.CollectionCommitLogEntryModel(
+            id='rights-col_1_id-1',
+            user_id=self.USER_1_GAE_ID,
+            username='user',
+            collection_id='col_1_id',
+            commit_type='edit',
+            commit_message='commit message 2',
+            commit_cmds=[{
+                'cmd': rights_manager.CMD_CHANGE_ROLE,
+                'assignee_id': self.USER_1_GAE_ID,
+                'old_role': rights_manager.ROLE_NONE,
+                'new_role': rights_manager.ROLE_EDITOR}],
+            version=1,
+            post_commit_status='public'
+        ).put()
+        collection_models.CollectionRightsSnapshotMetadataModel(
+            id='col_2_id-1',
+            committer_id=self.USER_1_GAE_ID,
+            commit_type='edit',
+            commit_message='commit message 2',
+            commit_cmds=[{
+                'cmd': rights_manager.CMD_CHANGE_ROLE,
+                'assignee_id': self.USER_1_GAE_ID,
+                'old_role': rights_manager.ROLE_NONE,
+                'new_role': rights_manager.ROLE_EDITOR}]
+        ).put()
+        collection_models.CollectionCommitLogEntryModel(
+            id='rights-col_2_id-1',
+            user_id=self.USER_1_GAE_ID,
+            username='user',
+            collection_id='col_1_id',
+            commit_type='edit',
+            commit_message='commit message 2',
+            commit_cmds=[{
+                'cmd': rights_manager.CMD_CHANGE_ROLE,
+                'assignee_id': self.USER_1_GAE_ID,
+                'old_role': rights_manager.ROLE_NONE,
+                'new_role': rights_manager.ROLE_EDITOR}],
+            version=1,
+            post_commit_status='public'
+        ).put()
+
+        output = self._run_one_off_job()
+        self.assertItemsEqual(
+            output, [['SUCCESS - CollectionRightsSnapshotMetadataModel', 2]])
+
+
+        output = self._run_one_off_job()
+        self.assertItemsEqual(
+            output,
+            [['SUCCESS_ALREADY_MIGRATED - '
+              'CollectionRightsSnapshotMetadataModel', 2]])
+
+        rights_snapshot_model = (
+            collection_models.CollectionRightsSnapshotMetadataModel.get_by_id(
+                'col_1_id-1'))
+        self.assertEqual(
+            rights_snapshot_model.commit_cmds[0]['assignee_id'],
+            self.USER_1_USER_ID)
+        rights_commit_model = (
+            collection_models.CollectionCommitLogEntryModel.get_by_id(
+                'rights-col_1_id-1'))
+        self.assertEqual(
+            rights_commit_model.commit_cmds[0]['assignee_id'],
+            self.USER_1_USER_ID)
+        rights_snapshot_model = (
+            collection_models.CollectionRightsSnapshotMetadataModel.get_by_id(
+                'col_2_id-1'))
+        self.assertEqual(
+            rights_snapshot_model.commit_cmds[0]['assignee_id'],
+            self.USER_1_USER_ID)
+        rights_commit_model = (
+            collection_models.CollectionCommitLogEntryModel.get_by_id(
+                'rights-col_2_id-1'))
+        self.assertEqual(
+            rights_commit_model.commit_cmds[0]['assignee_id'],
+            self.USER_1_USER_ID)
+
 
 class GaeIdNotInModelsVerificationJobTests(test_utils.GenericTestBase):
     """Tests for GaeIdNotInModelsVerificationJob."""
@@ -1810,24 +2437,6 @@ class GaeIdNotInModelsVerificationJobTests(test_utils.GenericTestBase):
             email='some.different@email.cz',
             role=feconf.ROLE_ID_COLLECTION_EDITOR
         ).put()
-
-    def test_verify_user_id_correct(self):
-        self.assertTrue(
-            user_id_migration.GaeIdNotInModelsVerificationJob
-            .verify_user_id_correct('uid_' + 'a' * 32)
-        )
-        self.assertFalse(
-            user_id_migration.GaeIdNotInModelsVerificationJob
-            .verify_user_id_correct('uid_' + 'a' * 31 + 'A')
-        )
-        self.assertFalse(
-            user_id_migration.GaeIdNotInModelsVerificationJob
-            .verify_user_id_correct('uid_' + 'a' * 31)
-        )
-        self.assertFalse(
-            user_id_migration.GaeIdNotInModelsVerificationJob
-            .verify_user_id_correct('a' * 36)
-        )
 
     def test_wrong_user_ids(self):
         user_models.UserSettingsModel(

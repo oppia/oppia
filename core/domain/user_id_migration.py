@@ -44,6 +44,21 @@ SEPARATE_MODEL_CLASSES = [
     exp_models.ExplorationSnapshotMetadataModel]
 
 
+def verify_user_id_correct(user_id):
+    """Verify that the user ID is in a correct format.
+
+    Args:
+        user_id: str. The user ID to be checked.
+
+    Returns:
+        bool. True when the ID is in a correct format, False otherwise.
+    """
+    return all((
+        user_id.islower(),
+        user_id.startswith('uid_'),
+        len(user_id) == user_models.USER_ID_LENGTH))
+
+
 def get_user_ids_corresponding_to_gae_ids(gae_ids):
     """Get user IDs corresponding to GAE IDs.
 
@@ -65,6 +80,9 @@ def get_user_ids_corresponding_to_gae_ids(gae_ids):
             user_settings_model = (
                 user_models.UserSettingsModel.get_by_gae_id(gae_id))
             if not user_settings_model:
+                if (verify_user_id_correct(gae_id) and
+                        user_models.UserSettingsModel.get_by_id(gae_id)):
+                    raise AlreadyMigratedUserException(gae_id)
                 raise MissingUserException(gae_id)
             new_ids.append(user_settings_model.id)
 
@@ -108,6 +126,11 @@ def are_commit_cmds_role_change(commit_cmds):
 
 class MissingUserException(Exception):
     """Exception for cases when the user doesn't exist."""
+    pass
+
+
+class AlreadyMigratedUserException(Exception):
+    """Exception for cases when the user is already migrated."""
     pass
 
 
@@ -428,6 +451,8 @@ class SnapshotsContentUserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
                     rights_snapshot_model)
         except MissingUserException as e:
             yield ('FAILURE - %s' % class_name, e)
+        except AlreadyMigratedUserException as e:
+            yield ('SUCCESS_ALREADY_MIGRATED - %s' % class_name, e)
         else:
             yield ('SUCCESS - %s' % class_name, rights_snapshot_model.id)
 
@@ -581,11 +606,14 @@ class SnapshotsMetadataUserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
                 yield ('SUCCESS - %s' % class_name, snapshot_model.id)
         except MissingUserException as e:
             yield ('FAILURE - %s' % class_name, e)
+        except AlreadyMigratedUserException as e:
+            yield ('SUCCESS_ALREADY_MIGRATED - %s' % class_name, e)
 
     @staticmethod
     def reduce(key, ids):
         """Implements the reduce function for this job."""
-        if key.startswith('SUCCESS - '):
+        if (key.startswith('SUCCESS - ') or
+                key.startswith('SUCCESS_ALREADY_MIGRATED - ')):
             yield (key, len(ids))
         else:
             yield (key, ids)
@@ -597,21 +625,6 @@ class GaeIdNotInModelsVerificationJob(jobs.BaseMapReduceOneOffJobManager):
     user_id, this job also checks that all the new user IDs are 32 lowercase
     chars long strings.
     """
-
-    @staticmethod
-    def verify_user_id_correct(user_id):
-        """Verify that the user ID is in a correct format.
-
-        Args:
-            user_id: str. The user ID to be checked.
-
-        Returns:
-            bool. True when the ID is in a correct format, False otherwise.
-        """
-        return all((
-            user_id.islower(),
-            user_id.startswith('uid_'),
-            len(user_id) == user_models.USER_ID_LENGTH))
 
     @classmethod
     def enqueue(cls, job_id, additional_job_params=None):
@@ -629,8 +642,7 @@ class GaeIdNotInModelsVerificationJob(jobs.BaseMapReduceOneOffJobManager):
     def map(user_model):
         """Implements the map function for this job."""
         gae_id = user_model.gae_id
-        if not (GaeIdNotInModelsVerificationJob
-                .verify_user_id_correct(user_model.id)):
+        if not verify_user_id_correct(user_model.id):
             yield ('FAILURE - WRONG ID FORMAT', (gae_id, user_model.id))
         success = True
         for model_class in models.Registry.get_all_storage_model_classes():
