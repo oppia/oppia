@@ -39,8 +39,6 @@ import { StatesBackendDictMapping, States, StatesObjectFactory } from
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { Voiceover } from 'domain/exploration/VoiceoverObjectFactory';
-import { VoiceoverByLanguageCode } from
-  'domain/exploration/RecordedVoiceoversObjectFactory';
 
 const INTERACTION_SPECS = require('interactions/interaction_specs.json');
 
@@ -169,7 +167,7 @@ export class Exploration {
     return this.getState(stateName).content.getHtml();
   }
 
-  getVoiceovers(stateName: string): VoiceoverByLanguageCode {
+  getVoiceovers(stateName: string): {[langCode: string]: Voiceover} {
     const state = this.getState(stateName);
     if (!state) {
       this.loggerService.error('Invalid state name: ' + stateName);

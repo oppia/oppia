@@ -24,7 +24,7 @@ import { IInteractionBackendDict, Interaction, InteractionObjectFactory } from
 import { IParamChangeBackendDict, ParamChange } from
   'domain/exploration/ParamChangeObjectFactory';
 import {
-  IRecordedVoiceoversBackendDict, RecordedVoiceovers,
+  IRecordedVoiceOverBackendDict, RecordedVoiceovers,
   RecordedVoiceoversObjectFactory
 } from 'domain/exploration/RecordedVoiceoversObjectFactory';
 import {
@@ -45,7 +45,7 @@ export interface IStateBackendDict {
   content: ISubtitledHtmlBackendDict;
   interaction: IInteractionBackendDict;
   param_changes: IParamChangeBackendDict[];
-  recorded_voiceovers: IRecordedVoiceoversBackendDict;
+  recorded_voiceovers: IRecordedVoiceOverBackendDict;
   solicit_answer_details: boolean;
   written_translations: IWrittenTranslationsBackendDict;
   /* eslint-enable camelcase */

@@ -20,13 +20,13 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { VoiceoverObjectFactory, IVoiceoverDict, Voiceover } from
+import { VoiceoverObjectFactory, IVoiceoverBackendDict, Voiceover } from
   'domain/exploration/VoiceoverObjectFactory';
 
 export interface IRecordedVoiceOverBackendDict {
   'voiceovers_mapping': {
     [propName: string]: {
-      [propName: string]: IVoiceoverDict
+      [propName: string]: IVoiceoverBackendDict
     }
   }
 }
@@ -37,16 +37,10 @@ export interface IVoiceoverMapping {
   }
 }
 
-export interface IRecordedVoiceoversBackendDict {
-  /* eslint-disable camelcase */
-  voiceovers_mapping: IVoiceoverBackendDictMapping;
-  /* eslint-enable camelcase */
-}
-
 export class RecordedVoiceovers {
   constructor(
       private voiceoverObjectFactory: VoiceoverObjectFactory,
-      public voiceoversMapping: VoiceoverMapping) {}
+      public voiceoversMapping: IVoiceoverMapping) {}
 
   getAllContentId(): string[] {
     return Object.keys(this.voiceoversMapping);
@@ -124,7 +118,7 @@ export class RecordedVoiceovers {
     this.getVoiceover(contentId, langCode).toggleNeedsUpdateAttribute();
   }
 
-  toBackendDict(): IRecordedVoiceoversBackendDict {
+  toBackendDict(): IRecordedVoiceOverBackendDict {
     const voiceoverBackendDictsMapping = {};
     for (const contentId in this.voiceoversMapping) {
       voiceoverBackendDictsMapping[contentId] = {};
@@ -144,8 +138,8 @@ export class RecordedVoiceoversObjectFactory {
   constructor(private voiceoverObjectFactory: VoiceoverObjectFactory) {}
 
   createFromBackendDict(
-      backendDict: IRecordedVoiceoversBackendDict): RecordedVoiceovers {
-    const voiceoverMapping: VoiceoverMapping = {};
+      backendDict: IRecordedVoiceOverBackendDict): RecordedVoiceovers {
+    const voiceoverMapping: IVoiceoverMapping = {};
     for (const contentId in backendDict.voiceovers_mapping) {
       voiceoverMapping[contentId] = {};
       for (const langCode in backendDict.voiceovers_mapping[contentId]) {

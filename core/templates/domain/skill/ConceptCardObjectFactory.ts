@@ -22,7 +22,7 @@ import { Injectable } from '@angular/core';
 
 import { AppConstants } from 'app.constants';
 import {
-  IRecordedVoiceoversBackendDict,
+  IRecordedVoiceOverBackendDict,
   RecordedVoiceovers, RecordedVoiceoversObjectFactory
 } from 'domain/exploration/RecordedVoiceoversObjectFactory';
 import {
@@ -36,7 +36,7 @@ export interface IConceptCardBackendDict {
   /* eslint-disable camelcase */
   explanation: ISubtitledHtmlBackendDict,
   worked_examples: IWorkedExampleBackendDict[],
-  recorded_voiceovers: IRecordedVoiceoversBackendDict
+  recorded_voiceovers: IRecordedVoiceOverBackendDict
   /* eslint-enable camelcase */
 }
 
