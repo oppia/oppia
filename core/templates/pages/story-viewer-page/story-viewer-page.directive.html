@@ -6,7 +6,7 @@
         <div class="oppia-page-heading oppia-story-title" style="text-align: left; padding-left: 60px; margin-top: 20px; margin-bottom: 0;">
           <[$ctrl.storyTitle]>
         </div>
-        <div class="oppia-story-description" style="text-align: left; padding-left: 60px; ">
+        <div class="oppia-story-description" style="text-align: left; padding-left: 60px; padding-bottom: 4vh;">
           <[$ctrl.storyDescription]>
         </div>
 
@@ -14,41 +14,41 @@
           <a ng-repeat="node in $ctrl.storyPlaythroughObject.getStoryNodes();"
              ng-href="<[$ctrl.getExplorationUrl(node)]>">
 
-            <div ng-style="!$first && {'margin-top': '100px'}">
-              <div ng-style="$index > 0 && !$ctrl.storyPlaythroughObject.getStoryNodes()[$index-1].isCompleted() && {'opacity' : '0.5'} || {} ">
+            <div>
+              <div ng-style="($index > 0 && !$ctrl.storyPlaythroughObject.getStoryNodes()[$index-1].isCompleted() && {'opacity': '0.5', 'display': 'flex'}) || { 'display': 'flex' }">
                 <svg 
-                  ng-show="$last == false" 
-                  ng-style="{}"
-                  style="position: absolute; left: 50px" 
-                  width="50px" height="340px" 
+                  ng-if="!$last" 
+                  width="130px"
+                  height="300px"
+                  ng-style="height: 300px;"
+                  class="hide-lesson-track"
                   xmlns="http://www.w3.org/1600/svg">
                   <path fill="none"
-                  
                     ng-attr-stroke="{{node.isCompleted() && '#296E5F' || 'rgb(204, 204, 204)' }}"
                     stroke-dasharray="30,16"
                     stroke-linecap="round"
                     stroke-width="10"
-                    d="M20 30 L20 340"/>
+                    d="M70 30 L70 300"/>
                 </svg>
+                <div ng-if="$last" style="width: 150px;" class="hide-lesson-track" />
 
-                <img ng-if="node.isCompleted()" ng-src="<[$ctrl.getStaticImageUrl('/general/collection_paw.svg')]>" class="lesson-icon-completed" >
-                <div ng-if="!node.isCompleted()" class="lesson-icon-uncompleted" />
+                <img ng-if="node.isCompleted()" ng-src="<[$ctrl.getStaticImageUrl('/general/collection_paw.svg')]>" class="lesson-icon-completed hide-lesson-track" >
+                <div ng-if="!node.isCompleted()" class="lesson-icon-uncompleted hide-lesson-track" />
 
-
-                <div ng-style="{color: 'rgb(51, 51, 51)','font-family': 'Capriola, Roboto, Arial,sans-serif', 'margin-top': '20px', 'margin-left': '150px', 'margin-right': '40px'}">
+                <div ng-style="{color: 'rgb(51, 51, 51)','font-family': 'Capriola, Roboto, Arial,sans-serif', 'margin-right': '40px', 'flex': '1', 'margin-left': '20px'}">
                   <p style="font-size: 30px; padding-top: 6px;" ng-if="!node.isCompleted()" aria-live="assertive">
                     Chapter {{$index + 1}}: <[node.getTitle()]>
                   </p>
                   <p ng-if="node.isCompleted()" ng-style="font-size: 16px;" aria-live="assertive" translate="I18N_STORY_VIEWER_COMPLETED_CHAPTER" translate-values="{title: node.getTitle()}" />
 
-                  <div style="display: flex; margin-top: 16px;">
+                  <div style="display: flex; margin-top: 16px; flex-wrap: wrap;">
                     <svg 
                         width="240"
                         height="180"
                         xmlns="http://www.w3.org/1600/svg"
                         xmlns:xlink="http://www.w3.org/1999/xlink"
                         version="1.1"
-                        style="position:relative">
+                        style="position:relative; margin-right: 10px; margin-bottom: 10px;">
                       <defs>
                         <pattern id="image<[$index]>" patternUnits="userSpaceOnUse" height="160" width="240">
                           <rect   
@@ -84,8 +84,8 @@
                       </a>
                     </svg>
 
-                    <div style="max-height: 180px; overflow-y: scroll; display: flex; flex: 1; padding: 20px; margin-left: 10px; border: rgb(248, 248, 248) 4px solid; border-radius: 8px;">
-                      <p><[node.getOutline()]></p>
+                    <div style="min-width: 200px; max-height: 180px; overflow-y: scroll; display: flex; flex: 1; padding: 20px; border: rgb(248, 248, 248) 4px solid; border-radius: 8px; margin-bottom: 20px;">
+                      <p><[node.getDescription()]></p>
                     </div>
                   </div>
                 </div>
