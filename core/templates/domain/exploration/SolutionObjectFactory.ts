@@ -36,6 +36,8 @@ import { NumberWithUnitsObjectFactory } from
 export interface ISolutionBackendDict {
   /* eslint-disable camelcase */
   answer_is_exclusive: boolean;
+  // NOTE TO DEVELOPERS: correctAnswer needs the type any because the value
+  // depends on the interaction type of the state.
   correct_answer: any;
   explanation: ISubtitledHtmlBackendDict;
   /* eslint-enable camelcase */
@@ -49,6 +51,8 @@ export class Solution {
       private htmlEscaperService: HtmlEscaperService,
       private numberWithUnitsObjectFactory: NumberWithUnitsObjectFactory,
       public answerIsExclusive: boolean,
+      // NOTE TO DEVELOPERS: correctAnswer needs the type any because the value
+      // depends on the interaction type of the state.
       public correctAnswer: any,
       public explanation: SubtitledHtml) {}
 
@@ -90,6 +94,8 @@ export class Solution {
     return `${solutionType} solution is "${correctAnswer}". ${explanation}.`;
   }
 
+  // NOTE TO DEVELOPERS: The following types must be any because the values
+  // depend on the property's type.
   setCorrectAnswer(correctAnswer: any): void {
     this.correctAnswer = correctAnswer;
   }
@@ -136,6 +142,8 @@ export class SolutionObjectFactory {
   }
 
   createNew(
+      // NOTE TO DEVELOPERS: correctAnswer needs the type any because the value
+      // depends on the interaction type of the state.
       answerIsExclusive: boolean, correctAnswer: any, explanationHtml: string,
       explanationId: string): Solution {
     return new Solution(

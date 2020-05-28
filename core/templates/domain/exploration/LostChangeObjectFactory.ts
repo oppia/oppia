@@ -28,6 +28,8 @@ export interface ILostChangeBackendDict {
   new_state_name?: string;
   old_state_name?: string;
   state_name?: string;
+  // NOTE TO DEVELOPERS: The following types must be any because the values
+  // depend on the property's type.
   new_value?: any;
   old_value?: any;
   property_name?: string;
@@ -41,6 +43,8 @@ export class LostChange {
       public newStateName?: string,
       public oldStateName?: string,
       public stateName?: string,
+      // NOTE TO DEVELOPERS: The following types must be any because the values
+      // depend on the property's type.
       public newValue?: any,
       public oldValue?: any,
       public propertyName?: string) {}

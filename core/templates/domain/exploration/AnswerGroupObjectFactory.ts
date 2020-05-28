@@ -29,6 +29,8 @@ export interface IAnswerGroupBackendDict {
   /* eslint-disable camelcase */
   rule_specs: IRuleBackendDict[];
   outcome: IOutcomeBackendDict;
+  // NOTE TO DEVELOPERS: trainingData needs the type any because the values
+  // depend on the interaction type of the answer.
   training_data: any;
   tagged_skill_misconception_id: string;
   /* eslint-enable camelcase */
@@ -38,6 +40,8 @@ export class AnswerGroup {
   constructor(
       public rules: Rule[],
       public outcome: Outcome,
+      // NOTE TO DEVELOPERS: trainingData needs the type any because the values
+      // depend on the interaction type of the answer.
       public trainingData: any,
       public taggedSkillMisconceptionId: string) {}
 
@@ -60,8 +64,10 @@ export class AnswerGroupObjectFactory {
       private ruleObjectFactory: RuleObjectFactory) {}
 
   createNew(
-      rules: Rule[], outcome: Outcome, trainingData: any,
-      taggedSkillMisconceptionId: string): AnswerGroup {
+      rules: Rule[], outcome: Outcome,
+      // NOTE TO DEVELOPERS: trainingData needs the type any because the values
+      // depend on the interaction type of the answer.
+      trainingData: any, taggedSkillMisconceptionId: string): AnswerGroup {
     return new AnswerGroup(
       rules, outcome, trainingData, taggedSkillMisconceptionId);
   }
