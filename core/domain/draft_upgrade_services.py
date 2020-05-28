@@ -102,33 +102,30 @@ class DraftUpgradeUtil(python_utils.OBJECT):
         Returns:
             list(ExplorationChange). The converted draft_change_list.
         """
+        convertion_fn = (
+            html_validation_service.
+            add_math_content_to_math_rte_components)
         for i, change in enumerate(draft_change_list):
             if (change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY and
                     change.property_name ==
-                    exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
-                converted_new_value = (
-                    [(
-                        state_domain.AnswerGroup.convert_html_in_answer_groups(
-                            answer_group,
-                            html_validation_service.
-                            add_math_content_to_math_rte_components))
-                     for answer_group in change.new_value])
+                    exp_domain.STATE_PROPERTY_CONTENT):
                 draft_change_list[i] = exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                     'property_name': (
-                        exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS),
+                        exp_domain.STATE_PROPERTY_CONTENT),
                     'state_name': change.state_name,
-                    'new_value': converted_new_value
+                    'new_value': convertion_fn(change.new_value)
                 })
             elif (change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY and
                   change.property_name ==
                   exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS):
+                # Only customization args with the key 'choices' have HTML
+                # content in them.
                 if 'choices' in change.new_value.keys():
                     for value_index, value in enumerate(
                             change.new_value['choices']['value']):
                         change.new_value['choices']['value'][value_index] = (
-                            html_validation_service.
-                            add_math_content_to_math_rte_components(value))
+                            convertion_fn(value))
                 draft_change_list[i] = exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                     'property_name': (
@@ -138,26 +135,7 @@ class DraftUpgradeUtil(python_utils.OBJECT):
                 })
             elif (change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY and
                   change.property_name ==
-                  exp_domain.STATE_PROPERTY_CONTENT):
-                draft_change_list[i] = exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'property_name': (
-                        exp_domain.STATE_PROPERTY_CONTENT),
-                    'state_name': change.state_name,
-                    'new_value': (
-                        html_validation_service.
-                        add_math_content_to_math_rte_components(
-                            change.new_value))
-                })
-            elif (change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY and
-                  change.property_name ==
                   exp_domain.STATE_PROPERTY_WRITTEN_TRANSLATIONS):
-                converted_new_value = (
-                    state_domain.WrittenTranslations.
-                    convert_html_in_written_translations(
-                        change.new_value,
-                        html_validation_service.
-                        add_math_content_to_math_rte_components))
                 draft_change_list[i] = exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                     'property_name': (
@@ -166,9 +144,7 @@ class DraftUpgradeUtil(python_utils.OBJECT):
                     'new_value': (
                         state_domain.WrittenTranslations.
                         convert_html_in_written_translations(
-                            change.new_value,
-                            html_validation_service.
-                            add_math_content_to_math_rte_components))
+                            change.new_value, convertion_fn))
                 })
 
             elif (change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY and
@@ -181,9 +157,7 @@ class DraftUpgradeUtil(python_utils.OBJECT):
                     'state_name': change.state_name,
                     'new_value': (
                         state_domain.Outcome.convert_html_in_outcome(
-                            change.new_value,
-                            html_validation_service.
-                            add_math_content_to_math_rte_components))
+                            change.new_value, convertion_fn))
                 })
 
             elif (change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY and
@@ -197,8 +171,7 @@ class DraftUpgradeUtil(python_utils.OBJECT):
                     'new_value': (
                         [(
                             state_domain.Hint.convert_html_in_hint(
-                                hint, html_validation_service.
-                                add_math_content_to_math_rte_components))
+                                hint, convertion_fn))
                          for hint in change.new_value])
                 })
 
@@ -206,15 +179,28 @@ class DraftUpgradeUtil(python_utils.OBJECT):
                   change.property_name ==
                   exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION):
                 change.new_value['explanation']['html'] = (
-                    html_validation_service.
-                    add_math_content_to_math_rte_components(
-                        change.new_value['explanation']['html']))
+                    convertion_fn(change.new_value['explanation']['html']))
                 draft_change_list[i] = exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                     'property_name': (
                         exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION),
                     'state_name': change.state_name,
                     'new_value': change.new_value
+                })
+            elif (change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY and
+                  change.property_name ==
+                  exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
+                draft_change_list[i] = exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name': (
+                        exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS),
+                    'state_name': change.state_name,
+                    'new_value': (
+                        [(
+                            state_domain.AnswerGroup.
+                            convert_html_in_answer_groups(
+                                answer_group, convertion_fn))
+                         for answer_group in change.new_value])
                 })
 
         return draft_change_list
