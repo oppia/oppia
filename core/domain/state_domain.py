@@ -307,6 +307,22 @@ class Solution(python_utils.OBJECT):
             interaction_id).normalize_answer(self.correct_answer)
         self.explanation.validate()
 
+    @classmethod
+    def convert_html_in_solution(cls, solution_dict, conversion_fn):
+        """Checks for HTML fields in a solution and convert it according
+        to the conversion function.
+
+        Args:
+            solution_dict: dict. The Solution dict.
+            conversion_fn: function. The function to be used for converting the
+                HTML.
+        Returns:
+            solution_dict. dict. The converted Solution dict.
+        """
+        solution_dict['explanation']['html'] = (
+            conversion_fn(solution_dict['explanation']['html']))
+        return solution_dict
+
 
 class InteractionInstance(python_utils.OBJECT):
     """Value object for an instance of an interaction."""
@@ -2263,7 +2279,8 @@ class State(python_utils.OBJECT):
             solution_html = state_dict[
                 'interaction']['solution']['explanation']['html']
             state_dict['interaction']['solution']['explanation']['html'] = (
-                conversion_fn(solution_html))
+                Solution.convert_html_in_solution(
+                    solution_html, conversion_fn))
 
         if state_dict['interaction']['id'] in (
                 'ItemSelectionInput', 'MultipleChoiceInput',

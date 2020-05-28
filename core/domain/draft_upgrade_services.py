@@ -102,7 +102,7 @@ class DraftUpgradeUtil(python_utils.OBJECT):
         Returns:
             list(ExplorationChange). The converted draft_change_list.
         """
-        convertion_fn = (
+        conversion_fn = (
             html_validation_service.
             add_math_content_to_math_rte_components)
         for i, change in enumerate(draft_change_list):
@@ -114,7 +114,7 @@ class DraftUpgradeUtil(python_utils.OBJECT):
                     'property_name': (
                         exp_domain.STATE_PROPERTY_CONTENT),
                     'state_name': change.state_name,
-                    'new_value': convertion_fn(change.new_value)
+                    'new_value': conversion_fn(change.new_value)
                 })
             elif (change.property_name ==
                   exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS):
@@ -124,7 +124,7 @@ class DraftUpgradeUtil(python_utils.OBJECT):
                     for value_index, value in enumerate(
                             change.new_value['choices']['value']):
                         change.new_value['choices']['value'][value_index] = (
-                            convertion_fn(value))
+                            conversion_fn(value))
                 draft_change_list[i] = exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                     'property_name': (
@@ -142,7 +142,7 @@ class DraftUpgradeUtil(python_utils.OBJECT):
                     'new_value': (
                         state_domain.WrittenTranslations.
                         convert_html_in_written_translations(
-                            change.new_value, convertion_fn))
+                            change.new_value, conversion_fn))
                 })
             elif (change.property_name ==
                   exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME):
@@ -153,7 +153,7 @@ class DraftUpgradeUtil(python_utils.OBJECT):
                     'state_name': change.state_name,
                     'new_value': (
                         state_domain.Outcome.convert_html_in_outcome(
-                            change.new_value, convertion_fn))
+                            change.new_value, conversion_fn))
                 })
             elif (change.property_name ==
                   exp_domain.STATE_PROPERTY_INTERACTION_HINTS):
@@ -165,19 +165,19 @@ class DraftUpgradeUtil(python_utils.OBJECT):
                     'new_value': (
                         [(
                             state_domain.Hint.convert_html_in_hint(
-                                hint_dict, convertion_fn))
+                                hint_dict, conversion_fn))
                          for hint_dict in change.new_value])
                 })
             elif (change.property_name ==
                   exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION):
-                change.new_value['explanation']['html'] = (
-                    convertion_fn(change.new_value['explanation']['html']))
                 draft_change_list[i] = exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                     'property_name': (
                         exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION),
                     'state_name': change.state_name,
-                    'new_value': change.new_value
+                    'new_value': (
+                        state_domain.Solution.convert_html_in_solution(
+                            change.new_value, conversion_fn))
                 })
             elif (change.property_name ==
                   exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
@@ -190,7 +190,7 @@ class DraftUpgradeUtil(python_utils.OBJECT):
                         [(
                             state_domain.AnswerGroup.
                             convert_html_in_answer_group(
-                                answer_group, convertion_fn))
+                                answer_group, conversion_fn))
                          for answer_group in change.new_value])
                 })
 
