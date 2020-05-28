@@ -76,6 +76,8 @@ import { CountVectorizerService } from 'classifiers/count-vectorizer.service';
 import { CreatorDashboardBackendApiService } from
   'domain/creator_dashboard/creator-dashboard-backend-api.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
+import { CurrentInteractionService } from
+  'pages/exploration-player-page/services/current-interaction.service';
 import { DateTimeFormatService } from 'services/date-time-format.service';
 import { DebouncerService } from 'services/debouncer.service';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
@@ -295,6 +297,8 @@ import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { UrlService } from 'services/contextual/url.service';
+import { UserExplorationPermissionsService } from
+  'pages/exploration-editor-page/services/user-exploration-permissions.service';
 import { UserInfoObjectFactory } from 'domain/user/UserInfoObjectFactory';
 import { UtilsService } from 'services/utils.service';
 import { ValidatorsService } from 'services/validators.service';
@@ -650,6 +654,11 @@ export class UpgradedServices {
         upgradedServices['HttpClient']));
     upgradedServices['CreatorDashboardBackendApiService'] =
       new CreatorDashboardBackendApiService(upgradedServices['HttpClient']);
+    upgradedServices['CurrentInteractionService'] =
+      new CurrentInteractionService(
+        upgradedServices['ContextService'],
+        upgradedServices['PlayerPositionService'],
+        upgradedServices['PlayerTranscriptService']);
     upgradedServices['EmailDashboardDataService'] =
       new EmailDashboardDataService(upgradedServices['HttpClient']);
     upgradedServices['ExplorationHtmlFormatterService'] =
@@ -695,6 +704,11 @@ export class UpgradedServices {
       upgradedServices['SubtopicObjectFactory'],
       upgradedServices['StoryReferenceObjectFactory'],
       upgradedServices['SkillSummaryObjectFactory']);
+    upgradedServices['UserExplorationPermissionsService'] = (
+      new UserExplorationPermissionsService(
+        upgradedServices['ContextService'],
+        upgradedServices['HttpClient'],
+        upgradedServices['UrlInterpolationService']));
 
     // Topological level: 4.
     upgradedServices['PredictionAlgorithmRegistryService'] =

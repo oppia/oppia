@@ -73,7 +73,7 @@ describe('Guest collection progress service', () => {
       title: title,
       objective: 'an objective',
       category: 'a category',
-      version: '1',
+      version: 1,
       nodes: []
     };
     return collectionObjectFactory.create(collectionBackendObject);
