@@ -14,7 +14,7 @@
 
 /**
  * @fileoverview Factory for creating filters of frontend topics
- * and skill dashboard
+ * and skill dashboard.
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
@@ -64,7 +64,7 @@ export class TopicsAndSkillsDashboardFilter {
 export class TopicsAndSkillsDashboardFilterObjectFactory {
   /**
    * @returns {TopicsAndSkillsDashboardFilter} - A new
-   * TopicsAndSkillsDashboardFilter instance
+   *   TopicsAndSkillsDashboardFilter instance.
    */
   createDefault(): TopicsAndSkillsDashboardFilter {
     return new TopicsAndSkillsDashboardFilter(

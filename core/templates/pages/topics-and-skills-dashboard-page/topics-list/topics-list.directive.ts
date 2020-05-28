@@ -96,7 +96,7 @@ angular.module('oppia').directive('topicsList', [
           };
 
           /**
-           * @param {String} topicId - ID of the topic
+           * @param {String} topicId - ID of the topic.
            */
           ctrl.deleteTopic = function(topicId) {
             $uibModal.open({

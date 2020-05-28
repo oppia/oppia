@@ -25,9 +25,9 @@ export class NewlyCreatedTopic {
   category: string;
   description: string;
   /**
-   * @param {String} category - category of the topic
-   * @param {String} name - name of the topic
-   * @param {String} description - description of the topic
+   * @param {String} category - category of the topic.
+   * @param {String} name - name of the topic.
+   * @param {String} description - description of the topic.
    */
   constructor(category, name, description) {
     this.category = category;
@@ -35,7 +35,7 @@ export class NewlyCreatedTopic {
     this.description = description;
   }
   /**
-   * @returns {Boolean} - A boolean indicating if the topic is valid
+   * @returns {Boolean} - A boolean indicating if the topic is valid.
    */
   isValid(): boolean {
     return !(!this.name || !this.category || !this.description);
@@ -47,7 +47,7 @@ export class NewlyCreatedTopic {
 })
 export class NewlyCreatedTopicObjectFactory {
   /**
-   * @returns {NewlyCreatedTopic} - A new NewlyCreatedTopic instance
+   * @returns {NewlyCreatedTopic} - A new NewlyCreatedTopic instance.
    */
   createDefault(): NewlyCreatedTopic {
     return new NewlyCreatedTopic(
