@@ -39,12 +39,12 @@ describe('LiterallyCanvasDiagramEditor', function() {
   }));
 
   it('should update diagram size', function() {
-    var WIDHT = 100;
+    var WIDTH = 100;
     var HEIGHT = 100;
-    LCDiagramEditorCtrl.diagramWidth = WIDHT;
+    LCDiagramEditorCtrl.diagramWidth = WIDTH;
     LCDiagramEditorCtrl.diagramHeight = HEIGHT;
     LCDiagramEditorCtrl.onWidthInputBlur();
-    expect(LCDiagramEditorCtrl.currentDiagramWidth).toBe(WIDHT);
+    expect(LCDiagramEditorCtrl.currentDiagramWidth).toBe(WIDTH);
     LCDiagramEditorCtrl.onHeightInputBlur();
     expect(LCDiagramEditorCtrl.currentDiagramHeight).toBe(HEIGHT);
   });
@@ -60,7 +60,8 @@ describe('LiterallyCanvasDiagramEditor', function() {
   });
 
   it('should validate data', function() {
-    // Will be implemented once the data is saved.
+    // TODO(#9357): Will be implemented once the svg data saving
+    // functionality is implemented.
     expect(LCDiagramEditorCtrl.validate()).toBe(false);
   });
 });

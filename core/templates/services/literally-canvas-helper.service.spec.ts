@@ -276,13 +276,13 @@ describe('LiterallyCanvasHelperService', function() {
       '</svg>');
     expect(LiterallyCanvasHelperService.isSVGTagValid(validSvgTag)).toBe(true);
 
-    var invalidSvgAttribute = (
+    var invalidWidthAtrribute = (
       '<svg widht="100" height="100"><rect id="rectangle-de569866-9c11-b553-' +
       'f5b7-4194e2380d9f" x="143" y="97" width="12" height="29" stroke="hsla' +
       '(0, 0%, 0%, 1)" fill="hsla(0, 0%, 100%, 1)" stroke-width="1"></rect>' +
       '</svg>');
     expect(() => {
-      LiterallyCanvasHelperService.isSVGTagValid(invalidSvgAttribute);
+      LiterallyCanvasHelperService.isSVGTagValid(invalidWidthAtrribute);
     }).toThrowError('Invalid tag or attribute in svg.');
 
     var invalidSvgTag = (
