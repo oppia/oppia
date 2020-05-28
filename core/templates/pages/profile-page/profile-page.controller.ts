@@ -56,9 +56,9 @@ angular.module('oppia').directive('profilePage', [
           ctrl.$onInit = function() {
             LoaderService.showLoadingScreen('Loading');
 
-            let fetchProfile = () =>
+            let fetchProfileData = () =>
               ProfilePageBackendApiService.fetchProfileData();
-            fetchProfile().then(function(data) {
+            fetchProfileData().then(function(data) {
               LoaderService.hideLoadingScreen();
               ctrl.username = {
                 title: 'Username',

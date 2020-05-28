@@ -51,29 +51,28 @@ describe('Profile test backend API service', () => {
     httpTestingController.verify();
   });
 
-  it('should successfully post subscribe to the backend',
-    fakeAsync(() => {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
+  it('should successfully post subscribe to ' +
+    'the backend', fakeAsync(() => {
+    var successHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
 
-      profilePageBackendApiService.subscribe('testUsername').then(
-        successHandler, failHandler);
+    profilePageBackendApiService.subscribe('testUsername').then(
+      successHandler, failHandler);
 
-      var req = httpTestingController.expectOne('/subscribehandler');
-      expect(req.request.method).toEqual('POST');
-      expect(req.request.body).toEqual({ creator_username: 'testUsername' });
-      req.flush({});
+    var req = httpTestingController.expectOne('/subscribehandler');
+    expect(req.request.method).toEqual('POST');
+    expect(req.request.body).toEqual({ creator_username: 'testUsername' });
+    req.flush({});
 
-      flushMicrotasks();
+    flushMicrotasks();
 
-      expect(successHandler).toHaveBeenCalled();
-      expect(failHandler).not.toHaveBeenCalled();
-    })
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  })
   );
 
   it('should use the rejection handler if the backend request' +
-  'failed on subscribe',
-  fakeAsync(() => {
+    'failed on subscribe', fakeAsync(() => {
     var successHandler = jasmine.createSpy('success');
     var failHandler = jasmine.createSpy('fail');
 
@@ -93,29 +92,28 @@ describe('Profile test backend API service', () => {
     expect(failHandler).toHaveBeenCalled();
   }));
 
-  it('should successfully post unsubscribe to the backend',
-    fakeAsync(() => {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
+  it('should successfully post unsubscribe to ' +
+    'the backend', fakeAsync(() => {
+    var successHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
 
-      profilePageBackendApiService.unsubscribe('testUsername').then(
-        successHandler, failHandler);
+    profilePageBackendApiService.unsubscribe('testUsername').then(
+      successHandler, failHandler);
 
-      var req = httpTestingController.expectOne('/unsubscribehandler');
-      expect(req.request.method).toEqual('POST');
-      expect(req.request.body).toEqual({ creator_username: 'testUsername' });
-      req.flush({});
+    var req = httpTestingController.expectOne('/unsubscribehandler');
+    expect(req.request.method).toEqual('POST');
+    expect(req.request.body).toEqual({ creator_username: 'testUsername' });
+    req.flush({});
 
-      flushMicrotasks();
+    flushMicrotasks();
 
-      expect(successHandler).toHaveBeenCalled();
-      expect(failHandler).not.toHaveBeenCalled();
-    })
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  })
   );
 
   it('should use the rejection handler if the backend request' +
-  'failed on unsubscribe',
-  fakeAsync(() => {
+    'failed on unsubscribe', fakeAsync(() => {
     var successHandler = jasmine.createSpy('success');
     var failHandler = jasmine.createSpy('fail');
 
@@ -135,29 +133,28 @@ describe('Profile test backend API service', () => {
     expect(failHandler).toHaveBeenCalled();
   }));
 
-  it('should successfully fetch profile data from the backend',
-    fakeAsync(() => {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
+  it('should successfully fetch profile data from ' +
+    'the backend', fakeAsync(() => {
+    var successHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
 
-      profilePageBackendApiService.fetchProfileData().then(
-        successHandler, failHandler);
+    profilePageBackendApiService.fetchProfileData().then(
+      successHandler, failHandler);
 
-      var req = httpTestingController
-        .expectOne('/profilehandler/data/testUsername');
-      expect(req.request.method).toEqual('GET');
-      req.flush({});
+    var req = httpTestingController
+      .expectOne('/profilehandler/data/testUsername');
+    expect(req.request.method).toEqual('GET');
+    req.flush({});
 
-      flushMicrotasks();
+    flushMicrotasks();
 
-      expect(successHandler).toHaveBeenCalled();
-      expect(failHandler).not.toHaveBeenCalled();
-    })
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  })
   );
 
   it('should use the rejection handler if the backend request' +
-  'failed on fetch profile data',
-  fakeAsync(() => {
+    'failed on fetch profile data', fakeAsync(() => {
     var successHandler = jasmine.createSpy('success');
     var failHandler = jasmine.createSpy('fail');
 
