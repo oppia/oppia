@@ -35,7 +35,7 @@ from core.platform import models
 
 
 class SuggestionMathRteAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """Job that checks for existence of math rtes in the suggestions."""
+    """Job that checks for existence of math RTEs in the suggestions."""
 
     @classmethod
     def entity_classes_to_map_over(cls):
