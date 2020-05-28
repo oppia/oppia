@@ -265,7 +265,12 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                         'html': html
                     }
                 }]
-            })]
+            }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_RENAME_STATE,
+                'old_state_name': 'Intro',
+                'new_state_name': 'Introduction',
+            })
+        ]
 
         expected_draft_change_list = (
             draft_upgrade_services.DraftUpgradeUtil._convert_states_v33_dict_to_v34_dict(  # pylint: disable=protected-access,line-too-long

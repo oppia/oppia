@@ -150,7 +150,7 @@ class AnswerGroup(python_utils.OBJECT):
         self.outcome.validate()
 
     @classmethod
-    def convert_html_in_answer_groups(cls, answer_group_dict, conversion_fn):
+    def convert_html_in_answer_group(cls, answer_group_dict, conversion_fn):
         """Checks for HTML fields in an answer group and converts it according
         to the conversion function.
 
@@ -161,7 +161,6 @@ class AnswerGroup(python_utils.OBJECT):
         Returns:
             answer_group_dict. dict. The converted answer group dict.
         """
-
         answer_group_dict['outcome']['feedback']['html'] = (
             conversion_fn(answer_group_dict['outcome']['feedback']['html']))
         for rule_spec_index, rule_spec in enumerate(
@@ -223,7 +222,6 @@ class Hint(python_utils.OBJECT):
         Returns:
             hint_dict: dict. The converted hints dict.
         """
-
         hint_dict['hint_content']['html'] = (
             conversion_fn(hint_dict['hint_content']['html']))
         return hint_dict
@@ -758,7 +756,6 @@ class Outcome(python_utils.OBJECT):
         Returns:
             outcome_dict: dict. The converted outcome dict.
         """
-
         outcome_dict['feedback']['html'] = (
             conversion_fn(outcome_dict['feedback']['html']))
         return outcome_dict
@@ -1461,7 +1458,6 @@ class RuleSpec(python_utils.OBJECT):
         Returns:
             rule_spec_dict. dict. The converted Rule Spec dict.
         """
-
         if rule_spec_dict['rule_type'] == 'HasElementXAtPositionY':
             rule_spec_dict['inputs']['x'] = (
                 conversion_fn(rule_spec_dict['inputs']['x']))
@@ -2249,16 +2245,9 @@ class State(python_utils.OBJECT):
 
         for answer_group_index, answer_group in enumerate(
                 state_dict['interaction']['answer_groups']):
-            state_dict['interaction']['answer_groups'][answer_group_index][
-                'outcome'] = (
-                    Outcome.convert_html_in_outcome(
-                        answer_group['outcome'], conversion_fn))
-            for rule_spec_index, rule_spec in enumerate(
-                    answer_group['rule_specs']):
-                state_dict['interaction']['answer_groups'][answer_group_index][
-                    'rule_specs'][rule_spec_index] = (
-                        RuleSpec.convert_html_in_rule_spec(
-                            rule_spec, conversion_fn))
+            state_dict['interaction']['answer_groups'][answer_group_index] = (
+                AnswerGroup.convert_html_in_answer_group(
+                    answer_group, conversion_fn))
 
         if 'written_translations' in state_dict.keys():
             state_dict['written_translations'] = (
@@ -2276,7 +2265,6 @@ class State(python_utils.OBJECT):
             state_dict['interaction']['solution']['explanation']['html'] = (
                 conversion_fn(solution_html))
 
-
         if state_dict['interaction']['id'] in (
                 'ItemSelectionInput', 'MultipleChoiceInput',
                 'DragAndDropSortInput'):
@@ -2285,4 +2273,5 @@ class State(python_utils.OBJECT):
                         'choices']['value']):
                 state_dict['interaction']['customization_args']['choices'][
                     'value'][value_index] = conversion_fn(value)
+                    
         return state_dict

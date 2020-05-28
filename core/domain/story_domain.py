@@ -975,7 +975,6 @@ class Story(python_utils.OBJECT):
         Returns:
             dict. The converted story_contents_dict.
         """
-
         for node in story_contents_dict['nodes']:
             node['outline'] = (
                 html_validation_service.

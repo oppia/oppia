@@ -912,6 +912,8 @@ def add_math_content_to_math_rte_components(html_string):
             math['math_content-with-value'] = (
                 escape_html(
                     json.dumps(normalized_math_content_dict, sort_keys=True)))
+    # We need to replace the <br/> tags (if any) with  <br> because for passing
+    # the textangular migration tests we need to have only <br> tags.
     return python_utils.UNICODE(soup).replace('<br/>', '<br>')
 
 
