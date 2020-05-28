@@ -7024,10 +7024,13 @@ class SkillModelValidatorTests(test_utils.GenericTestBase):
             'feedback': '<p>default_feedback</p>',
             'must_be_addressed': True}
 
+        misconception = skill_domain.Misconception.from_dict(
+            misconception_dict)
+
         for index, skill in enumerate(skills):
             skill.language_code = language_codes[index]
             skill.skill_contents = skill_contents
-            skill.add_misconception(misconception_dict)
+            skill.add_misconception(misconception)
             if index < 2:
                 skill.superseding_skill_id = '%s' % (index + 3)
                 skill.all_questions_merged = True
@@ -7241,15 +7244,19 @@ class SkillSnapshotMetadataModelValidatorTests(
                 }
             })
         )
+
         misconception_dict = {
             'id': 0, 'name': 'name', 'notes': '<p>notes</p>',
             'feedback': '<p>default_feedback</p>',
             'must_be_addressed': True}
 
+        misconception = skill_domain.Misconception.from_dict(
+            misconception_dict)
+
         for index, skill in enumerate(skills):
             skill.language_code = language_codes[index]
             skill.skill_contents = skill_contents
-            skill.add_misconception(misconception_dict)
+            skill.add_misconception(misconception)
             if index == 0:
                 skill_services.save_new_skill(self.user_id, skill)
             else:
@@ -7444,10 +7451,13 @@ class SkillSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
             'feedback': '<p>default_feedback</p>',
             'must_be_addressed': True}
 
+        misconception = skill_domain.Misconception.from_dict(
+            misconception_dict)
+
         for index, skill in enumerate(skills):
             skill.language_code = language_codes[index]
             skill.skill_contents = skill_contents
-            skill.add_misconception(misconception_dict)
+            skill.add_misconception(misconception)
             skill_services.save_new_skill(self.owner_id, skill)
 
         self.model_instance_0 = (
@@ -7592,10 +7602,13 @@ class SkillCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
             'feedback': '<p>default_feedback</p>',
             'must_be_addressed': True}
 
+        misconception = skill_domain.Misconception.from_dict(
+            misconception_dict)
+
         for index, skill in enumerate(skills):
             skill.language_code = language_codes[index]
             skill.skill_contents = skill_contents
-            skill.add_misconception(misconception_dict)
+            skill.add_misconception(misconception)
             skill_services.save_new_skill(self.owner_id, skill)
 
         self.model_instance_0 = (
@@ -7823,15 +7836,19 @@ class SkillSummaryModelValidatorTests(test_utils.GenericTestBase):
                 }
             })
         )
+
         misconception_dict = {
             'id': 0, 'name': 'name', 'notes': '<p>notes</p>',
             'feedback': '<p>default_feedback</p>',
             'must_be_addressed': True}
 
+        misconception = skill_domain.Misconception.from_dict(
+            misconception_dict)
+
         for index, skill in enumerate(skills):
             skill.language_code = language_codes[index]
             skill.skill_contents = skill_contents
-            skill.add_misconception(misconception_dict)
+            skill.add_misconception(misconception)
             skill_services.save_new_skill(self.owner_id, skill)
 
         self.model_instance_0 = skill_models.SkillSummaryModel.get_by_id('0')
