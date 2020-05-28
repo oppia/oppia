@@ -212,7 +212,7 @@ var ExplorationEditorTranslationTab = function() {
   var _selectLanguage = async function(language) {
     await waitFor.visibilityOf(
       languageSelectorElement,
-      'Language selector takes too long to appear.')
+      'Language selector takes too long to appear.');
     await languageSelectorElement.element(
       by.cssContainingText('option', language)).click();
   };
@@ -368,13 +368,19 @@ var ExplorationEditorTranslationTab = function() {
   this._isAudioPlaying = async function() {
     var firstValue = await audioMaterialSliderDiv.getAttribute(
       'aria-valuenow');
-    await browser.sleep(10);
-    var secondValue = await audioMaterialSliderDiv.getAttribute(
-      'aria-valuenow');
-    if (firstValue && secondValue) {
-      return +firstValue < +secondValue;
+    var audioPlaying = null;
+    try {
+      await waitFor.elementAttributeToBe(
+        audioMaterialSliderDiv, 'aria-valuenow', firstValue + 1,
+        'Audio slider is not advancing');
+      return true;
+    } catch (e) {
+      var secondValue = await audioMaterialSliderDiv.getAttribute(
+        'aria-valuenow');
+      if (firstValue && secondValue) {
+        return +firstValue < +secondValue;
+      }
     }
-    return false;
   };
 
   this.expectTranslationToMatch = async function(richTextInstructions) {

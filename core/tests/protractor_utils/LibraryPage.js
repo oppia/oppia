@@ -54,12 +54,12 @@ var LibraryPage = function() {
   var _getExplorationElements = async function(name) {
     return await element.all(
       by.css('.protractor-test-exp-summary-tile')).filter(
-        async function(tile) {
-          var tileTitle = await tile.element(
-            by.css('.protractor-test-exp-summary-tile-title')).getText();
-          return (tileTitle === name);
-        }
-      );
+      async function(tile) {
+        var tileTitle = await tile.element(
+          by.css('.protractor-test-exp-summary-tile-title')).getText();
+        return (tileTitle === name);
+      }
+    );
   };
 
   var _submitSearchQuery = async function(searchQuery) {

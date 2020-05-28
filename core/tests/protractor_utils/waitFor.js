@@ -87,6 +87,21 @@ var visibilityOf = async function(element, errorMessage) {
 };
 
 /**
+ * @param {Object} element - Element who attribute we are waiting to
+ *                           for
+ * @param {Object} attribute - Name of attribute
+ * @param {Object} value - Value we are waiting attribute to have
+ * @param {Object} errorMessage - Error message in case wait times out
+ */
+var elementAttributeToBe = async function(
+    element, attribute, value, errorMessage
+) {
+  await browser.wait(async function() {
+    return await element.getAttribute(attribute) === value;
+  }, DEFAULT_WAIT_TIME_MSECS, errorMessage);
+};
+
+/**
 * Wait for new tab is opened
 */
 var newTabToBeCreated = async function(errorMessage, urlToMatch) {
@@ -113,4 +128,5 @@ exports.invisibilityOf = invisibilityOf;
 exports.pageToFullyLoad = pageToFullyLoad;
 exports.textToBePresentInElement = textToBePresentInElement;
 exports.visibilityOf = visibilityOf;
+exports.elementAttributeToBe = elementAttributeToBe;
 exports.newTabToBeCreated = newTabToBeCreated;

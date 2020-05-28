@@ -72,7 +72,6 @@ var CollectionEditorPage = function() {
     var matched = false;
     var dropdownResultElement = element(
       by.cssContainingText('.dropdown-menu', new RegExp(query)));
-    debugger;
     if (await dropdownResultElement.isPresent()) {
       await dropdownResultElement.click();
       matched = true;
