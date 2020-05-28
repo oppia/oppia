@@ -65,7 +65,7 @@ export class RecordedVoiceovers {
 
   hasVoiceovers(contentId: string): boolean {
     return (
-      this.voiceoversMapping[contentId] &&
+      this.voiceoversMapping.hasOwnProperty(contentId) &&
       this.getVoiceoverLanguageCodes(contentId).length > 0);
   }
 
@@ -76,8 +76,10 @@ export class RecordedVoiceovers {
   }
 
   hasUnflaggedVoiceovers(contentId: string): boolean {
-    return Object.values(this.voiceoversMapping[contentId])
-      .some(voiceover => !voiceover.needsUpdate);
+    return (
+      this.voiceoversMapping.hasOwnProperty(contentId) &&
+      Object.values(this.voiceoversMapping[contentId])
+        .some(voiceover => !voiceover.needsUpdate));
   }
 
   addContentId(contentId: string): void {
