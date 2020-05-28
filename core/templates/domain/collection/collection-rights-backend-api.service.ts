@@ -26,6 +26,8 @@ import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { CollectionRights, CollectionRightsObjectFactory } from
   'domain/collection/CollectionRightsObjectFactory';
+import { ICollectionRightsBackendDict } from
+  'domain/collection/CollectionRightsObjectFactory';
 
 @Injectable({
   providedIn: 'root'
@@ -53,7 +55,7 @@ export class CollectionRightsBackendApiService {
         if (successCallback) {
           successCallback(
             this.collectionRightsObjectFactory
-              .create(response.body)
+              .create(response.body as ICollectionRightsBackendDict)
           );
         }
       },
