@@ -407,7 +407,7 @@ def apply_change_list(exploration_id, change_list):
                         raise Exception('Expected solution_list to be a list,'
                                         ' recieved %s' % change.new_value)
                     new_solution_hints = [state_domain.Solution.from_dict(
-                        interaction_id,solution_dict)
+                        solution_dict.interaction_id, solution_dict)
                                           for solution_dict in change.new_value]
                     state.update_interaction_solution(new_solution_hints)
                 elif (

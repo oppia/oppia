@@ -199,7 +199,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         init_state = exploration.states[exploration.init_state_name]
         init_state.update_interaction_id('TextInput')
-        solution_dict = {
+        solution_list = [{
             'answer_is_exclusive': False,
             'correct_answer': 'helloworld!',
             'explanation': {
@@ -209,7 +209,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     'raw_latex-with-value="&amp;quot;\\frac{x}{y}&amp;quot;">'
                     '</oppia-noninteractive-math></p>')
             },
-        }
+        }]
 
         init_state.update_interaction_solution(solution_list)
         self.assertFalse(init_state.is_rte_content_supported_on_android())
