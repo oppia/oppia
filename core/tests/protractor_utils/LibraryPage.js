@@ -36,16 +36,18 @@ var LibraryPage = function() {
   };
 
   var categorySelector = forms.MultiSelectEditor(
-    element(by.css('.protractor-test-search-bar-category-selector'))
-  );
+    element(by.css(
+      '.protractor-library-page-search-bar ' +
+      '.protractor-test-search-bar-category-selector')));
   var explorationObjective = element(
     by.css('.protractor-test-exp-summary-tile-objective'));
   var createActivityButton = element(
     by.css('.protractor-test-create-activity')
   );
   var languageSelector = forms.MultiSelectEditor(
-    element(by.css('.protractor-test-search-bar-language-selector'))
-  );
+    element(by.css(
+      '.protractor-library-page-search-bar ' +
+      '.protractor-test-search-bar-language-selector')));
   var searchInputs = element.all(
     by.css('.protractor-test-search-input'));
   var mainHeader = element(by.css('.protractor-test-library-main-header'));
