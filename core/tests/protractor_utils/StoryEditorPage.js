@@ -154,7 +154,13 @@ var StoryEditorPage = function() {
 
   this.createNewDestinationChapter = async function(title) {
     await browser.actions().mouseMove(addDestinationChapterButton).perform();
+    await waitFor.elementToBeClickable(
+      addDestinationChapterButton,
+      'Add destination chapter button takes too long to be clickable.');
     await addDestinationChapterButton.click();
+    await waitFor.visibilityOf(
+      newChapterTitleField,
+      'New Chapter modal takes too long to appear.');
     await newChapterTitleField.sendKeys(title);
     await confirmChapterCreationButton.click();
     await general.scrollToTop();
@@ -180,7 +186,13 @@ var StoryEditorPage = function() {
   };
 
   this.createInitialChapter = async function(title) {
+    await waitFor.elementToBeClickable(
+      createInitialChapterButton,
+      'Create Initial Chapter button takes too long to be clickable.');
     await createInitialChapterButton.click();
+    await waitFor.visibilityOf(
+      newChapterTitleField,
+      'New Chapter modal takes too long to appear.');
     await newChapterTitleField.sendKeys(title);
     await confirmChapterCreationButton.click();
   };
@@ -258,6 +270,9 @@ var StoryEditorPage = function() {
   };
 
   this.changeNodeDescription = async function(nodeDescription) {
+    // scrollToTop is added to prevent nodeDescriptionInputField from
+    // being hidden by the navbar.
+    await general.scrollToTop();
     await waitFor.visibilityOf(
       nodeDescriptionInputField,
       'NodeDescriptionInputField takes too long to be visible'
@@ -291,7 +306,8 @@ var StoryEditorPage = function() {
     // scrollToTop is added to prevent chapterTitles from being hidden
     // by the navbar.
     await general.scrollToTop();
-    await chapterTitles.get(index).click();
+    var chapterTitleButton = await chapterTitles.get(index);
+    await chapterTitleButton.click();
   };
 
   this.expectNodeOutlineToMatch = function(nodeOutline) {

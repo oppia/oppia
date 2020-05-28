@@ -33,6 +33,7 @@ var TopicEditorPage = function() {
     by.css('.protractor-test-confirm-story-creation-button'));
   var storyListItems = element.all(
     by.css('.protractor-test-story-list-item'));
+  var storyListTable = element(by.css('.protractor-test-story-list-table'));
 
   var topicNameField = element(
     by.css('.protractor-test-topic-name-field'));
@@ -64,6 +65,8 @@ var TopicEditorPage = function() {
     by.css('.protractor-test-delete-subtopic-button'));
   var skillCards = element.all(
     by.css('.protractor-test-skill-card'));
+  var skillSelectorModal = element(
+    by.css('.protractor-test-skill-select-modal'));
   var uncategorizedSkillItems = element.all(
     by.css('.protractor-test-uncategorized-skill-item'));
   var uncategorizedSkillsContainer = element(
@@ -152,13 +155,23 @@ var TopicEditorPage = function() {
   };
 
   this.createQuestionForSkillWithIndex = async function(index) {
+    await waitFor.elementToBeClickable(
+      createQuestionButton,
+      'Create Question button takes too long to be clickable');
     await createQuestionButton.click();
-    await skillItems.get(index).click();
+    await waitFor.visibilityOf(
+      skillSelectorModal,
+      'Select skill modal takes too long to appear');
+    var skillItem = await skillItems.get(index);
+    await skillItem.click();
     await waitFor.elementToBeClickable(
       confirmSkillButton,
       'Confirm Skill button takes too long to be clickable');
     await confirmSkillButton.click();
     await confirmSkillDifficultyButton.click();
+    await waitFor.invisibilityOf(
+      skillSelectorModal,
+      'Select skill modal takes too long to disappear');
   };
 
   this.moveToQuestionsTab = async function() {
@@ -237,22 +250,24 @@ var TopicEditorPage = function() {
 
   this.dragSkillFromSubtopicToUncategorized = async function(
       subtopicIndex, skillCardIndex) {
-    var subtopicCol = subtopicColumns.get(subtopicIndex);
+    var subtopicCol = await subtopicColumns.get(subtopicIndex);
     skillNamesElems = subtopicCol.all(
       by.css('.protractor-test-assigned-skill-card-text'));
-    var toMove = skillNamesElems.get(skillCardIndex);
+    var toMove = await skillNamesElems.get(skillCardIndex);
     await dragAndDrop(toMove, uncategorizedSkillsContainer);
   };
 
   this.expectSubtopicToHaveSkills = async function(subtopicIndex, skillNames) {
     var subtopicCol = await subtopicColumns.get(subtopicIndex);
-    skillNamesElems = subtopicCol.all(
+    var skillNamesElems = subtopicCol.all(
       by.css('.protractor-test-assigned-skill-card-text'));
-    skillNamesElems.each(async function(skillCardTextElem, index) {
+    var skillNamesCount = await skillNamesElems.count();
+    for (var i = 0; i < skillNamesCount; i++) {
+      var skillCardTextElem = await skillNamesElems.get(i);
       var text = await skillCardTextElem.getText();
-      expect(skillNames[index]).toEqual(text);
-    });
-    expect(await skillNamesElems.count()).toEqual(skillNames.length);
+      expect(skillNames[i]).toEqual(text);
+    }
+    expect(skillNamesCount).toEqual(skillNames.length);
   };
 
   this.moveToSubtopicsTab = async function() {
@@ -278,7 +293,10 @@ var TopicEditorPage = function() {
   };
 
   this.navigateToStoryWithIndex = async function(index) {
-    await storyListItems.get(index).click();
+    await waitFor.visibilityOf(
+      storyListTable, 'Story list table takes too long to appear.');
+    var storyItem = await storyListItems.get(index);
+    await storyItem.click();
     await waitFor.pageToFullyLoad();
   };
 

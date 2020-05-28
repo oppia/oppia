@@ -79,12 +79,14 @@ var TopicsAndSkillsDashboardPage = function() {
 
   // Returns a promise of all topics with the given name.
   var _getTopicElements = async function(topicName) {
-    topicsListElems = [];
-    for (var i = 0; i < await topicsListItems.count(); i++) {
-      var name = await topicsListItems.get(i).element(
+    var topicsListElems = [];
+    var topicsListItemsCount = await topicsListItems.count();
+    for (var i = 0; i < topicsListItemsCount; i++) {
+      var topic = await topicsListItems.get(i);
+      var name = await topic.element(
         by.css('.protractor-test-topic-name')).getText();
       if (name === topicName) {
-        topicsListElems.push(topicsListItems.get(i));
+        topicsListElems.push(topic);
       }
     }
     return topicsListElems;
@@ -118,21 +120,22 @@ var TopicsAndSkillsDashboardPage = function() {
   };
 
   this.navigateToTopicWithIndex = async function(index) {
-    var elems = await topicsListItems;
-    await elems[index].click();
+    var elem = await topicsListItems.get(index);
+    await elem.click();
   };
 
   this.assignSkillWithIndexToTopic = async function(index, topicIndex) {
-    var elems = await assignSkillToTopicButtons;
-    await elems[index].click();
-    var topics = await topicsListItems;
-    await topics[index].click();
+    var assignSkillButton = await assignSkillToTopicButtons.get(index);
+    await assignSkillButton.click();
+    var topic = await topicsListItems.get(topicIndex);
+    await topic.click();
     await confirmMoveButton.click();
   };
 
   this.assignSkillWithIndexToTopicByTopicName = async function(
       skillIndex, topicName) {
-    await (await assignSkillToTopicButtons.get(skillIndex)).click();
+    var assignSkillButton = await assignSkillToTopicButtons.get(skillIndex);
+    await assignSkillButton.click();
     var topicRowsCount = await topicNamesInTopicSelectModal.count();
     for (var i = 0; i < topicRowsCount; i++) {
       var topicElem = await topicNamesInTopicSelectModal.get(i);
@@ -162,8 +165,13 @@ var TopicsAndSkillsDashboardPage = function() {
       'Creating topic takes too long', '/topic_editor/');
     handles = await browser.getAllWindowHandles();
 
-    var newHandle = handles.filter(
-      handle => initialHandles.indexOf(handle) === -1)[0];
+    var newHandle = null;
+    for (var i = 0; i < handles.length; i++) {
+      if (initialHandles.indexOf(handles[i]) === -1) {
+        newHandle = handles[i];
+        break;
+      }
+    }
     await browser.switchTo().window(newHandle);
     if (shouldCloseTopicEditor) {
       await browser.driver.close();
@@ -241,8 +249,13 @@ var TopicsAndSkillsDashboardPage = function() {
     await waitFor.newTabToBeCreated(
       'Creating skill takes too long', '/skill_editor/');
     handles = await browser.getAllWindowHandles();
-    var newHandle = handles.filter(
-      handle => initialHandles.indexOf(handle) === -1)[0];
+    var newHandle = null;
+    for (var i = 0; i < handles.length; i++) {
+      if (initialHandles.indexOf(handles[i]) === -1) {
+        newHandle = handles[i];
+        break;
+      }
+    }
     await browser.switchTo().window(newHandle);
     if (shouldCloseSkillEditor) {
       await browser.driver.close();

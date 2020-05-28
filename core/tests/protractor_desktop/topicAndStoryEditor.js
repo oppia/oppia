@@ -277,7 +277,7 @@ describe('Chapter editor functionality', function() {
     await users.logout();
     await users.login(userEmail);
     await topicsAndSkillsDashboardPage.get();
-    await topicsAndSkillsDashboardPage.navigateToTopicWithIndex(0);
+    await topicsAndSkillsDashboardPage.editTopic(topicName);
     await topicEditorPage.navigateToStoryWithIndex(0);
     await storyEditorPage.expectNodeDescription('Chapter description 1');
   });
@@ -312,7 +312,7 @@ describe('Chapter editor functionality', function() {
     await users.logout();
     await users.login(userEmail);
     await topicsAndSkillsDashboardPage.get();
-    await topicsAndSkillsDashboardPage.navigateToTopicWithIndex(0);
+    await topicsAndSkillsDashboardPage.editTopic(topicName);
     await topicEditorPage.navigateToStoryWithIndex(0);
     await storyEditorPage.navigateToChapterByIndex(1);
     await storyEditorPage.expectNodeDescription('Chapter description 2');
