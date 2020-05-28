@@ -146,7 +146,8 @@ angular.module('oppia').config([
       'ThreadStatusDisplayService', 'TopicObjectFactory',
       'TopicRightsObjectFactory', 'TopicViewerBackendApiService',
       'TranslationLanguageService', 'UrlInterpolationService', 'UrlService',
-      'UserInfoObjectFactory', 'UtilsService', 'ValidatorsService',
+      'UserExplorationPermissionsService', 'UserInfoObjectFactory',
+      'UtilsService', 'ValidatorsService',
       'WindowDimensionsService', 'WindowRef'
     ];
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
