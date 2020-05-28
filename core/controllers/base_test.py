@@ -53,6 +53,21 @@ FORTY_EIGHT_HOURS_IN_SECS = 48 * 60 * 60
 PADDING = 1
 
 
+class HelperFunctionTests(test_utils.GenericTestBase):
+
+    def test_load_template(self):
+        about_path = os.path.join('core', 'templates', 'pages', 'about-page')
+        with self.swap(feconf, 'FRONTEND_TEMPLATES_DIR', about_path):
+            self.assertIn(
+                '"About us - Oppia"',
+                base.load_template('about-page.mainpage.html'))
+        donate_path = os.path.join('core', 'templates', 'pages', 'donate-page')
+        with self.swap(feconf, 'FRONTEND_TEMPLATES_DIR', donate_path):
+            self.assertIn(
+                '"Donate - Oppia"',
+                base.load_template('donate-page.mainpage.html'))
+
+
 class UniqueTemplateNamesTests(test_utils.GenericTestBase):
     """Tests to ensure that all template filenames in
     core/templates/pages have unique filenames. This is required
@@ -98,7 +113,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
 
     class MockHandlerForTestingErrorPageWithIframed(base.BaseHandler):
         def get(self):
-            self.values['iframed'] = True
+            self.iframed = True
             self.render_template('invalid_page.html')
 
     class MockHandlerForTestingUiAccessWrapper(base.BaseHandler):

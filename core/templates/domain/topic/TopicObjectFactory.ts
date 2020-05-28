@@ -24,10 +24,33 @@ import cloneDeep from 'lodash/cloneDeep';
 
 import { SkillSummary, SkillSummaryObjectFactory } from
   'domain/skill/SkillSummaryObjectFactory';
-import { StoryReference, StoryReferenceObjectFactory } from
-  'domain/topic/StoryReferenceObjectFactory';
-import { Subtopic, SubtopicObjectFactory } from
-  'domain/topic/SubtopicObjectFactory';
+import {
+  IStoryReferenceBackendDict,
+  StoryReference,
+  StoryReferenceObjectFactory
+} from 'domain/topic/StoryReferenceObjectFactory';
+import {
+  ISkillIdToDescriptionMap,
+  Subtopic,
+  ISubtopicBackendDict,
+  SubtopicObjectFactory
+} from 'domain/topic/SubtopicObjectFactory';
+
+interface ITopicBackendDict {
+  'id': string;
+  'name': string;
+  'abbreviated_name': string;
+  'description': string;
+  'language_code': string;
+  'uncategorized_skill_ids': string[];
+  'next_subtopic_id': number;
+  'version': number;
+  'thumbnail_filename': string;
+  'thumbnail_bg_color': string;
+  'subtopics': ISubtopicBackendDict[];
+  'canonical_story_references': IStoryReferenceBackendDict[];
+  'additional_story_references': IStoryReferenceBackendDict[];
+}
 
 export class Topic {
   _id: string;
@@ -54,8 +77,7 @@ export class Topic {
       nextSubtopicId: number, version: number, subtopics: Array<Subtopic>,
       thumbnailFilename: string,
       thumbnailBgColor: string,
-      // TODO(#7165): Replace any with exact type.
-      skillIdToDescriptionMap: any,
+      skillIdToDescriptionMap: ISkillIdToDescriptionMap,
       skillSummaryObjectFactory: SkillSummaryObjectFactory,
       subtopicObjectFactory: SubtopicObjectFactory,
       storyReferenceObjectFactory: StoryReferenceObjectFactory) {
@@ -233,7 +255,7 @@ export class Topic {
     return topicSkillIds;
   }
 
-  getSubtopicById(subtopicId: string): Subtopic | null {
+  getSubtopicById(subtopicId: number): Subtopic | null {
     for (let i = 0; i < this._subtopics.length; i++) {
       let id = this._subtopics[i].getId();
       if (id === subtopicId) {
@@ -253,7 +275,7 @@ export class Topic {
 
   // Attempts to remove a subtopic from this topic given the
   // subtopic ID.
-  deleteSubtopic(subtopicId: string, isNewlyCreated: boolean): void {
+  deleteSubtopic(subtopicId: number, isNewlyCreated: boolean): void {
     let subtopicDeleted = false;
     for (let i = 0; i < this._subtopics.length; i++) {
       if (this._subtopics[i].getId() === subtopicId) {
@@ -449,21 +471,23 @@ export class TopicObjectFactory {
       private subtopicObjectFactory: SubtopicObjectFactory,
       private storyReferenceObjectFactory: StoryReferenceObjectFactory,
       private skillSummaryObjectFactory: SkillSummaryObjectFactory) {}
-  // TODO(#7165): Replace any with exact type
-  create(topicBackendDict: any, skillIdToDescriptionDict: any): Topic {
-    let subtopics = topicBackendDict.subtopics.map((subtopic: Subtopic) => {
+  create(
+      topicBackendDict: ITopicBackendDict,
+      skillIdToDescriptionDict: ISkillIdToDescriptionMap): Topic {
+    let subtopics = topicBackendDict.subtopics.map((
+        subtopic: ISubtopicBackendDict) => {
       return this.subtopicObjectFactory.create(
         subtopic, skillIdToDescriptionDict);
     });
     let canonicalStoryReferences =
         topicBackendDict.canonical_story_references.map(
-          (reference: StoryReference) => {
+          (reference: IStoryReferenceBackendDict) => {
             return this.storyReferenceObjectFactory.createFromBackendDict(
               reference);
           });
     let additionalStoryReferences =
         topicBackendDict.additional_story_references.map(
-          (reference: StoryReference) => {
+          (reference: IStoryReferenceBackendDict) => {
             return this.storyReferenceObjectFactory.createFromBackendDict(
               reference);
           });
