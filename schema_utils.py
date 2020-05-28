@@ -398,7 +398,7 @@ def is_valid_postfix_expression(tokenized_expression):
                 stack[-1] = 'X'
 
     # In the end, the stack should only contain the resultant value, an operand.
-    return len(stack) == 1 and stack[0].isalnum()
+    return len(stack) == 1 and IS_OPERAND(stack[0])
 
 
 class Normalizers(python_utils.OBJECT):
@@ -606,7 +606,7 @@ class _Validators(python_utils.OBJECT):
 
     @staticmethod
     def is_valid_asciimath_expression(obj, algebraic=True):
-        """Checks if the given  obj(a string) represents a valid algebraic or
+        """Checks if the given obj (a string) represents a valid algebraic or
         numeric expression. The expression should be in the ASCIIMath format.
         More info: http://asciimath.org/
 
@@ -641,6 +641,7 @@ class _Validators(python_utils.OBJECT):
 
         # Expression should be syntactically valid.
         postfix_expression = infix_to_postfix(obj)
+
         return is_valid_postfix_expression(postfix_expression)
 
 
@@ -659,7 +660,7 @@ class _Validators(python_utils.OBJECT):
 
     @staticmethod
     def is_valid_math_equation(obj):
-        """Checks if the given  obj(a string) represents a valid math equation.
+        """Checks if the given  obj (a string) represents a valid math equation.
         The expression should be in the ASCIIMath format.
         More info: http://asciimath.org/
 
@@ -678,13 +679,18 @@ class _Validators(python_utils.OBJECT):
 
         # Both sides have to be valid expressions and at least one of them has
         # to be a valid algebraic expression.
-        if is_valid_asciimath_expression(lhs) and is_valid_asciimath_expression(
-                rhs):
+        lhs_is_algebraically_valid = is_valid_asciimath_expression(lhs)
+        rhs_is_algebraically_valid = is_valid_asciimath_expression(rhs)
+
+        lhs_is_numerically_valid = is_valid_asciimath_expression(
+            lhs, algebraic=False)
+        rhs_is_numerically_valid = is_valid_asciimath_expression(
+            rhs, algebraic=False)
+
+        if lhs_is_algebraically_valid and rhs_is_algebraically_valid:
             return True
-        if is_valid_asciimath_expression(lhs) and is_valid_asciimath_expression(
-                rhs, False):
+        if lhs_is_algebraically_valid and rhs_is_numerically_valid:
             return True
-        if is_valid_asciimath_expression(lhs, False) and (
-                is_valid_asciimath_expression(rhs)):
+        if lhs_is_numerically_valid and rhs_is_algebraically_valid:
             return True
         return False

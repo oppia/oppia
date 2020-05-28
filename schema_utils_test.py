@@ -497,6 +497,9 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
         self.assertTrue(is_valid_asciimath_expression('alpha + (-3)'))
         self.assertTrue(is_valid_asciimath_expression('alpha^(3.9/beta*gamma)'))
         self.assertTrue(is_valid_asciimath_expression('{a-(-3)/(2-(-b)^4)}^2'))
+        self.assertTrue(is_valid_asciimath_expression('a+(-3)/alpha + gamma^2'))
+        self.assertTrue(is_valid_asciimath_expression('(x+y) * (x-y)'))
+        self.assertTrue(is_valid_asciimath_expression('(a+ b)^2 - (c+d) ^ 3'))
 
         self.assertFalse(is_valid_asciimath_expression('a+b/'))
         self.assertFalse(is_valid_asciimath_expression('(352+)-3*x'))
@@ -529,12 +532,30 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
         self.assertTrue(is_valid_asciimath_expression('3+2^3', False))
         self.assertTrue(is_valid_asciimath_expression('(5-2^[6+3])', False))
         self.assertTrue(is_valid_asciimath_expression('(-5)^(-1)/2', False))
+        self.assertTrue(is_valid_asciimath_expression('2*10^3 + 3*10^2', False))
+        self.assertTrue(is_valid_asciimath_expression(
+            '{55 - 2/(-3)^100 + [5-4]}', False))
+        self.assertTrue(is_valid_asciimath_expression('(3^2) - (4^2)', False))
+        self.assertTrue(is_valid_asciimath_expression('(1+2+3)/(1-2-3)', False))
+        self.assertTrue(is_valid_asciimath_expression('24.6 + 3^(-1/2)', False))
+        self.assertTrue(is_valid_asciimath_expression('1^1^1^1^1^1^1', False))
+        self.assertTrue(is_valid_asciimath_expression(
+            '1000 + 200 + 30 + 4', False))
+        self.assertTrue(is_valid_asciimath_expression('(1.01)^39', False))
+        self.assertTrue(is_valid_asciimath_expression('506/(2-3)^(-3)', False))
 
         self.assertFalse(is_valid_asciimath_expression('3+2*a', False))
+        self.assertFalse(is_valid_asciimath_expression('3+2/*a', False))
+        self.assertFalse(is_valid_asciimath_expression('192.168.1 + 3', False))
+        self.assertFalse(is_valid_asciimath_expression('{1 - 2 (/3}', False))
+        self.assertFalse(is_valid_asciimath_expression('[5^(3-2])', False))
+        self.assertFalse(is_valid_asciimath_expression('55.02/3.5-(-a)', False))
+        self.assertFalse(is_valid_asciimath_expression('alpha + beta-1', False))
         self.assertFalse(is_valid_asciimath_expression('(3+2]', False))
         self.assertFalse(is_valid_asciimath_expression('3!2', False))
         self.assertFalse(is_valid_asciimath_expression('3-+2', False))
         self.assertFalse(is_valid_asciimath_expression('3-5=(-2)', False))
+        self.assertFalse(is_valid_asciimath_expression('3 > 2', False))
 
     def test_contains_valid_latin_letters(self):
         """Tests for the contains_valid_latin_letters static method."""
@@ -542,14 +563,15 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
             'contains_valid_latin_letters')
 
         self.assertTrue(contains_valid_latin_letters([]))
-        self.assertTrue(contains_valid_latin_letters(['a', 'z']))
-        self.assertTrue(contains_valid_latin_letters(['a', 'Z']))
+        self.assertTrue(contains_valid_latin_letters(['a', 'z', 'alpha']))
+        self.assertTrue(contains_valid_latin_letters(['a', 'Z', 'pi']))
         self.assertTrue(contains_valid_latin_letters(['A', 'Z']))
 
         self.assertFalse(contains_valid_latin_letters(['A', '']))
+        self.assertFalse(contains_valid_latin_letters(['Alpha', 'b']))
         self.assertFalse(contains_valid_latin_letters(['a', '1']))
         self.assertFalse(contains_valid_latin_letters(['A', 'Bc']))
-        self.assertFalse(contains_valid_latin_letters(['.', '2']))
+        self.assertFalse(contains_valid_latin_letters(['3', 'a']))
 
     def test_is_valid_math_equation_validator(self):
         """Tests for the is_valid_math_equation static method."""
@@ -557,10 +579,26 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
             'is_valid_math_equation')
 
         self.assertTrue(is_valid_math_equation('a+b=c'))
+        self.assertTrue(is_valid_math_equation('x^2+y^2=z^2'))
+        self.assertTrue(is_valid_math_equation('y = m*x + b'))
+        self.assertTrue(is_valid_math_equation('alpha^a + beta^b = gamma^(-c)'))
         self.assertTrue(is_valid_math_equation('a+b=0'))
         self.assertTrue(is_valid_math_equation('0=a+b'))
         self.assertTrue(is_valid_math_equation('(a/b)+c=(4^3)*a'))
+        self.assertTrue(is_valid_math_equation('2^alpha-(-3) = 3'))
+        self.assertTrue(is_valid_math_equation('(a+b)^2 = a^2 + b^2 + 2*a*b'))
+        self.assertTrue(is_valid_math_equation('x/a + y/b = 1'))
+        self.assertTrue(is_valid_math_equation('3 = -5 + pi^pi'))
+        self.assertTrue(is_valid_math_equation('pi = 3.1415'))
+        self.assertTrue(is_valid_math_equation('.4 + .5 = alpha * 4'))
 
+        self.assertFalse(is_valid_math_equation('3 -= 2/a'))
+        self.assertFalse(is_valid_math_equation('x + y = '))
+        self.assertFalse(is_valid_math_equation('(a+b)^2 = a^2 + b^2 + 2ab'))
+        self.assertFalse(is_valid_math_equation('(a+b = 0)'))
+        self.assertFalse(is_valid_math_equation('a+b=0=a-b'))
+        self.assertFalse(is_valid_math_equation('alpha - beta/c'))
+        self.assertFalse(is_valid_math_equation('2^alpha-(-3*) = 3'))
         self.assertFalse(is_valid_math_equation('a+b<=0'))
         self.assertFalse(is_valid_math_equation('a+b>=0'))
         self.assertFalse(is_valid_math_equation('a+b<0'))
