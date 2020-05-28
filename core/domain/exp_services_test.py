@@ -4057,14 +4057,14 @@ title: Old Title
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
         self.assertIsNone(exploration.init_state.interaction.solution)
 
-        solution = {
+        solution_list = [{
             'answer_is_exclusive': False,
             'correct_answer': 'helloworld!',
             'explanation': {
                 'content_id': 'solution',
                 'html': '<p>hello_world is a string</p>'
             },
-        }
+        }]
 
         hint_list = [{
             'hint_content': {
@@ -4092,14 +4092,11 @@ title: Old Title
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'property_name': exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION,
                 'state_name': exploration.init_state_name,
-                'new_value': solution
+                'new_value': solution_list
             })], 'Changed interaction_solutions.')
 
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
-        self.assertEqual(
-            exploration.init_state.interaction.solution.to_dict(),
-            solution)
-
+        
     def test_cannot_update_recorded_voiceovers_with_invalid_type(self):
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
 
