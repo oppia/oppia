@@ -23,7 +23,7 @@ import { Injectable } from '@angular/core';
 import { SkillSummary, SkillSummaryObjectFactory } from
   'domain/skill/SkillSummaryObjectFactory';
 import { StorySummary } from 'domain/story/StorySummaryObjectFactory';
-import { Subtopic, SubtopicObjectFactory } from
+import { ISubtopicBackendDict, Subtopic, SubtopicObjectFactory } from
   'domain/topic/SubtopicObjectFactory';
 
 export interface ISkillDescriptions {
@@ -120,7 +120,7 @@ export class ReadOnlyTopicObjectFactory {
   // which give tslint errors against underscore_casing in favor of camelCasing.
   createFromBackendDict(topicDataDict: any): ReadOnlyTopic {
     let subtopics: Array<Subtopic> = topicDataDict.subtopics.map(
-      (subtopic: Subtopic) => {
+      (subtopic: ISubtopicBackendDict) => {
         return this._subtopicObjectFactory.create(
           subtopic, topicDataDict.skill_descriptions);
       });

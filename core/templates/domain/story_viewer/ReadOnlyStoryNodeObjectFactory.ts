@@ -21,8 +21,21 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 export interface ExplorationSummary {
-  title: string,
-  status: string
+  title: string;
+  status: string;
+}
+
+interface IStoryNodeBackendDict {
+  id: string;
+  title: string;
+  'destination_node_ids': string[];
+  'prerequisite_skill_ids': string[];
+  'acquired_skill_ids': string[];
+  outline: string;
+  'outline_is_finalized': boolean;
+  'exploration_id': string;
+  'exp_summary_dict': ExplorationSummary;
+  completed: boolean;
 }
 
 export class ReadOnlyStoryNode {
@@ -86,11 +99,8 @@ export class ReadOnlyStoryNode {
   providedIn: 'root'
 })
 export class ReadOnlyStoryNodeObjectFactory {
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'subtopicDataBackendDict' is a dict with underscore_cased
-  // keys which give tslint errors against underscore_casing in favor of
-  // camelCasing.
-  createFromBackendDict(storyNodeBackendDict: any): ReadOnlyStoryNode {
+  createFromBackendDict(
+      storyNodeBackendDict: IStoryNodeBackendDict): ReadOnlyStoryNode {
     return new ReadOnlyStoryNode(storyNodeBackendDict.id,
       storyNodeBackendDict.title,
       storyNodeBackendDict.destination_node_ids,

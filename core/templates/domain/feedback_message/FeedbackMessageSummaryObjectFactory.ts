@@ -20,6 +20,18 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
+interface IFeedbackMessageSummaryBackendDict {
+  'message_id': number;
+  'text': string;
+  'updated_status': string;
+  'suggestion_html': string;
+  'current_content_html': string;
+  'description': string;
+  'author_username': string;
+  'author_picture_data_url': string;
+  'created_on_msecs': number;
+}
+
 export class FeedbackMessageSummary {
   messageId: number;
   text: string;
@@ -61,12 +73,10 @@ export class FeedbackMessageSummaryObjectFactory {
       newMessageId, newMessageText, null, null, null, null, authorUsername,
       authorPictureDataUrl, createdOnMsecs);
   }
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'feedbackMessageSummaryBackendDict' is a dict with
-  // underscore_cased keys which give tslint errors against underscore_casing
-  // in favor of camelCasing.
+
   createFromBackendDict(
-      feedbackMessageSummaryBackendDict: any): FeedbackMessageSummary {
+      feedbackMessageSummaryBackendDict: IFeedbackMessageSummaryBackendDict):
+      FeedbackMessageSummary {
     return new FeedbackMessageSummary(
       feedbackMessageSummaryBackendDict.message_id,
       feedbackMessageSummaryBackendDict.text,

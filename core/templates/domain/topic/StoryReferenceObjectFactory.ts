@@ -20,6 +20,11 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
+export interface IStoryReferenceBackendDict {
+  'story_id': string;
+  'story_is_published': boolean;
+}
+
 export class StoryReference {
   _storyId: string;
   _storyIsPublished: boolean;
@@ -44,11 +49,7 @@ export class StoryReference {
 })
 export class StoryReferenceObjectFactory {
   createFromBackendDict(
-      // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-      // 'any' because 'classifierData' is a dict with underscore_cased keys
-      // which give tslint errors against underscore_casing in favor of
-      // camelCasing.
-      storyReferenceBackendDict: any): StoryReference {
+      storyReferenceBackendDict: IStoryReferenceBackendDict): StoryReference {
     return new StoryReference(
       storyReferenceBackendDict.story_id,
       storyReferenceBackendDict.story_is_published);

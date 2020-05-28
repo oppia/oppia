@@ -23,6 +23,20 @@ import { Injectable } from '@angular/core';
 import { StoryEditorPageConstants } from
   'pages/story-editor-page/story-editor-page.constants';
 
+export interface IStoryNodeBackendDict {
+  'id': string;
+  'title': string;
+  'description': string;
+  'destination_node_ids': string[];
+  'prerequisite_skill_ids': string[];
+  'acquired_skill_ids': string[];
+  'outline': string;
+  'outline_is_finalized': boolean;
+  'exploration_id': string;
+  'thumbnail_bg_color': string;
+  'thumbnail_filename': string;
+}
+
 export class StoryNode {
   _id: string;
   _title: string;
@@ -265,11 +279,8 @@ export class StoryNode {
   providedIn: 'root'
 })
 export class StoryNodeObjectFactory {
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'storyNodeBackendObject' is a dict with underscore_cased
-  // keys which give tslint errors against underscore_casing in favor of
-  // camelCasing.
-  createFromBackendDict(storyNodeBackendObject: any): StoryNode {
+  createFromBackendDict(
+      storyNodeBackendObject: IStoryNodeBackendDict): StoryNode {
     return new StoryNode(
       storyNodeBackendObject.id, storyNodeBackendObject.title,
       storyNodeBackendObject.description,

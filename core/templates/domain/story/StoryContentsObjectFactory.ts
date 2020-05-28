@@ -22,8 +22,14 @@ import { Injectable } from '@angular/core';
 
 import { StoryEditorPageConstants } from
   'pages/story-editor-page/story-editor-page.constants';
-import { StoryNode, StoryNodeObjectFactory } from
+import { IStoryNodeBackendDict, StoryNode, StoryNodeObjectFactory } from
   'domain/story/StoryNodeObjectFactory';
+
+interface IStoryContentsBackendDict {
+  'initial_node_id': string;
+  'next_node_id': string;
+  'nodes': IStoryNodeBackendDict[];
+}
 
 export class StoryContents {
   _initialNodeId: string;
@@ -122,11 +128,9 @@ export class StoryContents {
     return -1;
   }
 
-  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
-  // 'any' because the return type is a list with varying element types.
-  validate(): any {
+  validate(): string[] {
     this._disconnectedNodes = [];
-    var issues = [];
+    var issues: string[] = [];
     var nodes = this._nodes;
     for (var i = 0; i < nodes.length; i++) {
       var nodeIssues = nodes[i].validate();
@@ -247,14 +251,11 @@ export class StoryContents {
     return issues;
   }
 
-  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
-  // 'any' because the return type is an assignment statement and should be
-  // typed as void and the return statement should be removed.
-  setInitialNodeId(nodeId: string): any {
+  setInitialNodeId(nodeId: string): void {
     if (this.getNodeIndex(nodeId) === -1) {
       throw new Error('The node with given id doesn\'t exist');
     }
-    return this._initialNodeId = nodeId;
+    this._initialNodeId = nodeId;
   }
 
   addNode(title: string): void {
@@ -402,11 +403,8 @@ export class StoryContents {
 })
 export class StoryContentsObjectFactory {
   constructor(private storyNodeObjectFactory: StoryNodeObjectFactory) {}
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'storyContentsBackendObject' is a dict with underscore_cased
-  // keys which give tslint errors against underscore_casing in favor of
-  // camelCasing.
-  createFromBackendDict(storyContentsBackendObject: any): StoryContents {
+  createFromBackendDict(
+      storyContentsBackendObject: IStoryContentsBackendDict): StoryContents {
     var nodes = [];
     for (var i = 0; i < storyContentsBackendObject.nodes.length; i++) {
       nodes.push(

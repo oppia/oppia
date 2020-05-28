@@ -37,7 +37,8 @@ describe('Story node object factory', () => {
       destination_node_ids: ['node_2'],
       outline: 'Outline',
       exploration_id: null,
-      outline_is_finalized: false
+      outline_is_finalized: false,
+      thumbnail_bg_color: '#a33f40',
     };
     _sampleStoryNode = storyNodeObjectFactory.createFromBackendDict(
       sampleStoryNodeBackendDict);

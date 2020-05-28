@@ -23,6 +23,17 @@ import { Injectable } from '@angular/core';
 import { ThreadMessageSummary, ThreadMessageSummaryObjectFactory } from
   'domain/feedback_message/ThreadMessageSummaryObjectFactory';
 
+interface IThreadMessageBackendDict {
+  'author_username': string;
+  'created_on_msecs': number;
+  'entity_type': string;
+  'entity_id': string;
+  'message_id': number;
+  'text': string;
+  'updated_status': string;
+  'updated_subject': string;
+}
+
 export class ThreadMessage {
   authorUsername: string;
   createdOnMsecs: number;
@@ -68,11 +79,8 @@ export class ThreadMessageObjectFactory {
     private threadMessageSummaryObjectFactory:
       ThreadMessageSummaryObjectFactory) {}
 
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'threadMessageBackendDict' is a dict with underscore_cased
-  // keys which give tslint errors against underscore_casing in favor of
-  // camelCasing.
-  createFromBackendDict(threadMessageBackendDict: any): ThreadMessage {
+  createFromBackendDict(
+      threadMessageBackendDict: IThreadMessageBackendDict): ThreadMessage {
     return new ThreadMessage(
       threadMessageBackendDict.author_username,
       threadMessageBackendDict.created_on_msecs,

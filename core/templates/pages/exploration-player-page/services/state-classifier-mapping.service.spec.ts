@@ -24,6 +24,42 @@ import { StateClassifierMappingService } from
 describe('State classifier mapping service', () => {
   describe('Test correct retrieval of classifier details', () => {
     let mappingService: StateClassifierMappingService;
+    let classifierData: IClassifierData = {
+      KNN: {
+        occurrence: 0,
+        K: 0,
+        T: 0,
+        top: 0,
+        fingerprint_data: {
+          0: {
+            'class': 0,
+            fingerprint: [[0]]
+          }
+        },
+        token_to_id: {
+          a: 0
+        }
+      },
+      SVM: {
+        classes: [0],
+        kernel_params: {
+          kernel: 'string',
+          coef0: 0,
+          degree: 0,
+          gamma: 0
+        },
+        intercept: [0],
+        n_support: [0],
+        probA: [0],
+        support_vectors: [[0]],
+        probB: [0],
+        dual_coef: [[0]]
+      },
+      cv_vocabulary: {
+        a: 0
+      }
+    };
+
     beforeEach(() => {
       TestBed.configureTestingModule({
         providers: [StateClassifierMappingService]
@@ -36,7 +72,7 @@ describe('State classifier mapping service', () => {
       mappingService.init({
         stateName1: {
           algorithm_id: 'TestClassifier',
-          classifier_data: {},
+          classifier_data: classifierData,
           data_schema_version: 1
         }
       });
@@ -48,7 +84,7 @@ describe('State classifier mapping service', () => {
         stateNameNonexistent);
 
       expect(retrievedClassifier.algorithmId).toEqual('TestClassifier');
-      expect(retrievedClassifier.classifierData).toEqual({});
+      expect(retrievedClassifier.classifierData).toEqual(classifierData);
       expect(retrievedClassifier.dataSchemaVersion).toEqual(1);
       expect(nonExistentClassifier).toBe(null);
     });
