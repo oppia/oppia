@@ -453,6 +453,7 @@ def main(args=None):
     commands = [common.NODE_BIN_PATH]
     if parsed_args.debug_mode:
         commands.append('--inspect-brk')
+    # This flag ensures tests fail if waitFor calls time out
     commands.append('--unhandled-rejections=strict')
     commands.append(PROTRACTOR_BIN_PATH)
     commands.extend(get_e2e_test_parameters(
