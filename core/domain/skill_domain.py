@@ -817,8 +817,8 @@ class Skill(python_utils.OBJECT):
             html_validation_service.add_math_content_to_math_rte_components(
                 skill_contents_dict['explanation']['html']))
         skill_contents_dict['written_translations'] = (
-            html_validation_service.
-            convert_html_fields_in_written_translations(
+            state_domain.WrittenTranslations.
+            convert_html_in_written_translations(
                 skill_contents_dict['written_translations'],
                 html_validation_service.
                 add_math_content_to_math_rte_components))

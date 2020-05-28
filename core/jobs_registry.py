@@ -33,11 +33,11 @@ from core.domain import skill_jobs_one_off
 from core.domain import stats_jobs_continuous
 from core.domain import stats_jobs_one_off
 from core.domain import story_jobs_one_off
+from core.domain import suggestion_jobs_one_off
 from core.domain import topic_jobs_one_off
 from core.domain import user_id_migration
 from core.domain import user_jobs_continuous
 from core.domain import user_jobs_one_off
-from core.domain import suggestion_jobs_one_off
 import python_utils
 
 # List of all manager classes for one-off batch jobs for which to show controls
@@ -53,7 +53,6 @@ ONE_OFF_JOB_MANAGERS = [
     exp_jobs_one_off.ExplorationMigrationJobManager,
     exp_jobs_one_off.ExplorationValidityJobManager,
     exp_jobs_one_off.HintsAuditOneOffJob,
-    suggestion_jobs_one_off.SuggestionAuditOneOffJob,
     exp_jobs_one_off.ItemSelectionInteractionOneOffJob,
     exp_jobs_one_off.ViewableExplorationsAuditJob,
     exp_jobs_one_off.ExplorationContentValidationJobForCKEditor,
@@ -93,7 +92,9 @@ ONE_OFF_JOB_MANAGERS = [
     user_jobs_one_off.UsernameLengthAuditOneOffJob,
     user_jobs_one_off.UsernameLengthDistributionOneOffJob,
     exp_jobs_one_off.MathExpressionInputInteractionOneOffJob,
-    exp_jobs_one_off.MultipleChoiceInteractionOneOffJob
+    exp_jobs_one_off.MultipleChoiceInteractionOneOffJob,
+    suggestion_jobs_one_off.SuggestionMathMigrationOneOffJob,
+    suggestion_jobs_one_off.SuggestionMathRteAuditOneOffJob
 ]
 
 # List of all manager classes for prod validation one-off batch jobs for which

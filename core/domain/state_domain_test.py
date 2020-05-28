@@ -47,7 +47,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'exp_id', 'owner_id', end_state_name='END',
             interaction_id='DragAndDropSortInput')
 
-        list_of_sets_of_html_strings = ['<p>list_of_sets_of_html_strings</p>']
+        html_string = '<p>list_of_sets_of_html_strings</p>'
+        list_of_sets_of_html_strings = [html_string]
+
         answer_group_dict = {
             'outcome': {
                 'dest': exploration.init_state_name,
@@ -65,6 +67,23 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     'x': [list_of_sets_of_html_strings]
                 },
                 'rule_type': 'IsEqualToOrdering'
+            }, {
+                'rule_type': 'HasElementXAtPositionY',
+                'inputs': {
+                    'x': html_string,
+                    'y': 2
+                }
+            }, {
+                'rule_type': 'HasElementXBeforeElementY',
+                'inputs': {
+                    'x': html_string,
+                    'y': html_string
+                }
+            }, {
+                'rule_type': 'IsEqualToOrderingWithOneItemAtIncorrectPosition',
+                'inputs': {
+                    'x': [list_of_sets_of_html_strings]
+                }
             }],
             'training_data': [],
             'tagged_skill_misconception_id': None
@@ -76,7 +95,12 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             exploration.init_state.interaction.get_all_html_content_strings())
         self.assertEqual(
             html_list,
-            ['<p>Feedback</p>', '<p>list_of_sets_of_html_strings</p>', '', ''])
+            [
+                '<p>Feedback</p>', '<p>list_of_sets_of_html_strings</p>',
+                '<p>list_of_sets_of_html_strings</p>',
+                '<p>list_of_sets_of_html_strings</p>',
+                '<p>list_of_sets_of_html_strings</p>',
+                '<p>list_of_sets_of_html_strings</p>', '', ''])
 
     def test_export_state_to_dict(self):
         """Test exporting a state to a dict."""
@@ -205,9 +229,12 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'explanation': {
                 'content_id': 'solution',
                 'html': (
-                    '<p><oppia-noninteractive-math '
-                    'raw_latex-with-value="&amp;quot;\\frac{x}{y}&amp;quot;">'
-                    '</oppia-noninteractive-math></p>')
+                    '<p>Value</p><oppia-noninteractive-' +
+                    'math math_content-with-value="{&amp;quot' +
+                    ';raw_latex&amp;quot;: &amp;quot;+,-,-,+' +
+                    '&amp;quot;, &amp;quot;svg_filename&amp;' +
+                    'quot;: &amp;quot;&amp;quot;}"></oppia' +
+                    '-noninteractive-math>')
             },
         }
 
@@ -238,9 +265,12 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         default_outcome = state_domain.Outcome(
             'Introduction', state_domain.SubtitledHtml(
                 'default_outcome', (
-                    '<p><oppia-noninteractive-math '
-                    'raw_latex-with-value="&amp;quot;\\frac{x}{y}&amp;quot;">'
-                    '</oppia-noninteractive-math></p>')),
+                    '<p>Value</p><oppia-noninteractive-' +
+                    'math math_content-with-value="{&amp;quot' +
+                    ';raw_latex&amp;quot;: &amp;quot;+,-,-,+' +
+                    '&amp;quot;, &amp;quot;svg_filename&amp;' +
+                    'quot;: &amp;quot;&amp;quot;}"></oppia' +
+                    '-noninteractive-math>')),
             False, [], None, None
         )
 

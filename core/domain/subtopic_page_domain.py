@@ -233,8 +233,8 @@ class SubtopicPage(python_utils.OBJECT):
             dict. The converted page_contents_dict.
         """
         page_contents_dict['written_translations'] = (
-            html_validation_service.
-            convert_html_fields_in_written_translations(
+            state_domain.WrittenTranslations.
+            convert_html_in_written_translations(
                 page_contents_dict['written_translations'],
                 html_validation_service.
                 add_math_content_to_math_rte_components))

@@ -27,7 +27,6 @@ from constants import constants
 from core.domain import android_validation_constants
 from core.domain import customization_args_util
 from core.domain import html_cleaner
-from core.domain import html_validation_service
 from core.domain import interaction_registry
 from core.domain import param_domain
 import feconf
@@ -150,6 +149,29 @@ class AnswerGroup(python_utils.OBJECT):
 
         self.outcome.validate()
 
+    @classmethod
+    def convert_html_in_answer_groups(cls, answer_group_dict, conversion_fn):
+        """Checks for HTML fields in an answer group and converts it according
+        to the conversion function.
+
+        Args:
+            answer_group_dict: dict. The answer group dict.
+            conversion_fn: function. The function to be used for converting the
+                HTML.
+        Returns:
+            answer_group_dict. dict. The converted answer group dict.
+        """
+
+        answer_group_dict['outcome']['feedback']['html'] = (
+            conversion_fn(answer_group_dict['outcome']['feedback']['html']))
+        for rule_spec_index, rule_spec in enumerate(
+                answer_group_dict['rule_specs']):
+            rule_spec_object = RuleSpec.from_dict(rule_spec)
+            answer_group_dict['rule_specs'][rule_spec_index] = (
+                rule_spec_object.convert_html_in_rule_spec(
+                    rule_spec, conversion_fn))
+        return answer_group_dict
+
 
 class Hint(python_utils.OBJECT):
     """Value object representing a hint."""
@@ -188,6 +210,23 @@ class Hint(python_utils.OBJECT):
     def validate(self):
         """Validates all properties of Hint."""
         self.hint_content.validate()
+
+    @classmethod
+    def convert_html_in_hint(cls, hint_dict, conversion_fn):
+        """Checks for HTML fields in the hints and converts it
+        according to the conversion function.
+
+        Args:
+            hint_dict: dict. The hints dict.
+            conversion_fn: function. The function to be used for converting the
+                HTML.
+        Returns:
+            hint_dict: dict. The converted hints dict.
+        """
+
+        hint_dict['hint_content']['html'] = (
+            conversion_fn(hint_dict['hint_content']['html']))
+        return hint_dict
 
 
 class Solution(python_utils.OBJECT):
@@ -550,10 +589,21 @@ class InteractionInstance(python_utils.OBJECT):
         if self.id == 'DragAndDropSortInput':
             for answer_group in self.answer_groups:
                 for rule_spec in answer_group.rule_specs:
-                    rule_spec_html_list = rule_spec.inputs['x']
-                    for rule_spec_html in rule_spec_html_list:
-                        html_list = html_list + rule_spec_html
-
+                    if rule_spec.rule_type == 'IsEqualToOrdering':
+                        rule_spec_html_list = rule_spec.inputs['x']
+                        for rule_spec_html in rule_spec_html_list:
+                            html_list = html_list + rule_spec_html
+                    elif (rule_spec.rule_type ==
+                          'IsEqualToOrderingWithOneItemAtIncorrectPosition'):
+                        rule_spec_html_list = rule_spec.inputs['x']
+                        for rule_spec_html in rule_spec_html_list:
+                            html_list = html_list + rule_spec_html
+                    elif rule_spec.rule_type == 'HasElementXAtPositionY':
+                        html_list = html_list + [rule_spec.inputs['x']]
+                    elif rule_spec.rule_type == 'HasElementXBeforeElementY':
+                        html_list = (
+                            html_list + [rule_spec.inputs['y']] +
+                            [rule_spec.inputs['x']])
         if self.default_outcome:
             default_outcome_html = self.default_outcome.feedback.html
             html_list = html_list + [default_outcome_html]
@@ -695,6 +745,23 @@ class Outcome(python_utils.OBJECT):
                 raise utils.ValidationError(
                     'Expected outcome refresher_exploration_id to be a string, '
                     'received %s' % self.refresher_exploration_id)
+
+    @classmethod
+    def convert_html_in_outcome(cls, outcome_dict, conversion_fn):
+        """Checks for HTML fields in the outcome and converts it
+        according to the conversion function.
+
+        Args:
+            outcome_dict: dict. The outcome dict.
+            conversion_fn: function. The function to be used for converting the
+                HTML.
+        Returns:
+            outcome_dict: dict. The converted outcome dict.
+        """
+
+        outcome_dict['feedback']['html'] = (
+            conversion_fn(outcome_dict['feedback']['html']))
+        return outcome_dict
 
 
 class Voiceover(python_utils.OBJECT):
@@ -1082,6 +1149,30 @@ class WrittenTranslations(python_utils.OBJECT):
 
         return translation_counts
 
+    @classmethod
+    def convert_html_in_written_translations(
+            cls, written_translations_dict, conversion_fn):
+        """Checks for HTML fields in the written translations and converts it
+        according to the conversion function.
+
+        Args:
+            written_translations_dict: dict. The written translations dict.
+            conversion_fn: function. The function to be used for converting the
+                HTML.
+        Returns:
+            written_translations_dict: dict. The converted written translations
+            dict.
+        """
+        for (content_id, language_code_to_written_translation) in (
+                written_translations_dict['translations_mapping'].items()):
+            for language_code in (
+                    language_code_to_written_translation.keys()):
+                written_translations_dict['translations_mapping'][
+                    content_id][language_code]['html'] = conversion_fn(
+                        written_translations_dict['translations_mapping'][
+                            content_id][language_code]['html'])
+        return written_translations_dict
+
 
 class RecordedVoiceovers(python_utils.OBJECT):
     """Value object representing a recorded voiceovers which stores voiceover of
@@ -1357,6 +1448,45 @@ class RuleSpec(python_utils.OBJECT):
                 # Otherwise, a simple parameter value needs to be normalizable
                 # by the parameter object in order to be valid.
                 param_obj.normalize(param_value)
+
+    @classmethod
+    def convert_html_in_rule_spec(cls, rule_spec_dict, conversion_fn):
+        """Checks for HTML fields in a Rule Spec and converts it according
+        to the conversion function.
+
+        Args:
+            rule_spec_dict: dict. The Rule Spec dict.
+            conversion_fn: function. The function to be used for converting the
+                HTML.
+        Returns:
+            rule_spec_dict. dict. The converted Rule Spec dict.
+        """
+
+        if rule_spec_dict['rule_type'] == 'HasElementXAtPositionY':
+            rule_spec_dict['inputs']['x'] = (
+                conversion_fn(rule_spec_dict['inputs']['x']))
+        elif rule_spec_dict['rule_type'] == 'HasElementXBeforeElementY':
+            rule_spec_dict['inputs']['x'] = (
+                conversion_fn(rule_spec_dict['inputs']['x']))
+            rule_spec_dict['inputs']['y'] = (
+                conversion_fn(rule_spec_dict['inputs']['y']))
+        elif rule_spec_dict['rule_type'] == 'IsEqualToOrdering':
+            for value_index, value in enumerate(rule_spec_dict['inputs']['x']):
+                rule_spec_dict['inputs']['x'][value_index][0] = (
+                    conversion_fn(value[0]))
+        elif (rule_spec_dict['rule_type'] ==
+              'IsEqualToOrderingWithOneItemAtIncorrectPosition'):
+            for value_index, value in enumerate(rule_spec_dict['inputs']['x']):
+                rule_spec_dict['inputs']['x'][value_index][0] = (
+                    conversion_fn(value[0]))
+        elif rule_spec_dict['rule_type'] == 'Equals':
+            if isinstance(rule_spec_dict['inputs']['x'], list):
+                for value_index, value in enumerate(
+                        rule_spec_dict['inputs']['x']):
+                    if isinstance(value, python_utils.BASESTRING):
+                        rule_spec_dict['inputs']['x'][value_index] = (
+                            conversion_fn(value))
+        return rule_spec_dict
 
 
 class SubtitledHtml(python_utils.OBJECT):
@@ -2113,41 +2243,46 @@ class State(python_utils.OBJECT):
             conversion_fn(state_dict['content']['html']))
         if state_dict['interaction']['default_outcome']:
             state_dict['interaction']['default_outcome'] = (
-                html_validation_service.
-                convert_html_fields_in_default_outcome(
+                Outcome.convert_html_in_outcome(
                     state_dict['interaction']['default_outcome'],
                     conversion_fn))
 
         for answer_group_index, answer_group in enumerate(
                 state_dict['interaction']['answer_groups']):
-            state_dict['interaction']['answer_groups'][answer_group_index] = (
-                html_validation_service.convert_html_fields_in_answer_group(
-                    answer_group, conversion_fn))
+            state_dict['interaction']['answer_groups'][answer_group_index][
+                'outcome'] = (
+                    Outcome.convert_html_in_outcome(
+                        answer_group['outcome'], conversion_fn))
+            for rule_spec_index, rule_spec in enumerate(
+                    answer_group['rule_specs']):
+                state_dict['interaction']['answer_groups'][answer_group_index][
+                    'rule_specs'][rule_spec_index] = (
+                        RuleSpec.convert_html_in_rule_spec(
+                            rule_spec, conversion_fn))
 
         if 'written_translations' in state_dict.keys():
             state_dict['written_translations'] = (
-                html_validation_service.
-                convert_html_fields_in_written_translations(
+                WrittenTranslations.
+                convert_html_in_written_translations(
                     state_dict['written_translations'], conversion_fn))
 
-        state_dict['interaction']['hints'] = (
-            html_validation_service.
-            convert_html_fields_in_hints(
-                state_dict['interaction']['hints'], conversion_fn))
+        for hint_index, hint in enumerate(state_dict['interaction']['hints']):
+            state_dict['interaction']['hints'][hint_index] = (
+                Hint.convert_html_in_hint(hint, conversion_fn))
 
         if state_dict['interaction']['solution']:
-            state_dict['interaction']['solution'] = (
-                html_validation_service.
-                convert_html_fields_in_solution(
-                    state_dict['interaction']['solution'], conversion_fn))
+            solution_html = state_dict[
+                'interaction']['solution']['explanation']['html']
+            state_dict['interaction']['solution']['explanation']['html'] = (
+                conversion_fn(solution_html))
+
 
         if state_dict['interaction']['id'] in (
                 'ItemSelectionInput', 'MultipleChoiceInput',
                 'DragAndDropSortInput'):
-            state_dict['interaction']['customization_args'] = (
-                html_validation_service.
-                convert_html_fields_in_customization_args(
-                    state_dict['interaction']['customization_args'],
-                    conversion_fn))
-
+            for value_index, value in enumerate(
+                    state_dict['interaction']['customization_args'][
+                        'choices']['value']):
+                state_dict['interaction']['customization_args']['choices'][
+                    'value'][value_index] = conversion_fn(value)
         return state_dict
