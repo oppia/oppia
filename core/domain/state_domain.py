@@ -1921,11 +1921,13 @@ class State(python_utils.OBJECT):
             Exception: 'solution_list' is not a list.
         """
         old_content_id_list = [
-            Solution.solution_content_id for Solution in self.interaction.solution]
+            Solution.solution_content_id for solution
+             in self.interaction.solution]
         self.interaction.solution = copy.deepcopy(solution_list)
 
         new_content_id_list = [
-            Solution.solution_content_id for Solution in self.interaction.solution]
+            Solution.solution_content_id for solution
+             in self.interaction.solution]
         self._update_content_ids_in_assets(
             old_content_id_list, new_content_id_list)
 
