@@ -220,11 +220,31 @@ def is_numeric_operand(string):
         return False
 
 
-# Given string must be a singular english alphabet or a valid greek letter.
-IS_ALGEBRAIC_OPERAND = lambda string: (
-    (string.isalpha() and len(string) == 1) or string in GREEK_LETTERS.keys())
+def is_algebraic_operand(string):
+    """Checks if the given string represents a valid algebraic operand
+    (variable). Given string must be a singular english alphabet or a valid
+    greek letter.
 
-IS_OPERAND = lambda c: is_numeric_operand(c) or IS_ALGEBRAIC_OPERAND(c)
+    Args:
+        string: str. The operand to be validated.
+
+    Returns:
+        bool. Whether the given string is a valid algebraic operand.
+    """
+    return (
+        string.isalpha() and len(string) == 1) or string in GREEK_LETTERS.keys()
+
+
+def is_operand(string):
+    """Checks if the given string represents a valid algebraic/numeric operand.
+
+    Args:
+        string: str. The operand to be validated.
+
+    Returns:
+        bool. Whether the given string is a valid algebraic/numeric operand.
+    """
+    return is_numeric_operand(string) or is_algebraic_operand(string)
 
 
 def contains_balanced_brackets(expression):
@@ -291,7 +311,7 @@ def tokenize(expression):
         if len(current_token) != 0:
             tokens.append(''.join(current_token))
         else:
-            if IS_ALGEBRAIC_OPERAND(expression[i]):
+            if is_algebraic_operand(expression[i]):
                 tokens.append(expression[i])
             else:
                 # This is required to signify the distinction between the unary
@@ -300,7 +320,7 @@ def tokenize(expression):
                 # operand and preceded by a '(' or must be the first character.
                 # otherwise its binary subtraction.
                 if expression[i] == '-' and i < len(expression) - 1:
-                    if (i == 0 or expression[i - 1] == '(') and IS_OPERAND(
+                    if (i == 0 or expression[i - 1] == '(') and is_operand(
                             expression[i + 1]):
                         tokens.append('~')
                     else:
@@ -328,7 +348,7 @@ def infix_to_postfix(expression):
     tokens = tokenize(expression)
 
     for token in tokens:
-        if IS_OPERAND(token):
+        if is_operand(token):
             postfix_expression.append(token)
         elif token in OPERATOR_PRECEDENCE.keys():
             while True:
@@ -384,7 +404,7 @@ def is_valid_postfix_expression(tokenized_expression):
     stack = []
 
     for token in tokenized_expression:
-        if IS_OPERAND(token):
+        if is_operand(token):
             stack.append(token)
         else:
             # If operator is unary negation, there must be at least one operand
@@ -398,7 +418,7 @@ def is_valid_postfix_expression(tokenized_expression):
                 stack[-1] = 'X'
 
     # In the end, the stack should only contain the resultant value, an operand.
-    return len(stack) == 1 and IS_OPERAND(stack[0])
+    return len(stack) == 1 and is_operand(stack[0])
 
 
 class Normalizers(python_utils.OBJECT):
@@ -656,7 +676,7 @@ class _Validators(python_utils.OBJECT):
         Returns:
             bool. Whether the given object contains valid latin letters.
         """
-        return all(IS_ALGEBRAIC_OPERAND(elem) for elem in obj)
+        return all(is_algebraic_operand(elem) for elem in obj)
 
     @staticmethod
     def is_valid_math_equation(obj):
