@@ -2061,6 +2061,8 @@ pre.oppia-pre-wrapped-text {
   padding-bottom: 25px;
   padding-top: 30px;
   position: relative;
+  background-color: white;
+  border-radius: 8px;
 }
 
 .oppia-page-heading {
