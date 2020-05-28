@@ -266,7 +266,7 @@ describe('Collection object factory', () => {
     });
     secondCollection.addCollectionNode(collectionNodeObjectFactory.create({
       exploration_id: 'exp_id5',
-      exploration: {}
+      exploration_summary: {}
     }));
 
     _addCollectionNode('exp_id0');
