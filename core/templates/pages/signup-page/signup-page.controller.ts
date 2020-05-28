@@ -18,9 +18,10 @@
 
 require('base-components/base-content.directive.ts');
 require(
-  'pages/signup-page/modal-templates/licence-explanation-modal.controller.ts');
+  'pages/signup-page/modal-templates/license-explanation-modal.controller.ts');
 require(
-  'pages/signup-page/modal-templates/licence-explanation-modal.controller.ts');
+  'pages/signup-page/modal-templates/' +
+  'registration-session-expired-modal.controller.ts');
 
 require('domain/utilities/url-interpolation.service.ts');
 require('services/alerts.service.ts');
@@ -64,7 +65,7 @@ angular.module('oppia').directive('signupPage', [
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/signup-page/modal-templates/' +
-                'licence-explanation-modal.template.directive.html'),
+                'license-explanation-modal.template.directive.html'),
               backdrop: true,
               controller: 'LicenseExplanationModalController'
             }).result.then(function() {}, function() {
@@ -191,7 +192,6 @@ angular.module('oppia').directive('signupPage', [
                 'registration-session-expired-modal.template.html'),
               backdrop: 'static',
               keyboard: false,
-              resolve: {},
               controller: 'RegistrationSessionExpiredModalController'
             });
           };

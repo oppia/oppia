@@ -208,7 +208,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'learner-view-rating.service.ts',
     'library-footer.directive.ts',
     'library-page.directive.ts',
-    'licence-explanation-modal.controller.ts',
+    'license-explanation-modal.controller.ts',
     'list-of-sets-of-html-strings-editor.directive.ts',
     'list-of-tabs-editor.directive.ts',
     'list-of-unicode-string-editor.directive.ts',

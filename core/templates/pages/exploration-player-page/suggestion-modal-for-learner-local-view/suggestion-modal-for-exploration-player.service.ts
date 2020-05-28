@@ -36,7 +36,6 @@ angular.module('oppia').factory('SuggestionModalForExplorationPlayerService', [
           'pages/exploration-player-page/templates/' +
           'exploration-player-suggestion-modal.directive.html'),
         backdrop: 'static',
-        resolve: {},
         controller: 'ExplorationPlayerSuggestionModalController'
       }).result.then(function(result) {
         var data = {
