@@ -169,11 +169,14 @@ angular.module('oppia').directive('skillsList', [
 
                   $scope.skillSummaries = skillSummaries;
                   $scope.selectedSkillId = '';
-                  $scope.save = function() {
+                  $scope.confirm = function() {
                     $uibModalInstance.close(
                       {skill: skill,
                         supersedingSkillId: $scope.selectedSkillId
                       });
+                  };
+                  $scope.save = function() {
+                    $scope.confirm();
                   };
                 }
               ]
