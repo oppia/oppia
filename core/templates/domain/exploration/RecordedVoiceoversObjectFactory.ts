@@ -81,10 +81,6 @@ export class RecordedVoiceovers {
       this.voiceoversMapping[contentId].hasOwnProperty(langCode));
   }
 
-  getVoiceover(contentId: string, langCode: string): Voiceover {
-    return this.voiceoversMapping[contentId][langCode];
-  }
-
   hasUnflaggedVoiceovers(contentId: string): boolean {
     return Object.values(this.voiceoversMapping[contentId])
       .some(voiceover => !voiceover.needsUpdate);
