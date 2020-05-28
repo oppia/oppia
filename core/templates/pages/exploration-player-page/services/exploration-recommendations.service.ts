@@ -25,26 +25,21 @@ import { ContextService } from 'services/context.service';
 import { ServicesConstants } from 'services/services.constants';
 import { UrlService } from 'services/contextual/url.service';
 
-export interface ISummary {
-  category: string;
-  // eslint-disable-next-line camelcase
-  community_owned: boolean;
-  id: string;
-  // eslint-disable-next-line camelcase
-  language_code: string;
-  // eslint-disable-next-line camelcase
-  num_views: number;
-  objective: string;
-  status: string;
-  tags: string[];
-  // eslint-disable-next-line camelcase
-  thumbnail_bg_color: string;
-  // eslint-disable-next-line camelcase
-  thumbnail_icon_url: string;
-  title: string;
+export interface IExplorationSummary {
+  'category'?: string;
+  'community_owned'?: boolean;
+  'id'?: string;
+  'language_code'?: string;
+  'num_views'?: number;
+  'objective'?: string;
+  'status'?: string;
+  'tags'?: string[];
+  'thumbnail_bg_color'?: string;
+  'thumbnail_icon_url'?: string;
+  'title'?: string;
 }
-export interface ISummaries {
-  summaries: ISummary[];
+export interface IExplorationSummaries {
+  summaries: IExplorationSummary[];
 }
 type RecommendationsUrlParams = {
   /* eslint-disable camelcase */
@@ -113,7 +108,7 @@ export class ExplorationRecommendationsService {
       '/explorehandler/recommendations/' +
       ExplorationRecommendationsService.explorationId, {
         params: recommendationsUrlParams
-      }).toPromise().then((data: ISummaries) => {
+      }).toPromise().then((data: IExplorationSummaries) => {
       successCallback(data.summaries);
     });
   }
