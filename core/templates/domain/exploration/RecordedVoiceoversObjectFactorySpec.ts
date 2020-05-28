@@ -198,10 +198,10 @@ describe('RecordedVoiceovers object factory', () => {
 
   it('should return false when checking unflagged voiceovers of non-existing ' +
     'content ids', () => {
-      expect(rv.hasUnflaggedVoiceovers('content')).toBe(true);
-      rv.deleteContentId('content');
-      expect(rv.hasUnflaggedVoiceovers('content')).toBe(false);
-    });
+    expect(rv.hasUnflaggedVoiceovers('content')).toBe(true);
+    rv.deleteContentId('content');
+    expect(rv.hasUnflaggedVoiceovers('content')).toBe(false);
+  });
 
   it('should add a given content id', () => {
     rv.addContentId('feedback_3');
