@@ -103,54 +103,72 @@ export class RuleInputTypeFactory {
     if (this._isGraph(variable)) {
       return variable;
     }
+
+    throw new Error('variable is not of type IGraphBackendDict.');
   }
 
   notesInstance(variable: IRuleInput): INote[] {
     if (this._isNoteArray(variable)) {
       return variable;
     }
+
+    throw new Error('variable is not of type INote[].');
   }
 
   numberWithUnitsInstance(variable: IRuleInput): INumberWithUnitsBackendDict {
     if (this._isNumberWithUnits(variable)) {
       return variable;
     }
+
+    throw new Error('variable is not of type INumberWithUnitsBackendDict.');
   }
 
   fractionInstance(variable: IRuleInput): IFractionDict {
     if (this._isFraction(variable)) {
       return variable;
     }
+
+    throw new Error('variable is not of type IFractionDict.');
   }
 
   stringInstance(variable: IRuleInput): string {
     if (this._isString(variable)) {
       return variable;
     }
+
+    throw new Error('variable is not of type string.');
   }
 
   numberInstance(variable: IRuleInput): number {
     if (this._isNumber(variable)) {
       return variable;
     }
+
+    throw new Error('variable is not of type number.');
   }
 
   stringArrayInstance(variable: IRuleInput): string[] {
     if (this._isStringArray(variable)) {
       return variable;
     }
+
+    throw new Error('variable is not of type string[].');
   }
 
   stringArrayArrayInstance(variable: IRuleInput): string[][] {
     if (this._isStringArrayArray(variable)) {
       return variable;
     }
+
+    throw new Error('variable is not of type string[][].');
   }
 
   numberArrayInstance(variable: IRuleInput): number[] {
     if (this._isNumberArray(variable)) {
       return variable;
     }
+
+    throw new Error('variable is not of type number[].');
   }
 }
 
