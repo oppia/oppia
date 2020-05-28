@@ -21,7 +21,31 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import {
+<<<<<<< HEAD
   IWrittenTranslationBackendDict,
+  WrittenTranslation, WrittenTranslationObjectFactory
+} from 'domain/exploration/WrittenTranslationObjectFactory';
+
+type TranslationsMapping = {
+  [contentId: string]: {[langCode: string]: WrittenTranslation}
+};
+
+type ITranslationBackendDictMapping = {
+  [contentId: string]: {[langCode: string]: IWrittenTranslationBackendDict}
+};
+
+export interface IWrittenTranslationsBackendDict {
+  /* eslint-disable camelcase */
+  translations_mapping: ITranslationBackendDictMapping;
+  /* eslint-enable camelcase */
+}
+
+export class WrittenTranslations {
+  constructor(
+      private writtenTranslationObjectFactory: WrittenTranslationObjectFactory,
+      public translationsMapping: TranslationsMapping) {}
+=======
+  ITranslationBackendDict,
   WrittenTranslation,
   WrittenTranslationObjectFactory
 } from 'domain/exploration/WrittenTranslationObjectFactory';
@@ -29,7 +53,7 @@ import {
 interface IWrittenTranslationsBackendDict {
   'translations_mapping': {
     [contentId: string]: {
-      [langCode: string]: IWrittenTranslationBackendDict
+      [langCode: string]: ITranslationBackendDict
     }
   }
 }
@@ -41,17 +65,28 @@ interface IWrittenTranslationsMapping {
 }
 
 export class WrittenTranslations {
+  translationsMapping: IWrittenTranslationsMapping;
+  _writtenTranslationObjectFactory: WrittenTranslationObjectFactory;
   constructor(
-      private writtenTranslationObjectFactory: WrittenTranslationObjectFactory,
-      private translationsMapping: IWrittenTranslationsMapping) {
+      translationsMapping: IWrittenTranslationsMapping,
+      writtenTranslationObjectFactory: WrittenTranslationObjectFactory) {
     this.translationsMapping = translationsMapping;
-    this.writtenTranslationObjectFactory = writtenTranslationObjectFactory;
+    this._writtenTranslationObjectFactory = writtenTranslationObjectFactory;
   }
+>>>>>>> upstream/develop
 
   getAllContentId(): string[] {
     return Object.keys(this.translationsMapping);
   }
 
+<<<<<<< HEAD
+=======
+  getWrittenTranslation(
+      contentId: string, langCode: string): WrittenTranslation {
+    return this.translationsMapping[contentId][langCode];
+  }
+
+>>>>>>> upstream/develop
   markAllTranslationsAsNeedingUpdate(contentId: string): void {
     Object.values(this.translationsMapping[contentId])
       .forEach(t => t.markAsNeedingUpdate());
@@ -116,6 +151,7 @@ export class WrittenTranslations {
   }
 
   toBackendDict(): IWrittenTranslationsBackendDict {
+<<<<<<< HEAD
     const translationBackendDictMapping = {};
     for (const contentId in this.translationsMapping) {
       translationBackendDictMapping[contentId] = {};
@@ -123,6 +159,17 @@ export class WrittenTranslations {
         translationBackendDictMapping[contentId][langCode] = (
           this.translationsMapping[contentId][langCode].toBackendDict());
       }
+=======
+    var translationsMappingDict = {};
+    for (var contentId in this.translationsMapping) {
+      var languageToWrittenTranslation = this.translationsMapping[contentId];
+      var languageToWrittenTranslationDict = {};
+      Object.keys(languageToWrittenTranslation).forEach((lang) => {
+        languageToWrittenTranslationDict[lang] = (
+          languageToWrittenTranslation[lang].toBackendDict());
+      });
+      translationsMappingDict[contentId] = languageToWrittenTranslationDict;
+>>>>>>> upstream/develop
     }
     return {translations_mapping: translationBackendDictMapping};
   }
@@ -133,12 +180,13 @@ export class WrittenTranslations {
 })
 export class WrittenTranslationsObjectFactory {
   constructor(
+<<<<<<< HEAD
       private writtenTranslationObjectFactory:
         WrittenTranslationObjectFactory) {}
 
   createFromBackendDict(
       backendDict: IWrittenTranslationsBackendDict): WrittenTranslations {
-    const translationsMapping: IWrittenTranslationsMapping = {};
+    const translationsMapping: TranslationsMapping = {};
     for (const contentId in backendDict.translations_mapping) {
       translationsMapping[contentId] = {};
       for (const langCode in backendDict.translations_mapping[contentId]) {
@@ -147,6 +195,26 @@ export class WrittenTranslationsObjectFactory {
             backendDict.translations_mapping[contentId][langCode]));
       }
     }
+=======
+    private writtenTranslationObjectFactory: WrittenTranslationObjectFactory) {}
+
+  createFromBackendDict(
+      writtenTranslationsDict: IWrittenTranslationsBackendDict):
+      WrittenTranslations {
+    var translationsMapping = {};
+    Object.keys(writtenTranslationsDict.translations_mapping).forEach(
+      (contentId) => {
+        translationsMapping[contentId] = {};
+        var languageCodeToWrittenTranslationDict = (
+          writtenTranslationsDict.translations_mapping[contentId]);
+        Object.keys(languageCodeToWrittenTranslationDict).forEach(
+          (langCode) => {
+            translationsMapping[contentId][langCode] = (
+              this.writtenTranslationObjectFactory.createFromBackendDict(
+                languageCodeToWrittenTranslationDict[langCode]));
+          });
+      });
+>>>>>>> upstream/develop
     return new WrittenTranslations(
       this.writtenTranslationObjectFactory, translationsMapping);
   }
