@@ -16,7 +16,7 @@
 
             <div>
               <div ng-style="($index > 0 && !$ctrl.storyPlaythroughObject.getStoryNodes()[$index-1].isCompleted() && {'opacity': '0.5', 'display': 'flex'}) || { 'display': 'flex' }">
-                <svg ng-if="!$last" 
+                <svg ng-if="!$last"
                      width="130px"
                      height="300px"
                      ng-style="height: 300px;"
@@ -52,7 +52,7 @@
                           <rect width="240"
                                 height="180"
                                 ng-attr-fill="<[$ctrl.pathIconParameters[$index].thumbnailBgColor]>"/>
-                          
+
                           <image ng-if="!node.isCompleted()"
                                  x="0"
                                  y="0"
