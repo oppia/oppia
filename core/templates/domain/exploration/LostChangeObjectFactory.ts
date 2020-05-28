@@ -138,10 +138,6 @@ export class LostChange {
 export class LostChangeObjectFactory {
   constructor(private utilsService: UtilsService) {}
 
-  /**
-   * @param {String} lostChangeDict - the name of the type to fetch.
-   * @returns {LostChange} - The associated type, if any.
-   */
   createNew(lostChangeDict: ILostChangeBackendDict): LostChange {
     return new LostChange(
       this.utilsService,

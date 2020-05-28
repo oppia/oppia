@@ -30,12 +30,10 @@ export interface IParamSpecBackendDict {
 export class ParamSpec {
   constructor(private objType: ParamType) {}
 
-  /** @returns {ParamType} - The type name of the parameter. */
   getType(): ParamType {
     return this.objType;
   }
 
-  /** @returns {{obj_type: String}} - Basic dict for backend consumption. */
   toBackendDict(): IParamSpecBackendDict {
     return {
       obj_type: this.objType.getName(),
@@ -48,11 +46,6 @@ export class ParamSpec {
 })
 export class ParamSpecObjectFactory {
   constructor(private paramTypeObjectFactory: ParamTypeObjectFactory) {}
-  /**
-   * @param {!{obj_type: String}} paramSpecBackendDict - Basic dict from
-   *    backend.
-   * @returns {ParamSpec} - A new ParamSpec instance.
-   */
   createFromBackendDict(
       paramSpecBackendDict: IParamSpecBackendDict): ParamSpec {
     return new ParamSpec(this.paramTypeObjectFactory.getTypeFromBackendName(

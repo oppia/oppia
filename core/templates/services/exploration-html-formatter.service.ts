@@ -39,18 +39,18 @@ export class ExplorationHtmlFormatterService {
       private htmlEscaperService: HtmlEscaperService) {}
 
   /**
-   * @param {string} interactionId - The interaction id.
-   * @param {object} interactionCustomizationArgSpecs - The various
-   *   attributes that the interaction depends on.
-   * @param {boolean} parentHasLastAnswerProperty - If this function is
-   *   called in the exploration_player view (including the preview mode),
-   *   callers should ensure that parentHasLastAnswerProperty is set to
-   *   true and $scope.lastAnswer =
-   *   PlayerTranscriptService.getLastAnswerOnDisplayedCard(index) is set on
-   *   the parent controller of the returned tag.
-   *   Otherwise, parentHasLastAnswerProperty should be set to false.
-   * @param {string} labelForFocusTarget - The label for setting focus on
-   *   the interaction.
+   * @param interactionId - The interaction id.
+   * @param interactionCustomizationArgSpecs - The various attributes that the
+   *   interaction depends on.
+   * @param parentHasLastAnswerProperty - If this function is called in the
+   *   exploration_player view (including the preview mode), callers should
+   *   ensure that parentHasLastAnswerProperty is set to true and
+   *   $scope.lastAnswer = (
+   *     PlayerTranscriptService.getLastAnswerOnDisplayedCard(index)) is set on
+   *     the parent controller of the returned tag. Otherwise,
+   *     parentHasLastAnswerProperty should be set to false.
+   * @param labelForFocusTarget - The label for setting focus on the
+   *   interaction.
    */
   getInteractionHtml(
       interactionId: string, interactionCustomizationArgSpecs: object,

@@ -41,9 +41,6 @@ export class ParamSpecs {
     return this.paramDict[paramName];
   }
 
-  /**
-   * @returns {Object.<String, ParamSpec>} - the map of params to their specs.
-   */
   getParamDict(): IParamDict {
     return this.paramDict;
   }
@@ -65,19 +62,11 @@ export class ParamSpecs {
     return false;
   }
 
-  /**
-   * @callback callback - Passed the name and corresponding ParamSpec of each
-   *   parameter in the specs.
-   */
   forEach(callback: Function): void {
     Object.entries(this.paramDict).forEach(
       ([paramName, paramSpec]) => callback(paramName, paramSpec));
   }
 
-  /**
-   * @returns {Object.<String, {obj_type: String}>} - Basic dict for backend
-   *    consumption.
-   */
   toBackendDict(): IParamSpecsBackendDict {
     var paramSpecsBackendDict = {};
     Object.entries(this.paramDict).forEach(([paramName, paramSpec]) => {
@@ -93,12 +82,6 @@ export class ParamSpecs {
 export class ParamSpecsObjectFactory {
   constructor(private paramSpecObjectFactory: ParamSpecObjectFactory) {}
 
-  /**
-   * @param {!Object.<String, {obj_type: String}>} paramSpecsBackendDict -
-   *    Basic dict of backend representation.
-   * @returns {ParamSpecs} - An instance with properties from the backend
-   *    dict.
-   */
   createFromBackendDict(backendDict: IParamSpecsBackendDict): ParamSpecs {
     var paramDict = {};
     for (const [paramName, paramBackendDict] of Object.entries(backendDict)) {
