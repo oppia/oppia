@@ -21,6 +21,8 @@ require(
   'components/common-layout-directives/common-elements/' +
   'background-banner.component.ts');
 
+require(
+  'components/forms/custom-forms-directives/select2-dropdown.directive.ts');
 require('components/entity-creation-services/skill-creation.service.ts');
 require('components/entity-creation-services/topic-creation.service.ts');
 require('components/rubrics-editor/rubrics-editor.directive.ts');
@@ -62,7 +64,7 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
         'topics-and-skills-dashboard-page.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$http', '$rootScope', '$scope', '$uibModal', '$window',
+        '$timeout', '$http', '$rootScope', '$scope', '$uibModal', '$window',
         'AlertsService', 'TopicsAndSkillsDashboardFilterObjectFactory',
         'RubricObjectFactory', 'SkillCreationService',
         'SkillObjectFactory', 'TopicCreationService',
@@ -74,9 +76,10 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
         'EVENT_TYPE_TOPIC_CREATION_ENABLED',
         'FATAL_ERROR_CODES', 'SKILL_DIFFICULTIES',
         'MAX_CHARS_IN_SKILL_DESCRIPTION', 'SKILL_DESCRIPTION_STATUS_VALUES',
-        'TOPIC_SORT_OPTIONS', 'TOPIC_PUBLISHED_OPTIONS',
+        'TOPIC_FILTER_DEFAULT_VALUE', 'TOPIC_SORT_OPTIONS',
+        'TOPIC_PUBLISHED_OPTIONS',
         function(
-            $http, $rootScope, $scope, $uibModal, $window,
+            $timeout, $http, $rootScope, $scope, $uibModal, $window,
             AlertsService, TopicsAndSkillsDashboardFilterObjectFactory,
             RubricObjectFactory, SkillCreationService,
             SkillObjectFactory, TopicCreationService,
@@ -88,7 +91,8 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
             EVENT_TYPE_TOPIC_CREATION_ENABLED,
             FATAL_ERROR_CODES, SKILL_DIFFICULTIES,
             MAX_CHARS_IN_SKILL_DESCRIPTION, SKILL_DESCRIPTION_STATUS_VALUES,
-            TOPIC_SORT_OPTIONS, TOPIC_PUBLISHED_OPTIONS) {
+            TOPIC_FILTER_DEFAULT_VALUE, TOPIC_SORT_OPTIONS,
+            TOPIC_PUBLISHED_OPTIONS) {
           var ctrl = this;
 
           /**
@@ -99,21 +103,8 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
           ctrl._initDashboard = function(stayInSameTab) {
             TopicsAndSkillsDashboardBackendApiService.fetchDashboardData().then(
               function(response) {
-                // TODO(#9364): Remove the following line once this file and
-                // the corresponding spec file is upgraded to Angular 8.
-                // The following condition is required for Karma testing. The
-                // Angular HttpClient returns an Observable which when converted
-                // to a promise does not have the 'data' key but the AngularJS
-                // mocks of services using HttpClient use $http which return
-                // promise and the content is contained in the 'data' key.
-                // Therefore the following condition checks for presence of
-                // 'response.data' which would be the case in AngularJS testing
-                // but assigns 'response' if the former is not present which is
-                // the case with HttpClient.
-                var responseData = response.data ? response.data : response;
-
-                ctrl.totalTopicSummaries = responseData.topic_summary_dicts;
-                ctrl.topicSummaries = responseData.topic_summary_dicts;
+                ctrl.totalTopicSummaries = response.topic_summary_dicts;
+                ctrl.topicSummaries = response.topic_summary_dicts;
                 ctrl.totalEntityCountToDisplay = ctrl.topicSummaries.length;
                 ctrl.currentCount = ctrl.totalEntityCountToDisplay;
                 ctrl.activeTab = ctrl.TAB_NAME_TOPICS;
@@ -124,22 +115,22 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
                   }
                 );
                 ctrl.untriagedSkillSummaries =
-                    responseData.untriaged_skill_summary_dicts;
+                    response.untriaged_skill_summary_dicts;
                 ctrl.totalUntriagedSkillSummaries =
                     ctrl.untriagedSkillSummaries;
                 ctrl.mergeableSkillSummaries =
-                    responseData.mergeable_skill_summary_dicts;
+                    response.mergeable_skill_summary_dicts;
                 if (!stayInSameTab || !ctrl.activeTab) {
                   ctrl.activeTab = ctrl.TAB_NAME_TOPICS;
                 }
-                ctrl.userCanCreateTopic = responseData.can_create_topic;
-                ctrl.userCanCreateSkill = responseData.can_create_skill;
+                ctrl.userCanCreateTopic = response.can_create_topic;
+                ctrl.userCanCreateSkill = response.can_create_skill;
                 $rootScope.$broadcast(
                   EVENT_TYPE_TOPIC_CREATION_ENABLED, ctrl.userCanCreateTopic);
                 $rootScope.$broadcast(
                   EVENT_TYPE_SKILL_CREATION_ENABLED, ctrl.userCanCreateSkill);
-                ctrl.userCanDeleteTopic = responseData.can_delete_topic;
-                ctrl.userCanDeleteSkill = responseData.can_delete_skill;
+                ctrl.userCanDeleteTopic = response.can_delete_topic;
+                ctrl.userCanDeleteSkill = response.can_delete_skill;
 
                 if (ctrl.topicSummaries.length === 0 &&
                     ctrl.untriagedSkillSummaries.length !== 0) {
@@ -209,7 +200,6 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
                     pageNumber * ctrl.itemsPerPage,
                     (pageNumber + 1) * ctrl.itemsPerPage);
             }
-            ctrl.applyFilters();
           };
           /**
            * @param {String} direction - Direction, whether to change the
@@ -235,13 +225,22 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
                 ctrl.topicSummaries.slice(0, ctrl.itemsPerPage);
             ctrl.currentCount = ctrl.topicSummaries.length;
             ctrl.goToPageNumber(0);
+            $scope.$applyAsync();
+            _forceSelect2Refresh();
+          };
+
+          var _forceSelect2Refresh = function() {
+            ctrl.select2DropdownIsShown = false;
+            $timeout(function() {
+              ctrl.select2DropdownIsShown = true;
+            }, 100);
           };
 
           ctrl.resetFilters = function() {
             ctrl.topicSummaries = ctrl.totalTopicSummaries;
             ctrl.currentCount = ctrl.totalEntityCountToDisplay;
             ctrl.filterObject.reset();
-            ctrl.goToPageNumber(0);
+            ctrl.applyFilters();
           };
 
           ctrl.refreshPagination = function() {
@@ -264,13 +263,20 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
             ctrl.filterObject = (
               TopicsAndSkillsDashboardFilterObjectFactory.createDefault());
             ctrl.categories = angular.copy(ALLOWED_TOPIC_CATEGORIES);
-            // Adding this since karma tests were adding 'All' for
-            // every it block.
-            if (!ctrl.categories.includes('All')) {
-              ctrl.categories.unshift('All');
+            // Adding this since karma tests adding TOPIC_FILTER_DEFAULT_VALUE
+            // for every it block.
+            if (!ctrl.categories.includes(TOPIC_FILTER_DEFAULT_VALUE)) {
+              ctrl.categories.unshift(TOPIC_FILTER_DEFAULT_VALUE);
             }
-            ctrl.sortOptions = TOPIC_SORT_OPTIONS;
-            ctrl.statusOptions = TOPIC_PUBLISHED_OPTIONS;
+            ctrl.sortOptions = [];
+            for (let key in TOPIC_SORT_OPTIONS) {
+              ctrl.sortOptions.push(TOPIC_SORT_OPTIONS[key]);
+            }
+            ctrl.statusOptions = [];
+            for (let key in TOPIC_PUBLISHED_OPTIONS) {
+              ctrl.statusOptions.push(TOPIC_PUBLISHED_OPTIONS[key]);
+            }
+            ctrl.select2DropdownIsShown = true;
 
             ctrl.generateNumbersTillRange = function(range) {
               var arr = [];

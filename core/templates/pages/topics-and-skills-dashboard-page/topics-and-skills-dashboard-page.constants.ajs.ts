@@ -46,3 +46,6 @@ angular.module('oppia').constant(
 angular.module('oppia').constant(
   'TOPIC_PUBLISHED_OPTIONS',
   TopicsAndSkillsDashboardPageConstants.TOPIC_PUBLISHED_OPTIONS);
+angular.module('oppia').constant(
+  'TOPIC_FILTER_DEFAULT_VALUE',
+  TopicsAndSkillsDashboardPageConstants.TOPIC_FILTER_DEFAULT_VALUE);

@@ -79,7 +79,7 @@ angular.module('oppia').controller('CreateNewSkillModal', [
           $scope.newSkillDescription)) {
         $scope.errorMsg = (
           'Please use a non-empty description consisting of ' +
-                    'alphanumeric characters, spaces and/or hyphens.');
+          'alphanumeric characters, spaces and/or hyphens.');
         return;
       }
       $uibModalInstance.close({

@@ -273,8 +273,6 @@ angular.module('oppia').directive('creatorDashboardPage', [
               CreatorDashboardBackendApiService.fetchDashboardData());
             dashboardDataPromise.then(
               function(response) {
-                // TODO(#9364): Remove the following line once this file and
-                // the corresponding spec file is upgraded to Angular 8.
                 // The following condition is required for Karma testing. The
                 // Angular HttpClient returns an Observable which when converted
                 // to a promise does not have the 'data' key but the AngularJS

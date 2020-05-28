@@ -95,11 +95,11 @@ describe('Topic and Skill dashboard page service', () => {
     let filteredArray = tsds.getFilteredTopics(topicsArray, filterOptions);
     expect(filteredArray).toEqual(topicsArray);
 
-    filterOptions.keyword = 'alp';
+    filterOptions.keywords = ['alp'];
     filteredArray = tsds.getFilteredTopics(topicsArray, filterOptions);
     expect(filteredArray).toEqual([topic1]);
 
-    filterOptions.keyword = '';
+    filterOptions.keywords = [];
     filterOptions.status = ETopicPublishedOptions.Published;
     filteredArray = tsds.getFilteredTopics(topicsArray, filterOptions);
     expect(filteredArray).toEqual([topic3, topic1]);

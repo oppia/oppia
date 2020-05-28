@@ -111,22 +111,17 @@
             </div>
             <div class="topic-skill-filter-row">
               <div class="topic-skill-filter-key">
-                <span>keywords</span>
-              </div>
-              <div class="topic-skill-filter-value">
-                <input type="text" ng-change="$ctrl.applyFilters()" ng-model="$ctrl.filterObject.keyword" class="protractor-test-topic-filter-keyword">
-              </div>
-            </div>
-            <div class="topic-skill-filter-row">
-              <div class="topic-skill-filter-key">
                 <span>Status</span>
               </div>
               <div class="topic-skill-filter-value">
-                <select class="form-control protractor-test-select-skill-dropdown"
-                        ng-model="$ctrl.filterObject.status"
-                        ng-options="item for item in $ctrl.statusOptions"
-                        ng-change="$ctrl.applyFilters()">
-                </select>
+                <div ng-if="$ctrl.select2DropdownIsShown">
+                  <select2-dropdown class="protractor-test-select-status-dropdown"
+                                    choices="$ctrl.statusOptions"
+                                    item="$ctrl.filterObject.status"
+                                    width="100%"
+                                    on-selection-change="$ctrl.applyFilters()">
+                  </select2-dropdown>
+                </div>
               </div>
             </div>
             <div class="topic-skill-filter-row">
@@ -134,11 +129,14 @@
                 <span>Category</span>
               </div>
               <div class="topic-skill-filter-value">
-                <select class="form-control protractor-test-topic-filter-category"
-                        ng-model="$ctrl.filterObject.category"
-                        ng-options="item for item in $ctrl.categories"
-                        ng-change="$ctrl.applyFilters()">
-                </select>
+                <div ng-if="$ctrl.select2DropdownIsShown">
+                  <select2-dropdown item="$ctrl.filterObject.category"
+                                    class="protractor-test-topic-filter-category"
+                                    choices="$ctrl.categories"
+                                    width="100%"
+                                    on-selection-change="$ctrl.applyFilters()">
+                  </select2-dropdown>
+                </div>
               </div>
             </div>
             <div class="topic-skill-filter-row">
@@ -146,11 +144,31 @@
                 <span>Sort</span>
               </div>
               <div class="topic-skill-filter-value">
-                <select class="form-control protractor-test-select-skill-dropdown"
-                        ng-model="$ctrl.filterObject.sort"
-                        ng-options="item for item in $ctrl.sortOptions"
-                        ng-change="$ctrl.applyFilters()">
-                </select>
+                <div ng-if="$ctrl.select2DropdownIsShown">
+                  <select2-dropdown class="protractor-test-select-category-dropdown"
+                                    choices="$ctrl.sortOptions"
+                                    item="$ctrl.filterObject.sort"
+                                    width="100%"
+                                    on-selection-change="$ctrl.applyFilters()">
+                  </select2-dropdown>
+                </div>
+              </div>
+            </div>
+            <div class="topic-skill-filter-row">
+              <div class="topic-skill-filter-key">
+                <span>Keywords</span>
+              </div>
+              <div class="topic-skill-filter-value">
+                <div ng-if="$ctrl.select2DropdownIsShown">
+                  <select2-dropdown item="$ctrl.filterObject.keywords"
+                                    class="protractor-test-select-keyword-dropdown"
+                                    choices="$ctrl.filterObject.keywords"
+                                    allow-multiple-choices="true"
+                                    new-choice-regex="<[::$ctrl.TAG_REGEX_STRING]>"
+                                    width="100%"
+                                    on-selection-change="$ctrl.applyFilters()">
+                  </select2-dropdown>
+                </div>
               </div>
             </div>
           </div>
@@ -245,12 +263,12 @@
     height: 100%;
   }
   .oppia-topics-and-skills-dashboard .create-topic-skill i {
-    color: #28a745;
+    color: #00645C;
     font-size: 30px;
     width: 100%;
   }
   .oppia-topics-and-skills-dashboard .create-topic-skill span {
-    color: #28a745;
+    color: #00645C;
     display: inline-block;
     font-size: 14px;
     line-height: 15px;
@@ -276,7 +294,7 @@
   }
   .oppia-topics-and-skills-dashboard .topic-skill-filter-reset {
     bottom: 0;
-    color: #28a745;
+    color: #00645C;
     cursor: pointer;
     position: absolute;
     right: 0;
@@ -312,7 +330,7 @@
     padding: 0 4px;
   }
   .oppia-topics-and-skills-dashboard .dashboard-list-pagination-active {
-    color: #28a745;
+    color: #00645C;
   }
   .oppia-topics-and-skills-dashboard .dashboard-tabs {
     display: flex;

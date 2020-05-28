@@ -45,7 +45,7 @@ var TopicsAndSkillsDashboardPage = function() {
   var topicCategoryField = element(by.css(
     '.protractor-test-new-topic-category-field'));
   var topicFilterKeywordField = element(by.css(
-    '.protractor-test-topic-filter-keyword'));
+    '.protractor-test-select-keyword-dropdown'));
   var topicFilterCategoryField = element(by.css(
     '.protractor-test-topic-filter-category'));
   var topicResetFilters = element(by.css(
@@ -195,17 +195,25 @@ var TopicsAndSkillsDashboardPage = function() {
   this.filterTopicsByKeyword = function(keyword) {
     waitFor.visibilityOf(
       topicFilterKeywordField,
-      'Topic Dashboard filters taking too long to appear.');
-    topicFilterKeywordField.click();
-    topicFilterKeywordField.sendKeys(keyword);
+      'Topic Dashboard keyword filter parent taking too long to appear.');
+    var filterKeywordInput = topicFilterKeywordField.element(
+      by.css('.select2-search__field'));
+    waitFor.visibilityOf(
+      filterKeywordInput,
+      'Topic Dashboard keyword filter taking too long to appear.');
+
+    filterKeywordInput.click();
+    filterKeywordInput.sendKeys(keyword);
+    filterKeywordInput.sendKeys(protractor.Key.RETURN);
   };
 
   this.filterTopicsByCategory = function(keyword) {
     waitFor.visibilityOf(
-      topicFilterKeywordField,
-      'Topic Dashboard filters taking too long to appear.');
-    topicFilterKeywordField.click();
-    topicFilterCategoryField.sendKeys(keyword);
+      topicFilterCategoryField,
+      'Topic Dashboard category taking too long to appear.');
+
+    topicFilterCategoryField.click();
+    browser.driver.switchTo().activeElement().sendKeys(keyword + '\n');
   };
 
   this.resetTopicFilters = function() {
@@ -231,6 +239,7 @@ var TopicsAndSkillsDashboardPage = function() {
         confirmTopicDeletionButton,
         'Confirm Delete Topic button takes too long to be clickable');
       confirmTopicDeletionButton.click();
+      this.get();
       waitFor.pageToFullyLoad();
     });
   };

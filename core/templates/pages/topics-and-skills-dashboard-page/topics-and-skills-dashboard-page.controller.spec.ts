@@ -19,42 +19,6 @@
 import { UpgradedServices } from 'services/UpgradedServices';
 
 describe('Topics and Skills Dashboard Page', function() {
-  var $scope = null, ctrl = null;
-  var $httpBackend = null;
-  var $uibModal = null;
-  var directive = null;
-  var $rootScope = null;
-  var $q = null;
-  var TopicsAndSkillsDashboardFilterObjectFactory = null;
-  var TOPICS_AND_SKILLS_DASHBOARD_DATA_URL =
-      '/topics_and_skills_dashboard/data';
-  var SAMPLE_TOPIC_ID = 'hyuy4GUlvTqJ';
-  var AlertsService = null;
-  var sampleDataResults = {
-    topic_summary_dicts: [{
-      id: SAMPLE_TOPIC_ID,
-      name: 'Sample Name',
-      category: 'Mathematics',
-      language_code: 'en',
-      version: 1,
-      canonical_story_count: 3,
-      additional_story_count: 0,
-      uncategorized_skill_count: 3,
-      subtopic_count: 3,
-      topic_model_created_on: 1466178691847.67,
-      topic_model_last_updated: 1466178759209.839
-    }],
-    skill_summary_dicts: [],
-    untriaged_skill_summary_dicts: [{
-      id: SAMPLE_TOPIC_ID,
-      name: 'Sample Name',
-      language_code: 'en'
-    }],
-    can_create_topic: true,
-    can_create_skill: true,
-    can_delete_topic: true,
-    can_delete_skill: true
-  };
   beforeEach(angular.mock.module('oppia'));
 
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -62,271 +26,273 @@ describe('Topics and Skills Dashboard Page', function() {
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
     }
-    $provide.factory(
-      'SkillCreationService', ['$http', $http => {
-        return {
-          createNewSkill: (a, b, c, d) => $http.post(
-            '/skill_editor_handler/create_new')
-        };
-      }]);
-
-    $provide.factory(
-      'TopicsAndSkillsDashboardBackendApiService', ['$http', $http => {
-        return {
-          fetchDashboardData: () => $http.get(
-            '/topics_and_skills_dashboard/data')
-        };
-      }]);
   }));
 
-  beforeEach(angular.mock.inject(function($injector) {
-    $httpBackend = $injector.get('$httpBackend');
-    $rootScope = $injector.get('$rootScope');
-    $scope = $rootScope.$new();
-    $uibModal = $injector.get('$uibModal');
-    $httpBackend = $injector.get('$httpBackend');
-    AlertsService = $injector.get('AlertsService');
-    $q = $injector.get('$q');
-    TopicsAndSkillsDashboardFilterObjectFactory = $injector.get(
-      'TopicsAndSkillsDashboardFilterObjectFactory');
+  var $scope = null, ctrl = null;
+  var $uibModal = null;
+  var directive = null;
+  var $rootScope = null;
+  var $q = null;
+  var $timeout = null;
+  var TopicsAndSkillsDashboardBackendApiService = null;
+  var TopicsAndSkillsDashboardFilterObjectFactory = null;
+  var SAMPLE_TOPIC_ID = 'hyuy4GUlvTqJ';
+  var AlertsService = null;
 
-    directive = $injector.get('topicsAndSkillsDashboardPageDirective')[0];
-    ctrl = $injector.instantiate(directive.controller, {
-      $scope: $scope,
-    });
-    ctrl.$onInit();
-  }));
+  describe('when backend dict contains topics', function() {
+    var sampleDataResults = {
+      topic_summary_dicts: [{
+        id: SAMPLE_TOPIC_ID,
+        name: 'Sample Name',
+        category: 'Mathematics',
+        language_code: 'en',
+        version: 1,
+        canonical_story_count: 3,
+        additional_story_count: 0,
+        uncategorized_skill_count: 3,
+        subtopic_count: 3,
+        topic_model_created_on: 1466178691847.67,
+        topic_model_last_updated: 1466178759209.839
+      }],
+      skill_summary_dicts: [],
+      untriaged_skill_summary_dicts: [{
+        id: SAMPLE_TOPIC_ID,
+        name: 'Sample Name',
+        language_code: 'en'
+      }],
+      can_create_topic: true,
+      can_create_skill: true,
+      can_delete_topic: true,
+      can_delete_skill: true
+    };
+    var SkillCreationService;
 
-  afterEach(function() {
-    $httpBackend.verifyNoOutstandingRequest();
-    $httpBackend.verifyNoOutstandingExpectation();
-  });
+    beforeEach(angular.mock.inject(function($injector) {
+      $rootScope = $injector.get('$rootScope');
+      $scope = $rootScope.$new();
+      $timeout = $injector.get('$timeout');
+      $uibModal = $injector.get('$uibModal');
+      AlertsService = $injector.get('AlertsService');
+      $q = $injector.get('$q');
+      TopicsAndSkillsDashboardFilterObjectFactory = $injector.get(
+        'TopicsAndSkillsDashboardFilterObjectFactory');
+      TopicsAndSkillsDashboardBackendApiService = $injector.get(
+        'TopicsAndSkillsDashboardBackendApiService');
+      var MockTopicsAndSkillsDashboardBackendApiService = {
+        fetchDashboardData: () => {
+          var deferred = $q.defer();
+          deferred.resolve(sampleDataResults);
+          return deferred.promise;
+        }
+      };
+      SkillCreationService = $injector.get('SkillCreationService');
+      directive = $injector.get('topicsAndSkillsDashboardPageDirective')[0];
+      ctrl = $injector.instantiate(directive.controller, {
+        $scope: $scope,
+        // SkillCreationService: MockSkillCreationService,
+        TopicsAndSkillsDashboardBackendApiService:
+        MockTopicsAndSkillsDashboardBackendApiService
+      });
 
-  it('should init the dashboard and fetch data', function() {
-    $httpBackend.expect('GET', TOPICS_AND_SKILLS_DASHBOARD_DATA_URL).respond(
-      sampleDataResults);
-    $httpBackend.flush();
+      ctrl.$onInit();
+      $rootScope.$apply();
+    }));
 
-    const filterObject =
+    it('should init the dashboard and fetch data', function() {
+      const filterObject =
         TopicsAndSkillsDashboardFilterObjectFactory.createDefault();
-    expect(ctrl.pageNumber).toEqual(0);
-    expect(ctrl.topicPageNumber).toEqual(0);
-    expect(ctrl.itemsPerPage).toEqual(10);
-    expect(ctrl.skillPageNumber).toEqual(0);
-    expect(ctrl.selectedIndex).toEqual(null);
-    expect(ctrl.itemsPerPageChoice).toEqual([10, 15, 20]);
-    expect(ctrl.categories).toEqual(['All', 'Mathematics']);
-    expect(ctrl.filterObject).toEqual(filterObject);
-    enum ETopicSortOptions {
-      IncreasingCreatedOn = 'Newly Created',
-      DecreasingCreatedOn = 'Oldest Created',
-      IncreasingUpdatedOn = 'Most Recently Updated',
-      DecreasingUpdatedOn = 'Least Recently Updated',
-    }
+      expect(ctrl.pageNumber).toEqual(0);
+      expect(ctrl.topicPageNumber).toEqual(0);
+      expect(ctrl.itemsPerPage).toEqual(10);
+      expect(ctrl.skillPageNumber).toEqual(0);
+      expect(ctrl.selectedIndex).toEqual(null);
+      expect(ctrl.itemsPerPageChoice).toEqual([10, 15, 20]);
+      expect(ctrl.categories).toEqual(['All', 'Mathematics']);
+      expect(ctrl.filterObject).toEqual(filterObject);
 
-    enum ETopicPublishedOptions {
-      All = 'All',
-      Published = 'Published',
-      NotPublished = 'Not Published'
-    }
-    expect(ctrl.sortOptions).toEqual(ETopicSortOptions);
-    expect(ctrl.statusOptions).toEqual(ETopicPublishedOptions);
+      expect(ctrl.sortOptions).toEqual([
+        'Newly Created', 'Oldest Created',
+        'Most Recently Updated', 'Least Recently Updated']);
+      expect(ctrl.statusOptions).toEqual([
+        'All', 'Published', 'Not Published']);
 
-    expect(ctrl.activeTab).toEqual('topics');
-    expect(ctrl.totalTopicSummaries).toEqual(
-      sampleDataResults.topic_summary_dicts);
-    expect(ctrl.untriagedSkillSummaries).toEqual(
-      sampleDataResults.untriaged_skill_summary_dicts);
-    expect(ctrl.totalEntityCountToDisplay).toEqual(1);
-    expect(ctrl.userCanCreateTopic).toEqual(true);
-    expect(ctrl.userCanCreateSkill).toEqual(true);
-  });
-
-  it('should set the active tab', function() {
-    $httpBackend.expect('GET', TOPICS_AND_SKILLS_DASHBOARD_DATA_URL).respond(
-      sampleDataResults);
-    $httpBackend.flush();
-    expect(ctrl.activeTab).toEqual('topics');
-    ctrl.setActiveTab(ctrl.TAB_NAME_UNTRIAGED_SKILLS);
-    expect(ctrl.activeTab).toEqual('untriagedSkills');
-    ctrl.setActiveTab(ctrl.TAB_NAME_TOPICS);
-    expect(ctrl.activeTab).toEqual('topics');
-  });
-
-  it('should go to Page Number', function() {
-    $httpBackend.expect('GET', TOPICS_AND_SKILLS_DASHBOARD_DATA_URL).respond(
-      sampleDataResults);
-    $httpBackend.flush();
-    expect(ctrl.topicPageNumber).toEqual(0);
-    expect(ctrl.pageNumber).toEqual(0);
-    ctrl.goToPageNumber(4);
-    expect(ctrl.topicPageNumber).toEqual(4);
-    expect(ctrl.pageNumber).toEqual(4);
-  });
-
-  it('should open the create Topic Modal', function() {
-    $httpBackend.expect('GET', TOPICS_AND_SKILLS_DASHBOARD_DATA_URL).respond(
-      sampleDataResults);
-    $httpBackend.flush();
-    var modalSpy = spyOn($uibModal, 'open').and.callThrough();
-    ctrl.createTopic();
-    expect(modalSpy).toHaveBeenCalled();
-  });
-
-  it('should open Create Skill Modal', function() {
-    $httpBackend.expect('GET', TOPICS_AND_SKILLS_DASHBOARD_DATA_URL).respond(
-      sampleDataResults);
-    $httpBackend.flush();
-    var modalSpy = spyOn($uibModal, 'open').and.callThrough();
-    ctrl.createSkill();
-    expect(modalSpy).toHaveBeenCalled();
-  });
-
-  it('should call the skill creation service', function() {
-    $httpBackend.expect('GET', TOPICS_AND_SKILLS_DASHBOARD_DATA_URL).respond(
-      sampleDataResults);
-    $httpBackend.flush();
-
-    spyOn($uibModal, 'open').and.returnValue({
-      result: $q.resolve({
-        description: 'Description',
-        rubrics: 'Easy',
-        explanation: 'Explanation'
-      })
+      expect(ctrl.activeTab).toEqual('topics');
+      expect(ctrl.totalTopicSummaries).toEqual(
+        sampleDataResults.topic_summary_dicts);
+      expect(ctrl.untriagedSkillSummaries).toEqual(
+        sampleDataResults.untriaged_skill_summary_dicts);
+      expect(ctrl.totalEntityCountToDisplay).toEqual(1);
+      expect(ctrl.userCanCreateTopic).toEqual(true);
+      expect(ctrl.userCanCreateSkill).toEqual(true);
     });
 
-    $httpBackend.expectPOST('/skill_editor_handler/create_new').respond(200);
-    ctrl.createSkill();
-    $httpBackend.flush();
-  });
-
-  it('should navigate the page', function() {
-    $httpBackend.expect('GET', TOPICS_AND_SKILLS_DASHBOARD_DATA_URL).respond(
-      sampleDataResults);
-    $httpBackend.flush();
-    var totalEntityCountToDisplay = 50;
-    var itemsPerPage = 10;
-
-    expect(ctrl.activeTab).toEqual('topics');
-
-    ctrl.totalEntityCountToDisplay = totalEntityCountToDisplay;
-    ctrl.itemsPerPage = itemsPerPage;
-
-    expect(ctrl.topicPageNumber).toEqual(0);
-    expect(ctrl.pageNumber).toEqual(0);
-
-    ctrl.changePageByOne('next_page');
-    expect(ctrl.topicPageNumber).toEqual(1);
-    expect(ctrl.pageNumber).toEqual(1);
-
-    ctrl.changePageByOne('next_page');
-    expect(ctrl.topicPageNumber).toEqual(2);
-    expect(ctrl.pageNumber).toEqual(2);
-
-    ctrl.changePageByOne('prev_page');
-    expect(ctrl.topicPageNumber).toEqual(1);
-    expect(ctrl.pageNumber).toEqual(1);
-
-    ctrl.changePageByOne('prev_page');
-    expect(ctrl.topicPageNumber).toEqual(0);
-    expect(ctrl.pageNumber).toEqual(0);
-
-    ctrl.changePageByOne('prev_page');
-    expect(ctrl.topicPageNumber).toEqual(0);
-    expect(ctrl.pageNumber).toEqual(0);
-  });
-
-  it('should reset the filters', function() {
-    $httpBackend.expect('GET', TOPICS_AND_SKILLS_DASHBOARD_DATA_URL).respond(
-      sampleDataResults);
-    $httpBackend.flush();
-    const filterObject = (
-      TopicsAndSkillsDashboardFilterObjectFactory.createDefault());
-    expect(ctrl.filterObject).toEqual(filterObject);
-    ctrl.filterObject.sort = 'Newly Created';
-    ctrl.filterObject.keyword = 'keyword1';
-    ctrl.filterObject.category = 'category1';
-    ctrl.filterObject.status = 'Published';
-    ctrl.resetFilters();
-    expect(ctrl.filterObject).toEqual(filterObject);
-  });
-
-  it('should return number from 1 to the range specified', function() {
-    $httpBackend.expect('GET', TOPICS_AND_SKILLS_DASHBOARD_DATA_URL).respond(
-      sampleDataResults);
-    $httpBackend.flush();
-    var array = ctrl.generateNumbersTillRange(5);
-    expect(array).toEqual([0, 1, 2, 3, 4]);
-  });
-
-  it('should apply the filters', function() {
-    $httpBackend.expect('GET', TOPICS_AND_SKILLS_DASHBOARD_DATA_URL).respond(
-      sampleDataResults);
-    $httpBackend.flush();
-    const topic1 = {
-      is_published: true, name: 'Alpha', category: 'Mathematics',
-      description: 'Alpha description',
-    };
-    const topic2 = {
-      is_published: false, name: 'Alpha2', category: 'Mathematics',
-      description: 'Alp2 desc',
-    };
-    const topic3 = {
-      is_published: false, name: 'Beta', category: 'Mathematics',
-      description: 'Beta description',
-    };
-    const topic4 = {
-      is_published: true, name: 'Gamma', category: 'Mathematics',
-      description: 'Gamma description',
-    };
-    ctrl.filterObject = (
-      TopicsAndSkillsDashboardFilterObjectFactory.createDefault());
-    ctrl.totalTopicSummaries = [topic1, topic2, topic3, topic4];
-
-    ctrl.applyFilters();
-    expect(ctrl.topicSummaries).toEqual(ctrl.totalTopicSummaries);
-    expect(ctrl.displayedTopicSummaries).toEqual(ctrl.totalTopicSummaries);
-    expect(ctrl.currentCount).toEqual(4);
-    expect(ctrl.pageNumber).toEqual(0);
-
-    ctrl.filterObject.status = 'Published';
-    ctrl.applyFilters();
-    expect(ctrl.topicSummaries).toEqual([topic1, topic4]);
-    expect(ctrl.displayedTopicSummaries).toEqual([topic1, topic4]);
-    expect(ctrl.currentCount).toEqual(2);
-    expect(ctrl.pageNumber).toEqual(0);
-
-    ctrl.filterObject.keyword = 'gamm';
-    ctrl.applyFilters();
-    expect(ctrl.topicSummaries).toEqual([topic4]);
-    expect(ctrl.displayedTopicSummaries).toEqual([topic4]);
-    expect(ctrl.currentCount).toEqual(1);
-    expect(ctrl.pageNumber).toEqual(0);
-  });
-
-  it('should show warning if fetch dashboard data failed with fatal error',
-    function() {
-      var alertSpy = spyOn(AlertsService, 'addWarning').and.callThrough();
-      $httpBackend.expect('GET', TOPICS_AND_SKILLS_DASHBOARD_DATA_URL).respond(
-        400);
-      $httpBackend.flush();
-
-      expect(alertSpy).toHaveBeenCalled();
+    it('should set the active tab', function() {
+      expect(ctrl.activeTab).toEqual('topics');
+      ctrl.setActiveTab(ctrl.TAB_NAME_UNTRIAGED_SKILLS);
+      expect(ctrl.activeTab).toEqual('untriagedSkills');
+      ctrl.setActiveTab(ctrl.TAB_NAME_TOPICS);
+      expect(ctrl.activeTab).toEqual('topics');
     });
 
-  it('should show warning if fetch dashboard data failed with fatal error',
-    function() {
-      var alertSpy = spyOn(AlertsService, 'addWarning').and.callThrough();
-      $httpBackend.expect('GET', TOPICS_AND_SKILLS_DASHBOARD_DATA_URL).respond(
-        402);
-      $httpBackend.flush();
-
-      expect(alertSpy).toHaveBeenCalledWith(
-        'Unexpected error code from the server.');
+    it('should go to Page Number', function() {
+      expect(ctrl.topicPageNumber).toEqual(0);
+      expect(ctrl.pageNumber).toEqual(0);
+      ctrl.goToPageNumber(4);
+      expect(ctrl.topicPageNumber).toEqual(4);
+      expect(ctrl.pageNumber).toEqual(4);
     });
 
-  it('should change active tab to skills if topic summaries are null',
-    function() {
+    it('should open the create Topic Modal', function() {
+      var modalSpy = spyOn($uibModal, 'open').and.callThrough();
+      ctrl.createTopic();
+      expect(modalSpy).toHaveBeenCalled();
+    });
+
+    it('should open Create Skill Modal', function() {
+      var modalSpy = spyOn($uibModal, 'open').and.callThrough();
+      ctrl.createSkill();
+      expect(modalSpy).toHaveBeenCalled();
+    });
+
+    it('should call the skill creation service', function() {
+      spyOn($uibModal, 'open').and.returnValue({
+        result: $q.resolve({
+          description: 'Description',
+          rubrics: 'Easy',
+          explanation: 'Explanation'
+        })
+      });
+
+      var skillSpy = spyOn(SkillCreationService, 'createNewSkill');
+      ctrl.createSkill();
+      $rootScope.$apply();
+      expect(skillSpy).toHaveBeenCalled();
+    });
+
+    it('should navigate the page', function() {
+      var totalEntityCountToDisplay = 50;
+      var itemsPerPage = 10;
+
+      expect(ctrl.activeTab).toEqual('topics');
+
+      ctrl.totalEntityCountToDisplay = totalEntityCountToDisplay;
+      ctrl.itemsPerPage = itemsPerPage;
+
+      expect(ctrl.topicPageNumber).toEqual(0);
+      expect(ctrl.pageNumber).toEqual(0);
+
+      ctrl.changePageByOne('next_page');
+      expect(ctrl.topicPageNumber).toEqual(1);
+      expect(ctrl.pageNumber).toEqual(1);
+
+      ctrl.changePageByOne('next_page');
+      expect(ctrl.topicPageNumber).toEqual(2);
+      expect(ctrl.pageNumber).toEqual(2);
+
+      ctrl.changePageByOne('prev_page');
+      expect(ctrl.topicPageNumber).toEqual(1);
+      expect(ctrl.pageNumber).toEqual(1);
+
+      ctrl.changePageByOne('prev_page');
+      expect(ctrl.topicPageNumber).toEqual(0);
+      expect(ctrl.pageNumber).toEqual(0);
+
+      ctrl.changePageByOne('prev_page');
+      expect(ctrl.topicPageNumber).toEqual(0);
+      expect(ctrl.pageNumber).toEqual(0);
+    });
+
+    it('should reset the filters', function() {
+      const filterObject = (
+        TopicsAndSkillsDashboardFilterObjectFactory.createDefault());
+      expect(ctrl.filterObject).toEqual(filterObject);
+      ctrl.filterObject.sort = 'Newly Created';
+      ctrl.filterObject.keywords = ['keyword1'];
+      ctrl.filterObject.category = 'category1';
+      ctrl.filterObject.status = 'Published';
+      ctrl.resetFilters();
+      expect(ctrl.filterObject).toEqual(filterObject);
+    });
+
+    it('should re-render the filter dropdowns', function() {
+      ctrl.applyFilters();
+      expect(ctrl.select2DropdownIsShown).toBe(false);
+      $timeout.flush();
+      expect(ctrl.select2DropdownIsShown).toBe(true);
+    });
+
+
+    it('should return number from 1 to the range specified', function() {
+      var array = ctrl.generateNumbersTillRange(5);
+      expect(array).toEqual([0, 1, 2, 3, 4]);
+    });
+
+    it('should apply the filters', function() {
+      const topic1 = {
+        is_published: true, name: 'Alpha', category: 'Mathematics',
+        description: 'Alpha description',
+      };
+      const topic2 = {
+        is_published: false, name: 'Alpha2', category: 'Mathematics',
+        description: 'Alp2 desc',
+      };
+      const topic3 = {
+        is_published: false, name: 'Beta', category: 'Mathematics',
+        description: 'Beta description',
+      };
+      const topic4 = {
+        is_published: true, name: 'Gamma', category: 'Mathematics',
+        description: 'Gamma description',
+      };
+      ctrl.filterObject = (
+        TopicsAndSkillsDashboardFilterObjectFactory.createDefault());
+      ctrl.totalTopicSummaries = [topic1, topic2, topic3, topic4];
+
+      ctrl.applyFilters();
+      expect(ctrl.topicSummaries).toEqual(ctrl.totalTopicSummaries);
+      expect(ctrl.displayedTopicSummaries).toEqual(ctrl.totalTopicSummaries);
+      expect(ctrl.currentCount).toEqual(4);
+      expect(ctrl.pageNumber).toEqual(0);
+
+      ctrl.filterObject.status = 'Published';
+      ctrl.applyFilters();
+      expect(ctrl.topicSummaries).toEqual([topic1, topic4]);
+      expect(ctrl.displayedTopicSummaries).toEqual([topic1, topic4]);
+      expect(ctrl.currentCount).toEqual(2);
+      expect(ctrl.pageNumber).toEqual(0);
+
+      ctrl.filterObject.keywords = ['gamm'];
+      ctrl.applyFilters();
+      expect(ctrl.topicSummaries).toEqual([topic4]);
+      expect(ctrl.displayedTopicSummaries).toEqual([topic4]);
+      expect(ctrl.currentCount).toEqual(1);
+      expect(ctrl.pageNumber).toEqual(0);
+    });
+
+    it('should call goToPageNumber when refreshPagination is called',
+      function() {
+        var changePageSpy = spyOn(ctrl, 'goToPageNumber');
+        ctrl.refreshPagination();
+        expect(changePageSpy).toHaveBeenCalledWith(0);
+      });
+
+    it('should call initDashboard on reinitialized event', function() {
+      var initDashboardSpy = spyOn(ctrl, '_initDashboard');
+      $rootScope.$broadcast('topicsAndSkillsDashboardReinitialized');
+      expect(initDashboardSpy).toHaveBeenCalled();
+    });
+  });
+
+  describe('when the backend dict has no topics', function() {
+    beforeEach(angular.mock.inject(function($injector) {
+      $rootScope = $injector.get('$rootScope');
+      $scope = $rootScope.$new();
+      AlertsService = $injector.get('AlertsService');
+      $q = $injector.get('$q');
+      TopicsAndSkillsDashboardFilterObjectFactory = $injector.get(
+        'TopicsAndSkillsDashboardFilterObjectFactory');
+      TopicsAndSkillsDashboardBackendApiService = $injector.get(
+        'TopicsAndSkillsDashboardBackendApiService');
       var sampleDataResults2 = {
         topic_summary_dicts: [],
         skill_summary_dicts: [],
@@ -338,25 +304,116 @@ describe('Topics and Skills Dashboard Page', function() {
         can_create_topic: true,
         can_create_skill: true
       };
-      $httpBackend.expect('GET', TOPICS_AND_SKILLS_DASHBOARD_DATA_URL).respond(
-        sampleDataResults2);
-      $httpBackend.flush();
-      expect(ctrl.activeTab).toEqual('untriagedSkills');
-    });
+      var MockTopicsAndSkillsDashboardBackendApiService = {
+        fetchDashboardData: () => {
+          var deferred = $q.defer();
+          deferred.resolve(sampleDataResults2);
+          return deferred.promise;
+        }
+      };
 
-  it('should call goToPageNumber when refreshPagination is called',
-    function() {
-      var changePageSpy = spyOn(ctrl, 'goToPageNumber');
-      ctrl.refreshPagination();
-      expect(changePageSpy).toHaveBeenCalledWith(0);
-    });
+      directive = $injector.get('topicsAndSkillsDashboardPageDirective')[0];
+      ctrl = $injector.instantiate(directive.controller, {
+        $scope: $scope,
+        TopicsAndSkillsDashboardBackendApiService:
+        MockTopicsAndSkillsDashboardBackendApiService
+      });
 
-  it('should call initDashboard on reinitialized event', function() {
-    $httpBackend.expect('GET', TOPICS_AND_SKILLS_DASHBOARD_DATA_URL).respond(
-      sampleDataResults);
-    $httpBackend.flush();
-    var initDashboardSpy = spyOn(ctrl, '_initDashboard');
-    $rootScope.$broadcast('topicsAndSkillsDashboardReinitialized');
-    expect(initDashboardSpy).toHaveBeenCalled();
+      ctrl.$onInit();
+      $rootScope.$apply();
+    }));
+
+    it('should change active tab to skills if topic summaries are null',
+      function() {
+        expect(ctrl.activeTab).toEqual('untriagedSkills');
+      });
+  });
+
+  describe('when fetching the backend data fails with fatal error', function() {
+    var mockAlertsService;
+    beforeEach(angular.mock.inject(function($injector) {
+      $rootScope = $injector.get('$rootScope');
+      $scope = $rootScope.$new();
+      $uibModal = $injector.get('$uibModal');
+      AlertsService = $injector.get('AlertsService');
+      $q = $injector.get('$q');
+      TopicsAndSkillsDashboardBackendApiService = $injector.get(
+        'TopicsAndSkillsDashboardBackendApiService');
+      mockAlertsService = {
+        addWarning: function() {}
+      };
+      var MockTopicsAndSkillsDashboardBackendApiService = {
+        fetchDashboardData: () => {
+          var deferred = $q.defer();
+          var errorResponse = {
+            status: 500
+          };
+          deferred.reject(errorResponse);
+          return deferred.promise;
+        }
+      };
+
+      directive = $injector.get('topicsAndSkillsDashboardPageDirective')[0];
+      ctrl = $injector.instantiate(directive.controller, {
+        $scope: $scope,
+        AlertsService: mockAlertsService,
+        TopicsAndSkillsDashboardBackendApiService:
+                MockTopicsAndSkillsDashboardBackendApiService
+      });
+
+      ctrl.$onInit();
+    }));
+
+    it('should show warning if fetch dashboard data failed with fatal error',
+      function() {
+        var alertSpy = spyOn(mockAlertsService, 'addWarning');
+        $rootScope.$apply();
+        expect(alertSpy).toHaveBeenCalledWith('Failed to get dashboard data.');
+      });
+  });
+
+  describe('when fetching the backend data fails', function() {
+    var mockAlertsService;
+    beforeEach(angular.mock.inject(function($injector) {
+      $rootScope = $injector.get('$rootScope');
+      $scope = $rootScope.$new();
+      mockAlertsService = {
+        addWarning: function() {}
+      };
+      $uibModal = $injector.get('$uibModal');
+      AlertsService = $injector.get('AlertsService');
+      $q = $injector.get('$q');
+      TopicsAndSkillsDashboardBackendApiService = $injector.get(
+        'TopicsAndSkillsDashboardBackendApiService');
+      var MockTopicsAndSkillsDashboardBackendApiService = {
+        fetchDashboardData: () => {
+          var deferred = $q.defer();
+          var errorResponse = {
+            status: 402
+          };
+          deferred.reject(errorResponse);
+          return deferred.promise;
+        }
+      };
+
+      directive = $injector.get('topicsAndSkillsDashboardPageDirective')[0];
+      ctrl = $injector.instantiate(directive.controller, {
+        $scope: $scope,
+
+        AlertsService: mockAlertsService,
+        TopicsAndSkillsDashboardBackendApiService:
+                MockTopicsAndSkillsDashboardBackendApiService
+      });
+
+      ctrl.$onInit();
+    }));
+
+    it('should show warning if fetch dashboard data failed',
+      function() {
+        var alertSpy = spyOn(mockAlertsService, 'addWarning');
+        $rootScope.$apply();
+        expect(alertSpy).toHaveBeenCalledWith(
+          'Unexpected error code from the server.');
+      });
   });
 });

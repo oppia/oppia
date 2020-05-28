@@ -48,17 +48,21 @@ export class TopicsAndSkillsDashboardPageService {
     let EPublishedOptions = (
       TopicsAndSkillsDashboardPageConstants.TOPIC_PUBLISHED_OPTIONS);
     let filteredTopics = topicsArray;
-    if (filterObject.keyword) {
+
+    if (filterObject.keywords.length) {
       filteredTopics = topicsArray.filter((topic) => {
-        return (
-          topic.name.toLowerCase().includes(
-            filterObject.keyword.toLowerCase()) ||
-            topic.description.toLowerCase().includes(
-              filterObject.keyword.toLowerCase()));
+        for (let keyword of filterObject.keywords) {
+          if (topic.name.toLowerCase().includes(keyword.toLowerCase()) ||
+              topic.description.toLowerCase().includes(keyword.toLowerCase())) {
+            return true;
+          }
+        }
+        return false;
       });
     }
 
-    if (filterObject.category !== 'All') {
+    if (filterObject.category !==
+        TopicsAndSkillsDashboardPageConstants.TOPIC_FILTER_DEFAULT_VALUE) {
       filteredTopics = filteredTopics.filter((topic) => {
         return (
           filterObject.category === topic.category);

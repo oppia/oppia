@@ -20,26 +20,29 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { ETopicPublishedOptions, ETopicSortOptions } from
+import {
+  ETopicPublishedOptions,
+  ETopicSortOptions,
+  TopicsAndSkillsDashboardPageConstants } from
   // eslint-disable-next-line max-len
   'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.constants';
 
 export class TopicsAndSkillsDashboardFilter {
   category: string;
-  keyword: string;
+  keywords: Array<string>;
   sort: ETopicSortOptions;
   status: ETopicPublishedOptions;
 
   /**
    * @param {String} category - category to filter for.
-   * @param {String} keyword - keyword to filter for.
+   * @param {String[]} keywords - keywords to filter for.
    * @param {ETopicSortOptions} sort - One of the values in ETopicSortOptions.
    * @param {ETopicPublishedOptions} status - One of the values
-   * in ETopicPublishedOptions.
+   *   in ETopicPublishedOptions.
    */
-  constructor(category, keyword, sort, status) {
+  constructor(category, keywords, sort, status) {
     this.category = category;
-    this.keyword = keyword;
+    this.keywords = keywords;
     this.sort = sort;
     this.status = status;
   }
@@ -47,8 +50,9 @@ export class TopicsAndSkillsDashboardFilter {
    * Resets the filter object values
    */
   reset(): void {
-    this.category = 'All';
-    this.keyword = '';
+    this.category =
+        TopicsAndSkillsDashboardPageConstants.TOPIC_FILTER_DEFAULT_VALUE;
+    this.keywords = [];
     this.sort = ETopicSortOptions.IncreasingCreatedOn;
     this.status = ETopicPublishedOptions.All;
   }
@@ -64,8 +68,8 @@ export class TopicsAndSkillsDashboardFilterObjectFactory {
    */
   createDefault(): TopicsAndSkillsDashboardFilter {
     return new TopicsAndSkillsDashboardFilter(
-      'All', '', ETopicSortOptions.IncreasingCreatedOn,
-      ETopicPublishedOptions.All);
+      TopicsAndSkillsDashboardPageConstants.TOPIC_FILTER_DEFAULT_VALUE,
+      [], ETopicSortOptions.IncreasingCreatedOn, ETopicPublishedOptions.All);
   }
 }
 
