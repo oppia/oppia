@@ -65,9 +65,9 @@ angular.module('oppia').run([
             edit: function() {
               // The following check allows the editing of the RTE components
               // only in editor pages.
-              // if (!ContextService.canAddOrEditComponents()) {
-              //   return;
-              // }
+              if (!ContextService.canAddOrEditComponents()) {
+                return;
+              }
               editor.fire('lockSnapshot', {
                 dontUpdate: true
               });

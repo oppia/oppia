@@ -105,12 +105,12 @@ angular.module('oppia').directive('ckEditor4Rte', [
           return 'oppia' + name;
         }).join(',');
         var buttonNames = [];
-        // if (ContextService.canAddOrEditComponents()) {
+        if (ContextService.canAddOrEditComponents()) {
           names.forEach(function(name) {
             buttonNames.push('Oppia' + name);
             buttonNames.push('-');
           });
-        // }
+        }
         buttonNames.pop();
         // All icons on the toolbar except the Rich Text components.
         var allIcons = ['undo', 'redo', 'bold', 'Italic', 'numberedList',
