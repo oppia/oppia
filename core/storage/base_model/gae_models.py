@@ -151,7 +151,6 @@ class BaseModel(ndb.Model):
         """
         raise NotImplementedError
 
-
     @staticmethod
     def export_data(user_id):
         """This method should be implemented by subclasses.
@@ -380,11 +379,7 @@ class BaseCommitLogEntryModel(BaseModel):
     """Base Model for the models that store the log of commits to a
     construct.
     """
-    # Update superclass model to make these properties indexed.
-    created_on = ndb.DateTimeProperty(auto_now_add=True, indexed=True)
-    last_updated = ndb.DateTimeProperty(auto_now=True, indexed=True)
 
-    # The id of the user.
     user_id = ndb.StringProperty(indexed=True, required=True)
     # The type of the commit: 'create', 'revert', 'edit', 'delete'.
     commit_type = ndb.StringProperty(indexed=True, required=True)

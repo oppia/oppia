@@ -164,7 +164,7 @@ class RemoveCommitUsernamesOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             del commit_model._properties['username']
             if 'username' in commit_model._values:
                 del commit_model._values['username']
-            commit_model.put()
+            commit_model.put(update_last_updated_time=False)
             yield ('SUCCESS_REMOVED - %s' % class_name, commit_model.id)
         else:
             yield ('SUCCESS_ALREADY_REMOVED - %s' % class_name, commit_model.id)
