@@ -87,11 +87,11 @@ class HelperFunctionsTests(test_utils.GenericTestBase):
                 [self.USER_1_GAE_ID, self.USER_2_GAE_ID, self.USER_3_GAE_ID]),
             [self.USER_1_USER_ID, self.USER_2_USER_ID, self.USER_3_USER_ID]
         )
-        with self.assertRaises(user_id_migration.AlreadyMigratedUserExceptionn):
+        with self.assertRaises(user_id_migration.AlreadyMigratedUserException):
             user_id_migration.get_user_ids_corresponding_to_gae_ids(
                 [self.USER_1_USER_ID, 'nonexistent_gae_id'])
 
-        with self.assertRaises(user_id_migration.MissingUserExceptio):
+        with self.assertRaises(user_id_migration.MissingUserException):
             user_id_migration.get_user_ids_corresponding_to_gae_ids(
                 [self.USER_1_GAE_ID, 'nonexistent_gae_id'])
 
