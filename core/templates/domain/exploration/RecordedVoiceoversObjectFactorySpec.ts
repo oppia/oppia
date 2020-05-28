@@ -151,16 +151,16 @@ describe('RecordedVoiceovers object factory', () => {
     });
   });
 
-  it('should return a correct voiceover for a given content id and language',
-    () => {
-      expect(rv.getVoiceover('hint_1', 'en')).toEqual(
-        vof.createFromBackendDict({
-          filename: 'filename9.mp3',
-          file_size_bytes: 104000,
-          needs_update: false,
-          duration_secs: 10.4
-        }));
-    });
+  it('should return a correct voiceover for a given content ' +
+    'id and language', () => {
+    expect(rv.getVoiceover('hint_1', 'en')).toEqual(
+      vof.createFromBackendDict({
+        filename: 'filename9.mp3',
+        file_size_bytes: 104000,
+        needs_update: false,
+        duration_secs: 10.4
+      }));
+  });
 
   it('should make all audio needs update for a give content id', () => {
     rv.markAllVoiceoversAsNeedingUpdate('content');
@@ -248,17 +248,17 @@ describe('RecordedVoiceovers object factory', () => {
     );
   });
 
-  it(
-    'should toggle needs update attribute in a given content id', () => {
-      rv.toggleNeedsUpdateAttribute('content', 'hi');
-      expect(rv.getVoiceover('content', 'hi')).toEqual(
-        vof.createFromBackendDict({
-          filename: 'filename2.mp3',
-          file_size_bytes: 11000,
-          needs_update: true,
-          duration_secs: 0.11
-        }));
-    });
+  it('should toggle needs update attribute in a given ' +
+    'content id', () => {
+    rv.toggleNeedsUpdateAttribute('content', 'hi');
+    expect(rv.getVoiceover('content', 'hi')).toEqual(
+      vof.createFromBackendDict({
+        filename: 'filename2.mp3',
+        file_size_bytes: 11000,
+        needs_update: true,
+        duration_secs: 0.11
+      }));
+  });
 
   it('should correctly convert to backend dict', () => {
     expect(rv.toBackendDict()).toEqual(rvDict);
