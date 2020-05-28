@@ -36,7 +36,7 @@ angular.module('oppia').controller('SkillMasteryModalController', [
       $scope.masteryChange = masteryPerSkillMapping[skillId];
     }
 
-    $scope.openConceptCardModal = function(skillId) {
+    $scope.openConceptCardModal = function() {
       openConceptCardModal([skillId]);
     };
   }

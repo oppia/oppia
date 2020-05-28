@@ -106,6 +106,9 @@ angular.module('oppia').directive('questionOpportunities', [
                 '/pages/topic-editor-page/modal-templates/' +
                 'select-skill-and-difficulty-modal.template.html'),
               backdrop: true,
+              resolve: {
+                skillId: () => skillId
+              },
               controller: (
                 'QuestionsOpportunitiesSelectSkillAndDifficultyModalController')
             }).result.then(function(result) {

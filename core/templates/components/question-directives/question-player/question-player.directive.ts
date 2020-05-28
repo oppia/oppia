@@ -505,16 +505,15 @@ angular.module('oppia').directive('questionPlayer', [
           };
 
           ctrl.openSkillMasteryModal = function(skillId) {
+            var masteryPerSkillMapping = ctrl.masteryPerSkillMapping;
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/components/question-directives/question-player/' +
                 'skill-mastery-modal.template.html'),
               backdrop: true,
               resolve: {
-                masteryPerSkillMapping: () => ctrl.masteryPerSkillMapping,
-                openConceptCardModal: (arg) => {
-                  openConceptCardModal(arg);
-                },
+                masteryPerSkillMapping: () => masteryPerSkillMapping,
+                openConceptCardModal: () => openConceptCardModal,
                 skillId: () => skillId,
                 userIsLoggedIn: () => ctrl.userIsLoggedIn,
               },

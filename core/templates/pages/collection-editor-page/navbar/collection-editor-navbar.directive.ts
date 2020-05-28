@@ -146,7 +146,6 @@ angular.module('oppia').directive('collectionEditorNavbar', [
 
             if (additionalMetadataNeeded) {
               $uibModal.open({
-                bindToController: {},
                 templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                   '/pages/collection-editor-page/templates/' +
                   'collection-editor-pre-publish-modal.directive.html'),

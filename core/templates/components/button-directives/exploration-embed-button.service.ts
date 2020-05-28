@@ -16,6 +16,10 @@
  * @fileoverview Service for the 'embed exploration' modal.
  */
 
+require(
+  'components/button-directives/' +
+  'exploration-embed-button-modal.controller.ts');
+
 require('domain/utilities/url-interpolation.service.ts');
 require('services/site-analytics.service.ts');
 

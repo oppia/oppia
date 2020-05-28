@@ -99,5 +99,7 @@ angular.module('oppia').controller(
 
         $uibModalInstance.close(metadataList);
       };
+
+      ctrl.cancel = $scope.cancel;
     }
   ]);

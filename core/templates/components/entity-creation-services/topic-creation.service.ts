@@ -75,6 +75,10 @@ angular.module('oppia').factory('TopicCreationService', [
               topicCreationInProgress = false;
               AlertsService.addWarning(errorResponse.error);
             });
+        }, function() {
+          // Note to developers:
+          // This callback is triggered when the Cancel button is
+          // clicked. No further action is needed.
         });
       }
     };

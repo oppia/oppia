@@ -95,7 +95,7 @@ angular.module('oppia').controller('TranslationModalController', [
           });
       }
       if (!$scope.moreAvailable) {
-        $scope.close();
+        $scope.confirm();
       }
     };
   }
