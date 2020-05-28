@@ -20,7 +20,7 @@
                      width="130px"
                      height="300px"
                      ng-style="height: 300px;"
-                     class="hide-lesson-track"
+                     class="oppia-hide-lesson-track"
                      xmlns="http://www.w3.org/1600/svg">
                   <path fill="none"
                         ng-attr-stroke="{{node.isCompleted() && '#296E5F' || 'rgb(204, 204, 204)' }}"
@@ -29,13 +29,13 @@
                         stroke-width="10"
                         d="M70 30 L70 300"/>
                 </svg>
-                <div ng-if="$last" style="width: 150px;" class="hide-lesson-track" />
+                <div ng-if="$last" style="width: 150px;" class="oppia-hide-lesson-track" />
 
-                <img ng-if="node.isCompleted()" ng-src="<[$ctrl.getStaticImageUrl('/general/collection_paw.svg')]>" class="lesson-icon-completed hide-lesson-track">
-                <div ng-if="!node.isCompleted()" class="lesson-icon-uncompleted hide-lesson-track" />
+                <img ng-if="node.isCompleted()" ng-src="<[$ctrl.getStaticImageUrl('/general/collection_paw.svg')]>" class="lesson-icon-completed oppia-hide-lesson-track">
+                <div ng-if="!node.isCompleted()" class="lesson-icon-uncompleted oppia-hide-lesson-track" />
 
                 <div ng-style="{color: 'rgb(51, 51, 51)','font-family': 'Capriola, Roboto, Arial,sans-serif', 'margin-right': '40px', 'flex': '1', 'margin-left': '20px'}">
-                  <p style="font-size: 30px; padding-top: 6px;" ng-if="!node.isCompleted()" aria-live="assertive">
+                  <p style="font-size: 30px; padding-top: 6px;" class="oppia-chapter-title" ng-if="!node.isCompleted()" aria-live="assertive">
                     Chapter {{$index + 1}}: <[node.getTitle()]>
                   </p>
                   <p ng-if="node.isCompleted()" ng-style="font-size: 16px;" aria-live="assertive" translate="I18N_STORY_VIEWER_COMPLETED_CHAPTER" translate-values="{title: node.getTitle()}" />

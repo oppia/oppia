@@ -32,6 +32,7 @@ describe('Read only story node object factory', () => {
     var sampleReadOnlyStoryNodeBackendDict = {
       id: 'node_1',
       title: 'Title 1',
+      description: 'Description',
       prerequisite_skill_ids: ['skill_1'],
       acquired_skill_ids: ['skill_2'],
       destination_node_ids: ['node_2'],
