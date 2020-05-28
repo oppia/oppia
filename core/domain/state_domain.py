@@ -2273,5 +2273,5 @@ class State(python_utils.OBJECT):
                         'choices']['value']):
                 state_dict['interaction']['customization_args']['choices'][
                     'value'][value_index] = conversion_fn(value)
-                    
+
         return state_dict
