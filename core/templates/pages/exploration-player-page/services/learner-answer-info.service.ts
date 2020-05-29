@@ -159,8 +159,6 @@ export class LearnerAnswerInfoService {
     el.attr('translate', 'I18N_SOLICIT_ANSWER_DETAILS_FEEDBACK');
     return ($('<span>').append(el)).html();
   }
-
 }
 angular.module('oppia').factory(
-  'LearnerAnswerInfoService',
-  downgradeInjectable(LearnerAnswerInfoService));
+  'LearnerAnswerInfoService', downgradeInjectable(LearnerAnswerInfoService));

@@ -24,6 +24,10 @@ import { AnswerClassificationResultObjectFactory } from
   'domain/classifier/AnswerClassificationResultObjectFactory';
 import { AnswerClassificationService } from
   'pages/exploration-player-page/services/answer-classification.service';
+import { CamelCaseToHyphensPipe } from
+  'filters/string-utility-filters/camel-case-to-hyphens.pipe';
+import { ConvertToPlainTextPipe } from
+  'filters/string-utility-filters/convert-to-plain-text.pipe.ts';
 import { LearnerAnswerDetailsBackendApiService } from
   'domain/statistics/learner-answer-details-backend-api.service.ts';
 import { LearnerAnswerInfoService } from
@@ -47,13 +51,7 @@ fdescribe('Learner answer info service', () => {
   let learnerAnswerInfoService: LearnerAnswerInfoService = null;
   let answerClassificationService: AnswerClassificationService = null;
   let DEFAULT_OUTCOME_CLASSIFICATION;
-  /*
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('AnswerClassificationService', {
-      getMatchingClassificationResult: function() {},
-    });
-  }));
-  */
+
   beforeEach(() => {
     stateDict = {
       content: {
@@ -142,6 +140,9 @@ fdescribe('Learner answer info service', () => {
       }
     };
 
+    TestBed.configureTestingModule({
+      providers: [CamelCaseToHyphensPipe, ConvertToPlainTextPipe]
+    });
     sof = TestBed.get(StateObjectFactory);
     oof = TestBed.get(OutcomeObjectFactory);
     acrof = TestBed.get(AnswerClassificationResultObjectFactory);
@@ -172,15 +173,13 @@ fdescribe('Learner answer info service', () => {
     // canAskLearnerAnswerInfo which is a boolean variable as true as every
     // probability index is greater than 0.
     spyOn(Math, 'random').and.returnValue(0);
-    console.log(learnerAnswerInfoService);
   });
 
   fdescribe('.initLearnerAnswerInfo', () => {
     beforeEach(() => {
-      learnerAnswerInfoService.initLearnerAnswerInfoService(
+      this.learnerAnswerInfoService.initLearnerAnswerInfoService(
         '10', firstState, mockAnswer, mockInteractionRulesService, false);
     });
-
     fit('should return can ask learner for answer info true', function() {
       expect(learnerAnswerInfoService.canAskLearnerForAnswerInfo()).toBe(true);
     });

@@ -35,6 +35,8 @@ import { RequestInterceptor } from 'services/request-interceptor.service';
 export class ServiceBootstrapComponent {}
 
 import { AppConstants } from 'app.constants';
+import { CamelCaseToHyphensPipe } from
+ 'filters/string-utility-filters/camel-case-to-hyphens.pipe';
 import { ClassifiersExtensionConstants } from
   'classifiers/classifiers-extension.constants';
 import { CollectionSummaryTileConstants } from
@@ -63,6 +65,7 @@ import { ExplorationPlayerConstants } from
   ],
   providers: [
     AppConstants,
+    CamelCaseToHyphensPipe,
     ClassifiersExtensionConstants,
     CollectionSummaryTileConstants,
     InteractionsExtensionsConstants,
