@@ -212,11 +212,11 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         }
 
         init_state.update_interaction_solution(state_domain.Solution.from_dict(
-        self.interaction.id, solution_dict))
+            self.interaction.id, solution_dict))
         self.assertFalse(init_state.is_rte_content_supported_on_android())
         solution_dict['explanation']['html'] = ''
         init_state.update_interaction_solution(state_domain.Solution.from_dict(
-        self.interaction.id, solution_dict))
+            self.interaction.id, solution_dict))
         self.assertTrue(init_state.is_rte_content_supported_on_android())
 
         hints_list = []
@@ -444,7 +444,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         }
 
         init_state.update_interaction_solution(
-        state_domain.Solution.from_dict(self.interaction.id,solution_dict))
+            state_domain.Solution.from_dict(self.interaction.id, solution_dict))
 
         written_translations_dict = {
             'translations_mapping': {
@@ -873,7 +873,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         }
 
         init_state.update_interaction_solution(
-        state_domain.Solution.from_dict(self.interaction.id,solution_dict))
+            state_domain.Solution.from_dict(self.interaction.id, solution_dict))
         exploration.validate()
 
         hints_list.append(
@@ -941,7 +941,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             }
         }
         init_state.update_interaction_solution(
-        state_domain.Solution.from_dict(self.interaction.id,solution))
+            state_domain.Solution.from_dict(self.interaction.id, solution))
         exploration.validate()
 
     def test_validate_state_solicit_answer_details(self):
@@ -995,7 +995,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         exploration.init_state.update_interaction_hints(hints_list)
         exploration.init_state.update_interaction_solution(
-        state_domain.Solution.from_dict(self.interaction.id,solution))
+            state_domain.Solution.from_dict(self.interaction.id, solution))
         exploration.validate()
 
         solution = {
@@ -1008,7 +1008,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         }
 
         exploration.init_state.update_interaction_solution(
-        state_domain.Solution.from_dict(self.interaction.id,solution))
+            state_domain.Solution.from_dict(self.interaction.id, solution))
         with self.assertRaisesRegexp(
             Exception, 'Expected answer_is_exclusive to be bool, received 1'):
             exploration.validate()
@@ -1112,7 +1112,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         }
 
         exploration.init_state.update_interaction_solution(
-        state_domain.Solution.from_dict(self.interaction.id,solution))
+            state_domain.Solution.from_dict(self.interaction.id, solution))
         exploration.init_state.update_content(
             state_domain.SubtitledHtml.from_dict({
                 'content_id': 'solution',
@@ -1338,7 +1338,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         exploration.init_state.update_interaction_hints(hints_list)
         exploration.init_state.update_interaction_solution(
-        state_domain.Solution.from_dict(self.interaction.id,solution))
+            state_domain.Solution.from_dict(self.interaction.id, solution))
 
         self.assertEqual(
             exploration.init_state.interaction.solution.to_dict(), solution)
@@ -1346,7 +1346,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             Exception, 'Expected argument to be a object'):
             exploration.init_state.update_interaction_solution(
-            Solution.from_dict(self.interaction.id,[]))
+                Solution.from_dict(self.interaction.id, []))
 
     def test_update_interaction_solution_with_no_solution(self):
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')

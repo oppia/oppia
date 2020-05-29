@@ -1926,7 +1926,7 @@ class State(python_utils.OBJECT):
                 self.interaction.solution.explanation.content_id)
 
         if sol is not None:
-            if not isinstance(sol,Solution):
+            if not isinstance(sol, Solution):
                 raise Exception(
                     'Expected argument to be a domain object, recieved %s'
                     % sol)
