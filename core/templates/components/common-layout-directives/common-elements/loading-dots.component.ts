@@ -22,7 +22,8 @@ import { downgradeComponent } from '@angular/upgrade/static';
 
 @Component({
   selector: 'loading-dots',
-  template: require('./loading-dots.component.html')
+  templateUrl: './loading-dots.component.html',
+  styleUrls: []
 })
 export class LoadingDotsComponent implements OnInit {
   ngOnInit() {}

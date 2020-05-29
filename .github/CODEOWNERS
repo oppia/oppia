@@ -529,6 +529,7 @@
 /core/templates/**/*Spec.ts @marianazangrossi
 /extensions/**/*.spec.ts @marianazangrossi
 /extensions/**/*Spec.ts @marianazangrossi
+/core/templates/components/common-layout-directives/common-elements/loading-dots.component.spec.ts @marianazangrossi
 
 # Draft version upgrade.
 /core/domain/draft_upgrade_services*.py @DubeySandeep
