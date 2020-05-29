@@ -39,6 +39,7 @@ _PARSER.add_argument(
 RUNNING_PROCESSES = []
 
 APP_ENGINE_PORT = 8181
+NGINX_PORT = 9999
 
 
 def setup_and_install_dependencies():
@@ -155,6 +156,7 @@ def run_lighthouse_checks_with_compression():
     start_proxy_server()
     build.main(args=['--prod_env'])
     start_google_app_engine_server(True)
+    wait_for_port_to_be_open(NGINX_PORT)
     wait_for_port_to_be_open(APP_ENGINE_PORT)
     run_lighthouse_checks()
 
