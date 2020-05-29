@@ -1070,33 +1070,38 @@ def save_exploration_summary(exp_summary):
     Args:
         exp_summary: ExplorationSummary. The exploration summary to save.
     """
-    exp_summary_model = exp_models.ExpSummaryModel(
-        id=exp_summary.id,
-        title=exp_summary.title,
-        category=exp_summary.category,
-        objective=exp_summary.objective,
-        language_code=exp_summary.language_code,
-        tags=exp_summary.tags,
-        ratings=exp_summary.ratings,
-        scaled_average_rating=exp_summary.scaled_average_rating,
-        status=exp_summary.status,
-        community_owned=exp_summary.community_owned,
-        owner_ids=exp_summary.owner_ids,
-        editor_ids=exp_summary.editor_ids,
-        voice_artist_ids=exp_summary.voice_artist_ids,
-        viewer_ids=exp_summary.viewer_ids,
-        contributor_ids=exp_summary.contributor_ids,
-        contributors_summary=exp_summary.contributors_summary,
-        version=exp_summary.version,
-        exploration_model_last_updated=(
+    exp_summary_dict = {
+        'title': exp_summary.title,
+        'category': exp_summary.category,
+        'objective': exp_summary.objective,
+        'language_code': exp_summary.language_code,
+        'tags': exp_summary.tags,
+        'ratings': exp_summary.ratings,
+        'scaled_average_rating': exp_summary.scaled_average_rating,
+        'status': exp_summary.status,
+        'community_owned': exp_summary.community_owned,
+        'owner_ids': exp_summary.owner_ids,
+        'editor_ids': exp_summary.editor_ids,
+        'voice_artist_ids': exp_summary.voice_artist_ids,
+        'viewer_ids': exp_summary.viewer_ids,
+        'contributor_ids': exp_summary.contributor_ids,
+        'contributors_summary': exp_summary.contributors_summary,
+        'version': exp_summary.version,
+        'exploration_model_last_updated': (
             exp_summary.exploration_model_last_updated),
-        exploration_model_created_on=(
+        'exploration_model_created_on': (
             exp_summary.exploration_model_created_on),
-        first_published_msec=(
+        'first_published_msec': (
             exp_summary.first_published_msec)
-    )
+    }
 
-    exp_summary_model.put()
+    exp_summary_model = (exp_models.ExpSummaryModel.get_by_id(exp_summary.id))
+    if exp_summary_model is not None:
+        exp_summary_model.populate(**exp_summary_dict)
+        exp_summary_model.put()
+    else:
+        exp_summary_dict['id'] = exp_summary.id
+        exp_models.ExpSummaryModel(**exp_summary_dict).put()
 
     # The index should be updated after saving the exploration
     # summary instead of after saving the exploration since the

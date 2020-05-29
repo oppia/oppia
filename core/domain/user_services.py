@@ -682,36 +682,46 @@ def _save_user_settings(user_settings):
         user_settings: UserSettings domain object.
     """
     user_settings.validate()
-    user_models.UserSettingsModel(
-        id=user_settings.user_id,
-        gae_id=user_settings.gae_id,
-        email=user_settings.email,
-        role=user_settings.role,
-        username=user_settings.username,
-        normalized_username=user_settings.normalized_username,
-        last_agreed_to_terms=user_settings.last_agreed_to_terms,
-        last_started_state_editor_tutorial=(
+
+    user_settings_dict = {
+        'gae_id': user_settings.gae_id,
+        'email': user_settings.email,
+        'role': user_settings.role,
+        'username': user_settings.username,
+        'normalized_username': user_settings.normalized_username,
+        'last_agreed_to_terms': user_settings.last_agreed_to_terms,
+        'last_started_state_editor_tutorial': (
             user_settings.last_started_state_editor_tutorial),
-        last_started_state_translation_tutorial=(
+        'last_started_state_translation_tutorial': (
             user_settings.last_started_state_translation_tutorial),
-        last_logged_in=user_settings.last_logged_in,
-        last_edited_an_exploration=user_settings.last_edited_an_exploration,
-        last_created_an_exploration=(
+        'last_logged_in': user_settings.last_logged_in,
+        'last_edited_an_exploration': user_settings.last_edited_an_exploration,
+        'last_created_an_exploration': (
             user_settings.last_created_an_exploration),
-        profile_picture_data_url=user_settings.profile_picture_data_url,
-        default_dashboard=user_settings.default_dashboard,
-        creator_dashboard_display_pref=(
+        'profile_picture_data_url': user_settings.profile_picture_data_url,
+        'default_dashboard': user_settings.default_dashboard,
+        'creator_dashboard_display_pref': (
             user_settings.creator_dashboard_display_pref),
-        user_bio=user_settings.user_bio,
-        subject_interests=user_settings.subject_interests,
-        first_contribution_msec=user_settings.first_contribution_msec,
-        preferred_language_codes=user_settings.preferred_language_codes,
-        preferred_site_language_code=(
+        'user_bio': user_settings.user_bio,
+        'subject_interests': user_settings.subject_interests,
+        'first_contribution_msec': user_settings.first_contribution_msec,
+        'preferred_language_codes': user_settings.preferred_language_codes,
+        'preferred_site_language_code': (
             user_settings.preferred_site_language_code),
-        preferred_audio_language_code=(
+        'preferred_audio_language_code': (
             user_settings.preferred_audio_language_code),
-        deleted=user_settings.deleted
-    ).put()
+        'deleted': user_settings.deleted
+    }
+
+    # If user with the given user_id already exists, update that model
+    # with the given user settings, otherwise, create a new one.
+    user_model = user_models.UserSettingsModel.get_by_id(user_settings.user_id)
+    if user_model is not None:
+        user_model.populate(**user_settings_dict)
+        user_model.put()
+    else:
+        user_settings_dict['id'] = user_settings.user_id
+        user_models.UserSettingsModel(**user_settings_dict).put()
 
 
 def _transform_user_settings(user_settings_model):

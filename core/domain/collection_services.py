@@ -1058,29 +1058,37 @@ def save_collection_summary(collection_summary):
         collection_summary: The collection summary object to be saved in the
             datastore.
     """
-    collection_summary_model = collection_models.CollectionSummaryModel(
-        id=collection_summary.id,
-        title=collection_summary.title,
-        category=collection_summary.category,
-        objective=collection_summary.objective,
-        language_code=collection_summary.language_code,
-        tags=collection_summary.tags,
-        status=collection_summary.status,
-        community_owned=collection_summary.community_owned,
-        owner_ids=collection_summary.owner_ids,
-        editor_ids=collection_summary.editor_ids,
-        viewer_ids=collection_summary.viewer_ids,
-        contributor_ids=collection_summary.contributor_ids,
-        contributors_summary=collection_summary.contributors_summary,
-        version=collection_summary.version,
-        node_count=collection_summary.node_count,
-        collection_model_last_updated=(
+    collection_summary_dict = {
+        'title': collection_summary.title,
+        'category': collection_summary.category,
+        'objective': collection_summary.objective,
+        'language_code': collection_summary.language_code,
+        'tags': collection_summary.tags,
+        'status': collection_summary.status,
+        'community_owned': collection_summary.community_owned,
+        'owner_ids': collection_summary.owner_ids,
+        'editor_ids': collection_summary.editor_ids,
+        'viewer_ids': collection_summary.viewer_ids,
+        'contributor_ids': collection_summary.contributor_ids,
+        'contributors_summary': collection_summary.contributors_summary,
+        'version': collection_summary.version,
+        'node_count': collection_summary.node_count,
+        'collection_model_last_updated': (
             collection_summary.collection_model_last_updated),
-        collection_model_created_on=(
+        'collection_model_created_on': (
             collection_summary.collection_model_created_on)
-    )
+    }
 
-    collection_summary_model.put()
+    collection_summary_model = (
+        collection_models.CollectionSummaryModel.get_by_id(
+            collection_summary.id))
+    if collection_summary_model is not None:
+        collection_summary_model.populate(**collection_summary_dict)
+        collection_summary_model.put()
+    else:
+        collection_summary_dict['id'] = collection_summary.id
+        collection_models.CollectionSummaryModel(
+            **collection_summary_dict).put()
 
 
 def delete_collection_summaries(collection_ids):
