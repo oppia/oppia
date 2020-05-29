@@ -2054,6 +2054,8 @@ pre.oppia-pre-wrapped-text {
 }
 
 .oppia-story-player-tiles-container {
+  background-color: #ffffff;
+  border-radius: 8px;
   height: 100%;
   margin: 0 auto;
   max-width: 975px;
@@ -2061,8 +2063,6 @@ pre.oppia-pre-wrapped-text {
   padding-bottom: 25px;
   padding-top: 30px;
   position: relative;
-  background-color: white;
-  border-radius: 8px;
 }
 
 .oppia-page-heading {
