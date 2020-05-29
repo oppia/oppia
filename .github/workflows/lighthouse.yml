@@ -3,7 +3,7 @@ on: [push]
 
 jobs:
   lighthouse:
-    runs-on:  ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [ubuntu-18.04]
@@ -11,10 +11,9 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v1
         with:
-          python-version: '2.x'
-          architecture: 'x64'
+          python-version: "2.x"
+          architecture: "x64"
       - name: Install Third Party Dependencies
         run: python -m scripts.install_third_party_libs
       - name: Run lighthouse checks
-        run: python -m scripts.lighthouse_checks
-
+        run: python -m scripts.lighthouse_checks --enable_compression
