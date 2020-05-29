@@ -32,13 +32,6 @@ angular.module('oppia').directive('storiesList', ['UrlInterpolationService',
         '/pages/topic-viewer-page/stories-list/' +
         'topic-viewer-stories-list.directive.html'),
       controllerAs: '$ctrl',
-      controller: ['$scope',
-        function($scope) {
-          var ctrl = this;
-
-          ctrl.$onInit = function() {
-          };
-        }
-      ]
+      controller: [function() {}]
     };
   }]);

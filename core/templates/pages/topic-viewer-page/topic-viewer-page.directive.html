@@ -55,7 +55,10 @@
       <!-- <skills-mastery-list degrees-of-mastery="$ctrl.degreesOfMastery" skill-descriptions="$ctrl.skillDescriptions"></skills-mastery-list> -->
     </div>
     <div ng-if="$ctrl.activeTab === 'subtopics'">
-      <subtopics-list subtopics-list="$ctrl.subtopics"></subtopics-list>
+      <subtopics-list subtopics-list="$ctrl.subtopics"
+                      topic-name="$ctrl.topicName"
+                      topic-id="$ctrl.topicId">
+      </subtopics-list>
     </div>
   </div>
 </div>
@@ -82,8 +85,8 @@
     display: flex;
     flex-wrap: wrap;
     margin-bottom: 0;
-    margin-left: 20vw;
-    margin-right: 20vw;
+    margin-left: 25vw;
+    margin-right: 25vw;
     padding-left: 0;
     padding-top: 20px;
     text-align: center;
@@ -140,7 +143,7 @@
   .topic-viewer-page-content .oppia-page-card {
     border-radius: 0.25em;
     margin-top: 5vh;
-    width: 60vw;
+    width: 50vw;
   }
 
   @media(max-width: 1024px) {
@@ -159,7 +162,7 @@
   @media(max-width: 500px) {
     .topic-viewer-page-content .oppia-page-card {
       padding: 5px 15px 25px 25px;
-      width: 85vw;
+      width: 90vw;
     }
 
     .oppia-topic-viewer-tabs-container .topic-viewer-tabs {

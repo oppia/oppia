@@ -65,8 +65,6 @@ angular.module('oppia').directive('storySummaryTile', [
             if (ctrl.chaptersDisplayed !== ctrl.nodeCount) {
               ctrl.showButton = true;
             }
-            ctrl.referenceHeight = (
-              angular.element('.story-thumbnail')[0].offsetHeight);
             ctrl.thumbnailUrl = (
               AssetsBackendApiService.getThumbnailUrlForPreview(
                 ENTITY_TYPE.STORY, ctrl.getStorySummary().getId(),

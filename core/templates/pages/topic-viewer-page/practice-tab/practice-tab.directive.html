@@ -1,7 +1,7 @@
 <div class="oppia-practice-tab-container">
   <md-card class="oppia-page-card oppia-long-text">
     <h2 class="tab-title"> Master these Skills </h2>
-    <span class="practice-content"> Select skills that you would like to practice </span>
+    <span class="practice-content"> Select skills that you would like to practice. </span>
     <md-checkbox ng-repeat="subtopic in $ctrl.availableSubtopics" ng-model="$ctrl.selectedSubtopicIndices[$index]">
       <[subtopic.getTitle()]>
     </md-checkbox>
