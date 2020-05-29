@@ -1021,21 +1021,16 @@ class Skill(python_utils.OBJECT):
                 return ind
         return None
 
-    def add_misconception(self, misconception_dict):
+    def add_misconception(self, misconception):
         """Adds a new misconception to the skill.
 
         Args:
-            misconception_dict: dict. The misconception to be added.
+            misconception: Misconception. The misconception to be added.
         """
-        misconception = Misconception(
-            misconception_dict['id'],
-            misconception_dict['name'],
-            misconception_dict['notes'],
-            misconception_dict['feedback'],
-            misconception_dict['must_be_addressed'])
+
         self.misconceptions.append(misconception)
         self.next_misconception_id = self.get_incremented_misconception_id(
-            misconception_dict['id'])
+            misconception.id)
 
     def _find_prerequisite_skill_id_index(self, skill_id_to_find):
         """Returns the index of the skill_id in the prerequisite_skill_ids

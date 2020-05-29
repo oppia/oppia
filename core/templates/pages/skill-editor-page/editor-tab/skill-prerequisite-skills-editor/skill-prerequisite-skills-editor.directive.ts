@@ -40,11 +40,9 @@ angular.module('oppia').directive('skillPrerequisiteSkillsEditor', [
         'skill-prerequisite-skills-editor/' +
         'skill-prerequisite-skills-editor.directive.html'),
       controller: [
-        '$scope', '$filter', '$uibModal', '$rootScope',
-        'EVENT_SKILL_REINITIALIZED', 'AlertsService',
+        '$scope', '$filter', '$uibModal', 'AlertsService',
         function(
-            $scope, $filter, $uibModal, $rootScope,
-            EVENT_SKILL_REINITIALIZED, AlertsService) {
+            $scope, $filter, $uibModal, AlertsService) {
           var ctrl = this;
           var groupedSkillSummaries =
             SkillEditorStateService.getGroupedSkillSummaries();
@@ -79,6 +77,9 @@ angular.module('oppia').directive('skillPrerequisiteSkillsEditor', [
 
                   $scope.skillSummaries = sortedSkillSummaries;
                   $scope.selectedSkillId = null;
+                  $scope.save = function() {
+                    $scope.confirm($scope.selectedSkillId);
+                  };
                   $scope.countOfSkillsToPrioritize = skillsInSameTopicCount;
                 }
               ]

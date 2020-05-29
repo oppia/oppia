@@ -26,20 +26,54 @@ import cloneDeep from 'lodash/cloneDeep';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
+import { IMisconceptionBackendDict } from
+  'domain/skill/MisconceptionObjectFactory';
+
+interface IBackendChangeObject {
+  // This interface may not have all the possible values.
+  // Add properties with a '?' if you find any that needs to be here.
+  'cmd'?: string;
+  'property_name'?: string;
+
+  'state_name'?: string;
+  'old_state_name'?: string;
+  'new_state_name'?: string;
+
+  'new_value'?: Object;
+  'old_value'?: Object;
+
+  'exploration_id'?: string;
+
+  'new_misconception_dict'?: IMisconceptionBackendDict;
+  'misconception_id'?: string;
+
+  'skill_id'?: string;
+  'uncategorized_skill_id'?: string;
+  'new_uncategorized_skill_id'?: string;
+  'skill_difficulty'?: number;
+
+  'explanations'?: string[];
+  'difficulty'?: string;
+
+  'node_id'?: string;
+
+  'story_id'?: string;
+
+  'subtopic_id'?: number;
+  'new_subtopic_id'?: number;
+  'old_subtopic_id'?: number;
+
+  'version_number'?: number;
+}
+
 export class Change {
-  // TODO(#7176): Replace 'any' with the exact type. This (and elsewhere
-  // throughout) has been kept as 'any' because 'backendChangeObject' is a
-  // dict with possible underscore_cased keys which give tslint errors
-  // against underscore_casing in favor of camelCasing. Also,
-  // 'applyChangeToObject' and 'reverseChangeToObject' are functions whose
-  // return type depends upon the arguments passed to the constructor.
-  _backendChangeObject: any;
-  _applyChangeToObject: any;
-  _reverseChangeToObject: any;
+  _backendChangeObject: IBackendChangeObject;
+  _applyChangeToObject: Function;
+  _reverseChangeToObject: Function;
 
   constructor(
-      backendChangeObject: any, applyChangeToObject: any,
-      reverseChangeToObject: any) {
+      backendChangeObject: IBackendChangeObject, applyChangeToObject: Function,
+      reverseChangeToObject: Function) {
     this._backendChangeObject = cloneDeep(backendChangeObject);
     this._applyChangeToObject = applyChangeToObject;
     this._reverseChangeToObject = reverseChangeToObject;
@@ -47,48 +81,25 @@ export class Change {
 
   // Returns the JSON object which represents a backend python dict of this
   // change. Changes to this object are not reflected in this domain object.
-  // TODO(#7176): Replace 'any' with the exact type. This (and elsewhere
-  // throughout) has been kept as 'any' because 'backendChangeObject' is a
-  // dict with possible underscore_cased keys which give tslint errors
-  // against underscore_casing in favor of camelCasing. Also,
-  // 'applyChangeToObject' and 'reverseChangeToObject' are functions whose
-  // return type depends upon the arguments passed to the constructor.
-  getBackendChangeObject(): any {
+  getBackendChangeObject(): IBackendChangeObject {
     return cloneDeep(this._backendChangeObject);
   }
 
-  // TODO(#7176): Replace 'any' with the exact type. This (and elsewhere
-  // throughout) has been kept as 'any' because 'backendChangeObject' is a
-  // dict with possible underscore_cased keys which give tslint errors
-  // against underscore_casing in favor of camelCasing. Also,
-  // 'applyChangeToObject' and 'reverseChangeToObject' are functions whose
-  // return type depends upon the arguments passed to the constructor.
-  setBackendChangeObject(backendChangeObject: any): any {
+  setBackendChangeObject(
+      backendChangeObject: IBackendChangeObject): IBackendChangeObject {
     return this._backendChangeObject = cloneDeep(backendChangeObject);
   }
 
   // Applies this change to the related object (such as a frontend collection
   // domain object).
-  // TODO(#7176): Replace 'any' with the exact type. This (and elsewhere
-  // throughout) has been kept as 'any' because 'backendChangeObject' is a
-  // dict with possible underscore_cased keys which give tslint errors
-  // against underscore_casing in favor of camelCasing. Also,
-  // 'applyChangeToObject' and 'reverseChangeToObject' are functions whose
-  // return type depends upon the arguments passed to the constructor.
-  applyChange(domainObject: any): void {
+  applyChange(domainObject: IBackendChangeObject): void {
     this._applyChangeToObject(this._backendChangeObject, domainObject);
   }
 
   // Reverse-applies this change to the related object (such as a frontend
   // collection domain object). This method should only be used to reverse a
   // change that was previously applied by calling the applyChange() method.
-  // TODO(#7176): Replace 'any' with the exact type. This (and elsewhere
-  // throughout) has been kept as 'any' because 'backendChangeObject' is a
-  // dict with possible underscore_cased keys which give tslint errors
-  // against underscore_casing in favor of camelCasing. Also,
-  // 'applyChangeToObject' and 'reverseChangeToObject' are functions whose
-  // return type depends upon the arguments passed to the constructor.
-  reverseChange(domainObject: any): void {
+  reverseChange(domainObject: IBackendChangeObject): void {
     this._reverseChangeToObject(this._backendChangeObject, domainObject);
   }
 }
@@ -105,15 +116,9 @@ export class ChangeObjectFactory {
   // parameter is a callback which behaves in the same way as the second
   // parameter and takes the same inputs, except it should reverse the change
   // for the provided domain object.
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'backendChangeObject' is a dict with possible
-  // underscore_cased keys which give tslint errors against underscore_casing
-  // in favor of camelCasing. Also, 'applyChangeToObject' and
-  // 'reverseChangeToObject' are functions whose return type depends upon the
-  // arguments passed to the constructor.
   create(
-      backendChangeObject: any, applyChangeToObject: any,
-      reverseChangeToObject: any): Change {
+      backendChangeObject: IBackendChangeObject, applyChangeToObject: Function,
+      reverseChangeToObject: Function): Change {
     return new Change(
       backendChangeObject, applyChangeToObject, reverseChangeToObject);
   }
