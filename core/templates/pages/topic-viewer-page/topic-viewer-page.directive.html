@@ -37,7 +37,7 @@
   </div>
   <background-banner></background-banner>
   <div class="topic-viewer-page-content" ng-if="!$ctrl.topicIsLoading">
-    <div ng-if="$ctrl.activeTab === 'info'" class="tab-content">
+    <div ng-if="$ctrl.activeTab === 'info'">
       <topic-info-tab topic-name="$ctrl.topicName"
                       topic-description="$ctrl.topicDescription"
                       story-count="$ctrl.canonicalStorySummaries.length"
@@ -45,14 +45,16 @@
                       chapter-count="$ctrl.chapterCount">
       </topic-info-tab>
     </div>
-    <div ng-if="$ctrl.activeTab === 'story'" class="tab-content">
+    <div ng-if="$ctrl.activeTab === 'story'">
       <stories-list canonical-story-summaries="$ctrl.canonicalStorySummaries"></stories-list>
     </div>
-    <div ng-if="$ctrl.activeTab === 'practice'" class="oppia-practice-tab">
-      <practice-tab topic-name="$ctrl.topicName"></practice-tab>
-      <skills-mastery-list degrees-of-mastery="$ctrl.degreesOfMastery" skill-descriptions="$ctrl.skillDescriptions"></skills-mastery-list>
+    <div ng-if="$ctrl.activeTab === 'practice'">
+      <practice-tab subtopics-list="$ctrl.subtopics"
+                    topic-name="$ctrl.topicName">
+      </practice-tab>
+      <!-- <skills-mastery-list degrees-of-mastery="$ctrl.degreesOfMastery" skill-descriptions="$ctrl.skillDescriptions"></skills-mastery-list> -->
     </div>
-    <div ng-if="$ctrl.activeTab === 'subtopics'" class="oppia-subtopics-tab">
+    <div ng-if="$ctrl.activeTab === 'subtopics'">
       <subtopics-list subtopics-list="$ctrl.subtopics"></subtopics-list>
     </div>
   </div>
@@ -102,6 +104,12 @@
     width: 100%;
   }
 
+  .topic-viewer-page-content .tab-title {
+    color: #01645c;
+    font-family: 'Capriola', 'Roboto', Arial, sans-serif;
+    font-size: 2em;
+  }
+
   .oppia-topic-viewer-tabs-container .topic-viewer-tabs .topic-viewer-tabs-text .tab-title {
     font-size: 1em;
     text-decoration: none;
@@ -131,6 +139,8 @@
 
   .topic-viewer-page-content .oppia-page-card {
     border-radius: 0.25em;
+    margin-top: 5vh;
+    width: 60vw;
   }
 
   @media(max-width: 1024px) {
@@ -169,17 +179,6 @@
     .oppia-topic-viewer-tabs-container .topic-viewer-tabs li {
       width: auto;
     }
-  }
-
-  .oppia-topic-viewer-container .tab-content {
-    margin: 0 auto;
-    width: max-content;
-  }
-
-  .oppia-practice-tab {
-    margin: 0 auto;
-    width: 100%;
-    max-width: 800px;
   }
 
   .oppia-topic-viewer-container {

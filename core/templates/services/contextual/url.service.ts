@@ -85,6 +85,14 @@ export class UrlService {
     throw new Error('Invalid URL for topic');
   }
 
+  getSelectedSubtopicsFromUrl(): string {
+    let pathname = this.getPathname();
+    if (pathname.match(/\/practice_session/g)) {
+      return decodeURIComponent(pathname.split('/')[3]);
+    }
+    throw new Error('Invalid URL for practice session');
+  }
+
   getClassroomNameFromUrl(): string {
     let pathname = this.getPathname();
     let argumentsArray = pathname.split('/');
