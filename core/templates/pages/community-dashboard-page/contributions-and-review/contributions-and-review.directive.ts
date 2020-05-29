@@ -266,7 +266,7 @@ angular.module('oppia').directive('contributionsAndReview', [
               targetId, suggestionId, contentHtml, translationHtml,
               reviewable) {
             // We need to set the context here so that the rte fetches images
-            // for the give ENTITY_TYPE and entityId.
+            // for the given ENTITY_TYPE and targetId.
             ContextService.setCustomEntityContext(
               ENTITY_TYPE.EXPLORATION, targetId);
             var _templateUrl = UrlInterpolationService.getDirectiveTemplateUrl(

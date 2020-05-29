@@ -133,7 +133,7 @@ angular.module('oppia').directive(
                     $uibModalInstance: $uibModalInstance
                   });
                   // We need to set the context here so that the rte fetches
-                  // images for the give ENTITY_TYPE and entityId.
+                  // images for the given ENTITY_TYPE and targetId.
                   ContextService.setCustomEntityContext(
                     ENTITY_TYPE.EXPLORATION, opportunity.id);
                   $scope.userIsLoggedIn = userIsLoggedIn;
