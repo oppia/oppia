@@ -1077,7 +1077,7 @@ class SingleNewlineAboveArgsChecker(checkers.BaseChecker):
 
             # Check if it is a docstring and not some multi-line string.
             if (prev_line.startswith(b'class ') or
-                    prev_line.startswith(b'def ')) or (is_class_or_function):
+                    prev_line.startswith(b'def ') or is_class_or_function):
                 is_class_or_function = True
                 if prev_line.endswith(b'):') and line.startswith(b'"""'):
                     is_docstring = True
@@ -1164,7 +1164,7 @@ class DivisionOperatorChecker(checkers.BaseChecker):
             if line.count(string_indicator) >= 2:
                 continue
 
-            if re.search(br'[^/]/[^/]', line) and (
+            if (re.search(br'[^/]/[^/]', line) and
                     not line.endswith(multi_line_indicator)):
                 self.add_message(
                     'division-operator-used', line=line_num + 1)
