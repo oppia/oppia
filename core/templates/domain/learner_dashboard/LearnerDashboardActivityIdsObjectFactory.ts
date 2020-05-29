@@ -20,6 +20,15 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
+export interface ILearnerDashboardActivityIdsDict {
+  'incomplete_exploration_ids': string[];
+  'incomplete_collection_ids': string[];
+  'completed_exploration_ids': string[];
+  'completed_collection_ids': string[];
+  'exploration_playlist_ids': string[];
+  'collection_playlist_ids': string[];
+}
+
 export class LearnerDashboardActivityIds {
   incompleteExplorationIds: string[];
   incompleteCollectionIds: string[];
@@ -128,12 +137,9 @@ export class LearnerDashboardActivityIds {
   providedIn: 'root'
 })
 export class LearnerDashboardActivityIdsObjectFactory {
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'skillRightsBackendDict' is a dict with underscore_cased
-  // keys which give tslint errors against underscore_casing in favor of
-  // camelCasing.
   createFromBackendDict(
-      learnerDashboardActivityIdsDict: any): LearnerDashboardActivityIds {
+      learnerDashboardActivityIdsDict: ILearnerDashboardActivityIdsDict):
+      LearnerDashboardActivityIds {
     return new LearnerDashboardActivityIds(
       learnerDashboardActivityIdsDict.incomplete_exploration_ids,
       learnerDashboardActivityIdsDict.incomplete_collection_ids,

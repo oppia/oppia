@@ -18,11 +18,11 @@
  */
 
 export interface IMisconceptionBackendDict {
-  feedback: string;
-  id: string;
+  'feedback': string;
+  'id': string;
   'must_be_addressed': boolean;
-  name: string;
-  notes: string;
+  'name': string;
+  'notes': string;
 }
 
 import { downgradeInjectable } from '@angular/upgrade/static';
