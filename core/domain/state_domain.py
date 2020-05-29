@@ -1910,15 +1910,14 @@ class State(python_utils.OBJECT):
         self._update_content_ids_in_assets(
             old_content_id_list, new_content_id_list)
 
-    def update_interaction_solution(self, solution_dict):
+    def update_interaction_solution(self, sol):
         """Update the solution of interaction.
 
         Args:
-            solution_dict: dict or None. The dict representation of
-                Solution object.
+            sol: Solution object.
 
         Raises:
-            Exception: 'solution_dict' is not a dict.
+            Exception: 'sol' is not a domain object.
         """
         old_content_id_list = []
         new_content_id_list = []
@@ -1926,11 +1925,12 @@ class State(python_utils.OBJECT):
             old_content_id_list.append(
                 self.interaction.solution.explanation.content_id)
 
-        if solution_dict is not None:
-            if not isinstance(solution_dict, dict):
+        if sol is not None:
+            if not isinstance(sol,Solution):
                 raise Exception(
-                    'Expected solution to be a dict, received %s'
-                    % solution_dict)
+                    'Expected argument to be a domain object, recieved %s'
+                    % sol)
+            solution_dict = sol.to_dict()
             self.interaction.solution = Solution.from_dict(
                 self.interaction.id, solution_dict)
             new_content_id_list.append(

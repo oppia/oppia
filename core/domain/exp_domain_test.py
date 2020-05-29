@@ -717,14 +717,15 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         init_state.update_interaction_default_outcome(default_outcome)
         exploration.validate()
 
-        init_state.update_interaction_solution({
+        init_state.update_interaction_solution(state_domain.Solution.from_dict(
+        self.interaction.id, {
             'answer_is_exclusive': True,
             'correct_answer': 'hello_world!',
             'explanation': {
                 'content_id': 'solution',
                 'html': 'hello_world is a string'
                 }
-        })
+        }))
         self._assert_validation_error(
             exploration,
             re.escape('Hint(s) must be specified if solution is specified'))
@@ -1218,7 +1219,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 'html': '<p>hello_world is a string</p>'
             },
         }
-        init_state.update_interaction_solution(solution)
+        init_state.update_interaction_solution(state_domain.Solution.from_dict(
+        self.interaction.id,solution))
 
         self.assertEqual(exploration.get_content_count(), 7)
 
@@ -8338,7 +8340,8 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
             }
         }
 
-        state1.update_interaction_solution(solution_dict1)
+        state1.update_interaction_solution(state_domain.Solution.from_dict(
+        solution_dict['interaction_id'], solution_dict1)
 
         answer_group_list2 = [{
             'rule_specs': [{
