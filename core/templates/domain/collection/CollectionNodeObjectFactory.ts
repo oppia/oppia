@@ -23,17 +23,19 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import { AppConstants } from 'app.constants';
+// eslint-disable-next-line max-len
+import { IExplorationSummary } from 'core/templates/pages/exploration-player-page/services/exploration-recommendations.service';
+
+export interface ICollectionNodeBackendDict {
+  'exploration_id'?: string;
+  'exploration_summary'?: IExplorationSummary;
+}
 
 export class CollectionNode {
   _explorationId: string;
-  // TODO(#7165): Replace 'any' with the exact type. This has been typed
-  // as 'any' since '_explorationSummaryObject' is a dict of varying keys.
-  _explorationSummaryObject: any;
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'collectionNodeBackendObject' is a dict with underscore_cased
-  // keys which give tslint errors against underscore_casing in favor of
-  // camelCasing.
-  constructor(collectionNodeBackendObject: any) {
+  _explorationSummaryObject: IExplorationSummary;
+
+  constructor(collectionNodeBackendObject: ICollectionNodeBackendDict) {
     this._explorationId = collectionNodeBackendObject.exploration_id;
     this._explorationSummaryObject = cloneDeep(
       collectionNodeBackendObject.exploration_summary);
@@ -78,9 +80,7 @@ export class CollectionNode {
   // frontend exploration summary tile displaying. Changes to the returned
   // object are not reflected in this domain object. The value returned by
   // this function is null if doesExplorationExist() returns false.
-  // TODO(#7165): Replace 'any' with the exact type. This has been typed
-  // as 'any' since '_explorationSummaryObject' is a dict of varying keys.
-  getExplorationSummaryObject(): any {
+  getExplorationSummaryObject(): IExplorationSummary {
     // TODO(bhenning): This should be represented by a
     // frontend summary domain object that is also shared with
     // the search result and profile pages.
@@ -88,9 +88,8 @@ export class CollectionNode {
   }
 
   // Sets the raw exploration summary object stored within this node.
-  // TODO(#7165): Replace 'any' with the exact type. This has been typed
-  // as 'any' since '_explorationSummaryObject' is a dict of varying keys.
-  setExplorationSummaryObject(explorationSummaryBackendObject: any): any {
+  setExplorationSummaryObject(
+      explorationSummaryBackendObject: IExplorationSummary): void {
     this._explorationSummaryObject = cloneDeep(
       explorationSummaryBackendObject);
   }
@@ -109,11 +108,9 @@ export class CollectionNodeObjectFactory {
   // Static class methods. Note that "this" is not available in static
   // contexts. This function takes a JSON object which represents a backend
   // collection node python dict.
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'collectionNodeBackendObject' is a dict with underscore_cased
-  // keys which give tslint errors against underscore_casing in favor of
-  // camelCasing.
-  create(collectionNodeBackendObject: any): CollectionNode {
+  create(
+      collectionNodeBackendObject: ICollectionNodeBackendDict):
+      CollectionNode {
     return new CollectionNode(collectionNodeBackendObject);
   }
 
