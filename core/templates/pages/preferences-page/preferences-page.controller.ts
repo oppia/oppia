@@ -24,7 +24,7 @@ require(
 require('components/forms/custom-forms-directives/image-uploader.directive.ts');
 require(
   'components/common-layout-directives/common-elements/' +
-  'background-banner.directive.ts');
+  'background-banner.component.ts');
 require('filters/string-utility-filters/truncate.filter.ts');
 require(
   'pages/preferences-page/modal-templates/' +

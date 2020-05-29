@@ -67,6 +67,7 @@ from . import general_purpose_linter
 from . import html_linter
 from . import js_ts_linter
 from . import python_linter
+from . import third_party_typings_linter
 from .. import common
 from .. import concurrent_task_utils
 from .. import install_third_party_libs
@@ -552,6 +553,10 @@ def main(args=None):
 
     lint_messages += codeowner_linter.check_codeowner_file(
         verbose_mode_enabled)
+
+    lint_messages += (
+        third_party_typings_linter.check_third_party_libs_type_defs(
+            verbose_mode_enabled))
 
     _print_complete_summary_of_lint_messages(lint_messages)
 

@@ -15,7 +15,6 @@
 /**
  * @fileoverview Controller for select skill modal.
  */
-
 require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
@@ -33,7 +32,6 @@ angular.module('oppia').controller('SelectSkillModalController', [
     $scope.selectedSkillId = null;
     $scope.countOfSkillsToPrioritize =
       skillsInSameTopicCount;
-
     $scope.save = function() {
       for (var idx in sortedSkillSummaries) {
         if (
@@ -43,6 +41,9 @@ angular.module('oppia').controller('SelectSkillModalController', [
             sortedSkillSummaries[idx]);
         }
       }
+    };
+    $scope.save = function() {
+      $scope.confirm($scope.selectedSkillId);
     };
   }
 ]);
