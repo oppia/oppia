@@ -66,6 +66,8 @@ import { CodeReplRulesService } from
   'interactions/CodeRepl/directives/code-repl-rules.service';
 import { CollectionCreationBackendService } from
   'components/entity-creation-services/collection-creation-backend-api.service';
+import { CollectionCreationService } from
+  'components/entity-creation-services/collection-creation.service';
 import { ComputeGraphService } from 'services/compute-graph.service';
 import { ConceptCardObjectFactory } from
   'domain/skill/ConceptCardObjectFactory';
@@ -301,6 +303,8 @@ import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { UrlService } from 'services/contextual/url.service';
+import { UserExplorationPermissionsService } from
+  'pages/exploration-editor-page/services/user-exploration-permissions.service';
 import { UserInfoObjectFactory } from 'domain/user/UserInfoObjectFactory';
 import { UtilsService } from 'services/utils.service';
 import { ValidatorsService } from 'services/validators.service';
@@ -710,8 +714,21 @@ export class UpgradedServices {
       upgradedServices['SubtopicObjectFactory'],
       upgradedServices['StoryReferenceObjectFactory'],
       upgradedServices['SkillSummaryObjectFactory']);
+    upgradedServices['UserExplorationPermissionsService'] = (
+      new UserExplorationPermissionsService(
+        upgradedServices['ContextService'],
+        upgradedServices['HttpClient'],
+        upgradedServices['UrlInterpolationService']));
 
     // Topological level: 4.
+    upgradedServices['CollectionCreationService'] =
+      new CollectionCreationService(
+        upgradedServices['CollectionCreationBackendService'],
+        upgradedServices['AlertsService'],
+        upgradedServices['SiteAnalyticsService'],
+        upgradedServices['UrlInterpolationService'],
+        upgradedServices['LoaderService'],
+        upgradedServices['WindowRef']);
     upgradedServices['PredictionAlgorithmRegistryService'] =
       new PredictionAlgorithmRegistryService(
         upgradedServices['CodeReplPredictionService'],
