@@ -30,6 +30,9 @@ require(
   'components/question-directives/questions-list/' +
   'questions-list.constants.ajs.ts');
 require(
+  'components/skill-selector/' +
+  'questions-list-select-skill-modal.controller.ts');
+require(
   'components/skill-selector/skill-selector.directive.ts');
 
 require('components/entity-creation-services/question-creation.service.ts');
@@ -581,30 +584,7 @@ angular.module('oppia').directive('questionsList', [
                           '/components/skill-selector/' +
                           'select-skill-modal.template.html'),
                       backdrop: true,
-                      controller: [
-                        '$controller', '$scope', '$uibModalInstance',
-                        function($controller, $scope, $uibModalInstance) {
-                          $controller('ConfirmOrCancelModalController', {
-                            $scope: $scope,
-                            $uibModalInstance: $uibModalInstance
-                          });
-                          $scope.skillSummaries = sortedSkillSummaries;
-                          $scope.selectedSkillId = null;
-                          $scope.countOfSkillsToPrioritize =
-                            skillsInSameTopicCount;
-                          $scope.save = function() {
-                            for (var idx in sortedSkillSummaries) {
-                              if (
-                                $scope.selectedSkillId ===
-                                sortedSkillSummaries[idx].id) {
-                                $uibModalInstance.close(
-                                  sortedSkillSummaries[idx]);
-                              }
-                            }
-                            $scope.confirm($scope.selectedSkillId);
-                          };
-                        }
-                      ]
+                      controller: 'QuestionsListSelectSkillModalController'
                     }).result.then(function(summary) {
                       for (var idx in $scope.associatedSkillSummaries) {
                         if (

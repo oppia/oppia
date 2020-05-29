@@ -20,24 +20,28 @@ require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
 
-angular.module('oppia').controller('MergeSkillModalController', [
-  '$controller', '$scope', '$uibModalInstance', 'skill', 'skillSummaries',
-  function($controller, $scope, $uibModalInstance, skill, skillSummaries) {
+angular.module('oppia').controller('QuestionsListSelectSkillModalController', [
+  '$controller', '$scope', '$uibModalInstance', 'skillsInSameTopicCount',
+  'sortedSkillSummaries',
+  function($controller, $scope, $uibModalInstance, skillsInSameTopicCount,
+      sortedSkillSummaries) {
     $controller('ConfirmOrCancelModalController', {
       $scope: $scope,
       $uibModalInstance: $uibModalInstance
     });
-
-    $scope.skillSummaries = skillSummaries;
-    $scope.selectedSkillId = '';
-    $scope.confirm = function() {
-      $uibModalInstance.close(
-        {skill: skill,
-          supersedingSkillId: $scope.selectedSkillId
-        });
-    };
+    $scope.skillSummaries = sortedSkillSummaries;
+    $scope.selectedSkillId = null;
+    $scope.countOfSkillsToPrioritize =
+      skillsInSameTopicCount;
     $scope.save = function() {
-      $scope.confirm();
+      for (var idx in sortedSkillSummaries) {
+        if (
+          $scope.selectedSkillId ===
+          sortedSkillSummaries[idx].id) {
+          $uibModalInstance.close(
+            sortedSkillSummaries[idx]);
+        }
+      }
     };
   }
 ]);

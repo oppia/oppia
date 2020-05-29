@@ -342,6 +342,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'question-player.directive.ts',
     'question-suggestion.service.ts',
     'question-update.service.ts',
+    'questions-list-select-skill-modal.controller.ts',
     'questions-list.directive.ts',
     'random-selector.directive.ts',
     'rating-display.directive.ts',
