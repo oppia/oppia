@@ -432,7 +432,7 @@ class AdminHandler(base.BaseHandler):
                     'property_name': 'category',
                     'new_value': 'Astronomy'
                 })], 'Change category')
-                
+
             story.add_node(
                 '%s%d' % (story_domain.NODE_ID_PREFIX, 2), 'Finding the value of a number')
             story.update_node_description(
