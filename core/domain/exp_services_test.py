@@ -4096,7 +4096,7 @@ title: Old Title
             })], 'Changed interaction_solutions.')
 
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
-
+        
     def test_cannot_update_recorded_voiceovers_with_invalid_type(self):
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
 
