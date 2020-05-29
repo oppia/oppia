@@ -112,7 +112,8 @@ def start_proxy_server():
             }
         """)
 
-    start_server_command = ['nginx', '-c', nginx_conf_file]
+    python_utils.PRINT('Starting proxy server')
+    start_server_command = ['sudo', 'nginx', '-c', nginx_conf_file]
     p = subprocess.Popen(start_server_command);
 
     RUNNING_PROCESSES.append(p)
