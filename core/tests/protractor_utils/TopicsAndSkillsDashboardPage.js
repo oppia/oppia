@@ -254,7 +254,8 @@ var TopicsAndSkillsDashboardPage = function() {
       'Save Concept Card Explanation button takes too long to be clickable');
     await saveConceptCardExplanationButton.click();
     await waitFor.invisibilityOf(
-      editor, 'Explanation Editor takes too long to close');
+      saveConceptCardExplanationButton,
+      'Explanation Editor takes too long to close');
 
     await skillEditorPage.addRubricExplanationForDifficulty(
       'Easy', 'Explanation for easy difficulty.');
@@ -267,9 +268,6 @@ var TopicsAndSkillsDashboardPage = function() {
       confirmSkillCreationButton,
       'Create skill button takes too long to be clickable');
     await confirmSkillCreationButton.click();
-    await waitFor.invisibilityOf(
-      confirmSkillCreationButton,
-      'Create skill modal takes too long to be disappear.');
 
     await waitFor.newTabToBeCreated(
       'Creating skill takes too long', '/skill_editor/');
@@ -285,6 +283,13 @@ var TopicsAndSkillsDashboardPage = function() {
     if (shouldCloseSkillEditor) {
       await browser.driver.close();
       await browser.switchTo().window(parentHandle);
+      await waitFor.invisibilityOf(
+        confirmSkillCreationButton,
+        'Create skill modal takes too long to be disappear.');
+    } else {
+      await waitFor.visibilityOf(
+        element(by.css('.protractor-test-skill-description-field')),
+        'Skill Editor is taking too long to appear.');
     }
     await waitFor.pageToFullyLoad();
   };
