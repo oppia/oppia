@@ -311,6 +311,9 @@ def apply_change_list(topic_id, change_list):
                       topic_domain.TOPIC_PROPERTY_DESCRIPTION):
                     topic.update_description(change.new_value)
                 elif (change.property_name ==
+                      topic_domain.TOPIC_PROPERTY_CATEGORY):
+                    topic.update_category(change.new_value)
+                elif (change.property_name ==
                       topic_domain.TOPIC_PROPERTY_LANGUAGE_CODE):
                     topic.update_language_code(change.new_value)
                 elif (change.property_name ==
@@ -423,6 +426,7 @@ def _save_topic(committer_id, topic, commit_message, change_list):
     topic_model.name = topic.name
     topic_model.canonical_name = topic.canonical_name
     topic_model.abbreviated_name = topic.abbreviated_name
+    topic_model.category = topic.category
     topic_model.thumbnail_bg_color = topic.thumbnail_bg_color
     topic_model.thumbnail_filename = topic.thumbnail_filename
     topic_model.canonical_story_references = [

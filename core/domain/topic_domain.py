@@ -1049,6 +1049,14 @@ class Topic(python_utils.OBJECT):
         """
         self.description = new_description
 
+    def update_category(self, new_category):
+        """Updates the category of a topic object.
+
+        Args:
+            new_category: str. The updated category for the topic.
+        """
+        self.category = new_category
+
     def update_language_code(self, new_language_code):
         """Updates the language code of a topic object.
 

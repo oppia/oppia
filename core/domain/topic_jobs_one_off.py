@@ -165,3 +165,40 @@ class RemoveDeletedSkillsFromTopicOneOffJob(
                 sum(ast.literal_eval(v) for v in values))])
         else:
             yield (key, values)
+
+
+class AddCategoryToTopicOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """One-off job to add category to a topic."""
+    _CATEGORY_ADDED_KEY = 'category_added'
+    _CATEGORY_PRESENT_KEY = 'category_present'
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [topic_models.TopicModel]
+
+    @staticmethod
+    def map(item):
+        topic = topic_fetchers.get_topic_by_id(item.id)
+        if hasattr(topic, 'category') and topic.category:
+            yield (AddCategoryToTopicOneOffJob._CATEGORY_PRESENT_KEY, 1)
+            return
+
+        commit_cmds = [topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
+            'property_name': 'category',
+            'new_value': 'Mathematics',
+            'old_value': 'buu'
+        })]
+        topic_services.update_topic_and_subtopic_pages(
+            feconf.MIGRATION_BOT_USERNAME, item.id, commit_cmds,
+            'Updated topic\'s category to Mathematics.')
+        yield (AddCategoryToTopicOneOffJob._CATEGORY_ADDED_KEY, 1)
+
+    @staticmethod
+    def reduce(key, values):
+        if key == AddCategoryToTopicOneOffJob._CATEGORY_ADDED_KEY:
+            yield (key, ['Category Added to %d topics.' % (
+                sum(ast.literal_eval(v) for v in values))])
+        elif key == AddCategoryToTopicOneOffJob._CATEGORY_PRESENT_KEY:
+            yield (key, ['Category Present in %d topics.' % (
+                sum(ast.literal_eval(v) for v in values))])

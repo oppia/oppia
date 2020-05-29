@@ -340,3 +340,86 @@ class RemoveDeletedSkillsFromTopicOneOffJobTests(
         expected = [[u'topic_deleted',
                      [u'Encountered 1 deleted topics.']]]
         self.assertEqual(expected, [ast.literal_eval(x) for x in output])
+
+
+class AddCategoryToTopicOneOffJobTests(
+        test_utils.GenericTestBase):
+
+    ALBERT_EMAIL = 'albert@example.com'
+    ALBERT_NAME = 'albert'
+
+    TOPIC_ID = 'topic_id'
+
+    def setUp(self):
+        super(AddCategoryToTopicOneOffJobTests, self).setUp()
+        # Setup user who will own the test topics.
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.process_and_flush_pending_tasks()
+
+    def test_job_add_category_if_absent(self):
+        """Tests that the AddCategoryToTopicOneOffJobTests job adds
+        category to the topic if category is not present.
+        """
+
+        topic = topic_domain.Topic.create_default_topic(
+            self.TOPIC_ID, 'A name', 'abbrev', 'description', 'Mathematics')
+        topic_services.save_new_topic(self.albert_id, topic)
+
+        commit_cmds = [topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
+            'property_name': 'category',
+            'new_value': '',
+            'old_value': 'Mathematics'
+        })]
+
+        def mock_validate(unused_self, strict=True):
+            if strict:
+                return True
+
+        validate_swap = self.swap(topic_domain.Topic, 'validate', mock_validate)
+        with validate_swap:
+            topic_services.update_topic_and_subtopic_pages(
+                feconf.MIGRATION_BOT_USERNAME, topic.id, commit_cmds,
+                'Removed category from topic.')
+
+        job_id = (
+            topic_jobs_one_off.AddCategoryToTopicOneOffJob
+            .create_new())
+        topic_jobs_one_off.AddCategoryToTopicOneOffJob.enqueue(
+            job_id)
+        self.process_and_flush_pending_tasks()
+
+        output = (
+            topic_jobs_one_off.AddCategoryToTopicOneOffJob
+            .get_output(job_id))
+        expected = [
+            [u'category_added',
+             [u'Category Added to 1 topics.']]]
+
+        self.assertEqual(expected, [ast.literal_eval(x) for x in output])
+
+    def test_job_skip_category_if_present(self):
+        """Tests that the AddCategoryToTopicOneOffJobTests job skips if
+        category is present in the topic.
+        """
+
+        topic = topic_domain.Topic.create_default_topic(
+            self.TOPIC_ID, 'A name', 'abbrev', 'description', 'Mathematics')
+        topic_services.save_new_topic(self.albert_id, topic)
+
+        job_id = (
+            topic_jobs_one_off.AddCategoryToTopicOneOffJob
+            .create_new())
+        topic_jobs_one_off.AddCategoryToTopicOneOffJob.enqueue(
+            job_id)
+        self.process_and_flush_pending_tasks()
+
+        output = (
+            topic_jobs_one_off.AddCategoryToTopicOneOffJob
+            .get_output(job_id))
+        expected = [
+            [u'category_present',
+             [u'Category Present in 1 topics.']]]
+
+        self.assertEqual(expected, [ast.literal_eval(x) for x in output])
