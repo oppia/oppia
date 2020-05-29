@@ -255,6 +255,9 @@ angular.module('oppia').directive('storyNodeEditor', [
 
                   $scope.skillSummaries = skillSummaries;
                   $scope.selectedSkillId = null;
+                  $scope.save = function() {
+                    $scope.confirm($scope.selectedSkillId);
+                  };
                   $scope.countOfSkillsToPrioritize = 0;
                 }
               ]
@@ -290,6 +293,9 @@ angular.module('oppia').directive('storyNodeEditor', [
 
                   $scope.skillSummaries = skillSummaries;
                   $scope.selectedSkillId = null;
+                  $scope.save = function() {
+                    $scope.confirm($scope.selectedSkillId);
+                  };
                   $scope.countOfSkillsToPrioritize = 0;
                 }
               ]

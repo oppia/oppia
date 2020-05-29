@@ -77,6 +77,9 @@ angular.module('oppia').directive('skillPrerequisiteSkillsEditor', [
 
                   $scope.skillSummaries = sortedSkillSummaries;
                   $scope.selectedSkillId = null;
+                  $scope.save = function() {
+                    $scope.confirm($scope.selectedSkillId);
+                  };
                   $scope.countOfSkillsToPrioritize = skillsInSameTopicCount;
                 }
               ]
