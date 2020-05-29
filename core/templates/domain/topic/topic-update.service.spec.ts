@@ -331,7 +331,6 @@ describe('Topic update service', function() {
     }]);
   });
 
-
   it('should set/unset changes to a topic\'s thumbnail filename', function() {
     expect(_sampleTopic.getThumbnailFilename()).toEqual(undefined);
 
@@ -354,7 +353,6 @@ describe('Topic update service', function() {
       old_value: null
     }]);
   });
-
 
   it('should set/unset changes to a topic\'s thumbnail bg color', function() {
     expect(_sampleTopic.getThumbnailBgColor()).toEqual(undefined);
@@ -379,7 +377,6 @@ describe('Topic update service', function() {
     }]);
   });
 
-
   it('should set/unset changes to a topic\'s language code', function() {
     expect(_sampleTopic.getLanguageCode()).toEqual('en');
 
@@ -400,7 +397,6 @@ describe('Topic update service', function() {
       old_value: 'en'
     }]);
   });
-
 
   it('should not create a backend change dict for changing subtopic title ' +
     'when the subtopic does not exist', function() {
@@ -434,7 +430,6 @@ describe('Topic update service', function() {
     }]);
   }
   );
-
 
   it('should not create a backend change dict for changing subtopic  ' +
     'thumbnail filename when the subtopic does not exist', function() {
@@ -580,7 +575,6 @@ describe('Topic update service', function() {
     }).toThrowError('Subtopic doesn\'t exist');
     expect(UndoRedoService.getCommittableChangeList()).toEqual([]);
   });
-
 
   it('should not create a backend change dict for moving subtopic' +
     'when error is thrown', function() {
