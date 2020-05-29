@@ -83,10 +83,11 @@ ID_LENGTH = 12
 class BaseModel(ndb.Model):
     """Base model for all persistent object storage classes."""
 
-    # When this entity was first created. This can be overwritten and
-    # set explicitly.
+    # When this entity was first created. This value should only modified with
+    # the put or put_multi methods.
     created_on = ndb.DateTimeProperty(indexed=True, required=True)
-    # When this entity was last updated. This cannot be set directly.
+    # When this entity was last updated. This value should only modified with
+    # the put or put_multi methods.
     last_updated = ndb.DateTimeProperty(indexed=True, required=True)
     # Whether the current version of the model instance is deleted.
     deleted = ndb.BooleanProperty(indexed=True, default=False)
@@ -380,6 +381,7 @@ class BaseCommitLogEntryModel(BaseModel):
     construct.
     """
 
+    # The id of the user.
     user_id = ndb.StringProperty(indexed=True, required=True)
     # The type of the commit: 'create', 'revert', 'edit', 'delete'.
     commit_type = ndb.StringProperty(indexed=True, required=True)
