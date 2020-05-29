@@ -145,6 +145,9 @@ var TopicsAndSkillsDashboardPage = function() {
   this.assignSkillWithIndexToTopicByTopicName = async function(
       skillIndex, topicName) {
     var assignSkillButton = await assignSkillToTopicButtons.get(skillIndex);
+    await waitFor.elementToBeClickable(
+      assignSkillButton,
+      'Assign Skill button takes too long to be clickable.');
     await assignSkillButton.click();
     var topicRowsCount = await topicNamesInTopicSelectModal.count();
     for (var i = 0; i < topicRowsCount; i++) {
@@ -153,6 +156,9 @@ var TopicsAndSkillsDashboardPage = function() {
       if (isTarget === topicName) {
         await topicElem.click();
         await confirmMoveButton.click();
+        await waitFor.invisibilityOf(
+          confirmMoveButton,
+          'Confirm move button takes too long to disappear.');
         break;
       }
     }
@@ -167,10 +173,14 @@ var TopicsAndSkillsDashboardPage = function() {
       createTopicButton,
       'Create Topic button takes too long to be clickable');
     await createTopicButton.click();
-
+    await waitFor.visibilityOf(
+      topicNameField,
+      'Create Topic modal takes too long to appear.');
     await topicNameField.sendKeys(topicName);
     await confirmTopicCreationButton.click();
-
+    await waitFor.invisibilityOf(
+      confirmTopicCreationButton,
+      'Create Topic modal takes too long to disappear.');
     await waitFor.newTabToBeCreated(
       'Creating topic takes too long', '/topic_editor/');
     handles = await browser.getAllWindowHandles();
@@ -305,6 +315,8 @@ var TopicsAndSkillsDashboardPage = function() {
       topicElements[0], 'Unable to click on topic: ' + topicName);
     await topicElements[0].click();
     await waitFor.pageToFullyLoad();
+    await waitFor.invisibilityOf(
+      topicElements[0], 'Topic editor page takes too long to load.');
   };
 
   this.expectSkillDescriptionToBe = async function(description, index) {

@@ -239,13 +239,22 @@ var StoryEditorPage = function() {
   };
 
   this.saveStory = async function(commitMessage) {
+    await waitFor.elementToBeClickable(
+      saveStoryButton,
+      'Save story button takes too long to be clickable');
     await saveStoryButton.click();
+    await waitFor.visibilityOf(
+      commitMessageField,
+      'Commit message modal takes too long to appear.');
     await commitMessageField.sendKeys(commitMessage);
 
     await waitFor.elementToBeClickable(
       closeSaveModalButton,
       'Close save modal button takes too long to be clickable');
     await closeSaveModalButton.click();
+    await waitFor.invisibilityOf(
+      closeSaveModalButton,
+      'Commit message modal takes too long to disappear.');
     await waitFor.pageToFullyLoad();
   };
 

@@ -302,6 +302,8 @@ var TopicEditorPage = function() {
     var storyItem = await storyListItems.get(index);
     await storyItem.click();
     await waitFor.pageToFullyLoad();
+    await waitFor.invisibilityOf(
+      storyListTable, 'Story list table too long to disappear.');
   };
 
   this.createStory = async function(storyTitle) {
