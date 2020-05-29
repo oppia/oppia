@@ -26,12 +26,15 @@
                         stroke-dasharray="30,16"
                         stroke-linecap="round"
                         stroke-width="8"
-                        d="M71 30 L71 360"></path>
+                        d="M71 30 L71 360">
+                  </path>
                 </svg>
-                <div ng-if="$last" style="width: 130px;" class="oppia-hide-lesson-track"></div>
+                <div ng-if="$last" style="width: 130px;" class="oppia-hide-lesson-track">
+                </div>
 
                 <img ng-if="node.isCompleted()" ng-src="<[$ctrl.getStaticImageUrl('/general/collection_paw.svg')]>" class="oppia-lesson-icon-completed oppia-hide-lesson-track">
-                <div ng-if="!node.isCompleted()" class="oppia-lesson-icon-uncompleted oppia-hide-lesson-track"></div>
+                <div ng-if="!node.isCompleted()" class="oppia-lesson-icon-uncompleted oppia-hide-lesson-track">
+                </div>
 
                 <div class="oppia-story-viewer-card">
                   <p style="font-size: 30px; padding-top: 3px;" class="oppia-chapter-title" aria-live="assertive">
@@ -49,7 +52,8 @@
                         <pattern id="image<[$index]>" patternUnits="userSpaceOnUse" height="160" width="240">
                           <rect width="240"
                                 height="180"
-                                ng-attr-fill="<[$ctrl.pathIconParameters[$index].thumbnailBgColor]>"></rect>
+                                ng-attr-fill="<[$ctrl.pathIconParameters[$index].thumbnailBgColor]>"> 
+                          </rect>
 
                           <image x="0"
                                  y="0"
@@ -68,11 +72,13 @@
                                 r="50"
                                 id="<['highlight' + $index]>"
                                 fill="#FF8C00"
-                                fill-opacity="0.5"></circle>
+                                fill-opacity="0.5">
+                        </circle>
                         <rect width="240"
                               height="180"
                               fill="url(#image<[$index]>)"
-                              rx="8"></rect>
+                              rx="8">
+                        </rect>
                       </a>
                     </svg>
 
