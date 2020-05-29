@@ -825,7 +825,7 @@ def save_topic_summary(topic_summary):
     """
     topic_summary_dict = {
         'name': topic_summary.name,
-        'description': topic_summary.description
+        'description': topic_summary.description,
         'category': topic_summary.category,
         'canonical_name': topic_summary.canonical_name,
         'language_code': topic_summary.language_code,
