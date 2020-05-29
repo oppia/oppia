@@ -178,9 +178,7 @@ var TopicsAndSkillsDashboardPage = function() {
       'Create Topic modal takes too long to appear.');
     await topicNameField.sendKeys(topicName);
     await confirmTopicCreationButton.click();
-    await waitFor.invisibilityOf(
-      confirmTopicCreationButton,
-      'Create Topic modal takes too long to disappear.');
+
     await waitFor.newTabToBeCreated(
       'Creating topic takes too long', '/topic_editor/');
     handles = await browser.getAllWindowHandles();
@@ -195,7 +193,14 @@ var TopicsAndSkillsDashboardPage = function() {
     await browser.switchTo().window(newHandle);
     if (shouldCloseTopicEditor) {
       await browser.driver.close();
-      return await browser.switchTo().window(parentHandle);
+      await browser.switchTo().window(parentHandle);
+      await waitFor.invisibilityOf(
+        confirmTopicCreationButton,
+        'Create Topic modal takes too long to disappear.');
+    } else {
+      await waitFor.visibilityOf(
+        element(by.css('.protractor-test-topic-name-field')),
+        'Topic Editor is taking too long to appear.');
     }
     return await waitFor.pageToFullyLoad();
   };
