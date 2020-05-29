@@ -74,7 +74,7 @@ def start_google_app_engine_server(prodEnv):
 
 def download_and_install_nginx():
     """Download and install nginx"""
-    python_utils.PRINT('Installing nginx')
+    python_utils.PRINT('Installing nginx...')
     update_command = ['sudo', 'apt-get', 'update']
     install_command = ['sudo', 'apt-get', 'install', 'nginx']
 
@@ -84,7 +84,7 @@ def download_and_install_nginx():
 
 def start_proxy_server():
     nginx_conf_file = os.path.join(
-        common.CURR_DIR, '.lighthouseci', 'nginx.conf')
+        common.OPPIA_TOOLS_DIR, 'nginx.conf')
     with python_utils.open_file(nginx_conf_file, 'w') as f:
         f.write("""
             events {
