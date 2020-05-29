@@ -1910,22 +1910,34 @@ class State(python_utils.OBJECT):
         self._update_content_ids_in_assets(
             old_content_id_list, new_content_id_list)
 
-    def update_interaction_solution(self, solution_list):
+    def update_interaction_solution(self, solution_dict):
         """Update the solution of interaction.
 
         Args:
-            solution_list: list(solution) or None. The list representation of
+            solution_dict: dict or None. The dict representation of
                 Solution object.
 
         Raises:
-            Exception: 'solution_list' is not a list.
+            Exception: 'solution_dict' is not a dict.
         """
-        old_content_id_list = [
-            Solution.solution_content_id for Solution in self.interaction.solution]
-        self.interaction.solution = copy.deepcopy(solution_list)
+        old_content_id_list = []
+        new_content_id_list = []
+        if self.interaction.solution:
+            old_content_id_list.append(
+                self.interaction.solution.explanation.content_id)
 
-        new_content_id_list = [
-            Solution.solution_content_id for Solution in self.interaction.solution]
+        if solution_dict is not None:
+            if not isinstance(solution_dict, dict):
+                raise Exception(
+                    'Expected solution to be a dict, received %s'
+                    % solution_dict)
+            self.interaction.solution = Solution.from_dict(
+                self.interaction.id, solution_dict)
+            new_content_id_list.append(
+                self.interaction.solution.explanation.content_id)
+        else:
+            self.interaction.solution = None
+
         self._update_content_ids_in_assets(
             old_content_id_list, new_content_id_list)
 
