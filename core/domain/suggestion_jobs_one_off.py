@@ -23,9 +23,7 @@ import ast
 import logging
 
 from core import jobs
-from core.domain import exp_domain
 from core.domain import html_validation_service
-from core.domain import question_domain
 from core.domain import suggestion_registry
 from core.domain import suggestion_services
 from core.platform import models
@@ -84,27 +82,19 @@ class SuggestionMathMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 SuggestionMathMigrationOneOffJob._ERROR_KEY,
                 'Suggestion %s failed validation: %s' % (item.id, e))
             return
-        suggestion_dict = suggestion.to_dict()
-        if (suggestion.suggestion_type ==
-                suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT):
-            suggestion_dict = (
-                suggestion_registry.SuggestionTranslateContent.
-                convert_html_in_suggestion(
-                    suggestion_dict, html_validation_service.
-                    add_math_content_to_math_rte_components))
-            suggestion.change = (
-                exp_domain.ExplorationChange(suggestion_dict['change']))
-        elif (suggestion.suggestion_type ==
-              suggestion_models.SUGGESTION_TYPE_ADD_QUESTION):
-            suggestion_dict = (
-                suggestion_registry.SuggestionAddQuestion.
-                convert_html_in_suggestion(
-                    suggestion_dict, html_validation_service.
-                    add_math_content_to_math_rte_components))
-            suggestion.change = (
-                question_domain.QuestionSuggestionChange(
-                    suggestion_dict['change']))
-        suggestion.validate()
+        suggestion.change = (
+            suggestion.convert_html_in_suggestion(
+                html_validation_service.
+                add_math_content_to_math_rte_components))
+        try:
+            suggestion.validate()
+        except Exception as e:
+            logging.error(
+                'Suggestion %s failed validation: %s' % (item.id, e))
+            yield (
+                SuggestionMathMigrationOneOffJob._ERROR_KEY,
+                'Suggestion %s failed validation: %s' % (item.id, e))
+            return
         item.change_cmd = suggestion.change.to_dict()
         item.put()
         yield ('suggestion_migrated', 1)

@@ -27,6 +27,7 @@ from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import question_domain
 from core.domain import suggestion_jobs_one_off
+from core.domain import suggestion_registry
 from core.domain import suggestion_services
 from core.platform import models
 from core.tests import test_utils
@@ -808,7 +809,7 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
                 self.author_id, suggestion_dict['change'], 'test description',
                 self.reviewer_id)
 
-        def _mock_get_suggestion_by_id(unused_skill_id):
+        def _mock_get_suggestion_by_id(unused_suggestion_id):
             """Mocks get_suggestion_by_id()."""
             return 'invalid_suggestion'
         get_suggestion_by_id_swap = (
@@ -830,4 +831,154 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
         expected_output = (
             u'[u\'validation_error\', [u"Suggestion skill1.thread1 failed v' +
             'alidation: \'unicode\' object has no attribute \'validate\'"]]')
+        self.assertEqual(actual_output, [expected_output])
+
+    def test_yield_validation_error_after_migration(self):
+        html = (
+            '<p>Value</p><oppia-noninteractive-math ' +
+            'raw_latex-with-value="&amp;quot;+,-,-,+&amp;quot' +
+            ';"></oppia-noninteractive-math>')
+        answer_group = {
+            'outcome': {
+                'dest': None,
+                'feedback': {
+                    'content_id': 'feedback_1',
+                    'html': html
+                },
+                'labelled_as_correct': True,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'rule_specs': [{
+                'inputs': {
+                    'x': 0
+                },
+                'rule_type': 'Equals'
+            }],
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }
+        question_state_dict = {
+            'content': {
+                'content_id': 'content_1',
+                'html': 'Question 1'
+            },
+            'recorded_voiceovers': {
+                'voiceovers_mapping': {
+                    'content_1': {},
+                    'feedback_1': {},
+                    'feedback_2': {},
+                    'hint_1': {},
+                    'solution': {}
+                }
+            },
+            'written_translations': {
+                'translations_mapping': {
+                    'content_1': {},
+                    'feedback_1': {},
+                    'feedback_2': {},
+                    'hint_1': {},
+                    'solution': {}
+                }
+            },
+            'interaction': {
+                'answer_groups': [answer_group],
+                'confirmed_unclassified_answers': [],
+                'customization_args': {
+                    'choices': {
+                        'value': ['option 1']
+                    },
+                    'showChoicesInShuffledOrder': {
+                        'value': True
+                    }
+                },
+                'default_outcome': {
+                    'dest': None,
+                    'feedback': {
+                        'content_id': 'feedback_2',
+                        'html': 'Correct Answer'
+                    },
+                    'param_changes': [],
+                    'refresher_exploration_id': None,
+                    'labelled_as_correct': True,
+                    'missing_prerequisite_skill_id': None
+                },
+                'hints': [{
+                    'hint_content': {
+                        'content_id': 'hint_1',
+                        'html': 'Hint 1'
+                    }
+                }],
+                'solution': {
+                    'answer_is_exclusive': False,
+                    'correct_answer': 0,
+                    'explanation': {
+                        'content_id': 'solution',
+                        'html': '<p>This is a solution.</p>'
+                    }
+                },
+                'id': 'MultipleChoiceInput'
+            },
+            'param_changes': [],
+            'solicit_answer_details': False,
+            'classifier_model_id': None
+        }
+        suggestion_dict = {
+            'suggestion_id': 'skill1.thread1',
+            'suggestion_type': suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
+            'target_type': suggestion_models.TARGET_TYPE_SKILL,
+            'target_id': 'skill1',
+            'target_version_at_submission': 1,
+            'status': suggestion_models.STATUS_ACCEPTED,
+            'author_name': 'author',
+            'final_reviewer_id': self.reviewer_id,
+            'change': {
+                'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
+                'question_dict': {
+                    'question_state_data': question_state_dict,
+                    'language_code': 'en',
+                    'question_state_data_schema_version': (
+                        feconf.CURRENT_STATE_SCHEMA_VERSION),
+                    'linked_skill_ids': ['skill_1']
+                },
+                'skill_id': 'skill_1',
+                'skill_difficulty': 0.3,
+            },
+            'score_category': 'question.skill1',
+            'last_updated': utils.get_time_in_millisecs(self.fake_date)
+        }
+        with self.swap(
+            feedback_models.GeneralFeedbackThreadModel,
+            'generate_new_thread_id', self.mock_generate_new_skill_thread_id):
+            suggestion_services.create_suggestion(
+                suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
+                suggestion_models.TARGET_TYPE_SKILL,
+                'skill1', feconf.CURRENT_STATE_SCHEMA_VERSION,
+                self.author_id, suggestion_dict['change'], 'test description',
+                self.reviewer_id)
+
+        def _mock_convert_html_in_suggestion(unused_self, unused_conversion_fn):
+            """Mocks convert_html_in_suggestion()."""
+            return 'invalid_suggestion after migration'
+
+        _mock_convert_html_in_suggestion_swap = (
+            self.swap(
+                suggestion_registry.SuggestionAddQuestion,
+                'convert_html_in_suggestion', _mock_convert_html_in_suggestion))
+        with _mock_convert_html_in_suggestion_swap:
+            job_id = (
+                suggestion_jobs_one_off.SuggestionMathMigrationOneOffJob.
+                create_new())
+            (
+                suggestion_jobs_one_off.
+                SuggestionMathMigrationOneOffJob.enqueue(job_id))
+            self.process_and_flush_pending_tasks()
+        actual_output = (
+            suggestion_jobs_one_off.SuggestionMathMigrationOneOffJob.
+            get_output(job_id))
+        expected_output = (
+            u'[u\'validation_error\', [u\'Suggestion skill1.thread1 failed v' +
+            'alidation: Expected change to be an instance of QuestionSuggest' +
+            'ionChange\']]')
         self.assertEqual(actual_output, [expected_output])

@@ -109,6 +109,13 @@ class DraftUpgradeUnitTests(test_utils.GenericTestBase):
 
 class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
     """Test the DraftUpgradeUtil module."""
+    EXP_ID = 'exp_id'
+    USER_ID = 'user_id'
+    EXP_MIGRATION_CHANGE_LIST = [exp_domain.ExplorationChange({
+        'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
+        'from_version': '33',
+        'to_version': '34'
+    })]
 
     def test_convert_to_latest_schema_version_implemented(self):
         state_schema_version = feconf.CURRENT_STATE_SCHEMA_VERSION
@@ -272,9 +279,14 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             })
         ]
 
+        self.save_new_valid_exploration(self.EXP_ID, self.USER_ID)
+        exp_services.update_exploration(
+            self.USER_ID, self.EXP_ID, self.EXP_MIGRATION_CHANGE_LIST,
+            'Ran Exploration Migration job.')
+        exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
         expected_draft_change_list = (
-            draft_upgrade_services.DraftUpgradeUtil._convert_states_v33_dict_to_v34_dict(  # pylint: disable=protected-access,line-too-long
-                draft_change_list))
+            draft_upgrade_services.try_upgrading_draft_to_exp_version(
+                draft_change_list, 1, exploration.version, self.EXP_ID))
         self.assertEqual(
             expected_draft_change_list[0].to_dict(),
             exp_domain.ExplorationChange({
