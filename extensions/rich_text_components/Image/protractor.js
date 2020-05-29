@@ -19,17 +19,17 @@
 
 var objects = require(process.cwd() + '/extensions/objects/protractor.js');
 
-var customizeComponent = function(modal, filepath, name) {
-  modal.element(by.tagName('button')).click();
+var customizeComponent = async function(modal, filepath, name) {
+  await modal.element(by.tagName('button')).click();
   var filepathEditor = objects.FilepathEditor(
     modal.element(by.tagName('filepath-editor')));
-  filepathEditor.upload(filepath);
-  filepathEditor.setName(name);
+  await filepathEditor.upload(filepath);
+  await filepathEditor.setName(name);
 };
 
-var expectComponentDetailsToMatch = function(elem, name) {
+var expectComponentDetailsToMatch = async function(elem, name) {
   // The original filepath is not recorded and so cannot be checked.
-  expect(elem.getAttribute('filepath-with-value')).toMatch(name);
+  expect(await elem.getAttribute('filepath-with-value')).toMatch(name);
 };
 
 exports.customizeComponent = customizeComponent;

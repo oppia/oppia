@@ -26,24 +26,23 @@ var customizeInteraction = function(elem) {
   // There is no customization option.
 };
 
-var expectInteractionDetailsToMatch = function(elem) {
+var expectInteractionDetailsToMatch = async function(elem) {
   expect(
-    mathExpressionInputTag(elem).isPresent()
+    await mathExpressionInputTag(elem).isPresent()
   ).toBe(true);
 };
 
-var submitAnswer = function(elem, answer) {
-  mathExpressionInputTag(elem).click();
+var submitAnswer = async function(elem, answer) {
+  await mathExpressionInputTag(elem).click();
   var mathInputElem = element(by.css('.guppy_active'));
   var submitAnswerButon = element(by.css(
     '.protractor-test-submit-answer-button'));
   // Input box is always empty.
-  mathInputElem.isPresent().then(function(present) {
-    if (present) {
-      mathInputElem.sendKeys(answer);
-      submitAnswerButon.click();
-    }
-  });
+  var present = await mathInputElem.isPresent();
+  if (present) {
+    await mathInputElem.sendKeys(answer);
+    await submitAnswerButon.click();
+  }
 };
 
 var answerObjectType = 'UnicodeString';

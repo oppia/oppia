@@ -24,15 +24,13 @@ var ClassroomPage = function() {
   var topicSummaryTiles = element.all(
     by.css('.protractor-test-topic-summary-tile'));
 
-  this.get = function(classroomName) {
-    browser.get('/' + classroomName);
-    waitFor.pageToFullyLoad();
+  this.get = async function(classroomName) {
+    await browser.get('/' + classroomName);
+    await waitFor.pageToFullyLoad();
   };
 
-  this.expectNumberOfTopicsToBe = function(count) {
-    topicSummaryTiles.then(function(topics) {
-      expect(topics.length).toEqual(count);
-    });
+  this.expectNumberOfTopicsToBe = async function(count) {
+    expect(await topicSummaryTiles.count()).toEqual(count);
   };
 };
 

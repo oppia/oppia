@@ -90,100 +90,101 @@ var ExplorationEditorSettingsTab = function() {
     saveParamChangesButton.click();
   };
 
-  this.deleteExploration = function() {
-    waitFor.elementToBeClickable(deleteExplorationButton,
+  this.deleteExploration = async function() {
+    await waitFor.elementToBeClickable(deleteExplorationButton,
       'Delete Exploration button is not clickable');
-    deleteExplorationButton.click();
-    waitFor.elementToBeClickable(confirmDeleteExplorationButton,
+    await deleteExplorationButton.click();
+    await waitFor.elementToBeClickable(confirmDeleteExplorationButton,
       'Confirm Delete Exploration button is not clickable');
-    confirmDeleteExplorationButton.click();
-    waitFor.invisibilityOf(confirmDeleteExplorationButton,
+    await confirmDeleteExplorationButton.click();
+    await waitFor.invisibilityOf(confirmDeleteExplorationButton,
       'Delete Exploration modal takes too long to disappear');
     // Returning to /creator_dashboard.
-    waitFor.pageToFullyLoad();
+    await waitFor.pageToFullyLoad();
   };
 
   this.enableParameters = function() {
     enableParametersSwitch.click();
   };
 
-  this.enableCorrectnessFeedback = function() {
-    expect(enableCorrectnessFeedbackButton.isDisplayed()).toBe(true);
-    waitFor.elementToBeClickable(enableCorrectnessFeedbackButton,
+  this.enableCorrectnessFeedback = async function() {
+    expect(await enableCorrectnessFeedbackButton.isDisplayed()).toBe(true);
+    await waitFor.elementToBeClickable(enableCorrectnessFeedbackButton,
       'Enable correctness feedback button is not clickable.');
-    enableCorrectnessFeedbackButton.click();
+    await enableCorrectnessFeedbackButton.click();
   };
 
-  this.expectAvailableFirstStatesToBe = function(names) {
-    initialStateSelect.all(by.tagName('option')).map(function(elem) {
-      return elem.getText();
-    }).then(function(options) {
-      expect(options.sort()).toEqual(names.sort());
-    });
+  this.expectAvailableFirstStatesToBe = async function(names) {
+    var options = await initialStateSelect.all(by.tagName('option'))
+      .map(async function(elem) {
+        return await elem.getText();
+      });
+    expect(options.sort()).toEqual(names.sort());
   };
 
-  this.openAndClosePreviewSummaryTile = function() {
-    openPreviewSummaryButton.click();
-    waitFor.visibilityOf(explorationSummaryTile,
+  this.openAndClosePreviewSummaryTile = async function() {
+    await openPreviewSummaryButton.click();
+    await waitFor.visibilityOf(explorationSummaryTile,
       'Summary Tile takes too long to appear');
-    expect(explorationSummaryTile.isPresent()).toBeTruthy();
-    closePreviewSummaryButton.click();
-    waitFor.invisibilityOf(explorationSummaryTile,
+    expect(await explorationSummaryTile.isPresent()).toBeTruthy();
+    await closePreviewSummaryButton.click();
+    await waitFor.invisibilityOf(explorationSummaryTile,
       'Summary Tile takes too long to disappear');
-    expect((explorationSummaryTile.isPresent())).toBeFalsy();
+    expect(await explorationSummaryTile.isPresent()).toBeFalsy();
   };
 
-  this.setCategory = function(category) {
-    forms.AutocompleteDropdownEditor(explorationCategoryInput).setValue(
-      category);
+  this.setCategory = async function(category) {
+    await (
+      await forms.AutocompleteDropdownEditor(explorationCategoryInput)
+    ).setValue(category);
   };
 
-  this.setFirstState = function(stateName) {
-    initialStateSelectOption(stateName).click();
+  this.setFirstState = async function(stateName) {
+    await initialStateSelectOption(stateName).click();
   };
 
-  this.setLanguage = function(language) {
-    element(by.css('.protractor-test-exploration-language-select')).
+  this.setLanguage = async function(language) {
+    await element(by.css('.protractor-test-exploration-language-select')).
       element(by.cssContainingText('option', language)).click();
   };
 
-  this.setObjective = function(objective) {
-    explorationObjectiveInput.clear();
-    explorationObjectiveInput.sendKeys(objective);
+  this.setObjective = async function(objective) {
+    await explorationObjectiveInput.clear();
+    await explorationObjectiveInput.sendKeys(objective);
   };
 
-  this.setTitle = function(title) {
-    explorationTitleInput.clear();
-    explorationTitleInput.sendKeys(title);
+  this.setTitle = async function(title) {
+    await explorationTitleInput.clear();
+    await explorationTitleInput.sendKeys(title);
   };
 
-  this.expectCategoryToBe = function(category) {
-    expect(explorationCategoryInput.$('option:checked').getText()).
+  this.expectCategoryToBe = async function(category) {
+    expect(await explorationCategoryInput.$('option:checked').getText()).
       toEqual(category);
   };
 
-  this.expectFirstStateToBe = function(firstState) {
-    expect(initialStateSelect.$('option:checked').getText()).
+  this.expectFirstStateToBe = async function(firstState) {
+    expect(await initialStateSelect.$('option:checked').getText()).
       toEqual(firstState);
   };
 
-  this.expectLanguageToBe = function(language) {
-    expect(explorationLanguageInput.$('option:checked').getText()).
+  this.expectLanguageToBe = async function(language) {
+    expect(await explorationLanguageInput.$('option:checked').getText()).
       toEqual(language);
   };
 
-  this.expectObjectiveToBe = function(objective) {
-    expect(explorationObjectiveInput.getAttribute('value')).
+  this.expectObjectiveToBe = async function(objective) {
+    expect(await explorationObjectiveInput.getAttribute('value')).
       toEqual(objective);
   };
 
-  this.expectTitleToBe = function(title) {
-    expect(explorationTitleInput.getAttribute('value')).
+  this.expectTitleToBe = async function(title) {
+    expect(await explorationTitleInput.getAttribute('value')).
       toEqual(title);
   };
 
-  this.expectWarningsColorToBe = function(color) {
-    expect(explorationObjectiveWarning.getCssValue('color')).
+  this.expectWarningsColorToBe = async function(color) {
+    expect(await explorationObjectiveWarning.getCssValue('color')).
       toEqual(color);
   };
 };

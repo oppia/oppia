@@ -23,14 +23,11 @@
 
 var BooleanEditor = function(elem) {
   return {
-    setValue: function(value) {
-      elem.element(by.tagName('input')).isSelected().then(
-        function(currentValue) {
-          if (value !== currentValue) {
-            elem.element(by.tagName('input')).click();
-          }
-        }
-      );
+    setValue: async function(value) {
+      currentValue = await elem.element(by.tagName('input')).isSelected();
+      if (value !== currentValue) {
+        await elem.element(by.tagName('input')).click();
+      }
     }
   };
 };
@@ -39,164 +36,145 @@ var CoordTwoDim = function(elem) {
   return {
     // The 'coordinates' arg is a two-element list whose elements represent
     // latitude and longitude respectively.
-    setValue: function(coordinates) {
-      elem.all(by.tagName('input')).first().clear();
-      elem.all(by.tagName('input')).first().sendKeys(coordinates[0]);
-      elem.all(by.tagName('input')).last().clear();
-      elem.all(by.tagName('input')).last().sendKeys(coordinates[1]);
+    setValue: async function(coordinates) {
+      await elem.all(by.tagName('input')).first().clear();
+      await elem.all(by.tagName('input')).first().sendKeys(coordinates[0]);
+      await elem.all(by.tagName('input')).last().clear();
+      await elem.all(by.tagName('input')).last().sendKeys(coordinates[1]);
     }
   };
 };
 
 var FilepathEditor = function(elem) {
   return {
-    upload: function(filepath) {
+    upload: async function(filepath) {
       // TODO(Jacob): Modify filepath relative to the directory from which the
       // protractor code is operating.
-      elem.element(by.css('.protractor-test-file-upload')).sendKeys(filepath);
+      await elem.element(by.css('.protractor-test-file-upload'))
+        .sendKeys(filepath);
     },
-    setName: function(name) {
-      elem.element(by.css('.protractor-test-file-name')).clear();
-      elem.element(by.css('.protractor-test-file-name')).sendKeys(name);
+    setName: async function(name) {
+      await elem.element(by.css('.protractor-test-file-name')).clear();
+      await elem.element(by.css('.protractor-test-file-name')).sendKeys(name);
     }
   };
 };
 
 var FractionEditor = function(elem) {
   return {
-    setValue: function(value) {
-      elem.element(by.tagName('input')).clear();
-      elem.element(by.tagName('input')).sendKeys(value);
+    setValue: async function(value) {
+      await elem.element(by.tagName('input')).clear();
+      await elem.element(by.tagName('input')).sendKeys(value);
     },
-    expectValueToBe: function(expectedValue) {
-      elem.element(by.tagName('input')).getAttribute('value').then(
-        function(value) {
-          expect(value).toEqual(expectedValue);
-        }
-      );
+    expectValueToBe: async function(expectedValue) {
+      var value = await elem.element(by.tagName('input')).getAttribute('value');
+      expect(value).toEqual(expectedValue);
     }
   };
 };
 
 var IntEditor = function(elem) {
   return {
-    setValue: function(value) {
-      elem.element(by.tagName('input')).clear();
-      elem.element(by.tagName('input')).sendKeys(value);
+    setValue: async function(value) {
+      await elem.element(by.tagName('input')).clear();
+      await elem.element(by.tagName('input')).sendKeys(value);
     },
-    expectValueToBe: function(expectedValue) {
-      elem.element(by.tagName('input')).getAttribute('value').then(
-        function(value) {
-          expect(value).toEqual(expectedValue);
-        }
-      );
+    expectValueToBe: async function(expectedValue) {
+      var value = await elem.element(by.tagName('input')).getAttribute('value');
+      expect(value).toEqual(expectedValue);
     }
   };
 };
 
 var MathLatexStringEditor = function(elem) {
   return {
-    setValue: function(rawLatex) {
-      elem.element(by.tagName('textarea')).clear();
-      elem.element(by.tagName('textarea')).sendKeys(rawLatex);
+    setValue: async function(rawLatex) {
+      await elem.element(by.tagName('textarea')).clear();
+      await elem.element(by.tagName('textarea')).sendKeys(rawLatex);
     }
   };
 };
 
 var NonnegativeIntEditor = function(elem) {
   return {
-    setValue: function(value) {
-      elem.element(by.tagName('input')).clear();
-      elem.element(by.tagName('input')).sendKeys(value);
+    setValue: async function(value) {
+      await elem.element(by.tagName('input')).clear();
+      await elem.element(by.tagName('input')).sendKeys(value);
     },
-    expectValueToBe: function(expectedValue) {
-      elem.element(by.tagName('input')).getAttribute('value').then(
-        function(value) {
-          expect(value).toEqual(expectedValue);
-        }
-      );
+    expectValueToBe: async function(expectedValue) {
+      var value = await elem.element(by.tagName('input')).getAttribute('value');
+      expect(value).toEqual(expectedValue);
     }
   };
 };
 
 var NormalizedStringEditor = function(elem) {
   return {
-    setValue: function(value) {
-      elem.element(by.tagName('input')).clear();
-      elem.element(by.tagName('input')).sendKeys(value);
+    setValue: async function(value) {
+      await elem.element(by.tagName('input')).clear();
+      await elem.element(by.tagName('input')).sendKeys(value);
     },
-    expectValueToBe: function(expectedValue) {
-      elem.element(by.tagName('input')).getAttribute('value').then(
-        function(value) {
-          expect(value).toEqual(expectedValue);
-        }
-      );
+    expectValueToBe: async function(expectedValue) {
+      var value = await elem.element(by.tagName('input')).getAttribute('value');
+      expect(value).toEqual(expectedValue);
     }
   };
 };
 
 var NumberWithUnitsEditor = function(elem) {
   return {
-    setValue: function(value) {
-      elem.element(by.tagName('input')).clear();
-      elem.element(by.tagName('input')).sendKeys(value);
+    setValue: async function(value) {
+      await elem.element(by.tagName('input')).clear();
+      await elem.element(by.tagName('input')).sendKeys(value);
     },
-    expectValueToBe: function(expectedValue) {
-      elem.element(by.tagName('input')).getAttribute('value').then(
-        function(value) {
-          expect(value).toEqual(expectedValue);
-        }
-      );
+    expectValueToBe: async function(expectedValue) {
+      var value = await elem.element(by.tagName('input')).getAttribute('value');
+      expect(value).toEqual(expectedValue);
     }
   };
 };
 
 var ParameterNameEditor = function(elem) {
   return {
-    setValue: function(text) {
-      elem.element(by.cssContainingText('option', text)).click();
+    setValue: async function(text) {
+      await elem.element(by.cssContainingText('option', text)).click();
     }
   };
 };
 
 var SanitizedUrlEditor = function(elem) {
   return {
-    setValue: function(text) {
-      elem.element(by.tagName('input')).clear();
-      elem.element(by.tagName('input')).sendKeys(text);
+    setValue: async function(text) {
+      await elem.element(by.tagName('input')).clear();
+      await elem.element(by.tagName('input')).sendKeys(text);
     },
-    expectValueToBe: function(expectedValue) {
-      elem.element(by.tagName('input')).getAttribute('value').then(
-        function(value) {
-          expect(value).toEqual(expectedValue);
-        }
-      );
+    expectValueToBe: async function(expectedValue) {
+      var value = await elem.element(by.tagName('input')).getAttribute('value');
+      expect(value).toEqual(expectedValue);
     }
   };
 };
 
 var SkillSelector = function(elem) {
   return {
-    setValue: function(skillDescription) {
-      elem.element(
+    setValue: async function(skillDescription) {
+      await elem.element(
         by.css('.protractor-test-skill-name-input')).sendKeys(skillDescription);
-      elem.element(by.css('.protractor-test-rte-skill-selector-item')).click();
+      await elem.element(
+        by.css('.protractor-test-rte-skill-selector-item')).click();
     }
   };
 };
 
 var UnicodeStringEditor = function(elem) {
   return {
-    setValue: function(text) {
-      elem.element(by.tagName('input')).clear();
-      elem.element(by.tagName('input')).sendKeys(text);
+    setValue: async function(text) {
+      await elem.element(by.tagName('input')).clear();
+      await elem.element(by.tagName('input')).sendKeys(text);
     },
-    expectValueToBe: function(expectedValue) {
-      elem.element(by.tagName('input')).getAttribute('value').then(
-        function(value) {
-          expect(value).toEqual(expectedValue);
-        }
-      );
+    expectValueToBe: async function(expectedValue) {
+      var value = await elem.element(by.tagName('input')).getAttribute('value');
+      expect(value).toEqual(expectedValue);
     }
   };
 };

@@ -58,47 +58,48 @@ var ExplorationEditorHistoryTab = function() {
 
   this.getHistoryGraph = function() {
     return {
-      openStateHistory: function(stateName) {
-        stateNodes.map(function(stateElement) {
-          return stateNodeLabel(stateElement).getText();
-        }).then(function(listOfNames) {
-          var matched = false;
-          for (var i = 0; i < listOfNames.length; i++) {
-            if (listOfNames[i] === stateName) {
-              stateNodes.get(i).click();
-              matched = true;
-            }
-          }
-          if (!matched) {
-            throw new Error(
-              'State ' + stateName + ' not found by getHistoryGraph.');
-          }
+      openStateHistory: async function(stateName) {
+        var listOfNames = await stateNodes.map(async function(stateElement) {
+          return await stateNodeLabel(stateElement).getText();
         });
+        var matched = false;
+        for (var i = 0; i < listOfNames.length; i++) {
+          if (listOfNames[i] === stateName) {
+            await stateNodes.get(i).click();
+            matched = true;
+          }
+        }
+        if (!matched) {
+          throw new Error(
+            'State ' + stateName + ' not found by getHistoryGraph.');
+        }
       },
-      closeStateHistory: function() {
-        waitFor.elementToBeClickable(
+      closeStateHistory: async function() {
+        await waitFor.elementToBeClickable(
           closeStateHistoryButton,
           'Close State History button is not clickable');
-        expect(closeStateHistoryButton.isDisplayed()).toBe(true);
-        closeStateHistoryButton.click();
-        waitFor.invisibilityOf(
+        expect(await closeStateHistoryButton.isDisplayed()).toBe(true);
+        await closeStateHistoryButton.click();
+        await waitFor.invisibilityOf(
           closeStateHistoryButton,
           'Close State History button takes too long to disappear.');
       },
-      deselectTwoVersions: function(versionNumber1, versionNumber2) {
+      deselectTwoVersions: async function(versionNumber1, versionNumber2) {
         // Array starts at 0.
-        historyCheckboxSelector.count().then(function(totalVersionNumber) {
-          var v1Position = totalVersionNumber - versionNumber1;
-          var v2Position = totalVersionNumber - versionNumber2;
+        var totalVersionNumber = await historyCheckboxSelector.count();
+        var v1Position = totalVersionNumber - versionNumber1;
+        var v2Position = totalVersionNumber - versionNumber2;
 
-          expect(historyCheckboxSelector.get(v1Position).isDisplayed())
-            .toBe(true);
-          historyCheckboxSelector.get(v1Position).click();
+        var historyCheckboxAtv1 = await historyCheckboxSelector.get(
+          v1Position);
+        var historyCheckboxAtv2 = await historyCheckboxSelector.get(
+          v2Position);
 
-          expect(historyCheckboxSelector.get(v2Position).isDisplayed())
-            .toBe(true);
-          historyCheckboxSelector.get(v2Position).click();
-        });
+        expect(await historyCheckboxAtv1.isDisplayed()).toBe(true);
+        await historyCheckboxAtv1.click();
+
+        expect(await historyCheckboxAtv2.isDisplayed()).toBe(true);
+        await historyCheckboxAtv2.click();
       },
       /*
        * This method selects two version's checkboxes to be compared
@@ -106,23 +107,25 @@ var ExplorationEditorHistoryTab = function() {
        *        versionNumber1 (int) : history version # 1
        *        versionNumber2 (int) : history version # 2
        */
-      selectTwoVersions: function(versionNumber1, versionNumber2) {
+      selectTwoVersions: async function(versionNumber1, versionNumber2) {
         // Array starts at 0
-        historyCheckboxSelector.count().then(function(totalVersionNumber) {
-          var v1Position = totalVersionNumber - versionNumber1;
-          var v2Position = totalVersionNumber - versionNumber2;
+        var totalVersionNumber = await historyCheckboxSelector.count();
+        var v1Position = totalVersionNumber - versionNumber1;
+        var v2Position = totalVersionNumber - versionNumber2;
 
-          expect(historyCheckboxSelector.get(v1Position).isDisplayed())
-            .toBe(true);
-          historyCheckboxSelector.get(v1Position).click();
+        var historyCheckboxAtv1 = await historyCheckboxSelector.get(
+          v1Position);
+        var historyCheckboxAtv2 = await historyCheckboxSelector.get(
+          v2Position);
 
-          expect(historyCheckboxSelector.get(v2Position).isDisplayed())
-            .toBe(true);
-          historyCheckboxSelector.get(v2Position).click();
-        });
+        expect(await historyCheckboxAtv1.isDisplayed()).toBe(true);
+        await historyCheckboxAtv1.click();
+
+        expect(await historyCheckboxAtv2.isDisplayed()).toBe(true);
+        await historyCheckboxAtv2.click();
         // Click button to show graph.
-        expect(showHistoryGraphButton.isDisplayed()).toBe(true);
-        showHistoryGraphButton.click();
+        expect(await showHistoryGraphButton.isDisplayed()).toBe(true);
+        await showHistoryGraphButton.click();
       },
       /*
        * This method compares the states in the history graph using each
@@ -136,19 +139,21 @@ var ExplorationEditorHistoryTab = function() {
        *                            label should appear after a space. It
        *                            may be truncated.)
        */
-      expectHistoryStatesToMatch: function(expectedStates) {
-        stateNodes.map(function(stateElement) {
+      expectHistoryStatesToMatch: async function(expectedStates) {
+        var states = await stateNodes.map(async function(stateElement) {
+          var label = await stateNodeLabel(stateElement).getText();
+          var color = await stateNodeBackground(stateElement).getCssValue(
+            'fill');
           return {
-            label: stateNodeLabel(stateElement).getText(),
-            color: stateNodeBackground(stateElement).getCssValue('fill')
+            label: label,
+            color: color
           };
-        }).then(function(states) {
-          expect(states.length).toEqual(expectedStates.length);
-          // Note: we need to compare this way because the state graph is
-          // sometimes generated with states in different configurations.
-          states.forEach(function(element) {
-            expect(expectedStates).toContain(element);
-          });
+        });
+        expect(states.length).toEqual(expectedStates.length);
+        // Note: we need to compare this way because the state graph is
+        // sometimes generated with states in different configurations.
+        states.forEach(function(element) {
+          expect(expectedStates).toContain(element);
         });
       },
       /*
@@ -159,28 +164,26 @@ var ExplorationEditorHistoryTab = function() {
        *        addedLinks (int) : number of added links
        *        deletedLinks (int) : number of deleted links
        */
-      expectNumberOfLinksToMatch: function(
+      expectNumberOfLinksToMatch: async function(
           totalLinks, addedLinks, deletedLinks) {
         var COLOR_ADDED = 'rgb(31, 125, 31)';
         var COLOR_DELETED = 'rgb(178, 34, 34)';
         var totalCount = 0;
         var addedCount = 0;
         var deletedCount = 0;
-        historyGraphLink.map(function(link) {
-          link.getCssValue('stroke').then(function(linkColor) {
-            totalCount++;
-            if (linkColor === COLOR_ADDED) {
-              addedCount++;
-            } else if (linkColor === COLOR_DELETED) {
-              deletedCount++;
-            }
-            return;
-          });
-        }).then(function() {
-          expect(totalLinks).toEqual(totalCount);
-          expect(addedLinks).toEqual(addedCount);
-          expect(deletedLinks).toEqual(deletedCount);
+        await historyGraphLink.map(async function(link) {
+          var linkColor = await link.getCssValue('stroke');
+          totalCount++;
+          if (linkColor === COLOR_ADDED) {
+            addedCount++;
+          } else if (linkColor === COLOR_DELETED) {
+            deletedCount++;
+          }
+          return;
         });
+        expect(totalLinks).toEqual(totalCount);
+        expect(addedLinks).toEqual(addedCount);
+        expect(deletedLinks).toEqual(deletedCount);
       },
       /**
        * This method compares text contents of 2 version's state contents to
@@ -199,12 +202,12 @@ var ExplorationEditorHistoryTab = function() {
        *                             line
        *                     - highlighted: true or false
        */
-      expectTextToMatch: function(v1StateContents, v2StateContents) {
-        forms.CodeMirrorChecker(
+      expectTextToMatch: async function(v1StateContents, v2StateContents) {
+        await forms.CodeMirrorChecker(
           element.all(by.css('.CodeMirror-code')).first(),
           'first'
         ).expectTextToBe(v1StateContents);
-        forms.CodeMirrorChecker(
+        await forms.CodeMirrorChecker(
           element.all(by.css('.CodeMirror-code')).last(),
           'last'
         ).expectTextToBe(v2StateContents);
@@ -220,14 +223,14 @@ var ExplorationEditorHistoryTab = function() {
        *        dict key - text : extract of string of expected text
        *        dict key - highlighted : true or false
        */
-      expectTextWithHighlightingToMatch: function(
+      expectTextWithHighlightingToMatch: async function(
           v1StateContents, v2StateContents) {
-        forms.CodeMirrorChecker(
-          element.all(by.css('.CodeMirror-code')).first(),
+        await forms.CodeMirrorChecker(
+          await element.all(by.css('.CodeMirror-code')).first(),
           'first'
         ).expectTextWithHighlightingToBe(v1StateContents);
-        forms.CodeMirrorChecker(
-          element.all(by.css('.CodeMirror-code')).last(),
+        await forms.CodeMirrorChecker(
+          await element.all(by.css('.CodeMirror-code')).last(),
           'last'
         ).expectTextWithHighlightingToBe(v2StateContents);
       }
@@ -236,14 +239,15 @@ var ExplorationEditorHistoryTab = function() {
 
   // This function assumes that the selected version is valid and found on the
   // first page of the exploration history.
-  this.revertToVersion = function(version) {
+  this.revertToVersion = async function(version) {
     var versionPosition = null;
-    historyCheckboxSelector.count().then(function(versionNumber) {
-      // Note: there is no 'revert' link next to the current version
-      versionPosition = versionNumber - version - 1;
-      revertVersionButton.get(versionPosition).click();
-      confirmRevertVersionButton.click();
-    });
+    var versionNumber = await historyCheckboxSelector.count();
+    // Note: there is no 'revert' link next to the current version
+    versionPosition = versionNumber - version - 1;
+    var revertVersionButtonForSelectedPosition = revertVersionButton.get(
+      versionPosition);
+    await revertVersionButtonForSelectedPosition.click();
+    await confirmRevertVersionButton.click();
   };
 };
 

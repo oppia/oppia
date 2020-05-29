@@ -903,7 +903,8 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             mock_get_e2e_test_parameters, expected_args=[(3, 'full', True)])
         popen_swap = self.swap_with_checks(
             subprocess, 'Popen', mock_popen, expected_args=[([
-                common.NODE_BIN_PATH, run_e2e_tests.PROTRACTOR_BIN_PATH,
+                common.NODE_BIN_PATH, '--unhandled-rejections=strict',
+                run_e2e_tests.PROTRACTOR_BIN_PATH,
                 'commands'],)])
         exit_swap = self.swap_with_checks(
             sys, 'exit', mock_exit, expected_args=[(0,)])
@@ -995,6 +996,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         popen_swap = self.swap_with_checks(
             subprocess, 'Popen', mock_popen, expected_args=[([
                 common.NODE_BIN_PATH, '--inspect-brk',
+                '--unhandled-rejections=strict',
                 run_e2e_tests.PROTRACTOR_BIN_PATH, 'commands'],)])
         exit_swap = self.swap_with_checks(
             sys, 'exit', mock_exit, expected_args=[(0,)])

@@ -21,42 +21,41 @@ var ExplorationEditorPage = require(
   '../protractor_utils/ExplorationEditorPage.js');
 var waitFor = require('./waitFor.js');
 
-var scrollToTop = function() {
-  browser.executeScript('window.scrollTo(0,0);');
+var scrollToTop = async function() {
+  await browser.executeScript('window.scrollTo(0,0);');
 };
 
 // We will report all console logs of level greater than this.
 var CONSOLE_LOG_THRESHOLD = 900;
 var CONSOLE_ERRORS_TO_IGNORE = [];
 
-var checkForConsoleErrors = function(errorsToIgnore) {
+var checkForConsoleErrors = async function(errorsToIgnore) {
   var irrelevantErrors = errorsToIgnore.concat(CONSOLE_ERRORS_TO_IGNORE);
-  browser.manage().logs().get('browser').then(function(browserLogs) {
-    var fatalErrors = [];
-    // The mobile tests run on the latest version of Chrome.
-    // The newer versions report 'Slow Network' as a console error.
-    // This causes the tests to fail, therefore, we remove such logs.
-    if (browser.isMobile) {
-      browserLogs = browserLogs.filter(function(browserLog) {
-        return !(browserLog.message.includes(' Slow network is detected.'));
-      });
-    }
+  var browserLogs = await browser.manage().logs().get('browser');
+  var fatalErrors = [];
+  // The mobile tests run on the latest version of Chrome.
+  // The newer versions report 'Slow Network' as a console error.
+  // This causes the tests to fail, therefore, we remove such logs.
+  if (browser.isMobile) {
+    browserLogs = browserLogs.filter(function(browserLog) {
+      return !(browserLog.message.includes(' Slow network is detected.'));
+    });
+  }
 
-    for (var i = 0; i < browserLogs.length; i++) {
-      if (browserLogs[i].level.value > CONSOLE_LOG_THRESHOLD) {
-        var errorFatal = true;
-        for (var j = 0; j < irrelevantErrors.length; j++) {
-          if (browserLogs[i].message.match(irrelevantErrors[j])) {
-            errorFatal = false;
-          }
-        }
-        if (errorFatal) {
-          fatalErrors.push(browserLogs[i]);
+  for (var i = 0; i < browserLogs.length; i++) {
+    if (browserLogs[i].level.value > CONSOLE_LOG_THRESHOLD) {
+      var errorFatal = true;
+      for (var j = 0; j < irrelevantErrors.length; j++) {
+        if (browserLogs[i].message.match(irrelevantErrors[j])) {
+          errorFatal = false;
         }
       }
+      if (errorFatal) {
+        fatalErrors.push(browserLogs[i]);
+      }
     }
-    expect(fatalErrors).toEqual([]);
-  });
+  }
+  expect(fatalErrors).toEqual([]);
 };
 
 var isInDevMode = function() {
@@ -75,91 +74,83 @@ var EXPLORATION_ID_LENGTH = 12;
 
 var FIRST_STATE_DEFAULT_NAME = 'Introduction';
 
-var _getExplorationId = function(currentUrlPrefix) {
-  return {
-    then: function(callbackFunction) {
-      browser.getCurrentUrl().then(function(url) {
-        expect(url.slice(0, currentUrlPrefix.length)).toBe(currentUrlPrefix);
-        var explorationId = url.slice(
-          currentUrlPrefix.length,
-          currentUrlPrefix.length + EXPLORATION_ID_LENGTH);
-        return callbackFunction(explorationId);
-      }, function() {
-        // Note to developers:
-        // Promise is returned by getCurrentUrl which is handled here.
-        // No further action is needed.
-      });
-    }
-  };
+var _getExplorationId = async function(currentUrlPrefix) {
+  var url = await browser.getCurrentUrl();
+  expect(url.slice(0, currentUrlPrefix.length)).toBe(currentUrlPrefix);
+  var explorationId = url.slice(
+    currentUrlPrefix.length,
+    currentUrlPrefix.length + EXPLORATION_ID_LENGTH);
+  return explorationId;
 };
 
 // If we are currently in the editor, this will return a promise with the
 // exploration ID.
-var getExplorationIdFromEditor = function() {
-  return _getExplorationId(SERVER_URL_PREFIX + EDITOR_URL_SLICE);
+var getExplorationIdFromEditor = async function() {
+  return await _getExplorationId(SERVER_URL_PREFIX + EDITOR_URL_SLICE);
 };
 
 // Likewise for the player
-var getExplorationIdFromPlayer = function() {
-  return _getExplorationId(SERVER_URL_PREFIX + PLAYER_URL_SLICE);
+var getExplorationIdFromPlayer = async function() {
+  return await _getExplorationId(SERVER_URL_PREFIX + PLAYER_URL_SLICE);
 };
 
 // The explorationId here should be a string, not a promise.
-var openEditor = function(explorationId) {
-  browser.get(EDITOR_URL_SLICE + explorationId);
-  waitFor.pageToFullyLoad();
+var openEditor = async function(explorationId) {
+  await browser.get(EDITOR_URL_SLICE + explorationId);
+  await waitFor.pageToFullyLoad();
   var explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
   var explorationEditorMainTab = explorationEditorPage.getMainTab();
-  explorationEditorMainTab.exitTutorial();
+  await explorationEditorMainTab.exitTutorial();
 };
 
-var openPlayer = function(explorationId) {
-  browser.get(PLAYER_URL_SLICE + explorationId);
-  waitFor.pageToFullyLoad();
+var openPlayer = async function(explorationId) {
+  await browser.get(PLAYER_URL_SLICE + explorationId);
+  await waitFor.pageToFullyLoad();
 };
 
 // Takes the user from an exploration editor to its player.
 // NOTE: we do not use the preview button because that will open a new window.
-var moveToPlayer = function() {
-  getExplorationIdFromEditor().then(openPlayer);
+var moveToPlayer = async function() {
+  var explorationId = await getExplorationIdFromEditor();
+  await openPlayer(explorationId);
 };
 
 // Takes the user from the exploration player to its editor.
-var moveToEditor = function() {
-  getExplorationIdFromPlayer().then(openEditor);
+var moveToEditor = async function() {
+  var explorationId = await getExplorationIdFromPlayer();
+  await openEditor(explorationId);
 };
 
-var expect404Error = function() {
-  expect(element(by.css('.protractor-test-error-container')).getText()).
+var expect404Error = async function() {
+  expect(await element(by.css('.protractor-test-error-container')).getText()).
     toMatch('Error 404');
 };
 
 // Checks no untranslated values are shown in the page.
-var ensurePageHasNoTranslationIds = function() {
+var ensurePageHasNoTranslationIds = async function() {
   // The use of the InnerHTML is hacky, but is faster than checking each
   // individual component that contains text.
-  element(by.css('.oppia-base-container')).getAttribute('innerHTML').then(
-    function(promiseValue) {
-      // First remove all the attributes translate and variables that are
-      // not displayed
-      var REGEX_TRANSLATE_ATTR = new RegExp('translate="I18N_', 'g');
-      var REGEX_NG_VARIABLE = new RegExp('<\\[\'I18N_', 'g');
-      var REGEX_NG_TOP_NAV_VISIBILITY =
-        new RegExp('ng-show="\\$ctrl.navElementsVisibilityStatus.I18N_', 'g');
-      expect(promiseValue.replace(REGEX_TRANSLATE_ATTR, '')
-        .replace(REGEX_NG_VARIABLE, '')
-        .replace(REGEX_NG_TOP_NAV_VISIBILITY, '')).not.toContain('I18N');
-    });
+  var promiseValue = await element(by.css(
+    '.oppia-base-container')).getAttribute('innerHTML');
+  // First remove all the attributes translate and variables that are
+  // not displayed
+  var REGEX_TRANSLATE_ATTR = new RegExp('translate="I18N_', 'g');
+  var REGEX_NG_VARIABLE = new RegExp('<\\[\'I18N_', 'g');
+  var REGEX_NG_TOP_NAV_VISIBILITY = (
+    new RegExp('ng-show="\\$ctrl.navElementsVisibilityStatus.I18N_', 'g'));
+  expect(promiseValue.replace(REGEX_TRANSLATE_ATTR, '')
+    .replace(REGEX_NG_VARIABLE, '')
+    .replace(REGEX_NG_TOP_NAV_VISIBILITY, '')).not.toContain('I18N');
 };
 
-var acceptAlert = function() {
-  waitFor.alertToBePresent();
-  browser.switchTo().alert().accept();
-  waitFor.pageToFullyLoad();
+var acceptAlert = async function() {
+  await waitFor.alertToBePresent();
+  await (await browser.switchTo().alert()).accept();
+  await waitFor.pageToFullyLoad();
 };
 
 var closeCurrentTabAndSwitchTo = async function(destHandle) {
-  browser.driver.close();
+  await browser.driver.close();
   await browser.switchTo().window(destHandle);
 };
 
@@ -174,30 +165,29 @@ var _getUniqueLogMessages = function(logs) {
   return Object.keys(logsDict);
 };
 
-var checkConsoleErrorsExist = function(expectedErrors) {
+var checkConsoleErrorsExist = async function(expectedErrors) {
   // Checks that browser logs match entries in expectedErrors array.
-  browser.manage().logs().get('browser').then(function(browserLogs) {
-    // Some browsers such as chrome raise two errors for a missing resource.
-    // To keep consistent behaviour across browsers, we keep only the logs
-    // that have a unique value for their message attribute.
-    var uniqueLogMessages = _getUniqueLogMessages(browserLogs);
-    expect(uniqueLogMessages.length).toBe(expectedErrors.length);
-    for (var i = 0; i < expectedErrors.length; i++) {
-      var errorPresent = false;
-      for (var j = 0; j < uniqueLogMessages.length; j++) {
-        if (uniqueLogMessages[j].match(expectedErrors[i])) {
-          errorPresent = true;
-        }
+  var browserLogs = await browser.manage().logs().get('browser');
+  // Some browsers such as chrome raise two errors for a missing resource.
+  // To keep consistent behaviour across browsers, we keep only the logs
+  // that have a unique value for their message attribute.
+  var uniqueLogMessages = _getUniqueLogMessages(browserLogs);
+  expect(uniqueLogMessages.length).toBe(expectedErrors.length);
+  for (var i = 0; i < expectedErrors.length; i++) {
+    var errorPresent = false;
+    for (var j = 0; j < uniqueLogMessages.length; j++) {
+      if (uniqueLogMessages[j].match(expectedErrors[i])) {
+        errorPresent = true;
       }
-      expect(errorPresent).toBe(true);
     }
-  });
+    expect(errorPresent).toBe(true);
+  }
 };
 
-var goToHomePage = function() {
+var goToHomePage = async function() {
   var oppiaMainLogo = element(by.css('.protractor-test-oppia-main-logo'));
-  oppiaMainLogo.click();
-  return waitFor.pageToFullyLoad();
+  await oppiaMainLogo.click();
+  return await waitFor.pageToFullyLoad();
 };
 
 exports.acceptAlert = acceptAlert;

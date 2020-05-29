@@ -28,11 +28,11 @@ var CommunityDashboardPage = function() {
     return new CommunityDashboardTranslateTextTab
       .CommunityDashboardTranslateTextTab();
   };
-  this.navigateToTranslateTextTab = function() {
-    waitFor.elementToBeClickable(
+  this.navigateToTranslateTextTab = async function() {
+    await waitFor.elementToBeClickable(
       navigateToTranslateTextTabButton, 'Translate text tab is not clickable');
-    navigateToTranslateTextTabButton.click();
-    waitFor.pageToFullyLoad();
+    await navigateToTranslateTextTabButton.click();
+    await waitFor.pageToFullyLoad();
   };
 };
 

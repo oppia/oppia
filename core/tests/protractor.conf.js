@@ -359,6 +359,8 @@ exports.config = {
     format: 'summary'
   },
 
+  SELENIUM_PROMISE_MANAGER: false,
+
   // ----- The cleanup step -----
   //
   // A callback function called once the tests have finished running and

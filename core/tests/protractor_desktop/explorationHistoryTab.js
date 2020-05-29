@@ -48,29 +48,31 @@ describe('Exploration history', function() {
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
   });
 
-  it('should display the history', function() {
-    users.createUser('user@historyTab.com', 'userHistoryTab');
-    users.login('user@historyTab.com');
-    workflow.createExploration();
+  it('should display the history', async function() {
+    await users.createUser('user@historyTab.com', 'userHistoryTab');
+    await users.login('user@historyTab.com');
+    await workflow.createExploration();
 
     // Check renaming state, editing text, editing interactions and adding
     // state.
-    explorationEditorMainTab.setStateName('first');
-    explorationEditorMainTab.setContent(forms.toRichText(
+    await explorationEditorMainTab.setStateName('first');
+    explorationEditorMainTab.setContent(await forms.toRichText(
       'enter 6 to continue'));
-    explorationEditorMainTab.setInteraction('NumericInput');
-    explorationEditorMainTab.addResponse(
+    await explorationEditorMainTab.setInteraction('NumericInput');
+    await explorationEditorMainTab.addResponse(
       'NumericInput', null, 'second', true, 'Equals', 6);
-    explorationEditorMainTab.moveToState('second');
-    explorationEditorMainTab.setContent(forms.toRichText('this is card 2'));
-    explorationEditorMainTab.setInteraction('Continue');
-    var responseEditor = explorationEditorMainTab.getResponseEditor('default');
-    responseEditor.setDestination('final card', true, null);
+    await explorationEditorMainTab.moveToState('second');
+    await explorationEditorMainTab.setContent(
+      await forms.toRichText('this is card 2'));
+    await explorationEditorMainTab.setInteraction('Continue');
+    var responseEditor = await explorationEditorMainTab.getResponseEditor(
+      'default');
+    await responseEditor.setDestination('final card', true, null);
     // Setup a terminating state.
-    explorationEditorMainTab.moveToState('final card');
-    explorationEditorMainTab.setInteraction('EndExploration');
-    explorationEditorMainTab.moveToState('first');
-    explorationEditorPage.saveChanges();
+    await explorationEditorMainTab.moveToState('final card');
+    await explorationEditorMainTab.setInteraction('EndExploration');
+    await explorationEditorMainTab.moveToState('first');
+    await explorationEditorPage.saveChanges();
 
     var VERSION_1_STATE_1_CONTENTS = {
       1: {
@@ -441,34 +443,34 @@ describe('Exploration history', function() {
       label: 'final card',
       color: COLOR_ADDED
     }];
-    explorationEditorPage.navigateToHistoryTab();
+    await explorationEditorPage.navigateToHistoryTab();
     var historyGraph = explorationEditorHistoryTab.getHistoryGraph();
-    historyGraph.selectTwoVersions(1, 2);
-    historyGraph.expectHistoryStatesToMatch(expectedHistoryStates);
-    historyGraph.expectNumberOfLinksToMatch(2, 2, 0);
-    historyGraph.openStateHistory('first (was: Introd...');
-    historyGraph.expectTextWithHighlightingToMatch(
+    await historyGraph.selectTwoVersions(1, 2);
+    await historyGraph.expectHistoryStatesToMatch(expectedHistoryStates);
+    await historyGraph.expectNumberOfLinksToMatch(2, 2, 0);
+    await historyGraph.openStateHistory('first (was: Introd...');
+    await historyGraph.expectTextWithHighlightingToMatch(
       VERSION_1_STATE_1_CONTENTS, VERSION_2_STATE_1_CONTENTS);
-    historyGraph.closeStateHistory();
+    await historyGraph.closeStateHistory();
 
-    historyGraph.openStateHistory('second');
-    historyGraph.expectTextToMatch(STATE_2_STRING, '');
-    historyGraph.closeStateHistory();
+    await historyGraph.openStateHistory('second');
+    await historyGraph.expectTextToMatch(STATE_2_STRING, '');
+    await historyGraph.closeStateHistory();
 
     // Reset all checkboxes.
     // Switching the 2 compared versions should give the same result.
-    historyGraph.deselectTwoVersions(1, 2);
-    historyGraph.selectTwoVersions(2, 1);
-    historyGraph.expectHistoryStatesToMatch(expectedHistoryStates);
-    historyGraph.expectNumberOfLinksToMatch(2, 2, 0);
+    await historyGraph.deselectTwoVersions(1, 2);
+    await historyGraph.selectTwoVersions(2, 1);
+    await historyGraph.expectHistoryStatesToMatch(expectedHistoryStates);
+    await historyGraph.expectNumberOfLinksToMatch(2, 2, 0);
 
     // Check deleting a state.
-    explorationEditorPage.navigateToMainTab();
-    explorationEditorMainTab.deleteState('second');
-    explorationEditorMainTab.moveToState('first');
-    explorationEditorMainTab.getResponseEditor(0).
-      setDestination('final card', false, null);
-    explorationEditorPage.saveChanges();
+    await explorationEditorPage.navigateToMainTab();
+    await explorationEditorMainTab.deleteState('second');
+    await explorationEditorMainTab.moveToState('first');
+    responseEditor = await explorationEditorMainTab.getResponseEditor(0);
+    await responseEditor.setDestination('final card', false, null);
+    await explorationEditorPage.saveChanges();
 
     expectedHistoryStates = [{
       label: 'first',
@@ -480,21 +482,21 @@ describe('Exploration history', function() {
       label: 'final card',
       color: COLOR_UNCHANGED
     }];
-    explorationEditorPage.navigateToHistoryTab();
-    historyGraph = explorationEditorHistoryTab.getHistoryGraph();
-    historyGraph.selectTwoVersions(2, 3);
-    historyGraph.expectHistoryStatesToMatch(expectedHistoryStates);
-    historyGraph.expectNumberOfLinksToMatch(3, 1, 2);
+    await explorationEditorPage.navigateToHistoryTab();
+    historyGraph = await explorationEditorHistoryTab.getHistoryGraph();
+    await historyGraph.selectTwoVersions(2, 3);
+    await historyGraph.expectHistoryStatesToMatch(expectedHistoryStates);
+    await historyGraph.expectNumberOfLinksToMatch(3, 1, 2);
 
-    historyGraph.openStateHistory('second');
-    historyGraph.expectTextToMatch('', STATE_2_STRING);
-    historyGraph.closeStateHistory();
+    await historyGraph.openStateHistory('second');
+    await historyGraph.expectTextToMatch('', STATE_2_STRING);
+    await historyGraph.closeStateHistory();
 
     // Check renaming a state.
-    explorationEditorPage.navigateToMainTab();
-    explorationEditorMainTab.moveToState('first');
-    explorationEditorMainTab.setStateName('third');
-    explorationEditorPage.saveChanges();
+    await explorationEditorPage.navigateToMainTab();
+    await explorationEditorMainTab.moveToState('first');
+    await explorationEditorMainTab.setStateName('third');
+    await explorationEditorPage.saveChanges();
     expectedHistoryStates = [{
       label: 'third (was: first)',
       color: COLOR_RENAMED_UNCHANGED
@@ -502,24 +504,26 @@ describe('Exploration history', function() {
       label: 'final card',
       color: COLOR_UNCHANGED
     }];
-    explorationEditorPage.navigateToHistoryTab();
-    historyGraph = explorationEditorHistoryTab.getHistoryGraph();
-    historyGraph.selectTwoVersions(3, 4);
-    historyGraph.expectHistoryStatesToMatch(expectedHistoryStates);
-    historyGraph.expectNumberOfLinksToMatch(1, 0, 0);
+    await explorationEditorPage.navigateToHistoryTab();
+    historyGraph = await explorationEditorHistoryTab.getHistoryGraph();
+    await historyGraph.selectTwoVersions(3, 4);
+    await historyGraph.expectHistoryStatesToMatch(expectedHistoryStates);
+    await historyGraph.expectNumberOfLinksToMatch(1, 0, 0);
 
     // Check re-inserting a deleted state.
-    explorationEditorPage.navigateToMainTab();
-    explorationEditorMainTab.moveToState('third');
-    explorationEditorMainTab.getResponseEditor(0).
-      setDestination('second', true, null);
-    explorationEditorMainTab.moveToState('second');
-    explorationEditorMainTab.setContent(forms.toRichText('this is card 2'));
-    explorationEditorMainTab.setInteraction('Continue');
+    await explorationEditorPage.navigateToMainTab();
+    await explorationEditorMainTab.moveToState('third');
+    responseEditor = await explorationEditorMainTab.getResponseEditor(0);
+    await responseEditor.setDestination('second', true, null);
+    await explorationEditorMainTab.moveToState('second');
+    await explorationEditorMainTab.setContent(
+      await forms.toRichText('this is card 2'));
+    await explorationEditorMainTab.setInteraction('Continue');
 
-    var responseEditor = explorationEditorMainTab.getResponseEditor('default');
-    responseEditor.setDestination('final card', false, null);
-    explorationEditorPage.saveChanges();
+    var responseEditor = await explorationEditorMainTab.getResponseEditor(
+      'default');
+    await responseEditor.setDestination('final card', false, null);
+    await explorationEditorPage.saveChanges();
 
     expectedHistoryStates = [{
       label: 'third (was: first)',
@@ -531,49 +535,50 @@ describe('Exploration history', function() {
       label: 'final card',
       color: COLOR_UNCHANGED
     }];
-    explorationEditorPage.navigateToHistoryTab();
-    historyGraph = explorationEditorHistoryTab.getHistoryGraph();
-    historyGraph.selectTwoVersions(2, 5);
-    historyGraph.expectHistoryStatesToMatch(expectedHistoryStates);
-    historyGraph.expectNumberOfLinksToMatch(2, 0, 0);
+    await explorationEditorPage.navigateToHistoryTab();
+    historyGraph = await explorationEditorHistoryTab.getHistoryGraph();
+    await historyGraph.selectTwoVersions(2, 5);
+    await historyGraph.expectHistoryStatesToMatch(expectedHistoryStates);
+    await historyGraph.expectNumberOfLinksToMatch(2, 0, 0);
 
-    users.logout();
+    await users.logout();
   });
 
-  it('should revert to old exploration commit', function() {
-    users.createUser('user2@historyTab.com', 'user2HistoryTab');
-    users.login('user2@historyTab.com');
-    workflow.createExploration();
+  it('should revert to old exploration commit', async function() {
+    await users.createUser('user2@historyTab.com', 'user2HistoryTab');
+    await users.login('user2@historyTab.com');
+    await workflow.createExploration();
 
     // Make changes for second commit.
     // First card.
-    explorationEditorMainTab.setStateName('first');
-    explorationEditorMainTab.setContent(forms.toRichText(
+    await explorationEditorMainTab.setStateName('first');
+    await explorationEditorMainTab.setContent(await forms.toRichText(
       'enter 6 to continue'));
-    explorationEditorMainTab.setInteraction('NumericInput');
-    explorationEditorMainTab.addResponse(
+    await explorationEditorMainTab.setInteraction('NumericInput');
+    await explorationEditorMainTab.addResponse(
       'NumericInput', null, 'second', true, 'Equals', 6);
     // Second card.
-    explorationEditorMainTab.moveToState('second');
-    explorationEditorMainTab.setContent(
-      forms.toRichText('card 2 second commit text'));
-    explorationEditorMainTab.setInteraction('Continue');
-    var responseEditor = explorationEditorMainTab.getResponseEditor('default');
-    responseEditor.setDestination('final card', true, null);
+    await explorationEditorMainTab.moveToState('second');
+    await explorationEditorMainTab.setContent(
+      await forms.toRichText('card 2 second commit text'));
+    await explorationEditorMainTab.setInteraction('Continue');
+    var responseEditor = await explorationEditorMainTab.getResponseEditor(
+      'default');
+    await responseEditor.setDestination('final card', true, null);
     // Final card.
-    explorationEditorMainTab.moveToState('final card');
-    explorationEditorMainTab.setInteraction('EndExploration');
-    explorationEditorMainTab.moveToState('first');
-    explorationEditorPage.saveChanges();
+    await explorationEditorMainTab.moveToState('final card');
+    await explorationEditorMainTab.setInteraction('EndExploration');
+    await explorationEditorMainTab.moveToState('first');
+    await explorationEditorPage.saveChanges();
 
     // Create third commit.
-    explorationEditorPage.navigateToMainTab();
-    explorationEditorMainTab.moveToState('first');
-    explorationEditorMainTab.setStateName('third');
-    explorationEditorMainTab.moveToState('second');
-    explorationEditorMainTab.setContent(
-      forms.toRichText('card 2 third commit text'));
-    explorationEditorPage.saveChanges();
+    await explorationEditorPage.navigateToMainTab();
+    await explorationEditorMainTab.moveToState('first');
+    await explorationEditorMainTab.setStateName('third');
+    await explorationEditorMainTab.moveToState('second');
+    await explorationEditorMainTab.setContent(
+      await forms.toRichText('card 2 third commit text'));
+    await explorationEditorPage.saveChanges();
     expectedHistoryStates = [{
       label: 'third (was: first)',
       color: COLOR_RENAMED_UNCHANGED
@@ -584,30 +589,31 @@ describe('Exploration history', function() {
       label: 'final card',
       color: COLOR_UNCHANGED
     }];
-    explorationEditorPage.navigateToHistoryTab();
-    historyGraph = explorationEditorHistoryTab.getHistoryGraph();
-    historyGraph.selectTwoVersions(2, 3);
-    historyGraph.expectHistoryStatesToMatch(expectedHistoryStates);
-    historyGraph.expectNumberOfLinksToMatch(2, 0, 0);
+    await explorationEditorPage.navigateToHistoryTab();
+    var historyGraph = await explorationEditorHistoryTab.getHistoryGraph();
+    await historyGraph.selectTwoVersions(2, 3);
+    await historyGraph.expectHistoryStatesToMatch(expectedHistoryStates);
+    await historyGraph.expectNumberOfLinksToMatch(2, 0, 0);
 
     // Revert to version 2.
-    explorationEditorPage.navigateToHistoryTab();
-    explorationEditorHistoryTab.revertToVersion(2);
+    await explorationEditorPage.navigateToHistoryTab();
+    await explorationEditorHistoryTab.revertToVersion(2);
 
     // Verify exploration is version 2.
-    general.moveToPlayer();
-    explorationPlayerPage.expectContentToMatch(
-      forms.toRichText('enter 6 to continue'));
-    explorationPlayerPage.submitAnswer('NumericInput', 6);
-    explorationPlayerPage.expectExplorationToNotBeOver();
-    explorationPlayerPage.expectContentToMatch(
-      forms.toRichText('card 2 second commit text'));
-    explorationPlayerPage.expectInteractionToMatch('Continue', 'CONTINUE');
-    explorationPlayerPage.submitAnswer('Continue', null);
-    explorationPlayerPage.expectExplorationToBeOver();
+    await general.moveToPlayer();
+    await explorationPlayerPage.expectContentToMatch(
+      await forms.toRichText('enter 6 to continue'));
+    await explorationPlayerPage.submitAnswer('NumericInput', 6);
+    await explorationPlayerPage.expectExplorationToNotBeOver();
+    await explorationPlayerPage.expectContentToMatch(
+      await forms.toRichText('card 2 second commit text'));
+    await explorationPlayerPage.expectInteractionToMatch(
+      'Continue', 'CONTINUE');
+    await explorationPlayerPage.submitAnswer('Continue', null);
+    await explorationPlayerPage.expectExplorationToBeOver();
 
     // Verify history states between original and reversion.
-    general.moveToEditor();
+    await general.moveToEditor();
     var expectedHistoryStates = [{
       label: 'first',
       color: COLOR_UNCHANGED
@@ -618,16 +624,16 @@ describe('Exploration history', function() {
       label: 'final card',
       color: COLOR_UNCHANGED
     }];
-    explorationEditorPage.navigateToHistoryTab();
-    historyGraph = explorationEditorHistoryTab.getHistoryGraph();
-    historyGraph.selectTwoVersions(2, 4);
-    historyGraph.expectHistoryStatesToMatch(expectedHistoryStates);
-    historyGraph.expectNumberOfLinksToMatch(2, 0, 0);
+    await explorationEditorPage.navigateToHistoryTab();
+    historyGraph = await explorationEditorHistoryTab.getHistoryGraph();
+    await historyGraph.selectTwoVersions(2, 4);
+    await historyGraph.expectHistoryStatesToMatch(expectedHistoryStates);
+    await historyGraph.expectNumberOfLinksToMatch(2, 0, 0);
 
-    users.logout();
+    await users.logout();
   });
 
-  afterEach(function() {
-    general.checkForConsoleErrors([]);
+  afterEach(async function() {
+    await general.checkForConsoleErrors([]);
   });
 });

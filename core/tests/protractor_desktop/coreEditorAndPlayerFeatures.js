@@ -47,28 +47,28 @@ describe('Enable correctness feedback and set correctness', function() {
     ['NumericInput', 3]
   ];
 
-  var enableCorrectnessFeedbackSetting = function() {
-    explorationEditorPage.navigateToSettingsTab();
-    explorationEditorSettingsTab.enableCorrectnessFeedback();
+  var enableCorrectnessFeedbackSetting = async function() {
+    await explorationEditorPage.navigateToSettingsTab();
+    await explorationEditorSettingsTab.enableCorrectnessFeedback();
   };
 
-  var testEnableCorrectnessInPlayerPage = function() {
-    libraryPage.get();
-    libraryPage.findExploration(explorationTitle);
-    libraryPage.playExploration(explorationTitle);
-    explorationPlayerPage.submitAnswer.apply(
+  var testEnableCorrectnessInPlayerPage = async function() {
+    await libraryPage.get();
+    await libraryPage.findExploration(explorationTitle);
+    await libraryPage.playExploration(explorationTitle);
+    await explorationPlayerPage.submitAnswer.apply(
       null, correctOptions[currentExplorationIndex]);
-    explorationPlayerPage.expectCorrectFeedback();
-    explorationPlayerPage.clickThroughToNextCard();
-    explorationPlayerPage.expectExplorationToBeOver();
+    await explorationPlayerPage.expectCorrectFeedback();
+    await explorationPlayerPage.clickThroughToNextCard();
+    await explorationPlayerPage.expectExplorationToBeOver();
   };
 
-  beforeAll(function() {
-    users.createUser('user@markCorrect.com', 'userMarkCorrect');
-    users.login('user@markCorrect.com');
+  beforeAll(async function() {
+    await users.createUser('user@markCorrect.com', 'userMarkCorrect');
+    await users.login('user@markCorrect.com');
   });
 
-  beforeEach(function() {
+  beforeEach(async function() {
     explorationTitle = EXPLORATION_TITLE + String(currentExplorationIndex);
     libraryPage = new LibraryPage.LibraryPage();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
@@ -76,183 +76,188 @@ describe('Enable correctness feedback and set correctness', function() {
     explorationEditorMainTab = explorationEditorPage.getMainTab();
     explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
-    workflow.createExploration();
-    explorationEditorPage.navigateToSettingsTab();
-    explorationEditorSettingsTab.setTitle(explorationTitle);
-    explorationEditorSettingsTab.setCategory('Algorithm');
-    explorationEditorSettingsTab.setObjective('Learn more about Oppia');
-    explorationEditorSettingsTab.setLanguage('English');
-    explorationEditorPage.navigateToMainTab();
+    await workflow.createExploration();
+    await explorationEditorPage.navigateToSettingsTab();
+    await explorationEditorSettingsTab.setTitle(explorationTitle);
+    await explorationEditorSettingsTab.setCategory('Algorithm');
+    await explorationEditorSettingsTab.setObjective('Learn more about Oppia');
+    await explorationEditorSettingsTab.setLanguage('English');
+    await explorationEditorPage.navigateToMainTab();
   });
 
   it('should allow selecting correct feedback from the response editor ' +
-     'after the interaction is created', function() {
-    explorationEditorMainTab.setStateName('First');
-    explorationEditorMainTab.setContent(forms.toRichText(
+     'after the interaction is created', async function() {
+    await explorationEditorMainTab.setStateName('First');
+    await explorationEditorMainTab.setContent(await forms.toRichText(
       'Select the right option.'));
 
     // Create interaction first.
-    explorationEditorMainTab.setInteraction('MultipleChoiceInput', [
-      forms.toRichText('Correct!'),
-      forms.toRichText('Wrong!')
+    await explorationEditorMainTab.setInteraction('MultipleChoiceInput', [
+      await forms.toRichText('Correct!'),
+      await forms.toRichText('Wrong!')
     ]);
-    explorationEditorMainTab.addResponse(
-      'MultipleChoiceInput', forms.toRichText('Good!'),
+    await explorationEditorMainTab.addResponse(
+      'MultipleChoiceInput', await forms.toRichText('Good!'),
       'End', true, 'Equals', 'Correct!');
-    responseEditor = explorationEditorMainTab.getResponseEditor('default');
-    responseEditor.setFeedback(forms.toRichText('Wrong!'));
-    explorationEditorMainTab.moveToState('End');
-    explorationEditorMainTab.setInteraction('EndExploration');
+    var responseEditor = await explorationEditorMainTab.getResponseEditor(
+      'default');
+    await responseEditor.setFeedback(await forms.toRichText('Wrong!'));
+    await explorationEditorMainTab.moveToState('End');
+    await explorationEditorMainTab.setInteraction('EndExploration');
     // Turn on correctness feedback.
-    enableCorrectnessFeedbackSetting();
+    await enableCorrectnessFeedbackSetting();
 
     // Go back to mark the solution as correct.
-    explorationEditorPage.navigateToMainTab();
-    explorationEditorMainTab.moveToState('First');
-    responseEditor = explorationEditorMainTab.getResponseEditor(0);
-    responseEditor.markAsCorrect();
-    explorationEditorMainTab.expectTickMarkIsDisplayed();
-    explorationEditorPage.saveChanges();
-    workflow.publishExploration();
-    testEnableCorrectnessInPlayerPage();
+    await explorationEditorPage.navigateToMainTab();
+    await explorationEditorMainTab.moveToState('First');
+    responseEditor = await explorationEditorMainTab.getResponseEditor(0);
+    await responseEditor.markAsCorrect();
+    await explorationEditorMainTab.expectTickMarkIsDisplayed();
+    await explorationEditorPage.saveChanges();
+    await workflow.publishExploration();
+    await testEnableCorrectnessInPlayerPage();
   });
 
   it('should allow selecting correct feedback from the response editor ' +
-     'during set the interaction', function() {
+     'during set the interaction', async function() {
     // Turn on correctness feedback first.
-    enableCorrectnessFeedbackSetting();
+    await enableCorrectnessFeedbackSetting();
 
     // Go to main tab to create interactions.
-    explorationEditorPage.navigateToMainTab();
-    explorationEditorMainTab.setStateName('First');
-    explorationEditorMainTab.setContent(forms.toRichText(
+    await explorationEditorPage.navigateToMainTab();
+    await explorationEditorMainTab.setStateName('First');
+    await explorationEditorMainTab.setContent(await forms.toRichText(
       'Select the right option.'));
 
     // Create interaction without closing the add response modal. Set
     // correctness in the modal.
-    explorationEditorMainTab.setInteractionWithoutCloseAddResponse('TextInput');
-    responseEditor = explorationEditorMainTab.getResponseEditor('pop');
-    responseEditor.markAsCorrect();
+    await explorationEditorMainTab.setInteractionWithoutCloseAddResponse(
+      'TextInput');
+    responseEditor = await explorationEditorMainTab.getResponseEditor('pop');
+    await responseEditor.markAsCorrect();
 
     // Set the response for this interaction and close it.
-    explorationEditorMainTab.setResponse(
-      'TextInput', forms.toRichText('Correct!'),
+    await explorationEditorMainTab.setResponse(
+      'TextInput', await forms.toRichText('Correct!'),
       'End', true, 'Equals', 'One');
 
-    explorationEditorMainTab.expectTickMarkIsDisplayed();
-    responseEditor = explorationEditorMainTab.getResponseEditor('default');
-    responseEditor.setFeedback(forms.toRichText('Wrong!'));
-    explorationEditorMainTab.moveToState('End');
-    explorationEditorMainTab.setInteraction('EndExploration');
-    explorationEditorPage.saveChanges();
-    workflow.publishExploration();
-    testEnableCorrectnessInPlayerPage();
+    await explorationEditorMainTab.expectTickMarkIsDisplayed();
+    responseEditor = await explorationEditorMainTab.getResponseEditor(
+      'default');
+    await responseEditor.setFeedback(await forms.toRichText('Wrong!'));
+    await explorationEditorMainTab.moveToState('End');
+    await explorationEditorMainTab.setInteraction('EndExploration');
+    await explorationEditorPage.saveChanges();
+    await workflow.publishExploration();
+    await testEnableCorrectnessInPlayerPage();
   });
 
   it('should allow selecting correct feedback from the default response editor',
-    function() {
+    async function() {
       // Turn on correctness feedback first.
-      enableCorrectnessFeedbackSetting();
+      await enableCorrectnessFeedbackSetting();
 
       // Go back to main tab to create interactions.
-      explorationEditorPage.navigateToMainTab();
-      explorationEditorMainTab.setStateName('First');
-      explorationEditorMainTab.setContent(forms.toRichText(
+      await explorationEditorPage.navigateToMainTab();
+      await explorationEditorMainTab.setStateName('First');
+      await explorationEditorMainTab.setContent(await forms.toRichText(
         'Select the right option.'));
-      explorationEditorMainTab.setInteraction('NumericInput');
+      await explorationEditorMainTab.setInteraction('NumericInput');
 
       // Set correctness in response editor.
-      responseEditor = explorationEditorMainTab.getResponseEditor('default');
-      responseEditor.markAsCorrect();
-      responseEditor.setFeedback(forms.toRichText('Correct!'));
-      responseEditor.setDestination('End', true, true);
-      explorationEditorMainTab.expectTickMarkIsDisplayed();
+      responseEditor = await explorationEditorMainTab.getResponseEditor(
+        'default');
+      await responseEditor.markAsCorrect();
+      await responseEditor.setFeedback(await forms.toRichText('Correct!'));
+      await responseEditor.setDestination('End', true, true);
+      await explorationEditorMainTab.expectTickMarkIsDisplayed();
 
-      explorationEditorMainTab.moveToState('End');
-      explorationEditorMainTab.setInteraction('EndExploration');
-      explorationEditorPage.saveChanges();
-      workflow.publishExploration();
-      testEnableCorrectnessInPlayerPage();
+      await explorationEditorMainTab.moveToState('End');
+      await explorationEditorMainTab.setInteraction('EndExploration');
+      await explorationEditorPage.saveChanges();
+      await workflow.publishExploration();
+      await testEnableCorrectnessInPlayerPage();
     });
 
-  it('should show Learn Again button correctly', function() {
+  it('should show Learn Again button correctly', async function() {
     // Turn on correctness feedback first.
-    enableCorrectnessFeedbackSetting();
+    await enableCorrectnessFeedbackSetting();
 
     // Go to main tab to create interactions.
-    explorationEditorPage.navigateToMainTab();
-    explorationEditorMainTab.setStateName('First');
-    explorationEditorMainTab.setContent(forms.toRichText(
+    await explorationEditorPage.navigateToMainTab();
+    await explorationEditorMainTab.setStateName('First');
+    await explorationEditorMainTab.setContent(await forms.toRichText(
       'Select the right option.'));
 
-    explorationEditorMainTab.setInteraction('MultipleChoiceInput', [
-      forms.toRichText('Correct!'),
-      forms.toRichText('Wrong!')
+    await explorationEditorMainTab.setInteraction('MultipleChoiceInput', [
+      await forms.toRichText('Correct!'),
+      await forms.toRichText('Wrong!')
     ]);
-    explorationEditorMainTab.addResponse(
-      'MultipleChoiceInput', forms.toRichText('Good!'),
+    await explorationEditorMainTab.addResponse(
+      'MultipleChoiceInput', await forms.toRichText('Good!'),
       'Second', true, 'Equals', 'Correct!');
-    responseEditor = explorationEditorMainTab.getResponseEditor('default');
-    responseEditor.setFeedback(forms.toRichText('Wrong!'));
-    responseEditor = explorationEditorMainTab.getResponseEditor(0);
-    responseEditor.markAsCorrect();
+    responseEditor = await explorationEditorMainTab.getResponseEditor(
+      'default');
+    await responseEditor.setFeedback(await forms.toRichText('Wrong!'));
+    responseEditor = await explorationEditorMainTab.getResponseEditor(0);
+    await responseEditor.markAsCorrect();
 
-    explorationEditorMainTab.moveToState('Second');
-    explorationEditorMainTab.setContent(forms.toRichText(
+    await explorationEditorMainTab.moveToState('Second');
+    await explorationEditorMainTab.setContent(await forms.toRichText(
       'Select the right option.'));
 
-    explorationEditorMainTab.setInteraction('MultipleChoiceInput', [
-      forms.toRichText('Correct!'),
-      forms.toRichText('Wrong!')
+    await explorationEditorMainTab.setInteraction('MultipleChoiceInput', [
+      await forms.toRichText('Correct!'),
+      await forms.toRichText('Wrong!')
     ]);
-    explorationEditorMainTab.addResponse(
-      'MultipleChoiceInput', forms.toRichText('Good!'),
+    await explorationEditorMainTab.addResponse(
+      'MultipleChoiceInput', await forms.toRichText('Good!'),
       'End', true, 'Equals', 'Correct!');
-    explorationEditorMainTab.addResponse(
-      'MultipleChoiceInput', forms.toRichText('Wrong!'),
+    await explorationEditorMainTab.addResponse(
+      'MultipleChoiceInput', await forms.toRichText('Wrong!'),
       'First', false, 'Equals', 'Wrong!');
 
-    explorationEditorMainTab.moveToState('End');
-    explorationEditorMainTab.setInteraction('EndExploration');
-    explorationEditorPage.saveChanges();
-    workflow.publishExploration();
+    await explorationEditorMainTab.moveToState('End');
+    await explorationEditorMainTab.setInteraction('EndExploration');
+    await explorationEditorPage.saveChanges();
+    await workflow.publishExploration();
 
-    libraryPage.get();
-    libraryPage.findExploration(explorationTitle);
-    libraryPage.playExploration(explorationTitle);
+    await libraryPage.get();
+    await libraryPage.findExploration(explorationTitle);
+    await libraryPage.playExploration(explorationTitle);
 
-    explorationPlayerPage.submitAnswer.apply(null, correctOptions[0]);
-    explorationPlayerPage.expectNextCardButtonTextToBe('CONTINUE');
-    explorationPlayerPage.clickThroughToNextCard();
+    await explorationPlayerPage.submitAnswer.apply(null, correctOptions[0]);
+    await explorationPlayerPage.expectNextCardButtonTextToBe('CONTINUE');
+    await explorationPlayerPage.clickThroughToNextCard();
 
-    explorationPlayerPage.submitAnswer.apply(
+    await explorationPlayerPage.submitAnswer.apply(
       null, ['MultipleChoiceInput', 'Wrong!']);
-    explorationPlayerPage.expectNextCardButtonTextToBe('LEARN AGAIN');
-    explorationPlayerPage.clickThroughToNextCard();
+    await explorationPlayerPage.expectNextCardButtonTextToBe('LEARN AGAIN');
+    await explorationPlayerPage.clickThroughToNextCard();
 
-    explorationPlayerPage.submitAnswer.apply(null, correctOptions[0]);
-    explorationPlayerPage.expectNextCardButtonTextToBe('CONTINUE');
-    explorationPlayerPage.clickThroughToNextCard();
+    await explorationPlayerPage.submitAnswer.apply(null, correctOptions[0]);
+    await explorationPlayerPage.expectNextCardButtonTextToBe('CONTINUE');
+    await explorationPlayerPage.clickThroughToNextCard();
 
-    explorationPlayerPage.submitAnswer.apply(
+    await explorationPlayerPage.submitAnswer.apply(
       null, ['MultipleChoiceInput', 'Wrong!']);
-    explorationPlayerPage.expectNextCardButtonTextToBe('LEARN AGAIN');
-    explorationPlayerPage.clickThroughToNextCard();
+    await explorationPlayerPage.expectNextCardButtonTextToBe('LEARN AGAIN');
+    await explorationPlayerPage.clickThroughToNextCard();
 
-    explorationPlayerPage.submitAnswer.apply(null, correctOptions[0]);
-    explorationPlayerPage.expectNextCardButtonTextToBe('CONTINUE');
-    explorationPlayerPage.clickThroughToNextCard();
+    await explorationPlayerPage.submitAnswer.apply(null, correctOptions[0]);
+    await explorationPlayerPage.expectNextCardButtonTextToBe('CONTINUE');
+    await explorationPlayerPage.clickThroughToNextCard();
 
-    explorationPlayerPage.submitAnswer.apply(null, correctOptions[0]);
-    explorationPlayerPage.expectNextCardButtonTextToBe('CONTINUE');
-    explorationPlayerPage.clickThroughToNextCard();
-    explorationPlayerPage.expectExplorationToBeOver();
+    await explorationPlayerPage.submitAnswer.apply(null, correctOptions[0]);
+    await explorationPlayerPage.expectNextCardButtonTextToBe('CONTINUE');
+    await explorationPlayerPage.clickThroughToNextCard();
+    await explorationPlayerPage.expectExplorationToBeOver();
   });
 
-  afterEach(function() {
-    libraryPage.get();
+  afterEach(async function() {
+    await libraryPage.get();
     currentExplorationIndex += 1;
-    general.checkForConsoleErrors([]);
+    await general.checkForConsoleErrors([]);
   });
 });
 
@@ -264,261 +269,284 @@ describe('Core exploration functionality', function() {
   var explorationEditorSettingsTab = null;
   var userNumber = 1;
 
-  beforeEach(function() {
+  beforeEach(async function() {
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
     explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
-
-    users.createUser(
+    await users.createUser(
       `user${userNumber}@stateEditor.com`, `user${userNumber}StateEditor`);
-    users.login(`user${userNumber}@stateEditor.com`);
-    workflow.createExploration();
+    await users.login(`user${userNumber}@stateEditor.com`);
+    await workflow.createExploration();
 
     userNumber++;
   });
 
-  it('should display plain text content', function() {
-    explorationEditorMainTab.setContent(forms.toRichText('plain text'));
-    explorationEditorMainTab.setInteraction('Continue', 'click here');
-    explorationEditorMainTab.getResponseEditor('default')
-      .setDestination('final card', true, null);
+  it('should display plain text content', async function() {
+    await explorationEditorMainTab.setContent(
+      await forms.toRichText('plain text'));
+    await explorationEditorMainTab.setInteraction('Continue', 'click here');
+    var responseEditor = await explorationEditorMainTab.getResponseEditor(
+      'default');
+    await responseEditor.setDestination('final card', true, null);
 
     // Setup a terminating state.
-    explorationEditorMainTab.moveToState('final card');
-    explorationEditorMainTab.setInteraction('EndExploration');
-    explorationEditorPage.saveChanges();
+    await explorationEditorMainTab.moveToState('final card');
+    await explorationEditorMainTab.setInteraction('EndExploration');
+    await explorationEditorPage.saveChanges();
 
-    general.moveToPlayer();
-    explorationPlayerPage.expectContentToMatch(forms.toRichText('plain text'));
-    explorationPlayerPage.expectExplorationToNotBeOver();
-    explorationPlayerPage.expectInteractionToMatch('Continue', 'click here');
-    explorationPlayerPage.submitAnswer('Continue', null);
-    explorationPlayerPage.expectExplorationToBeOver();
+    await general.moveToPlayer();
+    await explorationPlayerPage.expectContentToMatch(
+      await forms.toRichText('plain text'));
+    await explorationPlayerPage.expectExplorationToNotBeOver();
+    await explorationPlayerPage.expectInteractionToMatch(
+      'Continue', 'click here');
+    await explorationPlayerPage.submitAnswer('Continue', null);
+    await explorationPlayerPage.expectExplorationToBeOver();
   });
 
-  it('should create content and multiple choice interactions', function() {
-    explorationEditorMainTab.setContent(function(richTextEditor) {
-      richTextEditor.appendBoldText('bold text');
-      richTextEditor.appendPlainText(' ');
-      richTextEditor.appendItalicText('italic text');
-      richTextEditor.appendPlainText(' ');
-      richTextEditor.appendPlainText(' ');
-      richTextEditor.appendOrderedList(['entry 1', 'entry 2']);
-      richTextEditor.appendUnorderedList(['an entry', 'another entry']);
-    });
-    explorationEditorMainTab.setInteraction(
-      'MultipleChoiceInput',
-      [forms.toRichText('option A'), forms.toRichText('option B')]);
-    explorationEditorMainTab.getResponseEditor('default').setDestination(
-      'final card', true, null);
-
-    // Setup a terminating state.
-    explorationEditorMainTab.moveToState('final card');
-    explorationEditorMainTab.setInteraction('EndExploration');
-    explorationEditorPage.saveChanges();
-
-    general.moveToPlayer();
-    explorationPlayerPage.expectExplorationToNotBeOver();
-    explorationPlayerPage.expectInteractionToMatch(
-      'MultipleChoiceInput', ['option A', 'option B']);
-    explorationPlayerPage.submitAnswer('MultipleChoiceInput', 'option B');
-    explorationPlayerPage.expectExplorationToBeOver();
-  });
-
-  it('should obey numeric interaction rules and display feedback', function() {
-    explorationEditorMainTab.setContent(forms.toRichText('some content'));
-    explorationEditorMainTab.setInteraction('NumericInput');
-    explorationEditorMainTab.addResponse('NumericInput',
-      function(richTextEditor) {
-        richTextEditor.appendBoldText('correct');
-      }, 'final card', true, 'IsInclusivelyBetween', -1, 3);
-    explorationEditorMainTab.getResponseEditor(0).expectRuleToBe(
-      'NumericInput', 'IsInclusivelyBetween', [-1, 3]);
-    explorationEditorMainTab.getResponseEditor(0)
-      .expectFeedbackInstructionToBe('correct');
-    explorationEditorMainTab.getResponseEditor('default').setFeedback(
-      forms.toRichText('out of bounds'));
-    explorationEditorMainTab.getResponseEditor('default')
-      .expectFeedbackInstructionToBe('out of bounds');
-    explorationEditorMainTab.getResponseEditor('default').setDestination(
-      null, false, null);
-
-    // Setup a terminating state.
-
-    explorationEditorMainTab.moveToState('final card');
-    explorationEditorMainTab.setInteraction('EndExploration');
-    explorationEditorPage.saveChanges();
-
-    general.moveToPlayer();
-    explorationPlayerPage.submitAnswer('NumericInput', 5);
-    explorationPlayerPage.expectLatestFeedbackToMatch(
-      forms.toRichText('out of bounds')
-    );
-    explorationPlayerPage.expectExplorationToNotBeOver();
-    // It's important to test the value 0 in order to ensure that it would
-    // still get submitted even though it is a falsy value in JavaScript.
-    explorationPlayerPage.submitAnswer('NumericInput', 0);
-    explorationPlayerPage.expectLatestFeedbackToMatch(
-      function(richTextChecker) {
-        richTextChecker.readBoldText('correct');
+  it('should create content and multiple choice interactions',
+    async function() {
+      await explorationEditorMainTab.setContent(async function(richTextEditor) {
+        await richTextEditor.appendBoldText('bold text');
+        await richTextEditor.appendPlainText(' ');
+        await richTextEditor.appendItalicText('italic text');
+        await richTextEditor.appendPlainText(' ');
+        await richTextEditor.appendPlainText(' ');
+        await richTextEditor.appendOrderedList(['entry 1', 'entry 2']);
+        await richTextEditor.appendUnorderedList(['an entry', 'another entry']);
       });
-    explorationPlayerPage.clickThroughToNextCard();
-    explorationPlayerPage.expectExplorationToBeOver();
-  });
+      await explorationEditorMainTab.setInteraction('MultipleChoiceInput', [
+        await forms.toRichText('option A'), await forms.toRichText('option B')
+      ]);
+      var responseEditor = await explorationEditorMainTab.getResponseEditor(
+        'default');
+      await responseEditor.setDestination('final card', true, null);
+
+      // Setup a terminating state.
+      await explorationEditorMainTab.moveToState('final card');
+      await explorationEditorMainTab.setInteraction('EndExploration');
+      await explorationEditorPage.saveChanges();
+
+      await general.moveToPlayer();
+      await explorationPlayerPage.expectExplorationToNotBeOver();
+      await explorationPlayerPage.expectInteractionToMatch(
+        'MultipleChoiceInput', ['option A', 'option B']);
+      await explorationPlayerPage.submitAnswer(
+        'MultipleChoiceInput', 'option B');
+      await explorationPlayerPage.expectExplorationToBeOver();
+    });
+
+  it('should obey numeric interaction rules and display feedback',
+    async function() {
+      await explorationEditorMainTab.setContent(
+        await forms.toRichText('some content'));
+      await explorationEditorMainTab.setInteraction('NumericInput');
+      await explorationEditorMainTab.addResponse('NumericInput',
+        async function(richTextEditor) {
+          await richTextEditor.appendBoldText('correct');
+        }, 'final card', true, 'IsInclusivelyBetween', -1, 3);
+      var responseEditor = await explorationEditorMainTab.getResponseEditor(0);
+      await responseEditor.expectRuleToBe(
+        'NumericInput', 'IsInclusivelyBetween', [-1, 3]);
+      responseEditor = await explorationEditorMainTab.getResponseEditor(0);
+      await responseEditor.expectFeedbackInstructionToBe('correct');
+      responseEditor = await explorationEditorMainTab.getResponseEditor(
+        'default');
+      await responseEditor.setFeedback(
+        await forms.toRichText('out of bounds'));
+      responseEditor = await explorationEditorMainTab.getResponseEditor(
+        'default');
+      await responseEditor.expectFeedbackInstructionToBe('out of bounds');
+      responseEditor = await explorationEditorMainTab.getResponseEditor(
+        'default');
+      await responseEditor.setDestination(null, false, null);
+
+      // Setup a terminating state.
+
+      await explorationEditorMainTab.moveToState('final card');
+      await explorationEditorMainTab.setInteraction('EndExploration');
+      await explorationEditorPage.saveChanges();
+
+      await general.moveToPlayer();
+      await explorationPlayerPage.submitAnswer('NumericInput', 5);
+      await explorationPlayerPage.expectLatestFeedbackToMatch(
+        await forms.toRichText('out of bounds')
+      );
+      await explorationPlayerPage.expectExplorationToNotBeOver();
+      // It's important to test the value 0 in order to ensure that it would
+      // still get submitted even though it is a falsy value in JavaScript.
+      await explorationPlayerPage.submitAnswer('NumericInput', 0);
+      await explorationPlayerPage.expectLatestFeedbackToMatch(
+        async function(richTextChecker) {
+          await richTextChecker.readBoldText('correct');
+        });
+      await explorationPlayerPage.clickThroughToNextCard();
+      await explorationPlayerPage.expectExplorationToBeOver();
+    });
 
   it('should skip the customization modal for interactions having no ' +
-      'customization options', function() {
-    explorationEditorMainTab.setContent(forms.toRichText('some content'));
+      'customization options', async function() {
+    await explorationEditorMainTab.setContent(
+      await forms.toRichText('some content'));
 
     // Numeric input does not have any customization arguments. Therefore the
     // customization modal and the save interaction button does not appear.
-    explorationEditorMainTab.setInteraction('NumericInput');
-    explorationEditorMainTab.deleteInteraction();
+    await explorationEditorMainTab.setInteraction('NumericInput');
+    await explorationEditorMainTab.deleteInteraction();
     // The Continue input has customization options. Therefore the
     // customization modal does appear and so does the save interaction button.
-    explorationEditorMainTab.setInteraction('Continue');
+    await explorationEditorMainTab.setInteraction('Continue');
   });
 
   it('should open appropriate modal on re-clicking an interaction to ' +
-     'customize it', function() {
-    explorationEditorMainTab.setContent(forms.toRichText('some content'));
+     'customize it', async function() {
+    await explorationEditorMainTab.setContent(
+      await forms.toRichText('some content'));
 
     // Numeric input does not have any customization arguments. Therefore, on
     // re-clicking, a modal opens up informing the user that this interaction
     // does not have any customization options. To dismiss this modal, user
     // clicks 'Okay' implying that he/she has got the message.
-    explorationEditorMainTab.setInteraction('NumericInput');
-    element(by.css('.protractor-test-interaction')).click();
+    await explorationEditorMainTab.setInteraction('NumericInput');
+    await element(by.css('.protractor-test-interaction')).click();
     var okayBtn = element(
       by.css('.protractor-test-close-no-customization-modal'));
-    expect(okayBtn.isPresent()).toBe(true);
-    okayBtn.click();
+    expect(await okayBtn.isPresent()).toBe(true);
+    await okayBtn.click();
 
     // Continue input has customization options. Therefore, on re-clicking, a
     // modal opens up containing the customization arguments for this input.
     // The user can dismiss this modal by clicking the 'Save Interaction'
     // button.
-    explorationEditorMainTab.deleteInteraction();
-    explorationEditorMainTab.setInteraction('Continue');
-    element(by.css('.protractor-test-interaction')).click();
+    await explorationEditorMainTab.deleteInteraction();
+    await explorationEditorMainTab.setInteraction('Continue');
+    await element(by.css('.protractor-test-interaction')).click();
     var saveInteractionBtn = element(
       by.css('.protractor-test-save-interaction'));
-    expect(saveInteractionBtn.isPresent()).toBe(true);
-    saveInteractionBtn.click();
+    expect(await saveInteractionBtn.isPresent()).toBe(true);
+    await saveInteractionBtn.click();
   });
 
   it('should correctly display contents, rule parameters, feedback' +
-  ' instructions and newly created state', function() {
+    ' instructions and newly created state', async function() {
     // Verify exploration's text content.
-    explorationEditorMainTab.setContent(forms.toRichText('Happiness Checker'));
-    explorationEditorMainTab.expectContentToMatch(
-      forms.toRichText('Happiness Checker'));
+    await explorationEditorMainTab.setContent(
+      await forms.toRichText('Happiness Checker'));
+    await explorationEditorMainTab.expectContentToMatch(
+      await forms.toRichText('Happiness Checker'));
     // Verify interaction's details.
-    explorationEditorMainTab.setInteraction('TextInput', 'How are you?', 5);
-    explorationEditorMainTab.expectInteractionToMatch(
+    await explorationEditorMainTab.setInteraction(
+      'TextInput', 'How are you?', 5);
+    await explorationEditorMainTab.expectInteractionToMatch(
       'TextInput', 'How are you?', 5);
     // Verify rule parameter input by checking editor's response tab.
     // Create new state 'I am happy' for 'happy' rule.
-    explorationEditorMainTab.addResponse(
-      'TextInput', forms.toRichText('You must be happy!'),
+    await explorationEditorMainTab.addResponse(
+      'TextInput', await forms.toRichText('You must be happy!'),
       'I am happy', true, 'FuzzyEquals', 'happy');
-    explorationEditorMainTab.getResponseEditor(0).expectRuleToBe(
+    var responseEditor = await explorationEditorMainTab.getResponseEditor(0);
+    await responseEditor.expectRuleToBe(
       'TextInput', 'FuzzyEquals', ['"happy"']);
-    explorationEditorMainTab.getResponseEditor(0)
-      .expectFeedbackInstructionToBe('You must be happy!');
+    responseEditor = await explorationEditorMainTab.getResponseEditor(0);
+    await responseEditor.expectFeedbackInstructionToBe('You must be happy!');
     // Verify newly created state.
-    explorationEditorMainTab.moveToState('I am happy');
-    explorationEditorMainTab.expectCurrentStateToBe('I am happy');
+    await explorationEditorMainTab.moveToState('I am happy');
+    await explorationEditorMainTab.expectCurrentStateToBe('I am happy');
     // Go back, create default response (try again) and verify response.
-    explorationEditorMainTab.moveToState('Introduction');
-    explorationEditorMainTab.addResponse(
-      'TextInput', forms.toRichText('You cannot be sad!'),
+    await explorationEditorMainTab.moveToState('Introduction');
+    await explorationEditorMainTab.addResponse(
+      'TextInput', await forms.toRichText('You cannot be sad!'),
       '(try again)', false, 'FuzzyEquals', 'sad');
-    explorationEditorMainTab.getResponseEditor(1).expectRuleToBe(
-      'TextInput', 'FuzzyEquals', ['"sad"']);
-    explorationEditorPage.saveChanges();
+    responseEditor = await explorationEditorMainTab.getResponseEditor(1);
+    await responseEditor.expectRuleToBe('TextInput', 'FuzzyEquals', ['"sad"']);
+    await explorationEditorPage.saveChanges();
   });
 
-  it('should be able to edit title', function() {
-    explorationEditorPage.navigateToSettingsTab();
+  it('should be able to edit title', async function() {
+    await explorationEditorPage.navigateToSettingsTab();
 
-    explorationEditorSettingsTab.expectTitleToBe('');
-    explorationEditorSettingsTab.setTitle('title1');
-    explorationEditorPage.navigateToMainTab();
-    explorationEditorPage.navigateToSettingsTab();
-    explorationEditorSettingsTab.expectTitleToBe('title1');
+    await explorationEditorSettingsTab.expectTitleToBe('');
+    await explorationEditorSettingsTab.setTitle('title1');
+    await explorationEditorPage.navigateToMainTab();
+    await explorationEditorPage.navigateToSettingsTab();
+    await explorationEditorSettingsTab.expectTitleToBe('title1');
   });
 
-  it('should be able to edit goal', function() {
-    explorationEditorPage.navigateToSettingsTab();
+  it('should be able to edit goal', async function() {
+    await explorationEditorPage.navigateToSettingsTab();
 
-    explorationEditorSettingsTab.expectObjectiveToBe('');
-    explorationEditorSettingsTab.setObjective('It is just a test.');
-    explorationEditorPage.navigateToMainTab();
-    explorationEditorPage.navigateToSettingsTab();
-    explorationEditorSettingsTab.expectObjectiveToBe('It is just a test.');
+    await explorationEditorSettingsTab.expectObjectiveToBe('');
+    await explorationEditorSettingsTab.setObjective('It is just a test.');
+    await explorationEditorPage.navigateToMainTab();
+    await explorationEditorPage.navigateToSettingsTab();
+    await explorationEditorSettingsTab.expectObjectiveToBe(
+      'It is just a test.');
   });
 
-  it('should show warnings when the length of goal < 15', function() {
-    explorationEditorPage.navigateToSettingsTab();
+  it('should show warnings when the length of goal < 15', async function() {
+    await explorationEditorPage.navigateToSettingsTab();
 
     // Color grey when there is no warning, red when there is a warning
-    explorationEditorSettingsTab.expectWarningsColorToBe(
+    await explorationEditorSettingsTab.expectWarningsColorToBe(
       'rgba(115, 115, 115, 1)');
-    explorationEditorSettingsTab.setObjective('short goal');
-    explorationEditorSettingsTab.expectWarningsColorToBe(
+    await explorationEditorSettingsTab.setObjective('short goal');
+    await explorationEditorSettingsTab.expectWarningsColorToBe(
       'rgba(169, 68, 66, 1)');
   });
 
-  it('should be able to select category from the dropdown menu', function() {
-    explorationEditorPage.navigateToSettingsTab();
+  it('should be able to select category from the dropdown menu',
+    async function() {
+      await explorationEditorPage.navigateToSettingsTab();
 
-    explorationEditorSettingsTab.expectCategoryToBe('');
-    explorationEditorSettingsTab.setCategory('Biology');
-    explorationEditorPage.navigateToMainTab();
-    explorationEditorPage.navigateToSettingsTab();
-    explorationEditorSettingsTab.expectCategoryToBe('Biology');
-  });
+      await explorationEditorSettingsTab.expectCategoryToBe('');
+      await explorationEditorSettingsTab.setCategory('Biology');
+      await explorationEditorPage.navigateToMainTab();
+      await explorationEditorPage.navigateToSettingsTab();
+      await explorationEditorSettingsTab.expectCategoryToBe('Biology');
+    });
 
   it('should be able to create new category which is not' +
-  ' in the dropdown menu', function() {
-    explorationEditorPage.navigateToSettingsTab();
+  ' in the dropdown menu', async function() {
+    await explorationEditorPage.navigateToSettingsTab();
 
-    explorationEditorSettingsTab.expectCategoryToBe('');
-    explorationEditorSettingsTab.setCategory('New');
-    explorationEditorPage.navigateToMainTab();
-    explorationEditorPage.navigateToSettingsTab();
-    explorationEditorSettingsTab.expectCategoryToBe('New');
+    await explorationEditorSettingsTab.expectCategoryToBe('');
+    await explorationEditorSettingsTab.setCategory('New');
+    await explorationEditorPage.navigateToMainTab();
+    await explorationEditorPage.navigateToSettingsTab();
+    await explorationEditorSettingsTab.expectCategoryToBe('New');
   });
 
-  it('should be able to select language from the dropdown menu', function() {
-    explorationEditorPage.navigateToSettingsTab();
+  it('should be able to select language from the dropdown menu',
+    async function() {
+      await explorationEditorPage.navigateToSettingsTab();
+      await explorationEditorSettingsTab.expectLanguageToBe('English');
+      await explorationEditorSettingsTab.setLanguage('italiano (Italian)');
+      await explorationEditorPage.navigateToMainTab();
+      await explorationEditorPage.navigateToSettingsTab();
+      await explorationEditorSettingsTab.expectLanguageToBe(
+        'italiano (Italian)');
+    });
 
-    explorationEditorSettingsTab.expectLanguageToBe('English');
-    explorationEditorSettingsTab.setLanguage('italiano (Italian)');
-    explorationEditorPage.navigateToMainTab();
-    explorationEditorPage.navigateToSettingsTab();
-    explorationEditorSettingsTab.expectLanguageToBe('italiano (Italian)');
+  it('should change the first card of the exploration', async function() {
+    await explorationEditorMainTab.setStateName('card 1');
+    await explorationEditorMainTab.setContent(
+      await forms.toRichText('this is card 1'));
+    await explorationEditorMainTab.setInteraction('Continue');
+    var responseEditor = await explorationEditorMainTab.getResponseEditor(
+      'default');
+    await responseEditor.setDestination('card 2', true, null);
+
+    await explorationEditorPage.navigateToSettingsTab();
+    await explorationEditorSettingsTab.expectFirstStateToBe('card 1');
+    await explorationEditorSettingsTab.setFirstState('card 2');
+    await explorationEditorPage.navigateToMainTab();
+    await explorationEditorPage.navigateToSettingsTab();
+    await explorationEditorSettingsTab.expectFirstStateToBe('card 2');
   });
 
-  it('should change the first card of the exploration', function() {
-    explorationEditorMainTab.setStateName('card 1');
-    explorationEditorMainTab.setContent(forms.toRichText('this is card 1'));
-    explorationEditorMainTab.setInteraction('Continue');
-    explorationEditorMainTab.getResponseEditor('default').setDestination(
-      'card 2', true, null);
-
-    explorationEditorPage.navigateToSettingsTab();
-    explorationEditorSettingsTab.expectFirstStateToBe('card 1');
-    explorationEditorSettingsTab.setFirstState('card 2');
-    explorationEditorPage.navigateToMainTab();
-    explorationEditorPage.navigateToSettingsTab();
-    explorationEditorSettingsTab.expectFirstStateToBe('card 2');
-  });
-
-  afterEach(function() {
-    general.checkForConsoleErrors([]);
-    users.logout();
+  afterEach(async function() {
+    await general.checkForConsoleErrors([]);
+    await users.logout();
   });
 });

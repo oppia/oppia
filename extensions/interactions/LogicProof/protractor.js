@@ -16,22 +16,23 @@
  * @fileoverview End-to-end testing utilities for the LogicProof interaction.
  */
 
-var customizeInteraction = function(elem, assumption, target, defaultText) {
-  elem.element(by.id('logicQuestionAssumptions')).sendKeys(assumption);
-  elem.element(by.id('logicQuestionTarget')).sendKeys(target);
-  elem.element(by.id('logicQuestionProof')).sendKeys(defaultText);
+var customizeInteraction = async function(
+    elem, assumption, target, defaultText) {
+  await elem.element(by.id('logicQuestionAssumptions')).sendKeys(assumption);
+  await elem.element(by.id('logicQuestionTarget')).sendKeys(target);
+  await elem.element(by.id('logicQuestionProof')).sendKeys(defaultText);
 };
 
-var expectInteractionDetailsToMatch = function(elem) {
+var expectInteractionDetailsToMatch = async function(elem) {
   expect(
-    elem.element(by.tagName('oppia-interactive-logic-proof')).isPresent()
+    await elem.element(by.tagName('oppia-interactive-logic-proof')).isPresent()
   ).toBe(true);
 };
 
-var submitAnswer = function() {
+var submitAnswer = async function() {
   // TODO(nithusha21): find a way to send keys to the code-mirror element.
   // Temporarily pass the answer as defaultText in the customization args.
-  element(by.css('.oppia-learner-confirm-button')).click();
+  await element(by.css('.oppia-learner-confirm-button')).click();
 };
 
 var answerObjectType = 'CheckedProof';

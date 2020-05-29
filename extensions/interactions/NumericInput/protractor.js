@@ -21,16 +21,17 @@ var customizeInteraction = function() {
   // There are no customizations.
 };
 
-var expectInteractionDetailsToMatch = function(elem) {
+var expectInteractionDetailsToMatch = async function(elem) {
   expect(
-    elem.element(by.tagName('oppia-interactive-numeric-input')).isPresent()
+    await elem.element(by.tagName(
+      'oppia-interactive-numeric-input')).isPresent()
   ).toBe(true);
 };
 
-var submitAnswer = function(elem, answer) {
-  elem.element(by.tagName('oppia-interactive-numeric-input')).
+var submitAnswer = async function(elem, answer) {
+  await elem.element(by.tagName('oppia-interactive-numeric-input')).
     element(by.tagName('input')).sendKeys(answer);
-  element(by.css('.protractor-test-submit-answer-button')).click();
+  await element(by.css('.protractor-test-submit-answer-button')).click();
 };
 
 var answerObjectType = 'Real';

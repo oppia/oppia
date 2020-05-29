@@ -62,81 +62,81 @@ describe('Learner dashboard functionality', function() {
       new SubscriptionDashboardPage.SubscriptionDashboardPage();
   });
 
-  it('displays learners subscriptions', function() {
-    users.createUser('learner1@learnerDashboard.com',
+  it('displays learners subscriptions', async function() {
+    await users.createUser('learner1@learnerDashboard.com',
       'learner1learnerDashboard');
     var creator1Id = 'creatorName';
-    users.createUser(creator1Id + '@learnerDashboard.com', creator1Id);
+    await users.createUser(creator1Id + '@learnerDashboard.com', creator1Id);
     var creator2Id = 'collectionAdm';
-    users.createUser(creator2Id + '@learnerDashboard.com',
+    await users.createUser(creator2Id + '@learnerDashboard.com',
       creator2Id);
-    users.login(creator1Id + '@learnerDashboard.com');
-    workflow.createAndPublishExploration(
+    await users.login(creator1Id + '@learnerDashboard.com');
+    await workflow.createAndPublishExploration(
       'Activations',
       'Chemistry',
       'Learn about different types of chemistry activations.',
       'English'
     );
-    users.logout();
+    await users.logout();
 
-    users.login('learner1@learnerDashboard.com');
+    await users.login('learner1@learnerDashboard.com');
     // Subscribe to both the creators.
-    subscriptionDashboardPage.navigateToUserSubscriptionPage(creator1Id);
-    subscriptionDashboardPage.navigateToSubscriptionButton();
-    subscriptionDashboardPage.navigateToUserSubscriptionPage(creator2Id);
-    subscriptionDashboardPage.navigateToSubscriptionButton();
+    await subscriptionDashboardPage.navigateToUserSubscriptionPage(creator1Id);
+    await subscriptionDashboardPage.navigateToSubscriptionButton();
+    await subscriptionDashboardPage.navigateToUserSubscriptionPage(creator2Id);
+    await subscriptionDashboardPage.navigateToSubscriptionButton();
 
     // Completing exploration 'Activations' to activate /learner_dashboard
-    libraryPage.get();
-    libraryPage.findExploration('Activations');
-    libraryPage.playExploration('Activations');
-    explorationPlayerPage.expectExplorationNameToBe('Activations');
-    explorationPlayerPage.rateExploration(4);
+    await libraryPage.get();
+    await libraryPage.findExploration('Activations');
+    await libraryPage.playExploration('Activations');
+    await explorationPlayerPage.expectExplorationNameToBe('Activations');
+    await explorationPlayerPage.rateExploration(4);
 
     // Both creators should be present in the subscriptions section of the
     // dashboard.
-    learnerDashboardPage.get();
-    learnerDashboardPage.navigateToSubscriptionsSection();
+    await learnerDashboardPage.get();
+    await learnerDashboardPage.navigateToSubscriptionsSection();
     // The last user (collectionAdm) that learner subsribes to is placed first
     // in the list.
-    learnerDashboardPage.expectSubscriptionFirstNameToMatch('collect...');
+    await learnerDashboardPage.expectSubscriptionFirstNameToMatch('collect...');
     // The first user (creatorName) that learner subscribes to is placed
     // last in the list.
-    learnerDashboardPage.expectSubscriptionLastNameToMatch('creator...');
-    users.logout();
+    await learnerDashboardPage.expectSubscriptionLastNameToMatch('creator...');
+    await users.logout();
   });
 
-  it('displays learner feedback threads', function() {
-    users.createUser('learner2@learnerDashboard.com',
+  it('displays learner feedback threads', async function() {
+    await users.createUser('learner2@learnerDashboard.com',
       'learner2learnerDashboard');
-    users.createUser(
+    await users.createUser(
       'feedbackAdm@learnerDashboard.com', 'feedbackAdmlearnerDashboard');
-    users.login('feedbackAdm@learnerDashboard.com');
-    workflow.createAndPublishExploration(
+    await users.login('feedbackAdm@learnerDashboard.com');
+    await workflow.createAndPublishExploration(
       'BUS101',
       'Business',
       'Learn about different business regulations around the world.',
       'English'
     );
-    users.logout();
+    await users.logout();
 
-    users.login('learner2@learnerDashboard.com');
+    await users.login('learner2@learnerDashboard.com');
     var feedback = 'A good exploration. Would love to see a few more questions';
-    libraryPage.get();
-    libraryPage.findExploration('BUS101');
-    libraryPage.playExploration('BUS101');
-    explorationPlayerPage.submitFeedback(feedback);
+    await libraryPage.get();
+    await libraryPage.findExploration('BUS101');
+    await libraryPage.playExploration('BUS101');
+    await explorationPlayerPage.submitFeedback(feedback);
 
     // Verify feedback thread is created.
-    learnerDashboardPage.get();
-    learnerDashboardPage.navigateToFeedbackSection();
-    learnerDashboardPage.expectFeedbackExplorationTitleToMatch('BUS101');
-    learnerDashboardPage.navigateToFeedbackThread();
-    learnerDashboardPage.expectFeedbackMessageToMatch(feedback);
-    users.logout();
+    await learnerDashboardPage.get();
+    await learnerDashboardPage.navigateToFeedbackSection();
+    await learnerDashboardPage.expectFeedbackExplorationTitleToMatch('BUS101');
+    await learnerDashboardPage.navigateToFeedbackThread();
+    await learnerDashboardPage.expectFeedbackMessageToMatch(feedback);
+    await users.logout();
   });
 
-  it('should add exploration to play later list', function() {
+  it('should add exploration to play later list', async function() {
     var EXPLORATION_FRACTION = 'fraction';
     var EXPLORATION_SINGING = 'singing';
     var CATEGORY_MATHEMATICS = 'Mathematics';
@@ -145,38 +145,38 @@ describe('Learner dashboard functionality', function() {
     var EXPLORATION_OBJECTIVE = 'hold the light of two trees';
     var EXPLORATION_OBJECTIVE2 = 'show us the darkness';
 
-    users.createUser(
+    await users.createUser(
       'creator@learnerDashboard.com', 'creatorLearnerDashboard');
-    users.login('creator@learnerDashboard.com');
-    workflow.createAndPublishExploration(
+    await users.login('creator@learnerDashboard.com');
+    await workflow.createAndPublishExploration(
       EXPLORATION_FRACTION, CATEGORY_MATHEMATICS,
       EXPLORATION_OBJECTIVE, LANGUAGE_ENGLISH);
-    workflow.createAndPublishExploration(
+    await workflow.createAndPublishExploration(
       EXPLORATION_SINGING, CATEGORY_MUSIC,
       EXPLORATION_OBJECTIVE2, LANGUAGE_ENGLISH);
-    users.logout();
+    await users.logout();
 
-    users.createUser(
+    await users.createUser(
       'learner@learnerDashboard.com', 'learnerLearnerDashboard');
-    users.login('learner@learnerDashboard.com');
-    libraryPage.get();
-    libraryPage.findExploration(EXPLORATION_FRACTION);
-    libraryPage.addSelectedExplorationToPlaylist();
-    learnerDashboardPage.get();
-    learnerDashboardPage.navigateToPlayLaterExplorationSection();
-    learnerDashboardPage.expectTitleOfExplorationSummaryTileToMatch(
+    await users.login('learner@learnerDashboard.com');
+    await libraryPage.get();
+    await libraryPage.findExploration(EXPLORATION_FRACTION);
+    await libraryPage.addSelectedExplorationToPlaylist();
+    await learnerDashboardPage.get();
+    await learnerDashboardPage.navigateToPlayLaterExplorationSection();
+    await learnerDashboardPage.expectTitleOfExplorationSummaryTileToMatch(
       EXPLORATION_FRACTION);
-    libraryPage.get();
-    libraryPage.findExploration(EXPLORATION_SINGING);
-    libraryPage.addSelectedExplorationToPlaylist();
-    learnerDashboardPage.get();
-    learnerDashboardPage.navigateToPlayLaterExplorationSection();
-    learnerDashboardPage.expectTitleOfExplorationSummaryTileToMatch(
+    await libraryPage.get();
+    await libraryPage.findExploration(EXPLORATION_SINGING);
+    await libraryPage.addSelectedExplorationToPlaylist();
+    await learnerDashboardPage.get();
+    await learnerDashboardPage.navigateToPlayLaterExplorationSection();
+    await learnerDashboardPage.expectTitleOfExplorationSummaryTileToMatch(
       EXPLORATION_SINGING);
-    users.logout();
+    await users.logout();
   });
 
-  afterEach(function() {
-    general.checkForConsoleErrors([]);
+  afterEach(async function() {
+    await general.checkForConsoleErrors([]);
   });
 });

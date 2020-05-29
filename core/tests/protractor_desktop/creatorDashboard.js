@@ -53,228 +53,204 @@ describe('Creator dashboard functionality', function() {
       new SubscriptionDashboardPage.SubscriptionDashboardPage();
   });
 
-  it('should display correct stats on dashboard', function() {
+  it('should display correct stats on dashboard', async function() {
     var feedback = 'A good exploration. Would love to see a few more questions';
     // Create required users.
-    users.createUser(
-      'user1@creatorDashboard.com',
-      'creatorDashboardOwner');
-    users.createUser(
-      'user2@creatorDashboard.com',
-      'learner2');
-    users.createUser(
-      'user3@creatorDashboard.com',
-      'learner3');
-    users.createUser(
-      'user4@creatorDashboard.com',
-      'learner4');
+    await users.createUser(
+      'user1@creatorDashboard.com', 'creatorDashboardOwner');
+    await users.createUser('user2@creatorDashboard.com', 'learner2');
+    await users.createUser('user3@creatorDashboard.com', 'learner3');
+    await users.createUser('user4@creatorDashboard.com', 'learner4');
 
-    users.login('user1@creatorDashboard.com');
-    workflow.createAndPublishExploration(
+    await users.login('user1@creatorDashboard.com');
+    await workflow.createAndPublishExploration(
       EXPLORATION_TITLE_1,
       EXPLORATION_CATEGORY,
       EXPLORATION_OBJECTIVE,
       EXPLORATION_LANGUAGE);
-    creatorDashboardPage.get();
+    await creatorDashboardPage.get();
 
-    workflow.createAndPublishExploration(
+    await workflow.createAndPublishExploration(
       EXPLORATION_TITLE_2,
       EXPLORATION_CATEGORY,
       EXPLORATION_OBJECTIVE,
       EXPLORATION_LANGUAGE);
 
-    users.login('user2@creatorDashboard.com');
-    subscriptionDashboardPage.navigateToUserSubscriptionPage(
+    await users.login('user2@creatorDashboard.com');
+    await subscriptionDashboardPage.navigateToUserSubscriptionPage(
       'creatorDashboardOwner');
-    subscriptionDashboardPage.navigateToSubscriptionButton();
-    libraryPage.get();
-    libraryPage.findExploration(EXPLORATION_TITLE_1);
-    libraryPage.playExploration(EXPLORATION_TITLE_1);
-    explorationPlayerPage.rateExploration(3);
-    users.logout();
+    await subscriptionDashboardPage.navigateToSubscriptionButton();
+    await libraryPage.get();
+    await libraryPage.findExploration(EXPLORATION_TITLE_1);
+    await libraryPage.playExploration(EXPLORATION_TITLE_1);
+    await explorationPlayerPage.rateExploration(3);
+    await users.logout();
 
-    users.login('user3@creatorDashboard.com');
-    libraryPage.get();
-    libraryPage.findExploration(EXPLORATION_TITLE_1);
-    libraryPage.playExploration(EXPLORATION_TITLE_1);
-    explorationPlayerPage.rateExploration(5);
-    explorationPlayerPage.submitFeedback(feedback);
-    users.logout();
+    await users.login('user3@creatorDashboard.com');
+    await libraryPage.get();
+    await libraryPage.findExploration(EXPLORATION_TITLE_1);
+    await libraryPage.playExploration(EXPLORATION_TITLE_1);
+    await explorationPlayerPage.rateExploration(5);
+    await explorationPlayerPage.submitFeedback(feedback);
+    await users.logout();
 
-    users.login('user1@creatorDashboard.com');
-    creatorDashboardPage.get();
-    expect(creatorDashboardPage.getAverageRating()).toEqual('4');
-    expect(creatorDashboardPage.getTotalPlays()).toEqual('2');
-    expect(creatorDashboardPage.getOpenFeedbacks()).toEqual('1');
-    expect(creatorDashboardPage.getSubscribers()).toEqual('1');
-    users.logout();
+    await users.login('user1@creatorDashboard.com');
+    await creatorDashboardPage.get();
+    expect(await creatorDashboardPage.getAverageRating()).toEqual('4');
+    expect(await creatorDashboardPage.getTotalPlays()).toEqual('2');
+    expect(await creatorDashboardPage.getOpenFeedbacks()).toEqual('1');
+    expect(await creatorDashboardPage.getSubscribers()).toEqual('1');
+    await users.logout();
 
-    users.login('user4@creatorDashboard.com');
-    subscriptionDashboardPage.navigateToUserSubscriptionPage(
+    await users.login('user4@creatorDashboard.com');
+    await subscriptionDashboardPage.navigateToUserSubscriptionPage(
       'creatorDashboardOwner');
-    subscriptionDashboardPage.navigateToSubscriptionButton();
-    libraryPage.get();
-    libraryPage.findExploration(EXPLORATION_TITLE_2);
-    libraryPage.playExploration(EXPLORATION_TITLE_2);
-    explorationPlayerPage.rateExploration(4);
-    explorationPlayerPage.submitFeedback(feedback);
-    users.logout();
+    await subscriptionDashboardPage.navigateToSubscriptionButton();
+    await libraryPage.get();
+    await libraryPage.findExploration(EXPLORATION_TITLE_2);
+    await libraryPage.playExploration(EXPLORATION_TITLE_2);
+    await explorationPlayerPage.rateExploration(4);
+    await explorationPlayerPage.submitFeedback(feedback);
+    await users.logout();
 
-    users.login('user1@creatorDashboard.com');
-    creatorDashboardPage.get();
-    expect(creatorDashboardPage.getAverageRating()).toEqual('4');
-    expect(creatorDashboardPage.getTotalPlays()).toEqual('3');
-    expect(creatorDashboardPage.getOpenFeedbacks()).toEqual('2');
-    expect(creatorDashboardPage.getSubscribers()).toEqual('2');
-    users.logout();
+    await users.login('user1@creatorDashboard.com');
+    await creatorDashboardPage.get();
+    expect(await creatorDashboardPage.getAverageRating()).toEqual('4');
+    expect(await creatorDashboardPage.getTotalPlays()).toEqual('3');
+    expect(await creatorDashboardPage.getOpenFeedbacks()).toEqual('2');
+    expect(await creatorDashboardPage.getSubscribers()).toEqual('2');
+    await users.logout();
   });
 
-  it('should work fine in grid view', function() {
+  it('should work fine in grid view', async function() {
     var feedback = 'A good exploration. Would love to see a few more questions';
     // Create required users.
-    users.createUser(
-      'user5@creatorDashboard.com',
-      'creatorDashboard');
-    users.createUser(
-      'user6@creatorDashboard.com',
-      'learner6');
-    users.createUser(
-      'user7@creatorDashboard.com',
-      'learner7');
+    await users.createUser('user5@creatorDashboard.com', 'creatorDashboard');
+    await users.createUser('user6@creatorDashboard.com', 'learner6');
+    await users.createUser('user7@creatorDashboard.com', 'learner7');
 
-    users.login('user5@creatorDashboard.com');
-    workflow.createAndPublishExploration(
+    await users.login('user5@creatorDashboard.com');
+    await workflow.createAndPublishExploration(
       EXPLORATION_TITLE_3,
       EXPLORATION_CATEGORY,
       EXPLORATION_OBJECTIVE,
       EXPLORATION_LANGUAGE);
-    creatorDashboardPage.get();
+    await creatorDashboardPage.get();
 
-    workflow.createAndPublishExploration(
+    await workflow.createAndPublishExploration(
       EXPLORATION_TITLE_4,
       EXPLORATION_CATEGORY,
       EXPLORATION_OBJECTIVE,
       EXPLORATION_LANGUAGE);
-    users.logout();
-    users.login('user6@creatorDashboard.com');
-    libraryPage.get();
-    libraryPage.findExploration(EXPLORATION_TITLE_3);
-    libraryPage.playExploration(EXPLORATION_TITLE_3);
-    explorationPlayerPage.rateExploration(3);
-    users.logout();
+    await users.logout();
+    await users.login('user6@creatorDashboard.com');
+    await libraryPage.get();
+    await libraryPage.findExploration(EXPLORATION_TITLE_3);
+    await libraryPage.playExploration(EXPLORATION_TITLE_3);
+    await explorationPlayerPage.rateExploration(3);
+    await users.logout();
 
-    users.login('user7@creatorDashboard.com');
-    libraryPage.get();
-    libraryPage.findExploration(EXPLORATION_TITLE_4);
-    libraryPage.playExploration(EXPLORATION_TITLE_4);
-    explorationPlayerPage.rateExploration(5);
-    explorationPlayerPage.submitFeedback(feedback);
-    users.logout();
+    await users.login('user7@creatorDashboard.com');
+    await libraryPage.get();
+    await libraryPage.findExploration(EXPLORATION_TITLE_4);
+    await libraryPage.playExploration(EXPLORATION_TITLE_4);
+    await explorationPlayerPage.rateExploration(5);
+    await explorationPlayerPage.submitFeedback(feedback);
+    await users.logout();
 
-    users.login('user5@creatorDashboard.com');
-    creatorDashboardPage.get();
-    creatorDashboardPage.getExpSummaryTileTitles().
-      then(function(titles) {
-        expect(titles.length).toEqual(2);
-        expect(titles[0].getText()).toEqual(EXPLORATION_TITLE_4);
-        expect(titles[1].getText()).toEqual(EXPLORATION_TITLE_3);
-      });
-    creatorDashboardPage.getExpSummaryTileRatings().
-      then(function(ratings) {
-        expect(ratings.length).toEqual(2);
-        expect(ratings[0].getText()).toEqual('5.0');
-        expect(ratings[1].getText()).toEqual('3.0');
-      });
-    creatorDashboardPage.getExpSummaryTileOpenFeedbackCount().
-      then(function(feedbackCount) {
-        expect(feedbackCount.length).toEqual(2);
-        expect(feedbackCount[0].getText()).toEqual('1');
-        expect(feedbackCount[1].getText()).toEqual('0');
-      });
-    creatorDashboardPage.getExpSummaryTileViewsCount().
-      then(function(views) {
-        expect(views.length).toEqual(2);
-        expect(views[0].getText()).toEqual('1');
-        expect(views[1].getText()).toEqual('1');
-      });
-    users.logout();
+    await users.login('user5@creatorDashboard.com');
+    await creatorDashboardPage.get();
+
+    var titles = await creatorDashboardPage.getExpSummaryTileTitles();
+    expect(titles.length).toEqual(2);
+    expect(await titles[0].getText()).toEqual(EXPLORATION_TITLE_4);
+    expect(await titles[1].getText()).toEqual(EXPLORATION_TITLE_3);
+
+    var ratings = await creatorDashboardPage.getExpSummaryTileRatings();
+    expect(ratings.length).toEqual(2);
+    expect(await ratings[0].getText()).toEqual('5.0');
+    expect(await ratings[1].getText()).toEqual('3.0');
+
+    var feedbackCount = await (
+      creatorDashboardPage.getExpSummaryTileOpenFeedbackCount());
+    expect(feedbackCount.length).toEqual(2);
+    expect(await feedbackCount[0].getText()).toEqual('1');
+    expect(await feedbackCount[1].getText()).toEqual('0');
+
+    var views = await creatorDashboardPage.getExpSummaryTileViewsCount();
+    expect(views.length).toEqual(2);
+    expect(await views[0].getText()).toEqual('1');
+    expect(await views[1].getText()).toEqual('1');
+
+    await users.logout();
   });
 
-  it('should work fine in list view', function() {
+  it('should work fine in list view', async function() {
     var feedback = 'A good exploration. Would love to see a few more questions';
     // Create required users.
-    users.createUser(
-      'user8@creatorDashboard.com',
-      'newCreatorDashboard');
-    users.createUser(
-      'user9@creatorDashboard.com',
-      'learner9');
-    users.createUser(
-      'user10@creatorDashboard.com',
-      'learner10');
+    await users.createUser('user8@creatorDashboard.com', 'newCreatorDashboard');
+    await users.createUser('user9@creatorDashboard.com', 'learner9');
+    await users.createUser('user10@creatorDashboard.com', 'learner10');
 
-    users.login('user8@creatorDashboard.com');
-    workflow.createAndPublishExploration(
+    await users.login('user8@creatorDashboard.com');
+    await workflow.createAndPublishExploration(
       EXPLORATION_TITLE_5,
       EXPLORATION_CATEGORY,
       EXPLORATION_OBJECTIVE,
       EXPLORATION_LANGUAGE);
-    creatorDashboardPage.get();
+    await creatorDashboardPage.get();
 
-    workflow.createAndPublishExploration(
+    await workflow.createAndPublishExploration(
       EXPLORATION_TITLE_6,
       EXPLORATION_CATEGORY,
       EXPLORATION_OBJECTIVE,
       EXPLORATION_LANGUAGE);
-    users.logout();
-    users.login('user9@creatorDashboard.com');
-    libraryPage.get();
-    libraryPage.findExploration(EXPLORATION_TITLE_5);
-    libraryPage.playExploration(EXPLORATION_TITLE_5);
-    explorationPlayerPage.rateExploration(3);
-    users.logout();
+    await users.logout();
+    await users.login('user9@creatorDashboard.com');
+    await libraryPage.get();
+    await libraryPage.findExploration(EXPLORATION_TITLE_5);
+    await libraryPage.playExploration(EXPLORATION_TITLE_5);
+    await explorationPlayerPage.rateExploration(3);
+    await users.logout();
 
-    users.login('user10@creatorDashboard.com');
-    libraryPage.get();
-    libraryPage.findExploration(EXPLORATION_TITLE_6);
-    libraryPage.playExploration(EXPLORATION_TITLE_6);
-    explorationPlayerPage.rateExploration(5);
-    explorationPlayerPage.submitFeedback(feedback);
-    users.logout();
+    await users.login('user10@creatorDashboard.com');
+    await libraryPage.get();
+    await libraryPage.findExploration(EXPLORATION_TITLE_6);
+    await libraryPage.playExploration(EXPLORATION_TITLE_6);
+    await explorationPlayerPage.rateExploration(5);
+    await explorationPlayerPage.submitFeedback(feedback);
+    await users.logout();
 
-    users.login('user8@creatorDashboard.com');
-    creatorDashboardPage.get();
+    await users.login('user8@creatorDashboard.com');
+    await creatorDashboardPage.get();
 
-    creatorDashboardPage.getListView();
+    await creatorDashboardPage.getListView();
 
-    creatorDashboardPage.getExpSummaryRowTitles().
-      then(function(titles) {
-        expect(titles.length).toEqual(2);
-        expect(titles[0].getText()).toEqual(EXPLORATION_TITLE_6);
-        expect(titles[1].getText()).toEqual(EXPLORATION_TITLE_5);
-      });
-    creatorDashboardPage.getExpSummaryRowRatings().
-      then(function(ratings) {
-        expect(ratings.length).toEqual(2);
-        expect(ratings[0].getText()).toEqual('5.0');
-        expect(ratings[1].getText()).toEqual('3.0');
-      });
-    creatorDashboardPage.getExpSummaryRowOpenFeedbackCount().
-      then(function(feedbackCount) {
-        expect(feedbackCount.length).toEqual(2);
-        expect(feedbackCount[0].getText()).toEqual('1');
-        expect(feedbackCount[1].getText()).toEqual('0');
-      });
-    creatorDashboardPage.getExpSummaryRowViewsCount().
-      then(function(views) {
-        expect(views.length).toEqual(2);
-        expect(views[0].getText()).toEqual('1');
-        expect(views[1].getText()).toEqual('1');
-      });
-    users.logout();
+    var titles = await creatorDashboardPage.getExpSummaryRowTitles();
+    expect(titles.length).toEqual(2);
+    expect(await titles[0].getText()).toEqual(EXPLORATION_TITLE_6);
+    expect(await titles[1].getText()).toEqual(EXPLORATION_TITLE_5);
+
+    var ratings = await creatorDashboardPage.getExpSummaryRowRatings();
+    expect(ratings.length).toEqual(2);
+    expect(await ratings[0].getText()).toEqual('5.0');
+    expect(await ratings[1].getText()).toEqual('3.0');
+
+    var feedbackCount = await (
+      creatorDashboardPage.getExpSummaryRowOpenFeedbackCount());
+    expect(feedbackCount.length).toEqual(2);
+    expect(await feedbackCount[0].getText()).toEqual('1');
+    expect(await feedbackCount[1].getText()).toEqual('0');
+
+    var views = await creatorDashboardPage.getExpSummaryRowViewsCount();
+    expect(views.length).toEqual(2);
+    expect(await views[0].getText()).toEqual('1');
+    expect(await views[1].getText()).toEqual('1');
+
+    await users.logout();
   });
 
-  afterEach(function() {
-    general.checkForConsoleErrors([]);
+  afterEach(async function() {
+    await general.checkForConsoleErrors([]);
   });
 });
