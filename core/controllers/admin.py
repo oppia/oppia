@@ -435,7 +435,7 @@ class AdminHandler(base.BaseHandler):
                 })], 'Change category')
 
             story.add_node(
-                '%s%d' % (story_domain.NODE_ID_PREFIX, 2), 
+                '%s%d' % (story_domain.NODE_ID_PREFIX, 2),
                 'Finding the value of a number')
             story.update_node_description(
                 '%s%d' % (story_domain.NODE_ID_PREFIX, 2),
@@ -450,7 +450,7 @@ class AdminHandler(base.BaseHandler):
                 '%s%d' % (story_domain.NODE_ID_PREFIX, 3), 'Comparing Numbers')
             story.update_node_description(
                 '%s%d' % (story_domain.NODE_ID_PREFIX, 3),
-                'Jaime learns if a number is smaller or greater than another ' 
+                'Jaime learns if a number is smaller or greater than another '
                 + 'number.')
             story.update_node_exploration_id(
                 '%s%d' % (story_domain.NODE_ID_PREFIX, 3), '13')
