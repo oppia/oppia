@@ -13,21 +13,11 @@
 // limitations under the License.
 
 /**
- * @fileoverview Requires for EndExploration interaction.
+ * @fileoverview Directive for the EndExploration short response.
+ *
+ * IMPORTANT NOTE: The naming convention for customization args that are passed
+ * into the directive is: the name of the parameter, followed by 'With',
+ * followed by the name of the arg.
  */
 
-require(
-  'interactions/EndExploration/directives/' +
-  'end-exploration-rules.service.ts');
-require(
-  'interactions/EndExploration/directives/' +
-  'end-exploration-validation.service.ts');
-require(
-  'interactions/EndExploration/directives/' +
-  'oppia-interactive-end-exploration.directive.ts');
-require(
-  'interactions/EndExploration/directives/' +
-  'oppia-response-end-exploration.component.ts');
-require(
-  'interactions/EndExploration/directives/' +
-  'oppia-short-response-end-exploration.component.ts');
+angular.module('oppia').component('oppiaShortResponseEndExploration', {});
