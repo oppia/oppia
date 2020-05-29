@@ -1782,3 +1782,19 @@ class ExplorationMissingStatsAuditOneOffJobTests(OneOffJobTestBase):
              'ExplorationStats "ID" v3 has stats for card "State ②", but card '
              'only appears in versions: 1, 2.']
         ])
+
+    def test_no_error_when_exploration_can_not_update_schema(self):
+        old_schema = self.swap(feconf, 'CURRENT_STATE_SCHEMA_VERSION', 24)
+
+        with old_schema:
+            self.save_new_default_exploration('ID', 'owner_id')
+
+        new_schema = self.swap(feconf, 'CURRENT_STATE_SCHEMA_VERSION', 25)
+        schema_update_failure = self.swap(
+            exp_domain.Exploration, '_convert_states_v24_dict_to_v25_dict',
+            classmethod(lambda *_: python_utils.divide(1, 0)))
+
+        with new_schema, schema_update_failure:
+            self.assertItemsEqual(self.run_one_off_job(), [
+                ['EXPECTED', '1 ExplorationStats model is valid']
+            ])
