@@ -49,6 +49,10 @@ export class CollectionCreationBackendService {
   }
 }
 
+export interface ICollectionCreationResponse {
+  collectionId: string
+}
+
 angular.module('oppia').factory(
   'CollectionCreationBackendService',
   downgradeInjectable(CollectionCreationBackendService));
