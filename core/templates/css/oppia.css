@@ -2058,9 +2058,10 @@ pre.oppia-pre-wrapped-text {
   border-radius: 8px;
   height: 100%;
   margin: 0 auto;
+  margin-bottom: 120px;
   max-width: 975px;
   min-height: 500px;
-  padding-bottom: 25px;
+  padding-bottom: 100px;
   padding-top: 30px;
   position: relative;
 }
