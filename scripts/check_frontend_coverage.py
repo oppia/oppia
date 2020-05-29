@@ -73,7 +73,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'code-repl-prediction.service.ts',
     'code-string-editor.directive.ts',
     'codemirror-mergeview.directive.ts',
-    'collection-creation.service.ts',
     'collection-details-editor.directive.ts',
     'collection-editor-navbar-breadcrumb.directive.ts',
     'collection-editor-navbar.directive.ts',
