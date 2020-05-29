@@ -121,15 +121,25 @@ var TopicsAndSkillsDashboardPage = function() {
 
   this.navigateToTopicWithIndex = async function(index) {
     var elem = await topicsListItems.get(index);
+    await waitFor.elementToBeClickable(
+      elem, 'Topic taking too long to be clickable');
     await elem.click();
   };
 
   this.assignSkillWithIndexToTopic = async function(index, topicIndex) {
     var assignSkillButton = await assignSkillToTopicButtons.get(index);
+    await waitFor.elementToBeClickable(
+      assignSkillButton,
+      'Assign skill button taking too long to be clickable');
     await assignSkillButton.click();
     var topic = await topicsListItems.get(topicIndex);
+    await waitFor.elementToBeClickable(
+      topic, 'Topic list item taking too long to be clickable');
     await topic.click();
     await confirmMoveButton.click();
+    await waitFor.invisibilityOf(
+      confirmMoveButton,
+      'Topic assignment modal taking too long to disappear');
   };
 
   this.assignSkillWithIndexToTopicByTopicName = async function(
@@ -217,7 +227,9 @@ var TopicsAndSkillsDashboardPage = function() {
       createSkillButton,
       'Create Skill button takes too long to be clickable');
     await createSkillButton.click();
-
+    await waitFor.visibilityOf(
+      skillNameField,
+      'Create Skill modal takes too long to appear.');
     await skillNameField.sendKeys(description);
     await editConceptCardExplanationButton.click();
 
@@ -245,6 +257,9 @@ var TopicsAndSkillsDashboardPage = function() {
       confirmSkillCreationButton,
       'Create skill button takes too long to be clickable');
     await confirmSkillCreationButton.click();
+    await waitFor.invisibilityOf(
+      confirmSkillCreationButton,
+      'Create skill modal takes too long to be disappear.');
 
     await waitFor.newTabToBeCreated(
       'Creating skill takes too long', '/skill_editor/');
@@ -265,6 +280,9 @@ var TopicsAndSkillsDashboardPage = function() {
   };
 
   this.navigateToUnusedSkillsTab = async function() {
+    await waitFor.elementToBeClickable(
+      unusedSkillsTabButton,
+      'Unused skills tab button taking too long to be clickable');
     await unusedSkillsTabButton.click();
   };
 

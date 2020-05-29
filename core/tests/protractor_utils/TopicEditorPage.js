@@ -271,6 +271,8 @@ var TopicEditorPage = function() {
   };
 
   this.moveToSubtopicsTab = async function() {
+    await waitFor.elementToBeClickable(subtopicsTabButton,
+      'Subtopics tab button taking too long to be clickable');
     await subtopicsTabButton.click();
   };
 

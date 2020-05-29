@@ -195,6 +195,9 @@ var StoryEditorPage = function() {
       'New Chapter modal takes too long to appear.');
     await newChapterTitleField.sendKeys(title);
     await confirmChapterCreationButton.click();
+    await waitFor.invisibilityOf(
+      confirmChapterCreationButton,
+      'New Chapter modal takes too long to disappear.');
   };
 
   this.expectNotesToBe = async function(richTextInstructions) {
