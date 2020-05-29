@@ -91,6 +91,7 @@ angular.module('oppia').config([
     var servicesToProvide = [
       'AlertsService', 'BackgroundMaskService', 'BrowserCheckerService',
       'CodeReplRulesService', 'CollectionCreationBackendService',
+      'CollectionCreationBackendService',
       'ContextService', 'CsrfTokenService', 'DateTimeFormatService',
       'DebouncerService', 'DeviceInfoService',
       'DocumentAttributeCustomizationService',

@@ -66,6 +66,8 @@ import { CodeReplRulesService } from
   'interactions/CodeRepl/directives/code-repl-rules.service';
 import { CollectionCreationBackendService } from
   'components/entity-creation-services/collection-creation-backend-api.service';
+import { CollectionCreationService } from
+  'components/entity-creation-services/collection-creation.service';
 import { ComputeGraphService } from 'services/compute-graph.service';
 import { ConceptCardObjectFactory } from
   'domain/skill/ConceptCardObjectFactory';
@@ -711,6 +713,14 @@ export class UpgradedServices {
         upgradedServices['UrlInterpolationService']));
 
     // Topological level: 4.
+    upgradedServices['CollectionCreationService'] =
+      new CollectionCreationService(
+        upgradedServices['CollectionCreationBackendService'],
+        upgradedServices['AlertsService'],
+        upgradedServices['SiteAnalyticsService'],
+        upgradedServices['UrlInterpolationService'],
+        upgradedServices['LoaderService'],
+        upgradedServices['WindowRef']);
     upgradedServices['PredictionAlgorithmRegistryService'] =
       new PredictionAlgorithmRegistryService(
         upgradedServices['CodeReplPredictionService'],
