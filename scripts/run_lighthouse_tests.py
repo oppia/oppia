@@ -38,6 +38,8 @@ _PARSER.add_argument(
 
 RUNNING_PROCESSES = []
 
+APP_ENGINE_PORT = 8181
+
 
 def setup_and_install_dependencies():
     """Runs the setup and installation scripts."""
@@ -63,12 +65,14 @@ def start_google_app_engine_server(prodEnv):
     else:
         app_yaml_filepath = 'app_dev.yaml'
 
+    python_utils.PRINT('Starting oppia server...')
+
     p = subprocess.Popen(
         '%s %s/dev_appserver.py --host 0.0.0.0 --port %s '
         '--clear_datastore=yes --dev_appserver_log_level=critical '
         '--log_level=critical --skip_sdk_update_check=true %s' % (
             common.CURRENT_PYTHON_BIN, common.GOOGLE_APP_ENGINE_HOME,
-            8181, app_yaml_filepath), shell=True)
+            APP_ENGINE_PORT, app_yaml_filepath), shell=True)
     RUNNING_PROCESSES.append(p)
 
 
@@ -80,6 +84,25 @@ def download_and_install_nginx():
 
     subprocess.check_call(update_command)
     subprocess.check_call(install_command)
+
+
+def wait_for_port_to_be_open(port_number):
+    """Wait until the port is open.
+
+    Args:
+        port_number: int. The port number to wait.
+    """
+    waited_seconds = 0
+    while (not common.is_port_open(port_number) and
+           waited_seconds < MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS):
+        time.sleep(1)
+        waited_seconds += 1
+    if (waited_seconds ==
+            MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS and
+            not common.is_port_open(port_number)):
+        python_utils.PRINT(
+            'Failed to start server on port %s, exiting ...' % port_number)
+        sys.exit(1)
 
 
 def start_proxy_server():
@@ -112,7 +135,7 @@ def start_proxy_server():
             }
         """)
 
-    python_utils.PRINT('Starting proxy server')
+    python_utils.PRINT('Starting proxy server...')
     start_server_command = ['sudo', 'nginx', '-c', nginx_conf_file]
     p = subprocess.Popen(start_server_command);
 
@@ -132,6 +155,7 @@ def run_lighthouse_checks_with_compression():
     start_proxy_server()
     build.main(args=['--prod_env'])
     start_google_app_engine_server(True)
+    wait_for_port_to_be_open(APP_ENGINE_PORT)
     run_lighthouse_checks()
 
 
@@ -159,6 +183,7 @@ def main(args=None):
         run_lighthouse_checks_with_compression()
     else:
         start_google_app_engine_server(False)
+        wait_for_port_to_be_open(APP_ENGINE_PORT)
         run_lighthouse_checks()
 
 
