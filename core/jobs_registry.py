@@ -75,6 +75,8 @@ ONE_OFF_JOB_MANAGERS = [
     stats_jobs_one_off.StatisticsAuditV2,
     stats_jobs_one_off.StatisticsAudit,
     story_jobs_one_off.StoryMigrationOneOffJob,
+    suggestion_jobs_one_off.SuggestionMathMigrationOneOffJob,
+    suggestion_jobs_one_off.SuggestionMathRteAuditOneOffJob,
     topic_jobs_one_off.RemoveDeletedSkillsFromTopicOneOffJob,
     topic_jobs_one_off.TopicMigrationOneOffJob,
     user_id_migration.GaeIdNotInModelsVerificationJob,
@@ -92,9 +94,7 @@ ONE_OFF_JOB_MANAGERS = [
     user_jobs_one_off.UsernameLengthAuditOneOffJob,
     user_jobs_one_off.UsernameLengthDistributionOneOffJob,
     exp_jobs_one_off.MathExpressionInputInteractionOneOffJob,
-    exp_jobs_one_off.MultipleChoiceInteractionOneOffJob,
-    suggestion_jobs_one_off.SuggestionMathMigrationOneOffJob,
-    suggestion_jobs_one_off.SuggestionMathRteAuditOneOffJob
+    exp_jobs_one_off.MultipleChoiceInteractionOneOffJob
 ]
 
 # List of all manager classes for prod validation one-off batch jobs for which

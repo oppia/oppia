@@ -1162,6 +1162,18 @@ class WrittenTranslations(python_utils.OBJECT):
 
         return translation_counts
 
+    def get_all_html_content_strings(self):
+        """Gets all html content strings used in the written translations.
+
+        Returns:
+            list(str). The list of html content strings.
+        """
+        html_string_list = []
+        for translations in self.translations_mapping.values():
+            for translation in translations.values():
+                html_string_list.append(translation.html)
+        return html_string_list
+
     @classmethod
     def convert_html_in_written_translations(
             cls, written_translations_dict, conversion_fn):
@@ -2276,11 +2288,9 @@ class State(python_utils.OBJECT):
                 Hint.convert_html_in_hint(hint, conversion_fn))
 
         if state_dict['interaction']['solution']:
-            solution_html = state_dict[
-                'interaction']['solution']['explanation']['html']
-            state_dict['interaction']['solution']['explanation']['html'] = (
+            state_dict['interaction']['solution'] = (
                 Solution.convert_html_in_solution(
-                    solution_html, conversion_fn))
+                    state_dict['interaction']['solution'], conversion_fn))
 
         if state_dict['interaction']['id'] in (
                 'ItemSelectionInput', 'MultipleChoiceInput',

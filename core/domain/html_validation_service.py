@@ -884,7 +884,7 @@ def get_filename_with_dimensions(old_filename, exp_id):
 def add_math_content_to_math_rte_components(html_string):
     """Replaces the attribute raw_latex-with-value in all Math RTE tags with
     a new attribute math_content-with-value. The new attribute has an additional
-    field for storing SVG filenames.The field for SVG filename will be an empty
+    field for storing SVG filenames. The field for SVG filename will be an empty
     string.
 
     Args:
@@ -944,6 +944,20 @@ def get_invalid_svg_tags_and_attrs(svg_string):
         else:
             invalid_elements.append(element.name)
     return (invalid_elements, invalid_attrs)
+
+
+def check_for_math_rte_in_html(html_string):
+    """Checks for existence of Math RTE tags inside an HTML string.
+
+    Args:
+        html_string: str. HTML string to check.
+
+    Returns:
+        bool. Whether the HTML has Math RTE or not.
+    """
+    soup = bs4.BeautifulSoup(
+        html_string.encode(encoding='utf-8'), 'html.parser')
+    return soup.findAll(name='oppia-noninteractive-math')
 
 
 def is_parsable_as_xml(xml_string):
