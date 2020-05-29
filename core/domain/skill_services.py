@@ -733,20 +733,26 @@ def save_skill_summary(skill_summary):
         skill_summary: The skill summary object to be saved in the
             datastore.
     """
-    skill_summary_model = skill_models.SkillSummaryModel(
-        id=skill_summary.id,
-        description=skill_summary.description,
-        language_code=skill_summary.language_code,
-        version=skill_summary.version,
-        misconception_count=skill_summary.misconception_count,
-        worked_examples_count=skill_summary.worked_examples_count,
-        skill_model_last_updated=(
+    skill_summary_dict = {
+        'description': skill_summary.description,
+        'language_code': skill_summary.language_code,
+        'version': skill_summary.version,
+        'misconception_count': skill_summary.misconception_count,
+        'worked_examples_count': skill_summary.worked_examples_count,
+        'skill_model_last_updated': (
             skill_summary.skill_model_last_updated),
-        skill_model_created_on=(
+        'skill_model_created_on': (
             skill_summary.skill_model_created_on)
-    )
+    }
 
-    skill_summary_model.put()
+    skill_summary_model = (
+        skill_models.SkillSummaryModel.get_by_id(skill_summary.id))
+    if skill_summary_model is not None:
+        skill_summary_model.populate(**skill_summary_dict)
+        skill_summary_model.put()
+    else:
+        skill_summary_dict['id'] = skill_summary.id
+        skill_models.SkillSummaryModel(**skill_summary_dict).put()
 
 
 def create_user_skill_mastery(user_id, skill_id, degree_of_mastery):
