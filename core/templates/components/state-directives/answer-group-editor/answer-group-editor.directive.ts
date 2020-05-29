@@ -197,7 +197,7 @@ angular.module('oppia').directive('answerGroupEditor', [
               case 'CodeString':
               case 'UnicodeString':
               case 'NormalizedString':
-              case 'MathLatexString':
+              case 'MathExpressionContent':
               case 'Html':
               case 'SanitizedUrl':
               case 'Filepath':
