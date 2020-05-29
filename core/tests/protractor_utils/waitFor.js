@@ -107,18 +107,13 @@ var elementAttributeToBe = async function(
 var newTabToBeCreated = async function(errorMessage, urlToMatch) {
   var currentHandles = [];
 
-  await browser.wait(function() {
-    return browser.driver.getAllWindowHandles().then(async function(handles) {
-      await browser.waitForAngularEnabled(false);
-      return await browser.switchTo().window(await handles.pop()).then(
-        async function() {
-          return await browser.getCurrentUrl().then(async function(url) {
-            await browser.waitForAngularEnabled(true);
-            return await url.match(urlToMatch);
-          });
-        }
-      );
-    });
+  await browser.wait(async function() {
+    var handles = await browser.driver.getAllWindowHandles();
+    await browser.waitForAngularEnabled(false);
+    await browser.switchTo().window(await handles.pop());
+    var url = await browser.getCurrentUrl();
+    await browser.waitForAngularEnabled(true);
+    return await url.match(urlToMatch);
   }, DEFAULT_WAIT_TIME_MSECS, errorMessage);
 };
 

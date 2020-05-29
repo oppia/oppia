@@ -146,12 +146,14 @@ var TopicEditorPage = function() {
     await selectSkillDropdown.click();
     await element(by.css('option[label="' + skillDescription + '"]')).click();
     await waitFor.visibilityOf(
-      questionItem, 'Question takes too long to appear');
+      questionItems.first(), 'Question takes too long to appear');
     expect(await questionItems.count()).toEqual(count);
   };
 
   this.saveQuestion = async function() {
     await saveQuestionButton.click();
+    await waitFor.invisibilityOf(
+      saveQuestionButton, 'Question modal takes too long to disappear');
   };
 
   this.createQuestionForSkillWithIndex = async function(index) {

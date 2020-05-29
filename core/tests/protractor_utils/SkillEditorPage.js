@@ -120,6 +120,9 @@ var SkillEditorPage = function() {
       saveRubricExplanationButton,
       'Save Rubric Explanation button takes too long to be clickable');
     await saveRubricExplanationButton.click();
+    await waitFor.invisibilityOf(
+      saveRubricExplanationButton,
+      'Save Rubric Explanation editor takes too long to close.');
   };
 
   this.deleteRubricExplanationWithIndex = async function(
