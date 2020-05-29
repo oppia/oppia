@@ -34,7 +34,6 @@ from core.domain import feedback_services
 from core.domain import interaction_registry
 from core.domain import learner_progress_services
 from core.domain import moderator_services
-from core.domain import question_fetchers
 from core.domain import question_services
 from core.domain import rating_services
 from core.domain import recommendations_services
@@ -216,24 +215,22 @@ class PretestHandler(base.BaseHandler):
     @acl_decorators.can_play_exploration
     def get(self, exploration_id):
         """Handles GET request."""
-        start_cursor = self.request.get('cursor')
         story_id = self.request.get('story_id')
         story = story_fetchers.get_story_by_id(story_id, strict=False)
         if story is None:
             raise self.InvalidInputException
         if not story.has_exploration(exploration_id):
             raise self.InvalidInputException
-        pretest_questions, _, next_start_cursor = (
-            question_fetchers.get_questions_and_skill_descriptions_by_skill_ids(
+        pretest_questions = (
+            question_services.get_questions_by_skill_ids(
                 feconf.NUM_PRETEST_QUESTIONS,
                 story.get_prerequisite_skill_ids_for_exp_id(exploration_id),
-                start_cursor)
+                True)
         )
         question_dicts = [question.to_dict() for question in pretest_questions]
 
         self.values.update({
             'pretest_question_dicts': question_dicts,
-            'next_start_cursor': next_start_cursor
         })
         self.render_json(self.values)
 
