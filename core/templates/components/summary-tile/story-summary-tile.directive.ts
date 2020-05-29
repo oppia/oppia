@@ -16,10 +16,6 @@
  * @fileoverview Component for a canonical story tile.
  */
 
-require(
-  'components/summary-tile/' +
-  'story-summary-tile-displayed-chapters-calculator.directive.ts');
-
 require('domain/utilities/url-interpolation.service.ts');
 require('domain/topic_viewer/topic-viewer-domain.constants.ajs.ts');
 require('services/assets-backend-api.service.ts');
@@ -61,11 +57,16 @@ angular.module('oppia').directive('storySummaryTile', [
 
           ctrl.$onInit = function() {
             ctrl.nodeCount = ctrl.getStorySummary().getNodeTitles().length;
+            ctrl.chaptersDisplayed = 3;
+            if (WindowDimensionsService.getWidth() <= 800) {
+              ctrl.chaptersDisplayed = 2;
+            }
             ctrl.showButton = false;
+            if (ctrl.chaptersDisplayed !== ctrl.nodeCount) {
+              ctrl.showButton = true;
+            }
             ctrl.referenceHeight = (
               angular.element('.story-thumbnail')[0].offsetHeight);
-            ctrl.chaptersDisplayed = (
-              ctrl.getStorySummary().getNodeTitles().length);
             ctrl.thumbnailUrl = (
               AssetsBackendApiService.getThumbnailUrlForPreview(
                 ENTITY_TYPE.STORY, ctrl.getStorySummary().getId(),

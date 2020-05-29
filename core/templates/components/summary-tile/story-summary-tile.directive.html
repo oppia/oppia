@@ -7,20 +7,15 @@
        <[$ctrl.getStorySummary().getNodeTitles().length]> Chapters
     </span>
   </div>
-  <div class="story-details"
-       displayed-chapters-calculator
-       chapters-displayed="$ctrl.chaptersDisplayed"
-       reference-height="$ctrl.referenceHeight"
-       show-button="$ctrl.showButton">
+  <div class="story-details">
     <div class="story-thumbnail"
-         style="height: 10vw; width: 15vw"
          ng-style="{background: $ctrl.getStorySummary().getThumbnailBgColor()}">
       <img ng-src="<[$ctrl.thumbnailUrl]>"
            class="img-thumbnail"
            ng-style="{background: $ctrl.getStorySummary().getThumbnailBgColor()}">
     </div>
     <div class="chapter-details">
-      <div class="chapter-title" ng-repeat="title in $ctrl.getStorySummary().getNodeTitles()">
+      <div ng-class="{'border-bottom': $index < $ctrl.chaptersDisplayed}" class="chapter-title" ng-repeat="title in $ctrl.getStorySummary().getNodeTitles()">
         <span ng-if="$index < $ctrl.chaptersDisplayed"> Chapter <[$index + 1]>: <[title]> </span>
       </div>
       <div ng-click="$ctrl.showAllChapters()"
@@ -57,8 +52,8 @@
 
   story-summary-tile .chapter-title {
     display: block;
-    font-size: 1.2em;
-    margin-bottom: 1vh;
+    font-size: 1.1em;
+    margin-bottom: 0.7vh;
   }
 
   story-summary-tile .chapter-details {
@@ -93,13 +88,13 @@
   }
 
   story-summary-tile .story-thumbnail {
-    border-radius: 0.25rem;
+    border-radius: 0.4em;
     display: table-cell;
     float: left;
-    height: 10vw;
+    height: 150px;
     text-align: center;
     vertical-align: middle;
-    width: 14vw;
+    width: 240px;
   }
 
   story-summary-tile a {
@@ -109,5 +104,24 @@
   story-summary-tile a:hover {
     cursor: pointer;
     text-decoration: none;
+  }
+
+  @media (max-width: 500px) {
+    story-summary-tile .story-details {
+      box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.2);
+      border-radius: 0.4em;
+      display: inherit;
+      width: 240px;
+    }
+
+    story-summary-tile .story-thumbnail {
+      border: none;
+    }
+
+    story-summary-tile .chapter-details {
+      border: none;
+      margin-left: 0;
+      width: 240px;
+    }
   }
 </style>
