@@ -17,12 +17,12 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import os
 import argparse
+import atexit
+import os
+import re
 import shutil
 import subprocess
-import re
-import atexit
 
 import python_utils
 from scripts import build
@@ -85,7 +85,7 @@ def download_and_install_nginx():
 def start_proxy_server():
     nginx_conf_file = os.path.join(
         common.CURR_DIR, '.lighthouseci', 'nginx.conf')
-    with open(nginx_conf_file, 'w') as f:
+    with python_utils.open_file(nginx_conf_file, 'w') as f:
         f.write("""
             events {
 
