@@ -40,6 +40,7 @@ RUNNING_PROCESSES = []
 
 APP_ENGINE_PORT = 8181
 NGINX_PORT = 9999
+MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS = 1000
 
 
 def setup_and_install_dependencies():
