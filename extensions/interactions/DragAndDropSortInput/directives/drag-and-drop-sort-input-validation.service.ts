@@ -131,7 +131,7 @@ export class DragAndDropSortInputValidationService {
         var inputs = rules[j].inputs;
         var rule = rules[j];
         if (!customizationArgs.allowMultipleItemsInSamePosition.value) {
-          var xInputs = this.ruleInputTypeFactory.stringArrayArrayInstance(
+          var xInputs = this.ruleInputTypeFactory.getStringArrayArrayInstance(
             inputs.x);
           for (var i = 0; i < xInputs.length; i++) {
             if (xInputs[i].length > 1) {
@@ -165,7 +165,7 @@ export class DragAndDropSortInputValidationService {
             break;
           case 'IsEqualToOrdering':
           case 'IsEqualToOrderingWithOneItemAtIncorrectPosition':
-            var xInputs = this.ruleInputTypeFactory.stringArrayArrayInstance(
+            var xInputs = this.ruleInputTypeFactory.getStringArrayArrayInstance(
               inputs.x);
             for (var k = 0; k < xInputs.length; k++) {
               if (inputs.x[k].length === 0) {

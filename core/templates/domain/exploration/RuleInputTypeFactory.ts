@@ -99,7 +99,7 @@ export class RuleInputTypeFactory {
       variable.length === 0 || typeof variable[0] === 'number'));
   }
 
-  graphInstance(variable: IRuleInput): IGraphBackendDict {
+  getGraphInstance(variable: IRuleInput): IGraphBackendDict {
     if (this._isGraph(variable)) {
       return variable;
     }
@@ -107,7 +107,7 @@ export class RuleInputTypeFactory {
     throw new Error('variable is not of type IGraphBackendDict.');
   }
 
-  notesInstance(variable: IRuleInput): INote[] {
+  getNotesInstance(variable: IRuleInput): INote[] {
     if (this._isNoteArray(variable)) {
       return variable;
     }
@@ -115,7 +115,8 @@ export class RuleInputTypeFactory {
     throw new Error('variable is not of type INote[].');
   }
 
-  numberWithUnitsInstance(variable: IRuleInput): INumberWithUnitsBackendDict {
+  getNumberWithUnitsInstance(
+      variable: IRuleInput): INumberWithUnitsBackendDict {
     if (this._isNumberWithUnits(variable)) {
       return variable;
     }
@@ -123,7 +124,7 @@ export class RuleInputTypeFactory {
     throw new Error('variable is not of type INumberWithUnitsBackendDict.');
   }
 
-  fractionInstance(variable: IRuleInput): IFractionDict {
+  getFractionInstance(variable: IRuleInput): IFractionDict {
     if (this._isFraction(variable)) {
       return variable;
     }
@@ -131,7 +132,7 @@ export class RuleInputTypeFactory {
     throw new Error('variable is not of type IFractionDict.');
   }
 
-  stringInstance(variable: IRuleInput): string {
+  getStringInstance(variable: IRuleInput): string {
     if (this._isString(variable)) {
       return variable;
     }
@@ -139,7 +140,7 @@ export class RuleInputTypeFactory {
     throw new Error('variable is not of type string.');
   }
 
-  numberInstance(variable: IRuleInput): number {
+  getNumberInstance(variable: IRuleInput): number {
     if (this._isNumber(variable)) {
       return variable;
     }
@@ -147,7 +148,7 @@ export class RuleInputTypeFactory {
     throw new Error('variable is not of type number.');
   }
 
-  stringArrayInstance(variable: IRuleInput): string[] {
+  getStringArrayInstance(variable: IRuleInput): string[] {
     if (this._isStringArray(variable)) {
       return variable;
     }
@@ -155,7 +156,7 @@ export class RuleInputTypeFactory {
     throw new Error('variable is not of type string[].');
   }
 
-  stringArrayArrayInstance(variable: IRuleInput): string[][] {
+  getStringArrayArrayInstance(variable: IRuleInput): string[][] {
     if (this._isStringArrayArray(variable)) {
       return variable;
     }
@@ -163,7 +164,7 @@ export class RuleInputTypeFactory {
     throw new Error('variable is not of type string[][].');
   }
 
-  numberArrayInstance(variable: IRuleInput): number[] {
+  getNumberArrayInstance(variable: IRuleInput): number[] {
     if (this._isNumberArray(variable)) {
       return variable;
     }

@@ -101,7 +101,7 @@ export class GraphInputValidationService {
       var rules = answerGroups[i].rules;
       for (var j = 0; j < rules.length; j++) {
         var rule = rules[j];
-        var gInputs = this.ruleInputTypeFactory.graphInstance(rule.inputs.g);
+        var gInputs = this.ruleInputTypeFactory.getGraphInstance(rule.inputs.g);
         try {
           if (rule.type === 'HasGraphProperty') {
             continue;

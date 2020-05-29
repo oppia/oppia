@@ -75,105 +75,105 @@ describe('RuleInputTypeFactory', () => {
   });
 
   it('should correctly identify graph', () => {
-    expect(ruleInputTypeFactory.graphInstance(inputGraph)).toEqual({
+    expect(ruleInputTypeFactory.getGraphInstance(inputGraph)).toEqual({
       vertices: new Array(10)
     });
     expect(() => {
-      ruleInputTypeFactory.graphInstance(inputNotes);
+      ruleInputTypeFactory.getGraphInstance(inputNotes);
     }).toThrowError('variable is not of type IGraphBackendDict.');
     expect(() => {
-      ruleInputTypeFactory.graphInstance(inputFraction);
+      ruleInputTypeFactory.getGraphInstance(inputFraction);
     }).toThrowError('variable is not of type IGraphBackendDict.');
     expect(() => {
-      ruleInputTypeFactory.graphInstance(inputNumberWithUnits);
+      ruleInputTypeFactory.getGraphInstance(inputNumberWithUnits);
     }).toThrowError('variable is not of type IGraphBackendDict.');
     expect(() => {
-      ruleInputTypeFactory.graphInstance(inputString);
+      ruleInputTypeFactory.getGraphInstance(inputString);
     }).toThrowError('variable is not of type IGraphBackendDict.');
     expect(() => {
-      ruleInputTypeFactory.graphInstance(inputNumber);
+      ruleInputTypeFactory.getGraphInstance(inputNumber);
     }).toThrowError('variable is not of type IGraphBackendDict.');
     expect(() => {
-      ruleInputTypeFactory.graphInstance(inputStringArray);
+      ruleInputTypeFactory.getGraphInstance(inputStringArray);
     }).toThrowError('variable is not of type IGraphBackendDict.');
     expect(() => {
-      ruleInputTypeFactory.graphInstance(inputStringArrayArray);
+      ruleInputTypeFactory.getGraphInstance(inputStringArrayArray);
     }).toThrowError('variable is not of type IGraphBackendDict.');
     expect(() => {
-      ruleInputTypeFactory.graphInstance(inputnumberArray);
+      ruleInputTypeFactory.getGraphInstance(inputnumberArray);
     }).toThrowError('variable is not of type IGraphBackendDict.');
   });
 
   it('should correctly identify notes', () => {
-    expect(ruleInputTypeFactory.notesInstance(inputNotes)).toEqual([{
+    expect(ruleInputTypeFactory.getNotesInstance(inputNotes)).toEqual([{
       readableNoteName: 'E4',
       noteDuration: {
         num: 1,
         den: 1
       }
     }]);
-    expect(ruleInputTypeFactory.notesInstance([])).toEqual([]);
+    expect(ruleInputTypeFactory.getNotesInstance([])).toEqual([]);
     expect(() => {
-      ruleInputTypeFactory.notesInstance(inputGraph);
+      ruleInputTypeFactory.getNotesInstance(inputGraph);
     }).toThrowError('variable is not of type INote[].');
     expect(() => {
-      ruleInputTypeFactory.notesInstance(inputFraction);
+      ruleInputTypeFactory.getNotesInstance(inputFraction);
     }).toThrowError('variable is not of type INote[].');
     expect(() => {
-      ruleInputTypeFactory.notesInstance(inputNumberWithUnits);
+      ruleInputTypeFactory.getNotesInstance(inputNumberWithUnits);
     }).toThrowError('variable is not of type INote[].');
     expect(() => {
-      ruleInputTypeFactory.notesInstance(inputString);
+      ruleInputTypeFactory.getNotesInstance(inputString);
     }).toThrowError('variable is not of type INote[].');
     expect(() => {
-      ruleInputTypeFactory.notesInstance(inputNumber);
+      ruleInputTypeFactory.getNotesInstance(inputNumber);
     }).toThrowError('variable is not of type INote[].');
     expect(() => {
-      ruleInputTypeFactory.notesInstance(inputStringArray);
+      ruleInputTypeFactory.getNotesInstance(inputStringArray);
     }).toThrowError('variable is not of type INote[].');
     expect(() => {
-      ruleInputTypeFactory.notesInstance(inputStringArrayArray);
+      ruleInputTypeFactory.getNotesInstance(inputStringArrayArray);
     }).toThrowError('variable is not of type INote[].');
     expect(() => {
-      ruleInputTypeFactory.notesInstance(inputnumberArray);
+      ruleInputTypeFactory.getNotesInstance(inputnumberArray);
     }).toThrowError('variable is not of type INote[].');
   });
 
   it('should correctly identify fraction', () => {
-    expect(ruleInputTypeFactory.fractionInstance(inputFraction)).toEqual({
+    expect(ruleInputTypeFactory.getFractionInstance(inputFraction)).toEqual({
       isNegative: false,
       wholeNumber: 0,
       numerator: 1,
       denominator: 1
     });
     expect(() => {
-      ruleInputTypeFactory.fractionInstance(inputGraph);
+      ruleInputTypeFactory.getFractionInstance(inputGraph);
     }).toThrowError('variable is not of type IFractionDict.');
     expect(() => {
-      ruleInputTypeFactory.fractionInstance(inputNotes);
+      ruleInputTypeFactory.getFractionInstance(inputNotes);
     }).toThrowError('variable is not of type IFractionDict.');
     expect(() => {
-      ruleInputTypeFactory.fractionInstance(inputNumberWithUnits);
+      ruleInputTypeFactory.getFractionInstance(inputNumberWithUnits);
     }).toThrowError('variable is not of type IFractionDict.');
     expect(() => {
-      ruleInputTypeFactory.fractionInstance(inputString);
+      ruleInputTypeFactory.getFractionInstance(inputString);
     }).toThrowError('variable is not of type IFractionDict.');
     expect(() => {
-      ruleInputTypeFactory.fractionInstance(inputNumber);
+      ruleInputTypeFactory.getFractionInstance(inputNumber);
     }).toThrowError('variable is not of type IFractionDict.');
     expect(() => {
-      ruleInputTypeFactory.fractionInstance(inputStringArray);
+      ruleInputTypeFactory.getFractionInstance(inputStringArray);
     }).toThrowError('variable is not of type IFractionDict.');
     expect(() => {
-      ruleInputTypeFactory.fractionInstance(inputStringArrayArray);
+      ruleInputTypeFactory.getFractionInstance(inputStringArrayArray);
     }).toThrowError('variable is not of type IFractionDict.');
     expect(() => {
-      ruleInputTypeFactory.fractionInstance(inputnumberArray);
+      ruleInputTypeFactory.getFractionInstance(inputnumberArray);
     }).toThrowError('variable is not of type IFractionDict.');
   });
 
   it('should correctly identify number with units', () => {
-    expect(ruleInputTypeFactory.numberWithUnitsInstance(
+    expect(ruleInputTypeFactory.getNumberWithUnitsInstance(
       inputNumberWithUnits)).toEqual({
       type: 'fraction',
       real: 0,
@@ -194,173 +194,173 @@ describe('RuleInputTypeFactory', () => {
         }]
     });
     expect(() => {
-      ruleInputTypeFactory.numberWithUnitsInstance(inputGraph);
+      ruleInputTypeFactory.getNumberWithUnitsInstance(inputGraph);
     }).toThrowError('variable is not of type INumberWithUnitsBackendDict.');
     expect(() => {
-      ruleInputTypeFactory.numberWithUnitsInstance(inputNotes);
+      ruleInputTypeFactory.getNumberWithUnitsInstance(inputNotes);
     }).toThrowError('variable is not of type INumberWithUnitsBackendDict.');
     expect(() => {
-      ruleInputTypeFactory.numberWithUnitsInstance(inputFraction);
+      ruleInputTypeFactory.getNumberWithUnitsInstance(inputFraction);
     }).toThrowError('variable is not of type INumberWithUnitsBackendDict.');
     expect(() => {
-      ruleInputTypeFactory.numberWithUnitsInstance(inputString);
+      ruleInputTypeFactory.getNumberWithUnitsInstance(inputString);
     }).toThrowError('variable is not of type INumberWithUnitsBackendDict.');
     expect(() => {
-      ruleInputTypeFactory.numberWithUnitsInstance(inputNumber);
+      ruleInputTypeFactory.getNumberWithUnitsInstance(inputNumber);
     }).toThrowError('variable is not of type INumberWithUnitsBackendDict.');
     expect(() => {
-      ruleInputTypeFactory.numberWithUnitsInstance(inputStringArray);
+      ruleInputTypeFactory.getNumberWithUnitsInstance(inputStringArray);
     }).toThrowError('variable is not of type INumberWithUnitsBackendDict.');
     expect(() => {
-      ruleInputTypeFactory.numberWithUnitsInstance(inputStringArrayArray);
+      ruleInputTypeFactory.getNumberWithUnitsInstance(inputStringArrayArray);
     }).toThrowError('variable is not of type INumberWithUnitsBackendDict.');
     expect(() => {
-      ruleInputTypeFactory.numberWithUnitsInstance(inputnumberArray);
+      ruleInputTypeFactory.getNumberWithUnitsInstance(inputnumberArray);
     }).toThrowError('variable is not of type INumberWithUnitsBackendDict.');
   });
 
   it('should correctly identify string', () => {
-    expect(ruleInputTypeFactory.stringInstance(
+    expect(ruleInputTypeFactory.getStringInstance(
       inputString)).toEqual('string');
     expect(() => {
-      ruleInputTypeFactory.stringInstance(inputGraph);
+      ruleInputTypeFactory.getStringInstance(inputGraph);
     }).toThrowError('variable is not of type string.');
     expect(() => {
-      ruleInputTypeFactory.stringInstance(inputNotes);
+      ruleInputTypeFactory.getStringInstance(inputNotes);
     }).toThrowError('variable is not of type string.');
     expect(() => {
-      ruleInputTypeFactory.stringInstance(inputFraction);
+      ruleInputTypeFactory.getStringInstance(inputFraction);
     }).toThrowError('variable is not of type string.');
     expect(() => {
-      ruleInputTypeFactory.stringInstance(inputNumberWithUnits);
+      ruleInputTypeFactory.getStringInstance(inputNumberWithUnits);
     }).toThrowError('variable is not of type string.');
     expect(() => {
-      ruleInputTypeFactory.stringInstance(inputNumber);
+      ruleInputTypeFactory.getStringInstance(inputNumber);
     }).toThrowError('variable is not of type string.');
     expect(() => {
-      ruleInputTypeFactory.stringInstance(inputStringArray);
+      ruleInputTypeFactory.getStringInstance(inputStringArray);
     }).toThrowError('variable is not of type string.');
     expect(() => {
-      ruleInputTypeFactory.stringInstance(inputStringArrayArray);
+      ruleInputTypeFactory.getStringInstance(inputStringArrayArray);
     }).toThrowError('variable is not of type string.');
     expect(() => {
-      ruleInputTypeFactory.stringInstance(inputnumberArray);
+      ruleInputTypeFactory.getStringInstance(inputnumberArray);
     }).toThrowError('variable is not of type string.');
   });
 
   it('should correctly identify number', () => {
-    expect(ruleInputTypeFactory.numberInstance(
+    expect(ruleInputTypeFactory.getNumberInstance(
       inputNumber)).toEqual(0);
     expect(() => {
-      ruleInputTypeFactory.numberInstance(inputGraph);
+      ruleInputTypeFactory.getNumberInstance(inputGraph);
     }).toThrowError('variable is not of type number.');
     expect(() => {
-      ruleInputTypeFactory.numberInstance(inputNotes);
+      ruleInputTypeFactory.getNumberInstance(inputNotes);
     }).toThrowError('variable is not of type number.');
     expect(() => {
-      ruleInputTypeFactory.numberInstance(inputFraction);
+      ruleInputTypeFactory.getNumberInstance(inputFraction);
     }).toThrowError('variable is not of type number.');
     expect(() => {
-      ruleInputTypeFactory.numberInstance(inputNumberWithUnits);
+      ruleInputTypeFactory.getNumberInstance(inputNumberWithUnits);
     }).toThrowError('variable is not of type number.');
     expect(() => {
-      ruleInputTypeFactory.numberInstance(inputString);
+      ruleInputTypeFactory.getNumberInstance(inputString);
     }).toThrowError('variable is not of type number.');
     expect(() => {
-      ruleInputTypeFactory.numberInstance(inputStringArray);
+      ruleInputTypeFactory.getNumberInstance(inputStringArray);
     }).toThrowError('variable is not of type number.');
     expect(() => {
-      ruleInputTypeFactory.numberInstance(inputStringArrayArray);
+      ruleInputTypeFactory.getNumberInstance(inputStringArrayArray);
     }).toThrowError('variable is not of type number.');
     expect(() => {
-      ruleInputTypeFactory.numberInstance(inputnumberArray);
+      ruleInputTypeFactory.getNumberInstance(inputnumberArray);
     }).toThrowError('variable is not of type number.');
   });
 
   it('should correctly identify string array', () => {
-    expect(ruleInputTypeFactory.stringArrayInstance(
+    expect(ruleInputTypeFactory.getStringArrayInstance(
       inputStringArray)).toEqual(['string1', 'string2']);
     expect(() => {
-      ruleInputTypeFactory.stringArrayInstance(inputGraph);
+      ruleInputTypeFactory.getStringArrayInstance(inputGraph);
     }).toThrowError('variable is not of type string[].');
     expect(() => {
-      ruleInputTypeFactory.stringArrayInstance(inputNotes);
+      ruleInputTypeFactory.getStringArrayInstance(inputNotes);
     }).toThrowError('variable is not of type string[].');
     expect(() => {
-      ruleInputTypeFactory.stringArrayInstance(inputFraction);
+      ruleInputTypeFactory.getStringArrayInstance(inputFraction);
     }).toThrowError('variable is not of type string[].');
     expect(() => {
-      ruleInputTypeFactory.stringArrayInstance(inputNumberWithUnits);
+      ruleInputTypeFactory.getStringArrayInstance(inputNumberWithUnits);
     }).toThrowError('variable is not of type string[].');
     expect(() => {
-      ruleInputTypeFactory.stringArrayInstance(inputString);
+      ruleInputTypeFactory.getStringArrayInstance(inputString);
     }).toThrowError('variable is not of type string[].');
     expect(() => {
-      ruleInputTypeFactory.stringArrayInstance(inputNumber);
+      ruleInputTypeFactory.getStringArrayInstance(inputNumber);
     }).toThrowError('variable is not of type string[].');
     expect(() => {
-      ruleInputTypeFactory.stringArrayInstance(inputStringArrayArray);
+      ruleInputTypeFactory.getStringArrayInstance(inputStringArrayArray);
     }).toThrowError('variable is not of type string[].');
     expect(() => {
-      ruleInputTypeFactory.stringArrayInstance(inputnumberArray);
+      ruleInputTypeFactory.getStringArrayInstance(inputnumberArray);
     }).toThrowError('variable is not of type string[].');
   });
 
   it('should correctly identify string array array', () => {
-    expect(ruleInputTypeFactory.stringArrayArrayInstance(
+    expect(ruleInputTypeFactory.getStringArrayArrayInstance(
       inputStringArrayArray)).toEqual([['a', 'b'], ['d'], ['c']]);
     expect(() => {
-      ruleInputTypeFactory.stringArrayArrayInstance(inputGraph);
+      ruleInputTypeFactory.getStringArrayArrayInstance(inputGraph);
     }).toThrowError('variable is not of type string[][].');
     expect(() => {
-      ruleInputTypeFactory.stringArrayArrayInstance(inputNotes);
+      ruleInputTypeFactory.getStringArrayArrayInstance(inputNotes);
     }).toThrowError('variable is not of type string[][].');
     expect(() => {
-      ruleInputTypeFactory.stringArrayArrayInstance(inputFraction);
+      ruleInputTypeFactory.getStringArrayArrayInstance(inputFraction);
     }).toThrowError('variable is not of type string[][].');
     expect(() => {
-      ruleInputTypeFactory.stringArrayArrayInstance(inputNumberWithUnits);
+      ruleInputTypeFactory.getStringArrayArrayInstance(inputNumberWithUnits);
     }).toThrowError('variable is not of type string[][].');
     expect(() => {
-      ruleInputTypeFactory.stringArrayArrayInstance(inputString);
+      ruleInputTypeFactory.getStringArrayArrayInstance(inputString);
     }).toThrowError('variable is not of type string[][].');
     expect(() => {
-      ruleInputTypeFactory.stringArrayArrayInstance(inputNumber);
+      ruleInputTypeFactory.getStringArrayArrayInstance(inputNumber);
     }).toThrowError('variable is not of type string[][].');
     expect(() => {
-      ruleInputTypeFactory.stringArrayArrayInstance(inputStringArray);
+      ruleInputTypeFactory.getStringArrayArrayInstance(inputStringArray);
     }).toThrowError('variable is not of type string[][].');
     expect(() => {
-      ruleInputTypeFactory.stringArrayArrayInstance(inputnumberArray);
+      ruleInputTypeFactory.getStringArrayArrayInstance(inputnumberArray);
     }).toThrowError('variable is not of type string[][].');
   });
 
   it('should correctly identify number array', () => {
-    expect(ruleInputTypeFactory.numberArrayInstance(
+    expect(ruleInputTypeFactory.getNumberArrayInstance(
       inputnumberArray)).toEqual([0]);
     expect(() => {
-      ruleInputTypeFactory.numberArrayInstance(inputGraph);
+      ruleInputTypeFactory.getNumberArrayInstance(inputGraph);
     }).toThrowError('variable is not of type number[].');
     expect(() => {
-      ruleInputTypeFactory.numberArrayInstance(inputNotes);
+      ruleInputTypeFactory.getNumberArrayInstance(inputNotes);
     }).toThrowError('variable is not of type number[].');
     expect(() => {
-      ruleInputTypeFactory.numberArrayInstance(inputFraction);
+      ruleInputTypeFactory.getNumberArrayInstance(inputFraction);
     }).toThrowError('variable is not of type number[].');
     expect(() => {
-      ruleInputTypeFactory.numberArrayInstance(inputNumberWithUnits);
+      ruleInputTypeFactory.getNumberArrayInstance(inputNumberWithUnits);
     }).toThrowError('variable is not of type number[].');
     expect(() => {
-      ruleInputTypeFactory.numberArrayInstance(inputString);
+      ruleInputTypeFactory.getNumberArrayInstance(inputString);
     }).toThrowError('variable is not of type number[].');
     expect(() => {
-      ruleInputTypeFactory.numberArrayInstance(inputNumber);
+      ruleInputTypeFactory.getNumberArrayInstance(inputNumber);
     }).toThrowError('variable is not of type number[].');
     expect(() => {
-      ruleInputTypeFactory.numberArrayInstance(inputStringArray);
+      ruleInputTypeFactory.getNumberArrayInstance(inputStringArray);
     }).toThrowError('variable is not of type number[].');
     expect(() => {
-      ruleInputTypeFactory.numberArrayInstance(inputStringArrayArray);
+      ruleInputTypeFactory.getNumberArrayInstance(inputStringArrayArray);
     }).toThrowError('variable is not of type number[].');
   });
 });

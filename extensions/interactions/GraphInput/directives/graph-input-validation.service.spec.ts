@@ -136,11 +136,11 @@ describe('GraphInputValidationService', () => {
   it('The graph used in the rule x in group y exceeds supported maximum ' +
     'number of vertices of 10 for isomorphism check.',
   () => {
-    ritf.graphInstance(
+    ritf.getGraphInstance(
       answerGroups[0].rules[0].inputs.g).vertices = new Array(11);
-    ritf.graphInstance(
+    ritf.getGraphInstance(
       answerGroups[0].rules[1].inputs.g).vertices = new Array(11);
-    ritf.graphInstance(
+    ritf.getGraphInstance(
       answerGroups[1].rules[0].inputs.g).vertices = new Array(11);
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, answerGroups,

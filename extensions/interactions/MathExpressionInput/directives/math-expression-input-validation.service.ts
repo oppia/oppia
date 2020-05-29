@@ -68,7 +68,7 @@ export class MathExpressionInputValidationService {
       var rules = answerGroups[i].rules;
       for (var j = 0; j < rules.length; j++) {
         try {
-          MathExpression.fromLatex(this.ruleInputTypeFactory.stringInstance(
+          MathExpression.fromLatex(this.ruleInputTypeFactory.getStringInstance(
             rules[j].inputs.x));
         } catch (e) {
           warningsList.push({

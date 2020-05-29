@@ -109,7 +109,7 @@ export class NumericInputValidationService {
         };
         switch (rule.type) {
           case 'Equals':
-            var x = this.ruleInputTypeFactory.numberInstance(rule.inputs.x);
+            var x = this.ruleInputTypeFactory.getNumberInstance(rule.inputs.x);
             setLowerAndUpperBounds(range, x, x, true, true);
             break;
           case 'IsInclusivelyBetween':
@@ -121,24 +121,25 @@ export class NumericInputValidationService {
             setLowerAndUpperBounds(range, a, b, true, true);
             break;
           case 'IsGreaterThan':
-            var x = this.ruleInputTypeFactory.numberInstance(rule.inputs.x);
+            var x = this.ruleInputTypeFactory.getNumberInstance(rule.inputs.x);
             setLowerAndUpperBounds(range, x, Infinity, false, false);
             break;
           case 'IsGreaterThanOrEqualTo':
-            var x = this.ruleInputTypeFactory.numberInstance(rule.inputs.x);
+            var x = this.ruleInputTypeFactory.getNumberInstance(rule.inputs.x);
             setLowerAndUpperBounds(range, x, Infinity, true, false);
             break;
           case 'IsLessThan':
-            var x = this.ruleInputTypeFactory.numberInstance(rule.inputs.x);
+            var x = this.ruleInputTypeFactory.getNumberInstance(rule.inputs.x);
             setLowerAndUpperBounds(range, -Infinity, x, false, false);
             break;
           case 'IsLessThanOrEqualTo':
-            var x = this.ruleInputTypeFactory.numberInstance(rule.inputs.x);
+            var x = this.ruleInputTypeFactory.getNumberInstance(rule.inputs.x);
             setLowerAndUpperBounds(range, -Infinity, x, false, true);
             break;
           case 'IsWithinTolerance':
-            var x = this.ruleInputTypeFactory.numberInstance(rule.inputs.x);
-            var tol = this.ruleInputTypeFactory.numberInstance(rule.inputs.tol);
+            var x = this.ruleInputTypeFactory.getNumberInstance(rule.inputs.x);
+            var tol = this.ruleInputTypeFactory.getNumberInstance(
+              rule.inputs.tol);
             setLowerAndUpperBounds(range, x - tol, x + tol, true, true);
             break;
           default:
