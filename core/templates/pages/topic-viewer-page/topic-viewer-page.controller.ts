@@ -77,6 +77,11 @@ angular.module('oppia').directive('topicViewerPage', [
                 ctrl.topicDescription = readOnlyTopic.getTopicDescription();
                 ctrl.canonicalStorySummaries = (
                   readOnlyTopic.getCanonicalStorySummaries());
+                ctrl.chapterCount = 0;
+                for (var idx in ctrl.canonicalStorySummaries) {
+                  ctrl.chapterCount += (
+                    ctrl.canonicalStorySummaries[idx].getNodeTitles().length);
+                }
                 ctrl.degreesOfMastery = readOnlyTopic.getDegreesOfMastery();
                 ctrl.subtopics = readOnlyTopic.getSubtopics();
                 ctrl.skillDescriptions = readOnlyTopic.getSkillDescriptions();

@@ -17,6 +17,7 @@
  */
 
 require('domain/utilities/url-interpolation.service.ts');
+require('services/contextual/window-dimensions.service.ts');
 
 angular.module('oppia').directive('topicInfoTab', ['UrlInterpolationService',
   function(UrlInterpolationService) {
@@ -27,11 +28,23 @@ angular.module('oppia').directive('topicInfoTab', ['UrlInterpolationService',
         getTopicName: '&topicName',
         getTopicDescription: '&topicDescription',
         getStoryCount: '&storyCount',
-        getSubtopicCount: '&subtopicCount'
+        getSubtopicCount: '&subtopicCount',
+        getChapterCount: '&chapterCount'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/topic-viewer-page/info-tab/topic-info-tab.directive.html'),
       controllerAs: '$ctrl',
-      controller: [function() {}]
+      controller: [
+        'WindowDimensionsService', function(WindowDimensionsService) {
+          var ctrl = this;
+
+          ctrl.$onInit = function() {
+            ctrl.isMobile = false;
+            if (WindowDimensionsService.getWidth() <= 1024) {
+              ctrl.isMobile = true;
+            }
+          };
+        }
+      ]
     };
   }]);
