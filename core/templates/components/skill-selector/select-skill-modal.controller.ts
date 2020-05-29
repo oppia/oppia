@@ -41,6 +41,7 @@ angular.module('oppia').controller('SelectSkillModalController', [
             sortedSkillSummaries[idx]);
         }
       }
+      $scope.confirm($scope.selectedSkillId);
     };
   }
 ]);
