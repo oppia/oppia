@@ -31,8 +31,6 @@ import { QuestionDomainConstants } from
   providedIn: 'root'
 })
 export class PretestQuestionBackendApiService {
-  _cursor: string = '';
-
   constructor(
     private urlInterpolationService: UrlInterpolationService,
     private http: HttpClient
@@ -50,13 +48,11 @@ export class PretestQuestionBackendApiService {
       QuestionDomainConstants.PRETEST_QUESTIONS_URL_TEMPLATE, {
         exploration_id: explorationId,
         story_id: storyId,
-        cursor: this._cursor
       });
 
     this.http.get(pretestDataUrl).toPromise().then((data: any) => {
       var pretestQuestionDicts = (
         cloneDeep(data.pretest_question_dicts));
-      this._cursor = data.next_start_cursor;
       if (successCallback) {
         successCallback(pretestQuestionDicts);
       }

@@ -318,19 +318,10 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
         # Call the handler.
         with self.swap(feconf, 'NUM_PRETEST_QUESTIONS', 1):
             json_response_1 = self.get_json(
-                '%s/%s?story_id=%s&cursor=' % (
+                '%s/%s?story_id=%s' % (
                     feconf.EXPLORATION_PRETESTS_URL_PREFIX, exp_id, story_id))
-            next_cursor = json_response_1['next_start_cursor']
-
-            self.assertEqual(len(json_response_1['pretest_question_dicts']), 1)
-            json_response_2 = self.get_json(
-                '%s/%s?story_id=%s&cursor=%s' % (
-                    feconf.EXPLORATION_PRETESTS_URL_PREFIX, exp_id, story_id,
-                    next_cursor))
-            self.assertEqual(len(json_response_2['pretest_question_dicts']), 1)
-            self.assertNotEqual(
-                json_response_1['pretest_question_dicts'][0]['id'],
-                json_response_2['pretest_question_dicts'][0]['id'])
+        self.assertTrue(json_response_1['pretest_question_dicts'][0]['id'] in
+                        [question_id, question_id_2])
 
         self.get_json(
             '%s/%s?story_id=%s' % (

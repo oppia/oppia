@@ -18,6 +18,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import math
+import random
 
 from constants import constants
 from core.platform import models
@@ -326,7 +327,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
     @classmethod
     def get_question_skill_links_based_on_difficulty_equidistributed_by_skill(
             cls, total_question_count, skill_ids, difficulty_requested):
-        """Fetches the list of constant number of QuestionSkillLinkModels
+        """Fetches the list of constant number of random QuestionSkillLinkModels
         linked to the skills, sorted by the absolute value of the difference
         between skill difficulty and the requested difficulty.
 
@@ -338,15 +339,12 @@ class QuestionSkillLinkModel(base_models.BaseModel):
                 requested to be fetched.
 
         Returns:
-            list(QuestionSkillLinkModel). A list of QuestionSkillLinkModels
-                corresponding to given skill_ids, with
+            list(QuestionSkillLinkModel). A list of random
+                QuestionSkillLinkModels corresponding to given skill_ids, with
                 total_question_count/len(skill_ids) number of questions for
                 each skill. If not evenly divisible, it will be rounded up.
                 If not enough questions for a skill, just return all questions
-                it links to. The order of questions will follow the order of
-                given skill ids, and the order of questions for the same skill
-                follows the absolute value of the difference between skill
-                difficulty and the requested difficulty.
+                it links to.
         """
         if len(skill_ids) > feconf.MAX_NUMBER_OF_SKILL_IDS:
             raise Exception('Please keep the number of skill IDs below 20.')
@@ -357,59 +355,98 @@ class QuestionSkillLinkModel(base_models.BaseModel):
 
         question_skill_link_mapping = {}
 
+        # For fetching the questions randomly we have used a random offset.
+        # But this is a temporary solution since this method scales linearly.
+        # Other alternative methods were:
+        # 1) Using a random id in question id filter
+        # 2) Adding an additional column that can be filtered upon.
+        # But these methods are not viable because google datastore limits
+        # each query to have at most one inequality filter. So we can't filter
+        # on both question_id and difficulty. Please see
+        # https://github.com/oppia/oppia/pull/9061#issuecomment-629765809
+        # for more details.
+
+        def get_offset(query):
+            """Helper function to get the offset."""
+            question_count = query.count()
+            if question_count > 2 * question_count_per_skill:
+                return utils.get_random_int(
+                    question_count - (question_count_per_skill * 2))
+            return 0
+
         for skill_id in skill_ids:
             query = cls.query(cls.skill_id == skill_id)
 
             equal_questions_query = query.filter(
                 cls.skill_difficulty == difficulty_requested)
+
             # We fetch more questions here in order to try and ensure that the
             # eventual number of returned questions is sufficient to meet the
             # number requested, even after deduplication.
-            new_question_skill_link_models = (
-                equal_questions_query.fetch(question_count_per_skill * 2))
+            new_question_skill_link_models = equal_questions_query.fetch(
+                limit=question_count_per_skill * 2,
+                offset=get_offset(equal_questions_query))
             for model in new_question_skill_link_models:
                 if model.question_id in question_skill_link_mapping:
                     new_question_skill_link_models.remove(model)
 
-            if len(new_question_skill_link_models) < question_count_per_skill:
+            if len(new_question_skill_link_models) >= question_count_per_skill:
+                new_question_skill_link_models = random.sample(
+                    new_question_skill_link_models, question_count_per_skill)
+            else:
                 # Fetch QuestionSkillLinkModels with difficulty smaller than
-                # requested difficulty and sort them by decreasing difficulty.
+                # requested difficulty.
                 easier_questions_query = query.filter(
                     cls.skill_difficulty < difficulty_requested)
-                easier_questions_query = easier_questions_query.order(
-                    -cls.skill_difficulty)
                 easier_question_skill_link_models = (
-                    easier_questions_query.fetch(question_count_per_skill))
+                    easier_questions_query.fetch(
+                        limit=question_count_per_skill * 2,
+                        offset=get_offset(easier_questions_query)))
                 for model in easier_question_skill_link_models:
                     if model.question_id in question_skill_link_mapping:
                         easier_question_skill_link_models.remove(model)
-                new_question_skill_link_models.extend(
-                    easier_question_skill_link_models)
-
-                if (len(new_question_skill_link_models) <
-                        question_count_per_skill):
+                question_extra_count = (
+                    len(new_question_skill_link_models) +
+                    len(easier_question_skill_link_models) -
+                    question_count_per_skill)
+                if question_extra_count >= 0:
+                    easier_question_skill_link_models = random.sample(
+                        easier_question_skill_link_models,
+                        question_count_per_skill -
+                        len(new_question_skill_link_models)
+                    )
+                    new_question_skill_link_models.extend(
+                        easier_question_skill_link_models)
+                else:
                     # Fetch QuestionSkillLinkModels with difficulty larger than
-                    # requested difficulty and sort them by increasing
-                    # difficulty.
+                    # requested difficulty.
+                    new_question_skill_link_models.extend(
+                        easier_question_skill_link_models)
                     harder_questions_query = query.filter(
                         cls.skill_difficulty > difficulty_requested)
-                    harder_questions_query = harder_questions_query.order(
-                        cls.skill_difficulty)
                     harder_question_skill_link_models = (
-                        harder_questions_query.fetch(question_count_per_skill))
+                        harder_questions_query.fetch(
+                            limit=question_count_per_skill * 2,
+                            offset=get_offset(harder_questions_query)))
+                    harder_question_skill_link_models = (
+                        harder_questions_query.fetch())
                     for model in harder_question_skill_link_models:
                         if model.question_id in question_skill_link_mapping:
                             harder_question_skill_link_models.remove(model)
+                    question_extra_count = (
+                        len(new_question_skill_link_models) +
+                        len(harder_question_skill_link_models) -
+                        question_count_per_skill)
+                    if question_extra_count >= 0:
+                        harder_question_skill_link_models = (
+                            random.sample(
+                                harder_question_skill_link_models,
+                                question_count_per_skill -
+                                len(new_question_skill_link_models)
+                            ))
                     new_question_skill_link_models.extend(
                         harder_question_skill_link_models)
 
-                # Sort QuestionSkillLinkModels by the difference between their
-                # difficulty and requested difficulty.
-                new_question_skill_link_models = sorted(
-                    new_question_skill_link_models,
-                    key=lambda model: abs(
-                        model.skill_difficulty - difficulty_requested)
-                )
             new_question_skill_link_models = (
                 new_question_skill_link_models[:question_count_per_skill])
 
@@ -422,8 +459,8 @@ class QuestionSkillLinkModel(base_models.BaseModel):
     @classmethod
     def get_question_skill_links_equidistributed_by_skill(
             cls, total_question_count, skill_ids):
-        """Fetches the list of constant number of QuestionSkillLinkModels
-        linked to the skills.
+        """Fetches the list of constant number of random
+        QuestionSkillLinkModels linked to the skills.
 
         Args:
             total_question_count: int. The number of questions expected.
@@ -431,14 +468,12 @@ class QuestionSkillLinkModel(base_models.BaseModel):
                 question ids are to be retrieved.
 
         Returns:
-            list(QuestionSkillLinkModel). A list of QuestionSkillLinkModels
-                corresponding to given skill_ids, with
+            list(QuestionSkillLinkModel). A list of random
+                QuestionSkillLinkModelscorresponding to given skill_ids, with
                 total_question_count/len(skill_ids) number of questions for
                 each skill. If not evenly divisible, it will be rounded up.
                 If not enough questions for a skill, just return all questions
-                it links to. The order of questions will follow the order of
-                given skill ids, but the order of questions for the same skill
-                is random.
+                it links to.
         """
         if len(skill_ids) > feconf.MAX_NUMBER_OF_SKILL_IDS:
             raise Exception('Please keep the number of skill IDs below 20.')
@@ -450,23 +485,44 @@ class QuestionSkillLinkModel(base_models.BaseModel):
         question_skill_link_models = []
         existing_question_ids = []
 
+        def get_offset(query):
+            """Helper function to get the offset."""
+            question_count = query.count()
+            if question_count > 2 * question_count_per_skill:
+                return utils.get_random_int(
+                    question_count - (question_count_per_skill * 2))
+            return 0
+
         for skill_id in skill_ids:
             query = cls.query(cls.skill_id == skill_id)
+
             # We fetch more questions here in order to try and ensure that the
             # eventual number of returned questions is sufficient to meet the
             # number requested, even after deduplication.
             new_question_skill_link_models = query.fetch(
-                question_count_per_skill * 2)
+                limit=question_count_per_skill * 2,
+                offset=get_offset(query))
 
             # Deduplicate if the same question is linked to multiple skills.
             for model in new_question_skill_link_models:
                 if model.question_id in existing_question_ids:
                     new_question_skill_link_models.remove(model)
+            if len(new_question_skill_link_models) > question_count_per_skill:
+                sampled_question_skill_link_models = random.sample(
+                    new_question_skill_link_models,
+                    question_count_per_skill
+                )
+            else:
+                sampled_question_skill_link_models = (
+                    new_question_skill_link_models)
+
 
             question_skill_link_models.extend(
-                new_question_skill_link_models[:question_count_per_skill])
-            existing_question_ids.extend(
-                [model.question_id for model in new_question_skill_link_models])
+                sampled_question_skill_link_models)
+            existing_question_ids.extend([
+                model.question_id for model in (
+                    sampled_question_skill_link_models)
+            ])
 
         return question_skill_link_models
 
