@@ -162,8 +162,6 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         # Select JS files which need to be checked.
         files_to_check = self.all_filepaths
         parsed_js_and_ts_files = dict()
-        if not files_to_check:
-            return parsed_js_and_ts_files
         if not self.verbose_mode_enabled:
             python_utils.PRINT('Validating and parsing JS and TS files ...')
         for filepath in files_to_check:

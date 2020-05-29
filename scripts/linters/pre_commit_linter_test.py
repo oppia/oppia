@@ -65,23 +65,8 @@ INVALID_RELATIVE_IMPORT_FILEPATH = os.path.join(
 INVALID_PARENT_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_parent.ts')
 INVALID_TEMPLATE_URL_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_templateurl.ts')
-INVALID_CONSTANT_IN_TS_FILEPATH = os.path.join(
-    LINTER_TESTS_DIR, 'invalid_constant_in_ts_file.ts')
-INVALID_CONSTANT_FILEPATH = os.path.join(
-    LINTER_TESTS_DIR, 'invalid.constants.ts')
-INVALID_LINE_BREAK_IN_CONTROLLER_DEPENDENCIES_FILEPATH = os.path.join(
-    LINTER_TESTS_DIR, 'invalid_line_breaks_in_controller_dependencies.ts')
-INVALID_SCOPE_TRUE_FILEPATH = os.path.join(
-    LINTER_TESTS_DIR, 'invalid_scope_true.ts')
-INVALID_SCOPE_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_scope.ts')
-INVALID_COMPONENT_FILEPATH = os.path.join(
-    LINTER_TESTS_DIR, 'invalid_component.ts')
-INVALID_SORTED_DEPENDENCIES_FILEPATH = os.path.join(
-    LINTER_TESTS_DIR, 'invalid_sorted_dependencies.ts')
 INVALID_FILEOVERVIEW_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_fileoverview.ts')
-INVALID_ANY_TYPE_FILEPATH = os.path.join(
-    LINTER_TESTS_DIR, 'invalid_any_type.ts')
 INVALID_TO_THROW_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_toThrow.ts')
 INVALID_THROW_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_throw.ts')
@@ -463,122 +448,6 @@ class JsTsLintTests(LintTests):
         self.assertTrue(
             appears_in_linter_stdout(
                 ['Line 26: Please do not use innerHTML property.'],
-                self.linter_stdout))
-
-    def test_invalid_constant_file(self):
-        with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-            with self.install_swap:
-                pre_commit_linter.main(
-                    args=['--path=%s' % INVALID_CONSTANT_FILEPATH])
-        self.assertFalse(all_checks_passed(self.linter_stdout))
-        self.assertTrue(
-            appears_in_linter_stdout(
-                ['Duplicate constant declaration found.'],
-                self.linter_stdout))
-        self.assertTrue(
-            appears_in_linter_stdout(
-                ['Please ensure that the constant ADMIN_TABS is initialized '
-                 'from the value from the corresponding Angular constants file '
-                 '(the *.constants.ts file). Please create one in the Angular '
-                 'constants file if it does not exist there.'],
-                self.linter_stdout))
-
-    def test_invalid_constant_in_ts_file(self):
-        with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-            with self.install_swap:
-                pre_commit_linter.main(
-                    args=['--path=%s' % INVALID_CONSTANT_IN_TS_FILEPATH])
-        self.assertFalse(all_checks_passed(self.linter_stdout))
-        self.assertTrue(
-            appears_in_linter_stdout(
-                ['Constant declaration found at line 19. Please declare the '
-                 'constants in a separate constants file.'],
-                self.linter_stdout))
-
-    def test_invalid_line_break_in_controller_dependencies(self):
-        with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-            with self.install_swap:
-                pre_commit_linter.main(
-                    args=['--path=%s' % (
-                        INVALID_LINE_BREAK_IN_CONTROLLER_DEPENDENCIES_FILEPATH)]
-                    )
-        self.assertFalse(all_checks_passed(self.linter_stdout))
-        self.assertTrue(
-            appears_in_linter_stdout(
-                ['Please ensure that in file',
-                 'the line breaks pattern between the dependencies mentioned as'
-                 ' strings:\n[$rootScope,$window,BackgroundMaskService,\n'
-                 'SidebarStatusService,UrlService]\nand the dependencies '
-                 'mentioned as function parameters: \n($rootScope,$window,\n'
-                 'BackgroundMaskService,\nSidebarStatusService,UrlService)\n'
-                 'for the corresponding controller should exactly match.'],
-                self.linter_stdout))
-
-    def test_invalid_scope_is_set_to_true(self):
-        with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-            with self.install_swap:
-                pre_commit_linter.main(
-                    args=['--path=%s' % INVALID_SCOPE_TRUE_FILEPATH])
-        self.assertFalse(all_checks_passed(self.linter_stdout))
-        self.assertTrue(
-            appears_in_linter_stdout(
-                ['Please ensure that baseContent directive in ',
-                 ' file does not have scope set to true.'],
-                self.linter_stdout))
-
-    def test_invalid_scope(self):
-        with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-            with self.install_swap:
-                pre_commit_linter.main(
-                    args=['--path=%s' % INVALID_SCOPE_FILEPATH])
-        self.assertFalse(all_checks_passed(self.linter_stdout))
-        self.assertTrue(
-            appears_in_linter_stdout(
-                ['Please ensure that baseContent directive in ',
-                 ' file has a scope: {}.'],
-                self.linter_stdout))
-
-    def test_invalid_component(self):
-        with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-            with self.install_swap:
-                pre_commit_linter.main(
-                    args=['--path=%s' % INVALID_COMPONENT_FILEPATH])
-        self.assertFalse(all_checks_passed(self.linter_stdout))
-        self.assertTrue(
-            appears_in_linter_stdout(
-                ['Please ensure that there is exactly one component '
-                 'in the file.'],
-                self.linter_stdout))
-
-    def test_invalid_sorted_dependencies(self):
-        with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-            with self.install_swap:
-                pre_commit_linter.main(
-                    args=['--path=%s' % INVALID_SORTED_DEPENDENCIES_FILEPATH])
-        self.assertFalse(all_checks_passed(self.linter_stdout))
-        self.assertTrue(
-            appears_in_linter_stdout(
-                ['Please ensure that in SuggestionModalForCreatorViewController'
-                 ' in file ', 'the stringfied dependencies should be in the '
-                 'following manner: dollar imports, regular imports and '
-                 'constant imports, all in sorted order.'],
-                self.linter_stdout))
-
-    def test_invalid_any_type(self):
-        with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-            with self.install_swap:
-                pre_commit_linter.main(
-                    args=['--path=%s' % INVALID_ANY_TYPE_FILEPATH])
-        self.assertFalse(all_checks_passed(self.linter_stdout))
-        self.assertTrue(
-            appears_in_linter_stdout(
-                ['\'any\' type found at line 20. Please do not declare variable'
-                 ' as \'any\' type'],
-                self.linter_stdout))
-        self.assertTrue(
-            appears_in_linter_stdout(
-                ['\'any\' type found at line 22. Please do not declare variable'
-                 ' as \'any\' type'],
                 self.linter_stdout))
 
     def test_invalid_to_throw(self):
