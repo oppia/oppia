@@ -8341,7 +8341,7 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
         }
 
         state1.update_interaction_solution(state_domain.Solution.from_dict(
-        solution_dict['interaction_id'], solution_dict1)
+        solution_dict['interaction_id'], solution_dict1))
 
         answer_group_list2 = [{
             'rule_specs': [{

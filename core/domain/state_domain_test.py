@@ -1346,7 +1346,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             Exception, 'Expected argument to be a object'):
             exploration.init_state.update_interaction_solution(
-                Solution.from_dict(self.interaction.id, []))
+                state_domain.Solution.from_dict(self.interaction.id, []))
 
     def test_update_interaction_solution_with_no_solution(self):
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
