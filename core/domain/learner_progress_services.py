@@ -97,13 +97,20 @@ def _save_completed_activities(activities_completed):
         activities_completed: CompletedActivities. The activities
             completed domain object to be saved in the datastore.
     """
-    completed_activities_model = user_models.CompletedActivitiesModel(
-        id=activities_completed.id,
-        exploration_ids=(
+    activities_completed_dict = {
+        'exploration_ids': (
             activities_completed.exploration_ids),
-        collection_ids=activities_completed.collection_ids)
+        'collection_ids': activities_completed.collection_ids
+    }
 
-    completed_activities_model.put()
+    completed_activities_model = (
+        user_models.CompletedActivitiesModel.get_by_id(activities_completed.id))
+    if completed_activities_model is not None:
+        completed_activities_model.populate(**activities_completed_dict)
+        completed_activities_model.put()
+    else:
+        activities_completed_dict['id'] = activities_completed.id
+        user_models.CompletedActivitiesModel(**activities_completed_dict).put()
 
 
 def _save_incomplete_activities(incomplete_activities):
