@@ -1470,41 +1470,36 @@ class ContentMigrationTests(test_utils.GenericTestBase):
     def test_add_math_content_to_math_rte_components(self):
         test_cases = [{
             'html_content': (
-                '<p>Feedback</p><oppia-noninteractive-math '
-                'raw_latex-with-value="&amp;quot;+,-,-,+&amp;quot;">'
-                '</oppia-noninteractive-math>'
+                '<p>Feedback</p><oppia-noninteractive-math raw_latex-with-valu'
+                'e="&amp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>'
             ),
             'expected_output': (
-                '<p>Feedback</p><oppia-noninteractive-'
-                'math math_content-with-value="{&amp;quot'
-                ';raw_latex&amp;quot;: &amp;quot;+,-,-,+'
-                '&amp;quot;, &amp;quot;svg_filename&amp;'
-                'quot;: &amp;quot;&amp;quot;}"></oppia-noninteractive-math>'
+                '<p>Feedback</p><oppia-noninteractive-math math_content-with-v'
+                'alue="{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+'
+                '&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot;&amp'
+                ';quot;}"></oppia-noninteractive-math>'
             )
         }, {
             'html_content': (
-                '<oppia-noninteractive-math raw_latex-with-value='
-                '"&amp;quot;+,+,+,+&amp;quot;">'
-                '</oppia-noninteractive-math>'
+                '<oppia-noninteractive-math raw_latex-with-value="&amp;quot;+,'
+                '+,+,+&amp;quot;"></oppia-noninteractive-math>'
             ),
             'expected_output': (
-                '<oppia-noninteractive-math math_content-with-'
-                'value="{&amp;quot;raw_latex&amp;quot;: &amp;'
-                'quot;+,+,+,+&amp;quot;, &amp;quot;'
-                'svg_filename&amp;quot;: &amp;quot;&amp;'
-                'quot;}"></oppia-noninteractive-math>'
+                '<oppia-noninteractive-math math_content-with-value="{&amp;'
+                'quot;raw_latex&amp;quot;: &amp;quot;+,+,+,+&amp;quot;, &amp;'
+                'quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
+                '-noninteractive-math>'
             )
         }, {
             'html_content': (
-                '<oppia-noninteractive-math raw_latex-with-value='
-                '"&amp;quot;(x - a_1)(x - a_2)(x - a_3)...(x - '
-                'a_n)&amp;quot;"></oppia-noninteractive-math>'
+                '<oppia-noninteractive-math raw_latex-with-value="&amp;quot;'
+                '(x - a_1)(x - a_2)(x - a_3)...(x - a_n)&amp;quot;"></oppia-'
+                'noninteractive-math>'
             ),
             'expected_output': (
-                '<oppia-noninteractive-math math_content-with-'
-                'value="{&amp;quot;raw_latex&amp;quot;: &amp;'
-                'quot;(x - a_1)(x - a_2)(x - a_3)...(x - a_n)'
-                '&amp;quot;, &amp;quot;svg_filename&amp;quot;'
+                '<oppia-noninteractive-math math_content-with-value="{&amp;q'
+                'uot;raw_latex&amp;quot;: &amp;quot;(x - a_1)(x - a_2)(x - a'
+                '_3)...(x - a_n)&amp;quot;, &amp;quot;svg_filename&amp;quot;'
                 ': &amp;quot;&amp;quot;}"></oppia-noninteractive-math>'
             )
         }, {
@@ -1512,17 +1507,15 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             'expected_output': ('')
         }, {
             'html_content': (
-                '<oppia-noninteractive-math math_content-with-'
-                'value="{&amp;quot;raw_latex&amp;quot;: &amp;'
-                'quot;(x - a_1)(x - a_2)(x - a_3)...(x - a_n)'
-                '&amp;quot;, &amp;quot;svg_filename&amp;quot;'
+                '<oppia-noninteractive-math math_content-with-value="{&amp;qu'
+                'ot;raw_latex&amp;quot;: &amp;quot;(x - a_1)(x - a_2)(x - a_3)'
+                '...(x - a_n)&amp;quot;, &amp;quot;svg_filename&amp;quot;'
                 ': &amp;quot;&amp;quot;}"></oppia-noninteractive-math>'
             ),
             'expected_output': (
-                '<oppia-noninteractive-math math_content-with-'
-                'value="{&amp;quot;raw_latex&amp;quot;: &amp;'
-                'quot;(x - a_1)(x - a_2)(x - a_3)...(x - a_n)'
-                '&amp;quot;, &amp;quot;svg_filename&amp;quot;'
+                '<oppia-noninteractive-math math_content-with-value="{&amp;q'
+                'uot;raw_latex&amp;quot;: &amp;quot;(x - a_1)(x - a_2)(x - a'
+                '_3)...(x - a_n)&amp;quot;, &amp;quot;svg_filename&amp;quot;'
                 ': &amp;quot;&amp;quot;}"></oppia-noninteractive-math>'
             )
         }]

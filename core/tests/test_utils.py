@@ -428,12 +428,10 @@ class TestBase(unittest.TestCase):
     VERSION_4_STORY_CONTENTS_DICT = {
         'nodes': [{
             'outline': (
-                '<p>Value</p><oppia-noninteractive-' +
-                'math math_content-with-value="{&amp;quot' +
-                ';raw_latex&amp;quot;: &amp;quot;+,-,-,+' +
-                '&amp;quot;, &amp;quot;svg_filename&amp;' +
-                'quot;: &amp;quot;&amp;quot;}"></oppia' +
-                '-noninteractive-math>'),
+                '<p>Value</p><oppia-noninteractive-'
+                'math math_content-with-value="{&amp;quot;raw_latex&amp;quot;'
+                ': &amp;quot;+,-,-,+&amp;quot;, &amp;quot;svg_filename&amp;'
+                'quot;: &amp;quot;&amp;quot;}"></oppia-noninteractive-math>'),
             'exploration_id': None,
             'destination_node_ids': [],
             'outline_is_finalized': False,

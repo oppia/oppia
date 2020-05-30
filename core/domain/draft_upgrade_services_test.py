@@ -129,13 +129,13 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
 
     def test_convert_states_v33_dict_to_v34_dict(self):
         html_content = (
-            '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&a' +
+            '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&a'
             'mp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>')
 
         expected_html_content = (
-            '<p>Value</p><oppia-noninteractive-math math_content-with-value=' +
-            '"{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;, &' +
-            'amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia' +
+            '<p>Value</p><oppia-noninteractive-math math_content-with-value='
+            '"{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;, &'
+            'amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
             '-noninteractive-math>')
 
         draft_change_list = [

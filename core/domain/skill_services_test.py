@@ -1018,13 +1018,13 @@ class SkillMigrationTests(test_utils.GenericTestBase):
         })
         explanation_content_id = feconf.DEFAULT_SKILL_EXPLANATION_CONTENT_ID
         html_content = (
-            '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&a' +
+            '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&a'
             'mp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>')
 
         expected_html_content = (
-            '<p>Value</p><oppia-noninteractive-math math_content-with-value=' +
-            '"{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;, &' +
-            'amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia' +
+            '<p>Value</p><oppia-noninteractive-math math_content-with-value='
+            '"{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;, &'
+            'amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
             '-noninteractive-math>')
 
         written_translations_dict = {
@@ -1138,13 +1138,13 @@ class SkillMigrationTests(test_utils.GenericTestBase):
         })
         explanation_content_id = feconf.DEFAULT_SKILL_EXPLANATION_CONTENT_ID
         html_content = (
-            '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&a' +
+            '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&a'
             'mp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>')
 
         expected_html_content = (
-            '<p>Value</p><oppia-noninteractive-math math_content-with-value=' +
-            '"{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;, &' +
-            'amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia' +
+            '<p>Value</p><oppia-noninteractive-math math_content-with-value='
+            '"{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;, &'
+            'amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
             '-noninteractive-math>')
 
         skill_contents = skill_domain.SkillContents(
@@ -1200,12 +1200,12 @@ class SkillMigrationTests(test_utils.GenericTestBase):
         })
         explanation_content_id = feconf.DEFAULT_SKILL_EXPLANATION_CONTENT_ID
         html_content = (
-            '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&a' +
+            '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&a'
             'mp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>')
         expected_html_content = (
-            '<p>Value</p><oppia-noninteractive-math math_content-with-value=' +
-            '"{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;, &' +
-            'amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia' +
+            '<p>Value</p><oppia-noninteractive-math math_content-with-value='
+            '"{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;, &'
+            'amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
             '-noninteractive-math>')
         skill_contents = skill_domain.SkillContents(
             state_domain.SubtitledHtml(

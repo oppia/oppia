@@ -69,9 +69,9 @@ class SuggestionMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
         there is single exploration.
         """
         html_content = (
-            '<p>Value</p><oppia-noninteractive-math math_content-with-value=' +
-            '"{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;, &' +
-            'amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia' +
+            '<p>Value</p><oppia-noninteractive-math math_content-with-value='
+            '"{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;, &'
+            'amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
             '-noninteractive-math>')
 
         state_dict = {
@@ -505,12 +505,12 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
             False)
         exp_services.save_new_exploration(self.author_id, exploration)
         html_content = (
-            '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&a' +
+            '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&a'
             'mp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>')
         expected_html_content = (
-            '<p>Value</p><oppia-noninteractive-math math_content-with-value=' +
-            '"{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;, &' +
-            'amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia' +
+            '<p>Value</p><oppia-noninteractive-math math_content-with-value='
+            '"{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;, &'
+            'amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
             '-noninteractive-math>')
         add_translation_change_dict = {
             'cmd': 'add_translation',
@@ -681,7 +681,7 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
 
     def test_migration_skips_suggestions_failing_validation(self):
         html_content = (
-            '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&a' +
+            '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&a'
             'mp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>')
         answer_group = {
             'outcome': {
@@ -829,7 +829,7 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
 
     def test_yield_validation_error_after_migration(self):
         html_content = (
-            '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&a' +
+            '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&a'
             'mp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>')
         answer_group = {
             'outcome': {

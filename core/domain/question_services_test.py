@@ -977,7 +977,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
 
     def test_migrate_question_state_from_v33_to_v34(self):
         feedback_html_content = (
-            '<p>Feedback</p><oppia-noninteractive-math raw_latex-with-value="' +
+            '<p>Feedback</p><oppia-noninteractive-math raw_latex-with-value="'
             '&amp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>')
         answer_group = {
             'outcome': {
@@ -1049,9 +1049,9 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             'classifier_model_id': None
         }
         expected_feeedback_html_content = (
-            '<p>Feedback</p><oppia-noninteractive-math math_content-with-val' +
-            'ue="{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;,' +
-            ' &amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppi' +
+            '<p>Feedback</p><oppia-noninteractive-math math_content-with-val'
+            'ue="{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;,'
+            ' &amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppi'
             'a-noninteractive-math>')
         question_model = (
             question_models.QuestionModel(
