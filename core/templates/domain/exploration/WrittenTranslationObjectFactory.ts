@@ -20,6 +20,11 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
+export interface ITranslationBackendDict {
+  'html': string;
+  'needs_update': boolean;
+}
+
 export class WrittenTranslation {
   html: string;
   needsUpdate: boolean;
@@ -39,10 +44,8 @@ export class WrittenTranslation {
   toggleNeedsUpdateAttribute(): void {
     this.needsUpdate = !this.needsUpdate;
   }
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because the return type is a dict with underscore_cased keys which
-  // gives tslint errors against underscore_casing in favor of camelCasing.
-  toBackendDict(): any {
+
+  toBackendDict(): ITranslationBackendDict {
     return {
       html: this.html,
       needs_update: this.needsUpdate
@@ -57,11 +60,8 @@ export class WrittenTranslationObjectFactory {
   createNew(html: string): WrittenTranslation {
     return new WrittenTranslation(html, false);
   }
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'translationBackendDict' is a dict with underscore_cased keys
-  // which gives tslint errors against underscore_casing in favor of
-  // camelCasing.
-  createFromBackendDict(translationBackendDict: any) {
+
+  createFromBackendDict(translationBackendDict: ITranslationBackendDict) {
     return new WrittenTranslation(
       translationBackendDict.html,
       translationBackendDict.needs_update);
