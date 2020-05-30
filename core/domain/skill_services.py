@@ -352,20 +352,8 @@ def get_image_filenames_from_skill(skill):
     Returns:
        list(str). List containing the name of the image files in skill.
     """
-    filenames = []
-
     html_list = skill.get_all_html_content_strings()
-    rte_components_in_skill = []
-    for html_string in html_list:
-        rte_components_in_skill.extend(
-            html_cleaner.get_rte_components(html_string))
-
-    for rte_comp in rte_components_in_skill:
-        if 'id' in rte_comp and rte_comp['id'] == 'oppia-noninteractive-image':
-            filenames.append(
-                rte_comp['customization_args']['filepath-with-value'])
-
-    return filenames
+    return html_cleaner.get_image_filenames_from_html_strings(html_list)
 
 
 def get_skill_by_id(skill_id, strict=True, version=None):
