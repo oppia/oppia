@@ -405,7 +405,6 @@
 	"I18N_SIGNUP_EMAIL_PREFERENCES_EXPLAIN": "आप अपनी प्राथमिकता पेज से किसी भी समय इस सेटिंग को बदल सकते हैं।",
 	"I18N_SIGNUP_ERROR_MUST_AGREE_TO_TERMS": "इस साइट पर एक्सप्लोरेशन्स को संपादित करने के लिए, आपको साइट के शर्तों से सहमत होना पड़ेगा।",
 	"I18N_SIGNUP_ERROR_NO_USERNAME": "कृपया उपयोगकर्तानाम डालें।",
-	"I18N_SIGNUP_ERROR_USERNAME_MORE_50_CHARS": "एक उपयोगकर्ता का नाम ज्यादा से ज्यादा 50 अक्षर का हो सकता है।",
 	"I18N_SIGNUP_ERROR_USERNAME_NOT_AVAILABLE": "यह उपयोगकर्ता नाम उपलब्ध नहीं है।",
 	"I18N_SIGNUP_ERROR_USERNAME_ONLY_ALPHANUM": "उपयोगकर्ता के नाम में केवल अल्फान्यूमेरिक अक्षर हो सकता है।",
 	"I18N_SIGNUP_ERROR_USERNAME_TAKEN": "क्षमा करें, यह उपयोगकर्ता नाम पहले ही ले लिया जा चूका है।",

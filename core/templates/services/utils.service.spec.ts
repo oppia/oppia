@@ -47,4 +47,25 @@ describe('Utils Service', () => {
     expect(uts.isString(null)).toEqual(false);
     expect(uts.isString({})).toEqual(false);
   });
+
+  it('should check if the input is an error', () => {
+    // A custom Error.
+    var NotImplementedError = function(message) {
+      this.name = 'NotImplementedError';
+      this.message = (message || '');
+    };
+    NotImplementedError.prototype = Error.prototype;
+    expect(uts.isError(new Error())).toBeTrue();
+    expect(uts.isError(new NotImplementedError('abc'))).toBeTrue();
+    expect(uts.isError(new DOMException('abc'))).toBeTrue();
+    expect(uts.isError(12)).toBeFalse();
+    expect(uts.isError(undefined)).toBeFalse();
+    expect(uts.isError('abc')).toBeFalse();
+    expect(uts.isError(NaN)).toBeFalse();
+    expect(uts.isError({})).toBeFalse();
+    expect(uts.isError({
+      a: 'b'
+    })).toBeFalse();
+    expect(uts.isError(null)).toBeFalse();
+  });
 });
