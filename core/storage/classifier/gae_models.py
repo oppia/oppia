@@ -164,6 +164,7 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
         Args:
             cursor: str or None. The list of returned entities starts from this
                 datastore cursor.
+
         Returns:
             List of the ClassifierTrainingJobModels with status new or pending.
         """

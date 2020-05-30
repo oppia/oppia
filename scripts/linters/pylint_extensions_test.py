@@ -1731,6 +1731,8 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
         with python_utils.open_file(filename, 'w') as tmp:
             tmp.write(
                 u"""# variable_name is used.
+                \"\"\"This is a docstring.\"\"\"
+                # variable_name is used.
                 """)
         node_variable_name_in_comment.file = filename
         node_variable_name_in_comment.path = filename
