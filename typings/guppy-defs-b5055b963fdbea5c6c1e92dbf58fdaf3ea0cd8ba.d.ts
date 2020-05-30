@@ -72,6 +72,10 @@ class Guppy {
   constructor(id: string, config: GuppyConfig);
 }
 
+class GuppyOSK {
+  constructor(config: GuppyConfig);
+}
+
 namespace Guppy {
   export function init(config: GuppyInitConfig): void;
   export let instances: Object;
@@ -94,4 +98,5 @@ namespace Guppy {
   export let ready: boolean;
   export function register_keyboard_handlers(): void;
   export function remove_global_symbol(name: string): void;
+  export function use_osk(GuppyOSK): void;
 }

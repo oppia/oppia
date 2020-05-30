@@ -30,16 +30,20 @@ angular.module('oppia').directive('mathEditor', [
       },
       template: require('./math-editor.directive.html'),
       controllerAs: '$ctrl',
-      controller: ['$scope', '$element', function($scope, $element) {
+      controller: ['$element', function($element) {
         var ctrl = this;
+        var guppyDivElt, guppyDivId, guppyInstance: Guppy;
+
         ctrl.$onInit = function() {
           ctrl.alwaysEditable = true;
-          new Guppy("guppy1", {
-            settings: {
-              empty_content: 'hey',
-              buttons: ["settings"]
-            }
-          });
+
+          guppyDivElt = $element[0].querySelector('.guppy-div');
+          // Dynamically assigns a unique id to the guppy-div
+          guppyDivElt.setAttribute(
+            'id', 'guppy_' + Math.floor(Math.random() * 100000000));
+          guppyDivId = guppyDivElt.id;
+          guppyInstance = new Guppy(guppyDivId, {});
+          guppyInstance.render();
         };
       }]
     };

@@ -203,6 +203,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'logic-question-editor.directive.ts',
     'login-required-message.directive.ts',
     'maintenance-page.controller.ts',
+    'math-editor.directive.ts',
     'math-expression-input-rules.service.ts',
     'math-expression-input-validation.service.ts',
     'math-latex-string-editor.directive.ts',
