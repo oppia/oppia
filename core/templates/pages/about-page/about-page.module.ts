@@ -31,8 +31,11 @@ import { BrowserModule } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { AboutPageComponent } from './about-page.component';
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { SharedComponentsModule } from 'components/shared-component.module';
+import { TranslatePipe } from 'filters/translate.pipe';
+
 // This component is needed to force-bootstrap Angular at the beginning of the
 // app.
 @Component({
@@ -54,10 +57,13 @@ import { ObjectsDomainConstants } from
     SharedComponentsModule
   ],
   declarations: [
-    ServiceBootstrapComponent
+    ServiceBootstrapComponent,
+    AboutPageComponent,
+    TranslatePipe
   ],
   entryComponents: [
-    ServiceBootstrapComponent
+    ServiceBootstrapComponent,
+    AboutPageComponent
   ],
   providers: [
     AppConstants,
