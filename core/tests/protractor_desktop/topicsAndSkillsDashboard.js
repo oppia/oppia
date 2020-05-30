@@ -56,41 +56,41 @@ describe('Topics and skills dashboard functionality', function() {
     await topicsAndSkillsDashboardPage.createTopic(
       'Topic 1', 'Topic 1 description', 'Mathematics', true);
 
-    topicsAndSkillsDashboardPage.get();
-    topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(1);
-    topicsAndSkillsDashboardPage.deleteTopicWithIndex(0);
-    topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(0);
+    await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(1);
+    await topicsAndSkillsDashboardPage.deleteTopicWithIndex(0);
+    await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(0);
   });
 
-  it('should filter the topics', function() {
-    topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(0);
-    topicsAndSkillsDashboardPage.createTopic(
+  it('should filter the topics', async function() {
+    await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(0);
+    await topicsAndSkillsDashboardPage.createTopic(
       'Alpha', 'Alpha description', 'Mathematics', true);
-    topicsAndSkillsDashboardPage.get();
-    topicsAndSkillsDashboardPage.createTopic(
+    await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.createTopic(
       'Beta', 'Beta description', 'Mathematics', true);
 
-    topicsAndSkillsDashboardPage.get();
-    topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(2);
-    topicsAndSkillsDashboardPage.filterTopicsByKeyword('alp');
-    topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(1);
-    topicsAndSkillsDashboardPage.resetTopicFilters();
-    topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(2);
+    await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(2);
+    await topicsAndSkillsDashboardPage.filterTopicsByKeyword('alp');
+    await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(1);
+    await topicsAndSkillsDashboardPage.resetTopicFilters();
+    await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(2);
 
-    topicsAndSkillsDashboardPage.filterTopicsByKeyword('be');
-    topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(1);
-    topicsAndSkillsDashboardPage.resetTopicFilters();
-    topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(2);
+    await topicsAndSkillsDashboardPage.filterTopicsByKeyword('be');
+    await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(1);
+    await topicsAndSkillsDashboardPage.resetTopicFilters();
+    await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(2);
 
-    topicsAndSkillsDashboardPage.filterTopicsByCategory('Mathematics');
-    topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(2);
-    topicsAndSkillsDashboardPage.resetTopicFilters();
+    await topicsAndSkillsDashboardPage.filterTopicsByCategory('Mathematics');
+    await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(2);
+    await topicsAndSkillsDashboardPage.resetTopicFilters();
 
-    topicsAndSkillsDashboardPage.filterTopicsByKeyword('gamma');
-    topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(0);
-    topicsAndSkillsDashboardPage.resetTopicFilters();
+    await topicsAndSkillsDashboardPage.filterTopicsByKeyword('gamma');
+    await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(0);
+    await topicsAndSkillsDashboardPage.resetTopicFilters();
 
-    topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(2);
+    await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(2);
   });
 
   it('should move published skill to unused skills section', async function() {

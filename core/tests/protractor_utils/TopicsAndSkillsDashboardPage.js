@@ -130,25 +130,19 @@ var TopicsAndSkillsDashboardPage = function() {
   };
 
   this.navigateToTopicWithIndex = async function(index) {
-    var elem = await topicsListItems.get(index);
-    await waitFor.elementToBeClickable(
-      elem, 'Topic taking too long to be clickable');
-    await elem.click();
-  this.navigateToTopicWithIndex = function(index) {
-    waitFor.visibilityOf(topicsTable,
+    await waitFor.visibilityOf(topicsTable,
       'Topic table taking too long to appear.');
-    element.all(
-      by.css('.protractor-test-topic-edit-box')).then((elems) => {
-      var editTopicButton = element(
-        by.css('.protractor-test-edit-topic-button'));
-      var topicEditOptionBox = elems[index];
-      browser.actions().mouseMove(topicEditOptionBox).perform();
-      waitFor.elementToBeClickable(
-        editTopicButton,
-        'Edit Topic button takes too long to be clickable');
-      editTopicButton.click();
-      waitFor.pageToFullyLoad();
-    });
+    var topicEditOptions = await element.all(
+      by.css('.protractor-test-topic-edit-box'));
+    var editTopicButton = element(
+      by.css('.protractor-test-edit-topic-button'));
+    var topicEditOptionBox = topicEditOptions[index];
+    await browser.actions().mouseMove(topicEditOptionBox).perform();
+    await waitFor.elementToBeClickable(
+      editTopicButton,
+      'Edit Topic button takes too long to be clickable');
+    await editTopicButton.click();
+    await waitFor.pageToFullyLoad();
   };
 
   this.assignSkillWithIndexToTopic = async function(index, topicIndex) {
@@ -189,90 +183,99 @@ var TopicsAndSkillsDashboardPage = function() {
     }
   };
 
-  this.createTopic = async function(topicName, shouldCloseTopicEditor) {
-  this.createTopic = function(
+  this.createTopic = async function(
       topicName, description, category, shouldCloseTopicEditor) {
     var initialHandles = [];
-    return browser.getAllWindowHandles().then(function(handles) {
-      initialHandles = handles;
-      return browser.getWindowHandle();
-    }).then(function(parentHandle) {
-      waitFor.elementToBeClickable(
-        createTopicButton,
-        'Create Topic button takes too long to be clickable');
-      createTopicButton.click();
-      topicNameField.sendKeys(topicName);
-      topicDescriptionField.sendKeys(description);
-      topicCategoryField.click();
-      browser.driver.switchTo().activeElement().sendKeys(category + '\n');
-      confirmTopicCreationButton.click();
+    var handles = await browser.getAllWindowHandles();
+    initialHandles = handles;
+    var parentHandle = await browser.getWindowHandle();
+    await waitFor.elementToBeClickable(
+      createTopicButton,
+      'Create Topic button takes too long to be clickable');
+    await createTopicButton.click();
+    await waitFor.visibilityOf(
+      topicNameField,
+      'Create Topic modal takes too long to appear.');
+    await topicNameField.sendKeys(topicName);
+    await topicDescriptionField.sendKeys(description);
+    await topicCategoryField.click();
+    await browser.driver.switchTo().activeElement().sendKeys(category + '\n');
+    await confirmTopicCreationButton.click();
 
-      waitFor.newTabToBeCreated(
-        'Creating topic takes too long', '/topic_editor/');
-      return browser.getAllWindowHandles().then(function(handles) {
-        var newHandle = handles.filter(
-          handle => initialHandles.indexOf(handle) === -1)[0];
-        browser.switchTo().window(newHandle).then(function() {
-          if (shouldCloseTopicEditor) {
-            browser.driver.close();
-            return browser.switchTo().window(parentHandle);
-          }
-          return waitFor.pageToFullyLoad();
-        });
-      });
-    });
+    await waitFor.newTabToBeCreated(
+      'Creating topic takes too long', '/topic_editor/');
+    handles = await browser.getAllWindowHandles();
+
+    var newHandle = null;
+    for (var i = 0; i < handles.length; i++) {
+      if (initialHandles.indexOf(handles[i]) === -1) {
+        newHandle = handles[i];
+        break;
+      }
+    }
+    await browser.switchTo().window(newHandle);
+    if (shouldCloseTopicEditor) {
+      await browser.driver.close();
+      await browser.switchTo().window(parentHandle);
+      await waitFor.invisibilityOf(
+        confirmTopicCreationButton,
+        'Create Topic modal takes too long to disappear.');
+    } else {
+      await waitFor.visibilityOf(
+        element(by.css('.protractor-test-topic-name-field')),
+        'Topic Editor is taking too long to appear.');
+    }
+    return await waitFor.pageToFullyLoad();
   };
 
-  this.filterTopicsByKeyword = function(keyword) {
-    waitFor.visibilityOf(
+  this.filterTopicsByKeyword = async function(keyword) {
+    await waitFor.visibilityOf(
       topicFilterKeywordField,
       'Topic Dashboard keyword filter parent taking too long to appear.');
     var filterKeywordInput = topicFilterKeywordField.element(
       by.css('.select2-search__field'));
-    waitFor.visibilityOf(
+    await waitFor.visibilityOf(
       filterKeywordInput,
       'Topic Dashboard keyword filter taking too long to appear.');
 
-    filterKeywordInput.click();
-    filterKeywordInput.sendKeys(keyword);
-    filterKeywordInput.sendKeys(protractor.Key.RETURN);
+    await filterKeywordInput.click();
+    await filterKeywordInput.sendKeys(keyword);
+    await filterKeywordInput.sendKeys(protractor.Key.RETURN);
   };
 
-  this.filterTopicsByCategory = function(keyword) {
-    waitFor.visibilityOf(
+  this.filterTopicsByCategory = async function(keyword) {
+    await waitFor.visibilityOf(
       topicFilterCategoryField,
       'Topic Dashboard category taking too long to appear.');
 
-    topicFilterCategoryField.click();
-    browser.driver.switchTo().activeElement().sendKeys(keyword + '\n');
+    await topicFilterCategoryField.click();
+    await browser.driver.switchTo().activeElement().sendKeys(keyword + '\n');
   };
 
-  this.resetTopicFilters = function() {
-    waitFor.visibilityOf(
+  this.resetTopicFilters = async function() {
+    await waitFor.visibilityOf(
       topicResetFilters, 'Reset button taking too long to be clickable');
-    topicResetFilters.click();
+    await topicResetFilters.click();
   };
 
-  this.deleteTopicWithIndex = function(index) {
-    waitFor.visibilityOf(topicsTable,
+  this.deleteTopicWithIndex = async function(index) {
+    await waitFor.visibilityOf(topicsTable,
       'Topic table taking too long to appear.');
-    element.all(
-      by.css('.protractor-test-topic-edit-box')).then((elems) => {
-      var deleteTopicButton = element(
-        by.css('.protractor-test-delete-topic-button'));
-      var topicEditOptionBox = elems[index];
-      browser.actions().mouseMove(topicEditOptionBox).perform();
-      waitFor.elementToBeClickable(
-        deleteTopicButton,
-        'Delete Topic button takes too long to be clickable');
-      deleteTopicButton.click();
-      waitFor.elementToBeClickable(
-        confirmTopicDeletionButton,
-        'Confirm Delete Topic button takes too long to be clickable');
-      confirmTopicDeletionButton.click();
-      this.get();
-      waitFor.pageToFullyLoad();
-    });
+    var topics = await element.all(by.css('.protractor-test-topic-edit-box'));
+    var deleteTopicButton = element(
+      by.css('.protractor-test-delete-topic-button'));
+    var topicEditOptionBox = topics[index];
+    await browser.actions().mouseMove(topicEditOptionBox).perform();
+    await waitFor.elementToBeClickable(
+      deleteTopicButton,
+      'Delete Topic button takes too long to be clickable');
+    await deleteTopicButton.click();
+    await waitFor.elementToBeClickable(
+      confirmTopicDeletionButton,
+      'Confirm Delete Topic button takes too long to be clickable');
+    await confirmTopicDeletionButton.click();
+    await this.get();
+    await waitFor.pageToFullyLoad();
   };
 
   this.deleteSkillWithIndex = async function(index) {
@@ -370,16 +373,15 @@ var TopicsAndSkillsDashboardPage = function() {
     expect(await topicNames.get(index).getText()).toEqual(topicName);
   };
 
-  this.editTopic = function(topicName) {
-    waitFor.visibilityOf(topicsTable,
+  this.editTopic = async function(topicName) {
+    await waitFor.visibilityOf(topicsTable,
       'Topic table taking too long to appear.');
-    topicNames.then((topics)=> {
-      topics.forEach((topic, index) => {
-        topic.getText().then((name) => {
-          if (topicName === name) {
-            this.navigateToTopicWithIndex(index);
-          }
-        });
+    var topics = await topicNames;
+    topics.forEach((topic, index) => {
+      topic.getText().then((name) => {
+        if (topicName === name) {
+          this.navigateToTopicWithIndex(index);
+        }
       });
     });
   };

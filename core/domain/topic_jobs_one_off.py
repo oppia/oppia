@@ -187,7 +187,7 @@ class AddCategoryToTopicOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
             'property_name': 'category',
             'new_value': 'Mathematics',
-            'old_value': 'buu'
+            'old_value': ''
         })]
         topic_services.update_topic_and_subtopic_pages(
             feconf.MIGRATION_BOT_USERNAME, item.id, commit_cmds,
