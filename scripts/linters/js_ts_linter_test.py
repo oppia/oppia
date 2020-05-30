@@ -116,10 +116,10 @@ class JsTsLintTests(test_utils.GenericTestBase):
         self.print_swap = self.swap(python_utils, 'PRINT', mock_print)
 
     def test_validate_and_parse_js_and_ts_files_with_exception(self):
-        def mock_parse_script(ununsed_file_content):
+        def mock_parse_script(unused_file_content):
             raise Exception()
         esprima_swap = self.swap(esprima, 'parseScript', mock_parse_script)
-        with self.print_swap, esprima_swap, self.assertRaises(Exception) as e:
+        with self.print_swap, esprima_swap, self.assertRaises(Exception):
             js_ts_linter.JsTsLintChecksManager(
                 [], [INVALID_ANY_TYPE_FILEPATH], FILE_CACHE,
                 True).perform_all_lint_checks()
@@ -268,7 +268,7 @@ class JsTsLintTests(test_utils.GenericTestBase):
         self.assertTrue(
             appears_in_linter_stdout(
                 ['You have an error in your DI configuration. Each items of '
-                'the array should match exactly one function parameter'],
+                 'the array should match exactly one function parameter'],
                 self.linter_stdout))
 
     def test_third_party_linter_with_stderr(self):
@@ -308,7 +308,8 @@ class JsTsLintTests(test_utils.GenericTestBase):
 
     def test_get_linters(self):
         custom_linter, third_party = js_ts_linter.get_linters(
-            [VALID_JS_FILEPATH], [VALID_TS_FILEPATH], FILE_CACHE, True)
+            [VALID_JS_FILEPATH], [VALID_TS_FILEPATH], FILE_CACHE,
+            verbose_mode_enabled=True)
         self.assertTrue(
             isinstance(custom_linter, js_ts_linter.JsTsLintChecksManager))
         self.assertTrue(
