@@ -204,13 +204,13 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'correct_answer': 'helloworld!',
             'explanation': {
                 'content_id': 'solution',
-        'html': (
-            '<p><oppia-noninteractive-math '
-            'raw_latex-with-value="&amp;quot;\\frac{x}{y}&amp;quot;">'
-            '</oppia-noninteractive-math></p>')
+                'html': (
+                    '<p><oppia-noninteractive-math '
+                    'raw_latex-with-value="&amp;quot;\\frac{x}{y}&amp;quot;">'
+                    '</oppia-noninteractive-math></p>')
             },
         }
-        solution = state_domain.Solution(
+        solution = state_domain.Solution.from_dict(
             init_state.interaction.id, solution_dict)
         init_state.update_interaction_solution(solution)
         self.assertFalse(init_state.is_rte_content_supported_on_android())
