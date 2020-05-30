@@ -25,20 +25,24 @@ require(
   'pages/exploration-editor-page/translation-tab/services/' +
   'translation-language.service.ts');
 require('services/alerts.service.ts');
+require('services/context.service.ts');
 
 angular.module('oppia').controller('TranslationModalController', [
   '$controller', '$scope', '$uibModalInstance', 'AlertsService',
-  'TranslateTextService', 'TranslationLanguageService', 'opportunity',
-  'userIsLoggedIn',
+  'ContextService', 'TranslateTextService', 'TranslationLanguageService',
+  'opportunity', 'userIsLoggedIn', 'ENTITY_TYPE',
   function(
       $controller, $scope, $uibModalInstance, AlertsService,
-      TranslateTextService, TranslationLanguageService, opportunity,
-      userIsLoggedIn) {
+      ContextService, TranslateTextService, TranslationLanguageService,
+      opportunity, userIsLoggedIn, ENTITY_TYPE) {
     $controller('ConfirmOrCancelModalController', {
       $scope: $scope,
       $uibModalInstance: $uibModalInstance
     });
-
+    // We need to set the context here so that the rte fetches
+    // images for the given ENTITY_TYPE and targetId.
+    ContextService.setCustomEntityContext(
+      ENTITY_TYPE.EXPLORATION, opportunity.id);
     $scope.userIsLoggedIn = userIsLoggedIn;
     $scope.uploadingTranslation = false;
     $scope.activeWrittenTranslation = {};
@@ -95,7 +99,7 @@ angular.module('oppia').controller('TranslationModalController', [
           });
       }
       if (!$scope.moreAvailable) {
-        $scope.confirm();
+        $uibModalInstance.close();
       }
     };
   }
