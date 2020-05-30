@@ -209,6 +209,10 @@ import { RubricObjectFactory } from
   'domain/skill/RubricObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 import { SVMPredictionService } from 'classifiers/svm-prediction.service';
+import { SchemaDefaultValueService } from
+  'services/schema-default-value.service';
+import { SchemaUndefinedLastElementService } from
+  'services/schema-undefined-last-element.service.ts';
 import { SidebarStatusService } from 'domain/sidebar/sidebar-status.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { SkillCreationBackendApiService } from
@@ -428,6 +432,8 @@ export class UpgradedServices {
     upgradedServices['RubricObjectFactory'] =
       new RubricObjectFactory();
     upgradedServices['RuleObjectFactory'] = new RuleObjectFactory();
+    upgradedServices['SchemaUndefinedLastElementService'] =
+      new SchemaUndefinedLastElementService();
     upgradedServices['SkillSummaryObjectFactory'] =
       new SkillSummaryObjectFactory();
     upgradedServices['SolutionValidityService'] = new SolutionValidityService();
@@ -533,6 +539,8 @@ export class UpgradedServices {
         new SkillCreationBackendApiService(upgradedServices['HttpClient']);
     upgradedServices['SVMPredictionService'] = new SVMPredictionService(
       upgradedServices['PredictionResultObjectFactory']);
+    upgradedServices['SchemaDefaultValueService'] =
+      new SchemaDefaultValueService(upgradedServices['LoggerService']);
     upgradedServices['SiteAnalyticsService'] = new SiteAnalyticsService(
       upgradedServices['WindowRef']);
     upgradedServices['StateClassifierMappingService'] =
