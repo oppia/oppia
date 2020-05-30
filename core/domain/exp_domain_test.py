@@ -716,16 +716,11 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         init_state.update_interaction_answer_groups(answer_groups_list)
         init_state.update_interaction_default_outcome(default_outcome)
         exploration.validate()
-        solution = {
-            'answer_is_exclusive': True,
-            'correct_answer': 'hello_world!',
-            'explanation': {
-                'content_id': 'solution',
-                'html': 'hello_world is a string'
-            },
-        }
-        init_state.update_interaction_solution(state_domain.Solution.from_dict(
-            self.interaction.id, solution))
+        solution = state_domain.Solution(
+                init_state.interaction.id,
+                True, 'hello_world!', state_domain.SubtitledHtml(
+                    'solution', 'hello_world is a string'))
+        init_state.update_interaction_solution(solution)
         self._assert_validation_error(
             exploration,
             re.escape('Hint(s) must be specified if solution is specified'))
@@ -1211,16 +1206,19 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         ]
         init_state.update_interaction_hints(hints_list)
 
-        solution = {
-            'answer_is_exclusive': False,
-            'correct_answer': 'helloworld!',
-            'explanation': {
-                'content_id': 'solution',
-                'html': '<p>hello_world is a string</p>'
-            },
-        }
-        init_state.update_interaction_solution(state_domain.Solution.from_dict(
-            self.interaction.id, solution))
+        # solution = {
+        #     'answer_is_exclusive': False,
+        #     'correct_answer': 'helloworld!',
+        #     'explanation': {
+        #         'content_id': 'solution',
+        #         'html': '<p>hello_world is a string</p>'
+        #     },
+        # }
+        solution = state_domain.Solution(
+                init_state.interaction.id,
+                False, 'helloworld!', state_domain.SubtitledHtml(
+                    'solution', '<p>hello_world is a string</p>'))
+        init_state.update_interaction_solution(solution)
 
         self.assertEqual(exploration.get_content_count(), 7)
 
@@ -8330,18 +8328,20 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
         ]
         state2.update_interaction_hints(hint_list2)
 
-        solution_dict1 = {
-            'interaction_id': '',
-            'answer_is_exclusive': True,
-            'correct_answer': 'Answer1',
-            'explanation': {
-                'content_id': 'solution',
-                'html': '<p>This is solution for state1</p>'
-            }
-        }
-
-        state1.update_interaction_solution(state_domain.Solution.from_dict(
-            solution_dict1['interaction_id'], solution_dict1))
+        # solution_dict1 = {
+        #     'interaction_id': '',
+        #     'answer_is_exclusive': True,
+        #     'correct_answer': 'Answer1',
+        #     'explanation': {
+        #         'content_id': 'solution',
+        #         'html': '<p>This is solution for state1</p>'
+        #     }
+        # }
+        solution = state_domain.Solution(
+                state1.interaction.id,
+                True, 'Answer1', state_domain.SubtitledHtml(
+                    'solution', '<p>This is solution for state1</p>'))
+        state1.update_interaction_solution(solution)
 
         answer_group_list2 = [{
             'rule_specs': [{

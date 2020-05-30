@@ -199,24 +199,29 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         init_state = exploration.states[exploration.init_state_name]
         init_state.update_interaction_id('TextInput')
-        solution_dict = {
-            'answer_is_exclusive': False,
-            'correct_answer': 'helloworld!',
-            'explanation': {
-                'content_id': 'solution',
-                'html': (
-                    '<p><oppia-noninteractive-math '
+        # solution_dict = {
+        #     'answer_is_exclusive': False,
+        #     'correct_answer': 'helloworld!',
+        #     'explanation': {
+        #         'content_id': 'solution',
+        # 'html': (
+        #     '<p><oppia-noninteractive-math '
+        #     'raw_latex-with-value="&amp;quot;\\frac{x}{y}&amp;quot;">'
+        #     '</oppia-noninteractive-math></p>')
+        #     },
+        # }
+        solution = state_domain.Solution(
+                init_state.interaction.id, False,
+                'helloworld!', state_domain.SubtitledHtml(
+                    'solution', '<p><oppia-noninteractive-math '
                     'raw_latex-with-value="&amp;quot;\\frac{x}{y}&amp;quot;">'
-                    '</oppia-noninteractive-math></p>')
-            },
-        }
-
-        init_state.update_interaction_solution(state_domain.Solution.from_dict(
-            self.interaction.id, solution_dict))
+                    '</oppia-noninteractive-math></p>'))
+        init_state.update_interaction_solution(solution)
         self.assertFalse(init_state.is_rte_content_supported_on_android())
         solution_dict['explanation']['html'] = ''
-        init_state.update_interaction_solution(state_domain.Solution.from_dict(
-            self.interaction.id, solution_dict))
+        init_state.update_interaction_solution(
+            state_domain.Solution.from_dict(
+                init_state.interaction.id, solution_dict))
         self.assertTrue(init_state.is_rte_content_supported_on_android())
 
         hints_list = []
@@ -444,7 +449,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         }
 
         init_state.update_interaction_solution(
-            state_domain.Solution.from_dict(self.interaction.id, solution_dict))
+            state_domain.Solution.from_dict(
+                init_state.interaction.id, solution_dict))
 
         written_translations_dict = {
             'translations_mapping': {
@@ -873,7 +879,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         }
 
         init_state.update_interaction_solution(
-            state_domain.Solution.from_dict(self.interaction.id, solution_dict))
+            state_domain.Solution.from_dict(
+                init_state.interaction.id, solution_dict))
         exploration.validate()
 
         hints_list.append(
@@ -941,7 +948,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             }
         }
         init_state.update_interaction_solution(
-            state_domain.Solution.from_dict(self.interaction.id, solution))
+            state_domain.Solution.from_dict(
+                init_state.interaction.id, solution))
         exploration.validate()
 
     def test_validate_state_solicit_answer_details(self):
@@ -995,7 +1003,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         exploration.init_state.update_interaction_hints(hints_list)
         exploration.init_state.update_interaction_solution(
-            state_domain.Solution.from_dict(self.interaction.id, solution))
+            state_domain.Solution.from_dict(
+                exploration.init_state.interaction.id, solution))
         exploration.validate()
 
         solution = {
@@ -1008,7 +1017,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         }
 
         exploration.init_state.update_interaction_solution(
-            state_domain.Solution.from_dict(self.interaction.id, solution))
+            state_domain.Solution.from_dict(
+                exploration.init_state.interaction.id, solution))
         with self.assertRaisesRegexp(
             Exception, 'Expected answer_is_exclusive to be bool, received 1'):
             exploration.validate()
@@ -1112,7 +1122,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         }
 
         exploration.init_state.update_interaction_solution(
-            state_domain.Solution.from_dict(self.interaction.id, solution))
+            state_domain.Solution.from_dict(
+                exploration.init_state.interaction.id, solution))
         exploration.init_state.update_content(
             state_domain.SubtitledHtml.from_dict({
                 'content_id': 'solution',
@@ -1338,15 +1349,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         exploration.init_state.update_interaction_hints(hints_list)
         exploration.init_state.update_interaction_solution(
-            state_domain.Solution.from_dict(self.interaction.id, solution))
-
-        self.assertEqual(
-            exploration.init_state.interaction.solution.to_dict(), solution)
-
-        with self.assertRaisesRegexp(
-            Exception, 'Expected argument to be a object'):
-            exploration.init_state.update_interaction_solution(
-                state_domain.Solution.from_dict(self.interaction.id, []))
+            state_domain.Solution.from_dict(
+                exploration.init_state.interaction.id, solution))
 
     def test_update_interaction_solution_with_no_solution(self):
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')

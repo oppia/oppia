@@ -1910,7 +1910,7 @@ class State(python_utils.OBJECT):
         self._update_content_ids_in_assets(
             old_content_id_list, new_content_id_list)
 
-    def update_interaction_solution(self, sol):
+    def update_interaction_solution(self, solution):
         """Update the solution of interaction.
 
         Args:
@@ -1925,14 +1925,8 @@ class State(python_utils.OBJECT):
             old_content_id_list.append(
                 self.interaction.solution.explanation.content_id)
 
-        if sol is not None:
-            if not isinstance(sol, Solution):
-                raise Exception(
-                    'Expected argument to be a domain object, recieved %s'
-                    % sol)
-            solution_dict = sol.to_dict()
-            self.interaction.solution = Solution.from_dict(
-                self.interaction.id, solution_dict)
+        if solution:
+            self.interaction.solution = solution
             new_content_id_list.append(
                 self.interaction.solution.explanation.content_id)
         else:
