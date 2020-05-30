@@ -1113,11 +1113,10 @@ class SkillMigrationTests(test_utils.GenericTestBase):
         model.commit(
             'user_id_admin', 'skill model created', commit_cmd_dicts)
 
-        swap_skill_object = self.swap(skill_domain, 'Skill', skill_domain.Skill)
         current_schema_version_swap = self.swap(
             feconf, 'CURRENT_SKILL_CONTENTS_SCHEMA_VERSION', 2)
 
-        with swap_skill_object, current_schema_version_swap:
+        with current_schema_version_swap:
             skill = skill_services.get_skill_from_model(model)
 
         self.assertEqual(skill.skill_contents_schema_version, 2)
@@ -1247,11 +1246,10 @@ class SkillMigrationTests(test_utils.GenericTestBase):
         model.commit(
             'user_id_admin', 'skill model created', commit_cmd_dicts)
 
-        swap_skill_object = self.swap(skill_domain, 'Skill', skill_domain.Skill)
         current_schema_version_swap = self.swap(
             feconf, 'CURRENT_RUBRIC_SCHEMA_VERSION', 3)
 
-        with swap_skill_object, current_schema_version_swap:
+        with current_schema_version_swap:
             skill = skill_services.get_skill_from_model(model)
 
         self.assertEqual(skill.rubric_schema_version, 3)
