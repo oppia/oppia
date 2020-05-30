@@ -40,61 +40,66 @@ describe('rich-text components', function() {
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
   });
 
-  it('should display correctly', function() {
-    users.createUser('user@richTextComponents.com', 'userRichTextComponents');
-    users.login('user@richTextComponents.com');
+  it('should display correctly', async function() {
+    await users.createUser(
+      'user@richTextComponents.com', 'userRichTextComponents');
+    await users.login('user@richTextComponents.com');
 
-    workflow.createExploration();
+    await workflow.createExploration();
 
-    explorationEditorMainTab.setContent(function(richTextEditor) {
-      richTextEditor.appendBoldText('bold');
-      richTextEditor.appendPlainText(' ');
+    await explorationEditorMainTab.setContent(async function(richTextEditor) {
+      await richTextEditor.appendBoldText('bold');
+      await richTextEditor.appendPlainText(' ');
       // TODO(Jacob): add test for image RTE component
-      richTextEditor.addRteComponent('Link', 'http://google.com/', true);
-      richTextEditor.addRteComponent('Math', 'abc');
-      richTextEditor.addRteComponent('Video', 'M7lc1UVf-VE', 10, 100, false);
+      await richTextEditor.addRteComponent('Link', 'http://google.com/', true);
+      await richTextEditor.addRteComponent('Math', 'abc');
+      await richTextEditor.addRteComponent(
+        'Video', 'M7lc1UVf-VE', 10, 100, false);
       // We put these last as otherwise Protractor sometimes fails to scroll to
       // and click on them.
-      richTextEditor.addRteComponent(
-        'Collapsible', 'title', forms.toRichText('inner'));
-      richTextEditor.addRteComponent('Tabs', [{
+      await richTextEditor.addRteComponent(
+        'Collapsible', 'title', await forms.toRichText('inner'));
+      await richTextEditor.addRteComponent('Tabs', [{
         title: 'title 1',
-        content: forms.toRichText('contents 1')
+        content: await forms.toRichText('contents 1')
       }, {
         title: 'title 1',
-        content: forms.toRichText('contents 2')
+        content: await forms.toRichText('contents 2')
       }]);
     });
 
-    explorationEditorPage.navigateToPreviewTab();
+    await explorationEditorPage.navigateToPreviewTab();
 
-    explorationPlayerPage.expectContentToMatch(function(richTextChecker) {
-      richTextChecker.readBoldText('bold');
-      richTextChecker.readPlainText(' ');
-      richTextChecker.readRteComponent('Link', 'http://google.com/', true);
-      richTextChecker.readRteComponent('Math', 'abc');
-      richTextChecker.readRteComponent('Video', 'M7lc1UVf-VE', 10, 100, false);
-      richTextChecker.readRteComponent(
-        'Collapsible', 'title', forms.toRichText('inner'));
-      richTextChecker.readRteComponent('Tabs', [{
-        title: 'title 1',
-        content: forms.toRichText('contents 1')
-      }, {
-        title: 'title 1',
-        content: forms.toRichText('contents 2')
-      }]);
-    });
+    await explorationPlayerPage.expectContentToMatch(
+      async function(richTextChecker) {
+        await richTextChecker.readBoldText('bold');
+        await richTextChecker.readPlainText(' ');
+        await richTextChecker.readRteComponent(
+          'Link', 'http://google.com/', true);
+        await richTextChecker.readRteComponent('Math', 'abc');
+        await richTextChecker.readRteComponent(
+          'Video', 'M7lc1UVf-VE', 10, 100, false);
+        await richTextChecker.readRteComponent(
+          'Collapsible', 'title', await forms.toRichText('inner'));
+        await richTextChecker.readRteComponent('Tabs', [{
+          title: 'title 1',
+          content: await forms.toRichText('contents 1')
+        }, {
+          title: 'title 1',
+          content: await forms.toRichText('contents 2')
+        }]);
+      });
 
-    explorationEditorPage.discardChanges();
-    users.logout();
+    await explorationEditorPage.discardChanges();
+    await users.logout();
   });
 
   // TODO(Jacob): Add in a test for the use of rich text inside collapsibles
   // and tabs. Previous attempts at such a test intermittently fail with the
   // rich-text checker unable to read the formatted text.
 
-  afterEach(function() {
-    general.checkForConsoleErrors([
+  afterEach(async function() {
+    await general.checkForConsoleErrors([
       // TODO(pranavsid98): This error is caused by the upgrade from Chrome 60
       // to Chrome 61. Chrome version at time of recording this is 61.0.3163.
       'chrome-extension://invalid/ - Failed to load resource: net::ERR_FAILED',
@@ -118,12 +123,13 @@ describe('Interactions', function() {
     libraryPage = new LibraryPage.LibraryPage();
   });
 
-  it('should pass their own test suites', function() {
-    users.createUser('user@interactions.com', 'userInteractions');
-    users.login('user@interactions.com');
-    workflow.createExploration();
-    explorationEditorMainTab.setStateName('first');
-    explorationEditorMainTab.setContent(forms.toRichText('some content'));
+  it('should pass their own test suites', async function() {
+    await users.createUser('user@interactions.com', 'userInteractions');
+    await users.login('user@interactions.com');
+    await workflow.createExploration();
+    await explorationEditorMainTab.setStateName('first');
+    await explorationEditorMainTab.setContent(
+      await forms.toRichText('some content'));
 
     var defaultOutcomeSet = false;
 
@@ -133,7 +139,7 @@ describe('Interactions', function() {
       for (var i = 0; i < interaction.testSuite.length; i++) {
         var test = interaction.testSuite[i];
 
-        explorationEditorMainTab.setInteraction.apply(
+        await explorationEditorMainTab.setInteraction.apply(
           null, [interactionId].concat(test.interactionArguments));
 
         // Delete any leftover rules that may remain from previous tests of the
@@ -142,145 +148,150 @@ describe('Interactions', function() {
           '.protractor-test-delete-response'));
         var confirmDeleteResponseButton = element(by.css(
           '.protractor-test-confirm-delete-response'));
-        deleteResponseButton.isPresent().then(function(isPresent) {
-          if (isPresent) {
-            deleteResponseButton.click();
-            confirmDeleteResponseButton.click();
-          }
-        });
+        if (await deleteResponseButton.isPresent()) {
+          await deleteResponseButton.click();
+          await confirmDeleteResponseButton.click();
+        }
 
-        explorationEditorMainTab.addResponse.apply(explorationEditorMainTab, [
-          interactionId, forms.toRichText('yes'), null, false
-        ].concat(test.ruleArguments));
+        await explorationEditorMainTab.addResponse.apply(
+          explorationEditorMainTab, [
+            interactionId, await forms.toRichText('yes'), null, false
+          ].concat(test.ruleArguments));
 
         if (!defaultOutcomeSet) {
           // The default outcome will be preserved for subsequent tests.
-          explorationEditorMainTab.getResponseEditor('default')
-            .setFeedback(forms.toRichText('no'));
-          explorationEditorMainTab.getResponseEditor('default')
-            .setDestination('(try again)', false, null);
+          var responseEditor = (
+            await explorationEditorMainTab.getResponseEditor('default'));
+          await responseEditor.setFeedback(await forms.toRichText('no'));
+          responseEditor = await explorationEditorMainTab.getResponseEditor(
+            'default');
+          await responseEditor.setDestination('(try again)', false, null);
           defaultOutcomeSet = true;
         }
 
-        explorationEditorPage.navigateToPreviewTab();
-        explorationPlayerPage.expectInteractionToMatch.apply(
+        await explorationEditorPage.navigateToPreviewTab();
+        await explorationPlayerPage.expectInteractionToMatch.apply(
           null, [interactionId].concat(test.expectedInteractionDetails));
 
         for (var j = 0; j < test.wrongAnswers.length; j++) {
-          explorationPlayerPage.submitAnswer(
+          await explorationPlayerPage.submitAnswer(
             interactionId, test.wrongAnswers[j]);
-          explorationPlayerPage.expectLatestFeedbackToMatch(
-            forms.toRichText('no'));
+          await explorationPlayerPage.expectLatestFeedbackToMatch(
+            await forms.toRichText('no'));
         }
         // Dismiss conversation help card.
         var clearHelpcardButton = element(by.css(
           '.protractor-test-close-help-card-button'));
-        clearHelpcardButton.isPresent().then(function(isPresent) {
-          if (isPresent) {
-            clearHelpcardButton.click();
-          }
-        });
+        var isPresent = await clearHelpcardButton.isPresent();
+        if (isPresent) {
+          await clearHelpcardButton.click();
+        }
 
         for (var j = 0; j < test.correctAnswers.length; j++) {
-          explorationPlayerPage.submitAnswer(
+          await explorationPlayerPage.submitAnswer(
             interactionId, test.correctAnswers[j]);
-          explorationPlayerPage.expectLatestFeedbackToMatch(
-            forms.toRichText('yes'));
+          await explorationPlayerPage.expectLatestFeedbackToMatch(
+            await forms.toRichText('yes'));
         }
-        explorationEditorPage.navigateToMainTab();
-        explorationEditorMainTab.deleteInteraction();
+        await explorationEditorPage.navigateToMainTab();
+        await explorationEditorMainTab.deleteInteraction();
       }
     }
-    explorationEditorPage.discardChanges();
-    users.logout();
+    await explorationEditorPage.discardChanges();
+    await users.logout();
   });
 
-  it('publish and play exploration successfully', function() {
+  it('publish and play exploration successfully', async function() {
     /*
      * This suite should be expanded as new interaction's e2e utility is added.
      */
-    users.createAndLoginUser(
+    await users.createAndLoginUser(
       'explorationEditor@interactions.com', 'explorationEditor');
-    workflow.createExploration();
+    await workflow.createExploration();
 
-    explorationEditorMainTab.setStateName('Graph');
-    explorationEditorMainTab.setContent(forms.toRichText(
+    await explorationEditorMainTab.setStateName('Graph');
+    await explorationEditorMainTab.setContent(await forms.toRichText(
       'Draw a complete graph with the given vertices.'));
     var graphDictForInput = {
       vertices: [[277, 77], [248, 179], [405, 144]]
     };
-    explorationEditorMainTab.setInteraction('GraphInput', graphDictForInput);
+    await explorationEditorMainTab.setInteraction(
+      'GraphInput', graphDictForInput);
     var graphDictForResponse = {
       edges: [[0, 1], [1, 2], [0, 2]],
       vertices: [[277, 77], [248, 179], [405, 144]]
     };
-    explorationEditorMainTab.addResponse(
-      'GraphInput', forms.toRichText('Good job!'), 'MathExp',
+    await explorationEditorMainTab.addResponse(
+      'GraphInput', await forms.toRichText('Good job!'), 'MathExp',
       true, 'IsIsomorphicTo', graphDictForResponse);
-    var responseEditor = explorationEditorMainTab.getResponseEditor('default');
-    responseEditor.setFeedback(forms.toRichText(
+    var responseEditor = await explorationEditorMainTab.getResponseEditor(
+      'default');
+    await responseEditor.setFeedback(await forms.toRichText(
       'A complete graph is a graph in which each pair of graph vertices is ' +
       'connected by an edge.'));
 
-    explorationEditorMainTab.moveToState('MathExp');
-    explorationEditorMainTab.setContent(function(richTextEditor) {
-      richTextEditor.appendPlainText(
+    await explorationEditorMainTab.moveToState('MathExp');
+    await explorationEditorMainTab.setContent(async function(richTextEditor) {
+      await richTextEditor.appendPlainText(
         'Please simplify the following expression: ');
       // Some Latex styling is expected here.
-      richTextEditor.addRteComponent(
+      await richTextEditor.addRteComponent(
         'Math', '16x^{12}/4x^2');
     });
 
-    explorationEditorMainTab.setInteraction('MathExpressionInput');
+    await explorationEditorMainTab.setInteraction('MathExpressionInput');
     // Proper Latex styling for rule spec is required.
-    explorationEditorMainTab.addResponse(
-      'MathExpressionInput', forms.toRichText('Good job!'), 'End', true,
+    await explorationEditorMainTab.addResponse(
+      'MathExpressionInput', await forms.toRichText('Good job!'), 'End', true,
       'IsMathematicallyEquivalentTo', '\\frac{16x^{12}}{4x^{2}}');
     // Expecting answer to be 4x^10
-    var responseEditor = explorationEditorMainTab.getResponseEditor('default');
-    responseEditor.setFeedback(forms.toRichText(
+    var responseEditor = await explorationEditorMainTab.getResponseEditor(
+      'default');
+    await responseEditor.setFeedback(await forms.toRichText(
       'A simplified expression should be smaller than the original.'));
 
-    explorationEditorMainTab.moveToState('End');
-    explorationEditorMainTab.setInteraction('EndExploration');
-    explorationEditorPage.navigateToSettingsTab();
-    explorationEditorSettingsTab.setTitle('Regression Test Exploration');
-    explorationEditorSettingsTab.setObjective(
+    await explorationEditorMainTab.moveToState('End');
+    await explorationEditorMainTab.setInteraction('EndExploration');
+    await explorationEditorPage.navigateToSettingsTab();
+    await explorationEditorSettingsTab.setTitle('Regression Test Exploration');
+    await explorationEditorSettingsTab.setObjective(
       'To publish and play this exploration');
-    explorationEditorSettingsTab.setCategory('Logic');
-    explorationEditorPage.saveChanges();
-    workflow.publishExploration();
-    users.logout();
+    await explorationEditorSettingsTab.setCategory('Logic');
+    await explorationEditorPage.saveChanges();
+    await workflow.publishExploration();
+    await users.logout();
 
-    users.createAndLoginUser('graphLearner@interactions.com', 'graphLearner');
-    libraryPage.get();
-    libraryPage.findExploration('Regression Test Exploration');
-    libraryPage.playExploration('Regression Test Exploration');
-    explorationPlayerPage.expectExplorationNameToBe(
+    await users.createAndLoginUser(
+      'graphLearner@interactions.com', 'graphLearner');
+    await libraryPage.get();
+    await libraryPage.findExploration('Regression Test Exploration');
+    await libraryPage.playExploration('Regression Test Exploration');
+    await explorationPlayerPage.expectExplorationNameToBe(
       'Regression Test Exploration');
 
     // Play Graph Input interaction.
-    explorationPlayerPage.expectContentToMatch(forms.toRichText(
+    await explorationPlayerPage.expectContentToMatch(await forms.toRichText(
       'Draw a complete graph with the given vertices.'));
     var graphDictForAnswer = {
       edges: [[1, 2], [1, 0], [0, 2]]
     };
-    explorationPlayerPage.submitAnswer('GraphInput', graphDictForAnswer);
-    explorationPlayerPage.expectLatestFeedbackToMatch(
-      forms.toRichText('Good job!'));
-    explorationPlayerPage.clickThroughToNextCard();
+    await explorationPlayerPage.submitAnswer('GraphInput', graphDictForAnswer);
+    await explorationPlayerPage.expectLatestFeedbackToMatch(
+      await forms.toRichText('Good job!'));
+    await explorationPlayerPage.clickThroughToNextCard();
 
     // Play Math Expression Input interaction.
-    explorationPlayerPage.submitAnswer('MathExpressionInput', '4 * x^(10)');
-    explorationPlayerPage.expectLatestFeedbackToMatch(
-      forms.toRichText('Good job!'));
-    explorationPlayerPage.clickThroughToNextCard();
+    await explorationPlayerPage.submitAnswer(
+      'MathExpressionInput', '4 * x^(10)');
+    await explorationPlayerPage.expectLatestFeedbackToMatch(
+      await forms.toRichText('Good job!'));
+    await explorationPlayerPage.clickThroughToNextCard();
 
-    explorationPlayerPage.expectExplorationToBeOver();
-    users.logout();
+    await explorationPlayerPage.expectExplorationToBeOver();
+    await users.logout();
   });
 
-  afterEach(function() {
-    general.checkForConsoleErrors([]);
+  afterEach(async function() {
+    await general.checkForConsoleErrors([]);
   });
 });

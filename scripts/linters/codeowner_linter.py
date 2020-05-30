@@ -48,7 +48,9 @@ CODEOWNER_IMPORTANT_PATHS = [
     '/package.json',
     '/yarn.lock',
     '/scripts/install_third_party_libs.py',
-    '/.github/']
+    '/.github/',
+    '/.github/CODEOWNERS',
+    '/.github/stale.yml']
 
 
 def _walk_with_gitignore(root, exclude_dirs):
