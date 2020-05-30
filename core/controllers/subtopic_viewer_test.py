@@ -158,7 +158,7 @@ class SubtopicPageDataHandlerTests(BaseSubtopicViewerControllerTests):
             expected_dict = {
                 'topic_id': 'topic_id',
                 'page_contents': expected_page_contents_dict,
-                'subtopic_title': 'Subtopic Title'
+                'subtopic_title': 'Subtopic Title',
                 'next_subtopic': None
             }
             self.assertDictContainsSubset(expected_dict, json_response)
