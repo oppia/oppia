@@ -63,7 +63,7 @@ class SubtopicPageDataHandler(base.BaseHandler):
         for index, subtopic in enumerate(topic.subtopics):
             if subtopic.id == subtopic_id:
                 subtopic_title = subtopic.title
-                if(index != len(topic.subtopics) - 1):
+                if index != len(topic.subtopics) - 1:
                     next_subtopic = topic.subtopics[index + 1].to_dict()
                 break
         subtopic_page_contents = (
