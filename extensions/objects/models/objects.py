@@ -447,7 +447,7 @@ class Filepath(BaseObject):
     SCHEMA = UnicodeString.SCHEMA
 
 
-class LiterallyCanvasDiagram(BaseObject):
+class SvgFilename(BaseObject):
     """A string representing a filename of the saved
     svg file created using literallyCanvas.
     """

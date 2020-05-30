@@ -173,11 +173,11 @@ export = {
     "is_lesson_related": false,
     "is_block_element": true,
     "customization_arg_specs": [{
-      "name": "svg_filepath",
+      "name": "svg_filename",
       "description": "The custom svg diagram filename",
       "schema": {
         "type": "custom",
-        "obj_type": "LiterallyCanvasDiagram"
+        "obj_type": "svgFilename"
       },
       "default_value": ""
     }, {

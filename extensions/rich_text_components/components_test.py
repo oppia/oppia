@@ -220,20 +220,20 @@ class ComponentValidationUnitTests(test_utils.GenericTestBase):
     def test_svg_editor_validation(self):
         """Tests svg editor component validation."""
         valid_items = [{
-            'svg_filepath-with-value': 'random.svg',
+            'svg_filename-with-value': 'random.svg',
             'alt-with-value': '1234'
         }, {
-            'svg_filepath-with-value': 'xyz.svg',
+            'svg_filename-with-value': 'xyz.svg',
             'alt-with-value': 'hello'
         }]
         invalid_items = [{
-            'svg_filepath-with-value': 'random.png',
+            'svg_filename-with-value': 'random.png',
             'alt-with-value': 'abc'
         }, {
-            'svg_filepath-with-value': 'xyz.svg.svg',
+            'svg_filename-with-value': 'xyz.svg.svg',
             'alt-with-value': 'hello'
         }, {
-            'svg_filepath-with-value': 'xyz.png.svg',
+            'svg_filename-with-value': 'xyz.png.svg',
             'alt-with-value': 'hello'
         }]
 
