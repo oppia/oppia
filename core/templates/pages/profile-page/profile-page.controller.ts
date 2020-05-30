@@ -88,7 +88,7 @@ angular.module('oppia').directive('profilePage', [
                     if (exploration1.playthroughs > exploration2.playthroughs) {
                       return 1;
                     } else if (
-                      exploration1.playthroughs > exploration2.playthroughs) {
+                      exploration1.playthroughs === exploration2.playthroughs) {
                       return 0;
                     } else {
                       return -1;
@@ -126,15 +126,13 @@ angular.module('oppia').directive('profilePage', [
                   );
                 } else {
                   if (!ctrl.isAlreadySubscribed) {
-                    ctrl.isAlreadySubscribed = true;
                     $http.post('/subscribehandler', {
                       creator_username: data.profile_username
-                    });
+                    }).then(() => ctrl.isAlreadySubscribed = true);
                   } else {
-                    ctrl.isAlreadySubscribed = false;
                     $http.post('/unsubscribehandler', {
                       creator_username: data.profile_username
-                    });
+                    }).then(() => ctrl.isAlreadySubscribed = false);
                   }
                   ctrl.updateSubscriptionButtonPopoverText();
                 }
