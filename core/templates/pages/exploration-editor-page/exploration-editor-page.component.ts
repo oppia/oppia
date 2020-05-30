@@ -275,8 +275,6 @@ angular.module('oppia').component('explorationEditorPage', {
             explorationData.correctness_feedback_enabled);
           StateClassifierMappingService.init(
             explorationData.state_classifier_mapping);
-          PlaythroughIssuesService.initSession(
-            explorationData.exploration_id, explorationData.version);
 
           ctrl.explorationTitleService = ExplorationTitleService;
           ctrl.explorationCategoryService = ExplorationCategoryService;
