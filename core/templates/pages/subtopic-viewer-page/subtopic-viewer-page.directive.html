@@ -12,15 +12,14 @@
     </div>
   </div>
 
-  <[$ctrl.nextSubtopicSummaryIsShown]>
-
   <div ng-if="$ctrl.nextSubtopicSummaryIsShown" class="oppia-subtopic-viewer-next-subtopic-summary">
-    <md-card class="oppia-subtopic-summary-tile">
-      <subtopic-summary-tile subtopic-id="$ctrl.nextSubtopicId"
-                             subtopic-title="$ctrl.nextSubtopicTitle"
-                             topic-name="$ctrl.topicName">
-      </subtopic-summary-tile>
-    </md-card>
+      <div>
+        <p class="oppia-subtopic-next-subtopic-label">Next Skill:</p>
+        <subtopic-summary-tile subtopic="$ctrl.nextSubtopic"
+                               topic-id="$ctrl.parentTopicId"
+                               topic-name="$ctrl.topicName">
+        </subtopic-summary-tile>
+      </div>
   </div>
 </div>
 <style>
@@ -53,6 +52,11 @@
     position: relative;
     text-decoration: none;
   }
+  .oppia-subtopic-next-subtopic-label {
+    color: rgb(51, 51, 51);
+    font-family: 'Roboto', Arial, sans-serif;
+    font-size: 1.4em;
+  }
   .oppia-subtopic-viewer-container .oppia-page-contents-viewer {
     background-color: rgb(236, 245, 252);
     border-radius: 0.5em;
@@ -71,9 +75,8 @@
   .oppia-subtopic-viewer-next-subtopic-summary {
     display: flex;
     justify-content: flex-end;
-    margin: 0 auto;
+    margin: 50px auto;
     max-width: 975px;
-
   }
   .oppia-subtopic-summary-tile {
     -webkit-transition: all 300ms;

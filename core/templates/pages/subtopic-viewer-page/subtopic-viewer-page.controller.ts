@@ -69,12 +69,11 @@ angular.module('oppia').directive('subtopicViewerPage', [
                 ctrl.subtopicTitle = subtopicDataObject.getSubtopicTitle();
                 PageTitleService.setPageTitle(ctrl.subtopicTitle + ' - Oppia');
 
-                let nextSubtopicTitle =
-                  subtopicDataObject.getNextSubtopicTitle();
-                if (nextSubtopicTitle) {
-                  ctrl.nextSubtopicTitle = nextSubtopicTitle;
-                  ctrl.nextSubtopicId =
-                    (parseInt(ctrl.subtopicId) + 1).toString();
+                let nextSubtopic =
+                  subtopicDataObject.getNextSubtopic();
+                if (nextSubtopic) {
+                  ctrl.parentTopicId = subtopicDataObject.getParentTopicId();
+                  ctrl.nextSubtopic = nextSubtopic;
                   ctrl.nextSubtopicSummaryIsShown = true;
                 }
 
