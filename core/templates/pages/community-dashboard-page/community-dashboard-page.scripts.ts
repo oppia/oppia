@@ -20,4 +20,4 @@ require('pages/community-dashboard-page/community-dashboard-page.module.ts');
 require('App.ts');
 
 require('pages/community-dashboard-page/' +
-  'community-dashboard-page.controller.ts');
+  'community-dashboard-page.component.ts');

@@ -252,7 +252,7 @@ QA Team
 * Milestone 3.2 (3th PR) - Increase coverage for three services (#8569)
 * Fix part of #4057: Increase frontend test services from Milestone 3.2 (2nd PR) (#8560)
 * Fix part of #4057: Increase frontend test services from Milestone 3.2 (1st PR) (#8530)
-* Increase coverage for notifications-dashboard-page.controller.ts and mark-all-audio-and-translations-as-needing-update.controller.ts (#8528)
+* Increase coverage for notifications-dashboard-page.component.ts and mark-all-audio-and-translations-as-needing-update.controller.ts (#8528)
 * Milestone 3.1 (3rd PR) - Increase coverage for hints-and-solution-manager.service.ts (#8525)
 * Milestone 3.1 (2nd PR) - Increase coverage for three services (#8524)
 * Fix part of #4057: Adds test for UserEmailPreferencesService (#8513)

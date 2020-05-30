@@ -23,4 +23,4 @@ require('App.ts');
 
 require('pages/OppiaFooterDirective.ts');
 
-require('pages/preferences-page/preferences-page.controller.ts');
+require('pages/preferences-page/preferences-page.component.ts');

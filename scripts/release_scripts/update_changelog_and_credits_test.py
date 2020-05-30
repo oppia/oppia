@@ -44,7 +44,7 @@ MOCK_CHANGELOG_FILEPATH = os.path.join(RELEASE_TEST_DIR, 'CHANGELOG')
 MOCK_AUTHORS_FILEPATH = os.path.join(RELEASE_TEST_DIR, 'AUTHORS')
 MOCK_CONTRIBUTORS_FILEPATH = os.path.join(RELEASE_TEST_DIR, 'CONTRIBUTORS')
 MOCK_ABOUT_PAGE_FILEPATH = os.path.join(
-    RELEASE_TEST_DIR, 'about-page.directive.html')
+    RELEASE_TEST_DIR, 'about-page.component.html')
 
 MOCK_UPDATED_CHANGELOG_FILEPATH = os.path.join(
     RELEASE_TEST_DIR, 'UPDATED_CHANGELOG')
@@ -55,15 +55,13 @@ MOCK_UPDATED_AUTHORS_FILEPATH = os.path.join(
 MOCK_UPDATED_CONTRIBUTORS_FILEPATH = os.path.join(
     RELEASE_TEST_DIR, 'UPDATED_CONTRIBUTORS')
 MOCK_UPDATED_ABOUT_PAGE_FILEPATH = os.path.join(
-    RELEASE_TEST_DIR, 'updated-about-page.directive.html')
+    RELEASE_TEST_DIR, 'updated-about-page.component.html')
 
 
 def read_from_file(filepath):
     """Reads the lines from a file.
-
     Args:
         filepath: str. The path of the file to read.
-
     Returns:
         list(str). The list of lines in the file.
     """
@@ -73,7 +71,6 @@ def read_from_file(filepath):
 
 def write_to_file(filepath, filelines):
     """Writes a list of lines to a file.
-
     Args:
         filepath: str. The path of the file to write to.
         filelines: list(str). The lines to write to the file.
@@ -306,7 +303,7 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
             '<p>Invalid</p>\n', '<ul>\n', '  <li>line</li>\n', '</ul>\n']
         with self.assertRaisesRegexp(
             Exception, (
-                'Expected about-page.directive.html to have <span>A</span>.')):
+                'Expected about-page.component.html to have <span>A</span>.')):
             update_changelog_and_credits.find_indentation(about_page_lines)
 
     def test_missing_li_in_about_page(self):
@@ -315,7 +312,7 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             Exception, (
                 'Expected <span>A</span> text to be followed by an unordered '
-                'list in about-page.directive.html')):
+                'list in about-page.component.html')):
             update_changelog_and_credits.find_indentation(about_page_lines)
 
     def test_removal_of_updates_with_no_exception(self):

@@ -19,6 +19,8 @@
 // the code corresponding to the spec is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
 
+require('pages/moderator-page/moderator-page.component.ts');
+
 describe('Moderator Page', function() {
   var ctrl = null;
 
@@ -59,7 +61,7 @@ describe('Moderator Page', function() {
     });
   }));
 
-  beforeEach(angular.mock.inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector, $componentController) {
     $httpBackend = $injector.get('$httpBackend');
     $q = $injector.get('$q');
     $rootScope = $injector.get('$rootScope');
@@ -74,8 +76,9 @@ describe('Moderator Page', function() {
       .and.returnValue($q.resolve('sample-csrf-token'));
 
     $scope = $rootScope.$new();
-    var directive = $injector.get('moderatorPageDirective')[0];
-    ctrl = $injector.instantiate(directive.controller, { $scope });
+    ctrl = $componentController('moderatorPage', {
+      $scope: $scope
+    });
   }));
 
   afterEach(function() {

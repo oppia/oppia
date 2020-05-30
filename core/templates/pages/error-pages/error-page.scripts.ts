@@ -22,4 +22,4 @@ require('pages/error-pages/error-page.module.ts');
 require('App.ts');
 
 require('base-components/base-content.directive.ts');
-require('pages/error-pages/error-page.controller.ts');
+require('pages/error-pages/error-page.component.ts');

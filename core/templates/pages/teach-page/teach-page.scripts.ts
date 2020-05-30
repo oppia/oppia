@@ -21,4 +21,4 @@
 require('pages/teach-page/teach-page.module.ts');
 require('App.ts');
 
-require('pages/teach-page/teach-page.controller.ts');
+require('pages/teach-page/teach-page.component.ts');

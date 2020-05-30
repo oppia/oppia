@@ -15,6 +15,11 @@
 /**
  * @fileoverview Unit tests for notificationsDashboardPage.
  */
+
+require(
+  'pages/notifications-dashboard-page/' +
+  'notifications-dashboard-page.component.ts');
+
 describe('Notifications Dashboard Page', function() {
   var $scope, ctrl;
   var $httpBackend = null;
@@ -33,7 +38,8 @@ describe('Notifications Dashboard Page', function() {
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('WindowRef', windowRefMock);
   }));
-  beforeEach(angular.mock.inject(function($injector, $compile, $rootScope) {
+  beforeEach(angular.mock.inject(function(
+      $injector, $componentController, $rootScope) {
     $httpBackend = $injector.get('$httpBackend');
     $scope = $rootScope.$new();
     loadingMessage = '';
@@ -41,8 +47,8 @@ describe('Notifications Dashboard Page', function() {
     subscriptions.push(LoaderService.getLoadingMessageSubject().subscribe(
       (message: string) => loadingMessage = message
     ));
-    var directive = $injector.get('notificationsDashboardPageDirective')[0];
-    ctrl = $injector.instantiate(directive.controller, {
+
+    ctrl = $componentController('notificationsDashboardPage', {
       $rootScope: $scope
     });
   }));

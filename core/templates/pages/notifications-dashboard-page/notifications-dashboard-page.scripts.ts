@@ -24,4 +24,4 @@ require('App.ts');
 
 require(
   'pages/notifications-dashboard-page/' +
-  'notifications-dashboard-page.controller.ts');
+  'notifications-dashboard-page.component.ts');
