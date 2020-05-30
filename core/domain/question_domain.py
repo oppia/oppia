@@ -312,8 +312,8 @@ class Question(python_utils.OBJECT):
     @classmethod
     def _convert_state_v33_dict_to_v34_dict(cls, question_state_dict):
         """Converts from version 33 to 34. Version 34 adds a new
-        attribute math RTEs. The new attribute has an additional field to
-        for storing SVG filenames.
+        attribute for math components. The new attribute has an additional field
+        to for storing SVG filenames.
 
         Args:
             question_state_dict: dict. A dict where each key-value pair

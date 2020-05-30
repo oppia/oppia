@@ -32,7 +32,7 @@ from core.platform import models
 
 
 class SuggestionMathRteAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """Job that checks for existence of math RTEs in the suggestions."""
+    """Job that checks for existence of math components in the suggestions."""
 
     @classmethod
     def entity_classes_to_map_over(cls):
@@ -42,26 +42,22 @@ class SuggestionMathRteAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     def map(item):
         html_string_list = []
         suggestion = suggestion_services.get_suggestion_from_model(item)
-        suggestion_domain_class = (
-            suggestion_registry.SUGGESTION_TYPES_TO_DOMAIN_CLASSES[
-                suggestion.suggestion_type])
-        suggestion_object = suggestion_domain_class.from_dict(
-            suggestion.to_dict())
         html_string_list = (
-            html_string_list + suggestion_object.get_all_html_content_strings())
+            html_string_list + suggestion.get_all_html_content_strings())
         html_string = ''.join(html_string_list)
-        if html_validation_service.check_for_math_rte_in_html(html_string):
+        if html_validation_service.check_for_math_component_in_html(
+                html_string):
             yield ('Suggestion with Math', item.id)
 
     @staticmethod
     def reduce(key, values):
         yield (
-            '%d suggestions have Math RTEs in them with IDs.' % len(values),
-            values)
+            '%d suggestions have Math components in them with IDs.' %
+            len(values), values)
 
 
 class SuggestionMathMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """A one-time job that can be used to migrate the Math RTEs in the
+    """A one-time job that can be used to migrate the Math components in the
     suggestions to the new Math Schema.
     """
     _ERROR_KEY = 'validation_error'
@@ -82,18 +78,22 @@ class SuggestionMathMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 SuggestionMathMigrationOneOffJob._ERROR_KEY,
                 'Suggestion %s failed validation: %s' % (item.id, e))
             return
+        suggestion_domain_class = (
+            suggestion_registry.SUGGESTION_TYPES_TO_DOMAIN_CLASSES[
+                suggestion.suggestion_type])
         suggestion.change = (
-            suggestion.convert_html_in_suggestion(
+            suggestion_domain_class.convert_html_in_suggestion(
+                suggestion.change.to_dict(),
                 html_validation_service.
                 add_math_content_to_math_rte_components))
         try:
             suggestion.validate()
         except Exception as e:
             logging.error(
-                'Suggestion %s failed validation: %s' % (item.id, e))
+                'Suggestion %s failed after validation: %s' % (item.id, e))
             yield (
                 SuggestionMathMigrationOneOffJob._ERROR_KEY,
-                'Suggestion %s failed validation: %s' % (item.id, e))
+                'Suggestion %s failed after validation: %s' % (item.id, e))
             return
         item.change_cmd = suggestion.change.to_dict()
         item.put()

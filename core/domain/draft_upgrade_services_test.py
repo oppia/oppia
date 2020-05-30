@@ -128,17 +128,14 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             'unimplemented.' % (state_schema_version, conversion_fn_name))
 
     def test_convert_states_v33_dict_to_v34_dict(self):
-        html = (
-            '<p>Value</p><oppia-noninteractive-math ' +
-            'raw_latex-with-value="&amp;quot;+,-,-,+&amp;quot' +
-            ';"></oppia-noninteractive-math>')
+        html_content = (
+            '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&a' +
+            'mp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>')
 
-        expected_html = (
-            '<p>Value</p><oppia-noninteractive-' +
-            'math math_content-with-value="{&amp;quot' +
-            ';raw_latex&amp;quot;: &amp;quot;+,-,-,+' +
-            '&amp;quot;, &amp;quot;svg_filename&amp;' +
-            'quot;: &amp;quot;&amp;quot;}"></oppia' +
+        expected_html_content = (
+            '<p>Value</p><oppia-noninteractive-math math_content-with-value=' +
+            '"{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;, &' +
+            'amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia' +
             '-noninteractive-math>')
 
         draft_change_list = [
@@ -151,7 +148,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                         'value': [
                             '<p>1</p>',
                             '<p>2</p>',
-                            html,
+                            html_content,
                             '<p>4</p>'
                         ]
                     },
@@ -170,31 +167,31 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                     'rule_specs': [{
                         'rule_type': 'Equals',
                         'inputs': {'x': [
-                            html
+                            html_content
                         ]}
                     }, {
                         'rule_type': 'Equals',
                         'inputs': {'x': 1}
                     }, {
                         'rule_type': 'HasElementXAtPositionY',
-                        'inputs': {'x': html,
+                        'inputs': {'x': html_content,
                                    'y': 2}
                     }, {
                         'rule_type': 'IsEqualToOrdering',
-                        'inputs': {'x': [[html]]}
+                        'inputs': {'x': [[html_content]]}
                     }, {
                         'rule_type': 'HasElementXBeforeElementY',
-                        'inputs': {'x': html,
-                                   'y': html}
+                        'inputs': {'x': html_content,
+                                   'y': html_content}
                     }, {
                         'rule_type': 'IsEqualToOrderingWithOneItemAtIncorrectPosition',  # pylint: disable=protected-access,line-too-long
-                        'inputs': {'x': [[html]]}
+                        'inputs': {'x': [[html_content]]}
                     }],
                     'outcome': {
                         'dest': 'Introduction',
                         'feedback': {
                             'content_id': 'feedback',
-                            'html': html
+                            'html': html_content
                         },
                         'param_changes': [],
                         'labelled_as_correct': False,
@@ -208,7 +205,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'state_name': 'Intro',
                 'property_name': 'content',
-                'new_value': html
+                'new_value': html_content
             }), exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'state_name': 'Intro',
@@ -217,7 +214,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                     'translations_mapping': {
                         'content1': {
                             'en': {
-                                'html': html,
+                                'html': html_content,
                                 'needs_update': True
                             },
                             'hi': {
@@ -227,7 +224,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                         },
                         'feedback_1': {
                             'hi': {
-                                'html': html,
+                                'html': html_content,
                                 'needs_update': False
                             },
                             'en': {
@@ -246,7 +243,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                     'correct_answer': 'helloworld!',
                     'explanation': {
                         'content_id': 'solution',
-                        'html': html
+                        'html': html_content
                     },
                 }
             }), exp_domain.ExplorationChange({
@@ -255,7 +252,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 'property_name': 'default_outcome',
                 'new_value': {
                     'param_changes': [], 'feedback': {
-                        'content_id': 'default_outcome', 'html': html
+                        'content_id': 'default_outcome', 'html': html_content
                     },
                     'dest': 'Introduction',
                     'refresher_exploration_id': None,
@@ -269,7 +266,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 'new_value': [{
                     'hint_content': {
                         'content_id': 'hint1',
-                        'html': html
+                        'html': html_content
                     }
                 }]
             }), exp_domain.ExplorationChange({
@@ -298,7 +295,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                         'value': [
                             '<p>1</p>',
                             '<p>2</p>',
-                            expected_html,
+                            expected_html_content,
                             '<p>4</p>'
                         ]
                     },
@@ -321,31 +318,31 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                     'rule_specs': [{
                         'rule_type': 'Equals',
                         'inputs': {'x': [
-                            expected_html
+                            expected_html_content
                         ]}
                     }, {
                         'rule_type': 'Equals',
                         'inputs': {'x': 1}
                     }, {
                         'rule_type': 'HasElementXAtPositionY',
-                        'inputs': {'x': expected_html,
+                        'inputs': {'x': expected_html_content,
                                    'y': 2}
                     }, {
                         'rule_type': 'IsEqualToOrdering',
-                        'inputs': {'x': [[expected_html]]}
+                        'inputs': {'x': [[expected_html_content]]}
                     }, {
                         'rule_type': 'HasElementXBeforeElementY',
-                        'inputs': {'x': expected_html,
-                                   'y': expected_html}
+                        'inputs': {'x': expected_html_content,
+                                   'y': expected_html_content}
                     }, {
                         'rule_type': 'IsEqualToOrderingWithOneItemAtIncorrectPosition',  # pylint: disable=protected-access,line-too-long
-                        'inputs': {'x': [[expected_html]]}
+                        'inputs': {'x': [[expected_html_content]]}
                     }],
                     'outcome': {
                         'dest': 'Introduction',
                         'feedback': {
                             'content_id': 'feedback',
-                            'html': expected_html
+                            'html': expected_html_content
                         },
                         'param_changes': [],
                         'labelled_as_correct': False,
@@ -362,7 +359,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'state_name': 'Intro',
                 'property_name': 'content',
-                'new_value': expected_html
+                'new_value': expected_html_content
             }).to_dict())
         self.assertEqual(
             expected_draft_change_list[3].to_dict(),
@@ -374,7 +371,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                     'translations_mapping': {
                         'content1': {
                             'en': {
-                                'html': expected_html,
+                                'html': expected_html_content,
                                 'needs_update': True
                             },
                             'hi': {
@@ -384,7 +381,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                         },
                         'feedback_1': {
                             'hi': {
-                                'html': expected_html,
+                                'html': expected_html_content,
                                 'needs_update': False
                             },
                             'en': {
@@ -406,7 +403,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                     'correct_answer': 'helloworld!',
                     'explanation': {
                         'content_id': 'solution',
-                        'html': expected_html
+                        'html': expected_html_content
                     },
                 }
             }).to_dict())
@@ -419,7 +416,8 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 'property_name': 'default_outcome',
                 'new_value': {
                     'param_changes': [], 'feedback': {
-                        'content_id': 'default_outcome', 'html': expected_html
+                        'content_id': 'default_outcome',
+                        'html': expected_html_content
                     },
                     'dest': 'Introduction',
                     'refresher_exploration_id': None,
@@ -437,7 +435,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 'new_value': [{
                     'hint_content': {
                         'content_id': 'hint1',
-                        'html': expected_html
+                        'html': expected_html_content
                     }
                 }]
             }).to_dict())

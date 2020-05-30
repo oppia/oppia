@@ -19,8 +19,8 @@
 
 var objects = require(process.cwd() + '/extensions/objects/protractor.js');
 
-var customizeComponent = function(modal, rawLatex) {
-  objects.MathExpressionContentEditor(
+var customizeComponent = async function(modal, rawLatex) {
+  await objects.MathExpressionContentEditor(
     modal.element(by.tagName('math-expression-content-editor'))
   ).setValue(rawLatex);
 };
@@ -39,11 +39,10 @@ var escapedJsonToObj = function(json) {
       .replace(/&amp;/g, '&')));
 };
 
-var expectComponentDetailsToMatch = function(elem, rawLatex) {
+var expectComponentDetailsToMatch = async function(elem, rawLatex) {
   // TODO(Jacob): Check that the actual latex being displayed is correct.
-  elem.getAttribute('math_content-with-value').then(function(value) {
-    expect(escapedJsonToObj(value).raw_latex).toMatch(rawLatex);
-  });
+  var mathComponent = await elem.getAttribute('raw_latex-with-value');
+  expect(mathComponent.raw_latex).toMatch(rawLatex);
 };
 
 exports.customizeComponent = customizeComponent;

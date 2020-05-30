@@ -2416,7 +2416,7 @@ class Exploration(python_utils.OBJECT):
     @classmethod
     def _convert_states_v33_dict_to_v34_dict(cls, states_dict):
         """Converts from version 33 to 34. Version 34 adds a new
-        attribute math RTEs. The new attribute has an additional field to
+        attribute math components. The new attribute has an additional field to
         for storing SVG filenames.
 
         Args:
@@ -3366,8 +3366,8 @@ class Exploration(python_utils.OBJECT):
     @classmethod
     def _convert_v38_dict_to_v39_dict(cls, exploration_dict):
         """Converts a v38 exploration dict into a v39 exploration dict.
-        Adds a new attribute math RTEs. The new attribute has an additional
-        field to for storing SVG filenames.
+        Adds a new attribute math components. The new attribute has an
+        additional field to for storing SVG filenames.
 
         Args:
             exploration_dict: dict. The dict representation of an exploration

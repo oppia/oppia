@@ -68,19 +68,17 @@ class SuggestionMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
         """Checks that correct number of hints are tabulated when
         there is single exploration.
         """
-        html = (
-            '<p>Value</p><oppia-noninteractive-' +
-            'math math_content-with-value="{&amp;quot' +
-            ';raw_latex&amp;quot;: &amp;quot;+,-,-,+' +
-            '&amp;quot;, &amp;quot;svg_filename&amp;' +
-            'quot;: &amp;quot;&amp;quot;}"></oppia' +
+        html_content = (
+            '<p>Value</p><oppia-noninteractive-math math_content-with-value=' +
+            '"{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;, &' +
+            'amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia' +
             '-noninteractive-math>')
 
-        expected_dict = {
+        state_dict = {
             'classifier_model_id': None,
             'content': {
                 'content_id': 'content',
-                'html': html
+                'html': html_content
             },
             'interaction': {
                 'answer_groups': [],
@@ -90,7 +88,7 @@ class SuggestionMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
                     'dest': 'Introduction',
                     'feedback': {
                         'content_id': 'default_outcome',
-                        'html': html
+                        'html': html_content
                     },
                     'labelled_as_correct': False,
                     'param_changes': [],
@@ -117,7 +115,7 @@ class SuggestionMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
             }
         }
         states = {
-            'Introduction': expected_dict
+            'Introduction': state_dict
         }
         exploration = (
             exp_domain.Exploration(
@@ -134,8 +132,8 @@ class SuggestionMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
             'state_name': 'Introduction',
             'content_id': 'content',
             'language_code': 'hi',
-            'content_html': html,
-            'translation_html': html
+            'content_html': html_content,
+            'translation_html': html_content
         }
         with self.swap(
             feedback_models.GeneralFeedbackThreadModel,
@@ -152,7 +150,7 @@ class SuggestionMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
                 'dest': None,
                 'feedback': {
                     'content_id': 'feedback_1',
-                    'html': html
+                    'html': html_content
                 },
                 'labelled_as_correct': True,
                 'param_changes': [],
@@ -190,7 +188,7 @@ class SuggestionMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
                     'hint_1': {},
                     'solution': {
                         'en': {
-                            'html': html,
+                            'html': html_content,
                             'needs_update': True
                         }
                     }
@@ -201,7 +199,7 @@ class SuggestionMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
                 'confirmed_unclassified_answers': [],
                 'customization_args': {
                     'choices': {
-                        'value': [html]
+                        'value': [html_content]
                     },
                     'showChoicesInShuffledOrder': {
                         'value': True
@@ -211,7 +209,7 @@ class SuggestionMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
                     'dest': None,
                     'feedback': {
                         'content_id': 'feedback_2',
-                        'html': html
+                        'html': html_content
                     },
                     'param_changes': [],
                     'refresher_exploration_id': None,
@@ -282,19 +280,19 @@ class SuggestionMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
             suggestion_jobs_one_off.
             SuggestionMathRteAuditOneOffJob.get_output(job_id))
         output_string = (
-            u"[u\'2 suggestions have Math RTEs in them with IDs.\', " +  # pylint: disable=invalid-string-quote
-            "[u\'exploration.exp1.thread_1\', u'skill1.thread1\']]")     # pylint: disable=invalid-string-quote
+            u'[u\'2 suggestions have Math components in them with IDs.\', ' +
+            '[u\'exploration.exp1.thread_1\', u\'skill1.thread1\']]')
         expected_output = [output_string]
         self.assertEqual(actual_output, expected_output)
 
     def test_for_html_in_suggestion_with_no_math_rte(self):
-        html = '<p>This has no Math Rte</p>'
+        html_content = '<p>This has no Math components</p>'
         answer_group = {
             'outcome': {
                 'dest': None,
                 'feedback': {
                     'content_id': 'feedback_1',
-                    'html': html
+                    'html': html_content
                 },
                 'labelled_as_correct': True,
                 'param_changes': [],
@@ -333,7 +331,7 @@ class SuggestionMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
                     'hint_1': {},
                     'solution': {
                         'en': {
-                            'html': html,
+                            'html': html_content,
                             'needs_update': True
                         }
                     }
@@ -344,7 +342,7 @@ class SuggestionMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
                 'confirmed_unclassified_answers': [],
                 'customization_args': {
                     'choices': {
-                        'value': [html]
+                        'value': [html_content]
                     },
                     'showChoicesInShuffledOrder': {
                         'value': True
@@ -354,7 +352,7 @@ class SuggestionMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
                     'dest': None,
                     'feedback': {
                         'content_id': 'feedback_2',
-                        'html': html
+                        'html': html_content
                     },
                     'param_changes': [],
                     'refresher_exploration_id': None,
@@ -506,16 +504,13 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
             feconf.DEFAULT_INIT_STATE_NAME, states, {}, [], 0, False,
             False)
         exp_services.save_new_exploration(self.author_id, exploration)
-        html = (
-            '<p>Value</p><oppia-noninteractive-math ' +
-            'raw_latex-with-value="&amp;quot;+,-,-,+&amp;quot' +
-            ';"></oppia-noninteractive-math>')
-        expected_html = (
-            '<p>Value</p><oppia-noninteractive-' +
-            'math math_content-with-value="{&amp;quot' +
-            ';raw_latex&amp;quot;: &amp;quot;+,-,-,+' +
-            '&amp;quot;, &amp;quot;svg_filename&amp;' +
-            'quot;: &amp;quot;&amp;quot;}"></oppia' +
+        html_content = (
+            '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&a' +
+            'mp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>')
+        expected_html_content = (
+            '<p>Value</p><oppia-noninteractive-math math_content-with-value=' +
+            '"{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;, &' +
+            'amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia' +
             '-noninteractive-math>')
         add_translation_change_dict = {
             'cmd': 'add_translation',
@@ -523,7 +518,7 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
             'content_id': 'content',
             'language_code': 'hi',
             'content_html': 'this is the content HTML',
-            'translation_html': html
+            'translation_html': html_content
         }
         with self.swap(
             feedback_models.GeneralFeedbackThreadModel,
@@ -540,7 +535,7 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
                 'dest': None,
                 'feedback': {
                     'content_id': 'feedback_1',
-                    'html': html
+                    'html': html_content
                 },
                 'labelled_as_correct': True,
                 'param_changes': [],
@@ -671,7 +666,7 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
             'content_id': 'content',
             'language_code': 'hi',
             'content_html': 'this is the content HTML',
-            'translation_html': expected_html
+            'translation_html': expected_html_content
         }
         self.assertEqual(
             expected_suggestion_change_dict,
@@ -679,22 +674,21 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
         observed_question_suggestion = (
             suggestion_services.get_suggestion_by_id('skill1.thread1'))
         migrated_html = (
-            observed_question_suggestion.to_dict()['change']['question_dict'][
+            observed_question_suggestion.change.question_dict[
                 'question_state_data']['interaction']['answer_groups'][0][
                     'outcome']['feedback']['html'])
-        self.assertEqual(migrated_html, expected_html)
+        self.assertEqual(migrated_html, expected_html_content)
 
     def test_migration_skips_suggestions_failing_validation(self):
-        html = (
-            '<p>Value</p><oppia-noninteractive-math ' +
-            'raw_latex-with-value="&amp;quot;+,-,-,+&amp;quot' +
-            ';"></oppia-noninteractive-math>')
+        html_content = (
+            '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&a' +
+            'mp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>')
         answer_group = {
             'outcome': {
                 'dest': None,
                 'feedback': {
                     'content_id': 'feedback_1',
-                    'html': html
+                    'html': html_content
                 },
                 'labelled_as_correct': True,
                 'param_changes': [],
@@ -834,16 +828,15 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(actual_output, [expected_output])
 
     def test_yield_validation_error_after_migration(self):
-        html = (
-            '<p>Value</p><oppia-noninteractive-math ' +
-            'raw_latex-with-value="&amp;quot;+,-,-,+&amp;quot' +
-            ';"></oppia-noninteractive-math>')
+        html_content = (
+            '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&a' +
+            'mp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>')
         answer_group = {
             'outcome': {
                 'dest': None,
                 'feedback': {
                     'content_id': 'feedback_1',
-                    'html': html
+                    'html': html_content
                 },
                 'labelled_as_correct': True,
                 'param_changes': [],
@@ -958,7 +951,9 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
                 self.author_id, suggestion_dict['change'], 'test description',
                 self.reviewer_id)
 
-        def _mock_convert_html_in_suggestion(unused_self, unused_conversion_fn):
+        @classmethod
+        def _mock_convert_html_in_suggestion(
+                unused_cls, unused_dict, unused_conversion_fn):
             """Mocks convert_html_in_suggestion()."""
             return 'invalid_suggestion after migration'
 
@@ -978,7 +973,7 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
             suggestion_jobs_one_off.SuggestionMathMigrationOneOffJob.
             get_output(job_id))
         expected_output = (
-            u'[u\'validation_error\', [u\'Suggestion skill1.thread1 failed v' +
-            'alidation: Expected change to be an instance of QuestionSuggest' +
-            'ionChange\']]')
+            u'[u\'validation_error\', [u\'Suggestion skill1.thread1 failed ' +
+            'after validation: Expected change to be an instance of ' +
+            'QuestionSuggestionChange\']]')
         self.assertEqual(actual_output, [expected_output])

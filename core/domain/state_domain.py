@@ -151,23 +151,23 @@ class AnswerGroup(python_utils.OBJECT):
 
     @classmethod
     def convert_html_in_answer_group(cls, answer_group_dict, conversion_fn):
-        """Checks for HTML fields in an answer group and converts it according
-        to the conversion function.
+        """Checks for HTML fields in an answer group dict and converts it
+        according to the conversion function.
 
         Args:
             answer_group_dict: dict. The answer group dict.
             conversion_fn: function. The function to be used for converting the
                 HTML.
+
         Returns:
-            answer_group_dict. dict. The converted answer group dict.
+            dict. The converted answer group dict.
         """
-        answer_group_dict['outcome']['feedback']['html'] = (
-            conversion_fn(answer_group_dict['outcome']['feedback']['html']))
+        answer_group_dict['outcome']['feedback']['html'] = conversion_fn(
+            answer_group_dict['outcome']['feedback']['html'])
         for rule_spec_index, rule_spec in enumerate(
                 answer_group_dict['rule_specs']):
-            rule_spec_object = RuleSpec.from_dict(rule_spec)
             answer_group_dict['rule_specs'][rule_spec_index] = (
-                rule_spec_object.convert_html_in_rule_spec(
+                RuleSpec.convert_html_in_rule_spec(
                     rule_spec, conversion_fn))
         return answer_group_dict
 
@@ -220,7 +220,7 @@ class Hint(python_utils.OBJECT):
             conversion_fn: function. The function to be used for converting the
                 HTML.
         Returns:
-            hint_dict: dict. The converted hints dict.
+            dict. The converted hints dict.
         """
         hint_dict['hint_content']['html'] = (
             conversion_fn(hint_dict['hint_content']['html']))
@@ -317,7 +317,7 @@ class Solution(python_utils.OBJECT):
             conversion_fn: function. The function to be used for converting the
                 HTML.
         Returns:
-            solution_dict. dict. The converted Solution dict.
+            dict. The converted Solution dict.
         """
         solution_dict['explanation']['html'] = (
             conversion_fn(solution_dict['explanation']['html']))
@@ -770,7 +770,7 @@ class Outcome(python_utils.OBJECT):
             conversion_fn: function. The function to be used for converting the
                 HTML.
         Returns:
-            outcome_dict: dict. The converted outcome dict.
+            dict. The converted outcome dict.
         """
         outcome_dict['feedback']['html'] = (
             conversion_fn(outcome_dict['feedback']['html']))
@@ -1185,10 +1185,9 @@ class WrittenTranslations(python_utils.OBJECT):
             conversion_fn: function. The function to be used for converting the
                 HTML.
         Returns:
-            written_translations_dict: dict. The converted written translations
-            dict.
+            dict. The converted written translations dict.
         """
-        for (content_id, language_code_to_written_translation) in (
+        for content_id, language_code_to_written_translation in (
                 written_translations_dict['translations_mapping'].items()):
             for language_code in (
                     language_code_to_written_translation.keys()):
@@ -1484,7 +1483,7 @@ class RuleSpec(python_utils.OBJECT):
             conversion_fn: function. The function to be used for converting the
                 HTML.
         Returns:
-            rule_spec_dict. dict. The converted Rule Spec dict.
+            dict. The converted Rule Spec dict.
         """
         if rule_spec_dict['rule_type'] == 'HasElementXAtPositionY':
             rule_spec_dict['inputs']['x'] = (
@@ -2302,3 +2301,14 @@ class State(python_utils.OBJECT):
                     'value'][value_index] = conversion_fn(value)
 
         return state_dict
+
+    def get_all_html_content_strings(self):
+        """Get all html content strings in the state.
+
+        Returns:
+            list(str): The list of all html content strings in the interaction.
+            """
+        html_list = (
+            self.written_translations.get_all_html_content_strings() +
+            self.interaction.get_all_html_content_strings())
+        return html_list

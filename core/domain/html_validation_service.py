@@ -882,16 +882,16 @@ def get_filename_with_dimensions(old_filename, exp_id):
 
 
 def add_math_content_to_math_rte_components(html_string):
-    """Replaces the attribute raw_latex-with-value in all Math RTE tags with
-    a new attribute math_content-with-value. The new attribute has an additional
-    field for storing SVG filenames. The field for SVG filename will be an empty
-    string.
+    """Replaces the attribute raw_latex-with-value in all Math component tags
+    with a new attribute math_content-with-value. The new attribute has an
+    additional field for storing SVG filenames. The field for SVG filename will
+    be an empty string.
 
     Args:
         html_string: str. HTML string to modify.
 
     Returns:
-        str. Updated HTML string with all Math RTE tags having the new
+        str. Updated HTML string with all Math component tags having the new
         attribute.
     """
     soup = bs4.BeautifulSoup(
@@ -912,6 +912,8 @@ def add_math_content_to_math_rte_components(html_string):
             math['math_content-with-value'] = (
                 escape_html(
                     json.dumps(normalized_math_content_dict, sort_keys=True)))
+        else:
+            return html_string
     # We need to replace the <br/> tags (if any) with  <br> because for passing
     # the textangular migration tests we need to have only <br> tags.
     return python_utils.UNICODE(soup).replace('<br/>', '<br>')
@@ -946,18 +948,22 @@ def get_invalid_svg_tags_and_attrs(svg_string):
     return (invalid_elements, invalid_attrs)
 
 
-def check_for_math_rte_in_html(html_string):
-    """Checks for existence of Math RTE tags inside an HTML string.
+def check_for_math_component_in_html(html_string):
+    """Checks for existence of Math component tags inside an HTML string.
 
     Args:
         html_string: str. HTML string to check.
 
     Returns:
-        bool. Whether the HTML has Math RTE or not.
+        bool. Whether the HTML has Math components or not.
     """
     soup = bs4.BeautifulSoup(
         html_string.encode(encoding='utf-8'), 'html.parser')
-    return soup.findAll(name='oppia-noninteractive-math')
+    math = soup.findAll(name='oppia-noninteractive-math')
+    if len(math) == 0:
+        return False
+    else:
+        return True
 
 
 def is_parsable_as_xml(xml_string):

@@ -404,27 +404,6 @@ class SuggestionTranslateContent(BaseSuggestion):
         self.score_category = score_category
         self.last_updated = last_updated
 
-    @classmethod
-    def from_dict(cls, suggestion_dict):
-        """Return a Domain object for a suggestion of type
-        SUGGESTION_TYPE_TRANSLATE_CONTENT from a dict.
-
-        Args:
-            suggestion_dict: dict. The dict representation of Suggestion object.
-
-        Returns:
-            SuggestionTranslateContent. The corresponding suggestion domain
-            object.
-        """
-        return cls(
-            suggestion_dict['suggestion_id'], suggestion_dict['target_id'],
-            suggestion_dict['target_version_at_submission'],
-            suggestion_dict['status'], user_services.get_user_id_from_username(
-                suggestion_dict['author_name']),
-            suggestion_dict['final_reviewer_id'],
-            suggestion_dict['change'], suggestion_dict['score_category'],
-            suggestion_dict['last_updated'])
-
     def validate(self):
         """Validates a suggestion object of type SuggestionTranslateContent.
 
@@ -498,22 +477,23 @@ class SuggestionTranslateContent(BaseSuggestion):
         html_string_list.append(self.change.content_html)
         return html_string_list
 
-    def convert_html_in_suggestion(self, conversion_fn):
+    @classmethod
+    def convert_html_in_suggestion(cls, change_dict, conversion_fn):
         """Checks for HTML fields in the suggestion and converts it according
         to the conversion function.
 
         Args:
             conversion_fn: function. The function to be used for converting the
                 HTML.
+            change_dict: dict. The change dict to be converted
         Returns:
-            suggestion change. ExplorationChange. The converted Suggestion
-            change.
+            dict. The converted Suggestion change.
         """
-        self.change.content_html = (
-            conversion_fn(self.change.content_html))
-        self.change.translation_html = (
-            conversion_fn(self.change.translation_html))
-        return exp_domain.ExplorationChange(self.change.to_dict())
+        change_dict['content_html'] = (
+            conversion_fn(change_dict['content_html']))
+        change_dict['translation_html'] = (
+            conversion_fn(change_dict['translation_html']))
+        return exp_domain.ExplorationChange(change_dict)
 
 
 class SuggestionAddQuestion(BaseSuggestion):
@@ -560,26 +540,6 @@ class SuggestionAddQuestion(BaseSuggestion):
         self.score_category = score_category
         self.last_updated = last_updated
 
-    @classmethod
-    def from_dict(cls, suggestion_dict):
-        """Return a Domain object for a suggestion of type
-        SUGGESTION_TYPE_ADD_QUESTION from a dict.
-
-        Args:
-            suggestion_dict: dict. The dict representation of Suggestion object.
-
-        Returns:
-            SuggestionAddQuestion. The corresponding suggestion domain
-            object.
-        """
-        return cls(
-            suggestion_dict['suggestion_id'], suggestion_dict['target_id'],
-            suggestion_dict['target_version_at_submission'],
-            suggestion_dict['status'], user_services.get_user_id_from_username(
-                suggestion_dict['author_name']),
-            suggestion_dict['final_reviewer_id'],
-            suggestion_dict['change'], suggestion_dict['score_category'],
-            suggestion_dict['last_updated'])
 
     def validate(self):
         """Validates a suggestion object of type SuggestionAddQuestion.
@@ -731,40 +691,31 @@ class SuggestionAddQuestion(BaseSuggestion):
             list(str). The list of html content strings.
         """
         html_string_list = []
-        interaction_object = (
-            state_domain.InteractionInstance.from_dict(
-                self.change.question_dict['question_state_data'][
-                    'interaction']))
+        state_object = (
+            state_domain.State.from_dict(
+                self.change.question_dict['question_state_data']))
         html_string_list = (
             html_string_list +
-            interaction_object.get_all_html_content_strings())
-        written_translations_dict = (
-            self.change.question_dict['question_state_data'][
-                'written_translations'])
-        written_translations_object = (
-            state_domain.WrittenTranslations.from_dict(
-                written_translations_dict))
-        html_string_list = (
-            html_string_list +
-            written_translations_object.get_all_html_content_strings())
+            state_object.get_all_html_content_strings())
         return html_string_list
 
-    def convert_html_in_suggestion(self, conversion_fn):
+    @classmethod
+    def convert_html_in_suggestion(cls, change_dict, conversion_fn):
         """Checks for HTML fields in the suggestion and converts it according
         to the conversion function.
 
         Args:
             conversion_fn: function. The function to be used for converting the
                 HTML.
+            change_dict: dict. The change dict to be converted
         Returns:
-            suggestion change. QuestionSuggestionChange. The converted
-            Suggestion change.
+            dict. The converted Suggestion change.
         """
-        self.change.question_dict['question_state_data'] = (
+        change_dict['question_dict']['question_state_data'] = (
             state_domain.State.convert_html_fields_in_state(
-                self.change.question_dict['question_state_data'],
+                change_dict['question_dict']['question_state_data'],
                 conversion_fn))
-        return question_domain.QuestionSuggestionChange(self.change.to_dict())
+        return question_domain.QuestionSuggestionChange(change_dict)
 
 
 class BaseVoiceoverApplication(python_utils.OBJECT):

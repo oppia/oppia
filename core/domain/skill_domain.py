@@ -805,7 +805,7 @@ class Skill(python_utils.OBJECT):
     @classmethod
     def _convert_skill_contents_v1_dict_to_v2_dict(cls, skill_contents_dict):
         """Converts v1 skill contents to the v2 schema. In the v2 schema,
-        the new Math RTE schema is introduced.
+        the new Math components schema is introduced.
 
         Args:
             skill_contents_dict: dict. The v1 skill_contents_dict.
@@ -906,7 +906,7 @@ class Skill(python_utils.OBJECT):
     @classmethod
     def _convert_misconception_v2_dict_to_v3_dict(cls, misconception_dict):
         """Converts v2 misconception schema to the v3 schema. In the v3 schema,
-        the new Math RTE schema is introduced.
+        the new Math components schema is introduced.
 
         Args:
             misconception_dict: dict. The v2 misconception dict.
@@ -941,7 +941,7 @@ class Skill(python_utils.OBJECT):
     @classmethod
     def _convert_rubric_v2_dict_to_v3_dict(cls, rubric_dict):
         """Converts v2 rubric schema to the v3 schema. In the v3 schema,
-        the new Math RTE schema is introduced.
+        the new Math components schema is introduced.
 
         Args:
             rubric_dict: dict. The v2 rubric dict.

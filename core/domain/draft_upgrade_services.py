@@ -93,7 +93,7 @@ class DraftUpgradeUtil(python_utils.OBJECT):
     @classmethod
     def _convert_states_v33_dict_to_v34_dict(cls, draft_change_list):
         """Converts draft change list from state version 33 to 34. State
-        version 34 adds the new schema for Math RTEs.
+        version 34 adds the new schema for Math components.
 
         Args:
             draft_change_list: list(ExplorationChange). The list of
@@ -107,11 +107,10 @@ class DraftUpgradeUtil(python_utils.OBJECT):
         for i, change in enumerate(draft_change_list):
             if not change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY:
                 continue
-            else:
-                # The change object has the key 'new_value' only if the
-                # cmd is 'CMD_EDIT_STATE_PROPERTY' or
-                # 'CMD_EDIT_EXPLORATION_PROPERTY'.
-                new_value = change.new_value
+            # The change object has the key 'new_value' only if the
+            # cmd is 'CMD_EDIT_STATE_PROPERTY' or
+            # 'CMD_EDIT_EXPLORATION_PROPERTY'.
+            new_value = change.new_value
             if change.property_name == exp_domain.STATE_PROPERTY_CONTENT:
                 new_value = conversion_fn(new_value)
             elif (change.property_name ==
@@ -136,11 +135,10 @@ class DraftUpgradeUtil(python_utils.OBJECT):
                         new_value, conversion_fn))
             elif (change.property_name ==
                   exp_domain.STATE_PROPERTY_INTERACTION_HINTS):
-                new_value = (
-                    [(
-                        state_domain.Hint.convert_html_in_hint(
-                            hint_dict, conversion_fn))
-                     for hint_dict in new_value])
+                new_value = [
+                    (state_domain.Hint.convert_html_in_hint(
+                        hint_dict, conversion_fn))
+                    for hint_dict in new_value]
             elif (change.property_name ==
                   exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION):
                 new_value = (
@@ -148,12 +146,10 @@ class DraftUpgradeUtil(python_utils.OBJECT):
                         new_value, conversion_fn))
             elif (change.property_name ==
                   exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
-                new_value = (
-                    [(
-                        state_domain.AnswerGroup.
-                        convert_html_in_answer_group(
-                            answer_group, conversion_fn))
-                     for answer_group in new_value])
+                new_value = [
+                    (state_domain.AnswerGroup.convert_html_in_answer_group(
+                        answer_group, conversion_fn))
+                    for answer_group in new_value]
             draft_change_list[i] = exp_domain.ExplorationChange({
                 'cmd': change.cmd,
                 'property_name': change.property_name,

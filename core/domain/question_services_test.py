@@ -976,16 +976,15 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         self.assertEqual(cust_args['showChoicesInShuffledOrder']['value'], True)
 
     def test_migrate_question_state_from_v33_to_v34(self):
-        feedback_html = (
-            '<p>Feedback</p><oppia-noninteractive-math ' +
-            'raw_latex-with-value="&amp;quot;+,-,-,+&amp;quot' +
-            ';"></oppia-noninteractive-math>')
+        feedback_html_content = (
+            '<p>Feedback</p><oppia-noninteractive-math raw_latex-with-value="' +
+            '&amp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>')
         answer_group = {
             'outcome': {
                 'dest': 'abc',
                 'feedback': {
                     'content_id': 'feedback_1',
-                    'html': feedback_html
+                    'html': feedback_html_content
                 },
                 'labelled_as_correct': True,
                 'param_changes': [],
@@ -1049,14 +1048,11 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             'solicit_answer_details': False,
             'classifier_model_id': None
         }
-        expected_feeedback_html = (
-            '<p>Feedback</p><oppia-noninteractive-' +
-            'math math_content-with-value="{&amp;quot' +
-            ';raw_latex&amp;quot;: &amp;quot;+,-,-,+' +
-            '&amp;quot;, &amp;quot;svg_filename&amp;' +
-            'quot;: &amp;quot;&amp;quot;}"></oppia' +
-            '-noninteractive-math>')
-
+        expected_feeedback_html_content = (
+            '<p>Feedback</p><oppia-noninteractive-math math_content-with-val' +
+            'ue="{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;,' +
+            ' &amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppi' +
+            'a-noninteractive-math>')
         question_model = (
             question_models.QuestionModel(
                 id='question_id',
@@ -1082,7 +1078,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         self.assertEqual(question.question_state_data_schema_version, 34)
 
         migrated_answer_group = (
-            question.question_state_data.interaction.answer_groups[0].to_dict())
+            question.question_state_data.interaction.answer_groups[0])
         self.assertEqual(
-            migrated_answer_group['outcome']['feedback']['html'],
-            expected_feeedback_html)
+            migrated_answer_group.outcome.feedback.html,
+            expected_feeedback_html_content)

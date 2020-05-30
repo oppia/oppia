@@ -1017,17 +1017,14 @@ class SkillMigrationTests(test_utils.GenericTestBase):
             'cmd': skill_domain.CMD_CREATE_NEW
         })
         explanation_content_id = feconf.DEFAULT_SKILL_EXPLANATION_CONTENT_ID
-        html = (
-            '<p>Value</p><oppia-noninteractive-math ' +
-            'raw_latex-with-value="&amp;quot;+,-,-,+&amp;quot' +
-            ';"></oppia-noninteractive-math>')
+        html_content = (
+            '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&a' +
+            'mp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>')
 
-        expected_html = (
-            '<p>Value</p><oppia-noninteractive-' +
-            'math math_content-with-value="{&amp;quot' +
-            ';raw_latex&amp;quot;: &amp;quot;+,-,-,+' +
-            '&amp;quot;, &amp;quot;svg_filename&amp;' +
-            'quot;: &amp;quot;&amp;quot;}"></oppia' +
+        expected_html_content = (
+            '<p>Value</p><oppia-noninteractive-math math_content-with-value=' +
+            '"{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;, &' +
+            'amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia' +
             '-noninteractive-math>')
 
         written_translations_dict = {
@@ -1048,7 +1045,7 @@ class SkillMigrationTests(test_utils.GenericTestBase):
             'translations_mapping': {
                 'content1': {
                     'en': {
-                        'html': expected_html,
+                        'html': expected_html_content,
                         'needs_update': True
                     },
                     'hi': {
@@ -1071,11 +1068,11 @@ class SkillMigrationTests(test_utils.GenericTestBase):
         worked_example_dict_math = {
             'question': {
                 'content_id': 'question1',
-                'html': expected_html
+                'html': expected_html_content
             },
             'explanation': {
                 'content_id': 'explanation1',
-                'html': expected_html
+                'html': expected_html_content
             }
         }
 
@@ -1091,11 +1088,13 @@ class SkillMigrationTests(test_utils.GenericTestBase):
             state_domain.WrittenTranslations.from_dict(
                 written_translations_dict))
         skill_contents_dict = skill_contents.to_dict()
-        skill_contents_dict['explanation']['html'] = html
+        skill_contents_dict['explanation']['html'] = html_content
         skill_contents_dict['written_translations'][
-            'translations_mapping']['content1']['en']['html'] = html
-        skill_contents_dict['worked_examples'][0]['question']['html'] = html
-        skill_contents_dict['worked_examples'][0]['explanation']['html'] = html
+            'translations_mapping']['content1']['en']['html'] = html_content
+        skill_contents_dict['worked_examples'][0]['question']['html'] = (
+            html_content)
+        skill_contents_dict['worked_examples'][0]['explanation']['html'] = (
+            html_content)
 
         model = skill_models.SkillModel(
             id='skill_id',
@@ -1124,13 +1123,13 @@ class SkillMigrationTests(test_utils.GenericTestBase):
         self.assertEqual(skill.skill_contents_schema_version, 2)
 
         self.assertEqual(
-            (skill.skill_contents.to_dict())['explanation']['html'],
-            expected_html)
+            skill.skill_contents.explanation.html,
+            expected_html_content)
         self.assertEqual(
-            (skill.skill_contents.to_dict())['written_translations'],
+            skill.skill_contents.written_translations.to_dict(),
             written_translations_dict_math)
         self.assertEqual(
-            (skill.skill_contents.to_dict())['worked_examples'][0],
+            skill.skill_contents.worked_examples[0].to_dict(),
             worked_example_dict_math)
 
     def test_migrate_misconceptions_to_latest_schema(self):
@@ -1138,17 +1137,14 @@ class SkillMigrationTests(test_utils.GenericTestBase):
             'cmd': skill_domain.CMD_CREATE_NEW
         })
         explanation_content_id = feconf.DEFAULT_SKILL_EXPLANATION_CONTENT_ID
-        html = (
-            '<p>Value</p><oppia-noninteractive-math ' +
-            'raw_latex-with-value="&amp;quot;+,-,-,+&amp;quot' +
-            ';"></oppia-noninteractive-math>')
+        html_content = (
+            '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&a' +
+            'mp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>')
 
-        expected_html = (
-            '<p>Value</p><oppia-noninteractive-' +
-            'math math_content-with-value="{&amp;quot' +
-            ';raw_latex&amp;quot;: &amp;quot;+,-,-,+' +
-            '&amp;quot;, &amp;quot;svg_filename&amp;' +
-            'quot;: &amp;quot;&amp;quot;}"></oppia' +
+        expected_html_content = (
+            '<p>Value</p><oppia-noninteractive-math math_content-with-value=' +
+            '"{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;, &' +
+            'amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia' +
             '-noninteractive-math>')
 
         skill_contents = skill_domain.SkillContents(
@@ -1171,8 +1167,8 @@ class SkillMigrationTests(test_utils.GenericTestBase):
             misconceptions=[{
                 'id': 1,
                 'name': 'name',
-                'notes': html,
-                'feedback': html
+                'notes': html_content,
+                'feedback': html_content
             }],
             rubrics=[],
             skill_contents=skill_contents.to_dict(),
@@ -1194,24 +1190,22 @@ class SkillMigrationTests(test_utils.GenericTestBase):
 
         self.assertEqual(skill.misconceptions_schema_version, 3)
         self.assertEqual(skill.misconceptions[0].must_be_addressed, True)
-        self.assertEqual(skill.misconceptions[0].notes, expected_html)
-        self.assertEqual(skill.misconceptions[0].feedback, expected_html)
+        self.assertEqual(skill.misconceptions[0].notes, expected_html_content)
+        self.assertEqual(
+            skill.misconceptions[0].feedback, expected_html_content)
 
     def test_migrate_rubrics_to_latest_schema(self):
         commit_cmd = skill_domain.SkillChange({
             'cmd': skill_domain.CMD_CREATE_NEW
         })
         explanation_content_id = feconf.DEFAULT_SKILL_EXPLANATION_CONTENT_ID
-        html = (
-            '<p>Value</p><oppia-noninteractive-math ' +
-            'raw_latex-with-value="&amp;quot;+,-,-,+&amp;quot' +
-            ';"></oppia-noninteractive-math>')
-        expected_html = (
-            '<p>Value</p><oppia-noninteractive-' +
-            'math math_content-with-value="{&amp;quot' +
-            ';raw_latex&amp;quot;: &amp;quot;+,-,-,+' +
-            '&amp;quot;, &amp;quot;svg_filename&amp;' +
-            'quot;: &amp;quot;&amp;quot;}"></oppia' +
+        html_content = (
+            '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&a' +
+            'mp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>')
+        expected_html_content = (
+            '<p>Value</p><oppia-noninteractive-math math_content-with-value=' +
+            '"{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;, &' +
+            'amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia' +
             '-noninteractive-math>')
         skill_contents = skill_domain.SkillContents(
             state_domain.SubtitledHtml(
@@ -1240,7 +1234,7 @@ class SkillMigrationTests(test_utils.GenericTestBase):
                 'explanations': ['Medium explanation']
             }, {
                 'difficulty': 'Hard',
-                'explanations': ['Hard explanation', html]
+                'explanations': ['Hard explanation', html_content]
             }],
             skill_contents=skill_contents.to_dict(),
             next_misconception_id=1,
@@ -1267,4 +1261,5 @@ class SkillMigrationTests(test_utils.GenericTestBase):
         self.assertEqual(skill.rubrics[1].explanations, ['Medium explanation'])
         self.assertEqual(skill.rubrics[2].difficulty, 'Hard')
         self.assertEqual(
-            skill.rubrics[2].explanations, ['Hard explanation', expected_html])
+            skill.rubrics[2].explanations,
+            ['Hard explanation', expected_html_content])

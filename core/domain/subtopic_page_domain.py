@@ -223,7 +223,7 @@ class SubtopicPage(python_utils.OBJECT):
     @classmethod
     def _convert_page_contents_v1_dict_to_v2_dict(cls, page_contents_dict):
         """Converts v1 SubtopicPage Contents schema to the v2 schema.
-        v2 schema introduces the new schema for Math RTEs.
+        v2 schema introduces the new schema for Math components.
 
         Args:
             page_contents_dict: dict. A dict used to initialize a SubtopicPage

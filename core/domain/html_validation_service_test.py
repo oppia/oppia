@@ -1510,6 +1510,21 @@ class ContentMigrationTests(test_utils.GenericTestBase):
         }, {
             'html_content': (''),
             'expected_output': ('')
+        }, {
+            'html_content': (
+                '<oppia-noninteractive-math math_content-with-'
+                'value="{&amp;quot;raw_latex&amp;quot;: &amp;'
+                'quot;(x - a_1)(x - a_2)(x - a_3)...(x - a_n)'
+                '&amp;quot;, &amp;quot;svg_filename&amp;quot;'
+                ': &amp;quot;&amp;quot;}"></oppia-noninteractive-math>'
+            ),
+            'expected_output': (
+                '<oppia-noninteractive-math math_content-with-'
+                'value="{&amp;quot;raw_latex&amp;quot;: &amp;'
+                'quot;(x - a_1)(x - a_2)(x - a_3)...(x - a_n)'
+                '&amp;quot;, &amp;quot;svg_filename&amp;quot;'
+                ': &amp;quot;&amp;quot;}"></oppia-noninteractive-math>'
+            )
         }]
 
         for test_case in test_cases:
