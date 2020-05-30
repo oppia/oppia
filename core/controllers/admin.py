@@ -294,8 +294,8 @@ class AdminHandler(base.BaseHandler):
         state.update_recorded_voiceovers(recorded_voiceovers)
         state.update_written_translations(written_translations)
         solution = state_domain.Solution(
-                'TextInput', False, 'Solution', state_domain.SubtitledHtml(
-                    'solution', '<p>This is a solution.</p>'))
+            'TextInput', False, 'Solution', state_domain.SubtitledHtml(
+                'solution', '<p>This is a solution.</p>'))
         hints_list = [
             state_domain.Hint(
                 state_domain.SubtitledHtml('hint_1', '<p>This is a hint.</p>')

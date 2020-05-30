@@ -2204,7 +2204,7 @@ class AppEngineTestBase(TestBase):
         ]
         state.update_interaction_solution(
             state_domain.Solution.from_dict(
-                state.interaction.id,solution_dict))
+                state.interaction.id, solution_dict))
         state.update_interaction_hints(hints_list)
         state.interaction.customization_args = {
             'placeholder': 'Enter text here',

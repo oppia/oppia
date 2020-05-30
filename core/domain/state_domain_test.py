@@ -199,23 +199,19 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         init_state = exploration.states[exploration.init_state_name]
         init_state.update_interaction_id('TextInput')
-        # solution_dict = {
-        #     'answer_is_exclusive': False,
-        #     'correct_answer': 'helloworld!',
-        #     'explanation': {
-        #         'content_id': 'solution',
-        # 'html': (
-        #     '<p><oppia-noninteractive-math '
-        #     'raw_latex-with-value="&amp;quot;\\frac{x}{y}&amp;quot;">'
-        #     '</oppia-noninteractive-math></p>')
-        #     },
-        # }
+        solution_dict = {
+            'answer_is_exclusive': False,
+            'correct_answer': 'helloworld!',
+            'explanation': {
+                'content_id': 'solution',
+        'html': (
+            '<p><oppia-noninteractive-math '
+            'raw_latex-with-value="&amp;quot;\\frac{x}{y}&amp;quot;">'
+            '</oppia-noninteractive-math></p>')
+            },
+        }
         solution = state_domain.Solution(
-                init_state.interaction.id, False,
-                'helloworld!', state_domain.SubtitledHtml(
-                    'solution', '<p><oppia-noninteractive-math '
-                    'raw_latex-with-value="&amp;quot;\\frac{x}{y}&amp;quot;">'
-                    '</oppia-noninteractive-math></p>'))
+            init_state.interaction.id, solution_dict)
         init_state.update_interaction_solution(solution)
         self.assertFalse(init_state.is_rte_content_supported_on_android())
         solution_dict['explanation']['html'] = ''

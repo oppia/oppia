@@ -403,7 +403,7 @@ def apply_change_list(exploration_id, change_list):
                 elif (
                         change.property_name ==
                         exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION):
-                    new_solution = None;
+                    new_solution = None
                     if change.new_value:
                         new_solution = state_domain.Solution.from_dict(
                             state.interaction.id, change.new_value)
