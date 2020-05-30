@@ -1,31 +1,39 @@
 <div class="oppia-practice-tab-container">
-  <md-card class="oppia-practice-tab-card">
-    <button class="oppia-new-practice-session" ng-click="$ctrl.newPracticeSession()">
-      New Practice Session
-    </button>
+  <md-card class="oppia-page-card oppia-long-text">
+    <h2 class="tab-title"> Master these Skills </h2>
+    <span class="practice-content"> Select skills that you would like to practice. </span>
+    <md-checkbox ng-repeat="subtopic in $ctrl.availableSubtopics" ng-model="$ctrl.selectedSubtopicIndices[$index]">
+      <[subtopic.getTitle()]>
+    </md-checkbox>
+    <md-button ng-disabled="$ctrl.disableStartButton()"
+               ng-click="$ctrl.newPracticeSession()"
+               class="practice-session-button md-accent md-raised">
+      Start
+    </md-button>
   </md-card>
 </div>
 <style>
-  .oppia-practice-tab-container {
-    margin-top: 20px;
-  }
-
-  .oppia-new-practice-session {
+  practice-tab .md-button {
+    align-self: center;
     color: white;
-    border-radius: 4px;
+    border-radius: 0.4em;
     font-family: "Capriola", "Roboto", Arial, sans-serif;
-    height: 50px;
-    width: 100%;
-    max-width: 800px;
     margin-top: 20px;
     text-transform: uppercase;
-    background: #0D48A1;
-    padding: 10px;
+    width: 200px;
   }
 
-  .oppia-practice-tab-card {
-    background: #FFFFFF;
-    height: 100px;
-    text-align: center;
+  practice-tab .md-button.md-raised.md-accent.practice-session-button:not([disabled]) {
+    background-color: #439788;
+  }
+
+  practice-tab md-checkbox {
+    margin-top: 1vh;
+  }
+
+  practice-tab .practice-content {
+    font-family: "Capriola", "Roboto", Arial, sans-serif;
+    font-size: 1.2em;
+    margin-bottom: 2.5vh;
   }
 </style>

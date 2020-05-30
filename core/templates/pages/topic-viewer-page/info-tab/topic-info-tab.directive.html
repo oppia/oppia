@@ -1,0 +1,157 @@
+<div class="oppia-topic-info-container">
+  <md-card class="oppia-page-card oppia-long-text">
+    <h2 class="tab-title"><[$ctrl.getTopicName()]></h2>
+    <div class="info-tab-content">
+      <div class="info-tab-left-container" ng-if="!$ctrl.isMobile">
+        <md-card class="info-tab-count">
+          <div style="padding-top: 12%;">
+            <[$ctrl.getStoryCount()]>
+          </div>
+        </md-card>
+        Stories
+
+        <md-card class="info-tab-count" style="margin-top: 20%;">
+          <div style="padding-top: 12%;">
+            <[$ctrl.getChapterCount()]>
+          </div>
+        </md-card>
+        Lessons
+
+        <md-card class="info-tab-count" style="margin-top: 20%;">
+          <div style="padding-top: 12%;">
+            <[$ctrl.getSubtopicCount()]>
+          </div>
+        </md-card>
+        Skills
+      </div>
+      <div class="info-tab-right-container">
+        <strong class="header" translate="I18N_TOPIC_VIEWER_DESCRIPTION"></strong>
+        <[$ctrl.getTopicDescription()]>
+        <md-content ng-if="$ctrl.isMobile" layout="row" style="margin-top: 2.5vh;">
+          <md-card class="info-tab-count">
+            <md-card-content>
+              <[$ctrl.getStoryCount()]>
+            </md-card-content>
+          </md-card>
+          <md-card class="info-tab-count">
+            <md-card-content>
+              <[$ctrl.getChapterCount()]>
+            </md-card-content>
+          </md-card>
+          <md-card class="info-tab-count">
+            <md-card-content>
+              <[$ctrl.getSubtopicCount()]>
+            </md-card-content>
+          </md-card>
+        </md-content>
+        <div ng-if="$ctrl.isMobile" layout="row">
+          <span class="cell-1">
+              Stories
+          </span>
+          <span class="cell-2">
+              Lessons
+          </span>
+          <span class="cell-3">
+              Skills
+          </span>
+        </div>
+      </div>
+    </div>
+  </md-card>
+</div>
+
+<style>
+  topic-info-tab .info-tab-count {
+    background-color: #606060;
+    border-radius: 0.25em;
+    color: white;
+    display: block;
+    font-size: 1.4em;
+    height: 52px;
+    margin-left: 25%;
+    width: 50%;
+  }
+
+  topic-info-tab .header {
+    display: block;
+    font-size: 1.2em;
+    padding-bottom: 10px;
+  }
+
+  topic-info-tab .info-tab-left-container {
+    border-right: 1px solid #BDBDBD;
+    display: inline-block;
+    float: left;
+    padding-bottom: 5vh;
+    padding-top: 5vh;
+    position: relative;
+    text-align: center;
+    white-space: initial;
+    width: 150px;
+  }
+
+  topic-info-tab .info-tab-right-container {
+    display: inline-block;
+    margin-top: 5vh;
+    padding-left: 5%;
+    width: 65%;
+  }
+
+  topic-info-tab .info-tab-content {
+    display: flex;
+  }
+
+  @media (max-width: 1024px) {
+    topic-info-tab .cell-1 {
+      margin-left: 15%;
+    }
+
+    topic-info-tab .cell-2 {
+      margin-left: 21.5%;
+    }
+
+    topic-info-tab .cell-3 {
+      margin-left: 22%;
+    }
+
+    topic-info-tab md-card-content {
+      margin-left: 30%;
+    }
+
+    topic-info-tab .info-tab-count {
+      display: inline;
+      height: auto;
+      margin-left: 10%;
+      width: 20%;
+    }
+
+    topic-info-tab .info-tab-right-container {
+      margin-top: 1vh;
+      padding-left: 0;
+      width: 100%;
+    }
+  }
+
+  @media (max-width: 500px) {
+    topic-info-tab .cell-1 {
+      margin-left: 7%;
+    }
+
+    topic-info-tab .cell-2 {
+      margin-left: 14%;
+    }
+
+    topic-info-tab .cell-3 {
+      margin-left: 15%;
+    }
+
+    topic-info-tab .info-tab-count {
+      margin-left: 5%;
+      width: 25%;
+    }
+
+    topic-info-tab md-card-content {
+      margin-left: 15%;
+    }
+  }
+</style>

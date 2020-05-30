@@ -18,6 +18,7 @@
 
 require('domain/topic_viewer/topic-viewer-domain.constants.ajs.ts');
 require('domain/utilities/url-interpolation.service.ts');
+require('services/assets-backend-api.service.ts');
 
 angular.module('oppia').directive('subtopicSummaryTile', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -25,27 +26,33 @@ angular.module('oppia').directive('subtopicSummaryTile', [
       restrict: 'E',
       scope: {},
       bindToController: {
-        getSkillCount: '&skillCount',
-        getSubtopicId: '&subtopicId',
-        getSubtopicTitle: '&subtopicTitle',
+        getSubtopic: '&subtopic',
+        getTopicId: '&topicId',
         getTopicName: '&topicName'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/summary-tile/subtopic-summary-tile.directive.html'),
       controllerAs: '$ctrl',
-      controller: ['SUBTOPIC_VIEWER_URL_TEMPLATE',
-        function(SUBTOPIC_VIEWER_URL_TEMPLATE) {
+      controller: [
+        'AssetsBackendApiService', 'ENTITY_TYPE',
+        'SUBTOPIC_VIEWER_URL_TEMPLATE',
+        function(
+            AssetsBackendApiService, ENTITY_TYPE,
+            SUBTOPIC_VIEWER_URL_TEMPLATE) {
           var ctrl = this;
-          ctrl.getSubtopicLink = function() {
-            return UrlInterpolationService.interpolateUrl(
+          ctrl.openSubtopicPage = function() {
+            window.location.href = UrlInterpolationService.interpolateUrl(
               SUBTOPIC_VIEWER_URL_TEMPLATE, {
                 topic_name: ctrl.getTopicName(),
-                subtopic_id: ctrl.getSubtopicId().toString()
+                subtopic_id: ctrl.getSubtopic().getId().toString()
               });
           };
 
-          ctrl.getStaticImageUrl = function(imagePath) {
-            return UrlInterpolationService.getStaticImageUrl(imagePath);
+          ctrl.$onInit = function() {
+            ctrl.thumbnailUrl = (
+              AssetsBackendApiService.getThumbnailUrlForPreview(
+                ENTITY_TYPE.TOPIC, ctrl.getTopicId(),
+                ctrl.getSubtopic().getThumbnailFilename()));
           };
         }
       ]
