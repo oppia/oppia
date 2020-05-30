@@ -107,15 +107,13 @@ var PreferencesPage = function() {
   };
 
   this.setUserBio = async function(bio) {
-    waitFor.visibilityOf(
-      userBioElement,
-      'User bio field takes too long to appear.');
+    await waitFor.visibilityOf(
+      userBioElement, 'User bio field takes too long to appear.');
     await userBioElement.clear();
     await userBioElement.sendKeys(bio);
     await navBar.click();
-    waitFor.elementToBeClickable(
-      preferencesLink,
-      'Preferences takes too long to be clickable.');
+    await waitFor.elementToBeClickable(
+      preferencesLink, 'Preferences takes too long to be clickable.');
     await preferencesLink.click();
   };
 
@@ -171,9 +169,8 @@ var PreferencesPage = function() {
   };
 
   this.expectUserBioToBe = async function(bio) {
-    waitFor.visibilityOf(
-      userBioElement,
-      'User bio field takes too long to appear.');
+    await waitFor.visibilityOf(
+      userBioElement, 'User bio field takes too long to appear.');
     expect(await userBioElement.getAttribute('value')).toMatch(bio);
   };
 
