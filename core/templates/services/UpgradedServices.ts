@@ -66,6 +66,8 @@ import { CodeReplRulesService } from
   'interactions/CodeRepl/directives/code-repl-rules.service';
 import { CollectionCreationBackendService } from
   'components/entity-creation-services/collection-creation-backend-api.service';
+import { CollectionCreationService } from
+  'components/entity-creation-services/collection-creation.service';
 import { ComputeGraphService } from 'services/compute-graph.service';
 import { ConceptCardObjectFactory } from
   'domain/skill/ConceptCardObjectFactory';
@@ -76,6 +78,8 @@ import { CountVectorizerService } from 'classifiers/count-vectorizer.service';
 import { CreatorDashboardBackendApiService } from
   'domain/creator_dashboard/creator-dashboard-backend-api.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
+import { CurrentInteractionService } from
+  'pages/exploration-player-page/services/current-interaction.service';
 import { DateTimeFormatService } from 'services/date-time-format.service';
 import { DebouncerService } from 'services/debouncer.service';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
@@ -203,6 +207,10 @@ import { RubricObjectFactory } from
   'domain/skill/RubricObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 import { SVMPredictionService } from 'classifiers/svm-prediction.service';
+import { SchemaDefaultValueService } from
+  'services/schema-default-value.service';
+import { SchemaUndefinedLastElementService } from
+  'services/schema-undefined-last-element.service.ts';
 import { SidebarStatusService } from 'domain/sidebar/sidebar-status.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
@@ -295,6 +303,8 @@ import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { UrlService } from 'services/contextual/url.service';
+import { UserExplorationPermissionsService } from
+  'pages/exploration-editor-page/services/user-exploration-permissions.service';
 import { UserInfoObjectFactory } from 'domain/user/UserInfoObjectFactory';
 import { UtilsService } from 'services/utils.service';
 import { ValidatorsService } from 'services/validators.service';
@@ -405,6 +415,8 @@ export class UpgradedServices {
     upgradedServices['RubricObjectFactory'] =
       new RubricObjectFactory();
     upgradedServices['RuleObjectFactory'] = new RuleObjectFactory();
+    upgradedServices['SchemaUndefinedLastElementService'] =
+      new SchemaUndefinedLastElementService();
     upgradedServices['SkillSummaryObjectFactory'] =
       new SkillSummaryObjectFactory();
     upgradedServices['SolutionValidityService'] = new SolutionValidityService();
@@ -504,6 +516,8 @@ export class UpgradedServices {
         upgradedServices['VoiceoverObjectFactory']);
     upgradedServices['SVMPredictionService'] = new SVMPredictionService(
       upgradedServices['PredictionResultObjectFactory']);
+    upgradedServices['SchemaDefaultValueService'] =
+      new SchemaDefaultValueService(upgradedServices['LoggerService']);
     upgradedServices['SiteAnalyticsService'] = new SiteAnalyticsService(
       upgradedServices['WindowRef']);
     upgradedServices['StateClassifierMappingService'] =
@@ -650,6 +664,11 @@ export class UpgradedServices {
         upgradedServices['HttpClient']));
     upgradedServices['CreatorDashboardBackendApiService'] =
       new CreatorDashboardBackendApiService(upgradedServices['HttpClient']);
+    upgradedServices['CurrentInteractionService'] =
+      new CurrentInteractionService(
+        upgradedServices['ContextService'],
+        upgradedServices['PlayerPositionService'],
+        upgradedServices['PlayerTranscriptService']);
     upgradedServices['EmailDashboardDataService'] =
       new EmailDashboardDataService(upgradedServices['HttpClient']);
     upgradedServices['ExplorationHtmlFormatterService'] =
@@ -695,8 +714,21 @@ export class UpgradedServices {
       upgradedServices['SubtopicObjectFactory'],
       upgradedServices['StoryReferenceObjectFactory'],
       upgradedServices['SkillSummaryObjectFactory']);
+    upgradedServices['UserExplorationPermissionsService'] = (
+      new UserExplorationPermissionsService(
+        upgradedServices['ContextService'],
+        upgradedServices['HttpClient'],
+        upgradedServices['UrlInterpolationService']));
 
     // Topological level: 4.
+    upgradedServices['CollectionCreationService'] =
+      new CollectionCreationService(
+        upgradedServices['CollectionCreationBackendService'],
+        upgradedServices['AlertsService'],
+        upgradedServices['SiteAnalyticsService'],
+        upgradedServices['UrlInterpolationService'],
+        upgradedServices['LoaderService'],
+        upgradedServices['WindowRef']);
     upgradedServices['PredictionAlgorithmRegistryService'] =
       new PredictionAlgorithmRegistryService(
         upgradedServices['CodeReplPredictionService'],
