@@ -59,9 +59,12 @@ class SubtopicPageDataHandler(base.BaseHandler):
 
         subtopic_id = int(subtopic_id)
         topic = topic_fetchers.get_topic_by_name(topic_name)
-        for subtopic in topic.subtopics:
+        next_subtopic_title = None
+        for index, subtopic in enumerate(topic.subtopics):
             if subtopic.id == subtopic_id:
                 subtopic_title = subtopic.title
+                if(index != len(topic.subtopics) - 1):
+                    next_subtopic_title = topic.subtopics[index + 1].title
                 break
         subtopic_page_contents = (
             subtopic_page_services.get_subtopic_page_contents_by_id(
@@ -70,6 +73,7 @@ class SubtopicPageDataHandler(base.BaseHandler):
 
         self.values.update({
             'page_contents': subtopic_page_contents_dict,
-            'subtopic_title': subtopic_title
+            'subtopic_title': subtopic_title,
+            'next_subtopic_title': next_subtopic_title
         })
         self.render_json(self.values)

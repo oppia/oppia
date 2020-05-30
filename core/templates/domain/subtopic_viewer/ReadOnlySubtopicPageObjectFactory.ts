@@ -29,15 +29,21 @@ import {
 export interface ISubtopicDataBackendDict {
   'subtopic_title': string;
   'page_contents': ISubtopicPageContentsBackendDict;
+  'next_subtopic_title': string
 }
 
 export class ReadOnlySubtopicPageData {
   subtopicTitle: string;
   pageContents: SubtopicPageContents;
+  nextSubtopicTitle: string;
 
-  constructor(subtopicTitle: string, pageContents: SubtopicPageContents) {
+  constructor(subtopicTitle: string,
+      pageContents: SubtopicPageContents,
+      nextSubtopicTitle: string
+  ) {
     this.subtopicTitle = subtopicTitle;
     this.pageContents = pageContents;
+    this.nextSubtopicTitle = nextSubtopicTitle;
   }
 
   getSubtopicTitle(): string {
@@ -46,6 +52,10 @@ export class ReadOnlySubtopicPageData {
 
   getPageContents(): SubtopicPageContents {
     return this.pageContents;
+  }
+
+  getNextSubtopicTitle(): string {
+    return this.nextSubtopicTitle;
   }
 }
 
@@ -63,7 +73,8 @@ export class ReadOnlySubtopicPageObjectFactory {
       subtopicDataBackendDict.subtopic_title,
       this.subtopicPageContentsObjectFactory.createFromBackendDict(
         subtopicDataBackendDict.page_contents
-      )
+      ),
+      subtopicDataBackendDict.next_subtopic_title
     );
   }
 }
