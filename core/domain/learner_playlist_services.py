@@ -56,12 +56,19 @@ def save_learner_playlist(learner_playlist):
         learner_playlist: LearnerPlaylist. The learner playlist domain object to
             be saved in the datastore.
     """
-    learner_playlist_model = user_models.LearnerPlaylistModel(
-        id=learner_playlist.id,
-        exploration_ids=learner_playlist.exploration_ids,
-        collection_ids=learner_playlist.collection_ids)
+    learner_playlist_dict = {
+        'exploration_ids': learner_playlist.exploration_ids,
+        'collection_ids': learner_playlist.collection_ids
+    }
 
-    learner_playlist_model.put()
+    learner_playlist_model = (user_models.LearnerPlaylistModel.get_by_id(
+        learner_playlist.id))
+    if learner_playlist_model is not None:
+        learner_playlist_model.populate(**learner_playlist_dict)
+        learner_playlist_model.put()
+    else:
+        learner_playlist_dict['id'] = learner_playlist.id
+        user_models.LearnerPlaylistModel(**learner_playlist_dict).put()
 
 
 def mark_exploration_to_be_played_later(

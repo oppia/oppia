@@ -33,6 +33,7 @@ describe('Classroom backend API service', function() {
     TopicSummaryObjectFactory = null;
   let responseDictionaries = {
     topic_summary_dicts: [{
+      id: 'topic1',
       name: 'Topic name',
       description: 'Topic description',
       canonical_story_count: 4,
@@ -40,6 +41,7 @@ describe('Classroom backend API service', function() {
       total_skill_count: 20,
       uncategorized_skill_count: 5
     }, {
+      id: 'topic2',
       name: 'Topic name 2',
       description: 'Topic description 2',
       canonical_story_count: 3,
@@ -79,11 +81,11 @@ describe('Classroom backend API service', function() {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
 
-      classroomBackendApiService.fetchClassroomData('0').then(
+      classroomBackendApiService.fetchClassroomData('math').then(
         successHandler, failHandler);
 
       let req = httpTestingController.expectOne(
-        '/classroom_data_handler/0');
+        '/classroom_data_handler/math');
       expect(req.request.method).toEqual('GET');
       req.flush(responseDictionaries);
 
@@ -133,6 +135,49 @@ describe('Classroom backend API service', function() {
       expect(successHandler).toHaveBeenCalledWith(
         sampleDataResultsObjects.topic_summary_objects);
       expect(failHandler).not.toHaveBeenCalled();
+    })
+  );
+
+  it('should handle successCallback for fetch classroom page is shown status',
+    fakeAsync(() => {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
+
+      classroomBackendApiService.fetchClassroomPageIsShownStatus().then(
+        successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(
+        '/classroom_page_status_handler');
+      expect(req.request.method).toEqual('GET');
+      req.flush({classroom_page_is_shown: false});
+
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalledWith(false);
+      expect(failHandler).not.toHaveBeenCalled();
+    })
+  );
+
+  it('should handle errorCallback for fetch classroom page is shown status',
+    fakeAsync(() => {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
+
+      classroomBackendApiService.fetchClassroomPageIsShownStatus().then(
+        successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(
+        '/classroom_page_status_handler');
+      expect(req.request.method).toEqual('GET');
+      req.flush('Invalid request', {
+        status: 400,
+        statusText: 'Invalid request'
+      });
+
+      flushMicrotasks();
+
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalled();
     })
   );
 });

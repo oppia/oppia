@@ -66,6 +66,8 @@ import { CodeReplRulesService } from
   'interactions/CodeRepl/directives/code-repl-rules.service';
 import { CollectionCreationBackendService } from
   'components/entity-creation-services/collection-creation-backend-api.service';
+import { CollectionCreationService } from
+  'components/entity-creation-services/collection-creation.service';
 import { ComputeGraphService } from 'services/compute-graph.service';
 import { ConceptCardObjectFactory } from
   'domain/skill/ConceptCardObjectFactory';
@@ -76,6 +78,8 @@ import { CountVectorizerService } from 'classifiers/count-vectorizer.service';
 import { CreatorDashboardBackendApiService } from
   'domain/creator_dashboard/creator-dashboard-backend-api.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
+import { CurrentInteractionService } from
+  'pages/exploration-player-page/services/current-interaction.service';
 import { DateTimeFormatService } from 'services/date-time-format.service';
 import { DebouncerService } from 'services/debouncer.service';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
@@ -124,6 +128,8 @@ import { ImprovementActionButtonObjectFactory } from
 import { ImprovementsService } from 'services/improvements.service';
 import { InteractionObjectFactory } from
   'domain/exploration/InteractionObjectFactory';
+import { InteractionRulesRegistryService } from
+  'services/interaction-rules-registry.service';
 import { InteractionSpecsService } from 'services/interaction-specs.service';
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
 import { LearnerActionObjectFactory } from
@@ -232,6 +238,8 @@ import { StateImprovementSuggestionService } from
 import { StateInteractionIdService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-interaction-id.service';
+import { StateInteractionStatsService } from
+  'services/state-interaction-stats.service';
 import { StateObjectFactory } from 'domain/state/StateObjectFactory';
 import { StatePropertyService } from
   // eslint-disable-next-line max-len
@@ -291,6 +299,8 @@ import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { UrlService } from 'services/contextual/url.service';
+import { UserExplorationPermissionsService } from
+  'pages/exploration-editor-page/services/user-exploration-permissions.service';
 import { UserInfoObjectFactory } from 'domain/user/UserInfoObjectFactory';
 import { UtilsService } from 'services/utils.service';
 import { ValidatorsService } from 'services/validators.service';
@@ -617,6 +627,26 @@ export class UpgradedServices {
       upgradedServices['NormalizeWhitespacePipe']);
 
     // Topological level: 3.
+    upgradedServices['InteractionRulesRegistryService'] =
+      new InteractionRulesRegistryService(
+        upgradedServices['CodeReplRulesService'],
+        upgradedServices['ContinueRulesService'],
+        upgradedServices['DragAndDropSortInputRulesService'],
+        upgradedServices['EndExplorationRulesService'],
+        upgradedServices['FractionInputRulesService'],
+        upgradedServices['GraphInputRulesService'],
+        upgradedServices['ImageClickInputRulesService'],
+        upgradedServices['InteractiveMapRulesService'],
+        upgradedServices['ItemSelectionInputRulesService'],
+        upgradedServices['LogicProofRulesService'],
+        upgradedServices['MathExpressionInputRulesService'],
+        upgradedServices['MultipleChoiceInputRulesService'],
+        upgradedServices['MusicNotesInputRulesService'],
+        upgradedServices['NumberWithUnitsRulesService'],
+        upgradedServices['NumericInputRulesService'],
+        upgradedServices['PencilCodeEditorRulesService'],
+        upgradedServices['SetInputRulesService'],
+        upgradedServices['TextInputRulesService']);
     upgradedServices['AudioTranslationLanguageService'] =
       new AudioTranslationLanguageService(
         upgradedServices['BrowserCheckerService'],
@@ -626,6 +656,11 @@ export class UpgradedServices {
         upgradedServices['HttpClient']));
     upgradedServices['CreatorDashboardBackendApiService'] =
       new CreatorDashboardBackendApiService(upgradedServices['HttpClient']);
+    upgradedServices['CurrentInteractionService'] =
+      new CurrentInteractionService(
+        upgradedServices['ContextService'],
+        upgradedServices['PlayerPositionService'],
+        upgradedServices['PlayerTranscriptService']);
     upgradedServices['EmailDashboardDataService'] =
       new EmailDashboardDataService(upgradedServices['HttpClient']);
     upgradedServices['ExplorationHtmlFormatterService'] =
@@ -671,8 +706,21 @@ export class UpgradedServices {
       upgradedServices['SubtopicObjectFactory'],
       upgradedServices['StoryReferenceObjectFactory'],
       upgradedServices['SkillSummaryObjectFactory']);
+    upgradedServices['UserExplorationPermissionsService'] = (
+      new UserExplorationPermissionsService(
+        upgradedServices['ContextService'],
+        upgradedServices['HttpClient'],
+        upgradedServices['UrlInterpolationService']));
 
     // Topological level: 4.
+    upgradedServices['CollectionCreationService'] =
+      new CollectionCreationService(
+        upgradedServices['CollectionCreationBackendService'],
+        upgradedServices['AlertsService'],
+        upgradedServices['SiteAnalyticsService'],
+        upgradedServices['UrlInterpolationService'],
+        upgradedServices['LoaderService'],
+        upgradedServices['WindowRef']);
     upgradedServices['PredictionAlgorithmRegistryService'] =
       new PredictionAlgorithmRegistryService(
         upgradedServices['CodeReplPredictionService'],
@@ -713,6 +761,15 @@ export class UpgradedServices {
       upgradedServices['RecordedVoiceoversObjectFactory'],
       upgradedServices['SubtitledHtmlObjectFactory'],
       upgradedServices['WrittenTranslationsObjectFactory']);
+    upgradedServices['StateInteractionStatsService'] =
+      new StateInteractionStatsService(
+        upgradedServices['AngularNameService'],
+        upgradedServices['AnswerClassificationService'],
+        upgradedServices['ContextService'],
+        upgradedServices['FractionObjectFactory'],
+        upgradedServices['HttpClient'],
+        upgradedServices['InteractionRulesRegistryService'],
+        upgradedServices['UrlInterpolationService']);
 
     // Topological level: 7.
     upgradedServices['StatesObjectFactory'] = new StatesObjectFactory(

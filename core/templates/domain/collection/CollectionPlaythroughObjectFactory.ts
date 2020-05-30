@@ -22,6 +22,11 @@ import cloneDeep from 'lodash/cloneDeep';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
+interface ICollectionPlaythroughBackendDict {
+  'next_exploration_id': string;
+  'completed_exploration_ids': string[];
+}
+
 export class CollectionPlaythrough {
   _nextExplorationId: string;
   _completedExplorationIds: string[];
@@ -76,12 +81,9 @@ export class CollectionPlaythroughObjectFactory {
   // Static class methods. Note that "this" is not available in static
   // contexts. This function takes a JSON object which represents a backend
   // collection playthrough python dict.
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'collectionPlaythroughBackendObject' is a dict with
-  // underscore_cased keys which give tslint errors against underscore_casing
-  // in favor of camelCasing.
   createFromBackendObject(
-      collectionPlaythroughBackendObject: any): CollectionPlaythrough {
+      collectionPlaythroughBackendObject: ICollectionPlaythroughBackendDict):
+      CollectionPlaythrough {
     return new CollectionPlaythrough(
       collectionPlaythroughBackendObject.next_exploration_id,
       collectionPlaythroughBackendObject.completed_exploration_ids);
