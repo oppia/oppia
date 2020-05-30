@@ -712,7 +712,7 @@ class GeneralPurposeLinter(python_utils.OBJECT):
         all_filepaths = [
             filepath for filepath in self.all_filepaths if not (
                 filepath.endswith('general_purpose_linter.py') or (
-                    filepath.endswith('pre_commit_linter_test.py')))]
+                    filepath.endswith('general_purpose_linter_test.py')))]
         failed = False
         stdout = sys.stdout
         with linter_utils.redirect_stdout(stdout):
