@@ -36,6 +36,7 @@ require('pages/community-dashboard-page/services/translate-text.service.ts');
 require(
   'pages/exploration-editor-page/translation-tab/services/' +
   'translation-language.service.ts');
+require('services/context.service.ts');
 require('services/alerts.service.ts');
 
 angular.module('oppia').directive(
@@ -123,9 +124,16 @@ angular.module('oppia').directive(
                 }
               },
               controller: [
-                '$scope', '$uibModalInstance', 'opportunity',
+                '$scope', '$uibModalInstance', 'opportunity', 'ContextService',
+                'ENTITY_TYPE',
                 function(
-                    $scope, $uibModalInstance, opportunity) {
+                    $scope, $uibModalInstance, opportunity, ContextService,
+                    ENTITY_TYPE) {
+                  // We need to set the context here so that the rte fetches
+                  // images for the given ENTITY_TYPE and targetId.
+                  ContextService.setCustomEntityContext(
+                    ENTITY_TYPE.EXPLORATION, opportunity.id);
+                  $scope.userIsLoggedIn = userIsLoggedIn;
                   $scope.uploadingTranslation = false;
                   $scope.activeWrittenTranslation = {};
                   $scope.activeWrittenTranslation.html = '';
