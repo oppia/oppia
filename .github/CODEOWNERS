@@ -73,7 +73,7 @@
 /LICENSE @seanlip
 /NOTICE @seanlip
 /core/templates/pages/about-page/ @DubeySandeep
-/core/templates/pages/about-page/about-page.directive.html @seanlip
+/core/templates/pages/about-page/about-page.component.html @seanlip
 /core/templates/pages/privacy-page/ @DubeySandeep
 /core/templates/pages/privacy-page/privacy-page.mainpage.html @seanlip
 /core/templates/pages/terms-page/ @DubeySandeep
