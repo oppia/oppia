@@ -287,25 +287,22 @@
 
 # New structures team.
 # Question project.
-/core/controllers/practice_sessions*.py @vinitamurthi
-/core/controllers/question*.py @aks681 @vinitamurthi
-/core/controllers/review_tests*.py @sophiewu6 @vinitamurthi
-/core/domain/question*.py @aks681 @vinitamurthi
-/core/storage/question/ @aks681 @vinitamurthi
-/core/templates/components/concept-card/ @sophiewu6 @vinitamurthi
-/core/templates/components/entity-creation-services/question-creation.service.ts @aks681 @vinitamurthi
-/core/templates/components/score-ring/ @vinitamurthi
-/core/templates/components/skill-mastery/ @sophiewu6 @vinitamurthi
-/core/templates/components/skills-mastery-list/ @sophiewu6 @vinitamurthi
-/core/templates/domain/question/ @aks681 @vinitamurthi
-/core/templates/domain/review_test/ @nishantwrp @sophiewu6 @vinitamurthi
-/core/templates/pages/practice-session-page/ @vinitamurthi
-/core/templates/pages/review-test-page/ @sophiewu6 @vinitamurthi
-/core/templates/services/questions-list.service*.ts @sophiewu6 @vinitamurthi
-/core/templates/components/question-directives/question-editor/ @aks681 @vinitamurthi
-/core/templates/components/question-directives/questions-list/ @aks681 @vinitamurthi
-/core/templates/components/question-directives/modal-templates/ @aks681 @vinitamurthi
-/core/templates/components/question-directives/question-player/ @vinitamurthi
+/core/controllers/practice_sessions*.py @aks681
+/core/controllers/question*.py @aks681
+/core/controllers/review_tests*.py @aks681
+/core/domain/question*.py @aks681
+/core/storage/question/ @aks681
+/core/templates/components/concept-card/ @kevintab95
+/core/templates/components/entity-creation-services/question-creation.service.ts @kevintab95
+/core/templates/components/score-ring/ @kevintab95
+/core/templates/components/skill-mastery/ @kevintab95
+/core/templates/components/skills-mastery-list/ @kevintab95
+/core/templates/domain/question/ @kevintab95
+/core/templates/domain/review_test/ @kevintab95
+/core/templates/pages/practice-session-page/ @kevintab95
+/core/templates/pages/review-test-page/ @kevintab95
+/core/templates/services/questions-list.service*.ts @kevintab95
+/core/templates/components/question-directives/ @aks681 @kevintab95
 
 # Readme
 /core/README.md @ankita240796
