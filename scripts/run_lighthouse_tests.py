@@ -19,6 +19,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import argparse
 import atexit
+import fileinput
 import os
 import re
 import shutil
@@ -156,12 +157,20 @@ def run_lighthouse_checks_with_compression():
     except subprocess.CalledProcessError:
         download_and_install_nginx()
 
+    constants_env_variable = '"DEV_MODE": false'
+    for line in fileinput.input(
+            files=[os.path.join('assets', 'constants.ts')], inplace=True):
+        # Inside this loop the STDOUT will be redirected to the file,
+        # constants.ts. The end='' is needed to avoid double line breaks.
+        python_utils.PRINT(
+            re.sub(
+                r'"DEV_MODE": .*', constants_env_variable, line), end='')
     build.main(args=['--prod_env'])
     start_google_app_engine_server(True)
     wait_for_port_to_be_open(APP_ENGINE_PORT)
     start_proxy_server()
     wait_for_port_to_be_open(NGINX_PORT)
-    run_lighthouse_checks()
+    # run_lighthouse_checks()
 
 
 def cleanup():
@@ -182,14 +191,14 @@ def cleanup():
 def main(args=None):
     """Runs lighthouse checks and deletes reports."""
     parsed_args = _PARSER.parse_args(args=args)
-    atexit.register(cleanup)
+    # atexit.register(cleanup)
     setup_and_install_dependencies()
     if parsed_args.enable_compression:
         run_lighthouse_checks_with_compression()
     else:
         start_google_app_engine_server(False)
         wait_for_port_to_be_open(APP_ENGINE_PORT)
-        run_lighthouse_checks()
+    #     run_lighthouse_checks()
 
 
 if __name__ == '__main__':
