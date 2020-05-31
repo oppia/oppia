@@ -227,6 +227,21 @@ class BaseSuggestion(python_utils.OBJECT):
             'Subclasses of BaseSuggestion should implement '
             'pre_update_validate.')
 
+    def get_all_html_content_strings(self):
+        """Gets all html content strings used in this suggestion."""
+        raise NotImplementedError(
+            'Subclasses of BaseSuggestion should implement '
+            'get_all_html_content_strings.')
+
+    @staticmethod
+    def convert_html_in_suggestion_change_dict(change_dict, conversion_fn):
+        """Checks for HTML fields in a suggestion change dict and converts it
+        according to the conversion function.
+        """
+        raise NotImplementedError(
+            'Subclasses of BaseSuggestion should implement '
+            'convert_html_in_suggestion_change_dict.')
+
     @property
     def is_handled(self):
         """Returns if the suggestion has either been accepted or rejected.

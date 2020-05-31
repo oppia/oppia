@@ -88,6 +88,24 @@ class BaseSuggestionUnitTests(test_utils.GenericTestBase):
             ' pre_update_validate.'):
             self.base_suggestion.pre_update_validate({})
 
+    def test_base_class_get_all_html_content_strings(self):
+        with self.assertRaisesRegexp(
+            NotImplementedError,
+            'Subclasses of BaseSuggestion should implement'
+            ' get_all_html_content_strings.'):
+            self.base_suggestion.get_all_html_content_strings()
+
+    def test_base_class_convert_html_in_suggestion_change_dict(self):
+        def conversion_fn():
+            """Temporary function."""
+            pass
+        with self.assertRaisesRegexp(
+            NotImplementedError,
+            'Subclasses of BaseSuggestion should implement'
+            ' convert_html_in_suggestion_change_dict.'):
+            self.base_suggestion.convert_html_in_suggestion_change_dict(
+                {}, conversion_fn)
+
 
 class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
     """Tests for the SuggestionEditStateContent class."""
