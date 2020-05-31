@@ -18,7 +18,6 @@
 
 require('base-components/base-content.directive.ts');
 
-require('pages/email-dashboard-pages/email-dashboard-data.service.ts');
 require('services/user.service.ts');
 
 angular.module('oppia').component('emailDashboardPage', {

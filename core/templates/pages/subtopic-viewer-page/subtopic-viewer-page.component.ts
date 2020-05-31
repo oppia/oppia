@@ -25,12 +25,6 @@ require(
 require('directives/angular-html-bind.directive.ts');
 require('directives/mathjax-bind.directive.ts');
 
-require('domain/subtopic_viewer/subtopic-viewer-backend-api.service.ts');
-require('services/alerts.service.ts');
-require('services/page-title.service.ts');
-require('services/contextual/url.service.ts');
-require('services/contextual/window-dimensions.service.ts');
-
 angular.module('oppia').component('subtopicViewerPage', {
   template: require('./subtopic-viewer-page.component.html'),
   controller: [

@@ -18,8 +18,6 @@
 
 require('base-components/base-content.directive.ts');
 
-require('domain/utilities/url-interpolation.service.ts');
-
 angular.module('oppia').component('emailDashboardResultPage', {
   template: require('./email-dashboard-result.component.html'),
   controller: [
