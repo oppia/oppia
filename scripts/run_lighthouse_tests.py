@@ -191,14 +191,14 @@ def cleanup():
 def main(args=None):
     """Runs lighthouse checks and deletes reports."""
     parsed_args = _PARSER.parse_args(args=args)
-    # atexit.register(cleanup)
+    atexit.register(cleanup)
     setup_and_install_dependencies()
     if parsed_args.enable_compression:
         run_lighthouse_checks_with_compression()
     else:
         start_google_app_engine_server(False)
         wait_for_port_to_be_open(APP_ENGINE_PORT)
-    #     run_lighthouse_checks()
+        run_lighthouse_checks()
 
 
 if __name__ == '__main__':
