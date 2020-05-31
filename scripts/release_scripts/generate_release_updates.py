@@ -67,27 +67,30 @@ def create_new_file_with_release_message_template():
         '   4. Names of release testers\n'
         '   5. Name of QA Team lead\n'
         '   6. Your name\n' % RELEASE_MAIL_MESSAGE_FILEPATH)
+    common.ask_user_to_confirm('Please save the file.')
 
 
 def validate_release_message():
     """Checks the message after the mail template is updated by the
     user.
-
-    Raises:
-        Exception: The message still contains sections from template
-            which are not updated.
     """
-    with python_utils.open_file(RELEASE_MAIL_MESSAGE_FILEPATH, 'r') as f:
-        release_mail_message = f.read()
+    message_is_invalid = True
+    while message_is_invalid:
+        mail_message_file = python_utils.open_file(
+            RELEASE_MAIL_MESSAGE_FILEPATH, 'r')
+        release_mail_message = mail_message_file.read()
         extra_sections = [
             section for section in SECTIONS_TO_ADD if (
                 section in release_mail_message)]
         if extra_sections:
-            raise Exception(
+            common.ask_user_to_confirm(
                 'Template not formatted correctly. '
                 'Following sections still not updated: %s.\n'
-                'Please re-run the scripts and make the updates again.' % (
+                'Please update the sections correctly.' % (
                     ', '.join(extra_sections)))
+            common.ask_user_to_confirm('Please save the file.')
+        else:
+            message_is_invalid = False
 
 
 def get_new_authors_and_contributors_mail_ids():
