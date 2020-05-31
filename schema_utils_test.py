@@ -151,7 +151,7 @@ VALIDATOR_SPECS = {
             }
         },
         'is_uniquified': {},
-        'contains_valid_latin_letters': {}
+        'contains_valid_placeholders': {}
     },
     SCHEMA_TYPE_UNICODE: {
         'matches_regex': {
@@ -508,6 +508,7 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
         self.assertFalse(is_valid_asciimath_expression('(25 + 3.4.3*a)'))
         self.assertFalse(is_valid_asciimath_expression('a_b'))
         self.assertFalse(is_valid_asciimath_expression('!/'))
+        self.assertFalse(is_valid_asciimath_expression('a~b'))
         self.assertFalse(is_valid_asciimath_expression('1+2'))
         self.assertFalse(is_valid_asciimath_expression('a*b)'))
         self.assertFalse(is_valid_asciimath_expression('(a}+{b)'))
@@ -553,25 +554,26 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
         self.assertFalse(is_valid_asciimath_expression('alpha + beta-1', False))
         self.assertFalse(is_valid_asciimath_expression('(3+2]', False))
         self.assertFalse(is_valid_asciimath_expression('3!2', False))
+        self.assertFalse(is_valid_asciimath_expression('3~2', False))
         self.assertFalse(is_valid_asciimath_expression('3-+2', False))
         self.assertFalse(is_valid_asciimath_expression('3-5=(-2)', False))
         self.assertFalse(is_valid_asciimath_expression('3 > 2', False))
 
-    def test_contains_valid_latin_letters(self):
-        """Tests for the contains_valid_latin_letters static method."""
-        contains_valid_latin_letters = schema_utils.get_validator(
-            'contains_valid_latin_letters')
+    def test_contains_valid_placeholders(self):
+        """Tests for the contains_valid_placeholders static method."""
+        contains_valid_placeholders = schema_utils.get_validator(
+            'contains_valid_placeholders')
 
-        self.assertTrue(contains_valid_latin_letters([]))
-        self.assertTrue(contains_valid_latin_letters(['a', 'z', 'alpha']))
-        self.assertTrue(contains_valid_latin_letters(['a', 'Z', 'pi']))
-        self.assertTrue(contains_valid_latin_letters(['A', 'Z']))
+        self.assertTrue(contains_valid_placeholders([]))
+        self.assertTrue(contains_valid_placeholders(['a', 'z', 'alpha']))
+        self.assertTrue(contains_valid_placeholders(['a', 'Z', 'pi']))
+        self.assertTrue(contains_valid_placeholders(['A', 'Z']))
 
-        self.assertFalse(contains_valid_latin_letters(['A', '']))
-        self.assertFalse(contains_valid_latin_letters(['Alpha', 'b']))
-        self.assertFalse(contains_valid_latin_letters(['a', '1']))
-        self.assertFalse(contains_valid_latin_letters(['A', 'Bc']))
-        self.assertFalse(contains_valid_latin_letters(['3', 'a']))
+        self.assertFalse(contains_valid_placeholders(['A', '']))
+        self.assertFalse(contains_valid_placeholders(['Alpha', 'b']))
+        self.assertFalse(contains_valid_placeholders(['a', '1']))
+        self.assertFalse(contains_valid_placeholders(['A', 'Bc']))
+        self.assertFalse(contains_valid_placeholders(['3', 'a']))
 
     def test_is_valid_math_equation_validator(self):
         """Tests for the is_valid_math_equation static method."""
@@ -599,6 +601,7 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
         self.assertFalse(is_valid_math_equation('a+b=0=a-b'))
         self.assertFalse(is_valid_math_equation('alpha - beta/c'))
         self.assertFalse(is_valid_math_equation('2^alpha-(-3*) = 3'))
+        self.assertFalse(is_valid_math_equation('a~b = 0'))
         self.assertFalse(is_valid_math_equation('a+b<=0'))
         self.assertFalse(is_valid_math_equation('a+b>=0'))
         self.assertFalse(is_valid_math_equation('a+b<0'))

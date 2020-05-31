@@ -1083,7 +1083,7 @@ class SetOfPlaceholders(BaseObject):
         'validators': [{
             'id': 'is_uniquified'
         }, {
-            'id': 'contains_valid_latin_letters'
+            'id': 'contains_valid_placeholders'
         }]
     }
 

@@ -284,7 +284,9 @@ def tokenize(expression):
     # Removing whitespace.
     expression = expression.replace(' ', '')
 
-    # Replacing greek letters with corresponding symbols.
+    # Replacing greek letters with corresponding symbols. The replaced symbols
+    # are english letters since this is just a structural check so the exact
+    # greek letters are not needed.
     for letter in GREEK_LETTERS:
         expression = expression.replace(letter, GREEK_LETTERS[letter])
 
@@ -297,37 +299,38 @@ def tokenize(expression):
 
     tokens = []
 
-    i = 0
-    while i < len(expression):
-        current_token = []
+    index = 0
+    while index < len(expression):
+        current_token_list = []
         # If character is a numeric operand, add all following numbers to the
         # current token.
-        while is_numeric_operand(expression[i]) or expression[i] == '.':
-            current_token.append(expression[i])
-            i += 1
-            if i == len(expression):
+        while is_numeric_operand(expression[index]) or expression[index] == '.':
+            current_token_list.append(expression[index])
+            index += 1
+            if index == len(expression):
                 break
 
-        if len(current_token) != 0:
-            tokens.append(''.join(current_token))
+        if len(current_token_list) != 0:
+            tokens.append(''.join(current_token_list))
         else:
-            if is_algebraic_operand(expression[i]):
-                tokens.append(expression[i])
+            if is_algebraic_operand(expression[index]):
+                tokens.append(expression[index])
             else:
                 # This is required to signify the distinction between the unary
                 # negation operation and the binary subtraction operation.
                 # For unary negation: The negative sign must be followed by an
                 # operand and preceded by a '(' or must be the first character.
                 # otherwise its binary subtraction.
-                if expression[i] == '-' and i < len(expression) - 1:
-                    if (i == 0 or expression[i - 1] == '(') and is_operand(
-                            expression[i + 1]):
+                if expression[index] == '-' and index < len(expression) - 1:
+                    if (index == 0 or expression[
+                            index - 1] == '(') and is_operand(expression[
+                                index + 1]):
                         tokens.append('~')
                     else:
                         tokens.append('-')
                 else:
-                    tokens.append(expression[i])
-            i += 1
+                    tokens.append(expression[index])
+            index += 1
 
     return tokens
 
@@ -341,7 +344,8 @@ def infix_to_postfix(expression):
         expression: str. A math expression (algebraic/numeric).
 
     Returns:
-        list. The postfix notation of the given expression.
+        list|None. The postfix notation of the given expression. Returns None if
+            the given expression is invalid.
     """
     postfix_expression, stack = [], []
 
@@ -377,7 +381,7 @@ def infix_to_postfix(expression):
                 top_char = stack.pop()
         else:
             # The token is invalid.
-            return ['Invalid expression.']
+            return None
 
     while len(stack):
         postfix_expression.append(stack.pop())
@@ -392,15 +396,12 @@ def is_valid_postfix_expression(tokenized_expression):
     negation operator which requires at least one operand preceding it.
 
     Args:
-        tokenized_expression: list. Tokenized postfix notation of the
+        tokenized_expression: list. A tokenized postfix notation of the
             math expression.
 
     Returns:
         bool. Whether the given postfix notation is syntactically valid.
     """
-    if tokenized_expression == ['Invalid expression.']:
-        return False
-
     stack = []
 
     for token in tokenized_expression:
@@ -661,20 +662,24 @@ class _Validators(python_utils.OBJECT):
 
         # Expression should be syntactically valid.
         postfix_expression = infix_to_postfix(obj)
+        if postfix_expression is None:
+            return False
 
         return is_valid_postfix_expression(postfix_expression)
 
 
     @staticmethod
-    def contains_valid_latin_letters(obj):
+    def contains_valid_placeholders(obj):
         """Returns True iff all elements of the given object (a list) are
-        valid latin letters.
+        valid placeholders. A placeholder could be an english alphabet
+        (uppercase/lowercase) or a greek letter represented as a single word.
+        Valid greek letters are present in the GREEK_LETTERS constant.
 
         Args:
             obj: list(*). A list of strings.
 
         Returns:
-            bool. Whether the given object contains valid latin letters.
+            bool. Whether the given object contains valid placeholders.
         """
         return all(is_algebraic_operand(elem) for elem in obj)
 
