@@ -7754,10 +7754,10 @@ react-dom-factories@1.0.2:
   resolved "https://registry.yarnpkg.com/react-dom-factories/-/react-dom-factories-1.0.2.tgz#eb7705c4db36fb501b3aa38ff759616aa0ff96e0"
   integrity sha1-63cFxNs2+1AbOqOP91lhaqD/luA=
 
-react-dom@16.1.1:
-  version "16.1.1"
-  resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-16.1.1.tgz#b2e331b6d752faf1a2d31399969399a41d8d45f8"
-  integrity sha512-q06jiwST8SEPAMIEkAsu7BgynEZtqF87VrTc70XsW7nxVhWEu2Y4MF5UfxxHQO/mNtQHQWP0YcFxmwm9oMrMaQ==
+react-dom@16.1.2:
+  version "16.1.2"
+  resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-16.1.2.tgz#c4011fa5183fcbdf34344472935ef920d8dc7179"
+  integrity sha512-e2iKeys/pJcIzszO+9EYxnTus6JI3pftzhXGG8K9B9co2SljknimfuY1/VlAG9nDBipDAc8jkIuuhlz+EiGL+g==
   dependencies:
     fbjs "^0.8.16"
     loose-envify "^1.1.0"
