@@ -22,7 +22,6 @@ import atexit
 import fileinput
 import os
 import re
-import shutil
 import subprocess
 import sys
 import time
@@ -35,7 +34,7 @@ from scripts import install_third_party_libs
 _PARSER = argparse.ArgumentParser()
 
 _PARSER.add_argument(
-    "--enable_compression",
+    '--enable_compression',
     help='optional; if specified, uses nginx to serve compressed assets',
     action='store_true')
 
@@ -82,7 +81,7 @@ def start_google_app_engine_server(prodEnv):
 
 
 def download_and_install_nginx():
-    """Download and install nginx"""
+    """Download and install nginx."""
     python_utils.PRINT('Installing nginx...')
     update_command = ['sudo', 'apt-get', 'update']
     install_command = ['sudo', 'apt-get', 'install', 'nginx']
@@ -111,6 +110,7 @@ def wait_for_port_to_be_open(port_number):
 
 
 def start_proxy_server():
+    """Start the nginx proxy server."""
     nginx_conf_file = os.path.join(
         common.OPPIA_TOOLS_DIR, 'nginx.conf')
     with python_utils.open_file(nginx_conf_file, 'w') as f:
@@ -142,14 +142,14 @@ def start_proxy_server():
 
     python_utils.PRINT('Starting proxy server...')
     start_server_command = ['sudo', 'nginx', '-c', nginx_conf_file]
-    p = subprocess.Popen(start_server_command);
+    p = subprocess.Popen(start_server_command)
 
     RUNNING_PROCESSES.append(p)
 
 
 def run_lighthouse_checks_with_compression():
     """Run lighthouse checks with compression enabled."""
-    # Check if nginx is installed
+    # Check if nginx is installed.
     try:
         python_utils.PRINT('Checking if nginx is installed...')
         check_nginx_command = ['which', 'nginx']
@@ -170,7 +170,7 @@ def run_lighthouse_checks_with_compression():
     wait_for_port_to_be_open(APP_ENGINE_PORT)
     start_proxy_server()
     wait_for_port_to_be_open(NGINX_PORT)
-    # run_lighthouse_checks()
+    run_lighthouse_checks()
 
 
 def cleanup():
