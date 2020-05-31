@@ -532,8 +532,7 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
             ('<script></script>', ''),
             ('<a class="webLink" href="https'
              '://www.oppia.com/"><img src="images/oppia.png"></a>',
-             '<a href="https://www.oppia.com/"></a>'),
-            (b'<script></script>', '')]
+             '<a href="https://www.oppia.com/"></a>')]
         invalid_vals = [['<script></script>', '<script></script>']]
         self.check_normalization(schema, mappings, invalid_vals)
 
