@@ -144,7 +144,7 @@ def prompt_user_to_send_announcement_email():
             RELEASE_MAIL_MESSAGE_FILEPATH, new_contributors_mail_ids,
             release_version))
     common.open_new_tab_in_browser_if_possible(
-        'https://groups.google.com/forum/#!categories/oppia/announcements')
+        'https://groups.google.com/forum/#!categories/oppia')
     common.ask_user_to_confirm('Add announcements label to the email sent.\n')
     common.ask_user_to_confirm(
         'Ensure the email sent to oppia@ is in the Announcements category')
