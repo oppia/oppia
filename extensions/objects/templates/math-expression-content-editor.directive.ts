@@ -15,7 +15,7 @@
 /**
  * @fileoverview Directive for math expression content editor.
  */
-
+require('mathjaxConfig.ts');
 require('directives/mathjax-bind.directive.ts');
 
 // Every editor directive should implement an alwaysEditable option. There
@@ -35,28 +35,57 @@ angular.module('oppia').directive('mathExpressionContentEditor', [
       controllerAs: '$ctrl',
       controller: ['$scope', function($scope) {
         var ctrl = this;
+        var convertLatexStringToSvg = function(inputLatexString) {
+          var emptyDiv = document.createElement("div");
+          var outputElement = angular.element(emptyDiv);
+          var $script = angular.element(
+            '<script type="math/tex">'
+          ).html(inputLatexString === undefined ? '' : inputLatexString);
+          console.log("in convertLatexStringToSvg")
+          outputElement.html('');
+          outputElement.append($script);
+          MathJax.Hub.Queue(["Typeset", MathJax.Hub, outputElement[0]]);
+          MathJax.Hub.Queue(function() {
+            ctrl.svgString = outputElement[0].getElementsByTagName('span')[0].innerHTML;
+            // console.log("svgString")
+            // console.log(ctrl.svgString)
+          });
+        }
+        
         ctrl.$onInit = function() {
           // Reset the component each time the value changes (e.g. if this is
           // part of an editable list).
+          ctrl.svgString = '';
           $scope.$watch('$ctrl.value', function() {
             ctrl.localValue = {
-              label: ctrl.value.raw_latex || ''
+              label: ctrl.value.raw_latex || '',
             };
           }, true);
           $scope.$on('externalSave', function() {
+             console.log("svgString in externalSave")
+             console.log(ctrl.svgString)
+
             if (ctrl.active) {
               ctrl.replaceValue(ctrl.localValue.label);
               // The $scope.$apply() call is needed to propagate the replaced
               // value.
               $scope.$apply();
+              console.log("svgString in active")
+              console.log(ctrl.svgString)
+
             }
           });
           ctrl.placeholderText = '\\frac{x}{y}';
           ctrl.alwaysEditable = ctrl.getAlwaysEditable();
+          console.log("alwaysEditable")
+          console.log(ctrl.alwaysEditable)
 
           if (ctrl.alwaysEditable) {
+
             $scope.$watch('$ctrl.localValue.label', function(newValue) {
+
               ctrl.value.raw_latex = newValue;
+              convertLatexStringToSvg(ctrl.localValue.label);
             });
           } else {
             ctrl.openEditor = function() {
