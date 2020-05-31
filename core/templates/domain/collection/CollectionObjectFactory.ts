@@ -22,8 +22,22 @@ import cloneDeep from 'lodash/cloneDeep';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { CollectionNode, CollectionNodeObjectFactory } from
-  'domain/collection/CollectionNodeObjectFactory';
+import {
+  ICollectionNodeBackendDict,
+  CollectionNode,
+  CollectionNodeObjectFactory
+} from 'domain/collection/CollectionNodeObjectFactory';
+
+interface ICollectionBackendDict {
+  'id'?: string;
+  'title'?: string;
+  'objective'?: string;
+  'language_code'?: string;
+  'tags'?: string[];
+  'category'?: string;
+  'version'?: number;
+  'nodes'?: ICollectionNodeBackendDict[];
+}
 
 export class Collection {
   _id: string;
@@ -35,12 +49,9 @@ export class Collection {
   _version: number;
   _nodes: CollectionNode[];
   _explorationIdToNodeIndexMap: {};
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'collectionBackendObject' is a dict with underscore_cased
-  // keys which give tslint errors against underscore_casing in favor of
-  // camelCasing.
+
   constructor(
-      collectionBackendObject: any,
+      collectionBackendObject: ICollectionBackendDict,
       collectionNodeObjectFactory: CollectionNodeObjectFactory) {
     this._id = collectionBackendObject.id;
     this._title = collectionBackendObject.title;
@@ -258,11 +269,8 @@ export class Collection {
 export class CollectionObjectFactory {
   constructor(
       private collectionNodeObjectFactory: CollectionNodeObjectFactory) {}
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'collectionBackendObject' is a dict with underscore_cased
-  // keys which give tslint errors against underscore_casing in favor of
-  // camelCasing.
-  create(collectionBackendObject: any): Collection {
+
+  create(collectionBackendObject: ICollectionBackendDict): Collection {
     return new Collection(
       collectionBackendObject, this.collectionNodeObjectFactory);
   }

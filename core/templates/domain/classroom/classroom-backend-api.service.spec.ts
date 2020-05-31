@@ -33,6 +33,7 @@ describe('Classroom backend API service', function() {
     TopicSummaryObjectFactory = null;
   let responseDictionaries = {
     topic_summary_dicts: [{
+      id: 'topic1',
       name: 'Topic name',
       description: 'Topic description',
       canonical_story_count: 4,
@@ -40,6 +41,7 @@ describe('Classroom backend API service', function() {
       total_skill_count: 20,
       uncategorized_skill_count: 5
     }, {
+      id: 'topic2',
       name: 'Topic name 2',
       description: 'Topic description 2',
       canonical_story_count: 3,
