@@ -156,11 +156,11 @@ def run_lighthouse_checks_with_compression():
     except subprocess.CalledProcessError:
         download_and_install_nginx()
 
-    start_proxy_server()
     build.main(args=['--prod_env'])
     start_google_app_engine_server(True)
-    wait_for_port_to_be_open(NGINX_PORT)
     wait_for_port_to_be_open(APP_ENGINE_PORT)
+    start_proxy_server()
+    wait_for_port_to_be_open(NGINX_PORT)
     run_lighthouse_checks()
 
 

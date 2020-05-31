@@ -2,19 +2,17 @@
   "ci": {
     "collect": {
       "numberOfRuns": 1,
-      "startServerReadyPattern": "default: \"GET /_ah/warmup HTTP/1.1\"",
-      "startServerReadyTimeout": 250000,
       "url": [
-        "http://127.0.0.1:8181/",
-        "http://127.0.0.1:8181/about",
-        "http://127.0.0.1:8181/contact",
-        "http://127.0.0.1:8181/donate",
-        "http://127.0.0.1:8181/get_started",
-        "http://127.0.0.1:8181/library",
-        "http://127.0.0.1:8181/privacy",
-        "http://127.0.0.1:8181/teach",
-        "http://127.0.0.1:8181/terms",
-        "http://127.0.0.1:8181/thanks"
+        "http://127.0.0.1:9999/",
+        "http://127.0.0.1:9999/about",
+        "http://127.0.0.1:9999/contact",
+        "http://127.0.0.1:9999/donate",
+        "http://127.0.0.1:9999/get_started",
+        "http://127.0.0.1:9999/library",
+        "http://127.0.0.1:9999/privacy",
+        "http://127.0.0.1:9999/teach",
+        "http://127.0.0.1:9999/terms",
+        "http://127.0.0.1:9999/thanks"
       ]
     },
     "assert": {
