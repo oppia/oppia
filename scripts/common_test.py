@@ -145,14 +145,38 @@ class CommonTests(test_utils.GenericTestBase):
         with getcwd_swap, basename_swap, isdir_swap:
             common.require_cwd_to_be_oppia(allow_deploy_dir=True)
 
-    def test_open_new_tab_in_browser_if_possible_with_url_opening_correctly(
+    def test_open_new_tab_in_browser_if_possible_with_user_manually_opening_url(
             self):
         check_function_calls = {
-            'input_gets_called': False,
+            'input_gets_called': 0,
             'check_call_gets_called': False
         }
         expected_check_function_calls = {
-            'input_gets_called': False,
+            'input_gets_called': 1,
+            'check_call_gets_called': False
+        }
+        def mock_call(unused_cmd_tokens):
+            return 0
+        def mock_check_call(unused_cmd_tokens):
+            check_function_calls['check_call_gets_called'] = True
+        def mock_input():
+            check_function_calls['input_gets_called'] += 1
+            return 'n'
+        call_swap = self.swap(subprocess, 'call', mock_call)
+        check_call_swap = self.swap(subprocess, 'check_call', mock_check_call)
+        input_swap = self.swap(python_utils, 'INPUT', mock_input)
+        with call_swap, check_call_swap, input_swap:
+            common.open_new_tab_in_browser_if_possible('test-url')
+        self.assertEqual(check_function_calls, expected_check_function_calls)
+
+    def test_open_new_tab_in_browser_if_possible_with_url_opening_correctly(
+            self):
+        check_function_calls = {
+            'input_gets_called': 0,
+            'check_call_gets_called': False
+        }
+        expected_check_function_calls = {
+            'input_gets_called': 1,
             'check_call_gets_called': True
         }
         def mock_call(unused_cmd_tokens):
@@ -160,7 +184,8 @@ class CommonTests(test_utils.GenericTestBase):
         def mock_check_call(unused_cmd_tokens):
             check_function_calls['check_call_gets_called'] = True
         def mock_input():
-            check_function_calls['input_gets_called'] = True
+            check_function_calls['input_gets_called'] += 1
+            return 'y'
         call_swap = self.swap(subprocess, 'call', mock_call)
         check_call_swap = self.swap(subprocess, 'check_call', mock_check_call)
         input_swap = self.swap(python_utils, 'INPUT', mock_input)
@@ -171,11 +196,11 @@ class CommonTests(test_utils.GenericTestBase):
     def test_open_new_tab_in_browser_if_possible_with_url_not_opening_correctly(
             self):
         check_function_calls = {
-            'input_gets_called': False,
+            'input_gets_called': 0,
             'check_call_gets_called': False
         }
         expected_check_function_calls = {
-            'input_gets_called': True,
+            'input_gets_called': 2,
             'check_call_gets_called': False
         }
         def mock_call(unused_cmd_tokens):
@@ -183,7 +208,8 @@ class CommonTests(test_utils.GenericTestBase):
         def mock_check_call(unused_cmd_tokens):
             check_function_calls['check_call_gets_called'] = True
         def mock_input():
-            check_function_calls['input_gets_called'] = True
+            check_function_calls['input_gets_called'] += 1
+            return 'y'
         call_swap = self.swap(subprocess, 'call', mock_call)
         check_call_swap = self.swap(subprocess, 'check_call', mock_check_call)
         input_swap = self.swap(python_utils, 'INPUT', mock_input)
