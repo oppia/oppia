@@ -43,7 +43,7 @@ import github # isort:skip
 
 ABOUT_PAGE_FILEPATH = os.path.join(
     'core', 'templates', 'pages', 'about-page',
-    'about-page.directive.html')
+    'about-page.component.html')
 AUTHORS_FILEPATH = os.path.join('', 'AUTHORS')
 CHANGELOG_FILEPATH = os.path.join('', 'CHANGELOG')
 CONTRIBUTORS_FILEPATH = os.path.join('', 'CONTRIBUTORS')
@@ -280,11 +280,11 @@ def update_contributors(release_summary_lines):
 
 def find_indentation(about_page_lines):
     """Finds indentation used for span and li elements to list developer
-    names in about-page.directive.html.
+    names in about-page.component.html.
 
     Args:
         about_page_lines: list(str). List of lines in
-            about-page.directive.html.
+            about-page.component.html.
 
     Returns:
         tuple(str, str). A tuple of span indent and li indent.
@@ -302,7 +302,7 @@ def find_indentation(about_page_lines):
             break
     if not span_line:
         raise Exception(
-            'Expected about-page.directive.html to have %s.' % span_text)
+            'Expected about-page.component.html to have %s.' % span_text)
     span_indent = span_line[:span_line.find(span_text)]
 
     if li_line.find('<li>') == -1:
@@ -312,13 +312,13 @@ def find_indentation(about_page_lines):
         #     <li>A*</li>.
         raise Exception(
             'Expected %s text to be followed by an unordered list in '
-            'about-page.directive.html' % span_text)
+            'about-page.component.html' % span_text)
     li_indent = li_line[:li_line.find('<li>')]
     return (span_indent, li_indent)
 
 
 def update_developer_names(release_summary_lines):
-    """Updates about-page.directive.html file.
+    """Updates about-page.component.html file.
 
     Args:
         release_summary_lines: list(str). List of lines in
