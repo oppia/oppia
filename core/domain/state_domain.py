@@ -149,8 +149,8 @@ class AnswerGroup(python_utils.OBJECT):
 
         self.outcome.validate()
 
-    @classmethod
-    def convert_html_in_answer_group(cls, answer_group_dict, conversion_fn):
+    @staticmethod
+    def convert_html_in_answer_group(answer_group_dict, conversion_fn):
         """Checks for HTML fields in an answer group dict and converts it
         according to the conversion function.
 
@@ -210,8 +210,8 @@ class Hint(python_utils.OBJECT):
         """Validates all properties of Hint."""
         self.hint_content.validate()
 
-    @classmethod
-    def convert_html_in_hint(cls, hint_dict, conversion_fn):
+    @staticmethod
+    def convert_html_in_hint(hint_dict, conversion_fn):
         """Checks for HTML fields in the hints and converts it
         according to the conversion function.
 
@@ -307,8 +307,8 @@ class Solution(python_utils.OBJECT):
             interaction_id).normalize_answer(self.correct_answer)
         self.explanation.validate()
 
-    @classmethod
-    def convert_html_in_solution(cls, solution_dict, conversion_fn):
+    @staticmethod
+    def convert_html_in_solution(solution_dict, conversion_fn):
         """Checks for HTML fields in a solution and convert it according
         to the conversion function.
 
@@ -592,32 +592,23 @@ class InteractionInstance(python_utils.OBJECT):
             outcome_html = answer_group.outcome.feedback.html
             html_list = html_list + [outcome_html]
 
-        # Note that ItemSelectionInput replicates the customization arg HTML
-        # in its answer groups.
-        if self.id == 'ItemSelectionInput':
-            for answer_group in self.answer_groups:
-                for rule_spec in answer_group.rule_specs:
-                    rule_spec_html = rule_spec.inputs['x']
-                    html_list = html_list + rule_spec_html
-
-        if self.id == 'DragAndDropSortInput':
-            for answer_group in self.answer_groups:
-                for rule_spec in answer_group.rule_specs:
-                    if rule_spec.rule_type == 'IsEqualToOrdering':
+        for answer_group in self.answer_groups:
+            for rule_spec in answer_group.rule_specs:
+                field_check_dict_for_rule_spec = (
+                    RuleSpec.get_all_html_fields_in_rule_spec(
+                        rule_spec.to_dict()))
+                if field_check_dict_for_rule_spec['does_input_x_have_html']:
+                    if field_check_dict_for_rule_spec['is_input_list']:
+                        html_list = html_list + rule_spec.inputs['x']
+                    elif field_check_dict_for_rule_spec['is_input_list_of_set']:
                         rule_spec_html_list = rule_spec.inputs['x']
                         for rule_spec_html in rule_spec_html_list:
                             html_list = html_list + rule_spec_html
-                    elif (rule_spec.rule_type ==
-                          'IsEqualToOrderingWithOneItemAtIncorrectPosition'):
-                        rule_spec_html_list = rule_spec.inputs['x']
-                        for rule_spec_html in rule_spec_html_list:
-                            html_list = html_list + rule_spec_html
-                    elif rule_spec.rule_type == 'HasElementXAtPositionY':
+                    else:
                         html_list = html_list + [rule_spec.inputs['x']]
-                    elif rule_spec.rule_type == 'HasElementXBeforeElementY':
-                        html_list = (
-                            html_list + [rule_spec.inputs['y']] +
-                            [rule_spec.inputs['x']])
+                if field_check_dict_for_rule_spec['does_input_y_have_html']:
+                    html_list = html_list + [rule_spec.inputs['y']]
+
         if self.default_outcome:
             default_outcome_html = self.default_outcome.feedback.html
             html_list = html_list + [default_outcome_html]
@@ -760,8 +751,8 @@ class Outcome(python_utils.OBJECT):
                     'Expected outcome refresher_exploration_id to be a string, '
                     'received %s' % self.refresher_exploration_id)
 
-    @classmethod
-    def convert_html_in_outcome(cls, outcome_dict, conversion_fn):
+    @staticmethod
+    def convert_html_in_outcome(outcome_dict, conversion_fn):
         """Checks for HTML fields in the outcome and converts it
         according to the conversion function.
 
@@ -1174,9 +1165,9 @@ class WrittenTranslations(python_utils.OBJECT):
                 html_string_list.append(translation.html)
         return html_string_list
 
-    @classmethod
+    @staticmethod
     def convert_html_in_written_translations(
-            cls, written_translations_dict, conversion_fn):
+            written_translations_dict, conversion_fn):
         """Checks for HTML fields in the written translations and converts it
         according to the conversion function.
 
@@ -1473,8 +1464,46 @@ class RuleSpec(python_utils.OBJECT):
                 # by the parameter object in order to be valid.
                 param_obj.normalize(param_value)
 
-    @classmethod
-    def convert_html_in_rule_spec(cls, rule_spec_dict, conversion_fn):
+    @staticmethod
+    def get_all_html_fields_in_rule_spec(rule_spec_dict):
+        """Checks for HTML in a rule_spec dict and returns all the information
+        about fields having HTML in them.
+
+        Args:
+            rule_spec_dict: dict. The dict representation of RuleSpec object.
+
+        Returns:
+            dict. The dict having the information about all the fields which
+            have HTML.
+        """
+        field_check_dict = {
+            'does_input_x_have_html': False,
+            'does_input_y_have_html': False,
+            'is_input_list': False,
+            'is_input_list_of_set': False
+        }
+        if rule_spec_dict['rule_type'] == 'HasElementXAtPositionY':
+            field_check_dict['does_input_x_have_html'] = True
+        elif rule_spec_dict['rule_type'] == 'HasElementXBeforeElementY':
+            field_check_dict['does_input_x_have_html'] = True
+            field_check_dict['does_input_y_have_html'] = True
+        elif rule_spec_dict['rule_type'] == 'IsEqualToOrdering':
+            field_check_dict['does_input_x_have_html'] = True
+            field_check_dict['is_input_list_of_set'] = True
+        elif (rule_spec_dict['rule_type'] ==
+              'IsEqualToOrderingWithOneItemAtIncorrectPosition'):
+            field_check_dict['does_input_x_have_html'] = True
+            field_check_dict['is_input_list_of_set'] = True
+        elif rule_spec_dict['rule_type'] == 'Equals':
+            if isinstance(rule_spec_dict['inputs']['x'], list):
+                for value in rule_spec_dict['inputs']['x']:
+                    if isinstance(value, python_utils.BASESTRING):
+                        field_check_dict['does_input_x_have_html'] = True
+                        field_check_dict['is_input_list'] = True
+        return field_check_dict
+
+    @staticmethod
+    def convert_html_in_rule_spec(rule_spec_dict, conversion_fn):
         """Checks for HTML fields in a Rule Spec and converts it according
         to the conversion function.
 
@@ -1485,30 +1514,26 @@ class RuleSpec(python_utils.OBJECT):
         Returns:
             dict. The converted Rule Spec dict.
         """
-        if rule_spec_dict['rule_type'] == 'HasElementXAtPositionY':
-            rule_spec_dict['inputs']['x'] = (
-                conversion_fn(rule_spec_dict['inputs']['x']))
-        elif rule_spec_dict['rule_type'] == 'HasElementXBeforeElementY':
-            rule_spec_dict['inputs']['x'] = (
-                conversion_fn(rule_spec_dict['inputs']['x']))
-            rule_spec_dict['inputs']['y'] = (
-                conversion_fn(rule_spec_dict['inputs']['y']))
-        elif rule_spec_dict['rule_type'] == 'IsEqualToOrdering':
-            for value_index, value in enumerate(rule_spec_dict['inputs']['x']):
-                rule_spec_dict['inputs']['x'][value_index][0] = (
-                    conversion_fn(value[0]))
-        elif (rule_spec_dict['rule_type'] ==
-              'IsEqualToOrderingWithOneItemAtIncorrectPosition'):
-            for value_index, value in enumerate(rule_spec_dict['inputs']['x']):
-                rule_spec_dict['inputs']['x'][value_index][0] = (
-                    conversion_fn(value[0]))
-        elif rule_spec_dict['rule_type'] == 'Equals':
-            if isinstance(rule_spec_dict['inputs']['x'], list):
+        field_check_dict = (
+            RuleSpec.get_all_html_fields_in_rule_spec(
+                rule_spec_dict))
+        if field_check_dict['does_input_x_have_html']:
+            if field_check_dict['is_input_list_of_set']:
                 for value_index, value in enumerate(
                         rule_spec_dict['inputs']['x']):
-                    if isinstance(value, python_utils.BASESTRING):
-                        rule_spec_dict['inputs']['x'][value_index] = (
-                            conversion_fn(value))
+                    rule_spec_dict['inputs']['x'][value_index][0] = (
+                        conversion_fn(value[0]))
+            elif field_check_dict['is_input_list']:
+                for value_index, value in enumerate(
+                        rule_spec_dict['inputs']['x']):
+                    rule_spec_dict['inputs']['x'][value_index] = (
+                        conversion_fn(value))
+            else:
+                rule_spec_dict['inputs']['x'] = (
+                    conversion_fn(rule_spec_dict['inputs']['x']))
+        if field_check_dict['does_input_y_have_html']:
+            rule_spec_dict['inputs']['y'] = (
+                conversion_fn(rule_spec_dict['inputs']['y']))
         return rule_spec_dict
 
 

@@ -40,10 +40,8 @@ class SuggestionMathRteAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def map(item):
-        html_string_list = []
         suggestion = suggestion_services.get_suggestion_from_model(item)
-        html_string_list = (
-            html_string_list + suggestion.get_all_html_content_strings())
+        html_string_list = suggestion.get_all_html_content_strings()
         html_string = ''.join(html_string_list)
         if html_validation_service.check_for_math_component_in_html(
                 html_string):
@@ -52,8 +50,7 @@ class SuggestionMathRteAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def reduce(key, values):
         yield (
-            '%d suggestions have Math components in them with IDs.' %
-            len(values), values)
+            '%d suggestions have Math components in them.' % len(values))
 
 
 class SuggestionMathMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
@@ -82,7 +79,7 @@ class SuggestionMathMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             suggestion_registry.SUGGESTION_TYPES_TO_DOMAIN_CLASSES[
                 suggestion.suggestion_type])
         suggestion.change = (
-            suggestion_domain_class.convert_html_in_suggestion(
+            suggestion_domain_class.convert_html_in_suggestion_change_dict(
                 suggestion.change.to_dict(),
                 html_validation_service.
                 add_math_content_to_math_rte_components))
@@ -90,10 +87,12 @@ class SuggestionMathMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             suggestion.validate()
         except Exception as e:
             logging.error(
-                'Suggestion %s failed after validation: %s' % (item.id, e))
+                'Suggestion %s failed validation after migration: %s' % (
+                    item.id, e))
             yield (
                 SuggestionMathMigrationOneOffJob._ERROR_KEY,
-                'Suggestion %s failed after validation: %s' % (item.id, e))
+                'Suggestion %s failed validation after migration: %s' % (
+                    item.id, e))
             return
         item.change_cmd = suggestion.change.to_dict()
         item.put()

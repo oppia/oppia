@@ -472,22 +472,19 @@ class SuggestionTranslateContent(BaseSuggestion):
         Returns:
             list(str). The list of html content strings.
         """
-        html_string_list = []
-        html_string_list.append(self.change.translation_html)
-        html_string_list.append(self.change.content_html)
-        return html_string_list
+        return [self.change.translation_html, self.change.content_html]
 
-    @classmethod
-    def convert_html_in_suggestion(cls, change_dict, conversion_fn):
-        """Checks for HTML fields in the suggestion and converts it according
-        to the conversion function.
+    @staticmethod
+    def convert_html_in_suggestion_change_dict(change_dict, conversion_fn):
+        """Checks for HTML fields in a suggestion change dict and converts it
+        according to the conversion function.
 
         Args:
             conversion_fn: function. The function to be used for converting the
                 HTML.
             change_dict: dict. The change dict to be converted
         Returns:
-            dict. The converted Suggestion change.
+            dict. The converted Suggestion change dict.
         """
         change_dict['content_html'] = (
             conversion_fn(change_dict['content_html']))
@@ -539,7 +536,6 @@ class SuggestionAddQuestion(BaseSuggestion):
             feconf.CURRENT_STATE_SCHEMA_VERSION)
         self.score_category = score_category
         self.last_updated = last_updated
-
 
     def validate(self):
         """Validates a suggestion object of type SuggestionAddQuestion.
@@ -690,26 +686,24 @@ class SuggestionAddQuestion(BaseSuggestion):
         Returns:
             list(str). The list of html content strings.
         """
-        html_string_list = []
         state_object = (
             state_domain.State.from_dict(
                 self.change.question_dict['question_state_data']))
-        html_string_list = (
-            html_string_list +
-            state_object.get_all_html_content_strings())
+        html_string_list = state_object.get_all_html_content_strings()
         return html_string_list
 
-    @classmethod
-    def convert_html_in_suggestion(cls, change_dict, conversion_fn):
-        """Checks for HTML fields in the suggestion and converts it according
-        to the conversion function.
+    @staticmethod
+    def convert_html_in_suggestion_change_dict(change_dict, conversion_fn):
+        """Checks for HTML fields in a suggestion change dict and converts it
+        according to the conversion function.
 
         Args:
+            change_dict: dict. The change dict to be converted
             conversion_fn: function. The function to be used for converting the
                 HTML.
-            change_dict: dict. The change dict to be converted
+
         Returns:
-            dict. The converted Suggestion change.
+            dict. The converted Suggestion change dict.
         """
         change_dict['question_dict']['question_state_data'] = (
             state_domain.State.convert_html_fields_in_state(

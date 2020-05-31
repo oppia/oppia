@@ -312,7 +312,7 @@ class SetOfNormalizedString(BaseObject):
 class MathExpressionContent(BaseObject):
     """Math Expression Content class."""
 
-    description = 'The Math Expression be displayed.'
+    description = 'The Math Expression to be displayed.'
     default_value = {
         'raw_latex': '',
         'svg_filename': ''

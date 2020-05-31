@@ -32,6 +32,7 @@ from core.domain import suggestion_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
+import python_utils
 import utils
 
 (suggestion_models, feedback_models) = models.Registry.import_models([
@@ -279,11 +280,10 @@ class SuggestionMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
         actual_output = (
             suggestion_jobs_one_off.
             SuggestionMathRteAuditOneOffJob.get_output(job_id))
-        output_string = (
-            u'[u\'2 suggestions have Math components in them with IDs.\', ' +
-            '[u\'exploration.exp1.thread_1\', u\'skill1.thread1\']]')
-        expected_output = [output_string]
-        self.assertEqual(actual_output, expected_output)
+        expected_output = '[u\'2 suggestions have Math components in them.\']'
+        self.assertEqual(
+            python_utils.UNICODE(actual_output), python_utils.UNICODE(
+                expected_output))
 
     def test_for_html_in_suggestion_with_no_math_rte(self):
         html_content = '<p>This has no Math components</p>'
@@ -678,6 +678,10 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
                 'question_state_data']['interaction']['answer_groups'][0][
                     'outcome']['feedback']['html'])
         self.assertEqual(migrated_html, expected_html_content)
+        self.assertNotEqual(
+            suggestion_dict['last_updated'],
+            utils.get_time_in_millisecs(
+                observed_question_suggestion.last_updated))
 
     def test_migration_skips_suggestions_failing_validation(self):
         html_content = (
@@ -952,16 +956,17 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
                 self.reviewer_id)
 
         @classmethod
-        def _mock_convert_html_in_suggestion(
+        def _mock_convert_html_in_suggestion_change_dict(
                 unused_cls, unused_dict, unused_conversion_fn):
-            """Mocks convert_html_in_suggestion()."""
+            """Mocks convert_html_in_suggestion_change_dict()."""
             return 'invalid_suggestion after migration'
 
-        _mock_convert_html_in_suggestion_swap = (
+        _mock_convert_html_in_suggestion_change_dict_swap = (
             self.swap(
                 suggestion_registry.SuggestionAddQuestion,
-                'convert_html_in_suggestion', _mock_convert_html_in_suggestion))
-        with _mock_convert_html_in_suggestion_swap:
+                'convert_html_in_suggestion_change_dict',
+                _mock_convert_html_in_suggestion_change_dict))
+        with _mock_convert_html_in_suggestion_change_dict_swap:
             job_id = (
                 suggestion_jobs_one_off.SuggestionMathMigrationOneOffJob.
                 create_new())
@@ -973,7 +978,7 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
             suggestion_jobs_one_off.SuggestionMathMigrationOneOffJob.
             get_output(job_id))
         expected_output = (
-            u'[u\'validation_error\', [u\'Suggestion skill1.thread1 failed ' +
-            'after validation: Expected change to be an instance of ' +
+            u'[u\'validation_error\', [u\'Suggestion skill1.thread1 failed '
+            'validation after migration: Expected change to be an instance of '
             'QuestionSuggestionChange\']]')
         self.assertEqual(actual_output, [expected_output])

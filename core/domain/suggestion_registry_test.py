@@ -1036,6 +1036,20 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             'hi': 1
         })
 
+    def test_get_all_html_content_strings(self):
+        suggestion = suggestion_registry.SuggestionTranslateContent(
+            self.suggestion_dict['suggestion_id'],
+            self.suggestion_dict['target_id'],
+            self.suggestion_dict['target_version_at_submission'],
+            self.suggestion_dict['status'], self.author_id,
+            self.reviewer_id, self.suggestion_dict['change'],
+            self.suggestion_dict['score_category'], self.fake_date)
+
+        actual_outcome_list = suggestion.get_all_html_content_strings()
+        expected_outcome_list = [
+            u'<p>This is translated html.</p>', u'<p>This is a content.</p>']
+        self.assertEqual(expected_outcome_list, actual_outcome_list)
+
 
 class SuggestionAddQuestionTest(test_utils.GenericTestBase):
     """Tests for the SuggestionAddQuestion class."""
@@ -1475,6 +1489,20 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             'old question_dict'):
             suggestion.pre_update_validate(
                 question_domain.QuestionSuggestionChange(change))
+
+    def test_get_all_html_content_strings(self):
+        suggestion = suggestion_registry.SuggestionAddQuestion(
+            self.suggestion_dict['suggestion_id'],
+            self.suggestion_dict['target_id'],
+            self.suggestion_dict['target_version_at_submission'],
+            self.suggestion_dict['status'], self.author_id,
+            self.reviewer_id, self.suggestion_dict['change'],
+            self.suggestion_dict['score_category'], self.fake_date)
+
+        actual_outcome_list = suggestion.get_all_html_content_strings()
+        expected_outcome_list = [
+            u'', u'<p>This is a hint.</p>', u'<p>This is a solution.</p>']
+        self.assertEqual(expected_outcome_list, actual_outcome_list)
 
 
 class MockInvalidVoiceoverApplication(

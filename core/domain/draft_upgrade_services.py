@@ -102,8 +102,8 @@ class DraftUpgradeUtil(python_utils.OBJECT):
         Returns:
             list(ExplorationChange). The converted draft_change_list.
         """
-        conversion_fn = (html_validation_service.
-                         add_math_content_to_math_rte_components)
+        conversion_fn = (
+            html_validation_service.add_math_content_to_math_rte_components)
         for i, change in enumerate(draft_change_list):
             if not change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY:
                 continue
@@ -150,6 +150,7 @@ class DraftUpgradeUtil(python_utils.OBJECT):
                     (state_domain.AnswerGroup.convert_html_in_answer_group(
                         answer_group, conversion_fn))
                     for answer_group in new_value]
+
             draft_change_list[i] = exp_domain.ExplorationChange({
                 'cmd': change.cmd,
                 'property_name': change.property_name,

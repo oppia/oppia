@@ -896,9 +896,10 @@ def add_math_content_to_math_rte_components(html_string):
     """
     soup = bs4.BeautifulSoup(
         html_string.encode(encoding='utf-8'), 'html.parser')
-    for math in soup.findAll(name='oppia-noninteractive-math'):
-        if math.has_attr('raw_latex-with-value'):
-            raw_latex = json.loads(unescape_html(math['raw_latex-with-value']))
+    for math_tag in soup.findAll(name='oppia-noninteractive-math'):
+        if math_tag.has_attr('raw_latex-with-value'):
+            raw_latex = (
+                json.loads(unescape_html(math_tag['raw_latex-with-value'])))
             math_content_dict = {
                 'raw_latex': raw_latex,
                 'svg_filename': ''
@@ -907,9 +908,9 @@ def add_math_content_to_math_rte_components(html_string):
             normalized_math_content_dict = (
                 objects.MathExpressionContent.normalize(math_content_dict))
             # Delete the attribute raw_latex-with-value.
-            del math['raw_latex-with-value']
+            del math_tag['raw_latex-with-value']
             # Add the new attribute math_expression_contents-with-value.
-            math['math_content-with-value'] = (
+            math_tag['math_content-with-value'] = (
                 escape_html(
                     json.dumps(normalized_math_content_dict, sort_keys=True)))
         else:
@@ -959,11 +960,8 @@ def check_for_math_component_in_html(html_string):
     """
     soup = bs4.BeautifulSoup(
         html_string.encode(encoding='utf-8'), 'html.parser')
-    math = soup.findAll(name='oppia-noninteractive-math')
-    if len(math) == 0:
-        return False
-    else:
-        return True
+    math_tag = soup.findAll(name='oppia-noninteractive-math')
+    return bool(math_tag)
 
 
 def is_parsable_as_xml(xml_string):
