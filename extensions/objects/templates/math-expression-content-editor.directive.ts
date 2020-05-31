@@ -17,13 +17,22 @@
  */
 require('mathjaxConfig.ts');
 require('directives/mathjax-bind.directive.ts');
+require('services/image-upload-helper.service.ts');
+require('services/context.service.ts');
+require('services/alerts.service.ts');
+require('services/csrf-token.service.ts');
+require('domain/utilities/url-interpolation.service.ts');
+
 
 // Every editor directive should implement an alwaysEditable option. There
 // may be additional customization options for the editor that should be passed
 // in via initArgs.
 
 angular.module('oppia').directive('mathExpressionContentEditor', [
-  function() {
+  'AlertsService', 'ContextService', 'CsrfTokenService',
+  'ImageUploadHelperService', 'UrlInterpolationService',
+  function(AlertsService, ContextService, CsrfTokenService,
+      ImageUploadHelperService, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
@@ -36,22 +45,86 @@ angular.module('oppia').directive('mathExpressionContentEditor', [
       controller: ['$scope', function($scope) {
         var ctrl = this;
         var convertLatexStringToSvg = function(inputLatexString) {
-          var emptyDiv = document.createElement("div");
+          var emptyDiv = document.createElement('div');
           var outputElement = angular.element(emptyDiv);
           var $script = angular.element(
             '<script type="math/tex">'
           ).html(inputLatexString === undefined ? '' : inputLatexString);
-          console.log("in convertLatexStringToSvg")
           outputElement.html('');
           outputElement.append($script);
-          MathJax.Hub.Queue(["Typeset", MathJax.Hub, outputElement[0]]);
+          MathJax.Hub.Queue(['Typeset', MathJax.Hub, outputElement[0]]);
           MathJax.Hub.Queue(function() {
-            ctrl.svgString = outputElement[0].getElementsByTagName('span')[0].innerHTML;
-            // console.log("svgString")
-            // console.log(ctrl.svgString)
+            ctrl.svgString = (
+              outputElement[0].getElementsByTagName('span')[0].outerHTML);
           });
-        }
-        
+        };
+
+        var processAndSaveSvg = function() {
+          var cleanedSvgString = (
+            ImageUploadHelperService.cleanMathExpressionSvgString(
+              ctrl.svgString));
+          var dimensions = (
+            ImageUploadHelperService.
+              extractDimensionsFromMathExpressionSvgString(cleanedSvgString));
+          var fileName = (
+            ImageUploadHelperService.generateMathExpressionImageFilename(
+              dimensions.height, dimensions.width, dimensions.verticalPadding));
+          ctrl.value.svg_filename = fileName;
+          let resampledFile ;
+          var dataURI = 'data:image/svg+xml;base64,' + btoa(cleanedSvgString);
+          var invalidTagsAndAttributes = (
+            ImageUploadHelperService.getInvalidSvgTagsAndAttrs(
+              dataURI));
+          var tags = invalidTagsAndAttributes.tags;
+          var attrs = invalidTagsAndAttributes.attrs;
+          if (tags.length === 0 && attrs.length === 0) {
+            resampledFile = (
+              ImageUploadHelperService.convertImageDataToImageFile(
+                dataURI));
+            postToServer(resampledFile, fileName);
+          } else {
+            ctrl.value.raw_latex = '';
+            ctrl.value.svg_filename = '';
+            AlertsService.addWarning('SVG failed validation.');
+          }
+        };
+
+        var postToServer = function(resampledFile, filename) {
+          let form = new FormData();
+          form.append('image', resampledFile);
+          form.append('payload', JSON.stringify({
+            filename: filename
+          }));
+          var imageUploadUrlTemplate = '/createhandler/imageupload/' +
+            '<entity_type>/<entity_id>';
+          CsrfTokenService.getTokenAsync().then(function(token) {
+            form.append('csrf_token', token);
+            $.ajax({
+              url: UrlInterpolationService.interpolateUrl(
+                imageUploadUrlTemplate, {
+                  entity_type: ContextService.getEntityType(),
+                  entity_id: ContextService.getEntityId()
+                }
+              ),
+              data: form,
+              processData: false,
+              contentType: false,
+              type: 'POST',
+              dataFilter: function(data) {
+                // Remove the XSSI prefix.
+                var transformedData = data.substring(5);
+                return JSON.parse(transformedData);
+              },
+              dataType: 'text'
+            }).fail(function(data) {
+              // Remove the XSSI prefix.
+              var transformedData = data.responseText.substring(5);
+              var parsedResponse = JSON.parse(transformedData);
+              AlertsService.addWarning(
+                parsedResponse.error || 'Error communicating with server.');
+            });
+          });
+        };
         ctrl.$onInit = function() {
           // Reset the component each time the value changes (e.g. if this is
           // part of an editable list).
@@ -62,28 +135,19 @@ angular.module('oppia').directive('mathExpressionContentEditor', [
             };
           }, true);
           $scope.$on('externalSave', function() {
-             console.log("svgString in externalSave")
-             console.log(ctrl.svgString)
+            processAndSaveSvg();
 
             if (ctrl.active) {
               ctrl.replaceValue(ctrl.localValue.label);
               // The $scope.$apply() call is needed to propagate the replaced
               // value.
               $scope.$apply();
-              console.log("svgString in active")
-              console.log(ctrl.svgString)
-
             }
           });
           ctrl.placeholderText = '\\frac{x}{y}';
           ctrl.alwaysEditable = ctrl.getAlwaysEditable();
-          console.log("alwaysEditable")
-          console.log(ctrl.alwaysEditable)
-
           if (ctrl.alwaysEditable) {
-
             $scope.$watch('$ctrl.localValue.label', function(newValue) {
-
               ctrl.value.raw_latex = newValue;
               convertLatexStringToSvg(ctrl.localValue.label);
             });

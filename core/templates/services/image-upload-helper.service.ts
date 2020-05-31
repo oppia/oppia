@@ -99,6 +99,66 @@ angular.module('oppia').factory('ImageUploadHelperService', [
           '_height_' + height +
           '_width_' + width +
           '.' + extension;
+      },
+
+      cleanMathExpressionSvgString: function(svgString) {
+        // We need to modify/remove unnecessary attributes added by mathjax
+        // from the svg tag.
+        var domParser = new DOMParser();
+        var cleanedSvgString = '';
+        var doc = domParser.parseFromString(svgString, 'image/svg+xml');
+        doc.querySelectorAll('*').forEach((node) => {
+          if (node.tagName.toLowerCase() === 'svg') {
+            node.removeAttribute('xmlns:xlink');
+            node.removeAttribute('role');
+            node.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+            cleanedSvgString = node.outerHTML;
+          }
+        });
+        return cleanedSvgString;
+      },
+
+      extractDimensionsFromMathExpressionSvgString: function(svgString) {
+        var domParser = new DOMParser();
+        var dimensions = {
+          height: '',
+          width: '',
+          verticalPadding: ''
+        };
+        var doc = domParser.parseFromString(svgString, 'image/svg+xml');
+        doc.querySelectorAll('*').forEach((node) => {
+          if (node.tagName.toLowerCase() === 'svg') {
+            dimensions.height = (
+              (node.getAttribute('height').match(/\d+\.\d+/g)[0]).replace(
+                '.', ''));
+            dimensions.width = (
+              (node.getAttribute('width').match(/\d+\.\d+/g)[0]).replace(
+                '.', ''));
+            dimensions.verticalPadding = (
+              (node.getAttribute('style').match(/\d+\.\d+/g)[0]).replace(
+                '.', ''));
+          }
+        });
+        return dimensions;
+      },
+
+      generateMathExpressionImageFilename: function(
+          height, width, verticalPadding) {
+        var date = new Date();
+        return 'mathImg_' +
+          date.getFullYear() +
+          ('0' + (date.getMonth() + 1)).slice(-2) +
+          ('0' + date.getDate()).slice(-2) +
+          '_' +
+          ('0' + date.getHours()).slice(-2) +
+          ('0' + date.getMinutes()).slice(-2) +
+          ('0' + date.getSeconds()).slice(-2) +
+          '_' +
+          Math.random().toString(36).substr(2, 10) +
+          '_height_' + height +
+          '_width_' + width +
+          '_vertical_' + verticalPadding +
+          '.' + 'svg';
       }
     };
   }
