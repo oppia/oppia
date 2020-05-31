@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for oppia email dashboard page.
+ * @fileoverview Component for oppia email dashboard page.
  */
 
 require('base-components/base-content.directive.ts');

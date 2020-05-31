@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for landing page.
+ * @fileoverview Component for landing page.
  */
 
 require('base-components/base-content.directive.ts');

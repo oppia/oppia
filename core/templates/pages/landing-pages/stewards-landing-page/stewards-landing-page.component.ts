@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for the stewards landing page.
+ * @fileoverview Component for the stewards landing page.
  */
 
 require('base-components/base-content.directive.ts');

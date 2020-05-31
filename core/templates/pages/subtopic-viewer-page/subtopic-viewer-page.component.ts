@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the subtopic viewer.
+ * @fileoverview Component for the subtopic viewer.
  */
 
 require('rich_text_components/richTextComponentsRequires.ts');

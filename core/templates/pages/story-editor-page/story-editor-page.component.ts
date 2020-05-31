@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Primary controller for the story editor page.
+ * @fileoverview Component for the story editor page.
  */
 
 require('objects/objectComponentsRequires.ts');

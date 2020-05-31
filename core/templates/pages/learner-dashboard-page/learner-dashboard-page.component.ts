@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controllers for the creator dashboard.
+ * @fileoverview Component for the creator dashboard.
  */
 
 require(

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controllers for the exploration editor page and the editor
+ * @fileoverview Component for the exploration editor page and the editor
  *               help tab in the navbar.
  */
 

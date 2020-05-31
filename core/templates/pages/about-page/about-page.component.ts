@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controllers for the about page.
+ * @fileoverview Component for the about page.
  */
 
 require(

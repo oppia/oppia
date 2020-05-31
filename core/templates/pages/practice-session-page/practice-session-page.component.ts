@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controllers for the practice session.
+ * @fileoverview Component for the practice session.
  */
 
 require('base-components/base-content.directive.ts');

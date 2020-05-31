@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Dependencies for the explaration player page.
+ * @fileoverview Component for the explaration player page.
  */
 
 require('base-components/base-content.directive.ts');

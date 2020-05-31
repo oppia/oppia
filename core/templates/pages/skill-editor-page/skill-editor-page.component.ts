@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Primary controller for the skill editor page.
+ * @fileoverview Component for the skill editor page.
  */
 
 require('interactions/interactionsQuestionsRequires.ts');
