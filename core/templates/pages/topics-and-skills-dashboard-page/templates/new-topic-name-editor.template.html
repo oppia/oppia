@@ -1,40 +1,68 @@
 <div class="modal-header">
   <h3>
-    Enter Topic Name
+    New Topic
   </h3>
 </div>
-<form ng-submit="save(topicName, abbreviatedTopicName)">
-  <div class="modal-body new-topic-name-editor">
-    <div class="form-group row" ng-class="{'has-error': !isTopicNameValid()}">
-      <label class="col-sm-6 col-form-label">Enter a name for the topic: &nbsp;</label>
-      <div class="col-sm-6 topic-name-field">
-        <input class="form-control protractor-test-new-topic-name-field" ng-model="topicName" maxlength="<[MAX_CHARS_IN_TOPIC_NAME]>" autofocus>
-        <span class="oppia-input-box-subtitle">
-          <i>
-            Topic name should be at most <[MAX_CHARS_IN_TOPIC_NAME]> characters.
-          </i>
-        </span>
+<form ng-submit="save()">
+  <div class="modal-body create-new-topic-form">
+    <div class="create-new-topic-input-field">
+      <div><span class="create-new-topic-input-label">Category</span></div>
+      <div>
+        <select2-dropdown class="protractor-test-new-topic-category-field"
+                          item="newlyCreatedTopic.category"
+                          choices="categories"
+                          placeholder="Choose a category"
+                          width="60%">
+        </select2-dropdown>
       </div>
     </div>
+    <div class="create-new-topic-input-field" ng-class="{'has-error': !isTopicNameValid()}">
+      <div><span class="create-new-topic-input-label">Name</span></div>
+      <input class="protractor-test-new-topic-name-field" ng-model="newlyCreatedTopic.name" maxlength="<[MAX_CHARS_IN_TOPIC_NAME]>">
+      <div class="oppia-input-box-subtitle">
+        <i>
+          Topic name should be at most <[MAX_CHARS_IN_TOPIC_NAME]> characters.
+        </i>
+      </div>
+    </div>
+    <div class="create-new-topic-input-field">
+      <div><span class="create-new-topic-input-label">Description</span></div>
+      <textarea class="protractor-test-new-topic-description-field"
+                rows="4" cols="50" placeholder="Enter description"
+                maxlength="<[MAX_CHARS_IN_TOPIC_DESCRIPTION]>"
+                ng-model="newlyCreatedTopic.description">
+      </textarea>
+      <div class="oppia-input-box-subtitle">
+        <i>
+          Topic name should be at most <[MAX_CHARS_IN_TOPIC_DESCRIPTION]> characters.
+        </i>
+      </div>
+    </div>
+    <div class="create-new-topic-input-field">
+      <label class="create-new-topic-input-label">Topic Thumbnail</label>
+      <thumbnail-uploader aspect-ratio="'4:3'"
+                          disabled="true"
+                          preview-description-bg-color="'#2F6687'">
+      </thumbnail-uploader>
+    </div>
   </div>
+
   <div class="modal-footer">
     <button class="btn btn-secondary" ng-click="cancel()" type="button">Cancel</button>
-    <button class="btn btn-success protractor-test-confirm-topic-creation-button" type="submit" ng-disabled="!isTopicNameValid()">
+    <button class="btn btn-success protractor-test-confirm-topic-creation-button" type="submit" ng-disabled="!newlyCreatedTopic.isValid()">
       <span>Create Topic</span>
     </button>
   </div>
 </form>
 <style>
-  .new-topic-name-editor .form-text {
-    margin-left: 37.5%;
-    margin-top: -3%;
+  .create-new-topic-input-field {
+     margin: 10px 0;
   }
-  .new-topic-name-editor .topic-name-field {
-    height: 35px;
-    margin-left: -15%;
+  .create-new-topic-input-field input, .create-new-topic-input-field textarea,.create-new-topic-input-field select {
+    border: 1px solid #b9b5b5;
+    border-radius: 5px;
   }
-
-  .new-topic-name-editor input {
-    width: 130%;
+  .create-new-topic-input-label {
+    font-weight: bold;
   }
 </style>

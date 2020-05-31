@@ -59,6 +59,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.save_new_topic(
             self.TOPIC_ID, self.user_id, name='Name',
             description='Description',
+            category='Mathematics',
             canonical_story_ids=[self.story_id_1, self.story_id_2],
             additional_story_ids=[self.story_id_3],
             uncategorized_skill_ids=[self.skill_id_1, self.skill_id_2],
@@ -95,6 +96,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(topic_summary.id, self.TOPIC_ID)
         self.assertEqual(topic_summary.name, 'Name')
         self.assertEqual(topic_summary.description, 'Description')
+        self.assertEqual(topic_summary.category, 'Mathematics')
         self.assertEqual(topic_summary.canonical_story_count, 0)
         self.assertEqual(topic_summary.additional_story_count, 0)
         self.assertEqual(topic_summary.uncategorized_skill_count, 2)
@@ -118,6 +120,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(len(topic_summaries), 2)
         self.assertEqual(topic_summaries[0].name, 'Name')
+        self.assertEqual(topic_summaries[0].description, 'Description')
+        self.assertEqual(topic_summaries[0].category, 'Mathematics')
         self.assertEqual(topic_summaries[0].canonical_story_count, 0)
         self.assertEqual(topic_summaries[0].additional_story_count, 0)
         self.assertEqual(topic_summaries[0].total_skill_count, 2)
@@ -161,6 +165,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             id='topic_id',
             name='name',
             abbreviated_name='abbrev',
+            description='description1',
+            category='Mathematics',
             canonical_name='canonical_name',
             next_subtopic_id=1,
             language_code='en',
@@ -183,6 +189,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             id='topic_id_2',
             name='name 2',
             abbreviated_name='abbrev',
+            description='description',
+            category='Mathematics',
             canonical_name='canonical_name_2',
             next_subtopic_id=1,
             language_code='en',
@@ -208,6 +216,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(topic_summary.id, self.TOPIC_ID)
         self.assertEqual(topic_summary.name, 'Name')
         self.assertEqual(topic_summary.description, 'Description')
+        self.assertEqual(topic_summary.category, 'Mathematics')
         self.assertEqual(topic_summary.canonical_story_count, 0)
         self.assertEqual(topic_summary.additional_story_count, 0)
         self.assertEqual(topic_summary.uncategorized_skill_count, 2)
@@ -220,6 +229,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(topic_summary.id, self.TOPIC_ID)
         self.assertEqual(topic_summary.name, 'Name')
         self.assertEqual(topic_summary.description, 'Description')
+        self.assertEqual(topic_summary.category, 'Mathematics')
         self.assertEqual(topic_summary.canonical_story_count, 0)
         self.assertEqual(topic_summary.additional_story_count, 0)
         self.assertEqual(topic_summary.uncategorized_skill_count, 2)
@@ -1323,6 +1333,8 @@ class SubtopicMigrationTests(test_utils.GenericTestBase):
             name='name',
             abbreviated_name='abbrev',
             canonical_name='Name',
+            description='description1',
+            category='Mathematics',
             next_subtopic_id=1,
             language_code='en',
             subtopics=[subtopic_v1_dict],
@@ -1366,6 +1378,8 @@ class StoryReferenceMigrationTests(test_utils.GenericTestBase):
             name='name',
             abbreviated_name='abbrev',
             canonical_name='Name',
+            description='description1',
+            category='Mathematics',
             next_subtopic_id=1,
             language_code='en',
             subtopics=[],

@@ -54,7 +54,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             self.publish_exploration(self.owner_id, exp.id)
 
         topic = topic_domain.Topic.create_default_topic(
-            topic_id='0', name='topic', abbreviated_name='abbrev')
+            '0', 'topic', 'abbrev', 'description', 'Mathematics')
         topic_services.save_new_topic(self.owner_id, topic)
 
         self.skill_id_0 = 'skill_id_0'
@@ -299,7 +299,7 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
             self.publish_exploration(self.owner_id, exp.id)
 
         topic = topic_domain.Topic.create_default_topic(
-            topic_id='0', name='topic', abbreviated_name='abbrev')
+            '0', 'topic', 'abbrev', 'description', 'Mathematics')
         topic_services.save_new_topic(self.owner_id, topic)
 
         stories = [story_domain.Story.create_default_story(

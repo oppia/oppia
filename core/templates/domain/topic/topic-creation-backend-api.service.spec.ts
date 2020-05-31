@@ -22,6 +22,8 @@ import { HttpClientTestingModule, HttpTestingController }
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { CsrfTokenService } from 'services/csrf-token.service';
+import { NewlyCreatedTopic, NewlyCreatedTopicObjectFactory } from
+  'domain/topics_and_skills_dashboard/NewlyCreatedTopicObjectFactory';
 import { TopicCreationBackendApiService, ITopicCreationBackend } from
   'domain/topic/topic-creation-backend-api.service.ts';
 
@@ -29,9 +31,12 @@ describe('Topic creation backend api service', () => {
   let csrfService: CsrfTokenService = null;
   let httpTestingController: HttpTestingController = null;
   let topicCreationBackendApiService: TopicCreationBackendApiService = null;
+  let newlyCreatedTopicObjectFactory: NewlyCreatedTopicObjectFactory = null;
+  let topic: NewlyCreatedTopic = null;
   let postData: ITopicCreationBackend = {
-    abbreviated_name: 'topic-abbr-name',
-    name: 'topic-name'
+    name: 'topic-name',
+    category: 'Mathematics',
+    description: 'Description'
   };
 
   beforeEach(() => {
@@ -42,8 +47,14 @@ describe('Topic creation backend api service', () => {
 
     csrfService = TestBed.get(CsrfTokenService);
     httpTestingController = TestBed.get(HttpTestingController);
+    newlyCreatedTopicObjectFactory = TestBed.get(
+      NewlyCreatedTopicObjectFactory);
     topicCreationBackendApiService = TestBed.get(
       TopicCreationBackendApiService);
+    topic = newlyCreatedTopicObjectFactory.createDefault();
+    topic.name = 'topic-name';
+    topic.category = 'Mathematics';
+    topic.description = 'Description';
     spyOn(csrfService, 'getTokenAsync').and.returnValue(() => {
       return new Promise((resolve) => {
         resolve('sample-csrf-token');
@@ -59,8 +70,8 @@ describe('Topic creation backend api service', () => {
     fakeAsync(() => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
-      topicCreationBackendApiService.createTopic(
-        'topic-name', 'topic-abbr-name').then(
+
+      topicCreationBackendApiService.createTopic(topic).then(
         successHandler);
       let req = httpTestingController.expectOne(
         '/topic_editor_handler/create_new');
@@ -76,8 +87,7 @@ describe('Topic creation backend api service', () => {
     fakeAsync(() => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
-      topicCreationBackendApiService.createTopic(
-        'topic-name', 'topic-abbr-name').then(
+      topicCreationBackendApiService.createTopic(topic).then(
         successHandler, failHandler);
       const errorResponse = new HttpErrorResponse({
         error: 'test 404 error',

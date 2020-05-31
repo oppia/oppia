@@ -158,7 +158,9 @@ class NewTopicHandlerTests(BaseTopicsAndSkillsDashboardTests):
         csrf_token = self.get_new_csrf_token()
         payload = {
             'name': 'Topic name',
-            'abbreviated_name': 'name'
+            'abbreviated_name': 'name',
+            'category': 'Mathematics',
+            'description': 'Topic description'
         }
         json_response = self.post_json(
             self.url, payload, csrf_token=csrf_token)

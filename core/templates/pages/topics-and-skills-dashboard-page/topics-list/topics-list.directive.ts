@@ -34,32 +34,71 @@ angular.module('oppia').directive('topicsList', [
       restrict: 'E',
       scope: {
         getTopicSummaries: '&topicSummaries',
+        getPageNumber: '&pageNumber',
+        getItemsPerPage: '&itemsPerPage',
         canDeleteTopic: '&userCanDeleteTopic',
         selectedTopicIds: '='
       },
+      controllerAs: '$ctrl',
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/topics-and-skills-dashboard-page/topics-list/' +
         'topics-list.directive.html'),
       controller: [
         '$scope', '$uibModal', '$rootScope', 'EditableTopicBackendApiService',
-        'AlertsService', 'EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED',
+        'AlertsService', 'UrlInterpolationService',
+        'EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED',
         function(
             $scope, $uibModal, $rootScope, EditableTopicBackendApiService,
-            AlertsService, EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED) {
+            AlertsService, UrlInterpolationService,
+            EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED) {
           var ctrl = this;
-          $scope.getTopicEditorUrl = function(topicId) {
+          /**
+           * @param {String} topicId - ID of the topic.
+           * @returns {String} Url of the topic editor with the
+           * topic ID provided in the args.
+           */
+          ctrl.getTopicEditorUrl = function(topicId) {
+            var TOPIC_EDITOR_URL_TEMPLATE = '/topic_editor/<topic_id>';
+            UrlInterpolationService.interpolateUrl(
+              TOPIC_EDITOR_URL_TEMPLATE, {
+                topic_id: topicId
+              });
             return '/topic_editor/' + topicId;
           };
 
-          $scope.selectTopic = function(topicId) {
-            if ($scope.selectedTopicIds) {
-              if ($scope.selectedTopicIds.indexOf(topicId) === -1) {
-                $scope.selectedTopicIds.push(topicId);
-              }
-            }
+          /**
+           * @param {String} topicId - ID of the topic.
+           * @returns {Boolean} Returns true for the topic whose
+           * edit options should be shown.
+           */
+          ctrl.showEditOptions = function(topicId) {
+            return ctrl.selectedIndex === topicId;
           };
 
-          $scope.deleteTopic = function(topicId) {
+          /**
+           * @param {String} topicId - ID of the topic.
+           */
+          ctrl.enableEditOptions = function(topicId) {
+            ctrl.selectedIndex = topicId;
+          };
+
+          /**
+           ** @param {Number} topicIndex - Index of the topic in
+           * the topicSummaries.
+           * @returns {Number} The calculated serial number
+           * of the topic taking into consideration the current page
+           * number and the items being displayed per page.
+           */
+          ctrl.getSerialNumberForTopic = function(topicIndex) {
+            var topicSerialNumber = (
+              topicIndex + (ctrl.getPageNumber() * ctrl.getItemsPerPage()));
+            return (topicSerialNumber + 1);
+          };
+
+          /**
+           * @param {String} topicId - ID of the topic.
+           */
+          ctrl.deleteTopic = function(topicId) {
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/topics-and-skills-dashboard-page/templates/' +
@@ -85,11 +124,14 @@ angular.module('oppia').directive('topicsList', [
           };
 
           ctrl.$onInit = function() {
+            ctrl.getPageNumber = $scope.getPageNumber;
+            ctrl.getItemsPerPage = $scope.getItemsPerPage;
+            ctrl.selectedIndex = null;
             // As additional stories are not supported initially, it's not
             // being shown, for now.
-            $scope.TOPIC_HEADINGS = [
-              'name', 'subtopic_count', 'skill_count',
-              'canonical_story_count', 'topic_status'
+            ctrl.TOPIC_HEADINGS = [
+              'index', 'name', 'canonical_story_count', 'subtopic_count',
+              'skill_count', 'topic_status'
             ];
           };
         }

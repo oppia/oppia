@@ -61,7 +61,8 @@ class BaseTopicViewerControllerTests(test_utils.GenericTestBase):
         self.story_2.node_count = 0
 
         self.topic = topic_domain.Topic.create_default_topic(
-            self.topic_id, 'public_topic_name', 'abbrev')
+            self.topic_id, 'public_topic_name', 'abbrev',
+            'description', 'Mathematics')
         self.topic.uncategorized_skill_ids.append(self.skill_id_1)
         self.topic.subtopics.append(topic_domain.Subtopic(
             1, 'subtopic_name', [self.skill_id_2], 'image.svg',
@@ -82,7 +83,8 @@ class BaseTopicViewerControllerTests(test_utils.GenericTestBase):
         story_services.save_new_story(self.admin_id, self.story_2)
 
         self.topic = topic_domain.Topic.create_default_topic(
-            self.topic_id_1, 'private_topic_name', 'abbrev')
+            self.topic_id_1, 'private_topic_name', 'abbrev',
+            'description', 'Mathematics')
         self.topic.thumbnail_filename = 'Image.svg'
         self.topic.thumbnail_bg_color = (
             constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0])
@@ -240,7 +242,8 @@ class TopicPageDataHandlerTests(BaseTopicViewerControllerTests):
 
     def test_get_with_no_skills_ids(self):
         self.topic = topic_domain.Topic.create_default_topic(
-            self.topic_id, 'topic_with_no_skills', 'abbrev')
+            self.topic_id, 'topic_with_no_skills', 'abbrev', 'description',
+            'Mathematics')
         topic_services.save_new_topic(self.admin_id, self.topic)
         topic_services.publish_topic(self.topic_id, self.admin_id)
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
@@ -264,7 +267,7 @@ class TopicPageDataHandlerTests(BaseTopicViewerControllerTests):
         self.topic_id = 'new_topic'
         self.skill_id_1 = skill_services.get_new_skill_id()
         self.topic = topic_domain.Topic.create_default_topic(
-            self.topic_id, 'new_topic', 'abbrev')
+            self.topic_id, 'new_topic', 'abbrev', 'description', 'Mathematics')
         self.topic.uncategorized_skill_ids.append(self.skill_id_1)
         self.topic.thumbnail_filename = 'Image.svg'
         self.topic.thumbnail_bg_color = (

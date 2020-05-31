@@ -80,6 +80,8 @@ import { CreatorDashboardBackendApiService } from
 import { CsrfTokenService } from 'services/csrf-token.service';
 import { CurrentInteractionService } from
   'pages/exploration-player-page/services/current-interaction.service';
+import { NewlyCreatedTopicObjectFactory } from
+  'domain/topics_and_skills_dashboard/NewlyCreatedTopicObjectFactory';
 import { DateTimeFormatService } from 'services/date-time-format.service';
 import { DebouncerService } from 'services/debouncer.service';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
@@ -213,6 +215,8 @@ import { SchemaUndefinedLastElementService } from
   'services/schema-undefined-last-element.service.ts';
 import { SidebarStatusService } from 'domain/sidebar/sidebar-status.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
+import { SkillCreationBackendApiService } from
+  'domain/skill/skill-creation-backend-api.service';
 import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
 import { SkillSummaryObjectFactory } from
   'domain/skill/SkillSummaryObjectFactory';
@@ -294,11 +298,22 @@ import { ThreadMessageSummaryObjectFactory } from
 import { ThreadStatusDisplayService } from
   // eslint-disable-next-line max-len
   'pages/exploration-editor-page/feedback-tab/services/thread-status-display.service';
+import { TopicsAndSkillsDashboardFilterObjectFactory } from
+  // eslint-disable-next-line max-len
+  'domain/topics_and_skills_dashboard/TopicsAndSkillsDashboardFilterObjectFactory';
+import { TopicCreationBackendApiService } from
+  'domain/topic/topic-creation-backend-api.service';
 import { TopicObjectFactory } from 'domain/topic/TopicObjectFactory';
 import { TopicRightsObjectFactory } from
   'domain/topic/TopicRightsObjectFactory';
 import { TopicSummaryObjectFactory } from
   'domain/topic/TopicSummaryObjectFactory';
+import { TopicsAndSkillsDashboardBackendApiService } from
+  // eslint-disable-next-line max-len
+  'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
+import { TopicsAndSkillsDashboardPageService } from
+  // eslint-disable-next-line max-len
+  'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.service';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
@@ -374,6 +389,8 @@ export class UpgradedServices {
     upgradedServices['ExplorationFeaturesService'] =
       new ExplorationFeaturesService();
     upgradedServices['ExpressionParserService'] = new ExpressionParserService();
+    upgradedServices['NewlyCreatedTopicObjectFactory'] =
+        new NewlyCreatedTopicObjectFactory();
     upgradedServices['FractionObjectFactory'] = new FractionObjectFactory();
     upgradedServices['GenerateContentIdService'] =
       new GenerateContentIdService();
@@ -438,6 +455,10 @@ export class UpgradedServices {
     upgradedServices['ThreadStatusDisplayService'] =
       new ThreadStatusDisplayService();
     upgradedServices['Title'] = new Title({});
+    upgradedServices['TopicsAndSkillsDashboardFilterObjectFactory'] =
+        new TopicsAndSkillsDashboardFilterObjectFactory();
+    upgradedServices['TopicsAndSkillsDashboardPageService'] =
+        new TopicsAndSkillsDashboardPageService();
     upgradedServices['TopicRightsObjectFactory'] =
       new TopicRightsObjectFactory();
     upgradedServices['TopicSummaryObjectFactory'] =
@@ -514,6 +535,8 @@ export class UpgradedServices {
     upgradedServices['RecordedVoiceoversObjectFactory'] =
       new RecordedVoiceoversObjectFactory(
         upgradedServices['VoiceoverObjectFactory']);
+    upgradedServices['SkillCreationBackendApiService'] =
+        new SkillCreationBackendApiService(upgradedServices['HttpClient']);
     upgradedServices['SVMPredictionService'] = new SVMPredictionService(
       upgradedServices['PredictionResultObjectFactory']);
     upgradedServices['SchemaDefaultValueService'] =
@@ -538,6 +561,12 @@ export class UpgradedServices {
     upgradedServices['ThreadMessageObjectFactory'] =
       new ThreadMessageObjectFactory(
         upgradedServices['ThreadMessageSummaryObjectFactory']);
+    upgradedServices['TopicsAndSkillsDashboardBackendApiService'] =
+        new TopicsAndSkillsDashboardBackendApiService(
+          upgradedServices['HttpClient']);
+    upgradedServices['TopicCreationBackendApiService'] =
+        new TopicCreationBackendApiService(
+          upgradedServices['HttpClient']);
     upgradedServices['UrlService'] = new UrlService(
       upgradedServices['WindowRef']);
     upgradedServices['WindowDimensionsService'] = new WindowDimensionsService(

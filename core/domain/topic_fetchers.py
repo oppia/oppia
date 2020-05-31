@@ -146,7 +146,8 @@ def get_topic_from_model(topic_model):
         topic_model.abbreviated_name,
         topic_model.thumbnail_filename,
         topic_model.thumbnail_bg_color,
-        topic_model.description, [
+        topic_model.description,
+        topic_model.category, [
             topic_domain.StoryReference.from_dict(reference)
             for reference in versioned_canonical_story_references[
                 'story_references']

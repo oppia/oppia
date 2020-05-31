@@ -79,6 +79,10 @@ angular.module('oppia').constant(
   TopicDomainConstants.TOPIC_PROPERTY_THUMBNAIL_BG_COLOR);
 
 angular.module('oppia').constant(
+  'TOPIC_PROPERTY_CATEGORY',
+  TopicDomainConstants.TOPIC_PROPERTY_CATEGORY);
+
+angular.module('oppia').constant(
   'TOPIC_PROPERTY_DESCRIPTION',
   TopicDomainConstants.TOPIC_PROPERTY_DESCRIPTION);
 angular.module('oppia').constant(

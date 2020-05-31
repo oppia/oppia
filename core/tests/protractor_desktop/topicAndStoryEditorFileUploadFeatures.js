@@ -56,12 +56,15 @@ describe('Topic editor functionality', function() {
   it('should edit topic name, thumbnail and description ' +
     'correctly', async function() {
     var TOPIC_NAME = 'TASEFUF_1';
+    var TOPIC_DESCRIPTION = 'TASEFUF_1 description';
+    var TOPIC_CATEGORY = 'Mathematics';
     var EDITED_TOPIC_NAME = 'TASEFUF_1 edited';
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.createTopic(TOPIC_NAME, false);
     NEW_TOPIC_NAME = EDITED_TOPIC_NAME;
     await topicsAndSkillsDashboardPage.get();
-    await topicsAndSkillsDashboardPage.editTopic(TOPIC_NAME);
+    await topicsAndSkillsDashboardPage.createTopic(TOPIC_NAME,
+      TOPIC_DESCRIPTION, TOPIC_CATEGORY, false);
     await topicEditorPage.changeTopicName(NEW_TOPIC_NAME);
     var defaultThumbnailImageSrc = (
       await topicEditorPage.getTopicThumbnailSource());
@@ -82,6 +85,9 @@ describe('Topic editor functionality', function() {
 
   it('should edit subtopic page contents correctly', async function() {
     var TOPIC_NAME = 'TASEFUF_2';
+    var TOPIC_DESCRIPTION = 'TASEFUF_2 description';
+    var TOPIC_CATEGORY = 'Mathematics';
+
     await topicsAndSkillsDashboardPage.createTopic(TOPIC_NAME, false);
     var defaultThumbnailSrc = (
       await topicEditorPage.getTopicThumbnailSource());
@@ -122,7 +128,10 @@ describe('Topic editor functionality', function() {
 
   it('should publish and unpublish a story correctly', async function() {
     var TOPIC_NAME = 'TASEFUF_3';
-    await topicsAndSkillsDashboardPage.createTopic(TOPIC_NAME, false);
+    var TOPIC_DESCRIPTION = 'TASEFUF_3 description';
+    var TOPIC_CATEGORY = 'Mathematics';
+    await topicsAndSkillsDashboardPage.createTopic(TOPIC_NAME,
+      TOPIC_DESCRIPTION, TOPIC_CATEGORY, false);
 
     await topicEditorPage.expectNumberOfStoriesToBe(0);
     await topicEditorPage.createStory('Story Title');
@@ -201,7 +210,8 @@ describe('Chapter editor functionality', function() {
   it('should create a basic chapter with a thumbnail.', async function() {
     await topicsAndSkillsDashboardPage.get();
     var defaultThumbnailImageSrc = null;
-    await topicsAndSkillsDashboardPage.createTopic(TOPIC_NAME, false);
+    await topicsAndSkillsDashboardPage.createTopic(TOPIC_NAME,
+      'Topic description', 'Mathematics', false);
     defaultThumbnailImageSrc = await topicEditorPage.getTopicThumbnailSource();
     await topicEditorPage.submitTopicThumbnail('../data/test_svg.svg');
     expect(await topicEditorPage.getTopicThumbnailSource()).not.toEqual(

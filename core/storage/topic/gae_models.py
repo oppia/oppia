@@ -61,6 +61,8 @@ class TopicModel(base_models.VersionedModel):
     thumbnail_bg_color = ndb.StringProperty(indexed=True)
     # The description of the topic.
     description = ndb.TextProperty(indexed=False)
+    # The category this topic belongs to.
+    category = ndb.StringProperty(required=True, indexed=True)
     # This consists of the list of objects referencing canonical stories that
     # are part of this topic.
     canonical_story_references = ndb.JsonProperty(repeated=True, indexed=False)
@@ -231,6 +233,9 @@ class TopicSummaryModel(base_models.BaseModel):
     language_code = ndb.StringProperty(required=True, indexed=True)
     # The description of the topic.
     description = ndb.TextProperty(indexed=False)
+
+    # The category this topic belongs to.
+    category = ndb.StringProperty(required=True, indexed=True)
 
     # Time when the topic model was last updated (not to be
     # confused with last_updated, which is the time when the

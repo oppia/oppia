@@ -53,6 +53,8 @@ export = {
     "story": ["#F8BF74", "#D68F78", "#8EBBB6", "#B3D8F1"]
   },
 
+  "ALLOWED_TOPIC_CATEGORIES": ["Mathematics"],
+
   // The SVG tag-specific attribute whitelist is based on the list of tags and
   // and attributes specified in this project:
   // https://github.com/cure53/DOMPurify

@@ -16,19 +16,31 @@
  * @fileoverview Modal and functionality for the create topic button.
  */
 
+require(
+  'components/forms/custom-forms-directives/select2-dropdown.directive.ts');
+require(
+  'components/forms/custom-forms-directives/thumbnail-uploader.directive.ts');
+require('domain/topic/topic-update.service.ts');
+require('domain/topics_and_skills_dashboard/' +
+  'TopicsAndSkillsDashboardFilterObjectFactory');
 require('domain/utilities/url-interpolation.service.ts');
 require('domain/topic/topic-creation-backend-api.service.ts');
+require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 require('services/alerts.service.ts');
+require('services/image-upload-helper.service.ts');
 
 angular.module('oppia').factory('TopicCreationService', [
   '$rootScope', '$uibModal', '$window', 'AlertsService',
   'TopicCreationBackendApiService', 'UrlInterpolationService',
+  'ALLOWED_TOPIC_CATEGORIES',
   'EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED',
-  'MAX_CHARS_IN_TOPIC_NAME', function(
+  'MAX_CHARS_IN_TOPIC_DESCRIPTION', 'MAX_CHARS_IN_TOPIC_NAME',
+  function(
       $rootScope, $uibModal, $window, AlertsService,
       TopicCreationBackendApiService, UrlInterpolationService,
+      ALLOWED_TOPIC_CATEGORIES,
       EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED,
-      MAX_CHARS_IN_TOPIC_NAME) {
+      MAX_CHARS_IN_TOPIC_DESCRIPTION, MAX_CHARS_IN_TOPIC_NAME) {
     var TOPIC_EDITOR_URL_TEMPLATE = '/topic_editor/<topic_id>';
     var topicCreationInProgress = false;
 
@@ -44,21 +56,18 @@ angular.module('oppia').factory('TopicCreationService', [
           backdrop: true,
           controller: [
             '$scope', '$uibModalInstance',
-            function($scope, $uibModalInstance) {
-              $scope.topicName = '';
-              $scope.abbreviatedTopicName = '';
+            'NewlyCreatedTopicObjectFactory',
+            function($scope, $uibModalInstance,
+                NewlyCreatedTopicObjectFactory) {
+              $scope.categories = ALLOWED_TOPIC_CATEGORIES;
+              $scope.newlyCreatedTopic = (
+                NewlyCreatedTopicObjectFactory.createDefault());
               $scope.MAX_CHARS_IN_TOPIC_NAME = MAX_CHARS_IN_TOPIC_NAME;
-              // No need for a length check below since the topic name input
-              // field in the HTML file has the maxlength attribute which
-              // disallows the user from entering more than the valid length.
-              $scope.isTopicNameValid = function() {
-                return $scope.topicName !== '';
-              };
-              $scope.save = function(topicName, abbreviatedTopicName) {
-                $uibModalInstance.close({
-                  topicName: topicName,
-                  abbreviatedTopicName: abbreviatedTopicName
-                });
+              $scope.MAX_CHARS_IN_TOPIC_DESCRIPTION = (
+                MAX_CHARS_IN_TOPIC_DESCRIPTION);
+
+              $scope.save = function() {
+                $uibModalInstance.close($scope.newlyCreatedTopic);
               };
               $scope.cancel = function() {
                 $uibModalInstance.dismiss('cancel');
@@ -67,9 +76,9 @@ angular.module('oppia').factory('TopicCreationService', [
           ]
         });
 
-        modalInstance.result.then(function(topic) {
-          if (topic.topicName === '') {
-            throw new Error('Topic name cannot be empty');
+        modalInstance.result.then(function(newlyCreatedTopic) {
+          if (!newlyCreatedTopic.isValid()) {
+            throw new Error('Topic fields cannot be empty');
           }
           topicCreationInProgress = true;
           AlertsService.clearWarnings();
@@ -80,8 +89,7 @@ angular.module('oppia').factory('TopicCreationService', [
           // new tab is created as soon as the user clicks the 'Create' button
           // and filled with URL once the details are fetched from the backend.
           var newTab = $window.open();
-          TopicCreationBackendApiService.createTopic(
-            topic.topicName, topic.abbreviatedTopicName).then(
+          TopicCreationBackendApiService.createTopic(newlyCreatedTopic).then(
             function(response) {
               $rootScope.$broadcast(
                 EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED);

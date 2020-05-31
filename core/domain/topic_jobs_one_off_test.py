@@ -65,7 +65,7 @@ class TopicMigrationOneOffJobTests(test_utils.GenericTestBase):
         # Create a new topic that should not be affected by the
         # job.
         topic = topic_domain.Topic.create_default_topic(
-            self.TOPIC_ID, name='A name', abbreviated_name='abbrev')
+            self.TOPIC_ID, 'A name', 'abbrev', 'description', 'Mathematics')
         topic.add_subtopic(1, title='A subtitle')
         topic_services.save_new_topic(self.albert_id, topic)
         self.assertEqual(
@@ -97,7 +97,7 @@ class TopicMigrationOneOffJobTests(test_utils.GenericTestBase):
         and does not attempt to migrate.
         """
         topic = topic_domain.Topic.create_default_topic(
-            self.TOPIC_ID, name='A name', abbreviated_name='abbrev')
+            self.TOPIC_ID, 'A name', 'abbrev', 'description', 'Mathematics')
         topic_services.save_new_topic(self.albert_id, topic)
 
         # Delete the topic before migration occurs.
@@ -134,7 +134,7 @@ class TopicMigrationOneOffJobTests(test_utils.GenericTestBase):
         # Generate topic with old(v1) subtopic data.
         self.save_new_topic_with_subtopic_schema_v1(
             self.TOPIC_ID, self.albert_id, 'A name', 'abbrev',
-            'a name', '', 'Image.svg', '#C6DCDA', [], [], [], 2)
+            'a name', '', 'Mathematics', 'Image.svg', '#C6DCDA', [], [], [], 2)
         topic_model = (
             topic_models.TopicModel.get(self.TOPIC_ID))
         self.assertEqual(topic_model.subtopic_schema_version, 1)
@@ -186,7 +186,8 @@ class TopicMigrationOneOffJobTests(test_utils.GenericTestBase):
         # The topic model created will be invalid due to invalid language code.
         self.save_new_topic_with_subtopic_schema_v1(
             self.TOPIC_ID, self.albert_id, 'A name', 'abbrev',
-            'a name', '', 'Image.svg', '#C6DCDA', [], [], [], 2,
+            'a name', 'description', 'Mathematics', 'Image.svg',
+            '#C6DCDA', [], [], [], 2,
             language_code='invalid_language_code')
 
         job_id = (
@@ -245,7 +246,7 @@ class RemoveDeletedSkillsFromTopicOneOffJobTests(
         # Create a new topic that should not be affected by the
         # job.
         topic = topic_domain.Topic.create_default_topic(
-            self.TOPIC_ID, name='A name', abbreviated_name='abbrev')
+            self.TOPIC_ID, 'A name', 'abbrev', 'description', 'Mathematics')
         topic.add_subtopic(1, title='A subtitle')
         topic.add_uncategorized_skill_id('valid_skill_1')
         topic.add_uncategorized_skill_id('valid_skill_2')
@@ -305,7 +306,7 @@ class RemoveDeletedSkillsFromTopicOneOffJobTests(
         skills that are deleted.
         """
         topic = topic_domain.Topic.create_default_topic(
-            self.TOPIC_ID, name='A name', abbreviated_name='abbrev')
+            self.TOPIC_ID, 'A name', 'abbrev', 'description', 'Mathematics')
         topic.add_uncategorized_skill_id('skill_1')
         topic.add_uncategorized_skill_id('skill_2')
         topic_services.save_new_topic(self.albert_id, topic)
@@ -338,4 +339,87 @@ class RemoveDeletedSkillsFromTopicOneOffJobTests(
             .get_output(job_id))
         expected = [[u'topic_deleted',
                      [u'Encountered 1 deleted topics.']]]
+        self.assertEqual(expected, [ast.literal_eval(x) for x in output])
+
+
+class AddCategoryToTopicOneOffJobTests(
+        test_utils.GenericTestBase):
+
+    ALBERT_EMAIL = 'albert@example.com'
+    ALBERT_NAME = 'albert'
+
+    TOPIC_ID = 'topic_id'
+
+    def setUp(self):
+        super(AddCategoryToTopicOneOffJobTests, self).setUp()
+        # Setup user who will own the test topics.
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.process_and_flush_pending_tasks()
+
+    def test_job_add_category_if_absent(self):
+        """Tests that the AddCategoryToTopicOneOffJobTests job adds
+        category to the topic if category is not present.
+        """
+
+        topic = topic_domain.Topic.create_default_topic(
+            self.TOPIC_ID, 'A name', 'abbrev', 'description', 'Mathematics')
+        topic_services.save_new_topic(self.albert_id, topic)
+
+        commit_cmds = [topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
+            'property_name': 'category',
+            'new_value': '',
+            'old_value': 'Mathematics'
+        })]
+
+        def mock_validate(unused_self, strict=True):
+            if strict:
+                return True
+
+        validate_swap = self.swap(topic_domain.Topic, 'validate', mock_validate)
+        with validate_swap:
+            topic_services.update_topic_and_subtopic_pages(
+                feconf.MIGRATION_BOT_USERNAME, topic.id, commit_cmds,
+                'Removed category from topic.')
+
+        job_id = (
+            topic_jobs_one_off.AddCategoryToTopicOneOffJob
+            .create_new())
+        topic_jobs_one_off.AddCategoryToTopicOneOffJob.enqueue(
+            job_id)
+        self.process_and_flush_pending_tasks()
+
+        output = (
+            topic_jobs_one_off.AddCategoryToTopicOneOffJob
+            .get_output(job_id))
+        expected = [
+            [u'category_added',
+             [u'Category Added to 1 topics.']]]
+
+        self.assertEqual(expected, [ast.literal_eval(x) for x in output])
+
+    def test_job_skip_category_if_present(self):
+        """Tests that the AddCategoryToTopicOneOffJobTests job skips if
+        category is present in the topic.
+        """
+
+        topic = topic_domain.Topic.create_default_topic(
+            self.TOPIC_ID, 'A name', 'abbrev', 'description', 'Mathematics')
+        topic_services.save_new_topic(self.albert_id, topic)
+
+        job_id = (
+            topic_jobs_one_off.AddCategoryToTopicOneOffJob
+            .create_new())
+        topic_jobs_one_off.AddCategoryToTopicOneOffJob.enqueue(
+            job_id)
+        self.process_and_flush_pending_tasks()
+
+        output = (
+            topic_jobs_one_off.AddCategoryToTopicOneOffJob
+            .get_output(job_id))
+        expected = [
+            [u'category_present',
+             [u'Category Present in 1 topics.']]]
+
         self.assertEqual(expected, [ast.literal_eval(x) for x in output])

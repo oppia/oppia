@@ -46,7 +46,8 @@ class BasePracticeSessionsControllerTests(test_utils.GenericTestBase):
             self.skill_id2, self.admin_id, description='Skill 2')
 
         self.topic = topic_domain.Topic.create_default_topic(
-            self.topic_id, 'public_topic_name', 'abbrev')
+            self.topic_id, 'public_topic_name', 'abbrev', 'description',
+            'Mathematics')
         self.topic.uncategorized_skill_ids.append(self.skill_id1)
         self.topic.subtopics.append(topic_domain.Subtopic(
             1, 'subtopic_name', [self.skill_id2], 'image.svg',
@@ -58,7 +59,8 @@ class BasePracticeSessionsControllerTests(test_utils.GenericTestBase):
         topic_services.save_new_topic(self.admin_id, self.topic)
 
         self.topic = topic_domain.Topic.create_default_topic(
-            self.topic_id_1, 'private_topic_name', 'abbrev')
+            self.topic_id_1, 'private_topic_name', 'abbrev',
+            'description', 'Mathematics')
         self.topic.thumbnail_filename = 'Topic.svg'
         self.topic.thumbnail_bg_color = (
             constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0])
@@ -114,7 +116,8 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
 
     def test_get_fails_when_skill_ids_dont_exist(self):
         topic = topic_domain.Topic.create_default_topic(
-            'topic_id_3', 'topic_without_skills', 'abbrev')
+            'topic_id_3', 'topic_without_skills', 'abbrev',
+            'description', 'Mathematics')
         topic.uncategorized_skill_ids.append('non_existent_skill')
         topic.thumbnail_filename = 'Topic.svg'
         topic.thumbnail_bg_color = (
