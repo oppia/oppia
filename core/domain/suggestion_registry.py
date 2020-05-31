@@ -393,6 +393,38 @@ class SuggestionEditStateContent(BaseSuggestion):
             raise utils.ValidationError(
                 'The new html must not match the old html')
 
+    def get_all_html_content_strings(self):
+        """Gets all html content strings used in this suggestion.
+
+        Returns:
+            list(str). The list of html content strings.
+        """
+        html_string_list = [self.change.new_value]
+        if self.change.old_value is not None:
+            html_string_list.append(self.change.old_value)
+        return html_string_list
+
+
+    @staticmethod
+    def convert_html_in_suggestion_change_dict(change_dict, conversion_fn):
+        """Checks for HTML fields in a suggestion change dict and converts it
+        according to the conversion function.
+
+        Args:
+            conversion_fn: function. The function to be used for converting the
+                HTML.
+            change_dict: dict. The change dict to be converted
+        Returns:
+            dict. The converted Suggestion change dict.
+        """
+        if (change_dict.has_key('old_value') and
+                change_dict['old_value'] is not None):
+            change_dict['old_value'] = (
+                conversion_fn(change_dict['old_value']))
+        change_dict['new_value'] = (
+            conversion_fn(change_dict['new_value']))
+        return exp_domain.ExplorationChange(change_dict)
+
 
 class SuggestionTranslateContent(BaseSuggestion):
     """Domain object for a suggestion of type
