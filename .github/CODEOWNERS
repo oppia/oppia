@@ -158,6 +158,7 @@
 /core/templates/services/exploration-features*.ts @kevintab95
 /core/templates/services/exploration-html-formatter.service*.ts @kevintab95
 /core/templates/services/image-upload-helper.service*.ts @kevintab95
+/core/templates/services/literally-canvas-helper.service*.ts @kevintab95
 /core/templates/services/validators.service*.ts @kevintab95
 
 

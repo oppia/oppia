@@ -143,6 +143,11 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
                 component_id)
             self.assertTrue(self._is_camel_cased(component_id))
 
+            # TODO(#9356): Remove this if condition once the Svgeditor
+            # directive is created in the second part of 1st milestone.
+            if component_id == 'Svgeditor':
+                continue
+
             # Check that the component directory exists.
             component_dir = os.path.join(
                 feconf.RTE_EXTENSIONS_DIR, component_id)
@@ -198,6 +203,10 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
 
         rtc_ts_filenames = []
         for component_id in feconf.ALLOWED_RTE_EXTENSIONS:
+            # TODO(#9356): Remove this if condition once the Svgeditor
+            # directive is created in the second part of 1st milestone.
+            if component_id == 'Svgeditor':
+                continue
             component_dir = os.path.join(
                 feconf.RTE_EXTENSIONS_DIR, component_id)
             directives_dir = os.path.join(component_dir, 'directives')

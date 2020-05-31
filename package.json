@@ -107,14 +107,19 @@
     "angular-cookies": "^1.7.9",
     "angular-route": "^1.7.9",
     "bootstrap": "^3.4.1",
+    "create-react-class": "15.6.2",
     "cropperjs": "^1.5.6",
     "default-passive-events": "^1.0.10",
     "gif-frames": "^1.0.1",
     "gifshot": "^0.4.5",
+    "literallycanvas": "0.5.2",
     "lodash": "^4.17.14",
     "mathjs": "^7.0.0",
     "moment": "^2.24.0",
     "nerdamer": "^1.1.4",
+    "react": "16.1.1",
+    "react-dom": "16.1.1",
+    "react-dom-factories": "1.0.2",
     "wavesurfer.js": "^3.3.3"
   }
 }
