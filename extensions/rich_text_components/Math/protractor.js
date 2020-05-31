@@ -41,7 +41,7 @@ var escapedJsonToObj = function(json) {
 
 var expectComponentDetailsToMatch = async function(elem, rawLatex) {
   // TODO(Jacob): Check that the actual latex being displayed is correct.
-  var mathComponent = await elem.getAttribute('raw_latex-with-value');
+  var mathComponent = await elem.getAttribute('math_content-with-value');
   expect(mathComponent.raw_latex).toMatch(rawLatex);
 };
 
