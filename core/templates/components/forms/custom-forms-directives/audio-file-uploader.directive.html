@@ -1,4 +1,4 @@
-<div class="oppia-audio-container">
+<div class="oppia-audio-container protractor-test-audio-upload-container">
   <form id="<[inputFieldFormId]>">
     <input type="file"
            ng-class="inputFieldClassName"
@@ -10,7 +10,7 @@
     Audio translation files should be less than <b>five minutes</b> long.
   </div>
 
-  <div ng-if="errorMessage" class="error-message">
+  <div ng-if="errorMessage" class="error-message protractor-test-upload-error-message">
     <i class="material-icons">&#xE002;</i>
     <[errorMessage]>
   </div>
