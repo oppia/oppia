@@ -18,8 +18,9 @@
 
 import { WindowRef } from 'services/contextual/window-ref.service';
 
+require('pages/about-page/about-page.component.ts');
+
 describe('About Page', function() {
-  var $scope = null;
   var ctrl = null;
   var windowRef = new WindowRef();
   var credits = [];
@@ -28,14 +29,11 @@ describe('About Page', function() {
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('WindowRef', windowRef);
   }));
+  beforeEach(angular.mock.inject(function($componentController) {
+    ctrl = $componentController('aboutPage');
+  }));
   beforeEach(angular.mock.inject(function($injector) {
-    var $rootScope = $injector.get('$rootScope');
-    $scope = $rootScope.$new();
-    var directive = $injector.get('aboutPageDirective')[0];
     credits = $injector.get('CREDITS_CONSTANTS');
-    ctrl = $injector.instantiate(directive.controller, {
-      $rootScope: $scope
-    });
   }));
 
   afterEach(function() {
