@@ -4,8 +4,8 @@ window.MathJax = {
   // @ts-ignore
   skipStartupTypeset: true,
   messageStyle: 'none',
-  jax: ["input/TeX", "output/SVG"],
-  extensions: ["tex2jax.js", "MathMenu.js", "MathZoom.js"],
+  jax: ['input/TeX', 'output/SVG'],
+  extensions: ['tex2jax.js', 'MathMenu.js', 'MathZoom.js'],
   showMathMenu: false,
   showProcessingMessages: false,
   SVG: {
@@ -18,6 +18,6 @@ window.MathJax = {
     useFontCache: false
   },
   TeX: {
-    extensions: ["AMSmath.js", "AMSsymbols.js",   "autoload-all.js"]
+    extensions: ['AMSmath.js', 'AMSsymbols.js', 'autoload-all.js']
   }
 };
