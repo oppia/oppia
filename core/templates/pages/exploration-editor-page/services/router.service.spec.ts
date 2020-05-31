@@ -147,7 +147,9 @@ describe('Router Service', () => {
 
     // @ts-ignore
     var jQuerySpy = spyOn(window, '$');
+    // @ts-ignore
     jQuerySpy.withArgs('.oppia-editor-cards-container').and.returnValue(
+      // @ts-ignore
       $(document.createElement('div')));
     jQuerySpy.and.callThrough();
 
@@ -185,7 +187,9 @@ describe('Router Service', () => {
 
     // @ts-ignore
     var jQuerySpy = spyOn(window, '$');
+    // @ts-ignore
     jQuerySpy.withArgs('.oppia-editor-cards-container').and.returnValue(
+      // @ts-ignore
       $(document.createElement('div')));
     jQuerySpy.and.callThrough();
 

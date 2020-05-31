@@ -33,6 +33,7 @@ describe('Subtopic object factory', () => {
     var sampleSubtopicBackendObject = {
       id: 1,
       thumbnail_filename: 'image.png',
+      thumbnail_bg_color: '#a33f40',
       title: 'Title',
       skill_ids: ['skill_1', 'skill_2']
     };
