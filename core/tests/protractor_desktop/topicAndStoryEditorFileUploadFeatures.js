@@ -59,9 +59,7 @@ describe('Topic editor functionality', function() {
     var TOPIC_DESCRIPTION = 'TASEFUF_1 description';
     var TOPIC_CATEGORY = 'Mathematics';
     var EDITED_TOPIC_NAME = 'TASEFUF_1 edited';
-    await topicsAndSkillsDashboardPage.get();
-    await topicsAndSkillsDashboardPage.createTopic(TOPIC_NAME, false);
-    NEW_TOPIC_NAME = EDITED_TOPIC_NAME;
+    var NEW_TOPIC_NAME = EDITED_TOPIC_NAME;
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.createTopic(TOPIC_NAME,
       TOPIC_DESCRIPTION, TOPIC_CATEGORY, false);
@@ -88,7 +86,8 @@ describe('Topic editor functionality', function() {
     var TOPIC_DESCRIPTION = 'TASEFUF_2 description';
     var TOPIC_CATEGORY = 'Mathematics';
 
-    await topicsAndSkillsDashboardPage.createTopic(TOPIC_NAME, false);
+    await topicsAndSkillsDashboardPage.createTopic(
+      TOPIC_NAME, TOPIC_CATEGORY, TOPIC_DESCRIPTION, false);
     var defaultThumbnailSrc = (
       await topicEditorPage.getTopicThumbnailSource());
     await topicEditorPage.submitTopicThumbnail('../data/test_svg.svg');

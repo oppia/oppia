@@ -62,7 +62,7 @@ export class TopicsAndSkillsDashboardPageService {
     }
 
     if (filterObject.category !==
-        TopicsAndSkillsDashboardPageConstants.TOPIC_FILTER_DEFAULT_VALUE) {
+        TopicsAndSkillsDashboardPageConstants.TOPIC_FILTER_DEFAULT_CATEGORY) {
       filteredTopics = filteredTopics.filter((topic) => {
         return (
           filterObject.category === topic.category);

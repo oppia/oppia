@@ -76,7 +76,7 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
         'EVENT_TYPE_TOPIC_CREATION_ENABLED',
         'FATAL_ERROR_CODES', 'SKILL_DIFFICULTIES',
         'MAX_CHARS_IN_SKILL_DESCRIPTION', 'SKILL_DESCRIPTION_STATUS_VALUES',
-        'TOPIC_FILTER_DEFAULT_VALUE', 'TOPIC_SORT_OPTIONS',
+        'TOPIC_FILTER_DEFAULT_CATEGORY', 'TOPIC_SORT_OPTIONS',
         'TOPIC_PUBLISHED_OPTIONS',
         function(
             $timeout, $http, $rootScope, $scope, $uibModal, $window,
@@ -91,7 +91,7 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
             EVENT_TYPE_TOPIC_CREATION_ENABLED,
             FATAL_ERROR_CODES, SKILL_DIFFICULTIES,
             MAX_CHARS_IN_SKILL_DESCRIPTION, SKILL_DESCRIPTION_STATUS_VALUES,
-            TOPIC_FILTER_DEFAULT_VALUE, TOPIC_SORT_OPTIONS,
+            TOPIC_FILTER_DEFAULT_CATEGORY, TOPIC_SORT_OPTIONS,
             TOPIC_PUBLISHED_OPTIONS) {
           var ctrl = this;
 
@@ -263,10 +263,10 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
             ctrl.filterObject = (
               TopicsAndSkillsDashboardFilterObjectFactory.createDefault());
             ctrl.categories = angular.copy(ALLOWED_TOPIC_CATEGORIES);
-            // Adding this since karma tests adding TOPIC_FILTER_DEFAULT_VALUE
-            // for every it block.
-            if (!ctrl.categories.includes(TOPIC_FILTER_DEFAULT_VALUE)) {
-              ctrl.categories.unshift(TOPIC_FILTER_DEFAULT_VALUE);
+            // Adding this since karma tests adds
+            // TOPIC_FILTER_DEFAULT_CATEGORY for every it block.
+            if (!ctrl.categories.includes(TOPIC_FILTER_DEFAULT_CATEGORY)) {
+              ctrl.categories.unshift(TOPIC_FILTER_DEFAULT_CATEGORY);
             }
             ctrl.sortOptions = [];
             for (let key in TOPIC_SORT_OPTIONS) {

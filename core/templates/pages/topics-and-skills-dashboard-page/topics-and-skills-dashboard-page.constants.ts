@@ -47,5 +47,5 @@ export class TopicsAndSkillsDashboardPageConstants {
   public static ALLOWED_TOPIC_CATEGORIES = constants.ALLOWED_TOPIC_CATEGORIES;
   public static TOPIC_SORT_OPTIONS = ETopicSortOptions;
   public static TOPIC_PUBLISHED_OPTIONS = ETopicPublishedOptions;
-  public static TOPIC_FILTER_DEFAULT_VALUE = 'All';
+  public static TOPIC_FILTER_DEFAULT_CATEGORY = 'All';
 }

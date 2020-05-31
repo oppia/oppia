@@ -17,7 +17,6 @@
  * in Protractor tests.
  */
 
-var forms = require('./forms.js');
 var waitFor = require('./waitFor.js');
 var SkillEditorPage = require('./SkillEditorPage.js');
 
@@ -48,8 +47,12 @@ var TopicsAndSkillsDashboardPage = function() {
     '.protractor-test-select-keyword-dropdown'));
   var topicFilterCategoryField = element(by.css(
     '.protractor-test-topic-filter-category'));
+  var topicEditOptions = element.all(
+    by.css('.protractor-test-topic-edit-box'));
   var topicResetFilters = element(by.css(
     '.protractor-test-topic-filter-reset'));
+  var deleteTopicButton = element(
+    by.css('.protractor-test-delete-topic-button'));
   var skillNameField = element(
     by.css('.protractor-test-new-skill-description-field')
   );
@@ -132,11 +135,9 @@ var TopicsAndSkillsDashboardPage = function() {
   this.navigateToTopicWithIndex = async function(index) {
     await waitFor.visibilityOf(topicsTable,
       'Topic table taking too long to appear.');
-    var topicEditOptions = await element.all(
-      by.css('.protractor-test-topic-edit-box'));
     var editTopicButton = element(
       by.css('.protractor-test-edit-topic-button'));
-    var topicEditOptionBox = topicEditOptions[index];
+    var topicEditOptionBox = await topicEditOptions.get(index);
     await browser.actions().mouseMove(topicEditOptionBox).perform();
     await waitFor.elementToBeClickable(
       editTopicButton,
@@ -199,7 +200,8 @@ var TopicsAndSkillsDashboardPage = function() {
     await topicNameField.sendKeys(topicName);
     await topicDescriptionField.sendKeys(description);
     await topicCategoryField.click();
-    await browser.driver.switchTo().activeElement().sendKeys(category + '\n');
+    await (await
+    browser.driver.switchTo().activeElement()).sendKeys(category + '\n');
     await confirmTopicCreationButton.click();
 
     await waitFor.newTabToBeCreated(
@@ -249,7 +251,8 @@ var TopicsAndSkillsDashboardPage = function() {
       'Topic Dashboard category taking too long to appear.');
 
     await topicFilterCategoryField.click();
-    await browser.driver.switchTo().activeElement().sendKeys(keyword + '\n');
+    await (await
+    browser.driver.switchTo().activeElement()).sendKeys(keyword + '\n');
   };
 
   this.resetTopicFilters = async function() {
@@ -261,10 +264,8 @@ var TopicsAndSkillsDashboardPage = function() {
   this.deleteTopicWithIndex = async function(index) {
     await waitFor.visibilityOf(topicsTable,
       'Topic table taking too long to appear.');
-    var topics = await element.all(by.css('.protractor-test-topic-edit-box'));
-    var deleteTopicButton = element(
-      by.css('.protractor-test-delete-topic-button'));
-    var topicEditOptionBox = topics[index];
+    var topics = element.all(by.css('.protractor-test-topic-edit-box'));
+    var topicEditOptionBox = await topics.get(index);
     await browser.actions().mouseMove(topicEditOptionBox).perform();
     await waitFor.elementToBeClickable(
       deleteTopicButton,
@@ -275,7 +276,6 @@ var TopicsAndSkillsDashboardPage = function() {
       'Confirm Delete Topic button takes too long to be clickable');
     await confirmTopicDeletionButton.click();
     await this.get();
-    await waitFor.pageToFullyLoad();
   };
 
   this.deleteSkillWithIndex = async function(index) {
@@ -376,14 +376,14 @@ var TopicsAndSkillsDashboardPage = function() {
   this.editTopic = async function(topicName) {
     await waitFor.visibilityOf(topicsTable,
       'Topic table taking too long to appear.');
+
     var topics = await topicNames;
-    topics.forEach((topic, index) => {
-      topic.getText().then((name) => {
-        if (topicName === name) {
-          this.navigateToTopicWithIndex(index);
-        }
-      });
-    });
+    await Promise.all(topics.map(async(topic, index) => {
+      var name = await topic.getText();
+      if (name === topicName) {
+        await this.navigateToTopicWithIndex(index);
+      }
+    }));
   };
 
   this.expectSkillDescriptionToBe = async function(description, index) {

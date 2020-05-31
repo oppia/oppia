@@ -51,7 +51,7 @@ export class TopicsAndSkillsDashboardFilter {
    */
   reset(): void {
     this.category =
-        TopicsAndSkillsDashboardPageConstants.TOPIC_FILTER_DEFAULT_VALUE;
+        TopicsAndSkillsDashboardPageConstants.TOPIC_FILTER_DEFAULT_CATEGORY;
     this.keywords = [];
     this.sort = ETopicSortOptions.IncreasingCreatedOn;
     this.status = ETopicPublishedOptions.All;
@@ -68,7 +68,7 @@ export class TopicsAndSkillsDashboardFilterObjectFactory {
    */
   createDefault(): TopicsAndSkillsDashboardFilter {
     return new TopicsAndSkillsDashboardFilter(
-      TopicsAndSkillsDashboardPageConstants.TOPIC_FILTER_DEFAULT_VALUE,
+      TopicsAndSkillsDashboardPageConstants.TOPIC_FILTER_DEFAULT_CATEGORY,
       [], ETopicSortOptions.IncreasingCreatedOn, ETopicPublishedOptions.All);
   }
 }

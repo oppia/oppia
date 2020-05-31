@@ -65,10 +65,10 @@ describe('Topics and skills dashboard functionality', function() {
   it('should filter the topics', async function() {
     await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(0);
     await topicsAndSkillsDashboardPage.createTopic(
-      'Alpha', 'Alpha description', 'Mathematics', true);
+      'Alpha Topic Dashboard', 'Alpha description', 'Mathematics', true);
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.createTopic(
-      'Beta', 'Beta description', 'Mathematics', true);
+      'Beta Topic Dashboard', 'Beta description', 'Mathematics', true);
 
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(2);
@@ -85,6 +85,7 @@ describe('Topics and skills dashboard functionality', function() {
     await topicsAndSkillsDashboardPage.filterTopicsByCategory('Mathematics');
     await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(2);
     await topicsAndSkillsDashboardPage.resetTopicFilters();
+    await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(2);
 
     await topicsAndSkillsDashboardPage.filterTopicsByKeyword('gamma');
     await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(0);
