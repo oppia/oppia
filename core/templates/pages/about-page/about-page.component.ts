@@ -65,6 +65,7 @@ export class AboutPageComponent implements OnInit {
   onTabClick(tabName: string) {
     this.windowRef.nativeWindow.location.hash = '#' + tabName;
     this.activeTabName = tabName;
+    return this.windowRef.nativeWindow;
   }
 
   getStaticImageUrl(imagePath: string) {
@@ -75,7 +76,7 @@ export class AboutPageComponent implements OnInit {
     this.activeTabName = this.TAB_ID_ABOUT;
     this.translate.use(
       this.i18nLanguageCodeService.getCurrentI18nLanguageCode());
-    this.i18nLanguageCodeService.getI18nLanguageCodeSubject().subscribe(
+    this.i18nLanguageCodeService.onI18nLanguageCodeChange().subscribe(
       (code) => this.translate.use(code)
     );
     this.ALLOWED_TABS = [

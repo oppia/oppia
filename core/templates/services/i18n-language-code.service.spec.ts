@@ -26,7 +26,7 @@ describe('Loader Service', () => {
   let parentSubscription: Subscription;
   beforeEach(() => {
     parentSubscription = new Subscription();
-    parentSubscription.add(i18nLanguageCodeService.getI18nLanguageCodeSubject()
+    parentSubscription.add(i18nLanguageCodeService.onI18nLanguageCodeChange()
       .subscribe(code => languageCode = code));
   });
 
@@ -35,12 +35,12 @@ describe('Loader Service', () => {
   });
 
   it('should set the language code', () => {
-    i18nLanguageCodeService.setI18nLanguageCodeSubject('pt-br');
+    i18nLanguageCodeService.setI18nLanguageCode('pt-br');
     expect(languageCode).toBe('pt-br');
   });
 
   it('should get the latest language code', () => {
-    i18nLanguageCodeService.setI18nLanguageCodeSubject('es');
+    i18nLanguageCodeService.setI18nLanguageCode('es');
     const latestCode = i18nLanguageCodeService.getCurrentI18nLanguageCode();
     expect(latestCode).toBe('es');
   });

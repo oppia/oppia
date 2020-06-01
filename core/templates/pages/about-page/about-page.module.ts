@@ -36,14 +36,6 @@ import { RequestInterceptor } from 'services/request-interceptor.service';
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { TranslatePipe } from 'filters/translate.pipe';
 
-// This component is needed to force-bootstrap Angular at the beginning of the
-// app.
-@Component({
-  selector: 'service-bootstrap',
-  template: ''
-})
-export class ServiceBootstrapComponent {}
-
 import { AppConstants } from 'app.constants';
 import { InteractionsExtensionsConstants } from
   'interactions/interactions-extension.constants';
@@ -57,12 +49,9 @@ import { ObjectsDomainConstants } from
     SharedComponentsModule
   ],
   declarations: [
-    ServiceBootstrapComponent,
-    AboutPageComponent,
-    TranslatePipe
+    AboutPageComponent
   ],
   entryComponents: [
-    ServiceBootstrapComponent,
     AboutPageComponent
   ],
   providers: [
@@ -93,11 +82,3 @@ const downgradedModule = downgradeModule(bootstrapFn);
 declare var angular: ng.IAngularStatic;
 
 angular.module('oppia').requires.push(downgradedModule);
-
-angular.module('oppia').directive(
-  // This directive is the downgraded version of the Angular component to
-  // bootstrap the Angular 8.
-  'serviceBootstrap',
-  downgradeComponent({
-    component: ServiceBootstrapComponent
-  }) as angular.IDirectiveFactory);

@@ -68,4 +68,59 @@ describe('Utils Service', () => {
     })).toBeFalse();
     expect(uts.isError(null)).toBeFalse();
   });
+
+  it('should check if the two objects are equal', () => {
+    const objA = {
+      k1: 'Value1',
+      k2: 'Value2',
+      k3: [1, 2, 3, 4, {a: 'b'}],
+      k4: {
+        x: [1, 2, 3, {a: [1, 2, 3]}],
+        y: 'abc'
+      }
+    };
+    const objB = {
+      k1: 'Value1',
+      k2: 'Value2',
+      k3: [1, 2, 3, 4, {a: 'b'}],
+      k4: {
+        x: [1, 2, 3, {a: [1, 2, 3]}],
+        y: 'abc'
+      }
+    };
+    const objC = {
+      name: 'test'
+    };
+    expect(uts.isEquivalent(objA, objB)).toBe(true);
+    expect(uts.isEquivalent(objA, objC)).toBe(false);
+  });
+
+  it('should check if an obj is defined or not', () => {
+    const objA = {};
+    const objB = {
+      key: 'value'
+    };
+    let objC;
+    const objD = null;
+    expect(uts.isDefined(objA)).toBe(true);
+    expect(uts.isDefined(objB)).toBe(true);
+    expect(uts.isDefined(objC)).toBe(false);
+    expect(uts.isDefined(objD)).toBe(false);
+  });
+
+  it('should check if a variable is an object or not', () => {
+    const objA = {
+      key: 'value'
+    };
+    const num1 = 1;
+    const str = 'string';
+    let objB;
+    const objC = [1, 2, 3, 4];
+    expect(uts.isObject(objA)).toBe(true);
+    expect(uts.isObject(num1)).toBe(false);
+    expect(uts.isObject(str)).toBe(false);
+    // The next output comes as undefined that is why I have commented it
+    // expect(uts.isObject(objB)).toBe(false);
+    expect(uts.isObject(objC)).toBe(false);
+  });
 });

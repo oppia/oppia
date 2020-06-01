@@ -23,6 +23,9 @@
 /core/templates/services/contextual/logger.service.spec.ts @bansalnitish
 /core/templates/services/UpgradedServices.ts @bansalnitish
 /core/templates/services/request-interceptor.service*.ts @bansalnitish
+/core/templates/services/translate.service.ts @bansalnitish
+/core/templates/filters/translate.pipe.ts @bansalnitish
+/core/templates/services/i18n-language-code.service.ts @bansalnitish
 /typings/ @ankita240796
 /tsconfig.json @ankita240796
 
@@ -73,7 +76,7 @@
 /LICENSE @seanlip
 /NOTICE @seanlip
 /core/templates/pages/about-page/ @DubeySandeep
-/core/templates/pages/about-page/about-page.directive.html @seanlip
+/core/templates/pages/about-page/about-page.component.html @seanlip
 /core/templates/pages/privacy-page/ @DubeySandeep
 /core/templates/pages/privacy-page/privacy-page.mainpage.html @seanlip
 /core/templates/pages/terms-page/ @DubeySandeep

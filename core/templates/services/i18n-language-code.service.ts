@@ -17,9 +17,7 @@
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-
-import { Subject } from 'rxjs';
+import { Injectable, EventEmitter } from '@angular/core';
 
 @Injectable({
   providedIn: 'root'
@@ -35,7 +33,7 @@ export class I18nLanguageCodeService {
    * complete.
    */
   // eslint-disable-next-line max-len
-  static languageCodeSubject: Subject<string> = new Subject<string> ();
+  static languageCodeChange = new EventEmitter<string> ();
   static languageCode = 'en';
 
   constructor() {}
@@ -45,15 +43,15 @@ export class I18nLanguageCodeService {
     return I18nLanguageCodeService.languageCode;
   }
 
-  getI18nLanguageCodeSubject(): Subject<string> {
+  onI18nLanguageCodeChange(): EventEmitter<string> {
     // TODO(#9154): Change I18nLanguageCodeService to "this".
-    return I18nLanguageCodeService.languageCodeSubject;
+    return I18nLanguageCodeService.languageCodeChange;
   }
 
-  setI18nLanguageCodeSubject(code: string): void {
+  setI18nLanguageCode(code: string): void {
     // TODO(#9154): Change I18nLanguageCodeService to "this".
     I18nLanguageCodeService.languageCode = code;
-    I18nLanguageCodeService.languageCodeSubject.next(code);
+    I18nLanguageCodeService.languageCodeChange.emit(code);
   }
 }
 

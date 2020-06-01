@@ -1,13 +1,26 @@
-/* eslint-disable max-len */
+// Copyright 2019 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Translate service for i18n translations
+ */
+
 import { Injectable, EventEmitter } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, isObservable, forkJoin, of } from 'rxjs';
 import { map } from 'rxjs/operators';
-
-const isDefined = (value: any): boolean => {
-  return typeof value !== 'undefined' && value !== null;
-};
-
+import { UtilsService } from './utils.service';
 export interface MissingTranslationHandlerParams {
    // the key that's missing in translation files
   key: string;
@@ -34,28 +47,33 @@ export class TranslateService {
   suffix = '.json';
   translations: Array<Object> = [];
   templateMatcher: RegExp = /\<\[\s?([^{}\s]*)\s?\]\>/g;
-  private _onLangChange: EventEmitter<LangChangeEvent> = new EventEmitter<LangChangeEvent>();
 
+  private _onLangChange = new EventEmitter<LangChangeEvent>();
   get onLangChange(): EventEmitter<LangChangeEvent> {
     return this._onLangChange;
   }
-  constructor(private http: HttpClient) {}
 
+  constructor(private http: HttpClient, private utils: UtilsService) {}
+
+  // This function fecthes translation.
   fetchTranslations(lang:string) {
     return this.http.get(`${this.prefix}${lang}${this.suffix}`).toPromise();
   }
 
+  // This function sets the new translations
   async use(lang: string) {
     // Check if it has already been fetched before
     if (Object.keys(this.translations).includes(lang)) {
       this.currentLang = lang;
-      this._onLangChange.emit({lang: lang, translations: this.translations[lang]});
+      this._onLangChange.emit(
+        {lang: lang, translations: this.translations[lang]});
       return of(this.translations[lang]);
     }
-
+    // Otherwise fetch the translations
     this.translations[lang] = await this.fetchTranslations(lang);
     this.currentLang = lang;
-    this._onLangChange.emit({lang: lang, translations: this.translations[lang]});
+    this._onLangChange.emit(
+      {lang: lang, translations: this.translations[lang]});
   }
 
 
@@ -78,7 +96,8 @@ export class TranslateService {
     key = '';
     do {
       key += keys.shift();
-      if (isDefined(target) && isDefined(target[key]) && (typeof target[key] === 'object' || !keys.length)) {
+      if (this.utils.isDefined(target) && this.utils.isDefined(target[key]) &&
+        (typeof target[key] === 'object' || !keys.length)) {
         target = target[key];
         key = '';
       } else if (!keys.length) {
@@ -100,17 +119,19 @@ export class TranslateService {
       return expr;
     }
 
-    return expr.replace(this.templateMatcher, (substring: string, b: string) => {
-      let r = this.getValue(params, b);
-      return isDefined(r) ? r : substring;
-    });
+    return expr.replace(this.templateMatcher,
+      (substring: string, b: string) => {
+        let r = this.getValue(params, b);
+        return this.utils.isDefined(r) ? r : substring;
+      });
   }
 
-  getParsedResult(translations: any, key: any, interpolateParams?: Object): any {
+  getParsedResult(
+      translations: any, key: any, interpolateParams?: Object) {
     let res: string | Observable<string>;
 
     if (key instanceof Array) {
-      let result: any = {},
+      let result = {},
         observables: boolean = false;
       for (let k of key) {
         result[k] = this.getParsedResult(translations, k, interpolateParams);
@@ -119,10 +140,11 @@ export class TranslateService {
         }
       }
       if (observables) {
-        const sources = key.map(k => isObservable(result[k]) ? result[k] : of(result[k] as string));
+        const sources = key.map(
+          k => isObservable(result[k]) ? result[k] : of(result[k] as string));
         return forkJoin(sources).pipe(
           map((arr: Array<string>) => {
-            let obj: any = {};
+            let obj = {};
             arr.forEach((value: string, index: number) => {
               obj[key[index]] = value;
             });
@@ -134,15 +156,21 @@ export class TranslateService {
     }
 
     if (translations) {
-      res = this.interpolate(this.getValue(translations, key), interpolateParams);
+      res = this.interpolate(
+        this.getValue(translations, key), interpolateParams);
     }
 
-    if (typeof res === 'undefined' && this.defaultLang !== null && this.defaultLang !== this.currentLang) {
-      res = this.interpolate(this.getValue(this.translations[this.defaultLang], key), interpolateParams);
+    if (typeof res === 'undefined' && this.defaultLang !== null &&
+      this.defaultLang !== this.currentLang) {
+      res = this.interpolate(this.getValue(
+        this.translations[this.defaultLang], key), interpolateParams);
     }
 
     if (typeof res === 'undefined') {
-      let params: MissingTranslationHandlerParams = {key, translateService: this};
+      let params: MissingTranslationHandlerParams = {
+        key,
+        translateService: this
+      };
       if (typeof interpolateParams !== 'undefined') {
         params.interpolateParams = interpolateParams;
       }
@@ -152,13 +180,16 @@ export class TranslateService {
     return typeof res !== 'undefined' ? res : key;
   }
 
-  get(key: string | Array<string>, interpolateParams?: Object): Observable<string | any> {
-    if (!isDefined(key) || !key.length) {
+  get(
+      key: string | Array<string>,
+      interpolateParams?: Object): Observable<string | any> {
+    if (!this.utils.isDefined(key) || !key.length) {
       // eslint-disable-next-line quotes
       throw new Error(`Parameter "key" required`);
     }
     // check if we are loading a new translation to use {
-    let res = this.getParsedResult(this.translations[this.currentLang], key, interpolateParams);
+    let res = this.getParsedResult(
+      this.translations[this.currentLang], key, interpolateParams);
     return isObservable(res) ? res : of(res);
   }
 }

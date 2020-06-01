@@ -40,7 +40,7 @@ angular.module('oppia').directive('i18nFooter', [
           var siteLanguageUrl = '/save_site_language';
           ctrl.changeLanguage = function() {
             $translate.use(ctrl.currentLanguageCode);
-            I18nLanguageCodeService.setI18nLanguageCodeSubject(
+            I18nLanguageCodeService.setI18nLanguageCode(
               ctrl.currentLanguageCode);
             UserService.getUserInfoAsync().then(function(userInfo) {
               if (userInfo.isLoggedIn()) {
@@ -52,10 +52,14 @@ angular.module('oppia').directive('i18nFooter', [
           };
           ctrl.$onInit = function() {
             ctrl.supportedSiteLanguages = SUPPORTED_SITE_LANGUAGES;
+            // Fetching the saved language code from cookie as $translate in
+            //  angularjs uses cookies to store the last used code and we need
+            // fetch that code in order to have constistency in translations in
+            // both angular and angularjs.
             if (document.cookie.includes('NG_TRANSLATE_LANG_KEY=')) {
               var lang = document.cookie.split('NG_TRANSLATE_LANG_KEY=')[1];
               lang = lang.split(';')[0];
-              I18nLanguageCodeService.setI18nLanguageCodeSubject(
+              I18nLanguageCodeService.setI18nLanguageCode(
                 lang);
             }
             // The $timeout seems to be necessary for the dropdown
