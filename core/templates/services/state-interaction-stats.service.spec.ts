@@ -86,85 +86,87 @@ describe('State Interaction Stats Service', () => {
       spyOn(this.contextService, 'getExplorationId').and.returnValue('expid');
     });
 
-    it('should provide cached results when caching is specified', () => {
-      this.statsCaptured = [];
-      const captureStats = (stats: IStateRulesStats) => {
-        expect(stats).not.toBeFalsy();
-        this.statsCaptured.push(stats);
-      }
+    it('should provide cached results when caching is specified',
+      fakeAsync(() => {
+        this.statsCaptured = [];
+        const captureStats = (stats: IStateRulesStats) => {
+          expect(stats).not.toBeFalsy();
+          this.statsCaptured.push(stats);
+        }
 
-      this.stateInteractionStatsService.computeStats(this.mockState, true)
-        .then(captureStats);
-      const req = this.httpTestingController.expectOne(
-        '/createhandler/state_interaction_stats/expid/Hola');
-      expect(req.request.method).toEqual('GET');
-      req.flush({
-        visualizations_info: [{
-          data: [
-            {answer: 'Ni Hao', frequency: 5},
-            {answer: 'Aloha', frequency: 3},
-            {answer: 'Hola', frequency: 1}
-          ]
-        }]
-      });
-      flushMicrotasks();
+        this.stateInteractionStatsService.computeStats(this.mockState, true)
+          .then(captureStats);
+        const req = this.httpTestingController.expectOne(
+          '/createhandler/state_interaction_stats/expid/Hola');
+        expect(req.request.method).toEqual('GET');
+        req.flush({
+          visualizations_info: [{
+            data: [
+              {answer: 'Ni Hao', frequency: 5},
+              {answer: 'Aloha', frequency: 3},
+              {answer: 'Hola', frequency: 1}
+            ]
+          }]
+        });
+        flushMicrotasks();
 
-      this.stateInteractionStatsService.computeStats(this.mockState)
-        .then(captureStats);
-      this.httpTestingController.expectNone(
-        '/createhandler/state_interaction_stats/expid/Hola');
-      flushMicrotasks();
+        this.stateInteractionStatsService.computeStats(this.mockState)
+          .then(captureStats);
+        this.httpTestingController.expectNone(
+          '/createhandler/state_interaction_stats/expid/Hola');
+        flushMicrotasks();
 
-      expect(this.statsCaptured.length).toEqual(2);
-      const [statsFromFirstFetch, statsFromSecondFetch] = this.statsCaptured;
-      expect(statsFromSecondFetch).toBe(statsFromFirstFetch);
-    });
+        expect(this.statsCaptured.length).toEqual(2);
+        const [statsFromFirstFetch, statsFromSecondFetch] = this.statsCaptured;
+        expect(statsFromSecondFetch).toBe(statsFromFirstFetch);
+      }));
 
-    it('should provide fresh results when caching is not specified', () => {
-      this.statsCaptured = [];
-      const captureStats = (stats: IStateRulesStats) => {
-        expect(stats).not.toBeFalsy();
-        this.statsCaptured.push(stats);
-      }
+    it('should provide fresh results when caching is not specified',
+      fakeAsync(() => {
+        this.statsCaptured = [];
+        const captureStats = (stats: IStateRulesStats) => {
+          expect(stats).not.toBeFalsy();
+          this.statsCaptured.push(stats);
+        }
 
-      this.stateInteractionStatsService.computeStats(this.mockState, true)
-        .then(captureStats);
-      const firstRequest = this.httpTestingController.expectOne(
-        '/createhandler/state_interaction_stats/expid/Hola');
-      expect(firstRequest.request.method).toEqual('GET');
-      firstRequest.flush({
-        visualizations_info: [{
-          data: [
-            {answer: 'Ni Hao', frequency: 5},
-            {answer: 'Aloha', frequency: 3},
-            {answer: 'Hola', frequency: 1}
-          ]
-        }]
-      });
-      flushMicrotasks();
+        this.stateInteractionStatsService.computeStats(this.mockState, true)
+          .then(captureStats);
+        const firstRequest = this.httpTestingController.expectOne(
+          '/createhandler/state_interaction_stats/expid/Hola');
+        expect(firstRequest.request.method).toEqual('GET');
+        firstRequest.flush({
+          visualizations_info: [{
+            data: [
+              {answer: 'Ni Hao', frequency: 5},
+              {answer: 'Aloha', frequency: 3},
+              {answer: 'Hola', frequency: 1}
+            ]
+          }]
+        });
+        flushMicrotasks();
 
-      expect(this.statsCaptured.length).toEqual(1);
+        expect(this.statsCaptured.length).toEqual(1);
 
-      this.stateInteractionStatsService.computeStats(this.mockState, false)
-        .then(captureStats);
-      const secondRequest = this.httpTestingController.expectOne(
-        '/createhandler/state_interaction_stats/expid/Hola');
-      expect(secondRequest.request.method).toEqual('GET');
-      secondRequest.flush({
-        visualizations_info: [{
-          data: [
-            {answer: 'Hello', frequency: 9},
-            {answer: 'Bonjour', frequency: 5},
-            {answer: 'Ciao', frequency: 4}
-          ]
-        }]
-      });
-      flushMicrotasks();
+        this.stateInteractionStatsService.computeStats(this.mockState, false)
+          .then(captureStats);
+        const secondRequest = this.httpTestingController.expectOne(
+          '/createhandler/state_interaction_stats/expid/Hola');
+        expect(secondRequest.request.method).toEqual('GET');
+        secondRequest.flush({
+          visualizations_info: [{
+            data: [
+              {answer: 'Hello', frequency: 9},
+              {answer: 'Bonjour', frequency: 5},
+              {answer: 'Ciao', frequency: 4}
+            ]
+          }]
+        });
+        flushMicrotasks();
 
-      expect(this.statsCaptured.length).toEqual(2);
-      const [statsFromFirstFetch, statsFromSecondFetch] = this.statsCaptured;
-      expect(statsFromSecondFetch).not.toBe(statsFromFirstFetch);
-    });
+        expect(this.statsCaptured.length).toEqual(2);
+        const [statsFromFirstFetch, statsFromSecondFetch] = this.statsCaptured;
+        expect(statsFromSecondFetch).not.toBe(statsFromFirstFetch);
+      }));
 
 
     it('should include answer frequencies in the response', fakeAsync(() => {
