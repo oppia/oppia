@@ -259,12 +259,61 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self._assert_valid_story_id('Story id should be a string', 10)
         self._assert_valid_story_id('Invalid story id', 'abc')
 
+    def _assert_valid_thumbnail_filename_for_story(
+            self, expected_error_substring, thumbnail_filename):
+        """Checks that story passes validation for thumbnail filename."""
+        with self.assertRaisesRegexp(
+            utils.ValidationError, expected_error_substring):
+            story_domain.Story.require_valid_thumbnail_filename(
+                thumbnail_filename)
+
+    def _assert_valid_thumbnail_filename_for_story_node(
+            self, expected_error_substring, thumbnail_filename):
+        """Checks that story node passes validation for thumbnail filename."""
+        with self.assertRaisesRegexp(
+            utils.ValidationError, expected_error_substring):
+            story_domain.StoryNode.require_valid_thumbnail_filename(
+                thumbnail_filename)
+
+    def test_thumbnail_filename_validation_for_story(self):
+        self._assert_valid_thumbnail_filename_for_story(
+            'Expected thumbnail filename to be a string, received 10', 10)
+        self._assert_valid_thumbnail_filename_for_story(
+            'Thumbnail filename should not start with a dot.', '.name')
+        self._assert_valid_thumbnail_filename_for_story(
+            'Thumbnail filename should not include slashes or '
+            'consecutive dot characters.', 'file/name')
+        self._assert_valid_thumbnail_filename_for_story(
+            'Thumbnail filename should not include slashes or '
+            'consecutive dot characters.', 'file..name')
+        self._assert_valid_thumbnail_filename_for_story(
+            'Thumbnail filename should include an extension.', 'name')
+        self._assert_valid_thumbnail_filename_for_story(
+            'Expected a filename ending in svg, received name.jpg', 'name.jpg')
+
+    def test_thumbnail_filename_validation_for_story_node(self):
+        self._assert_valid_thumbnail_filename_for_story_node(
+            'Expected thumbnail filename to be a string, received 10', 10)
+        self._assert_valid_thumbnail_filename_for_story_node(
+            'Thumbnail filename should not start with a dot.', '.name')
+        self._assert_valid_thumbnail_filename_for_story_node(
+            'Thumbnail filename should not include slashes or '
+            'consecutive dot characters.', 'file/name')
+        self._assert_valid_thumbnail_filename_for_story_node(
+            'Thumbnail filename should not include slashes or '
+            'consecutive dot characters.', 'file..name')
+        self._assert_valid_thumbnail_filename_for_story_node(
+            'Thumbnail filename should include an extension.', 'name')
+        self._assert_valid_thumbnail_filename_for_story_node(
+            'Expected a filename ending in svg, received name.jpg', 'name.jpg')
+
     def test_to_human_readable_dict(self):
         story_summary = story_fetchers.get_story_summary_by_id(self.STORY_ID)
         expected_dict = {
             'id': self.STORY_ID,
             'title': 'Title',
-            'description': 'Description'
+            'description': 'Description',
+            'node_count': 0
         }
 
         self.assertEqual(expected_dict, story_summary.to_human_readable_dict())
@@ -279,6 +328,8 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         expected_story_dict = {
             'id': self.STORY_ID,
             'title': 'Title',
+            'thumbnail_filename': None,
+            'thumbnail_bg_color': None,
             'description': feconf.DEFAULT_STORY_DESCRIPTION,
             'notes': feconf.DEFAULT_STORY_NOTES,
             'story_contents': {
@@ -353,8 +404,31 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
 
     def test_title_validation(self):
         self.story.title = 1
+        self._assert_validation_error('Title should be a string')
+        self.story.title = (
+            'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz')
         self._assert_validation_error(
-            'Title should be a string')
+            'Story title should be less than 39 chars')
+
+    def test_thumbnail_filename_validation(self):
+        self.story.thumbnail_filename = []
+        self._assert_validation_error(
+            'Expected thumbnail filename to be a string, received')
+
+    def test_thumbnail_bg_validation(self):
+        self.story.thumbnail_bg_color = '#FFFFFF'
+        self._assert_validation_error(
+            'Story thumbnail background color #FFFFFF is not supported.')
+
+    def test_thumbnail_filename_or_thumbnail_bg_color_is_none(self):
+        self.story.thumbnail_bg_color = '#F8BF74'
+        self.story.thumbnail_filename = None
+        self._assert_validation_error(
+            'Story thumbnail image is not provided.')
+        self.story.thumbnail_bg_color = None
+        self.story.thumbnail_filename = 'test.svg'
+        self._assert_validation_error(
+            'Story thumbnail background color is not specified.')
 
     def test_description_validation(self):
         self.story.description = 1
@@ -421,6 +495,41 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             'Expected title to be a string, received 1')
 
+        self.story.story_contents.nodes[0].title = (
+            'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz')
+        self._assert_validation_error(
+            'Chapter title should be less than 36 chars')
+
+    def test_node_description_validation(self):
+        self.story.story_contents.nodes[0].description = 1
+        self._assert_validation_error(
+            'Expected description to be a string, received 1')
+
+        self.story.story_contents.nodes[0].description = (
+            'Lorem ipsum dolor sit amet, consectetuer '
+            'adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. '
+            'Dum sociis natoque penatibus et magnis dis parturient montes, '
+            'nascetur ridiculus mus. Donec quam felis, ultricies nec, '
+            'pellentesque eu,'
+        )
+        self._assert_validation_error(
+            'Chapter description should be less than 152 chars')
+
+    def test_node_thumbnail_bg_validation(self):
+        self.story.story_contents.nodes[0].thumbnail_bg_color = '#FFFFFF'
+        self._assert_validation_error(
+            'Chapter thumbnail background color #FFFFFF is not supported.')
+
+    def test_node_thumbnail_filename_or_thumbnail_bg_color_is_none(self):
+        self.story.story_contents.nodes[0].thumbnail_bg_color = '#F8BF74'
+        self.story.story_contents.nodes[0].thumbnail_filename = None
+        self._assert_validation_error(
+            'Chapter thumbnail image is not provided.')
+        self.story.story_contents.nodes[0].thumbnail_bg_color = None
+        self.story.story_contents.nodes[0].thumbnail_filename = 'test.svg'
+        self._assert_validation_error(
+            'Chapter thumbnail background color is not specified.')
+
     def test_nodes_validation(self):
         self.story.story_contents.initial_node_id = 'node_10'
         self._assert_validation_error('Expected starting node to exist')
@@ -441,7 +550,10 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self.story.story_contents.nodes = [
             story_domain.StoryNode.from_dict({
                 'id': 'node_1',
+                'thumbnail_filename': None,
+                'thumbnail_bg_color': None,
                 'title': 'Title 1',
+                'description': 'Description 1',
                 'destination_node_ids': [self.NODE_ID_2],
                 'prerequisite_skill_ids': [],
                 'acquired_skill_ids': [],
@@ -479,6 +591,10 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self.story.story_contents.nodes[0].prerequisite_skill_ids = 1
         self._assert_validation_error(
             'Expected prerequisite skill ids to be a list, received 1')
+        self.story.story_contents.nodes[0].prerequisite_skill_ids = ['1']
+        self.story.story_contents.nodes[0].thumbnail_filename = []
+        self._assert_validation_error(
+            'Expected thumbnail filename to be a string, received')
 
     def test_acquired_prerequisite_skill_intersection_validation(self):
         self.story.story_contents.nodes[0].prerequisite_skill_ids = [
@@ -493,7 +609,11 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self.story.story_contents.next_node_id = 'node_4'
         node_1 = {
             'id': 'node_1',
+            'thumbnail_filename': 'image1.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
             'title': 'Title 1',
+            'description': 'Description 1',
             'destination_node_ids': ['node_3'],
             'acquired_skill_ids': [],
             'prerequisite_skill_ids': [],
@@ -503,7 +623,11 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         }
         node_2 = {
             'id': 'node_2',
+            'thumbnail_filename': 'image2.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
             'title': 'Title 2',
+            'description': 'Description 2',
             'destination_node_ids': ['node_1'],
             'acquired_skill_ids': [],
             'prerequisite_skill_ids': [],
@@ -513,7 +637,11 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         }
         node_3 = {
             'id': 'node_3',
+            'thumbnail_filename': 'image3.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
             'title': 'Title 3',
+            'description': 'Description 3',
             'destination_node_ids': [],
             'acquired_skill_ids': [],
             'prerequisite_skill_ids': [],
@@ -542,7 +670,11 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self.story.story_contents.next_node_id = 'node_4'
         node_1 = {
             'id': 'node_1',
+            'thumbnail_filename': 'image.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
             'title': 'Title 1',
+            'description': 'Description 1',
             'destination_node_ids': ['node_3'],
             'acquired_skill_ids': [],
             'prerequisite_skill_ids': [],
@@ -552,7 +684,11 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         }
         node_2 = {
             'id': 'node_2',
+            'thumbnail_filename': 'image.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
             'title': 'Title 2',
+            'description': 'Description 2',
             'destination_node_ids': ['node_1'],
             'acquired_skill_ids': [],
             'prerequisite_skill_ids': [],
@@ -562,7 +698,11 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         }
         node_3 = {
             'id': 'node_3',
+            'thumbnail_filename': 'image.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
             'title': 'Title 3',
+            'description': 'Description 3',
             'destination_node_ids': [],
             'acquired_skill_ids': [],
             'prerequisite_skill_ids': [],
@@ -588,7 +728,11 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self.story.story_contents.next_node_id = 'node_4'
         node_1 = {
             'id': 'node_1',
+            'thumbnail_filename': 'image.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
             'title': 'Title 1',
+            'description': 'Description 1',
             'destination_node_ids': ['node_3'],
             'acquired_skill_ids': [],
             'prerequisite_skill_ids': [],
@@ -611,7 +755,11 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self.story.story_contents.next_node_id = 'node_4'
         node_1 = {
             'id': 'node_1',
+            'thumbnail_filename': 'image.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
             'title': 'Title 1',
+            'description': 'Description 1',
             'destination_node_ids': ['node_3'],
             'acquired_skill_ids': [],
             'prerequisite_skill_ids': [],
@@ -634,7 +782,11 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         # Case 1: Prerequisite skills not acquired.
         node_1 = {
             'id': 'node_1',
+            'thumbnail_filename': 'image.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
             'title': 'Title 1',
+            'description': 'Description 1',
             'destination_node_ids': ['node_2', 'node_3'],
             'acquired_skill_ids': ['skill_2'],
             'prerequisite_skill_ids': ['skill_1'],
@@ -644,7 +796,11 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         }
         node_2 = {
             'id': 'node_2',
+            'thumbnail_filename': 'image.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
             'title': 'Title 2',
+            'description': 'Description 2',
             'destination_node_ids': [],
             'acquired_skill_ids': ['skill_3'],
             'prerequisite_skill_ids': ['skill_2'],
@@ -654,7 +810,11 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         }
         node_3 = {
             'id': 'node_3',
+            'thumbnail_filename': 'image.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
             'title': 'Title 3',
+            'description': 'Description 3',
             'destination_node_ids': [],
             'acquired_skill_ids': ['skill_4'],
             'prerequisite_skill_ids': ['skill_3'],
@@ -675,7 +835,11 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         # Case 2: Story with loops.
         node_1 = {
             'id': 'node_1',
+            'thumbnail_filename': 'image.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
             'title': 'Title 1',
+            'description': 'Description 1',
             'destination_node_ids': ['node_2'],
             'acquired_skill_ids': ['skill_2'],
             'prerequisite_skill_ids': ['skill_1'],
@@ -685,7 +849,11 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         }
         node_2 = {
             'id': 'node_2',
+            'thumbnail_filename': 'image.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
             'title': 'Title 2',
+            'description': 'Description 2',
             'destination_node_ids': ['node_3'],
             'acquired_skill_ids': ['skill_3'],
             'prerequisite_skill_ids': ['skill_2'],
@@ -695,7 +863,11 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         }
         node_3 = {
             'id': 'node_3',
+            'thumbnail_filename': 'image.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
             'title': 'Title 3',
+            'description': 'Description 3',
             'destination_node_ids': ['node_2'],
             'acquired_skill_ids': ['skill_4'],
             'prerequisite_skill_ids': ['skill_3'],
@@ -713,7 +885,11 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         # Case 3: Disconnected graph.
         node_1 = {
             'id': 'node_1',
+            'thumbnail_filename': 'image.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
             'title': 'Title 1',
+            'description': 'Description 1',
             'destination_node_ids': ['node_2'],
             'acquired_skill_ids': ['skill_2'],
             'prerequisite_skill_ids': ['skill_1'],
@@ -723,7 +899,11 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         }
         node_2 = {
             'id': 'node_2',
+            'thumbnail_filename': 'image.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
             'title': 'Title 2',
+            'description': 'Description 2',
             'destination_node_ids': [],
             'acquired_skill_ids': ['skill_3'],
             'prerequisite_skill_ids': ['skill_2'],
@@ -733,7 +913,11 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         }
         node_3 = {
             'id': 'node_3',
+            'thumbnail_filename': 'image.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
             'title': 'Title 3',
+            'description': 'Description 3',
             'destination_node_ids': [],
             'acquired_skill_ids': ['skill_4'],
             'prerequisite_skill_ids': ['skill_3'],
@@ -752,7 +936,11 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         # Case 4: Graph with duplicate nodes.
         node_1 = {
             'id': 'node_1',
+            'thumbnail_filename': 'image.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
             'title': 'Title 1',
+            'description': 'Description 1',
             'destination_node_ids': ['node_2'],
             'acquired_skill_ids': ['skill_2'],
             'prerequisite_skill_ids': ['skill_1'],
@@ -762,7 +950,11 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         }
         node_2 = {
             'id': 'node_2',
+            'thumbnail_filename': 'image.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
             'title': 'Title 2',
+            'description': 'Description 2',
             'destination_node_ids': [],
             'acquired_skill_ids': ['skill_3'],
             'prerequisite_skill_ids': ['skill_2'],
@@ -772,7 +964,11 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         }
         node_3 = {
             'id': 'node_2',
+            'thumbnail_filename': 'image.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
             'title': 'Title 2',
+            'description': 'Description 2',
             'destination_node_ids': [],
             'acquired_skill_ids': ['skill_4'],
             'prerequisite_skill_ids': ['skill_3'],
@@ -791,6 +987,10 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         node_1 = {
             'id': 'node_1',
             'title': 'Title 1',
+            'description': 'Description 1',
+            'thumbnail_filename': 'image.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
             'destination_node_ids': ['node_2'],
             'acquired_skill_ids': ['skill_2'],
             'prerequisite_skill_ids': ['skill_1'],
@@ -801,6 +1001,10 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         node_2 = {
             'id': 'node_2',
             'title': 'Title 2',
+            'description': 'Description 2',
+            'thumbnail_filename': 'image.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
             'destination_node_ids': ['node_3'],
             'acquired_skill_ids': ['skill_3'],
             'prerequisite_skill_ids': ['skill_2'],
@@ -811,6 +1015,10 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         node_3 = {
             'id': 'node_3',
             'title': 'Title 2',
+            'description': 'Description 3',
+            'thumbnail_filename': 'image.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
             'destination_node_ids': [],
             'acquired_skill_ids': ['skill_4'],
             'prerequisite_skill_ids': ['skill_3'],
@@ -830,7 +1038,11 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         # Case 6: A valid graph.
         node_1 = {
             'id': 'node_1',
+            'thumbnail_filename': 'image.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
             'title': 'Title 1',
+            'description': 'Description 1',
             'destination_node_ids': ['node_2'],
             'acquired_skill_ids': ['skill_2'],
             'prerequisite_skill_ids': ['skill_1', 'skill_0'],
@@ -840,7 +1052,11 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         }
         node_2 = {
             'id': 'node_2',
+            'thumbnail_filename': 'image.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
             'title': 'Title 2',
+            'description': 'Description 2',
             'destination_node_ids': ['node_4', 'node_3'],
             'acquired_skill_ids': ['skill_3', 'skill_4'],
             'prerequisite_skill_ids': ['skill_2'],
@@ -850,7 +1066,11 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         }
         node_3 = {
             'id': 'node_3',
+            'thumbnail_filename': 'image.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
             'title': 'Title 3',
+            'description': 'Description 3',
             'destination_node_ids': [],
             'acquired_skill_ids': [],
             'prerequisite_skill_ids': ['skill_4'],
@@ -860,7 +1080,11 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         }
         node_4 = {
             'id': 'node_4',
+            'thumbnail_filename': 'image.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
             'title': 'Title 4',
+            'description': 'Description 4',
             'destination_node_ids': [],
             'acquired_skill_ids': [],
             'prerequisite_skill_ids': ['skill_2'],
@@ -881,8 +1105,9 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         story_contents object.
         """
         story_node = story_domain.StoryNode(
-            self.NODE_ID_1, 'Title', [self.NODE_ID_2],
-            [self.SKILL_ID_1], [self.SKILL_ID_2],
+            self.NODE_ID_1, 'Title', 'Description', None,
+            constants.ALLOWED_THUMBNAIL_BG_COLORS['chapter'][0],
+            [self.NODE_ID_2], [self.SKILL_ID_1], [self.SKILL_ID_2],
             'Outline', False, self.EXP_ID)
         story_contents = story_domain.StoryContents(
             [story_node], self.NODE_ID_1, 2)
@@ -896,6 +1121,11 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self.story.story_contents.nodes[0].exploration_id = 1
         self._assert_validation_error(
             'Expected exploration ID to be a string')
+
+    def test_validate_empty_exploration_id(self):
+        self.story.story_contents.nodes[0].exploration_id = ''
+        self._assert_validation_error(
+            'Expected exploration ID to not be an empty string')
 
     def test_validate_non_str_outline(self):
         self.story.story_contents.nodes[0].outline = 0

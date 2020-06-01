@@ -143,12 +143,12 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         subprocess_swap = self.swap(run_e2e_tests, 'SUBPROCESSES', [])
 
 
-        dev_appserver_path = '%s/dev_appserver.py' % (
+        google_app_engine_path = '%s/' % (
             common.GOOGLE_APP_ENGINE_HOME)
         webdriver_download_path = '%s/downloads' % (
             run_e2e_tests.WEBDRIVER_HOME_PATH)
         process_pattern = [
-            ('.*%s.*' % re.escape(dev_appserver_path),),
+            ('.*%s.*' % re.escape(google_app_engine_path),),
             ('.*%s.*' % re.escape(webdriver_download_path),)
         ]
         def mock_kill_process_based_on_regex(unused_regex):
@@ -187,12 +187,12 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
 
         subprocess_swap = self.swap(run_e2e_tests, 'SUBPROCESSES', [])
 
-        dev_appserver_path = '%s/dev_appserver.py' % (
+        google_app_engine_path = '%s/' % (
             common.GOOGLE_APP_ENGINE_HOME)
         webdriver_download_path = '%s/downloads' % (
             run_e2e_tests.WEBDRIVER_HOME_PATH)
         process_pattern = [
-            ('.*%s.*' % re.escape(dev_appserver_path),),
+            ('.*%s.*' % re.escape(google_app_engine_path),),
             ('.*%s.*' % re.escape(webdriver_download_path),)
         ]
         expected_pattern = process_pattern[:]
@@ -903,7 +903,8 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             mock_get_e2e_test_parameters, expected_args=[(3, 'full', True)])
         popen_swap = self.swap_with_checks(
             subprocess, 'Popen', mock_popen, expected_args=[([
-                common.NODE_BIN_PATH, run_e2e_tests.PROTRACTOR_BIN_PATH,
+                common.NODE_BIN_PATH, '--unhandled-rejections=strict',
+                run_e2e_tests.PROTRACTOR_BIN_PATH,
                 'commands'],)])
         exit_swap = self.swap_with_checks(
             sys, 'exit', mock_exit, expected_args=[(0,)])
@@ -995,6 +996,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         popen_swap = self.swap_with_checks(
             subprocess, 'Popen', mock_popen, expected_args=[([
                 common.NODE_BIN_PATH, '--inspect-brk',
+                '--unhandled-rejections=strict',
                 run_e2e_tests.PROTRACTOR_BIN_PATH, 'commands'],)])
         exit_swap = self.swap_with_checks(
             sys, 'exit', mock_exit, expected_args=[(0,)])

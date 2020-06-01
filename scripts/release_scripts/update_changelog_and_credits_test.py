@@ -31,12 +31,8 @@ from scripts import common
 from scripts.release_scripts import generate_release_info
 from scripts.release_scripts import update_changelog_and_credits
 
-_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
-_PY_GITHUB_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'PyGithub-1.43.7')
-sys.path.insert(0, _PY_GITHUB_PATH)
-
 # pylint: disable=wrong-import-position
-import github # isort:skip
+import github  # isort:skip
 # pylint: enable=wrong-import-position
 
 RELEASE_TEST_DIR = os.path.join('core', 'tests', 'release_sources', '')
@@ -48,7 +44,7 @@ MOCK_CHANGELOG_FILEPATH = os.path.join(RELEASE_TEST_DIR, 'CHANGELOG')
 MOCK_AUTHORS_FILEPATH = os.path.join(RELEASE_TEST_DIR, 'AUTHORS')
 MOCK_CONTRIBUTORS_FILEPATH = os.path.join(RELEASE_TEST_DIR, 'CONTRIBUTORS')
 MOCK_ABOUT_PAGE_FILEPATH = os.path.join(
-    RELEASE_TEST_DIR, 'about-page.directive.html')
+    RELEASE_TEST_DIR, 'about-page.component.html')
 
 MOCK_UPDATED_CHANGELOG_FILEPATH = os.path.join(
     RELEASE_TEST_DIR, 'UPDATED_CHANGELOG')
@@ -59,15 +55,13 @@ MOCK_UPDATED_AUTHORS_FILEPATH = os.path.join(
 MOCK_UPDATED_CONTRIBUTORS_FILEPATH = os.path.join(
     RELEASE_TEST_DIR, 'UPDATED_CONTRIBUTORS')
 MOCK_UPDATED_ABOUT_PAGE_FILEPATH = os.path.join(
-    RELEASE_TEST_DIR, 'updated-about-page.directive.html')
+    RELEASE_TEST_DIR, 'updated-about-page.component.html')
 
 
 def read_from_file(filepath):
     """Reads the lines from a file.
-
     Args:
         filepath: str. The path of the file to read.
-
     Returns:
         list(str). The list of lines in the file.
     """
@@ -77,7 +71,6 @@ def read_from_file(filepath):
 
 def write_to_file(filepath, filelines):
     """Writes a list of lines to a file.
-
     Args:
         filepath: str. The path of the file to write to.
         filelines: list(str). The lines to write to the file.
@@ -285,38 +278,32 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
             '### section1:\n': '### section2: \n'
         }
         ordering_swap = self.swap(
-            update_changelog_and_credits, 'EXPECTED_ORDERING',
+            update_changelog_and_credits, 'EXPECTED_ORDERING_DICT',
             invalid_ordering)
-        with ordering_swap, self.assertRaisesRegexp(
-            Exception, (
-                'Expected release_summary to have ### section1: section to '
-                'ensure that automatic updates to changelog and credits are '
-                'correct.')):
-            update_changelog_and_credits.check_ordering_of_sections(
-                release_summary_lines)
+        with ordering_swap:
+            self.assertFalse(
+                update_changelog_and_credits.is_order_of_sections_valid(
+                    release_summary_lines))
 
     def test_invalid_ordering_of_sections_in_release_summary(self):
         release_summary_lines = read_from_file(MOCK_RELEASE_SUMMARY_FILEPATH)
         invalid_ordering = {
-            '### New Authors:\n': '### section2: \n'
+            release_constants.NEW_AUTHORS_HEADER: '### section2: \n'
         }
         ordering_swap = self.swap(
-            update_changelog_and_credits, 'EXPECTED_ORDERING',
+            update_changelog_and_credits, 'EXPECTED_ORDERING_DICT',
             invalid_ordering)
-        with ordering_swap, self.assertRaisesRegexp(
-            Exception, (
-                'Expected ### New Authors: section to be followed by ### '
-                'section2: section in release_summary to ensure that automatic '
-                'updates to changelog and credits are correct.')):
-            update_changelog_and_credits.check_ordering_of_sections(
-                release_summary_lines)
+        with ordering_swap:
+            self.assertFalse(
+                update_changelog_and_credits.is_order_of_sections_valid(
+                    release_summary_lines))
 
     def test_missing_span_in_about_page(self):
         about_page_lines = [
             '<p>Invalid</p>\n', '<ul>\n', '  <li>line</li>\n', '</ul>\n']
         with self.assertRaisesRegexp(
             Exception, (
-                'Expected about-page.directive.html to have <span>A</span>.')):
+                'Expected about-page.component.html to have <span>A</span>.')):
             update_changelog_and_credits.find_indentation(about_page_lines)
 
     def test_missing_li_in_about_page(self):
@@ -325,7 +312,7 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             Exception, (
                 'Expected <span>A</span> text to be followed by an unordered '
-                'list in about-page.directive.html')):
+                'list in about-page.component.html')):
             update_changelog_and_credits.find_indentation(about_page_lines)
 
     def test_removal_of_updates_with_no_exception(self):
@@ -428,6 +415,59 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
                             'Please re-run this script.')):
                         update_changelog_and_credits.main()
 
+    def test_get_release_summary_lines(self):
+        with python_utils.open_file(MOCK_RELEASE_SUMMARY_FILEPATH, 'r') as f:
+            correct_lines = f.readlines()
+            wrong_lines = []
+            for line in correct_lines:
+                line = line.replace(
+                    'gmail.com', release_constants.INVALID_EMAIL_SUFFIX)
+                wrong_lines.append(line)
+
+        check_function_calls = {
+            'readlines_gets_called': 0,
+            'ask_user_to_confirm_gets_called': 0,
+            'is_order_of_sections_valid_gets_called': 0
+        }
+        expected_check_function_calls = {
+            'readlines_gets_called': 2,
+            'ask_user_to_confirm_gets_called': 3,
+            'is_order_of_sections_valid_gets_called': 2
+        }
+        class MockFile(python_utils.OBJECT):
+            def readlines(self):
+                """Read lines of the file object."""
+                return mock_readlines()
+        def mock_readlines():
+            check_function_calls['readlines_gets_called'] += 1
+            if check_function_calls['readlines_gets_called'] == 2:
+                return correct_lines
+            return wrong_lines
+
+        def mock_open_file(unused_path, unused_mode):
+            return MockFile()
+        def mock_ask_user_to_confirm(unused_msg):
+            check_function_calls['ask_user_to_confirm_gets_called'] += 1
+        def mock_is_order_of_sections_valid(unused_release_summary_lines):
+            check_function_calls[
+                'is_order_of_sections_valid_gets_called'] += 1
+            if check_function_calls[
+                    'is_order_of_sections_valid_gets_called'] == 1:
+                return False
+            return True
+
+        open_file_swap = self.swap(python_utils, 'open_file', mock_open_file)
+        ask_user_swap = self.swap(
+            common, 'ask_user_to_confirm', mock_ask_user_to_confirm)
+        check_order_swap = self.swap(
+            update_changelog_and_credits, 'is_order_of_sections_valid',
+            mock_is_order_of_sections_valid)
+        with open_file_swap, ask_user_swap, check_order_swap:
+            self.assertEqual(
+                correct_lines,
+                update_changelog_and_credits.get_release_summary_lines())
+        self.assertEqual(check_function_calls, expected_check_function_calls)
+
     def test_create_branch(self):
         check_function_calls = {
             'get_branch_gets_called': False,
@@ -497,7 +537,7 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
             'update_authors_gets_called': False,
             'update_contributors_gets_called': False,
             'update_developer_names_gets_called': False,
-            'check_ordering_of_sections_gets_called': False,
+            'get_release_summary_lines_gets_called': False,
             'create_branch_gets_called': False,
             'open_new_tab_in_browser_if_possible_gets_called': False
         }
@@ -509,7 +549,7 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
             'update_authors_gets_called': True,
             'update_contributors_gets_called': True,
             'update_developer_names_gets_called': True,
-            'check_ordering_of_sections_gets_called': True,
+            'get_release_summary_lines_gets_called': True,
             'create_branch_gets_called': True,
             'open_new_tab_in_browser_if_possible_gets_called': True
         }
@@ -536,9 +576,8 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
             check_function_calls['update_contributors_gets_called'] = True
         def mock_update_developer_names(unused_release_summary_lines):
             check_function_calls['update_developer_names_gets_called'] = True
-        def mock_check_ordering_of_sections(unused_release_summary_lines):
-            check_function_calls[
-                'check_ordering_of_sections_gets_called'] = True
+        def mock_get_release_summary_lines():
+            check_function_calls['get_release_summary_lines_gets_called'] = True
         def mock_create_branch(
                 unused_repo_fork, unused_target_branch, unused_github_username,
                 unused_current_release_version_number):
@@ -574,9 +613,9 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
         update_developer_names_swap = self.swap(
             update_changelog_and_credits, 'update_developer_names',
             mock_update_developer_names)
-        check_order_swap = self.swap(
-            update_changelog_and_credits, 'check_ordering_of_sections',
-            mock_check_ordering_of_sections)
+        get_lines_swap = self.swap(
+            update_changelog_and_credits, 'get_release_summary_lines',
+            mock_get_release_summary_lines)
         create_branch_swap = self.swap(
             update_changelog_and_credits, 'create_branch', mock_create_branch)
         input_swap = self.swap(python_utils, 'INPUT', mock_input)
@@ -590,7 +629,7 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
             with self.main_swap, self.getpass_swap, input_swap, check_prs_swap:
                 with remove_updates_swap, update_authors_swap, open_tab_swap:
                     with update_changelog_swap, update_contributors_swap:
-                        with update_developer_names_swap, check_order_swap:
+                        with update_developer_names_swap, get_lines_swap:
                             with create_branch_swap, get_repo_swap:
                                 with blocking_bug_swap, get_org_swap:
                                     with get_org_repo_swap:

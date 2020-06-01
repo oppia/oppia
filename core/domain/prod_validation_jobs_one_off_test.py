@@ -479,6 +479,91 @@ class RoleQueryAuditModelValidatorTests(test_utils.GenericTestBase):
         run_job_and_check_output(self, expected_output, sort=True)
 
 
+class UsernameChangeAuditModelValidatorTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(UsernameChangeAuditModelValidatorTests, self).setUp()
+
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(USER_EMAIL, USER_NAME)
+
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+
+        admin_model = user_models.UserSettingsModel.get_by_id(self.admin_id)
+        admin_model.role = feconf.ROLE_ID_ADMIN
+        admin_model.put()
+
+        model_id = '%s.%s' % (self.admin_id, int(math.floor(time.time())))
+        self.model_instance = audit_models.UsernameChangeAuditModel(
+            id=model_id, committer_id=self.admin_id,
+            old_username=USER_NAME, new_username='new')
+        self.model_instance.put()
+
+        self.job_class = (
+            prod_validation_jobs_one_off.UsernameChangeAuditModelAuditOneOffJob)
+
+    def test_standard_model(self):
+        expected_output = [
+            u'[u\'fully-validated UsernameChangeAuditModel\', 1]']
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_created_on_greater_than_last_updated(self):
+        self.model_instance.created_on = (
+            self.model_instance.last_updated + datetime.timedelta(days=1))
+        self.model_instance.put()
+        expected_output = [(
+            u'[u\'failed validation check for time field relation check '
+            'of UsernameChangeAuditModel\', '
+            '[u\'Entity id %s: The created_on field has a value '
+            '%s which is greater than the value '
+            '%s of last_updated field\']]') % (
+                self.model_instance.id, self.model_instance.created_on,
+                self.model_instance.last_updated
+            )]
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_last_updated_greater_than_current_time(self):
+        expected_output = [(
+            u'[u\'failed validation check for current time check of '
+            'UsernameChangeAuditModel\', '
+            '[u\'Entity id %s: The last_updated field has a '
+            'value %s which is greater than the time when the job was run\']]'
+        ) % (self.model_instance.id, self.model_instance.last_updated)]
+
+        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
+            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
+            update_datastore_types_for_mock_datetime()
+            run_job_and_check_output(self, expected_output)
+
+    def test_model_with_non_existent_user_id(self):
+        user_models.UserSettingsModel.get(self.admin_id).delete()
+        expected_output = [(
+            u'[u\'failed validation check for committer_ids field check of '
+            'UsernameChangeAuditModel\', '
+            '[u"Entity id %s: based on field committer_ids having value '
+            '%s, expect model UserSettingsModel with '
+            'id %s but it doesn\'t exist"]]') % (
+                self.model_instance.id, self.admin_id, self.admin_id)]
+
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_invalid_id(self):
+        model_invalid_id = '%s.%s' % (
+            int(math.floor(time.time())), self.admin_id)
+        model_instance_with_invalid_id = audit_models.UsernameChangeAuditModel(
+            id=model_invalid_id, committer_id=self.admin_id,
+            old_username=USER_NAME, new_username='new')
+        model_instance_with_invalid_id.put()
+        expected_output = [(
+            u'[u\'fully-validated UsernameChangeAuditModel\', 1]'
+        ), (
+            u'[u\'failed validation check for model id check of '
+            'UsernameChangeAuditModel\', '
+            '[u\'Entity id %s: Entity id does not match regex pattern\']]'
+        ) % model_invalid_id]
+        run_job_and_check_output(self, expected_output, sort=True)
+
+
 class ClassifierTrainingJobModelValidatorTests(test_utils.GenericTestBase):
 
     def setUp(self):
@@ -5537,11 +5622,11 @@ class QuestionModelValidatorTests(test_utils.GenericTestBase):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         rubrics = [
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
+                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
+                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
+                constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
         skills = [skill_domain.Skill.create_default_skill(
             '%s' % i,
             description='description %d' % i,
@@ -5716,11 +5801,11 @@ class QuestionSkillLinkModelValidatorTests(test_utils.GenericTestBase):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         rubrics = [
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
+                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
+                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
+                constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
         skills = [skill_domain.Skill.create_default_skill(
             '%s' % i,
             description='description %d' % i,
@@ -5951,11 +6036,11 @@ class QuestionSnapshotMetadataModelValidatorTests(
         self.user_id = self.get_user_id_from_email(USER_EMAIL)
         rubrics = [
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
+                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
+                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
+                constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
         skills = [skill_domain.Skill.create_default_skill(
             '%s' % i,
             description='description %d' % i,
@@ -6131,11 +6216,11 @@ class QuestionSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         rubrics = [
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
+                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
+                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
+                constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
         skills = [skill_domain.Skill.create_default_skill(
             '%s' % i,
             description='description %d' % i,
@@ -6261,11 +6346,11 @@ class QuestionCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         rubrics = [
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
+                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
+                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
+                constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
         skills = [skill_domain.Skill.create_default_skill(
             '%s' % i,
             description='description %d' % i,
@@ -6481,11 +6566,11 @@ class QuestionSummaryModelValidatorTests(test_utils.GenericTestBase):
         self.user_id = self.get_user_id_from_email(USER_EMAIL)
         rubrics = [
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
+                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
+                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
+                constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
         skills = [skill_domain.Skill.create_default_skill(
             '%s' % i,
             description='description %d' % i,
@@ -6895,11 +6980,11 @@ class SkillModelValidatorTests(test_utils.GenericTestBase):
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         rubrics = [
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
+                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
+                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
+                constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
         self.set_admins([self.ADMIN_USERNAME])
 
         language_codes = ['ar', 'en', 'en']
@@ -6911,7 +6996,8 @@ class SkillModelValidatorTests(test_utils.GenericTestBase):
 
         for i in python_utils.RANGE(2):
             skill = skill_domain.Skill.create_default_skill(
-                '%s' % (i + 3), description='description %d' % (i + 3),
+                '%s' % (i + 3),
+                description='description %d' % (i + 3),
                 rubrics=rubrics)
             skill_services.save_new_skill(self.owner_id, skill)
 
@@ -6938,10 +7024,13 @@ class SkillModelValidatorTests(test_utils.GenericTestBase):
             'feedback': '<p>default_feedback</p>',
             'must_be_addressed': True}
 
+        misconception = skill_domain.Misconception.from_dict(
+            misconception_dict)
+
         for index, skill in enumerate(skills):
             skill.language_code = language_codes[index]
             skill.skill_contents = skill_contents
-            skill.add_misconception(misconception_dict)
+            skill.add_misconception(misconception)
             if index < 2:
                 skill.superseding_skill_id = '%s' % (index + 3)
                 skill.all_questions_merged = True
@@ -7125,11 +7214,11 @@ class SkillSnapshotMetadataModelValidatorTests(
         self.set_admins([self.ADMIN_USERNAME])
         rubrics = [
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
+                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
+                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
+                constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
         language_codes = ['ar', 'en', 'en']
         skills = [skill_domain.Skill.create_default_skill(
             '%s' % i,
@@ -7155,15 +7244,19 @@ class SkillSnapshotMetadataModelValidatorTests(
                 }
             })
         )
+
         misconception_dict = {
             'id': 0, 'name': 'name', 'notes': '<p>notes</p>',
             'feedback': '<p>default_feedback</p>',
             'must_be_addressed': True}
 
+        misconception = skill_domain.Misconception.from_dict(
+            misconception_dict)
+
         for index, skill in enumerate(skills):
             skill.language_code = language_codes[index]
             skill.skill_contents = skill_contents
-            skill.add_misconception(misconception_dict)
+            skill.add_misconception(misconception)
             if index == 0:
                 skill_services.save_new_skill(self.user_id, skill)
             else:
@@ -7323,11 +7416,11 @@ class SkillSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
         self.set_admins([self.ADMIN_USERNAME])
         rubrics = [
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
+                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
+                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
+                constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
         language_codes = ['ar', 'en', 'en']
         skills = [skill_domain.Skill.create_default_skill(
             '%s' % i,
@@ -7358,10 +7451,13 @@ class SkillSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
             'feedback': '<p>default_feedback</p>',
             'must_be_addressed': True}
 
+        misconception = skill_domain.Misconception.from_dict(
+            misconception_dict)
+
         for index, skill in enumerate(skills):
             skill.language_code = language_codes[index]
             skill.skill_contents = skill_contents
-            skill.add_misconception(misconception_dict)
+            skill.add_misconception(misconception)
             skill_services.save_new_skill(self.owner_id, skill)
 
         self.model_instance_0 = (
@@ -7471,11 +7567,11 @@ class SkillCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
         self.set_admins([self.ADMIN_USERNAME])
         rubrics = [
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
+                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
+                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
+                constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
         language_codes = ['ar', 'en', 'en']
         skills = [skill_domain.Skill.create_default_skill(
             '%s' % i,
@@ -7506,10 +7602,13 @@ class SkillCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
             'feedback': '<p>default_feedback</p>',
             'must_be_addressed': True}
 
+        misconception = skill_domain.Misconception.from_dict(
+            misconception_dict)
+
         for index, skill in enumerate(skills):
             skill.language_code = language_codes[index]
             skill.skill_contents = skill_contents
-            skill.add_misconception(misconception_dict)
+            skill.add_misconception(misconception)
             skill_services.save_new_skill(self.owner_id, skill)
 
         self.model_instance_0 = (
@@ -7707,11 +7806,11 @@ class SkillSummaryModelValidatorTests(test_utils.GenericTestBase):
         self.set_admins([self.ADMIN_USERNAME])
         rubrics = [
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
+                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
+                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
+                constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
         language_codes = ['ar', 'en', 'en']
         skills = [skill_domain.Skill.create_default_skill(
             '%s' % i,
@@ -7737,15 +7836,19 @@ class SkillSummaryModelValidatorTests(test_utils.GenericTestBase):
                 }
             })
         )
+
         misconception_dict = {
             'id': 0, 'name': 'name', 'notes': '<p>notes</p>',
             'feedback': '<p>default_feedback</p>',
             'must_be_addressed': True}
 
+        misconception = skill_domain.Misconception.from_dict(
+            misconception_dict)
+
         for index, skill in enumerate(skills):
             skill.language_code = language_codes[index]
             skill.skill_contents = skill_contents
-            skill.add_misconception(misconception_dict)
+            skill.add_misconception(misconception)
             skill_services.save_new_skill(self.owner_id, skill)
 
         self.model_instance_0 = skill_models.SkillSummaryModel.get_by_id('0')
@@ -9026,14 +9129,15 @@ class TopicModelValidatorTests(test_utils.GenericTestBase):
             abbreviated_name='abbrev%s' % i) for i in python_utils.RANGE(3)]
         rubrics = [
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
+                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
+                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
+                constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
         skills = [
             skill_domain.Skill.create_default_skill(
-                skill_id='%s' % i, description='skill%s' % i, rubrics=rubrics)
+                skill_id='%s' % i,
+                description='skill%s' % i, rubrics=rubrics)
             for i in python_utils.RANGE(9)]
 
         for skill in skills:
@@ -9298,40 +9402,6 @@ class TopicModelValidatorTests(test_utils.GenericTestBase):
             ), u'[u\'fully-validated TopicModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 
-    def test_model_with_abbreviated_name_is_empty(self):
-        self.model_instance_0.abbreviated_name = None
-        self.model_instance_0.commit(self.owner_id, '', [])
-        expected_output = [
-            (
-                u'[u\'failed validation check for abbreviated name check '
-                'of TopicModel\', '
-                '[u\'Entity id 0 : Topic name Topic0: Expected nonempty '
-                'abbreviated name, but received None.\']]'
-            ), (
-                u'[u\'failed validation check for domain object check '
-                'of TopicModel\', [u\'Entity id 0: Entity fails domain '
-                'validation with the error Abbreviated name should be a '
-                'string.\']]'
-            ), u'[u\'fully-validated TopicModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
-
-    def test_model_with_abbreviated_name_is_empty_string(self):
-        self.model_instance_0.abbreviated_name = ''
-        self.model_instance_0.commit(self.owner_id, '', [])
-        expected_output = [
-            (
-                u'[u\'failed validation check for abbreviated name check '
-                'of TopicModel\', '
-                '[u\'Entity id 0 : Topic name Topic0: Expected nonempty '
-                'abbreviated name, but received .\']]'
-            ), (
-                u'[u\'failed validation check for domain object check '
-                'of TopicModel\', [u\'Entity id 0: Entity fails domain '
-                'validation with the error Abbreviated name field should '
-                'not be empty.\']]'
-            ), u'[u\'fully-validated TopicModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
-
 
 class TopicSnapshotMetadataModelValidatorTests(
         test_utils.GenericTestBase):
@@ -9354,14 +9424,15 @@ class TopicSnapshotMetadataModelValidatorTests(
             abbreviated_name='abbrev%s' % i) for i in python_utils.RANGE(3)]
         rubrics = [
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
+                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
+                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
+                constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
         skills = [
             skill_domain.Skill.create_default_skill(
-                skill_id='%s' % i, description='skill%s' % i, rubrics=rubrics)
+                skill_id='%s' % i,
+                description='skill%s' % i, rubrics=rubrics)
             for i in python_utils.RANGE(9)]
 
         for skill in skills:
@@ -9546,11 +9617,11 @@ class TopicSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
             abbreviated_name='abbrev%s' % i) for i in python_utils.RANGE(3)]
         rubrics = [
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
+                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
+                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
+                constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
         skills = [
             skill_domain.Skill.create_default_skill(
                 skill_id='%s' % i, description='skill%s' % i, rubrics=rubrics)
@@ -9706,11 +9777,11 @@ class TopicRightsModelValidatorTests(test_utils.GenericTestBase):
             abbreviated_name='abbrev%s' % i) for i in python_utils.RANGE(3)]
         rubrics = [
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
+                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
+                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
+                constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
         skills = [
             skill_domain.Skill.create_default_skill(
                 skill_id='%s' % i, description='skill%s' % i, rubrics=rubrics)
@@ -9881,11 +9952,11 @@ class TopicRightsSnapshotMetadataModelValidatorTests(
             abbreviated_name='abbrev%s' % i) for i in python_utils.RANGE(3)]
         rubrics = [
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
+                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
+                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
+                constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
         skills = [
             skill_domain.Skill.create_default_skill(
                 skill_id='%s' % i, description='skill%s' % i, rubrics=rubrics)
@@ -10085,11 +10156,11 @@ class TopicRightsSnapshotContentModelValidatorTests(
             abbreviated_name='abbrev%s' % i) for i in python_utils.RANGE(3)]
         rubrics = [
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
+                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
+                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
+                constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
         skills = [
             skill_domain.Skill.create_default_skill(
                 skill_id='%s' % i, description='skill%s' % i, rubrics=rubrics)
@@ -10243,11 +10314,11 @@ class TopicCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
             abbreviated_name='abbrev%s' % i) for i in python_utils.RANGE(3)]
         rubrics = [
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
+                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
+                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
+                constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
         skills = [
             skill_domain.Skill.create_default_skill(
                 skill_id='%s' % i, description='skill%s' % i, rubrics=rubrics)
@@ -10525,11 +10596,11 @@ class TopicSummaryModelValidatorTests(test_utils.GenericTestBase):
             abbreviated_name='abbrev%s' % i) for i in python_utils.RANGE(3)]
         rubrics = [
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
+                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
+                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
+                constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
         skills = [
             skill_domain.Skill.create_default_skill(
                 skill_id='%s' % i, description='skill%s' % i, rubrics=rubrics)
@@ -10707,12 +10778,12 @@ class TopicSummaryModelValidatorTests(test_utils.GenericTestBase):
         self.model_instance_0.put()
         expected_output = [
             (
-                u'[u\'failed validation check for subtopic count check '
-                'of TopicSummaryModel\', '
-                '[u"Entity id 0: Subtopic count: 10 does not match '
-                'the total number of subtopics in topic model: '
-                '[{u\'skill_ids\': [u\'0\', u\'1\'], u\'id\': 1, '
-                'u\'title\': u\'subtopic1\'}] "]]'
+                u'[u\'failed validation check for subtopic count check of Topi'
+                'cSummaryModel\', [u"Entity id 0: Subtopic count: 10 does not '
+                'match the total number of subtopics in topic model: [{u\'thum'
+                'bnail_bg_color\': None, u\'skill_ids\': [u\'0\', '
+                'u\'1\'], u\'id\': 1, u\'thumbnail_filename\': None, u\'title'
+                '\': u\'subtopic1\'}] "]]'
             ), u'[u\'fully-validated TopicSummaryModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 
@@ -10748,11 +10819,11 @@ class SubtopicPageModelValidatorTests(test_utils.GenericTestBase):
             abbreviated_name='abbrev%s' % i) for i in python_utils.RANGE(3)]
         rubrics = [
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
+                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
+                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
+                constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
         skills = [
             skill_domain.Skill.create_default_skill(
                 skill_id='%s' % i, description='skill%s' % i, rubrics=rubrics)
@@ -10959,11 +11030,11 @@ class SubtopicPageSnapshotMetadataModelValidatorTests(
             abbreviated_name='abbrev%s' % i) for i in python_utils.RANGE(3)]
         rubrics = [
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
+                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
+                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
+                constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
         skills = [
             skill_domain.Skill.create_default_skill(
                 skill_id='%s' % i, description='skill%s' % i, rubrics=rubrics)
@@ -11165,11 +11236,11 @@ class SubtopicPageSnapshotContentModelValidatorTests(
             abbreviated_name='abbrev%s' % i) for i in python_utils.RANGE(3)]
         rubrics = [
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
+                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
+                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
+                constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
         skills = [
             skill_domain.Skill.create_default_skill(
                 skill_id='%s' % i, description='skill%s' % i, rubrics=rubrics)
@@ -11332,11 +11403,11 @@ class SubtopicPageCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
             abbreviated_name='abbrev%s' % i) for i in python_utils.RANGE(3)]
         rubrics = [
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
+                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
+                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
+                constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
         skills = [
             skill_domain.Skill.create_default_skill(
                 skill_id='%s' % i, description='skill%s' % i, rubrics=rubrics)
@@ -13937,11 +14008,11 @@ class UserSkillMasteryModelValidatorTests(test_utils.GenericTestBase):
         self.set_admins([self.OWNER_USERNAME])
         rubrics = [
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
+                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
+                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
+                constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
         skill = skill_domain.Skill.create_default_skill(
             'skill', description='description', rubrics=rubrics)
         skill_services.save_new_skill(self.owner_id, skill)

@@ -16,6 +16,7 @@
  * @fileoverview Requires for question only interactions.
  */
 
+require('interactions/DragAndDropSortInput/DragAndDropSortInput.ts');
 require('interactions/FractionInput/FractionInput.ts');
 require('interactions/ImageClickInput/ImageClickInput.ts');
 require('interactions/ItemSelectionInput/ItemSelectionInput.ts');

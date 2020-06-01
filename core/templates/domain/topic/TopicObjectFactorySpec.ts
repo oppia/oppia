@@ -32,6 +32,7 @@ describe('Topic object factory', () => {
       name: 'Topic name',
       abbreviated_name: 'abbrev',
       thumbnail_filename: 'img.png',
+      thumbnail_bg_color: '#a33f40',
       description: 'Topic description',
       version: 1,
       uncategorized_skill_ids: ['skill_1', 'skill_2'],
@@ -52,7 +53,9 @@ describe('Topic object factory', () => {
       subtopics: [{
         id: 1,
         title: 'Title',
-        skill_ids: ['skill_3']
+        skill_ids: ['skill_3'],
+        thumbnail_filename: 'img.png',
+        thumbnail_bg_color: '#a33f40'
       }],
       next_subtopic_id: 1,
       language_code: 'en'
@@ -78,7 +81,6 @@ describe('Topic object factory', () => {
 
     expect(_sampleTopic.validate()).toEqual([
       'Topic name should not be empty.',
-      'Abbreviated name should not be empty.',
       'The story with id story_2 is present in both canonical ' +
       'and additional stories.',
       'The skill with id skill_1 is duplicated in the topic'
@@ -116,9 +118,12 @@ describe('Topic object factory', () => {
     let secondTopic = topicObjectFactory.create({
       id: 'topic_id_2',
       name: 'Another name',
+      abbreviated_name: 'abbrev',
+      thumbnail_filename: 'img.png',
+      thumbnail_bg_color: '#a33f40',
       description: 'Another description',
       language_code: 'en',
-      version: '15',
+      version: 15,
       canonical_story_references: [{
         story_id: 'story_10',
         story_is_published: true
@@ -132,7 +137,9 @@ describe('Topic object factory', () => {
       subtopics: [{
         id: 1,
         title: 'Title',
-        skill_ids: ['skill_1']
+        skill_ids: ['skill_1'],
+        thumbnail_filename: 'img.png',
+        thumbnail_bg_color: '#a33f40'
       }]
     }, {
       skill_1: 'Description 1',

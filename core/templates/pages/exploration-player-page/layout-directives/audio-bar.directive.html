@@ -1,12 +1,27 @@
 <div class="audio-header" ng-if="isAudioBarAvailable()">
   <div ng-if="audioBarIsExpanded" class="audio-controls">
-    <div style="width: 560px;">
-      <i class="fas audio-controls-button-icon"
-         ng-click="onPlayButtonClicked()"
-         ng-class="{'fa-ellipsis-h': audioLoadingIndicatorIsShown, 'fa-play-circle': !isAudioPlaying(), 'fa-pause-circle': isAudioPlaying(), 'audio-controls-audio-not-available': !isAudioAvailableInCurrentLanguage() || audioIsLoading}"
-         uib-tooltip="<[!isAudioAvailableInCurrentLanguage() ? ('I18N_PLAYER_AUDIO_NOT_AVAILABLE_IN' | translate:{languageDescription:getCurrentAudioLanguageDescription()}) : '']>"
-         tooltip-append-to-body="true" tooltip-placement="right">
-      </i>
+    <div class="oppia-audio-header-control-buttons">
+      <div class="audio-header-control-icons">
+        <a ng-click="onBackwardButtonClicked()">
+          <span class="oppia-replay-white-circle"  ng-if="progressBarIsShown">
+            <i class="fas fa-undo audio-undo-icon"></i>
+            <span class="oppia-five-icon">5</span>
+          </span>
+        </a>
+        <a ng-click="onPlayButtonClicked()"
+           uib-tooltip="<[!isAudioAvailableInCurrentLanguage() ? ('I18N_PLAYER_AUDIO_NOT_AVAILABLE_IN' | translate:{languageDescription:getCurrentAudioLanguageDescription()}) : '']>"
+           tooltip-append-to-body="true" tooltip-placement="right">
+          <i class="fas oppia-audio-controls-button-icon"
+             ng-class="{'fa-ellipsis-h': audioLoadingIndicatorIsShown, 'fa-play-circle': !isAudioPlaying(), 'fa-pause-circle': isAudioPlaying(), 'audio-controls-audio-not-available': !isAudioAvailableInCurrentLanguage() || audioIsLoading}">
+          </i>
+        </a>
+        <a ng-click="onForwardButtonClicked()">
+          <span class="oppia-replay-white-circle oppia-replay-white-circle-forward" ng-if="progressBarIsShown">
+            <i class="fas fa-undo audio-undo-icon audio-undo-icon-forward"></i>
+            <span class="oppia-five-icon oppia-five-icon-forward">5</span>
+          </span>
+        </a>
+      </div>
       <div class="slider-section" ng-if="progressBarIsShown">
         <div ng-if="audioLoadingIndicatorIsShown">
           <md-progress-linear md-mode="indeterminate"></md-progress-linear>
@@ -20,12 +35,13 @@
         <!--Filler space for message-->
         <span class="audio-controls-message">&zwnj;</span>
       </div>
-      <select class="audio-language-select"
-              ng-model="selectedLanguage.value"
-              ng-options="o.value as o.displayed for o in languagesInExploration"
-              ng-style="progressBarIsShown ? {'width': '30%'} : {'width': '60%'}"
-              ng-change="onNewLanguageSelected()">
-      </select>
+      <div class="oppia-audio-header-select">
+        <select class="audio-language-select"
+                ng-model="selectedLanguage.value"
+                ng-options="o.value as o.displayed for o in languagesInExploration"
+                ng-change="onNewLanguageSelected()">
+        </select>
+      </div>
     </div>
     <div class="audio-collapse-button audio-toggle-button" ng-if="audioBarIsExpanded" ng-click="collapseAudioBar()"><i class="fas fa-sort-up"></i></div>
   </div>
@@ -121,21 +137,56 @@
     text-align: center;
   }
 
-  .audio-controls-button-icon {
+  .oppia-audio-controls-button-icon {
     color: white;
     font-size: 1.4em;
     min-width: 6%;
     text-align: right;
     vertical-align: middle;
   }
-
+  .oppia-audio-header-control-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 560px;
+  }
+  .oppia-replay-white-circle {
+    display: inline-block;
+    font-size: 1.4em;
+    height: 36px;
+    padding: 5px;
+    position: relative;
+    vertical-align: middle;
+    width: 36px;
+  }
+  .audio-undo-icon {
+    color: #fff;
+    left: 50%;
+    padding: 0;
+    position: absolute;
+    top: 7px;
+    transform: translateX(-43%);
+  }
+  .audio-undo-icon-forward {
+    transform: scaleX(-1) translateX(43%);
+  }
+  .oppia-audio-header-select {
+    transform: translateY(5px);
+  }
+  .oppia-five-icon {
+    bottom: 7px;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 800;
+    left: 3px;
+    position: relative;
+  }
+  .oppia-five-icon-forward {
+    left: 0;
+  }
   .audio-controls-button-image {
     width: 21px;
     height: 21px;
-  }
-
-  .audio-controls-button-icon:hover, .audio-controls-button-image:hover {
-    cursor: pointer;
   }
 
   .audio-controls-audio-not-available {
@@ -190,6 +241,7 @@
     left: 0;
     margin-top: -128px;
     position: fixed;
+    text-align: center;
     top: 184px;
     transition: margin-top 0.2s ease-in-out;
     width: 100%;
@@ -204,9 +256,6 @@
   }
 
   audio-bar .slider-section {
-    display: inline-block;
-    margin: 0 auto;
-    padding: 0 4px;
     transform: translateY(10px);
     width: 50%;
   }
@@ -219,4 +268,57 @@
     margin-top: -270px;
   }
 
+  @media screen and (max-width: 768px) {
+    .oppia-audio-header-control-buttons {
+      justify-content: space-evenly;
+    }
+    .oppia-replay-white-circle {
+      padding: 5px;
+      width: 26px;
+    }
+    .oppia-audio-header-select select {
+      width: 100%;
+    }
+    .audio-header-control-icons {
+      order: 2;
+    }
+    audio-bar .slider-section {
+      order: 1;
+      width: 90%;
+    }
+    .oppia-audio-header-select {
+      order: 3;
+      width: 50%;
+    }
+    .audio-collapse-button {
+      top: 80px;
+    }
+    .audio-controls {
+      height: 80px;
+    }
+  }
+
+  @media screen and (max-width: 550px) {
+    .audio-controls {
+      height: 98px;
+      padding: 0;
+    }
+    audio-bar .slider-section {
+      transform: translateY(4px);
+    }
+    .audio-collapse-button {
+      top: 98px;
+    }
+    .audio-header-control-icons {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+    }
+    .oppia-audio-controls-button-icon {
+      font-size: 1.1em;
+      margin: 0 20px;
+      position: relative;
+      top: 4px;
+    }
+  }
 </style>

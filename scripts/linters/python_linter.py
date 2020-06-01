@@ -19,6 +19,8 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import importlib
+import inspect
 import os
 import re
 import sys
@@ -115,6 +117,120 @@ class PythonLintChecksManager(python_utils.OBJECT):
                 summary_messages.append(summary_message)
         return summary_messages
 
+    def _check_that_all_jobs_are_listed_in_the_job_registry_file(self):
+        """This function is used to check that all the one-off and audit jobs
+        are registered in jobs_registry.py file.
+        """
+        def _get_jobs_class_names_in_filepath(filepath, base_class_name):
+            """Returns a list of job class names in the given filepath which has
+            the given base class.
+
+            Args:
+                filepath: str. The filepath of the jobs.
+                base_class_name: str. The name of the base class.
+
+            Returns:
+                list(str). A list of subclasses of the given base class which
+                exist in the given file.
+            """
+            class_names = []
+            filepath_without_extension = filepath[:-len('.py')]
+            module_path = filepath_without_extension.replace('/', '.')
+            python_module = importlib.import_module(module_path)
+            for name, clazz in inspect.getmembers(
+                    python_module, predicate=inspect.isclass):
+                all_base_classes = [base_class.__name__ for base_class in
+                                    (inspect.getmro(clazz))]
+                # Check that it's a subclass of 'BaseMapReduceOneOffJobManager'.
+                if base_class_name in all_base_classes:
+                    class_names.append(name)
+            return class_names
+
+        if self.verbose_mode_enabled:
+            python_utils.PRINT('Starting job registry checks')
+            python_utils.PRINT('----------------------------------------')
+        summary_messages = []
+        failed = False
+        jobs_in_cron = [
+            'DashboardStatsOneOffJob',
+            'UserDeletionOneOffJob',
+            'UserQueryOneOffJob',
+            'VerifyUserDeletionOneOffJob'
+        ]
+
+        jobs_registry = importlib.import_module('core.jobs_registry')
+        expected_one_off_jobs_set = set([
+            jobs.__name__ for jobs in jobs_registry.ONE_OFF_JOB_MANAGERS])
+        expected_validation_jobs_set = set([
+            jobs.__name__ for jobs in jobs_registry.AUDIT_JOB_MANAGERS])
+
+        one_off_jobs_list = []
+        validation_jobs_list = []
+        for filepath in self.all_filepaths:
+            if filepath.endswith('prod_validation_jobs_one_off.py'):
+                validation_jobs_list.extend(_get_jobs_class_names_in_filepath(
+                    filepath, 'ProdValidationAuditOneOffJob'))
+            elif filepath.endswith('_jobs_one_off.py'):
+                one_off_jobs_list.extend(_get_jobs_class_names_in_filepath(
+                    filepath, 'BaseMapReduceOneOffJobManager'))
+
+        # Removing jobs which are used in cron.
+        one_off_jobs_list = [
+            job for job in one_off_jobs_list if job not in jobs_in_cron]
+        one_off_jobs_set = set(one_off_jobs_list)
+        if len(one_off_jobs_list) != len(one_off_jobs_set):
+            failed = True
+            duplicate_one_off_job_names = (
+                linter_utils.get_duplicates_from_list_of_strings(
+                    one_off_jobs_list))
+            summary_message = 'Found one-off jobs with duplicate names: %s' % (
+                ', '.join(duplicate_one_off_job_names))
+            python_utils.PRINT(summary_message)
+            summary_messages.append(summary_message)
+
+        if validation_jobs_list:
+            # Removes the base validation job class the list.
+            validation_jobs_list.remove('ProdValidationAuditOneOffJob')
+        validation_jobs_set = set(validation_jobs_list)
+        if len(validation_jobs_list) != len(validation_jobs_set):
+            failed = True
+            duplicate_validation_job_names = (
+                linter_utils.get_duplicates_from_list_of_strings(
+                    validation_jobs_list))
+            summary_message = (
+                'Found validation jobs with duplicate names: %s' % (
+                    ', '.join(duplicate_validation_job_names)))
+            python_utils.PRINT(summary_message)
+            summary_messages.append(summary_message)
+
+        non_registered_one_off_jobs = (
+            one_off_jobs_set - expected_one_off_jobs_set)
+        if non_registered_one_off_jobs:
+            failed = True
+            summary_message = (
+                'Found one-off jobs not listed in jobs_registry file: %s' % (
+                    ',\n'.join(sorted(non_registered_one_off_jobs))))
+            python_utils.PRINT(summary_message)
+            summary_messages.append(summary_message)
+
+        non_registered_validation_jobs = (
+            validation_jobs_set - expected_validation_jobs_set)
+        if non_registered_validation_jobs:
+            failed = True
+            summary_message = (
+                'Found validation jobs not listed in jobs_registry file: %s' % (
+                    ',\n'.join(sorted(non_registered_validation_jobs))))
+            python_utils.PRINT(summary_message)
+            summary_messages.append(summary_message)
+
+        summary_message = (
+            '%s   Job registry check %s' % (
+                (_MESSAGE_TYPE_FAILED, 'failed') if failed else
+                (_MESSAGE_TYPE_SUCCESS, 'passed')))
+        python_utils.PRINT(summary_message)
+        summary_messages.append(summary_message)
+        return summary_messages
+
     def perform_all_lint_checks(self):
         """Perform all the lint checks and returns the messages returned by all
         the checks.
@@ -122,13 +238,15 @@ class PythonLintChecksManager(python_utils.OBJECT):
         Returns:
             all_messages: str. All the messages returned by the lint checks.
         """
-
         if not self.all_filepaths:
             python_utils.PRINT('')
             python_utils.PRINT('There are no Python files to lint.')
             return []
 
-        return self._check_import_order()
+        import_order_check_message = self._check_import_order()
+        job_registry_check_message = (
+            self._check_that_all_jobs_are_listed_in_the_job_registry_file())
+        return import_order_check_message + job_registry_check_message
 
 
 class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):

@@ -150,13 +150,13 @@ def ensure_screenshots_dir_is_removed():
 
 def cleanup():
     """Kill the running subprocesses and server fired in this program."""
-    dev_appserver_path = '%s/dev_appserver.py' % common.GOOGLE_APP_ENGINE_HOME
+    google_app_engine_path = '%s/' % common.GOOGLE_APP_ENGINE_HOME
     webdriver_download_path = '%s/downloads' % WEBDRIVER_HOME_PATH
     if common.is_windows_os():
         # In windows system, the java command line will use absolute path.
         webdriver_download_path = os.path.abspath(webdriver_download_path)
     processes_to_kill = [
-        '.*%s.*' % re.escape(dev_appserver_path),
+        '.*%s.*' % re.escape(google_app_engine_path),
         '.*%s.*' % re.escape(webdriver_download_path)
     ]
     for p in SUBPROCESSES:
@@ -453,6 +453,8 @@ def main(args=None):
     commands = [common.NODE_BIN_PATH]
     if parsed_args.debug_mode:
         commands.append('--inspect-brk')
+    # This flag ensures tests fail if waitFor calls time out.
+    commands.append('--unhandled-rejections=strict')
     commands.append(PROTRACTOR_BIN_PATH)
     commands.extend(get_e2e_test_parameters(
         parsed_args.sharding_instances, parsed_args.suite, dev_mode))

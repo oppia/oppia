@@ -209,17 +209,6 @@ handlers:
     X-Xss-Protection: "1; mode=block"
   secure: always
   expiration: "0"
-- url: /splash
-  static_files: webpack_bundles/splash-page.mainpage.html
-  upload: webpack_bundles/splash-page.mainpage.html
-  http_headers:
-    Pragma: no-cache
-    Strict-Transport-Security: "max-age=31536000; includeSubDomains"
-    X-Content-Type-Options: "nosniff"
-    X-Frame-Options: "DENY"
-    X-Xss-Protection: "1; mode=block"
-  secure: always
-  expiration: "0"
 - url: /teach
   static_files: webpack_bundles/teach-page.mainpage.html
   upload: webpack_bundles/teach-page.mainpage.html
@@ -380,6 +369,22 @@ skip_files:
 - third_party/static/fontawesome-free-5.9.0-web/
 - third_party/static/guppy-b5055b/site/
 - third_party/static/guppy-b5055b/test/
+# LiterallyCanvas is used from the npm package and only the images
+# are used from the third_party library. So we exclude all other folders.
+- third_party/static/literallycanvas-0.5.2/demo/
+- third_party/static/literallycanvas-0.5.2/lib/css/
+- third_party/static/literallycanvas-0.5.2/lib/js/
+- third_party/static/literallycanvas-0.5.2/scss/
+- third_party/static/literallycanvas-0.5.2/src/
+- third_party/static/literallycanvas-0.5.2/.babelrc
+- third_party/static/literallycanvas-0.5.2/.gitignore
+- third_party/static/literallycanvas-0.5.2/CHANGES.txt
+- third_party/static/literallycanvas-0.5.2/gulpfile.js
+- third_party/static/literallycanvas-0.5.2/literallycanvas.sublime-project
+- third_party/static/literallycanvas-0.5.2/Makefile
+- third_party/static/literallycanvas-0.5.2/package.json
+- third_party/static/literallycanvas-0.5.2/README.md
+- third_party/static/literallycanvas-0.5.2/yarn.lock
 - third_party/static/MathJax-2.7.5/docs/
 - third_party/static/MathJax-2.7.5/fonts/HTML-CSS/Gyre-Pagella/
 - third_party/static/MathJax-2.7.5/fonts/HTML-CSS/Gyre-Termes/
@@ -430,6 +435,5 @@ skip_files:
 - third_party/static/MathJax-2.7.5/test/
 - third_party/static/MathJax-2.7.5/unpacked/
 - third_party/static/messageformat-2.0.5/
-- third_party/static/ng-img-crop-0.3.2/
 - third_party/static/nginfinitescroll-1.0.0/
 - third_party/static/popperJs-1.15.0/

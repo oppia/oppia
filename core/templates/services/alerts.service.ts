@@ -143,7 +143,7 @@ export class AlertsService {
    * @param {string} message - Info message to display.
    * @param {number|undefined} timeoutMilliseconds - Timeout for the toast.
    */
-  addInfoMessage(message: string, timeoutMilliseconds: number): void {
+  addInfoMessage(message: string, timeoutMilliseconds?: number): void {
     if (timeoutMilliseconds === undefined) {
       timeoutMilliseconds = 1500;
     }
@@ -155,7 +155,7 @@ export class AlertsService {
    * @param {string} message - Success message to display
    * @param {number|undefined} timeoutMilliseconds - Timeout for the toast.
    */
-  addSuccessMessage(message: string, timeoutMilliseconds: number): void {
+  addSuccessMessage(message: string, timeoutMilliseconds?: number): void {
     if (timeoutMilliseconds === undefined) {
       timeoutMilliseconds = 1500;
     }

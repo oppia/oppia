@@ -20,6 +20,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import copy
 import logging
 
+from constants import constants
 from core.domain import opportunity_services
 from core.domain import question_domain
 from core.domain import question_fetchers
@@ -201,15 +202,15 @@ def delete_question_skill_link(user_id, question_id, skill_id):
 
 
 def get_questions_by_skill_ids(
-        total_question_count, skill_ids, fetch_by_difficulty):
+        total_question_count, skill_ids, require_medium_difficulty):
     """Returns constant number of questions linked to each given skill id.
 
     Args:
         total_question_count: int. The total number of questions to return.
         skill_ids: list(str). The IDs of the skills to which the questions
             should be linked.
-        fetch_by_difficulty: bool. Indicates whether the returned questions
-            should be fetched by skill difficulty.
+        require_medium_difficulty: bool. Indicates whether the returned
+            questions should be of medium difficulty.
 
     Returns:
         list(Question). The list containing an expected number of
@@ -219,9 +220,9 @@ def get_questions_by_skill_ids(
             divisible. If not enough questions for one skill, simply return
             all questions linked to it. The order of questions will follow the
             order of given skill ids, and the order of questions for the same
-            skill is random when fetch_by_difficulty is false, otherwise the
-            order is sorted by absolute value of the difference between skill
-            difficulty and the medium difficulty.
+            skill is random when require_medium_difficulty is false, otherwise
+            the order is sorted by absolute value of the difference between
+            skill difficulty and the medium difficulty.
     """
 
     if total_question_count > feconf.MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME:
@@ -229,11 +230,12 @@ def get_questions_by_skill_ids(
             'Question count is too high, please limit the question count to '
             '%d.' % feconf.MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME)
 
-    if fetch_by_difficulty:
+    if require_medium_difficulty:
         question_skill_link_models = (
             question_models.QuestionSkillLinkModel.get_question_skill_links_based_on_difficulty_equidistributed_by_skill( #pylint: disable=line-too-long
                 total_question_count, skill_ids,
-                feconf.MEDIUM_SKILL_DIFFICULTY))
+                constants.SKILL_DIFFICULTY_LABEL_TO_FLOAT[
+                    constants.SKILL_DIFFICULTY_MEDIUM]))
     else:
         question_skill_link_models = (
             question_models.QuestionSkillLinkModel.get_question_skill_links_equidistributed_by_skill( #pylint: disable=line-too-long
