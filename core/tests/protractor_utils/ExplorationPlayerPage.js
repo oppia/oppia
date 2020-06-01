@@ -117,14 +117,14 @@ var ExplorationPlayerPage = function() {
     var playBtn = element(
       by.css('.protractor-test-play-circle'));
     expect(playBtn.isPresent()).toBeTruthy();
-  };  
+  };
 
   this.changeLanguage = async function(lang) {
     var audioSelect = element(
       by.css('.protractor-test-audio-lang-select'));
     audioSelect.value = lang;
   };
-  
+
   this.clickThroughToNextCard = async function() {
     await waitFor.elementToBeClickable(
       nextCardButton, '"Next Card" button takes too long to be clickable');
