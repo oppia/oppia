@@ -25,24 +25,13 @@
         font-size: 1.2em;
         text-align: center;
       }
-      .oppia-story-path-section {
-        background: #fff;
-        border-radius: 2px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.14), 0 2px 4px rgba(0, 0, 0, 0.23);
-        float: left;
-        max-width: 675px;
-        padding: 20px 20px 60px 20px;
-        position: absolute;
-        text-align: left;
+
+      .oppia-story-viewer-inner-container {
+        padding-left: 20px;
+        padding-right: 20px;
+        padding-top: 40px;
       }
-      .oppia-story-table {
-        margin: 0 auto;
-        max-width: 90%;
-        position: relative;
-        text-align: left;
-        top: 35px;
-        width: 100%;
-      }
+     
       .oppia-card-preview-panel {
         background: #fff;
         border-radius: 2px;
@@ -79,27 +68,32 @@
 
       .oppia-lesson-icon-completed {
         background-color: #296E5F;
-        border-radius: 25px;
+        border-radius: 50%;
         height: 40px;
-        left: 50px;
+        left: 50%;
         position: absolute;
-        transform: rotate(-120deg);
+        top: 0;
+        transform: translateX(-50%) rotate(-120deg);
+        transform-origin: center;
         width: 40px;
       }
 
       .oppia-lesson-icon-uncompleted {
         background-color: #ffffff;
-        border: #296E5F 2px solid;
-        border-radius: 25px;
+        border-radius: 50%;
+        border: #296E5F 3px solid;
         height: 40px;
-        left: 50px;
+        left: 50%;
         position: absolute;
+        top: 0;
+        transform: translateX(-50%);
         width: 40px;
       }
       .oppia-story-viewer-title {
         color: #01645c;
-        font-family: Capriola, Roboto, Arial, sans-serif;
+        font-family: Roboto, Arial, sans-serif;
         font-size: 3em;
+        font-weight: 500;
         margin-top: 20px;
         margin-bottom: 0;
         padding-left: 60px;
@@ -108,7 +102,7 @@
       }
 
       .oppia-story-viewer-description {
-        font-family: Capriola, Roboto, Arial, sans-serif;
+        font-family: Roboto, Arial, sans-serif;
         font-size: 1.2em;
         padding-bottom: 4vh;
         padding-left: 60px;
@@ -118,9 +112,22 @@
       .oppia-story-viewer-card {
         color: rgb(51, 51, 51);
         flex: 1;
-        font-family: Capriola, Roboto, Arial, sans-serif;
-        margin-left: 20px;
-        margin-right: 40px;
+        font-family: Roboto, Arial, sans-serif;
+        margin-right: 60px;
+      }
+
+      .oppia-story-viewer-card-content {
+        display: flex;
+        flex-wrap: wrap;
+        margin-top: 16px;
+      }
+
+      .oppia-story-viewer-mobile-card-content {
+        border-radius: 6px;
+        box-shadow: 0px 2px 4px 2px rgba(0, 0, 0, 0.1);
+        margin-top: 16px;
+        overflow: hidden;
+        width: 300px;
       }
 
       .oppia-story-viewer-card-description-box {
@@ -128,28 +135,80 @@
         border: rgb(248, 248, 248) 4px solid;
         display: flex;
         flex: 1;
-        margin-bottom: 20px;
         max-height: 180px;
-        min-width: 200px;
-        overflow-y: scroll;
+        min-width: 120px;
         padding: 20px;
       }
 
+      .oppia-story-viewer-mobile-card-description-box {
+        padding: 20px;
+        max-height: 180px;
+      }
 
-      @media (max-width: 640px) {
-        .oppia-hide-lesson-track {
+      .oppia-lesson-track {
+        display: flex;
+        flex: 1;
+        height: 360px;
+        justify-content: center;
+        max-width: 170px;
+        overflow: hidden;
+        position: relative;
+      }
+
+      .oppia-chapter-title {
+        font-size: 30px;
+        margin-left: 8px;
+        padding-top: 3px;
+      }
+
+      @media (max-width: 768px) {
+        .oppia-story-viewer-title {
+          margin-top: 20px;
+          padding-left: 40px;
+          padding-top: 0px;
+        }
+
+        .oppia-lesson-track {
+          height: 530px;
+          max-width: 130px;
+        }
+
+        .oppia-story-viewer-card-content {
           display: none;
         }
 
+        .oppia-story-viewer-card {
+          margin-left: -10px;
+        }
+
         .oppia-chapter-title {
-          margin-top: 40px;
+          margin-left: 0;
+        }
+
+        .oppia-lesson-icon-completed {
+          width: 55px;
+          height: 55px;
+        }
+
+        .oppia-lesson-icon-uncompleted {
+          width: 55px;
+          height: 55px;
+        }
+
+        .oppia-story-viewer-inner-container {
+          padding-top: 80px;
         }
       }
 
-      @media (min-width: 768px) {
+      @media (min-width: 769px) {
+        .oppia-story-viewer-mobile-card-content {
+          display: none;
+        }
+        
         .oppia-story-description {
           padding-bottom: 4vh;
         }
+        
       }
 
       @media only screen and (max-width: 998px) {
