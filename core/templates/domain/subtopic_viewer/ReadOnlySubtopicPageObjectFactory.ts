@@ -31,7 +31,7 @@ import { ISubtopicBackendDict, Subtopic, SubtopicObjectFactory } from
 export interface ISubtopicDataBackendDict {
   'subtopic_title': string;
   'page_contents': ISubtopicPageContentsBackendDict;
-  'next_subtopic': ISubtopicBackendDict | null,
+  'next_subtopic_dict': ISubtopicBackendDict | null,
   'topic_id': string
 }
 
@@ -82,9 +82,9 @@ export class ReadOnlySubtopicPageObjectFactory {
 
   createFromBackendDict(subtopicDataBackendDict: ISubtopicDataBackendDict):
     ReadOnlySubtopicPageData {
-    let nextSubtopic = subtopicDataBackendDict.next_subtopic ? (
+    let nextSubtopic = subtopicDataBackendDict.next_subtopic_dict ? (
       this.subtopicObjectFactory
-        .create(subtopicDataBackendDict.next_subtopic, {})
+        .create(subtopicDataBackendDict.next_subtopic_dict, {})
     ) : null;
 
     return new ReadOnlySubtopicPageData(
