@@ -21,15 +21,10 @@
 /* eslint-disable max-len */
 import { MisconceptionObjectFactory } from
   'domain/skill/MisconceptionObjectFactory';
-import { OutcomeObjectFactory } from
-  'domain/exploration/OutcomeObjectFactory';
-import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 import { SolutionValidityService } from
   'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
 import { StateEditorService } from
   'components/state-editor/state-editor-properties-services/state-editor.service';
-import { SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
 /* eslint-enable max-len */
 // ^^^ This block is to be removed.
 
@@ -60,25 +55,25 @@ describe('Question misconception selector component', function() {
       $componentController = _$componentController_;
       misconceptionObjectFactory = $injector.get('MisconceptionObjectFactory');
       ses = $injector.get('StateEditorService');
-		}));
+    }));
 
   beforeEach(function() {
     mockMisconceptionObject = {
       abc: [
         misconceptionObjectFactory.create(
           '1', 'misc1', 'notes1', 'feedback1', true)
-			],
-			def: [
-				misconceptionObjectFactory.create(
+      ],
+      def: [
+        misconceptionObjectFactory.create(
           '2', 'misc2', 'notes2', 'feedback1', true)
-			]
-    }
+      ]
+    };
     spyOn(ses, 'getMisconceptionsBySkill').and.callFake(function() {
       return mockMisconceptionObject;
     });
     ctrl = $componentController('questionMisconceptionSelector', null, {
       misconceptionFeedbackIsUsed: true,
-      selectedMisconception: mockMisconceptionObject['abc'][0],
+      selectedMisconception: mockMisconceptionObject.abc[0],
       selectedMisconceptionSkillId: 'abc'
     });
     ctrl.$onInit();
@@ -86,19 +81,19 @@ describe('Question misconception selector component', function() {
 
   it('should initialize correctly', function() {
     expect(ctrl.misconceptionsBySkill).toEqual(mockMisconceptionObject);
-	});
+  });
 
-	it('should toggle feedback usage boolean correctly', function() {
-		expect(ctrl.misconceptionFeedbackIsUsed).toBeTrue();
-		ctrl.toggleMisconceptionFeedbackUsage();
-		expect(ctrl.misconceptionFeedbackIsUsed).toBeFalse();
-	});
+  it('should toggle feedback usage boolean correctly', function() {
+    expect(ctrl.misconceptionFeedbackIsUsed).toBeTrue();
+    ctrl.toggleMisconceptionFeedbackUsage();
+    expect(ctrl.misconceptionFeedbackIsUsed).toBeFalse();
+  });
 
-	it('should set selected misconception correctly', function() {
-		expect(ctrl.selectedMisconception).toEqual(mockMisconceptionObject['abc'][0]);
-		expect(ctrl.selectedMisconceptionSkillId).toEqual('abc');
-		ctrl.selectMisconception(mockMisconceptionObject['def'][0], 'def');
-		expect(ctrl.selectedMisconception).toEqual(mockMisconceptionObject['def'][0]);
-		expect(ctrl.selectedMisconceptionSkillId).toEqual('def');
-	})
+  it('should set selected misconception correctly', function() {
+    expect(ctrl.selectedMisconception).toEqual(mockMisconceptionObject.abc[0]);
+    expect(ctrl.selectedMisconceptionSkillId).toEqual('abc');
+    ctrl.selectMisconception(mockMisconceptionObject.def[0], 'def');
+    expect(ctrl.selectedMisconception).toEqual(mockMisconceptionObject.def[0]);
+    expect(ctrl.selectedMisconceptionSkillId).toEqual('def');
+  });
 });

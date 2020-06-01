@@ -71,9 +71,9 @@ describe('Question misconception editor component', function() {
 
   beforeEach(function() {
     var onSaveTaggedMisconceptionSpy = jasmine.createSpy(
-        'onSaveTaggedMisconception');
+      'onSaveTaggedMisconception');
     var onSaveAnswerGroupFeedbackSpy = jasmine.createSpy(
-        'onSaveAnswerGroupFeedback');
+      'onSaveAnswerGroupFeedback');
     var outcome = new OutcomeObjectFactory(new SubtitledHtmlObjectFactory());
     var rules = new RuleObjectFactory();
     mockMisconceptionObject = {
@@ -83,7 +83,7 @@ describe('Question misconception editor component', function() {
         misconceptionObjectFactory.create(
           '2', 'misc2', 'notes2', 'feedback1', true)
       ]
-    }
+    };
     spyOn(ses, 'getMisconceptionsBySkill').and.callFake(function() {
       return mockMisconceptionObject;
     });
@@ -104,9 +104,10 @@ describe('Question misconception editor component', function() {
       spyOn(ctrl, 'getTaggedSkillMisconceptionId').and.callFake(() => 'abc-1');
       ctrl.$onInit();
       expect(ctrl.misconceptionName).toEqual('misc1');
-      expect(ctrl.selectedMisconception).toEqual(mockMisconceptionObject['abc'][0]);
+      expect(ctrl.selectedMisconception).toEqual(
+        mockMisconceptionObject.abc[0]);
       expect(ctrl.selectedMisconceptionSkillId).toEqual('abc');
-  });
+    });
 
   it('should use feedback by default', function() {
     expect(ctrl.feedbackIsUsed).toBeTrue();
@@ -127,19 +128,19 @@ describe('Question misconception editor component', function() {
 
   it(
     'should throw an error if tagged misconception id is invalid', function() {
-    ctrl.getTaggedSkillMisconceptionId = () => 'invalidId';
-    expect(() => ctrl.$onInit()).toThrowError(
-      'Expected skillMisconceptionId to be <skillId>-<misconceptionId>.');
-  });
+      ctrl.getTaggedSkillMisconceptionId = () => 'invalidId';
+      expect(() => ctrl.$onInit()).toThrowError(
+        'Expected skillMisconceptionId to be <skillId>-<misconceptionId>.');
+    });
 
   it('should tag a misconception correctly', function() {
     var mockResultObject = {
-      misconception: mockMisconceptionObject['abc'][1],
+      misconception: mockMisconceptionObject.abc[1],
       misconceptionSkillId: 'abc',
       feedbackIsUsed: false
     };
     spyOn($uibModal, 'open').and.returnValue({
-        result: $q.resolve(mockResultObject)
+      result: $q.resolve(mockResultObject)
     });
     expect(ctrl.misconceptionName).toBeNull();
     expect(ctrl.selectedMisconception).toBeNull();
@@ -148,13 +149,13 @@ describe('Question misconception editor component', function() {
     ctrl.getTaggedSkillMisconceptionId = () => 'abc-1';
     ctrl.$onInit();
     expect(ctrl.misconceptionName).toEqual('misc1');
-    expect(ctrl.selectedMisconception).toEqual(mockMisconceptionObject['abc'][0]);
+    expect(ctrl.selectedMisconception).toEqual(mockMisconceptionObject.abc[0]);
     expect(ctrl.selectedMisconceptionSkillId).toEqual('abc');
     expect(ctrl.feedbackIsUsed).toBeTrue();
     ctrl.tagAnswerGroupWithMisconception();
     $rootScope.$digest();
     expect(ctrl.misconceptionName).toEqual('misc2');
-    expect(ctrl.selectedMisconception).toEqual(mockMisconceptionObject['abc'][1]);
+    expect(ctrl.selectedMisconception).toEqual(mockMisconceptionObject.abc[1]);
     expect(ctrl.selectedMisconceptionSkillId).toEqual('abc');
     expect(ctrl.feedbackIsUsed).toBeFalse();
     expect(ctrl.misconceptionEditorIsOpen).toBeFalse();
