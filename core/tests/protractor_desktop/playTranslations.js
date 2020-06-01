@@ -39,7 +39,7 @@ describe('Test Translations', function() {
   var explorationPlayerPage = null;
   var libraryPage = null;
 
-  beforeAll(function() {
+  beforeAll(async function() {
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
@@ -49,65 +49,60 @@ describe('Test Translations', function() {
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
     libraryPage = new LibraryPage.LibraryPage();
 
-    users.createUser('testTranslations@translations.com', 'testTranslations');
-    users.login('testTranslations@translations.com');
-    workflow.createExploration();
-
-    explorationEditorMainTab.setStateName('First');
-    explorationEditorMainTab.setContent(forms.toRichText(
-      'This is the first card.'
-    ));
-    explorationEditorMainTab.setInteraction('EndExploration');
-    explorationEditorPage.navigateToTranslationTab();
-    explorationEditorTranslationTab.exitTutorial();
-    explorationEditorTranslationTab.changeLanguage('Hindi');
-    explorationEditorTranslationTab.openUploadAudioModal();
-    explorationEditorTranslationTab.uploadAudio(
+    await users.createUser('testTranslations@translations.com', 'testTranslations');
+    await users.login('testTranslations@translations.com');
+    await workflow.createExploration();
+    await explorationEditorMainTab.exitTutorial();
+    await explorationEditorMainTab.setStateName('First');
+    await explorationEditorMainTab.setContent(await forms.toRichText(
+      'This is the first card.'));
+    await explorationEditorMainTab.setInteraction('EndExploration');
+    await explorationEditorPage.navigateToTranslationTab();
+    await explorationEditorTranslationTab.exitTutorial();
+    await explorationEditorTranslationTab.changeLanguage('Hindi');
+    await explorationEditorTranslationTab.openUploadAudioModal();
+    await explorationEditorTranslationTab.uploadAudio(
       '../data/cafe.mp3');
-    explorationEditorPage.saveChanges();
-    explorationEditorPage.navigateToSettingsTab();
-    explorationEditorSettingsTab.setTitle('Test Translations');
-    explorationEditorSettingsTab.setCategory('Languages');
-    explorationEditorSettingsTab.setLanguage('English');
-    explorationEditorSettingsTab.setObjective(
+    await explorationEditorPage.saveChanges();
+    await explorationEditorPage.navigateToSettingsTab();
+    await explorationEditorSettingsTab.setTitle('Test Translations');
+    await explorationEditorSettingsTab.setCategory('Languages');
+    await explorationEditorSettingsTab.setLanguage('English');
+    await explorationEditorSettingsTab.setObjective(
       'Testing if translations works');
-    explorationEditorPage.saveChanges('Done.');
-    workflow.publishExploration();
-    users.logout();
+    await explorationEditorPage.saveChanges('Done.');
+    await workflow.publishExploration();
+    await users.logout();
   });
 
-  it('should play and pause audio translations', function() {
-    users.login('testTranslations@translations.com');
-    libraryPage.get();
-    libraryPage.playExploration('Test Translations');
-    explorationPlayerPage.clickAudioBar();
-    explorationPlayerPage.playAudio();
-    explorationPlayerPage.expectAudioToBePlaying();
-    explorationPlayerPage.pauseAudio();
-    explorationPlayerPage.expectAudioToBePaused();
-    users.logout();
+  it('should play and pause audio translations', async function() {
+    await users.login('testTranslations@translations.com');
+    await libraryPage.get();
+    await libraryPage.playExploration('Test Translations');
+    await explorationPlayerPage.clickAudioBar();
+    await explorationPlayerPage.playAudio();
+    await explorationPlayerPage.expectAudioToBePlaying();
+    await explorationPlayerPage.pauseAudio();
+    await explorationPlayerPage.expectAudioToBePaused();
   });
-
-  it('should play translations for multiple languages', function() {
-    users.login('testTranslations@translations.com');
-    creatorDashboardPage.get();
-    creatorDashboardPage.editExploration('Test Translations');
-    explorationEditorPage.navigateToTranslationTab();
-    explorationEditorTranslationTab.exitTutorial();
-    explorationEditorTranslationTab.changeLanguage('Arabic');
-    explorationEditorTranslationTab.openUploadAudioModal();
-    explorationEditorTranslationTab.uploadAudio(
+      
+  it('should play translations for multiple languages', async function() {
+    await browser.get("/");
+    await creatorDashboardPage.get();
+    await creatorDashboardPage.editExploration('Test Translations');
+    await explorationEditorPage.navigateToTranslationTab();
+    await explorationEditorTranslationTab.exitTutorial();
+    await explorationEditorTranslationTab.changeLanguage('Arabic');
+    await explorationEditorTranslationTab.openUploadAudioModal();
+    await explorationEditorTranslationTab.uploadAudio(
       '../data/ambient-noise.mp3');
-    explorationEditorPage.saveChanges('Added another translation');
-    libraryPage.get();
-    libraryPage.playExploration('Test Translations');
-    browser.refresh();
-    explorationPlayerPage.clickAudioBar();
-    explorationPlayerPage.playAudio();
-    explorationPlayerPage.expectAudioToBePlaying();
-    explorationPlayerPage.pauseAudio();
-    explorationPlayerPage.changeLanguage('Arabic');
-    explorationPlayerPage.playAudio();
-    explorationPlayerPage.expectAudioToBePlaying();
+    await explorationEditorPage.saveChanges('Added another translation');
+    await libraryPage.get();
+    await libraryPage.playExploration('Test Translations');
+    await browser.refresh();
+    await explorationPlayerPage.clickAudioBar();
+    await explorationPlayerPage.changeLanguage('Arabic');
+    await explorationPlayerPage.playAudio();
+    await explorationPlayerPage.expectAudioToBePlaying();
   });
 });
