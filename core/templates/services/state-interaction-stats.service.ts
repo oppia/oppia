@@ -70,6 +70,8 @@ const STATE_INTERACTION_STATS_URL_TEMPLATE: string = (
 
 @Injectable({providedIn: 'root'})
 export class StateInteractionStatsService {
+  cachedStats: Promise<IStateRulesStats> = null;
+
   constructor(
       private angularNameService: AngularNameService,
       private answerClassificationService: AnswerClassificationService,
@@ -99,13 +101,17 @@ export class StateInteractionStatsService {
    * Returns a promise which will provide details of the given state's
    * answer-statistics.
    */
-  computeStats(state: State): Promise<IStateRulesStats> {
+  computeStats(
+      state: State, cacheResults: boolean = false): Promise<IStateRulesStats> {
+    if (cacheResults && this.cachedStats !== null) {
+      return this.cachedStats;
+    }
     const explorationId = this.contextService.getExplorationId();
     const interactionRulesService = (
       this.interactionRulesRegistryService.getRulesServiceByInteractionId(
         state.interaction.id));
     // TODO(#8038): Move this HTTP call into a backend-api.service module.
-    return this.http.get<IStateRulesStatsBackendDict>(
+    this.cachedStats = this.http.get<IStateRulesStatsBackendDict>(
       this.urlInterpolationService.interpolateUrl(
         STATE_INTERACTION_STATS_URL_TEMPLATE, {
           exploration_id: explorationId,
@@ -130,6 +136,7 @@ export class StateInteractionStatsService {
           options: info.options,
         })),
       });
+    return this.cachedStats;
   }
 }
 
