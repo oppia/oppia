@@ -47,7 +47,7 @@ angular.module('oppia').directive('subtopicSummaryTile', [
                   topic_name: ctrl.getTopicName(),
                   subtopic_id: ctrl.getSubtopic().getId().toString()
                 }
-              )
+              ), '_self'
             );
           };
 
