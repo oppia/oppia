@@ -13,6 +13,7 @@ var suites = {
 
     // Unfortunately, adding more than one file to a test suite results in
     // severe instability as of Chromedriver 2.38 (Chrome 66).
+    
     accessibility: [
       'protractor/accessibility.js'
     ],
