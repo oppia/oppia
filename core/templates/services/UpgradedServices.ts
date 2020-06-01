@@ -192,6 +192,8 @@ import { PredictionAlgorithmRegistryService } from
   'pages/exploration-player-page/services/prediction-algorithm-registry.service';
 import { PredictionResultObjectFactory } from
   'domain/classifier/PredictionResultObjectFactory';
+import { ProfilePageBackendApiService } from
+  'pages/profile-page/profile-page-backend-api.service';
 import { PythonProgramTokenizer } from 'classifiers/python-program.tokenizer';
 import { QuestionBackendApiService } from
   'domain/question/question-backend-api.service.ts';
@@ -688,6 +690,12 @@ export class UpgradedServices {
         upgradedServices['HttpClient'],
         upgradedServices['PlaythroughIssuesBackendApiService'],
         upgradedServices['UrlInterpolationService']);
+    upgradedServices['ProfilePageBackendApiService'] =
+      new ProfilePageBackendApiService(
+        upgradedServices['UrlInterpolationService'],
+        upgradedServices['HttpClient'],
+        upgradedServices['UrlService']
+      );
     upgradedServices['QuestionBackendApiService'] =
       new QuestionBackendApiService(
         upgradedServices['HttpClient'],
