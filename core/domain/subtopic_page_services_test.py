@@ -225,9 +225,6 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
     def test_migrate_page_contents_to_latest_schema(self):
         current_schema_version_swap = self.swap(
             feconf, 'CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION', 2)
-        subtopic_page_swap = self.swap(
-            subtopic_page_domain, 'SubtopicPage',
-            subtopic_page_domain.SubtopicPage)
         html_content = (
             '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&a'
             'mp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>')
@@ -321,7 +318,7 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
         )
         self.assertEqual(subtopic_page_model.page_contents_schema_version, 1)
 
-        with current_schema_version_swap, subtopic_page_swap:
+        with current_schema_version_swap:
             subtopic_page = subtopic_page_services.get_subtopic_page_from_model(
                 subtopic_page_model)
 
@@ -333,9 +330,6 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
             self):
         current_schema_version_swap = self.swap(
             feconf, 'CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION', 2)
-        subtopic_page_swap = self.swap(
-            subtopic_page_domain, 'SubtopicPage',
-            subtopic_page_domain.SubtopicPage)
         assert_raises_regexp_context_manager = self.assertRaisesRegexp(
             Exception,
             'Sorry, we can only process v1-v2 page schemas at present.')
@@ -345,7 +339,7 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
         subtopic_page_model.page_contents_schema_version = 0
         subtopic_page_model.commit(self.user_id, '', [])
 
-        with current_schema_version_swap, subtopic_page_swap, (
+        with current_schema_version_swap, (
             assert_raises_regexp_context_manager):
             subtopic_page_services.get_subtopic_page_from_model(
                 subtopic_page_model)

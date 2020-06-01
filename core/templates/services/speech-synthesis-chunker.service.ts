@@ -200,7 +200,7 @@ export class SpeechSynthesisChunkerService {
             _this.htmlEscaper.escapedJsonToObj(
               element.attributes['math_content-with-value'].textContent));
           const latexSpeakableText = _this._formatLatexToSpeakableText(
-            (mathContent).raw_latex);
+            mathContent.raw_latex);
           return latexSpeakableText.length > 0 ? latexSpeakableText + ' ' : '';
         }
       });

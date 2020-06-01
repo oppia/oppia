@@ -721,18 +721,26 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'rule_type': 'IsEqualToOrdering'
             }, {
                 'rule_type': 'HasElementXAtPositionY',
-                'inputs': {'x': html_with_old_math_schema,
-                           'y': 2}
+                'inputs': {
+                    'x': html_with_old_math_schema,
+                    'y': 2
+                }
             }, {
                 'rule_type': 'IsEqualToOrdering',
-                'inputs': {'x': [[html_with_old_math_schema]]}
+                'inputs': {
+                    'x': [[html_with_old_math_schema]]
+                }
             }, {
                 'rule_type': 'HasElementXBeforeElementY',
-                'inputs': {'x': html_with_old_math_schema,
-                           'y': html_with_old_math_schema}
+                'inputs': {
+                    'x': html_with_old_math_schema,
+                    'y': html_with_old_math_schema
+                }
             }, {
-                'rule_type': 'IsEqualToOrderingWithOneItemAtIncorrectPosition',  # pylint: disable=protected-access,line-too-long
-                'inputs': {'x': [[html_with_old_math_schema]]}
+                'rule_type': 'IsEqualToOrderingWithOneItemAtIncorrectPosition',
+                'inputs': {
+                    'x': [[html_with_old_math_schema]]
+                }
             }],
             'training_data': [],
             'tagged_skill_misconception_id': None
@@ -756,18 +764,26 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'rule_type': 'IsEqualToOrdering'
             }, {
                 'rule_type': 'HasElementXAtPositionY',
-                'inputs': {'x': html_with_new_math_schema,
-                           'y': 2}
+                'inputs': {
+                    'x': html_with_new_math_schema,
+                    'y': 2
+                }
             }, {
                 'rule_type': 'IsEqualToOrdering',
-                'inputs': {'x': [[html_with_new_math_schema]]}
+                'inputs': {
+                    'x': [[html_with_new_math_schema]]
+                }
             }, {
                 'rule_type': 'HasElementXBeforeElementY',
-                'inputs': {'x': html_with_new_math_schema,
-                           'y': html_with_new_math_schema}
+                'inputs': {
+                    'x': html_with_new_math_schema,
+                    'y': html_with_new_math_schema
+                }
             }, {
-                'rule_type': 'IsEqualToOrderingWithOneItemAtIncorrectPosition',  # pylint: disable=protected-access,line-too-long
-                'inputs': {'x': [[html_with_new_math_schema]]}
+                'rule_type': 'IsEqualToOrderingWithOneItemAtIncorrectPosition',
+                'inputs': {
+                    'x': [[html_with_new_math_schema]]
+                }
             }],
             'training_data': [],
             'tagged_skill_misconception_id': None
@@ -784,8 +800,10 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'solution': None,
                 'answer_groups': [answer_group_dict_with_old_math_schema],
                 'default_outcome': {
-                    'param_changes': [], 'feedback': {
-                        'content_id': 'default_outcome', 'html': (
+                    'param_changes': [],
+                    'feedback': {
+                        'content_id': 'default_outcome',
+                        'html': (
                             '<p><oppia-noninteractive-image filepath'
                             '-with-value="&amp;quot;random.png&amp;'
                             'quot;"></oppia-noninteractive-image>'
@@ -828,8 +846,10 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'solution': None,
                 'answer_groups': [answer_group_dict_with_new_math_schema],
                 'default_outcome': {
-                    'param_changes': [], 'feedback': {
-                        'content_id': 'default_outcome', 'html': (
+                    'param_changes': [],
+                    'feedback': {
+                        'content_id': 'default_outcome',
+                        'html': (
                             '<p><oppia-noninteractive-image filepath'
                             '-with-value="&amp;quot;random.png&amp;'
                             'quot;"></oppia-noninteractive-image>'

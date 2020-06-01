@@ -22,6 +22,7 @@ import datetime
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
+from core.domain import html_validation_service
 from core.domain import question_domain
 from core.domain import skill_services
 from core.domain import state_domain
@@ -608,6 +609,44 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
                 'new_value': 'Exploration 1 Albert title'
             }))
 
+    def test_get_all_html_content_strings(self):
+        suggestion = suggestion_registry.SuggestionEditStateContent(
+            self.suggestion_dict['suggestion_id'],
+            self.suggestion_dict['target_id'],
+            self.suggestion_dict['target_version_at_submission'],
+            self.suggestion_dict['status'], self.author_id,
+            self.reviewer_id, self.suggestion_dict['change'],
+            self.suggestion_dict['score_category'], self.fake_date)
+
+        actual_outcome_list = suggestion.get_all_html_content_strings()
+        expected_outcome_list = [u'new suggestion content']
+        self.assertEqual(expected_outcome_list, actual_outcome_list)
+
+    def test_convert_html_in_suggestion_change_dict(self):
+        html_content = (
+            '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&a'
+            'mp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>')
+        expected_html_content = (
+            '<p>Value</p><oppia-noninteractive-math math_content-with-value='
+            '"{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;, &'
+            'amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
+            '-noninteractive-math>')
+
+        change = {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+            'state_name': 'Introduction',
+            'new_value': '<p>suggestion</p>',
+            'old_value': html_content
+        }
+        converted_change_dict = (
+            suggestion_registry.SuggestionEditStateContent.
+            convert_html_in_suggestion_change_dict(
+                change, html_validation_service.
+                add_math_content_to_math_rte_components).to_dict())
+        self.assertEqual(
+            converted_change_dict['old_value'], expected_html_content)
+
 
 class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
     """Tests for the SuggestionEditStateContent class."""
@@ -1068,6 +1107,31 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             u'<p>This is translated html.</p>', u'<p>This is a content.</p>']
         self.assertEqual(expected_outcome_list, actual_outcome_list)
 
+    def test_convert_html_in_suggestion_change_dict(self):
+        html_content = (
+            '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&a'
+            'mp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>')
+        expected_html_content = (
+            '<p>Value</p><oppia-noninteractive-math math_content-with-value='
+            '"{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;, &'
+            'amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
+            '-noninteractive-math>')
+        change_dict = {
+            'cmd': exp_domain.CMD_ADD_TRANSLATION,
+            'state_name': 'Introduction',
+            'content_id': 'content',
+            'language_code': 'hi',
+            'content_html': html_content,
+            'translation_html': '<p>This is translated html.</p>'
+        }
+        converted_change_dict = (
+            suggestion_registry.SuggestionTranslateContent.
+            convert_html_in_suggestion_change_dict(
+                change_dict, html_validation_service.
+                add_math_content_to_math_rte_components).to_dict())
+        self.assertEqual(
+            converted_change_dict['content_html'], expected_html_content)
+
 
 class SuggestionAddQuestionTest(test_utils.GenericTestBase):
     """Tests for the SuggestionAddQuestion class."""
@@ -1521,6 +1585,143 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
         expected_outcome_list = [
             u'', u'<p>This is a hint.</p>', u'<p>This is a solution.</p>']
         self.assertEqual(expected_outcome_list, actual_outcome_list)
+
+    def test_convert_html_in_suggestion_change_dict(self):
+        html_content = (
+            '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&a'
+            'mp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>')
+        expected_html_content = (
+            '<p>Value</p><oppia-noninteractive-math math_content-with-value='
+            '"{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;, &'
+            'amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
+            '-noninteractive-math>')
+        answer_group = {
+            'outcome': {
+                'dest': None,
+                'feedback': {
+                    'content_id': 'feedback_1',
+                    'html': ''
+                },
+                'labelled_as_correct': True,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'rule_specs': [{
+                'inputs': {
+                    'x': 0
+                },
+                'rule_type': 'Equals'
+            }],
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }
+
+        question_state_dict = {
+            'content': {
+                'content_id': 'content_1',
+                'html': html_content
+            },
+            'recorded_voiceovers': {
+                'voiceovers_mapping': {
+                    'content_1': {},
+                    'feedback_1': {},
+                    'feedback_2': {},
+                    'hint_1': {},
+                    'solution': {}
+                }
+            },
+            'written_translations': {
+                'translations_mapping': {
+                    'content_1': {},
+                    'feedback_1': {},
+                    'feedback_2': {},
+                    'hint_1': {},
+                    'solution': {}
+                }
+            },
+            'interaction': {
+                'answer_groups': [answer_group],
+                'confirmed_unclassified_answers': [],
+                'customization_args': {
+                    'choices': {
+                        'value': ['option 1']
+                    },
+                    'showChoicesInShuffledOrder': {
+                        'value': True
+                    }
+                },
+                'default_outcome': {
+                    'dest': None,
+                    'feedback': {
+                        'content_id': 'feedback_2',
+                        'html': 'Correct Answer'
+                    },
+                    'param_changes': [],
+                    'refresher_exploration_id': None,
+                    'labelled_as_correct': True,
+                    'missing_prerequisite_skill_id': None
+                },
+                'hints': [{
+                    'hint_content': {
+                        'content_id': 'hint_1',
+                        'html': 'Hint 1'
+                    }
+                }],
+                'solution': {
+                    'answer_is_exclusive': False,
+                    'correct_answer': 0,
+                    'explanation': {
+                        'content_id': 'solution',
+                        'html': '<p>This is a solution.</p>'
+                    }
+                },
+                'id': 'MultipleChoiceInput'
+            },
+            'param_changes': [],
+            'solicit_answer_details': False,
+            'classifier_model_id': None
+        }
+
+        suggestion_dict = {
+            'suggestion_id': 'skill1.thread1',
+            'suggestion_type': suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
+            'target_type': suggestion_models.TARGET_TYPE_SKILL,
+            'target_id': 'skill1',
+            'target_version_at_submission': 1,
+            'status': suggestion_models.STATUS_ACCEPTED,
+            'author_name': 'author',
+            'final_reviewer_id': self.reviewer_id,
+            'change': {
+                'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
+                'question_dict': {
+                    'question_state_data': question_state_dict,
+                    'language_code': 'en',
+                    'question_state_data_schema_version': (
+                        feconf.CURRENT_STATE_SCHEMA_VERSION),
+                    'linked_skill_ids': ['skill_1']
+                },
+                'skill_id': 'skill_1',
+                'skill_difficulty': 0.3,
+            },
+            'score_category': 'question.skill1',
+            'last_updated': utils.get_time_in_millisecs(self.fake_date)
+        }
+        suggestion = suggestion_registry.SuggestionAddQuestion(
+            suggestion_dict['suggestion_id'], suggestion_dict['target_id'],
+            suggestion_dict['target_version_at_submission'],
+            suggestion_dict['status'], self.author_id, self.reviewer_id,
+            suggestion_dict['change'], suggestion_dict['score_category'],
+            self.fake_date)
+        converted_change_dict = (
+            suggestion.convert_html_in_suggestion_change_dict(
+                suggestion_dict['change'], html_validation_service.
+                add_math_content_to_math_rte_components).to_dict())
+        converted_html = (
+            converted_change_dict['question_dict']['question_state_data'][
+                'content']['html'])
+        self.assertEqual(converted_html, expected_html_content)
+
 
 
 class MockInvalidVoiceoverApplication(

@@ -171,21 +171,32 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                         ]}
                     }, {
                         'rule_type': 'Equals',
-                        'inputs': {'x': 1}
+                        'inputs': {
+                            'x': 1
+                        }
                     }, {
                         'rule_type': 'HasElementXAtPositionY',
-                        'inputs': {'x': html_content,
-                                   'y': 2}
+                        'inputs': {
+                            'x': html_content,
+                            'y': 2
+                        }
                     }, {
                         'rule_type': 'IsEqualToOrdering',
-                        'inputs': {'x': [[html_content]]}
+                        'inputs': {
+                            'x': [[html_content]]
+                        }
                     }, {
                         'rule_type': 'HasElementXBeforeElementY',
-                        'inputs': {'x': html_content,
-                                   'y': html_content}
+                        'inputs': {
+                            'x': html_content,
+                            'y': html_content
+                        }
                     }, {
-                        'rule_type': 'IsEqualToOrderingWithOneItemAtIncorrectPosition',  # pylint: disable=protected-access,line-too-long
-                        'inputs': {'x': [[html_content]]}
+                        'rule_type': (
+                            'IsEqualToOrderingWithOneItemAtIncorrectPosition'),
+                        'inputs': {
+                            'x': [[html_content]]
+                        }
                     }],
                     'outcome': {
                         'dest': 'Introduction',

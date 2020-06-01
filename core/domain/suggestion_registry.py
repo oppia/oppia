@@ -411,11 +411,12 @@ class SuggestionEditStateContent(BaseSuggestion):
         according to the conversion function.
 
         Args:
+            change_dict: dict. The change dict to be converted
             conversion_fn: function. The function to be used for converting the
                 HTML.
-            change_dict: dict. The change dict to be converted
+
         Returns:
-            dict. The converted Suggestion change dict.
+            ExplorationChange. The converted Suggestion change.
         """
         if (change_dict.has_key('old_value') and
                 change_dict['old_value'] is not None):
@@ -531,7 +532,7 @@ class SuggestionTranslateContent(BaseSuggestion):
                 HTML.
             change_dict: dict. The change dict to be converted
         Returns:
-            dict. The converted Suggestion change dict.
+            ExplorationChange. The converted Suggestion change.
         """
         change_dict['content_html'] = (
             conversion_fn(change_dict['content_html']))
@@ -750,7 +751,7 @@ class SuggestionAddQuestion(BaseSuggestion):
                 HTML.
 
         Returns:
-            dict. The converted Suggestion change dict.
+            QuestionSuggestionChange. The converted Suggestion change.
         """
         change_dict['question_dict']['question_state_data'] = (
             state_domain.State.convert_html_fields_in_state(
