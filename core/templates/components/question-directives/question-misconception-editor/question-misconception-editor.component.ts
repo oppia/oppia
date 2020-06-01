@@ -25,6 +25,9 @@ require(
 require(
   'components/question-directives/question-misconception-selector/' +
   'question-misconception-selector.component.ts');
+require(
+  'components/question-directives/question-misconception-editor/' +
+  'tag-misconception-modal.controller.ts');
 
 angular.module('oppia').component('questionMisconceptionEditor', {
   bindings: {
@@ -80,38 +83,18 @@ angular.module('oppia').component('questionMisconceptionEditor', {
       ctrl.tagAnswerGroupWithMisconception = function() {
         var taggedSkillMisconceptionId = (
           ctrl.getTaggedSkillMisconceptionId());
-        var modalInstance = $uibModal.open({
+        $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/topic-editor-page/modal-templates/' +
             'tag-misconception-modal.template.html'),
           backdrop: true,
-          controller: [
-            '$scope', '$uibModalInstance', 'StateEditorService',
-            function($scope, $uibModalInstance, StateEditorService) {
-              $scope.misconceptionsBySkill = (
-                StateEditorService.getMisconceptionsBySkill());
-              $scope.tempSelectedMisconception = null;
-              $scope.tempSelectedMisconceptionSkillId = null;
-              $scope.tempMisconceptionFeedbackIsUsed = true;
-              $scope.taggedSkillMisconceptionId = (
-                taggedSkillMisconceptionId);
-
-              $scope.done = function() {
-                $uibModalInstance.close({
-                  misconception: $scope.tempSelectedMisconception,
-                  misconceptionSkillId: $scope.tempSelectedMisconceptionSkillId,
-                  feedbackIsUsed: $scope.tempMisconceptionFeedbackIsUsed
-                });
-              };
-
-              $scope.cancel = function() {
-                $uibModalInstance.dismiss('cancel');
-              };
+          controller: 'TagMisconceptionModalController',
+          resolve: {
+            taggedSkillMisconceptionId: function() {
+              return taggedSkillMisconceptionId;
             }
-          ]
-        });
-
-        modalInstance.result.then(function(returnObject) {
+          }
+        }).result.then(function(returnObject) {
           var misconception = returnObject.misconception;
           var misconceptionSkillId = returnObject.misconceptionSkillId;
           var feedbackIsUsed = returnObject.feedbackIsUsed;

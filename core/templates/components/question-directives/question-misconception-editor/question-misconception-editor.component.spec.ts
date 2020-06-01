@@ -21,7 +21,7 @@
 /* eslint-disable max-len */
 import { MisconceptionObjectFactory } from
   'domain/skill/MisconceptionObjectFactory';
-import { OutcomeObjectFactory } from
+import { OutcomeObjectFactory, Outcome } from
   'domain/exploration/OutcomeObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 import { SolutionValidityService } from
@@ -159,5 +159,20 @@ describe('Question misconception editor component', function() {
     expect(ctrl.selectedMisconceptionSkillId).toEqual('abc');
     expect(ctrl.feedbackIsUsed).toBeFalse();
     expect(ctrl.misconceptionEditorIsOpen).toBeFalse();
+  });
+
+  it('should update tagged misconception name correctly', function() {
+    ctrl.outcome.feedback = {
+      setHtml: () => null
+    };
+    ctrl.editMisconception();
+    expect(ctrl.misconceptionEditorIsOpen).toBeTrue();
+    expect(ctrl.misconceptionName).toBeNull();
+    ctrl.feedbackIsUsed = true;
+    ctrl.selectedMisconception = mockMisconceptionObject.abc[0];
+    ctrl.selectedMisconceptionSkillId = 'abc';
+    ctrl.updateMisconception();
+    expect(ctrl.misconceptionEditorIsOpen).toBeFalse();
+    expect(ctrl.misconceptionName).toEqual('misc1');
   });
 });
