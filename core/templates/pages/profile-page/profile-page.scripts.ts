@@ -22,5 +22,5 @@ require('pages/profile-page/profile-page.module.ts');
 require('App.ts');
 
 require('pages/OppiaFooterDirective.ts');
-require('pages/profile-page/profile-page.controller.ts');
+require('pages/profile-page/profile-page.component.ts');
 require('pages/profile-page/profile-page-navbar.directive.ts');

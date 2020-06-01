@@ -68,6 +68,11 @@ var ExplorationEditorPage = function() {
     .first();
 
   /*
+   * Non-Interactive elements
+   */
+  var loadingModal = element(by.css('.protractor-test-loading-modal'));
+
+  /*
    * Buttons
    */
   var confirmDiscardChangesButton = element(
@@ -98,11 +103,11 @@ var ExplorationEditorPage = function() {
    */
   // CONTROLS
 
-  this.publishCardExploration = function(
+  this.publishCardExploration = async function(
       title, objective, category, language, tags) {
-    waitFor.elementToBeClickable(publishExplorationButton,
+    await waitFor.elementToBeClickable(publishExplorationButton,
       'Publish button taking too long to be clickable.');
-    publishExplorationButton.click();
+    await publishExplorationButton.click();
 
     var expTitle = element(by.css(
       '.protractor-test-exploration-title-input'));
@@ -111,50 +116,57 @@ var ExplorationEditorPage = function() {
     var expTags = element(by.css('.protractor-test-tags'));
     var expInput = expTags.element(by.tagName('input'));
 
-    waitFor.elementToBeClickable(expTitle,
+    await waitFor.elementToBeClickable(expTitle,
       'Exploration Title input is taking too long to appear');
+    await waitFor.elementToBeClickable(
+      element(by.css(
+        '.protractor-test-exploration-title-input'))
+    );
 
-    expTitle.sendKeys(title);
-    expObjective.sendKeys(objective);
+    await expTitle.sendKeys(title);
+    await expObjective.sendKeys(objective);
 
-    element(by.css('.select2-container')).click();
-    element(by.css('.select2-dropdown')).element(
+    await element(by.css('.select2-container')).click();
+    await element(by.css('.select2-dropdown')).element(
       by.css('.select2-search input')).sendKeys(category + '\n');
 
-    element(by.css('.protractor-test-exploration-language-select')).click();
-    element(by.css('.protractor-test-exploration-language-select'))
+    await element(by.css('.protractor-test-exploration-language-select'))
+      .click();
+    await element(by.css('.protractor-test-exploration-language-select'))
       .sendKeys(language + '\n');
 
 
-    expTags.click();
-    expInput.click();
+    await expTags.click();
+    await expInput.click();
 
-    tags.forEach(function(element) {
-      expInput.sendKeys(element, protractor.Key.ENTER);
-    });
+    for (var elem of tags) {
+      await expInput.sendKeys(elem, protractor.Key.ENTER);
+    }
 
     const saveChangesButton = element(by.css(
       '.protractor-test-confirm-pre-publication'));
-    waitFor.elementToBeClickable(saveChangesButton,
+    await waitFor.elementToBeClickable(saveChangesButton,
       'Save changes button taking too long to be clickable');
-    saveChangesButton.click();
+    await saveChangesButton.click();
 
-    waitFor.visibilityOf(element(by.css('.modal-content')),
+    await waitFor.visibilityOf(element(by.css('.modal-content')),
       'Modal Content taking too long to appear');
 
     const confirmPublish = element(by.css('.protractor-test-confirm-publish'));
-    waitFor.elementToBeClickable(confirmPublish,
+    await waitFor.elementToBeClickable(confirmPublish,
       'Confirm publish button taking too long to appear');
-    confirmPublish.click();
+    await confirmPublish.click();
 
-    waitFor.visibilityOf(element(by.css(
+    await waitFor.visibilityOf(element(by.css(
       '.protractor-test-share-publish-modal')),
     'Awesome modal taking too long to appear');
 
     const closeButton = element(by.css('.protractor-test-share-publish-close'));
-    waitFor.elementToBeClickable(closeButton,
+    await waitFor.elementToBeClickable(closeButton,
       'Close button taking too long to be clickable');
-    closeButton.click();
+    await closeButton.click();
+    await waitFor.invisibilityOf(closeButton,
+      'Close button taking too long to disappear');
   };
 
   this.verifyExplorationSettingFields = async function(
@@ -164,105 +176,107 @@ var ExplorationEditorPage = function() {
     const explorationObjective = element(by.css(
       '.protractor-test-exploration-objective-input'
     ));
-    const explorationCategory = element(by.css(
+    const explorationCategory = await element(by.css(
       '.select2-selection__rendered')).getText();
-    const explorationLanguage = element(by.css(
+    const explorationLanguage = await element(by.css(
       '.protractor-test-exploration-language-select'
     )).$('option:checked').getText();
     const explorationTags = element.all(by.css(
       '.select2-selection__choice'
     ));
-    waitFor.visibilityOf(explorationTitle,
+    await waitFor.visibilityOf(explorationTitle,
       'Exploration Goal taking too long to appear');
-    expect(explorationTitle.getAttribute('value')).toMatch(title);
+    expect(await explorationTitle.getAttribute('value')).toMatch(title);
     expect(explorationCategory).toMatch(category);
-    expect(explorationObjective.getAttribute('value')).toMatch(objective);
+    expect(await explorationObjective.getAttribute('value')).toMatch(objective);
     expect(explorationLanguage).toMatch(language);
-    explorationTags.then(function(elems) {
-      elems.forEach(function(explorationTag, index) {
-        expect(explorationTag.getText()).toMatch(tags[index]);
-      });
-    });
+    for (var i = 0; i < await explorationTags.count(); i++) {
+      expect(
+        await (await explorationTags.get(i)).getText()
+      ).toMatch(tags[i]);
+    }
   };
 
-  this.saveChanges = function(commitMessage) {
+  this.saveChanges = async function(commitMessage) {
     var toastSuccessElement = element(by.css('.toast-success'));
-    expect(saveChangesButton.isDisplayed()).toBe(true);
-    saveChangesButton.click().then(function() {
-      if (commitMessage) {
-        commitMessageInput.sendKeys(commitMessage);
-      }
-      waitFor.elementToBeClickable(
-        saveDraftButton, 'Save Draft button is not clickable');
-      saveDraftButton.click();
+    expect(await saveChangesButton.isDisplayed()).toBe(true);
+    await saveChangesButton.click();
+    if (commitMessage) {
+      await commitMessageInput.sendKeys(commitMessage);
+    }
+    await waitFor.elementToBeClickable(
+      saveDraftButton, 'Save Draft button is not clickable');
+    await saveDraftButton.click();
 
-      // This is necessary to give the page time to record the changes,
-      // so that it does not attempt to stop the user leaving.
-      waitFor.invisibilityOf(
-        toastSuccessElement,
-        'Toast message taking too long to disappear after saving changes');
-      expect(toastSuccessElement.isPresent()).toBe(false);
-    });
+    // This is necessary to give the page time to record the changes,
+    // so that it does not attempt to stop the user leaving.
+    await waitFor.invisibilityOf(
+      toastSuccessElement,
+      'Toast message taking too long to disappear after saving changes');
+    expect(await toastSuccessElement.isPresent()).toBe(false);
   };
 
-  this.discardChanges = function() {
-    saveDiscardToggleButton.click();
-    discardChangesButton.click();
-    confirmDiscardChangesButton.click();
+  this.discardChanges = async function() {
+    await saveDiscardToggleButton.click();
+    await discardChangesButton.click();
+    await confirmDiscardChangesButton.click();
+    await waitFor.invisibilityOf(loadingModal,
+      'Loading modal taking too long to disappear');
     // Expect editor page to completely reload.
-    waitFor.pageToFullyLoad();
+    await waitFor.pageToFullyLoad();
   };
 
-  this.expectCannotSaveChanges = function() {
-    expect(saveChangesButton.isPresent()).toBeFalsy();
+  this.expectCannotSaveChanges = async function() {
+    expect(await saveChangesButton.isPresent()).toBeFalsy();
   };
 
   // NAVIGATION
 
-  this.navigateToHistoryTab = function() {
-    waitFor.elementToBeClickable(
+  this.navigateToHistoryTab = async function() {
+    await waitFor.elementToBeClickable(
       navigateToHistoryTabButton, 'History tab is not clickable');
-    navigateToHistoryTabButton.click();
-    waitFor.pageToFullyLoad();
+    await navigateToHistoryTabButton.click();
+    await waitFor.pageToFullyLoad();
   };
 
-  this.navigateToFeedbackTab = function() {
-    waitFor.elementToBeClickable(
+  this.navigateToFeedbackTab = async function() {
+    await waitFor.elementToBeClickable(
       navigateToFeedbackTabButton, 'Feedback tab is not clickable');
-    navigateToFeedbackTabButton.click();
-    waitFor.pageToFullyLoad();
+    await navigateToFeedbackTabButton.click();
+    await waitFor.pageToFullyLoad();
   };
 
-  this.navigateToMainTab = function() {
-    waitFor.elementToBeClickable(
+  this.navigateToMainTab = async function() {
+    await waitFor.elementToBeClickable(
       navigateToMainTabButton, 'Main tab is not clickable');
-    navigateToMainTabButton.click();
-    neutralElement.click();
+    await navigateToMainTabButton.click();
+    await neutralElement.click();
   };
 
-  this.navigateToPreviewTab = function() {
-    waitFor.elementToBeClickable(
+  this.navigateToPreviewTab = async function() {
+    await waitFor.elementToBeClickable(
       navigateToPreviewTabButton, 'Preview tab is not clickable');
-    navigateToPreviewTabButton.click();
-    waitFor.pageToFullyLoad();
+    await navigateToPreviewTabButton.click();
+    await waitFor.pageToFullyLoad();
   };
 
-  this.navigateToSettingsTab = function() {
-    waitFor.elementToBeClickable(
+  this.navigateToSettingsTab = async function() {
+    await waitFor.elementToBeClickable(
       navigateToSettingsTabButton, 'Settings tab is not clickable');
-    navigateToSettingsTabButton.click();
+    await navigateToSettingsTabButton.click();
+    await waitFor.pageToFullyLoad();
   };
 
-  this.navigateToStatsTab = function() {
-    waitFor.elementToBeClickable(
+  this.navigateToStatsTab = async function() {
+    await waitFor.elementToBeClickable(
       navigateToStatsTabButton, 'Stats tab is not clickable');
-    navigateToStatsTabButton.click();
+    await navigateToStatsTabButton.click();
   };
-  this.navigateToTranslationTab = function() {
-    waitFor.elementToBeClickable(
+  this.navigateToTranslationTab = async function() {
+    await waitFor.elementToBeClickable(
       navigateToTranslationTabButton, 'Translation tab is not clickable');
-    navigateToTranslationTabButton.click();
-    waitFor.pageToFullyLoad();
+    await navigateToTranslationTabButton.click();
+    await waitFor.pageToFullyLoad();
   };
 };
 
