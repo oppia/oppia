@@ -49,7 +49,8 @@ describe('Test Translations', function() {
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
     libraryPage = new LibraryPage.LibraryPage();
 
-    await users.createUser('testTranslations@translations.com', 'testTranslations');
+    await users.createUser('testTranslations@translations.com', 
+      'testTranslations');
     await users.login('testTranslations@translations.com');
     await workflow.createExploration();
     await explorationEditorMainTab.exitTutorial();
@@ -85,9 +86,9 @@ describe('Test Translations', function() {
     await explorationPlayerPage.pauseAudio();
     await explorationPlayerPage.expectAudioToBePaused();
   });
-      
+
   it('should play translations for multiple languages', async function() {
-    await browser.get("/");
+    await browser.get('/');
     await creatorDashboardPage.get();
     await creatorDashboardPage.editExploration('Test Translations');
     await explorationEditorPage.navigateToTranslationTab();
