@@ -49,7 +49,7 @@ describe('Test Translations', function() {
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
     libraryPage = new LibraryPage.LibraryPage();
 
-    await users.createUser('testTranslations@translations.com', 
+    await users.createUser('testTranslations@translations.com',
       'testTranslations');
     await users.login('testTranslations@translations.com');
     await workflow.createExploration();
