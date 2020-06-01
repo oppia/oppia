@@ -161,6 +161,28 @@ describe('Question misconception editor component', function() {
     expect(ctrl.misconceptionEditorIsOpen).toBeFalse();
   });
 
+  it('should not tag a misconception if the modal was dismissed', function() {
+    spyOn($uibModal, 'open').and.returnValue({
+      result: $q.reject()
+    });
+    expect(ctrl.misconceptionName).toBeNull();
+    expect(ctrl.selectedMisconception).toBeNull();
+    expect(ctrl.selectedMisconceptionSkillId).toBeNull();
+    expect(ctrl.feedbackIsUsed).toBeTrue();
+    ctrl.getTaggedSkillMisconceptionId = () => 'abc-1';
+    ctrl.$onInit();
+    expect(ctrl.misconceptionName).toEqual('misc1');
+    expect(ctrl.selectedMisconception).toEqual(mockMisconceptionObject.abc[0]);
+    expect(ctrl.selectedMisconceptionSkillId).toEqual('abc');
+    expect(ctrl.feedbackIsUsed).toBeTrue();
+    ctrl.tagAnswerGroupWithMisconception();
+    $rootScope.$digest();
+    expect(ctrl.misconceptionName).toEqual('misc1');
+    expect(ctrl.selectedMisconception).toEqual(mockMisconceptionObject.abc[0]);
+    expect(ctrl.selectedMisconceptionSkillId).toEqual('abc');
+    expect(ctrl.feedbackIsUsed).toBeTrue();
+  });
+
   it('should update tagged misconception name correctly', function() {
     ctrl.outcome.feedback = {
       setHtml: () => null

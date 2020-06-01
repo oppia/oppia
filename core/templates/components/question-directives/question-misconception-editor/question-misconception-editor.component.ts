@@ -90,9 +90,7 @@ angular.module('oppia').component('questionMisconceptionEditor', {
           backdrop: true,
           controller: 'TagMisconceptionModalController',
           resolve: {
-            taggedSkillMisconceptionId: function() {
-              return taggedSkillMisconceptionId;
-            }
+            taggedSkillMisconceptionId: taggedSkillMisconceptionId
           }
         }).result.then(function(returnObject) {
           var misconception = returnObject.misconception;
