@@ -45,7 +45,7 @@ export class ReadOnlySubtopicPageData {
       parentTopicId: string,
       subtopicTitle: string,
       pageContents: SubtopicPageContents,
-      nextSubtopic: Subtopic| null
+      nextSubtopic: Subtopic | null
   ) {
     this.parentTopicId = parentTopicId;
     this.subtopicTitle = subtopicTitle;
