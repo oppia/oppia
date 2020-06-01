@@ -8,26 +8,26 @@
             <[$ctrl.getStoryCount()]>
           </div>
         </md-card>
-        Stories
+        <span translate="I18N_TOPIC_VIEWER_STORIES"></span>
 
         <md-card class="info-tab-count" style="margin-top: 20%;">
           <div style="padding-top: 12%;">
             <[$ctrl.getChapterCount()]>
           </div>
         </md-card>
-        Lessons
+        <span translate="I18N_TOPIC_VIEWER_LESSONS"></span>
 
         <md-card class="info-tab-count" style="margin-top: 20%;">
           <div style="padding-top: 12%;">
             <[$ctrl.getSubtopicCount()]>
           </div>
         </md-card>
-        Skills
+        <span translate="I18N_TOPIC_VIEWER_SKILLS"></span>
       </div>
       <div class="info-tab-right-container">
         <strong class="header" translate="I18N_TOPIC_VIEWER_DESCRIPTION"></strong>
         <[$ctrl.getTopicDescription()]>
-        <md-content ng-if="$ctrl.isMobile" layout="row" style="margin-top: 2.5vh;">
+        <div class="stats-in-mobile" ng-if="$ctrl.isMobile">
           <md-card class="info-tab-count">
             <md-card-content>
               <[$ctrl.getStoryCount()]>
@@ -43,17 +43,15 @@
               <[$ctrl.getSubtopicCount()]>
             </md-card-content>
           </md-card>
-        </md-content>
-        <div ng-if="$ctrl.isMobile" layout="row">
-          <span class="cell-1">
-              Stories
-          </span>
-          <span class="cell-2">
-              Lessons
-          </span>
-          <span class="cell-3">
-              Skills
-          </span>
+          <div class="cell-title">
+            <span translate="I18N_TOPIC_VIEWER_STORIES"></span>
+          </div>
+          <div class="cell-title">
+            <span translate="I18N_TOPIC_VIEWER_LESSONS"></span>
+          </div>
+          <div class="cell-title">
+            <span translate="I18N_TOPIC_VIEWER_SKILLS"></span>
+          </div>
         </div>
       </div>
     </div>
@@ -69,6 +67,7 @@
     font-size: 1.4em;
     height: 52px;
     margin-left: 25%;
+    text-align: center;
     width: 50%;
   }
 
@@ -102,27 +101,27 @@
   }
 
   @media (max-width: 1024px) {
-    topic-info-tab .cell-1 {
-      margin-left: 15%;
+    topic-info-tab .stats-in-mobile {
+      border-top: 1px solid #b4b4b4;
+      display: grid;
+      grid-template-columns: 80px 80px 80px;
+      justify-content: space-between;
+      margin-top: 3vh;
+      padding-left: 10vw;
+      padding-right: 10vw;
+      padding-top: 3vh;
     }
 
-    topic-info-tab .cell-2 {
-      margin-left: 21.5%;
-    }
-
-    topic-info-tab .cell-3 {
-      margin-left: 22%;
-    }
-
-    topic-info-tab md-card-content {
-      margin-left: 30%;
+    topic-info-tab .cell-title {
+      text-align: center;
+      width: 100%;
     }
 
     topic-info-tab .info-tab-count {
       display: inline;
       height: auto;
-      margin-left: 10%;
-      width: 20%;
+      margin-left: 0;
+      width: 100%;
     }
 
     topic-info-tab .info-tab-right-container {
@@ -133,25 +132,9 @@
   }
 
   @media (max-width: 500px) {
-    topic-info-tab .cell-1 {
-      margin-left: 7%;
-    }
-
-    topic-info-tab .cell-2 {
-      margin-left: 14%;
-    }
-
-    topic-info-tab .cell-3 {
-      margin-left: 15%;
-    }
-
-    topic-info-tab .info-tab-count {
-      margin-left: 5%;
-      width: 25%;
-    }
-
-    topic-info-tab md-card-content {
-      margin-left: 15%;
+    topic-info-tab .stats-in-mobile {
+      grid-template-columns: 22vw 22vw 22vw;
+      padding: 3vh 0 0 0;
     }
   }
 </style>
