@@ -4,24 +4,13 @@
   </h3>
 </div>
 <div class="modal-body new-subtopic-title-editor">
-  <question-misconception-selector></question-misconception-selector>
+  <question-misconception-selector misconception-feedback-is-used="tempMisconceptionFeedbackIsUsed"
+                                   selected-misconception="tempSelectedMisconception"
+                                   selected-misconception-skill-id="tempSelectedMisconceptionSkillId"
+                                   tagged-skill-misconception-id="taggedSkillMisconceptionId">
+  </question-misconception-selector>
 </div>
 <div class="modal-footer">
   <button class="btn btn-secondary" ng-click="cancel()"> Cancel </button>
-  <button class="btn btn-success" ng-disabled="selectedMisconception === null" ng-click="done()"> Done </button>
+  <button class="btn btn-success" ng-disabled="tempSelectedMisconception === null" ng-click="done()"> Done </button>
 </div>
-
-<style>
-  .misconception-button {
-    text-align: left;
-  }
-  .misconception-feedback-container > p {
-    display: inline;
-  }
-  .misconception-feedback-usage-checkbox {
-    cursor: pointer;
-  }
-  .misconception-label {
-    margin-top: 2vh;
-  }
-</style>

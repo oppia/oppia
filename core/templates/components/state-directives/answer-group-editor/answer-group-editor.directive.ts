@@ -21,7 +21,7 @@ require(
 require('components/state-directives/rule-editor/rule-editor.directive.ts');
 require(
   'components/question-directives/question-misconception-editor/' +
-  'question-misconception-editor.directive.ts');
+  'question-misconception-editor.component.ts');
 require('directives/angular-html-bind.directive.ts');
 require('filters/parameterize-rule-description.filter.ts');
 
