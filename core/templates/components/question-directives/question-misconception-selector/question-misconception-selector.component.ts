@@ -27,7 +27,6 @@ angular.module('oppia').component('questionMisconceptionSelector', {
     misconceptionFeedbackIsUsed: '=',
     selectedMisconception: '=',
     selectedMisconceptionSkillId: '=',
-    getTaggedSkillMisconceptionId: '&taggedSkillMisconceptionId'
   },
   template: require(
     './question-misconception-selector.component.html'),

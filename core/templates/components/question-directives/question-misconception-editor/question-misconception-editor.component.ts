@@ -28,10 +28,10 @@ require(
 
 angular.module('oppia').component('questionMisconceptionEditor', {
   bindings: {
+    getOnSaveAnswerGroupFeedbackFn: '&onSaveAnswerGroupFeedback',
+    getOnSaveTaggedMisconception: '&onSaveTaggedMisconception',
     getTaggedSkillMisconceptionId: '&taggedSkillMisconceptionId',
     isEditable: '=',
-    getOnSaveTaggedMisconception: '&onSaveTaggedMisconception',
-    getOnSaveAnswerGroupFeedbackFn: '&onSaveAnswerGroupFeedback',
     outcome: '=',
     rules: '=',
   },
@@ -151,6 +151,7 @@ angular.module('oppia').component('questionMisconceptionEditor', {
         ctrl.selectedMisconceptionSkillId = null;
         ctrl.misconceptionsBySkill = (
           StateEditorService.getMisconceptionsBySkill());
+        ctrl.misconceptionEditorIsOpen = null;
         _getTaggedMisconceptionName(ctrl.getTaggedSkillMisconceptionId());
         ctrl.feedbackIsUsed = true;
       };
