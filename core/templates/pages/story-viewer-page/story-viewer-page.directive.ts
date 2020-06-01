@@ -44,11 +44,11 @@ angular.module('oppia').directive('storyViewerPage', [
         '/pages/story-viewer-page/story-viewer-page.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$anchorScroll', '$location', '$rootScope', '$window', 'AlertsService',
+        '$rootScope', '$window', 'AlertsService',
         'PageTitleService', 'LoaderService', 'StoryPlaythroughObjectFactory',
         'StoryViewerBackendApiService', 'UrlService', 'FATAL_ERROR_CODES',
         function(
-            $anchorScroll, $location, $rootScope, $window, AlertsService,
+            $rootScope, $window, AlertsService,
             PageTitleService, LoaderService, StoryPlaythroughObjectFactory,
             StoryViewerBackendApiService, UrlService, FATAL_ERROR_CODES) {
           var ctrl = this;
@@ -129,11 +129,6 @@ angular.module('oppia').directive('storyViewerPage', [
             return result;
           };
 
-          ctrl.scrollToLocation = function(id) {
-            $location.hash(id);
-            $anchorScroll();
-          };
-
           ctrl.$onInit = function() {
             ctrl.storyIsLoaded = false;
             LoaderService.showLoadingScreen('Loading');
@@ -175,9 +170,6 @@ angular.module('oppia').directive('storyViewerPage', [
             // background color and icon url for the icons generated on the
             // path.
             ctrl.pathIconParameters = [];
-            ctrl.nextExplorationId = null;
-
-            $anchorScroll.yOffset = -80;
           };
         }
       ]
