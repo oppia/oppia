@@ -87,7 +87,7 @@ describe('Tag misconception modal controller', function() {
       misconception: mockMisconceptionObject.abc[0],
       misconceptionSkillId: 'abc',
       feedbackIsUsed: true
-    })
+    });
   });
 
   it('should dismiss modal correctly', function() {
