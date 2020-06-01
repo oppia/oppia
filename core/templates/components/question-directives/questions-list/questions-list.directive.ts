@@ -601,6 +601,7 @@ angular.module('oppia').directive('questionsList', [
                                   sortedSkillSummaries[idx]);
                               }
                             }
+                            $scope.confirm($scope.selectedSkillId);
                           };
                         }
                       ]

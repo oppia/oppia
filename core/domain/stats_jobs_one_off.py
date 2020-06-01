@@ -1378,9 +1378,11 @@ class RegenerateMissingV2StatsModelsOneOffJob(
 class ExplorationMissingStatsAudit(jobs.BaseMapReduceOneOffJobManager):
     """A one-off job for finding explorations that are missing stats models."""
 
-    STATS_DELETED_KEY = 'deleted'
-    STATS_MISSING_KEY = 'missing'
-    STATS_PRESENT_KEY = 'present'
+    STATUS_DELETED_KEY = 'deleted'
+    STATUS_MISSING_KEY = 'missing'
+    STATUS_VALID_KEY = 'valid'
+    STATUS_STATE_MISSING_KEY = 'missing state'
+    STATUS_STATE_UNKNOWN_KEY = 'unknown state'
 
     JOB_RESULT_EXPECTED = 'EXPECTED'
     JOB_RESULT_UNEXPECTED = 'UNEXPECTED'
@@ -1390,53 +1392,112 @@ class ExplorationMissingStatsAudit(jobs.BaseMapReduceOneOffJobManager):
         return [exp_models.ExplorationModel]
 
     @staticmethod
-    def map(exp):
-        if exp.deleted:
+    def map(latest_exp_model):
+        if latest_exp_model.deleted:
             return
 
-        exp_versions = list(python_utils.RANGE(1, exp.version + 1))
-        exp_stats_model_ids = (
-            stats_models.ExplorationStatsModel.get_entity_id(exp.id, version)
-            for version in exp_versions)
-        exp_stats_models = stats_models.ExplorationStatsModel.get_multi(
-            exp_stats_model_ids, include_deleted=True)
+        exp_id = latest_exp_model.id
+        exp_versions_with_states = collections.defaultdict(set)
 
-        for exp_stats_model, exp_version in python_utils.ZIP(
-                exp_stats_models, exp_versions):
+        for version in python_utils.RANGE(1, latest_exp_model.version + 1):
+            exp_model = (
+                latest_exp_model if version == latest_exp_model.version else
+                exp_models.ExplorationModel.get_version(
+                    exp_id, version, strict=False))
+            exp_stats_model = stats_models.ExplorationStatsModel.get_by_id(
+                stats_models.ExplorationStatsModel.get_entity_id(
+                    exp_id, version))
+
+            for state_name in exp_model.states:
+                exp_versions_with_states[state_name].add(version)
+
             if exp_stats_model is None:
-                yield (
-                    ExplorationMissingStatsAudit.STATS_MISSING_KEY,
-                    (exp.id, exp_version))
+                key = '%s:%s' % (
+                    exp_id, ExplorationMissingStatsAudit.STATUS_MISSING_KEY)
+                yield (key.encode('utf-8'), exp_model.version)
+
             elif exp_stats_model.deleted:
-                yield (
-                    ExplorationMissingStatsAudit.STATS_DELETED_KEY,
-                    (exp.id, exp_version))
+                key = '%s:%s' % (
+                    exp_id, ExplorationMissingStatsAudit.STATUS_DELETED_KEY)
+                yield (key.encode('utf-8'), exp_model.version)
+
             else:
-                yield (
-                    ExplorationMissingStatsAudit.STATS_PRESENT_KEY,
-                    (exp.id, exp_version))
+                exp_states = set(exp_model.states)
+                exp_stats_states = set(exp_stats_model.state_stats_mapping)
+
+                for state_name in exp_states - exp_stats_states:
+                    key = '%s:%s:%s' % (
+                        exp_id,
+                        state_name,
+                        ExplorationMissingStatsAudit.STATUS_STATE_MISSING_KEY)
+                    state_version_occurrences = tuple(
+                        python_utils.UNICODE(v) for v in sorted(
+                            exp_versions_with_states[state_name]))
+                    yield (
+                        key.encode('utf-8'),
+                        (exp_model.version, state_version_occurrences))
+
+                for state_name in exp_stats_states - exp_states:
+                    key = '%s:%s:%s' % (
+                        exp_id,
+                        state_name,
+                        ExplorationMissingStatsAudit.STATUS_STATE_UNKNOWN_KEY)
+                    state_version_occurrences = tuple(
+                        python_utils.UNICODE(v) for v in sorted(
+                            exp_versions_with_states[state_name]))
+                    yield (
+                        key.encode('utf-8'),
+                        (exp_model.version, state_version_occurrences))
+
+                if exp_states == exp_stats_states:
+                    key = ExplorationMissingStatsAudit.STATUS_VALID_KEY
+                    yield (key, exp_model.version)
 
     @staticmethod
-    def reduce(stats_model_status, exp_id_version_pair_strs):
-        if stats_model_status == ExplorationMissingStatsAudit.STATS_PRESENT_KEY:
+    def reduce(encoded_key, str_escaped_values):
+        key = encoded_key.decode('utf-8')
+
+        if ExplorationMissingStatsAudit.STATUS_VALID_KEY in key:
             yield (
                 ExplorationMissingStatsAudit.JOB_RESULT_EXPECTED,
-                '%d ExplorationStats %s present' % (
-                    len(exp_id_version_pair_strs),
-                    'models' if len(exp_id_version_pair_strs) > 1 else 'model'))
-            return
+                '%d ExplorationStats model%s valid' % (
+                    len(str_escaped_values),
+                    ' is' if len(str_escaped_values) == 1 else 's are'))
 
-        exp_versions_without_stats_models = collections.defaultdict(list)
-        for exp_id, exp_version in (
-                ast.literal_eval(s) for s in exp_id_version_pair_strs):
-            exp_versions_without_stats_models[exp_id].append(exp_version)
+        elif ExplorationMissingStatsAudit.STATUS_STATE_MISSING_KEY in key:
+            exp_id, state_name, _ = key.split(':')
+            for exp_version, state_version_occurrences in (
+                    ast.literal_eval(s) for s in str_escaped_values):
+                error_str = 'but card appears in version%s: %s' % (
+                    '' if len(state_version_occurrences) == 1 else 's',
+                    ', '.join(state_version_occurrences))
+                yield (
+                    ExplorationMissingStatsAudit.JOB_RESULT_UNEXPECTED,
+                    'ExplorationStats "%s" v%s does not have stats for card '
+                    '"%s", %s.' % (exp_id, exp_version, state_name, error_str))
 
-        for exp_id, exp_versions in exp_versions_without_stats_models.items():
-            sorted_version_strs = [
-                python_utils.UNICODE(v) for v in sorted(exp_versions)]
+        elif ExplorationMissingStatsAudit.STATUS_STATE_UNKNOWN_KEY in key:
+            exp_id, state_name, _ = key.split(':')
+            for exp_version, state_version_occurrences in (
+                    ast.literal_eval(s) for s in str_escaped_values):
+                if state_version_occurrences:
+                    error_str = 'but card only appears in version%s: %s' % (
+                        '' if len(state_version_occurrences) == 1 else 's',
+                        ', '.join(state_version_occurrences))
+                else:
+                    error_str = 'but card never existed'
+                yield (
+                    ExplorationMissingStatsAudit.JOB_RESULT_UNEXPECTED,
+                    'ExplorationStats "%s" v%s has stats for card "%s", %s.' % (
+                        exp_id, exp_version, state_name, error_str))
+
+        else:
+            exp_id, status = key.split(':')
+            exp_versions_without_stats_as_strs = sorted(str_escaped_values)
+
             yield (
                 ExplorationMissingStatsAudit.JOB_RESULT_UNEXPECTED,
-                'ExplorationStats for Exploration "%s" %s at %s: %s' % (
-                    exp_id, stats_model_status,
-                    'versions' if len(sorted_version_strs) > 1 else 'version',
-                    ', '.join(sorted_version_strs)))
+                'ExplorationStats for Exploration "%s" %s at version%s: %s' % (
+                    exp_id, status,
+                    '' if len(exp_versions_without_stats_as_strs) == 1 else 's',
+                    ', '.join(exp_versions_without_stats_as_strs)))
