@@ -13,7 +13,7 @@
   </div>
 
   <div ng-if="$ctrl.nextSubtopicSummaryIsShown" class="oppia-subtopic-viewer-next-subtopic-summary">
-    <div>
+    <div style="margin-right: 10%; margin-top: 80px;">
       <p class="oppia-subtopic-next-subtopic-label" translate="I18N_SUBTOPIC_VIEWER_NEXT_SKILL">Next Skill:</p>
       <subtopic-summary-tile subtopic="$ctrl.nextSubtopic"
                              topic-id="$ctrl.parentTopicId"
@@ -24,12 +24,14 @@
 </div>
 <style>
   .oppia-subtopic-viewer-container {
+    padding-left: 20px;
+    padding-right: 20px;
     padding-top: 40px;
     position: relative;
   }
-  .oppia-subtopic-viewer-container-card .oppia-subtopic-title {
-    color: #01645c;
-    font-family: 'Capriola', 'Roboto', Arial, sans-serif;
+  .oppia-subtopic-title {
+    color: #00645C;
+    font-family: Capriola, Roboto, Arial, sans-serif;
     font-size: 3em;
     margin-bottom: 25px;
     margin-left: 50px;
@@ -39,12 +41,12 @@
   }
   .oppia-subtopic-viewer-container-card {
     background-color: #ffffff;
-    border-radius: 8px;
+    border-radius: 4px;
     color: #000000;
-    font-family: 'Roboto', Arial, sans-serif;
+    font-family: Roboto, Arial, sans-serif;
     height: 100%;
     margin: 0 auto;
-    max-width: 975px;
+    max-width: 880px;
     min-height: 500px;
     padding-bottom: 100px;
     padding-top: 30px;
@@ -53,15 +55,16 @@
   }
   .oppia-subtopic-next-subtopic-label {
     color: rgb(51, 51, 51);
-    font-family: 'Capriola', 'Roboto', Arial, sans-serif;
+    font-family: Roboto, Arial, sans-serif;
     font-size: 1.4em;
+    font-weight: 600;
   }
-  .oppia-subtopic-viewer-container .oppia-page-contents-viewer {
+  .oppia-page-contents-viewer {
     background-color: rgb(236, 245, 252);
-    border-radius: 0.5em;
+    border-radius: 4px;
     color: rgb(51, 51, 51);
-    font-family: 'Roboto', Arial, sans-serif;
-    font-size: 1.2em;
+    font-family: Roboto, Arial, sans-serif;
+    font-size: 1.4em;
     margin-left: 50px;
     margin-right: 50px;
     margin-top: 4vh;
@@ -74,8 +77,8 @@
   .oppia-subtopic-viewer-next-subtopic-summary {
     display: flex;
     justify-content: flex-end;
-    margin: 50px auto;
-    max-width: 975px;
+    margin: 0 auto;
+    max-width: 880px;
   }
   .oppia-subtopic-summary-tile {
     background-color: #fff;
@@ -92,9 +95,21 @@
     width: 200px;
     -webkit-transition: all 300ms;
   }
-  @media(max-width: 925px) {
+
+  @media(max-width: 700px) {
     .oppia-subtopic-viewer-container {
-      max-width: 95%;
+      padding-top: 80px;
+    }
+
+    .oppia-subtopic-title {
+      padding-top: 20px;
+    }
+
+    .oppia-page-contents-viewer {
+      padding-bottom: 30px;
+      padding-left: 20px;
+      padding-right: 20px;
+      padding-top: 30px;
     }
   }
 </style>
