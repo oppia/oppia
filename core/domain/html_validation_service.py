@@ -960,8 +960,8 @@ def check_for_math_component_in_html(html_string):
     """
     soup = bs4.BeautifulSoup(
         html_string.encode(encoding='utf-8'), 'html.parser')
-    math_tag = soup.findAll(name='oppia-noninteractive-math')
-    return bool(math_tag)
+    math_tags = soup.findAll(name='oppia-noninteractive-math')
+    return bool(math_tags)
 
 
 def is_parsable_as_xml(xml_string):

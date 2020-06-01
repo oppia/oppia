@@ -592,22 +592,35 @@ class InteractionInstance(python_utils.OBJECT):
             outcome_html = answer_group.outcome.feedback.html
             html_list = html_list + [outcome_html]
 
-        for answer_group in self.answer_groups:
-            for rule_spec in answer_group.rule_specs:
-                field_check_dict_for_rule_spec = (
-                    RuleSpec.get_all_html_fields_in_rule_spec(
-                        rule_spec.to_dict()))
-                if field_check_dict_for_rule_spec['does_input_x_have_html']:
-                    if field_check_dict_for_rule_spec['is_input_list']:
-                        html_list = html_list + rule_spec.inputs['x']
-                    elif field_check_dict_for_rule_spec['is_input_list_of_set']:
+        if self.id == 'ItemSelectionInput':
+            for answer_group in self.answer_groups:
+                for rule_spec in answer_group.rule_specs:
+                    rule_spec_html = rule_spec.inputs['x']
+                    html_list = html_list + rule_spec_html
+        # NOTE TO DEVELOPERS: This logic needs to be kept in sync with
+        # the code in the function convert_html_in_rule_spec() in the
+        # class RuleSpec.
+        # See issue: https://github.com/oppia/oppia/issues/9413. We cannot make
+        # this declarative until issue-9413 has been fixed, because this method
+        # has no reference to the interaction type.
+        if self.id == 'DragAndDropSortInput':
+            for answer_group in self.answer_groups:
+                for rule_spec in answer_group.rule_specs:
+                    if rule_spec.rule_type == 'IsEqualToOrdering':
                         rule_spec_html_list = rule_spec.inputs['x']
                         for rule_spec_html in rule_spec_html_list:
                             html_list = html_list + rule_spec_html
-                    else:
+                    elif (rule_spec.rule_type ==
+                          'IsEqualToOrderingWithOneItemAtIncorrectPosition'):
+                        rule_spec_html_list = rule_spec.inputs['x']
+                        for rule_spec_html in rule_spec_html_list:
+                            html_list = html_list + rule_spec_html
+                    elif rule_spec.rule_type == 'HasElementXAtPositionY':
                         html_list = html_list + [rule_spec.inputs['x']]
-                if field_check_dict_for_rule_spec['does_input_y_have_html']:
-                    html_list = html_list + [rule_spec.inputs['y']]
+                    elif rule_spec.rule_type == 'HasElementXBeforeElementY':
+                        html_list = (
+                            html_list + [rule_spec.inputs['y']] +
+                            [rule_spec.inputs['x']])
 
         if self.default_outcome:
             default_outcome_html = self.default_outcome.feedback.html
@@ -1465,44 +1478,6 @@ class RuleSpec(python_utils.OBJECT):
                 param_obj.normalize(param_value)
 
     @staticmethod
-    def get_all_html_fields_in_rule_spec(rule_spec_dict):
-        """Checks for HTML in a rule_spec dict and returns all the information
-        about fields having HTML in them.
-
-        Args:
-            rule_spec_dict: dict. The dict representation of RuleSpec object.
-
-        Returns:
-            dict. The dict having the information about all the fields which
-            have HTML.
-        """
-        field_check_dict = {
-            'does_input_x_have_html': False,
-            'does_input_y_have_html': False,
-            'is_input_list': False,
-            'is_input_list_of_set': False
-        }
-        if rule_spec_dict['rule_type'] == 'HasElementXAtPositionY':
-            field_check_dict['does_input_x_have_html'] = True
-        elif rule_spec_dict['rule_type'] == 'HasElementXBeforeElementY':
-            field_check_dict['does_input_x_have_html'] = True
-            field_check_dict['does_input_y_have_html'] = True
-        elif rule_spec_dict['rule_type'] == 'IsEqualToOrdering':
-            field_check_dict['does_input_x_have_html'] = True
-            field_check_dict['is_input_list_of_set'] = True
-        elif (rule_spec_dict['rule_type'] ==
-              'IsEqualToOrderingWithOneItemAtIncorrectPosition'):
-            field_check_dict['does_input_x_have_html'] = True
-            field_check_dict['is_input_list_of_set'] = True
-        elif rule_spec_dict['rule_type'] == 'Equals':
-            if isinstance(rule_spec_dict['inputs']['x'], list):
-                for value in rule_spec_dict['inputs']['x']:
-                    if isinstance(value, python_utils.BASESTRING):
-                        field_check_dict['does_input_x_have_html'] = True
-                        field_check_dict['is_input_list'] = True
-        return field_check_dict
-
-    @staticmethod
     def convert_html_in_rule_spec(rule_spec_dict, conversion_fn):
         """Checks for HTML fields in a Rule Spec and converts it according
         to the conversion function.
@@ -1514,26 +1489,36 @@ class RuleSpec(python_utils.OBJECT):
         Returns:
             dict. The converted Rule Spec dict.
         """
-        field_check_dict = (
-            RuleSpec.get_all_html_fields_in_rule_spec(
-                rule_spec_dict))
-        if field_check_dict['does_input_x_have_html']:
-            if field_check_dict['is_input_list_of_set']:
-                for value_index, value in enumerate(
-                        rule_spec_dict['inputs']['x']):
-                    rule_spec_dict['inputs']['x'][value_index][0] = (
-                        conversion_fn(value[0]))
-            elif field_check_dict['is_input_list']:
-                for value_index, value in enumerate(
-                        rule_spec_dict['inputs']['x']):
-                    rule_spec_dict['inputs']['x'][value_index] = (
-                        conversion_fn(value))
-            else:
-                rule_spec_dict['inputs']['x'] = (
-                    conversion_fn(rule_spec_dict['inputs']['x']))
-        if field_check_dict['does_input_y_have_html']:
+        # NOTE TO DEVELOPERS: This logic needs to be kept in sync with
+        # the code in the function get_all_html_content_strings() in the
+        # class InteractionInstance.
+        # See issue: https://github.com/oppia/oppia/issues/9413. We cannot make
+        # this declarative until issue-9413 has been fixed, because this method
+        # has no reference to the interaction type.
+        if rule_spec_dict['rule_type'] == 'HasElementXAtPositionY':
+            rule_spec_dict['inputs']['x'] = (
+                conversion_fn(rule_spec_dict['inputs']['x']))
+        elif rule_spec_dict['rule_type'] == 'HasElementXBeforeElementY':
+            rule_spec_dict['inputs']['x'] = (
+                conversion_fn(rule_spec_dict['inputs']['x']))
             rule_spec_dict['inputs']['y'] = (
                 conversion_fn(rule_spec_dict['inputs']['y']))
+        elif rule_spec_dict['rule_type'] == 'IsEqualToOrdering':
+            for value_index, value in enumerate(rule_spec_dict['inputs']['x']):
+                rule_spec_dict['inputs']['x'][value_index][0] = (
+                    conversion_fn(value[0]))
+        elif (rule_spec_dict['rule_type'] ==
+              'IsEqualToOrderingWithOneItemAtIncorrectPosition'):
+            for value_index, value in enumerate(rule_spec_dict['inputs']['x']):
+                rule_spec_dict['inputs']['x'][value_index][0] = (
+                    conversion_fn(value[0]))
+        elif rule_spec_dict['rule_type'] == 'Equals':
+            if isinstance(rule_spec_dict['inputs']['x'], list):
+                for value_index, value in enumerate(
+                        rule_spec_dict['inputs']['x']):
+                    if isinstance(value, python_utils.BASESTRING):
+                        rule_spec_dict['inputs']['x'][value_index] = (
+                            conversion_fn(value))
         return rule_spec_dict
 
 
