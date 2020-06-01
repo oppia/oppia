@@ -126,8 +126,8 @@ angular.module('oppia').factory('QuestionObjectFactory', [
           var misconceptionNameListElement = document.createElement('li');
           misconceptionNameListElement.appendChild(
             document.createTextNode(misconceptionName));
-            misconceptionsUnorderedListElement.appendChild(
-              misconceptionNameListElement);
+          misconceptionsUnorderedListElement.appendChild(
+            misconceptionNameListElement);
         });
         return (
           `${returnString} ${misconceptionsUnorderedListElement.outerHTML}`);

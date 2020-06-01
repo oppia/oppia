@@ -42,12 +42,12 @@ angular.module('oppia').component('questionMisconceptionSelector', {
 
       ctrl.toggleMisconceptionFeedbackUsage = function() {
         ctrl.misconceptionFeedbackIsUsed = (
-            !ctrl.misconceptionFeedbackIsUsed);
+          !ctrl.misconceptionFeedbackIsUsed);
       };
 
       ctrl.$onInit = function() {
         ctrl.misconceptionsBySkill = (
-            StateEditorService.getMisconceptionsBySkill());
+          StateEditorService.getMisconceptionsBySkill());
       };
     }
   ]
