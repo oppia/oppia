@@ -5,8 +5,8 @@
     <md-checkbox ng-repeat="subtopic in $ctrl.availableSubtopics" ng-model="$ctrl.selectedSubtopicIndices[$index]">
       <[subtopic.getTitle()]>
     </md-checkbox>
-    <md-button ng-disabled="$ctrl.disableStartButton()"
-               ng-click="$ctrl.newPracticeSession()"
+    <md-button ng-disabled="$ctrl.isStartButtonDisabled()"
+               ng-click="$ctrl.openNewPracticeSession()"
                class="practice-session-button md-accent md-raised">
       Start
     </md-button>

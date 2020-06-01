@@ -34,18 +34,21 @@ angular.module('oppia').directive('subtopicSummaryTile', [
         '/components/summary-tile/subtopic-summary-tile.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        'AssetsBackendApiService', 'ENTITY_TYPE',
+        '$window', 'AssetsBackendApiService', 'ENTITY_TYPE',
         'SUBTOPIC_VIEWER_URL_TEMPLATE',
         function(
-            AssetsBackendApiService, ENTITY_TYPE,
+            $window, AssetsBackendApiService, ENTITY_TYPE,
             SUBTOPIC_VIEWER_URL_TEMPLATE) {
           var ctrl = this;
           ctrl.openSubtopicPage = function() {
-            window.location.href = UrlInterpolationService.interpolateUrl(
-              SUBTOPIC_VIEWER_URL_TEMPLATE, {
-                topic_name: ctrl.getTopicName(),
-                subtopic_id: ctrl.getSubtopic().getId().toString()
-              });
+            $window.open(
+              UrlInterpolationService.interpolateUrl(
+                SUBTOPIC_VIEWER_URL_TEMPLATE, {
+                  topic_name: ctrl.getTopicName(),
+                  subtopic_id: ctrl.getSubtopic().getId().toString()
+                }
+              )
+            );
           };
 
           ctrl.$onInit = function() {

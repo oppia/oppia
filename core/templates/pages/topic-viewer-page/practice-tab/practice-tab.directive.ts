@@ -42,26 +42,23 @@ angular.module('oppia').directive('practiceTab', [
             $scope) {
           var ctrl = this;
 
-          ctrl.newPracticeSession = function() {
-            var commaSeparatedSelectedSubtopics = '';
+          ctrl.openNewPracticeSession = function() {
+            var selectedSubtopics = [];
             for (var idx in ctrl.selectedSubtopicIndices) {
               if (ctrl.selectedSubtopicIndices[idx]) {
-                commaSeparatedSelectedSubtopics += (
-                  ctrl.availableSubtopics[idx].getTitle() + ',');
+                selectedSubtopics.push(
+                  ctrl.availableSubtopics[idx].getTitle());
               }
             }
             var practiceSessionsUrl = UrlInterpolationService.interpolateUrl(
               PRACTICE_SESSIONS_URL, {
                 topic_name: ctrl.getTopicName(),
-                // These are actually the selected subtopics, but named so
-                // because this will be shown in the URL and for the learner,
-                // we surface the subtopics as 'Skills'.
-                selected_skills: commaSeparatedSelectedSubtopics
+                subtopic_titles_list: JSON.stringify(selectedSubtopics)
               });
             $window.location.href = practiceSessionsUrl;
           };
 
-          ctrl.disableStartButton = function() {
+          ctrl.isStartButtonDisabled = function() {
             for (var idx in ctrl.selectedSubtopicIndices) {
               if (ctrl.selectedSubtopicIndices[idx]) {
                 return false;
