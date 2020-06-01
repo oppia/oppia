@@ -17,9 +17,9 @@
               <div ng-style="($index > 0 && !$ctrl.storyPlaythroughObject.getStoryNodes()[$index-1].isCompleted() && {'opacity': '0.5', 'display': 'flex'}) || { 'display': 'flex' }">
                 <div class="oppia-lesson-track">
                   <svg ng-if="!$last"
-                      width="9px"
-                      height="530px"
-                      xmlns="http://www.w3.org/1600/svg">
+                       width="9px"
+                       height="530px"
+                       xmlns="http://www.w3.org/1600/svg">
                     <path fill="none"
                           ng-attr-stroke="{{node.isCompleted() && '#296E5F' || 'rgb(204, 204, 204)' }}"
                           stroke-dasharray="30,16"

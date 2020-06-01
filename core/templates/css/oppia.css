@@ -2059,10 +2059,10 @@ pre.oppia-pre-wrapped-text {
   box-shadow: 0px 0px 8px 6px rgba(0, 0, 0, 0.05);
   height: 100%;
   margin-bottom: 120px;
-  margin: 0 auto;
+  margin-left: auto;
+  margin-right: auto;
   max-width: 880px;
   min-height: 500px;
-  padding-bottom: 100px;
   padding-top: 30px;
   position: relative;
 }
