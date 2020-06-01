@@ -2,7 +2,7 @@ Selected Misconception: <[$ctrl.selectedMisconception && $ctrl.selectedMisconcep
 <div ng-repeat="(skillId, misconceptions) in $ctrl.misconceptionsBySkill">
   <div ng-repeat="misconception in misconceptions">
     <button class="btn btn-secondary misconception-button" style="width: 100%" ng-click="$ctrl.selectMisconception(misconception, skillId)">
-      <b style="display: inline;"><[!misconception.isMandatory() ? ' (Optional) ' : '']><[misconception.getName()]>:</b>
+      <b style="display: inline;"><[misconception.isMandatory() ? '' : ' (Optional) ']><[misconception.getName()]></b>
       <angular-html-bind class="misconception-notes-container" html-data="misconception.getNotes()">
       </angular-html-bind>
     </button>
