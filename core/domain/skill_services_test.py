@@ -105,6 +105,39 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(skill_summary.misconception_count, 1)
         self.assertEqual(skill_summary.worked_examples_count, 1)
 
+    def test_get_image_filenames_from_skill(self):
+        explanation_html = (
+            'Explanation with image: <oppia-noninteractive-image '
+            'filepath-with-value="&quot;img.svg&quot;" caption-with-value='
+            '"&quot;&quot;" alt-with-value="&quot;Image&quot;">'
+            '</oppia-noninteractive-image>'
+        )
+        example_explanation_html = (
+            'Explanation with image: <oppia-noninteractive-image '
+            'filepath-with-value="&quot;img2.svg&quot;" caption-with-value='
+            '"&quot;&quot;" alt-with-value="&quot;Image&quot;">'
+            '</oppia-noninteractive-image>'
+        )
+        example_1 = skill_domain.WorkedExample(
+            state_domain.SubtitledHtml('2', '<p>Example Question 1</p>'),
+            state_domain.SubtitledHtml('3', example_explanation_html)
+        )
+        self.skill.skill_contents = skill_domain.SkillContents(
+            state_domain.SubtitledHtml('1', explanation_html), [example_1],
+            state_domain.RecordedVoiceovers.from_dict({
+                'voiceovers_mapping': {
+                    '1': {}, '2': {}, '3': {}
+                }
+            }),
+            state_domain.WrittenTranslations.from_dict({
+                'translations_mapping': {
+                    '1': {}, '2': {}, '3': {}
+                }
+            })
+        )
+        filenames = skill_services.get_image_filenames_from_skill(self.skill)
+        self.assertEqual(filenames, ['img.svg', 'img2.svg'])
+
     def test_get_new_skill_id(self):
         new_skill_id = skill_services.get_new_skill_id()
 

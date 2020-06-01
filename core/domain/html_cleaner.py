@@ -117,6 +117,29 @@ def strip_html_tags(html_string):
     return bleach.clean(html_string, tags=[], attributes={}, strip=True)
 
 
+def get_image_filenames_from_html_strings(html_strings):
+    """Extracts the image filename from the oppia-noninteractive-image RTE
+    component from all the html strings passed in.
+
+    Args:
+        html_strings: list(str). List of HTML strings.
+
+    Returns:
+        list(str). List of image filenames from html_strings.
+    """
+    all_rte_components = []
+    filenames = []
+    for html_string in html_strings:
+        all_rte_components.extend(get_rte_components(html_string))
+
+    for rte_comp in all_rte_components:
+        if 'id' in rte_comp and rte_comp['id'] == 'oppia-noninteractive-image':
+            filenames.append(
+                rte_comp['customization_args']['filepath-with-value'])
+
+    return list(set(filenames))
+
+
 def get_rte_components(html_string):
     """Extracts the RTE components from an HTML string.
 

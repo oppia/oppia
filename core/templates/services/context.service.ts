@@ -40,6 +40,7 @@ export class ContextService {
   questionId = null;
   editorContext = null;
   customEntityContext = null;
+  imageSaveDestination = AppConstants.IMAGE_SAVE_DESTINATION_SERVER;
 
   init(editorName: string): void {
     this.editorContext = editorName;
@@ -103,6 +104,10 @@ export class ContextService {
         } else if (pathnameArray[i] === 'collection_editor') {
           this.pageContext = ServicesConstants.PAGE_CONTEXT.COLLECTION_EDITOR;
           return ServicesConstants.PAGE_CONTEXT.COLLECTION_EDITOR;
+        } else if (pathnameArray[i] === 'topics_and_skills_dashboard') {
+          this.pageContext = (
+            ServicesConstants.PAGE_CONTEXT.TOPICS_AND_SKILLS_DASHBOARD);
+          return ServicesConstants.PAGE_CONTEXT.TOPICS_AND_SKILLS_DASHBOARD;
         }
       }
 
@@ -251,9 +256,26 @@ export class ContextService {
       ServicesConstants.PAGE_CONTEXT.COLLECTION_EDITOR,
       ServicesConstants.PAGE_CONTEXT.TOPIC_EDITOR,
       ServicesConstants.PAGE_CONTEXT.STORY_EDITOR,
-      ServicesConstants.PAGE_CONTEXT.SKILL_EDITOR
+      ServicesConstants.PAGE_CONTEXT.SKILL_EDITOR,
+      ServicesConstants.PAGE_CONTEXT.TOPICS_AND_SKILLS_DASHBOARD
     ];
     return (allowedPageContext.includes(currentPageContext));
+  }
+
+  // Sets the current context to save images in local storage. Depending on this
+  // value, new images can be either saved in the localStorage or uploaded
+  // directly to the datastore.
+  resetImageSaveDestination(): void {
+    this.imageSaveDestination = AppConstants.IMAGE_SAVE_DESTINATION_SERVER;
+  }
+
+  setImageSaveDestinationToLocalStorage(): void {
+    this.imageSaveDestination = (
+      AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE);
+  }
+
+  getImageSaveDestination(): string {
+    return this.imageSaveDestination;
   }
 }
 

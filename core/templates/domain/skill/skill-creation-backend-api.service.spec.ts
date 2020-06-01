@@ -21,13 +21,11 @@ import { HttpClientTestingModule, HttpTestingController }
   from '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-import { CsrfTokenService } from 'services/csrf-token.service';
 import { SkillCreationBackendApiService, IRubricBackend,
   ISkillCreationBackend } from
   'domain/skill/skill-creation-backend-api.service';
 
 describe('Skill creation backend api service', () => {
-  let csrfService: CsrfTokenService = null;
   let httpTestingController: HttpTestingController = null;
   let skillCreationBackendApiService: SkillCreationBackendApiService = null;
   let rubricDict: IRubricBackend = null;
@@ -38,15 +36,9 @@ describe('Skill creation backend api service', () => {
       imports: [HttpClientTestingModule]
     });
 
-    csrfService = TestBed.get(CsrfTokenService);
     httpTestingController = TestBed.get(HttpTestingController);
     skillCreationBackendApiService = TestBed.get(
       SkillCreationBackendApiService);
-    spyOn(csrfService, 'getTokenAsync').and.returnValue(() => {
-      return new Promise((resolve) => {
-        resolve('sample-csrf-token');
-      });
-    });
 
     rubricDict = {
       explanations: ['test-explanation'],
@@ -68,13 +60,24 @@ describe('Skill creation backend api service', () => {
     fakeAsync(() => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
+      let imageBlob = new Blob(
+        ['data:image/png;base64,xyz'], {type: 'image/png'});
+      let imageData = {
+        filename: 'image.png',
+        imageBlob: imageBlob
+      };
       skillCreationBackendApiService.createSkill(
-        'test-description', rubricDict, 'test_dictionary', ['test_id']).then(
-        successHandler);
+        'test-description', rubricDict, 'test_dictionary', ['test_id'],
+        [imageData]
+      ).then(successHandler);
       let req = httpTestingController.expectOne(
         '/skill_editor_handler/create_new');
       expect(req.request.method).toEqual('POST');
-      expect(req.request.body).toEqual(postData);
+      expect(req.request.body.get('payload')).toEqual(JSON.stringify(postData));
+      let sampleFormData = new FormData();
+      sampleFormData.append('image', imageBlob);
+      expect(
+        req.request.body.get('image.png')).toEqual(sampleFormData.get('image'));
       req.flush(postData);
       flushMicrotasks();
       expect(successHandler).toHaveBeenCalled();
@@ -86,8 +89,8 @@ describe('Skill creation backend api service', () => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
       skillCreationBackendApiService.createSkill(
-        'test-description', rubricDict, 'test_dictionary', ['test_id']).then(
-        successHandler, failHandler);
+        'test-description', rubricDict, 'test_dictionary', ['test_id'], []
+      ).then(successHandler, failHandler);
       let errorResponse = new HttpErrorResponse({
         error: 'test 404 error',
         status: 404,
@@ -97,7 +100,7 @@ describe('Skill creation backend api service', () => {
         '/skill_editor_handler/create_new');
       req.error(new ErrorEvent('Error'), errorResponse);
       expect(req.request.method).toEqual('POST');
-      expect(req.request.body).toEqual(postData);
+      expect(req.request.body.get('payload')).toEqual(JSON.stringify(postData));
       flushMicrotasks();
       expect(failHandler).toHaveBeenCalled();
       expect(successHandler).not.toHaveBeenCalled();

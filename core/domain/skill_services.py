@@ -20,6 +20,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import copy
 import logging
 
+from core.domain import html_cleaner
 from core.domain import opportunity_services
 from core.domain import role_services
 from core.domain import skill_domain
@@ -340,6 +341,19 @@ def get_skill_summary_from_model(skill_summary_model):
         skill_summary_model.skill_model_created_on,
         skill_summary_model.skill_model_last_updated
     )
+
+
+def get_image_filenames_from_skill(skill):
+    """Get the image filenames from the skill.
+
+    Args:
+        skill: Skill. The skill itself.
+
+    Returns:
+       list(str). List containing the name of the image files in skill.
+    """
+    html_list = skill.get_all_html_content_strings()
+    return html_cleaner.get_image_filenames_from_html_strings(html_list)
 
 
 def get_skill_by_id(skill_id, strict=True, version=None):

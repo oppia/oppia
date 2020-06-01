@@ -17,8 +17,8 @@
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 
 export interface IRubricBackend {
   difficulty: string,
@@ -32,25 +32,54 @@ export interface ISkillCreationBackend {
   rubrics: IRubricBackend
 }
 
+export interface IImageData {
+  filename: string,
+  imageBlob: Blob
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class SkillCreationBackendApiService {
   constructor(private http: HttpClient) {}
 
+  /**
+   * Sends POST request to create skill.
+   * @param {Promise} successCallback - Callback invoked on successful creation
+   *  of skill.
+   * @param {Promise} errorCallback - Callback invoked when skill creation
+   *  fails.
+   * @param {string} description - Description of the new skill.
+   * @param {Object[]} rubrics - Rubrics for the new skill.
+   * @param {string} rubric.difficulty - Difficulty of the rubric.
+   * @param {string[]} rubric.explanations - Explanations for the difficulty.
+   * @param {string} explanation - Explanation of the skill.
+   * @param {string[]} linkedTopicIds - Topic ids linked to the new skill.
+   * @param {Object[]} imagesData - Represents the images added to the skill.
+   * @param {string} imageData.filename - Filename of the image.
+   * @param {Blob} imageData.imageBlob - Image data represented as a Blob.
+   */
   _createSkill(
       successCallback: (value?: Object | PromiseLike<Object>) => void,
       errorCallback:(reason?: any) => void,
       description: string, rubrics: IRubricBackend, explanation: string,
-      linkedTopicIds: string[]): void {
+      linkedTopicIds: string[], imagesData: IImageData[]): void {
     let postData:ISkillCreationBackend = {
       description: description,
       linked_topic_ids: linkedTopicIds,
       explanation_dict: explanation,
       rubrics: rubrics
     };
+    let body = new FormData();
+    body.append('payload', JSON.stringify(postData));
+    let filenames = imagesData.map(obj => obj.filename);
+    let imageBlobs = imagesData.map(obj => obj.imageBlob);
+    for (let idx in imageBlobs) {
+      body.append(filenames[idx], imageBlobs[idx]);
+    }
+
     this.http.post(
-      '/skill_editor_handler/create_new', postData).toPromise()
+      '/skill_editor_handler/create_new', body).toPromise()
       .then((response: { skillId: string }) => {
         if (successCallback) {
           successCallback({
@@ -59,16 +88,17 @@ export class SkillCreationBackendApiService {
         }
       }, (errorResponse) => {
         if (errorCallback) {
-          errorCallback(errorResponse.body);
+          errorCallback(errorResponse.error.error);
         }
       });
   }
 
   createSkill(description: string, rubrics: IRubricBackend,
-      explanation: string, linkedTopicIds: string[]): PromiseLike<Object> {
+      explanation: string, linkedTopicIds: string[], imagesData: IImageData[]
+  ): PromiseLike<Object> {
     return new Promise((resolve, reject) => {
       this._createSkill(resolve, reject,
-        description, rubrics, explanation, linkedTopicIds);
+        description, rubrics, explanation, linkedTopicIds, imagesData);
     });
   }
 }
