@@ -21,4 +21,4 @@
 require('pages/moderator-page/moderator-page.module.ts');
 require('App.ts');
 
-require('pages/moderator-page/moderator-page.controller.ts');
+require('pages/moderator-page/moderator-page.component.ts');
