@@ -25,7 +25,7 @@ import { IWarning, baseInteractionValidationService } from
   'interactions/base-interaction-validation.service';
 import { Outcome } from
   'domain/exploration/OutcomeObjectFactory';
-import { RuleInputTypeFactory } from 'domain/exploration/RuleInputTypeFactory';
+import { TypeChangeService } from 'services/type-change.service';
 
 import { AppConstants } from 'app.constants';
 
@@ -36,7 +36,7 @@ export class ItemSelectionInputValidationService {
   constructor(
       private baseInteractionValidationServiceInstance:
         baseInteractionValidationService,
-      private ruleInputTypeFactory: RuleInputTypeFactory) {}
+      private typeChangeService: TypeChangeService) {}
 
   // TODO(#7176): Replace 'any' with the exact type. This has been kept as
   // 'any' because 'customizationArgs' is a dict with possible underscore_cased
@@ -144,7 +144,7 @@ export class ItemSelectionInputValidationService {
       answerGroups.forEach((answerGroup, answerIndex) => {
         var rules = answerGroup.rules;
         rules.forEach((rule, ruleIndex) => {
-          var ruleInputs = this.ruleInputTypeFactory.getStringArrayInstance(
+          var ruleInputs = this.typeChangeService.changeTypeToStringArray(
             rule.inputs.x);
           ruleInputs.forEach((ruleInput) => {
             var choiceIndex = answerChoiceToIndex[ruleInput];
@@ -193,7 +193,7 @@ export class ItemSelectionInputValidationService {
     answerGroups.forEach((answerGroup, answerIndex) => {
       var rules = answerGroup.rules;
       rules.forEach((rule, ruleIndex) => {
-        var ruleInputs = this.ruleInputTypeFactory.getStringArrayInstance(
+        var ruleInputs = this.typeChangeService.changeTypeToStringArray(
           rule.inputs.x);
         ruleInputs.forEach((ruleInput) => {
           if (rule.type === 'IsProperSubsetOf') {

@@ -25,7 +25,7 @@ import { IWarning, baseInteractionValidationService } from
   'interactions/base-interaction-validation.service';
 import { Outcome } from
   'domain/exploration/OutcomeObjectFactory';
-import { RuleInputTypeFactory } from 'domain/exploration/RuleInputTypeFactory';
+import { TypeChangeService } from 'services/type-change.service';
 
 import { AppConstants } from 'app.constants';
 
@@ -36,7 +36,7 @@ export class GraphInputValidationService {
   constructor(
       private baseInteractionValidationServiceInstance:
         baseInteractionValidationService,
-      private ruleInputTypeFactory: RuleInputTypeFactory) {}
+      private typeChangeService: TypeChangeService) {}
 
   VERTICES_LIMIT = 50;
 
@@ -101,7 +101,8 @@ export class GraphInputValidationService {
       var rules = answerGroups[i].rules;
       for (var j = 0; j < rules.length; j++) {
         var rule = rules[j];
-        var gInputs = this.ruleInputTypeFactory.getGraphInstance(rule.inputs.g);
+        var gInputs = this.typeChangeService.changeTypeToGraphBackendDict(
+          rule.inputs.g);
         try {
           if (rule.type === 'HasGraphProperty') {
             continue;
