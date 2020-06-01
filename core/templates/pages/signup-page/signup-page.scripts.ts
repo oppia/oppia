@@ -21,4 +21,4 @@
 require('pages/signup-page/signup-page.module.ts');
 require('App.ts');
 
-require('pages/signup-page/signup-page.controller.ts');
+require('pages/signup-page/signup-page.component.ts');
