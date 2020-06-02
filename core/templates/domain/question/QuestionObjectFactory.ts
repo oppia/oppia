@@ -120,9 +120,9 @@ angular.module('oppia').factory('QuestionObjectFactory', [
           }
           var skillMisconceptionId =
             skillId + '-' + misconceptionsBySkill[skillId][i].getId();
-          if (
-            !taggedSkillMisconceptionIds.hasOwnProperty(skillMisconceptionId)) {
-              unaddressedMisconceptionNames.push(
+          if (!taggedSkillMisconceptionIds.hasOwnProperty(
+            skillMisconceptionId)) {
+            unaddressedMisconceptionNames.push(
               misconceptionsBySkill[skillId][i].getName());
           }
         }

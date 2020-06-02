@@ -561,9 +561,11 @@ angular.module('oppia').directive('questionsList', [
                         return summary.getId() !== skillId;
                       });
                   };
+
                   $scope.getSkillLinkageModificationsArray = function() {
                     return returnModalObject.skillLinkageModificationsArray;
-                  }
+                  };
+
                   $scope.undo = function() {
                     $scope.associatedSkillSummaries = associatedSkillSummaries;
                     returnModalObject.skillLinkageModificationsArray = [];
