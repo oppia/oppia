@@ -61,7 +61,7 @@ class MockTranslateService {
     }
 }
 
-fdescribe('TranslatePipe', () => {
+describe('TranslatePipe', () => {
   let pipe: TranslatePipe;
   let translate: TranslateService;
   let changeDecRef: ChangeDetectorRef;
@@ -82,7 +82,7 @@ fdescribe('TranslatePipe', () => {
   }));
 
 
-  fit('should translate', () => {
+  it('should translate', () => {
     expect(pipe.transform('I18n_t_1')).toBe('Hello');
     expect(pipe.transform('I18n_t_2', {val: 'World'})).toBe('Hello World');
     expect(pipe.transform('I18n_t_3')).toBe('I18n_t_3');
@@ -97,7 +97,7 @@ fdescribe('TranslatePipe', () => {
   });
 
   // Sole purpose of this test is to cover ngOnDestroy
-  fit('should destroy subscriptions', () => {
+  it('should destroy subscriptions', () => {
     pipe.ngOnDestroy();
 
     // Reintializing the pipe because it jasmine tries to destroy it on its own

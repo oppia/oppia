@@ -21,7 +21,7 @@ import { HttpTestingController, HttpClientTestingModule } from
   '@angular/common/http/testing';
 import { TranslateService } from './translate.service';
 
-fdescribe('Translate service', () => {
+describe('Translate service', () => {
   let httpTestingController: HttpTestingController;
   let translate: TranslateService;
 
@@ -38,7 +38,7 @@ fdescribe('Translate service', () => {
     httpTestingController.verify();
   });
 
-  fit('should fetch translations', fakeAsync(() => {
+  it('should fetch translations', fakeAsync(() => {
     const successHandler = jasmine.createSpy('success');
     const failHandler = jasmine.createSpy('fail');
     const translations = {I18n_t_1: 'Hello'};
@@ -53,7 +53,7 @@ fdescribe('Translate service', () => {
     expect(failHandler).not.toHaveBeenCalled();
   }));
 
-  fit('should set the new translation', fakeAsync(() => {
+  it('should set the new translation', fakeAsync(() => {
     let lang = '';
     let translations = {};
     const enTranslations = {I18n_t_1: 'Hello'};
@@ -92,7 +92,7 @@ fdescribe('Translate service', () => {
     subscription.unsubscribe();
   }));
 
-  fit('should get translations', fakeAsync(() => {
+  it('should get translations', fakeAsync(() => {
     const enTranslations = {
       I18n_t_1: 'Hello',
       I18n_t_2: 'Hello <[val]>'
@@ -127,17 +127,17 @@ fdescribe('Translate service', () => {
       'I18n_t_3', {val: 'World'})).toBe('I18n_t_3');
   }));
 
-  fit('interpolate should work with functions', fakeAsync(() => {
+  it('interpolate should work with functions', fakeAsync(() => {
     expect(translate.interpolate(x => x, 'Hola')).toBe('Hola');
   }));
 
-  fit('should throw an error if key is not defined', fakeAsync(() => {
+  it('should throw an error if key is not defined', fakeAsync(() => {
     expect(function() {
       translate.getInterpolatedString('');
     }).toThrowError('Parameter "key" required');
   }));
 
-  fit('should ignore the key if target is undefined', fakeAsync(() => {
+  it('should ignore the key if target is undefined', fakeAsync(() => {
     let target;
     expect(translate.getValue(
       target, 'asdf.abcd')).toBeUndefined();
