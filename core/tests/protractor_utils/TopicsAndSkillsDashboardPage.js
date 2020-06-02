@@ -224,7 +224,7 @@ var TopicsAndSkillsDashboardPage = function() {
         confirmTopicCreationButton,
         'Create Topic modal takes too long to disappear.');
     } else {
-      await waitFor.visi.jsbilityOf(
+      await waitFor.visibilityOf(
         element(by.css('.protractor-test-topic-name-field')),
         'Topic Editor is taking too long to appear.');
     }
