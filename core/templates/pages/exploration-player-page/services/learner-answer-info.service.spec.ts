@@ -37,7 +37,7 @@ import { OutcomeObjectFactory } from
 import { State, StateObjectFactory } from 'domain/state/StateObjectFactory.ts';
 import { UpgradedServices } from 'services/UpgradedServices';
 
-fdescribe('Learner answer info service', () => {
+describe('Learner answer info service', () => {
   let sof: StateObjectFactory = null;
   let oof: OutcomeObjectFactory = null;
   let acrof: AnswerClassificationResultObjectFactory = null;
@@ -175,44 +175,44 @@ fdescribe('Learner answer info service', () => {
     spyOn(Math, 'random').and.returnValue(0);
   });
 
-  fdescribe('.initLearnerAnswerInfo', () => {
+  describe('.initLearnerAnswerInfo', () => {
     beforeEach(() => {
-      this.learnerAnswerInfoService.initLearnerAnswerInfoService(
+      learnerAnswerInfoService.initLearnerAnswerInfoService(
         '10', firstState, mockAnswer, mockInteractionRulesService, false);
     });
-    fit('should return can ask learner for answer info true', function() {
-      expect(learnerAnswerInfoService.canAskLearnerForAnswerInfo()).toBe(true);
+    it('should return can ask learner for answer info true', function() {
+      expect(learnerAnswerInfoService.getCanAskLearnerForAnswerInfo()).toBe(true);
     });
 
-    fit('should return current answer', function() {
+    it('should return current answer', function() {
       expect(learnerAnswerInfoService.getCurrentAnswer()).toEqual(
         'This is my answer');
     });
 
-    fit('should return current interaction rules service', function() {
+    it('should return current interaction rules service', function() {
       expect(
         learnerAnswerInfoService.getCurrentInteractionRulesService()).toEqual(
         mockInteractionRulesService);
     });
   });
 
-  fdescribe('learner answer info service', () => {
+  describe('learner answer info service', () => {
     beforeEach(() => {
       learnerAnswerInfoService.initLearnerAnswerInfoService(
         '10', firstState, mockAnswer, mockInteractionRulesService, false);
     });
 
-    fit('should not ask for answer details for same state', function() {
-      expect(learnerAnswerInfoService.canAskLearnerForAnswerInfo()).toBe(true);
+    it('should not ask for answer details for same state', function() {
+      expect(learnerAnswerInfoService.getCanAskLearnerForAnswerInfo()).toBe(true);
       learnerAnswerInfoService.recordLearnerAnswerInfo('My answer details');
-      expect(learnerAnswerInfoService.canAskLearnerForAnswerInfo()).toBe(false);
+      expect(learnerAnswerInfoService.getCanAskLearnerForAnswerInfo()).toBe(false);
       learnerAnswerInfoService.initLearnerAnswerInfoService(
         '10', firstState, mockAnswer, mockInteractionRulesService, false);
-      expect(learnerAnswerInfoService.canAskLearnerForAnswerInfo()).toBe(false);
+      expect(learnerAnswerInfoService.getCanAskLearnerForAnswerInfo()).toBe(false);
     });
   });
 
-  fdescribe(
+  describe(
     'should not ask for answer details for trivial interaction ids',
     () => {
       beforeEach(() => {
@@ -221,33 +221,33 @@ fdescribe('Learner answer info service', () => {
           '10', firstState, mockAnswer, mockInteractionRulesService, false);
       });
 
-      fit('should return can ask learner for answer info false', function() {
-        expect(learnerAnswerInfoService.canAskLearnerForAnswerInfo()).toBe(
+      it('should return can ask learner for answer info false', function() {
+        expect(learnerAnswerInfoService.getCanAskLearnerForAnswerInfo()).toBe(
           false);
       });
     });
 
-  fdescribe('init learner answer info service with solicit answer details false',
+  describe('init learner answer info service with solicit answer details false',
     () => {
       beforeEach(() => {
         firstState.solicitAnswerDetails = false;
         learnerAnswerInfoService.initLearnerAnswerInfoService(
           '10', firstState, mockAnswer, mockInteractionRulesService, false);
       });
-      fit('should return can ask learner for answer info false', function() {
-        expect(learnerAnswerInfoService.canAskLearnerForAnswerInfo()).toBe(
+      it('should return can ask learner for answer info false', function() {
+        expect(learnerAnswerInfoService.getCanAskLearnerForAnswerInfo()).toBe(
           false);
       });
     });
 
 
-  fdescribe('.recordLearnerAnswerInfo', () => {
+  describe('.recordLearnerAnswerInfo', () => {
     beforeEach(() => {
       learnerAnswerInfoService.initLearnerAnswerInfoService(
         '10', firstState, mockAnswer, mockInteractionRulesService, false);
     });
 
-    fit('should record learner answer details', function() {
+    it('should record learner answer details', function() {
       spyOn(ladbas, 'recordLearnerAnswerDetails');
       learnerAnswerInfoService.recordLearnerAnswerInfo('My details');
       expect(
@@ -256,7 +256,7 @@ fdescribe('Learner answer info service', () => {
     });
   });
 
-  fdescribe('learner answer info service', () => {
+  describe('learner answer info service', () => {
     beforeEach(() => {
       learnerAnswerInfoService.initLearnerAnswerInfoService(
         '10', firstState, mockAnswer, mockInteractionRulesService, false);
@@ -266,21 +266,21 @@ fdescribe('Learner answer info service', () => {
       learnerAnswerInfoService.recordLearnerAnswerInfo('My details 1');
     });
 
-    fit('should not record answer details more than two times', function() {
+    it('should not record answer details more than two times', function() {
       learnerAnswerInfoService.initLearnerAnswerInfoService(
         '10', thirdState, mockAnswer, mockInteractionRulesService, false);
-      expect(learnerAnswerInfoService.canAskLearnerForAnswerInfo()).toBe(false);
+      expect(learnerAnswerInfoService.getCanAskLearnerForAnswerInfo()).toBe(false);
     });
   });
 
-  fdescribe('return html from the service', () => {
-    fit('should return solicit answer details question', function() {
+  describe('return html from the service', () => {
+    it('should return solicit answer details question', function() {
       expect(
         learnerAnswerInfoService.getSolicitAnswerDetailsQuestion()).toEqual(
         '<p translate="I18N_SOLICIT_ANSWER_DETAILS_QUESTION"></p>');
     });
 
-    fit('should return solicit answer details feedback', function() {
+    it('should return solicit answer details feedback', function() {
       expect(
         learnerAnswerInfoService.getSolicitAnswerDetailsFeedback()).toEqual(
         '<p translate="I18N_SOLICIT_ANSWER_DETAILS_FEEDBACK"></p>');

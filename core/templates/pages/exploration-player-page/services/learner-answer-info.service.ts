@@ -136,7 +136,7 @@ export class LearnerAnswerInfoService {
     this.canAskLearnerForAnswerInfo = false;
   }
 
-  canAskLearnerForAnswerInfo(): boolean {
+  getCanAskLearnerForAnswerInfo(): boolean {
     return this.canAskLearnerForAnswerInfo;
   }
 
