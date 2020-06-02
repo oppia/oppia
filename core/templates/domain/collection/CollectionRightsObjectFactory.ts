@@ -22,7 +22,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-interface ICollectionRightsBackendDict {
+export interface ICollectionRightsBackendDict {
   'collection_id'?: number;
   'can_edit'?: boolean;
   'can_unpublish'?: boolean;
