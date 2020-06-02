@@ -339,7 +339,6 @@ import { SearchExplorationsBackendApiService } from
 import { SetInputValidationService } from
   'interactions/SetInput/directives/set-input-validation.service';
 import { SVMPredictionService } from 'classifiers/svm-prediction.service';
-  'services/schema-undefined-last-element.service.ts';
 import { SidebarStatusService } from 'domain/sidebar/sidebar-status.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { SkillCreationBackendApiService } from
