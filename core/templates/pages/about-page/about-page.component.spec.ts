@@ -36,8 +36,10 @@ class MockTranslatePipe implements PipeTransform {
 }
 
 class MockTranslateService {
-  use(code: string): string {
-    return code;
+  code = 'es';
+  use(lang: string): string {
+    this.code = lang;
+    return this.code;
   }
 }
 
@@ -88,6 +90,8 @@ let fixture: ComponentFixture<AboutPageComponent>;
 
 describe('About Page', function() {
   let windowRef: MockWindowRef;
+  let i18n = null;
+  let translate = null;
 
   beforeEach(() => {
     windowRef = new MockWindowRef();
@@ -105,6 +109,8 @@ describe('About Page', function() {
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
+    translate = TestBed.get(TranslateService);
+    i18n = TestBed.get(I18nLanguageCodeService);
     fixture = TestBed.createComponent(AboutPageComponent);
     component = fixture.componentInstance;
   });
@@ -205,4 +211,13 @@ describe('About Page', function() {
     expect(component.aboutPageMascotImgUrl).toBe(
       '/assets/images/general/about_page_mascot.png');
   });
+
+  it ('should receive code changes from I18n-lang-code-service', fakeAsync(
+    () => {
+      component.ngOnInit();
+
+      i18n.codeChange.emit('en');
+      fixture.detectChanges();
+      expect(translate.code).toBe('en');
+    }));
 });
