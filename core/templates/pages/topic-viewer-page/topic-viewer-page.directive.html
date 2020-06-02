@@ -52,7 +52,6 @@
       <practice-tab subtopics-list="$ctrl.subtopics"
                     topic-name="$ctrl.topicName">
       </practice-tab>
-      <!-- <skills-mastery-list degrees-of-mastery="$ctrl.degreesOfMastery" skill-descriptions="$ctrl.skillDescriptions"></skills-mastery-list> -->
     </div>
     <div ng-if="$ctrl.activeTab === 'subtopics'">
       <subtopics-list subtopics-list="$ctrl.subtopics"
@@ -63,8 +62,12 @@
   </div>
 </div>
 <style>
+  .navbar-light .navbar-container {
+    background: #00645C;
+  }
+
   .oppia-topic-viewer-tabs-container {
-    background-color: #439788;
+    background-color: #00645C;
     font-family: 'Capriola', 'Roboto', Arial, sans-serif;
     margin: 0 auto;
     width: 100%;
@@ -101,7 +104,7 @@
   }
 
   .oppia-topic-viewer-tabs-container .topic-viewer-tabs .topic-viewer-tabs-text {
-    color: white;
+    color: #ffffff;
     cursor: pointer;
     padding: 10px;
     width: 100%;
@@ -121,12 +124,12 @@
 
   .oppia-topic-viewer-tabs-container .topic-viewer-tabs-active .topic-viewer-tabs-text,
   .oppia-topic-viewer-tabs-container .topic-viewer-tabs-active .topic-viewer-tabs-text:hover {
-    color: white;
-    border-bottom: 4px solid white;
+    color: #ffffff;
+    border-bottom: 4px solid #ffffff;
   }
 
   .oppia-topic-viewer-tabs-container .topic-viewer-tabs .topic-viewer-tabs-text:hover {
-    color: white;
+    color: #ffffff;
     font-size: 1em;
     padding: 10px;
     text-decoration: none;
@@ -196,7 +199,7 @@
     width: 200px;
   }
   .oppia-topic-viewer-tabs .oppia-topic-viewer-tabs-text {
-    color: white;
+    color: #ffffff;
     font-size: 1.1em;
     font-weight: bold;
     padding: 10px;
@@ -207,7 +210,7 @@
 
   .oppia-topic-viewer-tabs-active .oppia-topic-viewer-tabs-text,
   .oppia-topic-viewer-tabs-active .oppia-topic-viewer-tabs-text:hover {
-    border-bottom: 4px solid white;
+    border-bottom: 4px solid #ffffff;
   }
   .oppia-topic-viewer-tabs {
     margin: 0 auto 0 10%;

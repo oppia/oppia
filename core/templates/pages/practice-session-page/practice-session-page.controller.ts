@@ -62,12 +62,12 @@ angular.module('oppia').directive('practiceSessionPage', [
               .interpolateUrl(
                 PRACTICE_SESSIONS_DATA_URL, {
                   topic_name: ctrl.topicName,
-                  selected_skills: ctrl.commaSeparatedSelectedSubtopics
+                  subtopic_titles_list: ctrl.stringifiedSubtopicsList
                 });
             var practiceSessionsUrl = UrlInterpolationService.interpolateUrl(
               PRACTICE_SESSIONS_URL, {
                 topic_name: ctrl.topicName,
-                selected_skills: ctrl.commaSeparatedSelectedSubtopics
+                subtopic_titles_list: ctrl.stringifiedSubtopicsList
               });
             var topicViewerUrl = UrlInterpolationService.interpolateUrl(
               TOPIC_VIEWER_PAGE, {
@@ -76,10 +76,10 @@ angular.module('oppia').directive('practiceSessionPage', [
             $http.get(practiceSessionsDataUrl).then(function(result) {
               var skillList = [];
               var skillDescriptions = [];
-              for (var skillId in result.data.skill_id_to_description_map) {
+              for (var skillId in result.data.skill_ids_to_descriptions_map) {
                 skillList.push(skillId);
                 skillDescriptions.push(
-                  result.data.skill_id_to_description_map[skillId]);
+                  result.data.skill_ids_to_descriptions_map[skillId]);
               }
               var questionPlayerConfig = {
                 resultActionButtons: [
@@ -108,7 +108,7 @@ angular.module('oppia').directive('practiceSessionPage', [
           };
           ctrl.$onInit = function() {
             ctrl.topicName = UrlService.getTopicNameFromLearnerUrl();
-            ctrl.commaSeparatedSelectedSubtopics = (
+            ctrl.stringifiedSubtopicsList = (
               UrlService.getSelectedSubtopicsFromUrl());
             _fetchSkillDetails();
             PageTitleService.setPageTitle(

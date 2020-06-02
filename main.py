@@ -263,11 +263,11 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/<comma_separated_skill_ids>' % feconf.QUESTIONS_LIST_URL_PREFIX,
         questions_list.QuestionsListHandler),
     get_redirect_route(
-        r'%s/<topic_name>/<selected_skills>' %
+        r'%s/<topic_name>' %
         feconf.PRACTICE_SESSION_URL_PREFIX,
         practice_sessions.PracticeSessionsPage),
     get_redirect_route(
-        r'%s/<topic_name>/<selected_skills>' %
+        r'%s/<topic_name>' %
         feconf.PRACTICE_SESSION_DATA_URL_PREFIX,
         practice_sessions.PracticeSessionsPageDataHandler),
     get_redirect_route(

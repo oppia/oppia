@@ -72,7 +72,7 @@ class PracticeSessionsPageTests(BasePracticeSessionsControllerTests):
     def test_any_user_can_access_practice_sessions_page(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             self.get_html_response(
-                '%s/%s/subtopic_name,' % (
+                '%s/%s?selected_subtopics=["subtopic_name"]' % (
                     feconf.PRACTICE_SESSION_URL_PREFIX,
                     'public_topic_name'))
 
@@ -80,7 +80,7 @@ class PracticeSessionsPageTests(BasePracticeSessionsControllerTests):
     def test_no_user_can_access_unpublished_topic_practice_session_page(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             self.get_html_response(
-                '%s/%s/subtopic_name,' % (
+                '%s/%s?selected_subtopics=["subtopic_name"]' % (
                     feconf.PRACTICE_SESSION_URL_PREFIX, 'private_topic_name'),
                 expected_status_int=404)
 
@@ -88,7 +88,7 @@ class PracticeSessionsPageTests(BasePracticeSessionsControllerTests):
     def test_get_fails_when_new_structures_not_enabled(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', False):
             self.get_html_response(
-                '%s/%s/subtopic_name,' % (
+                '%s/%s?selected_subtopics=["subtopic_name"]' % (
                     feconf.PRACTICE_SESSION_URL_PREFIX,
                     'public_topic_name'),
                 expected_status_int=404)
@@ -96,7 +96,7 @@ class PracticeSessionsPageTests(BasePracticeSessionsControllerTests):
     def test_get_fails_when_topic_doesnt_exist(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', False):
             self.get_html_response(
-                '%s/%s/subtopic_name,' % (
+                '%s/%s?selected_subtopics=["subtopic_name"]' % (
                     feconf.PRACTICE_SESSION_URL_PREFIX,
                     'non_existent_topic_name'),
                 expected_status_int=404)
@@ -107,7 +107,7 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
     def test_get_fails_when_new_structures_not_enabled(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', False):
             self.get_json(
-                '%s/%s/subtopic_name,' % (
+                '%s/%s?selected_subtopics=["subtopic_name"]' % (
                     feconf.PRACTICE_SESSION_DATA_URL_PREFIX,
                     'public_topic_name'),
                 expected_status_int=404)
@@ -126,7 +126,7 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
         topic_services.publish_topic('topic_id_3', self.admin_id)
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             self.get_json(
-                '%s/%s/subtopic_name,' % (
+                '%s/%s?selected_subtopics=["subtopic_name"]' % (
                     feconf.PRACTICE_SESSION_DATA_URL_PREFIX,
                     'topic_without_skills'),
                 expected_status_int=404)
@@ -135,20 +135,20 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
     def test_any_user_can_access_practice_sessions_data(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             json_response = self.get_json(
-                '%s/%s/subtopic_name,' % (
+                '%s/%s?selected_subtopics=["subtopic_name"]' % (
                     feconf.PRACTICE_SESSION_DATA_URL_PREFIX,
                     'public_topic_name'))
             self.assertEqual(json_response['topic_name'], 'public_topic_name')
             self.assertEqual(
-                len(json_response['skill_id_to_description_map']), 1)
+                len(json_response['skill_ids_to_descriptions_map']), 1)
             self.assertEqual(
-                json_response['skill_id_to_description_map']['skill_id_2'],
+                json_response['skill_ids_to_descriptions_map']['skill_id_2'],
                 'Skill 2')
 
     def test_no_user_can_access_unpublished_topic_practice_session_data(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             self.get_json(
-                '%s/%s/subtopic_name,' % (
+                '%s/%s?selected_subtopics=["subtopic_name"]' % (
                     feconf.PRACTICE_SESSION_DATA_URL_PREFIX,
                     'private_topic_name'),
                 expected_status_int=404)
@@ -156,7 +156,7 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
     def test_get_fails_when_topic_doesnt_exist(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             self.get_json(
-                '%s/%s/subtopic_name,' % (
+                '%s/%s?selected_subtopics=["subtopic_name"]' % (
                     feconf.PRACTICE_SESSION_DATA_URL_PREFIX,
                     'non_existent_topic_name'),
                 expected_status_int=404)

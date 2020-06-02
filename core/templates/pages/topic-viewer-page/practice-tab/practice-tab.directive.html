@@ -1,30 +1,59 @@
 <div class="oppia-practice-tab-container">
   <md-card class="oppia-page-card oppia-long-text">
-    <h2 class="tab-title"> Master these Skills </h2>
-    <span class="practice-content"> Select skills that you would like to practice. </span>
+    <h2 class="tab-title">
+      <span translate="I18N_TOPIC_VIEWER_MASTER_SKILLS"></span>
+    </h2>
+    <span class="practice-content">
+      <span translate="I18N_TOPIC_VIEWER_SELECT_SKILLS"></span>
+    </span>
     <md-checkbox ng-repeat="subtopic in $ctrl.availableSubtopics" ng-model="$ctrl.selectedSubtopicIndices[$index]">
       <[subtopic.getTitle()]>
     </md-checkbox>
-    <md-button ng-disabled="$ctrl.disableStartButton()"
-               ng-click="$ctrl.newPracticeSession()"
+    <md-button ng-disabled="$ctrl.isStartButtonDisabled()"
+               ng-click="$ctrl.openNewPracticeSession()"
                class="practice-session-button md-accent md-raised">
-      Start
+      <span translate="I18N_TOPIC_VIEWER_START_PRACTICE"></span>
     </md-button>
   </md-card>
 </div>
 <style>
+  practice-tab .oppia-long-text {
+    /* Since the same class is used in all the other tabs, it is defined in topic-viewer-page.directive.html,
+       but since those CSS classes are evaluated after the classes in this directive,
+       without the !important tag, any styles set here will be ignored for common classes.
+    */
+    width: 37.5vw !important;
+  }
+
+  @media (max-width: 1024px) {
+    practice-tab .oppia-long-text {
+      width: 60vw !important;
+    }
+  }
+
+  @media (max-width: 500px) {
+    practice-tab .oppia-long-text {
+      width: 90vw !important;
+    }
+  }
+
   practice-tab .md-button {
     align-self: center;
     color: white;
     border-radius: 0.4em;
-    font-family: "Capriola", "Roboto", Arial, sans-serif;
+    font-family: "Roboto", Arial, sans-serif;
     margin-top: 20px;
     text-transform: uppercase;
     width: 200px;
   }
 
+  practice-tab md-checkbox .md-label {
+    margin-top: -1px;
+    vertical-align: top;
+  }
+
   practice-tab .md-button.md-raised.md-accent.practice-session-button:not([disabled]) {
-    background-color: #439788;
+    background-color: #00645C;
   }
 
   practice-tab md-checkbox {
@@ -32,7 +61,7 @@
   }
 
   practice-tab .practice-content {
-    font-family: "Capriola", "Roboto", Arial, sans-serif;
+    font-family: "Roboto", Arial, sans-serif;
     font-size: 1.2em;
     margin-bottom: 2.5vh;
   }

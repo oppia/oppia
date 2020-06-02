@@ -4,7 +4,7 @@
       <a ng-href="<[$ctrl.getStoryLink()]>"><[$ctrl.getStorySummary().getTitle()]> </a>
     </strong>
     <span style="padding-left: 10px; font-size: 0.75em; color: #404040;">
-       <[$ctrl.getStorySummary().getNodeTitles().length]> Chapters
+       <[$ctrl.nodeCount]> <span translate="I18N_TOPIC_VIEWER_CHAPTER"></span><[($ctrl.nodeCount > 1) ? 's' : '']>
     </span>
   </div>
   <div class="story-details">
@@ -16,17 +16,21 @@
     </div>
     <div class="chapter-details">
       <div ng-class="{'border-bottom': $index < $ctrl.chaptersDisplayed}" class="chapter-title" ng-repeat="title in $ctrl.getStorySummary().getNodeTitles()">
-        <span ng-if="$index < $ctrl.chaptersDisplayed"> Chapter <[$index + 1]>: <[title]> </span>
+        <span ng-if="$index < $ctrl.chaptersDisplayed">
+          <span translate="I18N_TOPIC_VIEWER_CHAPTER"></span> <[$index + 1]>: <[title]>
+        </span>
       </div>
       <div ng-click="$ctrl.showAllChapters()"
            ng-if="$ctrl.showButton && ($ctrl.chaptersDisplayed < $ctrl.nodeCount)"
            class="view-button">
-        View All <span class="material-icons"> arrow_drop_down </span>
+        <span translate="I18N_TOPIC_VIEWER_VIEW_ALL"></span>
+        <span class="material-icons"> arrow_drop_down </span>
       </div>
       <div ng-click="$ctrl.hideExtraChapters()"
            ng-if="$ctrl.showButton && ($ctrl.chaptersDisplayed === $ctrl.nodeCount)"
            class="view-button">
-        View Less <span class="material-icons"> arrow_drop_up </span>
+        <span translate="I18N_TOPIC_VIEWER_VIEW_LESS"></span>
+        <span class="material-icons"> arrow_drop_up </span>
       </div>
     </div>
   </div>
@@ -40,10 +44,12 @@
   }
 
   story-summary-tile .view-button {
-    color: #296157;
+    color: #00645C;
     cursor: pointer;
     font-weight: bold;
-    margin-left: 12vw;
+    margin-top: 1vh;
+    text-align: center;
+    width: 100%;
   }
 
   story-summary-tile .view-button:focus {
@@ -61,9 +67,7 @@
     border-radius: 0.25rem;
     display: inline-block;
     margin-left: 0.8vw;
-    padding-left: 2vw;
-    padding-right: 2vw;
-    padding-top: 2.2vh;
+    padding: 1.25vh 2vw 1vh 2vw;
     width: 65%;
   }
 
@@ -91,14 +95,14 @@
     border-radius: 0.4em;
     display: table-cell;
     float: left;
-    height: 144px;
+    height: 150px;
     text-align: center;
     vertical-align: middle;
-    width: 192px;
+    width: 205px;
   }
 
   story-summary-tile a {
-    color: black;
+    color: #000000;
   }
 
   story-summary-tile a:hover {
@@ -111,17 +115,19 @@
       box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.2);
       border-radius: 0.4em;
       display: inherit;
-      width: 192px;
+      width: 205px;
     }
 
     story-summary-tile .story-thumbnail {
       border: none;
+      border-radius: 0.4em 0.4em 0 0;
     }
 
     story-summary-tile .chapter-details {
       border: none;
       margin-left: 0;
-      width: 192px;
+      padding: 2vh 3vw 2vh 4vw;
+      width: 205px;
     }
   }
 
@@ -130,12 +136,12 @@
       box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.2);
       border-radius: 0.4em;
       display: inherit;
-      width: 192px;
+      width: 205px;
     }
 
     story-summary-tile .story-thumbnail {
-      height: 144px;
-      width: 192px;
+      height: 150px;
+      width: 205px;
     }
   }
 </style>
