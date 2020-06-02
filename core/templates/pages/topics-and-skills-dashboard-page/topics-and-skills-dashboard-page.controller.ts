@@ -50,6 +50,7 @@ require(
 require('pages/topics-and-skills-dashboard-page/' +
     'topics-and-skills-dashboard-page.constants.ajs.ts');
 require('services/alerts.service.ts');
+require('services/image-local-storage.service.ts');
 
 
 angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
@@ -65,7 +66,9 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
       controllerAs: '$ctrl',
       controller: [
         '$timeout', '$http', '$rootScope', '$scope', '$uibModal', '$window',
-        'AlertsService', 'TopicsAndSkillsDashboardFilterObjectFactory',
+        'AlertsService',
+          'ContextService', 'ImageLocalStorageService',
+          'TopicsAndSkillsDashboardFilterObjectFactory',
         'RubricObjectFactory', 'SkillCreationService',
         'SkillObjectFactory', 'TopicCreationService',
         'TopicsAndSkillsDashboardBackendApiService',
@@ -175,6 +178,7 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
               backdrop: 'static',
               controller: 'CreateNewSkillModal'
             }).result.then(function(result) {
+              ContextService.resetImageSaveDestination();
               SkillCreationService.createNewSkill(
                 result.description, result.rubrics, result.explanation, []);
             });
