@@ -33,7 +33,6 @@ export interface MissingTranslationHandlerParams {
 
 export interface LangChangeEvent {
   lang: string;
-  translations: Object;
 }
 
 @Injectable({
@@ -65,7 +64,7 @@ export class TranslateService {
     this.currentLang = lang;
     if (Object.keys(this.translations).includes(lang)) {
       this._onLangChange.emit(
-        {lang: lang, translations: this.translations[lang]});
+        {lang: lang });
       return;
     }
     // Otherwise fetch the translations
@@ -74,7 +73,7 @@ export class TranslateService {
         this.translations[lang] = translations;
         if (this.currentLang === lang) {
           this._onLangChange.emit(
-            {lang: lang, translations: this.translations[lang]});
+            {lang: lang});
         }
       }
     );
@@ -82,17 +81,17 @@ export class TranslateService {
 
 
   interpolate(expr: string | Function, params?: Object): string {
-    let result: string;
+    let interpolatedString: string;
 
     if (typeof expr === 'string') {
-      result = this.interpolateString(expr, params);
+      interpolatedString = this.interpolateString(expr, params);
     } else if (typeof expr === 'function') {
-      result = this.interpolateFunction(expr, params);
+      interpolatedString = this.interpolateFunction(expr, params);
     } else {
-      result = expr as string;
+      interpolatedString = expr as string;
     }
 
-    return result;
+    return interpolatedString;
   }
 
   getValue(target: Object, key: string): string | undefined {
@@ -132,46 +131,28 @@ export class TranslateService {
       });
   }
 
-  getParsedResult(
-      translations: Object, key: string, interpolateParams?: Object): string {
-    let res: string;
-
-    if (translations) {
-      res = this.interpolate(
-        this.getValue(translations, key), interpolateParams);
-    }
-
-    // If the translation for the current lang doesn't exist use default lang
-    if (typeof res === 'undefined' && this.defaultLang !== null &&
-      this.defaultLang !== this.currentLang) {
-      res = this.interpolate(this.getValue(
-        this.translations[this.defaultLang], key), interpolateParams);
-    }
-
-    // If the translation for the default lang also doesn't exist raise an error
-    if (typeof res === 'undefined') {
-      let params: MissingTranslationHandlerParams = {
-        key,
-        translateService: this
-      };
-      if (typeof interpolateParams !== 'undefined') {
-        params.interpolateParams = interpolateParams;
-      }
-      res = params.key;
-    }
-
-    return typeof res !== 'undefined' ? res : key;
-  }
-
-  get(
+  getInterpolatedString(
       key: string,
       interpolateParams?: Object): string {
     if (!this.utils.isDefined(key) || !key.length) {
       throw new Error('Parameter "key" required');
     }
     // check if we are loading a new translation to use {
-    let res = this.getParsedResult(
-      this.translations[this.currentLang], key, interpolateParams);
-    return res;
+    let interpolatedString: string;
+    let translations = this.translations[this.currentLang];
+
+    if (translations) {
+      interpolatedString = this.interpolate(
+        this.getValue(translations, key), interpolateParams);
+    }
+
+    // If the translation for the current lang doesn't exist use default lang
+    if (typeof interpolatedString === 'undefined' &&
+        this.defaultLang !== null && this.defaultLang !== this.currentLang) {
+      interpolatedString = this.interpolate(this.getValue(
+        this.translations[this.defaultLang], key), interpolateParams);
+    }
+
+    return typeof interpolatedString !== 'undefined' ? interpolatedString : key;
   }
 }

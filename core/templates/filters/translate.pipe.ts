@@ -40,20 +40,13 @@ export class TranslatePipe implements PipeTransform, OnDestroy {
 
   updateValue(
       key: string,
-      interpolateParams?: Object,
-      translations?: Object | undefined
+      interpolateParams?: Object
   ): void {
-    let onTranslation = (res: string) => {
-      this.value = res !== undefined ? res : key;
-      this.lastKey = key;
-      this._ref.markForCheck();
-    };
-    if (translations) {
-      let res = this.translate.getParsedResult(
-        translations, key, interpolateParams);
-      onTranslation(res);
-    }
-    onTranslation(this.translate.get(key, interpolateParams));
+    const interpolatedString = this.translate.getInterpolatedString(
+      key, interpolateParams);
+    this.value = interpolatedString !== undefined ? interpolatedString : key;
+    this.lastKey = key;
+    this._ref.markForCheck();
   }
 
   // args[0] can be either object or string or empty. So type of args could be
@@ -101,7 +94,7 @@ export class TranslatePipe implements PipeTransform, OnDestroy {
     if (!this.onLangChange) {
       this.onLangChange = this.translate.onLangChange.subscribe(
         (event: LangChangeEvent) => {
-          this.updateValue(query, interpolateParams, event.translations);
+          this.updateValue(query, interpolateParams);
         }
       );
     }

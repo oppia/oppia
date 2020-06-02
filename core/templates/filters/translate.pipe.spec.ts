@@ -49,19 +49,8 @@ class MockTranslateService {
           return params[b];
         });
     }
-    getParsedResult(
-        translations: Object| undefined,
-        key: string,
-        interpolateParams?: Object | undefined) {
-      const str = translations[key];
-      if (!interpolateParams) {
-        return str;
-      }
 
-      return this.interpolateString(str, interpolateParams);
-    }
-
-    get(key: string,
+    getInterpolatedString(key: string,
         interpolateParams?: Object) {
       const str = this.translations[key];
       if (!interpolateParams) {
@@ -72,7 +61,7 @@ class MockTranslateService {
     }
 }
 
-describe('AboutPageComponent', () => {
+fdescribe('TranslatePipe', () => {
   let pipe: TranslatePipe;
   let translate: TranslateService;
   let changeDecRef: ChangeDetectorRef;
@@ -93,7 +82,7 @@ describe('AboutPageComponent', () => {
   }));
 
 
-  it('should translate', () => {
+  fit('should translate', () => {
     expect(pipe.transform('I18n_t_1')).toBe('Hello');
     expect(pipe.transform('I18n_t_2', {val: 'World'})).toBe('Hello World');
     expect(pipe.transform('I18n_t_3')).toBe('I18n_t_3');
@@ -104,12 +93,11 @@ describe('AboutPageComponent', () => {
       ('Wrong parameter in TranslatePipe. Expected a valid Object,' +
         (' received: {val: \'World\''))
     );
-    translate.onLangChange.emit({lang: 'en',
-      translations: translate.translations});
+    translate.onLangChange.emit({lang: 'en'});
   });
 
   // Sole purpose of this test is to cover ngOnDestroy
-  it('should destroy subscriptions', () => {
+  fit('should destroy subscriptions', () => {
     pipe.ngOnDestroy();
 
     // Reintializing the pipe because it jasmine tries to destroy it on its own

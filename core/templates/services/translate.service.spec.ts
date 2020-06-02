@@ -21,7 +21,7 @@ import { HttpTestingController, HttpClientTestingModule } from
   '@angular/common/http/testing';
 import { TranslateService } from './translate.service';
 
-describe('Translate service should', () => {
+fdescribe('Translate service', () => {
   let httpTestingController: HttpTestingController;
   let translate: TranslateService;
 
@@ -38,7 +38,7 @@ describe('Translate service should', () => {
     httpTestingController.verify();
   });
 
-  it('should fetch translations', fakeAsync(() => {
+  fit('should fetch translations', fakeAsync(() => {
     const successHandler = jasmine.createSpy('success');
     const failHandler = jasmine.createSpy('fail');
     const translations = {I18n_t_1: 'Hello'};
@@ -53,14 +53,14 @@ describe('Translate service should', () => {
     expect(failHandler).not.toHaveBeenCalled();
   }));
 
-  it('should set the new translation', fakeAsync(() => {
+  fit('should set the new translation', fakeAsync(() => {
     let lang = '';
     let translations = {};
     const enTranslations = {I18n_t_1: 'Hello'};
     const subscription = translate.onLangChange.subscribe(
       res => {
         lang = res.lang;
-        translations = res.translations;
+        translations = translate.translations[res.lang];
       }
     );
     const esTranslations = {
@@ -92,7 +92,7 @@ describe('Translate service should', () => {
     subscription.unsubscribe();
   }));
 
-  it('should get translations', fakeAsync(() => {
+  fit('should get translations', fakeAsync(() => {
     const enTranslations = {
       I18n_t_1: 'Hello',
       I18n_t_2: 'Hello <[val]>'
@@ -109,7 +109,8 @@ describe('Translate service should', () => {
 
     flushMicrotasks();
 
-    expect(translate.get('I18n_t_2', {val: 'World'})).toBe('Hello World');
+    expect(translate.getInterpolatedString(
+      'I18n_t_2', {val: 'World'})).toBe('Hello World');
 
     translate.use('es');
 
@@ -118,23 +119,27 @@ describe('Translate service should', () => {
 
     flushMicrotasks();
 
-    expect(translate.get('I18n_t_1')).toBe('Hola');
-    expect(translate.get('I18n_t_2', {val: 'World'})).toBe('Hello World');
-    expect(translate.get('I18n_t_3', {val: 'World'})).toBe('I18n_t_3');
+    expect(translate.getInterpolatedString(
+      'I18n_t_1')).toBe('Hola');
+    expect(translate.getInterpolatedString(
+      'I18n_t_2', {val: 'World'})).toBe('Hello World');
+    expect(translate.getInterpolatedString(
+      'I18n_t_3', {val: 'World'})).toBe('I18n_t_3');
   }));
 
-  it('interpolate should work with functions', fakeAsync(() => {
+  fit('interpolate should work with functions', fakeAsync(() => {
     expect(translate.interpolate(x => x, 'Hola')).toBe('Hola');
   }));
 
-  it('should throw an error if key is not defined', fakeAsync(() => {
+  fit('should throw an error if key is not defined', fakeAsync(() => {
     expect(function() {
-      translate.get('');
+      translate.getInterpolatedString('');
     }).toThrowError('Parameter "key" required');
   }));
 
-  it('should ignore the key if target is undefined', fakeAsync(() => {
+  fit('should ignore the key if target is undefined', fakeAsync(() => {
     let target;
-    expect(translate.getValue(target, 'asdf.abcd')).toBeUndefined();
+    expect(translate.getValue(
+      target, 'asdf.abcd')).toBeUndefined();
   }));
 });
