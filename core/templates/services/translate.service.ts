@@ -80,7 +80,7 @@ export class TranslateService {
   }
 
 
-  interpolate(expr: string | Function, params?: Object): string {
+  interpolateI18nString(expr: string | Function, params?: Object): string {
     let interpolatedString: string;
 
     if (typeof expr === 'string') {
@@ -94,27 +94,6 @@ export class TranslateService {
     return interpolatedString;
   }
 
-  getValue(target: Object, key: string): string | undefined {
-    let keys = typeof key === 'string' ? key.split('.') : [key];
-    key = '';
-    let tar: string | undefined;
-    do {
-      key += keys.shift();
-      if (this.utils.isDefined(target) && this.utils.isDefined(target[key]) &&
-        (typeof target[key] === 'object' || !keys.length)) {
-        tar = target[key];
-        target = target[key];
-        key = '';
-      } else if (!keys.length) {
-        target = undefined;
-        tar = undefined;
-      } else {
-        key += '.';
-      }
-    } while (keys.length);
-    return tar;
-  }
-
   private interpolateFunction(fn: Function, params?: Object | undefined) {
     return fn(params);
   }
@@ -126,7 +105,7 @@ export class TranslateService {
 
     return expr.replace(this.templateMatcher,
       (substring: string, b: string) => {
-        let r = this.getValue(params, b);
+        let r = params[b];
         return this.utils.isDefined(r) ? r : substring;
       });
   }
@@ -142,15 +121,15 @@ export class TranslateService {
     let translations = this.translations[this.currentLang];
 
     if (translations) {
-      interpolatedString = this.interpolate(
-        this.getValue(translations, key), interpolateParams);
+      interpolatedString = this.interpolateI18nString(
+        translations[key], interpolateParams);
     }
 
     // If the translation for the current lang doesn't exist use default lang
     if (typeof interpolatedString === 'undefined' &&
         this.defaultLang !== null && this.defaultLang !== this.currentLang) {
-      interpolatedString = this.interpolate(this.getValue(
-        this.translations[this.defaultLang], key), interpolateParams);
+      interpolatedString = this.interpolateI18nString(
+        this.translations[this.defaultLang][key], interpolateParams);
     }
 
     return typeof interpolatedString !== 'undefined' ? interpolatedString : key;

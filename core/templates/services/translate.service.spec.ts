@@ -128,18 +128,12 @@ describe('Translate service', () => {
   }));
 
   it('interpolate should work with functions', fakeAsync(() => {
-    expect(translate.interpolate(x => x, 'Hola')).toBe('Hola');
+    expect(translate.interpolateI18nString(x => x, 'Hola')).toBe('Hola');
   }));
 
   it('should throw an error if key is not defined', fakeAsync(() => {
     expect(function() {
       translate.getInterpolatedString('');
     }).toThrowError('Parameter "key" required');
-  }));
-
-  it('should ignore the key if target is undefined', fakeAsync(() => {
-    let target;
-    expect(translate.getValue(
-      target, 'asdf.abcd')).toBeUndefined();
   }));
 });
