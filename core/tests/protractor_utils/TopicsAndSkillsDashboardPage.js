@@ -53,6 +53,8 @@ var TopicsAndSkillsDashboardPage = function() {
     '.protractor-test-topic-filter-reset'));
   var deleteTopicButton = element(
     by.css('.protractor-test-delete-topic-button'));
+  var editTopicButton = element(
+    by.css('.protractor-test-edit-topic-button'));
   var skillNameField = element(
     by.css('.protractor-test-new-skill-description-field')
   );
@@ -95,7 +97,7 @@ var TopicsAndSkillsDashboardPage = function() {
     var topicsListElems = [];
     var topicsListItemsCount = await topicsListItems.count();
     for (var i = 0; i < topicsListItemsCount; i++) {
-      var topic = await topicsListItems.get(i);
+      var topic = topicsListItems.get(i);
       var name = await topic.element(
         by.css('.protractor-test-topic-name')).getText();
       if (name === topicName) {
@@ -135,9 +137,7 @@ var TopicsAndSkillsDashboardPage = function() {
   this.navigateToTopicWithIndex = async function(index) {
     await waitFor.visibilityOf(topicsTable,
       'Topic table taking too long to appear.');
-    var editTopicButton = element(
-      by.css('.protractor-test-edit-topic-button'));
-    var topicEditOptionBox = await topicEditOptions.get(index);
+    var topicEditOptionBox = topicEditOptions.get(index);
     await browser.actions().mouseMove(topicEditOptionBox).perform();
     await waitFor.elementToBeClickable(
       editTopicButton,
@@ -152,7 +152,7 @@ var TopicsAndSkillsDashboardPage = function() {
       assignSkillButton,
       'Assign skill button taking too long to be clickable');
     await assignSkillButton.click();
-    var topic = await topicsListItems.get(topicIndex);
+    var topic = topicsListItems.get(topicIndex);
     await waitFor.elementToBeClickable(
       topic, 'Topic list item taking too long to be clickable');
     await topic.click();
@@ -200,8 +200,9 @@ var TopicsAndSkillsDashboardPage = function() {
     await topicNameField.sendKeys(topicName);
     await topicDescriptionField.sendKeys(description);
     await topicCategoryField.click();
-    await (await
-    browser.driver.switchTo().activeElement()).sendKeys(category + '\n');
+    await (
+      await browser.driver.switchTo().activeElement()
+    ).sendKeys(category + '\n');
     await confirmTopicCreationButton.click();
 
     await waitFor.newTabToBeCreated(
@@ -223,7 +224,7 @@ var TopicsAndSkillsDashboardPage = function() {
         confirmTopicCreationButton,
         'Create Topic modal takes too long to disappear.');
     } else {
-      await waitFor.visibilityOf(
+      await waitFor.visi.jsbilityOf(
         element(by.css('.protractor-test-topic-name-field')),
         'Topic Editor is taking too long to appear.');
     }
@@ -251,8 +252,9 @@ var TopicsAndSkillsDashboardPage = function() {
       'Topic Dashboard category taking too long to appear.');
 
     await topicFilterCategoryField.click();
-    await (await
-    browser.driver.switchTo().activeElement()).sendKeys(keyword + '\n');
+    await (
+      await browser.driver.switchTo().activeElement()
+    ).sendKeys(keyword + '\n');
   };
 
   this.resetTopicFilters = async function() {
@@ -264,8 +266,7 @@ var TopicsAndSkillsDashboardPage = function() {
   this.deleteTopicWithIndex = async function(index) {
     await waitFor.visibilityOf(topicsTable,
       'Topic table taking too long to appear.');
-    var topics = element.all(by.css('.protractor-test-topic-edit-box'));
-    var topicEditOptionBox = await topics.get(index);
+    var topicEditOptionBox = topicEditOptions.get(index);
     await browser.actions().mouseMove(topicEditOptionBox).perform();
     await waitFor.elementToBeClickable(
       deleteTopicButton,
@@ -377,8 +378,7 @@ var TopicsAndSkillsDashboardPage = function() {
     await waitFor.visibilityOf(topicsTable,
       'Topic table taking too long to appear.');
 
-    var topics = await topicNames;
-    await Promise.all(topics.map(async(topic, index) => {
+    await Promise.all(topicNames.map(async(topic, index) => {
       var name = await topic.getText();
       if (name === topicName) {
         await this.navigateToTopicWithIndex(index);

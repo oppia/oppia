@@ -18,18 +18,23 @@
  */
 
 require('domain/utilities/url-interpolation.service.ts');
+require('services/context.service.ts');
+require('services/image-local-storage.service.ts');
 
 angular.module('oppia').controller('CreateNewSkillModal', [
-  '$scope', '$uibModalInstance', 'RubricObjectFactory', 'SkillCreationService',
-  'SkillObjectFactory', 'MAX_CHARS_IN_SKILL_DESCRIPTION',
-  'SKILL_DESCRIPTION_STATUS_VALUES', 'SKILL_DIFFICULTIES',
-  function($scope, $uibModalInstance, RubricObjectFactory, SkillCreationService,
-      SkillObjectFactory, MAX_CHARS_IN_SKILL_DESCRIPTION,
-      SKILL_DESCRIPTION_STATUS_VALUES, SKILL_DIFFICULTIES) {
+  '$scope', '$uibModalInstance', 'ContextService', 'ImageLocalStorageService',
+  'RubricObjectFactory', 'SkillCreationService', 'SkillObjectFactory',
+  'MAX_CHARS_IN_SKILL_DESCRIPTION', 'SKILL_DESCRIPTION_STATUS_VALUES',
+  'SKILL_DIFFICULTIES',
+  function($scope, $uibModalInstance, ContextService, ImageLocalStorageService,
+      RubricObjectFactory, SkillCreationService, SkillObjectFactory,
+      MAX_CHARS_IN_SKILL_DESCRIPTION, SKILL_DESCRIPTION_STATUS_VALUES,
+      SKILL_DIFFICULTIES) {
     var rubrics = [
       RubricObjectFactory.create(SKILL_DIFFICULTIES[0], []),
       RubricObjectFactory.create(SKILL_DIFFICULTIES[1], ['']),
       RubricObjectFactory.create(SKILL_DIFFICULTIES[2], [])];
+    ContextService.setImageSaveDestinationToLocalStorage();
     $scope.newSkillDescription = '';
     $scope.rubrics = rubrics;
     $scope.errorMsg = '';
@@ -90,6 +95,7 @@ angular.module('oppia').controller('CreateNewSkillModal', [
     };
 
     $scope.cancel = function() {
+      ImageLocalStorageService.flushStoredImagesData();
       SkillCreationService.resetSkillDescriptionStatusMarker();
       $uibModalInstance.dismiss('cancel');
     };

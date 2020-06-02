@@ -89,7 +89,6 @@ describe('Topics and Skills Dashboard Page', function() {
       directive = $injector.get('topicsAndSkillsDashboardPageDirective')[0];
       ctrl = $injector.instantiate(directive.controller, {
         $scope: $scope,
-        // SkillCreationService: MockSkillCreationService,
         TopicsAndSkillsDashboardBackendApiService:
         MockTopicsAndSkillsDashboardBackendApiService
       });

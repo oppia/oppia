@@ -54,7 +54,7 @@ describe('Topics and skills dashboard functionality', function() {
   it('should add a new topic to list and delete it', async function() {
     await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(0);
     await topicsAndSkillsDashboardPage.createTopic(
-      'Topic 1', 'Topic 1 description', 'Mathematics', true);
+      'Topic1 TASD', 'Topic 1 description', 'Mathematics', true);
 
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(1);
@@ -65,10 +65,10 @@ describe('Topics and skills dashboard functionality', function() {
   it('should filter the topics', async function() {
     await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(0);
     await topicsAndSkillsDashboardPage.createTopic(
-      'Alpha Topic Dashboard', 'Alpha description', 'Mathematics', true);
+      'Alpha TASD', 'Alpha description', 'Mathematics', true);
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.createTopic(
-      'Beta Topic Dashboard', 'Beta description', 'Mathematics', true);
+      'Beta TASD', 'Beta description', 'Mathematics', true);
 
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(2);

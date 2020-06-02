@@ -66,9 +66,8 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
       controllerAs: '$ctrl',
       controller: [
         '$timeout', '$http', '$rootScope', '$scope', '$uibModal', '$window',
-        'AlertsService',
-          'ContextService', 'ImageLocalStorageService',
-          'TopicsAndSkillsDashboardFilterObjectFactory',
+        'AlertsService', 'ContextService', 'ImageLocalStorageService',
+        'TopicsAndSkillsDashboardFilterObjectFactory',
         'RubricObjectFactory', 'SkillCreationService',
         'SkillObjectFactory', 'TopicCreationService',
         'TopicsAndSkillsDashboardBackendApiService',
@@ -83,7 +82,8 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
         'TOPIC_PUBLISHED_OPTIONS',
         function(
             $timeout, $http, $rootScope, $scope, $uibModal, $window,
-            AlertsService, TopicsAndSkillsDashboardFilterObjectFactory,
+            AlertsService, ContextService, ImageLocalStorageService,
+            TopicsAndSkillsDashboardFilterObjectFactory,
             RubricObjectFactory, SkillCreationService,
             SkillObjectFactory, TopicCreationService,
             TopicsAndSkillsDashboardBackendApiService,
