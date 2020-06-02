@@ -25,7 +25,6 @@ import sys
 import python_utils
 
 from . import build
-from . import check_frontend_coverage
 from . import common
 from . import install_third_party_libs
 from . import setup
@@ -108,8 +107,6 @@ def main(args=None):
             sys.exit(
                 'The frontend tests failed. Please fix it before running the'
                 ' test coverage check.')
-        else:
-            check_frontend_coverage.main()
     elif task.returncode:
         sys.exit(task.returncode)
 
