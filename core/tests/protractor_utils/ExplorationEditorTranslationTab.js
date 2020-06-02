@@ -192,11 +192,15 @@ var ExplorationEditorTranslationTab = function() {
     by.css('.protractor-test-node'));
   var audioOverFiveMinutesErrorMessageElement = element(
     by.css('.protractor-test-audio-file-upload-field-error-message'));
+  var audioUploadErrorMessageElement = element(by.css(
+    '.protractor-test-upload-error-message'));
   var playPauseAudioButton = element(
     by.css('.protractor-test-play-pause-audio-button'));
   var audioMaterialSliderDiv = element(by.css('.md-slider-wrapper'));
   var closeAudioUploaderModalButton = element(
     by.css('.protractor-test-close-audio-upload-modal'));
+  var audioUploadContainerElement = element(by.css(
+    '.protractor-test-audio-upload-container'));
   var translationFeedback = function(index) {
     return element(by.css('.protractor-test-feedback-' + index));
   };
@@ -326,7 +330,12 @@ var ExplorationEditorTranslationTab = function() {
     var audioAbsolutePath = path.resolve(
       __dirname, relativePathOfAudioToUpload);
     await audioUploadInput.sendKeys(audioAbsolutePath);
-    expect(await element(by.css('div.error-message')).getText())
+    // A fake click to trigger onChange event for audioUploadInput.
+    await audioUploadContainerElement.click();
+    await waitFor.visibilityOf(
+      audioUploadErrorMessageElement,
+      'Audio upload error message element is not visible');
+    expect(await audioUploadErrorMessageElement.getText())
       .toContain('This file is not recognized as an audio file.');
   };
 

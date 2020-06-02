@@ -17,6 +17,8 @@
  */
 import { WindowRef } from 'services/contextual/window-ref.service';
 
+require('pages/teach-page/teach-page.component.ts');
+
 describe('Teach Page', function() {
   var $scope = null, ctrl = null;
   var $timeout = null;
@@ -27,14 +29,14 @@ describe('Teach Page', function() {
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('WindowRef', windowRef);
   }));
-  beforeEach(angular.mock.inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector, $componentController) {
     $timeout = $injector.get('$timeout');
     SiteAnalyticsService = $injector.get('SiteAnalyticsService');
 
     var $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
-    var directive = $injector.get('teachPageDirective')[0];
-    ctrl = $injector.instantiate(directive.controller, {
+
+    ctrl = $componentController('teachPage', {
       $rootScope: $scope
     });
   }));
