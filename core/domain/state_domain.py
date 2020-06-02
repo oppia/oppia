@@ -1926,7 +1926,7 @@ class State(python_utils.OBJECT):
                 self.interaction.solution.explanation.content_id)
 
         if solution:
-            if not isinstance (solution, Solution):
+            if not isinstance(solution, Solution):
                 raise Exception(
                     'Expected solution to be a Solution object, received %s'
                     % solution)

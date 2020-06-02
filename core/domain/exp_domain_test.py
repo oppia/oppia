@@ -8339,7 +8339,7 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
             }
         }
         state2.update_interaction_hints(hint_list2)
-        solution = state_domain.Solution(
+        solution = state_domain.Solution.from_dict(
             state1.interaction.id, solution_dict1)
         state1.update_interaction_solution(solution)
 

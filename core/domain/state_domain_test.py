@@ -1343,17 +1343,18 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             }
         }
         solution = state_domain.Solution.from_dict(
-                exploration.init_state.interaction.id, solution_dict)
+            exploration.init_state.interaction.id, solution_dict)
         exploration.init_state.update_interaction_hints(hints_list)
         exploration.init_state.update_interaction_solution(solution)
         self.assertEqual(
-            exploration.init_state.interaction.solution.to_dict(), solution_dict)
+            exploration.init_state.interaction.solution.to_dict(),
+            solution_dict)
 
         with self.assertRaisesRegexp(
             Exception, 'Expected solution to be a dict'):
-                solution = state_domain.Solution.from_dict(
-                    exploration.init_state.interaction.id, [])
-                exploration.init_state.update_interaction_solution(solution)        
+            solution = state_domain.Solution.from_dict(
+                exploration.init_state.interaction.id, [])
+            exploration.init_state.update_interaction_solution(solution)        
 
     def test_update_interaction_solution_with_no_solution(self):
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
