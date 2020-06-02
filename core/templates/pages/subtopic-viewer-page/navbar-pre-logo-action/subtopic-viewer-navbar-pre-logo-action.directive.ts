@@ -31,8 +31,7 @@ angular.module('oppia').directive('subtopicViewerNavbarPreLogoAction', [
         'subtopic-viewer-navbar-pre-logo-action.directive.html'),
       controller: [
         '$scope', 'UrlService', 'TOPIC_VIEWER_URL_TEMPLATE', function(
-            $scope, UrlService,
-            TOPIC_VIEWER_URL_TEMPLATE) {
+            $scope, UrlService, TOPIC_VIEWER_URL_TEMPLATE) {
           var ctrl = this;
           $scope.getTopicUrl = function() {
             return UrlInterpolationService.interpolateUrl(
