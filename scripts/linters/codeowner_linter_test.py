@@ -165,7 +165,7 @@ class CodeOwnerLinterTests(test_utils.GenericTestBase):
             codeowner_linter.check_codeowner_file(FILE_CACHE, False)
             self.assertTrue(
                 appears_in_linter_stdout(
-                    ['Pattern on line 544 doesn\'t have codeowner'],
+                    ['Pattern on line 27 doesn\'t have codeowner'],
                     self.linter_stdout))
 
     def test_check_codeowner_file_without_full_file_path(self):
@@ -175,7 +175,7 @@ class CodeOwnerLinterTests(test_utils.GenericTestBase):
             codeowner_linter.check_codeowner_file(FILE_CACHE, False)
         self.assertTrue(
             appears_in_linter_stdout(
-                ['Pattern on line 543 is invalid. Use '
+                ['Pattern on line 26 is invalid. Use '
                  'full path relative to the root directory'],
                 self.linter_stdout))
 
@@ -186,7 +186,7 @@ class CodeOwnerLinterTests(test_utils.GenericTestBase):
             codeowner_linter.check_codeowner_file(FILE_CACHE, False)
         self.assertTrue(
             appears_in_linter_stdout(
-                ['Pattern on line 542 is invalid. '
+                ['Pattern on line 25 is invalid. '
                  '\'**\' wildcard not allowed'], self.linter_stdout))
 
     def test_check_codeowner_file_with_no_valid_match(self):
@@ -196,7 +196,7 @@ class CodeOwnerLinterTests(test_utils.GenericTestBase):
             codeowner_linter.check_codeowner_file(FILE_CACHE, False)
         self.assertTrue(
             appears_in_linter_stdout(
-                ['Pattern on line 436 doesn\'t match '
+                ['Pattern on line 2 doesn\'t match '
                  'any file or directory'], self.linter_stdout))
 
     def test_check_codeowner_file_with_no_match_in_codeowners_file(self):

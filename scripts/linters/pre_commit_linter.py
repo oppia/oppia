@@ -87,18 +87,13 @@ _PARSER.add_argument(
     '--verbose',
     help='verbose mode. All details will be printed.',
     action='store_true')
-_EXCLUSIVE_GROUP.add_argument(
+_PARSER.add_argument(
     '--only-check-file-extensions',
     nargs='+',
     choices=['html', 'css', 'js', 'ts', 'py', 'other'],
     help='specific file extensions to be linted. Space separated list. '
     'If either of js or ts used then both js and ts files will be linted.',
     action='store')
-
-if not os.getcwd().endswith('oppia'):
-    python_utils.PRINT('')
-    python_utils.PRINT(
-        'ERROR    Please run this script from the oppia root directory.')
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 
@@ -552,12 +547,12 @@ def main(args=None):
         semaphore.acquire()
         _get_task_output(lint_messages, task, semaphore)
 
-    # lint_messages += codeowner_linter.check_codeowner_file(
-    #     FILE_CACHE, verbose_mode_enabled)
-    #
-    # lint_messages += (
-    #     third_party_typings_linter.check_third_party_libs_type_defs(
-    #         verbose_mode_enabled))
+    lint_messages += codeowner_linter.check_codeowner_file(
+        FILE_CACHE, verbose_mode_enabled)
+
+    lint_messages += (
+        third_party_typings_linter.check_third_party_libs_type_defs(
+            verbose_mode_enabled))
 
     _print_complete_summary_of_lint_messages(lint_messages)
 
@@ -583,5 +578,8 @@ NAME_SPACE.files = FileCache()
 FILE_CACHE = NAME_SPACE.files
 
 
-if __name__ == '__main__':
+# The 'no coverage' pragma is used as this line is un-testable. This is because
+# it will only be called when pre_commit_linter.py is used as a
+# script.
+if __name__ == '__main__': # pragma: no cover
     main()
