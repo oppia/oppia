@@ -75,6 +75,7 @@ class MockTranslateService {
 describe('AboutPageComponent', () => {
   let pipe: TranslatePipe;
   let translate: TranslateService;
+  let changeDecRef: ChangeDetectorRef;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
@@ -87,7 +88,7 @@ describe('AboutPageComponent', () => {
       ]
     }).compileComponents();
     translate = TestBed.get(TranslateService);
-    let changeDecRef = TestBed.get(ChangeDetectorRef);
+    changeDecRef = TestBed.get(ChangeDetectorRef);
     pipe = new TranslatePipe(translate, changeDecRef, new UtilsService());
   }));
 
@@ -105,5 +106,14 @@ describe('AboutPageComponent', () => {
     );
     translate.onLangChange.emit({lang: 'en',
       translations: translate.translations});
+  });
+
+  // Sole purpose of this test is to cover ngOnDestroy
+  it('should destroy subscriptions', () => {
+    pipe.ngOnDestroy();
+
+    // Reintializing the pipe because it jasmine tries to destroy it on its own
+    // but I called the OnDestroy method and this leads to errors
+    pipe = new TranslatePipe(translate, changeDecRef, new UtilsService());
   });
 });
