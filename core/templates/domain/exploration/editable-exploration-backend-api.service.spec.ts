@@ -102,173 +102,199 @@ describe('Editable exploration backend API service', function() {
     $httpBackend.verifyNoOutstandingRequest();
   });
 
-  it('should successfully fetch an existing exploration from the backend',
-    function() {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
+  it('should successfully fetch an existing exploration from ' +
+    'the backend', function() {
+    var successHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
 
-      $httpBackend.expect('GET', '/createhandler/data/0').respond(
-        sampleDataResults);
-      EditableExplorationBackendApiService.fetchExploration('0').then(
-        successHandler, failHandler);
-      $httpBackend.flush();
+    $httpBackend.expect('GET', '/createhandler/data/0').respond(
+      sampleDataResults);
+    EditableExplorationBackendApiService.fetchExploration('0').then(
+      successHandler, failHandler);
+    $httpBackend.flush();
 
-      expect(successHandler).toHaveBeenCalledWith(sampleDataResults);
-      expect(failHandler).not.toHaveBeenCalled();
-    }
+    expect(successHandler).toHaveBeenCalledWith(sampleDataResults);
+    expect(failHandler).not.toHaveBeenCalled();
+  }
   );
 
-  it('should fetch and apply the draft of an exploration',
-    function() {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
+  it('should fetch and apply the draft of an exploration', function() {
+    var successHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
 
-      // Loading a exploration the first time should fetch it from the backend.
-      $httpBackend.expect(
-        'GET', '/createhandler/data/0?apply_draft=true').respond(
-        sampleDataResults);
+    // Loading a exploration the first time should fetch it from the backend.
+    $httpBackend.expect(
+      'GET', '/createhandler/data/0?apply_draft=true').respond(
+      sampleDataResults);
 
-      EditableExplorationBackendApiService.fetchApplyDraftExploration(
-        '0').then(successHandler, failHandler);
-      $httpBackend.flush();
+    EditableExplorationBackendApiService.fetchApplyDraftExploration(
+      '0').then(successHandler, failHandler);
+    $httpBackend.flush();
 
-      expect(successHandler).toHaveBeenCalledWith(sampleDataResults);
-      expect(failHandler).not.toHaveBeenCalled();
-    }
+    expect(successHandler).toHaveBeenCalledWith(sampleDataResults);
+    expect(failHandler).not.toHaveBeenCalled();
+  }
   );
 
-  it('should use the rejection handler if the backend request failed',
-    function() {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
+  it('should use the rejection handler if the backend ' +
+    'request failed', function() {
+    var successHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
 
-      // Loading a exploration the first time should fetch it from the backend.
-      $httpBackend.expect('GET', '/createhandler/data/1').respond(
-        500, 'Error loading exploration 1.');
-      EditableExplorationBackendApiService.fetchExploration('1').then(
-        successHandler, failHandler);
-      $httpBackend.flush();
+    // Loading a exploration the first time should fetch it from the backend.
+    $httpBackend.expect('GET', '/createhandler/data/1').respond(
+      500, 'Error loading exploration 1.');
+    EditableExplorationBackendApiService.fetchExploration('1').then(
+      successHandler, failHandler);
+    $httpBackend.flush();
 
-      expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalledWith('Error loading exploration 1.');
-    }
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith('Error loading exploration 1.');
+  }
   );
 
-  it('should update a exploration after fetching it from the backend',
-    function() {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
-      var exploration = null;
+  it('should update a exploration after fetching it from ' +
+    'the backend', function() {
+    var successHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
+    var exploration = null;
 
-      // Loading a exploration the first time should fetch it from the backend.
-      $httpBackend.expect('GET', '/createhandler/data/0').respond(
-        sampleDataResults);
+    // Loading a exploration the first time should fetch it from the backend.
+    $httpBackend.expect('GET', '/createhandler/data/0').respond(
+      sampleDataResults);
 
-      EditableExplorationBackendApiService.fetchExploration('0').then(
-        function(data) {
-          exploration = data;
-        });
-      $httpBackend.flush();
+    EditableExplorationBackendApiService.fetchExploration('0').then(
+      function(data) {
+        exploration = data;
+      });
+    $httpBackend.flush();
 
-      exploration.title = 'New Title';
-      exploration.version = '2';
+    exploration.title = 'New Title';
+    exploration.version = '2';
 
-      $httpBackend.expect('PUT', '/createhandler/data/0').respond(
-        exploration);
+    $httpBackend.expect('PUT', '/createhandler/data/0').respond(
+      exploration);
 
-      // Send a request to update exploration
-      EditableExplorationBackendApiService.updateExploration(
-        exploration.exploration_id, exploration.version,
-        exploration.title, []
-      ).then(successHandler, failHandler);
-      $httpBackend.flush();
+    // Send a request to update exploration
+    EditableExplorationBackendApiService.updateExploration(
+      exploration.exploration_id, exploration.version,
+      exploration.title, []
+    ).then(successHandler, failHandler);
+    $httpBackend.flush();
 
-      expect(successHandler).toHaveBeenCalledWith(exploration);
-      expect(failHandler).not.toHaveBeenCalled();
-    }
+    expect(successHandler).toHaveBeenCalledWith(exploration);
+    expect(failHandler).not.toHaveBeenCalled();
+  }
   );
 
-  it('should not cache exploration from backend into read only service',
-    function() {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
-      var exploration = null;
+  it('should not cache exploration from backend into ' +
+    'read only service', function() {
+    var successHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
+    var exploration = null;
 
-      $httpBackend.expect('GET', '/explorehandler/init/0')
-        .respond(sampleDataResults);
+    $httpBackend.expect('GET', '/explorehandler/init/0')
+      .respond(sampleDataResults);
 
-      ReadOnlyExplorationBackendApiService.loadLatestExploration('0', null)
-        .then(function(data) {
-          exploration = data;
-        });
-      $httpBackend.flush();
+    ReadOnlyExplorationBackendApiService.loadLatestExploration('0', null)
+      .then(function(data) {
+        exploration = data;
+      });
+    $httpBackend.flush();
 
-      expect(ReadOnlyExplorationBackendApiService.isCached('0')).toBe(true);
+    expect(ReadOnlyExplorationBackendApiService.isCached('0')).toBe(true);
 
-      exploration.title = 'New Title';
-      exploration.version = '2';
+    exploration.title = 'New Title';
+    exploration.version = '2';
 
-      $httpBackend.expect('PUT', '/createhandler/data/0')
-        .respond(exploration);
+    $httpBackend.expect('PUT', '/createhandler/data/0')
+      .respond(exploration);
 
-      // Send a request to update exploration
-      EditableExplorationBackendApiService.updateExploration(
-        exploration.exploration_id,
-        exploration.version,
-        exploration.title, []
-      ).then(successHandler, failHandler);
-      $httpBackend.flush();
+    // Send a request to update exploration
+    EditableExplorationBackendApiService.updateExploration(
+      exploration.exploration_id,
+      exploration.version,
+      exploration.title, []
+    ).then(successHandler, failHandler);
+    $httpBackend.flush();
 
-      expect(successHandler).toHaveBeenCalledWith(exploration);
-      expect(failHandler).not.toHaveBeenCalled();
+    expect(successHandler).toHaveBeenCalledWith(exploration);
+    expect(failHandler).not.toHaveBeenCalled();
 
-      expect(ReadOnlyExplorationBackendApiService.isCached('0')).toBe(false);
-    }
+    expect(ReadOnlyExplorationBackendApiService.isCached('0')).toBe(false);
+  }
   );
 
-  it('should delete exploration from the backend',
-    function() {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
-      var exploration = null;
+  it('should delete exploration from the backend', function() {
+    var successHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
+    var exploration = null;
 
-      $httpBackend.expect('GET', '/createhandler/data/0')
-        .respond(sampleDataResults);
+    $httpBackend.expect('GET', '/createhandler/data/0')
+      .respond(sampleDataResults);
 
-      EditableExplorationBackendApiService.fetchExploration('0')
-        .then(function(data) {
-          exploration = data;
-        });
-      $httpBackend.flush();
+    EditableExplorationBackendApiService.fetchExploration('0')
+      .then(function(data) {
+        exploration = data;
+      });
+    $httpBackend.flush();
 
-      exploration.title = 'New Title';
-      exploration.version = '2';
+    exploration.title = 'New Title';
+    exploration.version = '2';
 
-      $httpBackend.expect('PUT', '/createhandler/data/0')
-        .respond(exploration);
+    $httpBackend.expect('PUT', '/createhandler/data/0')
+      .respond(exploration);
 
-      // Send a request to update exploration
-      EditableExplorationBackendApiService.updateExploration(
-        exploration.exploration_id,
-        exploration.version,
-        'Minor edits', []
-      ).then(successHandler, failHandler);
-      $httpBackend.flush();
+    // Send a request to update exploration
+    EditableExplorationBackendApiService.updateExploration(
+      exploration.exploration_id,
+      exploration.version,
+      'Minor edits', []
+    ).then(successHandler, failHandler);
+    $httpBackend.flush();
 
-      expect(successHandler).toHaveBeenCalledWith(exploration);
-      expect(failHandler).not.toHaveBeenCalled();
+    expect(successHandler).toHaveBeenCalledWith(exploration);
+    expect(failHandler).not.toHaveBeenCalled();
 
-      $httpBackend.expect('DELETE', '/createhandler/data/0')
-        .respond({});
-      EditableExplorationBackendApiService
-        .deleteExploration(exploration.exploration_id)
-        .then(successHandler, failHandler);
-      $httpBackend.flush();
+    $httpBackend.expect('DELETE', '/createhandler/data/0')
+      .respond({});
+    EditableExplorationBackendApiService
+      .deleteExploration(exploration.exploration_id)
+      .then(successHandler, failHandler);
+    $httpBackend.flush();
 
-      expect(successHandler).toHaveBeenCalledWith({});
-      expect(failHandler).not.toHaveBeenCalled();
+    expect(successHandler).toHaveBeenCalledWith({});
+    expect(failHandler).not.toHaveBeenCalled();
 
-      expect(ReadOnlyExplorationBackendApiService.isCached('0')).toBe(false);
-    }
+    expect(ReadOnlyExplorationBackendApiService.isCached('0')).toBe(false);
+  }
+  );
+
+  it('should use the rejection handler if the backend ' +
+    'request failed', function() {
+    var successHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
+
+    var exploration = null;
+
+    $httpBackend.expect('GET', '/createhandler/data/0')
+      .respond(sampleDataResults);
+
+    EditableExplorationBackendApiService.fetchExploration('0')
+      .then(function(data) {
+        exploration = data;
+      });
+    $httpBackend.flush();
+
+    $httpBackend.expect('DELETE', '/createhandler/data/0').respond(
+      500, 'Error deleting exploration 1.');
+    EditableExplorationBackendApiService
+      .deleteExploration(exploration.exploration_id)
+      .then(successHandler, failHandler);
+    $httpBackend.flush();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith('Error deleting exploration 1.');
+  }
   );
 });
