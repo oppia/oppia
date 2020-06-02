@@ -63,6 +63,7 @@ angular.module('oppia').directive('mathExpressionContentEditor', [
           var cleanedSvgString = (
             ImageUploadHelperService.cleanMathExpressionSvgString(
               ctrl.svgString));
+          ctrl.value.svgString = cleanedSvgString;
           var dimensions = (
             ImageUploadHelperService.
               extractDimensionsFromMathExpressionSvgString(cleanedSvgString));
@@ -126,6 +127,9 @@ angular.module('oppia').directive('mathExpressionContentEditor', [
           });
         };
         ctrl.$onInit = function() {
+
+           console.log("inseid math editor")
+           console.log(ctrl.value)
           // Reset the component each time the value changes (e.g. if this is
           // part of an editable list).
           ctrl.svgString = '';

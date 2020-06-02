@@ -45,14 +45,32 @@ angular.module('oppia').controller('RteHelperModalController', [
     $scope.tmpCustomizationArgs = [];
     for (var i = 0; i < customizationArgSpecs.length; i++) {
       var caName = customizationArgSpecs[i].name;
-      $scope.tmpCustomizationArgs.push({
-        name: caName,
-        value: (
-          attrsCustomizationArgsDict.hasOwnProperty(caName) ?
-            angular.copy(attrsCustomizationArgsDict[caName]) :
-            customizationArgSpecs[i].default_value)
-      });
+      if (caName === 'math_content') {
+         value_dict = {
+            name: caName,
+            value: (
+              attrsCustomizationArgsDict.hasOwnProperty(caName) ?
+                angular.copy(attrsCustomizationArgsDict[caName]) :
+                customizationArgSpecs[i].default_value)
+         }
+         value_dict.value.svgString = '';
+         console.log("in init")
+         console.log(value_dict)
+         $scope.tmpCustomizationArgs.push(value_dict);
+
+      } else {
+         console.log("in else")
+         $scope.tmpCustomizationArgs.push({
+           name: caName,
+           value: (
+             attrsCustomizationArgsDict.hasOwnProperty(caName) ?
+               angular.copy(attrsCustomizationArgsDict[caName]) :
+               customizationArgSpecs[i].default_value)
+         });
+      }
     }
+    console.log("$scope.tmpCustomizationArgs before save")
+    console.log($scope.tmpCustomizationArgs)
 
     $scope.cancel = function() {
       $uibModalInstance.dismiss('cancel');
@@ -60,6 +78,8 @@ angular.module('oppia').controller('RteHelperModalController', [
 
     $scope.save = function() {
       $scope.$broadcast('externalSave');
+      console.log("$scope.tmpCustomizationArgs after save")
+      console.log($scope.tmpCustomizationArgs)
 
       var customizationArgsDict = {};
       for (var i = 0; i < $scope.tmpCustomizationArgs.length; i++) {
