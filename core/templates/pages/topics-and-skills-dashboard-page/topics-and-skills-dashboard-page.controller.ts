@@ -42,6 +42,7 @@ require(
 );
 require('domain/utilities/url-interpolation.service.ts');
 require('services/alerts.service.ts');
+require('services/image-local-storage.service.ts');
 
 require(
   'pages/topics-and-skills-dashboard-page/' +
@@ -59,18 +60,20 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
         'topics-and-skills-dashboard-page.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$rootScope', '$scope', '$uibModal',
-        'AlertsService', 'RubricObjectFactory', 'SkillCreationService',
-        'TopicCreationService',
+        '$http', '$rootScope', '$scope', '$uibModal', '$window',
+        'AlertsService', 'ContextService', 'ImageLocalStorageService',
+        'RubricObjectFactory', 'SkillCreationService',
+        'SkillObjectFactory', 'TopicCreationService',
         'TopicsAndSkillsDashboardBackendApiService', 'UrlInterpolationService',
         'EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED',
         'EVENT_TYPE_SKILL_CREATION_ENABLED',
         'EVENT_TYPE_TOPIC_CREATION_ENABLED',
         'FATAL_ERROR_CODES', 'SKILL_DIFFICULTIES',
         function(
-            $rootScope, $scope, $uibModal,
-            AlertsService, RubricObjectFactory, SkillCreationService,
-            TopicCreationService,
+            $http, $rootScope, $scope, $uibModal, $window,
+            AlertsService, ContextService, ImageLocalStorageService,
+            RubricObjectFactory, SkillCreationService,
+            SkillObjectFactory, TopicCreationService,
             TopicsAndSkillsDashboardBackendApiService, UrlInterpolationService,
             EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED,
             EVENT_TYPE_SKILL_CREATION_ENABLED,
@@ -139,6 +142,7 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
               RubricObjectFactory.create(SKILL_DIFFICULTIES[0], []),
               RubricObjectFactory.create(SKILL_DIFFICULTIES[1], ['']),
               RubricObjectFactory.create(SKILL_DIFFICULTIES[2], [])];
+            ContextService.setImageSaveDestinationToLocalStorage();
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/topics-and-skills-dashboard-page/templates/' +
@@ -149,9 +153,11 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
               },
               controller: 'CreateNewSkillModalController'
             }).result.then(function(result) {
+              ContextService.resetImageSaveDestination();
               SkillCreationService.createNewSkill(
                 result.description, result.rubrics, result.explanation, []);
             }, function() {
+              ImageLocalStorageService.flushStoredImagesData();
               SkillCreationService.resetSkillDescriptionStatusMarker();
             });
           };

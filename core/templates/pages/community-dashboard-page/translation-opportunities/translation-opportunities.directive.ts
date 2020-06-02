@@ -36,6 +36,7 @@ require('pages/community-dashboard-page/services/translate-text.service.ts');
 require(
   'pages/exploration-editor-page/translation-tab/services/' +
   'translation-language.service.ts');
+require('services/context.service.ts');
 require('services/alerts.service.ts');
 
 angular.module('oppia').directive(
@@ -122,16 +123,19 @@ angular.module('oppia').directive(
                 }
               },
               controller: [
-                '$controller', '$scope', '$uibModalInstance', 'opportunity',
-                'userIsLoggedIn',
+                '$controller', '$scope', '$uibModalInstance', 'ContextService',
+                'opportunity', 'userIsLoggedIn', 'ENTITY_TYPE',
                 function(
-                    $controller, $scope, $uibModalInstance, opportunity,
-                    userIsLoggedIn) {
+                    $controller, $scope, $uibModalInstance, ContextService,
+                    opportunity, userIsLoggedIn, ENTITY_TYPE) {
                   $controller('ConfirmOrCancelModalController', {
                     $scope: $scope,
                     $uibModalInstance: $uibModalInstance
                   });
-
+                  // We need to set the context here so that the rte fetches
+                  // images for the given ENTITY_TYPE and targetId.
+                  ContextService.setCustomEntityContext(
+                    ENTITY_TYPE.EXPLORATION, opportunity.id);
                   $scope.userIsLoggedIn = userIsLoggedIn;
                   $scope.uploadingTranslation = false;
                   $scope.activeWrittenTranslation = {};
