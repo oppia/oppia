@@ -542,3 +542,5 @@
 /yarn.lock/** @vojtechjelinek @kevinlee12
 scripts/install_third_party_libs.py @vojtechjelinek @kevinlee12
 /.github/
+/package.json @vojtechjelinek @kevinlee12
+/.github/CODEOWNERS @DubeySandeep

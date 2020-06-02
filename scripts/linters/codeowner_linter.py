@@ -53,7 +53,7 @@ CODEOWNER_IMPORTANT_PATHS = [
     '/.github/stale.yml']
 
 
-def walk_with_gitignore(root, exclude_dirs):
+def _walk_with_gitignore(root, exclude_dirs):
     """A walk function similar to os.walk but this would ignore the files and
     directories which is not tracked by git. Also, this will ignore the
     directories mentioned in exclude_dirs.
@@ -72,19 +72,19 @@ def walk_with_gitignore(root, exclude_dirs):
         else:
             file_paths.append(os.path.join(root, name))
 
-    yield [file_path for file_path in file_paths if not is_path_ignored(
+    yield [file_path for file_path in file_paths if not _is_path_ignored(
         file_path)]
 
     for dir_path in dirs:
         # Adding "/" in the end of the dir path according to the git dir path
         # structure.
-        if (not is_path_ignored(dir_path + '/')) and (
+        if (not _is_path_ignored(dir_path + '/')) and (
                 dir_path not in exclude_dirs):
-            for x in walk_with_gitignore(dir_path, exclude_dirs):
+            for x in _walk_with_gitignore(dir_path, exclude_dirs):
                 yield x
 
 
-def is_path_ignored(path_to_check):
+def _is_path_ignored(path_to_check):
     """Checks whether the given path is ignored by git.
 
     Args:
@@ -101,7 +101,7 @@ def is_path_ignored(path_to_check):
     return subprocess.call(command) == 0
 
 
-def is_path_contains_frontend_specs(path_to_check):
+def _is_path_contains_frontend_specs(path_to_check):
     """Checks whether if a path contains all spec files.
 
     Args:
@@ -113,7 +113,7 @@ def is_path_contains_frontend_specs(path_to_check):
     return '*.spec.ts' in path_to_check or '*Spec.ts' in path_to_check
 
 
-def check_for_important_patterns_at_bottom_of_codeowners(important_patterns):
+def _check_for_important_patterns_at_bottom_of_codeowners(important_patterns):
     """Checks that the most important patterns are at the bottom
     of the CODEOWNERS file.
 
@@ -235,7 +235,7 @@ def check_codeowner_file(file_cache, verbose_mode_enabled):
 
                     # The double asterisks should be allowed only when path
                     # includes all the frontend spec files.
-                    if not is_path_contains_frontend_specs(line_in_concern):
+                    if not _is_path_contains_frontend_specs(line_in_concern):
                         # The double asterisks pattern is supported by the
                         # CODEOWNERS syntax but not the glob in Python 2.
                         # The following condition checks this.
@@ -262,7 +262,7 @@ def check_codeowner_file(file_cache, verbose_mode_enabled):
                     line_in_concern = line_in_concern.replace('/', './', 1)
                     # The checking for path existence won't happen if the path
                     # is getting all the frontend spec files.
-                    if not is_path_contains_frontend_specs(line_in_concern):
+                    if not _is_path_contains_frontend_specs(line_in_concern):
                         if not glob.glob(line_in_concern):
                             summary_message = (
                                 '%s --> Pattern on line %s doesn\'t match '
@@ -283,7 +283,7 @@ def check_codeowner_file(file_cache, verbose_mode_enabled):
 
         # Checks that every file (except those under the dir represented by
         # the dir_patterns) is covered under CODEOWNERS.
-        for file_paths in walk_with_gitignore('.', dir_patterns):
+        for file_paths in _walk_with_gitignore('.', dir_patterns):
             for file_path in file_paths:
                 match = False
                 for file_pattern in file_patterns:
@@ -299,7 +299,7 @@ def check_codeowner_file(file_cache, verbose_mode_enabled):
                     failed = True
 
         tmp_failed, summary_message = (
-            check_for_important_patterns_at_bottom_of_codeowners(
+            _check_for_important_patterns_at_bottom_of_codeowners(
                 important_rules_in_critical_section))
         summary_messages.extend(summary_message)
         failed = failed or tmp_failed
