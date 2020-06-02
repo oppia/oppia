@@ -19,6 +19,7 @@
 import { Injectable, EventEmitter } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { UtilsService } from './utils.service';
+
 export interface MissingTranslationHandlerParams {
    // the key that's missing in translation files
   key: string;
@@ -166,8 +167,7 @@ export class TranslateService {
       key: string,
       interpolateParams?: Object): string {
     if (!this.utils.isDefined(key) || !key.length) {
-      // eslint-disable-next-line quotes
-      throw new Error(`Parameter "key" required`);
+      throw new Error('Parameter "key" required');
     }
     // check if we are loading a new translation to use {
     let res = this.getParsedResult(

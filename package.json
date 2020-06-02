@@ -104,8 +104,6 @@
     "@angular/platform-browser-dynamic": "^8.0.0",
     "@angular/router": "^8.0.0",
     "@angular/upgrade": "^8.0.0",
-    "@ngx-translate/core": "12.1.2",
-    "@ngx-translate/http-loader": "4.0.0",
     "angular": "^1.7.9",
     "angular-cookies": "^1.7.9",
     "angular-route": "^1.7.9",

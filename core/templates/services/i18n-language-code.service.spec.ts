@@ -20,18 +20,18 @@
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { Subscription } from 'rxjs';
 
-describe('Loader Service', () => {
+describe('I18nLanguageCodeService', () => {
   const i18nLanguageCodeService = new I18nLanguageCodeService();
   let languageCode: string = '';
-  let parentSubscription: Subscription;
+  let testSubscriptions: Subscription;
   beforeEach(() => {
-    parentSubscription = new Subscription();
-    parentSubscription.add(i18nLanguageCodeService.onI18nLanguageCodeChange()
+    testSubscriptions = new Subscription();
+    testSubscriptions.add(i18nLanguageCodeService.onI18nLanguageCodeChange()
       .subscribe(code => languageCode = code));
   });
 
   afterEach(() => {
-    parentSubscription.unsubscribe();
+    testSubscriptions.unsubscribe();
   });
 
   it('should set the language code', () => {

@@ -78,8 +78,8 @@ export class TranslatePipe implements PipeTransform, OnDestroy {
         try {
           interpolateParams = JSON.parse(validArgs);
         } catch (e) {
-          // eslint-disable-next-line max-len
-          throw new SyntaxError(`Wrong parameter in TranslatePipe. Expected a valid Object, received: ${args[0]}`);
+          throw new SyntaxError('Wrong parameter in TranslatePipe.' +
+          `Expected a valid Object, received: ${args[0]}`);
         }
       } else if (typeof args[0] === 'object' && !Array.isArray(args[0])) {
         interpolateParams = args[0];

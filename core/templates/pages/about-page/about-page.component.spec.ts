@@ -16,13 +16,14 @@
  * @fileoverview Unit tests for the about page.
  */
 
-import { TestBed, ComponentFixture, fakeAsync } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed} from '@angular/core/testing';
+import { EventEmitter, NO_ERRORS_SCHEMA, Pipe, PipeTransform }
+  from '@angular/core';
+
 import { AboutPageComponent } from './about-page.component';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { TranslateService } from 'services/translate.service';
 import { UtilsService } from 'services/utils.service';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
-import {Pipe, PipeTransform, EventEmitter} from '@angular/core';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
@@ -51,6 +52,8 @@ class MockI18nLanguageCodeService {
   }
 }
 
+// Mocking window object here because changing location.href causes the
+//  full page to reload. Page reloads raise an error in karma
 class MockWindowRef {
   _window = {
     location: {
@@ -104,9 +107,6 @@ describe('About Page', function() {
     }).compileComponents();
     fixture = TestBed.createComponent(AboutPageComponent);
     component = fixture.componentInstance;
-  });
-
-  afterEach(function() {
   });
 
   it('should click on about tab', () => {

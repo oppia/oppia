@@ -26,11 +26,11 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 export class UtilsService {
   // Determines if a variable is defined and not null.
   /**
-   * @param {any} value - the variable to be checked.
+   * @param {Object, Array<Object>, string, Array<string>, undefined, null}value
    * @return {boolean} - true if object is defined, false otherwise.
    */
   isDefined(
-      value: Object | number | string | Array<string> | undefined | null
+      value: Object | Array<Object> | string | Array<string> | undefined | null
   ): boolean {
     return typeof value !== 'undefined' && value !== null;
   }
