@@ -60,10 +60,6 @@ angular.module('oppia').factory('CollectionEditorStateService', [
     var _setCollectionRights = function(collectionRights) {
       _collectionRights.copyFromCollectionRights(collectionRights);
     };
-    var _updateCollectionRights = function(newBackendCollectionRightsObject) {
-      _setCollectionRights(CollectionRightsObjectFactory.create(
-        newBackendCollectionRightsObject));
-    };
 
     return {
       /**
@@ -88,7 +84,7 @@ angular.module('oppia').factory('CollectionEditorStateService', [
           });
         CollectionRightsBackendApiService.fetchCollectionRights(
           collectionId).then(function(newBackendCollectionRightsObject) {
-          _updateCollectionRights(newBackendCollectionRightsObject);
+          _setCollectionRights(newBackendCollectionRightsObject);
           _collectionIsLoading = false;
           // TODO(#8521): Remove the use of $rootScope.$applyAsync()
           // once the controller is migrated to angular.

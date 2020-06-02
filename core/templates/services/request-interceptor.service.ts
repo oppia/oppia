@@ -78,15 +78,18 @@ export class RequestInterceptor implements HttpInterceptor {
     if (request.body) {
       return from(this.csrf.getTokenAsync())
         .pipe(
-          switchMap(token => {
+          switchMap((token: string) => {
             if (request.method === 'POST' || request.method === 'PUT') {
-              var body = new FormData();
-              // @ts-ignore
-              body.append('csrf_token', token);
-              body.append('source', document.URL);
-              body.append('payload', JSON.stringify(request.body));
-              // @ts-ignore
-              request.body = body;
+              // If the body of the http request created is already in FormData
+              // form, no need to create the FormData object here.
+              if (!(request.body instanceof FormData)) {
+                var body = new FormData();
+                body.append('payload', JSON.stringify(request.body));
+                // @ts-ignore
+                request.body = body;
+              }
+              request.body.append('csrf_token', token);
+              request.body.append('source', document.URL);
             } else {
               // @ts-ignore
               request.body = {
