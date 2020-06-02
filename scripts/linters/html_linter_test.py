@@ -176,6 +176,33 @@ class CustomHTMLParserTests(test_utils.GenericTestBase):
                     debug=True).perform_all_lint_checks()
         self.assertTrue('Error in file' in e.exception.message)
 
+    def test_valid_html_file_with_custom_linter(self):
+        with self.print_swap:
+            html_linter.HTMLLintChecksManager(
+                [VALID_HTML_FILEPATH], FILE_CACHE, True,
+                debug=True).perform_all_lint_checks()
+        self.assertTrue(
+            appears_in_linter_stdout(
+                ['SUCCESS'], self.linter_stdout))
+
+    def test_custom_linter_with_no_files(self):
+        with self.print_swap:
+            html_linter.HTMLLintChecksManager(
+                [], FILE_CACHE, True,
+                debug=True).perform_all_lint_checks()
+        self.assertTrue(
+            appears_in_linter_stdout(
+                ['There are no HTML files to lint.'], self.linter_stdout))
+
+    def test_third_party_linter_with_no_files(self):
+        with self.print_swap:
+            html_linter.ThirdPartyHTMLLintChecksManager(
+                [], True).perform_all_lint_checks()
+        self.assertTrue(
+            appears_in_linter_stdout(
+                ['There are no HTML files to lint.'],
+                self.linter_stdout))
+
     def test_third_party_linter_with_verbose_mode_enabled(self):
         with self.print_swap:
             html_linter.ThirdPartyHTMLLintChecksManager(
@@ -188,10 +215,19 @@ class CustomHTMLParserTests(test_utils.GenericTestBase):
     def test_third_party_linter_with_verbose_mode_disabled(self):
         with self.print_swap:
             html_linter.ThirdPartyHTMLLintChecksManager(
-                [VALID_HTML_FILEPATH], True).perform_all_lint_checks()
+                [VALID_HTML_FILEPATH], False).perform_all_lint_checks()
         self.assertTrue(
             appears_in_linter_stdout(
                 ['SUCCESS   HTML linting passed'],
+                self.linter_stdout))
+
+    def test_third_party_linter_with_lint_errors(self):
+        with self.print_swap:
+            html_linter.ThirdPartyHTMLLintChecksManager(
+                [INVALID_QUOTES_HTML_FILEPATH], True).perform_all_lint_checks()
+        self.assertTrue(
+            appears_in_linter_stdout(
+                ['line 11, col 24, the `style` attribute is not double quoted'],
                 self.linter_stdout))
 
     def test_get_linters(self):

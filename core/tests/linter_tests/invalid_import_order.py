@@ -28,3 +28,6 @@ import os  # pylint: disable=unused-import
 import subprocess  # pylint: disable=unused-import
 import sys  # pylint: disable=unused-import
 import threading  # pylint: disable=unused-import
+
+def fun():
+    print 'hello'

@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2019 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,14 +13,12 @@
 // limitations under the License.
 
 /**
- * @fileoverview Invalid syntax .ts file,
- used by scripts/pre_commit_linter_test.
+ * @fileoverview Invalid syntax .ts file, used by
+    scripts/pre_commit_linter_test.
  */
 
-angular.module('oppia').directive('baseContent', [
-  function() {
-    return {
-      scope: false,
-    }
-  }
-]);
+ const INTERACTION_SPECS = require('interactions/interaction_specs.json');
+
+ export class InteractionSpecsConstants {
+   public static INTERACTION_SPECS = INTERACTION_SPECS;
+ }

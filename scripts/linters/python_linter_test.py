@@ -153,6 +153,15 @@ class PythonLintChecksManagerTests(test_utils.GenericTestBase):
                 ['SUCCESS   1 Python files linted for Python 3 compatibility'],
                 self.linter_stdout))
 
+    def test_valid_file_with_pylint_error(self):
+        with self.print_swap:
+            python_linter.ThirdPartyPythonLintChecksManager(
+                [INVALID_IMPORT_FILEPATH], True).perform_all_lint_checks()
+        self.assertTrue(
+            appears_in_linter_stdout(
+                ['C: 32, 0: Missing function docstring (missing-docstring)'],
+                self.linter_stdout))
+
     def test_python_utils_file(self):
         with self.print_swap:
             python_linter.ThirdPartyPythonLintChecksManager(
@@ -161,6 +170,32 @@ class PythonLintChecksManagerTests(test_utils.GenericTestBase):
             appears_in_linter_stdout(
                 ['There are no Python files to lint for Python 3 '
                  'compatibility.'], self.linter_stdout))
+
+    def test_for_python_three_incompatibility(self):
+        with self.print_swap:
+            python_linter.ThirdPartyPythonLintChecksManager(
+                [INVALID_IMPORT_FILEPATH], True).perform_all_lint_checks()
+        self.assertTrue(
+            appears_in_linter_stdout(
+                ['E: 33, 4: print statement used (print-statement)'],
+                self.linter_stdout))
+
+    def test_custom_linter_with_no_files(self):
+        with self.print_swap:
+            python_linter.PythonLintChecksManager(
+                [], True).perform_all_lint_checks()
+        self.assertTrue(
+            appears_in_linter_stdout(
+                ['There are no Python files to lint.'], self.linter_stdout))
+
+    def test_third_party_linter_with_no_files(self):
+        with self.print_swap:
+            python_linter.ThirdPartyPythonLintChecksManager(
+                [], True).perform_all_lint_checks()
+        self.assertTrue(
+            appears_in_linter_stdout(
+                ['There are no Python files to lint.'],
+                self.linter_stdout))
 
     def test_get_linters(self):
         custom_linter, third_party_linter = python_linter.get_linters(

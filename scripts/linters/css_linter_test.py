@@ -150,7 +150,7 @@ class ThirdPartyCSSLintChecksManagerTests(test_utils.GenericTestBase):
     def test_perform_all_lint_checks_with_valid_file(self):
         with self.print_swap:
             third_party_linter = css_linter.ThirdPartyCSSLintChecksManager(
-                CONFIG_PATH, [VALID_CSS_FILEPATH], True)
+                CONFIG_PATH, [VALID_CSS_FILEPATH], False)
             third_party_linter.perform_all_lint_checks()
         self.assertTrue(
             appears_in_linter_stdout(

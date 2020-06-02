@@ -750,9 +750,11 @@ class GeneralPurposeLinter(python_utils.OBJECT):
                     for pattern in REQUIRED_STRINGS_CONSTANTS:
                         if pattern not in file_content:
                             failed = True
-                            python_utils.PRINT('%s --> %s' % (
+                            summary_message = ('%s --> %s' % (
                                 filepath,
                                 REQUIRED_STRINGS_CONSTANTS[pattern]['message']))
+                            python_utils.PRINT(summary_message)
+                            summary_messages.append(summary_message)
                             python_utils.PRINT('')
                             total_error_count += 1
             if failed:

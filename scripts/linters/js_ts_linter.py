@@ -436,8 +436,6 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                                     continue
                                 # Separate out the body of the element.
                                 body = element.body
-                                if body.type != 'BlockStatement':
-                                    continue
                                 # Further separate the body elements from the
                                 # body.
                                 body_elements = body.body
@@ -446,13 +444,14 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                                     # statement.
                                     body_element_type_is_not_return = (
                                         body_element.type != 'ReturnStatement')
+                                    if body_element_type_is_not_return:
+                                        continue
                                     arg_type = (
                                         body_element.argument and
                                         body_element.argument.type)
                                     body_element_arg_type_is_not_object = (
                                         arg_type != 'ObjectExpression')
-                                    if (body_element_arg_type_is_not_object or
-                                            body_element_type_is_not_return):
+                                    if body_element_arg_type_is_not_object:
                                         continue
                                     # Separate the properties of the return
                                     # node.

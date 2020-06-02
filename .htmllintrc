@@ -6,7 +6,7 @@
     "attr-no-dup": true,
     "attr-no-unsafe-char": false,
     "attr-order": false,
-    "attr-quote-style": false,
+    "attr-quote-style": "double",
     "attr-req-value": false,
     "attr-validate": false,
     "class-no-dup": false,

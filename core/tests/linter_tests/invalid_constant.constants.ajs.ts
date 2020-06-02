@@ -23,6 +23,9 @@ angular.module('oppia').constant(
   'ADMIN_ROLE_HANDLER_URL', AdminPageConstants.ADMIN_ROLE_HANDLER_URL);
 
 angular.module('oppia').constant(
+  'ADMIN_ROLE_HANDLER_URL', AdminPageConstants.ADMIN_ROLE_HANDLER_URL);
+
+angular.module('oppia').constant(
   'ADMIN_HANDLER_URL', AdminPageConstants.ADMIN_HANDLER_URL);
 angular.module('oppia').constant(
   'ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL',

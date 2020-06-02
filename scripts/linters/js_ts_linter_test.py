@@ -52,6 +52,8 @@ FILE_CACHE = NAME_SPACE.files
 LINTER_TESTS_DIR = os.path.join(os.getcwd(), 'core', 'tests', 'linter_tests')
 VALID_JS_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'valid.js')
 VALID_TS_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'valid.ts')
+VALID_CONSTANT_OUTSIDE_CLASS_FILEPATH = os.path.join(
+    LINTER_TESTS_DIR, 'valid_constant_outside_class.constants.ts')
 INVALID_ANY_TYPE_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_any_type.ts')
 EXTRA_JS_FILEPATH = os.path.join('core', 'templates', 'demo.js')
@@ -121,7 +123,7 @@ class JsTsLintTests(test_utils.GenericTestBase):
         esprima_swap = self.swap(esprima, 'parseScript', mock_parse_script)
         with self.print_swap, esprima_swap, self.assertRaises(Exception):
             js_ts_linter.JsTsLintChecksManager(
-                [], [INVALID_ANY_TYPE_FILEPATH], FILE_CACHE,
+                [], [VALID_JS_FILEPATH], FILE_CACHE,
                 True).perform_all_lint_checks()
 
     def test_check_any_type(self):
@@ -189,7 +191,7 @@ class JsTsLintTests(test_utils.GenericTestBase):
         with self.print_swap:
             js_ts_linter.JsTsLintChecksManager(
                 [], [INVALID_SCOPE_FILEPATH], FILE_CACHE,
-                True).perform_all_lint_checks()
+                False).perform_all_lint_checks()
         self.assertTrue(
             appears_in_linter_stdout(
                 ['Please ensure that baseContent directive in ',
@@ -249,6 +251,39 @@ class JsTsLintTests(test_utils.GenericTestBase):
                  'constants file if it does not exist there.'],
                 self.linter_stdout))
 
+    def test_check_duplicate_constant_declaration_in_separate_files(self):
+        with self.print_swap:
+            js_ts_linter.JsTsLintChecksManager(
+                [], [INVALID_CONSTANT_IN_TS_FILEPATH,
+                     INVALID_CONSTANT_IN_TS_FILEPATH],
+                FILE_CACHE, True).perform_all_lint_checks()
+        self.assertTrue(
+            appears_in_linter_stdout(
+                ['The constant \'ADMIN_ROLE_HANDLER_URL\' is already declared '
+                 'in', 'Please import the file where the constant is declared '
+                 'or rename the constant.'],
+                self.linter_stdout))
+
+    def test_duplicate_constants_in_ajs_file(self):
+        with self.print_swap:
+            js_ts_linter.JsTsLintChecksManager(
+                [], [INVALID_CONSTANT_2_FILEPATH], FILE_CACHE,
+                True).perform_all_lint_checks()
+        self.assertTrue(
+            appears_in_linter_stdout(
+                ['Duplicate constant declaration found.'],
+                self.linter_stdout))
+
+    def test_check_constants_declaration_outside_class(self):
+        with self.print_swap:
+            js_ts_linter.JsTsLintChecksManager(
+                [], [VALID_CONSTANT_OUTSIDE_CLASS_FILEPATH], FILE_CACHE,
+                True).perform_all_lint_checks()
+        self.assertTrue(
+            appears_in_linter_stdout(
+                ['SUCCESS  Constants declaration check passed'],
+                self.linter_stdout))
+
     def test_check_constants_declaration_in_non_constant_file(self):
         with self.print_swap:
             js_ts_linter.JsTsLintChecksManager(
@@ -297,7 +332,16 @@ class JsTsLintTests(test_utils.GenericTestBase):
                 ['SUCCESS   1 JavaScript and Typescript files linted'],
                 self.linter_stdout))
 
-    def test_perform_all_lint_checks_with_no_files(self):
+    def test_custom_linter_with_no_files(self):
+        with self.print_swap:
+            js_ts_linter.JsTsLintChecksManager(
+                [], [], FILE_CACHE, True).perform_all_lint_checks()
+        self.assertTrue(
+            appears_in_linter_stdout(
+                ['There are no JavaScript or Typescript files to lint.'],
+                self.linter_stdout))
+
+    def test_third_party_linter_with_no_files(self):
         with self.print_swap:
             js_ts_linter.ThirdPartyJsTsLintChecksManager(
                 [], True).perform_all_lint_checks()

@@ -125,80 +125,32 @@ class LintTests(test_utils.GenericTestBase):
             mock_install_third_party_libs_main)
 
 
-class HTMLLintTests(LintTests):
-    """Test the HTML lint functions."""
+class PreCommitLinterTests(LintTests):
+    """Tests for methods in pre_commit_linter module."""
+
     def setUp(self):
-        super(HTMLLintTests, self).setUp()
+        super(PreCommitLinterTests, self).setUp()
         self.check_codeowner_swap = self.swap(
             codeowner_linter, 'check_codeowner_file', mock_check_codeowner_file)
 
-    def test_valid_html_file(self):
-        with self.print_swap, self.check_codeowner_swap, self.install_swap:
-            pre_commit_linter.main(args=['--path=%s' % VALID_HTML_FILEPATH])
-        self.assertTrue(all_checks_passed(self.linter_stdout))
-        self.assertTrue('SUCCESS   HTML linting passed' in self.linter_stdout)
+    def test_main_with_no_files(self):
+        def mock_get_all_filepaths(unused_path, unused_files):
+            return []
+        all_filepath_swap = self.swap(
+            pre_commit_linter, '_get_all_filepaths', mock_get_all_filepaths)
+        with self.print_swap, self.sys_swap, self.check_codeowner_swap:
+            with self.install_swap, all_filepath_swap:
+                pre_commit_linter.main()
+        self.assertTrue(
+            appears_in_linter_stdout(
+                ['No files to check'], self.linter_stdout))
 
-
-class CSSLintTests(LintTests):
-    """Test the CSS lint functions."""
-    def setUp(self):
-        super(CSSLintTests, self).setUp()
-        self.check_codeowner_swap = self.swap(
-            codeowner_linter, 'check_codeowner_file', mock_check_codeowner_file)
-
-    def test_valid_css_file(self):
+    def test_main_with_files_arg(self):
         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
             with self.install_swap:
-                pre_commit_linter.main(args=['--path=%s' % VALID_CSS_FILEPATH])
+                pre_commit_linter.main(args=['--files %s %s' % (VALID_HTML_FILEPATH, VALID_CSS_FILEPATH)])
+        self.assertEqual('', self.linter_stdout)
         self.assertTrue(all_checks_passed(self.linter_stdout))
         self.assertTrue(
             appears_in_linter_stdout(
                 ['SUCCESS   1 CSS file linted'], self.linter_stdout))
-
-
-class JsTsLintTests(LintTests):
-    """Test the JsTs lint functions."""
-    def setUp(self):
-        super(JsTsLintTests, self).setUp()
-        self.check_codeowner_swap = self.swap(
-            codeowner_linter, 'check_codeowner_file', mock_check_codeowner_file)
-
-    def test_valid_js_file(self):
-        with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-            with self.install_swap:
-                pre_commit_linter.main(args=['--path=%s' % VALID_JS_FILEPATH])
-        self.assertTrue(all_checks_passed(self.linter_stdout))
-        self.assertTrue(
-            appears_in_linter_stdout(
-                ['SUCCESS   1 JavaScript and Typescript files linted'],
-                self.linter_stdout)
-            )
-
-    def test_valid_ts_file(self):
-        with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-            with self.install_swap:
-                pre_commit_linter.main(args=['--path=%s' % VALID_TS_FILEPATH])
-        self.assertTrue(all_checks_passed(self.linter_stdout))
-        self.assertTrue(
-            appears_in_linter_stdout(
-                ['SUCCESS   1 JavaScript and Typescript files linted'],
-                self.linter_stdout))
-
-
-class PythonLintTests(LintTests):
-    """Test the Python lint functions."""
-    def setUp(self):
-        super(PythonLintTests, self).setUp()
-        self.check_codeowner_swap = self.swap(
-            codeowner_linter, 'check_codeowner_file', mock_check_codeowner_file)
-
-    def test_valid_py_file(self):
-        with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-            with self.install_swap:
-                pre_commit_linter.main(args=['--path=%s' % VALID_PY_FILEPATH])
-        self.assertTrue(all_checks_passed(self.linter_stdout))
-        self.assertTrue(
-            appears_in_linter_stdout(
-                ['SUCCESS   1 Python files linted'],
-                self.linter_stdout)
-            )

@@ -130,6 +130,7 @@ INVALID_COPYRIGHT_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_copyright.py')
 INVALID_UNICODE_LITERAL_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_unicode_literal.py')
+INVALID_DEV_MODE_IN_CONSTANT_FILEPATH = 'constants.ts'
 
 
 def appears_in_linter_stdout(phrases, linter_stdout):
@@ -779,3 +780,34 @@ class GeneralLintTests(LintTests):
                 ['Please ensure this file should contain a file overview i.e. '
                  'a short description of the file.'],
                 self.linter_stdout))
+
+    def test_invalid_dev_mode_in_constant_ts(self):
+        def mock_get_data(unused_self, unused_filepath, unused_mode):
+            return ['"DEV_MODE": false', 'Hello world']
+        get_data_swap = self.swap(
+            pre_commit_linter.FileCache, '_get_data', mock_get_data)
+        with self.print_swap, get_data_swap:
+            general_purpose_linter.GeneralPurposeLinter(
+                [INVALID_DEV_MODE_IN_CONSTANT_FILEPATH], FILE_CACHE, True
+            ).perform_all_lint_checks()
+        self.assertTrue(
+            appears_in_linter_stdout(
+                ['Please set the DEV_MODE variable in constants.ts'
+                 'to true before committing.'],
+                self.linter_stdout))
+
+    def test_linter_with_no_files(self):
+        with self.print_swap:
+            general_purpose_linter.GeneralPurposeLinter(
+                [], FILE_CACHE, True).perform_all_lint_checks()
+        self.assertTrue(
+            appears_in_linter_stdout(
+                ['There are no files to be checked.'], self.linter_stdout))
+
+    def test_get_linters(self):
+        custom_linter, third_party_linter = general_purpose_linter.get_linters(
+            [INVALID_AUTHOR_FILEPATH], FILE_CACHE, verbose_mode_enabled=True)
+        self.assertTrue(
+            isinstance(
+                custom_linter, general_purpose_linter.GeneralPurposeLinter))
+        self.assertEqual(third_party_linter, None)

@@ -17,61 +17,17 @@
  used by scripts/pre_commit_linter_test.
  */
 
-require('base-components/warning-loader.directive.ts');
-require('pages/OppiaFooterDirective.ts');
-
-require('domain/sidebar/sidebar-status.service.ts');
-require('services/contextual/url.service.ts');
-require('services/stateful/background-mask.service.ts');
-
-angular.module('oppia').directive('baseContent', [
+angular.module('oppia').directive('baseContent', {}, [{},
   function() {
     return {
-      restrict: 'E',
-      scope: true,
-      bindToController: {},
-      transclude: {
-        breadcrumb: '?navbarBreadcrumb',
-        content: 'content',
-        footer: '?pageFooter',
-        navOptions: '?navOptions',
-      },
-      template: require('./base-content.directive.html'),
-      controllerAs: '$ctrl',
-      controller: ['$rootScope', '$window', 'BackgroundMaskService',
-        'SidebarStatusService', 'UrlService',
-        function($rootScope, $window, BackgroundMaskService,
-            SidebarStatusService, UrlService) {
-          if ($window.location.hostname === 'oppiaserver.appspot.com') {
-            $window.location.href = (
-              'https://oppiatestserver.appspot.com' +
-              $window.location.pathname +
-              $window.location.search +
-              $window.location.hash);
-          }
+      scope: true
+    }
+    browser.wait()
+  }
+]);
 
-          var ctrl = this;
-          ctrl.isSidebarShown = () => SidebarStatusService.isSidebarShown();
-          ctrl.closeSidebarOnSwipe = () => SidebarStatusService.closeSidebar();
-          ctrl.isBackgroundMaskActive = () => (
-            BackgroundMaskService.isMaskActive());
-          ctrl.skipToMainContent = function() {
-            var mainContentElement = document.getElementById(
-              'oppia-main-content');
-
-            if (!mainContentElement) {
-              throw Error('Variable mainContentElement is undefined.');
-            }
-            mainContentElement.tabIndex = -1;
-            mainContentElement.scrollIntoView();
-            mainContentElement.focus();
-          };
-          ctrl.$onInit = function() {
-            ctrl.iframed = UrlService.isIframed();
-            ctrl.DEV_MODE = $rootScope.DEV_MODE;
-          };
-        }
-      ]
-    };
+angular.module('oppia').directive('baseContent', {}, [{},
+  function() {
+    return browser.wait()
   }
 ]);

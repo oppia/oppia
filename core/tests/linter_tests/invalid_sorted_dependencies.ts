@@ -21,12 +21,12 @@ angular.module('oppia').controller('SuggestionModalForCreatorViewController', [
   '$uibModalInstance', '$scope', 'SuggestionModalService',
   'canReviewActiveThread', 'description', 'newContent', 'oldContent',
   'stateName', 'suggestionIsHandled', 'suggestionStatus',
-  'suggestionType',
+  'suggestionType', IMPORT_STATEMENT,
   function(
       $scope, SuggestionModalService, $uibModalInstance,
       canReviewActiveThread, description, newContent, oldContent,
       stateName, suggestionIsHandled, suggestionStatus,
-      suggestionType
+      suggestionType, IMPORT_STATEMENT
   ) {
     $scope.isNotHandled = !suggestionIsHandled;
     $scope.canReject = $scope.isNotHandled;
