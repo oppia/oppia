@@ -48,7 +48,7 @@ describe('Test Translations', function() {
     explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
     libraryPage = new LibraryPage.LibraryPage();
-    
+
     await users.createUser('testTranslations@translations.com',
       'testTranslations');
     await users.login('testTranslations@translations.com');
@@ -59,7 +59,8 @@ describe('Test Translations', function() {
       'This is the first card.'));
     await explorationEditorMainTab.setInteraction('EndExploration');
     await explorationEditorPage.navigateToTranslationTab();
-    await explorationEditorTranslationTab.uploadAudioFileForLanguage('Hindi', '../data/cafe.mp3');
+    await explorationEditorTranslationTab.uploadAudioFileForLanguage(
+      'Hindi', '../data/cafe.mp3');
     await explorationEditorPage.saveChanges();
     await explorationEditorPage.navigateToSettingsTab();
     await explorationEditorSettingsTab.setTitle('Test Translations');
@@ -88,7 +89,8 @@ describe('Test Translations', function() {
     await creatorDashboardPage.get();
     await creatorDashboardPage.editExploration('Test Translations');
     await explorationEditorPage.navigateToTranslationTab();
-    await explorationEditorTranslationTab.uploadAudioFileForLanguage('Arabic', '../data/ambient-noise.mp3');
+    await explorationEditorTranslationTab.uploadAudioFileForLanguage(
+      'Arabic', '../data/ambient-noise.mp3');
     await explorationEditorPage.saveChanges('Added another translation');
     await libraryPage.get();
     await libraryPage.playExploration('Test Translations');
