@@ -1354,7 +1354,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             Exception, 'Expected solution to be a dict'):
             solution = state_domain.Solution.from_dict(
                 exploration.init_state.interaction.id, [])
-            exploration.init_state.update_interaction_solution(solution)        
+            exploration.init_state.update_interaction_solution(solution)
 
     def test_update_interaction_solution_with_no_solution(self):
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
