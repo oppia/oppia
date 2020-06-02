@@ -32,236 +32,6 @@ var ExplorationPlayerPage =
   require('../protractor_utils/ExplorationPlayerPage.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
 
-
-describe('Issues visualization', function() {
-  var EXPLORATION_TITLE = 'Welcome to Oppia!';
-  var EXPLORATION_OBJECTIVE = 'To explore something';
-  var EXPLORATION_CATEGORY = 'Algorithms';
-  var EXPLORATION_LANGUAGE = 'English';
-  var creatorDashboardPage = null;
-  var libraryPage = null;
-  var explorationEditorPage = null;
-  var explorationEditorStatsTab = null;
-  var explorationEditorMainTab = null;
-  var explorationEditorSettingsTab = null;
-  var explorationPlayerPage = null;
-  var adminPage = null;
-  var oppiaLogo = element(by.css('.protractor-test-oppia-main-logo'));
-
-  beforeAll(function() {
-    creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
-    explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
-    explorationEditorStatsTab = explorationEditorPage.getStatsTab();
-    explorationEditorMainTab = explorationEditorPage.getMainTab();
-    explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
-    explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
-    creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
-    libraryPage = new LibraryPage.LibraryPage();
-    adminPage = new AdminPage.AdminPage();
-
-    users.createUser(
-      'user2@ExplorationIssues.com',
-      'learnerExplorationIssues');
-    users.createAndLoginAdminUser(
-      'user1@ExplorationIssues.com',
-      'authorExplorationIssues');
-
-    workflow.createExplorationAsAdmin();
-    explorationEditorMainTab.exitTutorial();
-
-    var expId;
-    browser.getCurrentUrl().then(function(url) {
-      expId = url.split('/')[4].slice(0, -1);
-    }, function() {
-      // Note to developers:
-      // Promise is returned by getCurrentUrl which is handled here.
-      // No further action is needed.
-    });
-
-    explorationEditorPage.navigateToSettingsTab();
-    explorationEditorSettingsTab.setTitle(EXPLORATION_TITLE);
-    explorationEditorSettingsTab.setCategory(EXPLORATION_CATEGORY);
-    explorationEditorSettingsTab.setObjective(EXPLORATION_OBJECTIVE);
-    explorationEditorSettingsTab.setLanguage(EXPLORATION_LANGUAGE);
-
-    explorationEditorPage.navigateToMainTab();
-    explorationEditorMainTab.setStateName('One');
-    explorationEditorMainTab.setContent(
-      forms.toRichText('Please write 1 in words.'));
-    explorationEditorMainTab.setInteraction('TextInput');
-    explorationEditorMainTab.addResponse(
-      'TextInput', forms.toRichText('Good job'), 'Two', true, 'Equals',
-      'One');
-    explorationEditorMainTab.getResponseEditor('default').setFeedback(
-      forms.toRichText('Try again'));
-
-    explorationEditorMainTab.moveToState('Two');
-    explorationEditorMainTab.setContent(
-      forms.toRichText('Please write 2 in words.'));
-    explorationEditorMainTab.setInteraction('TextInput');
-    explorationEditorMainTab.addResponse(
-      'TextInput', forms.toRichText('Good job'), 'Three', true, 'Equals',
-      'Two');
-    explorationEditorMainTab.getResponseEditor('default').setFeedback(
-      forms.toRichText('Try again'));
-
-    explorationEditorMainTab.moveToState('Three');
-    explorationEditorMainTab.setContent(
-      forms.toRichText('Please write 3 in words.'));
-    explorationEditorMainTab.setInteraction('TextInput');
-    explorationEditorMainTab.addResponse(
-      'TextInput', forms.toRichText('Good job'), 'End', true, 'Equals',
-      'Three');
-    explorationEditorMainTab.addResponse(
-      'TextInput', forms.toRichText('Try 2 again'), 'Two', false, 'Equals',
-      'Two');
-    explorationEditorMainTab.getResponseEditor('default').setFeedback(
-      forms.toRichText('Try again'));
-
-    explorationEditorMainTab.moveToState('End');
-    explorationEditorMainTab.setInteraction('EndExploration');
-    explorationEditorPage.saveChanges();
-    workflow.publishExploration();
-
-    adminPage.editConfigProperty(
-      'The set of exploration IDs for recording playthrough issues',
-      'List',
-      function(elem) {
-        elem.addItem('Unicode').setValue(expId);
-      });
-    adminPage.editConfigProperty(
-      'The probability of recording playthroughs', 'Real',
-      function(elem) {
-        elem.setValue(1.0);
-      });
-    // TODO(#7569): Change this test to work with the improvements tab.
-    adminPage.editConfigProperty(
-      'Exposes the Improvements Tab for creators in the exploration editor.',
-      'Boolean',
-      function(elem) {
-        elem.setValue(false);
-      });
-  });
-
-  it('records early quit issue.', function() {
-    users.login('user2@ExplorationIssues.com');
-    libraryPage.get();
-    libraryPage.findExploration(EXPLORATION_TITLE);
-    libraryPage.playExploration(EXPLORATION_TITLE);
-
-    explorationPlayerPage.submitAnswer('TextInput', 'One');
-    explorationPlayerPage.clickThroughToNextCard();
-    explorationPlayerPage.expectExplorationToNotBeOver();
-
-    oppiaLogo.click();
-    general.acceptAlert();
-    users.logout();
-
-    users.login('user1@ExplorationIssues.com');
-    libraryPage.get();
-    libraryPage.findExploration(EXPLORATION_TITLE);
-    libraryPage.playExploration(EXPLORATION_TITLE);
-    general.moveToEditor();
-    explorationEditorPage.navigateToStatsTab();
-
-    explorationEditorStatsTab.clickIssue(0, 'Issue 1');
-    explorationEditorStatsTab.expectIssueTitleToBe(
-      'Several learners exited the exploration in less than a minute.');
-    explorationEditorStatsTab.markResolved();
-    users.logout();
-  });
-
-  it('records multiple incorrect issue.', function() {
-    users.login('user2@ExplorationIssues.com');
-    libraryPage.get();
-    libraryPage.findExploration(EXPLORATION_TITLE);
-    libraryPage.playExploration(EXPLORATION_TITLE);
-
-    explorationPlayerPage.submitAnswer('TextInput', 'WrongAnswer1');
-    explorationPlayerPage.expectLatestFeedbackToMatch(
-      forms.toRichText('Try again'));
-    explorationPlayerPage.submitAnswer('TextInput', 'WrongAnswer2');
-    explorationPlayerPage.expectLatestFeedbackToMatch(
-      forms.toRichText('Try again'));
-    explorationPlayerPage.submitAnswer('TextInput', 'WrongAnswer3');
-    explorationPlayerPage.expectLatestFeedbackToMatch(
-      forms.toRichText('Try again'));
-    explorationPlayerPage.expectExplorationToNotBeOver();
-
-    oppiaLogo.click();
-    general.acceptAlert();
-    users.logout();
-
-    users.login('user1@ExplorationIssues.com');
-    creatorDashboardPage.get();
-    creatorDashboardPage.editExploration(EXPLORATION_TITLE);
-    explorationEditorPage.navigateToStatsTab();
-    explorationEditorStatsTab.clickIssue(0, 'Issue 1');
-    explorationEditorStatsTab.expectIssueTitleToBe(
-      'Several learners submitted answers to card "One" several times, ' +
-      'then gave up and quit.');
-    explorationEditorStatsTab.markResolved();
-    users.logout();
-  });
-
-  it('records cyclic transitions issue.', function() {
-    users.login('user2@ExplorationIssues.com');
-    libraryPage.get();
-    libraryPage.findExploration(EXPLORATION_TITLE);
-    libraryPage.playExploration(EXPLORATION_TITLE);
-
-    explorationPlayerPage.submitAnswer('TextInput', 'One');
-    explorationPlayerPage.clickThroughToNextCard();
-    explorationPlayerPage.submitAnswer('TextInput', 'Two');
-    explorationPlayerPage.expectContentToMatch(forms.toRichText(
-      'Please write 2 in words.'));
-    explorationPlayerPage.clickThroughToNextCard();
-    explorationPlayerPage.submitAnswer('TextInput', 'Two');
-    explorationPlayerPage.expectContentToMatch(forms.toRichText(
-      'Please write 3 in words.'));
-    explorationPlayerPage.clickThroughToNextCard();
-    explorationPlayerPage.submitAnswer('TextInput', 'Two');
-    explorationPlayerPage.expectContentToMatch(forms.toRichText(
-      'Please write 2 in words.'));
-    explorationPlayerPage.clickThroughToNextCard();
-    explorationPlayerPage.submitAnswer('TextInput', 'Two');
-    explorationPlayerPage.expectContentToMatch(forms.toRichText(
-      'Please write 3 in words.'));
-    explorationPlayerPage.clickThroughToNextCard();
-    explorationPlayerPage.submitAnswer('TextInput', 'Two');
-    explorationPlayerPage.expectContentToMatch(forms.toRichText(
-      'Please write 2 in words.'));
-    explorationPlayerPage.clickThroughToNextCard();
-    explorationPlayerPage.submitAnswer('TextInput', 'Two');
-    explorationPlayerPage.expectContentToMatch(forms.toRichText(
-      'Please write 3 in words.'));
-    explorationPlayerPage.clickThroughToNextCard();
-    explorationPlayerPage.expectExplorationToNotBeOver();
-
-    oppiaLogo.click();
-    general.acceptAlert();
-    users.logout();
-
-    users.login('user1@ExplorationIssues.com');
-    libraryPage.get();
-    libraryPage.findExploration(EXPLORATION_TITLE);
-    libraryPage.playExploration(EXPLORATION_TITLE);
-    general.moveToEditor();
-    explorationEditorPage.navigateToStatsTab();
-
-    explorationEditorStatsTab.clickIssue(0, 'Issue 1');
-    explorationEditorStatsTab.expectIssueTitleToBe(
-      'Several learners ended up in a cyclic loop revisiting card ' +
-      '"Two" many times.');
-    explorationEditorStatsTab.markResolved();
-    users.logout();
-  });
-
-  afterEach(function() {
-    general.checkForConsoleErrors([]);
-  });
-});
-
 describe('Statistics tab', function() {
   var explorationEditorPage = null;
   var explorationEditorMainTab = null;
@@ -275,116 +45,119 @@ describe('Statistics tab', function() {
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
   });
 
-  it('checks statistics tab for an exploration', function() {
+  it('checks statistics tab for an exploration', async function() {
     var EXPLORATION_TITLE = 'Exploration for stats testing';
     var EXPLORATION_OBJECTIVE = 'To explore something';
     var EXPLORATION_CATEGORY = 'Algorithms';
     var EXPLORATION_LANGUAGE = 'English';
-    users.createUser(
+    await users.createUser(
       'user1@statisticsTab.com', 'statisticsTabCreator');
-    users.createUser(
+    await users.createUser(
       'user2@statisticsTab.com', 'statisticsTabLearner1');
-    users.createUser(
+    await users.createUser(
       'user3@statisticsTab.com', 'statisticsTabLearner2');
     var libraryPage = new LibraryPage.LibraryPage();
     var creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
-    var explorationPlayerPage =
-      new ExplorationPlayerPage.ExplorationPlayerPage();
+    var explorationPlayerPage = (
+      new ExplorationPlayerPage.ExplorationPlayerPage());
     var explorationStatsTab = explorationEditorPage.getStatsTab();
 
     // Creator creates and publishes an exploration.
-    users.login('user1@statisticsTab.com');
-    workflow.createExploration();
+    await users.login('user1@statisticsTab.com');
+    await workflow.createExploration();
 
-    explorationEditorPage.navigateToSettingsTab();
-    explorationEditorSettingsTab.setTitle(EXPLORATION_TITLE);
-    explorationEditorSettingsTab.setCategory(EXPLORATION_CATEGORY);
-    explorationEditorSettingsTab.setObjective(EXPLORATION_OBJECTIVE);
-    explorationEditorSettingsTab.setLanguage(EXPLORATION_LANGUAGE);
+    await explorationEditorPage.navigateToSettingsTab();
+    await explorationEditorSettingsTab.setTitle(EXPLORATION_TITLE);
+    await explorationEditorSettingsTab.setCategory(EXPLORATION_CATEGORY);
+    await explorationEditorSettingsTab.setObjective(EXPLORATION_OBJECTIVE);
+    await explorationEditorSettingsTab.setLanguage(EXPLORATION_LANGUAGE);
 
-    explorationEditorPage.navigateToMainTab();
-    explorationEditorMainTab.setStateName('One');
-    explorationEditorMainTab.setContent(
-      forms.toRichText('Please write 1 in words.'));
-    explorationEditorMainTab.setInteraction('TextInput');
-    explorationEditorMainTab.addResponse(
-      'TextInput', forms.toRichText('Good job'), 'Two', true, 'Equals',
+    await explorationEditorPage.navigateToMainTab();
+    await explorationEditorMainTab.setStateName('One');
+    await explorationEditorMainTab.setContent(
+      await forms.toRichText('Please write 1 in words.'));
+    await explorationEditorMainTab.setInteraction('TextInput');
+    await explorationEditorMainTab.addResponse(
+      'TextInput', await forms.toRichText('Good job'), 'Two', true, 'Equals',
       'One');
-    explorationEditorMainTab.getResponseEditor('default').setFeedback(
-      forms.toRichText('Try again'));
+    var responseEditor = await explorationEditorMainTab.getResponseEditor(
+      'default');
+    await responseEditor.setFeedback(await forms.toRichText('Try again'));
 
-    explorationEditorMainTab.moveToState('Two');
-    explorationEditorMainTab.setContent(
-      forms.toRichText('Please write 2 in words.'));
-    explorationEditorMainTab.setInteraction('TextInput');
-    explorationEditorMainTab.addResponse(
-      'TextInput', forms.toRichText('Good job'), 'Three', true, 'Equals',
+    await explorationEditorMainTab.moveToState('Two');
+    await explorationEditorMainTab.setContent(
+      await forms.toRichText('Please write 2 in words.'));
+    await explorationEditorMainTab.setInteraction('TextInput');
+    await explorationEditorMainTab.addResponse(
+      'TextInput', await forms.toRichText('Good job'), 'Three', true, 'Equals',
       'Two');
-    explorationEditorMainTab.getResponseEditor('default').setFeedback(
-      forms.toRichText('Try again'));
-    explorationEditorMainTab.addHint('The number 2 in words.');
-    explorationEditorMainTab.addSolution('TextInput', {
+    responseEditor = await explorationEditorMainTab.getResponseEditor(
+      'default');
+    await responseEditor.setFeedback(await forms.toRichText('Try again'));
+    await explorationEditorMainTab.addHint('The number 2 in words.');
+    await explorationEditorMainTab.addSolution('TextInput', {
       correctAnswer: 'Two',
       explanation: 'The English equivalent of 2'
     });
-    explorationEditorMainTab.moveToState('Three');
-    explorationEditorMainTab.setContent(
-      forms.toRichText('Please write 3 in words.'));
-    explorationEditorMainTab.setInteraction('TextInput');
-    explorationEditorMainTab.addResponse(
-      'TextInput', forms.toRichText('Good job'), 'End', true, 'Equals',
+    await explorationEditorMainTab.moveToState('Three');
+    await explorationEditorMainTab.setContent(
+      await forms.toRichText('Please write 3 in words.'));
+    await explorationEditorMainTab.setInteraction('TextInput');
+    await explorationEditorMainTab.addResponse(
+      'TextInput', await forms.toRichText('Good job'), 'End', true, 'Equals',
       'Three');
-    explorationEditorMainTab.getResponseEditor('default').setFeedback(
-      forms.toRichText('Try again'));
+    responseEditor = await explorationEditorMainTab.getResponseEditor(
+      'default');
+    await responseEditor.setFeedback(await forms.toRichText('Try again'));
 
-    explorationEditorMainTab.moveToState('End');
-    explorationEditorMainTab.setInteraction('EndExploration');
-    explorationEditorPage.saveChanges();
-    workflow.publishExploration();
+    await explorationEditorMainTab.moveToState('End');
+    await explorationEditorMainTab.setInteraction('EndExploration');
+    await explorationEditorPage.saveChanges();
+    await workflow.publishExploration();
 
-    users.logout();
+    await users.logout();
 
     // Learner 1 completes the exploration.
-    users.login('user2@statisticsTab.com');
-    libraryPage.get();
-    libraryPage.findExploration(EXPLORATION_TITLE);
-    libraryPage.playExploration(EXPLORATION_TITLE);
+    await users.login('user2@statisticsTab.com');
+    await libraryPage.get();
+    await libraryPage.findExploration(EXPLORATION_TITLE);
+    await libraryPage.playExploration(EXPLORATION_TITLE);
 
-    explorationPlayerPage.submitAnswer('TextInput', 'One');
-    explorationPlayerPage.clickThroughToNextCard();
-    explorationPlayerPage.submitAnswer('TextInput', '2');
-    explorationPlayerPage.viewHint();
-    explorationPlayerPage.submitAnswer('TextInput', '3');
-    explorationPlayerPage.viewSolution();
-    explorationPlayerPage.submitAnswer('TextInput', 'Two');
-    explorationPlayerPage.clickThroughToNextCard();
-    explorationPlayerPage.expectExplorationToNotBeOver();
-    explorationPlayerPage.submitAnswer('TextInput', 'Three');
-    explorationPlayerPage.clickThroughToNextCard();
-    explorationPlayerPage.expectExplorationToBeOver();
+    await explorationPlayerPage.submitAnswer('TextInput', 'One');
+    await explorationPlayerPage.clickThroughToNextCard();
+    await explorationPlayerPage.submitAnswer('TextInput', '2');
+    await explorationPlayerPage.viewHint();
+    await explorationPlayerPage.submitAnswer('TextInput', '3');
+    await explorationPlayerPage.viewSolution();
+    await explorationPlayerPage.submitAnswer('TextInput', 'Two');
+    await explorationPlayerPage.clickThroughToNextCard();
+    await explorationPlayerPage.expectExplorationToNotBeOver();
+    await explorationPlayerPage.submitAnswer('TextInput', 'Three');
+    await explorationPlayerPage.clickThroughToNextCard();
+    await explorationPlayerPage.expectExplorationToBeOver();
 
-    users.logout();
+    await users.logout();
 
     // Learner 2 starts the exploration and immediately quits it.
-    users.login('user3@statisticsTab.com');
-    libraryPage.get();
-    libraryPage.findExploration(EXPLORATION_TITLE);
-    libraryPage.playExploration(EXPLORATION_TITLE);
+    await users.login('user3@statisticsTab.com');
+    await libraryPage.get();
+    await libraryPage.findExploration(EXPLORATION_TITLE);
+    await libraryPage.playExploration(EXPLORATION_TITLE);
 
-    explorationPlayerPage.expectExplorationToNotBeOver();
+    await explorationPlayerPage.expectExplorationToNotBeOver();
 
-    users.logout();
+    await users.logout();
 
     // Creator visits the statistics tab.
-    users.login('user1@statisticsTab.com');
-    creatorDashboardPage.get();
-    creatorDashboardPage.navigateToExplorationEditor();
-    explorationEditorPage.navigateToStatsTab();
+    await users.login('user1@statisticsTab.com');
+    await creatorDashboardPage.get();
+    await creatorDashboardPage.navigateToExplorationEditor();
+    await explorationEditorPage.navigateToStatsTab();
 
     // Now, there should be one passerby for this exploration since only learner
     // 3 quit at the first state.
-    explorationStatsTab.expectNumPassersbyToBe('1');
+    await explorationStatsTab.expectNumPassersbyToBe('1');
 
-    users.logout();
+    await users.logout();
   });
 });
