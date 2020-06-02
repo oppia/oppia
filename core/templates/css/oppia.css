@@ -2593,10 +2593,14 @@ div#ng-curtain {
 }
 .oppia-logo-wide {
   margin-left: 25px;
-  width: 90px;
 }
 .oppia-logo-small {
   margin-left: 6px;
+}
+
+.oppia-navbar-back-button {
+  color: white;
+  padding: 6px;
 }
 
 .oppia-navbar-tabs {
@@ -2610,8 +2614,11 @@ div#ng-curtain {
   display: inline-block;
 }
 .navbar-header {
+  align-items: center;
+  display: flex;
   /* Prevent whitespace from inline-block elements from adding space. */
   font-size: 0;
+  height: 56px;
 }
 .nav-link.oppia-navbar-tab,
 .nav-item > div.oppia-navbar-tab {

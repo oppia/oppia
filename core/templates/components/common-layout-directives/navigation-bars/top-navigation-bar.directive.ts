@@ -34,7 +34,9 @@ angular.module('oppia').directive('topNavigationBar', [
     return {
       restrict: 'E',
       scope: {},
-      bindToController: {},
+      bindToController: {
+        backButtonShown: '<'
+      },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/common-layout-directives/navigation-bars/top-navigation' +
         '-bar.directive.html'),

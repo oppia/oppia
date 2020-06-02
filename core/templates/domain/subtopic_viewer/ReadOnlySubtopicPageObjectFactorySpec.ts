@@ -41,7 +41,7 @@ describe('Subtopic data object factory', () => {
 
       var sampleSubtopicDataBackendDict = {
         topic_id: 'topic_id',
-        next_subtopic: null,
+        next_subtopic_dict: null,
         subtopic_title: 'sample_title',
         page_contents: {
           subtitled_html: {
