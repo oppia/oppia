@@ -1914,10 +1914,10 @@ class State(python_utils.OBJECT):
         """Update the solution of interaction.
 
         Args:
-            sol: Solution object.
+            solution: Solution object.
 
         Raises:
-            Exception: 'sol' is not a domain object.
+            Exception: 'solution' is not a domain object.
         """
         old_content_id_list = []
         new_content_id_list = []
@@ -1926,6 +1926,10 @@ class State(python_utils.OBJECT):
                 self.interaction.solution.explanation.content_id)
 
         if solution:
+            if not isinstance (solution, Solution):
+                raise Exception(
+                    'Expected solution to be a Solution object, received %s'
+                    % solution)
             self.interaction.solution = solution
             new_content_id_list.append(
                 self.interaction.solution.explanation.content_id)
