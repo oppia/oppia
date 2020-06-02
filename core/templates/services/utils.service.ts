@@ -24,12 +24,14 @@ import { downgradeInjectable } from '@angular/upgrade/static';
   providedIn: 'root'
 })
 export class UtilsService {
-  // Determines is a variable is defined and not null.
+  // Determines if a variable is defined and not null.
   /**
    * @param {any} value - the variable to be checked.
    * @return {boolean} - true if object is defined, false otherwise.
    */
-  isDefined(value: any): boolean {
+  isDefined(
+      value: Object | number | string | Array<string> | undefined | null
+  ): boolean {
     return typeof value !== 'undefined' && value !== null;
   }
 
@@ -106,15 +108,6 @@ export class UtilsService {
       case '[object DOMException]': return true;
       default: return value instanceof Error;
     }
-  }
-
-  // Checks if a given variable is an object or not
-  /**
-   * @param {any} item - the variable to checked
-   * @returns {boolean} - true if is in object else false
-   */
-  isObject(item: any): boolean {
-    return (item && typeof item === 'object' && !Array.isArray(item));
   }
 }
 

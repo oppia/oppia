@@ -29,7 +29,7 @@ import { UtilsService } from 'services/utils.service';
 export class TranslatePipe implements PipeTransform, OnDestroy {
   value: string = '';
   lastKey: string;
-  lastParams: any[];
+  lastParams: Object | Array<Object>;
   onLangChange: Subscription;
 
   constructor(
@@ -41,7 +41,7 @@ export class TranslatePipe implements PipeTransform, OnDestroy {
   updateValue(
       key: string,
       interpolateParams?: Object,
-      translations?: any
+      translations?: Object | undefined
   ): void {
     let onTranslation = (res: string) => {
       this.value = res !== undefined ? res : key;
@@ -58,7 +58,9 @@ export class TranslatePipe implements PipeTransform, OnDestroy {
 
   // args[0] can be either object or string or empty. So type of args could be
   // Array<Object> or Array<string> or an empty array.
-  transform(query: string, ...args: Array<Object> | Array<string> | []): any {
+  transform(
+      query: string,
+      ...args: Array<Object> | Array<string> | []): string {
     if (!query || !query.length) {
       return query;
     }

@@ -130,7 +130,7 @@ describe('Translate service should', () => {
   it('should throw an error if key is not defined', fakeAsync(() => {
     expect(function() {
       translate.get('');
-    }).toThrow(new Error('Parameter "key" required'));
+    }).toThrowError('Parameter "key" required');
   }));
 
   it('should ignore the key if target is undefined', fakeAsync(() => {

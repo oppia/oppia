@@ -32,7 +32,7 @@ export interface MissingTranslationHandlerParams {
 
 export interface LangChangeEvent {
   lang: string;
-  translations: any;
+  translations: Object;
 }
 
 @Injectable({
@@ -80,7 +80,7 @@ export class TranslateService {
   }
 
 
-  interpolate(expr: string | Function, params?: any): string {
+  interpolate(expr: string | Function, params?: Object): string {
     let result: string;
 
     if (typeof expr === 'string') {
@@ -94,30 +94,32 @@ export class TranslateService {
     return result;
   }
 
-  getValue(target: any, key: string): any {
+  getValue(target: Object, key: string): string | undefined {
     let keys = typeof key === 'string' ? key.split('.') : [key];
     key = '';
+    let tar: string | undefined;
     do {
       key += keys.shift();
       if (this.utils.isDefined(target) && this.utils.isDefined(target[key]) &&
         (typeof target[key] === 'object' || !keys.length)) {
+        tar = target[key];
         target = target[key];
         key = '';
       } else if (!keys.length) {
         target = undefined;
+        tar = undefined;
       } else {
         key += '.';
       }
     } while (keys.length);
-
-    return target;
+    return tar;
   }
 
-  private interpolateFunction(fn: Function, params?: any) {
+  private interpolateFunction(fn: Function, params?: Object | undefined) {
     return fn(params);
   }
 
-  private interpolateString(expr: string, params?: any) {
+  private interpolateString(expr: string, params?: Object | undefined) {
     if (!params) {
       return expr;
     }
@@ -130,7 +132,7 @@ export class TranslateService {
   }
 
   getParsedResult(
-      translations: any, key: string, interpolateParams?: Object): string {
+      translations: Object, key: string, interpolateParams?: Object): string {
     let res: string;
 
     if (translations) {

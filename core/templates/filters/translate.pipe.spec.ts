@@ -40,7 +40,7 @@ class MockTranslateService {
       I18n_t_1: 'Hello',
       I18n_t_2: 'Hello <[val]>'
     };
-    private interpolateString(expr: string, params?: any) {
+    private interpolateString(expr: string, params?: Object | undefined) {
       if (!params) {
         return expr;
       }
@@ -50,7 +50,9 @@ class MockTranslateService {
         });
     }
     getParsedResult(
-        translations: any, key: string, interpolateParams?: Object) {
+        translations: Object| undefined,
+        key: string,
+        interpolateParams?: Object | undefined) {
       const str = translations[key];
       if (!interpolateParams) {
         return str;
@@ -97,9 +99,10 @@ describe('AboutPageComponent', () => {
     expect(pipe.transform('')).toBe('');
     expect(function() {
       pipe.transform('I18n_t_2', "{val: 'World'");
-    }).toThrow(
-      // eslint-disable-next-line max-len
-      new Error("Wrong parameter in TranslatePipe. Expected a valid Object, received: {val: 'World'"));
+    }).toThrowError(
+      ('Wrong parameter in TranslatePipe. Expected a valid Object,' +
+        (' received: {val: \'World\''))
+    );
     translate.onLangChange.emit({lang: 'en',
       translations: translate.translations});
   });

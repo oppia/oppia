@@ -107,20 +107,4 @@ describe('Utils Service', () => {
     expect(uts.isDefined(objC)).toBe(false);
     expect(uts.isDefined(objD)).toBe(false);
   });
-
-  it('should check if a variable is an object or not', () => {
-    const objA = {
-      key: 'value'
-    };
-    const num1 = 1;
-    const str = 'string';
-    let objB;
-    const objC = [1, 2, 3, 4];
-    expect(uts.isObject(objA)).toBe(true);
-    expect(uts.isObject(num1)).toBe(false);
-    expect(uts.isObject(str)).toBe(false);
-    // The next output comes as undefined that is why I have commented it
-    // expect(uts.isObject(objB)).toBe(false);
-    expect(uts.isObject(objC)).toBe(false);
-  });
 });
