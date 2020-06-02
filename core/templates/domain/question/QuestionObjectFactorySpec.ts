@@ -235,6 +235,7 @@ describe('Question object factory', function() {
   });
 
   it('should correctly report unaddressed misconceptions', function() {
+    var interaction = sampleQuestion.getStateData().interaction;
     var misconception1 = misconceptionObjectFactory.create(
       'id', 'name', 'notes', 'feedback', true);
     var misconception2 = misconceptionObjectFactory.create(
@@ -245,8 +246,10 @@ describe('Question object factory', function() {
       skillId1: [misconception1],
       skillId2: [misconception2, misconception3]
     };
+    interaction.answerGroups[0].outcome.labelledAsCorrect = false;
+    interaction.answerGroups[0].taggedSkillMisconceptionId = 'skillId1-id';
     expect(sampleQuestion.getUnaddressedMisconceptionNames(
-      misconceptionsDict)).toEqual(['name', 'name_2']);
+      misconceptionsDict)).toEqual(['name_2']);
   });
 
   it('should correctly validate question', function() {
