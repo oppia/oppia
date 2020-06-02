@@ -20,6 +20,18 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
+interface IUserInfoBackendDict {
+  'is_moderator': boolean;
+  'is_admin': boolean;
+  'is_super_admin': boolean;
+  'is_topic_manager': boolean;
+  'can_create_collections': boolean;
+  'preferred_site_language_code': string;
+  'username': string;
+  'email': string;
+  'user_is_logged_in': boolean;
+}
+
 export class UserInfo {
   _isModerator: boolean;
   _isAdmin: boolean;
@@ -88,10 +100,8 @@ export class UserInfo {
   providedIn: 'root'
 })
 export class UserInfoObjectFactory {
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'data' is a dict with underscore_cased keys which give tslint
-  // errors against underscore_casing in favor of camelCasing.
-  createFromBackendDict(data: any): UserInfo {
+  createFromBackendDict(
+      data: IUserInfoBackendDict): UserInfo {
     return new UserInfo(
       data.is_moderator, data.is_admin, data.is_super_admin,
       data.is_topic_manager, data.can_create_collections,

@@ -32,8 +32,8 @@ interface CkeditorCustomScope extends ng.IScope {
 }
 
 angular.module('oppia').directive('ckEditor4Rte', [
-  'ContextService', 'RteHelperService',
-  function(ContextService, RteHelperService) {
+  'ContextService', 'RteHelperService', 'ENABLE_LITERALLY_CANVAS_EDITOR',
+  function(ContextService, RteHelperService, ENABLE_LITERALLY_CANVAS_EDITOR) {
     return {
       restrict: 'E',
       scope: {
@@ -52,6 +52,13 @@ angular.module('oppia').directive('ckEditor4Rte', [
         var canReferToSkills = ContextService.canEntityReferToSkills();
 
         _RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
+          // TODO(#9358): Remove the if condition once the svgeditor is
+          // available for the users.
+          if (componentDefn.id === 'svgeditor') {
+            if (!ENABLE_LITERALLY_CANVAS_EDITOR) {
+              return;
+            }
+          }
           if (!((scope.uiConfig() &&
             scope.uiConfig().hide_complex_extensions &&
             componentDefn.isComplex) ||

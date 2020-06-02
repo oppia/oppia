@@ -168,6 +168,10 @@ export class AppConstants {
     SUBTOPIC: 'subtopic',
     QUESTION: 'question'
   };
+
+  public static IMAGE_SAVE_DESTINATION_SERVER = 'imageSaveDestinationServer';
+  public static IMAGE_SAVE_DESTINATION_LOCAL_STORAGE =
+    'imageSaveDestinationLocalStorage';
 }
 
 const constants = require('constants.ts');

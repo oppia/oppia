@@ -1353,6 +1353,22 @@ class UserSettingsTests(test_utils.GenericTestBase):
 
         self.assertEqual(user_ids, expected_user_ids)
 
+    def test_created_on_gets_updated_correctly(self):
+        # created_on should not be updated upon updating other attributes of
+        # the user settings model.
+        user_settings = user_services.create_new_user(
+            'gae_id', 'user@example.com')
+
+        user_settings_model = user_models.UserSettingsModel.get_by_id(
+            user_settings.user_id)
+        time_of_creation = user_settings_model.created_on
+
+        user_services.update_user_bio('gae_id', 'New bio.')
+
+        user_settings_model = user_models.UserSettingsModel.get_by_id(
+            user_settings.user_id)
+        self.assertEqual(user_settings_model.created_on, time_of_creation)
+
 
 class UserContributionsTests(test_utils.GenericTestBase):
 
