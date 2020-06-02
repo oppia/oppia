@@ -18,7 +18,7 @@
 
 import { ChangeDetectorRef, OnDestroy, Pipe, PipeTransform }
   from '@angular/core';
-import { isObservable, Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { LangChangeEvent, TranslateService } from 'services/translate.service';
 import { UtilsService } from 'services/utils.service';
 
@@ -51,13 +51,9 @@ export class TranslatePipe implements PipeTransform, OnDestroy {
     if (translations) {
       let res = this.translate.getParsedResult(
         translations, key, interpolateParams);
-      if (isObservable(res.subscribe)) {
-        res.subscribe(onTranslation);
-      } else {
-        onTranslation(res);
-      }
+      onTranslation(res);
     }
-    this.translate.get(key, interpolateParams).subscribe(onTranslation);
+    onTranslation(this.translate.get(key, interpolateParams));
   }
 
   // args[0] can be either object or string or empty. So type of args could be
@@ -80,8 +76,8 @@ export class TranslatePipe implements PipeTransform, OnDestroy {
         try {
           interpolateParams = JSON.parse(validArgs);
         } catch (e) {
-          throw new SyntaxError(`Wrong parameter in TranslatePipe.\
-           Expected a valid Object, received: ${args[0]}`);
+          // eslint-disable-next-line max-len
+          throw new SyntaxError(`Wrong parameter in TranslatePipe. Expected a valid Object, received: ${args[0]}`);
         }
       } else if (typeof args[0] === 'object' && !Array.isArray(args[0])) {
         interpolateParams = args[0];

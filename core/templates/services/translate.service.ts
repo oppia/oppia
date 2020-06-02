@@ -18,8 +18,6 @@
 
 import { Injectable, EventEmitter } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, isObservable, forkJoin, of } from 'rxjs';
-import { map } from 'rxjs/operators';
 import { UtilsService } from './utils.service';
 export interface MissingTranslationHandlerParams {
    // the key that's missing in translation files
@@ -61,19 +59,24 @@ export class TranslateService {
   }
 
   // This function sets the new translations
-  async use(lang: string) {
+  use(lang: string) {
     // Check if it has already been fetched before
+    this.currentLang = lang;
     if (Object.keys(this.translations).includes(lang)) {
-      this.currentLang = lang;
       this._onLangChange.emit(
         {lang: lang, translations: this.translations[lang]});
-      return of(this.translations[lang]);
+      return;
     }
     // Otherwise fetch the translations
-    this.translations[lang] = await this.fetchTranslations(lang);
-    this.currentLang = lang;
-    this._onLangChange.emit(
-      {lang: lang, translations: this.translations[lang]});
+    this.translations[lang] = this.fetchTranslations(lang).then(
+      translations => {
+        this.translations[lang] = translations;
+        if (this.currentLang === lang) {
+          this._onLangChange.emit(
+            {lang: lang, translations: this.translations[lang]});
+        }
+      }
+    );
   }
 
 
@@ -127,45 +130,22 @@ export class TranslateService {
   }
 
   getParsedResult(
-      translations: any, key: any, interpolateParams?: Object) {
-    let res: string | Observable<string>;
-
-    if (key instanceof Array) {
-      let result = {},
-        observables: boolean = false;
-      for (let k of key) {
-        result[k] = this.getParsedResult(translations, k, interpolateParams);
-        if (isObservable(result[k])) {
-          observables = true;
-        }
-      }
-      if (observables) {
-        const sources = key.map(
-          k => isObservable(result[k]) ? result[k] : of(result[k] as string));
-        return forkJoin(sources).pipe(
-          map((arr: Array<string>) => {
-            let obj = {};
-            arr.forEach((value: string, index: number) => {
-              obj[key[index]] = value;
-            });
-            return obj;
-          })
-        );
-      }
-      return result;
-    }
+      translations: any, key: string, interpolateParams?: Object): string {
+    let res: string;
 
     if (translations) {
       res = this.interpolate(
         this.getValue(translations, key), interpolateParams);
     }
 
+    // If the translation for the current lang doesn't exist use default lang
     if (typeof res === 'undefined' && this.defaultLang !== null &&
       this.defaultLang !== this.currentLang) {
       res = this.interpolate(this.getValue(
         this.translations[this.defaultLang], key), interpolateParams);
     }
 
+    // If the translation for the default lang also doesn't exist raise an error
     if (typeof res === 'undefined') {
       let params: MissingTranslationHandlerParams = {
         key,
@@ -181,8 +161,8 @@ export class TranslateService {
   }
 
   get(
-      key: string | Array<string>,
-      interpolateParams?: Object): Observable<string | any> {
+      key: string,
+      interpolateParams?: Object): string {
     if (!this.utils.isDefined(key) || !key.length) {
       // eslint-disable-next-line quotes
       throw new Error(`Parameter "key" required`);
@@ -190,6 +170,6 @@ export class TranslateService {
     // check if we are loading a new translation to use {
     let res = this.getParsedResult(
       this.translations[this.currentLang], key, interpolateParams);
-    return isObservable(res) ? res : of(res);
+    return res;
   }
 }

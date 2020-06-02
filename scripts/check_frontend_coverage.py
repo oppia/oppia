@@ -475,6 +475,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'topics-list.directive.ts',
     'training-panel.directive.ts',
     'translate-text.service.ts',
+    'translate.pipe.ts',
     'translation-file-hash-loader.service.ts',
     'translation-opportunities.directive.ts',
     'translation-tab.directive.ts',
