@@ -153,8 +153,6 @@ import { ExplorationObjectFactory } from
   'domain/exploration/ExplorationObjectFactory';
 import { ExplorationOpportunitySummaryObjectFactory } from
   'domain/opportunity/ExplorationOpportunitySummaryObjectFactory';
-import { ExplorationRecommendationsService } from
-  'pages/exploration-player-page/services/exploration-recommendations.service';
 import { ExpressionParserService } from 'expressions/expression-parser.service';
 import { ExpressionSyntaxTreeService } from
   'expressions/expression-syntax-tree.service';
@@ -984,11 +982,6 @@ export class UpgradedServices {
         upgradedServices['CamelCaseToHyphensPipe'],
         upgradedServices['ExtensionTagAssemblerService'],
         upgradedServices['HtmlEscaperService']);
-    upgradedServices['ExplorationRecommendationsService'] =
-      new ExplorationRecommendationsService(
-        upgradedServices['ContextService'],
-        upgradedServices['HttpClient'],
-        upgradedServices['UrlService']);
     upgradedServices['LearnerAnswerDetailsBackendApiService'] =
         new LearnerAnswerDetailsBackendApiService(
           upgradedServices['HttpClient'],
