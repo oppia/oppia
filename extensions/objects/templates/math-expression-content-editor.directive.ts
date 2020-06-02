@@ -20,8 +20,6 @@ require('directives/mathjax-bind.directive.ts');
 require('services/image-upload-helper.service.ts');
 require('services/context.service.ts');
 require('services/alerts.service.ts');
-require('services/csrf-token.service.ts');
-require('domain/utilities/url-interpolation.service.ts');
 
 
 // Every editor directive should implement an alwaysEditable option. There
@@ -29,10 +27,8 @@ require('domain/utilities/url-interpolation.service.ts');
 // in via initArgs.
 
 angular.module('oppia').directive('mathExpressionContentEditor', [
-  'AlertsService', 'ContextService', 'CsrfTokenService',
-  'ImageUploadHelperService', 'UrlInterpolationService',
-  function(AlertsService, ContextService, CsrfTokenService,
-      ImageUploadHelperService, UrlInterpolationService) {
+  'AlertsService', 'ContextService', 'ImageUploadHelperService',
+  function(AlertsService, ContextService, ImageUploadHelperService) {
     return {
       restrict: 'E',
       scope: {},
@@ -63,14 +59,12 @@ angular.module('oppia').directive('mathExpressionContentEditor', [
           var cleanedSvgString = (
             ImageUploadHelperService.cleanMathExpressionSvgString(
               ctrl.svgString));
-          ctrl.value.svgString = cleanedSvgString;
           var dimensions = (
             ImageUploadHelperService.
               extractDimensionsFromMathExpressionSvgString(cleanedSvgString));
           var fileName = (
             ImageUploadHelperService.generateMathExpressionImageFilename(
               dimensions.height, dimensions.width, dimensions.verticalPadding));
-          ctrl.value.svg_filename = fileName;
           let resampledFile ;
           var dataURI = 'data:image/svg+xml;base64,' + btoa(cleanedSvgString);
           var invalidTagsAndAttributes = (
@@ -82,7 +76,10 @@ angular.module('oppia').directive('mathExpressionContentEditor', [
             resampledFile = (
               ImageUploadHelperService.convertImageDataToImageFile(
                 dataURI));
-            postToServer(resampledFile, fileName);
+            ctrl.value.svgFileDict.svgFile = resampledFile;
+            ctrl.value.svgFileDict.entityType = ContextService.getEntityType();
+            ctrl.value.svgFileDict.entityId = ContextService.getEntityId();
+            ctrl.value.svgFileDict.fileName = fileName;
           } else {
             ctrl.value.raw_latex = '';
             ctrl.value.svg_filename = '';
@@ -90,46 +87,7 @@ angular.module('oppia').directive('mathExpressionContentEditor', [
           }
         };
 
-        var postToServer = function(resampledFile, filename) {
-          let form = new FormData();
-          form.append('image', resampledFile);
-          form.append('payload', JSON.stringify({
-            filename: filename
-          }));
-          var imageUploadUrlTemplate = '/createhandler/imageupload/' +
-            '<entity_type>/<entity_id>';
-          CsrfTokenService.getTokenAsync().then(function(token) {
-            form.append('csrf_token', token);
-            $.ajax({
-              url: UrlInterpolationService.interpolateUrl(
-                imageUploadUrlTemplate, {
-                  entity_type: ContextService.getEntityType(),
-                  entity_id: ContextService.getEntityId()
-                }
-              ),
-              data: form,
-              processData: false,
-              contentType: false,
-              type: 'POST',
-              dataFilter: function(data) {
-                // Remove the XSSI prefix.
-                var transformedData = data.substring(5);
-                return JSON.parse(transformedData);
-              },
-              dataType: 'text'
-            }).fail(function(data) {
-              // Remove the XSSI prefix.
-              var transformedData = data.responseText.substring(5);
-              var parsedResponse = JSON.parse(transformedData);
-              AlertsService.addWarning(
-                parsedResponse.error || 'Error communicating with server.');
-            });
-          });
-        };
         ctrl.$onInit = function() {
-
-           console.log("inseid math editor")
-           console.log(ctrl.value)
           // Reset the component each time the value changes (e.g. if this is
           // part of an editable list).
           ctrl.svgString = '';
@@ -140,7 +98,6 @@ angular.module('oppia').directive('mathExpressionContentEditor', [
           }, true);
           $scope.$on('externalSave', function() {
             processAndSaveSvg();
-
             if (ctrl.active) {
               ctrl.replaceValue(ctrl.localValue.label);
               // The $scope.$apply() call is needed to propagate the replaced
