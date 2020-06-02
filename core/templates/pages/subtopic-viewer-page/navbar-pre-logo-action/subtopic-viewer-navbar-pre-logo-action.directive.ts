@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the navbar pre-logo-action 
+ * @fileoverview Directive for the navbar pre-logo-action
  *  of the subtopic viewer.
  */
 
