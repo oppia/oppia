@@ -17,13 +17,6 @@
  used by scripts/pre_commit_linter_test.
  */
 
-require('base-components/warning-loader.directive.ts');
-require('pages/OppiaFooterDirective.ts');
-
-require('domain/sidebar/sidebar-status.service.ts');
-require('services/contextual/url.service.ts');
-require('services/stateful/background-mask.service.ts');
-
 angular.module('oppia').directive('baseContent', [
   function() {
     return {
@@ -36,7 +29,6 @@ angular.module('oppia').directive('baseContent', [
         footer: '?pageFooter',
         navOptions: '?navOptions',
       },
-      template: require('./base-content.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$rootScope', '$window', 'BackgroundMaskService',
         'SidebarStatusService', 'UrlService',
@@ -88,7 +80,6 @@ angular.module('oppia').directive('baseContent', [
         footer: '?pageFooter',
         navOptions: '?navOptions',
       },
-      template: require('./base-content.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$rootScope', '$window', 'BackgroundMaskService',
         'SidebarStatusService', 'UrlService',
