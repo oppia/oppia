@@ -9,7 +9,7 @@
           <[$ctrl.storyDescription]>
         </div>
 
-        <div ng-if="$ctrl.showChapters()" class="d-md-block">
+        <div ng-if="$ctrl.showChapters()" class="d-md-block oppia-story-viewer-card-container">
           <a ng-repeat="node in $ctrl.storyPlaythroughObject.getStoryNodes();"
              ng-href="<[$ctrl.getExplorationUrl(node)]>">
 
