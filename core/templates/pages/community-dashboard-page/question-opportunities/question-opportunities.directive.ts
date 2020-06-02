@@ -209,22 +209,8 @@ angular.module('oppia').directive('questionOpportunities', [
                         return MisconceptionObjectFactory
                           .createFromBackendDict(misconceptionsBackendDict);
                       });
-                  $scope.removeErrors = function() {
-                    $scope.validationError = null;
-                  };
-                  $scope.questionChanged = function() {
-                    $scope.removeErrors();
-                  };
                   $scope.done = function() {
-                    $scope.validationError = $scope.question.validate(
-                      $scope.misconceptionsBySkill);
-                    if ($scope.validationError) {
-                      return;
-                    }
-                    if (!StateEditorService.isCurrentSolutionValid()) {
-                      $scope.validationError =
-                        'The solution is invalid and does not ' +
-                        'correspond to a correct answer';
+                    if (!$scope.isQuestionValid()) {
                       return;
                     }
                     QuestionSuggestionService.submitSuggestion(
@@ -234,9 +220,13 @@ angular.module('oppia').directive('questionOpportunities', [
                   };
                   // Checking if Question contains all requirements to enable
                   // Save and Publish Question
-                  $scope.isSaveButtonDisabled = function() {
-                    return $scope.question.validate(
-                      $scope.misconceptionsBySkill);
+                  $scope.isQuestionValid = function() {
+                    var question = $scope.question;
+                    return !(
+                      question.validate() ||
+                      question.getUnaddressedMisconceptionNames(
+                        $scope.misconceptionsBySkill).length > 0 ||
+                      !StateEditorService.isCurrentSolutionValid());
                   };
 
                   $scope.cancel = function() {

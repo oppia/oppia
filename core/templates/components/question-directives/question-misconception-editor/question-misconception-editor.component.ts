@@ -46,7 +46,10 @@ angular.module('oppia').component('questionMisconceptionEditor', {
         $rootScope, $uibModal, StateEditorService,
         UrlInterpolationService) {
       var ctrl = this;
-      var _getTaggedMisconceptionName = function(skillMisconceptionId) {
+      var _setTaggedMisconceptionName = function(skillMisconceptionId) {
+        // skillMisconceptionId can be null when tagging a misconception
+        // for a new response for the first time by clicking on
+        // 'Tag a Misconception' button.
         if (skillMisconceptionId) {
           if (typeof skillMisconceptionId === 'string' &&
               skillMisconceptionId.split('-').length === 2) {
@@ -111,7 +114,7 @@ angular.module('oppia').component('questionMisconceptionEditor', {
         var skillId = ctrl.selectedMisconceptionSkillId;
         var misconceptionId = ctrl.selectedMisconception.getId();
         ctrl.getOnSaveTaggedMisconception()(misconceptionId, skillId);
-        _getTaggedMisconceptionName(`${skillId}-${misconceptionId}`);
+        ctrl.misconceptionName = ctrl.selectedMisconception.getName();
         var outcome = angular.copy(ctrl.outcome);
         if (ctrl.feedbackIsUsed) {
           outcome.feedback.setHtml(
@@ -133,7 +136,7 @@ angular.module('oppia').component('questionMisconceptionEditor', {
         ctrl.misconceptionsBySkill = (
           StateEditorService.getMisconceptionsBySkill());
         ctrl.misconceptionEditorIsOpen = null;
-        _getTaggedMisconceptionName(ctrl.getTaggedSkillMisconceptionId());
+        _setTaggedMisconceptionName(ctrl.getTaggedSkillMisconceptionId());
         ctrl.feedbackIsUsed = true;
       };
     }

@@ -147,11 +147,17 @@ angular.module('oppia').directive('questionsList', [
           };
 
           ctrl.saveAndPublishQuestion = function(commitMessage) {
-            var validationErrors = ctrl.question.validate(
-              ctrl.misconceptionsBySkill);
+            var validationErrors = ctrl.question.validate();
+            var unaddressedMisconceptions = (
+              ctrl.question.getUnaddressedMisconceptionNames(
+                ctrl.misconceptionsBySkill));
+            var unaddressedMisconceptionsErrorString = (
+              `Remaining misconceptions that need to be addressed: ${
+                unaddressedMisconceptions.join(', ')}`);
 
-            if (validationErrors) {
-              AlertsService.addWarning(validationErrors);
+            if (validationErrors || unaddressedMisconceptions.length) {
+              AlertsService.addWarning(
+                validationErrors || unaddressedMisconceptionsErrorString);
               return;
             }
             _reInitializeSelectedSkillIds();
@@ -536,20 +542,10 @@ angular.module('oppia').directive('questionsList', [
                   $scope.canEditQuestion = canEditQuestion;
                   $scope.newQuestionIsBeingCreated = newQuestionIsBeingCreated;
 
-                  if (!newQuestionIsBeingCreated) {
-                    $scope.validationError = $scope.question.validate(
-                      $scope.misconceptionsBySkill);
-                  }
-
-                  $scope.removeErrors = function() {
-                    $scope.validationError = null;
-                  };
                   $scope.getSkillEditorUrl = function(skillId) {
                     return '/skill_editor/' + skillId;
                   };
-                  $scope.questionChanged = function() {
-                    $scope.removeErrors();
-                  };
+
                   $scope.removeSkill = function(skillId) {
                     if ($scope.associatedSkillSummaries.length === 1) {
                       AlertsService.addInfoMessage(
@@ -565,6 +561,9 @@ angular.module('oppia').directive('questionsList', [
                         return summary.getId() !== skillId;
                       });
                   };
+                  $scope.getSkillLinkageModificationsArray = function() {
+                    return returnModalObject.skillLinkageModificationsArray;
+                  }
                   $scope.undo = function() {
                     $scope.associatedSkillSummaries = associatedSkillSummaries;
                     returnModalObject.skillLinkageModificationsArray = [];
@@ -637,15 +636,7 @@ angular.module('oppia').directive('questionsList', [
                   // as there is already a default commit message present in the
                   // backend for modification of skill linkages.
                   $scope.saveAndCommit = function() {
-                    $scope.validationError = $scope.question.validate(
-                      $scope.misconceptionsBySkill);
-                    if ($scope.validationError) {
-                      return;
-                    }
-                    if (!StateEditorService.isCurrentSolutionValid()) {
-                      $scope.validationError =
-                        'The solution is invalid and does not ' +
-                        'correspond to a correct answer';
+                    if (!$scope.isQuestionValid()) {
                       return;
                     }
 
@@ -673,29 +664,26 @@ angular.module('oppia').directive('questionsList', [
                   $scope.isSaveAndCommitButtonDisabled = function() {
                     return !(QuestionUndoRedoService.hasChanges() ||
                         (returnModalObject.skillLinkageModificationsArray.length
-                        ) > 0);
+                        ) > 0) ||
+                        !$scope.isQuestionValid();
                   };
 
 
                   $scope.done = function() {
-                    $scope.validationError = $scope.question.validate(
-                      $scope.misconceptionsBySkill);
-                    if ($scope.validationError) {
-                      return;
-                    }
-                    if (!StateEditorService.isCurrentSolutionValid()) {
-                      $scope.validationError =
-                        'The solution is invalid and does not ' +
-                        'correspond to a correct answer';
+                    if (!$scope.isQuestionValid()) {
                       return;
                     }
                     $uibModalInstance.close(returnModalObject);
                   };
                   // Checking if Question contains all requirement to enable
                   // Save and Publish Question
-                  $scope.isSaveButtonDisabled = function() {
-                    return $scope.question.validate(
-                      $scope.misconceptionsBySkill);
+                  $scope.isQuestionValid = function() {
+                    var question = $scope.question;
+                    return !(
+                      question.validate() ||
+                      question.getUnaddressedMisconceptionNames(
+                        $scope.misconceptionsBySkill).length > 0 ||
+                      !StateEditorService.isCurrentSolutionValid());
                   };
 
                   $scope.cancel = function() {

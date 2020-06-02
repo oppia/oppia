@@ -74,7 +74,7 @@ angular.module('oppia').factory('QuestionObjectFactory', [
         DEFAULT_LANGUAGE_CODE, 1, skillIds);
     };
 
-    Question.prototype.validate = function(misconceptionsBySkill) {
+    Question.prototype.validate = function() {
       var interaction = this._stateData.interaction;
       if (interaction.id === null) {
         return 'An interaction must be specified';
@@ -88,22 +88,31 @@ angular.module('oppia').factory('QuestionObjectFactory', [
         return 'A solution must be specified';
       }
       var answerGroups = this._stateData.interaction.answerGroups;
-      var taggedSkillMisconceptionIds = {};
       var atLeastOneAnswerCorrect = false;
       for (var i = 0; i < answerGroups.length; i++) {
         if (answerGroups[i].outcome.labelledAsCorrect) {
           atLeastOneAnswerCorrect = true;
           continue;
         }
-        if (answerGroups[i].taggedSkillMisconceptionId !== null) {
-          taggedSkillMisconceptionIds[
-            answerGroups[i].taggedSkillMisconceptionId] = true;
-        }
       }
       if (!atLeastOneAnswerCorrect) {
         return 'At least one answer should be marked correct';
       }
-      var pendingMisconceptionNamesToTag = [];
+      return false;
+    };
+
+    Question.prototype.getUnaddressedMisconceptionNames = function(
+        misconceptionsBySkill) {
+      var answerGroups = this._stateData.interaction.answerGroups;
+      var taggedSkillMisconceptionIds = {};
+      for (var i = 0; i < answerGroups.length; i++) {
+        if (!answerGroups[i].outcome.labelledAsCorrect &&
+            answerGroups[i].taggedSkillMisconceptionId !== null) {
+          taggedSkillMisconceptionIds[
+            answerGroups[i].taggedSkillMisconceptionId] = true;
+        }
+      }
+      var unaddressedMisconceptionNames = [];
       Object.keys(misconceptionsBySkill).forEach(function(skillId) {
         for (var i = 0; i < misconceptionsBySkill[skillId].length; i++) {
           if (!misconceptionsBySkill[skillId][i].isMandatory()) {
@@ -113,26 +122,12 @@ angular.module('oppia').factory('QuestionObjectFactory', [
             skillId + '-' + misconceptionsBySkill[skillId][i].getId();
           if (
             !taggedSkillMisconceptionIds.hasOwnProperty(skillMisconceptionId)) {
-            pendingMisconceptionNamesToTag.push(
+              unaddressedMisconceptionNames.push(
               misconceptionsBySkill[skillId][i].getName());
           }
         }
       });
-      if (pendingMisconceptionNamesToTag.length > 0) {
-        var returnString = 'Remaining misconceptions that need to be ' +
-          'addressed:';
-        var misconceptionsUnorderedListElement = document.createElement('ul');
-        pendingMisconceptionNamesToTag.forEach(function(misconceptionName) {
-          var misconceptionNameListElement = document.createElement('li');
-          misconceptionNameListElement.appendChild(
-            document.createTextNode(misconceptionName));
-          misconceptionsUnorderedListElement.appendChild(
-            misconceptionNameListElement);
-        });
-        return (
-          `${returnString} ${misconceptionsUnorderedListElement.outerHTML}`);
-      }
-      return false;
+      return unaddressedMisconceptionNames;
     };
 
     // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.

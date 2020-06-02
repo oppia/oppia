@@ -234,8 +234,7 @@ describe('Question object factory', function() {
     expect(sampleQuestion.toBackendDict(false).id).toEqual('question_id');
   });
 
-  it('should correctly validate question', function() {
-    var interaction = sampleQuestion.getStateData().interaction;
+  it('should correctly report unaddressed misconceptions', function() {
     var misconception1 = misconceptionObjectFactory.create(
       'id', 'name', 'notes', 'feedback', true);
     var misconception2 = misconceptionObjectFactory.create(
@@ -246,28 +245,29 @@ describe('Question object factory', function() {
       skillId1: [misconception1],
       skillId2: [misconception2, misconception3]
     };
+    expect(sampleQuestion.getUnaddressedMisconceptionNames(
+      misconceptionsDict)).toEqual(['name', 'name_2']);
+  });
 
-    expect(sampleQuestion.validate([])).toBe(false);
+  it('should correctly validate question', function() {
+    var interaction = sampleQuestion.getStateData().interaction;
 
-    expect(
-      sampleQuestion.validate(misconceptionsDict)).toEqual(
-      'Remaining misconceptions that need to be addressed: ' +
-      '<ul><li>name</li><li>name_2</li></ul>');
+    expect(sampleQuestion.validate()).toBe(false);
 
     interaction.answerGroups[0].outcome.labelledAsCorrect = false;
-    expect(sampleQuestion.validate([])).toEqual(
+    expect(sampleQuestion.validate()).toEqual(
       'At least one answer should be marked correct');
 
     interaction.solution = null;
-    expect(sampleQuestion.validate([])).toEqual(
+    expect(sampleQuestion.validate()).toEqual(
       'A solution must be specified');
 
     interaction.hints = [];
-    expect(sampleQuestion.validate([])).toEqual(
+    expect(sampleQuestion.validate()).toEqual(
       'At least 1 hint should be specfied');
 
     interaction.id = null;
-    expect(sampleQuestion.validate([])).toEqual(
+    expect(sampleQuestion.validate()).toEqual(
       'An interaction must be specified');
   });
 
