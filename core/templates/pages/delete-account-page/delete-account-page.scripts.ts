@@ -21,4 +21,4 @@
 require('./delete-account-page.module.ts');
 require('App.ts');
 
-require('./delete-account-page.controller.ts');
+require('./delete-account-page.component.ts');
