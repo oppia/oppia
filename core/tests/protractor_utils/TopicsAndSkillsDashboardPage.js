@@ -378,7 +378,7 @@ var TopicsAndSkillsDashboardPage = function() {
     await waitFor.visibilityOf(topicsTable,
       'Topic table taking too long to appear.');
 
-    await Promise.all(topicNames.map(async(topic, index) => {
+    await Promise.all(await topicNames.map(async(topic, index) => {
       var name = await topic.getText();
       if (name === topicName) {
         await this.navigateToTopicWithIndex(index);

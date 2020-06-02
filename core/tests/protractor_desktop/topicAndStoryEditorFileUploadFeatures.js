@@ -87,7 +87,7 @@ describe('Topic editor functionality', function() {
     var TOPIC_CATEGORY = 'Mathematics';
 
     await topicsAndSkillsDashboardPage.createTopic(
-      TOPIC_NAME, TOPIC_CATEGORY, TOPIC_DESCRIPTION, false);
+      TOPIC_NAME, TOPIC_DESCRIPTION, TOPIC_CATEGORY, false);
     var defaultThumbnailSrc = (
       await topicEditorPage.getTopicThumbnailSource());
     await topicEditorPage.submitTopicThumbnail('../data/test_svg.svg');
