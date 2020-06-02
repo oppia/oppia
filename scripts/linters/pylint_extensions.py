@@ -1272,12 +1272,14 @@ class SingleLineCommentChecker(checkers.BaseChecker):
 
                 # Check if variable name is used.
                 underscore_is_present = '_' in line.split()[1]
+                if underscore_is_present:
+                    continue
 
                 # Check if allowed prefix is used.
                 allowed_prefix_is_present = any(
                     line[2:].startswith(word) for word in (
                         allowed_comment_prefixes))
-                if allowed_prefix_is_present or underscore_is_present:
+                if allowed_prefix_is_present:
                     continue
 
             # Comments must start with a capital letter.
