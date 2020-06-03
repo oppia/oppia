@@ -293,6 +293,8 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             self.assertEqual(urlfetch_counter.times_called, 1)
             self.assertEqual(logging_error_mock.times_called, 1)
             self.assertEqual(expected_error_message, error_messages[0])
+            print("hello",profile_picture)
+            print("\n",user_services.DEFAULT_IDENTICON_DATA_URL)
             self.assertEqual(
                 profile_picture, user_services.DEFAULT_IDENTICON_DATA_URL)
 
