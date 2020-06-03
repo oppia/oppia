@@ -92,6 +92,10 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             'Expected misconception ID to be an integer')
 
+    def test_get_all_html_content_strings(self):
+        html_strings = self.skill.get_all_html_content_strings()
+        self.assertEqual(len(html_strings), 8)
+
     def test_valid_misconception_name(self):
         misconception_name = 'This string is smaller than 50'
         self.skill.update_misconception_name(0, misconception_name)
