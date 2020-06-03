@@ -261,12 +261,12 @@ def get_random_choice(alist):
 
 def test_file_for_webp(h):
     """Checks if a file is in webp format or not.
-    
+
     Args:
-        h: binary content of a file
-        
+        h: binary content of a file.
+
     Returns:
-        str. determines whether or not the file is a webp image
+        str. determines whether or not the file is a webp image.
     """
     if h.startswith(b'RIFF') and h[8:12] == b'WEBP':
         return 'webp'
