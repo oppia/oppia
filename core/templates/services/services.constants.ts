@@ -26,6 +26,7 @@ export class ServicesConstants {
     SKILL_EDITOR: 'skill_editor',
     STORY_EDITOR: 'story_editor',
     TOPIC_EDITOR: 'topic_editor',
+    TOPICS_AND_SKILLS_DASHBOARD: 'topics_and_skills_dashboard',
     OTHER: 'other'
   };
 
