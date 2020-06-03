@@ -87,7 +87,6 @@ def download_and_install_nginx():
     subprocess.check_call(install_command)
 
 
-
 def start_proxy_server():
     """Start the nginx proxy server."""
     filepath = os.path.join(common.CURR_DIR, 'nginx.conf')
