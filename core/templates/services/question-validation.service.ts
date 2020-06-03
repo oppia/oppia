@@ -18,8 +18,8 @@
  */
 
 require(
-    'components/state-editor/state-editor-properties-services/' +
-    'state-editor.service.ts');
+  'components/state-editor/state-editor-properties-services/' +
+  'state-editor.service.ts');
 
 angular.module('oppia').factory('QuestionValidationService', [
   'StateEditorService',

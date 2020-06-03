@@ -16,12 +16,17 @@
  * @fileoverview Unit tests for QuestionValidationService.
  */
 
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// question-misconception-editor.component.ts is upgraded to Angular 8.
+/* eslint-disable max-len */
 import { MisconceptionObjectFactory } from
   'domain/skill/MisconceptionObjectFactory';
 import { SolutionValidityService } from
   'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
 import { StateEditorService } from
   'components/state-editor/state-editor-properties-services/state-editor.service';
+/* eslint-enable max-len */
+// ^^^ This block is to be removed.
 
 require('domain/question/QuestionObjectFactory.ts');
 require('services/question-validation.service.ts');
@@ -167,8 +172,8 @@ describe('Question Validation Service', function() {
     interaction.answer_groups[0].outcome.labelled_as_correct = false;
     expect(
       qvs.isQuestionValid(
-          QuestionObjectFactory.createFromBackendDict(mockQuestionDict),
-          mockMisconceptionObject)).toBeFalse();
+        QuestionObjectFactory.createFromBackendDict(mockQuestionDict),
+        mockMisconceptionObject)).toBeFalse();
   });
 
   it('should return false if misconceptions are not addressed', function() {
