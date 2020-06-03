@@ -758,7 +758,7 @@ class UserSubscriptionsModelTests(test_utils.GenericTestBase):
     COLLECTION_IDS = ['23', '42', '4']
     ACTIVITY_IDS = ['8', '16', '23']
     GENERAL_FEEDBACK_THREAD_IDS = ['42', '4', '8']
-    GENERIC_DATETIME = datetime.datetime(2020, 6, 2);
+    GENERIC_DATETIME = datetime.datetime(2020, 6, 2)
 
     def setUp(self):
         """Set up user models in datastore for use in testing."""
