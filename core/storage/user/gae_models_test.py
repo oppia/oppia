@@ -758,6 +758,7 @@ class UserSubscriptionsModelTests(test_utils.GenericTestBase):
     COLLECTION_IDS = ['23', '42', '4']
     ACTIVITY_IDS = ['8', '16', '23']
     GENERAL_FEEDBACK_THREAD_IDS = ['42', '4', '8']
+    GENERIC_DATETIME = datetime.datetime(2020, 6, 2);
 
     def setUp(self):
         """Set up user models in datastore for use in testing."""
@@ -769,7 +770,8 @@ class UserSubscriptionsModelTests(test_utils.GenericTestBase):
             creator_ids=self.CREATOR_IDS,
             collection_ids=self.COLLECTION_IDS,
             activity_ids=self.ACTIVITY_IDS,
-            general_feedback_thread_ids=self.GENERAL_FEEDBACK_THREAD_IDS
+            general_feedback_thread_ids=self.GENERAL_FEEDBACK_THREAD_IDS,
+            last_checked=self.GENERIC_DATETIME
         ).put()
 
         user_models.UserSubscriptionsModel(
@@ -832,7 +834,7 @@ class UserSubscriptionsModelTests(test_utils.GenericTestBase):
             'collection_ids': self.COLLECTION_IDS,
             'activity_ids': self.ACTIVITY_IDS,
             'general_feedback_thread_ids': self.GENERAL_FEEDBACK_THREAD_IDS,
-            'last_checked': None
+            'last_checked': utils.get_time_in_millisecs(self.GENERIC_DATETIME)
         }
         self.assertEqual(user_data, test_data)
 

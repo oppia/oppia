@@ -862,7 +862,9 @@ class UserSubscriptionsModel(base_models.BaseModel):
             'general_feedback_thread_ids': (
                 user_model.general_feedback_thread_ids),
             'creator_ids': user_model.creator_ids,
-            'last_checked': user_model.last_checked
+            'last_checked':
+                None if user_model.last_checked is None else
+                utils.get_time_in_millisecs(user_model.last_checked)
         }
 
         return user_data
