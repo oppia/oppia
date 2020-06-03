@@ -616,7 +616,6 @@ class GeneralPurposeLinter(python_utils.OBJECT):
         # This boolean list keeps track of the regex matches
         # found in the file.
         pattern_found_list = []
-        python_utils.PRINT('-- -- --', filepath)
         file_content = FILE_CACHE.readlines(filepath)
         for index, regexp_to_check in enumerate(
                 pattern_list):
