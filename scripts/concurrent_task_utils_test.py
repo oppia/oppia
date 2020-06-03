@@ -14,12 +14,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Unit tests for scripts/linters/python_linter.py."""
+"""Unit tests for scripts/concurrent_task_utils.py."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import os
 import threading
 
 from core.tests import test_utils
@@ -30,6 +29,7 @@ from . import concurrent_task_utils
 
 def test_function(unused_arg):
     return python_utils.OBJECT
+
 
 class ConcurrentTaskUtilsTests(test_utils.GenericTestBase):
     """Test for concurrent_task_utils.py flie."""
@@ -57,13 +57,13 @@ class ConcurrentTaskUtilsTests(test_utils.GenericTestBase):
 
     def test_execute_task(self):
         task = concurrent_task_utils.create_task(
-            test_function('unused_arg'), True, self.semaphore, 'test')
+            test_function('unused_arg'), True, self.semaphore, name='test')
         with self.print_swap:
             concurrent_task_utils.execute_tasks([task], self.semaphore)
 
     def test_execute_task_with_exception(self):
         task_list = []
-        for _ in range(6):
+        for _ in python_utils.RANGE(6):
             task = concurrent_task_utils.create_task(
                 test_function, True, self.semaphore)
             task_list.append(task)
