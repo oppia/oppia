@@ -211,14 +211,23 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
             objects.NormalizedString, mappings, invalid_values)
 
     def test_math_latex_string_validation(self):
-        """Tests objects of type MathLatexString."""
-        mappings = [
-            ('123456789', u'123456789'), (u'x \\times y', u'x \\times y'),
+        """Tests objects of type MathExpressionContent."""
+        mappings = [(
+            {'raw_latex': '123456789', 'svg_filename': ''},
+            {'raw_latex': u'123456789', 'svg_filename': u''}
+        ), (
+            {'raw_latex': u'x \\times y', 'svg_filename': u''},
+            {'raw_latex': u'x \\times y', 'svg_filename': u''}
+        )]
+        invalid_vals = [
+            3.0, {'a': 1}, [1, 2, 1], None,
+            {'raw_latex': 1, 'svg_filename': 2},
+            {'raw_latex': ['x^2'], 'svg_filename':{}},
+            {'raw_latex': ('x', 'y'), 'svg_filename': ''},
         ]
-        invalid_vals = [3.0, {'a': 1}, [1, 2, 1], None]
 
         self.check_normalization(
-            objects.MathLatexString, mappings, invalid_vals)
+            objects.MathExpressionContent, mappings, invalid_vals)
 
     def test_skill_id_string_validation(self):
         """Tests objects of type SkillSelector."""

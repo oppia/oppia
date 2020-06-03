@@ -212,6 +212,27 @@ describe('Assets Backend API Service', function() {
       $rootScope.$apply();
     });
 
+    it('should successfully save a math Svg', function(done) {
+      var successMessage = 'Math SVG was successfully saved.';
+      // @ts-ignore in order to ignore JQuery properties that should
+      // be declarated.
+      spyOn($, 'ajax').and.callFake(function() {
+        var d = $.Deferred();
+        d.resolve(successMessage);
+        return d.promise();
+      });
+      var imageFile = new Blob();
+      AssetsBackendApiService.saveMathImage(
+        imageFile, 'new.svg', 'exploration', 'expid12345')
+        .then(function(response) {
+          expect(response).toBe(successMessage);
+        }).then(done, done.fail);
+
+      // $q Promises need to be forcibly resolved through a JavaScript digest,
+      // which is what $apply helps kick-start.
+      $rootScope.$apply();
+    });
+
     it('should handle rejection when saving a file fails', function(done) {
       var errorMessage = 'Error on saving audio';
       // @ts-ignore in order to ignore JQuery properties that should

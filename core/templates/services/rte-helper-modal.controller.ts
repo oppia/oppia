@@ -17,11 +17,15 @@
  */
 
 angular.module('oppia').controller('RteHelperModalController', [
-  '$scope', '$timeout', '$uibModalInstance', 'FocusManagerService',
+  '$scope', '$timeout', '$uibModalInstance', 'AlertsService',
+  'AssetsBackendApiService', 'ContextService', 'FocusManagerService',
   'attrsCustomizationArgsDict', 'customizationArgSpecs',
+  'IMAGE_SAVE_DESTINATION_LOCAL_STORAGE',
   function(
-      $scope, $timeout, $uibModalInstance, FocusManagerService,
-      attrsCustomizationArgsDict, customizationArgSpecs) {
+      $scope, $timeout, $uibModalInstance, AlertsService,
+      AssetsBackendApiService, ContextService, FocusManagerService,
+      attrsCustomizationArgsDict, customizationArgSpecs,
+      IMAGE_SAVE_DESTINATION_LOCAL_STORAGE) {
     var extractVideoIdFromVideoUrl = function(videoUrl) {
       videoUrl = videoUrl.split(/(vi\/|v=|\/v\/|youtu\.be\/|\/embed\/)/);
       return ((videoUrl[2] !== undefined) ?
@@ -41,17 +45,35 @@ angular.module('oppia').controller('RteHelperModalController', [
     $timeout(function() {
       $scope.modalIsLoading = false;
     });
-
+    $scope.isRteMathExpressionEditor = false;
     $scope.tmpCustomizationArgs = [];
     for (var i = 0; i < customizationArgSpecs.length; i++) {
       var caName = customizationArgSpecs[i].name;
-      $scope.tmpCustomizationArgs.push({
-        name: caName,
-        value: (
-          attrsCustomizationArgsDict.hasOwnProperty(caName) ?
-            angular.copy(attrsCustomizationArgsDict[caName]) :
-            customizationArgSpecs[i].default_value)
-      });
+      if (caName === 'math_content') {
+        $scope.isRteMathExpressionEditor = true;
+        var mathValueDict = {
+          name: caName,
+          value: (
+            attrsCustomizationArgsDict.hasOwnProperty(caName) ?
+              angular.copy(attrsCustomizationArgsDict[caName]) :
+              customizationArgSpecs[i].default_value)
+        };
+        mathValueDict.value.svgFileDict = {
+          svgFile: null,
+          entityType: '',
+          entityId: '',
+          fileName: ''
+        };
+        $scope.tmpCustomizationArgs.push(mathValueDict);
+      } else {
+        $scope.tmpCustomizationArgs.push({
+          name: caName,
+          value: (
+            attrsCustomizationArgsDict.hasOwnProperty(caName) ?
+              angular.copy(attrsCustomizationArgsDict[caName]) :
+              customizationArgSpecs[i].default_value)
+        });
+      }
     }
 
     $scope.cancel = function() {
@@ -60,20 +82,46 @@ angular.module('oppia').controller('RteHelperModalController', [
 
     $scope.save = function() {
       $scope.$broadcast('externalSave');
-
       var customizationArgsDict = {};
-      for (var i = 0; i < $scope.tmpCustomizationArgs.length; i++) {
-        var caName = $scope.tmpCustomizationArgs[i].name;
-        if (caName === 'video_id') {
-          var temp = $scope.tmpCustomizationArgs[i].value;
-          customizationArgsDict[caName] = (
-            extractVideoIdFromVideoUrl(temp.toString()));
-        } else {
-          customizationArgsDict[caName] = (
-            $scope.tmpCustomizationArgs[i].value);
+
+      if ($scope.isRteMathExpressionEditor) {
+        if (
+          ContextService.getImageSaveDestination() ===
+          IMAGE_SAVE_DESTINATION_LOCAL_STORAGE) {
+          $uibModalInstance.dismiss('cancel');
         }
+        var svgFileDict = $scope.tmpCustomizationArgs[0].value.svgFileDict;
+        AssetsBackendApiService.saveMathImage(
+          svgFileDict.svgFile, svgFileDict.fileName, svgFileDict.entityType,
+          svgFileDict.entityId).then(function(response) {
+          var mathContentDict = {
+            raw_latex: $scope.tmpCustomizationArgs[0].value.raw_latex,
+            svg_filename: response.filename
+          };
+          var caName = 'math_content';
+          customizationArgsDict[caName] = mathContentDict;
+          $uibModalInstance.close(customizationArgsDict);
+          $scope.isRteMathExpressionEditor = false;
+        }, function(errorResponse) {
+          AlertsService.addWarning(
+            errorResponse.error || 'Error communicating with server.');
+          $uibModalInstance.dismiss('cancel');
+          $scope.isRteMathExpressionEditor = false;
+        });
+      } else {
+        for (var i = 0; i < $scope.tmpCustomizationArgs.length; i++) {
+          var caName = $scope.tmpCustomizationArgs[i].name;
+          if (caName === 'video_id') {
+            var temp = $scope.tmpCustomizationArgs[i].value;
+            customizationArgsDict[caName] = (
+              extractVideoIdFromVideoUrl(temp.toString()));
+          } else {
+            customizationArgsDict[caName] = (
+              $scope.tmpCustomizationArgs[i].value);
+          }
+        }
+        $uibModalInstance.close(customizationArgsDict);
       }
-      $uibModalInstance.close(customizationArgsDict);
     };
   }
 ]);
