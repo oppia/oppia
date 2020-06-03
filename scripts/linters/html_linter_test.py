@@ -227,7 +227,7 @@ class CustomHTMLParserTests(test_utils.GenericTestBase):
                 [INVALID_QUOTES_HTML_FILEPATH], True).perform_all_lint_checks()
         self.assertTrue(
             appears_in_linter_stdout(
-                ['line 11, col 24, the `style` attribute is not double quoted'],
+                ['line 9, col 20, line contains trailing whitespace'],
                 self.linter_stdout))
 
     def test_get_linters(self):
