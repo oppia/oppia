@@ -32,22 +32,22 @@ export class LoaderService {
    * In order to keep the variables same, static is used until migration is
    * complete.
    */
-  static loadingMessageSubject = new EventEmitter<string>();
+  static loadingMessageChangedEvent = new EventEmitter<string>();
   constructor() {}
 
   showLoadingScreen(message: string): void {
     // TODO(#9154): Change LoaderService to "this".
-    LoaderService.loadingMessageSubject.emit(message);
+    LoaderService.loadingMessageChangedEvent.emit(message);
   }
 
   hideLoadingScreen(): void {
     // TODO(#9154): Change LoaderService to "this".
-    LoaderService.loadingMessageSubject.emit('');
+    LoaderService.loadingMessageChangedEvent.emit('');
   }
 
   onLoadingMessageChange(): EventEmitter<string> {
     // TODO(#9154): Change LoaderService to "this".
-    return LoaderService.loadingMessageSubject;
+    return LoaderService.loadingMessageChangedEvent;
   }
 }
 
