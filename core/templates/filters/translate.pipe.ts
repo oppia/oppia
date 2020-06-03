@@ -25,7 +25,7 @@ import { UtilsService } from 'services/utils.service';
 /**
  * Commonly used terms in this file.
  * Note: intentionally left out the L of innerHTM"L" to avoid the linter error.
- * Example: <h1 [innerHTML]="'I18N_ABOUT_PAGE_HEADING' | translate:{x: 'val'}">
+ * Example: <h1 [innerHTM]="'I18N_ABOUT_PAGE_HEADING' | translate:{x: 'val'}">
  * 'I18N_ABOUT_PAGE_HEADING' is referred here as key.
  * "translate" is the pipe. Every pipe must have a transform function. The
  * transform function called when angular encouters the pipe in HTML.
