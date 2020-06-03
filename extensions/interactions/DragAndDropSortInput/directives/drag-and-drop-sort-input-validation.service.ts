@@ -25,7 +25,6 @@ import { IWarning, baseInteractionValidationService } from
   'interactions/base-interaction-validation.service';
 import { Outcome } from
   'domain/exploration/OutcomeObjectFactory';
-import { TypeChangeService } from 'services/type-change.service';
 
 import { AppConstants } from 'app.constants';
 
@@ -35,8 +34,7 @@ import { AppConstants } from 'app.constants';
 export class DragAndDropSortInputValidationService {
   constructor(
       private baseInteractionValidationServiceInstance:
-        baseInteractionValidationService,
-      private typeChangeService: TypeChangeService) {}
+        baseInteractionValidationService) {}
 
   // TODO(#7176): Replace 'any' with the exact type. This has been kept as
   // 'any' because 'customizationArgs' is a dict with possible underscore_cased
@@ -131,8 +129,7 @@ export class DragAndDropSortInputValidationService {
         var inputs = rules[j].inputs;
         var rule = rules[j];
         if (!customizationArgs.allowMultipleItemsInSamePosition.value) {
-          var xInputs = this.typeChangeService.changeTypeToStringArrayArray(
-            inputs.x);
+          var xInputs = <string[][]>inputs.x;
           for (var i = 0; i < xInputs.length; i++) {
             if (xInputs[i].length > 1) {
               warningsList.push({
@@ -165,8 +162,7 @@ export class DragAndDropSortInputValidationService {
             break;
           case 'IsEqualToOrdering':
           case 'IsEqualToOrderingWithOneItemAtIncorrectPosition':
-            var xInputs = this.typeChangeService.changeTypeToStringArrayArray(
-              inputs.x);
+            var xInputs = <string[][]>inputs.x;
             for (var k = 0; k < xInputs.length; k++) {
               if (inputs.x[k].length === 0) {
                 areAnyItemsEmpty = true;

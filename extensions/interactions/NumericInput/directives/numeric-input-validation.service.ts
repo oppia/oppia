@@ -25,7 +25,6 @@ import { IWarning, baseInteractionValidationService } from
   'interactions/base-interaction-validation.service';
 import { Outcome } from
   'domain/exploration/OutcomeObjectFactory';
-import { TypeChangeService } from 'services/type-change.service';
 
 import { AppConstants } from 'app.constants';
 
@@ -35,8 +34,7 @@ import { AppConstants } from 'app.constants';
 export class NumericInputValidationService {
   constructor(
       private baseInteractionValidationServiceInstance:
-        baseInteractionValidationService,
-      private typeChangeService: TypeChangeService) {}
+        baseInteractionValidationService) {}
 
   // TODO(#7176): Replace 'any' with the exact type. This has been kept as
   // 'any' because 'customizationArgs' is a dict with possible underscore_cased
@@ -109,7 +107,7 @@ export class NumericInputValidationService {
         };
         switch (rule.type) {
           case 'Equals':
-            var x = this.typeChangeService.changeTypeToNumber(rule.inputs.x);
+            var x = (<number>rule.inputs.x);
             setLowerAndUpperBounds(range, x, x, true, true);
             break;
           case 'IsInclusivelyBetween':
@@ -121,25 +119,24 @@ export class NumericInputValidationService {
             setLowerAndUpperBounds(range, a, b, true, true);
             break;
           case 'IsGreaterThan':
-            var x = this.typeChangeService.changeTypeToNumber(rule.inputs.x);
+            var x = (<number>rule.inputs.x);
             setLowerAndUpperBounds(range, x, Infinity, false, false);
             break;
           case 'IsGreaterThanOrEqualTo':
-            var x = this.typeChangeService.changeTypeToNumber(rule.inputs.x);
+            var x = (<number>rule.inputs.x);
             setLowerAndUpperBounds(range, x, Infinity, true, false);
             break;
           case 'IsLessThan':
-            var x = this.typeChangeService.changeTypeToNumber(rule.inputs.x);
+            var x = (<number>rule.inputs.x);
             setLowerAndUpperBounds(range, -Infinity, x, false, false);
             break;
           case 'IsLessThanOrEqualTo':
-            var x = this.typeChangeService.changeTypeToNumber(rule.inputs.x);
+            var x = (<number>rule.inputs.x);
             setLowerAndUpperBounds(range, -Infinity, x, false, true);
             break;
           case 'IsWithinTolerance':
-            var x = this.typeChangeService.changeTypeToNumber(rule.inputs.x);
-            var tol = this.typeChangeService.changeTypeToNumber(
-              rule.inputs.tol);
+            var x = (<number>rule.inputs.x);
+            var tol = (<number>rule.inputs.tol);
             setLowerAndUpperBounds(range, x - tol, x + tol, true, true);
             break;
           default:

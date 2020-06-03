@@ -28,7 +28,6 @@ import { Outcome, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
 import { Rule, RuleObjectFactory } from
   'domain/exploration/RuleObjectFactory';
-import { TypeChangeService } from 'services/type-change.service';
 
 import { AppConstants } from 'app.constants';
 import { WARNING_TYPES_CONSTANT } from 'app-type.constants';
@@ -48,7 +47,7 @@ describe('DragAndDropSortInputValidationService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [DragAndDropSortInputValidationService, TypeChangeService]
+      providers: [DragAndDropSortInputValidationService]
     });
 
     validatorService = TestBed.get(DragAndDropSortInputValidationService);

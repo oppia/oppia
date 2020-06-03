@@ -25,7 +25,6 @@ import { IWarning, baseInteractionValidationService } from
   'interactions/base-interaction-validation.service';
 import { Outcome } from
   'domain/exploration/OutcomeObjectFactory';
-import { TypeChangeService } from 'services/type-change.service';
 
 import { AppConstants } from 'app.constants';
 
@@ -35,8 +34,7 @@ import { AppConstants } from 'app.constants';
 export class MathExpressionInputValidationService {
   constructor(
       private baseInteractionValidationServiceInstance:
-        baseInteractionValidationService,
-      private typeChangeService: TypeChangeService) {}
+        baseInteractionValidationService) {}
 
   // TODO(#7176): Replace 'any' with the exact type. This has been kept as
   // 'any' because 'customizationArgs' is a dict with possible underscore_cased
@@ -68,8 +66,7 @@ export class MathExpressionInputValidationService {
       var rules = answerGroups[i].rules;
       for (var j = 0; j < rules.length; j++) {
         try {
-          MathExpression.fromLatex(this.typeChangeService.changeTypeToString(
-            rules[j].inputs.x));
+          MathExpression.fromLatex((<string>rules[j].inputs.x));
         } catch (e) {
           warningsList.push({
             type: AppConstants.WARNING_TYPES.CRITICAL,
