@@ -55,7 +55,7 @@ class MockI18nLanguageCodeService {
 }
 
 // Mocking window object here because changing location.href causes the
-//  full page to reload. Page reloads raise an error in karma
+// full page to reload. Page reloads raise an error in karma.
 class MockWindowRef {
   _window = {
     location: {

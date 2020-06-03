@@ -24,7 +24,7 @@ import { UtilsService } from 'services/utils.service';
 
 /**
  * Commonly used terms in this file.
- * Note: intentionally left out the L of innerHTM"L" to avoid the linter error.
+ * Note: Intentionally left out the L of innerHTM"L" to avoid the linting error.
  * Example: <h1 [innerHTM]="'I18N_ABOUT_PAGE_HEADING' | translate:{x: 'val'}">
  * 'I18N_ABOUT_PAGE_HEADING' is referred here as key.
  * "translate" is the pipe. Every pipe must have a transform function. The
@@ -35,7 +35,7 @@ import { UtilsService } from 'services/utils.service';
 
 @Pipe({
   name: 'translate',
-  // This option is required to update the value when the promise is resolved.
+  // This option is required to update the value when promises are resolved.
   pure: false
 })
 export class TranslatePipe implements PipeTransform, OnDestroy {
@@ -62,6 +62,9 @@ export class TranslatePipe implements PipeTransform, OnDestroy {
     this.interpolatedValue = interpolatedString !== undefined ?
     interpolatedString :
     key;
+
+    // Storing the key to check if the key is same when the transform is invoked
+    // again.
     this.lastKey = key;
     this._ref.markForCheck();
   }
@@ -94,7 +97,7 @@ export class TranslatePipe implements PipeTransform, OnDestroy {
     this.lastKey = key;
 
     // Storing the params to check if the params are same when the transform is
-    //  invoked again.
+    // invoked again.
     this.lastParams = params;
 
     // Update the interpolated value.

@@ -32,7 +32,6 @@ export class I18nLanguageCodeService {
    * In order to keep the variables same, static is used until migration is
    * complete.
    */
-  // eslint-disable-next-line max-len
   static languageCodeChange = new EventEmitter<string> ();
   static languageCode = 'en';
 

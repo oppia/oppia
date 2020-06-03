@@ -54,8 +54,8 @@ angular.module('oppia').directive('i18nFooter', [
             ctrl.supportedSiteLanguages = SUPPORTED_SITE_LANGUAGES;
             // Fetching the saved language code from cookie, because $translate
             // in angularjs uses cookies to store the last used code and we need
-            // to fetch that code in order to have consistency in translation
-            // language used in both angular and angularjs.
+            // to fetch that code in order to have the same translation language
+            // used in both angular and angularjs when the webpage first loads.
             if (document.cookie.includes('NG_TRANSLATE_LANG_KEY=')) {
               var lang = document.cookie.split('NG_TRANSLATE_LANG_KEY=')[1];
               lang = lang.split(';')[0];

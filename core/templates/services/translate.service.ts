@@ -22,15 +22,16 @@ import { UtilsService } from './utils.service';
 
 /**
  * Commonly used terms in this file.
- * Note: intentionally left out the L of innerHTM"L" to avoid the linter error.
- * Example: <h1 [innerHTM]="'I18N_ABOUT_PAGE_HEADING' | translate:{x: 'val'}">
+ * Note: Intentionally left out the L of innerHTM"L" to avoid the linting error.
+ * Example: <h1 [innerHTM]="'I18N_ABOUT_PAGE_HEADING' | translate:{x: 'Oppia'}">
  * 'I18N_ABOUT_PAGE_HEADING' is referred here as key or key.
- * "translate" is the pipe. Every pipe must have a transform function. The
- * transform function called when angular encounters the pipe in HTML.
- * The object following the pipe, i.e.{x: 'val'}, is another argument to the
- * transform function. It is called params or interpolationParams.
+ * "translate" is the pipe.
+ * The object following the pipe, i.e. {x: 'Oppia'}, is called params or
+ * interpolationParams.
  * Each i18n translation JSON file contains translations as
- * {key: translatedValue, key2: translatedValue2}.
+ * {key: translatedValue, key2: translatedValue2}. Let us say that
+ * translatedValue is "Hola <[x]>". Here the value of x comes from the params
+ * passed. So after interpolation is will become "Hola Oppia".
  */
 
 export interface LangChangeEvent {
@@ -68,7 +69,7 @@ export class TranslateService {
    * This function sets the new translations
    * @param {string} lang - language code of the translation to be used
    */
-  use(lang: string) {
+  use(lang: string): void {
     // Check if the translations for the "lang" have been fetched before.
     this.currentLang = lang;
     if (Object.keys(this.translations).includes(lang)) {
@@ -128,7 +129,7 @@ export class TranslateService {
         translations[key], interpolateParams);
     }
 
-    // If the translation for the current lang doesn't exist use default lang
+    // If the translation for the current lang doesn't exist use fallback lang
     translations = this.translations[this.fallbackLang];
     if (this.fallbackLang !== null && this.fallbackLang !== this.currentLang &&
         (translations && translations[key])) {
@@ -136,7 +137,7 @@ export class TranslateService {
         translations[key], interpolateParams);
     }
 
-    // If the translation for the default lang doesn't exist, return the key.
+    // If the translation for the fallback lang doesn't exist, return the key.
     return key;
   }
 }
