@@ -243,6 +243,7 @@
 /extensions/objects/ @aks681
 /extensions/value_generators/ @vojtechjelinek
 /extensions/__init__.py @aks681
+/expression_parser.py @aks681
 
 
 # Lesson Analytics team.
