@@ -95,11 +95,8 @@ export class TranslateService {
    * @returns {string} interpolated translatedValue
    */
   interpolateTranslatedValue(
-      translatedValue: string | undefined,
+      translatedValue: string,
       params?: Object | undefined): string {
-    if (typeof translatedValue === undefined) {
-      return translatedValue as string;
-    }
     if (!params) {
       return translatedValue;
     }

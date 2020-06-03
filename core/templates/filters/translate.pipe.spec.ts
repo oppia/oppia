@@ -85,6 +85,7 @@ describe('TranslatePipe', () => {
   it('should translate', () => {
     expect(pipe.transform('I18n_t_1')).toBe('Hello');
     expect(pipe.transform('I18n_t_2', {val: 'World'})).toBe('Hello World');
+    expect(pipe.transform('I18n_t_2', {val: 'World'})).toBe('Hello World');
     expect(pipe.transform('I18n_t_3')).toBe('I18n_t_3');
     expect(pipe.transform('')).toBe('');
     translate.onLangChange.emit({lang: 'en'});

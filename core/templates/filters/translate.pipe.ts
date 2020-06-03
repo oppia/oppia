@@ -77,7 +77,7 @@ export class TranslatePipe implements PipeTransform, OnDestroy {
     }
 
     // If the key and params are same, return the last stored value.
-    if (this.utils.isEquivalent(key, this.lastKey) &&
+    if (key === this.lastKey &&
           this.utils.isEquivalent(params, this.lastParams)) {
       return this.interpolatedValue;
     }
