@@ -13,7 +13,7 @@
   </div>
 
   <div ng-if="$ctrl.nextSubtopicSummaryIsShown" class="oppia-subtopic-viewer-next-subtopic-summary">
-    <div style="margin-right: 50px; margin-top: 80px;">
+    <div class="margin-right: 50px; margin-top: 80px;">
       <p class="oppia-subtopic-next-subtopic-label" translate="I18N_SUBTOPIC_VIEWER_NEXT_SKILL">Next Skill:</p>
       <subtopic-summary-tile subtopic="$ctrl.nextSubtopic"
                              topic-id="$ctrl.parentTopicId"
@@ -23,6 +23,11 @@
   </div>
 </div>
 <style>
+  .oppia-subtopic-summary-tile-container {
+    margin-right: 50px;
+    margin-top: 80px;
+  }
+
   .oppia-subtopic-viewer-container {
     padding-left: 20px;
     padding-right: 20px;
@@ -69,10 +74,7 @@
     margin-left: 50px;
     margin-right: 50px;
     margin-top: 4vh;
-    padding-bottom: 40px;
-    padding-left: 50px;
-    padding-right: 50px;
-    padding-top: 40px;
+    padding: 40px 50px;
     width: calc(100% - 100px);
   }
   .oppia-subtopic-viewer-next-subtopic-summary {
@@ -109,10 +111,7 @@
     }
 
     .oppia-page-contents-viewer {
-      padding-bottom: 30px;
-      padding-left: 20px;
-      padding-right: 20px;
-      padding-top: 30px;
+      padding: 30px 20px;
     }
   }
 </style>
