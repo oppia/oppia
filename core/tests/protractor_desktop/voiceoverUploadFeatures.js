@@ -29,6 +29,7 @@ var CreatorDashboardPage =
 describe('Voiceover upload features', function() {
   var TEST_USERNAME = 'uploadUser';
   var TEST_EMAIL = TEST_USERNAME + '@example.com';
+  var EXPLORATION_TITLE = 'Upload audio file';
   var creatorDashboardPage = null;
   var explorationEditorPage = null;
   var explorationEditorMainTab = null;
@@ -52,11 +53,23 @@ describe('Voiceover upload features', function() {
       'This is the first card.'
     ));
     await explorationEditorMainTab.setInteraction('EndExploration');
+
+    await explorationEditorPage.navigateToSettingsTab();
+    await explorationEditorSettingsTab.setTitle(EXPLORATION_TITLE);
+    await explorationEditorSettingsTab.setCategory('Languages');
+    await explorationEditorSettingsTab.setLanguage('English');
+    await explorationEditorSettingsTab.setObjective(
+      'Upload an translation audio file.');
+    await explorationEditorPage.navigateToTranslationTab();
+    await explorationEditorTranslationTab.exitTutorial();
+    await explorationEditorPage.saveChanges(
+      'Created exploration for voiceover upload.');
   });
 
   beforeEach(async function() {
+    await creatorDashboardPage.get();
+    await creatorDashboardPage.editExploration(EXPLORATION_TITLE);
     await explorationEditorPage.navigateToTranslationTab();
-    await explorationEditorTranslationTab.exitTutorial();
   });
 
   it('should upload an audio file', async function() {
@@ -105,7 +118,7 @@ describe('Voiceover upload features', function() {
       await users.logout();
       await users.login(TEST_EMAIL);
       await creatorDashboardPage.get();
-      await creatorDashboardPage.editExploration('Untitled');
+      await creatorDashboardPage.editExploration(EXPLORATION_TITLE);
       await explorationEditorMainTab.exitTutorial();
 
       await explorationEditorPage.navigateToTranslationTab();
@@ -127,7 +140,7 @@ describe('Voiceover upload features', function() {
       await users.logout();
       await users.login(TEST_EMAIL);
       await creatorDashboardPage.get();
-      await creatorDashboardPage.editExploration('Untitled');
+      await creatorDashboardPage.editExploration(EXPLORATION_TITLE);
       await explorationEditorMainTab.exitTutorial();
 
       await explorationEditorPage.navigateToTranslationTab();
@@ -136,12 +149,6 @@ describe('Voiceover upload features', function() {
     });
 
   afterAll(async function() {
-    await explorationEditorPage.navigateToSettingsTab();
-    await explorationEditorSettingsTab.setTitle('Upload audio file');
-    await explorationEditorSettingsTab.setCategory('Languages');
-    await explorationEditorSettingsTab.setLanguage('English');
-    await explorationEditorSettingsTab.setObjective(
-      'Upload an translation audio file.');
     await explorationEditorPage.saveChanges(
       'Adds audio file in translation tab.');
     await workflow.publishExploration();
