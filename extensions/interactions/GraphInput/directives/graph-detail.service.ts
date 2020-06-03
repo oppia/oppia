@@ -24,6 +24,26 @@ export interface IEdgeCentre {
   y: number;
 }
 
+interface IGraphVertex {
+  x: number;
+  y: number;
+  label: string;
+}
+
+interface IGraphEdge {
+  src: number;
+  dst: number;
+  weight: number;
+}
+
+export interface IGraphBackendDict {
+  isDirected?: boolean;
+  isWeighted?: boolean;
+  isLabeled?: boolean;
+  vertices?: IGraphVertex[];
+  edges?: IGraphEdge[];
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -31,10 +51,7 @@ export class GraphDetailService {
   VERTEX_RADIUS: number = 6;
   EDGE_WIDTH: number = 3;
 
-  // TODO(#7165): Replace 'any' with the exact type. This has been typed
-  // as 'any' since 'graph' is a dict with 'answer' type object which is itself
-  // typed 'any'.
-  getDirectedEdgeArrowPoints(graph: any, index: number): string {
+  getDirectedEdgeArrowPoints(graph: IGraphBackendDict, index: number): string {
     var ARROW_WIDTH = 5;
     var ARROW_HEIGHT = 10;
 
@@ -67,10 +84,7 @@ export class GraphDetailService {
     return ret;
   }
 
-  // TODO(#7165): Replace 'any' with the exact type. This has been typed
-  // as 'any' since 'graph' is a dict with 'answer' type object which is itself
-  // typed 'any'.
-  getEdgeCentre(graph: any, index: number): IEdgeCentre {
+  getEdgeCentre(graph: IGraphBackendDict, index: number): IEdgeCentre {
     var edge = graph.edges[index];
     var srcVertex = graph.vertices[edge.src];
     var dstVertex = graph.vertices[edge.dst];

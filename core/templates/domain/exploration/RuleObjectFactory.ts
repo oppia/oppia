@@ -20,21 +20,33 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
+import { INumberWithUnitsBackendDict } from
+  'domain/objects/NumberWithUnitsObjectFactory';
+import { IFractionDict } from
+  'domain/objects/FractionObjectFactory.ts';
+/* eslint-disable max-len */
+import { INote } from 'extensions/interactions/MusicNotesInput/directives/music-notes-input-rules.service';
+import { IGraphBackendDict } from 'extensions/interactions/GraphInput/directives/graph-detail.service';
+/* eslint-enable max-len */
+
 export interface IBackendRuleDict {
-  inputs: IRuleInput,
-  'rule_type': string
+  'inputs': IRuleInputs;
+  'rule_type': string;
 }
-// The rule inputs are dependent on the 'type' of rule
-// that's why 'any' is used here
-export interface IRuleInput {
-  [propName: string]: any;
+
+export type IRuleInput = (string | number | IFractionDict |
+  INumberWithUnitsBackendDict | string[] | INote[] |
+  number[] | IGraphBackendDict| string[][]);
+
+export interface IRuleInputs {
+  [propName: string]: IRuleInput;
 }
 
 export class Rule {
   type: string;
-  inputs: IRuleInput;
+  inputs: IRuleInputs;
 
-  constructor(type: string, inputs: IRuleInput) {
+  constructor(type: string, inputs: IRuleInputs) {
     this.type = type;
     this.inputs = inputs;
   }
@@ -50,7 +62,7 @@ export class Rule {
   providedIn: 'root'
 })
 export class RuleObjectFactory {
-  createNew(type: string, inputs: IRuleInput): Rule {
+  createNew(type: string, inputs: IRuleInputs): Rule {
     return new Rule(type, inputs);
   }
 

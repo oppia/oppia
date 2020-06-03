@@ -20,10 +20,19 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory.ts';
+import { IFractionDict, Fraction, FractionObjectFactory } from
+  'domain/objects/FractionObjectFactory.ts';
 import { ObjectsDomainConstants } from
   'domain/objects/objects-domain.constants';
-import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory.ts';
+import { IUnit, Units, UnitsObjectFactory } from
+  'domain/objects/UnitsObjectFactory.ts';
+
+export interface INumberWithUnitsBackendDict {
+  type: string;
+  real: number;
+  fraction: IFractionDict;
+  units: IUnit[];
+}
 
 /* Guidelines for adding new custom currency units in Number with Units
   interaction:
@@ -37,12 +46,14 @@ import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory.ts';
     base_unit: Define the unit in terms of base unit only if the defined custom
       unit is a sub unit else assign it 'null' value.*/
 export class NumberWithUnits {
-  type;
-  real;
-  fraction;
-  units;
+  type: string;
+  real: number;
+  fraction: Fraction;
+  units: IUnit[];
 
-  constructor(type, real, fractionObj, unitsObj) {
+  constructor(
+      type: string, real: number, fractionObj: Fraction,
+      unitsObj: Units) {
     this.type = type;
     this.real = real;
     this.fraction = fractionObj;
@@ -120,8 +131,8 @@ export class NumberWithUnitsObjectFactory {
       this.unitsFactory.createCurrencyUnits();
     } catch (parsingError) {}
   }
-  // TODO(#7165): Replace any with exact type.
-  fromRawInputString(rawInput: any): NumberWithUnits {
+
+  fromRawInputString(rawInput: string): NumberWithUnits {
     rawInput = rawInput.trim();
     var type = '';
     var real = 0.0;
@@ -135,7 +146,7 @@ export class NumberWithUnitsObjectFactory {
     if (rawInput !== '' && rawInput !== null) {
       // Start with digit when there is no currency unit.
       if (rawInput.match(/^\d/)) {
-        var ind = rawInput.indexOf(rawInput.match(/[a-z(₹$]/i));
+        var ind = rawInput.indexOf(String(rawInput.match(/[a-z(₹$]/i)));
         if (ind === -1) {
           // There is value with no units.
           value = rawInput;
@@ -179,7 +190,7 @@ export class NumberWithUnitsObjectFactory {
             // eslint-disable-next-line max-len
             ObjectsDomainConstants.NUMBER_WITH_UNITS_PARSING_ERRORS.INVALID_CURRENCY);
         }
-        var ind = rawInput.indexOf(rawInput.match(/[0-9]/));
+        var ind = rawInput.indexOf(String(rawInput.match(/[0-9]/)));
         if (ind === -1) {
           throw new Error(
             // eslint-disable-next-line max-len
@@ -206,8 +217,8 @@ export class NumberWithUnitsObjectFactory {
         }
         units = units + ' ';
 
-        var ind2 = rawInput.indexOf(
-          rawInput.substr(ind).match(/[a-z(]/i));
+        var ind2 = rawInput.indexOf(String(
+          rawInput.substr(ind).match(/[a-z(]/i)));
         if (ind2 !== -1) {
           value = rawInput.substr(ind, ind2 - ind).trim();
           units += rawInput.substr(ind2).trim();
@@ -243,8 +254,8 @@ export class NumberWithUnitsObjectFactory {
     var unitsObj = this.unitsFactory.fromRawInputString(units);
     return new NumberWithUnits(type, real, fractionObj, unitsObj);
   }
-  // TODO(#7165): Replace any with correct type.
-  fromDict(numberWithUnitsDict: any): NumberWithUnits {
+
+  fromDict(numberWithUnitsDict: INumberWithUnitsBackendDict): NumberWithUnits {
     return new NumberWithUnits(
       numberWithUnitsDict.type,
       numberWithUnitsDict.real,

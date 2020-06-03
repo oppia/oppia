@@ -142,7 +142,7 @@ export class ItemSelectionInputValidationService {
       answerGroups.forEach((answerGroup, answerIndex) => {
         var rules = answerGroup.rules;
         rules.forEach((rule, ruleIndex) => {
-          var ruleInputs = rule.inputs.x;
+          var ruleInputs = (<string[]>rule.inputs.x);
           ruleInputs.forEach((ruleInput) => {
             var choiceIndex = answerChoiceToIndex[ruleInput];
             if (rule.type === 'Equals') {
@@ -190,7 +190,7 @@ export class ItemSelectionInputValidationService {
     answerGroups.forEach((answerGroup, answerIndex) => {
       var rules = answerGroup.rules;
       rules.forEach((rule, ruleIndex) => {
-        var ruleInputs = rule.inputs.x;
+        var ruleInputs = (<string[]>rule.inputs.x);
         ruleInputs.forEach((ruleInput) => {
           if (rule.type === 'IsProperSubsetOf') {
             if (ruleInputs.length < 2) {
