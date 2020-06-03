@@ -26,6 +26,7 @@ import shutil
 import socket
 import subprocess
 import sys
+import time
 
 import python_utils
 import release_constants
@@ -78,6 +79,7 @@ RELEASE_BRANCH_REGEX = r'release-(\d+\.\d+\.\d+)$'
 RELEASE_MAINTENANCE_BRANCH_REGEX = r'release-maintenance-(\d+\.\d+\.\d+)$'
 HOTFIX_BRANCH_REGEX = r'release-(\d+\.\d+\.\d+)-hotfix-[1-9]+$'
 TEST_BRANCH_REGEX = r'test-[A-Za-z0-9-]*$'
+MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS = 1000
 
 
 def is_windows_os():
@@ -552,6 +554,24 @@ def inplace_replace_file(filename, regex_pattern, replacement_string):
         os.remove(filename)
         shutil.move(backup_filename, filename)
         raise
+
+
+def wait_for_port_to_be_open(port_number):
+    """Wait until the port is open.
+
+    Args:
+        port_number: int. The port number to wait.
+    """
+    waited_seconds = 0
+    while (not is_port_open(port_number)
+           and waited_seconds < MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS):
+        time.sleep(1)
+        waited_seconds += 1
+    if (waited_seconds == MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS
+            and not is_port_open(port_number)):
+        python_utils.PRINT('Failed to start server on port %s, exiting ...' %
+                           port_number)
+        sys.exit(1)
 
 
 class CD(python_utils.OBJECT):

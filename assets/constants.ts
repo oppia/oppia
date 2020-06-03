@@ -5286,5 +5286,5 @@ export = {
   // Maximum allowed length of a username.
   "MAX_USERNAME_LENGTH": 30,
 
-  "DEV_MODE": true
+  "DEV_MODE": false
 };

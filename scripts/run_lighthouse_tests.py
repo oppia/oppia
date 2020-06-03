@@ -23,8 +23,6 @@ import fileinput
 import os
 import re
 import subprocess
-import sys
-import time
 
 import python_utils
 from scripts import build
@@ -42,7 +40,6 @@ RUNNING_PROCESSES = []
 
 APP_ENGINE_PORT = 8181
 NGINX_PORT = 9999
-MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS = 1000
 
 
 def setup_and_install_dependencies():
@@ -62,9 +59,9 @@ def run_lighthouse_checks():
         python_utils.PRINT(line[:-1])
 
 
-def start_google_app_engine_server(prodEnv):
+def start_google_app_engine_server(prod_env):
     """Start the Google App Engine server."""
-    if prodEnv:
+    if prod_env:
         app_yaml_filepath = 'app.yaml'
     else:
         app_yaml_filepath = 'app_dev.yaml'
@@ -90,58 +87,13 @@ def download_and_install_nginx():
     subprocess.check_call(install_command)
 
 
-def wait_for_port_to_be_open(port_number):
-    """Wait until the port is open.
-
-    Args:
-        port_number: int. The port number to wait.
-    """
-    waited_seconds = 0
-    while (not common.is_port_open(port_number) and
-           waited_seconds < MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS):
-        time.sleep(1)
-        waited_seconds += 1
-    if (waited_seconds ==
-            MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS and
-            not common.is_port_open(port_number)):
-        python_utils.PRINT(
-            'Failed to start server on port %s, exiting ...' % port_number)
-        sys.exit(1)
-
 
 def start_proxy_server():
     """Start the nginx proxy server."""
-    nginx_conf_file = os.path.join(
-        common.OPPIA_TOOLS_DIR, 'nginx.conf')
-    with python_utils.open_file(nginx_conf_file, 'w') as f:
-        f.write("""
-            events {
-
-            }
-            http {
-                server {
-                    listen 9999;
-
-                    gzip                on;
-                    gzip_buffers        16 8k;
-                    gzip_comp_level     9;
-                    gzip_http_version   1.1;
-                    gzip_proxied        any;
-                    gzip_types          *;
-                    gzip_vary           on;
-
-                    location / {
-                        proxy_set_header x-real-IP $remote_addr;
-                        proxy_set_header x-forwarded-for $proxy_add_x_forwarded_for;
-                        proxy_set_header host $host;
-                        proxy_pass http://127.0.0.1:8181;
-                    }
-                }
-            }
-        """)
+    filepath = os.path.join(common.CURR_DIR, 'nginx.conf')
 
     python_utils.PRINT('Starting proxy server...')
-    start_server_command = ['sudo', 'nginx', '-c', nginx_conf_file]
+    start_server_command = ['sudo', 'nginx', '-c', filepath]
     p = subprocess.Popen(start_server_command)
 
     RUNNING_PROCESSES.append(p)
@@ -149,7 +101,6 @@ def start_proxy_server():
 
 def run_lighthouse_checks_with_compression():
     """Run lighthouse checks with compression enabled."""
-    # Check if nginx is installed.
     try:
         python_utils.PRINT('Checking if nginx is installed...')
         check_nginx_command = ['which', 'nginx']
@@ -167,9 +118,9 @@ def run_lighthouse_checks_with_compression():
                 r'"DEV_MODE": .*', constants_env_variable, line), end='')
     build.main(args=['--prod_env'])
     start_google_app_engine_server(True)
-    wait_for_port_to_be_open(APP_ENGINE_PORT)
+    common.wait_for_port_to_be_open(APP_ENGINE_PORT)
     start_proxy_server()
-    wait_for_port_to_be_open(NGINX_PORT)
+    common.wait_for_port_to_be_open(NGINX_PORT)
     run_lighthouse_checks()
 
 
@@ -197,7 +148,7 @@ def main(args=None):
         run_lighthouse_checks_with_compression()
     else:
         start_google_app_engine_server(False)
-        wait_for_port_to_be_open(APP_ENGINE_PORT)
+        common.wait_for_port_to_be_open(APP_ENGINE_PORT)
         run_lighthouse_checks()
 
 
