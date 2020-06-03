@@ -73,7 +73,7 @@ angular.module('oppia').component('aboutPage', {
           .slice(0, listOfNamesToThank.length - 1).join(', ') +
           ' & ' + listOfNamesToThank[listOfNamesToThank.length - 1];
         ctrl.aboutPageMascotImgUrl = UrlInterpolationService
-          .getStaticImageUrl('/general/about_page_mascot.png');
+          .getStaticImageUrl('/general/about_page_mascot.webp');
 
         WindowRef.nativeWindow.onhashchange = function() {
           const hashChange = window.location.hash.slice(1);
