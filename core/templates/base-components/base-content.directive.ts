@@ -72,7 +72,7 @@ angular.module('oppia').directive('baseContent', [
           ctrl.$onInit = function() {
             ctrl.iframed = UrlService.isIframed();
             ctrl.DEV_MODE = $rootScope.DEV_MODE;
-            LoaderService.onLoadingMessageChange().subscribe(
+            LoaderService.onLoadingMessageChange.subscribe(
               (message: string) => this.loadingMessage = message
             );
           };
