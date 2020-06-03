@@ -49,6 +49,7 @@ require(
   'state-editor.service.ts');
 require('services/alerts.service.ts');
 require('services/contextual/url.service.ts');
+require('services/question-validation.service.ts');
 
 angular.module('oppia').directive('questionsList', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -147,7 +148,7 @@ angular.module('oppia').directive('questionsList', [
           };
 
           ctrl.saveAndPublishQuestion = function(commitMessage) {
-            var validationErrors = ctrl.question.validate();
+            var validationErrors = ctrl.question.getValidationErrorMessage();
             var unaddressedMisconceptions = (
               ctrl.question.getUnaddressedMisconceptionNames(
                 ctrl.misconceptionsBySkill));
@@ -525,10 +526,10 @@ angular.module('oppia').directive('questionsList', [
               keyboard: false,
               controller: [
                 '$scope', '$uibModalInstance', 'StateEditorService',
-                'UndoRedoService',
+                'UndoRedoService', 'QuestionValidationService',
                 function(
                     $scope, $uibModalInstance, StateEditorService,
-                    UndoRedoService) {
+                    UndoRedoService, QuestionValidationService) {
                   var returnModalObject = {
                     skillLinkageModificationsArray: [],
                     commitMessage: ''
@@ -680,12 +681,8 @@ angular.module('oppia').directive('questionsList', [
                   // Checking if Question contains all requirement to enable
                   // Save and Publish Question
                   $scope.isQuestionValid = function() {
-                    var question = $scope.question;
-                    return !(
-                      question.validate() ||
-                      question.getUnaddressedMisconceptionNames(
-                        $scope.misconceptionsBySkill).length > 0 ||
-                      !StateEditorService.isCurrentSolutionValid());
+                    return QuestionValidationService.isQuestionValid(
+                      $scope.question, $scope.misconceptionsBySkill);
                   };
 
                   $scope.cancel = function() {

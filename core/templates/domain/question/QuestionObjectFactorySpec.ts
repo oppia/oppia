@@ -255,22 +255,22 @@ describe('Question object factory', function() {
   it('should correctly validate question', function() {
     var interaction = sampleQuestion.getStateData().interaction;
 
-    expect(sampleQuestion.validate()).toBe(false);
+    expect(sampleQuestion.getValidationErrorMessage()).toBeNull();
 
     interaction.answerGroups[0].outcome.labelledAsCorrect = false;
-    expect(sampleQuestion.validate()).toEqual(
+    expect(sampleQuestion.getValidationErrorMessage()).toEqual(
       'At least one answer should be marked correct');
 
     interaction.solution = null;
-    expect(sampleQuestion.validate()).toEqual(
+    expect(sampleQuestion.getValidationErrorMessage()).toEqual(
       'A solution must be specified');
 
     interaction.hints = [];
-    expect(sampleQuestion.validate()).toEqual(
+    expect(sampleQuestion.getValidationErrorMessage()).toEqual(
       'At least 1 hint should be specfied');
 
     interaction.id = null;
-    expect(sampleQuestion.validate()).toEqual(
+    expect(sampleQuestion.getValidationErrorMessage()).toEqual(
       'An interaction must be specified');
   });
 

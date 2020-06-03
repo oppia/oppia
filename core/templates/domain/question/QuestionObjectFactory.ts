@@ -74,7 +74,7 @@ angular.module('oppia').factory('QuestionObjectFactory', [
         DEFAULT_LANGUAGE_CODE, 1, skillIds);
     };
 
-    Question.prototype.validate = function() {
+    Question.prototype.getValidationErrorMessage = function() {
       var interaction = this._stateData.interaction;
       if (interaction.id === null) {
         return 'An interaction must be specified';
@@ -98,7 +98,7 @@ angular.module('oppia').factory('QuestionObjectFactory', [
       if (!atLeastOneAnswerCorrect) {
         return 'At least one answer should be marked correct';
       }
-      return false;
+      return null;
     };
 
     Question.prototype.getUnaddressedMisconceptionNames = function(

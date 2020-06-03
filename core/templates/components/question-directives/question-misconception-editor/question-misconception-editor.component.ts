@@ -46,32 +46,6 @@ angular.module('oppia').component('questionMisconceptionEditor', {
         $rootScope, $uibModal, StateEditorService,
         UrlInterpolationService) {
       var ctrl = this;
-      var _setTaggedMisconceptionName = function(skillMisconceptionId) {
-        // skillMisconceptionId can be null when tagging a misconception
-        // for a new response for the first time by clicking on
-        // 'Tag a Misconception' button.
-        if (skillMisconceptionId) {
-          if (typeof skillMisconceptionId === 'string' &&
-              skillMisconceptionId.split('-').length === 2) {
-            var skillId = skillMisconceptionId.split('-')[0];
-            var misconceptionId = skillMisconceptionId.split('-')[1];
-            var misconceptions = ctrl.misconceptionsBySkill[skillId];
-
-            for (var i = 0; i < misconceptions.length; i++) {
-              if (misconceptions[i].getId().toString() ===
-                misconceptionId) {
-                ctrl.misconceptionName = misconceptions[i].getName();
-                ctrl.selectedMisconception = misconceptions[i];
-                ctrl.selectedMisconceptionSkillId = skillId;
-              }
-            }
-          } else {
-            throw new Error(
-              'Expected skillMisconceptionId to be ' +
-              '<skillId>-<misconceptionId>.');
-          }
-        }
-      };
 
       ctrl.containsMisconceptions = function() {
         var containsMisconceptions = false;
@@ -136,7 +110,28 @@ angular.module('oppia').component('questionMisconceptionEditor', {
         ctrl.misconceptionsBySkill = (
           StateEditorService.getMisconceptionsBySkill());
         ctrl.misconceptionEditorIsOpen = null;
-        _setTaggedMisconceptionName(ctrl.getTaggedSkillMisconceptionId());
+        var skillMisconceptionId = ctrl.getTaggedSkillMisconceptionId();
+        if (skillMisconceptionId) {
+          if (typeof skillMisconceptionId === 'string' &&
+              skillMisconceptionId.split('-').length === 2) {
+            var skillId = skillMisconceptionId.split('-')[0];
+            var misconceptionId = skillMisconceptionId.split('-')[1];
+            var misconceptions = ctrl.misconceptionsBySkill[skillId];
+
+            for (var i = 0; i < misconceptions.length; i++) {
+              if (misconceptions[i].getId().toString() ===
+                misconceptionId) {
+                ctrl.misconceptionName = misconceptions[i].getName();
+                ctrl.selectedMisconception = misconceptions[i];
+                ctrl.selectedMisconceptionSkillId = skillId;
+              }
+            }
+          } else {
+            throw new Error(
+              'Expected skillMisconceptionId to be ' +
+              '<skillId>-<misconceptionId>.');
+          }
+        }
         ctrl.feedbackIsUsed = true;
       };
     }

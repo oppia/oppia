@@ -368,7 +368,8 @@ angular.module('oppia').directive('stateResponses', [
                       tmpRule: angular.copy($scope.tmpRule),
                       tmpOutcome: angular.copy($scope.tmpOutcome),
                       tmpTaggedSkillMisconceptionId: (
-                        $scope.tmpTaggedSkillMisconceptionId),
+                        $scope.tmpOutcome.labelledAsCorrect ? null : (
+                          $scope.tmpTaggedSkillMisconceptionId)),
                       reopen: reopen
                     });
                   };

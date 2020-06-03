@@ -51,6 +51,7 @@ require(
   'pages/community-dashboard-page/services/' +
   'contribution-opportunities.service.ts');
 require('services/alerts.service.ts');
+require('services/question-validation.service.ts');
 
 angular.module('oppia').directive('questionOpportunities', [
   'UrlInterpolationService', 'MAX_QUESTIONS_PER_SKILL',
@@ -193,8 +194,10 @@ angular.module('oppia').directive('questionOpportunities', [
               keyboard: false,
               controller: [
                 '$scope', '$uibModalInstance', 'StateEditorService',
+                'QuestionValidationService',
                 function(
-                    $scope, $uibModalInstance, StateEditorService) {
+                    $scope, $uibModalInstance, StateEditorService,
+                    QuestionValidationService) {
                   $scope.canEditQuestion = true;
                   $scope.newQuestionIsBeingCreated = true;
                   $scope.question = question;
@@ -221,12 +224,8 @@ angular.module('oppia').directive('questionOpportunities', [
                   // Checking if Question contains all requirements to enable
                   // Save and Publish Question
                   $scope.isQuestionValid = function() {
-                    var question = $scope.question;
-                    return !(
-                      question.validate() ||
-                      question.getUnaddressedMisconceptionNames(
-                        $scope.misconceptionsBySkill).length > 0 ||
-                      !StateEditorService.isCurrentSolutionValid());
+                    return QuestionValidationService.isQuestionValid(
+                      $scope.question, $scope.misconceptionsBySkill);
                   };
 
                   $scope.cancel = function() {
