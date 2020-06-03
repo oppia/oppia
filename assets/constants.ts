@@ -5175,7 +5175,7 @@ export = {
   },
 
   "ENABLE_PREREQUISITE_SKILLS": false,
-  "ENABLE_LITERALLY_CANVAS_EDITOR": false,
+  "ENABLE_LITERALLY_CANVAS_EDITOR": true,
 
   // For the full new structures viewer features, both
   // ENABLE_NEW_STRUCTURE_PLAYERS and ENABLE_NEW_STRUCTURE_VIEWER_UPDATES has

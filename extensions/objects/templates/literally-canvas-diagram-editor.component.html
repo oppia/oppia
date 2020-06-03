@@ -1,5 +1,5 @@
 <div ng-model="$ctrl.data" ui-validate="'$ctrl.validate($value)'" class="fs-container">
-  <div class="diagram-editor-size-toolbar">
+  <div ng-if="!$ctrl.isDiagramSaved()"  class="diagram-editor-size-toolbar">
     Width: <input type="number" ng-model="$ctrl.diagramWidth" ng-blur="$ctrl.onWidthInputBlur()" max="$ctrl.maxDiagramWidth">
     Height: <input type="number" ng-model="$ctrl.diagramHeight" ng-blur="$ctrl.onHeightInputBlur()" max="$ctrl.maxDiagramHeight">
     <i class="material-icons"
@@ -7,11 +7,53 @@
         &#xE887;
     </i>
   </div>
-  <div ng-attr-id="<[$ctrl.lcID]>">
+  <div ng-attr-id="<[$ctrl.lcID]>" ng-if="!$ctrl.isDiagramSaved()">
+  </div>
+  <div ng-if="$ctrl.isDiagramSaved()">
+    <div class="diagram-editor-saved-image-container">
+      <i class="material-icons diagram-editor-edit"
+         ng-click="$ctrl.continueDiagramEditing()"
+         title="Continue editing the diagram">
+         &#xE254;
+      </i>
+      <img ng-src="<[$ctrl.data.savedSVGUrl]>" ng-style="$ctrl.svgContainerStyle">
+    </div>
+  </div>
+  <div ng-if="$ctrl.isDiagramCreated()" class="diagram-editor-save-box">
+    <button type="button"
+            class="btn btn-success"
+            ng-click="$ctrl.saveSVGFile()"
+            ng-disabled="$ctrl.isUserDrawing()">
+      Use This Image
+    </button>
   </div>
 </div>
 
 <style type="text/css">
+  .diagram-editor-edit {
+    color: black;
+    position: absolute;
+    right: 6px;
+    text-shadow: 0px 0px 1px #fff;
+    top: 6px;
+  }
+
+  .diagram-editor-save-box {
+    margin-top: 6px;
+    text-align: right;
+  }
+
+  .diagram-editor-saved-image-container {
+    position: relative;
+    margin: 0 auto;
+    display: inline-block;
+    background-color: red;
+  }
+
+  .diagram-editor-saved-image-container img {
+    background-color: white;
+  }
+
   .diagram-editor-size-toolbar {
     padding: 4px;
     text-align: left;

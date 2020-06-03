@@ -46,7 +46,7 @@ class BaseRteComponent(python_utils.OBJECT):
         'SanitizedUrl': objects.SanitizedUrl,
         'MathLatexString': objects.MathLatexString,
         'ListOfTabs': objects.ListOfTabs,
-        'SvgFilename': objects.SvgFilename,
+        'LiterallyCanvasDiagram': objects.SvgFilename,
         'int': objects.Int,
         'bool': objects.Boolean,
         'SkillSelector': objects.SkillSelector

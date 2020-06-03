@@ -177,7 +177,7 @@ export = {
       "description": "The custom svg diagram filename",
       "schema": {
         "type": "custom",
-        "obj_type": "SvgFilename"
+        "obj_type": "LiterallyCanvasDiagram"
       },
       "default_value": ""
     }, {
