@@ -13,8 +13,19 @@
 // limitations under the License.
 
 /**
- * @fileoverview Translate pipe for i18n translations
+ * @fileoverview Translate pipe for i18n translations.
  */
+
+/**
+ * Commonly used terms in this file.
+ * Example: <h1 [innerHTML]="'I18N_ABOUT_PAGE_HEADING' | translate:{x: 'val'}">
+ * 'I18N_ABOUT_PAGE_HEADING' is referred here as key.
+ * "translate" is the pipe. Every pipe must have a transform function. The
+ * transform function called when angular encouters the pipe in HTML.
+ * The object following the pipe, i.e.{x: 'val'}, is another argument to the
+ * transform function. This object is called params or interpolationParams.
+ */
+
 
 import { ChangeDetectorRef, OnDestroy, Pipe, PipeTransform }
   from '@angular/core';
@@ -24,10 +35,11 @@ import { UtilsService } from 'services/utils.service';
 
 @Pipe({
   name: 'translate',
-  pure: false // required to update the value when the promise is resolved
+  // This option is required to update the value when the promise is resolved.
+  pure: false
 })
 export class TranslatePipe implements PipeTransform, OnDestroy {
-  value: string = '';
+  interpolatedValue: string = '';
   lastKey: string;
   lastParams: Object | Array<Object>;
   onLangChange: Subscription;
@@ -38,77 +50,78 @@ export class TranslatePipe implements PipeTransform, OnDestroy {
     private utils: UtilsService
   ) {}
 
-  updateValue(
-      key: string,
-      interpolateParams?: Object
-  ): void {
+  /**
+   * @param {string} key - key for i18n translation
+   * @param {Object} interpolateParams - Params for interpolation
+   */
+  updateInterpolatedValue(key: string, interpolateParams?: Object): void {
     const interpolatedString = this.translate.getInterpolatedString(
       key, interpolateParams);
-    this.value = interpolatedString !== undefined ? interpolatedString : key;
+
+    // Using multiline ternary (https://eslint.org/docs/rules/multiline-ternary).
+    this.interpolatedValue = interpolatedString !== undefined ?
+    interpolatedString :
+    key;
     this.lastKey = key;
     this._ref.markForCheck();
   }
 
-  // args[0] can be either object or string or empty. So type of args could be
-  // Array<Object> or Array<string> or an empty array.
-  transform(
-      query: string,
-      ...args: Array<Object> | Array<string> | []): string {
-    if (!query || !query.length) {
-      return query;
+  /**
+   * @param {string} key - key for i18n
+   * @param {Object} params - params for interpolation
+   * @returns {string} - Interpolated I18n value
+   */
+  transform(key: string, params?: Object): string {
+    if (!key || !key.length) {
+      return key;
+    }
+
+    // If the key and params are same, return the last stored value.
+    if (this.utils.isEquivalent(key, this.lastKey) &&
+          this.utils.isEquivalent(params, this.lastParams)) {
+      return this.interpolatedValue;
     }
 
     let interpolateParams: Object;
-    if (this.utils.isDefined(args[0]) && args.length) {
-      if (typeof args[0] === 'string' && args[0].length) {
-        // We want to accept objects written in the template such as {n:1},
-        // {'n':1}, {n:'v'}
-        // which is why we might need to change it to real JSON
-        // objects such as {"n":1} or {"n":"v"}
-        let validArgs: string = args[0]
-          .replace(/(\')?([a-zA-Z0-9_]+)(\')?(\s)?:/g, '"$2":')
-          .replace(/:(\s)?(\')(.*?)(\')/g, ':"$3"');
-        try {
-          interpolateParams = JSON.parse(validArgs);
-        } catch (e) {
-          throw new SyntaxError('Wrong parameter in TranslatePipe. ' +
-          `Expected a valid Object, received: ${args[0]}`);
-        }
-      } else if (typeof args[0] === 'object' && !Array.isArray(args[0])) {
-        interpolateParams = args[0];
+    if (this.utils.isDefined(params)) {
+      if (typeof params === 'object' && !Array.isArray(params)) {
+        interpolateParams = params;
       }
     }
 
-    // store the query, in case it changes
-    this.lastKey = query;
+    // Storing the key to check if the key is same when the transform is invoked
+    // again.
+    this.lastKey = key;
 
-    // store the params, in case they change
-    this.lastParams = args;
+    // Storing the params to check if the params are same when the transform is
+    //  invoked again.
+    this.lastParams = params;
 
-    // set the value
-    this.updateValue(query, interpolateParams);
+    // Update the interpolated value.
+    this.updateInterpolatedValue(key, interpolateParams);
 
-    // if there is a subscription to onLangChange, clean it
+    // If there is a subscription to onLangChange, unsubscribe.
     this._dispose();
-    // subscribe to onLangChange event, in case the language changes
+    // Subscribe to onLangChange event, in case the language changes.
     if (!this.onLangChange) {
       this.onLangChange = this.translate.onLangChange.subscribe(
         (event: LangChangeEvent) => {
-          this.updateValue(query, interpolateParams);
+          this.updateInterpolatedValue(key, interpolateParams);
         }
       );
     }
-    return this.value;
+    return this.interpolatedValue;
   }
 
   /**
-   * Clean any existing subscription to change events
+   * Clean up any existing subscription to change events
    */
   private _dispose(): void {
-    if (typeof this.onLangChange !== 'undefined') {
-      this.onLangChange.unsubscribe();
-      this.onLangChange = undefined;
+    if (typeof this.onLangChange === 'undefined') {
+      return;
     }
+    this.onLangChange.unsubscribe();
+    this.onLangChange = undefined;
   }
 
   ngOnDestroy(): void {

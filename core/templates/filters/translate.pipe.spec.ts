@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the about page.
+ * @fileoverview Unit tests for the translate pipe.
  */
 
 import { async, TestBed } from '@angular/core/testing';
@@ -87,21 +87,17 @@ describe('TranslatePipe', () => {
     expect(pipe.transform('I18n_t_2', {val: 'World'})).toBe('Hello World');
     expect(pipe.transform('I18n_t_3')).toBe('I18n_t_3');
     expect(pipe.transform('')).toBe('');
-    expect(function() {
-      pipe.transform('I18n_t_2', "{val: 'World'");
-    }).toThrowError(
-      ('Wrong parameter in TranslatePipe. Expected a valid Object,' +
-        (' received: {val: \'World\''))
-    );
     translate.onLangChange.emit({lang: 'en'});
   });
 
-  // Sole purpose of this test is to cover ngOnDestroy
+  // The sole purpose of this test is to cover ngOnDestroy.
   it('should destroy subscriptions', () => {
     pipe.ngOnDestroy();
 
-    // Reintializing the pipe because it jasmine tries to destroy it on its own
-    // but I called the OnDestroy method and this leads to errors
+    // Reintializing the pipe because jasmine tries to destroy the pipe.
+    // But since I have called the ngOnDestroy method and the pipe is destroyed.
+    // And if the pipe is not reinitialized it will raise an error saying cannot
+    // call ngOnDestroy of undefined.
     pipe = new TranslatePipe(translate, changeDecRef, new UtilsService());
   });
 });

@@ -50,10 +50,11 @@ export class AboutPageComponent implements OnInit {
     'Vikrant Nanda', 'Vinamrata Singal',
     'Yarin Feigenbaum'];
   // Define constant for each tab on the page.
-  TAB_ID_ABOUT: string = 'about';
-  TAB_ID_FOUNDATION: string = 'foundation';
-  TAB_ID_CREDITS: string = 'credits';
-  ALLOWED_TABS: Array<string>;
+  TAB_ID_ABOUT = 'about';
+  TAB_ID_FOUNDATION = 'foundation';
+  TAB_ID_CREDITS = 'credits';
+  ALLOWED_TABS = [
+    this.TAB_ID_ABOUT, this.TAB_ID_FOUNDATION, this.TAB_ID_CREDITS];
   constructor(
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private urlInterpolationService: UrlInterpolationService,
@@ -79,8 +80,6 @@ export class AboutPageComponent implements OnInit {
     this.i18nLanguageCodeService.onI18nLanguageCodeChange().subscribe(
       (code) => this.translate.use(code)
     );
-    this.ALLOWED_TABS = [
-      this.TAB_ID_ABOUT, this.TAB_ID_FOUNDATION, this.TAB_ID_CREDITS];
     const hash = this.windowRef.nativeWindow.location.hash.slice(1);
     if (hash === 'license') {
       this.activeTabName = this.TAB_ID_FOUNDATION;

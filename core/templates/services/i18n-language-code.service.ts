@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Service for informing of i18n language code changes.
+ * @fileoverview Service for informing of the i18n language code changes.
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';

@@ -127,10 +127,6 @@ describe('Translate service', () => {
       'I18n_t_3', {val: 'World'})).toBe('I18n_t_3');
   }));
 
-  it('interpolate should work with functions', fakeAsync(() => {
-    expect(translate.interpolateI18nString(x => x, 'Hola')).toBe('Hola');
-  }));
-
   it('should throw an error if key is not defined', fakeAsync(() => {
     expect(function() {
       translate.getInterpolatedString('');

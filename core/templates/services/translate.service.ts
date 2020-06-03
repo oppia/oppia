@@ -1,4 +1,4 @@
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -10,7 +10,7 @@
 // distributed under the License is distributed on an "AS-IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
-// limitations under the License.
+// limitations under the License
 
 /**
  * @fileoverview Translate service for i18n translations
@@ -20,16 +20,17 @@ import { Injectable, EventEmitter } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { UtilsService } from './utils.service';
 
-export interface MissingTranslationHandlerParams {
-   // the key that's missing in translation files
-  key: string;
-
-  // an instance of the service that was unable to translate the key.
-  translateService: TranslateService;
-
-   // Interpolation params that were passed along for translating the given key.
-  interpolateParams?: Object;
-}
+/**
+ * Commonly used terms in this file.
+ * Example: <h1 [innerHTML]="'I18N_ABOUT_PAGE_HEADING' | translate:{x: 'val'}">
+ * 'I18N_ABOUT_PAGE_HEADING' is referred here as key or key.
+ * "translate" is the pipe. Every pipe must have a transform function. The
+ * transform function called when angular encounters the pipe in HTML.
+ * The object following the pipe, i.e.{x: 'val'}, is another argument to the
+ * transform function. It is called params or interpolationParams.
+ * Each i18n translation JSON file contains translations as
+ * {key: translatedValue, key2: translatedValue2}.
+ */
 
 export interface LangChangeEvent {
   lang: string;
@@ -40,7 +41,7 @@ export interface LangChangeEvent {
 })
 export class TranslateService {
   currentLang = 'en';
-  defaultLang = 'en';
+  fallbackLang = 'en';
   prefix = '/assets/i18n/';
   suffix = '.json';
   translations: Array<Object> = [];
@@ -53,21 +54,28 @@ export class TranslateService {
 
   constructor(private http: HttpClient, private utils: UtilsService) {}
 
-  // This function fecthes translation.
-  fetchTranslations(lang:string) {
+  /**
+   * Function to fetch JSON file containing translations.
+   * @param {string} lang - Code of the language
+   * @returns {Promise<Object>} - A promise that resolves to the translations
+   */
+  fetchTranslations(lang:string): Promise<Object> {
     return this.http.get(`${this.prefix}${lang}${this.suffix}`).toPromise();
   }
 
-  // This function sets the new translations
+  /**
+   * This function sets the new translations
+   * @param {string} lang - language code of the translation to be used
+   */
   use(lang: string) {
-    // Check if it has already been fetched before
+    // Check if the translations for the "lang" have been fetched before.
     this.currentLang = lang;
     if (Object.keys(this.translations).includes(lang)) {
       this._onLangChange.emit(
         {lang: lang });
       return;
     }
-    // Otherwise fetch the translations
+    // Otherwise fetch the translations.
     this.translations[lang] = this.fetchTranslations(lang).then(
       translations => {
         this.translations[lang] = translations;
@@ -79,59 +87,58 @@ export class TranslateService {
     );
   }
 
-
-  interpolateI18nString(expr: string | Function, params?: Object): string {
-    let interpolatedString: string;
-
-    if (typeof expr === 'string') {
-      interpolatedString = this.interpolateString(expr, params);
-    } else if (typeof expr === 'function') {
-      interpolatedString = this.interpolateFunction(expr, params);
-    } else {
-      interpolatedString = expr as string;
+  /**
+   * Functions that interpolates the translatedValue
+   * @param {string} translatedValue - The value corresponding to the key
+   * @param {Object} params - interpolations parameters
+   * @returns {string} interpolated translatedValue
+   */
+  interpolateTranslatedValue(
+      translatedValue: string | undefined,
+      params?: Object | undefined): string {
+    if (typeof translatedValue === undefined) {
+      return translatedValue as string;
     }
-
-    return interpolatedString;
-  }
-
-  private interpolateFunction(fn: Function, params?: Object | undefined) {
-    return fn(params);
-  }
-
-  private interpolateString(expr: string, params?: Object | undefined) {
     if (!params) {
-      return expr;
+      return translatedValue;
     }
-
-    return expr.replace(this.templateMatcher,
+    return translatedValue.replace(this.templateMatcher,
       (substring: string, b: string) => {
         let r = params[b];
         return this.utils.isDefined(r) ? r : substring;
       });
   }
 
+  /**
+   * Gets the translatedValue corresponding to the key and returns the
+   * interpolated string of the translatedValue using the interpolateParams.
+   * @param {string} key - key for i18n translation
+   * @param interpolateParams - params for interpolation
+   * @returns {string} - interpolated string of the translatedValue
+   * corresponding to the key.
+   */
   getInterpolatedString(
       key: string,
       interpolateParams?: Object): string {
     if (!this.utils.isDefined(key) || !key.length) {
       throw new Error('Parameter "key" required');
     }
-    // check if we are loading a new translation to use {
-    let interpolatedString: string;
     let translations = this.translations[this.currentLang];
 
-    if (translations) {
-      interpolatedString = this.interpolateI18nString(
+    if (translations && translations[key]) {
+      return this.interpolateTranslatedValue(
         translations[key], interpolateParams);
     }
 
     // If the translation for the current lang doesn't exist use default lang
-    if (typeof interpolatedString === 'undefined' &&
-        this.defaultLang !== null && this.defaultLang !== this.currentLang) {
-      interpolatedString = this.interpolateI18nString(
-        this.translations[this.defaultLang][key], interpolateParams);
+    translations = this.translations[this.fallbackLang];
+    if (this.fallbackLang !== null && this.fallbackLang !== this.currentLang &&
+        (translations && translations[key])) {
+      return this.interpolateTranslatedValue(
+        translations[key], interpolateParams);
     }
 
-    return typeof interpolatedString !== 'undefined' ? interpolatedString : key;
+    // If the translation for the default lang doesn't exist, return the key.
+    return key;
   }
 }
