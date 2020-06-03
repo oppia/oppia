@@ -17,9 +17,7 @@
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-
-import { Subject } from 'rxjs';
+import { EventEmitter, Injectable } from '@angular/core';
 
 @Injectable({
   providedIn: 'root'
@@ -34,20 +32,20 @@ export class LoaderService {
    * In order to keep the variables same, static is used until migration is
    * complete.
    */
-  static loadingMessageSubject: Subject<string> = new Subject<string>();
+  static loadingMessageSubject = new EventEmitter<string>();
   constructor() {}
 
   showLoadingScreen(message: string): void {
     // TODO(#9154): Change LoaderService to "this".
-    LoaderService.loadingMessageSubject.next(message);
+    LoaderService.loadingMessageSubject.emit(message);
   }
 
   hideLoadingScreen(): void {
     // TODO(#9154): Change LoaderService to "this".
-    LoaderService.loadingMessageSubject.next('');
+    LoaderService.loadingMessageSubject.emit('');
   }
 
-  getLoadingMessageSubject(): Subject<string> {
+  onLoadingMessageChange(): EventEmitter<string> {
     // TODO(#9154): Change LoaderService to "this".
     return LoaderService.loadingMessageSubject;
   }
