@@ -81,7 +81,6 @@ describe('TranslatePipe', () => {
     pipe = new TranslatePipe(translate, changeDecRef, new UtilsService());
   }));
 
-
   it('should translate', () => {
     expect(pipe.transform('I18n_t_1')).toBe('Hello');
     expect(pipe.transform('I18n_t_2', {val: 'World'})).toBe('Hello World');
@@ -96,9 +95,9 @@ describe('TranslatePipe', () => {
     pipe.ngOnDestroy();
 
     // Reintializing the pipe because jasmine tries to destroy the pipe.
-    // But since I have called the ngOnDestroy method and the pipe is destroyed.
-    // And if the pipe is not reinitialized it will raise an error saying cannot
-    // call ngOnDestroy of undefined.
+    // But since ngOnDestroy method has been called and the pipe is destroyed.
+    // And if the pipe is not reinitialized karma will raise an error saying
+    // "cannot call ngOnDestroy of undefined".
     pipe = new TranslatePipe(translate, changeDecRef, new UtilsService());
   });
 });

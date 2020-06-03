@@ -24,8 +24,8 @@ import { downgradeInjectable } from '@angular/upgrade/static';
   providedIn: 'root'
 })
 export class UtilsService {
-  // Determines if a variable is defined and not null.
   /**
+   * Determines if a variable is defined and not null.
    * @param {Object, Array<Object>, string, Array<string>, undefined, null}value
    * @return {boolean} - true if object is defined, false otherwise.
    */

@@ -28,7 +28,7 @@ import { UtilsService } from 'services/utils.service';
  * Example: <h1 [innerHTM]="'I18N_ABOUT_PAGE_HEADING' | translate:{x: 'val'}">
  * 'I18N_ABOUT_PAGE_HEADING' is referred here as key.
  * "translate" is the pipe. Every pipe must have a transform function. The
- * transform function called when angular encouters the pipe in HTML.
+ * transform function is called when angular encouters the pipe in HTML.
  * The object following the pipe, i.e.{x: 'val'}, is another argument to the
  * transform function. This object is called params or interpolationParams.
  */

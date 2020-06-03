@@ -31,7 +31,7 @@ import { UtilsService } from './utils.service';
  * Each i18n translation JSON file contains translations as
  * {key: translatedValue, key2: translatedValue2}. Let us say that
  * translatedValue is "Hola <[x]>". Here the value of x comes from the params
- * passed. So after interpolation is will become "Hola Oppia".
+ * passed. So, after interpolation it will become "Hola Oppia".
  */
 
 export interface LangChangeEvent {
@@ -129,7 +129,7 @@ export class TranslateService {
         translations[key], interpolateParams);
     }
 
-    // If the translation for the current lang doesn't exist use fallback lang
+    // If the translation for the current lang doesn't exist use fallback lang.
     translations = this.translations[this.fallbackLang];
     if (this.fallbackLang !== null && this.fallbackLang !== this.currentLang &&
         (translations && translations[key])) {
