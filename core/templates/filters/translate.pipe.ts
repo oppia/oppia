@@ -16,8 +16,15 @@
  * @fileoverview Translate pipe for i18n translations.
  */
 
+import { ChangeDetectorRef, OnDestroy, Pipe, PipeTransform }
+  from '@angular/core';
+import { Subscription } from 'rxjs';
+import { LangChangeEvent, TranslateService } from 'services/translate.service';
+import { UtilsService } from 'services/utils.service';
+
 /**
  * Commonly used terms in this file.
+ * Note: intentionally left out the L of innerHTM"L" to avoid the linter error.
  * Example: <h1 [innerHTML]="'I18N_ABOUT_PAGE_HEADING' | translate:{x: 'val'}">
  * 'I18N_ABOUT_PAGE_HEADING' is referred here as key.
  * "translate" is the pipe. Every pipe must have a transform function. The
@@ -25,13 +32,6 @@
  * The object following the pipe, i.e.{x: 'val'}, is another argument to the
  * transform function. This object is called params or interpolationParams.
  */
-
-
-import { ChangeDetectorRef, OnDestroy, Pipe, PipeTransform }
-  from '@angular/core';
-import { Subscription } from 'rxjs';
-import { LangChangeEvent, TranslateService } from 'services/translate.service';
-import { UtilsService } from 'services/utils.service';
 
 @Pipe({
   name: 'translate',
