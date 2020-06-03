@@ -232,6 +232,7 @@
 
 # Interaction project.
 /core/domain/customization_args_util*.py @brianrodri
+/core/domain/expression_parser*.py @aks681
 /core/domain/interaction_registry*.py @aks681
 /core/domain/obj_services*.py @aks681
 /core/templates/components/version-diff-visualization/codemirror-mergeview.directive.ts @aks681
@@ -243,7 +244,6 @@
 /extensions/objects/ @aks681
 /extensions/value_generators/ @vojtechjelinek
 /extensions/__init__.py @aks681
-/expression_parser.py @aks681
 
 
 # Lesson Analytics team.

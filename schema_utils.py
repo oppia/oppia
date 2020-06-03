@@ -30,8 +30,8 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import numbers
 import re
 
+from core.domain import expression_parser
 from core.domain import html_cleaner
-import expression_parser
 import python_utils
 
 SCHEMA_KEY_ITEMS = 'items'
@@ -404,23 +404,14 @@ class _Validators(python_utils.OBJECT):
             bool. Whether the given object is a valid expression.
         """
 
-        # Expression should not contain any invalid characters.
-        for character in obj:
-            if not bool(re.match(
-                    r'(\s|\d|\w|\.|\(|\)|\{|\}|\[|\]|\-|\+|\*|\/|\^)',
-                    character)):
-                return False
-
-        try:
-            parser = expression_parser.Parser(obj)
-            parser.parse()
-            expression_is_algebraic = expression_parser.is_algebraic(obj)
-            # If the algebraic flag is true, expression_is_algebraic should
-            # also be true, otherwise both should be false which would imply
-            # that the expression is numeric.
-            return not algebraic ^ expression_is_algebraic
-        except Exception:
+        if not expression_parser.is_valid_expression(obj):
             return False
+
+        expression_is_algebraic = expression_parser.is_algebraic(obj)
+        # If the algebraic flag is true, expression_is_algebraic should
+        # also be true, otherwise both should be false which would imply
+        # that the expression is numeric.
+        return not algebraic ^ expression_is_algebraic
 
     @staticmethod
     def contains_valid_placeholders(obj):

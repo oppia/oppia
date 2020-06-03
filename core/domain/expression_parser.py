@@ -20,7 +20,7 @@ It uses the following grammar in Backus-Naur form:
 <expr2> ::= <expr1> (('*' | '/') <expr1>)*
 <expr1> ::= '-' <expr1> | '+' <expr1> | <unit> ('^' <expr1>)?
 
-<unit> ::= <identifier> ('(' <expr> ')')* | <number> | '(' <expr> ')'
+<unit> ::= <identifier> | <number> | '(' <expr> ')' | <function> '(' <expr> ')'
 <number> ::= r'[0-9]+.[0-9]+|[0-9]+'
 <identifier> ::= r'[a-zA-Z]+'
 """
@@ -91,12 +91,26 @@ class Token(python_utils.OBJECT):
         # Categorize the token.
         if self.is_identifier(text):
             self.category = 'identifier'
+        elif self.is_function(text):
+            self.category = 'function'
         elif self.is_number(text):
             self.category = 'number'
         elif self.is_operator(text):
             self.category = 'operator'
         else:
             raise Exception('Invalid syntax')
+
+
+    def is_function(self, text):
+        """Checks if given token represents a valid math function.
+
+        Args:
+            text: str. String representation of the token.
+        Returns:
+            bool. Whether the given string represents a valid math function.
+        """
+        return text in MATH_FUNCTIONS
+
 
     def is_identifier(self, text):
         """Checks if given token represents a valid identifier. A valid
@@ -111,8 +125,6 @@ class Token(python_utils.OBJECT):
         if text.isalpha() and len(text) == 1:
             return True
         if text in GREEK_LETTERS:
-            return True
-        if text in MATH_FUNCTIONS:
             return True
         return False
 
@@ -277,6 +289,13 @@ class Parser(python_utils.OBJECT):
             Exception: Invalid syntax.
         """
 
+        # Expression should not contain any invalid characters.
+        for character in text:
+            if not bool(re.match(
+                    r'(\s|\d|\w|\.|\(|\)|\{|\}|\[|\]|\-|\+|\*|\/|\^)',
+                    character)):
+                raise Exception('Invalid syntax.')
+
         # Position of the next token in the token list.
         self.next_token_index = 0
         tokens = re.findall(
@@ -370,7 +389,8 @@ class Parser(python_utils.OBJECT):
 
     def parse_unit(self):
         """Function representing the following production rule of the grammar:
-        <unit> ::= <identifier> ('(' <expr> ')')* | <number> | '(' <expr> ')'
+        <unit> ::= <identifier> | <number> | '(' <expr> ')' |
+        <function> '(' <expr> ')'
 
         Returns:
             Node. Root node of the generated parse tree.
@@ -381,11 +401,13 @@ class Parser(python_utils.OBJECT):
 
         token = self.get_next_token()
         if token.category == 'identifier':
+            return Identifier(token)
+
+        if token.category == 'function':
             if self.is_next_token(['(']):
                 child = self.parse_expr()
                 self.expect_token(')')
                 return Function(token, child)
-            return Identifier(token)
 
         if token.category == 'number':
             return Number(token)
@@ -407,7 +429,6 @@ class Parser(python_utils.OBJECT):
 
         if self.next_token_index < len(self.token_list):
             return self.token_list[self.next_token_index]
-        return None
 
     def get_next_token(self):
         """Function to retrieve the token at the next position and then
@@ -468,3 +489,21 @@ class Parser(python_utils.OBJECT):
         token = self.token_list[self.next_token_index]
         self.next_token_index += 1
         return token
+
+
+def is_valid_expression(expression):
+    """Checks if given math expression is syntactically valid.
+
+    Args:
+        expression: str. String representation of the math expression.
+
+    Returns:
+        bool. Whether the given math expression is syntactically valid.
+    """
+
+    try:
+        parser = Parser(expression)
+        parser.parse()
+        return True
+    except Exception:
+        return False
