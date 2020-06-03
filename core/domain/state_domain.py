@@ -2316,8 +2316,8 @@ class State(python_utils.OBJECT):
         """Get all html content strings in the state.
 
         Returns:
-            list(str): The list of all html content strings in the interaction.
-            """
+            list(str). The list of all html content strings in the interaction.
+        """
         html_list = (
             self.written_translations.get_all_html_content_strings() +
             self.interaction.get_all_html_content_strings())

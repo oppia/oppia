@@ -166,9 +166,9 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 'new_value': [{
                     'rule_specs': [{
                         'rule_type': 'Equals',
-                        'inputs': {'x': [
-                            html_content
-                        ]}
+                        'inputs': {
+                            'x': [html_content]
+                        }
                     }, {
                         'rule_type': 'Equals',
                         'inputs': {
@@ -262,8 +262,10 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 'state_name': 'Intro',
                 'property_name': 'default_outcome',
                 'new_value': {
-                    'param_changes': [], 'feedback': {
-                        'content_id': 'default_outcome', 'html': html_content
+                    'param_changes': [],
+                    'feedback': {
+                        'content_id': 'default_outcome',
+                        'html': html_content
                     },
                     'dest': 'Introduction',
                     'refresher_exploration_id': None,
@@ -328,26 +330,37 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 'new_value': [{
                     'rule_specs': [{
                         'rule_type': 'Equals',
-                        'inputs': {'x': [
-                            expected_html_content
-                        ]}
+                        'inputs': {
+                            'x': [expected_html_content]
+                        }
                     }, {
                         'rule_type': 'Equals',
-                        'inputs': {'x': 1}
+                        'inputs': {
+                            'x': 1
+                        }
                     }, {
                         'rule_type': 'HasElementXAtPositionY',
-                        'inputs': {'x': expected_html_content,
-                                   'y': 2}
+                        'inputs': {
+                            'x': expected_html_content,
+                            'y': 2
+                        }
                     }, {
                         'rule_type': 'IsEqualToOrdering',
-                        'inputs': {'x': [[expected_html_content]]}
+                        'inputs': {
+                            'x': [[expected_html_content]]
+                        }
                     }, {
                         'rule_type': 'HasElementXBeforeElementY',
-                        'inputs': {'x': expected_html_content,
-                                   'y': expected_html_content}
+                        'inputs': {
+                            'x': expected_html_content,
+                            'y': expected_html_content
+                        }
                     }, {
-                        'rule_type': 'IsEqualToOrderingWithOneItemAtIncorrectPosition',  # pylint: disable=protected-access,line-too-long
-                        'inputs': {'x': [[expected_html_content]]}
+                        'rule_type': (
+                            'IsEqualToOrderingWithOneItemAtIncorrectPosition'),
+                        'inputs': {
+                            'x': [[expected_html_content]]
+                        }
                     }],
                     'outcome': {
                         'dest': 'Introduction',
@@ -426,7 +439,8 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 'state_name': 'Intro',
                 'property_name': 'default_outcome',
                 'new_value': {
-                    'param_changes': [], 'feedback': {
+                    'param_changes': [],
+                    'feedback': {
                         'content_id': 'default_outcome',
                         'html': expected_html_content
                     },
