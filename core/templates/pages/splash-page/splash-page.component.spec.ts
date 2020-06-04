@@ -18,6 +18,8 @@
 
 const constants = require('constants.ts');
 
+require('pages/splash-page/splash-page.component.ts');
+
 describe('Splash Page', function() {
   var $scope = null, ctrl = null;
   var $timeout = null;
@@ -37,7 +39,7 @@ describe('Splash Page', function() {
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('WindowRef', windowRefMock);
   }));
-  beforeEach(angular.mock.inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector, $componentController) {
     $timeout = $injector.get('$timeout');
     $q = $injector.get('$q');
     UserService = $injector.get('UserService');
@@ -49,8 +51,8 @@ describe('Splash Page', function() {
     loadingMessage = '';
     var $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
-    var directive = $injector.get('splashPageDirective')[0];
-    ctrl = $injector.instantiate(directive.controller, {
+
+    ctrl = $componentController('splashPage', {
       $rootScope: $scope
     });
   }));

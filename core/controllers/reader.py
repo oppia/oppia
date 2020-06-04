@@ -34,7 +34,6 @@ from core.domain import feedback_services
 from core.domain import interaction_registry
 from core.domain import learner_progress_services
 from core.domain import moderator_services
-from core.domain import question_fetchers
 from core.domain import question_services
 from core.domain import rating_services
 from core.domain import recommendations_services
@@ -54,59 +53,30 @@ import utils
 MAX_SYSTEM_RECOMMENDATIONS = 4
 
 
-def _get_exploration_player_data(
-        exploration_id, version, collection_id, can_edit):
-    """Returns a dict of exploration player data.
+def _does_exploration_exist(exploration_id, version, collection_id):
+    """Returns if an exploration exists.
 
     Args:
         exploration_id: str. The ID of the exploration.
         version: int or None. The version of the exploration.
         collection_id: str. ID of the collection.
-        can_edit: bool. Whether the given user can edit this activity.
 
     Returns:
-        dict. A dict of exploration player data.
-        The keys and values of the dict are as follows:
-        - 'can_edit': bool. Whether the given user can edit this activity.
-        - 'exploration_title': str. Title of exploration.
-        - 'exploration_version': int. The version of the exploration.
-        - 'collection_id': str. ID of the collection.
-        - 'collection_title': str. Title of collection.
-            required by the given exploration ID.
-        - 'is_private': bool. Whether the exploration is private or not.
-        - 'meta_name': str. Title of exploration.
-        - 'meta_description': str. Objective of exploration.
+        bool. True if the exploration exists False otherwise.
     """
-    try:
-        exploration = exp_fetchers.get_exploration_by_id(
-            exploration_id, version=version)
-    except Exception:
-        raise Exception
+    exploration = exp_fetchers.get_exploration_by_id(
+        exploration_id, strict=False, version=version)
 
-    collection_title = None
+    if exploration is None:
+        return False
+
     if collection_id:
-        try:
-            collection = collection_services.get_collection_by_id(
-                collection_id)
-            collection_title = collection.title
-        except Exception:
-            raise Exception
+        collection = collection_services.get_collection_by_id(
+            collection_id, strict=False)
+        if collection is None:
+            return False
 
-    version = exploration.version
-
-    return {
-        'can_edit': can_edit,
-        'exploration_title': exploration.title,
-        'exploration_version': version,
-        'collection_id': collection_id,
-        'collection_title': collection_title,
-        'is_private': rights_manager.is_exploration_private(
-            exploration_id),
-        # Note that this overwrites the value in base.py.
-        'meta_name': exploration.title,
-        # Note that this overwrites the value in base.py.
-        'meta_description': utils.capitalize_string(exploration.objective),
-    }
+    return True
 
 
 class ExplorationEmbedPage(base.BaseHandler):
@@ -121,14 +91,10 @@ class ExplorationEmbedPage(base.BaseHandler):
         """
         version_str = self.request.get('v')
         version = int(version_str) if version_str else None
-        exploration_rights = rights_manager.get_exploration_rights(
-            exploration_id, strict=False)
 
         # Note: this is an optional argument and will be None when the
         # exploration is being played outside the context of a collection.
         collection_id = self.request.get('collection_id')
-        can_edit = rights_manager.check_can_edit_activity(
-            self.user, exploration_rights)
 
         # This check is needed in order to show the correct page when a 404
         # error is raised. The self.request.get('iframed') part of the check is
@@ -136,19 +102,14 @@ class ExplorationEmbedPage(base.BaseHandler):
         # embedding script.
         if (feconf.EXPLORATION_URL_EMBED_PREFIX in self.request.uri or
                 self.request.get('iframed')):
-            self.values['iframed'] = True
-        try:
-            # If the exploration does not exist, a 404 error is raised.
-            exploration_data_values = _get_exploration_player_data(
-                exploration_id, version, collection_id, can_edit)
-        except Exception:
+            self.iframed = True
+
+        if not _does_exploration_exist(exploration_id, version, collection_id):
             raise self.PageNotFoundException
 
-        self.values.update(exploration_data_values)
-        self.values['iframed'] = True
+        self.iframed = True
         self.render_template(
-            'exploration-player-page.mainpage.html',
-            iframe_restriction=None)
+            'exploration-player-page.mainpage.html', iframe_restriction=None)
 
 
 class ExplorationPage(base.BaseHandler):
@@ -163,8 +124,6 @@ class ExplorationPage(base.BaseHandler):
         """
         version_str = self.request.get('v')
         version = int(version_str) if version_str else None
-        exploration_rights = rights_manager.get_exploration_rights(
-            exploration_id, strict=False)
 
         if self.request.get('iframed'):
             redirect_url = '/embed/exploration/%s' % exploration_id
@@ -180,20 +139,11 @@ class ExplorationPage(base.BaseHandler):
             collection_id = None
         else:
             collection_id = self.request.get('collection_id')
-        can_edit = rights_manager.check_can_edit_activity(
-            self.user, exploration_rights)
 
-        try:
-            # If the exploration does not exist, a 404 error is raised.
-            exploration_data_values = _get_exploration_player_data(
-                exploration_id, version, collection_id, can_edit)
-        except Exception:
+        if not _does_exploration_exist(exploration_id, version, collection_id):
             raise self.PageNotFoundException
 
-        self.values.update(exploration_data_values)
-        self.values['iframed'] = False
-        self.render_template(
-            'exploration-player-page.mainpage.html')
+        self.render_template('exploration-player-page.mainpage.html')
 
 
 class ExplorationHandler(base.BaseHandler):
@@ -265,24 +215,22 @@ class PretestHandler(base.BaseHandler):
     @acl_decorators.can_play_exploration
     def get(self, exploration_id):
         """Handles GET request."""
-        start_cursor = self.request.get('cursor')
         story_id = self.request.get('story_id')
         story = story_fetchers.get_story_by_id(story_id, strict=False)
         if story is None:
             raise self.InvalidInputException
         if not story.has_exploration(exploration_id):
             raise self.InvalidInputException
-        pretest_questions, _, next_start_cursor = (
-            question_fetchers.get_questions_and_skill_descriptions_by_skill_ids(
+        pretest_questions = (
+            question_services.get_questions_by_skill_ids(
                 feconf.NUM_PRETEST_QUESTIONS,
                 story.get_prerequisite_skill_ids_for_exp_id(exploration_id),
-                start_cursor)
+                True)
         )
         question_dicts = [question.to_dict() for question in pretest_questions]
 
         self.values.update({
             'pretest_question_dicts': question_dicts,
-            'next_start_cursor': next_start_cursor
         })
         self.render_json(self.values)
 
