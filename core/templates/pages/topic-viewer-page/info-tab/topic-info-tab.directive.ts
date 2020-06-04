@@ -23,9 +23,14 @@ angular.module('oppia').directive('topicInfoTab', ['UrlInterpolationService',
   function(UrlInterpolationService) {
     return {
       restrict: 'E',
-      link: function(scope, element) {
-        element[0].getControllerScope = function() {
-          return scope.$ctrl;
+      link: function(scope, element, attrs, ctrl) {
+        // This is needed in order for the $ctrl scope to be retrievable during
+        // Karma unit testing. The usual function getControllerScope() couldn't
+        // be used here as the functions local to the controller could only be
+        // accessed as scope.$ctrl.<fn_name>, which is not a part of IScope and
+        // hence threw typescript errors.
+        element[0].getLocalControllerScope = function() {
+          return ctrl;
         };
       },
       scope: {},

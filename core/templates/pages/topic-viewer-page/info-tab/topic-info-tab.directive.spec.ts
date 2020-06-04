@@ -27,7 +27,7 @@ require('pages/topic-viewer-page/info-tab/topic-info-tab.directive.ts');
 
 describe('Topic info tab controller', function() {
   describe('Topic info tab', function() {
-    var ctrlScope, rootScope, outerScope;
+    var ctrlScope, rootScope, outerScope, windowWidth;
 
     beforeEach(angular.mock.module('directiveTemplates'));
     beforeEach(function() {
@@ -41,7 +41,7 @@ describe('Topic info tab controller', function() {
     }));
 
     beforeEach(function() {
-      mockWindowDimensionsService = {
+      var mockWindowDimensionsService = {
         getWidth: function() {
           return windowWidth;
         }
@@ -59,7 +59,7 @@ describe('Topic info tab controller', function() {
         '<topic-info-tab></topic-info-tab>');
       var compiledElem = $compile(elem)(outerScope);
       outerScope.$digest();
-      ctrlScope = compiledElem[0].getControllerScope();
+      ctrlScope = compiledElem[0].getLocalControllerScope();
     }));
 
     it('should correctly get wide screen width', function() {
