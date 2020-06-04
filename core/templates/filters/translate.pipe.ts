@@ -62,9 +62,9 @@ export class TranslatePipe implements PipeTransform, OnDestroy {
   onLangChange: Subscription;
 
   constructor(
-    private translate: TranslateService,
+    private translateService: TranslateService,
     private ref: ChangeDetectorRef,
-    private utils: UtilsService
+    private utilsService: UtilsService
   ) {}
 
   /**
@@ -73,7 +73,7 @@ export class TranslatePipe implements PipeTransform, OnDestroy {
    * @param {Object} interpolateParams - Params for interpolation
    */
   updateInterpolatedValue(key: string, interpolateParams?: Object): void {
-    this.interpolatedValue = this.translate.getInterpolatedString(
+    this.interpolatedValue = this.translateService.getInterpolatedString(
       key, interpolateParams);
 
     // Storing the key to check if the key is same when the transform is invoked
@@ -99,12 +99,12 @@ export class TranslatePipe implements PipeTransform, OnDestroy {
     // If the key and params are same, return the last stored value.
     if (
       key === this.lastKey &&
-      this.utils.isEquivalent(params, this.lastParams)) {
+      this.utilsService.isEquivalent(params, this.lastParams)) {
       return this.interpolatedValue;
     }
 
     let interpolateParams: Object;
-    if (this.utils.isDefined(params) && !Array.isArray(params)) {
+    if (this.utilsService.isDefined(params) && !Array.isArray(params)) {
       interpolateParams = params;
     }
 
@@ -120,10 +120,10 @@ export class TranslatePipe implements PipeTransform, OnDestroy {
     this.updateInterpolatedValue(key, interpolateParams);
 
     // If there is a subscription to onLangChange, unsubscribe.
-    this._disposeSubscriptions();
+    this.disposeSubscriptions();
     // Subscribe to onLangChange event, in case the language changes.
     if (!this.onLangChange) {
-      this.onLangChange = this.translate.onLangChange.subscribe(
+      this.onLangChange = this.translateService.onLangChange.subscribe(
         (event: LangChangeEvent) => {
           this.updateInterpolatedValue(key, interpolateParams);
         }
@@ -135,7 +135,7 @@ export class TranslatePipe implements PipeTransform, OnDestroy {
   /**
    * Clean up any existing subscription to change events
    */
-  private _disposeSubscriptions(): void {
+  private disposeSubscriptions(): void {
     if (typeof this.onLangChange === 'undefined') {
       return;
     }
@@ -144,6 +144,6 @@ export class TranslatePipe implements PipeTransform, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this._disposeSubscriptions();
+    this.disposeSubscriptions();
   }
 }

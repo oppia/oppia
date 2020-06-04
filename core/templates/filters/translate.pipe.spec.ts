@@ -52,7 +52,7 @@ class MockTranslateService {
 
 describe('TranslatePipe', () => {
   let pipe: TranslatePipe;
-  let translate: TranslateService;
+  let translateService: TranslateService;
   let changeDecRef: ChangeDetectorRef;
 
   beforeEach(async(() => {
@@ -65,9 +65,10 @@ describe('TranslatePipe', () => {
         { provide: ChangeDetectorRef, useClass: MockChangeDetectorRef}
       ]
     }).compileComponents();
-    translate = TestBed.get(TranslateService);
+    translateService = TestBed.get(TranslateService);
     changeDecRef = TestBed.get(ChangeDetectorRef);
-    pipe = new TranslatePipe(translate, changeDecRef, new UtilsService());
+    pipe = new TranslatePipe(
+      translateService, changeDecRef, new UtilsService());
   }));
 
   it('should translate', () => {
@@ -76,7 +77,7 @@ describe('TranslatePipe', () => {
     expect(pipe.transform('I18n_t_2', {val: 'World'})).toBe('Hello <[val]>');
     expect(pipe.transform('I18n_t_3')).toBe('I18n_t_3');
     expect(pipe.transform('')).toBe('');
-    translate.onLangChange.emit({lang: 'en'});
+    translateService.onLangChange.emit({lang: 'en'});
   });
 
   // The sole purpose of this test is to cover ngOnDestroy.
@@ -87,6 +88,7 @@ describe('TranslatePipe', () => {
     // But since ngOnDestroy method has been called and the pipe is destroyed.
     // And if the pipe is not reinitialized karma will raise an error saying
     // "cannot call ngOnDestroy of undefined".
-    pipe = new TranslatePipe(translate, changeDecRef, new UtilsService());
+    pipe = new TranslatePipe(
+      translateService, changeDecRef, new UtilsService());
   });
 });

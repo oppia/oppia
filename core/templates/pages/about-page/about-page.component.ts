@@ -58,9 +58,9 @@ export class AboutPageComponent implements OnInit {
   constructor(
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private urlInterpolationService: UrlInterpolationService,
-    private translate: TranslateService,
+    private translateService: TranslateService,
     private windowRef: WindowRef) {
-    translate.use('en');
+    translateService.use('en');
   }
 
   onTabClick(tabName: string) {
@@ -75,10 +75,10 @@ export class AboutPageComponent implements OnInit {
 
   ngOnInit() {
     this.activeTabName = this.TAB_ID_ABOUT;
-    this.translate.use(
+    this.translateService.use(
       this.i18nLanguageCodeService.getCurrentI18nLanguageCode());
     this.i18nLanguageCodeService.onI18nLanguageCodeChange().subscribe(
-      (code) => this.translate.use(code)
+      (code) => this.translateService.use(code)
     );
     const hash = this.windowRef.nativeWindow.location.hash.slice(1);
     if (hash === 'license') {

@@ -59,7 +59,7 @@ export class TranslateService {
     return this._onLangChangeEventEmitter;
   }
 
-  constructor(private http: HttpClient, private utils: UtilsService) {}
+  constructor(private http: HttpClient, private utilsService: UtilsService) {}
 
   /**
    * Function to fetch JSON file containing translations.
@@ -109,7 +109,7 @@ export class TranslateService {
     return translatedValue.replace(this.templateMatcher,
       (substring: string, b: string) => {
         let r = params[b];
-        return this.utils.isDefined(r) ? r : substring;
+        return this.utilsService.isDefined(r) ? r : substring;
       });
   }
 
@@ -124,7 +124,7 @@ export class TranslateService {
   getInterpolatedString(
       key: string,
       interpolateParams?: Object): string {
-    if (!this.utils.isDefined(key) || !key.length) {
+    if (!this.utilsService.isDefined(key) || !key.length) {
       throw new Error('Parameter "key" required');
     }
     let translations = this.translations[this.currentLang];
