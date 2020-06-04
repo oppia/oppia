@@ -31,6 +31,7 @@ require('objects/templates/int-editor.directive.ts');
 require('objects/templates/list-of-sets-of-html-strings-editor.directive.ts');
 require('objects/templates/list-of-tabs-editor.directive.ts');
 require('objects/templates/list-of-unicode-string-editor.directive.ts');
+require('objects/templates/literally-canvas-diagram-editor.component.ts');
 require('objects/templates/logic-error-category-editor.directive.ts');
 require('objects/templates/logic-question-editor.directive.ts');
 require('objects/templates/math-latex-string-editor.directive.ts');

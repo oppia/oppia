@@ -174,7 +174,7 @@ angular.module('oppia').directive('explorationEditorPage', [
         'ExplorationTitleService', 'ExplorationWarningsService',
         'GraphDataService', 'PageTitleService', 'LoaderService',
         'ParamChangesObjectFactory', 'ParamSpecsObjectFactory',
-        'PlaythroughIssuesService', 'RouterService', 'SiteAnalyticsService',
+        'RouterService', 'SiteAnalyticsService',
         'StateClassifierMappingService', 'StateEditorService',
         'StateTopAnswersStatsBackendApiService', 'StateTopAnswersStatsService',
         'StateTutorialFirstTimeService', 'ThreadDataService',
@@ -195,7 +195,7 @@ angular.module('oppia').directive('explorationEditorPage', [
             ExplorationTitleService, ExplorationWarningsService,
             GraphDataService, PageTitleService, LoaderService,
             ParamChangesObjectFactory, ParamSpecsObjectFactory,
-            PlaythroughIssuesService, RouterService, SiteAnalyticsService,
+            RouterService, SiteAnalyticsService,
             StateClassifierMappingService, StateEditorService,
             StateTopAnswersStatsBackendApiService, StateTopAnswersStatsService,
             StateTutorialFirstTimeService, ThreadDataService,
@@ -284,8 +284,6 @@ angular.module('oppia').directive('explorationEditorPage', [
                 explorationData.correctness_feedback_enabled);
               StateClassifierMappingService.init(
                 explorationData.state_classifier_mapping);
-              PlaythroughIssuesService.initSession(
-                explorationData.exploration_id, explorationData.version);
 
               ctrl.explorationTitleService = ExplorationTitleService;
               ctrl.explorationCategoryService = ExplorationCategoryService;
