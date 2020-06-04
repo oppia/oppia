@@ -286,7 +286,7 @@ def convert_png_binary_to_data_url(content):
     if imghdr.what(None, h=content) == 'png':
         return 'data:image/png;base64,%s' % python_utils.url_quote(
             base64.b64encode(content))
-    elif test_file_for_webp(h=content) == 'webp':
+    elif is_file_webp_image(content) == 'webp':
         return 'data:image/webp;base64,%s' % python_utils.url_quote(
             base64.b64encode(content))
     else:
