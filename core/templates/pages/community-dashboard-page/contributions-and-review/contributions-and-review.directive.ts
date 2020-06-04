@@ -1,5 +1,3 @@
-import { MisconceptionObjectFactory, Misconception } from "domain/skill/MisconceptionObjectFactory";
-
 // Copyright 2019 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -347,22 +345,21 @@ angular.module('oppia').directive('contributionsAndReview', [
                 ctrl.activeReviewTab === ctrl.SUGGESTION_TYPE_QUESTION;
               var contributionDetails = (
                 ctrl.contributions[suggestionId].details);
-              SkillBackendApiService.fetchSkill(
-                suggestion.change.skill_id).then(
-                  function(skillDict) {
-                    var misconceptionsBySkill = {};
-                    var skill = skillDict.skill;
-                    misconceptionsBySkill[skill.id] = (
-                      skill.misconceptions.map((misconceptionDict) => {
-                        return (
-                          MisconceptionObjectFactory.createFromBackendDict(
-                            misconceptionDict));
-                      }));
-                    _showQuestionSuggestionModal(
-                      suggestion, contributionDetails, reviewable,
-                      misconceptionsBySkill);
-                  }
+              var skillId = suggestion.change.skill_id;
+              SkillBackendApiService.fetchSkill(skillId).then((skillDict) => {
+                var misconceptionsBySkill = {};
+                var skill = skillDict.skill;
+                misconceptionsBySkill[skill.id] = (
+                  skill.misconceptions.map((misconceptionDict) => {
+                    return (
+                      MisconceptionObjectFactory.createFromBackendDict(
+                        misconceptionDict));
+                  })
                 );
+                _showQuestionSuggestionModal(
+                  suggestion, contributionDetails, reviewable,
+                  misconceptionsBySkill);
+              });
             }
             if (suggestion.suggestion_type === ctrl.SUGGESTION_TYPE_TRANSLATE) {
               var reviewable =
