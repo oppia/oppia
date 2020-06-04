@@ -30,13 +30,13 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { TranslatePipe } from 'filters/translate.pipe';
 
 @Pipe({name: 'translate'})
-class MockTranslatePipe extends TranslatePipe {
+class MockTranslatePipe {
   transform(value: string, params: Object | undefined):string {
     return value;
   }
 }
 
-class MockTranslateService extends TranslateService {
+class MockTranslateService {
   code = 'es';
   use(lang: string): string {
     this.code = lang;
@@ -44,7 +44,7 @@ class MockTranslateService extends TranslateService {
   }
 }
 
-class MockI18nLanguageCodeService extends I18nLanguageCodeService {
+class MockI18nLanguageCodeService {
   codeChange = new EventEmitter<string>();
   getCurrentI18nLanguageCode() {
     return 'en';
