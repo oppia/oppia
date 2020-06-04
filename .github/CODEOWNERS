@@ -91,7 +91,7 @@
 /core/domain/learner_progress*.py @nithusha21
 /core/domain/subscription_services*.py @nithusha21
 /core/templates/domain/creator_dashboard/ @nithusha21
-/core/templates/domain/email-dashbaord/ @nithusha21
+/core/templates/domain/email-dashboard/ @nithusha21
 /core/templates/domain/learner_dashboard/ @nithusha21
 /core/templates/pages/creator-dashboard-page/ @nithusha21
 /core/templates/pages/email-dashboard-pages/ @nithusha21
