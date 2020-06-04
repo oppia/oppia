@@ -23,10 +23,10 @@
                  ng-click="$ctrl.showEditProfilePictureModal()">
             </div>
             <i class="material-icons oppia-editor-edit-icon" style="top: 8px; right: 8px;">&#xE254;</i>
-            <picture>
+            <picture ng-if="!$ctrl.profilePictureDataUrl">
               <source type="image/webp" ng-srcset="<[$ctrl.getStaticImageUrl('/general/no_profile_picture.webp')]>">
               <source type="image/png" ng-srcset="<[$ctrl.getStaticImageUrl('/general/no_profile_picture.png')]>">
-              <img ng-if="!$ctrl.profilePictureDataUrl" ng-src="<[$ctrl.getStaticImageUrl('/general/no_profile_picture.png')]>" class="img-thumbnail">
+              <img ng-src="<[$ctrl.getStaticImageUrl('/general/no_profile_picture.png')]>" class="img-thumbnail">
             </picture>
           </div>
         </div>

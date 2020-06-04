@@ -255,15 +255,6 @@ class PreferencesHandlerTests(test_utils.GenericTestBase):
     EXP_ID = 'exp_id'
     EXP_TITLE = 'Exploration title'
 
-    def check_image_png_or_webp(self, image_string):
-        """Returns Boolean
-        Checks if the image is in png or webp format only.
-        """
-        if(image_string.startswith('data:image/png') or
-           image_string.startswith('data:image/webp')):
-            return True
-        return False
-
     def setUp(self):
         super(PreferencesHandlerTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
@@ -298,7 +289,7 @@ class PreferencesHandlerTests(test_utils.GenericTestBase):
         self.login(self.OWNER_EMAIL)
         csrf_token = self.get_new_csrf_token()
         user_settings = user_services.get_user_settings(self.owner_id)
-        self.assertTrue(self.check_image_png_or_webp(
+        self.assertTrue(test_utils.check_image_png_or_webp(
             user_settings.profile_picture_data_url))
         self.put_json(
             feconf.PREFERENCES_DATA_URL,
