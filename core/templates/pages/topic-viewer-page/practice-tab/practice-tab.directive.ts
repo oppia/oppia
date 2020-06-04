@@ -43,17 +43,17 @@ angular.module('oppia').directive('practiceTab', [
           var ctrl = this;
 
           ctrl.openNewPracticeSession = function() {
-            var selectedSubtopics = [];
+            var selectedSubtopicIds = [];
             for (var idx in ctrl.selectedSubtopicIndices) {
               if (ctrl.selectedSubtopicIndices[idx]) {
-                selectedSubtopics.push(
-                  ctrl.availableSubtopics[idx].getTitle());
+                selectedSubtopicIds.push(
+                  ctrl.availableSubtopics[idx].getId());
               }
             }
             var practiceSessionsUrl = UrlInterpolationService.interpolateUrl(
               PRACTICE_SESSIONS_URL, {
                 topic_name: ctrl.getTopicName(),
-                subtopic_titles_list: JSON.stringify(selectedSubtopics)
+                comma_separated_subtopic_ids: selectedSubtopicIds.join(',')
               });
             $window.location.href = practiceSessionsUrl;
           };

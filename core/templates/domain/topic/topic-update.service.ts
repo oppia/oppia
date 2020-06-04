@@ -446,7 +446,7 @@ angular.module('oppia').factory('TopicUpdateService', [
             var thumbnailFilename = (
               _getNewPropertyValueFromChangeDict(changeDict));
             subtopic.setThumbnailFilename(thumbnailFilename);
-          }, function(changeDict, subtopic) {
+          }, function(changeDict, topic) {
             // Undo.
             subtopic.setThumbnailFilename(oldThumbnailFilename);
           });
@@ -472,7 +472,7 @@ angular.module('oppia').factory('TopicUpdateService', [
             var thumbnailBgColor = (
               _getNewPropertyValueFromChangeDict(changeDict));
             subtopic.setThumbnailBgColor(thumbnailBgColor);
-          }, function(changeDict, subtopic) {
+          }, function(changeDict, topic) {
             // Undo.
             subtopic.setThumbnailBgColor(oldThumbnailBgColor);
           });

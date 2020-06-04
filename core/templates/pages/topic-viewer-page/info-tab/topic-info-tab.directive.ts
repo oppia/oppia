@@ -23,6 +23,16 @@ angular.module('oppia').directive('topicInfoTab', ['UrlInterpolationService',
   function(UrlInterpolationService) {
     return {
       restrict: 'E',
+      link: function(scope, element, attrs, ctrl) {
+        // This is needed in order for the $ctrl scope to be retrievable during
+        // Karma unit testing. The usual function getControllerScope() couldn't
+        // be used here as the functions local to the controller could only be
+        // accessed as scope.$ctrl.<fn_name>, which is not a part of IScope and
+        // hence threw typescript errors.
+        element[0].getLocalControllerScope = function() {
+          return ctrl;
+        };
+      },
       scope: {},
       bindToController: {
         getTopicName: '&topicName',
@@ -38,11 +48,15 @@ angular.module('oppia').directive('topicInfoTab', ['UrlInterpolationService',
         'WindowDimensionsService', function(WindowDimensionsService) {
           var ctrl = this;
 
-          ctrl.$onInit = function() {
-            ctrl.isMobile = false;
+          ctrl.checkSmallScreenWidth = function() {
             if (WindowDimensionsService.getWidth() <= 1024) {
-              ctrl.isMobile = true;
+              return true;
             }
+            return false;
+          };
+
+          ctrl.$onInit = function() {
+            ctrl.screenHasSmallWidth = ctrl.checkSmallScreenWidth();
           };
         }
       ]

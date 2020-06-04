@@ -17,23 +17,19 @@
   </md-card>
 </div>
 <style>
-  practice-tab .oppia-long-text {
-    /* Since the same class is used in all the other tabs, it is defined in topic-viewer-page.directive.html,
-       but since those CSS classes are evaluated after the classes in this directive,
-       without the !important tag, any styles set here will be ignored for common classes.
-    */
-    width: 37.5vw !important;
+  practice-tab .oppia-practice-tab-container .oppia-page-card {
+    width: 37.5vw;
   }
 
   @media (max-width: 1024px) {
-    practice-tab .oppia-long-text {
-      width: 60vw !important;
+    practice-tab .oppia-practice-tab-container .oppia-page-card {
+      width: 60vw;
     }
   }
 
   @media (max-width: 500px) {
-    practice-tab .oppia-long-text {
-      width: 90vw !important;
+    practice-tab .oppia-practice-tab-container .oppia-page-card {
+      width: 90vw;
     }
   }
 
