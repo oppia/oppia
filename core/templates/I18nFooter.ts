@@ -50,7 +50,8 @@ angular.module('oppia').directive('i18nFooter', [
           };
           ctrl.$onInit = function() {
             ctrl.supportedSiteLanguages = SUPPORTED_SITE_LANGUAGES;
-            ctrl.currentLanguageCode = $translate.proposedLanguage();
+            ctrl.currentLanguageCode = (
+              $translate.proposedLanguage() || $translate.use());
           };
         }
       ]
