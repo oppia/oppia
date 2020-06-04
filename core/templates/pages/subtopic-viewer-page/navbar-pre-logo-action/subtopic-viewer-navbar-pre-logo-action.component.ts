@@ -27,14 +27,15 @@ angular.module('oppia').component('subtopicViewerNavbarPreLogoAction', {
     'UrlInterpolationService', 'UrlService', 'TOPIC_VIEWER_URL_TEMPLATE',
     function(UrlInterpolationService, UrlService, TOPIC_VIEWER_URL_TEMPLATE) {
       var ctrl = this;
-      ctrl.getTopicUrl = function() {
-        return UrlInterpolationService.interpolateUrl(
+
+      ctrl.$onInit = function() {
+        ctrl.topicName = UrlService.getTopicNameFromLearnerUrl();
+
+        ctrl.topicUrl = UrlInterpolationService.interpolateUrl(
           TOPIC_VIEWER_URL_TEMPLATE, {
             topic_name: ctrl.topicName
           });
-      };
-      ctrl.$onInit = function() {
-        ctrl.topicName = UrlService.getTopicNameFromLearnerUrl();
+        console.log(ctrl.topicUrl);
       };
     }]
 });

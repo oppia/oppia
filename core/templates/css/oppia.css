@@ -2614,11 +2614,8 @@ div#ng-curtain {
   display: inline-block;
 }
 .navbar-header {
-  align-items: center;
-  display: flex;
   /* Prevent whitespace from inline-block elements from adding space. */
   font-size: 0;
-  height: 56px;
 }
 .nav-link.oppia-navbar-tab,
 .nav-item > div.oppia-navbar-tab {
