@@ -16,11 +16,17 @@
  * @fileoverview Factory for creating instances of Units domain objects.
  */
 
-export interface IUnitsDict {
-  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'units' is a list with varying element types. An exact
-  // type needs to be found for it.
-  units: any;
+export interface IUnit {
+  unit: string;
+  exponent: number;
+}
+
+export interface IUnitsBackendDict {
+  units: Array<IUnit>;
+}
+
+interface UnitsDict {
+  [unit: string]: number;
 }
 
 import { downgradeInjectable } from '@angular/upgrade/static';
@@ -32,15 +38,12 @@ import { ObjectsDomainConstants } from
   'domain/objects/objects-domain.constants';
 
 export class Units {
-  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'units' is a list with varying element types. An exact
-  // type needs to be found for it.
-  units: any;
-  constructor(unitsList: any) {
+  units: IUnit[];
+  constructor(unitsList: IUnit[]) {
     this.units = unitsList;
   }
 
-  toDict(): IUnitsDict {
+  toDict(): IUnitsBackendDict {
     return {
       units: this.units
     };
@@ -94,10 +97,7 @@ export class UnitsObjectFactory {
     return unitList;
   }
 
-  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
-  // 'any' because the return type is a list with varying element types. An
-  // exact type needs to be found for it.
-  unitWithMultiplier(unitList: string[]): any {
+  unitWithMultiplier(unitList: string[]): Array<[string, number]> {
     var multiplier = 1;
     var unitsWithMultiplier = [];
     var parenthesisStack = [];
@@ -131,23 +131,15 @@ export class UnitsObjectFactory {
     return unitsWithMultiplier;
   }
 
-  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'unitDict' is a dict with varying element types. An
-  // exact type needs to be found for it, Once that is found the return type
-  // can also be typed.
-  convertUnitDictToList(unitDict: any): any[] {
-    var unitList = [];
+  convertUnitDictToList(unitDict: UnitsDict): IUnit[] {
+    var unitList: IUnit[] = [];
     for (var key in unitDict) {
       unitList.push({unit: key, exponent: unitDict[key]});
     }
     return unitList;
   }
 
-  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'unitsWithMultiplier' is a dict with varying element types.
-  // An exact type needs to be found for it, Once that is found the return type
-  // can also be typed.
-  unitToList(unitsWithMultiplier: any): any {
+  unitToList(unitsWithMultiplier: Array<[string, number]>): IUnit[] {
     var unitDict = {};
     for (var i = 0; i < unitsWithMultiplier.length; i++) {
       var unit = unitsWithMultiplier[i][0];
@@ -170,17 +162,11 @@ export class UnitsObjectFactory {
     return this.convertUnitDictToList(unitDict);
   }
 
-  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'units' is a list with varying element types. An exact
-  // type needs to be found for it.
-  fromList(unitsList: any): Units {
+  fromList(unitsList: IUnit[]): Units {
     return new Units(unitsList);
   }
 
-  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
-  // 'any' because the return type is to be determined once 'unitToList' has
-  // determined return type.
-  fromStringToList(unitsString: string): any {
+  fromStringToList(unitsString: string): IUnit[] {
     return this.unitToList(
       this.unitWithMultiplier(this.stringToLexical(unitsString)));
   }
@@ -201,10 +187,7 @@ export class UnitsObjectFactory {
     }
   }
 
-  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'units' is a list with varying element types. An exact
-  // type needs to be found for it.
-  toMathjsCompatibleString(units: any): string {
+  toMathjsCompatibleString(units: string): string {
     // Makes the units compatible with the math.js allowed format.
     units = units.replace(/per/g, '/');
 
@@ -242,10 +225,7 @@ export class UnitsObjectFactory {
     return units.trim();
   }
 
-  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'units' is a list with varying element types. An exact
-  // type needs to be found for it.
-  fromRawInputString(units: any): Units {
+  fromRawInputString(units: string): Units {
     try {
       this.createCurrencyUnits();
     } catch (parsingError) {}
