@@ -16,7 +16,7 @@
 
 """Domain objects for topics, and related models."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import absolute_import, print_function  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import copy
@@ -604,6 +604,17 @@ class Topic(python_utils.OBJECT):
         """
         skill_ids = copy.deepcopy(self.uncategorized_skill_ids)
 
+        for subtopic in self.subtopics:
+            skill_ids.extend(copy.deepcopy(subtopic.skill_ids))
+        return skill_ids
+
+    def get_all_skill_ids_and_topic(self):
+        """Returns all the ids of all the skills present in the topic.
+
+        Returns:
+            list(str). The list of all the skill ids present in the topic.
+        """
+        skill_ids = copy.deepcopy(self.uncategorized_skill_ids)
         for subtopic in self.subtopics:
             skill_ids.extend(copy.deepcopy(subtopic.skill_ids))
         return skill_ids

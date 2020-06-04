@@ -1,25 +1,30 @@
 <md-card layout="row" class="list-view-item">
-  Search By Skill
-  <input type="text" class="form-control protractor-test-search-skill-input" placeholder="Enter a skill name" ng-model="skillFilterText">
-</md-card>
-<md-card layout="row" class="list-view-item">
-  <table class="dashboard-table text-break">
+  <table class="dashboard-table">
     <colgroup>
-      <col style="width: 50%;">
+      <col style="width: 5%;">
       <col style="width: 25%;">
-      <col style="width: 25%;">
+      <col style="width: 12%;">
+      <col style="width: 12%;">
+      <col style="width: 15%;">
+      <col style="width: 10%;">
     </colgroup>
     <tr>
       <th ng-repeat="key in SKILL_HEADINGS"
           class="dashboard-table-headings">
-        <p ng-if="key === 'description'"> Skill Description </p>
+        <p ng-if="key === 'index'"></p>
+        <p ng-if="key === 'description'" id="dashboard-table-heading-skills-description"> Skill Description </p>
         <p ng-if="key === 'worked_examples_count'"> Worked Examples </p>
         <p ng-if="key === 'misconception_count'"> Misconceptions </p>
+        <p ng-if="key === 'status'"> Status </p>
+        <p ng-if="key === 'status'"> Options </p>
       </th>
     </tr>
-    <tr ng-repeat="skill in getSkillSummaries() | filter:skillFilterText"
+    <tr ng-repeat="skill in getSkillSummaries() track by $index"
         ng-click="selectSkill(skill)"
         class="list-item protractor-test-skills-list-item">
+      <td>
+        <[getSerialNumberForSkill($index)]>.
+      </td>
       <td ng-class="{'hoverable-cell': highlightedIndex === $index}"
           ng-mouseover="highlightColumns($index)"
           ng-mouseleave="unhighlightColumns()">
@@ -30,35 +35,49 @@
       <td ng-class="{'hoverable-cell': highlightedIndex === $index}"
           ng-mouseover="highlightColumns($index)"
           ng-mouseleave="unhighlightColumns()">
-        <a ng-href="<[getSkillEditorUrl(skill.id)]>" class="list-summary">
+        <a ng-href="<[getSkillEditorUrl(skill.id)]>" class="list-summary text-center">
           <span> <[skill.worked_examples_count]> </span>
         </a>
       </td>
       <td ng-class="{'hoverable-cell': highlightedIndex === $index}"
           ng-mouseover="highlightColumns($index)"
           ng-mouseleave="unhighlightColumns()">
-        <a ng-href="<[getSkillEditorUrl(skill.id)]>" class="list-summary">
+        <a ng-href="<[getSkillEditorUrl(skill.id)]>" class="list-summary text-center">
           <span> <[skill.misconception_count]> </span>
         </a>
       </td>
-      <td ng-if="getEditableTopicSummaries().length > 0 && !isUnpublishedSkill()">
+      <td ng-class="{'hoverable-cell': highlightedIndex === $index}"
+          ng-mouseover="highlightColumns($index)"
+          ng-mouseleave="unhighlightColumns()">
+        <a ng-href="<[getSkillEditorUrl(skill.id)]>" class="list-summary text-center">
+          <span ng-if="skill.topic">
+            Assigned
+          </span>
+          <span ng-if="!skill.topic">
+            Not Assigned
+          </span>
+        </a>
+      </td>
+      <td>
+      <div ng-if="getEditableTopicSummaries().length > 0 && !isUnpublishedSkill()">
         <button class="btn btn-secondary skills-list-action-button
         protractor-test-assign-skill-to-topic-button" ng-click="assignSkillToTopic(skill.id)">
           <span> Assign to Topic </span>
         </button>
-      </td>
-      <td class="merge-skill" ng-if="getMergeableSkillSummaries().length > 0">
+      </div>
+      <div class="merge-skill" ng-if="getMergeableSkillSummaries().length > 0">
         <div class="protractor-test-merge-skills-button merge-skill-icon"
              ng-click="mergeSkill(skill)">
           <span class="material-icons" title="Merge Skill">
             merge_type
           </span>
         </div>
-      </td>
-      <td class="delete-icon">
+      </div>
+      <div class="delete-icon">
         <a ng-if="canDeleteSkill()" ng-click="deleteSkill(skill.id)" class="protractor-test-delete-skill-button">
           <span class="fas fa-trash-alt list-summary"></span>
         </a>
+      </div>
       </td>
     </tr>
   </table>
@@ -70,24 +89,25 @@
 <style>
   skills-list .list-view-item {
     background: #fff;
-    margin: 20px 7.5px 0 12.5%;
-    padding: 10px 20px;
-    width: 75%;
+    box-shadow: none;
+    margin-top: 50px;
   }
 
   skills-list .dashboard-table {
-    display: block;
     font-size: 15px;
-    max-height: 700px;
-    overflow-y: auto;
     width: 100%;
   }
 
   skills-list .dashboard-table .dashboard-table-headings {
     border-bottom: 2px solid #bbb;
+    text-align: center;
     padding-bottom: 0.7em;
   }
-
+  skills-list #dashboard-table-heading-skills-description {
+    text-align: left;
+    width: 100%;
+    display: inline-block;
+  }
   skills-list .dashboard-table .dashboard-table-headings p {
     display: inline;
   }

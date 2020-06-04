@@ -465,6 +465,14 @@ class AdminHandler(base.BaseHandler):
             if self.user.role != feconf.ROLE_ID_ADMIN:
                 raise Exception(
                     'User does not have enough rights to generate data.')
+            for i in range(1, 20):
+                skill_id = skill_services.get_new_skill_id()
+                skill_name = ('Dummy Skill %d' % i)
+                skill = self._create_dummy_skill(
+                    skill_id, skill_name, '<p>Dummy Explanation %d</p>' % i)
+                skill_services.save_new_skill(self.user_id, skill)
+
+
             skill_id = skill_services.get_new_skill_id()
             skill_name = 'Dummy Skill %s' % python_utils.UNICODE(
                 random.getrandbits(32))

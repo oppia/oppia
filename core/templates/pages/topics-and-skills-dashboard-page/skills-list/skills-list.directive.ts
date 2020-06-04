@@ -42,6 +42,8 @@ angular.module('oppia').directive('skillsList', [
       restrict: 'E',
       scope: {
         getSkillSummaries: '&skillSummaries',
+        getPageNumber: '&pageNumber',
+        getItemsPerPage: '&itemsPerPage',
         getEditableTopicSummaries: '&editableTopicSummaries',
         getMergeableSkillSummaries: '&mergeableSkillSummaries',
         canDeleteSkill: '&userCanDeleteSkill',
@@ -204,10 +206,17 @@ angular.module('oppia').directive('skillsList', [
             });
           };
 
+          $scope.getSerialNumberForSkill = function(skillIndex) {
+            var skillSerialNumber = (
+              skillIndex + ($scope.getPageNumber() * $scope.getItemsPerPage()));
+            return (skillSerialNumber + 1);
+          };
+
+
           ctrl.$onInit = function() {
             $scope.SKILL_HEADINGS = [
-              'description', 'worked_examples_count', 'misconception_count'
-            ];
+              'index', 'description', 'worked_examples_count',
+              'misconception_count', 'status'];
             $scope.highlightedIndex = null;
           };
         }

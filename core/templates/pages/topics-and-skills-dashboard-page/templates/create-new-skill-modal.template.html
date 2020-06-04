@@ -1,15 +1,15 @@
 <div class="modal-header">
-  <h3>Create New Skill</h3>
+  <h3>New Skill</h3>
 </div>
 
 <form ng-submit="createNewSkill()">
   <div class="modal-body">
     <div class="oppia-rule-details-header" style="margin-bottom: 0.5em; margin-top: 1em;">
-      <strong>New Skill Description</strong>
+      <strong>Skill Description</strong>
     </div>
     <input type="text" class="form-control protractor-test-new-skill-description-field"
-           placeholder="eg: Adding Fractions" ng-change="resetErrorMsg()" ng-model="newSkillDescription"
-           autofocus maxlength="<[MAX_CHARS_IN_SKILL_DESCRIPTION]>">
+           placeholder="eg: Adding Fractions" ng-change="updateSkillDescription()" ng-model="newSkillDescription"
+           maxlength="<[MAX_CHARS_IN_SKILL_DESCRIPTION]>" autofocus>
     <span class="oppia-input-box-subtitle">
       <i>
         Skill description should be at most <[MAX_CHARS_IN_SKILL_DESCRIPTION]> characters.
@@ -20,21 +20,22 @@
         <[errorMsg]>
       </i>
     </span>
-    <div class="oppia-rule-details-header" style="margin-bottom: 0.5em; margin-top: 1em;">
+    <div class="oppia-rule-details-header" style="margin-bottom: 0.5em; margin-top: 1em;" ng-click="openConceptCardExplanationEditor()">
       <strong>Review Material</strong>
+      <div class="oppia-input-box-subtitle">
+      <i>
+        This gives the learner a brief overview of how to perform the skill.
+      </i>
+        <i class="fa fa-pen"></i>
     </div>
-    <review-material-editor bindable-dict="bindableDict"
-                            on-save-explanation="onSaveExplanation">
-    </review-material-editor>
-    <div class="oppia-rule-details-header" style="margin-bottom: 0.5em; margin-top: 1em;">
-      <strong>Add Skill Rubrics</strong>
     </div>
-    <rubrics-editor rubrics="rubrics"
-                    on-save-rubric="onSaveRubric"
-                    new-skill-being-created="true">
-    </rubrics-editor>
-  </div>
 
+    <div ng-if="conceptCardExplanationEditorIsShown">
+      <schema-based-editor schema="HTML_SCHEMA" class="protractor-test-concept-card-text"
+                           local-value="bindableDict.displayedConceptCardExplanation">
+      </schema-based-editor>
+    </div>
+  </div>
   <div class="modal-footer">
     <button class="btn btn-secondary" ng-click="cancel()" type="button">Cancel</button>
     <button class="btn btn-success protractor-test-confirm-skill-creation-button"

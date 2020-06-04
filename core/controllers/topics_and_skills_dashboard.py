@@ -16,7 +16,7 @@
 are created.
 """
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import absolute_import, print_function  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.controllers import acl_decorators
@@ -50,16 +50,32 @@ class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
 
+        order = self.request.get('order')
+        limit = self.request.get('limit')
+        offset = self.request.get('offset')
+
         topic_summaries = topic_services.get_all_topic_summaries()
         topic_summary_dicts = [
             summary.to_dict() for summary in topic_summaries]
 
-        skill_summaries = skill_services.get_all_skill_summaries()
+        skill_summaries = skill_services.get_skills_in_batches(order, limit, offset)
         skill_summary_dicts = [
             summary.to_dict() for summary in skill_summaries]
 
         skill_ids_assigned_to_some_topic = (
             topic_services.get_all_skill_ids_assigned_to_some_topic())
+        skill_ids_assigned_to_some_topic_with_topic_details = (
+            topic_services.get_all_skill_ids_assigned_to_some_topic_with_topic_name())
+
+        assigned_skill_dicts = []
+
+        for assigned_skill in skill_ids_assigned_to_some_topic_with_topic_details:
+            assigned_skill_dict = (
+                skill_services.get_skill_summary_by_id(assigned_skill[0]).to_dict())
+            assigned_skill_dict['category'] = assigned_skill[1]
+            assigned_skill_dict['topic'] = assigned_skill[2]
+            assigned_skill_dicts.append(assigned_skill_dict)
+
         merged_skill_ids = (
             skill_services.get_merged_skill_ids())
         topic_rights_dict = topic_services.get_all_topic_rights()
@@ -101,6 +117,7 @@ class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
             'untriaged_skill_summary_dicts': untriaged_skill_summary_dicts,
             'mergeable_skill_summary_dicts': mergeable_skill_summary_dicts,
             'topic_summary_dicts': topic_summary_dicts,
+            'assigned_skill_summary_dicts': assigned_skill_dicts,
             'can_delete_topic': can_delete_topic,
             'can_create_topic': can_create_topic,
             'can_delete_skill': can_delete_skill,

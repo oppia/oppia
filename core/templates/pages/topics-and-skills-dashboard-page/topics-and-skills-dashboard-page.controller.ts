@@ -101,8 +101,9 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
            * @param {Boolean} stayInSameTab - To stay in the same tab or not.
            */
           ctrl._initDashboard = function(stayInSameTab) {
-            TopicsAndSkillsDashboardBackendApiService.fetchDashboardData().then(
+            TopicsAndSkillsDashboardBackendApiService.fetchDashboardData('order by created by', 10, 30).then(
               function(response) {
+                console.log(response);
                 ctrl.totalTopicSummaries = response.topic_summary_dicts;
                 ctrl.topicSummaries = response.topic_summary_dicts;
                 ctrl.totalEntityCountToDisplay = ctrl.topicSummaries.length;
@@ -116,6 +117,7 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
                 );
                 ctrl.untriagedSkillSummaries =
                     response.untriaged_skill_summary_dicts;
+                ctrl.totalSkillSummaries = [...response.untriaged_skill_summary_dicts, ...response.assigned_skill_summary_dicts];
                 ctrl.totalUntriagedSkillSummaries =
                     ctrl.untriagedSkillSummaries;
                 ctrl.mergeableSkillSummaries =
@@ -168,16 +170,7 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
           };
 
           ctrl.createSkill = function() {
-            $uibModal.open({
-              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/topics-and-skills-dashboard-page/templates/' +
-                'create-new-skill-modal.template.html'),
-              backdrop: 'static',
-              controller: 'CreateNewSkillModal'
-            }).result.then(function(result) {
-              SkillCreationService.createNewSkill(
-                result.description, result.rubrics, result.explanation, []);
-            });
+            SkillCreationService.createSkill();
           };
           /**
            * @param {Number} pageNumber - Page number to navigate to.
@@ -192,11 +185,11 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
                     (pageNumber + 1) * ctrl.itemsPerPage);
             } else if (ctrl.activeTab === ctrl.TAB_NAME_UNTRIAGED_SKILLS) {
               ctrl.totalEntityCountToDisplay =
-                  ctrl.totalUntriagedSkillSummaries.length;
+                  ctrl.totalSkillSummaries.length;
               ctrl.skillPageNumber = pageNumber;
               ctrl.pageNumber = ctrl.skillPageNumber;
-              ctrl.untriagedSkillSummaries =
-                  ctrl.totalUntriagedSkillSummaries.slice(
+              ctrl.displayedSkillSummaries =
+                  ctrl.totalSkillSummaries.slice(
                     pageNumber * ctrl.itemsPerPage,
                     (pageNumber + 1) * ctrl.itemsPerPage);
             }
@@ -259,7 +252,7 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
             ctrl.itemsPerPage = 10;
             ctrl.skillPageNumber = 0;
             ctrl.selectedIndex = null;
-            ctrl.itemsPerPageChoice = [10, 15, 20];
+            ctrl.itemsPerPageChoice = [10, 15, 20, 50];
             ctrl.filterObject = (
               TopicsAndSkillsDashboardFilterObjectFactory.createDefault());
             ctrl.categories = angular.copy(ALLOWED_TOPIC_CATEGORIES);

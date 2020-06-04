@@ -75,9 +75,15 @@ export interface ITopicSummaryBackendDict {
 export class TopicsAndSkillsDashboardBackendApiService {
   constructor(private http: HttpClient) {}
 
-  fetchDashboardData(): Promise<ITopicsAndSkillsDashboardDataBackendDict> {
+  fetchDashboardData(order, limit, offset): Promise<ITopicsAndSkillsDashboardDataBackendDict> {
     return this.http.get<ITopicsAndSkillsDashboardDataBackendDict>(
-      '/topics_and_skills_dashboard/data').toPromise();
+      '/topics_and_skills_dashboard/data', {
+        params: {
+          order: order,
+          limit: limit,
+          offset: offset
+        }
+      }).toPromise();
   }
 
   mergeSkills(oldSkillId:string, newSkillId:string): Promise<void> {

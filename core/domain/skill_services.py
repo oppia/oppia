@@ -229,6 +229,22 @@ def get_all_skill_summaries():
     return skill_summaries
 
 
+def get_skills_in_batches(order, limit, offset):
+    skill_summaries_models, dummy = skill_models.SkillSummaryModel.get_in_batches(
+        order, limit, offset)
+    skill_summaries = [
+        get_skill_summary_from_model(summary)
+        for summary in skill_summaries_models]
+
+    # for item in dummy:
+    #     print (item)
+    # skill_summaries2 = [
+    #     get_skill_summary_from_model(s)
+    #     for s in dummy]
+    # print(skill_summaries2)
+    return skill_summaries
+
+
 def get_multi_skill_summaries(skill_ids):
     """Returns a list of skill summaries matching the skill IDs provided.
 
