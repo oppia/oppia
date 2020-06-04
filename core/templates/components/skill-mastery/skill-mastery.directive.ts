@@ -70,7 +70,8 @@ angular.module('oppia').directive('skillMasteryViewer', [
 
             SkillMasteryBackendApiService.fetchSkillMasteryDegrees(
               [ctrl.skillId]).then(function(degreesOfMastery) {
-              ctrl.skillMasteryDegree = degreesOfMastery[ctrl.skillId];
+              ctrl.skillMasteryDegree = degreesOfMastery.getMasteryDegree(
+                ctrl.skillId);
             });
           };
         }

@@ -21,12 +21,15 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
 import { SkillDomainConstants } from 'domain/skill/skill-domain.constants';
+import { SkillMasteryObjectFactory } from './SkillMasteryObjectFactory';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SkillMasteryBackendApiService {
-  constructor(private httpClient: HttpClient) {}
+  constructor(
+    private httpClient: HttpClient,
+    private skillMasteryObjectFactory: SkillMasteryObjectFactory) {}
 
   _fetchSkillMasteryDegrees(skillIds: Array<string>,
       successCallback: (value?: Object | PromiseLike<Object>) => void,
@@ -37,7 +40,9 @@ export class SkillMasteryBackendApiService {
       }
     }).toPromise().then((response: any) => {
       if (successCallback) {
-        successCallback(response.degrees_of_mastery);
+        let skillMastery = this.skillMasteryObjectFactory
+          .createFromBackendDict(response.degrees_of_mastery);
+        successCallback(skillMastery);
       }
     }, (errorResponse) =>{
       if (errorCallback) {
