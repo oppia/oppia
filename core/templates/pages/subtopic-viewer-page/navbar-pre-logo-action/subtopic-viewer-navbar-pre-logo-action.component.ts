@@ -35,7 +35,6 @@ angular.module('oppia').component('subtopicViewerNavbarPreLogoAction', {
           TOPIC_VIEWER_URL_TEMPLATE, {
             topic_name: ctrl.topicName
           });
-        console.log(ctrl.topicUrl);
       };
     }]
 });

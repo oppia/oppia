@@ -44,6 +44,6 @@ describe('subtopic viewer pre logo action', function() {
 
   it('should set the topic url from the topic name correctly', function() {
     ctrl.$onInit();
-    expect(ctrl.getTopicUrl()).toEqual('/topic/Topic%20Name');
+    expect(ctrl.topicUrl).toEqual('/topic/Topic%20Name');
   });
 });
