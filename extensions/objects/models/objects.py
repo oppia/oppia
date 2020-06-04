@@ -20,7 +20,9 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import copy
+import string
 
+from core.domain import expression_parser
 import python_utils
 import schema_utils
 
@@ -1050,8 +1052,6 @@ class DragAndDropPositiveInt(BaseObject):
 class AlgebraicExpression(BaseObject):
     """Class for algebraic expressions. Stores a unicode string representing a
     valid algebraic expression.
-    The expression should be in the ASCIIMath format.
-    More info: http://asciimath.org/
     """
 
     description = 'A unicode string for an algebraic expression.'
@@ -1060,38 +1060,31 @@ class AlgebraicExpression(BaseObject):
     SCHEMA = {
         'type': 'unicode',
         'validators': [{
-            'id': 'is_valid_asciimath_expression',
+            'id': 'is_valid_math_expression',
             'algebraic': True
         }]
     }
 
 
-class SetOfPlaceholders(BaseObject):
-    """Class for set of placeholders. Placeholders are latin letters that are
+class Placeholder(BaseObject):
+    """Class for a placeholder. Placeholders are latin letters that are
     used in Math Interactions.
     A placeholder could be an english alphabet (uppercase/lowercase) or a greek
-    letter represented as a single word. Valid greek letters are present in the
-    GREEK_LETTERS constant in schema_utils.py.
+    letter represented as a single word.
     """
 
-    description = 'A set (a list with unique elements) of placeholders.'
-    default_value = []
+    description = 'A string representing a placeholder.'
+    default_value = 'a'
 
     SCHEMA = {
-        'type': 'list',
-        'items': UnicodeString.SCHEMA,
-        'validators': [{
-            'id': 'is_uniquified'
-        }, {
-            'id': 'contains_valid_placeholders'
-        }]
+        'type': 'unicode',
+        'choices': list(string.ascii_letters) + expression_parser.GREEK_LETTERS
     }
 
 
 class MathEquation(BaseObject):
     """Class for math equations. Stores a unicode string representing a
-    valid math equation. The expression should be in the ASCIIMath format.
-    More info: http://asciimath.org/
+    valid math equation.
     """
 
     description = 'A unicode string for a math equation.'

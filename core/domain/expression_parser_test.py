@@ -112,6 +112,8 @@ class ParserUnitTests(test_utils.GenericTestBase):
             '(a+ b)^2 - (c+d) ^ 3'))
 
         self.assertTrue(expression_parser.is_valid_expression('3+2'))
+        self.assertTrue(expression_parser.is_valid_expression('---+34'))
+        self.assertTrue(expression_parser.is_valid_expression('---(3/+4)'))
         self.assertTrue(expression_parser.is_valid_expression('3+2^3'))
         self.assertTrue(expression_parser.is_valid_expression('(5-2^[6+3])'))
         self.assertTrue(expression_parser.is_valid_expression('(-5)^(-1)/2'))
@@ -135,6 +137,7 @@ class ParserUnitTests(test_utils.GenericTestBase):
 
 
         self.assertFalse(expression_parser.is_valid_expression('a+b/'))
+        self.assertFalse(expression_parser.is_valid_expression('2x + 3/2'))
         self.assertFalse(expression_parser.is_valid_expression('(352+)-3*x'))
         self.assertFalse(expression_parser.is_valid_expression('ab/2'))
         self.assertFalse(expression_parser.is_valid_expression('Alpha/2'))

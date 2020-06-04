@@ -390,10 +390,9 @@ class _Validators(python_utils.OBJECT):
         return bool(re.search(r'^[\w\.\+\-]+\@[\w]+\.[a-z]{2,3}$', obj))
 
     @staticmethod
-    def is_valid_asciimath_expression(obj, algebraic=True):
+    def is_valid_math_expression(obj, algebraic=True):
         """Checks if the given obj (a string) represents a valid algebraic or
-        numeric expression. The expression should be in the ASCIIMath format.
-        More info: http://asciimath.org/
+        numeric expression.
 
         Args:
             obj: str. The given expression.
@@ -414,32 +413,8 @@ class _Validators(python_utils.OBJECT):
         return not algebraic ^ expression_is_algebraic
 
     @staticmethod
-    def contains_valid_placeholders(obj):
-        """Returns True iff all elements of the given object (a list) are
-        valid placeholders. A placeholder could be a single latin letter
-        (uppercase/lowercase) or a greek letter represented as a single word.
-        Valid greek letters are present in the GREEK_LETTERS constant
-        in expression_parser.py.
-
-        Args:
-            obj: list(*). A list of strings.
-
-        Returns:
-            bool. Whether the given object contains valid placeholders.
-        """
-        for ele in obj:
-            if ele.isalpha() and len(ele) == 1:
-                continue
-            if ele in expression_parser.GREEK_LETTERS:
-                continue
-            return False
-        return True
-
-    @staticmethod
     def is_valid_math_equation(obj):
         """Checks if the given  obj (a string) represents a valid math equation.
-        The expression should be in the ASCIIMath format.
-        More info: http://asciimath.org/
 
         Args:
             obj: str. A string.
@@ -450,18 +425,18 @@ class _Validators(python_utils.OBJECT):
         if obj.count('=') != 1:
             return False
 
-        is_valid_asciimath_expression = get_validator(
-            'is_valid_asciimath_expression')
+        is_valid_math_expression = get_validator(
+            'is_valid_math_expression')
         lhs, rhs = obj.split('=')
 
         # Both sides have to be valid expressions and at least one of them has
         # to be a valid algebraic expression.
-        lhs_is_algebraically_valid = is_valid_asciimath_expression(lhs)
-        rhs_is_algebraically_valid = is_valid_asciimath_expression(rhs)
+        lhs_is_algebraically_valid = is_valid_math_expression(lhs)
+        rhs_is_algebraically_valid = is_valid_math_expression(rhs)
 
-        lhs_is_numerically_valid = is_valid_asciimath_expression(
+        lhs_is_numerically_valid = is_valid_math_expression(
             lhs, algebraic=False)
-        rhs_is_numerically_valid = is_valid_asciimath_expression(
+        rhs_is_numerically_valid = is_valid_math_expression(
             rhs, algebraic=False)
 
         if lhs_is_algebraically_valid and rhs_is_algebraically_valid:

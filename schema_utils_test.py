@@ -150,8 +150,7 @@ VALIDATOR_SPECS = {
                 }],
             }
         },
-        'is_uniquified': {},
-        'contains_valid_placeholders': {}
+        'is_uniquified': {}
     },
     SCHEMA_TYPE_UNICODE: {
         'matches_regex': {
@@ -165,7 +164,7 @@ VALIDATOR_SPECS = {
         'is_nonempty': {},
         'is_regex': {},
         'is_valid_email': {},
-        'is_valid_asciimath_expression': {
+        'is_valid_math_expression': {
             'algebraic': {
                 'type': SCHEMA_TYPE_BOOL
             }
@@ -482,40 +481,24 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
             schema_utils.get_validator('some invalid validator method name')
 
     def test_is_valid_algebraic_expression_validator(self):
-        """Tests for the is_valid_asciimath_expression static method with
+        """Tests for the is_valid_math_expression static method with
         algebraic type.
         """
-        is_valid_asciimath_expression = schema_utils.get_validator(
-            'is_valid_asciimath_expression')
+        is_valid_math_expression = schema_utils.get_validator(
+            'is_valid_math_expression')
 
-        self.assertTrue(is_valid_asciimath_expression('a+b*2'))
-        self.assertFalse(is_valid_asciimath_expression('3+4/2'))
+        self.assertTrue(is_valid_math_expression('a+b*2'))
+        self.assertFalse(is_valid_math_expression('3+4/2'))
 
     def test_is_valid_numeric_expression_validator(self):
-        """Tests for the is_valid_asciimath_expression static method with
+        """Tests for the is_valid_math_expression static method with
         numeric type.
         """
-        is_valid_asciimath_expression = schema_utils.get_validator(
-            'is_valid_asciimath_expression')
+        is_valid_math_expression = schema_utils.get_validator(
+            'is_valid_math_expression')
 
-        self.assertFalse(is_valid_asciimath_expression('a+b*2', False))
-        self.assertTrue(is_valid_asciimath_expression('3+4/2', False))
-
-    def test_contains_valid_placeholders(self):
-        """Tests for the contains_valid_placeholders static method."""
-        contains_valid_placeholders = schema_utils.get_validator(
-            'contains_valid_placeholders')
-
-        self.assertTrue(contains_valid_placeholders([]))
-        self.assertTrue(contains_valid_placeholders(['a', 'z', 'alpha']))
-        self.assertTrue(contains_valid_placeholders(['a', 'Z', 'pi']))
-        self.assertTrue(contains_valid_placeholders(['A', 'Z']))
-
-        self.assertFalse(contains_valid_placeholders(['A', '']))
-        self.assertFalse(contains_valid_placeholders(['Alpha', 'b']))
-        self.assertFalse(contains_valid_placeholders(['a', '1']))
-        self.assertFalse(contains_valid_placeholders(['A', 'Bc']))
-        self.assertFalse(contains_valid_placeholders(['3', 'a']))
+        self.assertFalse(is_valid_math_expression('a+b*2', False))
+        self.assertTrue(is_valid_math_expression('3+4/2', False))
 
     def test_is_valid_math_equation_validator(self):
         """Tests for the is_valid_math_equation static method."""
