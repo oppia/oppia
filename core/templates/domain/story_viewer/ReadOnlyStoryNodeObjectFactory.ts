@@ -87,7 +87,6 @@ export class ReadOnlyStoryNode {
   }
 
   isCompleted(): boolean {
-    if(this._id === 'node_1') return true;
     return this._completed;
   }
 
