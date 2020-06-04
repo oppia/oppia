@@ -35,6 +35,7 @@ require(
   'pages/community-dashboard-page/services/' +
   'contribution-and-review.service.ts');
 require('services/alerts.service.ts');
+require('services/context.service.ts');
 require('services/suggestion-modal.service.ts');
 
 angular.module('oppia').directive('contributionsAndReview', [
@@ -49,11 +50,13 @@ angular.module('oppia').directive('contributionsAndReview', [
         'contributions-and-review.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$filter', '$uibModal', 'AlertsService', 'ContributionAndReviewService',
-        'QuestionObjectFactory', 'UserService',
+        '$filter', '$uibModal', 'AlertsService', 'ContextService',
+        'ContributionAndReviewService', 'QuestionObjectFactory', 'UserService',
+        'ENTITY_TYPE',
         function(
-            $filter, $uibModal, AlertsService, ContributionAndReviewService,
-            QuestionObjectFactory, UserService) {
+            $filter, $uibModal, AlertsService, ContextService,
+            ContributionAndReviewService, QuestionObjectFactory, UserService,
+            ENTITY_TYPE) {
           var ctrl = this;
           var SUGGESTION_LABELS = {
             review: {
@@ -262,6 +265,10 @@ angular.module('oppia').directive('contributionsAndReview', [
           var _showTranslationSuggestionModal = function(
               targetId, suggestionId, contentHtml, translationHtml,
               reviewable) {
+            // We need to set the context here so that the rte fetches images
+            // for the given ENTITY_TYPE and targetId.
+            ContextService.setCustomEntityContext(
+              ENTITY_TYPE.EXPLORATION, targetId);
             var _templateUrl = UrlInterpolationService.getDirectiveTemplateUrl(
               '/pages/community-dashboard-page/modal-templates/' +
               'translation-suggestion-review.directive.html');
