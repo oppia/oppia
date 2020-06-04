@@ -24,7 +24,8 @@ import { UtilsService } from 'services/utils.service';
 
 /**
  * Commonly used terms in this file.
- * Note: Intentionally left out the L of innerHTM"L" to avoid the linting error.
+ * Note: Intentionally left out the L of innerHTM"L" (only in this file) to
+ * avoid the linting errors.
  * Example: <h1 [innerHTM]="'I18N_ABOUT_PAGE_HEADING' | translate:{x: 'val'}">
  * 'I18N_ABOUT_PAGE_HEADING' is referred here as key.
  * "translate" is the pipe. Every pipe must have a transform function. The
@@ -46,7 +47,7 @@ export class TranslatePipe implements PipeTransform, OnDestroy {
 
   constructor(
     private translate: TranslateService,
-    private _ref: ChangeDetectorRef,
+    private ref: ChangeDetectorRef,
     private utils: UtilsService
   ) {}
 
@@ -55,18 +56,13 @@ export class TranslatePipe implements PipeTransform, OnDestroy {
    * @param {Object} interpolateParams - Params for interpolation
    */
   updateInterpolatedValue(key: string, interpolateParams?: Object): void {
-    const interpolatedString = this.translate.getInterpolatedString(
+    this.interpolatedValue = this.translate.getInterpolatedString(
       key, interpolateParams);
-
-    // Using multiline ternary (https://eslint.org/docs/rules/multiline-ternary).
-    this.interpolatedValue = interpolatedString !== undefined ?
-    interpolatedString :
-    key;
 
     // Storing the key to check if the key is same when the transform is invoked
     // again.
     this.lastKey = key;
-    this._ref.markForCheck();
+    this.ref.markForCheck();
   }
 
   /**
@@ -74,22 +70,21 @@ export class TranslatePipe implements PipeTransform, OnDestroy {
    * @param {Object} params - params for interpolation
    * @returns {string} - Interpolated I18n value
    */
-  transform(key: string, params?: Object): string {
+  transform(key: string, params?: Object | undefined): string {
     if (!key || !key.length) {
       return key;
     }
 
     // If the key and params are same, return the last stored value.
-    if (key === this.lastKey &&
-          this.utils.isEquivalent(params, this.lastParams)) {
+    if (
+      key === this.lastKey &&
+      this.utils.isEquivalent(params, this.lastParams)) {
       return this.interpolatedValue;
     }
 
     let interpolateParams: Object;
-    if (this.utils.isDefined(params)) {
-      if (typeof params === 'object' && !Array.isArray(params)) {
-        interpolateParams = params;
-      }
+    if (this.utils.isDefined(params) && !Array.isArray(params)) {
+      interpolateParams = params;
     }
 
     // Storing the key to check if the key is same when the transform is invoked
@@ -104,7 +99,7 @@ export class TranslatePipe implements PipeTransform, OnDestroy {
     this.updateInterpolatedValue(key, interpolateParams);
 
     // If there is a subscription to onLangChange, unsubscribe.
-    this._dispose();
+    this.dispose();
     // Subscribe to onLangChange event, in case the language changes.
     if (!this.onLangChange) {
       this.onLangChange = this.translate.onLangChange.subscribe(
@@ -119,7 +114,7 @@ export class TranslatePipe implements PipeTransform, OnDestroy {
   /**
    * Clean up any existing subscription to change events
    */
-  private _dispose(): void {
+  private dispose(): void {
     if (typeof this.onLangChange === 'undefined') {
       return;
     }
@@ -128,6 +123,6 @@ export class TranslatePipe implements PipeTransform, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this._dispose();
+    this.dispose();
   }
 }

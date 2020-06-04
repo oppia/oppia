@@ -23,19 +23,20 @@ import { EventEmitter, NO_ERRORS_SCHEMA, Pipe, PipeTransform }
 import { AboutPageComponent } from './about-page.component';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { TranslateService } from 'services/translate.service';
-import { UtilsService } from 'services/utils.service';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
+import { UtilsService } from 'services/utils.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
+import { TranslatePipe } from 'filters/translate.pipe';
 
 @Pipe({name: 'translate'})
-class MockTranslatePipe implements PipeTransform {
-  transform(value: string, ...args):string {
+class MockTranslatePipe extends TranslatePipe {
+  transform(value: string, params: Object | undefined):string {
     return value;
   }
 }
 
-class MockTranslateService {
+class MockTranslateService extends TranslateService {
   code = 'es';
   use(lang: string): string {
     this.code = lang;
@@ -43,7 +44,7 @@ class MockTranslateService {
   }
 }
 
-class MockI18nLanguageCodeService {
+class MockI18nLanguageCodeService extends I18nLanguageCodeService {
   codeChange = new EventEmitter<string>();
   getCurrentI18nLanguageCode() {
     return 'en';
@@ -89,9 +90,9 @@ let component: AboutPageComponent;
 let fixture: ComponentFixture<AboutPageComponent>;
 
 describe('About Page', function() {
-  let windowRef: MockWindowRef;
   let i18n = null;
   let translate = null;
+  let windowRef: MockWindowRef;
 
   beforeEach(() => {
     windowRef = new MockWindowRef();

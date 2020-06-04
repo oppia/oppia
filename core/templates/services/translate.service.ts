@@ -22,7 +22,8 @@ import { UtilsService } from './utils.service';
 
 /**
  * Commonly used terms in this file.
- * Note: Intentionally left out the L of innerHTM"L" to avoid the linting error.
+ * Note: Intentionally left out the L of innerHTM"L" (only in this file) to
+ * avoid the linting error.
  * Example: <h1 [innerHTM]="'I18N_ABOUT_PAGE_HEADING' | translate:{x: 'Oppia'}">
  * 'I18N_ABOUT_PAGE_HEADING' is referred here as key or key.
  * "translate" is the pipe.
@@ -112,7 +113,7 @@ export class TranslateService {
    * Gets the translatedValue corresponding to the key and returns the
    * interpolated string of the translatedValue using the interpolateParams.
    * @param {string} key - key for i18n translation
-   * @param interpolateParams - params for interpolation
+   * @param {Object} interpolateParams - params for interpolation
    * @returns {string} - interpolated string of the translatedValue
    * corresponding to the key.
    */
