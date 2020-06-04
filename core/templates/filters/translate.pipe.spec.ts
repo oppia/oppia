@@ -16,8 +16,9 @@
  * @fileoverview Unit tests for the translate pipe.
  */
 
-import { async, TestBed } from '@angular/core/testing';
-import { EventEmitter, ChangeDetectorRef } from '@angular/core';
+import { async, TestBed, ComponentFixture, fakeAsync }
+  from '@angular/core/testing';
+import { EventEmitter, ChangeDetectorRef, Component } from '@angular/core';
 
 import { TranslateService } from 'services/translate.service';
 import { TranslatePipe } from './translate.pipe';
@@ -37,7 +38,8 @@ class MockTranslateService {
   }
   translations = {
     I18n_t_1: 'Hello',
-    I18n_t_2: 'Hello <[val]>'
+    I18n_t_2: 'Hello <[val]>',
+    I18n_rogue: '<script>alert(\'Oppia\');</script>Hello'
   };
 
   getInterpolatedString(key: string,
@@ -91,4 +93,40 @@ describe('TranslatePipe', () => {
     pipe = new TranslatePipe(
       translateService, changeDecRef, new UtilsService());
   });
+});
+
+@Component({
+  // eslint-disable-next-line angular/no-inline-template
+  template: '<h1 [innerHTML] = "\'I18n_rogue\' | translate"></h1>'
+})
+class MockComponent { }
+
+describe('Angular', () => {
+  let component: MockComponent;
+  let fixture: ComponentFixture<MockComponent>;
+
+  beforeEach(async(() => {
+    TestBed.configureTestingModule({
+      declarations: [
+        TranslatePipe,
+        MockComponent
+      ],
+      providers: [
+        { provide: TranslateService, useClass: MockTranslateService },
+        { provide: ChangeDetectorRef, useClass: MockChangeDetectorRef}
+      ]
+    }).compileComponents();
+    fixture = TestBed.createComponent(MockComponent);
+    component = fixture.componentInstance;
+  }));
+
+  it('should sanitize translations', fakeAsync(() => {
+    const compiledComponent = fixture.debugElement.nativeElement;
+    // The DOM should be empty for now since the translations haven't
+    // been rendered yet
+    expect(compiledComponent.querySelector('h1').textContent).toEqual('');
+    fixture.detectChanges();
+    // The content should be stripped of <script>...<script>
+    expect(compiledComponent.querySelector('h1').textContent).toEqual('Hello');
+  }));
 });

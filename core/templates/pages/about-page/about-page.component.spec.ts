@@ -27,7 +27,6 @@ import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { UtilsService } from 'services/utils.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
-import { TranslatePipe } from 'filters/translate.pipe';
 
 @Pipe({name: 'translate'})
 class MockTranslatePipe {
