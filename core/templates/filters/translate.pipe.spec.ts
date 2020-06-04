@@ -39,7 +39,8 @@ class MockTranslateService {
   translations = {
     I18n_t_1: 'Hello',
     I18n_t_2: 'Hello <[val]>',
-    I18n_rogue: '<script>alert(\'Oppia\');</script>Hello'
+    I18n_rogue_1: '<script>alert(\'Oppia\');</script>Hello',
+    I18n_rogue_2: '<oppia-img>Me</oppia-img>Hola'
   };
 
   getInterpolatedString(key: string,
@@ -95,9 +96,13 @@ describe('TranslatePipe', () => {
   });
 });
 
+// Adding the following two lines for reference.
+// I18n_rogue_1: '<script>alert(\'Oppia\');</script>Hello',
+// I18n_rogue_2: '<oppia-img>Me</oppia-img>Hola'
 @Component({
-  // eslint-disable-next-line angular/no-inline-template
-  template: '<h1 [innerHTML] = "\'I18n_rogue\' | translate"></h1>'
+  // eslint-disable-next-line no-multi-str, angular/no-inline-template
+  template: '<h1 [innerHTML] = "\'I18n_rogue_1\' | translate"></h1>\
+              <h2 [innerHTML] = "\'I18n_rogue_2\' | translate"></h2>'
 })
 class MockComponent { }
 
@@ -125,8 +130,14 @@ describe('Angular', () => {
     // The DOM should be empty for now since the translations haven't
     // been rendered yet
     expect(compiledComponent.querySelector('h1').textContent).toEqual('');
+    expect(compiledComponent.querySelector('h2').textContent).toEqual('');
     fixture.detectChanges();
-    // The content should be stripped of <script>...<script>
+
+    // The content in h1 should be stripped of <script>...</script>
     expect(compiledComponent.querySelector('h1').textContent).toEqual('Hello');
+
+    // The content in h2 shouldn't have oppia-img tags but it should contain the
+    // safe text within the tag.
+    expect(compiledComponent.querySelector('h2').textContent).toEqual('MeHola');
   }));
 });
