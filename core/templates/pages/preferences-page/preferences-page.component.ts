@@ -140,6 +140,14 @@ angular.module('oppia').component('preferencesPage', {
         _saveDataItem('default_dashboard', defaultDashboard);
       };
 
+      ctrl.exportingData = false;
+
+      ctrl.handleExportDataClick = function() {
+          if (ctrl.exportingData === false) {
+              ctrl.exportingData = true
+          }
+      }
+
       ctrl.showEditProfilePictureModal = function() {
         $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
