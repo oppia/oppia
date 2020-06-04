@@ -144,7 +144,7 @@ describe('Url Service', () => {
 
   it('should correctly retrieve selected subtopics from url', () => {
     mockLocation.pathname = '/practice_session/topicName';
-    mockLocation.search = '?selected_subtopics=abcdefgijklm';
+    mockLocation.search = '?selected_subtopic_ids=abcdefgijklm';
     expect(
       urlService.getSelectedSubtopicsFromUrl()
     ).toBe('abcdefgijklm');
@@ -153,7 +153,7 @@ describe('Url Service', () => {
       urlService.getSelectedSubtopicsFromUrl();
     }).toThrowError('Invalid URL for practice session');
     mockLocation.pathname = '/practice_session/topicName';
-    mockLocation.search = '?selected_subtopicsabcdefgijklm';
+    mockLocation.search = '?selected_subtopic_idsabcdefgijklm';
     expect(function() {
       urlService.getSelectedSubtopicsFromUrl();
     }).toThrowError('Invalid URL for practice session');
