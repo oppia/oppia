@@ -222,7 +222,9 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
     {
         'regexp': re.compile(r'innerHTML'),
         'message': 'Please do not use innerHTML property.',
-        'excluded_files': ('core/templates/Polyfills.ts',),
+        'excluded_files': (
+            'core/templates/Polyfills.ts',
+            'core/templates/filters/translate.pipe.spec.ts'),
         'excluded_dirs': ('core/tests/',)
     }
 ]
