@@ -20,12 +20,20 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { SubtopicPageContents, SubtopicPageContentsObjectFactory } from
-  'domain/topic/SubtopicPageContentsObjectFactory';
+import {
+  ISubtopicPageContentsBackendDict,
+  SubtopicPageContents,
+  SubtopicPageContentsObjectFactory
+} from 'domain/topic/SubtopicPageContentsObjectFactory';
+
+export interface ISubtopicDataBackendDict {
+  'subtopic_title': string;
+  'page_contents': ISubtopicPageContentsBackendDict;
+}
 
 export class ReadOnlySubtopicPageData {
-  subtopicTitle;
-  pageContents;
+  subtopicTitle: string;
+  pageContents: SubtopicPageContents;
 
   constructor(subtopicTitle: string, pageContents: SubtopicPageContents) {
     this.subtopicTitle = subtopicTitle;
@@ -48,11 +56,8 @@ export class ReadOnlySubtopicPageObjectFactory {
   constructor(
     private subtopicPageContentsObjectFactory: SubtopicPageContentsObjectFactory
   ) {}
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'subtopicDataBackendDict' is a dict with underscore_cased
-  // keys which give tslint errors against underscore_casing in favor of
-  // camelCasing.
-  createFromBackendDict(subtopicDataBackendDict: any):
+
+  createFromBackendDict(subtopicDataBackendDict: ISubtopicDataBackendDict):
     ReadOnlySubtopicPageData {
     return new ReadOnlySubtopicPageData(
       subtopicDataBackendDict.subtopic_title,

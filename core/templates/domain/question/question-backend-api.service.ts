@@ -35,7 +35,7 @@ export class QuestionBackendApiService {
     private urlInterpolationService: UrlInterpolationService) {}
 
   private _fetchQuestions(
-      skillIds: any, questionCount: any,
+      skillIds: Array<string>, questionCount: number,
       questionsSortedByDifficulty: boolean,
       successCallback: (value?: Object | PromiseLike<Object>) => void,
       errorCallback: (reason?: any) => void): void {
