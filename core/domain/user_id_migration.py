@@ -156,7 +156,7 @@ class CreateNewUsersMigrationJob(jobs.BaseMapReduceOneOffJobManager):
     def map(user_model):
         """Implements the map function for this job."""
         if user_model.id != user_model.gae_id:
-            yield ('ALREADY MIGRATED', (user_model.gae_id, user_model.id))
+            yield 'SUCCESS_ALREADY_MIGRATED', (user_model.gae_id, user_model.id)
             return
 
         old_model = user_models.UserSettingsModel.get_by_id(user_model.gae_id)
@@ -201,7 +201,7 @@ class UserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
         if model_class.get_by_id(new_user_id) is not None:
             # Some models can be already migrated and there is no need to
             # migrate them again.
-            return ('ALREADY MIGRATED', (old_user_id, new_user_id))
+            return 'SUCCESS_ALREADY_MIGRATED', (old_user_id, new_user_id)
 
         old_model = model_class.get_by_id(old_user_id)
         if not old_model:
@@ -209,7 +209,7 @@ class UserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
             # UserSubscribersModel, is only defined for users who actually have
             # at least one subscriber) that is why we are okay with the fact
             # that model is None.
-            return ('MISSING OLD MODEL', (old_user_id, new_user_id))
+            return ('SUCCESS_MISSING_OLD_MODEL', (old_user_id, new_user_id))
         model_values = old_model.to_dict()
         model_values['id'] = new_user_id
         new_model = model_class(**model_values)

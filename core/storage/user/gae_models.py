@@ -888,7 +888,7 @@ class UserSubscriptionsModel(base_models.BaseModel):
 
         old_model = cls.get_by_id(old_user_id)
         if not old_model:
-            return ('MISSING OLD MODEL', (old_user_id, new_user_id))
+            return ('SUCCESS_MISSING_OLD_MODEL', (old_user_id, new_user_id))
         model_values = old_model.to_dict()
         model_values['id'] = new_user_id
         new_model = cls(**model_values)
@@ -1011,7 +1011,7 @@ class UserSubscribersModel(base_models.BaseModel):
 
         old_model = cls.get_by_id(old_user_id)
         if not old_model:
-            return ('MISSING OLD MODEL', (old_user_id, new_user_id))
+            return ('SUCCESS_MISSING_OLD_MODEL', (old_user_id, new_user_id))
         model_values = old_model.to_dict()
         model_values['id'] = new_user_id
         new_model = cls(**model_values)
