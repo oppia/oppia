@@ -211,10 +211,14 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             },
         }
 
-        init_state.update_interaction_solution(solution_dict)
+        solution = state_domain.Solution.from_dict(
+            init_state.interaction.id, solution_dict)
+        init_state.update_interaction_solution(solution)
         self.assertFalse(init_state.is_rte_content_supported_on_android())
         solution_dict['explanation']['html'] = ''
-        init_state.update_interaction_solution(solution_dict)
+        init_state.update_interaction_solution(
+            state_domain.Solution.from_dict(
+                init_state.interaction.id, solution_dict))
         self.assertTrue(init_state.is_rte_content_supported_on_android())
 
         hints_list = []
@@ -441,7 +445,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             },
         }
 
-        init_state.update_interaction_solution(solution_dict)
+        init_state.update_interaction_solution(
+            state_domain.Solution.from_dict(
+                init_state.interaction.id, solution_dict))
 
         written_translations_dict = {
             'translations_mapping': {
@@ -869,7 +875,10 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             },
         }
 
-        init_state.update_interaction_solution(solution_dict)
+        init_state.update_interaction_solution(
+            state_domain.Solution.from_dict(
+                init_state.interaction.id, solution_dict))
+
         exploration.validate()
 
         hints_list.append(
@@ -928,7 +937,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 state_domain.Solution.from_dict(
                     init_state.interaction.id, solution))
 
-        solution = {
+        solution_dict = {
             'answer_is_exclusive': False,
             'correct_answer': 'hello_world!',
             'explanation': {
@@ -936,6 +945,10 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'html': '<p>hello_world is a string</p>'
             }
         }
+        init_state.update_interaction_solution(
+            state_domain.Solution.from_dict(
+                init_state.interaction.id, solution_dict))
+
         init_state.update_interaction_solution(solution)
         exploration.validate()
 
@@ -974,7 +987,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         # Solution should be set to None as default.
         self.assertEqual(exploration.init_state.interaction.solution, None)
 
-        solution = {
+        solution_dict = {
             'answer_is_exclusive': False,
             'correct_answer': 'hello_world!',
             'explanation': {
@@ -989,10 +1002,12 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         ]
 
         exploration.init_state.update_interaction_hints(hints_list)
-        exploration.init_state.update_interaction_solution(solution)
+        exploration.init_state.update_interaction_solution(
+            state_domain.Solution.from_dict(
+                exploration.init_state.interaction.id, solution_dict))
         exploration.validate()
 
-        solution = {
+        solution_dict = {
             'answer_is_exclusive': 1,
             'correct_answer': 'hello_world!',
             'explanation': {
@@ -1001,7 +1016,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             }
         }
 
-        exploration.init_state.update_interaction_solution(solution)
+        exploration.init_state.update_interaction_solution(
+            state_domain.Solution.from_dict(
+                exploration.init_state.interaction.id, solution_dict))
         with self.assertRaisesRegexp(
             Exception, 'Expected answer_is_exclusive to be bool, received 1'):
             exploration.validate()
@@ -1095,7 +1112,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         hints_list = [state_domain.Hint(subtitled_html)]
 
         exploration.init_state.interaction.hints = hints_list
-        solution = {
+        solution_dict = {
             'answer_is_exclusive': True,
             'correct_answer': 'hello_world!',
             'explanation': {
@@ -1104,7 +1121,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             }
         }
 
-        exploration.init_state.update_interaction_solution(solution)
+        exploration.init_state.update_interaction_solution(
+            state_domain.Solution.from_dict(
+                exploration.init_state.interaction.id, solution_dict))
         exploration.init_state.update_content(
             state_domain.SubtitledHtml.from_dict({
                 'content_id': 'solution',
@@ -1319,7 +1338,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     'hint_1', '<p>Hello, this is html1 for state2</p>')
             )
         ]
-        solution = {
+        solution_dict = {
             'answer_is_exclusive': True,
             'correct_answer': u'hello_world!',
             'explanation': {
@@ -1327,16 +1346,20 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'html': u'<p>hello_world is a string</p>'
             }
         }
-
+        solution = state_domain.Solution.from_dict(
+            exploration.init_state.interaction.id, solution_dict)
         exploration.init_state.update_interaction_hints(hints_list)
         exploration.init_state.update_interaction_solution(solution)
 
         self.assertEqual(
-            exploration.init_state.interaction.solution.to_dict(), solution)
+            exploration.init_state.interaction.solution.to_dict(),
+            solution_dict)
 
         with self.assertRaisesRegexp(
             Exception, 'Expected solution to be a dict'):
-            exploration.init_state.update_interaction_solution([])
+            solution = state_domain.Solution.from_dict(
+                exploration.init_state.interaction.id, [])
+            exploration.init_state.update_interaction_solution(solution)
 
     def test_update_interaction_solution_with_no_solution(self):
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
