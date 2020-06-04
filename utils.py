@@ -268,7 +268,7 @@ def is_file_webp_image(binary_content):
     Returns:
         bool. Whether file is in WebP format or not.
     """
-    return h.startswith(b'RIFF') and h[8:12] == b'WEBP'
+    return binary_content.startswith(b'RIFF') and binary_content[8:12] == b'WEBP'
 
 
 def convert_png_binary_to_data_url(content):
