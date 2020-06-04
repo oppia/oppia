@@ -92,7 +92,7 @@ describe('State Interaction Stats Service', () => {
         const captureStats = (stats: IStateRulesStats) => {
           expect(stats).not.toBeFalsy();
           this.statsCaptured.push(stats);
-        }
+        };
 
         this.stateInteractionStatsService.computeStats(this.mockState)
           .then(captureStats);
@@ -127,7 +127,7 @@ describe('State Interaction Stats Service', () => {
         const captureStats = (stats: IStateRulesStats) => {
           expect(stats).not.toBeFalsy();
           this.statsCaptured.push(stats);
-        }
+        };
 
         this.stateInteractionStatsService.computeStats(this.mockState)
           .then(captureStats);
