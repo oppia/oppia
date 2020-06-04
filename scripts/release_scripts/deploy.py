@@ -366,14 +366,14 @@ def check_travis_and_circleci_tests(current_branch_name):
     python_utils.PRINT('\nEnter your GitHub username.\n')
     github_username = python_utils.INPUT().lower().strip()
 
-    travis_url = 'https://travis-ci.org/%s/oppia/branches' % github_username
+    travis_url = 'https://travis-ci.com/%s/oppia/branches' % github_username
     circleci_url = 'https://circleci.com/gh/%s/workflows/oppia' % (
         github_username)
 
     try:
         python_utils.url_open(travis_url)
     except Exception:
-        travis_url = 'https://travis-ci.org/oppia/oppia/branches'
+        travis_url = 'https://travis-ci.com/oppia/oppia/branches'
 
     try:
         python_utils.url_open(circleci_url)
