@@ -168,7 +168,7 @@ angular.module('oppia').directive('outcomeEditor', [
               var contentId = ctrl.savedOutcome.feedback.getContentId();
               ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired(contentId);
             }
-            ctrl.getOnSaveFeedbackFn()(ctrl.savedOutcome);
+            ctrl.getOnSaveFeedbackFn(ctrl.savedOutcome);
           };
 
           ctrl.saveThisDestination = function() {

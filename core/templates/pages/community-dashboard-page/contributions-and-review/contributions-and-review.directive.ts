@@ -1,3 +1,5 @@
+import { MisconceptionObjectFactory, Misconception } from "domain/skill/MisconceptionObjectFactory";
+
 // Copyright 2019 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,6 +26,8 @@ require(
   'question-editor.directive.ts');
 require('directives/angular-html-bind.directive.ts');
 require('domain/question/QuestionObjectFactory.ts');
+require('domain/skill/MisconceptionObjectFactory.ts');
+require('domain/skill/skill-backend-api.service.ts');
 require('filters/format-rte-preview.filter.ts');
 require('interactions/interactionsQuestionsRequires.ts');
 require('objects/objectComponentsRequires.ts');
@@ -51,11 +55,13 @@ angular.module('oppia').directive('contributionsAndReview', [
       controllerAs: '$ctrl',
       controller: [
         '$filter', '$uibModal', 'AlertsService', 'ContextService',
-        'ContributionAndReviewService', 'QuestionObjectFactory', 'UserService',
+        'ContributionAndReviewService', 'MisconceptionObjectFactory',
+        'QuestionObjectFactory', 'SkillBackendApiService', 'UserService',
         'ENTITY_TYPE',
         function(
             $filter, $uibModal, AlertsService, ContextService,
-            ContributionAndReviewService, QuestionObjectFactory, UserService,
+            ContributionAndReviewService, MisconceptionObjectFactory,
+            QuestionObjectFactory, SkillBackendApiService, UserService,
             ENTITY_TYPE) {
           var ctrl = this;
           var SUGGESTION_LABELS = {
@@ -134,7 +140,8 @@ angular.module('oppia').directive('contributionsAndReview', [
           };
 
           var _showQuestionSuggestionModal = function(
-              suggestion, contributionDetails, reviewable) {
+              suggestion, contributionDetails, reviewable,
+              misconceptionsBySkill) {
             var _templateUrl = UrlInterpolationService.getDirectiveTemplateUrl(
               '/pages/community-dashboard-page/modal-templates/' +
               'question-suggestion-review.directive.html');
@@ -190,7 +197,7 @@ angular.module('oppia').directive('contributionsAndReview', [
                     $scope.questionStateData = question.getStateData();
                     $scope.questionId = question.getId();
                     $scope.canEditQuestion = false;
-                    $scope.misconceptionsBySkill = [];
+                    $scope.misconceptionsBySkill = misconceptionsBySkill;
                     $scope.skillDifficultyLabel = getSkillDifficultyLabel();
                     $scope.skillRubricExplanation = getRubricExplanation(
                       $scope.skillDifficultyLabel);
@@ -338,10 +345,24 @@ angular.module('oppia').directive('contributionsAndReview', [
             if (suggestion.suggestion_type === ctrl.SUGGESTION_TYPE_QUESTION) {
               var reviewable =
                 ctrl.activeReviewTab === ctrl.SUGGESTION_TYPE_QUESTION;
-              var contributionDetails =
-                ctrl.contributions[suggestionId].details;
-              _showQuestionSuggestionModal(
-                suggestion, contributionDetails, reviewable);
+              var contributionDetails = (
+                ctrl.contributions[suggestionId].details);
+              SkillBackendApiService.fetchSkill(
+                suggestion.change.skill_id).then(
+                  function(skillDict) {
+                    var misconceptionsBySkill = {};
+                    var skill = skillDict.skill;
+                    misconceptionsBySkill[skill.id] = (
+                      skill.misconceptions.map((misconceptionDict) => {
+                        return (
+                          MisconceptionObjectFactory.createFromBackendDict(
+                            misconceptionDict));
+                      }));
+                    _showQuestionSuggestionModal(
+                      suggestion, contributionDetails, reviewable,
+                      misconceptionsBySkill);
+                  }
+                );
             }
             if (suggestion.suggestion_type === ctrl.SUGGESTION_TYPE_TRANSLATE) {
               var reviewable =

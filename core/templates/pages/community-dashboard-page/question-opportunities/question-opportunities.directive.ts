@@ -206,12 +206,8 @@ angular.module('oppia').directive('questionOpportunities', [
                   $scope.skill = skill;
                   $scope.skillDifficulty = skillDifficulty;
                   $scope.misconceptionsBySkill = {};
-                  $scope.misconceptionsBySkill[$scope.skill.getId()] =
-                    $scope.skill.getMisconceptions().map(
-                      function(misconceptionsBackendDict) {
-                        return MisconceptionObjectFactory
-                          .createFromBackendDict(misconceptionsBackendDict);
-                      });
+                  $scope.misconceptionsBySkill[$scope.skill.getId()] = (
+                    $scope.skill.getMisconceptions());
                   $scope.done = function() {
                     if (!$scope.isQuestionValid()) {
                       return;
