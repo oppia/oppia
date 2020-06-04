@@ -314,10 +314,10 @@ angular.module('oppia').directive('explorationEditorPage', [
 
               UserExplorationPermissionsService.getPermissionsAsync()
                 .then(function(permissions) {
-                  if (permissions.can_edit) {
+                  if (permissions.canEdit) {
                     EditabilityService.markEditable();
                   }
-                  if (permissions.can_voiceover || permissions.can_edit) {
+                  if (permissions.canVoiceover || permissions.canEdit) {
                     EditabilityService.markTranslatable();
                   }
                 });
@@ -625,7 +625,7 @@ angular.module('oppia').directive('explorationEditorPage', [
             // visible on the create page.
             UserExplorationPermissionsService.getPermissionsAsync()
               .then(function(permissions) {
-                if (!permissions.can_edit) {
+                if (!permissions.canEdit) {
                   var index = ctrl.EDITOR_TUTORIAL_OPTIONS.indexOf(
                     saveButtonTutorialElement);
                   ctrl.EDITOR_TUTORIAL_OPTIONS.splice(index, 1);

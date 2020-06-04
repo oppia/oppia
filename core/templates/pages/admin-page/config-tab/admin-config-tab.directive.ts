@@ -48,7 +48,7 @@ angular.module('oppia').directive('adminConfigTab', [
 
         ctrl.reloadConfigProperties = function() {
           AdminDataService.getDataAsync().then(function(response) {
-            ctrl.configProperties = response.config_properties;
+            ctrl.configProperties = response.configProperties;
             // TODO(#8521): Remove the use of $rootScope.$apply()
             // once the directive is migrated to angular
             $rootScope.$apply();

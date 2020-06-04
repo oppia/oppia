@@ -21,7 +21,6 @@ require(
   'mark-all-audio-and-translations-as-needing-update.controller.ts');
 require('components/state-editor/state-editor.directive.ts');
 
-require('components/entity-creation-services/question-creation.service.ts');
 require('domain/question/editable-question-backend-api.service.ts');
 require('domain/question/QuestionObjectFactory.ts');
 require('domain/question/question-update.service.ts');
@@ -59,14 +58,14 @@ angular.module('oppia').directive('questionEditor', [
       controllerAs: '$ctrl',
       controller: [
         '$scope', '$rootScope', '$uibModal',
-        'AlertsService', 'QuestionCreationService',
+        'AlertsService',
         'EditabilityService', 'EditableQuestionBackendApiService',
         'LoaderService', 'INTERACTION_SPECS', 'StateEditorService',
         'ResponsesService', 'SolutionValidityService', 'QuestionUpdateService',
         'QuestionObjectFactory',
         function(
             $scope, $rootScope, $uibModal,
-            AlertsService, QuestionCreationService,
+            AlertsService,
             EditabilityService, EditableQuestionBackendApiService,
             LoaderService, INTERACTION_SPECS, StateEditorService,
             ResponsesService, SolutionValidityService, QuestionUpdateService,

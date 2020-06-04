@@ -327,10 +327,10 @@ angular.module('oppia').directive('adminRolesTab', [
           ctrl.graphData = {};
           ctrl.graphDataLoaded = false;
           AdminDataService.getDataAsync().then(function(response) {
-            ctrl.UPDATABLE_ROLES = response.updatable_roles;
-            ctrl.VIEWABLE_ROLES = response.viewable_roles;
-            ctrl.topicSummaries = response.topic_summaries;
-            ctrl.graphData = response.role_graph_data;
+            ctrl.UPDATABLE_ROLES = response.updatableRoles;
+            ctrl.VIEWABLE_ROLES = response.viewableRoles;
+            ctrl.topicSummaries = response.topicSummaries;
+            ctrl.graphData = response.roleGraphData;
 
             ctrl.graphDataLoaded = false;
             // Calculating initStateId and finalStateIds for graphData

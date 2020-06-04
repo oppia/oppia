@@ -22,22 +22,95 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { AdminDataService } from
   'pages/admin-page/services/admin-data.service';
+import { AdminData, AdminDataObjectFactory } from
+  'domain/admin/AdminDataObjectFactory';
 
 describe('Admin Data Service', () => {
   let adminDataService: AdminDataService = null;
   let httpTestingController: HttpTestingController;
+  let adminDataObjectFactory: AdminDataObjectFactory;
   var sampleAdminData = {
-    property: 'value'
+    unfinished_job_data: [],
+    role_graph_data: {
+      links: [
+        {
+          source: 'TOPIC_MANAGER',
+          target: 'MODERATOR'
+        }
+      ],
+      nodes: {
+        TOPIC_MANAGER: 'topic manager'
+      }
+    },
+    topic_summaries: [
+      {
+        topic_model_created_on: 1591196558882.194,
+        uncategorized_skill_count: 0,
+        name: 'Empty Topic',
+        additional_story_count: 0,
+        total_skill_count: 0,
+        version: 1,
+        canonical_story_count: 0,
+        subtopic_count: 0,
+        description: '',
+        id: 'VqgPTpt7JyJy',
+        topic_model_last_updated: 1591196558882.2,
+        language_code: 'en'
+      }
+    ],
+    one_off_job_specs: [],
+    updatable_roles: {
+      TOPIC_MANAGER: 'topic manager'
+    },
+    human_readable_current_time: 'June 03 15:31:20',
+    audit_job_specs: [],
+    demo_collections: [],
+    config_properties: {
+      oppia_csrf_secret: {
+        schema: {
+          type: 'unicode'
+        },
+        value: '3WHOWnD3sy0r1wukJ2lX4vBS_YA=',
+        description: 'Text used to encrypt CSRF tokens.'
+      }
+    },
+    demo_exploration_ids: ['19'],
+    recent_job_data: [],
+    demo_explorations: [
+      [
+        '0',
+        'welcome.yaml'
+      ]
+    ],
+    continuous_computations_data: [
+      {
+        is_startable: true,
+        status_code: 'never_started',
+        computation_type: 'FeedbackAnalyticsAggregator',
+        last_started_msec: null,
+        active_realtime_layer_index: null,
+        last_stopped_msec: null,
+        is_stoppable: false,
+        last_finished_msec: null
+      }
+    ],
+    viewable_roles: {
+      TOPIC_MANAGER: 'topic manager'
+    }
   };
+  let adminDataResponse: AdminData;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [AdminDataService]
+      providers: [AdminDataService, AdminDataObjectFactory]
     });
     adminDataService = TestBed.get(
       AdminDataService);
     httpTestingController = TestBed.get(HttpTestingController);
+    adminDataObjectFactory = TestBed.get(AdminDataObjectFactory);
+    adminDataResponse = adminDataObjectFactory.createFromBackendDict(
+      sampleAdminData);
   });
 
   afterEach(() => {
@@ -46,7 +119,7 @@ describe('Admin Data Service', () => {
 
   it('should return the correct admin data', fakeAsync(() => {
     adminDataService.getDataAsync().then(function(response) {
-      expect(response).toEqual(sampleAdminData);
+      expect(response).toEqual(adminDataResponse);
     });
 
     var req = httpTestingController.expectOne(
@@ -69,7 +142,7 @@ describe('Admin Data Service', () => {
       flushMicrotasks();
 
       adminDataService.getDataAsync().then(function(response) {
-        expect(response).toEqual(sampleAdminData);
+        expect(response).toEqual(adminDataResponse);
       });
 
       httpTestingController.expectNone('/adminhandler');

@@ -158,7 +158,7 @@ angular.module('oppia').directive('statisticsTab', [
                     return improvementType;
                   },
                   visualizationsInfo: function() {
-                    return stats.visualizations_info;
+                    return stats.visualizationsInfo;
                   }
                 },
                 controller: [
@@ -239,7 +239,7 @@ angular.module('oppia').directive('statisticsTab', [
                         el.attr('escaped-options', escapedOptions);
                         el.attr(
                           'addressed-info-is-supported',
-                          vizInfo.addressed_info_is_supported);
+                          vizInfo.addressedInfoIsSupported);
                         return el.get(0).outerHTML;
                       });
 

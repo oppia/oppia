@@ -197,9 +197,9 @@ angular.module('oppia').directive('adminDevModeActivitiesTab', [
           ctrl.DEMO_EXPLORATIONS = {};
           ctrl.reloadingAllExplorationPossible = false;
           AdminDataService.getDataAsync().then(function(response) {
-            ctrl.DEMO_EXPLORATIONS = response.demo_explorations;
-            ctrl.DEMO_COLLECTIONS = response.demo_collections;
-            demoExplorationIds = response.demo_exploration_ids;
+            ctrl.DEMO_EXPLORATIONS = response.demoExplorations;
+            ctrl.DEMO_COLLECTIONS = response.demoCollections;
+            demoExplorationIds = response.demoExplorationIds;
             ctrl.reloadingAllExplorationPossible = true;
             // TODO(#8521): Remove the use of $rootScope.$apply()
             // once the directive is migrated to angular

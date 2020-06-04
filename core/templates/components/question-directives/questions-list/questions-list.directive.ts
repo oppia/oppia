@@ -32,7 +32,6 @@ require(
 require(
   'components/skill-selector/skill-selector.directive.ts');
 
-require('components/entity-creation-services/question-creation.service.ts');
 require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/question/editable-question-backend-api.service.ts');
 require('domain/question/QuestionObjectFactory.ts');
@@ -73,7 +72,7 @@ angular.module('oppia').directive('questionsList', [
       controllerAs: '$ctrl',
       controller: [
         '$scope', '$filter', '$http', '$q', '$timeout', '$uibModal', '$window',
-        '$location', 'AlertsService', 'QuestionCreationService', 'UrlService',
+        '$location', 'AlertsService', 'UrlService',
         'NUM_QUESTIONS_PER_PAGE', 'EditableQuestionBackendApiService',
         'SkillBackendApiService', 'MisconceptionObjectFactory',
         'QuestionObjectFactory', 'SkillDifficultyObjectFactory',
@@ -83,7 +82,7 @@ angular.module('oppia').directive('questionsList', [
         'QuestionUndoRedoService', 'UndoRedoService', 'QuestionsListService',
         function(
             $scope, $filter, $http, $q, $timeout, $uibModal, $window,
-            $location, AlertsService, QuestionCreationService, UrlService,
+            $location, AlertsService, UrlService,
             NUM_QUESTIONS_PER_PAGE, EditableQuestionBackendApiService,
             SkillBackendApiService, MisconceptionObjectFactory,
             QuestionObjectFactory, SkillDifficultyObjectFactory,
