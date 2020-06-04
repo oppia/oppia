@@ -144,7 +144,7 @@ angular.module('oppia').component('preferencesPage', {
 
       ctrl.handleExportDataClick = function() {
         if (ctrl.exportingData === false) {
-            ctrl.exportingData = true;
+          ctrl.exportingData = true;
         }
       };
 
