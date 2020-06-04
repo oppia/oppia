@@ -151,12 +151,12 @@ def check_image_png_or_webp(image_string):
 
     Args:
         image_string: str. image url in base64 format.
-    
+
     Returns:
         boolean. Returns true if image is in WebP format.
     """
     if(image_string.startswith('data:image/png') or
-    image_string.startswith('data:image/webp')):
+       image_string.startswith('data:image/webp')):
         return True
     return False
 
