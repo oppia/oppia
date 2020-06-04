@@ -259,16 +259,16 @@ def get_random_choice(alist):
     return alist[index]
 
 
-def is_file_webp_image(binary_content):
+def is_file_webp_image(binary_str):
     """Checks if a file is in WebP format or not.
 
     Args:
-        binary_content: str. Binary content of a file.
+        binary_str: str. Binary content of a file.
 
     Returns:
         bool. Whether file is in WebP format or not.
     """
-    return binary_content.startswith(b'RIFF') and binary_content[8:12] == b'WEBP'
+    return binary_str.startswith(b'RIFF') && binary_str[8:12] == b'WEBP'
 
 
 def convert_png_binary_to_data_url(content):
