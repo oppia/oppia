@@ -23,6 +23,11 @@ angular.module('oppia').directive('topicInfoTab', ['UrlInterpolationService',
   function(UrlInterpolationService) {
     return {
       restrict: 'E',
+      link: function(scope, element) {
+        element[0].getControllerScope = function() {
+          return scope.$ctrl;
+        };
+      },
       scope: {},
       bindToController: {
         getTopicName: '&topicName',
@@ -38,11 +43,15 @@ angular.module('oppia').directive('topicInfoTab', ['UrlInterpolationService',
         'WindowDimensionsService', function(WindowDimensionsService) {
           var ctrl = this;
 
-          ctrl.$onInit = function() {
-            ctrl.screenHasSmallWidth = false;
+          ctrl.checkSmallScreenWidth = function() {
             if (WindowDimensionsService.getWidth() <= 1024) {
-              ctrl.screenHasSmallWidth = true;
+              return true;
             }
+            return false;
+          };
+
+          ctrl.$onInit = function() {
+            ctrl.screenHasSmallWidth = ctrl.checkSmallScreenWidth();
           };
         }
       ]
