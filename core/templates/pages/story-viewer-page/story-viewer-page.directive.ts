@@ -27,6 +27,9 @@ require('components/summary-tile/exploration-summary-tile.directive.ts');
 require(
   'pages/story-viewer-page/navbar-breadcrumb/' +
   'story-viewer-navbar-breadcrumb.directive.ts');
+require(
+  'pages/story-viewer-page/navbar-pre-logo-action/' +
+  'story-viewer-navbar-pre-logo-action.component.ts');
 
 require('domain/story_viewer/StoryPlaythroughObjectFactory.ts');
 require('domain/story_viewer/story-viewer-backend-api.service.ts');
