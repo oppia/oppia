@@ -143,10 +143,10 @@ angular.module('oppia').component('preferencesPage', {
       ctrl.exportingData = false;
 
       ctrl.handleExportDataClick = function() {
-          if (ctrl.exportingData === false) {
-              ctrl.exportingData = true
-          }
-      }
+        if (ctrl.exportingData === false) {
+            ctrl.exportingData = true;
+        }
+      };
 
       ctrl.showEditProfilePictureModal = function() {
         $uibModal.open({
