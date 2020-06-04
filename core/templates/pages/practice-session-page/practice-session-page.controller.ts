@@ -62,12 +62,12 @@ angular.module('oppia').directive('practiceSessionPage', [
               .interpolateUrl(
                 PRACTICE_SESSIONS_DATA_URL, {
                   topic_name: ctrl.topicName,
-                  subtopic_titles_list: ctrl.stringifiedSubtopicsList
+                  comma_separated_subtopic_ids: ctrl.commaSeparatedSubtopicIds
                 });
             var practiceSessionsUrl = UrlInterpolationService.interpolateUrl(
               PRACTICE_SESSIONS_URL, {
                 topic_name: ctrl.topicName,
-                subtopic_titles_list: ctrl.stringifiedSubtopicsList
+                comma_separated_subtopic_ids: ctrl.commaSeparatedSubtopicIds
               });
             var topicViewerUrl = UrlInterpolationService.interpolateUrl(
               TOPIC_VIEWER_PAGE, {
@@ -108,7 +108,7 @@ angular.module('oppia').directive('practiceSessionPage', [
           };
           ctrl.$onInit = function() {
             ctrl.topicName = UrlService.getTopicNameFromLearnerUrl();
-            ctrl.stringifiedSubtopicsList = (
+            ctrl.commaSeparatedSubtopicIds = (
               UrlService.getSelectedSubtopicsFromUrl());
             _fetchSkillDetails();
             PageTitleService.setPageTitle(

@@ -39,9 +39,9 @@ angular.module('oppia').directive('topicInfoTab', ['UrlInterpolationService',
           var ctrl = this;
 
           ctrl.$onInit = function() {
-            ctrl.isMobile = false;
+            ctrl.screenHasSmallWidth = false;
             if (WindowDimensionsService.getWidth() <= 1024) {
-              ctrl.isMobile = true;
+              ctrl.screenHasSmallWidth = true;
             }
           };
         }

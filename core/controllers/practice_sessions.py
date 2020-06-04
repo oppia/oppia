@@ -17,14 +17,13 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import json
-
 from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import skill_services
 from core.domain import topic_fetchers
 import feconf
+import python_utils
 
 
 class PracticeSessionsPage(base.BaseHandler):
@@ -54,11 +53,12 @@ class PracticeSessionsPageDataHandler(base.BaseHandler):
         # Topic cannot be None as an exception will be thrown from its decorator
         # if so.
         topic = topic_fetchers.get_topic_by_name(topic_name)
-        subtopic_titles_list = self.request.get('selected_subtopics')
-        selected_subtopic_titles = json.loads(subtopic_titles_list)
+        comma_separated_subtopic_ids = self.request.get('selected_subtopic_ids')
+        selected_subtopic_ids = comma_separated_subtopic_ids.split(',')
+
         selected_skill_ids = []
         for subtopic in topic.subtopics:
-            if subtopic.title in selected_subtopic_titles:
+            if python_utils.UNICODE(subtopic.id) in selected_subtopic_ids:
                 selected_skill_ids.extend(subtopic.skill_ids)
         try:
             skills = skill_services.get_multi_skills(selected_skill_ids)
