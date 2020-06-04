@@ -22,6 +22,10 @@ import { UtilsService } from './utils.service';
 
 /**
  * Commonly used terms in this file.
+ * key - Key for i18n translation
+ * translatedValue - I18n translation corresponding to the key in json file
+ * interpolateParams or params - Params for interpolation
+ * interpolatedValue - The final translation that is returned.
  * Note: Intentionally left out the L of innerHTM"L" (only in this file) to
  * avoid the linting error.
  * Example: <h1 [innerHTM]="'I18N_ABOUT_PAGE_HEADING' | translate:{x: 'Oppia'}">
@@ -50,9 +54,9 @@ export class TranslateService {
   translations: Array<Object> = [];
   templateMatcher: RegExp = /\<\[\s?([^{}\s]*)\s?\]\>/g;
 
-  private _onLangChange = new EventEmitter<LangChangeEvent>();
+  private _onLangChangeEventEmitter = new EventEmitter<LangChangeEvent>();
   get onLangChange(): EventEmitter<LangChangeEvent> {
-    return this._onLangChange;
+    return this._onLangChangeEventEmitter;
   }
 
   constructor(private http: HttpClient, private utils: UtilsService) {}
@@ -74,7 +78,7 @@ export class TranslateService {
     // Check if the translations for the "lang" have been fetched before.
     this.currentLang = lang;
     if (Object.keys(this.translations).includes(lang)) {
-      this._onLangChange.emit(
+      this._onLangChangeEventEmitter.emit(
         {lang: lang });
       return;
     }
@@ -83,7 +87,7 @@ export class TranslateService {
       translations => {
         this.translations[lang] = translations;
         if (this.currentLang === lang) {
-          this._onLangChange.emit(
+          this._onLangChangeEventEmitter.emit(
             {lang: lang});
         }
       }

@@ -31,34 +31,23 @@ class MockChangeDetectorRef {
 }
 
 class MockTranslateService {
-    langChange = new EventEmitter();
-    templateMatcher: RegExp = /\<\[\s?([^{}\s]*)\s?\]\>/g;
-    get onLangChange() {
-      return this.langChange;
-    }
-    translations = {
-      I18n_t_1: 'Hello',
-      I18n_t_2: 'Hello <[val]>'
-    };
-    private interpolateString(expr: string, params?: Object | undefined) {
-      if (!params) {
-        return expr;
-      }
-      return expr.replace(this.templateMatcher,
-        (substring: string, b: string) => {
-          return params[b];
-        });
-    }
+  langChangeEventEmitter = new EventEmitter();
+  get onLangChange() {
+    return this.langChangeEventEmitter;
+  }
+  translations = {
+    I18n_t_1: 'Hello',
+    I18n_t_2: 'Hello <[val]>'
+  };
 
-    getInterpolatedString(key: string,
-        interpolateParams?: Object) {
-      const str = this.translations[key];
-      if (!interpolateParams) {
-        return str;
-      }
-
-      return this.interpolateString(str, interpolateParams);
+  getInterpolatedString(key: string,
+      interpolateParams?: Object) {
+    const str = this.translations[key];
+    if (!str) {
+      return key;
     }
+    return str;
+  }
 }
 
 describe('TranslatePipe', () => {
@@ -83,8 +72,8 @@ describe('TranslatePipe', () => {
 
   it('should translate', () => {
     expect(pipe.transform('I18n_t_1')).toBe('Hello');
-    expect(pipe.transform('I18n_t_2', {val: 'World'})).toBe('Hello World');
-    expect(pipe.transform('I18n_t_2', {val: 'World'})).toBe('Hello World');
+    expect(pipe.transform('I18n_t_2', {val: 'World'})).toBe('Hello <[val]>');
+    expect(pipe.transform('I18n_t_2', {val: 'World'})).toBe('Hello <[val]>');
     expect(pipe.transform('I18n_t_3')).toBe('I18n_t_3');
     expect(pipe.transform('')).toBe('');
     translate.onLangChange.emit({lang: 'en'});
@@ -93,7 +82,7 @@ describe('TranslatePipe', () => {
   // The sole purpose of this test is to cover ngOnDestroy.
   it('should destroy subscriptions', () => {
     pipe.ngOnDestroy();
-
+    expect(pipe).not.toBeDefined;
     // Reintializing the pipe because jasmine tries to destroy the pipe.
     // But since ngOnDestroy method has been called and the pipe is destroyed.
     // And if the pipe is not reinitialized karma will raise an error saying
