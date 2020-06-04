@@ -102,8 +102,8 @@ export class StateInteractionStatsService {
    * answer-statistics.
    */
   computeStats(
-      state: State, cacheResults: boolean = false): Promise<IStateRulesStats> {
-    if (cacheResults && this.cachedStats !== null) {
+      state: State, useCache: boolean = false): Promise<IStateRulesStats> {
+    if (useCache && this.cachedStats !== null) {
       return this.cachedStats;
     }
     const explorationId = this.contextService.getExplorationId();
