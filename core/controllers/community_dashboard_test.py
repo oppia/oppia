@@ -24,6 +24,7 @@ from core.domain import story_services
 from core.domain import topic_domain
 from core.domain import topic_services
 from core.domain import user_services
+from core.domain import config_services
 from core.tests import test_utils
 import feconf
 import python_utils
@@ -420,3 +421,24 @@ class UserCommunityRightsDataHandlerTest(test_utils.GenericTestBase):
                 'can_review_voiceover_for_language_codes': [],
                 'can_review_questions': True
             })
+
+class FeaturedTranslationLanguagesHandlerTest(test_utils.GenericTestBase):
+    def test_get_featured_translation_languages(self):
+        response = self.get_json('/getfeaturedtranslationlanguages')
+        self.assertEqual(response, {
+            'featured_translation_languages': []
+        })
+
+        new_value = [
+            {'language_code': 'en', 'description': 'Partnership with ABC'}
+        ]
+        config_services.set_property(
+            'admin',
+            'featured_translation_languages',
+            new_value
+        )
+
+        response = self.get_json('/getfeaturedtranslationlanguages')
+        self.assertEqual(response, {
+            'featured_translation_languages': new_value
+        })

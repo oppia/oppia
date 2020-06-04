@@ -24,6 +24,7 @@ from core.domain import exp_fetchers
 from core.domain import opportunity_services
 from core.domain import topic_fetchers
 from core.domain import user_services
+from core.domain import config_domain
 import feconf
 import utils
 
@@ -218,4 +219,15 @@ class UserCommunityRightsDataHandler(base.BaseHandler):
             'can_review_questions': (
                 community_rights.can_review_questions
                 if community_rights else False)
+        })
+
+class FeaturedTranslationLanguagesHandler(base.BaseHandler):
+    """Provides featured translation languages set in admin config
+    """
+    @acl_decorators.open_access
+    def get(self):
+        """Handles GET requests."""
+        self.render_json({
+            'featured_translation_languages':
+                config_domain.FEATURED_TRANSLATION_LANGUAGES.value
         })
