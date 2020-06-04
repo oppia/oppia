@@ -29,7 +29,7 @@ describe('Donate page', () => {
   const siteAnalyticsServiceStub = new SiteAnalyticsService(
     new WindowRef());
 
-  beforeEach(() => {
+  beforeEach(async() => {
     TestBed.configureTestingModule({
       declarations: [DonatePageComponent],
       providers: [
@@ -52,8 +52,15 @@ describe('Donate page', () => {
           }
         }
       ]
-    });
-
+    }).overrideComponent(DonatePageComponent, {
+      set: {
+        // The template is being overwritten because require is being
+        // used on component, which will throw an error on unit tests.
+        template: ''
+      }
+    }).compileComponents();
+  });
+  beforeEach(() => {
     this.fixture = TestBed.createComponent(DonatePageComponent);
     this.component = this.fixture.componentInstance;
   });
