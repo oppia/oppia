@@ -112,7 +112,7 @@
   <outcome-editor is-editable="$ctrl.isEditable"
                   display-feedback="$ctrl.displayFeedback"
                   on-save-dest="$ctrl.getOnSaveAnswerGroupDestFn()"
-                  on-save-feedback="$ctrl.getOnSaveAnswerGroupFeedback()"
+                  on-save-feedback="$ctrl.getOnSaveAnswerGroupFeedbackFn()"
                   on-save-correctness-label="$ctrl.getOnSaveAnswerGroupCorrectnessLabelFn()"
                   outcome="$ctrl.outcome"
                   add-state="$ctrl.addState"
@@ -122,7 +122,7 @@
   <question-misconception-editor is-editable="$ctrl.isEditable"
                                  ng-if="$ctrl.isInQuestionMode()"
                                  on-save-tagged-misconception="$ctrl.onSaveTaggedMisconception"
-                                 on-save-answer-group-feedback="$ctrl.onSaveAnswerGroupFeedback"
+                                 on-save-answer-group-feedback="$ctrl.getOnSaveAnswerGroupFeedbackFn()"
                                  outcome="$ctrl.outcome"
                                  rules="$ctrl.rules"
                                  tagged-skill-misconception-id="$ctrl.taggedSkillMisconceptionId">

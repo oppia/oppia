@@ -55,7 +55,7 @@ angular.module('oppia').directive('answerGroupEditor', [
           '&onSaveAnswerGroupCorrectnessLabel'),
         taggedSkillMisconceptionId: '=',
         isEditable: '=',
-        onSaveAnswerGroupFeedback: '=',
+        getOnSaveAnswerGroupFeedbackFn: '&onSaveAnswerGroupFeedback',
         onSaveTaggedMisconception: '=',
         outcome: '=',
         rules: '=',
