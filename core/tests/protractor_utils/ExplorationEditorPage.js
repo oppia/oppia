@@ -264,6 +264,7 @@ var ExplorationEditorPage = function() {
     await waitFor.elementToBeClickable(
       navigateToSettingsTabButton, 'Settings tab is not clickable');
     await navigateToSettingsTabButton.click();
+    await waitFor.pageToFullyLoad();
   };
 
   this.navigateToStatsTab = async function() {
