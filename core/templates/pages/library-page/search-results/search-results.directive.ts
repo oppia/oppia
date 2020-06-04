@@ -39,6 +39,9 @@ angular.module('oppia').directive('searchResults', [
         function($scope, $q, $timeout, $window, LoaderService,
             SiteAnalyticsService, UserService) {
           var ctrl = this;
+          ctrl.getStaticImageUrl = function(imagePath) {
+            return UrlInterpolationService.getStaticImageUrl(imagePath);
+          };
           ctrl.onRedirectToLogin = function(destinationUrl) {
             SiteAnalyticsService.registerStartLoginEvent('noSearchResults');
             $timeout(function() {
