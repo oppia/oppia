@@ -24,7 +24,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { UtilsService } from 'services/utils.service';
 
-interface Note {
+export interface INote {
   readableNoteName: string,
   noteDuration: {
     num: number,
@@ -38,7 +38,7 @@ interface Note {
 export class MusicNotesInputRulesService {
   constructor(private utilsService: UtilsService) {}
 
-  static _getMidiNoteValue(note: Note): number {
+  static _getMidiNoteValue(note: INote): number {
     if (
       InteractionsExtensionsConstants.NOTE_NAMES_TO_MIDI_VALUES.hasOwnProperty(
         note.readableNoteName)) {
@@ -55,23 +55,24 @@ export class MusicNotesInputRulesService {
     });
   }
 
-  Equals(answer: Note[], inputs: {x: Note[]}): boolean {
+  Equals(answer: INote[], inputs: {x: INote[]}): boolean {
     return this.utilsService.isEquivalent(
       MusicNotesInputRulesService._convertSequenceToMidi(answer),
       MusicNotesInputRulesService._convertSequenceToMidi(inputs.x));
   }
-  IsLongerThan(answer: Note[], inputs: {x: Note[], k: number}): boolean {
+  IsLongerThan(answer: INote[], inputs: {x: INote[], k: number}): boolean {
     return MusicNotesInputRulesService._convertSequenceToMidi(
       answer).length > inputs.k;
   }
   // TODO(wxy): validate that inputs.a <= inputs.b
   HasLengthInclusivelyBetween(
-      answer: Note[], inputs: {x: Note[], a: number, b: number}): boolean {
+      answer: INote[], inputs: {x: INote[], a: number, b: number}): boolean {
     var answerLength:number = (
       MusicNotesInputRulesService._convertSequenceToMidi(answer).length);
     return answerLength >= inputs.a && answerLength <= inputs.b;
   }
-  IsEqualToExceptFor(answer: Note[], inputs: {x: Note[], k: number}): boolean {
+  IsEqualToExceptFor(
+      answer: INote[], inputs: {x: INote[], k: number}): boolean {
     var targetSequence: number[] = (
       MusicNotesInputRulesService._convertSequenceToMidi(inputs.x));
     var userSequence: number[] = (
@@ -88,7 +89,7 @@ export class MusicNotesInputRulesService {
     });
     return numWrongNotes <= inputs.k;
   }
-  IsTranspositionOf(answer: Note[], inputs: {x: Note[], y: number}): boolean {
+  IsTranspositionOf(answer: INote[], inputs: {x: INote[], y: number}): boolean {
     var targetSequence: number[] = (
       MusicNotesInputRulesService._convertSequenceToMidi(inputs.x));
     var userSequence: number[] = (
@@ -101,7 +102,7 @@ export class MusicNotesInputRulesService {
     });
   }
   IsTranspositionOfExceptFor(
-      answer: Note[], inputs: {x: Note[], y: number, k: number}): boolean {
+      answer: INote[], inputs: {x: INote[], y: number, k: number}): boolean {
     var targetSequence: number[] = (
       MusicNotesInputRulesService._convertSequenceToMidi(inputs.x));
     var userSequence: number[] = (
@@ -123,4 +124,3 @@ export class MusicNotesInputRulesService {
 angular.module('oppia').factory(
   'MusicNotesInputRulesService',
   downgradeInjectable(MusicNotesInputRulesService));
-
