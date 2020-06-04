@@ -151,7 +151,7 @@ export class AudioTranslationLanguageService {
 
   /**
    * @return {Array<string>} An array of the audio language codes in
-   exploration.
+   *  exploration.
    */
   getAllAudioLanguageCodesInExploration(): Array<string> {
     return this._allAudioLanguageCodesInExploration;
