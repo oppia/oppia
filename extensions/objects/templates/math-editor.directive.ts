@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for position of terms editor.
+ * @fileoverview Directive for math editor.
  */
 
 // Every editor directive should implement an alwaysEditable option. There
@@ -44,6 +44,9 @@ angular.module('oppia').directive('mathEditor', [
           guppyDivId = guppyDivElt.id;
           guppyInstance = new Guppy(guppyDivId, {});
           guppyInstance.render();
+          Guppy.event('change', () => {
+            ctrl.value = guppyInstance.asciimath();
+          });
         };
       }]
     };

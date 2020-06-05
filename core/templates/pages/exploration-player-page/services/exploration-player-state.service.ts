@@ -153,7 +153,7 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
         var featuresData = combinedData[1];
         if (doesMathExpressionInputInteractionExist(explorationData.states)) {
           Guppy.init({
-            symbols: ['/third_party/static/guppy-b5055b/sym/symbols.json',
+            symbols: ['/third_party/static/guppy-f944022/sym/symbols.json',
               oppiaSymbolsUrl]});
         }
         ExplorationFeaturesService.init(explorationData, featuresData);
@@ -197,7 +197,7 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
           doesMathExpressionInputInteractionExist(
             explorationData.exploration.states)) {
           Guppy.init({
-            symbols: ['/third_party/static/guppy-b5055b/sym/symbols.json',
+            symbols: ['/third_party/static/guppy-f944022/sym/symbols.json',
               oppiaSymbolsUrl]});
         }
         ExplorationFeaturesService.init(explorationData, featuresData);

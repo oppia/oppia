@@ -1,5 +1,5 @@
 /* eslint-disable camelcase */
-// Code - third_party/static/guppy-b5055b/src/guppy.js
+// Code - third_party/static/guppy-f944022/src/guppy.js
 
 interface GuppyConfig {
   events?: Object;
@@ -73,7 +73,7 @@ class Guppy {
 }
 
 class GuppyOSK {
-  constructor(config: GuppyConfig);
+  constructor(config: Object);
 }
 
 namespace Guppy {
@@ -98,5 +98,5 @@ namespace Guppy {
   export let ready: boolean;
   export function register_keyboard_handlers(): void;
   export function remove_global_symbol(name: string): void;
-  export function use_osk(GuppyOSK): void;
+  export function use_osk(osk: GuppyOSK): void;
 }
