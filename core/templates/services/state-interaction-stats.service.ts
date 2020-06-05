@@ -32,34 +32,26 @@ import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 
 export interface IAnswerData {
-  /* eslint-disable camelcase */
-  answer: any; // Type depends on interaction id.
-  frequency: number;
-  is_addressed?: boolean;
-  /* eslint-enable camelcase */
+  'answer': any; // Needs to be 'any' because type depends on interaction id.
+  'frequency': number;
+  'is_addressed'?: boolean;
 }
 
 export interface IVisualizationInfo {
-  /* eslint-disable camelcase */
-  addressed_info_is_supported: boolean;
-  data: IAnswerData[];
-  id: string;
-  options: {[name: string]: object};
-  /* eslint-enable camelcase */
+  'addressed_info_is_supported': boolean;
+  'data': IAnswerData[];
+  'id': string;
+  'options': {[name: string]: object};
 }
 
 export interface IStateRulesStatsBackendDict {
-  /* eslint-disable camelcase */
-  visualizations_info: IVisualizationInfo[];
-  /* eslint-enable camelcase */
+  'visualizations_info': IVisualizationInfo[];
 }
 
 export interface IStateRulesStats {
-  /* eslint-disable camelcase */
-  exploration_id: string;
-  state_name: string;
-  visualizations_info: IVisualizationInfo[];
-  /* eslint-enable camelcase */
+  'exploration_id': string;
+  'state_name': string;
+  'visualizations_info': IVisualizationInfo[];
 }
 
 // TODO(#8038): Move this constant into a backend-api.service module.
@@ -115,7 +107,7 @@ export class StateInteractionStatsService {
           state_name: state.name,
         }))
       .toPromise().then(response => {
-        this.cachedStats = {
+        this.cachedStats = <IStateRulesStats>{
           exploration_id: explorationId,
           state_name: state.name,
           visualizations_info: response.visualizations_info.map(info => ({
@@ -123,12 +115,11 @@ export class StateInteractionStatsService {
             data: info.data.map(datum => <IAnswerData>{
               answer: this.getReadableAnswerString(state, datum.answer),
               frequency: datum.frequency,
-              is_addressed: (
-                info.addressed_info_is_supported ?
-                  this.answerClassificationService
-                    .isClassifiedExplicitlyOrGoesToNewState(
-                      state.name, state, datum.answer, interactionRulesService) :
-                  undefined),
+              is_addressed: info.addressed_info_is_supported ?
+                this.answerClassificationService
+                  .isClassifiedExplicitlyOrGoesToNewState(
+                    state.name, state, datum.answer, interactionRulesService) :
+                undefined,
             }),
             id: info.id,
             options: info.options,
