@@ -221,6 +221,7 @@ class UserCommunityRightsDataHandler(base.BaseHandler):
                 if community_rights else False)
         })
 
+
 class FeaturedTranslationLanguagesHandler(base.BaseHandler):
     """Provides featured translation languages set in admin config
     """

@@ -422,6 +422,7 @@ class UserCommunityRightsDataHandlerTest(test_utils.GenericTestBase):
                 'can_review_questions': True
             })
 
+
 class FeaturedTranslationLanguagesHandlerTest(test_utils.GenericTestBase):
     """Test for the FeaturedTranslationLanguagesHandler."""
 
