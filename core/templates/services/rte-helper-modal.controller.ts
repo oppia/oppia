@@ -19,12 +19,12 @@
 angular.module('oppia').controller('RteHelperModalController', [
   '$scope', '$timeout', '$uibModalInstance', 'AlertsService',
   'AssetsBackendApiService', 'ContextService', 'FocusManagerService',
-  'attrsCustomizationArgsDict', 'customizationArgSpecs',
+  'ImageLocalStorageService', 'ImageUploadHelperService', 'attrsCustomizationArgsDict', 'customizationArgSpecs',
   'IMAGE_SAVE_DESTINATION_LOCAL_STORAGE',
   function(
       $scope, $timeout, $uibModalInstance, AlertsService,
       AssetsBackendApiService, ContextService, FocusManagerService,
-      attrsCustomizationArgsDict, customizationArgSpecs,
+      ImageLocalStorageService, ImageUploadHelperService, attrsCustomizationArgsDict, customizationArgSpecs,
       IMAGE_SAVE_DESTINATION_LOCAL_STORAGE) {
     var extractVideoIdFromVideoUrl = function(videoUrl) {
       videoUrl = videoUrl.split(/(vi\/|v=|\/v\/|youtu\.be\/|\/embed\/)/);
@@ -59,9 +59,7 @@ angular.module('oppia').controller('RteHelperModalController', [
               customizationArgSpecs[i].default_value)
         };
         mathValueDict.value.svgFileDict = {
-          svgFile: null,
-          entityType: '',
-          entityId: '',
+          svgData: null,
           fileName: ''
         };
         $scope.tmpCustomizationArgs.push(mathValueDict);
@@ -85,19 +83,37 @@ angular.module('oppia').controller('RteHelperModalController', [
       var customizationArgsDict = {};
 
       if ($scope.isRteMathExpressionEditor) {
+        var svgFileDict = $scope.tmpCustomizationArgs[0].value.svgFileDict;
         if (
           ContextService.getImageSaveDestination() ===
           IMAGE_SAVE_DESTINATION_LOCAL_STORAGE) {
-          $uibModalInstance.dismiss('cancel');
+          ImageLocalStorageService.saveImage(svgFileDict.fileName, svgFileDict.svgData);
+          console.log("saved math in localstoraeg3")
+          var mathContentDict = {
+            raw_latex: $scope.tmpCustomizationArgs[0].value.raw_latex,
+            svg_filename: svgFileDict.fileName
+          };
+          var caName = 'math_content';
+          customizationArgsDict[caName] = mathContentDict;
+          $uibModalInstance.close(customizationArgsDict);
+          $scope.isRteMathExpressionEditor = false;
+          return;
         }
-        var svgFileDict = $scope.tmpCustomizationArgs[0].value.svgFileDict;
+        console.log("in backend save3")
+        console.log(ContextService.getImageSaveDestination())
+        var resampledFile = (
+           ImageUploadHelperService.convertImageDataToImageFile(
+             svgFileDict.svgData));
+
         AssetsBackendApiService.saveMathImage(
-          svgFileDict.svgFile, svgFileDict.fileName, svgFileDict.entityType,
-          svgFileDict.entityId).then(function(response) {
+          resampledFile, svgFileDict.fileName, ContextService.getEntityType(),
+          ContextService.getEntityId()).then(function(response) {
           var mathContentDict = {
             raw_latex: $scope.tmpCustomizationArgs[0].value.raw_latex,
             svg_filename: response.filename
           };
+          console.log("in isRteMathExpressionEditor save")
+          console.log(response.filename)
           var caName = 'math_content';
           customizationArgsDict[caName] = mathContentDict;
           $uibModalInstance.close(customizationArgsDict);

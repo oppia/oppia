@@ -3,6 +3,12 @@
         style="float: right;">
   Create Question
 </button>
+<button class="btn btn-secondary protractor-test-create-question-button"
+        ng-click="$ctrl.createMockQuestion()"
+        style="float: right;">
+  Create  mock Question
+</button>
+
 <table class="dashboard-table" ng-if="$ctrl.getQuestionSummariesForOneSkill().length > 0">
   <colgroup>
     <col style="width: 5%;">

@@ -65,7 +65,6 @@ angular.module('oppia').directive('mathExpressionContentEditor', [
           var fileName = (
             ImageUploadHelperService.generateMathExpressionImageFilename(
               dimensions.height, dimensions.width, dimensions.verticalPadding));
-          let resampledFile ;
           var dataURI = 'data:image/svg+xml;base64,' + btoa(cleanedSvgString);
           var invalidTagsAndAttributes = (
             ImageUploadHelperService.getInvalidSvgTagsAndAttrs(
@@ -73,12 +72,7 @@ angular.module('oppia').directive('mathExpressionContentEditor', [
           var tags = invalidTagsAndAttributes.tags;
           var attrs = invalidTagsAndAttributes.attrs;
           if (tags.length === 0 && attrs.length === 0) {
-            resampledFile = (
-              ImageUploadHelperService.convertImageDataToImageFile(
-                dataURI));
-            ctrl.value.svgFileDict.svgFile = resampledFile;
-            ctrl.value.svgFileDict.entityType = ContextService.getEntityType();
-            ctrl.value.svgFileDict.entityId = ContextService.getEntityId();
+            ctrl.value.svgFileDict.svgData = dataURI;
             ctrl.value.svgFileDict.fileName = fileName;
           } else {
             ctrl.value.raw_latex = '';

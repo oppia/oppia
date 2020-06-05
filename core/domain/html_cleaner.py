@@ -137,6 +137,15 @@ def get_image_filenames_from_html_strings(html_strings):
             filenames.append(
                 rte_comp['customization_args']['filepath-with-value'])
 
+        import json
+        if 'id' in rte_comp and rte_comp['id'] == 'oppia-noninteractive-math':
+            print("\n\n******************************************************\n\n")
+            print("rte_comp")
+            print(json.dumps(rte_comp, indent=4))
+            print("******************************************************\n\n")
+            filenames.append(
+                rte_comp['customization_args']['math_content-with-value']['svg_filename'])
+
     return list(set(filenames))
 
 

@@ -41,14 +41,28 @@ angular.module('oppia').factory('EditableQuestionBackendApiService', [
       QUESTION_SKILL_LINK_URL_TEMPLATE) {
     var _createQuestion = function(
         skillIds, skillDifficulties,
-        questionDict, successCallback, errorCallback) {
+        questionDict, imagesData, successCallback, errorCallback) {
       var postData = {
         question_dict: questionDict,
         skill_ids: skillIds,
-        skill_difficulties: skillDifficulties
+        skill_difficulties: skillDifficulties,
       };
-      $http.post(QUESTION_CREATION_URL, postData).then(function(response) {
+      let body = new FormData();
+      body.append('payload', JSON.stringify(postData));
+      let filenames = imagesData.map(obj => obj.filename);
+      let imageBlobs = imagesData.map(obj => obj.imageBlob);
+      for (let idx in imageBlobs) {
+        body.append(filenames[idx], imageBlobs[idx]);
+      }
+      $http.post(QUESTION_CREATION_URL, (body), {
+        headers: {
+          'Content-Type': undefined
+       }
+      }).then(function(response) {
         var questionId = response.data.question_id;
+        console.log('Success saving to backend')
+        console.log(response.data)
+
         if (successCallback) {
           successCallback(questionId);
         }
@@ -156,10 +170,11 @@ angular.module('oppia').factory('EditableQuestionBackendApiService', [
     };
 
     return {
-      createQuestion: function(skillIds, skillDifficulties, questionDict) {
+      createQuestion: function(
+        skillIds, skillDifficulties, questionDict, imagesData) {
         return $q(function(resolve, reject) {
           _createQuestion(skillIds, skillDifficulties,
-            questionDict, resolve, reject);
+            questionDict, imagesData, resolve, reject);
         });
       },
 

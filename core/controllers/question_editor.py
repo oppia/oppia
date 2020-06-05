@@ -24,10 +24,13 @@ from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import question_domain
 from core.domain import question_services
+from core.domain import image_validation_services
+from core.domain import html_cleaner
+from core.domain import fs_services
 from core.domain import skill_domain
 from core.domain import skill_services
 import feconf
-
+import utils
 
 class QuestionCreationHandler(base.BaseHandler):
     """A handler that creates the question model given a question dict."""
@@ -70,7 +73,6 @@ class QuestionCreationHandler(base.BaseHandler):
             feconf.CURRENT_STATE_SCHEMA_VERSION)
         question_dict['id'] = question_services.get_new_question_id()
         question_dict['linked_skill_ids'] = skill_ids
-
         try:
             question = question_domain.Question.from_dict(question_dict)
         except Exception as e:
@@ -98,6 +100,50 @@ class QuestionCreationHandler(base.BaseHandler):
                for difficulty in skill_difficulties):
             raise self.InvalidInputException(
                 'Skill difficulties must be between 0 and 1')
+
+        print("\n\n******************************************************\n\n")
+        print("body")
+        print(self.request.body)
+        print("question dict")
+        print(question_dict)
+        print("******************************************************\n\n")
+
+        html_list = question.question_state_data.get_all_html_content_strings()
+        print("\n\n******************************************************\n\n")
+        print("html_list")
+        print(html_list)
+        filenames = html_cleaner.get_image_filenames_from_html_strings(html_list)
+        print("filenames")
+        print(filenames)
+        print("******************************************************\n\n")
+
+        for filename in filenames:
+            # image = image_dict['imageBlob']
+            # filename = image_dict['filename']
+            print("filename")
+            print(filename)
+            image = self.request.get(filename)
+            print("image")
+            print(image)
+            if not image:
+                logging.error(
+                    'Image not provided for file with name %s when the skill '
+                    'with id %s was created.' % (filename, skill.id))
+                raise self.InvalidInputException(
+                    'No image data provided for file with name %s. %s'
+                    % (filename, image_validation_error_message_suffix))
+            try:
+                file_format = (
+                    image_validation_services.validate_image_and_filename(
+                        image, filename))
+            except utils.ValidationError as e:
+                e = '%s %s' % (e, image_validation_error_message_suffix)
+                raise self.InvalidInputException(e)
+            image_is_compressible = (
+                file_format in feconf.COMPRESSIBLE_IMAGE_FORMATS)
+            fs_services.save_original_and_compressed_versions_of_image(
+                filename, feconf.ENTITY_TYPE_SKILL, skill.id, image,
+                'image', image_is_compressible)
 
         question_services.add_question(self.user_id, question)
         question_services.link_multiple_skills_for_question(
