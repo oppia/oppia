@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for AdminDataObjectFactorySpec.ts.
+ * @fileoverview Unit tests for AdminDataObjectFactory.ts.
  */
 
 import { AdminDataObjectFactory } from

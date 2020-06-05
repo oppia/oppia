@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Backend api service for playthrough.
+ * @fileoverview Backend API service for playthrough.
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';

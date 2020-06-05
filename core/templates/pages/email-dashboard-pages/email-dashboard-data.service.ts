@@ -103,15 +103,15 @@ export class EmailDashboardDataService {
   }
 
   fetchQuery(queryId: string): Promise<EmailDashboardQuery> {
-    return this.emailDashboardBackendApiService.fetchQuery(queryId).then((
-        newQuery) => {
-      this.queries.forEach(function(query, index, queries) {
-        if (query.id === queryId) {
-          queries[index] = newQuery;
-        }
+    return this.emailDashboardBackendApiService.fetchQuery(queryId)
+      .then((newQuery) => {
+        this.queries.forEach(function(query, index, queries) {
+          if (query.id === queryId) {
+            queries[index] = newQuery;
+          }
+        });
+        return newQuery;
       });
-      return newQuery;
-    });
   }
 }
 
