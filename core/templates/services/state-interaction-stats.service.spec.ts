@@ -110,7 +110,7 @@ describe('State Interaction Stats Service', () => {
         });
         flushMicrotasks();
 
-        this.stateInteractionStatsService.computeStats(this.mockState)
+        this.stateInteractionStatsService.computeStats(this.mockState, false)
           .then(captureStats);
         this.httpTestingController.expectNone(
           '/createhandler/state_interaction_stats/expid/Hola');
@@ -173,9 +173,8 @@ describe('State Interaction Stats Service', () => {
       this.onSuccess = jasmine.createSpy('success');
       this.onFailure = jasmine.createSpy('failure');
 
-      this.stateInteractionStatsService.computeStats(
-        this.mockState
-      ).then(this.onSuccess, this.onFailure);
+      this.stateInteractionStatsService.computeStats(this.mockState, false)
+        .then(this.onSuccess, this.onFailure);
 
       const req = this.httpTestingController.expectOne(
         '/createhandler/state_interaction_stats/expid/Hola');
@@ -209,9 +208,8 @@ describe('State Interaction Stats Service', () => {
         this.onSuccess = jasmine.createSpy('success');
         this.onFailure = jasmine.createSpy('failure');
 
-        this.stateInteractionStatsService.computeStats(
-          this.mockState
-        ).then(this.onSuccess, this.onFailure);
+        this.stateInteractionStatsService.computeStats(this.mockState, false)
+          .then(this.onSuccess, this.onFailure);
 
         const req = this.httpTestingController.expectOne(
           '/createhandler/state_interaction_stats/expid/Hola');
@@ -243,7 +241,8 @@ describe('State Interaction Stats Service', () => {
         this.onFailure = jasmine.createSpy('failure');
 
         this.stateInteractionStatsService.computeStats({
-          name: 'Fraction', interaction: {id: 'FractionInput'}
+          name: 'Fraction', interaction: {id: 'FractionInput'},
+          false
         }).then(this.onSuccess, this.onFailure);
 
         const req = this.httpTestingController.expectOne(

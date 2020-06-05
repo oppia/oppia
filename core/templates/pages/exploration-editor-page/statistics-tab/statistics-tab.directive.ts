@@ -140,7 +140,7 @@ angular.module('oppia').directive('statisticsTab', [
             AlertsService.clearWarnings();
 
             StateInteractionStatsService.computeStats(
-              ExplorationStatesService.getState(stateName)
+              ExplorationStatesService.getState(stateName, false)
             ).then(stats => {
               $uibModal.open({
                 templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(

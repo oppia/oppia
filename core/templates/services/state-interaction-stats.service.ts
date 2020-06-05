@@ -101,8 +101,7 @@ export class StateInteractionStatsService {
    * Returns a promise which will provide details of the given state's
    * answer-statistics.
    */
-  computeStats(
-      state: State, cacheResults: boolean = false): Promise<IStateRulesStats> {
+  computeStats(state: State, cacheResults: boolean): Promise<IStateRulesStats> {
     if (cacheResults && this.cachedStats !== null) {
       return this.cachedStats;
     }
