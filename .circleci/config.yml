@@ -33,7 +33,7 @@ workflows:
       #       - frontend_tests
       - e2e_file_upload_features:
           requires:
-            - typescript_tests
+            - setup
       - e2e_navigation_and_admin:
           requires:
             - setup
