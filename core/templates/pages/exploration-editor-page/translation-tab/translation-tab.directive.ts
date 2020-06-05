@@ -20,15 +20,14 @@ require(
   'components/common-layout-directives/common-elements/' +
   'attribution-guide.directive.ts');
 require(
-  'components/common-layout-directives/common-elements/' +
-  'confirm-or-cancel-modal.controller.ts');
-require(
   'pages/exploration-editor-page/translation-tab/state-translation/' +
   'state-translation.directive.ts');
 require(
+  'pages/exploration-editor-page/translation-tab/modal-templates/' +
+  'welcome-translation-modal.controller.ts');
+require(
   'pages/exploration-editor-page/translation-tab/' +
-  'state-translation-status-graph/state-translation-status-graph.directive.ts'
-);
+  'state-translation-status-graph/state-translation-status-graph.directive.ts');
 require(
   'pages/exploration-editor-page/translation-tab/translator-overview/' +
   'translator-overview.directive.ts');
@@ -136,26 +135,7 @@ angular.module('oppia').directive('translationTab', [
                 '/pages/exploration-editor-page/translation-tab/' +
                 'modal-templates/welcome-translation-modal.template.html'),
               backdrop: true,
-              controller: [
-                '$controller', '$scope', '$uibModalInstance', 'ContextService',
-                'SiteAnalyticsService',
-                function($controller, $scope, $uibModalInstance, ContextService,
-                    SiteAnalyticsService) {
-                  $controller('ConfirmOrCancelModalController', {
-                    $scope: $scope,
-                    $uibModalInstance: $uibModalInstance
-                  });
-                  $scope.explorationId = ContextService.getExplorationId();
-
-                  SiteAnalyticsService.registerTutorialModalOpenEvent(
-                    $scope.explorationId);
-
-                  // translation tutorial image url for modal
-                  $scope.translationWelcomeImgUrl = (
-                    UrlInterpolationService.getStaticImageUrl(
-                      '/general/editor_welcome.svg'));
-                }
-              ],
+              controller: 'WelcomeTranslationModalController',
               windowClass: 'oppia-welcome-modal'
             }).result.then(function(explorationId) {
               SiteAnalyticsService.registerAcceptTutorialModalEvent(
