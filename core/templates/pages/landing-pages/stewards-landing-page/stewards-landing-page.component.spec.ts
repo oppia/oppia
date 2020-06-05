@@ -72,7 +72,7 @@ describe('Stewards Landing Page', function() {
       href: '/library'
     }, {
       text: 'Subscribe to our Newsletter',
-      href: 'https://tinyletter.com/oppia'
+      href: 'https://eepurl.com/g5v9Df'
     }]);
     expect(ctrl.isActiveTab(activeTabName)).toBe(true);
     expect(ctrl.isActiveTab('Teachers')).toBe(false);
@@ -94,7 +94,7 @@ describe('Stewards Landing Page', function() {
       href: '/library'
     }, {
       text: 'Subscribe to our Newsletter',
-      href: 'https://tinyletter.com/oppia'
+      href: 'https://eepurl.com/g5v9Df'
     }]);
     expect(ctrl.isActiveTab(activeTabName)).toBe(true);
     expect(ctrl.isActiveTab('Parents')).toBe(false);
@@ -216,7 +216,7 @@ describe('Stewards Landing Page', function() {
       href: '/library'
     }, {
       text: 'Subscribe to our Newsletter',
-      href: 'https://tinyletter.com/oppia'
+      href: 'https://eepurl.com/g5v9Df'
     }]);
     expect(ctrl.windowIsNarrow).toBe(true);
   });

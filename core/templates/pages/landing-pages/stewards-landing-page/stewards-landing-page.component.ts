@@ -60,7 +60,7 @@ angular.module('oppia').component('stewardsLandingPage', {
             href: '/library'
           }, {
             text: 'Subscribe to our Newsletter',
-            href: 'https://tinyletter.com/oppia'
+            href: 'https://eepurl.com/g5v9Df'
           }];
         } else if (tabName === ctrl.TAB_NAME_NONPROFITS) {
           return [{
