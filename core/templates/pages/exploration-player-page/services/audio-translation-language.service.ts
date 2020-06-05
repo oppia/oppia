@@ -135,14 +135,14 @@ export class AudioTranslationLanguageService {
   }
 
   /**
-   * @return {string} The current audio language code (ex. en).
+   * @return {string} The current audio language code (eg. en).
    */
   getCurrentAudioLanguageCode(): string {
     return this._currentAudioLanguageCode;
   }
 
   /**
-   * @return {string} The current language description (ex. English).
+   * @return {string} The current language description (eg. English).
    */
   getCurrentAudioLanguageDescription(): string {
     return this.languageUtilService.getAudioLanguageDescription(
