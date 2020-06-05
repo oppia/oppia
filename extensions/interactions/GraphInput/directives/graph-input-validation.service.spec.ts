@@ -27,6 +27,8 @@ import { GraphInputValidationService } from
 import { Outcome, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
+import { IGraphBackendDict } from
+  'extensions/interactions/GraphInput/directives/graph-detail.service';
 
 import { AppConstants } from 'app.constants';
 import { WARNING_TYPES_CONSTANT } from 'app-type.constants';
@@ -134,9 +136,12 @@ describe('GraphInputValidationService', () => {
   it('The graph used in the rule x in group y exceeds supported maximum ' +
     'number of vertices of 10 for isomorphism check.',
   () => {
-    answerGroups[0].rules[0].inputs.g.vertices = new Array(11);
-    answerGroups[0].rules[1].inputs.g.vertices = new Array(11);
-    answerGroups[1].rules[0].inputs.g.vertices = new Array(11);
+    (<IGraphBackendDict>
+      answerGroups[0].rules[0].inputs.g).vertices = new Array(11);
+    (<IGraphBackendDict>
+      answerGroups[0].rules[1].inputs.g).vertices = new Array(11);
+    (<IGraphBackendDict>
+      answerGroups[1].rules[0].inputs.g).vertices = new Array(11);
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, answerGroups,
       goodDefaultOutcome);
