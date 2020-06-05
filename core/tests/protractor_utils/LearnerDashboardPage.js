@@ -123,14 +123,6 @@ var LearnerDashboardPage = function() {
     await subscriptionsSection.click();
   };
 
-  this.expectTitleOfCollectionSummaryTileToBeHidden = function(title) {
-    element.all(by.cssContainingText(
-      '.protractor-test-collection-summary-tile-title', title))
-      .then(function(items) {
-        expect(items.length).toBe(0);
-      });
-  };
-
   this.expectTitleOfCollectionSummaryTileToMatch = async function(title) {
     var collectionTitle = element(by.cssContainingText(
       '.protractor-test-collection-summary-tile-title', title));
