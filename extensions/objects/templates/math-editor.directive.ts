@@ -42,11 +42,14 @@ angular.module('oppia').directive('mathEditor', [
           guppyDivElt.setAttribute(
             'id', 'guppy_' + Math.floor(Math.random() * 100000000));
           guppyDivId = guppyDivElt.id;
-          guppyInstance = new Guppy(guppyDivId, {});
-          guppyInstance.render();
-          Guppy.event('change', () => {
-            ctrl.value = guppyInstance.asciimath();
+          guppyInstance = new Guppy(guppyDivId, {
+            events: {
+              change: function(e) {
+                ctrl.value = guppyInstance.asciimath();
+              }
+            }
           });
+          guppyInstance.render();
         };
       }]
     };
