@@ -223,7 +223,7 @@ class UserCommunityRightsDataHandler(base.BaseHandler):
 
 
 class FeaturedTranslationLanguagesHandler(base.BaseHandler):
-    """Provides featured translation languages set in admin config"""
+    """Provides featured translation languages set in admin config."""
 
     @acl_decorators.open_access
     def get(self):
