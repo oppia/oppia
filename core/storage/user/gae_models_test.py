@@ -763,7 +763,7 @@ class UserSubscriptionsModelTests(test_utils.GenericTestBase):
     USER_ID_5 = 'user_id_5'
     USER_ID_6 = 'user_id_6'
     CREATOR_IDS = [USER_ID_5, USER_ID_6]
-    CREATOR_USERNAMES = ['username_user_id_5', 'username_user_id_6']
+    CREATOR_USERNAMES = ['usernameuser_id_5', 'usernameuser_id_6']
     COLLECTION_IDS = ['23', '42', '4']
     ACTIVITY_IDS = ['8', '16', '23']
     GENERAL_FEEDBACK_THREAD_IDS = ['42', '4', '8']
