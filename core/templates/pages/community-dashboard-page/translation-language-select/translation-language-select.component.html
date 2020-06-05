@@ -19,9 +19,9 @@
       <div class="oppia-translation-language-select-dropdown-label">Most needed languages</div>
       <div *ngFor="let featuredOption of featuredLanguages; index as i">
         <div class="oppia-translation-language-select-dropdown-option"
-          *ngIf="languageIdToDescription[featuredOption.getLanguageCode()]"
-          (click)="_selectOption(featuredOption.getLanguageCode())"
-          [ngClass]="{'oppia-translation-language-select-dropdown-option-selected' : featuredOption.getLanguageCode() === value}">
+             *ngIf="languageIdToDescription[featuredOption.getLanguageCode()]"
+             (click)="_selectOption(featuredOption.getLanguageCode())"
+             [ngClass]="{'oppia-translation-language-select-dropdown-option-selected' : featuredOption.getLanguageCode() === value}">
           {{languageIdToDescription[featuredOption.getLanguageCode()]}}
 
           <span class="material-icons"
