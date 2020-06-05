@@ -856,12 +856,10 @@ class UserSubscriptionsModel(base_models.BaseModel):
         if user_model is None:
             return {}
 
-        creator_usernames = []
         creator_user_models = UserSettingsModel.get_multi(
             user_model.creator_ids)
-
-        for creator in creator_user_models:
-            creator_usernames.append(creator.username)
+        creator_usernames = [
+            creator.username for creator in creator_user_models]
 
         user_data = {
             'activity_ids': user_model.activity_ids,
