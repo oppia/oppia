@@ -84,8 +84,8 @@ angular.module('oppia').factory('LiterallyCanvasHelperService', [
     };
 
     var svgToSnapshot = function(node) {
-      var id = node.attributes.id.value.split('-')
-      var shape:any ={}
+      var id = node.attributes.id.value.split('-');
+      var shape:any = {};
       if (id[0] == 'ellipse') {
         shape.className = 'Ellipse';
         shape.data = {};

@@ -34,10 +34,10 @@ angular.module('oppia').component('literallyCanvasDiagramEditor', {
     value: '='
   },
   controller: [
-    '$http', '$sce', '$scope', 'AlertsService', 'AssetsBackendApiService',
+    '$http', '$q', '$sce', '$scope', 'AlertsService', 'AssetsBackendApiService',
     'ContextService', 'CsrfTokenService', 'ImagePreloaderService',
     'ImageUploadHelperService', 'LiterallyCanvasHelperService', 
-    'UrlInterpolationService', function($http, $sce, $scope, AlertsService,
+    'UrlInterpolationService', function($http, $q, $sce, $scope, AlertsService,
       AssetsBackendApiService, ContextService, CsrfTokenService, 
       ImagePreloaderService, ImageUploadHelperService, 
       LiterallyCanvasHelperService, UrlInterpolationService) {
@@ -135,8 +135,9 @@ angular.module('oppia').component('literallyCanvasDiagramEditor', {
         }
       }
 
-      ctrl.postImageToServer = function(dimensions, resampledFile) {
-        let form = new FormData();
+      ctrl.postSVGToServer = function(dimensions, resampledFile) {
+        return $q(function(successCallback, errorCallback) {
+          let form = new FormData();
         form.append('image', resampledFile);
         form.append('payload', JSON.stringify({
           filename: ImageUploadHelperService.generateImageFilename(
@@ -157,37 +158,25 @@ angular.module('oppia').component('literallyCanvasDiagramEditor', {
               processData: false,
               contentType: false,
               type: 'POST',
-              dataFilter: function(data) {
-                // Remove the XSSI prefix.
-                var transformedData = data.substring(5);
-                return JSON.parse(transformedData);
-              },
               dataType: 'text'
             }).done(function(data) {
-              // Pre-load image before marking the image as saved.
-              var img = new Image();
-              img.onload = function() {
-                console.log("onload")
-                ctrl.setSavedSVGFilename(data.filename, false);
-                var dimensions = (
-                  ImagePreloaderService.getDimensionsOfImage(data.filename));
-                ctrl.svgContainerStyle = {
-                  height: dimensions.height + 'px',
-                  width: dimensions.width + 'px'
-                };
-                $scope.$apply();
-              };
-              img.src = getTrustedResourceUrlForSVGFileName(data.filename);
+              // Remove the XSSI prefix.
+              var transformedData = data.substring(5);
+              var parsedResponse = JSON.parse(transformedData);
+              if (successCallback) {
+                successCallback(parsedResponse);
+              }
             }).fail(function(data) {
               // Remove the XSSI prefix.
               var transformedData = data.responseText.substring(5);
               var parsedResponse = JSON.parse(transformedData);
-              AlertsService.addWarning(
-                parsedResponse.error || 'Error communicating with server.');
-              $scope.$apply();
+              if (errorCallback) {
+                errorCallback(parsedResponse);
+              }
             });
-          });
+        })
       }
+      )};
 
       ctrl.saveSVGFile = function() {
         AlertsService.clearWarnings();
@@ -210,7 +199,27 @@ angular.module('oppia').component('literallyCanvasDiagramEditor', {
           resampledFile = (
             ImageUploadHelperService.convertImageDataToImageFile(
               svgDataURI));
-          ctrl.postImageToServer(dimensions, resampledFile);
+          ctrl.postSVGToServer(dimensions, resampledFile).then(function(data) {
+              // Pre-load image before marking the image as saved.
+              console.log("hihihih")
+              console.log(data)
+              var img = new Image();
+              img.onload = function() {
+                ctrl.setSavedSVGFilename(data.filename, false);
+                var dimensions = (
+                  ImagePreloaderService.getDimensionsOfImage(data.filename));
+                ctrl.svgContainerStyle = {
+                  height: dimensions.height + 'px',
+                  width: dimensions.width + 'px'
+                };
+                $scope.$apply();
+              };
+              img.src = getTrustedResourceUrlForSVGFileName(data.filename);
+            }, function(parsedResponse) {
+                AlertsService.addWarning(
+                  parsedResponse.error || 'Error communicating with server.');
+                $scope.$apply();
+            })
         }
       }
 
@@ -219,12 +228,7 @@ angular.module('oppia').component('literallyCanvasDiagramEditor', {
       }
 
       ctrl.continueDiagramEditing = function() {
-        ctrl.diagramStatus = 'editing';
-        ctrl.data = {};
-        ctrl.invalidTagsAndAttributes = {
-          tags: [],
-          attrs: []
-        };
+        
         angular.element(document).ready(function() {
           ctrl.lc = LC.init(document.getElementById(ctrl.lcID), {
             imageSize: {
@@ -248,16 +252,22 @@ angular.module('oppia').component('literallyCanvasDiagramEditor', {
               LC.tools.Eyedropper
             ]
           });
+          ctrl.diagramStatus = 'editing';
+          ctrl.data = {};
+          ctrl.invalidTagsAndAttributes = {
+            tags: [],
+            attrs: []
+          };
           var snapshot = LiterallyCanvasHelperService.svgParse(
             ctrl.savedSVGDiagram, ctrl.lc)
           ctrl.lc.loadSnapshot(snapshot);
         });
       }
 
-      ctrl.validate = function(data) {
+      ctrl.validate = function() {
         return (
-          ctrl.isDiagramSaved() && data.savedSVGFileName &&
-          data.savedSVGFileName.length > 0);
+          ctrl.isDiagramSaved() && ctrl.data.savedSVGFileName &&
+          ctrl.data.savedSVGFileName.length > 0);
       };
 
       ctrl.$onInit = function() {

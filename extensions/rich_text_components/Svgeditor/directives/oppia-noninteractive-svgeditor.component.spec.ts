@@ -18,7 +18,7 @@
 
 import { UpgradedServices } from 'services/UpgradedServices';
 
-fdescribe('oppiaNoninteractiveSvgeditor', function() {
+describe('oppiaNoninteractiveSvgeditor', function() {
   var ecs = null;
   var ctrl = null;
   var mockabas = {

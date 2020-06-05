@@ -1,4 +1,4 @@
-<div ng-model="$ctrl.data" ui-validate="'$ctrl.validate($value)'" class="fs-container">
+<div ng-model="$ctrl.data" ui-validate="'$ctrl.validate()'" class="fs-container">
   <div ng-if="!$ctrl.isDiagramSaved()"  class="diagram-editor-size-toolbar">
     Width: <input type="number" ng-model="$ctrl.diagramWidth" ng-blur="$ctrl.onWidthInputBlur()" max="$ctrl.maxDiagramWidth">
     Height: <input type="number" ng-model="$ctrl.diagramHeight" ng-blur="$ctrl.onHeightInputBlur()" max="$ctrl.maxDiagramHeight">
