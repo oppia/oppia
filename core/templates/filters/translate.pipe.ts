@@ -90,7 +90,9 @@ export class TranslatePipe implements PipeTransform, OnDestroy {
 
   /**
    * @param {string} key - key for i18n
-   * @param {Object | undefined} params - key-value pairs for interpolation
+   * @param {Object | undefined} params - key-value pairs for interpolation. No
+   *  key-value pairs are sent when the translation does not require
+   *  interpolation. In that case the params will be undefined.
    * @returns {string} - interpolated I18n value
    */
   transform(key: string, params?: Object | undefined): string {
