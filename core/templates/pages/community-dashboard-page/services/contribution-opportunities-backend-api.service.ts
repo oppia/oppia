@@ -27,12 +27,6 @@ import { SkillOpportunity } from
   'domain/opportunity/SkillOpportunityObjectFactory';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
-import {
-  ReadOnlyFeaturedTranslationLanguage,
-  ReadOnlyFeaturedTranslationLanguageObjectFactory,
-  IFeaturedTranslationLanguageBackendDict
-} from
-  'domain/community_dashboard/ReadOnlyFeaturedTranslationLanguageObjectFactory';
 
 const constants = require('constants.ts');
 
