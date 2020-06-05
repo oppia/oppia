@@ -16,55 +16,68 @@
  * @fileoverview Modal and functionality for the create collection button.
  */
 
-// eslint-disable-next-line max-len
-require('components/entity-creation-services/collection-creation-backend-api.service.ts');
-require('services/alerts.service.ts');
-require('domain/utilities/url-interpolation.service.ts');
-require('services/site-analytics.service.ts');
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
-// TODO(bhenning): Refactor this to match the frontend design spec and reduce
-// duplicated code between CollectionCreationService and
-// ExplorationCreationService.
+import { AlertsService } from 'services/alerts.service';
+import { CollectionCreationBackendService, ICollectionCreationResponse } from
+  'components/entity-creation-services/collection-creation-backend-api.service';
+import { LoaderService } from 'services/loader.service.ts';
+import { SiteAnalyticsService } from 'services/site-analytics.service';
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
 
-angular.module('oppia').factory('CollectionCreationService', [
-  '$timeout', '$window', 'AlertsService',
-  'CollectionCreationBackendService', 'LoaderService', 'SiteAnalyticsService',
-  'UrlInterpolationService',
-  function(
-      $timeout, $window, AlertsService,
-      CollectionCreationBackendService, LoaderService, SiteAnalyticsService,
-      UrlInterpolationService) {
-    var CREATE_NEW_COLLECTION_URL_TEMPLATE = (
-      '/collection_editor/create/<collection_id>');
-    var collectionCreationInProgress = false;
+@Injectable({
+  providedIn: 'root'
+})
+export class CollectionCreationService {
+  // TODO(#9154): Remove static when migration is complete.
+  static collectionCreationInProgress: boolean = false;
 
-    return {
-      createNewCollection: function() {
-        if (collectionCreationInProgress) {
-          return;
-        }
-
-        collectionCreationInProgress = true;
-        AlertsService.clearWarnings();
-
-        LoaderService.showLoadingScreen('Creating collection');
-
-        CollectionCreationBackendService.createCollection().then(
-          function(response) {
-            SiteAnalyticsService.registerCreateNewCollectionEvent(
-              response.collectionId);
-            $timeout(function() {
-              $window.location = UrlInterpolationService.interpolateUrl(
-                CREATE_NEW_COLLECTION_URL_TEMPLATE, {
-                  collection_id: response.collectionId
-                }
-              );
-            }, 150);
-          }, function() {
-            LoaderService.hideLoadingScreen();
-          }
-        );
-      }
-    };
+  constructor(
+    private collectionCreationBackendService: CollectionCreationBackendService,
+    private alertsService: AlertsService,
+    private siteAnalyticsService: SiteAnalyticsService,
+    private urlInterpolationService: UrlInterpolationService,
+    private loaderService: LoaderService,
+    private windowRef: WindowRef) {
   }
-]);
+
+  CREATE_NEW_COLLECTION_URL_TEMPLATE = (
+      '/collection_editor/create/<collection_id>');
+
+  createNewCollection(): void {
+    if (CollectionCreationService.collectionCreationInProgress) {
+      return;
+    }
+
+    CollectionCreationService.collectionCreationInProgress = true;
+    this.alertsService.clearWarnings();
+
+    this.loaderService.showLoadingScreen('Creating collection');
+
+    this.collectionCreationBackendService.createCollection()
+      .then((response: ICollectionCreationResponse) => {
+        this.siteAnalyticsService.registerCreateNewCollectionEvent(
+          response.collectionId);
+
+        setTimeout(() => {
+          this.windowRef.nativeWindow.location.href =
+            this.urlInterpolationService.interpolateUrl(
+              this.CREATE_NEW_COLLECTION_URL_TEMPLATE, {
+                collection_id: response.collectionId
+              }
+            );
+          CollectionCreationService.collectionCreationInProgress = false;
+        }, 150);
+      }, () => {
+        this.loaderService.hideLoadingScreen();
+        CollectionCreationService.collectionCreationInProgress = false;
+      });
+  }
+}
+
+angular.module('oppia').factory(
+  'CollectionCreationService',
+  downgradeInjectable(CollectionCreationService));

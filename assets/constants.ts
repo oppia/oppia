@@ -5175,6 +5175,7 @@ export = {
   },
 
   "ENABLE_PREREQUISITE_SKILLS": false,
+  "ENABLE_LITERALLY_CANVAS_EDITOR": false,
 
   // For the full new structures viewer features, both
   // ENABLE_NEW_STRUCTURE_PLAYERS and ENABLE_NEW_STRUCTURE_VIEWER_UPDATES has
@@ -5282,8 +5283,8 @@ export = {
   // Used to disable account data export until it is fully implemented.
   "ENABLE_ACCOUNT_EXPORT": false,
 
-  // Used to hide the callout to classroom until it is ready.
-  "SHOW_CLASSROOM_CALLOUT": false,
+  // Maximum allowed length of a username.
+  "MAX_USERNAME_LENGTH": 30,
 
   "DEV_MODE": true
 };

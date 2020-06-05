@@ -26,9 +26,10 @@ from core.platform import models
 from core.tests import test_utils
 import feconf
 import python_utils
+import utils
 
-(base_models, feedback_models) = models.Registry.import_models(
-    [models.NAMES.base_model, models.NAMES.feedback])
+(base_models, feedback_models, user_models) = models.Registry.import_models(
+    [models.NAMES.base_model, models.NAMES.feedback, models.NAMES.user])
 
 CREATED_ON_FIELD = 'created_on'
 LAST_UPDATED_FIELD = 'last_updated'
@@ -43,6 +44,10 @@ class FeedbackThreadModelTest(test_utils.GenericTestBase):
     ENTITY_TYPE = feconf.ENTITY_TYPE_EXPLORATION
     ENTITY_ID = 'exp_id_2'
     USER_ID = 'user_1'
+    OLD_USER_1_ID = 'user_1_old'
+    NEW_USER_1_ID = 'user_1_new'
+    OLD_USER_2_ID = 'user_2_old'
+    NEW_USER_2_ID = 'user_2_new'
     STATUS = 'open'
     SUBJECT = 'dummy subject'
     HAS_SUGGESTION = True
@@ -52,6 +57,17 @@ class FeedbackThreadModelTest(test_utils.GenericTestBase):
     def setUp(self):
         """Set up user models in datastore for use in testing."""
         super(FeedbackThreadModelTest, self).setUp()
+
+        user_models.UserSettingsModel(
+            id=self.NEW_USER_1_ID,
+            gae_id='gae_1_id',
+            email='some@email.com'
+        ).put()
+        user_models.UserSettingsModel(
+            id=self.NEW_USER_2_ID,
+            gae_id='gae_2_id',
+            email='some_other@email.com'
+        ).put()
 
         self.feedback_thread_model = feedback_models.GeneralFeedbackThreadModel(
             id='%s.%s.%s' % (self.ENTITY_TYPE, self.ENTITY_ID, 'random'),
@@ -83,17 +99,82 @@ class FeedbackThreadModelTest(test_utils.GenericTestBase):
         self.assertEqual(
             feedback_models.GeneralFeedbackThreadModel
             .get_user_id_migration_policy(),
-            base_models.USER_ID_MIGRATION_POLICY.ONE_FIELD)
+            base_models.USER_ID_MIGRATION_POLICY.CUSTOM)
 
-    def test_get_user_id_migration_field(self):
-        # We need to compare the field types not the field values, thus using
-        # python_utils.UNICODE.
+    def test_migrate_model(self):
+        id_ = '%s.%s.%s' % (self.ENTITY_TYPE, self.ENTITY_ID, 'random')
+        feedback_models.GeneralFeedbackThreadModel(
+            id=id_,
+            entity_type=self.ENTITY_TYPE,
+            entity_id=self.ENTITY_ID,
+            original_author_id=self.OLD_USER_1_ID,
+            subject=self.SUBJECT,
+            last_nonempty_message_author_id=self.OLD_USER_2_ID,
+        ).put()
+
+        feedback_models.GeneralFeedbackThreadModel.migrate_model(
+            self.OLD_USER_1_ID, self.NEW_USER_1_ID)
+        migrated_model = (
+            feedback_models.GeneralFeedbackThreadModel.get_by_id(id_))
+        self.assertEqual(migrated_model.original_author_id, self.NEW_USER_1_ID)
         self.assertEqual(
-            python_utils.UNICODE(
-                feedback_models.GeneralFeedbackThreadModel
-                .get_user_id_migration_field()),
-            python_utils.UNICODE(
-                feedback_models.GeneralFeedbackThreadModel.original_author_id))
+            migrated_model.last_nonempty_message_author_id, self.OLD_USER_2_ID)
+
+        feedback_models.GeneralFeedbackThreadModel.migrate_model(
+            self.OLD_USER_2_ID, self.NEW_USER_2_ID)
+        migrated_model = (
+            feedback_models.GeneralFeedbackThreadModel.get_by_id(id_))
+        self.assertEqual(migrated_model.original_author_id, self.NEW_USER_1_ID)
+        self.assertEqual(
+            migrated_model.last_nonempty_message_author_id, self.NEW_USER_2_ID)
+
+        feedback_models.GeneralFeedbackThreadModel(
+            id=id_,
+            entity_type=self.ENTITY_TYPE,
+            entity_id=self.ENTITY_ID,
+            original_author_id=self.OLD_USER_1_ID,
+            subject=self.SUBJECT,
+            last_nonempty_message_author_id=self.OLD_USER_1_ID,
+        ).put()
+
+        feedback_models.GeneralFeedbackThreadModel.migrate_model(
+            self.OLD_USER_1_ID, self.NEW_USER_1_ID)
+        migrated_model = (
+            feedback_models.GeneralFeedbackThreadModel.get_by_id(id_))
+        self.assertEqual(migrated_model.original_author_id, self.NEW_USER_1_ID)
+        self.assertEqual(
+            migrated_model.last_nonempty_message_author_id, self.NEW_USER_1_ID)
+
+    def test_verify_model_user_ids_exist(self):
+        model = feedback_models.GeneralFeedbackThreadModel(
+            id='%s.%s.%s' % (self.ENTITY_TYPE, self.ENTITY_ID, 'random'),
+            entity_type=self.ENTITY_TYPE,
+            entity_id=self.ENTITY_ID,
+            original_author_id=self.NEW_USER_1_ID,
+            subject=self.SUBJECT,
+            last_nonempty_message_author_id=self.NEW_USER_2_ID,
+        )
+        self.assertTrue(model.verify_model_user_ids_exist())
+
+        model.original_author_id = feconf.SYSTEM_COMMITTER_ID
+        self.assertTrue(model.verify_model_user_ids_exist())
+        model.original_author_id = feconf.MIGRATION_BOT_USER_ID
+        self.assertTrue(model.verify_model_user_ids_exist())
+        model.original_author_id = feconf.SUGGESTION_BOT_USER_ID
+        self.assertTrue(model.verify_model_user_ids_exist())
+
+        model.original_author_id = self.OLD_USER_1_ID
+        self.assertFalse(model.verify_model_user_ids_exist())
+
+        model.original_author_id = self.NEW_USER_1_ID
+        model.last_nonempty_message_author_id = self.OLD_USER_2_ID
+        self.assertFalse(model.verify_model_user_ids_exist())
+
+        model.last_nonempty_message_author_id = None
+        self.assertTrue(model.verify_model_user_ids_exist())
+
+        model.original_author_id = None
+        self.assertTrue(model.verify_model_user_ids_exist())
 
     def test_raise_exception_by_mocking_collision(self):
         feedback_thread_model_cls = feedback_models.GeneralFeedbackThreadModel
@@ -143,7 +224,8 @@ class FeedbackThreadModelTest(test_utils.GenericTestBase):
                 'has_suggestion': self.HAS_SUGGESTION,
                 'summary': self.SUMMARY,
                 'message_count': self.MESSAGE_COUNT,
-                'last_updated': self.feedback_thread_model.last_updated
+                'last_updated_msec': utils.get_time_in_millisecs(
+                    self.feedback_thread_model.last_updated)
             }
         }
         self.assertEqual(user_data, test_data)

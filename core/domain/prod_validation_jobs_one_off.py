@@ -90,6 +90,7 @@ IMAGE_PATH_REGEX = (
 AUDIO_PATH_REGEX = (
     '%saudio/[A-Za-z0-9-_]{1,}\\.(%s)' % (
         ASSETS_PATH_REGEX, ('|').join(ALLOWED_AUDIO_EXTENSIONS)))
+USER_ID_REGEX = 'uid_[a-z]{32}'
 ALL_CONTINUOUS_COMPUTATION_MANAGERS_CLASS_NAMES = [
     'FeedbackAnalyticsAggregator',
     'InteractionAnswerSummariesAggregator',
@@ -609,7 +610,7 @@ class BaseUserModelValidator(BaseModelValidator):
 
     @classmethod
     def _get_model_id_regex(cls, unused_item):
-        return '^\\d+$'
+        return r'^%s$' % USER_ID_REGEX
 
     @classmethod
     def _get_exp_ids(cls, unused_item):
@@ -785,6 +786,22 @@ class RoleQueryAuditModelValidator(BaseModelValidator):
     @classmethod
     def _get_external_id_relationships(cls, item):
         return {'user_ids': (user_models.UserSettingsModel, [item.user_id])}
+
+
+class UsernameChangeAuditModelValidator(BaseModelValidator):
+    """Class for validating UsernameChangeAuditModels."""
+
+    @classmethod
+    def _get_model_id_regex(cls, item):
+        # Valid id: [committer_id].[timestamp_in_sec]
+        # committer_id refers to the user that is making the change.
+        regex_string = '^%s\\.\\d+$' % item.committer_id
+        return regex_string
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {'committer_ids': (
+            user_models.UserSettingsModel, [item.committer_id])}
 
 
 class ClassifierTrainingJobModelValidator(BaseModelValidator):
@@ -976,6 +993,8 @@ class CollectionModelValidator(BaseModelValidator):
             'snapshot_content_ids': (
                 collection_models.CollectionSnapshotContentModel,
                 snapshot_model_ids),
+            'all_users_model_ids': (
+                collection_models.CollectionRightsAllUsersModel, [item.id])
         }
 
 
@@ -1096,6 +1115,19 @@ class CollectionRightsSnapshotContentModelValidator(
             'collection_rights_ids': (
                 collection_models.CollectionRightsModel,
                 [item.id[:item.id.find('-')]]),
+        }
+
+
+class CollectionRightsAllUsersModelValidator(BaseModelValidator):
+    """Class for validating CollectionRightsAllUsersModel."""
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {
+            'collection_rights_ids': (
+                collection_models.CollectionRightsModel, [item.id]),
+            'all_user_ids': (
+                user_models.UserSettingsModel, item.all_user_ids)
         }
 
 
@@ -1690,8 +1722,9 @@ class GeneralFeedbackEmailReplyToIdModelValidator(BaseModelValidator):
     @classmethod
     def _get_model_id_regex(cls, unused_item):
         return (
-            '^\\d+\\.(%s)\\.[A-Za-z0-9-_]{1,%s}\\.'
+            '^%s\\.(%s)\\.[A-Za-z0-9-_]{1,%s}\\.'
             '[A-Za-z0-9=+/]{1,}') % (
+                USER_ID_REGEX,
                 ('|').join(suggestion_models.TARGET_TYPE_CHOICES),
                 base_models.ID_LENGTH)
 
@@ -1758,6 +1791,8 @@ class ExplorationModelValidator(BaseModelValidator):
             'snapshot_content_ids': (
                 exp_models.ExplorationSnapshotContentModel,
                 snapshot_model_ids),
+            'all_users_model_ids': (
+                exp_models.ExplorationRightsAllUsersModel, [item.id])
         }
 
 
@@ -1882,6 +1917,19 @@ class ExplorationRightsSnapshotContentModelValidator(
             'exploration_rights_ids': (
                 exp_models.ExplorationRightsModel,
                 [item.id[:item.id.find('-')]]),
+        }
+
+
+class ExplorationRightsAllUsersModelValidator(BaseModelValidator):
+    """Class for validating ExplorationRightsAllUsersModel."""
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {
+            'exploration_rights_ids': (
+                exp_models.ExplorationRightsModel, [item.id]),
+            'all_user_ids': (
+                user_models.UserSettingsModel, item.all_user_ids)
         }
 
 
@@ -2182,7 +2230,7 @@ class GeneralFeedbackThreadUserModelValidator(BaseModelValidator):
         thread_id_string = '%s\\.[A-Za-z0-9-_]{1,%s}\\.[A-Za-z0-9-_=]{1,}' % (
             ('|').join(suggestion_models.TARGET_TYPE_CHOICES),
             base_models.ID_LENGTH)
-        regex_string = '^\\d*\\.%s$' % thread_id_string
+        regex_string = '^%s\\.%s$' % (USER_ID_REGEX, thread_id_string)
         return regex_string
 
     @classmethod
@@ -2217,7 +2265,7 @@ class UnsentFeedbackEmailModelValidator(BaseModelValidator):
 
     @classmethod
     def _get_model_id_regex(cls, unused_item):
-        return '^\\d*$'
+        return '^%s$' % USER_ID_REGEX
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -2267,7 +2315,7 @@ class JobModelValidator(BaseModelValidator):
 
     @classmethod
     def _get_model_id_regex(cls, item):
-        # Valid id: [job_type].[current time].[random int]
+        # Valid id: [job_type]-[current time]-[random int]
         regex_string = '^%s-\\d*-\\d*$' % item.job_type
         return regex_string
 
@@ -3217,7 +3265,9 @@ class TopicModelValidator(BaseModelValidator):
             'subtopic_page_ids': (
                 topic_models.SubtopicPageModel,
                 ['%s-%s' % (
-                    item.id, subtopic['id']) for subtopic in item.subtopics])
+                    item.id, subtopic['id']) for subtopic in item.subtopics]),
+            'all_users_model_ids': (
+                topic_models.TopicRightsAllUsersModel, [item.id])
         }
 
     @classmethod
@@ -3365,6 +3415,19 @@ class TopicRightsSnapshotContentModelValidator(
             'topic_rights_ids': (
                 topic_models.TopicRightsModel,
                 [item.id[:item.id.find('-')]]),
+        }
+
+
+class TopicRightsAllUsersModelValidator(BaseModelValidator):
+    """Class for validating TopicRightsAllUsersModel."""
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {
+            'topic_rights_ids': (
+                topic_models.TopicRightsModel, [item.id]),
+            'all_user_ids': (
+                user_models.UserSettingsModel, item.all_user_ids)
         }
 
 
@@ -4910,6 +4973,7 @@ class PseudonymizedUserModelValidator(BaseUserModelValidator):
 MODEL_TO_VALIDATOR_MAPPING = {
     activity_models.ActivityReferencesModel: ActivityReferencesModelValidator,
     audit_models.RoleQueryAuditModel: RoleQueryAuditModelValidator,
+    audit_models.UsernameChangeAuditModel: UsernameChangeAuditModelValidator,
     classifier_models.ClassifierTrainingJobModel: (
         ClassifierTrainingJobModelValidator),
     classifier_models.TrainingJobExplorationMappingModel: (
@@ -4926,6 +4990,8 @@ MODEL_TO_VALIDATOR_MAPPING = {
         CollectionRightsSnapshotContentModelValidator),
     collection_models.CollectionCommitLogEntryModel: (
         CollectionCommitLogEntryModelValidator),
+    collection_models.CollectionRightsAllUsersModel: (
+        CollectionRightsAllUsersModelValidator),
     collection_models.CollectionSummaryModel: CollectionSummaryModelValidator,
     config_models.ConfigPropertyModel: ConfigPropertyModelValidator,
     config_models.ConfigPropertySnapshotMetadataModel: (
@@ -4948,6 +5014,8 @@ MODEL_TO_VALIDATOR_MAPPING = {
         ExplorationRightsSnapshotMetadataModelValidator),
     exp_models.ExplorationRightsSnapshotContentModel: (
         ExplorationRightsSnapshotContentModelValidator),
+    exp_models.ExplorationRightsAllUsersModel: (
+        ExplorationRightsAllUsersModelValidator),
     exp_models.ExplorationCommitLogEntryModel: (
         ExplorationCommitLogEntryModelValidator),
     exp_models.ExpSummaryModel: ExpSummaryModelValidator,
@@ -5007,6 +5075,7 @@ MODEL_TO_VALIDATOR_MAPPING = {
         TopicRightsSnapshotMetadataModelValidator),
     topic_models.TopicRightsSnapshotContentModel: (
         TopicRightsSnapshotContentModelValidator),
+    topic_models.TopicRightsAllUsersModel: TopicRightsAllUsersModelValidator,
     topic_models.TopicCommitLogEntryModel: (
         TopicCommitLogEntryModelValidator),
     topic_models.TopicSummaryModel: TopicSummaryModelValidator,
@@ -5124,6 +5193,14 @@ class RoleQueryAuditModelAuditOneOffJob(ProdValidationAuditOneOffJob):
         return [audit_models.RoleQueryAuditModel]
 
 
+class UsernameChangeAuditModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates UsernameChangeAuditModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [audit_models.UsernameChangeAuditModel]
+
+
 class ClassifierTrainingJobModelAuditOneOffJob(ProdValidationAuditOneOffJob):
     """Job that audits and validates ClassifierTrainingJobModel."""
 
@@ -5191,6 +5268,14 @@ class CollectionRightsSnapshotContentModelAuditOneOffJob(
     @classmethod
     def entity_classes_to_map_over(cls):
         return [collection_models.CollectionRightsSnapshotContentModel]
+
+
+class CollectionRightsAllUsersModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates CollectionRightsAllUsersModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [collection_models.CollectionRightsAllUsersModel]
 
 
 class CollectionCommitLogEntryModelAuditOneOffJob(
@@ -5328,6 +5413,15 @@ class ExplorationRightsSnapshotContentModelAuditOneOffJob(
     @classmethod
     def entity_classes_to_map_over(cls):
         return [exp_models.ExplorationRightsSnapshotContentModel]
+
+
+class ExplorationRightsAllUsersModelAuditOneOffJob(
+        ProdValidationAuditOneOffJob):
+    """Job that audits and validates ExplorationRightsAllUsersModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationRightsAllUsersModel]
 
 
 class ExplorationCommitLogEntryModelAuditOneOffJob(
@@ -5633,6 +5727,14 @@ class TopicRightsSnapshotContentModelAuditOneOffJob(
     @classmethod
     def entity_classes_to_map_over(cls):
         return [topic_models.TopicRightsSnapshotContentModel]
+
+
+class TopicRightsAllUsersModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates TopicRightsAllUsersModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [topic_models.TopicRightsAllUsersModel]
 
 
 class TopicCommitLogEntryModelAuditOneOffJob(

@@ -8,7 +8,7 @@
       <[instructionMessage]>
     </h3>
   </div>
-  <div class="modal-body select-skill-modal">
+  <div class="modal-body select-skill-modal protractor-test-skill-select-modal">
     <div ng-if="skillSummaries.length == 0">
       You can only create questions for topics that have atleast one skill
       attached to it. Please link a skill to this topic before adding questions.
@@ -37,14 +37,14 @@
   </div>
   <div class="modal-footer" ng-switch="skillSummaries.length > 0">
     <div ng-switch-when="true">
-      <button class="btn btn-secondary" ng-click="cancelModal()"> Cancel </button>
+      <button class="btn btn-secondary" ng-click="cancel()"> Cancel </button>
       <button class="btn btn-success protractor-test-confirm-skill-button"
               ng-disabled="selectedSkillIds.length === 0"
               ng-click="goToNextStep()"> Next
       </button>
     </div>
     <div ng-switch-when="false">
-      <button class="btn btn-secondary" ng-click="closeModal()"> Ok </button>
+      <button class="btn btn-secondary" ng-click="cancel()"> Ok </button>
     </div>
   </div>
 </div>
@@ -73,7 +73,7 @@
   </div>
   <div class="modal-footer" ng-switch="linkedSkillsWithDifficulty.length > 0">
     <div ng-switch-when="true">
-      <button class="btn btn-secondary" ng-click="cancelModal()"> Cancel </button>
+      <button class="btn btn-secondary" ng-click="cancel()"> Cancel </button>
       <button class="btn btn-success protractor-test-confirm-skill-difficulty-button"
               ng-disabled="linkedSkillsWithDifficulty.length === 0"
               ng-click="startQuestionCreation()"> Done

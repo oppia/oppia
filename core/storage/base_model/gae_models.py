@@ -909,7 +909,7 @@ class VersionedModel(BaseModel):
         # pylint: enable=protected-access
 
     @classmethod
-    def get_version(cls, entity_id, version_number):
+    def get_version(cls, entity_id, version_number, strict=True):
         """Gets model instance representing the given version.
 
         The snapshot content is used to populate this model instance. The
@@ -918,6 +918,8 @@ class VersionedModel(BaseModel):
         Args:
             entity_id: str.
             version_number: int.
+            strict: bool. Whether to fail noisily if no entity with the given id
+                exists in the datastore. Default is True.
 
         Returns:
             VersionedModel. Model instance representing given version.
@@ -926,13 +928,24 @@ class VersionedModel(BaseModel):
             Exception: This model instance has been deleted.
         """
         # pylint: disable=protected-access
-        cls.get(entity_id)._require_not_marked_deleted()
+        current_version_model = cls.get(entity_id, strict=strict)
+
+        if current_version_model is None:
+            return None
+
+        current_version_model._require_not_marked_deleted()
 
         snapshot_id = cls.get_snapshot_id(entity_id, version_number)
 
-        return cls(
-            id=entity_id,
-            version=version_number)._reconstitute_from_snapshot_id(snapshot_id)
+        try:
+            return cls(
+                id=entity_id,
+                version=version_number
+            )._reconstitute_from_snapshot_id(snapshot_id)
+        except cls.EntityNotFoundError as e:
+            if not strict:
+                return None
+            raise e
         # pylint: enable=protected-access
 
     @classmethod
@@ -1003,7 +1016,7 @@ class VersionedModel(BaseModel):
         if version is None:
             return super(VersionedModel, cls).get(entity_id, strict=strict)
         else:
-            return cls.get_version(entity_id, version)
+            return cls.get_version(entity_id, version, strict=strict)
 
     @classmethod
     def get_snapshots_metadata(

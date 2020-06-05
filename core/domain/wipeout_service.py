@@ -175,7 +175,8 @@ def _delete_story_models(pending_deletion_model):
         Args:
             story_related_models: list(ndb.Model). Models which user IDs should
                 be pseudonymized.
-            user_id: str. New pseudonymized user ID to be used for the models.
+            pseudonymized_user_id: str. New pseudonymized user ID to be used for
+                the models.
         """
         metadata_models = [
             model for model in story_related_models

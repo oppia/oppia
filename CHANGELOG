@@ -1,5 +1,127 @@
 This file contains a summary of changes to the Oppia code base.
 
+v2.9.3 (20 May 2020)
+------------------------
+Contributor Pages
+* Fix #9018: Capitalizes the tab name in community dashboard page (#9089)
+
+Bug fixes
+* Fix question versioning (#9318)
+* Fix #9249: Add error message instead of warning modal in skill editor (#9259)
+* Fix #9224: fix overflow of RTE in question editor (#9243)
+* Fix #9221: Fixed the position of pencil-icon used to open review-material editor. (#9240)
+* Fix #9208, #9211, #9217, #9234 and #9236: Open new tab in firefox without errors, restrict misconception name to 100 chars and disable solicit answer details in question editor (#9218)
+* Fix #9040: Preferences page width in mobile devices (#9055)
+
+Server Errors
+* Fix #8456: Fix throwing of errors (#9193)
+
+Miscellaneous
+* Update meta-tags to align with better SEO standards (#9187)
+* Introduce ProdValidationAuditOneOffJobMetaClass (#9183)
+* Fix #9007: Add a second function argument to avoid the warning message (#9160)
+* Fix part of #9146: Combine methods in LearnerAnswerDetailsBackendApiService (#9151)
+* URL changes for SEO (#9109)
+* Remove JQuery css manipulation from controller and use ng-class in template instead (#9104)
+* Fix part of #8015: search-explorations-backend-api now returns an ExplorationMetadata object instead of a dictionary (#9090)
+* Fix part of #7450 use update exploration instead of save_exploration (#9030)
+* Fix part of #8015: editable.question.backend.api.service.ts now returns a domain object … (#8986)
+
+Release team
+* Update release scripts to address concerns around clarity of instructions (#9177)
+* Add check for version length (#9147)
+* Add check for invalid emails (#9130)
+* Fix memcache url (#9080)
+* Fix memcache flush issue (#9039)
+* Move all wrap up steps to script (#8974)
+
+Learner/Creator Pages
+* Fix #9309: Added conditional while rendering the classroom page. (#9312)
+* Fix #9288: Prevent deletion of skills assigned to topics; Add a job to clean-up deleted skills that are attached to topics; (#9291)
+* Fixes bugs in the topic editor (#9265)
+* Fix #9212 and #9227: Replaces HtmlParams with FormData API; Adds check for prepublish validate to enable/disable the story publish button; Explicitly sets the mimetype while committing files to GCS (#9233)
+* Fix #9209: Add css to fix overflow issues and adds logic to duplicate SVG instead of compressing it (#9216)
+* Fix # 7809 : Swapped buttons to ensure uniformity (#9196)
+* Fix whitespace in the rte in chapter outline (#9190)
+* Add chapter description (#9157)
+* Add multiple explanations for each difficulty in a skill rubric (#9148)
+* Fix #9134: Fixed bugs with the Drag-and-drop interaction (#9141)
+* Fix #9121: Address review comments in #9087 (#9126)
+* Fix #3369: Resize editor to avoid overflowing when creator uses longer responses (#9122)
+* Fix UI and UX issues in new structures editors and dashboard (#9110)
+* Thumbnail functionality for topic, subtopic, story and chapter (#9095)
+* Username length audit job (#9093)
+* Changed character limits for the new editors and allowed saving of invalid exps in draft stories (#9087)
+* Fixes #7448: Adds a filter option to filter skills. (#9082)
+* Replace ChangesInHumanReadableForm service to directive. (#9078)
+* Fix #8951: Fixed solution preview uniqueness indicator. (#9067)
+* Add an audit job to find all explorations using multichoice input interaction having invalid rules. (#9062)
+* Fix #9005: Cursor changes to a pointer for the delete icon (#9054)
+* The EndExploration card should not have any IDs added. (#9032)
+* Fix part of #8015 : Domain object for topic-viewer-backend-api.service.ts (#8975)
+* Split worked example into questions and answers in skill editor (#8946)
+* Fixes #5254 Shuffle multiple choice (#8738)
+* Fix #8339: Improving end exploration UI (#8725)
+* Fix #8730: Throw PageNotFoundException instead when trying to access an invalid topic (#8722)
+* Fix #8402: Adding replay button for lesson #8402 (#8519)
+
+Speed improvement
+* Remove ngResource from manifest as it is not used anywhere (#9072)
+* Fix part of #7004: Use webpack to import ckeditor instead of script imports (#8866)
+
+Data handling
+* Fix part of #5914: Complete Controller Layer of Takeout (#9133)
+* Fix part of #5914: Complete Full Takeout on Backend (#8976)
+* Rework the contributors audit job to fix the models (#8961)
+
+QA Team
+* Fix #9086 and #9100: Fix classroom e2e flakes (#9118)
+* Fix part of #4057: Added a test file for exploration-tags-service.ts (#9117)
+* Fix part of #4057: Added a test file for  exploration-param-changes.service.ts (#9114)
+* Fix part of #4057: Added a test file for exploration-category-service.ts (#9108)
+* Increase 100% coverage files that were fakely fully covered. (#9096)
+* Fix #8758: add waitFor statement before accessing response tab element (#9081)
+* Fix part of #4057. Unit test for exploration-feature-service.ts (#9076)
+* Fix #8884: Select Admin Page Status Message by HTML Class (#9068)
+* Fix issue #4057: Increase frontend test coverage for RatingComputationService (#8991)
+* Fix part of #6240: add e2e test for item selection interaction (#8985)
+* Fix Router Service unit test issues (#8919)
+* Fix part of #4057: Added a test file for StateHintsService.ts . (#8811)
+* Fix part of #4057: Added a test file for StateNameService.ts . (#8793)
+
+Angular Migration
+* Fix part of #8472: Upgrades CollectionCreationBackendApiService to Angular (#9125)
+* Fix part of #8472: Migrate learner answer details (#9046)
+* Fix part of 8472: Upgrades QuestionCreation and QuestionBackendApi service to Angular (#9029)
+* Improve typing of playthrough-issues-backend-api-service (#8997)
+* Fix #8966: Update expression-syntax-tree.service to use more typescript features (#8978)
+* Removes unnecessary services from App.ts (#8940)
+* Fix part of #8472: migrated playthrough-issues-backend-service files from angularjs to angular 8 (#8907)
+
+Developer experience
+* Fix lint issue related to bad throw pattern (#9205)
+* Fix part of #7450: JobManagerUnitTests no longer abuse private methods. (#9189)
+* Remove performance tests (#9188)
+* Fix issues with merging of target branch on circleci (#9181)
+* Fix part of #4057: increasing line-by-line coverage for classroom-backend-api.service.ts (#9168)
+* Fix #9137: Changed google app engine path to be absolute path (#9161)
+* Introduce contextmanager for creating temporary directories (#9142)
+* Add a lint check for all jobs register in jobs_registry.py file (#9129)
+* Fix #9106: Upgrade batch of libraries, fix frontend tests, and other small changes  (#9107)
+* Add instructions for N/A (#9105)
+* Fix #8993: Linter now catchs custom js/ts lint errors (#9101)
+* Fix #9079: Merge the target branch before running the tests on CircleCI (#9084)
+* Remove mathjs from manifest.json (#9083)
+* Fix #8954: Add separate compilation config for circleci e2e tests (#9060)
+* Fix part of issue #7450: Changed email_manager_test.EmailRightsTest to use public method (#9059)
+* Fix setup on Arch (#9031)
+* Fix part of #7427: Added missing docstrings to core/domain/state_domain.py (#9028)
+* Remove fork-ts-checker-webpack-plugin (#9019)
+* Replace ui-utils with ui-validate since only this part of utils is used (#9002)
+* Fix part of #7450: modified email_manager.BulkEmailsTests to use public methods instead of private methods (#8996)
+* Perform yarn routine upgrade (#8984)
+
+
 v2.9.2 (21 Apr 2020)
 ------------------------
 Learner/Creator Pages
@@ -130,7 +252,7 @@ QA Team
 * Milestone 3.2 (3th PR) - Increase coverage for three services (#8569)
 * Fix part of #4057: Increase frontend test services from Milestone 3.2 (2nd PR) (#8560)
 * Fix part of #4057: Increase frontend test services from Milestone 3.2 (1st PR) (#8530)
-* Increase coverage for notifications-dashboard-page.controller.ts and mark-all-audio-and-translations-as-needing-update.controller.ts (#8528)
+* Increase coverage for notifications-dashboard-page.component.ts and mark-all-audio-and-translations-as-needing-update.controller.ts (#8528)
 * Milestone 3.1 (3rd PR) - Increase coverage for hints-and-solution-manager.service.ts (#8525)
 * Milestone 3.1 (2nd PR) - Increase coverage for three services (#8524)
 * Fix part of #4057: Adds test for UserEmailPreferencesService (#8513)
