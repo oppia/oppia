@@ -1914,7 +1914,11 @@ class State(python_utils.OBJECT):
         """Update the solution of interaction.
 
         Args:
+<<<<<<< Updated upstream
             solution: Solution object.
+=======
+            solution: Solution. Object of class Solution.
+>>>>>>> Stashed changes
 
         Raises:
             Exception: 'solution' is not a domain object.
@@ -1926,10 +1930,13 @@ class State(python_utils.OBJECT):
                 self.interaction.solution.explanation.content_id)
 
         if solution is not None:
+<<<<<<< Updated upstream
             if not isinstance(solution, Solution):
                 raise Exception(
                     'Expected solution to be a Solution object, received %s'
                     % solution)
+=======
+>>>>>>> Stashed changes
             self.interaction.solution = solution
             new_content_id_list.append(
                 self.interaction.solution.explanation.content_id)
