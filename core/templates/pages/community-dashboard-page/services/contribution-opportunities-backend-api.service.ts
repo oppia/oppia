@@ -52,9 +52,7 @@ export class ContributionOpportunitiesBackendApiService {
   urlTemplate = '/opportunitiessummaryhandler/<opportunityType>';
   constructor(
     private urlInterpolationService: UrlInterpolationService,
-    private http: HttpClient,
-    private readOnlyFeaturedTranslationLanguageObjectFactory:
-      ReadOnlyFeaturedTranslationLanguageObjectFactory,
+    private http: HttpClient
   ) {}
 
   // TODO(#7165): Replace any with exact type.
@@ -103,32 +101,6 @@ export class ContributionOpportunitiesBackendApiService {
     });
   }
 
-  private _fetchFeaturedTranslationLanguages(
-      successCallback: (
-        featuredTranslationLanguages: ReadOnlyFeaturedTranslationLanguage[]
-      ) => void,
-      errorCallback: (reason?: any) => void
-  ) {
-    this.http.get('/getfeaturedtranslationlanguages').toPromise()
-      .then((data: any) => {
-        let featuredTranslationLanguages = (
-          data.featured_translation_languages.map(
-            (backendDict: IFeaturedTranslationLanguageBackendDict) =>
-              this.readOnlyFeaturedTranslationLanguageObjectFactory
-                .createFromBackendDict(backendDict)
-          ));
-
-        if (successCallback) {
-          successCallback(featuredTranslationLanguages);
-        }
-      },
-      (error) => {
-        if (errorCallback) {
-          errorCallback(error);
-        }
-      });
-  }
-
   fetchSkillOpportunities(cursor: string): Promise<Object> {
     const params: ContributionOpportunityParams = {
       cursor: cursor
@@ -162,12 +134,6 @@ export class ContributionOpportunitiesBackendApiService {
       this._fetchOpportunities(
         constants.OPPORTUNITY_TYPE_VOICEOVER,
         params, resolve, reject);
-    });
-  }
-
-  fetchFeaturedTranslationLanguages(): Promise<Object> {
-    return new Promise((resolve, reject) => {
-      this._fetchFeaturedTranslationLanguages(resolve, reject);
     });
   }
 }
