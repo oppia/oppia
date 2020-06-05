@@ -118,7 +118,7 @@
     "moment": "^2.24.0",
     "nerdamer": "^1.1.4",
     "react": "16.1.1",
-    "react-dom": "16.1.1",
+    "react-dom": "16.1.2",
     "react-dom-factories": "1.0.2",
     "wavesurfer.js": "^3.3.3"
   }
