@@ -66,9 +66,10 @@ class MockWindowRef {
       },
       set hash(val) {
         this._hash = val;
-        if (this._hashChange !== null) {
-          this._hashChange();
+        if (this._hashChange === null) {
+          return;
         }
+        this._hashChange();
       },
       reload: (val) => val
     },

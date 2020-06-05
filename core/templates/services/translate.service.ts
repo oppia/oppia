@@ -22,21 +22,28 @@ import { UtilsService } from './utils.service';
 
 /**
  * Commonly used terms in this file.
- * key - Key for i18n translation
- * translatedValue - I18n translation corresponding to the key in json file
- * interpolateParams or params - Params for interpolation
- * interpolatedValue - The final translation that is returned.
+ *   key - Key for i18n translation
+ *   translatedValue - I18n translation corresponding to the key in json file
+ *   interpolateParams or params - Key-value pairs for interpolation
+ *   interpolatedValue - The final translation that is returned.
+ *
+ * Example: <h1 [innerHTM]="'I18N_ABOUT_PAGE_HEADING' | translate:{x: 'Oppia'}">
+ *   'I18N_ABOUT_PAGE_HEADING' is referred here as key or key.
+ *
+ *   "translate" is the pipe.
+ *
+ *   The object following the pipe, i.e. {x: 'Oppia'}, is called params or
+ *   interpolationParams.
+ *
+ *   Each i18n translation JSON file contains translations as:
+ *   {key: translatedValue, key2: translatedValue2}.
+ *
+ *   Let us say that translatedValue is "Hola <[x]>". Here the value of x comes
+ *   from the params passed. So, after interpolation it will become
+ *   "Hola Oppia".
+ *
  * Note: Intentionally left out the L of innerHTM"L" (only in this file) to
  * avoid the linting error.
- * Example: <h1 [innerHTM]="'I18N_ABOUT_PAGE_HEADING' | translate:{x: 'Oppia'}">
- * 'I18N_ABOUT_PAGE_HEADING' is referred here as key or key.
- * "translate" is the pipe.
- * The object following the pipe, i.e. {x: 'Oppia'}, is called params or
- * interpolationParams.
- * Each i18n translation JSON file contains translations as
- * {key: translatedValue, key2: translatedValue2}. Let us say that
- * translatedValue is "Hola <[x]>". Here the value of x comes from the params
- * passed. So, after interpolation it will become "Hola Oppia".
  */
 
 export interface LangChangeEvent {
@@ -97,7 +104,7 @@ export class TranslateService {
   /**
    * Functions that interpolates the translatedValue
    * @param {string} translatedValue - The value corresponding to the key
-   * @param {Object} params - interpolations parameters
+   * @param {Object} params - key-value pairs for interpolation
    * @returns {string} interpolated translatedValue
    */
   interpolateTranslatedValue(
@@ -117,7 +124,7 @@ export class TranslateService {
    * Gets the translatedValue corresponding to the key and returns the
    * interpolated string of the translatedValue using the interpolateParams.
    * @param {string} key - key for i18n translation
-   * @param {Object} interpolateParams - params for interpolation
+   * @param {Object} interpolateParams - key-value pairs for interpolation
    * @returns {string} - interpolated string of the translatedValue
    * corresponding to the key.
    */

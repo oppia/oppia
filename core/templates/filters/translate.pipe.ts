@@ -23,20 +23,22 @@ import { LangChangeEvent, TranslateService } from 'services/translate.service';
 import { UtilsService } from 'services/utils.service';
 
 /**
- * Commonly used terms in this file.
- * key - Key for i18n translation
- * interpolateParams or params - Params for interpolation
- * interpolatedValue - The final translation that is returned.
- * Note: Intentionally left out the L of innerHTM"L" (only in this file) to
- * avoid the linting errors.
+ * Commonly used terms in this file:
+ *   key - Key for i18n translation
+ *   interpolateParams or params - Key-value pairs for interpolation
+ *   interpolatedValue - The final translation that is returned.
+ *
  * Example: <h1 [innerHTM]="'I18N_ABOUT_PAGE_HEADING' | translate:{x: 'val'}">
- * 'I18N_ABOUT_PAGE_HEADING' is referred here as key.
- * "translate" is the pipe. Every pipe must have a transform function. The
- * transform function is called when angular encouters the pipe in HTML.
- * The object following the pipe, i.e. {x: 'val'}, is another argument to the
- * transform function. This object is called params or interpolationParams.
+ *   'I18N_ABOUT_PAGE_HEADING' is referred here as key.
+ *
+ *   "translate" is the pipe. Every pipe must have a transform function. The
+ *   transform function is called when angular encounters the pipe in HTML.
+ *
+ *   The object following the pipe, i.e. {x: 'val'}, is another argument to the
+ *   transform function. This object is called params or interpolationParams.
+ *
  * Note: For every "| translate" angular encounters in the html, it creates a
- * seperate instance of this pipe.
+ * separate instance of this pipe.
  */
 
 @Pipe({
@@ -52,25 +54,25 @@ export class TranslatePipe implements PipeTransform, OnDestroy {
    * previously sent key and params are same as the current one, the pipe
    * doesn't request for translation and interpolation again.
    */
-  lastKey: string;
+  lastKey: string = null;
   /**
    * Variable to keep track of the last param sent for translation. If the
    * previously sent key and params are same as the current one, the pipe
    * doesn't request for translation and interpolation again.
    */
   lastParams: Object;
-  onLangChange: Subscription;
+  onLangChange: Subscription = null;
 
   constructor(
     private translateService: TranslateService,
-    private ref: ChangeDetectorRef,
+    private changeDetectorRef: ChangeDetectorRef,
     private utilsService: UtilsService
   ) {}
 
   /**
    * Updates the value of interpolatedValue.
    * @param {string} key - key for i18n translation
-   * @param {Object} interpolateParams - Params for interpolation
+   * @param {Object} interpolateParams - key-value pairs for interpolation
    */
   updateInterpolatedValue(key: string, interpolateParams?: Object): void {
     this.interpolatedValue = this.translateService.getInterpolatedString(
@@ -83,13 +85,13 @@ export class TranslatePipe implements PipeTransform, OnDestroy {
     // Storing the params to check if the params are same when the transform is
     // invoked again.
     this.lastParams = interpolateParams;
-    this.ref.markForCheck();
+    this.changeDetectorRef.markForCheck();
   }
 
   /**
    * @param {string} key - key for i18n
-   * @param {Object} params - params for interpolation
-   * @returns {string} - Interpolated I18n value
+   * @param {Object | undefined} params - key-value pairs for interpolation
+   * @returns {string} - interpolated I18n value
    */
   transform(key: string, params?: Object | undefined): string {
     if (!key || !key.length) {
@@ -119,16 +121,15 @@ export class TranslatePipe implements PipeTransform, OnDestroy {
     // Update the interpolated value.
     this.updateInterpolatedValue(key, interpolateParams);
 
-    // If there is a subscription to onLangChange, unsubscribe.
-    this.disposeSubscriptions();
     // Subscribe to onLangChange event, in case the language changes.
-    if (!this.onLangChange) {
+    if (this.onLangChange === null) {
       this.onLangChange = this.translateService.onLangChange.subscribe(
         (event: LangChangeEvent) => {
           this.updateInterpolatedValue(key, interpolateParams);
         }
       );
     }
+
     return this.interpolatedValue;
   }
 
@@ -136,11 +137,11 @@ export class TranslatePipe implements PipeTransform, OnDestroy {
    * Clean up any existing subscription to change events
    */
   private disposeSubscriptions(): void {
-    if (typeof this.onLangChange === 'undefined') {
+    if (this.onLangChange === null) {
       return;
     }
     this.onLangChange.unsubscribe();
-    this.onLangChange = undefined;
+    this.onLangChange = null;
   }
 
   ngOnDestroy(): void {

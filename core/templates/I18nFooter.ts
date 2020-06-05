@@ -29,12 +29,13 @@ angular.module('oppia').directive('i18nFooter', [
       template: require('./i18n-footer.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$http', '$timeout', '$translate', 'I18nLanguageCodeService',
-        'UserService', 'SUPPORTED_SITE_LANGUAGES',
+        '$document', '$http', '$timeout', '$translate',
+        'I18nLanguageCodeService', 'UserService', 'SUPPORTED_SITE_LANGUAGES',
         function(
-            $http, $timeout, $translate, I18nLanguageCodeService,
-            UserService, SUPPORTED_SITE_LANGUAGES) {
+            $document, $http, $timeout, $translate,
+            I18nLanguageCodeService, UserService, SUPPORTED_SITE_LANGUAGES) {
           var ctrl = this;
+          var NG_TRANSLATE_COOKIE_KEY = 'NG_TRANSLATE_LANG_KEY=';
           // Changes the language of the translations.
           var preferencesDataUrl = '/preferenceshandler/data';
           var siteLanguageUrl = '/save_site_language';
@@ -56,10 +57,11 @@ angular.module('oppia').directive('i18nFooter', [
             // in angularjs uses cookies to store the last used code and we need
             // to fetch that code in order to have the same translation language
             // used in both angular and angularjs when the webpage first loads.
-            if (document.cookie.includes('NG_TRANSLATE_LANG_KEY=')) {
-              var lang = document.cookie.split('NG_TRANSLATE_LANG_KEY=')[1];
-              lang = lang.split(';')[0];
-              I18nLanguageCodeService.setI18nLanguageCode(lang);
+            if ($document.cookie.includes(NG_TRANSLATE_COOKIE_KEY)) {
+              var languageCode = (
+                $document.cookie.split(NG_TRANSLATE_COOKIE_KEY)[1]);
+              languageCode = languageCode.split(';')[0];
+              I18nLanguageCodeService.setI18nLanguageCode(languageCode);
             }
             // The $timeout seems to be necessary for the dropdown
             // to show anything at the outset, if the default language

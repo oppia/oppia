@@ -49,6 +49,15 @@ class MockTranslateService {
     if (!str) {
       return key;
     }
+
+    if (interpolateParams) {
+      return str.replace(/\<\[\s?([^{}\s]*)\s?\]\>/g,
+        (substring: string, b: string) => {
+          let r = interpolateParams[b];
+          return r;
+        });
+    }
+
     return str;
   }
 }
@@ -56,7 +65,7 @@ class MockTranslateService {
 describe('TranslatePipe', () => {
   let pipe: TranslatePipe;
   let translateService: TranslateService;
-  let changeDecRef: ChangeDetectorRef;
+  let changeDectorRef: ChangeDetectorRef;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
@@ -69,15 +78,15 @@ describe('TranslatePipe', () => {
       ]
     }).compileComponents();
     translateService = TestBed.get(TranslateService);
-    changeDecRef = TestBed.get(ChangeDetectorRef);
+    changeDectorRef = TestBed.get(ChangeDetectorRef);
     pipe = new TranslatePipe(
-      translateService, changeDecRef, new UtilsService());
+      translateService, changeDectorRef, new UtilsService());
   }));
 
   it('should translate', () => {
     expect(pipe.transform('I18n_t_1')).toBe('Hello');
-    expect(pipe.transform('I18n_t_2', {val: 'World'})).toBe('Hello <[val]>');
-    expect(pipe.transform('I18n_t_2', {val: 'World'})).toBe('Hello <[val]>');
+    expect(pipe.transform('I18n_t_2', {val: 'World'})).toBe('Hello World');
+    expect(pipe.transform('I18n_t_2', {val: 'World'})).toBe('Hello World');
     expect(pipe.transform('I18n_t_3')).toBe('I18n_t_3');
     expect(pipe.transform('')).toBe('');
     translateService.onLangChange.emit({lang: 'en'});
@@ -85,6 +94,7 @@ describe('TranslatePipe', () => {
 
   // The sole purpose of this test is to cover ngOnDestroy.
   it('should destroy subscriptions', () => {
+    expect(pipe).toBeDefined;
     pipe.ngOnDestroy();
     expect(pipe).not.toBeDefined;
     // Reintializing the pipe because jasmine tries to destroy the pipe.
@@ -92,20 +102,25 @@ describe('TranslatePipe', () => {
     // And if the pipe is not reinitialized karma will raise an error saying
     // "cannot call ngOnDestroy of undefined".
     pipe = new TranslatePipe(
-      translateService, changeDecRef, new UtilsService());
+      translateService, changeDectorRef, new UtilsService());
+    expect(pipe).toBeDefined;
   });
 });
 
-// Adding the following two lines for reference.
+// Adding the following three lines for reference.
+// I18n_t_2: 'Hello <[val]>',
 // I18n_rogue_1: '<script>alert(\'Oppia\');</script>Hello',
 // I18n_rogue_2: '<oppia-img>Me</oppia-img>Hola'
 @Component({
+  /* eslint-disable max-len */
   // eslint-disable-next-line no-multi-str, angular/no-inline-template
   template: '<h1 [innerHTML] = "\'I18n_rogue_1\' | translate"></h1>\
-              <h2 [innerHTML] = "\'I18n_rogue_2\' | translate"></h2>'
+    <h2 [innerHTML] = "\'I18n_rogue_2\' | translate"></h2>\
+    <h3 [innerHTML] = "\'I18n_t_2\' | translate: {val: \'<script>alert(\\\'Hello\\\');</script>\' }"></h3>\
+    <h4 [innerHTML] = "\'I18n_t_2\' | translate: {val: \'<oppia-img>O</oppia-img>\' }"></h4>'
 })
 class MockComponent { }
-
+/* eslint-enable max-len */
 describe('Angular', () => {
   let component: MockComponent;
   let fixture: ComponentFixture<MockComponent>;
@@ -128,16 +143,27 @@ describe('Angular', () => {
   it('should sanitize translations', fakeAsync(() => {
     const compiledComponent = fixture.debugElement.nativeElement;
     // The DOM should be empty for now since the translations haven't
-    // been rendered yet
+    // been rendered yet.
     expect(compiledComponent.querySelector('h1').textContent).toEqual('');
     expect(compiledComponent.querySelector('h2').textContent).toEqual('');
+    expect(compiledComponent.querySelector('h3').textContent).toEqual('');
+    expect(compiledComponent.querySelector('h4').textContent).toEqual('');
     fixture.detectChanges();
 
-    // The content in h1 should be stripped of <script>...</script>
+    // The text content in h1 should be stripped of <script>...</script>.
     expect(compiledComponent.querySelector('h1').textContent).toEqual('Hello');
 
-    // The content in h2 shouldn't have oppia-img tags but it should contain the
-    // safe text within the tag.
+    // The text content in h2 shouldn't have oppia-img tags but it should
+    // contain the safe text within the tag.
     expect(compiledComponent.querySelector('h2').textContent).toEqual('MeHola');
+
+    // The interpolation params sent to translate in h3 should be stripped of
+    // <script>...</script>.
+    expect(compiledComponent.querySelector('h3').textContent).toEqual('Hello ');
+
+    // The interpolation params sent to translate in h3 should be stripped of
+    //  oppia-img tags but should contain the safe content inside the tag.
+    expect(
+      compiledComponent.querySelector('h4').textContent).toEqual('Hello O');
   }));
 });
