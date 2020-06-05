@@ -23,6 +23,58 @@ from core.domain import expression_parser
 from core.tests import test_utils
 
 
+class HelperFunctionsUnitTests(test_utils.GenericTestBase):
+    """Test the 'contains_balanced_brackets' and 'is_algebraic' helper
+    functions.
+    """
+
+    def test_contains_balanced_brackets(self):
+        """Tests for contains_balanced_brackets method."""
+        self.assertTrue(expression_parser.contains_balanced_brackets(''))
+        self.assertTrue(expression_parser.contains_balanced_brackets('a+2'))
+        self.assertTrue(expression_parser.contains_balanced_brackets('(a / 2)'))
+        self.assertTrue(expression_parser.contains_balanced_brackets('[a/ 2]'))
+        self.assertTrue(expression_parser.contains_balanced_brackets(' {a/2} '))
+        self.assertTrue(expression_parser.contains_balanced_brackets('([a]/2)'))
+        self.assertTrue(expression_parser.contains_balanced_brackets(
+            '[(a/{ 2 })]'))
+        self.assertTrue(expression_parser.contains_balanced_brackets(
+            '(([{}]{})( ){[ ]})'))
+        self.assertTrue(expression_parser.contains_balanced_brackets(
+            '[[ [((()))[[[[[]{}]]{}]]()]] ]'))
+        self.assertTrue(expression_parser.contains_balanced_brackets(
+            '{( 2x^2 ) ^ [ 3/2 ]} / 4'))
+
+        self.assertFalse(expression_parser.contains_balanced_brackets('(a/2'))
+        self.assertFalse(expression_parser.contains_balanced_brackets('a/2]'))
+        self.assertFalse(expression_parser.contains_balanced_brackets('[)(]'))
+        self.assertFalse(expression_parser.contains_balanced_brackets('{ [} ]'))
+        self.assertFalse(expression_parser.contains_balanced_brackets(']]][[['))
+        self.assertFalse(expression_parser.contains_balanced_brackets(')({})'))
+        self.assertFalse(expression_parser.contains_balanced_brackets('4/{0/]'))
+        self.assertFalse(expression_parser.contains_balanced_brackets('(a/2]'))
+
+    def test_is_algebraic(self):
+        """Tests for is_algebraic method."""
+        self.assertTrue(expression_parser.is_algebraic('a^2.3'))
+        self.assertTrue(expression_parser.is_algebraic('abs(alpha)'))
+        self.assertTrue(expression_parser.is_algebraic('alpha/gamma'))
+        self.assertTrue(expression_parser.is_algebraic('A + 2/3'))
+
+        self.assertFalse(expression_parser.is_algebraic('1 + 2'))
+        self.assertFalse(expression_parser.is_algebraic('1^2^3/4'))
+        self.assertFalse(expression_parser.is_algebraic('1'))
+        self.assertFalse(expression_parser.is_algebraic('sqrt(4/4)'))
+        self.assertFalse(expression_parser.is_algebraic('tan(30)'))
+
+        with self.assertRaises(Exception):
+            expression_parser.is_algebraic('1 +2)')
+        with self.assertRaises(Exception):
+            expression_parser.is_algebraic('Alpha')
+        with self.assertRaises(Exception):
+            expression_parser.is_algebraic('invalid + 2')
+
+
 class TokenUnitTests(test_utils.GenericTestBase):
     """Test the token module."""
 

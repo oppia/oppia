@@ -63,18 +63,26 @@ def contains_balanced_brackets(expression):
     return len(stack) == 0
 
 
-def is_algebraic(expresssion):
+def is_algebraic(expression):
     """Checks if the given expression is algebraic. An algebraic expression must
     contain at least one valid identifier (latin letter or greek symbol name).
 
     Args:
-        expresssion: str. A math expression.
+        expression: str. A math expression.
 
     Returns:
         bool. Whether the given expression contains at least one single
             latin letter or greek symbol name.
+
+    Raises:
+        Exception: Invalid syntax.
     """
-    tokens = [token.text for token in Parser(expresssion).token_list]
+    try:
+        token_list = Parser(expression).token_list
+    except Exception:
+        raise Exception('Invalid syntax.')
+
+    tokens = [token.text for token in token_list]
     return any(
         (token.isalpha() and len(token) == 1) or (
             token in GREEK_LETTERS) for token in tokens)
@@ -164,86 +172,84 @@ class Node(python_utils.OBJECT):
     be an empty list.
     """
 
-    def __init__(self, operator_token, children):
+    def __init__(self, children):
         """Initializes a Node object. For ex. 'a + b' will have root node as
-        '+' (operator_token) and children as ['a', 'b'].
+        '+' and children as ['a', 'b'].
 
         Args:
-            operator_token: Token. The token representing the operator.
             children: list(Node). Child nodes of the current node.
         """
-        self.operator_token = operator_token
         self.children = children
 
 
 class AddOperator(Node):
     """Class representing the addition operator node."""
 
-    def __init__(self, operator_token, left, right):
+    def __init__(self, left, right):
         """Initializes an AddOperator object.
 
         Args:
-            operator_token: Token. The token representing the add operator.
             left: Node. Left child of the operator.
             right: Node. Right child of the operator.
         """
-        super(AddOperator, self).__init__(operator_token, [left, right])
+        self.operator_token = '+'
+        super(AddOperator, self).__init__([left, right])
 
 
 class SubtractOperator(Node):
     """Class representing the subtraction operator node."""
 
-    def __init__(self, operator_token, left, right):
+    def __init__(self, left, right):
         """Initializes an SubtractOperator object.
 
         Args:
-            operator_token: Token. The token representing the subtract operator.
             left: Node. Left child of the operator.
             right: Node. Right child of the operator.
         """
-        super(SubtractOperator, self).__init__(operator_token, [left, right])
+        self.operator_token = '-'
+        super(SubtractOperator, self).__init__([left, right])
 
 
 class MultiplyOperator(Node):
     """Class representing the multiplication operator node."""
 
-    def __init__(self, operator_token, left, right):
+    def __init__(self, left, right):
         """Initializes an MultiplyOperator object.
 
         Args:
-            operator_token: Token. The token representing the multiply operator.
             left: Node. Left child of the operator.
             right: Node. Right child of the operator.
         """
-        super(MultiplyOperator, self).__init__(operator_token, [left, right])
+        self.operator_token = '*'
+        super(MultiplyOperator, self).__init__([left, right])
 
 
 class DivideOperator(Node):
     """Class representing the division operator node."""
 
-    def __init__(self, operator_token, left, right):
+    def __init__(self, left, right):
         """Initializes an DivideOperator object.
 
         Args:
-            operator_token: Token. The token representing the divide operator.
             left: Node. Left child of the operator.
             right: Node. Right child of the operator.
         """
-        super(DivideOperator, self).__init__(operator_token, [left, right])
+        self.operator_token = '/'
+        super(DivideOperator, self).__init__([left, right])
 
 
 class PowerOperator(Node):
     """Class representing the power operator node."""
 
-    def __init__(self, operator_token, left, right):
+    def __init__(self, left, right):
         """Initializes an PowerOperator object.
 
         Args:
-            operator_token: Token. The token representing the power operator.
             left: Node. Left child of the operator.
             right: Node. Right child of the operator.
         """
-        super(PowerOperator, self).__init__(operator_token, [left, right])
+        self.operator_token = '^'
+        super(PowerOperator, self).__init__([left, right])
 
 
 class Identifier(Node):
@@ -258,7 +264,8 @@ class Identifier(Node):
         Args:
             token: Token. The token representing the identifier.
         """
-        super(Identifier, self).__init__(token, [])
+        self.token = token
+        super(Identifier, self).__init__([])
 
 
 class Number(Node):
@@ -270,7 +277,8 @@ class Number(Node):
         Args:
             token: Token. The token representing a real number.
         """
-        super(Number, self).__init__(token, [])
+        self.token = token
+        super(Number, self).__init__([])
 
 
 class Function(Node):
@@ -285,7 +293,8 @@ class Function(Node):
             token: Token. The token representing the math function.
             child: Node. The parameter of the function.
         """
-        super(Function, self).__init__(token, [child])
+        self.token = token
+        super(Function, self).__init__([child])
 
 
 class Parser(python_utils.OBJECT):
@@ -315,8 +324,11 @@ class Parser(python_utils.OBJECT):
 
         # Position of the next token in the token list.
         self.next_token_index = 0
-        tokens = re.findall(
-            r'([a-zA-Z]+|[0-9]+\.[0-9]+|[0-9]+|[\[\{\(\)\}\]\+\*\-\/\^])', text)
+
+        re_string = r'([a-zA-Z]+|[0-9]+\.[0-9]+|[0-9]+)'
+        re_string = re_string[:-1] + '|[' + '\\'.join(VALID_OPERATORS) + '])'
+
+        tokens = re.findall(re_string, text)
         self.token_list = [Token(token) for token in tokens]
 
         if not contains_balanced_brackets(text):
@@ -358,11 +370,9 @@ class Parser(python_utils.OBJECT):
         while operator_token:
             parsed_right = self.parse_mul_expr()
             if operator_token.text == '+':
-                parsed_expr = AddOperator(
-                    operator_token, parsed_expr, parsed_right)
+                parsed_expr = AddOperator(parsed_expr, parsed_right)
             else:
-                parsed_expr = SubtractOperator(
-                    operator_token, parsed_expr, parsed_right)
+                parsed_expr = SubtractOperator(parsed_expr, parsed_right)
             operator_token = self.is_next_token(['+', '-'])
         return parsed_expr
 
@@ -379,11 +389,9 @@ class Parser(python_utils.OBJECT):
         while operator_token:
             parsed_right = self.parse_pow_expr()
             if operator_token.text == '*':
-                parsed_expr = MultiplyOperator(
-                    operator_token, parsed_expr, parsed_right)
+                parsed_expr = MultiplyOperator(parsed_expr, parsed_right)
             else:
-                parsed_expr = DivideOperator(
-                    operator_token, parsed_expr, parsed_right)
+                parsed_expr = DivideOperator(parsed_expr, parsed_right)
             operator_token = self.is_next_token(['*', '/'])
         return parsed_expr
 
@@ -406,7 +414,7 @@ class Parser(python_utils.OBJECT):
         if operator_token:
             # Using recursion for right-associative ^ operator.
             parsed_right = self.parse_pow_expr()
-            return PowerOperator(operator_token, parsed_expr, parsed_right)
+            return PowerOperator(parsed_expr, parsed_right)
         return parsed_expr
 
     def parse_unit(self):
