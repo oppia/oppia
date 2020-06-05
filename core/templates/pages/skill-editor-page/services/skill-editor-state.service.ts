@@ -46,10 +46,10 @@ angular.module('oppia').factory('SkillEditorStateService', [
       current: [],
       others: []
     };
-    var skillChangedEventEmitter = new EventEmitter();
+    var _skillChangedEventEmitter = new EventEmitter();
     var _setSkill = function(skill) {
       _skill.copyFromSkill(skill);
-      skillChangedEventEmitter.emit();
+      _skillChangedEventEmitter.emit();
       _skillIsInitialized = true;
     };
 
@@ -197,8 +197,8 @@ angular.module('oppia').factory('SkillEditorStateService', [
         return true;
       },
 
-      onSkillChange: function() {
-        return skillChangedEventEmitter;
+      get onSkillChange() {
+        return _skillChangedEventEmitter;
       },
 
       getSkillRights: function() {
