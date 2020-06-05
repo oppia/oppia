@@ -423,6 +423,8 @@ class UserCommunityRightsDataHandlerTest(test_utils.GenericTestBase):
             })
 
 class FeaturedTranslationLanguagesHandlerTest(test_utils.GenericTestBase):
+    """Test for the FeaturedTranslationLanguagesHandler."""
+
     def test_get_featured_translation_languages(self):
         response = self.get_json('/getfeaturedtranslationlanguages')
         self.assertEqual(response, {
