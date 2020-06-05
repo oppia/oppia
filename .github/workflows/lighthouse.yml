@@ -13,7 +13,5 @@ jobs:
         with:
           python-version: "2.x"
           architecture: "x64"
-      - name: Install Third Party Dependencies
-        run: python -m scripts.install_third_party_libs
       - name: Run lighthouse checks
         run: python -m scripts.run_lighthouse_tests --enable_compression
