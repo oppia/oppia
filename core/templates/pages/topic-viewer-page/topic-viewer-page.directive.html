@@ -64,12 +64,27 @@
 <style>
   .navbar-light .navbar-container {
     background: #00645C;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+  }
+
+  .topic-viewer-page-content {
+    margin-top: -200px;
+  }
+
+  .oppia-navbar {
+    box-shadow: none;
+  }
+
+  .oppia-topic-viewer-container .background-banner-position {
+    position: inherit;
   }
 
   .oppia-topic-viewer-tabs-container {
     background-color: #00645C;
+    box-shadow: 3px 3px 6px rgba(0,0,0, 0.5);
     font-family: 'Capriola', 'Roboto', Arial, sans-serif;
     margin: 0 auto;
+    position: relative;
     width: 100%;
   }
 
@@ -146,6 +161,7 @@
   .topic-viewer-page-content .oppia-page-card {
     border-radius: 0.25em;
     margin-top: 5vh;
+    padding-bottom: 10vh;
     width: 50vw;
   }
 
@@ -164,7 +180,7 @@
 
   @media(max-width: 500px) {
     .topic-viewer-page-content .oppia-page-card {
-      padding: 5px 15px 25px 25px;
+      padding: 15px 24px 64px 24px;
       width: 90vw;
     }
 
