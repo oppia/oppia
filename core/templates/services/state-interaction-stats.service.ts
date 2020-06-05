@@ -63,6 +63,7 @@ const STATE_INTERACTION_STATS_URL_TEMPLATE: string = (
 
 @Injectable({providedIn: 'root'})
 export class StateInteractionStatsService {
+  // NOTE TO DEVELOPERS: Fulfilled promises can be reused indefinitely.
   cachedStats: Promise<IStateRulesStats> = null;
 
   constructor(
