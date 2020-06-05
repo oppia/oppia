@@ -159,8 +159,7 @@ class SkillCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     A new instance of this model is created and saved every time a commit to
     SkillModel occurs.
 
-    The id for this model is of the form
-    'skill-{{SKILL_ID}}-{{SKILL_VERSION}}'.
+    The id for this model is of the form 'skill-[skill_id]-[version]'.
     """
     # The id of the skill being edited.
     skill_id = ndb.StringProperty(indexed=True, required=True)

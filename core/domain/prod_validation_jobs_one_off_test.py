@@ -52,6 +52,7 @@ from core.domain import subtopic_page_domain
 from core.domain import suggestion_services
 from core.domain import topic_domain
 from core.domain import topic_services
+from core.domain import user_id_migration
 from core.domain import user_query_services
 from core.domain import user_services
 from core.domain import wipeout_service
@@ -842,6 +843,8 @@ class CollectionModelValidatorTests(test_utils.GenericTestBase):
             collection.add_node('%s' % (index * 2))
             collection.add_node('%s' % (index * 2 + 1))
             collection_services.save_new_collection(self.owner_id, collection)
+            collection_models.CollectionRightsAllUsersModel(
+                id='%s' % index, all_user_ids=[self.owner_id]).put()
 
         self.model_instance_0 = collection_models.CollectionModel.get_by_id('0')
         self.model_instance_1 = collection_models.CollectionModel.get_by_id('1')
@@ -996,6 +999,19 @@ class CollectionModelValidatorTests(test_utils.GenericTestBase):
                 '[u"Entity id 0: based on field snapshot_content_ids having '
                 'value 0-1, expect model CollectionSnapshotContentModel '
                 'with id 0-1 but it doesn\'t exist"]]'),
+            u'[u\'fully-validated CollectionModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_rights_all_users_failure(self):
+        collection_models.CollectionRightsAllUsersModel.get_by_id(
+            '0').delete()
+        expected_output = [
+            (
+                u'[u\'failed validation check for all_users_model_ids '
+                'field check of CollectionModel\', '
+                '[u"Entity id 0: based on field all_users_model_ids having '
+                'value 0, expect model CollectionRightsAllUsersModel '
+                'with id 0 but it doesn\'t exist"]]'),
             u'[u\'fully-validated CollectionModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 
@@ -1786,6 +1802,124 @@ class CollectionRightsSnapshotContentModelValidatorTests(
             ), (
                 u'[u\'fully-validated CollectionRightsSnapshotContentModel\', '
                 '3]')]
+        run_job_and_check_output(self, expected_output, sort=True)
+
+
+class CollectionRightsAllUsersModelValidatorTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(CollectionRightsAllUsersModelValidatorTests, self).setUp()
+
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+        editor_email = 'user@editor.com'
+        self.signup(editor_email, 'editor')
+        self.editor_id = self.get_user_id_from_email(editor_email)
+        self.owner = user_services.UserActionsInfo(self.owner_id)
+
+        explorations = [exp_domain.Exploration.create_default_exploration(
+            '%s' % i,
+            title='title %d' % i,
+            category='category%d' % i,
+        ) for i in python_utils.RANGE(6)]
+        for exp in explorations:
+            exp_services.save_new_exploration(self.owner_id, exp)
+
+        collections = [collection_domain.Collection.create_default_collection(
+            '%s' % i,
+            title='title %d' % i,
+            category='category%d' % i,
+            objective='objective%d' % i,
+        ) for i in python_utils.RANGE(3)]
+        for index, collection in enumerate(collections):
+            collection.add_node('%s' % (index * 2))
+            collection.add_node('%s' % (index * 2 + 1))
+            collection_services.save_new_collection(self.owner_id, collection)
+
+        rights_manager.assign_role_for_collection(
+            self.owner, '0', self.editor_id, rights_manager.ROLE_EDITOR)
+
+        user_id_migration.AddAllUserIdsSnapshotContentVerificationJob.enqueue(
+            user_id_migration.AddAllUserIdsSnapshotContentVerificationJob
+            .create_new()
+        )
+        self.process_and_flush_pending_tasks()
+
+        self.model_instance_0 = (
+            collection_models.CollectionRightsAllUsersModel.get_by_id('0'))
+        self.model_instance_1 = (
+            collection_models.CollectionRightsAllUsersModel.get_by_id('1'))
+        self.model_instance_2 = (
+            collection_models.CollectionRightsAllUsersModel.get_by_id('2'))
+
+        self.job_class = (
+            prod_validation_jobs_one_off.
+            CollectionRightsAllUsersModelAuditOneOffJob)
+
+    def test_standard_operation(self):
+        expected_output = [
+            u'[u\'fully-validated CollectionRightsAllUsersModel\', 3]']
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_created_on_greater_than_last_updated(self):
+        self.model_instance_0.created_on = (
+            self.model_instance_0.last_updated + datetime.timedelta(days=1))
+        self.model_instance_0.put()
+        expected_output = [(
+            u'[u\'failed validation check for time field relation check '
+            'of CollectionRightsAllUsersModel\', '
+            '[u\'Entity id %s: The created_on field has a value '
+            '%s which is greater than the value '
+            '%s of last_updated field\']]') % (
+                self.model_instance_0.id,
+                self.model_instance_0.created_on,
+                self.model_instance_0.last_updated
+            ), (
+                u'[u\'fully-validated '
+                'CollectionRightsAllUsersModel\', 2]')]
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_last_updated_greater_than_current_time(self):
+        self.model_instance_1.delete()
+        self.model_instance_2.delete()
+        expected_output = [(
+            u'[u\'failed validation check for current time check of '
+            'CollectionRightsAllUsersModel\', '
+            '[u\'Entity id %s: The last_updated field has a '
+            'value %s which is greater than the time when the job was run\']]'
+        ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
+
+        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
+            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
+            update_datastore_types_for_mock_datetime()
+            run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_exploration_model_failure(self):
+        collection_models.CollectionRightsModel.get_by_id('0').delete(
+            self.owner_id, '', [])
+        expected_output = [
+            (
+                u'[u\'failed validation check for collection_rights_ids '
+                'field check of CollectionRightsAllUsersModel\', '
+                '[u"Entity id 0: based on field collection_rights_ids '
+                'having value 0, expect model CollectionRightsModel with '
+                'id 0 but it doesn\'t exist"]]'
+            ), u'[u\'fully-validated CollectionRightsAllUsersModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_user_settings_model_failure(self):
+        user_models.UserSettingsModel.get_by_id(self.editor_id).delete()
+        expected_output = [
+            (
+                u'[u\'failed validation check for all_user_ids '
+                'field check of CollectionRightsAllUsersModel\', '
+                '[u"Entity id 0: based on field all_user_ids '
+                'having value %s, expect model UserSettingsModel with '
+                'id %s but it doesn\'t exist"]]'
+            ) % (self.editor_id, self.editor_id),
+            u'[u\'fully-validated CollectionRightsAllUsersModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 
 
@@ -3387,8 +3521,10 @@ class ExplorationModelValidatorTests(test_utils.GenericTestBase):
             language_code=language_codes[i]
         ) for i in python_utils.RANGE(3)]
 
-        for exp in explorations:
+        for index, exp in enumerate(explorations):
             exp_services.save_new_exploration(self.owner_id, exp)
+            exp_models.ExplorationRightsAllUsersModel(
+                id='%s' % index, all_user_ids=[self.owner_id]).put()
 
         self.model_instance_0 = exp_models.ExplorationModel.get_by_id('0')
         self.model_instance_1 = exp_models.ExplorationModel.get_by_id('1')
@@ -3527,6 +3663,18 @@ class ExplorationModelValidatorTests(test_utils.GenericTestBase):
                 '[u"Entity id 0: based on field snapshot_content_ids having '
                 'value 0-1, expect model ExplorationSnapshotContentModel '
                 'with id 0-1 but it doesn\'t exist"]]'),
+            u'[u\'fully-validated ExplorationModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_rights_all_users_failure(self):
+        exp_models.ExplorationRightsAllUsersModel.get_by_id('0').delete()
+        expected_output = [
+            (
+                u'[u\'failed validation check for all_users_model_ids '
+                'field check of ExplorationModel\', '
+                '[u"Entity id 0: based on field all_users_model_ids having '
+                'value 0, expect model ExplorationRightsAllUsersModel '
+                'with id 0 but it doesn\'t exist"]]'),
             u'[u\'fully-validated ExplorationModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 
@@ -4261,6 +4409,113 @@ class ExplorationRightsSnapshotContentModelValidatorTests(
             ), (
                 u'[u\'fully-validated ExplorationRightsSnapshotContentModel\', '
                 '3]')]
+        run_job_and_check_output(self, expected_output, sort=True)
+
+
+class ExplorationRightsAllUsersModelValidatorTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(ExplorationRightsAllUsersModelValidatorTests, self).setUp()
+
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.owner = user_services.UserActionsInfo(self.owner_id)
+
+        editor_email = 'user@editor.com'
+        self.signup(editor_email, 'editor')
+        self.editor_id = self.get_user_id_from_email(editor_email)
+
+        explorations = [exp_domain.Exploration.create_default_exploration(
+            '%s' % i,
+            title='title %d' % i,
+            category='category%d' % i,
+        ) for i in python_utils.RANGE(3)]
+        for exp in explorations:
+            exp_services.save_new_exploration(self.owner_id, exp)
+
+        rights_manager.assign_role_for_exploration(
+            self.owner, '0', self.editor_id, rights_manager.ROLE_EDITOR)
+
+        user_id_migration.AddAllUserIdsSnapshotContentVerificationJob.enqueue(
+            user_id_migration.AddAllUserIdsSnapshotContentVerificationJob
+            .create_new()
+        )
+        self.process_and_flush_pending_tasks()
+
+        self.model_instance_0 = (
+            exp_models.ExplorationRightsAllUsersModel.get_by_id('0'))
+        self.model_instance_1 = (
+            exp_models.ExplorationRightsAllUsersModel.get_by_id('1'))
+        self.model_instance_2 = (
+            exp_models.ExplorationRightsAllUsersModel.get_by_id('2'))
+
+        self.job_class = (
+            prod_validation_jobs_one_off.
+            ExplorationRightsAllUsersModelAuditOneOffJob)
+
+    def test_standard_operation(self):
+        expected_output = [
+            u'[u\'fully-validated ExplorationRightsAllUsersModel\', 3]']
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_created_on_greater_than_last_updated(self):
+        self.model_instance_0.created_on = (
+            self.model_instance_0.last_updated + datetime.timedelta(days=1))
+        self.model_instance_0.put()
+        expected_output = [(
+            u'[u\'failed validation check for time field relation check '
+            'of ExplorationRightsAllUsersModel\', '
+            '[u\'Entity id %s: The created_on field has a value '
+            '%s which is greater than the value '
+            '%s of last_updated field\']]') % (
+                self.model_instance_0.id,
+                self.model_instance_0.created_on,
+                self.model_instance_0.last_updated
+            ), (
+                u'[u\'fully-validated '
+                'ExplorationRightsAllUsersModel\', 2]')]
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_last_updated_greater_than_current_time(self):
+        self.model_instance_1.delete()
+        self.model_instance_2.delete()
+        expected_output = [(
+            u'[u\'failed validation check for current time check of '
+            'ExplorationRightsAllUsersModel\', '
+            '[u\'Entity id %s: The last_updated field has a '
+            'value %s which is greater than the time when the job was run\']]'
+        ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
+
+        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
+            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
+            update_datastore_types_for_mock_datetime()
+            run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_exploration_model_failure(self):
+        exp_models.ExplorationRightsModel.get_by_id('0').delete(
+            self.owner_id, '', [])
+        expected_output = [
+            (
+                u'[u\'failed validation check for exploration_rights_ids '
+                'field check of ExplorationRightsAllUsersModel\', '
+                '[u"Entity id 0: based on field exploration_rights_ids '
+                'having value 0, expect model ExplorationRightsModel with '
+                'id 0 but it doesn\'t exist"]]'
+            ), u'[u\'fully-validated ExplorationRightsAllUsersModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_user_settings_model_failure(self):
+        user_models.UserSettingsModel.get_by_id(self.editor_id).delete()
+        expected_output = [
+            (
+                u'[u\'failed validation check for all_user_ids '
+                'field check of ExplorationRightsAllUsersModel\', '
+                '[u"Entity id 0: based on field all_user_ids '
+                'having value %s, expect model UserSettingsModel with '
+                'id %s but it doesn\'t exist"]]'
+            ) % (self.editor_id, self.editor_id),
+            u'[u\'fully-validated ExplorationRightsAllUsersModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 
 
@@ -9177,6 +9432,8 @@ class TopicModelValidatorTests(test_utils.GenericTestBase):
                     'new_subtopic_id': 1,
                     'skill_id': '%s' % (index * 3 + 1)
                 })], 'Changes.')
+            topic_models.TopicRightsAllUsersModel(
+                id='%s' % index, all_user_ids=[self.owner_id]).put()
 
         self.model_instance_0 = topic_models.TopicModel.get_by_id('0')
         self.model_instance_1 = topic_models.TopicModel.get_by_id('1')
@@ -9361,6 +9618,18 @@ class TopicModelValidatorTests(test_utils.GenericTestBase):
                 '[u"Entity id 0: based on field snapshot_content_ids having '
                 'value 0-1, expect model TopicSnapshotContentModel '
                 'with id 0-1 but it doesn\'t exist"]]'),
+            u'[u\'fully-validated TopicModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_rights_all_users_failure(self):
+        topic_models.TopicRightsAllUsersModel.get_by_id('0').delete()
+        expected_output = [
+            (
+                u'[u\'failed validation check for all_users_model_ids '
+                'field check of TopicModel\', '
+                '[u"Entity id 0: based on field all_users_model_ids having '
+                'value 0, expect model TopicRightsAllUsersModel '
+                'with id 0 but it doesn\'t exist"]]'),
             u'[u\'fully-validated TopicModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 
@@ -10289,6 +10558,120 @@ class TopicRightsSnapshotContentModelValidatorTests(
             ), (
                 u'[u\'fully-validated TopicRightsSnapshotContentModel\', '
                 '3]')]
+        run_job_and_check_output(self, expected_output, sort=True)
+
+
+class TopicRightsAllUsersModelValidatorTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(TopicRightsAllUsersModelValidatorTests, self).setUp()
+
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.set_admins([self.ADMIN_USERNAME])
+        self.admin = user_services.UserActionsInfo(self.admin_id)
+
+        manager1_email = 'user@manager1.com'
+        self.signup(manager1_email, 'manager1')
+        self.set_topic_managers(['manager1'])
+        self.manager1_id = self.get_user_id_from_email(manager1_email)
+        self.manager1 = user_services.UserActionsInfo(self.manager1_id)
+
+        topics = [topic_domain.Topic.create_default_topic(
+            topic_id='%s' % i,
+            name='topic%s' % i,
+            abbreviated_name='abbrev%s' % i) for i in python_utils.RANGE(3)]
+
+        language_codes = ['ar', 'en', 'en']
+        for index, topic in enumerate(topics):
+            topic.language_code = language_codes[index]
+            topic_services.save_new_topic(self.owner_id, topic)
+
+        topic_services.assign_role(
+            self.admin, self.manager1, topic_domain.ROLE_MANAGER, '0')
+
+        user_id_migration.AddAllUserIdsSnapshotContentVerificationJob.enqueue(
+            user_id_migration.AddAllUserIdsSnapshotContentVerificationJob
+            .create_new()
+        )
+        self.process_and_flush_pending_tasks()
+
+        self.model_instance_0 = (
+            topic_models.TopicRightsAllUsersModel.get_by_id('0'))
+        self.model_instance_1 = (
+            topic_models.TopicRightsAllUsersModel.get_by_id('1'))
+        self.model_instance_2 = (
+            topic_models.TopicRightsAllUsersModel.get_by_id('2'))
+
+        self.job_class = (
+            prod_validation_jobs_one_off.TopicRightsAllUsersModelAuditOneOffJob)
+
+    def test_standard_operation(self):
+        expected_output = [
+            u'[u\'fully-validated TopicRightsAllUsersModel\', 3]']
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_created_on_greater_than_last_updated(self):
+        self.model_instance_0.created_on = (
+            self.model_instance_0.last_updated + datetime.timedelta(days=1))
+        self.model_instance_0.put()
+        expected_output = [(
+            u'[u\'failed validation check for time field relation check '
+            'of TopicRightsAllUsersModel\', '
+            '[u\'Entity id %s: The created_on field has a value '
+            '%s which is greater than the value '
+            '%s of last_updated field\']]') % (
+                self.model_instance_0.id,
+                self.model_instance_0.created_on,
+                self.model_instance_0.last_updated
+            ), (
+                u'[u\'fully-validated '
+                'TopicRightsAllUsersModel\', 2]')]
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_last_updated_greater_than_current_time(self):
+        self.model_instance_1.delete()
+        self.model_instance_2.delete()
+        expected_output = [(
+            u'[u\'failed validation check for current time check of '
+            'TopicRightsAllUsersModel\', '
+            '[u\'Entity id %s: The last_updated field has a '
+            'value %s which is greater than the time when the job was run\']]'
+        ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
+
+        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
+            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
+            update_datastore_types_for_mock_datetime()
+            run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_topic_model_failure(self):
+        topic_models.TopicRightsModel.get_by_id('0').delete(
+            self.owner_id, '', [])
+        expected_output = [
+            (
+                u'[u\'failed validation check for topic_rights_ids '
+                'field check of TopicRightsAllUsersModel\', '
+                '[u"Entity id 0: based on field topic_rights_ids '
+                'having value 0, expect model TopicRightsModel with '
+                'id 0 but it doesn\'t exist"]]'
+            ), u'[u\'fully-validated TopicRightsAllUsersModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_user_settings_model_failure(self):
+        user_models.UserSettingsModel.get_by_id(self.manager1_id).delete()
+        expected_output = [
+            (
+                u'[u\'failed validation check for all_user_ids '
+                'field check of TopicRightsAllUsersModel\', '
+                '[u"Entity id 0: based on field all_user_ids '
+                'having value %s, expect model UserSettingsModel with '
+                'id %s but it doesn\'t exist"]]'
+            ) % (self.manager1_id, self.manager1_id),
+            u'[u\'fully-validated TopicRightsAllUsersModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 
 
@@ -12877,10 +13260,11 @@ class UserSubscriptionsModelValidatorTests(test_utils.GenericTestBase):
             (
                 u'[u\'failed validation check for general_feedback_thread_ids '
                 'field check of UserSubscriptionsModel\', '
-                '[u"Entity id 110211048197157141232: based on '
+                '[u"Entity id %s: based on '
                 'field general_feedback_thread_ids having value '
                 'nonexist_thread_id, expect model GeneralFeedbackThreadModel '
-                'with id nonexist_thread_id but it doesn\'t exist"]]'),
+                'with id nonexist_thread_id but it doesn\'t '
+                'exist"]]') % self.user_id,
             u'[u\'fully-validated UserSubscriptionsModel\', 1]']
         run_job_and_check_output(self, expected_output, sort=True)
 

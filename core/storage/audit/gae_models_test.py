@@ -67,15 +67,7 @@ class RoleQueryAuditModelUnitTests(test_utils.GenericTestBase):
     def test_get_user_id_migration_policy(self):
         self.assertEqual(
             audit_models.RoleQueryAuditModel.get_user_id_migration_policy(),
-            base_models.USER_ID_MIGRATION_POLICY.ONE_FIELD)
-
-    def test_get_user_id_migration_field(self):
-        # We need to compare the field types not the field values, thus using
-        # python_utils.UNICODE.
-        self.assertEqual(
-            python_utils.UNICODE(
-                audit_models.RoleQueryAuditModel.get_user_id_migration_field()),
-            python_utils.UNICODE(audit_models.RoleQueryAuditModel.user_id))
+            base_models.USER_ID_MIGRATION_POLICY.COPY_AND_UPDATE_ONE_FIELD)
 
     def test_get_model(self):
         audit_model = audit_models.RoleQueryAuditModel.get(self.ID)

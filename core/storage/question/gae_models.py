@@ -48,8 +48,7 @@ class QuestionSnapshotContentModel(base_models.BaseSnapshotContentModel):
 class QuestionModel(base_models.VersionedModel):
     """Model for storing Questions.
 
-    The ID of instances of this class has the form
-    {{random_hash_of_12_chars}}
+    The ID of instances of this class are in form of random hash of 12 chars.
     """
     SNAPSHOT_METADATA_CLASS = QuestionSnapshotMetadataModel
     SNAPSHOT_CONTENT_CLASS = QuestionSnapshotContentModel
@@ -95,8 +94,8 @@ class QuestionModel(base_models.VersionedModel):
 
     @classmethod
     def _get_new_id(cls):
-        """Generates a unique ID for the question of the form
-        {{random_hash_of_12_chars}}
+        """Generates a unique ID for the question in the form of random hash
+        of 12 chars.
 
         Returns:
            new_id: int. ID of the new QuestionModel instance.
@@ -196,8 +195,7 @@ class QuestionModel(base_models.VersionedModel):
 class QuestionSkillLinkModel(base_models.BaseModel):
     """Model for storing Question-Skill Links.
 
-    The ID of instances of this class has the form
-    {{random_hash_of_12_chars}}
+    The ID of instances of this class has the form '[question_id]:[skill_id]'.
     """
 
     # The ID of the question.
@@ -606,8 +604,7 @@ class QuestionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     A new instance of this model is created and saved every time a commit to
     QuestionModel occurs.
 
-    The id for this model is of the form
-    'question-{{QUESTION_ID}}-{{QUESTION_VERSION}}'.
+    The id for this model is of the form 'question-[question_id]-[version]'.
     """
     # The id of the question being edited.
     question_id = ndb.StringProperty(indexed=True, required=True)

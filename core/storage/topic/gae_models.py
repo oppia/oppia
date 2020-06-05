@@ -175,8 +175,7 @@ class TopicCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     A new instance of this model is created and saved every time a commit to
     TopicModel occurs.
 
-    The id for this model is of the form
-    'topic-{{TOPIC_ID}}-{{TOPIC_VERSION}}'.
+    The id for this model is of the form 'topic-[topic_id]-[version]'.
     """
     # The id of the topic being edited.
     topic_id = ndb.StringProperty(indexed=True, required=True)
@@ -381,7 +380,7 @@ class SubtopicPageCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     SubtopicPageModel occurs.
 
     The id for this model is of the form
-    'subtopicpage-{{SUBTOPIC_PAGE_ID}}-{{SUBTOPIC_PAGE_VERSION}}'.
+    'subtopicpage-[subtopic_page_id]-[version]'.
     """
     # The id of the subtopic page being edited.
     subtopic_page_id = ndb.StringProperty(indexed=True, required=True)
@@ -438,6 +437,7 @@ class TopicRightsModel(base_models.VersionedModel):
 
     # The user_ids of the managers of this topic.
     manager_ids = ndb.StringProperty(indexed=True, repeated=True)
+
     # Whether this topic is published.
     topic_is_published = ndb.BooleanProperty(
         indexed=True, required=True, default=False)
@@ -457,19 +457,9 @@ class TopicRightsModel(base_models.VersionedModel):
         Returns:
             bool. Whether any models refer to the given user ID.
         """
-        more_results = True
-        cursor = None
-        while more_results:
-            snapshot_content_models, cursor, more_results = (
-                cls.SNAPSHOT_CONTENT_CLASS.query().fetch_page(
-                    base_models.FETCH_BATCH_SIZE, start_cursor=cursor))
-            for snapshot_content_model in snapshot_content_models:
-                reconstituted_model = cls(**snapshot_content_model.content)
-                if user_id in reconstituted_model.manager_ids:
-                    return True
-        return (cls.query(cls.manager_ids == user_id).get(
-            keys_only=True) is not None or
-                cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id))
+        return (cls.query(
+            cls.manager_ids == user_id).get(keys_only=True) is not None
+                or cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id))
 
     @staticmethod
     def get_user_id_migration_policy():
@@ -588,3 +578,72 @@ class TopicRightsModel(base_models.VersionedModel):
         return {
             'managed_topic_ids': managed_topic_ids
         }
+
+
+class TopicRightsAllUsersModel(base_models.BaseModel):
+    """Temporary storage model for all user ids ever mentioned in the topic
+    rights.
+
+    TODO (#8529): This model should be deleted after the user ID migration is
+    completed.
+
+    The id of each instance is the id of the corresponding topic.
+    """
+    # The user_ids of users who are (or were in history) members of manager_ids
+    # in corresponding rights model.
+    all_user_ids = ndb.StringProperty(indexed=True, repeated=True)
+
+    @staticmethod
+    def get_deletion_policy():
+        """TopicRightsAllUsersModel are temporary model that will be
+        deleted after user migration.
+        """
+        return base_models.DELETION_POLICY.DELETE
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether TopicRightsAllUsersModel references the given user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return cls.query(
+            cls.all_user_ids == user_id).get(keys_only=True) is not None
+
+    @staticmethod
+    def get_export_policy():
+        """This model is only used for migration purposes. All the data
+        contained in this model are already exported through TopicRightsModel.
+        """
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """TopicRightsAllUsersModel has multiple fields with user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.CUSTOM
+
+    @classmethod
+    def migrate_model(cls, unused_old_user_id, unused_new_user_id):
+        """This model is used to verify that the user ID migration of
+        TopicRightsSnapshotContentModel was successful. The content is filled by
+        the AddAllUserIdsVerificationJob and
+        AddAllUserIdsSnapshotsVerificationJob before the
+        GaeIdNotInModelsVerificationJob is run, thus it shouldn't be migrated by
+        this method.
+
+        Args:
+            unused_old_user_id: str. The old user ID.
+            unused_new_user_id: str. The new user ID.
+        """
+        pass
+
+    def verify_model_user_ids_exist(self):
+        """Check if UserSettingsModel exists for all the ids in all_user_ids."""
+        user_ids = [user_id for user_id in self.all_user_ids
+                    if user_id not in feconf.SYSTEM_USERS]
+        user_settings_models = user_models.UserSettingsModel.get_multi(
+            user_ids, include_deleted=True)
+        return all(model is not None for model in user_settings_models)

@@ -1853,7 +1853,7 @@ class CollectionSummaryTests(CollectionServicesUnitTests):
         # collection.
         collection_summary = collection_services.get_collection_summary_by_id(
             self.COLLECTION_0_ID)
-        self.assertEqual(
+        self.assertItemsEqual(
             collection_summary.contributor_ids,
             [albert_id, bob_id])
 
