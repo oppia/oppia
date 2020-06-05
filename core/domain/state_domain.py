@@ -1927,7 +1927,7 @@ class State(python_utils.OBJECT):
 
         if solution is not None:
             if not isinstance(solution, Solution):
-                Raise Exception('expected Solution object,recieved %s'
+                raise Exception('expected Solution object,recieved %s'
                 %solution)
             self.interaction.solution = solution
             new_content_id_list.append(
