@@ -209,7 +209,9 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
             directive_filenames = os.listdir(directives_dir)
             rtc_ts_filenames.extend(
                 filename for filename
-                in directive_filenames if filename.endswith('.ts'))
+                in directive_filenames if (
+                    filename.endswith('.ts') and
+                    not filename.endswith('.spec.ts')))
 
         rtc_ts_file = os.path.join(
             feconf.RTE_EXTENSIONS_DIR, 'richTextComponentsRequires.ts')

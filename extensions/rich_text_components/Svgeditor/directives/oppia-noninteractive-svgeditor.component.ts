@@ -28,19 +28,20 @@ require('services/html-escaper.service.ts');
 angular.module('oppia').component('oppiaNoninteractiveSvgeditor', {
   template: require('./svgeditor.component.html'),
   controller: [
-    '$attrs', 'AssetsBackendApiService', 'ContextService', 'HtmlEscaperService',
-    'ImagePreloaderService', function($attrs, AssetsBackendApiService,
-      ContextService, HtmlEscaperService, ImagePreloaderService) {
-        var ctrl = this;
-        ctrl.$onInit = function() {
-          ctrl.filename = HtmlEscaperService.escapedJsonToObj(
-            $attrs.svgFilenameWithValue);
-          ctrl.dimensions = (
-            ImagePreloaderService.getDimensionsOfImage(ctrl.filename));
-          ctrl.svgContainerStyle = {
-            height: ctrl.dimensions.height + 'px',
-            width: ctrl.dimensions.width + 'px'
-          };
+    '$attrs', 'AssetsBackendApiService', 'ContextService',
+    'HtmlEscaperService', 'ImagePreloaderService',
+    function($attrs, AssetsBackendApiService, ContextService,
+        HtmlEscaperService, ImagePreloaderService) {
+      var ctrl = this;
+      ctrl.$onInit = function() {
+        ctrl.filename = HtmlEscaperService.escapedJsonToObj(
+          $attrs.svgFilenameWithValue);
+        ctrl.dimensions = (
+          ImagePreloaderService.getDimensionsOfImage(ctrl.filename));
+        ctrl.svgContainerStyle = {
+          height: ctrl.dimensions.height + 'px',
+          width: ctrl.dimensions.width + 'px'
+        };
         ctrl.svgUrl = AssetsBackendApiService.getImageUrlForPreview(
           ContextService.getEntityType(), ContextService.getEntityId(),
           ctrl.filename);
@@ -50,8 +51,7 @@ angular.module('oppia').component('oppiaNoninteractiveSvgeditor', {
           ctrl.svgAltText = HtmlEscaperService.escapedJsonToObj(
             $attrs.altWithValue);
         }
-      }
+      };
     }
   ]
-
 });

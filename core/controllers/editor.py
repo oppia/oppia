@@ -626,14 +626,6 @@ class ImageUploadHandler(EditorHandler):
     @acl_decorators.can_edit_entity
     def post(self, entity_type, entity_id):
         """Saves an image uploaded by a content creator."""
-        print("hello")
-        print("hello")
-        print("hello")
-        print(self.request)
-        print("hello")
-        print(self.payload)
-        print("hello")
-        print("hello")
 
         raw = self.request.get('image')
         filename = self.payload.get('filename')

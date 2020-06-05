@@ -36,11 +36,12 @@ angular.module('oppia').component('literallyCanvasDiagramEditor', {
   controller: [
     '$http', '$q', '$sce', '$scope', 'AlertsService', 'AssetsBackendApiService',
     'ContextService', 'CsrfTokenService', 'ImagePreloaderService',
-    'ImageUploadHelperService', 'LiterallyCanvasHelperService', 
-    'UrlInterpolationService', function($http, $q, $sce, $scope, AlertsService,
-      AssetsBackendApiService, ContextService, CsrfTokenService, 
-      ImagePreloaderService, ImageUploadHelperService, 
-      LiterallyCanvasHelperService, UrlInterpolationService) {
+    'ImageUploadHelperService', 'LiterallyCanvasHelperService',
+    'UrlInterpolationService',
+    function($http, $q, $sce, $scope, AlertsService, AssetsBackendApiService,
+        ContextService, CsrfTokenService, ImagePreloaderService,
+        ImageUploadHelperService, LiterallyCanvasHelperService,
+        UrlInterpolationService) {
       const ctrl = this;
       // These max width and height paramameters were determined by manual
       // testing and reference from OUTPUT_IMAGE_MAX_WIDTH_PX in
@@ -94,25 +95,26 @@ angular.module('oppia').component('literallyCanvasDiagramEditor', {
 
       ctrl.isDiagramCreated = function() {
         // This function checks if any shape has been created or not.
-        if(typeof(ctrl.lc) !== 'undefined' && ctrl.diagramStatus == 'editing') {
+        if (typeof ctrl.lc !== 'undefined' &&
+          ctrl.diagramStatus === 'editing') {
           var svgString = ctrl.lc.getSVGString();
           var domParser = new DOMParser();
           var doc = domParser.parseFromString(svgString, 'text/xml');
           var elements = doc.querySelectorAll('svg > g > *');
-          if(elements.length > 0) {
+          if (elements.length > 0) {
             return true;
           }
         }
         return false;
-      }
+      };
 
       ctrl.isUserDrawing = function() {
-        if(typeof(ctrl.lc) !== 'undefined' &&
+        if (typeof ctrl.lc !== 'undefined' &&
            ctrl.lc._shapesInProgress.length > 0) {
           return true;
         }
         return false;
-      }
+      };
 
       var getTrustedResourceUrlForSVGFileName = function(svgFileName) {
         var encodedFilepath = window.encodeURIComponent(svgFileName);
@@ -126,27 +128,28 @@ angular.module('oppia').component('literallyCanvasDiagramEditor', {
         ctrl.data = {
           savedSVGFileName: filename,
           savedSVGUrl: getTrustedResourceUrlForSVGFileName(filename)
-        }
+        };
         ctrl.value = filename;
-        if(setData) {
+        if (setData) {
           $http.get(ctrl.data.savedSVGUrl).then(function(response) {
             ctrl.savedSVGDiagram = response.data;
           });
         }
-      }
+      };
 
       ctrl.postSVGToServer = function(dimensions, resampledFile) {
         return $q(function(successCallback, errorCallback) {
           let form = new FormData();
-        form.append('image', resampledFile);
-        form.append('payload', JSON.stringify({
-          filename: ImageUploadHelperService.generateImageFilename(
-            dimensions.height, dimensions.width, 'svg')
-        }));
-        var imageUploadUrlTemplate = '/createhandler/imageupload/' +
-          '<entity_type>/<entity_id>';
-        CsrfTokenService.getTokenAsync().then(function(token) {
-          form.append('csrf_token', token);
+          form.append('image', resampledFile);
+          form.append('payload', JSON.stringify({
+            filename: ImageUploadHelperService.generateImageFilename(
+              dimensions.height, dimensions.width, 'svg')
+          })
+          );
+          var imageUploadUrlTemplate = '/createhandler/imageupload/' +
+            '<entity_type>/<entity_id>';
+          CsrfTokenService.getTokenAsync().then(function(token) {
+            form.append('csrf_token', token);
             $.ajax({
               url: UrlInterpolationService.interpolateUrl(
                 imageUploadUrlTemplate, {
@@ -174,9 +177,9 @@ angular.module('oppia').component('literallyCanvasDiagramEditor', {
                 errorCallback(parsedResponse);
               }
             });
-        })
-      }
-      )};
+          });
+        });
+      };
 
       ctrl.saveSVGFile = function() {
         AlertsService.clearWarnings();
@@ -191,44 +194,50 @@ angular.module('oppia').component('literallyCanvasDiagramEditor', {
         var dimensions = {
           width: ctrl.diagramWidth,
           height: ctrl.diagramHeight,
-         }
+        };
         let resampledFile;
-        
+
         if (LiterallyCanvasHelperService.svgTagIsValid(svgString)) {
           ctrl.savedSVGDiagram = svgString;
           resampledFile = (
             ImageUploadHelperService.convertImageDataToImageFile(
               svgDataURI));
           ctrl.postSVGToServer(dimensions, resampledFile).then(function(data) {
-              // Pre-load image before marking the image as saved.
-              console.log("hihihih")
-              console.log(data)
-              var img = new Image();
-              img.onload = function() {
-                ctrl.setSavedSVGFilename(data.filename, false);
-                var dimensions = (
-                  ImagePreloaderService.getDimensionsOfImage(data.filename));
-                ctrl.svgContainerStyle = {
-                  height: dimensions.height + 'px',
-                  width: dimensions.width + 'px'
-                };
-                $scope.$apply();
+            // Pre-load image before marking the image as saved.
+            var img = new Image();
+            img.onload = function() {
+              ctrl.setSavedSVGFilename(data.filename, false);
+              var dimensions = (
+                ImagePreloaderService.getDimensionsOfImage(data.filename));
+              ctrl.svgContainerStyle = {
+                height: dimensions.height + 'px',
+                width: dimensions.width + 'px'
               };
-              img.src = getTrustedResourceUrlForSVGFileName(data.filename);
-            }, function(parsedResponse) {
-                AlertsService.addWarning(
-                  parsedResponse.error || 'Error communicating with server.');
-                $scope.$apply();
-            })
+              $scope.$apply();
+            };
+            img.src = getTrustedResourceUrlForSVGFileName(data.filename);
+          }, function(parsedResponse) {
+            AlertsService.addWarning(
+              parsedResponse.error || 'Error communicating with server.');
+            $scope.$apply();
+          });
         }
-      }
+      };
 
       ctrl.isDiagramSaved = function() {
-        return ctrl.diagramStatus == 'saved';
-      }
+        return ctrl.diagramStatus === 'saved';
+      };
 
       ctrl.continueDiagramEditing = function() {
-        
+        ctrl.diagramStatus = 'editing';
+        if (typeof ctrl.lc !== 'undefined') {
+          ctrl.lc.teardown();
+        }
+        ctrl.data = {};
+        ctrl.invalidTagsAndAttributes = {
+          tags: [],
+          attrs: []
+        };
         angular.element(document).ready(function() {
           ctrl.lc = LC.init(document.getElementById(ctrl.lcID), {
             imageSize: {
@@ -252,17 +261,11 @@ angular.module('oppia').component('literallyCanvasDiagramEditor', {
               LC.tools.Eyedropper
             ]
           });
-          ctrl.diagramStatus = 'editing';
-          ctrl.data = {};
-          ctrl.invalidTagsAndAttributes = {
-            tags: [],
-            attrs: []
-          };
           var snapshot = LiterallyCanvasHelperService.svgParse(
-            ctrl.savedSVGDiagram, ctrl.lc)
+            ctrl.savedSVGDiagram, ctrl.lc);
           ctrl.lc.loadSnapshot(snapshot);
         });
-      }
+      };
 
       ctrl.validate = function() {
         return (
@@ -283,7 +286,7 @@ angular.module('oppia').component('literallyCanvasDiagramEditor', {
           'Polygon', LiterallyCanvasHelperService.polygonSVGRenderer);
         LC.defineSVGRenderer(
           'Text', LiterallyCanvasHelperService.textSVGRenderer);
-        if(ctrl.value) {
+        if (ctrl.value) {
           ctrl.setSavedSVGFilename(ctrl.value, true);
           var dimensions = (
             ImagePreloaderService.getDimensionsOfImage(ctrl.value));
@@ -296,7 +299,8 @@ angular.module('oppia').component('literallyCanvasDiagramEditor', {
             ctrl.lc = LC.init(document.getElementById(ctrl.lcID), {
               imageSize: {
                 width: ctrl.diagramWidth, height: ctrl.diagramHeight},
-              imageURLPrefix: '/third_party/static/literallycanvas-0.5.2/lib/img',
+              imageURLPrefix: (
+                '/third_party/static/literallycanvas-0.5.2/lib/img'),
               toolbarPosition: 'bottom',
               defaultStrokeWidth: DEFAULT_STROKE_WIDTH,
               strokeWidths: ALLOWED_STROKE_WIDTHS,

@@ -42,7 +42,7 @@ describe('oppiaNoninteractiveSvgeditor', function() {
     $provide.value('$attrs', {
       svgFilenameWithValue: '&quot;svgFilename.svg&quot;',
       altWithValue: '&quot;altText&quot;'
-    })
+    });
   }));
   beforeEach(angular.mock.module('oppia', $provide => {
     var ugs = new UpgradedServices();
@@ -58,10 +58,9 @@ describe('oppiaNoninteractiveSvgeditor', function() {
     ctrl.$onInit();
   }));
 
-  it('should fetch the svg file',function() {
+  it('should fetch the svg file', function() {
     expect(ctrl.filename).toBe('svgFilename.svg');
     expect(ctrl.svgAltText).toBe('altText');
     expect(ctrl.svgUrl).toBe('imageUrl:exploration_1_svgFilename.svg');
   });
-
 });

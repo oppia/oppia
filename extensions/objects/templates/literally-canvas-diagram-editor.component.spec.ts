@@ -36,7 +36,7 @@ describe('LiterallyCanvasDiagramEditor', function() {
     '0, 0)"> <g id="line-241c7047-7297-9aa7-486d-818cfebd30d7"><line x1="105' +
     '.5" y1="97.125" x2="145.5" y2="130.125" stroke="hsla(0, 0%, 0%, 1)" fil' +
     'l="undefined" stroke-width="2" stroke-linecap="round"></line></g> </g> ' +
-    '</svg>');   
+    '</svg>');
   var dataUrl = 'data:image/svg+xml;utf8,' + linesvg;
 
   var mockLiterallyCanvas = {
@@ -51,6 +51,9 @@ describe('LiterallyCanvasDiagramEditor', function() {
     getSVGString: function() {
       return this.currentSvg;
     },
+    teardown: function() {
+      return 'LiterallyCanvas is removed';
+    }
   };
 
   var mockabas = {
@@ -149,14 +152,20 @@ describe('LiterallyCanvasDiagramEditor', function() {
   });
 
   it('should save svg file created by literallyCanvas', function(done) {
-    var response = ")]}'\n{ \"filename\": \"imageFile1.svg\" }"
+    // responseText contains a XSSI Prefix, which is represented by )]}'
+    // string. That's why double quotes is being used here. It's not
+    // possible to use \' instead of ' so the XSSI Prefix won't be
+    // evaluated correctly.
+    /* eslint-disable quotes */
+    var responseText = ")]}'\n{ \"filename\": \"imageFile1.svg\" }";
+    /* eslint-enable quotes */
 
     LCDiagramEditorCtrl.lc.currentSvg = linesvg;
     // @ts-ignore in order to ignore JQuery properties that should
     // be declarated.
     spyOn($, 'ajax').and.callFake(function() {
       var d = $.Deferred();
-      d.resolve(response);
+      d.resolve(responseText);
       return d.promise();
     });
     LCDiagramEditorCtrl.saveSVGFile();
@@ -178,9 +187,9 @@ describe('LiterallyCanvasDiagramEditor', function() {
     LCDiagramEditorCtrl.lc.currentSvg = defaultsvg;
     LCDiagramEditorCtrl.saveSVGFile();
     expect(alertSpy).toHaveBeenCalledWith('Custom Diagram not created.');
-  })
+  });
 
-  it('should handle rejection when saving a  svg file fails', function(done) {
+  it('should handle rejection when saving a svg file fails', function(done) {
     LCDiagramEditorCtrl.lc.currentSvg = linesvg;
     var errorMessage = 'Error on saving svg file';
     // @ts-ignore in order to ignore JQuery properties that should
@@ -213,68 +222,71 @@ describe('LiterallyCanvasDiagramEditor', function() {
 
   it('should allow user to continue editing the diagram', function() {
     LCDiagramEditorCtrl.savedSVGDiagram = linesvg;
-    LCDiagramEditorCtrl.continueDiagramEditing()
+    LCDiagramEditorCtrl.continueDiagramEditing();
     expect(LCDiagramEditorCtrl.diagramStatus).toBe('editing');
     LCDiagramEditorCtrl.lc = mockLiterallyCanvas;
   });
-
 });
 
 
-describe('LiterallyCanvasDiagramEditor with value attribute', function() {
-  var LCDiagramEditorCtrl = null;
-  var $httpBackend = null;
-  var ecs = null;
-  var linesvg = (
-    '<svg xmlns="http://www.w3.org/2000/' +
-    'svg" width="450" height="350" viewBox="0 0 450 350"> <rect width="450" ' +
-    'height="350" x="0" y="0" fill="transparent" /> <g transform="translate(' +
-    '0, 0)"> <g id="line-241c7047-7297-9aa7-486d-818cfebd30d7"><line x1="105' +
-    '.5" y1="97.125" x2="145.5" y2="130.125" stroke="hsla(0, 0%, 0%, 1)" fil' +
-    'l="undefined" stroke-width="2" stroke-linecap="round"></line></g> </g> ' +
-    '</svg>');
-  var mockabas = {
-    getImageUrlForPreview: function(contentType, contentId, filepath) {
-      return '/imageurl_' + contentType + '_' + contentId + '_' + filepath;
-    }
-  };
-  var mockips = {
-    getDimensionsOfImage: function() {
-      return {
-        width: 450,
-        height: 350
-      };
-    }
-  };
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('AssetsBackendApiService', mockabas);
-    $provide.value('ImagePreloaderService', mockips);
-    $provide.value('ImageUploadHelperService', {});
-  }));
-  beforeEach(angular.mock.module('oppia', $provide => {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
-    $httpBackend = $injector.get('$httpBackend');
-    ecs = $injector.get('ContextService');    
-    spyOn(ecs, 'getEntityType').and.returnValue('exploration');
-    spyOn(ecs, 'getEntityId').and.returnValue('1');
-    LCDiagramEditorCtrl = $componentController('literallyCanvasDiagramEditor', null, {
-      value: 'svgimageFilename1.svg'
+describe('LiterallyCanvasDiagramEditor initialized with value attribute',
+  function() {
+    var LCDiagramEditorCtrl = null;
+    var $httpBackend = null;
+    var ecs = null;
+    var linesvg = (
+      '<svg xmlns="http://www.w3.org/2000/' +
+      'svg" width="450" height="350" viewBox="0 0 450 350"> <rect width="450' +
+      '" height="350" x="0" y="0" fill="transparent" /> <g transform="transl' +
+      'ate(0, 0)"> <g id="line-241c7047-7297-9aa7-486d-818cfebd30d7"><line x' +
+      '1="105.5" y1="97.125" x2="145.5" y2="130.125" stroke="hsla(0, 0%, 0%,' +
+      ' 1)" fill="undefined" stroke-width="2" stroke-linecap="round"></line>' +
+      '</g> </g> </svg>');
+    var mockabas = {
+      getImageUrlForPreview: function(contentType, contentId, filepath) {
+        return '/imageurl_' + contentType + '_' + contentId + '_' + filepath;
+      }
+    };
+    var mockips = {
+      getDimensionsOfImage: function() {
+        return {
+          width: 450,
+          height: 350
+        };
+      }
+    };
+    beforeEach(angular.mock.module('oppia'));
+    beforeEach(angular.mock.module('oppia', function($provide) {
+      $provide.value('AssetsBackendApiService', mockabas);
+      $provide.value('ImagePreloaderService', mockips);
+      $provide.value('ImageUploadHelperService', {});
+    }));
+    beforeEach(angular.mock.module('oppia', $provide => {
+      var ugs = new UpgradedServices();
+      for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
+        $provide.value(key, value);
+      }
+    }));
+    beforeEach(angular.mock.inject(function($injector, $componentController) {
+      $httpBackend = $injector.get('$httpBackend');
+      ecs = $injector.get('ContextService');
+      spyOn(ecs, 'getEntityType').and.returnValue('exploration');
+      spyOn(ecs, 'getEntityId').and.returnValue('1');
+      LCDiagramEditorCtrl = $componentController(
+        'literallyCanvasDiagramEditor', null, {
+          value: 'svgimageFilename1.svg'
+        }
+      );
+      LCDiagramEditorCtrl.$onInit();
+    }));
+
+    it('should load the svg file', function() {
+      $httpBackend.expect(
+        'GET', '/imageurl_exploration_1_svgimageFilename1.svg'
+      ).respond(linesvg);
+      $httpBackend.flush();
+      expect(LCDiagramEditorCtrl.diagramStatus).toBe('saved');
+      expect(LCDiagramEditorCtrl.savedSVGDiagram).toBe(linesvg);
     });
-    LCDiagramEditorCtrl.$onInit();
-  }));
-
-  it('should load the svg file', function() {
-    $httpBackend.expect(
-      'GET', '/imageurl_exploration_1_svgimageFilename1.svg').respond(linesvg);
-    $httpBackend.flush();
-    expect(LCDiagramEditorCtrl.diagramStatus).toBe('saved');
-    expect(LCDiagramEditorCtrl.savedSVGDiagram).toBe(linesvg);
-  })
-
-})
+  }
+);

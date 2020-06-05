@@ -18,7 +18,6 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import logging
-import time
 
 from constants import constants
 from core.controllers import acl_decorators
@@ -110,6 +109,7 @@ class AssetDevHandler(base.BaseHandler):
             fs = fs_domain.AbstractFileSystem(
                 fs_domain.GcsFileSystem(entity_type, entity_id))
             raw = fs.get('%s/%s' % (asset_type, filename))
+
             self.response.cache_control.no_cache = None
             self.response.cache_control.public = True
             self.response.cache_control.max_age = 600

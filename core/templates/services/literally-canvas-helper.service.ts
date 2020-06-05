@@ -59,6 +59,7 @@ angular.module('oppia').factory('LiterallyCanvasHelperService', [
     };
 
     var validateSVGTag = function(svgString) {
+      // This function validates a svg tag.
       var domParser = new DOMParser();
       var doc = domParser.parseFromString(svgString, 'image/svg+xml');
       var allowedTags = Object.keys(CONSTANTS.SVG_ATTRS_WHITELIST);
@@ -83,24 +84,55 @@ angular.module('oppia').factory('LiterallyCanvasHelperService', [
       return valid;
     };
 
-    var svgToSnapshot = function(node) {
+    var svgToShapeObject = function(node) {
+      // This function converts a svg tag into an object.
       var id = node.attributes.id.value.split('-');
-      var shape:any = {};
-      if (id[0] == 'ellipse') {
+      var shape = {
+        className: '',
+        data: {
+          x: null,
+          y: null,
+          x1: null,
+          y1: null,
+          x2: null,
+          y2: null,
+          color: null,
+          width: null,
+          height: null,
+          strokeWidth: null,
+          strokeColor: null,
+          fillColor: null,
+          capString: null,
+          dash: null,
+          endCapShapes: null,
+          order: null,
+          tailSize: null,
+          pointCoordinatePairs: null,
+          smoothedPointCoordinatePairs: null,
+          pointSize: null,
+          pointColor: null,
+          smooth: null,
+          isClosed: null,
+          text: null,
+          font: null,
+          forcedWidth: null,
+          forcedHeight: null
+        },
+        id: ''
+      };
+      if (id[0] === 'ellipse') {
         shape.className = 'Ellipse';
-        shape.data = {};
         shape.data.x = node.attributes.cx.value - node.attributes.rx.value;
         shape.data.y = node.attributes.cy.value - node.attributes.ry.value;
-        shape.data.width  = 2 * node.attributes.rx.value;
-        shape.data.height  = 2 * node.attributes.ry.value;
-        shape.data.strokeWidth = parseInt(node.attributes['stroke-width'].value);
+        shape.data.width = 2 * node.attributes.rx.value;
+        shape.data.height = 2 * node.attributes.ry.value;
+        shape.data.strokeWidth = parseInt(
+          node.attributes['stroke-width'].value);
         shape.data.strokeColor = node.attributes.stroke.value;
         shape.data.fillColor = node.attributes.fill.value;
         shape.id = id.slice(1).join('-');
-      } 
-      else if (id[0] == 'rectangle') {
+      } else if (id[0] === 'rectangle') {
         shape.className = 'Rectangle';
-        shape.data = {};
         var strokeWidth = node.attributes['stroke-width'].value;
         var shift = strokeWidth % 2 !== 0 ? 0.5 : 0;
         shape.data.x = node.attributes.x.value - shift;
@@ -111,14 +143,12 @@ angular.module('oppia').factory('LiterallyCanvasHelperService', [
         shape.data.strokeColor = node.attributes.stroke.value;
         shape.data.fillColor = node.attributes.fill.value;
         shape.id = id.slice(1).join('-');
-      }
-      else if (id[0] == 'line') {
+      } else if (id[0] === 'line') {
         shape.className = 'Line';
         var innerTags = node.querySelectorAll('*');
         var lineTag = innerTags[0];
         var strokeWidth = lineTag.attributes['stroke-width'].value;
         var shift = strokeWidth % 2 !== 0 ? 0.5 : 0;
-        shape.data = {};
         shape.data.x1 = lineTag.attributes.x1.value - shift;
         shape.data.y1 = lineTag.attributes.y1.value - shift;
         shape.data.x2 = lineTag.attributes.x2.value - shift;
@@ -134,26 +164,24 @@ angular.module('oppia').factory('LiterallyCanvasHelperService', [
         }
         shape.data.endCapShapes = [null, null];
         if (innerTags.length > 1) {
-          for(var i = 1; i < innerTags.length; i++){
+          for (var i = 1; i < innerTags.length; i++) {
             var position = innerTags[i].attributes.id.value.slice(-1);
-            if (position == '0') {
+            if (position === '0') {
               shape.data.endCapShapes[0] = 'arrow';
             } else {
               shape.data.endCapShapes[1] = 'arrow';
             }
           }
         }
-      }
-      else if (id[0] == 'linepath') {
-        shape.className = 'LinePath'
-        shape.data = {}
+      } else if (id[0] === 'linepath') {
+        shape.className = 'LinePath';
         shape.data.order = 3;
         shape.data.tailSize = 3;
         shape.data.smooth = true;
         var smoothedPoints = node.attributes.points.value.split(' ').map(
           a => a.split(',').map(b => parseFloat(b)));
         var points = [];
-        for (var i=0; i < smoothedPoints.length; i += 8) {
+        for (var i = 0; i < smoothedPoints.length; i += 8) {
           points.push(smoothedPoints[i]);
         }
         shape.data.pointCoordinatePairs = points;
@@ -161,18 +189,16 @@ angular.module('oppia').factory('LiterallyCanvasHelperService', [
         shape.data.pointSize = parseInt(node.attributes['stroke-width'].value);
         shape.data.pointColor = node.attributes.stroke.value;
         shape.id = id.slice(1).join('-');
-      }
-      else if (id[0] == 'polygon') {
-        shape.className = 'Polygon'
-        shape.data = {};
-        if (id[1] == 'closed') {
+      } else if (id[0] === 'polygon') {
+        shape.className = 'Polygon';
+        if (id[1] === 'closed') {
           var strokeWidth = node.attributes['stroke-width'].value;
           shape.data.strokeWidth = parseInt(strokeWidth);
           shape.data.fillColor = node.attributes.fill.value;
           shape.data.strokeColor = node.attributes.stroke.value;
           shape.data.dash = null;
           if (typeof node.attributes['stroke-dasharray'] !== 'undefined') {
-            var dash = node.attributes['stroke-dasharray'].value
+            var dash = node.attributes['stroke-dasharray'].value;
             shape.data.dash = dash.split(', ').map(a => parseInt(a));
           }
           shape.data.isClosed = true;
@@ -200,16 +226,14 @@ angular.module('oppia').factory('LiterallyCanvasHelperService', [
               a => a.split(',').map(b => parseFloat(b) - shift)));
         }
         shape.id = id.slice(2).join('-');
-      }
-      else if (id[0] == 'text') {
-        shape.className = 'Text'
-        shape.data = {};
+      } else if (id[0] === 'text') {
+        shape.className = 'Text';
         shape.data.x = parseFloat(node.attributes.x.value);
         shape.data.y = parseFloat(node.attributes.y.value);
         var text = '';
         node.querySelectorAll('*').forEach(a=>{
-          text += a.innerHTML + '\n';
-        })
+          text += a.textContent + '\n';
+        });
         shape.data.text = text.slice(0, -1);
         shape.data.color = node.attributes.fill.value;
         shape.data.font = node.attributes.style.value.slice(6, -1);
@@ -219,12 +243,15 @@ angular.module('oppia').factory('LiterallyCanvasHelperService', [
         shape.data.forcedHeight = (
           typeof node.attributes.height !== 'undefined' ? (
             parseFloat(node.attributes.height.value)) : 0);
+        shape.id = id.slice(1).join('-');
       }
       return shape;
     };
 
     return {
       svgParse: function(svgString, lc) {
+        // This function is used to convert svg to snapshot object which is
+        // used by literallyCanvas to load the svg into canvas.
         var domParser = new DOMParser();
         var doc = domParser.parseFromString(svgString, 'text/xml');
         var snapshot = {
@@ -245,20 +272,24 @@ angular.module('oppia').factory('LiterallyCanvasHelperService', [
         var rect = doc.querySelector('svg > rect');
         snapshot.colors.primary = lc.colors.primary;
         snapshot.colors.secondary = lc.colors.secondary;
+        // @ts-ignore fill property doesnot exist error.
         snapshot.colors.background = rect.attributes.fill.value;
         snapshot.position = lc.position;
         snapshot.backgroundShapes = lc.backgroundShapes;
+        // @ts-ignore width property doesnot exist error.
         snapshot.imageSize.width = rect.attributes.width.value;
+        // @ts-ignore height property doesnot exist error.
         snapshot.imageSize.height = rect.attributes.height.value;
 
         doc.querySelectorAll('svg > g > *').forEach((node) => {
-          snapshot.shapes.push(svgToSnapshot(node));
-        })
+          snapshot.shapes.push(svgToShapeObject(node));
+        });
         return snapshot;
       },
 
       svgTagIsValid: function(svgString) {
-        return validateSVGTag(svgString)
+        // This function is used to validate the svg tag.
+        return validateSVGTag(svgString);
       },
 
       rectangleSVGRenderer: function(shape) {

@@ -83,6 +83,11 @@ describe('LiterallyCanvasHelperService', function() {
       '(0, 0%, 100%, 1)" points="225.5,241.125 264.5,310.125 409.5,280.125 3' +
       '79.5,211.125" stroke="hsla(0, 0%, 0%, 1)" stroke-width="2" stroke-das' +
       'harray="4, 8"></polygon> </g> </svg>');
+    var attrs = ['x', 'y', 'x1', 'y1', 'x2', 'y2', 'color', 'width', 'height',
+      'strokeWidth', 'strokeColor', 'fillColor', 'capString', 'dash',
+      'endCapShapes', 'order', 'tailSize', 'pointCoordinatePairs',
+      'smoothedPointCoordinatePairs', 'pointSize', 'pointColor',
+      'smooth', 'isClosed', 'text', 'font', 'forcedWidth', 'forcedHeight'];
     var actualSnapshotObject = {
       colors: {
         primary: 'hsla(0, 0%, 0%, 1)',
@@ -322,10 +327,13 @@ describe('LiterallyCanvasHelperService', function() {
             y: 167.125,
             text: 'hello',
             color: 'hsla(0, 0%, 0%, 1)',
-            font: 'italic bold 18px \"Helvetica Neue\", Helvetica, Arial, sans-serif',
+            font: (
+              'italic bold 18px \"Helvetica Neue\", Helvetica, Arial, ' +
+              'sans-serif'),
             forcedWidth: 0,
             forcedHeight: 0
-          }
+          },
+          id: '7db838f5-4021-5708-d4aa-92aa70a7605b'
         },
         {
           className: 'Polygon',
@@ -396,6 +404,14 @@ describe('LiterallyCanvasHelperService', function() {
       imageSize: {
         width: '450',
         height: '350'
+      }
+    };
+    for (var i = 0; i < actualSnapshotObject.shapes.length; i++) {
+      var data = actualSnapshotObject.shapes[i].data;
+      for (var j = 0; j < attrs.length; j++) {
+        if (!(attrs[j] in data)) {
+          data[attrs[j]] = null;
+        }
       }
     }
     var snapshotObject = LiterallyCanvasHelperService.svgParse(svgTag, mockLc);
