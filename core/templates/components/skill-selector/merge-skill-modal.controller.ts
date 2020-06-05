@@ -32,7 +32,8 @@ angular.module('oppia').controller('MergeSkillModalController', [
     $scope.selectedSkillId = '';
     $scope.confirm = function() {
       $uibModalInstance.close(
-        {skill: skill,
+        {
+          skill: skill,
           supersedingSkillId: $scope.selectedSkillId
         });
     };
