@@ -160,7 +160,7 @@ class AnswerSubmittedEventLogEntryModel(base_models.BaseModel):
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
         """Generates a unique id for the event model of the form
-        {{random_hash}} from {{timestamp}:{exp_id}:{session_id}}.
+        '[timestamp]:[exp_id]:[session_id]'.
         """
         timestamp = datetime.datetime.utcnow()
         return cls.get_new_id('%s:%s:%s' % (
@@ -226,7 +226,7 @@ class ExplorationActualStartEventLogEntryModel(base_models.BaseModel):
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
         """Generates a unique id for the event model of the form
-        {{random_hash}} from {{timestamp}:{exp_id}:{session_id}}.
+        '[timestamp]:[exp_id]:[session_id]'.
         """
         timestamp = datetime.datetime.utcnow()
         return cls.get_new_id('%s:%s:%s' % (
@@ -285,7 +285,7 @@ class SolutionHitEventLogEntryModel(base_models.BaseModel):
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
         """Generates a unique id for the event model of the form
-        {{random_hash}} from {{timestamp}:{exp_id}:{session_id}}.
+        '[timestamp]:[exp_id]:[session_id]'.
         """
         timestamp = datetime.datetime.utcnow()
         return cls.get_new_id('%s:%s:%s' % (
@@ -914,7 +914,7 @@ class StateCompleteEventLogEntryModel(base_models.BaseModel):
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
         """Generates a unique id for the event model of the form
-        {{random_hash}} from {{timestamp}:{exp_id}:{session_id}}.
+        '[timestamp]:[exp_id]:[session_id]'.
         """
         timestamp = datetime.datetime.utcnow()
         return cls.get_new_id('%s:%s:%s' % (
@@ -980,7 +980,7 @@ class LeaveForRefresherExplorationEventLogEntryModel(base_models.BaseModel):
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
         """Generates a unique id for the event model of the form
-        {{random_hash}} from {{timestamp}:{exp_id}:{session_id}}.
+        '[timestamp]:[exp_id]:[session_id]'.
         """
         timestamp = datetime.datetime.utcnow()
         return cls.get_new_id('%s:%s:%s' % (
@@ -1017,7 +1017,7 @@ class ExplorationStatsModel(base_models.BaseModel):
     """Model for storing analytics data for an exploration. This model contains
     statistics data aggregated from version 1 to the version given in the key.
 
-    The ID of instances of this class has the form {{exp_id}}.{{exp_version}}.
+    The ID of instances of this class has the form [exp_id].[exp_version].
     """
     # ID of exploration.
     exp_id = ndb.StringProperty(indexed=True)
@@ -1066,7 +1066,7 @@ class ExplorationStatsModel(base_models.BaseModel):
     @classmethod
     def get_entity_id(cls, exp_id, exp_version):
         """Generates an ID for the instance of the form
-        {{exp_id}}.{{exp_version}}.
+        '[exp_id].[exp_version]'.
 
         Args:
             exp_id: str. ID of the exploration.
@@ -1234,7 +1234,7 @@ class ExplorationIssuesModel(base_models.BaseModel):
     @classmethod
     def get_entity_id(cls, exp_id, exp_version):
         """Generates an ID for the instance of the form
-        {{exp_id}}.{{exp_version}}.
+        [exp_id].[exp_version].
 
         Args:
             exp_id: str. ID of the exploration.
@@ -1293,7 +1293,7 @@ class PlaythroughModel(base_models.BaseModel):
     """Model for storing recorded useful playthrough data in the datastore.
 
     The ID of instances of this class are of the form
-    {{exp_id}}.{{random_hash_of_16_chars}}
+    '[exp_id].[random hash of 16 chars]'.
     """
     # ID of the exploration.
     exp_id = ndb.StringProperty(indexed=True, required=True)
@@ -1324,7 +1324,7 @@ class PlaythroughModel(base_models.BaseModel):
     @classmethod
     def _generate_id(cls, exp_id):
         """Generates a unique id for the playthrough of the form
-        {{exp_id}}.{{random_hash_of_16_chars}}
+        '[exp_id].[random hash of 16 chars]'.
 
         Args:
             exp_id: str. ID of the exploration.
