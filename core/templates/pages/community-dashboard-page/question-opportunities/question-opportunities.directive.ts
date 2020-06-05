@@ -27,6 +27,13 @@ require(
   'components/question-directives/question-editor/' +
   'question-editor.directive.ts');
 require(
+  'pages/community-dashboard-page/login-required-message/' +
+  'login-required-message.directive.ts');
+require(
+  'pages/community-dashboard-page/opportunities-list/' +
+  'opportunities-list.directive.ts');
+
+require(
   'components/question-directives/questions-list/' +
   'questions-list.constants.ajs.ts');
 require(
@@ -68,14 +75,15 @@ angular.module('oppia').directive('questionOpportunities', [
         'ContributionOpportunitiesService', 'MisconceptionObjectFactory',
         'QuestionObjectFactory', 'QuestionSuggestionService',
         'QuestionUndoRedoService', 'SkillBackendApiService',
-        'SkillObjectFactory',
+        'SkillObjectFactory', 'UserService',
         function(
             $rootScope, $scope, $uibModal, AlertsService,
             ContributionOpportunitiesService, MisconceptionObjectFactory,
             QuestionObjectFactory, QuestionSuggestionService,
             QuestionUndoRedoService, SkillBackendApiService,
-            SkillObjectFactory) {
+            SkillObjectFactory, UserService) {
           const ctrl = this;
+          let userIsLoggedIn = false;
 
           const updateWithNewOpportunities = function(opportunities, more) {
             for (const index in opportunities) {
@@ -113,6 +121,11 @@ angular.module('oppia').directive('questionOpportunities', [
           };
 
           ctrl.onClickSuggestQuestionButton = function(skillId) {
+            if (!userIsLoggedIn) {
+              ContributionOpportunitiesService.showRequiresLoginModal();
+              return;
+            }
+
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/topic-editor-page/modal-templates/' +
@@ -275,6 +288,9 @@ angular.module('oppia').directive('questionOpportunities', [
             ctrl.moreOpportunitiesAvailable = true;
             ctrl.progressBarRequired = true;
             ctrl.opportunityHeadingTruncationLength = 45;
+            UserService.getUserInfoAsync().then(function(userInfo) {
+              userIsLoggedIn = userInfo.isLoggedIn();
+            });
             ContributionOpportunitiesService.getSkillOpportunities(
               updateWithNewOpportunities);
           };
