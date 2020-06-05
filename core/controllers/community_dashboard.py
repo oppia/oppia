@@ -20,11 +20,11 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
+from core.domain import config_domain
 from core.domain import exp_fetchers
 from core.domain import opportunity_services
 from core.domain import topic_fetchers
 from core.domain import user_services
-from core.domain import config_domain
 import feconf
 import utils
 
