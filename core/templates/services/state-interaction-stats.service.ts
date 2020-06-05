@@ -111,21 +111,21 @@ export class StateInteractionStatsService {
         })
     ).toPromise().then(response => <IStateRulesStats>{
       exploration_id: explorationId,
-        state_name: state.name,
-        visualizations_info: response.visualizations_info.map(vizInfo => ({
-          id: vizInfo.id,
-          options: vizInfo.options,
-          addressed_info_is_supported: vizInfo.addressed_info_is_supported,
-          data: vizInfo.data.map(datum => <IAnswerData>{
-            answer: this.getReadableAnswerString(state, datum.answer),
-            frequency: datum.frequency,
-            is_addressed: vizInfo.addressed_info_is_supported ?
-            this.answerClassificationService
-              .isClassifiedExplicitlyOrGoesToNewState(
-                state.name, state, datum.answer, interactionRulesService) :
-            undefined,
-          }),
-        })),
+      state_name: state.name,
+      visualizations_info: response.visualizations_info.map(vizInfo => ({
+        id: vizInfo.id,
+        options: vizInfo.options,
+        addressed_info_is_supported: vizInfo.addressed_info_is_supported,
+        data: vizInfo.data.map(datum => <IAnswerData>{
+          answer: this.getReadableAnswerString(state, datum.answer),
+          frequency: datum.frequency,
+          is_addressed: vizInfo.addressed_info_is_supported ?
+          this.answerClassificationService
+            .isClassifiedExplicitlyOrGoesToNewState(
+              state.name, state, datum.answer, interactionRulesService) :
+          undefined,
+        }),
+      })),
     });
     return this.cachedStats;
   }
