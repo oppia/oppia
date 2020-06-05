@@ -32,9 +32,10 @@ import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 
 export interface IAnswerData {
-  'answer': any; // Needs to be 'any' because type depends on interaction id.
+  // Needs to be 'any' because type depends on the interaction's id.
+  'answer': any;
   'frequency': number;
-  // Not present if the visualization can not present addressed answers.
+  // N/A when the visualization can not present addressed answers.
   'is_addressed'?: boolean;
 }
 
@@ -42,7 +43,8 @@ export interface IVisualizationInfo {
   'addressed_info_is_supported': boolean;
   'data': IAnswerData[];
   'id': string;
-  'options': {[name: string]: object};
+  // Needs to be 'any' because type depends on the visualization's id.
+  'options': {[name: string]: any};
 }
 
 export interface IStateRulesStatsBackendDict {
