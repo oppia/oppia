@@ -1,4 +1,4 @@
-<div #dropdown class="oppia-translation-language-select-container">
+<div #dropdown class="oppia-translation-language-select-container protractor-test-language-selector">
   <div class="oppia-translation-language-select-inner-container" (click)="_toggleDropdown()">
     {{languageIdToDescription[value]}}
     <span class="material-icons" style="color: #009688;" [ngStyle]="{ 'transform': dropdownShown ? 'scaleY(-1)' : 'scaleY(1)' }">
