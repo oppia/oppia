@@ -28,6 +28,7 @@ module.exports = function(config) {
       // and extensions/... are switched. The test framework may be flaky.
       'core/templates/**/*_directive.html',
       'core/templates/**/*.directive.html',
+      'core/templates/**/*.component.html',
       'core/templates/**/*.template.html',
       // Any of the *.module.ts files could be used here, we use
       // about-page.module.ts because it is first alphabetically.
@@ -44,6 +45,7 @@ module.exports = function(config) {
         included: false
       },
       'extensions/interactions/**/*.directive.html',
+      'extensions/interactions/**/*.component.html',
       'extensions/interactions/rule_templates.json',
       'core/tests/data/*.json',
       {
@@ -74,8 +76,10 @@ module.exports = function(config) {
       // list above.
       'core/templates/**/*_directive.html': ['ng-html2js'],
       'core/templates/**/*.directive.html': ['ng-html2js'],
+      'core/templates/**/*.component.html': ['ng-html2js'],
       'core/templates/**/*.template.html': ['ng-html2js'],
       'extensions/interactions/**/*.directive.html': ['ng-html2js'],
+      'extensions/interactions/**/*.component.html': ['ng-html2js'],
       'extensions/interactions/rule_templates.json': ['json_fixtures'],
       'core/tests/data/*.json': ['json_fixtures']
     },
