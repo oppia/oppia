@@ -16,6 +16,10 @@
  * @fileoverview Directive for the exploration graph.
  */
 
+require(
+  'pages/exploration-editor-page/editor-tab/templates/modal-templates/' +
+  'exploration-graph-modal.controller.ts');
+
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require('pages/exploration-editor-page/services/graph-data.service.ts');
@@ -25,6 +29,7 @@ require(
   'state-editor.service.ts');
 require('services/alerts.service.ts');
 require('services/editability.service.ts');
+require('services/contextual/logger.service.ts');
 
 angular.module('oppia').directive('explorationGraph', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -38,12 +43,12 @@ angular.module('oppia').directive('explorationGraph', [
       controllerAs: '$ctrl',
       controller: [
         '$uibModal', 'AlertsService', 'EditabilityService',
-        'ExplorationStatesService', 'GraphDataService', 'RouterService',
-        'StateEditorService', 'UrlInterpolationService',
+        'ExplorationStatesService', 'GraphDataService', 'LoggerService',
+        'RouterService', 'StateEditorService', 'UrlInterpolationService',
         function(
             $uibModal, AlertsService, EditabilityService,
-            ExplorationStatesService, GraphDataService, RouterService,
-            StateEditorService, UrlInterpolationService) {
+            ExplorationStatesService, GraphDataService, LoggerService,
+            RouterService, StateEditorService, UrlInterpolationService) {
           var ctrl = this;
           // We hide the graph at the outset in order not to confuse new
           // exploration creators.
@@ -78,45 +83,18 @@ angular.module('oppia').directive('explorationGraph', [
                 }
               },
               windowClass: 'oppia-large-modal-window',
-              controller: [
-                '$scope', '$uibModalInstance', 'StateEditorService',
-                'GraphDataService', 'isEditable',
-                function($scope, $uibModalInstance, StateEditorService,
-                    GraphDataService, isEditable) {
-                  $scope.currentStateName = StateEditorService
-                    .getActiveStateName();
-                  $scope.graphData = GraphDataService.getGraphData();
-                  $scope.isEditable = isEditable;
-
-                  $scope.deleteState = function(stateName) {
-                    $uibModalInstance.close({
-                      action: 'delete',
-                      stateName: stateName
-                    });
-                  };
-
-                  $scope.selectState = function(stateName) {
-                    $uibModalInstance.close({
-                      action: 'navigate',
-                      stateName: stateName
-                    });
-                  };
-
-                  $scope.cancel = function() {
-                    $uibModalInstance.dismiss('cancel');
-                    AlertsService.clearWarnings();
-                  };
-                }
-              ]
+              controller: 'ExplorationGraphModalController'
             }).result.then(function(closeDict) {
               if (closeDict.action === 'delete') {
                 ExplorationStatesService.deleteState(closeDict.stateName);
               } else if (closeDict.action === 'navigate') {
                 ctrl.onClickStateInMinimap(closeDict.stateName);
               } else {
-                console.error('Invalid closeDict action: ' + closeDict.action);
+                LoggerService.error(
+                  'Invalid closeDict action: ' + closeDict.action);
               }
             }, function() {
+              AlertsService.clearWarnings();
               // This callback is triggered when the Cancel button is
               // clicked. No further action is needed.
             });

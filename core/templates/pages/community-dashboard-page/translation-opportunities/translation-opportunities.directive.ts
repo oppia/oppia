@@ -19,12 +19,12 @@
 require('components/ck-editor-helpers/ck-editor-4-rte.directive.ts');
 require('components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts');
 require(
-  'components/common-layout-directives/common-elements/' +
-  'confirm-or-cancel-modal.controller.ts');
-require(
   'components/forms/schema-based-editors/schema-based-editor.directive.ts');
 require('directives/angular-html-bind.directive.ts');
 require('directives/mathjax-bind.directive.ts');
+require(
+  'pages/community-dashboard-page/modal-templates/' +
+  'translation-modal.controller.ts');
 require(
   'pages/community-dashboard-page/opportunities-list/' +
   'opportunities-list.directive.ts');
@@ -33,11 +33,6 @@ require(
   'pages/community-dashboard-page/services/' +
   'contribution-opportunities.service.ts');
 require('pages/community-dashboard-page/services/translate-text.service.ts');
-require(
-  'pages/exploration-editor-page/translation-tab/services/' +
-  'translation-language.service.ts');
-require('services/context.service.ts');
-require('services/alerts.service.ts');
 
 angular.module('oppia').directive(
   'translationOpportunities', ['UrlInterpolationService', function(
@@ -51,11 +46,11 @@ angular.module('oppia').directive(
       'translation-opportunities.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$rootScope', '$scope', '$uibModal', 'AlertsService',
+        '$rootScope', '$scope', '$uibModal',
         'ContributionOpportunitiesService', 'TranslateTextService',
         'TranslationLanguageService', 'UserService',
         function(
-            $rootScope, $scope, $uibModal, AlertsService,
+            $rootScope, $scope, $uibModal,
             ContributionOpportunitiesService, TranslateTextService,
             TranslationLanguageService, UserService) {
           var ctrl = this;
@@ -122,81 +117,7 @@ angular.module('oppia').directive(
                   return userIsLoggedIn;
                 }
               },
-              controller: [
-                '$controller', '$scope', '$uibModalInstance', 'ContextService',
-                'opportunity', 'userIsLoggedIn', 'ENTITY_TYPE',
-                function(
-                    $controller, $scope, $uibModalInstance, ContextService,
-                    opportunity, userIsLoggedIn, ENTITY_TYPE) {
-                  $controller('ConfirmOrCancelModalController', {
-                    $scope: $scope,
-                    $uibModalInstance: $uibModalInstance
-                  });
-                  // We need to set the context here so that the rte fetches
-                  // images for the given ENTITY_TYPE and targetId.
-                  ContextService.setCustomEntityContext(
-                    ENTITY_TYPE.EXPLORATION, opportunity.id);
-                  $scope.userIsLoggedIn = userIsLoggedIn;
-                  $scope.uploadingTranslation = false;
-                  $scope.activeWrittenTranslation = {};
-                  $scope.activeWrittenTranslation.html = '';
-                  $scope.HTML_SCHEMA = {
-                    type: 'html',
-                    ui_config: {
-                      hide_complex_extensions: 'true'
-                    }
-                  };
-                  $scope.subheading = opportunity.subheading;
-                  $scope.heading = opportunity.heading;
-                  $scope.loadingData = true;
-                  $scope.moreAvailable = false;
-                  $scope.textToTranslate = '';
-                  $scope.languageDescription = (
-                    TranslationLanguageService.getActiveLanguageDescription());
-                  TranslateTextService.init(
-                    opportunity.id,
-                    TranslationLanguageService.getActiveLanguageCode(),
-                    function() {
-                      var textAndAvailability = (
-                        TranslateTextService.getTextToTranslate());
-                      $scope.textToTranslate = textAndAvailability.text;
-                      $scope.moreAvailable = textAndAvailability.more;
-                      $scope.loadingData = false;
-                    });
-
-                  $scope.skipActiveTranslation = function() {
-                    var textAndAvailability = (
-                      TranslateTextService.getTextToTranslate());
-                    $scope.textToTranslate = textAndAvailability.text;
-                    $scope.moreAvailable = textAndAvailability.more;
-                    $scope.activeWrittenTranslation.html = '';
-                  };
-
-                  $scope.suggestTranslatedText = function() {
-                    if (!$scope.uploadingTranslation && !$scope.loadingData) {
-                      $scope.uploadingTranslation = true;
-                      TranslateTextService.suggestTranslatedText(
-                        $scope.activeWrittenTranslation.html,
-                        TranslationLanguageService.getActiveLanguageCode(),
-                        function() {
-                          AlertsService.addSuccessMessage(
-                            'Submitted translation for review.');
-                          if ($scope.moreAvailable) {
-                            var textAndAvailability = (
-                              TranslateTextService.getTextToTranslate());
-                            $scope.textToTranslate = textAndAvailability.text;
-                            $scope.moreAvailable = textAndAvailability.more;
-                          }
-                          $scope.activeWrittenTranslation.html = '';
-                          $scope.uploadingTranslation = false;
-                        });
-                    }
-                    if (!$scope.moreAvailable) {
-                      $uibModalInstance.close();
-                    }
-                  };
-                }
-              ]
+              controller: 'TranslationModalController'
             }).result.then(function() {}, function() {
               // Note to developers:
               // This callback is triggered when the Cancel button is clicked.

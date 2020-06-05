@@ -17,8 +17,9 @@
  */
 
 require(
-  'components/common-layout-directives/common-elements/' +
-  'confirm-or-cancel-modal.controller.ts');
+  'components/button-directives/' +
+  'exploration-embed-button-modal.controller.ts');
+
 require('domain/utilities/url-interpolation.service.ts');
 require('services/site-analytics.service.ts');
 
@@ -37,30 +38,7 @@ angular.module('oppia').factory('ExplorationEmbedButtonService', [
               return explorationId;
             }
           },
-          controller: [
-            '$controller', '$scope', '$uibModalInstance', '$window',
-            'explorationId',
-            function($controller, $scope, $uibModalInstance, $window,
-                explorationId) {
-              $controller('ConfirmOrCancelModalController', {
-                $scope: $scope,
-                $uibModalInstance: $uibModalInstance
-              });
-              $scope.explorationId = explorationId;
-              $scope.serverName = (
-                $window.location.protocol + '//' + $window.location.host);
-
-              $scope.selectText = function(evt) {
-                var codeDiv = evt.currentTarget;
-                var range = document.createRange();
-                range.setStartBefore(codeDiv.firstChild);
-                range.setEndAfter(codeDiv.lastChild);
-                var selection = window.getSelection();
-                selection.removeAllRanges();
-                selection.addRange(range);
-              };
-            }
-          ]
+          controller: 'ExplorationEmbedButtonModalController'
         }).result.then(function() {}, function() {
           // Note to developers:
           // This callback is triggered when the Cancel button is clicked.

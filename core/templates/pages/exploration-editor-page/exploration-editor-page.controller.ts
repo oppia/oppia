@@ -24,9 +24,6 @@ require(
   'components/common-layout-directives/common-elements/' +
   'attribution-guide.directive.ts');
 require(
-  'components/common-layout-directives/common-elements/' +
-  'confirm-or-cancel-modal.controller.ts');
-require(
   'components/forms/custom-forms-directives/select2-dropdown.directive.ts');
 require(
   'components/forms/schema-based-editors/schema-based-editor.directive.ts');
@@ -46,6 +43,8 @@ require(
 require(
   'pages/exploration-editor-page/exploration-title-editor/' +
   'exploration-title-editor.directive.ts');
+require(
+  'pages/exploration-editor-page/modal-templates/welcome-modal.controller.ts');
 require(
   'pages/exploration-editor-page/param-changes-editor/' +
   'param-changes-editor.directive.ts');
@@ -442,25 +441,7 @@ angular.module('oppia').directive('explorationEditorPage', [
                 '/pages/exploration-editor-page/modal-templates/' +
                 'welcome-modal.template.html'),
               backdrop: true,
-              controller: [
-                '$controller', '$scope', '$uibModalInstance',
-                'SiteAnalyticsService', 'ContextService',
-                function($controller, $scope, $uibModalInstance,
-                    SiteAnalyticsService, ContextService) {
-                  $controller('ConfirmOrCancelModalController', {
-                    $scope: $scope,
-                    $uibModalInstance: $uibModalInstance
-                  });
-                  $scope.explorationId = ContextService.getExplorationId();
-
-                  SiteAnalyticsService.registerTutorialModalOpenEvent(
-                    $scope.explorationId);
-
-                  $scope.editorWelcomeImgUrl = (
-                    UrlInterpolationService.getStaticImageUrl(
-                      '/general/editor_welcome.svg'));
-                }
-              ],
+              controller: 'WelcomeModalController',
               windowClass: 'oppia-welcome-modal'
             }).result.then(function(explorationId) {
               SiteAnalyticsService.registerAcceptTutorialModalEvent(
