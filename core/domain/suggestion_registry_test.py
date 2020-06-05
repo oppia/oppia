@@ -96,16 +96,16 @@ class BaseSuggestionUnitTests(test_utils.GenericTestBase):
             ' get_all_html_content_strings.'):
             self.base_suggestion.get_all_html_content_strings()
 
-    def test_base_class_convert_html_in_suggestion_change_dict(self):
+    def test_base_class_convert_html_in_suggestion_change(self):
         def conversion_fn():
             """Temporary function."""
             pass
         with self.assertRaisesRegexp(
             NotImplementedError,
             'Subclasses of BaseSuggestion should implement'
-            ' convert_html_in_suggestion_change_dict.'):
-            self.base_suggestion.convert_html_in_suggestion_change_dict(
-                {}, conversion_fn)
+            ' convert_html_in_suggestion_change.'):
+            self.base_suggestion.convert_html_in_suggestion_change(
+                conversion_fn)
 
 
 class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
@@ -622,7 +622,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         expected_outcome_list = [u'new suggestion content']
         self.assertEqual(expected_outcome_list, actual_outcome_list)
 
-    def test_convert_html_in_suggestion_change_dict(self):
+    def test_convert_html_in_suggestion_change(self):
         html_content = (
             '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&a'
             'mp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>')
@@ -639,13 +639,19 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             'new_value': '<p>suggestion</p>',
             'old_value': html_content
         }
-        converted_change_dict = (
-            suggestion_registry.SuggestionEditStateContent.
-            convert_html_in_suggestion_change_dict(
-                change, html_validation_service.
-                add_math_content_to_math_rte_components).to_dict())
+        suggestion = suggestion_registry.SuggestionEditStateContent(
+            self.suggestion_dict['suggestion_id'],
+            self.suggestion_dict['target_id'],
+            self.suggestion_dict['target_version_at_submission'],
+            self.suggestion_dict['status'], self.author_id,
+            self.reviewer_id, change,
+            self.suggestion_dict['score_category'], self.fake_date)
+
+        suggestion.convert_html_in_suggestion_change(
+            html_validation_service.
+            add_math_content_to_math_rte_components)
         self.assertEqual(
-            converted_change_dict['old_value'], expected_html_content)
+            suggestion.change.old_value, expected_html_content)
 
 
 class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
@@ -1107,7 +1113,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             u'<p>This is translated html.</p>', u'<p>This is a content.</p>']
         self.assertEqual(expected_outcome_list, actual_outcome_list)
 
-    def test_convert_html_in_suggestion_change_dict(self):
+    def test_convert_html_in_suggestion_change(self):
         html_content = (
             '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&a'
             'mp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>')
@@ -1124,13 +1130,17 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             'content_html': html_content,
             'translation_html': '<p>This is translated html.</p>'
         }
-        converted_change_dict = (
-            suggestion_registry.SuggestionTranslateContent.
-            convert_html_in_suggestion_change_dict(
-                change_dict, html_validation_service.
-                add_math_content_to_math_rte_components).to_dict())
+        suggestion = suggestion_registry.SuggestionTranslateContent(
+            self.suggestion_dict['suggestion_id'],
+            self.suggestion_dict['target_id'],
+            self.suggestion_dict['target_version_at_submission'],
+            self.suggestion_dict['status'], self.author_id,
+            self.reviewer_id, change_dict,
+            self.suggestion_dict['score_category'], self.fake_date)
+        suggestion.convert_html_in_suggestion_change(
+            html_validation_service.add_math_content_to_math_rte_components)
         self.assertEqual(
-            converted_change_dict['content_html'], expected_html_content)
+            suggestion.change.content_html, expected_html_content)
 
 
 class SuggestionAddQuestionTest(test_utils.GenericTestBase):
@@ -1583,10 +1593,10 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
 
         actual_outcome_list = suggestion.get_all_html_content_strings()
         expected_outcome_list = [
-            u'', u'<p>This is a hint.</p>', u'<p>This is a solution.</p>']
+            u'', u'<p>This is a hint.</p>', u'<p>This is a solution.</p>', u'']
         self.assertEqual(expected_outcome_list, actual_outcome_list)
 
-    def test_convert_html_in_suggestion_change_dict(self):
+    def test_convert_html_in_suggestion_change(self):
         html_content = (
             '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&a'
             'mp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>')
@@ -1713,15 +1723,11 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             suggestion_dict['status'], self.author_id, self.reviewer_id,
             suggestion_dict['change'], suggestion_dict['score_category'],
             self.fake_date)
-        converted_change_dict = (
-            suggestion.convert_html_in_suggestion_change_dict(
-                suggestion_dict['change'], html_validation_service.
-                add_math_content_to_math_rte_components).to_dict())
-        converted_html = (
-            converted_change_dict['question_dict']['question_state_data'][
-                'content']['html'])
-        self.assertEqual(converted_html, expected_html_content)
-
+        suggestion.convert_html_in_suggestion_change(
+            html_validation_service.add_math_content_to_math_rte_components)
+        self.assertEqual(
+            suggestion.change.question_dict['question_state_data']['content'][
+                'html'], expected_html_content)
 
 
 class MockInvalidVoiceoverApplication(

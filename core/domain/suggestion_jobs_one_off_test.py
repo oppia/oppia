@@ -771,10 +771,6 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
                 'question_state_data']['interaction']['answer_groups'][0][
                     'outcome']['feedback']['html'])
         self.assertEqual(migrated_html, expected_html_content)
-        self.assertNotEqual(
-            suggestion_dict['last_updated'],
-            utils.get_time_in_millisecs(
-                observed_question_suggestion.last_updated))
 
     def test_migrate_in_suggestion_edit_content_with_math_rte_correctly(self):
         """Checks that correct number of hints are tabulated when
@@ -1151,18 +1147,17 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
                 self.author_id, suggestion_dict['change'], 'test description',
                 self.reviewer_id)
 
-        @classmethod
-        def _mock_convert_html_in_suggestion_change_dict(
-                unused_cls, unused_dict, unused_conversion_fn):
-            """Mocks convert_html_in_suggestion_change_dict()."""
-            return 'invalid_suggestion after migration'
+        def _mock_convert_html_in_suggestion_change(
+                unused_self, unused_conversion_fn):
+            """Mocks convert_html_in_suggestion_change()."""
+            unused_self.change = {}
 
-        _mock_convert_html_in_suggestion_change_dict_swap = (
+        _mock_convert_html_in_suggestion_change_swap = (
             self.swap(
                 suggestion_registry.SuggestionAddQuestion,
-                'convert_html_in_suggestion_change_dict',
-                _mock_convert_html_in_suggestion_change_dict))
-        with _mock_convert_html_in_suggestion_change_dict_swap:
+                'convert_html_in_suggestion_change',
+                _mock_convert_html_in_suggestion_change))
+        with _mock_convert_html_in_suggestion_change_swap:
             job_id = (
                 suggestion_jobs_one_off.SuggestionMathMigrationOneOffJob.
                 create_new())

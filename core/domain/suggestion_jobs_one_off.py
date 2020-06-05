@@ -24,7 +24,6 @@ import logging
 
 from core import jobs
 from core.domain import html_validation_service
-from core.domain import suggestion_registry
 from core.domain import suggestion_services
 from core.platform import models
 
@@ -75,14 +74,9 @@ class SuggestionMathMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 SuggestionMathMigrationOneOffJob._ERROR_KEY,
                 'Suggestion %s failed validation: %s' % (item.id, e))
             return
-        suggestion_domain_class = (
-            suggestion_registry.SUGGESTION_TYPES_TO_DOMAIN_CLASSES[
-                suggestion.suggestion_type])
-        suggestion.change = (
-            suggestion_domain_class.convert_html_in_suggestion_change_dict(
-                suggestion.change.to_dict(),
-                html_validation_service.
-                add_math_content_to_math_rte_components))
+        suggestion.convert_html_in_suggestion_change(
+            html_validation_service.add_math_content_to_math_rte_components)
+
         try:
             suggestion.validate()
         except Exception as e:
@@ -95,7 +89,7 @@ class SuggestionMathMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                     item.id, e))
             return
         item.change_cmd = suggestion.change.to_dict()
-        item.put()
+        item.put(update_last_updated_time=False)
         yield ('suggestion_migrated', 1)
 
     @staticmethod
