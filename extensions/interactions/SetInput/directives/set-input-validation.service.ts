@@ -88,7 +88,7 @@ export class SetInputValidationService {
     return warningsList;
   }
 
-  getRuleAvailabilityWarnings(answerGroups: AnswerGroup[]): IWarning[] {
+  getRedundantRuleWarnings(answerGroups: AnswerGroup[]): IWarning[] {
     let warningsList: IWarning[] = [];
 
     let previousRules: Array<{
@@ -166,7 +166,7 @@ export class SetInputValidationService {
       defaultOutcome: Outcome): IWarning[] {
     return [
       ...this.getCustomizationArgsWarnings(customizationArgs),
-      ...this.getRuleAvailabilityWarnings(answerGroups),
+      ...this.getRedundantRuleWarnings(answerGroups),
       ...this.baseInteractionValidationServiceInstance.getAllOutcomeWarnings(
         answerGroups, defaultOutcome, stateName)
     ];
