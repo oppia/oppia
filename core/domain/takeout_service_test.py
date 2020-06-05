@@ -170,7 +170,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
                 id=creator_id,
                 gae_id='gae_' + creator_id,
                 username='username' + creator_id,
-                email=creator_id + '@oppia.org'
+                email=creator_id + '@example.com'
             ).put()
 
         user_models.UserSubscriptionsModel(
