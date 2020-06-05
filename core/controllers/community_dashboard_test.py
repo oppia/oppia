@@ -17,6 +17,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+from core.domain import config_services
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import story_domain
@@ -24,7 +25,6 @@ from core.domain import story_services
 from core.domain import topic_domain
 from core.domain import topic_services
 from core.domain import user_services
-from core.domain import config_services
 from core.tests import test_utils
 import feconf
 import python_utils
