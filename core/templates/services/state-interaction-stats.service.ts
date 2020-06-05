@@ -36,6 +36,10 @@ export interface IAnswerData {
   'answer': any;
   'frequency': number;
   // N/A when the visualization can not present addressed answers.
+  //
+  // For example, for SetInput interactions the individual answer elements are
+  // not generally intended to be used as a single response to SetInput
+  // interactions, so we omit addressed information entirely.
   'is_addressed'?: boolean;
 }
 
