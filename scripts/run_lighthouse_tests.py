@@ -42,11 +42,6 @@ APP_ENGINE_PORT = 8181
 NGINX_PORT = 9999
 
 
-def setup_and_install_dependencies():
-    """Runs the setup and installation scripts."""
-    install_third_party_libs.main()
-
-
 def run_lighthouse_checks():
     """Runs the lighthhouse checks through the lighthouserc.json config."""
     node_path = os.path.join(common.NODE_PATH, 'bin', 'node')
@@ -139,7 +134,6 @@ def main(args=None):
     """Runs lighthouse checks and deletes reports."""
     parsed_args = _PARSER.parse_args(args=args)
     atexit.register(cleanup)
-    setup_and_install_dependencies()
     build.main(args=['--prod_env'])
 
     if parsed_args.disable_compression:
