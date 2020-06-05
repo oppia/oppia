@@ -137,8 +137,7 @@ class StoryCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     A new instance of this model is created and saved every time a commit to
     StoryModel occurs.
 
-    The id for this model is of the form
-    'story-{{STORY_ID}}-{{STORY_VERSION}}'.
+    The id for this model is of the form 'story-[story_id]-[version]'.
     """
     # The id of the story being edited.
     story_id = ndb.StringProperty(indexed=True, required=True)
