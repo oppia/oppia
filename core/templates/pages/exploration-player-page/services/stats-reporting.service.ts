@@ -166,6 +166,8 @@ export class StatsReportingService {
     this.http.post(this.getFullStatsUrl('STATS_EVENTS'), {
       aggregated_stats: StatsReportingService.aggregatedStats,
       exp_version: StatsReportingService.explorationVersion
+    }).toPromise().then(() => {
+      // Required for the post operation to deliver data to backend.
     });
     this.refreshAggregatedStats();
   }
@@ -208,6 +210,8 @@ export class StatsReportingService {
       session_id: StatsReportingService.sessionId,
       state_name: stateName,
       version: StatsReportingService.explorationVersion
+    }).toPromise().then(() => {
+      // Required for the post operation to deliver data to backend.
     });
 
     // TODO(#8038): Move this into a backend-api.service.
@@ -217,6 +221,8 @@ export class StatsReportingService {
       new_state_name: stateName,
       old_params: params,
       session_id: StatsReportingService.sessionId,
+    }).toPromise().then(() => {
+      // Required for the post operation to deliver data to backend.
     });
 
     this.messengerService.sendMessage(
@@ -243,6 +249,8 @@ export class StatsReportingService {
       exploration_version: StatsReportingService.explorationVersion,
       state_name: stateName,
       session_id: StatsReportingService.sessionId
+    }).toPromise().then(() => {
+      // Required for the post operation to deliver data to backend.
     });
 
     this.playthroughService.recordExplorationStartAction(stateName);
@@ -261,6 +269,8 @@ export class StatsReportingService {
       session_id: StatsReportingService.sessionId,
       time_spent_in_state_secs: (
         StatsReportingService.stateStopwatch.getTimeInSecs())
+    }).toPromise().then(() => {
+      // Required for the post operation to deliver data to backend.
     });
   }
 
@@ -276,6 +286,8 @@ export class StatsReportingService {
       session_id: StatsReportingService.sessionId,
       time_spent_in_state_secs: (
         StatsReportingService.stateStopwatch.getTimeInSecs())
+    }).toPromise().then(() => {
+      // Required for the post operation to deliver data to backend.
     });
   }
 
@@ -304,6 +316,8 @@ export class StatsReportingService {
       new_state_name: newStateName,
       old_params: oldParams,
       session_id: StatsReportingService.sessionId,
+    }).toPromise().then(() => {
+      // Required for the post operation to deliver data to backend.
     });
 
     // Broadcast information about the state transition to listeners.
@@ -338,6 +352,8 @@ export class StatsReportingService {
       session_id: StatsReportingService.sessionId,
       time_spent_in_state_secs: (
         StatsReportingService.stateStopwatch.getTimeInSecs())
+    }).toPromise().then(() => {
+      // Required for the post operation to deliver data to backend.
     });
   }
 
@@ -355,6 +371,8 @@ export class StatsReportingService {
       session_id: StatsReportingService.sessionId,
       state_name: stateName,
       version: StatsReportingService.explorationVersion
+    }).toPromise().then(() => {
+      // Required for the post operation to deliver data to backend.
     });
 
     this.messengerService.sendMessage(
@@ -399,6 +417,8 @@ export class StatsReportingService {
       answer_group_index: answerGroupIndex,
       rule_spec_index: ruleIndex,
       classification_categorization: classificationCategorization
+    }).toPromise().then(() => {
+      // Required for the post operation to deliver data to backend.
     });
   }
 
@@ -415,6 +435,8 @@ export class StatsReportingService {
       session_id: StatsReportingService.sessionId,
       state_name: stateName,
       version: StatsReportingService.explorationVersion
+    }).toPromise().then(() => {
+      // Required for the post operation to deliver data to backend.
     });
 
     this.postStatsToBackend();
