@@ -241,9 +241,8 @@ describe('State Interaction Stats Service', () => {
         this.onFailure = jasmine.createSpy('failure');
 
         this.stateInteractionStatsService.computeStats({
-          name: 'Fraction', interaction: {id: 'FractionInput'},
-          false
-        }).then(this.onSuccess, this.onFailure);
+          name: 'Fraction', interaction: {id: 'FractionInput'}
+        }, false).then(this.onSuccess, this.onFailure);
 
         const req = this.httpTestingController.expectOne(
           '/createhandler/state_interaction_stats/expid/Fraction');
