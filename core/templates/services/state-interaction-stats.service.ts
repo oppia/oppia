@@ -107,17 +107,17 @@ export class StateInteractionStatsService {
           state_name: state.name,
         }))
       .toPromise().then(response => {
-        this.cachedStats = <IStateRulesStats>{
+        this.cachedStats = {
           exploration_id: explorationId,
           state_name: state.name,
-          visualizations_info: response.visualizations_info.map(info => ({
-            id: info.id,
-            options: info.options,
-            addressed_info_is_supported: info.addressed_info_is_supported,
-            data: info.data.map(datum => <IAnswerData>{
+          visualizations_info: response.visualizations_info.map(vizInfo => ({
+            id: vizInfo.id,
+            options: vizInfo.options,
+            addressed_info_is_supported: vizInfo.addressed_info_is_supported,
+            data: vizInfo.data.map(datum => <IAnswerData>{
               answer: this.getReadableAnswerString(state, datum.answer),
               frequency: datum.frequency,
-              is_addressed: info.addressed_info_is_supported ?
+              is_addressed: vizInfo.addressed_info_is_supported ?
                 this.answerClassificationService
                   .isClassifiedExplicitlyOrGoesToNewState(
                     state.name, state, datum.answer, interactionRulesService) :
