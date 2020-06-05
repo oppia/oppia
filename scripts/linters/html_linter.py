@@ -379,6 +379,7 @@ class ThirdPartyHTMLLintChecksManager(python_utils.OBJECT):
                 if error_count:
                     error_summary.append(error_count)
                     python_utils.PRINT(linter_stdout)
+                    summary_messages.append(linter_stdout)
 
         with linter_utils.redirect_stdout(stdout):
             if self.verbose_mode_enabled:
