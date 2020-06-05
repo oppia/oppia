@@ -148,10 +148,6 @@ angular.module('oppia').component('communityDashboardPage', {
                   languageCode))
             };
           }));
-        ctrl.languageSelectorOptions = (
-          ctrl.languageCodesAndDescriptions.map(
-            languageDict => languageDict.description
-          ));
 
         ctrl.languageCode = (
           allAudioLanguageCodes.indexOf(prevSelectedLanguageCode) !== -1 ?

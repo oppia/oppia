@@ -33,7 +33,7 @@ export class TranslationLanguageSelectComponent implements OnInit {
   @Input() options: {id: string, description: string}[];
   @Input() value: string;
   @Output() setValue: EventEmitter<string> = new EventEmitter();
-  @ViewChild('dropdown', {'static': true}) dropdownRef;
+  @ViewChild('dropdown', {'static': false}) dropdownRef;
 
   featuredLanguages: ReadOnlyFeaturedTranslationLanguage[] = [];
   languageIdToDescription: {[id: string]: string} = {};
