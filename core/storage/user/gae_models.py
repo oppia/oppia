@@ -859,7 +859,7 @@ class UserSubscriptionsModel(base_models.BaseModel):
         creator_usernames = []
         creator_user_models = UserSettingsModel.get_multi(
             user_model.creator_ids)
-        
+
         for creator in creator_user_models:
             creator_usernames.append(creator.username)
 
