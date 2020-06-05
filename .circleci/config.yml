@@ -19,39 +19,42 @@ workflows:
 
     jobs:
       - setup
-      - lint_tests:
-          requires:
-            - setup
-      - frontend_tests:
-          requires:
-            - setup
-      - typescript_tests:
-          requires:
-            - frontend_tests
-      - backend_tests:
-          requires:
-            - frontend_tests
+      # - lint_tests:
+      #     requires:
+      #       - setup
+      # - frontend_tests:
+      #     requires:
+      #       - setup
+      # - typescript_tests:
+      #     requires:
+      #       - frontend_tests
+      # - backend_tests:
+      #     requires:
+      #       - frontend_tests
       - e2e_file_upload_features:
           requires:
             - typescript_tests
       - e2e_navigation_and_admin:
           requires:
-            - typescript_tests
-      - e2e_classroom_page:
-          requires:
-            - e2e_file_upload_features
-      - e2e_topic_and_story_editor:
-          requires:
-            - e2e_file_upload_features
-      - e2e_library_and_collections:
+            - setup
+      # - e2e_classroom_page:
+      #     requires:
+      #       - e2e_file_upload_features
+      # - e2e_topic_and_story_editor:
+      #     requires:
+      #       - e2e_file_upload_features
+      - e2e_creators:
           requires:
             - e2e_navigation_and_admin
-      - e2e_users:
-          requires:
-              - e2e_navigation_and_admin
-      - e2e_accessibility_and_embedding:
-          requires:
-              - e2e_navigation_and_admin
+      # - e2e_library_and_collections:
+      #     requires:
+      #       - e2e_navigation_and_admin
+      # - e2e_users:
+      #     requires:
+      #         - e2e_navigation_and_admin
+      # - e2e_accessibility_and_embedding:
+      #     requires:
+      #         - e2e_navigation_and_admin
 
 var_for_docker_image: &docker_image circleci/python:2.7.17-browsers
 
@@ -103,9 +106,9 @@ jobs:
       - run:
           name: Install dependencies
           command: python -m scripts.install_third_party_libs
-      - run:
-          name: Check that all e2e test files are captured in protractor.conf.js
-          command: python -m scripts.check_e2e_tests_are_captured_in_ci
+      # - run:
+      #     name: Check that all e2e test files are captured in protractor.conf.js
+      #     command: python -m scripts.check_e2e_tests_are_captured_in_ci
       - persist_to_workspace:
           root: /home/circleci/
           paths:
@@ -220,6 +223,37 @@ jobs:
           name: Run e2e collections test
           command: |
             python -m scripts.run_e2e_tests --skip-install --skip-build --suite="collections" --prod_env
+      - run:
+          name: Run e2e community dashboard
+          command: |
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="communityDashboard" --prod_env;
+
+  e2e_creators:
+    <<: *job_defaults
+    steps:
+      - checkout
+      - attach_workspace:
+          at: /home/circleci/
+      - run:
+          name: Run e2e creator dashboard test
+          command: |
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="creatorDashboard" --prod_env
+      - run:
+          name: Run e2e exploration feedback tab test
+          command: |
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="explorationFeedbackTab" --prod_env
+      - run:
+          name: Run e2e exploration history tab test
+          command: |
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="explorationHistoryTab" --prod_env
+      - run:
+          name: Run e2e exploration statistics test
+          command: |
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="explorationStatisticsTab" --prod_env
+      - run:
+          name: Run e2e exploration translation tab test
+          command: |
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="explorationTranslationTab" --prod_env
 
   e2e_users:
     <<: *job_defaults
