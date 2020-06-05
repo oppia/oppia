@@ -104,7 +104,8 @@ export class ContributionOpportunitiesBackendApiService {
 
   private _fetchFeaturedTranslationLanguages(
       successCallback: (
-        featuredTranslationLanguages: ReadOnlyFeaturedTranslationLanguageObjectFactory[]
+        featuredTranslationLanguages:
+        ReadOnlyFeaturedTranslationLanguageObjectFactory[]
       ) => void,
       errorCallback: (reason?: any) => void
   ) {
