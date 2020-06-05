@@ -29,7 +29,8 @@ import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import {
   ReadOnlyFeaturedTranslationLanguageObjectFactory,
-  IFeaturedTranslationLanguageBackendDict
+  IFeaturedTranslationLanguageBackendDict,
+  ReadOnlyFeaturedTranslationLanguage
 } from
   'domain/community_dashboard/ReadOnlyFeaturedTranslationLanguageObjectFactory';
 
@@ -105,7 +106,7 @@ export class ContributionOpportunitiesBackendApiService {
   private _fetchFeaturedTranslationLanguages(
       successCallback: (
         featuredTranslationLanguages:
-        ReadOnlyFeaturedTranslationLanguageObjectFactory[]
+        ReadOnlyFeaturedTranslationLanguage[]
       ) => void,
       errorCallback: (reason?: any) => void
   ) {

@@ -76,7 +76,8 @@ angular.module('oppia').component('communityDashboardPage', {
         return languageDescriptions;
       };
 
-      ctrl.onChangeLanguage = function() {
+      ctrl.onChangeLanguage = function(languageCode: string) {
+        ctrl.languageCode = languageCode;
         TranslationLanguageService.setActiveLanguageCode(ctrl.languageCode);
         LocalStorageService.updateLastSelectedTranslationLanguageCode(
           ctrl.languageCode);
