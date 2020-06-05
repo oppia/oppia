@@ -23,9 +23,7 @@ import datetime
 import hashlib
 import imghdr
 import logging
-import math
 import re
-import time
 
 from constants import constants
 from core.domain import role_services
@@ -2023,7 +2021,9 @@ def log_username_change(committer_id, old_username, new_username):
         new_username: str. The new username that the current one is being
             changed to.
     """
-    model_id = '%s.%s' % (committer_id, int(math.floor(time.time())))
+    time_of_query = (datetime.datetime.utcnow() - datetime.datetime(
+        1970, 1, 1)).total_seconds()
+    model_id = '%s.%s' % (committer_id, time_of_query)
 
     audit_models.UsernameChangeAuditModel(
         id=model_id, committer_id=committer_id, old_username=old_username,
