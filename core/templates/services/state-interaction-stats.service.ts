@@ -111,6 +111,8 @@ export class StateInteractionStatsService {
           exploration_id: explorationId,
           state_name: state.name,
           visualizations_info: response.visualizations_info.map(info => ({
+            id: info.id,
+            options: info.options,
             addressed_info_is_supported: info.addressed_info_is_supported,
             data: info.data.map(datum => <IAnswerData>{
               answer: this.getReadableAnswerString(state, datum.answer),
@@ -121,8 +123,6 @@ export class StateInteractionStatsService {
                     state.name, state, datum.answer, interactionRulesService) :
                 undefined,
             }),
-            id: info.id,
-            options: info.options,
           })),
         };
         return this.cachedStats;
