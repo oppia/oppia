@@ -34,6 +34,7 @@ import { UrlInterpolationService } from
 export interface IAnswerData {
   'answer': any; // Needs to be 'any' because type depends on interaction id.
   'frequency': number;
+  // Not present if the visualization can not present addressed answers.
   'is_addressed'?: boolean;
 }
 
