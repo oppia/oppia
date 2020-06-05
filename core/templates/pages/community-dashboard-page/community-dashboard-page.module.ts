@@ -44,6 +44,8 @@ export class ServiceBootstrapComponent {}
 import { AppConstants } from 'app.constants';
 import { CommunityDashboardConstants } from
   'pages/community-dashboard-page/community-dashboard-page.constants';
+import { TranslationLanguageSelectComponent } from
+  './translation-language-select/translation-language-select.component';
 
 @NgModule({
   imports: [
@@ -52,10 +54,12 @@ import { CommunityDashboardConstants } from
     SharedComponentsModule
   ],
   declarations: [
-    ServiceBootstrapComponent
+    ServiceBootstrapComponent,
+    TranslationLanguageSelectComponent
   ],
   entryComponents: [
-    ServiceBootstrapComponent
+    ServiceBootstrapComponent,
+    TranslationLanguageSelectComponent
   ],
   providers: [
     AppConstants,

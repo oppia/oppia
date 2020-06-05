@@ -428,9 +428,10 @@ class FeaturedTranslationLanguagesHandlerTest(test_utils.GenericTestBase):
 
     def test_get_featured_translation_languages(self):
         response = self.get_json('/getfeaturedtranslationlanguages')
-        self.assertEqual(response, {
-            'featured_translation_languages': []
-        })
+        self.assertEqual(
+            response,
+            {'featured_translation_languages': []}
+        )
 
         new_value = [
             {'language_code': 'en', 'description': 'Partnership with ABC'}
@@ -442,6 +443,7 @@ class FeaturedTranslationLanguagesHandlerTest(test_utils.GenericTestBase):
         )
 
         response = self.get_json('/getfeaturedtranslationlanguages')
-        self.assertEqual(response, {
-            'featured_translation_languages': new_value
-        })
+        self.assertEqual(
+            response,
+            {'featured_translation_languages': new_value}
+        )

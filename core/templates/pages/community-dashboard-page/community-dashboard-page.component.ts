@@ -27,6 +27,9 @@ require(
   'pages/community-dashboard-page/contributions-and-review/' +
   'contributions-and-review.directive.ts');
 require(
+  'pages/community-dashboard-page/translation-language-select/' +
+  'translation-language-select.component.ts');
+require(
   'pages/community-dashboard-page/question-opportunities/' +
   'question-opportunities.directive.ts');
 require(
@@ -144,6 +147,11 @@ angular.module('oppia').component('communityDashboardPage', {
                   languageCode))
             };
           }));
+        ctrl.languageSelectorOptions = (
+          ctrl.languageCodesAndDescriptions.map(
+            languageDict => languageDict.description
+          ));
+
         ctrl.languageCode = (
           allAudioLanguageCodes.indexOf(prevSelectedLanguageCode) !== -1 ?
           prevSelectedLanguageCode : DEFAULT_OPPORTUNITY_LANGUAGE_CODE);
