@@ -196,7 +196,9 @@ angular.module('oppia').directive('paramChangesEditor', [
             $scope.paramChangesService.restoreFromMemento();
             $scope.isParamChangesEditorOpen = false;
           };
-
+          ctrl.getStaticImageUrl = function(imagePath) {
+            return UrlInterpolationService.getStaticImageUrl(imagePath);
+          };
           ctrl.$onInit = function() {
             $scope.EditabilityService = EditabilityService;
             $scope.isParamChangesEditorOpen = false;

@@ -46,6 +46,9 @@ angular.module('oppia').directive('sharingLinks', [
             ExplorationEmbedButtonService, SiteAnalyticsService,
             DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR) {
           var ctrl = this;
+          ctrl.getStaticImageUrl = function(imagePath) {
+            return UrlInterpolationService.getStaticImageUrl(imagePath);
+          };
           ctrl.$onInit = function() {
             ctrl.registerShareEvent = null;
 

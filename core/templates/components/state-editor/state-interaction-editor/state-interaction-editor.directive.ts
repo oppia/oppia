@@ -432,6 +432,9 @@ angular.module('oppia').directive('stateInteractionEditor', [
               AlertsService.clearWarnings();
             });
           };
+          ctrl.getStaticImageUrl = function(imagePath) {
+            return UrlInterpolationService.getStaticImageUrl(imagePath);
+          };
           ctrl.$onInit = function() {
             $scope.EditabilityService = EditabilityService;
 

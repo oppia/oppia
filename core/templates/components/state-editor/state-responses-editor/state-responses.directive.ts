@@ -562,6 +562,9 @@ angular.module('oppia').directive('stateResponses', [
             var activeStateName = $scope.stateName;
             return outcome && (outcome.dest === activeStateName);
           };
+          ctrl.getStaticImageUrl = function(imagePath) {
+            return UrlInterpolationService.getStaticImageUrl(imagePath);
+          };
           ctrl.$onInit = function() {
             $scope.SHOW_TRAINABLE_UNRESOLVED_ANSWERS = (
               SHOW_TRAINABLE_UNRESOLVED_ANSWERS);

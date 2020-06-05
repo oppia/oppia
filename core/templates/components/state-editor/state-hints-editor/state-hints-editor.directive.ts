@@ -243,6 +243,9 @@ angular.module('oppia').directive('stateHintsEditor', [
             StateHintsService.saveDisplayedValue();
             $scope.onSaveHints(StateHintsService.displayed);
           };
+          ctrl.getStaticImageUrl = function(imagePath) {
+            return UrlInterpolationService.getStaticImageUrl(imagePath);
+          };
           ctrl.$onInit = function() {
             $scope.EditabilityService = EditabilityService;
             $scope.StateHintsService = StateHintsService;
