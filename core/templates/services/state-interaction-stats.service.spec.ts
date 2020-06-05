@@ -94,7 +94,7 @@ describe('State Interaction Stats Service', () => {
           this.statsCaptured.push(stats);
         };
 
-        this.stateInteractionStatsService.computeStats(this.mockState)
+        this.stateInteractionStatsService.computeStats(this.mockState, false)
           .then(captureStats);
         const req = this.httpTestingController.expectOne(
           '/createhandler/state_interaction_stats/expid/Hola');
@@ -129,7 +129,7 @@ describe('State Interaction Stats Service', () => {
           this.statsCaptured.push(stats);
         };
 
-        this.stateInteractionStatsService.computeStats(this.mockState)
+        this.stateInteractionStatsService.computeStats(this.mockState, false)
           .then(captureStats);
         const firstRequest = this.httpTestingController.expectOne(
           '/createhandler/state_interaction_stats/expid/Hola');

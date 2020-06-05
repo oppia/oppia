@@ -63,7 +63,7 @@ const STATE_INTERACTION_STATS_URL_TEMPLATE: string = (
 
 @Injectable({providedIn: 'root'})
 export class StateInteractionStatsService {
-  cachedStats: IStateRulesStats = null;
+  cachedStats: Promise<IStateRulesStats> = null;
 
   constructor(
       private answerClassificationService: AnswerClassificationService,
@@ -93,8 +93,9 @@ export class StateInteractionStatsService {
    * Returns a promise which will provide details of the given state's
    * answer-statistics.
    */
-  computeStats(state: State, cacheResults: boolean): Promise<IStateRulesStats> {
-    if (cacheResults && this.cachedStats !== null) {
+  computeStats(
+      state: State, useCachedResults: boolean): Promise<IStateRulesStats> {
+    if (useCachedResults && this.cachedStats !== null) {
       return this.cachedStats;
     }
     const explorationId = this.contextService.getExplorationId();
@@ -102,33 +103,31 @@ export class StateInteractionStatsService {
       this.interactionRulesRegistryService.getRulesServiceByInteractionId(
         state.interaction.id));
     // TODO(#8038): Move this HTTP call into a backend-api.service module.
-    return this.http.get<IStateRulesStatsBackendDict>(
+    this.cachedStats = this.http.get<IStateRulesStatsBackendDict>(
       this.urlInterpolationService.interpolateUrl(
         STATE_INTERACTION_STATS_URL_TEMPLATE, {
           exploration_id: explorationId,
           state_name: state.name,
-        }))
-      .toPromise().then(response => {
-        this.cachedStats = {
-          exploration_id: explorationId,
-          state_name: state.name,
-          visualizations_info: response.visualizations_info.map(vizInfo => ({
-            id: vizInfo.id,
-            options: vizInfo.options,
-            addressed_info_is_supported: vizInfo.addressed_info_is_supported,
-            data: vizInfo.data.map(datum => <IAnswerData>{
-              answer: this.getReadableAnswerString(state, datum.answer),
-              frequency: datum.frequency,
-              is_addressed: vizInfo.addressed_info_is_supported ?
-                this.answerClassificationService
-                  .isClassifiedExplicitlyOrGoesToNewState(
-                    state.name, state, datum.answer, interactionRulesService) :
-                undefined,
-            }),
-          })),
-        };
-        return this.cachedStats;
-      });
+        })
+    ).toPromise().then(response => <IStateRulesStats>{
+      exploration_id: explorationId,
+        state_name: state.name,
+        visualizations_info: response.visualizations_info.map(vizInfo => ({
+          id: vizInfo.id,
+          options: vizInfo.options,
+          addressed_info_is_supported: vizInfo.addressed_info_is_supported,
+          data: vizInfo.data.map(datum => <IAnswerData>{
+            answer: this.getReadableAnswerString(state, datum.answer),
+            frequency: datum.frequency,
+            is_addressed: vizInfo.addressed_info_is_supported ?
+            this.answerClassificationService
+              .isClassifiedExplicitlyOrGoesToNewState(
+                state.name, state, datum.answer, interactionRulesService) :
+            undefined,
+          }),
+        })),
+    });
+    return this.cachedStats;
   }
 }
 
