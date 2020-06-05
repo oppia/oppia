@@ -636,8 +636,6 @@ export class UpgradedServices {
       new SkillRightsObjectFactory();
     upgradedServices['SkillSummaryObjectFactory'] =
       new SkillSummaryObjectFactory();
-    upgradedServices['SpeechSynthesisChunkerService'] =
-      new SpeechSynthesisChunkerService();
     upgradedServices['SolutionValidityService'] = new SolutionValidityService();
     upgradedServices['StateGraphLayoutService'] = new StateGraphLayoutService();
     upgradedServices['StateImprovementSuggestionService'] =
@@ -878,6 +876,8 @@ export class UpgradedServices {
         upgradedServices['CodeNormalizerService']);
     upgradedServices['SidebarStatusService'] = new SidebarStatusService(
       upgradedServices['WindowDimensionsService']);
+    upgradedServices['SpeechSynthesisChunkerService'] =
+      new SpeechSynthesisChunkerService(upgradedServices['HtmlEscaperService']);
     upgradedServices['StateContentService'] = new StateContentService(
       upgradedServices['AlertsService'], upgradedServices['UtilsService']);
     upgradedServices['StateCustomizationArgsService'] =
