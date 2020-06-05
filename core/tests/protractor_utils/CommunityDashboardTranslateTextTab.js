@@ -26,6 +26,7 @@ var CommunityDashboardTranslateTextTab = function() {
     by.css('option:checked'));
 
   var _selectLanguage = async function(language) {
+    await selectableLanguageElements.click();
     await selectableLanguageElements.element(
       by.cssContainingText(
         '.oppia-translation-language-select-dropdown-option',

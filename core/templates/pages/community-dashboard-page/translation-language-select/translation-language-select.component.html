@@ -25,6 +25,7 @@
           {{languageIdToDescription[featuredOption.getLanguageCode()]}}
 
           <span class="material-icons"
+                *ngIf="featuredOption.getDescription()"
                 style="color:rgb(183, 183, 183)"
                 (mouseenter)="_showDescriptionPopup(i)"
                 (mouseleave)="_hideDescriptionPopup()">
