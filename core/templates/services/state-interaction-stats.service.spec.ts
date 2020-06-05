@@ -92,9 +92,9 @@ describe('State Interaction Stats Service', () => {
         const captureStats = (stats: IStateRulesStats) => {
           expect(stats).not.toBeFalsy();
           this.statsCaptured.push(stats);
-        }
+        };
 
-        this.stateInteractionStatsService.computeStats(this.mockState, true)
+        this.stateInteractionStatsService.computeStats(this.mockState)
           .then(captureStats);
         const req = this.httpTestingController.expectOne(
           '/createhandler/state_interaction_stats/expid/Hola');
@@ -110,7 +110,7 @@ describe('State Interaction Stats Service', () => {
         });
         flushMicrotasks();
 
-        this.stateInteractionStatsService.computeStats(this.mockState, false)
+        this.stateInteractionStatsService.computeStats(this.mockState, true)
           .then(captureStats);
         this.httpTestingController.expectNone(
           '/createhandler/state_interaction_stats/expid/Hola');
@@ -127,9 +127,9 @@ describe('State Interaction Stats Service', () => {
         const captureStats = (stats: IStateRulesStats) => {
           expect(stats).not.toBeFalsy();
           this.statsCaptured.push(stats);
-        }
+        };
 
-        this.stateInteractionStatsService.computeStats(this.mockState, true)
+        this.stateInteractionStatsService.computeStats(this.mockState)
           .then(captureStats);
         const firstRequest = this.httpTestingController.expectOne(
           '/createhandler/state_interaction_stats/expid/Hola');
