@@ -66,7 +66,6 @@ class MockUserStatsMRJobManager(
 
 class UserServicesUnitTests(test_utils.GenericTestBase):
     """Test the user services methods."""
-
     def test_set_and_get_username(self):
         gae_id = 'someUser'
         username = 'username'
@@ -263,7 +262,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         user_email = 'user@example.com'
         expected_gravatar_filepath = os.path.join(
             self.get_static_asset_filepath(), 'assets', 'images', 'avatar',
-            'gravatar_example.webp')
+            'gravatar_example.png')
         with python_utils.open_file(
             expected_gravatar_filepath, 'rb', encoding=None) as f:
             gravatar = f.read()
@@ -322,7 +321,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
     def test_default_identicon_data_url(self):
         identicon_filepath = os.path.join(
             self.get_static_asset_filepath(), 'assets', 'images', 'avatar',
-            'user_blue_72px.webp')
+            'user_blue_72px.png')
         identicon_data_url = utils.convert_png_to_data_url(identicon_filepath)
         self.assertEqual(
             identicon_data_url, user_services.DEFAULT_IDENTICON_DATA_URL)
