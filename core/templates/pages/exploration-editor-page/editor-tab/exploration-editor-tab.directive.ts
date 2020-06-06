@@ -17,8 +17,8 @@
  */
 
 require(
-  'components/forms/forms-templates/' +
-  'mark-all-audio-and-translations-as-needing-update.controller.ts');
+  'components/common-layout-directives/common-elements/' +
+  'confirm-or-cancel-modal.controller.ts');
 require('directives/angular-html-bind.directive.ts');
 require(
   'pages/exploration-editor-page/editor-tab/graph-directives/' +
@@ -228,8 +228,7 @@ angular.module('oppia').directive('explorationEditorTab', [
                   '/components/forms/forms-templates/mark-all-audio-and-' +
                   'translations-as-needing-update-modal.directive.html'),
                 backdrop: true,
-                controller: (
-                  'MarkAllAudioAndTranslationsAsNeedingUpdateController')
+                controller: 'ConfirmOrCancelModalController'
               }).result.then(function() {
                 if (recordedVoiceovers.hasUnflaggedVoiceovers(contentId)) {
                   recordedVoiceovers.markAllVoiceoversAsNeedingUpdate(

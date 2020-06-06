@@ -179,6 +179,9 @@ angular.module('oppia').directive('skillsList', [
                         supersedingSkillId: $scope.selectedSkillId
                       });
                   };
+                  $scope.save = function() {
+                    $scope.confirm();
+                  };
                 }
               ], windowClass: 'skill-select-modal',
               size: 'xl'

@@ -20,6 +20,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import copy
 import logging
 
+from core.domain import html_cleaner
 from core.domain import opportunity_services
 from core.domain import role_services
 from core.domain import skill_domain
@@ -340,6 +341,19 @@ def get_skill_summary_from_model(skill_summary_model):
         skill_summary_model.skill_model_created_on,
         skill_summary_model.skill_model_last_updated
     )
+
+
+def get_image_filenames_from_skill(skill):
+    """Get the image filenames from the skill.
+
+    Args:
+        skill: Skill. The skill itself.
+
+    Returns:
+       list(str). List containing the name of the image files in skill.
+    """
+    html_list = skill.get_all_html_content_strings()
+    return html_cleaner.get_image_filenames_from_html_strings(html_list)
 
 
 def get_skill_by_id(skill_id, strict=True, version=None):
@@ -733,20 +747,26 @@ def save_skill_summary(skill_summary):
         skill_summary: The skill summary object to be saved in the
             datastore.
     """
-    skill_summary_model = skill_models.SkillSummaryModel(
-        id=skill_summary.id,
-        description=skill_summary.description,
-        language_code=skill_summary.language_code,
-        version=skill_summary.version,
-        misconception_count=skill_summary.misconception_count,
-        worked_examples_count=skill_summary.worked_examples_count,
-        skill_model_last_updated=(
+    skill_summary_dict = {
+        'description': skill_summary.description,
+        'language_code': skill_summary.language_code,
+        'version': skill_summary.version,
+        'misconception_count': skill_summary.misconception_count,
+        'worked_examples_count': skill_summary.worked_examples_count,
+        'skill_model_last_updated': (
             skill_summary.skill_model_last_updated),
-        skill_model_created_on=(
+        'skill_model_created_on': (
             skill_summary.skill_model_created_on)
-    )
+    }
 
-    skill_summary_model.put()
+    skill_summary_model = (
+        skill_models.SkillSummaryModel.get_by_id(skill_summary.id))
+    if skill_summary_model is not None:
+        skill_summary_model.populate(**skill_summary_dict)
+        skill_summary_model.put()
+    else:
+        skill_summary_dict['id'] = skill_summary.id
+        skill_models.SkillSummaryModel(**skill_summary_dict).put()
 
 
 def create_user_skill_mastery(user_id, skill_id, degree_of_mastery):
