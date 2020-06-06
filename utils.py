@@ -259,18 +259,6 @@ def get_random_choice(alist):
     return alist[index]
 
 
-def is_file_webp_image(binary_str):
-    """Checks if a file is in WebP format or not.
-
-    Args:
-        binary_str: str. Binary content of a file.
-
-    Returns:
-        bool. Whether file is in WebP format or not.
-    """
-    return binary_str.startswith(b'RIFF') and binary_str[8:12] == b'WEBP'
-
-
 def convert_png_binary_to_data_url(content):
     """Converts a png image string (represented by 'content') to a data URL.
 
@@ -286,11 +274,8 @@ def convert_png_binary_to_data_url(content):
     if imghdr.what(None, h=content) == 'png':
         return 'data:image/png;base64,%s' % python_utils.url_quote(
             base64.b64encode(content).decode('utf-8'))
-    elif is_file_webp_image(content) == 'webp':
-        return 'data:image/webp;base64,%s' % python_utils.url_quote(
-            base64.b64encode(content))
     else:
-        raise Exception('The given string does not represent a PNG/WEBP image.')
+        raise Exception('The given string does not represent a PNG image.')
 
 
 def convert_png_to_data_url(filepath):
