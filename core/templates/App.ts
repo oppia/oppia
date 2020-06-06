@@ -169,14 +169,9 @@ angular.module('oppia').config([
                 // Get CSRF token before sending the request.
                 CsrfTokenService.getTokenAsync().then(function(token) {
                    if ((config.data instanceof FormData)) {
-                      console.log(" in form data")
                       config.data.append('csrf_token', token)
                       config.data.append('source', document.URL)
-                     console.log("in httpProvider.interceptors10 after intercep")
-                     console.log(config.data)
-
                   } else {
-                     console.log("in normal ers")
                     config.data = $.param({
                       csrf_token: token,
                       payload: JSON.stringify(config.data),

@@ -60,9 +60,6 @@ angular.module('oppia').factory('EditableQuestionBackendApiService', [
        }
       }).then(function(response) {
         var questionId = response.data.question_id;
-        console.log('Success saving to backend')
-        console.log(response.data)
-
         if (successCallback) {
           successCallback(questionId);
         }
