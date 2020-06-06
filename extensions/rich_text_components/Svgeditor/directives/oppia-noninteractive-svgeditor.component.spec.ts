@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the literally canvas diagram editor.
+ * @fileoverview Unit tests for the oppia noninteractive svg editor component.
  */
 
 import { UpgradedServices } from 'services/UpgradedServices';
