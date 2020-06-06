@@ -59,7 +59,7 @@ angular.module('oppia').factory('LiterallyCanvasHelperService', [
     };
 
     var validateSVGTag = function(svgString) {
-      // This function validates a svg tag.
+      // This function validates an svg tag.
       var domParser = new DOMParser();
       var doc = domParser.parseFromString(svgString, 'image/svg+xml');
       var allowedTags = Object.keys(CONSTANTS.SVG_ATTRS_WHITELIST);
@@ -84,8 +84,8 @@ angular.module('oppia').factory('LiterallyCanvasHelperService', [
       return valid;
     };
 
-    var svgToShapeObject = function(node) {
-      // This function converts a svg tag into an object.
+    var convertSvgToShapeObject = function(node) {
+      // This function converts an svg tag into an object.
       var id = node.attributes.id.value.split('-');
       var shape = {
         className: '',
@@ -249,9 +249,9 @@ angular.module('oppia').factory('LiterallyCanvasHelperService', [
     };
 
     return {
-      svgParse: function(svgString, lc) {
-        // This function is used to convert svg to snapshot object which is
-        // used by literallyCanvas to load the svg into canvas.
+      parseSvg: function(svgString, lc) {
+        // This function is used to convert an svg to a snapshot object which
+        // is used by literallyCanvas to load the svg into canvas.
         var domParser = new DOMParser();
         var doc = domParser.parseFromString(svgString, 'text/xml');
         var snapshot = {
@@ -282,12 +282,12 @@ angular.module('oppia').factory('LiterallyCanvasHelperService', [
         snapshot.imageSize.height = rect.attributes.height.value;
 
         doc.querySelectorAll('svg > g > *').forEach((node) => {
-          snapshot.shapes.push(svgToShapeObject(node));
+          snapshot.shapes.push(convertSvgToShapeObject(node));
         });
         return snapshot;
       },
 
-      svgTagIsValid: function(svgString) {
+      isSvgTagValid: function(svgString) {
         // This function is used to validate the svg tag.
         return validateSVGTag(svgString);
       },

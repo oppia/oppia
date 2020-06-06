@@ -197,7 +197,7 @@ angular.module('oppia').component('literallyCanvasDiagramEditor', {
         };
         let resampledFile;
 
-        if (LiterallyCanvasHelperService.svgTagIsValid(svgString)) {
+        if (LiterallyCanvasHelperService.isSvgTagValid(svgString)) {
           ctrl.savedSVGDiagram = svgString;
           resampledFile = (
             ImageUploadHelperService.convertImageDataToImageFile(
@@ -261,7 +261,7 @@ angular.module('oppia').component('literallyCanvasDiagramEditor', {
               LC.tools.Eyedropper
             ]
           });
-          var snapshot = LiterallyCanvasHelperService.svgParse(
+          var snapshot = LiterallyCanvasHelperService.parseSvg(
             ctrl.savedSVGDiagram, ctrl.lc);
           ctrl.lc.loadSnapshot(snapshot);
         });

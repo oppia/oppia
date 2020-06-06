@@ -16,9 +16,6 @@
  * @fileoverview Unit tests for the literally canvas diagram editor.
  */
 
-import { UpgradedServices } from 'services/UpgradedServices';
-
-
 describe('LiterallyCanvasDiagramEditor', function() {
   var alertSpy = null;
   var ecs = null;
@@ -85,12 +82,6 @@ describe('LiterallyCanvasDiagramEditor', function() {
     $provide.value('AssetsBackendApiService', mockabas);
     $provide.value('ImagePreloaderService', mockips);
     $provide.value('ImageUploadHelperService', mockiuhs);
-  }));
-  beforeEach(angular.mock.module('oppia', $provide => {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
   }));
   beforeEach(angular.mock.inject(function($injector, $componentController, $q) {
     ecs = $injector.get('ContextService');
@@ -189,7 +180,7 @@ describe('LiterallyCanvasDiagramEditor', function() {
     expect(alertSpy).toHaveBeenCalledWith('Custom Diagram not created.');
   });
 
-  it('should handle rejection when saving a svg file fails', function(done) {
+  it('should handle rejection when saving an svg file fails', function(done) {
     LCDiagramEditorCtrl.lc.currentSvg = linesvg;
     var errorMessage = 'Error on saving svg file';
     // @ts-ignore in order to ignore JQuery properties that should
@@ -260,12 +251,6 @@ describe('LiterallyCanvasDiagramEditor initialized with value attribute',
       $provide.value('AssetsBackendApiService', mockabas);
       $provide.value('ImagePreloaderService', mockips);
       $provide.value('ImageUploadHelperService', {});
-    }));
-    beforeEach(angular.mock.module('oppia', $provide => {
-      var ugs = new UpgradedServices();
-      for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-        $provide.value(key, value);
-      }
     }));
     beforeEach(angular.mock.inject(function($injector, $componentController) {
       $httpBackend = $injector.get('$httpBackend');

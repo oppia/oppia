@@ -25,7 +25,7 @@ describe('LiterallyCanvasHelperService', function() {
       'LiterallyCanvasHelperService');
   }));
 
-  it('should parse a svg and return a snapshot object', function() {
+  it('should parse an svg and return a snapshot object', function() {
     var mockLc = {
       colors: {
         primary: 'hsla(0, 0%, 0%, 1)',
@@ -414,7 +414,7 @@ describe('LiterallyCanvasHelperService', function() {
         }
       }
     }
-    var snapshotObject = LiterallyCanvasHelperService.svgParse(svgTag, mockLc);
+    var snapshotObject = LiterallyCanvasHelperService.parseSvg(svgTag, mockLc);
     expect(snapshotObject).toEqual(actualSnapshotObject);
   });
 
@@ -667,7 +667,7 @@ describe('LiterallyCanvasHelperService', function() {
       'f5b7-4194e2380d9f" x="143" y="97" width="12" height="29" stroke="hsla' +
       '(0, 0%, 0%, 1)" fill="hsla(0, 0%, 100%, 1)" stroke-width="1"></rect>' +
       '</svg>');
-    expect(LiterallyCanvasHelperService.svgTagIsValid(validSvgTag)).toBe(true);
+    expect(LiterallyCanvasHelperService.isSvgTagValid(validSvgTag)).toBe(true);
 
     var invalidWidthAttribute = (
       '<svg widht="100" height="100"><rect id="rectangle-de569866-9c11-b553-' +
@@ -675,7 +675,7 @@ describe('LiterallyCanvasHelperService', function() {
       '(0, 0%, 0%, 1)" fill="hsla(0, 0%, 100%, 1)" stroke-width="1"></rect>' +
       '</svg>');
     expect(() => {
-      LiterallyCanvasHelperService.svgTagIsValid(invalidWidthAttribute);
+      LiterallyCanvasHelperService.isSvgTagValid(invalidWidthAttribute);
     }).toThrowError('Invalid tag or attribute in svg.');
 
     var invalidSvgTag = (
@@ -684,7 +684,7 @@ describe('LiterallyCanvasHelperService', function() {
       ', 0%, 0%, 1)" fill="hsla(0, 0%, 100%, 1)" stroke-width="1"></rect>' +
       '<script src="evil.com"></script></svg>');
     expect(() => {
-      LiterallyCanvasHelperService.svgTagIsValid(invalidSvgTag);
+      LiterallyCanvasHelperService.isSvgTagValid(invalidSvgTag);
     }).toThrowError('Invalid tag or attribute in svg.');
   });
 });

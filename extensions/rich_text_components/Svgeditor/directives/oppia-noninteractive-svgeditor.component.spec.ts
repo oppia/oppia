@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for the oppia noninteractive svg editor component.
  */
 
-import { UpgradedServices } from 'services/UpgradedServices';
-
 describe('oppiaNoninteractiveSvgeditor', function() {
   var ecs = null;
   var ctrl = null;
@@ -43,12 +41,6 @@ describe('oppiaNoninteractiveSvgeditor', function() {
       svgFilenameWithValue: '&quot;svgFilename.svg&quot;',
       altWithValue: '&quot;altText&quot;'
     });
-  }));
-  beforeEach(angular.mock.module('oppia', $provide => {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
   }));
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     ecs = $injector.get('ContextService');

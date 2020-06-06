@@ -164,7 +164,7 @@ export = {
   "Svgeditor": {
     "backend_id": "svgeditor",
     "category": "Basic Input",
-    "description": "A SVG diagram editor.",
+    "description": "An SVG diagram editor.",
     "frontend_id": "svgeditor",
     "tooltip": "Insert diagram",
     "icon_data_url": "/rich_text_components/Svgeditor/Svgeditor.png",
