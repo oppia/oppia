@@ -42,8 +42,9 @@ class SuggestionMathRteAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         suggestion = suggestion_services.get_suggestion_from_model(item)
         html_string_list = suggestion.get_all_html_content_strings()
         html_string = ''.join(html_string_list)
-        if html_validation_service.check_for_math_component_in_html(
-                html_string):
+        if (
+                html_validation_service.check_for_math_component_in_html(
+                    html_string)):
             yield ('Suggestion with Math', item.id)
 
     @staticmethod
@@ -56,8 +57,8 @@ class SuggestionMathMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """A one-time job that can be used to migrate the Math components in the
     suggestions to the new Math Schema.
     """
-    _ERROR_KEY = 'validation_error'
-
+    _ERROR_KEY_BEFORE_MIGRATION = 'validation_error'
+    _ERROR_KEY_AFTER_MIGRATION = 'validation_error_after_migration'
     @classmethod
     def entity_classes_to_map_over(cls):
         return [suggestion_models.GeneralSuggestionModel]
@@ -71,7 +72,7 @@ class SuggestionMathMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             logging.error(
                 'Suggestion %s failed validation: %s' % (item.id, e))
             yield (
-                SuggestionMathMigrationOneOffJob._ERROR_KEY,
+                SuggestionMathMigrationOneOffJob._ERROR_KEY_BEFORE_MIGRATION,
                 'Suggestion %s failed validation: %s' % (item.id, e))
             return
         suggestion.convert_html_in_suggestion_change(
@@ -84,8 +85,8 @@ class SuggestionMathMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 'Suggestion %s failed validation after migration: %s' % (
                     item.id, e))
             yield (
-                SuggestionMathMigrationOneOffJob._ERROR_KEY,
-                'Suggestion %s failed validation after migration: %s' % (
+                SuggestionMathMigrationOneOffJob._ERROR_KEY_AFTER_MIGRATION,
+                'Suggestion %s failed validation: %s' % (
                     item.id, e))
             return
         item.change_cmd = suggestion.change.to_dict()
@@ -94,7 +95,12 @@ class SuggestionMathMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def reduce(key, values):
-        if key != SuggestionMathMigrationOneOffJob._ERROR_KEY:
+        if (
+                (key !=
+                 SuggestionMathMigrationOneOffJob._ERROR_KEY_AFTER_MIGRATION)
+                and (key !=
+                     SuggestionMathMigrationOneOffJob.
+                     _ERROR_KEY_BEFORE_MIGRATION)):
             yield (key, ['%d suggestions successfully migrated.' % (
                 sum(ast.literal_eval(v) for v in values))])
         else:

@@ -1169,7 +1169,7 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
             suggestion_jobs_one_off.SuggestionMathMigrationOneOffJob.
             get_output(job_id))
         expected_output = (
-            u'[u\'validation_error\', [u\'Suggestion skill1.thread1 failed '
-            'validation after migration: Expected change to be an instance of '
+            u'[u\'validation_error_after_migration\', [u\'Suggestion skill1.t'
+            'hread1 failed validation: Expected change to be an instance of '
             'QuestionSuggestionChange\']]')
         self.assertEqual(actual_output, [expected_output])
