@@ -21,6 +21,9 @@ require(
 require('components/state-directives/rule-editor/rule-editor.directive.ts');
 require('directives/angular-html-bind.directive.ts');
 require('filters/parameterize-rule-description.filter.ts');
+require(
+  'pages/topic-editor-page/modal-templates/' +
+  'tag-misconception-modal.controller.ts');
 
 require('domain/utilities/url-interpolation.service.ts');
 require('domain/exploration/RuleObjectFactory.ts');
@@ -112,47 +115,13 @@ angular.module('oppia').directive('answerGroupEditor', [
           };
 
           ctrl.tagAnswerGroupWithMisconception = function() {
-            var modalInstance = $uibModal.open({
+            $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/topic-editor-page/modal-templates/' +
                 'tag-misconception-modal.template.html'),
               backdrop: true,
-              controller: [
-                '$scope', '$uibModalInstance', 'StateEditorService',
-                function($scope, $uibModalInstance, StateEditorService) {
-                  $scope.misconceptionsBySkill =
-                    StateEditorService.getMisconceptionsBySkill();
-                  $scope.selectedMisconception = null;
-                  $scope.selectedMisconceptionSkillId = null;
-                  $scope.misconceptionFeedbackIsUsed = false;
-
-                  $scope.selectMisconception = function(
-                      misconception, skillId) {
-                    $scope.selectedMisconception = angular.copy(misconception);
-                    $scope.selectedMisconceptionSkillId = skillId;
-                  };
-
-                  $scope.toggleMisconceptionFeedbackUsage = function() {
-                    $scope.misconceptionFeedbackIsUsed =
-                      !$scope.misconceptionFeedbackIsUsed;
-                  };
-
-                  $scope.done = function() {
-                    $uibModalInstance.close({
-                      misconception: $scope.selectedMisconception,
-                      misconceptionSkillId: $scope.selectedMisconceptionSkillId,
-                      feedbackIsUsed: $scope.misconceptionFeedbackIsUsed
-                    });
-                  };
-
-                  $scope.cancel = function() {
-                    $uibModalInstance.dismiss('cancel');
-                  };
-                }
-              ]
-            });
-
-            modalInstance.result.then(function(returnObject) {
+              controller: 'TagMisconceptionModalController'
+            }).result.then(function(returnObject) {
               var misconception = returnObject.misconception;
               var misconceptionSkillId = returnObject.misconceptionSkillId;
               var feedbackIsUsed = returnObject.feedbackIsUsed;
