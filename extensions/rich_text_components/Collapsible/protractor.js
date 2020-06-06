@@ -19,24 +19,24 @@
 
 var forms = require(process.cwd() + '/core/tests/protractor_utils/forms.js');
 
-var customizeComponent = function(modal, heading, contentInstructions) {
-  forms.UnicodeEditor(
+var customizeComponent = async function(modal, heading, contentInstructions) {
+  await forms.UnicodeEditor(
     modal.element(by.tagName('schema-based-unicode-editor'))
   ).setValue(heading);
-  var richTextEditor = forms.RichTextEditor(
+  var richTextEditor = await forms.RichTextEditor(
     modal.element(by.tagName('schema-based-html-editor')));
-  richTextEditor.clear();
-  contentInstructions(richTextEditor);
+  await richTextEditor.clear();
+  await contentInstructions(richTextEditor);
 };
 
-var expectComponentDetailsToMatch = function(
+var expectComponentDetailsToMatch = async function(
     elem, heading, contentInstructions) {
   var headerElement = elem.element(by.css(
     '.protractor-test-collapsible-heading'));
-  expect(headerElement.getText()).toMatch(heading);
+  expect(await headerElement.getText()).toMatch(heading);
   // Open the collapsible block so we can examine it.
-  headerElement.click();
-  forms.expectRichText(
+  await headerElement.click();
+  await forms.expectRichText(
     elem.element(by.css('.panel-body')).element(by.css(
       '.protractor-test-collapsible-content'))
   ).toMatch(contentInstructions);

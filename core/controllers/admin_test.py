@@ -18,8 +18,6 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import logging
-import math
-import time
 
 from constants import constants
 from core import jobs
@@ -48,6 +46,7 @@ from core.platform import models
 from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
 import feconf
+import utils
 
 (exp_models, job_models, opportunity_models, audit_models) = (
     models.Registry.import_models(
@@ -1248,21 +1247,24 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
     def test_update_username_creates_audit_model(self):
         user_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
-        time_of_query = time.time()
 
-        self.put_json(
-            '/updateusernamehandler',
-            payload={
-                'old_username': self.OLD_USERNAME,
-                'new_username': self.NEW_USERNAME},
-            csrf_token=csrf_token)
+        current_time_in_millisecs = utils.get_current_time_in_millisecs()
+        mock_get_current_time_in_millisecs = lambda: current_time_in_millisecs
+        with self.swap(
+            utils, 'get_current_time_in_millisecs',
+            mock_get_current_time_in_millisecs):
+            self.put_json(
+                '/updateusernamehandler',
+                payload={
+                    'old_username': self.OLD_USERNAME,
+                    'new_username': self.NEW_USERNAME},
+                csrf_token=csrf_token)
 
         self.assertTrue(
             audit_models.UsernameChangeAuditModel.has_reference_to_user_id(
                 user_id))
 
-        model_id = '%s.%s' % (user_id, int(math.floor(time_of_query)))
-
+        model_id = '%s.%s' % (user_id, current_time_in_millisecs)
         username_change_audit_model = (
             audit_models.UsernameChangeAuditModel.get(model_id))
 
