@@ -53,8 +53,7 @@ export class PlaythroughBackendApiService {
 
   storePlaythrough(
       playthrough: Playthrough, issueSchemaVersion: number,
-      playthroughId: string):
-    Promise<StorePlaythroughResponse> {
+      playthroughId: string): Promise<StorePlaythroughResponse> {
     let playthroughUrl = this.urlInterpolationService.interpolateUrl(
       this.STORE_PLAYTHROUGH_URL, {
         exploration_id: playthrough.expId

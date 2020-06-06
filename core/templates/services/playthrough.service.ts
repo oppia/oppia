@@ -212,7 +212,7 @@ export class PlaythroughService {
         this.playthrough, ServicesConstants.CURRENT_ISSUE_SCHEMA_VERSION,
         playthroughId);
       if (isNewPlaythrough) {
-        promise.then((response) => {
+        promise.then(response => {
           if (response.playthroughStored) {
             // In cases where maximum number of playthroughs already exists, the
             // above flag is not True and playthrough ID is not set.

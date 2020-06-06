@@ -82,24 +82,24 @@ angular.module('oppia').directive('questionsList', [
       controllerAs: '$ctrl',
       controller: [
         '$scope', '$filter', '$http', '$q', '$timeout', '$uibModal', '$window',
-        '$location', 'AlertsService', 'UrlService',
-        'NUM_QUESTIONS_PER_PAGE', 'EditableQuestionBackendApiService',
-        'SkillBackendApiService', 'MisconceptionObjectFactory',
-        'QuestionObjectFactory', 'SkillDifficultyObjectFactory',
-        'SkillSummaryObjectFactory', 'DEFAULT_SKILL_DIFFICULTY',
+        '$location', 'AlertsService', 'EditableQuestionBackendApiService',
+        'MisconceptionObjectFactory', 'QuestionObjectFactory',
+        'QuestionsListService', 'QuestionUndoRedoService',
+        'SkillBackendApiService', 'SkillDifficultyObjectFactory',
+        'SkillSummaryObjectFactory', 'StateEditorService', 'UndoRedoService',
+        'UrlService', 'DEFAULT_SKILL_DIFFICULTY',
         'EVENT_QUESTION_SUMMARIES_INITIALIZED', 'MODE_SELECT_DIFFICULTY',
-        'MODE_SELECT_SKILL', 'SKILL_DIFFICULTIES', 'StateEditorService',
-        'QuestionUndoRedoService', 'UndoRedoService', 'QuestionsListService',
+        'MODE_SELECT_SKILL', 'NUM_QUESTIONS_PER_PAGE', 'SKILL_DIFFICULTIES',
         function(
             $scope, $filter, $http, $q, $timeout, $uibModal, $window,
-            $location, AlertsService, UrlService,
-            NUM_QUESTIONS_PER_PAGE, EditableQuestionBackendApiService,
-            SkillBackendApiService, MisconceptionObjectFactory,
-            QuestionObjectFactory, SkillDifficultyObjectFactory,
-            SkillSummaryObjectFactory, DEFAULT_SKILL_DIFFICULTY,
+            $location, AlertsService, EditableQuestionBackendApiService,
+            MisconceptionObjectFactory, QuestionObjectFactory,
+            QuestionsListService, QuestionUndoRedoService,
+            SkillBackendApiService, SkillDifficultyObjectFactory,
+            SkillSummaryObjectFactory, StateEditorService, UndoRedoService,
+            UrlService, DEFAULT_SKILL_DIFFICULTY,
             EVENT_QUESTION_SUMMARIES_INITIALIZED, MODE_SELECT_DIFFICULTY,
-            MODE_SELECT_SKILL, SKILL_DIFFICULTIES, StateEditorService,
-            QuestionUndoRedoService, UndoRedoService, QuestionsListService) {
+            MODE_SELECT_SKILL, NUM_QUESTIONS_PER_PAGE, SKILL_DIFFICULTIES) {
           var ctrl = this;
           var _reInitializeSelectedSkillIds = function() {
             ctrl.selectedSkillId = ctrl.getSelectedSkillId();

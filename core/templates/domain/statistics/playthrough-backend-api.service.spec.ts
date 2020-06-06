@@ -71,7 +71,7 @@ describe('Playthrough backend api service', () => {
     });
 
     let req = httpTestingController.expectOne(
-      req => (/.*?explorehandler\/store_playthrough?.*/g).test(req.url));
+      '/explorehandler/store_playthrough/expId1');
     expect(req.request.method).toEqual('POST');
     req.flush(backendResposne);
 

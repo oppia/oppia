@@ -67,7 +67,7 @@ describe('Exploration permissions backend api service', () => {
     });
 
     let req = httpTestingController.expectOne(
-      req => (/.*?createhandler\/permissions?.*/g).test(req.url));
+      '/createhandler/permissions/exp1');
     expect(req.request.method).toEqual('GET');
     req.flush(backendResponse);
 
