@@ -19,12 +19,14 @@
 angular.module('oppia').controller('RteHelperModalController', [
   '$scope', '$timeout', '$uibModalInstance', 'AlertsService',
   'AssetsBackendApiService', 'ContextService', 'FocusManagerService',
-  'ImageLocalStorageService', 'ImageUploadHelperService', 'attrsCustomizationArgsDict', 'customizationArgSpecs',
+  'ImageLocalStorageService', 'ImageUploadHelperService',
+  'attrsCustomizationArgsDict', 'customizationArgSpecs',
   'IMAGE_SAVE_DESTINATION_LOCAL_STORAGE',
   function(
       $scope, $timeout, $uibModalInstance, AlertsService,
       AssetsBackendApiService, ContextService, FocusManagerService,
-      ImageLocalStorageService, ImageUploadHelperService, attrsCustomizationArgsDict, customizationArgSpecs,
+      ImageLocalStorageService, ImageUploadHelperService,
+      attrsCustomizationArgsDict, customizationArgSpecs,
       IMAGE_SAVE_DESTINATION_LOCAL_STORAGE) {
     var extractVideoIdFromVideoUrl = function(videoUrl) {
       videoUrl = videoUrl.split(/(vi\/|v=|\/v\/|youtu\.be\/|\/embed\/)/);
@@ -87,8 +89,8 @@ angular.module('oppia').controller('RteHelperModalController', [
         if (
           ContextService.getImageSaveDestination() ===
           IMAGE_SAVE_DESTINATION_LOCAL_STORAGE) {
-          ImageLocalStorageService.saveImage(svgFileDict.fileName, svgFileDict.svgData);
-          console.log("saved math in localstoraeg3")
+          ImageLocalStorageService.saveImage(
+            svgFileDict.fileName, svgFileDict.svgData);
           var mathContentDict = {
             raw_latex: $scope.tmpCustomizationArgs[0].value.raw_latex,
             svg_filename: svgFileDict.fileName
@@ -99,12 +101,9 @@ angular.module('oppia').controller('RteHelperModalController', [
           $scope.isRteMathExpressionEditor = false;
           return;
         }
-        console.log("in backend save3")
-        console.log(ContextService.getImageSaveDestination())
         var resampledFile = (
-           ImageUploadHelperService.convertImageDataToImageFile(
-             svgFileDict.svgData));
-
+          ImageUploadHelperService.convertImageDataToImageFile(
+            svgFileDict.svgData));
         AssetsBackendApiService.saveMathImage(
           resampledFile, svgFileDict.fileName, ContextService.getEntityType(),
           ContextService.getEntityId()).then(function(response) {
@@ -112,8 +111,6 @@ angular.module('oppia').controller('RteHelperModalController', [
             raw_latex: $scope.tmpCustomizationArgs[0].value.raw_latex,
             svg_filename: response.filename
           };
-          console.log("in isRteMathExpressionEditor save")
-          console.log(response.filename)
           var caName = 'math_content';
           customizationArgsDict[caName] = mathContentDict;
           $uibModalInstance.close(customizationArgsDict);

@@ -66,7 +66,6 @@ export class RequestInterceptor implements HttpInterceptor {
   intercept(
       request: HttpRequest<any>, next: HttpHandler
   ): Observable<HttpEvent<any>> {
-     console.log("in request intercetpr")
     var csrf = this.csrf;
     try {
       csrf.initializeToken();
@@ -91,15 +90,6 @@ export class RequestInterceptor implements HttpInterceptor {
               }
               request.body.append('csrf_token', token);
               request.body.append('source', document.URL);
-              console.log("in request intercetpr2")
-              console.log(request.body)
-              var dict = {}
-              for (var [key, value] of request.body.entries()) {
-                 dict[key] = value;
-              }
-              console.log("dict")
-              console.log(dict)
-
             } else {
               // @ts-ignore
               request.body = {
@@ -112,7 +102,6 @@ export class RequestInterceptor implements HttpInterceptor {
           })
         );
     } else {
-      console.log("in second")
       return next.handle(request);
     }
   }

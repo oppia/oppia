@@ -34,17 +34,17 @@ require('services/context.service.ts');
 require('services/image-local-storage.service.ts');
 
 angular.module('oppia').controller('QuestionSuggestionEditorModalController', [
-  '$scope', '$uibModal', '$uibModalInstance', 'AlertsService', 'ContextService'
+  '$scope', '$uibModal', '$uibModalInstance', 'AlertsService', 'ContextService',
   'ImageLocalStorageService', 'MisconceptionObjectFactory',
-  'QuestionSuggestionService',
-  'QuestionUndoRedoService', 'StateEditorService', 'UrlInterpolationService',
-  'question', 'questionId', 'questionStateData', 'skill', 'skillDifficulty',
+  'QuestionSuggestionService', 'QuestionUndoRedoService', 'StateEditorService',
+  'UrlInterpolationService', 'question', 'questionId', 'questionStateData',
+  'skill', 'skillDifficulty',
   function(
       $scope, $uibModal, $uibModalInstance, AlertsService, ContextService,
       ImageLocalStorageService, MisconceptionObjectFactory,
-      QuestionSuggestionService,
-      QuestionUndoRedoService, StateEditorService, UrlInterpolationService,
-      question, questionId, questionStateData, skill, skillDifficulty) {
+      QuestionSuggestionService, QuestionUndoRedoService, StateEditorService,
+      UrlInterpolationService, question, questionId, questionStateData,
+      skill, skillDifficulty) {
     $scope.canEditQuestion = true;
     $scope.newQuestionIsBeingCreated = true;
     $scope.question = question;
@@ -80,7 +80,7 @@ angular.module('oppia').controller('QuestionSuggestionEditorModalController', [
       var imagesData = ImageLocalStorageService.getStoredImagesData();
       ImageLocalStorageService.flushStoredImagesData();
       QuestionSuggestionService.submitSuggestion(
-        $scope.question, $scope.skill, $scope.skillDifficulty, imagesData
+        $scope.question, $scope.skill, $scope.skillDifficulty, imagesData,
         function() {
           AlertsService.addSuccessMessage('Submitted question for review.');
         });
