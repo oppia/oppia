@@ -48,8 +48,8 @@ export class PlaythroughBackendApiService {
     '/explorehandler/store_playthrough/<exploration_id>');
 
   constructor(
-    private http: HttpClient,
-    private urlInterpolationService: UrlInterpolationService) {}
+      private http: HttpClient,
+      private urlInterpolationService: UrlInterpolationService) {}
 
   storePlaythrough(
       playthrough: Playthrough, issueSchemaVersion: number,

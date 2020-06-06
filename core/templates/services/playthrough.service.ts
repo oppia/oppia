@@ -49,11 +49,11 @@ interface CycleIdentifier {
 })
 export class PlaythroughService {
   constructor(
-    private explorationFeaturesService: ExplorationFeaturesService,
-    private learnerActionObjectFactory: LearnerActionObjectFactory,
-    private playthroughObjectFactory: PlaythroughObjectFactory,
-    private playthroughBackendApiService: PlaythroughBackendApiService,
-    private stopwatchObjectFactory: StopwatchObjectFactory) {}
+      private explorationFeaturesService: ExplorationFeaturesService,
+      private learnerActionObjectFactory: LearnerActionObjectFactory,
+      private playthroughBackendApiService: PlaythroughBackendApiService,
+      private playthroughObjectFactory: PlaythroughObjectFactory,
+      private stopwatchObjectFactory: StopwatchObjectFactory) {}
 
     playthrough: Playthrough = null;
     expStopwatch: Stopwatch = null;
