@@ -27,12 +27,10 @@ angular.module('oppia').component('thanksPage', {
   controller: ['UrlInterpolationService', function(
       UrlInterpolationService) {
     var ctrl = this;
-    ctrl.getStaticImageUrl = function(imagePath) {
-      return UrlInterpolationService.getStaticImageUrl(imagePath);
-    };
     ctrl.$onInit = function() {
-      ctrl.thanksImgUrl = UrlInterpolationService.getStaticImageUrl(
-        '/general/donate.webp');
+      ctrl.getStaticImageUrl = function(imagePath) {
+        return UrlInterpolationService.getStaticImageUrl(imagePath);
+      };
     };
   }]
 });

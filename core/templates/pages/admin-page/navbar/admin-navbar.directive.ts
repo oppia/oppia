@@ -75,6 +75,9 @@ angular.module('oppia').directive('adminNavbar', [
           angular.element(evt.currentTarget).parent().removeClass('open');
           ctrl.dropdownMenuisActive = false;
         };
+        ctrl.getStaticImageUrl = function(imagePath) {
+          return UrlInterpolationService.getStaticImageUrl(imagePath);
+        };
 
         ctrl.$onInit = function() {
           ctrl.ADMIN_TAB_URLS = ADMIN_TAB_URLS;
@@ -97,9 +100,6 @@ angular.module('oppia').directive('adminNavbar', [
               })
             );
           });
-          //  The logoWhiteImgUrl is no longer used in the html page
-          ctrl.logoWhiteImgUrl = UrlInterpolationService.getStaticImageUrl(
-            '/logo/288x128_logo_white.webp');
 
           ctrl.logoutUrl = LOGOUT_URL;
 

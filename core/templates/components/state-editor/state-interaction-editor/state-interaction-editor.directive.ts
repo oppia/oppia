@@ -252,9 +252,6 @@ angular.module('oppia').directive('stateInteractionEditor', [
             $scope.StateInteractionIdService = StateInteractionIdService;
             $scope.hasLoaded = false;
             $scope.customizationModalReopened = false;
-
-            $scope.userBlueImgUrl = UrlInterpolationService.getStaticImageUrl(
-              '/avatar/user_blue_72px.webp');
             $scope.$on('stateEditorInitialized', function(evt, stateData) {
               if (stateData === undefined || $.isEmptyObject(stateData)) {
                 throw new Error(

@@ -180,8 +180,6 @@ angular.module('oppia').directive('skillConceptCardEditor', [
 
           ctrl.$onInit = function() {
             $scope.skill = SkillEditorStateService.getSkill();
-            $scope.dragDotsImgUrl = UrlInterpolationService.getStaticImageUrl(
-              '/general/drag_dots.webp');
             initBindableFieldsDict();
             ctrl.directiveSubscriptions.add(
               SkillEditorStateService.getSkillChangedSubject().subscribe(
