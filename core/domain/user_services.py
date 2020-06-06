@@ -834,8 +834,7 @@ def create_new_user(gae_id, email):
     if user_settings is not None:
         raise Exception('User %s already exists.' % gae_id)
 
-    # TODO(#7848): Generate user_id together with the migration.
-    user_id = gae_id
+    user_id = user_models.UserSettingsModel.get_new_id('')
     user_settings = UserSettings(
         user_id, gae_id, email, feconf.ROLE_ID_EXPLORATION_EDITOR,
         preferred_language_codes=[constants.DEFAULT_LANGUAGE_CODE])
