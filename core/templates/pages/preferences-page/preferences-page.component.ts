@@ -51,15 +51,15 @@ angular.module('oppia').component('preferencesPage', {
     '$uibModal', 'AlertsService', 'LanguageUtilService', 'LoaderService',
     'UrlInterpolationService', 'UserService',
     'DASHBOARD_TYPE_CREATOR', 'DASHBOARD_TYPE_LEARNER',
-    'ENABLE_ACCOUNT_DELETION', 'SUPPORTED_AUDIO_LANGUAGES',
-    'SUPPORTED_SITE_LANGUAGES',
+    'ENABLE_ACCOUNT_DELETION', 'ENABLE_ACCOUNT_EXPORT',
+    'SUPPORTED_AUDIO_LANGUAGES', 'SUPPORTED_SITE_LANGUAGES',
     function(
         $http, $q, $translate, $timeout, $window,
         $uibModal, AlertsService, LanguageUtilService, LoaderService,
         UrlInterpolationService, UserService,
         DASHBOARD_TYPE_CREATOR, DASHBOARD_TYPE_LEARNER,
-        ENABLE_ACCOUNT_DELETION, SUPPORTED_AUDIO_LANGUAGES,
-        SUPPORTED_SITE_LANGUAGES) {
+        ENABLE_ACCOUNT_DELETION, ENABLE_ACCOUNT_EXPORT,
+        SUPPORTED_AUDIO_LANGUAGES, SUPPORTED_SITE_LANGUAGES) {
       var ctrl = this;
       var _PREFERENCES_DATA_URL = '/preferenceshandler/data';
 
@@ -138,6 +138,14 @@ angular.module('oppia').component('preferencesPage', {
 
       ctrl.saveDefaultDashboard = function(defaultDashboard) {
         _saveDataItem('default_dashboard', defaultDashboard);
+      };
+
+      ctrl.exportingData = false;
+
+      ctrl.handleExportDataClick = function() {
+        if (!ctrl.exportingData) {
+          ctrl.exportingData = true;
+        }
       };
 
       ctrl.showEditProfilePictureModal = function() {
@@ -276,6 +284,7 @@ angular.module('oppia').component('preferencesPage', {
           LoaderService.hideLoadingScreen();
         });
         ctrl.userCanDeleteAccount = ENABLE_ACCOUNT_DELETION;
+        ctrl.userCanExportAccount = ENABLE_ACCOUNT_EXPORT;
         ctrl.subjectInterestsChangedAtLeastOnce = false;
         ctrl.TAG_REGEX_STRING = '^[a-z ]+$';
         ctrl.LANGUAGE_CHOICES =

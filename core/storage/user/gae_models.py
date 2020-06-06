@@ -927,13 +927,20 @@ class UserSubscriptionsModel(base_models.BaseModel):
         if user_model is None:
             return {}
 
+        creator_user_models = UserSettingsModel.get_multi(
+            user_model.creator_ids)
+        creator_usernames = [
+            creator.username for creator in creator_user_models]
+
         user_data = {
             'activity_ids': user_model.activity_ids,
             'collection_ids': user_model.collection_ids,
             'general_feedback_thread_ids': (
                 user_model.general_feedback_thread_ids),
-            'creator_ids': user_model.creator_ids,
-            'last_checked': user_model.last_checked
+            'creator_usernames': creator_usernames,
+            'last_checked':
+                None if user_model.last_checked is None else
+                utils.get_time_in_millisecs(user_model.last_checked)
         }
 
         return user_data
