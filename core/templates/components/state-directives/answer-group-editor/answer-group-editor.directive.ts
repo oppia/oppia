@@ -24,6 +24,9 @@ require(
   'question-misconception-editor.component.ts');
 require('directives/angular-html-bind.directive.ts');
 require('filters/parameterize-rule-description.filter.ts');
+require(
+  'pages/topic-editor-page/modal-templates/' +
+  'tag-misconception-modal.controller.ts');
 
 require('domain/utilities/url-interpolation.service.ts');
 require('domain/exploration/RuleObjectFactory.ts');

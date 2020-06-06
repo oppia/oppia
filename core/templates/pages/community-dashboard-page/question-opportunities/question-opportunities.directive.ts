@@ -27,31 +27,26 @@ require(
   'components/question-directives/question-editor/' +
   'question-editor.directive.ts');
 require(
+  'pages/community-dashboard-page/modal-templates/' +
+  'question-suggestion-editor-modal.controller.ts');
+require(
+  'pages/topic-editor-page/modal-templates/' +
+  'question-opportunities-select-skill-and-difficulty-modal.controller.ts');
+require(
   'components/question-directives/questions-list/' +
   'questions-list.constants.ajs.ts');
-require(
-  'components/state-editor/state-editor-properties-services/' +
-  'state-editor.service.ts');
 require('directives/angular-html-bind.directive.ts');
 require('directives/mathjax-bind.directive.ts');
 require('domain/editor/undo_redo/question-undo-redo.service.ts');
 require('domain/question/QuestionObjectFactory.ts');
-require('domain/skill/MisconceptionObjectFactory.ts');
-require('domain/skill/skill-backend-api.service.ts');
-require('domain/skill/SkillDifficultyObjectFactory.ts');
-require('domain/skill/SkillObjectFactory.ts');
 require('interactions/codemirrorRequires.ts');
 require(
   'pages/community-dashboard-page/opportunities-list/' +
   'opportunities-list.directive.ts');
 require(
   'pages/community-dashboard-page/services/' +
-  'question-suggestion.service.ts');
-require(
-  'pages/community-dashboard-page/services/' +
   'contribution-opportunities.service.ts');
 require('services/alerts.service.ts');
-require('services/question-validation.service.ts');
 
 angular.module('oppia').directive('questionOpportunities', [
   'UrlInterpolationService', 'MAX_QUESTIONS_PER_SKILL',
@@ -65,17 +60,13 @@ angular.module('oppia').directive('questionOpportunities', [
       'question-opportunities.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$rootScope', '$scope', '$uibModal', 'AlertsService',
-        'ContributionOpportunitiesService', 'MisconceptionObjectFactory',
-        'QuestionObjectFactory', 'QuestionSuggestionService',
-        'QuestionUndoRedoService', 'SkillBackendApiService',
-        'SkillObjectFactory',
+        '$rootScope', '$uibModal', 'AlertsService',
+        'ContributionOpportunitiesService', 'QuestionObjectFactory',
+        'QuestionUndoRedoService',
         function(
-            $rootScope, $scope, $uibModal, AlertsService,
-            ContributionOpportunitiesService, MisconceptionObjectFactory,
-            QuestionObjectFactory, QuestionSuggestionService,
-            QuestionUndoRedoService, SkillBackendApiService,
-            SkillObjectFactory) {
+            $rootScope, $uibModal, AlertsService,
+            ContributionOpportunitiesService, QuestionObjectFactory,
+            QuestionUndoRedoService) {
           const ctrl = this;
 
           const updateWithNewOpportunities = function(opportunities, more) {
@@ -100,10 +91,6 @@ angular.module('oppia').directive('questionOpportunities', [
             $rootScope.$apply();
           };
 
-          const onSubmitSuggestionSuccess = function() {
-            AlertsService.addSuccessMessage('Submitted question for review.');
-          };
-
           ctrl.onLoadMoreOpportunities = function() {
             if (!ctrl.opportunitiesAreLoading &&
                 ctrl.moreOpportunitiesAvailable) {
@@ -119,53 +106,11 @@ angular.module('oppia').directive('questionOpportunities', [
                 '/pages/topic-editor-page/modal-templates/' +
                 'select-skill-and-difficulty-modal.template.html'),
               backdrop: true,
-              controller: [
-                '$controller', '$scope', '$uibModalInstance',
-                'DEFAULT_SKILL_DIFFICULTY', 'MODE_SELECT_DIFFICULTY',
-                'SkillDifficultyObjectFactory',
-                function($controller, $scope, $uibModalInstance,
-                    DEFAULT_SKILL_DIFFICULTY, MODE_SELECT_DIFFICULTY,
-                    SkillDifficultyObjectFactory) {
-                  $controller('ConfirmOrCancelModalController', {
-                    $scope: $scope,
-                    $uibModalInstance: $uibModalInstance
-                  });
-                  const init = function() {
-                    $scope.instructionMessage = (
-                      'Select the skill(s) to link the question to:');
-                    $scope.currentMode = MODE_SELECT_DIFFICULTY;
-                    SkillBackendApiService.fetchSkill(skillId)
-                      .then(function(backendSkillObject) {
-                        $scope.skill =
-                          SkillObjectFactory.createFromBackendDict(
-                            backendSkillObject.skill);
-                        $scope.linkedSkillsWithDifficulty = [
-                          SkillDifficultyObjectFactory.create(
-                            skillId, $scope.skill.getDescription(),
-                            DEFAULT_SKILL_DIFFICULTY)
-                        ];
-                        $scope.skillIdToRubricsObject = {};
-                        $scope.skillIdToRubricsObject[skillId] =
-                          $scope.skill.getRubrics();
-                      }, function(error) {
-                        AlertsService.addWarning(
-                          `Error populating skill: ${error}.`);
-                      });
-                  };
-
-                  $scope.startQuestionCreation = function() {
-                    const result = {
-                      skill: $scope.skill,
-                      skillDifficulty:
-                        parseFloat(
-                          $scope.linkedSkillsWithDifficulty[0].getDifficulty())
-                    };
-                    $uibModalInstance.close(result);
-                  };
-
-                  init();
-                }
-              ]
+              resolve: {
+                skillId: () => skillId
+              },
+              controller: (
+                'QuestionsOpportunitiesSelectSkillAndDifficultyModalController')
             }).result.then(function(result) {
               if (AlertsService.warnings.length === 0) {
                 ctrl.createQuestion(result.skill, result.skillDifficulty);
@@ -192,61 +137,14 @@ angular.module('oppia').directive('questionOpportunities', [
               size: 'lg',
               backdrop: 'static',
               keyboard: false,
-              controller: [
-                '$scope', '$uibModalInstance', 'StateEditorService',
-                'QuestionValidationService',
-                function(
-                    $scope, $uibModalInstance, StateEditorService,
-                    QuestionValidationService) {
-                  $scope.canEditQuestion = true;
-                  $scope.newQuestionIsBeingCreated = true;
-                  $scope.question = question;
-                  $scope.questionStateData = questionStateData;
-                  $scope.questionId = questionId;
-                  $scope.skill = skill;
-                  $scope.skillDifficulty = skillDifficulty;
-                  $scope.misconceptionsBySkill = {};
-                  $scope.misconceptionsBySkill[$scope.skill.getId()] = (
-                    $scope.skill.getMisconceptions());
-                  $scope.done = function() {
-                    if (!$scope.isQuestionValid()) {
-                      return;
-                    }
-                    QuestionSuggestionService.submitSuggestion(
-                      $scope.question, $scope.skill, $scope.skillDifficulty,
-                      onSubmitSuggestionSuccess);
-                    $uibModalInstance.close();
-                  };
-                  // Checking if Question contains all requirements to enable
-                  // Save and Publish Question
-                  $scope.isQuestionValid = function() {
-                    return QuestionValidationService.isQuestionValid(
-                      $scope.question, $scope.misconceptionsBySkill);
-                  };
-
-                  $scope.cancel = function() {
-                    if (QuestionUndoRedoService.hasChanges()) {
-                      $uibModal.open({
-                        templateUrl:
-                          UrlInterpolationService.getDirectiveTemplateUrl(
-                            '/components/question-directives/modal-templates/' +
-                            'confirm-question-modal-exit-modal.directive.html'),
-                        backdrop: true,
-                        controller: 'ConfirmOrCancelModalController'
-                      }).result.then(function() {
-                        $uibModalInstance.dismiss('cancel');
-                      }, function() {
-                        // Note to developers:
-                        // This callback is triggered when the Cancel button
-                        // is clicked.
-                        // No further action is needed.
-                      });
-                    } else {
-                      $uibModalInstance.dismiss('cancel');
-                    }
-                  };
-                }
-              ]
+              resolve: {
+                question: () => question,
+                questionId: () => questionId,
+                questionStateData: () => questionStateData,
+                skill: () => skill,
+                skillDifficulty: () => skillDifficulty
+              },
+              controller: 'QuestionSuggestionEditorModalController'
             }).result.then(function() {}, function() {
               // Note to developers:
               // This callback is triggered when the Cancel button is clicked.
