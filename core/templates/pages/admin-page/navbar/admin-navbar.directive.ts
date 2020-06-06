@@ -75,6 +75,7 @@ angular.module('oppia').directive('adminNavbar', [
           angular.element(evt.currentTarget).parent().removeClass('open');
           ctrl.dropdownMenuisActive = false;
         };
+
         ctrl.getStaticImageUrl = function(imagePath) {
           return UrlInterpolationService.getStaticImageUrl(imagePath);
         };
