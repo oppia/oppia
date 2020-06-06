@@ -26,7 +26,6 @@ import { NewlyCreatedTopic } from
 
 export interface ITopicCreationBackend {
   name: string;
-  category: string;
   description: string;
 }
 
@@ -42,7 +41,6 @@ export class TopicCreationBackendApiService {
       topic: NewlyCreatedTopic): void {
     let postData: ITopicCreationBackend = {
       name: topic.name,
-      category: topic.category,
       description: topic.description,
     };
     this.http.post(

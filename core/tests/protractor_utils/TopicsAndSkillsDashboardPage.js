@@ -41,12 +41,10 @@ var TopicsAndSkillsDashboardPage = function() {
     '.protractor-test-new-topic-name-field'));
   var topicDescriptionField = element(by.css(
     '.protractor-test-new-topic-description-field'));
-  var topicCategoryField = element(by.css(
-    '.protractor-test-new-topic-category-field'));
   var topicFilterKeywordField = element(by.css(
     '.protractor-test-select-keyword-dropdown'));
-  var topicFilterCategoryField = element(by.css(
-    '.protractor-test-topic-filter-category'));
+  var topicFilterClassroomField = element(by.css(
+    '.protractor-test-select-classroom-dropdown'));
   var topicEditOptions = element.all(
     by.css('.protractor-test-topic-edit-box'));
   var topicResetFilters = element(by.css(
@@ -185,7 +183,7 @@ var TopicsAndSkillsDashboardPage = function() {
   };
 
   this.createTopic = async function(
-      topicName, description, category, shouldCloseTopicEditor) {
+      topicName, description, shouldCloseTopicEditor) {
     var initialHandles = [];
     var handles = await browser.getAllWindowHandles();
     initialHandles = handles;
@@ -199,10 +197,6 @@ var TopicsAndSkillsDashboardPage = function() {
       'Create Topic modal takes too long to appear.');
     await topicNameField.sendKeys(topicName);
     await topicDescriptionField.sendKeys(description);
-    await topicCategoryField.click();
-    await (
-      await browser.driver.switchTo().activeElement()
-    ).sendKeys(category + '\n');
     await confirmTopicCreationButton.click();
 
     await waitFor.newTabToBeCreated(
@@ -246,12 +240,12 @@ var TopicsAndSkillsDashboardPage = function() {
     await filterKeywordInput.sendKeys(protractor.Key.RETURN);
   };
 
-  this.filterTopicsByCategory = async function(keyword) {
+  this.filterTopicsByClassroom = async function(keyword) {
     await waitFor.visibilityOf(
-      topicFilterCategoryField,
-      'Topic Dashboard category taking too long to appear.');
+      topicFilterClassroomField,
+      'Topic Dashboard classroom filter taking too long to appear.');
 
-    await topicFilterCategoryField.click();
+    await topicFilterClassroomField.click();
     await (
       await browser.driver.switchTo().activeElement()
     ).sendKeys(keyword + '\n');
@@ -378,7 +372,7 @@ var TopicsAndSkillsDashboardPage = function() {
     await waitFor.visibilityOf(topicsTable,
       'Topic table taking too long to appear.');
 
-    await Promise.all(await topicNames.map(async(topic, index) => {
+    Promise.all(await topicNames.map(async(topic, index) => {
       var name = await topic.getText();
       if (name === topicName) {
         await this.navigateToTopicWithIndex(index);

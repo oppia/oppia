@@ -126,13 +126,13 @@
             </div>
             <div class="topic-skill-filter-row">
               <div class="topic-skill-filter-key">
-                <span>Category</span>
+                <span>Classroom</span>
               </div>
               <div class="topic-skill-filter-value">
                 <div ng-if="$ctrl.select2DropdownIsShown">
-                  <select2-dropdown item="$ctrl.filterObject.category"
-                                    class="protractor-test-topic-filter-category"
-                                    choices="$ctrl.categories"
+                  <select2-dropdown item="$ctrl.filterObject.classroom"
+                                    class="classroom-dropdown protractor-test-select-classroom-dropdown"
+                                    choices="$ctrl.classrooms"
                                     width="100%"
                                     on-selection-change="$ctrl.applyFilters()">
                   </select2-dropdown>
@@ -145,7 +145,7 @@
               </div>
               <div class="topic-skill-filter-value">
                 <div ng-if="$ctrl.select2DropdownIsShown">
-                  <select2-dropdown class="protractor-test-select-category-dropdown"
+                  <select2-dropdown class="protractor-test-select-sort-dropdown"
                                     choices="$ctrl.sortOptions"
                                     item="$ctrl.filterObject.sort"
                                     width="100%"
@@ -283,6 +283,9 @@
   }
   .topic-skill-filter-value input, .topic-skill-filter-value select {
     width: 100%;
+  }
+  .classroom-dropdown .select2-results {
+    text-transform: capitalize;
   }
   .oppia-topics-and-skills-dashboard .topic-skill-filter-header {
     margin: 10px 0 15px;

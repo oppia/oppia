@@ -16,8 +16,6 @@
  * @fileoverview Constants for the topics and skills dashboard.
  */
 
-const constants = require('constants.ts');
-
 export enum ETopicSortOptions {
   IncreasingCreatedOn = 'Newly Created',
   DecreasingCreatedOn = 'Oldest Created',
@@ -44,8 +42,7 @@ export class TopicsAndSkillsDashboardPageConstants {
     STATUS_CHANGED: 'changed',
     STATUS_DISABLED: 'disabled'
   };
-  public static ALLOWED_TOPIC_CATEGORIES = constants.ALLOWED_TOPIC_CATEGORIES;
   public static TOPIC_SORT_OPTIONS = ETopicSortOptions;
   public static TOPIC_PUBLISHED_OPTIONS = ETopicPublishedOptions;
-  public static TOPIC_FILTER_DEFAULT_CATEGORY = 'All';
+  public static TOPIC_FILTER_CLASSROOM_ALL = 'All';
 }

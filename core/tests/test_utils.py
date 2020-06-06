@@ -1471,8 +1471,7 @@ tags: []
             thumbnail_filename='topic.svg',
             thumbnail_bg_color=(
                 constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0]),
-            description='description', category='Mathematics',
-            canonical_story_ids=None,
+            description='description', canonical_story_ids=None,
             additional_story_ids=None, uncategorized_skill_ids=None,
             subtopics=None, next_subtopic_id=0,
             language_code=constants.DEFAULT_LANGUAGE_CODE):
@@ -1487,7 +1486,6 @@ tags: []
             thumbnail_bg_color: str|None. The thumbnail background color of the
                 topic.
             description: str. The description of the topic.
-            category: str. The category of the topic.
             canonical_story_ids: list(str). The list of ids of canonical stories
                 that are part of the topic.
             additional_story_ids: list(str). The list of ids of additional
@@ -1516,7 +1514,7 @@ tags: []
         topic = topic_domain.Topic(
             topic_id, name, abbreviated_name,
             thumbnail_filename, thumbnail_bg_color,
-            description, category, canonical_story_references,
+            description, canonical_story_references,
             additional_story_references, uncategorized_skill_ids, subtopics,
             feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION, next_subtopic_id,
             language_code, 0, feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION
@@ -1526,7 +1524,7 @@ tags: []
 
     def save_new_topic_with_subtopic_schema_v1(
             self, topic_id, owner_id, name, abbreviated_name,
-            canonical_name, description, category, thumbnail_filename,
+            canonical_name, description, thumbnail_filename,
             thumbnail_bg_color, canonical_story_references,
             additional_story_references,
             uncategorized_skill_ids, next_subtopic_id,
@@ -1550,7 +1548,6 @@ tags: []
             abbreviated_name: str. The abbreviated name of the topic.
             canonical_name: str. The canonical name (lowercase) of the topic.
             description: str. The description of the topic.
-            category: str. The category of the topic.
             thumbnail_filename: str. The thumbnail file name of the topic.
             thumbnail_bg_color: str. The thumbnail background color of the
                 topic.
@@ -1579,7 +1576,6 @@ tags: []
             thumbnail_bg_color=thumbnail_bg_color,
             canonical_name=canonical_name,
             description=description,
-            category=category,
             language_code=language_code,
             canonical_story_references=canonical_story_references,
             additional_story_references=additional_story_references,

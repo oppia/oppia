@@ -159,7 +159,6 @@ class NewTopicHandlerTests(BaseTopicsAndSkillsDashboardTests):
         payload = {
             'name': 'Topic name',
             'abbreviated_name': 'name',
-            'category': 'Mathematics',
             'description': 'Topic description'
         }
         json_response = self.post_json(

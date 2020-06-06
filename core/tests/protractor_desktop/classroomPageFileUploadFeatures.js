@@ -60,7 +60,7 @@ describe('Classroom page functionality', function() {
       var handle = await browser.getWindowHandle();
       await topicsAndSkillsDashboardPage.get();
       await topicsAndSkillsDashboardPage.createTopic('Topic 1',
-        'Description', 'Mathematics', false);
+        'Description', false);
       await topicEditorPage.submitTopicThumbnail('../data/test_svg.svg');
       await topicEditorPage.saveTopic('Added thumbnail.');
       var url = await browser.getCurrentUrl();

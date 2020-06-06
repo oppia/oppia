@@ -32,13 +32,11 @@ require('services/image-upload-helper.service.ts');
 angular.module('oppia').factory('TopicCreationService', [
   '$rootScope', '$uibModal', '$window', 'AlertsService',
   'TopicCreationBackendApiService', 'UrlInterpolationService',
-  'ALLOWED_TOPIC_CATEGORIES',
   'EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED',
   'MAX_CHARS_IN_TOPIC_DESCRIPTION', 'MAX_CHARS_IN_TOPIC_NAME',
   function(
       $rootScope, $uibModal, $window, AlertsService,
       TopicCreationBackendApiService, UrlInterpolationService,
-      ALLOWED_TOPIC_CATEGORIES,
       EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED,
       MAX_CHARS_IN_TOPIC_DESCRIPTION, MAX_CHARS_IN_TOPIC_NAME) {
     var TOPIC_EDITOR_URL_TEMPLATE = '/topic_editor/<topic_id>';
@@ -52,14 +50,12 @@ angular.module('oppia').factory('TopicCreationService', [
         var modalInstance = $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/topics-and-skills-dashboard-page/templates/' +
-            'new-topic-name-editor.template.html'),
+            'create-new-topic-modal.template.html'),
           backdrop: true,
           controller: [
-            '$scope', '$uibModalInstance',
-            'NewlyCreatedTopicObjectFactory',
-            function($scope, $uibModalInstance,
-                NewlyCreatedTopicObjectFactory) {
-              $scope.categories = ALLOWED_TOPIC_CATEGORIES;
+            '$scope', '$uibModalInstance', 'NewlyCreatedTopicObjectFactory',
+            function(
+                $scope, $uibModalInstance, NewlyCreatedTopicObjectFactory) {
               $scope.newlyCreatedTopic = (
                 NewlyCreatedTopicObjectFactory.createDefault());
               $scope.MAX_CHARS_IN_TOPIC_NAME = MAX_CHARS_IN_TOPIC_NAME;

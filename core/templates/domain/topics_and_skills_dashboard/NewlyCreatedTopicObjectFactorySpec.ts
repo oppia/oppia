@@ -30,15 +30,11 @@ describe('Newly Created Topic Object Factory', () => {
   });
 
   it('should create a new default topic for the topics dashboard', () => {
-    expect(topic.category).toEqual('');
     expect(topic.description).toEqual('');
     expect(topic.name).toEqual('');
   });
 
   it('should validate the new topic fields', () => {
-    expect(topic.isValid()).toBe(false);
-
-    topic.category = 'Mathematics';
     expect(topic.isValid()).toBe(false);
 
     topic.description = 'Topic description';

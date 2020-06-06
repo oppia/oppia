@@ -20,7 +20,6 @@ require('base-components/base-content.directive.ts');
 require(
   'components/common-layout-directives/common-elements/' +
   'background-banner.component.ts');
-
 require(
   'components/forms/custom-forms-directives/select2-dropdown.directive.ts');
 require('components/entity-creation-services/skill-creation.service.ts');
@@ -72,13 +71,12 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
         'SkillObjectFactory', 'TopicCreationService',
         'TopicsAndSkillsDashboardBackendApiService',
         'TopicsAndSkillsDashboardPageService', 'UrlInterpolationService',
-        'ALLOWED_TOPIC_CATEGORIES',
         'EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED',
         'EVENT_TYPE_SKILL_CREATION_ENABLED',
         'EVENT_TYPE_TOPIC_CREATION_ENABLED',
         'FATAL_ERROR_CODES', 'SKILL_DIFFICULTIES',
         'MAX_CHARS_IN_SKILL_DESCRIPTION', 'SKILL_DESCRIPTION_STATUS_VALUES',
-        'TOPIC_FILTER_DEFAULT_CATEGORY', 'TOPIC_SORT_OPTIONS',
+        'TOPIC_FILTER_CLASSROOM_ALL', 'TOPIC_SORT_OPTIONS',
         'TOPIC_PUBLISHED_OPTIONS',
         function(
             $timeout, $http, $rootScope, $scope, $uibModal, $window,
@@ -88,13 +86,12 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
             SkillObjectFactory, TopicCreationService,
             TopicsAndSkillsDashboardBackendApiService,
             TopicsAndSkillsDashboardPageService, UrlInterpolationService,
-            ALLOWED_TOPIC_CATEGORIES,
             EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED,
             EVENT_TYPE_SKILL_CREATION_ENABLED,
             EVENT_TYPE_TOPIC_CREATION_ENABLED,
             FATAL_ERROR_CODES, SKILL_DIFFICULTIES,
             MAX_CHARS_IN_SKILL_DESCRIPTION, SKILL_DESCRIPTION_STATUS_VALUES,
-            TOPIC_FILTER_DEFAULT_CATEGORY, TOPIC_SORT_OPTIONS,
+            TOPIC_FILTER_CLASSROOM_ALL, TOPIC_SORT_OPTIONS,
             TOPIC_PUBLISHED_OPTIONS) {
           var ctrl = this;
 
@@ -107,7 +104,7 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
             TopicsAndSkillsDashboardBackendApiService.fetchDashboardData().then(
               function(response) {
                 ctrl.totalTopicSummaries = response.topic_summary_dicts;
-                ctrl.topicSummaries = response.topic_summary_dicts;
+                ctrl.topicSummaries = ctrl.totalTopicSummaries;
                 ctrl.totalEntityCountToDisplay = ctrl.topicSummaries.length;
                 ctrl.currentCount = ctrl.totalEntityCountToDisplay;
                 ctrl.activeTab = ctrl.TAB_NAME_TOPICS;
@@ -138,6 +135,12 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
                 if (ctrl.topicSummaries.length === 0 &&
                     ctrl.untriagedSkillSummaries.length !== 0) {
                   ctrl.activeTab = ctrl.TAB_NAME_UNTRIAGED_SKILLS;
+                }
+                ctrl.classrooms = response.classroom_names;
+                // Adding this since karma tests adds
+                // TOPIC_FILTER_CLASSROOM_ALL for every it block.
+                if (!ctrl.classrooms.includes(TOPIC_FILTER_CLASSROOM_ALL)) {
+                  ctrl.classrooms.unshift(TOPIC_FILTER_CLASSROOM_ALL);
                 }
                 ctrl.applyFilters();
                 $rootScope.$apply();
@@ -266,12 +269,7 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
             ctrl.itemsPerPageChoice = [10, 15, 20];
             ctrl.filterObject = (
               TopicsAndSkillsDashboardFilterObjectFactory.createDefault());
-            ctrl.categories = angular.copy(ALLOWED_TOPIC_CATEGORIES);
-            // Adding this since karma tests adds
-            // TOPIC_FILTER_DEFAULT_CATEGORY for every it block.
-            if (!ctrl.categories.includes(TOPIC_FILTER_DEFAULT_CATEGORY)) {
-              ctrl.categories.unshift(TOPIC_FILTER_DEFAULT_CATEGORY);
-            }
+            ctrl.classrooms = [];
             ctrl.sortOptions = [];
             for (let key in TOPIC_SORT_OPTIONS) {
               ctrl.sortOptions.push(TOPIC_SORT_OPTIONS[key]);

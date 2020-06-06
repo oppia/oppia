@@ -249,7 +249,7 @@ import { MusicPhrasePlayerService } from
   // eslint-disable-next-line max-len
   'interactions/MusicNotesInput/directives/music-phrase-player.service';
 import { NewlyCreatedTopicObjectFactory } from
-      'domain/topics_and_skills_dashboard/NewlyCreatedTopicObjectFactory';
+  'domain/topics_and_skills_dashboard/NewlyCreatedTopicObjectFactory';
 import { NormalizeWhitespacePipe } from
   'filters/string-utility-filters/normalize-whitespace.pipe';
 import { NormalizeWhitespacePunctuationAndCasePipe } from
@@ -468,14 +468,14 @@ import { TopicsAndSkillsDashboardBackendApiService } from
   'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 import { TopicSummaryObjectFactory } from
   'domain/topic/TopicSummaryObjectFactory';
-import { TopicsAndSkillsDashboardBackendApiService } from
+import { TopicsAndSkillsDashboardFilterObjectFactory } from
   // eslint-disable-next-line max-len
-  'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
+  'domain/topics_and_skills_dashboard/TopicsAndSkillsDashboardFilterObjectFactory';
 import { TopicsAndSkillsDashboardPageService } from
   // eslint-disable-next-line max-len
   'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.service';
 import { TopicViewerBackendApiService } from
-      'domain/topic_viewer/topic-viewer-backend-api.service';
+  'domain/topic_viewer/topic-viewer-backend-api.service';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';

@@ -26,7 +26,12 @@
       <td>
         <div class="list-summary list-summary-name protractor-test-topics-list-item">
           <div><span class="topic-name protractor-test-topic-name"><[topic.name]></span></div>
-          <div><span class="topic-category protractor-test-topic-category"><[topic.category]></span></div>
+          <div>
+            <span class="topic-classroom protractor-test-topic-classroom">
+              <span ng-if="topic.classroom"><[topic.classroom]></span>
+              <span ng-if="!topic.classroom">Unassigned</span>
+            </span>
+          </div>
           <div><span class="topic-description protractor-test-topic-description"><[topic.description]></span></div>
         </div>
       </td>
@@ -53,8 +58,8 @@
         </p>
       </td>
       <td class="text-center topic-list-status">
-        <span class="topic-list-status-text" ng-if="$ctrl.topic.is_published"> Published </span>
-        <span class="topic-list-status-text" ng-if="!$ctrl.topic.is_published"> Not Published </span>
+        <span class="topic-list-status-text" ng-if="topic.is_published"> Published </span>
+        <span class="topic-list-status-text" ng-if="!topic.is_published"> Not Published </span>
         <p class="fas fa-ellipsis-v protractor-test-topic-edit-box" ng-mouseover="$ctrl.enableEditOptions(topic.id)"></p>
         <div ng-if="$ctrl.showEditOptions(topic.id)" class="topic-edit-options" ng-mouseleave="$ctrl.enableEditOptions(null)">
           <a class="topic-edit-options-edit protractor-test-edit-topic-button" ng-href="<[$ctrl.getTopicEditorUrl(topic.id)]>">
@@ -136,7 +141,7 @@
     font-size: 17px;
     font-weight: bold;
   }
-  topics-list .topic-category {
+  topics-list .topic-classroom {
     font-size: 15px;
     margin: 4px 0;
     text-transform: uppercase;

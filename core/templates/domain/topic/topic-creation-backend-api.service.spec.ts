@@ -35,7 +35,6 @@ describe('Topic creation backend api service', () => {
   let topic: NewlyCreatedTopic = null;
   let postData: ITopicCreationBackend = {
     name: 'topic-name',
-    category: 'Mathematics',
     description: 'Description'
   };
 
@@ -53,7 +52,6 @@ describe('Topic creation backend api service', () => {
       TopicCreationBackendApiService);
     topic = newlyCreatedTopicObjectFactory.createDefault();
     topic.name = 'topic-name';
-    topic.category = 'Mathematics';
     topic.description = 'Description';
     spyOn(csrfService, 'getTokenAsync').and.returnValue(() => {
       return new Promise((resolve) => {
@@ -70,7 +68,6 @@ describe('Topic creation backend api service', () => {
     fakeAsync(() => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
-
       topicCreationBackendApiService.createTopic(topic).then(
         successHandler);
       let req = httpTestingController.expectOne(

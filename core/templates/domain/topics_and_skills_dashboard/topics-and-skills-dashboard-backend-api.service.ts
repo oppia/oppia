@@ -28,7 +28,7 @@ export interface ITopicSummaryBackendDict {
     /* eslint-disable camelcase */
     id: string;
     name: string;
-    category: string;
+    classroom: string;
     language_code: string;
     description: string;
     version: number;
@@ -58,6 +58,7 @@ export interface ITopicSummaryBackendDict {
 
   interface ITopicsAndSkillsDashboardDataBackendDict {
     /* eslint-disable camelcase */
+    classroom_names: Array<string>;
     untriaged_skill_summary_dicts: ISkillSummaryBackendDict[];
     mergeable_skill_summary_dicts: ISkillSummaryBackendDict[];
     topic_summary_dicts: ITopicSummaryBackendDict[];

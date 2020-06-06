@@ -16,7 +16,10 @@
  * @fileoverview Unit tests for the topics and skills dashboard page.
  */
 
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// the code corresponding to the spec is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
+// ^^^ This block is to be removed.
 
 describe('Topics and Skills Dashboard Page', function() {
   beforeEach(angular.mock.module('oppia'));
@@ -44,7 +47,7 @@ describe('Topics and Skills Dashboard Page', function() {
       topic_summary_dicts: [{
         id: SAMPLE_TOPIC_ID,
         name: 'Sample Name',
-        category: 'Mathematics',
+        classroom: 'Math',
         language_code: 'en',
         version: 1,
         canonical_story_count: 3,
@@ -60,6 +63,7 @@ describe('Topics and Skills Dashboard Page', function() {
         name: 'Sample Name',
         language_code: 'en'
       }],
+      classroom_names: ['math'],
       can_create_topic: true,
       can_create_skill: true,
       can_delete_topic: true,
@@ -106,7 +110,7 @@ describe('Topics and Skills Dashboard Page', function() {
       expect(ctrl.skillPageNumber).toEqual(0);
       expect(ctrl.selectedIndex).toEqual(null);
       expect(ctrl.itemsPerPageChoice).toEqual([10, 15, 20]);
-      expect(ctrl.categories).toEqual(['All', 'Mathematics']);
+      expect(ctrl.classrooms).toEqual(['All', 'math']);
       expect(ctrl.filterObject).toEqual(filterObject);
 
       expect(ctrl.sortOptions).toEqual([
@@ -207,7 +211,7 @@ describe('Topics and Skills Dashboard Page', function() {
       expect(ctrl.filterObject).toEqual(filterObject);
       ctrl.filterObject.sort = 'Newly Created';
       ctrl.filterObject.keywords = ['keyword1'];
-      ctrl.filterObject.category = 'category1';
+      ctrl.filterObject.classroom = 'math';
       ctrl.filterObject.status = 'Published';
       ctrl.resetFilters();
       expect(ctrl.filterObject).toEqual(filterObject);
@@ -228,19 +232,19 @@ describe('Topics and Skills Dashboard Page', function() {
 
     it('should apply the filters', function() {
       const topic1 = {
-        is_published: true, name: 'Alpha', category: 'Mathematics',
+        is_published: true, name: 'Alpha', classroom: 'Math',
         description: 'Alpha description',
       };
       const topic2 = {
-        is_published: false, name: 'Alpha2', category: 'Mathematics',
+        is_published: false, name: 'Alpha2', classroom: 'Math',
         description: 'Alp2 desc',
       };
       const topic3 = {
-        is_published: false, name: 'Beta', category: 'Mathematics',
+        is_published: false, name: 'Beta', classroom: 'Math',
         description: 'Beta description',
       };
       const topic4 = {
-        is_published: true, name: 'Gamma', category: 'Mathematics',
+        is_published: true, name: 'Gamma', classroom: 'Math',
         description: 'Gamma description',
       };
       ctrl.filterObject = (

@@ -38,35 +38,35 @@ describe('Topics And Skills Dashboard Filter Object', () => {
   });
 
   it('should create a new dashboard filter object', () => {
-    expect(filter.category).toEqual('All');
+    expect(filter.classroom).toEqual('All');
     expect(filter.sort).toEqual(ETopicSortOptions.IncreasingCreatedOn);
     expect(filter.status).toEqual(ETopicPublishedOptions.All);
     expect(filter.keywords).toEqual([]);
   });
 
   it('should reset values of the filter', () => {
-    expect(filter.category).toEqual('All');
+    expect(filter.classroom).toEqual('All');
     expect(filter.sort).toEqual(ETopicSortOptions.IncreasingCreatedOn);
     expect(filter.status).toEqual(ETopicPublishedOptions.All);
     expect(filter.keywords).toEqual([]);
 
-    const category = 'Mathematics';
+    const classroom = 'Math';
     const sort = 'Newly Created';
     const status = 'Published';
     const keywords = ['Key1'];
 
-    filter.category = category;
+    filter.classroom = classroom;
     filter.sort = ETopicSortOptions.IncreasingCreatedOn;
     filter.status = ETopicPublishedOptions.Published;
     filter.keywords = keywords;
 
-    expect(filter.category).toEqual(category);
+    expect(filter.classroom).toEqual(classroom);
     expect(filter.sort).toEqual(sort);
     expect(filter.status).toEqual(status);
     expect(filter.keywords).toEqual(keywords);
 
     filter.reset();
-    expect(filter.category).toEqual('All');
+    expect(filter.classroom).toEqual('All');
     expect(filter.sort).toEqual(ETopicSortOptions.IncreasingCreatedOn);
     expect(filter.status).toEqual(ETopicPublishedOptions.All);
     expect(filter.keywords).toEqual([]);
