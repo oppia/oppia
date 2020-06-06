@@ -486,15 +486,15 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
         self.check_normalization(
             objects.PositionOfTerms, mappings, invalid_values)
 
-    def test_placeholder_validation(self):
-        """Tests objects of type Placeholder."""
+    def test_algebraic_identifier_validation(self):
+        """Tests objects of type AlgebraicIdentifier."""
 
         mappings = [('a', 'a'), ('alpha', 'alpha'), ('Z', 'Z')]
 
         invalid_values = [None, 2, 'string', 'item']
 
         self.check_normalization(
-            objects.Placeholder, mappings, invalid_values)
+            objects.AlgebraicIdentifier, mappings, invalid_values)
 
 
 class SchemaValidityTests(test_utils.GenericTestBase):

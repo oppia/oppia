@@ -392,7 +392,8 @@ class _Validators(python_utils.OBJECT):
     @staticmethod
     def is_valid_math_expression(obj, algebraic=True):
         """Checks if the given obj (a string) represents a valid algebraic or
-        numeric expression.
+        numeric expression. Note that purely-numeric expressions are NOT
+        considered valid algebraic expressions.
 
         Args:
             obj: str. The given expression.
@@ -414,7 +415,7 @@ class _Validators(python_utils.OBJECT):
 
     @staticmethod
     def is_valid_math_equation(obj):
-        """Checks if the given  obj (a string) represents a valid math equation.
+        """Checks if the given obj (a string) represents a valid math equation.
 
         Args:
             obj: str. A string.

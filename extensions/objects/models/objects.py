@@ -1066,14 +1066,13 @@ class AlgebraicExpression(BaseObject):
     }
 
 
-class Placeholder(BaseObject):
-    """Class for a placeholder. Placeholders are latin letters that are
-    used in Math Interactions.
-    A placeholder could be an english alphabet (uppercase/lowercase) or a greek
-    letter represented as a single word.
+class AlgebraicIdentifier(BaseObject):
+    """Class for an algebraic identifier.
+    An algebraic identifier could be an english alphabet (uppercase/lowercase)
+    or a greek letter represented as a single word.
     """
 
-    description = 'A string representing a placeholder.'
+    description = 'A string representing an algebraic identifier.'
     default_value = 'a'
 
     SCHEMA = {

@@ -199,6 +199,7 @@ class ParserUnitTests(test_utils.GenericTestBase):
         self.assertFalse(expression_parser.is_valid_expression(
             '(25 + 3.4.3*a)'))
         self.assertFalse(expression_parser.is_valid_expression('sqrt(abs)'))
+        self.assertFalse(expression_parser.is_valid_expression('alpha + bet/2'))
         self.assertFalse(expression_parser.is_valid_expression('a(b+c)'))
         self.assertFalse(expression_parser.is_valid_expression('a_b'))
         self.assertFalse(expression_parser.is_valid_expression('!/'))

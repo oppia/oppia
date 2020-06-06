@@ -43,7 +43,7 @@
       "units": []
     },
     "AlgebraicExpression": "a",
-    "Placeholder": "a",
+    "AlgebraicIdentifier": "a",
     "MathEquation": "a=b",
     "PositionOfTerms": "both"
 }

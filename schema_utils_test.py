@@ -522,6 +522,7 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
         self.assertTrue(is_valid_math_equation('abs(35 - x) = 22.3'))
 
         self.assertFalse(is_valid_math_equation('3 -= 2/a'))
+        self.assertFalse(is_valid_math_equation('3 == 2/a'))
         self.assertFalse(is_valid_math_equation('x + y = '))
         self.assertFalse(is_valid_math_equation('(a+b)^2 = a^2 + b^2 + 2ab'))
         self.assertFalse(is_valid_math_equation('(a+b = 0)'))
