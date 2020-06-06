@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2015 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,12 +17,24 @@
  *
  */
 
+require(
+  'components/common-layout-directives/common-elements/' +
+  'confirm-or-cancel-modal.controller.ts');
+
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-editor.service.ts');
+
 angular.module('oppia').controller('TagMisconceptionModalController', [
-  '$scope', '$uibModalInstance', 'StateEditorService',
+  '$controller', '$scope', '$uibModalInstance', 'StateEditorService',
   'taggedSkillMisconceptionId',
   function(
-      $scope, $uibModalInstance, StateEditorService,
+      $controller, $scope, $uibModalInstance, StateEditorService,
       taggedSkillMisconceptionId) {
+    $controller('ConfirmOrCancelModalController', {
+      $scope: $scope,
+      $uibModalInstance: $uibModalInstance
+    });
     $scope.misconceptionsBySkill = (
       StateEditorService.getMisconceptionsBySkill());
     $scope.tempSelectedMisconception = null;
