@@ -20,7 +20,7 @@ angular.module('oppia').factory('QuestionSuggestionService', [
   '$http', function($http) {
     return {
       submitSuggestion: function(
-          question, associatedSkill, skillDifficulty, onSuccess) {
+          question, associatedSkill, skillDifficulty, imagesData, onSuccess) {
         var url = '/suggestionhandler/';
         var data = {
           suggestion_type: 'add_question',
@@ -37,7 +37,15 @@ angular.module('oppia').factory('QuestionSuggestionService', [
             skill_difficulty: skillDifficulty,
           }
         };
-        $http.post(url, data).then(onSuccess);
+        let body = new FormData();
+        body.append('payload', JSON.stringify(data));
+        let filenames = imagesData.map(obj => obj.filename);
+        let imageBlobs = imagesData.map(obj => obj.imageBlob);
+        for (let idx in imageBlobs) {
+          body.append(filenames[idx], imageBlobs[idx]);
+        }
+        $http.post(url, body, { headers: {'Content-Type': undefined} }).then(
+          onSuccess);
       }
     };
   }]);

@@ -2181,5 +2181,6 @@ class State(python_utils.OBJECT):
         """
         html_list = (
             self.written_translations.get_all_html_content_strings() +
-            self.interaction.get_all_html_content_strings())
+            self.interaction.get_all_html_content_strings() + [
+                self.content.html])
         return html_list

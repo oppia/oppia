@@ -108,6 +108,10 @@ export class ContextService {
           this.pageContext = (
             ServicesConstants.PAGE_CONTEXT.TOPICS_AND_SKILLS_DASHBOARD);
           return ServicesConstants.PAGE_CONTEXT.TOPICS_AND_SKILLS_DASHBOARD;
+        } else if (pathnameArray[i] === 'community_dashboard') {
+          this.pageContext = (
+            ServicesConstants.PAGE_CONTEXT.COMMUNITY_DASHBOARD);
+          return ServicesConstants.PAGE_CONTEXT.COMMUNITY_DASHBOARD;
         }
       }
 
@@ -257,7 +261,8 @@ export class ContextService {
       ServicesConstants.PAGE_CONTEXT.TOPIC_EDITOR,
       ServicesConstants.PAGE_CONTEXT.STORY_EDITOR,
       ServicesConstants.PAGE_CONTEXT.SKILL_EDITOR,
-      ServicesConstants.PAGE_CONTEXT.TOPICS_AND_SKILLS_DASHBOARD
+      ServicesConstants.PAGE_CONTEXT.TOPICS_AND_SKILLS_DASHBOARD,
+      ServicesConstants.PAGE_CONTEXT.COMMUNITY_DASHBOARD
     ];
     return (allowedPageContext.includes(currentPageContext));
   }

@@ -36,8 +36,9 @@ require('pages/community-dashboard-page/services/translate-text.service.ts');
 require(
   'pages/exploration-editor-page/translation-tab/services/' +
   'translation-language.service.ts');
-require('services/context.service.ts');
 require('services/alerts.service.ts');
+require('services/context.service.ts');
+require('services/image-local-storage.service.ts');
 
 angular.module('oppia').directive(
   'translationOpportunities', ['UrlInterpolationService', function(
@@ -51,13 +52,13 @@ angular.module('oppia').directive(
       'translation-opportunities.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$rootScope', '$scope', '$uibModal', 'AlertsService',
-        'ContributionOpportunitiesService', 'TranslateTextService',
-        'TranslationLanguageService', 'UserService',
+        '$rootScope', '$scope', '$uibModal', 'AlertsService', 'ContextService',
+        'ContributionOpportunitiesService', 'ImageLocalStorageService',
+        'TranslateTextService', 'TranslationLanguageService', 'UserService',
         function(
-            $rootScope, $scope, $uibModal, AlertsService,
-            ContributionOpportunitiesService, TranslateTextService,
-            TranslationLanguageService, UserService) {
+            $rootScope, $scope, $uibModal, AlertsService, ContextService,
+            ContributionOpportunitiesService, ImageLocalStorageService,
+            TranslateTextService, TranslationLanguageService, UserService) {
           var ctrl = this;
           var userIsLoggedIn = false;
           var getOpportunitySummary = function(expId) {
@@ -108,6 +109,7 @@ angular.module('oppia').directive(
 
           ctrl.onClickButton = function(expId) {
             var opportunity = getOpportunitySummary(expId);
+            ContextService.setImageSaveDestinationToLocalStorage();
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/community-dashboard-page/modal-templates/' +
@@ -124,10 +126,12 @@ angular.module('oppia').directive(
               },
               controller: [
                 '$controller', '$scope', '$uibModalInstance', 'ContextService',
-                'opportunity', 'userIsLoggedIn', 'ENTITY_TYPE',
+                'ImageLocalStorageService', 'opportunity', 'userIsLoggedIn',
+                'ENTITY_TYPE',
                 function(
                     $controller, $scope, $uibModalInstance, ContextService,
-                    opportunity, userIsLoggedIn, ENTITY_TYPE) {
+                    ImageLocalStorageService, opportunity, userIsLoggedIn,
+                    ENTITY_TYPE) {
                   $controller('ConfirmOrCancelModalController', {
                     $scope: $scope,
                     $uibModalInstance: $uibModalInstance
@@ -175,8 +179,10 @@ angular.module('oppia').directive(
                   $scope.suggestTranslatedText = function() {
                     if (!$scope.uploadingTranslation && !$scope.loadingData) {
                       $scope.uploadingTranslation = true;
+                      var imagesData = (
+                        ImageLocalStorageService.getStoredImagesData());
                       TranslateTextService.suggestTranslatedText(
-                        $scope.activeWrittenTranslation.html,
+                        imagesData, $scope.activeWrittenTranslation.html,
                         TranslationLanguageService.getActiveLanguageCode(),
                         function() {
                           AlertsService.addSuccessMessage(
@@ -197,10 +203,14 @@ angular.module('oppia').directive(
                   };
                 }
               ]
-            }).result.then(function() {}, function() {
+            }).result.then(function() {
+              ContextService.resetImageSaveDestination();
+            }, function() {
               // Note to developers:
               // This callback is triggered when the Cancel button is clicked.
               // No further action is needed.
+              ContextService.resetImageSaveDestination();
+              ImageLocalStorageService.flushStoredImagesData();
             });
           };
           ctrl.$onInit = function() {

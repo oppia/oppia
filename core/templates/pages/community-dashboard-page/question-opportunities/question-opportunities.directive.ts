@@ -51,6 +51,9 @@ require(
   'pages/community-dashboard-page/services/' +
   'contribution-opportunities.service.ts');
 require('services/alerts.service.ts');
+require('services/context.service.ts');
+require('services/image-local-storage.service.ts');
+
 
 angular.module('oppia').directive('questionOpportunities', [
   'UrlInterpolationService', 'MAX_QUESTIONS_PER_SKILL',
@@ -64,17 +67,17 @@ angular.module('oppia').directive('questionOpportunities', [
       'question-opportunities.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$rootScope', '$scope', '$uibModal', 'AlertsService',
-        'ContributionOpportunitiesService', 'MisconceptionObjectFactory',
-        'QuestionObjectFactory', 'QuestionSuggestionService',
-        'QuestionUndoRedoService', 'SkillBackendApiService',
-        'SkillObjectFactory',
+        '$rootScope', '$scope', '$uibModal', 'AlertsService', 'ContextService',
+        'ContributionOpportunitiesService', 'ImageLocalStorageService',
+        'MisconceptionObjectFactory', 'QuestionObjectFactory',
+        'QuestionSuggestionService', 'QuestionUndoRedoService',
+        'SkillBackendApiService', 'SkillObjectFactory',
         function(
-            $rootScope, $scope, $uibModal, AlertsService,
-            ContributionOpportunitiesService, MisconceptionObjectFactory,
-            QuestionObjectFactory, QuestionSuggestionService,
-            QuestionUndoRedoService, SkillBackendApiService,
-            SkillObjectFactory) {
+            $rootScope, $scope, $uibModal, AlertsService, ContextService,
+            ContributionOpportunitiesService, ImageLocalStorageService,
+            MisconceptionObjectFactory, QuestionObjectFactory,
+            QuestionSuggestionService, QuestionUndoRedoService,
+            SkillBackendApiService, SkillObjectFactory) {
           const ctrl = this;
 
           const updateWithNewOpportunities = function(opportunities, more) {
@@ -177,6 +180,7 @@ angular.module('oppia').directive('questionOpportunities', [
           };
 
           ctrl.createQuestion = function(skill, skillDifficulty) {
+            ContextService.setImageSaveDestinationToLocalStorage();
             const skillId = skill.getId();
             const question =
               QuestionObjectFactory.createDefaultQuestion([skillId]);
@@ -227,9 +231,13 @@ angular.module('oppia').directive('questionOpportunities', [
                         'correspond to a correct answer';
                       return;
                     }
+                    ContextService.resetImageSaveDestination();
+                    var imagesData = (
+                      ImageLocalStorageService.getStoredImagesData());
                     QuestionSuggestionService.submitSuggestion(
                       $scope.question, $scope.skill, $scope.skillDifficulty,
-                      onSubmitSuggestionSuccess);
+                      imagesData, onSubmitSuggestionSuccess);
+                    ImageLocalStorageService.flushStoredImagesData();
                     $uibModalInstance.close();
                   };
                   // Checking if Question contains all requirements to enable
@@ -249,6 +257,8 @@ angular.module('oppia').directive('questionOpportunities', [
                         backdrop: true,
                         controller: 'ConfirmOrCancelModalController'
                       }).result.then(function() {
+                        ContextService.resetImageSaveDestination();
+                        ImageLocalStorageService.flushStoredImagesData();
                         $uibModalInstance.dismiss('cancel');
                       }, function() {
                         // Note to developers:
@@ -257,6 +267,8 @@ angular.module('oppia').directive('questionOpportunities', [
                         // No further action is needed.
                       });
                     } else {
+                      ContextService.resetImageSaveDestination();
+                      ImageLocalStorageService.flushStoredImagesData();
                       $uibModalInstance.dismiss('cancel');
                     }
                   };

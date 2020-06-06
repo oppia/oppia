@@ -19,6 +19,8 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import os
+
 from constants import constants
 from core.domain import exp_domain
 from core.domain import exp_fetchers
@@ -38,6 +40,8 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
+import python_utils
+
 
 (suggestion_models, feedback_models) = models.Registry.import_models([
     models.NAMES.suggestion, models.NAMES.feedback])
@@ -224,6 +228,100 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                 self.author_id_2))['suggestions']
         self.assertEqual(len(suggestions), 3)
         self.logout()
+
+    def test_suggestion_with_valid_images(self):
+        self.login(self.AUTHOR_EMAIL_2)
+        csrf_token = self.get_new_csrf_token()
+        exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
+        filename = 'img.png'
+        translation_html = (
+            '<oppia-noninteractive-image filepath-with-value='
+            '"&quot;img.png&quot;" caption-with-value="&quot;&quot;" '
+            'alt-with-value="&quot;Image&quot;"></oppia-noninteractive-image>'
+        )
+        post_data = {
+            'suggestion_type': (
+                suggestion_models
+                .SUGGESTION_TYPE_TRANSLATE_CONTENT),
+            'target_type': (
+                suggestion_models.TARGET_TYPE_EXPLORATION),
+            'target_id': 'exp1',
+            'target_version_at_submission': exploration.version,
+            'change': {
+                'cmd': exp_domain.CMD_ADD_TRANSLATION,
+                'state_name': 'State 1',
+                'content_id': 'content',
+                'language_code': 'hi',
+                'content_html': '<p>old content html</p>',
+                'translation_html': translation_html
+            },
+            'description': 'change again to state 3',
+        }
+
+        with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
+            mode='rb', encoding=None) as f:
+            raw_image = f.read()
+
+        self.post_json(
+            '%s/' % feconf.SUGGESTION_URL_PREFIX, post_data,
+            csrf_token=csrf_token,
+            upload_files=(
+                (filename, filename, raw_image), )
+        )
+        suggestions = self.get_json(
+            '%s?author_id=%s' % (
+                feconf.SUGGESTION_LIST_URL_PREFIX,
+                self.author_id_2))['suggestions']
+        self.assertEqual(len(suggestions), 3)
+
+    def test_suggestion_with_invalid_images(self):
+        self.login(self.AUTHOR_EMAIL_2)
+        csrf_token = self.get_new_csrf_token()
+        exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
+        translation_html = (
+            '<oppia-noninteractive-image filepath-with-value='
+            '"&quot;img.svg&quot;" caption-with-value="&quot;&quot;" '
+            'alt-with-value="&quot;Image&quot;"></oppia-noninteractive-image>'
+        )
+        post_data = {
+            'suggestion_type': (
+                suggestion_models
+                .SUGGESTION_TYPE_TRANSLATE_CONTENT),
+            'target_type': (
+                suggestion_models.TARGET_TYPE_EXPLORATION),
+            'target_id': 'exp1',
+            'target_version_at_submission': exploration.version,
+            'change': {
+                'cmd': exp_domain.CMD_ADD_TRANSLATION,
+                'state_name': 'State 1',
+                'content_id': 'content',
+                'language_code': 'hi',
+                'content_html': '<p>old content html</p>',
+                'translation_html': translation_html
+            },
+            'description': 'change again to state 3',
+        }
+        response_dict = self.post_json(
+            '%s/' % feconf.SUGGESTION_URL_PREFIX, post_data,
+            csrf_token=csrf_token,
+            expected_status_int=400)
+        self.assertIn(
+            'No image data provided for file with name img.svg.',
+            response_dict['error'])
+
+        large_image = '<svg><path d="%s" /></svg>' % (
+            'M150 0 L75 200 L225 200 Z ' * 4000)
+        response_dict = self.post_json(
+            '%s/' % feconf.SUGGESTION_URL_PREFIX, post_data,
+            csrf_token=csrf_token,
+            upload_files=(
+                ('img.svg', 'img.svg', large_image),
+            ), expected_status_int=400)
+        self.assertIn(
+            'Image exceeds file size limit of 100 KB.',
+            response_dict['error'])
+
 
     def test_suggestion_to_exploration_handler_with_invalid_suggestion_id(self):
         self.login(self.EDITOR_EMAIL)

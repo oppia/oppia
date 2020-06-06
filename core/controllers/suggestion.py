@@ -19,10 +19,16 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import logging
+
 from core.controllers import acl_decorators
 from core.controllers import base
+from core.domain import fs_services
+from core.domain import html_cleaner
+from core.domain import image_validation_services
 from core.domain import opportunity_services
 from core.domain import skill_services
+from core.domain import state_domain
 from core.domain import suggestion_services
 from core.platform import models
 import feconf
@@ -103,6 +109,25 @@ class SuggestionHandler(base.BaseHandler):
 
     @acl_decorators.can_suggest_changes
     def post(self):
+        suggestion_type = self.payload.get('suggestion_type')
+        change_dict = self.payload.get('change')
+        filenames = []
+        if (
+                suggestion_type ==
+                suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT):
+            html_list = [change_dict['translation_html']]
+            filenames = (
+                html_cleaner.get_image_filenames_from_html_strings(html_list))
+        elif (
+                suggestion_type ==
+                suggestion_models.SUGGESTION_TYPE_ADD_QUESTION):
+            state_object = (
+                state_domain.State.from_dict(
+                    change_dict['question_dict']['question_state_data']))
+            html_list = state_object.get_all_html_content_strings()
+            filenames = (
+                html_cleaner.get_image_filenames_from_html_strings(html_list))
+
         suggestion_services.create_suggestion(
             self.payload.get('suggestion_type'),
             self.payload.get('target_type'), self.payload.get('target_id'),
@@ -110,6 +135,28 @@ class SuggestionHandler(base.BaseHandler):
             self.user_id, self.payload.get('change'),
             self.payload.get('description'),
             self.payload.get('final_reviewer_id'))
+        for filename in filenames:
+            image = self.request.get(filename)
+            if not image:
+                logging.error(
+                    'Image not provided for file with name %s when the '
+                    'suggestion was created.' % (filename))
+                raise self.InvalidInputException(
+                    'No image data provided for file with name %s.'
+                    % (filename))
+            try:
+                file_format = (
+                    image_validation_services.validate_image_and_filename(
+                        image, filename))
+            except utils.ValidationError as e:
+                e = '%s' % (e)
+                raise self.InvalidInputException(e)
+            image_is_compressible = (
+                file_format in feconf.COMPRESSIBLE_IMAGE_FORMATS)
+            fs_services.save_original_and_compressed_versions_of_image(
+                filename, self.payload.get('target_type'),
+                self.payload.get('target_id'), image, 'image',
+                image_is_compressible)
         self.render_json(self.values)
 
 

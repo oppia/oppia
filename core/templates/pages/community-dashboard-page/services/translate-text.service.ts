@@ -91,7 +91,7 @@ angular.module('oppia').factory('TranslateTextService', [
         };
       },
       suggestTranslatedText: function(
-          translationHtml, languageCode, successCallback) {
+          imagesData, translationHtml, languageCode, successCallback) {
         var url = '/suggestionhandler/';
         var data = {
           suggestion_type: 'translate_content',
@@ -110,7 +110,15 @@ angular.module('oppia').factory('TranslateTextService', [
             translation_html: translationHtml
           }
         };
-        $http.post(url, data).then(successCallback);
+        let body = new FormData();
+        body.append('payload', JSON.stringify(data));
+        let filenames = imagesData.map(obj => obj.filename);
+        let imageBlobs = imagesData.map(obj => obj.imageBlob);
+        for (let idx in imageBlobs) {
+          body.append(filenames[idx], imageBlobs[idx]);
+        }
+        $http.post(url, body, { headers: {'Content-Type': undefined} }).then(
+          successCallback);
       }
     };
   }]);

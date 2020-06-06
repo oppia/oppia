@@ -187,11 +187,6 @@ class NewSkillHandler(base.BaseHandler):
             'the image.' % skill.id)
         for filename in image_filenames:
             image = self.request.get(filename)
-            print("\n\n******************************************************\n\n")
-            print("image")
-            print(image)
-            print("******************************************************\n\n")
-
             if not image:
                 logging.error(
                     'Image not provided for file with name %s when the skill '
