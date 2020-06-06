@@ -177,20 +177,18 @@ describe('Topic update service', function() {
       sampleTopicBackendObject.skillIdToDescriptionDict);
   }));
 
-  it('should remove/add an additional story id from/to a topic',
-    function() {
-      expect(_sampleTopic.getAdditionalStoryIds()).toEqual(['story_2']);
-      TopicUpdateService.removeAdditionalStory(_sampleTopic, 'story_2');
-      expect(_sampleTopic.getAdditionalStoryIds()).toEqual([]);
+  it('should remove/add an additional story id from/to a topic', function() {
+    expect(_sampleTopic.getAdditionalStoryIds()).toEqual(['story_2']);
+    TopicUpdateService.removeAdditionalStory(_sampleTopic, 'story_2');
+    expect(_sampleTopic.getAdditionalStoryIds()).toEqual([]);
 
-      UndoRedoService.undoChange(_sampleTopic);
-      expect(_sampleTopic.getAdditionalStoryIds()).toEqual(['story_2']);
-    }
+    UndoRedoService.undoChange(_sampleTopic);
+    expect(_sampleTopic.getAdditionalStoryIds()).toEqual(['story_2']);
+  }
   );
 
   it('should create a proper backend change dict for removing an additional ' +
-    'story id',
-  function() {
+    'story id', function() {
     TopicUpdateService.removeAdditionalStory(_sampleTopic, 'story_2');
     expect(UndoRedoService.getCommittableChangeList()).toEqual([{
       cmd: 'delete_additional_story',
@@ -199,28 +197,25 @@ describe('Topic update service', function() {
   });
 
   it('should not create a backend change dict for removing an additional ' +
-    'story id when an error is encountered',
-  function() {
+    'story id when an error is encountered', function() {
     expect(function() {
       TopicUpdateService.removeAdditionalStory(_sampleTopic, 'story_5');
     }).toThrowError('Given story id not present in additional story ids.');
     expect(UndoRedoService.getCommittableChangeList()).toEqual([]);
   });
 
-  it('should remove/add a canonical story id from/to a topic',
-    function() {
-      expect(_sampleTopic.getCanonicalStoryIds()).toEqual(['story_1']);
-      TopicUpdateService.removeCanonicalStory(_sampleTopic, 'story_1');
-      expect(_sampleTopic.getCanonicalStoryIds()).toEqual([]);
+  it('should remove/add a canonical story id from/to a topic', function() {
+    expect(_sampleTopic.getCanonicalStoryIds()).toEqual(['story_1']);
+    TopicUpdateService.removeCanonicalStory(_sampleTopic, 'story_1');
+    expect(_sampleTopic.getCanonicalStoryIds()).toEqual([]);
 
-      UndoRedoService.undoChange(_sampleTopic);
-      expect(_sampleTopic.getCanonicalStoryIds()).toEqual(['story_1']);
-    }
+    UndoRedoService.undoChange(_sampleTopic);
+    expect(_sampleTopic.getCanonicalStoryIds()).toEqual(['story_1']);
+  }
   );
 
   it('should create a proper backend change dict for removing a canonical ' +
-    'story id',
-  function() {
+    'story id', function() {
     TopicUpdateService.removeCanonicalStory(_sampleTopic, 'story_1');
     expect(UndoRedoService.getCommittableChangeList()).toEqual([{
       cmd: 'delete_canonical_story',
@@ -229,34 +224,31 @@ describe('Topic update service', function() {
   });
 
   it('should not create a backend change dict for removing a canonical ' +
-    'story id when an error is encountered',
-  function() {
+    'story id when an error is encountered', function() {
     expect(function() {
       TopicUpdateService.removeCanonicalStory(_sampleTopic, 'story_10');
     }).toThrowError('Given story id not present in canonical story ids.');
     expect(UndoRedoService.getCommittableChangeList()).toEqual([]);
   });
 
-  it('should remove/add an uncategorized skill id from/to a topic',
-    function() {
-      expect(_sampleTopic.getUncategorizedSkillSummaries()).toEqual([
-        _firstSkillSummary
-      ]);
-      TopicUpdateService.removeUncategorizedSkill(
-        _sampleTopic, _firstSkillSummary
-      );
-      expect(_sampleTopic.getUncategorizedSkillSummaries()).toEqual([]);
+  it('should remove/add an uncategorized skill id from/to a topic', function() {
+    expect(_sampleTopic.getUncategorizedSkillSummaries()).toEqual([
+      _firstSkillSummary
+    ]);
+    TopicUpdateService.removeUncategorizedSkill(
+      _sampleTopic, _firstSkillSummary
+    );
+    expect(_sampleTopic.getUncategorizedSkillSummaries()).toEqual([]);
 
-      UndoRedoService.undoChange(_sampleTopic);
-      expect(_sampleTopic.getUncategorizedSkillSummaries()).toEqual([
-        _firstSkillSummary
-      ]);
-    }
+    UndoRedoService.undoChange(_sampleTopic);
+    expect(_sampleTopic.getUncategorizedSkillSummaries()).toEqual([
+      _firstSkillSummary
+    ]);
+  }
   );
 
   it('should create a proper backend change dict for removing an ' +
-    'uncategorized skill id',
-  function() {
+    'uncategorized skill id', function() {
     TopicUpdateService.removeUncategorizedSkill(
       _sampleTopic, _firstSkillSummary);
     expect(UndoRedoService.getCommittableChangeList()).toEqual([{
@@ -266,8 +258,7 @@ describe('Topic update service', function() {
   });
 
   it('should not create a backend change dict for removing an uncategorized ' +
-    'skill id when an error is encountered',
-  function() {
+    'skill id when an error is encountered', function() {
     expect(function() {
       TopicUpdateService.removeUncategorizedSkill(
         _sampleTopic, _thirdSkillSummary);
@@ -277,75 +268,242 @@ describe('Topic update service', function() {
 
   it('should set/unset changes to a topic\'s name', function() {
     expect(_sampleTopic.getName()).toEqual('Topic name');
-    TopicUpdateService.setTopicName(_sampleTopic, 'new name');
-    expect(_sampleTopic.getName()).toEqual('new name');
+
+    TopicUpdateService.setTopicName(_sampleTopic, 'new unique value');
+    expect(_sampleTopic.getName()).toEqual('new unique value');
 
     UndoRedoService.undoChange(_sampleTopic);
     expect(_sampleTopic.getName()).toEqual('Topic name');
   });
 
-  it('should create a proper backend change dict for changing names',
-    function() {
-      TopicUpdateService.setTopicName(_sampleTopic, 'new name');
-      expect(UndoRedoService.getCommittableChangeList()).toEqual([{
-        cmd: 'update_topic_property',
-        property_name: 'name',
-        new_value: 'new name',
-        old_value: 'Topic name'
-      }]);
-    }
-  );
+  it('should create a proper backend change dict ' +
+    'for changing a topic\'s name', function() {
+    TopicUpdateService.setTopicName(_sampleTopic, 'new unique value');
+    expect(UndoRedoService.getCommittableChangeList()).toEqual([{
+      cmd: 'update_topic_property',
+      property_name: 'name',
+      new_value: 'new unique value',
+      old_value: 'Topic name'
+    }]);
+  });
 
   it('should set/unset changes to a topic\'s description', function() {
     expect(_sampleTopic.getDescription()).toEqual('Topic description');
-    TopicUpdateService.setTopicDescription(_sampleTopic, 'new description');
-    expect(_sampleTopic.getDescription()).toEqual('new description');
+
+    TopicUpdateService.setTopicDescription(_sampleTopic, 'new unique value');
+    expect(_sampleTopic.getDescription()).toEqual('new unique value');
 
     UndoRedoService.undoChange(_sampleTopic);
     expect(_sampleTopic.getDescription()).toEqual('Topic description');
   });
 
-  it('should create a proper backend change dict for changing descriptions',
-    function() {
-      TopicUpdateService.setTopicDescription(_sampleTopic, 'new description');
-      expect(UndoRedoService.getCommittableChangeList()).toEqual([{
-        cmd: 'update_topic_property',
-        property_name: 'description',
-        new_value: 'new description',
-        old_value: 'Topic description'
-      }]);
-    }
-  );
-
-  it('should set/unset changes to a subtopic\'s title', function() {
-    expect(_sampleTopic.getSubtopics()[0].getTitle()).toEqual('Title');
-    TopicUpdateService.setSubtopicTitle(_sampleTopic, 1, 'new title');
-    expect(_sampleTopic.getSubtopics()[0].getTitle()).toEqual('new title');
-
-    UndoRedoService.undoChange(_sampleTopic);
-    expect(_sampleTopic.getSubtopics()[0].getTitle()).toEqual('Title');
+  it('should create a proper backend change dict ' +
+    'for changing a topic\'s description', function() {
+    TopicUpdateService.setTopicDescription(_sampleTopic, 'new unique value');
+    expect(UndoRedoService.getCommittableChangeList()).toEqual([{
+      cmd: 'update_topic_property',
+      property_name: 'description',
+      new_value: 'new unique value',
+      old_value: 'Topic description'
+    }]);
   });
 
-  it('should create a proper backend change dict for changing subtopic title',
-    function() {
-      TopicUpdateService.setSubtopicTitle(_sampleTopic, 1, 'new title');
-      expect(UndoRedoService.getCommittableChangeList()).toEqual([{
-        cmd: 'update_subtopic_property',
-        subtopic_id: 1,
-        property_name: 'title',
-        new_value: 'new title',
-        old_value: 'Title'
-      }]);
-    }
-  );
+  it('should set/unset changes to a topic\'s abbreviated name', function() {
+    expect(_sampleTopic.getAbbreviatedName()).toEqual(undefined);
+
+    TopicUpdateService.setAbbreviatedTopicName(
+      _sampleTopic, 'new unique value');
+    expect(_sampleTopic.getAbbreviatedName()).toEqual('new unique value');
+
+    UndoRedoService.undoChange(_sampleTopic);
+    expect(_sampleTopic.getAbbreviatedName()).toEqual(undefined);
+  });
+
+  it('should create a proper backend change dict ' +
+    'for changing a topic\'s abbreviated name', function() {
+    TopicUpdateService.setAbbreviatedTopicName(
+      _sampleTopic, 'new unique value');
+    expect(UndoRedoService.getCommittableChangeList()).toEqual([{
+      cmd: 'update_topic_property',
+      property_name: 'abbreviated_name',
+      new_value: 'new unique value',
+      old_value: null
+    }]);
+  });
+
+  it('should set/unset changes to a topic\'s thumbnail filename', function() {
+    expect(_sampleTopic.getThumbnailFilename()).toEqual(undefined);
+
+    TopicUpdateService.setTopicThumbnailFilename(
+      _sampleTopic, 'new unique value');
+    expect(_sampleTopic.getThumbnailFilename()).toEqual('new unique value');
+
+    UndoRedoService.undoChange(_sampleTopic);
+    expect(_sampleTopic.getThumbnailFilename()).toEqual(undefined);
+  });
+
+  it('should create a proper backend change dict ' +
+    'for changing a topic\'s thumbnail filename', function() {
+    TopicUpdateService.setTopicThumbnailFilename(
+      _sampleTopic, 'new unique value');
+    expect(UndoRedoService.getCommittableChangeList()).toEqual([{
+      cmd: 'update_topic_property',
+      property_name: 'thumbnail_filename',
+      new_value: 'new unique value',
+      old_value: null
+    }]);
+  });
+
+  it('should set/unset changes to a topic\'s thumbnail bg color', function() {
+    expect(_sampleTopic.getThumbnailBgColor()).toEqual(undefined);
+
+    TopicUpdateService.setTopicThumbnailBgColor(
+      _sampleTopic, '#ffffff');
+    expect(_sampleTopic.getThumbnailBgColor()).toEqual('#ffffff');
+
+    UndoRedoService.undoChange(_sampleTopic);
+    expect(_sampleTopic.getThumbnailBgColor()).toEqual(undefined);
+  });
+
+  it('should create a proper backend change dict ' +
+    'for changing a topic\'s thumbnail bg color', function() {
+    TopicUpdateService.setTopicThumbnailBgColor(
+      _sampleTopic, 'new unique value');
+    expect(UndoRedoService.getCommittableChangeList()).toEqual([{
+      cmd: 'update_topic_property',
+      property_name: 'thumbnail_bg_color',
+      new_value: 'new unique value',
+      old_value: null
+    }]);
+  });
+
+  it('should set/unset changes to a topic\'s language code', function() {
+    expect(_sampleTopic.getLanguageCode()).toEqual('en');
+
+    TopicUpdateService.setTopicLanguageCode(_sampleTopic, 'fr');
+    expect(_sampleTopic.getLanguageCode()).toEqual('fr');
+
+    UndoRedoService.undoChange(_sampleTopic);
+    expect(_sampleTopic.getLanguageCode()).toEqual('en');
+  });
+
+  it('should create a proper backend change dict ' +
+    'for changing a topic\'s language code', function() {
+    TopicUpdateService.setTopicLanguageCode(_sampleTopic, 'fr');
+    expect(UndoRedoService.getCommittableChangeList()).toEqual([{
+      cmd: 'update_topic_property',
+      property_name: 'language_code',
+      new_value: 'fr',
+      old_value: 'en'
+    }]);
+  });
 
   it('should not create a backend change dict for changing subtopic title ' +
-    'when an error is encountered',
-  function() {
+    'when the subtopic does not exist', function() {
     expect(function() {
-      TopicUpdateService.setSubtopicTitle(_sampleTopic, 10, 'title2');
+      TopicUpdateService.setSubtopicTitle(_sampleTopic, 10, 'whatever');
     }).toThrowError('Subtopic doesn\'t exist');
     expect(UndoRedoService.getCommittableChangeList()).toEqual([]);
+  });
+
+  it('should set/unset changes to a subtopic\'s title', function() {
+    expect(_sampleTopic.getSubtopics()[0].getTitle())
+      .toEqual('Title');
+    TopicUpdateService.setSubtopicTitle(_sampleTopic, 1, 'new unique value');
+    expect(_sampleTopic.getSubtopics()[0].getTitle())
+      .toEqual('new unique value');
+
+    UndoRedoService.undoChange(_sampleTopic);
+    expect(_sampleTopic.getSubtopics()[0].getTitle())
+      .toEqual('Title');
+  });
+
+  it('should create a proper backend change dict for changing subtopic ' +
+    'title', function() {
+    TopicUpdateService.setSubtopicTitle(_sampleTopic, 1, 'new unique value');
+    expect(UndoRedoService.getCommittableChangeList()).toEqual([{
+      cmd: 'update_subtopic_property',
+      subtopic_id: 1,
+      property_name: 'title',
+      new_value: 'new unique value',
+      old_value: 'Title'
+    }]);
+  }
+  );
+
+  it('should not create a backend change dict for changing subtopic  ' +
+    'thumbnail filename when the subtopic does not exist', function() {
+    expect(function() {
+      TopicUpdateService
+        .setSubtopicThumbnailFilename(_sampleTopic, 10, 'whatever');
+    }).toThrowError('Subtopic doesn\'t exist');
+    expect(UndoRedoService.getCommittableChangeList()).toEqual([]);
+  });
+
+  it('should set/unset changes to a subtopic\'s thumbnail' +
+    'filename', function() {
+    expect(_sampleTopic.getSubtopics()[0].getThumbnailFilename())
+      .toEqual(undefined);
+
+    TopicUpdateService
+      .setSubtopicThumbnailFilename(_sampleTopic, 1, 'filename');
+    expect(_sampleTopic.getSubtopics()[0].getThumbnailFilename())
+      .toEqual('filename');
+
+    UndoRedoService.undoChange(_sampleTopic);
+    expect(_sampleTopic.getSubtopics()[0].getThumbnailFilename())
+      .toEqual(undefined);
+  });
+
+  it('should create a proper backend change dict for changing subtopic ' +
+    'thumbnail filename', function() {
+    TopicUpdateService
+      .setSubtopicThumbnailFilename(_sampleTopic, 1, 'filename');
+    expect(UndoRedoService.getCommittableChangeList()).toEqual([{
+      cmd: 'update_subtopic_property',
+      subtopic_id: 1,
+      property_name: 'thumbnail_filename',
+      new_value: 'filename',
+      old_value: undefined
+    }]);
+  }
+  );
+
+  it('should not create a backend change dict for changing subtopic ' +
+    'thumbnail bg color when the subtopic does not exist', function() {
+    expect(function() {
+      TopicUpdateService
+        .setSubtopicThumbnailBgColor(_sampleTopic, 10, 'whatever');
+    }).toThrowError('Subtopic doesn\'t exist');
+    expect(UndoRedoService.getCommittableChangeList()).toEqual([]);
+  });
+
+  it('should set/unset changes to a subtopic\'s thumbnail bg ' +
+    'color', function() {
+    expect(_sampleTopic.getSubtopics()[0].getThumbnailBgColor())
+      .toEqual(undefined);
+
+    TopicUpdateService
+      .setSubtopicThumbnailBgColor(_sampleTopic, 1, '#ffffff');
+    expect(_sampleTopic.getSubtopics()[0].getThumbnailBgColor())
+      .toEqual('#ffffff');
+
+    UndoRedoService.undoChange(_sampleTopic);
+    expect(_sampleTopic.getSubtopics()[0].getThumbnailBgColor())
+      .toEqual(undefined);
+  });
+
+  it('should create a proper backend change dict for changing subtopic ' +
+    'thumbnail bg color', function() {
+    TopicUpdateService
+      .setSubtopicThumbnailBgColor(_sampleTopic, 1, '#ffffff');
+    expect(UndoRedoService.getCommittableChangeList()).toEqual([{
+      cmd: 'update_subtopic_property',
+      subtopic_id: 1,
+      property_name: 'thumbnail_bg_color',
+      new_value: '#ffffff',
+      old_value: undefined
+    }]);
   });
 
   it('should add/remove a subtopic', function() {
@@ -400,26 +558,33 @@ describe('Topic update service', function() {
     expect(UndoRedoService.getChangeCount()).toEqual(1);
   });
 
-  it('should create a proper backend change dict for deleting a subtopic',
-    function() {
-      TopicUpdateService.deleteSubtopic(_sampleTopic, 1);
-      expect(UndoRedoService.getCommittableChangeList()).toEqual([{
-        cmd: 'delete_subtopic',
-        subtopic_id: 1
-      }]);
-    }
+  it('should create a proper backend change dict for deleting ' +
+    'a subtopic', function() {
+    TopicUpdateService.deleteSubtopic(_sampleTopic, 1);
+    expect(UndoRedoService.getCommittableChangeList()).toEqual([{
+      cmd: 'delete_subtopic',
+      subtopic_id: 1
+    }]);
+  }
   );
 
   it('should not create a backend change dict for deleting a subtopic ' +
-    'when an error is encountered',
-  function() {
+    'when an error is encountered', function() {
     expect(function() {
       TopicUpdateService.deleteSubtopic(_sampleTopic, 10);
     }).toThrowError('Subtopic doesn\'t exist');
     expect(UndoRedoService.getCommittableChangeList()).toEqual([]);
   });
 
-  it('should move a skill id to a subtopic', function() {
+  it('should not create a backend change dict for moving subtopic' +
+    'when error is thrown', function() {
+    expect(function() {
+      TopicUpdateService.moveSkillToSubtopic(_sampleTopic, 1, null, undefined);
+    }).toThrowError('New subtopic cannot be null');
+    expect(UndoRedoService.getCommittableChangeList()).toEqual([]);
+  });
+
+  it('should move/undo move a skill id to a subtopic', function() {
     expect(_sampleTopic.getUncategorizedSkillSummaries()).toEqual([
       _firstSkillSummary
     ]);
@@ -433,12 +598,39 @@ describe('Topic update service', function() {
       _secondSkillSummary, _firstSkillSummary
     ]);
 
+    /** Undo back to uncategorized */
     UndoRedoService.undoChange(_sampleTopic);
     expect(_sampleTopic.getUncategorizedSkillSummaries()).toEqual([
       _firstSkillSummary
     ]);
     expect(_sampleTopic.getSubtopics()[0].getSkillSummaries()).toEqual([
       _secondSkillSummary
+    ]);
+
+    /**
+     * Undo back to old subtopic
+     *  Move to _sampleTopic, move to _sampleTopic2, then undo
+     */
+    TopicUpdateService.addSubtopic(_sampleTopic, 'Title 2');
+
+    TopicUpdateService.moveSkillToSubtopic(
+      _sampleTopic, null, 1, _firstSkillSummary);
+    expect(_sampleTopic.getUncategorizedSkillSummaries()).toEqual([]);
+    expect(_sampleTopic.getSubtopics()[0].getSkillSummaries()).toEqual([
+      _secondSkillSummary, _firstSkillSummary
+    ]);
+
+    TopicUpdateService.moveSkillToSubtopic(
+      _sampleTopic, 1, 2, _firstSkillSummary);
+    expect(_sampleTopic.getSubtopics()[0].getSkillSummaries()).toEqual(
+      [_secondSkillSummary]);
+    expect(_sampleTopic.getSubtopics()[1].getSkillSummaries()).toEqual(
+      [_firstSkillSummary]);
+
+    UndoRedoService.undoChange(_sampleTopic);
+    expect(_sampleTopic.getUncategorizedSkillSummaries()).toEqual([]);
+    expect(_sampleTopic.getSubtopics()[0].getSkillSummaries()).toEqual([
+      _secondSkillSummary, _firstSkillSummary
     ]);
   });
 
@@ -509,9 +701,42 @@ describe('Topic update service', function() {
     }]);
   });
 
+  it('should properly decrement subtopic ids of moved subtopics ' +
+    'when a newly created subtopic is deleted', function() {
+    TopicUpdateService.addSubtopic(_sampleTopic, 'Title 2');
+    TopicUpdateService.addSubtopic(_sampleTopic, 'Title 3');
+    TopicUpdateService.addSubtopic(_sampleTopic, 'Title 4');
+
+    TopicUpdateService.moveSkillToSubtopic(
+      _sampleTopic, 1, 3, _secondSkillSummary
+    );
+    TopicUpdateService.moveSkillToSubtopic(
+      _sampleTopic, 3, 4, _secondSkillSummary
+    );
+    TopicUpdateService.deleteSubtopic(_sampleTopic, 2);
+    expect(UndoRedoService.getCommittableChangeList()).toEqual([{
+      cmd: 'add_subtopic',
+      title: 'Title 3',
+      subtopic_id: 2
+    }, {
+      cmd: 'add_subtopic',
+      title: 'Title 4',
+      subtopic_id: 3
+    }, {
+      cmd: 'move_skill_id_to_subtopic',
+      old_subtopic_id: 1,
+      new_subtopic_id: 2,
+      skill_id: 'skill_2'
+    }, {
+      cmd: 'move_skill_id_to_subtopic',
+      old_subtopic_id: 2,
+      new_subtopic_id: 3,
+      skill_id: 'skill_2'
+    }]);
+  });
+
   it('should create a proper backend change dict for moving a skill id to a ' +
-    'subtopic',
-  function() {
+    'subtopic', function() {
     TopicUpdateService.moveSkillToSubtopic(
       _sampleTopic, null, 1, _firstSkillSummary);
     expect(UndoRedoService.getCommittableChangeList()).toEqual([{
@@ -523,8 +748,7 @@ describe('Topic update service', function() {
   });
 
   it('should not create a backend change dict for moving a skill id to a' +
-    'subtopic when an error is encountered',
-  function() {
+    'subtopic when an error is encountered', function() {
     expect(function() {
       TopicUpdateService.moveSkillToSubtopic(
         _sampleTopic, null, 1, _secondSkillSummary);
@@ -560,8 +784,7 @@ describe('Topic update service', function() {
   });
 
   it('should create a proper backend change dict for removing a skill id ' +
-    'from a subtopic',
-  function() {
+    'from a subtopic', function() {
     TopicUpdateService.removeSkillFromSubtopic(
       _sampleTopic, 1, _secondSkillSummary);
     expect(UndoRedoService.getCommittableChangeList()).toEqual([{
@@ -572,35 +795,13 @@ describe('Topic update service', function() {
   });
 
   it('should not create a backend change dict for removing a skill id from a' +
-    'subtopic when an error is encountered',
-  function() {
+    'subtopic when an error is encountered', function() {
     expect(function() {
       TopicUpdateService.removeSkillFromSubtopic(
         _sampleTopic, 1, _firstSkillSummary);
     }).toThrowError('The given skill doesn\'t exist in the subtopic');
     expect(UndoRedoService.getCommittableChangeList()).toEqual([]);
   });
-
-  it('should set/unset changes to a topic\'s language code', function() {
-    expect(_sampleTopic.getLanguageCode()).toEqual('en');
-    TopicUpdateService.setTopicLanguageCode(_sampleTopic, 'fi');
-    expect(_sampleTopic.getLanguageCode()).toEqual('fi');
-
-    UndoRedoService.undoChange(_sampleTopic);
-    expect(_sampleTopic.getLanguageCode()).toEqual('en');
-  });
-
-  it('should create a proper backend change dict for changing language codes',
-    function() {
-      TopicUpdateService.setTopicLanguageCode(_sampleTopic, 'fi');
-      expect(UndoRedoService.getCommittableChangeList()).toEqual([{
-        cmd: 'update_topic_property',
-        property_name: 'language_code',
-        new_value: 'fi',
-        old_value: 'en'
-      }]);
-    }
-  );
 
   it('should set/unset changes to a subtopic page\'s page content', function() {
     var newSampleSubtitledHtmlDict = {
@@ -670,33 +871,98 @@ describe('Topic update service', function() {
     });
   });
 
-  it('should create a proper backend change dict for changing html data',
-    function() {
-      var newSampleSubtitledHtmlDict = {
-        html: 'new content',
+  it('should create a proper backend change dict for changing ' +
+    'html data', function() {
+    var newSampleSubtitledHtmlDict = {
+      html: 'new content',
+      content_id: 'content'
+    };
+    var newSampleSubtitledHtml =
+      subtitledHtmlObjectFactory.createFromBackendDict(
+        newSampleSubtitledHtmlDict);
+    TopicUpdateService.setSubtopicPageContentsHtml(
+      _sampleSubtopicPage, 1, newSampleSubtitledHtml);
+    expect(UndoRedoService.getCommittableChangeList()).toEqual([{
+      cmd: 'update_subtopic_page_property',
+      property_name: 'page_contents_html',
+      subtopic_id: 1,
+      new_value: newSampleSubtitledHtml.toBackendDict(),
+      old_value: {
+        html: 'test content',
         content_id: 'content'
-      };
-      var newSampleSubtitledHtml =
-        subtitledHtmlObjectFactory.createFromBackendDict(
-          newSampleSubtitledHtmlDict);
-      TopicUpdateService.setSubtopicPageContentsHtml(
-        _sampleSubtopicPage, 1, newSampleSubtitledHtml);
-      expect(UndoRedoService.getCommittableChangeList()).toEqual([{
-        cmd: 'update_subtopic_page_property',
-        property_name: 'page_contents_html',
-        subtopic_id: 1,
-        new_value: newSampleSubtitledHtml.toBackendDict(),
-        old_value: {
-          html: 'test content',
-          content_id: 'content'
-        }
-      }]);
-    }
+      }
+    }]);
+  }
   );
 
+  it('should set/unset changes to a subtopic page\'s audio data', function() {
+    var newRecordedVoiceoversDict = {
+      voiceovers_mapping: {
+        content: {
+          en: {
+            filename: 'test_2.mp3',
+            file_size_bytes: 1000,
+            needs_update: false,
+            duration_secs: 1.0
+          }
+        }
+      }
+    };
+    var newVoiceovers = recordedVoiceoversObjectFactory.createFromBackendDict(
+      newRecordedVoiceoversDict);
+
+    expect(_sampleSubtopicPage.getPageContents().toBackendDict()).toEqual({
+      subtitled_html: {
+        html: 'test content',
+        content_id: 'content'
+      },
+      recorded_voiceovers: {
+        voiceovers_mapping: {
+          content: {
+            en: {
+              filename: 'test.mp3',
+              file_size_bytes: 100,
+              needs_update: false,
+              duration_secs: 0.1
+            }
+          }
+        }
+      }
+    });
+
+    TopicUpdateService.setSubtopicPageContentsAudio(
+      _sampleSubtopicPage, 1, newVoiceovers);
+    expect(_sampleSubtopicPage.getPageContents().toBackendDict()).toEqual({
+      subtitled_html: {
+        html: 'test content',
+        content_id: 'content'
+      },
+      recorded_voiceovers: newRecordedVoiceoversDict
+    });
+
+    UndoRedoService.undoChange(_sampleSubtopicPage);
+    expect(_sampleSubtopicPage.getPageContents().toBackendDict()).toEqual({
+      subtitled_html: {
+        html: 'test content',
+        content_id: 'content'
+      },
+      recorded_voiceovers: {
+        voiceovers_mapping: {
+          content: {
+            en: {
+              filename: 'test.mp3',
+              file_size_bytes: 100,
+              needs_update: false,
+              duration_secs: 0.1
+            }
+          }
+        }
+      }
+    });
+  });
+
   it('should create a proper backend change dict for changing subtopic ' +
-     'page audio data',
-  function() {
+     'page audio data', function() {
     var newRecordedVoiceoversDict = {
       voiceovers_mapping: {
         content: {
