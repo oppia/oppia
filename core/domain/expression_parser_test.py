@@ -59,7 +59,6 @@ class HelperFunctionsUnitTests(test_utils.GenericTestBase):
         self.assertTrue(expression_parser.is_algebraic('a^2.3'))
         self.assertTrue(expression_parser.is_algebraic('abs(alpha)'))
         self.assertTrue(expression_parser.is_algebraic('alpha/gamma'))
-        self.assertTrue(expression_parser.is_algebraic('alpha + bet/22'))
         self.assertTrue(expression_parser.is_algebraic('A + 2/3'))
 
         self.assertFalse(expression_parser.is_algebraic('1 + 2'))
@@ -74,6 +73,8 @@ class HelperFunctionsUnitTests(test_utils.GenericTestBase):
             expression_parser.is_algebraic('Alpha')
         with self.assertRaises(Exception):
             expression_parser.is_algebraic('invalid + 2')
+        with self.assertRaises(Exception):
+            expression_parser.is_algebraic('alpha + bet/22')
 
 
 class TokenUnitTests(test_utils.GenericTestBase):
