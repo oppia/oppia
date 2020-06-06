@@ -32,13 +32,13 @@ angular.module('oppia').controller('QuestionEditorModalController', [
   '$scope', '$uibModal', '$uibModalInstance', 'AlertsService',
   'QuestionUndoRedoService', 'SkillSummaryObjectFactory', 'StateEditorService',
   'UrlInterpolationService', 'associatedSkillSummaries', 'canEditQuestion',
-  'groupedSkillSummaries', 'misconceptionsBySkill',
+  'categorizedSkills', 'groupedSkillSummaries', 'misconceptionsBySkill',
   'newQuestionIsBeingCreated', 'question', 'questionId', 'questionStateData',
   function(
       $scope, $uibModal, $uibModalInstance, AlertsService,
       QuestionUndoRedoService, SkillSummaryObjectFactory, StateEditorService,
       UrlInterpolationService, associatedSkillSummaries, canEditQuestion,
-      groupedSkillSummaries, misconceptionsBySkill,
+      categorizedSkills, groupedSkillSummaries, misconceptionsBySkill,
       newQuestionIsBeingCreated, question, questionId, questionStateData) {
     var returnModalObject = {
       skillLinkageModificationsArray: [],
@@ -101,8 +101,11 @@ angular.module('oppia').controller('QuestionEditorModalController', [
         resolve: {
           skillsInSameTopicCount: () => skillsInSameTopicCount,
           sortedSkillSummaries: () => sortedSkillSummaries,
+          categorizedSkills: () => categorizedSkills
         },
-        controller: 'SelectSkillModalController'
+        controller: 'SelectSkillModalController',
+        windowClass: 'skill-select-modal',
+        size: 'xl'
       }).result.then(function(summary) {
         for (var idx in $scope.associatedSkillSummaries) {
           if (

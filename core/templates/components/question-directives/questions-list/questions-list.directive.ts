@@ -470,7 +470,8 @@ angular.module('oppia').directive('questionsList', [
                 newQuestionIsBeingCreated: () => newQuestionIsBeingCreated,
                 question: () => question,
                 questionId: () => questionId,
-                questionStateData: () => questionStateData
+                questionStateData: () => questionStateData,
+                categorizedSkills: () => categorizedSkills
               },
               controller: 'QuestionEditorModalController',
             }).result.then(function(modalObject) {

@@ -20,15 +20,16 @@ require(
   'confirm-or-cancel-modal.controller.ts');
 
 angular.module('oppia').controller('SelectSkillModalController', [
-  '$controller', '$scope', '$uibModalInstance', 'skillsInSameTopicCount',
-  'sortedSkillSummaries',
-  function($controller, $scope, $uibModalInstance, skillsInSameTopicCount,
-      sortedSkillSummaries) {
+  '$controller', '$scope', '$uibModalInstance', 'categorizedSkills',
+  'skillsInSameTopicCount', 'sortedSkillSummaries',
+  function($controller, $scope, $uibModalInstance, categorizedSkills,
+      skillsInSameTopicCount, sortedSkillSummaries) {
     $controller('ConfirmOrCancelModalController', {
       $scope: $scope,
       $uibModalInstance: $uibModalInstance
     });
     $scope.skillSummaries = sortedSkillSummaries;
+    $scope.categorizedSkills = categorizedSkills;
     $scope.selectedSkillId = null;
     $scope.countOfSkillsToPrioritize =
       skillsInSameTopicCount;
