@@ -57,7 +57,7 @@ angular.module('oppia').factory('EditableQuestionBackendApiService', [
       $http.post(QUESTION_CREATION_URL, (body), {
         headers: {
           'Content-Type': undefined
-       }
+        }
       }).then(function(response) {
         var questionId = response.data.question_id;
         if (successCallback) {
@@ -168,7 +168,7 @@ angular.module('oppia').factory('EditableQuestionBackendApiService', [
 
     return {
       createQuestion: function(
-        skillIds, skillDifficulties, questionDict, imagesData) {
+          skillIds, skillDifficulties, questionDict, imagesData) {
         return $q(function(resolve, reject) {
           _createQuestion(skillIds, skillDifficulties,
             questionDict, imagesData, resolve, reject);

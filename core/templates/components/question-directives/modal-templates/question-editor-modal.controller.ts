@@ -33,7 +33,7 @@ require('services/image-local-storage.service.ts');
 
 angular.module('oppia').controller('QuestionEditorModalController', [
   '$scope', '$uibModal', '$uibModalInstance', 'AlertsService', 'ContextService',
-  'ImageLocalStorageService' ,'QuestionUndoRedoService',
+  'ImageLocalStorageService', 'QuestionUndoRedoService',
   'SkillSummaryObjectFactory', 'StateEditorService', 'UrlInterpolationService',
   'associatedSkillSummaries', 'canEditQuestion', 'groupedSkillSummaries',
   'misconceptionsBySkill', 'newQuestionIsBeingCreated', 'question',
