@@ -1,4 +1,4 @@
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ var ExplorationPlayerPage =
 var LibraryPage =
     require('../protractor_utils/LibraryPage.js');
 
-describe('Test Translations', function() {
+describe('Test if Translations Play', function() {
   var creatorDashboardPage = null;
   var explorationEditorPage = null;
   var explorationEditorMainTab = null;
@@ -63,7 +63,7 @@ describe('Test Translations', function() {
       'Hindi', '../data/cafe.mp3');
     await explorationEditorPage.saveChanges();
     await explorationEditorPage.navigateToSettingsTab();
-    await explorationEditorSettingsTab.setTitle('Test Translations');
+    await explorationEditorSettingsTab.setTitle('translationPlayerTest');
     await explorationEditorSettingsTab.setCategory('Languages');
     await explorationEditorSettingsTab.setLanguage('English');
     await explorationEditorSettingsTab.setObjective(
@@ -76,7 +76,7 @@ describe('Test Translations', function() {
   it('should play and pause audio translations', async function() {
     await users.login('testTranslations@translations.com');
     await libraryPage.get();
-    await libraryPage.playExploration('Test Translations');
+    await libraryPage.playExploration('translationPlayerTest');
     await explorationPlayerPage.clickAudioBar();
     await explorationPlayerPage.playAudio();
     await explorationPlayerPage.expectAudioToBePlaying();
@@ -87,13 +87,17 @@ describe('Test Translations', function() {
   it('should play translations for multiple languages', async function() {
     await browser.get('/');
     await creatorDashboardPage.get();
-    await creatorDashboardPage.editExploration('Test Translations');
+    await creatorDashboardPage.editExploration('translationPlayerTest');
     await explorationEditorPage.navigateToTranslationTab();
     await explorationEditorTranslationTab.uploadAudioFileForLanguage(
       'Arabic', '../data/ambient-noise.mp3');
     await explorationEditorPage.saveChanges('Added another translation');
     await libraryPage.get();
-    await libraryPage.playExploration('Test Translations');
+    await libraryPage.playExploration('translationPlayerTest');
+    await explorationPlayerPage.clickAudioBar();
+    await explorationPlayerPage.playAudio();
+    await explorationPlayerPage.expectAudioToBePlaying();
+    await explorationPlayerPage.pauseAudio();
     await browser.refresh();
     await explorationPlayerPage.clickAudioBar();
     await explorationPlayerPage.changeLanguage('Arabic');

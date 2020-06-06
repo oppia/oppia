@@ -84,6 +84,10 @@ var ExplorationPlayerPage = function() {
     by.css('.protractor-test-audio-bar'));
   var audioSelect = element(
     by.css('.protractor-test-audio-lang-select'));
+  var playButton = element(
+    by.css('.protractor-test-play-circle'));
+  var pauseButton = element(
+    by.css('.protractor-test-pause-circle'));
 
   this.clickAudioBar = function() {
     waitFor.elementToBeClickable(audioBar,
@@ -91,38 +95,32 @@ var ExplorationPlayerPage = function() {
     audioBar.click();
   };
 
-  this.playAudio = function() {
-    var playBtn = element(
-      by.css('.protractor-test-play-circle'));
-    waitFor.elementToBeClickable(playBtn,
+  this.playAudio = async function() {
+    await waitFor.elementToBeClickable(playButton,
       'Play button taking too long to be clickable');
-    playBtn.click();
+    await playButton.click();
   };
 
-  this.expectAudioToBePlaying = function() {
-    var pauseBtn = element(
-      by.css('.protractor-test-pause-circle'));
-    expect(pauseBtn.isPresent()).toBeTruthy();
+  this.expectAudioToBePlaying = async function() {
+    expect(pauseButton.isPresent()).toBeTruthy();
   };
 
-  this.pauseAudio = function() {
-    var pauseBtn = element(
-      by.css('.protractor-test-pause-circle'));
-    waitFor.elementToBeClickable(pauseBtn,
+  this.pauseAudio = async function() {
+    await waitFor.elementToBeClickable(pauseButton,
       'Pause button taking too long to be clickable');
-    pauseBtn.click();
+    await pauseButton.click();
   };
 
-  this.expectAudioToBePaused = function() {
-    var playBtn = element(
-      by.css('.protractor-test-play-circle'));
-    expect(playBtn.isPresent()).toBeTruthy();
+  this.expectAudioToBePaused = async function() {
+    expect(playButton.isPresent()).toBeTruthy();
   };
 
-  this.changeLanguage = async function(lang) {
-    var audioSelect = element(
-      by.css('.protractor-test-audio-lang-select'));
-    audioSelect.value = lang;
+  this.changeLanguage = async function(language) {
+    await waitFor.visibilityOf(
+      audioSelect,
+      'Language selector takes too long to appear.');
+    await audioSelect.element(
+      by.cssContainingText('option', language)).click();
   };
 
   this.clickThroughToNextCard = async function() {
