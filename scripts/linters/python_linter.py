@@ -117,6 +117,41 @@ class PythonLintChecksManager(python_utils.OBJECT):
                 summary_messages.append(summary_message)
         return summary_messages
 
+    def _check_non_test_files(self):
+        """This function is used to check that function
+           with test_only in their names are in test files.
+        """
+        if self.verbose_mode_enabled:
+            python_utils.PRINT('Starting function defintion checks')
+            python_utils.PRINT('----------------------------------------')
+        summary_messages = []
+        files_to_check = self.py_filepaths
+        failed = False
+        for filepath in files_to_check:
+            if filepath.find('_test.py') == -1:
+                with python_utils.open_file(filepath, 'r') as fp:
+                    for cnt, line in enumerate(fp):
+                        ind1 = line.find(' def ')
+                        ind2 = line.find('test_only')
+                        if ind1 != -1 and ind2 != -1:
+                            python_utils.PRINT(
+                                'ERROR: Non test file uses test functions at'
+                                'line: ', cnt, 'in file: ', filepath)
+                            failed = True
+        if failed:
+            summary_message = (
+                '%s   Test functions are used in non test files,'
+                'see affect files above.' % (_MESSAGE_TYPE_FAILED))
+            python_utils.PRINT(summary_message)
+            summary_messages.append(summary_message)
+        else:
+            summary_message = (
+                '%s   Function definition checks passed'
+                % _MESSAGE_TYPE_SUCCESS)
+            python_utils.PRINT(summary_message)
+            summary_messages.append(summary_message)
+        return summary_messages
+
     def _check_that_all_jobs_are_listed_in_the_job_registry_file(self):
         """This function is used to check that all the one-off and audit jobs
         are registered in jobs_registry.py file.
@@ -244,9 +279,11 @@ class PythonLintChecksManager(python_utils.OBJECT):
             return []
 
         import_order_check_message = self._check_import_order()
+        test_function_check_message = self._check_non_test_files()
         job_registry_check_message = (
             self._check_that_all_jobs_are_listed_in_the_job_registry_file())
-        return import_order_check_message + job_registry_check_message
+        return (import_order_check_message + job_registry_check_message +
+                test_function_check_message)
 
 
 class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
