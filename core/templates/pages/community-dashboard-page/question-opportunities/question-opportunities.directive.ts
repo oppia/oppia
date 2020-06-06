@@ -67,7 +67,7 @@ angular.module('oppia').directive('questionOpportunities', [
         'ContributionOpportunitiesService', 'ImageLocalStorageService',
         'QuestionObjectFactory', 'QuestionUndoRedoService',
         function(
-            $rootScope, $uibModal, AlertsService, ContextService
+            $rootScope, $uibModal, AlertsService, ContextService,
             ContributionOpportunitiesService, ImageLocalStorageService,
             QuestionObjectFactory, QuestionUndoRedoService) {
           const ctrl = this;
