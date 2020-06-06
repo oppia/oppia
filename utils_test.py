@@ -277,7 +277,7 @@ class UtilsTests(test_utils.GenericTestBase):
             self.get_static_asset_filepath(), 'assets', 'favicon.ico')
 
         with self.assertRaisesRegexp(
-            Exception, 'The given string does not represent a PNG/WEBP image.'):
+            Exception, 'The given string does not represent a PNG image.'):
             utils.convert_png_to_data_url(favicon_filepath)
 
     def test_get_exploration_components_from_dir_with_invalid_path_raises_error(
