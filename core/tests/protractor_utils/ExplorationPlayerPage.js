@@ -84,6 +84,10 @@ var ExplorationPlayerPage = function() {
     by.css('.protractor-test-audio-bar'));
   var audioSelect = element(
     by.css('.protractor-test-audio-lang-select'));
+  var playButton = element(
+    by.css('.protractor-test-play-circle'));
+  var pauseButton = element(
+    by.css('.protractor-test-pause-circle'));
 
   this.clickAudioBar = async function() {
     await waitFor.elementToBeClickable(audioBar,
@@ -92,37 +96,31 @@ var ExplorationPlayerPage = function() {
   };
 
   this.playAudio = async function() {
-    var playBtn = element(
-      by.css('.protractor-test-play-circle'));
-    await waitFor.elementToBeClickable(playBtn,
+    await waitFor.elementToBeClickable(playButton,
       'Play button taking too long to be clickable');
-    await playBtn.click();
+    await playButton.click();
   };
 
   this.expectAudioToBePlaying = async function() {
-    var pauseBtn = element(
-      by.css('.protractor-test-pause-circle'));
-    expect(pauseBtn.isPresent()).toBeTruthy();
+    expect(pauseButton.isPresent()).toBeTruthy();
   };
 
   this.pauseAudio = async function() {
-    var pauseBtn = element(
-      by.css('.protractor-test-pause-circle'));
-    await waitFor.elementToBeClickable(pauseBtn,
+    await waitFor.elementToBeClickable(pauseButton,
       'Pause button taking too long to be clickable');
-    await pauseBtn.click();
+    await pauseButton.click();
   };
 
   this.expectAudioToBePaused = async function() {
-    var playBtn = element(
-      by.css('.protractor-test-play-circle'));
-    expect(playBtn.isPresent()).toBeTruthy();
+    expect(playButton.isPresent()).toBeTruthy();
   };
 
-  this.changeLanguage = async function(lang) {
-    var audioSelect = element(
-      by.css('.protractor-test-audio-lang-select'));
-    audioSelect.value = lang;
+  this.changeLanguage = async function(language) {
+    await waitFor.visibilityOf(
+      audioSelect,
+      'Language selector takes too long to appear.');
+    await audioSelect.element(
+      by.cssContainingText('option', language)).click();
   };
 
   this.clickThroughToNextCard = async function() {
