@@ -1,39 +1,41 @@
 <div class="oppia-topic-viewer-container" style="position: relative;">
   <div class="oppia-topic-viewer-tabs-container">
-    <ul class="topic-viewer-tabs">
-      <li ng-class="{'topic-viewer-tabs-active': $ctrl.activeTab === 'info'}">
-        <div class="topic-viewer-tabs-text" ng-click="$ctrl.setActiveTab('info')">
-          <img class="tab-icon" ng-src="<[$ctrl.getStaticImageUrl('/icons/info_24px.svg')]>">
-          <a class="tab-title"
-             translate="I18N_TOPIC_VIEWER_INFO">
-          </a>
-        </div>
-      </li>
-      <li ng-class="{'topic-viewer-tabs-active': $ctrl.activeTab === 'story'}">
-        <div class="topic-viewer-tabs-text" ng-click="$ctrl.setActiveTab('story')">
-          <img class="tab-icon" ng-src="<[$ctrl.getStaticImageUrl('/icons/play_icon_24px.svg')]>">
-          <a class="tab-title"
-             translate="I18N_TOPIC_VIEWER_LESSONS">
-          </a>
-        </div>
-      </li>
-      <li ng-class="{'topic-viewer-tabs-active': $ctrl.activeTab === 'practice'}">
-        <div class="topic-viewer-tabs-text" ng-click="$ctrl.setActiveTab('practice')">
-          <img class="tab-icon" ng-src="<[$ctrl.getStaticImageUrl('/icons/train_icon_24px.svg')]>">
-          <a class="tab-title"
-             translate="I18N_TOPIC_VIEWER_PRACTICE">
-          </a>
-        </div>
-      </li>
-      <li ng-class="{'topic-viewer-tabs-active': $ctrl.activeTab === 'subtopics'}">
-        <div class="topic-viewer-tabs-text" ng-click="$ctrl.setActiveTab('subtopics')">
-          <img class="tab-icon" ng-src="<[$ctrl.getStaticImageUrl('/icons/review_icon_24px.svg')]>">
-          <a class="tab-title"
-             translate="I18N_TOPIC_VIEWER_REVISION">
-          </a>
-        </div>
-      </li>
-    </ul>
+    <div class="topic-viewer-tabs-list">
+      <ul class="topic-viewer-tabs">
+        <li ng-class="{'topic-viewer-tabs-active': $ctrl.activeTab === 'info'}">
+          <div class="topic-viewer-tabs-text" ng-click="$ctrl.setActiveTab('info')">
+            <img class="tab-icon" ng-src="<[$ctrl.getStaticImageUrl('/icons/info_24px.svg')]>">
+            <a class="tab-title"
+               translate="I18N_TOPIC_VIEWER_INFO">
+            </a>
+          </div>
+        </li>
+        <li ng-class="{'topic-viewer-tabs-active': $ctrl.activeTab === 'story'}">
+          <div class="topic-viewer-tabs-text" ng-click="$ctrl.setActiveTab('story')">
+            <img class="tab-icon" ng-src="<[$ctrl.getStaticImageUrl('/icons/play_icon_24px.svg')]>">
+            <a class="tab-title"
+               translate="I18N_TOPIC_VIEWER_LESSONS">
+            </a>
+          </div>
+        </li>
+        <li ng-class="{'topic-viewer-tabs-active': $ctrl.activeTab === 'practice'}">
+          <div class="topic-viewer-tabs-text" ng-click="$ctrl.setActiveTab('practice')">
+            <img class="tab-icon" ng-src="<[$ctrl.getStaticImageUrl('/icons/train_icon_24px.svg')]>">
+            <a class="tab-title"
+               translate="I18N_TOPIC_VIEWER_PRACTICE">
+            </a>
+          </div>
+        </li>
+        <li ng-class="{'topic-viewer-tabs-active': $ctrl.activeTab === 'subtopics'}">
+          <div class="topic-viewer-tabs-text" ng-click="$ctrl.setActiveTab('subtopics')">
+            <img class="tab-icon" ng-src="<[$ctrl.getStaticImageUrl('/icons/review_icon_24px.svg')]>">
+            <a class="tab-title"
+               translate="I18N_TOPIC_VIEWER_REVISION">
+            </a>
+          </div>
+        </li>
+      </ul>
+    </div>
   </div>
   <background-banner></background-banner>
   <div class="topic-viewer-page-content" ng-if="!$ctrl.topicIsLoading">
@@ -62,9 +64,20 @@
   </div>
 </div>
 <style>
+  .oppia-topic-viewer-container {
+    color: black;
+    margin: 0 auto;
+    text-decoration: none;
+  }
+
   .navbar-light .navbar-container {
     background: #00645C;
     border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+  }
+
+  .topic-viewer-tabs-list {
+    margin: 0 auto;
+    width: 704px;
   }
 
   .topic-viewer-page-content {
@@ -103,8 +116,6 @@
     display: flex;
     flex-wrap: wrap;
     margin-bottom: 0;
-    margin-left: 25vw;
-    margin-right: 25vw;
     padding-left: 0;
     padding-top: 20px;
     text-align: center;
@@ -121,8 +132,12 @@
   .oppia-topic-viewer-tabs-container .topic-viewer-tabs .topic-viewer-tabs-text {
     color: #ffffff;
     cursor: pointer;
+    font-size: 1.1em;
+    font-weight: bold;
     padding: 10px;
-    width: 100%;
+    text-decoration: none;
+    text-transform: uppercase;
+    width: 152px;
   }
 
   .topic-viewer-page-content .tab-title {
@@ -143,15 +158,6 @@
     border-bottom: 4px solid #ffffff;
   }
 
-  .oppia-topic-viewer-tabs-container .topic-viewer-tabs .topic-viewer-tabs-text:hover {
-    color: #ffffff;
-    font-size: 1em;
-    padding: 10px;
-    text-decoration: none;
-    text-transform: uppercase;
-    width: 100%;
-  }
-
   .oppia-topic-viewer-tabs-container .topic-viewer-tabs .topic-viewer-tabs-text:hover,
   .oppia-topic-viewer-tabs-container .topic-viewer-tabs .topic-viewer-tabs-text:focus {
     outline: 0;
@@ -161,11 +167,19 @@
   .topic-viewer-page-content .oppia-page-card {
     border-radius: 0.25em;
     margin-top: 5vh;
-    padding-bottom: 10vh;
-    width: 50vw;
+    padding-bottom: 7.5vh;
+    width: 704px;
   }
 
   @media(max-width: 1024px) {
+    .topic-viewer-tabs-list {
+      width: 80vw;
+    }
+
+    .oppia-topic-viewer-tabs-container .topic-viewer-tabs .topic-viewer-tabs-text {
+      width: 100%;
+    }
+
     .topic-viewer-page-content .oppia-page-card {
       margin-top: 5vh;
       width: 80vw;
@@ -173,12 +187,18 @@
 
     .oppia-topic-viewer-tabs-container .topic-viewer-tabs {
       justify-content: center;
-      margin-left: 10vw;
-      margin-right: 10vw;
     }
   }
 
   @media(max-width: 500px) {
+    .topic-viewer-tabs-list {
+      width: 90vw;
+    }
+
+    .oppia-topic-viewer-tabs-container .topic-viewer-tabs .topic-viewer-tabs-text {
+      width: 100%;
+    }
+
     .topic-viewer-page-content .oppia-page-card {
       padding: 15px 24px 64px 24px;
       width: 90vw;
@@ -186,8 +206,6 @@
 
     .oppia-topic-viewer-tabs-container .topic-viewer-tabs {
       justify-content: center;
-      margin-left: 0;
-      margin-right: 0;
     }
 
     .oppia-topic-viewer-tabs-container .topic-viewer-tabs .tab-icon {
@@ -201,41 +219,5 @@
     .oppia-topic-viewer-tabs-container .topic-viewer-tabs li {
       width: auto;
     }
-  }
-
-  .oppia-topic-viewer-container {
-    color: black;
-    margin: 0 auto;
-    text-decoration: none;
-  }
-  .oppia-topic-viewer-tabs span {
-    display: -webkit-flex;
-    display: inline-flex;
-    margin-bottom: 0;
-    width: 200px;
-  }
-  .oppia-topic-viewer-tabs .oppia-topic-viewer-tabs-text {
-    color: #ffffff;
-    font-size: 1.1em;
-    font-weight: bold;
-    padding: 10px;
-    text-decoration: none;
-    text-transform: uppercase;
-    width: 100%;
-  }
-
-  .oppia-topic-viewer-tabs-active .oppia-topic-viewer-tabs-text,
-  .oppia-topic-viewer-tabs-active .oppia-topic-viewer-tabs-text:hover {
-    border-bottom: 4px solid #ffffff;
-  }
-  .oppia-topic-viewer-tabs {
-    margin: 0 auto 0 10%;
-    display: inline-block;
-  }
-  .oppia-topic-viewer-tabs .oppia-topic-viewer-tabs-text:hover {
-    padding: 10px;
-    text-transform: uppercase;
-    width: 100%;
-    text-shadow: 0.5px 0.5px 0.5px #e7e7e2;
   }
 </style>
