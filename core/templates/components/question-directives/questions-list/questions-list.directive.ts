@@ -96,8 +96,8 @@ angular.module('oppia').directive('questionsList', [
         'QuestionUndoRedoService', 'UndoRedoService', 'QuestionsListService',
         function(
             $scope, $filter, $http, $q, $timeout, $uibModal, $window,
-            $location, AlertsService, ContextService, ImageLocalStorageService,
-            QuestionCreationService, UrlService,
+            $location, AlertsService, ContextService,
+            ImageLocalStorageService, QuestionCreationService, UrlService,
             NUM_QUESTIONS_PER_PAGE, EditableQuestionBackendApiService,
             SkillBackendApiService, MisconceptionObjectFactory,
             QuestionObjectFactory, SkillDifficultyObjectFactory,

@@ -43,8 +43,8 @@ angular.module('oppia').controller('QuestionEditorModalController', [
       ImageLocalStorageService, QuestionUndoRedoService,
       SkillSummaryObjectFactory, StateEditorService, UrlInterpolationService,
       associatedSkillSummaries, canEditQuestion, groupedSkillSummaries,
-      misconceptionsBySkill, newQuestionIsBeingCreated, question, questionId,
-      questionStateData) {
+      misconceptionsBySkill, newQuestionIsBeingCreated, question,
+      questionId, questionStateData) {
     var returnModalObject = {
       skillLinkageModificationsArray: [],
       commitMessage: ''
