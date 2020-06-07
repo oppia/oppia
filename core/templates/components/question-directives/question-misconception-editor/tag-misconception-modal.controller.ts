@@ -14,6 +14,7 @@
 
 /**
  * @fileoverview Controller for tag misconception modal.
+ *
  */
 
 require(
@@ -26,34 +27,32 @@ require(
 
 angular.module('oppia').controller('TagMisconceptionModalController', [
   '$controller', '$scope', '$uibModalInstance', 'StateEditorService',
-  function($controller, $scope, $uibModalInstance, StateEditorService) {
+  'taggedSkillMisconceptionId',
+  function(
+      $controller, $scope, $uibModalInstance, StateEditorService,
+      taggedSkillMisconceptionId) {
     $controller('ConfirmOrCancelModalController', {
       $scope: $scope,
       $uibModalInstance: $uibModalInstance
     });
-    $scope.misconceptionsBySkill =
-      StateEditorService.getMisconceptionsBySkill();
-    $scope.selectedMisconception = null;
-    $scope.selectedMisconceptionSkillId = null;
-    $scope.misconceptionFeedbackIsUsed = false;
-
-    $scope.selectMisconception = function(
-        misconception, skillId) {
-      $scope.selectedMisconception = angular.copy(misconception);
-      $scope.selectedMisconceptionSkillId = skillId;
-    };
-
-    $scope.toggleMisconceptionFeedbackUsage = function() {
-      $scope.misconceptionFeedbackIsUsed =
-        !$scope.misconceptionFeedbackIsUsed;
-    };
+    $scope.misconceptionsBySkill = (
+      StateEditorService.getMisconceptionsBySkill());
+    $scope.tempSelectedMisconception = null;
+    $scope.tempSelectedMisconceptionSkillId = null;
+    $scope.tempMisconceptionFeedbackIsUsed = true;
+    $scope.taggedSkillMisconceptionId = (
+      taggedSkillMisconceptionId);
 
     $scope.done = function() {
       $uibModalInstance.close({
-        misconception: $scope.selectedMisconception,
-        misconceptionSkillId: $scope.selectedMisconceptionSkillId,
-        feedbackIsUsed: $scope.misconceptionFeedbackIsUsed
+        misconception: $scope.tempSelectedMisconception,
+        misconceptionSkillId: $scope.tempSelectedMisconceptionSkillId,
+        feedbackIsUsed: $scope.tempMisconceptionFeedbackIsUsed
       });
+    };
+
+    $scope.cancel = function() {
+      $uibModalInstance.dismiss('cancel');
     };
   }
 ]);
