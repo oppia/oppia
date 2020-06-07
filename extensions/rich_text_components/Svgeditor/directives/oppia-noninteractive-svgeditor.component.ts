@@ -24,14 +24,17 @@ require('pages/exploration-player-page/services/image-preloader.service.ts');
 require('services/assets-backend-api.service.ts');
 require('services/context.service.ts');
 require('services/html-escaper.service.ts');
+require('services/image-local-storage.service.ts');
 
 angular.module('oppia').component('oppiaNoninteractiveSvgeditor', {
   template: require('./svgeditor.component.html'),
   controller: [
     '$attrs', 'AssetsBackendApiService', 'ContextService',
-    'HtmlEscaperService', 'ImagePreloaderService',
+    'HtmlEscaperService', 'ImageLocalStorageService',
+    'ImagePreloaderService', 'IMAGE_SAVE_DESTINATION_LOCAL_STORAGE',
     function($attrs, AssetsBackendApiService, ContextService,
-        HtmlEscaperService, ImagePreloaderService) {
+        HtmlEscaperService, ImageLocalStorageService,
+        ImagePreloaderService, IMAGE_SAVE_DESTINATION_LOCAL_STORAGE) {
       var ctrl = this;
       ctrl.$onInit = function() {
         ctrl.filename = HtmlEscaperService.escapedJsonToObj(
@@ -42,9 +45,16 @@ angular.module('oppia').component('oppiaNoninteractiveSvgeditor', {
           height: ctrl.dimensions.height + 'px',
           width: ctrl.dimensions.width + 'px'
         };
-        ctrl.svgUrl = AssetsBackendApiService.getImageUrlForPreview(
-          ContextService.getEntityType(), ContextService.getEntityId(),
-          ctrl.filename);
+        if (
+          ContextService.getImageSaveDestination() ===
+          IMAGE_SAVE_DESTINATION_LOCAL_STORAGE) {
+          ctrl.svgUrl = ImageLocalStorageService.getObjectUrlForImage(
+            ctrl.filename);
+        } else {
+          ctrl.svgUrl = AssetsBackendApiService.getImageUrlForPreview(
+            ContextService.getEntityType(), ContextService.getEntityId(),
+            ctrl.filename);
+        }
 
         ctrl.svgAltText = '';
         if ($attrs.altWithValue) {

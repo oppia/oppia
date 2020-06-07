@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for the literally canvas diagram editor.
  */
 
+import { AppConstants } from 'app.constants';
+
 describe('LiterallyCanvasDiagramEditor', function() {
   var alertSpy = null;
   var ecs = null;
@@ -80,6 +82,7 @@ describe('LiterallyCanvasDiagramEditor', function() {
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('AssetsBackendApiService', mockabas);
+    $provide.value('ImageLocalStorageService', {});
     $provide.value('ImagePreloaderService', mockips);
     $provide.value('ImageUploadHelperService', mockiuhs);
   }));
@@ -93,6 +96,8 @@ describe('LiterallyCanvasDiagramEditor', function() {
     alertSpy = spyOn(AlertsService, 'addWarning').and.callThrough();
     spyOn(ecs, 'getEntityType').and.returnValue('exploration');
     spyOn(ecs, 'getEntityId').and.returnValue('1');
+    spyOn(ecs, 'getImageSaveDestination').and.returnValue(
+      AppConstants.IMAGE_SAVE_DESTINATION_SERVER);
     spyOn(CsrfService, 'getTokenAsync').and.callFake(function() {
       var deferred = $q.defer();
       deferred.resolve('sample-csrf-token');
@@ -214,8 +219,8 @@ describe('LiterallyCanvasDiagramEditor', function() {
   it('should allow user to continue editing the diagram', function() {
     LCDiagramEditorCtrl.savedSVGDiagram = linesvg;
     LCDiagramEditorCtrl.continueDiagramEditing();
-    expect(LCDiagramEditorCtrl.diagramStatus).toBe('editing');
     LCDiagramEditorCtrl.lc = mockLiterallyCanvas;
+    expect(LCDiagramEditorCtrl.diagramStatus).toBe('editing');
   });
 });
 
@@ -275,3 +280,118 @@ describe('LiterallyCanvasDiagramEditor initialized with value attribute',
     });
   }
 );
+
+describe('LiterallyCanvasDiagramEditor with image save destination as ' +
+  'local storage', function() {
+  var ecs = null;
+  var LCDiagramEditorCtrl = null;
+  var defaultsvg = (
+    '<svg xmlns="http://www.w3.org/2000/svg" width="450" height="350" view' +
+    'Box="0 0 450 350"> <rect width="450" height="350" x="0" y="0" fill="t' +
+    'ransparent" /> <g transform="translate(0, 0)">  </g> </svg>');
+  var linesvg = (
+    '<svg xmlns="http://www.w3.org/2000/' +
+    'svg" width="450" height="350" viewBox="0 0 450 350"> <rect width="450" ' +
+    'height="350" x="0" y="0" fill="transparent" /> <g transform="translate(' +
+    '0, 0)"> <g id="line-241c7047-7297-9aa7-486d-818cfebd30d7"><line x1="105' +
+    '.5" y1="97.125" x2="145.5" y2="130.125" stroke="hsla(0, 0%, 0%, 1)" fil' +
+    'l="undefined" stroke-width="2" stroke-linecap="round"></line></g> </g> ' +
+    '</svg>');
+  var dataUrl = 'data:image/svg+xml;utf8,' + linesvg;
+
+  var mockLiterallyCanvas = {
+    currentSvg: defaultsvg,
+    _shapesInProgress: [],
+    setImageSize: function(width, height) {
+      var text = (
+        'The updated diagram width is ' + width +
+        ' and height is ' + height);
+      return text;
+    },
+    getSVGString: function() {
+      return this.currentSvg;
+    },
+    teardown: function() {
+      return 'LiterallyCanvas is removed';
+    }
+  };
+
+  var mockilss = {
+    getObjectUrlForImage: function(filename) {
+      return dataUrl;
+    },
+    saveImage: function(filename, imageData) {
+      return 'Image file save.';
+    },
+    deleteImage: function(filename) {
+      return 'Image file is deleted.';
+    }
+  };
+
+  var mockiuhs = {
+    convertImageDataToImageFile: function(svgDataUri) {
+      return new Blob();
+    },
+    generateImageFilename: function(height, widht, extension) {
+      return height + '_' + widht + '.' + extension;
+    }
+  };
+
+  var mockips = {
+    getDimensionsOfImage: function() {
+      return {
+        width: 450,
+        height: 350
+      };
+    }
+  };
+
+  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('AssetsBackendApiService', {});
+    $provide.value('ImageLocalStorageService', mockilss);
+    $provide.value('ImagePreloaderService', mockips);
+    $provide.value('ImageUploadHelperService', mockiuhs);
+  }));
+  beforeEach(angular.mock.inject(function($injector, $componentController) {
+    ecs = $injector.get('ContextService');
+    spyOn(ecs, 'getImageSaveDestination').and.returnValue(
+      AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE);
+
+    LCDiagramEditorCtrl = $componentController(
+      'literallyCanvasDiagramEditor');
+    var mockDocument = document.createElement('div');
+    mockDocument.setAttribute('id', LCDiagramEditorCtrl.lcID);
+    var $document = angular.element(document);
+    $document.find('body').append(mockDocument.outerHTML);
+    LCDiagramEditorCtrl.$onInit();
+    LCDiagramEditorCtrl.lc = mockLiterallyCanvas;
+  }));
+
+
+  it('should save svg file to local storage created by literallyCanvas',
+    function(done) {
+      LCDiagramEditorCtrl.lc.currentSvg = linesvg;
+      LCDiagramEditorCtrl.saveSVGFile();
+
+      // A setTimeout is being used here in order to wait for both the image
+      // and the reader onload function. A time of 100ms is used because
+      // there are two onload functions.
+      setTimeout(function() {
+        expect(LCDiagramEditorCtrl.data.savedSVGFileName).toBe('350_450.svg');
+        expect(LCDiagramEditorCtrl.data.savedSVGUrl.toString()).toBe(dataUrl);
+        expect(LCDiagramEditorCtrl.validate()).toBe(true);
+        done();
+      }, 100);
+    }
+  );
+
+  it('should allow user to continue editing the diagram and delete the ' +
+    'image from local storage', function() {
+    LCDiagramEditorCtrl.data.savedSVGFileName = 'image.svg';
+    LCDiagramEditorCtrl.savedSVGDiagram = linesvg;
+    LCDiagramEditorCtrl.continueDiagramEditing();
+    LCDiagramEditorCtrl.lc = mockLiterallyCanvas;
+    expect(LCDiagramEditorCtrl.diagramStatus).toBe('editing');
+  });
+});

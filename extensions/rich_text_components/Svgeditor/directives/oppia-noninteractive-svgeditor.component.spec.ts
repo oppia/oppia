@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for the oppia noninteractive svg editor component.
  */
 
+import { AppConstants } from 'app.constants';
+
 describe('oppiaNoninteractiveSvgeditor', function() {
   var ecs = null;
   var ctrl = null;
@@ -37,6 +39,7 @@ describe('oppiaNoninteractiveSvgeditor', function() {
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('AssetsBackendApiService', mockabas);
     $provide.value('ImagePreloaderService', mockips);
+    $provide.value('ImageLocalStorageService', {});
     $provide.value('$attrs', {
       svgFilenameWithValue: '&quot;svgFilename.svg&quot;',
       altWithValue: '&quot;altText&quot;'
@@ -46,6 +49,51 @@ describe('oppiaNoninteractiveSvgeditor', function() {
     ecs = $injector.get('ContextService');
     spyOn(ecs, 'getEntityType').and.returnValue('exploration');
     spyOn(ecs, 'getEntityId').and.returnValue('1');
+    spyOn(ecs, 'getImageSaveDestination').and.returnValue(
+      AppConstants.IMAGE_SAVE_DESTINATION_SERVER);
+    ctrl = $componentController('oppiaNoninteractiveSvgeditor');
+    ctrl.$onInit();
+  }));
+
+  it('should fetch the svg file', function() {
+    expect(ctrl.filename).toBe('svgFilename.svg');
+    expect(ctrl.svgAltText).toBe('altText');
+    expect(ctrl.svgUrl).toBe('imageUrl:exploration_1_svgFilename.svg');
+  });
+});
+
+describe('oppiaNoninteractiveSvgeditor with image save destination as' +
+  ' local storage', function() {
+  var ecs = null;
+  var ctrl = null;
+  var mockilss = {
+    getObjectUrlForImage: function() {
+      return 'imageUrl:exploration_1_svgFilename.svg';
+    }
+  };
+  var mockips = {
+    getDimensionsOfImage: function() {
+      return {
+        width: 450,
+        height: 350
+      };
+    }
+  };
+
+  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('AssetsBackendApiService', {});
+    $provide.value('ImageLocalStorageService', mockilss);
+    $provide.value('ImagePreloaderService', mockips);
+    $provide.value('$attrs', {
+      svgFilenameWithValue: '&quot;svgFilename.svg&quot;',
+      altWithValue: '&quot;altText&quot;'
+    });
+  }));
+  beforeEach(angular.mock.inject(function($injector, $componentController) {
+    ecs = $injector.get('ContextService');
+    spyOn(ecs, 'getImageSaveDestination').and.returnValue(
+      AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE);
     ctrl = $componentController('oppiaNoninteractiveSvgeditor');
     ctrl.$onInit();
   }));

@@ -22,6 +22,7 @@ require('services/alerts.service.ts');
 require('services/assets-backend-api.service.ts');
 require('services/context.service.ts');
 require('services/csrf-token.service.ts');
+require('services/image-local-storage.service.ts');
 require('services/image-upload-helper.service.ts');
 
 const LC = require('literallycanvas');
@@ -34,14 +35,16 @@ angular.module('oppia').component('literallyCanvasDiagramEditor', {
     value: '='
   },
   controller: [
-    '$http', '$q', '$sce', '$scope', 'AlertsService', 'AssetsBackendApiService',
-    'ContextService', 'CsrfTokenService', 'ImagePreloaderService',
+    '$http', '$q', '$sce', '$scope', 'AlertsService',
+    'AssetsBackendApiService', 'ContextService', 'CsrfTokenService',
+    'ImageLocalStorageService', 'ImagePreloaderService',
     'ImageUploadHelperService', 'LiterallyCanvasHelperService',
-    'UrlInterpolationService',
-    function($http, $q, $sce, $scope, AlertsService, AssetsBackendApiService,
-        ContextService, CsrfTokenService, ImagePreloaderService,
+    'UrlInterpolationService', 'IMAGE_SAVE_DESTINATION_LOCAL_STORAGE',
+    function($http, $q, $sce, $scope, AlertsService,
+        AssetsBackendApiService, ContextService, CsrfTokenService,
+        ImageLocalStorageService, ImagePreloaderService,
         ImageUploadHelperService, LiterallyCanvasHelperService,
-        UrlInterpolationService) {
+        UrlInterpolationService, IMAGE_SAVE_DESTINATION_LOCAL_STORAGE) {
       const ctrl = this;
       // These max width and height paramameters were determined by manual
       // testing and reference from OUTPUT_IMAGE_MAX_WIDTH_PX in
@@ -67,6 +70,7 @@ angular.module('oppia').component('literallyCanvasDiagramEditor', {
       };
       ctrl.entityId = ContextService.getEntityId();
       ctrl.entityType = ContextService.getEntityType();
+      ctrl.imageSaveDestination = ContextService.getImageSaveDestination();
       ctrl.svgContainerStyle = {};
 
       ctrl.onWidthInputBlur = function() {
@@ -117,6 +121,13 @@ angular.module('oppia').component('literallyCanvasDiagramEditor', {
       };
 
       var getTrustedResourceUrlForSVGFileName = function(svgFileName) {
+        if (
+          ctrl.imageSaveDestination ===
+          IMAGE_SAVE_DESTINATION_LOCAL_STORAGE) {
+          var imageUrl = ImageLocalStorageService.getObjectUrlForImage(
+            svgFileName);
+          return $sce.trustAsResourceUrl(imageUrl);
+        }
         var encodedFilepath = window.encodeURIComponent(svgFileName);
         return $sce.trustAsResourceUrl(
           AssetsBackendApiService.getImageUrlForPreview(
@@ -181,6 +192,30 @@ angular.module('oppia').component('literallyCanvasDiagramEditor', {
         });
       };
 
+      ctrl.saveImageToLocalStorage = function(
+          dimensions, resampledFile) {
+        var filename = ImageUploadHelperService.generateImageFilename(
+          dimensions.height, dimensions.width, 'svg');
+        var reader = new FileReader();
+        reader.onload = function() {
+          var imageData = reader.result;
+          ImageLocalStorageService.saveImage(filename, imageData);
+          var img = new Image();
+          img.onload = function() {
+            ctrl.setSavedSVGFilename(filename, false);
+            var dimensions = (
+              ImagePreloaderService.getDimensionsOfImage(filename));
+            ctrl.svgContainerStyle = {
+              height: dimensions.height + 'px',
+              width: dimensions.width + 'px'
+            };
+            $scope.$apply();
+          };
+          img.src = getTrustedResourceUrlForSVGFileName(filename);
+        };
+        reader.readAsDataURL(resampledFile);
+      };
+
       ctrl.saveSVGFile = function() {
         AlertsService.clearWarnings();
 
@@ -202,25 +237,32 @@ angular.module('oppia').component('literallyCanvasDiagramEditor', {
           resampledFile = (
             ImageUploadHelperService.convertImageDataToImageFile(
               svgDataURI));
-          ctrl.postSVGToServer(dimensions, resampledFile).then(function(data) {
-            // Pre-load image before marking the image as saved.
-            var img = new Image();
-            img.onload = function() {
-              ctrl.setSavedSVGFilename(data.filename, false);
-              var dimensions = (
-                ImagePreloaderService.getDimensionsOfImage(data.filename));
-              ctrl.svgContainerStyle = {
-                height: dimensions.height + 'px',
-                width: dimensions.width + 'px'
+          if (
+            ctrl.imageSaveDestination ===
+            IMAGE_SAVE_DESTINATION_LOCAL_STORAGE) {
+            ctrl.saveImageToLocalStorage(dimensions, resampledFile);
+          } else {
+            ctrl.postSVGToServer(
+              dimensions, resampledFile).then(function(data) {
+              // Pre-load image before marking the image as saved.
+              var img = new Image();
+              img.onload = function() {
+                ctrl.setSavedSVGFilename(data.filename, false);
+                var dimensions = (
+                  ImagePreloaderService.getDimensionsOfImage(data.filename));
+                ctrl.svgContainerStyle = {
+                  height: dimensions.height + 'px',
+                  width: dimensions.width + 'px'
+                };
+                $scope.$apply();
               };
+              img.src = getTrustedResourceUrlForSVGFileName(data.filename);
+            }, function(parsedResponse) {
+              AlertsService.addWarning(
+                parsedResponse.error || 'Error communicating with server.');
               $scope.$apply();
-            };
-            img.src = getTrustedResourceUrlForSVGFileName(data.filename);
-          }, function(parsedResponse) {
-            AlertsService.addWarning(
-              parsedResponse.error || 'Error communicating with server.');
-            $scope.$apply();
-          });
+            });
+          }
         }
       };
 
@@ -229,6 +271,13 @@ angular.module('oppia').component('literallyCanvasDiagramEditor', {
       };
 
       ctrl.continueDiagramEditing = function() {
+        if (
+          ctrl.data.savedSVGFileName &&
+          ctrl.imageSaveDestination ===
+          IMAGE_SAVE_DESTINATION_LOCAL_STORAGE) {
+          ImageLocalStorageService.deleteImage(
+            ctrl.data.savedSVGFileName);
+        }
         ctrl.diagramStatus = 'editing';
         if (typeof ctrl.lc !== 'undefined') {
           ctrl.lc.teardown();
