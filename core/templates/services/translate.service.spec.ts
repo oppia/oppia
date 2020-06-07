@@ -124,6 +124,8 @@ describe('Translate service', () => {
     expect(translate.getInterpolatedString(
       'I18n_t_2', {val: 'World'})).toBe('Hello World');
     expect(translate.getInterpolatedString(
+      'I18n_t_2', {val2: 'World'})).toBe('Hello <[val]>');
+    expect(translate.getInterpolatedString(
       'I18n_t_3', {val: 'World'})).toBe('I18n_t_3');
   }));
 
