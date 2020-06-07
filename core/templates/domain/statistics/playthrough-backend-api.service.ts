@@ -59,11 +59,11 @@ export class PlaythroughBackendApiService {
         exploration_id: playthrough.expId
       });
 
-    return this.http.post(playthroughUrl, {
+    return this.http.post<IStorePlaythroughBackendResponse>(playthroughUrl, {
       playthrough_data: playthrough.toBackendDict(),
       issue_schema_version: issueSchemaVersion,
       playthrough_id: playthroughId
-    }).toPromise().then((response: IStorePlaythroughBackendResponse) => {
+    }).toPromise().then(response => {
       return new StorePlaythroughResponse(
         response.playthrough_stored, response.playthrough_id);
     });

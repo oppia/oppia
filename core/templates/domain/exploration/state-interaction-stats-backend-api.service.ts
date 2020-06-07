@@ -45,11 +45,12 @@ export class StateInteractionStatsBackendApiService {
     private urlInterpolationService: UrlInterpolationService) {}
 
   getStats(explorationId: string, name: string): Promise<VisualizationInfo[]> {
-    return this.http.get(this.urlInterpolationService.interpolateUrl(
-      this.STATE_INTERACTION_STATS_URL_TEMPLATE, {
-        exploration_id: explorationId,
-        state_name: name
-      })).toPromise().then((backendDict: IStateInteractionStatsBackendDict) => {
+    return this.http.get<IStateInteractionStatsBackendDict>(
+      this.urlInterpolationService.interpolateUrl(
+        this.STATE_INTERACTION_STATS_URL_TEMPLATE, {
+          exploration_id: explorationId,
+          state_name: name
+        })).toPromise().then(backendDict => {
       let visualizationInfoObjects = backendDict.visualizations_info.map((
           visInfoDict) => {
         return this.visualizationInfoObjectFactory.createFromBackendDict(

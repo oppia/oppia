@@ -68,10 +68,10 @@ export class ExplorationRecommendationsBackendApiService {
       recommendationsUrlParams.current_node_id = currentNodeId;
     }
 
-    return this.http.get(
+    return this.http.get<IExplorationSummariesBackendDict>(
       '/explorehandler/recommendations/' + explorationId, {
         params: recommendationsUrlParams
-      }).toPromise().then((backendDict: IExplorationSummariesBackendDict) => {
+      }).toPromise().then(backendDict => {
       return backendDict.summaries.map((
           summaryDict: IExplorationSummaryBackendDict) => {
         return this.explorationSummaryObjectFactory.createFromBackendDict(

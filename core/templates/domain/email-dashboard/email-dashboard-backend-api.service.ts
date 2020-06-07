@@ -61,9 +61,10 @@ export class EmailDashboardBackendApiService {
     if (cursor) {
       params.cursor = cursor;
     }
-    return this.http.get(this.QUERY_DATA_URL, {
-      params: params
-    }).toPromise().then((data: IEmailDashboardQueryResultsBackendDict) => {
+    return this.http.get<IEmailDashboardQueryResultsBackendDict>(
+      this.QUERY_DATA_URL, {
+        params: params
+      }).toPromise().then(data => {
       let emailDashboardQueryResultsObject = (
         this.queryResultsObjectFactory.createFromBackendDict(data));
       return emailDashboardQueryResultsObject;
@@ -71,11 +72,12 @@ export class EmailDashboardBackendApiService {
   }
 
   fetchQuery(queryId: string): Promise<EmailDashboardQuery> {
-    return this.http.get(this.QUERY_STATUS_CHECK_URL, {
-      params: {
-        query_id: queryId
-      }
-    }).toPromise().then((data: IEmailDashboardQueryBackendDict) => {
+    return this.http.get<IEmailDashboardQueryBackendDict>(
+      this.QUERY_STATUS_CHECK_URL, {
+        params: {
+          query_id: queryId
+        }
+      }).toPromise().then(data => {
       let queryObject = this.queryObjectFactory.createFromBackendDict(data);
       return queryObject;
     });
@@ -91,9 +93,9 @@ export class EmailDashboardBackendApiService {
       edited_fewer_than_n_exps: data.editedFewerThanNExps
     };
 
-    return this.http.post(this.QUERY_DATA_URL, {
-      data: postData}).toPromise().then((
-        data: IEmailDashboardQueryBackendDict) => {
+    return this.http.post<IEmailDashboardQueryBackendDict>(
+      this.QUERY_DATA_URL, {
+        data: postData}).toPromise().then(data => {
       let queryObject = this.queryObjectFactory.createFromBackendDict(data);
       return queryObject;
     });

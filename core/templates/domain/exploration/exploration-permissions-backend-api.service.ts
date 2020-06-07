@@ -46,13 +46,13 @@ export class ExplorationPermissionsBackendApiService {
         exploration_id: this.contextService.getExplorationId()
       });
 
-    return this.http.get(explorationPermissionsUrl).toPromise().then(
-      (response: IExplorationPermissionsBackendDict) => {
-        let permissionsObject = (
-          this.explorationPermissionsObjectFactory.createFromBackendDict(
-            response));
-        return permissionsObject;
-      });
+    return this.http.get<IExplorationPermissionsBackendDict>(
+      explorationPermissionsUrl).toPromise().then(response => {
+      let permissionsObject = (
+        this.explorationPermissionsObjectFactory.createFromBackendDict(
+          response));
+      return permissionsObject;
+    });
   }
 }
 

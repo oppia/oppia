@@ -37,9 +37,8 @@ export class AdminBackendApiService {
     private adminDataObjectFactory: AdminDataObjectFactory) {}
 
   getData(): Promise<AdminData> {
-    return this.http.get(
-      AdminPageConstants.ADMIN_HANDLER_URL).toPromise().then((
-        adminData: IAdminDataBackendDict) => {
+    return this.http.get<IAdminDataBackendDict>(
+      AdminPageConstants.ADMIN_HANDLER_URL).toPromise().then(adminData => {
       return this.adminDataObjectFactory.createFromBackendDict(adminData);
     });
   }
