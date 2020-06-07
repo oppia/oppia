@@ -17,9 +17,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import datetime
 import logging
-import math
 
 from constants import constants
 from core import jobs
@@ -48,6 +46,7 @@ from core.platform import models
 from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
 import feconf
+import utils
 
 (exp_models, job_models, opportunity_models, audit_models) = (
     models.Registry.import_models(
@@ -1249,11 +1248,18 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
         user_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        current_datetime = datetime.datetime.utcnow()
-        with self.mock_datetime_utcnow(current_datetime):
-            # To get the current time in seconds.
-            time_of_query = (datetime.datetime.utcnow() - datetime.datetime(
-                1970, 1, 1)).total_seconds()
+        creation_time_in_millisecs = utils.get_current_time_in_millisecs()
+        mock_get_current_time_in_millisecs = lambda: creation_time_in_millisecs
+        # Since the UsernameChangeAuditModel's ID is formed from the user ID and
+        # a millisecond timestamp we need to make sure that
+        # get_current_time_in_millisecs returns the same value as we have saved
+        # into current_time_in_millisecs. If we don't force the same value via
+        # swap flakes can occur, since as the time flows the saved milliseconds
+        # can differ from the milliseconds saved into the
+        # UsernameChangeAuditModel's ID.
+        with self.swap(
+            utils, 'get_current_time_in_millisecs',
+            mock_get_current_time_in_millisecs):
             self.put_json(
                 '/updateusernamehandler',
                 payload={
@@ -1265,8 +1271,7 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
             audit_models.UsernameChangeAuditModel.has_reference_to_user_id(
                 user_id))
 
-        model_id = '%s.%s' % (user_id, int(math.floor(time_of_query)))
-
+        model_id = '%s.%d' % (user_id, creation_time_in_millisecs)
         username_change_audit_model = (
             audit_models.UsernameChangeAuditModel.get(model_id))
 
