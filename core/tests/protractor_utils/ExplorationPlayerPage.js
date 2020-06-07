@@ -82,7 +82,7 @@ var ExplorationPlayerPage = function() {
 
   var audioBar = element(
     by.css('.protractor-test-audio-bar'));
-  var audioSelect = element(
+  var audioSelector = element(
     by.css('.protractor-test-audio-lang-select'));
   var playButton = element(
     by.css('.protractor-test-play-circle'));
@@ -117,9 +117,9 @@ var ExplorationPlayerPage = function() {
 
   this.changeLanguage = async function(language) {
     await waitFor.visibilityOf(
-      audioSelect,
+      audioSelector,
       'Language selector takes too long to appear.');
-    await audioSelect.element(
+    await audioSelector.element(
       by.cssContainingText('option', language)).click();
   };
 

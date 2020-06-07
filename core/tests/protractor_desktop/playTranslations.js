@@ -73,7 +73,7 @@ describe('Test if Translations Play', function() {
     await users.logout();
   });
 
-  it('should play and pause audio translations', async function() {
+  it('should play and pause voiceovers', async function() {
     await users.login('testTranslations@translations.com');
     await libraryPage.get();
     await libraryPage.playExploration('translationPlayerTest');
@@ -85,7 +85,6 @@ describe('Test if Translations Play', function() {
   });
 
   it('should play translations for multiple languages', async function() {
-    await browser.get('/');
     await creatorDashboardPage.get();
     await creatorDashboardPage.editExploration('translationPlayerTest');
     await explorationEditorPage.navigateToTranslationTab();
