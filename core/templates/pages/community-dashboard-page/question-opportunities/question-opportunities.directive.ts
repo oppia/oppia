@@ -21,6 +21,9 @@ require('components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts');
 require(
   'components/forms/schema-based-editors/schema-based-editor.directive.ts');
 require(
+  'components/question-difficulty-selector/' +
+  'question-difficulty-selector.directive.ts');
+require(
   'components/question-directives/question-editor/' +
   'question-editor.directive.ts');
 require(
