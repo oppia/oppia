@@ -479,7 +479,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'summary-list-header.directive.ts',
     'supplemental-card.directive.ts',
     'svm-prediction.service.ts',
-    'tag-misconception-modal.controller.ts',
     'teach-oppia-modal.controller.ts',
     'teacher.ts',
     'teacher2.ts',
