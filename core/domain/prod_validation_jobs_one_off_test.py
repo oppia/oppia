@@ -495,7 +495,7 @@ class UsernameChangeAuditModelValidatorTests(test_utils.GenericTestBase):
         admin_model.put()
 
         model_id = (
-            '%s.%s' % (self.admin_id, utils.get_current_time_in_millisecs()))
+            '%s.%d' % (self.admin_id, utils.get_current_time_in_millisecs()))
         self.model_instance = audit_models.UsernameChangeAuditModel(
             id=model_id, committer_id=self.admin_id,
             old_username=USER_NAME, new_username='new')
@@ -551,7 +551,7 @@ class UsernameChangeAuditModelValidatorTests(test_utils.GenericTestBase):
 
     def test_model_with_invalid_id(self):
         model_invalid_id = (
-            '%s.%s' % (utils.get_current_time_in_millisecs(), self.admin_id))
+            '%d.%s' % (utils.get_current_time_in_millisecs(), self.admin_id))
         model_instance_with_invalid_id = audit_models.UsernameChangeAuditModel(
             id=model_invalid_id, committer_id=self.admin_id,
             old_username=USER_NAME, new_username='new')

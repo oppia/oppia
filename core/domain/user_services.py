@@ -2021,7 +2021,7 @@ def log_username_change(committer_id, old_username, new_username):
             changed to.
     """
 
-    model_id = '%s.%s' % (committer_id, utils.get_current_time_in_millisecs())
+    model_id = '%s.%d' % (committer_id, utils.get_current_time_in_millisecs())
     audit_models.UsernameChangeAuditModel(
         id=model_id, committer_id=committer_id, old_username=old_username,
         new_username=new_username).put()

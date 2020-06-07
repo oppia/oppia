@@ -1271,7 +1271,7 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
             audit_models.UsernameChangeAuditModel.has_reference_to_user_id(
                 user_id))
 
-        model_id = '%s.%s' % (user_id, creation_time_in_millisecs)
+        model_id = '%s.%d' % (user_id, creation_time_in_millisecs)
         username_change_audit_model = (
             audit_models.UsernameChangeAuditModel.get(model_id))
 
