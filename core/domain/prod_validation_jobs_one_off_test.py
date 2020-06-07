@@ -494,7 +494,8 @@ class UsernameChangeAuditModelValidatorTests(test_utils.GenericTestBase):
         admin_model.role = feconf.ROLE_ID_ADMIN
         admin_model.put()
 
-        model_id = '%s.%s' % (self.admin_id, int(math.floor(time.time())))
+        model_id = (
+            '%s.%d' % (self.admin_id, utils.get_current_time_in_millisecs()))
         self.model_instance = audit_models.UsernameChangeAuditModel(
             id=model_id, committer_id=self.admin_id,
             old_username=USER_NAME, new_username='new')
@@ -549,8 +550,8 @@ class UsernameChangeAuditModelValidatorTests(test_utils.GenericTestBase):
         run_job_and_check_output(self, expected_output)
 
     def test_model_with_invalid_id(self):
-        model_invalid_id = '%s.%s' % (
-            int(math.floor(time.time())), self.admin_id)
+        model_invalid_id = (
+            '%d.%s' % (utils.get_current_time_in_millisecs(), self.admin_id))
         model_instance_with_invalid_id = audit_models.UsernameChangeAuditModel(
             id=model_invalid_id, committer_id=self.admin_id,
             old_username=USER_NAME, new_username='new')
@@ -9031,14 +9032,15 @@ class StorySummaryModelValidatorTests(test_utils.GenericTestBase):
             u'[u\'fully-validated StorySummaryModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 
-    def test_model_with_invalid_node_count(self):
-        self.model_instance_0.node_count = 10
+    def test_model_with_invalid_node_titles(self):
+        self.model_instance_0.node_titles = ['Title 1']
         self.model_instance_0.put()
         expected_output = [
             (
-                u'[u\'failed validation check for node count check of '
-                'StorySummaryModel\', [u\'Entity id 0: Node count: 10 does '
-                'not match the number of nodes in story_contents dict: []\']]'
+                u'[u\'failed validation check for node titles check of '
+                'StorySummaryModel\', [u"Entity id 0: Node titles: '
+                '[u\'Title 1\'] does not match the nodes in story_contents '
+                'dict: []"]]'
             ), u'[u\'fully-validated StorySummaryModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 

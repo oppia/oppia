@@ -933,6 +933,7 @@ class Topic(python_utils.OBJECT):
         versioned_subtopics dict from current_version to
         current_version + 1. Note that the versioned_subtopics being
         passed in is modified in-place.
+
         Args:
             versioned_subtopics: dict. A dict with two keys:
                 - schema_version: str. The schema version for the
@@ -1119,6 +1120,7 @@ class Topic(python_utils.OBJECT):
         Raises:
             Exception. The new_subtopic_id and the expected next subtopic id
                 differs.
+
         Returns:
             int. The id of the newly created subtopic.
         """
