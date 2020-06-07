@@ -57,33 +57,34 @@ export class PlaythroughService {
     private stopwatchObjectFactory: StopwatchObjectFactory,
     private urlInterpolationService: UrlInterpolationService) {}
 
-    playthrough: Playthrough = null;
-    expStopwatch: Stopwatch = null;
-    isLearnerInSamplePopulation: boolean = null;
-    multipleIncorrectStateName: MultipleIncorrectStateNames = {
+    static playthrough: Playthrough = null;
+    static expStopwatch: Stopwatch = null;
+    static isLearnerInSamplePopulation: boolean = null;
+    static multipleIncorrectStateName: MultipleIncorrectStateNames = {
       state_name: null,
       num_times_incorrect: null
     };
-    cycleIdentifier: CycleIdentifier = {
+    static cycleIdentifier: CycleIdentifier = {
       cycle: null,
       num_cycles: null
     };
-    visitedStates: string[] = [];
-    misTracker: boolean = false;
-    cstTracker: boolean = false;
+    static visitedStates: string[] = [];
+    static misTracker: boolean = false;
+    static cstTracker: boolean = false;
 
     private removeOldQuitAction(): void {
-      var quitAction = this.playthrough.actions[
-        this.playthrough.actions.length - 1];
+      let quitAction = PlaythroughService.playthrough.actions[
+        PlaythroughService.playthrough.actions.length - 1];
       // After the second quit action is recorded, the first quit is removed
       // using this method. This ensures that there are only two quit actions
       // in the playthrough actions list at a time.
-      this.playthrough.actions = this.playthrough.actions.filter(
-        (action) => {
-          return (
-            action.actionType !== AppConstants.ACTION_TYPE_EXPLORATION_QUIT);
-        });
-      this.playthrough.actions.push(quitAction);
+      PlaythroughService.playthrough.actions = (
+        PlaythroughService.playthrough.actions.filter(
+          (action) => {
+            return (
+              action.actionType !== AppConstants.ACTION_TYPE_EXPLORATION_QUIT);
+          }));
+      PlaythroughService.playthrough.actions.push(quitAction);
     }
 
     private determineIfLearnerIsInSamplePopulation(
@@ -92,72 +93,75 @@ export class PlaythroughService {
     }
 
     private createMultipleIncorrectIssueTracker(initStateName: string): void {
-      if (this.misTracker) {
+      if (PlaythroughService.misTracker) {
         return;
       }
-      this.multipleIncorrectStateName = {
+      PlaythroughService.multipleIncorrectStateName = {
         state_name: initStateName,
         num_times_incorrect: 0
       };
-      this.misTracker = true;
+      PlaythroughService.misTracker = true;
     }
 
     private createCyclicIssueTracker(initStateName: string): void {
-      if (this.cstTracker) {
+      if (PlaythroughService.cstTracker) {
         return;
       }
-      this.cycleIdentifier = {
+      PlaythroughService.cycleIdentifier = {
         cycle: '',
         num_cycles: 0
       };
-      this.visitedStates.unshift(initStateName);
-      this.cstTracker = true;
+      PlaythroughService.visitedStates.unshift(initStateName);
+      PlaythroughService.cstTracker = true;
     }
 
     private incrementIncorrectAnswerInMultipleIncorrectIssueTracker(): void {
-      this.multipleIncorrectStateName.num_times_incorrect += 1;
+      PlaythroughService.multipleIncorrectStateName.num_times_incorrect += 1;
     }
 
     private recordStateTransitionInMultipleIncorrectIssueTracker(
         destStateName: string): void {
-      if (this.multipleIncorrectStateName.num_times_incorrect <
+      if (PlaythroughService.multipleIncorrectStateName.num_times_incorrect <
         ServicesConstants.NUM_INCORRECT_ANSWERS_THRESHOLD) {
-        this.multipleIncorrectStateName.state_name = destStateName;
-        this.multipleIncorrectStateName.num_times_incorrect = 0;
+        PlaythroughService.multipleIncorrectStateName.state_name = (
+          destStateName);
+        PlaythroughService.multipleIncorrectStateName.num_times_incorrect = 0;
       }
     }
 
     private recordStateTransitionInCyclicIssueTracker(
         destStateName: string): void {
-      if (this.cycleIdentifier.num_cycles <
+      if (PlaythroughService.cycleIdentifier.num_cycles <
         ServicesConstants.NUM_REPEATED_CYCLES_THRESHOLD) {
-        if (this.visitedStates.indexOf(destStateName) !== -1) {
+        if (PlaythroughService.visitedStates.indexOf(destStateName) !== -1) {
           // Cycle identified.
-          var cycleStartIndex = this.visitedStates.indexOf(destStateName);
-          this.visitedStates.push(destStateName);
-          var cycleString = this.visitedStates.slice(
-            cycleStartIndex, this.visitedStates.length
+          let cycleStartIndex = PlaythroughService.visitedStates.indexOf(
+            destStateName);
+          PlaythroughService.visitedStates.push(destStateName);
+          let cycleString = PlaythroughService.visitedStates.slice(
+            cycleStartIndex, PlaythroughService.visitedStates.length
           ).toString();
-          if (this.cycleIdentifier.cycle === cycleString) {
-            this.cycleIdentifier.num_cycles += 1;
+          if (PlaythroughService.cycleIdentifier.cycle === cycleString) {
+            PlaythroughService.cycleIdentifier.num_cycles += 1;
           } else {
-            this.cycleIdentifier.cycle = cycleString;
-            this.cycleIdentifier.num_cycles = 1;
+            PlaythroughService.cycleIdentifier.cycle = cycleString;
+            PlaythroughService.cycleIdentifier.num_cycles = 1;
           }
-          this.visitedStates = [destStateName];
+          PlaythroughService.visitedStates = [destStateName];
         } else {
-          this.visitedStates.push(destStateName);
+          PlaythroughService.visitedStates.push(destStateName);
         }
       }
     }
 
     private isMultipleIncorrectSubmissionsIssue(): boolean {
-      return this.multipleIncorrectStateName.num_times_incorrect >=
-        ServicesConstants.NUM_INCORRECT_ANSWERS_THRESHOLD;
+      return (
+        PlaythroughService.multipleIncorrectStateName.num_times_incorrect >=
+        ServicesConstants.NUM_INCORRECT_ANSWERS_THRESHOLD);
     }
 
     private isCyclicStateTransitionsIssue(): boolean {
-      return this.cycleIdentifier.num_cycles >=
+      return PlaythroughService.cycleIdentifier.num_cycles >=
         ServicesConstants.NUM_REPEATED_CYCLES_THRESHOLD;
     }
 
@@ -171,34 +175,37 @@ export class PlaythroughService {
       // issues to be recorded in case of multiple issues is captured. This
       // follows MultipleIncorrectSubmissionsIssue ->
       // CyclicStateTransitionsIssue -> EarlyQuitIssue.
-      var timeSpentInExpInSecs = this.expStopwatch.getTimeInSecs();
+      let timeSpentInExpInSecs = (
+        PlaythroughService.expStopwatch.getTimeInSecs());
       if (this.isMultipleIncorrectSubmissionsIssue()) {
-        this.playthrough.issueType = (
+        PlaythroughService.playthrough.issueType = (
           AppConstants.ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS);
-        this.playthrough.issueCustomizationArgs = {
+        PlaythroughService.playthrough.issueCustomizationArgs = {
           state_name: {
-            value: this.multipleIncorrectStateName.state_name
+            value: PlaythroughService.multipleIncorrectStateName.state_name
           },
           num_times_answered_incorrectly: {
-            value: this.multipleIncorrectStateName.num_times_incorrect
+            value: (
+              PlaythroughService.multipleIncorrectStateName.num_times_incorrect)
           }
         };
       } else if (this.isCyclicStateTransitionsIssue()) {
-        this.playthrough.issueType = (
+        PlaythroughService.playthrough.issueType = (
           AppConstants.ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS);
-        this.playthrough.issueCustomizationArgs = {
+        PlaythroughService.playthrough.issueCustomizationArgs = {
           state_names: {
-            value: this.cycleIdentifier.cycle.split(',')
+            value: PlaythroughService.cycleIdentifier.cycle.split(',')
           }
         };
       } else if (this.isEarlyQuitIssue(timeSpentInExpInSecs)) {
-        this.playthrough.issueType = AppConstants.ISSUE_TYPE_EARLY_QUIT;
-        this.playthrough.issueCustomizationArgs = {
+        PlaythroughService.playthrough.issueType = (
+          AppConstants.ISSUE_TYPE_EARLY_QUIT);
+        PlaythroughService.playthrough.issueCustomizationArgs = {
           state_name: {
             value:
-              this.playthrough.actions[
-                this.playthrough.actions.length - 1].actionCustomizationArgs
-                .state_name.value
+              PlaythroughService.playthrough.actions[
+                PlaythroughService.playthrough.actions.length - 1
+              ].actionCustomizationArgs.state_name.value
           },
           time_spent_in_exp_in_secs: {
             value: timeSpentInExpInSecs
@@ -208,10 +215,10 @@ export class PlaythroughService {
     }
 
     private storePlaythrough(isNewPlaythrough: boolean): void {
-      var playthroughId = (
-        isNewPlaythrough ? null : this.playthrough.playthroughId);
-      var promise = this.http.post(this.getFullPlaythroughUrl(), {
-        playthrough_data: this.playthrough.toBackendDict(),
+      let playthroughId = (
+        isNewPlaythrough ? null : PlaythroughService.playthrough.playthroughId);
+      let promise = this.http.post(this.getFullPlaythroughUrl(), {
+        playthrough_data: PlaythroughService.playthrough.toBackendDict(),
         issue_schema_version: ServicesConstants.CURRENT_ISSUE_SCHEMA_VERSION,
         playthrough_id: playthroughId
       }).toPromise();
@@ -223,7 +230,8 @@ export class PlaythroughService {
           if (response.playthrough_stored) {
             // In cases where maximum number of playthroughs already exists, the
             // above flag is not True and playthrough ID is not set.
-            this.playthrough.playthroughId = response.playthrough_id;
+            PlaythroughService.playthrough.playthroughId = (
+              response.playthrough_id);
           }
         });
       }
@@ -232,34 +240,45 @@ export class PlaythroughService {
     private getFullPlaythroughUrl(): string {
       return this.urlInterpolationService.interpolateUrl(
         ServicesConstants.STORE_PLAYTHROUGH_URL, {
-          exploration_id: this.playthrough.expId
+          exploration_id: PlaythroughService.playthrough.expId
         });
     }
 
     private isPlaythroughDiscarded(): boolean {
       return !this.explorationFeaturesService.isPlaythroughRecordingEnabled() ||
-        !this.isLearnerInSamplePopulation;
+        !PlaythroughService.isLearnerInSamplePopulation;
     }
 
     initSession(
         explorationId: string, explorationVersion: number,
         playthroughProbability: number): void {
-      this.isLearnerInSamplePopulation =
+      PlaythroughService.isLearnerInSamplePopulation =
         this.determineIfLearnerIsInSamplePopulation(playthroughProbability);
-      this.playthrough = this.playthroughObjectFactory.createNew(
+      PlaythroughService.playthrough = this.playthroughObjectFactory.createNew(
         null, explorationId, explorationVersion, null, {}, []);
-      this.expStopwatch = this.stopwatchObjectFactory.create();
+      PlaythroughService.expStopwatch = this.stopwatchObjectFactory.create();
+      PlaythroughService.multipleIncorrectStateName = {
+        state_name: null,
+        num_times_incorrect: null
+      };
+      PlaythroughService.cycleIdentifier = {
+        cycle: null,
+        num_cycles: null
+      };
+      PlaythroughService.visitedStates = [];
+      PlaythroughService.misTracker = false;
+      PlaythroughService.cstTracker = false;
     }
 
     getPlaythrough(): Playthrough {
-      return this.playthrough;
+      return PlaythroughService.playthrough;
     }
 
     recordExplorationStartAction(initStateName: string): void {
       if (this.isPlaythroughDiscarded()) {
         return;
       }
-      var expStartLearnerAction = this.learnerActionObjectFactory.createNew(
+      let expStartLearnerAction = this.learnerActionObjectFactory.createNew(
         AppConstants.ACTION_TYPE_EXPLORATION_START,
         {
           state_name: {
@@ -268,13 +287,13 @@ export class PlaythroughService {
         },
         ServicesConstants.CURRENT_ACTION_SCHEMA_VERSION);
 
-      this.playthrough.actions.unshift(expStartLearnerAction);
+      PlaythroughService.playthrough.actions.unshift(expStartLearnerAction);
 
       this.createMultipleIncorrectIssueTracker(initStateName);
 
       this.createCyclicIssueTracker(initStateName);
 
-      this.expStopwatch.reset();
+      PlaythroughService.expStopwatch.reset();
     }
 
     recordAnswerSubmitAction(
@@ -284,38 +303,39 @@ export class PlaythroughService {
       if (this.isPlaythroughDiscarded()) {
         return;
       }
-      if (!this.cstTracker) {
+      if (!PlaythroughService.cstTracker) {
         this.createCyclicIssueTracker(stateName);
       }
-      if (!this.misTracker) {
+      if (!PlaythroughService.misTracker) {
         this.createMultipleIncorrectIssueTracker(stateName);
       }
-      this.playthrough.actions.push(this.learnerActionObjectFactory.createNew(
-        AppConstants.ACTION_TYPE_ANSWER_SUBMIT,
-        {
-          state_name: {
-            value: stateName
+      PlaythroughService.playthrough.actions.push(
+        this.learnerActionObjectFactory.createNew(
+          AppConstants.ACTION_TYPE_ANSWER_SUBMIT,
+          {
+            state_name: {
+              value: stateName
+            },
+            dest_state_name: {
+              value: destStateName
+            },
+            interaction_id: {
+              value: interactionId
+            },
+            submitted_answer: {
+              value: answer
+            },
+            feedback: {
+              value: feedback
+            },
+            time_spent_state_in_msecs: {
+              value: timeSpentInStateSecs
+            }
           },
-          dest_state_name: {
-            value: destStateName
-          },
-          interaction_id: {
-            value: interactionId
-          },
-          submitted_answer: {
-            value: answer
-          },
-          feedback: {
-            value: feedback
-          },
-          time_spent_state_in_msecs: {
-            value: timeSpentInStateSecs
-          }
-        },
-        ServicesConstants.CURRENT_ACTION_SCHEMA_VERSION
-      ));
+          ServicesConstants.CURRENT_ACTION_SCHEMA_VERSION
+        ));
 
-      var didNotMoveToNextState = (destStateName === stateName);
+      let didNotMoveToNextState = (destStateName === stateName);
       if (didNotMoveToNextState) {
         this.incrementIncorrectAnswerInMultipleIncorrectIssueTracker();
       } else {
@@ -330,18 +350,19 @@ export class PlaythroughService {
       if (this.isPlaythroughDiscarded()) {
         return;
       }
-      this.playthrough.actions.push(this.learnerActionObjectFactory.createNew(
-        AppConstants.ACTION_TYPE_EXPLORATION_QUIT,
-        {
-          state_name: {
-            value: stateName
+      PlaythroughService.playthrough.actions.push(
+        this.learnerActionObjectFactory.createNew(
+          AppConstants.ACTION_TYPE_EXPLORATION_QUIT,
+          {
+            state_name: {
+              value: stateName
+            },
+            time_spent_in_state_in_msecs: {
+              value: timeSpentInStateSecs
+            }
           },
-          time_spent_in_state_in_msecs: {
-            value: timeSpentInStateSecs
-          }
-        },
-        ServicesConstants.CURRENT_ACTION_SCHEMA_VERSION
-      ));
+          ServicesConstants.CURRENT_ACTION_SCHEMA_VERSION
+        ));
     }
 
     recordPlaythrough(isExplorationComplete: boolean): void {
@@ -352,10 +373,11 @@ export class PlaythroughService {
         // If the exploration is completed, do not check for issues.
         return;
       }
-      if (this.playthrough.playthroughId) {
+      if (PlaythroughService.playthrough.playthroughId) {
         // Playthrough ID exists, so issue has already been identified.
         this.removeOldQuitAction();
-        if (this.playthrough.issueType === AppConstants.ISSUE_TYPE_EARLY_QUIT) {
+        if (PlaythroughService.playthrough.issueType ===
+          AppConstants.ISSUE_TYPE_EARLY_QUIT) {
           // If the existing issue is of type early quit, and some other issue
           // can be identified, update the issue since early quit has lower
           // priority.
@@ -365,7 +387,7 @@ export class PlaythroughService {
       } else {
         // Playthrough ID doesn't exist.
         this.analyzePlaythrough();
-        if (this.playthrough.issueType) {
+        if (PlaythroughService.playthrough.issueType) {
           // Issue type exists, so an issue is identified after analyzing the
           // playthrough, and the playthrough is stored.
           this.storePlaythrough(true);
