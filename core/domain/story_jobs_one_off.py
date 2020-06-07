@@ -92,3 +92,42 @@ class StoryMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 sum(ast.literal_eval(v) for v in values))])
         else:
             yield (key, values)
+
+
+class RegenerateStorySummaryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """One-off job to regenerate story summaries."""
+
+    _DELETED_KEY = 'story_deleted'
+    _PROCESSED_KEY = 'story_processed'
+    _ERROR_KEY = 'story_errored'
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [story_models.StoryModel]
+
+    @staticmethod
+    def map(item):
+        if item.deleted:
+            yield (RegenerateStorySummaryOneOffJob._DELETED_KEY, 1)
+            return
+
+        try:
+            story_services.create_story_summary(item.id)
+        except Exception as e:
+            yield (
+                RegenerateStorySummaryOneOffJob._ERROR_KEY,
+                'Failed to create story summary %s: %s' % (item.id, e))
+            return
+
+        yield (RegenerateStorySummaryOneOffJob._PROCESSED_KEY, 1)
+
+    @staticmethod
+    def reduce(key, values):
+        if key == RegenerateStorySummaryOneOffJob._DELETED_KEY:
+            yield (key, ['Encountered %d deleted stories.' % (
+                sum(ast.literal_eval(v) for v in values))])
+        elif key == RegenerateStorySummaryOneOffJob._PROCESSED_KEY:
+            yield (key, ['Successfully processed %d stories.' % (
+                sum(ast.literal_eval(v) for v in values))])
+        else:
+            yield (key, values)

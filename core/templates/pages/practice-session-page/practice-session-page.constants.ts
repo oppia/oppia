@@ -20,9 +20,12 @@ export class PracticeSessionPageConstants {
   public static TOTAL_QUESTIONS = 20;
 
   public static PRACTICE_SESSIONS_DATA_URL =
-    '/practice_session/data/<topic_name>';
+    '/practice_session/data/<topic_name>?' +
+    'selected_subtopic_ids=<comma_separated_subtopic_ids>';
 
   public static TOPIC_VIEWER_PAGE = '/topic/<topic_name>';
 
-  public static PRACTICE_SESSIONS_URL = '/practice_session/<topic_name>';
+  public static PRACTICE_SESSIONS_URL =
+    '/practice_session/<topic_name>?' +
+    'selected_subtopic_ids=<comma_separated_subtopic_ids>';
 }

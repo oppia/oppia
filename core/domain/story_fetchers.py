@@ -133,7 +133,9 @@ def get_story_summary_from_model(story_summary_model):
         story_summary_model.description,
         story_summary_model.language_code,
         story_summary_model.version,
-        story_summary_model.node_count,
+        story_summary_model.node_titles,
+        story_summary_model.thumbnail_bg_color,
+        story_summary_model.thumbnail_filename,
         story_summary_model.story_model_created_on,
         story_summary_model.story_model_last_updated
     )

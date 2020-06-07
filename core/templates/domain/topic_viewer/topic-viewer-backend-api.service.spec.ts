@@ -67,18 +67,23 @@ describe('Topic viewer backend API service', () => {
     sampleDataResults = {
       topic_name: 'topic_name',
       topic_id: 'topic_id',
+      topic_description: 'Topic description',
       canonical_story_dicts: [{
         id: '0',
         title: 'Story Title',
         description: 'Story Description',
-        node_count: 1,
+        node_titles: ['Chapter 1'],
+        thumbnail_filename: 'image.svg',
+        thumbnail_bg_color: '#F8BF74',
         published: true
       }],
       additional_story_dicts: [{
         id: '1',
         title: 'Story Title',
         description: 'Story Description',
-        node_count: 1,
+        node_count: ['Chapter 1'],
+        thumbnail_filename: 'image.svg',
+        thumbnail_bg_color: '#F8BF74',
         published: true
       }],
       uncategorized_skill_ids: ['skill_id_1'],

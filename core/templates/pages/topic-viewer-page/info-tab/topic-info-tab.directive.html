@@ -1,0 +1,146 @@
+<div class="oppia-topic-info-container">
+  <md-card class="oppia-page-card oppia-long-text">
+    <h2 class="tab-title"><[$ctrl.getTopicName()]></h2>
+    <div class="info-tab-content">
+      <div class="info-tab-left-container" ng-if="!$ctrl.screenHasSmallWidth">
+        <md-card class="info-tab-count">
+          <div style="padding-top: 12%;">
+            <[$ctrl.getStoryCount()]>
+          </div>
+        </md-card>
+        <span ng-if="$ctrl.getStoryCount() !== 1" translate="I18N_TOPIC_VIEWER_STORIES"></span>
+        <span ng-if="$ctrl.getStoryCount() === 1" translate="I18N_TOPIC_VIEWER_STORY"></span>
+
+        <md-card class="info-tab-count" style="margin-top: 20%;">
+          <div style="padding-top: 12%;">
+            <[$ctrl.getChapterCount()]>
+          </div>
+        </md-card>
+        <span ng-if="$ctrl.getChapterCount() !== 1" translate="I18N_TOPIC_VIEWER_LESSONS"></span>
+        <span ng-if="$ctrl.getChapterCount() === 1" translate="I18N_TOPIC_VIEWER_LESSON"></span>
+
+        <md-card class="info-tab-count" style="margin-top: 20%;">
+          <div style="padding-top: 12%;">
+            <[$ctrl.getSubtopicCount()]>
+          </div>
+        </md-card>
+        <span ng-if="$ctrl.getSubtopicCount() !== 1" translate="I18N_TOPIC_VIEWER_SKILLS"></span>
+        <span ng-if="$ctrl.getSubtopicCount() === 1" translate="I18N_TOPIC_VIEWER_SKILL"></span>
+      </div>
+      <div class="info-tab-right-container">
+        <strong class="header" translate="I18N_TOPIC_VIEWER_DESCRIPTION"></strong>
+        <[$ctrl.getTopicDescription()]>
+        <div class="stats-in-mobile" ng-if="$ctrl.screenHasSmallWidth">
+          <md-card class="info-tab-count">
+              <[$ctrl.getStoryCount()]>
+          </md-card>
+          <md-card class="info-tab-count">
+              <[$ctrl.getChapterCount()]>
+          </md-card>
+          <md-card class="info-tab-count">
+              <[$ctrl.getSubtopicCount()]>
+          </md-card>
+          <div class="cell-title">
+            <span ng-if="$ctrl.getStoryCount() !== 1" translate="I18N_TOPIC_VIEWER_STORIES"></span>
+            <span ng-if="$ctrl.getStoryCount() === 1" translate="I18N_TOPIC_VIEWER_STORY"></span>
+          </div>
+          <div class="cell-title">
+            <span ng-if="$ctrl.getChapterCount() !== 1" translate="I18N_TOPIC_VIEWER_LESSONS"></span>
+            <span ng-if="$ctrl.getChapterCount() === 1" translate="I18N_TOPIC_VIEWER_LESSON"></span>
+          </div>
+          <div class="cell-title">
+            <span ng-if="$ctrl.getSubtopicCount() !== 1" translate="I18N_TOPIC_VIEWER_SKILLS"></span>
+            <span ng-if="$ctrl.getSubtopicCount() === 1" translate="I18N_TOPIC_VIEWER_SKILL"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </md-card>
+</div>
+
+<style>
+  topic-info-tab .info-tab-count {
+    background-color: #606060;
+    border-radius: 0.25em;
+    color: white;
+    display: block;
+    font-size: 1.4em;
+    height: 52px;
+    margin-left: 25%;
+    text-align: center;
+    width: 50%;
+  }
+
+  topic-info-tab .header {
+    display: block;
+    font-size: 1.2em;
+    padding-bottom: 10px;
+  }
+
+  topic-info-tab .info-tab-left-container {
+    border-right: 1px solid #BDBDBD;
+    display: inline-block;
+    float: left;
+    padding-bottom: 5vh;
+    padding-top: 5vh;
+    position: relative;
+    text-align: center;
+    white-space: initial;
+    width: 150px;
+  }
+
+  topic-info-tab .info-tab-right-container {
+    display: inline-block;
+    margin-top: 5vh;
+    padding-left: 5%;
+    width: 85%;
+  }
+
+  topic-info-tab .info-tab-content {
+    display: flex;
+  }
+
+  @media (max-width: 1024px) {
+    topic-info-tab .stats-in-mobile {
+      border-top: 1px solid #b4b4b4;
+      display: grid;
+      grid-template-columns: 80px 80px 80px;
+      justify-content: space-between;
+      margin-top: 3vh;
+      padding-left: 10vw;
+      padding-right: 10vw;
+      padding-top: 3vh;
+    }
+
+    topic-info-tab .cell-title {
+      text-align: center;
+      width: 100%;
+    }
+
+    topic-info-tab .info-tab-count {
+      display: inline;
+      height: 50px;
+      margin-left: 0;
+      padding-top: 10px;
+      width: 100%;
+    }
+
+    topic-info-tab .info-tab-right-container {
+      margin-top: 1vh;
+      padding-left: 0;
+      width: 100%;
+    }
+  }
+
+  @media (max-width: 500px) {
+    topic-info-tab .stats-in-mobile {
+      grid-template-columns: 20vw 20vw 20vw;
+      padding: 3vh 0 0 0;
+    }
+
+    topic-info-tab .info-tab-count {
+      height: 45px;
+      padding-top: 6px;
+    }
+  }
+</style>

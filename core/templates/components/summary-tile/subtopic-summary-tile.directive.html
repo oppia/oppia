@@ -1,35 +1,86 @@
-<a ng-href="<[$ctrl.getSubtopicLink()]>">
-  <div class="oppia-subtopic-image">
-    <img ng-src="<[$ctrl.getStaticImageUrl('/subjects/Astronomy.svg')]>" alt="">
+<div class="subtopic-card" ng-click="$ctrl.openSubtopicPage()">
+  <div class="subtopic-thumbnail"
+       ng-style="{background: $ctrl.getSubtopic().getThumbnailBgColor()}">
+    <img ng-src="<[$ctrl.thumbnailUrl]>"
+         class="img-thumbnail"
+         ng-style="{background: $ctrl.getSubtopic().getThumbnailBgColor()}">
   </div>
-  <div class="oppia-subtopic-title">
-    <[::$ctrl.getSubtopicTitle()]>
+  <div class="subtopic-title">
+    <[$ctrl.getSubtopic().getTitle()]>
   </div>
-  <div class="oppia-subtopic-skill-count">
-    Skills in subtopic: <[::$ctrl.getSkillCount()]>
-  </div>
-</a>
+</div>
 <style>
-  subtopic-summary-tile .oppia-subtopic-image {
-    background-color: #cd672b;
-    padding: 0 34px 0 34px;
-    z-index: 1;
+  subtopic-summary-tile .subtopic-card {
+    box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    width: 170px;
   }
-  subtopic-summary-tile .oppia-subtopic-title {
-    color: #4a4a4a;
-    display: block;
-    font-size: 1.4em;
-    font-weight: bold;
-    padding: 10px;
+
+  subtopic-summary-tile .subtopic-card:focus {
+    outline: 0;
+  }
+
+  subtopic-summary-tile .subtopic-thumbnail {
+    border: 1px solid #ffffff;
+    border-radius: 0.4em;
+    height: 120px;
     text-align: center;
+    vertical-align: middle;
+    width: 100%;
   }
-  subtopic-summary-tile .oppia-subtopic-skill-count {
-    color: #4a4a4a;
-    display: block;
-    font-size: 1.1em;
-    text-align: center;
+
+  subtopic-summary-tile .img-thumbnail {
+    border-radius: 0.4em 0.4em 0 0;
+    max-height: 100%;
+    max-width: 100%;
+    border: none;
   }
-  subtopic-summary-tile a:hover {
-    text-decoration: none;
+
+  subtopic-summary-tile .subtopic-title {
+    background-color: #BE563C;
+    border-radius: 0 0 0.4em 0.4em;
+    color: #ffffff;
+    font-family: "Roboto", Arial, sans-serif;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    padding: 10px 5px 5px 15px;
+    height: 100px;
+  }
+
+  @media(max-width: 1024px) {
+    subtopics-list .subtopic-card {
+      width: 150px;
+    }
+
+    subtopic-summary-tile .subtopic-title {
+      font-size: 0.8em;
+      height: 85px;
+      padding-left: 10px;
+    }
+  }
+
+  @media(max-width: 680px) {
+    subtopics-list .subtopic-card {
+      width: 130px;
+    }
+
+    subtopic-summary-tile .subtopic-title {
+      font-size: 0.8em;
+      height: 85px;
+    }
+  }
+
+  @media(max-width: 500px) {
+    subtopics-list .subtopic-card {
+      width: 140px;
+    }
+
+    subtopic-summary-tile .subtopic-title {
+      height: 75px;
+    }
+
+    subtopic-summary-tile .subtopic-thumbnail {
+      height: 100px;
+    }
   }
 </style>

@@ -53,12 +53,12 @@ class BaseTopicViewerControllerTests(test_utils.GenericTestBase):
         self.story_1 = story_domain.Story.create_default_story(
             self.story_id_1, 'story_title', self.topic_id_1)
         self.story_1.description = 'story_description'
-        self.story_1.node_count = 0
+        self.story_1.node_titles = []
 
         self.story_2 = story_domain.Story.create_default_story(
             self.story_id_2, 'story_title', self.topic_id_2)
         self.story_2.description = 'story_description'
-        self.story_2.node_count = 0
+        self.story_2.node_titles = []
 
         self.topic = topic_domain.Topic.create_default_topic(
             self.topic_id, 'public_topic_name', 'abbrev')
@@ -145,14 +145,18 @@ class TopicPageDataHandlerTests(BaseTopicViewerControllerTests):
                     'id': self.story_1.id,
                     'title': self.story_1.title,
                     'description': self.story_1.description,
-                    'node_count': self.story_1.node_count,
+                    'node_titles': self.story_1.node_titles,
+                    'thumbnail_filename': None,
+                    'thumbnail_bg_color': None,
                     'published': True
                 }],
                 'additional_story_dicts': [{
                     'id': self.story_2.id,
                     'title': self.story_2.title,
                     'description': self.story_2.description,
-                    'node_count': self.story_2.node_count,
+                    'node_titles': self.story_2.node_titles,
+                    'thumbnail_filename': None,
+                    'thumbnail_bg_color': None,
                     'published': True
                 }],
                 'uncategorized_skill_ids': [self.skill_id_1],
@@ -201,14 +205,18 @@ class TopicPageDataHandlerTests(BaseTopicViewerControllerTests):
                         'id': self.story_1.id,
                         'title': self.story_1.title,
                         'description': self.story_1.description,
-                        'node_count': self.story_1.node_count,
+                        'node_titles': self.story_1.node_titles,
+                        'thumbnail_filename': None,
+                        'thumbnail_bg_color': None,
                         'published': True
                     }],
                     'additional_story_dicts': [{
                         'id': self.story_2.id,
                         'title': self.story_2.title,
                         'description': self.story_2.description,
-                        'node_count': self.story_2.node_count,
+                        'node_titles': self.story_2.node_titles,
+                        'thumbnail_filename': None,
+                        'thumbnail_bg_color': None,
                         'published': True
                     }],
                     'uncategorized_skill_ids': [self.skill_id_1],
