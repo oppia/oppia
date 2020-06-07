@@ -16,12 +16,13 @@
 
 """Commands for operations on topics, and related models."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import absolute_import, print_function  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import collections
 import logging
 
+from core.domain import config_domain
 from core.domain import opportunity_services
 from core.domain import role_services
 from core.domain import state_domain
@@ -88,22 +89,41 @@ def get_all_skill_ids_assigned_to_some_topic():
     return skill_ids
 
 
-def get_all_skill_ids_assigned_to_some_topic_with_topic_name():
+def get_all_skill_ids_assigned_to_some_topic_with_topic_details():
     """Returns the ids of all the skills that are linked to some topics.
 
     Returns:
         set([str]). The ids of all the skills linked to some topic.
     """
-    skill_ids = []
+    skill_ids_with_topic_name = []
     all_topic_models = topic_models.TopicModel.get_all()
     all_topics = [
         topic_fetchers.get_topic_from_model(topic)
         for topic in all_topic_models]
+
     for topic in all_topics:
-        for skill_id in topic.get_all_skill_ids_and_topic():
-            obj = skill_id, topic.name, topic.category
-            skill_ids.append(obj)
-    return skill_ids
+        for skill_ids in topic.get_all_skill_ids():
+            classroom_name = get_classroom_name_for_topic_with_id(topic.id)
+            obj = skill_ids, topic.name, classroom_name
+            skill_ids_with_topic_name.append(obj)
+    return skill_ids_with_topic_name
+
+
+def get_classroom_name_for_topic_with_id(topic_id):
+    """ Return the name of the classroom to which the topic
+    with the given id is assigned.
+
+    Returns:
+        str. The name of the classroom assigned to the given topic with id
+    """
+    all_classrooms_dict = config_domain.TOPIC_IDS_FOR_CLASSROOM_PAGES.value
+
+    for classroom in all_classrooms_dict:
+        if topic_id in classroom['topic_ids']:
+            classroom_name = classroom['name']
+            return classroom_name
+
+    return None
 
 
 def get_topic_summary_from_model(topic_summary_model):

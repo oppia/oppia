@@ -25,6 +25,9 @@ require(
   'pages/topics-and-skills-dashboard-page/' +
   'topics-and-skills-dashboard-page.constants.ajs.ts');
 
+require(
+  'pages/topics-and-skills-dashboard-page/' +
+  'create-new-skill-modal.controller.ts');
 angular.module('oppia').factory('SkillCreationService', [
   '$rootScope', '$uibModal', '$timeout', '$window', 'AlertsService',
   'ImageLocalStorageService', 'SkillCreationBackendApiService',
@@ -62,7 +65,7 @@ angular.module('oppia').factory('SkillCreationService', [
         skillDescriptionStatusMarker = (
           SKILL_DESCRIPTION_STATUS_VALUES.STATUS_UNCHANGED);
       },
-      createSkill: function() {
+      createNewSkill: function() {
         $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/topics-and-skills-dashboard-page/templates/' +
@@ -70,6 +73,7 @@ angular.module('oppia').factory('SkillCreationService', [
           backdrop: 'static',
           controller: 'CreateNewSkillModalController'
         }).result.then(function(result) {
+          console.log(result);
           if (skillCreationInProgress) {
             return;
           }
@@ -89,7 +93,7 @@ angular.module('oppia').factory('SkillCreationService', [
           var newTab = $window.open();
           SkillCreationBackendApiService.createSkill(
             result.description, rubrics, result.explanation,
-            result.linkedTopicIds).then(function(response) {
+            result.linkedTopicIds, result.imagesData).then(function(response) {
             $timeout(function() {
               $rootScope.$broadcast(
                 EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED, true);

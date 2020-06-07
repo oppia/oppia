@@ -23,6 +23,10 @@ import { HttpClient } from '@angular/common/http';
 import { TopicsAndSkillsDashboardDomainConstants } from
   // eslint-disable-next-line max-len
   'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-domain.constants';
+import {
+  TopicsAndSkillsDashboardFilter,
+  TopicsAndSkillsDashboardFilterObjectFactory
+} from 'domain/topics_and_skills_dashboard/TopicsAndSkillsDashboardFilterObjectFactory';
 
 export interface ITopicSummaryBackendDict {
     /* eslint-disable camelcase */
@@ -79,6 +83,22 @@ export class TopicsAndSkillsDashboardBackendApiService {
   fetchDashboardData(): Promise<ITopicsAndSkillsDashboardDataBackendDict> {
     return this.http.get<ITopicsAndSkillsDashboardDataBackendDict>(
       '/topics_and_skills_dashboard/data').toPromise();
+  }
+
+  // fetchSkillsData(): Promise<ISkillDashboardDataBackendDict>{
+  fetchSkillsDashboardData(
+      filter: TopicsAndSkillsDashboardFilter,
+      pageNumber, itemsPerPage): Promise<any> {
+    return this.http.get('/skills_dashboard/data', {
+      params: {
+        classroomName: filter.classroom,
+        status: filter.status,
+        sort: filter.sort,
+        keywords: filter.keywords,
+        pageNumber,
+        itemsPerPage,
+      }
+    }).toPromise();
   }
 
   mergeSkills(oldSkillId:string, newSkillId:string): Promise<void> {

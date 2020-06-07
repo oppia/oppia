@@ -24,7 +24,9 @@ require(
 require(
   'pages/topics-and-skills-dashboard-page/topic-selector/' +
   'topic-selector.directive.ts');
-
+require(
+  'domain/topics_and_skills_dashboard/' +
+    'topics-and-skills-dashboard-backend-api.service.ts');
 require('domain/skill/skill-backend-api.service.ts');
 require('domain/topic/editable-topic-backend-api.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
@@ -216,7 +218,7 @@ angular.module('oppia').directive('skillsList', [
           ctrl.$onInit = function() {
             $scope.SKILL_HEADINGS = [
               'index', 'description', 'worked_examples_count',
-              'misconception_count', 'status'];
+              'misconception_count', 'status', 'options'];
             $scope.highlightedIndex = null;
           };
         }

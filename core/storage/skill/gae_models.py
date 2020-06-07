@@ -250,10 +250,8 @@ class SkillSummaryModel(base_models.BaseModel):
         """
         # query = cls.query().order(-cls.created_on).fetch(limit=10, offset=3)
         query = cls.query().order(-cls.created_on).fetch(limit=200, offset=0)
-        print('Hellooooo111')
         print (cls.query().count())
-        query_a = ndb.gql("SELECT * FROM SkillSummaryModel where description = 'GOku'")
-        return query, query_a
+        return query
 
     @staticmethod
     def get_export_policy():

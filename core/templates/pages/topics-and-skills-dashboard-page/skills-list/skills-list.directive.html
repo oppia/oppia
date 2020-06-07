@@ -3,10 +3,10 @@
     <colgroup>
       <col style="width: 5%;">
       <col style="width: 25%;">
-      <col style="width: 12%;">
-      <col style="width: 12%;">
-      <col style="width: 15%;">
       <col style="width: 10%;">
+      <col style="width: 10%;">
+      <col style="width: 15%;">
+      <col style="width: 20%;">
     </colgroup>
     <tr>
       <th ng-repeat="key in SKILL_HEADINGS"
@@ -16,7 +16,7 @@
         <p ng-if="key === 'worked_examples_count'"> Worked Examples </p>
         <p ng-if="key === 'misconception_count'"> Misconceptions </p>
         <p ng-if="key === 'status'"> Status </p>
-        <p ng-if="key === 'status'"> Options </p>
+        <p ng-if="key === 'options'"> Options </p>
       </th>
     </tr>
     <tr ng-repeat="skill in getSkillSummaries() track by $index"
@@ -25,30 +25,31 @@
       <td>
         <[getSerialNumberForSkill($index)]>.
       </td>
-      <td ng-class="{'hoverable-cell': highlightedIndex === $index}"
-          ng-mouseover="highlightColumns($index)"
-          ng-mouseleave="unhighlightColumns()">
+      <td>
         <a ng-href="<[getSkillEditorUrl(skill.id)]>" class="list-summary">
-          <span class="protractor-test-skill-description"> <[skill.description]> </span>
+          <div class="skill-description protractor-test-skill-description"> <[skill.description]> </div>
+          <div class="skill-topic">
+          <span ng-if="!skill.topic">
+            Unassigned
+            <i class="fa fa-exclamation-triangle"></i>
+          </span>
+          <span ng-if="skill.topic">
+            <[skill.topic]>
+          </span>
+          </div>
         </a>
       </td>
-      <td ng-class="{'hoverable-cell': highlightedIndex === $index}"
-          ng-mouseover="highlightColumns($index)"
-          ng-mouseleave="unhighlightColumns()">
+      <td>
         <a ng-href="<[getSkillEditorUrl(skill.id)]>" class="list-summary text-center">
           <span> <[skill.worked_examples_count]> </span>
         </a>
       </td>
-      <td ng-class="{'hoverable-cell': highlightedIndex === $index}"
-          ng-mouseover="highlightColumns($index)"
-          ng-mouseleave="unhighlightColumns()">
+      <td>
         <a ng-href="<[getSkillEditorUrl(skill.id)]>" class="list-summary text-center">
           <span> <[skill.misconception_count]> </span>
         </a>
       </td>
-      <td ng-class="{'hoverable-cell': highlightedIndex === $index}"
-          ng-mouseover="highlightColumns($index)"
-          ng-mouseleave="unhighlightColumns()">
+      <td>
         <a ng-href="<[getSkillEditorUrl(skill.id)]>" class="list-summary text-center">
           <span ng-if="skill.topic">
             Assigned
@@ -58,7 +59,7 @@
           </span>
         </a>
       </td>
-      <td>
+      <td class="skill-edit-options">
       <div ng-if="getEditableTopicSummaries().length > 0 && !isUnpublishedSkill()">
         <button class="btn btn-secondary skills-list-action-button
         protractor-test-assign-skill-to-topic-button" ng-click="assignSkillToTopic(skill.id)">
@@ -93,6 +94,31 @@
     margin-top: 50px;
   }
 
+  skills-list .list-item {
+    height: 140px;
+    text-align: left;
+    vertical-align: baseline;
+  }
+
+  skills-list .list-item td {
+    padding-top: 15px;
+  }
+
+  skills-list .skill-description {
+    font-size: 17px;
+    font-weight: bold;
+  }
+
+  skills-list .skill-topic {
+    font-size: 15px;
+    margin: 4px 0;
+    text-transform: uppercase;
+  }
+
+  skills-list .skill-topic i {
+    color: #D57B00;
+  }
+
   skills-list .dashboard-table {
     font-size: 15px;
     width: 100%;
@@ -120,37 +146,24 @@
     text-decoration: none;
   }
 
-  skills-list .list-item {
-    height: 2.5em;
-  }
-
   skills-list .list-item:not(:last-child) {
     border-bottom: 1px solid #bbb;
+  }
+
+  skills-list .skill-edit-options {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+    align-items: center;
   }
 
   skills-list .hoverable-cell {
     background-color: #ededed;
   }
 
-  skills-list .delete-icon {
-    padding-left: 0.8vw;
-  }
-
-  skills-list .merge-skill {
-    padding-left: 0.8vw;
-  }
-
   skills-list .merge-skill .merge-skill-icon {
     width: 20px;
     cursor: pointer;
-  }
-
-  skills-list tr td:nth-child(4) {
-    border-bottom: 1px solid #fff;
-  }
-
-  skills-list tr td:nth-child(5) {
-    border-bottom: 1px solid #fff;
   }
 
   skills-list .list-summary span {

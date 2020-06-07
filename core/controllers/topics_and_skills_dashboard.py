@@ -16,7 +16,7 @@
 are created.
 """
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import absolute_import, print_function  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import logging
@@ -71,15 +71,13 @@ class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
         skill_ids_assigned_to_some_topic = (
             topic_services.get_all_skill_ids_assigned_to_some_topic())
         skill_ids_assigned_to_some_topic_with_topic_details = (
-            topic_services.get_all_skill_ids_assigned_to_some_topic_with_topic_name())
-
+            topic_services.get_all_skill_ids_assigned_to_some_topic_with_topic_details())
         assigned_skill_dicts = []
 
         for assigned_skill in skill_ids_assigned_to_some_topic_with_topic_details:
             assigned_skill_dict = (
                 skill_services.get_skill_summary_by_id(assigned_skill[0]).to_dict())
-            assigned_skill_dict['category'] = assigned_skill[1]
-            assigned_skill_dict['topic'] = assigned_skill[2]
+            assigned_skill_dict['topic'] = assigned_skill[1]
             assigned_skill_dicts.append(assigned_skill_dict)
 
         merged_skill_ids = (
@@ -119,16 +117,16 @@ class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
                 mergeable_skill_summary_dicts.append(skill_summary_dict)
 
         can_delete_topic = (
-            role_services.ACTION_DELETE_TOPIC in self.user.actions)
+                role_services.ACTION_DELETE_TOPIC in self.user.actions)
 
         can_create_topic = (
-            role_services.ACTION_CREATE_NEW_TOPIC in self.user.actions)
+                role_services.ACTION_CREATE_NEW_TOPIC in self.user.actions)
 
         can_delete_skill = (
-            role_services.ACTION_DELETE_ANY_SKILL in self.user.actions)
+                role_services.ACTION_DELETE_ANY_SKILL in self.user.actions)
 
         can_create_skill = (
-            role_services.ACTION_CREATE_NEW_SKILL in self.user.actions)
+                role_services.ACTION_CREATE_NEW_SKILL in self.user.actions)
 
         self.values.update({
             'untriaged_skill_summary_dicts': untriaged_skill_summary_dicts,
@@ -142,6 +140,33 @@ class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
             'can_create_skill': can_create_skill
         })
         self.render_json(self.values)
+
+
+class SkillsDashboardPageDataHandler(base.BaseHandler):
+    """Provides data for the user's skills dashboard page."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.can_access_topics_and_skills_dashboard
+    def get(self):
+        """Handles GET requests."""
+
+        classroom_name = self.request.get('classroomName')
+        status = self.request.get('status')
+        keywords = self.request.get('keywords')
+        sort_by = self.request.get('sort')
+        page_number = int(self.request.get('pageNumber'))
+        items_per_page = int(self.request.get('itemsPerPage'))
+        print(classroom_name, status, keywords, sort_by, page_number, items_per_page)
+        skill_summary_dicts = skill_services.get_filtered_skills(status, classroom_name, keywords, sort_by)
+        skill_summary_dicts_paginated = skill_summary_dicts[
+            page_number * items_per_page: ((page_number + 1) * items_per_page)]
+
+        self.render_json({
+            'test_summary': skill_summary_dicts,
+            'skill_summary_dicts': skill_summary_dicts_paginated,
+            'total_skill_count': len(skill_summary_dicts)
+        })
 
 
 class NewTopicHandler(base.BaseHandler):

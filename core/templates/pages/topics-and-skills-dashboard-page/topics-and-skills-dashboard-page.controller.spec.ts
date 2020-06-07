@@ -131,7 +131,7 @@ describe('Topics and Skills Dashboard Page', function() {
 
     it('should set the active tab', function() {
       expect(ctrl.activeTab).toEqual('topics');
-      ctrl.setActiveTab(ctrl.TAB_NAME_UNTRIAGED_SKILLS);
+      ctrl.setActiveTab(ctrl.TAB_NAME_SKILLS);
       expect(ctrl.activeTab).toEqual('untriagedSkills');
       ctrl.setActiveTab(ctrl.TAB_NAME_TOPICS);
       expect(ctrl.activeTab).toEqual('topics');

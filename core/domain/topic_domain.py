@@ -602,6 +602,18 @@ class Topic(python_utils.OBJECT):
             skill_ids.extend(copy.deepcopy(subtopic.skill_ids))
         return skill_ids
 
+    def get_all_skill_ids_and_topic(self):
+        """Returns all the ids of all the skills present in the topic.
+
+        Returns:
+            list(str). The list of all the skill ids present in the topic.
+        """
+        skill_ids = copy.deepcopy(self.uncategorized_skill_ids)
+        for subtopic in self.subtopics:
+            skill_ids.extend(copy.deepcopy(subtopic.skill_ids))
+        # print(skill_ids)
+        return skill_ids
+
     def publish_story(self, story_id):
         """Marks story with the given id as published.
 

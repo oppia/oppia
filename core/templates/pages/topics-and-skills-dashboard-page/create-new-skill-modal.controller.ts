@@ -18,64 +18,75 @@
  */
 
 require('domain/utilities/url-interpolation.service.ts');
-require('services/context.service.ts');
-require('services/image-local-storage.service.ts');
+require('domain/exploration/SubtitledHtmlObjectFactory.ts');
+require('components/ck-editor-helpers/ck-editor-4-rte.directive.ts');
+require('components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts');
+require(
+  'components/forms/schema-based-editors/schema-based-editor.directive.ts');
+require('domain/exploration/SubtitledHtmlObjectFactory.ts');
+require('domain/utilities/url-interpolation.service.ts');
+require('components/ck-editor-helpers/ck-editor-4-rte.directive.ts');
+require('components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts');
+require('components/forms/custom-forms-directives/image-uploader.directive.ts');
+
+require('directives/mathjax-bind.directive.ts');
+require('filters/string-utility-filters/normalize-whitespace.filter.ts');
+require('objects/objectComponentsRequires.ts');
+require('directives/angular-html-bind.directive.ts');
 
 angular.module('oppia').controller('CreateNewSkillModalController', [
-  '$scope', '$uibModalInstance', 'ContextService', 'ImageLocalStorageService',
-  'RubricObjectFactory', 'SkillCreationService', 'SkillObjectFactory',
-  'MAX_CHARS_IN_SKILL_DESCRIPTION', 'SKILL_DESCRIPTION_STATUS_VALUES',
-  'SKILL_DIFFICULTIES',
-  function($scope, $uibModalInstance, ContextService, ImageLocalStorageService,
-      RubricObjectFactory, SkillCreationService, SkillObjectFactory,
-      MAX_CHARS_IN_SKILL_DESCRIPTION, SKILL_DESCRIPTION_STATUS_VALUES,
-      SKILL_DIFFICULTIES) {
+  '$scope', '$uibModalInstance', 'RubricObjectFactory', 'SkillCreationService',
+  'SubtitledHtmlObjectFactory', 'COMPONENT_NAME_EXPLANATION',
+  'SkillObjectFactory', 'MAX_CHARS_IN_SKILL_DESCRIPTION',
+  'SKILL_DESCRIPTION_STATUS_VALUES', 'SKILL_DIFFICULTIES',
+  function($scope, $uibModalInstance, RubricObjectFactory, SkillCreationService,
+      SubtitledHtmlObjectFactory, COMPONENT_NAME_EXPLANATION,
+      SkillObjectFactory, MAX_CHARS_IN_SKILL_DESCRIPTION,
+      SKILL_DESCRIPTION_STATUS_VALUES, SKILL_DIFFICULTIES) {
     var rubrics = [
       RubricObjectFactory.create(SKILL_DIFFICULTIES[0], []),
       RubricObjectFactory.create(SKILL_DIFFICULTIES[1], ['']),
       RubricObjectFactory.create(SKILL_DIFFICULTIES[2], [])];
-    ContextService.setImageSaveDestinationToLocalStorage();
     $scope.newSkillDescription = '';
     $scope.rubrics = rubrics;
     $scope.errorMsg = '';
+    $scope.conceptCardExplanationEditorIsShown = false;
     $scope.bindableDict = {
       displayedConceptCardExplanation: ''
     };
+    $scope.HTML_SCHEMA = {
+      type: 'html'
+    };
     $scope.MAX_CHARS_IN_SKILL_DESCRIPTION = (
       MAX_CHARS_IN_SKILL_DESCRIPTION);
-    var newExplanationObject = null;
+    $scope.newExplanationObject = null;
 
-    $scope.$watch('newSkillDescription', function() {
+    $scope.openConceptCardExplanationEditor = function() {
+      console.log('open called');
+      $scope.conceptCardExplanationEditorIsShown = true;
+    };
+
+    $scope.updateSkillDescription = function() {
+      $scope.resetErrorMsg();
       if (
         SkillCreationService.getSkillDescriptionStatus() !==
           SKILL_DESCRIPTION_STATUS_VALUES.STATUS_DISABLED) {
-        var initParagraph = document.createElement('p');
-        var explanations = $scope.rubrics[1].getExplanations();
-        var newExplanation = document.createTextNode(
-          $scope.newSkillDescription);
-        initParagraph.appendChild(newExplanation);
-        explanations[0] = initParagraph.outerHTML;
-        $scope.rubrics[1].setExplanations(explanations);
+        $scope.rubrics[1].setExplanations([$scope.newSkillDescription]);
         SkillCreationService.markChangeInSkillDescription();
-      }
-    });
-
-    $scope.onSaveExplanation = function(explanationObject) {
-      newExplanationObject = explanationObject.toBackendDict();
-      $scope.bindableDict.displayedConceptCardExplanation = (
-        explanationObject.getHtml());
-    };
-
-    $scope.onSaveRubric = function(difficulty, explanations) {
-      for (var idx in $scope.rubrics) {
-        if ($scope.rubrics[idx].getDifficulty() === difficulty) {
-          $scope.rubrics[idx].setExplanations(explanations);
-        }
       }
     };
 
     $scope.resetErrorMsg = function() {
       $scope.errorMsg = '';
+    };
+
+    $scope.saveConceptCardExplanation = function() {
+      var explanationObject = SubtitledHtmlObjectFactory.createDefault(
+        $scope.bindableDict.displayedConceptCardExplanation,
+        COMPONENT_NAME_EXPLANATION);
+      $scope.newExplanationObject = explanationObject.toBackendDict();
+      $scope.bindableDict.displayedConceptCardExplanation = (
+        explanationObject.getHtml());
     };
 
     $scope.createNewSkill = function() {
@@ -87,15 +98,17 @@ angular.module('oppia').controller('CreateNewSkillModalController', [
           'alphanumeric characters, spaces and/or hyphens.');
         return;
       }
+      $scope.saveConceptCardExplanation();
       $uibModalInstance.close({
         description: $scope.newSkillDescription,
         rubrics: $scope.rubrics,
-        explanation: newExplanationObject
+        explanation: $scope.newExplanationObject,
+        linkedTopicIds: [],
+        imagesData: []
       });
     };
 
     $scope.cancel = function() {
-      ImageLocalStorageService.flushStoredImagesData();
       SkillCreationService.resetSkillDescriptionStatusMarker();
       $uibModalInstance.dismiss('cancel');
     };
