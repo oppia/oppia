@@ -80,6 +80,7 @@ class ThirdPartyCSSLintChecksManagerTests(test_utils.GenericTestBase):
         super(ThirdPartyCSSLintChecksManagerTests, self).setUp()
         self.filepaths = [VALID_CSS_FILEPATH, INVALID_CSS_FILEPATH]
         self.linter_stdout = []
+
         def mock_print(*args):
             """Mock for python_utils.PRINT. Append the values to print to
             linter_stdout list.

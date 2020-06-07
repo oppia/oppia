@@ -12,7 +12,7 @@
 */
 
 /*
-  CSS file with invalid syntax.
+  CSS file with invalid syntax, used by scripts/linters/css_linter_test.py.
 */
 @-webkit-keyframes dot {
   0% { opacity : 0; }

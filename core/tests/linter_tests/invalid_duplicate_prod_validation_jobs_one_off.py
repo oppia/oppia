@@ -14,7 +14,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Test file of linter."""
+"""Python file with invalid syntax, used by scripts/linters/
+python_linter_test.
+"""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
@@ -25,8 +27,7 @@ from core import jobs
 from core.platform import models
 import python_utils
 
-(user_models,) = (
-        models.Registry.import_models([models.NAMES.user]))
+(user_models,) = (models.Registry.import_models([models.NAMES.user]))
 datastore_services = models.Registry.import_datastore_services()
 
 

@@ -12,7 +12,8 @@
 */
 
 /*
-  CSS file with valid syntax, used for testing in scripts/pre_commit_linter_test.
+  CSS file with valid syntax, used for testing in scripts/linters/
+  css_linter_test.py.
 */
 @-webkit-keyframes dot {
   0% { opacity: 0; }

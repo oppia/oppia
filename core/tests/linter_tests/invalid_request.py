@@ -14,7 +14,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Python file with invalid syntax, used by scripts/pre_commit_linter_test."""
+"""Python file with invalid syntax, used by scripts/linters/
+python_linter_test.
+"""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
@@ -25,18 +27,20 @@ import python_utils
 
 
 class FakeClass(python_utils.OBJECT):
-    """This is a fake docstring for valid syntax purposes."""
+    """This is a fake docstring for invalid syntax purposes."""
 
     def __init__(self, fake_arg):
         self.fake_arg = fake_arg
 
     def fake_method(self, source_url, data, headers):
         """This doesn't do anything.
+
         Args:
             source_url: str. The URL.
             data: str. Additional data to send to the server.
             headers: dict. The request headers.
+
         Returns:
-            Request: Returns Request object.
+            Request(object): Returns Request object.
         """
         return urllib2.Request(source_url, data, headers)

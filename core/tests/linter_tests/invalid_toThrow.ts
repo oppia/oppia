@@ -13,8 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Invalid syntax .ts file, used by
-    scripts/pre_commit_linter_test.
+ * @fileoverview Invalid syntax .ts file, used by scripts/linters/
+ * js_ts_linter_test.py.
  */
 
 describe('Build questions', function() {

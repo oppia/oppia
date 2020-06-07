@@ -33,8 +33,8 @@ INVALID_IMPORT_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_import_order.py')
 
 INVALID_JOBS_ONE_OFF_FILEPATHS = [
-    'core/tests/linter_tests/invalid_duplicate_jobs_one_off.py',
-    'core/tests/linter_tests/invalid_jobs_one_off.py']
+    'core/tests/linter_tests/invalid_duplicate_jobs_one_off.py']
+VALID_JOBS_ONE_OFF_FILEPATHS = ['core/tests/linter_tests/valid_jobs_one_off.py']
 INVALID_PROD_VALIDATION_JOBS_ONE_OFF_FILEPATHS = [
     'core/tests/linter_tests/invalid_duplicate_prod_validation_jobs_one_off.py',
     'core/tests/linter_tests/invalid_prod_validation_jobs_one_off.py']
@@ -71,6 +71,7 @@ class PythonLintChecksManagerTests(test_utils.GenericTestBase):
     def setUp(self):
         super(PythonLintChecksManagerTests, self).setUp()
         self.linter_stdout = []
+
         def mock_print(*args):
             """Mock for python_utils.PRINT. Append the values to print to
             linter_stdout list.
@@ -105,7 +106,8 @@ class PythonLintChecksManagerTests(test_utils.GenericTestBase):
     def test_all_jobs_are_listed_in_the_job_registry_file(self):
         with self.print_swap:
             python_linter.PythonLintChecksManager(
-                INVALID_JOBS_ONE_OFF_FILEPATHS, True).perform_all_lint_checks()
+                INVALID_JOBS_ONE_OFF_FILEPATHS + VALID_JOBS_ONE_OFF_FILEPATHS,
+                True).perform_all_lint_checks()
         self.assertTrue(
             appears_in_linter_stdout(
                 ['Found one-off jobs with duplicate names: '
@@ -119,7 +121,7 @@ class PythonLintChecksManagerTests(test_utils.GenericTestBase):
     def test_valid_all_jobs_are_listed_in_the_job_registry_file(self):
         with self.print_swap:
             python_linter.PythonLintChecksManager(
-                INVALID_JOBS_ONE_OFF_FILEPATHS[1:],
+                VALID_JOBS_ONE_OFF_FILEPATHS,
                 True).perform_all_lint_checks()
         self.assertTrue(
             appears_in_linter_stdout(
@@ -159,7 +161,7 @@ class PythonLintChecksManagerTests(test_utils.GenericTestBase):
                 [INVALID_IMPORT_FILEPATH], True).perform_all_lint_checks()
         self.assertTrue(
             appears_in_linter_stdout(
-                ['C: 32, 0: Missing function docstring (missing-docstring)'],
+                ['C: 33, 0: Missing function docstring (missing-docstring)'],
                 self.linter_stdout))
 
     def test_python_utils_file(self):
@@ -177,7 +179,7 @@ class PythonLintChecksManagerTests(test_utils.GenericTestBase):
                 [INVALID_IMPORT_FILEPATH], True).perform_all_lint_checks()
         self.assertTrue(
             appears_in_linter_stdout(
-                ['E: 33, 4: print statement used (print-statement)'],
+                ['E: 34, 4: print statement used (print-statement)'],
                 self.linter_stdout))
 
     def test_custom_linter_with_no_files(self):

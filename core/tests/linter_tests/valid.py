@@ -14,7 +14,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Python file with valid syntax, used by scripts/pre_commit_linter_test."""
+"""Python file with valid syntax, used by scripts/linters/
+python_linter_test.py.
+"""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
@@ -30,9 +32,11 @@ class FakeClass(python_utils.OBJECT):
 
     def fake_method(self, name):
         """This doesn't do anything.
+
         Args:
             name: str. Means nothing.
+
         Yields:
-            tuple. The argument passed in but twice in a tuple.
+            tuple(str, str). The argument passed in but twice in a tuple.
         """
         yield (name, name)

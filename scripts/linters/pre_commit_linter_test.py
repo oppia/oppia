@@ -118,6 +118,7 @@ class LintTests(test_utils.GenericTestBase):
     def setUp(self):
         super(LintTests, self).setUp()
         self.linter_stdout = []
+
         def mock_print(*args):
             """Mock for python_utils.PRINT. Append the values to print to
             linter_stdout list.

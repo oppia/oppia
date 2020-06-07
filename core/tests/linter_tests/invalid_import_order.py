@@ -14,8 +14,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Python file with invalid import order, used by
-scripts/pre_commit_linter_test."""
+"""Python file with invalid syntax, used by scripts/linters/
+python_linter_test.
+"""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules

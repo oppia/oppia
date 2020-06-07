@@ -36,7 +36,9 @@ class ConcurrentTaskUtilsTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(ConcurrentTaskUtilsTests, self).setUp()
+        self.semaphore = threading.Semaphore(1)
         self.linter_stdout = []
+
         def mock_print(*args):
             """Mock for python_utils.PRINT. Append the values to print to
             linter_stdout list.
@@ -48,7 +50,6 @@ class ConcurrentTaskUtilsTests(test_utils.GenericTestBase):
             self.linter_stdout.append(
                 ' '.join(python_utils.UNICODE(arg) for arg in args))
         self.print_swap = self.swap(python_utils, 'PRINT', mock_print)
-        self.semaphore = threading.Semaphore(1)
 
     def test_create_task(self):
         task = concurrent_task_utils.create_task(
@@ -60,6 +61,8 @@ class ConcurrentTaskUtilsTests(test_utils.GenericTestBase):
             test_function('unused_arg'), True, self.semaphore, name='test')
         with self.print_swap:
             concurrent_task_utils.execute_tasks([task], self.semaphore)
+        expected_output = [s for s in self.linter_stdout if 'FINISHED' in s]
+        self.assertTrue(len(expected_output) == 1)
 
     def test_execute_task_with_exception(self):
         task_list = []

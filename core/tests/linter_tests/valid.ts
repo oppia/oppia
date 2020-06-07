@@ -13,7 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Valid syntax .ts file, used by scripts/pre_commit_linter_test.
+ * @fileoverview Valid syntax .ts file, used by scripts/linters/
+ * js_ts_linter_test.py.
  */
 
 const CodeMirror = require('static/code-mirror-5.17.0/lib/codemirror.js');

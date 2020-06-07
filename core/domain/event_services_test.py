@@ -229,17 +229,16 @@ class EventHandlerNameTests(test_utils.GenericTestBase):
 
     def _get_all_python_files(self):
         """Recursively collects all Python files in the core/ and extensions/
-        directory.
+        directory except files in core/tests/linter_tests/ directory.
 
         Returns:
             a list of Python files.
         """
         files_in_directory = []
         for directory, _, files in os.walk('.'):
-            if not (directory.startswith('./core/') or
-                    directory.startswith('./extensions/')):
-                continue
-            if directory.startswith('./core/tests/linter_tests'):
+            if (not (directory.startswith('./core/') or
+                     directory.startswith('./extensions/')) or (
+                         directory.startswith('./core/tests/linter_tests/'))):
                 continue
             for file_name in files:
                 if not file_name.endswith('.py'):

@@ -13,7 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Invalid syntax .js file.
+ * @fileoverview Invalid syntax .ts file, used by scripts/linters/
+ * js_ts_linter_test.py.
  */
 
 var forms = require('../protractor_utils/forms.js');

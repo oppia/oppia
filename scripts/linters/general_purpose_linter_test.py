@@ -164,6 +164,7 @@ class LintTests(test_utils.GenericTestBase):
     def setUp(self):
         super(LintTests, self).setUp()
         self.linter_stdout = []
+
         def mock_print(*args):
             """Mock for python_utils.PRINT. Append the values to print to
             linter_stdout list.
@@ -222,7 +223,7 @@ class JsTsLintTests(LintTests):
             ).perform_all_lint_checks()
         self.assertTrue(
             appears_in_linter_stdout(
-                ['Line 29: In tests, please do not use browser.explore().'],
+                ['Line 30: In tests, please do not use browser.explore().'],
                 self.linter_stdout))
 
     def test_invalid_browser_pause(self):
@@ -232,7 +233,7 @@ class JsTsLintTests(LintTests):
             ).perform_all_lint_checks()
         self.assertTrue(
             appears_in_linter_stdout(
-                ['Line 29: In tests, please do not use browser.pause().'],
+                ['Line 30: In tests, please do not use browser.pause().'],
                 self.linter_stdout))
 
     def test_invalid_browser_sleep(self):
@@ -242,7 +243,7 @@ class JsTsLintTests(LintTests):
             ).perform_all_lint_checks()
         self.assertTrue(
             appears_in_linter_stdout(
-                ['Line 29: In tests, please do not use browser.sleep().'],
+                ['Line 30: In tests, please do not use browser.sleep().'],
                 self.linter_stdout))
 
     def test_invalid_browser_wait_for_angular(self):
@@ -252,7 +253,7 @@ class JsTsLintTests(LintTests):
             ).perform_all_lint_checks()
         self.assertTrue(
             appears_in_linter_stdout(
-                ['Line 29: In tests, please do not use '
+                ['Line 30: In tests, please do not use '
                  'browser.waitForAngular().'],
                 self.linter_stdout))
 
@@ -263,11 +264,11 @@ class JsTsLintTests(LintTests):
             ).perform_all_lint_checks()
         self.assertTrue(
             appears_in_linter_stdout(
-                ['Line 22: In tests, please use \'describe\' instead of '
+                ['Line 23: In tests, please use \'describe\' instead of '
                  '\'ddescribe\'or \'fdescribe\''], self.linter_stdout))
         self.assertTrue(
             appears_in_linter_stdout(
-                ['Line 26: In tests, please use \'describe\' instead of '
+                ['Line 27: In tests, please use \'describe\' instead of '
                  '\'ddescribe\'or \'fdescribe\''], self.linter_stdout))
 
     def test_invalid_iit_fit(self):
@@ -277,11 +278,11 @@ class JsTsLintTests(LintTests):
             ).perform_all_lint_checks()
         self.assertTrue(
             appears_in_linter_stdout(
-                ['Line 39: In tests, please use \'it\' instead of \'iit\' or '
+                ['Line 40: In tests, please use \'it\' instead of \'iit\' or '
                  '\'fit\''], self.linter_stdout))
         self.assertTrue(
             appears_in_linter_stdout(
-                ['Line 63: In tests, please use \'it\' instead of \'iit\' or '
+                ['Line 64: In tests, please use \'it\' instead of \'iit\' or '
                  '\'fit\''], self.linter_stdout))
 
     def test_invalid_inject(self):
@@ -291,7 +292,7 @@ class JsTsLintTests(LintTests):
             ).perform_all_lint_checks()
         self.assertTrue(
             appears_in_linter_stdout(
-                ['Line 24: In tests, please use \'angular.mock.inject\' '
+                ['Line 25: In tests, please use \'angular.mock.inject\' '
                  'instead of \'inject\''], self.linter_stdout))
 
     def test_invalid_template_url(self):
@@ -301,7 +302,7 @@ class JsTsLintTests(LintTests):
             ).perform_all_lint_checks()
         self.assertTrue(
             appears_in_linter_stdout(
-                ['Line 23: The directives must be directly referenced.'],
+                ['Line 24: The directives must be directly referenced.'],
                 self.linter_stdout))
 
     def test_invalid_parent(self):
@@ -322,7 +323,7 @@ class JsTsLintTests(LintTests):
             ).perform_all_lint_checks()
         self.assertTrue(
             appears_in_linter_stdout(
-                ['Line 19: Please, don\'t use relative imports in require().'],
+                ['Line 20: Please, don\'t use relative imports in require().'],
                 self.linter_stdout))
 
     def test_invalid_inner_html(self):
@@ -332,7 +333,7 @@ class JsTsLintTests(LintTests):
             ).perform_all_lint_checks()
         self.assertTrue(
             appears_in_linter_stdout(
-                ['Line 26: Please do not use innerHTML property.'],
+                ['Line 27: Please do not use innerHTML property.'],
                 self.linter_stdout))
 
     def test_invalid_to_throw(self):
@@ -377,7 +378,7 @@ class PythonLintTests(LintTests):
             ).perform_all_lint_checks()
         self.assertTrue(
             appears_in_linter_stdout(
-                ['Line 24: Please remove author tags from this file.'],
+                ['Line 26: Please remove author tags from this file.'],
                 self.linter_stdout))
 
     def test_invalid_datetime_now(self):
@@ -387,7 +388,7 @@ class PythonLintTests(LintTests):
             ).perform_all_lint_checks()
         self.assertTrue(
             appears_in_linter_stdout(
-                ['Line 38: Please use datetime.datetime.utcnow() instead '
+                ['Line 41: Please use datetime.datetime.utcnow() instead '
                  'of datetime.datetime.now().'],
                 self.linter_stdout))
 
@@ -398,7 +399,7 @@ class PythonLintTests(LintTests):
             ).perform_all_lint_checks()
         self.assertTrue(
             appears_in_linter_stdout(
-                ['Line 38: Please use python_utils.PRINT().'],
+                ['Line 42: Please use python_utils.PRINT().'],
                 self.linter_stdout))
 
     def test_invalid_pylint_id(self):
@@ -408,7 +409,7 @@ class PythonLintTests(LintTests):
             ).perform_all_lint_checks()
         self.assertTrue(
             appears_in_linter_stdout(
-                ['Line 38: Please remove pylint exclusion if it is unnecessary,'
+                ['Line 42: Please remove pylint exclusion if it is unnecessary,'
                  ' or make it human readable with a sentence instead of an id. '
                  'The id-to-message list can be seen '
                  'here->http://pylint-messages.wikidot.com/all-codes'],
@@ -421,7 +422,7 @@ class PythonLintTests(LintTests):
             ).perform_all_lint_checks()
         self.assertTrue(
             appears_in_linter_stdout(
-                ['Line 38: Please do not use self.assertEquals method. This '
+                ['Line 42: Please do not use self.assertEquals method. This '
                  'method has been deprecated. Instead use self.assertEqual '
                  'method.'],
                 self.linter_stdout))
@@ -433,7 +434,7 @@ class PythonLintTests(LintTests):
             ).perform_all_lint_checks()
         self.assertTrue(
             appears_in_linter_stdout(
-                ['Line 38: Please use python_utils.open_file() instead '
+                ['Line 42: Please use python_utils.open_file() instead '
                  'of open().'],
                 self.linter_stdout))
 
@@ -444,7 +445,7 @@ class PythonLintTests(LintTests):
             ).perform_all_lint_checks()
         self.assertTrue(
             appears_in_linter_stdout(
-                ['Line 40: Please use python_utils.string_io() instead of '
+                ['Line 44: Please use python_utils.string_io() instead of '
                  'import StringIO.'],
                 self.linter_stdout))
 
@@ -455,7 +456,7 @@ class PythonLintTests(LintTests):
             ).perform_all_lint_checks()
         self.assertTrue(
             appears_in_linter_stdout(
-                ['Line 40: Please use python_utils.url_quote().'],
+                ['Line 44: Please use python_utils.url_quote().'],
                 self.linter_stdout))
 
     def test_invalid_unquote_plus(self):
@@ -465,7 +466,7 @@ class PythonLintTests(LintTests):
             ).perform_all_lint_checks()
         self.assertTrue(
             appears_in_linter_stdout(
-                ['Line 40: Please use python_utils.url_unquote_plus().'],
+                ['Line 44: Please use python_utils.url_unquote_plus().'],
                 self.linter_stdout))
 
     def test_invalid_urlencode(self):
@@ -475,7 +476,7 @@ class PythonLintTests(LintTests):
             ).perform_all_lint_checks()
         self.assertTrue(
             appears_in_linter_stdout(
-                ['Line 41: Please use python_utils.url_encode().'],
+                ['Line 45: Please use python_utils.url_encode().'],
                 self.linter_stdout))
 
     def test_invalid_urlretrieve(self):
@@ -485,7 +486,7 @@ class PythonLintTests(LintTests):
             ).perform_all_lint_checks()
         self.assertTrue(
             appears_in_linter_stdout(
-                ['Line 41: Please use python_utils.url_retrieve().'],
+                ['Line 45: Please use python_utils.url_retrieve().'],
                 self.linter_stdout))
 
     def test_invalid_urlopen(self):
@@ -495,7 +496,7 @@ class PythonLintTests(LintTests):
             ).perform_all_lint_checks()
         self.assertTrue(
             appears_in_linter_stdout(
-                ['Line 40: Please use python_utils.url_open().'],
+                ['Line 44: Please use python_utils.url_open().'],
                 self.linter_stdout))
 
     def test_invalid_urlsplit(self):
@@ -505,7 +506,7 @@ class PythonLintTests(LintTests):
             ).perform_all_lint_checks()
         self.assertTrue(
             appears_in_linter_stdout(
-                ['Line 40: Please use python_utils.url_split().'],
+                ['Line 45: Please use python_utils.url_split().'],
                 self.linter_stdout))
 
     def test_invalid_urlparse(self):
@@ -515,7 +516,7 @@ class PythonLintTests(LintTests):
             ).perform_all_lint_checks()
         self.assertTrue(
             appears_in_linter_stdout(
-                ['Line 40: Please use python_utils.url_parse().'],
+                ['Line 45: Please use python_utils.url_parse().'],
                 self.linter_stdout))
 
     def test_invalid_url_unsplit(self):
@@ -525,7 +526,7 @@ class PythonLintTests(LintTests):
             ).perform_all_lint_checks()
         self.assertTrue(
             appears_in_linter_stdout(
-                ['Line 40: Please use python_utils.url_unsplit().'],
+                ['Line 45: Please use python_utils.url_unsplit().'],
                 self.linter_stdout))
 
     def test_invalid_parse_qs(self):
@@ -535,7 +536,7 @@ class PythonLintTests(LintTests):
             ).perform_all_lint_checks()
         self.assertTrue(
             appears_in_linter_stdout(
-                ['Line 40: Please use python_utils.parse_query_string().'],
+                ['Line 45: Please use python_utils.parse_query_string().'],
                 self.linter_stdout))
 
     def test_invalid_unquote(self):
@@ -545,7 +546,7 @@ class PythonLintTests(LintTests):
             ).perform_all_lint_checks()
         self.assertTrue(
             appears_in_linter_stdout(
-                ['Line 41: Please use python_utils.urllib_unquote().'],
+                ['Line 44: Please use python_utils.urllib_unquote().'],
                 self.linter_stdout))
 
     def test_invalid_urljoin(self):
@@ -555,7 +556,7 @@ class PythonLintTests(LintTests):
             ).perform_all_lint_checks()
         self.assertTrue(
             appears_in_linter_stdout(
-                ['Line 42: Please use python_utils.url_join().'],
+                ['Line 45: Please use python_utils.url_join().'],
                 self.linter_stdout))
 
     def test_invalid_request(self):
@@ -565,7 +566,7 @@ class PythonLintTests(LintTests):
             ).perform_all_lint_checks()
         self.assertTrue(
             appears_in_linter_stdout(
-                ['Line 42: Please use python_utils.url_request().'],
+                ['Line 46: Please use python_utils.url_request().'],
                 self.linter_stdout))
 
     def test_invalid_input(self):
@@ -575,7 +576,7 @@ class PythonLintTests(LintTests):
             ).perform_all_lint_checks()
         self.assertTrue(
             appears_in_linter_stdout(
-                ['Line 38: Please use python_utils.INPUT.'],
+                ['Line 42: Please use python_utils.INPUT.'],
                 self.linter_stdout))
 
     def test_invalid_map(self):
@@ -585,7 +586,7 @@ class PythonLintTests(LintTests):
             ).perform_all_lint_checks()
         self.assertTrue(
             appears_in_linter_stdout(
-                ['Line 38: Please use python_utils.MAP.'],
+                ['Line 42: Please use python_utils.MAP.'],
                 self.linter_stdout))
 
     def test_invalid_next(self):
@@ -595,7 +596,7 @@ class PythonLintTests(LintTests):
             ).perform_all_lint_checks()
         self.assertTrue(
             appears_in_linter_stdout(
-                ['Line 39: Please use python_utils.NEXT.'],
+                ['Line 43: Please use python_utils.NEXT.'],
                 self.linter_stdout))
 
     def test_invalid_object(self):
@@ -605,7 +606,7 @@ class PythonLintTests(LintTests):
             ).perform_all_lint_checks()
         self.assertTrue(
             appears_in_linter_stdout(
-                ['Line 23: Please use python_utils.OBJECT.'],
+                ['Line 25: Please use python_utils.OBJECT.'],
                 self.linter_stdout))
 
     def test_invalid_range(self):
@@ -615,7 +616,7 @@ class PythonLintTests(LintTests):
             ).perform_all_lint_checks()
         self.assertTrue(
             appears_in_linter_stdout(
-                ['Line 38: Please use python_utils.RANGE.'],
+                ['Line 42: Please use python_utils.RANGE.'],
                 self.linter_stdout))
 
     def test_invalid_round(self):
@@ -625,7 +626,7 @@ class PythonLintTests(LintTests):
             ).perform_all_lint_checks()
         self.assertTrue(
             appears_in_linter_stdout(
-                ['Line 38: Please use python_utils.ROUND.'],
+                ['Line 42: Please use python_utils.ROUND.'],
                 self.linter_stdout))
 
     def test_invalid_str(self):
@@ -635,7 +636,7 @@ class PythonLintTests(LintTests):
             ).perform_all_lint_checks()
         self.assertTrue(
             appears_in_linter_stdout(
-                ['Line 38: Please try to use python_utils.convert_to_bytes() '
+                ['Line 42: Please try to use python_utils.convert_to_bytes() '
                  'for the strings used in webapp2\'s built-in methods or for '
                  'strings used directly in NDB datastore models. If you need to'
                  ' cast ints/floats to strings, please use '
@@ -649,7 +650,7 @@ class PythonLintTests(LintTests):
             ).perform_all_lint_checks()
         self.assertTrue(
             appears_in_linter_stdout(
-                ['Line 40: Please use python_utils.ZIP.'],
+                ['Line 44: Please use python_utils.ZIP.'],
                 self.linter_stdout))
 
     def test_invalid_basestring(self):
@@ -659,7 +660,7 @@ class PythonLintTests(LintTests):
             ).perform_all_lint_checks()
         self.assertTrue(
             appears_in_linter_stdout(
-                ['Line 38: Please use python_utils.BASESTRING.'],
+                ['Line 42: Please use python_utils.BASESTRING.'],
                 self.linter_stdout))
 
     def test_invalid_metaclass(self):
@@ -669,7 +670,7 @@ class PythonLintTests(LintTests):
             ).perform_all_lint_checks()
         self.assertTrue(
             appears_in_linter_stdout(
-                ['Line 42: Please use python_utils.with_metaclass().'],
+                ['Line 46: Please use python_utils.with_metaclass().'],
                 self.linter_stdout))
 
     def test_invalid_iteritems(self):
@@ -679,7 +680,7 @@ class PythonLintTests(LintTests):
             ).perform_all_lint_checks()
         self.assertTrue(
             appears_in_linter_stdout(
-                ['Line 38: Please use items() instead.'],
+                ['Line 43: Please use items() instead.'],
                 self.linter_stdout))
 
     def test_invalid_itervalues(self):
@@ -689,7 +690,7 @@ class PythonLintTests(LintTests):
             ).perform_all_lint_checks()
         self.assertTrue(
             appears_in_linter_stdout(
-                ['Line 38: Please use values() instead.'],
+                ['Line 43: Please use values() instead.'],
                 self.linter_stdout))
 
     def test_invalid_iterkeys(self):
@@ -699,7 +700,7 @@ class PythonLintTests(LintTests):
             ).perform_all_lint_checks()
         self.assertTrue(
             appears_in_linter_stdout(
-                ['Line 38: Please use keys() instead.'],
+                ['Line 43: Please use keys() instead.'],
                 self.linter_stdout))
 
 
@@ -744,7 +745,7 @@ class GeneralLintTests(LintTests):
             ).perform_all_lint_checks()
         self.assertTrue(
             appears_in_linter_stdout(
-                ['Line 31: Please assign TODO comments to a user in the format'
+                ['Line 33: Please assign TODO comments to a user in the format'
                  ' TODO(username): XXX.'],
                 self.linter_stdout))
 

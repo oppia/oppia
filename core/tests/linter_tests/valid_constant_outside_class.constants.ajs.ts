@@ -13,7 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Test file for linter.
+ * @fileoverview Invalid syntax .ts file, used by scripts/linters/
+ * js_ts_linter_test.py.
  */
 
 const INTERACTION_SPECS = require('interactions/interaction_specs.json');

@@ -13,15 +13,15 @@
 // limitations under the License.
 
 /**
- * @fileoverview Invalid syntax .ts file,
- used by scripts/pre_commit_linter_test.
+ * @fileoverview Invalid syntax .ts file, used by scripts/linters/
+ * js_ts_linter_test.py.
  */
 
 angular.module('oppia').controller('SuggestionModalForCreatorViewController', [
   '$uibModalInstance', '$scope', 'SuggestionModalService',
   'canReviewActiveThread', 'description', 'newContent', 'oldContent',
   'stateName', 'suggestionIsHandled', 'suggestionStatus',
-  'suggestionType', IMPORT_STATEMENT,
+  'suggestionType', 'IMPORT_STATEMENT',
   function(
       $scope, SuggestionModalService, $uibModalInstance,
       canReviewActiveThread, description, newContent, oldContent,

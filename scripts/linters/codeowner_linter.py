@@ -185,6 +185,15 @@ def check_codeowner_file(file_cache, verbose_mode_enabled):
     please refer https://docs.python.org/2/library/glob.html.
     This function also ensures that the most important rules are at the
     bottom of the CODEOWNERS file.
+
+    Args:
+        file_cache: object(FileCache). Provides thread-safe access to cached
+            file content.
+        verbose_mode_enabled: bool. True if verbose mode is enabled.
+
+    Returns:
+        summary_messages: list(str). List of summary messages returned by the
+            lint checks.
     """
     stdout = sys.stdout
     if verbose_mode_enabled:
@@ -298,11 +307,11 @@ def check_codeowner_file(file_cache, verbose_mode_enabled):
                     summary_messages.append(summary_message)
                     failed = True
 
-        tmp_failed, summary_message = (
+        codeowner_pattern_check_failed, summary_message = (
             _check_for_important_patterns_at_bottom_of_codeowners(
                 important_rules_in_critical_section))
         summary_messages.extend(summary_message)
-        failed = failed or tmp_failed
+        failed = failed or codeowner_pattern_check_failed
 
         if failed:
             summary_message = (
