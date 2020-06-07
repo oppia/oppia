@@ -140,35 +140,31 @@ angular.module('oppia').directive('statisticsTab', [
             AlertsService.clearWarnings();
 
             StateInteractionStatsService.computeStats(
-              ExplorationStatesService.getState(stateName), false
-            ).then(stats => {
-              $uibModal.open({
-                templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                  '/pages/exploration-editor-page/statistics-tab/templates/' +
-                  'state-stats-modal.template.html'),
-                backdrop: true,
-                resolve: {
-                  improvementType: function() {
-                    return improvementType;
-                  },
-                  stateName: function() {
-                    return stateName;
-                  },
-                  stateStats: function() {
-                    return ctrl.stateStats[stateName];
-                  },
-                  stateStatsModalIsOpen: function() {
-                    return stateStatsModalIsOpen;
-                  },
-                  visualizationsInfo: function() {
-                    return stats.visualizations_info;
-                  }
+              ExplorationStatesService.getState(stateName)
+            ).then(stats => $uibModal.open({
+              controller: 'StateStatsModalController',
+              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                '/pages/exploration-editor-page/statistics-tab/templates/' +
+                'state-stats-modal.template.html'),
+              backdrop: true,
+              resolve: {
+                improvementType: function() {
+                  return improvementType;
                 },
-                controller: 'StateStatsModalController'
-              }).result.then(function() {}, function() {
-                AlertsService.clearWarnings();
-              });
-            });
+                stateName: function() {
+                  return stateName;
+                },
+                stateStats: function() {
+                  return ctrl.stateStats[stateName];
+                },
+                stateStatsModalIsOpen: function() {
+                  return stateStatsModalIsOpen;
+                },
+                visualizationsInfo: function() {
+                  return stats.visualizations_info;
+                }
+              },
+            }).result.then(null, () => AlertsService.clearWarnings()));
           };
           ctrl.$onInit = function() {
             $scope.$on('refreshStatisticsTab', function() {
