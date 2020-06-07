@@ -87,9 +87,9 @@ describe('TranslatePipe', () => {
     expect(pipe.transform('I18n_t_1')).toBe('Hello');
     expect(pipe.transform('I18n_t_2', {val: 'World'})).toBe('Hello World');
     expect(pipe.transform('I18n_t_2', {val: 'World'})).toBe('Hello World');
-    // Adding rogue params here, it should return the interpolated value with
-    // the script tags as santization happens when it is sent to the view using
-    // innerHTM"L"
+    // The pipe should return the interpolated value with the rogue params, as
+    // santization happens when the interpolated value is sent to the view
+    // using innerHTM"L".
     expect(pipe.transform('I18n_t_2', {val: '<script>World</script>'})).toBe(
       'Hello <script>World</script>');
     expect(pipe.transform('I18n_t_3')).toBe('I18n_t_3');
