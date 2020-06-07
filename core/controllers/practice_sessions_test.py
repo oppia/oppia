@@ -47,8 +47,6 @@ class BasePracticeSessionsControllerTests(test_utils.GenericTestBase):
 
         self.topic = topic_domain.Topic.create_default_topic(
             self.topic_id, 'public_topic_name', 'abbrev', 'description')
-        self.topic.uncategorized_skill_ids.append(self.skill_id1)
-            self.topic_id, 'public_topic_name', 'abbrev')
         self.topic.subtopics.append(topic_domain.Subtopic(
             1, 'subtopic_name', [self.skill_id1], 'image.svg',
             constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0]))
