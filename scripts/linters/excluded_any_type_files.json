@@ -87,7 +87,6 @@
     "core/templates/services/schema-undefined-last-element.service.ts",
     "core/templates/services/site-analytics.service.ts",
     "core/templates/services/speech-synthesis-chunker.service.ts",
-    "core/templates/services/state-interaction-stats.service.ts",
     "core/templates/services/state-top-answers-stats.service.spec.ts",
     "core/templates/services/suggestion-modal.service.ts",
     "core/templates/services/suggestions.service.ts",

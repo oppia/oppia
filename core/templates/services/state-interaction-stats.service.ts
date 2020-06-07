@@ -43,6 +43,8 @@ type Answer = (
   INumberWithUnitsBackendDict | string[] | INote[] |
   number[] | IGraphBackendDict| string[][]);
 
+type Option = string | string[];
+
 export interface IAnswerData {
   'answer': Answer;
   'frequency': number;
@@ -58,8 +60,7 @@ export interface IVisualizationInfo {
   'addressed_info_is_supported': boolean;
   'data': IAnswerData[];
   'id': string;
-  // Needs to be 'any' because type depends on the visualization's id.
-  'options': {[name: string]: any};
+  'options': {[name: string]: Option};
 }
 
 export interface IStateRulesStatsBackendDict {
