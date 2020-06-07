@@ -53,8 +53,7 @@ class MockTranslateService {
     if (interpolateParams) {
       return str.replace(/\<\[\s?([^{}\s]*)\s?\]\>/g,
         (substring: string, interpolateParamsKey: string) => {
-          let r = interpolateParams[interpolateParamsKey];
-          return r;
+          return interpolateParams[interpolateParamsKey];
         });
     }
 
