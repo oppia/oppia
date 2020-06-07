@@ -198,8 +198,10 @@ def get_file_contents(filepath, mode='r'):
 
 def return_json(filepath):
     """Return json object when provided url
+
     Args:
         filepath: the path to the json file.
+
     Return:
         a parsed json objects.
     """
@@ -209,8 +211,8 @@ def return_json(filepath):
 
 def test_manifest_syntax(dependency_type, dependency_dict):
     """This checks syntax of the manifest.json dependencies.
-
     Display warning message when there is an error and terminate the program.
+
     Args:
       dependency_type: str. Dependency download format.
       dependency_dict: dict. manifest.json dependency dict.
@@ -265,6 +267,7 @@ def test_manifest_syntax(dependency_type, dependency_dict):
 
 def validate_manifest(filepath):
     """This validates syntax of the manifest.json
+
     Args:
       filepath: the path to the json file.
     """
@@ -282,6 +285,7 @@ def validate_manifest(filepath):
 
 def download_manifest_files(filepath):
     """This download all files to the required folders
+
     Args:
       filepath: the path to the json file.
     """
