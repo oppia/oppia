@@ -47,7 +47,7 @@ angular.module('oppia').component('positionOfTermsEditor', {
         humanReadableName: 'with reordering allowed around ='
       }];
 
-      ctrl.localValue = ctrl.positionOfTerms[2]
+      ctrl.localValue = ctrl.positionOfTerms[2];
       for (var i = 0; i < ctrl.positionOfTerms.length; i++) {
         if (ctrl.positionOfTerms[i].name === ctrl.value) {
           ctrl.localValue = ctrl.positionOfTerms[i];
