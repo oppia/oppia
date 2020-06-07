@@ -1131,7 +1131,6 @@ class DivisionOperatorChecker(checkers.BaseChecker):
         """
 
         in_multi_line_comment = False
-        in_multi_line_docstring = False
         multi_line_indicator = b'"""'
         string_indicator = b'\''
         file_content = read_from_node(node)
