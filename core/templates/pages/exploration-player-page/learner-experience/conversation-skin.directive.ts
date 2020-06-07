@@ -1330,7 +1330,8 @@ angular.module('oppia').directive('conversationSkin', [
                 return;
               }
               if (hasInteractedAtLeastOnce && !$scope.isInPreviewMode &&
-                  !$scope.displayedCard.isTerminal()) {
+                  !$scope.displayedCard.isTerminal() &&
+                  !ExplorationPlayerStateService.isInQuestionMode()) {
                 StatsReportingService.recordMaybeLeaveEvent(
                   PlayerTranscriptService.getLastStateName(),
                   LearnerParamsService.getAllParams());

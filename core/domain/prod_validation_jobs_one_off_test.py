@@ -9032,14 +9032,15 @@ class StorySummaryModelValidatorTests(test_utils.GenericTestBase):
             u'[u\'fully-validated StorySummaryModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 
-    def test_model_with_invalid_node_count(self):
-        self.model_instance_0.node_count = 10
+    def test_model_with_invalid_node_titles(self):
+        self.model_instance_0.node_titles = ['Title 1']
         self.model_instance_0.put()
         expected_output = [
             (
-                u'[u\'failed validation check for node count check of '
-                'StorySummaryModel\', [u\'Entity id 0: Node count: 10 does '
-                'not match the number of nodes in story_contents dict: []\']]'
+                u'[u\'failed validation check for node titles check of '
+                'StorySummaryModel\', [u"Entity id 0: Node titles: '
+                '[u\'Title 1\'] does not match the nodes in story_contents '
+                'dict: []"]]'
             ), u'[u\'fully-validated StorySummaryModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 
