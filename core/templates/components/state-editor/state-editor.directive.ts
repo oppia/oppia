@@ -55,6 +55,8 @@ angular.module('oppia').directive('stateEditor', [
       scope: {
         addState: '=',
         getStateContentPlaceholder: '&stateContentPlaceholder',
+        getStateContentSaveButtonPlaceholder: (
+          '&stateContentSaveButtonPlaceholder'),
         isInteractionShown: '&interactionIsShown',
         navigateToState: '=',
         onSaveHints: '=',

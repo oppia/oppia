@@ -17,7 +17,7 @@
       </div>
     </md-card>
     <button class="btn btn-success btn-sm" ng-click="addSkill()">Link Another Skill</button>
-    <button class="btn btn-primary btn-sm" ng-click="undo()">Undo Skill Changes</button>
+    <button class="btn btn-primary btn-sm" ng-click="undo()" ng-if="getSkillLinkageModificationsArray().length > 0">Undo Skill Changes</button>
   </div>
 
   <h4 ng-if="!newQuestionIsBeingCreated" style="margin-top: 4vh;"> <strong> Question Editor </strong> </h4>
@@ -28,13 +28,16 @@
                    can-edit-question="canEditQuestion"
                    question-changed="questionChanged">
   </question-editor>
-  <div class="alert alert-danger" ng-if="validationError">
-    <[validationError]>
-    <span class="oppia-transition-200"
-          ng-click="removeErrors()"
-          style="float: right;">
-      <i class="material-icons md-18">&#xE5CD;</i>
-    </span>
+  <div class="alert alert-danger" ng-if="question.getStateData().interaction.id && question.getValidationErrorMessage()">
+    <[question.getValidationErrorMessage()]>
+  </div>
+  <div class="alert alert-danger" ng-if="question.getStateData().interaction.id && !question.getValidationErrorMessage() && question.getUnaddressedMisconceptionNames(misconceptionsBySkill).length">
+    Remaining misconceptions that need to be addressed:
+    <ul>
+      <li ng-repeat="misconceptionName in question.getUnaddressedMisconceptionNames(misconceptionsBySkill)">
+        <[misconceptionName]>
+      </li>
+    </ul>
   </div>
 </div>
 <div class="modal-footer">
@@ -43,7 +46,7 @@
           title="To Save please add: interaction, hint, solution and address all misconceptions"
           class="btn btn-success protractor-test-save-question-button"
           ng-click="done()"
-          ng-disabled="isSaveButtonDisabled()">
+          ng-disabled="!isQuestionValid()">
     Done
   </button>
   <button ng-if="!newQuestionIsBeingCreated"

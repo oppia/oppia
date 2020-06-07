@@ -320,7 +320,8 @@ angular.module('oppia').directive('stateResponses', [
             }).result.then(function(result) {
               // Create a new answer group.
               $scope.answerGroups.push(AnswerGroupObjectFactory.createNew(
-                [result.tmpRule], result.tmpOutcome, [], null));
+                [result.tmpRule], result.tmpOutcome, [],
+                result.tmpTaggedSkillMisconceptionId));
               ResponsesService.save(
                 $scope.answerGroups, $scope.defaultOutcome,
                 function(newAnswerGroups, newDefaultOutcome) {

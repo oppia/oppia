@@ -119,16 +119,12 @@
                   warnings-are-suppressed="$ctrl.suppressWarnings()"
                   show-mark-all-audio-as-needing-update-modal-if-required="$ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired">
   </outcome-editor>
-
-  <div ng-if="$ctrl.isInQuestionMode() && $ctrl.getTaggedSkillMisconceptionId() !== null && !$ctrl.outcome.labelledAsCorrect">
-    <label> Tagged Misconception: </label>
-    <[$ctrl.misconceptionName]>
-  </div>
-  <button type="button"
-          ng-if="$ctrl.isEditable && $ctrl.isInQuestionMode() && $ctrl.rules && !$ctrl.outcome.labelledAsCorrect && $ctrl.containsMisconceptions()"
-          class="btn btn-secondary btn-lg oppia-add-rule-button protractor-test-add-answer"
-          style="padding-top: 5px;"
-          ng-click="$ctrl.tagAnswerGroupWithMisconception()">
-    Tag with misconception
-  </button>
+  <question-misconception-editor is-editable="$ctrl.isEditable"
+                                 ng-if="$ctrl.isInQuestionMode()"
+                                 on-save-tagged-misconception="$ctrl.onSaveTaggedMisconception"
+                                 on-save-answer-group-feedback="$ctrl.getOnSaveAnswerGroupFeedbackFn()"
+                                 outcome="$ctrl.outcome"
+                                 rules="$ctrl.rules"
+                                 tagged-skill-misconception-id="$ctrl.taggedSkillMisconceptionId">
+  </question-misconception-editor>
 </div>

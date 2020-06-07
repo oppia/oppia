@@ -20,12 +20,14 @@ require('services/suggestion-modal.service.ts');
 
 angular.module('oppia').controller('QuestionSuggestionReviewModalController', [
   '$scope', '$uibModalInstance', 'SuggestionModalService',
-  'authorName', 'contentHtml', 'question', 'questionHeader', 'reviewable',
-  'skillDifficulty', 'skillRubrics', 'SKILL_DIFFICULTY_LABEL_TO_FLOAT',
+  'authorName', 'contentHtml', 'misconceptionsBySkill', 'question',
+  'questionHeader', 'reviewable', 'skillDifficulty', 'skillRubrics',
+  'SKILL_DIFFICULTY_LABEL_TO_FLOAT',
   function(
       $scope, $uibModalInstance, SuggestionModalService,
-      authorName, contentHtml, question, questionHeader, reviewable,
-      skillDifficulty, skillRubrics, SKILL_DIFFICULTY_LABEL_TO_FLOAT) {
+      authorName, contentHtml, misconceptionsBySkill, question,
+      questionHeader, reviewable, skillDifficulty, skillRubrics,
+      SKILL_DIFFICULTY_LABEL_TO_FLOAT) {
     const init = () => {
       $scope.authorName = authorName;
       $scope.contentHtml = contentHtml;
@@ -36,7 +38,7 @@ angular.module('oppia').controller('QuestionSuggestionReviewModalController', [
       $scope.questionStateData = question.getStateData();
       $scope.questionId = question.getId();
       $scope.canEditQuestion = false;
-      $scope.misconceptionsBySkill = [];
+      $scope.misconceptionsBySkill = misconceptionsBySkill;
       $scope.skillDifficultyLabel = getSkillDifficultyLabel();
       $scope.skillRubricExplanation = getRubricExplanation(
         $scope.skillDifficultyLabel);
