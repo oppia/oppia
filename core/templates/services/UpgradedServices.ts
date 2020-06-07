@@ -1211,8 +1211,8 @@ export class UpgradedServices {
       new PlaythroughService(
         upgradedServices['ExplorationFeaturesService'],
         upgradedServices['LearnerActionObjectFactory'],
-        upgradedServices['PlaythroughObjectFactory'],
         upgradedServices['PlaythroughBackendApiService'],
+        upgradedServices['PlaythroughObjectFactory'],
         upgradedServices['StopwatchObjectFactory']);
     upgradedServices['StateObjectFactory'] = new StateObjectFactory(
       upgradedServices['InteractionObjectFactory'],
