@@ -138,15 +138,12 @@ class ActivityRights(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Public explorations should have no viewers specified.')
 
-        owner_editor = set(self.owner_ids).intersection(set(self.editor_ids))
-        owner_voice_artist = set(self.owner_ids).intersection(
-            set(self.voice_artist_ids))
-        owner_viewer = set(self.owner_ids).intersection(set(self.viewer_ids))
-        editor_voice_artist = set(self.editor_ids).intersection(
-            set(self.voice_artist_ids))
-        editor_viewer = set(self.editor_ids).intersection(set(self.viewer_ids))
-        voice_artist_viewer = set(self.voice_artist_ids).intersection(
-            set(self.viewer_ids))
+        owner_editor = set(self.owner_ids) & set(self.editor_ids)
+        owner_voice_artist = set(self.owner_ids) & set(self.voice_artist_ids)
+        owner_viewer = set(self.owner_ids) & set(self.viewer_ids)
+        editor_voice_artist = set(self.editor_ids) & set(self.voice_artist_ids)
+        editor_viewer = set(self.editor_ids) & set(self.viewer_ids)
+        voice_artist_viewer = set(self.voice_artist_ids) & set(self.viewer_ids)
         if owner_editor:
             raise utils.ValidationError(
                 'A user cannot be both an owner and an editor: %s' %
@@ -326,6 +323,7 @@ def get_activity_rights_from_model(activity_rights_model, activity_type):
     Returns:
         ActivityRights. The rights object created from the model.
     """
+
     return ActivityRights(
         activity_rights_model.id,
         activity_rights_model.owner_ids,
