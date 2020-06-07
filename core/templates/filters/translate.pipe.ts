@@ -89,10 +89,10 @@ export class TranslatePipe implements PipeTransform, OnDestroy {
   }
 
   /**
-   * Every pipe is supposed to have a function named transform as Pipes
-   * implement PipeTranform interface. The PipeTransform interface expects a
-   * transform function. This transform function is called by angular to
-   * transform input values to output values for display in a view.
+   * Every pipe is supposed to have a function named "transform". This is
+   * because Pipes implement the PipeTransform interface. The PipeTransform
+   * interface expects a function named "transform". This "transform" function
+   * is called by angular to transform input values for display in a view.
    * @param {string} key - key for i18n
    * @param {Object | undefined} params - key-value pairs for interpolation. No
    *  key-value pairs are sent when the translation does not require
