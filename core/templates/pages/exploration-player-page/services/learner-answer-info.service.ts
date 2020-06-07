@@ -107,7 +107,7 @@ export class LearnerAnswerInfoService {
 
     var classificationResult = (
       this.answerClassificationService.getMatchingClassificationResult(
-        this.stateName, state.interaction, answer,
+        this.stateName, state.interaction, new Object(answer),
         interactionRulesService));
     var outcome = classificationResult.outcome;
     var thresholdProbabilityIndex = null;
