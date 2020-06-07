@@ -46,8 +46,9 @@ require(
 require(
   'pages/topics-and-skills-dashboard-page/' +
   'topics-and-skills-dashboard-page.service');
-require('pages/topics-and-skills-dashboard-page/' +
-    'topics-and-skills-dashboard-page.constants.ajs.ts');
+require(
+  'pages/topics-and-skills-dashboard-page/' +
+  'topics-and-skills-dashboard-page.constants.ajs.ts');
 require('services/alerts.service.ts');
 require('services/image-local-storage.service.ts');
 
@@ -109,17 +110,17 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
                 ctrl.currentCount = ctrl.totalEntityCountToDisplay;
                 ctrl.activeTab = ctrl.TAB_NAME_TOPICS;
                 ctrl.goToPageNumber(0);
-                ctrl.editableTopicSummaries = ctrl.topicSummaries.filter(
+                ctrl.editableTopicSummaries = (ctrl.topicSummaries.filter(
                   function(summary) {
                     return summary.can_edit_topic === true;
                   }
-                );
-                ctrl.untriagedSkillSummaries =
-                    response.untriaged_skill_summary_dicts;
-                ctrl.totalUntriagedSkillSummaries =
-                    ctrl.untriagedSkillSummaries;
-                ctrl.mergeableSkillSummaries =
-                    response.mergeable_skill_summary_dicts;
+                ));
+                ctrl.untriagedSkillSummaries = (
+                  response.untriaged_skill_summary_dicts);
+                ctrl.totalUntriagedSkillSummaries = (
+                  ctrl.untriagedSkillSummaries);
+                ctrl.mergeableSkillSummaries = (
+                  response.mergeable_skill_summary_dicts);
                 if (!stayInSameTab || !ctrl.activeTab) {
                   ctrl.activeTab = ctrl.TAB_NAME_TOPICS;
                 }
@@ -193,19 +194,18 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
             if (ctrl.activeTab === ctrl.TAB_NAME_TOPICS) {
               ctrl.topicPageNumber = pageNumber;
               ctrl.pageNumber = ctrl.topicPageNumber;
-              ctrl.displayedTopicSummaries =
-                  ctrl.topicSummaries.slice(
-                    pageNumber * ctrl.itemsPerPage,
-                    (pageNumber + 1) * ctrl.itemsPerPage);
+              ctrl.displayedTopicSummaries = (ctrl.topicSummaries.slice(
+                pageNumber * ctrl.itemsPerPage,
+                (pageNumber + 1) * ctrl.itemsPerPage));
             } else if (ctrl.activeTab === ctrl.TAB_NAME_UNTRIAGED_SKILLS) {
-              ctrl.totalEntityCountToDisplay =
-                  ctrl.totalUntriagedSkillSummaries.length;
+              ctrl.totalEntityCountToDisplay = (
+                ctrl.totalUntriagedSkillSummaries.length);
               ctrl.skillPageNumber = pageNumber;
               ctrl.pageNumber = ctrl.skillPageNumber;
-              ctrl.untriagedSkillSummaries =
-                  ctrl.totalUntriagedSkillSummaries.slice(
-                    pageNumber * ctrl.itemsPerPage,
-                    (pageNumber + 1) * ctrl.itemsPerPage);
+              ctrl.untriagedSkillSummaries = (
+                ctrl.totalUntriagedSkillSummaries.slice(
+                  pageNumber * ctrl.itemsPerPage,
+                  (pageNumber + 1) * ctrl.itemsPerPage));
             }
           };
           /**
@@ -236,6 +236,10 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
             _forceSelect2Refresh();
           };
 
+          // Select2 dropdown cannot automatically refresh its display
+          // after being translated.
+          // Use ctrl.select2DropdownIsShown in its ng-if attribute
+          // and this function to force it to reload
           var _forceSelect2Refresh = function() {
             ctrl.select2DropdownIsShown = false;
             $timeout(function() {

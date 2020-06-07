@@ -1,12 +1,12 @@
 <md-card layout="row" class="list-view-item">
   <table class="dashboard-table protractor-test-topics-table">
     <colgroup>
-      <col style="width: 5%;">
-      <col style="width: 35%;">
-      <col style="width: 10%;">
-      <col style="width: 10%;">
-      <col style="width: 10%;">
-      <col style="width: 12%;">
+      <col class="dashboard-table-index-column">
+      <col class="dashboard-table-name-column">
+      <col class="dashboard-table-story-column">
+      <col class="dashboard-table-subtopic-column">
+      <col class="dashboard-table-skill-column">
+      <col class="dashboard-table-status-column">
     </colgroup>
     <tr>
       <th ng-repeat="key in $ctrl.TOPIC_HEADINGS"
@@ -40,7 +40,7 @@
           <span> <[topic.canonical_story_count]> </span>
         </p>
       </td>
-      <td >
+      <td>
         <p class="list-summary text-center">
           <span> <[topic.total_skill_count]> </span>
           <div ng-show="$ctrl.topic.uncategorized_skill_count"
@@ -68,7 +68,7 @@
           </a>
           <a ng-if="canDeleteTopic()" ng-click="$ctrl.deleteTopic(topic.id)">
             <i class="fas fa-trash-alt protractor-test-delete-topic-button"></i>
-            <span >Delete</span>
+            <span>Delete</span>
           </a>
         </div>
       </td>
@@ -82,7 +82,24 @@
     box-shadow: none;
     margin-top: 50px;
   }
-
+  topics-list .dashboard-table-index-column {
+    width: 5%;
+  }
+  topics-list .dashboard-table-name-column {
+    width: 35%;
+  }
+  topics-list .dashboard-table-story-column {
+    width: 10%;
+  }
+  topics-list .dashboard-table-subtopic-column {
+    width: 10%;
+  }
+  topics-list .dashboard-table-skill-column {
+    width: 10%;
+  }
+  topics-list .dashboard-table-status-column {
+    width: 12%;
+  }
   topics-list .dashboard-table {
     font-size: 15px;
     width: 100%;
@@ -96,7 +113,7 @@
     width: 90%;
   }
   topics-list .topic-edit-options {
-    background-color: white;
+    background-color: #ffffff;
     border: 1px solid black;
     display: flex;
     flex-wrap: wrap;
