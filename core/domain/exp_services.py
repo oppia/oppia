@@ -1367,6 +1367,7 @@ def get_next_page_of_all_non_private_commits(
             - bool. indicating whether there are (likely) more results after
               this batch. If False, there are no more results; if True, there
               are probably more results.
+
     Raises:
         ValueError: The argument max_age is not datetime.timedelta or None.
     """

@@ -157,12 +157,15 @@ def get_remote_name():
 
 def git_diff_name_status(left, right, diff_filter=''):
     """Compare two branches/commits etc with git.
+
     Parameter:
         left: the lefthand comperator
         right: the righthand comperator
         diff_filter: arguments given to --diff-filter (ACMRTD...)
+
     Returns:
         List of FileDiffs (tuple with name/status)
+
     Raises:
         ValueError if git command fails.
     """
@@ -193,14 +196,17 @@ def git_diff_name_status(left, right, diff_filter=''):
 
 def compare_to_remote(remote, local_branch, remote_branch=None):
     """Compare local with remote branch with git diff.
+
     Parameter:
         remote: Git remote being pushed to
         local_branch: Git branch being pushed to
         remote_branch: The branch on the remote to test against. If None same
             as local branch.
+
     Returns:
         List of file names that are modified, changed, renamed or added
         but not deleted
+
     Raises:
         ValueError if git command fails.
     """
@@ -222,9 +228,11 @@ def extract_files_to_lint(file_diffs):
 
 def collect_files_being_pushed(ref_list, remote):
     """Collect modified files and filter those that need linting.
+
     Parameter:
         ref_list: list of references to parse (provided by git in stdin)
         remote: the remote being pushed to
+
     Returns:
         dict: Dict mapping branch names to 2-tuples of the form (list of
             changed files, list of files to lint).

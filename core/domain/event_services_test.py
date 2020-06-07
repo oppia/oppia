@@ -230,6 +230,7 @@ class EventHandlerNameTests(test_utils.GenericTestBase):
     def _get_all_python_files(self):
         """Recursively collects all Python files in the core/ and extensions/
         directory.
+
         Returns:
             a list of Python files.
         """

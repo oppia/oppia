@@ -393,6 +393,7 @@ def get_e2e_test_parameters(
         suite_name: str. Performs test for different suites.
         dev_mode_setting: bool. Represents whether run the related commands in
             dev mode.
+
     Returns:
         list(str): Parameters for running the tests.
     """

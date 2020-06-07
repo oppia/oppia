@@ -905,6 +905,7 @@ class SingleSpaceAfterYieldTests(unittest.TestCase):
         with python_utils.open_file(filename, 'w') as tmp:
             tmp.write(
                 u"""def helloworld():
+                    \"\"\"Below is the yield statement.\"\"\"
                     yield (5, 2)
                 """)
         node_well_formed_one_line_yield_file.file = filename
@@ -1070,6 +1071,7 @@ class ExcessiveEmptyLinesCheckerTests(unittest.TestCase):
 
 
                     def func2():
+                        \"\"\"This is a comment.\"\"\"
                         returns_something
                 """)
         node_excessive_empty_lines.file = filename
@@ -1100,6 +1102,8 @@ class ExcessiveEmptyLinesCheckerTests(unittest.TestCase):
 
                     @something
                     def func1():
+                        \"\"\"This is a multiline
+                        comment.\"\"\"
                         returns_something
                 """)
         node_method_with_decorator.file = filename
@@ -1165,10 +1169,10 @@ class SingleNewlineAboveArgsCheckerTests(unittest.TestCase):
         with python_utils.open_file(filename, 'w') as tmp:
             tmp.write(
                 u"""def func(arg):
-                        '''Do something.
+                        \"\"\"Do something.
                         Args:
                             arg: argument
-                        '''
+                        \"\"\"
                         do something
                 """)
         node_single_newline_above_args.file = filename
@@ -1195,10 +1199,10 @@ class SingleNewlineAboveArgsCheckerTests(unittest.TestCase):
         with python_utils.open_file(filename, 'w') as tmp:
             tmp.write(
                 u"""def func():
-                        '''Raises exception.
+                        \"\"\"Raises exception.
                         Raises:
                             raises_exception
-                        '''
+                        \"\"\"
                         raises_exception
                 """)
         node_single_newline_above_raises.file = filename
@@ -1225,10 +1229,10 @@ class SingleNewlineAboveArgsCheckerTests(unittest.TestCase):
         with python_utils.open_file(filename, 'w') as tmp:
             tmp.write(
                 u"""def func():
-                    '''Returns something.
+                    \"\"\"Returns something.
                     Returns:
                         returns_something
-                    '''
+                    \"\"\"
                     returns_something
                 """)
         node_with_no_space_above_return.file = filename
@@ -1255,13 +1259,13 @@ class SingleNewlineAboveArgsCheckerTests(unittest.TestCase):
         with python_utils.open_file(filename, 'w') as tmp:
             tmp.write(
                 u"""def func(arg):
-                    '''Raises exception.
+                    \"\"\"Raises exception.
 
                     Args:
                         arg: argument
                     Raises:
                         raises_something
-                    '''
+                    \"\"\"
                     raises_exception
                 """)
         node_newline_above_args_raises.file = filename
@@ -1287,13 +1291,13 @@ class SingleNewlineAboveArgsCheckerTests(unittest.TestCase):
         with python_utils.open_file(filename, 'w') as tmp:
             tmp.write(
                 u"""def func(arg):
-                    '''Returns Something.
+                    \"\"\"Returns Something.
 
                     Args:
                         arg: argument
                     Returns:
                         returns_something
-                    '''
+                    \"\"\"
                     returns_something
                 """)
         node_newline_above_args_returns.file = filename
@@ -1319,7 +1323,7 @@ class SingleNewlineAboveArgsCheckerTests(unittest.TestCase):
         with python_utils.open_file(filename, 'w') as tmp:
             tmp.write(
                 u"""def func():
-                    '''Do something.
+                    \"\"\"Do something.
 
 
 
@@ -1328,7 +1332,7 @@ class SingleNewlineAboveArgsCheckerTests(unittest.TestCase):
 
                     Returns:
                         returns_something
-                    '''
+                    \"\"\"
                     raises_exception
                     returns_something
                 """)
@@ -1356,7 +1360,7 @@ class SingleNewlineAboveArgsCheckerTests(unittest.TestCase):
         with python_utils.open_file(filename, 'w') as tmp:
             tmp.write(
                 u"""def func(arg):
-                        '''Returns something.
+                        \"\"\"Returns something.
 
 
                         Args:
@@ -1365,7 +1369,7 @@ class SingleNewlineAboveArgsCheckerTests(unittest.TestCase):
 
                         Returns:
                             returns_something
-                        '''
+                        \"\"\"
                         returns something
                 """)
         node_with_two_newline.file = filename
@@ -1396,14 +1400,14 @@ class SingleNewlineAboveArgsCheckerTests(unittest.TestCase):
         with python_utils.open_file(filename, 'w') as tmp:
             tmp.write(
                 u"""def func(arg):
-                        '''Returns something.
+                        \"\"\"Returns something.
 
                         Args:
                             arg: argument
 
                         Returns:
                             returns_something
-                        '''
+                        \"\"\"
                         "Returns: something"
                         returns_something
                 """)
@@ -1425,7 +1429,7 @@ class SingleNewlineAboveArgsCheckerTests(unittest.TestCase):
         with python_utils.open_file(filename, 'w') as tmp:
             tmp.write(
                 u"""def func():
-                    '''Do something.'''
+                    \"\"\"Do something.\"\"\"
 
                     do something
                 """)
@@ -1448,7 +1452,7 @@ class SingleNewlineAboveArgsCheckerTests(unittest.TestCase):
         with python_utils.open_file(filename, 'w') as tmp:
             tmp.write(
                 u"""def func(arg):
-                        '''Returns something.
+                        \"\"\"Returns something.
 
                         Args:
                             arg: argument
@@ -1458,7 +1462,7 @@ class SingleNewlineAboveArgsCheckerTests(unittest.TestCase):
 
                         Raises:
                             raises something
-                        '''
+                        \"\"\"
                         raises_something
                         returns_something
                 """)
@@ -1548,6 +1552,49 @@ class DivisionOperatorCheckerTests(unittest.TestCase):
 
         self.checker_test_object.checker.process_module(
             node_division_inside_string)
+
+        with self.checker_test_object.assertNoMessages():
+            temp_file.close()
+
+    def test_division_operator_inside_multiline_docstring(self):
+        node_division_inside_multiline_docstring = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                    \"\"\"This is inside a multiline docstring
+                    in scripts/linter/pre_commit_linter.\"\"\"
+                """)
+        node_division_inside_multiline_docstring.file = filename
+        node_division_inside_multiline_docstring.path = filename
+
+        self.checker_test_object.checker.process_module(
+            node_division_inside_multiline_docstring)
+
+        with self.checker_test_object.assertNoMessages():
+            temp_file.close()
+
+    def test_division_operator_inside_single_line_docstring(self):
+        node_division_inside_singleline_docstring = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                    \"\"\"scripts/linters/pre_commit_linter.py\"\"\"
+                """)
+        node_division_inside_singleline_docstring.file = filename
+        node_division_inside_singleline_docstring.path = filename
+
+        self.checker_test_object.checker.process_module(
+            node_division_inside_singleline_docstring)
 
         with self.checker_test_object.assertNoMessages():
             temp_file.close()
@@ -1734,6 +1781,28 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
         with self.checker_test_object.assertNoMessages():
             temp_file.close()
 
+    def test_comment_inside_docstring(self):
+        node_comment_inside_docstring = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                    \"\"\"# str. variable is type of str.\"\"\"
+                    \"\"\"# str. variable is type
+                    of str.\"\"\"
+                """)
+        node_comment_inside_docstring.file = filename
+        node_comment_inside_docstring.path = filename
+
+        self.checker_test_object.checker.process_module(
+            node_comment_inside_docstring)
+
+        with self.checker_test_object.assertNoMessages():
+            temp_file.close()
 
     def test_well_formed_comment(self):
         node_with_no_error_message = astroid.scoped_nodes.Module(

@@ -1356,7 +1356,6 @@ def can_modify_exploration_roles(handler):
     """Decorators to check whether user can manage rights related to an
     exploration.
 
-
     Args:
         handler: function. The function to be decorated.
 

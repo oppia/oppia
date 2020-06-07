@@ -178,6 +178,7 @@ def get_story_summary_by_id(story_id, strict=True):
         story_id: str. ID of the story summary.
         strict: bool. Whether to fail noisily if no story summary with the given
             id exists in the datastore.
+
     Returns:
         StorySummary. The story summary domain object corresponding to
         a story with the given story_id.
