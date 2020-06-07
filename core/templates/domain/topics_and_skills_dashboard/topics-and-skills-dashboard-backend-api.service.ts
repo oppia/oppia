@@ -28,7 +28,7 @@ export interface ITopicSummaryBackendDict {
     /* eslint-disable camelcase */
     id: string;
     name: string;
-    category: string;
+    classroom: string;
     language_code: string;
     description: string;
     version: number;
@@ -58,6 +58,7 @@ export interface ITopicSummaryBackendDict {
 
   interface ITopicsAndSkillsDashboardDataBackendDict {
     /* eslint-disable camelcase */
+    all_classroom_names: Array<string>;
     untriaged_skill_summary_dicts: ISkillSummaryBackendDict[];
     mergeable_skill_summary_dicts: ISkillSummaryBackendDict[];
     topic_summary_dicts: ITopicSummaryBackendDict[];
@@ -75,15 +76,9 @@ export interface ITopicSummaryBackendDict {
 export class TopicsAndSkillsDashboardBackendApiService {
   constructor(private http: HttpClient) {}
 
-  fetchDashboardData(order, limit, offset): Promise<ITopicsAndSkillsDashboardDataBackendDict> {
+  fetchDashboardData(): Promise<ITopicsAndSkillsDashboardDataBackendDict> {
     return this.http.get<ITopicsAndSkillsDashboardDataBackendDict>(
-      '/topics_and_skills_dashboard/data', {
-        params: {
-          order: order,
-          limit: limit,
-          offset: offset
-        }
-      }).toPromise();
+      '/topics_and_skills_dashboard/data').toPromise();
   }
 
   mergeSkills(oldSkillId:string, newSkillId:string): Promise<void> {

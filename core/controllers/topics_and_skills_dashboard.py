@@ -16,13 +16,14 @@
 are created.
 """
 
-from __future__ import absolute_import, print_function  # pylint: disable=import-only-modules
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import logging
 
 from core.controllers import acl_decorators
 from core.controllers import base
+from core.domain import config_domain
 from core.domain import fs_services
 from core.domain import image_validation_services
 from core.domain import question_services
@@ -95,6 +96,17 @@ class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
                             self.user, topic_rights)
                     )
 
+        all_classrooms_dict = config_domain.TOPIC_IDS_FOR_CLASSROOM_PAGES.value
+        all_classroom_names = [
+            classroom['name'] for classroom in all_classrooms_dict]
+
+        for topic_summary_dict in topic_summary_dicts:
+            topic_summary_dict['classroom'] = None
+            for classroom in all_classrooms_dict:
+                if topic_summary_dict['id'] in classroom['topic_ids']:
+                    topic_summary_dict['classroom'] = classroom['name']
+                    break
+
         untriaged_skill_summary_dicts = []
         mergeable_skill_summary_dicts = []
         for skill_summary_dict in skill_summary_dicts:
@@ -123,6 +135,7 @@ class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
             'mergeable_skill_summary_dicts': mergeable_skill_summary_dicts,
             'topic_summary_dicts': topic_summary_dicts,
             'assigned_skill_summary_dicts': assigned_skill_dicts,
+            'all_classroom_names': all_classroom_names,
             'can_delete_topic': can_delete_topic,
             'can_create_topic': can_create_topic,
             'can_delete_skill': can_delete_skill,
@@ -140,7 +153,6 @@ class NewTopicHandler(base.BaseHandler):
         name = self.payload.get('name')
         abbreviated_name = self.payload.get('abbreviated_name')
         description = self.payload.get('description')
-        category = self.payload.get('category')
         try:
             topic_domain.Topic.require_valid_name(name)
         except:
@@ -148,7 +160,7 @@ class NewTopicHandler(base.BaseHandler):
                 'Invalid topic name, received %s.' % name)
         new_topic_id = topic_services.get_new_topic_id()
         topic = topic_domain.Topic.create_default_topic(
-            new_topic_id, name, abbreviated_name, description, category)
+            new_topic_id, name, abbreviated_name, description)
         topic_services.save_new_topic(self.user_id, topic)
 
         self.render_json({

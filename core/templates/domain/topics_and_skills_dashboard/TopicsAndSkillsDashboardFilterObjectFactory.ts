@@ -28,20 +28,20 @@ import {
   'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.constants';
 
 export class TopicsAndSkillsDashboardFilter {
-  category: string;
+  classroom: string;
   keywords: Array<string>;
   sort: ETopicSortOptions;
   status: ETopicPublishedOptions;
 
   /**
-   * @param {String} category - category to filter for.
+   * @param {String} classroom - classroom to filter for.
    * @param {String[]} keywords - keywords to filter for.
    * @param {ETopicSortOptions} sort - One of the values in ETopicSortOptions.
    * @param {ETopicPublishedOptions} status - One of the values
    *   in ETopicPublishedOptions.
    */
-  constructor(category, keywords, sort, status) {
-    this.category = category;
+  constructor(classroom, keywords, sort, status) {
+    this.classroom = classroom;
     this.keywords = keywords;
     this.sort = sort;
     this.status = status;
@@ -50,8 +50,8 @@ export class TopicsAndSkillsDashboardFilter {
    * Resets the filter object values
    */
   reset(): void {
-    this.category =
-        TopicsAndSkillsDashboardPageConstants.TOPIC_FILTER_DEFAULT_CATEGORY;
+    this.classroom =
+        TopicsAndSkillsDashboardPageConstants.TOPIC_FILTER_CLASSROOM_ALL;
     this.keywords = [];
     this.sort = ETopicSortOptions.IncreasingCreatedOn;
     this.status = ETopicPublishedOptions.All;
@@ -68,7 +68,7 @@ export class TopicsAndSkillsDashboardFilterObjectFactory {
    */
   createDefault(): TopicsAndSkillsDashboardFilter {
     return new TopicsAndSkillsDashboardFilter(
-      TopicsAndSkillsDashboardPageConstants.TOPIC_FILTER_DEFAULT_CATEGORY,
+      TopicsAndSkillsDashboardPageConstants.TOPIC_FILTER_CLASSROOM_ALL,
       [], ETopicSortOptions.IncreasingCreatedOn, ETopicPublishedOptions.All);
   }
 }

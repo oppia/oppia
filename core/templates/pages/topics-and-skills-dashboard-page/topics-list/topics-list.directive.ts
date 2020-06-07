@@ -59,11 +59,10 @@ angular.module('oppia').directive('topicsList', [
            */
           ctrl.getTopicEditorUrl = function(topicId) {
             var TOPIC_EDITOR_URL_TEMPLATE = '/topic_editor/<topic_id>';
-            UrlInterpolationService.interpolateUrl(
+            return UrlInterpolationService.interpolateUrl(
               TOPIC_EDITOR_URL_TEMPLATE, {
                 topic_id: topicId
               });
-            return '/topic_editor/' + topicId;
           };
 
           /**

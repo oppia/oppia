@@ -17,8 +17,12 @@
  * @fileoverview Unit tests for the topics and skills dashboard directive.
  */
 
-import { AlertsService } from 'services/alerts.service';
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// the code corresponding to the spec is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
+// ^^^ This block is to be removed.
+
+import { AlertsService } from 'services/alerts.service';
 
 describe('Topics List Directive', function() {
   var $uibModal = null;

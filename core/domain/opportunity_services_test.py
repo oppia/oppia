@@ -73,8 +73,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
             self.publish_exploration(self.owner_id, exp.id)
 
         topic = topic_domain.Topic.create_default_topic(
-            self.TOPIC_ID, 'topic', 'abbrev', 'description', 'Mathematics')
-
+            self.TOPIC_ID, 'topic', 'abbrev', 'description')
         topic_services.save_new_topic(self.owner_id, topic)
 
         story = story_domain.Story.create_default_story(
@@ -575,7 +574,7 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
             self.publish_exploration(self.owner_id, exp.id)
 
         topic = topic_domain.Topic.create_default_topic(
-            self.TOPIC_ID, 'topic', 'abbrev', 'description', 'Mathematics')
+            self.TOPIC_ID, 'topic', 'abbrev', 'description')
         topic_services.save_new_topic(self.owner_id, topic)
 
         story = story_domain.Story.create_default_story(

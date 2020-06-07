@@ -61,11 +61,12 @@ export class TopicsAndSkillsDashboardPageService {
       });
     }
 
-    if (filterObject.category !==
-        TopicsAndSkillsDashboardPageConstants.TOPIC_FILTER_DEFAULT_CATEGORY) {
+    if (filterObject.classroom !==
+        TopicsAndSkillsDashboardPageConstants.TOPIC_FILTER_CLASSROOM_ALL) {
       filteredTopics = filteredTopics.filter((topic) => {
         return (
-          filterObject.category === topic.category);
+          topic.classroom && filterObject.classroom.toLowerCase() ===
+            topic.classroom.toLowerCase());
       });
     }
 

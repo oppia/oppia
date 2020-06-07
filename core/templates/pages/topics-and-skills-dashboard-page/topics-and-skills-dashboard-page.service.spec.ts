@@ -47,7 +47,7 @@ describe('Topic and Skill dashboard page service', () => {
       topic_model_last_updated: 1581839492500.852,
       additional_story_count: 0,
       name: 'Alpha',
-      category: 'Mathematics',
+      classroom: 'Math',
       version: 1,
       description: 'Alpha description',
       subtopic_count: 0,
@@ -65,7 +65,7 @@ describe('Topic and Skill dashboard page service', () => {
       topic_model_last_updated: 1681839492500.852,
       additional_story_count: 0,
       name: 'Beta',
-      category: 'Mathematics',
+      classroom: 'Math',
       version: 1,
       description: 'Beta description',
       subtopic_count: 0,
@@ -83,7 +83,7 @@ describe('Topic and Skill dashboard page service', () => {
       topic_model_last_updated: 1781839492500.852,
       additional_story_count: 0,
       name: 'Gamma',
-      category: 'Algorithms',
+      classroom: 'English',
       version: 1,
       description: 'Gamma description',
       subtopic_count: 0,
@@ -126,7 +126,7 @@ describe('Topic and Skill dashboard page service', () => {
     expect(filteredArray).toEqual([topic1, topic2, topic3]);
 
     filterOptions.sort = ETopicSortOptions.IncreasingCreatedOn;
-    filterOptions.category = 'Mathematics';
+    filterOptions.classroom = 'Math';
     filteredArray = tsds.getFilteredTopics(topicsArray, filterOptions);
     expect(filteredArray).toEqual([topic2, topic1]);
 

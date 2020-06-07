@@ -393,11 +393,9 @@ class AdminHandler(base.BaseHandler):
                 self.user_id, question_id_3, skill_id_3, 0.7)
 
             topic_1 = topic_domain.Topic.create_default_topic(
-                topic_id_1, 'Dummy Topic 1', 'abbrev', 'description',
-                'Mathematics')
+                topic_id_1, 'Dummy Topic 1', 'abbrev', 'description')
             topic_2 = topic_domain.Topic.create_default_topic(
-                topic_id_2, 'Empty Topic', 'abbrev', 'description',
-                'Mathematics')
+                topic_id_2, 'Empty Topic', 'abbrev', 'description')
 
             topic_1.add_canonical_story(story_id)
             topic_1.add_uncategorized_skill_id(skill_id_1)
@@ -465,14 +463,6 @@ class AdminHandler(base.BaseHandler):
             if self.user.role != feconf.ROLE_ID_ADMIN:
                 raise Exception(
                     'User does not have enough rights to generate data.')
-            for i in range(1, 20):
-                skill_id = skill_services.get_new_skill_id()
-                skill_name = ('Dummy Skill %d' % i)
-                skill = self._create_dummy_skill(
-                    skill_id, skill_name, '<p>Dummy Explanation %d</p>' % i)
-                skill_services.save_new_skill(self.user_id, skill)
-
-
             skill_id = skill_services.get_new_skill_id()
             skill_name = 'Dummy Skill %s' % python_utils.UNICODE(
                 random.getrandbits(32))
