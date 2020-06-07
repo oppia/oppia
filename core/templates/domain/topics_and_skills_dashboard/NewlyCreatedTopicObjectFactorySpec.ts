@@ -42,5 +42,11 @@ describe('Newly Created Topic Object Factory', () => {
 
     topic.name = 'TopicName1';
     expect(topic.isValid()).toBe(true);
+
+    topic.description = '';
+    expect(topic.isValid()).toBe(false);
+
+    topic.description = 'Topic description';
+    expect(topic.isValid()).toBe(true);
   });
 });

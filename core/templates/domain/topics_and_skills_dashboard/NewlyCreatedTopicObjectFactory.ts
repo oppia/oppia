@@ -35,7 +35,7 @@ export class NewlyCreatedTopic {
    * @returns {Boolean} - A boolean indicating if the topic is valid.
    */
   isValid(): boolean {
-    return !(!this.name || !this.description);
+    return Boolean(this.name && this.description);
   }
 }
 
@@ -47,8 +47,7 @@ export class NewlyCreatedTopicObjectFactory {
    * @returns {NewlyCreatedTopic} - A new NewlyCreatedTopic instance.
    */
   createDefault(): NewlyCreatedTopic {
-    return new NewlyCreatedTopic(
-      '', '');
+    return new NewlyCreatedTopic('', '');
   }
 }
 

@@ -20,6 +20,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import os
 
 from constants import constants
+from core.domain import config_services
 from core.domain import question_services
 from core.domain import skill_services
 from core.domain import state_domain
@@ -74,6 +75,9 @@ class TopicsAndSkillsDashboardPageDataHandlerTests(
 
         # Check that admins can access the topics and skills dashboard data.
         self.login(self.ADMIN_EMAIL)
+        config_services.set_property(
+            self.admin_id, 'topic_ids_for_classroom_pages', [{
+                'name': 'math', 'topic_ids': [self.topic_id]}])
         json_response = self.get_json(
             feconf.TOPICS_AND_SKILLS_DASHBOARD_DATA_URL)
         self.assertEqual(len(json_response['topic_summary_dicts']), 1)
@@ -126,6 +130,10 @@ class TopicsAndSkillsDashboardPageDataHandlerTests(
         self.assertEqual(
             json_response['untriaged_skill_summary_dicts'][0]['id'],
             skill_id)
+        self.assertEqual(
+            len(json_response['all_classroom_names']), 1)
+        self.assertEqual(
+            json_response['all_classroom_names'], ['math'])
         self.assertEqual(
             json_response['can_delete_topic'], False)
         self.assertEqual(

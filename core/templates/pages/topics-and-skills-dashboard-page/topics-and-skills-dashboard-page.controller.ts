@@ -36,7 +36,7 @@ require(
 require('domain/utilities/url-interpolation.service.ts');
 require(
   'pages/topics-and-skills-dashboard-page/' +
-  'create-new-skill.modal.controller.ts');
+  'create-new-skill-modal.controller.ts');
 require(
   'pages/topics-and-skills-dashboard-page/skills-list/' +
   'skills-list.directive.ts');
@@ -136,7 +136,7 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
                     ctrl.untriagedSkillSummaries.length !== 0) {
                   ctrl.activeTab = ctrl.TAB_NAME_UNTRIAGED_SKILLS;
                 }
-                ctrl.classrooms = response.classroom_names;
+                ctrl.classrooms = response.all_classroom_names;
                 // Adding this since karma tests adds
                 // TOPIC_FILTER_CLASSROOM_ALL for every it block.
                 if (!ctrl.classrooms.includes(TOPIC_FILTER_CLASSROOM_ALL)) {
@@ -179,7 +179,7 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
                 '/pages/topics-and-skills-dashboard-page/templates/' +
                 'create-new-skill-modal.template.html'),
               backdrop: 'static',
-              controller: 'CreateNewSkillModal'
+              controller: 'CreateNewSkillModalController'
             }).result.then(function(result) {
               ContextService.resetImageSaveDestination();
               SkillCreationService.createNewSkill(

@@ -63,7 +63,7 @@ describe('Topics and Skills Dashboard Page', function() {
         name: 'Sample Name',
         language_code: 'en'
       }],
-      classroom_names: ['math'],
+      all_classroom_names: ['math'],
       can_create_topic: true,
       can_create_skill: true,
       can_delete_topic: true,

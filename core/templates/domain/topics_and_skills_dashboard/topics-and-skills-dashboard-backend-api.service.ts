@@ -58,7 +58,7 @@ export interface ITopicSummaryBackendDict {
 
   interface ITopicsAndSkillsDashboardDataBackendDict {
     /* eslint-disable camelcase */
-    classroom_names: Array<string>;
+    all_classroom_names: Array<string>;
     untriaged_skill_summary_dicts: ISkillSummaryBackendDict[];
     mergeable_skill_summary_dicts: ISkillSummaryBackendDict[];
     topic_summary_dicts: ITopicSummaryBackendDict[];

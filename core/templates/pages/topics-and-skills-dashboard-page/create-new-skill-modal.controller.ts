@@ -21,7 +21,7 @@ require('domain/utilities/url-interpolation.service.ts');
 require('services/context.service.ts');
 require('services/image-local-storage.service.ts');
 
-angular.module('oppia').controller('CreateNewSkillModal', [
+angular.module('oppia').controller('CreateNewSkillModalController', [
   '$scope', '$uibModalInstance', 'ContextService', 'ImageLocalStorageService',
   'RubricObjectFactory', 'SkillCreationService', 'SkillObjectFactory',
   'MAX_CHARS_IN_SKILL_DESCRIPTION', 'SKILL_DESCRIPTION_STATUS_VALUES',
@@ -48,7 +48,7 @@ angular.module('oppia').controller('CreateNewSkillModal', [
     $scope.$watch('newSkillDescription', function() {
       if (
         SkillCreationService.getSkillDescriptionStatus() !==
-                SKILL_DESCRIPTION_STATUS_VALUES.STATUS_DISABLED) {
+          SKILL_DESCRIPTION_STATUS_VALUES.STATUS_DISABLED) {
         var initParagraph = document.createElement('p');
         var explanations = $scope.rubrics[1].getExplanations();
         var newExplanation = document.createTextNode(

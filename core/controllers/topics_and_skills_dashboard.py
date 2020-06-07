@@ -80,20 +80,16 @@ class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
                             self.user, topic_rights)
                     )
 
-        all_classroom_dict = config_domain.TOPIC_IDS_FOR_CLASSROOM_PAGES.value
-        classroom_names = [
-            classroom['name'] for classroom in all_classroom_dict]
+        all_classrooms_dict = config_domain.TOPIC_IDS_FOR_CLASSROOM_PAGES.value
+        all_classroom_names = [
+            classroom['name'] for classroom in all_classrooms_dict]
 
         for topic_summary_dict in topic_summary_dicts:
-            classroom_is_assigned_to_topic = False
-            for classroom in all_classroom_dict:
+            topic_summary_dict['classroom'] = None
+            for classroom in all_classrooms_dict:
                 if topic_summary_dict['id'] in classroom['topic_ids']:
-                    classroom_is_assigned_to_topic = True
                     topic_summary_dict['classroom'] = classroom['name']
                     break
-
-            if not classroom_is_assigned_to_topic:
-                topic_summary_dict['classroom'] = None
 
         untriaged_skill_summary_dicts = []
         mergeable_skill_summary_dicts = []
@@ -122,7 +118,7 @@ class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
             'untriaged_skill_summary_dicts': untriaged_skill_summary_dicts,
             'mergeable_skill_summary_dicts': mergeable_skill_summary_dicts,
             'topic_summary_dicts': topic_summary_dicts,
-            'classroom_names': classroom_names,
+            'all_classroom_names': all_classroom_names,
             'can_delete_topic': can_delete_topic,
             'can_create_topic': can_create_topic,
             'can_delete_skill': can_delete_skill,
