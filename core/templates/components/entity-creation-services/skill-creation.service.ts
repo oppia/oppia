@@ -17,19 +17,26 @@
  */
 
 require('domain/utilities/url-interpolation.service.ts');
-require('services/alerts.service.ts');
 require('domain/skill/skill-creation-backend-api.service.ts');
+require('services/alerts.service.ts');
+require('services/image-local-storage.service.ts');
 
 require(
   'pages/topics-and-skills-dashboard-page/' +
   'topics-and-skills-dashboard-page.constants.ajs.ts');
 
 angular.module('oppia').factory('SkillCreationService', [
+  '$rootScope', '$timeout', '$window', 'AlertsService',
+  'ImageLocalStorageService', 'SkillCreationBackendApiService',
+  'UrlInterpolationService', 'EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED',
   '$uibModal', '$rootScope', '$timeout', '$window', 'AlertsService',
   'SkillCreationBackendApiService', 'UrlInterpolationService',
   'EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED',
   'SKILL_DESCRIPTION_STATUS_VALUES',
   function(
+      $rootScope, $timeout, $window, AlertsService,
+      ImageLocalStorageService, SkillCreationBackendApiService,
+      UrlInterpolationService, EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED,
       $uibModal, $rootScope, $timeout, $window, AlertsService,
       SkillCreationBackendApiService, UrlInterpolationService,
       EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED,
@@ -92,14 +99,15 @@ angular.module('oppia').factory('SkillCreationService', [
               $rootScope.$broadcast(
                 EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED, true);
               skillCreationInProgress = false;
+              ImageLocalStorageService.flushStoredImagesData();
               newTab.location.href = UrlInterpolationService.interpolateUrl(
                 CREATE_NEW_SKILL_URL_TEMPLATE, {
                   skill_id: response.skillId
                 });
             }, 150);
-          }, function() {
+          }, function(errorMessage) {
+            AlertsService.addWarning(errorMessage);
           });
-        });
       }
     };
   }

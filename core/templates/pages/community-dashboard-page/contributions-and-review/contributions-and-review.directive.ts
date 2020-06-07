@@ -30,11 +30,18 @@ require('objects/objectComponentsRequires.ts');
 require(
   'pages/community-dashboard-page/login-required-message/' +
   'login-required-message.directive.ts');
+require(
+  'pages/community-dashboard-page/modal-templates/' +
+  'question-suggestion-review-modal.controller.ts');
+require(
+  'pages/community-dashboard-page/modal-templates/' +
+  'translation-suggestion-review-modal.controller.ts');
 
 require(
   'pages/community-dashboard-page/services/' +
   'contribution-and-review.service.ts');
 require('services/alerts.service.ts');
+require('services/context.service.ts');
 require('services/suggestion-modal.service.ts');
 
 angular.module('oppia').directive('contributionsAndReview', [
@@ -49,11 +56,13 @@ angular.module('oppia').directive('contributionsAndReview', [
         'contributions-and-review.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$filter', '$uibModal', 'AlertsService', 'ContributionAndReviewService',
-        'QuestionObjectFactory', 'UserService',
+        '$filter', '$uibModal', 'AlertsService', 'ContextService',
+        'ContributionAndReviewService', 'QuestionObjectFactory', 'UserService',
+        'ENTITY_TYPE',
         function(
-            $filter, $uibModal, AlertsService, ContributionAndReviewService,
-            QuestionObjectFactory, UserService) {
+            $filter, $uibModal, AlertsService, ContextService,
+            ContributionAndReviewService, QuestionObjectFactory, UserService,
+            ENTITY_TYPE) {
           var ctrl = this;
           var SUGGESTION_LABELS = {
             review: {
@@ -172,82 +181,7 @@ angular.module('oppia').directive('contributionsAndReview', [
                   return skillDifficulty;
                 }
               },
-              controller: [
-                '$scope', '$uibModalInstance', 'SuggestionModalService',
-                'question', 'reviewable', 'SKILL_DIFFICULTY_LABEL_TO_FLOAT',
-                function($scope, $uibModalInstance, SuggestionModalService,
-                    question, reviewable, SKILL_DIFFICULTY_LABEL_TO_FLOAT) {
-                  const init = () => {
-                    $scope.authorName = authorName;
-                    $scope.contentHtml = contentHtml;
-                    $scope.reviewable = reviewable;
-                    $scope.reviewMessage = '';
-                    $scope.question = question;
-                    $scope.questionHeader = questionHeader;
-                    $scope.questionStateData = question.getStateData();
-                    $scope.questionId = question.getId();
-                    $scope.canEditQuestion = false;
-                    $scope.misconceptionsBySkill = [];
-                    $scope.skillDifficultyLabel = getSkillDifficultyLabel();
-                    $scope.skillRubricExplanation = getRubricExplanation(
-                      $scope.skillDifficultyLabel);
-                  };
-
-                  $scope.questionChanged = function() {
-                    $scope.validationError = null;
-                  };
-
-                  $scope.accept = function() {
-                    SuggestionModalService.acceptSuggestion(
-                      $uibModalInstance,
-                      {
-                        action: SuggestionModalService.ACTION_ACCEPT_SUGGESTION,
-                        reviewMessage: $scope.reviewMessage,
-                        skillDifficulty: skillDifficulty
-                      });
-                  };
-
-                  $scope.reject = function() {
-                    SuggestionModalService.rejectSuggestion(
-                      $uibModalInstance,
-                      {
-                        action: SuggestionModalService.ACTION_REJECT_SUGGESTION,
-                        reviewMessage: $scope.reviewMessage
-                      });
-                  };
-
-                  $scope.cancel = function() {
-                    SuggestionModalService.cancelSuggestion($uibModalInstance);
-                  };
-
-                  const getSkillDifficultyLabel = () => {
-                    const skillDifficultyFloatToLabel = invertMap(
-                      SKILL_DIFFICULTY_LABEL_TO_FLOAT);
-                    return skillDifficultyFloatToLabel[skillDifficulty];
-                  };
-
-                  const getRubricExplanation = skillDifficultyLabel => {
-                    for (const rubric of skillRubrics) {
-                      if (rubric.difficulty === skillDifficultyLabel) {
-                        return rubric.explanation;
-                      }
-                    }
-                    return 'This rubric has not yet been specified.';
-                  };
-
-                  const invertMap = originalMap => {
-                    return Object.keys(originalMap).reduce(
-                      (invertedMap, key) => {
-                        invertedMap[originalMap[key]] = key;
-                        return invertedMap;
-                      },
-                      {}
-                    );
-                  };
-
-                  init();
-                }
-              ]
+              controller: 'QuestionSuggestionReviewModalController'
             }).result.then(function(result) {
               ContributionAndReviewService.resolveSuggestiontoSkill(
                 targetId, suggestionId, result.action, result.reviewMessage,
@@ -262,6 +196,10 @@ angular.module('oppia').directive('contributionsAndReview', [
           var _showTranslationSuggestionModal = function(
               targetId, suggestionId, contentHtml, translationHtml,
               reviewable) {
+            // We need to set the context here so that the rte fetches images
+            // for the given ENTITY_TYPE and targetId.
+            ContextService.setCustomEntityContext(
+              ENTITY_TYPE.EXPLORATION, targetId);
             var _templateUrl = UrlInterpolationService.getDirectiveTemplateUrl(
               '/pages/community-dashboard-page/modal-templates/' +
               'translation-suggestion-review.directive.html');
@@ -281,40 +219,7 @@ angular.module('oppia').directive('contributionsAndReview', [
                   return reviewable;
                 }
               },
-              controller: [
-                '$scope', '$uibModalInstance', 'SuggestionModalService',
-                'reviewable', 'translationHtml', 'contentHtml',
-                function($scope, $uibModalInstance, SuggestionModalService,
-                    reviewable, translationHtml, contentHtml) {
-                  $scope.translationHtml = translationHtml;
-                  $scope.contentHtml = contentHtml;
-                  $scope.reviewable = reviewable;
-                  $scope.commitMessage = '';
-                  $scope.reviewMessage = '';
-
-                  $scope.accept = function() {
-                    SuggestionModalService.acceptSuggestion(
-                      $uibModalInstance,
-                      {
-                        action: SuggestionModalService.ACTION_ACCEPT_SUGGESTION,
-                        commitMessage: $scope.commitMessage,
-                        reviewMessage: $scope.reviewMessage
-                      });
-                  };
-
-                  $scope.reject = function() {
-                    SuggestionModalService.rejectSuggestion(
-                      $uibModalInstance,
-                      {
-                        action: SuggestionModalService.ACTION_REJECT_SUGGESTION,
-                        reviewMessage: $scope.reviewMessage
-                      });
-                  };
-                  $scope.cancel = function() {
-                    SuggestionModalService.cancelSuggestion($uibModalInstance);
-                  };
-                }
-              ]
+              controller: 'TranslationSuggestionReviewModalController'
             }).result.then(function(result) {
               ContributionAndReviewService.resolveSuggestiontoExploration(
                 targetId, suggestionId, result.action, result.reviewMessage,

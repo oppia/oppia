@@ -1122,8 +1122,7 @@ class TopicRightsTests(test_utils.GenericTestBase):
         }
 
         self.topic_summary = topic_domain.TopicRights(
-            'topic_id', [self.user_id_a], False
-        )
+            'topic_id', [self.user_id_a], False)
 
     def test_topic_summary_gets_created(self):
         self.assertEqual(

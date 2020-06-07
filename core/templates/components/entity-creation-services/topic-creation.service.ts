@@ -17,30 +17,21 @@
  */
 
 require(
-  'components/forms/custom-forms-directives/select2-dropdown.directive.ts');
-require(
-  'components/forms/custom-forms-directives/thumbnail-uploader.directive.ts');
-require('domain/topic/topic-update.service.ts');
-require('domain/topics_and_skills_dashboard/' +
-  'TopicsAndSkillsDashboardFilterObjectFactory');
+  'pages/topics-and-skills-dashboard-page/templates/' +
+  'new-topic-name-editor-modal.controller');
+
 require('domain/utilities/url-interpolation.service.ts');
 require('domain/topic/topic-creation-backend-api.service.ts');
-require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 require('services/alerts.service.ts');
-require('services/image-upload-helper.service.ts');
 
 angular.module('oppia').factory('TopicCreationService', [
   '$rootScope', '$uibModal', '$window', 'AlertsService',
   'TopicCreationBackendApiService', 'UrlInterpolationService',
-  'ALLOWED_TOPIC_CATEGORIES',
   'EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED',
-  'MAX_CHARS_IN_TOPIC_DESCRIPTION', 'MAX_CHARS_IN_TOPIC_NAME',
   function(
       $rootScope, $uibModal, $window, AlertsService,
       TopicCreationBackendApiService, UrlInterpolationService,
-      ALLOWED_TOPIC_CATEGORIES,
-      EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED,
-      MAX_CHARS_IN_TOPIC_DESCRIPTION, MAX_CHARS_IN_TOPIC_NAME) {
+      EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED) {
     var TOPIC_EDITOR_URL_TEMPLATE = '/topic_editor/<topic_id>';
     var topicCreationInProgress = false;
 
@@ -49,36 +40,16 @@ angular.module('oppia').factory('TopicCreationService', [
         if (topicCreationInProgress) {
           return;
         }
-        var modalInstance = $uibModal.open({
+
+        $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/topics-and-skills-dashboard-page/templates/' +
             'new-topic-name-editor.template.html'),
           backdrop: true,
-          controller: [
-            '$scope', '$uibModalInstance',
-            'NewlyCreatedTopicObjectFactory',
-            function($scope, $uibModalInstance,
-                NewlyCreatedTopicObjectFactory) {
-              $scope.categories = ALLOWED_TOPIC_CATEGORIES;
-              $scope.newlyCreatedTopic = (
-                NewlyCreatedTopicObjectFactory.createDefault());
-              $scope.MAX_CHARS_IN_TOPIC_NAME = MAX_CHARS_IN_TOPIC_NAME;
-              $scope.MAX_CHARS_IN_TOPIC_DESCRIPTION = (
-                MAX_CHARS_IN_TOPIC_DESCRIPTION);
-
-              $scope.save = function() {
-                $uibModalInstance.close($scope.newlyCreatedTopic);
-              };
-              $scope.cancel = function() {
-                $uibModalInstance.dismiss('cancel');
-              };
-            }
-          ]
-        });
-
-        modalInstance.result.then(function(newlyCreatedTopic) {
-          if (!newlyCreatedTopic.isValid()) {
-            throw new Error('Topic fields cannot be empty');
+          controller: 'NewTopicNameEditorModalController'
+        }).result.then(function(topic) {
+          if (topic.topicName === '') {
+            throw new Error('Topic name cannot be empty');
           }
           topicCreationInProgress = true;
           AlertsService.clearWarnings();
@@ -89,7 +60,8 @@ angular.module('oppia').factory('TopicCreationService', [
           // new tab is created as soon as the user clicks the 'Create' button
           // and filled with URL once the details are fetched from the backend.
           var newTab = $window.open();
-          TopicCreationBackendApiService.createTopic(newlyCreatedTopic).then(
+          TopicCreationBackendApiService.createTopic(
+            topic.topicName, topic.abbreviatedTopicName).then(
             function(response) {
               $rootScope.$broadcast(
                 EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED);
@@ -103,6 +75,10 @@ angular.module('oppia').factory('TopicCreationService', [
               topicCreationInProgress = false;
               AlertsService.addWarning(errorResponse.error);
             });
+        }, function() {
+          // Note to developers:
+          // This callback is triggered when the Cancel button is
+          // clicked. No further action is needed.
         });
       }
     };
