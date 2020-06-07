@@ -219,6 +219,6 @@ describe('About Page', function() {
 
       i18n.codeChangeEventEmiiter.emit('en');
       fixture.detectChanges();
-      expect(translate.code).toBe('en');
+      expect(translate.languageCode).toBe('en');
     }));
 });
