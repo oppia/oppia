@@ -135,8 +135,9 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
 
     def test_any_user_can_access_practice_sessions_data(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
+            # Adding invalid subtopic IDs as well, which should get ignored.
             json_response = self.get_json(
-                '%s/%s?selected_subtopic_ids=1,2' % (
+                '%s/%s?selected_subtopic_ids=1,2,3,4' % (
                     feconf.PRACTICE_SESSION_DATA_URL_PREFIX,
                     'public_topic_name'))
             self.assertEqual(json_response['topic_name'], 'public_topic_name')

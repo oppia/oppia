@@ -58,6 +58,10 @@ class PracticeSessionsPageDataHandler(base.BaseHandler):
 
         selected_skill_ids = []
         for subtopic in topic.subtopics:
+            # An error is not thrown here, since it's fine to just ignore the
+            # passed in subtopic IDs, if they don't exist, which would be the
+            # case if the creator deletes subtopics after the learner has
+            # loaded the topic viewer page.
             if python_utils.UNICODE(subtopic.id) in selected_subtopic_ids:
                 selected_skill_ids.extend(subtopic.skill_ids)
         try:

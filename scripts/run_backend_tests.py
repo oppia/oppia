@@ -53,6 +53,7 @@ import subprocess
 import sys
 import threading
 import time
+import unittest
 
 import python_utils
 
@@ -201,10 +202,7 @@ def _get_all_test_targets(test_path=None, include_load_tests=True):
         python_module = importlib.import_module(test_target_path)
         for name, clazz in inspect.getmembers(
                 python_module, predicate=inspect.isclass):
-            all_base_classes = [base_class.__name__ for base_class in
-                                (inspect.getmro(clazz))]
-            # Check that it is a subclass of 'AppEngineTestBase'.
-            if 'AppEngineTestBase' in all_base_classes:
+            if unittest.TestCase in inspect.getmro(clazz):
                 class_names.append(name)
 
         return [
