@@ -2113,6 +2113,7 @@ class Exploration(python_utils.OBJECT):
     def _convert_states_v22_dict_to_v23_dict(cls, states_dict):
         """Converts from version 22 to 23. Version 23 ensures that all
         all oppia-noninteractive-image tags have caption attribute.
+
         Args:
             states_dict: dict. A dict where each key-value pair represents,
                 respectively, a state name and a dict used to initialize a

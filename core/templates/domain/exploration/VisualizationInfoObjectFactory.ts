@@ -32,9 +32,9 @@ import { IGraphBackendDict } from
 /* eslint-enable max-len */
 
 export interface IAnswerStatsBackendDict {
-  'answer': (string | number | IFractionDict |
-    INumberWithUnitsBackendDict | string[] | INote[] |
-    number[] | IGraphBackendDict| string[][]);
+  'answer': (
+    string | number | IFractionDict | INumberWithUnitsBackendDict | string[] |
+    INote[] | number[] | IGraphBackendDict| string[][]);
   'frequency': number;
   'is_addressed'?: boolean;
 }

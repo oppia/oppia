@@ -58,7 +58,7 @@ export class EmailDashboardDataService {
     var endQueryIndex = (this.currentPageIndex + 1) * this.QUERIES_PER_PAGE;
 
     return this.emailDashboardBackendApiService.submitQuery(
-      data).then((query) => {
+      data).then(query => {
       var newQueries = [query];
       this.queries = newQueries.concat(this.queries);
       return this.queries.slice(startQueryIndex, endQueryIndex);
@@ -78,7 +78,7 @@ export class EmailDashboardDataService {
     } else {
       this.currentPageIndex = this.currentPageIndex + 1;
       return this.emailDashboardBackendApiService.fetchQueriesPage(
-        this.QUERIES_PER_PAGE, this.latestCursor).then((data) => {
+        this.QUERIES_PER_PAGE, this.latestCursor).then(data => {
         this.queries = this.queries.concat(data.recentQueries);
         this.latestCursor = data.cursor;
         return this.queries.slice(startQueryIndex, endQueryIndex);
@@ -104,7 +104,7 @@ export class EmailDashboardDataService {
 
   fetchQuery(queryId: string): Promise<EmailDashboardQuery> {
     return this.emailDashboardBackendApiService.fetchQuery(queryId)
-      .then((newQuery) => {
+      .then(newQuery => {
         this.queries.forEach(function(query, index, queries) {
           if (query.id === queryId) {
             queries[index] = newQuery;

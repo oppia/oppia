@@ -71,7 +71,7 @@ export class ExplorationRecommendationsService {
 
     this.expRecommendationBackendApiService.getRecommendedSummaryDicts(
       authorRecommendedExpIds, includeSystemRecommendations, collectionId,
-      storyId, currentNodeId, explorationId).then((expSummaries) => {
+      storyId, currentNodeId, explorationId).then(expSummaries => {
       successCallback(expSummaries);
     });
   }
