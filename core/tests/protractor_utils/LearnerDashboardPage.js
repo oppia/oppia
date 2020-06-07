@@ -135,7 +135,6 @@ var LearnerDashboardPage = function() {
     var items = element.all(by.cssContainingText(
       '.protractor-test-exp-summary-tile-title', title));
     expect(await items.count()).toBe(0);
-    };
   };
 
   this.expectTitleOfExplorationSummaryTileToMatch = async function(title) {
