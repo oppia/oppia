@@ -242,18 +242,22 @@ jobs:
           name: Run e2e exploration feedback tab test
           command: |
             python -m scripts.run_e2e_tests --skip-install --skip-build --suite="explorationFeedbackTab" --prod_env
+          when: always
       - run:
           name: Run e2e exploration history tab test
           command: |
             python -m scripts.run_e2e_tests --skip-install --skip-build --suite="explorationHistoryTab" --prod_env
+          when: always
       - run:
           name: Run e2e exploration statistics test
           command: |
             python -m scripts.run_e2e_tests --skip-install --skip-build --suite="explorationStatisticsTab" --prod_env
+          when: always
       - run:
           name: Run e2e exploration translation tab test
           command: |
             python -m scripts.run_e2e_tests --skip-install --skip-build --suite="explorationTranslationTab" --prod_env
+          when: always
 
   e2e_users:
     <<: *job_defaults
