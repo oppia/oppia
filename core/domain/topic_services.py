@@ -16,7 +16,7 @@
 
 """Commands for operations on topics, and related models."""
 
-from __future__ import absolute_import, print_function  # pylint: disable=import-only-modules
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import collections
@@ -121,7 +121,6 @@ def get_topic_summary_from_model(topic_summary_model):
         topic_summary_model.canonical_name,
         topic_summary_model.language_code,
         topic_summary_model.description,
-        topic_summary_model.category,
         topic_summary_model.version,
         topic_summary_model.canonical_story_count,
         topic_summary_model.additional_story_count,
@@ -184,7 +183,6 @@ def _create_topic(committer_id, topic, commit_message, commit_cmds):
         thumbnail_filename=topic.thumbnail_filename,
         canonical_name=topic.canonical_name,
         description=topic.description,
-        category=topic.category,
         language_code=topic.language_code,
         canonical_story_references=[
             reference.to_dict()
@@ -329,9 +327,6 @@ def apply_change_list(topic_id, change_list):
                       topic_domain.TOPIC_PROPERTY_DESCRIPTION):
                     topic.update_description(change.new_value)
                 elif (change.property_name ==
-                      topic_domain.TOPIC_PROPERTY_CATEGORY):
-                    topic.update_category(change.new_value)
-                elif (change.property_name ==
                       topic_domain.TOPIC_PROPERTY_LANGUAGE_CODE):
                     topic.update_language_code(change.new_value)
                 elif (change.property_name ==
@@ -444,7 +439,6 @@ def _save_topic(committer_id, topic, commit_message, change_list):
     topic_model.name = topic.name
     topic_model.canonical_name = topic.canonical_name
     topic_model.abbreviated_name = topic.abbreviated_name
-    topic_model.category = topic.category
     topic_model.thumbnail_bg_color = topic.thumbnail_bg_color
     topic_model.thumbnail_filename = topic.thumbnail_filename
     topic_model.canonical_story_references = [
@@ -822,9 +816,8 @@ def compute_summary_of_topic(topic):
         total_skill_count = total_skill_count + len(subtopic.skill_ids)
 
     topic_summary = topic_domain.TopicSummary(
-        topic.id, topic.name, topic.canonical_name,
-        topic.language_code, topic.description, topic.category,
-        topic.version, topic_model_canonical_story_count,
+        topic.id, topic.name, topic.canonical_name, topic.language_code,
+        topic.description, topic.version, topic_model_canonical_story_count,
         topic_model_additional_story_count,
         topic_model_uncategorized_skill_count, topic_model_subtopic_count,
         total_skill_count, topic.created_on, topic.last_updated
@@ -844,7 +837,6 @@ def save_topic_summary(topic_summary):
     topic_summary_dict = {
         'name': topic_summary.name,
         'description': topic_summary.description,
-        'category': topic_summary.category,
         'canonical_name': topic_summary.canonical_name,
         'language_code': topic_summary.language_code,
         'version': topic_summary.version,

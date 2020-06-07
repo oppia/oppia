@@ -26,19 +26,15 @@ require(
   'topics-and-skills-dashboard-page.constants.ajs.ts');
 
 angular.module('oppia').factory('SkillCreationService', [
-  '$rootScope', '$timeout', '$window', 'AlertsService',
+  '$rootScope', '$uibModal', '$timeout', '$window', 'AlertsService',
   'ImageLocalStorageService', 'SkillCreationBackendApiService',
-  'UrlInterpolationService', 'EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED',
-  '$uibModal', '$rootScope', '$timeout', '$window', 'AlertsService',
-  'SkillCreationBackendApiService', 'UrlInterpolationService',
+  'UrlInterpolationService',
   'EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED',
   'SKILL_DESCRIPTION_STATUS_VALUES',
   function(
-      $rootScope, $timeout, $window, AlertsService,
+      $rootScope, $uibModal, $timeout, $window, AlertsService,
       ImageLocalStorageService, SkillCreationBackendApiService,
-      UrlInterpolationService, EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED,
-      $uibModal, $rootScope, $timeout, $window, AlertsService,
-      SkillCreationBackendApiService, UrlInterpolationService,
+      UrlInterpolationService,
       EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED,
       SKILL_DESCRIPTION_STATUS_VALUES) {
     var CREATE_NEW_SKILL_URL_TEMPLATE = (
@@ -74,7 +70,6 @@ angular.module('oppia').factory('SkillCreationService', [
           backdrop: 'static',
           controller: 'CreateNewSkillModalController'
         }).result.then(function(result) {
-          console.log(result);
           if (skillCreationInProgress) {
             return;
           }
@@ -108,6 +103,7 @@ angular.module('oppia').factory('SkillCreationService', [
           }, function(errorMessage) {
             AlertsService.addWarning(errorMessage);
           });
+        });
       }
     };
   }
