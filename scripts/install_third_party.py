@@ -334,7 +334,8 @@ def download_manifest_files(filepath):
 
 def remove_emojis_from_guppy(guppy_file_path):
     """The emoji symbols present in the guppy.min.js file are not compatible
-    with all platforms, hence they must be removed from the file.
+    with all platforms, hence they must be removed from the file. Leaving these
+    leads to console warnings which cause the e2e tests to fail.
     For reference: https://github.com/daniel3735928559/guppy/issues/138
 
     Args:

@@ -1,5 +1,6 @@
 /* eslint-disable camelcase */
 // Code - third_party/static/guppy-f944022/src/guppy.js
+// This guppy version corresponds to the commit on June 5 2019.
 
 interface GuppyConfig {
   events?: Object;
@@ -48,6 +49,7 @@ interface GuppySymbols {
 class Guppy {
   activate: () => void;
   asciimath: () => void;
+  configure: () => void;
   deactivate: () => void;
   doc: () => Object;
   equations: () => Array<Object>;
@@ -56,7 +58,7 @@ class Guppy {
   import_latex: (text: string) => void;
   import_syntax_tree: (tree: Object) => void;
   import_text: (text: string) => void;
-  import_xml: (text: string) => void;
+  import_xml: (xml: string) => void;
   is_changed: () => boolean;
   latex: () => string;
   recompute_locations_paths: () => void;
@@ -73,6 +75,9 @@ class Guppy {
 }
 
 class GuppyOSK {
+  attach: (guppy?: Guppy) => void;
+  detach: () => void;
+
   constructor(config: Object);
 }
 
@@ -99,4 +104,5 @@ namespace Guppy {
   export function register_keyboard_handlers(): void;
   export function remove_global_symbol(name: string): void;
   export function use_osk(osk: GuppyOSK): void;
+  export function event(name: string, handler: Function): void;
 }
