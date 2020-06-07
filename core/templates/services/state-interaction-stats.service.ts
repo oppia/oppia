@@ -44,7 +44,7 @@ type Answer = (
   number[] | IGraphBackendDict| string[][]);
 
 export interface IAnswerData {
-  'answer': string;
+  'answer': Answer;
   'frequency': number;
   // N/A when the visualization can not present addressed answers.
   //
@@ -97,12 +97,13 @@ export class StateInteractionStatsService {
     return state.interaction.id === 'TextInput';
   }
 
-  private getReadableAnswerString(state: State, answer: Answer): string {
+  // Converts answer to a more-readable representation based on their type.
+  private getReadableAnswerString(state: State, answer: Answer): Answer {
     if (state.interaction.id === 'FractionInput') {
       return (
         this.fractionObjectFactory.fromDict(<IFractionDict> answer).toString());
     }
-    return angular.toJson(answer);
+    return answer;
   }
 
   /**
