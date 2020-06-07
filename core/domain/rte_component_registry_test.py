@@ -207,6 +207,8 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
                 feconf.RTE_EXTENSIONS_DIR, component_id)
             directives_dir = os.path.join(component_dir, 'directives')
             directive_filenames = os.listdir(directives_dir)
+            # When reading for all the .ts files in the directives directory,
+            # the .spec.ts # files should not be included.
             rtc_ts_filenames.extend(
                 filename for filename
                 in directive_filenames if (
