@@ -47,7 +47,7 @@ import { UtilsService } from './utils.service';
  */
 
 export interface LangChangeEvent {
-  lang: string;
+  newLanguageCode: string;
 }
 
 @Injectable({
@@ -61,41 +61,43 @@ export class TranslateService {
   translations: Array<Object> = [];
   templateMatcher: RegExp = /\<\[\s?([^{}\s]*)\s?\]\>/g;
 
-  private _onLangChangeEventEmitter = new EventEmitter<LangChangeEvent>();
+  private onLangChangeEventEmitter = new EventEmitter<LangChangeEvent>();
   get onLangChange(): EventEmitter<LangChangeEvent> {
-    return this._onLangChangeEventEmitter;
+    return this.onLangChangeEventEmitter;
   }
 
   constructor(private http: HttpClient, private utilsService: UtilsService) {}
 
   /**
    * Function to fetch JSON file containing translations.
-   * @param {string} lang - Code of the language
+   * @param {string} languageCode - Code of the language
    * @returns {Promise<Object>} - A promise that resolves to the translations
    */
-  fetchTranslations(lang:string): Promise<Object> {
-    return this.http.get(`${this.prefix}${lang}${this.suffix}`).toPromise();
+  fetchTranslations(languageCode:string): Promise<Object> {
+    return this.http.get(
+      `${this.prefix}${languageCode}${this.suffix}`).toPromise();
   }
 
   /**
    * This function sets the new translations
-   * @param {string} lang - language code of the translation to be used
+   * @param {string} languageCode - language code of the translation to be used
    */
-  use(lang: string): void {
+  use(newLanguageCode: string): void {
     // Check if the translations for the "lang" have been fetched before.
-    this.currentLang = lang;
-    if (Object.keys(this.translations).includes(lang)) {
-      this._onLangChangeEventEmitter.emit(
-        {lang: lang });
+    this.currentLang = newLanguageCode;
+    if (Object.keys(this.translations).includes(newLanguageCode)) {
+      this.onLangChangeEventEmitter.emit(
+        {newLanguageCode: newLanguageCode });
       return;
     }
     // Otherwise fetch the translations.
-    this.translations[lang] = this.fetchTranslations(lang).then(
+    this.translations[newLanguageCode] = this.fetchTranslations(
+      newLanguageCode).then(
       translations => {
-        this.translations[lang] = translations;
-        if (this.currentLang === lang) {
-          this._onLangChangeEventEmitter.emit(
-            {lang: lang});
+        this.translations[newLanguageCode] = translations;
+        if (this.currentLang === newLanguageCode) {
+          this.onLangChangeEventEmitter.emit(
+            {newLanguageCode: newLanguageCode});
         }
       }
     );
@@ -109,14 +111,17 @@ export class TranslateService {
    */
   interpolateTranslatedValue(
       translatedValue: string,
-      params?: Object | undefined): string {
-    if (!params) {
+      interpolateParams?: Object | undefined): string {
+    if (!interpolateParams) {
       return translatedValue;
     }
     return translatedValue.replace(this.templateMatcher,
-      (substring: string, b: string) => {
-        let r = params[b];
-        return this.utilsService.isDefined(r) ? r : substring;
+      (substring: string, interpolateParamsKey: string) => {
+        let interpolateParamsValue = interpolateParams[interpolateParamsKey];
+        if (this.utilsService.isDefined(interpolateParamsValue)) {
+          return interpolateParamsValue;
+        }
+        return substring;
       });
   }
 

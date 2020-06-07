@@ -32,7 +32,7 @@ export class I18nLanguageCodeService {
    * In order to keep the variables same, static is used until migration is
    * complete.
    */
-  static languageCodeChange = new EventEmitter<string> ();
+  static languageCodeChangeEventEmitter = new EventEmitter<string> ();
   static languageCode = 'en';
 
   constructor() {}
@@ -42,15 +42,15 @@ export class I18nLanguageCodeService {
     return I18nLanguageCodeService.languageCode;
   }
 
-  onI18nLanguageCodeChange(): EventEmitter<string> {
+  get onI18nLanguageCodeChange(): EventEmitter<string> {
     // TODO(#9154): Change I18nLanguageCodeService to "this".
-    return I18nLanguageCodeService.languageCodeChange;
+    return I18nLanguageCodeService.languageCodeChangeEventEmitter;
   }
 
   setI18nLanguageCode(code: string): void {
     // TODO(#9154): Change I18nLanguageCodeService to "this".
     I18nLanguageCodeService.languageCode = code;
-    I18nLanguageCodeService.languageCodeChange.emit(code);
+    I18nLanguageCodeService.languageCodeChangeEventEmitter.emit(code);
   }
 }
 

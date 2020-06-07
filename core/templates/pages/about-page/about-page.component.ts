@@ -77,7 +77,7 @@ export class AboutPageComponent implements OnInit {
     this.activeTabName = this.TAB_ID_ABOUT;
     this.translateService.use(
       this.i18nLanguageCodeService.getCurrentI18nLanguageCode());
-    this.i18nLanguageCodeService.onI18nLanguageCodeChange().subscribe(
+    this.i18nLanguageCodeService.onI18nLanguageCodeChange.subscribe(
       (code) => this.translateService.use(code)
     );
     const hash = this.windowRef.nativeWindow.location.hash.slice(1);

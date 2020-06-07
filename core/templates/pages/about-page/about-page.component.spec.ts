@@ -36,21 +36,21 @@ class MockTranslatePipe {
 }
 
 class MockTranslateService {
-  code = 'es';
-  use(lang: string): string {
-    this.code = lang;
-    return this.code;
+  languageCode = 'es';
+  use(newLanguageCode: string): string {
+    this.languageCode = newLanguageCode;
+    return this.languageCode;
   }
 }
 
 class MockI18nLanguageCodeService {
-  codeChange = new EventEmitter<string>();
+  codeChangeEventEmiiter = new EventEmitter<string>();
   getCurrentI18nLanguageCode() {
     return 'en';
   }
 
-  onI18nLanguageCodeChange() {
-    return this.codeChange;
+  get onI18nLanguageCodeChange() {
+    return this.codeChangeEventEmiiter;
   }
 }
 
@@ -213,11 +213,11 @@ describe('About Page', function() {
       '/assets/images/general/about_page_mascot.png');
   });
 
-  it ('should receive code changes from I18n-lang-code-service', fakeAsync(
+  it ('should receive code changes from I18n-language-code-service', fakeAsync(
     () => {
       component.ngOnInit();
 
-      i18n.codeChange.emit('en');
+      i18n.codeChangeEventEmiiter.emit('en');
       fixture.detectChanges();
       expect(translate.code).toBe('en');
     }));

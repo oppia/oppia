@@ -89,6 +89,10 @@ export class TranslatePipe implements PipeTransform, OnDestroy {
   }
 
   /**
+   * Every pipe is supposed to have a function named transform as Pipes
+   * PipeTranform. The PipeTransform interface expects a tranform function.
+   * This tranform function is called by angular to transform input values
+   * to output values for display in a view.
    * @param {string} key - key for i18n
    * @param {Object | undefined} params - key-value pairs for interpolation. No
    *  key-value pairs are sent when the translation does not require
@@ -107,11 +111,6 @@ export class TranslatePipe implements PipeTransform, OnDestroy {
       return this.interpolatedValue;
     }
 
-    let interpolateParams: Object;
-    if (this.utilsService.isDefined(params) && !Array.isArray(params)) {
-      interpolateParams = params;
-    }
-
     // Storing the key to check if the key is same when the transform is invoked
     // again.
     this.lastKey = key;
@@ -119,6 +118,11 @@ export class TranslatePipe implements PipeTransform, OnDestroy {
     // Storing the params to check if the params are same when the transform is
     // invoked again.
     this.lastParams = params;
+
+    let interpolateParams: Object;
+    if (this.utilsService.isDefined(params) && !Array.isArray(params)) {
+      interpolateParams = params;
+    }
 
     // Update the interpolated value.
     this.updateInterpolatedValue(key, interpolateParams);

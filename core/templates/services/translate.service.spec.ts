@@ -54,13 +54,13 @@ describe('Translate service', () => {
   }));
 
   it('should set the new translation', fakeAsync(() => {
-    let lang = '';
+    let languageCode = '';
     let translations = {};
     const enTranslations = {I18n_t_1: 'Hello'};
     const subscription = translate.onLangChange.subscribe(
       res => {
-        lang = res.lang;
-        translations = translate.translations[res.lang];
+        languageCode = res.newLanguageCode;
+        translations = translate.translations[res.newLanguageCode];
       }
     );
     const esTranslations = {
@@ -73,7 +73,7 @@ describe('Translate service', () => {
 
     flushMicrotasks();
 
-    expect(lang).toBe('en');
+    expect(languageCode).toBe('en');
     expect(translations).toBe(enTranslations);
 
     translate.use('es');
@@ -82,11 +82,11 @@ describe('Translate service', () => {
 
     flushMicrotasks();
 
-    expect(lang).toBe('es');
+    expect(languageCode).toBe('es');
     expect(translations).toBe(esTranslations);
 
     translate.use('en');
-    expect(lang).toBe('en');
+    expect(languageCode).toBe('en');
     expect(translations).toBe(enTranslations);
 
     subscription.unsubscribe();
