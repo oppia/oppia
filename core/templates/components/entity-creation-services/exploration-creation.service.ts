@@ -17,6 +17,10 @@
  * modal.
  */
 
+require(
+  'pages/creator-dashboard-page/modal-templates/' +
+  'upload-activity-modal.controller.ts');
+
 require('domain/utilities/url-interpolation.service.ts');
 require('services/alerts.service.ts');
 require('services/csrf-token.service.ts');
@@ -69,30 +73,7 @@ angular.module('oppia').factory('ExplorationCreationService', [
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/creator-dashboard-page/modal-templates/' +
             'upload-activity-modal.directive.html'),
-          controller: [
-            '$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
-              $scope.save = function() {
-                var returnObj = {
-                  yamlFile: null
-                };
-                var file = (
-                  <HTMLInputElement>document.getElementById('newFileInput')
-                ).files[0];
-                if (!file || !file.size) {
-                  AlertsService.addWarning('Empty file detected.');
-                  return;
-                }
-                returnObj.yamlFile = file;
-
-                $uibModalInstance.close(returnObj);
-              };
-
-              $scope.cancel = function() {
-                $uibModalInstance.dismiss('cancel');
-                AlertsService.clearWarnings();
-              };
-            }
-          ]
+          controller: 'UploadActivityModalController'
         }).result.then(function(result) {
           var yamlFile = result.yamlFile;
 
@@ -129,6 +110,10 @@ angular.module('oppia').factory('ExplorationCreationService', [
               $rootScope.$apply();
             });
           });
+        }, function() {
+          // Note to developers:
+          // This callback is triggered when the Cancel button is
+          // clicked. No further action is needed.
         });
       }
     };

@@ -58,6 +58,7 @@ class MockPsutilProcess(python_utils.OBJECT):
 
     def __init__(self, index):
         """Constructor for this mock object.
+
         Args:
             index: int. The index of process to be checked.
         """

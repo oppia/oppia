@@ -19,8 +19,9 @@
  */
 
 require(
-  'components/common-layout-directives/common-elements/' +
-  'confirm-or-cancel-modal.controller.ts');
+  'pages/exploration-editor-page/editor-tab/templates/' +
+  'modal-templates/confirm-delete-state-modal.controller.ts');
+
 require('domain/exploration/StatesObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('filters/string-utility-filters/normalize-whitespace.filter.ts');
@@ -428,18 +429,10 @@ angular.module('oppia').factory('ExplorationStatesService', [
             '/pages/exploration-editor-page/editor-tab/templates/' +
             'modal-templates/confirm-delete-state-modal.template.html'),
           backdrop: true,
-          controller: [
-            '$controller', '$scope', '$uibModalInstance',
-            function($controller, $scope, $uibModalInstance) {
-              $controller('ConfirmOrCancelModalController', {
-                $scope: $scope,
-                $uibModalInstance: $uibModalInstance
-              });
-              $scope.deleteStateWarningText = (
-                'Are you sure you want to delete the card "' +
-                deleteStateName + '"?');
-            }
-          ]
+          resolve: {
+            deleteStateName: () => deleteStateName
+          },
+          controller: 'ConfirmDeleteStateModalController'
         }).result.then(function() {
           _states.deleteState(deleteStateName);
 
