@@ -236,9 +236,10 @@ class EventHandlerNameTests(test_utils.GenericTestBase):
         """
         files_in_directory = []
         for directory, _, files in os.walk('.'):
-            if (not (directory.startswith('./core/') or
-                     directory.startswith('./extensions/')) or (
-                         directory.startswith('./core/tests/linter_tests/'))):
+            if not (directory.startswith('./core/') or
+                    directory.startswith('./extensions/')):
+                continue
+            elif directory.startswith('./core/tests/linter_tests/'):
                 continue
             for file_name in files:
                 if not file_name.endswith('.py'):
