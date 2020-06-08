@@ -45,9 +45,6 @@ require(
   'topics-and-skills-dashboard-backend-api.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require(
-  'pages/topics-and-skills-dashboard-page/' +
-  'create-new-skill-modal.controller.ts');
-require(
   'pages/topics-and-skills-dashboard-page/skills-list/' +
   'skills-list.directive.ts');
 require(
@@ -185,11 +182,19 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
           };
 
           ctrl.createSkill = function() {
+            var rubrics = [
+              RubricObjectFactory.create(SKILL_DIFFICULTIES[0], []),
+              RubricObjectFactory.create(SKILL_DIFFICULTIES[1], ['']),
+              RubricObjectFactory.create(SKILL_DIFFICULTIES[2], [])];
+            ContextService.setImageSaveDestinationToLocalStorage();
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/topics-and-skills-dashboard-page/templates/' +
                 'create-new-skill-modal.template.html'),
               backdrop: 'static',
+              resolve: {
+                rubrics: () => rubrics
+              },
               controller: 'CreateNewSkillModalController'
             }).result.then(function(result) {
               ContextService.resetImageSaveDestination();
