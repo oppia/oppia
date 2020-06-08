@@ -1,31 +1,64 @@
 <div class="oppia-practice-tab-container">
-  <md-card class="oppia-practice-tab-card">
-    <button class="oppia-new-practice-session" ng-click="$ctrl.newPracticeSession()">
-      New Practice Session
-    </button>
+  <md-card class="oppia-page-card oppia-long-text">
+    <h2 class="tab-title">
+      <span translate="I18N_TOPIC_VIEWER_MASTER_SKILLS"></span>
+    </h2>
+    <span class="practice-content">
+      <span translate="I18N_TOPIC_VIEWER_SELECT_SKILLS"></span>
+    </span>
+    <md-checkbox ng-repeat="subtopic in $ctrl.availableSubtopics" ng-model="$ctrl.selectedSubtopicIndices[$index]">
+      <[subtopic.getTitle()]>
+    </md-checkbox>
+    <md-button ng-disabled="$ctrl.isStartButtonDisabled()"
+               ng-click="$ctrl.openNewPracticeSession()"
+               class="practice-session-button md-accent md-raised">
+      <span translate="I18N_TOPIC_VIEWER_START_PRACTICE"></span>
+    </md-button>
   </md-card>
 </div>
 <style>
-  .oppia-practice-tab-container {
-    margin-top: 20px;
+  practice-tab .oppia-practice-tab-container .oppia-page-card {
+    width: 550px;
   }
 
-  .oppia-new-practice-session {
+  @media (max-width: 1024px) {
+    practice-tab .oppia-practice-tab-container .oppia-page-card {
+      width: 60vw;
+    }
+  }
+
+  @media (max-width: 500px) {
+    practice-tab .oppia-practice-tab-container .oppia-page-card {
+      width: 90vw;
+    }
+  }
+
+  practice-tab .md-button {
+    align-self: center;
     color: white;
-    border-radius: 4px;
-    font-family: "Capriola", "Roboto", Arial, sans-serif;
-    height: 50px;
-    width: 100%;
-    max-width: 800px;
+    border-radius: 0.4em;
+    font-family: "Roboto", Arial, sans-serif;
     margin-top: 20px;
     text-transform: uppercase;
-    background: #0D48A1;
-    padding: 10px;
+    width: 200px;
   }
 
-  .oppia-practice-tab-card {
-    background: #FFFFFF;
-    height: 100px;
-    text-align: center;
+  practice-tab md-checkbox .md-label {
+    margin-top: -1px;
+    vertical-align: top;
+  }
+
+  practice-tab .md-button.md-raised.md-accent.practice-session-button:not([disabled]) {
+    background-color: #00645C;
+  }
+
+  practice-tab md-checkbox {
+    margin-top: 1vh;
+  }
+
+  practice-tab .practice-content {
+    font-family: "Roboto", Arial, sans-serif;
+    font-size: 1.2em;
+    margin-bottom: 2.5vh;
   }
 </style>
