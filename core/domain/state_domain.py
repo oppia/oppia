@@ -219,6 +219,7 @@ class Hint(python_utils.OBJECT):
             hint_dict: dict. The hints dict.
             conversion_fn: function. The function to be used for converting the
                 HTML.
+
         Returns:
             dict. The converted hints dict.
         """
@@ -316,6 +317,7 @@ class Solution(python_utils.OBJECT):
             solution_dict: dict. The Solution dict.
             conversion_fn: function. The function to be used for converting the
                 HTML.
+
         Returns:
             dict. The converted Solution dict.
         """
@@ -773,6 +775,7 @@ class Outcome(python_utils.OBJECT):
             outcome_dict: dict. The outcome dict.
             conversion_fn: function. The function to be used for converting the
                 HTML.
+
         Returns:
             dict. The converted outcome dict.
         """
@@ -1188,6 +1191,7 @@ class WrittenTranslations(python_utils.OBJECT):
             written_translations_dict: dict. The written translations dict.
             conversion_fn: function. The function to be used for converting the
                 HTML.
+
         Returns:
             dict. The converted written translations dict.
         """
@@ -1486,6 +1490,7 @@ class RuleSpec(python_utils.OBJECT):
             rule_spec_dict: dict. The Rule Spec dict.
             conversion_fn: function. The function to be used for converting the
                 HTML.
+
         Returns:
             dict. The converted Rule Spec dict.
         """
