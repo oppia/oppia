@@ -398,9 +398,9 @@ class SuggestionEditStateContent(BaseSuggestion):
         Returns:
             list(str). The list of html content strings.
         """
-        html_string_list = [self.change.new_value]
+        html_string_list = [self.change.new_value['html']]
         if self.change.old_value is not None:
-            html_string_list.append(self.change.old_value)
+            html_string_list.append(self.change.old_value['html'])
         return html_string_list
 
 
@@ -413,10 +413,10 @@ class SuggestionEditStateContent(BaseSuggestion):
                 HTML.
         """
         if self.change.old_value is not None:
-            self.change.old_value = (
-                conversion_fn(self.change.old_value))
-        self.change.new_value = (
-            conversion_fn(self.change.new_value))
+            self.change.old_value['html'] = (
+                conversion_fn(self.change.old_value['html']))
+        self.change.new_value['html'] = (
+            conversion_fn(self.change.new_value['html']))
 
 
 class SuggestionTranslateContent(BaseSuggestion):

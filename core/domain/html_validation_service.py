@@ -898,23 +898,38 @@ def add_math_content_to_math_rte_components(html_string):
         html_string.encode(encoding='utf-8'), 'html.parser')
     for math_tag in soup.findAll(name='oppia-noninteractive-math'):
         if math_tag.has_attr('raw_latex-with-value'):
-            raw_latex = (
-                json.loads(unescape_html(math_tag['raw_latex-with-value'])))
+            try:
+                # The raw_latex attribute value should be enclosed in
+                # double quotes(&amp;quot;) and should be a valid unicode
+                # string.
+                raw_latex = (
+                    json.loads(unescape_html(math_tag['raw_latex-with-value'])))
+                normailzed_raw_latex = (
+                    objects.UnicodeString.normalize(raw_latex))
+            except Exception as e:
+                error_message = (
+                    'Invalid raw_latex value found in the math tag : %s' % (
+                        python_utils.UNICODE(e)))
+                raise Exception(error_message)
             math_content_dict = {
-                'raw_latex': raw_latex,
+                'raw_latex': normailzed_raw_latex,
                 'svg_filename': ''
             }
-            # Normalize and validate the value before adding to the math tag.
+            # Normalize and validate the value before adding to the math
+            # tag.
             normalized_math_content_dict = (
                 objects.MathExpressionContent.normalize(math_content_dict))
-            # Delete the attribute raw_latex-with-value.
-            del math_tag['raw_latex-with-value']
             # Add the new attribute math_expression_contents-with-value.
             math_tag['math_content-with-value'] = (
                 escape_html(
                     json.dumps(normalized_math_content_dict, sort_keys=True)))
+            # Delete the attribute raw_latex-with-value.
+            del math_tag['raw_latex-with-value']
+        elif math_tag.has_attr('math_content-with-value'):
+            pass
         else:
-            return html_string
+            raise Exception(
+                'Invalid math tag with no proper attribute found.')
     # We need to replace the <br/> tags (if any) with  <br> because for passing
     # the textangular migration tests we need to have only <br> tags.
     return python_utils.UNICODE(soup).replace('<br/>', '<br>')

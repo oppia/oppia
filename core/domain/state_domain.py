@@ -1512,7 +1512,9 @@ class RuleSpec(python_utils.OBJECT):
             for value_index, value in enumerate(rule_spec_dict['inputs']['x']):
                 rule_spec_dict['inputs']['x'][value_index][0] = (
                     conversion_fn(value[0]))
-        elif rule_spec_dict['rule_type'] == 'Equals':
+        elif rule_spec_dict['rule_type'] in (
+                'ContainsAtLeastOneOf', 'IsProperSubsetOf',
+                'DoesNotContainAtLeastOneOf', 'Equals'):
             if isinstance(rule_spec_dict['inputs']['x'], list):
                 for value_index, value in enumerate(
                         rule_spec_dict['inputs']['x']):

@@ -610,12 +610,22 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             }))
 
     def test_get_all_html_content_strings(self):
+        change_dict = {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+            'state_name': 'state_1',
+            'new_value': {
+                'content_id': 'content',
+                'html': 'new suggestion content'
+            },
+            'old_value': None
+        }
         suggestion = suggestion_registry.SuggestionEditStateContent(
             self.suggestion_dict['suggestion_id'],
             self.suggestion_dict['target_id'],
             self.suggestion_dict['target_version_at_submission'],
             self.suggestion_dict['status'], self.author_id,
-            self.reviewer_id, self.suggestion_dict['change'],
+            self.reviewer_id, change_dict,
             self.suggestion_dict['score_category'], self.fake_date)
 
         actual_outcome_list = suggestion.get_all_html_content_strings()
@@ -636,8 +646,14 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'property_name': exp_domain.STATE_PROPERTY_CONTENT,
             'state_name': 'Introduction',
-            'new_value': '<p>suggestion</p>',
-            'old_value': html_content
+            'new_value': {
+                'content_id': 'content',
+                'html': '<p>suggestion</p>'
+            },
+            'old_value': {
+                'content_id': 'content',
+                'html': html_content
+            }
         }
         suggestion = suggestion_registry.SuggestionEditStateContent(
             self.suggestion_dict['suggestion_id'],
@@ -651,7 +667,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             html_validation_service.
             add_math_content_to_math_rte_components)
         self.assertEqual(
-            suggestion.change.old_value, expected_html_content)
+            suggestion.change.old_value['html'], expected_html_content)
 
 
 class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):

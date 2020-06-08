@@ -1525,6 +1525,25 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 html_validation_service.add_math_content_to_math_rte_components(
                     test_case['html_content']),
                 test_case['expected_output'])
+        invalid_cases = [{
+            'html_content': (
+                '<p>Feedback</p><oppia-noninteractive-math></oppia-nonintera'
+                'ctive-math>')
+        }, {
+            'html_content': (
+                '<p>Feedback</p><oppia-noninteractive-math raw_latex-with-valu'
+                'e="++--"></oppia-noninteractive-math>'
+            )
+        }]
+        with self.assertRaisesRegexp(
+            Exception, 'Invalid math tag with no proper attribute found'):
+            html_validation_service.add_math_content_to_math_rte_components(
+                invalid_cases[0]['html_content'])
+
+        with self.assertRaisesRegexp(
+            Exception, 'Invalid raw_latex value found in the math tag'):
+            html_validation_service.add_math_content_to_math_rte_components(
+                invalid_cases[1]['html_content'])
 
     def test_regenerate_image_filename_using_dimensions(self):
         regenerated_name = (
