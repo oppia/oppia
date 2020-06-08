@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for JobSpecObjectFactory.ts.
  */
 
-import { JobSpecObjectFactory } from 'domain/admin/JobSpecObjectFactory';
+import { JobSpecObjectFactory } from 'domain/admin/job-spec-object.factory';
 
 describe('Job Spec Object Factory', () => {
   let jsof: JobSpecObjectFactory;

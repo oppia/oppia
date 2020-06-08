@@ -25,7 +25,7 @@ import { CsrfTokenService } from
 import { EmailDashboardDataService } from
   'pages/email-dashboard-pages/email-dashboard-data.service';
 import { EmailDashboardQueryObjectFactory } from
-  'domain/email-dashboard/EmailDashboardQueryObjectFactory';
+  'domain/email-dashboard/email-dashboard-query-object.factory';
 
 describe('Email Dashboard Services', () => {
   describe('Email Dashboard Services', () => {

@@ -28,17 +28,17 @@ import {
   IComputationDataBackendDict,
   ComputationData,
   ComputationDataObjectFactory
-} from 'domain/admin/ComputationDataObjectFactory';
+} from 'domain/admin/computation-data-object.factory';
 import {
   IJobDataBackendDict,
   JobData,
   JobDataObjectFactory
-} from 'domain/admin/JobDataObjectFactory';
+} from 'domain/admin/job-data-object.factory';
 import {
   IJobSpecBackendDict,
   JobSpec,
   JobSpecObjectFactory
-} from 'domain/admin/JobSpecObjectFactory';
+} from 'domain/admin/job-spec-object.factory';
 
 interface IUserRoles {
   [role: string]: string;

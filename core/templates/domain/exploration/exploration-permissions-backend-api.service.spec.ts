@@ -24,7 +24,7 @@ import { ContextService } from 'services/context.service';
 import { ExplorationPermissionsBackendApiService } from
   'domain/exploration/exploration-permissions-backend-api.service';
 import { ExplorationPermissionsObjectFactory } from
-  'domain/exploration/ExplorationPermissionsObjectFactory';
+  'domain/exploration/exploration-permissions-object.factory';
 
 describe('Exploration permissions backend api service', () => {
   let epbas: ExplorationPermissionsBackendApiService;

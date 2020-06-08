@@ -17,7 +17,7 @@
  */
 
 import { ComputationDataObjectFactory } from
-  'domain/admin/ComputationDataObjectFactory';
+  'domain/admin/computation-data-object.factory';
 
 describe('Computation Data Object Factory', () => {
   let cdof: ComputationDataObjectFactory;

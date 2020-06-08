@@ -24,7 +24,7 @@ import {
   IAdminDataBackendDict,
   AdminData,
   AdminDataObjectFactory
-} from 'domain/admin/AdminDataObjectFactory';
+} from 'domain/admin/admin-data-object.factory';
 import { AdminPageConstants } from
   'pages/admin-page/admin-page.constants';
 

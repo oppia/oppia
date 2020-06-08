@@ -17,13 +17,13 @@
  */
 
 import { AdminDataObjectFactory } from
-  'domain/admin/AdminDataObjectFactory';
+  'domain/admin/admin-data-object.factory';
 import { ComputationDataObjectFactory } from
-  'domain/admin/ComputationDataObjectFactory';
+  'domain/admin/computation-data-object.factory';
 import { JobDataObjectFactory } from
-  'domain/admin/JobDataObjectFactory';
+  'domain/admin/job-data-object.factory';
 import { JobSpecObjectFactory } from
-  'domain/admin/JobSpecObjectFactory';
+  'domain/admin/job-spec-object.factory';
 import { TopicSummaryObjectFactory } from
   'domain/topic/TopicSummaryObjectFactory';
 

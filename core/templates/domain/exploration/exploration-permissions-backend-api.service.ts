@@ -27,7 +27,7 @@ import {
   IExplorationPermissionsBackendDict,
   ExplorationPermissions,
   ExplorationPermissionsObjectFactory
-} from 'domain/exploration/ExplorationPermissionsObjectFactory';
+} from 'domain/exploration/exploration-permissions-object.factory';
 
 @Injectable({
   providedIn: 'root'

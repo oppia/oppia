@@ -31,13 +31,9 @@ interface IStorePlaythroughBackendResponse {
 }
 
 export class StorePlaythroughResponse {
-  playthroughStored: boolean;
-  playthroughId: string;
-
-  constructor(playthroughStored: boolean, playthroughId: string) {
-    this.playthroughId = playthroughId;
-    this.playthroughStored = playthroughStored;
-  }
+  constructor(
+    public playthroughStored: boolean,
+    public playthroughId: string) {}
 }
 
 @Injectable({

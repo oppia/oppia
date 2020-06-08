@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for JobDataObjectFactory.ts.
  */
 
-import { JobDataObjectFactory } from 'domain/admin/JobDataObjectFactory';
+import { JobDataObjectFactory } from 'domain/admin/job-data-object.factory';
 
 describe('Job Data Object Factory', () => {
   let jdof: JobDataObjectFactory;

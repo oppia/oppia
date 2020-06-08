@@ -24,12 +24,12 @@ import {
   IEmailDashboardQueryResultsBackendDict,
   EmailDashboardQueryResults,
   EmailDashboardQueryResultsObjectFactory
-} from 'domain/email-dashboard/EmailDashboardQueryResultsObjectFactory';
+} from 'domain/email-dashboard/email-dashboard-query-results-object.factory';
 import {
   IEmailDashboardQueryBackendDict,
   EmailDashboardQuery,
   EmailDashboardQueryObjectFactory
-} from 'domain/email-dashboard/EmailDashboardQueryObjectFactory';
+} from 'domain/email-dashboard/email-dashboard-query-object.factory';
 
 export interface IQueryData {
   hasNotLoggedInForNDays?: string;

@@ -17,9 +17,9 @@
  */
 
 import { EmailDashboardQueryObjectFactory } from
-  'domain/email-dashboard/EmailDashboardQueryObjectFactory';
+  'domain/email-dashboard/email-dashboard-query-object.factory';
 import { EmailDashboardQueryResultsObjectFactory } from
-  'domain/email-dashboard/EmailDashboardQueryResultsObjectFactory';
+  'domain/email-dashboard/email-dashboard-query-results-object.factory';
 
 describe('email dashboard query results object factory', () => {
   let edqof: EmailDashboardQueryObjectFactory;

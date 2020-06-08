@@ -24,7 +24,7 @@ import {
   IExplorationSummaryBackendDict,
   ExplorationSummary,
   ExplorationSummaryObjectFactory
-} from 'domain/summary/ExplorationSummaryObjectFactory';
+} from 'domain/summary/exploration-summary-object.factory';
 
 type IRecommendationsUrlParams = {
   'stringified_author_recommended_ids'?: string;

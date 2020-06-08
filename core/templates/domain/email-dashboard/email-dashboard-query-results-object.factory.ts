@@ -24,7 +24,7 @@ import {
   IEmailDashboardQuery,
   EmailDashboardQuery,
   EmailDashboardQueryObjectFactory
-} from 'domain/email-dashboard/EmailDashboardQueryObjectFactory';
+} from 'domain/email-dashboard/email-dashboard-query-object.factory';
 
 export interface IEmailDashboardQueryResultsBackendDict {
   'cursor': string;

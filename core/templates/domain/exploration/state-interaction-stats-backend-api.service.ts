@@ -24,7 +24,7 @@ import {
   IVisualizationInfoBackendDict,
   VisualizationInfo,
   VisualizationInfoObjectFactory
-} from 'domain/exploration/VisualizationInfoObjectFactory';
+} from 'domain/exploration/visualization-info-object.factory';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 

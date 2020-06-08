@@ -23,7 +23,7 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { AdminBackendApiService } from
   'domain/admin/admin-backend-api.service';
 import { AdminDataObjectFactory, AdminData } from
-  'domain/admin/AdminDataObjectFactory';
+  'domain/admin/admin-data-object.factory';
 
 describe('Admin backend api service', () => {
   let abas: AdminBackendApiService;

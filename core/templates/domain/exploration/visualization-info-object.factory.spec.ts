@@ -17,7 +17,7 @@
  */
 
 import { VisualizationInfoObjectFactory } from
-  'domain/exploration/VisualizationInfoObjectFactory';
+  'domain/exploration/visualization-info-object.factory';
 import { AnswerStatsObjectFactory } from
   'domain/exploration/AnswerStatsObjectFactory';
 

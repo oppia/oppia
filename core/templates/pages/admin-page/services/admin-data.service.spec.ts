@@ -23,7 +23,7 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { AdminDataService } from
   'pages/admin-page/services/admin-data.service';
 import { AdminData, AdminDataObjectFactory } from
-  'domain/admin/AdminDataObjectFactory';
+  'domain/admin/admin-data-object.factory';
 
 describe('Admin Data Service', () => {
   let adminDataService: AdminDataService = null;

@@ -29,7 +29,7 @@ import { NormalizeWhitespacePunctuationAndCasePipe } from
 import { StateInteractionStatsService } from
   'services/state-interaction-stats.service';
 import { VisualizationInfoObjectFactory } from
-  'domain/exploration/VisualizationInfoObjectFactory';
+  'domain/exploration/visualization-info-object.factory';
 
 describe('State Interaction Stats Service', () => {
   beforeEach(() => {

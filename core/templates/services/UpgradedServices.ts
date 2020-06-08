@@ -26,6 +26,10 @@ import {
   ɵangular_packages_common_http_http_d
 } from '@angular/common/http';
 
+import { AdminBackendApiService } from
+  'domain/admin/admin-backend-api.service';
+import { AdminDataObjectFactory } from
+  'domain/admin/admin-data-object.factory';
 import { AdminDataService } from
   'pages/admin-page/services/admin-data.service';
 import { AdminRouterService } from
@@ -33,10 +37,6 @@ import { AdminRouterService } from
 import { AdminTaskManagerService } from
   'pages/admin-page/services/admin-task-manager.service';
 import { AlertsService } from 'services/alerts.service';
-import { AdminBackendApiService } from
-  'domain/admin/admin-backend-api.service';
-import { AdminDataObjectFactory } from
-  'domain/admin/AdminDataObjectFactory';
 import { AngularNameService } from
   'pages/exploration-editor-page/services/angular-name.service';
 import { AnswerClassificationResultObjectFactory } from
@@ -91,9 +91,9 @@ import { CollectionCreationBackendService } from
 import { CollectionCreationService } from
   'components/entity-creation-services/collection-creation.service';
 import { ComputationDataObjectFactory } from
-  'domain/admin/ComputationDataObjectFactory';
+  'domain/admin/computation-data-object.factory';
 import { CollectionNodeObjectFactory } from
-  'domain/collection/CollectionNodeObjectFactory';
+  'domain/collection/collection-node-object.factory';
 import { CollectionObjectFactory } from
   'domain/collection/CollectionObjectFactory';
 import { CollectionPlaythroughObjectFactory } from
@@ -137,16 +137,16 @@ import { EditableCollectionBackendApiService } from
 import { EditabilityService } from 'services/editability.service';
 import { EditorFirstTimeEventsService } from
   'pages/exploration-editor-page/services/editor-first-time-events.service';
-import { EndExplorationValidationService } from
-  'interactions/EndExploration/directives/end-exploration-validation.service';
 import { EmailDashboardBackendApiService } from
   'domain/email-dashboard/email-dashboard-backend-api.service';
 import { EmailDashboardDataService } from
   'pages/email-dashboard-pages/email-dashboard-data.service';
 import { EmailDashboardQueryObjectFactory } from
-  'domain/email-dashboard/EmailDashboardQueryObjectFactory';
+  'domain/email-dashboard/email-dashboard-query-object.factory';
 import { EmailDashboardQueryResultsObjectFactory } from
-  'domain/email-dashboard/EmailDashboardQueryResultsObjectFactory';
+  'domain/email-dashboard/email-dashboard-query-results-object.factory';
+import { EndExplorationValidationService } from
+  'interactions/EndExploration/directives/end-exploration-validation.service';
 import { EntityContextObjectFactory } from
   'domain/utilities/EntityContextObjectFactory';
 import { ExplorationDiffService } from
@@ -165,15 +165,15 @@ import { ExplorationObjectFactory } from
   'domain/exploration/ExplorationObjectFactory';
 import { ExplorationOpportunitySummaryObjectFactory } from
   'domain/opportunity/ExplorationOpportunitySummaryObjectFactory';
-import { ExpressionParserService } from 'expressions/expression-parser.service';
 import { ExplorationPermissionsBackendApiService } from
   'domain/exploration/exploration-permissions-backend-api.service';
 import { ExplorationPermissionsObjectFactory } from
-  'domain/exploration/ExplorationPermissionsObjectFactory';
+  'domain/exploration/exploration-permissions-object.factory';
 import { ExplorationSummaryObjectFactory } from
-  'domain/summary/ExplorationSummaryObjectFactory';
+  'domain/summary/exploration-summary-object.factory';
 import { ExplorationRecommendationsBackendApiService } from
   'domain/recommendations/exploration-recommendations-backend-api.service';
+import { ExpressionParserService } from 'expressions/expression-parser.service';
 import { ExpressionSyntaxTreeService } from
   'expressions/expression-syntax-tree.service';
 import { ExtensionTagAssemblerService } from
@@ -224,9 +224,9 @@ import { InteractionRulesRegistryService } from
   'services/interaction-rules-registry.service';
 import { InteractionSpecsService } from 'services/interaction-specs.service';
 import { JobDataObjectFactory } from
-  'domain/admin/JobDataObjectFactory';
+  'domain/admin/job-data-object.factory';
 import { JobSpecObjectFactory } from
-  'domain/admin/JobSpecObjectFactory';
+  'domain/admin/job-spec-object.factory';
 import { InteractiveMapValidationService } from
   'interactions/InteractiveMap/directives/interactive-map-validation.service';
 import { ItemSelectionInputValidationService } from
@@ -508,7 +508,7 @@ import { VersionTreeService } from
 import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory';
 import { VisualizationInfoObjectFactory } from
-  'domain/exploration/VisualizationInfoObjectFactory';
+  'domain/exploration/visualization-info-object.factory';
 import { WindowDimensionsService } from
   'services/contextual/window-dimensions.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
@@ -559,8 +559,6 @@ export class UpgradedServices {
     upgradedServices['ChangeObjectFactory'] = new ChangeObjectFactory();
     upgradedServices['ClassifierObjectFactory'] = new ClassifierObjectFactory();
     upgradedServices['CodeNormalizerService'] = new CodeNormalizerService();
-    upgradedServices['ComputationDataObjectFactory'] =
-      new ComputationDataObjectFactory();
     upgradedServices['CollectionNodeObjectFactory'] =
       new CollectionNodeObjectFactory();
     upgradedServices['CollectionPlaythroughObjectFactory'] =
@@ -569,6 +567,8 @@ export class UpgradedServices {
       new CollectionRightsObjectFactory();
     upgradedServices['CollectionValidationService'] =
       new CollectionValidationService();
+    upgradedServices['ComputationDataObjectFactory'] =
+      new ComputationDataObjectFactory();
     upgradedServices['ComputeGraphService'] = new ComputeGraphService();
     upgradedServices['ConstructTranslationIdsService'] =
       new ConstructTranslationIdsService();
@@ -968,6 +968,8 @@ export class UpgradedServices {
     upgradedServices['AdminBackendApiService'] = new AdminBackendApiService(
       upgradedServices['HttpClient'],
       upgradedServices['AdminDataObjectFactory']);
+    upgradedServices['AdminDataService'] = new AdminDataService(
+      upgradedServices['HttpClient']);
     upgradedServices['EmailDashboardBackendApiService'] =
       new EmailDashboardBackendApiService(
         upgradedServices['HttpClient'],
@@ -979,21 +981,10 @@ export class UpgradedServices {
         upgradedServices['HttpClient'],
         upgradedServices['UrlInterpolationService'],
         upgradedServices['ExplorationPermissionsObjectFactory']);
-    upgradedServices['StateInteractionStatsBackendApiService'] =
-      new StateInteractionStatsBackendApiService(
-        upgradedServices['HttpClient'],
-        upgradedServices['VisualizationInfoObjectFactory'],
-        upgradedServices['UrlInterpolationService']);
     upgradedServices['ExplorationRecommendationsBackendApiService'] =
       new ExplorationRecommendationsBackendApiService(
         upgradedServices['HttpClient'],
         upgradedServices['ExplorationSummaryObjectFactory']);
-    upgradedServices['PlaythroughBackendApiService'] =
-      new PlaythroughBackendApiService(
-        upgradedServices['HttpClient'],
-        upgradedServices['UrlInterpolationService']);
-    upgradedServices['AdminDataService'] = new AdminDataService(
-      upgradedServices['HttpClient']);
     upgradedServices['InteractionRulesRegistryService'] =
       new InteractionRulesRegistryService(
         upgradedServices['CodeReplRulesService'],
@@ -1064,6 +1055,10 @@ export class UpgradedServices {
     upgradedServices['PlayerPositionService'] = new PlayerPositionService(
       upgradedServices['ContextService'],
       upgradedServices['PlayerTranscriptService']);
+    upgradedServices['PlaythroughBackendApiService'] =
+      new PlaythroughBackendApiService(
+        upgradedServices['HttpClient'],
+        upgradedServices['UrlInterpolationService']);
     upgradedServices['PlaythroughIssuesBackendApiService'] =
       new PlaythroughIssuesBackendApiService(
         upgradedServices['HttpClient'],
@@ -1112,6 +1107,11 @@ export class UpgradedServices {
     upgradedServices['StateCardObjectFactory'] =
       new StateCardObjectFactory(
         upgradedServices['AudioTranslationLanguageService']);
+    upgradedServices['StateInteractionStatsBackendApiService'] =
+      new StateInteractionStatsBackendApiService(
+        upgradedServices['HttpClient'],
+        upgradedServices['VisualizationInfoObjectFactory'],
+        upgradedServices['UrlInterpolationService']);
     upgradedServices['StateParamChangesService'] =
       new StateParamChangesService(
         upgradedServices['AlertsService'],
@@ -1148,12 +1148,7 @@ export class UpgradedServices {
         upgradedServices['UrlInterpolationService']);
 
     // Topological level: 4.
-    upgradedServices['EmailDashboardDataService'] =
-      new EmailDashboardDataService(
-        upgradedServices['HttpClient']);
-    upgradedServices['EmailDashboardDataService'] =
-      new EmailDashboardDataService(
-        upgradedServices['EmailDashboardBackendApiService']);
+
     upgradedServices['CollectionCreationService'] =
       new CollectionCreationService(
         upgradedServices['CollectionCreationBackendService'],
@@ -1167,6 +1162,12 @@ export class UpgradedServices {
         upgradedServices['HttpClient'],
         upgradedServices['ReadOnlyCollectionBackendApiService'],
         upgradedServices['UrlInterpolationService']);
+    upgradedServices['EmailDashboardDataService'] =
+        new EmailDashboardDataService(
+          upgradedServices['HttpClient']);
+    upgradedServices['EmailDashboardDataService'] =
+        new EmailDashboardDataService(
+          upgradedServices['EmailDashboardBackendApiService']);
     upgradedServices['PredictionAlgorithmRegistryService'] =
       new PredictionAlgorithmRegistryService(
         upgradedServices['CodeReplPredictionService'],

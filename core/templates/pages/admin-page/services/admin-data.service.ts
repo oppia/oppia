@@ -22,7 +22,7 @@ import { Injectable } from '@angular/core';
 import { AdminBackendApiService } from
   'domain/admin/admin-backend-api.service';
 import { AdminData } from
-  'domain/admin/AdminDataObjectFactory';
+  'domain/admin/admin-data-object.factory';
 
 @Injectable({
   providedIn: 'root'

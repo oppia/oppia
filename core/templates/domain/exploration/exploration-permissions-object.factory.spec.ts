@@ -17,7 +17,7 @@
  */
 
 import { ExplorationPermissionsObjectFactory } from
-  'domain/exploration/ExplorationPermissionsObjectFactory';
+  'domain/exploration/exploration-permissions-object.factory';
 
 describe('Exploration permissions object factory', () => {
   let epof: ExplorationPermissionsObjectFactory;

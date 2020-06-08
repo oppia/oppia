@@ -26,7 +26,7 @@ import { ContextService } from
 import { UserExplorationPermissionsService } from
   'pages/exploration-editor-page/services/user-exploration-permissions.service';
 import { ExplorationPermissions, ExplorationPermissionsObjectFactory } from
-  'domain/exploration/ExplorationPermissionsObjectFactory';
+  'domain/exploration/exploration-permissions-object.factory';
 
 describe('User Exploration Permissions Service', () => {
   let ueps: UserExplorationPermissionsService = null;

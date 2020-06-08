@@ -23,7 +23,7 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { ExplorationRecommendationsBackendApiService } from
   'domain/recommendations/exploration-recommendations-backend-api.service';
 import { ExplorationSummaryObjectFactory } from
-  'domain/summary/ExplorationSummaryObjectFactory';
+  'domain/summary/exploration-summary-object.factory';
 
 describe('Exploration recommendations backend api service', () => {
   let httpTestingController: HttpTestingController;

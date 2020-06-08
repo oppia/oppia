@@ -23,9 +23,9 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { EmailDashboardBackendApiService } from
   'domain/email-dashboard/email-dashboard-backend-api.service';
 import { EmailDashboardQueryObjectFactory } from
-  'domain/email-dashboard/EmailDashboardQueryObjectFactory';
+  'domain/email-dashboard/email-dashboard-query-object.factory';
 import { EmailDashboardQueryResultsObjectFactory } from
-  'domain/email-dashboard/EmailDashboardQueryResultsObjectFactory';
+  'domain/email-dashboard/email-dashboard-query-results-object.factory';
 
 describe('Email dashboard backend api service', () => {
   let httpTestingController: HttpTestingController;

@@ -17,7 +17,7 @@
  */
 
 import { ExplorationSummaryObjectFactory } from
-  'domain/summary/ExplorationSummaryObjectFactory';
+  'domain/summary/exploration-summary-object.factory';
 
 describe('Exploration summary object factory', () => {
   let esof: ExplorationSummaryObjectFactory;
