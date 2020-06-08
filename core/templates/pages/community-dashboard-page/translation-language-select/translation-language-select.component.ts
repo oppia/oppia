@@ -27,7 +27,8 @@ import { ReadOnlyFeaturedTranslationLanguage } from
 
 @Component({
   selector: 'translation-language-select',
-  template: require('./translation-language-select.component.html')
+  template: require('./translation-language-select.component.html'),
+  // templateUrl: './translation-language-select.component.html'
 })
 export class TranslationLanguageSelectComponent implements OnInit {
   @Input() options: {id: string, description: string}[];
