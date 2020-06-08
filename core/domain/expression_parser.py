@@ -1,4 +1,4 @@
-# Copyright 2014 The Oppia Authors. All Rights Reserved.
+# Copyright 2020 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -44,8 +44,10 @@ MATH_FUNCTIONS = [
     'arcsin', 'arccos', 'arctan', 'sinh', 'cosh', 'tanh']
 VALID_OPERATORS = ['[', '{', '(', ')', '}', ']', '+', '-', '/', '*', '^']
 
-_IDENTIFIER, _FUNCTION, _NUMBER, _OPERATOR = (
-    'identifier', 'function', 'number', 'operator')
+_TOKEN_CATEGORY_IDENTIFIER = 'identifier'
+_TOKEN_CATEGORY_FUNCTION = 'function'
+_TOKEN_CATEGORY_NUMBER = 'number'
+_TOKEN_CATEGORY_OPERATOR = 'operator'
 
 
 def contains_balanced_brackets(expression):
@@ -87,11 +89,11 @@ def is_algebraic(expression):
         Exception: Invalid syntax.
     """
     token_list = Parser(expression).token_list
-    tokens_text = [token.text for token in token_list]
+    token_texts = [token.text for token in token_list]
 
     return any(
         (token_text.isalpha() and len(token_text) == 1) or (
-            token_text in GREEK_LETTERS) for token_text in tokens_text)
+            token_text in GREEK_LETTERS) for token_text in token_texts)
 
 
 class Token(python_utils.OBJECT):
@@ -110,13 +112,13 @@ class Token(python_utils.OBJECT):
 
         # Categorize the token.
         if self.is_identifier(text):
-            self.category = _IDENTIFIER
+            self.category = _TOKEN_CATEGORY_IDENTIFIER
         elif self.is_function(text):
-            self.category = _FUNCTION
+            self.category = _TOKEN_CATEGORY_FUNCTION
         elif self.is_number(text):
-            self.category = _NUMBER
+            self.category = _TOKEN_CATEGORY_NUMBER
         elif self.is_operator(text):
-            self.category = _OPERATOR
+            self.category = _TOKEN_CATEGORY_OPERATOR
         else:
             raise Exception('Invalid token: %s.' % text)
 
@@ -172,8 +174,9 @@ class Node(python_utils.OBJECT):
     """Instances of the classes that inherit this class act as nodes of the
     parse tree. These could be internal as well as leaf nodes. For leaf nodes,
     the children parameter would be an empty list.
+
     NOTE: This class is not supposed to be used independently, but should be
-    inherited. The child class should have a variable that denotes the token
+    inherited. The child class should have an attribute that denotes the token
     that the node represents, i.e., operator, identifier, or function.
     """
 
@@ -335,8 +338,8 @@ class Parser(python_utils.OBJECT):
         re_string = r'([a-zA-Z]+|[0-9]+\.[0-9]+|[0-9]+|[%s])' % '\\'.join(
             VALID_OPERATORS)
 
-        tokens_text = re.findall(re_string, text)
-        self.token_list = [Token(token_text) for token_text in tokens_text]
+        token_texts = re.findall(re_string, text)
+        self.token_list = [Token(token_text) for token_text in token_texts]
 
         # Replacing all parens with '(' or ')' for simplicity.
         for i in python_utils.RANGE(len(self.token_list)):
@@ -431,16 +434,16 @@ class Parser(python_utils.OBJECT):
             Exception: Invalid token.
         """
         token = self.get_next_token()
-        if token.category == _IDENTIFIER:
+        if token.category == _TOKEN_CATEGORY_IDENTIFIER:
             return IdentifierNode(token)
 
-        if token.category == _FUNCTION:
+        if token.category == _TOKEN_CATEGORY_FUNCTION:
             if self.get_next_token_if_token_in(['(']):
                 parsed_child = self._parse_expr()
                 self.expect_token(')')
                 return UnaryFunctionNode(token, parsed_child)
 
-        if token.category == _NUMBER:
+        if token.category == _TOKEN_CATEGORY_NUMBER:
             return NumberNode(token)
 
         if token.text == '(':
@@ -481,7 +484,7 @@ class Parser(python_utils.OBJECT):
     def get_next_token_if_token_in(self, allowed_token_texts):
         """Function to verify that there is at least one more token remaining
         and that the next token is among the allowed_token_texts provided.
-        If true, returns the token otherwise, returns None.
+        If true, returns the token; otherwise, returns None.
 
         Args:
             allowed_token_texts: list(str). List of strings containing the
