@@ -74,7 +74,7 @@ describe('Profile menu flow', function() {
         await creatorDashboardLink.click();
         await waitFor.pageToFullyLoad();
         expect(await browser.getCurrentUrl()).toEqual(
-          'http://localhost:9001/creator_dashboard');
+          'http://localhost:9001/creator-dashboard');
       });
 
     it('should visit the learner dashboard from the profile dropdown menu',

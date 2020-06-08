@@ -105,6 +105,15 @@ class NotificationsDashboardHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
+class OldCreatorDashboardUrlHandler(base.BaseHandler):
+    """Redirects the old creator dashboard URL to the new one."""
+
+    @acl_decorators.open_access
+    def get(self):
+        """Handles GET requests."""
+        self.redirect(feconf.CREATOR_DASHBOARD_URL)
+
+
 class CreatorDashboardPage(base.BaseHandler):
     """Page showing the user's creator dashboard."""
 

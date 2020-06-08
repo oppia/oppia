@@ -46,6 +46,21 @@ import python_utils
 taskqueue_services = models.Registry.import_taskqueue_services()
 
 
+class OldCreatorDashboardUrlHandlerTest(test_utils.GenericTestBase):
+    """Test for redirecting the old creator dashboard page URL
+    to the new one.
+    """
+
+    def test_old_creator_dashboard_page_url(self):
+        """Test to validate that the old creator dashboard page url redirects
+        to the new one.
+        """
+        response = self.get_html_response(
+            '/creator_dashboard', expected_status_int=302)
+        self.assertEqual(
+            'http://localhost/creator-dashboard', response.headers['location'])
+
+
 class MockUserStatsAggregator(
         user_jobs_continuous.UserStatsAggregator):
     """A modified UserStatsAggregator that does not start a new
@@ -860,7 +875,7 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
         self.login(self.OWNER_EMAIL)
 
         response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
-        self.assertIn('Creator Dashboard - Oppia', response.body)
+        self.assertIn('Creator Dashboard | Oppia', response.body)
 
         self.logout()
 

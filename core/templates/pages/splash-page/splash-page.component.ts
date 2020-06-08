@@ -58,7 +58,7 @@ angular.module('oppia').component('splashPage', {
       ctrl.onClickCreateExplorationButton = function() {
         SiteAnalyticsService.registerClickCreateExplorationButtonEvent();
         $timeout(function() {
-          WindowRef.nativeWindow.location = '/creator_dashboard?mode=create';
+          WindowRef.nativeWindow.location = '/creator-dashboard?mode=create';
         }, 150);
         return false;
       };

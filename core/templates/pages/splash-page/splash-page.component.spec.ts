@@ -102,7 +102,7 @@ describe('Splash Page', function() {
     $timeout.flush(150);
 
     expect(windowRefMock.nativeWindow.location).toBe(
-      '/creator_dashboard?mode=create');
+      '/creator-dashboard?mode=create');
     expect(clickCreateExplorationButtonEventSpy).toHaveBeenCalled();
   });
 
