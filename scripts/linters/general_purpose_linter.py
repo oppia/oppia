@@ -744,6 +744,40 @@ class GeneralPurposeLinter(python_utils.OBJECT):
                 python_utils.PRINT(summary_message)
         return summary_messages
 
+    def _check_newline_at_eof(self):
+        """This function is used to detect newline at the end of file."""
+        if self.verbose_mode_enabled:
+            python_utils.PRINT(
+                'Starting newline at eof check\n'
+                '----------------------------------------')
+        summary_messages = []
+        files_to_lint = self.all_filepaths
+        failed = False
+
+        with linter_utils.redirect_stdout(sys.stdout):
+            for filepath in files_to_lint:
+                file_content = FILE_CACHE.readlines(filepath)
+                if not re.search(r'[^\n]\n', file_content[-1]):
+                    summary_message = (
+                        '%s --> There should be a single newline at the '
+                        'end of file.' % filepath)
+                    summary_messages.append(summary_message)
+                    python_utils.PRINT(summary_message)
+                    failed = True
+
+            if failed:
+                summary_message = (
+                    '%s   Newline at the eof check failed.' % (
+                        _MESSAGE_TYPE_FAILED))
+            else:
+                summary_message = (
+                    '%s   Newline at the eof check passed.' % (
+                        _MESSAGE_TYPE_SUCCESS))
+            summary_messages.append(summary_message)
+            python_utils.PRINT(summary_message)
+
+        return summary_messages
+
     def perform_all_lint_checks(self):
         """Perform all the lint checks and returns the messages returned by all
         the checks.
@@ -753,8 +787,11 @@ class GeneralPurposeLinter(python_utils.OBJECT):
         """
         mandatory_patterns_messages = self._check_mandatory_patterns()
         pattern_messages = self._check_bad_patterns()
+        newline_at_eof_messages = self._check_newline_at_eof()
 
-        all_messages = mandatory_patterns_messages + pattern_messages
+        all_messages = (
+            mandatory_patterns_messages + pattern_messages +
+            newline_at_eof_messages)
         return all_messages
 
 
