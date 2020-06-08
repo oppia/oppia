@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for literally canvas diagram editor.
+ * @fileoverview Directive for svg diagram filename editor.
  */
 
 require('domain/utilities/url-interpolation.service.ts');
@@ -29,8 +29,8 @@ const LC = require('literallycanvas');
 require('literallycanvas/lib/css/literallycanvas.css');
 require('services/literally-canvas-helper.service.ts');
 
-angular.module('oppia').component('literallyCanvasDiagramEditor', {
-  template: require('./literally-canvas-diagram-editor.component.html'),
+angular.module('oppia').component('svgFilenameEditor', {
+  template: require('./svg-filename-editor.component.html'),
   bindings: {
     value: '='
   },
@@ -54,6 +54,8 @@ angular.module('oppia').component('literallyCanvasDiagramEditor', {
       var MAX_DIAGRAM_HEIGHT = 551;
       var DEFAULT_STROKE_WIDTH = 2;
       var ALLOWED_STROKE_WIDTHS = [1, 2, 3, 5, 30];
+      var STATUS_EDITING = 'editing';
+      var STATUS_SAVED = 'saved';
       // Dynamically assign a unique id to each lc editor to avoid clashes
       // when there are multiple RTEs in the same page.
       ctrl.lcID = 'lc' + Math.floor(Math.random() * 100000).toString();
@@ -62,7 +64,7 @@ angular.module('oppia').component('literallyCanvasDiagramEditor', {
       ctrl.diagramHeight = 350;
       ctrl.currentDiagramHeight = 350;
       ctrl.data = {};
-      ctrl.diagramStatus = 'editing';
+      ctrl.diagramStatus = STATUS_EDITING;
       ctrl.savedSVGDiagram = '';
       ctrl.invalidTagsAndAttributes = {
         tags: [],
@@ -99,8 +101,8 @@ angular.module('oppia').component('literallyCanvasDiagramEditor', {
 
       ctrl.isDiagramCreated = function() {
         // This function checks if any shape has been created or not.
-        if (typeof ctrl.lc !== 'undefined' &&
-          ctrl.diagramStatus === 'editing') {
+        if (ctrl.lc !== undefined &&
+          ctrl.diagramStatus === STATUS_EDITING) {
           var svgString = ctrl.lc.getSVGString();
           var domParser = new DOMParser();
           var doc = domParser.parseFromString(svgString, 'text/xml');
@@ -113,11 +115,7 @@ angular.module('oppia').component('literallyCanvasDiagramEditor', {
       };
 
       ctrl.isUserDrawing = function() {
-        if (typeof ctrl.lc !== 'undefined' &&
-           ctrl.lc._shapesInProgress.length > 0) {
-          return true;
-        }
-        return false;
+        return Boolean(ctrl.lc && ctrl.lc._shapesInProgress.length);
       };
 
       var getTrustedResourceUrlForSVGFileName = function(svgFileName) {
@@ -135,7 +133,7 @@ angular.module('oppia').component('literallyCanvasDiagramEditor', {
       };
 
       ctrl.setSavedSVGFilename = function(filename, setData) {
-        ctrl.diagramStatus = 'saved';
+        ctrl.diagramStatus = STATUS_SAVED;
         ctrl.data = {
           savedSVGFileName: filename,
           savedSVGUrl: getTrustedResourceUrlForSVGFileName(filename)
@@ -157,8 +155,8 @@ angular.module('oppia').component('literallyCanvasDiagramEditor', {
               dimensions.height, dimensions.width, 'svg')
           })
           );
-          var imageUploadUrlTemplate = '/createhandler/imageupload/' +
-            '<entity_type>/<entity_id>';
+          var imageUploadUrlTemplate = (
+            '/createhandler/imageupload/<entity_type>/<entity_id>');
           CsrfTokenService.getTokenAsync().then(function(token) {
             form.append('csrf_token', token);
             $.ajax({
@@ -267,7 +265,7 @@ angular.module('oppia').component('literallyCanvasDiagramEditor', {
       };
 
       ctrl.isDiagramSaved = function() {
-        return ctrl.diagramStatus === 'saved';
+        return ctrl.diagramStatus === STATUS_SAVED;
       };
 
       ctrl.continueDiagramEditing = function() {
@@ -278,8 +276,8 @@ angular.module('oppia').component('literallyCanvasDiagramEditor', {
           ImageLocalStorageService.deleteImage(
             ctrl.data.savedSVGFileName);
         }
-        ctrl.diagramStatus = 'editing';
-        if (typeof ctrl.lc !== 'undefined') {
+        ctrl.diagramStatus = STATUS_EDITING;
+        if (ctrl.lc !== undefined) {
           ctrl.lc.teardown();
         }
         ctrl.data = {};
@@ -297,7 +295,7 @@ angular.module('oppia').component('literallyCanvasDiagramEditor', {
             defaultStrokeWidth: DEFAULT_STROKE_WIDTH,
             strokeWidths: ALLOWED_STROKE_WIDTHS,
             // Eraser tool is removed because svgRenderer has not been
-            // implemented in LiterallyCanvas and it can be included once
+            // implemented in LiterallyCanvas. It can be included once
             // svgRenderer function is implemented.
             tools: [
               LC.tools.Pencil,
@@ -354,7 +352,7 @@ angular.module('oppia').component('literallyCanvasDiagramEditor', {
               defaultStrokeWidth: DEFAULT_STROKE_WIDTH,
               strokeWidths: ALLOWED_STROKE_WIDTHS,
               // Eraser tool is removed because svgRenderer has not been
-              // implemented in LiterallyCanvas and it can be included once
+              // implemented in LiterallyCanvas. It can be included once
               // svgRenderer function is implemented.
               tools: [
                 LC.tools.Pencil,

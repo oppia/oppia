@@ -13,20 +13,20 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the oppia noninteractive svg editor component.
+ * @fileoverview Unit tests for the oppia noninteractive svg diagram component.
  */
 
 import { AppConstants } from 'app.constants';
 
-describe('oppiaNoninteractiveSvgeditor', function() {
-  var ecs = null;
+describe('oppiaNoninteractiveSvgdiagram', function() {
+  var contextService = null;
   var ctrl = null;
-  var mockabas = {
+  var mockAssetsBackendApiService = {
     getImageUrlForPreview: function(contentType, contentId, filename) {
       return 'imageUrl:' + contentType + '_' + contentId + '_' + filename;
     }
   };
-  var mockips = {
+  var mockImagePreloaderService = {
     getDimensionsOfImage: function() {
       return {
         width: 450,
@@ -37,8 +37,8 @@ describe('oppiaNoninteractiveSvgeditor', function() {
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('AssetsBackendApiService', mockabas);
-    $provide.value('ImagePreloaderService', mockips);
+    $provide.value('AssetsBackendApiService', mockAssetsBackendApiService);
+    $provide.value('ImagePreloaderService', mockImagePreloaderService);
     $provide.value('ImageLocalStorageService', {});
     $provide.value('$attrs', {
       svgFilenameWithValue: '&quot;svgFilename.svg&quot;',
@@ -46,12 +46,12 @@ describe('oppiaNoninteractiveSvgeditor', function() {
     });
   }));
   beforeEach(angular.mock.inject(function($injector, $componentController) {
-    ecs = $injector.get('ContextService');
-    spyOn(ecs, 'getEntityType').and.returnValue('exploration');
-    spyOn(ecs, 'getEntityId').and.returnValue('1');
-    spyOn(ecs, 'getImageSaveDestination').and.returnValue(
+    contextService = $injector.get('ContextService');
+    spyOn(contextService, 'getEntityType').and.returnValue('exploration');
+    spyOn(contextService, 'getEntityId').and.returnValue('1');
+    spyOn(contextService, 'getImageSaveDestination').and.returnValue(
       AppConstants.IMAGE_SAVE_DESTINATION_SERVER);
-    ctrl = $componentController('oppiaNoninteractiveSvgeditor');
+    ctrl = $componentController('oppiaNoninteractiveSvgdiagram');
     ctrl.$onInit();
   }));
 
@@ -62,16 +62,16 @@ describe('oppiaNoninteractiveSvgeditor', function() {
   });
 });
 
-describe('oppiaNoninteractiveSvgeditor with image save destination as' +
+describe('oppiaNoninteractiveSvgdiagram with image save destination as' +
   ' local storage', function() {
-  var ecs = null;
+  var contextService = null;
   var ctrl = null;
-  var mockilss = {
+  var mockImageLocalStorageService = {
     getObjectUrlForImage: function() {
       return 'imageUrl:exploration_1_svgFilename.svg';
     }
   };
-  var mockips = {
+  var mockImagePreloaderService = {
     getDimensionsOfImage: function() {
       return {
         width: 450,
@@ -83,18 +83,18 @@ describe('oppiaNoninteractiveSvgeditor with image save destination as' +
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('AssetsBackendApiService', {});
-    $provide.value('ImageLocalStorageService', mockilss);
-    $provide.value('ImagePreloaderService', mockips);
+    $provide.value('ImageLocalStorageService', mockImageLocalStorageService);
+    $provide.value('ImagePreloaderService', mockImagePreloaderService);
     $provide.value('$attrs', {
       svgFilenameWithValue: '&quot;svgFilename.svg&quot;',
       altWithValue: '&quot;altText&quot;'
     });
   }));
   beforeEach(angular.mock.inject(function($injector, $componentController) {
-    ecs = $injector.get('ContextService');
-    spyOn(ecs, 'getImageSaveDestination').and.returnValue(
+    contextService = $injector.get('ContextService');
+    spyOn(contextService, 'getImageSaveDestination').and.returnValue(
       AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE);
-    ctrl = $componentController('oppiaNoninteractiveSvgeditor');
+    ctrl = $componentController('oppiaNoninteractiveSvgdiagram');
     ctrl.$onInit();
   }));
 

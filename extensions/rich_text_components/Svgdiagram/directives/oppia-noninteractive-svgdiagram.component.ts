@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for the Svgeditor rich-text component.
+ * @fileoverview Component for the Svgdiagram rich-text component.
  *
  * IMPORTANT NOTE: The naming convention for customization args that are passed
  * into the component is: the name of the parameter, followed by 'With',
@@ -26,8 +26,8 @@ require('services/context.service.ts');
 require('services/html-escaper.service.ts');
 require('services/image-local-storage.service.ts');
 
-angular.module('oppia').component('oppiaNoninteractiveSvgeditor', {
-  template: require('./svgeditor.component.html'),
+angular.module('oppia').component('oppiaNoninteractiveSvgdiagram', {
+  template: require('./svgdiagram.component.html'),
   controller: [
     '$attrs', 'AssetsBackendApiService', 'ContextService',
     'HtmlEscaperService', 'ImageLocalStorageService',

@@ -32,8 +32,8 @@ require(
   'rich_text_components/Skillreview/directives/' +
   'oppia-noninteractive-skillreview.directive.ts');
 require(
-  'rich_text_components/Svgeditor/directives/' +
-  'oppia-noninteractive-svgeditor.component.ts');
+  'rich_text_components/Svgdiagram/directives/' +
+  'oppia-noninteractive-svgdiagram.component.ts');
 require(
   'rich_text_components/Tabs/directives/' +
   'oppia-noninteractive-tabs.directive.ts');
