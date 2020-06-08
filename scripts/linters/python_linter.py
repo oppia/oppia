@@ -126,30 +126,33 @@ class PythonLintChecksManager(python_utils.OBJECT):
             python_utils.PRINT('----------------------------------------')
         summary_messages = []
         files_to_check = self.py_filepaths
-        failed = False
-        for filepath in files_to_check:
-            if filepath.find('_test.py') == -1:
-                with python_utils.open_file(filepath, 'r') as fp:
-                    for cnt, line in enumerate(fp):
+        with linter_utils.redirect_stdout(sys.stdout):
+            failed = False
+            for filepath in files_to_check:
+                if not filepath.endswith('_test.py'):
+                    file_content = FILE_CACHE.read(filepath)
+                    for line_number, line in enumerate(
+                            file_content.split('\n')):
                         ind1 = line.find(' def ')
                         ind2 = line.find('test_only')
                         if ind1 != -1 and ind2 != -1:
                             python_utils.PRINT(
-                                'ERROR: Non test file uses test functions at'
-                                'line: ', cnt, 'in file: ', filepath)
+                                'ERROR:   Non test file uses test functions at'
+                                ' line:', line_number + 1, 'in file:', filepath)
                             failed = True
-        if failed:
-            summary_message = (
-                '%s   Test functions are used in non test files,'
-                'see affect files above.' % (_MESSAGE_TYPE_FAILED))
-            python_utils.PRINT(summary_message)
-            summary_messages.append(summary_message)
-        else:
-            summary_message = (
-                '%s   Function definition checks passed'
-                % _MESSAGE_TYPE_SUCCESS)
-            python_utils.PRINT(summary_message)
-            summary_messages.append(summary_message)
+
+            if failed:
+                summary_message = (
+                    '%s   Function defintion checks failed,'
+                    'see affect files above.' % (_MESSAGE_TYPE_FAILED))
+                python_utils.PRINT(summary_message)
+                summary_messages.append(summary_message)
+            else:
+                summary_message = (
+                    '%s   Function definition checks passed'
+                    % _MESSAGE_TYPE_SUCCESS)
+                python_utils.PRINT(summary_message)
+                summary_messages.append(summary_message)
         return summary_messages
 
     def _check_that_all_jobs_are_listed_in_the_job_registry_file(self):
