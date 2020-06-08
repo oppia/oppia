@@ -182,11 +182,18 @@ export interface ITextInputCustomizationArgs {
 }
 
 export type ICustomizationArgs = (
-  ICodeReplCustomizationArgs | IContinueCustomizationArgs |
-  IDragAndDropSortInputCustomizationArgs | IEndExplorationCustomizationArgs |
-  IFractionInputCustomizationArgs | IGraphInputCustomizationArgs |
-  IImageClickInputCustomizationArgs | IInteractiveMapCustomizationArgs |
-  IItemSelectionInputCustomizationArgs | ILogicCustomizationArgs |
-  IMultipleChoiceInputCustomizationArgs | IMusicNotesInputCustomizationArgs |
-  IPencilCodeCustomizationArgs | ISetInputCustomizationArgs |
+  ICodeReplCustomizationArgs |
+  IContinueCustomizationArgs |
+  IDragAndDropSortInputCustomizationArgs |
+  IEndExplorationCustomizationArgs |
+  IFractionInputCustomizationArgs |
+  IGraphInputCustomizationArgs |
+  IImageClickInputCustomizationArgs |
+  IInteractiveMapCustomizationArgs |
+  IItemSelectionInputCustomizationArgs |
+  ILogicCustomizationArgs |
+  IMultipleChoiceInputCustomizationArgs |
+  IMusicNotesInputCustomizationArgs |
+  IPencilCodeCustomizationArgs |
+  ISetInputCustomizationArgs |
   ITextInputCustomizationArgs);
