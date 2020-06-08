@@ -90,12 +90,41 @@ def is_algebraic(expression):
     Raises:
         Exception: Invalid syntax.
     """
-    token_list = Parser(expression).token_list
+    Parser(expression)
+    token_list = tokenize(expression)
     token_texts = [token.text for token in token_list]
 
     return any(
         (token_text.isalpha() and len(token_text) == 1) or (
             token_text in GREEK_LETTERS) for token_text in token_texts)
+
+
+def tokenize(expression):
+    """Splits the given expression into separate tokens based on the grammar
+    definitions.
+
+    Args:
+        expression: str. A math expression.
+
+    Returns:
+        list(Token). A list containing token objects formed from the given math
+            expression.
+    """
+    re_string = r'([a-zA-Z]+|[0-9]+\.[0-9]+|[0-9]+|[%s])' % '\\'.join(
+        VALID_OPERATORS)
+
+    token_texts = re.findall(re_string, expression)
+    token_list = [Token(token_text) for token_text in token_texts]
+
+    # Replacing all parens with '(' or ')' for simplicity.
+    for i in python_utils.RANGE(len(token_list)):
+        token = token_list[i]
+        if token.text in ['[', '{']:
+            token_list[i] = Token('(')
+        if token.text in ['}', ']']:
+            token_list[i] = Token(')')
+
+    return token_list
 
 
 class Token(python_utils.OBJECT):
@@ -315,45 +344,34 @@ class Parser(python_utils.OBJECT):
     https://en.wikipedia.org/wiki/Recursive_descent_parser
     """
 
-    def __init__(self, text):
+    def __init__(self, expression):
         """Initializes a Parser object. Tokenizes the given expression string
         and replaces all parens with '(' or ')' for simplicity.
 
         Args:
-            text: str. String representing the math expression.
+            expression: str. String representing the math expression.
 
         Raises:
             Exception: Invalid character or Invalid bracket pairing.
         """
         # Expression should not contain any invalid characters.
-        for character in text:
+        for character in expression:
             if not bool(re.match(r'(\s|\d|\w|\.)', character)) and (
                     character not in VALID_OPERATORS):
                 raise Exception('Invalid character: %s.' % character)
 
-        if not contains_balanced_brackets(text):
+        if not contains_balanced_brackets(expression):
             raise Exception('Invalid bracket pairing.')
 
         # Position of the next token in the token list.
         self.next_token_index = 0
-
-        re_string = r'([a-zA-Z]+|[0-9]+\.[0-9]+|[0-9]+|[%s])' % '\\'.join(
-            VALID_OPERATORS)
-
-        token_texts = re.findall(re_string, text)
-        self.token_list = [Token(token_text) for token_text in token_texts]
-
-        # Replacing all parens with '(' or ')' for simplicity.
-        for i in python_utils.RANGE(len(self.token_list)):
-            token = self.token_list[i]
-            if token.text in ['[', '{']:
-                self.token_list[i] = Token('(')
-            if token.text in ['}', ']']:
-                self.token_list[i] = Token(')')
+        # String representation of the math expression.
+        self.expression = expression
 
     def parse(self):
-        """A wrapper around the _parse_expr method. This method checks if all
-        tokens have been consumed by the _parse_expr method.
+        """A wrapper around the _parse_expr method. This method creates a list
+        of tokens present in the expression and checks if all tokens have been
+        consumed by the _parse_expr method.
 
         Returns:
             Node. Root node of the generated parse tree.
@@ -361,73 +379,95 @@ class Parser(python_utils.OBJECT):
         Raises:
             Exception: Invalid syntax.
         """
-        parsed_expr = self._parse_expr()
-        if self.next_token_index < len(self.token_list):
+        token_list = tokenize(self.expression)
+
+        parsed_expr = self._parse_expr(token_list)
+        if self.next_token_index < len(token_list):
             raise Exception('Invalid syntax.')
         return parsed_expr
 
-    def _parse_expr(self):
+    def _parse_expr(self, token_list):
         """Function representing the following production rule of the grammar:
         <expr> ::= <mul_expr> (('+' | '-') <mul_expr>)*
+
+        Args:
+            token_list: list(Token). A list containing token objects formed from
+                the given math expression.
 
         Returns:
             Node. Root node of the generated parse tree.
         """
-        parsed_expr = self.parse_mul_expr()
-        operator_token = self._get_next_token_if_token_in(['+', '-'])
+        parsed_expr = self.parse_mul_expr(token_list)
+        operator_token = self._get_next_token_if_token_in(
+            ['+', '-'], token_list)
         while operator_token:
-            parsed_right = self.parse_mul_expr()
+            parsed_right = self.parse_mul_expr(token_list)
             if operator_token.text == '+':
                 parsed_expr = AdditionOperatorNode(parsed_expr, parsed_right)
             else:
                 parsed_expr = SubtractionOperatorNode(parsed_expr, parsed_right)
-            operator_token = self._get_next_token_if_token_in(['+', '-'])
+            operator_token = self._get_next_token_if_token_in(
+                ['+', '-'], token_list)
         return parsed_expr
 
-    def parse_mul_expr(self):
+    def parse_mul_expr(self, token_list):
         """Function representing the following production rule of the grammar:
         <mul_expr> ::= <pow_expr> (('*' | '/') <pow_expr>)*
+
+        Args:
+            token_list: list(Token). A list containing token objects formed from
+                the given math expression.
 
         Returns:
             Node. Root node of the generated parse tree.
         """
-        parsed_expr = self.parse_pow_expr()
-        operator_token = self._get_next_token_if_token_in(['*', '/'])
+        parsed_expr = self.parse_pow_expr(token_list)
+        operator_token = self._get_next_token_if_token_in(
+            ['*', '/'], token_list)
         while operator_token:
-            parsed_right = self.parse_pow_expr()
+            parsed_right = self.parse_pow_expr(token_list)
             if operator_token.text == '*':
                 parsed_expr = MultiplicationOperatorNode(
                     parsed_expr, parsed_right)
             else:
                 parsed_expr = DivisionOperatorNode(parsed_expr, parsed_right)
-            operator_token = self._get_next_token_if_token_in(['*', '/'])
+            operator_token = self._get_next_token_if_token_in(
+                ['*', '/'], token_list)
         return parsed_expr
 
-    def parse_pow_expr(self):
+    def parse_pow_expr(self, token_list):
         """Function representing the following production rule of the grammar:
         <pow_expr> ::= '-' <pow_expr> | '+' <pow_expr> |
         <unit> ('^' <pow_expr>)?
+
+        Args:
+            token_list: list(Token). A list containing token objects formed from
+                the given math expression.
 
         Returns:
             Node. Root node of the generated parse tree.
         """
         # Eliminate any leading unary '+' or '-' operators, because they
         # are syntactically irrelevant.
-        while self._get_next_token_if_token_in(['+', '-']):
+        while self._get_next_token_if_token_in(['+', '-'], token_list):
             pass
 
-        parsed_expr = self.parse_unit()
-        operator_token = self._get_next_token_if_token_in(['^'])
+        parsed_expr = self.parse_unit(token_list)
+        operator_token = self._get_next_token_if_token_in(['^'], token_list)
         if operator_token:
             # Using recursion for right-associative ^ operator.
-            parsed_right = self.parse_pow_expr()
+            parsed_right = self.parse_pow_expr(token_list)
             return PowerOperatorNode(parsed_expr, parsed_right)
         return parsed_expr
 
-    def parse_unit(self):
+    def parse_unit(self, token_list):
         """Function representing the following production rule of the grammar:
         <unit> ::= <identifier> | <number> | '(' <expr> ')' |
         <function> '(' <expr> ')'
+
+        Args:
+            token_list: list(Token). A list containing token objects formed from
+                the given math expression.
 
         Returns:
             Node. Root node of the generated parse tree.
@@ -435,40 +475,48 @@ class Parser(python_utils.OBJECT):
         Raises:
             Exception: Invalid token.
         """
-        token = self._get_next_token()
+        token = self._get_next_token(token_list)
         if token.category == _TOKEN_CATEGORY_IDENTIFIER:
             return IdentifierNode(token)
 
         if token.category == _TOKEN_CATEGORY_FUNCTION:
-            if self._get_next_token_if_token_in(['(']):
-                parsed_child = self._parse_expr()
-                self._expect_token(')')
+            if self._get_next_token_if_token_in(['('], token_list):
+                parsed_child = self._parse_expr(token_list)
+                self._expect_token(')', token_list)
                 return UnaryFunctionNode(token, parsed_child)
 
         if token.category == _TOKEN_CATEGORY_NUMBER:
             return NumberNode(token)
 
         if token.text == '(':
-            parsed_expr = self._parse_expr()
-            self._expect_token(')')
+            parsed_expr = self._parse_expr(token_list)
+            self._expect_token(')', token_list)
             return parsed_expr
 
         raise Exception('Invalid token: %s.' % token.text)
 
-    def _check_next_token(self):
+    def _check_next_token(self, token_list):
         """Function to peek into the next position to see the next token. This
         is done without incrementing 'next_token_index'.
+
+        Args:
+            token_list: list(Token). A list containing token objects formed from
+                the given math expression.
 
         Returns:
             Token|None. Token at the next position. Returns none if there are no
                 more tokens left.
         """
-        if self.next_token_index < len(self.token_list):
-            return self.token_list[self.next_token_index]
+        if self.next_token_index < len(token_list):
+            return token_list[self.next_token_index]
 
-    def _get_next_token(self):
+    def _get_next_token(self, token_list):
         """Function to retrieve the token at the next position and then
         increment the next_token_index.
+
+        Args:
+            token_list: list(Token). A list containing token objects formed from
+                the given math expression.
 
         Returns:
             Token. Token at the next position.
@@ -476,14 +524,14 @@ class Parser(python_utils.OBJECT):
         Raises:
             Exception: Invalid syntax: Unexpected end of expression.
         """
-        if self.next_token_index < len(self.token_list):
-            token = self.token_list[self.next_token_index]
+        if self.next_token_index < len(token_list):
+            token = token_list[self.next_token_index]
             self.next_token_index += 1
             return token
 
         raise Exception('Invalid syntax: Unexpected end of expression.')
 
-    def _get_next_token_if_token_in(self, allowed_token_texts):
+    def _get_next_token_if_token_in(self, allowed_token_texts, token_list):
         """Function to verify that there is at least one more token remaining
         and that the next token is among the allowed_token_texts provided.
         If true, returns the token; otherwise, returns None.
@@ -491,26 +539,30 @@ class Parser(python_utils.OBJECT):
         Args:
             allowed_token_texts: list(str). List of strings containing the
                 allowed token texts at the next position.
+            token_list: list(Token). A list containing token objects formed from
+                the given math expression.
 
         Returns:
             Token|None. Token at the next position. Returns none if there are no
                 more tokens left or the next token is not in the
                 allowed_token_texts.
         """
-        if self.next_token_index < len(self.token_list):
-            text = self.token_list[self.next_token_index].text
+        if self.next_token_index < len(token_list):
+            text = token_list[self.next_token_index].text
             if text in allowed_token_texts:
-                token = self.token_list[self.next_token_index]
+                token = token_list[self.next_token_index]
                 self.next_token_index += 1
                 return token
         return None
 
-    def _expect_token(self, text):
+    def _expect_token(self, text, token_list):
         """Function to compare the next token's text with the given text. If
         comparision is true, increments next_token_index.
 
         Args:
             text: str. String representation of the token to check.
+            token_list: list(Token). A list containing token objects formed from
+                the given math expression.
 
         Returns:
             Token. Token at the next position.
@@ -518,12 +570,12 @@ class Parser(python_utils.OBJECT):
         Raises:
             Exception: Invalid token.
         """
-        token = self._check_next_token()
+        token = self._check_next_token(token_list)
         if token is None or token.text != text:
             raise Exception('Invalid token: %s.' % (
                 'None' if token is None else token.text))
 
-        token = self.token_list[self.next_token_index]
+        token = token_list[self.next_token_index]
         self.next_token_index += 1
         return token
 

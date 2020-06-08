@@ -181,8 +181,9 @@ class ParserUnitTests(test_utils.GenericTestBase):
         be parsed. That is done at the level above this one, i.e., in the
         _parse_expr function.
         """
-        root_node = expression_parser.Parser(
-            'a / b * 2 - c + d').parse_mul_expr()
+        expression = 'a / b * 2 - c + d'
+        root_node = expression_parser.Parser(expression).parse_mul_expr(
+            expression_parser.tokenize(expression))
         # Root node {*}.
         self.assertIsInstance(
             root_node, expression_parser.MultiplicationOperatorNode)
@@ -225,8 +226,9 @@ class ParserUnitTests(test_utils.GenericTestBase):
         operators won't be parsed. That is done at the levels above this one,
         i.e., in the _parse_expr and parse_mul_expr functions.
         """
-        root_node = expression_parser.Parser(
-            'a ^ b ^ 2 * c + d').parse_pow_expr()
+        expression = 'a ^ b ^ 2 * c + d'
+        root_node = expression_parser.Parser(expression).parse_pow_expr(
+            expression_parser.tokenize(expression))
         # Root node {^}.
         self.assertIsInstance(root_node, expression_parser.PowerOperatorNode)
         self.assertEqual(len(root_node.children), 2)
@@ -264,7 +266,9 @@ class ParserUnitTests(test_utils.GenericTestBase):
            /  |
          {a} {2}
         """
-        root_node = expression_parser.Parser('sqrt(a*2)').parse_unit()
+        expression = 'sqrt(a*2)'
+        root_node = expression_parser.Parser(expression).parse_unit(
+            expression_parser.tokenize(expression))
         # Root node {sqrt}.
         self.assertIsInstance(root_node, expression_parser.UnaryFunctionNode)
         self.assertEqual(len(root_node.children), 1)
