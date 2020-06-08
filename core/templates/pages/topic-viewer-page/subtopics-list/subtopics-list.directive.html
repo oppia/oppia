@@ -1,107 +1,59 @@
-<div ng-if="subtopics.length === 0">
-  <p class="intro-card-message" style="padding-top: 5vh;">
-    There are no subtopics to display.
-  </p>
-</div>
-
-<div ng-if="!topicViewerWindowIsNarrow">
-  <md-button class="md-no-ink oppia-topic-viewer-carousel-scroller"
-             ng-click="scroll(true)"
-             ng-hide="leftmostCardIndices == 0">
-    <i class="material-icons">&#xE314;</i>
-  </md-button>
-  <div class="oppia-topic-viewer-carousel-scroller" ng-if="leftmostCardIndices == 0" aria-hidden="true">
-  </div>
-
-  <div class="oppia-topic-viewer-carousel"
-       ng-swipe-right="scroll(true)"
-       ng-swipe-left="scroll(false)">
-    <div class="oppia-topic-viewer-carousel-tiles">
-      <md-card ng-repeat="subtopic in subtopics" class="oppia-subtopic-summary-tile">
-        <subtopic-summary-tile skill-count="subtopic.getSkillSummaries().length"
-                               subtopic-id="subtopic.getId()"
-                               subtopic-title="subtopic.getTitle()"
-                               topic-name="topicName">
-        </subtopic-summary-tile>
-      </md-card>
+<div class="oppia-subtopics-list-container">
+  <md-card class="oppia-page-card oppia-long-text">
+    <h2 class="tab-title">
+      <span translate="I18N_TOPIC_VIEWER_STUDY_SKILLS"></span>
+    </h2>
+    <span class="subtopic-subheading">
+      <span translate="I18N_TOPIC_VIEWER_STUDY_SKILLS_SUBTITLE"></span>
+    </span>
+    <div class="subtopics-container">
+      <subtopic-summary-tile ng-repeat="subtopic in $ctrl.getSubtopics()"
+                             subtopic="subtopic"
+                             topic-id="$ctrl.getTopicId()"
+                             topic-name="$ctrl.getTopicName()">
+      </subtopic-summary-tile>
     </div>
-  </div>
-
-  <md-button class="md-no-ink oppia-topic-viewer-carousel-scroller"
-             ng-click="scroll(false)"
-             ng-hide="(subtopics.length - tileDisplayCount) <= leftmostCardIndices"
-             aria-hidden="true">
-    <i class="material-icons">&#xE315;</i>
-  </md-button>
-  <div class="oppia-topic-viewer-carousel-scroller"
-       ng-if="(subtopics.length - tileDisplayCount) <= leftmostCardIndices">
-  </div>
-</div>
-
-<div ng-if="topicViewerWindowIsNarrow" class="oppia-topic-viewer-low-width">
-  <md-card ng-repeat="subtopic in subtopics" class="oppia-subtopic-summary-tile">
-    <subtopic-summary-tile skill-count="subtopic.getSkillSummaries().length"
-                           subtopic-id="subtopic.getId()"
-                           subtopic-title="subtopic.getTitle()"
-                           topic-name="topicName">
-    </subtopic-summary-tile>
   </md-card>
 </div>
-
 <style>
-  subtopics-list .oppia-topic-viewer-low-width {
-    margin: 0 auto;
-    width: min-content;
+  subtopics-list .subtopic-subheading {
+    font-family: "Roboto", Arial, sans-serif;
+    font-size: 1.2em;
+    margin-bottom: 2.5vh;
   }
-  subtopics-list .intro-card-message {
-    font-family: 'Capriola', 'Roboto', Arial, sans-serif;
-    font-size: 18px;
-    text-align: center;
+
+  subtopics-list .subtopics-container {
+    display: grid;
+    grid-template-columns: 170px 170px 170px;
+    grid-row-gap: 2vh;
+    justify-content: space-between;
+    margin-left: 20px;
   }
-  subtopics-list .oppia-subtopic-summary-tile {
-    background-color: #fff;
-    cursor: pointer;
-    display: inline-block;
-    height: 300px;
-    margin: 25px;
-    padding: 0;
-    position: relative;
-    text-align: left;
-    transition: all 300ms;
-    vertical-align: top;
-    -webkit-transition: all 300ms;
-    white-space: normal;
-    width: 250px;
+
+  subtopics-list subtopic-summary-tile {
+    margin-right: 2vw;
   }
-  subtopics-list div .oppia-topic-viewer-carousel-scroller {
-    color: #2c4841;
-    cursor: default;
-    float: left;
-    height: 60px;
-    margin-top: 200px;
-    max-width: 40px;
-    padding: 0;
-    position: relative;
-    width: 10vw;
+
+  @media(max-width: 1024px) {
+    subtopics-list .subtopics-container {
+      grid-template-columns: 150px 150px 150px;
+      margin-left: 2vw;
+    }
   }
-  .md-button.oppia-topic-viewer-carousel-scroller {
-    cursor: pointer;
+
+  @media(max-width: 680px) {
+    subtopics-list .subtopics-container {
+      grid-template-columns: 130px 130px 130px;
+      margin-left: 0;
+    }
   }
-  subtopics-list div .oppia-topic-viewer-carousel-scroller i {
-    font-size: 36px;
-    margin: 0;
-    padding: 0;
-    top: 50%;
-  }
-  .oppia-topic-viewer-carousel .oppia-topic-viewer-carousel-tiles {
-    white-space: nowrap;
-  }
-  subtopics-list div .oppia-topic-viewer-carousel {
-    float: left;
-    height: 430px;
-    max-width: 1420px;
-    overflow: hidden;
-    position: relative;
-    width: auto;
+
+  @media(max-width: 500px) {
+    subtopics-list .subtopics-container {
+      display: grid;
+      grid-template-columns: 140px 140px;
+      justify-content: space-between;
+      margin-left: 0;
+    }
   }
 </style>

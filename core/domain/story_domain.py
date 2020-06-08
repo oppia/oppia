@@ -1325,8 +1325,8 @@ class StorySummary(python_utils.OBJECT):
 
     def __init__(
             self, story_id, title, description, language_code, version,
-            node_count, story_model_created_on,
-            story_model_last_updated):
+            node_titles, thumbnail_bg_color, thumbnail_filename,
+            story_model_created_on, story_model_last_updated):
         """Constructs a StorySummary domain object.
 
         Args:
@@ -1335,7 +1335,10 @@ class StorySummary(python_utils.OBJECT):
             description: str. The description of the story.
             language_code: str. The language code of the story.
             version: int. The version of the story.
-            node_count: int. The number of nodes present in the story.
+            node_titles: list(str). The titles of nodes present in the story.
+            thumbnail_bg_color: str|None. The thumbnail background color of the
+                story.
+            thumbnail_filename: str|None. The thumbnail filename of the story.
             story_model_created_on: datetime.datetime. Date and time when
                 the story model is created.
             story_model_last_updated: datetime.datetime. Date and time
@@ -1346,7 +1349,9 @@ class StorySummary(python_utils.OBJECT):
         self.description = description
         self.language_code = language_code
         self.version = version
-        self.node_count = node_count
+        self.node_titles = node_titles
+        self.thumbnail_bg_color = thumbnail_bg_color
+        self.thumbnail_filename = thumbnail_filename
         self.story_model_created_on = story_model_created_on
         self.story_model_last_updated = story_model_last_updated
 
@@ -1369,15 +1374,31 @@ class StorySummary(python_utils.OBJECT):
                 'Expected description to be a string, received %s'
                 % self.description)
 
-        if not isinstance(self.node_count, int):
+        if not isinstance(self.node_titles, list):
             raise utils.ValidationError(
-                'Expected node_count to be an int, received \'%s\'' % (
-                    self.node_count))
+                'Expected node_titles to be a list, received \'%s\'' % (
+                    self.node_titles))
 
-        if self.node_count < 0:
+        for title in self.node_titles:
+            if not isinstance(title, python_utils.BASESTRING):
+                raise utils.ValidationError(
+                    'Expected each chapter title to be a string, received %s'
+                    % title)
+
+        utils.require_valid_thumbnail_filename(self.thumbnail_filename)
+        if (
+                self.thumbnail_bg_color is not None and not (
+                    Story.require_valid_thumbnail_bg_color(
+                        self.thumbnail_bg_color))):
             raise utils.ValidationError(
-                'Expected node_count to be non-negative, received \'%s\'' % (
-                    self.node_count))
+                'Story thumbnail background color %s is not supported.' % (
+                    self.thumbnail_bg_color))
+        if self.thumbnail_bg_color and self.thumbnail_filename is None:
+            raise utils.ValidationError(
+                'Story thumbnail image is not provided.')
+        if self.thumbnail_filename and self.thumbnail_bg_color is None:
+            raise utils.ValidationError(
+                'Story thumbnail background color is not specified.')
 
         if not isinstance(self.language_code, python_utils.BASESTRING):
             raise utils.ValidationError(
@@ -1400,7 +1421,9 @@ class StorySummary(python_utils.OBJECT):
             'description': self.description,
             'language_code': self.language_code,
             'version': self.version,
-            'node_count': self.node_count,
+            'node_titles': self.node_titles,
+            'thumbnail_filename': self.thumbnail_filename,
+            'thumbnail_bg_color': self.thumbnail_bg_color,
             'story_model_created_on': utils.get_time_in_millisecs(
                 self.story_model_created_on),
             'story_model_last_updated': utils.get_time_in_millisecs(
@@ -1417,5 +1440,7 @@ class StorySummary(python_utils.OBJECT):
             'id': self.id,
             'title': self.title,
             'description': self.description,
-            'node_count': self.node_count
+            'node_titles': self.node_titles,
+            'thumbnail_bg_color': self.thumbnail_bg_color,
+            'thumbnail_filename': self.thumbnail_filename
         }
