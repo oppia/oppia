@@ -311,6 +311,8 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s' % feconf.UPLOAD_EXPLORATION_URL,
         creator_dashboard.UploadExplorationHandler),
     get_redirect_route(
+        '/learner_dashboard', learner_dashboard.OldLearnerDashboardUrlHandler),
+    get_redirect_route(
         r'%s' % feconf.LEARNER_DASHBOARD_URL,
         learner_dashboard.LearnerDashboardPage),
     get_redirect_route(

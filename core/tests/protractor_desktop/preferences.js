@@ -151,7 +151,7 @@ describe('Preferences', function() {
       await preferencesPage.selectLearnerDashboard();
       await general.goToHomePage();
       expect(await browser.getCurrentUrl()).toEqual(
-        'http://localhost:9001/learner_dashboard');
+        'http://localhost:9001/learner-dashboard');
     });
 
   afterEach(async function() {

@@ -681,7 +681,7 @@ FRACTIONS_LANDING_PAGE_URL = '/fractions'
 LEARNER_ANSWER_INFO_HANDLER_URL = (
     '/learneranswerinfohandler/learner_answer_details')
 LEARNER_ANSWER_DETAILS_SUBMIT_URL = '/learneranswerdetailshandler'
-LEARNER_DASHBOARD_URL = '/learner_dashboard'
+LEARNER_DASHBOARD_URL = '/learner-dashboard'
 LEARNER_DASHBOARD_DATA_URL = '/learnerdashboardhandler/data'
 LEARNER_DASHBOARD_IDS_DATA_URL = '/learnerdashboardidshandler/data'
 LEARNER_DASHBOARD_FEEDBACK_THREAD_DATA_URL = '/learnerdashboardthreadhandler'

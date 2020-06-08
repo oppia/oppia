@@ -38,7 +38,7 @@ describe('Profile menu flow', function() {
   it('should land on the learner dashboard after successful login',
     async function() {
       expect(await browser.getCurrentUrl()).toEqual(
-        'http://localhost:9001/learner_dashboard');
+        'http://localhost:9001/learner-dashboard');
     });
 
   describe('profile dropdown menu', function() {
@@ -87,7 +87,7 @@ describe('Profile menu flow', function() {
         await learnerDashboardLink.click();
         await waitFor.pageToFullyLoad();
         expect(await browser.getCurrentUrl()).toEqual(
-          'http://localhost:9001/learner_dashboard');
+          'http://localhost:9001/learner-dashboard');
       });
 
     it('should not show the topics and skills dashboard link in the profile ' +
