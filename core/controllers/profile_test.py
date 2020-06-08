@@ -895,7 +895,7 @@ class ExportAccountHandlerTests(test_utils.GenericTestBase):
                 u'user_stats_data': {},
                 u'exploration_rights_snapshot_metadata_data': {},
                 u'user_subscriptions_data': {
-                    u'creator_ids': [],
+                    u'creator_usernames': [],
                     u'collection_ids': [],
                     u'activity_ids': [],
                     u'general_feedback_thread_ids': [],

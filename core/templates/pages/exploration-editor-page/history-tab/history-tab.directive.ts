@@ -16,13 +16,13 @@
  * @fileoverview Directive for the exploration history tab.
  */
 
-require(
-  'components/common-layout-directives/common-elements/' +
-  'confirm-or-cancel-modal.controller.ts');
 require('components/profile-link-directives/profile-link-text.directive.ts');
 require(
   'components/version-diff-visualization/' +
   'version-diff-visualization.directive.ts');
+require(
+  'pages/exploration-editor-page/history-tab/modal-templates/' +
+  'revert-exploration-modal.controller.ts');
 
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/exploration-editor-page/services/exploration-data.service.ts');
@@ -240,25 +240,7 @@ angular.module('oppia').directive('historyTab', [
                   return version;
                 }
               },
-              controller: [
-                '$controller', '$scope', '$uibModalInstance', 'version',
-                'ExplorationDataService',
-                function(
-                    $controller, $scope, $uibModalInstance, version,
-                    ExplorationDataService) {
-                  $controller('ConfirmOrCancelModalController', {
-                    $scope: $scope,
-                    $uibModalInstance: $uibModalInstance
-                  });
-
-                  $scope.version = version;
-                  $scope.getExplorationUrl = function(version) {
-                    return (
-                      '/explore/' + ExplorationDataService.explorationId +
-                      '?v=' + version);
-                  };
-                }
-              ]
+              controller: 'RevertExplorationModalController'
             }).result.then(function(version) {
               $http.post(ctrl.revertExplorationUrl, {
                 current_version: ExplorationDataService.data.version,
