@@ -149,7 +149,7 @@ describe('Static Pages Tour', function() {
   });
 
   it('visits the Privacy page', async function() {
-    await browser.get('/privacy');
+    await browser.get('/privacy-policy');
     await waitFor.pageToFullyLoad();
     expect(await element(
       by.css('.protractor-test-privacy-page')).isPresent()).toBe(true);

@@ -198,7 +198,7 @@ handlers:
     X-Xss-Protection: "1; mode=block"
   secure: always
   expiration: "0"
-- url: /privacy
+- url: /privacy-policy
   static_files: webpack_bundles/privacy-page.mainpage.html
   upload: webpack_bundles/privacy-page.mainpage.html
   http_headers:
