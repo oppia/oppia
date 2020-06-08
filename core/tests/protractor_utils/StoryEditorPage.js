@@ -120,21 +120,21 @@ var StoryEditorPage = function() {
     await waitFor.pageToFullyLoad();
   };
 
-  this.getStoryThumbnailSource = function() {
-    return workflow.getImageSource(storyThumbnailImageElement);
+  this.getStoryThumbnailSource = async function() {
+    return await workflow.getImageSource(storyThumbnailImageElement);
   };
 
-  this.getChapterThumbnailSource = function() {
-    return workflow.getImageSource(chapterThumbnailImageElement);
+  this.getChapterThumbnailSource = async function() {
+    return await workflow.getImageSource(chapterThumbnailImageElement);
   };
 
-  this.submitStoryThumbnail = function(imgPath) {
-    return workflow.submitImage(
+  this.submitStoryThumbnail = async function(imgPath) {
+    return await workflow.submitImage(
       storyThumbnailButton, thumbnailContainer, imgPath);
   };
 
-  this.submitChapterThumbnail = function(imgPath) {
-    return workflow.submitImage(
+  this.submitChapterThumbnail = async function(imgPath) {
+    return await workflow.submitImage(
       chapterThumbnailButton, thumbnailContainer, imgPath);
   };
 

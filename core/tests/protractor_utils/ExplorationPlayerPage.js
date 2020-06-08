@@ -279,14 +279,6 @@ var ExplorationPlayerPage = function() {
       waitingForResponseElem, 'Response takes too long to appear');
   };
 
-  this.submitAnswerDetails = function(answerDetails) {
-    answerDetailsTextArea.sendKeys(answerDetails);
-    waitFor.elementToBeClickable(
-      answerDetailsSubmitButton,
-      'Answer details submit button takes too long to be clickable');
-    answerDetailsSubmitButton.click();
-  };
-
   this.submitFeedback = async function(feedback) {
     await waitFor.elementToBeClickable(
       feedbackPopupLink, 'Feedback Popup link takes too long to be clickable');

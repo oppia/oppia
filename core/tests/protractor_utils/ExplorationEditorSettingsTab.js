@@ -67,29 +67,6 @@ var ExplorationEditorSettingsTab = function() {
   /*
    * Workflows
    */
-  // PARAMETERS
-
-  // This function adds a exploration level parameter change, creating
-  // the parameter if necessary.
-  this.addExplorationLevelParameterChange = function(paramName, paramValue) {
-    editParamChanges.click();
-    addParamButton.click();
-
-    var editorRowElem = element.all(by.css(
-      '.protractor-test-param-changes-list')).last();
-
-    forms.AutocompleteDropdownEditor(editorRowElem).setValue(paramName);
-
-    /* Setting parameter value is difficult via css since input fields
-      are dynamically generated. We isolate it as the last input in the
-      current parameter changes UI. */
-    var item = editorRowElem.all(by.tagName('input')).last();
-    item.clear();
-    item.sendKeys(paramValue);
-
-    saveParamChangesButton.click();
-  };
-
   this.deleteExploration = async function() {
     await waitFor.elementToBeClickable(deleteExplorationButton,
       'Delete Exploration button is not clickable');
@@ -101,10 +78,6 @@ var ExplorationEditorSettingsTab = function() {
       'Delete Exploration modal takes too long to disappear');
     // Returning to /creator_dashboard.
     await waitFor.pageToFullyLoad();
-  };
-
-  this.enableParameters = function() {
-    enableParametersSwitch.click();
   };
 
   this.enableCorrectnessFeedback = async function() {

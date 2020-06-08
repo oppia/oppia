@@ -35,8 +35,8 @@ var CommunityDashboardTranslateTextTab = function() {
     await waitFor.pageToFullyLoad();
   };
 
-  this.expectSelectedLanguageToBe = function(language) {
-    expect(selectedLanguageElement.getText()).toMatch(language);
+  this.expectSelectedLanguageToBe = async function(language) {
+    expect(await selectedLanguageElement.getText()).toMatch(language);
   };
 };
 exports.CommunityDashboardTranslateTextTab = CommunityDashboardTranslateTextTab;
