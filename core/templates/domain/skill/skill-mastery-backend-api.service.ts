@@ -40,8 +40,9 @@ export class SkillMasteryBackendApiService {
       }
     }).toPromise().then((response: any) => {
       if (successCallback) {
-        let skillMastery = this.skillMasteryObjectFactory
-          .createFromBackendDict(response.degrees_of_mastery);
+        let skillMastery = (
+          this.skillMasteryObjectFactory.createFromBackendDict(
+            response.degrees_of_mastery));
         successCallback(skillMastery);
       }
     }, (errorResponse) =>{
