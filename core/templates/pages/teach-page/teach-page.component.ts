@@ -35,7 +35,7 @@ angular.module('oppia').component('teachPage', {
       const ctrl = this;
       // Define constant for each tab on the page.
       ctrl.TAB_ID_TEACH = 'teach';
-      ctrl.TAB_ID_PLAYBOOK = 'participation-playbook';
+      ctrl.TAB_ID_PLAYBOOK = 'playbook';
       ctrl.TEACH_FORM_URL = 'https://goo.gl/forms/0p3Axuw5tLjTfiri1';
 
       const ALLOWED_TABS = [

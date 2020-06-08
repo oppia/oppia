@@ -50,7 +50,7 @@ angular.module('oppia').component('splashPage', {
       ctrl.onClickBrowseLibraryButton = function() {
         SiteAnalyticsService.registerClickBrowseLibraryButtonEvent();
         $timeout(function() {
-          WindowRef.nativeWindow.location = '/community-library';
+          WindowRef.nativeWindow.location = '/library';
         }, 150);
         return false;
       };

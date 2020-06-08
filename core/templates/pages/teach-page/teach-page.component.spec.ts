@@ -72,15 +72,14 @@ describe('Teach Page', function() {
     ctrl.$onInit();
     expect(ctrl.activeTabName).toBe('teach');
 
-    ctrl.onTabClick('participation-playbook');
+    ctrl.onTabClick('playbook');
 
     // setTimeout is being used here in order to wait onhashchange event to
     // finish. setTimeout is executed only after call stack is empty.
     // Ref: https://developer.mozilla.org/en-US/docs/Web/JavaScript/EventLoop
     setTimeout(function() {
-      expect(windowRef.nativeWindow.location.hash).toBe(
-        '#participation-playbook');
-      expect(ctrl.activeTabName).toBe('participation-playbook');
+      expect(windowRef.nativeWindow.location.hash).toBe('#playbook');
+      expect(ctrl.activeTabName).toBe('playbook');
       done();
     });
   });
@@ -95,13 +94,12 @@ describe('Teach Page', function() {
   });
 
   it('should activate playbook tab on init', function() {
-    windowRef.nativeWindow.location.hash = '#participation-playbook';
+    windowRef.nativeWindow.location.hash = '#playbook';
 
     ctrl.$onInit();
 
-    expect(windowRef.nativeWindow.location.hash).toBe(
-      '#participation-playbook');
-    expect(ctrl.activeTabName).toBe('participation-playbook');
+    expect(windowRef.nativeWindow.location.hash).toBe('#playbook');
+    expect(ctrl.activeTabName).toBe('playbook');
   });
 
   it('should get static image url', function() {
