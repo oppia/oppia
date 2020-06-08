@@ -46,9 +46,9 @@ export class PlaythroughBackendApiService {
       playthrough_data: playthrough.toBackendDict(),
       issue_schema_version: ServicesConstants.CURRENT_ISSUE_SCHEMA_VERSION,
       playthrough_id: playthrough.playthroughId
-    }).toPromise().then(({playthrough_id, playthrough_stored}) => {
-      return playthrough_stored ? playthrough_id : playthrough.playthroughId;
-    });
+    }).toPromise().then(
+      response => response.playthrough_stored ?
+        response.playthrough_id : playthrough.playthroughId);
   }
 }
 
