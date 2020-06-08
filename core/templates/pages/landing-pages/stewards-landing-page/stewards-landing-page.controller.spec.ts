@@ -114,7 +114,7 @@ describe('Stewards Landing Page', function() {
         'https://www.oppiafoundation.org/partnerships#get-in-touch')
     }, {
       text: 'Browse Lessons',
-        href: '/community-library'
+      href: '/community-library'
     }]);
     expect(ctrl.isActiveTab(activeTabName)).toBe(true);
     expect(ctrl.isActiveTab('Teachers')).toBe(false);
