@@ -263,10 +263,12 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/<comma_separated_skill_ids>' % feconf.QUESTIONS_LIST_URL_PREFIX,
         questions_list.QuestionsListHandler),
     get_redirect_route(
-        r'%s/<topic_name>' % feconf.PRACTICE_SESSION_URL_PREFIX,
+        r'%s/<topic_name>' %
+        feconf.PRACTICE_SESSION_URL_PREFIX,
         practice_sessions.PracticeSessionsPage),
     get_redirect_route(
-        r'%s/<topic_name>' % feconf.PRACTICE_SESSION_DATA_URL_PREFIX,
+        r'%s/<topic_name>' %
+        feconf.PRACTICE_SESSION_DATA_URL_PREFIX,
         practice_sessions.PracticeSessionsPageDataHandler),
     get_redirect_route(
         r'%s/<story_id>' % feconf.REVIEW_TEST_DATA_URL_PREFIX,
@@ -699,6 +701,9 @@ URLS = MAPREDUCE_HANDLERS + [
         feconf.VALIDATE_STORY_EXPLORATIONS_URL_PREFIX,
         story_editor.ValidateExplorationsHandler),
 
+    get_redirect_route(
+        '/classroom_page_status_handler', classroom.ClassroomPageStatusHandler),
+
     get_redirect_route(r'/emaildashboard', email_dashboard.EmailDashboardPage),
     get_redirect_route(
         r'/emaildashboarddatahandler',
@@ -720,7 +725,8 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'/explorationdataextractionhandler', admin.DataExtractionQueryHandler),
     get_redirect_route(
-        r'/sendDummyMailToAdminHandler', admin.SendDummyMailToAdminHandler),
+        r'/senddummymailtoadminhandler', admin.SendDummyMailToAdminHandler),
+    get_redirect_route(r'/updateusernamehandler', admin.UpdateUsernameHandler),
     get_redirect_route(r'/frontend_errors', FrontendErrorHandler),
     get_redirect_route(r'/logout', base.LogoutPage),
 

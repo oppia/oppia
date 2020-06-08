@@ -38,7 +38,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.signup('a@example.com', 'A')
         self.signup('b@example.com', 'B')
         self.topic = topic_domain.Topic.create_default_topic(
-            self.topic_id, 'Name', 'abbrev')
+            self.topic_id, 'Name', 'abbrev', 'description')
         self.topic.subtopics = [
             topic_domain.Subtopic(
                 1, 'Title', ['skill_id_1'], 'image.svg',
@@ -54,14 +54,14 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
     def test_create_default_topic(self):
         """Tests the create_default_topic() function."""
         topic = topic_domain.Topic.create_default_topic(
-            self.topic_id, 'Name', 'abbrev')
+            self.topic_id, 'Name', 'abbrev', 'description')
         expected_topic_dict = {
             'id': self.topic_id,
             'name': 'Name',
             'abbreviated_name': 'abbrev',
             'thumbnail_filename': None,
             'thumbnail_bg_color': None,
-            'description': feconf.DEFAULT_TOPIC_DESCRIPTION,
+            'description': 'description',
             'canonical_story_references': [],
             'additional_story_references': [],
             'uncategorized_skill_ids': [],
@@ -941,8 +941,8 @@ class TopicSummaryTests(test_utils.GenericTestBase):
         }
 
         self.topic_summary = topic_domain.TopicSummary(
-            'topic_id', 'name', 'name', 'en', 'topic description', 1, 1, 1, 1,
-            1, 1, current_time, current_time)
+            'topic_id', 'name', 'name', 'en', 'topic description',
+            1, 1, 1, 1, 1, 1, current_time, current_time)
 
     def test_topic_summary_gets_created(self):
         self.assertEqual(
@@ -1097,8 +1097,7 @@ class TopicRightsTests(test_utils.GenericTestBase):
         }
 
         self.topic_summary = topic_domain.TopicRights(
-            'topic_id', [self.user_id_a], False
-        )
+            'topic_id', [self.user_id_a], False)
 
     def test_topic_summary_gets_created(self):
         self.assertEqual(

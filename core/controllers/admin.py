@@ -393,9 +393,9 @@ class AdminHandler(base.BaseHandler):
                 self.user_id, question_id_3, skill_id_3, 0.7)
 
             topic_1 = topic_domain.Topic.create_default_topic(
-                topic_id_1, 'Dummy Topic 1', 'abbrev')
+                topic_id_1, 'Dummy Topic 1', 'abbrev', 'description')
             topic_2 = topic_domain.Topic.create_default_topic(
-                topic_id_2, 'Empty Topic', 'abbrev')
+                topic_id_2, 'Empty Topic', 'abbrev', 'description')
 
             topic_1.add_canonical_story(story_id)
             topic_1.add_uncategorized_skill_id(skill_id_1)
@@ -854,3 +854,48 @@ class SendDummyMailToAdminHandler(base.BaseHandler):
             self.render_json({})
         else:
             raise self.InvalidInputException('This app cannot send emails.')
+
+
+class UpdateUsernameHandler(base.BaseHandler):
+    """Handler for renaming usernames."""
+
+    @acl_decorators.can_access_admin_page
+    def put(self):
+        old_username = self.payload.get('old_username', None)
+        new_username = self.payload.get('new_username', None)
+
+        if old_username is None:
+            raise self.InvalidInputException(
+                'Invalid request: The old username must be specified.')
+
+        if new_username is None:
+            raise self.InvalidInputException(
+                'Invalid request: A new username must be specified.')
+
+        if not isinstance(old_username, python_utils.UNICODE):
+            raise self.InvalidInputException(
+                'Expected old username to be a unicode string, received %s'
+                % old_username)
+
+        if not isinstance(new_username, python_utils.UNICODE):
+            raise self.InvalidInputException(
+                'Expected new username to be a unicode string, received %s'
+                % new_username)
+
+        user_id = user_services.get_user_id_from_username(old_username)
+        if user_id is None:
+            raise self.InvalidInputException(
+                'Invalid username: %s' % old_username)
+
+        if len(new_username) > constants.MAX_USERNAME_LENGTH:
+            raise self.InvalidInputException(
+                'Expected new username to be less than %s characters, '
+                'received %s' % (constants.MAX_USERNAME_LENGTH, new_username))
+
+        if user_services.is_username_taken(new_username):
+            raise self.InvalidInputException('Username already taken.')
+
+        user_services.set_username(user_id, new_username)
+        user_services.log_username_change(
+            self.user_id, old_username, new_username)
+        self.render_json({})

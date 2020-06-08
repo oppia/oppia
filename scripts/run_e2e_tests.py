@@ -393,6 +393,7 @@ def get_e2e_test_parameters(
         suite_name: str. Performs test for different suites.
         dev_mode_setting: bool. Represents whether run the related commands in
             dev mode.
+
     Returns:
         list(str): Parameters for running the tests.
     """
@@ -453,6 +454,8 @@ def main(args=None):
     commands = [common.NODE_BIN_PATH]
     if parsed_args.debug_mode:
         commands.append('--inspect-brk')
+    # This flag ensures tests fail if waitFor calls time out.
+    commands.append('--unhandled-rejections=strict')
     commands.append(PROTRACTOR_BIN_PATH)
     commands.extend(get_e2e_test_parameters(
         parsed_args.sharding_instances, parsed_args.suite, dev_mode))

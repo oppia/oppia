@@ -36,11 +36,13 @@ import { InteractionsExtensionsConstants } from
 import { ObjectsDomainConstants } from
   'domain/objects/objects-domain.constants';
 import { RequestInterceptor } from 'services/request-interceptor.service';
+import { SharedComponentsModule } from 'components/shared-component.module';
 
 @NgModule({
   imports: [
     BrowserModule,
-    HttpClientModule
+    HttpClientModule,
+    SharedComponentsModule
   ],
   declarations: [
     DonatePageComponent

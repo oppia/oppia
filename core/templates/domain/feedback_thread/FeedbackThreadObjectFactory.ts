@@ -25,6 +25,19 @@ import { ThreadMessage } from
 import { ThreadMessageSummary, ThreadMessageSummaryObjectFactory } from
   'domain/feedback_message/ThreadMessageSummaryObjectFactory';
 
+interface IFeedbackThreadBackendDict {
+  'status': string;
+  'subject': string;
+  'summary': string;
+  'original_author_username': string;
+  'last_updated_msecs': number;
+  'message_count': number;
+  'state_name': string;
+  'thread_id': string;
+  'last_nonempty_message_author': string;
+  'last_nonempty_message_text': string;
+}
+
 export class FeedbackThread {
   status: string;
   subject: string;
@@ -80,11 +93,8 @@ export class FeedbackThreadObjectFactory {
     private threadMessageSummaryObjectFactory:
       ThreadMessageSummaryObjectFactory) {}
 
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'feedbackThreadBackendDict' is a dict with underscore_cased
-  // keys which give tslint errors against underscore_casing in favor of
-  // camelCasing.
-  createFromBackendDict(feedbackThreadBackendDict: any): FeedbackThread {
+  createFromBackendDict(
+      feedbackThreadBackendDict: IFeedbackThreadBackendDict): FeedbackThread {
     return new FeedbackThread(
       feedbackThreadBackendDict.status, feedbackThreadBackendDict.subject,
       feedbackThreadBackendDict.summary,

@@ -29,122 +29,133 @@ var CreatorDashboardPage =
 describe('Voiceover upload features', function() {
   var TEST_USERNAME = 'uploadUser';
   var TEST_EMAIL = TEST_USERNAME + '@example.com';
+  var EXPLORATION_TITLE = 'Upload audio file';
   var creatorDashboardPage = null;
   var explorationEditorPage = null;
   var explorationEditorMainTab = null;
   var explorationEditorTranslationTab = null;
   var explorationEditorSettingsTab = null;
 
-  beforeAll(function() {
+  beforeAll(async function() {
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
-    explorationEditorTranslationTab =
-      explorationEditorPage.getTranslationTab();
+    explorationEditorTranslationTab = (
+      explorationEditorPage.getTranslationTab());
     explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
 
-    users.createUser(TEST_EMAIL, TEST_USERNAME);
-    users.login(TEST_EMAIL);
-    workflow.createExploration();
+    await users.createUser(TEST_EMAIL, TEST_USERNAME);
+    await users.login(TEST_EMAIL);
+    await workflow.createExploration();
 
-    explorationEditorMainTab.setStateName('Uploading translation file');
-    explorationEditorMainTab.setContent(forms.toRichText(
+    await explorationEditorMainTab.setStateName('Uploading translation file');
+    await explorationEditorMainTab.setContent(await forms.toRichText(
       'This is the first card.'
     ));
-    explorationEditorMainTab.setInteraction('EndExploration');
+    await explorationEditorMainTab.setInteraction('EndExploration');
+
+    await explorationEditorPage.navigateToSettingsTab();
+    await explorationEditorSettingsTab.setTitle(EXPLORATION_TITLE);
+    await explorationEditorSettingsTab.setCategory('Languages');
+    await explorationEditorSettingsTab.setLanguage('English');
+    await explorationEditorSettingsTab.setObjective(
+      'Upload an translation audio file.');
+    await explorationEditorPage.navigateToTranslationTab();
+    await explorationEditorTranslationTab.exitTutorial();
+    await explorationEditorPage.saveChanges(
+      'Created exploration for voiceover upload.');
   });
 
-  beforeEach(function() {
-    explorationEditorPage.navigateToTranslationTab();
-    explorationEditorTranslationTab.exitTutorial();
+  beforeEach(async function() {
+    await creatorDashboardPage.get();
+    await creatorDashboardPage.editExploration(EXPLORATION_TITLE);
+    await explorationEditorPage.navigateToTranslationTab();
   });
 
-  it('should upload an audio file', function() {
-    explorationEditorTranslationTab.openUploadAudioModal();
-    explorationEditorTranslationTab.uploadAudio(
+  it('should upload an audio file', async function() {
+    await explorationEditorTranslationTab.openUploadAudioModal();
+    await explorationEditorTranslationTab.uploadAudio(
       '../data/cafe.mp3');
 
-    explorationEditorTranslationTab.playOrPauseAudioFile()
-      .then(function(playClick) {
-        expect(playClick).toBe(true);
+    var playClick = (
+      await explorationEditorTranslationTab.playOrPauseAudioFile());
+    expect(playClick).toBe(true);
 
-        explorationEditorTranslationTab.playOrPauseAudioFile()
-          .then(function(pauseClick) {
-            expect(pauseClick).toBe(false);
-          });
-      });
+    var pauseClick = (
+      await explorationEditorTranslationTab.playOrPauseAudioFile());
+    expect(pauseClick).toBe(false);
   });
 
-  it('should not let upload a non audio file', function() {
-    explorationEditorTranslationTab.openUploadAudioModal();
-    explorationEditorTranslationTab.expectWrongFileType(
+  it('should not let upload a non audio file', async function() {
+    await explorationEditorTranslationTab.openUploadAudioModal();
+    await explorationEditorTranslationTab.expectWrongFileType(
       '../data/img.png');
-    explorationEditorTranslationTab.expectSaveUploadedAudioButtonToBeDisabled();
-    explorationEditorTranslationTab.closeUploadAudioModal();
+    await explorationEditorTranslationTab
+      .expectSaveUploadedAudioButtonToBeDisabled();
+    await explorationEditorTranslationTab.closeUploadAudioModal();
   });
 
-  it('should not let upload a five minutes longer audio', function() {
-    explorationEditorTranslationTab.openUploadAudioModal();
-    explorationEditorTranslationTab.expectAudioOverFiveMinutes(
+  it('should not let upload a five minutes longer audio', async function() {
+    await explorationEditorTranslationTab.openUploadAudioModal();
+    await explorationEditorTranslationTab.expectAudioOverFiveMinutes(
       '../data/cafe-over-five-minutes.mp3');
-    explorationEditorTranslationTab.expectSaveUploadedAudioButtonToBeDisabled();
-    explorationEditorTranslationTab.closeUploadAudioModal();
-    explorationEditorTranslationTab.deleteAudioRecord();
+    await explorationEditorTranslationTab
+      .expectSaveUploadedAudioButtonToBeDisabled();
+    await explorationEditorTranslationTab.closeUploadAudioModal();
+    await explorationEditorTranslationTab.deleteAudioRecord();
   });
 
-  it('should upload recorded audio and play after logging out', function() {
-    explorationEditorTranslationTab.addAudioRecord();
-    explorationEditorTranslationTab.stopAudioRecord();
-    explorationEditorTranslationTab.confirmAudioRecord();
-    explorationEditorTranslationTab.playAudioRecord();
-    browser.refresh();
-    explorationEditorTranslationTab.playAudioRecord();
+  it('should upload recorded audio and play after logging out',
+    async function() {
+      await explorationEditorTranslationTab.addAudioRecord();
+      await explorationEditorTranslationTab.stopAudioRecord();
+      await explorationEditorTranslationTab.confirmAudioRecord();
+      await explorationEditorTranslationTab.playAudioRecord();
+      await browser.refresh();
+      await explorationEditorTranslationTab.playAudioRecord();
 
-    // Try after logging out
-    users.logout();
-    users.login(TEST_EMAIL);
-    creatorDashboardPage.get();
-    creatorDashboardPage.editExploration('Untitled');
-    explorationEditorMainTab.exitTutorial();
+      // Try after logging out
+      await users.logout();
+      await users.login(TEST_EMAIL);
+      await creatorDashboardPage.get();
+      await creatorDashboardPage.editExploration(EXPLORATION_TITLE);
+      await explorationEditorMainTab.exitTutorial();
 
-    explorationEditorPage.navigateToTranslationTab();
-    explorationEditorTranslationTab.playAudioRecord();
-    explorationEditorTranslationTab.deleteAudioRecord();
+      await explorationEditorPage.navigateToTranslationTab();
+      await explorationEditorTranslationTab.playAudioRecord();
+      await explorationEditorTranslationTab.deleteAudioRecord();
+    });
+
+  it('should upload audio file from path and play after logout',
+    async function() {
+      await explorationEditorTranslationTab.uploadAudioRecord(
+        '../../../data/explorations/audio_test/assets/audio/' +
+        'test_audio_1_en.mp3');
+      await explorationEditorTranslationTab.saveAudioRecord();
+      await explorationEditorTranslationTab.playAudioRecord();
+      await browser.refresh();
+      await explorationEditorTranslationTab.playAudioRecord();
+
+      // Try after logging out
+      await users.logout();
+      await users.login(TEST_EMAIL);
+      await creatorDashboardPage.get();
+      await creatorDashboardPage.editExploration(EXPLORATION_TITLE);
+      await explorationEditorMainTab.exitTutorial();
+
+      await explorationEditorPage.navigateToTranslationTab();
+      await explorationEditorTranslationTab.playAudioRecord();
+      await explorationEditorTranslationTab.deleteAudioRecord();
+    });
+
+  afterAll(async function() {
+    await explorationEditorPage.saveChanges(
+      'Adds audio file in translation tab.');
+    await workflow.publishExploration();
   });
 
-  it('should upload audio file from path and play after logout', function() {
-    explorationEditorTranslationTab.uploadAudioRecord(
-      '../../../data/explorations/audio_test/assets/audio/test_audio_1_en.mp3');
-    explorationEditorTranslationTab.saveAudioRecord();
-    explorationEditorTranslationTab.playAudioRecord();
-    browser.refresh();
-    explorationEditorTranslationTab.playAudioRecord();
-
-    // Try after logging out
-    users.logout();
-    users.login(TEST_EMAIL);
-    creatorDashboardPage.get();
-    creatorDashboardPage.editExploration('Untitled');
-    explorationEditorMainTab.exitTutorial();
-
-    explorationEditorPage.navigateToTranslationTab();
-    explorationEditorTranslationTab.playAudioRecord();
-    explorationEditorTranslationTab.deleteAudioRecord();
-  });
-
-  afterAll(function() {
-    explorationEditorPage.navigateToSettingsTab();
-    explorationEditorSettingsTab.setTitle('Upload audio file');
-    explorationEditorSettingsTab.setCategory('Languages');
-    explorationEditorSettingsTab.setLanguage('English');
-    explorationEditorSettingsTab.setObjective(
-      'Upload an translation audio file.');
-    explorationEditorPage.saveChanges('Adds audio file in translation tab.');
-    workflow.publishExploration();
-  });
-
-  afterEach(function() {
-    general.checkForConsoleErrors([
+  afterEach(async function() {
+    await general.checkForConsoleErrors([
       'Failed to load resource: the server responded with a status of 400' +
       '(Bad Request)', {status_code: 400,
         error: 'Audio files must be under 300 seconds in length.' +
