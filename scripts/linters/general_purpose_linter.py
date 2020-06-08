@@ -266,7 +266,11 @@ BAD_LINE_PATTERNS_HTML_REGEXP = [
     {
         'regexp': re.compile(r'text\/ng-template'),
         'message': 'The directives must be directly referenced.',
-        'excluded_files': (),
+        'excluded_files': (
+            'core/templates/pages/community-dashboard-page/' +
+                'translation-language-select/' +
+                'translation-language-select.component.ts'
+        ),
         'excluded_dirs': (
             'extensions/answer_summarizers/',
             'extensions/classifiers/',
