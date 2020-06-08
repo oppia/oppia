@@ -17,6 +17,9 @@
  */
 
 require('components/concept-card/concept-card.directive.ts');
+require(
+  'components/common-layout-directives/common-elements/' +
+  'confirm-or-cancel-modal.controller.ts');
 require('services/context.service.ts');
 require('services/html-escaper.service.ts');
 
@@ -49,20 +52,20 @@ angular.module('oppia').directive('oppiaNoninteractiveSkillreview', [
                 'components/concept-card/concept-card-modal.template.html'),
               backdrop: true,
               controller: [
-                '$scope', '$uibModalInstance',
+                '$controller', '$scope', '$uibModalInstance',
                 function(
-                    $scope, $uibModalInstance) {
+                    $controller, $scope, $uibModalInstance) {
+                  $controller('ConfirmOrCancelModalController', {
+                    $scope: $scope,
+                    $uibModalInstance: $uibModalInstance
+                  });
                   $scope.skillIds = [skillId];
                   $scope.index = 0;
                   $scope.modalHeader = 'Concept Card';
                   $scope.isInTestMode = false;
-
-                  $scope.closeModal = function() {
-                    $uibModalInstance.dismiss('cancel');
-                  };
                 }
               ]
-            }).result['catch'](function(res) {
+            }).result.then(function() {}, function(res) {
               ContextService.removeCustomEntityContext();
               if (!(res === 'cancel' || res === 'escape key press')) {
                 throw new Error(res);

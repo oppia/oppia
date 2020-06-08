@@ -16,6 +16,10 @@
  * @fileoverview Service for the 'embed exploration' modal.
  */
 
+require(
+  'components/button-directives/' +
+  'exploration-embed-button-modal.controller.ts');
+
 require('domain/utilities/url-interpolation.service.ts');
 require('services/site-analytics.service.ts');
 
@@ -34,28 +38,7 @@ angular.module('oppia').factory('ExplorationEmbedButtonService', [
               return explorationId;
             }
           },
-          controller: [
-            '$scope', '$uibModalInstance', '$window', 'explorationId',
-            function($scope, $uibModalInstance, $window, explorationId) {
-              $scope.explorationId = explorationId;
-              $scope.serverName = (
-                $window.location.protocol + '//' + $window.location.host);
-
-              $scope.close = function() {
-                $uibModalInstance.dismiss('close');
-              };
-
-              $scope.selectText = function(evt) {
-                var codeDiv = evt.currentTarget;
-                var range = document.createRange();
-                range.setStartBefore(codeDiv.firstChild);
-                range.setEndAfter(codeDiv.lastChild);
-                var selection = window.getSelection();
-                selection.removeAllRanges();
-                selection.addRange(range);
-              };
-            }
-          ]
+          controller: 'ExplorationEmbedButtonModalController'
         }).result.then(function() {}, function() {
           // Note to developers:
           // This callback is triggered when the Cancel button is clicked.

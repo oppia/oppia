@@ -22,6 +22,9 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import ast
 import logging
 
+from constants import constants
+from core.domain import skill_domain
+from core.domain import skill_services
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_jobs_one_off
@@ -62,7 +65,7 @@ class TopicMigrationOneOffJobTests(test_utils.GenericTestBase):
         # Create a new topic that should not be affected by the
         # job.
         topic = topic_domain.Topic.create_default_topic(
-            self.TOPIC_ID, name='A name', abbreviated_name='abbrev')
+            self.TOPIC_ID, 'A name', 'abbrev', 'description')
         topic.add_subtopic(1, title='A subtitle')
         topic_services.save_new_topic(self.albert_id, topic)
         self.assertEqual(
@@ -94,7 +97,7 @@ class TopicMigrationOneOffJobTests(test_utils.GenericTestBase):
         and does not attempt to migrate.
         """
         topic = topic_domain.Topic.create_default_topic(
-            self.TOPIC_ID, name='A name', abbreviated_name='abbrev')
+            self.TOPIC_ID, 'A name', 'abbrev', 'description')
         topic_services.save_new_topic(self.albert_id, topic)
 
         # Delete the topic before migration occurs.
@@ -183,7 +186,8 @@ class TopicMigrationOneOffJobTests(test_utils.GenericTestBase):
         # The topic model created will be invalid due to invalid language code.
         self.save_new_topic_with_subtopic_schema_v1(
             self.TOPIC_ID, self.albert_id, 'A name', 'abbrev',
-            'a name', '', 'Image.svg', '#C6DCDA', [], [], [], 2,
+            'a name', 'description', 'Image.svg',
+            '#C6DCDA', [], [], [], 2,
             language_code='invalid_language_code')
 
         job_id = (
@@ -201,4 +205,138 @@ class TopicMigrationOneOffJobTests(test_utils.GenericTestBase):
         expected = [[u'validation_error',
                      [u'Topic topic_id failed validation: '
                       'Invalid language code: invalid_language_code']]]
+        self.assertEqual(expected, [ast.literal_eval(x) for x in output])
+
+
+class RemoveDeletedSkillsFromTopicOneOffJobTests(
+        test_utils.GenericTestBase):
+
+    ALBERT_EMAIL = 'albert@example.com'
+    ALBERT_NAME = 'albert'
+
+    TOPIC_ID = 'topic_id'
+
+    def setUp(self):
+        super(RemoveDeletedSkillsFromTopicOneOffJobTests, self).setUp()
+        # Setup user who will own the test topics.
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.process_and_flush_pending_tasks()
+        self.rubrics = [
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
+
+    def test_job_removes_deleted_uncategorized_skill_ids(self):
+        """Tests that the RemoveDeletedSkillsFromTopicOneOffJob job removes
+        deleted uncategorized skills ids from the topic.
+        """
+        valid_skill_1 = skill_domain.Skill.create_default_skill(
+            'valid_skill_1', description='A description', rubrics=self.rubrics)
+        valid_skill_2 = skill_domain.Skill.create_default_skill(
+            'valid_skill_2', description='A description', rubrics=self.rubrics)
+        valid_skill_3 = skill_domain.Skill.create_default_skill(
+            'valid_skill_3', description='A description', rubrics=self.rubrics)
+        skill_services.save_new_skill(self.albert_id, valid_skill_1)
+        skill_services.save_new_skill(self.albert_id, valid_skill_2)
+        skill_services.save_new_skill(self.albert_id, valid_skill_3)
+        # Create a new topic that should not be affected by the
+        # job.
+        topic = topic_domain.Topic.create_default_topic(
+            self.TOPIC_ID, 'A name', 'abbrev', 'description')
+        topic.add_subtopic(1, title='A subtitle')
+        topic.add_uncategorized_skill_id('valid_skill_1')
+        topic.add_uncategorized_skill_id('valid_skill_2')
+        topic.add_uncategorized_skill_id('valid_skill_3')
+        topic.add_uncategorized_skill_id('deleted_skill_1')
+        topic.add_uncategorized_skill_id('deleted_skill_2')
+        topic.add_uncategorized_skill_id('deleted_skill_3')
+        topic.move_skill_id_to_subtopic(None, 1, 'valid_skill_3')
+        topic.move_skill_id_to_subtopic(None, 1, 'deleted_skill_3')
+        topic_services.save_new_topic(self.albert_id, topic)
+        # Pre-assert that all skills are added correctly.
+        self.assertEqual(
+            set(topic.uncategorized_skill_ids),
+            set([
+                'valid_skill_1',
+                'valid_skill_2',
+                'deleted_skill_1',
+                'deleted_skill_2'
+            ]))
+        self.assertEqual(
+            set(topic.subtopics[0].skill_ids),
+            set(['valid_skill_3', 'deleted_skill_3']))
+
+        # Start RemoveDeletedSkillsFromTopicOneOffJob.
+        job_id = (
+            topic_jobs_one_off.RemoveDeletedSkillsFromTopicOneOffJob
+            .create_new())
+        topic_jobs_one_off.RemoveDeletedSkillsFromTopicOneOffJob.enqueue(
+            job_id)
+        self.process_and_flush_pending_tasks()
+
+        # Assert that only valid skills remain after
+        # RemoveDeletedSkillsFromTopicOneOffJob.
+        updated_topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
+        self.assertEqual(
+            updated_topic.uncategorized_skill_ids,
+            ['valid_skill_1', 'valid_skill_2'])
+        self.assertEqual(
+            updated_topic.subtopics[0].skill_ids, ['valid_skill_3'])
+        output = (
+            topic_jobs_one_off.RemoveDeletedSkillsFromTopicOneOffJob
+            .get_output(job_id))
+        expected = [
+            [
+                u'Skill IDs deleted for topic topic_id:',
+                [u'[u\'deleted_skill_1\', u\'deleted_skill_2\','
+                 ' u\'deleted_skill_3\']']
+            ],
+            [u'topic_processed', [u'Processed 1 topics.']]
+        ]
+
+        self.assertEqual(expected, [ast.literal_eval(x) for x in output])
+
+    def test_job_skips_deleted_topic(self):
+        """Tests that RemoveDeletedSkillsFromTopicOneOffJob job skips
+        deleted topic and does not attempt to remove uncategorized skills for
+        skills that are deleted.
+        """
+        topic = topic_domain.Topic.create_default_topic(
+            self.TOPIC_ID, 'A name', 'abbrev', 'description')
+        topic.add_uncategorized_skill_id('skill_1')
+        topic.add_uncategorized_skill_id('skill_2')
+        topic_services.save_new_topic(self.albert_id, topic)
+
+        # Delete the topic before migration occurs.
+        topic_services.delete_topic(
+            self.albert_id, self.TOPIC_ID)
+
+        # Ensure the topic is deleted.
+        with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
+            topic_fetchers.get_topic_by_id(self.TOPIC_ID)
+
+        # Start migration job on sample topic.
+        job_id = (
+            topic_jobs_one_off.RemoveDeletedSkillsFromTopicOneOffJob
+            .create_new())
+        topic_jobs_one_off.RemoveDeletedSkillsFromTopicOneOffJob.enqueue(
+            job_id)
+
+        # This running without errors indicates the deleted topic is
+        # being ignored.
+        self.process_and_flush_pending_tasks()
+
+        # Ensure the topic is still deleted.
+        with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
+            topic_fetchers.get_topic_by_id(self.TOPIC_ID)
+
+        output = (
+            topic_jobs_one_off.RemoveDeletedSkillsFromTopicOneOffJob
+            .get_output(job_id))
+        expected = [[u'topic_deleted',
+                     [u'Encountered 1 deleted topics.']]]
         self.assertEqual(expected, [ast.literal_eval(x) for x in output])

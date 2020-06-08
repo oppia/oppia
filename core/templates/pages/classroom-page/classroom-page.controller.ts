@@ -19,7 +19,7 @@
 require('base-components/base-content.directive.ts');
 require(
   'components/common-layout-directives/common-elements/' +
-  'background-banner.directive.ts');
+  'background-banner.component.ts');
 require('components/summary-tile/topic-summary-tile.directive.ts');
 
 require('domain/classroom/classroom-backend-api.service.ts');
@@ -43,12 +43,12 @@ angular.module('oppia').directive('classroomPage', [
       controllerAs: '$ctrl',
       controller: [
         '$filter', '$rootScope', '$window', 'AlertsService',
-        'ClassroomBackendApiService', 'PageTitleService',
+        'ClassroomBackendApiService', 'LoaderService', 'PageTitleService',
         'TopicSummaryObjectFactory', 'UrlService',
         'WindowDimensionsService', 'FATAL_ERROR_CODES',
         function(
             $filter, $rootScope, $window, AlertsService,
-            ClassroomBackendApiService, PageTitleService,
+            ClassroomBackendApiService, LoaderService, PageTitleService,
             TopicSummaryObjectFactory, UrlService,
             WindowDimensionsService, FATAL_ERROR_CODES) {
           var ctrl = this;
@@ -62,11 +62,11 @@ angular.module('oppia').directive('classroomPage', [
             PageTitleService.setPageTitle(
               ctrl.classroomDisplayName + ' Classroom | Oppia');
 
-            $rootScope.loadingMessage = 'Loading';
+            LoaderService.showLoadingScreen('Loading');
             ClassroomBackendApiService.fetchClassroomData(
               classroomName).then(function(topicSummaryObjects) {
               ctrl.topicSummaries = topicSummaryObjects;
-              $rootScope.loadingMessage = '';
+              LoaderService.hideLoadingScreen();
               $rootScope.$broadcast('initializeTranslation');
             },
             function(errorResponse) {

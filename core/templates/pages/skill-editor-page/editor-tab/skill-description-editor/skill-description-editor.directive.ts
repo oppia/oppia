@@ -23,6 +23,8 @@ require('pages/skill-editor-page/services/skill-editor-state.service.ts');
 
 require('pages/skill-editor-page/skill-editor-page.constants.ajs.ts');
 
+import { Subscription } from 'rxjs';
+
 angular.module('oppia').directive('skillDescriptionEditor', [
   'SkillEditorStateService', 'SkillObjectFactory', 'SkillUpdateService',
   'UrlInterpolationService', 'MAX_CHARS_IN_SKILL_DESCRIPTION',
@@ -36,13 +38,18 @@ angular.module('oppia').directive('skillDescriptionEditor', [
         '/pages/skill-editor-page/editor-tab/skill-description-editor/' +
         'skill-description-editor.directive.html'),
       controller: [
-        '$scope', 'EVENT_SKILL_REINITIALIZED',
-        function($scope, EVENT_SKILL_REINITIALIZED) {
+        '$scope',
+        function($scope) {
           var ctrl = this;
-          $scope.MAX_CHARS_IN_SKILL_DESCRIPTION =
-            MAX_CHARS_IN_SKILL_DESCRIPTION;
+          ctrl.directiveSubscriptions = new Subscription();
+          $scope.MAX_CHARS_IN_SKILL_DESCRIPTION = (
+            MAX_CHARS_IN_SKILL_DESCRIPTION);
           $scope.canEditSkillDescription = function() {
             return $scope.skillRights.canEditSkillDescription();
+          };
+
+          $scope.resetErrorMsg = function() {
+            $scope.errorMsg = '';
           };
 
           $scope.saveSkillDescription = function(newSkillDescription) {
@@ -55,6 +62,10 @@ angular.module('oppia').directive('skillDescriptionEditor', [
               SkillUpdateService.setSkillDescription(
                 $scope.skill,
                 newSkillDescription);
+            } else {
+              $scope.errorMsg = (
+                'Please use a non-empty description consisting of ' +
+                'alphanumeric characters, spaces and/or hyphens.');
             }
           };
 
@@ -62,10 +73,17 @@ angular.module('oppia').directive('skillDescriptionEditor', [
             $scope.skill = SkillEditorStateService.getSkill();
             $scope.tmpSkillDescription = $scope.skill.getDescription();
             $scope.skillRights = SkillEditorStateService.getSkillRights();
-            $scope.$on(EVENT_SKILL_REINITIALIZED, function() {
-              $scope.tmpSkillDescription = $scope.skill.getDescription();
-            });
+            $scope.errorMsg = '';
+            ctrl.directiveSubscriptions.add(
+              SkillEditorStateService.getSkillChangedSubject().subscribe(
+                () => $scope.tmpSkillDescription = $scope.skill.getDescription()
+              )
+            );
           };
+
+          $scope.$on('$destroy', function() {
+            ctrl.directiveSubscriptions.unsubscribe();
+          });
         }
       ]
     };

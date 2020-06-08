@@ -4699,6 +4699,9 @@ export = {
     "code": "ar",
     "description": "العربية (Arabic)"
   }, {
+    "code": "sq",
+    "description": "shqip (Albanian)"
+  }, {
     "code": "bg",
     "description": "български (Bulgarian)"
   }, {
@@ -4864,6 +4867,10 @@ export = {
     "id": "ak",
     "description": "Akan",
     "relatedLanguages": ["ak"]
+  }, {
+    "id": "sq",
+    "description": "Albanian",
+    "relatedLanguages": ["sq"]
   }, {
     "id": "ar",
     "description": "Arabic",
@@ -5058,7 +5065,8 @@ export = {
       "ImageClickInput",
       "ItemSelectionInput",
       "MultipleChoiceInput",
-      "TextInput"
+      "TextInput",
+      "DragAndDropSortInput"
     ]
   }, {
     "name": "Math",
@@ -5167,6 +5175,7 @@ export = {
   },
 
   "ENABLE_PREREQUISITE_SKILLS": false,
+  "ENABLE_LITERALLY_CANVAS_EDITOR": false,
 
   // For the full new structures viewer features, both
   // ENABLE_NEW_STRUCTURE_PLAYERS and ENABLE_NEW_STRUCTURE_VIEWER_UPDATES has
@@ -5195,6 +5204,7 @@ export = {
   "MAX_CHARS_IN_SKILL_DESCRIPTION": 100,
   "MAX_CHARS_IN_STORY_TITLE": 39,
   "MAX_CHARS_IN_CHAPTER_TITLE": 36,
+  "MAX_CHARS_IN_CHAPTER_DESCRIPTION": 152,
   "MAX_CHARS_IN_MISCONCEPTION_NAME": 100,
 
   "NEW_STATE_TEMPLATE": {
@@ -5273,8 +5283,8 @@ export = {
   // Used to disable account data export until it is fully implemented.
   "ENABLE_ACCOUNT_EXPORT": false,
 
-  // Used to hide the callout to classroom until it is ready.
-  "SHOW_CLASSROOM_CALLOUT": false,
+  // Maximum allowed length of a username.
+  "MAX_USERNAME_LENGTH": 30,
 
   "DEV_MODE": true
 };

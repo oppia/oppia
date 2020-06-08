@@ -35,7 +35,7 @@
       <div ng-if="customizationArgSpec.schema.type === 'bool'" class="oppia-interaction-customization-label"><[customizationArgSpec.description]></div>
       <div style="margin-bottom: 15px;"></div>
     </div>
-    <div class="oppia-form-error oppia-units-input-error">
+    <div ng-if="getCustomizationArgsWarningMessage()" class="alert alert-danger oppia-units-input-error">
       <[getCustomizationArgsWarningMessage()]>
     </div>
   </form>
@@ -64,7 +64,7 @@
     </button>
   </div>
   <button class="btn btn-success protractor-test-close-no-customization-modal"
-          ng-click="okay()"
+          ng-click="confirm('okay')"
           ng-if="!hasCustomizationArgs && customizationModalReopened">
     Okay
   </button>

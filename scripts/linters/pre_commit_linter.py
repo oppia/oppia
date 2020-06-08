@@ -67,6 +67,7 @@ from . import general_purpose_linter
 from . import html_linter
 from . import js_ts_linter
 from . import python_linter
+from . import third_party_typings_linter
 from .. import common
 from .. import concurrent_task_utils
 from .. import install_third_party_libs
@@ -125,15 +126,16 @@ _PATHS_TO_INSERT = [
         _PARENT_DIR, 'oppia_tools', 'Pillow-%s' % common.PILLOW_VERSION),
     os.path.join(
         _PARENT_DIR, 'oppia_tools', 'psutil-%s' % common.PSUTIL_VERSION),
-    os.path.join('third_party', 'backports.functools_lru_cache-1.5'),
-    os.path.join('third_party', 'beautifulsoup4-4.7.1'),
-    os.path.join('third_party', 'bleach-3.1.0'),
+    os.path.join('third_party', 'backports.functools_lru_cache-1.6.1'),
+    os.path.join('third_party', 'beautifulsoup4-4.9.0'),
+    os.path.join('third_party', 'bleach-3.1.5'),
     os.path.join('third_party', 'callbacks-0.3.0'),
     os.path.join('third_party', 'gae-cloud-storage-1.9.22.1'),
     os.path.join('third_party', 'gae-mapreduce-1.9.22.0'),
     os.path.join('third_party', 'gae-pipeline-1.9.22.1'),
-    os.path.join('third_party', 'mutagen-1.42.0'),
-    os.path.join('third_party', 'soupsieve-1.9.1'),
+    os.path.join('third_party', 'mutagen-1.43.0'),
+    os.path.join('third_party', 'packaging-20.3'),
+    os.path.join('third_party', 'soupsieve-1.9.5'),
     os.path.join('third_party', 'six-1.12.0'),
     os.path.join('third_party', 'webencodings-0.5.1'),
 ]
@@ -417,27 +419,49 @@ def categorize_files(file_paths):
     _FILES.update(all_filepaths_dict)
 
 
-def _print_complete_summary_of_errors(all_messages):
-    """Print complete summary of errors."""
-    error_messages = all_messages
-    if error_messages != '':
+def _print_complete_summary_of_lint_messages(lint_messages):
+    """Print complete summary of lint messages."""
+    if lint_messages != '':
         python_utils.PRINT('Summary of Errors:')
         python_utils.PRINT('----------------------------------------')
-        for message in error_messages:
+        for message in lint_messages:
             python_utils.PRINT(message)
 
 
-def _get_task_output(all_messages, task, semaphore):
+def _get_task_output(lint_messages, task, semaphore):
     """Returns output of running tasks.
 
     Args:
-        all_messages: list(str). List of summary messages of linter output.
+        lint_messages: list(str). List of summary messages of linter output.
         task: object(TestingTaskSpec). The task object to get output of linter.
         semaphore: threading.Semaphore. The object that controls how many tasks
             can run at any time.
     """
-    all_messages += task.output
+    if task.output:
+        lint_messages += task.output
     semaphore.release()
+
+
+def _print_errors_stacktrace(errors_stacktrace):
+    """Print errors stacktrace caught during linter execution.
+
+    Args:
+        errors_stacktrace: list(str). List of error stacktrace of lint
+            execution failure.
+    """
+    python_utils.PRINT('')
+    python_utils.PRINT(
+        'Unable to run the complete lint test, please check '
+        'the following stack trace and fix the errors:')
+    python_utils.PRINT('+--------------------------+')
+    for stacktrace in errors_stacktrace:
+        python_utils.PRINT(stacktrace)
+        python_utils.PRINT('--------------------------------------------------')
+        python_utils.PRINT('')
+    python_utils.PRINT('--------------------------------------------------')
+    python_utils.PRINT(
+        'Some of the linting functions may not run until the'
+        ' above errors gets fixed')
 
 
 def main(args=None):
@@ -509,30 +533,39 @@ def main(args=None):
 
     # Concurrency limit: 25.
     concurrent_task_utils.execute_tasks(tasks_custom, custom_semaphore)
+
     # Concurrency limit: 2.
     concurrent_task_utils.execute_tasks(
         tasks_third_party, third_party_semaphore)
 
-    all_messages = []
+    lint_messages = []
 
     # Prepare semaphore for locking mechanism.
     semaphore = threading.Semaphore(1)
 
     for task in tasks_custom:
         semaphore.acquire()
-        _get_task_output(all_messages, task, semaphore)
+        _get_task_output(lint_messages, task, semaphore)
 
     for task in tasks_third_party:
         semaphore.acquire()
-        _get_task_output(all_messages, task, semaphore)
+        _get_task_output(lint_messages, task, semaphore)
 
-    all_messages += codeowner_linter.check_codeowner_file(
+    lint_messages += codeowner_linter.check_codeowner_file(
         verbose_mode_enabled)
 
-    _print_complete_summary_of_errors(all_messages)
+    lint_messages += (
+        third_party_typings_linter.check_third_party_libs_type_defs(
+            verbose_mode_enabled))
+
+    _print_complete_summary_of_lint_messages(lint_messages)
+
+    errors_stacktrace = concurrent_task_utils.ALL_ERRORS
+    if errors_stacktrace:
+        _print_errors_stacktrace(errors_stacktrace)
 
     if any([message.startswith(_MESSAGE_TYPE_FAILED) for message in
-            all_messages]):
+            lint_messages]) or errors_stacktrace:
         python_utils.PRINT('---------------------------')
         python_utils.PRINT('Checks Not Passed.')
         python_utils.PRINT('---------------------------')

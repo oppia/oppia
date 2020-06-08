@@ -21,9 +21,12 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
+import { NewlyCreatedTopic } from
+  'domain/topics_and_skills_dashboard/NewlyCreatedTopicObjectFactory';
+
 export interface ITopicCreationBackend {
-  'abbreviated_name': string;
   name: string;
+  description: string;
 }
 
 @Injectable({
@@ -35,10 +38,10 @@ export class TopicCreationBackendApiService {
   _createTopic(
       successCallback: (value?: Object | PromiseLike<Object>) => void,
       errorCallback:(reason?: any) => void,
-      topicName, abbreviatedTopicName): void {
+      topic: NewlyCreatedTopic): void {
     let postData: ITopicCreationBackend = {
-      name: topicName,
-      abbreviated_name: abbreviatedTopicName
+      name: topic.name,
+      description: topic.description,
     };
     this.http.post(
       '/topic_editor_handler/create_new', postData).toPromise()
@@ -50,15 +53,15 @@ export class TopicCreationBackendApiService {
         }
       }, (errorResponse) => {
         if (errorCallback) {
-          errorCallback(errorResponse.body);
+          errorCallback(errorResponse.error);
         }
       });
   }
 
   createTopic(
-      topicName: string, abbreviatedTopicName: string): PromiseLike<Object> {
+      topic: NewlyCreatedTopic): PromiseLike<Object> {
     return new Promise((resolve, reject) => {
-      this._createTopic(resolve, reject, topicName, abbreviatedTopicName);
+      this._createTopic(resolve, reject, topic);
     });
   }
 }

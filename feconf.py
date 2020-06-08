@@ -187,7 +187,7 @@ CURRENT_STATE_SCHEMA_VERSION = 33
 CURRENT_COLLECTION_SCHEMA_VERSION = 6
 
 # The current version of story contents dict in the story schema.
-CURRENT_STORY_CONTENTS_SCHEMA_VERSION = 2
+CURRENT_STORY_CONTENTS_SCHEMA_VERSION = 3
 
 # The current version of skill contents dict in the skill schema.
 CURRENT_SKILL_CONTENTS_SCHEMA_VERSION = 1
@@ -554,6 +554,9 @@ ALLOWED_RTE_EXTENSIONS = {
     'Math': {
         'dir': os.path.join(RTE_EXTENSIONS_DIR, 'Math')
     },
+    'Svgeditor': {
+        'dir': os.path.join(RTE_EXTENSIONS_DIR, 'svgeditor')
+    },
     'Tabs': {
         'dir': os.path.join(RTE_EXTENSIONS_DIR, 'Tabs')
     },
@@ -800,8 +803,6 @@ TOP_UNRESOLVED_ANSWERS_COUNT_DASHBOARD = 3
 OPEN_FEEDBACK_COUNT_DASHBOARD = 3
 # NOTE TO DEVELOPERS: This should be synchronized with App.js.
 ENABLE_ML_CLASSIFIERS = False
-SHOW_COLLECTION_NAVIGATION_TAB_HISTORY = False
-SHOW_COLLECTION_NAVIGATION_TAB_STATS = False
 
 # The regular expression used to identify whether a string contains float value.
 # The regex must match with regex that is stored in vmconf.py file of Oppia-ml.
@@ -860,18 +861,6 @@ LIBRARY_GROUP_TOP_RATED = 'top_rated'
 DEFAULT_TOPIC_SIMILARITY = 0.5
 SAME_TOPIC_SIMILARITY = 1.0
 
-# The following are all page descriptions for the meta tag.
-CREATE_PAGE_DESCRIPTION = (
-    'Help others learn new things. Create lessons through explorations and '
-    'share your knowledge with the community.')
-CREATOR_DASHBOARD_PAGE_DESCRIPTION = (
-    'Keep track of the lessons you have created, as well as feedback from '
-    'learners.')
-LIBRARY_GROUP_PAGE_DESCRIPTION = (
-    'Discover top-rated or recently-published explorations on Oppia. Learn '
-    'from these explorations or help improve an existing one for the '
-    'community.')
-
 # The type of the response returned by a handler when an exception is raised.
 HANDLER_TYPE_HTML = 'html'
 HANDLER_TYPE_JSON = 'json'
@@ -922,7 +911,8 @@ RTE_CONTENT_SPEC = {
             'oppia-noninteractive-image': ['b', 'i', 'li', 'p', 'pre'],
             'oppia-noninteractive-collapsible': ['b', 'i', 'li', 'p', 'pre'],
             'oppia-noninteractive-video': ['b', 'i', 'li', 'p', 'pre'],
-            'oppia-noninteractive-tabs': ['b', 'i', 'li', 'p', 'pre']
+            'oppia-noninteractive-tabs': ['b', 'i', 'li', 'p', 'pre'],
+            'oppia-noninteractive-svgeditor': ['b', 'i', 'li', 'p', 'pre']
         },
         # Valid html tags in TextAngular.
         'ALLOWED_TAG_LIST': [
@@ -940,7 +930,8 @@ RTE_CONTENT_SPEC = {
             'oppia-noninteractive-image',
             'oppia-noninteractive-collapsible',
             'oppia-noninteractive-video',
-            'oppia-noninteractive-tabs'
+            'oppia-noninteractive-tabs',
+            'oppia-noninteractive-svgeditor'
         ]
     },
     'RTE_TYPE_CKEDITOR': {
@@ -958,6 +949,9 @@ RTE_CONTENT_SPEC = {
             'oppia-noninteractive-link': ['strong', 'em', 'li', 'p', 'pre'],
             'oppia-noninteractive-math': ['strong', 'em', 'li', 'p', 'pre'],
             'oppia-noninteractive-image': ['blockquote', 'li', '[document]'],
+            'oppia-noninteractive-svgeditor': [
+                'blockquote', 'li', '[document]'
+            ],
             'oppia-noninteractive-collapsible': [
                 'blockquote', 'li', '[document]'
             ],
@@ -980,7 +974,8 @@ RTE_CONTENT_SPEC = {
             'oppia-noninteractive-image',
             'oppia-noninteractive-collapsible',
             'oppia-noninteractive-video',
-            'oppia-noninteractive-tabs'
+            'oppia-noninteractive-tabs',
+            'oppia-noninteractive-svgeditor'
         ]
 
     }

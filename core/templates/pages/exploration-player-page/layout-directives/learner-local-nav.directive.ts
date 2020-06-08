@@ -16,6 +16,10 @@
  * @fileoverview Directive for the local navigation in the learner view.
  */
 
+require(
+  'components/common-layout-directives/common-elements/' +
+  'confirm-or-cancel-modal.controller.ts');
+
 require('domain/utilities/url-interpolation.service.ts');
 require('domain/exploration/read-only-exploration-backend-api.service.ts');
 require('pages/exploration-player-page/services/exploration-engine.service.ts');
@@ -46,14 +50,14 @@ angular.module('oppia').directive('learnerLocalNav', [
         'learner-local-nav.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$http', '$rootScope', '$uibModal', 'AlertsService',
+        '$http', '$uibModal', 'AlertsService', 'LoaderService',
         'ExplorationEngineService', 'ExplorationPlayerStateService',
         'FocusManagerService', 'ReadOnlyExplorationBackendApiService',
         'SuggestionModalForExplorationPlayerService',
         'UrlInterpolationService', 'UserService', 'FEEDBACK_POPOVER_PATH',
         'FLAG_EXPLORATION_URL_TEMPLATE',
         function(
-            $http, $rootScope, $uibModal, AlertsService,
+            $http, $uibModal, AlertsService, LoaderService,
             ExplorationEngineService, ExplorationPlayerStateService,
             FocusManagerService, ReadOnlyExplorationBackendApiService,
             SuggestionModalForExplorationPlayerService,
@@ -76,8 +80,15 @@ angular.module('oppia').directive('learnerLocalNav', [
                 'flag-exploration-modal.template.html'),
               backdrop: true,
               controller: [
-                '$scope', '$uibModalInstance', 'PlayerPositionService',
-                function($scope, $uibModalInstance, PlayerPositionService) {
+                '$controller', '$scope', '$uibModalInstance',
+                'PlayerPositionService',
+                function($controller, $scope, $uibModalInstance,
+                    PlayerPositionService) {
+                  $controller('ConfirmOrCancelModalController', {
+                    $scope: $scope,
+                    $uibModalInstance: $uibModalInstance
+                  });
+
                   $scope.flagMessageTextareaIsShown = false;
                   var stateName = PlayerPositionService.getCurrentStateName();
 
@@ -96,10 +107,6 @@ angular.module('oppia').directive('learnerLocalNav', [
                         state: stateName
                       });
                     }
-                  };
-
-                  $scope.cancel = function() {
-                    $uibModalInstance.dismiss('cancel');
                   };
                 }
               ]
@@ -122,18 +129,11 @@ angular.module('oppia').directive('learnerLocalNav', [
                   'pages/exploration-player-page/templates/' +
                   'exploration-successfully-flagged-modal.template.html'),
                 backdrop: true,
-                controller: [
-                  '$scope', '$uibModalInstance',
-                  function($scope, $uibModalInstance) {
-                    $scope.close = function() {
-                      $uibModalInstance.dismiss('cancel');
-                    };
-                  }
-                ]
+                controller: 'ConfirmOrCancelModalController'
               }).result.then(function() {}, function() {
                 // Note to developers:
-                // This callback is triggered when the Cancel button is
-                // clicked. No further action is needed.
+                // This callback is triggered when the Cancel button is clicked.
+                // No further action is needed.
               });
             }, function() {
               // Note to developers:
@@ -149,10 +149,10 @@ angular.module('oppia').directive('learnerLocalNav', [
                 ctrl.canEdit = exploration.can_edit;
               });
             ctrl.username = '';
-            $rootScope.loadingMessage = 'Loading';
+            LoaderService.showLoadingScreen('Loading');
             UserService.getUserInfoAsync().then(function(userInfo) {
               ctrl.username = userInfo.getUsername();
-              $rootScope.loadingMessage = '';
+              LoaderService.hideLoadingScreen();
             });
           };
         }

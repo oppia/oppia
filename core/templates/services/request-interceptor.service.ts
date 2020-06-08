@@ -17,8 +17,8 @@
  */
 
 import { from, Observable } from 'rxjs';
-import { HttpClient, HttpParams, HttpRequest,
-  HttpInterceptor, HttpEvent, HttpHandler } from '@angular/common/http';
+import { HttpRequest, HttpInterceptor,
+  HttpEvent, HttpHandler } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { switchMap } from 'rxjs/operators';
 
@@ -78,15 +78,18 @@ export class RequestInterceptor implements HttpInterceptor {
     if (request.body) {
       return from(this.csrf.getTokenAsync())
         .pipe(
-          switchMap(token => {
+          switchMap((token: string) => {
             if (request.method === 'POST' || request.method === 'PUT') {
-              var body = new HttpParams()
+              // If the body of the http request created is already in FormData
+              // form, no need to create the FormData object here.
+              if (!(request.body instanceof FormData)) {
+                var body = new FormData();
+                body.append('payload', JSON.stringify(request.body));
                 // @ts-ignore
-                .set('csrf_token', token)
-                .set('source', document.URL)
-                .set('payload', JSON.stringify(request.body));
-              // @ts-ignore
-              request.body = body;
+                request.body = body;
+              }
+              request.body.append('csrf_token', token);
+              request.body.append('source', document.URL);
             } else {
               // @ts-ignore
               request.body = {

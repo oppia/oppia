@@ -107,7 +107,7 @@ export class NumericInputValidationService {
         };
         switch (rule.type) {
           case 'Equals':
-            var x = rule.inputs.x;
+            var x = (<number>rule.inputs.x);
             setLowerAndUpperBounds(range, x, x, true, true);
             break;
           case 'IsInclusivelyBetween':
@@ -119,24 +119,24 @@ export class NumericInputValidationService {
             setLowerAndUpperBounds(range, a, b, true, true);
             break;
           case 'IsGreaterThan':
-            var x = rule.inputs.x;
+            var x = (<number>rule.inputs.x);
             setLowerAndUpperBounds(range, x, Infinity, false, false);
             break;
           case 'IsGreaterThanOrEqualTo':
-            var x = rule.inputs.x;
+            var x = (<number>rule.inputs.x);
             setLowerAndUpperBounds(range, x, Infinity, true, false);
             break;
           case 'IsLessThan':
-            var x = rule.inputs.x;
+            var x = (<number>rule.inputs.x);
             setLowerAndUpperBounds(range, -Infinity, x, false, false);
             break;
           case 'IsLessThanOrEqualTo':
-            var x = rule.inputs.x;
+            var x = (<number>rule.inputs.x);
             setLowerAndUpperBounds(range, -Infinity, x, false, true);
             break;
           case 'IsWithinTolerance':
-            var x = rule.inputs.x;
-            var tol = rule.inputs.tol;
+            var x = (<number>rule.inputs.x);
+            var tol = (<number>rule.inputs.tol);
             setLowerAndUpperBounds(range, x - tol, x + tol, true, true);
             break;
           default:
@@ -162,6 +162,38 @@ export class NumericInputValidationService {
         answerGroups, defaultOutcome, stateName));
 
     return warningsList;
+  }
+
+  getErrorString(value: string): string {
+    if (!value) {
+      return '';
+    }
+
+    value = value.toString().trim();
+    const trailingDot = /\.\d/g;
+    const twoDecimals = /.*\..*\./g;
+    const extraChars = /[^0-9.+-]/g;
+    const trailingMinus = /^-/g;
+    const extraMinus = /-.*-/g;
+
+    if (value.includes('.') && !value.match(trailingDot)) {
+      return 'Trailing decimals are not allowed.';
+    } else if (value.match(twoDecimals)) {
+      return 'At most 1 decimal point should be present.';
+    } else if (value.match(extraChars)) {
+      return 'Only use numbers, minus sign (-), and decimal (.).';
+    } else if (value.includes('-') && !value.match(trailingMinus)) {
+      return 'Minus (-) sign is only allowed in beginning.';
+    } else if (value.includes('-') && value.match(extraMinus)) {
+      return 'At most 1 minus (-) sign should be present.';
+    }
+  }
+
+  parseValue(viewValue: string): number {
+    if (viewValue) {
+      viewValue = viewValue.trim();
+      return parseFloat(viewValue);
+    }
   }
 }
 

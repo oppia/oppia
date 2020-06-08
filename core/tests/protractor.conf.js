@@ -65,10 +65,6 @@ var suites = {
       'protractor_desktop/explorationHistoryTab.js'
     ],
 
-    explorationImprovementsTab: [
-      'protractor_desktop/explorationImprovementsTab.js'
-    ],
-
     explorationStatisticsTab: [
       'protractor_desktop/explorationStatisticsTab.js'
     ],
@@ -362,6 +358,8 @@ exports.config = {
     // How to format features (default: progress)
     format: 'summary'
   },
+
+  SELENIUM_PROMISE_MANAGER: false,
 
   // ----- The cleanup step -----
   //

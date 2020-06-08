@@ -36,9 +36,9 @@ import utils
 from google.appengine.api import urlfetch
 
 current_user_services = models.Registry.import_current_user_services()
-(user_models,) = models.Registry.import_models([models.NAMES.user])
+(user_models, audit_models) = models.Registry.import_models(
+    [models.NAMES.user, models.NAMES.audit])
 
-MAX_USERNAME_LENGTH = 50
 # Size (in px) of the gravatar being retrieved.
 GRAVATAR_SIZE_PX = 150
 # Data url for images/avatar/user_blue_72px.png.
@@ -275,10 +275,10 @@ class UserSettings(python_utils.OBJECT):
         """
         if not username:
             raise utils.ValidationError('Empty username supplied.')
-        elif len(username) > MAX_USERNAME_LENGTH:
+        elif len(username) > constants.MAX_USERNAME_LENGTH:
             raise utils.ValidationError(
                 'A username can have at most %s characters.'
-                % MAX_USERNAME_LENGTH)
+                % constants.MAX_USERNAME_LENGTH)
         elif not re.match(feconf.ALPHANUMERIC_REGEX, username):
             raise utils.ValidationError(
                 'Usernames can only have alphanumeric characters.')
@@ -680,36 +680,46 @@ def _save_user_settings(user_settings):
         user_settings: UserSettings domain object.
     """
     user_settings.validate()
-    user_models.UserSettingsModel(
-        id=user_settings.user_id,
-        gae_id=user_settings.gae_id,
-        email=user_settings.email,
-        role=user_settings.role,
-        username=user_settings.username,
-        normalized_username=user_settings.normalized_username,
-        last_agreed_to_terms=user_settings.last_agreed_to_terms,
-        last_started_state_editor_tutorial=(
+
+    user_settings_dict = {
+        'gae_id': user_settings.gae_id,
+        'email': user_settings.email,
+        'role': user_settings.role,
+        'username': user_settings.username,
+        'normalized_username': user_settings.normalized_username,
+        'last_agreed_to_terms': user_settings.last_agreed_to_terms,
+        'last_started_state_editor_tutorial': (
             user_settings.last_started_state_editor_tutorial),
-        last_started_state_translation_tutorial=(
+        'last_started_state_translation_tutorial': (
             user_settings.last_started_state_translation_tutorial),
-        last_logged_in=user_settings.last_logged_in,
-        last_edited_an_exploration=user_settings.last_edited_an_exploration,
-        last_created_an_exploration=(
+        'last_logged_in': user_settings.last_logged_in,
+        'last_edited_an_exploration': user_settings.last_edited_an_exploration,
+        'last_created_an_exploration': (
             user_settings.last_created_an_exploration),
-        profile_picture_data_url=user_settings.profile_picture_data_url,
-        default_dashboard=user_settings.default_dashboard,
-        creator_dashboard_display_pref=(
+        'profile_picture_data_url': user_settings.profile_picture_data_url,
+        'default_dashboard': user_settings.default_dashboard,
+        'creator_dashboard_display_pref': (
             user_settings.creator_dashboard_display_pref),
-        user_bio=user_settings.user_bio,
-        subject_interests=user_settings.subject_interests,
-        first_contribution_msec=user_settings.first_contribution_msec,
-        preferred_language_codes=user_settings.preferred_language_codes,
-        preferred_site_language_code=(
+        'user_bio': user_settings.user_bio,
+        'subject_interests': user_settings.subject_interests,
+        'first_contribution_msec': user_settings.first_contribution_msec,
+        'preferred_language_codes': user_settings.preferred_language_codes,
+        'preferred_site_language_code': (
             user_settings.preferred_site_language_code),
-        preferred_audio_language_code=(
+        'preferred_audio_language_code': (
             user_settings.preferred_audio_language_code),
-        deleted=user_settings.deleted
-    ).put()
+        'deleted': user_settings.deleted
+    }
+
+    # If user with the given user_id already exists, update that model
+    # with the given user settings, otherwise, create a new one.
+    user_model = user_models.UserSettingsModel.get_by_id(user_settings.user_id)
+    if user_model is not None:
+        user_model.populate(**user_settings_dict)
+        user_model.put()
+    else:
+        user_settings_dict['id'] = user_settings.user_id
+        user_models.UserSettingsModel(**user_settings_dict).put()
 
 
 def _transform_user_settings(user_settings_model):
@@ -822,8 +832,7 @@ def create_new_user(gae_id, email):
     if user_settings is not None:
         raise Exception('User %s already exists.' % gae_id)
 
-    # TODO(#7848): Generate user_id together with the migration.
-    user_id = gae_id
+    user_id = user_models.UserSettingsModel.get_new_id('')
     user_settings = UserSettings(
         user_id, gae_id, email, feconf.ROLE_ID_EXPLORATION_EDITOR,
         preferred_language_codes=[constants.DEFAULT_LANGUAGE_CODE])
@@ -877,8 +886,6 @@ def get_usernames(user_ids):
     return usernames
 
 
-# NB: If we ever allow usernames to change, update the
-# config_domain.BANNED_USERNAMES property.
 def set_username(user_id, new_username):
     """Updates the username of the user with the given user_id.
 
@@ -2002,3 +2009,19 @@ def get_community_reviewer_usernames(review_category, language_code=None):
         raise Exception('Invalid review category: %s' % review_category)
 
     return get_usernames(reviewer_ids)
+
+
+def log_username_change(committer_id, old_username, new_username):
+    """Stores the query to role structure in UsernameChangeAuditModel.
+
+    Args:
+        committer_id: str. The ID of the user that is making the change.
+        old_username: str. The current username that is being changed.
+        new_username: str. The new username that the current one is being
+            changed to.
+    """
+
+    model_id = '%s.%d' % (committer_id, utils.get_current_time_in_millisecs())
+    audit_models.UsernameChangeAuditModel(
+        id=model_id, committer_id=committer_id, old_username=old_username,
+        new_username=new_username).put()

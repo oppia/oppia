@@ -15,6 +15,10 @@
 /**
  * @fileoverview Directive for managing the state responses in the state editor.
  */
+
+require(
+  'components/common-layout-directives/common-elements/' +
+  'confirm-or-cancel-modal.controller.ts');
 require(
   'components/state-directives/answer-group-editor/' +
   'answer-group-editor.directive.ts');
@@ -28,6 +32,9 @@ require(
   'components/state-directives/outcome-editor/' +
   'outcome-feedback-editor.directive.ts');
 require('components/state-directives/rule-editor/rule-editor.directive.ts');
+require(
+  'pages/exploration-editor-page/editor-tab/templates/modal-templates/' +
+  'add-answer-group-modal.controller.ts');
 
 require('domain/exploration/AnswerGroupObjectFactory.ts');
 require('domain/exploration/HintObjectFactory.ts');
@@ -303,70 +310,18 @@ angular.module('oppia').directive('stateResponses', [
                 'modal-templates/add-answer-group-modal.template.html'),
               // Clicking outside this modal should not dismiss it.
               backdrop: 'static',
-              controller: [
-                '$scope', '$uibModalInstance', 'EditorFirstTimeEventsService',
-                'GenerateContentIdService', 'OutcomeObjectFactory',
-                'ResponsesService', 'RuleObjectFactory', 'StateEditorService',
-                'COMPONENT_NAME_FEEDBACK', 'INTERACTION_SPECS',
-                function(
-                    $scope, $uibModalInstance, EditorFirstTimeEventsService,
-                    GenerateContentIdService, OutcomeObjectFactory,
-                    ResponsesService, RuleObjectFactory, StateEditorService,
-                    COMPONENT_NAME_FEEDBACK, INTERACTION_SPECS) {
-                  $scope.feedbackEditorIsOpen = false;
-                  $scope.addState = addState;
-                  $scope.questionModeEnabled =
-                    StateEditorService.isInQuestionMode();
-                  $scope.openFeedbackEditor = function() {
-                    $scope.feedbackEditorIsOpen = true;
-                  };
-                  $scope.isCorrectnessFeedbackEnabled = function() {
-                    return StateEditorService.getCorrectnessFeedbackEnabled();
-                  };
-                  // This returns false if the current interaction ID is null.
-                  $scope.isCurrentInteractionLinear = function() {
-                    return (
-                      currentInteractionId &&
-                      INTERACTION_SPECS[currentInteractionId].is_linear);
-                  };
-                  $scope.tmpRule = RuleObjectFactory.createNew(null, {});
-                  var feedbackContentId = GenerateContentIdService.getNextId(
-                    existingContentIds, COMPONENT_NAME_FEEDBACK);
-                  $scope.tmpOutcome = OutcomeObjectFactory.createNew(
-                    $scope.questionModeEnabled ? null : stateName,
-                    feedbackContentId, '', []);
-
-                  $scope.isSelfLoopWithNoFeedback = function(tmpOutcome) {
-                    return (
-                      tmpOutcome.dest ===
-                      stateName && !tmpOutcome.hasNonemptyFeedback());
-                  };
-
-                  $scope.addAnswerGroupForm = {};
-
-                  $scope.saveResponse = function(reopen) {
-                    $scope.$broadcast('saveOutcomeFeedbackDetails');
-                    $scope.$broadcast('saveOutcomeDestDetails');
-
-                    EditorFirstTimeEventsService.registerFirstSaveRuleEvent();
-                    // Close the modal and save it afterwards.
-                    $uibModalInstance.close({
-                      tmpRule: angular.copy($scope.tmpRule),
-                      tmpOutcome: angular.copy($scope.tmpOutcome),
-                      reopen: reopen
-                    });
-                  };
-
-                  $scope.cancel = function() {
-                    $uibModalInstance.dismiss('cancel');
-                    AlertsService.clearWarnings();
-                  };
-                }
-              ]
+              resolve: {
+                addState: () => addState,
+                currentInteractionId: () => currentInteractionId,
+                existingContentIds: () => existingContentIds,
+                stateName: () => stateName,
+              },
+              controller: 'AddAnswerGroupModalController'
             }).result.then(function(result) {
               // Create a new answer group.
               $scope.answerGroups.push(AnswerGroupObjectFactory.createNew(
-                [result.tmpRule], result.tmpOutcome, [], null));
+                [result.tmpRule], result.tmpOutcome, [],
+                result.tmpTaggedSkillMisconceptionId));
               ResponsesService.save(
                 $scope.answerGroups, $scope.defaultOutcome,
                 function(newAnswerGroups, newDefaultOutcome) {
@@ -383,9 +338,7 @@ angular.module('oppia').directive('stateResponses', [
                 $scope.openAddAnswerGroupModal();
               }
             }, function() {
-              // Note to developers:
-              // This callback is triggered when the Cancel button is clicked.
-              // No further action is needed.
+              AlertsService.clearWarnings();
             });
           };
 
@@ -400,19 +353,7 @@ angular.module('oppia').directive('stateResponses', [
                 '/pages/exploration-editor-page/editor-tab/templates/' +
                 'modal-templates/delete-answer-group-modal.template.html'),
               backdrop: true,
-              controller: [
-                '$scope', '$uibModalInstance', function(
-                    $scope, $uibModalInstance) {
-                  $scope.reallyDelete = function() {
-                    $uibModalInstance.close();
-                  };
-
-                  $scope.cancel = function() {
-                    $uibModalInstance.dismiss('cancel');
-                    AlertsService.clearWarnings();
-                  };
-                }
-              ]
+              controller: 'ConfirmOrCancelModalController'
             }).result.then(function() {
               ResponsesService.deleteAnswerGroup(
                 index, function(newAnswerGroups) {
@@ -420,9 +361,7 @@ angular.module('oppia').directive('stateResponses', [
                   $scope.refreshWarnings()();
                 });
             }, function() {
-              // Note to developers:
-              // This callback is triggered when the Cancel button is clicked.
-              // No further action is needed.
+              AlertsService.clearWarnings();
             });
           };
 

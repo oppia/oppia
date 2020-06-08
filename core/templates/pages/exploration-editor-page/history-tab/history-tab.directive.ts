@@ -20,6 +20,9 @@ require('components/profile-link-directives/profile-link-text.directive.ts');
 require(
   'components/version-diff-visualization/' +
   'version-diff-visualization.directive.ts');
+require(
+  'pages/exploration-editor-page/history-tab/modal-templates/' +
+  'revert-exploration-modal.controller.ts');
 
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/exploration-editor-page/services/exploration-data.service.ts');
@@ -43,12 +46,12 @@ angular.module('oppia').directive('historyTab', [
         'history-tab.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$http', '$log', '$rootScope', '$scope',
+        '$http', '$log', '$scope', 'LoaderService',
         '$uibModal', '$window', 'CompareVersionsService',
         'DateTimeFormatService', 'EditabilityService', 'ExplorationDataService',
         'UrlInterpolationService', 'VersionTreeService',
         function(
-            $http, $log, $rootScope, $scope,
+            $http, $log, $scope, LoaderService,
             $uibModal, $window, CompareVersionsService,
             DateTimeFormatService, EditabilityService, ExplorationDataService,
             UrlInterpolationService, VersionTreeService) {
@@ -102,7 +105,7 @@ angular.module('oppia').directive('historyTab', [
 
           // Refreshes the displayed version history log.
           ctrl.refreshVersionHistory = function() {
-            $rootScope.loadingMessage = 'Loading';
+            LoaderService.showLoadingScreen('Loading');
             ExplorationDataService.getData().then(function(data) {
               var currentVersion = data.version;
               ctrl.currentVersion = currentVersion;
@@ -156,7 +159,7 @@ angular.module('oppia').directive('historyTab', [
                       selected: false
                     });
                   }
-                  $rootScope.loadingMessage = '';
+                  LoaderService.hideLoadingScreen();
                   ctrl.computeVersionsToDisplay();
                 });
             });
@@ -237,29 +240,7 @@ angular.module('oppia').directive('historyTab', [
                   return version;
                 }
               },
-              controller: [
-                '$scope', '$uibModalInstance', 'version',
-                'ExplorationDataService',
-                function(
-                    $scope, $uibModalInstance, version,
-                    ExplorationDataService) {
-                  $scope.version = version;
-
-                  $scope.getExplorationUrl = function(version) {
-                    return (
-                      '/explore/' + ExplorationDataService.explorationId +
-                      '?v=' + version);
-                  };
-
-                  $scope.revert = function() {
-                    $uibModalInstance.close(version);
-                  };
-
-                  $scope.cancel = function() {
-                    $uibModalInstance.dismiss('cancel');
-                  };
-                }
-              ]
+              controller: 'RevertExplorationModalController'
             }).result.then(function(version) {
               $http.post(ctrl.revertExplorationUrl, {
                 current_version: ExplorationDataService.data.version,
@@ -267,6 +248,10 @@ angular.module('oppia').directive('historyTab', [
               }).then(function() {
                 $window.location.reload();
               });
+            }, function() {
+              // Note to developers:
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
             });
           };
 
