@@ -21,45 +21,65 @@ require(
   'components/common-layout-directives/common-elements/' +
   'background-banner.component.ts');
 require('components/skills-mastery-list/skills-mastery-list.directive.ts');
+require('pages/topic-viewer-page/info-tab/topic-info-tab.directive.ts');
 require(
   'pages/topic-viewer-page/stories-list/' +
   'topic-viewer-stories-list.directive.ts');
 require('pages/topic-viewer-page/subtopics-list/subtopics-list.directive.ts');
 require('pages/topic-viewer-page/practice-tab/practice-tab.directive.ts');
+require('domain/topic_viewer/topic-viewer-backend-api.service.ts');
+require('services/alerts.service.ts');
+require('services/page-title.service.ts');
+require('services/contextual/url.service.ts');
+require('services/contextual/window-dimensions.service.ts');
 
 angular.module('oppia').component('topicViewerPage', {
   template: require('./topic-viewer-page.component.html'),
   controller: [
     '$rootScope', 'AlertsService', 'LoaderService',
     'PageTitleService', 'TopicViewerBackendApiService',
-    'UrlService', 'WindowDimensionsService', 'FATAL_ERROR_CODES',
+    'UrlInterpolationService', 'UrlService', 'WindowDimensionsService',
+    'FATAL_ERROR_CODES',
     function(
         $rootScope, AlertsService, LoaderService,
         PageTitleService, TopicViewerBackendApiService,
-        UrlService, WindowDimensionsService, FATAL_ERROR_CODES) {
+        UrlInterpolationService, UrlService, WindowDimensionsService,
+        FATAL_ERROR_CODES) {
       var ctrl = this;
       ctrl.setActiveTab = function(newActiveTabName) {
         ctrl.activeTab = newActiveTabName;
+      };
+      ctrl.getStaticImageUrl = function(imagePath) {
+        return UrlInterpolationService.getStaticImageUrl(imagePath);
       };
       ctrl.checkMobileView = function() {
         return (WindowDimensionsService.getWidth() < 500);
       };
       ctrl.$onInit = function() {
-        ctrl.canonicalStoriesList = [];
-        ctrl.setActiveTab('story');
+        ctrl.canonicalStorySummaries = [];
+        ctrl.setActiveTab('info');
         ctrl.topicName = UrlService.getTopicNameFromLearnerUrl();
 
         PageTitleService.setPageTitle(ctrl.topicName + ' - Oppia');
 
         LoaderService.showLoadingScreen('Loading');
+        ctrl.topicIsLoading = true;
         TopicViewerBackendApiService.fetchTopicData(ctrl.topicName).then(
           function(readOnlyTopic) {
             ctrl.topicId = readOnlyTopic.getTopicId();
-            ctrl.canonicalStoriesList = (
+            ctrl.topicName = readOnlyTopic.getTopicName();
+            ctrl.topicDescription = readOnlyTopic.getTopicDescription();
+            ctrl.canonicalStorySummaries = (
               readOnlyTopic.getCanonicalStorySummaries());
+            ctrl.chapterCount = 0;
+            for (var idx in ctrl.canonicalStorySummaries) {
+              ctrl.chapterCount += (
+                ctrl.canonicalStorySummaries[idx].getNodeTitles().length);
+            }
             ctrl.degreesOfMastery = readOnlyTopic.getDegreesOfMastery();
             ctrl.subtopics = readOnlyTopic.getSubtopics();
             ctrl.skillDescriptions = readOnlyTopic.getSkillDescriptions();
+            ctrl.topicIsLoading = false;
             LoaderService.hideLoadingScreen();
             ctrl.trainTabShouldBeDisplayed = (
               readOnlyTopic.getTrainTabShouldBeDisplayed());

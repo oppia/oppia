@@ -27,6 +27,9 @@ require(
 require('interactions/interactionsQuestionsRequires.ts');
 require('objects/objectComponentsRequiresForPlayers.ts');
 
+require('services/alerts.service.ts');
+require('services/contextual/url.service.ts');
+require('services/page-title.service.ts');
 require('pages/practice-session-page/practice-session-page.constants.ajs.ts');
 require('pages/interaction-specs.constants.ajs.ts');
 
@@ -45,11 +48,13 @@ angular.module('oppia').component('practiceSessionPage', {
         var practiceSessionsDataUrl = UrlInterpolationService
           .interpolateUrl(
             PRACTICE_SESSIONS_DATA_URL, {
-              topic_name: ctrl.topicName
+              topic_name: ctrl.topicName,
+              comma_separated_subtopic_ids: ctrl.commaSeparatedSubtopicIds
             });
         var practiceSessionsUrl = UrlInterpolationService.interpolateUrl(
           PRACTICE_SESSIONS_URL, {
-            topic_name: ctrl.topicName
+            topic_name: ctrl.topicName,
+            comma_separated_subtopic_ids: ctrl.commaSeparatedSubtopicIds
           });
         var topicViewerUrl = UrlInterpolationService.interpolateUrl(
           TOPIC_VIEWER_PAGE, {
@@ -58,10 +63,10 @@ angular.module('oppia').component('practiceSessionPage', {
         $http.get(practiceSessionsDataUrl).then(function(result) {
           var skillList = [];
           var skillDescriptions = [];
-          for (var skillId in result.data.skill_descriptions) {
+          for (var skillId in result.data.skill_ids_to_descriptions_map) {
             skillList.push(skillId);
             skillDescriptions.push(
-              result.data.skill_descriptions[skillId]);
+              result.data.skill_ids_to_descriptions_map[skillId]);
           }
           var questionPlayerConfig = {
             resultActionButtons: [
@@ -90,6 +95,8 @@ angular.module('oppia').component('practiceSessionPage', {
       };
       ctrl.$onInit = function() {
         ctrl.topicName = UrlService.getTopicNameFromLearnerUrl();
+        ctrl.commaSeparatedSubtopicIds = (
+          UrlService.getSelectedSubtopicsFromUrl());
         _fetchSkillDetails();
         PageTitleService.setPageTitle(
           'Practice Session: ' + ctrl.topicName + ' - Oppia');
