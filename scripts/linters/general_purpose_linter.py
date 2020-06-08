@@ -165,7 +165,8 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
         'message': 'The directives must be directly referenced.',
         'excluded_files': (
             'core/templates/pages/community-dashboard-page/' +
-                'translation-language-select/',
+                'translation-language-select/' +
+                'translation-language-select.component.ts'
             'core/templates/pages/exploration-player-page/'
             'FeedbackPopupDirective.js',
         ),
@@ -265,10 +266,7 @@ BAD_LINE_PATTERNS_HTML_REGEXP = [
     {
         'regexp': re.compile(r'text\/ng-template'),
         'message': 'The directives must be directly referenced.',
-        'excluded_files': (
-            'core/templates/pages/community-dashboard-page/' +
-                'translation-language-select/'
-        ),
+        'excluded_files': (),
         'excluded_dirs': (
             'extensions/answer_summarizers/',
             'extensions/classifiers/',
