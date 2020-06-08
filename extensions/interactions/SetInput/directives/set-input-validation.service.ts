@@ -46,9 +46,9 @@ export class SetInputValidationService {
   /**
   * Checks if the two sets are identical.
   *
-  * @param {string[]} inputA - first set
-  * @param {string[]} inputB - second set
-  * @return {boolean} True if the two sets are identical
+  * @param {string[]} inputA - first set.
+  * @param {string[]} inputB - second set.
+  * @return {boolean} True if the two sets are identical.
   */
   private isSameSet(inputA: string[], inputB: string[]): boolean {
     let setA = new Set(inputA);
@@ -62,8 +62,8 @@ export class SetInputValidationService {
   /**
   * Checks if the first set is a subset of the second set.
   *
-  * @param {string[]} inputA - first set
-  * @param {string[]} inputB - second set
+  * @param {string[]} inputA - first set.
+  * @param {string[]} inputB - second set.
   * @return {boolean} True if the first set is a subset of the second set.
   */
   private isSubset(inputA: string[], inputB: string[]): boolean {
@@ -74,8 +74,8 @@ export class SetInputValidationService {
   /**
   * Checks if the two rules are identical.
   *
-  * @param {Rule} ruleA - first rule
-  * @param {Rule} ruleB - second rule
+  * @param {Rule} ruleA - first rule.
+  * @param {Rule} ruleB - second rule.
   * @return {boolean} True if the two rules are identical.
   */
   private isSameRule(ruleA: Rule, ruleB: Rule): boolean {
@@ -113,8 +113,8 @@ export class SetInputValidationService {
   * Generate warnings for redundant rules in answer groups.
   * A rule is considered redundant if it will never be matched.
   *
-  * @param {AnswerGroup[]} answerGroups - answer groups created from user input
-  * @return {IWarning[]} Array of warnings
+  * @param {AnswerGroup[]} answerGroups - answer groups created from user input.
+  * @return {IWarning[]} Array of warnings.
   */
   getRedundantRuleWarnings(answerGroups: AnswerGroup[]): IWarning[] {
     let warningsList: IWarning[] = [];
@@ -139,7 +139,7 @@ export class SetInputValidationService {
               - they are of the same type, and
               - they are not 'Equal' rules, and
               - A's input is the subset of B's input or vice versa,
-                depending on their rule types
+                depending on their rule types.
             */
             let isRuleCoveredByAnyPrevRule = false;
             let ruleInput = <string[]>rule.inputs.x;
