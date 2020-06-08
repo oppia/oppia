@@ -29,6 +29,12 @@ import { Rule } from
   'domain/exploration/RuleObjectFactory';
 import { AppConstants } from 'app.constants';
 
+interface IPreviousRule {
+  answerGroupIndex: number;
+  ruleIndex: number;
+  rule: Rule;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -37,26 +43,29 @@ export class SetInputValidationService {
     private baseInteractionValidationServiceInstance:
       baseInteractionValidationService) {}
 
+  /**
+  * Checks if the two sets are identical
+  */
   private isSameSet(inputA: string[], inputB: string[]): boolean {
     let setA = new Set(inputA);
     let setB = new Set(inputB);
     if (setA.size !== setB.size) {
       return false;
     }
-    for (let element of setA.values()) {
-      if (!setB.has(element)) {
-        return false;
-      }
-    }
-    return true;
+    return this.isSubset(inputA, inputB);
   }
 
+  /**
+  * Checks if the first set is a subset of the second set
+  */
   private isSubset(inputA: string[], inputB: string[]): boolean {
-    // Checks if set inputA is a subset of inputB.
     let setB = new Set(inputB);
     return inputA.every(val => setB.has(val));
   }
 
+  /**
+  * Checks if the two rules are identical
+  */
   private isSameRule(ruleA: Rule, ruleB: Rule): boolean {
     return ruleA.type === ruleB.type &&
       this.isSameSet(<string[]>ruleA.inputs.x, <string[]>ruleB.inputs.x);
@@ -91,11 +100,7 @@ export class SetInputValidationService {
   getRedundantRuleWarnings(answerGroups: AnswerGroup[]): IWarning[] {
     let warningsList: IWarning[] = [];
 
-    let previousRules: Array<{
-      answerGroupIndex: number,
-      ruleIndex: number,
-      rule: Rule
-    }> = [];
+    let previousRules: IPreviousRule[] = [];
 
     for (let [answerGroupIndex, answerGroup] of answerGroups.entries()) {
       for (let [ruleIndex, rule] of answerGroup.rules.entries()) {
@@ -109,8 +114,14 @@ export class SetInputValidationService {
                 `answer group ${prevRule.answerGroupIndex + 1}`
             });
           } else if (prevRule.rule.type === rule.type) {
-            // Only consider rules of the same type as the previous rule
-            // of the same tyle might 'cover' the following one.
+            /*
+            For setInput, a rule A is made redundant by rule B only when:
+              - rule B appears before rule A, and
+              - they are of the same type, and
+              - they are not 'Equal' rules, and
+              - A's input is the subset of B's input or vice versa,
+                depending on their rule types
+            */
             let isRuleCoveredByAnyPrevRule = false;
             let ruleInput = <string[]>rule.inputs.x;
             let prevRuleInput = <string[]>prevRule.rule.inputs.x;
