@@ -72,6 +72,7 @@ ONE_OFF_JOB_MANAGERS = [
     stats_jobs_one_off.StatisticsAuditV1,
     stats_jobs_one_off.StatisticsAuditV2,
     stats_jobs_one_off.StatisticsAudit,
+    story_jobs_one_off.RegenerateStorySummaryOneOffJob,
     story_jobs_one_off.StoryMigrationOneOffJob,
     suggestion_jobs_one_off.SuggestionMathMigrationOneOffJob,
     suggestion_jobs_one_off.SuggestionMathRteAuditOneOffJob,

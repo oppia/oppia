@@ -20,26 +20,23 @@ require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
 
-require(
-  'components/state-editor/state-editor-properties-services/' +
-  'state-editor.service.ts');
 require('domain/editor/undo_redo/question-undo-redo.service.ts');
-require('domain/skill/MisconceptionObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require(
   'pages/community-dashboard-page/services/' +
   'question-suggestion.service.ts');
 require('services/alerts.service.ts');
+require('services/question-validation.service.ts');
 
 angular.module('oppia').controller('QuestionSuggestionEditorModalController', [
   '$scope', '$uibModal', '$uibModalInstance', 'AlertsService',
-  'MisconceptionObjectFactory', 'QuestionSuggestionService',
-  'QuestionUndoRedoService', 'StateEditorService', 'UrlInterpolationService',
+  'QuestionSuggestionService', 'QuestionUndoRedoService',
+  'QuestionValidationService', 'UrlInterpolationService',
   'question', 'questionId', 'questionStateData', 'skill', 'skillDifficulty',
   function(
       $scope, $uibModal, $uibModalInstance, AlertsService,
-      MisconceptionObjectFactory, QuestionSuggestionService,
-      QuestionUndoRedoService, StateEditorService, UrlInterpolationService,
+      QuestionSuggestionService, QuestionUndoRedoService,
+      QuestionValidationService, UrlInterpolationService,
       question, questionId, questionStateData, skill, skillDifficulty) {
     $scope.canEditQuestion = true;
     $scope.newQuestionIsBeingCreated = true;
@@ -49,28 +46,10 @@ angular.module('oppia').controller('QuestionSuggestionEditorModalController', [
     $scope.skill = skill;
     $scope.skillDifficulty = skillDifficulty;
     $scope.misconceptionsBySkill = {};
-    $scope.misconceptionsBySkill[$scope.skill.getId()] =
-      $scope.skill.getMisconceptions().map(
-        function(misconceptionsBackendDict) {
-          return MisconceptionObjectFactory
-            .createFromBackendDict(misconceptionsBackendDict);
-        });
-    $scope.removeErrors = function() {
-      $scope.validationError = null;
-    };
-    $scope.questionChanged = function() {
-      $scope.removeErrors();
-    };
+    $scope.misconceptionsBySkill[$scope.skill.getId()] = (
+      $scope.skill.getMisconceptions());
     $scope.done = function() {
-      $scope.validationError = $scope.question.validate(
-        $scope.misconceptionsBySkill);
-      if ($scope.validationError) {
-        return;
-      }
-      if (!StateEditorService.isCurrentSolutionValid()) {
-        $scope.validationError =
-          'The solution is invalid and does not ' +
-          'correspond to a correct answer';
+      if (!$scope.isQuestionValid()) {
         return;
       }
       QuestionSuggestionService.submitSuggestion(
@@ -80,10 +59,10 @@ angular.module('oppia').controller('QuestionSuggestionEditorModalController', [
       $uibModalInstance.close();
     };
     // Checking if Question contains all requirements to enable
-    // Save and Publish Question
-    $scope.isSaveButtonDisabled = function() {
-      return $scope.question.validate(
-        $scope.misconceptionsBySkill);
+    // Save and Publish Question.
+    $scope.isQuestionValid = function() {
+      return QuestionValidationService.isQuestionValid(
+        $scope.question, $scope.misconceptionsBySkill);
     };
 
     $scope.cancel = function() {
