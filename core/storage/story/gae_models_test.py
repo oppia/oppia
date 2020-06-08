@@ -134,7 +134,9 @@ class StorySummaryModelTest(test_utils.GenericTestBase):
             story_model_last_updated=datetime.datetime.utcnow(),
             story_model_created_on=datetime.datetime.utcnow(),
             language_code='language_code',
-            node_count=2,
+            node_titles=['Chapter 1'],
+            thumbnail_filename='image.svg',
+            thumbnail_bg_color='#F8BF74',
             version=1)
         story_summary_model.put()
         story_summary_by_id = story_models.StorySummaryModel.get_by_id('id')
@@ -142,5 +144,7 @@ class StorySummaryModelTest(test_utils.GenericTestBase):
         self.assertEqual(story_summary_by_id.description, 'description')
         self.assertEqual(story_summary_by_id.title, 'title')
         self.assertEqual(story_summary_by_id.language_code, 'language_code')
-        self.assertEqual(story_summary_by_id.node_count, 2)
+        self.assertEqual(story_summary_by_id.node_titles, ['Chapter 1'])
+        self.assertEqual(story_summary_by_id.thumbnail_bg_color, '#F8BF74')
+        self.assertEqual(story_summary_by_id.thumbnail_filename, 'image.svg')
         self.assertEqual(story_summary_by_id.version, 1)
