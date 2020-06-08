@@ -98,7 +98,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'collection-statistics-tab.directive.ts',
     'collection-summary-tile.directive.ts',
     'collection-update.service.ts',
-    'CollectionNodeObjectFactory.ts',
+    'collection-node-object.factory.ts',
     'CollectionObjectFactory.ts',
     'CollectionPlaythroughObjectFactory.ts',
     'community-dashboard-page.component.ts',
