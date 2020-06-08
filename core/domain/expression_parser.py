@@ -16,11 +16,13 @@
 
 It uses the following grammar in Backus-Naur form:
 
+# Non-terminals
 <expr> ::= <mul_expr> (('+' | '-') <mul_expr>)*
 <mul_expr> ::= <pow_expr> (('*' | '/') <pow_expr>)*
 <pow_expr> ::= '-' <pow_expr> | '+' <pow_expr> | <unit> ('^' <pow_expr>)?
-
 <unit> ::= <identifier> | <number> | '(' <expr> ')' | <function> '(' <expr> ')'
+
+# Terminals
 <number> ::= r'[0-9]+.[0-9]+|[0-9]+'
 <identifier> ::= r'[a-zA-Z]' | 'alpha' | 'beta' | 'gamma' | 'theta' | 'epsilon'
 | 'pi' | 'omega'
@@ -372,14 +374,14 @@ class Parser(python_utils.OBJECT):
             Node. Root node of the generated parse tree.
         """
         parsed_expr = self.parse_mul_expr()
-        operator_token = self.get_next_token_if_token_in(['+', '-'])
+        operator_token = self._get_next_token_if_token_in(['+', '-'])
         while operator_token:
             parsed_right = self.parse_mul_expr()
             if operator_token.text == '+':
                 parsed_expr = AdditionOperatorNode(parsed_expr, parsed_right)
             else:
                 parsed_expr = SubtractionOperatorNode(parsed_expr, parsed_right)
-            operator_token = self.get_next_token_if_token_in(['+', '-'])
+            operator_token = self._get_next_token_if_token_in(['+', '-'])
         return parsed_expr
 
     def parse_mul_expr(self):
@@ -390,7 +392,7 @@ class Parser(python_utils.OBJECT):
             Node. Root node of the generated parse tree.
         """
         parsed_expr = self.parse_pow_expr()
-        operator_token = self.get_next_token_if_token_in(['*', '/'])
+        operator_token = self._get_next_token_if_token_in(['*', '/'])
         while operator_token:
             parsed_right = self.parse_pow_expr()
             if operator_token.text == '*':
@@ -398,7 +400,7 @@ class Parser(python_utils.OBJECT):
                     parsed_expr, parsed_right)
             else:
                 parsed_expr = DivisionOperatorNode(parsed_expr, parsed_right)
-            operator_token = self.get_next_token_if_token_in(['*', '/'])
+            operator_token = self._get_next_token_if_token_in(['*', '/'])
         return parsed_expr
 
     def parse_pow_expr(self):
@@ -411,11 +413,11 @@ class Parser(python_utils.OBJECT):
         """
         # Eliminate any leading unary '+' or '-' operators, because they
         # are syntactically irrelevant.
-        while self.get_next_token_if_token_in(['+', '-']):
+        while self._get_next_token_if_token_in(['+', '-']):
             pass
 
         parsed_expr = self.parse_unit()
-        operator_token = self.get_next_token_if_token_in(['^'])
+        operator_token = self._get_next_token_if_token_in(['^'])
         if operator_token:
             # Using recursion for right-associative ^ operator.
             parsed_right = self.parse_pow_expr()
@@ -433,14 +435,14 @@ class Parser(python_utils.OBJECT):
         Raises:
             Exception: Invalid token.
         """
-        token = self.get_next_token()
+        token = self._get_next_token()
         if token.category == _TOKEN_CATEGORY_IDENTIFIER:
             return IdentifierNode(token)
 
         if token.category == _TOKEN_CATEGORY_FUNCTION:
-            if self.get_next_token_if_token_in(['(']):
+            if self._get_next_token_if_token_in(['(']):
                 parsed_child = self._parse_expr()
-                self.expect_token(')')
+                self._expect_token(')')
                 return UnaryFunctionNode(token, parsed_child)
 
         if token.category == _TOKEN_CATEGORY_NUMBER:
@@ -448,12 +450,12 @@ class Parser(python_utils.OBJECT):
 
         if token.text == '(':
             parsed_expr = self._parse_expr()
-            self.expect_token(')')
+            self._expect_token(')')
             return parsed_expr
 
         raise Exception('Invalid token: %s.' % token.text)
 
-    def check_next_token(self):
+    def _check_next_token(self):
         """Function to peek into the next position to see the next token. This
         is done without incrementing 'next_token_index'.
 
@@ -464,7 +466,7 @@ class Parser(python_utils.OBJECT):
         if self.next_token_index < len(self.token_list):
             return self.token_list[self.next_token_index]
 
-    def get_next_token(self):
+    def _get_next_token(self):
         """Function to retrieve the token at the next position and then
         increment the next_token_index.
 
@@ -481,7 +483,7 @@ class Parser(python_utils.OBJECT):
 
         raise Exception('Invalid syntax: Unexpected end of expression.')
 
-    def get_next_token_if_token_in(self, allowed_token_texts):
+    def _get_next_token_if_token_in(self, allowed_token_texts):
         """Function to verify that there is at least one more token remaining
         and that the next token is among the allowed_token_texts provided.
         If true, returns the token; otherwise, returns None.
@@ -503,7 +505,7 @@ class Parser(python_utils.OBJECT):
                 return token
         return None
 
-    def expect_token(self, text):
+    def _expect_token(self, text):
         """Function to compare the next token's text with the given text. If
         comparision is true, increments next_token_index.
 
@@ -516,7 +518,7 @@ class Parser(python_utils.OBJECT):
         Raises:
             Exception: Invalid token.
         """
-        token = self.check_next_token()
+        token = self._check_next_token()
         if token is None or token.text != text:
             raise Exception('Invalid token: %s.' % (
                 'None' if token is None else token.text))
