@@ -215,6 +215,11 @@ class BaseHandler(webapp2.RequestHandler):
                 b'https://oppiatestserver.appspot.com', permanent=True)
             return
 
+        if (feconf.ENABLE_MAINTENANCE_MODE and
+                not current_user_services.is_current_user_super_admin()):
+            self.render_template('maintenance-page.mainpage.html')
+            return
+
         if self.user_is_scheduled_for_deletion:
             self.redirect(
                 '/logout?redirect_url=%s' % feconf.PENDING_ACCOUNT_DELETION_URL)
