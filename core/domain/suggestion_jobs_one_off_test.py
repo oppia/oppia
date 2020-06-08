@@ -350,8 +350,14 @@ class SuggestionMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'property_name': exp_domain.STATE_PROPERTY_CONTENT,
             'state_name': 'Introduction',
-            'new_value': html_content,
-            'old_value': '<p>This is a suggestion </p>'
+            'new_value': {
+                'content_id': 'content',
+                'html': 'suggestion content'
+            },
+            'old_value': {
+                'content_id': 'content',
+                'html': html_content
+            }
         }
         with self.swap(
             feedback_models.GeneralFeedbackThreadModel,
@@ -841,15 +847,27 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'property_name': exp_domain.STATE_PROPERTY_CONTENT,
             'state_name': 'Introduction',
-            'new_value': html_content,
-            'old_value': '<p>This is a suggestion </p>'
+            'new_value': {
+                'content_id': 'content',
+                'html': 'new suggestion'
+            },
+            'old_value': {
+                'content_id': 'content',
+                'html': html_content
+            }
         }
         expected_change_dict = {
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'property_name': exp_domain.STATE_PROPERTY_CONTENT,
             'state_name': 'Introduction',
-            'new_value': expected_html_content,
-            'old_value': '<p>This is a suggestion </p>'
+            'new_value': {
+                'content_id': 'content',
+                'html': 'new suggestion'
+            },
+            'old_value': {
+                'content_id': 'content',
+                'html': expected_html_content
+            }
         }
 
         with self.swap(
