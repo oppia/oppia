@@ -290,6 +290,8 @@ import { PlayerPositionService } from
   'pages/exploration-player-page/services/player-position.service';
 import { PlayerTranscriptService } from
   'pages/exploration-player-page/services/player-transcript.service';
+import { PlaythroughBackendApiService } from
+  'services/playthrough-backend-api.service';
 import { PlaythroughIssueObjectFactory } from
   'domain/statistics/PlaythroughIssueObjectFactory';
 import { PlaythroughIssuesBackendApiService } from
@@ -1015,6 +1017,10 @@ export class UpgradedServices {
     upgradedServices['PlayerPositionService'] = new PlayerPositionService(
       upgradedServices['ContextService'],
       upgradedServices['PlayerTranscriptService']);
+    upgradedServices['PlaythroughBackendApiService'] =
+      new PlaythroughBackendApiService(
+        upgradedServices['HttpClient'],
+        upgradedServices['UrlInterpolationService']);
     upgradedServices['PlaythroughIssuesBackendApiService'] =
       new PlaythroughIssuesBackendApiService(
         upgradedServices['HttpClient'],
@@ -1121,6 +1127,13 @@ export class UpgradedServices {
         upgradedServices['HttpClient'],
         upgradedServices['ReadOnlyCollectionBackendApiService'],
         upgradedServices['UrlInterpolationService']);
+    upgradedServices['PlaythroughService'] =
+      new PlaythroughService(
+        upgradedServices['ExplorationFeaturesService'],
+        upgradedServices['LearnerActionObjectFactory'],
+        upgradedServices['PlaythroughBackendApiService'],
+        upgradedServices['PlaythroughObjectFactory'],
+        upgradedServices['StopwatchObjectFactory']);
     upgradedServices['PredictionAlgorithmRegistryService'] =
       new PredictionAlgorithmRegistryService(
         upgradedServices['CodeReplPredictionService'],
@@ -1158,14 +1171,6 @@ export class UpgradedServices {
         upgradedServices['UrlInterpolationService']);
 
     // Topological level: 6.
-    upgradedServices['PlaythroughService'] =
-      new PlaythroughService(
-        upgradedServices['HttpClient'],
-        upgradedServices['ExplorationFeaturesService'],
-        upgradedServices['LearnerActionObjectFactory'],
-        upgradedServices['PlaythroughObjectFactory'],
-        upgradedServices['StopwatchObjectFactory'],
-        upgradedServices['UrlInterpolationService']);
     upgradedServices['StateObjectFactory'] = new StateObjectFactory(
       upgradedServices['InteractionObjectFactory'],
       upgradedServices['ParamChangesObjectFactory'],
