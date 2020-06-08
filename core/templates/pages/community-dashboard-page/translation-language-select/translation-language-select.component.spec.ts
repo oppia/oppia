@@ -34,7 +34,9 @@ describe('Translation language select', () => {
     })
       .overrideComponent(TranslationLanguageSelectComponent, {
         set: {
-          templateUrl: 'base/core/templates/pages/community-dashboard-page/translation-language-select/translation-language-select.component.html',
+          templateUrl: 'base/core/templates/pages/community-dashboard-page/' +
+            'translation-language-select/' +
+            'translation-language-select.component.html',
           template: undefined
         }}
       )
@@ -47,15 +49,59 @@ describe('Translation language select', () => {
     fixture.detectChanges();
   });
 
-  it('should work', () => {
-    expect(true).toEqual(true);
-    // component.options = [
-    //   { id: 'en', description: 'English' },
-    //   { id: 'fr', description: 'French' }
-    // ];
-    // fixture.detectChanges();
-    // expect(component.languageIdToDescription).toEqual({
-    //   en: 'English', fr: 'French'
-    // });
+  it('should correctly initialize languageIdToDescription map', () => {
+    component.options = [
+      { id: 'en', description: 'English' },
+      { id: 'fr', description: 'French' }
+    ];
+    fixture.detectChanges();
+    expect(component.languageIdToDescription).toEqual({
+      en: 'English', fr: 'French'
+    });
+  });
+
+  it('should correctly initialize dropdown value', () => {
+    component.options = [
+      { id: 'en', description: 'English' },
+      { id: 'fr', description: 'French' }
+    ];
+    component.value = 'fr';
+    fixture.detectChanges();
+
+    const baseElement: HTMLElement = fixture.nativeElement;
+    const dropdown = baseElement
+      .querySelector('.oppia-translation-language-select-inner-container');
+
+    expect(dropdown.textContent).toEqual('French');
+  });
+
+  it('should correctly select toggle shown', () => {
+    expect(component.dropdownShown).toEqual(false);
+
+    fixture.nativeElement
+      .querySelector('.oppia-translation-language-select-inner-container')
+      .click();
+
+    expect(component.dropdownShown).toEqual(true);
+  });
+
+  it('should correctly select language and close dropdown', () => {
+    component.options = [
+      { id: 'en', description: 'English' },
+      { id: 'fr', description: 'French' }
+    ];
+    component.value = 'fr';
+    fixture.detectChanges();
+
+    expect(component.dropdownShown).toEqual(false);
+    expect(component.value).toEqual('fr');
+
+    fixture.nativeElement
+      .querySelector('.oppia-translation-language-select-inner-container')
+      .click();
+
+    component._selectOption('en');
+    expect(component.value).toEqual('en');
+    expect(component.dropdownShown).toEqual(false);
   });
 });
