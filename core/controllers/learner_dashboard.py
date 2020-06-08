@@ -37,7 +37,7 @@ class OldLearnerDashboardUrlHandler(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        self.redirect(feconf.LEARNER_DASHBOARD_URL)
+        self.redirect(feconf.LEARNER_DASHBOARD_URL, permanent=True)
 
 
 class LearnerDashboardPage(base.BaseHandler):

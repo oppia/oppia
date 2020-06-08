@@ -56,7 +56,7 @@ class OldNotificationsDashboardUrlHandler(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        self.redirect(feconf.NOTIFICATIONS_DASHBOARD_URL)
+        self.redirect(feconf.NOTIFICATIONS_DASHBOARD_URL, permanent=True)
 
 
 class NotificationsDashboardPage(base.BaseHandler):
@@ -120,7 +120,7 @@ class OldCreatorDashboardUrlHandler(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        self.redirect(feconf.CREATOR_DASHBOARD_URL)
+        self.redirect(feconf.CREATOR_DASHBOARD_URL, permanent=True)
 
 
 class CreatorDashboardPage(base.BaseHandler):

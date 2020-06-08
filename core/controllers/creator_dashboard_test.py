@@ -56,7 +56,7 @@ class OldNotificationsDashboardUrlHandlerTest(test_utils.GenericTestBase):
         redirects to the new one.
         """
         response = self.get_html_response(
-            '/notifications_dashboard', expected_status_int=302)
+            '/notifications_dashboard', expected_status_int=301)
         self.assertEqual(
             'http://localhost/notifications', response.headers['location'])
 
@@ -71,7 +71,7 @@ class OldCreatorDashboardUrlHandlerTest(test_utils.GenericTestBase):
         to the new one.
         """
         response = self.get_html_response(
-            '/creator_dashboard', expected_status_int=302)
+            '/creator_dashboard', expected_status_int=301)
         self.assertEqual(
             'http://localhost/creator-dashboard', response.headers['location'])
 
@@ -112,7 +112,7 @@ class HomePageTests(test_utils.GenericTestBase):
             '/notifications', expected_status_int=302)
         # This should redirect to the login page.
         self.assertIn('signup', response.headers['location'])
-        self.assertIn('notifications_dashboard', response.headers['location'])
+        self.assertIn('notifications', response.headers['location'])
 
         self.login('reader@example.com')
         self.get_html_response(

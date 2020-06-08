@@ -44,7 +44,7 @@ class OldLearnerDashboardUrlHandlerTest(test_utils.GenericTestBase):
         to the new one.
         """
         response = self.get_html_response(
-            '/learner_dashboard', expected_status_int=302)
+            '/learner_dashboard', expected_status_int=301)
         self.assertEqual(
             'http://localhost/learner-dashboard', response.headers['location'])
 
