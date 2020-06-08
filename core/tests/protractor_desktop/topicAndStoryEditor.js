@@ -54,7 +54,8 @@ describe('Topic editor functionality', function() {
       'creator@topicEditor.com', 'creatorTopicEditor');
     var handle = await browser.getWindowHandle();
     await topicsAndSkillsDashboardPage.get();
-    await topicsAndSkillsDashboardPage.createTopic('Topic 1', false);
+    await topicsAndSkillsDashboardPage.createTopic('Topic 1',
+      'Description', false);
     var url = await browser.getCurrentUrl();
     topicId = url.split('/')[4];
     await general.closeCurrentTabAndSwitchTo(handle);
@@ -166,8 +167,10 @@ describe('Topic editor functionality', function() {
     await topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
       'Skill 2', 'Concept card explanation', true);
     var TOPIC_NAME = 'TASE2';
+    var TOPIC_DESCRIPTION = 'TASE2 description';
     await topicsAndSkillsDashboardPage.get();
-    await topicsAndSkillsDashboardPage.createTopic(TOPIC_NAME, false);
+    await topicsAndSkillsDashboardPage.createTopic(TOPIC_NAME,
+      TOPIC_DESCRIPTION, false);
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.navigateToUnusedSkillsTab();
     await topicsAndSkillsDashboardPage.assignSkillWithIndexToTopicByTopicName(
@@ -254,7 +257,8 @@ describe('Chapter editor functionality', function() {
     var handle = await browser.getWindowHandle();
     dummyExplorationIds = await createDummyExplorations(3);
     await topicsAndSkillsDashboardPage.get();
-    await topicsAndSkillsDashboardPage.createTopic(topicName, false);
+    await topicsAndSkillsDashboardPage.createTopic(topicName,
+      'Description', false);
     await topicEditorPage.createStory('Story 0');
     var url = await browser.getCurrentUrl();
     storyId = url.split('/')[4];
