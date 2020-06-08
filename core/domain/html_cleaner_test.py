@@ -223,7 +223,7 @@ class RteComponentExtractorUnitTests(test_utils.GenericTestBase):
             '<oppia-noninteractive-svgdiagram '
             'svg_filename-with-value="&quot;img5.svg&quot;"'
             ' alt-with-value="&quot;Image&quot;">'
-            '</oppia-noninteractive-svgdiagram><oppia-noninteractive-svgdiag' 
+            '</oppia-noninteractive-svgdiagram><oppia-noninteractive-svgdiag'
             'ram svg_filename-with-value="&quot;img6.svg&quot;"'
             ' alt-with-value="&quot;Image&quot;">'
             '</oppia-noninteractive-svgdiagram><oppia-noninteractive-image '

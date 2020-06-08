@@ -110,7 +110,7 @@ describe('SvgFilenameEditor', function() {
       return deferred.promise;
     });
 
-    LCDiagramEditorCtrl = $componentController('SvgFilenameEditor');
+    LCDiagramEditorCtrl = $componentController('svgFilenameEditor');
     var mockDocument = document.createElement('div');
     mockDocument.setAttribute('id', LCDiagramEditorCtrl.lcID);
     var $document = angular.element(document);
@@ -269,7 +269,7 @@ describe('SvgFilenameEditor initialized with value attribute',
       spyOn(contextService, 'getEntityType').and.returnValue('exploration');
       spyOn(contextService, 'getEntityId').and.returnValue('1');
       LCDiagramEditorCtrl = $componentController(
-        'SvgFilenameEditor', null, {
+        'svgFilenameEditor', null, {
           value: 'svgimageFilename1.svg'
         }
       );
@@ -368,7 +368,7 @@ describe('SvgFilenameEditor with image save destination as ' +
       AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE);
 
     LCDiagramEditorCtrl = $componentController(
-      'SvgFilenameEditor');
+      'svgFilenameEditor');
     var mockDocument = document.createElement('div');
     mockDocument.setAttribute('id', LCDiagramEditorCtrl.lcID);
     var $document = angular.element(document);

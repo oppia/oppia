@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for svg diagram filename editor.
+ * @fileoverview Component for svg filename editor.
  */
 
 require('domain/utilities/url-interpolation.service.ts');
@@ -54,8 +54,8 @@ angular.module('oppia').component('svgFilenameEditor', {
       var MAX_DIAGRAM_HEIGHT = 551;
       var DEFAULT_STROKE_WIDTH = 2;
       var ALLOWED_STROKE_WIDTHS = [1, 2, 3, 5, 30];
-      var STATUS_EDITING = 'editing';
-      var STATUS_SAVED = 'saved';
+      const STATUS_EDITING = 'editing';
+      const STATUS_SAVED = 'saved';
       // Dynamically assign a unique id to each lc editor to avoid clashes
       // when there are multiple RTEs in the same page.
       ctrl.lcID = 'lc' + Math.floor(Math.random() * 100000).toString();

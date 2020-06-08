@@ -64,7 +64,7 @@ angular.module('oppia').factory('LiterallyCanvasHelperService', [
       var invlidTagsAndAttr = (
         ImageUploadHelperService.getInvalidSvgTagsAndAttrs(dataURI));
       if (invlidTagsAndAttr.tags.length === 0 &&
-          invlidTagsAndAttr.attrs.length ===0) {
+          invlidTagsAndAttr.attrs.length === 0) {
         return true;
       } else {
         throw new Error('Invalid tag or attribute in svg.');
