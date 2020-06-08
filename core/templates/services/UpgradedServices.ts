@@ -248,6 +248,8 @@ import { MusicNotesInputValidationService } from
 import { MusicPhrasePlayerService } from
   // eslint-disable-next-line max-len
   'interactions/MusicNotesInput/directives/music-phrase-player.service';
+import { NewlyCreatedTopicObjectFactory } from
+  'domain/topics_and_skills_dashboard/NewlyCreatedTopicObjectFactory';
 import { NormalizeWhitespacePipe } from
   'filters/string-utility-filters/normalize-whitespace.pipe';
 import { NormalizeWhitespacePunctuationAndCasePipe } from
@@ -466,6 +468,12 @@ import { TopicsAndSkillsDashboardBackendApiService } from
   'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 import { TopicSummaryObjectFactory } from
   'domain/topic/TopicSummaryObjectFactory';
+import { TopicsAndSkillsDashboardFilterObjectFactory } from
+  // eslint-disable-next-line max-len
+  'domain/topics_and_skills_dashboard/TopicsAndSkillsDashboardFilterObjectFactory';
+import { TopicsAndSkillsDashboardPageService } from
+  // eslint-disable-next-line max-len
+  'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.service';
 import { TopicViewerBackendApiService } from
   'domain/topic_viewer/topic-viewer-backend-api.service';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
@@ -605,6 +613,8 @@ export class UpgradedServices {
     upgradedServices['NormalizeWhitespacePunctuationAndCasePipe'] =
       new NormalizeWhitespacePunctuationAndCasePipe();
     upgradedServices['NumberAttemptsService'] = new NumberAttemptsService();
+    upgradedServices['NewlyCreatedTopicObjectFactory'] =
+        new NewlyCreatedTopicObjectFactory();
     upgradedServices['ParamChangeObjectFactory'] =
       new ParamChangeObjectFactory();
     upgradedServices['ParamMetadataObjectFactory'] =
@@ -659,6 +669,10 @@ export class UpgradedServices {
     upgradedServices['ThreadStatusDisplayService'] =
       new ThreadStatusDisplayService();
     upgradedServices['Title'] = new Title({});
+    upgradedServices['TopicsAndSkillsDashboardFilterObjectFactory'] =
+        new TopicsAndSkillsDashboardFilterObjectFactory();
+    upgradedServices['TopicsAndSkillsDashboardPageService'] =
+        new TopicsAndSkillsDashboardPageService();
     upgradedServices['TopicRightsObjectFactory'] =
       new TopicRightsObjectFactory();
     upgradedServices['TopicSummaryObjectFactory'] =
@@ -791,6 +805,8 @@ export class UpgradedServices {
     upgradedServices['SetInputValidationService'] =
       new SetInputValidationService(
         upgradedServices['baseInteractionValidationService']);
+    upgradedServices['SkillCreationBackendApiService'] =
+        new SkillCreationBackendApiService(upgradedServices['HttpClient']);
     upgradedServices['SVMPredictionService'] = new SVMPredictionService(
       upgradedServices['PredictionResultObjectFactory']);
     upgradedServices['SchemaDefaultValueService'] =
@@ -818,6 +834,12 @@ export class UpgradedServices {
     upgradedServices['ThreadMessageObjectFactory'] =
       new ThreadMessageObjectFactory(
         upgradedServices['ThreadMessageSummaryObjectFactory']);
+    upgradedServices['TopicsAndSkillsDashboardBackendApiService'] =
+        new TopicsAndSkillsDashboardBackendApiService(
+          upgradedServices['HttpClient']);
+    upgradedServices['TopicCreationBackendApiService'] =
+        new TopicCreationBackendApiService(
+          upgradedServices['HttpClient']);
     upgradedServices['UrlService'] = new UrlService(
       upgradedServices['WindowRef']);
     upgradedServices['WindowDimensionsService'] = new WindowDimensionsService(

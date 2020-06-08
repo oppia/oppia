@@ -19,10 +19,7 @@
 var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
-var waitFor = require('../protractor_utils/waitFor.js');
-var workflow = require('../protractor_utils/workflow.js');
 
-var AdminPage = require('../protractor_utils/AdminPage.js');
 var ExplorationEditorPage = require(
   '../protractor_utils/ExplorationEditorPage.js');
 var TopicsAndSkillsDashboardPage = require(
@@ -54,12 +51,47 @@ describe('Topics and skills dashboard functionality', function() {
     await topicsAndSkillsDashboardPage.get();
   });
 
-  it('should add a new topic to list', async function() {
+  it('should add a new topic to list and delete it', async function() {
     await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(0);
-    await topicsAndSkillsDashboardPage.createTopic('Topic 1', true);
+    await topicsAndSkillsDashboardPage.createTopic(
+      'Topic1 TASD', 'Topic 1 description', true);
 
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(1);
+    await topicsAndSkillsDashboardPage.deleteTopicWithIndex(0);
+    await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(0);
+  });
+
+  it('should filter the topics', async function() {
+    await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(0);
+    await topicsAndSkillsDashboardPage.createTopic(
+      'Alpha TASD', 'Alpha description', true);
+    await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.createTopic(
+      'Beta TASD', 'Beta description', true);
+
+    await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(2);
+    await topicsAndSkillsDashboardPage.filterTopicsByKeyword('alp');
+    await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(1);
+    await topicsAndSkillsDashboardPage.resetTopicFilters();
+    await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(2);
+
+    await topicsAndSkillsDashboardPage.filterTopicsByKeyword('be');
+    await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(1);
+    await topicsAndSkillsDashboardPage.resetTopicFilters();
+    await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(2);
+
+    await topicsAndSkillsDashboardPage.filterTopicsByClassroom('Math');
+    await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(0);
+    await topicsAndSkillsDashboardPage.resetTopicFilters();
+    await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(2);
+
+    await topicsAndSkillsDashboardPage.filterTopicsByKeyword('gamma');
+    await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(0);
+    await topicsAndSkillsDashboardPage.resetTopicFilters();
+
+    await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(2);
   });
 
   it('should move published skill to unused skills section', async function() {
@@ -127,14 +159,6 @@ describe('Topics and skills dashboard functionality', function() {
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.navigateToUnusedSkillsTab();
     await topicsAndSkillsDashboardPage.expectNumberOfSkillsToBe(0);
-  });
-
-  it('should remove a topic from list once deleted', async function() {
-    await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(1);
-    await topicsAndSkillsDashboardPage.deleteTopicWithIndex(0);
-
-    await topicsAndSkillsDashboardPage.get();
-    await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(0);
   });
 
   afterEach(async function() {

@@ -1,0 +1,57 @@
+<div class="modal-header">
+  <h3>
+    New Topic
+  </h3>
+</div>
+<form ng-submit="save()">
+  <div class="modal-body create-new-topic-form">
+    <div class="create-new-topic-input-field" ng-class="{'has-error': !isTopicNameValid()}">
+      <div><span class="create-new-topic-input-label">Name</span></div>
+      <input class="protractor-test-new-topic-name-field" ng-model="newlyCreatedTopic.name" maxlength="<[MAX_CHARS_IN_TOPIC_NAME]>">
+      <div class="oppia-input-box-subtitle">
+        <i>
+          Topic name should be at most <[MAX_CHARS_IN_TOPIC_NAME]> characters.
+        </i>
+      </div>
+    </div>
+    <div class="create-new-topic-input-field">
+      <div><span class="create-new-topic-input-label">Description</span></div>
+      <textarea class="protractor-test-new-topic-description-field"
+                rows="4" cols="50" placeholder="Enter description"
+                maxlength="<[MAX_CHARS_IN_TOPIC_DESCRIPTION]>"
+                ng-model="newlyCreatedTopic.description">
+      </textarea>
+      <div class="oppia-input-box-subtitle">
+        <i>
+          Topic name should be at most <[MAX_CHARS_IN_TOPIC_DESCRIPTION]> characters.
+        </i>
+      </div>
+    </div>
+    <div class="create-new-topic-input-field">
+      <label class="create-new-topic-input-label">Topic Thumbnail</label>
+      <thumbnail-uploader aspect-ratio="'4:3'"
+                          disabled="true"
+                          preview-description-bg-color="'#2F6687'">
+      </thumbnail-uploader>
+    </div>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-secondary" ng-click="cancel()" type="button">Cancel</button>
+    <button class="btn btn-success protractor-test-confirm-topic-creation-button" type="submit" ng-disabled="!newlyCreatedTopic.isValid()">
+      <span>Create Topic</span>
+    </button>
+  </div>
+</form>
+<style>
+  .create-new-topic-form .create-new-topic-input-field {
+     margin: 10px 0;
+  }
+  .create-new-topic-form .create-new-topic-input-field input, .create-new-topic-input-field textarea,.create-new-topic-input-field select {
+    border: 1px solid #b9b5b5;
+    border-radius: 5px;
+  }
+  .create-new-topic-form .create-new-topic-input-label {
+    font-weight: bold;
+  }
+</style>

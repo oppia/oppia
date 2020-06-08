@@ -20,28 +20,30 @@ require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
 
-angular.module('oppia').controller('NewTopicNameEditorModalController', [
-  '$controller', '$scope', '$uibModalInstance', 'MAX_CHARS_IN_TOPIC_NAME',
-  function($controller, $scope, $uibModalInstance, MAX_CHARS_IN_TOPIC_NAME) {
+angular.module('oppia').controller('CreateNewTopicModalController', [
+  '$controller', '$scope', '$uibModalInstance',
+  'NewlyCreatedTopicObjectFactory', 'MAX_CHARS_IN_TOPIC_DESCRIPTION',
+  'MAX_CHARS_IN_TOPIC_NAME',
+  function(
+      $controller, $scope, $uibModalInstance,
+      NewlyCreatedTopicObjectFactory, MAX_CHARS_IN_TOPIC_DESCRIPTION,
+      MAX_CHARS_IN_TOPIC_NAME) {
     $controller('ConfirmOrCancelModalController', {
       $scope: $scope,
       $uibModalInstance: $uibModalInstance
     });
 
-    $scope.topicName = '';
-    $scope.abbreviatedTopicName = '';
+    $scope.newlyCreatedTopic = (
+      NewlyCreatedTopicObjectFactory.createDefault());
     $scope.MAX_CHARS_IN_TOPIC_NAME = MAX_CHARS_IN_TOPIC_NAME;
-    // No need for a length check below since the topic name input
-    // field in the HTML file has the maxlength attribute which
-    // disallows the user from entering more than the valid length.
-    $scope.isTopicNameValid = function() {
-      return $scope.topicName !== '';
+    $scope.MAX_CHARS_IN_TOPIC_DESCRIPTION = (
+      MAX_CHARS_IN_TOPIC_DESCRIPTION);
+
+    $scope.save = function() {
+      $uibModalInstance.close($scope.newlyCreatedTopic);
     };
-    $scope.save = function(topicName, abbreviatedTopicName) {
-      $uibModalInstance.close({
-        topicName: topicName,
-        abbreviatedTopicName: abbreviatedTopicName
-      });
+    $scope.cancel = function() {
+      $uibModalInstance.dismiss('cancel');
     };
   }
 ]);
