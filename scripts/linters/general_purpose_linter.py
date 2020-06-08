@@ -164,9 +164,9 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
         'regexp': re.compile(r'templateUrl: \''),
         'message': 'The directives must be directly referenced.',
         'excluded_files': (
-            'core/templates/pages/community-dashboard-page/' +
+            ('core/templates/pages/community-dashboard-page/' +
                 'translation-language-select/' +
-                'translation-language-select.component.ts'
+                'translation-language-select.component.ts')
             'core/templates/pages/exploration-player-page/'
             'FeedbackPopupDirective.js',
         ),
