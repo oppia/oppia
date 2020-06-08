@@ -130,7 +130,7 @@ describe('Profile menu flow', function() {
         await notificationsDashboardLink.click();
         await waitFor.pageToFullyLoad();
         expect(await browser.getCurrentUrl()).toEqual(
-          'http://localhost:9001/notifications_dashboard');
+          'http://localhost:9001/notifications');
       });
 
     it('should visit the preferences page from the profile dropdown menu',

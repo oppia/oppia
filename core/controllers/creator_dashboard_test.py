@@ -46,6 +46,21 @@ import python_utils
 taskqueue_services = models.Registry.import_taskqueue_services()
 
 
+class OldNotificationsDashboardUrlHandlerTest(test_utils.GenericTestBase):
+    """Test for redirecting the old notifications dashboard page URL
+    to the new one.
+    """
+
+    def test_old_notifications_dashboard_page_url(self):
+        """Test to validate that the old notifications dashboard page url
+        redirects to the new one.
+        """
+        response = self.get_html_response(
+            '/notifications_dashboard', expected_status_int=302)
+        self.assertEqual(
+            'http://localhost/notifications', response.headers['location'])
+
+
 class OldCreatorDashboardUrlHandlerTest(test_utils.GenericTestBase):
     """Test for redirecting the old creator dashboard page URL
     to the new one.
@@ -94,14 +109,14 @@ class HomePageTests(test_utils.GenericTestBase):
     def test_notifications_dashboard_redirects_for_logged_out_users(self):
         """Test the logged-out view of the notifications dashboard."""
         response = self.get_html_response(
-            '/notifications_dashboard', expected_status_int=302)
+            '/notifications', expected_status_int=302)
         # This should redirect to the login page.
         self.assertIn('signup', response.headers['location'])
         self.assertIn('notifications_dashboard', response.headers['location'])
 
         self.login('reader@example.com')
         self.get_html_response(
-            '/notifications_dashboard', expected_status_int=302)
+            '/notifications', expected_status_int=302)
         # This should redirect the user to complete signup.
         self.logout()
 
@@ -110,7 +125,7 @@ class HomePageTests(test_utils.GenericTestBase):
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
 
         self.login(self.EDITOR_EMAIL)
-        self.get_html_response('/notifications_dashboard')
+        self.get_html_response('/notifications')
         self.logout()
 
 

@@ -50,6 +50,15 @@ COLLECTION_ID_KEY = 'collectionId'
 QUESTION_ID_KEY = 'questionId'
 
 
+class OldNotificationsDashboardUrlHandler(base.BaseHandler):
+    """Redirects the old notifications dashboard URL to the new one."""
+
+    @acl_decorators.open_access
+    def get(self):
+        """Handles GET requests."""
+        self.redirect(feconf.NOTIFICATIONS_DASHBOARD_URL)
+
+
 class NotificationsDashboardPage(base.BaseHandler):
     """Page with notifications for the user."""
 
