@@ -53,8 +53,9 @@ describe('Skill mastery object factory', () => {
   it('should be able to set degree of mastery',
     () => {
       let skillMastery = skillMasteryObjectFactory.createFromBackendDict(
-        skillMasteryObjectFactory);
+        skillMasteryDictSample);
 
+      expect(skillMastery.getMasteryDegree('skillId1')).toBe(1.0);
       skillMastery.setMasteryDegree('skillId1', 0.5);
       expect(skillMastery.getMasteryDegree('skillId1')).toBe(0.5);
     });
