@@ -283,6 +283,8 @@ skip_files:
 # We exclude some of the scripts that are not directly imported in order to
 # reduce deployed file count.
 # TODO(sll): Find a more structured way of doing this.
+#
+# Please do not remove line below this, as it is used for testing purpose.
 # Third party files:
 - third_party/static/angular-audio-1.7.4/
 - third_party/static/angular-toastr-1.7.0/

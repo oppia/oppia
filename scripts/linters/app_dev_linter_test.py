@@ -23,8 +23,6 @@ import multiprocessing
 
 from core.tests import test_utils
 
-import python_utils
-
 from . import app_dev_linter
 from . import pre_commit_linter
 
@@ -35,21 +33,18 @@ FILE_CACHE = NAME_SPACE.files  # pylint: disable=redefined-builtin
 
 
 class AppDevLinterTests(test_utils.GenericTestBase):
-    """Tests for the app_dev_linter_test.py."""
-
-    def setUp(self):
-        super(AppDevLinterTests, self).setUp()
-        self.print_arr = []
-        def mock_print(msg):
-            self.print_arr.append(msg)
-        self.print_swap = self.swap(python_utils, 'PRINT', mock_print)
+    """Tests for the app_dev_linter.py."""
 
     def test_check_valid_pattern_in_app_dev_yaml(self):
-        def mock_get_data(unused_self, unused_filepath, unused_mode):
-            return '# Third party files:\n- third_party/static/bootstrap-4.3.1/'
-        get_data_swap = self.swap(
-            pre_commit_linter.FileCache, '_get_data', mock_get_data)
-        with self.print_swap, get_data_swap:
+        def mock_readlines(unused_self, unused_filepath):
+            return (
+                '# Just a comment',
+                '# Third party files:',
+                '- third_party/static/bootstrap-4.3.1/')
+
+        readlines_swap = self.swap(
+            pre_commit_linter.FileCache, 'readlines', mock_readlines)
+        with readlines_swap:
             summary_messages = (
                 app_dev_linter.check_skip_files_in_app_dev_yaml(
                     FILE_CACHE, True))
@@ -57,18 +52,14 @@ class AppDevLinterTests(test_utils.GenericTestBase):
             self.assertEqual(summary_messages, expected_summary_messages)
 
     def test_check_invalid_pattern_in_app_dev_yaml(self):
-        def mock_get_data(unused_self, unused_filepath, unused_mode):
-            return '# Third party files:\n- third_party/static/bootstrap-4.3/'
-        get_data_swap = self.swap(
-            pre_commit_linter.FileCache, '_get_data', mock_get_data)
-        with self.print_swap, get_data_swap:
+        def mock_readlines(unused_self, unused_filepath):
+            return (
+                '# Third party files:', '- third_party/static/bootstrap-4.3/')
+
+        readlines_swap = self.swap(
+            pre_commit_linter.FileCache, 'readlines', mock_readlines)
+        with readlines_swap:
             summary_messages = (
                 app_dev_linter.check_skip_files_in_app_dev_yaml(
                     FILE_CACHE, True))
-            expected_summary_messages = (
-                'FAILED   app_dev file coverage check failed, see messages '
-                'above for invalid file names in app_dev.yaml file')
-        self.assertEqual(summary_messages[1], expected_summary_messages)
-        self.assertTrue(
-            'Pattern on line 2 doesn\'t match any file or directory' in
-            summary_messages[0])
+        self.assertTrue(len(summary_messages) == 2)

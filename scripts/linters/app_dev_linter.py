@@ -34,8 +34,9 @@ def check_skip_files_in_app_dev_yaml(file_cache, verbose_mode_enabled):
     files in the repository.
     """
     if verbose_mode_enabled:
-        python_utils.PRINT('Starting app_dev file check')
-        python_utils.PRINT('----------------------------------------')
+        python_utils.PRINT(
+            'Starting app_dev file check\n'
+            '----------------------------------------')
 
     with linter_utils.redirect_stdout(sys.stdout):
         failed = False
@@ -48,21 +49,23 @@ def check_skip_files_in_app_dev_yaml(file_cache, verbose_mode_enabled):
                 skip_files_section_found = True
             if not skip_files_section_found:
                 continue
-            if stripped_line and stripped_line[0] != '#':
-                # Extract the file pattern from the line.
-                line_in_concern = stripped_line[2:]
-                # Adjustments to the dir paths in app_dev.yaml file
-                # for glob-style patterns to match correctly.
-                if line_in_concern.endswith('/'):
-                    line_in_concern = line_in_concern[:-1]
-                if not glob.glob(line_in_concern):
-                    summary_message = (
-                        '%s --> Pattern on line %s doesn\'t match '
-                        'any file or directory' % (
-                            APP_YAML_FILEPATH, line_num + 1))
-                    summary_messages.append(summary_message)
-                    python_utils.PRINT(summary_message)
-                    failed = True
+            if not stripped_line or stripped_line[0] == '#':
+                continue
+            # Extract the file pattern from the line as all skipped file
+            # lines start with a dash(-).
+            line_in_concern = stripped_line[len('- '):]
+            # Adjustments to the dir paths in app_dev.yaml file
+            # for glob-style patterns to match correctly.
+            if line_in_concern.endswith('/'):
+                line_in_concern = line_in_concern[:-1]
+            if not glob.glob(line_in_concern):
+                summary_message = (
+                    '%s --> Pattern on line %s doesn\'t match '
+                    'any file or directory' % (
+                        APP_YAML_FILEPATH, line_num + 1))
+                summary_messages.append(summary_message)
+                python_utils.PRINT(summary_message)
+                failed = True
 
         if failed:
             summary_message = (
