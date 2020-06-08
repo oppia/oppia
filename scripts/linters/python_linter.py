@@ -130,29 +130,37 @@ class PythonLintChecksManager(python_utils.OBJECT):
             failed = False
             for filepath in files_to_check:
                 if not filepath.endswith('_test.py'):
-                    file_content = FILE_CACHE.read(filepath)
-                    for line_number, line in enumerate(
-                            file_content.split('\n')):
-                        ind1 = line.find(' def ')
-                        ind2 = line.find('test_only')
-                        if ind1 != -1 and ind2 != -1:
-                            python_utils.PRINT(
+                    for line_num, line in enumerate(FILE_CACHE.readlines(
+                            filepath)):
+                        line = line.strip()
+                        words = line.split()
+                        if len(words) < 2:
+                            continue
+                        ind1 = words[0].startswith('def')
+                        ind2 = words[1].startswith('test_only')
+                        if ind1 and ind2:
+                            summary_message = (
                                 'ERROR:   Non test file uses test functions at'
-                                ' line:', line_number + 1, 'in file:', filepath)
+                                ' line:', python_utils.UNICODE(line_num + 1),
+                                ' in file:', filepath
+                                )
+                            # To convert tuple into string.
+                            s = ''.join(summary_message)
+                            python_utils.PRINT(s)
+                            summary_messages.append(s)
                             failed = True
 
             if failed:
                 summary_message = (
                     '%s   Function defintion checks failed,'
                     'see affect files above.' % (_MESSAGE_TYPE_FAILED))
-                python_utils.PRINT(summary_message)
-                summary_messages.append(summary_message)
             else:
                 summary_message = (
                     '%s   Function definition checks passed'
                     % _MESSAGE_TYPE_SUCCESS)
-                python_utils.PRINT(summary_message)
-                summary_messages.append(summary_message)
+
+        python_utils.PRINT(summary_message)
+        summary_messages.append(summary_message)
         return summary_messages
 
     def _check_that_all_jobs_are_listed_in_the_job_registry_file(self):
@@ -285,8 +293,9 @@ class PythonLintChecksManager(python_utils.OBJECT):
         test_function_check_message = self._check_non_test_files()
         job_registry_check_message = (
             self._check_that_all_jobs_are_listed_in_the_job_registry_file())
-        return (import_order_check_message + job_registry_check_message +
-                test_function_check_message)
+        all_messages = import_order_check_message + job_registry_check_message
+        all_messages = all_messages + test_function_check_message
+        return all_messages
 
 
 class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
