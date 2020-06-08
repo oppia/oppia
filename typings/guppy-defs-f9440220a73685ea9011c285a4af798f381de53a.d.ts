@@ -1,6 +1,9 @@
 /* eslint-disable camelcase */
 // Code - third_party/static/guppy-f944022/src/guppy.js
-// This guppy version corresponds to the commit on June 5 2019.
+// This guppy version corresponds to the commit on June 5 2019. 
+// For reference, visit:
+// eslint-disable-next-line max-len
+// https://github.com/daniel3735928559/guppy/tree/f9440220a73685ea9011c285a4af798f381de53a
 
 interface GuppyConfig {
   events?: Object;

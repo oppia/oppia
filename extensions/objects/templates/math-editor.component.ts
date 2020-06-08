@@ -25,19 +25,17 @@ angular.module('oppia').component('mathEditor', {
     value: '='
   },
   template: require('./math-editor.component.html'),
-  controller: ['$element', function($element) {
+  controller: [function() {
     const ctrl = this;
-    var guppyDivElt, guppyDivId, guppyInstance: Guppy;
+    var guppyDivElt, guppyInstance: Guppy;
 
     ctrl.$onInit = function() {
       ctrl.alwaysEditable = true;
 
-      guppyDivElt = $element[0].querySelector('.guppy-div');
+      guppyDivElt = $('.guppy-div');
       // Dynamically assigns a unique id to the guppy-div
-      guppyDivElt.setAttribute(
-        'id', 'guppy_' + Math.floor(Math.random() * 100000000));
-      guppyDivId = guppyDivElt.id;
-      guppyInstance = new Guppy(guppyDivId, {});
+      guppyDivElt.attr('id', 'guppy_' + Math.floor(Math.random() * 100000000));
+      guppyInstance = new Guppy(guppyDivElt.attr('id'), {});
       Guppy.event('change', (e) => {
         ctrl.value = guppyInstance.asciimath();
       });
