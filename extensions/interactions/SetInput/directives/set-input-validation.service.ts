@@ -44,7 +44,11 @@ export class SetInputValidationService {
       baseInteractionValidationService) {}
 
   /**
-  * Checks if the two sets are identical
+  * Checks if the two sets are identical.
+  *
+  * @param {string[]} inputA - first set
+  * @param {string[]} inputB - second set
+  * @return {boolean} True if the two sets are identical
   */
   private isSameSet(inputA: string[], inputB: string[]): boolean {
     let setA = new Set(inputA);
@@ -56,7 +60,11 @@ export class SetInputValidationService {
   }
 
   /**
-  * Checks if the first set is a subset of the second set
+  * Checks if the first set is a subset of the second set.
+  *
+  * @param {string[]} inputA - first set
+  * @param {string[]} inputB - second set
+  * @return {boolean} True if the first set is a subset of the second set.
   */
   private isSubset(inputA: string[], inputB: string[]): boolean {
     let setB = new Set(inputB);
@@ -64,7 +72,11 @@ export class SetInputValidationService {
   }
 
   /**
-  * Checks if the two rules are identical
+  * Checks if the two rules are identical.
+  *
+  * @param {Rule} ruleA - first rule
+  * @param {Rule} ruleB - second rule
+  * @return {boolean} True if the two rules are identical.
   */
   private isSameRule(ruleA: Rule, ruleB: Rule): boolean {
     return ruleA.type === ruleB.type &&
@@ -97,6 +109,13 @@ export class SetInputValidationService {
     return warningsList;
   }
 
+  /**
+  * Generate warnings for redundant rules in answer groups.
+  * A rule is considered redundant if it will never be matched.
+  *
+  * @param {AnswerGroup[]} answerGroups - answer groups created from user input
+  * @return {IWarning[]} Array of warnings
+  */
   getRedundantRuleWarnings(answerGroups: AnswerGroup[]): IWarning[] {
     let warningsList: IWarning[] = [];
 
