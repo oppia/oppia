@@ -27,8 +27,7 @@ import { ReadOnlyFeaturedTranslationLanguage } from
 
 @Component({
   selector: 'translation-language-select',
-  template: require('./translation-language-select.component.html'),
-  // templateUrl: './translation-language-select.component.html'
+  templateUrl: './translation-language-select.component.html'
 })
 export class TranslationLanguageSelectComponent implements OnInit {
   @Input() options: {id: string, description: string}[];
@@ -38,7 +37,7 @@ export class TranslationLanguageSelectComponent implements OnInit {
 
   featuredLanguages: ReadOnlyFeaturedTranslationLanguage[] = [];
   languageIdToDescription: {[id: string]: string} = {};
-  dropdownShown = true;
+  dropdownShown = false;
   descriptionPopupShown = false;
   descriptionPopupPxOffsetY = 0;
   descriptionPopupContent = '';

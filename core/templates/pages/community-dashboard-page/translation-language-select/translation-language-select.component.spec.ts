@@ -15,93 +15,192 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { TranslationLanguageSelectComponent } from
   './translation-language-select.component';
+import { ContributionOpportunitiesBackendApiService } from
+  '../services/contribution-opportunities-backend-api.service';
+import { ReadOnlyFeaturedTranslationLanguageObjectFactory } from
+  'domain/community_dashboard/ReadOnlyFeaturedTranslationLanguageObjectFactory';
 
 /**
  * @fileoverview Unit tests for the translation language select
  */
 
-
 describe('Translation language select', () => {
   let component: TranslationLanguageSelectComponent;
   let fixture: ComponentFixture<TranslationLanguageSelectComponent>;
 
-  beforeEach(angular.mock.module('oppia'));
+  let readOnlyFeaturedTranslationLanguageObjectFactory =
+    new ReadOnlyFeaturedTranslationLanguageObjectFactory();
+  let featuredLanguages = [
+    readOnlyFeaturedTranslationLanguageObjectFactory.createFromBackendDict({
+      language_code: 'fr',
+      description: 'Partnership with ABC'
+    }),
+    readOnlyFeaturedTranslationLanguageObjectFactory.createFromBackendDict({
+      language_code: 'de',
+      description: 'Partnership with CBA'
+    })
+  ];
+
+  let contributionOpportunitiesBackendApiServiceStub:
+    Partial<ContributionOpportunitiesBackendApiService> = {
+      fetchFeaturedTranslationLanguages: () =>
+        Promise.resolve(featuredLanguages)
+    };
+
+  let clickDropdown: () => void;
+  let getDropdownOptionsContainer: () => HTMLElement;
 
   beforeEach(async(() => {
-    // karma requires a templateUrl over template: require('./path/to/html')
     TestBed.configureTestingModule({
       declarations: [TranslationLanguageSelectComponent],
+      providers: [{
+        provide: ContributionOpportunitiesBackendApiService,
+        useValue: contributionOpportunitiesBackendApiServiceStub
+      }]
     })
-      .overrideComponent(TranslationLanguageSelectComponent, {
-        set: {
-          templateUrl: 'base/core/templates/pages/community-dashboard-page/' +
-            'translation-language-select/' +
-            'translation-language-select.component.html',
-          template: undefined
-        }}
-      )
       .compileComponents();
   }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(TranslationLanguageSelectComponent);
     component = fixture.componentInstance;
+
+    component.options = [
+      { id: 'en', description: 'English' },
+      { id: 'fr', description: 'French' },
+      { id: 'sp', description: 'Spanish' },
+      { id: 'de', description: 'German' }
+    ];
+    component.value = 'en';
     fixture.detectChanges();
   });
 
+  beforeEach(() => {
+    clickDropdown = () => {
+      fixture.debugElement.nativeElement
+        .querySelector('.oppia-translation-language-select-inner-container')
+        .click();
+      fixture.detectChanges();
+    };
+
+    getDropdownOptionsContainer = () => {
+      return fixture.debugElement.nativeElement
+        .querySelector('.oppia-translation-language-select-dropdown-container');
+    };
+  });
+
   it('should correctly initialize languageIdToDescription map', () => {
-    component.options = [
-      { id: 'en', description: 'English' },
-      { id: 'fr', description: 'French' }
-    ];
-    fixture.detectChanges();
     expect(component.languageIdToDescription).toEqual({
-      en: 'English', fr: 'French'
+      en: 'English',
+      fr: 'French',
+      sp: 'Spanish',
+      de: 'German'
+    });
+  });
+
+  it('should correctly fetch featured languages', () => {
+    fixture.whenStable().then(() => {
+      fixture.detectChanges();
+      expect(component.featuredLanguages).toEqual(featuredLanguages);
     });
   });
 
   it('should correctly initialize dropdown value', () => {
-    component.options = [
-      { id: 'en', description: 'English' },
-      { id: 'fr', description: 'French' }
-    ];
-    component.value = 'fr';
-    fixture.detectChanges();
+    const dropdown = (fixture.nativeElement
+      .querySelector('.oppia-translation-language-select-inner-container'));
 
-    const baseElement: HTMLElement = fixture.nativeElement;
-    const dropdown = baseElement
-      .querySelector('.oppia-translation-language-select-inner-container');
-
-    expect(dropdown.textContent).toEqual('French');
+    expect(dropdown.firstChild.textContent.trim()).toEqual('English');
   });
 
-  it('should correctly select toggle shown', () => {
+  it('should correctly show and hide the dropdown', () => {
     expect(component.dropdownShown).toEqual(false);
+    expect(getDropdownOptionsContainer()).toBeFalsy();
 
-    fixture.nativeElement
-      .querySelector('.oppia-translation-language-select-inner-container')
-      .click();
-
+    clickDropdown();
     expect(component.dropdownShown).toEqual(true);
+    expect(getDropdownOptionsContainer()).toBeTruthy();
+
+    clickDropdown();
+    expect(component.dropdownShown).toEqual(false);
+    expect(getDropdownOptionsContainer()).toBeFalsy();
+
+    clickDropdown();
+    expect(component.dropdownShown).toEqual(true);
+    expect(getDropdownOptionsContainer()).toBeTruthy();
+
+    let fakeClickAwayEvent = new MouseEvent('click');
+    Object.defineProperty(
+      fakeClickAwayEvent,
+      'target',
+      {value: document.createElement('div')});
+    component.onDocumentClick(fakeClickAwayEvent);
+    fixture.detectChanges();
+    expect(component.dropdownShown).toEqual(false);
+    expect(getDropdownOptionsContainer()).toBeFalsy();
   });
 
-  it('should correctly select language and close dropdown', () => {
-    component.options = [
-      { id: 'en', description: 'English' },
-      { id: 'fr', description: 'French' }
-    ];
-    component.value = 'fr';
-    fixture.detectChanges();
-
+  it('should correctly populate all options', () => {
     expect(component.dropdownShown).toEqual(false);
-    expect(component.value).toEqual('fr');
-
-    fixture.nativeElement
-      .querySelector('.oppia-translation-language-select-inner-container')
-      .click();
-
-    component._selectOption('en');
     expect(component.value).toEqual('en');
-    expect(component.dropdownShown).toEqual(false);
+
+    clickDropdown();
+    expect(component.dropdownShown).toEqual(true);
+    expect(getDropdownOptionsContainer()).toBeTruthy();
+
+    fixture.whenStable().then(() => {
+      fixture.detectChanges();
+
+      let allOptions = fixture.debugElement.nativeElement
+        .querySelectorAll('.oppia-translation-language-select-dropdown-option');
+
+      expect(allOptions.length).toEqual(6);
+      expect(allOptions[0].firstChild.textContent.trim()).toEqual('French');
+      expect(allOptions[1].firstChild.textContent.trim()).toEqual('German');
+      expect(allOptions[2].firstChild.textContent.trim()).toEqual('English');
+      expect(allOptions[3].firstChild.textContent.trim()).toEqual('French');
+      expect(allOptions[4].firstChild.textContent.trim()).toEqual('Spanish');
+      expect(allOptions[5].firstChild.textContent.trim()).toEqual('German');
+    });
+  });
+
+  it('should correctly select and indicate selction of an option', () => {
+    fixture.whenStable().then(() => {
+      let allOptions = fixture.debugElement.nativeElement
+        .querySelectorAll('.oppia-translation-language-select-dropdown-option');
+      expect(allOptions[3]
+        .classes['oppia-translation-language-select-dropdown-option-selected'])
+        .toBeFalsy();
+
+      spyOn(component.setValue, 'emit');
+
+      component._selectOption('fr');
+      fixture.detectChanges();
+      expect(allOptions[3]
+        .classes['oppia-translation-language-select-dropdown-option-selected'])
+        .toBeTruthy();
+
+      expect(component.setValue.emit).toHaveBeenCalledWith('fr');
+    });
+  });
+
+  it('should show details of featured language', () => {
+    fixture.whenStable().then(() => {
+      component._showDescriptionPopup(0);
+      fixture.detectChanges();
+
+      let allOptions = fixture.nativeElement
+        .querySelectorAll('.oppia-translation-language-select-dropdown-option');
+
+      expect(component.descriptionPopupContent).toEqual('Partnership with ABC');
+      expect(component.descriptionPopupShown).toEqual(true);
+      expect(allOptions[0].firstChild.textContent.trim()).toEqual('French');
+      expect(allOptions[0]
+        .classes['oppia-translation-language-select-dropdown-option-selected'])
+        .toBeTruthy();
+
+      component._hideDescriptionPopup();
+      fixture.detectChanges();
+      expect(component.descriptionPopupShown).toEqual(false);
+    });
   });
 });
