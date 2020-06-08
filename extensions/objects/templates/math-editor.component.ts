@@ -33,7 +33,7 @@ angular.module('oppia').component('mathEditor', {
       ctrl.alwaysEditable = true;
 
       guppyDivElt = $('.guppy-div');
-      // Dynamically assigns a unique id to the guppy-div
+      // Dynamically assigns a unique id to the guppy-div.
       guppyDivElt.attr('id', 'guppy_' + Math.floor(Math.random() * 100000000));
       guppyInstance = new Guppy(guppyDivElt.attr('id'), {});
       Guppy.event('change', (e) => {
