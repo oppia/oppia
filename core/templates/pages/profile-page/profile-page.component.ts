@@ -25,20 +25,22 @@ require('filters/string-utility-filters/truncate.filter.ts');
 require('pages/OppiaFooterDirective.ts');
 
 require('domain/utilities/url-interpolation.service.ts');
-require('services/contextual/url.service.ts');
 require('services/user.service.ts');
 require('services/date-time-format.service.ts');
+require('pages/profile-page/profile-page-backend-api.service');
 
 angular.module('oppia').component('profilePage', {
   template: require('./profile-page.component.html'),
   controller: [
-    '$http', '$log', '$window', 'DateTimeFormatService', 'LoaderService',
-    'UrlInterpolationService', 'UrlService', 'UserService',
-    function($http, $log, $window, DateTimeFormatService, LoaderService,
-        UrlInterpolationService, UrlService, UserService) {
+    '$http', '$log', '$window',
+    'DateTimeFormatService', 'LoaderService',
+    'UrlInterpolationService', 'UserService',
+    'ProfilePageBackendApiService',
+    function($http, $log, $window,
+        DateTimeFormatService, LoaderService,
+        UrlInterpolationService, UserService,
+        ProfilePageBackendApiService) {
       var ctrl = this;
-      var profileDataUrl = (
-        '/profilehandler/data/' + UrlService.getUsernameFromProfileUrl());
       var DEFAULT_PROFILE_PICTURE_URL = UrlInterpolationService
         .getStaticImageUrl('/general/no_profile_picture.png');
 
@@ -47,8 +49,9 @@ angular.module('oppia').component('profilePage', {
       };
       ctrl.$onInit = function() {
         LoaderService.showLoadingScreen('Loading');
-        $http.get(profileDataUrl).then(function(response) {
-          var data = response.data;
+        let fetchProfileData = () =>
+          ProfilePageBackendApiService.fetchProfileData();
+        fetchProfileData().then(function(data) {
           LoaderService.hideLoadingScreen();
           ctrl.username = {
             title: 'Username',
@@ -118,13 +121,11 @@ angular.module('oppia').component('profilePage', {
               );
             } else {
               if (!ctrl.isAlreadySubscribed) {
-                $http.post('/subscribehandler', {
-                  creator_username: data.profile_username
-                }).then(() => ctrl.isAlreadySubscribed = true);
+                ProfilePageBackendApiService.subscribe(data.profile_username)
+                  .then(() => ctrl.isAlreadySubscribed = true);
               } else {
-                $http.post('/unsubscribehandler', {
-                  creator_username: data.profile_username
-                }).then(() => ctrl.isAlreadySubscribed = false);
+                ProfilePageBackendApiService.unsubscribe(data.profile_username)
+                  .then(() => ctrl.isAlreadySubscribed = false);
               }
               ctrl.updateSubscriptionButtonPopoverText();
             }
