@@ -98,8 +98,8 @@ class _Gae(Platform):
                 from core.storage.feedback import gae_models as feedback_models
                 returned_models.append(feedback_models)
             elif name == NAMES.improvements:
-                from core.storage.improvements import gae_models as impv_models
-                returned_models.append(impv_models)
+                from core.storage.improvements import gae_models as improvements_models
+                returned_models.append(improvements_models)
             elif name == NAMES.job:
                 from core.storage.job import gae_models as job_models
                 returned_models.append(job_models)

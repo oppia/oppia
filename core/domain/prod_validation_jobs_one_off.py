@@ -3697,6 +3697,100 @@ class SubtopicPageModelValidator(BaseModelValidator):
         return []
 
 
+class TaskEntryModelAuditOneOffJob(BaseModelValidator):
+    """One off job for auditing task entries."""
+
+    # The name of the model which is to be used in the error messages.
+    MODEL_NAME = 'task entry'
+
+    @classmethod
+    def _get_model_id_regex(cls, item):
+        return re.escape('%s.%s.%d.%s.%s.%s' % (
+            item.entity_type, item.entity_id, item.entity_version,
+            item.task_type, item.target_type or '', item.target_id or ''))
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        external_id_relationships = {
+            'closed_by_ids': (user_models.UserSettingsModel, [item.closed_by])
+        }
+        if item.entity_type == feconf.ENTITY_TYPE_EXPLORATION:
+            external_id_relationships.update({
+                'entity_ids': (exp_models.ExplorationModel, [item.entity_id])
+            })
+        return external_id_relationships
+
+    @classmethod
+    def _validate_status(cls, item):
+        if item.status == improvements_models.STATUS_OPEN:
+            if item.closed_by:
+                cls.errors['status check'].append(
+                    'Task id %s: Status is open but closed_by is "%s", '
+                    'should be empty.' % (item.id, item.closed_by))
+            if item.closed_on:
+                cls.errors['status check'].append(
+                    'Task id %s: Status is open but closed_by is "%s", '
+                    'should be empty.' % (item.id, item.closed_on))
+        elif item.status == improvements_models.STATUS_RESOLVED:
+            if item.closed_by is None:
+                cls.errors['status check'].append(
+                    'Task id %s: Status is resolved but closed_by is not '
+                    'set' % (item.id,))
+            if item.closed_on is None:
+                cls.errors['status check'].append(
+                    'Task id %s: Status is resolved but closed_on is not '
+                    'set' % (item.id,))
+
+    @classmethod
+    def _validate_task_type(cls, item):
+        if item.task_type in (
+                improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
+                improvements_models.TASK_TYPE_NEEDS_GUIDING_RESPONSES,
+                improvements_models.TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS,
+                improvements_models.TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP):
+            if item.entity_type != improvements_models.ENTITY_TYPE_EXPLORATION:
+                cls.errors['task type check'].append(
+                    'Task id %s: Task type %s is not supported for %s '
+                    'entities' % (item.id, item.task_type, item.entity_type))
+            if item.target_type != improvements_models.TARGET_TYPE_STATE:
+                cls.errors['task type check'].append(
+                    'Task id %s: Task type %s is not supported for %s '
+                    'targets' % (item.id, item.task_type, item.target_type))
+            if not item.target_id:
+                cls.errors['task type check'].append(
+                    'Task id %s: Task type %s needs a target but no target '
+                    'id is set' % (item.id, item.task_type))
+
+    @classmethod
+    def _validate_state_target(cls, item):
+        """Validate that state name is a valid state in the
+        exploration corresponding to exp_id.
+
+        Args:
+            item: ndb.Model. ClassifierTrainingJobModel to validate.
+        """
+        if item.entity_type != improvements_models.ENTITY_TYPE_EXPLORATION:
+            return
+        if item.target_type != improvements_models.TARGET_TYPE_STATE:
+            return
+        exp_model = exp_models.ExplorationModel.get(
+            item.entity_id, strict=True, version=item.entity_version)
+        if item.target_id not in exp_model.states.keys():
+            cls.errors['target type check'].append((
+                'Task id %s: State name %s in entity is not present '
+                'in states of exploration corresponding to '
+                'exp_id %s') % (
+                    item.id, item.target_id, item.entity_id))
+
+    @classmethod
+    def _get_custom_validation_functions(cls):
+        return [
+            cls._validate_state_target,
+            cls._validate_status,
+            cls._validate_task_type
+        ]
+
+
 class SubtopicPageSnapshotMetadataModelValidator(
         BaseSnapshotMetadataModelValidator):
     """Class for validating SubtopicPageSnapshotMetadataModel."""

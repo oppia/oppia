@@ -25,7 +25,7 @@ from core.domain import email_jobs_one_off
 from core.domain import exp_jobs_one_off
 from core.domain import feedback_jobs_continuous
 from core.domain import feedback_jobs_one_off
-from core.domain import impv_jobs_one_off
+from core.domain import improvements_jobs_one_off
 from core.domain import opportunity_jobs_one_off
 from core.domain import prod_validation_jobs_one_off
 from core.domain import question_jobs_one_off
@@ -58,7 +58,7 @@ ONE_OFF_JOB_MANAGERS = [
     exp_jobs_one_off.ExplorationContentValidationJobForCKEditor,
     exp_jobs_one_off.InteractionCustomizationArgsValidationJob,
     feedback_jobs_one_off.FeedbackThreadCacheOneOffJob,
-    impv_jobs_one_off.TaskEntryModelAuditOneOffJob,
+    improvements_jobs_one_off.TaskEntryModelAuditOneOffJob,
     opportunity_jobs_one_off.ExplorationOpportunitySummaryModelRegenerationJob,
     opportunity_jobs_one_off.SkillOpportunityModelRegenerationJob,
     question_jobs_one_off.QuestionMigrationOneOffJob,

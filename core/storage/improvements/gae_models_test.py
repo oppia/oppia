@@ -25,7 +25,7 @@ from core.platform import models
 from core.tests import test_utils
 import feconf
 
-base_models, impv_models = models.Registry.import_models(
+base_models, improvements_models = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.improvements])
 
 
@@ -39,154 +39,134 @@ class TaskEntryModelTests(test_utils.GenericTestBase):
 
     def test_get_user_id_migration_policy(self):
         self.assertEqual(
-            impv_models.TaskEntryModel.get_user_id_migration_policy(),
+            improvements_models.TaskEntryModel.get_user_id_migration_policy(),
             base_models.USER_ID_MIGRATION_POLICY.ONE_FIELD)
 
     def test_get_user_id_migration_field(self):
         self.assertEqual(
-            impv_models.TaskEntryModel.get_user_id_migration_field(),
+            improvements_models.TaskEntryModel.get_user_id_migration_field(),
             'closed_by')
 
     def test_has_reference_to_user_id(self):
-        impv_models.TaskEntryModel(
-            id='task_id',
+        improvements_models.TaskEntryModel.get_or_create_task(
             entity_type=feconf.ENTITY_TYPE_EXPLORATION,
             entity_id='expid',
+            entity_version=1,
             task_type=feconf.TASK_TYPE_HIGH_BOUNCE_RATE,
-            entity_version_start=1,
             status='open',
-            closed_by='user_id'
-        ).put()
+            closed_by='user_id')
 
         self.assertTrue(
-            impv_models.TaskEntryModel.has_reference_to_user_id('user_id'))
+            improvements_models.TaskEntryModel.has_reference_to_user_id(
+                'user_id'))
         self.assertFalse(
-            impv_models.TaskEntryModel.has_reference_to_user_id('x_id'))
+            improvements_models.TaskEntryModel.has_reference_to_user_id(
+                'x_id'))
 
     def test_get_deletion_policy(self):
         self.assertEqual(
-            impv_models.TaskEntryModel.get_deletion_policy(),
+            improvements_models.TaskEntryModel.get_deletion_policy(),
             base_models.DELETION_POLICY.DELETE)
 
     def test_apply_deletion_policy(self):
-        impv_models.TaskEntryModel(
-            id='task_id',
+        improvements_models.TaskEntryModel.get_or_create_task(
             entity_type=feconf.ENTITY_TYPE_EXPLORATION,
             entity_id='expid',
+            entity_version=1,
             task_type=feconf.TASK_TYPE_HIGH_BOUNCE_RATE,
-            entity_version_start=1,
             status='open',
-            closed_by='user_id'
-        ).put()
+            closed_by='user_id')
 
         self.assertTrue(
-            impv_models.TaskEntryModel.has_reference_to_user_id('user_id'))
+            improvements_models.TaskEntryModel.has_reference_to_user_id(
+                'user_id'))
 
-        impv_models.TaskEntryModel.apply_deletion_policy('user_id')
+        improvements_models.TaskEntryModel.apply_deletion_policy('user_id')
 
         self.assertFalse(
-            impv_models.TaskEntryModel.has_reference_to_user_id('user_id'))
+            improvements_models.TaskEntryModel.has_reference_to_user_id(
+                'user_id'))
 
     def test_get_export_policy(self):
         self.assertEqual(
-            impv_models.TaskEntryModel.get_export_policy(),
+            improvements_models.TaskEntryModel.get_export_policy(),
             base_models.EXPORT_POLICY.CONTAINS_USER_DATA)
 
     def test_export_data_without_any_tasks(self):
-        self.assertEqual(impv_models.TaskEntryModel.export_data('user_id'), {
-            'task_ids_closed_by_user': []
-        })
+        self.assertEqual(
+            improvements_models.TaskEntryModel.export_data('user_id'),
+            {'task_ids_closed_by_user': []})
 
     def test_export_data_with_task(self):
-        impv_models.TaskEntryModel(
-            id='task_id',
+        task_id = improvements_models.TaskEntryModel.generate_task_id(
             entity_type=feconf.ENTITY_TYPE_EXPLORATION,
             entity_id='expid',
+            entity_version=1,
+            task_type=feconf.TASK_TYPE_HIGH_BOUNCE_RATE)
+        improvements_models.TaskEntryModel.get_or_create_task(
+            entity_type=feconf.ENTITY_TYPE_EXPLORATION,
+            entity_id='expid',
+            entity_version=1,
             task_type=feconf.TASK_TYPE_HIGH_BOUNCE_RATE,
-            entity_version_start=1,
             status='open',
-            closed_by='user_id'
-        ).put()
+            closed_by='user_id')
 
-        self.assertEqual(impv_models.TaskEntryModel.export_data('user_id'), {
-            'task_ids_closed_by_user': ['task_id']
-        })
+        self.assertEqual(
+            improvements_models.TaskEntryModel.export_data('user_id'),
+            {'task_ids_closed_by_user': [task_id]})
 
     def test_generate_new_task_id(self):
-        entity_type, entity_id, task_type = (
-            'TASK_TYPE', 'ENTITY_TYPE', 'ENTITY_ID')
-        task_ids = [
-            impv_models.TaskEntryModel.generate_new_task_id(
-                entity_type, entity_id, task_type),
-            impv_models.TaskEntryModel.generate_new_task_id(
-                entity_type, entity_id, task_type),
-        ]
-        self.assertIn(entity_type, task_ids[0])
-        self.assertIn(entity_type, task_ids[1])
-        self.assertIn(entity_id, task_ids[0])
-        self.assertIn(entity_id, task_ids[1])
-        self.assertIn(task_type, task_ids[0])
-        self.assertIn(task_type, task_ids[1])
-        # Although made of the same components, the IDs shouldn't compare equal.
-        self.assertNotEqual(task_ids[0], task_ids[1])
+        entity_type, entity_id, entity_version = (
+            'TEST_ONLY_ENTITY_TYPE', 'entity_id', 1)
+        task_type = 'TEST_ONLY_TASK_TYPE'
+        target_type, target_id = 'TEST_ONLY_TARGET_TYPE', 'target_id'
+        self.assertEqual(
+            improvements_models.TaskEntryModel.generate_task_id(
+                entity_type, entity_id, entity_version, task_type, target_type,
+                target_id),
+            'TEST_ONLY_ENTITY_TYPE.entity_id.1.TEST_ONLY_TASK_TYPE.'
+            'TEST_ONLY_TARGET_TYPE.target_id')
 
-    def test_can_generate_task_id_with_unicode_entity_id(self):
-        task_id = impv_models.TaskEntryModel.generate_new_task_id(
-            feconf.ENTITY_TYPE_EXPLORATION, 'expid\U0001F4C8', 'task_id')
-        impv_models.TaskEntryModel(
-            id=task_id,
-            entity_type=feconf.ENTITY_TYPE_EXPLORATION,
-            entity_id='expid\U0001F4C8',
-            task_type=feconf.TASK_TYPE_HIGH_BOUNCE_RATE,
-            entity_version_start=1,
-            status='open'
-        ).put()
+    def test_can_create_task_with_unicode_identifiers(self):
+        entity_type, entity_id, entity_version = (
+            'TEST_ONLY_ENTITY_TYPE', 'entity_id_\U0001F4C8', 1)
+        task_type = 'TEST_ONLY_TASK_TYPE'
+        target_type, target_id = 'TEST_ONLY_TARGET_TYPE', 'target_id_\U0001F4C8'
 
-    def test_error_reported_if_too_many_collisions(self):
-        # TaskEntryModel uses uuid.uuid4() as its source of randomness for IDs.
-        with self.swap(uuid, 'uuid4', _always_returns('duplicate-uuid')):
-            task_id = impv_models.TaskEntryModel.generate_new_task_id(
-                feconf.ENTITY_TYPE_EXPLORATION, 'expid',
-                feconf.TASK_TYPE_HIGH_BOUNCE_RATE)
-            impv_models.TaskEntryModel(
-                id=task_id,
-                entity_type=feconf.ENTITY_TYPE_EXPLORATION,
-                entity_id='expid',
-                task_type=feconf.TASK_TYPE_HIGH_BOUNCE_RATE,
-                entity_version_start=1,
-                status='open'
-            ).put()
-            with self.assertRaisesRegexp(Exception, 'too many collisions'):
-                impv_models.TaskEntryModel.generate_new_task_id(
-                    feconf.ENTITY_TYPE_EXPLORATION, 'expid',
-                    feconf.TASK_TYPE_HIGH_BOUNCE_RATE)
+        improvements_models.TaskEntryModel.get_or_create_task(
+            entity_type=entity_type,
+            entity_id=entity_id,
+            entity_version=entity_version,
+            task_type=task_type,
+            target_type=target_type,
+            target_id=target_id)
 
     def test_can_create_new_high_bounce_rate_task(self):
-        impv_models.TaskEntryModel(
-            id='task_id',
+        improvements_models.TaskEntryModel.get_or_create_task(
             entity_type=feconf.ENTITY_TYPE_EXPLORATION,
             entity_id='expid',
+            entity_version=1,
             task_type=feconf.TASK_TYPE_HIGH_BOUNCE_RATE,
-            entity_version_start=1,
-            status='open'
-        ).put()
+            target_type='state',
+            target_id='Introduction',
+            status='open')
 
     def test_can_create_new_successive_incorrect_answers_task(self):
-        impv_models.TaskEntryModel(
-            id='task_id',
+        improvements_models.TaskEntryModel.get_or_create_task(
             entity_type=feconf.ENTITY_TYPE_EXPLORATION,
             entity_id='expid',
+            entity_version=1,
             task_type=feconf.TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS,
-            entity_version_start=1,
-            status='open'
-        ).put()
+            target_type='state',
+            target_id='Introduction',
+            status='open')
 
     def test_can_create_new_needs_guiding_responses_task(self):
-        impv_models.TaskEntryModel(
-            id='task_id',
+        improvements_models.TaskEntryModel.get_or_create_task(
             entity_type=feconf.ENTITY_TYPE_EXPLORATION,
             entity_id='expid',
+            entity_version=1,
             task_type=feconf.TASK_TYPE_NEEDS_GUIDING_RESPONSES,
-            entity_version_start=1,
-            status='open'
-        ).put()
+            target_type='state',
+            target_id='Introduction',
+            status='open')

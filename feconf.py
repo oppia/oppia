@@ -134,6 +134,7 @@ ENTITY_TYPE_QUESTION = 'question'
 ENTITY_TYPE_VOICEOVER_APPLICATION = 'voiceover_application'
 
 TASK_TYPE_HIGH_BOUNCE_RATE = 'high-bounce-rate'
+TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP = 'ineffective-feedback-loop'
 TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS = 'successive-incorrect-answers'
 TASK_TYPE_NEEDS_GUIDING_RESPONSES = 'needs-guiding-responses'
 

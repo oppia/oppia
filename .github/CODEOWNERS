@@ -252,7 +252,7 @@
 /core/domain/action_registry*.py @brianrodri
 /core/domain/calculation_registry*.py @brianrodri
 /core/domain/event_services*.py @brianrodri
-/core/domain/impv*.py @brianrodri
+/core/domain/improvements*.py @brianrodri
 /core/domain/playthrough_issue_registry*.py @brianrodri
 /core/domain/stats*.py @brianrodri
 /core/domain/visualization_registry*.py @brianrodri
