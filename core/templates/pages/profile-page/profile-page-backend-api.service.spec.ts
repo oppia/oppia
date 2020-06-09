@@ -29,6 +29,8 @@ describe('Profile test backend API service', () => {
   let profilePageBackendApiService: ProfilePageBackendApiService = null;
   let httpTestingController: HttpTestingController;
   let urlService: UrlService = null;
+  let expectedBody = new FormData();
+  expectedBody.append('creator_username', 'testUsername' );
 
   let ERROR_STATUS_CODE = 500;
 
@@ -59,7 +61,7 @@ describe('Profile test backend API service', () => {
 
     let req = httpTestingController.expectOne('/subscribehandler');
     expect(req.request.method).toEqual('POST');
-    expect(req.request.body).toEqual({ creator_username: 'testUsername' });
+    expect(req.request.body).toEqual(expectedBody);
     req.flush({});
 
     flushMicrotasks();
@@ -79,7 +81,7 @@ describe('Profile test backend API service', () => {
 
     let req = httpTestingController.expectOne('/subscribehandler');
     expect(req.request.method).toEqual('POST');
-    expect(req.request.body).toEqual({ creator_username: 'testUsername' });
+    expect(req.request.body).toEqual(expectedBody);
     req.flush('Error loading data.', {
       status: ERROR_STATUS_CODE, statusText: 'Invalid Request'
     });
@@ -100,7 +102,7 @@ describe('Profile test backend API service', () => {
 
     let req = httpTestingController.expectOne('/unsubscribehandler');
     expect(req.request.method).toEqual('POST');
-    expect(req.request.body).toEqual({ creator_username: 'testUsername' });
+    expect(req.request.body).toEqual(expectedBody);
     req.flush({});
 
     flushMicrotasks();
@@ -120,7 +122,7 @@ describe('Profile test backend API service', () => {
 
     let req = httpTestingController.expectOne('/unsubscribehandler');
     expect(req.request.method).toEqual('POST');
-    expect(req.request.body).toEqual({ creator_username: 'testUsername' });
+    expect(req.request.body).toEqual(expectedBody);
     req.flush('Error loading data.', {
       status: ERROR_STATUS_CODE, statusText: 'Invalid Request'
     });
