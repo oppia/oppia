@@ -171,14 +171,7 @@ export class StateEditorService {
     // Special cases for multiple choice input and image click input.
     if (interactionId === 'MultipleChoiceInput') {
       return (<IMultipleChoiceInputCustomizationArgs> customizationArgs)
-        .choices.value.map(
-          function(val, ind) {
-            return {
-              val: ind,
-              label: val
-            };
-          }
-        );
+        .choices.value.map((val, ind) => ({ val: ind, label: val }));
     } else if (interactionId === 'ImageClickInput') {
       var _answerChoices = [];
       var imageWithRegions = (
@@ -195,21 +188,11 @@ export class StateEditorService {
     } else if (interactionId === 'ItemSelectionInput') {
       return (
         <IItemSelectionInputCustomizationArgs> customizationArgs)
-        .choices.value.map(function(val) {
-          return {
-            val: val,
-            label: val
-          };
-        });
+        .choices.value.map(val => ({ val: val, label: val }));
     } else if (interactionId === 'DragAndDropSortInput') {
       return (
         <IDragAndDropSortInputCustomizationArgs> customizationArgs)
-        .choices.value.map(function(val) {
-          return {
-            val: val,
-            label: val
-          };
-        });
+        .choices.value.map(val => ({ val: val, label: val }));
     } else {
       return null;
     }

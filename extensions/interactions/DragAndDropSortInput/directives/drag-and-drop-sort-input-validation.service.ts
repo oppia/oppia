@@ -86,9 +86,9 @@ export class DragAndDropSortInputValidationService {
   }
 
   getAllWarnings(
-      stateName: string, customizationArgs:
-      IDragAndDropSortInputCustomizationArgs, answerGroups: AnswerGroup[],
-      defaultOutcome: Outcome): IWarning[] {
+      stateName: string,
+      customizationArgs: IDragAndDropSortInputCustomizationArgs,
+      answerGroups: AnswerGroup[], defaultOutcome: Outcome): IWarning[] {
     var warningsList = [];
     var seenItems = [];
     var ranges = [];

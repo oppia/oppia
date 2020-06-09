@@ -39,7 +39,7 @@ describe('ImprovementsService', () => {
 
   describe('.isStateForcedToResolveOutstandingUnaddressedAnswers', () => {
     it('should return true for states with TextInput interactions', () => {
-      var mockStateBackendDict = {
+      let mockStateBackendDict = {
         classifier_model_id: null,
         content: {
           html: '',
@@ -97,7 +97,7 @@ describe('ImprovementsService', () => {
     });
 
     it('should return false for states with FractionInput interactions', () => {
-      var mockStateBackendDict = {
+      let mockStateBackendDict = {
         classifier_model_id: null,
         content: {
           html: '',
