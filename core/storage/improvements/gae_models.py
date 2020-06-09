@@ -76,7 +76,7 @@ class TaskEntryModel(base_models.BaseModel):
     """Task entry corresponding to an actionable task in the improvements tab.
 
     Instances of a class have an ID with the form:
-        [entity_type].[entity_id].[entity_version].[task_type].[target_type].[target_id] pylint: disable=line-too-long
+        [entity_type].[entity_id].[entity_version].[task_type].[target_type].[target_id] # pylint: disable=line-too-long
     """
     # The type of entity a task entry refers to.
     entity_type = ndb.StringProperty(
@@ -185,7 +185,7 @@ class TaskEntryModel(base_models.BaseModel):
             task_type: str. The type of task a task entry tracks.
             target_type: str or None. The optional type of sub-entity a task
                 entry refers to.
-            target_type: str or None. The optional ID of the sub-entity a task
+            target_id: str or None. The optional ID of the sub-entity a task
                 entry refers to.
 
         Returns:

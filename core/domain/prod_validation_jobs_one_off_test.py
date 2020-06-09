@@ -15015,8 +15015,8 @@ class TaskEntryModelValidatorTests(test_utils.GenericTestBase):
                 'Task id %s: Task type ineffective-feedback-loop is not '
                 'supported for TEST_ONLY_ENTITY_TYPE entities' % (
                     ifl_task_id,),
-                'Task id %s: Task type needs-guiding-responses is not supported '
-                'for TEST_ONLY_ENTITY_TYPE entities' % (
+                'Task id %s: Task type needs-guiding-responses is not '
+                'supported for TEST_ONLY_ENTITY_TYPE entities' % (
                     ngr_task_id,),
                 'Task id %s: Task type successive-incorrect-answers is not '
                 'supported for TEST_ONLY_ENTITY_TYPE entities' % (
@@ -15068,8 +15068,8 @@ class TaskEntryModelValidatorTests(test_utils.GenericTestBase):
                 'Task id %s: Task type ineffective-feedback-loop is not '
                 'supported for TEST_ONLY_TARGET_TYPE targets' % (
                     ifl_task_id,),
-                'Task id %s: Task type needs-guiding-responses is not supported '
-                'for TEST_ONLY_TARGET_TYPE targets' % (
+                'Task id %s: Task type needs-guiding-responses is not '
+                'supported for TEST_ONLY_TARGET_TYPE targets' % (
                     ngr_task_id,),
                 'Task id %s: Task type successive-incorrect-answers is not '
                 'supported for TEST_ONLY_TARGET_TYPE targets' % (
@@ -15118,8 +15118,8 @@ class TaskEntryModelValidatorTests(test_utils.GenericTestBase):
                 'Task id %s: Task type high-bounce-rate needs a target but no '
                 'target id is set' % (
                     hbr_task_id,),
-                'Task id %s: Task type ineffective-feedback-loop needs a target '
-                'but no target id is set' % (
+                'Task id %s: Task type ineffective-feedback-loop needs a '
+                'target but no target id is set' % (
                     ifl_task_id,),
                 'Task id %s: Task type needs-guiding-responses needs a target '
                 'but no target id is set' % (
