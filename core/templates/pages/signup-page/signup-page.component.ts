@@ -30,7 +30,6 @@ require('services/site-analytics.service.ts');
 require('services/user.service.ts');
 require('services/contextual/url.service.ts');
 require('services/stateful/focus-manager.service.ts');
-require('constants.ts');
 
 angular.module('oppia').component('signupPage', {
   template: require('./signup-page.component.html'),
