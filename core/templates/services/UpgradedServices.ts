@@ -238,6 +238,7 @@ import { LostChangeObjectFactory } from
 import { MathExpressionInputValidationService } from
   // eslint-disable-next-line max-len
   'interactions/MathExpressionInput/directives/math-expression-input-validation.service';
+import { MessengerService } from 'services/messenger.service';
 import { MetaTagCustomizationService } from
   'services/contextual/meta-tag-customization.service';
 import { MisconceptionObjectFactory } from
@@ -417,6 +418,8 @@ import { StateWrittenTranslationsService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-written-translations.service';
 import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
+import { StatsReportingService } from
+  'pages/exploration-player-page/services/stats-reporting.service';
 import { StopwatchObjectFactory } from
   'domain/utilities/StopwatchObjectFactory';
 import { StoryContentsObjectFactory } from
@@ -770,6 +773,9 @@ export class UpgradedServices {
     upgradedServices['MathExpressionInputValidationService'] =
       new MathExpressionInputValidationService(
         upgradedServices['baseInteractionValidationService']);
+    upgradedServices['MessengerService'] = new MessengerService(
+      upgradedServices['LoggerService'],
+      upgradedServices['WindowRef']);
     upgradedServices['MetaTagCustomizationService'] =
       new MetaTagCustomizationService(upgradedServices['WindowRef']);
     upgradedServices['MultipleChoiceInputValidationService'] =
@@ -1218,6 +1224,15 @@ export class UpgradedServices {
         upgradedServices['HttpClient'],
         upgradedServices['InteractionRulesRegistryService'],
         upgradedServices['UrlInterpolationService']);
+    upgradedServices['StatsReportingService'] = new StatsReportingService(
+      upgradedServices['ContextService'],
+      upgradedServices['HttpClient'],
+      upgradedServices['MessengerService'],
+      upgradedServices['PlaythroughService'],
+      upgradedServices['SiteAnalyticsService'],
+      upgradedServices['StopwatchObjectFactory'],
+      upgradedServices['UrlInterpolationService'],
+    );
 
     // Topological level: 7.
     upgradedServices['StatesObjectFactory'] = new StatesObjectFactory(
