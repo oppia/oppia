@@ -177,3 +177,13 @@ class TaskEntryModelTests(test_utils.GenericTestBase):
             target_type='state',
             target_id='Introduction',
             status='open')
+
+    def test_can_create_new_ineffective_feedback_loop_task(self):
+        improvements_models.TaskEntryModel.get_or_create_task(
+            entity_type=feconf.ENTITY_TYPE_EXPLORATION,
+            entity_id='expid',
+            entity_version=1,
+            task_type=feconf.TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP,
+            target_type='state',
+            target_id='Introduction',
+            status='open')

@@ -75,8 +75,8 @@ ENTITY_TYPE_TARGETS = {
 class TaskEntryModel(base_models.BaseModel):
     """Task entry corresponding to an actionable task in the improvements tab.
 
-    Instances of a class have an ID with the form:
-        [entity_type].[entity_id].[entity_version].[task_type].[target_type].[target_id] # pylint: disable=line-too-long
+    Instances have an ID of the form:
+    [entity_type].[entity_id].[entity_version].[task_type].[target_type].[target_id] # pylint: disable=line-too-long
     """
     # The type of entity a task entry refers to.
     entity_type = ndb.StringProperty(
@@ -97,7 +97,7 @@ class TaskEntryModel(base_models.BaseModel):
     target_id = ndb.StringProperty(
         default=None, required=False, indexed=True)
 
-    # Utility field for performing quick look-ups by entity.
+    # Utility field for performing quick look-ups by a specific entity.
     composite_entity_id = ndb.StringProperty(
         required=True, indexed=True)
 

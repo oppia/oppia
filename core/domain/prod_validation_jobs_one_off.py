@@ -152,9 +152,9 @@ class BaseModelValidator(python_utils.OBJECT):
         """
         regex_string = cls._get_model_id_regex(item)
         if not re.compile(regex_string).match(item.id):
-            cls.errors['model id check'].append(
-                'Entity id %s: Entity id does not match regex pattern' % (
-                    item.id,))
+            cls.errors['model id check'].append((
+                'Entity id %s: Entity id does not match regex pattern') % (
+                    item.id))
 
     @classmethod
     def _get_model_domain_object_instance(cls, unused_item):
@@ -5257,7 +5257,7 @@ class ProdValidationAuditOneOffJob( # pylint: disable=inherit-non-class
                     yield (
                         'failed validation check for %s of %s' % (
                             error_key, model_name),
-                        (',').join({v.encode('utf-8') for v in error_val}))
+                        (',').join(set(error_val)))
             else:
                 yield (
                     'fully-validated %s' % model_name, 1)
@@ -5268,7 +5268,7 @@ class ProdValidationAuditOneOffJob( # pylint: disable=inherit-non-class
         if 'fully-validated' in key:
             yield (key, len(values))
         else:
-            yield (key, [v.decode('utf-8') for v in values])
+            yield (key, values)
 
 
 class ActivityReferencesModelAuditOneOffJob(ProdValidationAuditOneOffJob):
