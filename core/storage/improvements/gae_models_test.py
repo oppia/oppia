@@ -127,6 +127,15 @@ class TaskEntryModelTests(test_utils.GenericTestBase):
             'TEST_ONLY_ENTITY_TYPE.entity_id.1.TEST_ONLY_TASK_TYPE.'
             'TEST_ONLY_TARGET_TYPE.target_id')
 
+    def test_generate_new_task_id_with_empty_target(self):
+        entity_type, entity_id, entity_version = (
+            'TEST_ONLY_ENTITY_TYPE', 'entity_id', 1)
+        task_type = 'TEST_ONLY_TASK_TYPE'
+        self.assertEqual(
+            improvements_models.TaskEntryModel.generate_task_id(
+                entity_type, entity_id, entity_version, task_type, None, None),
+            'TEST_ONLY_ENTITY_TYPE.entity_id.1.TEST_ONLY_TASK_TYPE..')
+
     def test_can_create_task_with_unicode_identifiers(self):
         entity_type, entity_id, entity_version = (
             'TEST_ONLY_ENTITY_TYPE', 'entity_id_\U0001F4C8', 1)

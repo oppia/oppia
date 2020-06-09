@@ -55,12 +55,17 @@ TARGET_TYPES = (
 )
 
 TEST_ONLY_TASK_TYPE = 'TEST_ONLY_TASK_TYPE'
+TASK_TYPE_HIGH_BOUNCE_RATE = feconf.TASK_TYPE_HIGH_BOUNCE_RATE
+TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP = feconf.TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP
+TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS = (
+    feconf.TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS)
+TASK_TYPE_NEEDS_GUIDING_RESPONSES = feconf.TASK_TYPE_NEEDS_GUIDING_RESPONSES
 TASK_TYPES = (
     TEST_ONLY_TASK_TYPE,
-    feconf.TASK_TYPE_HIGH_BOUNCE_RATE,
-    feconf.TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP,
-    feconf.TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS,
-    feconf.TASK_TYPE_NEEDS_GUIDING_RESPONSES,
+    TASK_TYPE_HIGH_BOUNCE_RATE,
+    TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP,
+    TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS,
+    TASK_TYPE_NEEDS_GUIDING_RESPONSES,
 )
 
 ENTITY_TYPE_TARGETS = {
@@ -185,7 +190,7 @@ class TaskEntryModel(base_models.BaseModel):
         """
         return '%s.%s.%d.%s.%s.%s' % (
             entity_type, entity_id, entity_version, task_type,
-            target_type, target_id)
+            target_type or '', target_id or '')
 
     @classmethod
     def generate_composite_entity_id(
@@ -250,4 +255,4 @@ class TaskEntryModel(base_models.BaseModel):
                 closed_by=closed_by,
                 closed_on=closed_on)
             task_entry.put()
-        return task_entry
+        return task_id

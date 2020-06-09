@@ -64,7 +64,7 @@ import utils
     activity_models, audit_models, base_models,
     classifier_models, collection_models,
     config_models, email_models, exp_models,
-    feedback_models, job_models,
+    feedback_models, improvements_models, job_models,
     opportunity_models, question_models,
     recommendations_models, skill_models,
     story_models, suggestion_models, topic_models,
@@ -73,7 +73,7 @@ import utils
             models.NAMES.activity, models.NAMES.audit, models.NAMES.base_model,
             models.NAMES.classifier, models.NAMES.collection,
             models.NAMES.config, models.NAMES.email, models.NAMES.exploration,
-            models.NAMES.feedback, models.NAMES.job,
+            models.NAMES.feedback, models.NAMES.improvements, models.NAMES.job,
             models.NAMES.opportunity, models.NAMES.question,
             models.NAMES.recommendations, models.NAMES.skill,
             models.NAMES.story, models.NAMES.suggestion, models.NAMES.topic,
@@ -152,9 +152,9 @@ class BaseModelValidator(python_utils.OBJECT):
         """
         regex_string = cls._get_model_id_regex(item)
         if not re.compile(regex_string).match(item.id):
-            cls.errors['model id check'].append((
-                'Entity id %s: Entity id does not match regex pattern') % (
-                    item.id))
+            cls.errors['model id check'].append(
+                'Entity id %s: Entity id does not match regex pattern' % (
+                    item.id,))
 
     @classmethod
     def _get_model_domain_object_instance(cls, unused_item):
@@ -3697,100 +3697,6 @@ class SubtopicPageModelValidator(BaseModelValidator):
         return []
 
 
-class TaskEntryModelAuditOneOffJob(BaseModelValidator):
-    """One off job for auditing task entries."""
-
-    # The name of the model which is to be used in the error messages.
-    MODEL_NAME = 'task entry'
-
-    @classmethod
-    def _get_model_id_regex(cls, item):
-        return re.escape('%s.%s.%d.%s.%s.%s' % (
-            item.entity_type, item.entity_id, item.entity_version,
-            item.task_type, item.target_type or '', item.target_id or ''))
-
-    @classmethod
-    def _get_external_id_relationships(cls, item):
-        external_id_relationships = {
-            'closed_by_ids': (user_models.UserSettingsModel, [item.closed_by])
-        }
-        if item.entity_type == feconf.ENTITY_TYPE_EXPLORATION:
-            external_id_relationships.update({
-                'entity_ids': (exp_models.ExplorationModel, [item.entity_id])
-            })
-        return external_id_relationships
-
-    @classmethod
-    def _validate_status(cls, item):
-        if item.status == improvements_models.STATUS_OPEN:
-            if item.closed_by:
-                cls.errors['status check'].append(
-                    'Task id %s: Status is open but closed_by is "%s", '
-                    'should be empty.' % (item.id, item.closed_by))
-            if item.closed_on:
-                cls.errors['status check'].append(
-                    'Task id %s: Status is open but closed_by is "%s", '
-                    'should be empty.' % (item.id, item.closed_on))
-        elif item.status == improvements_models.STATUS_RESOLVED:
-            if item.closed_by is None:
-                cls.errors['status check'].append(
-                    'Task id %s: Status is resolved but closed_by is not '
-                    'set' % (item.id,))
-            if item.closed_on is None:
-                cls.errors['status check'].append(
-                    'Task id %s: Status is resolved but closed_on is not '
-                    'set' % (item.id,))
-
-    @classmethod
-    def _validate_task_type(cls, item):
-        if item.task_type in (
-                improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
-                improvements_models.TASK_TYPE_NEEDS_GUIDING_RESPONSES,
-                improvements_models.TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS,
-                improvements_models.TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP):
-            if item.entity_type != improvements_models.ENTITY_TYPE_EXPLORATION:
-                cls.errors['task type check'].append(
-                    'Task id %s: Task type %s is not supported for %s '
-                    'entities' % (item.id, item.task_type, item.entity_type))
-            if item.target_type != improvements_models.TARGET_TYPE_STATE:
-                cls.errors['task type check'].append(
-                    'Task id %s: Task type %s is not supported for %s '
-                    'targets' % (item.id, item.task_type, item.target_type))
-            if not item.target_id:
-                cls.errors['task type check'].append(
-                    'Task id %s: Task type %s needs a target but no target '
-                    'id is set' % (item.id, item.task_type))
-
-    @classmethod
-    def _validate_state_target(cls, item):
-        """Validate that state name is a valid state in the
-        exploration corresponding to exp_id.
-
-        Args:
-            item: ndb.Model. ClassifierTrainingJobModel to validate.
-        """
-        if item.entity_type != improvements_models.ENTITY_TYPE_EXPLORATION:
-            return
-        if item.target_type != improvements_models.TARGET_TYPE_STATE:
-            return
-        exp_model = exp_models.ExplorationModel.get(
-            item.entity_id, strict=True, version=item.entity_version)
-        if item.target_id not in exp_model.states.keys():
-            cls.errors['target type check'].append((
-                'Task id %s: State name %s in entity is not present '
-                'in states of exploration corresponding to '
-                'exp_id %s') % (
-                    item.id, item.target_id, item.entity_id))
-
-    @classmethod
-    def _get_custom_validation_functions(cls):
-        return [
-            cls._validate_state_target,
-            cls._validate_status,
-            cls._validate_task_type
-        ]
-
-
 class SubtopicPageSnapshotMetadataModelValidator(
         BaseSnapshotMetadataModelValidator):
     """Class for validating SubtopicPageSnapshotMetadataModel."""
@@ -5036,6 +4942,113 @@ class PendingDeletionRequestModelValidator(BaseUserModelValidator):
             cls._validate_collections_are_marked_deleted]
 
 
+class TaskEntryModelValidator(BaseModelValidator):
+    """One off job for auditing task entries."""
+
+    # The name of the model which is to be used in the error messages.
+    MODEL_NAME = 'task entry'
+
+    @classmethod
+    def _get_model_id_regex(cls, item):
+        return re.escape('%s.%s.%d.%s.%s.%s' % (
+            item.entity_type, item.entity_id, item.entity_version,
+            item.task_type, item.target_type or '', item.target_id or ''))
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        external_id_relationships = dict()
+        if item.closed_by is not None:
+            external_id_relationships['closed_by_ids'] = (
+                user_models.UserSettingsModel, [item.closed_by])
+        if item.entity_type == feconf.ENTITY_TYPE_EXPLORATION:
+            external_id_relationships['entity_ids'] = (
+                exp_models.ExplorationModel, [item.entity_id])
+        return external_id_relationships
+
+    @classmethod
+    def _validate_composite_entity_id(cls, item):
+        regex_string = re.escape('%s.%s.%d' % (
+            item.entity_type, item.entity_id, item.entity_version))
+        if not re.compile(regex_string).match(item.composite_entity_id):
+            cls.errors['composite entity id check'].append(
+                'Task id %s: Composite entity id does not match regex pattern'
+                % (item.id,))
+
+    @classmethod
+    def _validate_status(cls, item):
+        if item.status == improvements_models.STATUS_OPEN:
+            if item.closed_by:
+                cls.errors['status check'].append(
+                    'Task id %s: Status is open but closed_by is "%s", '
+                    'should be empty.' % (item.id, item.closed_by))
+            if item.closed_on:
+                cls.errors['status check'].append(
+                    'Task id %s: Status is open but closed_on is "%s", '
+                    'should be empty.' % (item.id, item.closed_on))
+        elif item.status == improvements_models.STATUS_RESOLVED:
+            if item.closed_by is None:
+                cls.errors['status check'].append(
+                    'Task id %s: Status is resolved but closed_by is not '
+                    'set' % (item.id,))
+            if item.closed_on is None:
+                cls.errors['status check'].append(
+                    'Task id %s: Status is resolved but closed_on is not '
+                    'set' % (item.id,))
+
+    @classmethod
+    def _validate_task_type(cls, item):
+        if item.task_type in (
+                improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
+                improvements_models.TASK_TYPE_NEEDS_GUIDING_RESPONSES,
+                improvements_models.TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS,
+                improvements_models.TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP):
+            if item.entity_type != improvements_models.ENTITY_TYPE_EXPLORATION:
+                cls.errors['task type check'].append(
+                    'Task id %s: Task type %s is not supported for %s '
+                    'entities' % (item.id, item.task_type, item.entity_type))
+            if item.target_type != improvements_models.TARGET_TYPE_STATE:
+                cls.errors['task type check'].append(
+                    'Task id %s: Task type %s is not supported for %s '
+                    'targets' % (item.id, item.task_type, item.target_type))
+            if not item.target_id:
+                cls.errors['task type check'].append(
+                    'Task id %s: Task type %s needs a target but no target '
+                    'id is set' % (item.id, item.task_type))
+
+    @classmethod
+    def _validate_exploration_state_targets(cls, item):
+        """Validate that state name is a valid state in the
+        exploration corresponding to exp_id.
+
+        Args:
+            item: ndb.Model. ClassifierTrainingJobModel to validate.
+        """
+        if item.entity_type != improvements_models.ENTITY_TYPE_EXPLORATION:
+            return
+        if 'entity_ids field check' in cls.errors:
+            return
+        if item.target_type != improvements_models.TARGET_TYPE_STATE:
+            return
+        if item.target_id is None:
+            return
+        exp_model = exp_models.ExplorationModel.get(
+            item.entity_id, strict=True, version=item.entity_version)
+        if item.target_id not in exp_model.states.keys():
+            cls.errors['target type check'].append(
+                'Task id %s: State name %s is not present in states of '
+                'exploration with id %s' % (
+                    item.id, item.target_id, item.entity_id))
+
+    @classmethod
+    def _get_custom_validation_functions(cls):
+        return [
+            cls._validate_status,
+            cls._validate_exploration_state_targets,
+            cls._validate_task_type,
+            cls._validate_composite_entity_id,
+        ]
+
+
 MODEL_TO_VALIDATOR_MAPPING = {
     activity_models.ActivityReferencesModel: ActivityReferencesModelValidator,
     audit_models.RoleQueryAuditModel: RoleQueryAuditModelValidator,
@@ -5093,6 +5106,7 @@ MODEL_TO_VALIDATOR_MAPPING = {
         GeneralFeedbackThreadUserModelValidator),
     feedback_models.FeedbackAnalyticsModel: FeedbackAnalyticsModelValidator,
     feedback_models.UnsentFeedbackEmailModel: UnsentFeedbackEmailModelValidator,
+    improvements_models.TaskEntryModel: TaskEntryModelValidator,
     job_models.JobModel: JobModelValidator,
     job_models.ContinuousComputationModel: ContinuousComputationModelValidator,
     opportunity_models.ExplorationOpportunitySummaryModel: (
@@ -5228,7 +5242,7 @@ class ProdValidationAuditOneOffJob( # pylint: disable=inherit-non-class
                     yield (
                         'failed validation check for %s of %s' % (
                             error_key, model_name),
-                        (',').join(set(error_val)))
+                        (',').join({v.encode('utf-8') for v in error_val}))
             else:
                 yield (
                     'fully-validated %s' % model_name, 1)
@@ -5239,7 +5253,7 @@ class ProdValidationAuditOneOffJob( # pylint: disable=inherit-non-class
         if 'fully-validated' in key:
             yield (key, len(values))
         else:
-            yield (key, values)
+            yield (key, [v.decode('utf-8') for v in values])
 
 
 class ActivityReferencesModelAuditOneOffJob(ProdValidationAuditOneOffJob):
@@ -6034,3 +6048,11 @@ class PendingDeletionRequestModelAuditOneOffJob(ProdValidationAuditOneOffJob):
     @classmethod
     def entity_classes_to_map_over(cls):
         return [user_models.PendingDeletionRequestModel]
+
+
+class TaskEntryModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates TaskEntryModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [improvements_models.TaskEntryModel]
