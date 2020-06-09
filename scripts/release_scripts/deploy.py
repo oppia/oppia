@@ -493,9 +493,10 @@ def execute_deployment():
                 current_branch_name)
             last_commit_message = subprocess.check_output(
                 'git log -1 --pretty=%B'.split())
-            if not last_commit_message.startswith(
-                    'Update authors and changelog for v%s' % (
-                        release_version_number)):
+            if not common.is_current_branch_a_hotfix_branch() and (
+                    not last_commit_message.startswith(
+                        'Update authors and changelog for v%s' % (
+                            release_version_number))):
                 raise Exception(
                     'Invalid last commit message: %s.' % last_commit_message)
 
@@ -503,9 +504,12 @@ def execute_deployment():
 
             personal_access_token = common.get_personal_access_token()
             g = github.Github(personal_access_token)
-            repo = g.get_organization('oppia').get_repo('oppia')
-            common.check_blocking_bug_issue_count(repo)
-            common.check_prs_for_current_release_are_released(repo)
+
+            if not common.is_current_branch_a_hotfix_branch():
+                repo = g.get_organization('oppia').get_repo('oppia')
+                common.check_blocking_bug_issue_count(repo)
+                common.check_prs_for_current_release_are_released(repo)
+
             update_configs.main(personal_access_token)
             with python_utils.open_file(FECONF_PATH, 'r') as f:
                 feconf_contents = f.read()
