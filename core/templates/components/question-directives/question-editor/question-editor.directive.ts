@@ -70,8 +70,11 @@ angular.module('oppia').directive('questionEditor', [
             SolutionValidityService, StateEditorService, INTERACTION_SPECS) {
           var ctrl = this;
           ctrl.getStateContentPlaceholder = function() {
-            return (
-              'You can speak to the learner here, then ask them a question.');
+            return 'Type your question here.';
+          };
+
+          ctrl.getStateContentSaveButtonPlaceholder = function() {
+            return 'Save Question';
           };
 
           ctrl.navigateToState = function() {

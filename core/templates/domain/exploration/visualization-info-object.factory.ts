@@ -36,15 +36,23 @@ export interface IAnswerStatsBackendDict {
     string | number | IFractionDict | INumberWithUnitsBackendDict | string[] |
     INote[] | number[] | IGraphBackendDict| string[][]);
   'frequency': number;
+
+  // N/A when the visualization can not present addressed answers.
+  //
+  // For example, for SetInput interactions the individual answer elements are
+  // not generally intended to be used as a single response to SetInput
+  // interactions, so we omit addressed information entirely.
   'is_addressed'?: boolean;
 }
+
+export type Option = string | string[];
 
 export interface IVisualizationInfoBackendDict {
     'addressed_info_is_supported': boolean;
     'data': IAnswerStatsBackendDict[];
     'id': string;
     'options': {
-      [name: string]: Object
+      [name: string]: Option
   };
 }
 

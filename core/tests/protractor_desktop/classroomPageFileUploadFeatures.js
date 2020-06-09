@@ -59,7 +59,8 @@ describe('Classroom page functionality', function() {
     async function() {
       var handle = await browser.getWindowHandle();
       await topicsAndSkillsDashboardPage.get();
-      await topicsAndSkillsDashboardPage.createTopic('Topic 1', false);
+      await topicsAndSkillsDashboardPage.createTopic('Topic 1',
+        'Description', false);
       await topicEditorPage.submitTopicThumbnail('../data/test_svg.svg');
       await topicEditorPage.saveTopic('Added thumbnail.');
       var url = await browser.getCurrentUrl();
