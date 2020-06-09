@@ -23,6 +23,8 @@ import { AnswerGroup } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { IWarning, baseInteractionValidationService } from
   'interactions/base-interaction-validation.service';
+import { IMathExpressionCustomizationArgs } from
+  'interactions/customization-args-defs';
 import { Outcome } from
   'domain/exploration/OutcomeObjectFactory';
 
@@ -36,14 +38,16 @@ export class MathExpressionInputValidationService {
       private baseInteractionValidationServiceInstance:
         baseInteractionValidationService) {}
 
-  getCustomizationArgsWarnings(customizationArgs: {}): IWarning[] {
+  getCustomizationArgsWarnings(
+      customizationArgs: IMathExpressionCustomizationArgs): IWarning[] {
     // TODO(juansaba): Implement customization args validations.
     return [];
   }
 
   getAllWarnings(
-      stateName: string, customizationArgs: {}, answerGroups: AnswerGroup[],
-      defaultOutcome: Outcome): IWarning[] {
+      stateName: string,
+      customizationArgs: IMathExpressionCustomizationArgs,
+      answerGroups: AnswerGroup[], defaultOutcome: Outcome): IWarning[] {
     var warningsList = [];
 
     warningsList = warningsList.concat(

@@ -181,6 +181,14 @@ export interface ITextInputCustomizationArgs {
   };
 }
 
+export interface IMathExpressionCustomizationArgs {
+
+}
+
+export interface INumericInputCustomizationArgs {
+
+}
+
 export type IInteractionCustomizationArgs = (
   ICodeReplCustomizationArgs |
   IContinueCustomizationArgs |
@@ -196,4 +204,6 @@ export type IInteractionCustomizationArgs = (
   IMusicNotesInputCustomizationArgs |
   IPencilCodeCustomizationArgs |
   ISetInputCustomizationArgs |
-  ITextInputCustomizationArgs);
+  ITextInputCustomizationArgs |
+  IMathExpressionCustomizationArgs |
+  INumericInputCustomizationArgs);

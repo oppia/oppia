@@ -23,6 +23,8 @@ import { AnswerGroup } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { IWarning, baseInteractionValidationService } from
   'interactions/base-interaction-validation.service';
+import { INumericInputCustomizationArgs } from
+  'interactions/customization-args-defs';
 import { Outcome } from
   'domain/exploration/OutcomeObjectFactory';
 
@@ -37,14 +39,14 @@ export class NumericInputValidationService {
         baseInteractionValidationService) {}
 
   getCustomizationArgsWarnings(
-      customizationArgs: {}): IWarning[] {
+      customizationArgs: INumericInputCustomizationArgs): IWarning[] {
     return [];
   }
 
   getAllWarnings(
-      stateName: string, customizationArgs: {},
-      answerGroups: AnswerGroup[],
-      defaultOutcome: Outcome): IWarning[] {
+      stateName: string,
+      customizationArgs: INumericInputCustomizationArgs,
+      answerGroups: AnswerGroup[], defaultOutcome: Outcome): IWarning[] {
     var warningsList = [];
 
     warningsList = warningsList.concat(
