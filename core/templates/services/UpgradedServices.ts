@@ -349,7 +349,7 @@ import { SkillDifficultyObjectFactory } from
   'domain/skill/SkillDifficultyObjectFactory';
 import { SkillMasteryBackendApiService } from
   'domain/skill/skill-mastery-backend-api.service';
-import { SkillMasteryObjectFactory } from 
+import { SkillMasteryObjectFactory } from
   'domain/skill/SkillMasteryObjectFactory';
 import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
 import { SkillOpportunityObjectFactory } from
@@ -642,7 +642,7 @@ export class UpgradedServices {
       new SchemaUndefinedLastElementService();
     upgradedServices['SkillDifficultyObjectFactory'] =
       new SkillDifficultyObjectFactory();
-    upgradedServices['SkillMasteryObjectFactory'] = 
+    upgradedServices['SkillMasteryObjectFactory'] =
       new SkillMasteryObjectFactory();
     upgradedServices['SkillOpportunityObjectFactory'] =
       new SkillOpportunityObjectFactory();
