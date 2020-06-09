@@ -57,8 +57,10 @@ MOCK_UPDATED_CONTRIBUTORS_FILEPATH = os.path.join(
 
 def read_from_file(filepath):
     """Reads the lines from a file.
+
     Args:
         filepath: str. The path of the file to read.
+
     Returns:
         list(str). The list of lines in the file.
     """
@@ -68,6 +70,7 @@ def read_from_file(filepath):
 
 def write_to_file(filepath, filelines):
     """Writes a list of lines to a file.
+
     Args:
         filepath: str. The path of the file to write to.
         filelines: list(str). The lines to write to the file.
