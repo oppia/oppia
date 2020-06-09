@@ -28,6 +28,7 @@ export interface ExplorationSummary {
 interface IStoryNodeBackendDict {
   id: string;
   title: string;
+  description: string;
   'destination_node_ids': string[];
   'prerequisite_skill_ids': string[];
   'acquired_skill_ids': string[];
@@ -41,6 +42,7 @@ interface IStoryNodeBackendDict {
 export class ReadOnlyStoryNode {
   _id: string;
   _title: string;
+  _description: string;
   _destinationNodeIds: Array<string>;
   _prerequisiteSkillIds: Array<string>;
   _acquiredSkillIds: Array<string>;
@@ -50,12 +52,14 @@ export class ReadOnlyStoryNode {
   _explorationSummary: ExplorationSummary;
   _completed: boolean;
 
-  constructor(id: string, title: string, destinationNodeIds: Array<string>,
-      prerequisiteSkillIds: Array<string>, acquiredSkillIds: Array<string>,
-      outline: string, outlineIsFinalized: boolean, explorationId: string,
+  constructor(id: string, title: string, description: string,
+      destinationNodeIds: Array<string>, prerequisiteSkillIds: Array<string>,
+      acquiredSkillIds: Array<string>, outline: string,
+      outlineIsFinalized: boolean, explorationId: string,
       explorationSummary: ExplorationSummary, completed: boolean) {
     this._id = id;
     this._title = title;
+    this._description = description;
     this._destinationNodeIds = destinationNodeIds;
     this._prerequisiteSkillIds = prerequisiteSkillIds;
     this._acquiredSkillIds = acquiredSkillIds;
@@ -72,6 +76,10 @@ export class ReadOnlyStoryNode {
 
   getTitle(): string {
     return this._title;
+  }
+
+  getDescription(): string {
+    return this._description;
   }
 
   getExplorationId(): string {
@@ -103,6 +111,7 @@ export class ReadOnlyStoryNodeObjectFactory {
       storyNodeBackendDict: IStoryNodeBackendDict): ReadOnlyStoryNode {
     return new ReadOnlyStoryNode(storyNodeBackendDict.id,
       storyNodeBackendDict.title,
+      storyNodeBackendDict.description,
       storyNodeBackendDict.destination_node_ids,
       storyNodeBackendDict.prerequisite_skill_ids,
       storyNodeBackendDict.acquired_skill_ids,

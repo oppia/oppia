@@ -962,7 +962,7 @@ textarea {
 }
 
 .navbar-light .navbar-container {
-  background: #009688;
+  background: #00645C;
   height: 56px;
   width: 100%;
 }
@@ -2593,10 +2593,14 @@ div#ng-curtain {
 }
 .oppia-logo-wide {
   margin-left: 25px;
-  width: 90px;
 }
 .oppia-logo-small {
   margin-left: 6px;
+}
+
+.oppia-navbar-back-button {
+  color: white;
+  padding: 6px;
 }
 
 .oppia-navbar-tabs {

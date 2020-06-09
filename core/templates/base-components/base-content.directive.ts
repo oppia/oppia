@@ -29,9 +29,12 @@ angular.module('oppia').directive('baseContent', [
     return {
       restrict: 'E',
       scope: {},
-      bindToController: {},
+      bindToController: {
+        backButtonShown: '<'
+      },
       transclude: {
         breadcrumb: '?navbarBreadcrumb',
+        preLogoAction: '?navbarPreLogoAction',
         content: 'content',
         footer: '?pageFooter',
         navOptions: '?navOptions',
