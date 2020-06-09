@@ -35,7 +35,6 @@ angular.module('oppia').directive('i18nFooter', [
             $http, $timeout, $translate, I18nLanguageCodeService,
             UserService, SUPPORTED_SITE_LANGUAGES) {
           var ctrl = this;
-          var NG_TRANSLATE_COOKIE_KEY = 'NG_TRANSLATE_LANG_KEY=';
           // Changes the language of the translations.
           var preferencesDataUrl = '/preferenceshandler/data';
           var siteLanguageUrl = '/save_site_language';
@@ -53,27 +52,10 @@ angular.module('oppia').directive('i18nFooter', [
           };
           ctrl.$onInit = function() {
             ctrl.supportedSiteLanguages = SUPPORTED_SITE_LANGUAGES;
-            // Fetching the saved language code from cookie, because $translate
-            // in angularjs uses cookies to store the last used code and we need
-            // to fetch that code in order to have the same translation language
-            // used in both angular and angularjs when the webpage first loads.
-            if (document.cookie.includes(NG_TRANSLATE_COOKIE_KEY)) {
-              var languageCode = (
-                document.cookie.split(NG_TRANSLATE_COOKIE_KEY)[1]);
-              languageCode = languageCode.split(';')[0];
-              I18nLanguageCodeService.setI18nLanguageCode(languageCode);
-            }
-            // The $timeout seems to be necessary for the dropdown
-            // to show anything at the outset, if the default language
-            // is not English.
-            $timeout(function() {
-              // $translate.use() returns undefined until the language
-              // file is fully loaded, which causes a blank field
-              // in the dropdown, hence we use $translate.proposedLanguage()
-              // as suggested in http://stackoverflow.com/a/28903658
-              ctrl.currentLanguageCode = $translate.use() ||
-                $translate.proposedLanguage();
-            }, 50);
+            ctrl.currentLanguageCode = (
+              $translate.proposedLanguage() || $translate.use());
+            I18nLanguageCodeService.setI18nLanguageCode(
+              ctrl.currentLanguageCode);
           };
         }
       ]
