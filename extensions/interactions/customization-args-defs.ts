@@ -181,7 +181,7 @@ export interface ITextInputCustomizationArgs {
   };
 }
 
-export type ICustomizationArgs = (
+export type IInteractionCustomizationArgs = (
   ICodeReplCustomizationArgs |
   IContinueCustomizationArgs |
   IDragAndDropSortInputCustomizationArgs |

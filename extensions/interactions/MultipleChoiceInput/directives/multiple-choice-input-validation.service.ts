@@ -75,9 +75,9 @@ export class MultipleChoiceInputValidationService {
   }
 
   getAllWarnings(
-      stateName: string, customizationArgs:
-      IMultipleChoiceInputCustomizationArgs, answerGroups: AnswerGroup[],
-      defaultOutcome: Outcome): IWarning[] {
+      stateName: string,
+      customizationArgs: IMultipleChoiceInputCustomizationArgs,
+      answerGroups: AnswerGroup[], defaultOutcome: Outcome): IWarning[] {
     var warningsList = [];
 
     warningsList = warningsList.concat(

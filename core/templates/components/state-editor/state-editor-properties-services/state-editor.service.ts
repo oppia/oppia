@@ -27,7 +27,7 @@ import { AnswerGroup } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { Hint } from 'domain/exploration/HintObjectFactory';
 import {
-  ICustomizationArgs,
+  IInteractionCustomizationArgs,
   IDragAndDropSortInputCustomizationArgs,
   IImageClickInputCustomizationArgs,
   IItemSelectionInputCustomizationArgs,
@@ -145,7 +145,8 @@ export class StateEditorService {
     this.interaction.setDefaultOutcome(newOutcome);
   }
 
-  setInteractionCustomizationArgs(newArgs: ICustomizationArgs): void {
+  setInteractionCustomizationArgs(
+      newArgs: IInteractionCustomizationArgs): void {
     this.interaction.setCustomizationArgs(newArgs);
   }
 
@@ -162,14 +163,14 @@ export class StateEditorService {
   }
 
   getAnswerChoices(
-      interactionId: string, customizationArgs:
-      ICustomizationArgs): IAnswerChoice[] {
+      interactionId: string,
+      customizationArgs: IInteractionCustomizationArgs): IAnswerChoice[] {
     if (!interactionId) {
       return null;
     }
     // Special cases for multiple choice input and image click input.
     if (interactionId === 'MultipleChoiceInput') {
-      return (<IMultipleChoiceInputCustomizationArgs>customizationArgs)
+      return (<IMultipleChoiceInputCustomizationArgs> customizationArgs)
         .choices.value.map(
           function(val, ind) {
             return {
@@ -181,7 +182,7 @@ export class StateEditorService {
     } else if (interactionId === 'ImageClickInput') {
       var _answerChoices = [];
       var imageWithRegions = (
-        <IImageClickInputCustomizationArgs>customizationArgs)
+        <IImageClickInputCustomizationArgs> customizationArgs)
         .imageAndRegions.value;
       for (
         var j = 0; j < imageWithRegions.labeledRegions.length; j++) {
@@ -191,11 +192,18 @@ export class StateEditorService {
         });
       }
       return _answerChoices;
-    } else if (interactionId === 'ItemSelectionInput' ||
-        interactionId === 'DragAndDropSortInput') {
+    } else if (interactionId === 'ItemSelectionInput') {
       return (
-        <IDragAndDropSortInputCustomizationArgs |
-        IItemSelectionInputCustomizationArgs>customizationArgs)
+        <IItemSelectionInputCustomizationArgs> customizationArgs)
+        .choices.value.map(function(val) {
+          return {
+            val: val,
+            label: val
+          };
+        });
+    } else if (interactionId === 'DragAndDropSortInput') {
+      return (
+        <IDragAndDropSortInputCustomizationArgs> customizationArgs)
         .choices.value.map(function(val) {
           return {
             val: val,
