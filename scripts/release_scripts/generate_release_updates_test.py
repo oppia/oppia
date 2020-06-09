@@ -71,23 +71,61 @@ class GenerateReleaseUpdatesTests(test_utils.GenericTestBase):
                             generate_release_updates.SECTIONS_TO_ADD))))
 
     def test_validate_release_message_with_valid_message(self):
+        check_function_calls = {
+            'ask_user_to_confirm_gets_called': False
+        }
+        def mock_ask_user_to_confirm(unused_msg):
+            check_function_calls['ask_user_to_confirm_gets_called'] = True
+
         mail_file_swap = self.swap(
             generate_release_updates, 'RELEASE_MAIL_MESSAGE_FILEPATH',
             VALID_RELEASE_MAIL_MESSAGE_FILEPATH)
-        with mail_file_swap:
+        ask_user_swap = self.swap(
+            common, 'ask_user_to_confirm', mock_ask_user_to_confirm)
+        with mail_file_swap, ask_user_swap:
             generate_release_updates.validate_release_message()
+        self.assertFalse(
+            check_function_calls['ask_user_to_confirm_gets_called'])
 
     def test_validate_release_message_with_invalid_message(self):
-        mail_file_swap = self.swap(
-            generate_release_updates, 'RELEASE_MAIL_MESSAGE_FILEPATH',
-            INVALID_RELEASE_MAIL_MESSAGE_FILEPATH)
-        with mail_file_swap, self.assertRaisesRegexp(
-            Exception, (
-                'Template not formatted correctly. Following sections '
-                'still not updated: \\[Add main changes\\], '
-                '\\[Add names of release testers\\].\nPlease re-run '
-                'the scripts and make the updates again.')):
+        check_function_calls = {
+            'ask_user_to_confirm_gets_called': 0,
+            'read_gets_called': 0
+        }
+        expected_check_function_calls = {
+            'ask_user_to_confirm_gets_called': 2,
+            'read_gets_called': 2
+        }
+
+        def mock_open_file(unused_path, unused_mode):
+            return MockFile()
+        def mock_ask_user_to_confirm(unused_msg):
+            check_function_calls['ask_user_to_confirm_gets_called'] += 1
+
+        with python_utils.open_file(
+            VALID_RELEASE_MAIL_MESSAGE_FILEPATH, 'r') as f:
+            correct_content = f.read()
+        with python_utils.open_file(
+            INVALID_RELEASE_MAIL_MESSAGE_FILEPATH, 'r') as f:
+            wrong_content = f.read()
+
+        class MockFile(python_utils.OBJECT):
+            def read(self):
+                """Read content of the file object."""
+                return mock_read()
+        def mock_read():
+            check_function_calls['read_gets_called'] += 1
+            if check_function_calls['read_gets_called'] == 2:
+                return correct_content
+            return wrong_content
+
+        open_file_swap = self.swap(python_utils, 'open_file', mock_open_file)
+        ask_user_swap = self.swap(
+            common, 'ask_user_to_confirm', mock_ask_user_to_confirm)
+
+        with open_file_swap, ask_user_swap:
             generate_release_updates.validate_release_message()
+        self.assertEqual(check_function_calls, expected_check_function_calls)
 
     def test_prompt_user_to_send_announcement_email(self):
         check_function_calls = {
