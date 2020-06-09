@@ -74,6 +74,28 @@ angular.module('oppia').component('svgFilenameEditor', {
       ctrl.entityType = ContextService.getEntityType();
       ctrl.imageSaveDestination = ContextService.getImageSaveDestination();
       ctrl.svgContainerStyle = {};
+      var lcInitializingOptions = {
+        imageSize: {
+          width: ctrl.diagramWidth, height: ctrl.diagramHeight},
+        imageURLPrefix: (
+          '/third_party/static/literallycanvas-0.5.2/lib/img'),
+        toolbarPosition: 'bottom',
+        defaultStrokeWidth: DEFAULT_STROKE_WIDTH,
+        strokeWidths: ALLOWED_STROKE_WIDTHS,
+        // Eraser tool is removed because svgRenderer has not been
+        // implemented in LiterallyCanvas. It can be included once
+        // svgRenderer function is implemented.
+        tools: [
+          LC.tools.Pencil,
+          LC.tools.Line,
+          LC.tools.Ellipse,
+          LC.tools.Rectangle,
+          LC.tools.Text,
+          LC.tools.Polygon,
+          LC.tools.Pan,
+          LC.tools.Eyedropper
+        ]
+      };
 
       ctrl.onWidthInputBlur = function() {
         if (ctrl.diagramWidth < MAX_DIAGRAM_WIDTH) {
@@ -286,28 +308,8 @@ angular.module('oppia').component('svgFilenameEditor', {
           attrs: []
         };
         angular.element(document).ready(function() {
-          ctrl.lc = LC.init(document.getElementById(ctrl.lcID), {
-            imageSize: {
-              width: ctrl.diagramWidth, height: ctrl.diagramHeight},
-            imageURLPrefix: (
-              '/third_party/static/literallycanvas-0.5.2/lib/img'),
-            toolbarPosition: 'bottom',
-            defaultStrokeWidth: DEFAULT_STROKE_WIDTH,
-            strokeWidths: ALLOWED_STROKE_WIDTHS,
-            // Eraser tool is removed because svgRenderer has not been
-            // implemented in LiterallyCanvas. It can be included once
-            // svgRenderer function is implemented.
-            tools: [
-              LC.tools.Pencil,
-              LC.tools.Line,
-              LC.tools.Ellipse,
-              LC.tools.Rectangle,
-              LC.tools.Text,
-              LC.tools.Polygon,
-              LC.tools.Pan,
-              LC.tools.Eyedropper
-            ]
-          });
+          ctrl.lc = LC.init(
+            document.getElementById(ctrl.lcID), lcInitializingOptions);
           var snapshot = LiterallyCanvasHelperService.parseSvg(
             ctrl.savedSVGDiagram, ctrl.lc);
           ctrl.lc.loadSnapshot(snapshot);
@@ -343,28 +345,8 @@ angular.module('oppia').component('svgFilenameEditor', {
           };
         } else {
           angular.element(document).ready(function() {
-            ctrl.lc = LC.init(document.getElementById(ctrl.lcID), {
-              imageSize: {
-                width: ctrl.diagramWidth, height: ctrl.diagramHeight},
-              imageURLPrefix: (
-                '/third_party/static/literallycanvas-0.5.2/lib/img'),
-              toolbarPosition: 'bottom',
-              defaultStrokeWidth: DEFAULT_STROKE_WIDTH,
-              strokeWidths: ALLOWED_STROKE_WIDTHS,
-              // Eraser tool is removed because svgRenderer has not been
-              // implemented in LiterallyCanvas. It can be included once
-              // svgRenderer function is implemented.
-              tools: [
-                LC.tools.Pencil,
-                LC.tools.Line,
-                LC.tools.Ellipse,
-                LC.tools.Rectangle,
-                LC.tools.Text,
-                LC.tools.Polygon,
-                LC.tools.Pan,
-                LC.tools.Eyedropper
-              ]
-            });
+            ctrl.lc = LC.init(
+              document.getElementById(ctrl.lcID), lcInitializingOptions);
           });
         }
       };

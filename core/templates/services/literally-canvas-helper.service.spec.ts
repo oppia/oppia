@@ -670,7 +670,36 @@ describe('LiterallyCanvasHelperService', function() {
   });
 });
 
-describe('LiterallyCanvasHelperService svg validation', function() {
+describe('LiterallyCanvasHelperService svg tag validation', function() {
+  var LiterallyCanvasHelperService = null;
+  var mockImageUploadHelperService = {
+    getInvalidSvgTagsAndAttrs: function(dataURI) {
+      return { tags: ['script'], attrs: [] };
+    }
+  };
+
+  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('ImageUploadHelperService', mockImageUploadHelperService);
+  }));
+  beforeEach(angular.mock.inject(function($injector) {
+    LiterallyCanvasHelperService = $injector.get(
+      'LiterallyCanvasHelperService');
+  }));
+
+  it('should fail svg validation', function() {
+    var invalidSvgTag = (
+      '<svg width="100" height="100"><rect id="rectangle-de569866-9c11-b553-' +
+      'f5b7-4194e2380d9f" x="143" y="97" width="12" height29" stroke="hsla(0' +
+      ', 0%, 0%, 1)" fill="hsla(0, 0%, 100%, 1)" stroke-width="1"></rect>' +
+      '<script src="evil.com"></script></svg>');
+    expect(() => {
+      LiterallyCanvasHelperService.isSvgTagValid(invalidSvgTag);
+    }).toThrowError('Invalid tags in svg:script');
+  });
+});
+
+describe('LiterallyCanvasHelperService svg attribute validation', function() {
   var LiterallyCanvasHelperService = null;
   var mockImageUploadHelperService = {
     getInvalidSvgTagsAndAttrs: function(dataURI) {
@@ -695,6 +724,6 @@ describe('LiterallyCanvasHelperService svg validation', function() {
       '</svg>');
     expect(() => {
       LiterallyCanvasHelperService.isSvgTagValid(invalidWidthAttribute);
-    }).toThrowError('Invalid tag or attribute in svg.');
+    }).toThrowError('Invalid attributes in svg:widht');
   });
 });

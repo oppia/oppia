@@ -58,17 +58,19 @@ angular.module('oppia').factory('LiterallyCanvasHelperService', [
       }
     };
 
-    var isSvgTagValid = function(svgString) {
+    var _isSvgTagValid = function(svgString) {
       // This function validates an svg tag.
       var dataURI = 'data:image/svg+xml;base64,' + btoa(svgString);
       var invlidTagsAndAttr = (
         ImageUploadHelperService.getInvalidSvgTagsAndAttrs(dataURI));
-      if (invlidTagsAndAttr.tags.length === 0 &&
-          invlidTagsAndAttr.attrs.length === 0) {
-        return true;
-      } else {
-        throw new Error('Invalid tag or attribute in svg.');
-      }
+      if (invlidTagsAndAttr.tags.length !== 0) {
+        var errorText = 'Invalid tags in svg:' + invlidTagsAndAttr.tags.join();
+        throw new Error(errorText);
+      } else if(invlidTagsAndAttr.attrs.length !== 0) {
+        var errorText = 'Invalid attributes in svg:' + invlidTagsAndAttr.attrs.join();
+        throw new Error(errorText);
+      } 
+      return true;
     };
 
     var convertSvgToShapeObject = function(node) {
@@ -256,14 +258,14 @@ angular.module('oppia').factory('LiterallyCanvasHelperService', [
         var rect = doc.querySelector('svg > rect');
         snapshot.colors.primary = lc.colors.primary;
         snapshot.colors.secondary = lc.colors.secondary;
-        // @ts-ignore fill property does not exist error.
-        snapshot.colors.background = rect.attributes.fill.value;
+        snapshot.colors.background = (
+          (<CustomHashNodeMap>rect.attributes).fill.value);
         snapshot.position = lc.position;
         snapshot.backgroundShapes = lc.backgroundShapes;
-        // @ts-ignore width property does not exist error.
-        snapshot.imageSize.width = rect.attributes.width.value;
-        // @ts-ignore height property does not exist error.
-        snapshot.imageSize.height = rect.attributes.height.value;
+        snapshot.imageSize.width = (
+          (<CustomHashNodeMap>rect.attributes).width.value);
+        snapshot.imageSize.height = (
+          (<CustomHashNodeMap>rect.attributes).height.value);
 
         doc.querySelectorAll('svg > g > *').forEach((node) => {
           snapshot.shapes.push(convertSvgToShapeObject(node));
@@ -271,7 +273,7 @@ angular.module('oppia').factory('LiterallyCanvasHelperService', [
         return snapshot;
       },
 
-      isSvgTagValid: isSvgTagValid,
+      isSvgTagValid: _isSvgTagValid,
 
       rectangleSVGRenderer: function(shape) {
         // This function converts a rectangle shape object to the rect tag.
@@ -304,7 +306,7 @@ angular.module('oppia').factory('LiterallyCanvasHelperService', [
         }
         rect.setAttribute('stroke-width', shape.strokeWidth);
         var rectTag = rect.outerHTML;
-        if (isSvgTagValid(rectTag)) {
+        if (_isSvgTagValid(rectTag)) {
           return rectTag;
         }
       },
@@ -332,7 +334,7 @@ angular.module('oppia').factory('LiterallyCanvasHelperService', [
         }
         ellipse.setAttribute('stroke-width', shape.strokeWidth);
         var ellipseTag = ellipse.outerHTML;
-        if (isSvgTagValid(ellipseTag)) {
+        if (_isSvgTagValid(ellipseTag)) {
           return ellipseTag;
         }
       },
@@ -385,7 +387,7 @@ angular.module('oppia').factory('LiterallyCanvasHelperService', [
               arrowWidth, shape.color, 'position1'));
         }
         var gTag = g.outerHTML;
-        if (isSvgTagValid(gTag)) {
+        if (_isSvgTagValid(gTag)) {
           return gTag;
         }
       },
@@ -411,7 +413,7 @@ angular.module('oppia').factory('LiterallyCanvasHelperService', [
         linepath.setAttribute('stroke-linecap', 'round');
         linepath.setAttribute('stroke-width', shape.points[0].size);
         var linepathTag = linepath.outerHTML;
-        if (isSvgTagValid(linepathTag)) {
+        if (_isSvgTagValid(linepathTag)) {
           return linepathTag;
         }
       },
@@ -437,7 +439,7 @@ angular.module('oppia').factory('LiterallyCanvasHelperService', [
           }
           polygon.setAttribute('stroke-width', shape.strokeWidth);
           var polygonTag = polygon.outerHTML;
-          if (isSvgTagValid(polygonTag)) {
+          if (_isSvgTagValid(polygonTag)) {
             return polygonTag;
           }
         } else {
@@ -471,7 +473,7 @@ angular.module('oppia').factory('LiterallyCanvasHelperService', [
           g.appendChild(polyline1);
           g.appendChild(polyline2);
           var gTag = g.outerHTML;
-          if (isSvgTagValid(gTag)) {
+          if (_isSvgTagValid(gTag)) {
             return gTag;
           }
         }
@@ -506,7 +508,7 @@ angular.module('oppia').factory('LiterallyCanvasHelperService', [
           text.appendChild(tspan);
         }
         var textTag = text.outerHTML;
-        if (isSvgTagValid(textTag)) {
+        if (_isSvgTagValid(textTag)) {
           return textTag;
         }
       }
