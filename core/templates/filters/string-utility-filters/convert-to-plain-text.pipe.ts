@@ -26,7 +26,6 @@ export class ConvertToPlainTextPipe implements PipeTransform {
     strippedText = strippedText.replace(/&quot;/ig, '');
     strippedText = strippedText.replace(/&lt;/ig, ' ');
     strippedText = strippedText.replace(/p&gt;|[/;]/ig, ' ');
-    
     let trimmedText = strippedText.trim();
     if (trimmedText.length === 0) {
       return strippedText;

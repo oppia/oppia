@@ -23,7 +23,6 @@ angular.module('oppia').filter('convertToPlainText', [function() {
     strippedText = strippedText.replace(/&quot;/ig, '');
     strippedText = strippedText.replace(/&lt;/ig, ' ');
     strippedText = strippedText.replace(/p&gt;|[/;]/ig, ' ');
-    
     var trimmedText = strippedText.trim();
     if (trimmedText.length === 0) {
       return strippedText;
