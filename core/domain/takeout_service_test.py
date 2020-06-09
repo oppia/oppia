@@ -450,10 +450,13 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
 
         improvements_models.TaskEntryModel(
             id=self.GENERIC_MODEL_ID,
-            entity_type=feconf.ENTITY_TYPE_EXPLORATION,
+            composite_entity_id=self.GENERIC_MODEL_ID,
+            entity_type=improvements_models.TEST_ONLY_ENTITY_TYPE,
             entity_id=self.GENERIC_MODEL_ID,
-            task_type=feconf.TASK_TYPE_HIGH_BOUNCE_RATE, status='open',
-            entity_version_start=1, closed_by=self.USER_ID_1
+            entity_version=1,
+            task_type=improvements_models.TEST_ONLY_TASK_TYPE,
+            status='open',
+            closed_by=self.USER_ID_1
         ).put()
 
     def set_up_trivial(self):
