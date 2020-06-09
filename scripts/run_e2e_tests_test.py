@@ -322,23 +322,6 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             with check_call_swap, isdir_swap, exit_swap:
                 run_e2e_tests.run_webpack_compilation()
 
-    def test_update_dev_mode_in_constants_js_in_dev_mode_without_change_file(
-            self):
-        constant_file = 'constant.js'
-        inplace_replace_swap = self.inplace_replace_swap(expected_args=[(
-            constant_file, '"DEV_MODE": .*', '"DEV_MODE": true'
-        )])
-        with inplace_replace_swap:
-            run_e2e_tests.update_dev_mode_in_constants_js(constant_file, True)
-
-    def test_update_dev_mode_in_constants_js_in_prod_mode(self):
-        constant_file = 'constant.js'
-        inplace_replace_swap = self.inplace_replace_swap(expected_args=[(
-            constant_file, '"DEV_MODE": .*', '"DEV_MODE": false'
-        )])
-        with inplace_replace_swap:
-            run_e2e_tests.update_dev_mode_in_constants_js(constant_file, False)
-
     def test_run_webdriver_manager(self):
         expected_commands = [
             common.NODE_BIN_PATH, run_e2e_tests.WEBDRIVER_MANAGER_BIN_PATH,

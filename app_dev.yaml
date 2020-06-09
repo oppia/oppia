@@ -154,6 +154,7 @@ handlers:
     X-Xss-Protection: "1; mode=block"
   secure: always
   expiration: "0"
+  login: optional
 - url: /community_dashboard
   static_files: webpack_bundles/community-dashboard-page.mainpage.html
   upload: webpack_bundles/community-dashboard-page.mainpage.html
@@ -165,6 +166,7 @@ handlers:
     X-Xss-Protection: "1; mode=block"
   secure: always
   expiration: "0"
+  login: optional
 - url: /contact
   static_files: webpack_bundles/contact-page.mainpage.html
   upload: webpack_bundles/contact-page.mainpage.html
@@ -176,6 +178,7 @@ handlers:
     X-Xss-Protection: "1; mode=block"
   secure: always
   expiration: "0"
+  login: optional
 - url: /donate
   static_files: webpack_bundles/donate-page.mainpage.html
   upload: webpack_bundles/donate-page.mainpage.html
@@ -187,6 +190,7 @@ handlers:
     X-Xss-Protection: "1; mode=block"
   secure: always
   expiration: "0"
+  login: optional
 - url: /get_started
   static_files: webpack_bundles/get-started-page.mainpage.html
   upload: webpack_bundles/get-started-page.mainpage.html
@@ -198,6 +202,7 @@ handlers:
     X-Xss-Protection: "1; mode=block"
   secure: always
   expiration: "0"
+  login: optional
 - url: /privacy
   static_files: webpack_bundles/privacy-page.mainpage.html
   upload: webpack_bundles/privacy-page.mainpage.html
@@ -209,6 +214,7 @@ handlers:
     X-Xss-Protection: "1; mode=block"
   secure: always
   expiration: "0"
+  login: optional
 - url: /teach
   static_files: webpack_bundles/teach-page.mainpage.html
   upload: webpack_bundles/teach-page.mainpage.html
@@ -231,6 +237,7 @@ handlers:
     X-Xss-Protection: "1; mode=block"
   secure: always
   expiration: "0"
+  login: optional
 - url: /thanks
   static_files: webpack_bundles/thanks-page.mainpage.html
   upload: webpack_bundles/thanks-page.mainpage.html
@@ -242,6 +249,7 @@ handlers:
     X-Xss-Protection: "1; mode=block"
   secure: always
   expiration: "0"
+  login: optional
 - url: /.*
   script: main.app
   secure: always
