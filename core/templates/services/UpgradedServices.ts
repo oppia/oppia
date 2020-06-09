@@ -1126,7 +1126,8 @@ export class UpgradedServices {
         upgradedServices['TextInputPredictionService']);
     upgradedServices['ReadOnlySubtopicPageObjectFactory'] =
       new ReadOnlySubtopicPageObjectFactory(
-        upgradedServices['SubtopicPageContentsObjectFactory']);
+        upgradedServices['SubtopicPageContentsObjectFactory'],
+        upgradedServices['SubtopicObjectFactory']);
     upgradedServices['SolutionObjectFactory'] = new SolutionObjectFactory(
       upgradedServices['SubtitledHtmlObjectFactory'],
       upgradedServices['ExplorationHtmlFormatterService']);

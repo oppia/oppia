@@ -1,10 +1,27 @@
-<div class="nav navbar-nav oppia-navbar-breadcrumb ng-cloak">
-  <span class="oppia-navbar-breadcrumb-separator"></span>
-  <span>
-    <a ng-href="<[getTopicUrl()]>" style="color: white;"><[topicName]></a>
-  </span>
-  <span class="oppia-navbar-breadcrumb-separator"></span>
-  <span>
-    <[subtopicTitle]>
-  </span>
+<div ng-if="subtopicTitle" class="nav navbar-nav oppia-navbar-breadcrumb ng-cloak oppia-subtopic-viewer-nav-breadcrumb">
+  <div class="oppia-subtopic-viewer-nav-separator"></div>
+  <div class="oppia-subtopic-viewer-nav-labels-container">
+    <p style="margin: 0; font-size: 18px;"><[subtopicTitle]></p>
+    <a ng-href="<[getTopicUrl()]>" style="color: white; font-size: 12px;"><[topicName]></a>
+  </div>
 </div>
+
+<style>
+  .oppia-subtopic-viewer-nav-breadcrumb {
+    align-items: center;
+    height: 56px;
+    padding-top: 0;
+  }
+
+  .oppia-subtopic-viewer-nav-separator {
+    background-color: white;
+    height: 80%;
+    margin-right: 12px;
+    width: 1px;
+  }
+
+  .oppia-subtopic-viewer-nav-labels-container {
+    display: flex;
+    flex-direction: column;
+  }
+</style>
