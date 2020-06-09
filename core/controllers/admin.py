@@ -413,7 +413,7 @@ class AdminHandler(base.BaseHandler):
             self._reload_exploration('15')
             self._reload_exploration('25')
             self._reload_exploration('13')
-            
+
             story = story_domain.Story.create_default_story(
                 story_id, 'Help Jaime win the Arcade', topic_id_1)
 
@@ -421,7 +421,8 @@ class AdminHandler(base.BaseHandler):
                 (
                     '15',
                     'What are the place values?',
-                    'Jaime learns the place value of each digit in a big number.'
+                    'Jaime learns the place value of each digit in a big ' +
+                    'number.'
                 ),
                 (
                     '25',
@@ -449,9 +450,9 @@ class AdminHandler(base.BaseHandler):
                 story.update_node_exploration_id(
                     '%s%d' % (story_domain.NODE_ID_PREFIX, node_id), exp_id)
 
-                if(i != len(story_nodes) - 1):
+                if i != len(story_nodes) - 1:
                     story.update_node_destination_node_ids(
-                        '%s%d' % (story_domain.NODE_ID_PREFIX, node_id), 
+                        '%s%d' % (story_domain.NODE_ID_PREFIX, node_id),
                         ['%s%d' % (story_domain.NODE_ID_PREFIX, node_id + 1)])
 
                 exp_services.update_exploration(
