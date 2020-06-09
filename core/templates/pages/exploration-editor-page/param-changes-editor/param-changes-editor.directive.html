@@ -46,7 +46,7 @@
         <picture>
           <source type="image/webp" ng-srcset="<[getStaticImageUrl('/general/drag_dots.webp')]>">
           <source type="image/png" ng-srcset="<[getStaticImageUrl('/general/drag_dots.png')]>">
-          <img ng-if="EditabilityService.isEditable()" ng-src="<[getStaticImageUrl('/general/drag_dots.png')]>">
+          <img ng-if="EditabilityService.isEditable()" ng-src="<[getStaticImageUrl('/general/drag_dots.png')]>" width="10">
         </picture>
       </span>
       <span>

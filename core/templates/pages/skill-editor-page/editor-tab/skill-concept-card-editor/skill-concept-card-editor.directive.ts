@@ -63,7 +63,7 @@ angular.module('oppia').directive('skillConceptCardEditor', [
         function($scope, $filter, $uibModal) {
           var ctrl = this;
 
-          ctrl.getStaticImageUrl = function(imagePath) {
+          $scope.getStaticImageUrl = function(imagePath) {
             return UrlInterpolationService.getStaticImageUrl(imagePath);
           };
 
