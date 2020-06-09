@@ -792,7 +792,7 @@ class DeployTests(test_utils.GenericTestBase):
                 deploy.check_travis_and_circleci_tests('test-branch')
         self.assertEqual(
             self.urls_to_open, [
-                'https://travis-ci.com/username/oppia/branches',
+                'https://travis-ci.org/username/oppia/branches',
                 'https://circleci.com/gh/oppia/workflows/oppia'])
 
     def test_check_travis_and_circleci_tests_with_travis_tests_failing(self):
@@ -818,7 +818,7 @@ class DeployTests(test_utils.GenericTestBase):
                     deploy.check_travis_and_circleci_tests('test-branch')
         self.assertEqual(
             self.urls_to_open,
-            ['https://travis-ci.com/username/oppia/branches'])
+            ['https://travis-ci.org/username/oppia/branches'])
 
     def test_check_travis_and_circleci_tests_with_circleci_tests_failing(self):
         def mock_check_output(unused_cmd_tokens):
@@ -844,7 +844,7 @@ class DeployTests(test_utils.GenericTestBase):
                     deploy.check_travis_and_circleci_tests('test-branch')
         self.assertEqual(
             self.urls_to_open, [
-                'https://travis-ci.com/username/oppia/branches',
+                'https://travis-ci.org/username/oppia/branches',
                 'https://circleci.com/gh/username/workflows/oppia'])
 
     def test_create_release_doc(self):
