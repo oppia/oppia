@@ -75,6 +75,10 @@ class HelperFunctionsUnitTests(test_utils.GenericTestBase):
         with self.assertRaises(Exception):
             expression_parser.is_algebraic('alpha + bet/22')
 
+    def test_tokenize(self):
+        """Tests for tokenize method."""
+        pass
+
 
 class TokenUnitTests(test_utils.GenericTestBase):
     """Test the token module."""

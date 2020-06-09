@@ -42,8 +42,8 @@
       },
       "units": []
     },
-    "AlgebraicExpression": "a",
-    "AlgebraicIdentifier": "a",
-    "MathEquation": "a=b",
+    "AlgebraicExpression": "x",
+    "AlgebraicIdentifier": "x",
+    "MathEquation": "x=y",
     "PositionOfTerms": "both"
 }
