@@ -31,8 +31,8 @@ import threading
 
 import python_utils
 
-MESSAGE_TYPE_SUCCESS = 'SUCCESS'
-MESSAGE_TYPE_FAILED = 'FAILED'
+MESSAGE_TYPE_SUCCESS = 'SUCCESS '
+MESSAGE_TYPE_FAILED = 'FAILED '
 
 
 def memoize(func):

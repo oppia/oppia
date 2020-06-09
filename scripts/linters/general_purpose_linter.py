@@ -28,8 +28,6 @@ import python_utils
 from . import linter_utils
 from .. import common
 
-_MESSAGE_TYPE_SUCCESS = 'SUCCESS'
-_MESSAGE_TYPE_FAILED = 'FAILED'
 
 EXCLUDED_PATHS = (
     'third_party/*', 'build/*', '.git/*', '*.pyc', 'CHANGELOG',
@@ -664,12 +662,13 @@ class GeneralPurposeLinter(python_utils.OBJECT):
 
             if failed:
                 summary_message = (
-                    '%s  Mandatory pattern check failed, see errors above for'
-                    'patterns that should be added.' % _MESSAGE_TYPE_FAILED)
+                    '%s Mandatory pattern check failed, see errors above for'
+                    'patterns that should be added.' % (
+                        linter_utils.MESSAGE_TYPE_FAILED))
             else:
                 summary_message = (
-                    '%s  Mandatory pattern check passed' % (
-                        _MESSAGE_TYPE_SUCCESS))
+                    '%s Mandatory pattern check passed' % (
+                        linter_utils.MESSAGE_TYPE_SUCCESS))
             python_utils.PRINT(summary_message)
 
         python_utils.PRINT('')
@@ -728,11 +727,11 @@ class GeneralPurposeLinter(python_utils.OBJECT):
                 summary_message = (
                     '%s Pattern check failed, see errors above '
                     'for patterns that should be removed.' % (
-                        _MESSAGE_TYPE_FAILED))
+                        linter_utils.MESSAGE_TYPE_FAILED))
                 summary_messages.append(summary_message)
             else:
                 summary_message = '%s Pattern checks passed' % (
-                    _MESSAGE_TYPE_SUCCESS)
+                    linter_utils.MESSAGE_TYPE_SUCCESS)
                 summary_messages.append(summary_message)
 
             python_utils.PRINT('')
@@ -757,7 +756,9 @@ class GeneralPurposeLinter(python_utils.OBJECT):
         with linter_utils.redirect_stdout(sys.stdout):
             for filepath in files_to_lint:
                 file_content = FILE_CACHE.readlines(filepath)
-                if not re.search(r'[^\n]\n', file_content[-1]):
+                file_length = len(file_content)
+                if (file_length >= 2 and
+                        not re.search(r'[^\n]\n', file_content[-1])):
                     summary_message = (
                         '%s --> There should be a single newline at the '
                         'end of file.' % filepath)
@@ -767,12 +768,12 @@ class GeneralPurposeLinter(python_utils.OBJECT):
 
             if failed:
                 summary_message = (
-                    '%s   Newline at the eof check failed.' % (
-                        _MESSAGE_TYPE_FAILED))
+                    '%s Newline at the eof check failed.' % (
+                        linter_utils.MESSAGE_TYPE_FAILED))
             else:
                 summary_message = (
-                    '%s   Newline at the eof check passed.' % (
-                        _MESSAGE_TYPE_SUCCESS))
+                    '%s Newline at the eof check passed.' % (
+                        linter_utils.MESSAGE_TYPE_SUCCESS))
             summary_messages.append(summary_message)
             python_utils.PRINT(summary_message)
 
