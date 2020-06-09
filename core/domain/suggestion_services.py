@@ -91,7 +91,7 @@ def create_suggestion(
         suggestion_type, target_type, target_id,
         target_version_at_submission, status, author_id,
         final_reviewer_id, change, score_category, thread_id)
-
+    return get_suggestion_by_id(thread_id)
 
 def get_suggestion_from_model(suggestion_model):
     """Converts the given SuggestionModel to a Suggestion domain object

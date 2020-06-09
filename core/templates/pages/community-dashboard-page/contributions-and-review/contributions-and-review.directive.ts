@@ -265,6 +265,8 @@ angular.module('oppia').directive('contributionsAndReview', [
             if (suggestion.suggestion_type === ctrl.SUGGESTION_TYPE_TRANSLATE) {
               var reviewable =
                 ctrl.activeReviewTab === ctrl.SUGGESTION_TYPE_TRANSLATE;
+               console.log("in transaltion")
+               console.log(suggestion.suggestion_id)
               _showTranslationSuggestionModal(
                 suggestion.target_id, suggestion.suggestion_id,
                 suggestion.change.content_html,

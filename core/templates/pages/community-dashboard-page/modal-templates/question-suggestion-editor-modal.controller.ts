@@ -26,18 +26,22 @@ require(
   'pages/community-dashboard-page/services/' +
   'question-suggestion.service.ts');
 require('services/alerts.service.ts');
+require('services/context.service.ts');
+require('services/image-local-storage.service.ts');
 require('services/question-validation.service.ts');
 
 angular.module('oppia').controller('QuestionSuggestionEditorModalController', [
-  '$scope', '$uibModal', '$uibModalInstance', 'AlertsService',
-  'QuestionSuggestionService', 'QuestionUndoRedoService',
-  'QuestionValidationService', 'UrlInterpolationService',
-  'question', 'questionId', 'questionStateData', 'skill', 'skillDifficulty',
+  '$scope', '$uibModal', '$uibModalInstance', 'AlertsService', 'ContextService',
+  'ImageLocalStorageService' 'QuestionSuggestionService',
+  'QuestionUndoRedoService', 'QuestionValidationService',
+  'UrlInterpolationService', 'question', 'questionId', 'questionStateData',
+  'skill', 'skillDifficulty',
   function(
-      $scope, $uibModal, $uibModalInstance, AlertsService,
-      QuestionSuggestionService, QuestionUndoRedoService,
-      QuestionValidationService, UrlInterpolationService,
-      question, questionId, questionStateData, skill, skillDifficulty) {
+      $scope, $uibModal, $uibModalInstance, AlertsService, ContextService
+      ImageLocalStorageService, QuestionSuggestionService,
+      QuestionUndoRedoService, QuestionValidationService,
+      UrlInterpolationService, question, questionId, questionStateData,
+      skill, skillDifficulty) {
     $scope.canEditQuestion = true;
     $scope.newQuestionIsBeingCreated = true;
     $scope.question = question;
