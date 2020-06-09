@@ -35,11 +35,15 @@ angular.module('oppia').component('mathEditor', {
       return divId;
     };
 
+    ctrl.createGuppyInstance = function(divId: string) {
+      return new Guppy(divId, {});
+    }
+
     ctrl.$onInit = function() {
       ctrl.alwaysEditable = true;
       var divId = ctrl.assignIdToGuppyDiv();
-      var guppyInstance: Guppy = new Guppy(divId, {});
-      Guppy.event('change', (e) => {
+      var guppyInstance = ctrl.createGuppyInstance(divId);
+      guppyInstance.event('change', (e) => {
         ctrl.value = guppyInstance.asciimath();
       });
       guppyInstance.render();
