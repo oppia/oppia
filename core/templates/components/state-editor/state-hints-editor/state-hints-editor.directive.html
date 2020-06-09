@@ -23,9 +23,9 @@
                     ng-if="StateHintsService.displayed.length > 1"
                     ng-mousedown="changeActiveHintIndex(null)">
                 <picture ng-if="EditabilityService.isEditable()">
-                  <source type="image/webp" ng-srcset="<[$ctrl.getStaticImageUrl('/general/drag_dots.webp')]>">
-                  <source type="image/png" ng-srcset="<[$ctrl.getStaticImageUrl('/general/drag_dots.png')]>">
-                  <img ng-src="<[$ctrl.getStaticImageUrl('/general/drag_dots.png')]>" width="10">
+                  <source type="image/webp" ng-srcset="<[getStaticImageUrl('/general/drag_dots.webp')]>">
+                  <source type="image/png" ng-srcset="<[getStaticImageUrl('/general/drag_dots.png')]>">
+                  <img ng-src="<[getStaticImageUrl('/general/drag_dots.png')]>" width="10">
                 </picture>
               </span>
               <a ng-click="changeActiveHintIndex($index)"

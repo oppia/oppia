@@ -44,9 +44,9 @@
          class="oppia-param-editor-row protractor-test-param-changes-list">
       <span class="oppia-param-change-sort-handle" ng-if="paramChangesService.displayed.length > 1">
         <picture>
-          <source type="image/webp" ng-srcset="<[$ctrl.getStaticImageUrl('/general/drag_dots.webp')]>">
-          <source type="image/png" ng-srcset="<[$ctrl.getStaticImageUrl('/general/drag_dots.png')]>">
-          <img ng-if="EditabilityService.isEditable()" ng-src="<[$ctrl.getStaticImageUrl('/general/drag_dots.png')]>">
+          <source type="image/webp" ng-srcset="<[getStaticImageUrl('/general/drag_dots.webp')]>">
+          <source type="image/png" ng-srcset="<[getStaticImageUrl('/general/drag_dots.png')]>">
+          <img ng-if="EditabilityService.isEditable()" ng-src="<[getStaticImageUrl('/general/drag_dots.png')]>">
         </picture>
       </span>
       <span>

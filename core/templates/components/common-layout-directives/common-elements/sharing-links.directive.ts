@@ -46,9 +46,6 @@ angular.module('oppia').directive('sharingLinks', [
             ExplorationEmbedButtonService, SiteAnalyticsService,
             DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR) {
           var ctrl = this;
-          ctrl.getStaticImageUrl = function(imagePath) {
-            return UrlInterpolationService.getStaticImageUrl(imagePath);
-          };
           ctrl.$onInit = function() {
             ctrl.registerShareEvent = null;
 
@@ -79,6 +76,10 @@ angular.module('oppia').directive('sharingLinks', [
                 'SharingLinks directive can only be used either in the' +
                 'collection player or the exploration player');
             }
+
+            ctrl.getStaticImageUrl = function(imagePath) {
+              return UrlInterpolationService.getStaticImageUrl(imagePath);
+            };
 
             ctrl.serverName = (
               $window.location.protocol + '//' + $window.location.host);

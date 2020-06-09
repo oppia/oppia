@@ -213,14 +213,15 @@ angular.module('oppia').directive('stateHintsEditor', [
             StateHintsService.saveDisplayedValue();
             $scope.onSaveHints(StateHintsService.displayed);
           };
-          ctrl.getStaticImageUrl = function(imagePath) {
-            return UrlInterpolationService.getStaticImageUrl(imagePath);
-          };
+
           ctrl.$onInit = function() {
             $scope.EditabilityService = EditabilityService;
             $scope.StateHintsService = StateHintsService;
             StateHintsService.setActiveHintIndex(null);
             $scope.canEdit = EditabilityService.isEditable();
+            $scope.getStaticImageUrl = function(imagePath) {
+              return UrlInterpolationService.getStaticImageUrl(imagePath);
+            };
             // When the page is scrolled so that the top of the page is above
             // the browser viewport, there are some bugs in the positioning of
             // the helper. This is a bug in jQueryUI that has not been fixed

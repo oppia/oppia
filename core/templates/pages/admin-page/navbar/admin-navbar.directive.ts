@@ -76,15 +76,15 @@ angular.module('oppia').directive('adminNavbar', [
           ctrl.dropdownMenuisActive = false;
         };
 
-        ctrl.getStaticImageUrl = function(imagePath) {
-          return UrlInterpolationService.getStaticImageUrl(imagePath);
-        };
-
         ctrl.$onInit = function() {
           ctrl.ADMIN_TAB_URLS = ADMIN_TAB_URLS;
           UserService.getProfileImageDataUrlAsync().then(function(dataUrl) {
             ctrl.profilePictureDataUrl = dataUrl;
           });
+
+          ctrl.getStaticImageUrl = function(imagePath) {
+            return UrlInterpolationService.getStaticImageUrl(imagePath);
+          };
 
           ctrl.username = '';
           ctrl.isModerator = null;

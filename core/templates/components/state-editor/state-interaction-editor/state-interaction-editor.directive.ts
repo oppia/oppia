@@ -243,9 +243,7 @@ angular.module('oppia').directive('stateInteractionEditor', [
               AlertsService.clearWarnings();
             });
           };
-          ctrl.getStaticImageUrl = function(imagePath) {
-            return UrlInterpolationService.getStaticImageUrl(imagePath);
-          };
+
           ctrl.$onInit = function() {
             $scope.EditabilityService = EditabilityService;
 
@@ -271,6 +269,10 @@ angular.module('oppia').directive('stateInteractionEditor', [
               _updateInteractionPreviewAndAnswerChoices();
               $scope.hasLoaded = true;
             });
+
+            $scope.getStaticImageUrl = function(imagePath) {
+              return UrlInterpolationService.getStaticImageUrl(imagePath);
+            };
 
             $rootScope.$broadcast('interactionEditorInitialized');
             StateEditorService.updateStateInteractionEditorInitialised();
