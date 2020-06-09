@@ -4967,6 +4967,11 @@ class TaskEntryModelValidator(BaseModelValidator):
 
     @classmethod
     def _validate_composite_entity_id(cls, item):
+        """Validates the composite_entity_id field of the given item.
+
+        Args:
+            item: improvements_models.TaskEntryModel.
+        """
         regex_string = re.escape('%s.%s.%d' % (
             item.entity_type, item.entity_id, item.entity_version))
         if not re.compile(regex_string).match(item.composite_entity_id):
@@ -4976,6 +4981,11 @@ class TaskEntryModelValidator(BaseModelValidator):
 
     @classmethod
     def _validate_status(cls, item):
+        """Validates the fields of the item relating to the status field.
+
+        Args:
+            item: improvements_models.TaskEntryModel.
+        """
         if item.status == improvements_models.STATUS_OPEN:
             if item.closed_by:
                 cls.errors['status check'].append(
@@ -4997,6 +5007,11 @@ class TaskEntryModelValidator(BaseModelValidator):
 
     @classmethod
     def _validate_task_type(cls, item):
+        """Validates the fields of the item relating to the task_type field.
+
+        Args:
+            item: improvements_models.TaskEntryModel.
+        """
         if item.task_type in (
                 improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
                 improvements_models.TASK_TYPE_NEEDS_GUIDING_RESPONSES,
@@ -5017,11 +5032,11 @@ class TaskEntryModelValidator(BaseModelValidator):
 
     @classmethod
     def _validate_exploration_state_targets(cls, item):
-        """Validate that state name is a valid state in the
-        exploration corresponding to exp_id.
+        """Validate that the given item contains an existing exploration state
+        name.
 
         Args:
-            item: ndb.Model. ClassifierTrainingJobModel to validate.
+            item: improvements_models.TaskEntryModel.
         """
         if item.entity_type != improvements_models.ENTITY_TYPE_EXPLORATION:
             return

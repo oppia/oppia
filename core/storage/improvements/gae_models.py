@@ -19,11 +19,8 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import uuid
-
 from core.platform import models
 import feconf
-import python_utils
 
 from google.appengine.ext import ndb
 
@@ -79,7 +76,7 @@ class TaskEntryModel(base_models.BaseModel):
     """Task entry corresponding to an actionable task in the improvements tab.
 
     Instances of a class have an ID with the form:
-        [entity_type].[entity_id].[entity_version].[task_type].[target_type].[target_id] pylint: disable=max-len
+        [entity_type].[entity_id].[entity_version].[task_type].[target_type].[target_id] pylint: disable=line-too-long
     """
     # The type of entity a task entry refers to.
     entity_type = ndb.StringProperty(
@@ -183,7 +180,13 @@ class TaskEntryModel(base_models.BaseModel):
         Args:
             entity_type: str. The type of entity a task entry refers to.
             entity_id: str. The ID of the entity a task entry refers to.
+            entity_version: int. The version of the entity a task entry refers
+                to.
             task_type: str. The type of task a task entry tracks.
+            target_type: str or None. The optional type of sub-entity a task
+                entry refers to.
+            target_type: str or None. The optional ID of the sub-entity a task
+                entry refers to.
 
         Returns:
             str. The ID for the given task.
@@ -200,7 +203,8 @@ class TaskEntryModel(base_models.BaseModel):
         Args:
             entity_type: str. The type of entity a task entry refers to.
             entity_id: str. The ID of the entity a task entry refers to.
-            task_type: str. The type of task a task entry tracks.
+            entity_version: int. The version of the entity a task entry refers
+                to.
 
         Returns:
             str. The composite_entity_id for the given task.
@@ -234,10 +238,13 @@ class TaskEntryModel(base_models.BaseModel):
             closed_by: str. ID of the user who closed the task, if any.
             closed_on: str. The date and time at which a task was closed or
                 deprecated.
+
+        Returns:
+            TaskEntryModel.
         """
         task_id = cls.generate_task_id(
-            entity_type, entity_id, entity_version, task_type, target_type,
-            target_id)
+            entity_type, entity_id, entity_version, task_type,
+            target_type=target_type, target_id=target_id)
         composite_entity_id = cls.generate_composite_entity_id(
             entity_type, entity_id, entity_version)
         task_entry = cls.get_by_id(task_id)

@@ -14787,6 +14787,11 @@ class TaskEntryModelValidatorTests(test_utils.GenericTestBase):
             prod_validation_jobs_one_off.TaskEntryModelAuditOneOffJob)
 
     def run_job_and_get_output(self):
+        """Helper method to run job and fetch the output.
+
+        Returns:
+            list([str, *]).
+        """
         job_id = self.job_class.create_new()
         self.assertEqual(
             self.count_jobs_in_taskqueue(
@@ -14799,6 +14804,12 @@ class TaskEntryModelValidatorTests(test_utils.GenericTestBase):
         return [ast.literal_eval(o) for o in self.job_class.get_output(job_id)]
 
     def run_job_and_check_output(self, *expected_outputs):
+        """Helper method to run job and check for the expected output.
+
+        Args:
+            *expected_outputs: list(*). The items expected to be found in the
+                job's output.
+        """
         self.assertItemsEqual(
             self.run_job_and_get_output(), list(expected_outputs))
 
@@ -14816,7 +14827,7 @@ class TaskEntryModelValidatorTests(test_utils.GenericTestBase):
         self.run_job_and_check_output(['fully-validated TaskEntryModel', 1])
 
     def test_valid_edge_cases(self):
-        task_id = improvements_models.TaskEntryModel.get_or_create_task(
+        improvements_models.TaskEntryModel.get_or_create_task(
             improvements_models.TEST_ONLY_ENTITY_TYPE,
             'entity_id',
             1,
@@ -14996,20 +15007,21 @@ class TaskEntryModelValidatorTests(test_utils.GenericTestBase):
         self.assertEqual(
             error_key,
             'failed validation check for task type check of TaskEntryModel')
-        self.assertItemsEqual(error_messages, [
-            'Task id %s: Task type high-bounce-rate is not supported for '
-            'TEST_ONLY_ENTITY_TYPE entities' % (
-                hbr_task_id,),
-            'Task id %s: Task type ineffective-feedback-loop is not '
-            'supported for TEST_ONLY_ENTITY_TYPE entities' % (
-                ifl_task_id,),
-            'Task id %s: Task type needs-guiding-responses is not supported '
-            'for TEST_ONLY_ENTITY_TYPE entities' % (
-                ngr_task_id,),
-            'Task id %s: Task type successive-incorrect-answers is not '
-            'supported for TEST_ONLY_ENTITY_TYPE entities' % (
-                sia_task_id,)
-        ])
+        self.assertItemsEqual(
+            error_messages, [
+                'Task id %s: Task type high-bounce-rate is not supported for '
+                'TEST_ONLY_ENTITY_TYPE entities' % (
+                    hbr_task_id,),
+                'Task id %s: Task type ineffective-feedback-loop is not '
+                'supported for TEST_ONLY_ENTITY_TYPE entities' % (
+                    ifl_task_id,),
+                'Task id %s: Task type needs-guiding-responses is not supported '
+                'for TEST_ONLY_ENTITY_TYPE entities' % (
+                    ngr_task_id,),
+                'Task id %s: Task type successive-incorrect-answers is not '
+                'supported for TEST_ONLY_ENTITY_TYPE entities' % (
+                    sia_task_id,)
+            ])
 
     def test_invalid_target_type_for_exploration_task_types(self):
         hbr_task_id = improvements_models.TaskEntryModel.get_or_create_task(
@@ -15048,20 +15060,21 @@ class TaskEntryModelValidatorTests(test_utils.GenericTestBase):
         self.assertEqual(
             error_key,
             'failed validation check for task type check of TaskEntryModel')
-        self.assertItemsEqual(error_messages, [
-            'Task id %s: Task type high-bounce-rate is not supported for '
-            'TEST_ONLY_TARGET_TYPE targets' % (
-                hbr_task_id,),
-            'Task id %s: Task type ineffective-feedback-loop is not '
-            'supported for TEST_ONLY_TARGET_TYPE targets' % (
-                ifl_task_id,),
-            'Task id %s: Task type needs-guiding-responses is not supported '
-            'for TEST_ONLY_TARGET_TYPE targets' % (
-                ngr_task_id,),
-            'Task id %s: Task type successive-incorrect-answers is not '
-            'supported for TEST_ONLY_TARGET_TYPE targets' % (
-                sia_task_id,)
-        ])
+        self.assertItemsEqual(
+            error_messages, [
+                'Task id %s: Task type high-bounce-rate is not supported for '
+                'TEST_ONLY_TARGET_TYPE targets' % (
+                    hbr_task_id,),
+                'Task id %s: Task type ineffective-feedback-loop is not '
+                'supported for TEST_ONLY_TARGET_TYPE targets' % (
+                    ifl_task_id,),
+                'Task id %s: Task type needs-guiding-responses is not supported '
+                'for TEST_ONLY_TARGET_TYPE targets' % (
+                    ngr_task_id,),
+                'Task id %s: Task type successive-incorrect-answers is not '
+                'supported for TEST_ONLY_TARGET_TYPE targets' % (
+                    sia_task_id,)
+            ])
 
     def test_missing_target_id_for_exploration_task_types(self):
         hbr_task_id = improvements_models.TaskEntryModel.get_or_create_task(
@@ -15100,20 +15113,21 @@ class TaskEntryModelValidatorTests(test_utils.GenericTestBase):
         self.assertEqual(
             error_key,
             'failed validation check for task type check of TaskEntryModel')
-        self.assertItemsEqual(error_messages, [
-            'Task id %s: Task type high-bounce-rate needs a target but no '
-            'target id is set' % (
-                hbr_task_id,),
-            'Task id %s: Task type ineffective-feedback-loop needs a target '
-            'but no target id is set' % (
-                ifl_task_id,),
-            'Task id %s: Task type needs-guiding-responses needs a target '
-            'but no target id is set' % (
-                ngr_task_id,),
-            'Task id %s: Task type successive-incorrect-answers needs a '
-            'target but no target id is set' % (
-                sia_task_id,)
-        ])
+        self.assertItemsEqual(
+            error_messages, [
+                'Task id %s: Task type high-bounce-rate needs a target but no '
+                'target id is set' % (
+                    hbr_task_id,),
+                'Task id %s: Task type ineffective-feedback-loop needs a target '
+                'but no target id is set' % (
+                    ifl_task_id,),
+                'Task id %s: Task type needs-guiding-responses needs a target '
+                'but no target id is set' % (
+                    ngr_task_id,),
+                'Task id %s: Task type successive-incorrect-answers needs a '
+                'target but no target id is set' % (
+                    sia_task_id,)
+            ])
 
     def test_missing_state_name_for_exploration_task_types(self):
         hbr_task_id = improvements_models.TaskEntryModel.get_or_create_task(
@@ -15151,20 +15165,21 @@ class TaskEntryModelValidatorTests(test_utils.GenericTestBase):
         self.assertEqual(
             error_key,
             'failed validation check for target type check of TaskEntryModel')
-        self.assertItemsEqual(error_messages, [
-            'Task id %s: State name invalid_state_name is not present in '
-            'states of exploration with id exp_id' % (
-                hbr_task_id,),
-            'Task id %s: State name invalid_state_name is not present in '
-            'states of exploration with id exp_id' % (
-                ifl_task_id,),
-            'Task id %s: State name invalid_state_name is not present in '
-            'states of exploration with id exp_id' % (
-                ngr_task_id,),
-            'Task id %s: State name invalid_state_name is not present in '
-            'states of exploration with id exp_id' % (
-                sia_task_id,)
-        ])
+        self.assertItemsEqual(
+            error_messages, [
+                'Task id %s: State name invalid_state_name is not present in '
+                'states of exploration with id exp_id' % (
+                    hbr_task_id,),
+                'Task id %s: State name invalid_state_name is not present in '
+                'states of exploration with id exp_id' % (
+                    ifl_task_id,),
+                'Task id %s: State name invalid_state_name is not present in '
+                'states of exploration with id exp_id' % (
+                    ngr_task_id,),
+                'Task id %s: State name invalid_state_name is not present in '
+                'states of exploration with id exp_id' % (
+                    sia_task_id,)
+            ])
 
     def test_deleted_state_name_for_exploration_task_types(self):
         self.save_new_linear_exp_with_state_names_and_interactions(
@@ -15235,22 +15250,24 @@ class TaskEntryModelValidatorTests(test_utils.GenericTestBase):
             target_id='State 2')
 
         output = self.run_job_and_get_output()
+        self.assertEqual(len(output), 2)
         self.assertEqual(output[0], ['fully-validated TaskEntryModel', 4])
         error_key, error_messages = output[1]
         self.assertEqual(
             error_key,
             'failed validation check for target type check of TaskEntryModel')
-        self.assertItemsEqual(error_messages, [
-          'Task id %s: State name State 2 is not present in '
-          'states of exploration with id linear_exp_id' % (
-              new_ifl_task_id,),
-          'Task id %s: State name State 2 is not present in '
-          'states of exploration with id linear_exp_id' % (
-              new_hbr_task_id,),
-          'Task id %s: State name State 2 is not present in '
-          'states of exploration with id linear_exp_id' % (
-              new_ngr_task_id,),
-          'Task id %s: State name State 2 is not present in '
-          'states of exploration with id linear_exp_id' % (
-              new_sia_task_id,)
-        ])
+        self.assertItemsEqual(
+            error_messages, [
+                'Task id %s: State name State 2 is not present in '
+                'states of exploration with id linear_exp_id' % (
+                    new_ifl_task_id,),
+                'Task id %s: State name State 2 is not present in '
+                'states of exploration with id linear_exp_id' % (
+                    new_hbr_task_id,),
+                'Task id %s: State name State 2 is not present in '
+                'states of exploration with id linear_exp_id' % (
+                    new_ngr_task_id,),
+                'Task id %s: State name State 2 is not present in '
+                'states of exploration with id linear_exp_id' % (
+                    new_sia_task_id,)
+            ])
