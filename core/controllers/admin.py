@@ -412,10 +412,16 @@ class AdminHandler(base.BaseHandler):
             # for published stories.
             self._reload_exploration('15')
             self._reload_exploration('25')
+            self._reload_exploration('13')
+
             story = story_domain.Story.create_default_story(
-                story_id, 'Dummy Story 1', topic_id_1)
+                story_id, 'Help Jaime win the Arcade', topic_id_1)
             story.add_node(
-                '%s%d' % (story_domain.NODE_ID_PREFIX, 1), 'Dummy Chapter 1')
+                '%s%d' % (story_domain.NODE_ID_PREFIX, 1),
+                'What are the place values?')
+            story.update_node_description(
+                '%s%d' % (story_domain.NODE_ID_PREFIX, 1),
+                'Jaime learns the place value of each digit in a big number.')
             story.update_node_destination_node_ids(
                 '%s%d' % (story_domain.NODE_ID_PREFIX, 1), [
                     '%s%d' % (story_domain.NODE_ID_PREFIX, 2)])
@@ -427,10 +433,33 @@ class AdminHandler(base.BaseHandler):
                     'property_name': 'category',
                     'new_value': 'Astronomy'
                 })], 'Change category')
+
             story.add_node(
-                '%s%d' % (story_domain.NODE_ID_PREFIX, 2), 'Dummy Chapter 2')
+                '%s%d' % (story_domain.NODE_ID_PREFIX, 2),
+                'Finding the value of a number')
+            story.update_node_description(
+                '%s%d' % (story_domain.NODE_ID_PREFIX, 2),
+                'Jaime understands the value of his arcade score.')
+            story.update_node_destination_node_ids(
+                '%s%d' % (story_domain.NODE_ID_PREFIX, 2), [
+                    '%s%d' % (story_domain.NODE_ID_PREFIX, 3)])
             story.update_node_exploration_id(
                 '%s%d' % (story_domain.NODE_ID_PREFIX, 2), '25')
+
+            story.add_node(
+                '%s%d' % (story_domain.NODE_ID_PREFIX, 3), 'Comparing Numbers')
+            story.update_node_description(
+                '%s%d' % (story_domain.NODE_ID_PREFIX, 3),
+                'Jaime learns if a number is smaller or greater than another '
+                + 'number.')
+            story.update_node_exploration_id(
+                '%s%d' % (story_domain.NODE_ID_PREFIX, 3), '13')
+            exp_services.update_exploration(
+                self.user_id, '13', [exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'category',
+                    'new_value': 'Astronomy'
+                })], 'Change category')
 
             skill_services.save_new_skill(self.user_id, skill_1)
             skill_services.save_new_skill(self.user_id, skill_2)
