@@ -33,7 +33,7 @@ fdescribe('MathEditor', function() {
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.inject(function($componentController) {
     MathEditorCtrl = $componentController('mathEditor');
-    spyOn(window, 'Guppy').and.returnValue(new MockGuppy('div-id', {}));
+    window['Guppy'] = MockGuppy;
 
     MathEditorCtrl.$onInit();
   }));
