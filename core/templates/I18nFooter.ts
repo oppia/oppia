@@ -50,18 +50,8 @@ angular.module('oppia').directive('i18nFooter', [
           };
           ctrl.$onInit = function() {
             ctrl.supportedSiteLanguages = SUPPORTED_SITE_LANGUAGES;
-
-            // The $timeout seems to be necessary for the dropdown
-            // to show anything at the outset, if the default language
-            // is not English.
-            $timeout(function() {
-              // $translate.use() returns undefined until the language
-              // file is fully loaded, which causes a blank field
-              // in the dropdown, hence we use $translate.proposedLanguage()
-              // as suggested in http://stackoverflow.com/a/28903658
-              ctrl.currentLanguageCode = $translate.use() ||
-                $translate.proposedLanguage();
-            }, 50);
+            ctrl.currentLanguageCode = (
+              $translate.proposedLanguage() || $translate.use());
           };
         }
       ]
