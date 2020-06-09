@@ -25,7 +25,11 @@
       </td>
       <td>
         <div class="list-summary list-summary-name protractor-test-topics-list-item">
-          <div><span class="topic-name protractor-test-topic-name"><[topic.name]></span></div>
+          <div>
+            <a class="topic-name protractor-test-topic-name"
+               ng-href="<[$ctrl.getTopicEditorUrl(topic.id)]>"><[topic.name]>
+            </a>
+          </div>
           <div>
             <span class="topic-classroom protractor-test-topic-classroom">
               <span ng-if="topic.classroom"><[topic.classroom]></span>
@@ -155,8 +159,10 @@
     width: 100%;
   }
   topics-list .topic-name {
+    color: inherit;
     font-size: 17px;
     font-weight: bold;
+    text-decoration: none;
   }
   topics-list .topic-classroom {
     font-size: 15px;
