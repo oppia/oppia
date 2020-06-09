@@ -27,10 +27,12 @@ angular.module('oppia').component('positionOfTermsEditor', {
   template: require('./position-of-terms-editor.component.html'),
   controller: ['$scope', function($scope) {
     const ctrl = this;
+
+    ctrl.onChangePosition = function() {
+      ctrl.value = ctrl.localValue.name;
+    };
+
     ctrl.$onInit = function() {
-      $scope.$watch('$ctrl.localValue', function() {
-        ctrl.value = ctrl.localValue.name;
-      });
       ctrl.alwaysEditable = true;
 
       ctrl.positionOfTerms = [{
@@ -48,11 +50,6 @@ angular.module('oppia').component('positionOfTermsEditor', {
       }];
 
       ctrl.localValue = ctrl.positionOfTerms[2];
-      for (var i = 0; i < ctrl.positionOfTerms.length; i++) {
-        if (ctrl.positionOfTerms[i].name === ctrl.value) {
-          ctrl.localValue = ctrl.positionOfTerms[i];
-        }
-      }
     };
   }]
 });

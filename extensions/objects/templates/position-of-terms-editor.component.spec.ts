@@ -28,4 +28,15 @@ describe('PositionOfTerms', function() {
   it('should have the correct default value of position', function() {
     expect(PositionOfTermsCtrl.localValue.name).toBe('both');
   });
+
+  it('should change ctrl.value when ctrl.localValue changes', function() {
+    // Initially default value of localValue is assigned.
+    PositionOfTermsCtrl.onChangePosition();
+    expect(PositionOfTermsCtrl.value).toBe('both');
+
+    // Changing localValue should change ctrl.value
+    PositionOfTermsCtrl.localValue = PositionOfTermsCtrl.positionOfTerms[0];
+    PositionOfTermsCtrl.onChangePosition();
+    expect(PositionOfTermsCtrl.value).toBe('lhs');
+  });
 });
