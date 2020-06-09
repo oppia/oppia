@@ -32,6 +32,7 @@ describe('Read only story node object factory', () => {
     var sampleReadOnlyStoryNodeBackendDict = {
       id: 'node_1',
       title: 'Title 1',
+      description: 'Description',
       prerequisite_skill_ids: ['skill_1'],
       acquired_skill_ids: ['skill_2'],
       destination_node_ids: ['node_2'],
@@ -51,6 +52,7 @@ describe('Read only story node object factory', () => {
   it('should correctly return all the values', function() {
     expect(_sampleStoryNode.getId()).toEqual('node_1');
     expect(_sampleStoryNode.getTitle()).toEqual('Title 1');
+    expect(_sampleStoryNode.getDescription()).toEqual('Description');
     expect(_sampleStoryNode.getExplorationId()).toEqual('exp_id');
     expect(_sampleStoryNode.isCompleted()).toEqual(true);
     expect(_sampleStoryNode.getExplorationSummaryObject()).toEqual({
