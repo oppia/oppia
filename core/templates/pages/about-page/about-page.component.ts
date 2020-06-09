@@ -19,21 +19,28 @@
 import { Component, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
-import { TranslateService } from 'services/translate.service';
+import { AboutPageConstants } from './about-page.constants';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service.ts';
 import { WindowRef } from
   'services/contextual/window-ref.service.ts';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { TranslateService } from 'services/translate.service';
+
+interface CreditNames {
+  letter: String;
+  names: Array<String>;
+}
 
 @Component({
   selector: 'about-page',
   templateUrl: './about-page.component.html'
 })
 export class AboutPageComponent implements OnInit {
-  listOfNames: string;
   aboutPageMascotImgUrl: string;
   activeTabName: string;
+  allCredits: Array<CreditNames> = [];
+  listOfNames: string;
   listOfNamesToThank = [
     'Alex Kauffmann', 'Allison Barros',
     'Amy Latten', 'Brett Barros',
@@ -63,6 +70,12 @@ export class AboutPageComponent implements OnInit {
     translateService.use('en');
   }
 
+  getCredits(startLetter: string): Array<string> {
+    const results = AboutPageConstants.CREDITS_CONSTANTS.filter(
+      (credit) => credit.startsWith(startLetter)).sort();
+    return results;
+  }
+
   onTabClick(tabName: string) {
     this.windowRef.nativeWindow.location.hash = '#' + tabName;
     this.activeTabName = tabName;
@@ -80,6 +93,14 @@ export class AboutPageComponent implements OnInit {
     this.i18nLanguageCodeService.onI18nLanguageCodeChange.subscribe(
       (code) => this.translateService.use(code)
     );
+    this.allCredits = [];
+    const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+    for (const letter of letters) {
+      const names = this.getCredits(letter);
+      if (names.length > 0) {
+        this.allCredits.push({letter, names});
+      }
+    }
     const hash = this.windowRef.nativeWindow.location.hash.slice(1);
     if (hash === 'license') {
       this.activeTabName = this.TAB_ID_FOUNDATION;

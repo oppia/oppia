@@ -3037,8 +3037,8 @@ class StorySummaryModelValidator(BaseSummaryModelValidator):
         }
 
     @classmethod
-    def _validate_node_count(cls, item):
-        """Validate that node_count of model is equal to number of nodes
+    def _validate_node_titles(cls, item):
+        """Validate that node_titles of model is equal to list of node titles
         in StoryModel.story_contents.
 
         Args:
@@ -3055,11 +3055,12 @@ class StorySummaryModelValidator(BaseSummaryModelValidator):
             if story_model is None or story_model.deleted:
                 continue
             nodes = story_model.story_contents['nodes']
-            if item.node_count != len(nodes):
-                cls.errors['node count check'].append((
-                    'Entity id %s: Node count: %s does not match the '
-                    'number of nodes in story_contents dict: %s') % (
-                        item.id, item.node_count, nodes))
+            node_titles = [node.title for node in nodes]
+            if item.node_titles != node_titles:
+                cls.errors['node titles check'].append((
+                    'Entity id %s: Node titles: %s does not match the '
+                    'nodes in story_contents dict: %s') % (
+                        item.id, item.node_titles, nodes))
 
     @classmethod
     def _get_external_model_properties(cls):
@@ -3082,7 +3083,7 @@ class StorySummaryModelValidator(BaseSummaryModelValidator):
 
     @classmethod
     def _get_custom_validation_functions(cls):
-        return [cls._validate_node_count]
+        return [cls._validate_node_titles]
 
 
 class GeneralSuggestionModelValidator(BaseModelValidator):

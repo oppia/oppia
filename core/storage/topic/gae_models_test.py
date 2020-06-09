@@ -70,6 +70,7 @@ class TopicModelUnitTests(test_utils.GenericTestBase):
             id=self.TOPIC_ID,
             name=self.TOPIC_NAME,
             abbreviated_name='abbrev',
+            description='description',
             canonical_name=self.TOPIC_CANONICAL_NAME,
             subtopic_schema_version=feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION,
             story_reference_schema_version=(
@@ -99,10 +100,7 @@ class TopicModelUnitTests(test_utils.GenericTestBase):
 
     def test_get_by_name(self):
         topic = topic_domain.Topic.create_default_topic(
-            topic_id=self.TOPIC_ID,
-            name=self.TOPIC_NAME,
-            abbreviated_name='abbrev'
-        )
+            self.TOPIC_ID, self.TOPIC_NAME, 'abbrev', 'description')
         topic_services.save_new_topic(feconf.SYSTEM_COMMITTER_ID, topic)
         self.assertEqual(
             topic_models.TopicModel.get_by_name(self.TOPIC_NAME).name,

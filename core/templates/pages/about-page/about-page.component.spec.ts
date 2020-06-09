@@ -21,12 +21,13 @@ import { EventEmitter, NO_ERRORS_SCHEMA, Pipe, PipeTransform }
   from '@angular/core';
 
 import { AboutPageComponent } from './about-page.component';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
-import { TranslateService } from 'services/translate.service';
+import { AboutPageConstants } from './about-page.constants';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
-import { UtilsService } from 'services/utils.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { TranslateService } from 'services/translate.service';
+import { UtilsService } from 'services/utils.service';
 
 @Pipe({name: 'translate'})
 class MockTranslatePipe {
@@ -213,6 +214,7 @@ describe('About Page', function() {
       '/assets/images/general/about_page_mascot.png');
   });
 
+
   it ('should receive code changes from I18n-language-code-service', fakeAsync(
     () => {
       component.ngOnInit();
@@ -221,4 +223,11 @@ describe('About Page', function() {
       fixture.detectChanges();
       expect(translate.languageCode).toBe('en');
     }));
+
+  it('should obtain developer names with a letter', () => {
+    const namesWithV = AboutPageConstants.CREDITS_CONSTANTS.filter(
+      (credit) => credit.startsWith('V')).sort();
+    expect(component.getCredits('V')).toEqual(namesWithV);
+    expect(component.getCredits('8')).toEqual([]);
+  });
 });
