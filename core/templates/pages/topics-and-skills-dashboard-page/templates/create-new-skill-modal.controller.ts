@@ -62,8 +62,8 @@ angular.module('oppia').controller('CreateNewSkillModalController', [
 
     $scope.onSaveExplanation = function(explanationObject) {
       newExplanationObject = explanationObject.toBackendDict();
-      $scope.bindableDict.displayedConceptCardExplanation =
-        explanationObject.getHtml();
+      $scope.bindableDict.displayedConceptCardExplanation = (
+        explanationObject.getHtml());
     };
 
     $scope.onSaveRubric = function(difficulty, explanations) {

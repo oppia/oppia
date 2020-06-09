@@ -57,8 +57,7 @@ angular.module('oppia').controller('AddMisconceptionModalController', [
     $scope.misconceptionMustBeAddressed = true;
 
     $scope.saveMisconception = function() {
-      var newMisconceptionId =
-        $scope.skill.getNextMisconceptionId();
+      var newMisconceptionId = $scope.skill.getNextMisconceptionId();
       $uibModalInstance.close({
         misconception: MisconceptionObjectFactory.create(
           newMisconceptionId,

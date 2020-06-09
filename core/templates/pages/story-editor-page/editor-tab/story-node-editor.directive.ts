@@ -240,8 +240,8 @@ angular.module('oppia').directive('storyNodeEditor', [
           };
 
           $scope.addPrerequisiteSkillId = function() {
-            var sortedSkillSummaries =
-              StoryEditorStateService.getSkillSummaries();
+            var sortedSkillSummaries = (
+              StoryEditorStateService.getSkillSummaries());
             var skillsInSameTopicCount = 0;
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
@@ -268,8 +268,8 @@ angular.module('oppia').directive('storyNodeEditor', [
           };
 
           $scope.addAcquiredSkillId = function() {
-            var sortedSkillSummaries =
-              StoryEditorStateService.getSkillSummaries();
+            var sortedSkillSummaries = (
+              StoryEditorStateService.getSkillSummaries());
             var skillsInSameTopicCount = 0;
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(

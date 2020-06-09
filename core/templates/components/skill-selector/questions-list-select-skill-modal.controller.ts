@@ -31,8 +31,8 @@ angular.module('oppia').controller('QuestionsListSelectSkillModalController', [
     });
     $scope.skillSummaries = sortedSkillSummaries;
     $scope.selectedSkillId = null;
-    $scope.countOfSkillsToPrioritize =
-      skillsInSameTopicCount;
+    $scope.countOfSkillsToPrioritize = skillsInSameTopicCount;
+
     $scope.save = function() {
       for (var idx in sortedSkillSummaries) {
         if ($scope.selectedSkillId === sortedSkillSummaries[idx].id) {

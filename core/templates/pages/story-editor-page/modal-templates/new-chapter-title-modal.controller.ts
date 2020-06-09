@@ -45,8 +45,7 @@ angular.module('oppia').controller('NewChapterTitleModalController', [
     };
     $scope.save = function(title) {
       if ($scope.nodeTitles.indexOf(title) !== -1) {
-        $scope.errorMsg =
-          'A chapter with this title already exists';
+        $scope.errorMsg = 'A chapter with this title already exists';
         return;
       }
       $uibModalInstance.close(title);

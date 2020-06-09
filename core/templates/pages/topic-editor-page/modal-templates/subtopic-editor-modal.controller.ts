@@ -40,8 +40,7 @@ angular.module('oppia').controller('SubtopicEditorModalController', [
       $scope: $scope,
       $uibModalInstance: $uibModalInstance
     });
-    $scope.MAX_CHARS_IN_SUBTOPIC_TITLE =
-      MAX_CHARS_IN_SUBTOPIC_TITLE;
+    $scope.MAX_CHARS_IN_SUBTOPIC_TITLE = MAX_CHARS_IN_SUBTOPIC_TITLE;
     $scope.subtopicId = subtopic.getId();
     $scope.subtopicTitles = subtopicTitles;
     $scope.editableTitle = editableTitle;
@@ -92,8 +91,7 @@ angular.module('oppia').controller('SubtopicEditorModalController', [
         return;
       }
       if ($scope.subtopicTitles.indexOf(title) !== -1) {
-        $scope.errorMsg =
-          'A subtopic with this title already exists';
+        $scope.errorMsg = 'A subtopic with this title already exists';
         return;
       }
       $scope.editableTitle = title;
