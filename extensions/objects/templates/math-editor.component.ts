@@ -37,7 +37,7 @@ angular.module('oppia').component('mathEditor', {
 
     ctrl.createGuppyInstance = function(divId: string) {
       return new Guppy(divId, {});
-    }
+    };
 
     ctrl.$onInit = function() {
       ctrl.alwaysEditable = true;
