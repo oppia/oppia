@@ -66,10 +66,11 @@ angular.module('oppia').factory('LiterallyCanvasHelperService', [
       if (invlidTagsAndAttr.tags.length !== 0) {
         var errorText = 'Invalid tags in svg:' + invlidTagsAndAttr.tags.join();
         throw new Error(errorText);
-      } else if(invlidTagsAndAttr.attrs.length !== 0) {
-        var errorText = 'Invalid attributes in svg:' + invlidTagsAndAttr.attrs.join();
+      } else if (invlidTagsAndAttr.attrs.length !== 0) {
+        var errorText = (
+          'Invalid attributes in svg:' + invlidTagsAndAttr.attrs.join());
         throw new Error(errorText);
-      } 
+      }
       return true;
     };
 
