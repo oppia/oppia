@@ -29,6 +29,14 @@ import { ExplorationPlayerConstants } from
   'pages/exploration-player-page/exploration-player-page.constants';
 import { Interaction } from 'domain/exploration/InteractionObjectFactory';
 import { InteractionSpecsService } from 'services/interaction-specs.service';
+import { IFractionDict } from 'domain/objects/FractionObjectFactory';
+import { IGraphBackendDict } from
+  'extensions/interactions/GraphInput/directives/graph-detail.service';
+import { INote } from
+  // eslint-disable-next-line max-len
+  'extensions/interactions/MusicNotesInput/directives/music-notes-input-rules.service';
+import { INumberWithUnitsBackendDict } from
+  'domain/objects/NumberWithUnitsObjectFactory';
 import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
 import { PredictionAlgorithmRegistryService }
   // eslint-disable-next-line max-len
@@ -36,6 +44,11 @@ import { PredictionAlgorithmRegistryService }
 import { State } from 'domain/state/StateObjectFactory';
 import { StateClassifierMappingService } from
   'pages/exploration-player-page/services/state-classifier-mapping.service';
+
+type Answer = (
+  string | number | IFractionDict |
+  INumberWithUnitsBackendDict | string[] | INote[] |
+  number[] | IGraphBackendDict| string[][]);
 
 @Injectable({providedIn: 'root'})
 export class AnswerClassificationService {
@@ -62,7 +75,7 @@ export class AnswerClassificationService {
    * @return AnswerClassificationResult domain object.
    */
   private classifyAnswer(
-      answer, answerGroups: AnswerGroup[], defaultOutcome: Outcome,
+      answer: Answer, answerGroups: AnswerGroup[], defaultOutcome: Outcome,
       interactionRulesService): AnswerClassificationResult {
     // Find the first group that contains a rule which returns true
     // TODO(bhenning): Implement training data classification.
@@ -105,7 +118,7 @@ export class AnswerClassificationService {
    * @return The resulting AnswerClassificationResult domain object.
    */
   getMatchingClassificationResult(
-      stateName: string, interactionInOldState: Interaction, answer: object,
+      stateName: string, interactionInOldState: Interaction, answer: Answer,
       interactionRulesService): AnswerClassificationResult {
     var answerClassificationResult = null;
 
@@ -175,7 +188,7 @@ export class AnswerClassificationService {
   }
 
   isClassifiedExplicitlyOrGoesToNewState(
-      stateName: string, state: State, answer: object,
+      stateName: string, state: State, answer: Answer,
       interactionRulesService): boolean {
     const result = this.getMatchingClassificationResult(
       stateName, state.interaction, answer, interactionRulesService);
