@@ -121,6 +121,7 @@ class TopicPageDataHandler(base.BaseHandler):
         self.values.update({
             'topic_id': topic.id,
             'topic_name': topic.name,
+            'topic_description': topic.description,
             'canonical_story_dicts': canonical_story_dicts,
             'additional_story_dicts': additional_story_dicts,
             'uncategorized_skill_ids': uncategorized_skill_ids,

@@ -16,6 +16,19 @@
  * @fileoverview Constants for the topics and skills dashboard.
  */
 
+export enum ETopicSortOptions {
+  IncreasingCreatedOn = 'Newly Created',
+  DecreasingCreatedOn = 'Oldest Created',
+  IncreasingUpdatedOn = 'Most Recently Updated',
+  DecreasingUpdatedOn = 'Least Recently Updated',
+}
+
+export enum ETopicPublishedOptions {
+  All = 'All',
+  Published = 'Published',
+  NotPublished = 'Not Published'
+}
+
 export class TopicsAndSkillsDashboardPageConstants {
   public static EVENT_TYPE_TOPIC_CREATION_ENABLED = 'topicCreationEnabled';
 
@@ -29,4 +42,7 @@ export class TopicsAndSkillsDashboardPageConstants {
     STATUS_CHANGED: 'changed',
     STATUS_DISABLED: 'disabled'
   };
+  public static TOPIC_SORT_OPTIONS = ETopicSortOptions;
+  public static TOPIC_PUBLISHED_OPTIONS = ETopicPublishedOptions;
+  public static TOPIC_FILTER_CLASSROOM_ALL = 'All';
 }

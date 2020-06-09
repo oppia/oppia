@@ -118,6 +118,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(len(topic_summaries), 2)
         self.assertEqual(topic_summaries[0].name, 'Name')
+        self.assertEqual(topic_summaries[0].description, 'Description')
         self.assertEqual(topic_summaries[0].canonical_story_count, 0)
         self.assertEqual(topic_summaries[0].additional_story_count, 0)
         self.assertEqual(topic_summaries[0].total_skill_count, 2)
@@ -161,6 +162,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             id='topic_id',
             name='name',
             abbreviated_name='abbrev',
+            description='description1',
             canonical_name='canonical_name',
             next_subtopic_id=1,
             language_code='en',
@@ -183,6 +185,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             id='topic_id_2',
             name='name 2',
             abbreviated_name='abbrev',
+            description='description',
             canonical_name='canonical_name_2',
             next_subtopic_id=1,
             language_code='en',
@@ -1323,6 +1326,7 @@ class SubtopicMigrationTests(test_utils.GenericTestBase):
             name='name',
             abbreviated_name='abbrev',
             canonical_name='Name',
+            description='description1',
             next_subtopic_id=1,
             language_code='en',
             subtopics=[subtopic_v1_dict],
@@ -1366,6 +1370,7 @@ class StoryReferenceMigrationTests(test_utils.GenericTestBase):
             name='name',
             abbreviated_name='abbrev',
             canonical_name='Name',
+            description='description1',
             next_subtopic_id=1,
             language_code='en',
             subtopics=[],

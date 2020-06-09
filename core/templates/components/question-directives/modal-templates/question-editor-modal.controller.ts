@@ -32,19 +32,19 @@ require('services/image-local-storage.service.ts');
 
 
 angular.module('oppia').controller('QuestionEditorModalController', [
-  '$scope', '$uibModal', '$uibModalInstance', 'AlertsService', 'ContextService',
-  'ImageLocalStorageService', 'QuestionUndoRedoService',
-  'SkillSummaryObjectFactory', 'StateEditorService', 'UrlInterpolationService',
-  'associatedSkillSummaries', 'canEditQuestion', 'groupedSkillSummaries',
-  'misconceptionsBySkill', 'newQuestionIsBeingCreated', 'question',
-  'questionId', 'questionStateData',
+  '$scope', '$uibModal', '$uibModalInstance', 'AlertsService',
+  'QuestionUndoRedoService', 'QuestionValidationService',
+  'SkillSummaryObjectFactory', 'UrlInterpolationService',
+  'associatedSkillSummaries', 'canEditQuestion',
+  'groupedSkillSummaries', 'misconceptionsBySkill',
+  'newQuestionIsBeingCreated', 'question', 'questionId', 'questionStateData',
   function(
-      $scope, $uibModal, $uibModalInstance, AlertsService, ContextService,
-      ImageLocalStorageService, QuestionUndoRedoService,
-      SkillSummaryObjectFactory, StateEditorService, UrlInterpolationService,
-      associatedSkillSummaries, canEditQuestion, groupedSkillSummaries,
-      misconceptionsBySkill, newQuestionIsBeingCreated, question,
-      questionId, questionStateData) {
+      $scope, $uibModal, $uibModalInstance, AlertsService,
+      QuestionUndoRedoService, QuestionValidationService,
+      SkillSummaryObjectFactory, UrlInterpolationService,
+      associatedSkillSummaries, canEditQuestion,
+      groupedSkillSummaries, misconceptionsBySkill,
+      newQuestionIsBeingCreated, question, questionId, questionStateData) {
     var returnModalObject = {
       skillLinkageModificationsArray: [],
       commitMessage: ''
@@ -58,20 +58,10 @@ angular.module('oppia').controller('QuestionEditorModalController', [
     $scope.canEditQuestion = canEditQuestion;
     $scope.newQuestionIsBeingCreated = newQuestionIsBeingCreated;
 
-    if (!newQuestionIsBeingCreated) {
-      $scope.validationError = $scope.question.validate(
-        $scope.misconceptionsBySkill);
-    }
-
-    $scope.removeErrors = function() {
-      $scope.validationError = null;
-    };
     $scope.getSkillEditorUrl = function(skillId) {
       return '/skill_editor/' + skillId;
     };
-    $scope.questionChanged = function() {
-      $scope.removeErrors();
-    };
+
     $scope.removeSkill = function(skillId) {
       if ($scope.associatedSkillSummaries.length === 1) {
         AlertsService.addInfoMessage(
@@ -87,6 +77,11 @@ angular.module('oppia').controller('QuestionEditorModalController', [
           return summary.getId() !== skillId;
         });
     };
+
+    $scope.getSkillLinkageModificationsArray = function() {
+      return returnModalObject.skillLinkageModificationsArray;
+    };
+
     $scope.undo = function() {
       $scope.associatedSkillSummaries = associatedSkillSummaries;
       returnModalObject.skillLinkageModificationsArray = [];
@@ -140,15 +135,7 @@ angular.module('oppia').controller('QuestionEditorModalController', [
     // as there is already a default commit message present in the
     // backend for modification of skill linkages.
     $scope.saveAndCommit = function() {
-      $scope.validationError = $scope.question.validate(
-        $scope.misconceptionsBySkill);
-      if ($scope.validationError) {
-        return;
-      }
-      if (!StateEditorService.isCurrentSolutionValid()) {
-        $scope.validationError =
-          'The solution is invalid and does not ' +
-          'correspond to a correct answer';
+      if (!$scope.isQuestionValid()) {
         return;
       }
 
@@ -176,30 +163,22 @@ angular.module('oppia').controller('QuestionEditorModalController', [
     $scope.isSaveAndCommitButtonDisabled = function() {
       return !(QuestionUndoRedoService.hasChanges() ||
           (returnModalObject.skillLinkageModificationsArray.length
-          ) > 0);
+          ) > 0) ||
+          !$scope.isQuestionValid();
     };
 
 
     $scope.done = function() {
-      ContextService.resetImageSaveDestination();
-      $scope.validationError = $scope.question.validate(
-        $scope.misconceptionsBySkill);
-      if ($scope.validationError) {
-        return;
-      }
-      if (!StateEditorService.isCurrentSolutionValid()) {
-        $scope.validationError =
-          'The solution is invalid and does not ' +
-          'correspond to a correct answer';
+      if (!$scope.isQuestionValid()) {
         return;
       }
       $uibModalInstance.close(returnModalObject);
     };
     // Checking if Question contains all requirement to enable
     // Save and Publish Question
-    $scope.isSaveButtonDisabled = function() {
-      return $scope.question.validate(
-        $scope.misconceptionsBySkill);
+    $scope.isQuestionValid = function() {
+      return QuestionValidationService.isQuestionValid(
+        $scope.question, $scope.misconceptionsBySkill);
     };
 
     $scope.cancel = function() {
