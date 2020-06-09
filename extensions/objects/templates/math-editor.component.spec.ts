@@ -28,5 +28,4 @@ describe('MathEditor', function() {
     var guppyDivId = MathEditorCtrl.assignIdToGuppyDiv();
     expect(guppyDivId).toMatch(/guppy_[0-9]{1,8}/);
   });
-
 });
