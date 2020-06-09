@@ -16,24 +16,24 @@
  * @fileoverview Unit tests for the math editor.
  */
 
-fdescribe('MathEditor', function() {
+describe('MathEditor', function() {
   var MathEditorCtrl = null;
   class MockGuppy {
     constructor(id: string, config: Object) {}
 
     event(name: string, handler: Function): void {
       handler();
-    };
+    }
     asciimath(): string {
       return 'Dummy value';
-    };
-    render(): void {};
-  };
+    }
+    render(): void {}
+  }
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.inject(function($componentController) {
     MathEditorCtrl = $componentController('mathEditor');
-    window['Guppy'] = MockGuppy;
+    window.Guppy = MockGuppy;
 
     MathEditorCtrl.$onInit();
   }));
