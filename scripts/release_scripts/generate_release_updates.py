@@ -74,6 +74,9 @@ def validate_release_message():
     """Checks the message after the mail template is updated by the
     user.
     """
+    # Validation will work fine for cases where no new contributors are
+    # found since in that case the release co-ordinator will completely
+    # remove the new contributors section from the announcement mail.
     message_is_invalid = True
     while message_is_invalid:
         mail_message_file = python_utils.open_file(

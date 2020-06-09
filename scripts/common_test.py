@@ -173,10 +173,7 @@ class CommonTests(test_utils.GenericTestBase):
             self.assertEqual(
                 check_function_calls, expected_check_function_calls)
         finally:
-            if hasattr(
-                    common.open_new_tab_in_browser_if_possible, 'open_new_tab'):
-                delattr(
-                    common.open_new_tab_in_browser_if_possible, 'open_new_tab')
+            common.OPEN_NEW_TAB = {'user_pref': None}
 
     def test_open_new_tab_in_browser_if_possible_with_url_opening_correctly(
             self):
@@ -205,10 +202,7 @@ class CommonTests(test_utils.GenericTestBase):
             self.assertEqual(
                 check_function_calls, expected_check_function_calls)
         finally:
-            if hasattr(
-                    common.open_new_tab_in_browser_if_possible, 'open_new_tab'):
-                delattr(
-                    common.open_new_tab_in_browser_if_possible, 'open_new_tab')
+            common.OPEN_NEW_TAB = {'user_pref': None}
 
     def test_open_new_tab_in_browser_if_possible_with_url_not_opening_correctly(
             self):
@@ -237,10 +231,7 @@ class CommonTests(test_utils.GenericTestBase):
             self.assertEqual(
                 check_function_calls, expected_check_function_calls)
         finally:
-            if hasattr(
-                    common.open_new_tab_in_browser_if_possible, 'open_new_tab'):
-                delattr(
-                    common.open_new_tab_in_browser_if_possible, 'open_new_tab')
+            common.OPEN_NEW_TAB = {'user_pref': None}
 
     def test_get_remote_alias_with_correct_alias(self):
         def mock_check_output(unused_cmd_tokens):
