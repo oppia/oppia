@@ -61,7 +61,7 @@ export class ReadOnlyStoryNode {
       acquiredSkillIds: Array<string>, outline: string,
       outlineIsFinalized: boolean, explorationId: string,
       explorationSummary: ExplorationSummary, completed: boolean,
-      thumbnailBgColor: string, thumbnailFilename: strin) {
+      thumbnailBgColor: string, thumbnailFilename: string) {
     this._id = id;
     this._title = title;
     this._description = description;
