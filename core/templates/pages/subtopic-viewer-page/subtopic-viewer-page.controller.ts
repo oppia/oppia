@@ -24,6 +24,7 @@ require(
   'background-banner.component.ts');
 require('directives/angular-html-bind.directive.ts');
 require('directives/mathjax-bind.directive.ts');
+require('components/summary-tile/subtopic-summary-tile.directive.ts');
 
 require('domain/subtopic_viewer/subtopic-viewer-backend-api.service.ts');
 require('services/alerts.service.ts');
@@ -50,6 +51,7 @@ angular.module('oppia').directive('subtopicViewerPage', [
             PageTitleService, SubtopicViewerBackendApiService, UrlService,
             WindowDimensionsService, FATAL_ERROR_CODES) {
           var ctrl = this;
+          ctrl.nextSubtopicSummaryIsShown = false;
 
           ctrl.checkMobileView = function() {
             return (WindowDimensionsService.getWidth() < 500);
@@ -66,6 +68,15 @@ angular.module('oppia').directive('subtopicViewerPage', [
                   subtopicDataObject.getPageContents().getSubtitledHtml());
                 ctrl.subtopicTitle = subtopicDataObject.getSubtopicTitle();
                 PageTitleService.setPageTitle(ctrl.subtopicTitle + ' - Oppia');
+
+                let nextSubtopic = (
+                  subtopicDataObject.getNextSubtopic());
+                if (nextSubtopic) {
+                  ctrl.parentTopicId = subtopicDataObject.getParentTopicId();
+                  ctrl.nextSubtopic = nextSubtopic;
+                  ctrl.nextSubtopicSummaryIsShown = true;
+                }
+
                 LoaderService.hideLoadingScreen();
               },
               function(errorResponse) {
