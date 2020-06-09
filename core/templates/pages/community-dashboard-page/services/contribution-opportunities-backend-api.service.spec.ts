@@ -30,9 +30,9 @@ import { SkillOpportunityObjectFactory } from
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import {
-  ReadOnlyFeaturedTranslationLanguageObjectFactory
+  FeaturedTranslationLanguageObjectFactory
 } from
-  'domain/community_dashboard/ReadOnlyFeaturedTranslationLanguageObjectFactory';
+  'domain/community_dashboard/FeaturedTranslationLanguageObjectFactory';
 
 describe('Contribution Opportunities backend API service', function() {
   let contributionOpportunitiesBackendApiService:
@@ -187,7 +187,7 @@ describe('Contribution Opportunities backend API service', function() {
       const failHandler = jasmine.createSpy('fail');
 
       const readOnlyFTLFactory = TestBed.get(
-        ReadOnlyFeaturedTranslationLanguageObjectFactory);
+        FeaturedTranslationLanguageObjectFactory);
 
       contributionOpportunitiesBackendApiService
         .fetchFeaturedTranslationLanguages()

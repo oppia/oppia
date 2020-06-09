@@ -28,11 +28,11 @@ import { SkillOpportunity } from
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import {
-  ReadOnlyFeaturedTranslationLanguageObjectFactory,
+  FeaturedTranslationLanguageObjectFactory,
   IFeaturedTranslationLanguageBackendDict,
-  ReadOnlyFeaturedTranslationLanguage
+  FeaturedTranslationLanguage
 } from
-  'domain/community_dashboard/ReadOnlyFeaturedTranslationLanguageObjectFactory';
+  'domain/community_dashboard/FeaturedTranslationLanguageObjectFactory';
 
 const constants = require('constants.ts');
 
@@ -54,7 +54,7 @@ export class ContributionOpportunitiesBackendApiService {
     private urlInterpolationService: UrlInterpolationService,
     private http: HttpClient,
     private readOnlyFeaturedTranslationLanguageObjectFactory:
-      ReadOnlyFeaturedTranslationLanguageObjectFactory
+      FeaturedTranslationLanguageObjectFactory
   ) {}
 
   // TODO(#7165): Replace any with exact type.
@@ -83,7 +83,7 @@ export class ContributionOpportunitiesBackendApiService {
       successCallback: (
         opportunities?: Array<any>, nextCursor?: string, more?: boolean
         ) => void,
-      errorCallback: (reason?: any) => void
+      errorCallback: (reason: any) => void
   ): void {
     this.http.get(this.urlInterpolationService.interpolateUrl(
       this.urlTemplate, { opportunityType }
@@ -105,14 +105,13 @@ export class ContributionOpportunitiesBackendApiService {
 
   private _fetchFeaturedTranslationLanguages(
       successCallback: (
-        featuredTranslationLanguages:
-        ReadOnlyFeaturedTranslationLanguage[]
+        featuredTranslationLanguages: FeaturedTranslationLanguage[]
       ) => void,
-      errorCallback: (reason?: any) => void
+      errorCallback: (reason: any) => void
   ) {
     this.http.get('/getfeaturedtranslationlanguages').toPromise()
       .then((data: any) => {
-        let featuredTranslationLanguages = (
+        const featuredTranslationLanguages = (
           data.featured_translation_languages.map(
             (backendDict: IFeaturedTranslationLanguageBackendDict) =>
               this.readOnlyFeaturedTranslationLanguageObjectFactory

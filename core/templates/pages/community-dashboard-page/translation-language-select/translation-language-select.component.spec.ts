@@ -17,8 +17,8 @@ import { TranslationLanguageSelectComponent } from
   './translation-language-select.component';
 import { ContributionOpportunitiesBackendApiService } from
   '../services/contribution-opportunities-backend-api.service';
-import { ReadOnlyFeaturedTranslationLanguageObjectFactory } from
-  'domain/community_dashboard/ReadOnlyFeaturedTranslationLanguageObjectFactory';
+import { FeaturedTranslationLanguageObjectFactory } from
+  'domain/community_dashboard/FeaturedTranslationLanguageObjectFactory';
 
 /**
  * @fileoverview Unit tests for the translation language select
@@ -29,7 +29,7 @@ describe('Translation language select', () => {
   let fixture: ComponentFixture<TranslationLanguageSelectComponent>;
 
   let readOnlyFeaturedTranslationLanguageObjectFactory =
-    new ReadOnlyFeaturedTranslationLanguageObjectFactory();
+    new FeaturedTranslationLanguageObjectFactory();
   let featuredLanguages = [
     readOnlyFeaturedTranslationLanguageObjectFactory.createFromBackendDict({
       language_code: 'fr',

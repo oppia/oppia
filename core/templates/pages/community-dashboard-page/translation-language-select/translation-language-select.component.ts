@@ -22,8 +22,8 @@ import {
 import { downgradeComponent } from '@angular/upgrade/static';
 import { ContributionOpportunitiesBackendApiService } from
   '../services/contribution-opportunities-backend-api.service';
-import { ReadOnlyFeaturedTranslationLanguage } from
-  'domain/community_dashboard/ReadOnlyFeaturedTranslationLanguageObjectFactory';
+import { FeaturedTranslationLanguage } from
+  'domain/community_dashboard/FeaturedTranslationLanguageObjectFactory';
 
 @Component({
   selector: 'translation-language-select',
@@ -35,7 +35,7 @@ export class TranslationLanguageSelectComponent implements OnInit {
   @Output() setValue: EventEmitter<string> = new EventEmitter();
   @ViewChild('dropdown', {'static': false}) dropdownRef;
 
-  featuredLanguages: ReadOnlyFeaturedTranslationLanguage[] = [];
+  featuredLanguages: FeaturedTranslationLanguage[] = [];
   languageIdToDescription: {[id: string]: string} = {};
   dropdownShown = false;
   descriptionPopupShown = false;
@@ -53,7 +53,7 @@ export class TranslationLanguageSelectComponent implements OnInit {
 
     this.contributionOpportunitiesBackendApiService
       .fetchFeaturedTranslationLanguages()
-      .then((data: ReadOnlyFeaturedTranslationLanguage[]) => {
+      .then((data: FeaturedTranslationLanguage[]) => {
         this.featuredLanguages = data;
       });
   }

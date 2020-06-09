@@ -25,36 +25,29 @@ export interface IFeaturedTranslationLanguageBackendDict {
   'description': string;
 }
 
-export class ReadOnlyFeaturedTranslationLanguage {
-  _languageCode: string;
-  _description: string;
-
+export class FeaturedTranslationLanguage {
   constructor(
-      _languageCode: string,
-      _description: string
-  ) {
-    this._languageCode = _languageCode;
-    this._description = _description;
+      readonly _languageCode: string,
+      readonly _description: string
+  ) {}
+
+  get languageCode(): string {
+    return this.languageCode;
   }
 
-  getLanguageCode(): string {
-    return this._languageCode;
-  }
-
-  getDescription(): string {
-    return this._description;
+  get description(): string {
+    return this.description;
   }
 }
 
 @Injectable({
   providedIn: 'root'
 })
-export class ReadOnlyFeaturedTranslationLanguageObjectFactory {
+export class FeaturedTranslationLanguageObjectFactory {
   createFromBackendDict(
       featuredTranslationBackendDict: IFeaturedTranslationLanguageBackendDict
-  ):
-    ReadOnlyFeaturedTranslationLanguage {
-    return new ReadOnlyFeaturedTranslationLanguage(
+  ):FeaturedTranslationLanguage {
+    return new FeaturedTranslationLanguage(
       featuredTranslationBackendDict.language_code,
       featuredTranslationBackendDict.description
     );
@@ -62,6 +55,6 @@ export class ReadOnlyFeaturedTranslationLanguageObjectFactory {
 }
 
 angular.module('oppia').factory(
-  'ReadOnlyFeaturedTranslationLanguageObjectFactory',
-  downgradeInjectable(ReadOnlyFeaturedTranslationLanguageObjectFactory));
+  'FeaturedTranslationLanguageObjectFactory',
+  downgradeInjectable(FeaturedTranslationLanguageObjectFactory));
 

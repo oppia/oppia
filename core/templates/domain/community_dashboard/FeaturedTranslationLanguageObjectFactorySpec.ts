@@ -18,17 +18,15 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { ReadOnlyFeaturedTranslationLanguageObjectFactory } from
-  './ReadOnlyFeaturedTranslationLanguageObjectFactory';
+import { FeaturedTranslationLanguageObjectFactory } from
+  './FeaturedTranslationLanguageObjectFactory';
 
-describe('Read only Featured Translation Language factory', () => {
-  let readOnlyFTLFactory:
-    ReadOnlyFeaturedTranslationLanguageObjectFactory = null;
-  var _sampleFTL = null;
+describe('Featured Translation Language object factory', () => {
+  let readOnlyFTLFactory: FeaturedTranslationLanguageObjectFactory = null;
+  let _sampleFTL = null;
 
   beforeEach(() => {
-    readOnlyFTLFactory = TestBed.get(
-      ReadOnlyFeaturedTranslationLanguageObjectFactory);
+    readOnlyFTLFactory = TestBed.get(FeaturedTranslationLanguageObjectFactory);
 
     let sampleFRLDict = {
       language_code: 'en',
