@@ -298,7 +298,7 @@ jobs:
       - run:
           name: Run e2e play translations test
           command: |
-            python -m scripts.run_e2e_tests --skip-install --suite="playTranslations"
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="playTranslations"
 
   e2e_topic_and_story_editor:
     <<: *job_defaults
