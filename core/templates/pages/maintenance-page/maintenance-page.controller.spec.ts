@@ -32,6 +32,7 @@ describe('Maintenance page', function() {
       $provide.value(key, value);
     }
   }));
+
   beforeEach(angular.mock.inject(function($injector, $controller) {
     DocumentAttributeCustomizationService = $injector.get(
       'DocumentAttributeCustomizationService');

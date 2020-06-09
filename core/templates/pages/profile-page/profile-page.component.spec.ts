@@ -46,12 +46,14 @@ describe('Profile page', function() {
       $provide.value(key, value);
     }
   }));
+
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('UrlService', {
       getUsernameFromProfileUrl: () => 'username1'
     });
     $provide.value('WindowRef', windowRefMock);
   }));
+
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     $httpBackend = $injector.get('$httpBackend');
     $q = $injector.get('$q');

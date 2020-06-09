@@ -31,6 +31,7 @@ describe('Error page', function() {
       $provide.value(key, value);
     }
   }));
+
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     Title = $injector.get('Title');
     ctrl = $componentController('errorPage', {}, {

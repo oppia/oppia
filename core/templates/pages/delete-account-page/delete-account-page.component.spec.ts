@@ -35,12 +35,14 @@ describe('Delete account page', function() {
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('$window', windowMock);
   }));
+
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
     }
   }));
+
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     var $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();

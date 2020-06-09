@@ -32,6 +32,7 @@ describe('Thanks page', function() {
       $provide.value(key, value);
     }
   }));
+
   beforeEach(angular.mock.inject(function($componentController) {
     ctrl = $componentController('thanksPage');
   }));

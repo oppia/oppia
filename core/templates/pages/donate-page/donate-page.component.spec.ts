@@ -60,6 +60,7 @@ describe('Donate page', () => {
       }
     }).compileComponents();
   });
+
   beforeEach(() => {
     this.fixture = TestBed.createComponent(DonatePageComponent);
     this.component = this.fixture.componentInstance;
