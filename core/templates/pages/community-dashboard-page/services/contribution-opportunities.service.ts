@@ -22,8 +22,11 @@ require(
   'contribution-opportunities-backend-api.service.ts');
 
 angular.module('oppia').factory('ContributionOpportunitiesService', [
-  'ContributionOpportunitiesBackendApiService',
-  function(ContributionOpportunitiesBackendApiService) {
+  '$uibModal', 'ContributionOpportunitiesBackendApiService',
+  'UrlInterpolationService',
+  function(
+      $uibModal, ContributionOpportunitiesBackendApiService,
+      UrlInterpolationService) {
     var skillOpportunitiesCursor = null;
     var translationOpportunitiesCursor = null;
     var voiceoverOpportunitiesCursor = null;
@@ -58,6 +61,25 @@ angular.module('oppia').factory('ContributionOpportunitiesService', [
       });
     };
 
+    var showRequiresLoginModal = function(argument) {
+      $uibModal.open({
+        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+          '/pages/community-dashboard-page/modal-templates/' +
+          'login-required-modal.directive.html'),
+        backdrop: 'static',
+        controller: ['$scope', '$uibModalInstance',
+          function($scope, $uibModalInstance) {
+            $scope.close = function() {
+              $uibModalInstance.close();
+            };
+          }]
+      }).result.then(function() {}, function() {
+        // Note to developers:
+        // This callback is triggered when the Cancel button is clicked.
+        // No further action is needed.
+      });
+    };
+
     return {
       getSkillOpportunities: function(successCallback) {
         _getSkillOpportunities('', successCallback);
@@ -84,6 +106,7 @@ angular.module('oppia').factory('ContributionOpportunitiesService', [
           _getVoiceoverOpportunities(
             languageCode, voiceoverOpportunitiesCursor, successCallback);
         }
-      }
+      },
+      showRequiresLoginModal: showRequiresLoginModal
     };
   }]);
