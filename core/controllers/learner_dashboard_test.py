@@ -34,7 +34,7 @@ import utils
     models.NAMES.suggestion, models.NAMES.feedback])
 
 
-class OldLearnerDashboardUrlHandlerTest(test_utils.GenericTestBase):
+class OldLearnerDashboardRedirectPageTest(test_utils.GenericTestBase):
     """Test for redirecting the old learner dashboard page URL
     to the new one.
     """

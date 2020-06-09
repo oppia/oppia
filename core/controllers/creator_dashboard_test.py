@@ -46,7 +46,7 @@ import python_utils
 taskqueue_services = models.Registry.import_taskqueue_services()
 
 
-class OldNotificationsDashboardUrlHandlerTest(test_utils.GenericTestBase):
+class OldNotificationsDashboardRedirectPageTest(test_utils.GenericTestBase):
     """Test for redirecting the old notifications dashboard page URL
     to the new one.
     """
@@ -61,7 +61,7 @@ class OldNotificationsDashboardUrlHandlerTest(test_utils.GenericTestBase):
             'http://localhost/notifications', response.headers['location'])
 
 
-class OldCreatorDashboardUrlHandlerTest(test_utils.GenericTestBase):
+class OldCreatorDashboardRedirectPageTest(test_utils.GenericTestBase):
     """Test for redirecting the old creator dashboard page URL
     to the new one.
     """

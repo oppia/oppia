@@ -31,7 +31,7 @@ import python_utils
 import utils
 
 
-class OldLearnerDashboardUrlHandler(base.BaseHandler):
+class OldLearnerDashboardRedirectPage(base.BaseHandler):
     """Redirects the old learner dashboard URL to the new one."""
 
     @acl_decorators.open_access

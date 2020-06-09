@@ -39,7 +39,7 @@ import utils
 CAN_EDIT_STR = 'can_edit'
 
 
-class OldLibraryUrlHandlerTest(test_utils.GenericTestBase):
+class OldLibraryRedirectPageTest(test_utils.GenericTestBase):
     """Test for redirecting the old library page URL to the new one."""
 
     def test_old_library_page_url(self):

@@ -50,7 +50,7 @@ COLLECTION_ID_KEY = 'collectionId'
 QUESTION_ID_KEY = 'questionId'
 
 
-class OldNotificationsDashboardUrlHandler(base.BaseHandler):
+class OldNotificationsDashboardRedirectPage(base.BaseHandler):
     """Redirects the old notifications dashboard URL to the new one."""
 
     @acl_decorators.open_access
@@ -114,7 +114,7 @@ class NotificationsDashboardHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class OldCreatorDashboardUrlHandler(base.BaseHandler):
+class OldCreatorDashboardRedirectPage(base.BaseHandler):
     """Redirects the old creator dashboard URL to the new one."""
 
     @acl_decorators.open_access

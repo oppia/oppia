@@ -71,7 +71,7 @@ def get_matching_activity_dicts(query_string, search_cursor):
     return activity_list, new_search_cursor
 
 
-class OldLibraryUrlHandler(base.BaseHandler):
+class OldLibraryRedirectPage(base.BaseHandler):
     """Redirects the old library URL to the new one."""
 
     @acl_decorators.open_access

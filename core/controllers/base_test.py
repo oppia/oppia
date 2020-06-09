@@ -59,7 +59,7 @@ class HelperFunctionTests(test_utils.GenericTestBase):
         about_path = os.path.join('core', 'templates', 'pages', 'about-page')
         with self.swap(feconf, 'FRONTEND_TEMPLATES_DIR', about_path):
             self.assertIn(
-                '"About us - Oppia"',
+                '"About | Oppia"',
                 base.load_template('about-page.mainpage.html'))
         donate_path = os.path.join('core', 'templates', 'pages', 'donate-page')
         with self.swap(feconf, 'FRONTEND_TEMPLATES_DIR', donate_path):
@@ -174,7 +174,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
 
             # Some of these will 404 or 302. This is expected.
             self.get_response_without_checking_for_errors(
-                url, [200, 302, 400, 401, 404])
+                url, [200, 301, 302, 400, 401, 404])
 
         # TODO(sll): Add similar tests for POST, PUT, DELETE.
         # TODO(sll): Set a self.payload attr in the BaseHandler for
@@ -218,7 +218,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         # learner dashboard, going to '/' should redirect to the learner
         # dashboard page.
         response = self.get_html_response('/', expected_status_int=302)
-        self.assertIn('learner_dashboard', response.headers['location'])
+        self.assertIn('learner-dashboard', response.headers['location'])
         self.logout()
 
     def test_root_redirect_rules_for_deleted_user_prod_mode(self):
@@ -247,7 +247,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         # learner dashboard, going to '/' should redirect to the learner
         # dashboard page.
         response = self.get_html_response('/', expected_status_int=302)
-        self.assertIn('learner_dashboard', response.headers['location'])
+        self.assertIn('learner-dashboard', response.headers['location'])
         self.logout()
 
     def test_root_redirect_rules_for_logged_in_creators(self):
@@ -260,7 +260,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         # Since the default dashboard has been set as creator dashboard, going
         # to '/' should redirect to the creator dashboard.
         response = self.get_html_response('/', expected_status_int=302)
-        self.assertIn('creator_dashboard', response.headers['location'])
+        self.assertIn('creator-dashboard', response.headers['location'])
 
     def test_root_redirect_rules_for_logged_in_editors(self):
         self.login(self.TEST_CREATOR_EMAIL)
