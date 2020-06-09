@@ -169,7 +169,6 @@ import { FeedbackThreadSummaryObjectFactory } from
   'domain/feedback_thread/FeedbackThreadSummaryObjectFactory';
 import { FileDownloadRequestObjectFactory } from
   'domain/utilities/FileDownloadRequestObjectFactory';
-import { FormatTimePipe } from 'filters/format-timer.pipe';
 import { FractionInputValidationService } from
   'interactions/FractionInput/directives/fraction-input-validation.service';
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
@@ -1174,7 +1173,6 @@ export class UpgradedServices {
       upgradedServices['WrittenTranslationsObjectFactory']);
     upgradedServices['StateInteractionStatsService'] =
       new StateInteractionStatsService(
-        upgradedServices['AngularNameService'],
         upgradedServices['AnswerClassificationService'],
         upgradedServices['ContextService'],
         upgradedServices['FractionObjectFactory'],
