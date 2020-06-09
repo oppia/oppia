@@ -220,7 +220,7 @@ class BaseHandler(webapp2.RequestHandler):
                 b'https://oppiatestserver.appspot.com', permanent=True)
             return
 
-        if feconf.ENABLE_MAINTENANCE_MODE and self.is_super_admin:
+        if feconf.ENABLE_MAINTENANCE_MODE and not self.is_super_admin:
             self.handle_exception(
                 self.TemporaryMaintenanceException(
                     'Oppia is currently being upgraded, and the site should '
