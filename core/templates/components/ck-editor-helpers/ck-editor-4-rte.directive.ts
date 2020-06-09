@@ -277,6 +277,29 @@ angular.module('oppia').directive('ckEditor4Rte', [
           // Clean up CKEditor instance when directive is removed.
           ck.destroy();
         });
+
+        scope.$on('copy-element-to-translation-editor', (
+            _, html: string, widgetType?: string
+        ) => {
+          if (!widgetType) {
+            ck.insertHtml(html);
+          } else {
+            const valueMatcher = /(\w+)(-with-value=")([^"]+)(")/g;
+            let startupData = {};
+            let match;
+
+            while ((match = valueMatcher.exec(html)) !== null) {
+              const key = match[1];
+              const value = match[3];
+              startupData[key] = value.replace(/&amp;quot;/g, '');
+            }
+
+            ck.execCommand(
+              widgetType.replace('-noninteractive-', ''),
+              { startupData }
+            );
+          }
+        });
       }
     };
   }

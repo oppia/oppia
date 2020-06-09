@@ -43,7 +43,7 @@
           <[getEmptyContentMessage()]>
         </span>
         <span>
-          <angular-html-bind html-data="getRequiredHtml(stateContent)" class="oppia-rte-editor">
+          <angular-html-bind ng-click="onContentClick($event)" html-data="getRequiredHtml(stateContent)" class="oppia-rte-editor">
           </angular-html-bind>
         </span>
       </span>

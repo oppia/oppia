@@ -133,6 +133,55 @@ angular.module('oppia').directive('stateTranslation', [
             RouterService.navigateToMainTab(stateName);
           };
 
+          $scope.onContentClick = function($event) {
+            let target = $event.target;
+            let tagName = target.tagName.toLowerCase();
+            let nonWidgetTags = ['p', 'strong', 'br', 'em', 'li',
+              'ol', 'ul', 'pre', 'blockquote'];
+            let widgetTags = [
+              'oppia-noninteractive-link',
+              'oppia-noninteractive-math',
+              'oppia-noninteractive-image',
+              'oppia-noninteractive-collapsible',
+              'oppia-noninteractive-video',
+              'oppia-noninteractive-tabs',
+              'oppia-noninteractive-svgeditor'];
+
+            let copiedHtml;
+            let widgetType;
+
+            if (
+              nonWidgetTags.includes(tagName) &&
+              target.parentElement.tagName === 'ANGULAR-HTML-BIND'
+            ) {
+              copiedHtml = target.outerHTML;
+            } else {
+              // traverse up until we get to a div w/ tag oppia-noninteractive-*
+              // stop at angular-html-bind tag if not found
+              let currentElement = target;
+              while (currentElement.tagName !== 'ANGULAR-HTML-BIND') {
+                let currentTag = currentElement.tagName.toLowerCase();
+
+                if (widgetTags.includes(currentTag)) {
+                  copiedHtml = currentElement.outerHTML;
+                  widgetType = currentTag;
+                  break;
+                }
+                currentElement = currentElement.parentElement;
+              }
+
+              if (currentElement.tagName === 'ANGULAR-HTML-BIND') {
+                return;
+              }
+            }
+
+            $scope.$broadcast(
+              'copy-element-to-translation-editor',
+              copiedHtml,
+              widgetType,
+            );
+          };
+
           $scope.onTabClick = function(tabId) {
             if ($scope.isTranslationTabBusy) {
               $rootScope.$broadcast('showTranslationTabBusyModal');
