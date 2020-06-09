@@ -217,7 +217,7 @@ angular.module('oppia').directive('libraryPage', [
               Math.floor(Math.random() * possibleBannerFilenames.length)];
 
             ctrl.bannerImageFileUrl = UrlInterpolationService.getStaticImageUrl(
-              '/community-library/' + ctrl.bannerImageFilename);
+              '/library/' + ctrl.bannerImageFilename);
 
             ClassroomBackendApiService.fetchClassroomPageIsShownStatus().then(
               function(classroomIsShown) {
