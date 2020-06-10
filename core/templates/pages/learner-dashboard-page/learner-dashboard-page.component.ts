@@ -25,11 +25,23 @@ require(
 require('components/summary-tile/collection-summary-tile.directive.ts');
 require('components/summary-tile/exploration-summary-tile.directive.ts');
 require('filters/string-utility-filters/truncate.filter.ts');
+require(
+  'pages/learner-dashboard-page/modal-templates/' +
+  'remove-activity-from-learner-dashboard-modal.controller.ts');
 
 require('directives/angular-html-bind.directive.ts');
+require('domain/feedback_message/FeedbackMessageSummaryObjectFactory.ts');
+require('domain/feedback_thread/FeedbackThreadSummaryObjectFactory.ts');
+require('domain/learner_dashboard/learner-dashboard-backend-api.service.ts');
+require(
+  'pages/exploration-editor-page/feedback-tab/services/' +
+  'thread-status-display.service.ts');
 require(
   'pages/learner-dashboard-page/suggestion-modal/' +
   'suggestion-modal-for-learner-dashboard.service.ts');
+require('domain/utilities/url-interpolation.service.ts');
+require('services/alerts.service.ts');
+require('services/date-time-format.service.ts');
 require('services/user.service.ts');
 
 require('pages/learner-dashboard-page/learner-dashboard-page.constants.ajs.ts');
@@ -356,60 +368,7 @@ angular.module('oppia').component('learnerDashboardPage', {
               return activity;
             }
           },
-          controller: [
-            '$scope', '$uibModalInstance', '$http', 'sectionNameI18nId',
-            'subsectionName', 'ACTIVITY_TYPE_COLLECTION',
-            'ACTIVITY_TYPE_EXPLORATION',
-            function(
-                $scope, $uibModalInstance, $http, sectionNameI18nId,
-                subsectionName, ACTIVITY_TYPE_COLLECTION,
-                ACTIVITY_TYPE_EXPLORATION) {
-              $scope.sectionNameI18nId = sectionNameI18nId;
-              $scope.subsectionName = subsectionName;
-              $scope.activityTitle = activity.title;
-              $scope.remove = function() {
-                var activityType = '';
-                if (subsectionName ===
-                  LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS) {
-                  activityType = ACTIVITY_TYPE_EXPLORATION;
-                } else if (subsectionName ===
-                          LEARNER_DASHBOARD_SUBSECTION_I18N_IDS
-                            .COLLECTIONS) {
-                  activityType = ACTIVITY_TYPE_COLLECTION;
-                } else {
-                  throw new Error('Subsection name is not valid.');
-                }
-
-                var removeActivityUrlPrefix = '';
-                if (sectionNameI18nId ===
-                    LEARNER_DASHBOARD_SECTION_I18N_IDS.PLAYLIST) {
-                  removeActivityUrlPrefix =
-                    '/learnerplaylistactivityhandler/';
-                } else if (sectionNameI18nId ===
-                          LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE) {
-                  removeActivityUrlPrefix =
-                    '/learnerincompleteactivityhandler/';
-                } else {
-                  throw new Error('Section name is not valid.');
-                }
-
-                var removeActivityUrl = (
-                  UrlInterpolationService.interpolateUrl(
-                    removeActivityUrlPrefix +
-                    '<activityType>/<activityId>', {
-                      activityType: activityType,
-                      activityId: activity.id
-                    }));
-
-                $http['delete'](removeActivityUrl);
-                $uibModalInstance.close();
-              };
-
-              $scope.cancel = function() {
-                $uibModalInstance.dismiss('cancel');
-              };
-            }
-          ]
+          controller: 'RemoveActivityFromLearnerDashboardModalController'
         }).result.then(function() {
           if (sectionNameI18nId ===
               LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE) {
