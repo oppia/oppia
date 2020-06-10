@@ -20,12 +20,16 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import draft_upgrade_services
+from core.platform import models
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.tests import test_utils
 import feconf
 import utils
+
+(exp_models,) = models.Registry.import_models([models.NAMES.exploration])
+
 
 
 class DraftUpgradeUnitTests(test_utils.GenericTestBase):
@@ -109,6 +113,38 @@ class DraftUpgradeUnitTests(test_utils.GenericTestBase):
 
 class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
     """Test the DraftUpgradeUtil module."""
+
+    EXP_ID = 'exp_id'
+    USER_ID = 'user_id'
+
+
+    EXP_ADD_STATE_CHANGE_LIST = [exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_ADD_STATE,
+                    'state_name': 'State 1',
+                })]
+    DRAFT_CHANGELIST = [exp_domain.ExplorationChange({
+        'cmd': 'edit_exploration_property',
+        'property_name': 'title',
+        'old_value': None,
+        'new_value': 'Updated title'})]
+
+    def setUp(self):
+        super(DraftUpgradeUtilUnitTests, self).setUp()
+        self.save_new_valid_exploration(self.EXP_ID, self.USER_ID)
+
+
+    # In the test_convert_states_vx_dict_to_vy_dict methods, x and y are
+    # current schema version of the exploration and the schema version we
+    # want to upgrade to. This is a helper function to create ExplorationChanges
+    # for each test with the correct schema versions
+    def create_migration_change_list_for_test(self, current_schema_version,
+        schema_version_to_upgrade):
+        return [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
+            'from_version': current_schema_version,
+            'to_version': schema_version_to_upgrade,
+            })]
+
 
     def test_convert_to_latest_schema_version_implemented(self):
         state_schema_version = feconf.CURRENT_STATE_SCHEMA_VERSION
@@ -239,7 +275,8 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             }).to_dict())
 
     def test_convert_states_v29_dict_to_v30_dict(self):
-        draft_change_list = [
+        # Draft change list with schema version 29
+        draft_change_list_v29 = [
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'property_name': 'answer_groups',
@@ -271,9 +308,9 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                     'tagged_misconception_id': None
                 }
             })]
-        self.assertEqual(
-            draft_upgrade_services.DraftUpgradeUtil._convert_states_v29_dict_to_v30_dict(  # pylint: disable=protected-access,line-too-long
-                draft_change_list)[0].to_dict(),
+        # Draft change list with schema version 30, instead of
+        # tagged_misconception_id we have tag_skill_misconception_id
+        draft_change_list_v30 = [
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'property_name': 'answer_groups',
@@ -304,7 +341,29 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                     'training_data': [],
                     'tagged_skill_misconception_id': None
                 }
-            }).to_dict())
+            })]
+        # Create an exploration change list with the command that will suggest
+        # migrating the schema from version 29 to version 30
+        EXP_MIGRATION_CHANGE_LIST = self.create_migration_change_list_for_test(
+            '29','30')
+        # Apply that change list to the exploration so that it gets stored in
+        # the data store
+        exp_services.update_exploration(
+        self.USER_ID, self.EXP_ID, EXP_MIGRATION_CHANGE_LIST,
+        'Ran Exploration Migration job.')
+        exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
+        # Since we applied an update, the version of the exploration is 2
+        self.assertEqual(exploration. version, 2)
+        # In the function call below, we're actually testing if the
+        # _convert_states_v29_dict_to_v30_dict method works by applying it
+        # to draft_change_list_v29, the result should be a new draft_change_list
+        # with schema version 30
+        expected_draft_change_list = (
+            draft_upgrade_services.try_upgrading_draft_to_exp_version(
+                draft_change_list_v29, 1, exploration.version, self.EXP_ID)
+            )
+        self.assertEqual(expected_draft_change_list[0].to_dict(),
+            draft_change_list_v30[0].to_dict())
 
     def test_convert_states_v28_dict_to_v29_dict(self):
         draft_change_list = [
