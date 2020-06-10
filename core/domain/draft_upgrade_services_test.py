@@ -396,9 +396,9 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 'property_name': 'content',
                 'new_value': 'new value'
             })]
-        self.assertEqual(
-            draft_upgrade_services.DraftUpgradeUtil._convert_states_v28_dict_to_v29_dict(  # pylint: disable=protected-access,line-too-long
-                draft_change_list)[0].to_dict(),
+        expected_draft_change_list = self.helper_to_test_schema_verison_updates(
+            '28', '29', draft_change_list)
+        self.assertEqual(expected_draft_change_list[0].to_dict(),
             draft_change_list[0].to_dict())
 
     def test_convert_states_v27_dict_to_v28_dict(self):
