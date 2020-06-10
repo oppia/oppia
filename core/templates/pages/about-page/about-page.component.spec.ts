@@ -23,6 +23,7 @@ require('pages/about-page/about-page.component.ts');
 describe('About Page', function() {
   var ctrl = null;
   var windowRef = new WindowRef();
+  var credits = [];
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -30,6 +31,9 @@ describe('About Page', function() {
   }));
   beforeEach(angular.mock.inject(function($componentController) {
     ctrl = $componentController('aboutPage');
+  }));
+  beforeEach(angular.mock.inject(function($injector) {
+    credits = $injector.get('CREDITS_CONSTANTS');
   }));
 
   afterEach(function() {
@@ -172,5 +176,12 @@ describe('About Page', function() {
       ' Tricia Ngoon, Vikrant Nanda, Vinamrata Singal & Yarin Feigenbaum');
     expect(ctrl.aboutPageMascotImgUrl).toBe(
       '/assets/images/general/about_page_mascot.png');
+  });
+
+  it('should obtain developer names with a letter', function() {
+    var namesWithV = credits.filter(
+      (credit) => credit.startsWith('V')).sort();
+    expect(ctrl.getCredits('V')).toEqual(namesWithV);
+    expect(ctrl.getCredits('8')).toEqual([]);
   });
 });

@@ -159,11 +159,13 @@ class RteComponentExtractorUnitTests(test_utils.GenericTestBase):
             '<p>Test text&nbsp;'
             '<oppia-noninteractive-math '
             'math_content-with-value="{&amp;quot;raw_latex&amp;quot;:'
-            '&amp;quot;\\frac{x}{y}&amp;quot;,&amp;quot;svg_filename&amp;quot;:'
+            '&amp;quot;\\\\frac{x}{y}&amp;quot;,&amp;quot;svg_filename&amp;quot;:'
             '&amp;quot;&amp;quot;}">'
             '</oppia-noninteractive-math></p><p>&nbsp;'
             '<oppia-noninteractive-link '
-            'text-with-value="&amp;quot;Link&amp;quot;" '
+            'text-with-value='
+            '"&amp;quot;Link\\&amp;quot;quoted text\\&amp;quot;'
+            '&amp;#39;singlequotes&amp;#39;&amp;quot;" '
             'url-with-value="&amp;quot;https://www.example.com&amp;quot;">'
             '</oppia-noninteractive-link>.</p>'
             '<p>Video</p>'
@@ -177,7 +179,7 @@ class RteComponentExtractorUnitTests(test_utils.GenericTestBase):
         expected_components = [
             {
                 'customization_args': {
-                    'text-with-value': u'Link',
+                    'text-with-value': u'Link"quoted text"\'singlequotes\'',
                     'url-with-value': u'https://www.example.com'},
                 'id': 'oppia-noninteractive-link'
             },
