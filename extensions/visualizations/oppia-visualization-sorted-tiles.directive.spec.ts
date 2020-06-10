@@ -43,15 +43,21 @@ describe('Oppia sorted tiles visualization', function() {
     this.outerScope = $rootScope.$new();
     const elem = angular.element(
       '<oppia-visualization-sorted-tiles ' +
-      'escaped-data="[{\'answer\': \'foo\', \'frequency\': 5}]">' +
+      'escaped-data="[{\'answer\': \'foo\', \'frequency\': 5}]" ' +
+      'escaped-options="{\'header\': \'Pretty Tile\'}" ' +
+      '>' +
       '</oppia-visualization-sorted-tiles>');
     const compiledElem = $compile(elem)(this.outerScope);
     this.outerScope.$digest();
     this.ctrlScope = compiledElem[0].getControllerScope();
   }));
 
-  it('should display the correct number of stars', function() {
+  it('should interpret the escaped data', function() {
     this.outerScope.$digest();
     expect(this.ctrlScope.data).toEqual([{answer: 'foo', frequency: 5}]);
+  });
+
+  it('should interpret the escaped options', () => {
+    expect(this.ctrlScope.options).toEqual({'header': 'Pretty Tiles'});
   });
 });
