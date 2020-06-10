@@ -24,7 +24,9 @@ export class StorySummary {
   constructor(
     private _id: string,
     private _title: string,
-    private _nodeCount: number,
+    private _nodeTitles: Array<string>,
+    private _thumbnailFilename: string,
+    private _thumbnailBgColor: string,
     private _description: string,
     private _storyIsPublished: boolean
   ) {}
@@ -37,8 +39,16 @@ export class StorySummary {
     return this._title;
   }
 
-  getNodeCount(): number {
-    return this._nodeCount;
+  getNodeTitles(): Array<string> {
+    return this._nodeTitles.slice();
+  }
+
+  getThumbnailFilename(): string {
+    return this._thumbnailFilename;
+  }
+
+  getThumbnailBgColor(): string {
+    return this._thumbnailBgColor;
   }
 
   getDescription(): string {
@@ -58,7 +68,11 @@ export class StorySummaryObjectFactory {
     id: string;
     title: string;
     // eslint-disable-next-line camelcase
-    node_count: number;
+    node_titles: Array<string>;
+    // eslint-disable-next-line camelcase
+    thumbnail_filename: string;
+    // eslint-disable-next-line camelcase
+    thumbnail_bg_color: string;
     description: string;
     // eslint-disable-next-line camelcase
     story_is_published: boolean;
@@ -66,7 +80,9 @@ export class StorySummaryObjectFactory {
     return new StorySummary(
       storySummaryBackendDict.id,
       storySummaryBackendDict.title,
-      storySummaryBackendDict.node_count,
+      storySummaryBackendDict.node_titles,
+      storySummaryBackendDict.thumbnail_filename,
+      storySummaryBackendDict.thumbnail_bg_color,
       storySummaryBackendDict.description,
       storySummaryBackendDict.story_is_published
     );

@@ -257,10 +257,6 @@ def execute_branch_cut(target_version, hotfix_number):
 
     verify_target_branch_does_not_already_exist(remote_alias, new_branch_name)
 
-    # The release coordinator should verify that tests are passing on the parent
-    # branch before checking out the new branch.
-    common.open_new_tab_in_browser_if_possible(
-        'https://travis-ci.org/oppia/oppia/branches')
     while True:
         if not hotfix_number:
             branch_to_check = 'develop'
@@ -272,6 +268,10 @@ def execute_branch_cut(target_version, hotfix_number):
         python_utils.PRINT(
             'Please confirm: are Travis checks passing on %s? (y/n) ' % (
                 branch_to_check))
+        # The release coordinator should verify that tests are passing on
+        # the parent branch before checking out the new branch.
+        common.open_new_tab_in_browser_if_possible(
+            'https://travis-ci.com/oppia/oppia/branches')
         answer = python_utils.INPUT().lower()
         if answer in release_constants.AFFIRMATIVE_CONFIRMATIONS:
             break

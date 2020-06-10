@@ -39,3 +39,13 @@ angular.module('oppia').constant(
 angular.module('oppia').constant(
   'SKILL_DESCRIPTION_STATUS_VALUES',
   TopicsAndSkillsDashboardPageConstants.SKILL_DESCRIPTION_STATUS_VALUES);
+
+angular.module('oppia').constant(
+  'TOPIC_SORT_OPTIONS',
+  TopicsAndSkillsDashboardPageConstants.TOPIC_SORT_OPTIONS);
+angular.module('oppia').constant(
+  'TOPIC_PUBLISHED_OPTIONS',
+  TopicsAndSkillsDashboardPageConstants.TOPIC_PUBLISHED_OPTIONS);
+angular.module('oppia').constant(
+  'TOPIC_FILTER_CLASSROOM_ALL',
+  TopicsAndSkillsDashboardPageConstants.TOPIC_FILTER_CLASSROOM_ALL);

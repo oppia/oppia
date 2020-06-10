@@ -889,7 +889,8 @@ class Topic(python_utils.OBJECT):
                 % self.uncategorized_skill_ids)
 
     @classmethod
-    def create_default_topic(cls, topic_id, name, abbreviated_name):
+    def create_default_topic(
+            cls, topic_id, name, abbreviated_name, description):
         """Returns a topic domain object with default values. This is for
         the frontend where a default blank topic would be shown to the user
         when the topic is created for the first time.
@@ -898,13 +899,14 @@ class Topic(python_utils.OBJECT):
             topic_id: str. The unique id of the topic.
             name: str. The initial name for the topic.
             abbreviated_name: str. The abbreviated name for the topic.
+            description: str. The description for the topic.
 
         Returns:
             Topic. The Topic domain object with the default values.
         """
         return cls(
             topic_id, name, abbreviated_name, None, None,
-            feconf.DEFAULT_TOPIC_DESCRIPTION, [], [], [], [],
+            description, [], [], [], [],
             feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION, 1,
             constants.DEFAULT_LANGUAGE_CODE, 0,
             feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION)
@@ -931,6 +933,7 @@ class Topic(python_utils.OBJECT):
         versioned_subtopics dict from current_version to
         current_version + 1. Note that the versioned_subtopics being
         passed in is modified in-place.
+
         Args:
             versioned_subtopics: dict. A dict with two keys:
                 - schema_version: str. The schema version for the
@@ -1117,6 +1120,7 @@ class Topic(python_utils.OBJECT):
         Raises:
             Exception. The new_subtopic_id and the expected next subtopic id
                 differs.
+
         Returns:
             int. The id of the newly created subtopic.
         """
