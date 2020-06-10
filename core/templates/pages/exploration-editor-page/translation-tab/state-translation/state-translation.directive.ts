@@ -136,7 +136,6 @@ angular.module('oppia').directive('stateTranslation', [
           };
 
           $scope.onContentClick = function($event) {
-            console.log($scope.editingMode)
             CkEditorCopyContentService.broadcastCopy($scope, $event.target);
           };
 
