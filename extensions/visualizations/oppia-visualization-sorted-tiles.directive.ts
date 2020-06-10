@@ -13,10 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for "enumerated sorted tiles" visualization.
+ * @fileoverview Directive for the "sorted tiles" visualization.
  */
-
-require('directives/angular-html-bind.directive.ts');
 
 require('domain/utilities/url-interpolation.service.ts');
 require('services/html-escaper.service.ts');
@@ -36,13 +34,12 @@ angular.module('oppia').directive('oppiaVisualizationSortedTiles', [
       controller: [
         '$attrs', 'HtmlEscaperService',
         function($attrs, HtmlEscaperService) {
-          const ctrl = this;
-          ctrl.$onInit = () => {
-            ctrl.data = (
+          this.$onInit = () => {
+            this.data = (
               HtmlEscaperService.escapedJsonToObj($attrs.escapedData));
-            ctrl.options = (
+            this.options = (
               HtmlEscaperService.escapedJsonToObj($attrs.escapedOptions));
-            ctrl.addressedInfoIsSupported = $attrs.addressedInfoIsSupported;
+            this.addressedInfoIsSupported = $attrs.addressedInfoIsSupported;
           };
         }
       ]

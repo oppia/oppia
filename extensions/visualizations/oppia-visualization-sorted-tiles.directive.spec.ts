@@ -22,11 +22,12 @@
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
+require('App.ts');
 require('visualizations/oppia-visualization-sorted-tiles.directive.ts');
 
 describe('Oppia sorted tiles visualization', function() {
+  var $componentController, HtmlEscaperService, ctrl;
   beforeEach(angular.mock.module('directiveTemplates'));
-  beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
     const ugs = new UpgradedServices();
     for (const [key, value] of Object.entries(ugs.getUpgradedServices())) {
@@ -34,30 +35,23 @@ describe('Oppia sorted tiles visualization', function() {
     }
   }));
   beforeEach(angular.mock.inject(function(
-      $compile, $rootScope, $templateCache, UrlInterpolationService) {
-    const templateHtml = $templateCache.get(
-      UrlInterpolationService.getExtensionResourceUrl(
-        '/visualizations/oppia-visualization-sorted-tiles.directive.html'));
-    $compile(templateHtml)($rootScope);
-    $rootScope.$digest();
-    this.outerScope = $rootScope.$new();
-    const elem = angular.element(
-      '<oppia-visualization-sorted-tiles ' +
-      'escaped-data="[{\'answer\': \'foo\', \'frequency\': 5}]" ' +
-      'escaped-options="{\'header\': \'Pretty Tiles\'}" ' +
-      '>' +
-      '</oppia-visualization-sorted-tiles>');
-    const compiledElem = $compile(elem)(this.outerScope);
-    this.outerScope.$digest();
-    this.ctrlScope = compiledElem[0].getControllerScope();
+      _$componentController_, _HtmlEscaperService_) {
+    $componentController = _$componentController_;
+    HtmlEscaperService = _HtmlEscaperService_;
+    ctrl = $componentController('oppiaVisualizationSortedTiles', {
+      $attrs: {
+        escapedData: '[{"answer": "foo", "frequency": 5}]',
+        escapedOptions: '{"header": "Pretty Tiles"}',
+        addressedInfoIsSupported: true,
+      },
+      HtmlEscaperService: HtmlEscaperService,
+    }, {});
+    ctrl.$onInit();
   }));
 
-  it('should interpret the escaped data', function() {
-    this.outerScope.$digest();
-    expect(this.ctrlScope.data).toEqual([{answer: 'foo', frequency: 5}]);
-  });
-
-  it('should interpret the escaped options', () => {
-    expect(this.ctrlScope.options).toEqual({header: 'Pretty Tiles'});
+  it('should interpret the escaped attributes', () => {
+    expect(ctrl.addressedInfoIsSupported).toBeTrue();
+    expect(ctrl.data).toEqual([{answer: 'foo', frequency: 5}]);
+    expect(ctrl.options).toEqual({header: 'Pretty Tiles'});
   });
 });
