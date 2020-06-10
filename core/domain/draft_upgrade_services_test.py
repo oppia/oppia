@@ -170,6 +170,21 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                             'x': [html_content]
                         }
                     }, {
+                        'rule_type': 'ContainsAtLeastOneOf',
+                        'inputs': {
+                            'x': [html_content]
+                        }
+                    }, {
+                        'rule_type': 'IsProperSubsetOf',
+                        'inputs': {
+                            'x': [html_content]
+                        }
+                    }, {
+                        'rule_type': 'DoesNotContainAtLeastOneOf',
+                        'inputs': {
+                            'x': [html_content]
+                        }
+                    }, {
                         'rule_type': 'Equals',
                         'inputs': {
                             'x': 1
@@ -330,6 +345,21 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 'new_value': [{
                     'rule_specs': [{
                         'rule_type': 'Equals',
+                        'inputs': {
+                            'x': [expected_html_content]
+                        }
+                    }, {
+                        'rule_type': 'ContainsAtLeastOneOf',
+                        'inputs': {
+                            'x': [expected_html_content]
+                        }
+                    }, {
+                        'rule_type': 'IsProperSubsetOf',
+                        'inputs': {
+                            'x': [expected_html_content]
+                        }
+                    }, {
+                        'rule_type': 'DoesNotContainAtLeastOneOf',
                         'inputs': {
                             'x': [expected_html_content]
                         }

@@ -530,6 +530,7 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
         }
         mappings = [
             ('<script></script>', ''),
+            (b'<script></script>', ''),
             ('<a class="webLink" href="https'
              '://www.oppia.com/"><img src="images/oppia.png"></a>',
              '<a href="https://www.oppia.com/"></a>')]
