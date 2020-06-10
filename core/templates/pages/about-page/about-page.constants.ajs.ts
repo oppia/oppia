@@ -1,4 +1,4 @@
-// Copyright 2018 The Oppia Authors. All Rights Reserved.
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,20 +13,12 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for the
- * mark_all_audio_and_translations_as_needing_update modal.
+ * @fileoverview Constants for the Oppia about page.
  */
 
-angular.module('oppia').controller(
-  'MarkAllAudioAndTranslationsAsNeedingUpdateController', [
-    '$scope', '$uibModalInstance',
-    function($scope, $uibModalInstance) {
-      $scope.flagAll = function() {
-        $uibModalInstance.close();
-      };
+// TODO(#7092): Delete this file once migration is complete and these AngularJS
+// equivalents of the Angular constants are no longer needed.
+import { AboutPageConstants } from 'pages/about-page/about-page.constants';
 
-      $scope.cancel = function() {
-        $uibModalInstance.dismiss('cancel');
-      };
-    }
-  ]);
+angular.module('oppia').constant(
+  'CREDITS_CONSTANTS', AboutPageConstants.CREDITS_CONSTANTS);

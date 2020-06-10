@@ -220,6 +220,7 @@ def apply_change_list(topic_id, change_list):
     Raises:
         Exception. The incoming changelist had simultaneuous creation and
             deletion of subtopics.
+
     Returns:
         Topic, dict, list(int), list(int), list(SubtopicPageChange).
             The modified topic object, the modified subtopic pages dict keyed
