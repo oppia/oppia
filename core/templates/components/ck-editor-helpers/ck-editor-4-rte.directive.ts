@@ -291,7 +291,7 @@ angular.module('oppia').directive('ckEditor4Rte', [
             } else {
               const widgetName = tagName.replace('-noninteractive-', '');
               const valueMatcher = /(\w+)(-with-value=")([^"]+)(")/g;
-              let startupData: any = {};
+              let startupData: {[id: string]: any} = {};
               let match;
 
               while ((match = valueMatcher.exec(html)) !== null) {
