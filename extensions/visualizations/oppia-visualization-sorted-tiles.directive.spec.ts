@@ -23,7 +23,7 @@ import { UpgradedServices } from 'services/UpgradedServices';
 
 require('visualizations/oppia-visualization-sorted-tiles.directive.ts');
 
-describe('Oppia sorted tiles visualization', function() {
+describe('Oppia sorted tiles visualization', () => {
   beforeEach(angular.mock.module('directiveTemplates'));
   beforeEach(angular.mock.module('oppia', $provide => {
     const ugs = new UpgradedServices();
