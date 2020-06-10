@@ -435,6 +435,8 @@ class AdminHandler(base.BaseHandler):
             }]
 
             def generate_dummy_story_nodes(node_id, exp_id, title, description):
+                """Generates and connects sequential story nodes."""
+
                 story.add_node(
                     '%s%d' % (story_domain.NODE_ID_PREFIX, node_id),
                     title)
