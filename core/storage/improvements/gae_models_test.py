@@ -46,7 +46,7 @@ class TaskEntryModelTests(test_utils.GenericTestBase):
             'closed_by')
 
     def test_has_reference_to_user_id(self):
-        improvements_models.TaskEntryModel.get_or_create_task(
+        improvements_models.TaskEntryModel.create(
             entity_type=feconf.ENTITY_TYPE_EXPLORATION,
             entity_id='expid',
             entity_version=1,
@@ -67,7 +67,7 @@ class TaskEntryModelTests(test_utils.GenericTestBase):
             base_models.DELETION_POLICY.DELETE)
 
     def test_apply_deletion_policy(self):
-        improvements_models.TaskEntryModel.get_or_create_task(
+        improvements_models.TaskEntryModel.create(
             entity_type=feconf.ENTITY_TYPE_EXPLORATION,
             entity_id='expid',
             entity_version=1,
@@ -101,7 +101,7 @@ class TaskEntryModelTests(test_utils.GenericTestBase):
             entity_id='expid',
             entity_version=1,
             task_type=feconf.TASK_TYPE_HIGH_BOUNCE_RATE)
-        improvements_models.TaskEntryModel.get_or_create_task(
+        improvements_models.TaskEntryModel.create(
             entity_type=feconf.ENTITY_TYPE_EXPLORATION,
             entity_id='expid',
             entity_version=1,
@@ -140,7 +140,7 @@ class TaskEntryModelTests(test_utils.GenericTestBase):
         task_type = 'TEST_ONLY_TASK_TYPE'
         target_type, target_id = 'TEST_ONLY_TARGET_TYPE', 'target_id_\U0001F4C8'
 
-        improvements_models.TaskEntryModel.get_or_create_task(
+        improvements_models.TaskEntryModel.create(
             entity_type=entity_type,
             entity_id=entity_id,
             entity_version=entity_version,
@@ -149,7 +149,7 @@ class TaskEntryModelTests(test_utils.GenericTestBase):
             target_id=target_id)
 
     def test_can_create_new_high_bounce_rate_task(self):
-        improvements_models.TaskEntryModel.get_or_create_task(
+        improvements_models.TaskEntryModel.create(
             entity_type=feconf.ENTITY_TYPE_EXPLORATION,
             entity_id='expid',
             entity_version=1,
@@ -159,7 +159,7 @@ class TaskEntryModelTests(test_utils.GenericTestBase):
             status='open')
 
     def test_can_create_new_successive_incorrect_answers_task(self):
-        improvements_models.TaskEntryModel.get_or_create_task(
+        improvements_models.TaskEntryModel.create(
             entity_type=feconf.ENTITY_TYPE_EXPLORATION,
             entity_id='expid',
             entity_version=1,
@@ -169,7 +169,7 @@ class TaskEntryModelTests(test_utils.GenericTestBase):
             status='open')
 
     def test_can_create_new_needs_guiding_responses_task(self):
-        improvements_models.TaskEntryModel.get_or_create_task(
+        improvements_models.TaskEntryModel.create(
             entity_type=feconf.ENTITY_TYPE_EXPLORATION,
             entity_id='expid',
             entity_version=1,
@@ -179,7 +179,7 @@ class TaskEntryModelTests(test_utils.GenericTestBase):
             status='open')
 
     def test_can_create_new_ineffective_feedback_loop_task(self):
-        improvements_models.TaskEntryModel.get_or_create_task(
+        improvements_models.TaskEntryModel.create(
             entity_type=feconf.ENTITY_TYPE_EXPLORATION,
             entity_id='expid',
             entity_version=1,
@@ -187,3 +187,23 @@ class TaskEntryModelTests(test_utils.GenericTestBase):
             target_type='state',
             target_id='Introduction',
             status='open')
+
+    def test_can_not_create_duplicate_tasks(self):
+        improvements_models.TaskEntryModel.create(
+            entity_type=feconf.ENTITY_TYPE_EXPLORATION,
+            entity_id='expid',
+            entity_version=1,
+            task_type=feconf.TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP,
+            target_type='state',
+            target_id='Introduction',
+            status='open')
+
+        with self.assertRaisesRegex(Exception, 'Task id .* already exists'):
+            improvements_models.TaskEntryModel.create(
+                entity_type=feconf.ENTITY_TYPE_EXPLORATION,
+                entity_id='expid',
+                entity_version=1,
+                task_type=feconf.TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP,
+                target_type='state',
+                target_id='Introduction',
+                status='open')

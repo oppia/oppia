@@ -133,10 +133,10 @@ ENTITY_TYPE_SUBTOPIC = 'subtopic'
 ENTITY_TYPE_QUESTION = 'question'
 ENTITY_TYPE_VOICEOVER_APPLICATION = 'voiceover_application'
 
-TASK_TYPE_HIGH_BOUNCE_RATE = 'high-bounce-rate'
-TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP = 'ineffective-feedback-loop'
-TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS = 'successive-incorrect-answers'
-TASK_TYPE_NEEDS_GUIDING_RESPONSES = 'needs-guiding-responses'
+TASK_TYPE_HIGH_BOUNCE_RATE = 'high_bounce_rate'
+TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP = 'ineffective_feedback_loop'
+TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS = 'successive_incorrect_answers'
+TASK_TYPE_NEEDS_GUIDING_RESPONSES = 'needs_guiding_responses'
 
 # The maximum number of activities allowed in the playlist of the learner. This
 # limit applies to both the explorations playlist and the collections playlist.
