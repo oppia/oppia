@@ -20,10 +20,9 @@ import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-
+import { CsrfTokenService } from 'services/csrf-token.service';
 import { SkillBackendApiService } from
-  'domain/skill/skill-backend-api.service.ts';
-import { CsrfTokenService } from 'services/csrf-token.service.ts';
+  'domain/skill/skill-backend-api.service';
 
 
 describe('Skill backend API service', () => {
@@ -188,9 +187,7 @@ describe('Skill backend API service', () => {
       var reqPut = httpTestingController.expectOne(
         '/skill_editor_handler/data/1');
       expect(reqPut.request.method).toEqual('PUT');
-      reqPut.flush({
-        skill: skillDict
-      });
+      reqPut.flush({ skill: skillDict });
 
       flushMicrotasks();
 

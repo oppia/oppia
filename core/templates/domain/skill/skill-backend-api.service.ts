@@ -20,8 +20,9 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { SkillDomainConstants } from 'domain/skill/skill-domain.constants';
+
 import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service.ts';
+  'domain/utilities/url-interpolation.service';
 import cloneDeep from 'lodash/cloneDeep';
 
 
