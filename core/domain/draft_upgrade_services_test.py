@@ -402,19 +402,22 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             draft_change_list[0].to_dict())
 
     def test_convert_states_v27_dict_to_v28_dict(self):
-        draft_change_list = [
+        draft_change_list_v27 = [
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'property_name': 'content_ids_to_audio_translations',
                 'state_name': 'State B',
                 'new_value': 'new value',
             })]
-        self.assertEqual(
-            draft_upgrade_services.DraftUpgradeUtil._convert_states_v27_dict_to_v28_dict(  # pylint: disable=protected-access,line-too-long
-                draft_change_list)[0].to_dict(),
+        # Version 28 adds voiceovers_mapping
+        draft_change_list_v28 = [
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'property_name': 'recorded_voiceovers',
                 'state_name': 'State B',
                 'new_value': {'voiceovers_mapping': 'new value'}
-            }).to_dict())
+            })]
+        expected_draft_change_list = self.helper_to_test_schema_verison_updates(
+            '27', '28', draft_change_list_v27)
+        self.assertEqual(expected_draft_change_list[0].to_dict(),
+            draft_change_list_v28[0].to_dict())
