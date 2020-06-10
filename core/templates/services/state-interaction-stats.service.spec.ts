@@ -26,7 +26,7 @@ import { NormalizeWhitespacePipe } from
 import { NormalizeWhitespacePunctuationAndCasePipe } from
   // eslint-disable-next-line max-len
   'filters/string-utility-filters/normalize-whitespace-punctuation-and-case.pipe';
-import { IStateRulesStats, StateInteractionStatsService } from
+import { IStateInteractionStats, StateInteractionStatsService } from
   'services/state-interaction-stats.service';
 
 describe('State Interaction Stats Service', () => {
@@ -88,7 +88,7 @@ describe('State Interaction Stats Service', () => {
 
     it('should provide cached results after first call', fakeAsync(() => {
       this.statsCaptured = [];
-      const captureStats = (stats: IStateRulesStats) => {
+      const captureStats = (stats: IStateInteractionStats) => {
         expect(stats).toBeDefined();
         this.statsCaptured.push(stats);
       };
@@ -122,7 +122,7 @@ describe('State Interaction Stats Service', () => {
 
     it('should have separate caches for different state', fakeAsync(() => {
       this.statsCaptured = [];
-      const captureStats = (stats: IStateRulesStats) => {
+      const captureStats = (stats: IStateInteractionStats) => {
         expect(stats).toBeDefined();
         this.statsCaptured.push(stats);
       };
