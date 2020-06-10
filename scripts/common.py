@@ -81,7 +81,7 @@ HOTFIX_BRANCH_REGEX = r'release-(\d+\.\d+\.\d+)-hotfix-[1-9]+$'
 TEST_BRANCH_REGEX = r'test-[A-Za-z0-9-]*$'
 
 FECONF_PATH = os.path.join('.', 'feconf.py')
-CONSTANTS_PATH = os.path.join('assets', 'constants.ts')
+CONSTANTS_FILE_PATH = os.path.join('assets', 'constants.ts')
 
 
 def is_windows_os():

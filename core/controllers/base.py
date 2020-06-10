@@ -120,7 +120,8 @@ class UserFacingExceptions(python_utils.OBJECT):
         """Error class for an internal server side error (error code 500)."""
 
     class TemporaryMaintenanceException(Exception):
-        """Error class for a temporary maintenance (error code 503)."""
+        """Error class for when the server is currently down for temporary
+        maintenance (error code 503)."""
 
 
 class BaseHandler(webapp2.RequestHandler):

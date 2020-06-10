@@ -776,7 +776,7 @@ class BuildTests(test_utils.GenericTestBase):
         mock_constants_path = 'mock_app_dev.yaml'
         mock_feconf_path = 'mock_app.yaml'
         constants_path_swap = self.swap(
-            common, 'CONSTANTS_PATH', mock_constants_path)
+            common, 'CONSTANTS_FILE_PATH', mock_constants_path)
         feconf_path_swap = self.swap(common, 'FECONF_PATH', mock_feconf_path)
 
         constants_temp_file = tempfile.NamedTemporaryFile()

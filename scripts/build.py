@@ -147,11 +147,21 @@ _PARSER.add_argument(
     '--minify_third_party_libs_only', action='store_true', default=False,
     dest='minify_third_party_libs_only')
 _PARSER.add_argument(
-    '--deparallelize_terser', action='store_true', default=False,
-    dest='deparallelize_terser')
+    '--deparallelize_terser',
+    action='store_true',
+    default=False,
+    dest='deparallelize_terser',
+    help='Disable parallelism on terser plugin in webpack. Use with prod_env.')
 _PARSER.add_argument(
-    '--maintenance_mode', action='store_true', default=False,
-    dest='maintenance_mode')
+    '--maintenance_mode',
+    action='store_true',
+    default=False,
+    dest='maintenance_mode',
+    help=(
+        'Enable maintenance mode, '
+        'meaning that only super admins can access the site.'
+    )
+)
 
 
 def generate_app_yaml(deploy_mode=False, maintenance_mode=False):
@@ -161,7 +171,7 @@ def generate_app_yaml(deploy_mode=False, maintenance_mode=False):
         deploy_mode: bool. Whether the script is being called from deploy
             script.
         maintenance_mode: bool. Whether the site should be put into
-            the maintenance mode.
+            maintenance mode.
     """
     prod_file_prefix = 'build/'
     maintenance_page_path = 'webpack_bundles/maintenance-page.mainpage.html'
@@ -200,10 +210,10 @@ def modify_constants(prod_env, maintenance_mode):
     dev_mode_variable = (
         '"DEV_MODE": false' if prod_env else '"DEV_MODE": true')
     common.inplace_replace_file(
-        common.CONSTANTS_PATH, r'"DEV_MODE": .*', dev_mode_variable)
+        common.CONSTANTS_FILE_PATH, r'"DEV_MODE": .*', dev_mode_variable)
 
     enable_maintenance_mode_variable = (
-        'ENABLE_MAINTENANCE_MODE = ' + python_utils.UNICODE(maintenance_mode))
+        'ENABLE_MAINTENANCE_MODE = %s' % python_utils.UNICODE(maintenance_mode))
     common.inplace_replace_file(
         common.FECONF_PATH,
         r'ENABLE_MAINTENANCE_MODE = .*',

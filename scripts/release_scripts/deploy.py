@@ -33,6 +33,9 @@ IMPORTANT NOTES:
 
     where [app_name] is the name of your app. Note that the root folder MUST be
     named 'oppia'.
+
+3.  If you want to start the production server in the maintenance mode (the site
+    will only work for super admins) add a --maintenance_mode flag.
 """
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
@@ -148,12 +151,12 @@ def preprocess_release(app_name, deploy_data_path):
             shutil.copyfile(src, dst)
 
     with python_utils.open_file(
-        os.path.join(common.CONSTANTS_PATH), 'r') as assets_file:
+        os.path.join(common.CONSTANTS_FILE_PATH), 'r') as assets_file:
         content = assets_file.read()
         assert '"GCS_RESOURCE_BUCKET_NAME": "None-resources",' in content
     bucket_name = app_name + BUCKET_NAME_SUFFIX
     common.inplace_replace_file(
-        common.CONSTANTS_PATH,
+        common.CONSTANTS_FILE_PATH,
         r'"GCS_RESOURCE_BUCKET_NAME": "None-resources",',
         '"GCS_RESOURCE_BUCKET_NAME": "%s",' % bucket_name)
 
@@ -213,7 +216,7 @@ def build_scripts(maintenance_mode=False):
     """Builds and minifies all the scripts.
 
     Args:
-        maintenance_mode: bool. Whether enable the maintenance mode.
+        maintenance_mode: bool. Whether to enable the maintenance mode.
 
     Raises:
         Exception: The build process fails.

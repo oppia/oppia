@@ -212,19 +212,20 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         self.delete_json('/library/data', expected_status_int=404)
 
     def test_show_maintenance_mode_when_enabled(self):
-        swap_maintenace_mode = self.swap(
+        swap_maintenance_mode = self.swap(
             feconf, 'ENABLE_MAINTENANCE_MODE', True)
-        with swap_maintenace_mode:
+        with swap_maintenance_mode:
             response = (
                 self.get_html_response('/library', expected_status_int=503))
             self.assertIn('htmlWebpackPlugin.options.statusCode', response.body)
+            self.assertNotIn('<library-page>', response.body)
 
     def test_dont_show_maintenance_mode_when_enabled_and_super_admin(self):
-        swap_maintenace_mode = self.swap(
+        swap_maintenance_mode = self.swap(
             feconf, 'ENABLE_MAINTENANCE_MODE', True)
         login_super_admin = self.login_context(
             self.SUPER_ADMIN_EMAIL, is_super_admin=True)
-        with swap_maintenace_mode, login_super_admin:
+        with swap_maintenance_mode, login_super_admin:
             response = self.get_html_response('/library')
             self.assertIn('<library-page>', response.body)
 
