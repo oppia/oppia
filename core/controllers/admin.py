@@ -417,40 +417,36 @@ class AdminHandler(base.BaseHandler):
             story = story_domain.Story.create_default_story(
                 story_id, 'Help Jaime win the Arcade', topic_id_1)
 
-            story_nodes = [
-                (
-                    '15',
-                    'What are the place values?',
-                    'Jaime learns the place value of each digit in a big ' +
-                    'number.'
-                ),
-                (
-                    '25',
-                    'Finding the value of a number',
-                    'Jaime understands the value of his arcade score.'
-                ),
-                (
-                    '13',
-                    'Comparing Numbers',
-                    'Jaime learns if a number is smaller or greater than ' +
-                    'another number.'
-                )
-            ]
+            story_node_dicts = [{
+                'exp_id': '15',
+                'title': 'What are the place values?',
+                'description': 'Jaime learns the place value of each digit ' +
+                    'in a big number.'
+            }, {
+                'exp_id': '25',
+                'title': 'Finding the value of a number',
+                'description': 'Jaime understands the value of his ' +
+                    'arcade score.'
+            }, {
+                'exp_id': '13',
+                'title': 'Comparing Numbers',
+                'description': 'Jaime learns if a number is smaller or ' +
+                    'greater than another number.'
+            }]
 
-            for i, story_node in enumerate(story_nodes):
-                (exp_id, node_title, node_description) = story_node
+            def generate_dummy_story_nodes(node_id, exp_id, title, description):
                 node_id = i + 1
 
                 story.add_node(
                     '%s%d' % (story_domain.NODE_ID_PREFIX, node_id),
-                    node_title)
+                    title)
                 story.update_node_description(
                     '%s%d' % (story_domain.NODE_ID_PREFIX, node_id),
-                    node_description)
+                    description)
                 story.update_node_exploration_id(
                     '%s%d' % (story_domain.NODE_ID_PREFIX, node_id), exp_id)
 
-                if i != len(story_nodes) - 1:
+                if i != len(story_node_dicts) - 1:
                     story.update_node_destination_node_ids(
                         '%s%d' % (story_domain.NODE_ID_PREFIX, node_id),
                         ['%s%d' % (story_domain.NODE_ID_PREFIX, node_id + 1)])
@@ -461,6 +457,9 @@ class AdminHandler(base.BaseHandler):
                         'property_name': 'category',
                         'new_value': 'Astronomy'
                     })], 'Change category')
+
+            for i, story_node_dict in enumerate(story_node_dicts):
+                generate_dummy_story_nodes(i, **story_node_dict)
 
             skill_services.save_new_skill(self.user_id, skill_1)
             skill_services.save_new_skill(self.user_id, skill_2)
