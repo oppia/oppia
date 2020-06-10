@@ -176,7 +176,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             'unimplemented.' % (state_schema_version, conversion_fn_name))
 
     def test_convert_states_v32_dict_to_v33_dict(self):
-        draft_change_list = [
+        draft_change_list_v32 = [
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'state_name': 'state1',
@@ -213,14 +213,9 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                     }
                 }
             })]
-        expected_draft_change_list = (
-            draft_upgrade_services.DraftUpgradeUtil._convert_states_v32_dict_to_v33_dict(  # pylint: disable=protected-access,line-too-long
-                draft_change_list))
-        self.assertEqual(
-            expected_draft_change_list[1].to_dict(),
-            draft_change_list[1].to_dict())
-        self.assertEqual(
-            expected_draft_change_list[0].to_dict(),
+        # Version 33 adds a showChoicesInShuffledOrder bool, doesn't impact
+        # the second ExplorationChange
+        draft_change_list_v33 = [
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'state_name': 'state1',
@@ -238,7 +233,34 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                         'value': False
                     }
                 }
-            }).to_dict())
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'state2',
+                'property_name': 'widget_customization_args',
+                'new_value': {
+                    'choices': {
+                        'value': [
+                            '<p>1</p>',
+                            '<p>2</p>',
+                            '<p>3</p>',
+                            '<p>4</p>'
+                        ]
+                    },
+                    'maxAllowableSelectionCount': {
+                        'value': 1
+                    },
+                    'minAllowableSelectionCount': {
+                        'value': 1
+                    }
+                }
+            })]
+        expected_draft_change_list = self.helper_to_test_schema_verison_updates(
+            '32', '33', draft_change_list_v32)
+        self.assertEqual(expected_draft_change_list[0].to_dict(),
+            draft_change_list_v33[0].to_dict())
+        self.assertEqual(expected_draft_change_list[1].to_dict(),
+            draft_change_list_v33[1].to_dict())
 
     def test_convert_states_v31_dict_to_v32_dict(self):
         draft_change_list = [
