@@ -44,7 +44,7 @@ describe('Oppia sorted tiles visualization', function() {
     const elem = angular.element(
       '<oppia-visualization-sorted-tiles ' +
       'escaped-data="[{\'answer\': \'foo\', \'frequency\': 5}]" ' +
-      'escaped-options="{\'header\': \'Pretty Tile\'}" ' +
+      'escaped-options="{\'header\': \'Pretty Tiles\'}" ' +
       '>' +
       '</oppia-visualization-sorted-tiles>');
     const compiledElem = $compile(elem)(this.outerScope);
