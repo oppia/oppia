@@ -58,6 +58,6 @@ describe('Oppia sorted tiles visualization', function() {
   });
 
   it('should interpret the escaped options', () => {
-    expect(this.ctrlScope.options).toEqual({'header': 'Pretty Tiles'});
+    expect(this.ctrlScope.options).toEqual({header: 'Pretty Tiles'});
   });
 });
