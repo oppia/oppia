@@ -71,6 +71,8 @@ import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
 import { ChangeObjectFactory } from
   'domain/editor/undo_redo/ChangeObjectFactory';
+import { CkEditorCopyContentService } from
+  'components/ck-editor-helpers/ck-editor-copy-content-service';
 import { ClassifierObjectFactory } from
   'domain/classifier/ClassifierObjectFactory';
 import { ClassroomBackendApiService } from
@@ -536,6 +538,8 @@ export class UpgradedServices {
       new BrowserCheckerService(new WindowRef());
     upgradedServices['CamelCaseToHyphensPipe'] = new CamelCaseToHyphensPipe();
     upgradedServices['ChangeObjectFactory'] = new ChangeObjectFactory();
+    upgradedServices['CkEditorCopyContentService'] =
+      new CkEditorCopyContentService();
     upgradedServices['ClassifierObjectFactory'] = new ClassifierObjectFactory();
     upgradedServices['CodeNormalizerService'] = new CodeNormalizerService();
     upgradedServices['CollectionNodeObjectFactory'] =

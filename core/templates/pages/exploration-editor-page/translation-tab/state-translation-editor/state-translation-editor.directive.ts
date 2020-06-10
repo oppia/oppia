@@ -24,7 +24,6 @@ angular.module('oppia').directive('stateTranslationEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
-      scope: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration-editor-page/translation-tab/' +
         'state-translation-editor/state-translation-editor.directive.html'),

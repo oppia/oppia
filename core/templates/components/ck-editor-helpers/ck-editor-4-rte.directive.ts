@@ -33,7 +33,11 @@ interface CkeditorCustomScope extends ng.IScope {
 
 angular.module('oppia').directive('ckEditor4Rte', [
   'ContextService', 'RteHelperService', 'ENABLE_LITERALLY_CANVAS_EDITOR',
-  function(ContextService, RteHelperService, ENABLE_LITERALLY_CANVAS_EDITOR) {
+  'CkEditorCopyContentService',
+  function(
+      ContextService, RteHelperService, ENABLE_LITERALLY_CANVAS_EDITOR,
+      CkEditorCopyContentService
+  ) {
     return {
       restrict: 'E',
       scope: {
@@ -277,48 +281,7 @@ angular.module('oppia').directive('ckEditor4Rte', [
           ck.destroy();
         });
 
-        scope.$on(
-          'copy-element-to-translation-editor',
-          (_, element: HTMLElement, containedWidgetTagName?: string) => {
-            let tagName = (
-              containedWidgetTagName || element.tagName.toLowerCase());
-            let html = element.outerHTML;
-
-            if (
-              !containedWidgetTagName && !tagName.includes('-noninteractive-')
-            ) {
-              ck.insertHtml(html);
-            } else {
-              const widgetName = tagName.replace('-noninteractive-', '');
-              const valueMatcher = /(\w+)(-with-value=")([^"]+)(")/g;
-              let match;
-              let startupData: {[id: string]: string} = {};
-
-              while ((match = valueMatcher.exec(html)) !== null) {
-                const key = match[1];
-                const value = match[3];
-                startupData[key] = value
-                  .replace(/&amp;quot;/g, '"')
-                  .replace('\\\\', '\\');
-
-                if (widgetName !== 'oppiatabs') {
-                  startupData[key] = startupData[key]
-                    .substring(1, startupData[key].length - 1);
-                }
-              }
-
-              if (widgetName === 'oppiatabs' && startupData.tab_contents) {
-                ck.execCommand(
-                  widgetName,
-                  {startupData: {
-                    tab_contents: JSON.parse(startupData.tab_contents)
-                  }}
-                );
-              } else {
-                ck.execCommand(widgetName, { startupData });
-              }
-            }
-          });
+        CkEditorCopyContentService.bindPasteHandler(scope, ck);
       }
     };
   }

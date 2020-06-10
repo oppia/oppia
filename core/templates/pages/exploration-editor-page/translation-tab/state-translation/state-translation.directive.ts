@@ -73,7 +73,7 @@ angular.module('oppia').directive('stateTranslation', [
         'TranslationTabActiveModeService', 'COMPONENT_NAME_CONTENT',
         'COMPONENT_NAME_FEEDBACK', 'COMPONENT_NAME_HINT',
         'COMPONENT_NAME_SOLUTION', 'INTERACTION_SPECS',
-        'RULE_SUMMARY_WRAP_CHARACTER_COUNT',
+        'RULE_SUMMARY_WRAP_CHARACTER_COUNT', 'CkEditorCopyContentService',
         function(
             $filter, $rootScope, $scope,
             ExplorationCorrectnessFeedbackService,
@@ -84,8 +84,10 @@ angular.module('oppia').directive('stateTranslation', [
             TranslationTabActiveModeService, COMPONENT_NAME_CONTENT,
             COMPONENT_NAME_FEEDBACK, COMPONENT_NAME_HINT,
             COMPONENT_NAME_SOLUTION, INTERACTION_SPECS,
-            RULE_SUMMARY_WRAP_CHARACTER_COUNT) {
+            RULE_SUMMARY_WRAP_CHARACTER_COUNT, CkEditorCopyContentService
+        ) {
           var ctrl = this;
+
           $scope.isVoiceoverModeActive = (
             TranslationTabActiveModeService.isVoiceoverModeActive);
           var isTranslatedTextRequired = function() {
@@ -134,43 +136,8 @@ angular.module('oppia').directive('stateTranslation', [
           };
 
           $scope.onContentClick = function($event) {
-            const target: HTMLElement = $event.target;
-            let containedWidgetTagName;
-            let currentElement = target;
-
-            // traverse up parent until we arrive at outermost container
-            // and track if we encounter widget on the way
-            while (
-              currentElement.parentElement.tagName !== 'ANGULAR-HTML-BIND'
-            ) {
-              const currentTagName = currentElement.tagName.toLowerCase();
-              if (currentTagName.includes('-noninteractive-')) {
-                containedWidgetTagName = currentTagName;
-              }
-              currentElement = currentElement.parentElement;
-            }
-
-            // also traverse down children to check for widget tags
-            let descendents = Array.from(target.childNodes);
-            while (descendents.length !== 0) {
-              let currentDescendent = descendents.shift();
-              const currentTagName = currentDescendent.nodeName.toLowerCase();
-              if (currentTagName.includes('-noninteractive-')) {
-                containedWidgetTagName = currentTagName;
-                break;
-              }
-
-              descendents = [
-                ...descendents,
-                ...Array.from(currentDescendent.childNodes)
-              ];
-            }
-
-            $scope.$broadcast(
-              'copy-element-to-translation-editor',
-              currentElement,
-              containedWidgetTagName
-            );
+            console.log($scope.editingMode)
+            CkEditorCopyContentService.broadcastCopy($scope, $event.target);
           };
 
           $scope.onTabClick = function(tabId) {
