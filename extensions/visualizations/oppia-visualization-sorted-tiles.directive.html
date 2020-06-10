@@ -1,8 +1,8 @@
+<div ng-if="$ctrl.options.header">
+  <strong>{{ $ctrl.options.header }}</strong>
+  <hr>
+</div>
 <ol class="oppia-visualization-sorted-tiles">
-  <div ng-if="$ctrl.options.header">
-    <strong>{{ $ctrl.options.header }}</strong>
-    <hr>
-  </div>
   <li class="oppia-visualization-sorted-tiles-tile" ng-repeat="datum in $ctrl.data">
     <div class="oppia-visualization-sorted-tiles-tile-answer">
       {{datum.answer}}

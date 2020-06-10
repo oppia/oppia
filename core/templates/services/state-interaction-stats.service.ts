@@ -140,8 +140,7 @@ export class StateInteractionStatsService {
               is_addressed: vizInfo.addressed_info_is_supported ?
                 this.answerClassificationService
                   .isClassifiedExplicitlyOrGoesToNewState(
-                    state.name, state, datum.answer,
-                    interactionRulesService) :
+                    state.name, state, datum.answer, interactionRulesService) :
                 undefined,
             }),
           })),

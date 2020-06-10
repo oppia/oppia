@@ -120,7 +120,7 @@ describe('State Interaction Stats Service', () => {
       expect(statsFromSecondFetch).toBe(statsFromFirstFetch);
     }));
 
-    it('should have separate caches for different state', fakeAsync(() => {
+    it('should have separate caches for different states', fakeAsync(() => {
       this.statsCaptured = [];
       const captureStats = (stats: IStateInteractionStats) => {
         expect(stats).toBeDefined();
