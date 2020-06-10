@@ -140,18 +140,18 @@ class StoryProgressHandler(base.BaseHandler):
             ))
 
         acquired_skill_ids = [skill.id for skill in acquired_skills]
-        questions = (
+        questions_available = len(
             question_services.get_questions_by_skill_ids(
-                1, acquired_skill_ids, False))
+                1, acquired_skill_ids, False)) > 0
 
-        if (
-                (len(questions) > 0) and (
-                    (len(exp_summaries) != 0 and
-                     len(completed_nodes) %
-                     constants.NUM_EXPLORATIONS_PER_REVIEW_TEST == 0) or
-                    (len(completed_nodes) == len(ordered_nodes))
-                )
-            ):
+        learner_completed_story = len(completed_nodes) == len(ordered_nodes)
+        learner_at_review_point_in_story = (
+            len(exp_summaries) != 0 and (
+                len(completed_nodes) &
+                constants.NUM_EXPLORATIONS_PER_REVIEW_TEST == 0)
+        )
+        if questions_available and (
+                learner_at_review_point_in_story or learner_completed_story):
             ready_for_review_test = True
 
         return self.render_json({
