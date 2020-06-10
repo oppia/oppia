@@ -198,7 +198,7 @@ class TaskEntryModelTests(test_utils.GenericTestBase):
             target_id='Introduction',
             status='open')
 
-        with self.assertRaisesRegex(Exception, 'Task id .* already exists'):
+        with self.assertRaisesRegexp(Exception, 'Task id .* already exists'):
             improvements_models.TaskEntryModel.create(
                 entity_type=feconf.ENTITY_TYPE_EXPLORATION,
                 entity_id='expid',
