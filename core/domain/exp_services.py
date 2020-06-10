@@ -404,7 +404,7 @@ def apply_change_list(exploration_id, change_list):
                         change.property_name ==
                         exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION):
                     new_solution = None
-                    if change.new_value:
+                    if change.new_value is not None:
                         new_solution = state_domain.Solution.from_dict(
                             state.interaction.id, change.new_value)
                     state.update_interaction_solution(new_solution)
