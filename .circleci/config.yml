@@ -46,6 +46,9 @@ workflows:
       - e2e_creators:
           requires:
             - e2e_navigation_and_admin
+      - e2e_learner:
+          requires:
+            - e2e_navigation_and_admin
       # - e2e_library_and_collections:
       #     requires:
       #       - e2e_navigation_and_admin
@@ -239,6 +242,11 @@ jobs:
           command: |
             python -m scripts.run_e2e_tests --skip-install --skip-build --suite="creatorDashboard" --prod_env
       - run:
+          name: Run e2e additional editor test
+          command: |
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="additionalEditorFeatures" --prod_env
+          when: always
+      - run:
           name: Run e2e exploration feedback tab test
           command: |
             python -m scripts.run_e2e_tests --skip-install --skip-build --suite="explorationFeedbackTab" --prod_env
@@ -257,6 +265,38 @@ jobs:
           name: Run e2e exploration translation tab test
           command: |
             python -m scripts.run_e2e_tests --skip-install --skip-build --suite="explorationTranslationTab" --prod_env
+          when: always
+
+  e2e_learner:
+    <<: *job_defaults
+    steps:
+      - checkout
+      - attach_workspace:
+          at: /home/circleci/
+      - run:
+          name: Run e2e core editor and player features test
+          command: |
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="coreEditorAndPlayerFeatures" --prod_env
+          when: always
+      - run:
+          name: Run e2e additional player features test
+          command: |
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="additionalPlayerFeatures" --prod_env
+          when: always
+      - run:
+          name: Run e2e learner dashboard test
+          command: |
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="learnerDashboard" --prod_env
+          when: always
+      - run:
+          name: Run e2e learner test
+          command: |
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="learner" --prod_env
+          when: always
+      - run:
+          name: Run e2e extensions test
+          command: |
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="extensions" --prod_env
           when: always
 
   e2e_users:
