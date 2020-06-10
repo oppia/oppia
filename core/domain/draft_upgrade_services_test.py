@@ -162,9 +162,6 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             )
         return expected_draft_change_list
 
-
-
-
     def test_convert_to_latest_schema_version_implemented(self):
         state_schema_version = feconf.CURRENT_STATE_SCHEMA_VERSION
         conversion_fn_name = '_convert_states_v%s_dict_to_v%s_dict' % (
@@ -270,9 +267,9 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 'property_name': 'content',
                 'new_value': 'new value'
             })]
-        self.assertEqual(
-            draft_upgrade_services.DraftUpgradeUtil._convert_states_v31_dict_to_v32_dict(  # pylint: disable=protected-access,line-too-long
-                draft_change_list)[0].to_dict(),
+        expected_draft_change_list = self.helper_to_test_schema_verison_updates(
+            '31', '32', draft_change_list)
+        self.assertEqual(expected_draft_change_list[0].to_dict(),
             draft_change_list[0].to_dict())
 
     def test_convert_states_v30_dict_to_v31_dict(self):
