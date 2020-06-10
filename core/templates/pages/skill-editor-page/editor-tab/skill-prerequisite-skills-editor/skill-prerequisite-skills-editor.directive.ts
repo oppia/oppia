@@ -16,11 +16,10 @@
  * @fileoverview Directive for the skill prerequisite skills editor.
  */
 
-require(
-  'components/common-layout-directives/common-elements/' +
-  'confirm-or-cancel-modal.controller.ts');
+require('components/skill-selector/select-skill-modal.controller.ts');
 require(
   'components/skill-selector/skill-selector.directive.ts');
+
 require('domain/skill/skill-update.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/skill-editor-page/services/skill-editor-state.service.ts');
@@ -67,22 +66,11 @@ angular.module('oppia').directive('skillPrerequisiteSkillsEditor', [
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/components/skill-selector/select-skill-modal.template.html'),
               backdrop: true,
-              controller: [
-                '$controller', '$scope', '$uibModalInstance',
-                function($controller, $scope, $uibModalInstance) {
-                  $controller('ConfirmOrCancelModalController', {
-                    $scope: $scope,
-                    $uibModalInstance: $uibModalInstance
-                  });
-
-                  $scope.skillSummaries = sortedSkillSummaries;
-                  $scope.selectedSkillId = null;
-                  $scope.save = function() {
-                    $scope.confirm($scope.selectedSkillId);
-                  };
-                  $scope.countOfSkillsToPrioritize = skillsInSameTopicCount;
-                }
-              ]
+              resolve: {
+                skillsInSameTopicCount: () => skillsInSameTopicCount,
+                sortedSkillSummaries: () => sortedSkillSummaries
+              },
+              controller: 'SelectSkillModalController'
             }).result.then(function(skillId) {
               if (skillId === $scope.skill.getId()) {
                 AlertsService.addInfoMessage(

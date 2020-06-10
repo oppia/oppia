@@ -17,16 +17,18 @@
  */
 require(
   'components/forms/custom-forms-directives/thumbnail-uploader.directive.ts');
+require(
+  'pages/topic-editor-page/modal-templates/' +
+  'new-subtopic-title-modal.controller.ts');
+require(
+  'pages/topic-editor-page/modal-templates/' +
+  'subtopic-editor-modal.controller.ts');
 
 require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/topic/SubtopicPageObjectFactory.ts');
 require('domain/topic/topic-update.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
-
-// TODO(#9186): Change variable name to 'constants' once this file
-// is migrated to Angular.
-const subtopicConstants = require('constants.ts');
 
 angular.module('oppia').directive('subtopicsListTab', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -74,91 +76,14 @@ angular.module('oppia').directive('subtopicsListTab', [
                 '/pages/topic-editor-page/modal-templates/' +
                 'subtopic-editor-modal.template.html'),
               backdrop: true,
-              controller: [
-                '$scope', '$uibModalInstance',
-                function($scope, $uibModalInstance) {
-                  $scope.MAX_CHARS_IN_SUBTOPIC_TITLE =
-                    MAX_CHARS_IN_SUBTOPIC_TITLE;
-                  $scope.subtopicId = subtopic.getId();
-                  $scope.subtopicTitles = subtopicTitles;
-                  $scope.editableTitle = editableTitle;
-                  $scope.editableThumbnailFilename = editableThumbnailFilename;
-                  $scope.editableThumbnailBgColor = editableThumbnailBgColor;
-                  $scope.subtopicPage = (
-                    TopicEditorStateService.getSubtopicPage());
-                  $scope.allowedBgColors = (
-                    subtopicConstants.ALLOWED_THUMBNAIL_BG_COLORS.subtopic);
-                  var pageContents = $scope.subtopicPage.getPageContents();
-                  if (pageContents) {
-                    $scope.htmlData = pageContents.getHtml();
-                  }
-                  $scope.errorMsg = null;
-                  $scope.$on(EVENT_SUBTOPIC_PAGE_LOADED, function() {
-                    $scope.subtopicPage =
-                      TopicEditorStateService.getSubtopicPage();
-                    var pageContents = $scope.subtopicPage.getPageContents();
-                    $scope.htmlData = pageContents.getHtml();
-                  });
-                  $scope.SUBTOPIC_PAGE_SCHEMA = {
-                    type: 'html',
-                    ui_config: {
-                      rows: 100
-                    }
-                  };
-
-                  $scope.updateSubtopicThumbnailFilename = function(
-                      newThumbnailFilename) {
-                    var oldThumbnailFilename = subtopic.getThumbnailFilename();
-                    if (newThumbnailFilename === oldThumbnailFilename) {
-                      return;
-                    }
-                    $scope.editableThumbnailFilename = newThumbnailFilename;
-                  };
-
-                  $scope.updateSubtopicThumbnailBgColor = function(
-                      newThumbnailBgColor) {
-                    var oldThumbnailBgColor = subtopic.getThumbnailBgColor();
-                    if (newThumbnailBgColor === oldThumbnailBgColor) {
-                      return;
-                    }
-                    $scope.editableThumbnailBgColor = newThumbnailBgColor;
-                  };
-
-                  $scope.updateSubtopicTitle = function(title) {
-                    if (title === subtopic.getTitle()) {
-                      return;
-                    }
-                    if ($scope.subtopicTitles.indexOf(title) !== -1) {
-                      $scope.errorMsg =
-                        'A subtopic with this title already exists';
-                      return;
-                    }
-                    $scope.editableTitle = title;
-                  };
-
-                  $scope.resetErrorMsg = function() {
-                    $scope.errorMsg = null;
-                  };
-
-                  $scope.updateHtmlData = function(htmlData) {
-                    $scope.subtopicPage.getPageContents().setHtml(htmlData);
-                    $scope.openPreviewSubtopicPage(htmlData);
-                  };
-
-                  $scope.save = function() {
-                    $uibModalInstance.close({
-                      newTitle: $scope.editableTitle,
-                      newHtmlData: $scope.htmlData,
-                      newThumbnailFilename: $scope.editableThumbnailFilename,
-                      newThumbnailBgColor: $scope.editableThumbnailBgColor
-                    });
-                  };
-
-                  $scope.cancel = function() {
-                    $uibModalInstance.dismiss('cancel');
-                  };
-                }
-              ]
+              resolve: {
+                editableThumbnailBgColor: () => editableThumbnailBgColor,
+                editableThumbnailFilename: () => editableThumbnailFilename,
+                editableTitle: () => editableTitle,
+                subtopic: () => subtopic,
+                subtopicTitles: () => subtopicTitles,
+              },
+              controller: 'SubtopicEditorModalController'
             });
 
             modalInstance.result.then(function(newValues) {
@@ -261,34 +186,10 @@ angular.module('oppia').directive('subtopicsListTab', [
                 '/pages/topic-editor-page/modal-templates/' +
                 'new-subtopic-title-modal.template.html'),
               backdrop: true,
-              controller: [
-                '$scope', '$uibModalInstance',
-                function($scope, $uibModalInstance) {
-                  $scope.MAX_CHARS_IN_SUBTOPIC_TITLE =
-                    MAX_CHARS_IN_SUBTOPIC_TITLE;
-                  $scope.subtopicTitle = '';
-                  $scope.subtopicTitles = subtopicTitles;
-                  $scope.errorMsg = null;
-
-                  $scope.resetErrorMsg = function() {
-                    $scope.errorMsg = null;
-                  };
-                  $scope.isSubtopicTitleEmpty = function(subtopicTitle) {
-                    return (subtopicTitle === '');
-                  };
-                  $scope.save = function(title) {
-                    if ($scope.subtopicTitles.indexOf(title) !== -1) {
-                      $scope.errorMsg =
-                        'A subtopic with this title already exists';
-                      return;
-                    }
-                    $uibModalInstance.close(title);
-                  };
-                  $scope.cancel = function() {
-                    $uibModalInstance.dismiss('cancel');
-                  };
-                }
-              ]
+              resolve: {
+                subtopicTitles: () => subtopicTitles
+              },
+              controller: 'NewSubtopicTitleModalController'
             });
 
             modalInstance.result.then(function(title) {

@@ -16,11 +16,12 @@
  * @fileoverview Controller for the skills list viewer.
  */
 
-require(
-  'components/common-layout-directives/common-elements/' +
-  'confirm-or-cancel-modal.controller.ts');
+require('components/skill-selector/merge-skill-modal.controller.ts');
 require(
   'components/skill-selector/skill-selector.directive.ts');
+require(
+  'pages/topics-and-skills-dashboard-page/templates/' +
+  'assign-skill-to-topic-modal.controller.ts');
 require(
   'pages/topics-and-skills-dashboard-page/topic-selector/' +
   'topic-selector.directive.ts');
@@ -107,17 +108,10 @@ angular.module('oppia').directive('skillsList', [
                 '/pages/topics-and-skills-dashboard-page/templates/' +
                 'assign-skill-to-topic-modal.template.html'),
               backdrop: true,
-              controller: [
-                '$controller', '$scope', '$uibModalInstance',
-                function($controller, $scope, $uibModalInstance) {
-                  $controller('ConfirmOrCancelModalController', {
-                    $scope: $scope,
-                    $uibModalInstance: $uibModalInstance
-                  });
-                  $scope.topicSummaries = topicSummaries;
-                  $scope.selectedTopicIds = [];
-                }
-              ]
+              resolve: {
+                topicSummaries: () => topicSummaries
+              },
+              controller: 'AssignSkillToTopicModalController'
             }).result.then(function(topicIds) {
               var changeList = [{
                 cmd: 'add_uncategorized_skill_id',
@@ -159,27 +153,11 @@ angular.module('oppia').directive('skillsList', [
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/components/skill-selector/select-skill-modal.template.html'),
               backdrop: true,
-              controller: [
-                '$controller', '$scope', '$uibModalInstance',
-                function($controller, $scope, $uibModalInstance) {
-                  $controller('ConfirmOrCancelModalController', {
-                    $scope: $scope,
-                    $uibModalInstance: $uibModalInstance
-                  });
-
-                  $scope.skillSummaries = skillSummaries;
-                  $scope.selectedSkillId = '';
-                  $scope.confirm = function() {
-                    $uibModalInstance.close(
-                      {skill: skill,
-                        supersedingSkillId: $scope.selectedSkillId
-                      });
-                  };
-                  $scope.save = function() {
-                    $scope.confirm();
-                  };
-                }
-              ]
+              resolve: {
+                skill: () => skill,
+                skillSummaries: () => skillSummaries
+              },
+              controller: 'MergeSkillModalController'
             }).result.then(function(result) {
               var skill = result.skill;
               var supersedingSkillId = result.supersedingSkillId;

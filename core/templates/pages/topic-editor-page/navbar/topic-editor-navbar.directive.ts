@@ -22,6 +22,9 @@ require(
 require(
   'components/common-layout-directives/common-elements/' +
   'loading-dots.directive.ts');
+require(
+  'pages/topic-editor-page/modal-templates/' +
+  'topic-editor-save-modal.controller.ts');
 
 require('domain/classroom/classroom-domain.constants.ajs.ts');
 require('domain/editor/undo_redo/undo-redo.service.ts');
@@ -170,16 +173,10 @@ angular.module('oppia').directive('topicEditorNavbar', [
                 '/pages/topic-editor-page/modal-templates/' +
                 'topic-editor-save-modal.template.html'),
               backdrop: true,
-              controller: [
-                '$controller', '$scope', '$uibModalInstance',
-                function($controller, $scope, $uibModalInstance) {
-                  $controller('ConfirmOrCancelModalController', {
-                    $scope: $scope,
-                    $uibModalInstance: $uibModalInstance
-                  });
-                  $scope.isTopicPublished = topicIsPublished;
-                }
-              ]
+              resolve: {
+                topicIsPublished: () => topicIsPublished
+              },
+              controller: 'TopicEditorSaveModalController'
             }).result.then(function(commitMessage) {
               TopicEditorStateService.saveTopic(commitMessage);
             }, function() {}).then(function() {

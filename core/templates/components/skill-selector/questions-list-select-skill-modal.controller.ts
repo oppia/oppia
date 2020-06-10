@@ -13,13 +13,14 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for select skill modal.
+ * @fileoverview Controller for merge skill modal.
  */
+
 require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
 
-angular.module('oppia').controller('SelectSkillModalController', [
+angular.module('oppia').controller('QuestionsListSelectSkillModalController', [
   '$controller', '$scope', '$uibModalInstance', 'skillsInSameTopicCount',
   'sortedSkillSummaries',
   function($controller, $scope, $uibModalInstance, skillsInSameTopicCount,
@@ -30,10 +31,14 @@ angular.module('oppia').controller('SelectSkillModalController', [
     });
     $scope.skillSummaries = sortedSkillSummaries;
     $scope.selectedSkillId = null;
-    $scope.countOfSkillsToPrioritize =
-      skillsInSameTopicCount;
+    $scope.countOfSkillsToPrioritize = skillsInSameTopicCount;
+
     $scope.save = function() {
-      $scope.confirm($scope.selectedSkillId);
+      for (var idx in sortedSkillSummaries) {
+        if ($scope.selectedSkillId === sortedSkillSummaries[idx].id) {
+          $uibModalInstance.close(sortedSkillSummaries[idx]);
+        }
+      }
     };
   }
 ]);

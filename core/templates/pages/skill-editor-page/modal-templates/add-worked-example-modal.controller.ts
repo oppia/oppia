@@ -13,27 +13,36 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for select skill modal.
+ * @fileoverview Controller for add worked example modal.
  */
+
 require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
 
-angular.module('oppia').controller('SelectSkillModalController', [
-  '$controller', '$scope', '$uibModalInstance', 'skillsInSameTopicCount',
-  'sortedSkillSummaries',
-  function($controller, $scope, $uibModalInstance, skillsInSameTopicCount,
-      sortedSkillSummaries) {
+angular.module('oppia').controller('AddWorkedExampleModalController', [
+  '$controller', '$scope', '$uibModalInstance',
+  function($controller, $scope, $uibModalInstance) {
     $controller('ConfirmOrCancelModalController', {
       $scope: $scope,
       $uibModalInstance: $uibModalInstance
     });
-    $scope.skillSummaries = sortedSkillSummaries;
-    $scope.selectedSkillId = null;
-    $scope.countOfSkillsToPrioritize =
-      skillsInSameTopicCount;
-    $scope.save = function() {
-      $scope.confirm($scope.selectedSkillId);
+
+    $scope.WORKED_EXAMPLE_FORM_SCHEMA = {
+      type: 'html',
+      ui_config: {}
+    };
+
+    $scope.tmpWorkedExampleQuestionHtml = '';
+    $scope.tmpWorkedExampleExplanationHtml = '';
+
+    $scope.saveWorkedExample = function() {
+      $uibModalInstance.close({
+        workedExampleQuestionHtml:
+          $scope.tmpWorkedExampleQuestionHtml,
+        workedExampleExplanationHtml:
+          $scope.tmpWorkedExampleExplanationHtml
+      });
     };
   }
 ]);
