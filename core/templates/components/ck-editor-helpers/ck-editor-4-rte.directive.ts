@@ -107,7 +107,6 @@ angular.module('oppia').directive('ckEditor4Rte', [
                                        inlineWrapperRule +
                                        blockWrapperRule +
                                        blockOverlayRule;
-
         var pluginNames = names.map(function(name) {
           return 'oppia' + name;
         }).join(',');
@@ -278,28 +277,45 @@ angular.module('oppia').directive('ckEditor4Rte', [
           ck.destroy();
         });
 
-        scope.$on('copy-element-to-translation-editor', (
-            _, html: string, widgetType?: string
-        ) => {
-          if (!widgetType) {
-            ck.insertHtml(html);
-          } else {
-            const valueMatcher = /(\w+)(-with-value=")([^"]+)(")/g;
-            let startupData = {};
-            let match;
+        scope.$on(
+          'copy-element-to-translation-editor',
+          ( _, element: HTMLElement, containedWidgetTagName?: string) => {
+            let tagName = (
+              containedWidgetTagName || element.tagName.toLowerCase());
+            let html = element.outerHTML;
 
-            while ((match = valueMatcher.exec(html)) !== null) {
-              const key = match[1];
-              const value = match[3];
-              startupData[key] = value.replace(/&amp;quot;/g, '');
+            if (
+              !containedWidgetTagName && !tagName.includes('-noninteractive-')
+            ) {
+              ck.insertHtml(html);
+            } else {
+              const widgetName = tagName.replace('-noninteractive-', '');
+              const valueMatcher = /(\w+)(-with-value=")([^"]+)(")/g;
+              let startupData: any = {};
+              let match;
+
+              while ((match = valueMatcher.exec(html)) !== null) {
+                const key = match[1];
+                const value = match[3];
+                startupData[key] = value
+                  .replace(/&amp;quot;/g, '"')
+                  .replace('\\\\', '\\');
+
+                if (widgetName !== 'oppiatabs') {
+                  startupData[key] = startupData[key]
+                    .substring(1, startupData[key].length - 1);
+                }
+              }
+              if (widgetName === 'oppiatabs' && startupData.tab_contents) {
+                startupData.tab_contents = JSON.parse(startupData.tab_contents);
+              }
+
+              ck.execCommand(
+                widgetName,
+                { startupData }
+              );
             }
-
-            ck.execCommand(
-              widgetType.replace('-noninteractive-', ''),
-              { startupData }
-            );
-          }
-        });
+          });
       }
     };
   }

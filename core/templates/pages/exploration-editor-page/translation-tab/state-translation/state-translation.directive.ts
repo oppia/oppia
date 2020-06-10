@@ -134,51 +134,42 @@ angular.module('oppia').directive('stateTranslation', [
           };
 
           $scope.onContentClick = function($event) {
-            let target = $event.target;
-            let tagName = target.tagName.toLowerCase();
-            let nonWidgetTags = ['p', 'strong', 'br', 'em', 'li',
-              'ol', 'ul', 'pre', 'blockquote'];
-            let widgetTags = [
-              'oppia-noninteractive-link',
-              'oppia-noninteractive-math',
-              'oppia-noninteractive-image',
-              'oppia-noninteractive-collapsible',
-              'oppia-noninteractive-video',
-              'oppia-noninteractive-tabs',
-              'oppia-noninteractive-svgeditor'];
+            const target: HTMLElement = $event.target;
+            let containedWidgetTagName;
+            let currentElement = target;
 
-            let copiedHtml;
-            let widgetType;
-
-            if (
-              nonWidgetTags.includes(tagName) &&
-              target.parentElement.tagName === 'ANGULAR-HTML-BIND'
+            // traverse up parent until we arrive at outermost container
+            // and track if we encounter widget on the way
+            while (
+              currentElement.parentElement.tagName !== 'ANGULAR-HTML-BIND'
             ) {
-              copiedHtml = target.outerHTML;
-            } else {
-              // traverse up until we get to a div w/ tag oppia-noninteractive-*
-              // stop at angular-html-bind tag if not found
-              let currentElement = target;
-              while (currentElement.tagName !== 'ANGULAR-HTML-BIND') {
-                let currentTag = currentElement.tagName.toLowerCase();
+              const currentTagName = currentElement.tagName.toLowerCase();
+              if (currentTagName.includes('-noninteractive-')) {
+                containedWidgetTagName = currentTagName;
+              }
+              currentElement = currentElement.parentElement;
+            }
 
-                if (widgetTags.includes(currentTag)) {
-                  copiedHtml = currentElement.outerHTML;
-                  widgetType = currentTag;
-                  break;
-                }
-                currentElement = currentElement.parentElement;
+            // also traverse down children to check for widget tags
+            let descendents = Array.from(target.childNodes);
+            while (descendents.length !== 0) {
+              let currentDescendent = descendents.shift();
+              const currentTagName = currentDescendent.nodeName.toLowerCase();
+              if (currentTagName.includes('-noninteractive-')) {
+                containedWidgetTagName = currentTagName;
+                break;
               }
 
-              if (currentElement.tagName === 'ANGULAR-HTML-BIND') {
-                return;
-              }
+              descendents = [
+                ...descendents,
+                ...Array.from(currentDescendent.childNodes)
+              ];
             }
 
             $scope.$broadcast(
               'copy-element-to-translation-editor',
-              copiedHtml,
-              widgetType,
+              currentElement,
+              containedWidgetTagName
             );
           };
 
