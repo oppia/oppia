@@ -77,7 +77,7 @@ class OldLibraryRedirectPage(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        self.redirect(feconf.LIBRARY_INDEX_URL)
+        self.redirect(feconf.LIBRARY_INDEX_URL, permanent=True)
 
 
 class LibraryPage(base.BaseHandler):

@@ -46,7 +46,7 @@ class OldLibraryRedirectPageTest(test_utils.GenericTestBase):
         """Test to validate that the old library page url redirects
         to the new one.
         """
-        response = self.get_html_response('/library', expected_status_int=302)
+        response = self.get_html_response('/library', expected_status_int=301)
         self.assertEqual(
             'http://localhost/community-library', response.headers['location'])
 
