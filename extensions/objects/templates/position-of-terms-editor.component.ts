@@ -50,6 +50,7 @@ angular.module('oppia').component('positionOfTermsEditor', {
       }];
 
       ctrl.localValue = ctrl.positionOfTerms[2];
+      ctrl.value = ctrl.localValue;
     };
   }]
 });
