@@ -273,7 +273,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             draft_change_list[0].to_dict())
 
     def test_convert_states_v30_dict_to_v31_dict(self):
-        draft_change_list = [
+        draft_change_list_v30 = [
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'state_name': 'Intro',
@@ -290,10 +290,8 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                     }
                 }
             })]
-        self.assertEqual(
-            draft_upgrade_services.DraftUpgradeUtil # pylint: disable=protected-access
-            ._convert_states_v30_dict_to_v31_dict(
-                draft_change_list)[0].to_dict(),
+        # Version 31 adds the duration_secs property
+        draft_change_list_v31 = [
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'state_name': 'Intro',
@@ -310,7 +308,12 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                         }
                     }
                 }
-            }).to_dict())
+            })]
+        expected_draft_change_list = self.helper_to_test_schema_verison_updates(
+            '30', '31', draft_change_list_v30)
+        self.assertEqual(expected_draft_change_list[0].to_dict(),
+            draft_change_list_v31[0].to_dict())
+
 
     def test_convert_states_v29_dict_to_v30_dict(self):
         # Draft change list with schema version 29
