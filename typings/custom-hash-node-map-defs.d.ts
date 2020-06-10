@@ -1,6 +1,6 @@
 interface CustomHashNodeMap extends NamedNodeMap {
   fill: {
-  value: string;
+    value: string;
   },
   width: {
     value: string;

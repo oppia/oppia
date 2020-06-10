@@ -61,14 +61,15 @@ angular.module('oppia').factory('LiterallyCanvasHelperService', [
     var _isSvgTagValid = function(svgString) {
       // This function validates an svg tag.
       var dataURI = 'data:image/svg+xml;base64,' + btoa(svgString);
-      var invlidTagsAndAttr = (
+      var invalidTagsAndAttr = (
         ImageUploadHelperService.getInvalidSvgTagsAndAttrs(dataURI));
-      if (invlidTagsAndAttr.tags.length !== 0) {
-        var errorText = 'Invalid tags in svg:' + invlidTagsAndAttr.tags.join();
-        throw new Error(errorText);
-      } else if (invlidTagsAndAttr.attrs.length !== 0) {
+      if (invalidTagsAndAttr.tags.length !== 0) {
         var errorText = (
-          'Invalid attributes in svg:' + invlidTagsAndAttr.attrs.join());
+          'Invalid tags in svg:' + invalidTagsAndAttr.tags.join());
+        throw new Error(errorText);
+      } else if (invalidTagsAndAttr.attrs.length !== 0) {
+        var errorText = (
+          'Invalid attributes in svg:' + invalidTagsAndAttr.attrs.join());
         throw new Error(errorText);
       }
       return true;
