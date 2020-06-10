@@ -420,18 +420,18 @@ class AdminHandler(base.BaseHandler):
             story_node_dicts = [{
                 'exp_id': '15',
                 'title': 'What are the place values?',
-                'description': ('Jaime learns the place value of each digit ' +
-                    'in a big number.')
+                'description': 'Jaime learns the place value of each digit ' +
+                               'in a big number.'
             }, {
                 'exp_id': '25',
                 'title': 'Finding the value of a number',
-                'description': ('Jaime understands the value of his ' +
-                    'arcade score.')
+                'description': 'Jaime understands the value of his ' +
+                               'arcade score.'
             }, {
                 'exp_id': '13',
                 'title': 'Comparing Numbers',
-                'description': ('Jaime learns if a number is smaller or ' +
-                    'greater than another number.')
+                'description': 'Jaime learns if a number is smaller or ' +
+                               'greater than another number.'
             }]
 
             def generate_dummy_story_nodes(node_id, exp_id, title, description):
