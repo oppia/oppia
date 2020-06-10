@@ -17,41 +17,35 @@
  * visualization.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
+// TODO(#7222): Remove the following import once corresponding directive is
+// upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
 
-require('App.ts');
 require('visualizations/oppia-visualization-sorted-tiles.directive.ts');
 
 describe('Oppia sorted tiles visualization', function() {
-  var $componentController, HtmlEscaperService, ctrl;
   beforeEach(angular.mock.module('directiveTemplates'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', $provide => {
     const ugs = new UpgradedServices();
     for (const [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
     }
   }));
-  beforeEach(angular.mock.inject(function(
-      _$componentController_, _HtmlEscaperService_) {
-    $componentController = _$componentController_;
-    HtmlEscaperService = _HtmlEscaperService_;
-    ctrl = $componentController('oppiaVisualizationSortedTiles', {
+  beforeEach(angular.mock.inject(($componentController, HtmlEscaperService) => {
+    this.ctrl = $componentController('oppiaVisualizationSortedTiles', {
       $attrs: {
         escapedData: '[{"answer": "foo", "frequency": 5}]',
-        escapedOptions: '{"header": "Pretty Tiles"}',
+        escapedOptions: '{"header": "Pretty Tiles!"}',
         addressedInfoIsSupported: true,
       },
       HtmlEscaperService: HtmlEscaperService,
     }, {});
-    ctrl.$onInit();
+    this.ctrl.$onInit();
   }));
 
   it('should interpret the escaped attributes', () => {
-    expect(ctrl.addressedInfoIsSupported).toBeTrue();
-    expect(ctrl.data).toEqual([{answer: 'foo', frequency: 5}]);
-    expect(ctrl.options).toEqual({header: 'Pretty Tiles'});
+    expect(this.ctrl.addressedInfoIsSupported).toBeTrue();
+    expect(this.ctrl.data).toEqual([{answer: 'foo', frequency: 5}]);
+    expect(this.ctrl.options).toEqual({header: 'Pretty Tiles!'});
   });
 });

@@ -19,11 +19,9 @@
 require('domain/utilities/url-interpolation.service.ts');
 require('services/html-escaper.service.ts');
 
-// Each visualization receives three variables: 'data', 'options', and
-// 'isAddressed'. The exact format for each of these is specific to the
-// particular visualization.
 angular.module('oppia').directive('oppiaVisualizationSortedTiles', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+  'UrlInterpolationService',
+  function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
