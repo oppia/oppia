@@ -18,7 +18,7 @@
  */
 
 // Incase of doubts over what is done here, please look at the description of
-// pr #(not yet assigned)
+// pr #9479
 
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
