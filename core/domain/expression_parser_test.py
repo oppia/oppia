@@ -21,6 +21,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import expression_parser
 from core.tests import test_utils
+import python_utils
 
 
 class HelperFunctionsUnitTests(test_utils.GenericTestBase):
@@ -77,7 +78,62 @@ class HelperFunctionsUnitTests(test_utils.GenericTestBase):
 
     def test_tokenize(self):
         """Tests for tokenize method."""
-        pass
+        expression = 'a+b'
+        expected_output = ['a', '+', 'b']
+        actual_output = python_utils.MAP(
+            lambda x: x.text, expression_parser.tokenize(expression))
+        self.assertEqual(list(actual_output), expected_output)
+
+        expression = '53.4 - 6/alpha'
+        expected_output = ['53.4', '-', '6', '/', 'alpha']
+        actual_output = python_utils.MAP(
+            lambda x: x.text, expression_parser.tokenize(expression))
+        self.assertEqual(list(actual_output), expected_output)
+
+        expression = 'a^0.5 + (-zeta)'
+        expected_output = ['a', '^', '0.5', '+', '(', '-', 'zeta', ')']
+        actual_output = python_utils.MAP(
+            lambda x: x.text, expression_parser.tokenize(expression))
+        self.assertEqual(list(actual_output), expected_output)
+
+        expression = 'sqrt(3/[-A])'
+        expected_output = ['sqrt', '(', '3', '/', '(', '-', 'A', ')', ')']
+        actual_output = python_utils.MAP(
+            lambda x: x.text, expression_parser.tokenize(expression))
+        self.assertEqual(list(actual_output), expected_output)
+
+        expression = 'abs(sqrt(3)) * 4/ 2^ 3            '
+        expected_output = [
+            'abs', '(', 'sqrt', '(', '3', ')', ')', '*', '4', '/', '2',
+            '^', '3']
+        actual_output = python_utils.MAP(
+            lambda x: x.text, expression_parser.tokenize(expression))
+        self.assertEqual(list(actual_output), expected_output)
+
+        expression = ''
+        expected_output = []
+        actual_output = python_utils.MAP(
+            lambda x: x.text, expression_parser.tokenize(expression))
+        self.assertEqual(list(actual_output), expected_output)
+
+        expression = '3.4^4.3/0.0005 * {9}'
+        expected_output = ['3.4', '^', '4.3', '/', '0.0005', '*', '(', '9', ')']
+        actual_output = python_utils.MAP(
+            lambda x: x.text, expression_parser.tokenize(expression))
+        self.assertEqual(list(actual_output), expected_output)
+
+        with self.assertRaises(Exception):
+            expression_parser.tokenize('a.3')
+        with self.assertRaises(Exception):
+            expression_parser.tokenize('.3 -  2.4')
+        with self.assertRaises(Exception):
+            expression_parser.tokenize('1.2.3 + 4/2')
+        with self.assertRaises(Exception):
+            expression_parser.tokenize('a . . 3')
+        with self.assertRaises(Exception):
+            expression_parser.tokenize('3..4')
+        with self.assertRaises(Exception):
+            expression_parser.tokenize('..5')
 
 
 class TokenUnitTests(test_utils.GenericTestBase):
@@ -144,7 +200,7 @@ class ParserUnitTests(test_utils.GenericTestBase):
            /  |
          {b} {2}
         """
-        root_node = expression_parser.Parser('a + b / 2').parse()
+        root_node = expression_parser.Parser().parse('a + b / 2')
         # Root node {+}.
         self.assertIsInstance(root_node, expression_parser.AdditionOperatorNode)
         self.assertEqual(len(root_node.children), 2)
@@ -186,7 +242,7 @@ class ParserUnitTests(test_utils.GenericTestBase):
         _parse_expr function.
         """
         expression = 'a / b * 2 - c + d'
-        root_node = expression_parser.Parser(expression).parse_mul_expr(
+        root_node = expression_parser.Parser().parse_mul_expr(
             expression_parser.tokenize(expression))
         # Root node {*}.
         self.assertIsInstance(
@@ -231,7 +287,7 @@ class ParserUnitTests(test_utils.GenericTestBase):
         i.e., in the _parse_expr and parse_mul_expr functions.
         """
         expression = 'a ^ b ^ 2 * c + d'
-        root_node = expression_parser.Parser(expression).parse_pow_expr(
+        root_node = expression_parser.Parser().parse_pow_expr(
             expression_parser.tokenize(expression))
         # Root node {^}.
         self.assertIsInstance(root_node, expression_parser.PowerOperatorNode)
@@ -271,7 +327,7 @@ class ParserUnitTests(test_utils.GenericTestBase):
          {a} {2}
         """
         expression = 'sqrt(a*2)'
-        root_node = expression_parser.Parser(expression).parse_unit(
+        root_node = expression_parser.Parser().parse_unit(
             expression_parser.tokenize(expression))
         # Root node {sqrt}.
         self.assertIsInstance(root_node, expression_parser.UnaryFunctionNode)
