@@ -231,7 +231,10 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'state_name': 'Intro',
                 'property_name': 'content',
-                'new_value': html_content
+                'new_value': {
+                    'content_id': 'content',
+                    'html': html_content
+                }
             }), exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'state_name': 'Intro',
@@ -413,7 +416,10 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'state_name': 'Intro',
                 'property_name': 'content',
-                'new_value': expected_html_content
+                'new_value': {
+                    'content_id': 'content',
+                    'html': expected_html_content
+                }
             }).to_dict())
         self.assertEqual(
             expected_draft_change_list[3].to_dict(),

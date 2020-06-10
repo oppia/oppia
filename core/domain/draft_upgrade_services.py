@@ -105,6 +105,7 @@ class DraftUpgradeUtil(python_utils.OBJECT):
         conversion_fn = (
             html_validation_service.add_math_content_to_math_rte_components)
         for i, change in enumerate(draft_change_list):
+            new_value = None
             if not change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY:
                 continue
             # The change object has the key 'new_value' only if the
@@ -112,7 +113,7 @@ class DraftUpgradeUtil(python_utils.OBJECT):
             # 'CMD_EDIT_EXPLORATION_PROPERTY'.
             new_value = change.new_value
             if change.property_name == exp_domain.STATE_PROPERTY_CONTENT:
-                new_value = conversion_fn(new_value)
+                new_value['html'] = conversion_fn(new_value['html'])
             elif (change.property_name ==
                   exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS):
                 # Only customization args with the key 'choices' have HTML
@@ -150,13 +151,13 @@ class DraftUpgradeUtil(python_utils.OBJECT):
                     (state_domain.AnswerGroup.convert_html_in_answer_group(
                         answer_group, conversion_fn))
                     for answer_group in new_value]
-
-            draft_change_list[i] = exp_domain.ExplorationChange({
-                'cmd': change.cmd,
-                'property_name': change.property_name,
-                'state_name': change.state_name,
-                'new_value': new_value
-            })
+            if new_value is not None:
+                draft_change_list[i] = exp_domain.ExplorationChange({
+                    'cmd': change.cmd,
+                    'property_name': change.property_name,
+                    'state_name': change.state_name,
+                    'new_value': new_value
+                })
         return draft_change_list
 
     @classmethod
