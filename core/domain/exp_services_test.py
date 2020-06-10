@@ -4088,7 +4088,7 @@ title: Old Title
             exploration.init_state.interaction.solution.to_dict(),
             solution)
 
-        solution = None    
+        solution = None
         exp_services.update_exploration(
             self.albert_id, self.NEW_EXP_ID, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
