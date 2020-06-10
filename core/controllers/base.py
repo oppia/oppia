@@ -121,7 +121,8 @@ class UserFacingExceptions(python_utils.OBJECT):
 
     class TemporaryMaintenanceException(Exception):
         """Error class for when the server is currently down for temporary
-        maintenance (error code 503)."""
+        maintenance (error code 503).
+        """
 
 
 class BaseHandler(webapp2.RequestHandler):

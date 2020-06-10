@@ -102,10 +102,7 @@ def preprocess_release(app_name, deploy_data_path):
     in execute_deployment function. Currently it does the following:
 
     (1) Substitutes files from the per-app deployment data.
-    (2) Change the DEV_MODE constant in assets/constants.ts.
-    (3) Change GCS_RESOURCE_BUCKET in assets/constants.ts.
-    (4) Removes the "version" field from app.yaml, since gcloud does not like
-        it (when deploying).
+    (2) Change GCS_RESOURCE_BUCKET in assets/constants.ts.
 
     Args:
         app_name: str. Name of the app to deploy.
@@ -153,7 +150,9 @@ def preprocess_release(app_name, deploy_data_path):
     with python_utils.open_file(
         os.path.join(common.CONSTANTS_FILE_PATH), 'r') as assets_file:
         content = assets_file.read()
-        assert '"GCS_RESOURCE_BUCKET_NAME": "None-resources",' in content
+
+    assert '"DEV_MODE": true' in content
+    assert '"GCS_RESOURCE_BUCKET_NAME": "None-resources",' in content
     bucket_name = app_name + BUCKET_NAME_SUFFIX
     common.inplace_replace_file(
         common.CONSTANTS_FILE_PATH,
@@ -212,7 +211,7 @@ def update_and_check_indexes(app_name):
             'visit the indexes page. Exiting.')
 
 
-def build_scripts(maintenance_mode=False):
+def build_scripts(maintenance_mode):
     """Builds and minifies all the scripts.
 
     Args:
@@ -548,7 +547,7 @@ def execute_deployment():
             preprocess_release(app_name, deploy_data_path)
 
             update_and_check_indexes(app_name)
-            build_scripts(maintenance_mode=parsed_args.maintenance_mode)
+            build_scripts(parsed_args.maintenance_mode)
             deploy_application_and_write_log_entry(
                 app_name, current_release_version,
                 current_git_revision)

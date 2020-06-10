@@ -501,14 +501,18 @@ class DeployTests(test_utils.GenericTestBase):
 
     def test_invalid_dev_mode(self):
         constants_swap = self.swap(
-            common, 'CONSTANTS_FILE_PATH', INVALID_CONSTANTS_WITH_WRONG_DEV_MODE)
+            common,
+            'CONSTANTS_FILE_PATH',
+            INVALID_CONSTANTS_WITH_WRONG_DEV_MODE)
         with self.exists_swap, self.copyfile_swap, constants_swap:
             with self.listdir_swap, self.assertRaises(AssertionError):
                 deploy.preprocess_release('oppiaserver', 'deploy_dir')
 
     def test_invalid_bucket_name(self):
         constants_swap = self.swap(
-            common, 'CONSTANTS_FILE_PATH', INVALID_CONSTANTS_WITH_WRONG_BUCKET_NAME)
+            common,
+            'CONSTANTS_FILE_PATH',
+            INVALID_CONSTANTS_WITH_WRONG_BUCKET_NAME)
         with self.exists_swap, self.copyfile_swap, constants_swap:
             with self.listdir_swap, self.assertRaises(AssertionError):
                 deploy.preprocess_release('oppiaserver', 'deploy_dir')
@@ -516,14 +520,16 @@ class DeployTests(test_utils.GenericTestBase):
     def test_constants_are_updated_correctly(self):
         constants_swap = self.swap(
             common, 'CONSTANTS_FILE_PATH', VALID_CONSTANTS)
+        files_swap = self.swap(deploy, 'FILES_AT_ROOT', [])
+        images_dir_swap = self.swap(deploy, 'IMAGE_DIRS', [])
         with python_utils.open_file(VALID_CONSTANTS, 'r') as f:
             original_content = f.read()
         expected_content = original_content.replace(
-                '"GCS_RESOURCE_BUCKET_NAME": "None-resources",',
-                '"GCS_RESOURCE_BUCKET_NAME": "oppiaserver%s",' % (
-                    deploy.BUCKET_NAME_SUFFIX))
+            '"GCS_RESOURCE_BUCKET_NAME": "None-resources",',
+            '"GCS_RESOURCE_BUCKET_NAME": "oppiaserver%s",' % (
+                deploy.BUCKET_NAME_SUFFIX))
         try:
-            with self.exists_swap, self.copyfile_swap, constants_swap:
+            with self.exists_swap, constants_swap, files_swap, images_dir_swap:
                 with self.listdir_swap:
                     deploy.preprocess_release('oppiaserver', 'deploy_dir')
             with python_utils.open_file(VALID_CONSTANTS, 'r') as f:
@@ -570,10 +576,28 @@ class DeployTests(test_utils.GenericTestBase):
             return process
         # pylint: enable=unused-argument
         with self.swap(subprocess, 'Popen', mock_popen):
-            deploy.build_scripts()
+            deploy.build_scripts(False)
         self.assertEqual(
             cmd_tokens,
             ['python', '-m', 'scripts.build', '--prod_env', '--deploy_mode'])
+
+    def test_build_with_maintenance_mode(self):
+        process = subprocess.Popen(['echo', 'test'], stdout=subprocess.PIPE)
+        cmd_tokens = []
+        # pylint: disable=unused-argument
+        def mock_popen(tokens, stdout):
+            cmd_tokens.extend(tokens)
+            return process
+        # pylint: enable=unused-argument
+        with self.swap(subprocess, 'Popen', mock_popen):
+            deploy.build_scripts(True)
+        self.assertEqual(
+            cmd_tokens,
+            [
+                'python', '-m', 'scripts.build',
+                '--prod_env', '--deploy_mode', '--maintenance_mode'
+            ]
+        )
 
     def test_build_failure(self):
         process = subprocess.Popen(['test'], stdout=subprocess.PIPE)
@@ -586,7 +610,7 @@ class DeployTests(test_utils.GenericTestBase):
         # pylint: enable=unused-argument
         popen_swap = self.swap(subprocess, 'Popen', mock_popen)
         with popen_swap, self.assertRaisesRegexp(Exception, 'Build failed.'):
-            deploy.build_scripts()
+            deploy.build_scripts(False)
         self.assertEqual(
             cmd_tokens,
             ['python', '-m', 'scripts.build', '--prod_env', '--deploy_mode'])

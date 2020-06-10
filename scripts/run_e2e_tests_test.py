@@ -430,10 +430,6 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         def mock_isdir(unused_path):
             return True
 
-        def mock_update_dev_mode_in_constants_js(
-                unused_filename, unused_dev_mode):
-            pass
-
         def mock_is_file(unused_path):
             return True
 
@@ -445,10 +441,6 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             os.path, 'isfile', mock_is_file,
             expected_args=[(run_e2e_tests.HASHES_FILE_PATH,)])
 
-        update_dev_mode_in_constants_js_swap = self.swap_with_checks(
-            run_e2e_tests, 'update_dev_mode_in_constants_js',
-            mock_update_dev_mode_in_constants_js,
-            expected_args=[(self.mock_constant_file_path, True)])
         isdir_swap = self.swap_with_checks(os.path, 'isdir', mock_isdir)
         check_call_swap = self.swap_with_checks(
             subprocess, 'check_call', self.mock_check_call,
@@ -456,11 +448,10 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         build_main_swap = self.swap_with_checks(
             build, 'main', self.mock_build_main, expected_kwargs=[{'args': []}])
         print_swap = self.print_swap(called=False)
-        with print_swap, self.constant_file_path_swap:
+        with print_swap, self.constant_file_path_swap, check_call_swap:
             with self.node_bin_path_swap, self.webpack_bin_path_swap:
-                with update_dev_mode_in_constants_js_swap, check_call_swap:
-                    with is_file_swap, build_main_swap, isdir_swap:
-                        run_e2e_tests.build_js_files(True)
+                with is_file_swap, build_main_swap, isdir_swap:
+                    run_e2e_tests.build_js_files(True)
 
     def test_build_js_files_in_dev_mode_with_hash_file_not_exist(self):
 
