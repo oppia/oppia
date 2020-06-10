@@ -32,11 +32,11 @@ interface CkeditorCustomScope extends ng.IScope {
 }
 
 angular.module('oppia').directive('ckEditor4Rte', [
-  'ContextService', 'RteHelperService', 'ENABLE_LITERALLY_CANVAS_EDITOR',
-  'CkEditorCopyContentService',
+  'CkEditorCopyContentService', 'ContextService', 'RteHelperService',
+  'ENABLE_LITERALLY_CANVAS_EDITOR',
   function(
-      ContextService, RteHelperService, ENABLE_LITERALLY_CANVAS_EDITOR,
-      CkEditorCopyContentService
+      CkEditorCopyContentService, ContextService, RteHelperService,
+      ENABLE_LITERALLY_CANVAS_EDITOR,
   ) {
     return {
       restrict: 'E',
