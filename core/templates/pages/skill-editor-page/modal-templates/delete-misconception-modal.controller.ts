@@ -13,27 +13,32 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for select skill modal.
+ * @fileoverview Controller for delete misconception modal.
  */
+
 require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
 
-angular.module('oppia').controller('SelectSkillModalController', [
-  '$controller', '$scope', '$uibModalInstance', 'skillsInSameTopicCount',
-  'sortedSkillSummaries',
-  function($controller, $scope, $uibModalInstance, skillsInSameTopicCount,
-      sortedSkillSummaries) {
+require('pages/skill-editor-page/services/skill-editor-state.service.ts');
+
+angular.module('oppia').controller('DeleteMisconceptionModalController', [
+  '$controller', '$scope', '$uibModalInstance', 'SkillEditorStateService',
+  'index',
+  function(
+      $controller, $scope, $uibModalInstance, SkillEditorStateService,
+      index) {
     $controller('ConfirmOrCancelModalController', {
       $scope: $scope,
       $uibModalInstance: $uibModalInstance
     });
-    $scope.skillSummaries = sortedSkillSummaries;
-    $scope.selectedSkillId = null;
-    $scope.countOfSkillsToPrioritize =
-      skillsInSameTopicCount;
-    $scope.save = function() {
-      $scope.confirm($scope.selectedSkillId);
+
+    $scope.skill = SkillEditorStateService.getSkill();
+
+    $scope.confirm = function() {
+      $uibModalInstance.close({
+        id: $scope.skill.getMisconceptionAtIndex(index).getId()
+      });
     };
   }
 ]);
