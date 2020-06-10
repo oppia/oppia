@@ -19,6 +19,7 @@
 
 var waitFor = require('./waitFor.js');
 var SkillEditorPage = require('./SkillEditorPage.js');
+var workflow = require('./workflow.js');
 
 var TopicsAndSkillsDashboardPage = function() {
   var DASHBOARD_URL = '/topics_and_skills_dashboard';
@@ -87,8 +88,12 @@ var TopicsAndSkillsDashboardPage = function() {
   var topicNamesInTopicSelectModal = element.all(
     by.css('.protractor-test-topic-name-in-topic-select-modal'));
   var topicsTabButton = element(
-    by.css('.protractor-test-topics-tab')
-  );
+    by.css('.protractor-test-topics-tab'));
+  var imgPath = ('../data/test_svg.svg');
+  var topicThumbnailButton = element(
+    by.css('.protractor-test-photo-button'));
+  var thumbnailContainer = element(
+    by.css('.protractor-test-thumbnail-container'));
 
   // Returns a promise of all topics with the given name.
   var _getTopicElements = async function(topicName) {
@@ -136,7 +141,7 @@ var TopicsAndSkillsDashboardPage = function() {
     await waitFor.visibilityOf(topicsTable,
       'Topic table taking too long to appear.');
     var topicEditOptionBox = topicEditOptions.get(index);
-    await browser.actions().mouseMove(topicEditOptionBox).perform();
+    await topicEditOptionBox.click();
     await waitFor.elementToBeClickable(
       editTopicButton,
       'Edit Topic button takes too long to be clickable');
@@ -197,6 +202,9 @@ var TopicsAndSkillsDashboardPage = function() {
       'Create Topic modal takes too long to appear.');
     await topicNameField.sendKeys(topicName);
     await topicDescriptionField.sendKeys(description);
+    await workflow.submitImage(
+      topicThumbnailButton, thumbnailContainer, imgPath);
+
     await confirmTopicCreationButton.click();
 
     await waitFor.newTabToBeCreated(
@@ -261,7 +269,7 @@ var TopicsAndSkillsDashboardPage = function() {
     await waitFor.visibilityOf(topicsTable,
       'Topic table taking too long to appear.');
     var topicEditOptionBox = topicEditOptions.get(index);
-    await browser.actions().mouseMove(topicEditOptionBox).perform();
+    await topicEditOptionBox.click();
     await waitFor.elementToBeClickable(
       deleteTopicButton,
       'Delete Topic button takes too long to be clickable');
@@ -372,12 +380,12 @@ var TopicsAndSkillsDashboardPage = function() {
     await waitFor.visibilityOf(topicsTable,
       'Topic table taking too long to appear.');
 
-    Promise.all(await topicNames.map(async(topic, index) => {
+    await topicNames.map(async(topic, index) => {
       var name = await topic.getText();
       if (name === topicName) {
         await this.navigateToTopicWithIndex(index);
       }
-    }));
+    });
   };
 
   this.expectSkillDescriptionToBe = async function(description, index) {

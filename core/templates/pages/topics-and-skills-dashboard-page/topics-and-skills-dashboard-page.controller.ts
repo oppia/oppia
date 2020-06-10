@@ -46,8 +46,9 @@ require(
 require(
   'pages/topics-and-skills-dashboard-page/' +
   'topics-and-skills-dashboard-page.service');
-require('pages/topics-and-skills-dashboard-page/' +
-    'topics-and-skills-dashboard-page.constants.ajs.ts');
+require(
+  'pages/topics-and-skills-dashboard-page/' +
+  'topics-and-skills-dashboard-page.constants.ajs.ts');
 require('services/alerts.service.ts');
 require('services/image-local-storage.service.ts');
 

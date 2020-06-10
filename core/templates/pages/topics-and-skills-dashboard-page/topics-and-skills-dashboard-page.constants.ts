@@ -30,6 +30,19 @@ export enum ETopicPublishedOptions {
   NotPublished = 'Not Published'
 }
 
+export enum ETopicSortOptions {
+  IncreasingCreatedOn = 'Newly Created',
+  DecreasingCreatedOn = 'Oldest Created',
+  IncreasingUpdatedOn = 'Most Recently Updated',
+  DecreasingUpdatedOn = 'Least Recently Updated',
+}
+
+export enum ETopicPublishedOptions {
+  All = 'All',
+  Published = 'Published',
+  NotPublished = 'Not Published'
+}
+
 export class TopicsAndSkillsDashboardPageConstants {
   public static EVENT_TYPE_TOPIC_CREATION_ENABLED = 'topicCreationEnabled';
 

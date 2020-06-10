@@ -189,7 +189,7 @@
 
   <div class="col-sm-8 intro-card-wrapper" ng-if="($ctrl.totalTopicSummaries.length === 0 && $ctrl.untriagedSkillSummaries.length === 0)">
     <blockquote class="intro-card">
-      <p class="intro-card-message" style="padding-top: 6px;">
+      <p class="intro-card-message">
         No topics or skills have been created yet.
       </p>
       <button class="btn oppia-dashboard-intro-button oppia-transition-200"
@@ -221,7 +221,7 @@
     width: 95%;
   }
   .oppia-topics-and-skills-dashboard .dashboard-content-primary {
-    background-color: #fff;
+    background-color: #ffffff;
     border: 2px solid #aaaac1;
     border-radius: 8px;
     display: inline-block;
@@ -238,7 +238,7 @@
   }
   .oppia-topics-and-skills-dashboard .topic-skill-count {
     align-items: center;
-    background-color: #fff;
+    background-color: #ffffff;
     border: 2px solid #aaaac1;
     border-radius: 8px;
     display: flex;
@@ -255,7 +255,7 @@
     width: 33%;
   }
   .oppia-topics-and-skills-dashboard .topic-skill-filter {
-    background-color: #fff;
+    background-color: #ffffff;
     border: 2px solid #aaaac1;
     border-radius: 8px;
     margin-top: 40px;
@@ -282,8 +282,8 @@
   .oppia-topics-and-skills-dashboard .create-topic-skill span {
     color: #00645C;
     display: inline-block;
-    font-size: 14px;
-    line-height: 15px;
+    font-size: 16px;
+    line-height: 17px;
     width: 100%;
   }
   .oppia-topics-and-skills-dashboard .topic-skill-filter-content {
@@ -368,7 +368,7 @@
   }
   .oppia-topics-and-skills-dashboard .dashboard-title {
     color: #01645c;
-    font-family: 'Capriola', 'Roboto', Arial, sans-serif;
+    font-family: Capriola, Roboto, Arial, sans-serif;
     font-size: 3em;
     margin-bottom: 25px;
     margin-top: 0;
@@ -376,7 +376,7 @@
     text-align: center;
   }
   .oppia-topics-and-skills-dashboard .intro-card {
-    background: #fff;
+    background: #ffffff;
     border-left: none;
     border-radius: 5px;
     margin: 0 auto;
@@ -385,7 +385,7 @@
     width: 100%;
   }
   .oppia-topics-and-skills-dashboard .intro-card:before {
-    background: #fff;
+    background: #ffffff;
     border-bottom-right-radius: 80px 50px;
     bottom: -1.7em;
     content: "";
@@ -396,7 +396,7 @@
     z-index: 10;
   }
   .oppia-topics-and-skills-dashboard .intro-card:after {
-    background: #eee;
+    background: #eeeeee;
     border-bottom-right-radius: 40px 50px;
     bottom: -1.7em;
     content: "";
@@ -407,14 +407,15 @@
     z-index: 10;
   }
   .oppia-topics-and-skills-dashboard .intro-card-message {
-    font-family: 'Capriola', 'Roboto', Arial, sans-serif;
+    font-family: Capriola, Roboto, Arial, sans-serif;
     font-size: 18px;
     text-align: center;
+    padding-top: 6px;
   }
   .oppia-topics-and-skills-dashboard .dashboard-tabs .dashboard-tabs-text {
     border-bottom: 2px solid #aaaac1;
     color: #009688;
-    font-size: 1em;
+    font-size: 16px;
     padding: 10px;
     text-decoration: none;
     text-transform: uppercase;
@@ -424,11 +425,13 @@
   .oppia-topics-and-skills-dashboard .dashboard-tabs-active .dashboard-tabs-text:hover {
     background-color: #d8f4f2;
     border-bottom: 4px solid #009688;
+    border-radius: 8px 8px 0 0;
+    border-top: 1px solid #aaaac1;
     color: #009688;
   }
   .oppia-topics-and-skills-dashboard .dashboard-tabs .dashboard-tabs-text:hover {
     color: #009688;
-    font-size: 1em;
+    font-size: 16px;
     padding: 10px;
     text-decoration: none;
     text-transform: uppercase;

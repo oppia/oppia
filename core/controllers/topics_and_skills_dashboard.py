@@ -16,7 +16,7 @@
 are created.
 """
 
-from __future__ import absolute_import, print_function  # pylint: disable=import-only-modules
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import logging
@@ -56,30 +56,16 @@ class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
 
-        order = self.request.get('order')
-        limit = self.request.get('limit')
-        offset = self.request.get('offset')
-
         topic_summaries = topic_services.get_all_topic_summaries()
         topic_summary_dicts = [
             summary.to_dict() for summary in topic_summaries]
 
-        skill_summaries = skill_services.get_skills_in_batches(order, limit, offset)
+        skill_summaries = skill_services.get_all_skill_summaries()
         skill_summary_dicts = [
             summary.to_dict() for summary in skill_summaries]
 
         skill_ids_assigned_to_some_topic = (
             topic_services.get_all_skill_ids_assigned_to_some_topic())
-        skill_ids_assigned_to_some_topic_with_topic_details = (
-            topic_services.get_all_skill_ids_assigned_to_some_topic_with_topic_details())
-        assigned_skill_dicts = []
-
-        for assigned_skill in skill_ids_assigned_to_some_topic_with_topic_details:
-            assigned_skill_dict = (
-                skill_services.get_skill_summary_by_id(assigned_skill[0]).to_dict())
-            assigned_skill_dict['topic'] = assigned_skill[1]
-            assigned_skill_dicts.append(assigned_skill_dict)
-
         merged_skill_ids = (
             skill_services.get_merged_skill_ids())
         topic_rights_dict = topic_services.get_all_topic_rights()
@@ -117,22 +103,21 @@ class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
                 mergeable_skill_summary_dicts.append(skill_summary_dict)
 
         can_delete_topic = (
-                role_services.ACTION_DELETE_TOPIC in self.user.actions)
+            role_services.ACTION_DELETE_TOPIC in self.user.actions)
 
         can_create_topic = (
-                role_services.ACTION_CREATE_NEW_TOPIC in self.user.actions)
+            role_services.ACTION_CREATE_NEW_TOPIC in self.user.actions)
 
         can_delete_skill = (
-                role_services.ACTION_DELETE_ANY_SKILL in self.user.actions)
+            role_services.ACTION_DELETE_ANY_SKILL in self.user.actions)
 
         can_create_skill = (
-                role_services.ACTION_CREATE_NEW_SKILL in self.user.actions)
+            role_services.ACTION_CREATE_NEW_SKILL in self.user.actions)
 
         self.values.update({
             'untriaged_skill_summary_dicts': untriaged_skill_summary_dicts,
             'mergeable_skill_summary_dicts': mergeable_skill_summary_dicts,
             'topic_summary_dicts': topic_summary_dicts,
-            'assigned_skill_summary_dicts': assigned_skill_dicts,
             'all_classroom_names': all_classroom_names,
             'can_delete_topic': can_delete_topic,
             'can_create_topic': can_create_topic,
@@ -178,6 +163,10 @@ class NewTopicHandler(base.BaseHandler):
         name = self.payload.get('name')
         abbreviated_name = self.payload.get('abbreviated_name')
         description = self.payload.get('description')
+        thumbnail_filename = self.payload.get('filename')
+        thumbnail_bg_color = self.payload.get('thumbnailBgColor')
+        raw_image = self.request.get('image')
+
         try:
             topic_domain.Topic.require_valid_name(name)
         except:
@@ -187,6 +176,34 @@ class NewTopicHandler(base.BaseHandler):
         topic = topic_domain.Topic.create_default_topic(
             new_topic_id, name, abbreviated_name, description)
         topic_services.save_new_topic(self.user_id, topic)
+
+        try:
+            file_format = image_validation_services.validate_image_and_filename(
+                raw_image, thumbnail_filename)
+        except utils.ValidationError as e:
+            raise self.InvalidInputException(e)
+
+        entity_id = new_topic_id
+        filename_prefix = 'thumbnail'
+
+        image_is_compressible = (
+            file_format in feconf.COMPRESSIBLE_IMAGE_FORMATS)
+        fs_services.save_original_and_compressed_versions_of_image(
+            thumbnail_filename, feconf.ENTITY_TYPE_TOPIC, entity_id, raw_image,
+            filename_prefix, image_is_compressible)
+
+        topic_services.update_topic_and_subtopic_pages(
+            self.user_id, new_topic_id, [topic_domain.TopicChange({
+                'cmd': 'update_topic_property',
+                'property_name': 'thumbnail_filename',
+                'old_value': None,
+                'new_value': thumbnail_filename
+            }), topic_domain.TopicChange({
+                'cmd': 'update_topic_property',
+                'property_name': 'thumbnail_bg_color',
+                'old_value': None,
+                'new_value': thumbnail_bg_color
+            }), ], 'Add topic thumbnail.')
 
         self.render_json({
             'topicId': new_topic_id
