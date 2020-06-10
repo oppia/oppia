@@ -19,7 +19,7 @@
 
 var waitFor = require('./waitFor.js');
 var SkillEditorPage = require('./SkillEditorPage.js');
-var workflow = require('../protractor_utils/workflow.js');
+var workflow = require('./workflow.js');
 
 var TopicsAndSkillsDashboardPage = function() {
   var DASHBOARD_URL = '/topics_and_skills_dashboard';

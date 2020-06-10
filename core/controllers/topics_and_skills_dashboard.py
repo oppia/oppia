@@ -136,7 +136,7 @@ class NewTopicHandler(base.BaseHandler):
         name = self.payload.get('name')
         abbreviated_name = self.payload.get('abbreviated_name')
         description = self.payload.get('description')
-        filename = self.payload.get('filename')
+        thumbnail_filename = self.payload.get('filename')
         thumbnail_bg_color = self.payload.get('thumbnailBgColor')
         raw_image = self.request.get('image')
 
@@ -152,7 +152,7 @@ class NewTopicHandler(base.BaseHandler):
 
         try:
             file_format = image_validation_services.validate_image_and_filename(
-                raw_image, filename)
+                raw_image, thumbnail_filename)
         except utils.ValidationError as e:
             raise self.InvalidInputException(e)
 
@@ -162,7 +162,7 @@ class NewTopicHandler(base.BaseHandler):
         image_is_compressible = (
             file_format in feconf.COMPRESSIBLE_IMAGE_FORMATS)
         fs_services.save_original_and_compressed_versions_of_image(
-            filename, feconf.ENTITY_TYPE_TOPIC, entity_id, raw_image,
+            thumbnail_filename, feconf.ENTITY_TYPE_TOPIC, entity_id, raw_image,
             filename_prefix, image_is_compressible)
 
         topic_services.update_topic_and_subtopic_pages(
@@ -170,7 +170,7 @@ class NewTopicHandler(base.BaseHandler):
                 'cmd': 'update_topic_property',
                 'property_name': 'thumbnail_filename',
                 'old_value': None,
-                'new_value': filename
+                'new_value': thumbnail_filename
             }), topic_domain.TopicChange({
                 'cmd': 'update_topic_property',
                 'property_name': 'thumbnail_bg_color',

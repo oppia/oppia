@@ -13,8 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for simple modal with only two actions: close or
- * dismiss.
+ * @fileoverview Controller for the delete topic confirmation modal.
  */
 
 angular.module('oppia').controller('DeleteTopicModalController', [

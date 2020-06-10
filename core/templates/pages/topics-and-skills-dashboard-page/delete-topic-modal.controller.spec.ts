@@ -13,10 +13,10 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for ConfirmOrCancelModalController.
+ * @fileoverview Unit tests for DeleteTopicModalController.
  */
 
-describe('Delete TopicModal Controller', function() {
+describe('Delete Topic Modal Controller', function() {
   var $scope = null;
   var $uibModalInstance = null;
 

@@ -124,7 +124,7 @@ var TopicEditorPage = function() {
   };
 
   this.submitTopicThumbnail = async function(imgPath) {
-    return await workflow.submitImage(
+    return await workflow.changeExistingImage(
       topicThumbnailButton, thumbnailContainer, imgPath);
   };
 
