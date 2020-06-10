@@ -129,38 +129,40 @@ class PythonLintChecksManager(python_utils.OBJECT):
         with linter_utils.redirect_stdout(sys.stdout):
             failed = False
             for filepath in files_to_check:
-                if not filepath.endswith('_test.py'):
-                    for line_num, line in enumerate(FILE_CACHE.readlines(
-                            filepath)):
-                        line = line.strip()
-                        words = line.split()
-                        if len(words) < 2:
-                            continue
-                        ind1 = words[0].startswith('def')
-                        ind2 = words[1].startswith('test_only')
-                        if ind1 and ind2:
-                            summary_message = (
-                                'ERROR:   Non test file uses test functions at'
-                                ' line:', python_utils.UNICODE(line_num + 1),
-                                ' in file:', filepath
-                                )
-                            # To convert tuple into string.
-                            s = ''.join(summary_message)
-                            python_utils.PRINT(s)
-                            summary_messages.append(s)
-                            failed = True
+                if filepath.endswith('_test.py'):
+                    continue
+                filename = filepath.split('/')
+                filename = filename[-1]
+                for line_num, line in enumerate(FILE_CACHE.readlines(
+                        filepath)):
+                    line = line.strip()
+                    words = line.split()
+                    if len(words) < 2:
+                        continue
+                    ind1 = words[0].startswith('def')
+                    ind2 = words[1].startswith('test_only')
+                    if ind1 and ind2:
+                        filen = '%s -->' % (filename)
+                        line = ' "%s" ' % (line)
+                        number = '%s:' % (line_num)
+                        error_message = ' Non test file uses test functions'
+                        s = filen + line + number + error_message
+                        python_utils.PRINT(s)
+                        summary_messages.append(s)
+                        failed = True
 
             if failed:
                 summary_message = (
-                    '%s   Function defintion checks failed,'
-                    'see affect files above.' % (_MESSAGE_TYPE_FAILED))
+                    '%s Function defintion checks failed,'
+                    'see affect files above.'
+                    % (linter_utils.MESSAGE_TYPE_FAILED))
             else:
                 summary_message = (
-                    '%s   Function definition checks passed'
-                    % _MESSAGE_TYPE_SUCCESS)
+                    '%s Function definition checks passed'
+                    % (linter_utils.MESSAGE_TYPE_SUCCESS))
 
-        python_utils.PRINT(summary_message)
-        summary_messages.append(summary_message)
+            python_utils.PRINT(summary_message)
+            summary_messages.append(summary_message)
         return summary_messages
 
     def _check_that_all_jobs_are_listed_in_the_job_registry_file(self):
