@@ -1,4 +1,4 @@
-interface CustomHashNodeMap extends NamedNodeMap {
+interface CustomNamedNodeMap extends NamedNodeMap {
   fill: {
     value: string;
   },

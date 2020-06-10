@@ -261,13 +261,13 @@ angular.module('oppia').factory('LiterallyCanvasHelperService', [
         snapshot.colors.primary = lc.colors.primary;
         snapshot.colors.secondary = lc.colors.secondary;
         snapshot.colors.background = (
-          (<CustomHashNodeMap> rect.attributes).fill.value);
+          (<CustomNamedNodeMap> rect.attributes).fill.value);
         snapshot.position = lc.position;
         snapshot.backgroundShapes = lc.backgroundShapes;
         snapshot.imageSize.width = (
-          (<CustomHashNodeMap> rect.attributes).width.value);
+          (<CustomNamedNodeMap> rect.attributes).width.value);
         snapshot.imageSize.height = (
-          (<CustomHashNodeMap> rect.attributes).height.value);
+          (<CustomNamedNodeMap> rect.attributes).height.value);
 
         doc.querySelectorAll('svg > g > *').forEach((node) => {
           snapshot.shapes.push(convertSvgToShapeObject(node));
