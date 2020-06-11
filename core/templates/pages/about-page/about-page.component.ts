@@ -22,11 +22,13 @@ require(
 
 require('domain/utilities/url-interpolation.service.ts');
 
+require('pages/about-page/about-page.constants.ajs.ts');
+
 angular.module('oppia').component('aboutPage', {
   template: require('./about-page.component.html'),
   controller: [
-    'UrlInterpolationService', 'WindowRef',
-    function(UrlInterpolationService, WindowRef) {
+    'CREDITS_CONSTANTS', 'UrlInterpolationService', 'WindowRef',
+    function(CREDITS_CONSTANTS, UrlInterpolationService, WindowRef) {
       const ctrl = this;
       const listOfNamesToThank = [
         'Alex Kauffmann', 'Allison Barros',
@@ -53,6 +55,12 @@ angular.module('oppia').component('aboutPage', {
 
       ctrl.activeTabName = ctrl.TAB_ID_ABOUT;
 
+      ctrl.getCredits = function(startLetter: string) {
+        const results = CREDITS_CONSTANTS.filter(
+          (credit) => credit.startsWith(startLetter)).sort();
+        return results;
+      };
+
       ctrl.onTabClick = function(tabName: string) {
         // Update hash
         WindowRef.nativeWindow.location.hash = '#' + tabName;
@@ -62,6 +70,16 @@ angular.module('oppia').component('aboutPage', {
         return UrlInterpolationService.getStaticImageUrl(imagePath);
       };
       ctrl.$onInit = function() {
+        ctrl.allCredits = [];
+        var alphabetList = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+        for (var i = 0; i < alphabetList.length; i++) {
+          var letter = alphabetList[i];
+          var credits = ctrl.getCredits(letter);
+          if (credits.length > 0) {
+            ctrl.allCredits.push({letter: letter, credits: credits});
+          }
+        }
+
         const hash = WindowRef.nativeWindow.location.hash.slice(1);
         if (hash === 'license') {
           ctrl.activeTabName = ctrl.TAB_ID_FOUNDATION;

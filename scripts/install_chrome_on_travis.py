@@ -39,7 +39,7 @@ def main(args=None):
 
     # CHROME_SOURCE_URL is an environment variable set in Oppia's Travis repo
     # settings. It can be found under 'Environment Variables' header here:
-    # https://travis-ci.org/oppia/oppia/settings.
+    # https://travis-ci.com/oppia/oppia/settings.
     chrome_source_url = os.environ.get('CHROME_SOURCE_URL')
     travis_chrome_path = os.path.join(
         home_directory, '.cache/TravisChrome/',
