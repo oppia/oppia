@@ -19,8 +19,6 @@
 // In case of doubts over what is done here, please look at the description of
 // the PR #9479. https://github.com/oppia/oppia/pull/9479#issue-432536289
 
-import { OppiaAngularRootComponent } from
-  'components/oppia-angular-root.component';
 angular.module('oppia').directive('oppiaRoot', [
   function() {
     return {
@@ -33,51 +31,6 @@ angular.module('oppia').directive('oppiaRoot', [
           $scope.initialized = false;
 
           $scope.onInit = function() {
-            /**
-             * The angular.module('oppia').config(...) is added here to provide
-             * the "angular instance" of service in angularjs using the regular
-             * angularjs DI. We can choose not to have the following config.
-             * But in that case, we would have to keep the upgraded-services.ts
-             * because there is a lot of code dependent on it. Add the moment
-             * this is not executing. Help is needed here!
-             */
-            angular.module('oppia').config(['$provide', function($provide) {
-              /* eslint-disable max-len */
-              var servicesToProvide = [
-                'AlertsService', 'BackgroundMaskService', 'BrowserCheckerService',
-                'CodeReplRulesService', 'CollectionCreationBackendService',
-                'CollectionCreationBackendService',
-                'ContextService', 'CreatorDashboardBackendApiService', 'CsrfTokenService',
-                'DateTimeFormatService', 'DebouncerService', 'DeviceInfoService',
-                'DocumentAttributeCustomizationService',
-                'ExplorationHtmlFormatterService', 'ExplorationObjectFactory',
-                'ExpressionParserService', 'ExtensionTagAssemblerService',
-                'ExtractImageFilenamesFromStateService',
-                'HtmlEscaperService', 'IdGenerationService', 'InteractionObjectFactory',
-                'InteractionRulesRegistryService', 'LanguageUtilService',
-                'LoaderService', 'LocalStorageService', 'LoggerService',
-                'MetaTagCustomizationService', 'NormalizeWhitespacePipe',
-                'NormalizeWhitespacePunctuationAndCasePipe', 'PageTitleService',
-                'PencilCodeEditorRulesService', 'ProfilePageBackendApiService',
-                'RatingComputationService',
-                'SchemaDefaultValueService', 'SchemaUndefinedLastElementService',
-                'SidebarStatusService', 'SiteAnalyticsService', 'SkillObjectFactory',
-                'SolutionObjectFactory', 'StateCardObjectFactory',
-                'StateImprovementSuggestionService', 'StateInteractionStatsService',
-                'StateObjectFactory', 'StatesObjectFactory', 'SuggestionsService',
-                'SuggestionThreadObjectFactory', 'TextInputRulesService',
-                'ThreadMessageObjectFactory', 'ThreadMessageSummaryObjectFactory',
-                'ThreadStatusDisplayService', 'TranslationLanguageService',
-                'UrlInterpolationService', 'UrlService', 'UserInfoObjectFactory',
-                'UtilsService', 'ValidatorsService', 'WindowDimensionsService',
-                'WindowRef'];
-              /* eslint-enable max-len */
-              for (let service of servicesToProvide) {
-                $provide.value(service, OppiaAngularRootComponent[(
-                  service[0].toLowerCase() + service.substring(1))]);
-              }
-            }]);
-
             // The next line allows the transcluded content to start executing.
             $scope.initialized = true;
           };
