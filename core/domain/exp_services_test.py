@@ -4098,8 +4098,8 @@ title: Old Title
             })], 'Changed interaction_solutions.')
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
         self.assertEqual(
-            exploration.init_state.interaction.solution.to_dict(),
-            solution)
+            exploration.init_state.interaction.solution,
+            None)
 
     def test_cannot_update_recorded_voiceovers_with_invalid_type(self):
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)

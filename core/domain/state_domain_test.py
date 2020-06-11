@@ -1349,7 +1349,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             exploration.init_state.interaction.solution.to_dict(), solution)
 
         with self.assertRaisesRegexp(
-            Exception, 'list indices must be integers, not unicode'):
+            Exception, 'Expected solution to be a Solution object,'
+            'recieved test string'):
             exploration.init_state.update_interaction_solution('test string')
 
     def test_update_interaction_solution_with_no_solution(self):
