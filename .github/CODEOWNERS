@@ -255,6 +255,7 @@
 /core/domain/playthrough_issue_registry*.py @brianrodri
 /core/domain/stats*.py @brianrodri
 /core/domain/visualization_registry*.py @brianrodri
+/core/storage/improvements/ @brianrodri
 /core/storage/statistics/ @brianrodri
 /core/templates/components/common-layout-directives/common-elements/confirmation-modal.template.html @brianrodri
 /core/templates/domain/statistics/ @brianrodri
