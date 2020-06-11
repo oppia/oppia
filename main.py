@@ -263,12 +263,10 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/<comma_separated_skill_ids>' % feconf.QUESTIONS_LIST_URL_PREFIX,
         questions_list.QuestionsListHandler),
     get_redirect_route(
-        r'%s/<topic_name>' %
-        feconf.PRACTICE_SESSION_URL_PREFIX,
+        r'%s/<topic_name>' % feconf.PRACTICE_SESSION_URL_PREFIX,
         practice_sessions.PracticeSessionsPage),
     get_redirect_route(
-        r'%s/<topic_name>' %
-        feconf.PRACTICE_SESSION_DATA_URL_PREFIX,
+        r'%s/<topic_name>' % feconf.PRACTICE_SESSION_DATA_URL_PREFIX,
         practice_sessions.PracticeSessionsPageDataHandler),
     get_redirect_route(
         r'%s/<story_id>' % feconf.REVIEW_TEST_DATA_URL_PREFIX,
@@ -764,22 +762,5 @@ for subject in feconf.AVAILABLE_LANDING_PAGES:
 # 404 error handler (Needs to be at the end of the URLS list).
 URLS.append(get_redirect_route(r'/<:.*>', base.Error404Handler))
 
-URLS_TO_SERVE = []
-
-if (feconf.ENABLE_MAINTENANCE_MODE and
-        not current_user_services.is_current_user_super_admin()):
-    # Show only the maintenance mode page.
-    URLS_TO_SERVE = [
-        get_redirect_route(r'%s' % feconf.ADMIN_URL, admin.AdminPage),
-        get_redirect_route(r'/adminhandler', admin.AdminHandler),
-        get_redirect_route(r'/adminrolehandler', admin.AdminRoleHandler),
-        get_redirect_route(r'/adminjoboutput', admin.AdminJobOutputHandler),
-        get_redirect_route(
-            r'/admintopicscsvdownloadhandler',
-            admin.AdminTopicsCsvFileDownloader),
-        get_redirect_route(r'/<:.*>', pages.MaintenancePage)]
-else:
-    URLS_TO_SERVE = URLS
-
 app = transaction_services.toplevel_wrapper(  # pylint: disable=invalid-name
-    webapp2.WSGIApplication(URLS_TO_SERVE, debug=feconf.DEBUG))
+    webapp2.WSGIApplication(URLS, debug=feconf.DEBUG))

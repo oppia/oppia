@@ -338,7 +338,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.publish_exploration(owner_id, '0')
 
         topic = topic_domain.Topic.create_default_topic(
-            topic_id=topic_id, name='topic', abbreviated_name='abbrev')
+            topic_id, 'topic', 'abbrev', 'description')
         topic_services.save_new_topic(owner_id, topic)
 
         story = story_domain.Story.create_default_story(
