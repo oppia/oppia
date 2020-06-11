@@ -19,7 +19,6 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import argparse
-import codecs
 import contextlib
 import json
 import os
@@ -346,12 +345,14 @@ def remove_emojis_from_guppy(guppy_file_path):
         u'utf8chars:{template:"utf8char",values:{banana:{char:"🍌"},pineapple:'
         u'{char:"🍍"},mango:{char:"🥭"},kiwi:{char:"🥝"}}},')
 
-    with codecs.open(guppy_file_path, mode='r', encoding='utf-8') as f:
+    with python_utils.open_file(
+        guppy_file_path, mode='r', encoding='utf-8') as f:
         file_content = f.read()
 
     file_content = file_content.replace(text_to_remove, u'')
 
-    with codecs.open(guppy_file_path, mode='w', encoding='utf-8') as f:
+    with python_utils.open_file(
+        guppy_file_path, mode='w', encoding='utf-8') as f:
         f.write(file_content)
 
 
@@ -361,7 +362,7 @@ def main(args=None):
     download_manifest_files(MANIFEST_FILE_PATH)
 
     guppy_file_path = os.path.join(
-        THIRD_PARTY_STATIC_DIR, 'guppy-f944022', 'build', 'guppy.min.js')
+        THIRD_PARTY_STATIC_DIR, 'guppy-f94402', 'build', 'guppy.min.js')
     remove_emojis_from_guppy(guppy_file_path)
 
 

@@ -347,7 +347,7 @@
         "downloadFormat": "zip",
         "url": "https://github.com/daniel3735928559/guppy/archive/f9440220a73685ea9011c285a4af798f381de53a.zip",
         "rootDirPrefix": "guppy-",
-        "targetDir": "guppy-f944022"
+        "targetDir": "guppy-f94402"
       },
       "headroomJs": {
         "version": "0.9.4",
