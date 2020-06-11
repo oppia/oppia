@@ -18,7 +18,8 @@
 
 /**
  * This file contains a component that "informs" the oppia-root directive that
- * angular has finished loading. This also contains services to be added.
+ * angular has finished loading. This also contains services that are written
+ * in angular but have to be accessed in ajs code.
  *
  * To have a new angular service accesible in ajs do the following:
  *   - import the service here.
@@ -44,8 +45,8 @@
  *       ...
  *     }
  *
- * In case the above explanation was not clear or case of doubts over what is
- * done here, please look at the description of the PR #9479.
+ * In case the above explanation was not clear or in case of doubts over what
+ * is done here, please look at the description of the PR #9479.
  * https://github.com/oppia/oppia/pull/9479#issue-432536289
  * You can also find this example there under the "How does it solve the
  * Interceptor problem?" heading.
