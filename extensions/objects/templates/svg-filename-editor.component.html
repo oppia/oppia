@@ -1,0 +1,73 @@
+<div ng-model="$ctrl.data" ui-validate="'$ctrl.validate()'" class="fs-container">
+  <div ng-if="!$ctrl.isDiagramSaved()"  class="diagram-editor-size-toolbar">
+    Width: <input type="number" ng-model="$ctrl.diagramWidth" ng-blur="$ctrl.onWidthInputBlur()" max="$ctrl.maxDiagramWidth">
+    Height: <input type="number" ng-model="$ctrl.diagramHeight" ng-blur="$ctrl.onHeightInputBlur()" max="$ctrl.maxDiagramHeight">
+    <i class="material-icons"
+       title="<[$ctrl.getDiagramSizeInfo()]>">
+        &#xE887;
+    </i>
+  </div>
+  <div ng-attr-id="<[$ctrl.lcID]>" ng-if="!$ctrl.isDiagramSaved()">
+  </div>
+  <div ng-if="$ctrl.isDiagramSaved()">
+    <div class="diagram-editor-saved-image-container">
+      <i class="material-icons diagram-editor-edit"
+         ng-click="$ctrl.continueDiagramEditing()"
+         title="Continue editing the diagram">
+         &#xE254;
+      </i>
+      <img ng-src="<[$ctrl.data.savedSVGUrl]>" ng-style="$ctrl.svgContainerStyle">
+    </div>
+  </div>
+  <div ng-if="$ctrl.isDiagramCreated()" class="diagram-editor-save-box">
+    <button type="button"
+            class="btn btn-success"
+            ng-click="$ctrl.saveSVGFile()"
+            ng-disabled="$ctrl.isUserDrawing()">
+      Use This Image
+    </button>
+  </div>
+</div>
+
+<style type="text/css">
+  .diagram-editor-edit {
+    color: #000000;
+    position: absolute;
+    right: 6px;
+    text-shadow: 0px 0px 1px #ffffff;
+    top: 6px;
+    cursor: pointer;
+  }
+
+  .diagram-editor-save-box {
+    margin-top: 6px;
+    text-align: right;
+  }
+
+  .diagram-editor-saved-image-container {
+    position: relative;
+    margin: 0 auto;
+    display: inline-block;
+    background-color: #ff0000;
+  }
+
+  .diagram-editor-saved-image-container img {
+    background-color: #ffffff;
+  }
+
+  .diagram-editor-size-toolbar {
+    padding: 4px;
+    text-align: left;
+  }
+
+  .fs-container {
+    width: 100%;
+    margin: auto;
+  }
+
+  .literally {
+    width: 100%;
+    height: 100%;
+    position: relative;
+  }
+</style>

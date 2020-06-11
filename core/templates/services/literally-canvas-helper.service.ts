@@ -21,7 +21,7 @@
 const CONSTANTS = require('constants.ts');
 
 angular.module('oppia').factory('LiterallyCanvasHelperService', [
-  function() {
+  'ImageUploadHelperService', function(ImageUploadHelperService) {
     const getPoints = (x, y, angle, width) => [
       {
         x: x + (Math.cos(angle + Math.PI / 2) * width) / 2,
@@ -58,31 +58,225 @@ angular.module('oppia').factory('LiterallyCanvasHelperService', [
       }
     };
 
-    return {
-      isSVGTagValid: function(svgString) {
-        var domParser = new DOMParser();
-        var doc = domParser.parseFromString(svgString, 'image/svg+xml');
-        var allowedTags = Object.keys(CONSTANTS.SVG_ATTRS_WHITELIST);
-        var nodeTagName = null;
-        var valid = true;
-        doc.querySelectorAll('*').forEach((node) => {
-          nodeTagName = node.tagName.toLowerCase();
-          if (allowedTags.indexOf(nodeTagName) !== -1) {
-            for (var i = 0; i < node.attributes.length; i++) {
-              if (CONSTANTS.SVG_ATTRS_WHITELIST[nodeTagName].indexOf(
-                node.attributes[i].name.toLowerCase()) === -1) {
-                valid = false;
-              }
-            }
-          } else {
-            valid = false;
-          }
-        });
-        if (!valid) {
-          throw new Error('Invalid tag or attribute in svg.');
+    var _isSvgTagValid = function(svgString) {
+      // This function validates an svg tag.
+      var dataURI = 'data:image/svg+xml;base64,' + btoa(svgString);
+      var invalidTagsAndAttr = (
+        ImageUploadHelperService.getInvalidSvgTagsAndAttrs(dataURI));
+      if (invalidTagsAndAttr.tags.length !== 0) {
+        var errorText = (
+          'Invalid tags in svg:' + invalidTagsAndAttr.tags.join());
+        throw new Error(errorText);
+      } else if (invalidTagsAndAttr.attrs.length !== 0) {
+        var errorText = (
+          'Invalid attributes in svg:' + invalidTagsAndAttr.attrs.join());
+        throw new Error(errorText);
+      }
+      return true;
+    };
+
+    var convertSvgToShapeObject = function(node) {
+      // This function converts an svg tag into an object.
+      var id = node.attributes.id.value.split('-');
+      var shape = {
+        className: '',
+        data: {
+          x: null,
+          y: null,
+          x1: null,
+          y1: null,
+          x2: null,
+          y2: null,
+          color: null,
+          width: null,
+          height: null,
+          strokeWidth: null,
+          strokeColor: null,
+          fillColor: null,
+          capString: null,
+          dash: null,
+          endCapShapes: null,
+          order: null,
+          tailSize: null,
+          pointCoordinatePairs: null,
+          smoothedPointCoordinatePairs: null,
+          pointSize: null,
+          pointColor: null,
+          smooth: null,
+          isClosed: null,
+          text: null,
+          font: null,
+          forcedWidth: null,
+          forcedHeight: null
+        },
+        id: ''
+      };
+      if (id[0] === 'ellipse') {
+        shape.className = 'Ellipse';
+        shape.data.x = node.attributes.cx.value - node.attributes.rx.value;
+        shape.data.y = node.attributes.cy.value - node.attributes.ry.value;
+        shape.data.width = 2 * node.attributes.rx.value;
+        shape.data.height = 2 * node.attributes.ry.value;
+        shape.data.strokeWidth = parseInt(
+          node.attributes['stroke-width'].value);
+        shape.data.strokeColor = node.attributes.stroke.value;
+        shape.data.fillColor = node.attributes.fill.value;
+        shape.id = id.slice(1).join('-');
+      } else if (id[0] === 'rectangle') {
+        shape.className = 'Rectangle';
+        var strokeWidth = node.attributes['stroke-width'].value;
+        var shift = strokeWidth % 2 !== 0 ? 0.5 : 0;
+        shape.data.x = node.attributes.x.value - shift;
+        shape.data.y = node.attributes.y.value - shift;
+        shape.data.width = parseInt(node.attributes.width.value);
+        shape.data.height = parseInt(node.attributes.height.value);
+        shape.data.strokeWidth = parseInt(strokeWidth);
+        shape.data.strokeColor = node.attributes.stroke.value;
+        shape.data.fillColor = node.attributes.fill.value;
+        shape.id = id.slice(1).join('-');
+      } else if (id[0] === 'line') {
+        shape.className = 'Line';
+        var innerTags = node.querySelectorAll('*');
+        var lineTag = innerTags[0];
+        var strokeWidth = lineTag.attributes['stroke-width'].value;
+        var shift = strokeWidth % 2 !== 0 ? 0.5 : 0;
+        shape.data.x1 = lineTag.attributes.x1.value - shift;
+        shape.data.y1 = lineTag.attributes.y1.value - shift;
+        shape.data.x2 = lineTag.attributes.x2.value - shift;
+        shape.data.y2 = lineTag.attributes.y2.value - shift;
+        shape.data.strokeWidth = parseInt(strokeWidth);
+        shape.data.color = lineTag.attributes.stroke.value;
+        shape.data.capString = lineTag.attributes['stroke-linecap'].value;
+        shape.data.dash = null;
+        shape.id = id.slice(1).join('-');
+        if (lineTag.attributes['stroke-dasharray'] !== undefined) {
+          var dash = lineTag.attributes['stroke-dasharray'].value;
+          shape.data.dash = dash.split(', ').map(a => parseInt(a));
         }
-        return valid;
+        shape.data.endCapShapes = [null, null];
+        if (innerTags.length > 1) {
+          for (var i = 1; i < innerTags.length; i++) {
+            var position = innerTags[i].attributes.id.value.slice(-1);
+            var endCapShapeIndex = (position === '0') ? 0 : 1;
+            shape.data.endCapShapes[endCapShapeIndex] = 'arrow';
+          }
+        }
+      } else if (id[0] === 'linepath') {
+        shape.className = 'LinePath';
+        shape.data.order = 3;
+        shape.data.tailSize = 3;
+        shape.data.smooth = true;
+        var smoothedPoints = node.attributes.points.value.split(' ').map(
+          a => a.split(',').map(b => parseFloat(b)));
+        var points = [];
+        for (var i = 0; i < smoothedPoints.length; i += 8) {
+          points.push(smoothedPoints[i]);
+        }
+        shape.data.pointCoordinatePairs = points;
+        shape.data.smoothedPointCoordinatePairs = smoothedPoints;
+        shape.data.pointSize = parseInt(node.attributes['stroke-width'].value);
+        shape.data.pointColor = node.attributes.stroke.value;
+        shape.id = id.slice(1).join('-');
+      } else if (id[0] === 'polygon') {
+        shape.className = 'Polygon';
+        if (id[1] === 'closed') {
+          var strokeWidth = node.attributes['stroke-width'].value;
+          shape.data.strokeWidth = parseInt(strokeWidth);
+          shape.data.fillColor = node.attributes.fill.value;
+          shape.data.strokeColor = node.attributes.stroke.value;
+          shape.data.dash = null;
+          if (node.attributes['stroke-dasharray'] !== undefined) {
+            var dash = node.attributes['stroke-dasharray'].value;
+            shape.data.dash = dash.split(', ').map(a => parseInt(a));
+          }
+          shape.data.isClosed = true;
+          var shift = strokeWidth % 2 !== 0 ? 0.5 : 0;
+          shape.data.pointCoordinatePairs = (
+            node.attributes.points.value.split(' ').map(
+              a => a.split(',').map(b => parseFloat(b) - shift)));
+        } else {
+          var innerPolygon = node.querySelectorAll('*')[0];
+          var outerPolygon = node.querySelectorAll('*')[1];
+          var strokeWidth = outerPolygon.attributes['stroke-width'].value;
+          var strokeDash = outerPolygon.attributes['stroke-dasharray'];
+          shape.data.strokeWidth = parseInt(strokeWidth);
+          shape.data.fillColor = innerPolygon.attributes.fill.value;
+          shape.data.strokeColor = outerPolygon.attributes.stroke.value;
+          shape.data.dash = null;
+          if (strokeDash !== undefined) {
+            shape.data.dash = strokeDash.value.split(', ').map(
+              a => parseInt(a));
+          }
+          shape.data.isClosed = false;
+          var shift = strokeWidth % 2 !== 0 ? 0.5 : 0;
+          shape.data.pointCoordinatePairs = (
+            innerPolygon.attributes.points.value.split(' ').map(
+              a => a.split(',').map(b => parseFloat(b) - shift)));
+        }
+        shape.id = id.slice(2).join('-');
+      } else if (id[0] === 'text') {
+        shape.className = 'Text';
+        shape.data.x = parseFloat(node.attributes.x.value);
+        shape.data.y = parseFloat(node.attributes.y.value);
+        var text = '';
+        node.querySelectorAll('*').forEach(a=>{
+          text += a.textContent + '\n';
+        });
+        shape.data.text = text.slice(0, -1);
+        shape.data.color = node.attributes.fill.value;
+        shape.data.font = node.attributes.style.value.slice(6, -1);
+        shape.data.forcedWidth = (
+          node.attributes.width !== undefined ? (
+            parseFloat(node.attributes.width.value)) : 0);
+        shape.data.forcedHeight = (
+          node.attributes.height !== undefined ? (
+            parseFloat(node.attributes.height.value)) : 0);
+        shape.id = id.slice(1).join('-');
+      }
+      return shape;
+    };
+
+    return {
+      parseSvg: function(svgString, lc) {
+        // This function is used to convert an svg to a snapshot object which
+        // is used by literallyCanvas to load the svg into canvas.
+        var domParser = new DOMParser();
+        var doc = domParser.parseFromString(svgString, 'text/xml');
+        var snapshot = {
+          colors: {
+            primary: '',
+            secondary: '',
+            background: ''
+          },
+          position: '',
+          scale: 1,
+          shapes: [],
+          backgroundShapes: [],
+          imageSize: {
+            width: '',
+            height: ''
+          }
+        };
+        var rect = doc.querySelector('svg > rect');
+        snapshot.colors.primary = lc.colors.primary;
+        snapshot.colors.secondary = lc.colors.secondary;
+        snapshot.colors.background = (
+          (<CustomNamedNodeMap> rect.attributes).fill.value);
+        snapshot.position = lc.position;
+        snapshot.backgroundShapes = lc.backgroundShapes;
+        snapshot.imageSize.width = (
+          (<CustomNamedNodeMap> rect.attributes).width.value);
+        snapshot.imageSize.height = (
+          (<CustomNamedNodeMap> rect.attributes).height.value);
+
+        doc.querySelectorAll('svg > g > *').forEach((node) => {
+          snapshot.shapes.push(convertSvgToShapeObject(node));
+        });
+        return snapshot;
       },
+
+      isSvgTagValid: _isSvgTagValid,
+
       rectangleSVGRenderer: function(shape) {
         // This function converts a rectangle shape object to the rect tag.
         var height, width, x, x1, x2, y, y1, y2, id;
@@ -114,7 +308,7 @@ angular.module('oppia').factory('LiterallyCanvasHelperService', [
         }
         rect.setAttribute('stroke-width', shape.strokeWidth);
         var rectTag = rect.outerHTML;
-        if (this.isSVGTagValid(rectTag)) {
+        if (_isSvgTagValid(rectTag)) {
           return rectTag;
         }
       },
@@ -142,7 +336,7 @@ angular.module('oppia').factory('LiterallyCanvasHelperService', [
         }
         ellipse.setAttribute('stroke-width', shape.strokeWidth);
         var ellipseTag = ellipse.outerHTML;
-        if (this.isSVGTagValid(ellipseTag)) {
+        if (_isSvgTagValid(ellipseTag)) {
           return ellipseTag;
         }
       },
@@ -195,7 +389,7 @@ angular.module('oppia').factory('LiterallyCanvasHelperService', [
               arrowWidth, shape.color, 'position1'));
         }
         var gTag = g.outerHTML;
-        if (this.isSVGTagValid(gTag)) {
+        if (_isSvgTagValid(gTag)) {
           return gTag;
         }
       },
@@ -221,7 +415,7 @@ angular.module('oppia').factory('LiterallyCanvasHelperService', [
         linepath.setAttribute('stroke-linecap', 'round');
         linepath.setAttribute('stroke-width', shape.points[0].size);
         var linepathTag = linepath.outerHTML;
-        if (this.isSVGTagValid(linepathTag)) {
+        if (_isSvgTagValid(linepathTag)) {
           return linepathTag;
         }
       },
@@ -247,7 +441,7 @@ angular.module('oppia').factory('LiterallyCanvasHelperService', [
           }
           polygon.setAttribute('stroke-width', shape.strokeWidth);
           var polygonTag = polygon.outerHTML;
-          if (this.isSVGTagValid(polygonTag)) {
+          if (_isSvgTagValid(polygonTag)) {
             return polygonTag;
           }
         } else {
@@ -281,7 +475,7 @@ angular.module('oppia').factory('LiterallyCanvasHelperService', [
           g.appendChild(polyline1);
           g.appendChild(polyline2);
           var gTag = g.outerHTML;
-          if (this.isSVGTagValid(gTag)) {
+          if (_isSvgTagValid(gTag)) {
             return gTag;
           }
         }
@@ -316,7 +510,7 @@ angular.module('oppia').factory('LiterallyCanvasHelperService', [
           text.appendChild(tspan);
         }
         var textTag = text.outerHTML;
-        if (this.isSVGTagValid(textTag)) {
+        if (_isSvgTagValid(textTag)) {
           return textTag;
         }
       }

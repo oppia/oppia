@@ -143,9 +143,9 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
                 component_id)
             self.assertTrue(self._is_camel_cased(component_id))
 
-            # TODO(#9356): Remove this if condition once the Svgeditor
+            # TODO(#9356): Remove this if condition once the Svgdiagram
             # directive is created in the second part of 1st milestone.
-            if component_id == 'Svgeditor':
+            if component_id == 'Svgdiagram':
                 continue
 
             # Check that the component directory exists.
@@ -203,17 +203,17 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
 
         rtc_ts_filenames = []
         for component_id in feconf.ALLOWED_RTE_EXTENSIONS:
-            # TODO(#9356): Remove this if condition once the Svgeditor
-            # directive is created in the second part of 1st milestone.
-            if component_id == 'Svgeditor':
-                continue
             component_dir = os.path.join(
                 feconf.RTE_EXTENSIONS_DIR, component_id)
             directives_dir = os.path.join(component_dir, 'directives')
             directive_filenames = os.listdir(directives_dir)
+            # When reading for all the .ts files in the directives directory,
+            # the .spec.ts files should not be included.
             rtc_ts_filenames.extend(
                 filename for filename
-                in directive_filenames if filename.endswith('.ts'))
+                in directive_filenames if (
+                    filename.endswith('.ts') and
+                    not filename.endswith('.spec.ts')))
 
         rtc_ts_file = os.path.join(
             feconf.RTE_EXTENSIONS_DIR, 'richTextComponentsRequires.ts')

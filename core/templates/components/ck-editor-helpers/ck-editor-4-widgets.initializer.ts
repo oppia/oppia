@@ -30,9 +30,9 @@ angular.module('oppia').run([
       HtmlEscaperService, ContextService, ENABLE_LITERALLY_CANVAS_EDITOR) {
     var _RICH_TEXT_COMPONENTS = RteHelperService.getRichTextComponents();
     _RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
-      // TODO(#9358): Remove the if condition once the svgeditor is
+      // TODO(#9358): Remove the if condition once the svgdiagram is
       // available for the users.
-      if (componentDefn.id === 'svgeditor') {
+      if (componentDefn.id === 'svgdiagram') {
         if (!ENABLE_LITERALLY_CANVAS_EDITOR) {
           return;
         }
