@@ -451,11 +451,13 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
         improvements_models.TaskEntryModel(
             id=self.GENERIC_MODEL_ID,
             composite_entity_id=self.GENERIC_MODEL_ID,
-            entity_type=improvements_models.TEST_ONLY_ENTITY_TYPE,
+            entity_type=improvements_models.ENTITY_TYPE_EXPLORATION,
             entity_id=self.GENERIC_MODEL_ID,
             entity_version=1,
-            task_type=improvements_models.TEST_ONLY_TASK_TYPE,
-            status='open',
+            task_type=improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
+            target_type=improvements_models.TARGET_TYPE_STATE,
+            target_id=self.GENERIC_MODEL_ID,
+            status=improvements_models.STATUS_OPEN,
             closed_by=self.USER_ID_1
         ).put()
 

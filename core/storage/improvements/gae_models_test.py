@@ -21,7 +21,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.platform import models
 from core.tests import test_utils
-import feconf
 
 base_models, improvements_models = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.improvements])
@@ -47,19 +46,18 @@ class TaskEntryModelTests(test_utils.GenericTestBase):
 
     def test_has_reference_to_user_id(self):
         improvements_models.TaskEntryModel.create(
-            entity_type=feconf.ENTITY_TYPE_EXPLORATION,
-            entity_id='expid',
-            entity_version=1,
-            task_type=feconf.TASK_TYPE_HIGH_BOUNCE_RATE,
-            status='open',
-            closed_by='user_id')
-
+            improvements_models.ENTITY_TYPE_EXPLORATION,
+            'eid',
+            1,
+            improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
+            improvements_models.TARGET_TYPE_STATE,
+            'state name',
+            improvements_models.STATUS_RESOLVED,
+            'uid')
         self.assertTrue(
-            improvements_models.TaskEntryModel.has_reference_to_user_id(
-                'user_id'))
+            improvements_models.TaskEntryModel.has_reference_to_user_id('uid'))
         self.assertFalse(
-            improvements_models.TaskEntryModel.has_reference_to_user_id(
-                'x_id'))
+            improvements_models.TaskEntryModel.has_reference_to_user_id('xid'))
 
     def test_get_deletion_policy(self):
         self.assertEqual(
@@ -68,22 +66,20 @@ class TaskEntryModelTests(test_utils.GenericTestBase):
 
     def test_apply_deletion_policy(self):
         improvements_models.TaskEntryModel.create(
-            entity_type=feconf.ENTITY_TYPE_EXPLORATION,
-            entity_id='expid',
-            entity_version=1,
-            task_type=feconf.TASK_TYPE_HIGH_BOUNCE_RATE,
-            status='open',
-            closed_by='user_id')
-
+            improvements_models.ENTITY_TYPE_EXPLORATION,
+            'eid',
+            1,
+            improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
+            improvements_models.TARGET_TYPE_STATE,
+            'state name',
+            status=improvements_models.STATUS_OPEN,
+            closed_by='uid')
         self.assertTrue(
-            improvements_models.TaskEntryModel.has_reference_to_user_id(
-                'user_id'))
+            improvements_models.TaskEntryModel.has_reference_to_user_id('uid'))
 
-        improvements_models.TaskEntryModel.apply_deletion_policy('user_id')
-
+        improvements_models.TaskEntryModel.apply_deletion_policy('uid')
         self.assertFalse(
-            improvements_models.TaskEntryModel.has_reference_to_user_id(
-                'user_id'))
+            improvements_models.TaskEntryModel.has_reference_to_user_id('uid'))
 
     def test_get_export_policy(self):
         self.assertEqual(
@@ -92,118 +88,99 @@ class TaskEntryModelTests(test_utils.GenericTestBase):
 
     def test_export_data_without_any_tasks(self):
         self.assertEqual(
-            improvements_models.TaskEntryModel.export_data('user_id'),
+            improvements_models.TaskEntryModel.export_data('uid'),
             {'task_ids_closed_by_user': []})
 
     def test_export_data_with_task(self):
-        task_id = improvements_models.TaskEntryModel.generate_task_id(
-            entity_type=feconf.ENTITY_TYPE_EXPLORATION,
-            entity_id='expid',
-            entity_version=1,
-            task_type=feconf.TASK_TYPE_HIGH_BOUNCE_RATE)
-        improvements_models.TaskEntryModel.create(
-            entity_type=feconf.ENTITY_TYPE_EXPLORATION,
-            entity_id='expid',
-            entity_version=1,
-            task_type=feconf.TASK_TYPE_HIGH_BOUNCE_RATE,
-            status='open',
-            closed_by='user_id')
-
+        task_id = improvements_models.TaskEntryModel.create(
+            improvements_models.ENTITY_TYPE_EXPLORATION,
+            'eid',
+            1,
+            improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
+            improvements_models.TARGET_TYPE_STATE,
+            'state name',
+            status=improvements_models.STATUS_RESOLVED,
+            closed_by='uid')
         self.assertEqual(
-            improvements_models.TaskEntryModel.export_data('user_id'),
+            improvements_models.TaskEntryModel.export_data('uid'),
             {'task_ids_closed_by_user': [task_id]})
 
     def test_generate_new_task_id(self):
-        entity_type, entity_id, entity_version = (
-            'TEST_ONLY_ENTITY_TYPE', 'entity_id', 1)
-        task_type = 'TEST_ONLY_TASK_TYPE'
-        target_type, target_id = 'TEST_ONLY_TARGET_TYPE', 'target_id'
         self.assertEqual(
             improvements_models.TaskEntryModel.generate_task_id(
-                entity_type, entity_id, entity_version, task_type, target_type,
-                target_id),
-            'TEST_ONLY_ENTITY_TYPE.entity_id.1.TEST_ONLY_TASK_TYPE.'
-            'TEST_ONLY_TARGET_TYPE.target_id')
-
-    def test_generate_new_task_id_with_empty_target(self):
-        entity_type, entity_id, entity_version = (
-            'TEST_ONLY_ENTITY_TYPE', 'entity_id', 1)
-        task_type = 'TEST_ONLY_TASK_TYPE'
-        self.assertEqual(
-            improvements_models.TaskEntryModel.generate_task_id(
-                entity_type, entity_id, entity_version, task_type, None, None),
-            'TEST_ONLY_ENTITY_TYPE.entity_id.1.TEST_ONLY_TASK_TYPE..')
+                improvements_models.ENTITY_TYPE_EXPLORATION,
+                'eid',
+                1,
+                improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
+                improvements_models.TARGET_TYPE_STATE,
+                'tid'),
+            'exploration.eid.1.high_bounce_rate.state.tid')
 
     def test_can_create_task_with_unicode_identifiers(self):
-        entity_type, entity_id, entity_version = (
-            'TEST_ONLY_ENTITY_TYPE', 'entity_id_\U0001F4C8', 1)
-        task_type = 'TEST_ONLY_TASK_TYPE'
-        target_type, target_id = 'TEST_ONLY_TARGET_TYPE', 'target_id_\U0001F4C8'
-
         improvements_models.TaskEntryModel.create(
-            entity_type=entity_type,
-            entity_id=entity_id,
-            entity_version=entity_version,
-            task_type=task_type,
-            target_type=target_type,
-            target_id=target_id)
+            improvements_models.ENTITY_TYPE_EXPLORATION,
+            'eid_\U0001F4C8',
+            1,
+            improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
+            improvements_models.TARGET_TYPE_STATE,
+            'tid_\U0001F4C8')
 
     def test_can_create_new_high_bounce_rate_task(self):
         improvements_models.TaskEntryModel.create(
-            entity_type=feconf.ENTITY_TYPE_EXPLORATION,
-            entity_id='expid',
-            entity_version=1,
-            task_type=feconf.TASK_TYPE_HIGH_BOUNCE_RATE,
-            target_type='state',
-            target_id='Introduction',
-            status='open')
+            improvements_models.ENTITY_TYPE_EXPLORATION,
+            'eid',
+            1,
+            improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
+            improvements_models.TARGET_TYPE_STATE,
+            'Introduction',
+            status=improvements_models.STATUS_OPEN)
 
     def test_can_create_new_successive_incorrect_answers_task(self):
         improvements_models.TaskEntryModel.create(
-            entity_type=feconf.ENTITY_TYPE_EXPLORATION,
-            entity_id='expid',
-            entity_version=1,
-            task_type=feconf.TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS,
-            target_type='state',
-            target_id='Introduction',
-            status='open')
+            improvements_models.ENTITY_TYPE_EXPLORATION,
+            'eid',
+            1,
+            improvements_models.TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS,
+            improvements_models.TARGET_TYPE_STATE,
+            'Introduction',
+            status=improvements_models.STATUS_OPEN)
 
     def test_can_create_new_needs_guiding_responses_task(self):
         improvements_models.TaskEntryModel.create(
-            entity_type=feconf.ENTITY_TYPE_EXPLORATION,
-            entity_id='expid',
-            entity_version=1,
-            task_type=feconf.TASK_TYPE_NEEDS_GUIDING_RESPONSES,
-            target_type='state',
-            target_id='Introduction',
-            status='open')
+            improvements_models.ENTITY_TYPE_EXPLORATION,
+            'eid',
+            1,
+            improvements_models.TASK_TYPE_NEEDS_GUIDING_RESPONSES,
+            improvements_models.TARGET_TYPE_STATE,
+            'Introduction',
+            status=improvements_models.STATUS_OPEN)
 
     def test_can_create_new_ineffective_feedback_loop_task(self):
         improvements_models.TaskEntryModel.create(
-            entity_type=feconf.ENTITY_TYPE_EXPLORATION,
-            entity_id='expid',
-            entity_version=1,
-            task_type=feconf.TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP,
-            target_type='state',
-            target_id='Introduction',
-            status='open')
+            improvements_models.ENTITY_TYPE_EXPLORATION,
+            'eid',
+            1,
+            improvements_models.TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP,
+            improvements_models.TARGET_TYPE_STATE,
+            'Introduction',
+            status=improvements_models.STATUS_OPEN)
 
     def test_can_not_create_duplicate_tasks(self):
         improvements_models.TaskEntryModel.create(
-            entity_type=feconf.ENTITY_TYPE_EXPLORATION,
-            entity_id='expid',
-            entity_version=1,
-            task_type=feconf.TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP,
-            target_type='state',
-            target_id='Introduction',
-            status='open')
+            improvements_models.ENTITY_TYPE_EXPLORATION,
+            'eid',
+            1,
+            improvements_models.TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP,
+            improvements_models.TARGET_TYPE_STATE,
+            'Introduction',
+            status=improvements_models.STATUS_OPEN)
 
         with self.assertRaisesRegexp(Exception, 'Task id .* already exists'):
             improvements_models.TaskEntryModel.create(
-                entity_type=feconf.ENTITY_TYPE_EXPLORATION,
-                entity_id='expid',
-                entity_version=1,
-                task_type=feconf.TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP,
-                target_type='state',
-                target_id='Introduction',
-                status='open')
+                improvements_models.ENTITY_TYPE_EXPLORATION,
+                'eid',
+                1,
+                improvements_models.TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP,
+                improvements_models.TARGET_TYPE_STATE,
+                'Introduction',
+                status=improvements_models.STATUS_OPEN)

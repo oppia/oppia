@@ -14822,18 +14822,8 @@ class TaskEntryModelValidatorTests(test_utils.GenericTestBase):
             'exp_id',
             1,
             improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
-            target_type=improvements_models.TARGET_TYPE_STATE,
-            target_id=feconf.DEFAULT_INIT_STATE_NAME)
-        self.run_job_and_check_output(['fully-validated TaskEntryModel', 1])
-
-    def test_valid_edge_cases(self):
-        improvements_models.TaskEntryModel.create(
-            improvements_models.TEST_ONLY_ENTITY_TYPE,
-            'entity_id',
-            1,
-            improvements_models.TEST_ONLY_TASK_TYPE,
-            target_type=improvements_models.TEST_ONLY_TARGET_TYPE,
-            target_id='target_id')
+            improvements_models.TARGET_TYPE_STATE,
+            feconf.DEFAULT_INIT_STATE_NAME)
         self.run_job_and_check_output(['fully-validated TaskEntryModel', 1])
 
     def test_invalid_entity_id(self):
@@ -14842,14 +14832,32 @@ class TaskEntryModelValidatorTests(test_utils.GenericTestBase):
             'invalid_exp_id',
             1,
             improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
-            target_type=improvements_models.TARGET_TYPE_STATE,
-            target_id=feconf.DEFAULT_INIT_STATE_NAME)
+            improvements_models.TARGET_TYPE_STATE,
+            feconf.DEFAULT_INIT_STATE_NAME)
         self.run_job_and_check_output(
             ['failed validation check for entity_ids field check of '
              'TaskEntryModel',
              ['Entity id %s: based on field entity_ids having value '
               'invalid_exp_id, expect model ExplorationModel with id '
-              'invalid_exp_id but it doesn\'t exist' % (task_id,)]])
+              'invalid_exp_id but it doesn\'t exist' % (task_id,)]],
+            ['failed validation check for target_id field check of '
+             'TaskEntryModel',
+             ['Entity id %s: exploration with id "invalid_exp_id" does not '
+              'exist at version 1' % (task_id,)]])
+
+    def test_invalid_entity_version(self):
+        task_id = improvements_models.TaskEntryModel.create(
+            improvements_models.ENTITY_TYPE_EXPLORATION,
+            'exp_id',
+            2,
+            improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
+            improvements_models.TARGET_TYPE_STATE,
+            feconf.DEFAULT_INIT_STATE_NAME)
+        self.run_job_and_check_output(
+            ['failed validation check for target_id field check of '
+             'TaskEntryModel',
+             ['Entity id %s: exploration with id "exp_id" does not exist at '
+              'version 2' % (task_id,)]])
 
     def test_invalid_closed_by_ids(self):
         task_id = improvements_models.TaskEntryModel.create(
@@ -14857,8 +14865,8 @@ class TaskEntryModelValidatorTests(test_utils.GenericTestBase):
             'exp_id',
             1,
             improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
-            target_type=improvements_models.TARGET_TYPE_STATE,
-            target_id=feconf.DEFAULT_INIT_STATE_NAME,
+            improvements_models.TARGET_TYPE_STATE,
+            feconf.DEFAULT_INIT_STATE_NAME,
             status=improvements_models.STATUS_RESOLVED,
             closed_by='invalid_user_id',
             closed_on=CURRENT_DATETIME)
@@ -14886,12 +14894,12 @@ class TaskEntryModelValidatorTests(test_utils.GenericTestBase):
 
     def test_invalid_composite_entity_id(self):
         task_id = improvements_models.TaskEntryModel.generate_task_id(
-            entity_type=improvements_models.ENTITY_TYPE_EXPLORATION,
-            entity_id='exp_id',
-            entity_version=1,
-            task_type=improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
-            target_type=improvements_models.TARGET_TYPE_STATE,
-            target_id=feconf.DEFAULT_INIT_STATE_NAME)
+            improvements_models.ENTITY_TYPE_EXPLORATION,
+            'exp_id',
+            1,
+            improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
+            improvements_models.TARGET_TYPE_STATE,
+            feconf.DEFAULT_INIT_STATE_NAME)
         improvements_models.TaskEntryModel(
             id=task_id,
             composite_entity_id='bad_composite_id',
@@ -14903,9 +14911,10 @@ class TaskEntryModelValidatorTests(test_utils.GenericTestBase):
             target_id=feconf.DEFAULT_INIT_STATE_NAME,
             status=improvements_models.STATUS_OPEN).put()
         self.run_job_and_check_output(
-            ['failed validation check for composite entity id check of '
+            ['failed validation check for composite_entity_id field check of '
              'TaskEntryModel',
-             ['Task id %s: Composite entity id does not match regex pattern' % (
+             ['Entity id %s: composite_entity_id "bad_composite_id" should be '
+              '"exploration.exp_id.1"' % (
                  task_id,)]])
 
     def test_status_open_but_closed_by_is_set(self):
@@ -14914,13 +14923,13 @@ class TaskEntryModelValidatorTests(test_utils.GenericTestBase):
             'exp_id',
             1,
             improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
-            target_type=improvements_models.TARGET_TYPE_STATE,
-            target_id=feconf.DEFAULT_INIT_STATE_NAME,
+            improvements_models.TARGET_TYPE_STATE,
+            feconf.DEFAULT_INIT_STATE_NAME,
             status=improvements_models.STATUS_OPEN,
             closed_by=self.user_id)
         self.run_job_and_check_output(
-            ['failed validation check for status check of TaskEntryModel',
-             ['Task id %s: Status is open but closed_by is "%s", should be '
+            ['failed validation check for status field check of TaskEntryModel',
+             ['Entity id %s: status is open but closed_by is "%s", should be '
               'empty.' % (task_id, self.user_id)]])
 
     def test_status_open_but_closed_on_is_set(self):
@@ -14929,13 +14938,13 @@ class TaskEntryModelValidatorTests(test_utils.GenericTestBase):
             'exp_id',
             1,
             improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
-            target_type=improvements_models.TARGET_TYPE_STATE,
-            target_id=feconf.DEFAULT_INIT_STATE_NAME,
+            improvements_models.TARGET_TYPE_STATE,
+            feconf.DEFAULT_INIT_STATE_NAME,
             status=improvements_models.STATUS_OPEN,
             closed_on=CURRENT_DATETIME)
         self.run_job_and_check_output(
-            ['failed validation check for status check of TaskEntryModel',
-             ['Task id %s: Status is open but closed_on is "%s", should be '
+            ['failed validation check for status field check of TaskEntryModel',
+             ['Entity id %s: status is open but closed_on is "%s", should be '
               'empty.' % (task_id, CURRENT_DATETIME)]])
 
     def test_status_resolved_but_closed_by_is_not_set(self):
@@ -14944,14 +14953,14 @@ class TaskEntryModelValidatorTests(test_utils.GenericTestBase):
             'exp_id',
             1,
             improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
-            target_type=improvements_models.TARGET_TYPE_STATE,
-            target_id=feconf.DEFAULT_INIT_STATE_NAME,
+            improvements_models.TARGET_TYPE_STATE,
+            feconf.DEFAULT_INIT_STATE_NAME,
             status=improvements_models.STATUS_RESOLVED,
             closed_by=None,
             closed_on=CURRENT_DATETIME)
         self.run_job_and_check_output(
-            ['failed validation check for status check of TaskEntryModel',
-             ['Task id %s: Status is resolved but closed_by is not set' % (
+            ['failed validation check for status field check of TaskEntryModel',
+             ['Entity id %s: status is resolved but closed_by is not set' % (
                  task_id,)]])
 
     def test_status_resolved_but_closed_on_is_not_set(self):
@@ -14960,174 +14969,15 @@ class TaskEntryModelValidatorTests(test_utils.GenericTestBase):
             'exp_id',
             1,
             improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
-            target_type=improvements_models.TARGET_TYPE_STATE,
-            target_id=feconf.DEFAULT_INIT_STATE_NAME,
+            improvements_models.TARGET_TYPE_STATE,
+            feconf.DEFAULT_INIT_STATE_NAME,
             status=improvements_models.STATUS_RESOLVED,
             closed_by=self.user_id,
             closed_on=None)
         self.run_job_and_check_output(
-            ['failed validation check for status check of TaskEntryModel',
-             ['Task id %s: Status is resolved but closed_on is not set' % (
+            ['failed validation check for status field check of TaskEntryModel',
+             ['Entity id %s: status is resolved but closed_on is not set' % (
                  task_id,)]])
-
-    def test_invalid_entity_type_for_exploration_task_types(self):
-        hbr_task_id = improvements_models.TaskEntryModel.create(
-            improvements_models.TEST_ONLY_ENTITY_TYPE,
-            'entity_id',
-            1,
-            improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
-            target_type=improvements_models.TARGET_TYPE_STATE,
-            target_id=feconf.DEFAULT_INIT_STATE_NAME)
-        ifl_task_id = improvements_models.TaskEntryModel.create(
-            improvements_models.TEST_ONLY_ENTITY_TYPE,
-            'entity_id',
-            1,
-            improvements_models.TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP,
-            target_type=improvements_models.TARGET_TYPE_STATE,
-            target_id=feconf.DEFAULT_INIT_STATE_NAME)
-        ngr_task_id = improvements_models.TaskEntryModel.create(
-            improvements_models.TEST_ONLY_ENTITY_TYPE,
-            'entity_id',
-            1,
-            improvements_models.TASK_TYPE_NEEDS_GUIDING_RESPONSES,
-            target_type=improvements_models.TARGET_TYPE_STATE,
-            target_id=feconf.DEFAULT_INIT_STATE_NAME)
-        sia_task_id = improvements_models.TaskEntryModel.create(
-            improvements_models.TEST_ONLY_ENTITY_TYPE,
-            'entity_id',
-            1,
-            improvements_models.TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS,
-            target_type=improvements_models.TARGET_TYPE_STATE,
-            target_id=feconf.DEFAULT_INIT_STATE_NAME)
-
-        output = self.run_job_and_get_output()
-        self.assertEqual(len(output), 1)
-        error_key, error_messages = output[0]
-
-        self.assertEqual(
-            error_key,
-            'failed validation check for task type check of TaskEntryModel')
-        self.assertItemsEqual(
-            error_messages, [
-                'Task id %s: Task type high_bounce_rate is not supported for '
-                'TEST_ONLY_ENTITY_TYPE entities' % (
-                    hbr_task_id,),
-                'Task id %s: Task type ineffective_feedback_loop is not '
-                'supported for TEST_ONLY_ENTITY_TYPE entities' % (
-                    ifl_task_id,),
-                'Task id %s: Task type needs_guiding_responses is not '
-                'supported for TEST_ONLY_ENTITY_TYPE entities' % (
-                    ngr_task_id,),
-                'Task id %s: Task type successive_incorrect_answers is not '
-                'supported for TEST_ONLY_ENTITY_TYPE entities' % (
-                    sia_task_id,)
-            ])
-
-    def test_invalid_target_type_for_exploration_task_types(self):
-        hbr_task_id = improvements_models.TaskEntryModel.create(
-            improvements_models.ENTITY_TYPE_EXPLORATION,
-            'exp_id',
-            1,
-            improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
-            target_type=improvements_models.TEST_ONLY_TARGET_TYPE,
-            target_id='target_id')
-        ifl_task_id = improvements_models.TaskEntryModel.create(
-            improvements_models.ENTITY_TYPE_EXPLORATION,
-            'exp_id',
-            1,
-            improvements_models.TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP,
-            target_type=improvements_models.TEST_ONLY_TARGET_TYPE,
-            target_id='target_id')
-        ngr_task_id = improvements_models.TaskEntryModel.create(
-            improvements_models.ENTITY_TYPE_EXPLORATION,
-            'exp_id',
-            1,
-            improvements_models.TASK_TYPE_NEEDS_GUIDING_RESPONSES,
-            target_type=improvements_models.TEST_ONLY_TARGET_TYPE,
-            target_id='target_id')
-        sia_task_id = improvements_models.TaskEntryModel.create(
-            improvements_models.ENTITY_TYPE_EXPLORATION,
-            'exp_id',
-            1,
-            improvements_models.TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS,
-            target_type=improvements_models.TEST_ONLY_TARGET_TYPE,
-            target_id='target_id')
-
-        output = self.run_job_and_get_output()
-        self.assertEqual(len(output), 1)
-        error_key, error_messages = output[0]
-
-        self.assertEqual(
-            error_key,
-            'failed validation check for task type check of TaskEntryModel')
-        self.assertItemsEqual(
-            error_messages, [
-                'Task id %s: Task type high_bounce_rate is not supported for '
-                'TEST_ONLY_TARGET_TYPE targets' % (
-                    hbr_task_id,),
-                'Task id %s: Task type ineffective_feedback_loop is not '
-                'supported for TEST_ONLY_TARGET_TYPE targets' % (
-                    ifl_task_id,),
-                'Task id %s: Task type needs_guiding_responses is not '
-                'supported for TEST_ONLY_TARGET_TYPE targets' % (
-                    ngr_task_id,),
-                'Task id %s: Task type successive_incorrect_answers is not '
-                'supported for TEST_ONLY_TARGET_TYPE targets' % (
-                    sia_task_id,)
-            ])
-
-    def test_missing_target_id_for_exploration_task_types(self):
-        hbr_task_id = improvements_models.TaskEntryModel.create(
-            improvements_models.ENTITY_TYPE_EXPLORATION,
-            'exp_id',
-            1,
-            improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
-            target_type=improvements_models.TARGET_TYPE_STATE,
-            target_id=None)
-        ifl_task_id = improvements_models.TaskEntryModel.create(
-            improvements_models.ENTITY_TYPE_EXPLORATION,
-            'exp_id',
-            1,
-            improvements_models.TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP,
-            target_type=improvements_models.TARGET_TYPE_STATE,
-            target_id=None)
-        ngr_task_id = improvements_models.TaskEntryModel.create(
-            improvements_models.ENTITY_TYPE_EXPLORATION,
-            'exp_id',
-            1,
-            improvements_models.TASK_TYPE_NEEDS_GUIDING_RESPONSES,
-            target_type=improvements_models.TARGET_TYPE_STATE,
-            target_id=None)
-        sia_task_id = improvements_models.TaskEntryModel.create(
-            improvements_models.ENTITY_TYPE_EXPLORATION,
-            'exp_id',
-            1,
-            improvements_models.TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS,
-            target_type=improvements_models.TARGET_TYPE_STATE,
-            target_id=None)
-
-        output = self.run_job_and_get_output()
-        self.assertEqual(len(output), 1)
-        error_key, error_messages = output[0]
-
-        self.assertEqual(
-            error_key,
-            'failed validation check for task type check of TaskEntryModel')
-        self.assertItemsEqual(
-            error_messages, [
-                'Task id %s: Task type high_bounce_rate needs a target but no '
-                'target id is set' % (
-                    hbr_task_id,),
-                'Task id %s: Task type ineffective_feedback_loop needs a '
-                'target but no target id is set' % (
-                    ifl_task_id,),
-                'Task id %s: Task type needs_guiding_responses needs a target '
-                'but no target id is set' % (
-                    ngr_task_id,),
-                'Task id %s: Task type successive_incorrect_answers needs a '
-                'target but no target id is set' % (
-                    sia_task_id,)
-            ])
 
     def test_missing_state_name_for_exploration_task_types(self):
         hbr_task_id = improvements_models.TaskEntryModel.create(
@@ -15135,49 +14985,50 @@ class TaskEntryModelValidatorTests(test_utils.GenericTestBase):
             'exp_id',
             1,
             improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
-            target_type=improvements_models.TARGET_TYPE_STATE,
-            target_id='invalid_state_name')
+            improvements_models.TARGET_TYPE_STATE,
+            'invalid_state_name')
         ifl_task_id = improvements_models.TaskEntryModel.create(
             improvements_models.ENTITY_TYPE_EXPLORATION,
             'exp_id',
             1,
             improvements_models.TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP,
-            target_type=improvements_models.TARGET_TYPE_STATE,
-            target_id='invalid_state_name')
+            improvements_models.TARGET_TYPE_STATE,
+            'invalid_state_name')
         ngr_task_id = improvements_models.TaskEntryModel.create(
             improvements_models.ENTITY_TYPE_EXPLORATION,
             'exp_id',
             1,
             improvements_models.TASK_TYPE_NEEDS_GUIDING_RESPONSES,
-            target_type=improvements_models.TARGET_TYPE_STATE,
-            target_id='invalid_state_name')
+            improvements_models.TARGET_TYPE_STATE,
+            'invalid_state_name')
         sia_task_id = improvements_models.TaskEntryModel.create(
             improvements_models.ENTITY_TYPE_EXPLORATION,
             'exp_id',
             1,
             improvements_models.TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS,
-            target_type=improvements_models.TARGET_TYPE_STATE,
-            target_id='invalid_state_name')
+            improvements_models.TARGET_TYPE_STATE,
+            'invalid_state_name')
         output = self.run_job_and_get_output()
         self.assertEqual(len(output), 1)
         error_key, error_messages = output[0]
 
         self.assertEqual(
             error_key,
-            'failed validation check for target type check of TaskEntryModel')
+            'failed validation check for target_id field check of '
+            'TaskEntryModel')
         self.assertItemsEqual(
             error_messages, [
-                'Task id %s: State name invalid_state_name is not present in '
-                'states of exploration with id exp_id' % (
+                'Entity id %s: exploration with id "exp_id" does not have a '
+                'state named "invalid_state_name" at version 1' % (
                     hbr_task_id,),
-                'Task id %s: State name invalid_state_name is not present in '
-                'states of exploration with id exp_id' % (
+                'Entity id %s: exploration with id "exp_id" does not have a '
+                'state named "invalid_state_name" at version 1' % (
                     ifl_task_id,),
-                'Task id %s: State name invalid_state_name is not present in '
-                'states of exploration with id exp_id' % (
+                'Entity id %s: exploration with id "exp_id" does not have a '
+                'state named "invalid_state_name" at version 1' % (
                     ngr_task_id,),
-                'Task id %s: State name invalid_state_name is not present in '
-                'states of exploration with id exp_id' % (
+                'Entity id %s: exploration with id "exp_id" does not have a '
+                'state named "invalid_state_name" at version 1' % (
                     sia_task_id,)
             ])
 
@@ -15191,29 +15042,29 @@ class TaskEntryModelValidatorTests(test_utils.GenericTestBase):
             'linear_exp_id',
             1,
             improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
-            target_type=improvements_models.TARGET_TYPE_STATE,
-            target_id='State 2')
+            improvements_models.TARGET_TYPE_STATE,
+            'State 2')
         improvements_models.TaskEntryModel.create(
             improvements_models.ENTITY_TYPE_EXPLORATION,
             'linear_exp_id',
             1,
             improvements_models.TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP,
-            target_type=improvements_models.TARGET_TYPE_STATE,
-            target_id='State 2')
+            improvements_models.TARGET_TYPE_STATE,
+            'State 2')
         improvements_models.TaskEntryModel.create(
             improvements_models.ENTITY_TYPE_EXPLORATION,
             'linear_exp_id',
             1,
             improvements_models.TASK_TYPE_NEEDS_GUIDING_RESPONSES,
-            target_type=improvements_models.TARGET_TYPE_STATE,
-            target_id='State 2')
+            improvements_models.TARGET_TYPE_STATE,
+            'State 2')
         improvements_models.TaskEntryModel.create(
             improvements_models.ENTITY_TYPE_EXPLORATION,
             'linear_exp_id',
             1,
             improvements_models.TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS,
-            target_type=improvements_models.TARGET_TYPE_STATE,
-            target_id='State 2')
+            improvements_models.TARGET_TYPE_STATE,
+            'State 2')
 
         exp_services.update_exploration( # v2
             'owner_id', 'linear_exp_id', [
@@ -15225,29 +15076,29 @@ class TaskEntryModelValidatorTests(test_utils.GenericTestBase):
             'linear_exp_id',
             2,
             improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
-            target_type=improvements_models.TARGET_TYPE_STATE,
-            target_id='State 2')
+            improvements_models.TARGET_TYPE_STATE,
+            'State 2')
         new_ifl_task_id = improvements_models.TaskEntryModel.create(
             improvements_models.ENTITY_TYPE_EXPLORATION,
             'linear_exp_id',
             2,
             improvements_models.TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP,
-            target_type=improvements_models.TARGET_TYPE_STATE,
-            target_id='State 2')
+            improvements_models.TARGET_TYPE_STATE,
+            'State 2')
         new_ngr_task_id = improvements_models.TaskEntryModel.create(
             improvements_models.ENTITY_TYPE_EXPLORATION,
             'linear_exp_id',
             2,
             improvements_models.TASK_TYPE_NEEDS_GUIDING_RESPONSES,
-            target_type=improvements_models.TARGET_TYPE_STATE,
-            target_id='State 2')
+            improvements_models.TARGET_TYPE_STATE,
+            'State 2')
         new_sia_task_id = improvements_models.TaskEntryModel.create(
             improvements_models.ENTITY_TYPE_EXPLORATION,
             'linear_exp_id',
             2,
             improvements_models.TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS,
-            target_type=improvements_models.TARGET_TYPE_STATE,
-            target_id='State 2')
+            improvements_models.TARGET_TYPE_STATE,
+            'State 2')
 
         output = self.run_job_and_get_output()
         self.assertEqual(len(output), 2)
@@ -15255,19 +15106,20 @@ class TaskEntryModelValidatorTests(test_utils.GenericTestBase):
         error_key, error_messages = output[1]
         self.assertEqual(
             error_key,
-            'failed validation check for target type check of TaskEntryModel')
+            'failed validation check for target_id field check of '
+            'TaskEntryModel')
         self.assertItemsEqual(
             error_messages, [
-                'Task id %s: State name State 2 is not present in '
-                'states of exploration with id linear_exp_id' % (
+                'Entity id %s: exploration with id "linear_exp_id" does not '
+                'have a state named "State 2" at version 2' % (
                     new_ifl_task_id,),
-                'Task id %s: State name State 2 is not present in '
-                'states of exploration with id linear_exp_id' % (
+                'Entity id %s: exploration with id "linear_exp_id" does not '
+                'have a state named "State 2" at version 2' % (
                     new_hbr_task_id,),
-                'Task id %s: State name State 2 is not present in '
-                'states of exploration with id linear_exp_id' % (
+                'Entity id %s: exploration with id "linear_exp_id" does not '
+                'have a state named "State 2" at version 2' % (
                     new_ngr_task_id,),
-                'Task id %s: State name State 2 is not present in '
-                'states of exploration with id linear_exp_id' % (
+                'Entity id %s: exploration with id "linear_exp_id" does not '
+                'have a state named "State 2" at version 2' % (
                     new_sia_task_id,)
             ])

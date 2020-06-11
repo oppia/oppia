@@ -26,39 +26,31 @@ from google.appengine.ext import ndb
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
-TEST_ONLY_ENTITY_TYPE = 'TEST_ONLY_ENTITY_TYPE'
 ENTITY_TYPE_EXPLORATION = feconf.ENTITY_TYPE_EXPLORATION
 ENTITY_TYPES = (
-    TEST_ONLY_ENTITY_TYPE,
     ENTITY_TYPE_EXPLORATION,
 )
 
-TEST_ONLY_STATUS = 'TEST_ONLY_STATUS'
-STATUS_OPEN = 'open'
-STATUS_DEPRECATED = 'deprecated'
-STATUS_RESOLVED = 'resolved'
+STATUS_OPEN = feconf.TASK_STATUS_OPEN
+STATUS_OBSOLETE = feconf.TASK_STATUS_OBSOLETE
+STATUS_RESOLVED = feconf.TASK_STATUS_RESOLVED
 STATUS_CHOICES = (
-    TEST_ONLY_STATUS,
     STATUS_OPEN,
-    STATUS_DEPRECATED,
+    STATUS_OBSOLETE,
     STATUS_RESOLVED,
 )
 
-TEST_ONLY_TARGET_TYPE = 'TEST_ONLY_TARGET_TYPE'
-TARGET_TYPE_STATE = 'state'
+TARGET_TYPE_STATE = feconf.TASK_TARGET_TYPE_STATE
 TARGET_TYPES = (
-    TEST_ONLY_TARGET_TYPE,
     TARGET_TYPE_STATE,
 )
 
-TEST_ONLY_TASK_TYPE = 'TEST_ONLY_TASK_TYPE'
 TASK_TYPE_HIGH_BOUNCE_RATE = feconf.TASK_TYPE_HIGH_BOUNCE_RATE
 TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP = feconf.TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP
 TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS = (
     feconf.TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS)
 TASK_TYPE_NEEDS_GUIDING_RESPONSES = feconf.TASK_TYPE_NEEDS_GUIDING_RESPONSES
 TASK_TYPES = (
-    TEST_ONLY_TASK_TYPE,
     TASK_TYPE_HIGH_BOUNCE_RATE,
     TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP,
     TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS,
@@ -88,11 +80,11 @@ class TaskEntryModel(base_models.BaseModel):
     # The type of sub-entity a task entry focuses on. Value is None when an
     # entity does not have any meaningful sub-entities to target.
     target_type = ndb.StringProperty(
-        default=None, required=False, indexed=True, choices=TARGET_TYPES)
+        required=True, indexed=True, choices=TARGET_TYPES)
     # Uniquely identifies the sub-entity a task entry focuses on. Value is None
     # when an entity does not have any meaningful sub-entities to target.
     target_id = ndb.StringProperty(
-        default=None, required=False, indexed=True)
+        required=True, indexed=True)
 
     # Utility field for performing quick look-ups by a specific entity.
     # Value has the form: "[entity_type].[entity_id].[entity_version]".
@@ -171,8 +163,8 @@ class TaskEntryModel(base_models.BaseModel):
 
     @classmethod
     def generate_task_id(
-            cls, entity_type, entity_id, entity_version, task_type,
-            target_type=None, target_id=None):
+            cls, entity_type, entity_id, entity_version, task_type, target_type,
+            target_id):
         """Generates a new task entry ID.
 
         Args:
@@ -181,17 +173,15 @@ class TaskEntryModel(base_models.BaseModel):
             entity_version: int. The version of the entity a task entry refers
                 to.
             task_type: str. The type of task a task entry tracks.
-            target_type: str or None. The optional type of sub-entity a task
-                entry refers to.
-            target_id: str or None. The optional ID of the sub-entity a task
-                entry refers to.
+            target_type: str. The type of sub-entity a task entry refers to.
+            target_id: str. The ID of the sub-entity a task entry refers to.
 
         Returns:
             str. The ID for the given task.
         """
         return '%s.%s.%d.%s.%s.%s' % (
-            entity_type, entity_id, entity_version, task_type,
-            target_type or '', target_id or '')
+            entity_type, entity_id, entity_version, task_type, target_type,
+            target_id)
 
     @classmethod
     def generate_composite_entity_id(
@@ -216,8 +206,8 @@ class TaskEntryModel(base_models.BaseModel):
             entity_id,
             entity_version,
             task_type,
-            target_type=None,
-            target_id=None,
+            target_type,
+            target_id,
             status=STATUS_OPEN,
             closed_by=None,
             closed_on=None):
@@ -226,19 +216,18 @@ class TaskEntryModel(base_models.BaseModel):
         Args:
             entity_type: str. The type of entity a task entry refers to.
             entity_id: str. The ID of the entity a task entry refers to.
-            entity_version: str. The version of the entity a task entry refers
+            entity_version: int. The version of the entity a task entry refers
                 to.
             task_type: str. The type of task a task entry tracks.
-            target_type: str. The type of sub-entity a task entry focuses on.
-            target_id: str. Uniquely identifies the sub-entity a task entry
-                focuses on.
+            target_type: str. The type of sub-entity a task entry refers to.
+            target_id: str. The ID of the sub-entity a task entry refers to.
             status: str. Tracks the state/progress of a task entry.
             closed_by: str. ID of the user who closed the task, if any.
             closed_on: str. The date and time at which a task was closed or
                 deprecated.
 
         Returns:
-            TaskEntryModel.
+            str. The ID of the new task.
 
         Raises:
             Exception. A task corresponding to the provided identifier values
@@ -246,8 +235,8 @@ class TaskEntryModel(base_models.BaseModel):
             target_id) already exists in storage.
         """
         task_id = cls.generate_task_id(
-            entity_type, entity_id, entity_version, task_type,
-            target_type=target_type, target_id=target_id)
+            entity_type, entity_id, entity_version, task_type, target_type,
+            target_id)
         if cls.get_by_id(task_id) is not None:
             raise Exception('Task id %s already exists' % task_id)
         composite_entity_id = cls.generate_composite_entity_id(

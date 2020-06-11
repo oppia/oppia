@@ -138,6 +138,12 @@ TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP = 'ineffective_feedback_loop'
 TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS = 'successive_incorrect_answers'
 TASK_TYPE_NEEDS_GUIDING_RESPONSES = 'needs_guiding_responses'
 
+TASK_STATUS_OPEN = 'open'
+TASK_STATUS_OBSOLETE = 'obsolete'
+TASK_STATUS_RESOLVED = 'resolved'
+
+TASK_TARGET_TYPE_STATE = 'state'
+
 # The maximum number of activities allowed in the playlist of the learner. This
 # limit applies to both the explorations playlist and the collections playlist.
 MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT = 10

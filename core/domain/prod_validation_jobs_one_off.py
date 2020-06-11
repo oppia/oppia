@@ -4956,14 +4956,12 @@ class TaskEntryModelValidator(BaseModelValidator):
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        external_id_relationships = dict()
-        if item.closed_by is not None:
-            external_id_relationships['closed_by_ids'] = (
-                user_models.UserSettingsModel, [item.closed_by])
-        if item.entity_type == feconf.ENTITY_TYPE_EXPLORATION:
-            external_id_relationships['entity_ids'] = (
-                exp_models.ExplorationModel, [item.entity_id])
-        return external_id_relationships
+        return {
+            'closed_by_ids': (
+                user_models.UserSettingsModel,
+                [item.closed_by] if item.closed_by is not None else []),
+            'entity_ids': (exp_models.ExplorationModel, [item.entity_id])
+        }
 
     @classmethod
     def _validate_composite_entity_id(cls, item):
@@ -4972,12 +4970,15 @@ class TaskEntryModelValidator(BaseModelValidator):
         Args:
             item: improvements_models.TaskEntryModel.
         """
-        regex_string = re.escape('%s.%s.%d' % (
-            item.entity_type, item.entity_id, item.entity_version))
-        if not re.compile(regex_string).match(item.composite_entity_id):
-            cls.errors['composite entity id check'].append(
-                'Task id %s: Composite entity id does not match regex pattern'
-                % (item.id,))
+        expected_composite_entity_id = (
+            improvements_models.TaskEntryModel.generate_composite_entity_id(
+                item.entity_type, item.entity_id, item.entity_version))
+        if item.composite_entity_id != expected_composite_entity_id:
+            cls.errors['composite_entity_id field check'].append(
+                'Entity id %s: composite_entity_id "%s" should be "%s"' % (
+                    item.id,
+                    item.composite_entity_id,
+                    expected_composite_entity_id))
 
     @classmethod
     def _validate_status(cls, item):
@@ -4988,79 +4989,52 @@ class TaskEntryModelValidator(BaseModelValidator):
         """
         if item.status == improvements_models.STATUS_OPEN:
             if item.closed_by:
-                cls.errors['status check'].append(
-                    'Task id %s: Status is open but closed_by is "%s", '
+                cls.errors['status field check'].append(
+                    'Entity id %s: status is open but closed_by is "%s", '
                     'should be empty.' % (item.id, item.closed_by))
             if item.closed_on:
-                cls.errors['status check'].append(
-                    'Task id %s: Status is open but closed_on is "%s", '
+                cls.errors['status field check'].append(
+                    'Entity id %s: status is open but closed_on is "%s", '
                     'should be empty.' % (item.id, item.closed_on))
         elif item.status == improvements_models.STATUS_RESOLVED:
             if item.closed_by is None:
-                cls.errors['status check'].append(
-                    'Task id %s: Status is resolved but closed_by is not '
+                cls.errors['status field check'].append(
+                    'Entity id %s: status is resolved but closed_by is not '
                     'set' % (item.id,))
             if item.closed_on is None:
-                cls.errors['status check'].append(
-                    'Task id %s: Status is resolved but closed_on is not '
+                cls.errors['status field check'].append(
+                    'Entity id %s: status is resolved but closed_on is not '
                     'set' % (item.id,))
 
     @classmethod
-    def _validate_task_type(cls, item):
-        """Validates the fields of the item relating to the task_type field.
-
-        Args:
-            item: improvements_models.TaskEntryModel.
-        """
-        if item.task_type in (
-                improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
-                improvements_models.TASK_TYPE_NEEDS_GUIDING_RESPONSES,
-                improvements_models.TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS,
-                improvements_models.TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP):
-            if item.entity_type != improvements_models.ENTITY_TYPE_EXPLORATION:
-                cls.errors['task type check'].append(
-                    'Task id %s: Task type %s is not supported for %s '
-                    'entities' % (item.id, item.task_type, item.entity_type))
-            if item.target_type != improvements_models.TARGET_TYPE_STATE:
-                cls.errors['task type check'].append(
-                    'Task id %s: Task type %s is not supported for %s '
-                    'targets' % (item.id, item.task_type, item.target_type))
-            if not item.target_id:
-                cls.errors['task type check'].append(
-                    'Task id %s: Task type %s needs a target but no target '
-                    'id is set' % (item.id, item.task_type))
-
-    @classmethod
-    def _validate_exploration_state_targets(cls, item):
+    def _validate_target_id(cls, item):
         """Validate that the given item contains an existing exploration state
         name.
 
         Args:
             item: improvements_models.TaskEntryModel.
         """
-        if item.entity_type != improvements_models.ENTITY_TYPE_EXPLORATION:
+        try:
+            exp_model = exp_models.ExplorationModel.get(
+                item.entity_id, strict=True, version=item.entity_version)
+        except Exception:
+            cls.errors['target_id field check'].append(
+                'Entity id %s: exploration with id "%s" does not exist at '
+                'version %d' % (item.id, item.entity_id, item.entity_version))
             return
-        if 'entity_ids field check' in cls.errors:
-            return
-        if item.target_type != improvements_models.TARGET_TYPE_STATE:
-            return
-        if item.target_id is None:
-            return
-        exp_model = exp_models.ExplorationModel.get(
-            item.entity_id, strict=True, version=item.entity_version)
         if item.target_id not in exp_model.states.keys():
-            cls.errors['target type check'].append(
-                'Task id %s: State name %s is not present in states of '
-                'exploration with id %s' % (
-                    item.id, item.target_id, item.entity_id))
+            cls.errors['target_id field check'].append(
+                'Entity id %s: exploration with id "%s" does not have a state '
+                'named "%s" at version %d' % (
+                    item.id, item.entity_id, item.target_id,
+                    item.entity_version))
 
     @classmethod
     def _get_custom_validation_functions(cls):
         return [
-            cls._validate_status,
-            cls._validate_exploration_state_targets,
-            cls._validate_task_type,
             cls._validate_composite_entity_id,
+            cls._validate_status,
+            cls._validate_target_id,
         ]
 
 
