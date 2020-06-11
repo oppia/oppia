@@ -20,6 +20,8 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
+from core.domain import question_services
+from core.domain import skill_services
 from core.domain import story_fetchers
 from core.domain import story_services
 from core.domain import summary_services
@@ -130,11 +132,26 @@ class StoryProgressHandler(base.BaseHandler):
             summary_services.get_displayable_exp_summary_dicts_matching_ids(
                 next_exp_ids))
 
-        if (
-                (len(exp_summaries) != 0 and
-                 len(completed_nodes) %
-                 constants.NUM_EXPLORATIONS_PER_REVIEW_TEST == 0) or
-                (len(completed_nodes) == len(ordered_nodes))):
+        # If there are no questions for any of the acquired skills that the
+        # learner has completed, do not show review tests.
+        acquired_skills = skill_services.get_multi_skills(
+            story.get_acquired_skill_ids_for_node_ids(
+                completed_node_ids
+            ))
+
+        acquired_skill_ids = [skill.id for skill in acquired_skills]
+        questions_available = len(
+            question_services.get_questions_by_skill_ids(
+                1, acquired_skill_ids, False)) > 0
+
+        learner_completed_story = len(completed_nodes) == len(ordered_nodes)
+        learner_at_review_point_in_story = (
+            len(exp_summaries) != 0 and (
+                len(completed_nodes) &
+                constants.NUM_EXPLORATIONS_PER_REVIEW_TEST == 0)
+        )
+        if questions_available and (
+                learner_at_review_point_in_story or learner_completed_story):
             ready_for_review_test = True
 
         return self.render_json({

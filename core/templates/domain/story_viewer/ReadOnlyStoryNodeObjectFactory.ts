@@ -37,6 +37,8 @@ interface IStoryNodeBackendDict {
   'exploration_id': string;
   'exp_summary_dict': ExplorationSummary;
   completed: boolean;
+  'thumbnail_bg_color': string;
+  'thumbnail_filename': string;
 }
 
 export class ReadOnlyStoryNode {
@@ -51,12 +53,15 @@ export class ReadOnlyStoryNode {
   _explorationId: string;
   _explorationSummary: ExplorationSummary;
   _completed: boolean;
+  _thumbnailBgColor: string;
+  _thumbnailFilename: string;
 
   constructor(id: string, title: string, description: string,
       destinationNodeIds: Array<string>, prerequisiteSkillIds: Array<string>,
       acquiredSkillIds: Array<string>, outline: string,
       outlineIsFinalized: boolean, explorationId: string,
-      explorationSummary: ExplorationSummary, completed: boolean) {
+      explorationSummary: ExplorationSummary, completed: boolean,
+      thumbnailBgColor: string, thumbnailFilename: string) {
     this._id = id;
     this._title = title;
     this._description = description;
@@ -68,6 +73,8 @@ export class ReadOnlyStoryNode {
     this._explorationId = explorationId;
     this._explorationSummary = explorationSummary;
     this._completed = completed;
+    this._thumbnailBgColor = thumbnailBgColor;
+    this._thumbnailFilename = thumbnailFilename;
   }
 
   getId(): string {
@@ -101,6 +108,14 @@ export class ReadOnlyStoryNode {
   getOutlineStatus(): boolean {
     return this._outlineIsFinalized;
   }
+
+  getThumbnailFilename(): string {
+    return this._thumbnailFilename;
+  }
+
+  getThumbnailBgColor(): string {
+    return this._thumbnailBgColor;
+  }
 }
 
 @Injectable({
@@ -119,7 +134,9 @@ export class ReadOnlyStoryNodeObjectFactory {
       storyNodeBackendDict.outline_is_finalized,
       storyNodeBackendDict.exploration_id,
       storyNodeBackendDict.exp_summary_dict,
-      storyNodeBackendDict.completed);
+      storyNodeBackendDict.completed,
+      storyNodeBackendDict.thumbnail_bg_color,
+      storyNodeBackendDict.thumbnail_filename);
   }
 }
 

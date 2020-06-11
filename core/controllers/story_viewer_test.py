@@ -18,6 +18,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from constants import constants
+from core.domain import question_services
 from core.domain import story_domain
 from core.domain import story_services
 from core.domain import summary_services
@@ -299,6 +300,44 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
 
     def test_post_returns_empty_list_when_user_completes_story(self):
         csrf_token = self.get_new_csrf_token()
+        story_services.record_completed_node_in_story_context(
+            self.viewer_id, self.STORY_ID, self.NODE_ID_2)
+        story_services.record_completed_node_in_story_context(
+            self.viewer_id, self.STORY_ID, self.NODE_ID_1)
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
+            json_response = self.post_json(
+                '%s/%s/%s' % (
+                    feconf.STORY_PROGRESS_URL_PREFIX, self.STORY_ID,
+                    self.NODE_ID_3
+                ), {}, csrf_token=csrf_token
+            )
+        self.assertEqual(len(json_response['summaries']), 0)
+        self.assertIsNone(json_response['next_node_id'])
+        self.assertFalse(json_response['ready_for_review_test'])
+
+    def test_post_returns_ready_for_review_when_acquired_skills_exist(self):
+        csrf_token = self.get_new_csrf_token()
+        self.save_new_skill(
+            'skill_1', self.admin_id, description='Skill Description')
+        self.save_new_question(
+            'question_1', self.admin_id,
+            self._create_valid_question_data('ABC'), ['skill_1'])
+        question_services.create_new_question_skill_link(
+            self.admin_id, 'question_1', 'skill_1', 0.3)
+        changelist = [
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'property_name': (
+                    story_domain.STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS),
+                'node_id': self.NODE_ID_1,
+                'old_value': [],
+                'new_value': ['skill_1']
+            })
+        ]
+        story_services.update_story(
+            self.admin_id, self.STORY_ID, changelist,
+            'Added acquired skill.')
+
         story_services.record_completed_node_in_story_context(
             self.viewer_id, self.STORY_ID, self.NODE_ID_2)
         story_services.record_completed_node_in_story_context(

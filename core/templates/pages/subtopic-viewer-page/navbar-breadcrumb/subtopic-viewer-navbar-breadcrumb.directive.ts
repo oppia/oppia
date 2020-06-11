@@ -29,9 +29,9 @@ angular.module('oppia').directive('subtopicViewerNavbarBreadcrumb', [
         '/pages/subtopic-viewer-page/navbar-breadcrumb/' +
         'subtopic-viewer-navbar-breadcrumb.directive.html'),
       controller: [
-        '$scope', 'SubtopicViewerBackendApiService', 'UrlService',
+        '$rootScope', '$scope', 'SubtopicViewerBackendApiService', 'UrlService',
         'TOPIC_VIEWER_URL_TEMPLATE', function(
-            $scope, SubtopicViewerBackendApiService, UrlService,
+            $rootScope, $scope, SubtopicViewerBackendApiService, UrlService,
             TOPIC_VIEWER_URL_TEMPLATE) {
           var ctrl = this;
           $scope.getTopicUrl = function() {
@@ -46,6 +46,7 @@ angular.module('oppia').directive('subtopicViewerNavbarBreadcrumb', [
               $scope.topicName, UrlService.getSubtopicIdFromUrl()).then(
               function(subtopicDataObject) {
                 $scope.subtopicTitle = subtopicDataObject.getSubtopicTitle();
+                $rootScope.apply();
               });
           };
         }

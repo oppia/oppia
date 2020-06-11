@@ -83,6 +83,7 @@
     margin-bottom: 100px;
     margin-left: auto;
     margin-right: auto;
+    margin-top: 20px;
     max-width: 880px;
   }
   .oppia-subtopic-summary-tile {
@@ -101,17 +102,24 @@
     -webkit-transition: all 300ms;
   }
 
-  @media(max-width: 700px) {
+  @media(max-width: 600px) {
     .oppia-subtopic-viewer-container {
       padding-top: 80px;
     }
 
     .oppia-subtopic-title {
+      font-size: 2em;
+      margin-left: 25px;
       padding-top: 20px;
+      padding-right: 25px;
     }
 
     .oppia-page-contents-viewer {
+      font-size: 1.2em;
+      margin-left: 25px;
+      margin-right: 25px;
       padding: 30px 20px;
+      width: calc(100% - 50px);
     }
   }
 </style>

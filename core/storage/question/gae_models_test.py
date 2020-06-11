@@ -462,6 +462,20 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
                  3, skill_ids, 0.6
              ))
 
+    def test_get_questions_with_no_skills(self):
+        question_skill_links = (
+            question_models.QuestionSkillLinkModel.
+            get_question_skill_links_based_on_difficulty_equidistributed_by_skill( # pylint: disable=line-too-long
+                1, [], 0.6
+            )
+        )
+        self.assertEqual(question_skill_links, [])
+
+        question_skill_links = (
+            question_models.QuestionSkillLinkModel.
+            get_question_skill_links_equidistributed_by_skill(1, []))
+        self.assertEqual(question_skill_links, [])
+
     def test_get_more_question_skill_links_than_available(self):
         questionskilllink_model1 = (
             question_models.QuestionSkillLinkModel.create(
