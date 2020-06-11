@@ -21,6 +21,7 @@
 /core/templates/services/loader.service*.ts @bansalnitish
 /core/templates/services/contextual/logger.service.ts @bansalnitish
 /core/templates/services/contextual/logger.service.spec.ts @bansalnitish
+/core/templates/services/question-validation.service*.ts @bansalnitish
 /core/templates/services/UpgradedServices.ts @bansalnitish
 /core/templates/services/request-interceptor.service*.ts @bansalnitish
 /typings/ @ankita240796
@@ -117,7 +118,7 @@
 /tox.ini @kevinlee12
 /scripts/*.py @DubeySandeep
 /scripts/check_e2e_tests_are_captured_in_ci*.py @Showtim3 @DubeySandeep
-/scripts/check_frontend_coverage*.py @marianazangrossi @DubeySandeep
+/scripts/check_frontend_coverage*.py @nithusha21 @DubeySandeep
 /scripts/create_topological_sort_of_all_services*.py @bansalnitish @DubeySandeep
 /scripts/install_prerequisites.sh @DubeySandeep
 /scripts/typescript_checks*.py @ankita240796 @DubeySandeep
@@ -183,6 +184,7 @@
 # Global components and filters.
 /core/templates/components/button-directives/exploration-embed-button.service.ts @ankita240796
 /core/templates/components/button-directives/exploration-embed-button.directive.html @ankita240796
+/core/templates/components/button-directives/exploration-embed-button-modal.controller.ts @ankita240796
 /core/templates/components/button-directives/social-buttons.directive.ts @ankita240796
 /core/templates/components/button-directives/social-buttons.directive.html @ankita240796
 /core/templates/components/common-layout-directives/common-elements/alert-message.directive.ts @ankita240796
@@ -254,6 +256,7 @@
 /core/domain/playthrough_issue_registry*.py @brianrodri
 /core/domain/stats*.py @brianrodri
 /core/domain/visualization_registry*.py @brianrodri
+/core/storage/improvements/ @brianrodri
 /core/storage/statistics/ @brianrodri
 /core/templates/components/common-layout-directives/common-elements/confirmation-modal.template.html @brianrodri
 /core/templates/domain/statistics/ @brianrodri
@@ -305,6 +308,7 @@
 /core/templates/pages/review-test-page/ @kevintab95
 /core/templates/services/questions-list.service*.ts @kevintab95
 /core/templates/components/question-directives/ @aks681 @kevintab95
+
 
 # Readme
 /core/README.md @ankita240796
@@ -533,10 +537,10 @@
 /core/templates/services/services.constants.ts @vojtechjelinek
 
 # Frontend unit tests
-/core/templates/**/*.spec.ts @marianazangrossi
-/core/templates/**/*Spec.ts @marianazangrossi
-/extensions/**/*.spec.ts @marianazangrossi
-/extensions/**/*Spec.ts @marianazangrossi
+/core/templates/**/*.spec.ts @nithusha21
+/core/templates/**/*Spec.ts @nithusha21
+/extensions/**/*.spec.ts @nithusha21
+/extensions/**/*Spec.ts @nithusha21
 
 # Draft version upgrade.
 /core/domain/draft_upgrade_services*.py @DubeySandeep

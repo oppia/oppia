@@ -34,7 +34,7 @@ angular.module('oppia').factory('RteHelperService', [
     var _RICH_TEXT_COMPONENTS = [];
 
     Object.keys(RTE_COMPONENT_SPECS).sort().forEach(function(componentId) {
-      if (componentId === 'Svgeditor') {
+      if (componentId === 'Svgdiagram') {
         if (!ENABLE_LITERALLY_CANVAS_EDITOR) {
           return;
         }

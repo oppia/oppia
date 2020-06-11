@@ -16,7 +16,6 @@
  * @fileoverview Directive for the stories list.
  */
 
-require('components/summary-tile/story-summary-tile.directive.ts');
 require('pages/practice-session-page/practice-session-page.constants.ajs.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('services/contextual/window-dimensions.service.ts');
@@ -32,6 +31,7 @@ angular.module('oppia').directive('practiceTab', [
       scope: {},
       bindToController: {
         getTopicName: '&topicName',
+        getSubtopicsList: '&subtopicsList'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/topic-viewer-page/practice-tab/practice-tab.directive.html'),
@@ -42,12 +42,40 @@ angular.module('oppia').directive('practiceTab', [
             $scope) {
           var ctrl = this;
 
-          ctrl.newPracticeSession = function() {
+          ctrl.openNewPracticeSession = function() {
+            var selectedSubtopicIds = [];
+            for (var idx in ctrl.selectedSubtopicIndices) {
+              if (ctrl.selectedSubtopicIndices[idx]) {
+                selectedSubtopicIds.push(
+                  ctrl.availableSubtopics[idx].getId());
+              }
+            }
             var practiceSessionsUrl = UrlInterpolationService.interpolateUrl(
               PRACTICE_SESSIONS_URL, {
-                topic_name: ctrl.getTopicName()
+                topic_name: ctrl.getTopicName(),
+                comma_separated_subtopic_ids: selectedSubtopicIds.join(',')
               });
             $window.location.href = practiceSessionsUrl;
+          };
+
+          ctrl.isStartButtonDisabled = function() {
+            for (var idx in ctrl.selectedSubtopicIndices) {
+              if (ctrl.selectedSubtopicIndices[idx]) {
+                return false;
+              }
+            }
+            return true;
+          };
+
+          ctrl.$onInit = function() {
+            ctrl.selectedSubtopics = [];
+            ctrl.availableSubtopics = ctrl.getSubtopicsList().filter(
+              function(subtopic) {
+                return subtopic.getSkillSummaries().length > 0;
+              }
+            );
+            ctrl.selectedSubtopicIndices = Array(
+              ctrl.availableSubtopics.length).fill(false);
           };
         }
       ]

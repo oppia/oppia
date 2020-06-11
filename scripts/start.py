@@ -22,7 +22,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import argparse
 import atexit
-import fileinput
 import os
 import re
 import subprocess
@@ -56,6 +55,10 @@ _PARSER.add_argument(
 _PARSER.add_argument(
     '--prod_env',
     help='optional; if specified, runs Oppia in a production environment.',
+    action='store_true')
+_PARSER.add_argument(
+    '--maintenance_mode',
+    help='optional; if specified, puts Oppia into maintenance mode.',
     action='store_true')
 _PARSER.add_argument(
     '--no_browser',
@@ -102,28 +105,11 @@ def main(args=None):
     no_auto_restart = (
         '--automatic_restart=no' if parsed_args.no_auto_restart else '')
 
-    if parsed_args.prod_env:
-        constants_env_variable = '"DEV_MODE": false'
-        for line in fileinput.input(
-                files=[os.path.join('assets', 'constants.ts')], inplace=True):
-            # Inside this loop the STDOUT will be redirected to the file,
-            # constants.ts. The end='' is needed to avoid double line breaks.
-            python_utils.PRINT(
-                re.sub(
-                    r'"DEV_MODE": .*', constants_env_variable, line), end='')
-        build.main(args=['--prod_env'])
-        app_yaml_filepath = 'app.yaml'
-    else:
-        constants_env_variable = '"DEV_MODE": true'
-        for line in fileinput.input(
-                files=[os.path.join('assets', 'constants.ts')], inplace=True):
-            # Inside this loop the STDOUT will be redirected to the file,
-            # constants.ts. The end='' is needed to avoid double line breaks.
-            python_utils.PRINT(
-                re.sub(
-                    r'"DEV_MODE": .*', constants_env_variable, line), end='')
-        build.main(args=[])
-        app_yaml_filepath = 'app_dev.yaml'
+    build_args = ['--prod_env'] if parsed_args.prod_env else []
+    if parsed_args.maintenance_mode:
+        build_args.append('--maintenance_mode')
+    build.main(args=build_args)
+    app_yaml_filepath = 'app.yaml' if parsed_args.prod_env else 'app_dev.yaml'
 
     # Set up a local dev instance.
     # TODO(sll): do this in a new shell.
