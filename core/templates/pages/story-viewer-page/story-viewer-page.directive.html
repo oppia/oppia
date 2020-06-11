@@ -11,7 +11,8 @@
 
         <div ng-if="$ctrl.showChapters()" class="d-md-block oppia-story-viewer-card-container">
           <a ng-repeat="node in $ctrl.storyPlaythroughObject.getStoryNodes();"
-             ng-href="<[$ctrl.getExplorationUrl(node)]>">
+             ng-href="<[$ctrl.getExplorationUrl(node)]>"
+             ng-class="{'disabled-link': $ctrl.isChapterLocked(node)}">
 
             <div>
               <div ng-style="($index > 0 && !$ctrl.storyPlaythroughObject.getStoryNodes()[$index-1].isCompleted() && {'opacity': '0.5', 'display': 'flex'}) || { 'display': 'flex' }">
@@ -58,12 +59,12 @@
                                  y="0"
                                  height="180"
                                  width="240"
-                                 ng-attr-xlink:href="<[$ctrl.getStaticImageUrl($ctrl.pathIconParameters[$index].thumbnailIconUrl)]>"
+                                 ng-attr-xlink:href="<[$ctrl.pathIconParameters[$index].thumbnailIconUrl]>"
                                  xlink:href="">
                           </image>
                         </pattern>
                       </defs>
-                      <a xlink:href="<[$ctrl.getExplorationUrl(node)]>">
+                      <a xlink:href="<[$ctrl.getExplorationUrl(node)]>" ng-class="{'disabled-link': $ctrl.isChapterLocked(node)}">
                         <rect width="240"
                               height="180"
                               fill="url(#image<[$index]>)"
@@ -78,38 +79,38 @@
                   </div>
 
                   <div class="oppia-story-viewer-mobile-card-content">
-                    <svg width="300"
-                         height="225"
+                    <svg width="185"
+                         height="150"
                          xmlns="http://www.w3.org/1600/svg"
                          xmlns:xlink="http://www.w3.org/1999/xlink"
                          version="1.1"
                         >
                       <defs>
                         <pattern id="image2<[$index]>" patternUnits="userSpaceOnUse" height="160" width="240">
-                          <rect width="300"
-                                height="225"
+                          <rect width="185"
+                                height="150"
                                 ng-attr-fill="<[$ctrl.pathIconParameters[$index].thumbnailBgColor]>">
                           </rect>
 
                           <image x="0"
                                  y="0"
-                                 height="225"
-                                 width="300"
-                                 ng-attr-xlink:href="<[$ctrl.getStaticImageUrl($ctrl.pathIconParameters[$index].thumbnailIconUrl)]>"
+                                 width="185"
+                                 height="150"
+                                 ng-attr-xlink:href="<[$ctrl.pathIconParameters[$index].thumbnailIconUrl]>"
                                  xlink:href="">
                           </image>
                         </pattern>
                       </defs>
-                      <a xlink:href="<[$ctrl.getExplorationUrl(node)]>">
-                        <rect width="300"
-                              height="225"
+                      <a xlink:href="<[$ctrl.getExplorationUrl(node)]>" ng-class="{'disabled-link': $ctrl.isChapterLocked(node)}">
+                        <rect width="185"
+                              height="150"
                               fill="url(#image2<[$index]>)"
                         ></rect>
                       </a>
                     </svg>
 
                     <div class="oppia-story-viewer-mobile-card-description-box">
-                      <p style="font-size: 20px;"><[node.getDescription()]></p>
+                      <p><[node.getDescription()]></p>
                     </div>
                   </div>
                 </div>
@@ -123,25 +124,12 @@
   </div>
 </div>
 <style>
-  .oppia-story-node-small-screen {
-    left: 50%;
-    position: absolute;
-    text-align: center;
-    transform: translate(-50%, 170px);
-    z-index: 1;
+  .oppia-story-viewer-container a {
+    text-decoration: none;
   }
-  .oppia-story-node-small-screen::before {
-    color: #3f7a68;
-    content: attr(title-data);
-    font-family: "Capriola", "Roboto", Arial, sans-serif;
-    font-size: 16px;
-    left: -60px;
-    position: absolute;
-    text-align: center;
-    top: -30px;
-    width: 220px;
-  }
-  .oppia-story-node-default-cursor {
+
+  .disabled-link {
     cursor: default;
+    pointer-events: none;
   }
 </style>
