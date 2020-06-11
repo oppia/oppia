@@ -436,6 +436,7 @@ class AdminHandler(base.BaseHandler):
 
             def generate_dummy_story_nodes(node_id, exp_id, title, description):
                 """Generates and connects sequential story nodes.
+
                 Args:
                     node_id: int. The node id.
                     exp_id: str. The exploration id.
@@ -465,7 +466,7 @@ class AdminHandler(base.BaseHandler):
                     })], 'Change category')
 
             for i, story_node_dict in enumerate(story_node_dicts):
-                generate_dummy_story_nodes(i, **story_node_dict)
+                generate_dummy_story_nodes(i + 1, **story_node_dict)
 
             skill_services.save_new_skill(self.user_id, skill_1)
             skill_services.save_new_skill(self.user_id, skill_2)
