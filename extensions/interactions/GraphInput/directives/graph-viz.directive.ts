@@ -114,11 +114,13 @@ angular.module('oppia').directive('graphViz', [
             // Note: Transform client (X, Y) to SVG (X, Y). This has to be
             // done so that changes due to viewBox attribute are
             // propagated nicely.
-            var pt = vizContainer[0].createSVGPoint();
+            let vizElement: SVGSVGElement = (
+              vizContainer[0] as unknown as SVGSVGElement);
+            var pt = vizElement.createSVGPoint();
             pt.x = event.clientX;
             pt.y = event.clientY;
             var svgp = pt.matrixTransform(
-              vizContainer[0].getScreenCTM().inverse());
+              vizElement.getScreenCTM().inverse());
             ctrl.state.mouseX = svgp.x;
             ctrl.state.mouseY = svgp.y;
             // We use vertexDragStartX/Y and mouseDragStartX/Y to make
@@ -208,11 +210,12 @@ angular.module('oppia').directive('graphViz', [
           };
 
           var initViewboxSize = function() {
-            var svgContainer = $($element).find('.oppia-graph-viz-svg')[0];
-            var boundingBox = svgContainer.getBBox();
+            let vizElement: SVGSVGElement = (
+              vizContainer[0] as unknown as SVGSVGElement);
+            var boundingBox = vizElement.getBBox();
             var viewBoxHeight = Math.max(
               boundingBox.height + boundingBox.y,
-              svgContainer.getAttribute('height'));
+              parseInt(vizElement.getAttribute('height')));
             ctrl.svgViewBox = (
               0 + ' ' + 0 + ' ' + (boundingBox.width + boundingBox.x) +
                 ' ' + (viewBoxHeight));
