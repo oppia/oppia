@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html ng-app="oppia" ng-controller="Maintenance" itemscope itemtype="http://schema.org/Organization">
+<html ng-app="oppia" itemscope itemtype="http://schema.org/Organization">
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
@@ -9,7 +9,7 @@
   </head>
   <body>
     <service-bootstrap></service-bootstrap>
-    <div class="oppia-base-container">
+    <div class="oppia-base-container" ng-controller="Maintenance">
       <div class="oppia-content-container">
         <div id="wrapper">
           <div class="oppia-main-body">
@@ -17,7 +17,7 @@
               <div class="navbar-container">
                 <div class="navbar-header protractor-test-navbar-header float-left">
                   <a class="oppia-navbar-brand-name oppia-transition-200" href="/">
-                    <img ng-src="<[getStaticImageUrl('/logo/288x128_logo_white.png')]>"
+                    <img ng-src="<[getStaticImageUrl('/logo/288x128_logo_mint.png')]>"
                          class="oppia-logo oppia-logo-wide" alt="Oppia Home">
                   </a>
                 </div>

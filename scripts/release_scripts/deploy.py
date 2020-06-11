@@ -33,6 +33,9 @@ IMPORTANT NOTES:
 
     where [app_name] is the name of your app. Note that the root folder MUST be
     named 'oppia'.
+
+3.  If you want to start the production server in the maintenance mode (the site
+    will only work for super admins) add a --maintenance_mode flag.
 """
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
@@ -68,6 +71,8 @@ _PARSER.add_argument(
     '--app_name', help='name of the app to deploy to', type=str)
 _PARSER.add_argument(
     '--version', help='version to deploy', type=str)
+_PARSER.add_argument(
+    '--maintenance_mode', action='store_true', default=False)
 
 APP_NAME_OPPIASERVER = 'oppiaserver'
 APP_NAME_OPPIATESTSERVER = 'oppiatestserver'
@@ -78,8 +83,6 @@ CURRENT_DATETIME = datetime.datetime.utcnow()
 LOG_FILE_PATH = os.path.join('..', 'deploy.log')
 INDEX_YAML_PATH = os.path.join('.', 'index.yaml')
 THIRD_PARTY_DIR = os.path.join('.', 'third_party')
-FECONF_PATH = os.path.join('.', 'feconf.py')
-CONSTANTS_FILE_PATH = os.path.join('assets', 'constants.ts')
 
 FILES_AT_ROOT = ['favicon.ico', 'robots.txt']
 IMAGE_DIRS = ['avatar', 'general', 'sidebar', 'logo']
@@ -99,10 +102,7 @@ def preprocess_release(app_name, deploy_data_path):
     in execute_deployment function. Currently it does the following:
 
     (1) Substitutes files from the per-app deployment data.
-    (2) Change the DEV_MODE constant in assets/constants.ts.
-    (3) Change GCS_RESOURCE_BUCKET in assets/constants.ts.
-    (4) Removes the "version" field from app.yaml, since gcloud does not like
-        it (when deploying).
+    (2) Change GCS_RESOURCE_BUCKET in assets/constants.ts.
 
     Args:
         app_name: str. Name of the app to deploy.
@@ -147,21 +147,17 @@ def preprocess_release(app_name, deploy_data_path):
             dst = os.path.join(dst_dir, filename)
             shutil.copyfile(src, dst)
 
-    # Changes the DEV_MODE constant in assets/constants.ts.
     with python_utils.open_file(
-        os.path.join(CONSTANTS_FILE_PATH), 'r') as assets_file:
+        os.path.join(common.CONSTANTS_FILE_PATH), 'r') as assets_file:
         content = assets_file.read()
-    bucket_name = app_name + BUCKET_NAME_SUFFIX
+
     assert '"DEV_MODE": true' in content
     assert '"GCS_RESOURCE_BUCKET_NAME": "None-resources",' in content
-    os.remove(os.path.join(CONSTANTS_FILE_PATH))
-    content = content.replace('"DEV_MODE": true', '"DEV_MODE": false')
-    content = content.replace(
-        '"GCS_RESOURCE_BUCKET_NAME": "None-resources",',
+    bucket_name = app_name + BUCKET_NAME_SUFFIX
+    common.inplace_replace_file(
+        common.CONSTANTS_FILE_PATH,
+        r'"GCS_RESOURCE_BUCKET_NAME": "None-resources",',
         '"GCS_RESOURCE_BUCKET_NAME": "%s",' % bucket_name)
-    with python_utils.open_file(
-        os.path.join(CONSTANTS_FILE_PATH), 'w+') as new_assets_file:
-        new_assets_file.write(content)
 
 
 def check_errors_in_a_page(url_to_check, msg_to_confirm):
@@ -214,17 +210,22 @@ def update_and_check_indexes(app_name):
             'visit the indexes page. Exiting.')
 
 
-def build_scripts():
-    """Builds and Minifies all the scripts.
+def build_scripts(maintenance_mode):
+    """Builds and minifies all the scripts.
+
+    Args:
+        maintenance_mode: bool. Whether to enable the maintenance mode.
 
     Raises:
         Exception: The build process fails.
     """
     # Do a build, while outputting to the terminal.
     python_utils.PRINT('Building and minifying scripts...')
-    build_process = subprocess.Popen(
-        ['python', '-m', 'scripts.build', '--prod_env', '--deploy_mode'],
-        stdout=subprocess.PIPE)
+    build_command = [
+        'python', '-m', 'scripts.build', '--prod_env', '--deploy_mode']
+    if maintenance_mode:
+        build_command.append('--maintenance_mode')
+    build_process = subprocess.Popen(build_command, stdout=subprocess.PIPE)
     while True:
         line = build_process.stdout.readline().strip()
         if not line:
@@ -507,7 +508,7 @@ def execute_deployment():
             common.check_blocking_bug_issue_count(repo)
             common.check_prs_for_current_release_are_released(repo)
             update_configs.main(personal_access_token)
-            with python_utils.open_file(FECONF_PATH, 'r') as f:
+            with python_utils.open_file(common.FECONF_PATH, 'r') as f:
                 feconf_contents = f.read()
                 if ('MAILGUN_API_KEY' not in feconf_contents or
                         'MAILGUN_API_KEY = None' in feconf_contents):
@@ -545,7 +546,7 @@ def execute_deployment():
             preprocess_release(app_name, deploy_data_path)
 
             update_and_check_indexes(app_name)
-            build_scripts()
+            build_scripts(parsed_args.maintenance_mode)
             deploy_application_and_write_log_entry(
                 app_name, current_release_version,
                 current_git_revision)
@@ -566,5 +567,5 @@ def execute_deployment():
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because
 # it will only be called when deploy.py is used as a script.
-if __name__ == '__main__': # pragma: no cover
+if __name__ == '__main__':  # pragma: no cover
     execute_deployment()
