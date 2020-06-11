@@ -14915,7 +14915,7 @@ class TaskEntryModelValidatorTests(test_utils.GenericTestBase):
              'TaskEntryModel',
              ['Entity id %s: composite_entity_id "bad_composite_id" should be '
               '"exploration.exp_id.1"' % (
-                 task_id,)]])
+                  task_id,)]])
 
     def test_status_open_but_closed_by_is_set(self):
         task_id = improvements_models.TaskEntryModel.create(
