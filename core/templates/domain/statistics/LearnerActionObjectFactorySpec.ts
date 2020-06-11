@@ -20,70 +20,64 @@ import { TestBed } from '@angular/core/testing';
 
 import { LearnerActionObjectFactory } from
   'domain/statistics/LearnerActionObjectFactory';
-import { StatisticsDomainConstants } from
-  'domain/statistics/statistics-domain.constants';
 
 describe('Learner Action Object Factory', () => {
+  // TODO(#9311): Assign to "this" once we can use TestBed.inject to keep type
+  // information.
+  let learnerActionObjectFactory: LearnerActionObjectFactory;
+
   beforeEach(() => {
-    TestBed.configureTestingModule({
-      providers: [LearnerActionObjectFactory]
+    learnerActionObjectFactory = TestBed.get(LearnerActionObjectFactory);
+  });
+
+  it('should create a new exploration start action', () => {
+    const learnerAction = (
+      learnerActionObjectFactory.createExplorationStartAction({
+        state_name: {value: 'Hola'},
+      }));
+
+    expect(learnerAction.action_type).toEqual('ExplorationStart');
+    expect(learnerAction.action_customization_args).toEqual({
+      state_name: {value: 'Hola'},
     });
-
-    this.LearnerActionObjectFactory =
-      TestBed.get(LearnerActionObjectFactory);
-    this.LEARNER_ACTION_SCHEMA_LATEST_VERSION =
-      StatisticsDomainConstants.LEARNER_ACTION_SCHEMA_LATEST_VERSION;
+    expect(learnerAction.schema_version).toEqual(1);
   });
 
-  it('should create a new learner action', () => {
-    var learnerActionObject =
-        this.LearnerActionObjectFactory.createNew('AnswerSubmit', {});
+  it('should create a new answer submit action', () => {
+    const learnerAction = (
+      learnerActionObjectFactory.createAnswerSubmitAction({
+        state_name: {value: 'Hola'},
+        dest_state_name: {value: 'Adios'},
+        interaction_id: {value: 'TextInput'},
+        submitted_answer: {value: 'Hi'},
+        feedback: {value: 'Correct!'},
+        time_spent_state_in_msecs: {value: 3.5},
+      }));
 
-    expect(learnerActionObject.actionType).toEqual('AnswerSubmit');
-    expect(learnerActionObject.actionCustomizationArgs).toEqual({});
-    expect(learnerActionObject.schemaVersion)
-      .toEqual(this.LEARNER_ACTION_SCHEMA_LATEST_VERSION);
-  });
-
-  it('should throw if the schema version is not a positive int', () => {
-    var LearnerActionObjectFactoryLocalReference =
-        this.LearnerActionObjectFactory;
-
-    expect(() => {
-      return LearnerActionObjectFactoryLocalReference.createNew(
-        'AnswerSubmit', {}, -1);
-    }).toThrowError('given invalid schema version');
-  });
-
-  it('should use a specific schema version if provided', () => {
-    var learnerActionObject =
-        this.LearnerActionObjectFactory.createNew('AnswerSubmit', {}, 99);
-
-    expect(learnerActionObject.schemaVersion).toEqual(99);
-  });
-
-  it('should create a new learner action from a backend dict', () => {
-    var learnerActionObject =
-        this.LearnerActionObjectFactory.createFromBackendDict({
-          action_type: 'AnswerSubmit',
-          action_customization_args: {},
-          schema_version: 1
-        });
-
-    expect(learnerActionObject.actionType).toEqual('AnswerSubmit');
-    expect(learnerActionObject.actionCustomizationArgs).toEqual({});
-    expect(learnerActionObject.schemaVersion).toEqual(1);
-  });
-
-  it('should convert a learner action to a backend dict', () => {
-    var learnerActionObject =
-        this.LearnerActionObjectFactory.createNew('AnswerSubmit', {}, 1);
-
-    var learnerActionDict = learnerActionObject.toBackendDict();
-    expect(learnerActionDict).toEqual({
-      action_type: 'AnswerSubmit',
-      action_customization_args: {},
-      schema_version: 1
+    expect(learnerAction.action_type).toEqual('AnswerSubmit');
+    expect(learnerAction.action_customization_args).toEqual({
+      state_name: {value: 'Hola'},
+      dest_state_name: {value: 'Adios'},
+      interaction_id: {value: 'TextInput'},
+      submitted_answer: {value: 'Hi'},
+      feedback: {value: 'Correct!'},
+      time_spent_state_in_msecs: {value: 3.5},
     });
+    expect(learnerAction.schema_version).toEqual(1);
+  });
+
+  it('should create a new exploration quit action', () => {
+    const learnerAction = (
+      learnerActionObjectFactory.createExplorationQuitAction({
+        state_name: {value: 'Adios'},
+        time_spent_in_state_in_msecs: {value: 300},
+      }));
+
+    expect(learnerAction.action_type).toEqual('ExplorationQuit');
+    expect(learnerAction.action_customization_args).toEqual({
+      state_name: {value: 'Adios'},
+      time_spent_in_state_in_msecs: {value: 300},
+    });
+    expect(learnerAction.schema_version).toEqual(1);
   });
 });

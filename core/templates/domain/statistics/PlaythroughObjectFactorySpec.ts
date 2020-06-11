@@ -24,18 +24,21 @@ import { PlaythroughObjectFactory } from
   'domain/statistics/PlaythroughObjectFactory';
 
 describe('Playthrough Object Factory', () => {
-  beforeEach(() => {
-    TestBed.configureTestingModule({
-      providers: [PlaythroughObjectFactory]
-    });
+  let playthroughObjectFactory: PlaythroughObjectFactory;
+  let learnerActionObjectFactory: LearnerActionObjectFactory;
 
-    this.pof = TestBed.get(PlaythroughObjectFactory);
-    this.laof = TestBed.get(LearnerActionObjectFactory);
+  beforeEach(() => {
+    playthroughObjectFactory = TestBed.get(PlaythroughObjectFactory);
+    learnerActionObjectFactory = TestBed.get(LearnerActionObjectFactory);
   });
 
   it('should create a new playthrough', () => {
-    var actions = [this.laof.createNew('AnswerSubmit', {}, 1)];
-    var playthroughObject = this.pof.createNew(
+    var actions = [
+      learnerActionObjectFactory.createExplorationStartAction({
+        state_name: {value: 'state name'},
+      })
+    ];
+    var playthroughObject = playthroughObjectFactory.createNew(
       'playthroughId1', 'expId1', 1, 'EarlyQuit', {}, actions);
 
     expect(playthroughObject.playthroughId).toEqual('playthroughId1');
@@ -47,33 +50,40 @@ describe('Playthrough Object Factory', () => {
   });
 
   it('should create a new playthrough from a backend dict', () => {
-    var playthroughObject = this.pof.createFromBackendDict(
-      {
-        playthrough_id: 'playthroughId1',
-        exp_id: 'expId1',
-        exp_version: 1,
-        issue_type: 'EarlyQuit',
-        issue_customization_args: {},
-        actions: [{
-          action_type: 'AnswerSubmit',
-          action_customization_args: {},
-          schema_version: 1
-        }]
-      }
-    );
+    var playthroughObject = playthroughObjectFactory.createFromBackendDict({
+      playthrough_id: 'playthroughId1',
+      exp_id: 'expId1',
+      exp_version: 1,
+      issue_type: 'EarlyQuit',
+      issue_customization_args: {},
+      actions: [{
+        action_type: 'ExplorationStart',
+        action_customization_args: {
+          state_name: {value: 'state name'},
+        },
+        schema_version: 1
+      }]
+    });
 
     expect(playthroughObject.playthroughId).toEqual('playthroughId1');
     expect(playthroughObject.expId).toEqual('expId1');
     expect(playthroughObject.expVersion).toEqual(1);
     expect(playthroughObject.issueType).toEqual('EarlyQuit');
     expect(playthroughObject.issueCustomizationArgs).toEqual({});
-    expect(playthroughObject.actions).toEqual([this.laof.createNew(
-      'AnswerSubmit', {}, 1)]);
+    expect(playthroughObject.actions).toEqual([
+      learnerActionObjectFactory.createExplorationStartAction({
+        state_name: {value: 'state name'},
+      })
+    ]);
   });
 
   it('should convert a playthrough to a backend dict', () => {
-    var actions = [this.laof.createNew('AnswerSubmit', {}, 1)];
-    var playthroughObject = this.pof.createNew(
+    var actions = [
+      learnerActionObjectFactory.createExplorationStartAction({
+        state_name: {value: 'state name'},
+      })
+    ];
+    var playthroughObject = playthroughObjectFactory.createNew(
       'playthroughId1', 'expId1', 1, 'EarlyQuit', {}, actions);
 
     var playthroughDict = playthroughObject.toBackendDict();
@@ -84,8 +94,10 @@ describe('Playthrough Object Factory', () => {
       issue_type: 'EarlyQuit',
       issue_customization_args: {},
       actions: [{
-        action_type: 'AnswerSubmit',
-        action_customization_args: {},
+        action_type: 'ExplorationStart',
+        action_customization_args: {
+          state_name: {value: 'state name'},
+        },
         schema_version: 1
       }]
     });

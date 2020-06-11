@@ -22,41 +22,24 @@ import { TestBed } from '@angular/core/testing';
 
 import { ExplorationFeaturesService } from
   'services/exploration-features.service';
-import { LearnerActionObjectFactory } from
-  'domain/statistics/LearnerActionObjectFactory';
+import { Playthrough } from 'domain/statistics/PlaythroughObjectFactory';
 import { PlaythroughService } from 'services/playthrough.service';
+import { StopwatchObjectFactory } from
+  'domain/utilities/StopwatchObjectFactory';
 
 describe('PlaythroughService', () => {
-  let playthroughService: PlaythroughService = null;
-  let learnerActionObjectFactory: LearnerActionObjectFactory = null;
   let explorationFeaturesService: ExplorationFeaturesService = null;
+  let playthroughService: PlaythroughService = null;
+  let stopwatchObjectFactory: StopwatchObjectFactory = null;
+
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule]
     });
 
+    explorationFeaturesService = TestBed.get(ExplorationFeaturesService);
     playthroughService = TestBed.get(PlaythroughService);
-    learnerActionObjectFactory =
-      TestBed.get(LearnerActionObjectFactory);
-    explorationFeaturesService =
-      TestBed.get(ExplorationFeaturesService);
-  });
-
-  describe('.initSession()', () => {
-    it('stores the correct values', () => {
-      this.expId = 'expId';
-      this.expVersion = 1;
-      this.playthroughRecordingProbability = 1.0;
-
-      playthroughService.initSession(
-        this.expId, this.expVersion, this.playthroughRecordingProbability);
-
-      let playthrough = playthroughService.getPlaythrough();
-      expect(playthrough.expId).toEqual(this.expId);
-      expect(playthrough.expVersion).toEqual(this.expVersion);
-      expect(playthrough.actions).toEqual([]);
-      expect(playthrough.issueCustomizationArgs).toEqual({});
-    });
+    stopwatchObjectFactory = TestBed.get(StopwatchObjectFactory);
   });
 
   describe('recording exploration playthroughs', () => {
@@ -71,165 +54,139 @@ describe('PlaythroughService', () => {
         .and.returnValue(true);
     });
 
-    describe('.recordExplorationStartAction()', () => {
-      it('adds a learner action object to the actions array', () => {
+    it('should return a null playthrough before recording start action', () => {
+      expect(playthroughService.getPlaythrough()).toBeNull();
+    });
+
+    it('should return a null playthrough if start action is not first action',
+      () => {
+        playthroughService.recordAnswerSubmitAction(
+          'stateName1', 'stateName2', 'TextInput', 'Hello', 'Try again', 30);
+        expect(playthroughService.getPlaythrough()).toBeNull();
+
+        playthroughService.recordExplorationQuitAction('End', 13);
+        expect(playthroughService.getPlaythrough()).toBeNull();
+      });
+
+    it('should return a real playthrough if start action is first action',
+      () => {
         playthroughService.recordExplorationStartAction('initStateName1');
 
-        let playthrough = playthroughService.getPlaythrough();
-        let actionSchemaVersion = 1;
-        expect(playthrough.actions).toEqual([
-          learnerActionObjectFactory.createNew('ExplorationStart', {
-            state_name: {value: 'initStateName1'},
-          }, actionSchemaVersion),
-        ]);
+        expect(playthroughService.getPlaythrough()).toBeInstanceOf(Playthrough);
+      });
+
+    it('should identify multiple incorrect submissions', () => {
+      playthroughService.recordExplorationStartAction('stateName1');
+      playthroughService.recordAnswerSubmitAction(
+        'stateName1', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
+      playthroughService.recordAnswerSubmitAction(
+        'stateName1', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
+      playthroughService.recordAnswerSubmitAction(
+        'stateName1', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
+      playthroughService.recordAnswerSubmitAction(
+        'stateName1', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
+      playthroughService.recordAnswerSubmitAction(
+        'stateName1', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
+      playthroughService.recordExplorationQuitAction('stateName1', 60);
+
+      playthroughService.recordPlaythrough(false);
+
+      let playthrough = playthroughService.getPlaythrough();
+      expect(playthrough.issueType).toEqual('MultipleIncorrectSubmissions');
+      expect(playthrough.issueCustomizationArgs).toEqual({
+        state_name: {value: 'stateName1'},
+        num_times_answered_incorrectly: {value: 5}
       });
     });
 
-    describe('.recordAnswerSubmitAction()', () => {
-      it('adds a learner action object to the actions array', () => {
-        playthroughService.recordAnswerSubmitAction(
-          'stateName1', 'stateName2', 'TextInput', 'Hello', 'Try again', 30);
+    it('should identify early quits', () => {
+      spyOn(stopwatchObjectFactory, 'create').and.returnValue(
+        jasmine.createSpyObj('Stopwatch', {getTimeInSecs: 40, reset: null}));
 
-        let playthrough = playthroughService.getPlaythrough();
-        let actionSchemaVersion = 1;
-        expect(playthrough.actions).toEqual([
-          learnerActionObjectFactory.createNew('AnswerSubmit', {
-            state_name: {value: 'stateName1'},
-            dest_state_name: {value: 'stateName2'},
-            interaction_id: {value: 'TextInput'},
-            submitted_answer: {value: 'Hello'},
-            feedback: {value: 'Try again'},
-            time_spent_state_in_msecs: {value: 30},
-          }, actionSchemaVersion),
-        ]);
+      playthroughService.recordExplorationStartAction('stateName1');
+      playthroughService.recordAnswerSubmitAction(
+        'stateName1', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
+      playthroughService.recordExplorationQuitAction('stateName1', 60);
+
+      playthroughService.recordPlaythrough(false);
+
+      let playthrough = playthroughService.getPlaythrough();
+      expect(playthrough.issueType).toEqual('EarlyQuit');
+      expect(playthrough.issueCustomizationArgs).toEqual({
+        state_name: {value: 'stateName1'},
+        time_spent_in_exp_in_secs: {value: 40},
       });
     });
 
-    describe('.recordAnswerSubmitAction()', () => {
-      it('adds a learner action object to the actions array', () => {
-        playthroughService.recordExplorationQuitAction('stateName1', 120);
+    it('should identify cyclic state transitions', () => {
+      playthroughService.recordExplorationStartAction('stateName1');
+      playthroughService.recordAnswerSubmitAction(
+        'stateName1', 'stateName2', 'TextInput', 'Hello', 'Try again', 30);
+      playthroughService.recordAnswerSubmitAction(
+        'stateName2', 'stateName3', 'TextInput', 'Hello', 'Try again', 30);
+      playthroughService.recordAnswerSubmitAction(
+        'stateName3', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
+      playthroughService.recordAnswerSubmitAction(
+        'stateName1', 'stateName2', 'TextInput', 'Hello', 'Try again', 30);
+      playthroughService.recordAnswerSubmitAction(
+        'stateName2', 'stateName3', 'TextInput', 'Hello', 'Try again', 30);
+      playthroughService.recordAnswerSubmitAction(
+        'stateName3', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
+      playthroughService.recordAnswerSubmitAction(
+        'stateName1', 'stateName2', 'TextInput', 'Hello', 'Try again', 30);
+      playthroughService.recordAnswerSubmitAction(
+        'stateName2', 'stateName3', 'TextInput', 'Hello', 'Try again', 30);
+      playthroughService.recordAnswerSubmitAction(
+        'stateName3', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
+      playthroughService.recordExplorationQuitAction('stateName1', 30);
 
-        let playthrough = playthroughService.getPlaythrough();
-        let actionSchemaVersion = 1;
-        expect(playthrough.actions).toEqual([
-          learnerActionObjectFactory.createNew('ExplorationQuit', {
-            state_name: {value: 'stateName1'},
-            time_spent_in_state_in_msecs: {value: 120}
-          }, actionSchemaVersion),
-        ]);
+      playthroughService.recordPlaythrough(false);
+
+      let playthrough = playthroughService.getPlaythrough();
+      expect(playthrough.issueType).toEqual('CyclicStateTransitions');
+      expect(playthrough.issueCustomizationArgs).toEqual({
+        state_names: {
+          value: ['stateName1', 'stateName2', 'stateName3', 'stateName1']
+        },
       });
     });
 
-    describe('.recordPlaythrough()', () => {
-      it('identifies multiple incorrect submissions', () => {
-        playthroughService.recordExplorationStartAction('stateName1');
-        playthroughService.recordAnswerSubmitAction(
-          'stateName1', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
-        playthroughService.recordAnswerSubmitAction(
-          'stateName1', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
-        playthroughService.recordAnswerSubmitAction(
-          'stateName1', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
-        playthroughService.recordAnswerSubmitAction(
-          'stateName1', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
-        playthroughService.recordAnswerSubmitAction(
-          'stateName1', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
+    it('should identify p-shaped cyclic state transitions', () => {
+      // A p-shaped cycle looks like:
+      // [1] -> [2] -> [3] -> [4]
+      //                ^      v
+      //               [6] <- [5]
+      // 1, 2, 3, 4, 5, 6, 3, 4, 5, 6, 3, 4, 5, 6...
 
-        playthroughService.recordPlaythrough(false);
+      playthroughService.recordExplorationStartAction('stateName1');
+      playthroughService.recordAnswerSubmitAction(
+        'stateName1', 'stateName2', 'TextInput', 'Hello', 'Try again', 30);
+      playthroughService.recordAnswerSubmitAction(
+        'stateName2', 'stateName3', 'TextInput', 'Hello', 'Try again', 30);
+      playthroughService.recordAnswerSubmitAction(
+        'stateName3', 'stateName2', 'TextInput', 'Hello', 'Try again', 30);
+      playthroughService.recordAnswerSubmitAction(
+        'stateName2', 'stateName3', 'TextInput', 'Hello', 'Try again', 30);
+      playthroughService.recordAnswerSubmitAction(
+        'stateName3', 'stateName2', 'TextInput', 'Hello', 'Try again', 30);
+      playthroughService.recordAnswerSubmitAction(
+        'stateName2', 'stateName3', 'TextInput', 'Hello', 'Try again', 30);
+      playthroughService.recordAnswerSubmitAction(
+        'stateName3', 'stateName2', 'TextInput', 'Hello', 'Try again', 30);
+      playthroughService.recordExplorationQuitAction('stateName2', 60);
 
-        let playthrough = playthroughService.getPlaythrough();
-        expect(playthrough.issueType).toEqual('MultipleIncorrectSubmissions');
-        expect(playthrough.issueCustomizationArgs).toEqual({
-          state_name: {value: 'stateName1'},
-          num_times_answered_incorrectly: {value: 5}
-        });
-      });
+      playthroughService.recordPlaythrough(false);
 
-      it('identifies early quits', () => {
-        playthroughService.recordExplorationStartAction('stateName1');
-        playthroughService.recordAnswerSubmitAction(
-          'stateName1', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
-        playthroughService.recordExplorationQuitAction('stateName1', 60);
-
-        playthroughService.recordPlaythrough(false);
-
-        let playthrough = playthroughService.getPlaythrough();
-        expect(playthrough.issueType).toEqual('EarlyQuit');
-        // We don't check the time spent issue customization arg because it is
-        // flaky between tests.
-        expect(playthrough.issueCustomizationArgs).toEqual(
-          jasmine.objectContaining({state_name: {value: 'stateName1'}}));
-      });
-
-      it('identifies cyclic state transitions', () => {
-        playthroughService.recordExplorationStartAction('stateName1');
-        playthroughService.recordAnswerSubmitAction(
-          'stateName1', 'stateName2', 'TextInput', 'Hello', 'Try again', 30);
-        playthroughService.recordAnswerSubmitAction(
-          'stateName2', 'stateName3', 'TextInput', 'Hello', 'Try again', 30);
-        playthroughService.recordAnswerSubmitAction(
-          'stateName3', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
-        playthroughService.recordAnswerSubmitAction(
-          'stateName1', 'stateName2', 'TextInput', 'Hello', 'Try again', 30);
-        playthroughService.recordAnswerSubmitAction(
-          'stateName2', 'stateName3', 'TextInput', 'Hello', 'Try again', 30);
-        playthroughService.recordAnswerSubmitAction(
-          'stateName3', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
-        playthroughService.recordAnswerSubmitAction(
-          'stateName1', 'stateName2', 'TextInput', 'Hello', 'Try again', 30);
-        playthroughService.recordAnswerSubmitAction(
-          'stateName2', 'stateName3', 'TextInput', 'Hello', 'Try again', 30);
-        playthroughService.recordAnswerSubmitAction(
-          'stateName3', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
-        playthroughService.recordExplorationQuitAction('stateName1', 30);
-
-        playthroughService.recordPlaythrough(false);
-
-        let playthrough = playthroughService.getPlaythrough();
-        expect(playthrough.issueType).toEqual('CyclicStateTransitions');
-        expect(playthrough.issueCustomizationArgs).toEqual({
-          state_names: {
-            value: ['stateName1', 'stateName2', 'stateName3', 'stateName1']
-          },
-        });
-      });
-
-      it('identifies p-shaped cyclic state transitions', () => {
-        // A p-shaped cycle looks like:
-        // [1] -> [2] -> [3] -> [4]
-        //                ^      v
-        //               [6] <- [5]
-        // 1, 2, 3, 4, 5, 6, 3, 4, 5, 6, 3, 4, 5, 6...
-
-        playthroughService.recordExplorationStartAction('stateName1');
-        playthroughService.recordAnswerSubmitAction(
-          'stateName1', 'stateName2', 'TextInput', 'Hello', 'Try again', 30);
-        playthroughService.recordAnswerSubmitAction(
-          'stateName2', 'stateName3', 'TextInput', 'Hello', 'Try again', 30);
-        playthroughService.recordAnswerSubmitAction(
-          'stateName3', 'stateName2', 'TextInput', 'Hello', 'Try again', 30);
-        playthroughService.recordAnswerSubmitAction(
-          'stateName2', 'stateName3', 'TextInput', 'Hello', 'Try again', 30);
-        playthroughService.recordAnswerSubmitAction(
-          'stateName3', 'stateName2', 'TextInput', 'Hello', 'Try again', 30);
-        playthroughService.recordAnswerSubmitAction(
-          'stateName2', 'stateName3', 'TextInput', 'Hello', 'Try again', 30);
-        playthroughService.recordAnswerSubmitAction(
-          'stateName3', 'stateName2', 'TextInput', 'Hello', 'Try again', 30);
-        playthroughService.recordExplorationQuitAction('stateName2', 60);
-
-        playthroughService.recordPlaythrough(false);
-
-        let playthrough = playthroughService.getPlaythrough();
-        expect(playthrough.issueType).toEqual('CyclicStateTransitions');
-        // The cycle is stateName2->stateName3->stateName2.
-        expect(playthrough.issueCustomizationArgs).toEqual({
-          state_names: {value: ['stateName2', 'stateName3', 'stateName2']},
-        });
+      let playthrough = playthroughService.getPlaythrough();
+      expect(playthrough.issueType).toEqual('CyclicStateTransitions');
+      // The cycle is stateName2->stateName3->stateName2.
+      expect(playthrough.issueCustomizationArgs).toEqual({
+        state_names: {value: ['stateName2', 'stateName3', 'stateName2']},
       });
     });
   });
 
-  describe('disabling recording playthroughs for an exploration', () => {
+  describe('Disabling recording playthroughs for an exploration', () => {
     it('should not record learner actions', () => {
       this.expId = 'expId';
       this.expVersion = 1;
@@ -244,8 +201,7 @@ describe('PlaythroughService', () => {
         'stateName1', 'stateName2', 'TextInput', 'Hello', 'Try again', 30);
       playthroughService.recordExplorationQuitAction('stateName1', 120);
 
-      let playthrough = playthroughService.getPlaythrough();
-      expect(playthrough.actions).toEqual([]);
+      expect(playthroughService.getPlaythrough()).toBeNull();
     });
   });
 });

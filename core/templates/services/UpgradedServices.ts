@@ -295,6 +295,8 @@ import { PlaythroughIssuesBackendApiService } from
   'services/playthrough-issues-backend-api.service';
 import { PlaythroughObjectFactory } from
   'domain/statistics/PlaythroughObjectFactory';
+import { PlaythroughBackendApiService } from
+  'services/playthrough-backend-api.service';
 import { PlaythroughService } from 'services/playthrough.service';
 import { PredictionAlgorithmRegistryService } from
   // eslint-disable-next-line max-len
@@ -623,6 +625,8 @@ export class UpgradedServices {
       new PlayerCorrectnessFeedbackEnabledService();
     upgradedServices['PlaythroughIssueObjectFactory'] =
       new PlaythroughIssueObjectFactory();
+    upgradedServices['PlaythroughObjectFactory'] =
+      new PlaythroughObjectFactory();
     upgradedServices['PredictionResultObjectFactory'] =
       new PredictionResultObjectFactory();
     upgradedServices['QuestionSummaryObjectFactory'] =
@@ -791,8 +795,6 @@ export class UpgradedServices {
         upgradedServices['baseInteractionValidationService']);
     upgradedServices['PlayerTranscriptService'] = new PlayerTranscriptService(
       upgradedServices['LoggerService']);
-    upgradedServices['PlaythroughObjectFactory'] = new PlaythroughObjectFactory(
-      upgradedServices['LearnerActionObjectFactory']);
     upgradedServices['PythonProgramTokenizer'] = new PythonProgramTokenizer(
       upgradedServices['LoggerService']);
     upgradedServices['QuestionSummaryForOneSkillObjectFactory'] =
@@ -1017,8 +1019,12 @@ export class UpgradedServices {
     upgradedServices['PlaythroughIssuesBackendApiService'] =
       new PlaythroughIssuesBackendApiService(
         upgradedServices['HttpClient'],
-        upgradedServices['PlaythroughIssuesBackendApiService'],
+        upgradedServices['PlaythroughIssueObjectFactory'],
         upgradedServices['UrlInterpolationService']);
+    upgradedServices['PlaythroughBackendApiService'] =
+      new PlaythroughBackendApiService(
+        upgradedServices['HttpClient'],
+        upgradedServices['UrlInterpolationService'])
     upgradedServices['PretestQuestionBackendApiService'] =
       new PretestQuestionBackendApiService(
         upgradedServices['UrlInterpolationService'],
@@ -1160,12 +1166,11 @@ export class UpgradedServices {
     // Topological level: 6.
     upgradedServices['PlaythroughService'] =
       new PlaythroughService(
-        upgradedServices['HttpClient'],
         upgradedServices['ExplorationFeaturesService'],
         upgradedServices['LearnerActionObjectFactory'],
+        upgradedServices['PlaythroughBackendApiService'],
         upgradedServices['PlaythroughObjectFactory'],
-        upgradedServices['StopwatchObjectFactory'],
-        upgradedServices['UrlInterpolationService']);
+        upgradedServices['StopwatchObjectFactory']);
     upgradedServices['StateObjectFactory'] = new StateObjectFactory(
       upgradedServices['InteractionObjectFactory'],
       upgradedServices['ParamChangesObjectFactory'],

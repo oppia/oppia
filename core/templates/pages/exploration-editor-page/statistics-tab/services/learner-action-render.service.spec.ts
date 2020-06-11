@@ -110,8 +110,7 @@ describe('Learner Action Render Service', function() {
       'ParamChangesObjectFactory', new ParamChangesObjectFactory(
         new ParamChangeObjectFactory()));
     $provide.value(
-      'PlaythroughObjectFactory', new PlaythroughObjectFactory(
-        new LearnerActionObjectFactory()));
+      'PlaythroughObjectFactory', new PlaythroughObjectFactory());
     $provide.value(
       'RecordedVoiceoversObjectFactory',
       new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()));

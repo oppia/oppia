@@ -20,56 +20,40 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { LearnerAction, LearnerActionObjectFactory } from
-  'domain/statistics/LearnerActionObjectFactory';
+import { ILearnerAction } from 'domain/statistics/LearnerActionObjectFactory';
+
+export interface IPlaythroughBackendDict {
+  'playthrough_id': string;
+  'exp_id': string;
+  'exp_version': number;
+  'issue_type': string;
+  'issue_customization_args': any;
+  'actions': ILearnerAction[];
+}
 
 export class Playthrough {
-  playthroughId: string;
-  expId: string;
-  expVersion: number;
-  issueType: string;
-  issueCustomizationArgs: any;
-  actions: any[];
-  /**
-   * @constructor
-   * @param {string} playthroughId - ID of a playthrough.
-   * @param {string} expId - ID of an exploration.
-   * @param {number} expVersion - Version of an exploration.
-   * @param {string} issueType - type of an issue.
-   * @param {Object.<string, *>} issueCustomizationArgs - customization dict
-   *   for an issue.
-   * @param {LearnerAction[]} actions - list of learner actions.
-   */
   constructor(
-      playthroughId: string, expId: string, expVersion: number,
-      issueType: string, issueCustomizationArgs: any,
-      actions: LearnerAction[]) {
-    /** @type {string} */
-    this.playthroughId = playthroughId;
-    /** @type {string} */
-    this.expId = expId;
-    /** @type {number} */
-    this.expVersion = expVersion;
-    /** @type {string} */
-    this.issueType = issueType;
-    /** @type {Object.<string, *>} */
-    this.issueCustomizationArgs = issueCustomizationArgs;
-    /** @type {LearnerAction[]} */
-    this.actions = actions;
+      public playthroughId: string,
+      public expId: string,
+      public expVersion: number,
+      public issueType: string,
+      public issueCustomizationArgs: any,
+      public actions: ILearnerAction[]) {}
+
+  getLastAction(): ILearnerAction {
+    const actionsLength = this.actions.length;
+    return actionsLength > 0 ? this.actions[actionsLength - 1] : null;
   }
 
   /** @returns {PlaythroughBackendDict} */
   toBackendDict(): any {
-    var actionDicts = this.actions.map(function(action) {
-      return action.toBackendDict();
-    });
     return {
       id: this.playthroughId,
       exp_id: this.expId,
       exp_version: this.expVersion,
       issue_type: this.issueType,
       issue_customization_args: this.issueCustomizationArgs,
-      actions: actionDicts
+      actions: this.actions
     };
   }
 }
@@ -78,39 +62,22 @@ export class Playthrough {
   providedIn: 'root'
 })
 export class PlaythroughObjectFactory {
-  constructor(private learnerActionObjectFactory: LearnerActionObjectFactory) {}
-  /**
-   * @param {string} playthroughId - ID of a playthrough.
-   * @param {string} expId - ID of an exploration.
-   * @param {number} expVersion - Version of an exploration.
-   * @param {string} issueType - type of an issue.
-   * @param {Object.<string, *>} issueCustomizationArgs - customization dict
-   *   for an issue.
-   * @param {LearnerAction[]} actions - list of learner actions.
-   * @returns {Playthrough}
-   */
   createNew(
       playthroughId: string, expId: string, expVersion: number,
       issueType: string, issueCustomizationArgs: any,
-      actions: LearnerAction[]): Playthrough {
+      actions: ILearnerAction[]): Playthrough {
     return new Playthrough(
       playthroughId, expId, expVersion, issueType, issueCustomizationArgs,
       actions);
   }
 
-  /**
-   * @typedef
-   * @param {PlaythroughBackendDict} playthroughBackendDict
-   * @returns {Playthrough}
-   */
-  createFromBackendDict(playthroughBackendDict: any): Playthrough {
-    var actions = playthroughBackendDict.actions.map(
-      this.learnerActionObjectFactory.createFromBackendDict);
-
+  createFromBackendDict(
+      playthroughBackendDict: IPlaythroughBackendDict): Playthrough {
     return new Playthrough(
       playthroughBackendDict.playthrough_id, playthroughBackendDict.exp_id,
       playthroughBackendDict.exp_version, playthroughBackendDict.issue_type,
-      playthroughBackendDict.issue_customization_args, actions);
+      playthroughBackendDict.issue_customization_args,
+      playthroughBackendDict.actions);
   }
 }
 

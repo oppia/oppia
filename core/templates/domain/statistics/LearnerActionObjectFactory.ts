@@ -1,4 +1,4 @@
-// Copyright 2018 The Oppia Authors. All Rights Reserved.
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,96 +20,94 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { StatisticsDomainConstants } from
-  'domain/statistics/statistics-domain.constants';
-
-export class LearnerAction {
-  actionType: string;
-  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'outcome' is an outcome domain object and this can be
-  // directly typed to 'Outcome' type once 'OutcomeObjectFactory' is upgraded.
-  actionCustomizationArgs: any;
-  schemaVersion: number;
-  /**
-   * @constructor
-   * @param {string} actionType - type of an action.
-   * @param {Object.<string, *>} actionCustomizationArgs - customization dict
-   *   for an action.
-   * @param {number} schemaVersion - schema version of the class instance.
-   */
-  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'outcome' is an outcome domain object and this can be
-  // directly typed to 'Outcome' type once 'OutcomeObjectFactory' is upgraded.
-  constructor(
-      actionType: string, actionCustomizationArgs: any, schemaVersion: number) {
-    if (schemaVersion < 1) {
-      throw new Error('given invalid schema version');
-    }
-
-    /** @type {string} */
-    this.actionType = actionType;
-    /** @type {Object.<string, *>} */
-    this.actionCustomizationArgs = actionCustomizationArgs;
-    /** @type {number} */
-    this.schemaVersion = schemaVersion;
-  }
-
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because the return type is a dict with underscore_cased
-  // keys which give tslint errors against underscore_casing in favor of
-  // camelCasing.
-  toBackendDict(): any {
-    return {
-      action_type: this.actionType,
-      action_customization_args: this.actionCustomizationArgs,
-      schema_version: this.schemaVersion,
-    };
-  }
+export interface IExplorationStartCustomizationArgs {
+  'state_name': {value: string};
 }
+
+export interface IAnswerSubmitCustomizationArgs {
+  'state_name': {value: string};
+  'dest_state_name': {value: string};
+  'interaction_id': {value: string};
+  'submitted_answer': {value: string};
+  'feedback': {value: string};
+  'time_spent_state_in_msecs': {value: number};
+}
+
+export interface IExplorationQuitCustomizationArgs {
+  'state_name': {value: string};
+  'time_spent_in_state_in_msecs': {value: number};
+}
+
+export interface ILearnerActionExplorationStart {
+  // NOTE TO DEVELOPERS: The following two definitions are NOT typos! These are
+  // discriminated unions, a feature of TypeScript. Code will fail to compile if
+  // the compiler can not deduce that action_type and schema_version are set to
+  // the following values. For details see:
+  // https://www.typescriptlang.org/docs/handbook/advanced-types.html#discriminated-unions eslint-disable max-len
+  'action_type': 'ExplorationStart';
+  'schema_version': 1;
+  'action_customization_args': IExplorationStartCustomizationArgs;
+}
+
+export interface ILearnerActionAnswerSubmit {
+  // NOTE TO DEVELOPERS: The following two definitions are NOT typos! These are
+  // discriminated unions, a feature of TypeScript. Code will fail to compile if
+  // the compiler can not deduce that action_type and schema_version are set to
+  // the following values. For details see:
+  // https://www.typescriptlang.org/docs/handbook/advanced-types.html#discriminated-unions eslint-disable max-len
+  'action_type': 'AnswerSubmit';
+  'schema_version': 1;
+  'action_customization_args': IAnswerSubmitCustomizationArgs;
+}
+
+export interface ILearnerActionExplorationQuit {
+  // NOTE TO DEVELOPERS: The following two definitions are NOT typos! These are
+  // discriminated unions, a feature of TypeScript. Code will fail to compile if
+  // the compiler can not deduce that action_type and schema_version are set to
+  // the following values. For details see:
+  // https://www.typescriptlang.org/docs/handbook/advanced-types.html#discriminated-unions eslint-disable max-len
+  'action_type': 'ExplorationQuit';
+  'schema_version': 1;
+  'action_customization_args': IExplorationQuitCustomizationArgs;
+}
+
+export type ILearnerAction = (
+  ILearnerActionExplorationStart |
+  ILearnerActionAnswerSubmit |
+  ILearnerActionExplorationQuit);
 
 @Injectable({
   providedIn: 'root'
 })
 export class LearnerActionObjectFactory {
-  /**
-   * @property {string} actionType - type of an action
-   * @property {Object.<string, *>} actionCustomizationArgs - customization
-   *   dict for an action
-   * @property {number} [schemaVersion=LEARNER_ACTION_SCHEMA_LATEST_VERSION]
-   *   - schema version of the class instance.
-   * @returns {LearnerAction}
-   */
-  createNew(
-      actionType: string, actionCustomizationArgs: any,
-      schemaVersion: number): LearnerAction {
-    schemaVersion = schemaVersion ||
-      StatisticsDomainConstants.LEARNER_ACTION_SCHEMA_LATEST_VERSION;
-    return new LearnerAction(
-      actionType, actionCustomizationArgs, schemaVersion);
+  createExplorationStartAction(
+      actionCustomizationArgs:
+        IExplorationStartCustomizationArgs): ILearnerActionExplorationStart {
+    return {
+      action_type: 'ExplorationStart',
+      action_customization_args: actionCustomizationArgs,
+      schema_version: 1,
+    };
   }
 
-  /**
-   * @typedef LearnerActionBackendDict
-   * @property {string} actionType - type of an action.
-   * @property {Object.<string, *>} actionCustomizationArgs - customization
-   *   dict for an action.
-   * @property {number} schemaVersion - schema version of the class instance.
-   *   Defaults to the latest schema version.
-   */
+  createAnswerSubmitAction(
+      actionCustomizationArgs:
+        IAnswerSubmitCustomizationArgs): ILearnerActionAnswerSubmit {
+    return {
+      action_type: 'AnswerSubmit',
+      action_customization_args: actionCustomizationArgs,
+      schema_version: 1,
+    };
+  }
 
-  /**
-   * @param {LearnerActionBackendDict} learnerActionBackendDict
-   * @returns {LearnerAction}
-   */
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'learnerActionBackendDict' is a dict with underscore_cased
-  // keys which give tslint errors against underscore_casing in favor of
-  // camelCasing.
-  createFromBackendDict(learnerActionBackendDict: any): LearnerAction {
-    return new LearnerAction(
-      learnerActionBackendDict.action_type,
-      learnerActionBackendDict.action_customization_args,
-      learnerActionBackendDict.schema_version);
+  createExplorationQuitAction(
+      actionCustomizationArgs:
+        IExplorationQuitCustomizationArgs): ILearnerActionExplorationQuit {
+    return {
+      action_type: 'ExplorationQuit',
+      action_customization_args: actionCustomizationArgs,
+      schema_version: 1,
+    };
   }
 }
 
