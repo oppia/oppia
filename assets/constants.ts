@@ -4830,6 +4830,9 @@ export = {
     "id": "es",
     "text": "Español"
   }, {
+    "id": "fr",
+    "text": "français (French)"
+  }, {
     "id": "pt-br",
     "text": "Português (Brasil)"
   }, {
