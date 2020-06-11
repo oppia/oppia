@@ -12320,6 +12320,8 @@ class CompletedActivitiesModelValidatorTests(test_utils.GenericTestBase):
     def test_missing_exploration_model_failure(self):
         exp_models.ExplorationModel.get_by_id('2').delete(
             feconf.SYSTEM_COMMITTER_ID, '', [])
+        exp_models.ExplorationRightsModel.get_by_id('2').delete(
+            feconf.SYSTEM_COMMITTER_ID, '', [])
         expected_output = [
             (
                 u'[u\'failed validation check for exploration_ids '
@@ -12331,6 +12333,8 @@ class CompletedActivitiesModelValidatorTests(test_utils.GenericTestBase):
 
     def test_missing_collection_model_failure(self):
         collection_models.CollectionModel.get_by_id('4').delete(
+            feconf.SYSTEM_COMMITTER_ID, '', [])
+        collection_models.CollectionRightsModel.get_by_id('4').delete(
             feconf.SYSTEM_COMMITTER_ID, '', [])
         expected_output = [
             (
@@ -12373,7 +12377,7 @@ class CompletedActivitiesModelValidatorTests(test_utils.GenericTestBase):
             (
                 u'[u\'failed validation check for public exploration check '
                 'of CompletedActivitiesModel\', '
-                '[u"Entity id %s: Explorations with ids [u\'exp\'] are '
+                '[u"Entity id %s: Explorations with ids [\'exp\'] are '
                 'private"]]') % self.user_id]
         run_job_and_check_output(self, expected_output)
 
@@ -12387,7 +12391,7 @@ class CompletedActivitiesModelValidatorTests(test_utils.GenericTestBase):
             (
                 u'[u\'failed validation check for public collection check '
                 'of CompletedActivitiesModel\', '
-                '[u"Entity id %s: Collections with ids [u\'col\'] are '
+                '[u"Entity id %s: Collections with ids [\'col\'] are '
                 'private"]]') % self.user_id]
         run_job_and_check_output(self, expected_output)
 
@@ -12506,6 +12510,8 @@ class IncompleteActivitiesModelValidatorTests(test_utils.GenericTestBase):
     def test_missing_exploration_model_failure(self):
         exp_models.ExplorationModel.get_by_id('2').delete(
             feconf.SYSTEM_COMMITTER_ID, '', [])
+        exp_models.ExplorationRightsModel.get_by_id('2').delete(
+            feconf.SYSTEM_COMMITTER_ID, '', [])
         expected_output = [
             (
                 u'[u\'failed validation check for exploration_ids '
@@ -12517,6 +12523,8 @@ class IncompleteActivitiesModelValidatorTests(test_utils.GenericTestBase):
 
     def test_missing_collection_model_failure(self):
         collection_models.CollectionModel.get_by_id('4').delete(
+            feconf.SYSTEM_COMMITTER_ID, '', [])
+        collection_models.CollectionRightsModel.get_by_id('4').delete(
             feconf.SYSTEM_COMMITTER_ID, '', [])
         expected_output = [
             (
@@ -12559,7 +12567,7 @@ class IncompleteActivitiesModelValidatorTests(test_utils.GenericTestBase):
             (
                 u'[u\'failed validation check for public exploration check '
                 'of IncompleteActivitiesModel\', '
-                '[u"Entity id %s: Explorations with ids [u\'exp\'] are '
+                '[u"Entity id %s: Explorations with ids [\'exp\'] are '
                 'private"]]') % self.user_id]
         run_job_and_check_output(self, expected_output)
 
@@ -12573,7 +12581,7 @@ class IncompleteActivitiesModelValidatorTests(test_utils.GenericTestBase):
             (
                 u'[u\'failed validation check for public collection check '
                 'of IncompleteActivitiesModel\', '
-                '[u"Entity id %s: Collections with ids [u\'col\'] are '
+                '[u"Entity id %s: Collections with ids [\'col\'] are '
                 'private"]]') % self.user_id]
         run_job_and_check_output(self, expected_output)
 
@@ -12679,6 +12687,8 @@ class ExpUserLastPlaythroughModelValidatorTests(
     def test_missing_exploration_model_failure(self):
         exp_models.ExplorationModel.get_by_id('0').delete(
             feconf.SYSTEM_COMMITTER_ID, '', [])
+        exp_models.ExplorationRightsModel.get_by_id('0').delete(
+            feconf.SYSTEM_COMMITTER_ID, '', [])
         expected_output = [
             (
                 u'[u\'failed validation check for exploration_ids '
@@ -12708,7 +12718,7 @@ class ExpUserLastPlaythroughModelValidatorTests(
             (
                 u'[u\'failed validation check for public exploration check '
                 'of ExpUserLastPlaythroughModel\', '
-                '[u"Entity id %s.0: Explorations with ids [u\'0\'] are '
+                '[u"Entity id %s.0: Explorations with ids [\'0\'] are '
                 'private"]]') % self.user_id]
         run_job_and_check_output(self, expected_output)
 
@@ -12854,6 +12864,8 @@ class LearnerPlaylistModelValidatorTests(test_utils.GenericTestBase):
     def test_missing_exploration_model_failure(self):
         exp_models.ExplorationModel.get_by_id('2').delete(
             feconf.SYSTEM_COMMITTER_ID, '', [])
+        exp_models.ExplorationRightsModel.get_by_id('2').delete(
+            feconf.SYSTEM_COMMITTER_ID, '', [])
         expected_output = [
             (
                 u'[u\'failed validation check for exploration_ids '
@@ -12865,6 +12877,8 @@ class LearnerPlaylistModelValidatorTests(test_utils.GenericTestBase):
 
     def test_missing_collection_model_failure(self):
         collection_models.CollectionModel.get_by_id('6').delete(
+            feconf.SYSTEM_COMMITTER_ID, '', [])
+        collection_models.CollectionRightsModel.get_by_id('6').delete(
             feconf.SYSTEM_COMMITTER_ID, '', [])
         expected_output = [
             (
@@ -12929,7 +12943,7 @@ class LearnerPlaylistModelValidatorTests(test_utils.GenericTestBase):
             (
                 u'[u\'failed validation check for public exploration check '
                 'of LearnerPlaylistModel\', '
-                '[u"Entity id %s: Explorations with ids [u\'exp\'] are '
+                '[u"Entity id %s: Explorations with ids [\'exp\'] are '
                 'private"]]') % self.user_id]
         run_job_and_check_output(self, expected_output)
 
@@ -12943,7 +12957,7 @@ class LearnerPlaylistModelValidatorTests(test_utils.GenericTestBase):
             (
                 u'[u\'failed validation check for public collection check '
                 'of LearnerPlaylistModel\', '
-                '[u"Entity id %s: Collections with ids [u\'col\'] are '
+                '[u"Entity id %s: Collections with ids [\'col\'] are '
                 'private"]]') % self.user_id]
         run_job_and_check_output(self, expected_output)
 
@@ -13908,6 +13922,8 @@ class CollectionProgressModelValidatorTests(test_utils.GenericTestBase):
     def test_missing_exploration_model_failure(self):
         exp_models.ExplorationModel.get_by_id('1').delete(
             feconf.SYSTEM_COMMITTER_ID, '', [])
+        exp_models.ExplorationRightsModel.get_by_id('1').delete(
+            feconf.SYSTEM_COMMITTER_ID, '', [])
         expected_output = [
             (
                 u'[u\'failed validation check for exploration_ids '
@@ -13919,6 +13935,8 @@ class CollectionProgressModelValidatorTests(test_utils.GenericTestBase):
 
     def test_missing_collection_model_failure(self):
         collection_models.CollectionModel.get_by_id('col').delete(
+            feconf.SYSTEM_COMMITTER_ID, '', [])
+        collection_models.CollectionRightsModel.get_by_id('col').delete(
             feconf.SYSTEM_COMMITTER_ID, '', [])
         expected_output = [
             (
@@ -13947,7 +13965,7 @@ class CollectionProgressModelValidatorTests(test_utils.GenericTestBase):
             (
                 u'[u\'failed validation check for public exploration check '
                 'of CollectionProgressModel\', '
-                '[u"Entity id %s: Explorations with ids [u\'0\'] are '
+                '[u"Entity id %s: Explorations with ids [\'0\'] are '
                 'private"]]') % self.model_instance.id]
         run_job_and_check_output(self, expected_output)
 
@@ -13957,7 +13975,7 @@ class CollectionProgressModelValidatorTests(test_utils.GenericTestBase):
             (
                 u'[u\'failed validation check for public collection check '
                 'of CollectionProgressModel\', '
-                '[u"Entity id %s: Collections with ids [u\'col\'] are '
+                '[u"Entity id %s: Collections with ids [\'col\'] are '
                 'private"]]') % self.model_instance.id]
         run_job_and_check_output(self, expected_output)
 

@@ -613,28 +613,46 @@ class BaseUserModelValidator(BaseModelValidator):
         return r'^%s$' % USER_ID_REGEX
 
     @classmethod
-    def _get_exp_ids(cls, unused_item):
+    def _get_exp_ids(cls):
         """Returns a list of exploration ids related to the user model.
-
-        Args:
-            unused_item: ndb.Model. BaseUserModel to validate.
 
         Returns:
             list(str). List of exploration ids related to the model.
         """
-        return []
+        exploration_ids = []
+        exploration_model_class_model_id_model_tuples = (
+            cls.external_instance_details['exploration_ids'])
+        for (_, _, exploration_model) in (
+                exploration_model_class_model_id_model_tuples):
+            # The case for missing exploration external model is ignored here
+            # since errors for missing exploration external model are already
+            # checked and stored in _validate_external_id_relationships
+            # function.
+            if exploration_model is None or exploration_model.deleted:
+                continue
+            exploration_ids.append(exploration_model.id)
+        return exploration_ids
 
     @classmethod
-    def _get_col_ids(cls, unused_item):
+    def _get_col_ids(cls):
         """Returns a list of collection ids related to the user model.
-
-        Args:
-            unused_item: ndb.Model. BaseUserModel to validate.
 
         Returns:
             list(str). List of collection ids related to the model.
         """
-        return []
+        collection_ids = []
+        collection_model_class_model_id_model_tuples = (
+            cls.external_instance_details['collection_ids'])
+        for (_, _, collection_model) in (
+                collection_model_class_model_id_model_tuples):
+            # The case for missing collection external model is ignored here
+            # since errors for missing collection external model are already
+            # checked and stored in _validate_external_id_relationships
+            # function.
+            if collection_model is None or collection_model.deleted:
+                continue
+            collection_ids.append(collection_model.id)
+        return collection_ids
 
     @classmethod
     def _validate_explorations_are_public(cls, item):
@@ -643,7 +661,7 @@ class BaseUserModelValidator(BaseModelValidator):
         Args:
             item: ndb.Model. BaseUserModel to validate.
         """
-        exp_ids = cls._get_exp_ids(item)
+        exp_ids = cls._get_exp_ids()
         private_exp_ids = [
             exp_id for exp_id in exp_ids if (
                 rights_manager.is_exploration_private(exp_id))]
@@ -659,7 +677,7 @@ class BaseUserModelValidator(BaseModelValidator):
         Args:
             item: ndb.Model. BaseUserModel to validate.
         """
-        col_ids = cls._get_col_ids(item)
+        col_ids = cls._get_col_ids()
         private_col_ids = [
             col_id for col_id in col_ids if (
                 rights_manager.is_collection_private(col_id))]
@@ -3846,14 +3864,6 @@ class CompletedActivitiesModelValidator(BaseUserModelValidator):
         }
 
     @classmethod
-    def _get_exp_ids(cls, item):
-        return item.exploration_ids
-
-    @classmethod
-    def _get_col_ids(cls, item):
-        return item.collection_ids
-
-    @classmethod
     def _get_common_properties_of_external_model_which_should_not_match(
             cls, item):
         return [(
@@ -3891,14 +3901,6 @@ class IncompleteActivitiesModelValidator(BaseUserModelValidator):
             'collection_ids': (
                 collection_models.CollectionModel, item.collection_ids)
         }
-
-    @classmethod
-    def _get_exp_ids(cls, item):
-        return item.exploration_ids
-
-    @classmethod
-    def _get_col_ids(cls, item):
-        return item.collection_ids
 
     @classmethod
     def _get_common_properties_of_external_model_which_should_not_match(
@@ -3940,10 +3942,6 @@ class ExpUserLastPlaythroughModelValidator(BaseUserModelValidator):
             'exploration_ids': (
                 exp_models.ExplorationModel, [item.exploration_id])
         }
-
-    @classmethod
-    def _get_exp_ids(cls, item):
-        return [item.exploration_id]
 
     @classmethod
     def _validate_exp_id_is_marked_as_incomplete(cls, item):
@@ -4035,14 +4033,6 @@ class LearnerPlaylistModelValidator(BaseUserModelValidator):
             'collection_ids': (
                 collection_models.CollectionModel, item.collection_ids)
         }
-
-    @classmethod
-    def _get_exp_ids(cls, item):
-        return item.exploration_ids
-
-    @classmethod
-    def _get_col_ids(cls, item):
-        return item.collection_ids
 
     @classmethod
     def _get_common_properties_of_external_model_which_should_not_match(
@@ -4462,14 +4452,6 @@ class CollectionProgressModelValidator(BaseUserModelValidator):
             'completed_activities_ids': (
                 user_models.CompletedActivitiesModel, [item.user_id])
         }
-
-    @classmethod
-    def _get_exp_ids(cls, item):
-        return item.completed_explorations
-
-    @classmethod
-    def _get_col_ids(cls, item):
-        return [item.collection_id]
 
     @classmethod
     def _validate_completed_exploration(cls, item):
@@ -4903,7 +4885,7 @@ class PendingDeletionRequestModelValidator(BaseUserModelValidator):
         Args:
             item: ndb.Model. BaseUserModel to validate.
         """
-        exp_ids = cls._get_exp_ids(item)
+        exp_ids = item.exploration_ids
         not_marked_exp_ids = []
         for exp_id in exp_ids:
             exp_model = exp_models.ExplorationModel.get_by_id(exp_id)
@@ -4922,7 +4904,7 @@ class PendingDeletionRequestModelValidator(BaseUserModelValidator):
         Args:
             item: ndb.Model. BaseUserModel to validate.
         """
-        col_ids = cls._get_col_ids(item)
+        col_ids = item.collection_ids
         not_marked_col_ids = []
         for col_id in col_ids:
             col_model = collection_models.CollectionModel.get_by_id(col_id)
@@ -4933,14 +4915,6 @@ class PendingDeletionRequestModelValidator(BaseUserModelValidator):
             cls.errors['deleted collection check'].append(
                 'Entity id %s: Collections with ids %s are not marked as '
                 'deleted' % (item.id, not_marked_col_ids))
-
-    @classmethod
-    def _get_exp_ids(cls, item):
-        return item.exploration_ids
-
-    @classmethod
-    def _get_col_ids(cls, item):
-        return item.collection_ids
 
     @classmethod
     def _get_custom_validation_functions(cls):
