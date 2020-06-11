@@ -1013,7 +1013,7 @@ class CollectionSnapshotMetadataModelValidator(
         return {
             'collection_ids': (
                 collection_models.CollectionModel,
-                [item.id[:item.id.find('-')]]),
+                [item.id[:item.id.rfind(base_models.VERSION_DELIMETER)]]),
             'committer_ids': (
                 user_models.UserSettingsModel, [item.committer_id])
         }
@@ -1030,7 +1030,7 @@ class CollectionSnapshotContentModelValidator(
         return {
             'collection_ids': (
                 collection_models.CollectionModel,
-                [item.id[:item.id.find('-')]]),
+                [item.id[:item.id.rfind(base_models.VERSION_DELIMETER)]]),
         }
 
 
@@ -1097,7 +1097,7 @@ class CollectionRightsSnapshotMetadataModelValidator(
         return {
             'collection_rights_ids': (
                 collection_models.CollectionRightsModel,
-                [item.id[:item.id.find('-')]]),
+                [item.id[:item.id.rfind(base_models.VERSION_DELIMETER)]]),
             'committer_ids': (
                 user_models.UserSettingsModel, [item.committer_id])
         }
@@ -1114,7 +1114,7 @@ class CollectionRightsSnapshotContentModelValidator(
         return {
             'collection_rights_ids': (
                 collection_models.CollectionRightsModel,
-                [item.id[:item.id.find('-')]]),
+                [item.id[:item.id.rfind(base_models.VERSION_DELIMETER)]]),
         }
 
 
@@ -1541,7 +1541,7 @@ class ConfigPropertySnapshotMetadataModelValidator(
         return {
             'config_property_ids': (
                 config_models.ConfigPropertyModel,
-                [item.id[:item.id.find('-')]]),
+                [item.id[:item.id.rfind(base_models.VERSION_DELIMETER)]]),
             'committer_ids': (
                 user_models.UserSettingsModel, [item.committer_id])
         }
@@ -1562,7 +1562,7 @@ class ConfigPropertySnapshotContentModelValidator(
         return {
             'config_property_ids': (
                 config_models.ConfigPropertyModel,
-                [item.id[:item.id.find('-')]]),
+                [item.id[:item.id.rfind(base_models.VERSION_DELIMETER)]]),
         }
 
 
@@ -1810,7 +1810,8 @@ class ExplorationSnapshotMetadataModelValidator(
     def _get_external_id_relationships(cls, item):
         return {
             'exploration_ids': (
-                exp_models.ExplorationModel, [item.id[:item.id.find('-')]]),
+                exp_models.ExplorationModel,
+                [item.id[:item.id.rfind(base_models.VERSION_DELIMETER)]]),
             'committer_ids': (
                 user_models.UserSettingsModel, [item.committer_id])
         }
@@ -1826,7 +1827,8 @@ class ExplorationSnapshotContentModelValidator(
     def _get_external_id_relationships(cls, item):
         return {
             'exploration_ids': (
-                exp_models.ExplorationModel, [item.id[:item.id.find('-')]]),
+                exp_models.ExplorationModel,
+                [item.id[:item.id.rfind(base_models.VERSION_DELIMETER)]]),
         }
 
 
@@ -1899,7 +1901,7 @@ class ExplorationRightsSnapshotMetadataModelValidator(
         return {
             'exploration_rights_ids': (
                 exp_models.ExplorationRightsModel,
-                [item.id[:item.id.find('-')]]),
+                [item.id[:item.id.rfind(base_models.VERSION_DELIMETER)]]),
             'committer_ids': (
                 user_models.UserSettingsModel, [item.committer_id])
         }
@@ -1916,7 +1918,7 @@ class ExplorationRightsSnapshotContentModelValidator(
         return {
             'exploration_rights_ids': (
                 exp_models.ExplorationRightsModel,
-                [item.id[:item.id.find('-')]]),
+                [item.id[:item.id.rfind(base_models.VERSION_DELIMETER)]]),
         }
 
 
@@ -2522,7 +2524,7 @@ class QuestionSnapshotMetadataModelValidator(
         return {
             'question_ids': (
                 question_models.QuestionModel,
-                [item.id[:item.id.find('-')]]),
+                [item.id[:item.id.rfind(base_models.VERSION_DELIMETER)]]),
             'committer_ids': (
                 user_models.UserSettingsModel, [item.committer_id])
         }
@@ -2539,7 +2541,7 @@ class QuestionSnapshotContentModelValidator(
         return {
             'question_ids': (
                 question_models.QuestionModel,
-                [item.id[:item.id.find('-')]]),
+                [item.id[:item.id.rfind(base_models.VERSION_DELIMETER)]]),
         }
 
 
@@ -2782,7 +2784,7 @@ class SkillSnapshotMetadataModelValidator(
         return {
             'skill_ids': (
                 skill_models.SkillModel,
-                [item.id[:item.id.find('-')]]),
+                [item.id[:item.id.rfind(base_models.VERSION_DELIMETER)]]),
             'committer_ids': (
                 user_models.UserSettingsModel, [item.committer_id])
         }
@@ -2799,7 +2801,7 @@ class SkillSnapshotContentModelValidator(
         return {
             'skill_ids': (
                 skill_models.SkillModel,
-                [item.id[:item.id.find('-')]]),
+                [item.id[:item.id.rfind(base_models.VERSION_DELIMETER)]]),
         }
 
 
@@ -2973,7 +2975,8 @@ class StorySnapshotMetadataModelValidator(BaseSnapshotMetadataModelValidator):
     def _get_external_id_relationships(cls, item):
         return {
             'story_ids': (
-                story_models.StoryModel, [item.id[:item.id.find('-')]]),
+                story_models.StoryModel,
+                [item.id[:item.id.rfind(base_models.VERSION_DELIMETER)]]),
             'committer_ids': (
                 user_models.UserSettingsModel, [item.committer_id])
         }
@@ -2988,7 +2991,8 @@ class StorySnapshotContentModelValidator(BaseSnapshotContentModelValidator):
     def _get_external_id_relationships(cls, item):
         return {
             'story_ids': (
-                story_models.StoryModel, [item.id[:item.id.find('-')]]),
+                story_models.StoryModel,
+                [item.id[:item.id.rfind(base_models.VERSION_DELIMETER)]]),
         }
 
 
@@ -3342,7 +3346,8 @@ class TopicSnapshotMetadataModelValidator(BaseSnapshotMetadataModelValidator):
     def _get_external_id_relationships(cls, item):
         return {
             'topic_ids': (
-                topic_models.TopicModel, [item.id[:item.id.find('-')]]),
+                topic_models.TopicModel,
+                [item.id[:item.id.rfind(base_models.VERSION_DELIMETER)]]),
             'committer_ids': (
                 user_models.UserSettingsModel, [item.committer_id])
         }
@@ -3357,7 +3362,8 @@ class TopicSnapshotContentModelValidator(BaseSnapshotContentModelValidator):
     def _get_external_id_relationships(cls, item):
         return {
             'topic_ids': (
-                topic_models.TopicModel, [item.id[:item.id.find('-')]]),
+                topic_models.TopicModel,
+                [item.id[:item.id.rfind(base_models.VERSION_DELIMETER)]]),
         }
 
 
@@ -3398,7 +3404,7 @@ class TopicRightsSnapshotMetadataModelValidator(
         return {
             'topic_rights_ids': (
                 topic_models.TopicRightsModel,
-                [item.id[:item.id.find('-')]]),
+                [item.id[:item.id.rfind(base_models.VERSION_DELIMETER)]]),
             'committer_ids': (
                 user_models.UserSettingsModel, [item.committer_id])
         }
@@ -3415,7 +3421,7 @@ class TopicRightsSnapshotContentModelValidator(
         return {
             'topic_rights_ids': (
                 topic_models.TopicRightsModel,
-                [item.id[:item.id.find('-')]]),
+                [item.id[:item.id.rfind(base_models.VERSION_DELIMETER)]]),
         }
 
 
@@ -3715,7 +3721,8 @@ class SubtopicPageSnapshotMetadataModelValidator(
     def _get_external_id_relationships(cls, item):
         return {
             'subtopic_page_ids': (
-                topic_models.SubtopicPageModel, [item.id[:item.id.rfind('-')]]),
+                topic_models.SubtopicPageModel,
+                [item.id[:item.id.rfind(base_models.VERSION_DELIMETER)]]),
             'committer_ids': (
                 user_models.UserSettingsModel, [item.committer_id])
         }
@@ -3735,7 +3742,8 @@ class SubtopicPageSnapshotContentModelValidator(
     def _get_external_id_relationships(cls, item):
         return {
             'subtopic_page_ids': (
-                topic_models.SubtopicPageModel, [item.id[:item.id.rfind('-')]]),
+                topic_models.SubtopicPageModel,
+                [item.id[:item.id.rfind(base_models.VERSION_DELIMETER)]]),
         }
 
 
