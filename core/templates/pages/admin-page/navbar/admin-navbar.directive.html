@@ -54,8 +54,8 @@
                 ng-mouseover="$ctrl.onMouseoverDropdownIconOrMenu($event)"
                 ng-mouseleave="$ctrl.onMouseoutDropdownIconOrMenu($event)">
               <a class="nav-link oppia-navbar-tab"
-                uib-tooltip="Menu"
-                tooltip-placement="bottom">
+                 uib-tooltip="Menu"
+                 tooltip-placement="bottom">
                 <i class="fa fa-bars oppia-admin-page-dropdown-icon"></i>
               </a>
             </li>
@@ -67,8 +67,8 @@
                   role="menu">
                 <li ng-repeat="(tabName, url) in $ctrl.ADMIN_TAB_URLS">
                   <a class="dropdown-item nav-link oppia-navbar-tab"
-                    style = "color: #00376d"
-                    ng-href="<[url]>">
+                     style = "color: #00376d"
+                     ng-href="<[url]>">
                     <[tabName]>
                   </a>
                 </li>
@@ -129,14 +129,14 @@
           <ul class="nav oppia-navbar-tabs-admin">
             <li uib-dropdown class="nav-item uib-dropdown float-right">
               <a uib-dropdown-toggle class="nav-link uib-dropdown-toggle oppia-navbar-dropdown-toggle"
-                data-toggle="dropdown"
-                ng-mouseover="$ctrl.onMouseoverProfilePictureOrDropdown($event)"
-                ng-mouseleave="$ctrl.onMouseoutProfilePictureOrDropdown($event)">
+                 data-toggle="dropdown"
+                 ng-mouseover="$ctrl.onMouseoverProfilePictureOrDropdown($event)"
+                 ng-mouseleave="$ctrl.onMouseoutProfilePictureOrDropdown($event)">
                 <div class="oppia-navbar-profile-picture-container float-left" ng-cloak>
                   <div ng-if="$ctrl.profilePictureDataUrl">
                     <img ng-src="<[$ctrl.profilePictureDataUrl]>"
-                        class="dropdown-toggle oppia-navbar-profile-picture rounded-circle"
-                        alt = "">
+                         class="dropdown-toggle oppia-navbar-profile-picture rounded-circle"
+                         alt = "">
                   </div>
                   <div ng-if="!$ctrl.profilePictureDataUrl" class="dropdown-toggle">
                     <i class="material-icons md-40" style="margin-top: -1px;">&#xE853;</i>
