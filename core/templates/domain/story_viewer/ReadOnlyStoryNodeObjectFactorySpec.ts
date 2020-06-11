@@ -43,7 +43,9 @@ describe('Read only story node object factory', () => {
         title: 'Title',
         status: 'private'
       },
-      completed: true
+      completed: true,
+      thumbnail_bg_color: '#a33f40',
+      thumbnail_filename: 'image.png'
     };
     _sampleStoryNode = readOnlyStoryNodeObjectFactory.createFromBackendDict(
       sampleReadOnlyStoryNodeBackendDict);
@@ -62,5 +64,7 @@ describe('Read only story node object factory', () => {
     expect(_sampleStoryNode.getOutline()).toEqual('Outline');
     expect(_sampleStoryNode.getOutlineStatus()).toEqual(false);
     expect(_sampleStoryNode.getOutlineStatus()).toEqual(false);
+    expect(_sampleStoryNode.getThumbnailFilename()).toEqual('image.png');
+    expect(_sampleStoryNode.getThumbnailBgColor()).toEqual('#a33f40');
   });
 });
