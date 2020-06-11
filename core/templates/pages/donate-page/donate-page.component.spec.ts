@@ -66,9 +66,10 @@ describe('Donate page', () => {
     this.component = this.fixture.componentInstance;
   });
 
-  it('should successfully instantiate the component', () => {
-    expect(this.component).toBeDefined();
-  });
+  it('should successfully instantiate the component from beforeEach block',
+    () => {
+      expect(this.component).toBeDefined();
+    });
 
   it('should set component properties when ngOnInit() is called', () => {
     this.component.ngOnInit();
