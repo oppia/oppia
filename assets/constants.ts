@@ -5099,6 +5099,7 @@ export = {
       "NumericInput",
       "SetInput",
       "MathExpressionInput",
+      "AlgebraicExpressionInput",
       "NumberWithUnits"
     ]
   }, {

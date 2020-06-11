@@ -80,7 +80,8 @@ export class Solution {
     var correctAnswer = null;
     if (interactionId === 'GraphInput') {
       correctAnswer = '[Graph]';
-    } else if (interactionId === 'MathExpressionInput') {
+    } else if (interactionId === 'MathExpressionInput' ||
+      interactionId === 'AlgebraicExpressionInput') {
       correctAnswer = this.correctAnswer.latex;
     } else if (interactionId === 'CodeRepl' ||
       interactionId === 'PencilCodeEditor') {

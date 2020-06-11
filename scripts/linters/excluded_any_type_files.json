@@ -116,6 +116,8 @@
     "extensions/interactions/LogicProof/directives/logic-proof-validation.service.ts",
     "extensions/interactions/MathExpressionInput/directives/math-expression-input-rules.service.ts",
     "extensions/interactions/MathExpressionInput/directives/math-expression-input-validation.service.ts",
+    "extensions/interactions/AlgebraicExpressionInput/directives/algebraic-expression-input-rules.service.ts",
+    "extensions/interactions/AlgebraicExpressionInput/directives/algebraic-expression-input-validation.service.ts",
     "extensions/interactions/MultipleChoiceInput/directives/multiple-choice-input-validation.service.spec.ts",
     "extensions/interactions/MultipleChoiceInput/directives/multiple-choice-input-validation.service.ts",
     "extensions/interactions/MusicNotesInput/directives/music-notes-input-validation.service.ts",

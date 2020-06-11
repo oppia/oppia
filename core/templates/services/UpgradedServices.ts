@@ -234,6 +234,9 @@ import { LostChangeObjectFactory } from
 import { MathExpressionInputValidationService } from
   // eslint-disable-next-line max-len
   'interactions/MathExpressionInput/directives/math-expression-input-validation.service';
+import { AlgebraicExpressionInputValidationService } from
+  // eslint-disable-next-line max-len
+  'interactions/AlgebraicExpressionInput/directives/algebraic-expression-input-validation.service';
 import { MetaTagCustomizationService } from
   'services/contextual/meta-tag-customization.service';
 import { MisconceptionObjectFactory } from
@@ -758,6 +761,9 @@ export class UpgradedServices {
     upgradedServices['MathExpressionInputValidationService'] =
       new MathExpressionInputValidationService(
         upgradedServices['baseInteractionValidationService']);
+    upgradedServices['AlgebraicExpressionInputValidationService'] =
+      new AlgebraicExpressionInputValidationService(
+        upgradedServices['baseInteractionValidationService']);
     upgradedServices['MetaTagCustomizationService'] =
       new MetaTagCustomizationService(upgradedServices['WindowRef']);
     upgradedServices['MultipleChoiceInputValidationService'] =
@@ -957,6 +963,7 @@ export class UpgradedServices {
         upgradedServices['ItemSelectionInputRulesService'],
         upgradedServices['LogicProofRulesService'],
         upgradedServices['MathExpressionInputRulesService'],
+        upgradedServices['AlgebraicExpressionInputRulesService'],
         upgradedServices['MultipleChoiceInputRulesService'],
         upgradedServices['MusicNotesInputRulesService'],
         upgradedServices['NumberWithUnitsRulesService'],
