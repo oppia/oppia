@@ -64,7 +64,7 @@ import utils
     activity_models, audit_models, base_models,
     classifier_models, collection_models,
     config_models, email_models, exp_models,
-    feedback_models, job_models,
+    feedback_models, improvements_models, job_models,
     opportunity_models, question_models,
     recommendations_models, skill_models,
     story_models, suggestion_models, topic_models,
@@ -73,7 +73,7 @@ import utils
             models.NAMES.activity, models.NAMES.audit, models.NAMES.base_model,
             models.NAMES.classifier, models.NAMES.collection,
             models.NAMES.config, models.NAMES.email, models.NAMES.exploration,
-            models.NAMES.feedback, models.NAMES.job,
+            models.NAMES.feedback, models.NAMES.improvements, models.NAMES.job,
             models.NAMES.opportunity, models.NAMES.question,
             models.NAMES.recommendations, models.NAMES.skill,
             models.NAMES.story, models.NAMES.suggestion, models.NAMES.topic,
@@ -4942,6 +4942,102 @@ class PendingDeletionRequestModelValidator(BaseUserModelValidator):
             cls._validate_collections_are_marked_deleted]
 
 
+class TaskEntryModelValidator(BaseModelValidator):
+    """One off job for auditing task entries."""
+
+    # The name of the model which is to be used in the error messages.
+    MODEL_NAME = 'task entry'
+
+    @classmethod
+    def _get_model_id_regex(cls, item):
+        return re.escape(improvements_models.TaskEntryModel.generate_task_id(
+            item.entity_type, item.entity_id, item.entity_version,
+            item.task_type, item.target_type, item.target_id))
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {
+            'closed_by_ids': (
+                user_models.UserSettingsModel,
+                [item.closed_by] if item.closed_by is not None else []),
+            'entity_ids': (exp_models.ExplorationModel, [item.entity_id])
+        }
+
+    @classmethod
+    def _validate_composite_entity_id(cls, item):
+        """Validates the composite_entity_id field of the given item.
+
+        Args:
+            item: improvements_models.TaskEntryModel.
+        """
+        expected_composite_entity_id = (
+            improvements_models.TaskEntryModel.generate_composite_entity_id(
+                item.entity_type, item.entity_id, item.entity_version))
+        if item.composite_entity_id != expected_composite_entity_id:
+            cls.errors['composite_entity_id field check'].append(
+                'Entity id %s: composite_entity_id "%s" should be "%s"' % (
+                    item.id,
+                    item.composite_entity_id,
+                    expected_composite_entity_id))
+
+    @classmethod
+    def _validate_status(cls, item):
+        """Validates the fields of the item relating to the status field.
+
+        Args:
+            item: improvements_models.TaskEntryModel.
+        """
+        if item.status == improvements_models.STATUS_OPEN:
+            if item.closed_by:
+                cls.errors['status field check'].append(
+                    'Entity id %s: status is open but closed_by is "%s", '
+                    'should be empty.' % (item.id, item.closed_by))
+            if item.closed_on:
+                cls.errors['status field check'].append(
+                    'Entity id %s: status is open but closed_on is "%s", '
+                    'should be empty.' % (item.id, item.closed_on))
+        elif item.status == improvements_models.STATUS_RESOLVED:
+            if item.closed_by is None:
+                cls.errors['status field check'].append(
+                    'Entity id %s: status is resolved but closed_by is not '
+                    'set' % (item.id,))
+            if item.closed_on is None:
+                cls.errors['status field check'].append(
+                    'Entity id %s: status is resolved but closed_on is not '
+                    'set' % (item.id,))
+
+    @classmethod
+    def _validate_target_id(cls, item):
+        """Validate that the given item contains an existing exploration state
+        name.
+
+        Args:
+            item: improvements_models.TaskEntryModel.
+        """
+        try:
+            exp_model = exp_models.ExplorationModel.get(
+                item.entity_id, strict=True, version=item.entity_version)
+        except Exception:
+            cls.errors['target_id field check'].append(
+                'Entity id %s: exploration with id "%s" does not exist at '
+                'version %d' % (item.id, item.entity_id, item.entity_version))
+            return
+        if item.target_id not in exp_model.states.keys():
+            cls.errors['target_id field check'].append(
+                'Entity id %s: exploration with id "%s" does not have a state '
+                'named "%s" at version %d' % (
+                    item.id, item.entity_id, item.target_id,
+                    item.entity_version))
+
+    @classmethod
+    def _get_custom_validation_functions(cls):
+        return [
+            cls._validate_composite_entity_id,
+            cls._validate_status,
+            cls._validate_target_id,
+        ]
+
+
 MODEL_TO_VALIDATOR_MAPPING = {
     activity_models.ActivityReferencesModel: ActivityReferencesModelValidator,
     audit_models.RoleQueryAuditModel: RoleQueryAuditModelValidator,
@@ -4999,6 +5095,7 @@ MODEL_TO_VALIDATOR_MAPPING = {
         GeneralFeedbackThreadUserModelValidator),
     feedback_models.FeedbackAnalyticsModel: FeedbackAnalyticsModelValidator,
     feedback_models.UnsentFeedbackEmailModel: UnsentFeedbackEmailModelValidator,
+    improvements_models.TaskEntryModel: TaskEntryModelValidator,
     job_models.JobModel: JobModelValidator,
     job_models.ContinuousComputationModel: ContinuousComputationModelValidator,
     opportunity_models.ExplorationOpportunitySummaryModel: (
@@ -5940,3 +6037,11 @@ class PendingDeletionRequestModelAuditOneOffJob(ProdValidationAuditOneOffJob):
     @classmethod
     def entity_classes_to_map_over(cls):
         return [user_models.PendingDeletionRequestModel]
+
+
+class TaskEntryModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates TaskEntryModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [improvements_models.TaskEntryModel]
