@@ -4950,9 +4950,9 @@ class TaskEntryModelValidator(BaseModelValidator):
 
     @classmethod
     def _get_model_id_regex(cls, item):
-        return re.escape('%s.%s.%d.%s.%s.%s' % (
+        return re.escape(improvements_models.TaskEntryModel.generate_task_id(
             item.entity_type, item.entity_id, item.entity_version,
-            item.task_type, item.target_type or '', item.target_id or ''))
+            item.task_type, item.target_type, item.target_id))
 
     @classmethod
     def _get_external_id_relationships(cls, item):
