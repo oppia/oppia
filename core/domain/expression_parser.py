@@ -505,21 +505,6 @@ class Parser(python_utils.OBJECT):
 
         raise Exception('Invalid token: %s.' % token.text)
 
-    def _check_next_token(self, token_list):
-        """Function to peek into the next position to see the next token. This
-        is done without incrementing '_next_token_index'.
-
-        Args:
-            token_list: list(Token). A list containing token objects formed from
-                the given math expression.
-
-        Returns:
-            Token|None. Token at the next position. Returns None if there are no
-                more tokens left.
-        """
-        if self._next_token_index < len(token_list):
-            return token_list[self._next_token_index]
-
     def _get_next_token(self, token_list):
         """Function to retrieve the token at the next position and then
         increment the _next_token_index.
