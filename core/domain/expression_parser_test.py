@@ -189,61 +189,56 @@ class ParserUnitTests(test_utils.GenericTestBase):
     """Test the expression parser module."""
 
     def test_parse(self):
-        """Tests whether Parse.parse builds the correct parse tree. This
-        function is supposed to implement the following production rule:
+        """Tests to check whether the following production rule is implemented
+        correctly:
         <expr> ::= <mul_expr> (('+' | '-') <mul_expr>)*
 
-        The parse tree for 'a + b / 2' should be built as follows:
-           {+}
+        The parse tree for 'a + b - 2' should be built as follows:
+              {-}
+             /  |
+           {+} {2}
           /  |
-        {a} {/}
-           /  |
-         {b} {2}
+        {a} {b}
         """
-        root_node = expression_parser.Parser().parse('a + b / 2')
-        # Root node {+}.
-        self.assertIsInstance(root_node, expression_parser.AdditionOperatorNode)
+        root_node = expression_parser.Parser().parse('a + b - 2')
+        # Root node {-}.
+        self.assertIsInstance(
+            root_node, expression_parser.SubtractionOperatorNode)
         self.assertEqual(len(root_node.children), 2)
 
         left_child_1, right_child_1 = root_node.children
-        # Left child 1 {a}.
-        self.assertIsInstance(left_child_1, expression_parser.IdentifierNode)
-        self.assertEqual(left_child_1.token.text, 'a')
-        self.assertEqual(len(left_child_1.children), 0)
-        # Right child 1 {/}.
+        # Left child 1 {+}.
         self.assertIsInstance(
-            right_child_1, expression_parser.DivisionOperatorNode)
-        self.assertEqual(len(right_child_1.children), 2)
+            left_child_1, expression_parser.AdditionOperatorNode)
+        self.assertEqual(len(left_child_1.children), 2)
+        # Right child 1 {2}.
+        self.assertIsInstance(right_child_1, expression_parser.NumberNode)
+        self.assertEqual(right_child_1.token.text, '2')
+        self.assertEqual(len(right_child_1.children), 0)
 
-        left_child_2, right_child_2 = right_child_1.children
-        # Left child 2 {b}.
+        left_child_2, right_child_2 = left_child_1.children
+        # Left child 2 {a}.
         self.assertIsInstance(left_child_2, expression_parser.IdentifierNode)
-        self.assertEqual(left_child_2.token.text, 'b')
+        self.assertEqual(left_child_2.token.text, 'a')
         self.assertEqual(len(left_child_2.children), 0)
-        # Right child 2 {2}.
-        self.assertIsInstance(right_child_2, expression_parser.NumberNode)
-        self.assertEqual(right_child_2.token.text, '2')
+        # Right child 2 {b}.
+        self.assertIsInstance(right_child_2, expression_parser.IdentifierNode)
+        self.assertEqual(right_child_2.token.text, 'b')
         self.assertEqual(len(right_child_2.children), 0)
 
     def test_parse_mul_expr(self):
-        """Tests whether Parse.parse_mul_expr builds the correct parse tree.
-        This function is supposed to implement the following production rule:
+        """Tests to check whether the following production rule is implemented
+        correctly:
         <mul_expr> ::= <pow_expr> (('*' | '/') <pow_expr>)*
 
-        The parse tree for 'a / b * 2 - c + d' should be built as follows:
+        The parse tree for 'a / b * 2' should be built as follows:
               {*}
              /  |
            {/} {2}
           /  |
         {a} {b}
-
-        NOTE: At this level in the parsing process, '+' and '-' operators won't
-        be parsed. That is done at the level above this one, i.e., in the
-        _parse_expr function.
         """
-        expression = 'a / b * 2 - c + d'
-        root_node = expression_parser.Parser().parse_mul_expr(
-            expression_parser.tokenize(expression))
+        root_node = expression_parser.Parser().parse('a / b * 2')
         # Root node {*}.
         self.assertIsInstance(
             root_node, expression_parser.MultiplicationOperatorNode)
@@ -270,25 +265,19 @@ class ParserUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(right_child_2.children), 0)
 
     def test_parse_pow_expr(self):
-        """Tests whether Parse.parse_pow_expr builds the correct parse tree.
-        This function is supposed to implement the following production rule:
+        """Tests to check whether the following production rule is implemented
+        correctly:
         <pow_expr> ::= '-' <pow_expr> | '+' <pow_expr> |
         <unit> ('^' <pow_expr>)?
 
-        The parse tree for 'a ^ b ^ 2 * c + d' should be built as follows:
+        The parse tree for 'a ^ b ^ 2' should be built as follows:
               {^}
              /  |
            {a} {^}
               /  |
             {b} {2}
-
-        NOTE: At this level in the parsing process, '+', '-', '*', and '/'
-        operators won't be parsed. That is done at the levels above this one,
-        i.e., in the _parse_expr and parse_mul_expr functions.
         """
-        expression = 'a ^ b ^ 2 * c + d'
-        root_node = expression_parser.Parser().parse_pow_expr(
-            expression_parser.tokenize(expression))
+        root_node = expression_parser.Parser().parse('a ^ b ^ 2')
         # Root node {^}.
         self.assertIsInstance(root_node, expression_parser.PowerOperatorNode)
         self.assertEqual(len(root_node.children), 2)
@@ -314,8 +303,8 @@ class ParserUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(right_child_2.children), 0)
 
     def test_parse_unit(self):
-        """Tests whether Parse.parse_unit builds the correct parse tree.
-        This function is supposed to implement the following production rule:
+        """Tests to check whether the following production rule is implemented
+        correctly:
         <unit> ::= <identifier> | <number> | '(' <expr> ')' |
         <function> '(' <expr> ')'
 
@@ -326,9 +315,7 @@ class ParserUnitTests(test_utils.GenericTestBase):
            /  |
          {a} {2}
         """
-        expression = 'sqrt(a*2)'
-        root_node = expression_parser.Parser().parse_unit(
-            expression_parser.tokenize(expression))
+        root_node = expression_parser.Parser().parse('sqrt(a*2)')
         # Root node {sqrt}.
         self.assertIsInstance(root_node, expression_parser.UnaryFunctionNode)
         self.assertEqual(len(root_node.children), 1)
