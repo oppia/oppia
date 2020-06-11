@@ -65,7 +65,7 @@ describe('ItemSelectionInputValidationService', () => {
       dest: 'Second State',
       feedback: {
         html: 'Feedback',
-        audio_translations: {}
+        content_id: ''
       },
       labelled_as_correct: false,
       param_changes: [],

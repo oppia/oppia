@@ -54,7 +54,7 @@ describe('ImageClickInputValidationService', () => {
       dest: 'Second State',
       feedback: {
         html: '',
-        audio_translations: {}
+        content_id: ''
       },
       labelled_as_correct: false,
       param_changes: [],
@@ -66,7 +66,7 @@ describe('ImageClickInputValidationService', () => {
       dest: currentState,
       feedback: {
         html: '',
-        audio_translations: {}
+        content_id: ''
       },
       labelled_as_correct: false,
       param_changes: [],

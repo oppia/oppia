@@ -55,7 +55,7 @@ describe('MultipleChoiceInputValidationService', () => {
       dest: 'Second State',
       feedback: {
         html: '',
-        audio_translations: {}
+        content_id: ''
       },
       labelled_as_correct: false,
       param_changes: [],
@@ -67,7 +67,7 @@ describe('MultipleChoiceInputValidationService', () => {
       dest: currentState,
       feedback: {
         html: '',
-        audio_translations: {}
+        content_id: ''
       },
       labelled_as_correct: false,
       param_changes: [],

@@ -58,7 +58,7 @@ describe('NumericInputValidationService', () => {
     goodDefaultOutcome = oof.createFromBackendDict({
       dest: 'Second State',
       feedback: {
-        audio_translations: {},
+        content_id: '',
         html: ''
       },
       labelled_as_correct: false,
