@@ -159,7 +159,7 @@ class PythonLintChecksManager(python_utils.OBJECT):
 
             python_utils.PRINT(summary_message)
             summary_messages.append(summary_message)
-        return summary_messages    
+        return summary_messages
 
     def _check_that_all_jobs_are_listed_in_the_job_registry_file(self):
         """This function is used to check that all the one-off and audit jobs
@@ -290,7 +290,10 @@ class PythonLintChecksManager(python_utils.OBJECT):
         import_order_check_message = self._check_import_order()
         job_registry_check_message = (
             self._check_that_all_jobs_are_listed_in_the_job_registry_file())
-        return import_order_check_message + job_registry_check_message
+        test_function_check_message = self._check_non_test_files()
+        all_messages = import_order_check_message + job_registry_check_message
+        all_messages = all_messages + test_function_check_message
+        return all_messages
 
 
 class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
