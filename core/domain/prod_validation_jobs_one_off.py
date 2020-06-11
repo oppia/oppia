@@ -4338,6 +4338,8 @@ class ExplorationUserDataModelValidator(BaseUserModelValidator):
         Args:
             item: ndb.Model. ExplorationUserDataModel to validate.
         """
+        if item.draft_change_list is None:
+            return
         for change_dict in item.draft_change_list:
             try:
                 exp_domain.ExplorationChange(change_dict)

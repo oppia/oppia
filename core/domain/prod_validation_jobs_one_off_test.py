@@ -13747,6 +13747,13 @@ class ExplorationUserDataModelValidatorTests(test_utils.GenericTestBase):
                 'exp0 but it doesn\'t exist"]]' % self.model_instance.id)]
         run_job_and_check_output(self, expected_output)
 
+    def test_null_draft_change_list(self):
+        self.model_instance.draft_change_list = None
+        self.model_instance.put()
+        expected_output = [
+            u'[u\'fully-validated ExplorationUserDataModel\', 1]']
+        run_job_and_check_output(self, expected_output)
+
     def test_invalid_draft_change_list(self):
         self.model_instance.draft_change_list = [{
             'cmd': 'invalid'
