@@ -55,18 +55,18 @@
         </li>
         <li ng-if="$ctrl.CLASSROOM_PAGE_IS_SHOWN"
             ng-class="{'open' : $ctrl.activeMenuName === 'classroomMenu'}"
-            uib-dropdown
+            uib-dropdown 
             ng-show="$ctrl.navElementsVisibilityStatus.I18N_TOPNAV_CLASSROOM"
             aria-hidden="false"
             class="nav-item  oppia-navbar-clickable-dropdown protractor-test-classroom-oppia-list-item">
           <a ng-keydown="$ctrl.onMenuKeypress($event, 'classroomMenu', {shiftTab: $ctrl.ACTION_CLOSE, enter: $ctrl.ACTION_OPEN})" class="nav-link oppia-navbar-tab dropdown-toggle"
-            role="menuitem"
-            aria-haspopup="true"
-            aria-expanded="false"
-            aria-hidden="false"
-            tabindex="0"
-            ng-mouseover="$ctrl.openSubmenu($event, 'classroomMenu')"
-            ng-mouseleave="$ctrl.closeSubmenuIfNotMobile($event)">
+             role="menuitem"
+             aria-haspopup="true"
+             aria-expanded="false"
+             aria-hidden="false"
+             tabindex="0"
+             ng-mouseover="$ctrl.openSubmenu($event, 'classroomMenu')"
+             ng-mouseleave="$ctrl.closeSubmenuIfNotMobile($event)">
             <span class="oppia-navbar-tab-content" translate="I18N_TOPNAV_CLASSROOM"></span>
           </a>
           <ul uib-dropdown-menu class="uib-dropdown-menu oppia-navbar-dropdown"
@@ -79,7 +79,7 @@
         <li class="nav-item" ng-mouseover="$ctrl.blurNavigationLinks($event)" ng-show="$ctrl.navElementsVisibilityStatus.I18N_TOPNAV_DONATE">
           <div class="oppia-navbar-button-container">
             <a href="/donate"
-              class="btn oppia-navbar-button nav-link oppia-navbar-hide-on-small-width oppia-transition-200">
+               class="btn oppia-navbar-button nav-link oppia-navbar-hide-on-small-width oppia-transition-200">
               <span class="oppia-navbar-tab-content" translate="I18N_TOPNAV_DONATE"></span>
             </a>
           </div>

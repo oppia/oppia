@@ -33,7 +33,7 @@
       <label for="explorations-to-generate">Number of explorations to generate</label>
       <input class="form-control form-inline" style="margin-bottom: 5px"
              ng-model="$ctrl.numDummyExpsToGenerate"
-             placeholder="Explorations to generate" type="number" min="0" 
+             placeholder="Explorations to generate" type="number" min="0"
              id = "explorations-to-generate">
       <label for="explorations-to-publish">Number of explorations to publish</label>
       <em ng-show="$ctrl.numDummyExpsToGenerate"
@@ -43,8 +43,8 @@
       <input class="form-control form-inline"
              ng-model="$ctrl.numDummyExpsToPublish"
              placeholder="Explorations to Publish"
-             ng-disabled="!$ctrl.numDummyExpsToGenerate" type="number" min="0" 
-             id = "explorations-to-publish" 
+             ng-disabled="!$ctrl.numDummyExpsToGenerate" type="number" min="0"
+             id = "explorations-to-publish">
       <button type="button"
               class="btn btn-primary"
               ng-click="$ctrl.generateDummyExplorations()"
