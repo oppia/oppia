@@ -60,7 +60,8 @@ angular.module('oppia').directive('graphViz', [
             ADD_VERTEX: 2,
             DELETE: 3
           };
-          var vizContainer = $($element).find('.oppia-graph-viz-svg');
+          var vizContainer = (
+            <SVGSVGElement><any>$($element).find('.oppia-graph-viz-svg'));
           // Styling functions
           var DELETE_COLOR = 'red';
           var HOVER_COLOR = 'aqua';
@@ -114,13 +115,11 @@ angular.module('oppia').directive('graphViz', [
             // Note: Transform client (X, Y) to SVG (X, Y). This has to be
             // done so that changes due to viewBox attribute are
             // propagated nicely.
-            let vizElement: SVGSVGElement = (
-              vizContainer[0] as unknown as SVGSVGElement);
-            var pt = vizElement.createSVGPoint();
+            var pt = vizContainer[0].createSVGPoint();
             pt.x = event.clientX;
             pt.y = event.clientY;
             var svgp = pt.matrixTransform(
-              vizElement.getScreenCTM().inverse());
+              vizContainer[0].getScreenCTM().inverse());
             ctrl.state.mouseX = svgp.x;
             ctrl.state.mouseY = svgp.y;
             // We use vertexDragStartX/Y and mouseDragStartX/Y to make
@@ -210,12 +209,12 @@ angular.module('oppia').directive('graphViz', [
           };
 
           var initViewboxSize = function() {
-            let vizElement: SVGSVGElement = (
-              vizContainer[0] as unknown as SVGSVGElement);
-            var boundingBox = vizElement.getBBox();
+            var svgContainer = (
+              <SVGSVGElement><any>$($element).find('.oppia-graph-viz-svg')[0]);
+            var boundingBox = svgContainer.getBBox();
             var viewBoxHeight = Math.max(
               boundingBox.height + boundingBox.y,
-              parseInt(vizElement.getAttribute('height')));
+              parseInt(svgContainer.getAttribute('height')));
             ctrl.svgViewBox = (
               0 + ' ' + 0 + ' ' + (boundingBox.width + boundingBox.x) +
                 ' ' + (viewBoxHeight));
