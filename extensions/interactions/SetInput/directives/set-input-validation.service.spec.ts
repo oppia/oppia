@@ -40,10 +40,6 @@ describe('SetInputValidationService', () => {
 
   let goodCustomizationArgs: object;
 
-  let equalsRule1: Rule, equalsRule2: Rule;
-  let subsetRuleSmall: Rule, subsetRuleLarge: Rule;
-  let omitElementRuleSmall: Rule, omitElementRuleLarge: Rule;
-
   let createAnswerGroupByRules: (rules: Rule[]) => AnswerGroup;
 
   beforeEach(() => {
@@ -76,43 +72,6 @@ describe('SetInputValidationService', () => {
 
     goodAnswerGroups = [agof.createNew([], goodDefaultOutcome, false, null)];
 
-    subsetRuleSmall = rof.createFromBackendDict({
-      rule_type: 'IsSubsetOf',
-      inputs: {
-        x: ['1']
-      }
-    });
-    subsetRuleLarge = rof.createFromBackendDict({
-      rule_type: 'IsSubsetOf',
-      inputs: {
-        x: ['1', '2', '3']
-      }
-    });
-    omitElementRuleSmall = rof.createFromBackendDict({
-      rule_type: 'OmitsElementsIn',
-      inputs: {
-        x: ['1']
-      }
-    });
-    omitElementRuleLarge = rof.createFromBackendDict({
-      rule_type: 'OmitsElementsIn',
-      inputs: {
-        x: ['1', '2', '3']
-      }
-    });
-    equalsRule1 = rof.createFromBackendDict({
-      rule_type: 'Equals',
-      inputs: {
-        x: ['5', '6', '7']
-      }
-    });
-    equalsRule2 = rof.createFromBackendDict({
-      rule_type: 'Equals',
-      inputs: {
-        x: ['5', '6', '8']
-      }
-    });
-
     createAnswerGroupByRules = (rules) => agof.createNew(
       rules,
       goodDefaultOutcome,
@@ -121,6 +80,7 @@ describe('SetInputValidationService', () => {
     );
   });
 
+  // TODO: rename it
   it('should be able to perform basic validation', () => {
     var warnings = validatorService.getAllWarnings(
       currentState,
@@ -130,89 +90,706 @@ describe('SetInputValidationService', () => {
     expect(warnings).toEqual([]);
   });
 
-  it('should catch errors in customizationArgs', () => {
-    let badCustomizationArgs1 = {};
-    let badCustomizationArgs2 = { buttonText: { value: 1 } };
-    let badCustomizationArgs3 = { buttonText: { value: '' } };
+  describe('.getCustomizationArgsWarnings', () => {
+    it('should not generate error with correct customizationArgs', () => {
+      expect(validatorService.getAllWarnings(
+        currentState,
+        goodCustomizationArgs,
+        goodAnswerGroups,
+        goodDefaultOutcome
+      )).toEqual([]);
+    });
 
-    expect(validatorService.getAllWarnings(
-      currentState, goodCustomizationArgs, goodAnswerGroups, goodDefaultOutcome
-    )).toEqual([]);
+    it('should generate errors when buttonText is missing', () => {
+      let badCustomizationArgs = {};
 
-    expect(validatorService.getAllWarnings(
-      currentState, badCustomizationArgs1, goodAnswerGroups, goodDefaultOutcome
-    )).toEqual([{
-      type: WARNING_TYPES.ERROR,
-      message: 'Button text must be a string.'
-    }]);
+      expect(validatorService.getAllWarnings(
+        currentState,
+        badCustomizationArgs,
+        goodAnswerGroups,
+        goodDefaultOutcome
+      )).toEqual([{
+        type: WARNING_TYPES.ERROR,
+        message: 'Button text must be a string.'
+      }]);
+    });
 
-    expect(validatorService.getAllWarnings(
-      currentState, badCustomizationArgs2, goodAnswerGroups, goodDefaultOutcome
-    )).toEqual([{
-      type: WARNING_TYPES.ERROR,
-      message: 'Button text must be a string.'
-    }]);
+    it('should generate errors when buttonText is not string', () => {
+      let badCustomizationArgs = { buttonText: { value: 1 } };
 
-    expect(validatorService.getAllWarnings(
-      currentState, badCustomizationArgs3, goodAnswerGroups, goodDefaultOutcome
-    )).toEqual([{
-      type: WARNING_TYPES.ERROR,
-      message: 'Label for this button should not be empty.'
-    }]);
+      expect(validatorService.getAllWarnings(
+        currentState,
+        badCustomizationArgs,
+        goodAnswerGroups,
+        goodDefaultOutcome
+      )).toEqual([{
+        type: WARNING_TYPES.ERROR,
+        message: 'Button text must be a string.'
+      }]);
+    });
+
+    it('should generate errors when buttonText is empty', () => {
+      let badCustomizationArgs = { buttonText: { value: '' } };
+
+      expect(validatorService.getAllWarnings(
+        currentState,
+        badCustomizationArgs,
+        goodAnswerGroups,
+        goodDefaultOutcome
+      )).toEqual([{
+        type: WARNING_TYPES.ERROR,
+        message: 'Label for this button should not be empty.'
+      }]);
+    });
   });
 
-  it('should generate errors with identical rules', () => {
-    let answerGroup = createAnswerGroupByRules(
-      [subsetRuleSmall, subsetRuleSmall, subsetRuleLarge]
-    );
+  describe('.getRedundantRuleWarnings', () => {
+    describe('check identical rules', () => {
+      describe('Equals', () => {
+        it('should generate errors with identical rules', () => {
+          let equalsRule = rof.createFromBackendDict({
+            rule_type: 'Equals',
+            inputs: {
+              x: ['1', '2', '3']
+            }
+          });
+          let answerGroup = createAnswerGroupByRules(
+            [equalsRule, equalsRule]
+          );
 
-    expect(validatorService.getAllWarnings(
-      currentState, goodCustomizationArgs, [answerGroup], goodDefaultOutcome
-    )).toEqual([{
-      type: WARNING_TYPES.ERROR,
-      message: 'Rule 2 from answer group 1 is the same as rule 1 from answer' +
-      ' group 1'
-    }]);
-  });
+          expect(validatorService.getAllWarnings(
+            currentState,
+            goodCustomizationArgs,
+            [answerGroup],
+            goodDefaultOutcome
+          )).toEqual([{
+            type: WARNING_TYPES.ERROR,
+            message: 'Rule 2 from answer group 1 is the same as rule 1 ' +
+            'from answer group 1'
+          }]);
+        });
 
-  it('should generate errors with redundant rules', () => {
-    let answerGroup1 = createAnswerGroupByRules(
-      [subsetRuleLarge, subsetRuleSmall]
-    );
+        it('should not generate errors with different rules', () => {
+          let equalsRule1 = rof.createFromBackendDict({
+            rule_type: 'Equals',
+            inputs: {
+              x: ['1', '2', '3']
+            }
+          });
+          let equalsRule2 = rof.createFromBackendDict({
+            rule_type: 'Equals',
+            inputs: {
+              x: ['3', '4', '5', '6']
+            }
+          });
+          let answerGroup = createAnswerGroupByRules(
+            [equalsRule1, equalsRule2]
+          );
 
-    let answerGroup2 = createAnswerGroupByRules(
-      [omitElementRuleSmall, omitElementRuleLarge]
-    );
+          expect(validatorService.getAllWarnings(
+            currentState,
+            goodCustomizationArgs,
+            [answerGroup],
+            goodDefaultOutcome
+          )).toEqual([]);
+        });
+      });
 
-    expect(validatorService.getAllWarnings(
-      currentState, goodCustomizationArgs, [answerGroup1], goodDefaultOutcome
-    )).toEqual([{
-      type: WARNING_TYPES.ERROR,
-      message: 'Rule 2 from answer group 1 will never be matched because it ' +
-      'is made redundant by rule 1 from answer group 1.'
-    }]);
+      describe('IsSubsetOf', () => {
+        it('should generate errors with identical rules', () => {
+          let subsetRule = rof.createFromBackendDict({
+            rule_type: 'IsSubsetOf',
+            inputs: {
+              x: ['1', '2', '3']
+            }
+          });
+          let answerGroup = createAnswerGroupByRules(
+            [subsetRule, subsetRule]
+          );
 
-    expect(validatorService.getAllWarnings(
-      currentState, goodCustomizationArgs, [answerGroup2], goodDefaultOutcome
-    )).toEqual([{
-      type: WARNING_TYPES.ERROR,
-      message: 'Rule 2 from answer group 1 will never be matched because it ' +
-      'is made redundant by rule 1 from answer group 1.'
-    }]);
-  });
+          expect(validatorService.getAllWarnings(
+            currentState,
+            goodCustomizationArgs,
+            [answerGroup],
+            goodDefaultOutcome
+          )).toEqual([{
+            type: WARNING_TYPES.ERROR,
+            message: 'Rule 2 from answer group 1 is the same as rule 1 ' +
+            'from answer group 1'
+          }]);
+        });
 
-  it('should not generate errors with non-redundant rules', () => {
-    let answerGroup = createAnswerGroupByRules([
-      subsetRuleSmall,
-      subsetRuleLarge,
-      omitElementRuleLarge,
-      omitElementRuleSmall,
-      equalsRule1,
-      equalsRule2
-    ]);
+        it('should not generate errors with different rules', () => {
+          let subsetRule1 = rof.createFromBackendDict({
+            rule_type: 'IsSubsetOf',
+            inputs: {
+              x: ['1', '2', '3']
+            }
+          });
+          let subsetRule2 = rof.createFromBackendDict({
+            rule_type: 'IsSubsetOf',
+            inputs: {
+              x: ['3', '4', '5', '6']
+            }
+          });
+          let answerGroup = createAnswerGroupByRules(
+            [subsetRule1, subsetRule2]
+          );
 
-    expect(validatorService.getAllWarnings(
-      currentState, goodCustomizationArgs, [answerGroup], goodDefaultOutcome
-    )).toEqual([]);
+          expect(validatorService.getAllWarnings(
+            currentState,
+            goodCustomizationArgs,
+            [answerGroup],
+            goodDefaultOutcome
+          )).toEqual([]);
+        });
+      });
+
+      describe('HasElementsIn', () => {
+        it('should generate errors with identical rules', () => {
+          let hasElementsInRule = rof.createFromBackendDict({
+            rule_type: 'HasElementsIn',
+            inputs: {
+              x: ['1', '2', '3']
+            }
+          });
+          let answerGroup = createAnswerGroupByRules(
+            [hasElementsInRule, hasElementsInRule]
+          );
+
+          expect(validatorService.getAllWarnings(
+            currentState,
+            goodCustomizationArgs,
+            [answerGroup],
+            goodDefaultOutcome
+          )).toEqual([{
+            type: WARNING_TYPES.ERROR,
+            message: 'Rule 2 from answer group 1 is the same as rule 1 ' +
+            'from answer group 1'
+          }]);
+        });
+
+        it('should not generate errors with different rules', () => {
+          let hasElementsInRule1 = rof.createFromBackendDict({
+            rule_type: 'HasElementsIn',
+            inputs: {
+              x: ['1', '2', '3']
+            }
+          });
+          let hasElementsInRule2 = rof.createFromBackendDict({
+            rule_type: 'HasElementsIn',
+            inputs: {
+              x: ['3', '4', '5', '6']
+            }
+          });
+          let answerGroup = createAnswerGroupByRules(
+            [hasElementsInRule1, hasElementsInRule2]
+          );
+
+          expect(validatorService.getAllWarnings(
+            currentState,
+            goodCustomizationArgs,
+            [answerGroup],
+            goodDefaultOutcome
+          )).toEqual([]);
+        });
+      });
+
+      describe('IsDisjointFrom', () => {
+        it('should generate errors with identical rules', () => {
+          let disjointRule = rof.createFromBackendDict({
+            rule_type: 'IsDisjointFrom',
+            inputs: {
+              x: ['1', '2', '3']
+            }
+          });
+          let answerGroup = createAnswerGroupByRules(
+            [disjointRule, disjointRule]
+          );
+
+          expect(validatorService.getAllWarnings(
+            currentState,
+            goodCustomizationArgs,
+            [answerGroup],
+            goodDefaultOutcome
+          )).toEqual([{
+            type: WARNING_TYPES.ERROR,
+            message: 'Rule 2 from answer group 1 is the same as rule 1 ' +
+            'from answer group 1'
+          }]);
+        });
+
+        it('should not generate errors with different rules', () => {
+          let disjointRule1 = rof.createFromBackendDict({
+            rule_type: 'IsDisjointFrom',
+            inputs: {
+              x: ['1', '2', '3']
+            }
+          });
+          let disjointRule2 = rof.createFromBackendDict({
+            rule_type: 'IsDisjointFrom',
+            inputs: {
+              x: ['3', '4', '5', '6']
+            }
+          });
+          let answerGroup = createAnswerGroupByRules(
+            [disjointRule1, disjointRule2]
+          );
+
+          expect(validatorService.getAllWarnings(
+            currentState,
+            goodCustomizationArgs,
+            [answerGroup],
+            goodDefaultOutcome
+          )).toEqual([]);
+        });
+      });
+
+      describe('IsSupersetOf', () => {
+        it('should generate errors with identical rules', () => {
+          let supersetRule = rof.createFromBackendDict({
+            rule_type: 'IsSupersetOf',
+            inputs: {
+              x: ['1', '2', '3']
+            }
+          });
+          let answerGroup = createAnswerGroupByRules(
+            [supersetRule, supersetRule]
+          );
+
+          expect(validatorService.getAllWarnings(
+            currentState,
+            goodCustomizationArgs,
+            [answerGroup],
+            goodDefaultOutcome
+          )).toEqual([{
+            type: WARNING_TYPES.ERROR,
+            message: 'Rule 2 from answer group 1 is the same as rule 1 ' +
+            'from answer group 1'
+          }]);
+        });
+
+        it('should not generate errors with different rules', () => {
+          let supersetRule1 = rof.createFromBackendDict({
+            rule_type: 'IsSupersetOf',
+            inputs: {
+              x: ['1', '2', '3']
+            }
+          });
+          let supersetRule2 = rof.createFromBackendDict({
+            rule_type: 'IsSupersetOf',
+            inputs: {
+              x: ['3', '4', '5', '6']
+            }
+          });
+          let answerGroup = createAnswerGroupByRules(
+            [supersetRule1, supersetRule2]
+          );
+
+          expect(validatorService.getAllWarnings(
+            currentState,
+            goodCustomizationArgs,
+            [answerGroup],
+            goodDefaultOutcome
+          )).toEqual([]);
+        });
+      });
+
+      describe('HasElementsNotIn', () => {
+        it('should generate errors with identical rules', () => {
+          let hasElementNotInRule = rof.createFromBackendDict({
+            rule_type: 'HasElementsNotIn',
+            inputs: {
+              x: ['1', '2', '3']
+            }
+          });
+          let answerGroup = createAnswerGroupByRules(
+            [hasElementNotInRule, hasElementNotInRule]
+          );
+
+          expect(validatorService.getAllWarnings(
+            currentState,
+            goodCustomizationArgs,
+            [answerGroup],
+            goodDefaultOutcome
+          )).toEqual([{
+            type: WARNING_TYPES.ERROR,
+            message: 'Rule 2 from answer group 1 is the same as rule 1 ' +
+            'from answer group 1'
+          }]);
+        });
+
+        it('should not generate errors with different rules', () => {
+          let hasElementNotInRule1 = rof.createFromBackendDict({
+            rule_type: 'HasElementsNotIn',
+            inputs: {
+              x: ['1', '2', '3']
+            }
+          });
+          let hasElementNotInRule2 = rof.createFromBackendDict({
+            rule_type: 'HasElementsNotIn',
+            inputs: {
+              x: ['3', '4', '5', '6']
+            }
+          });
+          let answerGroup = createAnswerGroupByRules(
+            [hasElementNotInRule1, hasElementNotInRule2]
+          );
+
+          expect(validatorService.getAllWarnings(
+            currentState,
+            goodCustomizationArgs,
+            [answerGroup],
+            goodDefaultOutcome
+          )).toEqual([]);
+        });
+      });
+
+      describe('OmitsElementsIn', () => {
+        it('should generate errors with identical rules', () => {
+          let omitElementRule = rof.createFromBackendDict({
+            rule_type: 'OmitsElementsIn',
+            inputs: {
+              x: ['1', '2', '3']
+            }
+          });
+          let answerGroup = createAnswerGroupByRules(
+            [omitElementRule, omitElementRule]
+          );
+
+          expect(validatorService.getAllWarnings(
+            currentState,
+            goodCustomizationArgs,
+            [answerGroup],
+            goodDefaultOutcome
+          )).toEqual([{
+            type: WARNING_TYPES.ERROR,
+            message: 'Rule 2 from answer group 1 is the same as rule 1 ' +
+            'from answer group 1'
+          }]);
+        });
+
+        it('should not generate errors with different rules', () => {
+          let omitElementRule1 = rof.createFromBackendDict({
+            rule_type: 'OmitsElementsIn',
+            inputs: {
+              x: ['1', '2', '3']
+            }
+          });
+          let omitElementRule2 = rof.createFromBackendDict({
+            rule_type: 'OmitsElementsIn',
+            inputs: {
+              x: ['3', '4', '5', '6']
+            }
+          });
+          let answerGroup = createAnswerGroupByRules(
+            [omitElementRule1, omitElementRule2]
+          );
+
+          expect(validatorService.getAllWarnings(
+            currentState,
+            goodCustomizationArgs,
+            [answerGroup],
+            goodDefaultOutcome
+          )).toEqual([]);
+        });
+      });
+    });
+
+    describe('check redundant rules', () => {
+      describe('IsSubsetOf', () => {
+        let subsetRule1: Rule, subsetRule2: Rule;
+
+        beforeAll(() => {
+          subsetRule1 = rof.createFromBackendDict({
+            rule_type: 'IsSubsetOf',
+            inputs: {
+              x: ['1', '2', '3']
+            }
+          });
+          subsetRule2 = rof.createFromBackendDict({
+            rule_type: 'IsSubsetOf',
+            inputs: {
+              x: ['1', '2', '3', '4']
+            }
+          });
+        });
+
+        it('should generate errors with redundant rules', () => {
+          let answerGroup = createAnswerGroupByRules(
+            [subsetRule2, subsetRule1]
+          );
+
+          expect(validatorService.getAllWarnings(
+            currentState,
+            goodCustomizationArgs,
+            [answerGroup],
+            goodDefaultOutcome
+          )).toEqual([{
+            type: WARNING_TYPES.ERROR,
+            message: 'Rule 2 from answer group 1 will never be matched ' +
+            'because it is made redundant by rule 1 from answer group 1.'
+          }]);
+        });
+
+        it('should generate errors with non-redundant rules', () => {
+          let answerGroup = createAnswerGroupByRules(
+            [subsetRule1, subsetRule2]
+          );
+
+          expect(validatorService.getAllWarnings(
+            currentState,
+            goodCustomizationArgs,
+            [answerGroup],
+            goodDefaultOutcome
+          )).toEqual([]);
+        });
+      });
+
+      describe('HasElementsIn', () => {
+        let hasElementsInRule1: Rule, hasElementsInRule2: Rule;
+
+        beforeAll(() => {
+          hasElementsInRule1 = rof.createFromBackendDict({
+            rule_type: 'HasElementsIn',
+            inputs: {
+              x: ['1', '2', '3']
+            }
+          });
+          hasElementsInRule2 = rof.createFromBackendDict({
+            rule_type: 'HasElementsIn',
+            inputs: {
+              x: ['1', '2', '3', '4']
+            }
+          });
+        });
+
+        it('should generate errors with redundant rules', () => {
+          let answerGroup = createAnswerGroupByRules(
+            [hasElementsInRule2, hasElementsInRule1]
+          );
+
+          expect(validatorService.getAllWarnings(
+            currentState,
+            goodCustomizationArgs,
+            [answerGroup],
+            goodDefaultOutcome
+          )).toEqual([{
+            type: WARNING_TYPES.ERROR,
+            message: 'Rule 2 from answer group 1 will never be matched ' +
+            'because it is made redundant by rule 1 from answer group 1.'
+          }]);
+        });
+
+        it('should generate errors with non-redundant rules', () => {
+          let answerGroup = createAnswerGroupByRules(
+            [hasElementsInRule1, hasElementsInRule2]
+          );
+
+          expect(validatorService.getAllWarnings(
+            currentState,
+            goodCustomizationArgs,
+            [answerGroup],
+            goodDefaultOutcome
+          )).toEqual([]);
+        });
+      });
+
+      describe('IsDisjointFrom', () => {
+        let disjointRule1: Rule, disjointRule2: Rule;
+
+        beforeAll(() => {
+          disjointRule1 = rof.createFromBackendDict({
+            rule_type: 'IsDisjointFrom',
+            inputs: {
+              x: ['1', '2', '3']
+            }
+          });
+          disjointRule2 = rof.createFromBackendDict({
+            rule_type: 'IsDisjointFrom',
+            inputs: {
+              x: ['1', '2', '3', '4']
+            }
+          });
+        });
+
+        it('should generate errors with redundant rules', () => {
+          let answerGroup = createAnswerGroupByRules(
+            [disjointRule2, disjointRule1]
+          );
+
+          expect(validatorService.getAllWarnings(
+            currentState,
+            goodCustomizationArgs,
+            [answerGroup],
+            goodDefaultOutcome
+          )).toEqual([{
+            type: WARNING_TYPES.ERROR,
+            message: 'Rule 2 from answer group 1 will never be matched ' +
+            'because it is made redundant by rule 1 from answer group 1.'
+          }]);
+        });
+
+        it('should generate errors with non-redundant rules', () => {
+          let answerGroup = createAnswerGroupByRules(
+            [disjointRule1, disjointRule2]
+          );
+
+          expect(validatorService.getAllWarnings(
+            currentState,
+            goodCustomizationArgs,
+            [answerGroup],
+            goodDefaultOutcome
+          )).toEqual([]);
+        });
+      });
+
+      describe('IsSupersetOf', () => {
+        let supersetRule1: Rule, supersetRule2: Rule;
+
+        beforeAll(() => {
+          supersetRule1 = rof.createFromBackendDict({
+            rule_type: 'IsSupersetOf',
+            inputs: {
+              x: ['1', '2', '3']
+            }
+          });
+          supersetRule2 = rof.createFromBackendDict({
+            rule_type: 'IsSupersetOf',
+            inputs: {
+              x: ['1', '2', '3', '4']
+            }
+          });
+        });
+
+        it('should generate errors with redundant rules', () => {
+          let answerGroup = createAnswerGroupByRules(
+            [supersetRule1, supersetRule2]
+          );
+
+          expect(validatorService.getAllWarnings(
+            currentState,
+            goodCustomizationArgs,
+            [answerGroup],
+            goodDefaultOutcome
+          )).toEqual([{
+            type: WARNING_TYPES.ERROR,
+            message: 'Rule 2 from answer group 1 will never be matched ' +
+            'because it is made redundant by rule 1 from answer group 1.'
+          }]);
+        });
+
+        it('should generate errors with non-redundant rules', () => {
+          let answerGroup = createAnswerGroupByRules(
+            [supersetRule2, supersetRule1]
+          );
+
+          expect(validatorService.getAllWarnings(
+            currentState,
+            goodCustomizationArgs,
+            [answerGroup],
+            goodDefaultOutcome
+          )).toEqual([]);
+        });
+      });
+
+      describe('HasElementsNotIn', () => {
+        let hasElementsNotInRule1: Rule, hasElementsNotInRule2: Rule;
+
+        beforeAll(() => {
+          hasElementsNotInRule1 = rof.createFromBackendDict({
+            rule_type: 'HasElementsNotIn',
+            inputs: {
+              x: ['1', '2', '3']
+            }
+          });
+          hasElementsNotInRule2 = rof.createFromBackendDict({
+            rule_type: 'HasElementsNotIn',
+            inputs: {
+              x: ['1', '2', '3', '4']
+            }
+          });
+        });
+
+        it('should generate errors with redundant rules', () => {
+          let answerGroup = createAnswerGroupByRules(
+            [hasElementsNotInRule1, hasElementsNotInRule2]
+          );
+
+          expect(validatorService.getAllWarnings(
+            currentState,
+            goodCustomizationArgs,
+            [answerGroup],
+            goodDefaultOutcome
+          )).toEqual([{
+            type: WARNING_TYPES.ERROR,
+            message: 'Rule 2 from answer group 1 will never be matched ' +
+            'because it is made redundant by rule 1 from answer group 1.'
+          }]);
+        });
+
+        it('should generate errors with non-redundant rules', () => {
+          let answerGroup = createAnswerGroupByRules(
+            [hasElementsNotInRule2, hasElementsNotInRule1]
+          );
+
+          expect(validatorService.getAllWarnings(
+            currentState,
+            goodCustomizationArgs,
+            [answerGroup],
+            goodDefaultOutcome
+          )).toEqual([]);
+        });
+      });
+
+      describe('OmitsElementsIn', () => {
+        let omitsElementsInRule1: Rule, omitsElementsInRule2: Rule;
+
+        beforeAll(() => {
+          omitsElementsInRule1 = rof.createFromBackendDict({
+            rule_type: 'OmitsElementsIn',
+            inputs: {
+              x: ['1', '2', '3']
+            }
+          });
+          omitsElementsInRule2 = rof.createFromBackendDict({
+            rule_type: 'OmitsElementsIn',
+            inputs: {
+              x: ['1', '2', '3', '4']
+            }
+          });
+        });
+
+        it('should generate errors with redundant rules', () => {
+          let answerGroup = createAnswerGroupByRules(
+            [omitsElementsInRule1, omitsElementsInRule2]
+          );
+
+          expect(validatorService.getAllWarnings(
+            currentState,
+            goodCustomizationArgs,
+            [answerGroup],
+            goodDefaultOutcome
+          )).toEqual([{
+            type: WARNING_TYPES.ERROR,
+            message: 'Rule 2 from answer group 1 will never be matched ' +
+            'because it is made redundant by rule 1 from answer group 1.'
+          }]);
+        });
+
+        it('should generate errors with non-redundant rules', () => {
+          let answerGroup = createAnswerGroupByRules(
+            [omitsElementsInRule2, omitsElementsInRule1]
+          );
+
+          expect(validatorService.getAllWarnings(
+            currentState,
+            goodCustomizationArgs,
+            [answerGroup],
+            goodDefaultOutcome
+          )).toEqual([]);
+        });
+      });
+    });
   });
 });
