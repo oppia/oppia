@@ -22,7 +22,7 @@
              *ngIf="languageIdToDescription[featuredOption.languageCode]"
              (click)="selectOption(featuredOption.languageCode)"
              [ngClass]="{'oppia-translation-language-select-dropdown-option-selected' : featuredOption.languageCode === value}">
-             
+
           {{languageIdToDescription[featuredOption.languageCode]}}
 
           <span class="material-icons"
