@@ -16,6 +16,48 @@
  * @fileoverview The root component for angular application.
  */
 
+/**
+ * This file contains a component that "informs" the oppia-root directive that
+ * angular has finished loading. This also contains services to be added.
+ *
+ * To have a new angular service accesible in ajs do the following:
+ *   - import the service here.
+ *   - create a static variable with the name of the service class in camelCase.
+ *   - inject the service by providing it as an argument in the constructor.
+ *   - in the ngAfterViewInit assign the serivce to the static varible
+ *
+ * Example:
+ *   Let is assume that the service class is called MyService.
+ *   - First we add this to imports.
+ *     import { MyService } from './path';
+ *   - Then we create a static variable with the name of the service class.
+ *     static myService: MyService;
+ *   - Then we add it to the constructor
+ *     constructor(
+ *      ...
+ *      private myService: MyService
+ *     ...) {}
+ *   - Then we assign the serivce to the static varible in ngAfterViewInit
+ *     ngAfterViewInit() {
+ *       ...
+ *       OppiaAngularRootComponent.myService = this.myService
+ *       ...
+ *     }
+ *
+ * In the above explanation was not clear or case of doubts over what is done
+ * here, please look at the description of the PR #9479.
+ * https://github.com/oppia/oppia/pull/9479#issue-432536289
+ *
+ * File Structure:
+ *   1 - imports
+ *   2 - component declaration
+ *   3 - static declaration of service-variables
+ *   4 - constructor having all the services injected
+ *   5 - ngAfterViewInit function assigning the injected service to static class
+ *       variables and emitting an event to inform that angular has finished
+ *       loading
+ */
+
 /* eslint-disable max-len */
 import { Component, Output, AfterViewInit, EventEmitter } from '@angular/core';
 import { AdminDataService } from
