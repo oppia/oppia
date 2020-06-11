@@ -17,19 +17,9 @@
  * @fileoverview Unit tests for the topics and skills dashboard directive.
  */
 
-import { AlertsService } from 'services/alerts.service';
 import { UpgradedServices } from 'services/UpgradedServices';
 
 describe('Skills List Directive', function() {
-  var $uibModal = null;
-  var $scope = null;
-  var ctrl = null;
-  var $q = null;
-  var $httpBackend = null;
-  var $rootScope = null;
-  var directive = null;
-  var AlertsService = null;
-
   beforeEach(angular.mock.module('oppia'));
 
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -38,19 +28,42 @@ describe('Skills List Directive', function() {
       $provide.value(key, value);
     }
   }));
+  var $uibModal = null;
+  var $scope = null;
+  var ctrl = null;
+  var $q = null;
+  var $httpBackend = null;
+  var $rootScope = null;
+  var directive = null;
+  var $timeout = null;
+  var EditableTopicBackendApiService = null;
+  var TopicsAndSkillsDashboardBackendApiService = null;
 
   beforeEach(angular.mock.inject(function($injector) {
     $uibModal = $injector.get('$uibModal');
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
     $httpBackend = $injector.get('$httpBackend');
-    directive = $injector.get('skillsListDirective')[0];
+    $timeout = $injector.get('$timeout');
     $q = $injector.get('$q');
-    AlertsService = $injector.get('AlertsService');
+    TopicsAndSkillsDashboardBackendApiService =
+        $injector.get('TopicsAndSkillsDashboardBackendApiService');
+    var MockTopicsAndSkillsDashboardBackendApiService = {
+      mergeSkills: () => {
+        var deferred = $q.defer();
+        deferred.resolve();
+        return deferred.promise;
+      }
+    };
+    EditableTopicBackendApiService =
+        $injector.get('EditableTopicBackendApiService');
+    directive = $injector.get('skillsListDirective')[0];
+
     ctrl = $injector.instantiate(directive.controller, {
-      $rootScope: $scope,
       $scope: $scope,
-      $uibModal,
+      TopicsAndSkillsDashboardBackendApiService:
+      MockTopicsAndSkillsDashboardBackendApiService,
+      $uibModal
     });
   }));
 
@@ -58,93 +71,102 @@ describe('Skills List Directive', function() {
     ctrl.$onInit();
     const skillHeadings = [
       'index', 'description', 'worked_examples_count',
-      'misconception_count', 'status'];
+      'misconception_count', 'status', 'options'];
 
-    expect(ctrl.highlightedIndex).toEqual(null);
-    expect(ctrl.TOPIC_HEADINGS).toEqual(skillHeadings);
+    expect(ctrl.SKILL_HEADINGS).toEqual(skillHeadings);
   });
 
-  it('should return topic editor url', function() {
-    const topicId1 = 'uXcdsad3f42';
-    const topicId2 = 'aEdf44DGfre';
-    expect(ctrl.getTopicEditorUrl(topicId1)).toEqual(
-      '/topic_editor/uXcdsad3f42');
-    expect(ctrl.getTopicEditorUrl(topicId2)).toEqual(
-      '/topic_editor/aEdf44DGfre');
+  it('should return skill editor url', function() {
+    const skillId1 = 'uXcdsad3f42';
+    const skillId2 = 'aEdf44DGfre';
+    expect(ctrl.getSkillEditorUrl(skillId1)).toEqual(
+      '/skill_editor/uXcdsad3f42');
+    expect(ctrl.getSkillEditorUrl(skillId2)).toEqual(
+      '/skill_editor/aEdf44DGfre');
   });
 
-  it('should select and show edit options for a topic', function() {
-    const topicId1 = 'uXcdsad3f42';
-    const topicId2 = 'aEdf44DGfre';
-    expect(ctrl.showEditOptions(topicId1)).toEqual(false);
-    expect(ctrl.showEditOptions(topicId2)).toEqual(false);
-
-    ctrl.enableEditOptions(topicId1);
-    expect(ctrl.showEditOptions(topicId1)).toEqual(true);
-    expect(ctrl.showEditOptions(topicId2)).toEqual(false);
-
-    ctrl.enableEditOptions(topicId2);
-    expect(ctrl.showEditOptions(topicId1)).toEqual(false);
-    expect(ctrl.showEditOptions(topicId2)).toEqual(true);
-
-    ctrl.enableEditOptions(null);
-    expect(ctrl.showEditOptions(topicId1)).toEqual(false);
-    expect(ctrl.showEditOptions(topicId2)).toEqual(false);
-  });
-
-  it('should open the delete topic modal', function() {
+  it('should open the delete skill modal', function() {
     var modalSpy = spyOn($uibModal, 'open').and.callThrough();
-    ctrl.deleteTopic('dskfm4');
+    ctrl.deleteSkill('dskfm4');
     expect(modalSpy).toHaveBeenCalled();
   });
 
-  it('should return serial number for topic', function() {
+  it('should return serial number for skill', function() {
     ctrl.getPageNumber = function() {
       return 0;
     };
     ctrl.getItemsPerPage = function() {
       return 10;
     };
-    expect(ctrl.getSerialNumberForTopic(2)).toEqual(3);
+    expect(ctrl.getSerialNumberForSkill(2)).toEqual(3);
     ctrl.getPageNumber = function() {
       return 3;
     };
     ctrl.getItemsPerPage = function() {
       return 15;
     };
-    expect(ctrl.getSerialNumberForTopic(2)).toEqual(48);
+    expect(ctrl.getSerialNumberForSkill(2)).toEqual(48);
   });
 
-  it('should reinitialize the page after successfully deleting the topic',
+  it('should reinitialize the page after successfully deleting the skill',
     function() {
       spyOn($uibModal, 'open').and.returnValue({
         result: $q.resolve()
       });
       spyOn($rootScope, '$broadcast');
 
-      var topicId = 'CdjnJUE332dd';
-      var url = `/topic_editor_handler/data/${topicId}`;
+      var skillId = 'CdjnJUE332dd';
+      var url = '/skill_editor_handler/data/' + skillId;
       $httpBackend.expectDELETE(url).respond(200);
-      ctrl.deleteTopic(topicId);
+      ctrl.deleteSkill(skillId);
 
       $httpBackend.flush();
+      $timeout.flush();
       expect($rootScope.$broadcast).toHaveBeenCalledWith(
         'topicsAndSkillsDashboardReinitialized');
     });
 
-  it('should show the warning if deleting a topic failed', function() {
-    spyOn($uibModal, 'open').and.returnValue({
-      result: $q.resolve()
+  it('should reinitialize the page after merging the skill',
+    function() {
+      spyOn($uibModal, 'open').and.returnValue({
+        result: $q.resolve({
+          skill: {id: '1'},
+          supersedingSkillId: '2'
+        })
+      });
+
+      spyOn($rootScope, '$broadcast').and.callThrough();
+      $scope.getMergeableSkillSummaries = function() {
+        return [{id: 'dnfsdk', version: 1}];
+      };
+      var skillId = 'CdjnJUE332dd';
+
+      ctrl.mergeSkill(skillId);
+      $timeout.flush(100);
+
+      expect($rootScope.$broadcast).toHaveBeenCalledWith(
+        'topicsAndSkillsDashboardReinitialized');
     });
-    var alertSpy = spyOn(AlertsService, 'addWarning').and.callThrough();
 
-    var topicId = 'CdjnJUE332dd';
-    var url = '/topic_editor_handler/data/CdjnJUE332dd';
-    $httpBackend.expectDELETE(url).respond(400);
-    ctrl.deleteTopic(topicId);
-    $httpBackend.flush();
+  it('should assign skill to a topic',
+    function() {
+      var topicIds = ['dnfsdk'];
+      spyOn($uibModal, 'open').and.returnValue({
+        result: $q.resolve(topicIds)
+      });
+      var broadcastSpy = spyOn($rootScope, '$broadcast').and.callThrough();
 
-    expect(alertSpy).toHaveBeenCalledWith(
-      'There was an error when deleting the topic.');
-  });
+      $scope.getEditableTopicSummaries = function() {
+        return [{id: 'dnfsdk', version: 1}];
+      };
+      var skillId = 'CdjnJUE332dd';
+
+      spyOn(EditableTopicBackendApiService, 'updateTopic').and.returnValue(
+        $q.resolve());
+
+      ctrl.assignSkillToTopic(skillId);
+      $timeout.flush(100);
+      expect(broadcastSpy).toHaveBeenCalledWith(
+        'topicsAndSkillsDashboardReinitialized', true);
+    });
 });

@@ -232,48 +232,22 @@ def get_all_skill_summaries():
     return skill_summaries
 
 
-def get_skills_in_batches(order, limit, offset):
-    skill_summaries_models = skill_models.SkillSummaryModel.get_in_batches(
-        order, limit, offset)
-    skill_summaries = [
-        get_skill_summary_from_model(summary)
-        for summary in skill_summaries_models]
-
-    # for item in dummy:
-    #     print (item)
-    # skill_summaries2 = [
-    #     get_skill_summary_from_model(s)
-    #     for s in dummy]
-    # print(skill_summaries2)
-    return skill_summaries
-
-
-def get_filtered_skills(status, classroom_name, keywords, sort_by):
+def get_filtered_skill_dicts(status, classroom_name, keywords, sort_by):
 
     skill_summary_dicts = get_all_skill_summary_dicts_with_topic_and_classroom()
 
-    filtered_skill_summary_dicts = _filter_skills_by_status(skill_summary_dicts, status)
-    filtered_skill_summary_dicts = _filter_skills_by_classroom(filtered_skill_summary_dicts, classroom_name)
-    filtered_skill_summary_dicts = _filter_skills_by_keywords(filtered_skill_summary_dicts, keywords)
+    filtered_skill_summary_dicts = filter_skills_by_status(skill_summary_dicts, status)
+    filtered_skill_summary_dicts = filter_skills_by_classroom(filtered_skill_summary_dicts, classroom_name)
+    filtered_skill_summary_dicts = filter_skills_by_keywords(filtered_skill_summary_dicts, keywords)
 
-    if sort_by == constants.TOPIC_SKILL_DASHBOARD_SORT_OPTIONS['IncreasingCreatedOn']:
-        print('SORTING----1')
-        print('*****************************************************')
-        return sorted(filtered_skill_summary_dicts, key=lambda x: x['skill_model_created_on'])
     if sort_by == constants.TOPIC_SKILL_DASHBOARD_SORT_OPTIONS['DecreasingCreatedOn']:
-        print('SORTING----2')
-        print('*****************************************************')
         return sorted(filtered_skill_summary_dicts, key=lambda x: x['skill_model_created_on'], reverse=True)
-    if sort_by == constants.TOPIC_SKILL_DASHBOARD_SORT_OPTIONS['IncreasingUpdatedOn']:
-        print('SORTING----2')
-        print('*****************************************************')
+    elif sort_by == constants.TOPIC_SKILL_DASHBOARD_SORT_OPTIONS['IncreasingUpdatedOn']:
         return sorted(filtered_skill_summary_dicts, key=lambda x: x['skill_model_last_updated'])
-    if sort_by == constants.TOPIC_SKILL_DASHBOARD_SORT_OPTIONS['DecreasingUpdatedOn']:
-        print('SORTING----2')
-        print('*****************************************************')
+    elif sort_by == constants.TOPIC_SKILL_DASHBOARD_SORT_OPTIONS['DecreasingUpdatedOn']:
         return sorted(filtered_skill_summary_dicts, key=lambda x: x['skill_model_last_updated'], reverse=True)
-    print(filtered_skill_summary_dicts[0])
-    return filtered_skill_summary_dicts
+    else:
+        return sorted(filtered_skill_summary_dicts, key=lambda x: x['skill_model_created_on'])
 
 
 def get_all_skill_summary_dicts_with_topic_and_classroom():
@@ -294,11 +268,8 @@ def get_all_skill_summary_dicts_with_topic_and_classroom():
     return total_skill_summaries
 
 
-def _filter_skills_by_status(skill_summary_dicts, status):
-    skill_ids_assigned_to_some_topic = (
-        topic_services.get_all_skill_ids_assigned_to_some_topic())
-
-    if status == constants.SKILL_STATUS_OPTIONS['ALL']:
+def filter_skills_by_status(skill_summary_dicts, status):
+    if not status or status == constants.SKILL_STATUS_OPTIONS['ALL']:
         return skill_summary_dicts
 
     elif status == constants.SKILL_STATUS_OPTIONS['UNASSIGNED']:
@@ -317,12 +288,9 @@ def _filter_skills_by_status(skill_summary_dicts, status):
 
         return assigned_skill_dicts
 
-    else:
-        return skill_summary_dicts
 
-
-def _filter_skills_by_classroom(skill_summary_dicts, classroom_name):
-    if classroom_name == 'All':
+def filter_skills_by_classroom(skill_summary_dicts, classroom_name):
+    if not classroom_name or classroom_name == 'All':
         return skill_summary_dicts
 
     skill_summaries_with_classroom_name = []
@@ -333,18 +301,18 @@ def _filter_skills_by_classroom(skill_summary_dicts, classroom_name):
     return skill_summaries_with_classroom_name
 
 
-def _is_keyword_present_in_skill(skill, keywords):
+def is_keyword_present_in_skill(skill, keywords):
     for keyword in keywords:
         if skill['description'].lower().find(keyword.lower()) != -1:
             return True
     return False
 
 
-def _filter_skills_by_keywords(skill_summary_dicts, keywords):
-    if not len(keywords):
+def filter_skills_by_keywords(skill_summary_dicts, keywords):
+    if not keywords:
         return skill_summary_dicts
 
-    return filter(lambda skill_summary: _is_keyword_present_in_skill(
+    return filter(lambda skill_summary: is_keyword_present_in_skill(
         skill_summary, keywords), skill_summary_dicts)
 
 

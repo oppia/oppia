@@ -102,9 +102,7 @@ angular.module('oppia').controller('CreateNewSkillModalController', [
       $uibModalInstance.close({
         description: $scope.newSkillDescription,
         rubrics: $scope.rubrics,
-        explanation: $scope.newExplanationObject,
-        linkedTopicIds: [],
-        imagesData: []
+        explanation: $scope.newExplanationObject
       });
     };
 

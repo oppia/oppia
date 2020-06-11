@@ -9,7 +9,7 @@
       <col style="width: 20%;">
     </colgroup>
     <tr>
-      <th ng-repeat="key in SKILL_HEADINGS"
+      <th ng-repeat="key in $ctrl.SKILL_HEADINGS"
           class="dashboard-table-headings">
         <p ng-if="key === 'index'"></p>
         <p ng-if="key === 'description'" id="dashboard-table-heading-skills-description"> Skill Description </p>
@@ -23,7 +23,7 @@
         ng-click="selectSkill(skill)"
         class="list-item protractor-test-skills-list-item">
       <td>
-        <[getSerialNumberForSkill($index)]>.
+        <[$ctrl.getSerialNumberForSkill($index)]>.
       </td>
       <td>
         <a ng-href="<[getSkillEditorUrl(skill.id)]>" class="list-summary">
@@ -62,20 +62,20 @@
       <td class="skill-edit-options">
       <div ng-if="getEditableTopicSummaries().length > 0 && !isUnpublishedSkill()">
         <button class="btn btn-secondary skills-list-action-button
-        protractor-test-assign-skill-to-topic-button" ng-click="assignSkillToTopic(skill.id)">
+        protractor-test-assign-skill-to-topic-button" ng-click="$ctrl.assignSkillToTopic(skill.id)">
           <span> Assign to Topic </span>
         </button>
       </div>
       <div class="merge-skill" ng-if="getMergeableSkillSummaries().length > 0">
         <div class="protractor-test-merge-skills-button merge-skill-icon"
-             ng-click="mergeSkill(skill)">
+             ng-click="$ctrl.mergeSkill(skill)">
           <span class="material-icons" title="Merge Skill">
             merge_type
           </span>
         </div>
       </div>
       <div class="delete-icon">
-        <a ng-if="canDeleteSkill()" ng-click="deleteSkill(skill.id)" class="protractor-test-delete-skill-button">
+        <a ng-if="canDeleteSkill()" ng-click="$ctrl.deleteSkill(skill.id)" class="protractor-test-delete-skill-button">
           <span class="fas fa-trash-alt list-summary"></span>
         </a>
       </div>

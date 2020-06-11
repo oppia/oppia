@@ -142,13 +142,12 @@ class SkillsDashboardPageDataHandler(base.BaseHandler):
         sort_by = self.request.get('sort')
         page_number = int(self.request.get('pageNumber'))
         items_per_page = int(self.request.get('itemsPerPage'))
-        print(classroom_name, status, keywords, sort_by, page_number, items_per_page)
-        skill_summary_dicts = skill_services.get_filtered_skills(status, classroom_name, keywords, sort_by)
+
+        skill_summary_dicts = skill_services.get_filtered_skill_dicts(status, classroom_name, keywords, sort_by)
         skill_summary_dicts_paginated = skill_summary_dicts[
             page_number * items_per_page: ((page_number + 1) * items_per_page)]
 
         self.render_json({
-            'test_summary': skill_summary_dicts,
             'skill_summary_dicts': skill_summary_dicts_paginated,
             'total_skill_count': len(skill_summary_dicts)
         })

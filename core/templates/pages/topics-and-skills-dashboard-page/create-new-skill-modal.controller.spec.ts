@@ -19,7 +19,7 @@
 import { UpgradedServices } from 'services/UpgradedServices';
 import {RubricObjectFactory} from 'domain/skill/RubricObjectFactory';
 
-fdescribe('Create new skill modal', function() {
+describe('Create new skill modal', function() {
   beforeEach(angular.mock.module('oppia'));
 
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -33,13 +33,16 @@ fdescribe('Create new skill modal', function() {
   var $uibModalInstance = null;
   var skillDifficulties = null;
   var RubricObjectFactory = null;
-
+  var COMPONENT_NAME_EXPLANATION = null;
+  var SubtitledHtmlObjectFactory = null;
   beforeEach(angular.mock.inject(function($injector, $controller) {
     var $rootScope = $injector.get('$rootScope');
     $uibModalInstance = jasmine.createSpyObj(
       '$uibModalInstance', ['close', 'dismiss']);
     skillDifficulties = $injector.get('SKILL_DIFFICULTIES');
+    COMPONENT_NAME_EXPLANATION = $injector.get('COMPONENT_NAME_EXPLANATION');
     RubricObjectFactory = $injector.get('RubricObjectFactory');
+    SubtitledHtmlObjectFactory = $injector.get('SubtitledHtmlObjectFactory');
     $scope = $rootScope.$new();
     $controller('CreateNewSkillModalController', {
       $scope: $scope,
@@ -90,17 +93,43 @@ fdescribe('Create new skill modal', function() {
     expect($uibModalInstance.dismiss).toHaveBeenCalledWith('cancel');
   });
 
+  it('should set the error message if skill description is invalid',
+    function() {
+      var errorString = (
+        'Please use a non-empty description consisting of ' +
+        'alphanumeric characters, spaces and/or hyphens.');
+
+      $scope.newSkillDescription = '';
+      $scope.createNewSkill();
+      expect($scope.errorMsg).toEqual(errorString);
+      $scope.resetErrorMsg();
+
+      $scope.newSkillDescription = 'valid';
+      $scope.createNewSkill();
+      expect($scope.errorMsg).toEqual('');
+      $scope.resetErrorMsg();
+
+      $scope.newSkillDescription = 'invalidvalid>>';
+      $scope.createNewSkill();
+      expect($scope.errorMsg).toEqual(errorString);
+    });
   it('should close the modal with skill input values ', function() {
     var rubrics = [
       RubricObjectFactory.create(skillDifficulties[0], []),
-      RubricObjectFactory.create(skillDifficulties[1], ['']),
+      RubricObjectFactory.create(skillDifficulties[1], ['Large addition']),
       RubricObjectFactory.create(skillDifficulties[2], [])];
+    var explanationObject = SubtitledHtmlObjectFactory.createDefault(
+      $scope.bindableDict.displayedConceptCardExplanation,
+      COMPONENT_NAME_EXPLANATION);
+    var newExplanationObject = explanationObject.toBackendDict();
+
     $scope.newSkillDescription = 'Large addition';
     $scope.updateSkillDescription();
     $scope.createNewSkill();
     expect($uibModalInstance.close).toHaveBeenCalledWith({
       description: 'Large addition',
       rubrics: rubrics,
+      explanation: newExplanationObject
     });
   });
 });

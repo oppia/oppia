@@ -91,9 +91,10 @@ angular.module('oppia').factory('SkillCreationService', [
           // 'Create' button and filled with URL once the details are
           // fetched from the backend.
           var newTab = $window.open();
+          var imagesData = ImageLocalStorageService.getStoredImagesData();
           SkillCreationBackendApiService.createSkill(
             result.description, rubrics, result.explanation,
-            result.linkedTopicIds, result.imagesData).then(function(response) {
+            [], imagesData).then(function(response) {
             $timeout(function() {
               $rootScope.$broadcast(
                 EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED, true);

@@ -24,6 +24,7 @@ from constants import constants
 from core.domain import skill_domain
 from core.domain import skill_services
 from core.domain import state_domain
+from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
@@ -64,6 +65,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             self.MISCONCEPTION_ID_1, 'name', '<p>description</p>',
             '<p>default_feedback</p>', True)]
         self.SKILL_ID = skill_services.get_new_skill_id()
+        self.SKILL_ID2 = skill_services.get_new_skill_id()
 
         self.signup('a@example.com', 'A')
         self.signup(self.ADMIN_EMAIL, username=self.ADMIN_USERNAME)
@@ -306,6 +308,177 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(skill_summary.id, self.SKILL_ID)
         self.assertEqual(skill_summary.description, 'Description')
         self.assertEqual(skill_summary.misconception_count, 1)
+
+    def test_get_all_skill_summary_dicts_with_topic_and_classroom(self):
+        skill_summaries_dicts = skill_services.get_all_skill_summary_dicts_with_topic_and_classroom()
+        self.assertEqual(len(skill_summaries_dicts), 1)
+        self.assertEqual(skill_summaries_dicts[0]['id'], self.SKILL_ID)
+        self.assertEqual(skill_summaries_dicts[0]['description'], 'Description')
+        self.assertEqual(skill_summaries_dicts[0]['misconception_count'], 1)
+        self.assertEqual(skill_summaries_dicts[0]['worked_examples_count'], 1)
+        self.assertEqual(skill_summaries_dicts[0]['topic'], None)
+        self.assertEqual(skill_summaries_dicts[0]['classroom'], None)
+
+    def test_get_all_skill_summary_dicts_with_assigned_topic(self):
+        skill_id = self.SKILL_ID
+
+        def mock_topic_function():
+            return [(skill_id, 'topic1', 'math'),]
+        with self.swap(
+                topic_services,
+                'get_all_skill_ids_assigned_to_some_topic_with_topic_details', mock_topic_function):
+            skill_summaries = (
+                skill_services.get_all_skill_summary_dicts_with_topic_and_classroom())
+            self.assertEqual(skill_summaries[0]['topic'], 'topic1')
+
+    def test_get_filtered_skill_dicts(self):
+        self.skill2 = self.save_new_skill(
+            self.SKILL_ID2, self.USER_ID, description='Description2',
+            prerequisite_skill_ids=['skill_id_1', 'skill_id_2'])
+        skill_summaries_dicts = skill_services.get_filtered_skill_dicts(
+            None, None, None, None)
+        self.assertEqual(len(skill_summaries_dicts), 2)
+        self.assertEqual(skill_summaries_dicts[0]['id'], self.SKILL_ID)
+        self.assertEqual(skill_summaries_dicts[1]['id'], self.SKILL_ID2)
+
+        skill_summaries_dicts = skill_services.get_filtered_skill_dicts(
+            None, None, None, 'Oldest Created')
+        self.assertEqual(len(skill_summaries_dicts), 2)
+        self.assertEqual(skill_summaries_dicts[0]['id'], self.SKILL_ID2)
+        self.assertEqual(skill_summaries_dicts[1]['id'], self.SKILL_ID)
+
+        skill_summaries_dicts = skill_services.get_filtered_skill_dicts(
+            None, None, None, 'Most Recently Updated')
+        self.assertEqual(len(skill_summaries_dicts), 2)
+        self.assertEqual(skill_summaries_dicts[0]['id'], self.SKILL_ID)
+        self.assertEqual(skill_summaries_dicts[1]['id'], self.SKILL_ID2)
+
+        skill_summaries_dicts = skill_services.get_filtered_skill_dicts(
+            None, None, None, 'Least Recently Updated')
+        self.assertEqual(len(skill_summaries_dicts), 2)
+        self.assertEqual(skill_summaries_dicts[0]['id'], self.SKILL_ID2)
+        self.assertEqual(skill_summaries_dicts[1]['id'], self.SKILL_ID)
+
+    def test_filter_skills_by_status(self):
+        skill_dict1 = {
+            'topic': None,
+            'classroom': None,
+            'version': 1,
+            'description': u'Description',
+            'language_code': u'en',
+            'skill_model_last_updated': 1591929228715.174,
+            'skill_model_created_on': 1591929228715.171,
+            'misconception_count': 1,
+            'id': '3FmfRppeAbJA',
+            'worked_examples_count': 1}
+
+        skill_dict2 = {
+            'topic': None,
+            'classroom': None,
+            'version': 1,
+            'description': u'Description2',
+            'language_code': u'en',
+            'skill_model_last_updated': 1591929228715.174,
+            'skill_model_created_on': 1591929228715.171,
+            'misconception_count': 1,
+            'id': '3FmfRppeAbJA',
+            'worked_examples_count': 1}
+
+        filtered_skills = skill_services.filter_skills_by_status([skill_dict1, skill_dict2], None)
+        self.assertEqual(filtered_skills, [skill_dict1, skill_dict2])
+
+        filtered_skills = skill_services.filter_skills_by_status([skill_dict1, skill_dict2], 'All')
+        self.assertEqual(filtered_skills, [skill_dict1, skill_dict2])
+
+        skill_dict2['topic'] = 'topic1'
+        filtered_skills = skill_services.filter_skills_by_status([skill_dict1, skill_dict2], 'Assigned')
+        self.assertEqual(filtered_skills, [skill_dict2])
+
+        filtered_skills = skill_services.filter_skills_by_status([skill_dict1, skill_dict2], 'Unassigned')
+        self.assertEqual(filtered_skills, [skill_dict1])
+
+        skill_dict1['topic'] = 'topic2'
+        filtered_skills = skill_services.filter_skills_by_status([skill_dict1, skill_dict2], 'Assigned')
+        self.assertEqual(filtered_skills, [skill_dict1, skill_dict2])
+
+        filtered_skills = skill_services.filter_skills_by_status([skill_dict1, skill_dict2], 'Unassigned')
+        self.assertEqual(filtered_skills, [])
+
+    def test_filter_by_classroom(self):
+        skill_dict1 = {
+            'topic': None,
+            'classroom': None,
+            'version': 1,
+            'description': 'Description',
+            'language_code': 'en',
+            'skill_model_last_updated': 1591929228715.174,
+            'skill_model_created_on': 1591929228715.171,
+            'misconception_count': 1,
+            'id': '3FmfRppeAbJA',
+            'worked_examples_count': 1}
+
+        skill_dict2 = {
+            'topic': None,
+            'classroom': None,
+            'version': 1,
+            'description': 'Description2',
+            'language_code': 'en',
+            'skill_model_last_updated': 1591929228715.174,
+            'skill_model_created_on': 1591929228715.171,
+            'misconception_count': 1,
+            'id': '3FmfRppeAbJA',
+            'worked_examples_count': 1}
+
+        filtered_skills = skill_services.filter_skills_by_classroom([skill_dict1, skill_dict2], None)
+        self.assertEqual(filtered_skills, [skill_dict1, skill_dict2])
+
+        filtered_skills = skill_services.filter_skills_by_classroom([skill_dict1, skill_dict2], 'All')
+        self.assertEqual(filtered_skills, [skill_dict1, skill_dict2])
+
+        skill_dict1['classroom'] = 'math'
+
+        filtered_skills = skill_services.filter_skills_by_classroom([skill_dict1, skill_dict2], 'math')
+        self.assertEqual(filtered_skills, [skill_dict1])
+
+    def test_filter_skills_by_keywords(self):
+        skill_dict1 = {
+            'topic': None,
+            'classroom': None,
+            'version': 1,
+            'description': 'Addition skill',
+            'language_code': 'en',
+            'skill_model_last_updated': 1591929228715.174,
+            'skill_model_created_on': 1591929228715.171,
+            'misconception_count': 1,
+            'id': '3FmfRppeAbJA',
+            'worked_examples_count': 1}
+
+        skill_dict2 = {
+            'topic': None,
+            'classroom': None,
+            'version': 1,
+            'description': 'Subtraction skill',
+            'language_code': 'en',
+            'skill_model_last_updated': 1591929228715.174,
+            'skill_model_created_on': 1591929228715.171,
+            'misconception_count': 1,
+            'id': '3FmfRppeAbJA',
+            'worked_examples_count': 1}
+
+        filtered_skills = skill_services.filter_skills_by_keywords([skill_dict1, skill_dict2], None)
+        self.assertEqual(filtered_skills, [skill_dict1, skill_dict2])
+
+        filtered_skills = skill_services.filter_skills_by_keywords([skill_dict1, skill_dict2], ['subtract'])
+        self.assertEqual(filtered_skills, [skill_dict2])
+
+        filtered_skills = skill_services.filter_skills_by_keywords([skill_dict1, skill_dict2], ['add'])
+        self.assertEqual(filtered_skills, [skill_dict1])
+
+        filtered_skills = skill_services.filter_skills_by_keywords([skill_dict1, skill_dict2], ['add', 'tract'])
+        self.assertEqual(filtered_skills, [skill_dict1, skill_dict2])
+
+        filtered_skills = skill_services.filter_skills_by_keywords([skill_dict1, skill_dict2], ['multiply'])
+        self.assertEqual(filtered_skills, [])
 
     def test_update_skill(self):
         changelist = [
