@@ -141,8 +141,6 @@ export class SolutionObjectFactory {
         solutionBackendDict.explanation));
   }
 
-  // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
-  /* eslint-disable dot-notation */
   createNew(
       answerIsExclusive: boolean, correctAnswer: any, explanationHtml: string,
       explanationId: string): Solution {
