@@ -12,6 +12,7 @@
 # distributed under the License is distributed on an "AS-IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
+#
 # limitations under the License.
 
 """Lint checks for Python files."""
@@ -131,8 +132,6 @@ class PythonLintChecksManager(python_utils.OBJECT):
             for filepath in files_to_check:
                 if filepath.endswith('_test.py'):
                     continue
-                filename = filepath.split('/')
-                filename = filename[-1]
                 for line_num, line in enumerate(FILE_CACHE.readlines(
                         filepath)):
                     line = line.strip()
@@ -142,13 +141,11 @@ class PythonLintChecksManager(python_utils.OBJECT):
                     ind1 = words[0].startswith('def')
                     ind2 = words[1].startswith('test_only')
                     if ind1 and ind2:
-                        filen = '%s -->' % (filename)
-                        line = ' "%s" ' % (line)
-                        number = '%s:' % (line_num)
-                        error_message = ' Non test file uses test functions'
-                        s = filen + line + number + error_message
-                        python_utils.PRINT(s)
-                        summary_messages.append(s)
+                        summary_message = (
+                            '%s --> Line %s: Please do not use \'test_only\' '
+                            'in the non-test file.' % (filepath, line_num))
+                        python_utils.PRINT(summary_message)
+                        summary_messages.append(summary_message)
                         failed = True
 
             if failed:
