@@ -69,12 +69,12 @@ def check_skip_files_in_app_dev_yaml(file_cache, verbose_mode_enabled):
 
         if failed:
             summary_message = (
-                '%s   app_dev file coverage check failed, see messages above '
+                '%s app_dev file coverage check failed, see messages above '
                 'for invalid file names in app_dev.yaml file' %
-                linter_utils.MESSAGE_TYPE_FAILED)
+                linter_utils.FAILED_MESSAGE_PREFIX)
         else:
-            summary_message = '%s   app_dev file check passed' % (
-                linter_utils.MESSAGE_TYPE_SUCCESS)
+            summary_message = '%s app_dev file check passed' % (
+                linter_utils.SUCCESS_MESSAGE_PREFIX)
         summary_messages.append(summary_message)
         python_utils.PRINT(summary_message)
         python_utils.PRINT('')

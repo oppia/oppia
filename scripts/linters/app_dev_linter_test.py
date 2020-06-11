@@ -48,7 +48,7 @@ class AppDevLinterTests(test_utils.GenericTestBase):
             summary_messages = (
                 app_dev_linter.check_skip_files_in_app_dev_yaml(
                     FILE_CACHE, True))
-            expected_summary_messages = ['SUCCESS   app_dev file check passed']
+            expected_summary_messages = ['SUCCESS  app_dev file check passed']
             self.assertEqual(summary_messages, expected_summary_messages)
 
     def test_check_invalid_pattern_in_app_dev_yaml(self):
@@ -62,4 +62,7 @@ class AppDevLinterTests(test_utils.GenericTestBase):
             summary_messages = (
                 app_dev_linter.check_skip_files_in_app_dev_yaml(
                     FILE_CACHE, True))
-        self.assertTrue(len(summary_messages) == 2)
+        self.assertEqual(len(summary_messages), 2)
+        self.assertTrue(
+            'Pattern on line 2 doesn\'t match any file or directory' in
+            summary_messages[0])
