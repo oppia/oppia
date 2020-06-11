@@ -7,9 +7,10 @@
   </a>
 
   <a class="oppia-navbar-brand-name oppia-transition-200 protractor-test-oppia-main-logo d-none d-sm-block" href="/"
-     focus-on="<[::$ctrl.LABEL_FOR_CLEARING_FOCUS]>">
+     focus-on="<[::$ctrl.LABEL_FOR_CLEARING_FOCUS]>"
+     ng-class="$ctrl.windowIsNarrow ? 'oppia-logo-small' : 'oppia-logo-wide'">
     <img ng-src="<[$ctrl.getStaticImageUrl('/logo/288x128_logo_white.png')]>" class="oppia-logo"
-         ng-class="$ctrl.windowIsNarrow ? 'oppia-logo-small' : 'oppia-logo-wide'" alt="Oppia Home">
+         alt="Oppia Home" ng-style="!$ctrl.windowIsNarrow && {'width': '90px'}">
   </a>
   <!-- This is needed for the correct image to appear when an exploration is shared using G+. -->
   <a style="display: none;">
