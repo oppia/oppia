@@ -664,11 +664,11 @@ class GeneralPurposeLinter(python_utils.OBJECT):
                 summary_message = (
                     '%s Mandatory pattern check failed, see errors above for'
                     'patterns that should be added.' % (
-                        linter_utils.MESSAGE_TYPE_FAILED))
+                        linter_utils.FAILED_MESSAGE_PREFIX))
             else:
                 summary_message = (
                     '%s Mandatory pattern check passed' % (
-                        linter_utils.MESSAGE_TYPE_SUCCESS))
+                        linter_utils.SUCCESS_MESSAGE_PREFIX))
             python_utils.PRINT(summary_message)
 
         python_utils.PRINT('')
@@ -727,11 +727,11 @@ class GeneralPurposeLinter(python_utils.OBJECT):
                 summary_message = (
                     '%s Pattern check failed, see errors above '
                     'for patterns that should be removed.' % (
-                        linter_utils.MESSAGE_TYPE_FAILED))
+                        linter_utils.FAILED_MESSAGE_PREFIX))
                 summary_messages.append(summary_message)
             else:
                 summary_message = '%s Pattern checks passed' % (
-                    linter_utils.MESSAGE_TYPE_SUCCESS)
+                    linter_utils.SUCCESS_MESSAGE_PREFIX)
                 summary_messages.append(summary_message)
 
             python_utils.PRINT('')
@@ -757,7 +757,8 @@ class GeneralPurposeLinter(python_utils.OBJECT):
             for filepath in files_to_lint:
                 file_content = FILE_CACHE.readlines(filepath)
                 file_length = len(file_content)
-                if (file_length >= 2 and
+                if (
+                        file_length >= 2 and
                         not re.search(r'[^\n]\n', file_content[-1])):
                     summary_message = (
                         '%s --> There should be a single newline at the '
@@ -769,11 +770,11 @@ class GeneralPurposeLinter(python_utils.OBJECT):
             if failed:
                 summary_message = (
                     '%s Newline at the eof check failed.' % (
-                        linter_utils.MESSAGE_TYPE_FAILED))
+                        linter_utils.FAILED_MESSAGE_PREFIX))
             else:
                 summary_message = (
                     '%s Newline at the eof check passed.' % (
-                        linter_utils.MESSAGE_TYPE_SUCCESS))
+                        linter_utils.SUCCESS_MESSAGE_PREFIX))
             summary_messages.append(summary_message)
             python_utils.PRINT(summary_message)
 
