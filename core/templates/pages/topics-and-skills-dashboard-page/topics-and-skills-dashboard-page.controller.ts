@@ -22,6 +22,16 @@ require(
   'background-banner.component.ts');
 require(
   'components/forms/custom-forms-directives/select2-dropdown.directive.ts');
+require(
+  'pages/topics-and-skills-dashboard-page/skills-list/' +
+  'skills-list.directive.ts');
+require(
+  'pages/topics-and-skills-dashboard-page/templates/' +
+  'create-new-skill-modal.controller.ts');
+require(
+  'pages/topics-and-skills-dashboard-page/topics-list/' +
+  'topics-list.directive.ts');
+
 require('components/entity-creation-services/skill-creation.service.ts');
 require('components/entity-creation-services/topic-creation.service.ts');
 require('components/rubrics-editor/rubrics-editor.directive.ts');
@@ -34,9 +44,6 @@ require(
   'domain/topics_and_skills_dashboard/' +
   'topics-and-skills-dashboard-backend-api.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
-require(
-  'pages/topics-and-skills-dashboard-page/' +
-  'create-new-skill-modal.controller.ts');
 require(
   'pages/topics-and-skills-dashboard-page/skills-list/' +
   'skills-list.directive.ts');
@@ -175,16 +182,27 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
           };
 
           ctrl.createSkill = function() {
+            var rubrics = [
+              RubricObjectFactory.create(SKILL_DIFFICULTIES[0], []),
+              RubricObjectFactory.create(SKILL_DIFFICULTIES[1], ['']),
+              RubricObjectFactory.create(SKILL_DIFFICULTIES[2], [])];
+            ContextService.setImageSaveDestinationToLocalStorage();
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/topics-and-skills-dashboard-page/templates/' +
                 'create-new-skill-modal.template.html'),
               backdrop: 'static',
+              resolve: {
+                rubrics: () => rubrics
+              },
               controller: 'CreateNewSkillModalController'
             }).result.then(function(result) {
               ContextService.resetImageSaveDestination();
               SkillCreationService.createNewSkill(
                 result.description, result.rubrics, result.explanation, []);
+            }, function() {
+              ImageLocalStorageService.flushStoredImagesData();
+              SkillCreationService.resetSkillDescriptionStatusMarker();
             });
           };
           /**
