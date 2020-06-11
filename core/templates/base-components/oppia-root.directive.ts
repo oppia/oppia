@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 // Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,7 +17,7 @@
  */
 
 // Incase of doubts over what is done here, please look at the description of
-// pr #9479
+// the PR #9479. https://github.com/oppia/oppia/pull/9479#issue-432536289
 
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
@@ -27,20 +26,22 @@ angular.module('oppia').directive('oppiaRoot', [
     return {
       template: require('./oppia-root.directive.html'),
       scope: {},
-      transclude: {
-        app: 'app',
-      },
+      transclude: true,
       controllerAs: '$ctrl',
       controller: ['$scope',
         function($scope) {
           $scope.initialized = false;
 
           $scope.onInit = function() {
-            // This config is not getting executed. This doesn't affect my
-            // method but having the following lines would make this code
-            //  backwards compatible, obviating the need for having an
-            // upgraded-services.ts.
+            /**
+             * The angular.module('oppia').config(...) is added here to provide
+             * the "angular instance" of service in angularjs using the regular
+             * angularjs DI. We can choose not to have the following config.
+             * But in that case we would have to keep the upgraded-services.ts
+             * because there is a lot of code dependent on it.
+             */
             angular.module('oppia').config(['$provide', function($provide) {
+              /* eslint-disable max-len */
               var servicesToProvide = [
                 'AlertsService', 'BackgroundMaskService', 'BrowserCheckerService',
                 'CodeReplRulesService', 'CollectionCreationBackendService',
@@ -69,6 +70,7 @@ angular.module('oppia').directive('oppiaRoot', [
                 'UrlInterpolationService', 'UrlService', 'UserInfoObjectFactory',
                 'UtilsService', 'ValidatorsService', 'WindowDimensionsService',
                 'WindowRef'];
+              /* eslint-enable max-len */
               for (let service of servicesToProvide) {
                 $provide.value(service, OppiaAngularRootComponent[(
                   service[0].toLowerCase() + service.substring(1))]);

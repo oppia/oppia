@@ -5,23 +5,21 @@
   </head>
   <body>
     <oppia-root>
-      <app>
-        <div ng-controller="Base">
-          <base-content>
-            <navbar-breadcrumb>
-              <ul class="nav navbar-nav oppia-navbar-breadcrumb">
-                <li>
-                  <span class="oppia-navbar-breadcrumb-separator"></span>
-                  About
-                </li>
-              </ul>
-            </navbar-breadcrumb>
-            <content>
-              <about-page></about-page>
-            </content>
-          </base-content>
-        </div>
-      </app>
+      <div ng-controller="Base">
+        <base-content>
+          <navbar-breadcrumb>
+            <ul class="nav navbar-nav oppia-navbar-breadcrumb">
+              <li>
+                <span class="oppia-navbar-breadcrumb-separator"></span>
+                About
+              </li>
+            </ul>
+          </navbar-breadcrumb>
+          <content>
+            <about-page></about-page>
+          </content>
+        </base-content>
+      </div>
     </oppia-root>
     @load('pages/footer_js_libs.html')
   </body>
