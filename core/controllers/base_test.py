@@ -216,7 +216,8 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             feconf, 'ENABLE_MAINTENANCE_MODE', True)
         with swap_maintenance_mode:
             response = (
-                self.get_html_response('/library', expected_status_int=503))
+                self.get_html_response(
+                    '/community-library', expected_status_int=503))
             self.assertIn(
                 'The Oppia site is temporarily unavailable', response.body)
             self.assertNotIn('<library-page>', response.body)
@@ -227,7 +228,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         login_super_admin = self.login_context(
             self.SUPER_ADMIN_EMAIL, is_super_admin=True)
         with swap_maintenance_mode, login_super_admin:
-            response = self.get_html_response('/library')
+            response = self.get_html_response('/community-library')
             self.assertIn('<library-page>', response.body)
             self.assertNotIn(
                 'The Oppia site is temporarily unavailable', response.body)
@@ -715,13 +716,13 @@ class LogoutPageTests(test_utils.GenericTestBase):
         current_page = '/explore/0'
         self.get_html_response(current_page)
         response = self.get_html_response(
-            '/logout?redirect_url=library', expected_status_int=302)
+            '/logout?redirect_url=community-library', expected_status_int=302)
         expiry_date = response.headers['Set-Cookie'].rsplit('=', 1)
 
         self.assertTrue(
             datetime.datetime.utcnow() > datetime.datetime.strptime(
                 expiry_date[1], '%a, %d %b %Y %H:%M:%S GMT'))
-        self.assertIn('library', response.headers['Location'])
+        self.assertIn('community-library', response.headers['Location'])
 
     def test_logout_page_with_dev_mode_disabled(self):
         with self.swap(constants, 'DEV_MODE', False):
