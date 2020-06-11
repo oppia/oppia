@@ -77,7 +77,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'circular-image.directive.ts',
     'ck-editor-4-rte.directive.ts',
     'ck-editor-4-widgets.initializer.ts',
-    'classroom-page.controller.ts',
     'code-repl-prediction.service.ts',
     'code-string-editor.directive.ts',
     'codemirror-mergeview.directive.ts',
