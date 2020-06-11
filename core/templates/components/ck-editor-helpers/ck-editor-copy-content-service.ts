@@ -18,7 +18,7 @@
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable, Inject } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { IRootScopeService } from 'angular';
 
 
@@ -33,7 +33,7 @@ export class CkEditorCopyContentService {
    * tags
    * @param target {HTMLElement} target to copy
    */
-  _handleCopy(target: HTMLElement): {
+  private _handleCopy(target: HTMLElement): {
       rootElement: HTMLElement,
       containedWidgetTagName?: string
   } {
@@ -77,7 +77,7 @@ export class CkEditorCopyContentService {
    * @param containedWidgetTagName {string|undefined} the name of the widget
    *    in which element contains, if so
    */
-  _handlePaste(
+  private _handlePaste(
       editor: CKEDITOR.editor,
       element: HTMLElement,
       containedWidgetTagName?: string
