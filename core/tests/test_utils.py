@@ -205,6 +205,8 @@ class TestBase(unittest.TestCase):
     # A test unicode string.
     UNICODE_TEST_STRING = u'unicode ¡马!'
 
+    SUPER_ADMIN_EMAIL = 'tmpsuperadmin@example.com'
+
     # Dummy strings representing user attributes. Note that it is up to the
     # individual test to actually register these users as editors, admins, etc.
     ADMIN_EMAIL = 'admin@example.com'
@@ -591,7 +593,7 @@ tags: []
         """Signs up a superadmin user. Should be called at the end of
         setUp().
         """
-        self.signup('tmpsuperadmin@example.com', 'tmpsuperadm1n')
+        self.signup(self.SUPER_ADMIN_EMAIL, 'tmpsuperadm1n')
 
     def log_line(self, line):
         """Print the line with a prefix that can be identified by the
@@ -968,8 +970,7 @@ tags: []
         """Sets a given configuration object's value to the new value specified
         using a POST request.
         """
-        with self.login_context('tmpsuperadmin@example.com',
-                                is_super_admin=True):
+        with self.login_context(self.SUPER_ADMIN_EMAIL, is_super_admin=True):
             csrf_token = self.get_new_csrf_token()
             self.post_json(
                 '/adminhandler', {
@@ -986,8 +987,7 @@ tags: []
             username: str. Username of the given user.
             user_role: str. Role of the given user.
         """
-        with self.login_context('tmpsuperadmin@example.com',
-                                is_super_admin=True):
+        with self.login_context(self.SUPER_ADMIN_EMAIL, is_super_admin=True):
             csrf_token = self.get_new_csrf_token()
             self.post_json(
                 '/adminrolehandler', {
