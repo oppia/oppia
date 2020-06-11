@@ -80,35 +80,27 @@ describe('SetInputValidationService', () => {
     );
   });
 
-  // TODO: rename it
-  it('should be able to perform basic validation', () => {
-    var warnings = validatorService.getAllWarnings(
-      currentState,
-      goodCustomizationArgs,
-      goodAnswerGroups,
-      goodDefaultOutcome);
-    expect(warnings).toEqual([]);
-  });
-
   describe('.getCustomizationArgsWarnings', () => {
     it('should not generate error with correct customizationArgs', () => {
-      expect(validatorService.getAllWarnings(
+      let warnings = validatorService.getAllWarnings(
         currentState,
         goodCustomizationArgs,
         goodAnswerGroups,
         goodDefaultOutcome
-      )).toEqual([]);
+      );
+      expect(warnings).toEqual([]);
     });
 
     it('should generate errors when buttonText is missing', () => {
       let badCustomizationArgs = {};
 
-      expect(validatorService.getAllWarnings(
+      let warnings = validatorService.getAllWarnings(
         currentState,
         badCustomizationArgs,
         goodAnswerGroups,
         goodDefaultOutcome
-      )).toEqual([{
+      );
+      expect(warnings).toEqual([{
         type: WARNING_TYPES.ERROR,
         message: 'Button text must be a string.'
       }]);
@@ -117,12 +109,13 @@ describe('SetInputValidationService', () => {
     it('should generate errors when buttonText is not string', () => {
       let badCustomizationArgs = { buttonText: { value: 1 } };
 
-      expect(validatorService.getAllWarnings(
+      let warnings = validatorService.getAllWarnings(
         currentState,
         badCustomizationArgs,
         goodAnswerGroups,
         goodDefaultOutcome
-      )).toEqual([{
+      );
+      expect(warnings).toEqual([{
         type: WARNING_TYPES.ERROR,
         message: 'Button text must be a string.'
       }]);
@@ -131,12 +124,13 @@ describe('SetInputValidationService', () => {
     it('should generate errors when buttonText is empty', () => {
       let badCustomizationArgs = { buttonText: { value: '' } };
 
-      expect(validatorService.getAllWarnings(
+      let warnings = validatorService.getAllWarnings(
         currentState,
         badCustomizationArgs,
         goodAnswerGroups,
         goodDefaultOutcome
-      )).toEqual([{
+      );
+      expect(warnings).toEqual([{
         type: WARNING_TYPES.ERROR,
         message: 'Label for this button should not be empty.'
       }]);
@@ -157,12 +151,13 @@ describe('SetInputValidationService', () => {
             [equalsRule, equalsRule]
           );
 
-          expect(validatorService.getAllWarnings(
+          let warnings = validatorService.getAllWarnings(
             currentState,
             goodCustomizationArgs,
             [answerGroup],
             goodDefaultOutcome
-          )).toEqual([{
+          );
+          expect(warnings).toEqual([{
             type: WARNING_TYPES.ERROR,
             message: 'Rule 2 from answer group 1 is the same as rule 1 ' +
             'from answer group 1'
@@ -186,12 +181,13 @@ describe('SetInputValidationService', () => {
             [equalsRule1, equalsRule2]
           );
 
-          expect(validatorService.getAllWarnings(
+          let warnings = validatorService.getAllWarnings(
             currentState,
             goodCustomizationArgs,
             [answerGroup],
             goodDefaultOutcome
-          )).toEqual([]);
+          );
+          expect(warnings).toEqual([]);
         });
       });
 
@@ -207,12 +203,13 @@ describe('SetInputValidationService', () => {
             [subsetRule, subsetRule]
           );
 
-          expect(validatorService.getAllWarnings(
+          let warnings = validatorService.getAllWarnings(
             currentState,
             goodCustomizationArgs,
             [answerGroup],
             goodDefaultOutcome
-          )).toEqual([{
+          );
+          expect(warnings).toEqual([{
             type: WARNING_TYPES.ERROR,
             message: 'Rule 2 from answer group 1 is the same as rule 1 ' +
             'from answer group 1'
@@ -236,12 +233,13 @@ describe('SetInputValidationService', () => {
             [subsetRule1, subsetRule2]
           );
 
-          expect(validatorService.getAllWarnings(
+          let warnings = validatorService.getAllWarnings(
             currentState,
             goodCustomizationArgs,
             [answerGroup],
             goodDefaultOutcome
-          )).toEqual([]);
+          );
+          expect(warnings).toEqual([]);
         });
       });
 
@@ -257,12 +255,13 @@ describe('SetInputValidationService', () => {
             [hasElementsInRule, hasElementsInRule]
           );
 
-          expect(validatorService.getAllWarnings(
+          let warnings = validatorService.getAllWarnings(
             currentState,
             goodCustomizationArgs,
             [answerGroup],
             goodDefaultOutcome
-          )).toEqual([{
+          );
+          expect(warnings).toEqual([{
             type: WARNING_TYPES.ERROR,
             message: 'Rule 2 from answer group 1 is the same as rule 1 ' +
             'from answer group 1'
@@ -286,12 +285,13 @@ describe('SetInputValidationService', () => {
             [hasElementsInRule1, hasElementsInRule2]
           );
 
-          expect(validatorService.getAllWarnings(
+          let warnings = validatorService.getAllWarnings(
             currentState,
             goodCustomizationArgs,
             [answerGroup],
             goodDefaultOutcome
-          )).toEqual([]);
+          );
+          expect(warnings).toEqual([]);
         });
       });
 
@@ -307,12 +307,13 @@ describe('SetInputValidationService', () => {
             [disjointRule, disjointRule]
           );
 
-          expect(validatorService.getAllWarnings(
+          let warnings = validatorService.getAllWarnings(
             currentState,
             goodCustomizationArgs,
             [answerGroup],
             goodDefaultOutcome
-          )).toEqual([{
+          );
+          expect(warnings).toEqual([{
             type: WARNING_TYPES.ERROR,
             message: 'Rule 2 from answer group 1 is the same as rule 1 ' +
             'from answer group 1'
@@ -336,12 +337,13 @@ describe('SetInputValidationService', () => {
             [disjointRule1, disjointRule2]
           );
 
-          expect(validatorService.getAllWarnings(
+          let warnings = validatorService.getAllWarnings(
             currentState,
             goodCustomizationArgs,
             [answerGroup],
             goodDefaultOutcome
-          )).toEqual([]);
+          );
+          expect(warnings).toEqual([]);
         });
       });
 
@@ -357,12 +359,13 @@ describe('SetInputValidationService', () => {
             [supersetRule, supersetRule]
           );
 
-          expect(validatorService.getAllWarnings(
+          let warnings = validatorService.getAllWarnings(
             currentState,
             goodCustomizationArgs,
             [answerGroup],
             goodDefaultOutcome
-          )).toEqual([{
+          );
+          expect(warnings).toEqual([{
             type: WARNING_TYPES.ERROR,
             message: 'Rule 2 from answer group 1 is the same as rule 1 ' +
             'from answer group 1'
@@ -386,12 +389,13 @@ describe('SetInputValidationService', () => {
             [supersetRule1, supersetRule2]
           );
 
-          expect(validatorService.getAllWarnings(
+          let warnings = validatorService.getAllWarnings(
             currentState,
             goodCustomizationArgs,
             [answerGroup],
             goodDefaultOutcome
-          )).toEqual([]);
+          );
+          expect(warnings).toEqual([]);
         });
       });
 
@@ -407,12 +411,13 @@ describe('SetInputValidationService', () => {
             [hasElementNotInRule, hasElementNotInRule]
           );
 
-          expect(validatorService.getAllWarnings(
+          let warnings = validatorService.getAllWarnings(
             currentState,
             goodCustomizationArgs,
             [answerGroup],
             goodDefaultOutcome
-          )).toEqual([{
+          );
+          expect(warnings).toEqual([{
             type: WARNING_TYPES.ERROR,
             message: 'Rule 2 from answer group 1 is the same as rule 1 ' +
             'from answer group 1'
@@ -436,12 +441,13 @@ describe('SetInputValidationService', () => {
             [hasElementNotInRule1, hasElementNotInRule2]
           );
 
-          expect(validatorService.getAllWarnings(
+          let warnings = validatorService.getAllWarnings(
             currentState,
             goodCustomizationArgs,
             [answerGroup],
             goodDefaultOutcome
-          )).toEqual([]);
+          );
+          expect(warnings).toEqual([]);
         });
       });
 
@@ -457,12 +463,13 @@ describe('SetInputValidationService', () => {
             [omitElementRule, omitElementRule]
           );
 
-          expect(validatorService.getAllWarnings(
+          let warnings = validatorService.getAllWarnings(
             currentState,
             goodCustomizationArgs,
             [answerGroup],
             goodDefaultOutcome
-          )).toEqual([{
+          );
+          expect(warnings).toEqual([{
             type: WARNING_TYPES.ERROR,
             message: 'Rule 2 from answer group 1 is the same as rule 1 ' +
             'from answer group 1'
@@ -486,12 +493,13 @@ describe('SetInputValidationService', () => {
             [omitElementRule1, omitElementRule2]
           );
 
-          expect(validatorService.getAllWarnings(
+          let warnings = validatorService.getAllWarnings(
             currentState,
             goodCustomizationArgs,
             [answerGroup],
             goodDefaultOutcome
-          )).toEqual([]);
+          );
+          expect(warnings).toEqual([]);
         });
       });
     });
@@ -520,12 +528,13 @@ describe('SetInputValidationService', () => {
             [subsetRule2, subsetRule1]
           );
 
-          expect(validatorService.getAllWarnings(
+          let warnings = validatorService.getAllWarnings(
             currentState,
             goodCustomizationArgs,
             [answerGroup],
             goodDefaultOutcome
-          )).toEqual([{
+          );
+          expect(warnings).toEqual([{
             type: WARNING_TYPES.ERROR,
             message: 'Rule 2 from answer group 1 will never be matched ' +
             'because it is made redundant by rule 1 from answer group 1.'
@@ -537,12 +546,13 @@ describe('SetInputValidationService', () => {
             [subsetRule1, subsetRule2]
           );
 
-          expect(validatorService.getAllWarnings(
+          let warnings = validatorService.getAllWarnings(
             currentState,
             goodCustomizationArgs,
             [answerGroup],
             goodDefaultOutcome
-          )).toEqual([]);
+          );
+          expect(warnings).toEqual([]);
         });
       });
 
@@ -569,12 +579,13 @@ describe('SetInputValidationService', () => {
             [hasElementsInRule2, hasElementsInRule1]
           );
 
-          expect(validatorService.getAllWarnings(
+          let warnings = validatorService.getAllWarnings(
             currentState,
             goodCustomizationArgs,
             [answerGroup],
             goodDefaultOutcome
-          )).toEqual([{
+          );
+          expect(warnings).toEqual([{
             type: WARNING_TYPES.ERROR,
             message: 'Rule 2 from answer group 1 will never be matched ' +
             'because it is made redundant by rule 1 from answer group 1.'
@@ -586,12 +597,13 @@ describe('SetInputValidationService', () => {
             [hasElementsInRule1, hasElementsInRule2]
           );
 
-          expect(validatorService.getAllWarnings(
+          let warnings = validatorService.getAllWarnings(
             currentState,
             goodCustomizationArgs,
             [answerGroup],
             goodDefaultOutcome
-          )).toEqual([]);
+          );
+          expect(warnings).toEqual([]);
         });
       });
 
@@ -618,12 +630,13 @@ describe('SetInputValidationService', () => {
             [disjointRule2, disjointRule1]
           );
 
-          expect(validatorService.getAllWarnings(
+          let warnings = validatorService.getAllWarnings(
             currentState,
             goodCustomizationArgs,
             [answerGroup],
             goodDefaultOutcome
-          )).toEqual([{
+          );
+          expect(warnings).toEqual([{
             type: WARNING_TYPES.ERROR,
             message: 'Rule 2 from answer group 1 will never be matched ' +
             'because it is made redundant by rule 1 from answer group 1.'
@@ -635,12 +648,13 @@ describe('SetInputValidationService', () => {
             [disjointRule1, disjointRule2]
           );
 
-          expect(validatorService.getAllWarnings(
+          let warnings = validatorService.getAllWarnings(
             currentState,
             goodCustomizationArgs,
             [answerGroup],
             goodDefaultOutcome
-          )).toEqual([]);
+          );
+          expect(warnings).toEqual([]);
         });
       });
 
@@ -667,12 +681,13 @@ describe('SetInputValidationService', () => {
             [supersetRule1, supersetRule2]
           );
 
-          expect(validatorService.getAllWarnings(
+          let warnings = validatorService.getAllWarnings(
             currentState,
             goodCustomizationArgs,
             [answerGroup],
             goodDefaultOutcome
-          )).toEqual([{
+          );
+          expect(warnings).toEqual([{
             type: WARNING_TYPES.ERROR,
             message: 'Rule 2 from answer group 1 will never be matched ' +
             'because it is made redundant by rule 1 from answer group 1.'
@@ -684,12 +699,13 @@ describe('SetInputValidationService', () => {
             [supersetRule2, supersetRule1]
           );
 
-          expect(validatorService.getAllWarnings(
+          let warnings = validatorService.getAllWarnings(
             currentState,
             goodCustomizationArgs,
             [answerGroup],
             goodDefaultOutcome
-          )).toEqual([]);
+          );
+          expect(warnings).toEqual([]);
         });
       });
 
@@ -716,12 +732,13 @@ describe('SetInputValidationService', () => {
             [hasElementsNotInRule1, hasElementsNotInRule2]
           );
 
-          expect(validatorService.getAllWarnings(
+          let warnings = validatorService.getAllWarnings(
             currentState,
             goodCustomizationArgs,
             [answerGroup],
             goodDefaultOutcome
-          )).toEqual([{
+          );
+          expect(warnings).toEqual([{
             type: WARNING_TYPES.ERROR,
             message: 'Rule 2 from answer group 1 will never be matched ' +
             'because it is made redundant by rule 1 from answer group 1.'
@@ -733,12 +750,13 @@ describe('SetInputValidationService', () => {
             [hasElementsNotInRule2, hasElementsNotInRule1]
           );
 
-          expect(validatorService.getAllWarnings(
+          let warnings = validatorService.getAllWarnings(
             currentState,
             goodCustomizationArgs,
             [answerGroup],
             goodDefaultOutcome
-          )).toEqual([]);
+          );
+          expect(warnings).toEqual([]);
         });
       });
 
@@ -765,12 +783,13 @@ describe('SetInputValidationService', () => {
             [omitsElementsInRule1, omitsElementsInRule2]
           );
 
-          expect(validatorService.getAllWarnings(
+          let warnings = validatorService.getAllWarnings(
             currentState,
             goodCustomizationArgs,
             [answerGroup],
             goodDefaultOutcome
-          )).toEqual([{
+          );
+          expect(warnings).toEqual([{
             type: WARNING_TYPES.ERROR,
             message: 'Rule 2 from answer group 1 will never be matched ' +
             'because it is made redundant by rule 1 from answer group 1.'
@@ -782,12 +801,13 @@ describe('SetInputValidationService', () => {
             [omitsElementsInRule2, omitsElementsInRule1]
           );
 
-          expect(validatorService.getAllWarnings(
+          let warnings = validatorService.getAllWarnings(
             currentState,
             goodCustomizationArgs,
             [answerGroup],
             goodDefaultOutcome
-          )).toEqual([]);
+          );
+          expect(warnings).toEqual([]);
         });
       });
     });
