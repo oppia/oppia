@@ -58,23 +58,23 @@ export class TranslationLanguageSelectComponent implements OnInit {
       });
   }
 
-  _toggleDropdown() {
+  toggleDropdown() {
     this.dropdownShown = !this.dropdownShown;
   }
 
-  _selectOption(value: string) {
+  selectOption(value: string) {
     this.setValue.emit(value);
     this.dropdownShown = false;
   }
 
-  _showDescriptionPopup(index: number) {
+  showDescriptionPopup(index: number) {
     this.descriptionPopupPxOffsetY = 75 + 30 * index;
     this.descriptionPopupContent = (
-      this.featuredLanguages[index].getDescription());
+      this.featuredLanguages[index].description);
     this.descriptionPopupShown = true;
   }
 
-  _hideDescriptionPopup() {
+  hideDescriptionPopup() {
     this.descriptionPopupShown = false;
   }
 

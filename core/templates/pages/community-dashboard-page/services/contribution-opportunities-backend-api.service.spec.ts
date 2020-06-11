@@ -186,7 +186,7 @@ describe('Contribution Opportunities backend API service', function() {
       const successHandler = jasmine.createSpy('success');
       const failHandler = jasmine.createSpy('fail');
 
-      const readOnlyFTLFactory = TestBed.get(
+      const featuredTranslationLanguageObjectFactory = TestBed.get(
         FeaturedTranslationLanguageObjectFactory);
 
       contributionOpportunitiesBackendApiService
@@ -205,7 +205,7 @@ describe('Contribution Opportunities backend API service', function() {
       flushMicrotasks();
 
       expect(successHandler).toHaveBeenCalledWith([
-        readOnlyFTLFactory.createFromBackendDict(
+        featuredTranslationLanguageObjectFactory.createFromBackendDict(
           { language_code: 'en', description: 'English' }
         )
       ]);

@@ -28,14 +28,14 @@ describe('Translation language select', () => {
   let component: TranslationLanguageSelectComponent;
   let fixture: ComponentFixture<TranslationLanguageSelectComponent>;
 
-  let readOnlyFeaturedTranslationLanguageObjectFactory =
+  let featuredTranslationLanguageObjectFactory =
     new FeaturedTranslationLanguageObjectFactory();
   let featuredLanguages = [
-    readOnlyFeaturedTranslationLanguageObjectFactory.createFromBackendDict({
+    featuredTranslationLanguageObjectFactory.createFromBackendDict({
       language_code: 'fr',
       description: 'Partnership with ABC'
     }),
-    readOnlyFeaturedTranslationLanguageObjectFactory.createFromBackendDict({
+    featuredTranslationLanguageObjectFactory.createFromBackendDict({
       language_code: 'de',
       description: 'Partnership with CBA'
     })
@@ -173,7 +173,7 @@ describe('Translation language select', () => {
 
       spyOn(component.setValue, 'emit');
 
-      component._selectOption('fr');
+      component.selectOption('fr');
       fixture.detectChanges();
       expect(allOptions[3]
         .classes['oppia-translation-language-select-dropdown-option-selected'])
@@ -185,7 +185,7 @@ describe('Translation language select', () => {
 
   it('should show details of featured language', () => {
     fixture.whenStable().then(() => {
-      component._showDescriptionPopup(0);
+      component.showDescriptionPopup(0);
       fixture.detectChanges();
 
       let allOptions = fixture.nativeElement
@@ -198,7 +198,7 @@ describe('Translation language select', () => {
         .classes['oppia-translation-language-select-dropdown-option-selected'])
         .toBeTruthy();
 
-      component._hideDescriptionPopup();
+      component.hideDescriptionPopup();
       fixture.detectChanges();
       expect(component.descriptionPopupShown).toEqual(false);
     });

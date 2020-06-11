@@ -22,22 +22,25 @@ import { FeaturedTranslationLanguageObjectFactory } from
   './FeaturedTranslationLanguageObjectFactory';
 
 describe('Featured Translation Language object factory', () => {
-  let readOnlyFTLFactory: FeaturedTranslationLanguageObjectFactory = null;
-  let _sampleFTL = null;
+  let featuredTranslationLanguageObjectFactory:
+    FeaturedTranslationLanguageObjectFactory = null;
+  let sampleFTL = null;
 
   beforeEach(() => {
-    readOnlyFTLFactory = TestBed.get(FeaturedTranslationLanguageObjectFactory);
+    featuredTranslationLanguageObjectFactory = TestBed.get(
+      FeaturedTranslationLanguageObjectFactory);
 
-    let sampleFRLDict = {
+    let sampleFTLDict = {
       language_code: 'en',
       description: 'English'
     };
-    _sampleFTL = readOnlyFTLFactory.createFromBackendDict(sampleFRLDict);
+    sampleFTL = featuredTranslationLanguageObjectFactory
+      .createFromBackendDict(sampleFTLDict);
   });
 
   it('should correctly return all the values', function() {
-    expect(_sampleFTL.getLanguageCode()).toEqual('en');
-    expect(_sampleFTL.getDescription()).toEqual('English');
+    expect(sampleFTL.languageCode).toEqual('en');
+    expect(sampleFTL.description).toEqual('English');
   });
 });
 

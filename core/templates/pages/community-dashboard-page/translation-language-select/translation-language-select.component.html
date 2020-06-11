@@ -1,5 +1,5 @@
 <div #dropdown class="oppia-translation-language-select-container protractor-test-language-selector">
-  <div class="oppia-translation-language-select-inner-container" (click)="_toggleDropdown()">
+  <div class="oppia-translation-language-select-inner-container" (click)="toggleDropdown()">
     {{languageIdToDescription[value]}}
     <span class="material-icons" style="color: #009688;" [ngStyle]="{ 'transform': dropdownShown ? 'scaleY(-1)' : 'scaleY(1)' }">
       arrow_drop_down
@@ -19,16 +19,17 @@
       <div class="oppia-translation-language-select-dropdown-label">Most needed languages</div>
       <div *ngFor="let featuredOption of featuredLanguages; index as i">
         <div class="oppia-translation-language-select-dropdown-option"
-             *ngIf="languageIdToDescription[featuredOption.getLanguageCode()]"
-             (click)="_selectOption(featuredOption.getLanguageCode())"
-             [ngClass]="{'oppia-translation-language-select-dropdown-option-selected' : featuredOption.getLanguageCode() === value}">
-          {{languageIdToDescription[featuredOption.getLanguageCode()]}}
+             *ngIf="languageIdToDescription[featuredOption.languageCode]"
+             (click)="selectOption(featuredOption.languageCode)"
+             [ngClass]="{'oppia-translation-language-select-dropdown-option-selected' : featuredOption.languageCode === value}">
+             
+          {{languageIdToDescription[featuredOption.languageCode]}}
 
           <span class="material-icons"
-                *ngIf="featuredOption.getDescription()"
+                *ngIf="featuredOption.description"
                 style="color:rgb(183, 183, 183)"
-                (mouseenter)="_showDescriptionPopup(i)"
-                (mouseleave)="_hideDescriptionPopup()">
+                (mouseenter)="showDescriptionPopup(i)"
+                (mouseleave)="hideDescriptionPopup()">
             info
           </span>
         </div>
@@ -38,7 +39,7 @@
     <div class="oppia-translation-language-select-dropdown-label">All languages</div>
     <div class="oppia-translation-language-select-dropdown-option"
          *ngFor="let option of options"
-         (click)="_selectOption(option.id)"
+         (click)="selectOption(option.id)"
          [ngClass]="{'oppia-translation-language-select-dropdown-option-selected' : option.id === value}">
       {{option.description}}
     </div>

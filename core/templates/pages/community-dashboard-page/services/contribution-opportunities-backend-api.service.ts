@@ -29,7 +29,7 @@ import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import {
   FeaturedTranslationLanguageObjectFactory,
-  IFeaturedTranslationLanguageBackendDict,
+  FeaturedTranslationLanguageBackendDict,
   FeaturedTranslationLanguage
 } from
   'domain/community_dashboard/FeaturedTranslationLanguageObjectFactory';
@@ -53,7 +53,7 @@ export class ContributionOpportunitiesBackendApiService {
   constructor(
     private urlInterpolationService: UrlInterpolationService,
     private http: HttpClient,
-    private readOnlyFeaturedTranslationLanguageObjectFactory:
+    private featuredTranslationLanguageObjectFactory:
       FeaturedTranslationLanguageObjectFactory
   ) {}
 
@@ -83,7 +83,7 @@ export class ContributionOpportunitiesBackendApiService {
       successCallback: (
         opportunities?: Array<any>, nextCursor?: string, more?: boolean
         ) => void,
-      errorCallback: (reason: any) => void
+      errorCallback: (reason: string) => void
   ): void {
     this.http.get(this.urlInterpolationService.interpolateUrl(
       this.urlTemplate, { opportunityType }
@@ -103,30 +103,25 @@ export class ContributionOpportunitiesBackendApiService {
     });
   }
 
-  private _fetchFeaturedTranslationLanguages(
+  _getFeaturedTranslationLanguages(
       successCallback: (
         featuredTranslationLanguages: FeaturedTranslationLanguage[]
       ) => void,
-      errorCallback: (reason: any) => void
+      errorCallback: (reason: string) => void
   ) {
     this.http.get('/getfeaturedtranslationlanguages').toPromise()
-      .then((data: any) => {
-        const featuredTranslationLanguages = (
-          data.featured_translation_languages.map(
-            (backendDict: IFeaturedTranslationLanguageBackendDict) =>
-              this.readOnlyFeaturedTranslationLanguageObjectFactory
-                .createFromBackendDict(backendDict)
-          ));
-
-        if (successCallback) {
+      .then(
+        (data: any) => {
+          const featuredTranslationLanguages = (
+            data.featured_translation_languages.map(
+              (backendDict: FeaturedTranslationLanguageBackendDict) =>
+                this.featuredTranslationLanguageObjectFactory
+                  .createFromBackendDict(backendDict)
+            ));
           successCallback(featuredTranslationLanguages);
-        }
-      },
-      (error) => {
-        if (errorCallback) {
-          errorCallback(error);
-        }
-      });
+        },
+        errorCallback
+      );
   }
 
 
@@ -168,7 +163,7 @@ export class ContributionOpportunitiesBackendApiService {
 
   fetchFeaturedTranslationLanguages(): Promise<Object> {
     return new Promise((resolve, reject) => {
-      this._fetchFeaturedTranslationLanguages(resolve, reject);
+      this._getFeaturedTranslationLanguages(resolve, reject);
     });
   }
 }
