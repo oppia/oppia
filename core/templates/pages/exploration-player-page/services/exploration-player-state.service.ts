@@ -250,7 +250,13 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
         return QuestionPlayerEngineService.getPretestQuestionCount();
       },
       moveToExploration: function(callback) {
-        setExplorationMode();
+        if (
+          UrlService.getUrlParams().hasOwnProperty('story_id') &&
+          UrlService.getUrlParams().hasOwnProperty('node_id')) {
+          setStoryChapterMode();
+        } else {
+          setExplorationMode();
+        }
         ExplorationEngineService.moveToExploration(callback);
       },
       getLanguageCode: function() {
