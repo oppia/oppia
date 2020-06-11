@@ -1547,7 +1547,7 @@ tags: []
             name: str. The name of the topic.
             abbreviated_name: str. The abbreviated name of the topic.
             canonical_name: str. The canonical name (lowercase) of the topic.
-            description: str. The desscription of the topic.
+            description: str. The description of the topic.
             thumbnail_filename: str. The thumbnail file name of the topic.
             thumbnail_bg_color: str. The thumbnail background color of the
                 topic.
