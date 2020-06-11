@@ -27,8 +27,8 @@
  *   - in the ngAfterViewInit assign the serivce to the static varible
  *
  * Example:
- *   Let is assume that the service class is called MyService.
- *   - First we add this to imports.
+ *   Let us assume that the service class is called MyService.
+ *   - First import the service.
  *     import { MyService } from './path';
  *   - Then we create a static variable with the name of the service class.
  *     static myService: MyService;
@@ -44,9 +44,11 @@
  *       ...
  *     }
  *
- * In the above explanation was not clear or case of doubts over what is done
- * here, please look at the description of the PR #9479.
+ * In case the above explanation was not clear or case of doubts over what is
+ * done here, please look at the description of the PR #9479.
  * https://github.com/oppia/oppia/pull/9479#issue-432536289
+ * You can also find this example there under the "How does it solve the
+ * Interceptor problem?" heading.
  *
  * File Structure:
  *   1 - imports
