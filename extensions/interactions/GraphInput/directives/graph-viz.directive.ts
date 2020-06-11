@@ -568,7 +568,7 @@ angular.module('oppia').directive('graphViz', [
               ctrl.isMobile = true;
             }
 
-            ctrl.vizWidth = vizContainer.width();
+            ctrl.vizWidth = vizContainer.width;
 
             ctrl.graphOptions = [{
               text: 'Labeled',
