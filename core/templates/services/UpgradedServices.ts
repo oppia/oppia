@@ -65,6 +65,8 @@ import { CodeReplPredictionService } from
 import { CodeReplRulesService } from
   'interactions/CodeRepl/directives/code-repl-rules.service';
 import { ComputeGraphService } from 'services/compute-graph.service';
+import { ConceptCardBackendApiService } from
+  'domain/skill/concept-card-backend-api.service';
 import { ConceptCardObjectFactory } from
   'domain/skill/ConceptCardObjectFactory';
 import { ContextService } from 'services/context.service';
@@ -607,6 +609,10 @@ export class UpgradedServices {
       new AudioTranslationLanguageService(
         upgradedServices['BrowserCheckerService'],
         upgradedServices['LanguageUtilService']);
+    upgradedServices['ConceptCardBackendApiService'] =
+      new ConceptCardBackendApiService(
+        upgradedServices['HttpClient'],
+        upgradedServices['UrlInterpolationService']);
     upgradedServices['CreatorDashboardBackendApiService'] =
       new CreatorDashboardBackendApiService(upgradedServices['HttpClient']);
     upgradedServices['EmailDashboardDataService'] =

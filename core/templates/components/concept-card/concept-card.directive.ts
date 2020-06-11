@@ -78,6 +78,7 @@ angular.module('oppia').directive('conceptCard', [
               if (ctrl.currentConceptCard.getWorkedExamples().length > 0) {
                 ctrl.numberOfWorkedExamplesShown = 1;
               }
+              $rootScope.$apply();
             });
           };
         }
