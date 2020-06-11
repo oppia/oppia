@@ -56,20 +56,6 @@ FILES_EXCLUDED_FROM_ANY_TYPE_CHECK = json.load(python_utils.open_file(
 _MESSAGE_TYPE_SUCCESS = 'SUCCESS'
 _MESSAGE_TYPE_FAILED = 'FAILED'
 
-_BANNED_ESLINT_DISABLE_STATEMENTS = [
-    {
-        'pattern': r'eslint-(disable|enable)(-next-line)? camelcase',
-        'rule_name': 'camelcase',
-        'custom_message': (
-            'If you are using this statement to define properties '
-            'in an interface for a backend dict. Wrap the property '
-            'name in single quotes instead.'),
-        'exceptions': [
-            'typings/guppy-defs-b5055b963fdbea5c6c1e92dbf58fdaf3ea0cd8ba.d.ts',
-            'core/templates/services/UpgradedServices.ts']
-    }
-]
-
 
 def _get_expression_from_node_if_one_exists(
         parsed_node, components_to_check):
@@ -293,56 +279,6 @@ class JsTsLintChecksManager(python_utils.OBJECT):
             else:
                 summary_message = (
                     '%s ANY type check passed' % _MESSAGE_TYPE_SUCCESS)
-
-            python_utils.PRINT(summary_message)
-            python_utils.PRINT('')
-
-        return [summary_message]
-
-    def _check_banned_eslint_disable_statements(self):
-        """Checks if the eslint disable statements are used that
-        are not allowed.
-        """
-
-        if self.verbose_mode_enabled:
-            python_utils.PRINT('Starting eslint disable statements check')
-            python_utils.PRINT('----------------------------------------')
-
-        with linter_utils.redirect_stdout(sys.stdout):
-            failed = False
-
-            for file_path in self.all_filepaths:
-                for banned_rule in _BANNED_ESLINT_DISABLE_STATEMENTS:
-                    if file_path in banned_rule['exceptions']:
-                        continue
-
-                    file_content = FILE_CACHE.read(file_path)
-
-                    for line_number, line in enumerate(file_content.split(
-                            '\n')):
-                        if re.findall(
-                                banned_rule['pattern'], line):
-                            failed = True
-                            python_utils.PRINT(
-                                '%s --> Banned eslint statement for rule %s '
-                                'found in this file. Line no. %s' % (
-                                    file_path, banned_rule['rule_name'],
-                                    line_number + 1))
-
-                            if 'custom_message' in banned_rule:
-                                python_utils.PRINT(
-                                    banned_rule['custom_message'])
-
-                            python_utils.PRINT('')
-
-            if failed:
-                summary_message = (
-                    '%s Eslint disable statements check failed' % (
-                        _MESSAGE_TYPE_FAILED))
-            else:
-                summary_message = (
-                    '%s Eslint disable statements check passed' % (
-                        _MESSAGE_TYPE_SUCCESS))
 
             python_utils.PRINT(summary_message)
             python_utils.PRINT('')
@@ -926,8 +862,6 @@ class JsTsLintChecksManager(python_utils.OBJECT):
             self._get_expressions_from_parsed_script())
 
         any_type_messages = self._check_any_type()
-        banned_eslint_disable_statement_messages = (
-            self._check_banned_eslint_disable_statements())
         extra_js_files_messages = self._check_extra_js_files()
         js_and_ts_component_messages = (
             self._check_js_and_ts_component_name_and_count())
@@ -937,10 +871,9 @@ class JsTsLintChecksManager(python_utils.OBJECT):
             self._match_line_breaks_in_controller_dependencies())
 
         all_messages = (
-            any_type_messages + banned_eslint_disable_statement_messages +
-            extra_js_files_messages + js_and_ts_component_messages +
-            directive_scope_messages + sorted_dependencies_messages +
-            controller_dependency_messages)
+            any_type_messages + extra_js_files_messages +
+            js_and_ts_component_messages + directive_scope_messages +
+            sorted_dependencies_messages + controller_dependency_messages)
         return all_messages
 
 
