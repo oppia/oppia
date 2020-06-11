@@ -842,7 +842,7 @@
     "is_terminal": false,
     "default_outcome_heading": null,
     "rule_descriptions": {
-      "IsMathematicallyEquivalentTo": "is mathematically equivalent to (LaTeX) {{x|Math}}"
+      "MatchesExactlyWith": "matches exactly with {{x|UnicodeString}}"
     }
   },
   "FractionInput": {

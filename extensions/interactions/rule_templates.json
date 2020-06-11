@@ -119,8 +119,8 @@
     }
   },
   "AlgebraicExpressionInput": {
-    "IsMathematicallyEquivalentTo": {
-      "description": "is mathematically equivalent to (LaTeX) {{x|Math}}"
+    "MatchesExactlyWith": {
+      "description": "matches exactly with {{x|UnicodeString}}"
     }
   },
   "MultipleChoiceInput": {

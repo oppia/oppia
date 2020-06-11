@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Validator service for the algebraic expression input interaction.
+ * @fileoverview Validator service for the AlgebraicExpressionInput interaction.
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
@@ -25,8 +25,6 @@ import { IWarning, baseInteractionValidationService } from
   'interactions/base-interaction-validation.service';
 import { Outcome } from
   'domain/exploration/OutcomeObjectFactory';
-
-import { AppConstants } from 'app.constants';
 
 @Injectable({
   providedIn: 'root'
@@ -41,7 +39,6 @@ export class AlgebraicExpressionInputValidationService {
   // keys which give tslint errors against underscore_casing in favor of
   // camelCasing.
   getCustomizationArgsWarnings(customizationArgs: any): any[] {
-    // TODO(juansaba): Implement customization args validations.
     return [];
   }
 
@@ -61,22 +58,6 @@ export class AlgebraicExpressionInputValidationService {
       this.baseInteractionValidationServiceInstance.getAllOutcomeWarnings(
         answerGroups, defaultOutcome, stateName));
 
-    // Check that each rule has a valid math expression.
-    for (var i = 0; i < answerGroups.length; i++) {
-      var rules = answerGroups[i].rules;
-      for (var j = 0; j < rules.length; j++) {
-        try {
-          MathExpression.fromLatex((<string>rules[j].inputs.x));
-        } catch (e) {
-          warningsList.push({
-            type: AppConstants.WARNING_TYPES.CRITICAL,
-            message: (
-              'The math expression used in rule ' + String(j + 1) +
-              ' in group ' + String(i + 1) + ' is invalid.')
-          });
-        }
-      }
-    }
     return warningsList;
   }
 }

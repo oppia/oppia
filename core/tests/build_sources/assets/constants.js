@@ -473,6 +473,7 @@ var constants = {
         "NumericInput",
         "SetInput",
         "MathExpressionInput",
+        "AlgebraicExpressionInput",
         "NumberWithUnits"
     ]
   }, {

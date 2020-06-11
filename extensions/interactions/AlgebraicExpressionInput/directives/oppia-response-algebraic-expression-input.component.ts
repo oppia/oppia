@@ -20,25 +20,16 @@
  * followed by the name of the arg.
  */
 
-require('directives/mathjax-bind.directive.ts');
-
 require('services/html-escaper.service.ts');
 
-angular.module('oppia').directive('oppiaResponseAlgebraicExpressionInput', [
-  'HtmlEscaperService', function(HtmlEscaperService) {
-    return {
-      restrict: 'E',
-      scope: {},
-      bindToController: {},
-      template: require('./algebraic-expression-input-response.directive.html'),
-      controllerAs: '$ctrl',
-      controller: ['$attrs', function($attrs) {
-        var ctrl = this;
-        ctrl.$onInit = function() {
-          ctrl.latexAnswer = HtmlEscaperService.escapedJsonToObj(
-            $attrs.answer).latex;
-        };
-      }]
-    };
-  }
-]);
+angular.module('oppia').component('oppiaResponseAlgebraicExpressionInput', {
+  template: require('./algebraic-expression-input-response.component.html'),
+  controller: ['$attrs', 'HtmlEscaperService',
+    function($attrs, HtmlEscaperService) {
+      const ctrl = this;
+      ctrl.$onInit = function() {
+        ctrl.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
+      };
+    }
+  ]
+});

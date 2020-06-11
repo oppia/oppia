@@ -51,12 +51,13 @@ interface GuppySymbols {
 
 class Guppy {
   activate: () => void;
-  asciimath: () => void;
+  asciimath: () => string;
   configure: () => void;
   deactivate: () => void;
   doc: () => Object;
   equations: () => Array<Object>;
   evaluate: (evaluators?: Object) => Object;
+  event: (name: string, handler: Function) => void;
   func: (evaluators?: Object) => Function;
   import_latex: (text: string) => void;
   import_syntax_tree: (tree: Object) => void;

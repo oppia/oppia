@@ -31,8 +31,21 @@ angular.module('oppia').component('oppiaInteractiveAlgebraicExpressionInput', {
   template: require('./algebraic-expression-input-interaction.component.html'),
   controller: [
     'CurrentInteractionService', 'AlgebraicExpressionInputRulesService',
-    function(CurrentInteractionService, AlgebraicExpressionInputRulesService) {
-      const ctrl = this;
+    function(
+      CurrentInteractionService, AlgebraicExpressionInputRulesService) {
+      var ctrl = this;
+      var guppyInstance;
+
+      ctrl.assignIdToGuppyDiv = function() {
+        // Dynamically assigns a unique id to the guppy-div
+        var divId = 'guppy_' + Math.floor(Math.random() * 100000000);
+        var allElements = document.querySelectorAll('.guppy-div');
+        // Selecting the newest div, since there could be multiple divs active
+        // at the same time, so we want to activate the latest one.
+        var newestElement = allElements[allElements.length - 1];
+        newestElement.setAttribute('id', divId);
+        return divId;
+      };
 
       ctrl.isCurrentAnswerValid = function() {
         return true;
@@ -42,11 +55,17 @@ angular.module('oppia').component('oppiaInteractiveAlgebraicExpressionInput', {
         if (!ctrl.isCurrentAnswerValid()) {
           return;
         }
+        var answer = guppyInstance.asciimath();
         CurrentInteractionService.onSubmit(
-          ctrl.value, AlgebraicExpressionInputRulesService);
+          answer, AlgebraicExpressionInputRulesService);
       };
 
       ctrl.$onInit = function() {
+        var divId = ctrl.assignIdToGuppyDiv();
+        guppyInstance = new Guppy(divId, {});
+        guppyInstance.event('change', (e) => {
+          ctrl.value = guppyInstance.asciimath();
+        });
         CurrentInteractionService.registerCurrentInteraction(
           ctrl.submitAnswer, ctrl.isCurrentAnswerValid);
       };
