@@ -16,7 +16,7 @@
  * @fileoverview The root directive of the oppia ajs application.
  */
 
-// Incase of doubts over what is done here, please look at the description of
+// In case of doubts over what is done here, please look at the description of
 // the PR #9479. https://github.com/oppia/oppia/pull/9479#issue-432536289
 
 import { OppiaAngularRootComponent } from
@@ -37,8 +37,9 @@ angular.module('oppia').directive('oppiaRoot', [
              * The angular.module('oppia').config(...) is added here to provide
              * the "angular instance" of service in angularjs using the regular
              * angularjs DI. We can choose not to have the following config.
-             * But in that case we would have to keep the upgraded-services.ts
-             * because there is a lot of code dependent on it.
+             * But in that case, we would have to keep the upgraded-services.ts
+             * because there is a lot of code dependent on it. Add the moment
+             * this is not executing. Help is needed here!
              */
             angular.module('oppia').config(['$provide', function($provide) {
               /* eslint-disable max-len */
