@@ -215,7 +215,8 @@ AUDIT_JOB_MANAGERS = [
     prod_validation_jobs_one_off.UserContributionScoringModelAuditOneOffJob,
     prod_validation_jobs_one_off.PendingDeletionRequestModelAuditOneOffJob,
     prod_validation_jobs_one_off.SkillOpportunityModelAuditOneOffJob,
-    prod_validation_jobs_one_off.UserCommunityRightsModelAuditOneOffJob
+    prod_validation_jobs_one_off.UserCommunityRightsModelAuditOneOffJob,
+    prod_validation_jobs_one_off.TaskEntryModelAuditOneOffJob,
 ]
 
 # List of all ContinuousComputation managers to show controls for on the
