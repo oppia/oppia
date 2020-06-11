@@ -225,21 +225,6 @@ def run_webpack_compilation():
         sys.exit(1)
 
 
-def update_dev_mode_in_constants_js(constant_file, dev_mode_setting):
-    """Change constant file based on the running mode. Only the `DEV_MODE` line
-    should be changed.
-
-    Args:
-        constant_file: str. File path to the constant file.
-        dev_mode_setting: bool. Represents whether the program is running on dev
-            mode.
-    """
-    pattern = '"DEV_MODE": .*'
-    replace = '"DEV_MODE": %s' % (
-        'true' if dev_mode_setting else 'false')
-    common.inplace_replace_file(constant_file, pattern, replace)
-
-
 def run_webdriver_manager(parameters):
     """Run commands of webdriver manager.
 
@@ -271,7 +256,6 @@ def build_js_files(dev_mode_setting, deparallelize_terser=False):
         deparallelize_terser: bool. Represents whether to use webpack
         compilation config that disables parallelism on terser plugin.
     """
-    update_dev_mode_in_constants_js(CONSTANT_FILE_PATH, dev_mode_setting)
     if not dev_mode_setting:
         python_utils.PRINT('  Generating files for production mode...')
         if deparallelize_terser:
