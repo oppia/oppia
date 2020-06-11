@@ -23,7 +23,8 @@ import { Injectable } from '@angular/core';
 import { ILearnerAction } from 'domain/statistics/LearnerActionObjectFactory';
 
 export interface IPlaythroughBackendDict {
-  'playthrough_id': string;
+  'playthrough_id'?: string;
+  'id'?: string;
   'exp_id': string;
   'exp_version': number;
   'issue_type': string;
@@ -45,8 +46,7 @@ export class Playthrough {
     return actionsLength > 0 ? this.actions[actionsLength - 1] : null;
   }
 
-  /** @returns {PlaythroughBackendDict} */
-  toBackendDict(): any {
+  toBackendDict(): IPlaythroughBackendDict {
     return {
       id: this.playthroughId,
       exp_id: this.expId,

@@ -387,7 +387,6 @@ export class StatsReportingService {
     this.playthroughService.recordExplorationQuitAction(
       stateName, StatsReportingService.stateStopwatch.getTimeInSecs());
 
-    this.playthroughService.recordPlaythrough(true);
     StatsReportingService.explorationIsComplete = true;
   }
 
@@ -443,7 +442,7 @@ export class StatsReportingService {
 
     this.playthroughService.recordExplorationQuitAction(
       stateName, StatsReportingService.stateStopwatch.getTimeInSecs());
-    this.playthroughService.recordPlaythrough(false);
+    this.playthroughService.storePlaythrough();
   }
 
   recordAnswerSubmitAction(

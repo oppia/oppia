@@ -34,32 +34,30 @@ import { Stopwatch, StopwatchObjectFactory } from
 
 class MultipleIncorrectAnswersTracker {
   public currentStateName: string;
-  public numTimesIncorrect: number = 0;
+  public numTries: number = 0;
 
   constructor(initStateName: string) {
     this.currentStateName = initStateName;
   }
 
   public isIssue(): boolean {
-    return (
-      this.numTimesIncorrect >=
-      ServicesConstants.NUM_INCORRECT_ANSWERS_THRESHOLD);
+    return this.numTries >= ServicesConstants.NUM_INCORRECT_ANSWERS_THRESHOLD;
   }
 
   public recordStateTransition(destStateName: string): void {
     if (this.currentStateName === destStateName) {
-      this.numTimesIncorrect += 1;
+      this.numTries += 1;
     } else {
       this.currentStateName = destStateName;
-      this.numTimesIncorrect = 0;
+      this.numTries = 0;
     }
   }
 }
 
 class CyclicStateTransitionsTracker {
-  public cycleString: string = '';
-  public numCycles: number = 0;
   public visitedStates: string[];
+  public cycleString: string = null;
+  public numCycles: number = 0;
 
   constructor(initStateName: string) {
     this.visitedStates = [initStateName];
@@ -68,10 +66,10 @@ class CyclicStateTransitionsTracker {
   private makeCycleString(cycleStartIndex: number): string {
     const collision = this.visitedStates[cycleStartIndex];
     const cycleWithoutCollision = this.visitedStates.slice(cycleStartIndex);
-    return [...cycleWithoutCollision, collision].toString();
+    return [...cycleWithoutCollision, collision].join(', ');
   }
 
-  private latestState(): string {
+  private currentStateName(): string {
     return this.visitedStates[this.visitedStates.length - 1];
   }
 
@@ -84,7 +82,7 @@ class CyclicStateTransitionsTracker {
       this.visitedStates.push(destStateName);
       return;
     }
-    if (this.latestState() !== destStateName) {
+    if (this.currentStateName() !== destStateName) {
       const cycleString = (
         this.makeCycleString(this.visitedStates.indexOf(destStateName)));
       if (this.cycleString === cycleString) {
@@ -98,19 +96,35 @@ class CyclicStateTransitionsTracker {
   }
 }
 
+class EarlyQuitTracker {
+  constructor(private timeSpentInStateSecs: number = null) {}
+
+  isIssue(): boolean {
+    return (
+      this.timeSpentInStateSecs !== null &&
+      this.timeSpentInStateSecs < ServicesConstants.EARLY_QUIT_THRESHOLD_IN_SECS
+    );
+  }
+
+  recordExplorationQuit(timeSpentInStateSecs: number): void {
+    this.timeSpentInStateSecs = timeSpentInStateSecs;
+  }
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class PlaythroughService {
-  private explorationId: string;
-  private explorationVersion: number;
-  private isLearnerInSamplePopulation: boolean;
-  private timeSpentInExpInSecs: number;
+  private explorationId?: string = null;
+  private explorationVersion?: number = null;
+  private isLearnerInSamplePopulation?: boolean = null;
 
-  private playthrough: Playthrough;
-  private stopwatch: Stopwatch;
-  private multipleIncorrectAnswersTracker: MultipleIncorrectAnswersTracker;
-  private cyclicStateTransitionsTracker: CyclicStateTransitionsTracker;
+  private eqTracker?: EarlyQuitTracker = null;
+  private cstTracker?: CyclicStateTransitionsTracker = null;
+  private miaTracker?: MultipleIncorrectAnswersTracker = null;
+  private playthrough?: Playthrough = null;
+  private stopwatch?: Stopwatch = null;
+  private expDurationInSecs?: number = null;
 
   constructor(
       private explorationFeaturesService: ExplorationFeaturesService,
@@ -119,83 +133,60 @@ export class PlaythroughService {
       private playthroughObjectFactory: PlaythroughObjectFactory,
       private stopwatchObjectFactory: StopwatchObjectFactory) {}
 
-  private isEarlyQuitIssue(): boolean {
-    return (
-      this.timeSpentInExpInSecs !== null &&
-      this.timeSpentInExpInSecs <
-      ServicesConstants.EARLY_QUIT_THRESHOLD_IN_SECS);
-  }
-
-  private analyzePlaythrough(): void {
-    // The ordering of checks in this method is such that the priority of
-    // issues to be recorded in case of multiple issues is captured. This
-    // follows MultipleIncorrectSubmissionsIssue ->
-    // CyclicStateTransitionsIssue -> EarlyQuitIssue.
-    if (this.multipleIncorrectAnswersTracker.isIssue()) {
+  /**
+   * The ordering of checks in this method prioritizes the following types of
+   * playthroughs:
+   *    1. MultipleIncorrectSubmissionsIssue
+   *    2. CyclicStateTransitionsIssue
+   *    3. EarlyQuitIssue
+   */
+  private classifyPlaythrough(): void {
+    if (this.miaTracker !== null && this.miaTracker.isIssue()) {
       this.playthrough.issueType = (
         AppConstants.ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS);
       this.playthrough.issueCustomizationArgs = {
-        state_name: {
-          value: this.multipleIncorrectAnswersTracker.currentStateName
-        },
-        num_times_answered_incorrectly: {
-          value: this.multipleIncorrectAnswersTracker.numTimesIncorrect
-        }
+        state_name: {value: this.miaTracker.currentStateName},
+        num_times_answered_incorrectly: {value: this.miaTracker.numTries}
       };
-    } else if (this.cyclicStateTransitionsTracker.isIssue()) {
+    } else if (this.cstTracker !== null && this.cstTracker.isIssue()) {
       this.playthrough.issueType = (
         AppConstants.ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS);
       this.playthrough.issueCustomizationArgs = {
-        state_names: {
-          value: this.cyclicStateTransitionsTracker.cycleString.split(',')
-        }
+        state_names: {value: this.cstTracker.cycleString.split(', ')}
       };
-    } else if (this.isEarlyQuitIssue()) {
+    } else if (this.eqTracker !== null && this.eqTracker.isIssue()) {
+      const lastStateName = (
+        this.playthrough.getLastAction()
+          .action_customization_args.state_name.value);
       this.playthrough.issueType = AppConstants.ISSUE_TYPE_EARLY_QUIT;
       this.playthrough.issueCustomizationArgs = {
-        state_name: {
-          value: (
-            this.playthrough.actions[this.playthrough.actions.length - 1]
-              .action_customization_args.state_name.value)
-        },
-        time_spent_in_exp_in_secs: {
-          value: this.timeSpentInExpInSecs
-        }
+        state_name: {value: lastStateName},
+        time_spent_in_exp_in_secs: {value: this.expDurationInSecs}
       };
     }
   }
 
-  private isRecordingPlaythrough(): boolean {
+  private isPlaythroughRecordingEnabled(): boolean {
     return (
       this.explorationFeaturesService.isPlaythroughRecordingEnabled() &&
-      this.isLearnerInSamplePopulation);
+      this.isLearnerInSamplePopulation === true);
   }
 
   private isLearnerJustBrowsing(): boolean {
-    if (this.playthrough !== null &&
-        this.playthrough.actions.some(a => a.action_type === 'AnswerSubmit')) {
-      // Learners who have entered an answer are probably not just browsing.
-      return false;
-    }
-    if (this.timeSpentInExpInSecs >= 45) {
-      // Learners who have spent at least 45 seconds in the exploration are
-      // probably not just browsing.
-      return false;
-    }
-    // Otherwise, yes the learner is probably just browsing.
-    return true;
+    return (
+      // Learners who never enter an answer are probably just browsing.
+      !this.playthrough.actions.some(a => a.action_type === 'AnswerSubmit') ||
+      // Learners who leave the exploration quickly are probably just browsing.
+      this.expDurationInSecs < 45);
   }
 
   initSession(
       explorationId: string, explorationVersion: number,
-      sampleSizeProportion: number): void {
+      sampleSizePopulationProportion: number): void {
     this.explorationId = explorationId;
     this.explorationVersion = explorationVersion;
-    this.isLearnerInSamplePopulation = Math.random() < sampleSizeProportion;
-
-    this.playthrough = null;
-    this.multipleIncorrectAnswersTracker = null;
-    this.cyclicStateTransitionsTracker = null;
+    this.isLearnerInSamplePopulation = (
+      Math.random() < sampleSizePopulationProportion);
   }
 
   getPlaythrough(): Playthrough {
@@ -203,24 +194,26 @@ export class PlaythroughService {
   }
 
   recordExplorationStartAction(initStateName: string): void {
-    if (!this.isRecordingPlaythrough()) {
+    if (!this.isPlaythroughRecordingEnabled()) {
+      return;
+    }
+    if (this.playthrough !== null) {
       return;
     }
 
-    let explorationStartAction = (
+    const explorationStartAction = (
       this.learnerActionObjectFactory.createExplorationStartAction({
         state_name: {value: initStateName}
       }));
     this.playthrough = this.playthroughObjectFactory.createNew(
-      null, this.explorationId, this.explorationVersion, null, {},
+      null, this.explorationId, this.explorationVersion, null, null,
       [explorationStartAction]);
 
-    this.multipleIncorrectAnswersTracker = (
-      new MultipleIncorrectAnswersTracker(initStateName));
-    this.cyclicStateTransitionsTracker = (
-      new CyclicStateTransitionsTracker(initStateName));
+    this.eqTracker = new EarlyQuitTracker();
+    this.miaTracker = new MultipleIncorrectAnswersTracker(initStateName);
+    this.cstTracker = new CyclicStateTransitionsTracker(initStateName);
 
-    this.timeSpentInExpInSecs = 0;
+    this.expDurationInSecs = 0;
     this.stopwatch = this.stopwatchObjectFactory.create();
     this.stopwatch.reset();
   }
@@ -233,8 +226,8 @@ export class PlaythroughService {
       return;
     }
 
-    this.multipleIncorrectAnswersTracker.recordStateTransition(destStateName);
-    this.cyclicStateTransitionsTracker.recordStateTransition(destStateName);
+    this.miaTracker.recordStateTransition(destStateName);
+    this.cstTracker.recordStateTransition(destStateName);
 
     const answerSubmitAction = (
       this.learnerActionObjectFactory.createAnswerSubmitAction({
@@ -255,7 +248,8 @@ export class PlaythroughService {
       return;
     }
 
-    this.timeSpentInExpInSecs = this.stopwatch.getTimeInSecs();
+    this.expDurationInSecs = this.stopwatch.getTimeInSecs();
+    this.eqTracker.recordExplorationQuit(timeSpentInStateSecs);
 
     const explorationQuitAction = (
       this.learnerActionObjectFactory.createExplorationQuitAction({
@@ -263,18 +257,18 @@ export class PlaythroughService {
         time_spent_in_state_in_msecs: {value: 1000 * timeSpentInStateSecs}
       }));
     this.playthrough.actions.push(explorationQuitAction);
+
+    this.classifyPlaythrough();
   }
 
-  recordPlaythrough(isExplorationComplete: boolean): void {
-    if (isExplorationComplete ||
-        this.playthrough === null ||
-        this.playthrough.getLastAction().action_type !== 'ExplorationQuit') {
+  storePlaythrough(): void {
+    if (this.playthrough === null || this.playthrough.issueType === null) {
       return;
     }
-    this.analyzePlaythrough();
-    if (this.playthrough.issueType !== null && !this.isLearnerJustBrowsing()) {
-      this.playthroughBackendApiService.storePlaythrough(this.playthrough);
+    if (this.isLearnerJustBrowsing()) {
+      return;
     }
+    this.playthroughBackendApiService.storePlaythrough(this.playthrough);
   }
 }
 
