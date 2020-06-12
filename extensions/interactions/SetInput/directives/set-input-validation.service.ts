@@ -85,7 +85,8 @@ export class SetInputValidationService {
       this.areSameSet(<string[]>ruleA.inputs.x, <string[]>ruleB.inputs.x);
   }
 
-  getCustomizationArgsWarnings(customizationArgs: ISetInputCustomizationArgs): IWarning[] {
+  getCustomizationArgsWarnings(
+      customizationArgs: ISetInputCustomizationArgs): IWarning[] {
     let warningsList = [];
 
     let buttonText = customizationArgs.buttonText &&

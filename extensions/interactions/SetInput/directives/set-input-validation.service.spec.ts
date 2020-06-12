@@ -28,7 +28,8 @@ import { Rule, RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 
 import { WARNING_TYPES_CONSTANT } from 'app-type.constants';
 import { AppConstants } from 'app.constants';
-import { ISetInputCustomizationArgs } from 'interactions/customization-args-defs';
+import { ISetInputCustomizationArgs } from
+  'interactions/customization-args-defs';
 
 describe('SetInputValidationService', () => {
   let validatorService: SetInputValidationService;
