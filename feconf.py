@@ -701,10 +701,10 @@ LEARNER_INCOMPLETE_ACTIVITY_DATA_URL = '/learnerincompleteactivityhandler'
 LIBRARY_GROUP_DATA_URL = '/librarygrouphandler'
 LIBRARY_INDEX_URL = '/community-library'
 LIBRARY_INDEX_DATA_URL = '/libraryindexhandler'
-LIBRARY_RECENTLY_PUBLISHED_URL = '/community-library/recently_published'
+LIBRARY_RECENTLY_PUBLISHED_URL = '/community-library/recently-published'
 LIBRARY_SEARCH_URL = '/search/find'
 LIBRARY_SEARCH_DATA_URL = '/searchhandler/data'
-LIBRARY_TOP_RATED_URL = '/community-library/top_rated'
+LIBRARY_TOP_RATED_URL = '/community-library/top-rated'
 MERGE_SKILLS_URL = '/merge_skills_handler'
 NEW_COLLECTION_URL = '/collection_editor_handler/create_new'
 NEW_EXPLORATION_URL = '/contributehandler/create_new'
@@ -860,9 +860,9 @@ LIBRARY_CATEGORY_RECENTLY_PUBLISHED = 'I18N_LIBRARY_GROUPS_RECENTLY_PUBLISHED'
 
 # The group name that appears at the end of the url for the recently published
 # page.
-LIBRARY_GROUP_RECENTLY_PUBLISHED = 'recently_published'
+LIBRARY_GROUP_RECENTLY_PUBLISHED = 'recently-published'
 # The group name that appears at the end of the url for the top rated page.
-LIBRARY_GROUP_TOP_RATED = 'top_rated'
+LIBRARY_GROUP_TOP_RATED = 'top-rated'
 
 # Defaults for topic similarities.
 DEFAULT_TOPIC_SIMILARITY = 0.5

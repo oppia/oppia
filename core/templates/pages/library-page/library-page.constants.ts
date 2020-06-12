@@ -29,8 +29,8 @@ export class LibraryPageConstants {
 
   public static LIBRARY_PATHS_TO_MODES = {
     '/community-library': 'index',
-    '/community-library/top_rated': 'group',
-    '/community-library/recently_published': 'group',
+    '/community-library/top-rated': 'group',
+    '/community-library/recently-published': 'group',
     '/search/find': 'search'
   };
 

@@ -70,7 +70,7 @@ describe('Navigation features on mobile', function() {
         getStartedLink, 'Could not click get started link');
       await getStartedLink.click();
       await waitFor.pageToFullyLoad();
-      expect(await browser.getCurrentUrl()).toEqual('http://localhost:9001/get_started');
+      expect(await browser.getCurrentUrl()).toEqual('http://localhost:9001/get-started');
     });
 
   it('should navigate to Teach with Oppia page using the sidebar menu',
