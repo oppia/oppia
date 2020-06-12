@@ -280,46 +280,30 @@ var getImageSource = async function(customImageElement) {
   return await customImageElement.getAttribute('src');
 };
 
-var uploadImage = async function(imageClickableElement, imgPath) {
+var uploadImage = async function(
+    imageClickableElement, imgPath, resetExistingImage) {
   await waitFor.visibilityOf(
     imageClickableElement,
     'Image element is taking too long to appear.');
   await imageClickableElement.click();
+
+  if (resetExistingImage) {
+    await waitFor.visibilityOf(
+      thumbnailResetButton,
+      'Topic thumbnail reset button taking too long to appear.');
+    thumbnailResetButton.click();
+  }
+
   absPath = path.resolve(__dirname, imgPath);
   return await imageUploadInput.sendKeys(absPath);
 };
 
-var changeExistingImage = async function(
-    imageClickableElement, imageContainer, imgPath) {
-  await waitFor.visibilityOf(
-    imageClickableElement,
-    'Topic thumbnail button taking too long to appear1.');
-  imageClickableElement.click();
-  await waitFor.visibilityOf(
-    thumbnailResetButton,
-    'Topic thumbnail reset button taking too long to appear1.');
-  await thumbnailResetButton.click();
-  absPath = path.resolve(__dirname, imgPath);
-  await imageUploadInput.sendKeys(absPath);
-  await imageSubmitButton.click();
-  await waitFor.visibilityOf(
-    imageContainer, 'Image container is taking too long to appear');
-  await imageSubmitButton.click();
-  await waitFor.invisibilityOf(
-    imageUploadInput,
-    'Image uploader is taking too long to disappear');
-  await waitFor.invisibilityOf(
-    imageContainer,
-    'Image container is taking too long to disappear');
-  return await waitFor.pageToFullyLoad();
-};
-
 var submitImage = async function(
-    imageClickableElement, imageContainer, imgPath) {
+    imageClickableElement, imageContainer, imgPath, resetExistingImage) {
   await waitFor.visibilityOf(
     imageClickableElement,
     'Image element is taking too long to appear.');
-  await uploadImage(imageClickableElement, imgPath);
+  await uploadImage(imageClickableElement, imgPath, resetExistingImage);
   await waitFor.visibilityOf(
     imageContainer, 'Image container is taking too long to appear');
   await imageSubmitButton.click();
@@ -334,7 +318,6 @@ var submitImage = async function(
 
 exports.getImageSource = getImageSource;
 exports.submitImage = submitImage;
-exports.changeExistingImage = changeExistingImage;
 exports.uploadImage = uploadImage;
 
 exports.createExploration = createExploration;

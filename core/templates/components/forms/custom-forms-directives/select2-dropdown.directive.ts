@@ -95,9 +95,8 @@ angular.module('oppia').directive('select2Dropdown', [
           if ($scope.dropdownCssClass) {
             select2Options.dropdownCssClass = $scope.dropdownCssClass;
           }
-var select2Node = $element[0].firstChild;
-          console.log(select2Node);
-          console.log(select2Options);
+
+          var select2Node = $element[0].firstChild;
 
           // Initialize the dropdown.
           $(select2Node).select2(select2Options);

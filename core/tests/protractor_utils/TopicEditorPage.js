@@ -123,9 +123,10 @@ var TopicEditorPage = function() {
     return await workflow.getImageSource(subtopicThumbnailImageElement);
   };
 
-  this.submitTopicThumbnail = async function(imgPath) {
-    return await workflow.changeExistingImage(
-      topicThumbnailButton, thumbnailContainer, imgPath);
+  this.submitTopicThumbnail = async function(imgPath, resetExistingImage) {
+    return await workflow.submitImage(
+      topicThumbnailButton, thumbnailContainer, imgPath,
+      resetExistingImage);
   };
 
   this.submitSubtopicThumbnail = async function(imgPath) {
