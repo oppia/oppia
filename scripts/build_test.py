@@ -872,11 +872,13 @@ class BuildTests(test_utils.GenericTestBase):
         check_function_calls = {
             'build_using_webpack_gets_called': False,
             'ensure_files_exist_gets_called': False,
+            'modify_constants_gets_called': False,
             'compare_file_count_gets_called': False
         }
         expected_check_function_calls = {
             'build_using_webpack_gets_called': True,
             'ensure_files_exist_gets_called': True,
+            'modify_constants_gets_called': True,
             'compare_file_count_gets_called': True
         }
 
@@ -889,6 +891,9 @@ class BuildTests(test_utils.GenericTestBase):
         def mock_ensure_files_exist(unused_filepaths):
             check_function_calls['ensure_files_exist_gets_called'] = True
 
+        def mock_modify_constants(unused_prod_env, unused_maintenance_mode):
+            check_function_calls['modify_constants_gets_called'] = True
+
         def mock_compare_file_count(unused_first_dir, unused_second_dir):
             check_function_calls['compare_file_count_gets_called'] = True
 
@@ -896,12 +901,14 @@ class BuildTests(test_utils.GenericTestBase):
             build, '_ensure_files_exist', mock_ensure_files_exist)
         build_using_webpack_swap = self.swap(
             build, 'build_using_webpack', mock_build_using_webpack)
+        modify_constants_swap = self.swap(
+            build, 'modify_constants', mock_modify_constants)
         compare_file_count_swap = self.swap(
             build, '_compare_file_count', mock_compare_file_count)
 
-        with ensure_files_exist_swap, build_using_webpack_swap, (
-            compare_file_count_swap):
-            build.main(args=['--prod_env'])
+        with ensure_files_exist_swap, build_using_webpack_swap:
+            with modify_constants_swap, compare_file_count_swap:
+                build.main(args=['--prod_env'])
 
         self.assertEqual(check_function_calls, expected_check_function_calls)
 
@@ -909,12 +916,14 @@ class BuildTests(test_utils.GenericTestBase):
         check_function_calls = {
             'build_using_webpack_gets_called': False,
             'ensure_files_exist_gets_called': False,
+            'modify_constants_gets_called': False,
             'compare_file_count_gets_called': False
         }
         expected_check_function_calls = {
             'build_using_webpack_gets_called': True,
             'ensure_files_exist_gets_called': True,
-            'compare_file_count_gets_called': True
+            'modify_constants_gets_called': True,
+            'compare_file_count_gets_called': True,
         }
 
         expected_config_path = build.WEBPACK_TERSER_CONFIG
@@ -926,6 +935,9 @@ class BuildTests(test_utils.GenericTestBase):
         def mock_ensure_files_exist(unused_filepaths):
             check_function_calls['ensure_files_exist_gets_called'] = True
 
+        def mock_modify_constants(unused_prod_env, unused_maintenance_mode):
+            check_function_calls['modify_constants_gets_called'] = True
+
         def mock_compare_file_count(unused_first_dir, unused_second_dir):
             check_function_calls['compare_file_count_gets_called'] = True
 
@@ -933,39 +945,41 @@ class BuildTests(test_utils.GenericTestBase):
             build, '_ensure_files_exist', mock_ensure_files_exist)
         build_using_webpack_swap = self.swap(
             build, 'build_using_webpack', mock_build_using_webpack)
+        modify_constants_swap = self.swap(
+            build, 'modify_constants', mock_modify_constants)
         compare_file_count_swap = self.swap(
             build, '_compare_file_count', mock_compare_file_count)
 
-        with ensure_files_exist_swap, build_using_webpack_swap, (
-            compare_file_count_swap):
-            build.main(args=['--prod_env', '--deparallelize_terser'])
+        with ensure_files_exist_swap, build_using_webpack_swap:
+            with modify_constants_swap, compare_file_count_swap:
+                build.main(args=['--prod_env', '--deparallelize_terser'])
 
         self.assertEqual(check_function_calls, expected_check_function_calls)
 
     def test_build_with_watcher(self):
         check_function_calls = {
             'ensure_files_exist_gets_called': False,
+            'modify_constants_gets_called': False,
         }
         expected_check_function_calls = {
             'ensure_files_exist_gets_called': True,
+            'modify_constants_gets_called': True,
         }
 
         def mock_ensure_files_exist(unused_filepaths):
             check_function_calls['ensure_files_exist_gets_called'] = True
 
+        def mock_modify_constants(unused_prod_env, unused_maintenance_mode):
+            check_function_calls['modify_constants_gets_called'] = True
+
         ensure_files_exist_swap = self.swap(
             build, '_ensure_files_exist', mock_ensure_files_exist)
-        with ensure_files_exist_swap:
+        modify_constants_swap = self.swap(
+            build, 'modify_constants', mock_modify_constants)
+        with ensure_files_exist_swap, modify_constants_swap:
             build.main(args=[])
 
         self.assertEqual(check_function_calls, expected_check_function_calls)
-
-    def test_only_use_maintenance_mode_in_dev_mode(self):
-        assert_raises_regexp_context_manager = self.assertRaisesRegexp(
-            Exception,
-            'maintenance_mode should only be enabled in prod build.')
-        with assert_raises_regexp_context_manager:
-            build.main(args=['--maintenance_mode'])
 
     def test_cannot_maintenance_mode_in_dev_mode(self):
         assert_raises_regexp_context_manager = self.assertRaisesRegexp(
