@@ -89,10 +89,10 @@ var ExplorationPlayerPage = function() {
   var pauseButton = element(
     by.css('.protractor-test-pause-circle'));
 
-  this.clickAudioBar = function() {
-    waitFor.elementToBeClickable(audioBar,
+  this.clickAudioBar = async function() {
+    await waitFor.elementToBeClickable(audioBar,
       'Audio bar taking too long to be clickable');
-    audioBar.click();
+    await audioBar.click();
   };
 
   this.playAudio = async function() {
