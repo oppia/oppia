@@ -349,10 +349,10 @@ class BaseSummaryModelValidator(BaseModelValidator):
 
             for (_, _, external_model) in (
                     external_model_class_model_id_model_tuples):
-            # In the case of a missing external model, we don't
-            # report an error here since errors for missing external
-            # model are already checked and stored in
-            # _validate_external_id_relationships function.
+                # In the case of a missing external model, we don't
+                # report an error here since errors for missing external
+                # model are already checked and stored in
+                # _validate_external_id_relationships function.
                 if external_model is None or external_model.deleted:
                     continue
                 for (property_name, external_model_property_name) in (
@@ -614,7 +614,8 @@ class BaseUserModelValidator(BaseModelValidator):
 
     @classmethod
     def _get_exp_ids(cls):
-        """Returns a list of exploration ids related to the user model.
+        """Returns a list of exploration ids related to the current user model
+        based on the class.
 
         Returns:
             list(str). List of exploration ids related to the model.
@@ -635,7 +636,8 @@ class BaseUserModelValidator(BaseModelValidator):
 
     @classmethod
     def _get_col_ids(cls):
-        """Returns a list of collection ids related to the user model.
+        """Returns a list of collection ids related to the current user model
+        based on the class.
 
         Returns:
             list(str). List of collection ids related to the model.
