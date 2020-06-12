@@ -46,7 +46,6 @@
     "core/templates/domain/skill/skill-mastery-backend-api.service.ts",
     "core/templates/domain/state/StateObjectFactory.ts",
     "core/templates/domain/state_card/StateCardObjectFactory.ts",
-    "core/templates/domain/statistics/LearnerActionObjectFactorySpec.ts",
     "core/templates/domain/statistics/LearnerAnswerDetailsObjectFactory.ts",
     "core/templates/domain/statistics/PlaythroughIssueObjectFactory.ts",
     "core/templates/domain/statistics/PlaythroughObjectFactory.ts",
