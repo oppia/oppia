@@ -106,7 +106,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         # Return None for usernames that don't exists.
         self.assertEqual(
             [None, 'name1'],
-            user_services.get_usernames(['fakeUser', 'test1']))
+            user_services.get_usernames(['fakeUser', user_ids[0]]))
 
     def test_get_usernames_empty_list(self):
         # Return empty list when no user id passed.
@@ -1236,11 +1236,6 @@ class UserSettingsTests(test_utils.GenericTestBase):
         self.user_settings.validate()
         self.assertEqual(self.owner.role, feconf.ROLE_ID_EXPLORATION_EDITOR)
 
-    def test_gae_id_is_user_id(self):
-        self.assertEqual(
-            self.user_settings.user_id, self.user_settings.gae_id
-        )
-
     def test_validate_non_str_user_id(self):
         self.user_settings.user_id = 0
         with self.assertRaisesRegexp(
@@ -1352,6 +1347,22 @@ class UserSettingsTests(test_utils.GenericTestBase):
             '[Awaiting user registration: u..@example.com]']
 
         self.assertEqual(user_ids, expected_user_ids)
+
+    def test_created_on_gets_updated_correctly(self):
+        # created_on should not be updated upon updating other attributes of
+        # the user settings model.
+        user_settings = user_services.create_new_user(
+            'gae_id', 'user@example.com')
+
+        user_settings_model = user_models.UserSettingsModel.get_by_id(
+            user_settings.user_id)
+        time_of_creation = user_settings_model.created_on
+
+        user_services.update_user_bio(user_settings.user_id, 'New bio.')
+
+        user_settings_model = user_models.UserSettingsModel.get_by_id(
+            user_settings.user_id)
+        self.assertEqual(user_settings_model.created_on, time_of_creation)
 
 
 class UserContributionsTests(test_utils.GenericTestBase):
@@ -1554,10 +1565,9 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
             self.translator_id, 'hi')
 
         all_reviewers = user_services.get_all_community_reviewers()
-        self.assertEqual(len(all_reviewers), 2)
-
-        self.assertEqual(all_reviewers[0].id, self.voice_artist_id)
-        self.assertEqual(all_reviewers[1].id, self.translator_id)
+        self.assertItemsEqual(
+            [reviewer.id for reviewer in all_reviewers],
+            [self.voice_artist_id, self.translator_id])
 
     def test_remove_translation_review_rights_in_language(self):
         user_services.allow_user_to_review_translation_in_language(

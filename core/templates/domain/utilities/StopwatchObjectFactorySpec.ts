@@ -18,84 +18,88 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { LoggerService } from 'services/contextual/logger.service';
 import { StopwatchObjectFactory } from
   'domain/utilities/StopwatchObjectFactory';
 
 describe('Stopwatch object factory', () => {
-  describe('stopwatch object factory', () => {
-    let stopwatchObjectFactory: StopwatchObjectFactory = null;
-    let errorLog = [];
-    let log: LoggerService = null;
+  let stopwatchObjectFactory: StopwatchObjectFactory = null;
+  let nowSpy = null;
 
-    beforeEach(() => {
-      stopwatchObjectFactory = TestBed.get(StopwatchObjectFactory);
-      log = TestBed.get(LoggerService);
-      spyOn(log, 'error').and.callFake((errorMessage) => {
-        errorLog.push(errorMessage);
-        return errorMessage;
-      });
-    });
+  beforeEach(() => {
+    stopwatchObjectFactory = TestBed.get(StopwatchObjectFactory);
+    nowSpy = spyOn(Date, 'now');
+  });
 
-    let changeCurrentTime = function(stopwatch, desiredCurrentTime) {
-      stopwatch._getCurrentTime = function() {
-        return desiredCurrentTime;
-      };
-    };
+  const changeCurrentTime = (desiredCurrentTime) => {
+    nowSpy.and.returnValue(desiredCurrentTime);
+  };
 
-    it('should correctly record time intervals', () => {
-      let stopwatch = stopwatchObjectFactory.create();
-      changeCurrentTime(stopwatch, 0);
-      stopwatch.reset();
-      changeCurrentTime(stopwatch, 500);
-      expect(stopwatch.getTimeInSecs()).toEqual(0.5);
-    });
+  it('should correctly record time intervals', () => {
+    let stopwatch = stopwatchObjectFactory.create();
+    changeCurrentTime(0);
+    expect(stopwatch._getCurrentTime()).toBe(0);
+    stopwatch.reset();
+    changeCurrentTime(500);
+    expect(stopwatch._getCurrentTime()).toBe(500);
+    expect(stopwatch.getTimeInSecs()).toEqual(0.5);
+  });
 
-    it('should not reset stopwatch when current time is retrieved', () => {
-      let stopwatch = stopwatchObjectFactory.create();
-      changeCurrentTime(stopwatch, 0);
-      stopwatch.reset();
-      changeCurrentTime(stopwatch, 500);
-      expect(stopwatch.getTimeInSecs()).toEqual(0.5);
-      expect(stopwatch.getTimeInSecs()).toEqual(0.5);
-    });
+  it('should not reset stopwatch when current time is retrieved', () => {
+    let stopwatch = stopwatchObjectFactory.create();
+    changeCurrentTime(0);
+    expect(stopwatch._getCurrentTime()).toBe(0);
+    stopwatch.reset();
+    changeCurrentTime(500);
+    expect(stopwatch._getCurrentTime()).toBe(500);
+    expect(stopwatch.getTimeInSecs()).toEqual(0.5);
+    expect(stopwatch.getTimeInSecs()).toEqual(0.5);
+  });
 
-    it('should correctly reset the stopwatch', () => {
-      let stopwatch = stopwatchObjectFactory.create();
-      changeCurrentTime(stopwatch, 0);
-      stopwatch.reset();
-      changeCurrentTime(stopwatch, 500);
-      expect(stopwatch.getTimeInSecs()).toEqual(0.5);
-      stopwatch.reset();
-      expect(stopwatch.getTimeInSecs()).toEqual(0);
-      changeCurrentTime(stopwatch, 800);
-      expect(stopwatch.getTimeInSecs()).toEqual(0.3);
-    });
+  it('should correctly reset the stopwatch', () => {
+    let stopwatch = stopwatchObjectFactory.create();
+    changeCurrentTime(0);
+    expect(stopwatch._getCurrentTime()).toBe(0);
+    stopwatch.reset();
+    changeCurrentTime(500);
+    expect(stopwatch._getCurrentTime()).toBe(500);
+    expect(stopwatch.getTimeInSecs()).toEqual(0.5);
+    stopwatch.reset();
+    expect(stopwatch.getTimeInSecs()).toEqual(0);
+    changeCurrentTime(800);
+    expect(stopwatch._getCurrentTime()).toBe(800);
+    expect(stopwatch.getTimeInSecs()).toEqual(0.3);
+  });
 
-    it('should error if getTimeInSecs() is called before reset()', () => {
-      let stopwatch = stopwatchObjectFactory.create();
-      changeCurrentTime(stopwatch, 29);
-      expect(stopwatch.getTimeInSecs()).toBeNull();
-      // expect(errorLog).toEqual([
-      //   'Tried to retrieve the elapsed time, but no start time was set.']);
-    });
+  it('should error if getTimeInSecs() is called before reset()', () => {
+    // LoggerService is private, so to check if it's being called
+    // console.error needs to be spied.
+    const errorLog = spyOn(console, 'error').and.callThrough();
+    let stopwatch = stopwatchObjectFactory.create();
+    changeCurrentTime(29);
+    expect(stopwatch._getCurrentTime()).toBe(29);
+    expect(stopwatch.getTimeInSecs()).toBeNull();
+    expect(errorLog).toHaveBeenCalledWith(
+      'Tried to retrieve the elapsed time, but no start time was set.');
+  });
 
-    it('should instantiate independent stopwatches', () => {
-      let stopwatch1 = stopwatchObjectFactory.create();
-      let stopwatch2 = stopwatchObjectFactory.create();
+  it('should instantiate independent stopwatches', () => {
+    let stopwatch1 = stopwatchObjectFactory.create();
+    let stopwatch2 = stopwatchObjectFactory.create();
 
-      changeCurrentTime(stopwatch1, 0);
-      changeCurrentTime(stopwatch2, 0);
-      stopwatch1.reset();
+    changeCurrentTime(0);
+    expect(stopwatch1._getCurrentTime()).toBe(0);
+    expect(stopwatch2._getCurrentTime()).toBe(0);
+    stopwatch1.reset();
 
-      changeCurrentTime(stopwatch1, 50);
-      changeCurrentTime(stopwatch2, 50);
-      stopwatch2.reset();
+    changeCurrentTime(50);
+    expect(stopwatch1._getCurrentTime()).toBe(50);
+    expect(stopwatch2._getCurrentTime()).toBe(50);
+    stopwatch2.reset();
 
-      changeCurrentTime(stopwatch1, 100);
-      changeCurrentTime(stopwatch2, 100);
-      expect(stopwatch1.getTimeInSecs()).toEqual(0.1);
-      expect(stopwatch2.getTimeInSecs()).toEqual(0.05);
-    });
+    changeCurrentTime(100);
+    expect(stopwatch1._getCurrentTime()).toBe(100);
+    expect(stopwatch2._getCurrentTime()).toBe(100);
+    expect(stopwatch1.getTimeInSecs()).toEqual(0.1);
+    expect(stopwatch2.getTimeInSecs()).toEqual(0.05);
   });
 });

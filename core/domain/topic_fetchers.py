@@ -113,9 +113,11 @@ def get_topic_memcache_key(topic_id, version=None):
 def get_topic_from_model(topic_model):
     """Returns a topic domain object given a topic model loaded
     from the datastore.
+
     Args:
         topic_model: TopicModel. The topic model loaded from the
             datastore.
+
     Returns:
         topic. A Topic domain object corresponding to the given
             topic model.
@@ -145,6 +147,7 @@ def get_topic_from_model(topic_model):
         topic_model.id, topic_model.name,
         topic_model.abbreviated_name,
         topic_model.thumbnail_filename,
+        topic_model.thumbnail_bg_color,
         topic_model.description, [
             topic_domain.StoryReference.from_dict(reference)
             for reference in versioned_canonical_story_references[
@@ -174,6 +177,7 @@ def get_topic_by_id(topic_id, strict=True, version=None):
             id exists in the datastore.
         version: int or None. The version number of the topic to be
             retrieved. If it is None, the latest version will be retrieved.
+
     Returns:
         Topic or None. The domain object representing a topic with the
         given id, or None if it does not exist.

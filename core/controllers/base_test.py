@@ -53,6 +53,21 @@ FORTY_EIGHT_HOURS_IN_SECS = 48 * 60 * 60
 PADDING = 1
 
 
+class HelperFunctionTests(test_utils.GenericTestBase):
+
+    def test_load_template(self):
+        about_path = os.path.join('core', 'templates', 'pages', 'about-page')
+        with self.swap(feconf, 'FRONTEND_TEMPLATES_DIR', about_path):
+            self.assertIn(
+                '"About us - Oppia"',
+                base.load_template('about-page.mainpage.html'))
+        donate_path = os.path.join('core', 'templates', 'pages', 'donate-page')
+        with self.swap(feconf, 'FRONTEND_TEMPLATES_DIR', donate_path):
+            self.assertIn(
+                '"Donate - Oppia"',
+                base.load_template('donate-page.mainpage.html'))
+
+
 class UniqueTemplateNamesTests(test_utils.GenericTestBase):
     """Tests to ensure that all template filenames in
     core/templates/pages have unique filenames. This is required
@@ -98,7 +113,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
 
     class MockHandlerForTestingErrorPageWithIframed(base.BaseHandler):
         def get(self):
-            self.values['iframed'] = True
+            self.iframed = True
             self.render_template('invalid_page.html')
 
     class MockHandlerForTestingUiAccessWrapper(base.BaseHandler):
@@ -196,11 +211,48 @@ class BaseHandlerTests(test_utils.GenericTestBase):
 
         self.delete_json('/library/data', expected_status_int=404)
 
-    def test_redirect_in_logged_out_states(self):
-        """Test for a redirect in logged out state on '/'."""
+    def test_maintenance_mode_when_enabled_html(self):
+        swap_maintenance_mode = self.swap(
+            feconf, 'ENABLE_MAINTENANCE_MODE', True)
+        with swap_maintenance_mode:
+            response = (
+                self.get_html_response('/library', expected_status_int=503))
+            self.assertIn(
+                'The Oppia site is temporarily unavailable', response.body)
+            self.assertNotIn('<library-page>', response.body)
 
-        response = self.get_html_response('/', expected_status_int=302)
-        self.assertIn('splash', response.headers['location'])
+    def test_maintenance_mode_when_enabled_and_super_admin_html(self):
+        swap_maintenance_mode = self.swap(
+            feconf, 'ENABLE_MAINTENANCE_MODE', True)
+        login_super_admin = self.login_context(
+            self.SUPER_ADMIN_EMAIL, is_super_admin=True)
+        with swap_maintenance_mode, login_super_admin:
+            response = self.get_html_response('/library')
+            self.assertIn('<library-page>', response.body)
+            self.assertNotIn(
+                'The Oppia site is temporarily unavailable', response.body)
+
+    def test_maintenance_mode_when_enabled_json(self):
+        swap_maintenance_mode = self.swap(
+            feconf, 'ENABLE_MAINTENANCE_MODE', True)
+        with swap_maintenance_mode:
+            response = (
+                self.get_json('/url_handler', expected_status_int=503))
+            self.assertIn('error', response)
+            self.assertEqual(
+                response['error'],
+                'Oppia is currently being upgraded, and the site should be up '
+                'and running again in a few hours. Thanks for your patience!')
+
+    def test_maintenance_mode_when_enabled_and_super_admin_json(self):
+        swap_maintenance_mode = self.swap(
+            feconf, 'ENABLE_MAINTENANCE_MODE', True)
+        login_super_admin = self.login_context(
+            self.SUPER_ADMIN_EMAIL, is_super_admin=True)
+        with swap_maintenance_mode, login_super_admin:
+            response = self.get_json('/url_handler')
+            self.assertIn('login_url', response)
+            self.assertIsNone(response['login_url'])
 
     def test_root_redirect_rules_for_logged_in_learners(self):
         self.login(self.TEST_LEARNER_EMAIL)
@@ -373,7 +425,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             to a non-existent directory.
             """
             path = ''
-            if args[1] == 'Pillow-6.0.0':
+            if args[1] == 'Pillow-6.2.2':
                 return 'invalid_path'
             else:
                 path = '/'.join(args)
@@ -525,6 +577,11 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             'https://oppiaserver.appspot.com/splash', expected_status_int=301)
         self.assertEqual(
             response.headers['Location'], 'https://oppiatestserver.appspot.com')
+
+    def test_splash_redirect(self):
+        # Tests that the old '/splash' URL is redirected to '/'.
+        response = self.get_html_response('/splash', expected_status_int=302)
+        self.assertEqual('http://localhost/', response.headers['location'])
 
 
 class CsrfTokenManagerTests(test_utils.GenericTestBase):

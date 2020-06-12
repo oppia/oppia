@@ -548,6 +548,36 @@ def require_valid_name(name, name_type, allow_empty=False):
                 (character, name_type, name))
 
 
+def require_valid_thumbnail_filename(thumbnail_filename):
+    """Generic thumbnail filename validation.
+
+        Args:
+            thumbnail_filename: str. The thumbnail filename to validate.
+        """
+    if thumbnail_filename is not None:
+        if not isinstance(thumbnail_filename, python_utils.BASESTRING):
+            raise ValidationError(
+                'Expected thumbnail filename to be a string, received %s'
+                % thumbnail_filename)
+        if thumbnail_filename.rfind('.') == 0:
+            raise ValidationError(
+                'Thumbnail filename should not start with a dot.')
+        if '/' in thumbnail_filename or '..' in thumbnail_filename:
+            raise ValidationError(
+                'Thumbnail filename should not include slashes or '
+                'consecutive dot characters.')
+        if '.' not in thumbnail_filename:
+            raise ValidationError(
+                'Thumbnail filename should include an extension.')
+
+        dot_index = thumbnail_filename.rfind('.')
+        extension = thumbnail_filename[dot_index + 1:].lower()
+        if extension != 'svg':
+            raise ValidationError(
+                'Expected a filename ending in svg, received %s' %
+                thumbnail_filename)
+
+
 def capitalize_string(input_string):
     """Converts the first character of a string to its uppercase equivalent (if
     it's a letter), and returns the result.

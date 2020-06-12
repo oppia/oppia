@@ -18,7 +18,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from constants import constants
-from core.domain import exp_services
+from core.domain import question_services
 from core.domain import story_domain
 from core.domain import story_services
 from core.domain import summary_services
@@ -54,9 +54,16 @@ class BaseStoryViewerControllerTests(test_utils.GenericTestBase):
         self.EXP_ID_1 = '1'
         self.EXP_ID_7 = '7'
 
-        exp_services.load_demo(self.EXP_ID_0)
-        exp_services.load_demo(self.EXP_ID_1)
-        exp_services.load_demo(self.EXP_ID_7)
+        self.save_new_valid_exploration(
+            self.EXP_ID_0, self.admin_id, title='Title 1', end_state_name='End')
+        self.save_new_valid_exploration(
+            self.EXP_ID_1, self.admin_id, title='Title 2', end_state_name='End')
+        self.save_new_valid_exploration(
+            self.EXP_ID_7, self.admin_id, title='Title 3', end_state_name='End')
+        self.publish_exploration(self.admin_id, self.EXP_ID_0)
+        self.publish_exploration(self.admin_id, self.EXP_ID_1)
+        self.publish_exploration(self.admin_id, self.EXP_ID_7)
+
         story = story_domain.Story.create_default_story(
             self.STORY_ID, 'Title', self.TOPIC_ID)
         story.description = ('Description')
@@ -66,6 +73,10 @@ class BaseStoryViewerControllerTests(test_utils.GenericTestBase):
         self.node_1 = {
             'id': self.NODE_ID_1,
             'title': 'Title 1',
+            'description': 'Description 1',
+            'thumbnail_filename': 'image_1.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
             'destination_node_ids': ['node_3'],
             'acquired_skill_ids': [],
             'prerequisite_skill_ids': [],
@@ -78,6 +89,10 @@ class BaseStoryViewerControllerTests(test_utils.GenericTestBase):
         self.node_2 = {
             'id': self.NODE_ID_2,
             'title': 'Title 2',
+            'description': 'Description 2',
+            'thumbnail_filename': 'image_2.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
             'destination_node_ids': ['node_1'],
             'acquired_skill_ids': [],
             'prerequisite_skill_ids': [],
@@ -90,6 +105,10 @@ class BaseStoryViewerControllerTests(test_utils.GenericTestBase):
         self.node_3 = {
             'id': self.NODE_ID_3,
             'title': 'Title 3',
+            'description': 'Description 3',
+            'thumbnail_filename': 'image_3.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
             'destination_node_ids': [],
             'acquired_skill_ids': [],
             'prerequisite_skill_ids': [],
@@ -110,7 +129,6 @@ class BaseStoryViewerControllerTests(test_utils.GenericTestBase):
         story_services.save_new_story(self.admin_id, story)
         self.save_new_topic(
             self.TOPIC_ID, 'user', name='Topic',
-            abbreviated_name='abbrev', thumbnail_filename=None,
             description='A new topic', canonical_story_ids=[story.id],
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[], next_subtopic_id=0)
@@ -176,7 +194,6 @@ class StoryPageDataHandlerTests(BaseStoryViewerControllerTests):
         new_story_id = 'new_story_id'
         self.save_new_topic(
             'topic_id_1', 'user', name='Topic 2',
-            abbreviated_name='abbrev', thumbnail_filename=None,
             description='A new topic', canonical_story_ids=[new_story_id],
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[], next_subtopic_id=0)
@@ -283,6 +300,44 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
 
     def test_post_returns_empty_list_when_user_completes_story(self):
         csrf_token = self.get_new_csrf_token()
+        story_services.record_completed_node_in_story_context(
+            self.viewer_id, self.STORY_ID, self.NODE_ID_2)
+        story_services.record_completed_node_in_story_context(
+            self.viewer_id, self.STORY_ID, self.NODE_ID_1)
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
+            json_response = self.post_json(
+                '%s/%s/%s' % (
+                    feconf.STORY_PROGRESS_URL_PREFIX, self.STORY_ID,
+                    self.NODE_ID_3
+                ), {}, csrf_token=csrf_token
+            )
+        self.assertEqual(len(json_response['summaries']), 0)
+        self.assertIsNone(json_response['next_node_id'])
+        self.assertFalse(json_response['ready_for_review_test'])
+
+    def test_post_returns_ready_for_review_when_acquired_skills_exist(self):
+        csrf_token = self.get_new_csrf_token()
+        self.save_new_skill(
+            'skill_1', self.admin_id, description='Skill Description')
+        self.save_new_question(
+            'question_1', self.admin_id,
+            self._create_valid_question_data('ABC'), ['skill_1'])
+        question_services.create_new_question_skill_link(
+            self.admin_id, 'question_1', 'skill_1', 0.3)
+        changelist = [
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'property_name': (
+                    story_domain.STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS),
+                'node_id': self.NODE_ID_1,
+                'old_value': [],
+                'new_value': ['skill_1']
+            })
+        ]
+        story_services.update_story(
+            self.admin_id, self.STORY_ID, changelist,
+            'Added acquired skill.')
+
         story_services.record_completed_node_in_story_context(
             self.viewer_id, self.STORY_ID, self.NODE_ID_2)
         story_services.record_completed_node_in_story_context(

@@ -16,6 +16,9 @@
  * @fileoverview Directive for the exploration editor feedback tab.
  */
 
+require('pages/exploration-editor-page/feedback-tab/templates/' +
+  'create-feedback-thread-modal.controller.ts');
+
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/exploration-editor-page/services/change-list.service.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
@@ -46,14 +49,14 @@ angular.module('oppia').directive('feedbackTab', [
         'feedback-tab.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$q', '$rootScope', '$uibModal', 'AlertsService', 'ChangeListService',
-        'DateTimeFormatService', 'EditabilityService',
+        '$q', '$uibModal', 'AlertsService', 'ChangeListService',
+        'DateTimeFormatService', 'EditabilityService', 'LoaderService',
         'ExplorationStatesService',
         'SuggestionModalForExplorationEditorService', 'ThreadDataService',
         'ThreadStatusDisplayService', 'UrlInterpolationService', 'UserService',
         function(
-            $q, $rootScope, $uibModal, AlertsService, ChangeListService,
-            DateTimeFormatService, EditabilityService,
+            $q, $uibModal, AlertsService, ChangeListService,
+            DateTimeFormatService, EditabilityService, LoaderService,
             ExplorationStatesService,
             SuggestionModalForExplorationEditorService, ThreadDataService,
             ThreadStatusDisplayService, UrlInterpolationService, UserService) {
@@ -98,32 +101,7 @@ angular.module('oppia').directive('feedbackTab', [
                 '/pages/exploration-editor-page/feedback-tab/templates/' +
                 'create-feedback-thread-modal.template.html'),
               backdrop: true,
-              resolve: {},
-              controller: [
-                '$scope', '$uibModalInstance',
-                function($scope, $uibModalInstance) {
-                  $scope.newThreadSubject = '';
-                  $scope.newThreadText = '';
-
-                  $scope.create = (newThreadSubject, newThreadText) => {
-                    if (!newThreadSubject) {
-                      AlertsService.addWarning(
-                        'Please specify a thread subject.');
-                      return;
-                    }
-                    if (!newThreadText) {
-                      AlertsService.addWarning('Please specify a message.');
-                      return;
-                    }
-                    $uibModalInstance.close({
-                      newThreadSubject: newThreadSubject,
-                      newThreadText: newThreadText
-                    });
-                  };
-
-                  $scope.cancel = () => $uibModalInstance.dismiss('cancel');
-                }
-              ]
+              controller: 'CreateFeedbackThreadModalController'
             }).result.then(result => ThreadDataService.createNewThreadAsync(
               result.newThreadSubject, result.newThreadText)
             ).then(() => {
@@ -163,7 +141,8 @@ angular.module('oppia').directive('feedbackTab', [
           // TODO(Allan): Implement ability to edit suggestions before applying.
           ctrl.showSuggestionModal = () => {
             if (ctrl.activeThread === null) {
-              throw Error('Trying to show suggestion of a non-existent thread');
+              throw new Error(
+                'Trying to show suggestion of a non-existent thread');
             }
             SuggestionModalForExplorationEditorService.showSuggestionModal(
               ctrl.activeThread.suggestion.suggestionType, {
@@ -192,7 +171,8 @@ angular.module('oppia').directive('feedbackTab', [
             ctrl.messageSendingInProgress = true;
             let thread = ThreadDataService.getThread(threadId);
             if (thread === null) {
-              throw Error('Trying to add message to a non-existent thread.');
+              throw new Error(
+                'Trying to add message to a non-existent thread.');
             }
             ThreadDataService.addNewMessageAsync(thread, tmpText, tmpStatus)
               .then(() => {
@@ -207,7 +187,7 @@ angular.module('oppia').directive('feedbackTab', [
           ctrl.setActiveThread = function(threadId) {
             let thread = ThreadDataService.getThread(threadId);
             if (thread === null) {
-              throw Error('Trying to display a non-existent thread');
+              throw new Error('Trying to display a non-existent thread');
             }
             ThreadDataService.getMessagesAsync(thread).then(() => {
               ctrl.activeThread = thread;
@@ -238,7 +218,7 @@ angular.module('oppia').directive('feedbackTab', [
             ctrl.activeThread = null;
             ctrl.userIsLoggedIn = null;
             ctrl.threadIsStale = false;
-            $rootScope.loadingMessage = 'Loading';
+            LoaderService.showLoadingScreen('Loading');
 
             // Initial load of the thread list on page load.
             ctrl.tmpMessage = {
@@ -251,7 +231,7 @@ angular.module('oppia').directive('feedbackTab', [
               UserService.getUserInfoAsync().then(
                 userInfo => ctrl.userIsLoggedIn = userInfo.isLoggedIn()),
               ctrl.fetchUpdatedThreads()
-            ]).then(() => $rootScope.loadingMessage = '');
+            ]).then(() => LoaderService.hideLoadingScreen());
           };
         }
       ]

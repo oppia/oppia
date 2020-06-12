@@ -18,10 +18,26 @@
 
 require(
   'components/common-layout-directives/common-elements/' +
+  'confirm-or-cancel-modal.controller.ts');
+require(
+  'components/common-layout-directives/common-elements/' +
   'loading-dots.directive.ts');
 require(
   'components/common-layout-directives/common-elements/' +
   'sharing-links.directive.ts');
+require(
+  'pages/exploration-editor-page/modal-templates/' +
+  'editor-reloading-modal.controller.ts');
+require(
+  'pages/exploration-editor-page/modal-templates/' +
+  'exploration-metadata-modal.controller');
+require(
+  'pages/exploration-editor-page/modal-templates/' +
+  'exploration-save-modal.controller');
+require(
+  'pages/exploration-editor-page/modal-templates/' +
+  'post-publish-modal.controller.ts');
+
 require('domain/exploration/StatesObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require(
@@ -93,61 +109,13 @@ angular.module('oppia').factory('ExplorationSaveService', [
         ExplorationTagsService.savedMemento.length === 0);
     };
 
-    var areRequiredFieldsFilled = function() {
-      if (!ExplorationTitleService.displayed) {
-        AlertsService.addWarning('Please specify a title');
-        return false;
-      }
-      if (!ExplorationObjectiveService.displayed) {
-        AlertsService.addWarning('Please specify an objective');
-        return false;
-      }
-      if (!ExplorationCategoryService.displayed) {
-        AlertsService.addWarning('Please specify a category');
-        return false;
-      }
-
-      return true;
-    };
-
     var showCongratulatorySharingModal = function() {
       return $uibModal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/exploration-editor-page/modal-templates/' +
           'post-publish-modal.template.html'),
         backdrop: true,
-        controller: [
-          '$scope', '$window', '$uibModalInstance',
-          'ContextService', 'DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR',
-          function(
-              $scope, $window, $uibModalInstance,
-              ContextService, DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR) {
-            $scope.congratsImgUrl = UrlInterpolationService.getStaticImageUrl(
-              '/general/congrats.svg');
-            $scope.DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR = (
-              DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR);
-            $scope.close = function() {
-              $uibModalInstance.dismiss('cancel');
-            };
-            $scope.explorationId = (
-              ContextService.getExplorationId());
-            $scope.explorationLinkCopied = false;
-            $scope.explorationLink = (
-              $window.location.protocol + '//' +
-              $window.location.host + '/explore/' + $scope.explorationId);
-            $scope.selectText = function(evt) {
-              var codeDiv = evt.currentTarget;
-              var range = document.createRange();
-              range.setStartBefore(codeDiv.firstChild);
-              range.setEndAfter(codeDiv.lastChild);
-              var selection = window.getSelection();
-              selection.removeAllRanges();
-              selection.addRange(range);
-              $window.document.execCommand('copy');
-              $scope.explorationLinkCopied = true;
-            };
-          }
-        ]
+        controller: 'PostPublishModalController'
       }).result.then(function() {}, function() {
         // Note to developers:
         // This callback is triggered when the Cancel button is clicked.
@@ -160,23 +128,13 @@ angular.module('oppia').factory('ExplorationSaveService', [
       // This is resolved when modal is closed.
       var whenModalClosed = $q.defer();
 
-      var publishModalInstance = $uibModal.open({
+      $uibModal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/exploration-editor-page/modal-templates/' +
           'exploration-publish-modal.template.html'),
         backdrop: 'static',
-        controller: [
-          '$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
-            $scope.publish = $uibModalInstance.close;
-
-            $scope.cancel = function() {
-              $uibModalInstance.dismiss('cancel');
-            };
-          }
-        ]
-      });
-
-      publishModalInstance.result.then(function() {
+        controller: 'ConfirmOrCancelModalController'
+      }).result.then(function() {
         if (onStartSaveCallback) {
           onStartSaveCallback();
         }
@@ -267,16 +225,7 @@ angular.module('oppia').factory('ExplorationSaveService', [
             'confirm-discard-changes-modal.template.html'),
           backdrop: 'static',
           keyboard: false,
-          controller: [
-            '$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
-              $scope.cancel = function() {
-                $uibModalInstance.dismiss();
-              };
-              $scope.confirmDiscard = function() {
-                $uibModalInstance.close();
-              };
-            }
-          ]
+          controller: 'ConfirmOrCancelModalController'
         }).result.then(function() {
           AlertsService.clearWarnings();
           $rootScope.$broadcast('externalSave');
@@ -287,14 +236,7 @@ angular.module('oppia').factory('ExplorationSaveService', [
               'editor-reloading-modal.template.html'),
             backdrop: 'static',
             keyboard: false,
-            controller: [
-              '$scope', '$uibModalInstance',
-              function($scope, $uibModalInstance) {
-                $timeout(function() {
-                  $uibModalInstance.dismiss('cancel');
-                }, 2500);
-              }
-            ],
+            controller: 'EditorReloadingModalController',
             windowClass: 'oppia-loading-modal'
           });
 
@@ -306,6 +248,10 @@ angular.module('oppia').factory('ExplorationSaveService', [
           // exploration-with-draft-changes will be reloaded
           // (since it is already cached in ExplorationDataService).
           $window.location.reload();
+        }, function() {
+          // Note to developers:
+          // This callback is triggered when the Cancel button is clicked.
+          // No further action is needed.
         });
       },
 
@@ -327,127 +273,7 @@ angular.module('oppia').factory('ExplorationSaveService', [
               '/pages/exploration-editor-page/modal-templates/' +
               'exploration-metadata-modal.template.html'),
             backdrop: 'static',
-            controller: [
-              '$scope', '$uibModalInstance', 'ExplorationObjectiveService',
-              'ExplorationTitleService', 'ExplorationCategoryService',
-              'ExplorationStatesService', 'ExplorationLanguageCodeService',
-              'ExplorationTagsService', 'ALL_CATEGORIES',
-              'DEFAULT_LANGUAGE_CODE', 'TAG_REGEX',
-              function($scope, $uibModalInstance, ExplorationObjectiveService,
-                  ExplorationTitleService, ExplorationCategoryService,
-                  ExplorationStatesService, ExplorationLanguageCodeService,
-                  ExplorationTagsService, ALL_CATEGORIES,
-                  DEFAULT_LANGUAGE_CODE, TAG_REGEX) {
-                $scope.explorationTitleService = ExplorationTitleService;
-                $scope.explorationObjectiveService =
-                  ExplorationObjectiveService;
-                $scope.explorationCategoryService =
-                  ExplorationCategoryService;
-                $scope.explorationLanguageCodeService = (
-                  ExplorationLanguageCodeService);
-                $scope.explorationTagsService = ExplorationTagsService;
-
-                $scope.objectiveHasBeenPreviouslyEdited = (
-                  ExplorationObjectiveService.savedMemento.length > 0);
-
-                $scope.requireTitleToBeSpecified = (
-                  !ExplorationTitleService.savedMemento);
-                $scope.requireObjectiveToBeSpecified = (
-                  ExplorationObjectiveService.savedMemento.length < 15);
-                $scope.requireCategoryToBeSpecified = (
-                  !ExplorationCategoryService.savedMemento);
-                $scope.askForLanguageCheck = (
-                  ExplorationLanguageCodeService.savedMemento ===
-                  DEFAULT_LANGUAGE_CODE);
-                $scope.askForTags = (
-                  ExplorationTagsService.savedMemento.length === 0);
-
-                $scope.TAG_REGEX = TAG_REGEX;
-
-                $scope.CATEGORY_LIST_FOR_SELECT2 = [];
-
-                for (var i = 0; i < ALL_CATEGORIES.length; i++) {
-                  $scope.CATEGORY_LIST_FOR_SELECT2.push({
-                    id: ALL_CATEGORIES[i],
-                    text: ALL_CATEGORIES[i]
-                  });
-                }
-
-                if (ExplorationStatesService.isInitialized()) {
-                  var categoryIsInSelect2 = $scope.CATEGORY_LIST_FOR_SELECT2
-                    .some(
-                      function(categoryItem) {
-                        return categoryItem.id ===
-                      ExplorationCategoryService.savedMemento;
-                      }
-                    );
-
-                  // If the current category is not in the dropdown, add it
-                  // as the first option.
-                  if (!categoryIsInSelect2 &&
-                      ExplorationCategoryService.savedMemento) {
-                    $scope.CATEGORY_LIST_FOR_SELECT2.unshift({
-                      id: ExplorationCategoryService.savedMemento,
-                      text: ExplorationCategoryService.savedMemento
-                    });
-                  }
-                }
-
-                $scope.isSavingAllowed = function() {
-                  return Boolean(
-                    ExplorationTitleService.displayed &&
-                    ExplorationObjectiveService.displayed &&
-                    ExplorationObjectiveService.displayed.length >= 15 &&
-                    ExplorationCategoryService.displayed &&
-                    ExplorationLanguageCodeService.displayed);
-                };
-
-                $scope.save = function() {
-                  if (!areRequiredFieldsFilled()) {
-                    return;
-                  }
-
-                  // Record any fields that have changed.
-                  var metadataList = [];
-                  if (ExplorationTitleService.hasChanged()) {
-                    metadataList.push('title');
-                  }
-                  if (ExplorationObjectiveService.hasChanged()) {
-                    metadataList.push('objective');
-                  }
-                  if (ExplorationCategoryService.hasChanged()) {
-                    metadataList.push('category');
-                  }
-                  if (ExplorationLanguageCodeService.hasChanged()) {
-                    metadataList.push('language');
-                  }
-                  if (ExplorationTagsService.hasChanged()) {
-                    metadataList.push('tags');
-                  }
-
-                  // Save all the displayed values.
-                  ExplorationTitleService.saveDisplayedValue();
-                  ExplorationObjectiveService.saveDisplayedValue();
-                  ExplorationCategoryService.saveDisplayedValue();
-                  ExplorationLanguageCodeService.saveDisplayedValue();
-                  ExplorationTagsService.saveDisplayedValue();
-
-                  // TODO(sll): Get rid of the $timeout here.
-                  // It's currently used because there is a race condition: the
-                  // saveDisplayedValue() calls above result in autosave calls.
-                  // These race with the discardDraft() call that
-                  // will be called when the draft changes entered here
-                  // are properly saved to the backend.
-                  $timeout(function() {
-                    $uibModalInstance.close(metadataList);
-                  }, 500);
-                };
-
-                $scope.cancel = function() {
-                  $uibModalInstance.dismiss('cancel');
-                };
-              }
-            ]
+            controller: 'ExplorationMetadataModalController'
           });
 
           modalInstance.opened.then(function() {
@@ -558,42 +384,10 @@ angular.module('oppia').factory('ExplorationSaveService', [
               isExplorationPrivate: function() {
                 return ExplorationRightsService.isPrivate();
               },
-              diffData: function() {
-                return diffData;
-              }
+              diffData: diffData
             },
             windowClass: 'oppia-save-exploration-modal',
-            controller: [
-              '$scope', '$uibModalInstance', 'isExplorationPrivate',
-              function(
-                  $scope, $uibModalInstance, isExplorationPrivate) {
-                $scope.showDiff = false;
-                $scope.onClickToggleDiffButton = function() {
-                  $scope.showDiff = !$scope.showDiff;
-                  if ($scope.showDiff) {
-                    $('.oppia-save-exploration-modal').addClass(
-                      'oppia-save-exploration-wide-modal');
-                  } else {
-                    $('.oppia-save-exploration-modal').removeClass(
-                      'oppia-save-exploration-wide-modal');
-                  }
-                };
-
-                $scope.diffData = diffData;
-                $scope.isExplorationPrivate = isExplorationPrivate;
-
-                $scope.earlierVersionHeader = 'Last saved';
-                $scope.laterVersionHeader = 'New changes';
-
-                $scope.save = function(commitMessage) {
-                  $uibModalInstance.close(commitMessage);
-                };
-                $scope.cancel = function() {
-                  $uibModalInstance.dismiss('cancel');
-                  AlertsService.clearWarnings();
-                };
-              }
-            ]
+            controller: 'ExplorationSaveModalController'
           });
 
           // Modal is Opened
@@ -623,6 +417,7 @@ angular.module('oppia').factory('ExplorationSaveService', [
               whenModalClosed.resolve();
             });
           }, function() {
+            AlertsService.clearWarnings();
             modalIsOpen = false;
             whenModalClosed.resolve();
           });

@@ -17,6 +17,10 @@
  * exploration editor.
  */
 
+require(
+  'pages/exploration-editor-page/statistics-tab/templates/' +
+  'state-stats-modal.controller.ts');
+
 require('domain/exploration/read-only-exploration-backend-api.service.ts');
 require('domain/exploration/StatesObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
@@ -32,7 +36,7 @@ require('services/alerts.service.ts');
 require('services/compute-graph.service.ts');
 require('services/date-time-format.service.ts');
 require('services/exploration-features.service.ts');
-require('services/state-rules-stats.service.ts');
+require('services/state-interaction-stats.service.ts');
 require('visualizations/oppia-visualization-bar-chart.directive.ts');
 require(
   'visualizations/oppia-visualization-enumerated-frequency-table.directive.ts');
@@ -56,17 +60,17 @@ angular.module('oppia').directive('statisticsTab', [
         'DateTimeFormatService', 'ExplorationDataService',
         'ExplorationFeaturesService', 'ExplorationStatesService',
         'ReadOnlyExplorationBackendApiService', 'RouterService',
-        'StateImprovementSuggestionService', 'StateRulesStatsService',
-        'StatesObjectFactory', 'UrlInterpolationService',
-        'IMPROVE_TYPE_INCOMPLETE',
+        'StateImprovementSuggestionService',
+        'StateInteractionStatsService', 'StatesObjectFactory',
+        'UrlInterpolationService', 'IMPROVE_TYPE_INCOMPLETE',
         function(
             $http, $scope, $uibModal, AlertsService, ComputeGraphService,
             DateTimeFormatService, ExplorationDataService,
             ExplorationFeaturesService, ExplorationStatesService,
             ReadOnlyExplorationBackendApiService, RouterService,
-            StateImprovementSuggestionService, StateRulesStatsService,
-            StatesObjectFactory, UrlInterpolationService,
-            IMPROVE_TYPE_INCOMPLETE) {
+            StateImprovementSuggestionService,
+            StateInteractionStatsService, StatesObjectFactory,
+            UrlInterpolationService, IMPROVE_TYPE_INCOMPLETE) {
           var ctrl = this;
           var _EXPLORATION_STATS_VERSION_ALL = 'all';
           var stateStatsModalIsOpen = false;
@@ -95,9 +99,6 @@ angular.module('oppia').directive('statisticsTab', [
                   statesDict);
                 var initStateName = response.exploration.init_state_name;
 
-                ctrl.playthroughsAreAvailable =
-                  ExplorationFeaturesService.isPlaythroughRecordingEnabled() &&
-                  !ExplorationFeaturesService.isImprovementsTabEnabled();
                 ctrl.statsGraphData = ComputeGraphService.compute(
                   initStateName, states);
                 var improvements = (
@@ -138,131 +139,32 @@ angular.module('oppia').directive('statisticsTab', [
           ctrl.showStateStatsModal = function(stateName, improvementType) {
             AlertsService.clearWarnings();
 
-            StateRulesStatsService.computeStateRulesStats(
+            StateInteractionStatsService.computeStats(
               ExplorationStatesService.getState(stateName)
-            ).then(function(stateRulesStats) {
-              $uibModal.open({
-                templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                  '/pages/exploration-editor-page/statistics-tab/templates/' +
-                  'state-stats-modal.template.html'),
-                backdrop: true,
-                resolve: {
-                  stateName: function() {
-                    return stateName;
-                  },
-                  stateStats: function() {
-                    return ctrl.stateStats[stateName];
-                  },
-                  improvementType: function() {
-                    return improvementType;
-                  },
-                  visualizationsInfo: function() {
-                    return stateRulesStats.visualizations_info;
-                  }
+            ).then(stats => $uibModal.open({
+              controller: 'StateStatsModalController',
+              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                '/pages/exploration-editor-page/statistics-tab/templates/' +
+                'state-stats-modal.template.html'),
+              backdrop: true,
+              resolve: {
+                improvementType: function() {
+                  return improvementType;
                 },
-                controller: [
-                  '$scope', '$uibModalInstance', '$filter', '$injector',
-                  'stateName', 'stateStats', 'improvementType',
-                  'visualizationsInfo', 'HtmlEscaperService',
-                  'AngularNameService', 'AnswerClassificationService',
-                  function(
-                      $scope, $uibModalInstance, $filter, $injector,
-                      stateName, stateStats, improvementType,
-                      visualizationsInfo, HtmlEscaperService,
-                      AngularNameService, AnswerClassificationService) {
-                    var COMPLETION_RATE_PIE_CHART_OPTIONS = {
-                      left: 20,
-                      pieHole: 0.6,
-                      pieSliceTextStyleColor: 'black',
-                      pieSliceBorderColor: 'black',
-                      chartAreaWidth: 240,
-                      colors: ['#d8d8d8', '#008808', 'blue'],
-                      height: 270,
-                      legendPosition: 'right',
-                      width: 240
-                    };
-
-                    var title1 = 'Answer feedback statistics';
-                    $scope.COMPLETION_RATE_PIE_CHART_OPTIONS1 = angular.copy(
-                      COMPLETION_RATE_PIE_CHART_OPTIONS);
-                    $scope.COMPLETION_RATE_PIE_CHART_OPTIONS1.title = title1;
-
-                    var title2 = 'Solution usage statistics';
-                    $scope.COMPLETION_RATE_PIE_CHART_OPTIONS2 = angular.copy(
-                      COMPLETION_RATE_PIE_CHART_OPTIONS);
-                    $scope.COMPLETION_RATE_PIE_CHART_OPTIONS2.title = title2;
-
-                    $scope.stateName = stateName;
-                    $scope.stateStats = stateStats;
-                    $scope.improvementType = improvementType;
-
-                    var usefulFeedbackCount = (
-                      $scope.stateStats.useful_feedback_count);
-                    var totalAnswersCount = (
-                      $scope.stateStats.total_answers_count);
-                    if (totalAnswersCount > 0) {
-                      $scope.hasExplorationBeenAnswered = true;
-                    }
-                    $scope.pieChartData1 = [
-                      ['Type', 'Number'],
-                      ['Default feedback',
-                        totalAnswersCount - usefulFeedbackCount],
-                      ['Specific feedback', usefulFeedbackCount],
-                    ];
-
-                    var numTimesSolutionViewed = (
-                      $scope.stateStats.num_times_solution_viewed);
-                    $scope.pieChartData2 = [
-                      ['Type', 'Number'],
-                      ['Solutions used to answer', numTimesSolutionViewed],
-                      ['Solutions not used', totalAnswersCount - (
-                        numTimesSolutionViewed)]
-                    ];
-
-                    var _getVisualizationsHtml = function() {
-                      var htmlSnippets = visualizationsInfo.map(function(
-                          vizInfo) {
-                        var escapedData =
-                          HtmlEscaperService.objToEscapedJson(vizInfo.data);
-                        var escapedOptions =
-                          HtmlEscaperService.objToEscapedJson(vizInfo.options);
-
-                        var el = $(
-                          '<oppia-visualization-' +
-                          $filter('camelCaseToHyphens')(vizInfo.id) + '/>');
-                        el.attr('escaped-data', escapedData);
-                        el.attr('escaped-options', escapedOptions);
-                        el.attr(
-                          'addressed-info-is-supported',
-                          vizInfo.addressed_info_is_supported);
-                        return el.get(0).outerHTML;
-                      });
-
-                      return htmlSnippets.join('');
-                    };
-
-                    $scope.visualizationsHtml = _getVisualizationsHtml();
-
-                    $scope.cancel = function() {
-                      $uibModalInstance.dismiss('cancel');
-                      AlertsService.clearWarnings();
-                    };
-
-                    $scope.$on('$destroy', function() {
-                      stateStatsModalIsOpen = false;
-                    });
-
-                    $scope.navigateToStateEditor = function() {
-                      $scope.cancel();
-                      RouterService.navigateToMainTab(stateName);
-                    };
-                  }
-                ]
-              }).result.then(function() {}, function() {
-                // This callback is triggered when the Cancel button is
-                // clicked. No further action is needed.
-              });
-            });
+                stateName: function() {
+                  return stateName;
+                },
+                stateStats: function() {
+                  return ctrl.stateStats[stateName];
+                },
+                stateStatsModalIsOpen: function() {
+                  return stateStatsModalIsOpen;
+                },
+                visualizationsInfo: function() {
+                  return stats.visualizations_info;
+                }
+              },
+            }).result.then(null, () => AlertsService.clearWarnings()));
           };
           ctrl.$onInit = function() {
             $scope.$on('refreshStatisticsTab', function() {

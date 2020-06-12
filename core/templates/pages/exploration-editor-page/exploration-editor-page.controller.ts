@@ -44,6 +44,8 @@ require(
   'pages/exploration-editor-page/exploration-title-editor/' +
   'exploration-title-editor.directive.ts');
 require(
+  'pages/exploration-editor-page/modal-templates/welcome-modal.controller.ts');
+require(
   'pages/exploration-editor-page/param-changes-editor/' +
   'param-changes-editor.directive.ts');
 require(
@@ -158,7 +160,7 @@ angular.module('oppia').directive('explorationEditorPage', [
         'exploration-editor-page.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$http', '$log', '$q', '$rootScope', '$scope', '$templateCache',
+        '$http', '$log', '$q', '$scope', '$templateCache',
         '$timeout', '$uibModal', '$window', 'AutosaveInfoModalsService',
         'ChangeListService', 'ContextService', 'EditabilityService',
         'ExplorationAutomaticTextToSpeechService', 'ExplorationCategoryService',
@@ -169,16 +171,17 @@ angular.module('oppia').directive('explorationEditorPage', [
         'ExplorationParamSpecsService', 'ExplorationRightsService',
         'ExplorationStatesService', 'ExplorationTagsService',
         'ExplorationTitleService', 'ExplorationWarningsService',
-        'GraphDataService', 'PageTitleService', 'ParamChangesObjectFactory',
-        'ParamSpecsObjectFactory', 'PlaythroughIssuesService', 'RouterService',
-        'SiteAnalyticsService', 'StateClassifierMappingService',
-        'StateEditorService', 'StateTopAnswersStatsBackendApiService',
-        'StateTopAnswersStatsService', 'StateTutorialFirstTimeService',
-        'ThreadDataService', 'UrlInterpolationService',
-        'UserEmailPreferencesService', 'UserExplorationPermissionsService',
+        'GraphDataService', 'PageTitleService', 'LoaderService',
+        'ParamChangesObjectFactory', 'ParamSpecsObjectFactory',
+        'RouterService', 'SiteAnalyticsService',
+        'StateClassifierMappingService', 'StateEditorService',
+        'StateTopAnswersStatsBackendApiService', 'StateTopAnswersStatsService',
+        'StateTutorialFirstTimeService', 'ThreadDataService',
+        'UrlInterpolationService', 'UserEmailPreferencesService',
+        'UserExplorationPermissionsService',
         'EVENT_EXPLORATION_PROPERTY_CHANGED',
         function(
-            $http, $log, $q, $rootScope, $scope, $templateCache,
+            $http, $log, $q, $scope, $templateCache,
             $timeout, $uibModal, $window, AutosaveInfoModalsService,
             ChangeListService, ContextService, EditabilityService,
             ExplorationAutomaticTextToSpeechService, ExplorationCategoryService,
@@ -189,13 +192,14 @@ angular.module('oppia').directive('explorationEditorPage', [
             ExplorationParamSpecsService, ExplorationRightsService,
             ExplorationStatesService, ExplorationTagsService,
             ExplorationTitleService, ExplorationWarningsService,
-            GraphDataService, PageTitleService, ParamChangesObjectFactory,
-            ParamSpecsObjectFactory, PlaythroughIssuesService, RouterService,
-            SiteAnalyticsService, StateClassifierMappingService,
-            StateEditorService, StateTopAnswersStatsBackendApiService,
-            StateTopAnswersStatsService, StateTutorialFirstTimeService,
-            ThreadDataService, UrlInterpolationService,
-            UserEmailPreferencesService, UserExplorationPermissionsService,
+            GraphDataService, PageTitleService, LoaderService,
+            ParamChangesObjectFactory, ParamSpecsObjectFactory,
+            RouterService, SiteAnalyticsService,
+            StateClassifierMappingService, StateEditorService,
+            StateTopAnswersStatsBackendApiService, StateTopAnswersStatsService,
+            StateTutorialFirstTimeService, ThreadDataService,
+            UrlInterpolationService, UserEmailPreferencesService,
+            UserExplorationPermissionsService,
             EVENT_EXPLORATION_PROPERTY_CHANGED) {
           var ctrl = this;
           var _ID_TUTORIAL_STATE_CONTENT = '#tutorialStateContent';
@@ -279,8 +283,6 @@ angular.module('oppia').directive('explorationEditorPage', [
                 explorationData.correctness_feedback_enabled);
               StateClassifierMappingService.init(
                 explorationData.state_classifier_mapping);
-              PlaythroughIssuesService.initSession(
-                explorationData.exploration_id, explorationData.version);
 
               ctrl.explorationTitleService = ExplorationTitleService;
               ctrl.explorationCategoryService = ExplorationCategoryService;
@@ -433,50 +435,21 @@ angular.module('oppia').directive('explorationEditorPage', [
               ExplorationFeaturesService.isImprovementsTabEnabled();
           };
 
-          ctrl.isFeedbackTabEnabled = function() {
-            return ExplorationFeaturesService.isInitialized() &&
-              !ExplorationFeaturesService.isImprovementsTabEnabled();
-          };
-
           ctrl.showWelcomeExplorationModal = function() {
-            var modalInstance = $uibModal.open({
+            $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/exploration-editor-page/modal-templates/' +
                 'welcome-modal.template.html'),
               backdrop: true,
-              controller: [
-                '$scope', '$uibModalInstance', 'SiteAnalyticsService',
-                'ContextService',
-                function($scope, $uibModalInstance, SiteAnalyticsService,
-                    ContextService) {
-                  var explorationId = ContextService.getExplorationId();
-
-                  SiteAnalyticsService.registerTutorialModalOpenEvent(
-                    explorationId);
-
-                  $scope.beginTutorial = function() {
-                    SiteAnalyticsService.registerAcceptTutorialModalEvent(
-                      explorationId);
-                    $uibModalInstance.close();
-                  };
-
-                  $scope.cancel = function() {
-                    SiteAnalyticsService.registerDeclineTutorialModalEvent(
-                      explorationId);
-                    $uibModalInstance.dismiss('cancel');
-                  };
-
-                  $scope.editorWelcomeImgUrl = (
-                    UrlInterpolationService.getStaticImageUrl(
-                      '/general/editor_welcome.svg'));
-                }
-              ],
+              controller: 'WelcomeModalController',
               windowClass: 'oppia-welcome-modal'
-            });
-
-            modalInstance.result.then(function() {
+            }).result.then(function(explorationId) {
+              SiteAnalyticsService.registerAcceptTutorialModalEvent(
+                explorationId);
               ctrl.startTutorial();
-            }, function() {
+            }, function(explorationId) {
+              SiteAnalyticsService.registerDeclineTutorialModalEvent(
+                explorationId);
               StateTutorialFirstTimeService.markEditorTutorialFinished();
             });
           };
@@ -500,7 +473,7 @@ angular.module('oppia').directive('explorationEditorPage', [
             /** ********************************************************
              * Called on initial load of the exploration editor page.
              *********************************************************/
-            $rootScope.loadingMessage = 'Loading';
+            LoaderService.showLoadingScreen('Loading');
 
             ctrl.explorationId = ContextService.getExplorationId();
             ctrl.explorationUrl = '/create/' + ctrl.explorationId;

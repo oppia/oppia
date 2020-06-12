@@ -16,15 +16,19 @@
  * @fileoverview Modal and functionality for the create story button.
  */
 
+require(
+  'pages/topic-editor-page/modal-templates/' +
+  'new-story-title-editor-modal.controller.ts');
+
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 require('services/alerts.service.ts');
 
 angular.module('oppia').factory('StoryCreationService', [
-  '$http', '$rootScope', '$uibModal', '$window', 'AlertsService',
+  '$http', '$uibModal', '$window', 'AlertsService', 'LoaderService',
   'TopicEditorStateService', 'UrlInterpolationService',
   function(
-      $http, $rootScope, $uibModal, $window, AlertsService,
+      $http, $uibModal, $window, AlertsService, LoaderService,
       TopicEditorStateService, UrlInterpolationService) {
     var STORY_EDITOR_URL_TEMPLATE = '/story_editor/<story_id>';
     var STORY_CREATOR_URL_TEMPLATE = '/topic_editor_story_handler/<topic_id>';
@@ -35,36 +39,20 @@ angular.module('oppia').factory('StoryCreationService', [
         if (storyCreationInProgress) {
           return;
         }
-        var modalInstance = $uibModal.open({
+        $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/topic-editor-page/modal-templates/' +
             'new-story-title-editor.template.html'),
           backdrop: true,
-          controller: [
-            '$scope', '$uibModalInstance',
-            function($scope, $uibModalInstance) {
-              $scope.storyTitle = '';
-              $scope.isStoryTitleEmpty = function(storyTitle) {
-                return (storyTitle === '');
-              };
-              $scope.save = function(storyTitle) {
-                $uibModalInstance.close(storyTitle);
-              };
-              $scope.cancel = function() {
-                $uibModalInstance.dismiss('cancel');
-              };
-            }
-          ]
-        });
-
-        modalInstance.result.then(function(storyTitle) {
+          controller: 'NewStoryTitleEditorModalController'
+        }).result.then(function(storyTitle) {
           if (storyTitle === '') {
-            throw Error('Story title cannot be empty');
+            throw new Error('Story title cannot be empty');
           }
           storyCreationInProgress = true;
           AlertsService.clearWarnings();
           var topic = TopicEditorStateService.getTopic();
-          $rootScope.loadingMessage = 'Creating story';
+          LoaderService.showLoadingScreen('Creating story');
           var createStoryUrl = UrlInterpolationService.interpolateUrl(
             STORY_CREATOR_URL_TEMPLATE, {
               topic_id: topic.getId()
@@ -78,7 +66,7 @@ angular.module('oppia').factory('StoryCreationService', [
                 }
               );
             }, function() {
-              $rootScope.loadingMessage = '';
+              LoaderService.hideLoadingScreen();
             });
         }, function() {
           // Note to developers:

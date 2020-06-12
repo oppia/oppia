@@ -48,6 +48,10 @@ class StoryModel(base_models.VersionedModel):
 
     # The title of the story.
     title = ndb.StringProperty(required=True, indexed=True)
+    # The thumbnail filename of the story.
+    thumbnail_filename = ndb.StringProperty(indexed=True)
+    # The thumbnail background color of the story.
+    thumbnail_bg_color = ndb.StringProperty(indexed=True)
     # A high-level description of the story.
     description = ndb.StringProperty(indexed=False)
     # A set of notes, that describe the characters, main storyline, and setting.
@@ -133,8 +137,7 @@ class StoryCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     A new instance of this model is created and saved every time a commit to
     StoryModel occurs.
 
-    The id for this model is of the form
-    'story-{{STORY_ID}}-{{STORY_VERSION}}'.
+    The id for this model is of the form 'story-[story_id]-[version]'.
     """
     # The id of the story being edited.
     story_id = ndb.StringProperty(indexed=True, required=True)
@@ -195,8 +198,12 @@ class StorySummaryModel(base_models.BaseModel):
     # with created_on, which is the time when the story *summary*
     # model was created).
     story_model_created_on = ndb.DateTimeProperty(required=True, indexed=True)
-    # The number of nodes that are part of this story.
-    node_count = ndb.IntegerProperty(required=True, indexed=True)
+    # The titles of the nodes in the story, in the same order as present there.
+    node_titles = ndb.StringProperty(repeated=True, indexed=False)
+    # The thumbnail filename of the story.
+    thumbnail_filename = ndb.StringProperty(indexed=True)
+    # The thumbnail background color of the story.
+    thumbnail_bg_color = ndb.StringProperty(indexed=True)
     version = ndb.IntegerProperty(required=True)
 
     @staticmethod

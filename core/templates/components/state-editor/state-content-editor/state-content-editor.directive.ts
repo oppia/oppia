@@ -42,6 +42,8 @@ angular.module('oppia').directive('stateContentEditor', [
       },
       scope: {
         getStateContentPlaceholder: '&stateContentPlaceholder',
+        getStateContentSaveButtonPlaceholder: (
+          '&stateContentSaveButtonPlaceholder'),
         onSaveStateContent: '=',
         showMarkAllAudioAsNeedingUpdateModalIfRequired: '='
       },

@@ -18,6 +18,7 @@
  * the editor pages).
  */
 
+require('domain/classroom/classroom-backend-api.service');
 require('domain/sidebar/sidebar-status.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('services/debouncer.service.ts');
@@ -33,22 +34,25 @@ angular.module('oppia').directive('topNavigationBar', [
     return {
       restrict: 'E',
       scope: {},
-      bindToController: {},
-      template: require('./top-navigation-bar.directive.html'),
+      bindToController: {
+        backButtonShown: '<'
+      },
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/components/common-layout-directives/navigation-bars/top-navigation' +
+        '-bar.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$http', '$window', '$timeout', '$translate',
-        'SidebarStatusService', 'LABEL_FOR_CLEARING_FOCUS', 'UserService',
-        'SiteAnalyticsService', 'NavigationService', 'WindowDimensionsService',
-        'DebouncerService', 'DeviceInfoService', 'LOGOUT_URL',
-        'SHOW_CLASSROOM_CALLOUT',
+        '$http', '$scope', '$timeout', '$translate', '$window',
+        'ClassroomBackendApiService', 'DebouncerService', 'DeviceInfoService',
+        'NavigationService', 'SidebarStatusService', 'SiteAnalyticsService',
+        'UserService', 'WindowDimensionsService',
+        'LABEL_FOR_CLEARING_FOCUS', 'LOGOUT_URL',
         function(
-            $scope, $http, $window, $timeout, $translate,
-            SidebarStatusService, LABEL_FOR_CLEARING_FOCUS, UserService,
-            SiteAnalyticsService, NavigationService, WindowDimensionsService,
-            DebouncerService, DeviceInfoService, LOGOUT_URL,
-            SHOW_CLASSROOM_CALLOUT) {
-          $scope.SHOW_CLASSROOM_CALLOUT = SHOW_CLASSROOM_CALLOUT;
+            $http, $scope, $timeout, $translate, $window,
+            ClassroomBackendApiService, DebouncerService, DeviceInfoService,
+            NavigationService, SidebarStatusService, SiteAnalyticsService,
+            UserService, WindowDimensionsService,
+            LABEL_FOR_CLEARING_FOCUS, LOGOUT_URL) {
           var ctrl = this;
           var NAV_MODE_SIGNUP = 'signup';
           var NAV_MODES_WITH_CUSTOM_LOCAL_NAV = [
@@ -63,6 +67,8 @@ angular.module('oppia').directive('topNavigationBar', [
             'I18N_CREATE_EXPLORATION_CREATE', 'I18N_TOPNAV_LIBRARY'];
           var truncateNavbarDebounced =
             DebouncerService.debounce(truncateNavbar, 500);
+
+          ctrl.CLASSROOM_PAGE_IS_SHOWN = false;
 
           ctrl.getStaticImageUrl = function(imagePath) {
             return UrlInterpolationService.getStaticImageUrl(imagePath);
@@ -220,6 +226,11 @@ angular.module('oppia').directive('topNavigationBar', [
             NavigationService.KEYBOARD_EVENT_TO_KEY_CODES;
             ctrl.windowIsNarrow = WindowDimensionsService.isWindowNarrow();
             ctrl.navElementsVisibilityStatus = {};
+
+            ClassroomBackendApiService.fetchClassroomPageIsShownStatus().then(
+              function(classroomIsShown) {
+                ctrl.CLASSROOM_PAGE_IS_SHOWN = classroomIsShown;
+              });
 
             // Close the submenu if focus or click occurs anywhere outside of
             // the menu or outside of its parent (which opens submenu on hover).

@@ -32,6 +32,8 @@ describe('Subtopic object factory', () => {
 
     var sampleSubtopicBackendObject = {
       id: 1,
+      thumbnail_filename: 'image.png',
+      thumbnail_bg_color: '#a33f40',
       title: 'Title',
       skill_ids: ['skill_1', 'skill_2']
     };
@@ -45,6 +47,13 @@ describe('Subtopic object factory', () => {
 
   it('should not find issues with a valid subtopic', () => {
     expect(_sampleSubtopic.validate()).toEqual([]);
+  });
+
+  it('should correctly prepublish validate a story', () => {
+    expect(_sampleSubtopic.prepublishValidate()).toEqual([]);
+    _sampleSubtopic.setThumbnailFilename('');
+    expect(_sampleSubtopic.prepublishValidate()).toEqual([
+      'Subtopic Title should have a thumbnail.']);
   });
 
   it('should validate the subtopic', () => {

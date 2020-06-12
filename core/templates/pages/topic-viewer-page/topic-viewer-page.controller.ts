@@ -19,8 +19,9 @@
 require('base-components/base-content.directive.ts');
 require(
   'components/common-layout-directives/common-elements/' +
-  'background-banner.directive.ts');
+  'background-banner.component.ts');
 require('components/skills-mastery-list/skills-mastery-list.directive.ts');
+require('pages/topic-viewer-page/info-tab/topic-info-tab.directive.ts');
 require(
   'pages/topic-viewer-page/stories-list/' +
   'topic-viewer-stories-list.directive.ts');
@@ -43,38 +44,51 @@ angular.module('oppia').directive('topicViewerPage', [
         '/pages/topic-viewer-page/topic-viewer-page.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$rootScope', '$window', 'AlertsService',
+        '$rootScope', '$window', 'AlertsService', 'LoaderService',
         'PageTitleService', 'TopicViewerBackendApiService',
         'UrlService', 'WindowDimensionsService', 'FATAL_ERROR_CODES',
         function(
-            $rootScope, $window, AlertsService,
+            $rootScope, $window, AlertsService, LoaderService,
             PageTitleService, TopicViewerBackendApiService,
             UrlService, WindowDimensionsService, FATAL_ERROR_CODES) {
           var ctrl = this;
           ctrl.setActiveTab = function(newActiveTabName) {
             ctrl.activeTab = newActiveTabName;
           };
+          ctrl.getStaticImageUrl = function(imagePath) {
+            return UrlInterpolationService.getStaticImageUrl(imagePath);
+          };
           ctrl.checkMobileView = function() {
             return (WindowDimensionsService.getWidth() < 500);
           };
           ctrl.$onInit = function() {
-            ctrl.setActiveTab('story');
+            ctrl.canonicalStorySummaries = [];
+            ctrl.setActiveTab('info');
             ctrl.topicName = UrlService.getTopicNameFromLearnerUrl();
 
             PageTitleService.setPageTitle(ctrl.topicName + ' - Oppia');
 
-            $rootScope.loadingMessage = 'Loading';
+            LoaderService.showLoadingScreen('Loading');
+            ctrl.topicIsLoading = true;
             TopicViewerBackendApiService.fetchTopicData(ctrl.topicName).then(
-              function(topicDataDict) {
-                ctrl.topicId = topicDataDict.topic_id;
-                ctrl.canonicalStoriesList = topicDataDict.canonical_story_dicts;
-                ctrl.degreesOfMastery = topicDataDict.degrees_of_mastery;
-                ctrl.skillDescriptions = topicDataDict.skill_descriptions;
-                ctrl.subtopics = topicDataDict.subtopics;
-                $rootScope.loadingMessage = '';
-                ctrl.topicId = topicDataDict.id;
+              function(readOnlyTopic) {
+                ctrl.topicId = readOnlyTopic.getTopicId();
+                ctrl.topicName = readOnlyTopic.getTopicName();
+                ctrl.topicDescription = readOnlyTopic.getTopicDescription();
+                ctrl.canonicalStorySummaries = (
+                  readOnlyTopic.getCanonicalStorySummaries());
+                ctrl.chapterCount = 0;
+                for (var idx in ctrl.canonicalStorySummaries) {
+                  ctrl.chapterCount += (
+                    ctrl.canonicalStorySummaries[idx].getNodeTitles().length);
+                }
+                ctrl.degreesOfMastery = readOnlyTopic.getDegreesOfMastery();
+                ctrl.subtopics = readOnlyTopic.getSubtopics();
+                ctrl.skillDescriptions = readOnlyTopic.getSkillDescriptions();
+                ctrl.topicIsLoading = false;
+                LoaderService.hideLoadingScreen();
                 ctrl.trainTabShouldBeDisplayed = (
-                  topicDataDict.train_tab_should_be_displayed);
+                  readOnlyTopic.getTrainTabShouldBeDisplayed());
                 // TODO(#8521): Remove the use of $rootScope.$apply()
                 // once the controller is migrated to angular.
                 $rootScope.$apply();

@@ -22,8 +22,14 @@ import { Injectable } from '@angular/core';
 
 import { StoryEditorPageConstants } from
   'pages/story-editor-page/story-editor-page.constants';
-import { StoryNode, StoryNodeObjectFactory } from
+import { IStoryNodeBackendDict, StoryNode, StoryNodeObjectFactory } from
   'domain/story/StoryNodeObjectFactory';
+
+interface IStoryContentsBackendDict {
+  'initial_node_id': string;
+  'next_node_id': string;
+  'nodes': IStoryNodeBackendDict[];
+}
 
 export class StoryContents {
   _initialNodeId: string;
@@ -100,7 +106,7 @@ export class StoryContents {
     if (Object.keys(nodeTitles).length !== nodeIds.length) {
       for (var i = 0; i < nodeIds.length; i++) {
         if (!nodeTitles.hasOwnProperty(nodeIds[i])) {
-          throw Error('The node with id ' + nodeIds[i] + ' is invalid');
+          throw new Error('The node with id ' + nodeIds[i] + ' is invalid');
         }
       }
     }
@@ -122,11 +128,9 @@ export class StoryContents {
     return -1;
   }
 
-  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
-  // 'any' because the return type is a list with varying element types.
-  validate(): any {
+  validate(): string[] {
     this._disconnectedNodes = [];
-    var issues = [];
+    var issues: string[] = [];
     var nodes = this._nodes;
     for (var i = 0; i < nodes.length; i++) {
       var nodeIssues = nodes[i].validate();
@@ -148,7 +152,7 @@ export class StoryContents {
     for (var i = 0; i < nodeIds.length; i++) {
       var nodeId = nodeIds[i];
       if (nodeIds.indexOf(nodeId) < nodeIds.lastIndexOf(nodeId)) {
-        throw Error(
+        throw new Error(
           'The node with id ' + nodeId + ' is duplicated in the story');
       }
     }
@@ -162,7 +166,7 @@ export class StoryContents {
         initialNodeIsPresent = true;
       }
       if (nodeIdNumber > nextNodeIdNumber) {
-        throw Error(
+        throw new Error(
           'Node id out of bounds for node with id ' + nodes[i].getId());
       }
       for (var j = 0; j < nodes[i].getDestinationNodeIds().length; j++) {
@@ -175,7 +179,7 @@ export class StoryContents {
     }
     if (nodes.length > 0) {
       if (!initialNodeIsPresent) {
-        throw Error(
+        throw new Error(
           'Initial node - ' + this._initialNodeId +
           ' - is not present in the story');
       }
@@ -247,14 +251,11 @@ export class StoryContents {
     return issues;
   }
 
-  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
-  // 'any' because the return type is an assignment statement and should be
-  // typed as void and the return statement should be removed.
-  setInitialNodeId(nodeId: string): any {
+  setInitialNodeId(nodeId: string): void {
     if (this.getNodeIndex(nodeId) === -1) {
-      throw Error('The node with given id doesn\'t exist');
+      throw new Error('The node with given id doesn\'t exist');
     }
-    return this._initialNodeId = nodeId;
+    this._initialNodeId = nodeId;
   }
 
   addNode(title: string): void {
@@ -269,13 +270,13 @@ export class StoryContents {
 
   deleteNode(nodeId: string): void {
     if (this.getNodeIndex(nodeId) === -1) {
-      throw Error('The node does not exist');
+      throw new Error('The node does not exist');
     }
     if (nodeId === this._initialNodeId) {
       if (this._nodes.length === 1) {
         this._initialNodeId = null;
       } else {
-        throw Error('Cannot delete initial story node');
+        throw new Error('Cannot delete initial story node');
       }
     }
     for (var i = 0; i < this._nodes.length; i++) {
@@ -289,7 +290,7 @@ export class StoryContents {
   setNodeOutline(nodeId: string, outline: string): void {
     var index = this.getNodeIndex(nodeId);
     if (index === -1) {
-      throw Error('The node with given id doesn\'t exist');
+      throw new Error('The node with given id doesn\'t exist');
     }
     this._nodes[index].setOutline(outline);
   }
@@ -297,20 +298,31 @@ export class StoryContents {
   setNodeTitle(nodeId: string, title: string): void {
     var index = this.getNodeIndex(nodeId);
     if (index === -1) {
-      throw Error('The node with given id doesn\'t exist');
+      throw new Error('The node with given id doesn\'t exist');
     }
     this._nodes[index].setTitle(title);
+  }
+
+  setNodeDescription(nodeId: string, description: string): void {
+    var index = this.getNodeIndex(nodeId);
+    if (index === -1) {
+      throw new Error('The node with given id doesn\'t exist');
+    }
+    this._nodes[index].setDescription(description);
   }
 
   setNodeExplorationId(nodeId: string, explorationId: string): void {
     var index = this.getNodeIndex(nodeId);
     if (index === -1) {
-      throw Error('The node with given id doesn\'t exist');
-    } else if (explorationId !== null || explorationId !== '') {
-      for (var i = 0; i < this._nodes.length; i++) {
-        if ((this._nodes[i].getExplorationId() === explorationId) && (
-          i !== index)) {
-          throw Error('The given exploration already exists in the story.');
+      throw new Error('The node with given id doesn\'t exist');
+    } else {
+      if (explorationId !== null) {
+        for (var i = 0; i < this._nodes.length; i++) {
+          if ((this._nodes[i].getExplorationId() === explorationId) && (
+            i !== index)) {
+            throw new Error(
+              'The given exploration already exists in the story.');
+          }
         }
       }
       this._nodes[index].setExplorationId(explorationId);
@@ -320,7 +332,7 @@ export class StoryContents {
   markNodeOutlineAsFinalized(nodeId: string): void {
     var index = this.getNodeIndex(nodeId);
     if (index === -1) {
-      throw Error('The node with given id doesn\'t exist');
+      throw new Error('The node with given id doesn\'t exist');
     }
     this._nodes[index].markOutlineAsFinalized();
   }
@@ -328,7 +340,7 @@ export class StoryContents {
   markNodeOutlineAsNotFinalized(nodeId: string): void {
     var index = this.getNodeIndex(nodeId);
     if (index === -1) {
-      throw Error('The node with given id doesn\'t exist');
+      throw new Error('The node with given id doesn\'t exist');
     }
     this._nodes[index].markOutlineAsNotFinalized();
   }
@@ -336,7 +348,7 @@ export class StoryContents {
   addPrerequisiteSkillIdToNode(nodeId: string, skillId: string): void {
     var index = this.getNodeIndex(nodeId);
     if (index === -1) {
-      throw Error('The node with given id doesn\'t exist');
+      throw new Error('The node with given id doesn\'t exist');
     }
     this._nodes[index].addPrerequisiteSkillId(skillId);
   }
@@ -344,7 +356,7 @@ export class StoryContents {
   removePrerequisiteSkillIdFromNode(nodeId: string, skillId: string): void {
     var index = this.getNodeIndex(nodeId);
     if (index === -1) {
-      throw Error('The node with given id doesn\'t exist');
+      throw new Error('The node with given id doesn\'t exist');
     }
     this._nodes[index].removePrerequisiteSkillId(skillId);
   }
@@ -352,7 +364,7 @@ export class StoryContents {
   addAcquiredSkillIdToNode(nodeId: string, skillId: string): void {
     var index = this.getNodeIndex(nodeId);
     if (index === -1) {
-      throw Error('The node with given id doesn\'t exist');
+      throw new Error('The node with given id doesn\'t exist');
     }
     this._nodes[index].addAcquiredSkillId(skillId);
   }
@@ -360,7 +372,7 @@ export class StoryContents {
   removeAcquiredSkillIdFromNode(nodeId: string, skillId: string): void {
     var index = this.getNodeIndex(nodeId);
     if (index === -1) {
-      throw Error('The node with given id doesn\'t exist');
+      throw new Error('The node with given id doesn\'t exist');
     }
     this._nodes[index].removeAcquiredSkillId(skillId);
   }
@@ -368,10 +380,10 @@ export class StoryContents {
   addDestinationNodeIdToNode(nodeId: string, destinationNodeId: string): void {
     var index = this.getNodeIndex(nodeId);
     if (index === -1) {
-      throw Error('The node with given id doesn\'t exist');
+      throw new Error('The node with given id doesn\'t exist');
     }
     if (this.getNodeIndex(destinationNodeId) === -1) {
-      throw Error('The destination node with given id doesn\'t exist');
+      throw new Error('The destination node with given id doesn\'t exist');
     }
     this._nodes[index].addDestinationNodeId(destinationNodeId);
   }
@@ -380,7 +392,7 @@ export class StoryContents {
       nodeId: string, destinationNodeId: string): void {
     var index = this.getNodeIndex(nodeId);
     if (index === -1) {
-      throw Error('The node with given id doesn\'t exist');
+      throw new Error('The node with given id doesn\'t exist');
     }
     this._nodes[index].removeDestinationNodeId(destinationNodeId);
   }
@@ -391,11 +403,8 @@ export class StoryContents {
 })
 export class StoryContentsObjectFactory {
   constructor(private storyNodeObjectFactory: StoryNodeObjectFactory) {}
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'storyContentsBackendObject' is a dict with underscore_cased
-  // keys which give tslint errors against underscore_casing in favor of
-  // camelCasing.
-  createFromBackendDict(storyContentsBackendObject: any): StoryContents {
+  createFromBackendDict(
+      storyContentsBackendObject: IStoryContentsBackendDict): StoryContents {
     var nodes = [];
     for (var i = 0; i < storyContentsBackendObject.nodes.length; i++) {
       nodes.push(

@@ -24,6 +24,8 @@ import { LibraryPageConstants } from
   'pages/library-page/library-page.constants';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
+import { ExplorationMetadataObjectFactory } from
+  'domain/exploration/ExplorationMetadataObjectFactory';
 
 @Injectable({
   providedIn: 'root'
@@ -38,13 +40,17 @@ export class SearchExplorationsBackendApiService {
       searchQuery: string, successCallback: (
       value?: Object | PromiseLike<Object>) => void,
       errorCallback: (reason?: any) => void): void {
+    var explorationMetadataObject = null;
     var queryUrl = this.urlInterpolationService.interpolateUrl(
       LibraryPageConstants.SEARCH_EXPLORATION_URL_TEMPLATE, {
         query: btoa(searchQuery)
       }
     );
     this.http.get(queryUrl).toPromise().then((response) => {
-      successCallback(response);
+      explorationMetadataObject = (
+        ExplorationMetadataObjectFactory.createFromBackendDict(
+          angular.copy(response)));
+      successCallback(explorationMetadataObject);
     }, (errorResponse) => {
       errorCallback(errorResponse);
     });

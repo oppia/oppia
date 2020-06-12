@@ -248,7 +248,7 @@ angular.module('oppia').factory('ExplorationEngineService', [
           manualParamChanges = manualParamChangesToInit;
           initStateName = activeStateNameFromPreviewTab;
         } else {
-          throw 'Error: cannot populate exploration in learner mode.';
+          throw new Error('Cannot populate exploration in learner mode.');
         }
       },
       /**

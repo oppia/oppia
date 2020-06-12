@@ -86,7 +86,10 @@ describe('Collection editor state service', function() {
     var _fetchCollectionRights = function() {
       return $q(function(resolve, reject) {
         if (!self.failure) {
-          resolve(self.backendCollectionRightsObject);
+          resolve(
+            collectionRightsObjectFactory.create(
+              self.backendCollectionRightsObject
+            ));
         } else {
           reject();
         }
@@ -409,7 +412,7 @@ describe('Collection editor state service', function() {
     function() {
       expect(function() {
         CollectionEditorStateService.saveCollection('Commit message');
-      }).toThrow();
+      }).toThrowError('Cannot save a collection before one is loaded.');
     }
   );
 

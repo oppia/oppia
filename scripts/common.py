@@ -30,25 +30,36 @@ import sys
 import python_utils
 import release_constants
 
-PSUTIL_VERSION = '5.6.7'
 
 CURRENT_PYTHON_BIN = sys.executable
-NODE_VERSION = '10.18.0'
-PYLINT_VERSION = '1.9.4'
+
+# Versions of libraries used in devflow.
+COVERAGE_VERSION = '5.1'
+ESPRIMA_VERSION = '4.0.1'
+ISORT_VERSION = '4.3.21'
 PYCODESTYLE_VERSION = '2.5.0'
+PSUTIL_VERSION = '5.7.0'
+PYLINT_VERSION = '1.9.5'
 PYLINT_QUOTES_VERSION = '0.1.8'
+PYGITHUB_VERSION = '1.45'
+WEBTEST_VERSION = '2.0.35'
+
+# Node version.
+NODE_VERSION = '12.16.2'
 
 # NB: Please ensure that the version is consistent with the version in .yarnrc.
-YARN_VERSION = '1.22.0'
+YARN_VERSION = '1.22.4'
 
-COVERAGE_VERSION = '4.5.4'
+# Versions of libraries used in backend.
+PILLOW_VERSION = '6.2.2'
 
 RELEASE_BRANCH_NAME_PREFIX = 'release-'
 CURR_DIR = os.path.abspath(os.getcwd())
 OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, os.pardir, 'oppia_tools')
+OPPIA_TOOLS_DIR_ABS_PATH = os.path.abspath(OPPIA_TOOLS_DIR)
 THIRD_PARTY_DIR = os.path.join(CURR_DIR, 'third_party')
 GOOGLE_APP_ENGINE_HOME = os.path.join(
-    OPPIA_TOOLS_DIR, 'google_appengine_1.9.67', 'google_appengine')
+    OPPIA_TOOLS_DIR_ABS_PATH, 'google_appengine_1.9.67', 'google_appengine')
 GOOGLE_CLOUD_SDK_HOME = os.path.join(
     OPPIA_TOOLS_DIR, 'google-cloud-sdk-251.0.0', 'google-cloud-sdk')
 NODE_PATH = os.path.join(OPPIA_TOOLS_DIR, 'node-%s' % NODE_VERSION)
@@ -63,10 +74,15 @@ YARN_PATH = os.path.join(OPPIA_TOOLS_DIR, 'yarn-%s' % YARN_VERSION)
 OS_NAME = platform.system()
 ARCHITECTURE = platform.machine()
 PSUTIL_DIR = os.path.join(OPPIA_TOOLS_DIR, 'psutil-%s' % PSUTIL_VERSION)
+
 RELEASE_BRANCH_REGEX = r'release-(\d+\.\d+\.\d+)$'
 RELEASE_MAINTENANCE_BRANCH_REGEX = r'release-maintenance-(\d+\.\d+\.\d+)$'
 HOTFIX_BRANCH_REGEX = r'release-(\d+\.\d+\.\d+)-hotfix-[1-9]+$'
 TEST_BRANCH_REGEX = r'test-[A-Za-z0-9-]*$'
+USER_PREFERENCES = {'open_new_tab_in_browser': None}
+
+FECONF_PATH = os.path.join('.', 'feconf.py')
+CONSTANTS_FILE_PATH = os.path.join('assets', 'constants.ts')
 
 
 def is_windows_os():
@@ -139,6 +155,15 @@ def require_cwd_to_be_oppia(allow_deploy_dir=False):
 
 def open_new_tab_in_browser_if_possible(url):
     """Opens the given URL in a new browser tab, if possible."""
+    if USER_PREFERENCES['open_new_tab_in_browser'] is None:
+        python_utils.PRINT(
+            'Do you want the url to be opened in the browser? '
+            'Confirm by entering y/ye/yes.')
+        USER_PREFERENCES['open_new_tab_in_browser'] = python_utils.INPUT()
+    if USER_PREFERENCES['open_new_tab_in_browser'] not in ['y', 'ye', 'yes']:
+        python_utils.PRINT(
+            'Please open the following link in browser: %s' % url)
+        return
     browser_cmds = ['chromium-browser', 'google-chrome', 'firefox']
     for cmd in browser_cmds:
         if subprocess.call(['which', cmd]) == 0:
@@ -226,6 +251,17 @@ def get_current_release_version_number(release_branch_name):
         return hotfix_match.group(1)
     else:
         raise Exception('Invalid branch name: %s.' % release_branch_name)
+
+
+def is_current_branch_a_hotfix_branch():
+    """Checks if the current branch is a hotfix branch.
+
+    Returns:
+        bool. Whether the current branch is hotfix branch.
+    """
+    current_branch_name = get_current_branch_name()
+    return bool(
+        re.match(HOTFIX_BRANCH_REGEX, current_branch_name))
 
 
 def is_current_branch_a_release_branch():

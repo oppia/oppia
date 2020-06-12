@@ -19,37 +19,36 @@
 import 'core-js/es7/reflect';
 import 'zone.js';
 
-import { Component, NgModule, StaticProvider } from '@angular/core';
+angular.module('oppia', [
+  'headroom', require('angular-cookies'), 'ngTouch', 'ngSanitize',
+  'pascalprecht.translate', 'toastr', 'ui.bootstrap'
+]);
+
+import { NgModule, StaticProvider } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { downgradeComponent } from '@angular/upgrade/static';
 import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
-import { RequestInterceptor } from 'services/request-interceptor.service';
-
-// This component is needed to force-bootstrap Angular at the beginning of the
-// app.
-@Component({
-  selector: 'service-bootstrap',
-  template: ''
-})
-export class ServiceBootstrapComponent {}
 
 import { AppConstants } from 'app.constants';
+import { DonatePageComponent } from './donate-page.component';
 import { InteractionsExtensionsConstants } from
   'interactions/interactions-extension.constants';
 import { ObjectsDomainConstants } from
   'domain/objects/objects-domain.constants';
+import { RequestInterceptor } from 'services/request-interceptor.service';
+import { SharedComponentsModule } from 'components/shared-component.module';
 
 @NgModule({
   imports: [
     BrowserModule,
-    HttpClientModule
+    HttpClientModule,
+    SharedComponentsModule
   ],
   declarations: [
-    ServiceBootstrapComponent
+    DonatePageComponent
   ],
   entryComponents: [
-    ServiceBootstrapComponent
+    DonatePageComponent
   ],
   providers: [
     AppConstants,
@@ -76,19 +75,4 @@ const bootstrapFn = (extraProviders: StaticProvider[]) => {
 };
 const downgradedModule = downgradeModule(bootstrapFn);
 
-declare var angular: ng.IAngularStatic;
-
-angular.module('oppia', [
-  'dndLists', 'headroom', 'infinite-scroll', 'ngAnimate',
-  'ngAudio', require('angular-cookies'), 'ngImgCrop', 'ngJoyRide', 'ngMaterial',
-  'ngResource', 'ngSanitize', 'ngTouch', 'pascalprecht.translate',
-  'toastr', 'ui.bootstrap', 'ui.sortable', 'ui.tree', 'ui.validate',
-  downgradedModule
-])
-  // This directive is the downgraded version of the Angular component to
-  // bootstrap the Angular 8.
-  .directive(
-    'serviceBootstrap',
-    downgradeComponent({
-      component: ServiceBootstrapComponent
-    }) as angular.IDirectiveFactory);
+angular.module('oppia').requires.push(downgradedModule);

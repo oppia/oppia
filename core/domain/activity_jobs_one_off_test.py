@@ -21,10 +21,12 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
 
+from constants import constants
 from core.domain import activity_jobs_one_off
 from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import exp_domain
+from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import rights_manager
 from core.domain import search_services
@@ -39,6 +41,205 @@ gae_search_services = models.Registry.import_search_services()
 
 (collection_models, exp_models) = models.Registry.import_models(
     [models.NAMES.collection, models.NAMES.exploration])
+
+
+class ActivityContributorsSummaryOneOffJobTests(test_utils.GenericTestBase):
+    ONE_OFF_JOB_MANAGERS_FOR_TESTS = [
+        activity_jobs_one_off.ActivityContributorsSummaryOneOffJob]
+
+    EXP_ID = 'exp_id'
+    COL_ID = 'col_id'
+
+    USERNAME_A = 'usernamea'
+    USERNAME_B = 'usernameb'
+    EMAIL_A = 'emaila@example.com'
+    EMAIL_B = 'emailb@example.com'
+
+    def setUp(self):
+        super(ActivityContributorsSummaryOneOffJobTests, self).setUp()
+        self.signup(self.EMAIL_A, self.USERNAME_A)
+        self.signup(self.EMAIL_B, self.USERNAME_B)
+
+        self.user_a_id = self.get_user_id_from_email(self.EMAIL_A)
+        self.user_b_id = self.get_user_id_from_email(self.EMAIL_B)
+
+    def _run_one_off_job(self):
+        """Runs the one-off MapReduce job."""
+        job_id = (
+            activity_jobs_one_off.ActivityContributorsSummaryOneOffJob
+            .create_new())
+        activity_jobs_one_off.ActivityContributorsSummaryOneOffJob.enqueue(
+            job_id)
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_tasks()
+        stringified_output = (
+            activity_jobs_one_off.ActivityContributorsSummaryOneOffJob
+            .get_output(job_id))
+        eval_output = [ast.literal_eval(stringified_item) for
+                       stringified_item in stringified_output]
+        return eval_output
+
+    def test_contributors_for_valid_nonrevert_contribution(self):
+        # Let USER A make three commits.
+        exploration = self.save_new_valid_exploration(
+            self.EXP_ID, self.user_a_id)
+        collection = self.save_new_valid_collection(self.COL_ID, self.user_a_id)
+
+        exp_services.update_exploration(
+            self.user_a_id, self.EXP_ID, [exp_domain.ExplorationChange({
+                'cmd': 'edit_exploration_property',
+                'property_name': 'title',
+                'new_value': 'New Exploration Title'
+            })], 'Changed title.')
+        exp_services.update_exploration(
+            self.user_a_id, self.EXP_ID, [exp_domain.ExplorationChange({
+                'cmd': 'edit_exploration_property',
+                'property_name': 'objective',
+                'new_value': 'New Objective'
+            })], 'Changed Objective.')
+        collection_services.update_collection(
+            self.user_a_id, self.COL_ID, [{
+                'cmd': 'edit_collection_property',
+                'property_name': 'title',
+                'new_value': 'New Exploration Title'
+            }], 'Changed title.')
+        collection_services.update_collection(
+            self.user_a_id, self.COL_ID, [{
+                'cmd': 'edit_collection_property',
+                'property_name': 'objective',
+                'new_value': 'New Objective'
+            }], 'Changed Objective.')
+
+        output = self._run_one_off_job()
+        self.assertEqual([['SUCCESS', 3]], output)
+
+        exploration_summary = exp_fetchers.get_exploration_summary_by_id(
+            exploration.id)
+        self.assertEqual([self.user_a_id], exploration_summary.contributor_ids)
+        self.assertEqual(
+            {self.user_a_id: 3}, exploration_summary.contributors_summary)
+
+        collection_summary = collection_services.get_collection_summary_by_id(
+            collection.id)
+        self.assertEqual([self.user_a_id], collection_summary.contributor_ids)
+        self.assertEqual(
+            {self.user_a_id: 3}, collection_summary.contributors_summary)
+
+    def test_contributors_with_only_reverts_not_included(self):
+        # Let USER A make three commits.
+        exploration = self.save_new_valid_exploration(
+            self.EXP_ID, self.user_a_id, title='Exploration Title 1')
+
+        exp_services.update_exploration(
+            self.user_a_id, self.EXP_ID, [exp_domain.ExplorationChange({
+                'cmd': 'edit_exploration_property',
+                'property_name': 'title',
+                'new_value': 'New Exploration Title'
+            })], 'Changed title.')
+        exp_services.update_exploration(
+            self.user_a_id, self.EXP_ID, [exp_domain.ExplorationChange({
+                'cmd': 'edit_exploration_property',
+                'property_name': 'objective',
+                'new_value': 'New Objective'
+            })], 'Changed Objective.')
+
+        # Let the second user revert version 3 to version 2.
+        exp_services.revert_exploration(self.user_b_id, self.EXP_ID, 3, 2)
+
+        output = self._run_one_off_job()
+        self.assertEqual([['SUCCESS', 1]], output)
+
+        exploration_summary = exp_fetchers.get_exploration_summary_by_id(
+            exploration.id)
+        self.assertEqual([self.user_a_id], exploration_summary.contributor_ids)
+        self.assertEqual(
+            {self.user_a_id: 2}, exploration_summary.contributors_summary)
+
+    def test_reverts_not_counted(self):
+        # Let USER A make 3 non-revert commits.
+        exploration = self.save_new_valid_exploration(
+            self.EXP_ID, self.user_a_id, title='Exploration Title')
+        exp_services.update_exploration(
+            self.user_a_id, self.EXP_ID, [exp_domain.ExplorationChange({
+                'cmd': 'edit_exploration_property',
+                'property_name': 'title',
+                'new_value': 'New Exploration Title'
+            })], 'Changed title.')
+        exp_services.update_exploration(
+            self.user_a_id, self.EXP_ID, [exp_domain.ExplorationChange({
+                'cmd': 'edit_exploration_property',
+                'property_name': 'objective',
+                'new_value': 'New Objective'
+            })], 'Changed Objective.')
+
+        # Let USER A revert version 3 to version 2.
+        exp_services.revert_exploration(self.user_a_id, self.EXP_ID, 3, 2)
+
+        output = self._run_one_off_job()
+        self.assertEqual([['SUCCESS', 1]], output)
+
+        # Check that USER A's number of contributions is equal to 2.
+        exploration_summary = exp_fetchers.get_exploration_summary_by_id(
+            exploration.id)
+        self.assertEqual([self.user_a_id], exploration_summary.contributor_ids)
+        self.assertEqual(
+            {self.user_a_id: 2}, exploration_summary.contributors_summary)
+
+    def test_nonhuman_committers_not_counted(self):
+        # Create a commit with the system user id.
+        exploration = self.save_new_valid_exploration(
+            self.EXP_ID, feconf.SYSTEM_COMMITTER_ID, title='Original Title')
+        collection = self.save_new_valid_collection(self.COL_ID, self.user_a_id)
+
+        # Create commits with all the system user ids.
+        for system_id in constants.SYSTEM_USER_IDS:
+            exp_services.update_exploration(
+                system_id, self.EXP_ID, [exp_domain.ExplorationChange({
+                    'cmd': 'edit_exploration_property',
+                    'property_name': 'title',
+                    'new_value': 'Title changed by %s' % system_id
+                })], 'Changed title.')
+            collection_services.update_collection(
+                system_id, self.COL_ID, [{
+                    'cmd': 'edit_collection_property',
+                    'property_name': 'title',
+                    'new_value': 'New Exploration Title'
+                }], 'Changed title.')
+
+        output = self._run_one_off_job()
+        self.assertEqual([['SUCCESS', 3]], output)
+
+        # Check that no system id was added to the exploration's
+        # contributor's summary.
+        exploration_summary = exp_fetchers.get_exploration_summary_by_id(
+            exploration.id)
+        collection_summary = collection_services.get_collection_summary_by_id(
+            collection.id)
+        for system_id in constants.SYSTEM_USER_IDS:
+            self.assertNotIn(
+                system_id,
+                exploration_summary.contributors_summary)
+            self.assertNotIn(
+                system_id,
+                exploration_summary.contributor_ids)
+            self.assertNotIn(
+                system_id,
+                collection_summary.contributors_summary)
+            self.assertNotIn(
+                system_id,
+                collection_summary.contributor_ids)
+
+    def test_deleted_exploration(self):
+        self.save_new_valid_exploration(
+            self.EXP_ID, self.user_a_id)
+        exp_services.delete_exploration(feconf.SYSTEM_COMMITTER_ID, self.EXP_ID)
+
+        self.process_and_flush_pending_tasks()
+
+        output = self._run_one_off_job()
+        self.assertEqual([], output)
 
 
 class AuditContributorsOneOffJobTests(test_utils.GenericTestBase):
