@@ -20,22 +20,18 @@
 // may be additional customization options for the editor that should be passed
 // in via initArgs.
 
-angular.module('oppia').component('mathEditor', {
+angular.module('oppia').component('algebraicExpressionEditor', {
   bindings: {
     value: '='
   },
-  template: require('./math-editor.component.html'),
+  template: require('./algebraic-expression-editor.component.html'),
   controller: [function() {
     const ctrl = this;
 
     ctrl.assignIdToGuppyDiv = function() {
       // Dynamically assigns a unique id to the guppy-div
       var divId = 'guppy_' + Math.floor(Math.random() * 100000000);
-      var allElements = document.querySelectorAll('.guppy-div');
-      // Selecting the newest div, since there could be multiple divs active
-      // at the same time, so we want to activate the latest one.
-      var newestElement = allElements[allElements.length - 1];
-      newestElement.setAttribute('id', divId);
+      $('.guppy-div-creator').attr('id', divId);
       return divId;
     };
 

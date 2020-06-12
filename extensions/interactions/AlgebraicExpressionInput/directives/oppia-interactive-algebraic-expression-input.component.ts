@@ -25,7 +25,6 @@ require(
   'algebraic-expression-input-rules.service.ts');
 require(
   'pages/exploration-player-page/services/current-interaction.service.ts');
-require('../../../objects/templates/math-editor.component.ts');
 
 angular.module('oppia').component('oppiaInteractiveAlgebraicExpressionInput', {
   template: require('./algebraic-expression-input-interaction.component.html'),
@@ -39,9 +38,13 @@ angular.module('oppia').component('oppiaInteractiveAlgebraicExpressionInput', {
       ctrl.assignIdToGuppyDiv = function() {
         // Dynamically assigns a unique id to the guppy-div
         var divId = 'guppy_' + Math.floor(Math.random() * 100000000);
-        var allElements = document.querySelectorAll('.guppy-div');
-        // Selecting the newest div, since there could be multiple divs active
-        // at the same time, so we want to activate the latest one.
+        var allElements = document.querySelectorAll('.guppy-div-learner');
+        // At a given point in time, there could be two instances of learner
+        // facing guppy divs. One in the interaction editing panel, and the
+        // other in the exploration preview tab. The last element gives us the
+        // latter div, which is the one we need to watch for changes. This is
+        // why the last element has been chosen from the querySelectorAll's
+        // result.
         var newestElement = allElements[allElements.length - 1];
         newestElement.setAttribute('id', divId);
         return divId;

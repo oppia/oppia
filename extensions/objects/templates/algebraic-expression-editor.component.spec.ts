@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the math editor.
  */
 
-describe('MathEditor', function() {
+describe('AlgebraicExpressionEditor', function() {
   var MathEditorCtrl = null;
   class MockGuppy {
     constructor(id: string, config: Object) {}

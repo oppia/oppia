@@ -19,15 +19,26 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
+const nerdamer = require('../../../../node_modules/nerdamer');
+
 @Injectable({
   providedIn: 'root'
 })
 export class AlgebraicExpressionInputRulesService {
-  // TODO(#7165): Replace 'any' with the exact type. This has been typed
-  // as 'any' since 'answer' is a complex object having varying types. A general
-  // type needs to be found. Same goes for 'inputs'.
-  MatchesExactlyWith(answer: any, inputs: any): boolean {
-    return true;
+  MatchesExactlyWith(answer: string, inputs: {x: string}): boolean {
+    return nerdamer(answer).eq(inputs.x);
+  }
+
+  IsEquivalentTo(answer: string, inputs: {x: string}): boolean {
+    var expandedLearnerAnswer = nerdamer(`expand(${answer})`);
+    var simplifiedLearnerAnswer = nerdamer(
+      `simplify(${expandedLearnerAnswer})`);
+
+    var expandedCreatorAnswer = nerdamer(`expand(${inputs.x})`);
+    var simplifiedCreatorAnswer = nerdamer(
+      `simplify(${expandedCreatorAnswer})`);
+
+    return nerdamer(simplifiedLearnerAnswer).eq(simplifiedCreatorAnswer);
   }
 }
 

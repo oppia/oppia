@@ -1045,3 +1045,15 @@ class DragAndDropPositiveInt(BaseObject):
     default_value = 1
 
     SCHEMA = PositiveInt.SCHEMA
+
+
+class AlgebraicExpression(BaseObject):
+    """Class for algebraic expressions. Stores a unicode string representing a
+    valid algebraic expression.
+    """
+
+    description = 'A unicode string for an algebraic expression.'
+
+    SCHEMA = {
+        'type': 'unicode'
+    }

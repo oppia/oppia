@@ -842,7 +842,8 @@
     "is_terminal": false,
     "default_outcome_heading": null,
     "rule_descriptions": {
-      "MatchesExactlyWith": "matches exactly with {{x|UnicodeString}}"
+      "MatchesExactlyWith": "matches exactly with {{x|AlgebraicExpression}}",
+      "IsEquivalentTo": "is equivalent to {{x|AlgebraicExpression}}"
     }
   },
   "FractionInput": {

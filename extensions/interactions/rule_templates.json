@@ -120,7 +120,10 @@
   },
   "AlgebraicExpressionInput": {
     "MatchesExactlyWith": {
-      "description": "matches exactly with {{x|UnicodeString}}"
+      "description": "matches exactly with {{x|AlgebraicExpression}}"
+    },
+    "IsEquivalentTo": {
+      "description": "is equivalent to {{x|AlgebraicExpression}}"
     }
   },
   "MultipleChoiceInput": {

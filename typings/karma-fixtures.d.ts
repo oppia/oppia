@@ -100,6 +100,7 @@ interface IRuleDescription {
 interface IRuleTemplates {
   AlgebraicExpressionInput: {
     MatchesExactlyWith: IRuleDescription;
+    IsEquivalentTo: IRuleDescription;
   };
   CodeRepl: {
     CodeEquals: IRuleDescription;
