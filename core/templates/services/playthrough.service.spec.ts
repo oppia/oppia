@@ -320,15 +320,15 @@ describe('PlaythroughService', () => {
           jasmine.createSpyObj('Stopwatch', {getTimeInSecs: 35, reset: null}));
 
         playthroughService.recordExplorationStartAction('stateName1');
-          playthroughService.recordAnswerSubmitAction(
-            'stateName1', 'stateName1', 'TextInput', 'Hello', 'Try again', 5);
-          playthroughService.recordAnswerSubmitAction(
-            'stateName1', 'stateName1', 'TextInput', 'Hello', 'Try again', 5);
-          playthroughService.recordAnswerSubmitAction(
-            'stateName1', 'stateName1', 'TextInput', 'Hello', 'Try again', 5);
-          playthroughService.recordAnswerSubmitAction(
-            'stateName1', 'stateName1', 'TextInput', 'Hello', 'Try again', 5);
-          playthroughService.recordAnswerSubmitAction(
+        playthroughService.recordAnswerSubmitAction(
+          'stateName1', 'stateName1', 'TextInput', 'Hello', 'Try again', 5);
+        playthroughService.recordAnswerSubmitAction(
+          'stateName1', 'stateName1', 'TextInput', 'Hello', 'Try again', 5);
+        playthroughService.recordAnswerSubmitAction(
+          'stateName1', 'stateName1', 'TextInput', 'Hello', 'Try again', 5);
+        playthroughService.recordAnswerSubmitAction(
+          'stateName1', 'stateName1', 'TextInput', 'Hello', 'Try again', 5);
+        playthroughService.recordAnswerSubmitAction(
             'stateName1', 'stateName1', 'TextInput', 'Hello', 'Try again', 5);
         playthroughService.recordExplorationQuitAction('stateName1', 10);
 

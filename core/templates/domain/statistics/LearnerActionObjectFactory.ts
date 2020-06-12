@@ -60,7 +60,7 @@ export class LearnerAction {
       action_type: this.actionType,
       schema_version: this.schemaVersion,
       action_customization_args: this.actionCustomizationArgs,
-    }
+    };
   }
 }
 

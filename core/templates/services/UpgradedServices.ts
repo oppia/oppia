@@ -1026,7 +1026,7 @@ export class UpgradedServices {
     upgradedServices['PlaythroughBackendApiService'] =
       new PlaythroughBackendApiService(
         upgradedServices['HttpClient'],
-        upgradedServices['UrlInterpolationService'])
+        upgradedServices['UrlInterpolationService']);
     upgradedServices['PretestQuestionBackendApiService'] =
       new PretestQuestionBackendApiService(
         upgradedServices['UrlInterpolationService'],
