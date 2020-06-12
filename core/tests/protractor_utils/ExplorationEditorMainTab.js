@@ -551,45 +551,6 @@ var ExplorationEditorMainTab = function() {
       addHintModal, 'Add Hint modal takes too long to close');
   };
 
-  // Hints are zero-indexed.
-  this.getHintEditor = function(hintNum) {
-    var confirmDeteletHintButton = element(
-      by.css('.protractor-test-confirm-delete-hint'));
-    var headerElem = element.all(by.css('.protractor-test-hint-tab')).get(
-      hintNum);
-    var deleteHintIcon = headerElem.element(
-      by.css('.protractor-test-delete-response'));
-    var hintBodyElem = element(
-      by.css('.protractor-test-hint-body-' + hintNum));
-    hintBodyElem.isPresent().then(function(isVisible) {
-      if (!isVisible) {
-        headerElem.click();
-      }
-    });
-    return {
-      setHint: function(hint) {
-        var editHintIcon = element(
-          by.css('.protractor-test-open-hint-editor'));
-        editHintIcon.click();
-        browser.switchTo().activeElement().clear();
-        browser.switchTo().activeElement().sendKeys(hint);
-        waitFor.elementToBeClickable(
-          saveHintEditButton,
-          'Save Hint button takes too long to be clickable');
-        saveHintEditButton.click();
-        waitFor.visibilityOf(
-          editHintIcon, 'Add Hint modal takes too long to close');
-      },
-      deleteHint: function() {
-        deleteHintIcon.click();
-        confirmDeteletHintButton.click();
-      },
-      expectCannotDeleteHint: function() {
-        expect(deleteHintIcon.isPresent()).toBeFalsy();
-      }
-    };
-  };
-
   this.addSolution = async function(interactionId, solution) {
     await addSolutionButton.click();
     var addOrUpdateSolutionModal = element(
@@ -761,82 +722,7 @@ var ExplorationEditorMainTab = function() {
     await richTextInstructions(feedbackEditor);
   };
 
-  // PARAMETERS
-
-  // This function adds a multiple-choice parameter change, creating the
-  // parameter if necessary.
-  this.addMultipleChoiceParameterChange = function(paramName, paramValues) {
-    waitFor.elementToBeClickable(
-      editParamChanges, 'Edit Param Changes is not clickable');
-    editParamChanges.click();
-
-    waitFor.elementToBeClickable(
-      addParamButton, 'Add Param button is not clickable');
-    addParamButton.click();
-
-    var editorRowElem = element.all(by.css(
-      '.protractor-test-param-changes-list')).last();
-
-    forms.AutocompleteDropdownEditor(editorRowElem).setValue(paramName);
-
-    var editorRowOption = editorRowElem.element(
-      by.cssContainingText('option', 'to one of'));
-    waitFor.elementToBeClickable(
-      editorRowOption, 'Param Options are not clickable');
-    editorRowOption.click();
-    paramValues.forEach(function(paramValue) {
-      var item = editorRowElem.all(by.tagName('input')).last();
-      item.clear();
-      item.sendKeys(paramValue);
-    });
-
-    waitFor.elementToBeClickable(
-      saveParamChangesButton, 'Save Param Changes button is not clickable');
-    saveParamChangesButton.click();
-
-    waitFor.invisibilityOf(
-      saveParamChangesButton,
-      'Param Changes editor takes too long to disappear');
-  };
-
-  // This function adds a parameter change, creating the parameter if necessary.
-  this.addParameterChange = function(paramName, paramValue) {
-    waitFor.elementToBeClickable(
-      editParamChanges, 'Param Changes editor is not clickable');
-    editParamChanges.click();
-
-    waitFor.elementToBeClickable(
-      addParamButton, 'Add Param button is not clickable');
-    addParamButton.click();
-
-    var editorRowElem = element.all(by.css(
-      '.protractor-test-param-changes-list')).last();
-
-    forms.AutocompleteDropdownEditor(editorRowElem).setValue(paramName);
-
-    var item = editorRowElem.all(by.tagName('input')).last();
-    waitFor.elementToBeClickable(item, 'Param Options are not clickable');
-    // Setting parameter value is difficult via css since input fields
-    // are dynamically generated. We isolate it as the last input in the
-    // current parameter changes UI.
-    item.click();
-    item.clear();
-    item.sendKeys(paramValue);
-
-    waitFor.elementToBeClickable(
-      saveParamChangesButton, 'Save Param Changes button is not clickable');
-    saveParamChangesButton.click();
-
-    waitFor.invisibilityOf(
-      saveParamChangesButton,
-      'Param Changes editor takes too long to disappear');
-  };
-
   // RULES
-  this.selectRuleInAddResponseModal = function(interactionId, ruleName) {
-    _selectRule(addResponseDetails, interactionId, ruleName);
-  };
-
   var _getRuleDescription = function(interactionId, ruleName) {
     if (ruleTemplates.hasOwnProperty(interactionId)) {
       if (ruleTemplates[interactionId].hasOwnProperty(ruleName)) {
@@ -1031,13 +917,6 @@ var ExplorationEditorMainTab = function() {
       stateNameContainer, name,
       'Current state name is:' + await stateNameContainer.getAttribute(
         'textContent') + 'instead of expected ' + name);
-  };
-
-  this.setSolicitAnswerDetailsFeature = function() {
-    waitFor.elementToBeClickable(
-      solicitAnswerDetailsCheckbox,
-      'Solicit answer details checkbox takes too long to be clickable');
-    solicitAnswerDetailsCheckbox.click();
   };
 
   this.expectCurrentStateToBe = async function(name) {

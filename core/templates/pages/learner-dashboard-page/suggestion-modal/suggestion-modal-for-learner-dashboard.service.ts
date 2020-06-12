@@ -16,21 +16,21 @@
  * @fileoverview Service to display suggestion modal in learner view.
  */
 
+require(
+  'pages/learner-dashboard-page/suggestion-modal/' +
+  'learner-dashboard-suggestion-modal.controller.ts');
+
 require('domain/utilities/url-interpolation.service.ts');
-require('services/suggestion-modal.service.ts');
 
 angular.module('oppia').factory('SuggestionModalForLearnerDashboardService', [
   '$uibModal', 'UrlInterpolationService',
   function($uibModal, UrlInterpolationService) {
-    var _templateUrl = UrlInterpolationService.getDirectiveTemplateUrl(
-      '/pages/learner-dashboard-page/suggestion-modal/' +
-      'learner-dashboard-suggestion-modal.directive.html'
-    );
-
     var _showEditStateContentSuggestionModal = function(
         newContent, oldContent, description) {
       $uibModal.open({
-        templateUrl: _templateUrl,
+        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+          '/pages/learner-dashboard-page/suggestion-modal/' +
+          'learner-dashboard-suggestion-modal.directive.html'),
         backdrop: true,
         resolve: {
           newContent: function() {
@@ -43,19 +43,7 @@ angular.module('oppia').factory('SuggestionModalForLearnerDashboardService', [
             return description;
           }
         },
-        controller: [
-          '$scope', '$uibModalInstance', 'SuggestionModalService',
-          'description', 'newContent', 'oldContent',
-          function($scope, $uibModalInstance, SuggestionModalService,
-              description, newContent, oldContent) {
-            $scope.newContent = newContent;
-            $scope.oldContent = oldContent;
-            $scope.description = description;
-            $scope.cancel = function() {
-              SuggestionModalService.cancelSuggestion($uibModalInstance);
-            };
-          }
-        ]
+        controller: 'LearnerDashboardSuggestionModalController'
       });
     };
 
