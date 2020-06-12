@@ -48,9 +48,8 @@ export class SiteAnalyticsService {
   // For definitions of the various arguments, please see:
   // developers.google.com/analytics/devguides/collection/analyticsjs/
   // social-interactions
-  // TODO(#7176): Replace 'any' with the exact type.
   __sendSocialEventToGoogleAnalytics(
-      network: any, action: any, targetUrl: any): void {
+      network: string, action: string, targetUrl: string): void {
     if (this.windowRef.nativeWindow.ga && constants.CAN_SEND_ANALYTICS_EVENTS) {
       this.windowRef.nativeWindow.ga('send', 'social',
         network, action, targetUrl);
@@ -58,8 +57,7 @@ export class SiteAnalyticsService {
   }
 
   // The srcElement refers to the element on the page that is clicked.
-  // TODO(#7176): Replace 'any' with the exact type.
-  registerStartLoginEvent(srcElement: any): void {
+  registerStartLoginEvent(srcElement: string): void {
     this._sendEventToGoogleAnalytics(
       'LoginButton', 'click',
       this.windowRef.nativeWindow.location.pathname + ' ' + srcElement);

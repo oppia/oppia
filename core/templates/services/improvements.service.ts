@@ -20,17 +20,15 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
+import { State } from 'domain/state/StateObjectFactory';
+
 @Injectable({
   providedIn: 'root'
 })
 export class ImprovementsService {
   INTERACTION_IDS_REQUIRED_TO_BE_RESOLVED = ['TextInput'];
 
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'state' is a complex dict with many nested objects having
-  // underscore_cased keys which gives tslint errors against underscore_casing
-  // in favor of camelCasing.
-  isStateForcedToResolveOutstandingUnaddressedAnswers(state: any): boolean {
+  isStateForcedToResolveOutstandingUnaddressedAnswers(state: State): boolean {
     return !!state && this.INTERACTION_IDS_REQUIRED_TO_BE_RESOLVED.indexOf(
       state.interaction.id) !== -1;
   }

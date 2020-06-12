@@ -29,6 +29,18 @@ require('services/assets-backend-api.service.ts');
 require('services/context.service.ts');
 require('services/html-escaper.service.ts');
 
+export interface ILabeledRegion {
+  region?: {
+    area: number[][];
+  };
+  label: string;
+}
+
+export interface IImageWithRegions {
+  labeledRegions?: ILabeledRegion[];
+  imagePath?: string;
+}
+
 angular.module('oppia').directive('oppiaInteractiveImageClickInput', [
   'AssetsBackendApiService', 'ContextService',
   'HtmlEscaperService', 'ImageClickInputRulesService', 'ImagePreloaderService',
