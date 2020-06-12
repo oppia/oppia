@@ -220,7 +220,7 @@ angular.module('oppia').directive('questionsList', [
             ctrl.questionStateData = ctrl.question.getStateData();
             ctrl.questionIsBeingUpdated = false;
             ctrl.newQuestionIsBeingCreated = true;
-            ctrl.openQuestionEditor();
+            ctrl.openQuestionEditor(ctrl.newQuestionSkillDifficulties[0]);
           };
 
           ctrl.createQuestion = function() {
@@ -470,7 +470,8 @@ angular.module('oppia').directive('questionsList', [
             var skillIdToRubricMapping = ctrl.getSkillIdToRubricsObject();
             var skillNames = [];
             var rubrics = [];
-            if (ctrl.newQuestionIsBeingCreated) {
+            if (ctrl.newQuestionIsBeingCreated &&
+                ctrl.selectSkillModalIsShown()) {
               skillNames = ctrl.newQuestionSkillIds.map(
                 skillId => skillIdToNameMapping[skillId]);
               rubrics = ctrl.newQuestionSkillIds.map(
@@ -498,8 +499,8 @@ angular.module('oppia').directive('questionsList', [
                 question: () => question,
                 questionId: () => questionId,
                 questionStateData: () => questionStateData,
-                rubrics: () =>  rubrics,
-                skillNames: () =>  skillNames
+                rubrics: () => rubrics,
+                skillNames: () => skillNames
               },
               controller: 'QuestionEditorModalController',
             }).result.then(function(modalObject) {
