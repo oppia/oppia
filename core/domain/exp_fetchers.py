@@ -34,6 +34,7 @@ from core.platform import models
 import feconf
 import python_utils
 import utils
+from core.domain import rte_component_registry
 
 memcache_services = models.Registry.import_memcache_services()
 (exp_models,) = models.Registry.import_models([models.NAMES.exploration])
@@ -63,6 +64,17 @@ def _migrate_states_schema(versioned_exploration_states, exploration_id):
     """
     states_schema_version = versioned_exploration_states[
         'states_schema_version']
+    import json
+    print("\n\n\n\n\n*************************************************")
+    print("versioned_exploration_states")
+    print(json.dumps(versioned_exploration_states, indent=4))
+    print("schema")
+    oppia_custom_tags = (
+        rte_component_registry.Registry.get_tag_list_with_attrs())
+    print(json.dumps(oppia_custom_tags, indent=4))
+
+    print("\n*************************************************")
+
     if states_schema_version is None or states_schema_version < 1:
         states_schema_version = 0
 
@@ -318,11 +330,16 @@ def get_exploration_by_id(exploration_id, strict=True, version=None):
         [exploration_memcache_key]).get(exploration_memcache_key)
 
     if memcached_exploration is not None:
+        print("\n\n\n\n*****************************8888888888888888888")
+        print("in memcached_exploration")
         return memcached_exploration
     else:
         exploration_model = exp_models.ExplorationModel.get(
             exploration_id, strict=strict, version=version)
         if exploration_model:
+            print("\n\n\n\n*****************************888888888888888888")
+            print("in normal get")
+
             exploration = get_exploration_from_model(exploration_model)
             memcache_services.set_multi({
                 exploration_memcache_key: exploration})
