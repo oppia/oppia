@@ -17,7 +17,6 @@
  */
 
 import { AppConstants } from 'app.constants';
-import { async } from '@angular/core/testing';
 
 describe('SvgFilenameEditor', function() {
   var alertSpy = null;
