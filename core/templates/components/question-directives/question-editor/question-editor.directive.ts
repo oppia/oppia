@@ -17,8 +17,8 @@
  */
 
 require(
-  'components/forms/forms-templates/' +
-  'mark-all-audio-and-translations-as-needing-update.controller.ts');
+  'components/common-layout-directives/common-elements/' +
+  'confirm-or-cancel-modal.controller.ts');
 require('components/state-editor/state-editor.directive.ts');
 
 require('components/entity-creation-services/question-creation.service.ts');
@@ -73,8 +73,11 @@ angular.module('oppia').directive('questionEditor', [
             QuestionObjectFactory) {
           var ctrl = this;
           ctrl.getStateContentPlaceholder = function() {
-            return (
-              'You can speak to the learner here, then ask them a question.');
+            return 'Type your question here.';
+          };
+
+          ctrl.getStateContentSaveButtonPlaceholder = function() {
+            return 'Save Question';
           };
 
           ctrl.navigateToState = function() {
@@ -183,8 +186,7 @@ angular.module('oppia').directive('questionEditor', [
                   '/components/forms/forms-templates/mark-all-audio-and-' +
                   'translations-as-needing-update-modal.directive.html'),
                 backdrop: true,
-                controller: (
-                  'MarkAllAudioAndTranslationsAsNeedingUpdateController')
+                controller: 'ConfirmOrCancelModalController'
               }).result.then(function() {
                 updateQuestion(function() {
                   recordedVoiceovers.markAllVoiceoversAsNeedingUpdate(
