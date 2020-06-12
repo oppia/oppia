@@ -31,7 +31,7 @@ import {
 } from 'domain/admin/computation-data-object.factory';
 import {
   IJobDataBackendDict,
-  JobData,
+  Job,
   JobDataObjectFactory
 } from 'domain/admin/job-data-object.factory';
 import {
@@ -85,8 +85,8 @@ export class AdminData {
   updatableRoles: IUserRoles;
   roleGraphData: IRoleGraphData;
   viewableRoles: IUserRoles;
-  unfinishedJobData: JobData[];
-  recentJobData: JobData[];
+  unfinishedJobData: Job[];
+  recentJobData: Job[];
   continuousComputationsData: ComputationData[];
   topicSummaries: TopicSummary[];
   configProperties: IConfigProperties;
@@ -96,8 +96,8 @@ export class AdminData {
       demoExplorationIds: string[], oneOffJobSpecs: JobSpec[],
       humanReadableCurrentTime: string, auditJobSpecs: JobSpec[],
       updatableRoles: IUserRoles, roleGraphData: IRoleGraphData,
-      viewableRoles: IUserRoles, unfinishedJobData: JobData[],
-      recentJobData: JobData[], continuousComputationsData: ComputationData[],
+      viewableRoles: IUserRoles, unfinishedJobData: Job[],
+      recentJobData: Job[], continuousComputationsData: ComputationData[],
       topicSummaries: TopicSummary[], configProperties: IConfigProperties) {
     this.demoExplorations = demoExplorations;
     this.demoCollections = demoCollections;

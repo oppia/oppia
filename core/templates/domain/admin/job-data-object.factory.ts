@@ -32,7 +32,7 @@ export interface IJobDataBackendDict {
   'human_readable_time_started': string;
 }
 
-export class JobData {
+export class Job {
   humanReadableTimeFinished: string;
   timeFinishedMsec: number;
   jobType: string;
@@ -66,8 +66,8 @@ export class JobData {
   providedIn: 'root'
 })
 export class JobDataObjectFactory {
-  createFromBackendDict(backendDict: IJobDataBackendDict): JobData {
-    return new JobData(
+  createFromBackendDict(backendDict: IJobDataBackendDict): Job {
+    return new Job(
       backendDict.human_readable_time_finished, backendDict.time_finished_msec,
       backendDict.job_type, backendDict.status_code, backendDict.error,
       backendDict.can_be_canceled, backendDict.is_cancelable, backendDict.id,

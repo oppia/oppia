@@ -38,8 +38,8 @@ export class AdminBackendApiService {
 
   getData(): Promise<AdminData> {
     return this.http.get<IAdminDataBackendDict>(
-      AdminPageConstants.ADMIN_HANDLER_URL).toPromise().then(adminData => {
-      return this.adminDataObjectFactory.createFromBackendDict(adminData);
+      AdminPageConstants.ADMIN_HANDLER_URL).toPromise().then(response => {
+      return this.adminDataObjectFactory.createFromBackendDict(response);
     });
   }
 }

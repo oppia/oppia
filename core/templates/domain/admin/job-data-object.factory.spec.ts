@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for JobDataObjectFactory.ts.
+ * @fileoverview Unit tests for JobDataObjectFactory.
  */
 
 import { JobDataObjectFactory } from 'domain/admin/job-data-object.factory';

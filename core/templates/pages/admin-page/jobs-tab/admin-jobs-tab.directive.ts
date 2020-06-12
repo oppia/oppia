@@ -122,15 +122,15 @@ angular.module('oppia').directive('adminJobsTab', [
           ctrl.UNFINISHED_JOB_DATA = {};
           ctrl.AUDIT_JOB_SPECS = {};
           ctrl.RECENT_JOB_DATA = {};
-          AdminDataService.getDataAsync().then(function(response) {
+          AdminDataService.getDataAsync().then(function(adminDataObject) {
             ctrl.HUMAN_READABLE_CURRENT_TIME = (
-              response.humanReadeableCurrentTime);
+              adminDataObject.humanReadeableCurrentTime);
             ctrl.CONTINUOUS_COMPUTATIONS_DATA = (
-              response.continuousComputationsData);
-            ctrl.ONE_OFF_JOB_SPECS = response.oneOffJobSpecs;
-            ctrl.UNFINISHED_JOB_DATA = response.unfinishedJobData;
-            ctrl.AUDIT_JOB_SPECS = response.auditJobSpecs;
-            ctrl.RECENT_JOB_DATA = response.recentJobData;
+              adminDataObject.continuousComputationsData);
+            ctrl.ONE_OFF_JOB_SPECS = adminDataObject.oneOffJobSpecs;
+            ctrl.UNFINISHED_JOB_DATA = adminDataObject.unfinishedJobData;
+            ctrl.AUDIT_JOB_SPECS = adminDataObject.auditJobSpecs;
+            ctrl.RECENT_JOB_DATA = adminDataObject.recentJobData;
             // TODO(#8521): Remove the use of $rootScope.$apply()
             // once the directive is migrated to angular
             $rootScope.$apply();
