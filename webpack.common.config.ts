@@ -678,6 +678,9 @@ module.exports = {
             // Typescript checks do the type checking.
             transpileOnly: true
           }
+        },
+        {
+          loader: 'angular2-template-loader'
         }
       ]
     },
