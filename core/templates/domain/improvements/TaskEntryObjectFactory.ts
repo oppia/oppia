@@ -23,10 +23,10 @@ export interface ITaskEntryBackendDict {
   'task_type': string;
   'target_type': string;
   'target_id': string;
+  'issue_description'?: string;
+  'status': string;
   'closed_by': string;
   'closed_on_msecs': number;
-  'status': string;
-  'issue_description'?: string;
 }
 
 export class TaskEntry {
@@ -38,6 +38,30 @@ export class TaskEntry {
       private taskStatus: string,
       private closedBy: string,
       private closedOnMsecs: number) {}
+
+  toBackendDict(): ITaskEntryBackendDict {
+    return {
+      task_type: this.taskType,
+      target_type: this.targetType,
+      target_id: this.targetId,
+      status: this.taskStatus,
+      issue_description: this.issueDescription,
+      closed_by: this.closedBy,
+      closed_on_msecs: this.closedOnMsecs,
+    };
+  }
+
+  isOpen(): boolean {
+    return this.taskStatus === ImprovementsConstants.TASK_STATUS_TYPE_OPEN;
+  }
+
+  getClosedBy(): string {
+    return this.closedBy;
+  }
+
+  getClosedOnMsecs(): number {
+    return this.closedOnMsecs;
+  }
 
   open(): void {
     this.closedBy = null;
@@ -53,22 +77,6 @@ export class TaskEntry {
     this.closedBy = userId;
     this.closedOnMsecs = new Date().getTime();
     this.taskStatus = ImprovementsConstants.TASK_STATUS_TYPE_OBSOLETE;
-  }
-
-  isOpen(): boolean {
-    return this.taskStatus === ImprovementsConstants.TASK_STATUS_TYPE_OPEN;
-  }
-
-  toBackendDict(): ITaskEntryBackendDict {
-    return {
-      task_type: this.taskType,
-      target_type: this.targetType,
-      target_id: this.targetId,
-      status: this.taskStatus,
-      issue_description: this.issueDescription,
-      closed_by: this.closedBy,
-      closed_on_msecs: this.closedOnMsecs,
-    };
   }
 }
 

@@ -17,7 +17,7 @@
  * @fileoverview TODO
  */
 
-imporrt { HttpClientTestingModule, HttpTestingController }
+import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
@@ -55,7 +55,9 @@ describe('Exploration stats backend api service', () => {
   });
 
   it('should return a fully formed object from backend dict', fakeAsync(() => {
-    let onSuccess = jasmine.createSpy('success');
+    let onSuccess = jasmine.createSpy('success', stats => {
+      expect(stats).toBeInstanceOf(ExplorationStats);
+    });
     let onFailure = jasmine.createSpy('failure');
 
     explorationStatsBackendApiService.fetchExplorationStats('eid')
@@ -66,6 +68,6 @@ describe('Exploration stats backend api service', () => {
     req.flush(expStatsBackendDict);
     flushMicrotasks();
 
-    expect(onSuccess).toHaveBeenCalledWith();
+    expect(onSuccess).toHaveBeenCalled();
   }));
 });

@@ -20,52 +20,74 @@ import { ExplorationStats } from
   'domain/statistics/ExplorationStatsObjectFactory';
 import { ImprovementsConstants } from
   'domain/improvements/improvements.constants';
-import { ExplorationStatsService } from 'services/exploration-stats.service';
-import { StateStats } from 'domain/statistics/StateStatsObjectFactory';
 
-import { ITaskEntryBackendDict, TaskEntry, TaskEntryObjectFactory } from
+import { ITaskEntryBackendDict, TaskEntry } from
   'domain/improvements/TaskEntryObjectFactory';
 
-export class HighBounceRateTask {
-  constructor(private taskEntry: TaskEntry) {}
-
-  public isOpen(): boolean {
-    return this.taskEntry.isOpen();
+export class HighBounceRateTask extends TaskEntry {
+  constructor(
+      stateName: string,
+      issueDescription: string,
+      taskStatus: string = ImprovementsConstants.TASK_STATUS_TYPE_OPEN,
+      closedBy: string = null,
+      closedOnMsecs: number = null) {
+    super(
+      ImprovementsConstants.TASK_TYPE_HIGH_BOUNCE_RATE,
+      ImprovementsConstants.TASK_TARGET_TYPE_STATE, stateName, issueDescription,
+      taskStatus, closedBy, closedOnMsecs);
   }
 
-  public resolve(userId: string): void {
-    this.taskEntry.resolve(userId);
-  }
-
-  public toBackendDict(): ITaskEntryBackendDict {
-    return this.taskEntry.toBackendDict();
+  refreshStats(freshExplorationStats: ExplorationStats): void {
+    const numExpStarts = freshExplorationStats.numStarts;
+    if (numExpStarts <
+        ImprovementsConstants.HIGH_BOUNCE_RATE_MINIMUM_EXPLORATION_STARTS) {
+      return;
+    }
+    const stateBounceRate = freshExplorationStats.getBounceRate(this.targetId);
+    if (stateBounceRate >=
+        ImprovementsConstants.HIGH_BOUNCE_RATE_THRESHOLD_LOW) {
+      return;
+    }
+    this.discard();
   }
 }
 
 export class HighBounceRateTaskObjectFactory {
-  constructor(taskEntryObjectFactory: TaskEntryObjectFactory) {}
-
-  private getIssueDescription(
-      expStarts: number, stateDropOffs: number): string {
-    const dropOffPercent = Math.round(100 * stateDropOffs / expStarts);
-    return dropOffPercent + '% of learners had dropped off at this card.';
-  }
-
-  createFromStats(
-      expStats: ExplorationStats, stateStats: StateStats): HighBounceRateTask {
-    const stateDropOffs = stateStats.totalHitCount - stateStats.numCompletions;
-    const dropOffThreshold = (
-      expStats.numStarts *
-      ImprovementsConstants.HIGH_BOUNCE_RATE_DROP_OFF_PERCENT_THRESHOLD);
-    if (stateDropOffs >= dropOffThreshold) {
-      return new HighBounceRateTask();
+  /**
+   * Returns a new task object if the provided stats warrant one. Otherwise,
+   * returns null.
+   */
+  public createFromExplorationStats(
+      explorationStats: ExplorationStats,
+      stateName: string): HighBounceRateTask {
+    const numExpStarts = explorationStats.numStarts;
+    if (numExpStarts <
+        ImprovementsConstants.HIGH_BOUNCE_RATE_MINIMUM_EXPLORATION_STARTS) {
+      return null;
     }
+    const stateBounceRate = explorationStats.getBounceRate(stateName);
+    if (stateBounceRate <
+        ImprovementsConstants.HIGH_BOUNCE_RATE_THRESHOLD_HIGH) {
+      return null;
+    }
+    return new HighBounceRateTask(
+      stateName, this.newIssueDescription(stateBounceRate));
   }
 
-  createFromBackendDict(
-      backendDict: IHighBounceRateTaskBackendDict): HighBounceRateTask {
+  public createFromBackendDict(
+      backendDict: ITaskEntryBackendDict): HighBounceRateTask {
+    if (backendDict.task_type !==
+        ImprovementsConstants.TASK_TYPE_HIGH_BOUNCE_RATE) {
+      throw new Error('task entry has wrong type');
+    }
     return new HighBounceRateTask(
-      backendDict.state_name, backendDict.status, backendDict.closed_by,
-      backendDict.closed_on_msecs, backendDict.issue_description);
+      backendDict.target_id, backendDict.issue_description, backendDict.status,
+      backendDict.closed_by, backendDict.closed_on_msecs);
+  }
+
+  private newIssueDescription(bounceRate: number): string {
+    return (
+      Math.round(100 * bounceRate) +
+      '% of learners had dropped off at this card.');
   }
 }

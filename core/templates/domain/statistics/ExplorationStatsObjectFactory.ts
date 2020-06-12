@@ -46,19 +46,16 @@ export class ExplorationStats {
       public readonly numCompletions: number,
       private readonly stateStatsMapping: Map<string, StateStats>) {}
 
-  getStateStatsEntries(): [string, StateStats][] {
-    return [...this.stateStatsMapping.entries()];
-  }
-
-  getStateNames(): string[] {
-    return [...this.stateStatsMapping.keys()];
-  }
-
-  hasStateStats(stateName: string): boolean {
-    return this.stateStatsMapping.has(stateName);
+  getBounceRate(stateName: string): number {
+    const { totalHitCount, numCompletions } = this.getStateStats(stateName);
+    const stateDropOffs = totalHitCount - numCompletions;
+    return stateDropOffs / this.numStarts;
   }
 
   getStateStats(stateName: string): StateStats {
+    if (!this.stateStatsMapping.has(stateName)) {
+      throw new Error('no stats exist for state: ' + stateName);
+    }
     return this.stateStatsMapping.get(stateName);
   }
 }
