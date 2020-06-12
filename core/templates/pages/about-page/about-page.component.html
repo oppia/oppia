@@ -1,5 +1,5 @@
 <div class="oppia-static-header">
-  <h1 translate="I18N_ABOUT_PAGE_HEADING"></h1>
+  <h1 [innerHTML]="'I18N_ABOUT_PAGE_HEADING' | translate"></h1>
 </div>
 <background-banner></background-banner>
 <div>
@@ -7,110 +7,112 @@
     <div class="oppia-page-card oppia-static-content">
       <div class="about-nav">
         <ul class="oppia-about-tabs">
-          <li ng-class="{'oppia-about-tabs-active': $ctrl.activeTabName === $ctrl.TAB_ID_ABOUT}">
-            <a ng-click="$ctrl.onTabClick($ctrl.TAB_ID_ABOUT)" href="" class="oppia-about-tabs-text" id="about" translate="I18N_ABOUT_PAGE_TABS_ABOUT"></a>
+          <li [ngClass]="{'oppia-about-tabs-active': activeTabName === TAB_ID_ABOUT}">
+            <a (click)="onTabClick(TAB_ID_ABOUT)" class="oppia-about-tabs-text" id="about" [innerHTML]="'I18N_ABOUT_PAGE_TABS_ABOUT' | translate"></a>
           </li>
-          <li ng-class="{'oppia-about-tabs-active': $ctrl.activeTabName === $ctrl.TAB_ID_FOUNDATION}">
-            <a ng-click="$ctrl.onTabClick($ctrl.TAB_ID_FOUNDATION)" href="" class="oppia-about-tabs-text" id="foundation" translate="I18N_ABOUT_PAGE_TABS_FOUNDATION"></a>
+          <li [ngClass]="{'oppia-about-tabs-active':activeTabName === TAB_ID_FOUNDATION}">
+            <a (click)="onTabClick(TAB_ID_FOUNDATION)" class="oppia-about-tabs-text" id="foundation" [innerHTML]="'I18N_ABOUT_PAGE_TABS_FOUNDATION' | translate"></a>
           </li>
-          <li ng-class="{'oppia-about-tabs-active': $ctrl.activeTabName === $ctrl.TAB_ID_CREDITS}">
-            <a ng-click="$ctrl.onTabClick($ctrl.TAB_ID_CREDITS)" href="" class="oppia-about-tabs-text" id="credits" translate="I18N_ABOUT_PAGE_TABS_CREDITS"></a>
+          <li [ngClass]="{'oppia-about-tabs-active': activeTabName === TAB_ID_CREDITS}">
+            <a (click)="onTabClick(TAB_ID_CREDITS)" class="oppia-about-tabs-text" id="credits" [innerHTML]="'I18N_ABOUT_PAGE_TABS_CREDITS' | translate"></a>
           </li>
         </ul>
       </div>
 
       <div class="about-tab-container protractor-test-about-page" dir="auto">
-        <div class="about oppia-about-tab-content" ng-class="{'oppia-about-visible-content': $ctrl.activeTabName === $ctrl.TAB_ID_ABOUT}">
+        <div class="about oppia-about-tab-content" [ngClass]="{'oppia-about-visible-content': activeTabName === TAB_ID_ABOUT}">
           <div class="oppia-static-card-content oppia-static-card-content-narrow">
-            <h2 translate="I18N_ABOUT_PAGE_ABOUT_TAB_HEADING"></h2>
+            <h2 [innerHTML]="'I18N_ABOUT_PAGE_ABOUT_TAB_HEADING' | translate"></h2>
             <div class="oppia-about-text-align">
               <em>Oppia "O-pee-yah" (Finnish) - "to learn"</em>
             </div>
 
 
-            <p translate="I18N_ABOUT_PAGE_ABOUT_TAB_PARAGRAPH_1">
+            <p [innerHTML]="'I18N_ABOUT_PAGE_ABOUT_TAB_PARAGRAPH_1' | translate">
             </p>
-            <p translate="I18N_ABOUT_PAGE_ABOUT_TAB_PARAGRAPH_2">
+            <p [innerHTML]="'I18N_ABOUT_PAGE_ABOUT_TAB_PARAGRAPH_2' | translate">
             </p>
-            <p translate="I18N_ABOUT_PAGE_ABOUT_TAB_PARAGRAPH_3" translate-values="{ numberOfExplorations : '11,000', numberofStudentsServed: '430,000' }">
+            <p [innerHTML]="'I18N_ABOUT_PAGE_ABOUT_TAB_PARAGRAPH_3' | translate: { numberOfExplorations: '11,000', numberofStudentsServed: '430,000' }">
             </p>
-            <p translate="I18N_ABOUT_PAGE_ABOUT_TAB_PARAGRAPH_4">
+            <p [innerHTML]="'I18N_ABOUT_PAGE_ABOUT_TAB_PARAGRAPH_4' | translate">
             </p>
-            <p translate="I18N_ABOUT_PAGE_ABOUT_TAB_PARAGRAPH_5">
+            <p [innerHTML]="'I18N_ABOUT_PAGE_ABOUT_TAB_PARAGRAPH_5' | translate">
             </p>
-            <p translate="I18N_ABOUT_PAGE_ABOUT_TAB_PARAGRAPH_6">
+            <p [innerHTML]="'I18N_ABOUT_PAGE_ABOUT_TAB_PARAGRAPH_6' | translate">
             </p>
-            <p translate="I18N_ABOUT_PAGE_ABOUT_TAB_PARAGRAPH_7">
+            <p [innerHTML]="'I18N_ABOUT_PAGE_ABOUT_TAB_PARAGRAPH_7' | translate">
             </p>
-            <p translate="I18N_ABOUT_PAGE_ABOUT_TAB_PARAGRAPH_8">
+            <p [innerHTML]="'I18N_ABOUT_PAGE_ABOUT_TAB_PARAGRAPH_8' | translate">
             </p>
 
             <div class="oppia-about-three-cols-container">
               <div class="oppia-about-three-cols-layout oppia-about-three-cols-feature">
-                <img ng-src="<[$ctrl.getStaticImageUrl('/general/creator-create-exp.png')]>" alt="">
-                <h3 translate="I18N_ABOUT_PAGE_ABOUT_TAB_CREATE"></h3>
-                <p style="margin-top: -10px;" translate="I18N_ABOUT_PAGE_ABOUT_TAB_CREATE_TEXT">
+                <img [src]="getStaticImageUrl('/general/creator-create-exp.png')" alt="">
+                <h3 [innerHTML]="'I18N_ABOUT_PAGE_ABOUT_TAB_CREATE' | translate"></h3>
+                <p style="margin-top: -10px;" [innerHTML]="'I18N_ABOUT_PAGE_ABOUT_TAB_CREATE_TEXT' | translate">
                 </p>
               </div>
               <div class="oppia-about-three-cols-layout oppia-about-three-cols-feature">
-                <img ng-src="<[$ctrl.getStaticImageUrl('/general/creator-pub-share.png')]>" alt="">
-                <h3 translate="I18N_ABOUT_PAGE_ABOUT_TAB_SHARE"></h3>
-                <p style="margin-top: -10px;" translate="I18N_ABOUT_PAGE_ABOUT_TAB_SHARE_TEXT">
+                <img [src]="getStaticImageUrl('/general/creator-pub-share.png')" alt="">
+                <h3 [innerHTML]="'I18N_ABOUT_PAGE_ABOUT_TAB_SHARE' | translate"></h3>
+                <p style="margin-top: -10px;" [innerHTML]="'I18N_ABOUT_PAGE_ABOUT_TAB_SHARE_TEXT' | translate">
                 </p>
               </div>
               <div class="oppia-about-three-cols-layout oppia-about-three-cols-feature">
-                <img ng-src="<[$ctrl.getStaticImageUrl('/general/creator-feedback.png')]>" alt="">
-                <h3 translate="I18N_ABOUT_PAGE_ABOUT_TAB_FEEDBACK"></h3>
-                <p style="margin-top: -10px;" translate="I18N_ABOUT_PAGE_ABOUT_TAB_FEEDBACK_TEXT">
+                <img [src]="getStaticImageUrl('/general/creator-feedback.png')" alt="">
+                <h3 [innerHTML]="'I18N_ABOUT_PAGE_ABOUT_TAB_FEEDBACK' | translate"></h3>
+                <p style="margin-top: -10px;" [innerHTML]="'I18N_ABOUT_PAGE_ABOUT_TAB_FEEDBACK_TEXT' | translate">
                 </p>
               </div>
             </div>
           </div>
         </div>
 
-        <div class="foundation oppia-about-tab-content" ng-class="{'oppia-about-visible-content': $ctrl.activeTabName === $ctrl.TAB_ID_FOUNDATION}">
+        <div class="foundation oppia-about-tab-content" [ngClass]="{'oppia-about-visible-content': activeTabName === TAB_ID_FOUNDATION}">
           <div class="oppia-static-card-content oppia-static-card-content-narrow">
-            <h2 translate="I18N_ABOUT_PAGE_FOUNDATION_TAB_HEADING"></h2>
-            <p translate="I18N_ABOUT_PAGE_FOUNDATION_TAB_PARAGRAPH_1">
+            <h2 [innerHTML]="'I18N_ABOUT_PAGE_FOUNDATION_TAB_HEADING' | translate"></h2>
+            <p [innerHTML]="'I18N_ABOUT_PAGE_FOUNDATION_TAB_PARAGRAPH_1' | translate">
             </p>
-            <p translate="I18N_ABOUT_PAGE_FOUNDATION_TAB_PARAGRAPH_2">
+            <p [innerHTML]="'I18N_ABOUT_PAGE_FOUNDATION_TAB_PARAGRAPH_2' | translate">
             </p>
-            <p translate="I18N_ABOUT_PAGE_FOUNDATION_TAB_PARAGRAPH_3">
+            <p [innerHTML]="'I18N_ABOUT_PAGE_FOUNDATION_TAB_PARAGRAPH_3' | translate">
             </p>
-            <h3 translate="I18N_ABOUT_PAGE_FOUNDATION_TAB_PARAGRAPH_4_HEADING"></h3>
-            <p translate="I18N_ABOUT_PAGE_FOUNDATION_TAB_PARAGRAPH_4">
+            <h3 [innerHTML]="'I18N_ABOUT_PAGE_FOUNDATION_TAB_PARAGRAPH_4_HEADING' | translate"></h3>
+            <p [innerHTML]="'I18N_ABOUT_PAGE_FOUNDATION_TAB_PARAGRAPH_4' | translate">
             </p>
             <a id="license">
               <h1 style="padding-top: 70px; margin-top: -80px;"></h1>
             </a>
-            <h3 translate="I18N_ABOUT_PAGE_FOUNDATION_TAB_PARAGRAPH_5_LICENSE_HEADING"></h3>
-            <p translate="I18N_ABOUT_PAGE_FOUNDATION_TAB_PARAGRAPH_5">
+            <h3 [innerHTML]="'I18N_ABOUT_PAGE_FOUNDATION_TAB_PARAGRAPH_5_LICENSE_HEADING' | translate"></h3>
+            <p [innerHTML]="'I18N_ABOUT_PAGE_FOUNDATION_TAB_PARAGRAPH_5' | translate">
             </p>
-            <p translate="I18N_ABOUT_PAGE_FOUNDATION_TAB_PARAGRAPH_6">
+            <p [innerHTML]="'I18N_ABOUT_PAGE_FOUNDATION_TAB_PARAGRAPH_6' | translate">
             </p>
             <div class="text-center">
-              <a href="/donate" class="btn oppia-about-button oppia-about-foundation-tab-anchor" translate="I18N_ABOUT_PAGE_FOUNDATION_TAB_DONATE_BUTTON">
+              <a href="/donate" class="btn oppia-about-button oppia-about-foundation-tab-anchor" [innerHTML]="'I18N_ABOUT_PAGE_FOUNDATION_TAB_DONATE_BUTTON' | translate">
               </a>
-              <a href="/contact" class="btn oppia-about-button oppia-about-foundation-tab-anchor" translate="I18N_ABOUT_PAGE_FOUNDATION_TAB_GET_INVOLVED_BUTTON">
+              <a href="/contact" class="btn oppia-about-button oppia-about-foundation-tab-anchor" [innerHTML]="'I18N_ABOUT_PAGE_FOUNDATION_TAB_GET_INVOLVED_BUTTON' | translate">
               </a>
             </div>
           </div>
         </div>
 
-        <div class="credits oppia-about-tab-content" ng-class="{'oppia-about-visible-content': $ctrl.activeTabName === $ctrl.TAB_ID_CREDITS}">
+        <div class="credits oppia-about-tab-content" [ngClass]="{'oppia-about-visible-content': activeTabName === TAB_ID_CREDITS}">
           <div class="oppia-static-card-content oppia-static-card-content-wide">
-            <h2 translate="I18N_ABOUT_PAGE_CREDITS_TAB_HEADING"></h2>
-            <p translate="I18N_ABOUT_PAGE_CREDITS_TAB_TEXT">
+            <h2 [innerHTML]="'I18N_ABOUT_PAGE_CREDITS_TAB_HEADING' | translate"></h2>
+            <p [innerHTML]="'I18N_ABOUT_PAGE_CREDITS_TAB_TEXT' | translate">
             </p>
             <div class="oppia-about-credits-letter-groups three-col">
-              <span ng-repeat-start="item in $ctrl.allCredits"><[item.letter]></span>
-              <ul ng-repeat-end>
-                <li ng-repeat="credit in item.credits"><[credit]></li>
-              </ul>
+              <div *ngFor="let credit of allCredits">
+                <span>{{ credit.letter }}</span>
+                <ul>
+                  <li *ngFor="let name of credit.names">{{ name }}</li>
+                </ul>
+              </div>
             </div>
-            <p translate="I18N_ABOUT_PAGE_CREDITS_TAB_TEXT_BOTTOM" translate-values="{listOfNames: $ctrl.listOfNames}">
+            <p [innerHTML]="'I18N_ABOUT_PAGE_CREDITS_TAB_TEXT_BOTTOM' | translate :{listOfNames: listOfNames}">
             </p>
-            <p translate="I18N_ABOUT_PAGE_CREDITS_THANK_TRANSLATEWIKI">
+            <p [innerHTML]="'I18N_ABOUT_PAGE_CREDITS_THANK_TRANSLATEWIKI' | translate">
             </p>
           </div>
         </div>
@@ -120,11 +122,11 @@
     <div class="oppia-about-extra-container">
       <div class="oppia-static-extra-content oppia-about-clearfix">
         <div class="oppia-about-otter-container">
-          <img ng-src="<[$ctrl.aboutPageMascotImgUrl]>" class="oppia-about-otter" alt="Otter">
+          <img [src]="aboutPageMascotImgUrl" class="oppia-about-otter" alt="Otter">
         </div>
         <div class="oppia-about-otter-speech-card">
           <blockquote class="oppia-about-otter-speech-bubble">
-            <h3 translate="I18N_ABOUT_PAGE_SPEECH_BUBBLE"></h3>
+            <h3 [innerHTML]="'I18N_ABOUT_PAGE_SPEECH_BUBBLE' | translate"></h3>
           </blockquote>
         </div>
       </div>
@@ -132,8 +134,8 @@
       <div class="oppia-about-extra-info oppia-about-page-extra-info">
         <div class="oppia-static-content oppia-static-extra-content oppia-about-extra-content">
           <div class="oppia-static-card-content oppia-static-card-content-wide oppia-about-buttons-container">
-            <a href="/library" class="btn oppia-about-button" translate="I18N_ABOUT_PAGE_LEARN_BUTTON"></a>
-            <a href="/teach" class="btn oppia-about-button" translate="I18N_ABOUT_PAGE_TEACH_BUTTON"></a>
+            <a href="/library" class="btn oppia-about-button" [innerHTML]="'I18N_ABOUT_PAGE_LEARN_BUTTON' | translate"></a>
+            <a href="/teach" class="btn oppia-about-button" [innerHTML]="'I18N_ABOUT_PAGE_TEACH_BUTTON' | translate"></a>
           </div>
         </div>
       </div>
