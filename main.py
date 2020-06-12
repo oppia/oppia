@@ -228,6 +228,9 @@ URLS = MAPREDUCE_HANDLERS + [
         '/notifications_dashboard',
         creator_dashboard.OldNotificationsDashboardRedirectPage),
     get_redirect_route(
+        '/community_dashboard',
+        creator_dashboard.OldCommunityDashboardRedirectPage),
+    get_redirect_route(
         feconf.NOTIFICATIONS_DASHBOARD_URL,
         creator_dashboard.NotificationsDashboardPage),
     get_redirect_route(

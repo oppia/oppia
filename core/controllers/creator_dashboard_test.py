@@ -61,6 +61,22 @@ class OldNotificationsDashboardRedirectPageTest(test_utils.GenericTestBase):
             'http://localhost/notifications', response.headers['location'])
 
 
+class OldCommunityDashboardRedirectPageTest(test_utils.GenericTestBase):
+    """Test for redirecting the old community dashboard page URL
+    to the new one.
+    """
+
+    def test_old_community_dashboard_page_url(self):
+        """Test to validate that the old community dashboard page url
+        redirects to the new one.
+        """
+        response = self.get_html_response(
+            '/community_dashboard', expected_status_int=301)
+        self.assertEqual(
+            'http://localhost/community-dashboard',
+            response.headers['location'])
+
+
 class OldCreatorDashboardRedirectPageTest(test_utils.GenericTestBase):
     """Test for redirecting the old creator dashboard page URL
     to the new one.

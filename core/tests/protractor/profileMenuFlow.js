@@ -117,7 +117,7 @@ describe('Profile menu flow', function() {
       await topicsAndSkillsDashboardLink.click();
       await waitFor.pageToFullyLoad();
       expect(await browser.getCurrentUrl()).toEqual(
-        'http://localhost:9001/topics_and_skills_dashboard');
+        'http://localhost:9001/topics-and-skills-dashboard');
     });
 
     it('should visit the notifications page from the profile dropdown menu',
