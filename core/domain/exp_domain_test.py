@@ -8342,7 +8342,7 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
             }
         }
         solution = state_domain.Solution.from_dict(
-            state1.interactin.id, solution_dict)
+            state1.interaction.id, solution_dict)
         state1.update_interaction_solution(solution)
 
         answer_group_list2 = [{
