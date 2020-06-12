@@ -31,6 +31,7 @@ describe('Maintenance page', function() {
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
     }
+    $provide.constant('DEV_MODE', true);
   }));
 
   beforeEach(angular.mock.inject(function($injector, $controller) {
