@@ -65,7 +65,7 @@ describe('Topic editor functionality', function() {
     await topicEditorPage.changeTopicName(NEW_TOPIC_NAME);
     var defaultThumbnailImageSrc = (
       await topicEditorPage.getTopicThumbnailSource());
-    await topicEditorPage.submitTopicThumbnail('../data/test2_svg.svg');
+    await topicEditorPage.submitTopicThumbnail('../data/test2_svg.svg', true);
     var updatedThumbnailImageSrc = (
       await topicEditorPage.getTopicThumbnailSource());
     expect(defaultThumbnailImageSrc).not.toEqual(updatedThumbnailImageSrc);
@@ -88,7 +88,7 @@ describe('Topic editor functionality', function() {
       TOPIC_NAME, TOPIC_DESCRIPTION, false);
     var defaultThumbnailSrc = (
       await topicEditorPage.getTopicThumbnailSource());
-    await topicEditorPage.submitTopicThumbnail('../data/test2_svg.svg');
+    await topicEditorPage.submitTopicThumbnail('../data/test2_svg.svg', true);
     var updatedTopicThumbnailSrc = (
       await topicEditorPage.getTopicThumbnailSource());
     expect(defaultThumbnailSrc).not.toEqual(updatedTopicThumbnailSrc);
@@ -209,7 +209,7 @@ describe('Chapter editor functionality', function() {
     await topicsAndSkillsDashboardPage.createTopic(TOPIC_NAME,
       'Topic description', false);
     defaultThumbnailImageSrc = await topicEditorPage.getTopicThumbnailSource();
-    await topicEditorPage.submitTopicThumbnail('../data/test2_svg.svg');
+    await topicEditorPage.submitTopicThumbnail('../data/test2_svg.svg', true);
     expect(await topicEditorPage.getTopicThumbnailSource()).not.toEqual(
       defaultThumbnailImageSrc);
     await topicEditorPage.changeTopicDescription('Topic Description');

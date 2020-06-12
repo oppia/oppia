@@ -107,6 +107,7 @@ angular.module('oppia').controller('CreateNewSkillModalController', [
     };
 
     $scope.cancel = function() {
+      ImageLocalStorageService.flushStoredImagesData();
       SkillCreationService.resetSkillDescriptionStatusMarker();
       $uibModalInstance.dismiss('cancel');
     };

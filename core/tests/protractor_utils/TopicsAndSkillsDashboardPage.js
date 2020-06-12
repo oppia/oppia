@@ -89,7 +89,6 @@ var TopicsAndSkillsDashboardPage = function() {
     by.css('.protractor-test-topic-name-in-topic-select-modal'));
   var topicsTabButton = element(
     by.css('.protractor-test-topics-tab'));
-  var imgPath = ('../data/test_svg.svg');
   var topicThumbnailButton = element(
     by.css('.protractor-test-photo-button'));
   var thumbnailContainer = element(
@@ -203,7 +202,8 @@ var TopicsAndSkillsDashboardPage = function() {
     await topicNameField.sendKeys(topicName);
     await topicDescriptionField.sendKeys(description);
     await workflow.submitImage(
-      topicThumbnailButton, thumbnailContainer, imgPath);
+      topicThumbnailButton, thumbnailContainer,
+      ('../data/test_svg.svg'), false);
 
     await confirmTopicCreationButton.click();
 

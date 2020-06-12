@@ -29,8 +29,6 @@ env:
     - RUN_E2E_TESTS_LEARNER_DASHBOARD=true
     - RUN_E2E_TESTS_LEARNER=true
     - RUN_E2E_TESTS_SKILL_EDITOR=true
-    - RUN_E2E_TESTS_TOPICS_AND_SKILLS_DASHBOARD=true
-    - RUN_E2E_TESTS_TOPIC_AND_STORY_EDITOR=true
 
 jobs:
   allow_failures: []
@@ -82,8 +80,6 @@ script:
 - if [ "$RUN_E2E_TESTS_LEARNER_DASHBOARD" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite="learnerDashboard" --prod_env; fi
 - if [ "$RUN_E2E_TESTS_LEARNER" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite="learner" --prod_env; fi
 - if [ "$RUN_E2E_TESTS_SKILL_EDITOR" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite="skillEditor" --prod_env; fi
-- if [ "$RUN_E2E_TESTS_TOPICS_AND_SKILLS_DASHBOARD" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite="topicsAndSkillsDashboard" --prod_env; fi
-- if [ "$RUN_E2E_TESTS_TOPIC_AND_STORY_EDITOR" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite="topicAndStoryEditor" --prod_env; fi
 
 
 cache:
