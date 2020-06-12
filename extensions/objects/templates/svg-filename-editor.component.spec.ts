@@ -170,7 +170,7 @@ describe('SvgFilenameEditor', function() {
     expect(LCDiagramEditorCtrl.isUserDrawing()).toBe(true);
   });
 
-  it('should save svg file created by literallyCanvas', function(done) {
+  it('should save svg file created by literallyCanvas', function() {
     // responseText contains a XSSI Prefix, which is represented by )]}'
     // string. That's why double quotes is being used here. It's not
     // possible to use \' instead of ' so the XSSI Prefix won't be
@@ -192,14 +192,9 @@ describe('SvgFilenameEditor', function() {
     // $q Promises need to be forcibly resolved through a JavaScript digest,
     // which is what $apply helps kick-start.
     $scope.$apply();
-    // setTimeout is being used here in order to wait for the image onload
-    // event to finish.
-    setTimeout(function() {
-      expect(LCDiagramEditorCtrl.data.savedSVGFileName).toBe('imageFile1.svg');
-      expect(LCDiagramEditorCtrl.data.savedSVGUrl.toString()).toBe(dataUrl);
-      expect(LCDiagramEditorCtrl.validate()).toBe(true);
-      done();
-    });
+    expect(LCDiagramEditorCtrl.data.savedSVGFileName).toBe('imageFile1.svg');
+    expect(LCDiagramEditorCtrl.data.savedSVGUrl.toString()).toBe(dataUrl);
+    expect(LCDiagramEditorCtrl.validate()).toBe(true);
   });
 
   it('should not save svg file when no diagram is created', function() {
