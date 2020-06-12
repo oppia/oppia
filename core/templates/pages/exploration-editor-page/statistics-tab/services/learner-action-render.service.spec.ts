@@ -87,7 +87,7 @@ describe('Learner Action Render Service', function() {
       playthroughService.recordExplorationQuitAction('stateName2', 120);
 
       var renderedStatements = playthroughService.getPlaythrough().actions.map(
-        a => learnerActionRenderService.renderLearnerAction(a));
+        (a, i) => learnerActionRenderService.renderLearnerAction(a, i + 1));
 
       expect(renderedStatements[0]).toEqual(
         '1. Started exploration at card "stateName1".');

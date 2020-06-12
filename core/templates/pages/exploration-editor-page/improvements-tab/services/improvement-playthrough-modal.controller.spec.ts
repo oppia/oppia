@@ -132,30 +132,30 @@ describe('Improvement Playthough Modal Controller', function() {
     });
   });
 
-  describe('when playthough actions is greater than max unrelated actions' +
-  ' per block', function() {
-    playthoughActions = [
-      learnerActionObjectFactory.createExplorationStartAction({
-        state_name: {value: 'state_name1'}
-      }),
-      learnerActionObjectFactory.createExplorationStartAction({
-        state_name: {value: 'state_name2'}
-      }),
-      learnerActionObjectFactory.createExplorationStartAction({
-        state_name: {value: 'state_name3'}
-      }),
-      learnerActionObjectFactory.createExplorationStartAction({
-        state_name: {value: 'state_name4'}
-      }),
-      learnerActionObjectFactory.createExplorationStartAction({
-        state_name: {value: 'state_name5'}
-      }),
-      learnerActionObjectFactory.createExplorationStartAction({
-        state_name: {value: 'state_name6'}
-      }),
-    ];
+  describe('when playthough actions is greater than max unrelated actions ' +
+  'per block', function() {
+    beforeEach(function() {
+      playthoughActions = [
+        learnerActionObjectFactory.createExplorationStartAction({
+          state_name: {value: 'state_name1'}
+        }),
+        learnerActionObjectFactory.createExplorationStartAction({
+          state_name: {value: 'state_name2'}
+        }),
+        learnerActionObjectFactory.createExplorationStartAction({
+          state_name: {value: 'state_name3'}
+        }),
+        learnerActionObjectFactory.createExplorationStartAction({
+          state_name: {value: 'state_name4'}
+        }),
+        learnerActionObjectFactory.createExplorationStartAction({
+          state_name: {value: 'state_name5'}
+        }),
+        learnerActionObjectFactory.createExplorationStartAction({
+          state_name: {value: 'state_name6'}
+        }),
+      ];
 
-    beforeEach(() => {
       playthrough = playthroughObjectFactory.createNew(
         '0', '1', 1, 'EarlyQuit', {
           state_name: {

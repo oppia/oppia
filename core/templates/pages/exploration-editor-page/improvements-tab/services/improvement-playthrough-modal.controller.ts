@@ -72,12 +72,12 @@ angular.module('oppia').controller('ImprovementPlaythoughModalController', [
         let action = playthrough.actions[
           indexOfFirstDisplayedAction];
         previousStateName =
-            action.action_customization_args.state_name.value;
+            action.actionCustomizationArgs.state_name.value;
       }
       for (i = indexOfFirstDisplayedAction - 1; i >= 0; i--) {
         let action = playthrough.actions[i];
         let currentStateName =
-            action.action_customization_args.state_name.value;
+            action.actionCustomizationArgs.state_name.value;
 
         if (currentStateName !== previousStateName) {
           // When the latest state name and the state name of the

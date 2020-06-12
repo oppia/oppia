@@ -112,17 +112,17 @@ describe('Learner Action Object Factory', () => {
 
     expect(
       learnerActionObjectFactory.createFromBackendDict(
-        explorationStartActionBackendDict))
+        explorationStartActionBackendDict).toBackendDict())
       .toEqual(
         explorationStartActionBackendDict);
     expect(
       learnerActionObjectFactory.createFromBackendDict(
-        explorationQuitActionBackendDict))
+        explorationQuitActionBackendDict).toBackendDict())
       .toEqual(
         explorationQuitActionBackendDict);
     expect(
       learnerActionObjectFactory.createFromBackendDict(
-        answerSubmitActionBackendDict))
+        answerSubmitActionBackendDict).toBackendDict())
       .toEqual(
         answerSubmitActionBackendDict);
   });
@@ -163,7 +163,7 @@ describe('Learner Action Object Factory', () => {
     };
     expect(
       () => learnerActionObjectFactory.createFromBackendDict(invalidBackendDict)
-    ).toThrowError(/Backend dict has unknown action type/);
+    ).toThrowError(/Backend dict has unsupported schema version/);
   });
 
   it('should create a new answer submit action', () => {

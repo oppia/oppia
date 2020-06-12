@@ -77,8 +77,8 @@ export type ILearnerActionBackendDict = (
   ILearnerActionExplorationQuitBackendDict);
 
 export class LearnerActionExplorationStart {
-  actionType: 'ExplorationStart';
-  schemaVersion: 1;
+  actionType: 'ExplorationStart' = 'ExplorationStart';
+  schemaVersion: 1 = 1;
   actionCustomizationArgs: IExplorationStartCustomizationArgs;
 
   constructor(actionCustomizationArgs: IExplorationStartCustomizationArgs) {
@@ -94,16 +94,16 @@ export class LearnerActionExplorationStart {
   }
 }
 
-export class LearnerActionExplorationQuit {
-  actionType: 'ExplorationQuit';
-  schemaVersion: 1;
-  actionCustomizationArgs: IExplorationQuitCustomizationArgs;
+export class LearnerActionAnswerSubmit {
+  actionType: 'AnswerSubmit' = 'AnswerSubmit';
+  schemaVersion: 1 = 1;
+  actionCustomizationArgs: IAnswerSubmitCustomizationArgs;
 
-  constructor(actionCustomizationArgs: IExplorationQuitCustomizationArgs) {
+  constructor(actionCustomizationArgs: IAnswerSubmitCustomizationArgs) {
     this.actionCustomizationArgs = actionCustomizationArgs;
   }
 
-  toBackendDict(): ILearnerActionExplorationQuitBackendDict {
+  toBackendDict(): ILearnerActionAnswerSubmitBackendDict {
     return {
       action_type: this.actionType,
       schema_version: this.schemaVersion,
@@ -112,16 +112,16 @@ export class LearnerActionExplorationQuit {
   }
 }
 
-export class LearnerActionAnswerSubmit {
-  actionType: 'AnswerSubmit';
-  schemaVersion: 1;
-  actionCustomizationArgs: IAnswerSubmitCustomizationArgs;
+export class LearnerActionExplorationQuit {
+  actionType: 'ExplorationQuit' = 'ExplorationQuit';
+  schemaVersion: 1 = 1;
+  actionCustomizationArgs: IExplorationQuitCustomizationArgs;
 
-  constructor(actionCustomizationArgs: IAnswerSubmitCustomizationArgs) {
+  constructor(actionCustomizationArgs: IExplorationQuitCustomizationArgs) {
     this.actionCustomizationArgs = actionCustomizationArgs;
   }
 
-  toBackendDict(): ILearnerActionAnswerSubmitBackendDict {
+  toBackendDict(): ILearnerActionExplorationQuitBackendDict {
     return {
       action_type: this.actionType,
       schema_version: this.schemaVersion,
