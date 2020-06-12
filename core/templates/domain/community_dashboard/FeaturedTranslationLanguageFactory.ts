@@ -22,7 +22,7 @@ import { Injectable } from '@angular/core';
 
 export interface FeaturedTranslationLanguageBackendDict {
   'language_code': string;
-  'description': string;
+  description: string;
 }
 
 export class FeaturedTranslationLanguage {
@@ -35,10 +35,10 @@ export class FeaturedTranslationLanguage {
 @Injectable({
   providedIn: 'root'
 })
-export class FeaturedTranslationLanguageObjectFactory {
+export class FeaturedTranslationLanguageFactory {
   createFromBackendDict(
-      featuredTranslationBackendDict: FeaturedTranslationLanguageBackendDict
-  ):FeaturedTranslationLanguage {
+      featuredTranslationBackendDict:FeaturedTranslationLanguageBackendDict
+  ) : FeaturedTranslationLanguage {
     return new FeaturedTranslationLanguage(
       featuredTranslationBackendDict.language_code,
       featuredTranslationBackendDict.description
@@ -47,6 +47,6 @@ export class FeaturedTranslationLanguageObjectFactory {
 }
 
 angular.module('oppia').factory(
-  'FeaturedTranslationLanguageObjectFactory',
-  downgradeInjectable(FeaturedTranslationLanguageObjectFactory));
+  'FeaturedTranslationLanguageFactory',
+  downgradeInjectable(FeaturedTranslationLanguageFactory));
 

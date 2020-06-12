@@ -23,7 +23,7 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { ContributionOpportunitiesBackendApiService } from
   '../services/contribution-opportunities-backend-api.service';
 import { FeaturedTranslationLanguage } from
-  'domain/community_dashboard/FeaturedTranslationLanguageObjectFactory';
+  'domain/community_dashboard/FeaturedTranslationLanguageFactory';
 
 @Component({
   selector: 'translation-language-select',
@@ -50,7 +50,6 @@ export class TranslationLanguageSelectComponent implements OnInit {
   ngOnInit() {
     this.options.forEach(({id, description}) =>
       this.languageIdToDescription[id] = description);
-
     this.contributionOpportunitiesBackendApiService
       .fetchFeaturedTranslationLanguages()
       .then((data: FeaturedTranslationLanguage[]) => {

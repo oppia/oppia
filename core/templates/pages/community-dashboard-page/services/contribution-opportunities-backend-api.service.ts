@@ -28,11 +28,11 @@ import { SkillOpportunity } from
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import {
-  FeaturedTranslationLanguageObjectFactory,
+  FeaturedTranslationLanguageFactory,
   FeaturedTranslationLanguageBackendDict,
   FeaturedTranslationLanguage
 } from
-  'domain/community_dashboard/FeaturedTranslationLanguageObjectFactory';
+  'domain/community_dashboard/FeaturedTranslationLanguageFactory';
 
 const constants = require('constants.ts');
 
@@ -53,8 +53,8 @@ export class ContributionOpportunitiesBackendApiService {
   constructor(
     private urlInterpolationService: UrlInterpolationService,
     private http: HttpClient,
-    private featuredTranslationLanguageObjectFactory:
-      FeaturedTranslationLanguageObjectFactory
+    private featuredTranslationLanguageFactory:
+      FeaturedTranslationLanguageFactory
   ) {}
 
   // TODO(#7165): Replace any with exact type.
@@ -115,7 +115,7 @@ export class ContributionOpportunitiesBackendApiService {
           const featuredTranslationLanguages = (
             data.featured_translation_languages.map(
               (backendDict: FeaturedTranslationLanguageBackendDict) =>
-                this.featuredTranslationLanguageObjectFactory
+                this.featuredTranslationLanguageFactory
                   .createFromBackendDict(backendDict)
             ));
           successCallback(featuredTranslationLanguages);

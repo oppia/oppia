@@ -17,8 +17,8 @@ import { TranslationLanguageSelectComponent } from
   './translation-language-select.component';
 import { ContributionOpportunitiesBackendApiService } from
   '../services/contribution-opportunities-backend-api.service';
-import { FeaturedTranslationLanguageObjectFactory } from
-  'domain/community_dashboard/FeaturedTranslationLanguageObjectFactory';
+import { FeaturedTranslationLanguageFactory } from
+  'domain/community_dashboard/FeaturedTranslationLanguageFactory';
 
 /**
  * @fileoverview Unit tests for the translation language select
@@ -28,14 +28,14 @@ describe('Translation language select', () => {
   let component: TranslationLanguageSelectComponent;
   let fixture: ComponentFixture<TranslationLanguageSelectComponent>;
 
-  let featuredTranslationLanguageObjectFactory =
-    new FeaturedTranslationLanguageObjectFactory();
+  let featuredTranslationLanguageFactory =
+    new FeaturedTranslationLanguageFactory();
   let featuredLanguages = [
-    featuredTranslationLanguageObjectFactory.createFromBackendDict({
+    featuredTranslationLanguageFactory.createFromBackendDict({
       language_code: 'fr',
       description: 'Partnership with ABC'
     }),
-    featuredTranslationLanguageObjectFactory.createFromBackendDict({
+    featuredTranslationLanguageFactory.createFromBackendDict({
       language_code: 'de',
       description: 'Partnership with CBA'
     })

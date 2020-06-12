@@ -18,23 +18,23 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { FeaturedTranslationLanguageObjectFactory } from
-  './FeaturedTranslationLanguageObjectFactory';
+import { FeaturedTranslationLanguageFactory } from
+  './FeaturedTranslationLanguageFactory';
 
 describe('Featured Translation Language object factory', () => {
-  let featuredTranslationLanguageObjectFactory:
-    FeaturedTranslationLanguageObjectFactory = null;
+  let featuredTranslationLanguageFactory:
+    FeaturedTranslationLanguageFactory = null;
   let sampleFTL = null;
 
   beforeEach(() => {
-    featuredTranslationLanguageObjectFactory = TestBed.get(
-      FeaturedTranslationLanguageObjectFactory);
+    featuredTranslationLanguageFactory = TestBed.get(
+      FeaturedTranslationLanguageFactory);
 
     let sampleFTLDict = {
       language_code: 'en',
       description: 'English'
     };
-    sampleFTL = featuredTranslationLanguageObjectFactory
+    sampleFTL = featuredTranslationLanguageFactory
       .createFromBackendDict(sampleFTLDict);
   });
 

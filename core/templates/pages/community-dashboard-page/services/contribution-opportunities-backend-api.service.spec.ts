@@ -30,9 +30,9 @@ import { SkillOpportunityObjectFactory } from
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import {
-  FeaturedTranslationLanguageObjectFactory
+  FeaturedTranslationLanguageFactory
 } from
-  'domain/community_dashboard/FeaturedTranslationLanguageObjectFactory';
+  'domain/community_dashboard/FeaturedTranslationLanguageFactory';
 
 describe('Contribution Opportunities backend API service', function() {
   let contributionOpportunitiesBackendApiService:
@@ -186,8 +186,8 @@ describe('Contribution Opportunities backend API service', function() {
       const successHandler = jasmine.createSpy('success');
       const failHandler = jasmine.createSpy('fail');
 
-      const featuredTranslationLanguageObjectFactory = TestBed.get(
-        FeaturedTranslationLanguageObjectFactory);
+      const featuredTranslationLanguageFactory = TestBed.get(
+        FeaturedTranslationLanguageFactory);
 
       contributionOpportunitiesBackendApiService
         .fetchFeaturedTranslationLanguages()
@@ -205,7 +205,7 @@ describe('Contribution Opportunities backend API service', function() {
       flushMicrotasks();
 
       expect(successHandler).toHaveBeenCalledWith([
-        featuredTranslationLanguageObjectFactory.createFromBackendDict(
+        featuredTranslationLanguageFactory.createFromBackendDict(
           { language_code: 'en', description: 'English' }
         )
       ]);
