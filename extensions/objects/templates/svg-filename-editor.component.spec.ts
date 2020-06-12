@@ -91,13 +91,13 @@ describe('SvgFilenameEditor', function() {
     onload = null;
     constructor() {
       this.onload = function() {
-        return "Fake onload executed"
-      }
+        return 'Fake onload executed';
+      };
     }
     set src(url) {
       this.onload();
     }
-  };
+  }
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -372,27 +372,27 @@ describe('SvgFilenameEditor with image save destination as ' +
     onload = null;
     constructor() {
       this.onload = function() {
-        return "Fake onload executed";
-      }
+        return 'Fake onload executed';
+      };
     }
     readAsDataURL(file) {
       this.onload();
       return 'The file is loaded';
     }
-  };
+  }
 
   class mockImageObject {
     source = null;
     onload = null;
     constructor() {
       this.onload = function() {
-        return "Fake onload executed";
-      }
+        return 'Fake onload executed';
+      };
     }
     set src(url) {
       this.onload();
     }
-  };
+  }
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
