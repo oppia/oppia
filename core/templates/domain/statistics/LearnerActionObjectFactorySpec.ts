@@ -18,15 +18,7 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import {
-  ILearnerActionAnswerSubmitBackendDict,
-  ILearnerActionExplorationQuitBackendDict,
-  ILearnerActionExplorationStartBackendDict,
-  LearnerActionAnswerSubmit,
-  LearnerActionExplorationQuit,
-  LearnerActionExplorationStart,
-  LearnerActionObjectFactory
-} from
+import { LearnerActionObjectFactory } from
   'domain/statistics/LearnerActionObjectFactory';
 
 describe('Learner Action Object Factory', () => {
@@ -38,57 +30,15 @@ describe('Learner Action Object Factory', () => {
     learnerActionObjectFactory = TestBed.get(LearnerActionObjectFactory);
   });
 
-  it('should return correct action type from backend dict', () => {
-    const explorationStartAction = (
-      learnerActionObjectFactory.createFromBackendDict({
-        action_type: 'ExplorationStart',
-        action_customization_args: {
-          state_name: {value: 'Hola'},
-        },
-        schema_version: 1,
-      }));
-    const explorationQuitAction = (
-      learnerActionObjectFactory.createFromBackendDict({
-        action_type: 'ExplorationQuit',
-        action_customization_args: {
-          state_name: {value: 'End'},
-          time_spent_in_state_in_msecs: {value: 13000},
-        },
-        schema_version: 1,
-      }));
-    const answerSubmitAction = (
-      learnerActionObjectFactory.createFromBackendDict({
-        action_type: 'AnswerSubmit',
-        action_customization_args: {
-          state_name: {value: 'Hola'},
-          dest_state_name: {value: 'Adios'},
-          interaction_id: {value: 'TextInput'},
-          submitted_answer: {value: 'Hi'},
-          feedback: {value: 'Correct!'},
-          time_spent_state_in_msecs: {value: 3.5},
-          },
-        schema_version: 1,
-      }));
-
-    expect(explorationQuitAction)
-      .toBeInstanceOf(LearnerActionExplorationQuit);
-    expect(explorationStartAction)
-      .toBeInstanceOf(LearnerActionExplorationStart);
-    expect(answerSubmitAction)
-      .toBeInstanceOf(LearnerActionAnswerSubmit);
-  });
-
   it('should return a backend dict equivalent to input', () => {
-    const explorationStartActionBackendDict:
-        ILearnerActionExplorationStartBackendDict = {
+    const explorationStartActionBackendDict: ILearnerActionBackendDict = {
       action_type: 'ExplorationStart',
       action_customization_args: {
         state_name: {value: 'Hola'},
       },
       schema_version: 1,
     };
-    const explorationQuitActionBackendDict:
-        ILearnerActionExplorationQuitBackendDict = {
+    const explorationQuitActionBackendDict: ILearnerActionBackendDict = {
       action_type: 'ExplorationQuit',
       action_customization_args: {
         state_name: {value: 'End'},
@@ -96,8 +46,7 @@ describe('Learner Action Object Factory', () => {
       },
       schema_version: 1,
     };
-    const answerSubmitActionBackendDict:
-        ILearnerActionAnswerSubmitBackendDict = {
+    const answerSubmitActionBackendDict: ILearnerActionBackendDict = {
       action_type: 'AnswerSubmit',
       action_customization_args: {
         state_name: {value: 'Hola'},
@@ -138,32 +87,6 @@ describe('Learner Action Object Factory', () => {
       state_name: {value: 'Hola'},
     });
     expect(learnerAction.schemaVersion).toEqual(1);
-  });
-
-  it('should throw for unsupported action type', () => {
-    // NOTE TO DEVELOPERS: Needs to be any to compile, otherwise there's no way
-    // to test exhaustiveness.
-    const invalidBackendDict: any = {
-      action_type: '???',
-      action_customization_args: {},
-      schema_version: 1,
-    };
-    expect(
-      () => learnerActionObjectFactory.createFromBackendDict(invalidBackendDict)
-    ).toThrowError(/Backend dict has unknown action type/);
-  });
-
-  it('should throw for unsupported schema version', () => {
-    // NOTE TO DEVELOPERS: Needs to be any to compile, otherwise there's no way
-    // to test exhaustiveness.
-    const invalidBackendDict: any = {
-      action_type: 'ExplorationStart',
-      action_customization_args: {},
-      schema_version: 42,
-    };
-    expect(
-      () => learnerActionObjectFactory.createFromBackendDict(invalidBackendDict)
-    ).toThrowError(/Backend dict has unsupported schema version/);
   });
 
   it('should create a new answer submit action', () => {

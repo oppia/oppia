@@ -38,54 +38,24 @@ export interface IExplorationQuitCustomizationArgs {
   'time_spent_in_state_in_msecs': {value: number};
 }
 
-export interface ILearnerActionExplorationStartBackendDict {
-  // NOTE TO DEVELOPERS: The following two definitions are NOT typos! These are
-  // discriminated unions, a feature of TypeScript. Code will fail to compile if
-  // the compiler can not deduce that action_type and schema_version are set to
-  // the following values. For details see:
-  // https://www.typescriptlang.org/docs/handbook/advanced-types.html#discriminated-unions
-  'action_type': 'ExplorationStart';
-  'schema_version': 1;
-  'action_customization_args': IExplorationStartCustomizationArgs;
+export type ILearnerActionCustomizationArgs = (
+  IExplorationStartCustomizationArgs |
+  IAnswerSubmitCustomizationArgs |
+  IExplorationQuitCustomizationArgs);
+
+export interface ILearnerActionBackendDict {
+  'action_type': string;
+  'schema_version': number;
+  'action_customization_args': ILearnerActionCustomizationArgs;
 }
 
-export interface ILearnerActionAnswerSubmitBackendDict {
-  // NOTE TO DEVELOPERS: The following two definitions are NOT typos! These are
-  // discriminated unions, a feature of TypeScript. Code will fail to compile if
-  // the compiler can not deduce that action_type and schema_version are set to
-  // the following values. For details see:
-  // https://www.typescriptlang.org/docs/handbook/advanced-types.html#discriminated-unions
-  'action_type': 'AnswerSubmit';
-  'schema_version': 1;
-  'action_customization_args': IAnswerSubmitCustomizationArgs;
-}
+export class LearnerAction {
+  constructor(
+      public actionType: string,
+      public schemaVersion: number,
+      public actionCustomizationArgs: ILearnerActionCustomizationArgs) {}
 
-export interface ILearnerActionExplorationQuitBackendDict {
-  // NOTE TO DEVELOPERS: The following two definitions are NOT typos! These are
-  // discriminated unions, a feature of TypeScript. Code will fail to compile if
-  // the compiler can not deduce that action_type and schema_version are set to
-  // the following values. For details see:
-  // https://www.typescriptlang.org/docs/handbook/advanced-types.html#discriminated-unions
-  'action_type': 'ExplorationQuit';
-  'schema_version': 1;
-  'action_customization_args': IExplorationQuitCustomizationArgs;
-}
-
-export type ILearnerActionBackendDict = (
-  ILearnerActionExplorationStartBackendDict |
-  ILearnerActionAnswerSubmitBackendDict |
-  ILearnerActionExplorationQuitBackendDict);
-
-export class LearnerActionExplorationStart {
-  actionType: 'ExplorationStart' = 'ExplorationStart';
-  schemaVersion: 1 = 1;
-  actionCustomizationArgs: IExplorationStartCustomizationArgs;
-
-  constructor(actionCustomizationArgs: IExplorationStartCustomizationArgs) {
-    this.actionCustomizationArgs = actionCustomizationArgs;
-  }
-
-  toBackendDict(): ILearnerActionExplorationStartBackendDict {
+  toBackendDict(): ILearnerActionBackendDict {
     return {
       action_type: this.actionType,
       schema_version: this.schemaVersion,
@@ -93,95 +63,31 @@ export class LearnerActionExplorationStart {
     }
   }
 }
-
-export class LearnerActionAnswerSubmit {
-  actionType: 'AnswerSubmit' = 'AnswerSubmit';
-  schemaVersion: 1 = 1;
-  actionCustomizationArgs: IAnswerSubmitCustomizationArgs;
-
-  constructor(actionCustomizationArgs: IAnswerSubmitCustomizationArgs) {
-    this.actionCustomizationArgs = actionCustomizationArgs;
-  }
-
-  toBackendDict(): ILearnerActionAnswerSubmitBackendDict {
-    return {
-      action_type: this.actionType,
-      schema_version: this.schemaVersion,
-      action_customization_args: this.actionCustomizationArgs,
-    };
-  }
-}
-
-export class LearnerActionExplorationQuit {
-  actionType: 'ExplorationQuit' = 'ExplorationQuit';
-  schemaVersion: 1 = 1;
-  actionCustomizationArgs: IExplorationQuitCustomizationArgs;
-
-  constructor(actionCustomizationArgs: IExplorationQuitCustomizationArgs) {
-    this.actionCustomizationArgs = actionCustomizationArgs;
-  }
-
-  toBackendDict(): ILearnerActionExplorationQuitBackendDict {
-    return {
-      action_type: this.actionType,
-      schema_version: this.schemaVersion,
-      action_customization_args: this.actionCustomizationArgs,
-    };
-  }
-}
-
-export type LearnerAction = (
-  LearnerActionExplorationStart |
-  LearnerActionAnswerSubmit |
-  LearnerActionExplorationQuit);
 
 @Injectable({
   providedIn: 'root'
 })
 export class LearnerActionObjectFactory {
   createFromBackendDict(backendDict: ILearnerActionBackendDict): LearnerAction {
-    switch (backendDict.schema_version) {
-      case 1:
-        break;
-      default:
-        throw new Error(
-          'Backend dict has unsupported schema version: ' + backendDict);
-    }
-    switch (backendDict.action_type) {
-      case 'ExplorationStart':
-        return new LearnerActionExplorationStart(
-          backendDict.action_customization_args);
-      case 'AnswerSubmit':
-        return new LearnerActionAnswerSubmit(
-          backendDict.action_customization_args);
-      case 'ExplorationQuit':
-        return new LearnerActionExplorationQuit(
-          backendDict.action_customization_args);
-      default:
-        // NOTE TO DEVELOPERS: This branch will fail to compile if a new action
-        // type is introduced without being added to this switch statement.
-        const invalidBackendDict: never = backendDict;
-        throw new Error(
-          'Backend dict has unknown action type: ' + invalidBackendDict);
-    }
+    return new LearnerAction(
+      backendDict.action_type,
+      backendDict.schema_version,
+      backendDict.action_customization_args);
   }
 
   createExplorationStartAction(
-      actionCustomizationArgs:
-        IExplorationStartCustomizationArgs): LearnerActionExplorationStart {
-    return new LearnerActionExplorationStart(actionCustomizationArgs);
+      customizationArgs: IExplorationStartCustomizationArgs): LearnerAction {
+    return new LearnerAction('ExplorationStart', 1, customizationArgs);
   }
 
   createAnswerSubmitAction(
-      actionCustomizationArgs:
-        IAnswerSubmitCustomizationArgs): LearnerActionAnswerSubmit {
-    return new LearnerActionAnswerSubmit(actionCustomizationArgs);
+      customizationArgs: IAnswerSubmitCustomizationArgs): LearnerAction {
+    return new LearnerAction('AnswerSubmit', 1, customizationArgs);
   }
 
   createExplorationQuitAction(
-      actionCustomizationArgs:
-        IExplorationQuitCustomizationArgs): LearnerActionExplorationQuit {
-    return new LearnerActionExplorationQuit(actionCustomizationArgs);
+      customizationArgs: IExplorationQuitCustomizationArgs): LearnerAction {
+    return new LearnerAction('ExplorationQuit', 1, customizationArgs);
   }
 }
 
