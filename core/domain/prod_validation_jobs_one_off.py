@@ -615,18 +615,17 @@ class BaseUserModelValidator(BaseModelValidator):
         return r'^%s$' % USER_ID_REGEX
 
     @classmethod
-    def _get_exp_ids(cls):
-        """Returns a list of exploration ids related to the current user model
-        based on the class. This assumes cls.external_instance_details is
-        already populated.
+    def _validate_explorations_are_public(cls, item):
+        """Validates that explorations for model are public. This assumes
+        cls.external_instance_details is already populated.
 
-        Returns:
-            list(str). List of exploration ids related to the model.
+        Args:
+            item: ndb.Model. BaseUserModel to validate.
         """
         if 'exploration_ids' not in cls.external_instance_details:
-            return []
+            return
 
-        exploration_ids = []
+        exp_ids = []
         exploration_model_class_model_id_model_tuples = (
             cls.external_instance_details['exploration_ids'])
         for (_, _, exploration_model) in (
@@ -637,43 +636,8 @@ class BaseUserModelValidator(BaseModelValidator):
             # _validate_external_id_relationships function.
             if exploration_model is None or exploration_model.deleted:
                 continue
-            exploration_ids.append(exploration_model.id)
-        return exploration_ids
+            exp_ids.append(exploration_model.id)
 
-    @classmethod
-    def _get_col_ids(cls):
-        """Returns a list of collection ids related to the current user model
-        based on the class. This assumes cls.external_instance_details is
-        already populated.
-
-        Returns:
-            list(str). List of collection ids related to the model.
-        """
-        if 'collection_ids' not in cls.external_instance_details:
-            return []
-
-        collection_ids = []
-        collection_model_class_model_id_model_tuples = (
-            cls.external_instance_details['collection_ids'])
-        for (_, _, collection_model) in (
-                collection_model_class_model_id_model_tuples):
-            # In the case of a missing external collection model, we don't
-            # report an error here since errors for missing external collection
-            # model are already checked and stored in
-            # _validate_external_id_relationships function.
-            if collection_model is None or collection_model.deleted:
-                continue
-            collection_ids.append(collection_model.id)
-        return collection_ids
-
-    @classmethod
-    def _validate_explorations_are_public(cls, item):
-        """Validates that explorations for model are public.
-
-        Args:
-            item: ndb.Model. BaseUserModel to validate.
-        """
-        exp_ids = cls._get_exp_ids()
         private_exp_ids = [
             exp_id for exp_id in exp_ids if (
                 rights_manager.is_exploration_private(exp_id))]
@@ -684,12 +648,28 @@ class BaseUserModelValidator(BaseModelValidator):
 
     @classmethod
     def _validate_collections_are_public(cls, item):
-        """Validates that collections for model are public.
+        """Validates that collections for model are public. This assumes
+        cls.external_instance_details is already populated.
 
         Args:
             item: ndb.Model. BaseUserModel to validate.
         """
-        col_ids = cls._get_col_ids()
+        if 'collection_ids' not in cls.external_instance_details:
+            return
+
+        col_ids = []
+        collection_model_class_model_id_model_tuples = (
+            cls.external_instance_details['collection_ids'])
+        for (_, _, collection_model) in (
+                collection_model_class_model_id_model_tuples):
+            # In the case of a missing external collection model, we don't
+            # report an error here since errors for missing external collection
+            # model are already checked and stored in
+            # _validate_external_id_relationships function.
+            if collection_model is None or collection_model.deleted:
+                continue
+            col_ids.append(collection_model.id)
+
         private_col_ids = [
             col_id for col_id in col_ids if (
                 rights_manager.is_collection_private(col_id))]
