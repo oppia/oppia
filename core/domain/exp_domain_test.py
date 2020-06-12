@@ -725,7 +725,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 }
         }
         solution = state_domain.Solution.from_dict(
-            init_state.interactin.id, solution_dict)
+            init_state.interaction.id, solution_dict)
         init_state.update_interaction_solution(solution)
         self._assert_validation_error(
             exploration,
@@ -1221,7 +1221,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             },
         }
         solution = state_domain.Solution.from_dict(
-            init_state.interactin.id, solution_dict)
+            init_state.interaction.id, solution_dict)
         init_state.update_interaction_solution(solution)
 
         self.assertEqual(exploration.get_content_count(), 7)
