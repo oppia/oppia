@@ -170,13 +170,13 @@ def check_errors_in_a_page(url_to_check, msg_to_confirm):
     Returns:
         bool. Whether the page has errors or not.
     """
+    common.open_new_tab_in_browser_if_possible(url_to_check)
     while True:
         python_utils.PRINT(
             '******************************************************')
         python_utils.PRINT(
             'PLEASE CONFIRM: %s See %s '
             '(y/n)' % (msg_to_confirm, url_to_check))
-        common.open_new_tab_in_browser_if_possible(url_to_check)
         answer = python_utils.INPUT().lower()
         if answer in release_constants.AFFIRMATIVE_CONFIRMATIONS:
             return True
@@ -380,17 +380,17 @@ def check_travis_and_circleci_tests(current_branch_name):
     except Exception:
         circleci_url = 'https://circleci.com/gh/oppia/workflows/oppia'
 
+    common.open_new_tab_in_browser_if_possible(travis_url)
     python_utils.PRINT(
         'Are all travis tests passing on branch %s?\n' % current_branch_name)
-    common.open_new_tab_in_browser_if_possible(travis_url)
     travis_tests_passing = python_utils.INPUT().lower()
     if travis_tests_passing not in release_constants.AFFIRMATIVE_CONFIRMATIONS:
         raise Exception(
             'Please fix the travis tests before deploying.')
 
+    common.open_new_tab_in_browser_if_possible(circleci_url)
     python_utils.PRINT(
         'Are all circleci tests passing on branch %s?\n' % current_branch_name)
-    common.open_new_tab_in_browser_if_possible(circleci_url)
     circleci_tests_passing = python_utils.INPUT().lower()
     if circleci_tests_passing not in (
             release_constants.AFFIRMATIVE_CONFIRMATIONS):
@@ -494,19 +494,20 @@ def execute_deployment():
                 current_branch_name)
             last_commit_message = subprocess.check_output(
                 'git log -1 --pretty=%B'.split())
-            if not last_commit_message.startswith(
-                    'Update authors and changelog for v%s' % (
-                        release_version_number)):
-                raise Exception(
-                    'Invalid last commit message: %s.' % last_commit_message)
+            personal_access_token = common.get_personal_access_token()
+            if not common.is_current_branch_a_hotfix_branch():
+                if not last_commit_message.startswith(
+                        'Update authors and changelog for v%s' % (
+                            release_version_number)):
+                    raise Exception(
+                        'Invalid last commit message: %s.' % (
+                            last_commit_message))
+                g = github.Github(personal_access_token)
+                repo = g.get_organization('oppia').get_repo('oppia')
+                common.check_blocking_bug_issue_count(repo)
+                common.check_prs_for_current_release_are_released(repo)
 
             check_travis_and_circleci_tests(current_branch_name)
-
-            personal_access_token = common.get_personal_access_token()
-            g = github.Github(personal_access_token)
-            repo = g.get_organization('oppia').get_repo('oppia')
-            common.check_blocking_bug_issue_count(repo)
-            common.check_prs_for_current_release_are_released(repo)
             update_configs.main(personal_access_token)
             with python_utils.open_file(common.FECONF_PATH, 'r') as f:
                 feconf_contents = f.read()

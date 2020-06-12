@@ -217,12 +217,16 @@ class DeployTests(test_utils.GenericTestBase):
             sys, 'argv', ['deploy.py', '--app_name=oppiaserver'])
         def mock_check_output(unused_cmd_tokens):
             return 'Invalid'
+        def mock_get_personal_access_token():
+            return 'test'
         out_swap = self.swap(
             subprocess, 'check_output', mock_check_output)
+        get_token_swap = self.swap(
+            common, 'get_personal_access_token', mock_get_personal_access_token)
         with self.get_branch_swap, self.install_swap, self.cwd_check_swap:
             with self.release_script_exist_swap, self.gcloud_available_swap:
                 with self.run_swap, self.create_swap, args_swap, out_swap:
-                    with self.assertRaisesRegexp(
+                    with get_token_swap, self.assertRaisesRegexp(
                         Exception, 'Invalid last commit message: Invalid.'):
                         deploy.execute_deployment()
 
