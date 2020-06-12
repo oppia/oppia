@@ -177,7 +177,7 @@ describe('PlaythroughService', () => {
       expect(playthrough.issueType).toEqual('EarlyQuit');
       expect(playthrough.issueCustomizationArgs).toEqual({
         state_name: {value: 'stateName1'},
-        time_spent_in_exp_in_secs: {value: 50},
+        time_spent_in_exp_in_msecs: {value: 50000},
       });
     });
 

@@ -22,7 +22,7 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { LearnerActionObjectFactory } from
   'domain/statistics/LearnerActionObjectFactory';
-import { PlaythroughObjectFactory } from
+import { IEarlyQuitCustomizationArgs, PlaythroughObjectFactory } from
   'domain/statistics/PlaythroughObjectFactory';
 import { PlaythroughBackendApiService } from
   'services/playthrough-backend-api.service';
@@ -48,7 +48,8 @@ describe('Playthrough backend api service', function() {
     const onSuccess = jasmine.createSpy('success');
     const onFailure = jasmine.createSpy('failure');
     const playthrough = playthroughObjectFactory.createNew(
-      'pid', 'eid', 1, 'EarlyQuit', {state_name: {value: 100}}, [
+      'pid', 'eid', 1, 'EarlyQuit',
+      <IEarlyQuitCustomizationArgs>{state_name: {value: 'text'}}, [
         learnerActionObjectFactory.createExplorationStartAction({
           state_name: {value: 'Hola'}
         })

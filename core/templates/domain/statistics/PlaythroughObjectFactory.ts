@@ -23,13 +23,32 @@ import { Injectable } from '@angular/core';
 import { LearnerAction, LearnerActionObjectFactory, ILearnerActionBackendDict }
   from 'domain/statistics/LearnerActionObjectFactory';
 
+export interface IMultipleIncorrectSubmissionsCustomizationArgs {
+  'state_name': {value: string};
+  'num_times_answered_incorrectly': {value: number};
+}
+
+export interface ICyclicStateTransitionsCustomizationArgs {
+  'state_names': {value: string[]};
+}
+
+export interface IEarlyQuitCustomizationArgs {
+  'state_name': {value: string};
+  'time_spent_in_exp_in_msecs': {value: number};
+}
+
+export type IIssueCustomizationArgs = (
+  IMultipleIncorrectSubmissionsCustomizationArgs |
+  ICyclicStateTransitionsCustomizationArgs |
+  IEarlyQuitCustomizationArgs);
+
 export interface IPlaythroughBackendDict {
   'playthrough_id'?: string;
   'id'?: string;
   'exp_id': string;
   'exp_version': number;
   'issue_type': string;
-  'issue_customization_args': any;
+  'issue_customization_args': IIssueCustomizationArgs;
   'actions': ILearnerActionBackendDict[];
 }
 
@@ -39,7 +58,7 @@ export class Playthrough {
       public expId: string,
       public expVersion: number,
       public issueType: string,
-      public issueCustomizationArgs: any,
+      public issueCustomizationArgs: IIssueCustomizationArgs,
       public actions: LearnerAction[]) {}
 
   getLastAction(): LearnerAction {
@@ -67,7 +86,7 @@ export class PlaythroughObjectFactory {
 
   createNew(
       playthroughId: string, expId: string, expVersion: number,
-      issueType: string, issueCustomizationArgs: any,
+      issueType: string, issueCustomizationArgs: IIssueCustomizationArgs,
       actions: LearnerAction[]): Playthrough {
     return new Playthrough(
       playthroughId, expId, expVersion, issueType, issueCustomizationArgs,

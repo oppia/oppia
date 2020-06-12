@@ -24,8 +24,13 @@ import { ExplorationFeaturesService } from
   'services/exploration-features.service';
 import { LearnerActionObjectFactory } from
   'domain/statistics/LearnerActionObjectFactory';
-import { Playthrough, PlaythroughObjectFactory } from
-  'domain/statistics/PlaythroughObjectFactory';
+import {
+  ICyclicStateTransitionsCustomizationArgs,
+  IEarlyQuitCustomizationArgs,
+  IMultipleIncorrectSubmissionsCustomizationArgs,
+  Playthrough,
+  PlaythroughObjectFactory
+} from 'domain/statistics/PlaythroughObjectFactory';
 import { PlaythroughBackendApiService } from
   'services/playthrough-backend-api.service';
 import { ServicesConstants } from 'services/services.constants';
@@ -40,11 +45,11 @@ class MultipleIncorrectAnswersTracker {
     this.currentStateName = initStateName;
   }
 
-  public isIssue(): boolean {
+  isIssue(): boolean {
     return this.numTries >= ServicesConstants.NUM_INCORRECT_ANSWERS_THRESHOLD;
   }
 
-  public recordStateTransition(destStateName: string): void {
+  recordStateTransition(destStateName: string): void {
     if (this.currentStateName === destStateName) {
       this.numTries += 1;
     } else {
@@ -56,17 +61,17 @@ class MultipleIncorrectAnswersTracker {
 
 class CyclicStateTransitionsTracker {
   public visitedStates: string[];
-  public cycleString: string = null;
+  public cycle: string[] = null;
   public numCycles: number = 0;
 
   constructor(initStateName: string) {
     this.visitedStates = [initStateName];
   }
 
-  private makeCycleString(cycleStartIndex: number): string {
+  private makeCycle(cycleStartIndex: number): string[] {
     const collision = this.visitedStates[cycleStartIndex];
     const cycleWithoutCollision = this.visitedStates.slice(cycleStartIndex);
-    return [...cycleWithoutCollision, collision].join(', ');
+    return [...cycleWithoutCollision, collision];
   }
 
   private currentStateName(): string {
@@ -83,12 +88,11 @@ class CyclicStateTransitionsTracker {
       return;
     }
     if (this.currentStateName() !== destStateName) {
-      const cycleString = (
-        this.makeCycleString(this.visitedStates.indexOf(destStateName)));
-      if (this.cycleString === cycleString) {
+      const cycle = this.makeCycle(this.visitedStates.indexOf(destStateName));
+      if (angular.equals(this.cycle, cycle)) {
         this.numCycles += 1;
       } else {
-        this.cycleString = cycleString;
+        this.cycle = cycle;
         this.numCycles = 1;
       }
     }
@@ -97,7 +101,9 @@ class CyclicStateTransitionsTracker {
 }
 
 class EarlyQuitTracker {
-  constructor(private timeSpentInStateSecs: number = null) {}
+  constructor(
+      public stateName: string = null,
+      public timeSpentInStateSecs: number = null) {}
 
   isIssue(): boolean {
     return (
@@ -106,7 +112,8 @@ class EarlyQuitTracker {
     );
   }
 
-  recordExplorationQuit(timeSpentInStateSecs: number): void {
+  recordExplorationQuit(stateName: string, timeSpentInStateSecs: number): void {
+    this.stateName = stateName;
     this.timeSpentInStateSecs = timeSpentInStateSecs;
   }
 }
@@ -144,25 +151,25 @@ export class PlaythroughService {
     if (this.misTracker !== null && this.misTracker.isIssue()) {
       this.playthrough.issueType = (
         AppConstants.ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS);
-      this.playthrough.issueCustomizationArgs = {
-        state_name: {value: this.misTracker.currentStateName},
-        num_times_answered_incorrectly: {value: this.misTracker.numTries}
-      };
+      this.playthrough.issueCustomizationArgs = (
+        <IMultipleIncorrectSubmissionsCustomizationArgs>{
+          state_name: {value: this.misTracker.currentStateName},
+          num_times_answered_incorrectly: {value: this.misTracker.numTries}
+        });
     } else if (this.cstTracker !== null && this.cstTracker.isIssue()) {
       this.playthrough.issueType = (
         AppConstants.ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS);
-      this.playthrough.issueCustomizationArgs = {
-        state_names: {value: this.cstTracker.cycleString.split(', ')}
-      };
+      this.playthrough.issueCustomizationArgs = (
+        <ICyclicStateTransitionsCustomizationArgs>{
+          state_names: {value: this.cstTracker.cycle}
+        });
     } else if (this.eqTracker !== null && this.eqTracker.isIssue()) {
-      const lastStateName = (
-        this.playthrough.getLastAction()
-          .actionCustomizationArgs.state_name.value);
       this.playthrough.issueType = AppConstants.ISSUE_TYPE_EARLY_QUIT;
-      this.playthrough.issueCustomizationArgs = {
-        state_name: {value: lastStateName},
-        time_spent_in_exp_in_secs: {value: this.expDurationInSecs}
-      };
+      this.playthrough.issueCustomizationArgs = (
+        <IEarlyQuitCustomizationArgs>{
+          state_name: {value: this.eqTracker.stateName},
+          time_spent_in_exp_in_msecs: {value: this.expDurationInSecs * 1000}
+        });
     }
   }
 
@@ -249,7 +256,7 @@ export class PlaythroughService {
     }
 
     this.expDurationInSecs = this.stopwatch.getTimeInSecs();
-    this.eqTracker.recordExplorationQuit(timeSpentInStateSecs);
+    this.eqTracker.recordExplorationQuit(stateName, timeSpentInStateSecs);
 
     const explorationQuitAction = (
       this.learnerActionObjectFactory.createExplorationQuitAction({
