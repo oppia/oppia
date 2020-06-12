@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the "sorted tiles" visualization.
+ * @fileoverview Directive for the SortedTiles visualization.
  */
 
 require('services/html-escaper.service.ts');
