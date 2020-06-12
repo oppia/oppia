@@ -431,7 +431,7 @@ AVERAGE_RATINGS_DASHBOARD_PRECISION = 2
 # all HTTP requests to the maintenance page. This is the only check which
 # determines whether the site is in maintenance mode to avoid queries to the
 # database by non-admins.
-ENABLE_MAINTENANCE_MODE = True
+ENABLE_MAINTENANCE_MODE = False
 
 # The interactions permissible for a question.
 ALLOWED_QUESTION_INTERACTION_IDS = [
