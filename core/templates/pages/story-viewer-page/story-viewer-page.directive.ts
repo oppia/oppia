@@ -22,7 +22,6 @@ require(
 require(
   'components/common-layout-directives/common-elements/' +
   'background-banner.component.ts');
-require('components/summary-tile/exploration-summary-tile.directive.ts');
 
 require(
   'pages/story-viewer-page/navbar-breadcrumb/' +
@@ -34,6 +33,7 @@ require(
 require('domain/story_viewer/StoryPlaythroughObjectFactory.ts');
 require('domain/story_viewer/story-viewer-backend-api.service.ts');
 require('services/alerts.service.ts');
+require('services/assets-backend-api.service.ts');
 require('services/page-title.service.ts');
 require('services/contextual/url.service.ts');
 
@@ -47,13 +47,15 @@ angular.module('oppia').directive('storyViewerPage', [
         '/pages/story-viewer-page/story-viewer-page.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$rootScope', '$window', 'AlertsService',
+        '$rootScope', '$window', 'AlertsService', 'AssetsBackendApiService',
         'PageTitleService', 'LoaderService', 'StoryPlaythroughObjectFactory',
-        'StoryViewerBackendApiService', 'UrlService', 'FATAL_ERROR_CODES',
+        'StoryViewerBackendApiService', 'UrlService', 'ENTITY_TYPE',
+        'FATAL_ERROR_CODES',
         function(
-            $rootScope, $window, AlertsService,
+            $rootScope, $window, AlertsService, AssetsBackendApiService,
             PageTitleService, LoaderService, StoryPlaythroughObjectFactory,
-            StoryViewerBackendApiService, UrlService, FATAL_ERROR_CODES) {
+            StoryViewerBackendApiService, UrlService, ENTITY_TYPE,
+            FATAL_ERROR_CODES) {
           var ctrl = this;
           ctrl.getStaticImageUrl = function(imagePath) {
             return UrlInterpolationService.getStaticImageUrl(imagePath);
@@ -70,57 +72,37 @@ angular.module('oppia').directive('storyViewerPage', [
             var storyNodes = ctrl.storyPlaythroughObject.getStoryNodes();
             var iconParametersArray = [];
             iconParametersArray.push({
-              thumbnailIconUrl:
-                storyNodes[0].getExplorationSummaryObject(
-                ).thumbnail_icon_url.replace('subjects', 'inverted_subjects'),
+              thumbnailIconUrl: (
+                AssetsBackendApiService.getThumbnailUrlForPreview(
+                  ENTITY_TYPE.STORY, ctrl.storyId,
+                  storyNodes[0].getThumbnailFilename())),
               left: '225px',
               top: '35px',
-              thumbnailBgColor:
-                storyNodes[0].getExplorationSummaryObject(
-                ).thumbnail_bg_color
+              thumbnailBgColor: storyNodes[0].getThumbnailBgColor()
             });
 
             for (
               var i = 1; i < ctrl.storyPlaythroughObject.getStoryNodeCount();
               i++) {
-              var thumbnailColor = null;
-
-              if (!storyNodes[i].isCompleted() &&
-                (storyNodes[i].getId() !==
-                ctrl.storyPlaythroughObject.getNextPendingNodeId())) {
-                let hexCode = storyNodes[i].getExplorationSummaryObject(
-                ).thumbnail_bg_color;
-                // Adds a 50% opacity to the color.
-                // Changes the luminosity level of the faded color.
-                // Signed value, negative => darker.
-                let lum = 0.5;
-                thumbnailColor = '#';
-
-                let red = parseInt(hexCode.substring(1, 3), 16);
-                thumbnailColor += Math.round(
-                  Math.min(Math.max(0, red + (red * lum)), 255)).toString(16);
-
-                let green = parseInt(hexCode.substring(3, 5), 16);
-                thumbnailColor += Math.round(
-                  Math.min(
-                    Math.max(0, green + (green * lum)), 255)).toString(16);
-
-                let blue = parseInt(hexCode.substring(5, 7), 16);
-                thumbnailColor += Math.round(
-                  Math.min(
-                    Math.max(0, blue + (blue * lum)), 255)).toString(16);
-              } else {
-                thumbnailColor = storyNodes[i].getExplorationSummaryObject(
-                ).thumbnail_bg_color;
-              }
               iconParametersArray.push({
-                thumbnailIconUrl:
-                  storyNodes[i].getExplorationSummaryObject(
-                  ).thumbnail_icon_url.replace('subjects', 'inverted_subjects'),
-                thumbnailBgColor: thumbnailColor
+                thumbnailIconUrl: (
+                  AssetsBackendApiService.getThumbnailUrlForPreview(
+                    ENTITY_TYPE.STORY, ctrl.storyId,
+                    storyNodes[i].getThumbnailFilename())),
+                thumbnailBgColor: storyNodes[i].getThumbnailBgColor()
               });
             }
             return iconParametersArray;
+          };
+
+          ctrl.isChapterLocked = function(node) {
+            if (
+              node.isCompleted() || (
+                node.getId() ===
+                ctrl.storyPlaythroughObject.getNextPendingNodeId())) {
+              return false;
+            }
+            return true;
           };
 
           ctrl.getExplorationUrl = function(node) {
@@ -128,15 +110,15 @@ angular.module('oppia').directive('storyViewerPage', [
             result = UrlService.addField(
               result, 'story_id', UrlService.getStoryIdFromViewerUrl());
             result = UrlService.addField(
-              result, 'node_id', ctrl.currentNodeId);
+              result, 'node_id', node.getId());
             return result;
           };
 
           ctrl.$onInit = function() {
             ctrl.storyIsLoaded = false;
             LoaderService.showLoadingScreen('Loading');
-            var storyId = UrlService.getStoryIdFromViewerUrl();
-            StoryViewerBackendApiService.fetchStoryData(storyId).then(
+            ctrl.storyId = UrlService.getStoryIdFromViewerUrl();
+            StoryViewerBackendApiService.fetchStoryData(ctrl.storyId).then(
               function(storyDataDict) {
                 ctrl.storyIsLoaded = true;
                 ctrl.storyPlaythroughObject =
@@ -147,15 +129,6 @@ angular.module('oppia').directive('storyViewerPage', [
                 ctrl.storyTitle = storyDataDict.story_title;
                 ctrl.storyDescription = storyDataDict.story_description;
 
-                // Taking the characteristics of the first chapter as
-                // placeholder to be displayed on the right, since all
-                // explorations in the story should have the same category, and
-                // hence the same characteristics.
-                let firstChapterSummary =
-                  ctrl.storyPlaythroughObject.getInitialNode().
-                    getExplorationSummaryObject();
-                ctrl.thumbnailBgColor = firstChapterSummary.thumbnail_bg_color;
-                ctrl.thumbnailIconUrl = firstChapterSummary.thumbnail_icon_url;
                 LoaderService.hideLoadingScreen();
                 ctrl.pathIconParameters = ctrl.generatePathIconParameters();
                 // TODO(#8521): Remove the use of $rootScope.$apply()
