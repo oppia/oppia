@@ -30,6 +30,7 @@ from constants import constants
 from core import jobs_registry
 from core.domain import collection_domain
 from core.domain import collection_services
+from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import feedback_services
@@ -80,7 +81,7 @@ CURRENT_DATETIME = datetime.datetime.utcnow()
     opportunity_models, question_models,
     recommendations_models, skill_models,
     story_models, suggestion_models, topic_models,
-    user_models,) = (
+    user_models, stats_models,) = (
         models.Registry.import_models([
             models.NAMES.activity, models.NAMES.audit, models.NAMES.base_model,
             models.NAMES.classifier, models.NAMES.collection,
@@ -89,7 +90,7 @@ CURRENT_DATETIME = datetime.datetime.utcnow()
             models.NAMES.opportunity, models.NAMES.question,
             models.NAMES.recommendations, models.NAMES.skill,
             models.NAMES.story, models.NAMES.suggestion, models.NAMES.topic,
-            models.NAMES.user]))
+            models.NAMES.user, models.NAMES.statistics]))
 
 OriginalDatetimeType = datetime.datetime
 
@@ -15123,3 +15124,128 @@ class TaskEntryModelValidatorTests(test_utils.GenericTestBase):
                 'have a state named "State 2" at version 2' % (
                     new_sia_task_id,)
             ])
+
+
+class PlaythroughModelValidatorTests(test_utils.GenericTestBase):
+    def setUp(self):
+        super(PlaythroughModelValidatorTests, self).setUp()
+        self.exp = self.save_new_valid_exploration('EXP_ID', 'owner_id')
+        self.job_class = (
+            prod_validation_jobs_one_off
+            .PlaythroughModelAuditOneOffJob)
+
+    def create_playthrough(self):
+        """Helper method to create and return a simple playthrough model."""
+        playthrough_id = stats_models.PlaythroughModel.create(
+            self.exp.id, self.exp.version, issue_type='EarlyQuit',
+            issue_customization_args={
+                'state_name': {'value': 'state_name'},
+                'time_spent_in_exp_in_msecs': {'value': 200},
+            },
+            actions=[])
+        return stats_models.PlaythroughModel.get(playthrough_id)
+
+    def create_exp_issues_with_playthroughs(self, playthrough_ids_list):
+        """Helper method to create and return an ExplorationIssuesModel instance
+        with the given sets of playthrough ids as reference issues.
+        """
+        return stats_models.ExplorationIssuesModel.create(
+            self.exp.id, self.exp.version, unresolved_issues=[
+                {
+                    'issue_type': 'EarlyQuit',
+                    'issue_customization_args': {
+                        'state_name': {'value': 'state_name'},
+                        'time_spent_in_exp_in_msecs': {'value': 200},
+                    },
+                    'playthrough_ids': list(playthrough_ids),
+                    'schema_version': 1,
+                    'is_valid': True,
+                }
+                for playthrough_ids in playthrough_ids_list
+            ])
+
+    def test_output_for_good_playthrough(self):
+        self.set_config_property(
+            config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
+            [self.exp.id])
+        playthrough = self.create_playthrough()
+        self.create_exp_issues_with_playthroughs([[playthrough.id]])
+
+        expected_output = [u'[u\'fully-validated PlaythroughModel\', 1]']
+        run_job_and_check_output(self, expected_output)
+
+    def test_output_for_pre_release_playthrough(self):
+        self.set_config_property(
+            config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
+            [self.exp.id])
+        playthrough = self.create_playthrough()
+        # Set created_on to a date which is definitely before GSoC 2018.
+        playthrough.created_on = datetime.datetime(2017, 12, 31)
+        playthrough.put()
+        self.create_exp_issues_with_playthroughs([[playthrough.id]])
+
+        expected_output = [
+            (
+                u'[u\'failed validation check for create datetime check of '
+                'PlaythroughModel\', [u\'Entity id %s: released on '
+                '2017-12-31, which is before the GSoC 2018 submission '
+                'deadline (2018-09-01) and should therefore not exist.\']]' % (
+                    playthrough.id,)
+            )
+        ]
+        run_job_and_check_output(self, expected_output)
+
+    def test_output_for_non_whitelisted_playthrough(self):
+        self.set_config_property(
+            config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
+            [self.exp.id + 'differentiated'])
+        playthrough = self.create_playthrough()
+        self.create_exp_issues_with_playthroughs([[playthrough.id]])
+
+        expected_output = [
+            (
+                u'[u\'failed validation check for exploration id check of '
+                'PlaythroughModel\', [u\'Entity id %s: recorded in '
+                'exploration_id:EXP_ID which has not been curated for '
+                'recording.\']]' % (playthrough.id,)
+            )
+        ]
+        run_job_and_check_output(self, expected_output)
+
+    def test_output_for_bad_schema_playthrough(self):
+        self.set_config_property(
+            config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
+            [self.exp.id])
+        playthrough = self.create_playthrough()
+        playthrough.actions.append({'bad schema key': 'bad schema value'})
+        playthrough.put()
+        self.create_exp_issues_with_playthroughs([[playthrough.id]])
+
+        expected_output = [
+            (
+                u'[u\'failed validation check for domain object check of '
+                'PlaythroughModel\', [u"Entity id %s: '
+                'Entity fails domain validation with the error u\''
+                'schema_version\'"]]' % (playthrough.id,)
+            )
+        ]
+        run_job_and_check_output(self, expected_output)
+
+    def test_output_for_missing_reference(self):
+        self.set_config_property(
+            config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
+            [self.exp.id])
+        playthrough = self.create_playthrough()
+        self.create_exp_issues_with_playthroughs([
+            [playthrough.id + '-different'],
+        ])
+        expected_output = [
+            (
+                u'[u\'failed validation check for reference check of '
+                'PlaythroughModel\', [u\'Entity id %s: not referenced'
+                ' by any issue. Details: This playthrough was not found as '
+                'a reference in the containing ExplorationIssuesModel '
+                '(id=EXP_ID.1).\']]' % (playthrough.id,)
+            )
+        ]
+        run_job_and_check_output(self, expected_output)

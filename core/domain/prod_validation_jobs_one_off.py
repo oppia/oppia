@@ -44,6 +44,7 @@ from core.domain import recommendations_services
 from core.domain import rights_manager
 from core.domain import skill_domain
 from core.domain import skill_services
+from core.domain import stats_services
 from core.domain import story_domain
 from core.domain import story_fetchers
 from core.domain import subtopic_page_domain
@@ -68,7 +69,7 @@ import utils
     opportunity_models, question_models,
     recommendations_models, skill_models,
     story_models, suggestion_models, topic_models,
-    user_models,) = (
+    user_models, stats_models) = (
         models.Registry.import_models([
             models.NAMES.activity, models.NAMES.audit, models.NAMES.base_model,
             models.NAMES.classifier, models.NAMES.collection,
@@ -77,7 +78,7 @@ import utils
             models.NAMES.opportunity, models.NAMES.question,
             models.NAMES.recommendations, models.NAMES.skill,
             models.NAMES.story, models.NAMES.suggestion, models.NAMES.topic,
-            models.NAMES.user]))
+            models.NAMES.user, models.NAMES.statistics]))
 datastore_services = models.Registry.import_datastore_services()
 
 ALLOWED_AUDIO_EXTENSIONS = list(feconf.ACCEPTED_AUDIO_EXTENSIONS.keys())
@@ -5038,6 +5039,83 @@ class TaskEntryModelValidator(BaseModelValidator):
         ]
 
 
+class PlaythroughModelValidator(BaseModelValidator):
+    """Class for validating PlaythroughModel."""
+
+    PLAYTHROUGH_PROJECT_RELEASE_DATETIME = datetime.datetime(2018, 9, 1)
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {
+            'exp_id': (
+                exp_models.ExplorationModel, [item.exp_id]),
+        }
+
+    @classmethod
+    def _get_model_id_regex(cls, unused_item):
+        return '^[A-Za-z0-9-_]{1,%s}\.[A-Za-z0-9-_]{1,%s}$' % (
+            base_models.ID_LENGTH, base_models.ID_LENGTH)
+
+    @classmethod
+    def _get_model_domain_object_instance(cls, item):
+        return stats_services.get_playthrough_from_model(item)
+
+    @classmethod
+    def _map_to_audit_data(cls, item):
+        exp_id = item.exp_id
+        exp_version = item.exp_version
+        exp_issues = (
+            stats_models.ExplorationIssuesModel.get_model(exp_id, exp_version))
+        reference_error = (
+            'This playthrough was not found as a reference in the containing '
+            'ExplorationIssuesModel (id=%s)' % (exp_issues.id))
+        for exp_issue_dict in exp_issues.unresolved_issues:
+            if item.id in exp_issue_dict['playthrough_ids']:
+                reference_error = None
+                break
+
+        audit_data = {
+            'exp_id': item.exp_id,
+            'created_on': item.created_on.strftime('%Y-%m-%d'),
+            'reference_error': reference_error,
+        }
+
+        return audit_data
+
+    @classmethod
+    def _validate(cls, item):
+        audit_data = cls._map_to_audit_data(item)
+        whitelisted_exp_ids_for_playthroughs = (
+            config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS.value)
+
+        if audit_data['exp_id'] not in whitelisted_exp_ids_for_playthroughs:
+            cls.errors['exploration id check'].append(
+                'Entity id %s: recorded in exploration_id:%s which '
+                'has not been curated for recording.' % (
+                    item.id, audit_data['exp_id'])
+            )
+
+        created_on_datetime = datetime.datetime.strptime(
+            audit_data['created_on'], '%Y-%m-%d')
+        if created_on_datetime < cls.PLAYTHROUGH_PROJECT_RELEASE_DATETIME:
+            cls.errors['create datetime check'].append(
+                'Entity id %s: released on %s, which is before the '
+                'GSoC 2018 submission deadline (2018-09-01) and should '
+                'therefore not exist.' % (item.id, audit_data['created_on'],)
+            )
+
+        if audit_data['reference_error'] is not None:
+            cls.errors['reference check'].append(
+                'Entity id %s: not referenced by any issue. Details: %s.' % (
+                    item.id, audit_data['reference_error'])
+            )
+
+    @classmethod
+    def _get_custom_validation_functions(cls):
+        return [
+            cls._validate,
+        ]
+
 MODEL_TO_VALIDATOR_MAPPING = {
     activity_models.ActivityReferencesModel: ActivityReferencesModelValidator,
     audit_models.RoleQueryAuditModel: RoleQueryAuditModelValidator,
@@ -5178,7 +5256,8 @@ MODEL_TO_VALIDATOR_MAPPING = {
         UserContributionScoringModelValidator),
     user_models.UserCommunityRightsModel: UserCommunityRightsModelValidator,
     user_models.PendingDeletionRequestModel: (
-        PendingDeletionRequestModelValidator)
+        PendingDeletionRequestModelValidator),
+    stats_models.PlaythroughModel: PlaythroughModelValidator,
 }
 
 
@@ -6045,3 +6124,11 @@ class TaskEntryModelAuditOneOffJob(ProdValidationAuditOneOffJob):
     @classmethod
     def entity_classes_to_map_over(cls):
         return [improvements_models.TaskEntryModel]
+
+
+class PlaythroughModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates PlaythroughModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [stats_models.PlaythroughModel]
