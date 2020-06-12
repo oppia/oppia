@@ -18,7 +18,7 @@
 
 require('services/html-escaper.service.ts');
 
-angular.module('oppia').directive('oppiaVisualizationSortedTiles', [function() {
+angular.module('oppia').directive('oppiaVisualizationSortedTiles', function() {
   return {
     restrict: 'E',
     scope: {},
@@ -37,4 +37,4 @@ angular.module('oppia').directive('oppiaVisualizationSortedTiles', [function() {
       }
     ]
   };
-}]);
+});

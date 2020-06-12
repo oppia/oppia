@@ -80,7 +80,7 @@ const STATE_INTERACTION_STATS_URL_TEMPLATE: string = (
 @Injectable({providedIn: 'root'})
 export class StateInteractionStatsService {
   // NOTE TO DEVELOPERS: Fulfilled promises can be reused indefinitely.
-  cachedStats: Map<string, Promise<IStateInteractionStats>> = new Map();
+  statsCache: Map<string, Promise<IStateInteractionStats>> = new Map();
 
   constructor(
       private answerClassificationService: AnswerClassificationService,
@@ -98,7 +98,7 @@ export class StateInteractionStatsService {
     return state.interaction.id === 'TextInput';
   }
 
-  // Converts answer to a more-readable representation based on their type.
+  // Converts answer to a more-readable representation based on its type.
   private getReadableAnswerString(state: State, answer: Answer): Answer {
     if (state.interaction.id === 'FractionInput') {
       return (
@@ -112,15 +112,15 @@ export class StateInteractionStatsService {
    * answer-statistics.
    */
   computeStats(state: State): Promise<IStateInteractionStats> {
-    if (this.cachedStats.has(state.name)) {
-      return this.cachedStats.get(state.name);
+    if (this.statsCache.has(state.name)) {
+      return this.statsCache.get(state.name);
     }
     const explorationId = this.contextService.getExplorationId();
     const interactionRulesService = (
       this.interactionRulesRegistryService.getRulesServiceByInteractionId(
         state.interaction.id));
     // TODO(#8038): Move this HTTP call into a backend-api.service module.
-    const stats = this.http.get<IStateInteractionStatsBackendDict>(
+    const statsPromise = this.http.get<IStateInteractionStatsBackendDict>(
       this.urlInterpolationService.interpolateUrl(
         STATE_INTERACTION_STATS_URL_TEMPLATE, {
           exploration_id: explorationId,
@@ -144,8 +144,8 @@ export class StateInteractionStatsService {
           }),
         })),
       }));
-    this.cachedStats.set(state.name, stats);
-    return stats;
+    this.statsCache.set(state.name, statsPromise);
+    return statsPromise;
   }
 }
 
