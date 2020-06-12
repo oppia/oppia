@@ -173,15 +173,15 @@ describe('Concept card backend API service', () => {
     fakeAsync(() => {
       conceptCardBackendApiService.loadConceptCards(['1']).then(
         function(conceptCards) {
-          var req1 = httpTestingController.expectOne('/concept_card_handler/2');
-          expect(req1.request.method).toEqual('GET');
-          req1.flush(sampleResponse2);
-
           conceptCardBackendApiService.loadConceptCards(['1', '2']).then(
             function(conceptCards2) {
               expect(conceptCards).toEqual(sampleResponse1.concept_card_dicts);
               expect(conceptCards2).toEqual(sampleResponse3.concept_card_dicts);
             });
+
+          var req1 = httpTestingController.expectOne('/concept_card_handler/2');
+          expect(req1.request.method).toEqual('GET');
+          req1.flush(sampleResponse2);
         });
 
       var req2 = httpTestingController.expectOne('/concept_card_handler/1');

@@ -46,8 +46,7 @@ export class ConceptCardBackendApiService {
         comma_separated_skill_ids: skillIds.join(',')
       });
 
-    this.http.get(
-      conceptCardDataUrl, { observe: 'response'}).toPromise().then(
+    this.http.get(conceptCardDataUrl).toPromise().then(
       (response: any) => {
         if (successCallback) {
           successCallback(response.concept_card_dicts);
@@ -65,7 +64,7 @@ export class ConceptCardBackendApiService {
 
   private _getUncachedSkillIds(skillIds: Array<string>) {
     var uncachedSkillIds = [];
-    skillIds.forEach(function(skillId) {
+    skillIds.forEach((skillId) => {
       if (!this._isCached(skillId)) {
         uncachedSkillIds.push(skillId);
       }
@@ -82,8 +81,8 @@ export class ConceptCardBackendApiService {
         // Case where only part (or none) of the concept cards are cached
         // locally.
         this._fetchConceptCards(
-          uncachedSkillIds, function(uncachedConceptCards) {
-            skillIds.forEach(function(skillId) {
+          uncachedSkillIds, (uncachedConceptCards) => {
+            skillIds.forEach((skillId) => {
               if (uncachedSkillIds.includes(skillId)) {
                 conceptCards.push(
                   uncachedConceptCards[uncachedSkillIds.indexOf(skillId)]);
@@ -100,7 +99,7 @@ export class ConceptCardBackendApiService {
           }, reject);
       } else {
         // Case where all of the concept cards are cached locally.
-        skillIds.forEach(function(skillId) {
+        skillIds.forEach((skillId) => {
           conceptCards.push(cloneDeep(this._conceptCardCache[skillId]));
         });
         if (resolve) {
