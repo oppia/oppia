@@ -13,96 +13,117 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controllers for the about page.
+ * @fileoverview About page component.
  */
 
-require(
-  'components/common-layout-directives/common-elements/' +
-  'background-banner.component.ts');
+import { Component, OnInit } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
 
-require('domain/utilities/url-interpolation.service.ts');
+import { AboutPageConstants } from './about-page.constants';
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service.ts';
+import { WindowRef } from
+  'services/contextual/window-ref.service.ts';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { TranslateService } from 'services/translate.service';
 
-require('pages/about-page/about-page.constants.ajs.ts');
+interface CreditNames {
+  letter: String;
+  names: Array<String>;
+}
 
-angular.module('oppia').component('aboutPage', {
-  template: require('./about-page.component.html'),
-  controller: [
-    'CREDITS_CONSTANTS', 'UrlInterpolationService', 'WindowRef',
-    function(CREDITS_CONSTANTS, UrlInterpolationService, WindowRef) {
-      const ctrl = this;
-      const listOfNamesToThank = [
-        'Alex Kauffmann', 'Allison Barros',
-        'Amy Latten', 'Brett Barros',
-        'Crystal Kwok', 'Daniel Hernandez',
-        'Divya Siddarth', 'Ilwon Yoon',
-        'Jennifer Chen', 'John Cox',
-        'John Orr', 'Katie Berlent',
-        'Michael Wawszczak', 'Mike Gainer',
-        'Neil Fraser', 'Noah Falstein',
-        'Nupur Jain', 'Peter Norvig',
-        'Philip Guo', 'Piotr Mitros',
-        'Rachel Chen', 'Rahim Nathwani',
-        'Robyn Choo', 'Tricia Ngoon',
-        'Vikrant Nanda', 'Vinamrata Singal',
-        'Yarin Feigenbaum'];
-      // Define constant for each tab on the page.
-      ctrl.TAB_ID_ABOUT = 'about';
-      ctrl.TAB_ID_FOUNDATION = 'foundation';
-      ctrl.TAB_ID_CREDITS = 'credits';
+@Component({
+  selector: 'about-page',
+  templateUrl: './about-page.component.html'
+})
+export class AboutPageComponent implements OnInit {
+  aboutPageMascotImgUrl: string;
+  activeTabName: string;
+  allCredits: Array<CreditNames> = [];
+  listOfNames: string;
+  listOfNamesToThank = [
+    'Alex Kauffmann', 'Allison Barros',
+    'Amy Latten', 'Brett Barros',
+    'Crystal Kwok', 'Daniel Hernandez',
+    'Divya Siddarth', 'Ilwon Yoon',
+    'Jennifer Chen', 'John Cox',
+    'John Orr', 'Katie Berlent',
+    'Michael Wawszczak', 'Mike Gainer',
+    'Neil Fraser', 'Noah Falstein',
+    'Nupur Jain', 'Peter Norvig',
+    'Philip Guo', 'Piotr Mitros',
+    'Rachel Chen', 'Rahim Nathwani',
+    'Robyn Choo', 'Tricia Ngoon',
+    'Vikrant Nanda', 'Vinamrata Singal',
+    'Yarin Feigenbaum'];
+  // Define constant for each tab on the page.
+  TAB_ID_ABOUT = 'about';
+  TAB_ID_FOUNDATION = 'foundation';
+  TAB_ID_CREDITS = 'credits';
+  ALLOWED_TABS = [
+    this.TAB_ID_ABOUT, this.TAB_ID_FOUNDATION, this.TAB_ID_CREDITS];
+  constructor(
+    private i18nLanguageCodeService: I18nLanguageCodeService,
+    private urlInterpolationService: UrlInterpolationService,
+    private translateService: TranslateService,
+    private windowRef: WindowRef) {
+    translateService.use('en');
+  }
 
-      const ALLOWED_TABS = [
-        ctrl.TAB_ID_ABOUT, ctrl.TAB_ID_FOUNDATION, ctrl.TAB_ID_CREDITS];
+  getCredits(startLetter: string): Array<string> {
+    const results = AboutPageConstants.CREDITS_CONSTANTS.filter(
+      (credit) => credit.startsWith(startLetter)).sort();
+    return results;
+  }
 
-      ctrl.activeTabName = ctrl.TAB_ID_ABOUT;
+  onTabClick(tabName: string) {
+    this.windowRef.nativeWindow.location.hash = '#' + tabName;
+    this.activeTabName = tabName;
+    return this.windowRef.nativeWindow;
+  }
 
-      ctrl.getCredits = function(startLetter: string) {
-        const results = CREDITS_CONSTANTS.filter(
-          (credit) => credit.startsWith(startLetter)).sort();
-        return results;
-      };
+  getStaticImageUrl(imagePath: string) {
+    return this.urlInterpolationService.getStaticImageUrl(imagePath);
+  }
 
-      ctrl.onTabClick = function(tabName: string) {
-        // Update hash
-        WindowRef.nativeWindow.location.hash = '#' + tabName;
-        ctrl.activeTabName = tabName;
-      };
-      ctrl.getStaticImageUrl = function(imagePath: string) {
-        return UrlInterpolationService.getStaticImageUrl(imagePath);
-      };
-      ctrl.$onInit = function() {
-        ctrl.allCredits = [];
-        var alphabetList = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
-        for (var i = 0; i < alphabetList.length; i++) {
-          var letter = alphabetList[i];
-          var credits = ctrl.getCredits(letter);
-          if (credits.length > 0) {
-            ctrl.allCredits.push({letter: letter, credits: credits});
-          }
-        }
-
-        const hash = WindowRef.nativeWindow.location.hash.slice(1);
-        if (hash === 'license') {
-          ctrl.activeTabName = ctrl.TAB_ID_FOUNDATION;
-        } else if (ALLOWED_TABS.includes(hash)) {
-          ctrl.activeTabName = hash;
-        }
-
-        ctrl.listOfNames = listOfNamesToThank
-          .slice(0, listOfNamesToThank.length - 1).join(', ') +
-          ' & ' + listOfNamesToThank[listOfNamesToThank.length - 1];
-        ctrl.aboutPageMascotImgUrl = UrlInterpolationService
-          .getStaticImageUrl('/general/about_page_mascot.png');
-
-        WindowRef.nativeWindow.onhashchange = function() {
-          const hashChange = window.location.hash.slice(1);
-          if (hashChange === 'license') {
-            ctrl.activeTabName = ctrl.TAB_ID_FOUNDATION;
-            WindowRef.nativeWindow.location.reload(true);
-          } else if (ALLOWED_TABS.includes(hashChange)) {
-            ctrl.activeTabName = hashChange;
-          }
-        };
-      };
+  ngOnInit() {
+    this.activeTabName = this.TAB_ID_ABOUT;
+    this.translateService.use(
+      this.i18nLanguageCodeService.getCurrentI18nLanguageCode());
+    this.i18nLanguageCodeService.onI18nLanguageCodeChange.subscribe(
+      (code) => this.translateService.use(code)
+    );
+    this.allCredits = [];
+    const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+    for (const letter of letters) {
+      const names = this.getCredits(letter);
+      if (names.length > 0) {
+        this.allCredits.push({letter, names});
+      }
     }
-  ]
-});
+    const hash = this.windowRef.nativeWindow.location.hash.slice(1);
+    if (hash === 'license') {
+      this.activeTabName = this.TAB_ID_FOUNDATION;
+    } else if (this.ALLOWED_TABS.includes(hash)) {
+      this.activeTabName = hash;
+    }
+
+    this.listOfNames = this.listOfNamesToThank
+      .slice(0, this.listOfNamesToThank.length - 1).join(', ') +
+      ' & ' + this.listOfNamesToThank[this.listOfNamesToThank.length - 1];
+    this.aboutPageMascotImgUrl = this.urlInterpolationService
+      .getStaticImageUrl('/general/about_page_mascot.png');
+
+    this.windowRef.nativeWindow.onhashchange = () => {
+      const hashChange = this.windowRef.nativeWindow.location.hash.slice(1);
+      if (hashChange === 'license') {
+        this.activeTabName = this.TAB_ID_FOUNDATION;
+        this.windowRef.nativeWindow.location.reload(true);
+      } else if (this.ALLOWED_TABS.includes(hashChange)) {
+        this.activeTabName = hashChange;
+      }
+    };
+  }
+}
+angular.module('oppia').directive(
+  'aboutPage', downgradeComponent({component: AboutPageComponent}));
