@@ -20,6 +20,9 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
+import { AppConstants } from 'app.constants';
+import { StatisticsDomainConstants } from 'statistics-domain.constants';
+
 export interface IExplorationStartCustomizationArgs {
   'state_name': {value: string};
 }
@@ -53,7 +56,11 @@ export class LearnerAction {
   constructor(
       public actionType: string,
       public schemaVersion: number,
-      public actionCustomizationArgs: ILearnerActionCustomizationArgs) {}
+      public actionCustomizationArgs: ILearnerActionCustomizationArgs) {
+    if (this.schemaVersion < 1) {
+      throw new Error('given invalid schema version');
+    }
+  }
 
   toBackendDict(): ILearnerActionBackendDict {
     return {
@@ -77,17 +84,26 @@ export class LearnerActionObjectFactory {
 
   createExplorationStartAction(
       customizationArgs: IExplorationStartCustomizationArgs): LearnerAction {
-    return new LearnerAction('ExplorationStart', 1, customizationArgs);
+    return new LearnerAction(
+      AppConstants.ACTION_TYPE_EXPLORATION_START,
+      StatisticsDomainConstants.LEARNER_ACTION_SCHEMA_LATEST_VERSION,
+      customizationArgs);
   }
 
   createAnswerSubmitAction(
       customizationArgs: IAnswerSubmitCustomizationArgs): LearnerAction {
-    return new LearnerAction('AnswerSubmit', 1, customizationArgs);
+    return new LearnerAction(
+      AppConstants.ACTION_TYPE_ANSWER_SUBMIT,
+      StatisticsDomainConstants.LEARNER_ACTION_SCHEMA_LATEST_VERSION,
+      customizationArgs);
   }
 
   createExplorationQuitAction(
       customizationArgs: IExplorationQuitCustomizationArgs): LearnerAction {
-    return new LearnerAction('ExplorationQuit', 1, customizationArgs);
+    return new LearnerAction(
+      AppConstants.ACTION_TYPE_EXPLORATION_QUIT,
+      StatisticsDomainConstants.LEARNER_ACTION_SCHEMA_LATEST_VERSION,
+      customizationArgs);
   }
 }
 

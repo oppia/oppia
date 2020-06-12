@@ -30,6 +30,17 @@ describe('Learner Action Object Factory', () => {
     learnerActionObjectFactory = TestBed.get(LearnerActionObjectFactory);
   });
 
+  it('should throw for invalid schema versions', () => {
+    expect(
+      () => learnerActionObjectFactory.createFromBackendDict({
+        action_type: 'ExplorationStart',
+        action_customization_args: {
+          state_name: {value: 'Hola'},
+        },
+        schema_version: -1,
+      })).toThrowError('given invalid schema version');
+  });
+
   it('should return a backend dict equivalent to input', () => {
     const explorationStartActionBackendDict: ILearnerActionBackendDict = {
       action_type: 'ExplorationStart',
