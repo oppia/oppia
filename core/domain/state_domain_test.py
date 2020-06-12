@@ -217,7 +217,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         init_state.update_interaction_solution(solution)
         self.assertFalse(init_state.is_rte_content_supported_on_android())
         solution_dict['explanation']['html'] = ''
-        init_state.update_interaction_solution(solution_dict)
+        init_state.update_interaction_solution(state_domain.Solution.from_dict(
+            init_state.interaction.id, solution_dict))
         self.assertTrue(init_state.is_rte_content_supported_on_android())
 
         hints_list = []
