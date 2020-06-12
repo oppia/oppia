@@ -121,7 +121,7 @@ export class PlaythroughService {
 
   private eqTracker?: EarlyQuitTracker = null;
   private cstTracker?: CyclicStateTransitionsTracker = null;
-  private miaTracker?: MultipleIncorrectAnswersTracker = null;
+  private misTracker?: MultipleIncorrectAnswersTracker = null;
   private playthrough?: Playthrough = null;
   private stopwatch?: Stopwatch = null;
   private expDurationInSecs?: number = null;
@@ -141,12 +141,12 @@ export class PlaythroughService {
    *    3. EarlyQuitIssue
    */
   private classifyPlaythrough(): void {
-    if (this.miaTracker !== null && this.miaTracker.isIssue()) {
+    if (this.misTracker !== null && this.misTracker.isIssue()) {
       this.playthrough.issueType = (
         AppConstants.ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS);
       this.playthrough.issueCustomizationArgs = {
-        state_name: {value: this.miaTracker.currentStateName},
-        num_times_answered_incorrectly: {value: this.miaTracker.numTries}
+        state_name: {value: this.misTracker.currentStateName},
+        num_times_answered_incorrectly: {value: this.misTracker.numTries}
       };
     } else if (this.cstTracker !== null && this.cstTracker.isIssue()) {
       this.playthrough.issueType = (
@@ -210,7 +210,7 @@ export class PlaythroughService {
       [explorationStartAction]);
 
     this.eqTracker = new EarlyQuitTracker();
-    this.miaTracker = new MultipleIncorrectAnswersTracker(initStateName);
+    this.misTracker = new MultipleIncorrectAnswersTracker(initStateName);
     this.cstTracker = new CyclicStateTransitionsTracker(initStateName);
 
     this.expDurationInSecs = 0;
@@ -226,7 +226,7 @@ export class PlaythroughService {
       return;
     }
 
-    this.miaTracker.recordStateTransition(destStateName);
+    this.misTracker.recordStateTransition(destStateName);
     this.cstTracker.recordStateTransition(destStateName);
 
     const answerSubmitAction = (
