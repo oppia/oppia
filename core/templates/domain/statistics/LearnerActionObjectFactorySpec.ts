@@ -18,7 +18,7 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { LearnerActionObjectFactory } from
+import { ILearnerActionBackendDict, LearnerActionObjectFactory } from
   'domain/statistics/LearnerActionObjectFactory';
 
 describe('Learner Action Object Factory', () => {
