@@ -75,15 +75,6 @@ BAD_PATTERNS = {
                    'datetime.datetime.now().',
         'excluded_files': (),
         'excluded_dirs': ()},
-    '\t': {
-        'message': 'Please use spaces instead of tabs.',
-        'excluded_files': (),
-        'excluded_dirs': (
-            'assets/i18n/', 'core/tests/build_sources/assets/')},
-    '\r': {
-        'message': 'Please make sure all files only have LF endings (no CRLF).',
-        'excluded_files': (),
-        'excluded_dirs': ()},
     '<<<<<<<': {
         'message': 'Please fully resolve existing merge conflicts.',
         'excluded_files': (),
@@ -106,6 +97,18 @@ BAD_PATTERNS_REGEXP = [
                    'in the format TODO(username): XXX. ',
         'excluded_files': (),
         'excluded_dirs': ()
+    },
+    {
+        'regexp': re.compile(r'\r'),
+        'message': 'Please make sure all files only have LF endings (no CRLF).',
+        'excluded_files': (),
+        'excluded_dirs': ()
+    },
+    {
+        'regexp': re.compile(r'\t'),
+        'message': 'Please use spaces instead of tabs.',
+        'excluded_files': (),
+        'excluded_dirs': ('assets/i18n/', 'core/tests/build_sources/assets/')
     }
 ]
 
