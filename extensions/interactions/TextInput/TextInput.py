@@ -69,9 +69,10 @@ class TextInput(base.BaseInteraction):
 
     _answer_visualization_specs = [{
         # Table with answer counts for top N answers.
-        'id': 'SortedTiles',
+        'id': 'FrequencyTable',
         'options': {
-            'header': 'Top answers',
+            'column_headers': ['Answer', 'Count'],
+            'title': 'Top answers',
         },
         'calculation_id': 'Top10AnswerFrequencies',
         'addressed_info_is_supported': True,
