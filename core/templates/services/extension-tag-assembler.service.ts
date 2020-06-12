@@ -31,9 +31,9 @@ import { HtmlEscaperService } from 'services/html-escaper.service';
 export class ExtensionTagAssemblerService {
   constructor(private htmlEscaperService: HtmlEscaperService,
               private camelCaseToHyphens: CamelCaseToHyphensPipe) {}
-  // TODO(#7176): Replace 'any' with the exact type.
+
   formatCustomizationArgAttrs(
-      element: JQuery, customizationArgSpecs: Object): any {
+      element: JQuery, customizationArgSpecs: Object): JQuery {
     for (let caSpecName in customizationArgSpecs) {
       let caSpecValue = customizationArgSpecs[caSpecName].value;
       element.attr(
