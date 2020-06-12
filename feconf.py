@@ -133,6 +133,17 @@ ENTITY_TYPE_SUBTOPIC = 'subtopic'
 ENTITY_TYPE_QUESTION = 'question'
 ENTITY_TYPE_VOICEOVER_APPLICATION = 'voiceover_application'
 
+TASK_TYPE_HIGH_BOUNCE_RATE = 'high_bounce_rate'
+TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP = 'ineffective_feedback_loop'
+TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS = 'successive_incorrect_answers'
+TASK_TYPE_NEEDS_GUIDING_RESPONSES = 'needs_guiding_responses'
+
+TASK_STATUS_OPEN = 'open'
+TASK_STATUS_OBSOLETE = 'obsolete'
+TASK_STATUS_RESOLVED = 'resolved'
+
+TASK_TARGET_TYPE_STATE = 'state'
+
 # The maximum number of activities allowed in the playlist of the learner. This
 # limit applies to both the explorations playlist and the collections playlist.
 MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT = 10
@@ -550,8 +561,8 @@ ALLOWED_RTE_EXTENSIONS = {
     'Math': {
         'dir': os.path.join(RTE_EXTENSIONS_DIR, 'Math')
     },
-    'Svgeditor': {
-        'dir': os.path.join(RTE_EXTENSIONS_DIR, 'svgeditor')
+    'Svgdiagram': {
+        'dir': os.path.join(RTE_EXTENSIONS_DIR, 'svgdiagram')
     },
     'Tabs': {
         'dir': os.path.join(RTE_EXTENSIONS_DIR, 'Tabs')
@@ -908,7 +919,7 @@ RTE_CONTENT_SPEC = {
             'oppia-noninteractive-collapsible': ['b', 'i', 'li', 'p', 'pre'],
             'oppia-noninteractive-video': ['b', 'i', 'li', 'p', 'pre'],
             'oppia-noninteractive-tabs': ['b', 'i', 'li', 'p', 'pre'],
-            'oppia-noninteractive-svgeditor': ['b', 'i', 'li', 'p', 'pre']
+            'oppia-noninteractive-svgdiagram': ['b', 'i', 'li', 'p', 'pre']
         },
         # Valid html tags in TextAngular.
         'ALLOWED_TAG_LIST': [
@@ -927,7 +938,7 @@ RTE_CONTENT_SPEC = {
             'oppia-noninteractive-collapsible',
             'oppia-noninteractive-video',
             'oppia-noninteractive-tabs',
-            'oppia-noninteractive-svgeditor'
+            'oppia-noninteractive-svgdiagram'
         ]
     },
     'RTE_TYPE_CKEDITOR': {
@@ -945,7 +956,7 @@ RTE_CONTENT_SPEC = {
             'oppia-noninteractive-link': ['strong', 'em', 'li', 'p', 'pre'],
             'oppia-noninteractive-math': ['strong', 'em', 'li', 'p', 'pre'],
             'oppia-noninteractive-image': ['blockquote', 'li', '[document]'],
-            'oppia-noninteractive-svgeditor': [
+            'oppia-noninteractive-svgdiagram': [
                 'blockquote', 'li', '[document]'
             ],
             'oppia-noninteractive-collapsible': [
@@ -971,7 +982,7 @@ RTE_CONTENT_SPEC = {
             'oppia-noninteractive-collapsible',
             'oppia-noninteractive-video',
             'oppia-noninteractive-tabs',
-            'oppia-noninteractive-svgeditor'
+            'oppia-noninteractive-svgdiagram'
         ]
 
     }

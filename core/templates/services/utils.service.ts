@@ -24,6 +24,17 @@ import { downgradeInjectable } from '@angular/upgrade/static';
   providedIn: 'root'
 })
 export class UtilsService {
+  /**
+   * Determines if a variable is defined and not null.
+   * @param {Object, Array<Object>, string, Array<string>, undefined, null}value
+   * @return {boolean} - true if object is defined, false otherwise.
+   */
+  isDefined(
+      value: Object | Array<Object> | string | Array<string> | undefined | null
+  ): boolean {
+    return typeof value !== 'undefined' && value !== null;
+  }
+
   // The function here is to check whether the argument is empty or not. So, we
   // cannot have any specific type defined for the argument and the argument
   // is given a generic type of Object.
