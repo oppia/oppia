@@ -153,6 +153,11 @@ import { ExplorationObjectFactory } from
   'domain/exploration/ExplorationObjectFactory';
 import { ExplorationOpportunitySummaryObjectFactory } from
   'domain/opportunity/ExplorationOpportunitySummaryObjectFactory';
+import { ExplorationStatsObjectFactory } from
+  'domain/statistics/ExplorationStatsObjectFactory';
+import { ExplorationStatsService } from 'services/exploration-stats.service';
+import { ExplorationStatsBackendApiService } from
+  'services/exploration-stats-backend-api.service';
 import { ExpressionParserService } from 'expressions/expression-parser.service';
 import { ExpressionSyntaxTreeService } from
   'expressions/expression-syntax-tree.service';
@@ -408,6 +413,8 @@ import { StateSolicitAnswerDetailsService } from
 import { StateSolutionService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-solution.service';
+import { StateStatsObjectFactory } from
+  'domain/statistics/StateStatsObjectFactory';
 import { StateTopAnswersStatsBackendApiService } from
   'services/state-top-answers-stats-backend-api.service';
 import { StateWrittenTranslationsService } from
@@ -654,6 +661,7 @@ export class UpgradedServices {
     upgradedServices['StateImprovementSuggestionService'] =
       new StateImprovementSuggestionService();
     upgradedServices['StateNameService'] = new StateNameService();
+    upgradedServices['StateStatsObjectFactory'] = new StateStatsObjectFactory();
     upgradedServices['StopwatchObjectFactory'] = new StopwatchObjectFactory();
     upgradedServices['StoryNodeObjectFactory'] = new StoryNodeObjectFactory();
     upgradedServices['StoryReferenceObjectFactory'] =
@@ -720,6 +728,9 @@ export class UpgradedServices {
     upgradedServices['EndExplorationValidationService'] =
       new EndExplorationValidationService(
         upgradedServices['baseInteractionValidationService']);
+    upgradedServices['ExplorationStatsObjectFactory'] =
+      new ExplorationStatsObjectFactory(
+        upgradedServices['StateStatsObjectFactory']);
     upgradedServices['ExpressionSyntaxTreeService'] =
       new ExpressionSyntaxTreeService(
         upgradedServices['ExpressionParserService']);
@@ -999,6 +1010,11 @@ export class UpgradedServices {
       new ExplorationFeaturesBackendApiService(
         upgradedServices['UrlInterpolationService'],
         upgradedServices['HttpClient']);
+    upgradedServices['ExplorationStatsBackendApiService'] =
+      new ExplorationStatsBackendApiService(
+        upgradedServices['ExplorationStatsObjectFactory'],
+        upgradedServices['HttpClient'],
+        upgradedServices['UrlInterpolationService']);
     upgradedServices['ExplorationHtmlFormatterService'] =
       new ExplorationHtmlFormatterService(
         upgradedServices['CamelCaseToHyphensPipe'],
@@ -1122,6 +1138,8 @@ export class UpgradedServices {
         upgradedServices['HttpClient'],
         upgradedServices['ReadOnlyCollectionBackendApiService'],
         upgradedServices['UrlInterpolationService']);
+    upgradedServices['ExplorationStatsService'] = new ExplorationStatsService(
+        upgradedServices['ExplorationStatsBackendApiService']);
     upgradedServices['PredictionAlgorithmRegistryService'] =
       new PredictionAlgorithmRegistryService(
         upgradedServices['CodeReplPredictionService'],
