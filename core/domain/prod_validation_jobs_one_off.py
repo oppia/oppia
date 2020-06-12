@@ -349,10 +349,10 @@ class BaseSummaryModelValidator(BaseModelValidator):
 
             for (_, _, external_model) in (
                     external_model_class_model_id_model_tuples):
-                # The case for missing external model is ignored here
-                # since errors for missing external model are already
-                # checked and stored in _validate_external_id_relationships
-                # function.
+            # In the case of a missing external model, we don't
+            # report an error here since errors for missing external
+            # model are already checked and stored in
+            # _validate_external_id_relationships function.
                 if external_model is None or external_model.deleted:
                     continue
                 for (property_name, external_model_property_name) in (
@@ -430,10 +430,10 @@ class BaseSnapshotContentModelValidator(BaseModelValidator):
         version = item.id[item.id.rfind('-') + 1:]
         for (_, _, external_model) in (
                 external_model_class_model_id_model_tuples):
-            # The case for missing external model is ignored here
-            # since errors for missing external model are already
-            # checked and stored in _validate_external_id_relationships
-            # function.
+            # In the case of a missing external model, we don't
+            # report an error here since errors for missing external
+            # model are already checked and stored in
+            # _validate_external_id_relationships function.
             if external_model is None or external_model.deleted:
                 continue
             if int(external_model.version) < int(version):
@@ -624,10 +624,10 @@ class BaseUserModelValidator(BaseModelValidator):
             cls.external_instance_details['exploration_ids'])
         for (_, _, exploration_model) in (
                 exploration_model_class_model_id_model_tuples):
-            # The case for missing exploration external model is ignored here
-            # since errors for missing exploration external model are already
-            # checked and stored in _validate_external_id_relationships
-            # function.
+            # In the case of a missing external exploration model, we don't
+            # report an error here since errors for missing external exploration
+            # model are already checked and stored in
+            # _validate_external_id_relationships function.
             if exploration_model is None or exploration_model.deleted:
                 continue
             exploration_ids.append(exploration_model.id)
@@ -645,10 +645,10 @@ class BaseUserModelValidator(BaseModelValidator):
             cls.external_instance_details['collection_ids'])
         for (_, _, collection_model) in (
                 collection_model_class_model_id_model_tuples):
-            # The case for missing collection external model is ignored here
-            # since errors for missing collection external model are already
-            # checked and stored in _validate_external_id_relationships
-            # function.
+            # In the case of a missing external collection model, we don't
+            # report an error here since errors for missing external collection
+            # model are already checked and stored in
+            # _validate_external_id_relationships function.
             if collection_model is None or collection_model.deleted:
                 continue
             collection_ids.append(collection_model.id)
@@ -853,10 +853,10 @@ class ClassifierTrainingJobModelValidator(BaseModelValidator):
 
         for (_, _, exp_model) in (
                 exp_model_class_model_id_model_tuples):
-            # The case for missing exploration external model is ignored here
-            # since errors for missing exploration external model are already
-            # checked and stored in _validate_external_id_relationships
-            # function.
+            # In the case of a missing external exploration model, we don't
+            # report an error here since errors for missing external exploration
+            # model are already checked and stored in
+            # _validate_external_id_relationships function.
             if exp_model is None or exp_model.deleted:
                 continue
             if item.exp_version > exp_model.version:
@@ -880,10 +880,10 @@ class ClassifierTrainingJobModelValidator(BaseModelValidator):
 
         for (_, _, exp_model) in (
                 exp_model_class_model_id_model_tuples):
-            # The case for missing exploration external model is ignored here
-            # since errors for missing exploration external model are already
-            # checked and stored in _validate_external_id_relationships
-            # function.
+            # In the case of a missing external exploration model, we don't
+            # report an error here since errors for missing external exploration
+            # model are already checked and stored in
+            # _validate_external_id_relationships function.
             if exp_model is None or exp_model.deleted:
                 continue
             if item.state_name not in exp_model.states.keys():
@@ -932,10 +932,10 @@ class TrainingJobExplorationMappingModelValidator(BaseModelValidator):
 
         for (_, _, exp_model) in (
                 exp_model_class_model_id_model_tuples):
-            # The case for missing exploration external model is ignored here
-            # since errors for missing exploration external model are already
-            # checked and stored in _validate_external_id_relationships
-            # function.
+            # In the case of a missing external exploration model, we don't
+            # report an error here since errors for missing external exploration
+            # model are already checked and stored in
+            # _validate_external_id_relationships function.
             if exp_model is None or exp_model.deleted:
                 continue
             if item.exp_version > exp_model.version:
@@ -959,10 +959,10 @@ class TrainingJobExplorationMappingModelValidator(BaseModelValidator):
 
         for (_, _, exp_model) in (
                 exp_model_class_model_id_model_tuples):
-            # The case for missing exploration external model is ignored here
-            # since errors for missing exploration external model are already
-            # checked and stored in _validate_external_id_relationships
-            # function.
+            # In the case of a missing external exploration model, we don't
+            # report an error here since errors for missing external exploration
+            # model are already checked and stored in
+            # _validate_external_id_relationships function.
             if exp_model is None or exp_model.deleted:
                 continue
             if item.state_name not in exp_model.states.keys():
@@ -1031,7 +1031,7 @@ class CollectionSnapshotMetadataModelValidator(
         return {
             'collection_ids': (
                 collection_models.CollectionModel,
-                [item.id[:item.id.rfind(base_models.VERSION_DELIMETER)]]),
+                [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]]),
             'committer_ids': (
                 user_models.UserSettingsModel, [item.committer_id])
         }
@@ -1048,7 +1048,7 @@ class CollectionSnapshotContentModelValidator(
         return {
             'collection_ids': (
                 collection_models.CollectionModel,
-                [item.id[:item.id.rfind(base_models.VERSION_DELIMETER)]]),
+                [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]]),
         }
 
 
@@ -1115,7 +1115,7 @@ class CollectionRightsSnapshotMetadataModelValidator(
         return {
             'collection_rights_ids': (
                 collection_models.CollectionRightsModel,
-                [item.id[:item.id.rfind(base_models.VERSION_DELIMETER)]]),
+                [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]]),
             'committer_ids': (
                 user_models.UserSettingsModel, [item.committer_id])
         }
@@ -1132,7 +1132,7 @@ class CollectionRightsSnapshotContentModelValidator(
         return {
             'collection_rights_ids': (
                 collection_models.CollectionRightsModel,
-                [item.id[:item.id.rfind(base_models.VERSION_DELIMETER)]]),
+                [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]]),
         }
 
 
@@ -1240,10 +1240,10 @@ class CollectionSummaryModelValidator(BaseSummaryModelValidator):
 
         for (_, _, collection_model) in (
                 collection_model_class_model_id_model_tuples):
-            # The case for missing collection external model is ignored here
-            # since errors for missing collection external model are already
-            # checked and stored in _validate_external_id_relationships
-            # function.
+            # In the case of a missing external collection model, we don't
+            # report an error here since errors for missing external collection
+            # model are already checked and stored in
+            # _validate_external_id_relationships function.
             if collection_model is None or collection_model.deleted:
                 continue
             nodes = collection_model.collection_contents['nodes']
@@ -1342,10 +1342,10 @@ class ExplorationOpportunitySummaryModelValidator(BaseSummaryModelValidator):
 
         for (_, _, exploration_model) in (
                 exploration_model_class_model_id_model_tuples):
-            # The case for missing exploration external model is ignored here
-            # since errors for missing exploration external model are already
-            # checked and stored in _validate_external_id_relationships
-            # function.
+            # In the case of a missing external exploration model, we don't
+            # report an error here since errors for missing external exploration
+            # model are already checked and stored in
+            # _validate_external_id_relationships function.
             if exploration_model is None or exploration_model.deleted:
                 continue
             exploration = exp_fetchers.get_exploration_from_model(
@@ -1372,10 +1372,10 @@ class ExplorationOpportunitySummaryModelValidator(BaseSummaryModelValidator):
 
         for (_, _, exploration_model) in (
                 exploration_model_class_model_id_model_tuples):
-            # The case for missing exploration external model is ignored here
-            # since errors for missing exploration external model are already
-            # checked and stored in _validate_external_id_relationships
-            # function.
+            # In the case of a missing external exploration model, we don't
+            # report an error here since errors for missing external exploration
+            # model are already checked and stored in
+            # _validate_external_id_relationships function.
             if exploration_model is None or exploration_model.deleted:
                 continue
             exploration = exp_fetchers.get_exploration_from_model(
@@ -1399,10 +1399,10 @@ class ExplorationOpportunitySummaryModelValidator(BaseSummaryModelValidator):
             cls.external_instance_details['story_ids'])
 
         for (_, _, story_model) in story_model_class_model_id_model_tuples:
-            # The case for missing story external model is ignored here
-            # since errors for missing story external model are already
-            # checked and stored in _validate_external_id_relationships
-            # function.
+            # In the case of a missing external story model, we don't
+            # report an error here since errors for missing external story
+            # model are already checked and stored in
+            # _validate_external_id_relationships function.
             if story_model is None or story_model.deleted:
                 continue
             story = story_fetchers.get_story_from_model(story_model)
@@ -1479,10 +1479,10 @@ class SkillOpportunityModelValidator(BaseSummaryModelValidator):
 
         for (_, _, skill_model) in (
                 skill_model_class_model_id_model_tuples):
-            # The case for missing skill external model is ignored here
-            # since errors for missing skill external model are already
-            # checked and stored in _validate_external_id_relationships
-            # function.
+            # In the case of a missing external skill model, we don't
+            # report an error here since errors for missing external skill
+            # model are already checked and stored in
+            # _validate_external_id_relationships function.
             if skill_model is None or skill_model.deleted:
                 continue
             skill = skill_services.get_skill_from_model(skill_model)
@@ -1559,7 +1559,7 @@ class ConfigPropertySnapshotMetadataModelValidator(
         return {
             'config_property_ids': (
                 config_models.ConfigPropertyModel,
-                [item.id[:item.id.rfind(base_models.VERSION_DELIMETER)]]),
+                [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]]),
             'committer_ids': (
                 user_models.UserSettingsModel, [item.committer_id])
         }
@@ -1580,7 +1580,7 @@ class ConfigPropertySnapshotContentModelValidator(
         return {
             'config_property_ids': (
                 config_models.ConfigPropertyModel,
-                [item.id[:item.id.rfind(base_models.VERSION_DELIMETER)]]),
+                [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]]),
         }
 
 
@@ -1629,10 +1629,10 @@ class SentEmailModelValidator(BaseModelValidator):
 
         for (_, _, sender_model) in (
                 sender_model_class_model_id_model_tuples):
-            # The case for missing sender external model is ignored here
-            # since errors for missing sender external model are already
-            # checked and stored in _validate_external_id_relationships
-            # function.
+            # In the case of a missing external sender model, we don't
+            # report an error here since errors for missing external sender
+            # model are already checked and stored in
+            # _validate_external_id_relationships function.
             if sender_model is not None and not sender_model.deleted and (
                     sender_model.email != item.sender_email):
                 cls.errors['sender email check'].append((
@@ -1655,10 +1655,10 @@ class SentEmailModelValidator(BaseModelValidator):
 
         for (_, _, recipient_model) in (
                 recipient_model_class_model_id_model_tuples):
-            # The case for missing recipient external model is ignored here
-            # since errors for missing recipient external model are already
-            # checked and stored in _validate_external_id_relationships
-            # function.
+            # In the case of a missing external recipient model, we don't
+            # report an error here since errors for missing external recipient
+            # model are already checked and stored in
+            # _validate_external_id_relationships function.
             if recipient_model is not None and not recipient_model.deleted and (
                     recipient_model.email != item.recipient_email):
                 cls.errors['recipient email check'].append((
@@ -1714,10 +1714,10 @@ class BulkEmailModelValidator(BaseModelValidator):
 
         for (_, _, sender_model) in (
                 sender_model_class_model_id_model_tuples):
-            # The case for missing sender external model is ignored here
-            # since errors for missing sender external model are already
-            # checked and stored in _validate_external_id_relationships
-            # function.
+            # In the case of a missing external sender model, we don't
+            # report an error here since errors for missing external sender
+            # model are already checked and stored in
+            # _validate_external_id_relationships function.
             if sender_model is not None and not sender_model.deleted and (
                     sender_model.email != item.sender_email):
                 cls.errors['sender email check'].append((
@@ -1829,7 +1829,7 @@ class ExplorationSnapshotMetadataModelValidator(
         return {
             'exploration_ids': (
                 exp_models.ExplorationModel,
-                [item.id[:item.id.rfind(base_models.VERSION_DELIMETER)]]),
+                [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]]),
             'committer_ids': (
                 user_models.UserSettingsModel, [item.committer_id])
         }
@@ -1846,7 +1846,7 @@ class ExplorationSnapshotContentModelValidator(
         return {
             'exploration_ids': (
                 exp_models.ExplorationModel,
-                [item.id[:item.id.rfind(base_models.VERSION_DELIMETER)]]),
+                [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]]),
         }
 
 
@@ -1919,7 +1919,7 @@ class ExplorationRightsSnapshotMetadataModelValidator(
         return {
             'exploration_rights_ids': (
                 exp_models.ExplorationRightsModel,
-                [item.id[:item.id.rfind(base_models.VERSION_DELIMETER)]]),
+                [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]]),
             'committer_ids': (
                 user_models.UserSettingsModel, [item.committer_id])
         }
@@ -1936,7 +1936,7 @@ class ExplorationRightsSnapshotContentModelValidator(
         return {
             'exploration_rights_ids': (
                 exp_models.ExplorationRightsModel,
-                [item.id[:item.id.rfind(base_models.VERSION_DELIMETER)]]),
+                [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]]),
         }
 
 
@@ -2061,10 +2061,10 @@ class ExpSummaryModelValidator(BaseSummaryModelValidator):
             cls.external_instance_details['exploration_ids'])
         for (_, _, exploration_model) in (
                 exploration_model_class_model_id_model_tuples):
-            # The case for missing exploration external model is ignored here
-            # since errors for missing exploration external model are already
-            # checked and stored in _validate_external_id_relationships
-            # function.
+            # In the case of a missing external exploration model, we don't
+            # report an error here since errors for missing external exploration
+            # model are already checked and stored in
+            # _validate_external_id_relationships function.
             if exploration_model is None or exploration_model.deleted:
                 continue
             last_human_update_ms = exp_services.get_last_updated_by_human_ms(
@@ -2221,10 +2221,10 @@ class GeneralFeedbackMessageModelValidator(BaseModelValidator):
 
         for (_, _, feedback_thread_model) in (
                 feedback_thread_model_class_model_id_model_tuples):
-            # The case for missing feedback external model is ignored here
-            # since errors for missing feedback external model are already
-            # checked and stored in _validate_external_id_relationships
-            # function.
+            # In the case of a missing external feedback model, we don't
+            # report an error here since errors for missing external feedback
+            # model are already checked and stored in
+            # _validate_external_id_relationships function.
             if feedback_thread_model is not None and not (
                     feedback_thread_model.deleted) and (
                         item.message_id >= feedback_thread_model.message_count):
@@ -2542,7 +2542,7 @@ class QuestionSnapshotMetadataModelValidator(
         return {
             'question_ids': (
                 question_models.QuestionModel,
-                [item.id[:item.id.rfind(base_models.VERSION_DELIMETER)]]),
+                [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]]),
             'committer_ids': (
                 user_models.UserSettingsModel, [item.committer_id])
         }
@@ -2559,7 +2559,7 @@ class QuestionSnapshotContentModelValidator(
         return {
             'question_ids': (
                 question_models.QuestionModel,
-                [item.id[:item.id.rfind(base_models.VERSION_DELIMETER)]]),
+                [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]]),
         }
 
 
@@ -2620,10 +2620,10 @@ class QuestionSummaryModelValidator(BaseSummaryModelValidator):
 
         for (_, _, question_model) in (
                 question_model_class_model_id_model_tuples):
-            # The case for missing question external model is ignored here
-            # since errors for missing question external model are already
-            # checked and stored in _validate_external_id_relationships
-            # function.
+            # In the case of a missing external question model, we don't
+            # report an error here since errors for missing external question
+            # model are already checked and stored in
+            # _validate_external_id_relationships function.
             if question_model is None or question_model.deleted:
                 continue
             content_html = question_model.question_state_data['content']['html']
@@ -2802,7 +2802,7 @@ class SkillSnapshotMetadataModelValidator(
         return {
             'skill_ids': (
                 skill_models.SkillModel,
-                [item.id[:item.id.rfind(base_models.VERSION_DELIMETER)]]),
+                [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]]),
             'committer_ids': (
                 user_models.UserSettingsModel, [item.committer_id])
         }
@@ -2819,7 +2819,7 @@ class SkillSnapshotContentModelValidator(
         return {
             'skill_ids': (
                 skill_models.SkillModel,
-                [item.id[:item.id.rfind(base_models.VERSION_DELIMETER)]]),
+                [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]]),
         }
 
 
@@ -2881,10 +2881,10 @@ class SkillSummaryModelValidator(BaseSummaryModelValidator):
 
         for (_, _, skill_model) in (
                 skill_model_class_model_id_model_tuples):
-            # The case for missing skill external model is ignored here
-            # since errors for missing skill external model are already
-            # checked and stored in _validate_external_id_relationships
-            # function.
+            # In the case of a missing external skill model, we don't
+            # report an error here since errors for missing external skill
+            # model are already checked and stored in
+            # _validate_external_id_relationships function.
             if not skill_model or skill_model.deleted:
                 continue
             if item.misconception_count != len(skill_model.misconceptions):
@@ -2907,10 +2907,10 @@ class SkillSummaryModelValidator(BaseSummaryModelValidator):
 
         for (_, _, skill_model) in (
                 skill_model_class_model_id_model_tuples):
-            # The case for missing skill external model is ignored here
-            # since errors for missing skill external model are already
-            # checked and stored in _validate_external_id_relationships
-            # function.
+            # In the case of a missing external skill model, we don't
+            # report an error here since errors for missing external skill
+            # model are already checked and stored in
+            # _validate_external_id_relationships function.
             if not skill_model or skill_model.deleted:
                 continue
             if item.worked_examples_count != len(
@@ -2994,7 +2994,7 @@ class StorySnapshotMetadataModelValidator(BaseSnapshotMetadataModelValidator):
         return {
             'story_ids': (
                 story_models.StoryModel,
-                [item.id[:item.id.rfind(base_models.VERSION_DELIMETER)]]),
+                [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]]),
             'committer_ids': (
                 user_models.UserSettingsModel, [item.committer_id])
         }
@@ -3010,7 +3010,7 @@ class StorySnapshotContentModelValidator(BaseSnapshotContentModelValidator):
         return {
             'story_ids': (
                 story_models.StoryModel,
-                [item.id[:item.id.rfind(base_models.VERSION_DELIMETER)]]),
+                [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]]),
         }
 
 
@@ -3070,10 +3070,10 @@ class StorySummaryModelValidator(BaseSummaryModelValidator):
             'story_ids']
 
         for (_, _, story_model) in story_model_class_model_id_model_tuples:
-            # The case for missing story external model is ignored here
-            # since errors for missing story external model are already
-            # checked and stored in _validate_external_id_relationships
-            # function.
+            # In the case of a missing external story model, we don't
+            # report an error here since errors for missing external story
+            # model are already checked and stored in
+            # _validate_external_id_relationships function.
             if story_model is None or story_model.deleted:
                 continue
             nodes = story_model.story_contents['nodes']
@@ -3171,10 +3171,10 @@ class GeneralSuggestionModelValidator(BaseModelValidator):
 
         for (_, _, target_model) in (
                 target_model_class_model_id_model_tuples):
-            # The case for missing target external model is ignored here
-            # since errors for missing target external model are already
-            # checked and stored in _validate_external_id_relationships
-            # function.
+            # In the case of a missing external target model, we don't
+            # report an error here since errors for missing external target
+            # model are already checked and stored in
+            # _validate_external_id_relationships function.
             if target_model is None or target_model.deleted:
                 continue
             if item.target_version_at_submission > target_model.version:
@@ -3365,7 +3365,7 @@ class TopicSnapshotMetadataModelValidator(BaseSnapshotMetadataModelValidator):
         return {
             'topic_ids': (
                 topic_models.TopicModel,
-                [item.id[:item.id.rfind(base_models.VERSION_DELIMETER)]]),
+                [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]]),
             'committer_ids': (
                 user_models.UserSettingsModel, [item.committer_id])
         }
@@ -3381,7 +3381,7 @@ class TopicSnapshotContentModelValidator(BaseSnapshotContentModelValidator):
         return {
             'topic_ids': (
                 topic_models.TopicModel,
-                [item.id[:item.id.rfind(base_models.VERSION_DELIMETER)]]),
+                [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]]),
         }
 
 
@@ -3422,7 +3422,7 @@ class TopicRightsSnapshotMetadataModelValidator(
         return {
             'topic_rights_ids': (
                 topic_models.TopicRightsModel,
-                [item.id[:item.id.rfind(base_models.VERSION_DELIMETER)]]),
+                [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]]),
             'committer_ids': (
                 user_models.UserSettingsModel, [item.committer_id])
         }
@@ -3439,7 +3439,7 @@ class TopicRightsSnapshotContentModelValidator(
         return {
             'topic_rights_ids': (
                 topic_models.TopicRightsModel,
-                [item.id[:item.id.rfind(base_models.VERSION_DELIMETER)]]),
+                [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]]),
         }
 
 
@@ -3520,10 +3520,10 @@ class TopicSummaryModelValidator(BaseSummaryModelValidator):
             'topic_ids']
 
         for (_, _, topic_model) in topic_model_class_model_id_model_tuples:
-            # The case for missing topic external model is ignored here
-            # since errors for missing topic external model are already
-            # checked and stored in _validate_external_id_relationships
-            # function.
+            # In the case of a missing external topic model, we don't
+            # report an error here since errors for missing external topic
+            # model are already checked and stored in
+            # _validate_external_id_relationships function.
             if topic_model is None or topic_model.deleted:
                 continue
             pubished_canonical_story_ids = [
@@ -3550,10 +3550,10 @@ class TopicSummaryModelValidator(BaseSummaryModelValidator):
             'topic_ids']
 
         for (_, _, topic_model) in topic_model_class_model_id_model_tuples:
-            # The case for missing topic external model is ignored here
-            # since errors for missing topic external model are already
-            # checked and stored in _validate_external_id_relationships
-            # function.
+            # In the case of a missing external topic model, we don't
+            # report an error here since errors for missing external topic
+            # model are already checked and stored in
+            # _validate_external_id_relationships function.
             if topic_model is None or topic_model.deleted:
                 continue
             published_additional_story_ids = [
@@ -3582,10 +3582,10 @@ class TopicSummaryModelValidator(BaseSummaryModelValidator):
             'topic_ids']
 
         for (_, _, topic_model) in topic_model_class_model_id_model_tuples:
-            # The case for missing topic external model is ignored here
-            # since errors for missing topic external model are already
-            # checked and stored in _validate_external_id_relationships
-            # function.
+            # In the case of a missing external topic model, we don't
+            # report an error here since errors for missing external topic
+            # model are already checked and stored in
+            # _validate_external_id_relationships function.
             if topic_model is None or topic_model.deleted:
                 continue
             if item.uncategorized_skill_count != len(
@@ -3610,10 +3610,10 @@ class TopicSummaryModelValidator(BaseSummaryModelValidator):
             'topic_ids']
 
         for (_, _, topic_model) in topic_model_class_model_id_model_tuples:
-            # The case for missing topic external model is ignored here
-            # since errors for missing topic external model are already
-            # checked and stored in _validate_external_id_relationships
-            # function.
+            # In the case of a missing external topic model, we don't
+            # report an error here since errors for missing external topic
+            # model are already checked and stored in
+            # _validate_external_id_relationships function.
             if topic_model is None or topic_model.deleted:
                 continue
             subtopic_skill_ids = []
@@ -3642,10 +3642,10 @@ class TopicSummaryModelValidator(BaseSummaryModelValidator):
             'topic_ids']
 
         for (_, _, topic_model) in topic_model_class_model_id_model_tuples:
-            # The case for missing topic external model is ignored here
-            # since errors for missing topic external model are already
-            # checked and stored in _validate_external_id_relationships
-            # function.
+            # In the case of a missing external topic model, we don't
+            # report an error here since errors for missing external topic
+            # model are already checked and stored in
+            # _validate_external_id_relationships function.
             if topic_model is None or topic_model.deleted:
                 continue
             if item.subtopic_count != len(topic_model.subtopics):
@@ -3740,7 +3740,7 @@ class SubtopicPageSnapshotMetadataModelValidator(
         return {
             'subtopic_page_ids': (
                 topic_models.SubtopicPageModel,
-                [item.id[:item.id.rfind(base_models.VERSION_DELIMETER)]]),
+                [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]]),
             'committer_ids': (
                 user_models.UserSettingsModel, [item.committer_id])
         }
@@ -3761,7 +3761,7 @@ class SubtopicPageSnapshotContentModelValidator(
         return {
             'subtopic_page_ids': (
                 topic_models.SubtopicPageModel,
-                [item.id[:item.id.rfind(base_models.VERSION_DELIMETER)]]),
+                [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]]),
         }
 
 
@@ -3970,10 +3970,10 @@ class ExpUserLastPlaythroughModelValidator(BaseUserModelValidator):
             cls.external_instance_details['exploration_ids'])
         for (_, _, exploration_model) in (
                 exploration_model_class_model_id_model_tuples):
-            # The case for missing exploration external model is ignored here
-            # since errors for missing exploration external model are already
-            # checked and stored in _validate_external_id_relationships
-            # function.
+            # In the case of a missing external exploration model, we don't
+            # report an error here since errors for missing external exploration
+            # model are already checked and stored in
+            # _validate_external_id_relationships function.
             if exploration_model is None or exploration_model.deleted:
                 continue
             if item.last_played_exp_version > exploration_model.version:
@@ -3995,10 +3995,10 @@ class ExpUserLastPlaythroughModelValidator(BaseUserModelValidator):
             cls.external_instance_details['exploration_ids'])
         for (_, _, exploration_model) in (
                 exploration_model_class_model_id_model_tuples):
-            # The case for missing exploration external model is ignored here
-            # since errors for missing exploration external model are already
-            # checked and stored in _validate_external_id_relationships
-            # function.
+            # In the case of a missing external exploration model, we don't
+            # report an error here since errors for missing external exploration
+            # model are already checked and stored in
+            # _validate_external_id_relationships function.
             if exploration_model is None or exploration_model.deleted:
                 continue
             if item.last_played_state_name not in (
@@ -4147,10 +4147,10 @@ class UserSubscriptionsModelValidator(BaseUserModelValidator):
             cls.external_instance_details['subscriber_ids'])
         for (_, _, subscriber_model) in (
                 subscriber_model_class_model_id_model_tuples):
-            # The case for missing subscriber external model is ignored here
-            # since errors for missing subscriber external model are already
-            # checked and stored in _validate_external_id_relationships
-            # function.
+            # In the case of a missing external subscriber model, we don't
+            # report an error here since errors for missing external subscriber
+            # model are already checked and stored in
+            # _validate_external_id_relationships function.
             if subscriber_model is not None and not (
                     subscriber_model.deleted) and (
                         item.id not in subscriber_model.subscriber_ids):
@@ -4205,10 +4205,10 @@ class UserSubscribersModelValidator(BaseUserModelValidator):
             cls.external_instance_details['subscription_ids'])
         for (_, _, subscription_model) in (
                 subscription_model_class_model_id_model_tuples):
-            # The case for missing subscription external model is ignored here
-            # since errors for missing subscription external model are already
-            # checked and stored in _validate_external_id_relationships
-            # function.
+            # In the case of a missing external subscription model, we don't
+            # report an error here since errors for missing external
+            # subscription model are already checked and stored in
+            # _validate_external_id_relationships function.
             if subscription_model is not None and not (
                     subscription_model.deleted) and (
                         item.id not in subscription_model.creator_ids):
@@ -4411,10 +4411,10 @@ class ExplorationUserDataModelValidator(BaseUserModelValidator):
             cls.external_instance_details['exploration_ids'])
         for (_, _, exploration_model) in (
                 exploration_model_class_model_id_model_tuples):
-            # The case for missing exploration external model is ignored here
-            # since errors for missing exploration external model are already
-            # checked and stored in _validate_external_id_relationships
-            # function.
+            # In the case of a missing external exploration model, we don't
+            # report an error here since errors for missing external exploration
+            # model are already checked and stored in
+            # _validate_external_id_relationships function.
             if exploration_model is None or exploration_model.deleted:
                 continue
             if item.draft_change_list_exp_version > exploration_model.version:
@@ -4469,9 +4469,9 @@ class CollectionProgressModelValidator(BaseUserModelValidator):
             cls.external_instance_details['completed_activities_ids'])
         for (_, _, completed_activities_model) in (
                 completed_activities_model_class_model_id_model_tuples):
-            # The case for missing completed activities external model is
-            # ignored here since errors for missing completed activities
-            # external model are already checked and stored in
+            # In the case of a missing external completed activites model,
+            # we don't report an error here since errors for missing external
+            # completed activities model are already checked and stored in
             # _validate_external_id_relationships function.
             if completed_activities_model is not None and not (
                     completed_activities_model.deleted):
@@ -4489,10 +4489,10 @@ class CollectionProgressModelValidator(BaseUserModelValidator):
             cls.external_instance_details['collection_ids'])
         for (_, _, collection_model) in (
                 collection_model_class_model_id_model_tuples):
-            # The case for missing collection external model is ignored here
-            # since errors for missing collection external model are already
-            # checked and stored in _validate_external_id_relationships
-            # function.
+            # In the case of a missing external collection model, we don't
+            # report an error here since errors for missing external collection
+            # model are already checked and stored in
+            # _validate_external_id_relationships function.
             if collection_model is None or collection_model.deleted:
                 continue
             collection_node_ids = [
@@ -4544,10 +4544,10 @@ class StoryProgressModelValidator(BaseUserModelValidator):
             cls.external_instance_details['story_ids'])
         for (_, _, story_model) in (
                 story_model_class_model_id_model_tuples):
-            # The case for missing story external model is ignored here
-            # since errors for missing story external model are already
-            # checked and stored in _validate_external_id_relationships
-            # function.
+            # In the case of a missing external story model, we don't
+            # report an error here since errors for missing external story
+            # model are already checked and stored in
+            # _validate_external_id_relationships function.
             if story_model is None or story_model.deleted:
                 continue
             topic_id = story_model.corresponding_topic_id
@@ -4578,10 +4578,10 @@ class StoryProgressModelValidator(BaseUserModelValidator):
             cls.external_instance_details['story_ids'])
         for (_, _, story_model) in (
                 story_model_class_model_id_model_tuples):
-            # The case for missing story external model is ignored here
-            # since errors for missing story external model are already
-            # checked and stored in _validate_external_id_relationships
-            # function.
+            # In the case of a missing external story model, we don't
+            # report an error here since errors for missing external story
+            # model are already checked and stored in
+            # _validate_external_id_relationships function.
             if story_model is None or story_model.deleted:
                 continue
             story_node_ids = [
@@ -4679,10 +4679,10 @@ class UserQueryModelValidator(BaseUserModelValidator):
             cls.external_instance_details['sent_email_model_ids'])
         for (_, _, email_model) in (
                 email_model_class_model_id_model_tuples):
-            # The case for missing email external model is ignored here
-            # since errors for missing email external model are already
-            # checked and stored in _validate_external_id_relationships
-            # function.
+            # In the case of a missing external email model, we don't
+            # report an error here since errors for missing external email
+            # model are already checked and stored in
+            # _validate_external_id_relationships function.
             if email_model is not None and not email_model.deleted:
                 extra_recipient_ids = [
                     user_id
@@ -4746,10 +4746,10 @@ class UserBulkEmailsModelValidator(BaseUserModelValidator):
             cls.external_instance_details['sent_email_model_ids'])
         for (_, _, email_model) in (
                 email_model_class_model_id_model_tuples):
-            # The case for missing email external model is ignored here
-            # since errors for missing email external model are already
-            # checked and stored in _validate_external_id_relationships
-            # function.
+            # In the case of a missing external email model, we don't
+            # report an error here since errors for missing external email
+            # model are already checked and stored in
+            # _validate_external_id_relationships function.
             if email_model is not None and not email_model.deleted and (
                     item.id not in email_model.recipient_ids):
                 cls.errors['recipient check'].append(
