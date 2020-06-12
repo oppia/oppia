@@ -20,20 +20,38 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-import { SkillSummaryObjectFactory } from
+import { SkillSummary, SkillSummaryObjectFactory } from
   'domain/skill/SkillSummaryObjectFactory';
 
+export interface ISubtopicBackendDict {
+  'id': number;
+  'title': string;
+  'skill_ids': string[];
+  'thumbnail_filename': string;
+  'thumbnail_bg_color': string;
+}
+
+export interface ISkillIdToDescriptionMap {
+  [skillId: string]: string;
+}
+
 export class Subtopic {
-  _id: any;
-  _title: any;
-  _skillSummaries: any;
+  _id: number;
+  _title: string;
+  _skillSummaries: SkillSummary[];
   _skillSummaryObjectFactory: SkillSummaryObjectFactory;
+  _thumbnailFilename: string;
+  _thumbnailBgColor: string;
   constructor(
-      subtopicId, title, skillIds, skillIdToDescriptionMap,
-      skillSummaryObjectFactory) {
+      subtopicId: number, title: string, skillIds: string[],
+      skillIdToDescriptionMap: ISkillIdToDescriptionMap,
+      skillSummaryObjectFactory: SkillSummaryObjectFactory,
+      thumbnailFilename: string, thumbnailBgColor: string) {
     this._id = subtopicId;
     this._title = title;
     this._skillSummaryObjectFactory = skillSummaryObjectFactory;
+    this._thumbnailFilename = thumbnailFilename;
+    this._thumbnailBgColor = thumbnailBgColor;
     this._skillSummaries = skillIds.map(
       (skillId) => {
         return this._skillSummaryObjectFactory.create(
@@ -41,28 +59,28 @@ export class Subtopic {
       });
   }
 
-  getId() {
+  getId(): number {
     return this._id;
   }
 
-  decrementId() {
+  decrementId(): number {
     return --this._id;
   }
 
-  incrementId() {
+  incrementId(): number {
     return ++this._id;
   }
 
   // Returns the title of the subtopic.
-  getTitle() {
+  getTitle(): string {
     return this._title;
   }
 
-  setTitle(title) {
+  setTitle(title): void {
     this._title = title;
   }
 
-  validate() {
+  validate(): string[] {
     var issues = [];
     if (this._title === '') {
       issues.push('Subtopic title should not be empty');
@@ -81,18 +99,26 @@ export class Subtopic {
     return issues;
   }
 
+  prepublishValidate(): Array<string> {
+    let issues = [];
+    if (!this._thumbnailFilename) {
+      issues.push('Subtopic ' + this._title + ' should have a thumbnail.');
+    }
+    return issues;
+  }
+
   // Returns the summaries of the skills in the subtopic.
-  getSkillSummaries() {
+  getSkillSummaries(): SkillSummary[] {
     return this._skillSummaries.slice();
   }
 
-  hasSkill(skillId) {
+  hasSkill(skillId: string): boolean {
     return this._skillSummaries.some(function(skillSummary) {
       return skillSummary.getId() === skillId;
     });
   }
 
-  addSkill(skillId, skillDescription) {
+  addSkill(skillId: string, skillDescription: string): boolean {
     if (!this.hasSkill(skillId)) {
       this._skillSummaries.push(this._skillSummaryObjectFactory.create(
         skillId, skillDescription));
@@ -101,15 +127,31 @@ export class Subtopic {
     return false;
   }
 
-  removeSkill(skillId) {
+  removeSkill(skillId: string): void {
     var index = this._skillSummaries.map(function(skillSummary) {
       return skillSummary.getId();
     }).indexOf(skillId);
     if (index > -1) {
       this._skillSummaries.splice(index, 1);
     } else {
-      throw Error('The given skill doesn\'t exist in the subtopic');
+      throw new Error('The given skill doesn\'t exist in the subtopic');
     }
+  }
+
+  setThumbnailFilename(thumbnailFilename: string): void {
+    this._thumbnailFilename = thumbnailFilename;
+  }
+
+  getThumbnailFilename(): string {
+    return this._thumbnailFilename;
+  }
+
+  setThumbnailBgColor(thumbnailBgColor: string): void {
+    this._thumbnailBgColor = thumbnailBgColor;
+  }
+
+  getThumbnailBgColor(): string {
+    return this._thumbnailBgColor;
   }
 }
 
@@ -119,18 +161,23 @@ export class Subtopic {
 export class SubtopicObjectFactory {
   constructor(private skillSummaryObjectFactory: SkillSummaryObjectFactory) {}
 
-  create(subtopicBackendDict, skillIdToDescriptionMap) {
+  create(
+      subtopicBackendDict: ISubtopicBackendDict,
+      skillIdToDescriptionMap: ISkillIdToDescriptionMap) {
     return new Subtopic(
       subtopicBackendDict.id, subtopicBackendDict.title,
       subtopicBackendDict.skill_ids, skillIdToDescriptionMap,
-      this.skillSummaryObjectFactory);
+      this.skillSummaryObjectFactory, subtopicBackendDict.thumbnail_filename,
+      subtopicBackendDict.thumbnail_bg_color);
   }
 
-  createFromTitle(subtopicId, title) {
+  createFromTitle(subtopicId: number, title: string): Subtopic {
     return this.create({
       id: subtopicId,
       title: title,
-      skill_ids: []
+      skill_ids: [],
+      thumbnail_filename: null,
+      thumbnail_bg_color: null
     }, {});
   }
 }

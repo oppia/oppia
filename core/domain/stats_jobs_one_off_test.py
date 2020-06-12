@@ -19,6 +19,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import ast
 import datetime
 
 from core.domain import config_domain
@@ -1620,3 +1621,180 @@ class RegenerateMissingV2StatsModelsOneOffJobTests(OneOffJobTestBase):
 
         self.assertTrue('d' in all_models[5].state_stats_mapping)
         self.assertFalse('d' in all_models[6].state_stats_mapping)
+
+
+class ExplorationMissingStatsAuditOneOffJobTests(OneOffJobTestBase):
+    ONE_OFF_JOB_CLASS = stats_jobs_one_off.ExplorationMissingStatsAudit
+
+    def run_one_off_job(self):
+        output = super(
+            ExplorationMissingStatsAuditOneOffJobTests, self).run_one_off_job()
+        return [ast.literal_eval(o) for o in output]
+
+    def _do_not_create_stats_models(self):
+        """Returns a context manager which does not create new stats models."""
+        return self.swap(stats_services, 'create_stats_model', lambda _: None)
+
+    def test_success_when_there_are_no_models(self):
+        self.assertItemsEqual(self.run_one_off_job(), [])
+
+    def test_success_when_stats_model_exists(self):
+        self.save_new_default_exploration('ID', 'owner_id')
+
+        self.assertItemsEqual(self.run_one_off_job(), [
+            ['EXPECTED', '1 ExplorationStats model is valid'],
+        ])
+
+    def test_success_when_several_stats_model_exists(self):
+        self.save_new_default_exploration('ID1', 'owner_id')
+        self.save_new_default_exploration('ID2', 'owner_id')
+        self.save_new_default_exploration('ID3', 'owner_id')
+
+        self.assertItemsEqual(self.run_one_off_job(), [
+            ['EXPECTED', '3 ExplorationStats models are valid'],
+        ])
+
+    def test_error_when_stats_model_is_missing(self):
+        with self._do_not_create_stats_models():
+            self.save_new_default_exploration('ID', 'owner_id')
+
+        self.assertItemsEqual(self.run_one_off_job(), [
+            ['UNEXPECTED',
+             'ExplorationStats for Exploration "ID" missing at version: 1'],
+        ])
+
+    def test_error_when_stats_model_is_deleted(self):
+        exp = self.save_new_default_exploration('ID', 'owner_id')
+
+        stats = stats_models.ExplorationStatsModel.get_model('ID', exp.version)
+        stats.deleted = True
+        stats.put()
+
+        self.assertItemsEqual(self.run_one_off_job(), [
+            ['UNEXPECTED',
+             'ExplorationStats for Exploration "ID" deleted at version: 1'],
+        ])
+
+    def test_error_when_stats_model_is_missing_at_disjoint_versions(self):
+        with self._do_not_create_stats_models():
+            self.save_new_default_exploration('ID', 'owner_id')
+
+        exp_services.update_exploration('owner_id', 'ID', None, 'noop')
+
+        with self._do_not_create_stats_models():
+            exp_services.update_exploration('owner_id', 'ID', None, 'noop')
+
+        self.assertItemsEqual(self.run_one_off_job(), [
+            ['EXPECTED', '1 ExplorationStats model is valid'],
+            ['UNEXPECTED',
+             'ExplorationStats for Exploration "ID" missing at versions: 1, 3'],
+        ])
+
+    def test_error_when_stats_model_is_deleted_at_disjoint_versions(self):
+        self.save_new_default_exploration('ID', 'owner_id') # v1
+        exp_services.update_exploration('owner_id', 'ID', None, 'noop') # v2
+        exp_services.update_exploration('owner_id', 'ID', None, 'noop') # v3
+
+        for stats in stats_models.ExplorationStatsModel.get_multi_versions(
+                'ID', [1, 3]):
+            stats.deleted = True
+            stats.put()
+
+        self.assertItemsEqual(self.run_one_off_job(), [
+            ['EXPECTED', '1 ExplorationStats model is valid'],
+            ['UNEXPECTED',
+             'ExplorationStats for Exploration "ID" deleted at versions: 1, 3'],
+        ])
+
+    def test_no_error_when_exploration_is_missing(self):
+        stats_domain.ExplorationStats.create_default('ID', 1, {})
+
+        self.assertItemsEqual(self.run_one_off_job(), [])
+
+    def test_no_error_when_exploration_is_deleted(self):
+        with self._do_not_create_stats_models():
+            self.save_new_default_exploration('ID', 'owner_id')
+
+        exp_models.ExplorationModel.get('ID').delete(
+            'owner_id', feconf.COMMIT_MESSAGE_EXPLORATION_DELETED)
+
+        self.assertItemsEqual(self.run_one_off_job(), [])
+
+    def test_error_when_stats_for_state_is_missing(self):
+        self.save_new_default_exploration('ID', 'owner_id')
+        stats = stats_models.ExplorationStatsModel.get_model('ID', 1)
+        del stats.state_stats_mapping[feconf.DEFAULT_INIT_STATE_NAME]
+        stats.put()
+
+        self.assertItemsEqual(self.run_one_off_job(), [
+            ['UNEXPECTED',
+             'ExplorationStats "ID" v1 does not have stats for card "%s", but '
+             'card appears in version: 1.' % (feconf.DEFAULT_INIT_STATE_NAME)]
+        ])
+
+    def test_error_when_stats_for_state_does_not_exist(self):
+        self.save_new_default_exploration('ID', 'owner_id')
+        stats = stats_models.ExplorationStatsModel.get_model('ID', 1)
+        stats.state_stats_mapping['Unknown State'] = (
+            stats_domain.StateStats.create_default().to_dict())
+        stats.put()
+
+        self.assertItemsEqual(self.run_one_off_job(), [
+            ['UNEXPECTED',
+             'ExplorationStats "ID" v1 has stats for card "Unknown State", but '
+             'card never existed.']
+        ])
+
+    def test_error_when_stats_for_state_no_longer_exists(self):
+        self.save_new_default_exploration('ID', 'owner_id')
+        exp_services.update_exploration('owner_id', 'ID', None, 'noop') # v2
+        stats = stats_models.ExplorationStatsModel.get_model('ID', 2)
+        del stats.state_stats_mapping[feconf.DEFAULT_INIT_STATE_NAME]
+        stats.put()
+
+        self.assertItemsEqual(self.run_one_off_job(), [
+            ['EXPECTED', '1 ExplorationStats model is valid'],
+            ['UNEXPECTED',
+             'ExplorationStats "ID" v2 does not have stats for card "%s", but '
+             'card appears in versions: 1, 2.' % feconf.DEFAULT_INIT_STATE_NAME]
+        ])
+
+    def test_error_when_stats_for_state_once_existed(self):
+        self.save_new_linear_exp_with_state_names_and_interactions(
+            'ID', 'owner_id',
+            ['State ①', 'State ②', 'State ③'],
+            ['TextInput', 'TextInput', 'EndExploration'])
+        exp_services.update_exploration('owner_id', 'ID', None, 'noop') # v2
+        exp_services.update_exploration( # v3
+            'owner_id', 'ID', [
+                exp_domain.ExplorationChange(
+                    {'cmd': 'delete_state', 'state_name': 'State ②'})
+            ], 'Delete State ②')
+
+        stats = stats_models.ExplorationStatsModel.get_model('ID', 3)
+        stats.state_stats_mapping['State ②'] = (
+            stats_domain.StateStats.create_default().to_dict())
+        stats.put()
+
+        self.assertItemsEqual(self.run_one_off_job(), [
+            ['EXPECTED', '2 ExplorationStats models are valid'],
+            ['UNEXPECTED',
+             'ExplorationStats "ID" v3 has stats for card "State ②", but card '
+             'only appears in versions: 1, 2.']
+        ])
+
+    def test_no_error_when_exploration_can_not_update_schema(self):
+        old_schema = self.swap(feconf, 'CURRENT_STATE_SCHEMA_VERSION', 24)
+
+        with old_schema:
+            self.save_new_default_exploration('ID', 'owner_id')
+
+        new_schema = self.swap(feconf, 'CURRENT_STATE_SCHEMA_VERSION', 25)
+        schema_update_failure = self.swap(
+            exp_domain.Exploration, '_convert_states_v24_dict_to_v25_dict',
+            classmethod(lambda *_: python_utils.divide(1, 0)))
+
+        with new_schema, schema_update_failure:
+            self.assertItemsEqual(self.run_one_off_job(), [
+                ['EXPECTED', '1 ExplorationStats model is valid']
+            ])

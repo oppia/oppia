@@ -17,6 +17,9 @@
  * in editor.
  */
 
+require(
+  'pages/exploration-editor-page/modal-templates/help-modal.controller.ts');
+
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/exploration-editor-page/services/exploration-rights.service.ts');
 require(
@@ -43,15 +46,15 @@ angular.module('oppia').directive('editorNavigation', [
       controller: [
         '$rootScope', '$scope', '$timeout', '$uibModal', 'ContextService',
         'ExplorationFeaturesService', 'ExplorationRightsService',
-        'ExplorationWarningsService', 'ImprovementTaskService', 'RouterService',
-        'SiteAnalyticsService', 'StateTutorialFirstTimeService',
-        'ThreadDataService', 'UserService', 'WindowDimensionsService',
+        'ExplorationWarningsService', 'RouterService', 'SiteAnalyticsService',
+        'StateTutorialFirstTimeService', 'ThreadDataService', 'UserService',
+        'WindowDimensionsService',
         function(
             $rootScope, $scope, $timeout, $uibModal, ContextService,
             ExplorationFeaturesService, ExplorationRightsService,
-            ExplorationWarningsService, ImprovementTaskService, RouterService,
-            SiteAnalyticsService, StateTutorialFirstTimeService,
-            ThreadDataService, UserService, WindowDimensionsService) {
+            ExplorationWarningsService, RouterService, SiteAnalyticsService,
+            StateTutorialFirstTimeService, ThreadDataService, UserService,
+            WindowDimensionsService) {
           var ctrl = this;
           var taskCount = 0;
           $scope.getOpenTaskCount = function() {
@@ -62,55 +65,20 @@ angular.module('oppia').directive('editorNavigation', [
             return ExplorationFeaturesService.isInitialized() &&
               ExplorationFeaturesService.isImprovementsTabEnabled();
           };
-          $scope.isFeedbackTabEnabled = function() {
-            return ExplorationFeaturesService.isInitialized() &&
-              !ExplorationFeaturesService.isImprovementsTabEnabled();
-          };
 
           $scope.showUserHelpModal = function() {
             var explorationId = ContextService.getExplorationId();
             SiteAnalyticsService.registerClickHelpButtonEvent(explorationId);
             var EDITOR_TUTORIAL_MODE = 'editor';
             var TRANSLATION_TUTORIAL_MODE = 'translation';
-            var modalInstance = $uibModal.open({
+            $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/exploration-editor-page/modal-templates/' +
                 'help-modal.template.html'),
               backdrop: true,
-              controller: [
-                '$scope', '$uibModalInstance',
-                'SiteAnalyticsService', 'ContextService',
-                function(
-                    $scope, $uibModalInstance,
-                    SiteAnalyticsService, ContextService) {
-                  var explorationId = (
-                    ContextService.getExplorationId());
-
-                  $scope.beginEditorTutorial = function() {
-                    SiteAnalyticsService
-                      .registerOpenTutorialFromHelpCenterEvent(
-                        explorationId);
-                    $uibModalInstance.close(EDITOR_TUTORIAL_MODE);
-                  };
-
-                  $scope.beginTranslationTutorial = function() {
-                    SiteAnalyticsService
-                      .registerOpenTutorialFromHelpCenterEvent(
-                        explorationId);
-                    $uibModalInstance.close(TRANSLATION_TUTORIAL_MODE);
-                  };
-
-                  $scope.goToHelpCenter = function() {
-                    SiteAnalyticsService.registerVisitHelpCenterEvent(
-                      explorationId);
-                    $uibModalInstance.dismiss('cancel');
-                  };
-                }
-              ],
+              controller: 'HelpModalController',
               windowClass: 'oppia-help-modal'
-            });
-
-            modalInstance.result.then(function(mode) {
+            }).result.then(function(mode) {
               if (mode === EDITOR_TUTORIAL_MODE) {
                 $rootScope.$broadcast('openEditorTutorial');
               } else if (mode === TRANSLATION_TUTORIAL_MODE) {
@@ -165,10 +133,6 @@ angular.module('oppia').directive('editorNavigation', [
           };
 
           ctrl.$onInit = function() {
-            ImprovementTaskService.fetchOpenTaskCount().then(
-              countOfOpenTasks => {
-                taskCount = countOfOpenTasks;
-              });
             $scope.popoverControlObject = {
               postTutorialHelpPopoverIsShown: false
             };

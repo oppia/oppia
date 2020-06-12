@@ -30,13 +30,11 @@ import { Rule, RuleObjectFactory } from
   'domain/exploration/RuleObjectFactory';
 
 import { AppConstants } from 'app.constants';
+import { WARNING_TYPES_CONSTANT } from 'app-type.constants';
 
 describe('DragAndDropSortInputValidationService', () => {
   let validatorService: DragAndDropSortInputValidationService;
-  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'WARNING_TYPES' is a constant and its type needs to be
-  // preferably in the constants file itself.
-  let WARNING_TYPES: any;
+  let WARNING_TYPES: WARNING_TYPES_CONSTANT;
 
   let currentState: string;
   let answerGroups: AnswerGroup[], goodDefaultOutcome: Outcome;
@@ -76,7 +74,7 @@ describe('DragAndDropSortInputValidationService', () => {
         value: ['Item 1', 'Item 2', 'Item 3']
       },
       allowMultipleItemsInSamePosition: {
-        value: false
+        value: true
       }
     };
 
@@ -128,6 +126,17 @@ describe('DragAndDropSortInputValidationService', () => {
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArgs, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([]);
+  });
+
+  it('should not allow multiple items in same position', () => {
+    customizationArgs.allowMultipleItemsInSamePosition = false;
+    var warnings = validatorService.getAllWarnings(
+      currentState, customizationArgs, answerGroups, goodDefaultOutcome);
+    expect(warnings).toEqual([{
+      type: WARNING_TYPES.ERROR,
+      message: 'Multiple items in a single position are not allowed.'
+    }]);
+    customizationArgs.allowMultipleItemsInSamePosition = true;
   });
 
   it('should expect all items to be nonempty', () => {

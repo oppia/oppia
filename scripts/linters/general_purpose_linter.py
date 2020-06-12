@@ -166,6 +166,7 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
         'excluded_files': (
             'core/templates/pages/exploration-player-page/'
             'FeedbackPopupDirective.js',
+            '.component.ts'
         ),
         'excluded_dirs': (
             'extensions/answer_summarizers/',
@@ -173,6 +174,36 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
             'extensions/dependencies/',
             'extensions/value_generators/',
             'extensions/visualizations/')
+    },
+    {
+        'regexp': re.compile(r'toThrow[(]'),
+        'message': 'Please use \'toThrowError\' instead of '
+                   '\'toThrow\'',
+        'excluded_files': (
+            # Note to developers: In the excluded_files below,
+            # we use custom errors which cannot be caught by regex.
+            # The Logic Proof interaction which uses these custom errors
+            # will be deprecated soon (see #9198).
+            'extensions/interactions/LogicProof/static/js/student.spec.ts',
+            'extensions/interactions/LogicProof/static/js/complete.spec.ts',
+            'extensions/interactions/LogicProof/static/js/teacher.spec.ts'),
+        'excluded_dirs': ()
+    },
+    {
+        'regexp': re.compile(r'(?!catch\s(\n|.)*throw\s\w+;\n.*})'
+                             r'throw\s\b(\bError|\bTypeError|\bRangeError'
+                             r'\bSyntaxError|\bDimensionError)\('),
+        'message': 'Please use \'throw new\' instead of \'throw\'',
+        'excluded_files': (),
+        'excluded_dirs': ()
+    },
+    {
+        'regexp': re.compile(r'(?!catch\s(\n|.)*throw\s\w+;\n.*})'
+                             r'throw\s\'.*\';'),
+        'message': 'Please use '
+                   '\'throw new Error\' instead of \'throw\'',
+        'excluded_files': (),
+        'excluded_dirs': ()
     },
     {
         'regexp': re.compile(r'\$parent'),
@@ -191,7 +222,9 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
     {
         'regexp': re.compile(r'innerHTML'),
         'message': 'Please do not use innerHTML property.',
-        'excluded_files': ('core/templates/Polyfills.ts',),
+        'excluded_files': (
+            'core/templates/Polyfills.ts',
+            'core/templates/filters/translate.pipe.spec.ts'),
         'excluded_dirs': ('core/tests/',)
     }
 ]
@@ -500,7 +533,8 @@ def check_bad_pattern_in_file(filepath, file_content, pattern):
     regexp = pattern['regexp']
     if not (any(filepath.startswith(excluded_dir)
                 for excluded_dir in pattern['excluded_dirs'])
-            or filepath in pattern['excluded_files']):
+            or any(filepath.endswith(excluded_file)
+                   for excluded_file in pattern['excluded_files'])):
         bad_pattern_count = 0
         for line_num, line in enumerate(file_content.split('\n'), 1):
             if line.endswith('disable-bad-pattern-check'):

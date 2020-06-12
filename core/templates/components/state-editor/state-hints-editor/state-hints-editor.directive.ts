@@ -17,9 +17,15 @@
  * editor.
  */
 
+require(
+  'components/common-layout-directives/common-elements/' +
+  'confirm-or-cancel-modal.controller.ts');
 require('components/state-directives/hint-editor/hint-editor.directive.ts');
 require(
   'components/state-directives/response-header/response-header.directive.ts');
+require(
+  'pages/exploration-editor-page/editor-tab/templates/modal-templates/' +
+  'add-hint-modal.controller.ts');
 
 require('domain/exploration/HintObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
@@ -54,17 +60,15 @@ angular.module('oppia').directive('stateHintsEditor', [
         '/components/state-editor/state-hints-editor/' +
         'state-hints-editor.directive.html'),
       controller: [
-        '$scope', '$rootScope', '$uibModal', '$filter',
-        'GenerateContentIdService', 'AlertsService', 'INTERACTION_SPECS',
-        'StateHintsService', 'COMPONENT_NAME_HINT', 'StateEditorService',
-        'EditabilityService', 'StateInteractionIdService',
-        'UrlInterpolationService', 'HintObjectFactory', 'StateSolutionService',
+        '$scope', '$rootScope', '$uibModal', '$filter', 'AlertsService',
+        'EditabilityService', 'StateEditorService', 'StateHintsService',
+        'StateInteractionIdService', 'StateSolutionService',
+        'UrlInterpolationService', 'INTERACTION_SPECS',
         function(
-            $scope, $rootScope, $uibModal, $filter,
-            GenerateContentIdService, AlertsService, INTERACTION_SPECS,
-            StateHintsService, COMPONENT_NAME_HINT, StateEditorService,
-            EditabilityService, StateInteractionIdService,
-            UrlInterpolationService, HintObjectFactory, StateSolutionService) {
+            $scope, $rootScope, $uibModal, $filter, AlertsService,
+            EditabilityService, StateEditorService, StateHintsService,
+            StateInteractionIdService, StateSolutionService,
+            UrlInterpolationService, INTERACTION_SPECS) {
           var ctrl = this;
           var _getExistingHintsContentIds = function() {
             var existingContentIds = [];
@@ -134,48 +138,16 @@ angular.module('oppia').directive('stateHintsEditor', [
                 '/pages/exploration-editor-page/editor-tab/templates/' +
                 'modal-templates/add-hint-modal.template.html'),
               backdrop: 'static',
-              controller: [
-                '$scope', '$uibModalInstance', 'ContextService',
-                function($scope, $uibModalInstance, ContextService) {
-                  $scope.HINT_FORM_SCHEMA = {
-                    type: 'html',
-                    ui_config: {
-                      hide_complex_extensions: (
-                        ContextService.getEntityType() === 'question')
-                    }
-                  };
-
-                  $scope.tmpHint = '';
-
-                  $scope.addHintForm = {};
-
-                  $scope.hintIndex = StateHintsService.displayed.length + 1;
-
-                  $scope.saveHint = function() {
-                    var contentId = GenerateContentIdService.getNextId(
-                      existingHintsContentIds, COMPONENT_NAME_HINT);
-                    // Close the modal and save it afterwards.
-                    $uibModalInstance.close({
-                      hint: angular.copy(
-                        HintObjectFactory.createNew(contentId, $scope.tmpHint)),
-                      contentId: contentId
-                    });
-                  };
-
-                  $scope.cancel = function() {
-                    $uibModalInstance.dismiss('cancel');
-                    AlertsService.clearWarnings();
-                  };
-                }
-              ]
+              resolve: {
+                existingHintsContentIds: () => existingHintsContentIds
+              },
+              controller: 'AddHintModalController'
             }).result.then(function(result) {
               StateHintsService.displayed.push(result.hint);
               StateHintsService.saveDisplayedValue();
               $scope.onSaveHints(StateHintsService.displayed);
             }, function() {
-              // Note to developers:
-              // This callback is triggered when the Cancel button is clicked.
-              // No further action is needed.
+              AlertsService.clearWarnings();
             });
           };
 
@@ -187,19 +159,7 @@ angular.module('oppia').directive('stateHintsEditor', [
                 '/pages/exploration-editor-page/editor-tab/templates/' +
                 'modal-templates/delete-last-hint-modal.template.html'),
               backdrop: true,
-              controller: [
-                '$scope', '$uibModalInstance',
-                function($scope, $uibModalInstance) {
-                  $scope.deleteBothSolutionAndHint = function() {
-                    $uibModalInstance.close();
-                  };
-
-                  $scope.cancel = function() {
-                    $uibModalInstance.dismiss('cancel');
-                    AlertsService.clearWarnings();
-                  };
-                }
-              ]
+              controller: 'ConfirmOrCancelModalController'
             }).result.then(function() {
               var solutionContentId = StateSolutionService.displayed
                 .explanation.getContentId();
@@ -213,9 +173,7 @@ angular.module('oppia').directive('stateHintsEditor', [
               StateHintsService.saveDisplayedValue();
               $scope.onSaveHints(StateHintsService.displayed);
             }, function() {
-              // Note to developers:
-              // This callback is triggered when the Cancel button is clicked.
-              // No further action is needed.
+              AlertsService.clearWarnings();
             });
           };
 
@@ -230,19 +188,7 @@ angular.module('oppia').directive('stateHintsEditor', [
                 '/pages/exploration-editor-page/editor-tab/templates/' +
                 'modal-templates/delete-hint-modal.template.html'),
               backdrop: true,
-              controller: [
-                '$scope', '$uibModalInstance', function(
-                    $scope, $uibModalInstance) {
-                  $scope.reallyDelete = function() {
-                    $uibModalInstance.close();
-                  };
-
-                  $scope.cancel = function() {
-                    $uibModalInstance.dismiss('cancel');
-                    AlertsService.clearWarnings();
-                  };
-                }
-              ]
+              controller: 'ConfirmOrCancelModalController'
             }).result.then(function() {
               if (StateSolutionService.savedMemento &&
                 StateHintsService.savedMemento.length === 1) {
@@ -259,9 +205,7 @@ angular.module('oppia').directive('stateHintsEditor', [
                 StateHintsService.setActiveHintIndex(null);
               }
             }, function() {
-              // Note to developers:
-              // This callback is triggered when the Cancel button is clicked.
-              // No further action is needed.
+              AlertsService.clearWarnings();
             });
           };
 

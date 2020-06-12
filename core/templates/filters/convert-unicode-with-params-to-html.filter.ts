@@ -27,7 +27,7 @@ angular.module('oppia').filter('convertUnicodeWithParamsToHtml', [
   '$filter', function($filter) {
     var assert = function(text) {
       if (!text) {
-        throw 'Invalid unicode-string-with-parameters: ' + text;
+        throw new Error('Invalid unicode-string-with-parameters: ' + text);
       }
     };
 

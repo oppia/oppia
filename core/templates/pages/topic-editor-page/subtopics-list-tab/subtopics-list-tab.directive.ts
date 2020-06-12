@@ -15,6 +15,14 @@
 /**
  * @fileoverview Controller for the subtopics list editor.
  */
+require(
+  'components/forms/custom-forms-directives/thumbnail-uploader.directive.ts');
+require(
+  'pages/topic-editor-page/modal-templates/' +
+  'new-subtopic-title-modal.controller.ts');
+require(
+  'pages/topic-editor-page/modal-templates/' +
+  'subtopic-editor-modal.controller.ts');
 
 require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/topic/SubtopicPageObjectFactory.ts');
@@ -35,11 +43,13 @@ angular.module('oppia').directive('subtopicsListTab', [
         'UndoRedoService', 'SubtopicPageObjectFactory',
         'UrlInterpolationService', 'EVENT_TOPIC_REINITIALIZED',
         'EVENT_TOPIC_INITIALIZED', 'EVENT_SUBTOPIC_PAGE_LOADED',
+        'MAX_CHARS_IN_SUBTOPIC_TITLE',
         function(
             $scope, $uibModal, TopicEditorStateService, TopicUpdateService,
             UndoRedoService, SubtopicPageObjectFactory,
             UrlInterpolationService, EVENT_TOPIC_REINITIALIZED,
-            EVENT_TOPIC_INITIALIZED, EVENT_SUBTOPIC_PAGE_LOADED) {
+            EVENT_TOPIC_INITIALIZED, EVENT_SUBTOPIC_PAGE_LOADED,
+            MAX_CHARS_IN_SUBTOPIC_TITLE) {
           var ctrl = this;
           var SKILL_EDITOR_URL_TEMPLATE = '/skill_editor/<skillId>';
           var _initEditor = function() {
@@ -56,6 +66,8 @@ angular.module('oppia').directive('subtopicsListTab', [
 
           $scope.editSubtopic = function(subtopic) {
             var editableTitle = subtopic.getTitle();
+            var editableThumbnailFilename = subtopic.getThumbnailFilename();
+            var editableThumbnailBgColor = subtopic.getThumbnailBgColor();
             TopicEditorStateService.loadSubtopicPage(
               $scope.topic.getId(), subtopic.getId());
             var subtopicTitles = $scope.subtopicTitles;
@@ -64,71 +76,22 @@ angular.module('oppia').directive('subtopicsListTab', [
                 '/pages/topic-editor-page/modal-templates/' +
                 'subtopic-editor-modal.template.html'),
               backdrop: true,
-              controller: [
-                '$scope', '$uibModalInstance',
-                function($scope, $uibModalInstance) {
-                  $scope.subtopicId = subtopic.getId();
-                  $scope.subtopicTitles = subtopicTitles;
-                  $scope.editableTitle = editableTitle;
-                  $scope.subtopicPage =
-                    TopicEditorStateService.getSubtopicPage();
-                  var pageContents = $scope.subtopicPage.getPageContents();
-                  if (pageContents) {
-                    $scope.htmlData = pageContents.getHtml();
-                  }
-                  $scope.errorMsg = null;
-                  $scope.$on(EVENT_SUBTOPIC_PAGE_LOADED, function() {
-                    $scope.subtopicPage =
-                      TopicEditorStateService.getSubtopicPage();
-                    var pageContents = $scope.subtopicPage.getPageContents();
-                    $scope.htmlData = pageContents.getHtml();
-                  });
-                  $scope.SUBTOPIC_PAGE_SCHEMA = {
-                    type: 'html',
-                    ui_config: {
-                      rows: 100
-                    }
-                  };
-
-                  $scope.updateSubtopicTitle = function(title) {
-                    if (title === subtopic.getTitle()) {
-                      return;
-                    }
-                    if ($scope.subtopicTitles.indexOf(title) !== -1) {
-                      $scope.errorMsg =
-                        'A subtopic with this title already exists';
-                      return;
-                    }
-                    $scope.editableTitle = title;
-                  };
-
-                  $scope.resetErrorMsg = function() {
-                    $scope.errorMsg = null;
-                  };
-
-                  $scope.updateHtmlData = function(htmlData) {
-                    $scope.subtopicPage.getPageContents().setHtml(htmlData);
-                    $scope.openPreviewSubtopicPage(htmlData);
-                  };
-
-                  $scope.save = function() {
-                    $uibModalInstance.close({
-                      newTitle: $scope.editableTitle,
-                      newHtmlData: $scope.htmlData
-                    });
-                  };
-
-                  $scope.cancel = function() {
-                    $uibModalInstance.dismiss('cancel');
-                  };
-                }
-              ]
+              resolve: {
+                editableThumbnailBgColor: () => editableThumbnailBgColor,
+                editableThumbnailFilename: () => editableThumbnailFilename,
+                editableTitle: () => editableTitle,
+                subtopic: () => subtopic,
+                subtopicTitles: () => subtopicTitles,
+              },
+              controller: 'SubtopicEditorModalController'
             });
 
             modalInstance.result.then(function(newValues) {
               $scope.subtopicPage = TopicEditorStateService.getSubtopicPage();
               var newTitle = newValues.newTitle;
               var newHtmlData = newValues.newHtmlData;
+              var newThumbnailFilename = newValues.newThumbnailFilename;
+              var newThumbnailBgColor = newValues.newThumbnailBgColor;
 
               if (newTitle !== subtopic.getTitle()) {
                 TopicUpdateService.setSubtopicTitle(
@@ -142,6 +105,14 @@ angular.module('oppia').directive('subtopicsListTab', [
                 TopicUpdateService.setSubtopicPageContentsHtml(
                   $scope.subtopicPage, subtopic.getId(), subtitledHtml);
                 TopicEditorStateService.setSubtopicPage($scope.subtopicPage);
+              }
+              if (newThumbnailFilename !== subtopic.getThumbnailFilename()) {
+                TopicUpdateService.setSubtopicThumbnailFilename(
+                  $scope.topic, subtopic.getId(), newThumbnailFilename);
+              }
+              if (newThumbnailBgColor !== subtopic.getThumbnailBgColor()) {
+                TopicUpdateService.setSubtopicThumbnailBgColor(
+                  $scope.topic, subtopic.getId(), newThumbnailBgColor);
               }
             }, function() {
               // Note to developers:
@@ -215,32 +186,10 @@ angular.module('oppia').directive('subtopicsListTab', [
                 '/pages/topic-editor-page/modal-templates/' +
                 'new-subtopic-title-modal.template.html'),
               backdrop: true,
-              controller: [
-                '$scope', '$uibModalInstance',
-                function($scope, $uibModalInstance) {
-                  $scope.subtopicTitle = '';
-                  $scope.subtopicTitles = subtopicTitles;
-                  $scope.errorMsg = null;
-
-                  $scope.resetErrorMsg = function() {
-                    $scope.errorMsg = null;
-                  };
-                  $scope.isSubtopicTitleEmpty = function(subtopicTitle) {
-                    return (subtopicTitle === '');
-                  };
-                  $scope.save = function(title) {
-                    if ($scope.subtopicTitles.indexOf(title) !== -1) {
-                      $scope.errorMsg =
-                        'A subtopic with this title already exists';
-                      return;
-                    }
-                    $uibModalInstance.close(title);
-                  };
-                  $scope.cancel = function() {
-                    $uibModalInstance.dismiss('cancel');
-                  };
-                }
-              ]
+              resolve: {
+                subtopicTitles: () => subtopicTitles
+              },
+              controller: 'NewSubtopicTitleModalController'
             });
 
             modalInstance.result.then(function(title) {

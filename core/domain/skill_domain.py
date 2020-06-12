@@ -17,7 +17,10 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import copy
+
 from constants import constants
+from core.domain import android_validation_constants
 from core.domain import change_domain
 from core.domain import html_cleaner
 from core.domain import state_domain
@@ -129,7 +132,7 @@ class SkillChange(change_domain.BaseChange):
         'optional_attribute_names': []
     }, {
         'name': CMD_UPDATE_RUBRICS,
-        'required_attribute_names': ['difficulty', 'explanation'],
+        'required_attribute_names': ['difficulty', 'explanations'],
         'optional_attribute_names': []
     }, {
         'name': CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY,
@@ -246,8 +249,13 @@ class Misconception(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Expected misconception name to be a string, received %s' %
                 self.name)
-        utils.require_valid_name(
-            self.name, 'misconception_name', allow_empty=False)
+
+        misconception_name_length_limit = (
+            android_validation_constants.MAX_CHARS_IN_MISCONCEPTION_NAME)
+        if len(self.name) > misconception_name_length_limit:
+            raise utils.ValidationError(
+                'Misconception name should be less than %d chars, received %s'
+                % (misconception_name_length_limit, self.name))
 
         if not isinstance(self.notes, python_utils.BASESTRING):
             raise utils.ValidationError(
@@ -268,15 +276,17 @@ class Misconception(python_utils.OBJECT):
 class Rubric(python_utils.OBJECT):
     """Domain object describing a skill rubric."""
 
-    def __init__(self, difficulty, explanation):
+    def __init__(self, difficulty, explanations):
         """Initializes a Rubric domain object.
 
         Args:
             difficulty: str. The question difficulty that this rubric addresses.
-            explanation: str. The explanation for the corresponding difficulty.
+            explanations: list(str). The different explanations for the
+                corresponding difficulty.
         """
         self.difficulty = difficulty
-        self.explanation = html_cleaner.clean(explanation)
+        self.explanations = [
+            html_cleaner.clean(explanation) for explanation in explanations]
 
     def to_dict(self):
         """Returns a dict representing this Rubric domain object.
@@ -286,7 +296,7 @@ class Rubric(python_utils.OBJECT):
         """
         return {
             'difficulty': self.difficulty,
-            'explanation': self.explanation
+            'explanations': self.explanations
         }
 
     @classmethod
@@ -300,7 +310,7 @@ class Rubric(python_utils.OBJECT):
             Rubric. The corresponding Rubric domain object.
         """
         rubric = cls(
-            rubric_dict['difficulty'], rubric_dict['explanation'])
+            rubric_dict['difficulty'], rubric_dict['explanations'])
 
         return rubric
 
@@ -319,10 +329,16 @@ class Rubric(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Invalid difficulty received for rubric: %s' % self.difficulty)
 
-        if not isinstance(self.explanation, python_utils.BASESTRING):
+        if not isinstance(self.explanations, list):
             raise utils.ValidationError(
-                'Expected explanation to be a string, received %s' %
-                self.explanation)
+                'Expected explanations to be a list, received %s' %
+                self.explanations)
+
+        for explanation in self.explanations:
+            if not isinstance(explanation, python_utils.BASESTRING):
+                raise utils.ValidationError(
+                    'Expected each explanation to be a string, received %s' %
+                    explanation)
 
 
 class WorkedExample(python_utils.OBJECT):
@@ -580,6 +596,13 @@ class Skill(python_utils.OBJECT):
 
         if description == '':
             raise utils.ValidationError('Description field should not be empty')
+
+        description_length_limit = (
+            android_validation_constants.MAX_CHARS_IN_SKILL_DESCRIPTION)
+        if len(description) > description_length_limit:
+            raise utils.ValidationError(
+                'Skill description should be less than %d chars, received %s'
+                % (description_length_limit, description))
 
     def validate(self):
         """Validates various properties of the Skill object.
@@ -845,6 +868,22 @@ class Skill(python_utils.OBJECT):
         return misconception_dict
 
     @classmethod
+    def _convert_rubric_v1_dict_to_v2_dict(cls, rubric_dict):
+        """Converts v1 rubric schema to the v2 schema. In the v2 schema,
+        multiple explanations have been added for each difficulty.
+
+        Args:
+            rubric_dict: dict. The v1 rubric dict.
+
+        Returns:
+            dict. The converted rubric_dict.
+        """
+        explanation = rubric_dict['explanation']
+        del rubric_dict['explanation']
+        rubric_dict['explanations'] = [explanation]
+        return rubric_dict
+
+    @classmethod
     def update_rubrics_from_model(cls, versioned_rubrics, current_version):
         """Converts the rubrics blob contained in the given
         versioned_rubrics dict from current_version to
@@ -870,6 +909,29 @@ class Skill(python_utils.OBJECT):
             updated_rubrics.append(conversion_fn(rubric))
 
         versioned_rubrics['rubrics'] = updated_rubrics
+
+    def get_all_html_content_strings(self):
+        """Returns all html strings that are part of the skill
+        (or any of its subcomponents).
+
+        Returns:
+            list(str). The list of html contents.
+        """
+        html_content_strings = [self.skill_contents.explanation.html]
+
+        for rubric in self.rubrics:
+            for explanation in rubric.explanations:
+                html_content_strings.append(explanation)
+
+        for example in self.skill_contents.worked_examples:
+            html_content_strings.append(example.question.html)
+            html_content_strings.append(example.explanation.html)
+
+        for misconception in self.misconceptions:
+            html_content_strings.append(misconception.notes)
+            html_content_strings.append(misconception.feedback)
+
+        return html_content_strings
 
     def update_description(self, description):
         """Updates the description of the skill.
@@ -982,21 +1044,16 @@ class Skill(python_utils.OBJECT):
                 return ind
         return None
 
-    def add_misconception(self, misconception_dict):
+    def add_misconception(self, misconception):
         """Adds a new misconception to the skill.
 
         Args:
-            misconception_dict: dict. The misconception to be added.
+            misconception: Misconception. The misconception to be added.
         """
-        misconception = Misconception(
-            misconception_dict['id'],
-            misconception_dict['name'],
-            misconception_dict['notes'],
-            misconception_dict['feedback'],
-            misconception_dict['must_be_addressed'])
+
         self.misconceptions.append(misconception)
         self.next_misconception_id = self.get_incremented_misconception_id(
-            misconception_dict['id'])
+            misconception.id)
 
     def _find_prerequisite_skill_id_index(self, skill_id_to_find):
         """Returns the index of the skill_id in the prerequisite_skill_ids
@@ -1040,16 +1097,16 @@ class Skill(python_utils.OBJECT):
             raise ValueError('The skill to remove is not a prerequisite skill.')
         del self.prerequisite_skill_ids[index]
 
-    def update_rubric(self, difficulty, explanation):
+    def update_rubric(self, difficulty, explanations):
         """Adds or updates the rubric of the given difficulty.
 
         Args:
             difficulty: str. The difficulty of the rubric.
-            explanation: str. The explanation for the rubric.
+            explanations: list(str). The explanations for the rubric.
         """
         for rubric in self.rubrics:
             if rubric.difficulty == difficulty:
-                rubric.explanation = explanation
+                rubric.explanations = copy.deepcopy(explanations)
                 return
         raise ValueError(
             'There is no rubric for the given difficulty.')

@@ -15,9 +15,14 @@
 /**
  * @fileoverview Directive for the state graph visualization.
  */
+
 require(
   'components/common-layout-directives/common-elements/' +
   'loading-dots.directive.ts');
+require(
+  'pages/exploration-editor-page/editor-tab/templates/modal-templates/' +
+  'teach-oppia-modal.controller.ts');
+
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/exploration-editor-page/services/exploration-rights.service.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
@@ -100,156 +105,7 @@ angular.module('oppia').directive('unresolvedAnswersOverview', [
                 '/pages/exploration-editor-page/editor-tab/templates/' +
                 'modal-templates/teach-oppia-modal.template.html'),
               backdrop: true,
-              controller: [
-                '$filter', '$http', '$injector', '$log', '$scope',
-                '$uibModalInstance', 'AlertsService', 'AngularNameService',
-                'AnswerClassificationService', 'ContextService',
-                'ExplorationHtmlFormatterService', 'ExplorationStatesService',
-                'StateCustomizationArgsService', 'StateEditorService',
-                'StateInteractionIdService', 'TrainingDataService',
-                'TrainingModalService', 'UrlInterpolationService',
-                'DEFAULT_OUTCOME_CLASSIFICATION', 'EXPLICIT_CLASSIFICATION',
-                'TRAINING_DATA_CLASSIFICATION',
-                function(
-                    $filter, $http, $injector, $log, $scope,
-                    $uibModalInstance, AlertsService, AngularNameService,
-                    AnswerClassificationService, ContextService,
-                    ExplorationHtmlFormatterService, ExplorationStatesService,
-                    StateCustomizationArgsService, StateEditorService,
-                    StateInteractionIdService, TrainingDataService,
-                    TrainingModalService, UrlInterpolationService,
-                    DEFAULT_OUTCOME_CLASSIFICATION, EXPLICIT_CLASSIFICATION,
-                    TRAINING_DATA_CLASSIFICATION) {
-                  var _explorationId = (
-                    ContextService.getExplorationId());
-                  var _stateName = StateEditorService.getActiveStateName();
-                  var _state = ExplorationStatesService.getState(_stateName);
-                  var interactionId = StateInteractionIdService.savedMemento;
-
-                  var rulesServiceName = (
-                    AngularNameService.getNameOfInteractionRulesService(
-                      interactionId));
-
-                  // Inject RulesService dynamically.
-                  var rulesService = $injector.get(rulesServiceName);
-
-                  // Timeout for the toast that is shown when a response has
-                  // been confirmed or fixed.
-                  var TOAST_TIMEOUT = 2000;
-
-                  var fetchAndShowUnresolvedAnswers = function(
-                      expId, stateName) {
-                    var unresolvedAnswersUrl = (
-                      UrlInterpolationService.interpolateUrl(
-                        '/createhandler/get_top_unresolved_answers/' +
-                        '<exploration_id>', {
-                          exploration_id: expId
-                        }));
-                    $http.get(unresolvedAnswersUrl, {
-                      params: {
-                        state_name: stateName
-                      }
-                    }).then(function(response) {
-                      $scope.showUnresolvedAnswers(response.unresolved_answers);
-                    }, function(response) {
-                      $log.error(
-                        'Error occurred while fetching unresolved answers ' +
-                        'for exploration ' + _explorationId + 'state ' +
-                        _stateName + ': ' + response);
-                      $scope.showUnresolvedAnswers([]);
-                    });
-                  };
-
-                  $scope.showUnresolvedAnswers = function(unresolvedAnswers) {
-                    $scope.loadingDotsAreShown = false;
-                    $scope.unresolvedAnswers = [];
-
-                    unresolvedAnswers.forEach(function(item) {
-                      var acs = AnswerClassificationService;
-                      var answer = item.answer;
-                      var classificationResult = (
-                        acs.getMatchingClassificationResult(
-                          _stateName, _state.interaction, answer,
-                          rulesService));
-                      var classificationType = (
-                        classificationResult.classificationCategorization);
-                      if (classificationType !== EXPLICIT_CLASSIFICATION &&
-                        classificationType !== TRAINING_DATA_CLASSIFICATION &&
-                        !TrainingDataService.isConfirmedUnclassifiedAnswer(
-                          answer)) {
-                        var answerTemplate = (
-                          ExplorationHtmlFormatterService.getAnswerHtml(
-                            answer, StateInteractionIdService.savedMemento,
-                            StateCustomizationArgsService.savedMemento));
-                        var feedbackHtml = (
-                          classificationResult.outcome.feedback.getHtml());
-                        $scope.unresolvedAnswers.push({
-                          answer: answer,
-                          answerTemplate: answerTemplate,
-                          classificationResult: classificationResult,
-                          feedbackHtml: feedbackHtml
-                        });
-                      }
-                    });
-                  };
-
-                  $scope.confirmAnswerAssignment = function(answerIndex) {
-                    var answer = $scope.unresolvedAnswers[answerIndex];
-                    $scope.unresolvedAnswers.splice(answerIndex, 1);
-
-                    var classificationType = (
-                      answer.classificationResult.classificationCategorization);
-                    var truncatedAnswer = $filter(
-                      'truncateInputBasedOnInteractionAnswerType')(
-                      answer.answer, interactionId, 12);
-                    var successToast = (
-                      'The answer ' + truncatedAnswer +
-                      ' has been successfully trained.');
-
-                    if (classificationType === DEFAULT_OUTCOME_CLASSIFICATION) {
-                      TrainingDataService.associateWithDefaultResponse(
-                        answer.answer);
-                      AlertsService.addSuccessMessage(
-                        successToast, TOAST_TIMEOUT);
-                      return;
-                    }
-
-                    TrainingDataService.associateWithAnswerGroup(
-                      answer.classificationResult.answerGroupIndex,
-                      answer.answer);
-                    AlertsService.addSuccessMessage(
-                      successToast, TOAST_TIMEOUT);
-                  };
-
-                  $scope.openTrainUnresolvedAnswerModal = function(
-                      answerIndex) {
-                    var selectedAnswerIndex = answerIndex;
-                    var unresolvedAnswer = (
-                      $scope.unresolvedAnswers[answerIndex]);
-                    var answer = unresolvedAnswer.answer;
-                    var answerGroupIndex = (
-                      unresolvedAnswer.classificationResult.answerGroupIndex);
-                    return TrainingModalService.openTrainUnresolvedAnswerModal(
-                      answer, function() {
-                        $scope.unresolvedAnswers.splice(selectedAnswerIndex, 1);
-                        var truncatedAnswer = $filter(
-                          'truncateInputBasedOnInteractionAnswerType')(
-                          answer, interactionId, 12);
-                        var successToast = (
-                          'The response for ' + truncatedAnswer +
-                          ' has been fixed.');
-                        AlertsService.addSuccessMessage(
-                          successToast, TOAST_TIMEOUT);
-                      });
-                  };
-
-                  $scope.finishTeaching = function(reopen) {
-                    $uibModalInstance.dismiss();
-                  };
-
-                  $scope.loadingDotsAreShown = true;
-                  fetchAndShowUnresolvedAnswers(_explorationId, _stateName);
-                }]
+              controller: 'TeachOppiaModalController'
             }).result.then(function() {}, function() {
               // Note to developers:
               // This callback is triggered when the Cancel button is clicked.

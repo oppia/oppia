@@ -110,17 +110,17 @@ describe('Url Service', () => {
     mockLocation.pathname = '/topic_editor/abcdefgij';
     expect(function() {
       urlService.getTopicIdFromUrl();
-    }).toThrow();
+    }).toThrowError('Invalid topic id url');
 
     mockLocation.pathname = '/topiceditor/abcdefgijklm';
     expect(function() {
       urlService.getTopicIdFromUrl();
-    }).toThrow();
+    }).toThrowError('Invalid topic id url');
 
     mockLocation.pathname = '/topic_editor';
     expect(function() {
       urlService.getTopicIdFromUrl();
-    }).toThrow();
+    }).toThrowError('Invalid topic id url');
   });
 
   it('should correctly retrieve topic name from url', () => {
@@ -142,12 +142,29 @@ describe('Url Service', () => {
     }).toThrowError('Invalid URL for topic');
   });
 
+  it('should correctly retrieve selected subtopics from url', () => {
+    mockLocation.pathname = '/practice_session/topicName';
+    mockLocation.search = '?selected_subtopic_ids=abcdefgijklm';
+    expect(
+      urlService.getSelectedSubtopicsFromUrl()
+    ).toBe('abcdefgijklm');
+    mockLocation.pathname = '/topic/abcdefgijklm';
+    expect(function() {
+      urlService.getSelectedSubtopicsFromUrl();
+    }).toThrowError('Invalid URL for practice session');
+    mockLocation.pathname = '/practice_session/topicName';
+    mockLocation.search = '?selected_subtopic_idsabcdefgijklm';
+    expect(function() {
+      urlService.getSelectedSubtopicsFromUrl();
+    }).toThrowError('Invalid URL for practice session');
+  });
+
   it('should correctly retrieve classroom name from url', () => {
-    mockLocation.pathname = '/classroom/abcdefgijklm';
+    mockLocation.pathname = '/abcdefgijklm';
     expect(
       urlService.getClassroomNameFromUrl()
     ).toBe('abcdefgijklm');
-    mockLocation.pathname = '/classroom/class%20name';
+    mockLocation.pathname = '/class%20name';
     expect(
       urlService.getClassroomNameFromUrl()
     ).toBe('class name');
@@ -184,29 +201,29 @@ describe('Url Service', () => {
     mockLocation.pathname = '/story_editor/abcdefgij';
     expect(function() {
       urlService.getStoryIdFromUrl();
-    }).toThrow();
+    }).toThrowError('Invalid story id url');
 
     mockLocation.pathname = '/storyeditor/abcdefgijklm';
     expect(function() {
       urlService.getStoryIdFromUrl();
-    }).toThrow();
+    }).toThrowError('Invalid story id url');
 
     mockLocation.pathname = '/story_editor';
     expect(function() {
       urlService.getStoryIdFromUrl();
-    }).toThrow();
+    }).toThrowError('Invalid story id url');
   });
 
   it('should correctly retrieve story id from story viewer url', () => {
     mockLocation.pathname = '/story_viewer/abcdefgijklm';
     expect(function() {
       urlService.getStoryIdFromViewerUrl();
-    }).toThrow();
+    }).toThrowError('Invalid story id url');
 
     mockLocation.pathname = '/story/abcdefg';
     expect(function() {
       urlService.getStoryIdFromViewerUrl();
-    }).toThrow();
+    }).toThrowError('Invalid story id url');
 
     mockLocation.pathname = '/story/abcdefgijklm';
     expect(
@@ -222,7 +239,7 @@ describe('Url Service', () => {
     mockLocation.pathname = '/skill_editor/abcdefghijk';
     expect(function() {
       urlService.getSkillIdFromUrl();
-    }).toThrow();
+    }).toThrowError('Invalid Skill Id');
   });
 
   it('should correctly retrieve story id from url in player', () => {

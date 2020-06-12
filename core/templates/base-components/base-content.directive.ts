@@ -16,7 +16,8 @@
  * @fileoverview Directive for the Base Transclusion Component.
  */
 
-require('base-components/warning-loader.directive.ts');
+require('base-components/loading-message.component.ts');
+require('base-components/warnings-and-alerts.directive.ts');
 require('pages/OppiaFooterDirective.ts');
 
 require('domain/sidebar/sidebar-status.service.ts');
@@ -28,9 +29,12 @@ angular.module('oppia').directive('baseContent', [
     return {
       restrict: 'E',
       scope: {},
-      bindToController: {},
+      bindToController: {
+        backButtonShown: '<'
+      },
       transclude: {
         breadcrumb: '?navbarBreadcrumb',
+        preLogoAction: '?navbarPreLogoAction',
         content: 'content',
         footer: '?pageFooter',
         navOptions: '?navOptions',
@@ -38,9 +42,9 @@ angular.module('oppia').directive('baseContent', [
       template: require('./base-content.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$rootScope', '$window', 'BackgroundMaskService',
-        'SidebarStatusService', 'UrlService',
+        'SidebarStatusService', 'LoaderService', 'UrlService',
         function($rootScope, $window, BackgroundMaskService,
-            SidebarStatusService, UrlService) {
+            SidebarStatusService, LoaderService, UrlService) {
           // Mimic redirection behaviour in the backend (see issue #7867 for
           // details).
           if ($window.location.hostname === 'oppiaserver.appspot.com') {
@@ -52,6 +56,7 @@ angular.module('oppia').directive('baseContent', [
           }
 
           var ctrl = this;
+          ctrl.loadingMessage = '';
           ctrl.isSidebarShown = () => SidebarStatusService.isSidebarShown();
           ctrl.closeSidebarOnSwipe = () => SidebarStatusService.closeSidebar();
           ctrl.isBackgroundMaskActive = () => (
@@ -61,7 +66,7 @@ angular.module('oppia').directive('baseContent', [
               'oppia-main-content');
 
             if (!mainContentElement) {
-              throw Error('Variable mainContentElement is undefined.');
+              throw new Error('Variable mainContentElement is undefined.');
             }
             mainContentElement.tabIndex = -1;
             mainContentElement.scrollIntoView();
@@ -70,6 +75,9 @@ angular.module('oppia').directive('baseContent', [
           ctrl.$onInit = function() {
             ctrl.iframed = UrlService.isIframed();
             ctrl.DEV_MODE = $rootScope.DEV_MODE;
+            LoaderService.getLoadingMessageSubject().subscribe(
+              (message: string) => this.loadingMessage = message
+            );
           };
         }
       ]

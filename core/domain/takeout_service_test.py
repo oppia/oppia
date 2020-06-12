@@ -18,6 +18,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
+import json
 
 from constants import constants
 from core.domain import exp_domain
@@ -32,15 +33,18 @@ import feconf
 import utils
 
 (
-    base_models, collection_models, email_models,
-    exploration_models, feedback_models, skill_models,
-    topic_models, suggestion_models, user_models,
-    story_models, question_models, config_models
+    base_models, collection_models, config_models,
+    email_models, exploration_models, feedback_models,
+    improvements_models, question_models, skill_models,
+    story_models, suggestion_models, topic_models,
+    user_models,
 ) = models.Registry.import_models([
-    models.NAMES.base_model, models.NAMES.collection, models.NAMES.email,
-    models.NAMES.exploration, models.NAMES.feedback, models.NAMES.skill,
-    models.NAMES.topic, models.NAMES.suggestion, models.NAMES.user,
-    models.NAMES.story, models.NAMES.question, models.NAMES.config])
+    models.NAMES.base_model, models.NAMES.collection, models.NAMES.config,
+    models.NAMES.email, models.NAMES.exploration, models.NAMES.feedback,
+    models.NAMES.improvements, models.NAMES.question, models.NAMES.skill,
+    models.NAMES.story, models.NAMES.suggestion, models.NAMES.topic,
+    models.NAMES.user,
+])
 
 
 class TakeoutServiceUnitTests(test_utils.GenericTestBase):
@@ -58,6 +62,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
     USER_1_EMAIL = 'user1@example.com'
     GENERIC_USERNAME = 'user'
     GENERIC_DATE = datetime.datetime(2019, 5, 20)
+    GENERIC_EPOCH = utils.get_time_in_millisecs(GENERIC_DATE)
     GENERIC_IMAGE_URL = 'www.example.com/example.png'
     GENERIC_USER_BIO = 'I am a user of Oppia!'
     GENERIC_SUBJECT_INTERESTS = ['Math', 'Science']
@@ -82,6 +87,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
     ]
     EXPLORATION_IDS = ['exp_1']
     CREATOR_IDS = ['4', '8', '16']
+    CREATOR_USERNAMES = ['username4', 'username8', 'username16']
     COLLECTION_IDS = ['23', '42', '4']
     ACTIVITY_IDS = ['8', '16', '23']
     GENERAL_FEEDBACK_THREAD_IDS = ['42', '4', '8']
@@ -134,6 +140,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
         14) Creates new exploration rights.
         15) Populates user settings.
         16) Creates two reply-to ids for feedback.
+        17) Creates a task closed by the user.
         """
         super(TakeoutServiceUnitTests, self).setUp()
         # Setup for UserStatsModel.
@@ -162,11 +169,20 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             degree_of_mastery=self.DEGREE_OF_MASTERY).put()
 
         # Setup for UserSubscriptionsModel.
+        for creator_id in self.CREATOR_IDS:
+            user_models.UserSettingsModel(
+                id=creator_id,
+                gae_id='gae_' + creator_id,
+                username='username' + creator_id,
+                email=creator_id + '@example.com'
+            ).put()
+
         user_models.UserSubscriptionsModel(
             id=self.USER_ID_1, creator_ids=self.CREATOR_IDS,
             collection_ids=self.COLLECTION_IDS,
             activity_ids=self.ACTIVITY_IDS,
-            general_feedback_thread_ids=self.GENERAL_FEEDBACK_THREAD_IDS).put()
+            general_feedback_thread_ids=self.GENERAL_FEEDBACK_THREAD_IDS,
+            last_checked=self.GENERIC_DATE).put()
 
         # Setup for UserContributionsModel.
         self.save_new_valid_exploration(
@@ -432,6 +448,19 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             commit_cmds=self.COMMIT_CMDS
         ).put()
 
+        improvements_models.TaskEntryModel(
+            id=self.GENERIC_MODEL_ID,
+            composite_entity_id=self.GENERIC_MODEL_ID,
+            entity_type=improvements_models.ENTITY_TYPE_EXPLORATION,
+            entity_id=self.GENERIC_MODEL_ID,
+            entity_version=1,
+            task_type=improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
+            target_type=improvements_models.TARGET_TYPE_STATE,
+            target_id=self.GENERIC_MODEL_ID,
+            status=improvements_models.STATUS_OPEN,
+            closed_by=self.USER_ID_1
+        ).put()
+
     def set_up_trivial(self):
         """Setup for trivial test of export_data functionality."""
         super(TakeoutServiceUnitTests, self).setUp()
@@ -504,9 +533,12 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
         subscriptions_data = {
             'activity_ids': [],
             'collection_ids': [],
-            'creator_ids': [],
+            'creator_usernames': [],
             'general_feedback_thread_ids': [],
             'last_checked': None
+        }
+        task_entry_data = {
+            'task_ids_closed_by_user': []
         }
         topic_rights_data = {
             'managed_topic_ids': []
@@ -527,7 +559,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
         expected_exploration_rights_sm = {}
         expected_exploration_sm = {}
 
-        expected_export = {
+        expected_data = {
             'user_stats_data': stats_data,
             'user_settings_data': settings_data,
             'user_subscriptions_data': subscriptions_data,
@@ -538,6 +570,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             'incomplete_activities_data': incomplete_activities_data,
             'exp_user_last_playthrough_data': last_playthrough_data,
             'learner_playlist_data': learner_playlist_data,
+            'task_entry_data': task_entry_data,
             'topic_rights_data': topic_rights_data,
             'collection_progress_data': collection_progress_data,
             'story_progress_data': story_progress_data,
@@ -574,13 +607,15 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
         }
 
         # Perform export and compare.
-        exported_data = takeout_service.export_data_for_user(self.USER_ID_1)
-        self.assertEqual(expected_export, exported_data)
+        observed_data = takeout_service.export_data_for_user(self.USER_ID_1)
+        self.assertEqual(expected_data, observed_data)
+        observed_json = json.dumps(observed_data)
+        expected_json = json.dumps(expected_data)
+        self.assertEqual(json.loads(expected_json), json.loads(observed_json))
 
     def test_export_data_nontrivial(self):
         """Nontrivial test of export_data functionality."""
         self.set_up_non_trivial()
-
         # We set up the feedback_thread_model here so that we can easily
         # access it when computing the expected data later.
         feedback_thread_model = feedback_models.GeneralFeedbackThreadModel(
@@ -613,9 +648,9 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
         expected_exploration_data = {
             self.EXPLORATION_IDS[0]: {
                 'rating': 2,
-                'rated_on': self.GENERIC_DATE,
+                'rated_on': self.GENERIC_EPOCH,
                 'draft_change_list': {'new_content': {}},
-                'draft_change_list_last_updated': self.GENERIC_DATE,
+                'draft_change_list_last_updated': self.GENERIC_EPOCH,
                 'draft_change_list_exp_version': 3,
                 'draft_change_list_id': 1,
                 'mute_suggestion_notifications': (
@@ -671,7 +706,8 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
                 'has_suggestion': self.THREAD_HAS_SUGGESTION,
                 'summary': self.THREAD_SUMMARY,
                 'message_count': self.THREAD_MESSAGE_COUNT,
-                'last_updated': feedback_thread_model.last_updated
+                'last_updated_msec': utils.get_time_in_millisecs(
+                    feedback_thread_model.last_updated)
             },
             thread_id: {
                 'entity_type': self.THREAD_ENTITY_TYPE,
@@ -681,9 +717,10 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
                 'has_suggestion': False,
                 'summary': None,
                 'message_count': 2,
-                'last_updated': (feedback_models.
-                                 GeneralFeedbackThreadModel.
-                                 get(thread_id).last_updated)
+                'last_updated_msec': utils.get_time_in_millisecs(
+                    feedback_models.
+                    GeneralFeedbackThreadModel.
+                    get_by_id(thread_id).last_updated)
             }
         }
         expected_general_feedback_thread_user_data = {
@@ -741,11 +778,11 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             'role': feconf.ROLE_ID_ADMIN,
             'username': self.GENERIC_USERNAME,
             'normalized_username': self.GENERIC_USERNAME,
-            'last_agreed_to_terms': self.GENERIC_DATE,
-            'last_started_state_editor_tutorial': self.GENERIC_DATE,
-            'last_started_state_translation_tutorial': self.GENERIC_DATE,
-            'last_logged_in': self.GENERIC_DATE,
-            'last_edited_an_exploration': self.GENERIC_DATE,
+            'last_agreed_to_terms': self.GENERIC_EPOCH,
+            'last_started_state_editor_tutorial': self.GENERIC_EPOCH,
+            'last_started_state_translation_tutorial': self.GENERIC_EPOCH,
+            'last_logged_in': self.GENERIC_EPOCH,
+            'last_edited_an_exploration': self.GENERIC_EPOCH,
             'profile_picture_data_url': self.GENERIC_IMAGE_URL,
             'default_dashboard': 'learner',
             'creator_dashboard_display_pref': 'card',
@@ -763,14 +800,17 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
         }
 
         expected_subscriptions_data = {
-            'creator_ids': self.CREATOR_IDS,
+            'creator_usernames': self.CREATOR_USERNAMES,
             'collection_ids': self.COLLECTION_IDS,
             'activity_ids': self.ACTIVITY_IDS + self.EXPLORATION_IDS,
             'general_feedback_thread_ids': self.GENERAL_FEEDBACK_THREAD_IDS +
                                            [thread_id],
-            'last_checked': None
+            'last_checked': self.GENERIC_EPOCH
         }
 
+        expected_task_entry_data = {
+            'task_ids_closed_by_user': [self.GENERIC_MODEL_ID]
+        }
         expected_topic_data = {
             'managed_topic_ids': [self.TOPIC_ID_1, self.TOPIC_ID_2]
         }
@@ -909,7 +949,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             }
         }
 
-        expected_export = {
+        expected_data = {
             'user_stats_data': expected_stats_data,
             'user_settings_data': expected_settings_data,
             'user_subscriptions_data': expected_subscriptions_data,
@@ -920,6 +960,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             'incomplete_activities_data': expected_incomplete_activities_data,
             'exp_user_last_playthrough_data': expected_last_playthrough_data,
             'learner_playlist_data': expected_learner_playlist_data,
+            'task_entry_data': expected_task_entry_data,
             'topic_rights_data': expected_topic_data,
             'collection_progress_data': expected_collection_progress_data,
             'story_progress_data': expected_story_progress_data,
@@ -957,5 +998,8 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
                 expected_exploration_rights_sm,
             'exploration_snapshot_metadata_data': expected_exploration_sm,
         }
-        exported_data = takeout_service.export_data_for_user(self.USER_ID_1)
-        self.assertEqual(exported_data, expected_export)
+        observed_data = takeout_service.export_data_for_user(self.USER_ID_1)
+        self.assertEqual(observed_data, expected_data)
+        observed_json = json.dumps(observed_data)
+        expected_json = json.dumps(expected_data)
+        self.assertEqual(json.loads(observed_json), json.loads(expected_json))

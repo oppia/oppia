@@ -18,19 +18,20 @@
 
 var objects = require(process.cwd() + '/extensions/objects/protractor.js');
 
-var customizeInteraction = function(elem, requireSimplestForm) {
-  objects.BooleanEditor(elem.element(by.tagName('schema-based-bool-editor')))
-    .setValue(requireSimplestForm);
+var customizeInteraction = async function(elem, requireSimplestForm) {
+  await objects.BooleanEditor(elem.element(by.tagName(
+    'schema-based-bool-editor'))).setValue(requireSimplestForm);
 };
 
-var expectInteractionDetailsToMatch = function(elem) {
+var expectInteractionDetailsToMatch = async function(elem) {
   expect(
-    elem.element(by.tagName('oppia-interactive-fraction-input')).isPresent()
+    await elem.element(by.tagName(
+      'oppia-interactive-fraction-input')).isPresent()
   ).toBe(true);
 };
 
-var submitAnswer = function(elem, answer) {
-  elem.element(by.tagName('oppia-interactive-fraction-input'))
+var submitAnswer = async function(elem, answer) {
+  await elem.element(by.tagName('oppia-interactive-fraction-input'))
     .element(by.tagName('input')).sendKeys(answer + '\n');
 };
 

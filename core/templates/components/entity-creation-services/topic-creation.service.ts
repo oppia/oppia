@@ -16,16 +16,30 @@
  * @fileoverview Modal and functionality for the create topic button.
  */
 
+require(
+  'components/forms/custom-forms-directives/select2-dropdown.directive.ts');
+require(
+  'components/forms/custom-forms-directives/thumbnail-uploader.directive.ts');
+require('domain/topic/topic-update.service.ts');
+require('domain/topics_and_skills_dashboard/' +
+  'TopicsAndSkillsDashboardFilterObjectFactory');
 require('domain/utilities/url-interpolation.service.ts');
 require('domain/topic/topic-creation-backend-api.service.ts');
+require('pages/topic-editor-page/services/topic-editor-state.service.ts');
+require(
+  'pages/topics-and-skills-dashboard-page/' +
+    'create-new-topic-modal.controller.ts');
 require('services/alerts.service.ts');
+require('services/image-upload-helper.service.ts');
 
 angular.module('oppia').factory('TopicCreationService', [
   '$rootScope', '$uibModal', '$window', 'AlertsService',
   'TopicCreationBackendApiService', 'UrlInterpolationService',
+  'EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED',
   function(
       $rootScope, $uibModal, $window, AlertsService,
-      TopicCreationBackendApiService, UrlInterpolationService) {
+      TopicCreationBackendApiService, UrlInterpolationService,
+      EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED) {
     var TOPIC_EDITOR_URL_TEMPLATE = '/topic_editor/<topic_id>';
     var topicCreationInProgress = false;
 
@@ -34,61 +48,44 @@ angular.module('oppia').factory('TopicCreationService', [
         if (topicCreationInProgress) {
           return;
         }
-        var modalInstance = $uibModal.open({
+
+        $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/topics-and-skills-dashboard-page/templates/' +
-            'new-topic-name-editor.template.html'),
+            'create-new-topic-modal.template.html'),
           backdrop: true,
-          controller: [
-            '$scope', '$uibModalInstance',
-            function($scope, $uibModalInstance) {
-              $scope.topicName = '';
-              $scope.abbreviatedTopicName = '';
-              $scope.isAbbreviateTopicNameValid = function() {
-                return (
-                  $scope.abbreviatedTopicName !== '' &&
-                  $scope.abbreviatedTopicName.length <= 12);
-              };
-              $scope.isTopicNameValid = function() {
-                return (
-                  $scope.topicName !== '' &&
-                  $scope.topicName.length <= 20);
-              };
-              $scope.save = function(topicName, abbreviatedTopicName) {
-                $uibModalInstance.close({
-                  topicName: topicName,
-                  abbreviatedTopicName: abbreviatedTopicName
-                });
-              };
-              $scope.cancel = function() {
-                $uibModalInstance.dismiss('cancel');
-              };
-            }
-          ]
-        });
-
-        modalInstance.result.then(function(topic) {
-          if (topic.topicName === '') {
-            throw Error('Topic name cannot be empty');
-          }
-          if (topic.abbreviatedTopicName === '') {
-            throw Error('Abbreviated name cannot be empty');
+          controller: 'CreateNewTopicModalController'
+        }).result.then(function(newlyCreatedTopic) {
+          if (!newlyCreatedTopic.isValid()) {
+            throw new Error('Topic fields cannot be empty');
           }
           topicCreationInProgress = true;
           AlertsService.clearWarnings();
-
-          $rootScope.loadingMessage = 'Creating topic';
-          TopicCreationBackendApiService.createTopic(
-            topic.topicName, topic.abbreviatedTopicName).then(
+          // $window.open has to be initialized separately since if the 'open
+          // new tab' action does not directly result from a user input (which
+          // is not the case, if we wait for result from the backend before
+          // opening a new tab), some browsers block it as a popup. Here, the
+          // new tab is created as soon as the user clicks the 'Create' button
+          // and filled with URL once the details are fetched from the backend.
+          var newTab = $window.open();
+          TopicCreationBackendApiService.createTopic(newlyCreatedTopic).then(
             function(response) {
-              $window.location = UrlInterpolationService.interpolateUrl(
+              $rootScope.$broadcast(
+                EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED);
+              topicCreationInProgress = false;
+              newTab.location.href = UrlInterpolationService.interpolateUrl(
                 TOPIC_EDITOR_URL_TEMPLATE, {
                   topic_id: response.topicId
-                }
-              );
-            }, function() {
-              $rootScope.loadingMessage = '';
+                });
+            }, function(errorResponse) {
+              newTab.close();
+              topicCreationInProgress = false;
+              AlertsService.addWarning(errorResponse.error);
             });
+        }, function() {
+          // Note to developers:
+          // This callback is triggered when the Cancel button is
+          // clicked. No further action is needed.
         });
       }
     };

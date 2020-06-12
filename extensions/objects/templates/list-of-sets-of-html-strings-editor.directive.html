@@ -13,15 +13,22 @@
   p {
     margin-bottom: 10px;
   }
+  .oppia-drag-and-drop-error {
+    position: absolute;
+  }
 </style>
 
-<div class="container-fluid">
+<div class="container-fluid" ng-model="$ctrl.localValue"
+     ui-validate="'$ctrl.validOrdering'" ui-validate-watch="'$ctrl.validOrdering'">
   <p>NOTE: Two or more items may occupy the same slot.</p>
   <div ng-repeat="choice in $ctrl.choices track by $index">
     <div class="row">
       <div class="col-sm-1">
-        <select ng-model="choice.selectedRank" ng-change="$ctrl.selectedItem($index)" aria-label="choice"
-                id="{{$index}}" ng-options="index for index in $ctrl.allowedChoices()">
+        <select ng-model="choice.selectedRank"
+                ng-change="$ctrl.selectItem($index);"
+                aria-label="choice" id="<[$index]>"
+                ng-options="index for index in $ctrl.allowedChoices()"
+                ng-init="choice.selectedRank = $ctrl.initValues[$index]">
         </select>
       </div>
       <div class="col-sm-10">
@@ -31,6 +38,6 @@
   </div>
 </div>
 
-<div class="oppia-form-error">
+<div class="oppia-form-error oppia-drag-and-drop-error">
   <[$ctrl.getWarningText()]>
 </div>
