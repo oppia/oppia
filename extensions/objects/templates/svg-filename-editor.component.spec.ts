@@ -17,6 +17,7 @@
  */
 
 import { AppConstants } from 'app.constants';
+import { async } from '@angular/core/testing';
 
 describe('SvgFilenameEditor', function() {
   var alertSpy = null;
@@ -85,6 +86,19 @@ describe('SvgFilenameEditor', function() {
     }
   };
 
+  class mockImageObject {
+    source = null;
+    onload = null;
+    constructor() {
+      this.onload = function() {
+        return "Fake onload executed"
+      }
+    }
+    set src(url) {
+      this.onload();
+    }
+  };
+
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('AssetsBackendApiService', mockAssetsBackendApiService);
@@ -109,6 +123,9 @@ describe('SvgFilenameEditor', function() {
       deferred.resolve('sample-csrf-token');
       return deferred.promise;
     });
+    // @ts-ignore inorder to ignore other Image object properties that
+    // should be declared.
+    spyOn(window, 'Image').and.returnValue(new mockImageObject());
 
     LCDiagramEditorCtrl = $componentController('svgFilenameEditor');
     var mockDocument = document.createElement('div');
@@ -191,7 +208,7 @@ describe('SvgFilenameEditor', function() {
     expect(alertSpy).toHaveBeenCalledWith('Custom Diagram not created.');
   });
 
-  it('should handle rejection when saving an svg file fails', function(done) {
+  it('should handle rejection when saving an svg file fails', function() {
     LCDiagramEditorCtrl.lc.currentSvg = linesvg;
     var errorMessage = 'Error on saving svg file';
     // @ts-ignore in order to ignore JQuery properties that should
@@ -214,12 +231,7 @@ describe('SvgFilenameEditor', function() {
     // $q Promises need to be forcibly resolved through a JavaScript digest,
     // which is what $apply helps kick-start.
     $scope.$apply();
-    // setTimeout is being used here in order to wait for the image onload
-    // event to finish.
-    setTimeout(function() {
-      expect(alertSpy).toHaveBeenCalledWith(errorMessage);
-      done();
-    });
+    expect(alertSpy).toHaveBeenCalledWith(errorMessage);
   });
 
   it('should allow user to continue editing the diagram', function() {
@@ -355,6 +367,33 @@ describe('SvgFilenameEditor with image save destination as ' +
     }
   };
 
+  class mockReaderObject {
+    result = null;
+    onload = null;
+    constructor() {
+      this.onload = function() {
+        return "Fake onload executed";
+      }
+    }
+    readAsDataURL(file) {
+      this.onload();
+      return 'The file is loaded';
+    }
+  };
+
+  class mockImageObject {
+    source = null;
+    onload = null;
+    constructor() {
+      this.onload = function() {
+        return "Fake onload executed";
+      }
+    }
+    set src(url) {
+      this.onload();
+    }
+  };
+
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('AssetsBackendApiService', {});
@@ -366,6 +405,13 @@ describe('SvgFilenameEditor with image save destination as ' +
     contextService = $injector.get('ContextService');
     spyOn(contextService, 'getImageSaveDestination').and.returnValue(
       AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE);
+
+    // @ts-ignore inorder to ignore other Image object properties that
+    // should be declared.
+    spyOn(window, 'Image').and.returnValue(new mockImageObject());
+    // @ts-ignore inorder to ignore other FileReader object properties that
+    // should be declared.
+    spyOn(window, 'FileReader').and.returnValue(new mockReaderObject());
 
     LCDiagramEditorCtrl = $componentController(
       'svgFilenameEditor');
@@ -379,19 +425,13 @@ describe('SvgFilenameEditor with image save destination as ' +
 
 
   it('should save svg file to local storage created by literallyCanvas',
-    function(done) {
+    function() {
       LCDiagramEditorCtrl.lc.currentSvg = linesvg;
       LCDiagramEditorCtrl.saveSVGFile();
 
-      // A setTimeout is being used here in order to wait for both the image
-      // and the reader onload function. A time of 100ms is used because
-      // there are two onload functions.
-      setTimeout(function() {
-        expect(LCDiagramEditorCtrl.data.savedSVGFileName).toBe('350_450.svg');
-        expect(LCDiagramEditorCtrl.data.savedSVGUrl.toString()).toBe(dataUrl);
-        expect(LCDiagramEditorCtrl.validate()).toBe(true);
-        done();
-      }, 100);
+      expect(LCDiagramEditorCtrl.data.savedSVGFileName).toBe('350_450.svg');
+      expect(LCDiagramEditorCtrl.data.savedSVGUrl.toString()).toBe(dataUrl);
+      expect(LCDiagramEditorCtrl.validate()).toBe(true);
     }
   );
 
