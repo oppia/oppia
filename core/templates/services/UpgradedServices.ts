@@ -185,6 +185,7 @@ import { GuestCollectionProgressService } from
   'domain/collection/guest-collection-progress.service';
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
 import { HtmlEscaperService } from 'services/html-escaper.service';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { IdGenerationService } from 'services/id-generation.service';
 import { ImageClickInputValidationService } from
   // eslint-disable-next-line max-len
@@ -584,6 +585,7 @@ export class UpgradedServices {
     upgradedServices['GraphUtilsService'] = new GraphUtilsService();
     upgradedServices['GuestCollectionProgressObjectFactory'] =
       new GuestCollectionProgressObjectFactory();
+    upgradedServices['I18nLanguageCodeService'] = new I18nLanguageCodeService();
     upgradedServices['IdGenerationService'] = new IdGenerationService();
     upgradedServices['ImageFileObjectFactory'] = new ImageFileObjectFactory();
     upgradedServices['ImprovementActionButtonObjectFactory'] =
