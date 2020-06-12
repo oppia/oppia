@@ -335,8 +335,8 @@ class BaseSummaryModelValidator(BaseModelValidator):
     @classmethod
     def _validate_external_model_properties(cls, item):
         """Validate that properties of the model match the corresponding
-        properties of the external model. This assumes external models are
-        already fetched.
+        properties of the external model. This assumes
+        cls.external_instance_details is already populated.
 
         Args:
             item: ndb.Model. BaseSummaryModel to validate.
@@ -408,7 +408,7 @@ class BaseSnapshotContentModelValidator(BaseModelValidator):
     def _validate_base_model_version_from_item_id(cls, item):
         """Validate that external model corresponding to item.id
         has a version greater than or equal to the version in item.id.
-        This assumes external models are already fetched.
+        This assumes cls.external_instance_details is already populated.
 
         Args:
             item: ndb.Model. BaseSnapshotContentModel to validate.
@@ -617,11 +617,15 @@ class BaseUserModelValidator(BaseModelValidator):
     @classmethod
     def _get_exp_ids(cls):
         """Returns a list of exploration ids related to the current user model
-        based on the class. This assumes external models are already fetched.
+        based on the class. This assumes cls.external_instance_details is
+        already populated.
 
         Returns:
             list(str). List of exploration ids related to the model.
         """
+        if 'exploration_ids' not in cls.external_instance_details:
+            return []
+
         exploration_ids = []
         exploration_model_class_model_id_model_tuples = (
             cls.external_instance_details['exploration_ids'])
@@ -639,11 +643,15 @@ class BaseUserModelValidator(BaseModelValidator):
     @classmethod
     def _get_col_ids(cls):
         """Returns a list of collection ids related to the current user model
-        based on the class. This assumes external models are already fetched.
+        based on the class. This assumes cls.external_instance_details is
+        already populated.
 
         Returns:
             list(str). List of collection ids related to the model.
         """
+        if 'collection_ids' not in cls.external_instance_details:
+            return []
+
         collection_ids = []
         collection_model_class_model_id_model_tuples = (
             cls.external_instance_details['collection_ids'])
@@ -847,8 +855,8 @@ class ClassifierTrainingJobModelValidator(BaseModelValidator):
     @classmethod
     def _validate_exp_version(cls, item):
         """Validate that exp version is less than or equal to the version
-        of exploration corresponding to exp_id. This assumes external
-        models are already fetched.
+        of exploration corresponding to exp_id. This assumes
+        cls.external_instance_details is already populated.
 
         Args:
             item: ndb.Model. ClassifierTrainingJobModel to validate.
@@ -875,8 +883,8 @@ class ClassifierTrainingJobModelValidator(BaseModelValidator):
     @classmethod
     def _validate_state_name(cls, item):
         """Validate that state name is a valid state in the
-        exploration corresponding to exp_id. This assumes external
-        models are already fetched.
+        exploration corresponding to exp_id. This assumes
+        cls.external_instance_details is already populated.
 
         Args:
             item: ndb.Model. ClassifierTrainingJobModel to validate.
@@ -928,8 +936,8 @@ class TrainingJobExplorationMappingModelValidator(BaseModelValidator):
     @classmethod
     def _validate_exp_version(cls, item):
         """Validate that exp version is less than or equal to the version
-        of exploration corresponding to exp_id. This assumes external
-        models are already fetched.
+        of exploration corresponding to exp_id. This assumes
+        cls.external_instance_details is already populated.
 
         Args:
             item: ndb.Model. TrainingJobExplorationMappingModel to validate.
@@ -956,8 +964,8 @@ class TrainingJobExplorationMappingModelValidator(BaseModelValidator):
     @classmethod
     def _validate_state_name(cls, item):
         """Validate that state name is a valid state in the
-        exploration corresponding to exp_id. This assumes external
-        models are already fetched.
+        exploration corresponding to exp_id. This assumes
+        cls.external_instance_details is already populated.
 
         Args:
             item: ndb.Model. TrainingJobExplorationMappingbModel to validate.
@@ -1238,8 +1246,8 @@ class CollectionSummaryModelValidator(BaseSummaryModelValidator):
     @classmethod
     def _validate_node_count(cls, item):
         """Validate that node_count of model is equal to number of nodes
-        in CollectionModel.collection_contents. This assumes external
-        models are already fetched.
+        in CollectionModel.collection_contents. This assumes
+        cls.external_instance_details is already populated.
 
         Args:
             item: ndb.Model. CollectionSummaryModel to validate.
@@ -1341,7 +1349,8 @@ class ExplorationOpportunitySummaryModelValidator(BaseSummaryModelValidator):
     @classmethod
     def _validate_translation_counts(cls, item):
         """Validate that translation_counts match the translations available in
-        the exploration. This assumes external models are already fetched.
+        the exploration. This assumes cls.external_instance_details is
+        already populated.
 
         Args:
             item: ndb.Model. ExplorationOpportunitySummaryModel to validate.
@@ -1372,7 +1381,7 @@ class ExplorationOpportunitySummaryModelValidator(BaseSummaryModelValidator):
     def _validate_content_count(cls, item):
         """Validate that content_count of model is equal to the number of
         content available in the corresponding ExplorationModel. This assumes
-        external models are already fetched.
+        cls.external_instance_details is already populated.
 
         Args:
             item: ndb.Model. ExplorationOpportunitySummaryModel to validate.
@@ -1400,7 +1409,8 @@ class ExplorationOpportunitySummaryModelValidator(BaseSummaryModelValidator):
     @classmethod
     def _validate_chapter_title(cls, item):
         """Validate that chapter_title matches the title of the corresponding
-        node of StoryModel. This assumes external models are already fetched.
+        node of StoryModel. This assumes cls.external_instance_details is
+        already populated.
 
         Args:
             item: ndb.Model. ExplorationOpportunitySummaryModel to validate.
@@ -1479,8 +1489,8 @@ class SkillOpportunityModelValidator(BaseSummaryModelValidator):
     @classmethod
     def _validate_question_count(cls, item):
         """Validate that question_count matches the number of questions linked
-        to the opportunity's skill. This assumes external models are already
-        fetched.
+        to the opportunity's skill. This assumes
+        cls.external_instance_details is already populated.
 
         Args:
             item: ndb.Model. SkillOpportunityModel to validate.
@@ -1630,8 +1640,8 @@ class SentEmailModelValidator(BaseModelValidator):
     @classmethod
     def _validate_sender_email(cls, item):
         """Validate that sender email corresponds to email of user obtained
-        by using the sender_id. This assumes external models are already
-        fetched.
+        by using the sender_id. This assumes cls.external_instance_details
+        is already populated.
 
         Args:
             item: ndb.Model. SentEmailModel to validate.
@@ -1657,8 +1667,8 @@ class SentEmailModelValidator(BaseModelValidator):
     @classmethod
     def _validate_recipient_email(cls, item):
         """Validate that recipient email corresponds to email of user obtained
-        by using the recipient_id. This assumes external models are already
-        fetched.
+        by using the recipient_id. This assumes cls.external_instance_details
+        is already populated.
 
         Args:
             item: ndb.Model. SentEmailModel to validate.
@@ -1717,8 +1727,8 @@ class BulkEmailModelValidator(BaseModelValidator):
     @classmethod
     def _validate_sender_email(cls, item):
         """Validate that sender email corresponds to email of user obtained
-        by using the sender_id. This assumes external models are already
-        fetched.
+        by using the sender_id. This assumes cls.external_instance_details
+        is already populated.
 
         Args:
             item: ndb.Model. BulkEmailModel to validate.
@@ -2067,7 +2077,7 @@ class ExpSummaryModelValidator(BaseSummaryModelValidator):
     def _validate_exploration_model_last_updated(cls, item):
         """Validate that item.exploration_model_last_updated matches the
         time when a last commit was made by a human contributor. This assumes
-        external models are already fetched.
+        cls.external_instance_details is already populated.
 
         Args:
             item: ndb.Model. ExpSummaryModel to validate.
@@ -2226,8 +2236,8 @@ class GeneralFeedbackMessageModelValidator(BaseModelValidator):
     @classmethod
     def _validate_message_id(cls, item):
         """Validate that message_id is less than the message count for
-        feedback thread corresponding to the entity. This assumes external
-        models are already fetched.
+        feedback thread corresponding to the entity. This assumes
+        cls.external_instance_details is already populated.
 
         Args:
             item: ndb.Model. GeneralFeedbackMessageModel to validate.
@@ -2626,8 +2636,8 @@ class QuestionSummaryModelValidator(BaseSummaryModelValidator):
     @classmethod
     def _validate_question_content(cls, item):
         """Validate that question_content model is equal to
-        QuestionModel.question_state_data.content.html. This
-        assumes external models are already fetched.
+        QuestionModel.question_state_data.content.html. This assumes
+        cls.external_instance_details is already populated.
 
         Args:
             item: ndb.Model. QuestionSummaryModel to validate.
@@ -2888,8 +2898,8 @@ class SkillSummaryModelValidator(BaseSummaryModelValidator):
     @classmethod
     def _validate_misconception_count(cls, item):
         """Validate that misconception_count of model is equal to
-        number of misconceptions in SkillModel.misconceptions. This
-        assumes external models are already fetched.
+        number of misconceptions in SkillModel.misconceptions. This assumes
+        cls.external_instance_details is already populated.
 
         Args:
             item: ndb.Model. SkillSummaryModel to validate.
@@ -2916,7 +2926,7 @@ class SkillSummaryModelValidator(BaseSummaryModelValidator):
     def _validate_worked_examples_count(cls, item):
         """Validate that worked examples count of model is equal to
         number of misconceptions in SkillModel.skill_contents.worked_examples.
-        This assumes external models are already fetched.
+        This assumes cls.external_instance_details is already populated.
 
         Args:
             item: ndb.Model. SkillSummaryModel to validate.
@@ -3080,8 +3090,8 @@ class StorySummaryModelValidator(BaseSummaryModelValidator):
     @classmethod
     def _validate_node_titles(cls, item):
         """Validate that node_titles of model is equal to list of node titles
-        in StoryModel.story_contents. This assumes external models are already
-        fetched.
+        in StoryModel.story_contents. This assumes cls.external_instance_details
+        is already populated.
 
         Args:
             item: ndb.Model. StorySummaryModel to validate.
@@ -3180,7 +3190,7 @@ class GeneralSuggestionModelValidator(BaseModelValidator):
     def _validate_target_version_at_submission(cls, item):
         """Validate the target version at submission is less than or
         equal to the version of the target model. This assumes
-        external models are already fetched.
+        cls.external_instance_details is already populated.
 
         Args:
             item: ndb.Model. GeneralSuggestionModel to validate.
@@ -3533,7 +3543,7 @@ class TopicSummaryModelValidator(BaseSummaryModelValidator):
     def _validate_canonical_story_count(cls, item):
         """Validate that canonical story count of model is equal to
         number of story ids in TopicModel.canonical_story_ids. This
-        assumes external models are already fetched.
+        assumes cls.external_instance_details is already populated.
 
         Args:
             item: ndb.Model. TopicSummaryModel to validate.
@@ -3564,7 +3574,7 @@ class TopicSummaryModelValidator(BaseSummaryModelValidator):
     def _validate_additional_story_count(cls, item):
         """Validate that additional story count of model is equal to
         number of story ids in TopicModel.additional_story_ids. This
-        assumes external models are already fetched.
+        assumes cls.external_instance_details is already populated.
 
         Args:
             item: ndb.Model. TopicSummaryModel to validate.
@@ -3597,7 +3607,7 @@ class TopicSummaryModelValidator(BaseSummaryModelValidator):
     def _validate_uncategorized_skill_count(cls, item):
         """Validate that uncategorized skill count of model is equal to
         number of skill ids in TopicModel.uncategorized_skill_ids. This
-        assumes external models are already fetched.
+        assumes cls.external_instance_details is already populated.
 
         Args:
             item: ndb.Model. TopicSummaryModel to validate.
@@ -3625,8 +3635,8 @@ class TopicSummaryModelValidator(BaseSummaryModelValidator):
     def _validate_total_skill_count(cls, item):
         """Validate that total skill count of model is equal to
         number of skill ids in TopicModel.uncategorized_skill_ids and skill
-        ids in subtopics of TopicModel. This assumes external models are
-        already fetched.
+        ids in subtopics of TopicModel. This assumes
+        cls.external_instance_details is already populated.
 
         Args:
             item: ndb.Model. TopicSummaryModel to validate.
@@ -3658,8 +3668,8 @@ class TopicSummaryModelValidator(BaseSummaryModelValidator):
     @classmethod
     def _validate_subtopic_count(cls, item):
         """Validate that subtopic count of model is equal to
-        number of subtopics in TopicModel. This assumes external
-        models are already fetched.
+        number of subtopics in TopicModel. This assumes
+        cls.external_instance_details is already populated.
 
         Args:
             item: ndb.Model. TopicSummaryModel to validate.
@@ -3987,8 +3997,8 @@ class ExpUserLastPlaythroughModelValidator(BaseUserModelValidator):
     @classmethod
     def _validate_exp_version(cls, item):
         """Validates that last played exp version is less than or equal to
-        for version of the exploration. This assumes external models
-        are already fetched.
+        for version of the exploration. This assumes
+        cls.external_instance_details is already populated.
 
         Args:
             item: ndb.Model. ExpUserLastPlaythroughModel to validate.
@@ -4013,8 +4023,8 @@ class ExpUserLastPlaythroughModelValidator(BaseUserModelValidator):
     @classmethod
     def _validate_state_name(cls, item):
         """Validates that state name is a valid state in the exploration
-        corresponding to the entity. This assumes external models are
-        already fetched.
+        corresponding to the entity.This assumes
+        cls.external_instance_details is already populated.
 
         Args:
             item: ndb.Model. ExpUserLastPlaythroughModel to validate.
@@ -4167,7 +4177,7 @@ class UserSubscriptionsModelValidator(BaseUserModelValidator):
     def _validate_user_id_in_subscriber_ids(cls, item):
         """Validates that user id is present in list of
         subscriber ids of the creators the user has subscribed to.
-        This assumes external models are already fetched.
+        This assumes cls.external_instance_details is already populated.
 
         Args:
             item: ndb.Model. UserSubscriptionsModel to validate.
@@ -4225,8 +4235,8 @@ class UserSubscribersModelValidator(BaseUserModelValidator):
     def _validate_user_id_in_creator_ids(cls, item):
         """Validates that user id is present in list of
         creator ids to which the subscribers of user have
-        subscribed. This assumes external models are already
-        fetched.
+        subscribed. This assumes cls.external_instance_details is
+        already populated.
 
         Args:
             item: ndb.Model. UserSubscribersModel to validate.
@@ -4432,8 +4442,8 @@ class ExplorationUserDataModelValidator(BaseUserModelValidator):
     @classmethod
     def _validate_exp_version(cls, item):
         """Validates that draft change exp version is less than version
-        of the exploration corresponding to the model. This assumes external
-        models are already fetched.
+        of the exploration corresponding to the model. This assumes
+        cls.external_instance_details is already populated.
 
         Args:
             item: ndb.Model. ExplorationUserDataModel to validate.
@@ -4490,7 +4500,8 @@ class CollectionProgressModelValidator(BaseUserModelValidator):
     def _validate_completed_exploration(cls, item):
         """Validates that completed exploration ids belong to
         the collection and are present in CompletedActivitiesModel
-        for the user. This assumes external models are already fetched.
+        for the user. This assumes cls.external_instance_details is
+        already populated.
 
         Args:
             item: ndb.Model. CollectionProgressModel to validate.
@@ -4566,8 +4577,8 @@ class StoryProgressModelValidator(BaseUserModelValidator):
 
     @classmethod
     def _validate_story_is_public(cls, item):
-        """Validates that story is public. This assumes external models
-        are already fetched.
+        """Validates that story is public. This assumes
+        cls.external_instance_details is already populated.
 
         Args:
             item: ndb.Model. StoryProgressModel to validate.
@@ -4600,7 +4611,7 @@ class StoryProgressModelValidator(BaseUserModelValidator):
     @classmethod
     def _validate_completed_nodes(cls, item):
         """Validates that completed nodes belong to the story. This assumes
-        external models are already fetched.
+        cls.external_instance_details is already populated.
 
         Args:
             item: ndb.Model. StoryProgressModel to validate.
@@ -4703,7 +4714,8 @@ class UserQueryModelValidator(BaseUserModelValidator):
         all user ids are present in recipient ids since email
         is only sent to a limited maximum of qualified users.
         It also checks that a UserBulkEmailsModel exists for each
-        of the recipients. This assumes external models are already fetched.
+        of the recipients. This assumes cls.external_instance_details
+        is already populated.
 
         Args:
             item: ndb.Model. UserQueryModel to validate.
@@ -4770,8 +4782,8 @@ class UserBulkEmailsModelValidator(BaseUserModelValidator):
     @classmethod
     def _validate_user_id_in_recipient_id_for_emails(cls, item):
         """Validates that user id is present in recipient ids
-        for bulk email model. This assumes external models are already
-        fetched.
+        for bulk email model. This assumes cls.external_instance_details
+        is already populated.
 
         Args:
             item: ndb.Model. UserBulkEmailsModel to validate.
