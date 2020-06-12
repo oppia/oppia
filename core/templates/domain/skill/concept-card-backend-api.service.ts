@@ -40,7 +40,9 @@ export class ConceptCardBackendApiService {
   private _conceptCardCache = [];
 
   private _fetchConceptCards(
-      skillIds: Array<string>, successCallback: any, errorCallback: any): any {
+      skillIds: Array<string>,
+      successCallback: (value?: Object | PromiseLike<Object>) => void,
+      errorCallback: (reason?: any) => void): void {
     var conceptCardDataUrl = this.urlInterpolation.interpolateUrl(
       SkillDomainConstants.CONCEPT_CARD_DATA_URL_TEMPLATE, {
         comma_separated_skill_ids: skillIds.join(',')
@@ -53,16 +55,16 @@ export class ConceptCardBackendApiService {
         }
       }, (errorResponse) => {
         if (errorCallback) {
-          errorCallback(errorResponse.body);
+          errorCallback(errorResponse.error);
         }
       });
   }
 
-  private _isCached(skillId: string) {
+  private _isCached(skillId: string): Boolean {
     return this._conceptCardCache.hasOwnProperty(skillId);
   }
 
-  private _getUncachedSkillIds(skillIds: Array<string>) {
+  private _getUncachedSkillIds(skillIds: Array<string>): Array<string> {
     var uncachedSkillIds = [];
     skillIds.forEach((skillId) => {
       if (!this._isCached(skillId)) {
