@@ -21,7 +21,8 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import { AppConstants } from 'app.constants';
-import { StatisticsDomainConstants } from 'statistics-domain.constants';
+import { StatisticsDomainConstants } from
+  'domain/statistics/statistics-domain.constants';
 
 export interface IExplorationStartCustomizationArgs {
   'state_name': {value: string};
