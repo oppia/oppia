@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the math editor.
+ * @fileoverview Unit tests for the math editor component.
  */
 
 describe('MathEditor', function() {
