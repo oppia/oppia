@@ -20,7 +20,8 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { ILearnerAction } from 'domain/statistics/LearnerActionObjectFactory';
+import { LearnerAction, LearnerActionObjectFactory, ILearnerActionBackendDict }
+  from 'domain/statistics/LearnerActionObjectFactory';
 
 export interface IPlaythroughBackendDict {
   'playthrough_id'?: string;
@@ -29,7 +30,7 @@ export interface IPlaythroughBackendDict {
   'exp_version': number;
   'issue_type': string;
   'issue_customization_args': any;
-  'actions': ILearnerAction[];
+  'actions': ILearnerActionBackendDict[];
 }
 
 export class Playthrough {
@@ -39,9 +40,9 @@ export class Playthrough {
       public expVersion: number,
       public issueType: string,
       public issueCustomizationArgs: any,
-      public actions: ILearnerAction[]) {}
+      public actions: LearnerAction[]) {}
 
-  getLastAction(): ILearnerAction {
+  getLastAction(): LearnerAction {
     const actionsLength = this.actions.length;
     return actionsLength > 0 ? this.actions[actionsLength - 1] : null;
   }
@@ -53,7 +54,7 @@ export class Playthrough {
       exp_version: this.expVersion,
       issue_type: this.issueType,
       issue_customization_args: this.issueCustomizationArgs,
-      actions: this.actions
+      actions: this.actions.map(a => a.toBackendDict())
     };
   }
 }
@@ -62,10 +63,12 @@ export class Playthrough {
   providedIn: 'root'
 })
 export class PlaythroughObjectFactory {
+  constructor(private learnerActionObjectFactory: LearnerActionObjectFactory) {}
+
   createNew(
       playthroughId: string, expId: string, expVersion: number,
       issueType: string, issueCustomizationArgs: any,
-      actions: ILearnerAction[]): Playthrough {
+      actions: LearnerAction[]): Playthrough {
     return new Playthrough(
       playthroughId, expId, expVersion, issueType, issueCustomizationArgs,
       actions);
@@ -77,7 +80,8 @@ export class PlaythroughObjectFactory {
       playthroughBackendDict.playthrough_id, playthroughBackendDict.exp_id,
       playthroughBackendDict.exp_version, playthroughBackendDict.issue_type,
       playthroughBackendDict.issue_customization_args,
-      playthroughBackendDict.actions);
+      playthroughBackendDict.actions.map(
+        d => this.learnerActionObjectFactory.createFromBackendDict(d)));
   }
 }
 

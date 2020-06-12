@@ -625,8 +625,6 @@ export class UpgradedServices {
       new PlayerCorrectnessFeedbackEnabledService();
     upgradedServices['PlaythroughIssueObjectFactory'] =
       new PlaythroughIssueObjectFactory();
-    upgradedServices['PlaythroughObjectFactory'] =
-      new PlaythroughObjectFactory();
     upgradedServices['PredictionResultObjectFactory'] =
       new PredictionResultObjectFactory();
     upgradedServices['QuestionSummaryObjectFactory'] =
@@ -795,6 +793,8 @@ export class UpgradedServices {
         upgradedServices['baseInteractionValidationService']);
     upgradedServices['PlayerTranscriptService'] = new PlayerTranscriptService(
       upgradedServices['LoggerService']);
+    upgradedServices['PlaythroughObjectFactory'] = new PlaythroughObjectFactory(
+      upgradedServices['LearnerActionObjectFactory']);
     upgradedServices['PythonProgramTokenizer'] = new PythonProgramTokenizer(
       upgradedServices['LoggerService']);
     upgradedServices['QuestionSummaryForOneSkillObjectFactory'] =

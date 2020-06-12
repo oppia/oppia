@@ -100,8 +100,8 @@ angular.module('oppia').factory('LearnerActionRenderService', [
      * @returns {string}
      */
     var renderLearnerActionHTML = function(learnerAction, actionIndex) {
-      var actionType = learnerAction.action_type;
-      var custArgs = learnerAction.action_customization_args;
+      var actionType = learnerAction.actionType;
+      var custArgs = learnerAction.actionCustomizationArgs;
       var interaction = ExplorationStatesService.getState(
         custArgs.state_name.value).interaction;
       if (actionType === ACTION_TYPE_EXPLORATION_START) {

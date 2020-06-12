@@ -157,7 +157,7 @@ export class PlaythroughService {
     } else if (this.eqTracker !== null && this.eqTracker.isIssue()) {
       const lastStateName = (
         this.playthrough.getLastAction()
-          .action_customization_args.state_name.value);
+          .actionCustomizationArgs.state_name.value);
       this.playthrough.issueType = AppConstants.ISSUE_TYPE_EARLY_QUIT;
       this.playthrough.issueCustomizationArgs = {
         state_name: {value: lastStateName},
@@ -175,7 +175,7 @@ export class PlaythroughService {
   private isLearnerJustBrowsing(): boolean {
     return (
       // Learners who never enter an answer are probably just browsing.
-      !this.playthrough.actions.some(a => a.action_type === 'AnswerSubmit') ||
+      !this.playthrough.actions.some(a => a.actionType === 'AnswerSubmit') ||
       // Learners who leave the exploration quickly are probably just browsing.
       this.expDurationInSecs < 45);
   }
@@ -222,7 +222,7 @@ export class PlaythroughService {
       stateName: string, destStateName: string, interactionId: string,
       answer: string, feedback: string, timeSpentInStateSecs: number): void {
     if (this.playthrough === null ||
-        this.playthrough.getLastAction().action_type === 'ExplorationQuit') {
+        this.playthrough.getLastAction().actionType === 'ExplorationQuit') {
       return;
     }
 
@@ -244,7 +244,7 @@ export class PlaythroughService {
   recordExplorationQuitAction(
       stateName: string, timeSpentInStateSecs: number): void {
     if (this.playthrough === null ||
-        this.playthrough.getLastAction().action_type === 'ExplorationQuit') {
+        this.playthrough.getLastAction().actionType === 'ExplorationQuit') {
       return;
     }
 

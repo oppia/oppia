@@ -23,50 +23,49 @@ import { UpgradedServices } from 'services/UpgradedServices';
 import { AlertsService } from 'services/alerts.service';
 import { Playthrough, PlaythroughObjectFactory } from
   'domain/statistics/PlaythroughObjectFactory';
-import { ILearnerAction } from 'domain/statistics/LearnerActionObjectFactory';
+import { LearnerAction, LearnerActionObjectFactory } from
+  'domain/statistics/LearnerActionObjectFactory';
 
 describe('Improvement Playthough Modal Controller', function() {
+  var $controller = null;
+  var $rootScope = null;
   var $scope = null;
   var $uibModalInstance = null;
   var alertsService: AlertsService = null;
+  var learnerActionObjectFactory: LearnerActionObjectFactory = null;
   var playthroughObjectFactory: PlaythroughObjectFactory = null;
   var playthrough: Playthrough = null;
+  var playthoughActions: LearnerAction[] = null;
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
     }
-  }));
-  beforeEach(angular.mock.module(function($provide) {
     $provide.value('ExplorationStatesService', {
       getState: () => ({ interaction: null })
     });
   }));
 
+  beforeEach(angular.mock.inject(function($injector, _$controller_) {
+    $controller = _$controller_;
+    $rootScope = $injector.get('$rootScope');
+    alertsService = $injector.get('AlertsService');
+    learnerActionObjectFactory = $injector.get('LearnerActionObjectFactory');
+    playthroughObjectFactory = $injector.get('PlaythroughObjectFactory');
+  }));
+
   describe('when playthough actions is less than max unrelated actions ' +
     'per block', function() {
-    var playthoughActions: ILearnerAction[] = [{
-      action_type: 'ExplorationStart',
-      action_customization_args: {
-        state_name: {
-          value: 'state_name1'
-        }
-      },
-      schema_version: 1
-    }, {
-      action_type: 'ExplorationStart',
-      action_customization_args: {
-        state_name: {
-          value: 'state_name2'
-        }
-      },
-      schema_version: 1
-    }];
-
-    beforeEach(angular.mock.inject(function($injector, $controller) {
-      playthroughObjectFactory = $injector.get('PlaythroughObjectFactory');
-      alertsService = $injector.get('AlertsService');
+    beforeEach(() => {
+      playthoughActions = [
+        learnerActionObjectFactory.createExplorationStartAction({
+          state_name: {value: 'state_name1'}
+        }),
+        learnerActionObjectFactory.createExplorationStartAction({
+          state_name: {value: 'state_name2'}
+        }),
+      ];
 
       playthrough = playthroughObjectFactory.createNew(
         '0', '1', 1, 'MultipleIncorrectSubmissions', {
@@ -82,7 +81,6 @@ describe('Improvement Playthough Modal Controller', function() {
       $uibModalInstance = (
         jasmine.createSpyObj('$uibModalInstance', ['close', 'dismiss']));
 
-      var $rootScope = $injector.get('$rootScope');
       $scope = $rootScope.$new();
       $controller('ImprovementPlaythoughModalController', {
         $scope: $scope,
@@ -90,7 +88,7 @@ describe('Improvement Playthough Modal Controller', function() {
         playthrough: playthrough,
         playthroughIndex: 0
       });
-    }));
+    });
 
     it('should call init when controller is initialized', function() {
       expect($scope.playthroughIndex).toEqual(0);
@@ -136,60 +134,28 @@ describe('Improvement Playthough Modal Controller', function() {
 
   describe('when playthough actions is greater than max unrelated actions' +
   ' per block', function() {
-    var playthoughActions: ILearnerAction[] = [{
-      action_type: 'ExplorationStart',
-      action_customization_args: {
-        state_name: {
-          value: 'state_name1'
-        }
-      },
-      schema_version: 1
-    }, {
-      action_type: 'ExplorationStart',
-      action_customization_args: {
-        state_name: {
-          value: 'state_name2'
-        }
-      },
-      schema_version: 1
-    }, {
-      action_type: 'ExplorationStart',
-      action_customization_args: {
-        state_name: {
-          value: 'state_name3'
-        }
-      },
-      schema_version: 1
-    }, {
-      action_type: 'ExplorationStart',
-      action_customization_args: {
-        state_name: {
-          value: 'state_name4'
-        }
-      },
-      schema_version: 1
-    }, {
-      action_type: 'ExplorationStart',
-      action_customization_args: {
-        state_name: {
-          value: 'state_name5'
-        }
-      },
-      schema_version: 1
-    }, {
-      action_type: 'ExplorationStart',
-      action_customization_args: {
-        state_name: {
-          value: 'state_name6'
-        }
-      },
-      schema_version: 1
-    }];
+    playthoughActions = [
+      learnerActionObjectFactory.createExplorationStartAction({
+        state_name: {value: 'state_name1'}
+      }),
+      learnerActionObjectFactory.createExplorationStartAction({
+        state_name: {value: 'state_name2'}
+      }),
+      learnerActionObjectFactory.createExplorationStartAction({
+        state_name: {value: 'state_name3'}
+      }),
+      learnerActionObjectFactory.createExplorationStartAction({
+        state_name: {value: 'state_name4'}
+      }),
+      learnerActionObjectFactory.createExplorationStartAction({
+        state_name: {value: 'state_name5'}
+      }),
+      learnerActionObjectFactory.createExplorationStartAction({
+        state_name: {value: 'state_name6'}
+      }),
+    ];
 
-    beforeEach(angular.mock.inject(function($injector, $controller) {
-      playthroughObjectFactory = $injector.get('PlaythroughObjectFactory');
-      alertsService = $injector.get('AlertsService');
-
+    beforeEach(() => {
       playthrough = playthroughObjectFactory.createNew(
         '0', '1', 1, 'EarlyQuit', {
           state_name: {
@@ -204,7 +170,6 @@ describe('Improvement Playthough Modal Controller', function() {
       $uibModalInstance = jasmine.createSpyObj(
         '$uibModalInstance', ['close', 'dismiss']);
 
-      var $rootScope = $injector.get('$rootScope');
       $scope = $rootScope.$new();
       $controller('ImprovementPlaythoughModalController', {
         $scope: $scope,
@@ -212,7 +177,7 @@ describe('Improvement Playthough Modal Controller', function() {
         playthrough: playthrough,
         playthroughIndex: 0
       });
-    }));
+    });
 
     it('should call init when controller is initialized', function() {
       expect($scope.playthroughIndex).toEqual(0);
