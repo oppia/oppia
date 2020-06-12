@@ -28,6 +28,7 @@ import { Rule, RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 
 import { WARNING_TYPES_CONSTANT } from 'app-type.constants';
 import { AppConstants } from 'app.constants';
+import { ISetInputCustomizationArgs } from 'interactions/customization-args-defs';
 
 describe('SetInputValidationService', () => {
   let validatorService: SetInputValidationService;
@@ -38,7 +39,7 @@ describe('SetInputValidationService', () => {
   let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory,
     rof: RuleObjectFactory;
 
-  let goodCustomizationArgs: object;
+  let goodCustomizationArgs: ISetInputCustomizationArgs;
 
   let createAnswerGroupByRules: (rules: Rule[]) => AnswerGroup;
 
@@ -93,21 +94,6 @@ describe('SetInputValidationService', () => {
 
     it('should generate errors when buttonText is missing', () => {
       let badCustomizationArgs = {};
-
-      let warnings = validatorService.getAllWarnings(
-        currentState,
-        badCustomizationArgs,
-        goodAnswerGroups,
-        goodDefaultOutcome
-      );
-      expect(warnings).toEqual([{
-        type: WARNING_TYPES.ERROR,
-        message: 'Button text must be a string.'
-      }]);
-    });
-
-    it('should generate errors when buttonText is not string', () => {
-      let badCustomizationArgs = { buttonText: { value: 1 } };
 
       let warnings = validatorService.getAllWarnings(
         currentState,
@@ -508,7 +494,7 @@ describe('SetInputValidationService', () => {
       describe('IsSubsetOf', () => {
         let subsetRule1: Rule, subsetRule2: Rule;
 
-        beforeAll(() => {
+        beforeEach(() => {
           subsetRule1 = rof.createFromBackendDict({
             rule_type: 'IsSubsetOf',
             inputs: {
@@ -559,7 +545,7 @@ describe('SetInputValidationService', () => {
       describe('HasElementsIn', () => {
         let hasElementsInRule1: Rule, hasElementsInRule2: Rule;
 
-        beforeAll(() => {
+        beforeEach(() => {
           hasElementsInRule1 = rof.createFromBackendDict({
             rule_type: 'HasElementsIn',
             inputs: {
@@ -610,7 +596,7 @@ describe('SetInputValidationService', () => {
       describe('IsDisjointFrom', () => {
         let disjointRule1: Rule, disjointRule2: Rule;
 
-        beforeAll(() => {
+        beforeEach(() => {
           disjointRule1 = rof.createFromBackendDict({
             rule_type: 'IsDisjointFrom',
             inputs: {
@@ -661,7 +647,7 @@ describe('SetInputValidationService', () => {
       describe('IsSupersetOf', () => {
         let supersetRule1: Rule, supersetRule2: Rule;
 
-        beforeAll(() => {
+        beforeEach(() => {
           supersetRule1 = rof.createFromBackendDict({
             rule_type: 'IsSupersetOf',
             inputs: {
@@ -712,7 +698,7 @@ describe('SetInputValidationService', () => {
       describe('HasElementsNotIn', () => {
         let hasElementsNotInRule1: Rule, hasElementsNotInRule2: Rule;
 
-        beforeAll(() => {
+        beforeEach(() => {
           hasElementsNotInRule1 = rof.createFromBackendDict({
             rule_type: 'HasElementsNotIn',
             inputs: {
@@ -763,7 +749,7 @@ describe('SetInputValidationService', () => {
       describe('OmitsElementsIn', () => {
         let omitsElementsInRule1: Rule, omitsElementsInRule2: Rule;
 
-        beforeAll(() => {
+        beforeEach(() => {
           omitsElementsInRule1 = rof.createFromBackendDict({
             rule_type: 'OmitsElementsIn',
             inputs: {
