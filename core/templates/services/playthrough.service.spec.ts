@@ -329,7 +329,7 @@ describe('PlaythroughService', () => {
         playthroughService.recordAnswerSubmitAction(
           'stateName1', 'stateName1', 'TextInput', 'Hello', 'Try again', 5);
         playthroughService.recordAnswerSubmitAction(
-            'stateName1', 'stateName1', 'TextInput', 'Hello', 'Try again', 5);
+          'stateName1', 'stateName1', 'TextInput', 'Hello', 'Try again', 5);
         playthroughService.recordExplorationQuitAction('stateName1', 10);
 
         expect(playthroughService.getPlaythrough().issueType)
