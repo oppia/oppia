@@ -342,13 +342,10 @@ describe('PlaythroughService', () => {
         const backendApiStorePlaythroughSpy = (
           spyOn(playthroughBackendApiService, 'storePlaythrough'));
         spyOn(stopwatchObjectFactory, 'create').and.returnValue(
-          // NOTE TO DEVELOPERS: Time intentionally wrong here to check that the
-          // lack of submissions is why the playthrough fails to be stored,
-          // rather than the short time necessary for EarlyQuit issues.
-          jasmine.createSpyObj('Stopwatch', {getTimeInSecs: 80, reset: null}));
+          jasmine.createSpyObj('Stopwatch', {getTimeInSecs: 180, reset: null}));
 
         playthroughService.recordExplorationStartAction('stateName1');
-        playthroughService.recordExplorationQuitAction('stateName1', 40);
+        playthroughService.recordExplorationQuitAction('stateName1', 180);
 
         expect(playthroughService.getPlaythrough().issueType)
           .toEqual('EarlyQuit');
