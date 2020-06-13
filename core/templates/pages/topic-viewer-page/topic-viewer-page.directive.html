@@ -1,194 +1,219 @@
-<background-banner></background-banner>
 <div class="oppia-topic-viewer-container" style="position: relative;">
-  <div class="oppia-topic-name">
-    <[$ctrl.topicName]>
-  </div>
   <div class="oppia-topic-viewer-tabs-container">
-    <ul class="topic-viewer-tabs">
-      <li ng-class="{'topic-viewer-tabs-active': $ctrl.activeTab === 'story'}">
-        <a class="topic-viewer-tabs-text"
-           ng-click="$ctrl.setActiveTab('story')"
-           translate="I18N_TOPIC_VIEWER_PLAY">
-        </a>
-      </li>
-      <li ng-class="{'topic-viewer-tabs-active': $ctrl.activeTab === 'practice'}" ng-show="$ctrl.trainTabShouldBeDisplayed">
-        <a class="topic-viewer-tabs-text"
-           ng-click="$ctrl.setActiveTab('practice')"
-           translate="I18N_TOPIC_VIEWER_TRAIN">
-        </a>
-      </li>
-      <li ng-class="{'topic-viewer-tabs-active': $ctrl.activeTab === 'subtopics'}">
-        <a class="topic-viewer-tabs-text"
-           ng-click="$ctrl.setActiveTab('subtopics')"
-           translate="I18N_TOPIC_VIEWER_REVIEW">
-        </a>
-      </li>
-    </ul>
+    <div class="topic-viewer-tabs-list">
+      <ul class="topic-viewer-tabs">
+        <li ng-class="{'topic-viewer-tabs-active': $ctrl.activeTab === 'info'}">
+          <div class="topic-viewer-tabs-text" ng-click="$ctrl.setActiveTab('info')">
+            <img class="tab-icon" ng-src="<[$ctrl.getStaticImageUrl('/icons/info_24px.svg')]>">
+            <a class="tab-title"
+               translate="I18N_TOPIC_VIEWER_INFO">
+            </a>
+          </div>
+        </li>
+        <li ng-class="{'topic-viewer-tabs-active': $ctrl.activeTab === 'story'}">
+          <div class="topic-viewer-tabs-text" ng-click="$ctrl.setActiveTab('story')">
+            <img class="tab-icon" ng-src="<[$ctrl.getStaticImageUrl('/icons/play_icon_24px.svg')]>">
+            <a class="tab-title"
+               translate="I18N_TOPIC_VIEWER_LESSONS">
+            </a>
+          </div>
+        </li>
+        <li ng-class="{'topic-viewer-tabs-active': $ctrl.activeTab === 'practice'}" ng-show="$ctrl.trainTabShouldBeDisplayed">
+          <div class="topic-viewer-tabs-text" ng-click="$ctrl.setActiveTab('practice')">
+            <img class="tab-icon" ng-src="<[$ctrl.getStaticImageUrl('/icons/train_icon_24px.svg')]>">
+            <a class="tab-title"
+               translate="I18N_TOPIC_VIEWER_PRACTICE">
+            </a>
+          </div>
+        </li>
+        <li ng-class="{'topic-viewer-tabs-active': $ctrl.activeTab === 'subtopics'}">
+          <div class="topic-viewer-tabs-text" ng-click="$ctrl.setActiveTab('subtopics')">
+            <img class="tab-icon" ng-src="<[$ctrl.getStaticImageUrl('/icons/review_icon_24px.svg')]>">
+            <a class="tab-title"
+               translate="I18N_TOPIC_VIEWER_REVISION">
+            </a>
+          </div>
+        </li>
+      </ul>
+    </div>
   </div>
-  <div ng-if="$ctrl.activeTab === 'story'" class="oppia-story-tab">
-    <stories-list canonical-stories-list="$ctrl.canonicalStoriesList"></stories-list>
-  </div>
-  <div ng-if="$ctrl.activeTab === 'practice'" class="oppia-practice-tab">
-    <practice-tab topic-name="$ctrl.topicName"></practice-tab>
-    <skills-mastery-list degrees-of-mastery="$ctrl.degreesOfMastery" skill-descriptions="$ctrl.skillDescriptions"></skills-mastery-list>
-  </div>
-  <div ng-if="$ctrl.activeTab === 'subtopics'" class="oppia-subtopics-tab">
-    <subtopics-list subtopics-list="$ctrl.subtopics"></subtopics-list>
+  <background-banner></background-banner>
+  <div class="topic-viewer-page-content" ng-if="!$ctrl.topicIsLoading">
+    <div ng-if="$ctrl.activeTab === 'info'">
+      <topic-info-tab topic-name="$ctrl.topicName"
+                      topic-description="$ctrl.topicDescription"
+                      story-count="$ctrl.canonicalStorySummaries.length"
+                      subtopic-count="$ctrl.subtopics.length"
+                      chapter-count="$ctrl.chapterCount">
+      </topic-info-tab>
+    </div>
+    <div ng-if="$ctrl.activeTab === 'story'">
+      <stories-list canonical-story-summaries="$ctrl.canonicalStorySummaries"></stories-list>
+    </div>
+    <div ng-if="$ctrl.activeTab === 'practice'">
+      <practice-tab subtopics-list="$ctrl.subtopics"
+                    topic-name="$ctrl.topicName">
+      </practice-tab>
+    </div>
+    <div ng-if="$ctrl.activeTab === 'subtopics'">
+      <subtopics-list subtopics-list="$ctrl.subtopics"
+                      topic-name="$ctrl.topicName"
+                      topic-id="$ctrl.topicId">
+      </subtopics-list>
+    </div>
   </div>
 </div>
 <style>
-  .oppia-topic-viewer-tabs-container {
+  .oppia-topic-viewer-container {
+    color: black;
     margin: 0 auto;
-    width: 60%;
+    text-decoration: none;
+  }
+
+  .navbar-light .navbar-container {
+    background: #00645C;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+  }
+
+  .topic-viewer-tabs-list {
+    margin: 0 auto;
+    width: 704px;
+  }
+
+  .topic-viewer-page-content {
+    margin-top: -200px;
+  }
+
+  .oppia-navbar {
+    box-shadow: none;
+  }
+
+  .oppia-topic-viewer-container .background-banner-position {
+    position: inherit;
+  }
+
+  .oppia-topic-viewer-tabs-container {
+    background-color: #00645C;
+    box-shadow: 3px 3px 6px rgba(0,0,0, 0.5);
+    font-family: 'Capriola', 'Roboto', Arial, sans-serif;
+    margin: 0 auto;
+    position: relative;
+    width: 100%;
+  }
+
+  .oppia-topic-viewer-tabs-container .topic-viewer-tabs .tab-icon {
+    display: block;
+    font-size: 2em;
+    height: 45px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-bottom: 7px;
+    width: 50%;
   }
 
   .oppia-topic-viewer-tabs-container .topic-viewer-tabs {
-    display: -webkit-flex;
-    display: flex;
-    flex-wrap: wrap;
+    display: -webkit-inline-flex;
+    display: inline-flex;
+    justify-content: space-evenly;
     margin-bottom: 0;
     padding-left: 0;
-    padding-top: 50px;
+    padding-top: 20px;
     text-align: center;
+    width: 100%;
   }
 
   .oppia-topic-viewer-tabs-container .topic-viewer-tabs li {
-    display: -webkit-flex;
-    display: flex;
+    list-style: none;
     margin-bottom: 0;
-    width: 250px;
-    flex: 1;
   }
 
   .oppia-topic-viewer-tabs-container .topic-viewer-tabs .topic-viewer-tabs-text {
-    color: #009688;
-    font-size: 1em;
-    padding: 10px;
-    text-decoration: none;
-    text-transform: uppercase;
-    width: 100%;
-  }
-
-  .oppia-topic-viewer-tabs-container .topic-viewer-tabs-active .topic-viewer-tabs-text,
-  .oppia-topic-viewer-tabs-container .topic-viewer-tabs-active .topic-viewer-tabs-text:hover {
-    border-bottom: 4px solid #009688;
-    color: #009688;
-    margin-left: 7.5px;
-  }
-
-  .oppia-topic-viewer-tabs-container .topic-viewer-tabs .topic-viewer-tabs-text:hover {
-    color: #009688;
-    font-size: 1em;
-    padding: 10px;
-    text-decoration: none;
-    text-transform: uppercase;
-    width: 100%;
-  }
-
-  .oppia-topic-viewer-tabs-container .topic-viewer-tabs .topic-viewer-tabs-text:hover,
-  .oppia-topic-viewer-tabs-container .topic-viewer-tabs .topic-viewer-tabs-text:focus {
-    text-decoration: none;
-  }
-
-  @media(max-width: 815px) {
-    .oppia-topic-viewer-tabs-container .topic-viewer-tabs {
-      justify-content: center;
-    }
-
-    .oppia-topic-viewer-tabs-container .topic-viewer-tabs li {
-      width: auto;
-    }
-  }
-
-  .oppia-story-tab, .oppia-subtopics-tab {
-    margin: 0 auto;
-    width: max-content;
-  }
-
-  .oppia-practice-tab {
-    margin: 0 auto;
-    width: 100%;
-    max-width: 800px;
-  }
-
-  .oppia-topic-viewer-container .oppia-topic-name {
-    color: #01645c;
-    font-family: 'Capriola', 'Roboto', Arial, sans-serif;
-    font-size: 3em;
-    margin-top: 0;
-    margin-bottom: 25px;
-    padding-top: 66.5px;
-    text-align: center;
-  }
-  .oppia-topic-viewer-container {
-    color: black;
-    font-family: 'Roboto', Arial, sans-serif;
-    margin: 0 auto;
-    text-decoration: none;
-  }
-  .oppia-topic-viewer-tabs span {
-    display: -webkit-flex;
-    display: inline-flex;
-    margin-bottom: 0;
-    width: 200px;
-  }
-  .oppia-topic-viewer-tabs .oppia-topic-viewer-tabs-text {
-    color: white;
+    color: #ffffff;
+    cursor: pointer;
     font-size: 1.1em;
     font-weight: bold;
     padding: 10px;
     text-decoration: none;
     text-transform: uppercase;
-    width: 100%;
+    width: 152px;
   }
 
-  .oppia-topic-viewer-tabs-active .oppia-topic-viewer-tabs-text,
-  .oppia-topic-viewer-tabs-active .oppia-topic-viewer-tabs-text:hover {
-    background-color: #e7e7e2;
-    border-top: 4px solid #009688;
-    color: #009688;
+  .topic-viewer-page-content .tab-title {
+    color: #01645c;
+    font-family: 'Capriola', 'Roboto', Arial, sans-serif;
+    font-size: 2em;
   }
-  .oppia-topic-viewer-tabs {
-    background-color: #7e7e7e;
-    margin: 0 auto 0 10%;
-    display: inline-block;
-  }
-  .oppia-topic-viewer-tabs .oppia-topic-viewer-tabs-text:hover {
-    padding: 10px;
+
+  .oppia-topic-viewer-tabs-container .topic-viewer-tabs .topic-viewer-tabs-text .tab-title {
+    font-size: 1em;
+    text-decoration: none;
     text-transform: uppercase;
-    width: 100%;
-    text-shadow: 0.5px 0.5px 0.5px #e7e7e2;
-  }
-  @media(max-width: 925px) {
-    .oppia-topic-viewer-tabs {
-      margin: 0 auto;
-    }
-    .oppia-topic-viewer-container .oppia-topic-viewer-tabs {
-      justify-content: center;
-    }
-    .oppia-topic-viewer-container .oppia-topic-viewer-tabs li {
-      width: auto;
-    }
-    .oppia-topic-viewer-container {
-      max-width: 95%;
-    }
   }
 
-  @media(max-width: 649px) {
-    .oppia-topic-viewer-tabs-container {
+  .oppia-topic-viewer-tabs-container .topic-viewer-tabs-active .topic-viewer-tabs-text,
+  .oppia-topic-viewer-tabs-container .topic-viewer-tabs-active .topic-viewer-tabs-text:hover {
+    color: #ffffff;
+    border-bottom: 4px solid #ffffff;
+  }
+
+  .oppia-topic-viewer-tabs-container .topic-viewer-tabs .topic-viewer-tabs-text:hover,
+  .oppia-topic-viewer-tabs-container .topic-viewer-tabs .topic-viewer-tabs-text:focus {
+    outline: 0;
+    text-decoration: none;
+  }
+
+  .topic-viewer-page-content .oppia-page-card {
+    border-radius: 0.25em;
+    margin-top: 5vh;
+    padding-bottom: 7.5vh;
+    width: 704px;
+  }
+
+  @media(max-width: 1024px) {
+    .topic-viewer-tabs-list {
+      width: 80vw;
+    }
+
+    .oppia-topic-viewer-tabs-container .topic-viewer-tabs .topic-viewer-tabs-text {
       width: 100%;
     }
-    stories-list {
-      display: inline-grid;
+
+    .topic-viewer-page-content .oppia-page-card {
+      margin-top: 5vh;
+      width: 80vw;
+    }
+
+    .oppia-topic-viewer-tabs-container .topic-viewer-tabs li {
+      flex: 1;
+      width: auto;
     }
   }
 
-  @media(max-width: 426px) {
-    .oppia-topic-viewer-tabs span {
-      width: auto;
+  @media(max-width: 500px) {
+    .topic-viewer-tabs-list {
+      width: 90vw;
     }
-    .oppia-topic-viewer-container .oppia-topic-viewer-tabs {
-      max-width: 280px;
+
+    .oppia-topic-viewer-tabs-container .topic-viewer-tabs .topic-viewer-tabs-text {
+      width: 100%;
+    }
+
+    .topic-viewer-page-content .oppia-page-card {
+      padding: 15px 24px 64px 24px;
+      width: 90vw;
+    }
+
+    .oppia-topic-viewer-tabs-container .topic-viewer-tabs .tab-icon {
+      height: 30px;
+    }
+
+    .oppia-topic-viewer-tabs-container .topic-viewer-tabs .topic-viewer-tabs-text .tab-title {
+      font-size: 0.8em;
+    }
+
+    .oppia-topic-viewer-tabs-container .topic-viewer-tabs li {
+      flex: 1;
+      width: auto;
     }
   }
 </style>

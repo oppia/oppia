@@ -130,7 +130,7 @@ class ProfileDataHandlerTests(test_utils.GenericTestBase):
         self.login(self.EDITOR_EMAIL)
 
         response = self.get_html_response(feconf.PREFERENCES_URL)
-        self.assertIn('{"title": "Preferences - Oppia"})', response.body)
+        self.assertIn('{"title": "Preferences | Oppia"})', response.body)
 
         self.logout()
 
@@ -895,7 +895,7 @@ class ExportAccountHandlerTests(test_utils.GenericTestBase):
                 u'user_stats_data': {},
                 u'exploration_rights_snapshot_metadata_data': {},
                 u'user_subscriptions_data': {
-                    u'creator_ids': [],
+                    u'creator_usernames': [],
                     u'collection_ids': [],
                     u'activity_ids': [],
                     u'general_feedback_thread_ids': [],
@@ -932,7 +932,10 @@ class ExportAccountHandlerTests(test_utils.GenericTestBase):
                 u'general_suggestion_data': {},
                 u'user_contribution_scoring_data': {},
                 u'general_feedback_email_reply_to_id_data': {},
-                u'collection_rights_snapshot_metadata_data': {}
+                u'collection_rights_snapshot_metadata_data': {},
+                u'task_entry_data': {
+                    u'task_ids_closed_by_user': [],
+                },
             }
             self.assertEqual(
                 data,

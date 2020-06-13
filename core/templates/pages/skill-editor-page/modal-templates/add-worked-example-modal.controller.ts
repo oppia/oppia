@@ -13,34 +13,35 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for new topic name editor modal.
+ * @fileoverview Controller for add worked example modal.
  */
 
 require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
 
-angular.module('oppia').controller('NewTopicNameEditorModalController', [
-  '$controller', '$scope', '$uibModalInstance', 'MAX_CHARS_IN_TOPIC_NAME',
-  function($controller, $scope, $uibModalInstance, MAX_CHARS_IN_TOPIC_NAME) {
+angular.module('oppia').controller('AddWorkedExampleModalController', [
+  '$controller', '$scope', '$uibModalInstance',
+  function($controller, $scope, $uibModalInstance) {
     $controller('ConfirmOrCancelModalController', {
       $scope: $scope,
       $uibModalInstance: $uibModalInstance
     });
 
-    $scope.topicName = '';
-    $scope.abbreviatedTopicName = '';
-    $scope.MAX_CHARS_IN_TOPIC_NAME = MAX_CHARS_IN_TOPIC_NAME;
-    // No need for a length check below since the topic name input
-    // field in the HTML file has the maxlength attribute which
-    // disallows the user from entering more than the valid length.
-    $scope.isTopicNameValid = function() {
-      return $scope.topicName !== '';
+    $scope.WORKED_EXAMPLE_FORM_SCHEMA = {
+      type: 'html',
+      ui_config: {}
     };
-    $scope.save = function(topicName, abbreviatedTopicName) {
+
+    $scope.tmpWorkedExampleQuestionHtml = '';
+    $scope.tmpWorkedExampleExplanationHtml = '';
+
+    $scope.saveWorkedExample = function() {
       $uibModalInstance.close({
-        topicName: topicName,
-        abbreviatedTopicName: abbreviatedTopicName
+        workedExampleQuestionHtml:
+          $scope.tmpWorkedExampleQuestionHtml,
+        workedExampleExplanationHtml:
+          $scope.tmpWorkedExampleExplanationHtml
       });
     };
   }

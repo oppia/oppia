@@ -1,60 +1,76 @@
 <md-card layout="row" class="list-view-item">
-  <table class="dashboard-table">
+  <table class="dashboard-table protractor-test-topics-table">
     <colgroup>
-      <col style="width: 25%;">
-      <col style="width: 20%;">
-      <col style="width: 15%;">
-      <col style="width: 20%;">
-      <col style="width: 20%;">
+      <col class="dashboard-table-index-column">
+      <col class="dashboard-table-name-column">
+      <col class="dashboard-table-story-column">
+      <col class="dashboard-table-subtopic-column">
+      <col class="dashboard-table-skill-column">
+      <col class="dashboard-table-status-column">
     </colgroup>
     <tr>
-      <th ng-repeat="key in TOPIC_HEADINGS"
+      <th ng-repeat="key in $ctrl.TOPIC_HEADINGS"
           class="dashboard-table-headings">
-        <p ng-if="key === 'name'"> Topic Name </p>
-        <p ng-if="key === 'subtopic_count'"> Subtopics </p>
-        <p ng-if="key === 'skill_count'"> Skills </p>
-        <p ng-if="key === 'canonical_story_count'"> Canonical Stories (published) </p>
-        <p ng-if="key === 'topic_status'"> Topic Status </p>
+        <p ng-if="key === 'index'"></p>
+        <p ng-if="key === 'name'" id="dashboard-table-headings-details">Details</p>
+        <p ng-if="key === 'canonical_story_count'">Stories</p>
+        <p ng-if="key === 'subtopic_count'">Subtopics</p>
+        <p ng-if="key === 'skill_count'" class="text-center">Skills</p>
+        <p ng-if="key === 'topic_status'" class="text-center">Topic Status</p>
       </th>
     </tr>
-    <tr ng-repeat="topic in getTopicSummaries()" class="list-item">
+    <tr ng-repeat="topic in getTopicSummaries() track by $index" class="list-item">
       <td>
-        <a ng-href="<[getTopicEditorUrl(topic.id)]>" ng-click="selectTopic(topic.id)" class="list-summary protractor-test-topics-list-item">
-          <span class="protractor-test-topic-name"> <[topic.name]> </span>
-        </a>
+        <[$ctrl.getSerialNumberForTopic($index)]>.
       </td>
       <td>
-        <a ng-href="<[getTopicEditorUrl(topic.id)]>" ng-click="selectTopic(topic.id)" class="list-summary">
+        <div class="list-summary list-summary-name protractor-test-topics-list-item">
+          <div><span class="topic-name protractor-test-topic-name"><[topic.name]></span></div>
+          <div>
+            <span class="topic-classroom protractor-test-topic-classroom">
+              <span ng-if="topic.classroom"><[topic.classroom]></span>
+              <span ng-if="!topic.classroom">Unassigned</span>
+            </span>
+          </div>
+          <div><span class="topic-description protractor-test-topic-description"><[topic.description]></span></div>
+        </div>
+      </td>
+      <td>
+        <p class="text-center list-summary">
+          <span> <[topic.canonical_story_count]> </span>
+        </p>
+      </td>
+      <td>
+        <p class="text-center list-summary">
           <span> <[topic.subtopic_count]> </span>
-        </a>
+        </p>
       </td>
       <td>
-        <a ng-href="<[getTopicEditorUrl(topic.id)]>" ng-click="selectTopic(topic.id)" class="list-summary" uib-dropdown>
+        <p class="list-summary text-center">
           <span> <[topic.total_skill_count]> </span>
-          <div ng-show="topic.uncategorized_skill_count"
+          <div ng-show="$ctrl.topic.uncategorized_skill_count"
                class="oppia-editor-warnings-indicator oppia-editor-warnings-error-color"
                uib-tooltip="This topic has <[topic.uncategorized_skill_count]> uncategorized skill<[topic.uncategorized_skill_count > 1 ? 's' : '']>." tooltip-placement="bottom">
             <span class="oppia-editor-warnings-count">
               &nbsp;!
             </span>
           </div>
-        </a>
+        </p>
       </td>
-      <td>
-        <a ng-href="<[getTopicEditorUrl(topic.id)]>" ng-click="selectTopic(topic.id)" class="list-summary">
-          <span> <[topic.canonical_story_count]> </span>
-        </a>
-      </td>
-      <td>
-        <a ng-href="<[getTopicEditorUrl(topic.id)]>" ng-click="selectTopic(topic.id)" class="list-summary">
-          <span ng-if="topic.is_published"> Published </span>
-          <span ng-if="!topic.is_published"> Not Published </span>
-        </a>
-      </td>
-      <td class="delete-icon">
-        <a ng-if="canDeleteTopic()" ng-click="deleteTopic(topic.id)" class="protractor-test-delete-topic-button list-summary">
-          <span class="fas fa-trash-alt"></span>
-        </a>
+      <td class="text-center topic-list-status">
+        <span class="topic-list-status-text" ng-if="topic.is_published"> Published </span>
+        <span class="topic-list-status-text" ng-if="!topic.is_published"> Not Published </span>
+        <p class="fas fa-ellipsis-v protractor-test-topic-edit-box" ng-mouseover="$ctrl.enableEditOptions(topic.id)"></p>
+        <div ng-if="$ctrl.showEditOptions(topic.id)" class="topic-edit-options" ng-mouseleave="$ctrl.enableEditOptions(null)">
+          <a class="topic-edit-options-edit protractor-test-edit-topic-button" ng-href="<[$ctrl.getTopicEditorUrl(topic.id)]>">
+            <i class="fa fa-pen"></i>
+            <span>Edit</span>
+          </a>
+          <a ng-if="canDeleteTopic()" ng-click="$ctrl.deleteTopic(topic.id)">
+            <i class="fas fa-trash-alt protractor-test-delete-topic-button"></i>
+            <span>Delete</span>
+          </a>
+        </div>
       </td>
     </tr>
   </table>
@@ -63,25 +79,93 @@
 <style>
   topics-list .list-view-item {
     background: #fff;
-    margin: 20px 7.5px 0 12.5%;
-    padding: 10px 20px;
-    width: 75%;
+    box-shadow: none;
+    margin-top: 50px;
   }
-
+  topics-list .dashboard-table-index-column {
+    width: 5%;
+  }
+  topics-list .dashboard-table-name-column {
+    width: 35%;
+  }
+  topics-list .dashboard-table-story-column {
+    width: 10%;
+  }
+  topics-list .dashboard-table-subtopic-column {
+    width: 10%;
+  }
+  topics-list .dashboard-table-skill-column {
+    width: 10%;
+  }
+  topics-list .dashboard-table-status-column {
+    width: 12%;
+  }
   topics-list .dashboard-table {
     font-size: 15px;
     width: 100%;
+  }
+  topics-list .topic-list-status {
+    position: relative;
+  }
+  topics-list .topic-list-status-text {
+    display: inline-block;
+    text-align: right;
+    width: 90%;
+  }
+  topics-list .topic-edit-options {
+    background-color: #ffffff;
+    border: 1px solid black;
+    display: flex;
+    flex-wrap: wrap;
+    left: 0;
+    position: absolute;
+    top: 10px;
+    width: 120px;
+  }
+  topics-list .topic-edit-options a {
+    display: block;
+    padding: 5px;
+    width: 100%;
+    text-align: left;
+    text-decoration: none;
+  }
+  topics-list .topic-edit-options-edit {
+    border-bottom: 1px solid black;
+  }
+  topics-list .topic-edit-options a:hover,
+  topics-list .topic-edit-options a:active,
+  topics-list .topic-edit-options a:visited {
+    background-color: #e6e6e6;
+    color: inherit;
+    text-decoration: none;
   }
 
   topics-list .dashboard-table .dashboard-table-headings {
     border-bottom: 2px solid #bbb;
     padding-bottom: 0.7em;
+    text-align: center;
   }
 
   topics-list .dashboard-table .dashboard-table-headings p {
     display: inline;
   }
-
+  topics-list .dashboard-table #dashboard-table-headings-details {
+    display: inline-block;
+    text-align: left;
+    width: 100%;
+  }
+  topics-list .topic-name {
+    font-size: 17px;
+    font-weight: bold;
+  }
+  topics-list .topic-classroom {
+    font-size: 15px;
+    margin: 4px 0;
+    text-transform: uppercase;
+  }
+  topics-list .topic-description {
+    font-size: 15px;
+  }
   topics-list .list-summary,
   topics-list .list-summary:active,
   topics-list .list-summary:visited {
@@ -92,29 +176,22 @@
   }
 
   topics-list .list-item {
-    height: 2.5em;
+    height: 140px;
+    text-align: left;
+    vertical-align: baseline;
   }
 
-  topics-list .delete-icon {
-    border-bottom: 1px solid #fff;
-    padding-left: 0.8vw;
-  }
-
-  topics-list .list-item:hover .delete-icon {
-    background-color: #fff;
+  topics-list .list-item td {
+    padding-top: 15px;
   }
 
   topics-list .list-item:not(:last-child) {
     border-bottom: 1px solid #bbb;
   }
 
-  topics-list .list-item:hover {
-    background-color: #ededed;
-  }
-
   topics-list .oppia-editor-warnings-indicator {
-    left: 15px;
     bottom: 13px;
+    left: 15px;
   }
 
   topics-list .oppia-editor-warnings-error-color {
@@ -129,8 +206,8 @@
 
   @media (max-width: 768px) {
     topics-list .list-view-item {
-      width: 100%;
       margin: 0;
+      width: 100%;
     }
   }
 </style>

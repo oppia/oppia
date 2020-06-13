@@ -30,6 +30,9 @@ require(
   'components/question-directives/questions-list/' +
   'questions-list.constants.ajs.ts');
 require(
+  'components/skill-selector/' +
+  'questions-list-select-skill-modal.controller.ts');
+require(
   'components/skill-selector/skill-selector.directive.ts');
 
 require(
@@ -59,6 +62,7 @@ require(
   'state-editor.service.ts');
 require('services/alerts.service.ts');
 require('services/contextual/url.service.ts');
+require('services/question-validation.service.ts');
 
 angular.module('oppia').directive('questionsList', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -158,11 +162,17 @@ angular.module('oppia').directive('questionsList', [
           };
 
           ctrl.saveAndPublishQuestion = function(commitMessage) {
-            var validationErrors = ctrl.question.validate(
-              ctrl.misconceptionsBySkill);
+            var validationErrors = ctrl.question.getValidationErrorMessage();
+            var unaddressedMisconceptions = (
+              ctrl.question.getUnaddressedMisconceptionNames(
+                ctrl.misconceptionsBySkill));
+            var unaddressedMisconceptionsErrorString = (
+              `Remaining misconceptions that need to be addressed: ${
+                unaddressedMisconceptions.join(', ')}`);
 
-            if (validationErrors) {
-              AlertsService.addWarning(validationErrors);
+            if (validationErrors || unaddressedMisconceptions.length) {
+              AlertsService.addWarning(
+                validationErrors || unaddressedMisconceptionsErrorString);
               return;
             }
             _reInitializeSelectedSkillIds();

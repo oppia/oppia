@@ -19,6 +19,9 @@
 require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
+require(
+  'pages/exploration-player-page/templates/' +
+  'flag-exploration-modal.controller.ts');
 
 require('domain/utilities/url-interpolation.service.ts');
 require('domain/exploration/read-only-exploration-backend-api.service.ts');
@@ -79,37 +82,7 @@ angular.module('oppia').directive('learnerLocalNav', [
                 'pages/exploration-player-page/templates/' +
                 'flag-exploration-modal.template.html'),
               backdrop: true,
-              controller: [
-                '$controller', '$scope', '$uibModalInstance',
-                'PlayerPositionService',
-                function($controller, $scope, $uibModalInstance,
-                    PlayerPositionService) {
-                  $controller('ConfirmOrCancelModalController', {
-                    $scope: $scope,
-                    $uibModalInstance: $uibModalInstance
-                  });
-
-                  $scope.flagMessageTextareaIsShown = false;
-                  var stateName = PlayerPositionService.getCurrentStateName();
-
-                  $scope.showFlagMessageTextarea = function(value) {
-                    if (value) {
-                      $scope.flagMessageTextareaIsShown = true;
-                      FocusManagerService.setFocus('flagMessageTextarea');
-                    }
-                  };
-
-                  $scope.submitReport = function() {
-                    if ($scope.flagMessage) {
-                      $uibModalInstance.close({
-                        report_type: $scope.flag,
-                        report_text: $scope.flagMessage,
-                        state: stateName
-                      });
-                    }
-                  };
-                }
-              ]
+              controller: 'FlagExplorationModalController',
             }).result.then(function(result) {
               var flagExplorationUrl = UrlInterpolationService.interpolateUrl(
                 FLAG_EXPLORATION_URL_TEMPLATE, {
