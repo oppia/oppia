@@ -96,7 +96,7 @@ def open_file(filename, mode, encoding='utf-8', newline=None):
         filename: str. The file to be opened.
         mode: str. Mode in which the file is opened.
         encoding: str. Encoding in which the file is opened.
-        newline: str. Controls how universal newlines work.
+        newline: None|str. Controls how universal newlines work.
 
     Returns:
         _io.TextIOWrapper. The file object.
