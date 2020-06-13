@@ -762,7 +762,7 @@ class GeneralPurposeLinter(python_utils.OBJECT):
                 file_content = FILE_CACHE.readlines(filepath)
                 file_length = len(file_content)
                 if (
-                        file_length >= 2 and
+                        file_length >= 1 and
                         not re.search(r'[^\n]\n', file_content[-1])):
                     summary_message = (
                         '%s --> There should be a single newline at the '
