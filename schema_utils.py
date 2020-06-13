@@ -30,6 +30,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import numbers
 import re
 
+from core.domain import expression_parser
 from core.domain import html_cleaner
 import python_utils
 
@@ -387,3 +388,62 @@ class _Validators(python_utils.OBJECT):
             bool. Whether the given object is a valid email.
         """
         return bool(re.search(r'^[\w\.\+\-]+\@[\w]+\.[a-z]{2,3}$', obj))
+
+    @staticmethod
+    def is_valid_math_expression(obj, algebraic=True):
+        """Checks if the given obj (a string) represents a valid algebraic or
+        numeric expression. Note that purely-numeric expressions are NOT
+        considered valid algebraic expressions.
+
+        Args:
+            obj: str. The given expression.
+            algebraic: bool. True if the given expression is algebraic
+                else numeric.
+
+        Returns:
+            bool. Whether the given object is a valid expression.
+        """
+
+        if not expression_parser.is_valid_expression(obj):
+            return False
+
+        expression_is_algebraic = expression_parser.is_algebraic(obj)
+        # If the algebraic flag is true, expression_is_algebraic should
+        # also be true, otherwise both should be false which would imply
+        # that the expression is numeric.
+        return not algebraic ^ expression_is_algebraic
+
+    @staticmethod
+    def is_valid_math_equation(obj):
+        """Checks if the given obj (a string) represents a valid math equation.
+
+        Args:
+            obj: str. A string.
+
+        Returns:
+            bool. Whether the given object is a valid math equation.
+        """
+        if obj.count('=') != 1:
+            return False
+
+        is_valid_math_expression = get_validator(
+            'is_valid_math_expression')
+        lhs, rhs = obj.split('=')
+
+        # Both sides have to be valid expressions and at least one of them has
+        # to be a valid algebraic expression.
+        lhs_is_algebraically_valid = is_valid_math_expression(lhs)
+        rhs_is_algebraically_valid = is_valid_math_expression(rhs)
+
+        lhs_is_numerically_valid = is_valid_math_expression(
+            lhs, algebraic=False)
+        rhs_is_numerically_valid = is_valid_math_expression(
+            rhs, algebraic=False)
+
+        if lhs_is_algebraically_valid and rhs_is_algebraically_valid:
+            return True
+        if lhs_is_algebraically_valid and rhs_is_numerically_valid:
+            return True
+        if lhs_is_numerically_valid and rhs_is_algebraically_valid:
+            return True
+        return False
