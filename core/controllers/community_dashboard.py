@@ -27,6 +27,7 @@ from core.domain import user_services
 import feconf
 import utils
 
+
 class CommunityDashboardPage(base.BaseHandler):
     """Page showing the community dashboard."""
 
