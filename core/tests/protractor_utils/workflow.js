@@ -291,7 +291,7 @@ var uploadImage = async function(
     await waitFor.visibilityOf(
       thumbnailResetButton,
       'Topic thumbnail reset button taking too long to appear.');
-    thumbnailResetButton.click();
+    await thumbnailResetButton.click();
   }
 
   absPath = path.resolve(__dirname, imgPath);

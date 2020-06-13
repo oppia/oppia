@@ -35,22 +35,8 @@ describe('Delete Topic Modal Controller', function() {
     });
   }));
 
-  it('should close modal with the correct value', function() {
+  it('should initialize the correct value', function() {
     $scope.init();
     expect($scope.topicName).toEqual('hello');
-    var message = 'closing';
-    $scope.confirm(message);
-    expect($uibModalInstance.close).toHaveBeenCalledWith(message);
-  });
-
-  it('should dismiss modal', function() {
-    $scope.cancel();
-    expect($uibModalInstance.dismiss).toHaveBeenCalledWith('cancel');
-  });
-
-  it('should dismiss modal with the correct value', function() {
-    var message = 'canceling';
-    $scope.cancel(message);
-    expect($uibModalInstance.dismiss).toHaveBeenCalledWith(message);
   });
 });

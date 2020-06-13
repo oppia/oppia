@@ -17,18 +17,15 @@
  */
 
 angular.module('oppia').controller('DeleteTopicModalController', [
-  '$scope', '$uibModalInstance', 'topicName',
-  function($scope, $uibModalInstance, topicName) {
+  '$controller', '$scope', '$uibModalInstance', 'topicName',
+  function($controller, $scope, $uibModalInstance, topicName) {
+    $controller('ConfirmOrCancelModalController', {
+      $scope: $scope,
+      $uibModalInstance: $uibModalInstance
+    });
+
     $scope.init = function() {
       $scope.topicName = topicName;
-    };
-    $scope.confirm = function(value) {
-      $uibModalInstance.close(value);
-    };
-
-    $scope.cancel = function(value) {
-      var dismissValue = value || 'cancel';
-      $uibModalInstance.dismiss(dismissValue);
     };
     $scope.init();
   }
