@@ -31,9 +31,9 @@ import utils
 TEST_SUITES_NOT_RUN_ON_TRAVIS = [
     'full', 'adminPage', 'accessibility', 'classroomPage',
     'classroomPageFileUploadFeatures', 'collections', 'embedding',
-    'fileUploadFeatures', 'library', 'navigation', 'preferences',
-    'profileFeatures', 'profileMenu', 'publication', 'subscriptions',
-    'topicAndStoryEditorFileUploadFeatures', 'users']
+    'fileUploadFeatures', 'library', 'navigation', 'playTranslations',
+    'preferences', 'profileFeatures', 'profileMenu', 'publication', 
+    'subscriptions', 'topicAndStoryEditorFileUploadFeatures', 'users']
 
 TRAVIS_CI_FILE_PATH = os.path.join(os.getcwd(), '.travis.yml')
 PROTRACTOR_CONF_FILE_PATH = os.path.join(

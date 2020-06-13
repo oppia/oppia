@@ -80,6 +80,49 @@ var ExplorationPlayerPage = function() {
   var suggestionPopupLink =
     element(by.css('.protractor-test-exploration-suggestion-popup-link'));
 
+  var audioBar = element(
+    by.css('.protractor-test-audio-bar'));
+  var audioSelector = element(
+    by.css('.protractor-test-audio-lang-select'));
+  var playButton = element(
+    by.css('.protractor-test-play-circle'));
+  var pauseButton = element(
+    by.css('.protractor-test-pause-circle'));
+
+  this.clickAudioBar = async function() {
+    await waitFor.elementToBeClickable(audioBar,
+      'Audio bar taking too long to be clickable');
+    await audioBar.click();
+  };
+
+  this.playAudio = async function() {
+    await waitFor.elementToBeClickable(playButton,
+      'Play button taking too long to be clickable');
+    await playButton.click();
+  };
+
+  this.expectAudioToBePlaying = async function() {
+    expect(pauseButton.isPresent()).toBeTruthy();
+  };
+
+  this.pauseAudio = async function() {
+    await waitFor.elementToBeClickable(pauseButton,
+      'Pause button taking too long to be clickable');
+    await pauseButton.click();
+  };
+
+  this.expectAudioToBePaused = async function() {
+    expect(playButton.isPresent()).toBeTruthy();
+  };
+
+  this.changeLanguage = async function(language) {
+    await waitFor.visibilityOf(
+      audioSelector,
+      'Language selector takes too long to appear.');
+    await audioSelector.element(
+      by.cssContainingText('option', language)).click();
+  };
+
   this.clickThroughToNextCard = async function() {
     await waitFor.elementToBeClickable(
       nextCardButton, '"Next Card" button takes too long to be clickable');

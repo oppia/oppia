@@ -37,7 +37,7 @@ workflows:
       - e2e_navigation_and_admin:
           requires:
             - typescript_tests
-      - e2e_classroom_page:
+      - e2e_classroom_page_and_translations:
           requires:
             - e2e_file_upload_features
       - e2e_topic_and_story_editor:
@@ -284,7 +284,7 @@ jobs:
             - oppia/third_party/generated/
             - oppia/webpack_bundles
 
-  e2e_classroom_page:
+  e2e_classroom_page_and_translations:
     <<: *job_defaults
     steps:
       - checkout
@@ -295,6 +295,10 @@ jobs:
           name: Run e2e classroom page test
           command: |
             python -m scripts.run_e2e_tests --skip-install --skip-build --suite="classroomPageFileUploadFeatures"
+      - run:
+          name: Run e2e play translations test
+          command: |
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="playTranslations"
 
   e2e_topic_and_story_editor:
     <<: *job_defaults

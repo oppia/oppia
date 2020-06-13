@@ -97,6 +97,10 @@ var suites = {
       'protractor_desktop/navigation.js'
     ],
 
+    playTranslations: [
+      'protractor_desktop/playTranslations.js'
+    ],
+
     preferences: [
       'protractor_desktop/preferences.js'
     ],
