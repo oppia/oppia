@@ -52,9 +52,9 @@ export class HighBounceRateTask extends TaskEntry {
     if (this.isOpen() &&
         bounceRate < ImprovementsConstants.HIGH_BOUNCE_RATE_THRESHOLD_LOW) {
       this.makeObsolete();
-    } else if (
-      this.isObsolete() &&
-      bounceRate >= ImprovementsConstants.HIGH_BOUNCE_RATE_THRESHOLD_HIGH) {
+    } else if (this.isObsolete() &&
+               bounceRate >=
+               ImprovementsConstants.HIGH_BOUNCE_RATE_THRESHOLD_HIGH) {
       this.makeOpen();
       this.generateIssueDescription(bounceRate);
     }
