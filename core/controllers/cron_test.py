@@ -284,6 +284,7 @@ class CronJobTests(test_utils.GenericTestBase):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         self.save_new_valid_exploration(
             'exp_id', self.admin_id, title='A title', category='Algebra')
+        author_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
 
         new_content = state_domain.SubtitledHtml(
             'content', '<p>new suggestion content</p>').to_dict()
@@ -297,7 +298,7 @@ class CronJobTests(test_utils.GenericTestBase):
             suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             suggestion_models.TARGET_TYPE_EXPLORATION,
             'exp_id', 1,
-            feconf.SYSTEM_COMMITTER_ID, change, 'change title', None)
+            author_id, change, 'change title')
 
         exploration = exp_fetchers.get_exploration_by_id('exp_id')
         self.assertEqual(

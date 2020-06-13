@@ -108,8 +108,7 @@ class SuggestionHandler(base.BaseHandler):
             self.payload.get('target_type'), self.payload.get('target_id'),
             self.payload.get('target_version_at_submission'),
             self.user_id, self.payload.get('change'),
-            self.payload.get('description'),
-            None)
+            self.payload.get('description'))
         self.render_json(self.values)
 
 

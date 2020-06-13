@@ -282,7 +282,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
 
         suggestion.author_id = ''
         with self.assertRaisesRegexp(
-            Exception, 'Expected author_id to be in a valid user ID format.'):
+            Exception, 'Expected author_id to be in a valid user ID format'):
             suggestion.validate()
 
     def test_validate_final_reviewer_id(self):
@@ -317,7 +317,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         suggestion.final_reviewer_id = ''
         with self.assertRaisesRegexp(
             Exception,
-            'Expected final_reviewer_id to be in a valid user ID format.'):
+            'Expected final_reviewer_id to be in a valid user ID format'):
             suggestion.validate()
 
     def test_validate_score_category(self):

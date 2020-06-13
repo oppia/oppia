@@ -286,7 +286,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                 'question_dict': question_dict,
                 'skill_id': None,
                 'skill_difficulty': 0.3
-            }, None, None)
+            }, None)
 
         suggestion_id = suggestion_services.query_suggestions(
             [('author_id', self.author_id), (
@@ -354,7 +354,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         suggestion_services.create_suggestion(
             suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             suggestion_models.TARGET_TYPE_EXPLORATION, exp_id, 1,
-            self.editor_id, change_cmd, 'sample description', None)
+            self.editor_id, change_cmd, 'sample description')
 
         suggestion_id = suggestion_services.query_suggestions(
             [('author_id', self.editor_id), (
@@ -858,7 +858,7 @@ class SkillSuggestionTests(test_utils.GenericTestBase):
         suggestion_services.create_suggestion(
             suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             suggestion_models.TARGET_TYPE_EXPLORATION, exp_id, 1,
-            self.author_id, change_cmd, 'sample description', None)
+            self.author_id, change_cmd, 'sample description')
 
         suggestion_id = suggestion_services.query_suggestions(
             [('author_id', self.author_id), (

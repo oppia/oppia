@@ -165,8 +165,7 @@ class TasksTests(test_utils.GenericTestBase):
                     suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                     suggestion_models.TARGET_TYPE_EXPLORATION,
                     self.exploration.id, 1,
-                    self.user_id_a, change, 'test description',
-                    None)
+                    self.user_id_a, change, 'test description')
                 threadlist = feedback_services.get_all_threads(
                     suggestion_models.TARGET_TYPE_EXPLORATION,
                     self.exploration.id, True)

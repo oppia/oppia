@@ -157,26 +157,27 @@ class BaseSuggestion(python_utils.OBJECT):
                 'Expected author_id to be a string, received %s' % type(
                     self.author_id))
 
-        if not isinstance(self.final_reviewer_id, python_utils.BASESTRING):
-            if self.final_reviewer_id is not None:
-                raise utils.ValidationError(
-                    'Expected final_reviewer_id to be a string, received %s' %
-                    type(self.final_reviewer_id))
-
         if (
                 self.author_id is not None and
                 not user_id_migration.verify_user_id_correct(self.author_id)
         ):
             raise utils.ValidationError(
-                'Expected author_id to be in a valid user ID format.')
+                'Expected author_id to be in a valid user ID format, '
+                'received %s' % self.author_id)
 
-        if (
-                self.final_reviewer_id is not None and
-                not user_id_migration.verify_user_id_correct(
-                    self.final_reviewer_id)
-        ):
-            raise utils.ValidationError(
-                'Expected final_reviewer_id to be in a valid user ID format.')
+        if self.final_reviewer_id is not None:
+            if not isinstance(self.final_reviewer_id, python_utils.BASESTRING):
+                raise utils.ValidationError(
+                    'Expected final_reviewer_id to be a string, received %s' %
+                    type(self.final_reviewer_id))
+            if (
+                    not user_id_migration.verify_user_id_correct(
+                        self.final_reviewer_id) and
+                    self.final_reviewer_id != feconf.SUGGESTION_BOT_USER_ID
+            ):
+                raise utils.ValidationError(
+                'Expected final_reviewer_id to be in a valid user ID format, '
+                'received %s' % self.final_reviewer_id)
 
         if not isinstance(self.score_category, python_utils.BASESTRING):
             raise utils.ValidationError(
