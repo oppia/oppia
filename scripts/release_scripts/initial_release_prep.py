@@ -105,6 +105,8 @@ def cut_release_branch():
     Raises:
         AssertionError. The version entered is invalid.
     """
+    common.open_new_tab_in_browser_if_possible(
+        'https://github.com/oppia/oppia/releases')
     python_utils.PRINT(
         'Enter the new version for the release.\n'
         'If major changes occurred since the last release, or if '
@@ -112,8 +114,6 @@ def cut_release_branch():
         '(e.g. 2.5.3 -> 2.6.0 or 2.5.9 -> 2.6.0)\n'
         'Otherwise, increment the third version number '
         '(e.g. 2.5.3 -> 2.5.4)\n')
-    common.open_new_tab_in_browser_if_possible(
-        'https://github.com/oppia/oppia/releases')
     release_version = python_utils.INPUT()
     assert re.match(r'\d+\.\d+\.\d+$', release_version)
     cut_release_or_hotfix_branch.main(
@@ -130,11 +130,11 @@ def main():
         'Please check if anything extra is required for the release. '
         'If so, keep track of this and do it at the appropriate point.')
 
+    common.open_new_tab_in_browser_if_possible(
+        release_constants.RELEASE_DRIVE_URL)
     python_utils.PRINT(
         'Has the QA lead created a document for the current release?\n'
         'Confirm by entering y/ye/yes.\n')
-    common.open_new_tab_in_browser_if_possible(
-        release_constants.RELEASE_DRIVE_URL)
     doc_for_release_created = python_utils.INPUT().lower()
     if doc_for_release_created not in (
             release_constants.AFFIRMATIVE_CONFIRMATIONS):

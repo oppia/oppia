@@ -401,6 +401,10 @@ def create_branch(
                 contents.path, 'Update %s' % filepath, f.read(),
                 contents.sha, branch=target_branch)
     common.run_cmd(GIT_CMD_CHECKOUT.split(' '))
+    common.open_new_tab_in_browser_if_possible(
+        'https://github.com/oppia/oppia/compare/develop...%s:%s?'
+        'expand=1&title=Update authors and changelog for v%s' % (
+            github_username, target_branch, current_release_version_number))
     python_utils.PRINT(
         'Pushed changes to Github. '
         'Please create a pull request from the %s branch\n\n'
@@ -408,10 +412,6 @@ def create_branch(
         '"Update authors and changelog for v%s" '
         'otherwise deployment will fail.' % (
             target_branch, current_release_version_number))
-    common.open_new_tab_in_browser_if_possible(
-        'https://github.com/oppia/oppia/compare/develop...%s:%s?'
-        'expand=1&title=Update authors and changelog for v%s' % (
-            github_username, target_branch, current_release_version_number))
 
 
 def is_invalid_email_present(release_summary_lines):
