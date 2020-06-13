@@ -129,7 +129,7 @@ angular.module('oppia').directive('topicEditorNavbar', [
             ).then(function() {
               var successToast = 'Topic published.';
               if (redirectToDashboard) {
-                $window.location = '/topics_and_skills_dashboard';
+                $window.location = '/topics-and-skills-dashboard';
               }
               AlertsService.addSuccessMessage(
                 successToast, 1000);

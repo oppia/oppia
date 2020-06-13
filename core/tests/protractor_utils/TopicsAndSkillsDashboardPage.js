@@ -21,7 +21,7 @@ var waitFor = require('./waitFor.js');
 var SkillEditorPage = require('./SkillEditorPage.js');
 
 var TopicsAndSkillsDashboardPage = function() {
-  var DASHBOARD_URL = '/topics_and_skills_dashboard';
+  var DASHBOARD_URL = '/topics-and-skills-dashboard';
   var skillEditorPage = new SkillEditorPage.SkillEditorPage();
   var topicNames = element.all(by.css('.protractor-test-topic-name'));
   var skillDescriptions = element.all(
@@ -120,7 +120,7 @@ var TopicsAndSkillsDashboardPage = function() {
     await topicsAndSkillsDashboardLink.click();
     await waitFor.pageToFullyLoad();
     expect(await browser.getCurrentUrl()).toEqual(
-      'http://localhost:9001/topics_and_skills_dashboard');
+      'http://localhost:9001/topics-and-skills-dashboard');
   };
 
   this.mergeSkillWithIndexToSkillWithIndex = async function(

@@ -66,7 +66,7 @@ describe('Stewards Landing Page', function() {
     expect(ctrl.activeTabName).toBe(activeTabName);
     expect(ctrl.buttonDefinitions).toEqual([{
       text: 'Browse Lessons',
-      href: '/library'
+      href: '/community-library'
     }, {
       text: 'Subscribe to our Newsletter',
       href: 'https://eepurl.com/g5v9Df'
@@ -88,7 +88,7 @@ describe('Stewards Landing Page', function() {
     expect(ctrl.activeTabName).toBe(activeTabName);
     expect(ctrl.buttonDefinitions).toEqual([{
       text: 'Browse Lessons',
-      href: '/library'
+      href: '/community-library'
     }, {
       text: 'Subscribe to our Newsletter',
       href: 'https://eepurl.com/g5v9Df'
@@ -114,7 +114,7 @@ describe('Stewards Landing Page', function() {
         'https://www.oppiafoundation.org/partnerships#get-in-touch')
     }, {
       text: 'Browse Lessons',
-      href: '/library'
+      href: '/community-library'
     }]);
     expect(ctrl.isActiveTab(activeTabName)).toBe(true);
     expect(ctrl.isActiveTab('Teachers')).toBe(false);
@@ -174,7 +174,7 @@ describe('Stewards Landing Page', function() {
     var activeTabName = 'Parents';
     var buttonDefinition = {
       text: 'Browse Lessons',
-      href: '/library'
+      href: '/community-library'
     };
     ctrl.setActiveTabName(activeTabName);
     ctrl.onClickButton(buttonDefinition);
@@ -210,7 +210,7 @@ describe('Stewards Landing Page', function() {
     expect(ctrl.getActiveTabNameInSingularForm()).toBe('Parent');
     expect(ctrl.buttonDefinitions).toEqual([{
       text: 'Browse Lessons',
-      href: '/library'
+      href: '/community-library'
     }, {
       text: 'Subscribe to our Newsletter',
       href: 'https://eepurl.com/g5v9Df'

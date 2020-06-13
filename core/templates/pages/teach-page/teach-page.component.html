@@ -12,8 +12,8 @@
 
             </a>
           </li>
-          <li ng-class="{'oppia-about-tabs-active': $ctrl.activeTabName === $ctrl.TAB_ID_PLAYBOOK}">
-            <a ng-click="$ctrl.onTabClick($ctrl.TAB_ID_PLAYBOOK)" class="oppia-about-tabs-text" href="" id="playbook" translate="I18N_TEACH_PAGE_TAB_PARTICIPATION_PLAYBOOK">
+          <li ng-class="{'oppia-about-tabs-active': $ctrl.activeTabName === $ctrl.TAB_ID_PARTICIPATION}">
+            <a ng-click="$ctrl.onTabClick($ctrl.TAB_ID_PARTICIPATION)" class="oppia-about-tabs-text" href="" id="participation" translate="I18N_TEACH_PAGE_TAB_PARTICIPATION_PLAYBOOK">
             </a>
           </li>
         </ul>
@@ -43,7 +43,7 @@
           </a>
         </div>
 
-        <div class="playbook oppia-about-tab-content" ng-class="{'oppia-about-visible-content': $ctrl.activeTabName === $ctrl.TAB_ID_PLAYBOOK}">
+        <div class="participation oppia-about-tab-content" ng-class="{'oppia-about-visible-content': $ctrl.activeTabName === $ctrl.TAB_ID_PARTICIPATION}">
           <div class="oppia-static-card-content oppia-static-card-content-narrow">
             <h2 translate="I18N_TEACH_PAGE_COMMUNITY_GUIDELINES_HEADING"></h2>
             <ol>
@@ -102,10 +102,10 @@
         <div class="oppia-about-extra-info">
           <div class="oppia-static-content oppia-static-extra-content oppia-about-extra-content">
             <div class="oppia-static-card-content oppia-static-card-content-wide oppia-about-buttons-container">
-              <a href="/creator_dashboard?mode=create" class="btn oppia-about-button"
+              <a href="/creator-dashboard?mode=create" class="btn oppia-about-button"
                  translate="I18N_ACTION_CREATE_EXPLORATION">
               </a>
-              <a href="/library" class="btn oppia-about-button"
+              <a href="/community-library" class="btn oppia-about-button"
                  translate="I18N_ACTION_BROWSE_EXPLORATIONS">
               </a>
             </div>

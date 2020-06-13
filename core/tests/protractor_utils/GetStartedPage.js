@@ -19,7 +19,7 @@
 var waitFor = require('./waitFor.js');
 
 var GetStartedPage = function() {
-  var GET_STARTED_PAGE_URL = '/get_started';
+  var GET_STARTED_PAGE_URL = '/get-started';
 
   this.get = async function() {
     await browser.get(GET_STARTED_PAGE_URL);

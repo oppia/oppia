@@ -31,6 +31,15 @@ import python_utils
 import utils
 
 
+class OldLearnerDashboardRedirectPage(base.BaseHandler):
+    """Redirects the old learner dashboard URL to the new one."""
+
+    @acl_decorators.open_access
+    def get(self):
+        """Handles GET requests."""
+        self.redirect(feconf.LEARNER_DASHBOARD_URL, permanent=True)
+
+
 class LearnerDashboardPage(base.BaseHandler):
     """Page showing the user's learner dashboard."""
 

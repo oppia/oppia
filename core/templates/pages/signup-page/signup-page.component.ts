@@ -128,7 +128,7 @@ angular.module('oppia').component('signupPage', {
         var returnUrl = window.decodeURIComponent(
           UrlService.getUrlParams().return_url);
 
-        if (returnUrl.indexOf('creator_dashboard') !== -1) {
+        if (returnUrl.indexOf('creator-dashboard') !== -1) {
           defaultDashboard = DASHBOARD_TYPE_CREATOR;
         } else {
           defaultDashboard = DASHBOARD_TYPE_LEARNER;

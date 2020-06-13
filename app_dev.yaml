@@ -154,7 +154,7 @@ handlers:
     X-Xss-Protection: "1; mode=block"
   secure: always
   expiration: "0"
-- url: /community_dashboard
+- url: /community-dashboard
   static_files: webpack_bundles/community-dashboard-page.mainpage.html
   upload: webpack_bundles/community-dashboard-page.mainpage.html
   http_headers:
@@ -187,7 +187,7 @@ handlers:
     X-Xss-Protection: "1; mode=block"
   secure: always
   expiration: "0"
-- url: /get_started
+- url: /get-started
   static_files: webpack_bundles/get-started-page.mainpage.html
   upload: webpack_bundles/get-started-page.mainpage.html
   http_headers:
@@ -198,7 +198,7 @@ handlers:
     X-Xss-Protection: "1; mode=block"
   secure: always
   expiration: "0"
-- url: /privacy
+- url: /privacy-policy
   static_files: webpack_bundles/privacy-page.mainpage.html
   upload: webpack_bundles/privacy-page.mainpage.html
   http_headers:

@@ -128,7 +128,7 @@ angular.module('oppia').directive('settingsTab', [
             EXPLORATION_TITLE_INPUT_FOCUS_LABEL, TAG_REGEX) {
           var ctrl = this;
 
-          var CREATOR_DASHBOARD_PAGE_URL = '/creator_dashboard';
+          var CREATOR_DASHBOARD_PAGE_URL = '/creator-dashboard';
           var EXPLORE_PAGE_PREFIX = '/explore/';
 
           ctrl.getExplorePageUrl = function() {

@@ -38,7 +38,7 @@ describe('Profile menu flow', function() {
   it('should land on the learner dashboard after successful login',
     async function() {
       expect(await browser.getCurrentUrl()).toEqual(
-        'http://localhost:9001/learner_dashboard');
+        'http://localhost:9001/learner-dashboard');
     });
 
   describe('profile dropdown menu', function() {
@@ -74,7 +74,7 @@ describe('Profile menu flow', function() {
         await creatorDashboardLink.click();
         await waitFor.pageToFullyLoad();
         expect(await browser.getCurrentUrl()).toEqual(
-          'http://localhost:9001/creator_dashboard');
+          'http://localhost:9001/creator-dashboard');
       });
 
     it('should visit the learner dashboard from the profile dropdown menu',
@@ -87,7 +87,7 @@ describe('Profile menu flow', function() {
         await learnerDashboardLink.click();
         await waitFor.pageToFullyLoad();
         expect(await browser.getCurrentUrl()).toEqual(
-          'http://localhost:9001/learner_dashboard');
+          'http://localhost:9001/learner-dashboard');
       });
 
     it('should not show the topics and skills dashboard link in the profile ' +
@@ -117,7 +117,7 @@ describe('Profile menu flow', function() {
       await topicsAndSkillsDashboardLink.click();
       await waitFor.pageToFullyLoad();
       expect(await browser.getCurrentUrl()).toEqual(
-        'http://localhost:9001/topics_and_skills_dashboard');
+        'http://localhost:9001/topics-and-skills-dashboard');
     });
 
     it('should visit the notifications page from the profile dropdown menu',
@@ -130,7 +130,7 @@ describe('Profile menu flow', function() {
         await notificationsDashboardLink.click();
         await waitFor.pageToFullyLoad();
         expect(await browser.getCurrentUrl()).toEqual(
-          'http://localhost:9001/notifications_dashboard');
+          'http://localhost:9001/notifications');
       });
 
     it('should visit the preferences page from the profile dropdown menu',

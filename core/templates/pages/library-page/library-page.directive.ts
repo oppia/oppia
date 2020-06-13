@@ -233,7 +233,7 @@ angular.module('oppia').directive('libraryPage', [
             ctrl.pageMode = LIBRARY_PATHS_TO_MODES[currentPath];
             ctrl.LIBRARY_PAGE_MODES = LIBRARY_PAGE_MODES;
 
-            var title = 'Exploration Library - Oppia';
+            var title = 'Community Library Lessons | Oppia';
             if (ctrl.pageMode === LIBRARY_PAGE_MODES.GROUP ||
                 ctrl.pageMode === LIBRARY_PAGE_MODES.SEARCH) {
               title = 'Find explorations to learn from - Oppia';

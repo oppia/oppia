@@ -134,7 +134,7 @@ describe('Topic Landing Page', function() {
     ctrl.onClickExploreLessonsButton();
     $timeout.flush(150);
 
-    expect(windowRef.nativeWindow.location).toBe('/library');
+    expect(windowRef.nativeWindow.location).toBe('/community-library');
   });
 
   it('should have a tagline in the page title', function() {

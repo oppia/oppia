@@ -63,8 +63,8 @@ angular.module('oppia').directive('createActivityButton', [
 
             if (!ctrl.canCreateCollections) {
               ExplorationCreationService.createNewExploration();
-            } else if (UrlService.getPathname() !== '/creator_dashboard') {
-              $window.location.replace('/creator_dashboard?mode=create');
+            } else if (UrlService.getPathname() !== '/creator-dashboard') {
+              $window.location.replace('/creator-dashboard?mode=create');
             } else {
               $uibModal.open({
                 templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(

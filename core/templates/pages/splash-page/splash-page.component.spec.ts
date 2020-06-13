@@ -90,7 +90,7 @@ describe('Splash Page', function() {
     ctrl.onClickBrowseLibraryButton();
     $timeout.flush(150);
 
-    expect(windowRefMock.nativeWindow.location).toBe('/library');
+    expect(windowRefMock.nativeWindow.location).toBe('/community-library');
     expect(clickBrowseLibraryButtonEventSpy).toHaveBeenCalled();
   });
 
@@ -102,7 +102,7 @@ describe('Splash Page', function() {
     $timeout.flush(150);
 
     expect(windowRefMock.nativeWindow.location).toBe(
-      '/creator_dashboard?mode=create');
+      '/creator-dashboard?mode=create');
     expect(clickCreateExplorationButtonEventSpy).toHaveBeenCalled();
   });
 
