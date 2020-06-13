@@ -321,11 +321,12 @@ class BaseSummaryModelValidator(BaseModelValidator):
         This should be implemented by subclasses.
 
         Returns:
-            tuple(str, list(tuple), dict). A tuple with first element as
-                external model name, second element as a tuple of
-                cls.external_instance_details and the third element
-                as a properties dict with key as property name in summary
-                model and value as property name in external model.
+            tuple(str, str, dict). A tuple with first element as
+                external model name, second element as a key to fetch
+                external model details from cls.external_instance_details
+                and the third element as a properties dict with key as
+                property name in summary model and value as property name
+                in external model.
 
         Raises:
             NotImplementedError. This function has not yet been implemented.
@@ -344,17 +345,23 @@ class BaseSummaryModelValidator(BaseModelValidator):
 
         for (
                 external_model_name,
-                external_model_class_model_id_model_tuples,
+                external_model_field_key,
                 external_model_properties_dict
             ) in cls._get_external_model_properties():
 
-            for (_, _, external_model) in (
+            external_model_class_model_id_model_tuples = (
+                cls.external_instance_details[external_model_field_key])
+
+            for (model_class, model_id, external_model) in (
                     external_model_class_model_id_model_tuples):
-                # In the case of a missing external model, we don't
-                # report an error here since errors for missing external
-                # model are already checked and stored in
-                # _validate_external_id_relationships function.
                 if external_model is None or external_model.deleted:
+                    cls.errors[
+                        '%s field check' % external_model_field_key].append((
+                            'Entity id %s: based on field %s having value %s, '
+                            'expect model %s with id %s but it doesn\'t'
+                            ' exist' % (
+                                item.id, external_model_field_key,
+                                model_id, model_class.__name__, model_id)))
                     continue
                 for (property_name, external_model_property_name) in (
                         external_model_properties_dict.items()):
@@ -430,13 +437,15 @@ class BaseSnapshotContentModelValidator(BaseModelValidator):
             cls.external_instance_details['%s_ids' % key_to_fetch])
 
         version = item.id[item.id.rfind('-') + 1:]
-        for (_, _, external_model) in (
+        for (model_class, model_id, external_model) in (
                 external_model_class_model_id_model_tuples):
-            # In the case of a missing external model, we don't
-            # report an error here since errors for missing external
-            # model are already checked and stored in
-            # _validate_external_id_relationships function.
             if external_model is None or external_model.deleted:
+                cls.errors['%s_ids field check' % key_to_fetch].append((
+                    'Entity id %s: based on field %s_ids having'
+                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' exist' % (
+                        item.id, key_to_fetch, model_id,
+                        model_class.__name__, model_id)))
                 continue
             if int(external_model.version) < int(version):
                 cls.errors[
@@ -628,13 +637,14 @@ class BaseUserModelValidator(BaseModelValidator):
         exp_ids = []
         exploration_model_class_model_id_model_tuples = (
             cls.external_instance_details['exploration_ids'])
-        for (_, _, exploration_model) in (
+        for (model_class, model_id, exploration_model) in (
                 exploration_model_class_model_id_model_tuples):
-            # In the case of a missing external exploration model, we don't
-            # report an error here since errors for missing external exploration
-            # model are already checked and stored in
-            # _validate_external_id_relationships function.
             if exploration_model is None or exploration_model.deleted:
+                cls.errors['exploration_ids field check'].append((
+                    'Entity id %s: based on field exploration_ids having'
+                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' exist' % (
+                        item.id, model_id, model_class.__name__, model_id)))
                 continue
             exp_ids.append(exploration_model.id)
 
@@ -660,13 +670,14 @@ class BaseUserModelValidator(BaseModelValidator):
         col_ids = []
         collection_model_class_model_id_model_tuples = (
             cls.external_instance_details['collection_ids'])
-        for (_, _, collection_model) in (
+        for (model_class, model_id, collection_model) in (
                 collection_model_class_model_id_model_tuples):
-            # In the case of a missing external collection model, we don't
-            # report an error here since errors for missing external collection
-            # model are already checked and stored in
-            # _validate_external_id_relationships function.
             if collection_model is None or collection_model.deleted:
+                cls.errors['collection_ids field check'].append((
+                    'Entity id %s: based on field collection_ids having'
+                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' exist' % (
+                        item.id, model_id, model_class.__name__, model_id)))
                 continue
             col_ids.append(collection_model.id)
 
@@ -844,13 +855,14 @@ class ClassifierTrainingJobModelValidator(BaseModelValidator):
         exp_model_class_model_id_model_tuples = (
             cls.external_instance_details['exploration_ids'])
 
-        for (_, _, exp_model) in (
+        for (model_class, model_id, exp_model) in (
                 exp_model_class_model_id_model_tuples):
-            # In the case of a missing external exploration model, we don't
-            # report an error here since errors for missing external exploration
-            # model are already checked and stored in
-            # _validate_external_id_relationships function.
             if exp_model is None or exp_model.deleted:
+                cls.errors['exploration_ids field check'].append((
+                    'Entity id %s: based on field exploration_ids having'
+                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' exist' % (
+                        item.id, model_id, model_class.__name__, model_id)))
                 continue
             if item.exp_version > exp_model.version:
                 cls.errors['exp version check'].append((
@@ -872,13 +884,14 @@ class ClassifierTrainingJobModelValidator(BaseModelValidator):
         exp_model_class_model_id_model_tuples = (
             cls.external_instance_details['exploration_ids'])
 
-        for (_, _, exp_model) in (
+        for (model_class, model_id, exp_model) in (
                 exp_model_class_model_id_model_tuples):
-            # In the case of a missing external exploration model, we don't
-            # report an error here since errors for missing external exploration
-            # model are already checked and stored in
-            # _validate_external_id_relationships function.
             if exp_model is None or exp_model.deleted:
+                cls.errors['exploration_ids field check'].append((
+                    'Entity id %s: based on field exploration_ids having'
+                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' exist' % (
+                        item.id, model_id, model_class.__name__, model_id)))
                 continue
             if item.state_name not in exp_model.states.keys():
                 cls.errors['state name check'].append((
@@ -925,13 +938,14 @@ class TrainingJobExplorationMappingModelValidator(BaseModelValidator):
         exp_model_class_model_id_model_tuples = (
             cls.external_instance_details['exploration_ids'])
 
-        for (_, _, exp_model) in (
+        for (model_class, model_id, exp_model) in (
                 exp_model_class_model_id_model_tuples):
-            # In the case of a missing external exploration model, we don't
-            # report an error here since errors for missing external exploration
-            # model are already checked and stored in
-            # _validate_external_id_relationships function.
             if exp_model is None or exp_model.deleted:
+                cls.errors['exploration_ids field check'].append((
+                    'Entity id %s: based on field exploration_ids having'
+                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' exist' % (
+                        item.id, model_id, model_class.__name__, model_id)))
                 continue
             if item.exp_version > exp_model.version:
                 cls.errors['exp version check'].append((
@@ -953,13 +967,14 @@ class TrainingJobExplorationMappingModelValidator(BaseModelValidator):
         exp_model_class_model_id_model_tuples = (
             cls.external_instance_details['exploration_ids'])
 
-        for (_, _, exp_model) in (
+        for (model_class, model_id, exp_model) in (
                 exp_model_class_model_id_model_tuples):
-            # In the case of a missing external exploration model, we don't
-            # report an error here since errors for missing external exploration
-            # model are already checked and stored in
-            # _validate_external_id_relationships function.
             if exp_model is None or exp_model.deleted:
+                cls.errors['exploration_ids field check'].append((
+                    'Entity id %s: based on field exploration_ids having'
+                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' exist' % (
+                        item.id, model_id, model_class.__name__, model_id)))
                 continue
             if item.state_name not in exp_model.states.keys():
                 cls.errors['state name check'].append((
@@ -1235,13 +1250,14 @@ class CollectionSummaryModelValidator(BaseSummaryModelValidator):
         collection_model_class_model_id_model_tuples = (
             cls.external_instance_details['collection_ids'])
 
-        for (_, _, collection_model) in (
+        for (model_class, model_id, collection_model) in (
                 collection_model_class_model_id_model_tuples):
-            # In the case of a missing external collection model, we don't
-            # report an error here since errors for missing external collection
-            # model are already checked and stored in
-            # _validate_external_id_relationships function.
             if collection_model is None or collection_model.deleted:
+                cls.errors['collection_ids field check'].append((
+                    'Entity id %s: based on field collection_ids having'
+                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' exist' % (
+                        item.id, model_id, model_class.__name__, model_id)))
                 continue
             nodes = collection_model.collection_contents['nodes']
             if item.node_count != len(nodes):
@@ -1264,11 +1280,6 @@ class CollectionSummaryModelValidator(BaseSummaryModelValidator):
 
     @classmethod
     def _get_external_model_properties(cls):
-        collection_model_class_model_id_model_tuples = (
-            cls.external_instance_details['collection_ids'])
-        collection_rights_model_class_model_id_model_tuples = (
-            cls.external_instance_details['collection_rights_ids'])
-
         collection_model_properties_dict = {
             'title': 'title',
             'category': 'category',
@@ -1289,11 +1300,11 @@ class CollectionSummaryModelValidator(BaseSummaryModelValidator):
 
         return [(
             'collection',
-            collection_model_class_model_id_model_tuples,
+            'collection_ids',
             collection_model_properties_dict
         ), (
             'collection rights',
-            collection_rights_model_class_model_id_model_tuples,
+            'collection_rights_ids',
             collection_rights_model_properties_dict
         )]
 
@@ -1338,13 +1349,14 @@ class ExplorationOpportunitySummaryModelValidator(BaseSummaryModelValidator):
         exploration_model_class_model_id_model_tuples = (
             cls.external_instance_details['exploration_ids'])
 
-        for (_, _, exploration_model) in (
+        for (model_class, model_id, exploration_model) in (
                 exploration_model_class_model_id_model_tuples):
-            # In the case of a missing external exploration model, we don't
-            # report an error here since errors for missing external exploration
-            # model are already checked and stored in
-            # _validate_external_id_relationships function.
             if exploration_model is None or exploration_model.deleted:
+                cls.errors['exploration_ids field check'].append((
+                    'Entity id %s: based on field exploration_ids having'
+                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' exist' % (
+                        item.id, model_id, model_class.__name__, model_id)))
                 continue
             exploration = exp_fetchers.get_exploration_from_model(
                 exploration_model)
@@ -1369,13 +1381,14 @@ class ExplorationOpportunitySummaryModelValidator(BaseSummaryModelValidator):
         exploration_model_class_model_id_model_tuples = (
             cls.external_instance_details['exploration_ids'])
 
-        for (_, _, exploration_model) in (
+        for (model_class, model_id, exploration_model) in (
                 exploration_model_class_model_id_model_tuples):
-            # In the case of a missing external exploration model, we don't
-            # report an error here since errors for missing external exploration
-            # model are already checked and stored in
-            # _validate_external_id_relationships function.
             if exploration_model is None or exploration_model.deleted:
+                cls.errors['exploration_ids field check'].append((
+                    'Entity id %s: based on field exploration_ids having'
+                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' exist' % (
+                        item.id, model_id, model_class.__name__, model_id)))
                 continue
             exploration = exp_fetchers.get_exploration_from_model(
                 exploration_model)
@@ -1398,12 +1411,14 @@ class ExplorationOpportunitySummaryModelValidator(BaseSummaryModelValidator):
         story_model_class_model_id_model_tuples = (
             cls.external_instance_details['story_ids'])
 
-        for (_, _, story_model) in story_model_class_model_id_model_tuples:
-            # In the case of a missing external story model, we don't
-            # report an error here since errors for missing external story
-            # model are already checked and stored in
-            # _validate_external_id_relationships function.
+        for (model_class, model_id, story_model) in (
+                story_model_class_model_id_model_tuples):
             if story_model is None or story_model.deleted:
+                cls.errors['story_ids field check'].append((
+                    'Entity id %s: based on field story_ids having'
+                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' exist' % (
+                        item.id, model_id, model_class.__name__, model_id)))
                 continue
             story = story_fetchers.get_story_from_model(story_model)
             corresponding_story_node = (
@@ -1419,11 +1434,6 @@ class ExplorationOpportunitySummaryModelValidator(BaseSummaryModelValidator):
 
     @classmethod
     def _get_external_model_properties(cls):
-        topic_model_class_model_id_model_tuples = (
-            cls.external_instance_details['topic_ids'])
-        story_model_class_model_id_model_tuples = (
-            cls.external_instance_details['story_ids'])
-
         topic_model_properties_dict = {
             'topic_name': 'name'
         }
@@ -1434,11 +1444,11 @@ class ExplorationOpportunitySummaryModelValidator(BaseSummaryModelValidator):
 
         return [(
             'topic',
-            topic_model_class_model_id_model_tuples,
+            'topic_ids',
             topic_model_properties_dict
         ), (
             'story',
-            story_model_class_model_id_model_tuples,
+            'story_ids',
             story_model_properties_dict
         )]
 
@@ -1478,13 +1488,14 @@ class SkillOpportunityModelValidator(BaseSummaryModelValidator):
         skill_model_class_model_id_model_tuples = (
             cls.external_instance_details['skill_ids'])
 
-        for (_, _, skill_model) in (
+        for (model_class, model_id, skill_model) in (
                 skill_model_class_model_id_model_tuples):
-            # In the case of a missing external skill model, we don't
-            # report an error here since errors for missing external skill
-            # model are already checked and stored in
-            # _validate_external_id_relationships function.
             if skill_model is None or skill_model.deleted:
+                cls.errors['skill_ids field check'].append((
+                    'Entity id %s: based on field skill_ids having'
+                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' exist' % (
+                        item.id, model_id, model_class.__name__, model_id)))
                 continue
             skill = skill_services.get_skill_from_model(skill_model)
             question_skill_links = (
@@ -1499,16 +1510,13 @@ class SkillOpportunityModelValidator(BaseSummaryModelValidator):
 
     @classmethod
     def _get_external_model_properties(cls):
-        skill_model_class_model_id_model_tuples = (
-            cls.external_instance_details['skill_ids'])
-
         skill_model_properties_dict = {
             'skill_description': 'description'
         }
 
         return [(
             'skill',
-            skill_model_class_model_id_model_tuples,
+            'skill_ids',
             skill_model_properties_dict
         )]
 
@@ -1629,14 +1637,16 @@ class SentEmailModelValidator(BaseModelValidator):
         sender_model_class_model_id_model_tuples = (
             cls.external_instance_details['sender_id'])
 
-        for (_, _, sender_model) in (
+        for (model_class, model_id, sender_model) in (
                 sender_model_class_model_id_model_tuples):
-            # In the case of a missing external sender model, we don't
-            # report an error here since errors for missing external sender
-            # model are already checked and stored in
-            # _validate_external_id_relationships function.
-            if sender_model is not None and not sender_model.deleted and (
-                    sender_model.email != item.sender_email):
+            if sender_model is None or sender_model.deleted:
+                cls.errors['sender_id field check'].append((
+                    'Entity id %s: based on field sender_id having'
+                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' exist' % (
+                        item.id, model_id, model_class.__name__, model_id)))
+                continue
+            if sender_model.email != item.sender_email:
                 cls.errors['sender email check'].append((
                     'Entity id %s: Sender email %s in entity does not '
                     'match with email %s of user obtained through '
@@ -1656,14 +1666,16 @@ class SentEmailModelValidator(BaseModelValidator):
         recipient_model_class_model_id_model_tuples = (
             cls.external_instance_details['recipient_id'])
 
-        for (_, _, recipient_model) in (
+        for (model_class, model_id, recipient_model) in (
                 recipient_model_class_model_id_model_tuples):
-            # In the case of a missing external recipient model, we don't
-            # report an error here since errors for missing external recipient
-            # model are already checked and stored in
-            # _validate_external_id_relationships function.
-            if recipient_model is not None and not recipient_model.deleted and (
-                    recipient_model.email != item.recipient_email):
+            if recipient_model is None or recipient_model.deleted:
+                cls.errors['recipient_id field check'].append((
+                    'Entity id %s: based on field recipient_ids having'
+                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' exist' % (
+                        item.id, model_id, model_class.__name__, model_id)))
+                continue
+            if recipient_model.email != item.recipient_email:
                 cls.errors['recipient email check'].append((
                     'Entity id %s: Recipient email %s in entity does '
                     'not match with email %s of user obtained through '
@@ -1716,14 +1728,16 @@ class BulkEmailModelValidator(BaseModelValidator):
         sender_model_class_model_id_model_tuples = (
             cls.external_instance_details['sender_id'])
 
-        for (_, _, sender_model) in (
+        for (model_class, model_id, sender_model) in (
                 sender_model_class_model_id_model_tuples):
-            # In the case of a missing external sender model, we don't
-            # report an error here since errors for missing external sender
-            # model are already checked and stored in
-            # _validate_external_id_relationships function.
-            if sender_model is not None and not sender_model.deleted and (
-                    sender_model.email != item.sender_email):
+            if sender_model is None or sender_model.deleted:
+                cls.errors['sender_id field check'].append((
+                    'Entity id %s: based on field sender_id having'
+                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' exist' % (
+                        item.id, model_id, model_class.__name__, model_id)))
+                continue
+            if sender_model.email != item.sender_email:
                 cls.errors['sender email check'].append((
                     'Entity id %s: Sender email %s in entity does not '
                     'match with email %s of user obtained through '
@@ -2064,13 +2078,14 @@ class ExpSummaryModelValidator(BaseSummaryModelValidator):
         """
         exploration_model_class_model_id_model_tuples = (
             cls.external_instance_details['exploration_ids'])
-        for (_, _, exploration_model) in (
+        for (model_class, model_id, exploration_model) in (
                 exploration_model_class_model_id_model_tuples):
-            # In the case of a missing external exploration model, we don't
-            # report an error here since errors for missing external exploration
-            # model are already checked and stored in
-            # _validate_external_id_relationships function.
             if exploration_model is None or exploration_model.deleted:
+                cls.errors['exploration_ids field check'].append((
+                    'Entity id %s: based on field exploration_ids having'
+                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' exist' % (
+                        item.id, model_id, model_class.__name__, model_id)))
                 continue
             last_human_update_ms = exp_services.get_last_updated_by_human_ms(
                 exploration_model.id)
@@ -2086,11 +2101,6 @@ class ExpSummaryModelValidator(BaseSummaryModelValidator):
 
     @classmethod
     def _get_external_model_properties(cls):
-        exploration_model_class_model_id_model_tuples = (
-            cls.external_instance_details['exploration_ids'])
-        exploration_rights_model_class_model_id_model_tuples = (
-            cls.external_instance_details['exploration_rights_ids'])
-
         exploration_model_properties_dict = {
             'title': 'title',
             'category': 'category',
@@ -2111,11 +2121,11 @@ class ExpSummaryModelValidator(BaseSummaryModelValidator):
 
         return [(
             'exploration',
-            exploration_model_class_model_id_model_tuples,
+            'exploration_ids',
             exploration_model_properties_dict
         ), (
             'exploration rights',
-            exploration_rights_model_class_model_id_model_tuples,
+            'exploration_rights_ids',
             exploration_rights_model_properties_dict
         )]
 
@@ -2225,15 +2235,16 @@ class GeneralFeedbackMessageModelValidator(BaseModelValidator):
         feedback_thread_model_class_model_id_model_tuples = (
             cls.external_instance_details['feedback_thread_ids'])
 
-        for (_, _, feedback_thread_model) in (
+        for (model_class, model_id, feedback_thread_model) in (
                 feedback_thread_model_class_model_id_model_tuples):
-            # In the case of a missing external feedback model, we don't
-            # report an error here since errors for missing external feedback
-            # model are already checked and stored in
-            # _validate_external_id_relationships function.
-            if feedback_thread_model is not None and not (
-                    feedback_thread_model.deleted) and (
-                        item.message_id >= feedback_thread_model.message_count):
+            if feedback_thread_model is None or feedback_thread_model.deleted:
+                cls.errors['feedback_thread_ids field check'].append((
+                    'Entity id %s: based on field feedback_thread_ids having'
+                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' exist' % (
+                        item.id, model_id, model_class.__name__, model_id)))
+                continue
+            if item.message_id >= feedback_thread_model.message_count:
                 cls.errors['message id check'].append(
                     'Entity id %s: message id %s not less than total count '
                     'of messages %s in feedback thread model with id %s '
@@ -2625,13 +2636,14 @@ class QuestionSummaryModelValidator(BaseSummaryModelValidator):
         question_model_class_model_id_model_tuples = (
             cls.external_instance_details['question_ids'])
 
-        for (_, _, question_model) in (
+        for (model_class, model_id, question_model) in (
                 question_model_class_model_id_model_tuples):
-            # In the case of a missing external question model, we don't
-            # report an error here since errors for missing external question
-            # model are already checked and stored in
-            # _validate_external_id_relationships function.
             if question_model is None or question_model.deleted:
+                cls.errors['question_ids field check'].append((
+                    'Entity id %s: based on field question_ids having'
+                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' exist' % (
+                        item.id, model_id, model_class.__name__, model_id)))
                 continue
             content_html = question_model.question_state_data['content']['html']
             if item.question_content != content_html:
@@ -2644,9 +2656,6 @@ class QuestionSummaryModelValidator(BaseSummaryModelValidator):
 
     @classmethod
     def _get_external_model_properties(cls):
-        question_model_class_model_id_model_tuples = (
-            cls.external_instance_details['question_ids'])
-
         question_model_properties_dict = {
             'question_model_created_on': 'created_on',
             'question_model_last_updated': 'last_updated'
@@ -2654,7 +2663,7 @@ class QuestionSummaryModelValidator(BaseSummaryModelValidator):
 
         return [(
             'question',
-            question_model_class_model_id_model_tuples,
+            'question_ids',
             question_model_properties_dict
         )]
 
@@ -2889,10 +2898,6 @@ class SkillSummaryModelValidator(BaseSummaryModelValidator):
 
         for (_, _, skill_model) in (
                 skill_model_class_model_id_model_tuples):
-            # In the case of a missing external skill model, we don't
-            # report an error here since errors for missing external skill
-            # model are already checked and stored in
-            # _validate_external_id_relationships function.
             if not skill_model or skill_model.deleted:
                 continue
             if item.misconception_count != len(skill_model.misconceptions):
@@ -2914,13 +2919,14 @@ class SkillSummaryModelValidator(BaseSummaryModelValidator):
         skill_model_class_model_id_model_tuples = (
             cls.external_instance_details['skill_ids'])
 
-        for (_, _, skill_model) in (
+        for (model_class, model_id, skill_model) in (
                 skill_model_class_model_id_model_tuples):
-            # In the case of a missing external skill model, we don't
-            # report an error here since errors for missing external skill
-            # model are already checked and stored in
-            # _validate_external_id_relationships function.
             if not skill_model or skill_model.deleted:
+                cls.errors['skill_ids field check'].append((
+                    'Entity id %s: based on field skill_ids having'
+                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' exist' % (
+                        item.id, model_id, model_class.__name__, model_id)))
                 continue
             if item.worked_examples_count != len(
                     skill_model.skill_contents['worked_examples']):
@@ -2933,9 +2939,6 @@ class SkillSummaryModelValidator(BaseSummaryModelValidator):
 
     @classmethod
     def _get_external_model_properties(cls):
-        skill_model_class_model_id_model_tuples = (
-            cls.external_instance_details['skill_ids'])
-
         skill_model_properties_dict = {
             'description': 'description',
             'language_code': 'language_code',
@@ -2945,7 +2948,7 @@ class SkillSummaryModelValidator(BaseSummaryModelValidator):
 
         return [(
             'skill',
-            skill_model_class_model_id_model_tuples,
+            'skill_ids',
             skill_model_properties_dict
         )]
 
@@ -3079,12 +3082,14 @@ class StorySummaryModelValidator(BaseSummaryModelValidator):
         story_model_class_model_id_model_tuples = cls.external_instance_details[
             'story_ids']
 
-        for (_, _, story_model) in story_model_class_model_id_model_tuples:
-            # In the case of a missing external story model, we don't
-            # report an error here since errors for missing external story
-            # model are already checked and stored in
-            # _validate_external_id_relationships function.
+        for (model_class, model_id, story_model) in (
+                story_model_class_model_id_model_tuples):
             if story_model is None or story_model.deleted:
+                cls.errors['story_ids field check'].append((
+                    'Entity id %s: based on field story_ids having'
+                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' exist' % (
+                        item.id, model_id, model_class.__name__, model_id)))
                 continue
             nodes = story_model.story_contents['nodes']
             node_titles = [node.title for node in nodes]
@@ -3096,9 +3101,6 @@ class StorySummaryModelValidator(BaseSummaryModelValidator):
 
     @classmethod
     def _get_external_model_properties(cls):
-        story_model_class_model_id_model_tuples = cls.external_instance_details[
-            'story_ids']
-
         story_model_properties_dict = {
             'title': 'title',
             'language_code': 'language_code',
@@ -3109,7 +3111,7 @@ class StorySummaryModelValidator(BaseSummaryModelValidator):
 
         return [(
             'story',
-            story_model_class_model_id_model_tuples,
+            'story_ids',
             story_model_properties_dict
         )]
 
@@ -3180,13 +3182,15 @@ class GeneralSuggestionModelValidator(BaseModelValidator):
         target_model_class_model_id_model_tuples = (
             cls.external_instance_details['%s_ids' % item.target_type])
 
-        for (_, _, target_model) in (
+        for (model_class, model_id, target_model) in (
                 target_model_class_model_id_model_tuples):
-            # In the case of a missing external target model, we don't
-            # report an error here since errors for missing external target
-            # model are already checked and stored in
-            # _validate_external_id_relationships function.
             if target_model is None or target_model.deleted:
+                cls.errors['%s_ids field check' % item.target_type].append((
+                    'Entity id %s: based on field %s_ids having'
+                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' exist' % (
+                        item.id, item.target_type,
+                        model_id, model_class.__name__, model_id)))
                 continue
             if item.target_version_at_submission > target_model.version:
                 cls.errors['target version at submission check'].append(
@@ -3531,12 +3535,14 @@ class TopicSummaryModelValidator(BaseSummaryModelValidator):
         topic_model_class_model_id_model_tuples = cls.external_instance_details[
             'topic_ids']
 
-        for (_, _, topic_model) in topic_model_class_model_id_model_tuples:
-            # In the case of a missing external topic model, we don't
-            # report an error here since errors for missing external topic
-            # model are already checked and stored in
-            # _validate_external_id_relationships function.
+        for (model_class, model_id, topic_model) in (
+                topic_model_class_model_id_model_tuples):
             if topic_model is None or topic_model.deleted:
+                cls.errors['topic_ids field check'].append((
+                    'Entity id %s: based on field topic_ids having'
+                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' exist' % (
+                        item.id, model_id, model_class.__name__, model_id)))
                 continue
             pubished_canonical_story_ids = [
                 reference['story_id']
@@ -3562,12 +3568,14 @@ class TopicSummaryModelValidator(BaseSummaryModelValidator):
         topic_model_class_model_id_model_tuples = cls.external_instance_details[
             'topic_ids']
 
-        for (_, _, topic_model) in topic_model_class_model_id_model_tuples:
-            # In the case of a missing external topic model, we don't
-            # report an error here since errors for missing external topic
-            # model are already checked and stored in
-            # _validate_external_id_relationships function.
+        for (model_class, model_id, topic_model) in (
+                topic_model_class_model_id_model_tuples):
             if topic_model is None or topic_model.deleted:
+                cls.errors['topic_ids field check'].append((
+                    'Entity id %s: based on field topic_ids having'
+                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' exist' % (
+                        item.id, model_id, model_class.__name__, model_id)))
                 continue
             published_additional_story_ids = [
                 reference['story_id']
@@ -3595,12 +3603,14 @@ class TopicSummaryModelValidator(BaseSummaryModelValidator):
         topic_model_class_model_id_model_tuples = cls.external_instance_details[
             'topic_ids']
 
-        for (_, _, topic_model) in topic_model_class_model_id_model_tuples:
-            # In the case of a missing external topic model, we don't
-            # report an error here since errors for missing external topic
-            # model are already checked and stored in
-            # _validate_external_id_relationships function.
+        for (model_class, model_id, topic_model) in (
+                topic_model_class_model_id_model_tuples):
             if topic_model is None or topic_model.deleted:
+                cls.errors['topic_ids field check'].append((
+                    'Entity id %s: based on field topic_ids having'
+                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' exist' % (
+                        item.id, model_id, model_class.__name__, model_id)))
                 continue
             if item.uncategorized_skill_count != len(
                     topic_model.uncategorized_skill_ids):
@@ -3624,12 +3634,14 @@ class TopicSummaryModelValidator(BaseSummaryModelValidator):
         topic_model_class_model_id_model_tuples = cls.external_instance_details[
             'topic_ids']
 
-        for (_, _, topic_model) in topic_model_class_model_id_model_tuples:
-            # In the case of a missing external topic model, we don't
-            # report an error here since errors for missing external topic
-            # model are already checked and stored in
-            # _validate_external_id_relationships function.
+        for (model_class, model_id, topic_model) in (
+                topic_model_class_model_id_model_tuples):
             if topic_model is None or topic_model.deleted:
+                cls.errors['topic_ids field check'].append((
+                    'Entity id %s: based on field topic_ids having'
+                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' exist' % (
+                        item.id, model_id, model_class.__name__, model_id)))
                 continue
             subtopic_skill_ids = []
             for subtopic in topic_model.subtopics:
@@ -3657,12 +3669,14 @@ class TopicSummaryModelValidator(BaseSummaryModelValidator):
         topic_model_class_model_id_model_tuples = cls.external_instance_details[
             'topic_ids']
 
-        for (_, _, topic_model) in topic_model_class_model_id_model_tuples:
-            # In the case of a missing external topic model, we don't
-            # report an error here since errors for missing external topic
-            # model are already checked and stored in
-            # _validate_external_id_relationships function.
+        for (model_class, model_id, topic_model) in (
+                topic_model_class_model_id_model_tuples):
             if topic_model is None or topic_model.deleted:
+                cls.errors['topic_ids field check'].append((
+                    'Entity id %s: based on field topic_ids having'
+                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' exist' % (
+                        item.id, model_id, model_class.__name__, model_id)))
                 continue
             if item.subtopic_count != len(topic_model.subtopics):
                 cls.errors['subtopic count check'].append((
@@ -3673,9 +3687,6 @@ class TopicSummaryModelValidator(BaseSummaryModelValidator):
 
     @classmethod
     def _get_external_model_properties(cls):
-        topic_model_class_model_id_model_tuples = cls.external_instance_details[
-            'topic_ids']
-
         topic_model_properties_dict = {
             'name': 'name',
             'canonical_name': 'canonical_name',
@@ -3686,7 +3697,7 @@ class TopicSummaryModelValidator(BaseSummaryModelValidator):
 
         return [(
             'topic',
-            topic_model_class_model_id_model_tuples,
+            'topic_ids',
             topic_model_properties_dict
         )]
 
@@ -3985,13 +3996,14 @@ class ExpUserLastPlaythroughModelValidator(BaseUserModelValidator):
         """
         exploration_model_class_model_id_model_tuples = (
             cls.external_instance_details['exploration_ids'])
-        for (_, _, exploration_model) in (
+        for (model_class, model_id, exploration_model) in (
                 exploration_model_class_model_id_model_tuples):
-            # In the case of a missing external exploration model, we don't
-            # report an error here since errors for missing external exploration
-            # model are already checked and stored in
-            # _validate_external_id_relationships function.
             if exploration_model is None or exploration_model.deleted:
+                cls.errors['exploration_ids field check'].append((
+                    'Entity id %s: based on field exploration_ids having'
+                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' exist' % (
+                        item.id, model_id, model_class.__name__, model_id)))
                 continue
             if item.last_played_exp_version > exploration_model.version:
                 cls.errors['version check'].append(
@@ -4011,13 +4023,14 @@ class ExpUserLastPlaythroughModelValidator(BaseUserModelValidator):
         """
         exploration_model_class_model_id_model_tuples = (
             cls.external_instance_details['exploration_ids'])
-        for (_, _, exploration_model) in (
+        for (model_class, model_id, exploration_model) in (
                 exploration_model_class_model_id_model_tuples):
-            # In the case of a missing external exploration model, we don't
-            # report an error here since errors for missing external exploration
-            # model are already checked and stored in
-            # _validate_external_id_relationships function.
             if exploration_model is None or exploration_model.deleted:
+                cls.errors['exploration_ids field check'].append((
+                    'Entity id %s: based on field exploration_ids having'
+                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' exist' % (
+                        item.id, model_id, model_class.__name__, model_id)))
                 continue
             if item.last_played_state_name not in (
                     exploration_model.states.keys()):
@@ -4164,15 +4177,16 @@ class UserSubscriptionsModelValidator(BaseUserModelValidator):
         """
         subscriber_model_class_model_id_model_tuples = (
             cls.external_instance_details['subscriber_ids'])
-        for (_, _, subscriber_model) in (
+        for (model_class, model_id, subscriber_model) in (
                 subscriber_model_class_model_id_model_tuples):
-            # In the case of a missing external subscriber model, we don't
-            # report an error here since errors for missing external subscriber
-            # model are already checked and stored in
-            # _validate_external_id_relationships function.
-            if subscriber_model is not None and not (
-                    subscriber_model.deleted) and (
-                        item.id not in subscriber_model.subscriber_ids):
+            if subscriber_model is None or subscriber_model.deleted:
+                cls.errors['subscriber_ids field check'].append((
+                    'Entity id %s: based on field subscriber_ids having'
+                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' exist' % (
+                        item.id, model_id, model_class.__name__, model_id)))
+                continue
+            if item.id not in subscriber_model.subscriber_ids:
                 cls.errors['subscriber id check'].append(
                     'Entity id %s: User id is not present in subscriber ids of '
                     'creator with id %s to whom the user has subscribed' % (
@@ -4223,15 +4237,16 @@ class UserSubscribersModelValidator(BaseUserModelValidator):
         """
         subscription_model_class_model_id_model_tuples = (
             cls.external_instance_details['subscription_ids'])
-        for (_, _, subscription_model) in (
+        for (model_class, model_id, subscription_model) in (
                 subscription_model_class_model_id_model_tuples):
-            # In the case of a missing external subscription model, we don't
-            # report an error here since errors for missing external
-            # subscription model are already checked and stored in
-            # _validate_external_id_relationships function.
-            if subscription_model is not None and not (
-                    subscription_model.deleted) and (
-                        item.id not in subscription_model.creator_ids):
+            if subscription_model is None or subscription_model.deleted:
+                cls.errors['subscription_ids field check'].append((
+                    'Entity id %s: based on field subscription_ids having'
+                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' exist' % (
+                        item.id, model_id, model_class.__name__, model_id)))
+                continue
+            if item.id not in subscription_model.creator_ids:
                 cls.errors['subscription creator id check'].append(
                     'Entity id %s: User id is not present in creator ids to '
                     'which the subscriber of user with id %s has subscribed' % (
@@ -4430,13 +4445,14 @@ class ExplorationUserDataModelValidator(BaseUserModelValidator):
         """
         exploration_model_class_model_id_model_tuples = (
             cls.external_instance_details['exploration_ids'])
-        for (_, _, exploration_model) in (
+        for (model_class, model_id, exploration_model) in (
                 exploration_model_class_model_id_model_tuples):
-            # In the case of a missing external exploration model, we don't
-            # report an error here since errors for missing external exploration
-            # model are already checked and stored in
-            # _validate_external_id_relationships function.
             if exploration_model is None or exploration_model.deleted:
+                cls.errors['exploration_ids field check'].append((
+                    'Entity id %s: based on field exploration_ids having'
+                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' exist' % (
+                        item.id, model_id, model_class.__name__, model_id)))
                 continue
             if item.draft_change_list_exp_version > exploration_model.version:
                 cls.errors['exp version check'].append(
@@ -4489,33 +4505,36 @@ class CollectionProgressModelValidator(BaseUserModelValidator):
         completed_exp_ids = item.completed_explorations
         completed_activities_model_class_model_id_model_tuples = (
             cls.external_instance_details['completed_activities_ids'])
-        for (_, _, completed_activities_model) in (
+        for (model_class, model_id, completed_activities_model) in (
                 completed_activities_model_class_model_id_model_tuples):
-            # In the case of a missing external completed activites model,
-            # we don't report an error here since errors for missing external
-            # completed activities model are already checked and stored in
-            # _validate_external_id_relationships function.
-            if completed_activities_model is not None and not (
+            if completed_activities_model is None or (
                     completed_activities_model.deleted):
-                missing_exp_ids = [
-                    exp_id
-                    for exp_id in completed_exp_ids if exp_id not in (
-                        completed_activities_model.exploration_ids)]
-                if missing_exp_ids:
-                    cls.errors['completed exploration check'].append(
-                        'Entity id %s: Following completed exploration ids %s '
-                        'are not present in CompletedActivitiesModel for the '
-                        'user' % (item.id, missing_exp_ids))
+                cls.errors['completed_activities_ids field check'].append((
+                    'Entity id %s: based on field completed_activities_ids '
+                    'having value %s, expect model %s with id %s but it '
+                    'doesn\'t exist' % (
+                        item.id, model_id, model_class.__name__, model_id)))
+                continue
+            missing_exp_ids = [
+                exp_id
+                for exp_id in completed_exp_ids if exp_id not in (
+                    completed_activities_model.exploration_ids)]
+            if missing_exp_ids:
+                cls.errors['completed exploration check'].append(
+                    'Entity id %s: Following completed exploration ids %s '
+                    'are not present in CompletedActivitiesModel for the '
+                    'user' % (item.id, missing_exp_ids))
 
         collection_model_class_model_id_model_tuples = (
             cls.external_instance_details['collection_ids'])
-        for (_, _, collection_model) in (
+        for (model_class, model_id, collection_model) in (
                 collection_model_class_model_id_model_tuples):
-            # In the case of a missing external collection model, we don't
-            # report an error here since errors for missing external collection
-            # model are already checked and stored in
-            # _validate_external_id_relationships function.
             if collection_model is None or collection_model.deleted:
+                cls.errors['collection_ids field check'].append((
+                    'Entity id %s: based on field collection_ids having'
+                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' exist' % (
+                        item.id, model_id, model_class.__name__, model_id)))
                 continue
             collection_node_ids = [
                 node['exploration_id'] for node in (
@@ -4565,13 +4584,14 @@ class StoryProgressModelValidator(BaseUserModelValidator):
         """
         story_model_class_model_id_model_tuples = (
             cls.external_instance_details['story_ids'])
-        for (_, _, story_model) in (
+        for (model_class, model_id, story_model) in (
                 story_model_class_model_id_model_tuples):
-            # In the case of a missing external story model, we don't
-            # report an error here since errors for missing external story
-            # model are already checked and stored in
-            # _validate_external_id_relationships function.
             if story_model is None or story_model.deleted:
+                cls.errors['story_ids field check'].append((
+                    'Entity id %s: based on field story_ids having'
+                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' exist' % (
+                        item.id, model_id, model_class.__name__, model_id)))
                 continue
             topic_id = story_model.corresponding_topic_id
             if topic_id:
@@ -4600,13 +4620,14 @@ class StoryProgressModelValidator(BaseUserModelValidator):
             item.user_id)
         story_model_class_model_id_model_tuples = (
             cls.external_instance_details['story_ids'])
-        for (_, _, story_model) in (
+        for (model_class, model_id, story_model) in (
                 story_model_class_model_id_model_tuples):
-            # In the case of a missing external story model, we don't
-            # report an error here since errors for missing external story
-            # model are already checked and stored in
-            # _validate_external_id_relationships function.
             if story_model is None or story_model.deleted:
+                cls.errors['story_ids field check'].append((
+                    'Entity id %s: based on field story_ids having'
+                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' exist' % (
+                        item.id, model_id, model_class.__name__, model_id)))
                 continue
             story_node_ids = [
                 node['id'] for node in story_model.story_contents['nodes']]
@@ -4702,45 +4723,47 @@ class UserQueryModelValidator(BaseUserModelValidator):
         """
         email_model_class_model_id_model_tuples = (
             cls.external_instance_details['sent_email_model_ids'])
-        for (_, _, email_model) in (
+        for (model_class, model_id, email_model) in (
                 email_model_class_model_id_model_tuples):
-            # In the case of a missing external email model, we don't
-            # report an error here since errors for missing external email
-            # model are already checked and stored in
-            # _validate_external_id_relationships function.
-            if email_model is not None and not email_model.deleted:
-                extra_recipient_ids = [
-                    user_id
-                    for user_id in email_model.recipient_ids if user_id not in (
-                        item.user_ids)]
-                if extra_recipient_ids:
-                    cls.errors['recipient check'].append(
-                        'Entity id %s: Email model %s for query has following '
-                        'extra recipients %s which are not qualified as per '
-                        'the query'
-                        % (item.id, email_model.id, extra_recipient_ids))
-                if email_model.sender_id != item.submitter_id:
-                    cls.errors['sender check'].append(
-                        'Entity id %s: Sender id %s in email model with id %s '
-                        'does not match submitter id %s of query' % (
-                            item.id, email_model.sender_id,
-                            email_model.id, item.submitter_id))
+            if email_model is None or email_model.deleted:
+                cls.errors['sent_email_model_ids field check'].append((
+                    'Entity id %s: based on field sent_email_model_ids having'
+                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' exist' % (
+                        item.id, model_id, model_class.__name__, model_id)))
+                continue
+            extra_recipient_ids = [
+                user_id
+                for user_id in email_model.recipient_ids if user_id not in (
+                    item.user_ids)]
+            if extra_recipient_ids:
+                cls.errors['recipient check'].append(
+                    'Entity id %s: Email model %s for query has following '
+                    'extra recipients %s which are not qualified as per '
+                    'the query'
+                    % (item.id, email_model.id, extra_recipient_ids))
+            if email_model.sender_id != item.submitter_id:
+                cls.errors['sender check'].append(
+                    'Entity id %s: Sender id %s in email model with id %s '
+                    'does not match submitter id %s of query' % (
+                        item.id, email_model.sender_id,
+                        email_model.id, item.submitter_id))
 
-                recipient_user_ids = [
-                    recipient_id
-                    for recipient_id in email_model.recipient_ids if (
-                        recipient_id in item.user_ids)]
-                user_bulk_emails_model_list = (
-                    user_models.UserBulkEmailsModel.get_multi(
-                        recipient_user_ids))
-                for index, user_bulk_emails_model in enumerate(
-                        user_bulk_emails_model_list):
-                    if user_bulk_emails_model is None or (
-                            user_bulk_emails_model.deleted):
-                        cls.errors['user bulk email check'].append(
-                            'Entity id %s: UserBulkEmails model is missing for '
-                            'recipient with id %s' % (
-                                item.id, recipient_user_ids[index]))
+            recipient_user_ids = [
+                recipient_id
+                for recipient_id in email_model.recipient_ids if (
+                    recipient_id in item.user_ids)]
+            user_bulk_emails_model_list = (
+                user_models.UserBulkEmailsModel.get_multi(
+                    recipient_user_ids))
+            for index, user_bulk_emails_model in enumerate(
+                    user_bulk_emails_model_list):
+                if user_bulk_emails_model is None or (
+                        user_bulk_emails_model.deleted):
+                    cls.errors['user bulk email check'].append(
+                        'Entity id %s: UserBulkEmails model is missing for '
+                        'recipient with id %s' % (
+                            item.id, recipient_user_ids[index]))
 
     @classmethod
     def _get_custom_validation_functions(cls):
@@ -4770,14 +4793,16 @@ class UserBulkEmailsModelValidator(BaseUserModelValidator):
         """
         email_model_class_model_id_model_tuples = (
             cls.external_instance_details['sent_email_model_ids'])
-        for (_, _, email_model) in (
+        for (model_class, model_id, email_model) in (
                 email_model_class_model_id_model_tuples):
-            # In the case of a missing external email model, we don't
-            # report an error here since errors for missing external email
-            # model are already checked and stored in
-            # _validate_external_id_relationships function.
-            if email_model is not None and not email_model.deleted and (
-                    item.id not in email_model.recipient_ids):
+            if email_model is None or email_model.deleted:
+                cls.errors['sent_email_model_ids field check'].append((
+                    'Entity id %s: based on field sent_email_model_ids having'
+                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' exist' % (
+                        item.id, model_id, model_class.__name__, model_id)))
+                continue
+            if item.id not in email_model.recipient_ids:
                 cls.errors['recipient check'].append(
                     'Entity id %s: user id is not present in recipient ids '
                     'of BulkEmailModel with id %s' % (item.id, email_model.id))
