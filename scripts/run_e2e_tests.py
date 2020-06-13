@@ -439,10 +439,13 @@ def main(args=None):
         sys.exit(1)
     setup_and_install_dependencies(parsed_args.skip_install)
 
-
     atexit.register(cleanup)
 
     dev_mode = not parsed_args.prod_env
+
+    update_community_dashboard_status_in_feconf_file(
+        FECONF_FILE_PATH, parsed_args.community_dashboard_enabled)
+
     if not parsed_args.skip_build:
         build_js_files(
             dev_mode, deparallelize_terser=parsed_args.deparallelize_terser)
