@@ -30,7 +30,7 @@ describe('Community dashboard page', function() {
       new CommunityDashboardPage.CommunityDashboardPage());
     communityDashboardTranslateTextTab = (
       communityDashboardPage.getTranslateTextTab());
-    await browser.get('/community_dashboard');
+    await browser.get('/community-dashboard');
   });
 
   it('should allow user to switch to translate text tab', async function() {

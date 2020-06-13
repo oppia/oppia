@@ -46,6 +46,52 @@ import python_utils
 taskqueue_services = models.Registry.import_taskqueue_services()
 
 
+class OldNotificationsDashboardRedirectPageTest(test_utils.GenericTestBase):
+    """Test for redirecting the old notifications dashboard page URL
+    to the new one.
+    """
+
+    def test_old_notifications_dashboard_page_url(self):
+        """Test to validate that the old notifications dashboard page url
+        redirects to the new one.
+        """
+        response = self.get_html_response(
+            '/notifications_dashboard', expected_status_int=301)
+        self.assertEqual(
+            'http://localhost/notifications', response.headers['location'])
+
+
+class OldCommunityDashboardRedirectPageTest(test_utils.GenericTestBase):
+    """Test for redirecting the old community dashboard page URL
+    to the new one.
+    """
+
+    def test_old_community_dashboard_page_url(self):
+        """Test to validate that the old community dashboard page url
+        redirects to the new one.
+        """
+        response = self.get_html_response(
+            '/community_dashboard', expected_status_int=301)
+        self.assertEqual(
+            'http://localhost/community-dashboard',
+            response.headers['location'])
+
+
+class OldCreatorDashboardRedirectPageTest(test_utils.GenericTestBase):
+    """Test for redirecting the old creator dashboard page URL
+    to the new one.
+    """
+
+    def test_old_creator_dashboard_page_url(self):
+        """Test to validate that the old creator dashboard page url redirects
+        to the new one.
+        """
+        response = self.get_html_response(
+            '/creator_dashboard', expected_status_int=301)
+        self.assertEqual(
+            'http://localhost/creator-dashboard', response.headers['location'])
+
+
 class MockUserStatsAggregator(
         user_jobs_continuous.UserStatsAggregator):
     """A modified UserStatsAggregator that does not start a new
@@ -79,14 +125,14 @@ class HomePageTests(test_utils.GenericTestBase):
     def test_notifications_dashboard_redirects_for_logged_out_users(self):
         """Test the logged-out view of the notifications dashboard."""
         response = self.get_html_response(
-            '/notifications_dashboard', expected_status_int=302)
+            '/notifications', expected_status_int=302)
         # This should redirect to the login page.
         self.assertIn('signup', response.headers['location'])
-        self.assertIn('notifications_dashboard', response.headers['location'])
+        self.assertIn('notifications', response.headers['location'])
 
         self.login('reader@example.com')
         self.get_html_response(
-            '/notifications_dashboard', expected_status_int=302)
+            '/notifications', expected_status_int=302)
         # This should redirect the user to complete signup.
         self.logout()
 
@@ -95,7 +141,7 @@ class HomePageTests(test_utils.GenericTestBase):
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
 
         self.login(self.EDITOR_EMAIL)
-        self.get_html_response('/notifications_dashboard')
+        self.get_html_response('/notifications')
         self.logout()
 
 
@@ -860,7 +906,7 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
         self.login(self.OWNER_EMAIL)
 
         response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
-        self.assertIn('Creator Dashboard - Oppia', response.body)
+        self.assertIn('Creator Dashboard | Oppia', response.body)
 
         self.logout()
 

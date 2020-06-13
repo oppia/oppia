@@ -26,7 +26,7 @@ import { NormalizeWhitespacePipe } from
 import { NormalizeWhitespacePunctuationAndCasePipe } from
   // eslint-disable-next-line max-len
   'filters/string-utility-filters/normalize-whitespace-punctuation-and-case.pipe';
-import { IStateRulesStats, StateInteractionStatsService } from
+import { IStateInteractionStats, StateInteractionStatsService } from
   'services/state-interaction-stats.service';
 
 describe('State Interaction Stats Service', () => {
@@ -88,8 +88,8 @@ describe('State Interaction Stats Service', () => {
 
     it('should provide cached results after first call', fakeAsync(() => {
       this.statsCaptured = [];
-      const captureStats = (stats: IStateRulesStats) => {
-        expect(stats).not.toBeFalsy();
+      const captureStats = (stats: IStateInteractionStats) => {
+        expect(stats).toBeDefined();
         this.statsCaptured.push(stats);
       };
 
@@ -118,6 +118,51 @@ describe('State Interaction Stats Service', () => {
       expect(this.statsCaptured.length).toEqual(2);
       const [statsFromFirstFetch, statsFromSecondFetch] = this.statsCaptured;
       expect(statsFromSecondFetch).toBe(statsFromFirstFetch);
+    }));
+
+    it('should have separate caches for different states', fakeAsync(() => {
+      this.statsCaptured = [];
+      const captureStats = (stats: IStateInteractionStats) => {
+        expect(stats).toBeDefined();
+        this.statsCaptured.push(stats);
+      };
+
+      this.stateInteractionStatsService.computeStats(this.mockState)
+        .then(captureStats);
+      const holaReq = this.httpTestingController.expectOne(
+        '/createhandler/state_interaction_stats/expid/Hola');
+      expect(holaReq.request.method).toEqual('GET');
+      holaReq.flush({
+        visualizations_info: [{
+          data: [
+            {answer: 'Ni Hao', frequency: 5},
+            {answer: 'Aloha', frequency: 3},
+            {answer: 'Hola', frequency: 1}
+          ]
+        }]
+      });
+      flushMicrotasks();
+
+      this.mockState.name = 'Adios';
+      this.stateInteractionStatsService.computeStats(this.mockState)
+        .then(captureStats);
+      const adiosReq = this.httpTestingController.expectOne(
+        '/createhandler/state_interaction_stats/expid/Adios');
+      expect(adiosReq.request.method).toEqual('GET');
+      adiosReq.flush({
+        visualizations_info: [{
+          data: [
+            {answer: 'Zai Jian', frequency: 5},
+            {answer: 'Aloha', frequency: 3},
+            {answer: 'Adios', frequency: 1}
+          ]
+        }]
+      });
+      flushMicrotasks();
+
+      expect(this.statsCaptured.length).toEqual(2);
+      const [statsFromFirstFetch, statsFromSecondFetch] = this.statsCaptured;
+      expect(statsFromSecondFetch).not.toBe(statsFromFirstFetch);
     }));
 
     it('should include answer frequencies in the response', fakeAsync(() => {
