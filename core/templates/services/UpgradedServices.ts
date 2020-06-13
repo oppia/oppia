@@ -153,11 +153,11 @@ import { ExplorationObjectFactory } from
   'domain/exploration/ExplorationObjectFactory';
 import { ExplorationOpportunitySummaryObjectFactory } from
   'domain/opportunity/ExplorationOpportunitySummaryObjectFactory';
+import { ExplorationStatsBackendApiService } from
+  'services/exploration-stats-backend-api.service';
 import { ExplorationStatsObjectFactory } from
   'domain/statistics/ExplorationStatsObjectFactory';
 import { ExplorationStatsService } from 'services/exploration-stats.service';
-import { ExplorationStatsBackendApiService } from
-  'services/exploration-stats-backend-api.service';
 import { ExpressionParserService } from 'expressions/expression-parser.service';
 import { ExpressionSyntaxTreeService } from
   'expressions/expression-syntax-tree.service';

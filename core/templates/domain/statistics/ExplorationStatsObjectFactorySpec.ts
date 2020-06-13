@@ -27,6 +27,7 @@ import { StateStats } from 'domain/statistics/StateStatsObjectFactory';
 
 describe('Exploration stats', function() {
   let explorationStatsObjectFactory: ExplorationStatsObjectFactory = null;
+
   beforeEach(() => {
     explorationStatsObjectFactory = TestBed.get(ExplorationStatsObjectFactory);
   });

@@ -17,21 +17,22 @@
  */
 
 import { TestBed } from '@angular/core/testing';
-import { HighBounceRateTaskObjectFactory } from
-  'domain/improvements/HighBounceRateTaskObjectFactory';
+
 import { ExplorationStats, ExplorationStatsObjectFactory } from
   'domain/statistics/ExplorationStatsObjectFactory';
+import { HighBounceRateTaskObjectFactory } from
+  'domain/improvements/HighBounceRateTaskObjectFactory';
 import { IStateStatsBackendDict } from
   'domain/statistics/StateStatsObjectFactory';
 
 describe('High bounce rate task', function() {
-  let highBounceRateTaskObjectFactory: HighBounceRateTaskObjectFactory = null;
   let explorationStatsObjectFactory: ExplorationStatsObjectFactory = null;
+  let highBounceRateTaskObjectFactory: HighBounceRateTaskObjectFactory = null;
 
   beforeEach(() => {
+    explorationStatsObjectFactory = TestBed.get(ExplorationStatsObjectFactory);
     highBounceRateTaskObjectFactory = (
       TestBed.get(HighBounceRateTaskObjectFactory));
-    explorationStatsObjectFactory = TestBed.get(ExplorationStatsObjectFactory);
   });
 
   beforeEach(() => {

@@ -21,15 +21,15 @@ import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-import { ExplorationStatsBackendApiService } from
-  'services/exploration-stats-backend-api.service';
-import { IStateStatsBackendDict } from
-  'domain/statistics/StateStatsObjectFactory';
 import {
   ExplorationStats,
   ExplorationStatsObjectFactory,
   IExplorationStatsBackendDict
 } from 'domain/statistics/ExplorationStatsObjectFactory';
+import { ExplorationStatsBackendApiService } from
+  'services/exploration-stats-backend-api.service';
+import { IStateStatsBackendDict } from
+  'domain/statistics/StateStatsObjectFactory';
 
 describe('Exploration stats backend api service', () => {
   let explorationStatsBackendApiService: ExplorationStatsBackendApiService;
