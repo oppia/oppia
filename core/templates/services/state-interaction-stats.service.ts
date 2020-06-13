@@ -68,7 +68,7 @@ export interface IStateRulesStats {
 @Injectable({providedIn: 'root'})
 export class StateInteractionStatsService {
   // NOTE TO DEVELOPERS: Fulfilled promises can be reused indefinitely.
-  cachedStats: Promise<IStateRulesStats> = null;
+  statsCache: Map<string, Promise<IStateRulesStats>> = new Map();
 
   constructor(
       private answerClassificationService: AnswerClassificationService,
@@ -86,7 +86,7 @@ export class StateInteractionStatsService {
     return state.interaction.id === 'TextInput';
   }
 
-  // Converts answer to a more-readable representation based on their type.
+  // Converts answer to a more-readable representation based on its type.
   private getReadableAnswerString(state: State, answer: Answer): Answer {
     if (state.interaction.id === 'FractionInput') {
       return (
@@ -100,34 +100,36 @@ export class StateInteractionStatsService {
    * answer-statistics.
    */
   computeStats(state: State): Promise<IStateRulesStats> {
-    if (this.cachedStats === null) {
-      const explorationId = this.contextService.getExplorationId();
-      const interactionRulesService = (
-        this.interactionRulesRegistryService.getRulesServiceByInteractionId(
-          state.interaction.id));
-
-      this.cachedStats = this.stateInteractionStatsBackendApiService.getStats(
-        explorationId, state.name).then(vizInfo => <IStateRulesStats> {
-          explorationId: explorationId,
-          stateName: state.name,
-          visualizationsInfo: vizInfo.map(info => <IVisualizationInfo> ({
-            addressedInfoIsSupported: info.addressedInfoIsSupported,
-            data: info.data.map(datum => <IAnswerData>{
-              answer: this.getReadableAnswerString(state, datum.answer),
-              frequency: datum.frequency,
-              isAddressed: (
-                info.addressedInfoIsSupported ?
-                this.answerClassificationService
-                  .isClassifiedExplicitlyOrGoesToNewState(
-                    state.name, state, datum.answer, interactionRulesService) :
-                undefined)
-            }),
-            id: info.id,
-            options: info.options
-          })),
-        });
+    if (this.statsCache.has(state.name)) {
+      return this.statsCache.get(state.name);
     }
-    return this.cachedStats;
+    const explorationId = this.contextService.getExplorationId();
+    const interactionRulesService = (
+      this.interactionRulesRegistryService.getRulesServiceByInteractionId(
+        state.interaction.id));
+
+    const statsPromise = this.stateInteractionStatsBackendApiService.getStats(
+      explorationId, state.name).then(vizInfo => <IStateRulesStats> {
+        explorationId: explorationId,
+        stateName: state.name,
+        visualizationsInfo: vizInfo.map(info => <IVisualizationInfo> ({
+          addressedInfoIsSupported: info.addressedInfoIsSupported,
+          data: info.data.map(datum => <IAnswerData>{
+            answer: this.getReadableAnswerString(state, datum.answer),
+            frequency: datum.frequency,
+            isAddressed: (
+              info.addressedInfoIsSupported ?
+              this.answerClassificationService
+                .isClassifiedExplicitlyOrGoesToNewState(
+                  state.name, state, datum.answer, interactionRulesService) :
+              undefined)
+          }),
+          id: info.id,
+          options: info.options
+        })),
+      });
+    this.statsCache.set(state.name, statsPromise);
+    return statsPromise;
   }
 }
 

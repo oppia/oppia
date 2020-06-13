@@ -30,6 +30,9 @@ require(
   'components/question-directives/questions-list/' +
   'questions-list.constants.ajs.ts');
 require(
+  'components/skill-selector/' +
+  'questions-list-select-skill-modal.controller.ts');
+require(
   'components/skill-selector/skill-selector.directive.ts');
 
 require(
