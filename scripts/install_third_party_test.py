@@ -19,9 +19,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import codecs
 import os
-import shutil
 import tarfile
 import tempfile
 import zipfile
@@ -377,28 +375,3 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             with unzip_files_swap, untar_files_swap:
                 install_third_party.main(args=[])
         self.assertEqual(check_function_calls, expected_check_function_calls)
-
-    def test_remove_emojis_from_guppy(self):
-        source_url = (
-            'https://github.com/daniel3735928559/guppy/archive/f9440220a73685e'
-            'a9011c285a4af798f381de53a.zip')
-        file_name = 'guppy-f9440220a73685ea9011c285a4af798f381de53a'
-
-        install_third_party.download_and_unzip_files(
-            source_url, RELEASE_TEST_DIR, file_name, file_name)
-
-        guppy_file_path = os.path.join(
-            RELEASE_TEST_DIR, file_name, 'build', 'guppy.min.js')
-
-        install_third_party.remove_emojis_from_guppy(guppy_file_path)
-
-        text = (
-            u'utf8chars:{template:"utf8char",values:{banana:{char:"🍌"},'
-            u'pineapple:{char:"🍍"},mango:{char:"🥭"},kiwi:{char:"🥝"}}},')
-
-        with codecs.open(guppy_file_path, mode='r', encoding='utf-8') as f:
-            file_content = f.read()
-
-        shutil.rmtree(os.path.join(RELEASE_TEST_DIR, file_name))
-
-        self.assertNotIn(text, file_content)
