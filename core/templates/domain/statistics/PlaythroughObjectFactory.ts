@@ -43,8 +43,6 @@ export type IIssueCustomizationArgs = (
   IEarlyQuitCustomizationArgs);
 
 export interface IPlaythroughBackendDict {
-  'playthrough_id'?: string;
-  'id'?: string;
   'exp_id': string;
   'exp_version': number;
   'issue_type': string;
@@ -54,7 +52,6 @@ export interface IPlaythroughBackendDict {
 
 export class Playthrough {
   constructor(
-      public playthroughId: string,
       public expId: string,
       public expVersion: number,
       public issueType: string,
@@ -68,7 +65,6 @@ export class Playthrough {
 
   toBackendDict(): IPlaythroughBackendDict {
     return {
-      id: this.playthroughId,
       exp_id: this.expId,
       exp_version: this.expVersion,
       issue_type: this.issueType,
@@ -85,21 +81,19 @@ export class PlaythroughObjectFactory {
   constructor(private learnerActionObjectFactory: LearnerActionObjectFactory) {}
 
   createNew(
-      playthroughId: string, expId: string, expVersion: number,
-      issueType: string, issueCustomizationArgs: IIssueCustomizationArgs,
+      expId: string, expVersion: number, issueType: string,
+      issueCustomizationArgs: IIssueCustomizationArgs,
       actions: LearnerAction[]): Playthrough {
     return new Playthrough(
-      playthroughId, expId, expVersion, issueType, issueCustomizationArgs,
+      expId, expVersion, issueType, issueCustomizationArgs,
       actions);
   }
 
-  createFromBackendDict(
-      playthroughBackendDict: IPlaythroughBackendDict): Playthrough {
+  createFromBackendDict(backendDict: IPlaythroughBackendDict): Playthrough {
     return new Playthrough(
-      playthroughBackendDict.playthrough_id, playthroughBackendDict.exp_id,
-      playthroughBackendDict.exp_version, playthroughBackendDict.issue_type,
-      playthroughBackendDict.issue_customization_args,
-      playthroughBackendDict.actions.map(
+      backendDict.exp_id, backendDict.exp_version, backendDict.issue_type,
+      backendDict.issue_customization_args,
+      backendDict.actions.map(
         d => this.learnerActionObjectFactory.createFromBackendDict(d)));
   }
 }

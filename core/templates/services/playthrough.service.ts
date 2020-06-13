@@ -45,7 +45,7 @@ class MultipleIncorrectAnswersTracker {
     this.currentStateName = initStateName;
   }
 
-  isIssue(): boolean {
+  isExampleOfIssue(): boolean {
     return this.numTries >= ServicesConstants.NUM_INCORRECT_ANSWERS_THRESHOLD;
   }
 
@@ -78,7 +78,7 @@ class CyclicStateTransitionsTracker {
     return this.visitedStates[this.visitedStates.length - 1];
   }
 
-  isIssue(): boolean {
+  isExampleOfIssue(): boolean {
     return this.numCycles >= ServicesConstants.NUM_REPEATED_CYCLES_THRESHOLD;
   }
 
@@ -105,7 +105,7 @@ class EarlyQuitTracker {
       public stateName: string = null,
       public timeSpentInStateSecs: number = null) {}
 
-  isIssue(): boolean {
+  isExampleOfIssue(): boolean {
     return (
       this.timeSpentInStateSecs !== null &&
       this.timeSpentInStateSecs < ServicesConstants.EARLY_QUIT_THRESHOLD_IN_SECS
@@ -122,16 +122,16 @@ class EarlyQuitTracker {
   providedIn: 'root'
 })
 export class PlaythroughService {
-  private explorationId?: string = null;
-  private explorationVersion?: number = null;
-  private isLearnerInSamplePopulation?: boolean = null;
+  private explorationId: string = null;
+  private explorationVersion: number = null;
+  private learnerIsInSamplePopulation: boolean = null;
 
-  private eqTracker?: EarlyQuitTracker = null;
-  private cstTracker?: CyclicStateTransitionsTracker = null;
-  private misTracker?: MultipleIncorrectAnswersTracker = null;
-  private playthrough?: Playthrough = null;
-  private stopwatch?: Stopwatch = null;
-  private expDurationInSecs?: number = null;
+  private eqTracker: EarlyQuitTracker = null;
+  private cstTracker: CyclicStateTransitionsTracker = null;
+  private misTracker: MultipleIncorrectAnswersTracker = null;
+  private playthrough: Playthrough = null;
+  private stopwatch: Stopwatch = null;
+  private expDurationInSecs: number = null;
 
   constructor(
       private explorationFeaturesService: ExplorationFeaturesService,
@@ -148,7 +148,7 @@ export class PlaythroughService {
    *    3. EarlyQuitIssue
    */
   private classifyPlaythrough(): void {
-    if (this.misTracker !== null && this.misTracker.isIssue()) {
+    if (this.misTracker !== null && this.misTracker.isExampleOfIssue()) {
       this.playthrough.issueType = (
         AppConstants.ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS);
       this.playthrough.issueCustomizationArgs = (
@@ -156,14 +156,14 @@ export class PlaythroughService {
           state_name: {value: this.misTracker.currentStateName},
           num_times_answered_incorrectly: {value: this.misTracker.numTries}
         });
-    } else if (this.cstTracker !== null && this.cstTracker.isIssue()) {
+    } else if (this.cstTracker !== null && this.cstTracker.isExampleOfIssue()) {
       this.playthrough.issueType = (
         AppConstants.ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS);
       this.playthrough.issueCustomizationArgs = (
         <ICyclicStateTransitionsCustomizationArgs>{
           state_names: {value: this.cstTracker.cycle}
         });
-    } else if (this.eqTracker !== null && this.eqTracker.isIssue()) {
+    } else if (this.eqTracker !== null && this.eqTracker.isExampleOfIssue()) {
       this.playthrough.issueType = AppConstants.ISSUE_TYPE_EARLY_QUIT;
       this.playthrough.issueCustomizationArgs = (
         <IEarlyQuitCustomizationArgs>{
@@ -176,7 +176,7 @@ export class PlaythroughService {
   private isPlaythroughRecordingEnabled(): boolean {
     return (
       this.explorationFeaturesService.isPlaythroughRecordingEnabled() &&
-      this.isLearnerInSamplePopulation === true);
+      this.learnerIsInSamplePopulation === true);
   }
 
   private isLearnerJustBrowsing(): boolean {
@@ -192,7 +192,7 @@ export class PlaythroughService {
       sampleSizePopulationProportion: number): void {
     this.explorationId = explorationId;
     this.explorationVersion = explorationVersion;
-    this.isLearnerInSamplePopulation = (
+    this.learnerIsInSamplePopulation = (
       Math.random() < sampleSizePopulationProportion);
   }
 
