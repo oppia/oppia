@@ -1519,18 +1519,19 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
                     'schema_version': 1
                 }
             ])
-        stats_models.ExplorationIssuesModel.create(self.exp_id, 1, [
-            {
-                'issue_type': 'EarlyQuit',
-                'issue_customization_args': {
-                    'state_name': {'value': 'state_name1'},
-                    'time_spent_in_exp_in_msecs': {'value': 200}
-                    },
-                'playthrough_ids': [playthrough_id],
-                'schema_version': 1,
-                'is_valid': True
-            }
-        ])
+        stats_models.ExplorationIssuesModel.create(
+            self.exp_id, 1, [
+                {
+                    'issue_type': 'EarlyQuit',
+                    'issue_customization_args': {
+                        'state_name': {'value': 'state_name1'},
+                        'time_spent_in_exp_in_msecs': {'value': 200}
+                        },
+                    'playthrough_ids': [playthrough_id],
+                    'schema_version': 1,
+                    'is_valid': True
+                }
+            ])
 
         self.playthrough_data = {
             'exp_id': self.exp_id,

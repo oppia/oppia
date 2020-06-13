@@ -240,14 +240,6 @@ class StorePlaythroughHandler(base.BaseHandler):
     the playthrough already exists, it is updated in the datastore.
     """
 
-    def __init__(self, *args, **kwargs):
-        """Method that initializes member variables for the handler.
-
-        Attributes:
-        """
-        super(StorePlaythroughHandler, self).__init__(*args, **kwargs)
-        self.exp_issues = None
-
     def _get_matching_exp_issue(self, playthrough, exp_issues):
         """Finds an issue with the equivalent issue_type and associated states
         as the given playthrough in the unresolved issues list of the
@@ -281,6 +273,7 @@ class StorePlaythroughHandler(base.BaseHandler):
         Args:
             playthrough: Playthrough. The playthrough domain object.
             exp_issues: ExplorationIssues. The exploration issues domain object.
+            issue_schema_version: int. The version of the issue schema.
 
         Returns:
             bool. Whether a playthrough was stored.
@@ -328,8 +321,8 @@ class StorePlaythroughHandler(base.BaseHandler):
             stats_models.ExplorationIssuesModel.get_model(
                 exploration_id, playthrough.exp_version))
 
-        if self._assign_playthrough_to_issue(playthrough, exp_issues,
-                                             issue_schema_version):
+        if self._assign_playthrough_to_issue(
+                playthrough, exp_issues, issue_schema_version):
             stats_services.save_exp_issues_model_transactional(exp_issues)
         self.render_json({})
 
