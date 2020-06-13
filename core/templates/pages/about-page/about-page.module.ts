@@ -36,15 +36,6 @@ import { SharedComponentsModule } from 'components/shared-component.module';
 
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
-import { CamelCaseToHyphensPipe } from
-  'filters/string-utility-filters/camel-case-to-hyphens.pipe';
-import { NormalizeWhitespacePipe } from
-  'filters/string-utility-filters/normalize-whitespace.pipe';
-import { FormatTimePipe } from 'filters/format-timer.pipe';
-/* eslint-disable max-len */
-import { NormalizeWhitespacePunctuationAndCasePipe } from
-  'filters/string-utility-filters/normalize-whitespace-punctuation-and-case.pipe';
-/* eslint-enable max-len */
 
 import { AppConstants } from 'app.constants';
 import { InteractionsExtensionsConstants } from
@@ -74,11 +65,7 @@ import { AboutPageConstants } from 'pages/about-page/about-page.constants';
       provide: HTTP_INTERCEPTORS,
       useClass: RequestInterceptor,
       multi: true
-    },
-    CamelCaseToHyphensPipe,
-    NormalizeWhitespacePipe,
-    FormatTimePipe,
-    NormalizeWhitespacePunctuationAndCasePipe
+    }
   ]
 })
 class AboutPageModule {
