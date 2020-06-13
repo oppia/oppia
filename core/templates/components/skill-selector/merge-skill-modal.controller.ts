@@ -24,7 +24,7 @@ angular.module('oppia').controller('MergeSkillModalController', [
   '$controller', '$scope', '$uibModalInstance', 'categorizedSkills', 'skill',
   'skillSummaries',
   function($controller, $scope, $uibModalInstance, categorizedSkills, skill,
-     skillSummaries) {
+      skillSummaries) {
     $controller('ConfirmOrCancelModalController', {
       $scope: $scope,
       $uibModalInstance: $uibModalInstance
@@ -32,7 +32,7 @@ angular.module('oppia').controller('MergeSkillModalController', [
 
     $scope.skillSummaries = skillSummaries;
     $scope.categorizedSkills = categorizedSkills;
-    $scope.allowSkillsFromOtherTopics = true
+    $scope.allowSkillsFromOtherTopics = true;
     $scope.selectedSkillId = '';
     $scope.confirm = function() {
       $uibModalInstance.close(
