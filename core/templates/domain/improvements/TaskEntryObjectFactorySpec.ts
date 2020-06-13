@@ -13,7 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview TODO
+ * @fileoverview Unit tests for the public interface of the TaskEntry domain
+ *    object.
  */
 
 import { TestBed } from '@angular/core/testing';

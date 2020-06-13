@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview TODO
+ * @fileoverview Unit tests for the ExplorationStatsService.
  */
 
 import { HttpClientTestingModule } from
@@ -27,7 +27,7 @@ import { ExplorationStatsObjectFactory } from
   'domain/statistics/ExplorationStatsObjectFactory';
 import { ExplorationStatsService } from 'services/exploration-stats.service';
 
-describe('Exploration stats', function() {
+describe('Exploration stats service', function() {
   let contextService: ContextService = null;
   let explorationStatsBackendApiService: ExplorationStatsBackendApiService = (
     null);
@@ -51,12 +51,9 @@ describe('Exploration stats', function() {
       explorationStatsObjectFactory.createFromBackendDict({
         exp_id: 'eid',
         exp_version: 1,
-        num_starts_v1: 1,
-        num_starts_v2: 2,
-        num_actual_starts_v1: 10,
-        num_actual_starts_v2: 20,
-        num_completions_v1: 100,
-        num_completions_v2: 200,
+        num_starts: 2,
+        num_actual_starts: 20,
+        num_completions: 200,
         state_stats_mapping: {},
       }));
   });

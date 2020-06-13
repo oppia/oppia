@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview TODO
+ * @fileoverview Constants related to improvements tasks.
  */
 
 export namespace ImprovementsConstants {

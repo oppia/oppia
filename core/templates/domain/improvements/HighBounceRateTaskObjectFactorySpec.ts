@@ -13,11 +13,11 @@
 // limitations under the License.
 
 /**
- * @fileoverview TODO
+ * @fileoverview Unit tests for the HighBounceRateTask domain object.
  */
 
 import { TestBed } from '@angular/core/testing';
-import { HighBounceRateTask, HighBounceRateTaskObjectFactory } from
+import { HighBounceRateTaskObjectFactory } from
   'domain/improvements/HighBounceRateTaskObjectFactory';
 import { ExplorationStats, ExplorationStatsObjectFactory } from
   'domain/statistics/ExplorationStatsObjectFactory';
@@ -40,26 +40,18 @@ describe('High bounce rate task', function() {
         return explorationStatsObjectFactory.createFromBackendDict({
           exp_id: 'eid',
           exp_version: 1,
-          num_starts_v1: numExpStarts,
-          num_starts_v2: 2,
-          num_actual_starts_v1: 10,
-          num_actual_starts_v2: 20,
-          num_completions_v1: 100,
-          num_completions_v2: 200,
+          num_starts: numExpStarts,
+          num_actual_starts: 20,
+          num_completions: 200,
           state_stats_mapping: {
             Introduction: (
               <IStateStatsBackendDict>{
-                total_answers_count_v1: 0,
-                total_answers_count_v2: 0,
-                useful_feedback_count_v1: 0,
-                useful_feedback_count_v2: 0,
-                total_hit_count_v1: numExpStarts,
-                total_hit_count_v2: 0,
-                first_hit_count_v1: 0,
-                first_hit_count_v2: 0,
-                num_times_solution_viewed_v2: 0,
-                num_completions_v1: numExpStarts * (1.0 - bounceRate),
-                num_completions_v2: 0,
+                total_answers_count: 0,
+                useful_feedback_count: 0,
+                total_hit_count: numExpStarts,
+                first_hit_count: 0,
+                num_times_solution_viewed: 0,
+                num_completions: numExpStarts * (1 - bounceRate),
               }),
           },
         });

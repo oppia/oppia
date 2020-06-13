@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview TODO
+ * @fileoverview Domain object for holding the stats of an exploration.
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
@@ -25,12 +25,9 @@ import { IStateStatsBackendDict, StateStats, StateStatsObjectFactory } from
 export interface IExplorationStatsBackendDict {
   'exp_id': string;
   'exp_version': number;
-  'num_starts_v1': number;
-  'num_starts_v2': number;
-  'num_actual_starts_v1': number;
-  'num_actual_starts_v2': number;
-  'num_completions_v1': number;
-  'num_completions_v2': number;
+  'num_starts': number;
+  'num_actual_starts': number;
+  'num_completions': number;
   'state_stats_mapping': {[stateName: string]: IStateStatsBackendDict};
 }
 
@@ -67,25 +64,18 @@ export class ExplorationStatsObjectFactory {
   constructor(private stateStatsObjectFactory: StateStatsObjectFactory) {}
 
   createFromBackendDict(
-      expStatsBackendDict: IExplorationStatsBackendDict): ExplorationStats {
-    const numStarts = (
-      expStatsBackendDict.num_starts_v1 + expStatsBackendDict.num_starts_v2);
-    const numActualStarts = (
-      expStatsBackendDict.num_actual_starts_v1 +
-      expStatsBackendDict.num_actual_starts_v2);
-    const numCompletions = (
-      expStatsBackendDict.num_completions_v1 +
-      expStatsBackendDict.num_completions_v2);
+      backendDict: IExplorationStatsBackendDict): ExplorationStats {
     const stateStatsMapping = new Map(
-      Object.entries(expStatsBackendDict.state_stats_mapping).map(
+      Object.entries(backendDict.state_stats_mapping).map(
         ([stateName, stateStats]) => [
           stateName,
           this.stateStatsObjectFactory.createFromBackendDict(stateStats)
         ]));
 
     return new ExplorationStats(
-      expStatsBackendDict.exp_id, expStatsBackendDict.exp_version,
-      numStarts, numActualStarts, numCompletions, stateStatsMapping);
+      backendDict.exp_id, backendDict.exp_version, backendDict.num_starts,
+      backendDict.num_actual_starts, backendDict.num_completions,
+      stateStatsMapping);
   }
 }
 

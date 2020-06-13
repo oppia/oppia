@@ -59,16 +59,16 @@ angular.module('oppia').directive('statisticsTab', [
         '$http', '$scope', '$uibModal', 'AlertsService', 'ComputeGraphService',
         'DateTimeFormatService', 'ExplorationDataService',
         'ExplorationFeaturesService', 'ExplorationStatesService',
-        'ExplorationStatsService', 'ReadOnlyExplorationBackendApiService',
-        'RouterService', 'StateImprovementSuggestionService',
+        'ReadOnlyExplorationBackendApiService', 'RouterService',
+        'StateImprovementSuggestionService',
         'StateInteractionStatsService', 'StatesObjectFactory',
         'UrlInterpolationService', 'IMPROVE_TYPE_INCOMPLETE',
         function(
             $http, $scope, $uibModal, AlertsService, ComputeGraphService,
             DateTimeFormatService, ExplorationDataService,
             ExplorationFeaturesService, ExplorationStatesService,
-            ExplorationStatsService, ReadOnlyExplorationBackendApiService,
-            RouterService, StateImprovementSuggestionService,
+            ReadOnlyExplorationBackendApiService, RouterService,
+            StateImprovementSuggestionService,
             StateInteractionStatsService, StatesObjectFactory,
             UrlInterpolationService, IMPROVE_TYPE_INCOMPLETE) {
           var ctrl = this;
@@ -80,13 +80,17 @@ angular.module('oppia').directive('statisticsTab', [
               millisSinceEpoch);
           };
           ctrl.refreshExplorationStatistics = function(version) {
-            const expId = ExplorationDataService.explorationId;
+            ctrl.explorationStatisticsUrl = (
+              '/createhandler/statistics/' +
+              ExplorationDataService.explorationId);
 
-            ExplorationStatsService.fetchExplorationStats(expId).then(data => {
-              var numStarts = data.numStarts;
-              var numActualStarts = data.numActualStarts;
-              var numCompletions = data.numCompletions;
-              ctrl.stateStats = data.stateStatsMapping;
+            $http.get(ctrl.explorationStatisticsUrl).then(function(
+                statsResponse) {
+              var data = statsResponse.data;
+              var numStarts = data.num_starts;
+              var numActualStarts = data.num_actual_starts;
+              var numCompletions = data.num_completions;
+              ctrl.stateStats = data.state_stats_mapping;
 
               ReadOnlyExplorationBackendApiService.loadLatestExploration(
                 ExplorationDataService.explorationId).then(function(response) {

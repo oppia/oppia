@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview TODO
+ * @fileoverview Unit tests for the ExplorationStats domain object.
  */
 
 import { TestBed } from '@angular/core/testing';
@@ -35,12 +35,9 @@ describe('Exploration stats', function() {
     const explorationStatsBackendDict: IExplorationStatsBackendDict = {
       exp_id: 'eid',
       exp_version: 1,
-      num_starts_v1: 1,
-      num_starts_v2: 2,
-      num_actual_starts_v1: 10,
-      num_actual_starts_v2: 20,
-      num_completions_v1: 100,
-      num_completions_v2: 200,
+      num_starts: 1,
+      num_actual_starts: 10,
+      num_completions: 100,
       state_stats_mapping: {},
     };
 
@@ -50,9 +47,9 @@ describe('Exploration stats', function() {
 
     expect(explorationStats.expId).toEqual('eid');
     expect(explorationStats.expVersion).toEqual(1);
-    expect(explorationStats.numStarts).toEqual(3);
-    expect(explorationStats.numActualStarts).toEqual(30);
-    expect(explorationStats.numCompletions).toEqual(300);
+    expect(explorationStats.numStarts).toEqual(1);
+    expect(explorationStats.numActualStarts).toEqual(10);
+    expect(explorationStats.numCompletions).toEqual(100);
   });
 
   describe('Querying for state stats', () => {
@@ -61,25 +58,17 @@ describe('Exploration stats', function() {
       explorationStats = explorationStatsObjectFactory.createFromBackendDict({
         exp_id: 'eid',
         exp_version: 100,
-        num_starts_v1: 100,
-        num_starts_v2: 200,
-        num_actual_starts_v1: 100,
-        num_actual_starts_v2: 200,
-        num_completions_v1: 100,
-        num_completions_v2: 200,
+        num_starts: 100,
+        num_actual_starts: 100,
+        num_completions: 100,
         state_stats_mapping: {
           Introduction: {
-            total_answers_count_v1: 1,
-            total_answers_count_v2: 2,
-            useful_feedback_count_v1: 1,
-            useful_feedback_count_v2: 2,
-            total_hit_count_v1: 10,
-            total_hit_count_v2: 20,
-            first_hit_count_v1: 10,
-            first_hit_count_v2: 20,
-            num_times_solution_viewed_v2: 2,
-            num_completions_v1: 1,
-            num_completions_v2: 2,
+            total_answers_count: 1,
+            useful_feedback_count: 1,
+            total_hit_count: 10,
+            first_hit_count: 10,
+            num_times_solution_viewed: 100,
+            num_completions: 1,
           },
         },
       });
@@ -98,12 +87,12 @@ describe('Exploration stats', function() {
     it('should calculate bounce rate of state compared to exploration', () => {
       const introductionStats = explorationStats.getStateStats('Introduction');
 
-      expect(introductionStats.totalHitCount).toEqual(30);
-      expect(introductionStats.numCompletions).toEqual(3);
-      expect(explorationStats.numStarts).toEqual(300);
+      expect(introductionStats.totalHitCount).toEqual(10);
+      expect(introductionStats.numCompletions).toEqual(1);
+      expect(explorationStats.numStarts).toEqual(100);
 
       expect(explorationStats.getBounceRate('Introduction'))
-        .toBeCloseTo((30 - 3) / 300);
+        .toBeCloseTo((10 - 1) / 100);
     });
   });
 });

@@ -13,26 +13,19 @@
 // limitations under the License.
 
 /**
- * @fileoverview TODO
+ * @fileoverview Domain object holding the statistics of a state.
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 export interface IStateStatsBackendDict {
-  'total_answers_count_v1': number;
-  'total_answers_count_v2': number;
-  'useful_feedback_count_v1': number;
-  'useful_feedback_count_v2': number;
-  'total_hit_count_v1': number;
-  'total_hit_count_v2': number;
-  'first_hit_count_v1': number;
-  'first_hit_count_v2': number;
-  // Solution view analytics were only introduced in v2, and there are no
-  // existing event models in v1 that record solution viewed events.
-  'num_times_solution_viewed_v2': number;
-  'num_completions_v1': number;
-  'num_completions_v2': number;
+  'total_answers_count': number;
+  'useful_feedback_count': number;
+  'total_hit_count': number;
+  'first_hit_count': number;
+  'num_times_solution_viewed': number;
+  'num_completions': number;
 }
 
 export class StateStats {
@@ -50,22 +43,10 @@ export class StateStats {
 })
 export class StateStatsObjectFactory {
   createFromBackendDict(backendDict: IStateStatsBackendDict): StateStats {
-    const totalAnswersCount = (
-      backendDict.total_answers_count_v1 + backendDict.total_answers_count_v2);
-    const usefulFeedbackCount = (
-      backendDict.useful_feedback_count_v1 +
-      backendDict.useful_feedback_count_v2);
-    const totalHitCount = (
-      backendDict.total_hit_count_v1 + backendDict.total_hit_count_v2);
-    const firstHitCount = (
-      backendDict.first_hit_count_v1 + backendDict.first_hit_count_v2);
-    const numTimesSolutionViewed = backendDict.num_times_solution_viewed_v2;
-    const numCompletions = (
-      backendDict.num_completions_v1 + backendDict.num_completions_v2);
-
     return new StateStats(
-      totalAnswersCount, usefulFeedbackCount, totalHitCount, firstHitCount,
-      numTimesSolutionViewed,numCompletions);
+      backendDict.total_answers_count, backendDict.useful_feedback_count,
+      backendDict.total_hit_count, backendDict.first_hit_count,
+      backendDict.num_times_solution_viewed, backendDict.num_completions);
   }
 }
 
