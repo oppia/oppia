@@ -164,16 +164,16 @@ class BaseSuggestion(python_utils.OBJECT):
                     type(self.final_reviewer_id))
 
         if (
-            not user_id_migration.verify_user_id_correct(self.author_id) and
-            self.author_id is not None
+                not user_id_migration.verify_user_id_correct(self.author_id) and
+                self.author_id is not None
         ):
             raise utils.ValidationError(
                 'Expected author_id to be in a valid user ID format.')
 
         if (
-            not user_id_migration.verify_user_id_correct(
-                self.final_reviewer_id) and
-            self.final_reviewer_id is not None
+                not user_id_migration.verify_user_id_correct(
+                    self.final_reviewer_id) and
+                self.final_reviewer_id is not None
         ):
             raise utils.ValidationError(
                 'Expected final_reviewer_id to be in a valid user ID format.')
