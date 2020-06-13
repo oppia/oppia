@@ -49,25 +49,19 @@ export class StateStats {
   providedIn: 'root'
 })
 export class StateStatsObjectFactory {
-  createFromBackendDict(
-      stateStatsBackendDict: IStateStatsBackendDict): StateStats {
+  createFromBackendDict(backendDict: IStateStatsBackendDict): StateStats {
     const totalAnswersCount = (
-      stateStatsBackendDict.total_answers_count_v1 +
-      stateStatsBackendDict.total_answers_count_v2);
+      backendDict.total_answers_count_v1 + backendDict.total_answers_count_v2);
     const usefulFeedbackCount = (
-      stateStatsBackendDict.useful_feedback_count_v1 +
-      stateStatsBackendDict.useful_feedback_count_v2);
+      backendDict.useful_feedback_count_v1 +
+      backendDict.useful_feedback_count_v2);
     const totalHitCount = (
-      stateStatsBackendDict.total_hit_count_v1 +
-      stateStatsBackendDict.total_hit_count_v2);
+      backendDict.total_hit_count_v1 + backendDict.total_hit_count_v2);
     const firstHitCount = (
-      stateStatsBackendDict.first_hit_count_v1 +
-      stateStatsBackendDict.first_hit_count_v2);
-    const numTimesSolutionViewed = (
-      stateStatsBackendDict.num_times_solution_viewed_v2);
+      backendDict.first_hit_count_v1 + backendDict.first_hit_count_v2);
+    const numTimesSolutionViewed = backendDict.num_times_solution_viewed_v2;
     const numCompletions = (
-      stateStatsBackendDict.num_completions_v1 +
-      stateStatsBackendDict.num_completions_v2);
+      backendDict.num_completions_v1 + backendDict.num_completions_v2);
 
     return new StateStats(
       totalAnswersCount, usefulFeedbackCount, totalHitCount, firstHitCount,

@@ -188,6 +188,8 @@ import { GuestCollectionProgressObjectFactory } from
   'domain/collection/GuestCollectionProgressObjectFactory';
 import { GuestCollectionProgressService } from
   'domain/collection/guest-collection-progress.service';
+import { HighBounceRateTaskObjectFactory } from
+  'domain/improvements/HighBounceRateTaskObjectFactory';
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
 import { HtmlEscaperService } from 'services/html-escaper.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
@@ -451,6 +453,8 @@ import { SuggestionObjectFactory } from
 import { SuggestionThreadObjectFactory } from
   'domain/suggestion/SuggestionThreadObjectFactory';
 import { SuggestionsService } from 'services/suggestions.service';
+import { TaskEntryObjectFactory } from
+  'domain/improvements/TaskEntryObjectFactory';
 import { TextInputPredictionService } from
   'interactions/TextInput/text-input-prediction.service';
 import { TextInputRulesService } from
@@ -592,6 +596,8 @@ export class UpgradedServices {
     upgradedServices['GraphUtilsService'] = new GraphUtilsService();
     upgradedServices['GuestCollectionProgressObjectFactory'] =
       new GuestCollectionProgressObjectFactory();
+    upgradedServices['HighBounceRateTaskObjectFactory'] =
+      new HighBounceRateTaskObjectFactory();
     upgradedServices['I18nLanguageCodeService'] = new I18nLanguageCodeService();
     upgradedServices['IdGenerationService'] = new IdGenerationService();
     upgradedServices['ImageFileObjectFactory'] = new ImageFileObjectFactory();
@@ -672,6 +678,7 @@ export class UpgradedServices {
       new SubtitledHtmlObjectFactory();
     upgradedServices['SuggestionModalService'] = new SuggestionModalService();
     upgradedServices['SuggestionsService'] = new SuggestionsService();
+    upgradedServices['TaskEntryObjectFactory'] = new TaskEntryObjectFactory();
     upgradedServices['TextInputTokenizer'] = new TextInputTokenizer();
     upgradedServices['ThreadMessageSummaryObjectFactory'] =
       new ThreadMessageSummaryObjectFactory();
@@ -1139,6 +1146,7 @@ export class UpgradedServices {
         upgradedServices['ReadOnlyCollectionBackendApiService'],
         upgradedServices['UrlInterpolationService']);
     upgradedServices['ExplorationStatsService'] = new ExplorationStatsService(
+        upgradedServices['ContextService'],
         upgradedServices['ExplorationStatsBackendApiService']);
     upgradedServices['PredictionAlgorithmRegistryService'] =
       new PredictionAlgorithmRegistryService(

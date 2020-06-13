@@ -18,96 +18,40 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { TaskEntry, TaskEntryObjectFactory } from
+import { ITaskEntryBackendDict, TaskEntry, TaskEntryObjectFactory } from
   'domain/improvements/TaskEntryObjectFactory';
 
 describe('Task entry', function() {
   let taskEntryObjectFactory: TaskEntryObjectFactory = null;
-  let mockDate = new Date(2020, 6, 12, 17, 18, 33);
+
   beforeEach(() => {
     taskEntryObjectFactory = TestBed.get(TaskEntryObjectFactory);
   });
 
   it('should use same values from backend dict', () => {
-    const task: TaskEntry = taskEntryObjectFactory.createFromBackendDict({
+    const taskBackendDict: ITaskEntryBackendDict = {
       task_type: 'high_bounce_rate',
       target_type: 'state',
       target_id: 'Introduction',
       issue_description: '20% of learners dropped at this state',
       status: 'resolved',
       closed_by: 'uuid',
-      closed_on_msecs: mockDate.getTime(),
-    });
+      closed_on_msecs: 123456789,
+    };
+    const task: TaskEntry = (
+      taskEntryObjectFactory.createFromBackendDict(taskBackendDict));
 
     expect(task.taskType).toEqual('high_bounce_rate');
     expect(task.targetType).toEqual('state');
     expect(task.targetId).toEqual('Introduction');
-    expect(task.issueDescription)
+    expect(task.getIssueDescription())
       .toEqual('20% of learners dropped at this state');
+    expect(task.isObsolete()).toBeFalse();
     expect(task.isOpen()).toBeFalse();
+    expect(task.isResolved()).toBeTrue();
     expect(task.getClosedBy()).toEqual('uuid');
-    expect(task.getClosedOnMsecs()).toEqual(mockDate.getTime());
-  });
+    expect(task.getClosedOnMsecs()).toEqual(123456789);
 
-  it('should create a new task from input arguments', () => {
-    const task: TaskEntry = taskEntryObjectFactory.createNew(
-      'high_bounce_rate', 'state', 'Introduction',
-      '20% of learners dropped at this state', 'resolved', 'uuid',
-      mockDate.getTime());
-
-    expect(task.taskType).toEqual('high_bounce_rate');
-    expect(task.targetType).toEqual('state');
-    expect(task.targetId).toEqual('Introduction');
-    expect(task.issueDescription)
-      .toEqual('20% of learners dropped at this state');
-    expect(task.isOpen()).toBeTrue();
-    expect(task.getClosedBy()).toBeNull();
-    expect(task.getClosedOnMsecs()).toBeNull();
-  });
-
-  it('should create an open task by default', () => {
-    const task: TaskEntry = taskEntryObjectFactory.createNew(
-      'high_bounce_rate', 'state', 'Introduction',
-      '20% of learners dropped at this state');
-
-    expect(task.isOpen()).toBeTrue();
-    expect(task.getClosedBy()).toBeNull();
-    expect(task.getClosedOnMsecs()).toBeNull();
-  });
-
-  describe('Status management', () => {
-    beforeEach(() => {
-      jasmine.clock().mockDate(mockDate);
-
-      this.task = taskEntryObjectFactory.createNew(
-        'high_bounce_rate', 'state', 'Introduction',
-        '20% of learners dropped at this state');
-    });
-
-    it('should capture current datetime when resolved', () => {
-      this.task.resolve('uuid');
-
-      expect(this.task.isOpen()).toBeFalse();
-      expect(this.task.getClosedBy()).toEqual('uuid');
-      expect(this.task.getClosedOnMsecs()).toEqual(mockDate.getTime());
-    });
-
-    it('should clear out closing details when re-opened', () => {
-      this.task.resolve('uuid');
-      expect(this.task.isOpen()).toBeFalse();
-      expect(this.task.getClosedBy()).not.toBeNull();
-      expect(this.task.getClosedOnMsecs()).not.toBeNull();
-
-      this.task.open();
-      expect(this.task.isOpen()).toBeTrue();
-      expect(this.task.getClosedBy()).toBeNull();
-      expect(this.task.getClosedOnMsecs()).toBeNull();
-    });
-
-    it('should not be open after discarding', () => {
-      this.task.discard();
-
-      expect(this.task.isOpen()).toBeFalse();
-    });
+    expect(task.toBackendDict()).toEqual(taskBackendDict);
   });
 });

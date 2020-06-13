@@ -16,6 +16,9 @@
  * @fileoverview TODO
  */
 
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
+
 import { ImprovementsConstants } from
   'domain/improvements/improvements.constants';
 
@@ -31,69 +34,77 @@ export interface ITaskEntryBackendDict {
 
 export class TaskEntry {
   constructor(
-      public taskType: string,
-      public targetType: string,
-      public targetId: string,
-      public issueDescription: string,
+      public readonly taskType: string,
+      public readonly targetType: string,
+      public readonly targetId: string,
+      protected issueDescription: string,
       private taskStatus: string,
       private closedBy: string,
       private closedOnMsecs: number) {}
 
-  toBackendDict(): ITaskEntryBackendDict {
+  public toBackendDict(): ITaskEntryBackendDict {
     return {
       task_type: this.taskType,
       target_type: this.targetType,
       target_id: this.targetId,
       status: this.taskStatus,
-      issue_description: this.issueDescription,
       closed_by: this.closedBy,
       closed_on_msecs: this.closedOnMsecs,
+      issue_description: this.issueDescription,
     };
   }
 
-  isOpen(): boolean {
+  public getIssueDescription(): string {
+    return this.issueDescription;
+  }
+
+  public isOpen(): boolean {
     return this.taskStatus === ImprovementsConstants.TASK_STATUS_TYPE_OPEN;
   }
 
-  getClosedBy(): string {
+  public isObsolete(): boolean {
+    return this.taskStatus === ImprovementsConstants.TASK_STATUS_TYPE_OBSOLETE;
+  }
+
+  public isResolved(): boolean {
+    return this.taskStatus === ImprovementsConstants.TASK_STATUS_TYPE_RESOLVED;
+  }
+
+  public getClosedBy(): string {
     return this.closedBy;
   }
 
-  getClosedOnMsecs(): number {
+  public getClosedOnMsecs(): number {
     return this.closedOnMsecs;
   }
 
-  open(): void {
+  // NOTE TO DEVELOPERS: Only subclasses can change the task status, and only
+  // through the following 3 methods. This ensures that the three status fields
+  // (taskStatus, closedBy, closedOnMsecs) are always in sync.
+
+  protected makeOpen(): void {
     this.closedBy = null;
     this.closedOnMsecs = null;
     this.taskStatus = ImprovementsConstants.TASK_STATUS_TYPE_OPEN;
   }
 
-  discard(): void {
+  protected makeObsolete(): void {
+    this.closedBy = null;
+    this.closedOnMsecs = null;
     this.taskStatus = ImprovementsConstants.TASK_STATUS_TYPE_OBSOLETE;
   }
 
-  resolve(userId: string): void {
+  protected makeResolved(userId: string): void {
     this.closedBy = userId;
-    this.closedOnMsecs = new Date().getTime();
-    this.taskStatus = ImprovementsConstants.TASK_STATUS_TYPE_OBSOLETE;
+    this.closedOnMsecs = new Date().getUTCMilliseconds();
+    this.taskStatus = ImprovementsConstants.TASK_STATUS_TYPE_RESOLVED;
   }
 }
 
+@Injectable({
+  providedIn: 'root'
+})
 export class TaskEntryObjectFactory {
-  createNew(
-      taskType: string,
-      targetType: string,
-      targetId: string,
-      issueDescription: string,
-      taskStatus: string = ImprovementsConstants.TASK_STATUS_TYPE_OPEN,
-      closedBy: string = null,
-      closedOnMsecs: number = null): TaskEntry {
-    return new TaskEntry(
-      taskType, targetType, targetId, issueDescription, taskStatus, closedBy,
-      closedOnMsecs);
-  }
-
   createFromBackendDict(backendDict: ITaskEntryBackendDict): TaskEntry {
     return new TaskEntry(
       backendDict.task_type, backendDict.target_type, backendDict.target_id,
@@ -101,3 +112,6 @@ export class TaskEntryObjectFactory {
       backendDict.closed_on_msecs);
   }
 }
+
+angular.module('oppia').factory(
+  'TaskEntryObjectFactory', downgradeInjectable(TaskEntryObjectFactory));

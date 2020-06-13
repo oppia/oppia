@@ -23,51 +23,74 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { ExplorationStatsBackendApiService } from
   'services/exploration-stats-backend-api.service';
-import { IStateStatsBackendDict, StateStats } from
+import { IStateStatsBackendDict } from
   'domain/statistics/StateStatsObjectFactory';
-import { IExplorationStatsBackendDict, ExplorationStats } from
-  'domain/statistics/ExplorationStatsObjectFactory';
+import {
+  ExplorationStats,
+  ExplorationStatsObjectFactory,
+  IExplorationStatsBackendDict
+} from 'domain/statistics/ExplorationStatsObjectFactory';
 
 describe('Exploration stats backend api service', () => {
   let explorationStatsBackendApiService: ExplorationStatsBackendApiService;
+  let explorationStatsObjectFactory: ExplorationStatsObjectFactory;
   let httpTestingController: HttpTestingController;
-  let expStatsBackendDict: IExplorationStatsBackendDict = {
-    exp_id: 'eid',
-    exp_version: 1,
-    num_starts_v1: 10,
-    num_starts_v2: 15,
-    num_actual_starts_v1: 5,
-    num_actual_starts_v2: 9,
-    num_completions_v1: 3,
-    num_completions_v2: 8,
-    state_stats_mapping: {
-      Introduction: <IStateStatsBackendDict>{
-      },
-    },
-  };
 
   beforeEach(() => {
     TestBed.configureTestingModule({imports: [HttpClientTestingModule]});
 
     explorationStatsBackendApiService = (
       TestBed.get(ExplorationStatsBackendApiService));
+    explorationStatsObjectFactory = (
+      TestBed.get(ExplorationStatsObjectFactory));
     httpTestingController = TestBed.get(HttpTestingController);
   });
 
-  it('should return a fully formed object from backend dict', fakeAsync(() => {
-    let onSuccess = jasmine.createSpy('success', stats => {
-      expect(stats).toBeInstanceOf(ExplorationStats);
+  it('should return an ExplorationStats domain object', fakeAsync(() => {
+    let explorationStatsBackendDict: IExplorationStatsBackendDict = {
+      exp_id: 'eid',
+      exp_version: 1,
+      num_starts_v1: 0,
+      num_starts_v2: 0,
+      num_actual_starts_v1: 0,
+      num_actual_starts_v2: 0,
+      num_completions_v1: 0,
+      num_completions_v2: 0,
+      state_stats_mapping: {
+        Introduction: (
+          <IStateStatsBackendDict>{
+            total_answers_count_v1: 0,
+            total_answers_count_v2: 0,
+            useful_feedback_count_v1: 0,
+            useful_feedback_count_v2: 0,
+            total_hit_count_v1: 0,
+            total_hit_count_v2: 0,
+            first_hit_count_v1: 0,
+            first_hit_count_v2: 0,
+            num_times_solution_viewed_v2: 0,
+            num_completions_v1: 0,
+            num_completions_v2: 0,
+          }),
+      },
+    };
+    let explorationStats: ExplorationStats = (
+      explorationStatsObjectFactory.createFromBackendDict(
+        explorationStatsBackendDict));
+
+    let onSuccess = jasmine.createSpy('onSuccess', stats => {
+      expect(stats).toEqual(explorationStats);
     });
-    let onFailure = jasmine.createSpy('failure');
+    let onFailure = jasmine.createSpy('onFailure');
 
     explorationStatsBackendApiService.fetchExplorationStats('eid')
       .then(onSuccess, onFailure);
 
-    let req = httpTestingController.expectOne('/explorehandler/statistics/eid');
+    let req = httpTestingController.expectOne('/createhandler/statistics/eid');
     expect(req.request.method).toEqual('GET');
-    req.flush(expStatsBackendDict);
+    req.flush(explorationStatsBackendDict);
     flushMicrotasks();
 
     expect(onSuccess).toHaveBeenCalled();
+    expect(onFailure).not.toHaveBeenCalled();
   }));
 });
