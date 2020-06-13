@@ -22,13 +22,19 @@ import { HttpClientTestingModule, HttpTestingController } from
 
 import { ConceptCardBackendApiService } from
   'domain/skill/concept-card-backend-api.service';
+import { ConceptCardObjectFactory } from
+  'domain/skill/ConceptCardObjectFactory';
 
 describe('Concept card backend API service', () => {
   let conceptCardBackendApiService: ConceptCardBackendApiService = null;
   let httpTestingController: HttpTestingController;
+  let conceptCardObjectFactory: ConceptCardObjectFactory;
   let sampleResponse1 = null;
   let sampleResponse2 = null;
   let sampleResponse3 = null;
+  let conceptCardSampleResponse1 = null;
+  let conceptCardSampleResponse2 = null;
+  let conceptCardSampleResponse3 = null;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -38,6 +44,7 @@ describe('Concept card backend API service', () => {
 
     conceptCardBackendApiService = TestBed.get(ConceptCardBackendApiService);
     httpTestingController = TestBed.get(HttpTestingController);
+    conceptCardObjectFactory = TestBed.get(ConceptCardObjectFactory);
 
     var example1 = {
       question: {
@@ -124,6 +131,24 @@ describe('Concept card backend API service', () => {
     sampleResponse3 = {
       concept_card_dicts: [conceptCardDict1, conceptCardDict2]
     };
+
+    conceptCardSampleResponse1 = [];
+    sampleResponse1.concept_card_dicts.forEach((conceptCardDict) => {
+      conceptCardSampleResponse1.push(
+        conceptCardObjectFactory.createFromBackendDict(conceptCardDict));
+    });
+
+    conceptCardSampleResponse2 = [];
+    sampleResponse2.concept_card_dicts.forEach((conceptCardDict) => {
+      conceptCardSampleResponse2.push(
+        conceptCardObjectFactory.createFromBackendDict(conceptCardDict));
+    });
+
+    conceptCardSampleResponse3 = [];
+    sampleResponse3.concept_card_dicts.forEach((conceptCardDict) => {
+      conceptCardSampleResponse3.push(
+        conceptCardObjectFactory.createFromBackendDict(conceptCardDict));
+    });
   });
 
   afterEach(() => {
@@ -144,7 +169,7 @@ describe('Concept card backend API service', () => {
       flushMicrotasks();
 
       expect(successHandler).toHaveBeenCalledWith(
-        sampleResponse1.concept_card_dicts);
+        conceptCardSampleResponse1);
       expect(failHandler).not.toHaveBeenCalled();
     }));
 
@@ -165,18 +190,18 @@ describe('Concept card backend API service', () => {
       flushMicrotasks();
 
       expect(successHandler).toHaveBeenCalledWith(
-        sampleResponse3.concept_card_dicts);
+        conceptCardSampleResponse3);
       expect(failHandler).not.toHaveBeenCalled();
     }));
 
   it('should get all concept cards even the one which was fetched before',
     fakeAsync(() => {
       conceptCardBackendApiService.loadConceptCards(['1']).then(
-        function(conceptCards) {
+        (conceptCards) => {
           conceptCardBackendApiService.loadConceptCards(['1', '2']).then(
-            function(conceptCards2) {
-              expect(conceptCards).toEqual(sampleResponse1.concept_card_dicts);
-              expect(conceptCards2).toEqual(sampleResponse3.concept_card_dicts);
+            (conceptCards2) => {
+              expect(conceptCards).toEqual(conceptCardSampleResponse1);
+              expect(conceptCards2).toEqual(conceptCardSampleResponse3);
             });
 
           var req1 = httpTestingController.expectOne('/concept_card_handler/2');
@@ -212,11 +237,11 @@ describe('Concept card backend API service', () => {
 
   it('should not fetch the same concept card', fakeAsync(() => {
     conceptCardBackendApiService.loadConceptCards(['1'])
-      .then(function(conceptCards) {
+      .then((conceptCards) => {
         conceptCardBackendApiService.loadConceptCards(['1'])
-          .then(function(conceptCards2) {
+          .then((conceptCards2) => {
             expect(conceptCards).toEqual(conceptCards2);
-            expect(conceptCards2).toEqual(sampleResponse1.concept_card_dicts);
+            expect(conceptCards2).toEqual(conceptCardSampleResponse1);
           });
       });
 

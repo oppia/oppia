@@ -23,10 +23,20 @@ import { HttpClient } from '@angular/common/http';
 
 import cloneDeep from 'lodash/cloneDeep';
 
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
+import { ConceptCardObjectFactory } from
+  'domain/skill/ConceptCardObjectFactory';
+import { RecordedVoiceoversObjectFactory } from
+  'domain/exploration/RecordedVoiceoversObjectFactory';
 import { SkillDomainConstants } from
   'domain/skill/skill-domain.constants';
+import { SubtitledHtmlObjectFactory } from
+  'domain/exploration/SubtitledHtmlObjectFactory';
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
+import { VoiceoverObjectFactory } from
+  'domain/exploration/VoiceoverObjectFactory';
+import { WorkedExampleObjectFactory } from
+  'domain/skill/WorkedExampleObjectFactory';
 
 @Injectable({
   providedIn: 'root'
@@ -38,20 +48,32 @@ export class ConceptCardBackendApiService {
 
   // Maps previously loaded concept cards to their IDs.
   private _conceptCardCache = [];
+  private conceptCardObjectFactory = null;
 
   private _fetchConceptCards(
       skillIds: Array<string>,
       successCallback: (value?: Object | PromiseLike<Object>) => void,
-      errorCallback: (reason?: any) => void): void {
+      errorCallback: (reason?: string) => void): void {
     var conceptCardDataUrl = this.urlInterpolation.interpolateUrl(
       SkillDomainConstants.CONCEPT_CARD_DATA_URL_TEMPLATE, {
         comma_separated_skill_ids: skillIds.join(',')
       });
+      
+    var conceptCardObjects = [];
+    var conceptCardObjectFactory = new ConceptCardObjectFactory(
+      new SubtitledHtmlObjectFactory(),
+      new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()),
+      new WorkedExampleObjectFactory(new SubtitledHtmlObjectFactory()));
 
     this.http.get(conceptCardDataUrl).toPromise().then(
       (response: any) => {
         if (successCallback) {
-          successCallback(response.concept_card_dicts);
+          var conceptCardDicts = response.concept_card_dicts;
+          conceptCardDicts.forEach((conceptCardDict) => {
+            conceptCardObjects.push(
+              conceptCardObjectFactory.createFromBackendDict(conceptCardDict));
+          });
+          successCallback(conceptCardObjects);
         }
       }, (errorResponse) => {
         if (errorCallback) {
@@ -105,7 +127,7 @@ export class ConceptCardBackendApiService {
           conceptCards.push(cloneDeep(this._conceptCardCache[skillId]));
         });
         if (resolve) {
-          resolve(conceptCards);
+          resolve(cloneDeep(conceptCards));
         }
       }
     });
