@@ -26,6 +26,7 @@ env:
     - RUN_E2E_TESTS_LEARNER=true
     - RUN_E2E_TESTS_SKILL_EDITOR=true
     - RUN_E2E_TESTS_TOPIC=true
+    - RUN_E2E_ACCESSIBILITY_EMBEDDING=true
 
 jobs:
   allow_failures: []
@@ -69,4 +70,5 @@ script:
 - if [ "$RUN_E2E_TESTS_LEARNER" == 'true' ]; then python -m scripts.run_e2e_tests --suite="learner" --prod_env; python -m scripts.run_e2e_tests --skip-build --skip-install --suite="learnerDashboard" --prod_env; fi
 - if [ "$RUN_E2E_TESTS_SKILL_EDITOR" == 'true' ]; then python -m scripts.run_e2e_tests --suite="skillEditor" --prod_env; fi
 - if [ "$RUN_E2E_TESTS_TOPIC" == 'true' ]; then python -m scripts.run_e2e_tests --suite="topicAndStoryEditor" --prod_env; python -m scripts.run_e2e_tests --skip-build --skip-install --suite="topicsAndSkillsDashboard" --prod_env; fi
+- if [ "$RUN_E2E_ACCESSIBILITY_EMBEDDING" == 'true' ]; then python -m scripts.run_e2e_tests --suite="accessibility" --prod_env; python -m scripts.run_e2e_tests --skip-build --skip-install --suite="embedding" --prod_env; fi
 
