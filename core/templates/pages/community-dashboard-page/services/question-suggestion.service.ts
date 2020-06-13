@@ -28,8 +28,8 @@ angular.module('oppia').factory('QuestionSuggestionService', [
           description: 'Add new question',
           target_id: associatedSkill.getId(),
           target_version_at_submission: associatedSkill.getVersion(),
-          assigned_reviewer_id: '',
-          final_reviewer_id: '',
+          assigned_reviewer_id: null,
+          final_reviewer_id: null,
           change: {
             cmd: 'create_new_fully_specified_question',
             question_dict: question.toBackendDict(true),

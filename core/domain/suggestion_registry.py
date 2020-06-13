@@ -28,6 +28,7 @@ from core.domain import question_services
 from core.domain import skill_domain
 from core.domain import skill_services
 from core.domain import state_domain
+from core.domain import user_id_migration
 from core.domain import user_services
 from core.platform import models
 import feconf
@@ -161,6 +162,21 @@ class BaseSuggestion(python_utils.OBJECT):
                 raise utils.ValidationError(
                     'Expected final_reviewer_id to be a string, received %s' %
                     type(self.final_reviewer_id))
+
+        if (
+            not user_id_migration.verify_user_id_correct(self.author_id) and
+            self.author_id is not None
+        ):
+            raise utils.ValidationError(
+                'Expected author_id to be in a valid user ID format.')
+
+        if (
+            not user_id_migration.verify_user_id_correct(
+                self.final_reviewer_id) and
+            self.final_reviewer_id is not None
+        ):
+            raise utils.ValidationError(
+                'Expected final_reviewer_id to be in a valid user ID format.')
 
         if not isinstance(self.score_category, python_utils.BASESTRING):
             raise utils.ValidationError(
