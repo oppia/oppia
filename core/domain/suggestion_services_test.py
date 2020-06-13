@@ -149,6 +149,15 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                 self.target_id, self.target_version_at_submission,
                 self.author_id, self.change, 'test description')
 
+    def test_cannot_create_suggestion_with_invalid_author_id(self):
+        with self.assertRaisesRegexp(
+            Exception, 'Expected author_id to be in a valid user ID format'):
+            suggestion_services.create_suggestion(
+                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+                suggestion_models.TARGET_TYPE_EXPLORATION,
+                self.target_id, self.target_version_at_submission,
+                'invalid author ID', self.change, 'test description')
+
     def test_cannot_create_translation_suggestion_with_invalid_content_html_raise_error(self): # pylint: disable=line-too-long
         add_translation_change_dict = {
             'cmd': 'add_translation',
@@ -699,12 +708,6 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         queries = [('author_id', self.author_id_1)]
         self.assertEqual(len(suggestion_services.query_suggestions(queries)), 3)
         queries = [('author_id', self.author_id_2)]
-        self.assertEqual(len(suggestion_services.query_suggestions(queries)), 2)
-
-    def test_get_by_reviewer(self):
-        queries = [('final_reviewer_id', self.reviewer_id_1)]
-        self.assertEqual(len(suggestion_services.query_suggestions(queries)), 1)
-        queries = [('final_reviewer_id', self.reviewer_id_2)]
         self.assertEqual(len(suggestion_services.query_suggestions(queries)), 2)
 
     def test_get_by_target_id(self):

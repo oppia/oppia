@@ -85,6 +85,14 @@ def create_suggestion(
     else:
         raise Exception('Invalid suggestion type %s' % suggestion_type)
 
+    suggestion_domain_class = (
+        suggestion_registry.SUGGESTION_TYPES_TO_DOMAIN_CLASSES[
+            suggestion_type])
+    suggestion = suggestion_domain_class(
+        thread_id, target_id, target_version_at_submission, status, author_id,
+        None, change, score_category)
+    suggestion.validate()
+
     suggestion_models.GeneralSuggestionModel.create(
         suggestion_type, target_type, target_id,
         target_version_at_submission, status, author_id,
