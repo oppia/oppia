@@ -251,6 +251,7 @@ angular.module('oppia').directive('storyNodeEditor', [
           $scope.addPrerequisiteSkillId = function() {
             var sortedSkillSummaries = (
               StoryEditorStateService.getSkillSummaries());
+            var allowSkillsFromOtherTopics = true;
             var skillsInSameTopicCount = 0;
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
@@ -259,9 +260,12 @@ angular.module('oppia').directive('storyNodeEditor', [
               resolve: {
                 skillsInSameTopicCount: () => skillsInSameTopicCount,
                 sortedSkillSummaries: () => sortedSkillSummaries,
-                categorizedSkills: () => categorizedSkills
+                categorizedSkills: () => categorizedSkills,
+                allowSkillsFromOtherTopics: () => allowSkillsFromOtherTopics
               },
-              controller: 'SelectSkillModalController'
+              controller: 'SelectSkillModalController',
+              windowClass: 'skill-select-modal',
+              size: 'xl'
             }).result.then(function(skillId) {
               try {
                 StoryUpdateService.addPrerequisiteSkillIdToNode(
@@ -280,7 +284,11 @@ angular.module('oppia').directive('storyNodeEditor', [
           $scope.addAcquiredSkillId = function() {
             var sortedSkillSummaries = (
               StoryEditorStateService.getSkillSummaries());
+            var allowSkillsFromOtherTopics = false;
             var skillsInSameTopicCount = 0;
+            var topicName = StoryEditorStateService.getTopicName();
+            var categorizedSkillsInTopic = {};
+            categorizedSkillsInTopic[topicName] = categorizedSkills[topicName];
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/components/skill-selector/select-skill-modal.template.html'),
@@ -288,9 +296,12 @@ angular.module('oppia').directive('storyNodeEditor', [
               resolve: {
                 skillsInSameTopicCount: () => skillsInSameTopicCount,
                 sortedSkillSummaries: () => sortedSkillSummaries,
-                categorizedSkills:() => categorizedSkills
+                categorizedSkills: () => categorizedSkillsInTopic,
+                allowSkillsFromOtherTopics: () => allowSkillsFromOtherTopics
               },
-              controller: 'SelectSkillModalController'
+              controller: 'SelectSkillModalController',
+              windowClass: 'skill-select-modal',
+              size: 'xl'
             }).result.then(function(skillId) {
               try {
                 StoryUpdateService.addAcquiredSkillIdToNode(

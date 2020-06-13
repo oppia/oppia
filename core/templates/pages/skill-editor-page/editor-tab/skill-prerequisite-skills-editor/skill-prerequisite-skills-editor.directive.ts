@@ -71,7 +71,7 @@ angular.module('oppia').directive('skillPrerequisiteSkillsEditor', [
               groupedSkillSummaries.current.length;
             var sortedSkillSummaries = groupedSkillSummaries.current.concat(
               groupedSkillSummaries.others);
-
+            var allowSkillsFromOtherTopics = true;
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/components/skill-selector/select-skill-modal.template.html'),
@@ -79,9 +79,12 @@ angular.module('oppia').directive('skillPrerequisiteSkillsEditor', [
               resolve: {
                 skillsInSameTopicCount: () => skillsInSameTopicCount,
                 sortedSkillSummaries: () => sortedSkillSummaries,
-                categorizedSkills: () => categorizedSkills
+                categorizedSkills: () => categorizedSkills,
+                allowSkillsFromOtherTopics: () => allowSkillsFromOtherTopics
               },
-              controller: 'SelectSkillModalController'
+              controller: 'SelectSkillModalController',
+              windowClass: 'skill-select-modal',
+              size: 'xl'
             }).result.then(function(skillId) {
               if (skillId === $scope.skill.getId()) {
                 AlertsService.addInfoMessage(

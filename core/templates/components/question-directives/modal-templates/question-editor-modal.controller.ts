@@ -89,6 +89,7 @@ angular.module('oppia').controller('QuestionEditorModalController', [
       var sortedSkillSummaries =
         groupedSkillSummaries.current.concat(
           groupedSkillSummaries.others);
+      var allowSkillsFromOtherTopics = true;
       $uibModal.open({
         templateUrl:
           UrlInterpolationService.getDirectiveTemplateUrl(
@@ -98,7 +99,8 @@ angular.module('oppia').controller('QuestionEditorModalController', [
         resolve: {
           skillsInSameTopicCount: () => skillsInSameTopicCount,
           sortedSkillSummaries: () => sortedSkillSummaries,
-          categorizedSkills: () => categorizedSkills
+          categorizedSkills: () => categorizedSkills,
+          allowSkillsFromOtherTopics: () => allowSkillsFromOtherTopics
         },
         controller: 'SelectSkillModalController',
         windowClass: 'skill-select-modal',
