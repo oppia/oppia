@@ -963,4 +963,3 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         with swap_inplace_replace:
             run_e2e_tests.update_community_dashboard_status_in_feconf_file(
                 run_e2e_tests.FECONF_FILE_PATH, False)
-

@@ -245,6 +245,7 @@ def update_community_dashboard_status_in_feconf_file(
         feconf_file_path, enable_community_dashboard):
     """Change feconf.py file based on whether the community dashboard is
     enabled.
+
     Args:
         feconf_file_path: str. Path to the feconf.py file.
         enable_community_dashboard: bool. Represents whether community

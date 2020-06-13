@@ -152,7 +152,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
 
             self.assertFalse(response['more'])
             self.assertTrue(
-            isinstance(response['next_cursor'], python_utils.BASESTRING))
+                isinstance(response['next_cursor'], python_utils.BASESTRING))
 
     def test_get_translation_opportunity_data(self):
         with self.swap(feconf, 'COMMUNITY_DASHBOARD_ENABLED', True):
