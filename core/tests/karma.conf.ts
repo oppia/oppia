@@ -179,12 +179,23 @@ module.exports = function(config) {
                   // this is needed for thread-loader to work correctly
                   happyPackMode: true
                 }
+              },
+              {
+                loader: 'angular2-template-loader'
               }
             ]
           },
           {
             test: /\.html$/,
+            exclude: /(directive|component)\.html$/,
             loader: 'underscore-template-loader'
+          },
+          {
+            test: /(directive|component)\.html$/,
+            loader: 'html-loader',
+            options: {
+              attributes: false,
+            },
           },
           {
             // Exclude all the spec files from the report.
