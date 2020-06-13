@@ -45,7 +45,7 @@ describe('Splash Page', function() {
     UserService = $injector.get('UserService');
     LoaderService = $injector.get('LoaderService');
     SiteAnalyticsService = $injector.get('SiteAnalyticsService');
-    subscriptions.push(LoaderService.getLoadingMessageSubject().subscribe(
+    subscriptions.push(LoaderService.onLoadingMessageChange.subscribe(
       (message: string) => loadingMessage = message
     ));
     loadingMessage = '';

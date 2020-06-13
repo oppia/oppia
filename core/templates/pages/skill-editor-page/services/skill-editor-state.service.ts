@@ -26,7 +26,7 @@ require('domain/skill/skill-rights-backend-api.service.ts');
 require('pages/skill-editor-page/skill-editor-page.constants.ajs.ts');
 require('services/alerts.service.ts');
 require('services/questions-list.service.ts');
-import { Subject } from 'rxjs';
+import { EventEmitter } from '@angular/core';
 
 angular.module('oppia').factory('SkillEditorStateService', [
   'AlertsService', 'QuestionsListService',
@@ -46,10 +46,10 @@ angular.module('oppia').factory('SkillEditorStateService', [
       current: [],
       others: []
     };
-    var skillChangedSubject = new Subject();
+    var _skillChangedEventEmitter = new EventEmitter();
     var _setSkill = function(skill) {
       _skill.copyFromSkill(skill);
-      skillChangedSubject.next();
+      _skillChangedEventEmitter.emit();
       _skillIsInitialized = true;
     };
 
@@ -197,8 +197,8 @@ angular.module('oppia').factory('SkillEditorStateService', [
         return true;
       },
 
-      getSkillChangedSubject: function() {
-        return skillChangedSubject;
+      get onSkillChange() {
+        return _skillChangedEventEmitter;
       },
 
       getSkillRights: function() {
