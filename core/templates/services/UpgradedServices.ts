@@ -1017,16 +1017,16 @@ export class UpgradedServices {
       new ExplorationFeaturesBackendApiService(
         upgradedServices['UrlInterpolationService'],
         upgradedServices['HttpClient']);
-    upgradedServices['ExplorationStatsBackendApiService'] =
-      new ExplorationStatsBackendApiService(
-        upgradedServices['ExplorationStatsObjectFactory'],
-        upgradedServices['HttpClient'],
-        upgradedServices['UrlInterpolationService']);
     upgradedServices['ExplorationHtmlFormatterService'] =
       new ExplorationHtmlFormatterService(
         upgradedServices['CamelCaseToHyphensPipe'],
         upgradedServices['ExtensionTagAssemblerService'],
         upgradedServices['HtmlEscaperService']);
+    upgradedServices['ExplorationStatsBackendApiService'] =
+      new ExplorationStatsBackendApiService(
+        upgradedServices['ExplorationStatsObjectFactory'],
+        upgradedServices['HttpClient'],
+        upgradedServices['UrlInterpolationService']);
     upgradedServices['LearnerAnswerDetailsBackendApiService'] =
         new LearnerAnswerDetailsBackendApiService(
           upgradedServices['HttpClient'],
