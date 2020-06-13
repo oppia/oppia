@@ -382,25 +382,6 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             'Expected the first part of score_category to be content'):
             suggestion.validate()
 
-    def test_validate_score_sub_type(self):
-        expected_suggestion_dict = self.suggestion_dict
-        suggestion = suggestion_registry.SuggestionEditStateContent(
-            expected_suggestion_dict['suggestion_id'],
-            expected_suggestion_dict['target_id'],
-            expected_suggestion_dict['target_version_at_submission'],
-            expected_suggestion_dict['status'], self.author_id,
-            self.reviewer_id, expected_suggestion_dict['change'],
-            expected_suggestion_dict['score_category'], self.fake_date)
-
-        suggestion.validate()
-
-        suggestion.score_category = 'content.invalid_score_sub_type'
-        with self.assertRaisesRegexp(
-            Exception,
-            'Expected the second part of score_category to be a valid'
-            ' category'):
-            suggestion.validate()
-
     def test_validate_change_cmd(self):
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionEditStateContent(
@@ -410,7 +391,6 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'], self.fake_date)
-
         suggestion.validate()
 
         suggestion.change.cmd = 'invalid_cmd'
@@ -883,25 +863,6 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             Exception,
             'Expected the first part of score_category to be translation'):
-            suggestion.validate()
-
-    def test_validate_score_sub_type(self):
-        expected_suggestion_dict = self.suggestion_dict
-        suggestion = suggestion_registry.SuggestionTranslateContent(
-            expected_suggestion_dict['suggestion_id'],
-            expected_suggestion_dict['target_id'],
-            expected_suggestion_dict['target_version_at_submission'],
-            expected_suggestion_dict['status'], self.author_id,
-            self.reviewer_id, expected_suggestion_dict['change'],
-            expected_suggestion_dict['score_category'], self.fake_date)
-
-        suggestion.validate()
-
-        suggestion.score_category = 'translation.invalid_score_sub_type'
-        with self.assertRaisesRegexp(
-            Exception,
-            'Expected the second part of score_category to be a valid'
-            ' category'):
             suggestion.validate()
 
     def test_validate_change_cmd(self):
