@@ -158,7 +158,7 @@ class BaseSuggestion(python_utils.OBJECT):
                     self.author_id))
 
         if not isinstance(self.final_reviewer_id, python_utils.BASESTRING):
-            if self.final_reviewer_id:
+            if self.final_reviewer_id is not None:
                 raise utils.ValidationError(
                     'Expected final_reviewer_id to be a string, received %s' %
                     type(self.final_reviewer_id))
