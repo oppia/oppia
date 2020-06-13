@@ -2201,7 +2201,7 @@ class ExpSummaryModelValidator(BaseSummaryModelValidator):
 
     @classmethod
     def _get_external_instance_custom_validation_functions(cls):
-        return [_validate_exploration_model_last_updated]
+        return [cls._validate_exploration_model_last_updated]
 
 
 class GeneralFeedbackThreadModelValidator(BaseModelValidator):
@@ -3308,7 +3308,7 @@ class GeneralSuggestionModelValidator(BaseModelValidator):
 
     @classmethod
     def _get_external_instance_custom_validation_functions(cls):
-        return [_validate_target_version_at_submission]
+        return [cls._validate_target_version_at_submission]
 
 
 class GeneralVoiceoverApplicationModelValidator(BaseModelValidator):
