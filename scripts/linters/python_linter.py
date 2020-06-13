@@ -149,11 +149,11 @@ class PythonLintChecksManager(python_utils.OBJECT):
                 summary_message = (
                     '%s Function defintion checks failed,'
                     'see affect files above.'
-                    % (linter_utils.MESSAGE_TYPE_FAILED))
+                    % (linter_utils.FAILED_MESSAGE_PREFIX))
             else:
                 summary_message = (
                     '%s Function definition checks passed'
-                    % (linter_utils.MESSAGE_TYPE_SUCCESS))
+                    % (linter_utils.SUCCESS_MESSAGE_PREFIX))
 
             python_utils.PRINT(summary_message)
             summary_messages.append(summary_message)
