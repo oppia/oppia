@@ -32,7 +32,7 @@ TEST_SUITES_NOT_RUN_ON_TRAVIS = [
     'full', 'adminPage', 'accessibility', 'classroomPage',
     'classroomPageFileUploadFeatures', 'collections', 'embedding',
     'fileUploadFeatures', 'library', 'navigation', 'playTranslations',
-    'preferences', 'profileFeatures', 'profileMenu', 'publication', 
+    'preferences', 'profileFeatures', 'profileMenu', 'publication',
     'subscriptions', 'topicAndStoryEditorFileUploadFeatures', 'users']
 
 TRAVIS_CI_FILE_PATH = os.path.join(os.getcwd(), '.travis.yml')
