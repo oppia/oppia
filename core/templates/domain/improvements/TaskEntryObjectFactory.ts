@@ -26,7 +26,7 @@ export interface ITaskEntryBackendDict {
   'task_type': string;
   'target_type': string;
   'target_id': string;
-  'issue_description'?: string;
+  'issue_description': string;
   'status': string;
   'closed_by': string;
   'closed_on_msecs': number;
@@ -80,23 +80,23 @@ export class TaskEntry {
 
   // NOTE TO DEVELOPERS: Only subclasses can change the task status, and only
   // through the following 3 methods. This ensures that the three status fields
-  // (taskStatus, closedBy, closedOnMsecs) are always in sync.
+  // (taskStatus, closedBy, closedOnMsecs) are always kept in sync.
 
-  protected makeOpen(): void {
-    this.closedBy = null;
+  protected markAsOpen(): void {
     this.closedOnMsecs = null;
+    this.closedBy = null;
     this.taskStatus = ImprovementsConstants.TASK_STATUS_TYPE_OPEN;
   }
 
-  protected makeObsolete(): void {
-    this.closedBy = null;
+  protected markAsObsolete(): void {
     this.closedOnMsecs = null;
+    this.closedBy = null;
     this.taskStatus = ImprovementsConstants.TASK_STATUS_TYPE_OBSOLETE;
   }
 
-  protected makeResolved(userId: string): void {
-    this.closedBy = userId;
+  protected markAsResolved(userId: string): void {
     this.closedOnMsecs = new Date().getUTCMilliseconds();
+    this.closedBy = userId;
     this.taskStatus = ImprovementsConstants.TASK_STATUS_TYPE_RESOLVED;
   }
 }

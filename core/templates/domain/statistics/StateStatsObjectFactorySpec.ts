@@ -22,7 +22,7 @@ import { StateStatsObjectFactory } from
   'domain/statistics/StateStatsObjectFactory';
 
 describe('State stats', function() {
-  let stateStatsObjectFactory: StateStatsObjectFactory = null;
+  let stateStatsObjectFactory: StateStatsObjectFactory;
 
   beforeEach(() => {
     stateStatsObjectFactory = TestBed.get(StateStatsObjectFactory);

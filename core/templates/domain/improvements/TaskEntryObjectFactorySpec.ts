@@ -23,7 +23,7 @@ import { ITaskEntryBackendDict, TaskEntry, TaskEntryObjectFactory } from
   'domain/improvements/TaskEntryObjectFactory';
 
 describe('Task entry', function() {
-  let taskEntryObjectFactory: TaskEntryObjectFactory = null;
+  let taskEntryObjectFactory: TaskEntryObjectFactory;
 
   beforeEach(() => {
     taskEntryObjectFactory = TestBed.get(TaskEntryObjectFactory);
@@ -47,9 +47,9 @@ describe('Task entry', function() {
     expect(task.targetId).toEqual('Introduction');
     expect(task.getIssueDescription())
       .toEqual('20% of learners dropped at this state');
+    expect(task.isResolved()).toBeTrue();
     expect(task.isObsolete()).toBeFalse();
     expect(task.isOpen()).toBeFalse();
-    expect(task.isResolved()).toBeTrue();
     expect(task.getClosedBy()).toEqual('uuid');
     expect(task.getClosedOnMsecs()).toEqual(123456789);
 

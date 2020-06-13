@@ -18,16 +18,14 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { ExplorationStats, ExplorationStatsObjectFactory } from
+import { ExplorationStatsObjectFactory } from
   'domain/statistics/ExplorationStatsObjectFactory';
 import { HighBounceRateTaskObjectFactory } from
   'domain/improvements/HighBounceRateTaskObjectFactory';
-import { IStateStatsBackendDict } from
-  'domain/statistics/StateStatsObjectFactory';
 
 describe('High bounce rate task', function() {
-  let explorationStatsObjectFactory: ExplorationStatsObjectFactory = null;
-  let highBounceRateTaskObjectFactory: HighBounceRateTaskObjectFactory = null;
+  let explorationStatsObjectFactory: ExplorationStatsObjectFactory;
+  let highBounceRateTaskObjectFactory: HighBounceRateTaskObjectFactory;
 
   beforeEach(() => {
     explorationStatsObjectFactory = TestBed.get(ExplorationStatsObjectFactory);
@@ -36,24 +34,23 @@ describe('High bounce rate task', function() {
   });
 
   beforeEach(() => {
-    this.makeExplorationStatsWithBounceRate = (
-      (numExpStarts: number, bounceRate: number): ExplorationStats => {
+    this.newExplorationStatsWithBounceRate = (
+      (numExpStarts: number, bounceRate: number) => {
         return explorationStatsObjectFactory.createFromBackendDict({
           exp_id: 'eid',
           exp_version: 1,
           num_starts: numExpStarts,
-          num_actual_starts: 20,
-          num_completions: 200,
+          num_actual_starts: 0,
+          num_completions: 0,
           state_stats_mapping: {
-            Introduction: (
-              <IStateStatsBackendDict>{
-                total_answers_count: 0,
-                useful_feedback_count: 0,
-                total_hit_count: numExpStarts,
-                first_hit_count: 0,
-                num_times_solution_viewed: 0,
-                num_completions: numExpStarts * (1 - bounceRate),
-              }),
+            Introduction: {
+              total_answers_count: 0,
+              useful_feedback_count: 0,
+              total_hit_count: numExpStarts,
+              first_hit_count: 0,
+              num_times_solution_viewed: 0,
+              num_completions: Math.round(numExpStarts * (1 - bounceRate)),
+            },
           },
         });
       });
@@ -61,10 +58,11 @@ describe('High bounce rate task', function() {
 
   it('should create new task when a state has a high bounce rate', () => {
     const task = highBounceRateTaskObjectFactory.createFromExplorationStats(
-      this.makeExplorationStatsWithBounceRate(200, 0.50), 'Introduction');
+      this.newExplorationStatsWithBounceRate(200, 0.50), 'Introduction');
 
     expect(task).not.toBeNull();
     expect(task.taskType).toEqual('high_bounce_rate');
+    expect(task.targetType).toEqual('state');
     expect(task.targetId).toEqual('Introduction');
     expect(task.getIssueDescription())
       .toEqual('50% of learners had dropped off at this card.');
@@ -74,14 +72,14 @@ describe('High bounce rate task', function() {
   it('should not be created when state has a low bounce rate', () => {
     expect(
       highBounceRateTaskObjectFactory.createFromExplorationStats(
-        this.makeExplorationStatsWithBounceRate(200, 0.15), 'Introduction'))
+        this.newExplorationStatsWithBounceRate(200, 0.15), 'Introduction'))
       .toBeNull();
   });
 
   it('should not be created when state has too few exploration starts', () => {
     expect(
       highBounceRateTaskObjectFactory.createFromExplorationStats(
-        this.makeExplorationStatsWithBounceRate(80, 0.50), 'Introduction'))
+        this.newExplorationStatsWithBounceRate(80, 0.50), 'Introduction'))
       .toBeNull();
   });
 
@@ -93,7 +91,7 @@ describe('High bounce rate task', function() {
       issue_description: '28% of learners had dropped off at this card.',
       status: 'open',
       closed_by: null,
-      closed_on_msecs: null
+      closed_on_msecs: null,
     });
 
     expect(task.taskType).toEqual('high_bounce_rate');
@@ -113,7 +111,7 @@ describe('High bounce rate task', function() {
         issue_description: '28% of learners had dropped off at this card.',
         status: 'open',
         closed_by: null,
-        closed_on_msecs: null
+        closed_on_msecs: null,
       })).toBeNull();
   });
 
@@ -126,13 +124,13 @@ describe('High bounce rate task', function() {
         issue_description: '28% of learners had dropped off at this card.',
         status: 'open',
         closed_by: null,
-        closed_on_msecs: null
+        closed_on_msecs: null,
       })).toBeNull();
   });
 
   it('should capture current date when resolved', () => {
     const task = highBounceRateTaskObjectFactory.createFromExplorationStats(
-      this.makeExplorationStatsWithBounceRate(200, 0.50), 'Introduction');
+      this.newExplorationStatsWithBounceRate(200, 0.50), 'Introduction');
     expect(task.isOpen()).toBeTrue();
     expect(task.isResolved()).toBeFalse();
     expect(task.getClosedBy()).toBeNull();
@@ -148,27 +146,38 @@ describe('High bounce rate task', function() {
     expect(task.getClosedOnMsecs()).toEqual(mockDate.getUTCMilliseconds());
   });
 
-  it('should refresh status from changes in exploration stats', () => {
+  it('should update status based on changes to exploration stats', () => {
     const task = highBounceRateTaskObjectFactory.createFromExplorationStats(
-      this.makeExplorationStatsWithBounceRate(200, 0.50), 'Introduction');
+      this.newExplorationStatsWithBounceRate(200, 0.50), 'Introduction');
     expect(task.isOpen()).toBeTrue();
     expect(task.isObsolete()).toBeFalse();
     expect(task.isResolved()).toBeFalse();
 
-    task.refreshStatus(this.makeExplorationStatsWithBounceRate(200, 0.10));
+    task.refreshStatus(this.newExplorationStatsWithBounceRate(200, 0.10));
     expect(task.isOpen()).toBeFalse();
     expect(task.isObsolete()).toBeTrue();
     expect(task.isResolved()).toBeFalse();
 
-    task.refreshStatus(this.makeExplorationStatsWithBounceRate(200, 0.80));
+    task.refreshStatus(this.newExplorationStatsWithBounceRate(200, 0.80));
     expect(task.isOpen()).toBeTrue();
     expect(task.isObsolete()).toBeFalse();
     expect(task.isResolved()).toBeFalse();
   });
 
+  it('should not update status when number of starts is too low', () => {
+    const task = highBounceRateTaskObjectFactory.createFromExplorationStats(
+      this.newExplorationStatsWithBounceRate(200, 0.50), 'Introduction');
+    expect(task.isOpen()).toBeTrue();
+    expect(task.isObsolete()).toBeFalse();
+
+    task.refreshStatus(this.newExplorationStatsWithBounceRate(25, 0.05));
+    expect(task.isOpen()).toBeTrue();
+    expect(task.isObsolete()).toBeFalse();
+  });
+
   it('should stay resolved regardless of changes in exploration stats', () => {
     const task = highBounceRateTaskObjectFactory.createFromExplorationStats(
-      this.makeExplorationStatsWithBounceRate(200, 0.50), 'Introduction');
+      this.newExplorationStatsWithBounceRate(200, 0.50), 'Introduction');
     expect(task.isResolved()).toBeFalse();
     expect(task.isOpen()).toBeTrue();
     expect(task.isObsolete()).toBeFalse();
@@ -178,12 +187,12 @@ describe('High bounce rate task', function() {
     expect(task.isOpen()).toBeFalse();
     expect(task.isObsolete()).toBeFalse();
 
-    task.refreshStatus(this.makeExplorationStatsWithBounceRate(200, 0.10));
+    task.refreshStatus(this.newExplorationStatsWithBounceRate(200, 0.05));
     expect(task.isResolved()).toBeTrue();
     expect(task.isOpen()).toBeFalse();
     expect(task.isObsolete()).toBeFalse();
 
-    task.refreshStatus(this.makeExplorationStatsWithBounceRate(200, 0.80));
+    task.refreshStatus(this.newExplorationStatsWithBounceRate(200, 0.95));
     expect(task.isResolved()).toBeTrue();
     expect(task.isOpen()).toBeFalse();
     expect(task.isObsolete()).toBeFalse();

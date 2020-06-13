@@ -25,7 +25,7 @@ export namespace ImprovementsConstants {
 
   export const TASK_TARGET_TYPE_STATE: string = 'state';
 
-  export const HIGH_BOUNCE_RATE_MINIMUM_EXPLORATION_STARTS: number = 100;
   export const HIGH_BOUNCE_RATE_THRESHOLD_HIGH: number = 0.25;
   export const HIGH_BOUNCE_RATE_THRESHOLD_LOW: number = 0.20;
+  export const HIGH_BOUNCE_RATE_MINIMUM_EXPLORATION_STARTS: number = 100;
 }

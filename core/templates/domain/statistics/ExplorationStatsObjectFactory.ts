@@ -28,7 +28,7 @@ export interface IExplorationStatsBackendDict {
   'num_starts': number;
   'num_actual_starts': number;
   'num_completions': number;
-  'state_stats_mapping': {[stateName: string]: IStateStatsBackendDict};
+  'state_stats_mapping': { [stateName: string]: IStateStatsBackendDict };
 }
 
 @Injectable({
@@ -45,8 +45,7 @@ export class ExplorationStats {
 
   getBounceRate(stateName: string): number {
     const { totalHitCount, numCompletions } = this.getStateStats(stateName);
-    const stateDropOffs = totalHitCount - numCompletions;
-    return stateDropOffs / this.numStarts;
+    return (totalHitCount - numCompletions) / this.numStarts;
   }
 
   getStateStats(stateName: string): StateStats {
@@ -67,10 +66,8 @@ export class ExplorationStatsObjectFactory {
       backendDict: IExplorationStatsBackendDict): ExplorationStats {
     const stateStatsMapping = new Map(
       Object.entries(backendDict.state_stats_mapping).map(
-        ([stateName, stateStats]) => [
-          stateName,
-          this.stateStatsObjectFactory.createFromBackendDict(stateStats)
-        ]));
+        ([s, d]) => [s, this.stateStatsObjectFactory.createFromBackendDict(d)])
+    );
 
     return new ExplorationStats(
       backendDict.exp_id, backendDict.exp_version, backendDict.num_starts,

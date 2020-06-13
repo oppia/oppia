@@ -40,7 +40,7 @@ export class HighBounceRateTask extends TaskEntry {
   }
 
   public resolve(userId: string): void {
-    this.makeResolved(userId);
+    this.markAsResolved(userId);
   }
 
   public refreshStatus(explorationStats: ExplorationStats): void {
@@ -49,14 +49,14 @@ export class HighBounceRateTask extends TaskEntry {
       return;
     }
     const bounceRate = explorationStats.getBounceRate(this.targetId);
-    if (this.isOpen() &&
-        bounceRate < ImprovementsConstants.HIGH_BOUNCE_RATE_THRESHOLD_LOW) {
-      this.makeObsolete();
-    } else if (this.isObsolete() &&
-               bounceRate >=
-               ImprovementsConstants.HIGH_BOUNCE_RATE_THRESHOLD_HIGH) {
-      this.makeOpen();
+    if (this.isObsolete() &&
+        bounceRate >= ImprovementsConstants.HIGH_BOUNCE_RATE_THRESHOLD_HIGH) {
+      this.markAsOpen();
       this.generateIssueDescription(bounceRate);
+    } else if (this.isOpen() &&
+               bounceRate <
+                   ImprovementsConstants.HIGH_BOUNCE_RATE_THRESHOLD_LOW) {
+      this.markAsObsolete();
     }
   }
 
@@ -75,11 +75,10 @@ export class HighBounceRateTaskObjectFactory {
    * Returns a new task for the given state when the stats demonstrate a high
    * bounce rate for the given state. Otherwise, returns null.
    */
-  public createFromExplorationStats(
-      expStats: ExplorationStats,
-      stateName: string): HighBounceRateTask | null {
+  createFromExplorationStats(
+      stats: ExplorationStats, stateName: string): HighBounceRateTask | null {
     const task = new HighBounceRateTask(stateName);
-    task.refreshStatus(expStats);
+    task.refreshStatus(stats);
     return task.isOpen() ? task : null;
   }
 
@@ -87,19 +86,19 @@ export class HighBounceRateTaskObjectFactory {
    * Returns a new task from the given backend dict, or null if the dict does
    * not represent a high bounce rate task.
    */
-  public createFromBackendDict(
+  createFromBackendDict(
       backendDict: ITaskEntryBackendDict): HighBounceRateTask | null {
     if (backendDict.task_type !==
-        ImprovementsConstants.TASK_TYPE_HIGH_BOUNCE_RATE) {
+            ImprovementsConstants.TASK_TYPE_HIGH_BOUNCE_RATE) {
       return null;
     }
     if (backendDict.target_type !==
-        ImprovementsConstants.TASK_TARGET_TYPE_STATE) {
+            ImprovementsConstants.TASK_TARGET_TYPE_STATE) {
       return null;
     }
     return new HighBounceRateTask(
-      backendDict.target_id, backendDict.issue_description,
-      backendDict.status, backendDict.closed_by, backendDict.closed_on_msecs);
+      backendDict.target_id, backendDict.issue_description, backendDict.status,
+      backendDict.closed_by, backendDict.closed_on_msecs);
   }
 }
 

@@ -16,8 +16,7 @@
  * @fileoverview Unit tests for the ExplorationStatsService.
  */
 
-import { HttpClientTestingModule } from
-  '@angular/common/http/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { ContextService } from 'services/context.service';
@@ -28,11 +27,10 @@ import { ExplorationStatsObjectFactory } from
 import { ExplorationStatsService } from 'services/exploration-stats.service';
 
 describe('Exploration stats service', function() {
-  let contextService: ContextService = null;
-  let explorationStatsBackendApiService: ExplorationStatsBackendApiService = (
-    null);
-  let explorationStatsObjectFactory: ExplorationStatsObjectFactory = null;
-  let explorationStatsService: ExplorationStatsService = null;
+  let contextService: ContextService;
+  let explorationStatsBackendApiService: ExplorationStatsBackendApiService;
+  let explorationStatsObjectFactory: ExplorationStatsObjectFactory;
+  let explorationStatsService: ExplorationStatsService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({imports: [HttpClientTestingModule]});
