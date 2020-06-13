@@ -176,8 +176,8 @@ class BaseSuggestion(python_utils.OBJECT):
                     self.final_reviewer_id != feconf.SUGGESTION_BOT_USER_ID
             ):
                 raise utils.ValidationError(
-                'Expected final_reviewer_id to be in a valid user ID format, '
-                'received %s' % self.final_reviewer_id)
+                    'Expected final_reviewer_id to be in a valid user ID '
+                    'format, received %s' % self.final_reviewer_id)
 
         if not isinstance(self.score_category, python_utils.BASESTRING):
             raise utils.ValidationError(
