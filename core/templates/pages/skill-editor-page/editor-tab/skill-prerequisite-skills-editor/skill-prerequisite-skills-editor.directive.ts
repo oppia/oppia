@@ -71,7 +71,8 @@ angular.module('oppia').directive('skillPrerequisiteSkillsEditor', [
                 sortedSkillSummaries: () => sortedSkillSummaries
               },
               controller: 'SelectSkillModalController'
-            }).result.then(function(skillId) {
+            }).result.then(function(summary) {
+              var skillId = summary.id;
               if (skillId === $scope.skill.getId()) {
                 AlertsService.addInfoMessage(
                   'A skill cannot be a prerequisite of itself', 5000);
