@@ -301,6 +301,41 @@ class ItemSelectionInteractionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         yield (key, values)
 
 
+class ExplorationMathTagValidationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """Job that checks the html content of an exploration and validates all the
+    Math tags in the HTML.
+    """
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    @staticmethod
+    def map(item):
+        if item.deleted:
+            return
+
+        exploration = exp_fetchers.get_exploration_from_model(item)
+        for state_name, state in exploration.states.items():
+            html_string = ''.join(state.get_all_html_content_strings())
+            error_list = (
+                html_validation_service.validate_math_tags_in_html(html_string))
+            if len(error_list) > 0:
+                yield ({
+                    'exp_id': item.id,
+                    'exploration_rights': (
+                        rights_manager.get_exploration_rights(
+                            item.id).status)
+                    }, {
+                        'state': state_name,
+                        'error_list': python_utils.UNICODE(error_list),
+                        'no_of_invalid_tags': len(error_list)
+                    })
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, values)
+
+
 class ViewableExplorationsAuditJob(jobs.BaseMapReduceOneOffJobManager):
     """Job that outputs a list of private explorations which are viewable."""
 

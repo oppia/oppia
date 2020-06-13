@@ -1507,6 +1507,44 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             html_validation_service.get_invalid_svg_tags_and_attrs(
                 invalid_svg_string), ([], ['path:keytimes']))
 
+    def test_validate_math_tags_in_html(self):
+        test_cases = [
+            ('<p>Feedback</p><oppia-noninteractive-math raw_latex-with-valu'
+             'e="+,-,-,+"></oppia-noninteractive-math>'),
+            ('<p>Feedback</p><oppia-noninteractive-math></oppia-noninteracti'
+             've-math>'),
+            ('<p>Feedback</p><oppia-noninteractive-math invalid_tag-with-valu'
+             'e="&amp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>'),
+            ('<p>Feedback</p><oppia-noninteractive-math raw_latex-with-valu'
+             'e="&amp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>'),
+        ]
+        output_for_test_case1 = (
+            html_validation_service.validate_math_tags_in_html(test_cases[0]))
+        expected_error_message1 = (
+            'Invalid raw_latex value found in the math tag : No JSON object co'
+            'uld be decoded')
+        self.assertEqual(
+            output_for_test_case1[0]['error'], expected_error_message1)
+
+        output_for_test_case2 = (
+            html_validation_service.validate_math_tags_in_html(test_cases[1]))
+        expected_error_message2 = (
+            'Invalid math tag with no proper attribute found')
+        self.assertEqual(
+            output_for_test_case2[0]['error'], expected_error_message2)
+
+        output_for_test_case3 = (
+            html_validation_service.validate_math_tags_in_html(test_cases[2]))
+        expected_error_message3 = (
+            'Invalid math tag with no proper attribute found')
+        self.assertEqual(
+            output_for_test_case3[0]['error'], expected_error_message3)
+
+        self.assertEqual(
+            len(html_validation_service.validate_math_tags_in_html(
+                test_cases[3])), 0)
+
+
     def test_parsable_as_xml(self):
         invalid_xml = 'aDRjSzNS'
         self.assertEqual(

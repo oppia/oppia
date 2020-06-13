@@ -29,7 +29,7 @@ from core.domain import fs_domain
 from core.domain import fs_services
 from core.domain import rte_component_registry
 from core.platform import models
-
+from extensions.objects.models import objects
 import feconf
 import python_utils
 
@@ -907,6 +907,46 @@ def get_invalid_svg_tags_and_attrs(svg_string):
         else:
             invalid_elements.append(element.name)
     return (invalid_elements, invalid_attrs)
+
+
+def validate_math_tags_in_html(html_string):
+    """Returns a list of all invalid math tags in the given HTML.
+
+    Args:
+        html_string: str. The HTML string.
+
+    Returns:
+        list(dict). A list of dicts having invalid math tags. Each dict has
+        2 keys, one key is for the invalid tag and the other key is the error
+        raised because of the invalid tag.
+    """
+
+    soup = bs4.BeautifulSoup(
+        html_string.encode(encoding='utf-8'), 'html.parser')
+    error_list = []
+    for math_tag in soup.findAll(name='oppia-noninteractive-math'):
+        if math_tag.has_attr('raw_latex-with-value'):
+            try:
+                # The raw_latex attribute value should be enclosed in
+                # double quotes(&amp;quot;) and should be a valid unicode
+                # string.
+                raw_latex = (
+                    json.loads(unescape_html(math_tag['raw_latex-with-value'])))
+                objects.UnicodeString.normalize(raw_latex)
+            except Exception as e:
+                error_message = (
+                    'Invalid raw_latex value found in the math tag : %s' % (
+                        python_utils.UNICODE(e)))
+                error_list.append({
+                    'tag': math_tag,
+                    'error': error_message
+                })
+        else:
+            error_list.append({
+                'tag': math_tag,
+                'error': 'Invalid math tag with no proper attribute found'
+            })
+    return error_list
 
 
 def is_parsable_as_xml(xml_string):

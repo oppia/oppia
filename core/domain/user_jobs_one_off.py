@@ -20,8 +20,11 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import ast
 
 from core import jobs
+from core.domain import exp_domain
 from core.domain import exp_fetchers
+from core.domain import html_validation_service
 from core.domain import rights_manager
+from core.domain import state_domain
 from core.domain import subscription_services
 from core.domain import user_services
 from core.platform import models
@@ -321,6 +324,78 @@ class UserFirstContributionMsecOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         first_contribution_msec = min(commit_times_msec)
         user_services.update_first_contribution_msec_if_not_set(
             user_id, first_contribution_msec)
+
+
+class DraftChangesMathValidationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """Job that checks the html content of an exploration Draft change List and
+     validates all the Math tags in the HTML.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        """Return a list of datastore class references to map over."""
+        return [user_models.ExplorationUserDataModel]
+
+    @staticmethod
+    def map(item):
+        """Implements the map function for this job."""
+        draft_change_list = item.draft_change_list
+        html_list = []
+        for change in draft_change_list:
+            if not change['cmd'] == exp_domain.CMD_EDIT_STATE_PROPERTY:
+                continue
+            new_value = change['new_value']
+            if change['property_name'] == exp_domain.STATE_PROPERTY_CONTENT:
+                html_list = html_list + [new_value['html']]
+            elif (change['property_name'] ==
+                  exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS):
+                # Only customization args with the key 'choices' have HTML
+                # content in them.
+                if 'choices' in new_value.keys():
+                    html_list = html_list + new_value['choices']['value']
+            elif (change['property_name'] ==
+                  exp_domain.STATE_PROPERTY_WRITTEN_TRANSLATIONS):
+                written_translations_object = (
+                    state_domain.WrittenTranslations.from_dict(new_value))
+                html_list = (
+                    html_list +
+                    written_translations_object.get_all_html_content_strings())
+            elif (change['property_name'] ==
+                  exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME):
+                html_list = html_list + [new_value['feedback']['html']]
+            elif (change['property_name'] ==
+                  exp_domain.STATE_PROPERTY_INTERACTION_HINTS):
+                for hint in new_value:
+                    html_list = html_list + [hint['hint_content']['html']]
+            elif (change['property_name'] ==
+                  exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION):
+                html_list = html_list + [new_value['explanation']['html']]
+            elif (change['property_name'] ==
+                  exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
+                for answer_group in new_value:
+                    answer_group_object = (
+                        state_domain.AnswerGroup.from_dict(answer_group))
+                    html_list = (
+                        html_list +
+                        answer_group_object.get_all_html_content_strings())
+
+        html_string = ''.join(html_list)
+        error_list = (
+            html_validation_service.validate_math_tags_in_html(html_string))
+        if len(error_list) > 0:
+            yield ({
+                'draft_id': item.id,
+                'exp_id': item.exploration_id,
+                'user_id': item.user_id,
+                'no_of_invalid_tags': len(error_list)
+                }, {
+                    'error_list': python_utils.UNICODE(error_list)
+                })
+
+    @staticmethod
+    def reduce(key, values):
+        """Implements the reduce function for this job."""
+        yield (key, values)
 
 
 class UserProfilePictureOneOffJob(jobs.BaseMapReduceOneOffJobManager):

@@ -149,6 +149,43 @@ class AnswerGroup(python_utils.OBJECT):
 
         self.outcome.validate()
 
+    def get_all_html_content_strings(self):
+        """Get all html content strings in the AnswerGroup.
+
+        Returns:
+            list(str). The list of all html content strings in the interaction.
+        """
+        html_list = []
+
+        outcome_html = self.outcome.feedback.html
+        html_list = html_list + [outcome_html]
+        for rule_spec in self.rule_specs:
+            if rule_spec.rule_type == 'IsEqualToOrdering':
+                rule_spec_html_list = rule_spec.inputs['x']
+                for rule_spec_html in rule_spec_html_list:
+                    html_list = html_list + rule_spec_html
+            elif (rule_spec.rule_type ==
+                  'IsEqualToOrderingWithOneItemAtIncorrectPosition'):
+                rule_spec_html_list = rule_spec.inputs['x']
+                for rule_spec_html in rule_spec_html_list:
+                    html_list = html_list + rule_spec_html
+            elif rule_spec.rule_type == 'HasElementXAtPositionY':
+                html_list = html_list + [rule_spec.inputs['x']]
+            elif rule_spec.rule_type == 'HasElementXBeforeElementY':
+                html_list = (
+                    html_list + [rule_spec.inputs['y']] +
+                    [rule_spec.inputs['x']])
+            elif rule_spec.rule_type in (
+                    'ContainsAtLeastOneOf', 'IsProperSubsetOf',
+                    'DoesNotContainAtLeastOneOf', 'Equals'):
+                if isinstance(rule_spec.inputs['x'], list):
+                    for value in rule_spec.inputs['x']:
+                        if isinstance(value, python_utils.BASESTRING):
+                            rule_spec_html = rule_spec.inputs['x']
+                            html_list = html_list + rule_spec_html
+
+        return html_list
+
 
 class Hint(python_utils.OBJECT):
     """Value object representing a hint."""
@@ -535,23 +572,7 @@ class InteractionInstance(python_utils.OBJECT):
         html_list = []
 
         for answer_group in self.answer_groups:
-            outcome_html = answer_group.outcome.feedback.html
-            html_list = html_list + [outcome_html]
-
-        # Note that ItemSelectionInput replicates the customization arg HTML
-        # in its answer groups.
-        if self.id == 'ItemSelectionInput':
-            for answer_group in self.answer_groups:
-                for rule_spec in answer_group.rule_specs:
-                    rule_spec_html = rule_spec.inputs['x']
-                    html_list = html_list + rule_spec_html
-
-        if self.id == 'DragAndDropSortInput':
-            for answer_group in self.answer_groups:
-                for rule_spec in answer_group.rule_specs:
-                    rule_spec_html_list = rule_spec.inputs['x']
-                    for rule_spec_html in rule_spec_html_list:
-                        html_list = html_list + rule_spec_html
+            html_list = html_list + answer_group.get_all_html_content_strings()
 
         if self.default_outcome:
             default_outcome_html = self.default_outcome.feedback.html
@@ -1080,6 +1101,18 @@ class WrittenTranslations(python_utils.OBJECT):
                     translation_counts[language] += 1
 
         return translation_counts
+
+    def get_all_html_content_strings(self):
+        """Gets all html content strings used in the written translations.
+
+        Returns:
+            list(str). The list of html content strings.
+        """
+        html_string_list = []
+        for translations in self.translations_mapping.values():
+            for translation in translations.values():
+                html_string_list.append(translation.html)
+        return html_string_list
 
 
 class RecordedVoiceovers(python_utils.OBJECT):
@@ -2151,3 +2184,15 @@ class State(python_utils.OBJECT):
                     'choices']['value'][value_index] = conversion_fn(value)
 
         return state_dict
+
+    def get_all_html_content_strings(self):
+        """Get all html content strings in the state.
+
+        Returns:
+            list(str). The list of all html content strings in the interaction.
+        """
+        html_list = (
+            self.written_translations.get_all_html_content_strings() +
+            self.interaction.get_all_html_content_strings() + [
+                self.content.html])
+        return html_list

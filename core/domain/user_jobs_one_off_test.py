@@ -195,6 +195,417 @@ class UserContributionsOneOffJobTests(test_utils.GenericTestBase):
             ['exp_id'])
 
 
+class DraftChangesMathValidationOneOffJobTests(test_utils.GenericTestBase):
+    EXP_ID_1 = 'exp_id_1'
+    USER_A_EMAIL = 'a@example.com'
+    USER_A_USERNAME = 'a'
+    DATETIME = datetime.datetime.utcnow() + datetime.timedelta(30)
+
+    def _run_one_off_job(self):
+        """Runs the one-off MapReduce job."""
+        job_id = (
+            user_jobs_one_off.DraftChangesMathValidationOneOffJob.create_new())
+        user_jobs_one_off.DraftChangesMathValidationOneOffJob.enqueue(job_id)
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_tasks()
+        actual_output = (
+            user_jobs_one_off.
+            DraftChangesMathValidationOneOffJob.get_output(job_id))
+        return actual_output
+
+    def setUp(self):
+        super(DraftChangesMathValidationOneOffJobTests, self).setUp()
+        self.signup(self.USER_A_EMAIL, self.USER_A_USERNAME)
+        self.user_a_id = self.get_user_id_from_email(self.USER_A_EMAIL)
+        self.save_new_valid_exploration(
+            self.EXP_ID_1, self.user_a_id, end_state_name='End')
+
+    def test_draft_changes_with_invalid_tags(self):
+        """Creates the ExplorationUserDataModel objects for testing."""
+        # Explorations with draft set.
+
+        invalid_html_content1 = (
+            '<p>Value</p><oppia-noninteractive-math></oppia-noninteractive-m'
+            'ath>')
+
+        draft_change_list = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'state2',
+                'property_name': 'widget_customization_args',
+                'new_value': {
+                    'choices': {
+                        'value': [
+                            '<p>1</p>',
+                            '<p>2</p>',
+                            invalid_html_content1,
+                            '<p>4</p>'
+                        ]
+                    },
+                    'maxAllowableSelectionCount': {
+                        'value': 1
+                    },
+                    'minAllowableSelectionCount': {
+                        'value': 1
+                    }
+                }
+            }).to_dict(), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name': 'answer_groups',
+                'state_name': 'State 1',
+                'new_value': [{
+                    'rule_specs': [{
+                        'rule_type': 'Equals',
+                        'inputs': {
+                            'x': [invalid_html_content1]
+                        }
+                    }, {
+                        'rule_type': 'ContainsAtLeastOneOf',
+                        'inputs': {
+                            'x': [invalid_html_content1]
+                        }
+                    }, {
+                        'rule_type': 'IsProperSubsetOf',
+                        'inputs': {
+                            'x': [invalid_html_content1]
+                        }
+                    }, {
+                        'rule_type': 'DoesNotContainAtLeastOneOf',
+                        'inputs': {
+                            'x': [invalid_html_content1]
+                        }
+                    }, {
+                        'rule_type': 'Equals',
+                        'inputs': {
+                            'x': 1
+                        }
+                    }, {
+                        'rule_type': 'HasElementXAtPositionY',
+                        'inputs': {
+                            'x': invalid_html_content1,
+                            'y': 2
+                        }
+                    }, {
+                        'rule_type': 'IsEqualToOrdering',
+                        'inputs': {
+                            'x': [[invalid_html_content1]]
+                        }
+                    }, {
+                        'rule_type': 'HasElementXBeforeElementY',
+                        'inputs': {
+                            'x': invalid_html_content1,
+                            'y': invalid_html_content1
+                        }
+                    }, {
+                        'rule_type': (
+                            'IsEqualToOrderingWithOneItemAtIncorrectPosition'),
+                        'inputs': {
+                            'x': [[invalid_html_content1]]
+                        }
+                    }],
+                    'outcome': {
+                        'dest': 'Introduction',
+                        'feedback': {
+                            'content_id': 'feedback',
+                            'html': invalid_html_content1
+                        },
+                        'param_changes': [],
+                        'labelled_as_correct': False,
+                        'refresher_exploration_id': None,
+                        'missing_prerequisite_skill_id': None
+                    },
+                    'training_data': [],
+                    'tagged_skill_misconception_id': None
+                }]
+            }).to_dict(), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Intro',
+                'property_name': 'content',
+                'new_value': {
+                    'content_id': 'content',
+                    'html': invalid_html_content1
+                }
+            }).to_dict(), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Intro',
+                'property_name': 'written_translations',
+                'new_value': {
+                    'translations_mapping': {
+                        'content1': {
+                            'en': {
+                                'html': invalid_html_content1,
+                                'needs_update': True
+                            },
+                            'hi': {
+                                'html': 'Hey!',
+                                'needs_update': False
+                            }
+                        },
+                        'feedback_1': {
+                            'hi': {
+                                'html': invalid_html_content1,
+                                'needs_update': False
+                            },
+                            'en': {
+                                'html': 'hello!',
+                                'needs_update': False
+                            }
+                        }
+                    }
+                }
+            }).to_dict(), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Intro',
+                'property_name': 'solution',
+                'new_value': {
+                    'answer_is_exclusive': False,
+                    'correct_answer': 'helloworld!',
+                    'explanation': {
+                        'content_id': 'solution',
+                        'html': invalid_html_content1
+                    },
+                }
+            }).to_dict(), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Intro',
+                'property_name': 'default_outcome',
+                'new_value': {
+                    'param_changes': [],
+                    'feedback': {
+                        'content_id': 'default_outcome',
+                        'html': invalid_html_content1
+                    },
+                    'dest': 'Introduction',
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None,
+                    'labelled_as_correct': False
+                }
+            }).to_dict(), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Intro',
+                'property_name': 'hints',
+                'new_value': [{
+                    'hint_content': {
+                        'content_id': 'hint1',
+                        'html': invalid_html_content1
+                    }
+                }]
+            }).to_dict(), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_RENAME_STATE,
+                'old_state_name': 'Intro',
+                'new_state_name': 'Introduction',
+            }).to_dict()
+        ]
+
+
+        user_models.ExplorationUserDataModel(
+            id='%s.%s' % (self.user_a_id, self.EXP_ID_1),
+            user_id=self.user_a_id,
+            exploration_id=self.EXP_ID_1,
+            draft_change_list=draft_change_list,
+            draft_change_list_last_updated=self.DATETIME,
+            draft_change_list_exp_version=1,
+            draft_change_list_id=1).put()
+
+        output = self._run_one_off_job()
+        output_list = ast.literal_eval(output[0])
+        key_dict = ast.literal_eval(output_list[0])
+        self.assertEqual(len(output), 1)
+        self.assertEqual(key_dict['no_of_invalid_tags'], 17)
+
+    def test_draft_changes_with_valid_tags(self):
+        """Creates the ExplorationUserDataModel objects for testing."""
+        # Explorations with draft set.
+
+        valid_html_content = (
+            '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&a'
+            'mp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>')
+
+        draft_change_list = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'state2',
+                'property_name': 'widget_customization_args',
+                'new_value': {
+                    'choices': {
+                        'value': [
+                            '<p>1</p>',
+                            '<p>2</p>',
+                            valid_html_content,
+                            '<p>4</p>'
+                        ]
+                    },
+                    'maxAllowableSelectionCount': {
+                        'value': 1
+                    },
+                    'minAllowableSelectionCount': {
+                        'value': 1
+                    }
+                }
+            }).to_dict(), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name': 'answer_groups',
+                'state_name': 'State 1',
+                'new_value': [{
+                    'rule_specs': [{
+                        'rule_type': 'Equals',
+                        'inputs': {
+                            'x': [valid_html_content]
+                        }
+                    }, {
+                        'rule_type': 'ContainsAtLeastOneOf',
+                        'inputs': {
+                            'x': [valid_html_content]
+                        }
+                    }, {
+                        'rule_type': 'IsProperSubsetOf',
+                        'inputs': {
+                            'x': [valid_html_content]
+                        }
+                    }, {
+                        'rule_type': 'DoesNotContainAtLeastOneOf',
+                        'inputs': {
+                            'x': [valid_html_content]
+                        }
+                    }, {
+                        'rule_type': 'Equals',
+                        'inputs': {
+                            'x': 1
+                        }
+                    }, {
+                        'rule_type': 'HasElementXAtPositionY',
+                        'inputs': {
+                            'x': valid_html_content,
+                            'y': 2
+                        }
+                    }, {
+                        'rule_type': 'IsEqualToOrdering',
+                        'inputs': {
+                            'x': [[valid_html_content]]
+                        }
+                    }, {
+                        'rule_type': 'HasElementXBeforeElementY',
+                        'inputs': {
+                            'x': valid_html_content,
+                            'y': valid_html_content
+                        }
+                    }, {
+                        'rule_type': (
+                            'IsEqualToOrderingWithOneItemAtIncorrectPosition'),
+                        'inputs': {
+                            'x': [[valid_html_content]]
+                        }
+                    }],
+                    'outcome': {
+                        'dest': 'Introduction',
+                        'feedback': {
+                            'content_id': 'feedback',
+                            'html': valid_html_content
+                        },
+                        'param_changes': [],
+                        'labelled_as_correct': False,
+                        'refresher_exploration_id': None,
+                        'missing_prerequisite_skill_id': None
+                    },
+                    'training_data': [],
+                    'tagged_skill_misconception_id': None
+                }]
+            }).to_dict(), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Intro',
+                'property_name': 'content',
+                'new_value': {
+                    'content_id': 'content',
+                    'html': valid_html_content
+                }
+            }).to_dict(), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Intro',
+                'property_name': 'written_translations',
+                'new_value': {
+                    'translations_mapping': {
+                        'content1': {
+                            'en': {
+                                'html': valid_html_content,
+                                'needs_update': True
+                            },
+                            'hi': {
+                                'html': 'Hey!',
+                                'needs_update': False
+                            }
+                        },
+                        'feedback_1': {
+                            'hi': {
+                                'html': valid_html_content,
+                                'needs_update': False
+                            },
+                            'en': {
+                                'html': 'hello!',
+                                'needs_update': False
+                            }
+                        }
+                    }
+                }
+            }).to_dict(), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Intro',
+                'property_name': 'solution',
+                'new_value': {
+                    'answer_is_exclusive': False,
+                    'correct_answer': 'helloworld!',
+                    'explanation': {
+                        'content_id': 'solution',
+                        'html': valid_html_content
+                    },
+                }
+            }).to_dict(), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Intro',
+                'property_name': 'default_outcome',
+                'new_value': {
+                    'param_changes': [],
+                    'feedback': {
+                        'content_id': 'default_outcome',
+                        'html': valid_html_content
+                    },
+                    'dest': 'Introduction',
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None,
+                    'labelled_as_correct': False
+                }
+            }).to_dict(), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Intro',
+                'property_name': 'hints',
+                'new_value': [{
+                    'hint_content': {
+                        'content_id': 'hint1',
+                        'html': valid_html_content
+                    }
+                }]
+            }).to_dict(), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_RENAME_STATE,
+                'old_state_name': 'Intro',
+                'new_state_name': 'Introduction',
+            }).to_dict()
+        ]
+
+
+        user_models.ExplorationUserDataModel(
+            id='%s.%s' % (self.user_a_id, self.EXP_ID_1),
+            user_id=self.user_a_id,
+            exploration_id=self.EXP_ID_1,
+            draft_change_list=draft_change_list,
+            draft_change_list_last_updated=self.DATETIME,
+            draft_change_list_exp_version=1,
+            draft_change_list_id=1).put()
+
+        output = self._run_one_off_job()
+        self.assertEqual(len(output), 0)
+
+
 class UsernameLengthDistributionOneOffJobTests(test_utils.GenericTestBase):
     """Tests for the one-off username length distribution job."""
     USER_A_EMAIL = 'a@example.com'
