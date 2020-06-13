@@ -30,8 +30,8 @@ APP_YAML_FILEPATH = os.path.join(os.getcwd(), 'app_dev.yaml')
 
 
 def check_skip_files_in_app_dev_yaml(file_cache, verbose_mode_enabled):
-    """Check to ensure that all lines in skip_files in app.yaml reference valid
-    files in the repository.
+    """Check to ensure that all lines in skip_files in app_dev.yaml reference
+    valid files in the repository.
     """
     if verbose_mode_enabled:
         python_utils.PRINT(
