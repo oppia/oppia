@@ -284,7 +284,7 @@ def switch_version(app_name, current_release_version):
         Exception. The library page does not load correctly.
     """
     release_version_library_url = (
-        'https://%s-dot-%s.appspot.com/library' % (
+        'https://%s-dot-%s.appspot.com/community-library' % (
             current_release_version, app_name))
     library_page_loads_correctly = check_errors_in_a_page(
         release_version_library_url, 'Library page is loading correctly?')
