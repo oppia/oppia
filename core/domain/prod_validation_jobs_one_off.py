@@ -292,6 +292,20 @@ class BaseModelValidator(python_utils.OBJECT):
         return []
 
     @classmethod
+    def _get_external_instance_custom_validation_functions(cls):
+        """Returns the list of custom validation functions to run.
+
+        This method can be overridden by subclasses, if needed.
+
+        Each validation function should accept two arg, which are the
+        model instance to validate and the external instances for the class.
+
+        Returns:
+            list(function). The list of custom validation functions to run.
+        """
+        return []
+
+    @classmethod
     def validate(cls, item):
         """Run _fetch_external_instance_details and all _validate functions.
 
@@ -309,6 +323,9 @@ class BaseModelValidator(python_utils.OBJECT):
 
         for func in cls._get_custom_validation_functions():
             func(item)
+
+        for func in cls._get_external_instance_custom_validation_functions():
+            func(item, cls.external_instance_details)
 
 
 class BaseSummaryModelValidator(BaseModelValidator):
@@ -334,13 +351,16 @@ class BaseSummaryModelValidator(BaseModelValidator):
         raise NotImplementedError
 
     @classmethod
-    def _validate_external_model_properties(cls, item):
+    def _validate_external_model_properties(
+            cls, item, external_instance_details):
         """Validate that properties of the model match the corresponding
-        properties of the external model. This assumes
-        cls.external_instance_details is already populated.
+        properties of the external model.
 
         Args:
             item: ndb.Model. BaseSummaryModel to validate.
+            external_instance_details: dict(str, (list(str, str, ndb.Model))).
+                A dict is keyed by field name. Each value consists of a list
+                of (model class, external_key, external_model_instance) tuples.
         """
 
         for (
@@ -350,7 +370,7 @@ class BaseSummaryModelValidator(BaseModelValidator):
             ) in cls._get_external_model_properties():
 
             external_model_class_model_id_model_tuples = (
-                cls.external_instance_details[external_model_field_key])
+                external_instance_details[external_model_field_key])
 
             for (model_class, model_id, external_model) in (
                     external_model_class_model_id_model_tuples):
@@ -388,7 +408,8 @@ class BaseSummaryModelValidator(BaseModelValidator):
         """
         super(BaseSummaryModelValidator, cls).validate(item)
 
-        cls._validate_external_model_properties(item)
+        cls._validate_external_model_properties(
+            item, cls.external_instance_details)
 
 
 class BaseSnapshotContentModelValidator(BaseModelValidator):
@@ -412,13 +433,16 @@ class BaseSnapshotContentModelValidator(BaseModelValidator):
         return '^[A-Za-z0-9-_]{1,%s}-\\d+$' % base_models.ID_LENGTH
 
     @classmethod
-    def _validate_base_model_version_from_item_id(cls, item):
+    def _validate_base_model_version_from_item_id(
+            cls, item, external_instance_details):
         """Validate that external model corresponding to item.id
         has a version greater than or equal to the version in item.id.
-        This assumes cls.external_instance_details is already populated.
 
         Args:
             item: ndb.Model. BaseSnapshotContentModel to validate.
+            external_instance_details: dict(str, (list(str, str, ndb.Model))).
+                A dict is keyed by field name. Each value consists of a list
+                of (model class, external_key, external_model_instance) tuples.
         """
 
         if cls.EXTERNAL_MODEL_NAME == '':
@@ -434,7 +458,7 @@ class BaseSnapshotContentModelValidator(BaseModelValidator):
             val.capitalize() for val in name_split_by_space])
 
         external_model_class_model_id_model_tuples = (
-            cls.external_instance_details['%s_ids' % key_to_fetch])
+            external_instance_details['%s_ids' % key_to_fetch])
 
         version = item.id[item.id.rfind('-') + 1:]
         for (model_class, model_id, external_model) in (
@@ -466,7 +490,8 @@ class BaseSnapshotContentModelValidator(BaseModelValidator):
         """
         super(BaseSnapshotContentModelValidator, cls).validate(item)
 
-        cls._validate_base_model_version_from_item_id(item)
+        cls._validate_base_model_version_from_item_id(
+            item, cls.external_instance_details)
 
 
 class BaseSnapshotMetadataModelValidator(BaseSnapshotContentModelValidator):
@@ -624,19 +649,21 @@ class BaseUserModelValidator(BaseModelValidator):
         return r'^%s$' % USER_ID_REGEX
 
     @classmethod
-    def _validate_explorations_are_public(cls, item):
-        """Validates that explorations for model are public. This assumes
-        cls.external_instance_details is already populated.
+    def _validate_explorations_are_public(cls, item, external_instance_details):
+        """Validates that explorations for model are public.
 
         Args:
             item: ndb.Model. BaseUserModel to validate.
+            external_instance_details: dict(str, (list(str, str, ndb.Model))).
+                A dict is keyed by field name. Each value consists of a list
+                of (model class, external_key, external_model_instance) tuples.
         """
-        if 'exploration_ids' not in cls.external_instance_details:
+        if 'exploration_ids' not in external_instance_details:
             return
 
         exp_ids = []
         exploration_model_class_model_id_model_tuples = (
-            cls.external_instance_details['exploration_ids'])
+            external_instance_details['exploration_ids'])
         for (model_class, model_id, exploration_model) in (
                 exploration_model_class_model_id_model_tuples):
             if exploration_model is None or exploration_model.deleted:
@@ -657,19 +684,21 @@ class BaseUserModelValidator(BaseModelValidator):
                     item.id, private_exp_ids))
 
     @classmethod
-    def _validate_collections_are_public(cls, item):
-        """Validates that collections for model are public. This assumes
-        cls.external_instance_details is already populated.
+    def _validate_collections_are_public(cls, item, external_instance_details):
+        """Validates that collections for model are public.
 
         Args:
             item: ndb.Model. BaseUserModel to validate.
+            external_instance_details: dict(str, (list(str, str, ndb.Model))).
+                A dict is keyed by field name. Each value consists of a list
+                of (model class, external_key, external_model_instance) tuples.
         """
-        if 'collection_ids' not in cls.external_instance_details:
+        if 'collection_ids' not in external_instance_details:
             return
 
         col_ids = []
         collection_model_class_model_id_model_tuples = (
-            cls.external_instance_details['collection_ids'])
+            external_instance_details['collection_ids'])
         for (model_class, model_id, collection_model) in (
                 collection_model_class_model_id_model_tuples):
             if collection_model is None or collection_model.deleted:
@@ -844,16 +873,18 @@ class ClassifierTrainingJobModelValidator(BaseModelValidator):
         return {'exploration_ids': (exp_models.ExplorationModel, [item.exp_id])}
 
     @classmethod
-    def _validate_exp_version(cls, item):
+    def _validate_exp_version(cls, item, external_instance_details):
         """Validate that exp version is less than or equal to the version
-        of exploration corresponding to exp_id. This assumes
-        cls.external_instance_details is already populated.
+        of exploration corresponding to exp_id.
 
         Args:
             item: ndb.Model. ClassifierTrainingJobModel to validate.
+            external_instance_details: dict(str, (list(str, str, ndb.Model))).
+                A dict is keyed by field name. Each value consists of a list
+                of (model class, external_key, external_model_instance) tuples.
         """
         exp_model_class_model_id_model_tuples = (
-            cls.external_instance_details['exploration_ids'])
+            external_instance_details['exploration_ids'])
 
         for (model_class, model_id, exp_model) in (
                 exp_model_class_model_id_model_tuples):
@@ -873,16 +904,18 @@ class ClassifierTrainingJobModelValidator(BaseModelValidator):
                         item.exp_id))
 
     @classmethod
-    def _validate_state_name(cls, item):
+    def _validate_state_name(cls, item, external_instance_details):
         """Validate that state name is a valid state in the
-        exploration corresponding to exp_id. This assumes
-        cls.external_instance_details is already populated.
+        exploration corresponding to exp_id.
 
         Args:
             item: ndb.Model. ClassifierTrainingJobModel to validate.
+            external_instance_details: dict(str, (list(str, str, ndb.Model))).
+                A dict is keyed by field name. Each value consists of a list
+                of (model class, external_key, external_model_instance) tuples.
         """
         exp_model_class_model_id_model_tuples = (
-            cls.external_instance_details['exploration_ids'])
+            external_instance_details['exploration_ids'])
 
         for (model_class, model_id, exp_model) in (
                 exp_model_class_model_id_model_tuples):
@@ -901,7 +934,7 @@ class ClassifierTrainingJobModelValidator(BaseModelValidator):
                         item.id, item.state_name, item.exp_id))
 
     @classmethod
-    def _get_custom_validation_functions(cls):
+    def _get_external_instance_custom_validation_functions(cls):
         return [
             cls._validate_exp_version,
             cls._validate_state_name]
@@ -927,16 +960,18 @@ class TrainingJobExplorationMappingModelValidator(BaseModelValidator):
         return {'exploration_ids': (exp_models.ExplorationModel, [item.exp_id])}
 
     @classmethod
-    def _validate_exp_version(cls, item):
+    def _validate_exp_version(cls, item, external_instance_details):
         """Validate that exp version is less than or equal to the version
-        of exploration corresponding to exp_id. This assumes
-        cls.external_instance_details is already populated.
+        of exploration corresponding to exp_id.
 
         Args:
             item: ndb.Model. TrainingJobExplorationMappingModel to validate.
+            external_instance_details: dict(str, (list(str, str, ndb.Model))).
+                A dict is keyed by field name. Each value consists of a list
+                of (model class, external_key, external_model_instance) tuples.
         """
         exp_model_class_model_id_model_tuples = (
-            cls.external_instance_details['exploration_ids'])
+            external_instance_details['exploration_ids'])
 
         for (model_class, model_id, exp_model) in (
                 exp_model_class_model_id_model_tuples):
@@ -956,16 +991,18 @@ class TrainingJobExplorationMappingModelValidator(BaseModelValidator):
                         item.exp_id))
 
     @classmethod
-    def _validate_state_name(cls, item):
+    def _validate_state_name(cls, item, external_instance_details):
         """Validate that state name is a valid state in the
-        exploration corresponding to exp_id. This assumes
-        cls.external_instance_details is already populated.
+        exploration corresponding to exp_id.
 
         Args:
             item: ndb.Model. TrainingJobExplorationMappingbModel to validate.
+            external_instance_details: dict(str, (list(str, str, ndb.Model))).
+                A dict is keyed by field name. Each value consists of a list
+                of (model class, external_key, external_model_instance) tuples.
         """
         exp_model_class_model_id_model_tuples = (
-            cls.external_instance_details['exploration_ids'])
+            external_instance_details['exploration_ids'])
 
         for (model_class, model_id, exp_model) in (
                 exp_model_class_model_id_model_tuples):
@@ -984,7 +1021,7 @@ class TrainingJobExplorationMappingModelValidator(BaseModelValidator):
                         item.id, item.state_name, item.exp_id))
 
     @classmethod
-    def _get_custom_validation_functions(cls):
+    def _get_external_instance_custom_validation_functions(cls):
         return [
             cls._validate_exp_version,
             cls._validate_state_name]
@@ -1239,16 +1276,18 @@ class CollectionSummaryModelValidator(BaseSummaryModelValidator):
                     sorted(contributor_ids_from_contributors_summary)))
 
     @classmethod
-    def _validate_node_count(cls, item):
+    def _validate_node_count(cls, item, external_instance_details):
         """Validate that node_count of model is equal to number of nodes
-        in CollectionModel.collection_contents. This assumes
-        cls.external_instance_details is already populated.
+        in CollectionModel.collection_contents.
 
         Args:
             item: ndb.Model. CollectionSummaryModel to validate.
+            external_instance_details: dict(str, (list(str, str, ndb.Model))).
+                A dict is keyed by field name. Each value consists of a list
+                of (model class, external_key, external_model_instance) tuples.
         """
         collection_model_class_model_id_model_tuples = (
-            cls.external_instance_details['collection_ids'])
+            external_instance_details['collection_ids'])
 
         for (model_class, model_id, collection_model) in (
                 collection_model_class_model_id_model_tuples):
@@ -1311,10 +1350,13 @@ class CollectionSummaryModelValidator(BaseSummaryModelValidator):
     @classmethod
     def _get_custom_validation_functions(cls):
         return [
-            cls._validate_node_count,
             cls._validate_ratings_is_empty,
             cls._validate_contributors_summary,
             ]
+
+    @classmethod
+    def _get_external_instance_custom_validation_functions(cls):
+        return [cls._validate_node_count]
 
 
 class ExplorationOpportunitySummaryModelValidator(BaseSummaryModelValidator):
@@ -1338,16 +1380,18 @@ class ExplorationOpportunitySummaryModelValidator(BaseSummaryModelValidator):
         }
 
     @classmethod
-    def _validate_translation_counts(cls, item):
+    def _validate_translation_counts(cls, item, external_instance_details):
         """Validate that translation_counts match the translations available in
-        the exploration. This assumes cls.external_instance_details is
-        already populated.
+        the exploration.
 
         Args:
             item: ndb.Model. ExplorationOpportunitySummaryModel to validate.
+            external_instance_details: dict(str, (list(str, str, ndb.Model))).
+                A dict is keyed by field name. Each value consists of a list
+                of (model class, external_key, external_model_instance) tuples.
         """
         exploration_model_class_model_id_model_tuples = (
-            cls.external_instance_details['exploration_ids'])
+            external_instance_details['exploration_ids'])
 
         for (model_class, model_id, exploration_model) in (
                 exploration_model_class_model_id_model_tuples):
@@ -1370,16 +1414,18 @@ class ExplorationOpportunitySummaryModelValidator(BaseSummaryModelValidator):
                         exploration_translation_counts))
 
     @classmethod
-    def _validate_content_count(cls, item):
+    def _validate_content_count(cls, item, external_instance_details):
         """Validate that content_count of model is equal to the number of
-        content available in the corresponding ExplorationModel. This assumes
-        cls.external_instance_details is already populated.
+        content available in the corresponding ExplorationModel.
 
         Args:
             item: ndb.Model. ExplorationOpportunitySummaryModel to validate.
+            external_instance_details: dict(str, (list(str, str, ndb.Model))).
+                A dict is keyed by field name. Each value consists of a list
+                of (model class, external_key, external_model_instance) tuples.
         """
         exploration_model_class_model_id_model_tuples = (
-            cls.external_instance_details['exploration_ids'])
+            external_instance_details['exploration_ids'])
 
         for (model_class, model_id, exploration_model) in (
                 exploration_model_class_model_id_model_tuples):
@@ -1400,16 +1446,18 @@ class ExplorationOpportunitySummaryModelValidator(BaseSummaryModelValidator):
                         item.id, item.content_count, exploration_content_count))
 
     @classmethod
-    def _validate_chapter_title(cls, item):
+    def _validate_chapter_title(cls, item, external_instance_details):
         """Validate that chapter_title matches the title of the corresponding
-        node of StoryModel. This assumes cls.external_instance_details is
-        already populated.
+        node of StoryModel.
 
         Args:
             item: ndb.Model. ExplorationOpportunitySummaryModel to validate.
+            external_instance_details: dict(str, (list(str, str, ndb.Model))).
+                A dict is keyed by field name. Each value consists of a list
+                of (model class, external_key, external_model_instance) tuples.
         """
         story_model_class_model_id_model_tuples = (
-            cls.external_instance_details['story_ids'])
+            external_instance_details['story_ids'])
 
         for (model_class, model_id, story_model) in (
                 story_model_class_model_id_model_tuples):
@@ -1453,7 +1501,7 @@ class ExplorationOpportunitySummaryModelValidator(BaseSummaryModelValidator):
         )]
 
     @classmethod
-    def _get_custom_validation_functions(cls):
+    def _get_external_instance_custom_validation_functions(cls):
         return [
             cls._validate_translation_counts,
             cls._validate_content_count,
@@ -1477,16 +1525,18 @@ class SkillOpportunityModelValidator(BaseSummaryModelValidator):
         }
 
     @classmethod
-    def _validate_question_count(cls, item):
+    def _validate_question_count(cls, item, external_instance_details):
         """Validate that question_count matches the number of questions linked
-        to the opportunity's skill. This assumes
-        cls.external_instance_details is already populated.
+        to the opportunity's skill.
 
         Args:
             item: ndb.Model. SkillOpportunityModel to validate.
+            external_instance_details: dict(str, (list(str, str, ndb.Model))).
+                A dict is keyed by field name. Each value consists of a list
+                of (model class, external_key, external_model_instance) tuples.
         """
         skill_model_class_model_id_model_tuples = (
-            cls.external_instance_details['skill_ids'])
+            external_instance_details['skill_ids'])
 
         for (model_class, model_id, skill_model) in (
                 skill_model_class_model_id_model_tuples):
@@ -1521,7 +1571,7 @@ class SkillOpportunityModelValidator(BaseSummaryModelValidator):
         )]
 
     @classmethod
-    def _get_custom_validation_functions(cls):
+    def _get_external_instance_custom_validation_functions(cls):
         return [
             cls._validate_question_count,
         ]
@@ -1626,16 +1676,18 @@ class SentEmailModelValidator(BaseModelValidator):
                 ) % (item.id, item.sent_datetime))
 
     @classmethod
-    def _validate_sender_email(cls, item):
+    def _validate_sender_email(cls, item, external_instance_details):
         """Validate that sender email corresponds to email of user obtained
-        by using the sender_id. This assumes cls.external_instance_details
-        is already populated.
+        by using the sender_id.
 
         Args:
             item: ndb.Model. SentEmailModel to validate.
+            external_instance_details: dict(str, (list(str, str, ndb.Model))).
+                A dict is keyed by field name. Each value consists of a list
+                of (model class, external_key, external_model_instance) tuples.
         """
         sender_model_class_model_id_model_tuples = (
-            cls.external_instance_details['sender_id'])
+            external_instance_details['sender_id'])
 
         for (model_class, model_id, sender_model) in (
                 sender_model_class_model_id_model_tuples):
@@ -1655,16 +1707,18 @@ class SentEmailModelValidator(BaseModelValidator):
                         item.sender_id))
 
     @classmethod
-    def _validate_recipient_email(cls, item):
+    def _validate_recipient_email(cls, item, external_instance_details):
         """Validate that recipient email corresponds to email of user obtained
-        by using the recipient_id. This assumes cls.external_instance_details
-        is already populated.
+        by using the recipient_id.
 
         Args:
             item: ndb.Model. SentEmailModel to validate.
+            external_instance_details: dict(str, (list(str, str, ndb.Model))).
+                A dict is keyed by field name. Each value consists of a list
+                of (model class, external_key, external_model_instance) tuples.
         """
         recipient_model_class_model_id_model_tuples = (
-            cls.external_instance_details['recipient_id'])
+            external_instance_details['recipient_id'])
 
         for (model_class, model_id, recipient_model) in (
                 recipient_model_class_model_id_model_tuples):
@@ -1685,8 +1739,11 @@ class SentEmailModelValidator(BaseModelValidator):
 
     @classmethod
     def _get_custom_validation_functions(cls):
+        return [cls._validate_sent_datetime]
+
+    @classmethod
+    def _get_external_instance_custom_validation_functions(cls):
         return [
-            cls._validate_sent_datetime,
             cls._validate_sender_email,
             cls._validate_recipient_email]
 
@@ -1717,16 +1774,18 @@ class BulkEmailModelValidator(BaseModelValidator):
                 ) % (item.id, item.sent_datetime))
 
     @classmethod
-    def _validate_sender_email(cls, item):
+    def _validate_sender_email(cls, item, external_instance_details):
         """Validate that sender email corresponds to email of user obtained
-        by using the sender_id. This assumes cls.external_instance_details
-        is already populated.
+        by using the sender_id.
 
         Args:
             item: ndb.Model. BulkEmailModel to validate.
+            external_instance_details: dict(str, (list(str, str, ndb.Model))).
+                A dict is keyed by field name. Each value consists of a list
+                of (model class, external_key, external_model_instance) tuples.
         """
         sender_model_class_model_id_model_tuples = (
-            cls.external_instance_details['sender_id'])
+            external_instance_details['sender_id'])
 
         for (model_class, model_id, sender_model) in (
                 sender_model_class_model_id_model_tuples):
@@ -1747,9 +1806,11 @@ class BulkEmailModelValidator(BaseModelValidator):
 
     @classmethod
     def _get_custom_validation_functions(cls):
-        return [
-            cls._validate_sent_datetime,
-            cls._validate_sender_email]
+        return [cls._validate_sent_datetime]
+
+    @classmethod
+    def _get_external_instance_custom_validation_functions(cls):
+        return [cls._validate_sender_email]
 
 
 class GeneralFeedbackEmailReplyToIdModelValidator(BaseModelValidator):
@@ -2068,16 +2129,19 @@ class ExpSummaryModelValidator(BaseSummaryModelValidator):
                 ) % (item.id, item.first_published_msec))
 
     @classmethod
-    def _validate_exploration_model_last_updated(cls, item):
+    def _validate_exploration_model_last_updated(
+            cls, item, external_instance_details):
         """Validate that item.exploration_model_last_updated matches the
-        time when a last commit was made by a human contributor. This assumes
-        cls.external_instance_details is already populated.
+        time when a last commit was made by a human contributor.
 
         Args:
             item: ndb.Model. ExpSummaryModel to validate.
+            external_instance_details: dict(str, (list(str, str, ndb.Model))).
+                A dict is keyed by field name. Each value consists of a list
+                of (model class, external_key, external_model_instance) tuples.
         """
         exploration_model_class_model_id_model_tuples = (
-            cls.external_instance_details['exploration_ids'])
+            external_instance_details['exploration_ids'])
         for (model_class, model_id, exploration_model) in (
                 exploration_model_class_model_id_model_tuples):
             if exploration_model is None or exploration_model.deleted:
@@ -2224,16 +2288,18 @@ class GeneralFeedbackMessageModelValidator(BaseModelValidator):
         }
 
     @classmethod
-    def _validate_message_id(cls, item):
+    def _validate_message_id(cls, item, external_instance_details):
         """Validate that message_id is less than the message count for
-        feedback thread corresponding to the entity. This assumes
-        cls.external_instance_details is already populated.
+        feedback thread corresponding to the entity.
 
         Args:
             item: ndb.Model. GeneralFeedbackMessageModel to validate.
+            external_instance_details: dict(str, (list(str, str, ndb.Model))).
+                A dict is keyed by field name. Each value consists of a list
+                of (model class, external_key, external_model_instance) tuples.
         """
         feedback_thread_model_class_model_id_model_tuples = (
-            cls.external_instance_details['feedback_thread_ids'])
+            external_instance_details['feedback_thread_ids'])
 
         for (model_class, model_id, feedback_thread_model) in (
                 feedback_thread_model_class_model_id_model_tuples):
@@ -2625,16 +2691,18 @@ class QuestionSummaryModelValidator(BaseSummaryModelValidator):
         }
 
     @classmethod
-    def _validate_question_content(cls, item):
+    def _validate_question_content(cls, item, external_instance_details):
         """Validate that question_content model is equal to
-        QuestionModel.question_state_data.content.html. This assumes
-        cls.external_instance_details is already populated.
+        QuestionModel.question_state_data.content.html.
 
         Args:
             item: ndb.Model. QuestionSummaryModel to validate.
+            external_instance_details: dict(str, (list(str, str, ndb.Model))).
+                A dict is keyed by field name. Each value consists of a list
+                of (model class, external_key, external_model_instance) tuples.
         """
         question_model_class_model_id_model_tuples = (
-            cls.external_instance_details['question_ids'])
+            external_instance_details['question_ids'])
 
         for (model_class, model_id, question_model) in (
                 question_model_class_model_id_model_tuples):
@@ -2668,7 +2736,7 @@ class QuestionSummaryModelValidator(BaseSummaryModelValidator):
         )]
 
     @classmethod
-    def _get_custom_validation_functions(cls):
+    def _get_external_instance_custom_validation_functions(cls):
         return [cls._validate_question_content]
 
 
@@ -2885,16 +2953,18 @@ class SkillSummaryModelValidator(BaseSummaryModelValidator):
         }
 
     @classmethod
-    def _validate_misconception_count(cls, item):
+    def _validate_misconception_count(cls, item, external_instance_details):
         """Validate that misconception_count of model is equal to
-        number of misconceptions in SkillModel.misconceptions. This assumes
-        cls.external_instance_details is already populated.
+        number of misconceptions in SkillModel.misconceptions.
 
         Args:
             item: ndb.Model. SkillSummaryModel to validate.
+            external_instance_details: dict(str, (list(str, str, ndb.Model))).
+                A dict is keyed by field name. Each value consists of a list
+                of (model class, external_key, external_model_instance) tuples.
         """
         skill_model_class_model_id_model_tuples = (
-            cls.external_instance_details['skill_ids'])
+            external_instance_details['skill_ids'])
 
         for (_, _, skill_model) in (
                 skill_model_class_model_id_model_tuples):
@@ -2908,16 +2978,18 @@ class SkillSummaryModelValidator(BaseSummaryModelValidator):
                         skill_model.misconceptions))
 
     @classmethod
-    def _validate_worked_examples_count(cls, item):
+    def _validate_worked_examples_count(cls, item, external_instance_details):
         """Validate that worked examples count of model is equal to
         number of misconceptions in SkillModel.skill_contents.worked_examples.
-        This assumes cls.external_instance_details is already populated.
 
         Args:
             item: ndb.Model. SkillSummaryModel to validate.
+            external_instance_details: dict(str, (list(str, str, ndb.Model))).
+                A dict is keyed by field name. Each value consists of a list
+                of (model class, external_key, external_model_instance) tuples.
         """
         skill_model_class_model_id_model_tuples = (
-            cls.external_instance_details['skill_ids'])
+            external_instance_details['skill_ids'])
 
         for (model_class, model_id, skill_model) in (
                 skill_model_class_model_id_model_tuples):
@@ -2953,7 +3025,7 @@ class SkillSummaryModelValidator(BaseSummaryModelValidator):
         )]
 
     @classmethod
-    def _get_custom_validation_functions(cls):
+    def _get_external_instance_custom_validation_functions(cls):
         return [
             cls._validate_misconception_count,
             cls._validate_worked_examples_count]
@@ -3071,15 +3143,17 @@ class StorySummaryModelValidator(BaseSummaryModelValidator):
         }
 
     @classmethod
-    def _validate_node_titles(cls, item):
+    def _validate_node_titles(cls, item, external_instance_details):
         """Validate that node_titles of model is equal to list of node titles
-        in StoryModel.story_contents. This assumes cls.external_instance_details
-        is already populated.
+        in StoryModel.story_contents.
 
         Args:
             item: ndb.Model. StorySummaryModel to validate.
+            external_instance_details: dict(str, (list(str, str, ndb.Model))).
+                A dict is keyed by field name. Each value consists of a list
+                of (model class, external_key, external_model_instance) tuples.
         """
-        story_model_class_model_id_model_tuples = cls.external_instance_details[
+        story_model_class_model_id_model_tuples = external_instance_details[
             'story_ids']
 
         for (model_class, model_id, story_model) in (
@@ -3116,7 +3190,7 @@ class StorySummaryModelValidator(BaseSummaryModelValidator):
         )]
 
     @classmethod
-    def _get_custom_validation_functions(cls):
+    def _get_external_instance_custom_validation_functions(cls):
         return [cls._validate_node_titles]
 
 
@@ -3169,18 +3243,21 @@ class GeneralSuggestionModelValidator(BaseModelValidator):
                     item.id, item.target_type))
 
     @classmethod
-    def _validate_target_version_at_submission(cls, item):
+    def _validate_target_version_at_submission(
+            cls, item, external_instance_details):
         """Validate the target version at submission is less than or
-        equal to the version of the target model. This assumes
-        cls.external_instance_details is already populated.
+        equal to the version of the target model.
 
         Args:
             item: ndb.Model. GeneralSuggestionModel to validate.
+            external_instance_details: dict(str, (list(str, str, ndb.Model))).
+                A dict is keyed by field name. Each value consists of a list
+                of (model class, external_key, external_model_instance) tuples.
         """
         if item.target_type not in TARGET_TYPE_TO_TARGET_MODEL:
             return
         target_model_class_model_id_model_tuples = (
-            cls.external_instance_details['%s_ids' % item.target_type])
+            external_instance_details['%s_ids' % item.target_type])
 
         for (model_class, model_id, target_model) in (
                 target_model_class_model_id_model_tuples):
@@ -3524,15 +3601,17 @@ class TopicSummaryModelValidator(BaseSummaryModelValidator):
         }
 
     @classmethod
-    def _validate_canonical_story_count(cls, item):
+    def _validate_canonical_story_count(cls, item, external_instance_details):
         """Validate that canonical story count of model is equal to
-        number of story ids in TopicModel.canonical_story_ids. This
-        assumes cls.external_instance_details is already populated.
+        number of story ids in TopicModel.canonical_story_ids.
 
         Args:
             item: ndb.Model. TopicSummaryModel to validate.
+            external_instance_details: dict(str, (list(str, str, ndb.Model))).
+                A dict is keyed by field name. Each value consists of a list
+                of (model class, external_key, external_model_instance) tuples.
         """
-        topic_model_class_model_id_model_tuples = cls.external_instance_details[
+        topic_model_class_model_id_model_tuples = external_instance_details[
             'topic_ids']
 
         for (model_class, model_id, topic_model) in (
@@ -3557,15 +3636,17 @@ class TopicSummaryModelValidator(BaseSummaryModelValidator):
                         pubished_canonical_story_ids))
 
     @classmethod
-    def _validate_additional_story_count(cls, item):
+    def _validate_additional_story_count(cls, item, external_instance_details):
         """Validate that additional story count of model is equal to
-        number of story ids in TopicModel.additional_story_ids. This
-        assumes cls.external_instance_details is already populated.
+        number of story ids in TopicModel.additional_story_ids.
 
         Args:
             item: ndb.Model. TopicSummaryModel to validate.
+            external_instance_details: dict(str, (list(str, str, ndb.Model))).
+                A dict is keyed by field name. Each value consists of a list
+                of (model class, external_key, external_model_instance) tuples.
         """
-        topic_model_class_model_id_model_tuples = cls.external_instance_details[
+        topic_model_class_model_id_model_tuples = external_instance_details[
             'topic_ids']
 
         for (model_class, model_id, topic_model) in (
@@ -3592,15 +3673,18 @@ class TopicSummaryModelValidator(BaseSummaryModelValidator):
                         published_additional_story_ids))
 
     @classmethod
-    def _validate_uncategorized_skill_count(cls, item):
+    def _validate_uncategorized_skill_count(
+            cls, item, external_instance_details):
         """Validate that uncategorized skill count of model is equal to
-        number of skill ids in TopicModel.uncategorized_skill_ids. This
-        assumes cls.external_instance_details is already populated.
+        number of skill ids in TopicModel.uncategorized_skill_ids.
 
         Args:
             item: ndb.Model. TopicSummaryModel to validate.
+            external_instance_details: dict(str, (list(str, str, ndb.Model))).
+                A dict is keyed by field name. Each value consists of a list
+                of (model class, external_key, external_model_instance) tuples.
         """
-        topic_model_class_model_id_model_tuples = cls.external_instance_details[
+        topic_model_class_model_id_model_tuples = external_instance_details[
             'topic_ids']
 
         for (model_class, model_id, topic_model) in (
@@ -3622,16 +3706,18 @@ class TopicSummaryModelValidator(BaseSummaryModelValidator):
                         topic_model.uncategorized_skill_ids))
 
     @classmethod
-    def _validate_total_skill_count(cls, item):
+    def _validate_total_skill_count(cls, item, external_instance_details):
         """Validate that total skill count of model is equal to
         number of skill ids in TopicModel.uncategorized_skill_ids and skill
-        ids in subtopics of TopicModel. This assumes
-        cls.external_instance_details is already populated.
+        ids in subtopics of TopicModel.
 
         Args:
             item: ndb.Model. TopicSummaryModel to validate.
+            external_instance_details: dict(str, (list(str, str, ndb.Model))).
+                A dict is keyed by field name. Each value consists of a list
+                of (model class, external_key, external_model_instance) tuples.
         """
-        topic_model_class_model_id_model_tuples = cls.external_instance_details[
+        topic_model_class_model_id_model_tuples = external_instance_details[
             'topic_ids']
 
         for (model_class, model_id, topic_model) in (
@@ -3658,15 +3744,17 @@ class TopicSummaryModelValidator(BaseSummaryModelValidator):
                         subtopic_skill_ids))
 
     @classmethod
-    def _validate_subtopic_count(cls, item):
+    def _validate_subtopic_count(cls, item, external_instance_details):
         """Validate that subtopic count of model is equal to
-        number of subtopics in TopicModel. This assumes
-        cls.external_instance_details is already populated.
+        number of subtopics in TopicModel.
 
         Args:
             item: ndb.Model. TopicSummaryModel to validate.
+            external_instance_details: dict(str, (list(str, str, ndb.Model))).
+                A dict is keyed by field name. Each value consists of a list
+                of (model class, external_key, external_model_instance) tuples.
         """
-        topic_model_class_model_id_model_tuples = cls.external_instance_details[
+        topic_model_class_model_id_model_tuples = external_instance_details[
             'topic_ids']
 
         for (model_class, model_id, topic_model) in (
@@ -3702,7 +3790,7 @@ class TopicSummaryModelValidator(BaseSummaryModelValidator):
         )]
 
     @classmethod
-    def _get_custom_validation_functions(cls):
+    def _get_external_instance_custom_validation_functions(cls):
         return [
             cls._validate_canonical_story_count,
             cls._validate_additional_story_count,
@@ -3909,10 +3997,14 @@ class CompletedActivitiesModelValidator(BaseUserModelValidator):
 
     @classmethod
     def _get_custom_validation_functions(cls):
+        return [cls._validate_common_properties_do_not_match]
+
+    @classmethod
+    def _get_external_instance_custom_validation_functions(cls):
         return [
-            cls._validate_common_properties_do_not_match,
             cls._validate_explorations_are_public,
-            cls._validate_collections_are_public]
+            cls._validate_collections_are_public
+        ]
 
 
 class IncompleteActivitiesModelValidator(BaseUserModelValidator):
@@ -3948,10 +4040,14 @@ class IncompleteActivitiesModelValidator(BaseUserModelValidator):
 
     @classmethod
     def _get_custom_validation_functions(cls):
+        return [cls._validate_common_properties_do_not_match]
+
+    @classmethod
+    def _get_external_instance_custom_validation_functions(cls):
         return [
-            cls._validate_common_properties_do_not_match,
             cls._validate_explorations_are_public,
-            cls._validate_collections_are_public]
+            cls._validate_collections_are_public
+        ]
 
 
 class ExpUserLastPlaythroughModelValidator(BaseUserModelValidator):
@@ -3986,16 +4082,18 @@ class ExpUserLastPlaythroughModelValidator(BaseUserModelValidator):
                 'as incomplete' % (item.id, item.exploration_id))
 
     @classmethod
-    def _validate_exp_version(cls, item):
+    def _validate_exp_version(cls, item, external_instance_details):
         """Validates that last played exp version is less than or equal to
-        for version of the exploration. This assumes
-        cls.external_instance_details is already populated.
+        for version of the exploration.
 
         Args:
             item: ndb.Model. ExpUserLastPlaythroughModel to validate.
+            external_instance_details: dict(str, (list(str, str, ndb.Model))).
+                A dict is keyed by field name. Each value consists of a list
+                of (model class, external_key, external_model_instance) tuples.
         """
         exploration_model_class_model_id_model_tuples = (
-            cls.external_instance_details['exploration_ids'])
+            external_instance_details['exploration_ids'])
         for (model_class, model_id, exploration_model) in (
                 exploration_model_class_model_id_model_tuples):
             if exploration_model is None or exploration_model.deleted:
@@ -4013,16 +4111,18 @@ class ExpUserLastPlaythroughModelValidator(BaseUserModelValidator):
                         exploration_model.version, exploration_model.id))
 
     @classmethod
-    def _validate_state_name(cls, item):
+    def _validate_state_name(cls, item, external_instance_details):
         """Validates that state name is a valid state in the exploration
-        corresponding to the entity.This assumes
-        cls.external_instance_details is already populated.
+        corresponding to the entity.
 
         Args:
             item: ndb.Model. ExpUserLastPlaythroughModel to validate.
+            external_instance_details: dict(str, (list(str, str, ndb.Model))).
+                A dict is keyed by field name. Each value consists of a list
+                of (model class, external_key, external_model_instance) tuples.
         """
         exploration_model_class_model_id_model_tuples = (
-            cls.external_instance_details['exploration_ids'])
+            external_instance_details['exploration_ids'])
         for (model_class, model_id, exploration_model) in (
                 exploration_model_class_model_id_model_tuples):
             if exploration_model is None or exploration_model.deleted:
@@ -4043,9 +4143,12 @@ class ExpUserLastPlaythroughModelValidator(BaseUserModelValidator):
 
     @classmethod
     def _get_custom_validation_functions(cls):
+        return [cls._validate_exp_id_is_marked_as_incomplete]
+
+    @classmethod
+    def _get_external_instance_custom_validation_functions(cls):
         return [
             cls._validate_explorations_are_public,
-            cls._validate_exp_id_is_marked_as_incomplete,
             cls._validate_exp_version,
             cls._validate_state_name
         ]
@@ -4096,10 +4199,14 @@ class LearnerPlaylistModelValidator(BaseUserModelValidator):
 
     @classmethod
     def _get_custom_validation_functions(cls):
+        return [cls._validate_common_properties_do_not_match]
+
+    @classmethod
+    def _get_external_instance_custom_validation_functions(cls):
         return [
-            cls._validate_common_properties_do_not_match,
             cls._validate_explorations_are_public,
-            cls._validate_collections_are_public]
+            cls._validate_collections_are_public
+        ]
 
 
 class UserContributionsModelValidator(BaseUserModelValidator):
@@ -4167,16 +4274,19 @@ class UserSubscriptionsModelValidator(BaseUserModelValidator):
                     item.id, item.last_checked))
 
     @classmethod
-    def _validate_user_id_in_subscriber_ids(cls, item):
+    def _validate_user_id_in_subscriber_ids(
+            cls, item, external_instance_details):
         """Validates that user id is present in list of
         subscriber ids of the creators the user has subscribed to.
-        This assumes cls.external_instance_details is already populated.
 
         Args:
             item: ndb.Model. UserSubscriptionsModel to validate.
+            external_instance_details: dict(str, (list(str, str, ndb.Model))).
+                A dict is keyed by field name. Each value consists of a list
+                of (model class, external_key, external_model_instance) tuples.
         """
         subscriber_model_class_model_id_model_tuples = (
-            cls.external_instance_details['subscriber_ids'])
+            external_instance_details['subscriber_ids'])
         for (model_class, model_id, subscriber_model) in (
                 subscriber_model_class_model_id_model_tuples):
             if subscriber_model is None or subscriber_model.deleted:
@@ -4226,17 +4336,19 @@ class UserSubscribersModelValidator(BaseUserModelValidator):
                 'for user' % item.id)
 
     @classmethod
-    def _validate_user_id_in_creator_ids(cls, item):
+    def _validate_user_id_in_creator_ids(cls, item, external_instance_details):
         """Validates that user id is present in list of
         creator ids to which the subscribers of user have
-        subscribed. This assumes cls.external_instance_details is
-        already populated.
+        subscribed.
 
         Args:
             item: ndb.Model. UserSubscribersModel to validate.
+            external_instance_details: dict(str, (list(str, str, ndb.Model))).
+                A dict is keyed by field name. Each value consists of a list
+                of (model class, external_key, external_model_instance) tuples.
         """
         subscription_model_class_model_id_model_tuples = (
-            cls.external_instance_details['subscription_ids'])
+            external_instance_details['subscription_ids'])
         for (model_class, model_id, subscription_model) in (
                 subscription_model_class_model_id_model_tuples):
             if subscription_model is None or subscription_model.deleted:
@@ -4254,9 +4366,11 @@ class UserSubscribersModelValidator(BaseUserModelValidator):
 
     @classmethod
     def _get_custom_validation_functions(cls):
-        return [
-            cls._validate_user_id_not_in_subscriber_ids,
-            cls._validate_user_id_in_creator_ids]
+        return [cls._validate_user_id_not_in_subscriber_ids]
+
+    @classmethod
+    def _get_external_instance_custom_validation_functions(cls):
+        return [cls._validate_user_id_in_creator_ids]
 
 
 class UserRecentChangesBatchModelValidator(BaseUserModelValidator):
@@ -4435,16 +4549,18 @@ class ExplorationUserDataModelValidator(BaseUserModelValidator):
                     item.id, item.draft_change_list_last_updated))
 
     @classmethod
-    def _validate_exp_version(cls, item):
+    def _validate_exp_version(cls, item, external_instance_details):
         """Validates that draft change exp version is less than version
-        of the exploration corresponding to the model. This assumes
-        cls.external_instance_details is already populated.
+        of the exploration corresponding to the model.
 
         Args:
             item: ndb.Model. ExplorationUserDataModel to validate.
+            external_instance_details: dict(str, (list(str, str, ndb.Model))).
+                A dict is keyed by field name. Each value consists of a list
+                of (model class, external_key, external_model_instance) tuples.
         """
         exploration_model_class_model_id_model_tuples = (
-            cls.external_instance_details['exploration_ids'])
+            external_instance_details['exploration_ids'])
         for (model_class, model_id, exploration_model) in (
                 exploration_model_class_model_id_model_tuples):
             if exploration_model is None or exploration_model.deleted:
@@ -4468,8 +4584,11 @@ class ExplorationUserDataModelValidator(BaseUserModelValidator):
             cls._validate_draft_change_list,
             cls._validate_rating,
             cls._validate_rated_on,
-            cls._validate_draft_change_list_last_updated,
-            cls._validate_exp_version]
+            cls._validate_draft_change_list_last_updated]
+
+    @classmethod
+    def _get_external_instance_custom_validation_functions(cls):
+        return [cls._validate_exp_version]
 
 
 class CollectionProgressModelValidator(BaseUserModelValidator):
@@ -4493,18 +4612,21 @@ class CollectionProgressModelValidator(BaseUserModelValidator):
         }
 
     @classmethod
-    def _validate_completed_exploration(cls, item):
+    def _validate_completed_exploration(
+            cls, item, external_instance_details):
         """Validates that completed exploration ids belong to
         the collection and are present in CompletedActivitiesModel
-        for the user. This assumes cls.external_instance_details is
-        already populated.
+        for the user.
 
         Args:
             item: ndb.Model. CollectionProgressModel to validate.
+            external_instance_details: dict(str, (list(str, str, ndb.Model))).
+                A dict is keyed by field name. Each value consists of a list
+                of (model class, external_key, external_model_instance) tuples.
         """
         completed_exp_ids = item.completed_explorations
         completed_activities_model_class_model_id_model_tuples = (
-            cls.external_instance_details['completed_activities_ids'])
+            external_instance_details['completed_activities_ids'])
         for (model_class, model_id, completed_activities_model) in (
                 completed_activities_model_class_model_id_model_tuples):
             if completed_activities_model is None or (
@@ -4526,7 +4648,7 @@ class CollectionProgressModelValidator(BaseUserModelValidator):
                     'user' % (item.id, missing_exp_ids))
 
         collection_model_class_model_id_model_tuples = (
-            cls.external_instance_details['collection_ids'])
+            external_instance_details['collection_ids'])
         for (model_class, model_id, collection_model) in (
                 collection_model_class_model_id_model_tuples):
             if collection_model is None or collection_model.deleted:
@@ -4552,10 +4674,14 @@ class CollectionProgressModelValidator(BaseUserModelValidator):
 
     @classmethod
     def _get_custom_validation_functions(cls):
+        return [cls._validate_completed_exploration]
+
+    @classmethod
+    def _get_external_instance_custom_validation_functions(cls):
         return [
-            cls._validate_completed_exploration,
             cls._validate_explorations_are_public,
-            cls._validate_collections_are_public]
+            cls._validate_collections_are_public
+        ]
 
 
 class StoryProgressModelValidator(BaseUserModelValidator):
@@ -4575,15 +4701,17 @@ class StoryProgressModelValidator(BaseUserModelValidator):
         }
 
     @classmethod
-    def _validate_story_is_public(cls, item):
-        """Validates that story is public. This assumes
-        cls.external_instance_details is already populated.
+    def _validate_story_is_public(cls, item, external_instance_details):
+        """Validates that story is public.
 
         Args:
             item: ndb.Model. StoryProgressModel to validate.
+            external_instance_details: dict(str, (list(str, str, ndb.Model))).
+                A dict is keyed by field name. Each value consists of a list
+                of (model class, external_key, external_model_instance) tuples.
         """
         story_model_class_model_id_model_tuples = (
-            cls.external_instance_details['story_ids'])
+            external_instance_details['story_ids'])
         for (model_class, model_id, story_model) in (
                 story_model_class_model_id_model_tuples):
             if story_model is None or story_model.deleted:
@@ -4609,17 +4737,19 @@ class StoryProgressModelValidator(BaseUserModelValidator):
                         'entity is private' % (item.id, story_model.id))
 
     @classmethod
-    def _validate_completed_nodes(cls, item):
-        """Validates that completed nodes belong to the story. This assumes
-        cls.external_instance_details is already populated.
+    def _validate_completed_nodes(cls, item, external_instance_details):
+        """Validates that completed nodes belong to the story.
 
         Args:
             item: ndb.Model. StoryProgressModel to validate.
+            external_instance_details: dict(str, (list(str, str, ndb.Model))).
+                A dict is keyed by field name. Each value consists of a list
+                of (model class, external_key, external_model_instance) tuples.
         """
         completed_activity_model = user_models.CompletedActivitiesModel.get(
             item.user_id)
         story_model_class_model_id_model_tuples = (
-            cls.external_instance_details['story_ids'])
+            external_instance_details['story_ids'])
         for (model_class, model_id, story_model) in (
                 story_model_class_model_id_model_tuples):
             if story_model is None or story_model.deleted:
@@ -4684,7 +4814,7 @@ class StoryProgressModelValidator(BaseUserModelValidator):
                     'Entity id %s: %s' % (item.id, error_msg))
 
     @classmethod
-    def _get_custom_validation_functions(cls):
+    def _get_external_instance_custom_validation_functions(cls):
         return [
             cls._validate_story_is_public,
             cls._validate_completed_nodes]
@@ -4708,21 +4838,24 @@ class UserQueryModelValidator(BaseUserModelValidator):
         }
 
     @classmethod
-    def _validate_sender_and_recipient_ids(cls, item):
+    def _validate_sender_and_recipient_ids(
+            cls, item, external_instance_details):
         """Validates that sender id of BulkEmailModel matches the
         submitter id of query and all recipient ids are present in
         user ids who satisfy the query. It is not necessary that
         all user ids are present in recipient ids since email
         is only sent to a limited maximum of qualified users.
         It also checks that a UserBulkEmailsModel exists for each
-        of the recipients. This assumes cls.external_instance_details
-        is already populated.
+        of the recipients.
 
         Args:
             item: ndb.Model. UserQueryModel to validate.
+            external_instance_details: dict(str, (list(str, str, ndb.Model))).
+                A dict is keyed by field name. Each value consists of a list
+                of (model class, external_key, external_model_instance) tuples.
         """
         email_model_class_model_id_model_tuples = (
-            cls.external_instance_details['sent_email_model_ids'])
+            external_instance_details['sent_email_model_ids'])
         for (model_class, model_id, email_model) in (
                 email_model_class_model_id_model_tuples):
             if email_model is None or email_model.deleted:
@@ -4783,16 +4916,19 @@ class UserBulkEmailsModelValidator(BaseUserModelValidator):
         }
 
     @classmethod
-    def _validate_user_id_in_recipient_id_for_emails(cls, item):
+    def _validate_user_id_in_recipient_id_for_emails(
+            cls, item, external_instance_details):
         """Validates that user id is present in recipient ids
-        for bulk email model. This assumes cls.external_instance_details
-        is already populated.
+        for bulk email model.
 
         Args:
             item: ndb.Model. UserBulkEmailsModel to validate.
+            external_instance_details: dict(str, (list(str, str, ndb.Model))).
+                A dict is keyed by field name. Each value consists of a list
+                of (model class, external_key, external_model_instance) tuples.
         """
         email_model_class_model_id_model_tuples = (
-            cls.external_instance_details['sent_email_model_ids'])
+            external_instance_details['sent_email_model_ids'])
         for (model_class, model_id, email_model) in (
                 email_model_class_model_id_model_tuples):
             if email_model is None or email_model.deleted:
