@@ -28,6 +28,7 @@ angular.module('oppia', [
 
 import { NgModule, StaticProvider } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import { downgradeComponent } from '@angular/upgrade/static';
 import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { AboutPageComponent } from './about-page.component';
@@ -50,11 +51,11 @@ import { AboutPageConstants } from 'pages/about-page/about-page.constants';
     SharedComponentsModule
   ],
   declarations: [
-    AboutPageComponent
+    AboutPageComponent,
     OppiaAngularRootComponent
   ],
   entryComponents: [
-    AboutPageComponent
+    AboutPageComponent,
     OppiaAngularRootComponent
   ],
   providers: [
