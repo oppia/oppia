@@ -63,11 +63,11 @@ export interface IVisualizationInfo {
   'options': {[name: string]: Option};
 }
 
-export interface IStateRulesStatsBackendDict {
+export interface IStateInteractionStatsBackendDict {
   'visualizations_info': IVisualizationInfo[];
 }
 
-export interface IStateRulesStats {
+export interface IStateInteractionStats {
   'exploration_id': string;
   'state_name': string;
   'visualizations_info': IVisualizationInfo[];
@@ -80,7 +80,7 @@ const STATE_INTERACTION_STATS_URL_TEMPLATE: string = (
 @Injectable({providedIn: 'root'})
 export class StateInteractionStatsService {
   // NOTE TO DEVELOPERS: Fulfilled promises can be reused indefinitely.
-  cachedStats: Promise<IStateRulesStats> = null;
+  statsCache: Map<string, Promise<IStateInteractionStats>> = new Map();
 
   constructor(
       private answerClassificationService: AnswerClassificationService,
@@ -98,7 +98,7 @@ export class StateInteractionStatsService {
     return state.interaction.id === 'TextInput';
   }
 
-  // Converts answer to a more-readable representation based on their type.
+  // Converts answer to a more-readable representation based on its type.
   private getReadableAnswerString(state: State, answer: Answer): Answer {
     if (state.interaction.id === 'FractionInput') {
       return (
@@ -111,39 +111,41 @@ export class StateInteractionStatsService {
    * Returns a promise which will provide details of the given state's
    * answer-statistics.
    */
-  computeStats(state: State): Promise<IStateRulesStats> {
-    if (this.cachedStats === null) {
-      const explorationId = this.contextService.getExplorationId();
-      const interactionRulesService = (
-        this.interactionRulesRegistryService.getRulesServiceByInteractionId(
-          state.interaction.id));
-      // TODO(#8038): Move this HTTP call into a backend-api.service module.
-      this.cachedStats = this.http.get<IStateRulesStatsBackendDict>(
-        this.urlInterpolationService.interpolateUrl(
-          STATE_INTERACTION_STATS_URL_TEMPLATE, {
-            exploration_id: explorationId,
-            state_name: state.name,
-          })).toPromise()
-        .then(response => <IStateRulesStats>{
+  computeStats(state: State): Promise<IStateInteractionStats> {
+    if (this.statsCache.has(state.name)) {
+      return this.statsCache.get(state.name);
+    }
+    const explorationId = this.contextService.getExplorationId();
+    const interactionRulesService = (
+      this.interactionRulesRegistryService.getRulesServiceByInteractionId(
+        state.interaction.id));
+    // TODO(#8038): Move this HTTP call into a backend-api.service module.
+    const statsPromise = this.http.get<IStateInteractionStatsBackendDict>(
+      this.urlInterpolationService.interpolateUrl(
+        STATE_INTERACTION_STATS_URL_TEMPLATE, {
           exploration_id: explorationId,
           state_name: state.name,
-          visualizations_info: response.visualizations_info.map(vizInfo => ({
-            id: vizInfo.id,
-            options: vizInfo.options,
-            addressed_info_is_supported: vizInfo.addressed_info_is_supported,
-            data: vizInfo.data.map(datum => <IAnswerData>{
-              answer: this.getReadableAnswerString(state, datum.answer),
-              frequency: datum.frequency,
-              is_addressed: vizInfo.addressed_info_is_supported ?
-                this.answerClassificationService
-                  .isClassifiedExplicitlyOrGoesToNewState(
-                    state.name, state, datum.answer, interactionRulesService) :
-                undefined,
-            }),
-          })),
-        });
-    }
-    return this.cachedStats;
+        })).toPromise()
+      .then(response => ({
+        exploration_id: explorationId,
+        state_name: state.name,
+        visualizations_info: response.visualizations_info.map(vizInfo => ({
+          id: vizInfo.id,
+          options: vizInfo.options,
+          addressed_info_is_supported: vizInfo.addressed_info_is_supported,
+          data: vizInfo.data.map(datum => <IAnswerData>{
+            answer: this.getReadableAnswerString(state, datum.answer),
+            frequency: datum.frequency,
+            is_addressed: vizInfo.addressed_info_is_supported ?
+              this.answerClassificationService
+                .isClassifiedExplicitlyOrGoesToNewState(
+                  state.name, state, datum.answer, interactionRulesService) :
+              undefined,
+          }),
+        })),
+      }));
+    this.statsCache.set(state.name, statsPromise);
+    return statsPromise;
   }
 }
 
