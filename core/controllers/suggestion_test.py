@@ -126,7 +126,6 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                     'new_value': self.new_content
                 },
                 'description': 'change to state 1',
-                'final_reviewer_id': self.editor_id,
             }, csrf_token=csrf_token)
         self.logout()
 
@@ -150,7 +149,6 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                     'new_value': self.new_content
                 },
                 'description': 'change to state 2',
-                'final_reviewer_id': self.editor_id,
             }, csrf_token=csrf_token)
 
         self.post_json(
@@ -170,7 +168,6 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                     'new_value': self.new_content
                 },
                 'description': 'change to state 3',
-                'final_reviewer_id': self.editor_id,
             }, csrf_token=csrf_token)
         self.logout()
 
@@ -192,7 +189,6 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                     'translation_html': '<p>In Hindi</p>'
                 },
                 'description': 'change to state 3',
-                'final_reviewer_id': self.reviewer_id,
             }, csrf_token=csrf_token)
         self.logout()
 
@@ -1127,7 +1123,6 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
                     'translation_html': '<p>new content html in Hindi</p>'
                 },
                 'description': 'Adds translation',
-                'final_reviewer_id': None
             }, csrf_token=csrf_token)
 
         self.question_dict = {
@@ -1307,7 +1302,6 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
                     'translation_html': '<p>new content html in Hindi</p>'
                 },
                 'description': 'Adds translation',
-                'final_reviewer_id': None
             }, csrf_token=csrf_token)
 
         self.question_dict = {
