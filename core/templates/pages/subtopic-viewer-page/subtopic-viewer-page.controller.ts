@@ -43,11 +43,11 @@ angular.module('oppia').directive('subtopicViewerPage', [
         '/pages/subtopic-viewer-page/subtopic-viewer-page.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$window', 'AlertsService', 'LoaderService',
+        '$rootScope', '$window', 'AlertsService', 'LoaderService',
         'PageTitleService', 'SubtopicViewerBackendApiService', 'UrlService',
         'WindowDimensionsService', 'FATAL_ERROR_CODES',
         function(
-            $window, AlertsService, LoaderService,
+            $rootScope, $window, AlertsService, LoaderService,
             PageTitleService, SubtopicViewerBackendApiService, UrlService,
             WindowDimensionsService, FATAL_ERROR_CODES) {
           var ctrl = this;
@@ -78,6 +78,7 @@ angular.module('oppia').directive('subtopicViewerPage', [
                 }
 
                 LoaderService.hideLoadingScreen();
+                $rootScope.$apply();
               },
               function(errorResponse) {
                 if (FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1) {
