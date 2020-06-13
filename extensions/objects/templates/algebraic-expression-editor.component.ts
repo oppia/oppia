@@ -20,33 +20,81 @@
 // may be additional customization options for the editor that should be passed
 // in via initArgs.
 
+const nerdamer = require('../../../node_modules/nerdamer');
+
 angular.module('oppia').component('algebraicExpressionEditor', {
   bindings: {
     value: '='
   },
   template: require('./algebraic-expression-editor.component.html'),
-  controller: [function() {
+  controller: ['$scope', function($scope) {
     const ctrl = this;
+    var hasBeenTouched;
+    ctrl.warningText = '';
 
-    ctrl.assignIdToGuppyDiv = function() {
-      // Dynamically assigns a unique id to the guppy-div
-      var divId = 'guppy_' + Math.floor(Math.random() * 100000000);
-      $('.guppy-div-creator').attr('id', divId);
-      return divId;
-    };
+    ctrl.initializeGuppy = function() {
+      var guppyDivs = document.querySelectorAll('.guppy-div-creator');
+      var divId, guppyInstance;
+      hasBeenTouched = false;
+      for(var i = 0; i < guppyDivs.length; i++) {
+        divId = 'guppy_' + Math.floor(Math.random() * 100000000);
+        // Dynamically assigns a unique id to the guppy div.
+        guppyDivs[i].setAttribute('id', divId);
+        // Create a new guppy instance for that div.
+        guppyInstance = new Guppy(divId, {});
+        guppyInstance.event('change', (e) => {
+          ctrl.value = guppyInstance.asciimath();
+          hasBeenTouched = true;
+          // Need to manually trigger the digest cycle
+          // to make any 'watchers' aware of changes in answer.
+          $scope.$apply();
+        });
+      }
+    }
 
-    ctrl.createGuppyInstance = function(divId: string) {
-      return new Guppy(divId, {});
+    var cleanErrorMessage = function(errorMessage) {
+      var semiColonIndex = errorMessage.indexOf(':');
+      if(semiColonIndex !== -1) {
+        errorMessage = errorMessage.slice(0, semiColonIndex);
+      }
+      var atColonIndex = errorMessage.indexOf('at');
+      if(atColonIndex !== -1) {
+        return errorMessage.slice(0, atColonIndex);
+      }
+      return errorMessage;
+    }
+
+    ctrl.isCurrentAnswerValid = function() {
+      if(hasBeenTouched) {
+        try {
+          var containsVariables = nerdamer(ctrl.value).variables().length > 0;
+          if(ctrl.value.length === 0) {
+            throw new Error('Please enter a non-empty answer.');
+          } else if(!containsVariables) {
+            throw new Error('It looks like you have entered only ' +
+              'numbers. Make sure to include the necessary variables' +
+              ' mentioned in the question.');
+          } else if(ctrl.value.indexOf('=') !== -1 || ctrl.value.indexOf(
+              '<') !== -1 || ctrl.value.indexOf('>') !== -1) {
+                throw new Error('It looks like you have entered an' +
+                  'equation/inequality. Please enter an algebraic' +
+                  'expression instead.');
+            }
+        } catch (err) {
+          ctrl.warningText = cleanErrorMessage(err.message);
+          return false;
+        }
+      }
+      ctrl.warningText = '';
+      return true;
     };
 
     ctrl.$onInit = function() {
       ctrl.alwaysEditable = true;
-      var divId = ctrl.assignIdToGuppyDiv();
-      var guppyInstance = ctrl.createGuppyInstance(divId);
-      guppyInstance.event('change', (e) => {
-        ctrl.value = guppyInstance.asciimath();
-      });
-      guppyInstance.render();
+      if(ctrl.value === null) {
+        ctrl.value = '';
+      }
+      ctrl.initializeGuppy();
     };
   }]
 });

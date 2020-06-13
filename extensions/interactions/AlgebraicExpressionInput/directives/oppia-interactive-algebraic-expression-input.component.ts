@@ -26,52 +26,90 @@ require(
 require(
   'pages/exploration-player-page/services/current-interaction.service.ts');
 
+const nerdamer = require('../../../../node_modules/nerdamer');
+
 angular.module('oppia').component('oppiaInteractiveAlgebraicExpressionInput', {
   template: require('./algebraic-expression-input-interaction.component.html'),
   controller: [
-    'CurrentInteractionService', 'AlgebraicExpressionInputRulesService',
+    '$scope', 'CurrentInteractionService',
+    'AlgebraicExpressionInputRulesService',
     function(
-      CurrentInteractionService, AlgebraicExpressionInputRulesService) {
-      var ctrl = this;
-      var guppyInstance;
+      $scope, CurrentInteractionService,
+      AlgebraicExpressionInputRulesService) {
+        const ctrl = this;
+        var hasBeenTouched, answer = '';
+        ctrl.warningText = '';
 
-      ctrl.assignIdToGuppyDiv = function() {
-        // Dynamically assigns a unique id to the guppy-div
-        var divId = 'guppy_' + Math.floor(Math.random() * 100000000);
-        var allElements = document.querySelectorAll('.guppy-div-learner');
-        // At a given point in time, there could be two instances of learner
-        // facing guppy divs. One in the interaction editing panel, and the
-        // other in the exploration preview tab. The last element gives us the
-        // latter div, which is the one we need to watch for changes. This is
-        // why the last element has been chosen from the querySelectorAll's
-        // result.
-        var newestElement = allElements[allElements.length - 1];
-        newestElement.setAttribute('id', divId);
-        return divId;
-      };
-
-      ctrl.isCurrentAnswerValid = function() {
-        return true;
-      };
-
-      ctrl.submitAnswer = function() {
-        if (!ctrl.isCurrentAnswerValid()) {
-          return;
+        ctrl.initializeGuppy = function() {
+          var guppyDivs = document.querySelectorAll('.guppy-div-learner');
+          var divId, guppyInstance;
+          hasBeenTouched = false;
+          for(var i = 0; i < guppyDivs.length; i++) {
+            divId = 'guppy_' + Math.floor(Math.random() * 100000000);
+            // Dynamically assigns a unique id to the guppy div.
+            guppyDivs[i].setAttribute('id', divId);
+            // Create a new guppy instance for that div.
+            guppyInstance = new Guppy(divId, {});
+            guppyInstance.event('change', (e) => {
+              answer = guppyInstance.asciimath();
+              hasBeenTouched = true;
+              // Need to manually trigger the digest cycle
+              // to make any 'watchers' aware of changes in answer.
+              $scope.$apply();
+            });
+          }
         }
-        var answer = guppyInstance.asciimath();
-        CurrentInteractionService.onSubmit(
-          answer, AlgebraicExpressionInputRulesService);
-      };
 
-      ctrl.$onInit = function() {
-        var divId = ctrl.assignIdToGuppyDiv();
-        guppyInstance = new Guppy(divId, {});
-        guppyInstance.event('change', (e) => {
-          ctrl.value = guppyInstance.asciimath();
-        });
-        CurrentInteractionService.registerCurrentInteraction(
-          ctrl.submitAnswer, ctrl.isCurrentAnswerValid);
-      };
+        var cleanErrorMessage = function(errorMessage) {
+          var semiColonIndex = errorMessage.indexOf(':');
+          if(semiColonIndex !== -1) {
+            errorMessage = errorMessage.slice(0, semiColonIndex);
+          }
+          var atColonIndex = errorMessage.indexOf('at');
+          if(atColonIndex !== -1) {
+            return errorMessage.slice(0, atColonIndex);
+          }
+          return errorMessage;
+        }
+    
+        ctrl.isCurrentAnswerValid = function() {
+          if(hasBeenTouched) {
+            try {
+              var containsVariables = nerdamer(answer).variables().length > 0;
+              if(answer.length === 0) {
+                throw new Error('Please enter a non-empty answer.');
+              } else if(!containsVariables) {
+                throw new Error('It looks like you have entered only ' +
+                  'numbers. Make sure to include the necessary variables' +
+                  ' mentioned in the question.');
+              } else if(answer.indexOf('=') !== -1 || answer.indexOf(
+                  '<') !== -1 || answer.indexOf('>') !== -1) {
+                    throw new Error('It looks like you have entered an' +
+                      'equation/inequality. Please enter an algebraic' +
+                      'expression instead.');
+                }
+            } catch (err) {
+              ctrl.warningText = cleanErrorMessage(err.message);
+              return false;
+            }
+          }
+          ctrl.warningText = '';
+          return true;
+        };
+
+        ctrl.submitAnswer = function() {
+          if (!ctrl.isCurrentAnswerValid()) {
+            return;
+          }
+          CurrentInteractionService.onSubmit(
+            answer, AlgebraicExpressionInputRulesService);
+        };
+
+        ctrl.$onInit = function() {
+          ctrl.initializeGuppy();
+          CurrentInteractionService.registerCurrentInteraction(
+            ctrl.submitAnswer, ctrl.isCurrentAnswerValid);
+        };
     }
   ]
 });

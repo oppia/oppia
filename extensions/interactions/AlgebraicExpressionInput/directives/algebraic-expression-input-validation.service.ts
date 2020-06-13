@@ -25,6 +25,7 @@ import { IWarning, baseInteractionValidationService } from
   'interactions/base-interaction-validation.service';
 import { Outcome } from
   'domain/exploration/OutcomeObjectFactory';
+import { AppConstants } from 'app.constants';
 
 @Injectable({
   providedIn: 'root'
@@ -38,25 +39,34 @@ export class AlgebraicExpressionInputValidationService {
   // 'any' because 'customizationArgs' is a dict with possible underscore_cased
   // keys which give tslint errors against underscore_casing in favor of
   // camelCasing.
-  getCustomizationArgsWarnings(customizationArgs: any): any[] {
-    return [];
-  }
-
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'customizationArgs' is a dict with possible underscore_cased
-  // keys which give tslint errors against underscore_casing in favor of
-  // camelCasing.
   getAllWarnings(
       stateName: string, customizationArgs: any, answerGroups: AnswerGroup[],
       defaultOutcome: Outcome): IWarning[] {
     var warningsList = [];
 
     warningsList = warningsList.concat(
-      this.getCustomizationArgsWarnings(customizationArgs));
-
-    warningsList = warningsList.concat(
       this.baseInteractionValidationServiceInstance.getAllOutcomeWarnings(
         answerGroups, defaultOutcome, stateName));
+
+    var seenIsEquivalentTo = false;
+    for (var i = 0; i < answerGroups.length; i++) {
+      var rules = answerGroups[i].rules;
+      for (var j = 0; j < rules.length; j++) {
+        if(rules[j].type === 'IsEquivalentTo') {
+          seenIsEquivalentTo = true;
+        }
+        else if(seenIsEquivalentTo) {
+          warningsList.push({
+            type: AppConstants.WARNING_TYPES.ERROR,
+            message: (
+              'Rule ' + (j + 1) + ' from answer group ' +
+              (i + 1) +
+              ' will never be matched because it is preceded ' +
+              'by an \'IsEquivalentToRule\'.')
+          });
+        }
+      }
+    }
 
     return warningsList;
   }

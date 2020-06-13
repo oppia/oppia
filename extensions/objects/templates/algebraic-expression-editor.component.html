@@ -1,1 +1,7 @@
 <div class="guppy-div-creator"></div>
+
+<span type="text" ng-model="$ctrl.localValue" ui-validate="'$ctrl.isCurrentAnswerValid()'"></span>
+
+<div ng-show="!$ctrl.isCurrentAnswerValid()" class="oppia-algebraic-warning alert alert-danger mt-2 mb-4">
+  <[$ctrl.warningText]>
+</div>
