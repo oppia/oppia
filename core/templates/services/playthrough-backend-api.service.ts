@@ -26,11 +26,6 @@ import { Injectable } from '@angular/core';
 import { Playthrough } from 'domain/statistics/PlaythroughObjectFactory';
 import { ServicesConstants } from 'services/services.constants';
 
-export interface IStorePlaythroughResponse {
-  'playthrough_stored': boolean;
-  'playthrough_id': string;
-}
-
 @Injectable({
   providedIn: 'root'
 })
@@ -39,16 +34,14 @@ export class PlaythroughBackendApiService {
       private http: HttpClient,
       private urlInterpolationService: UrlInterpolationService) {}
 
-  storePlaythrough(
-      playthrough: Playthrough): Promise<IStorePlaythroughResponse> {
+  storePlaythrough(playthrough: Playthrough): Promise<void> {
     const storePlaythroughUrl = this.urlInterpolationService.interpolateUrl(
       ServicesConstants.STORE_PLAYTHROUGH_URL, {
         exploration_id: playthrough.expId
       });
-    return this.http.post<IStorePlaythroughResponse>(storePlaythroughUrl, {
+    return this.http.post<void>(storePlaythroughUrl, {
       playthrough_data: playthrough.toBackendDict(),
       issue_schema_version: ServicesConstants.CURRENT_ISSUE_SCHEMA_VERSION,
-      playthrough_id: playthrough.playthroughId
     }).toPromise();
   }
 }

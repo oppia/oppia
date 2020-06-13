@@ -68,7 +68,7 @@ describe('Improvement Playthough Modal Controller', function() {
       ];
 
       playthrough = playthroughObjectFactory.createNew(
-        '0', '1', 1, 'MultipleIncorrectSubmissions', {
+        '1', 1, 'MultipleIncorrectSubmissions', {
           state_name: {
             value: 'state_name1'
           },
@@ -157,7 +157,7 @@ describe('Improvement Playthough Modal Controller', function() {
       ];
 
       playthrough = playthroughObjectFactory.createNew(
-        '0', '1', 1, 'EarlyQuit', {
+        '1', 1, 'EarlyQuit', {
           state_name: {
             value: 'state_name1'
           },

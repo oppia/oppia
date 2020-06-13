@@ -18,22 +18,22 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { LearnerActionObjectFactory } from
-  'domain/statistics/LearnerActionObjectFactory';
 import {
   ICyclicStateTransitionsCustomizationArgs,
   IEarlyQuitCustomizationArgs,
   IMultipleIncorrectSubmissionsCustomizationArgs,
   PlaythroughObjectFactory
 } from 'domain/statistics/PlaythroughObjectFactory';
+import { LearnerActionObjectFactory } from
+  'domain/statistics/LearnerActionObjectFactory';
 
 describe('Playthrough Object Factory', () => {
-  let playthroughObjectFactory: PlaythroughObjectFactory;
   let learnerActionObjectFactory: LearnerActionObjectFactory;
+  let playthroughObjectFactory: PlaythroughObjectFactory;
 
   beforeEach(() => {
-    playthroughObjectFactory = TestBed.get(PlaythroughObjectFactory);
     learnerActionObjectFactory = TestBed.get(LearnerActionObjectFactory);
+    playthroughObjectFactory = TestBed.get(PlaythroughObjectFactory);
   });
 
   it('should create a new early quit playthrough', () => {
@@ -47,9 +47,8 @@ describe('Playthrough Object Factory', () => {
       time_spent_in_exp_in_msecs: {value: 45000},
     };
     var playthroughObject = playthroughObjectFactory.createNew(
-      'playthroughId1', 'expId1', 1, 'EarlyQuit', customizationArgs, actions);
+      'expId1', 1, 'EarlyQuit', customizationArgs, actions);
 
-    expect(playthroughObject.playthroughId).toEqual('playthroughId1');
     expect(playthroughObject.expId).toEqual('expId1');
     expect(playthroughObject.expVersion).toEqual(1);
     expect(playthroughObject.issueType).toEqual('EarlyQuit');
@@ -67,10 +66,8 @@ describe('Playthrough Object Factory', () => {
       state_names: {value: ['state 1', 'state 2', 'state 3', 'state 1']},
     };
     var playthroughObject = playthroughObjectFactory.createNew(
-      'playthroughId1', 'expId1', 1, 'CyclicStateTransitions',
-      customizationArgs, actions);
+      'expId1', 1, 'CyclicStateTransitions', customizationArgs, actions);
 
-    expect(playthroughObject.playthroughId).toEqual('playthroughId1');
     expect(playthroughObject.expId).toEqual('expId1');
     expect(playthroughObject.expVersion).toEqual(1);
     expect(playthroughObject.issueType).toEqual('CyclicStateTransitions');
@@ -89,10 +86,8 @@ describe('Playthrough Object Factory', () => {
       num_times_answered_incorrectly: {value: 5},
     };
     var playthroughObject = playthroughObjectFactory.createNew(
-      'playthroughId1', 'expId1', 1, 'MultipleIncorrectAnswers',
-      customizationArgs, actions);
+      'expId1', 1, 'MultipleIncorrectAnswers', customizationArgs, actions);
 
-    expect(playthroughObject.playthroughId).toEqual('playthroughId1');
     expect(playthroughObject.expId).toEqual('expId1');
     expect(playthroughObject.expVersion).toEqual(1);
     expect(playthroughObject.issueType).toEqual('MultipleIncorrectAnswers');
@@ -102,23 +97,23 @@ describe('Playthrough Object Factory', () => {
 
   it('should create a new playthrough from a backend dict', () => {
     var playthroughObject = playthroughObjectFactory.createFromBackendDict({
-      playthrough_id: 'playthroughId1',
       exp_id: 'expId1',
       exp_version: 1,
       issue_type: 'EarlyQuit',
       issue_customization_args: <IEarlyQuitCustomizationArgs>{
         state_name: {value: 'early quit'},
       },
-      actions: [{
-        action_type: 'ExplorationStart',
-        action_customization_args: {
-          state_name: {value: 'state name'},
-        },
-        schema_version: 1
-      }]
+      actions: [
+        {
+          action_type: 'ExplorationStart',
+          action_customization_args: {
+            state_name: {value: 'state name'},
+          },
+          schema_version: 1
+        }
+      ]
     });
 
-    expect(playthroughObject.playthroughId).toEqual('playthroughId1');
     expect(playthroughObject.expId).toEqual('expId1');
     expect(playthroughObject.expVersion).toEqual(1);
     expect(playthroughObject.issueType).toEqual('EarlyQuit');
@@ -143,11 +138,9 @@ describe('Playthrough Object Factory', () => {
       time_spent_in_exp_in_msecs: {value: 45000},
     };
     var playthroughObject = playthroughObjectFactory.createNew(
-      'playthroughId1', 'expId1', 1, 'EarlyQuit', customizationArgs, actions);
+      'expId1', 1, 'EarlyQuit', customizationArgs, actions);
 
-    var playthroughDict = playthroughObject.toBackendDict();
-    expect(playthroughDict).toEqual({
-      id: 'playthroughId1',
+    expect(playthroughObject.toBackendDict()).toEqual({
       exp_id: 'expId1',
       exp_version: 1,
       issue_type: 'EarlyQuit',

@@ -20,10 +20,10 @@ import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-import { LearnerActionObjectFactory } from
-  'domain/statistics/LearnerActionObjectFactory';
 import { IEarlyQuitCustomizationArgs, PlaythroughObjectFactory } from
   'domain/statistics/PlaythroughObjectFactory';
+import { LearnerActionObjectFactory } from
+  'domain/statistics/LearnerActionObjectFactory';
 import { PlaythroughBackendApiService } from
   'services/playthrough-backend-api.service';
 
@@ -48,7 +48,7 @@ describe('Playthrough backend api service', function() {
     const onSuccess = jasmine.createSpy('success');
     const onFailure = jasmine.createSpy('failure');
     const playthrough = playthroughObjectFactory.createNew(
-      'pid', 'eid', 1, 'EarlyQuit',
+      'eid', 1, 'EarlyQuit',
       <IEarlyQuitCustomizationArgs>{state_name: {value: 'text'}}, [
         learnerActionObjectFactory.createExplorationStartAction({
           state_name: {value: 'Hola'}
@@ -64,9 +64,8 @@ describe('Playthrough backend api service', function() {
     expect(req.request.body).toEqual({
       playthrough_data: playthrough.toBackendDict(),
       issue_schema_version: 1,
-      playthrough_id: 'pid',
     });
-    req.flush({playthrough_stored: true, playthrough_id: 'abc'});
+    req.flush({});
     flushMicrotasks();
 
     expect(onSuccess).toHaveBeenCalled();

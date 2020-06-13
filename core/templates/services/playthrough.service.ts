@@ -22,8 +22,6 @@ import { Injectable } from '@angular/core';
 import { AppConstants } from 'app.constants';
 import { ExplorationFeaturesService } from
   'services/exploration-features.service';
-import { LearnerActionObjectFactory } from
-  'domain/statistics/LearnerActionObjectFactory';
 import {
   ICyclicStateTransitionsCustomizationArgs,
   IEarlyQuitCustomizationArgs,
@@ -31,6 +29,8 @@ import {
   Playthrough,
   PlaythroughObjectFactory
 } from 'domain/statistics/PlaythroughObjectFactory';
+import { LearnerActionObjectFactory } from
+  'domain/statistics/LearnerActionObjectFactory';
 import { PlaythroughBackendApiService } from
   'services/playthrough-backend-api.service';
 import { ServicesConstants } from 'services/services.constants';
@@ -38,65 +38,66 @@ import { Stopwatch, StopwatchObjectFactory } from
   'domain/utilities/StopwatchObjectFactory';
 
 class MultipleIncorrectAnswersTracker {
-  public currentStateName: string;
-  public numTries: number = 0;
+  currStateName: string;
+  numTries: number = 0;
 
   constructor(initStateName: string) {
-    this.currentStateName = initStateName;
+    this.currStateName = initStateName;
   }
 
-  isExampleOfIssue(): boolean {
+  foundAnIssue(): boolean {
     return this.numTries >= ServicesConstants.NUM_INCORRECT_ANSWERS_THRESHOLD;
   }
 
   recordStateTransition(destStateName: string): void {
-    if (this.currentStateName === destStateName) {
+    if (this.currStateName === destStateName) {
       this.numTries += 1;
     } else {
-      this.currentStateName = destStateName;
+      this.currStateName = destStateName;
       this.numTries = 0;
     }
   }
 }
 
 class CyclicStateTransitionsTracker {
-  public visitedStates: string[];
-  public cycle: string[] = null;
-  public numCycles: number = 0;
+  pathOfUniqueStates: string[];
+  cycleOfStates: string[] = null;
+  numLoops: number = 0;
 
   constructor(initStateName: string) {
-    this.visitedStates = [initStateName];
+    this.pathOfUniqueStates = [initStateName];
   }
 
-  private makeCycle(cycleStartIndex: number): string[] {
-    const collision = this.visitedStates[cycleStartIndex];
-    const cycleWithoutCollision = this.visitedStates.slice(cycleStartIndex);
+  private makeCycle(collisionIndex: number): string[] {
+    const collision = this.pathOfUniqueStates[collisionIndex];
+    const cycleWithoutCollision = this.pathOfUniqueStates.slice(collisionIndex);
     return [...cycleWithoutCollision, collision];
   }
 
-  private currentStateName(): string {
-    return this.visitedStates[this.visitedStates.length - 1];
+  private currStateName(): string {
+    return this.pathOfUniqueStates[this.pathOfUniqueStates.length - 1];
   }
 
-  isExampleOfIssue(): boolean {
-    return this.numCycles >= ServicesConstants.NUM_REPEATED_CYCLES_THRESHOLD;
+  foundAnIssue(): boolean {
+    return this.numLoops >= ServicesConstants.NUM_REPEATED_CYCLES_THRESHOLD;
   }
 
   recordStateTransition(destStateName: string): void {
-    if (!this.visitedStates.includes(destStateName)) {
-      this.visitedStates.push(destStateName);
+    if (!this.pathOfUniqueStates.includes(destStateName)) {
+      this.pathOfUniqueStates.push(destStateName);
       return;
     }
-    if (this.currentStateName() !== destStateName) {
-      const cycle = this.makeCycle(this.visitedStates.indexOf(destStateName));
-      if (angular.equals(this.cycle, cycle)) {
-        this.numCycles += 1;
+    if (this.currStateName() !== destStateName) {
+      const cycleOfStates = (
+        this.makeCycle(this.pathOfUniqueStates.indexOf(destStateName)));
+      if (angular.equals(this.cycleOfStates, cycleOfStates)) {
+        this.numLoops += 1;
       } else {
-        this.cycle = cycle;
-        this.numCycles = 1;
+        this.cycleOfStates = cycleOfStates;
+        this.numLoops = 1;
       }
     }
-    this.visitedStates = [destStateName];
+    this.pathOfUniqueStates = [destStateName];
   }
 }
 
@@ -105,7 +106,7 @@ class EarlyQuitTracker {
       public stateName: string = null,
       public timeSpentInStateSecs: number = null) {}
 
-  isExampleOfIssue(): boolean {
+  foundAnIssue(): boolean {
     return (
       this.timeSpentInStateSecs !== null &&
       this.timeSpentInStateSecs < ServicesConstants.EARLY_QUIT_THRESHOLD_IN_SECS
@@ -148,22 +149,22 @@ export class PlaythroughService {
    *    3. EarlyQuitIssue
    */
   private classifyPlaythrough(): void {
-    if (this.misTracker !== null && this.misTracker.isExampleOfIssue()) {
+    if (this.misTracker && this.misTracker.foundAnIssue()) {
       this.playthrough.issueType = (
         AppConstants.ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS);
       this.playthrough.issueCustomizationArgs = (
         <IMultipleIncorrectSubmissionsCustomizationArgs>{
-          state_name: {value: this.misTracker.currentStateName},
+          state_name: {value: this.misTracker.currStateName},
           num_times_answered_incorrectly: {value: this.misTracker.numTries}
         });
-    } else if (this.cstTracker !== null && this.cstTracker.isExampleOfIssue()) {
+    } else if (this.cstTracker && this.cstTracker.foundAnIssue()) {
       this.playthrough.issueType = (
         AppConstants.ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS);
       this.playthrough.issueCustomizationArgs = (
         <ICyclicStateTransitionsCustomizationArgs>{
-          state_names: {value: this.cstTracker.cycle}
+          state_names: {value: this.cstTracker.cycleOfStates}
         });
-    } else if (this.eqTracker !== null && this.eqTracker.isExampleOfIssue()) {
+    } else if (this.eqTracker && this.eqTracker.foundAnIssue()) {
       this.playthrough.issueType = AppConstants.ISSUE_TYPE_EARLY_QUIT;
       this.playthrough.issueCustomizationArgs = (
         <IEarlyQuitCustomizationArgs>{
@@ -213,7 +214,7 @@ export class PlaythroughService {
         state_name: {value: initStateName}
       }));
     this.playthrough = this.playthroughObjectFactory.createNew(
-      null, this.explorationId, this.explorationVersion, null, null,
+      this.explorationId, this.explorationVersion, null, null,
       [explorationStartAction]);
 
     this.eqTracker = new EarlyQuitTracker();
