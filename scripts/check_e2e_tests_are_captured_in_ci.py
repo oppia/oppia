@@ -29,9 +29,8 @@ import utils
 # One is extra (ie. (full: [*.js])) and three other test suites are
 # are being run by CircleCI.
 TEST_SUITES_NOT_RUN_ON_TRAVIS = [
-    'full', 'adminPage', 'accessibility', 'classroomPage',
-    'classroomPageFileUploadFeatures', 'collections', 'embedding',
-    'fileUploadFeatures', 'library', 'navigation', 'preferences',
+    'full', 'adminPage', 'classroomPage', 'classroomPageFileUploadFeatures',
+    'collections', 'fileUploadFeatures', 'library', 'navigation', 'preferences',
     'profileFeatures', 'profileMenu', 'publication', 'subscriptions',
     'topicAndStoryEditorFileUploadFeatures', 'users']
 
@@ -75,7 +74,7 @@ def get_e2e_suite_names_from_script_travis_yml_file():
     # The following line extracts the test suites from patterns like
     # python -m scripts.run_e2e_tests --suite="accessibility".
     e2e_test_suite_regex = re.compile(
-        r'python -m scripts.run_e2e_tests --suite="([a-zA-Z_-]*)"')
+        r'--suite="([a-zA-Z_-]*)"')
     suites_list = e2e_test_suite_regex.findall(script_str)
 
     return sorted(suites_list)
@@ -196,12 +195,6 @@ def main():
         raise Exception('The e2e test suites that have been extracted from '
                         'protractor.conf.js are empty.')
 
-    if SAMPLE_TEST_SUITE_THAT_IS_KNOWN_TO_EXIST not in travis_e2e_jobs:
-        raise Exception('{} is expected to be in the e2e test suites '
-                        'extracted from the jobs section of .travis.yml '
-                        'file, but it is missing.'
-                        .format(SAMPLE_TEST_SUITE_THAT_IS_KNOWN_TO_EXIST))
-
     if SAMPLE_TEST_SUITE_THAT_IS_KNOWN_TO_EXIST not in travis_e2e_scripts:
         raise Exception('{} is expected to be in the e2e test suites '
                         'extracted from the script section of .travis.yml '
@@ -214,8 +207,7 @@ def main():
                         'but it is missing.'
                         .format(SAMPLE_TEST_SUITE_THAT_IS_KNOWN_TO_EXIST))
 
-    if not (protractor_test_suites == travis_e2e_jobs and
-            travis_e2e_jobs == travis_e2e_scripts):
+    if not (protractor_test_suites == travis_e2e_scripts):
         raise Exception(
             'Protractor test suites and Travis Ci test suites are not in sync.')
 
