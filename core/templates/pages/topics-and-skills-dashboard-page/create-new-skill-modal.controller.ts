@@ -19,34 +19,26 @@
 
 require('domain/utilities/url-interpolation.service.ts');
 require('domain/exploration/SubtitledHtmlObjectFactory.ts');
-require('components/ck-editor-helpers/ck-editor-4-rte.directive.ts');
-require('components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts');
-require(
-  'components/forms/schema-based-editors/schema-based-editor.directive.ts');
-require('domain/exploration/SubtitledHtmlObjectFactory.ts');
-require('domain/utilities/url-interpolation.service.ts');
-require('components/ck-editor-helpers/ck-editor-4-rte.directive.ts');
-require('components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts');
-require('components/forms/custom-forms-directives/image-uploader.directive.ts');
-
-require('directives/mathjax-bind.directive.ts');
-require('filters/string-utility-filters/normalize-whitespace.filter.ts');
-require('objects/objectComponentsRequires.ts');
-require('directives/angular-html-bind.directive.ts');
+require('services/context.service.ts');
+require('services/image-local-storage.service.ts');
 
 angular.module('oppia').controller('CreateNewSkillModalController', [
-  '$scope', '$uibModalInstance', 'RubricObjectFactory', 'SkillCreationService',
+  '$scope', '$uibModalInstance', 'ContextService', 'ImageLocalStorageService',
+  'RubricObjectFactory', 'SkillCreationService', 'SkillObjectFactory',
   'SubtitledHtmlObjectFactory', 'COMPONENT_NAME_EXPLANATION',
-  'SkillObjectFactory', 'MAX_CHARS_IN_SKILL_DESCRIPTION',
-  'SKILL_DESCRIPTION_STATUS_VALUES', 'SKILL_DIFFICULTIES',
-  function($scope, $uibModalInstance, RubricObjectFactory, SkillCreationService,
+  'MAX_CHARS_IN_SKILL_DESCRIPTION', 'SKILL_DESCRIPTION_STATUS_VALUES',
+  'SKILL_DIFFICULTIES',
+  function(
+      $scope, $uibModalInstance, ContextService, ImageLocalStorageService,
+      RubricObjectFactory, SkillCreationService, SkillObjectFactory,
       SubtitledHtmlObjectFactory, COMPONENT_NAME_EXPLANATION,
-      SkillObjectFactory, MAX_CHARS_IN_SKILL_DESCRIPTION,
-      SKILL_DESCRIPTION_STATUS_VALUES, SKILL_DIFFICULTIES) {
+      MAX_CHARS_IN_SKILL_DESCRIPTION, SKILL_DESCRIPTION_STATUS_VALUES,
+      SKILL_DIFFICULTIES) {
     var rubrics = [
       RubricObjectFactory.create(SKILL_DIFFICULTIES[0], []),
       RubricObjectFactory.create(SKILL_DIFFICULTIES[1], ['']),
       RubricObjectFactory.create(SKILL_DIFFICULTIES[2], [])];
+    ContextService.setImageSaveDestinationToLocalStorage();
     $scope.newSkillDescription = '';
     $scope.rubrics = rubrics;
     $scope.errorMsg = '';
@@ -62,7 +54,6 @@ angular.module('oppia').controller('CreateNewSkillModalController', [
     $scope.newExplanationObject = null;
 
     $scope.openConceptCardExplanationEditor = function() {
-      console.log('open called');
       $scope.conceptCardExplanationEditorIsShown = true;
     };
 

@@ -194,24 +194,20 @@ describe('Topics and Skills Dashboard Page', function() {
       expect(ctrl.pageNumber).toEqual(1);
       ctrl.currentCount = currentCount;
 
-
       ctrl.changePageByOne('next_page');
       expect(ctrl.topicPageNumber).toEqual(2);
       expect(ctrl.pageNumber).toEqual(2);
       ctrl.currentCount = currentCount;
-
 
       ctrl.changePageByOne('prev_page');
       expect(ctrl.topicPageNumber).toEqual(1);
       expect(ctrl.pageNumber).toEqual(1);
       ctrl.currentCount = currentCount;
 
-
       ctrl.changePageByOne('prev_page');
       expect(ctrl.topicPageNumber).toEqual(0);
       expect(ctrl.pageNumber).toEqual(0);
       ctrl.currentCount = currentCount;
-
 
       ctrl.changePageByOne('prev_page');
       expect(ctrl.topicPageNumber).toEqual(0);

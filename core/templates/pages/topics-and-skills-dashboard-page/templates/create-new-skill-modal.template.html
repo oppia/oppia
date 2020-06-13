@@ -9,7 +9,7 @@
     </div>
     <input type="text" class="form-control protractor-test-new-skill-description-field"
            placeholder="eg: Adding Fractions" ng-change="updateSkillDescription()" ng-model="newSkillDescription"
-           maxlength="<[MAX_CHARS_IN_SKILL_DESCRIPTION]>" autofocus>
+           maxlength="<[MAX_CHARS_IN_SKILL_DESCRIPTION]>">
     <span class="oppia-input-box-subtitle">
       <i>
         Skill description should be at most <[MAX_CHARS_IN_SKILL_DESCRIPTION]> characters.
@@ -20,14 +20,14 @@
         <[errorMsg]>
       </i>
     </span>
-    <div class="oppia-rule-details-header" style="margin-bottom: 0.5em; margin-top: 1em;" ng-click="openConceptCardExplanationEditor()">
+    <div class="oppia-rule-details-header protractor-test-open-concept-card" style="margin-bottom: 0.5em; margin-top: 1em;" ng-click="openConceptCardExplanationEditor()">
       <strong>Review Material</strong>
       <div class="oppia-input-box-subtitle">
-      <i>
-        This gives the learner a brief overview of how to perform the skill.
-      </i>
+        <i>
+          This gives the learner a brief overview of how to perform the skill.
+        </i>
         <i class="fa fa-pen"></i>
-    </div>
+      </div>
     </div>
 
     <div ng-if="conceptCardExplanationEditorIsShown">

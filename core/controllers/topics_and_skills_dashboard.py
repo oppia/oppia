@@ -137,13 +137,14 @@ class SkillsDashboardPageDataHandler(base.BaseHandler):
         """Handles GET requests."""
 
         classroom_name = self.request.get('classroomName')
-        status = self.request.get('status')
-        keywords = self.request.get('keywords')
-        sort_by = self.request.get('sort')
-        page_number = int(self.request.get('pageNumber'))
         items_per_page = int(self.request.get('itemsPerPage'))
+        keywords = self.request.get('keywords')
+        page_number = int(self.request.get('pageNumber'))
+        sort_by = self.request.get('sort')
+        status = self.request.get('status')
 
-        skill_summary_dicts = skill_services.get_filtered_skill_dicts(status, classroom_name, keywords, sort_by)
+        skill_summary_dicts = skill_services.get_filtered_skill_dicts(
+            status, classroom_name, keywords, sort_by)
         skill_summary_dicts_paginated = skill_summary_dicts[
             page_number * items_per_page: ((page_number + 1) * items_per_page)]
 

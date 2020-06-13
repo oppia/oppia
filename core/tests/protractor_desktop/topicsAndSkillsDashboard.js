@@ -153,12 +153,12 @@ describe('Topics and skills dashboard functionality', function() {
         'Skill to be deleted', 'Concept card explanation', true);
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.navigateToUnusedSkillsTab();
-    await topicsAndSkillsDashboardPage.expectNumberOfSkillsToBe(1);
+    await topicsAndSkillsDashboardPage.expectNumberOfSkillsToBe(2);
     await topicsAndSkillsDashboardPage.deleteSkillWithIndex(0);
 
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.navigateToUnusedSkillsTab();
-    await topicsAndSkillsDashboardPage.expectNumberOfSkillsToBe(0);
+    await topicsAndSkillsDashboardPage.expectNumberOfSkillsToBe(1);
   });
 
   afterEach(async function() {

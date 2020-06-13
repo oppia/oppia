@@ -104,7 +104,6 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
           ctrl._initDashboard = function(stayInSameTab) {
             TopicsAndSkillsDashboardBackendApiService.fetchDashboardData().then(
               function(response) {
-                console.log(response);
                 ctrl.totalTopicSummaries = response.topic_summary_dicts;
                 ctrl.topicSummaries = ctrl.totalTopicSummaries;
                 ctrl.totalEntityCountToDisplay = ctrl.topicSummaries.length;

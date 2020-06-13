@@ -155,6 +155,29 @@ class TopicsAndSkillsDashboardPageDataHandlerTests(
         self.logout()
 
 
+class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
+
+    def test_get(self):
+        # Check that non-admins or non-topic managers cannot access the
+        # topics and skills dashboard data.
+        self.login(self.NEW_USER_EMAIL)
+        self.get_json(
+            feconf.SKILL_DASHBOARD_DATA_URL,
+            expected_status_int=401)
+        self.logout()
+
+        self.login(self.ADMIN_EMAIL)
+        json_response = self.get_json(
+            feconf.SKILL_DASHBOARD_DATA_URL,
+            params={
+                'pageNumber': 0,
+                'itemsPerPage': 10
+            })
+        self.assertEqual(len(json_response['skill_summary_dicts']), 1)
+        self.assertEqual(
+            json_response['skill_summary_dicts'][0]['id'], self.linked_skill_id)
+
+
 class NewTopicHandlerTests(BaseTopicsAndSkillsDashboardTests):
 
     def setUp(self):

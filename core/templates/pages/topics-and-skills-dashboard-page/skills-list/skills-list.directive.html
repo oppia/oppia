@@ -1,12 +1,12 @@
 <md-card layout="row" class="list-view-item">
   <table class="dashboard-table">
     <colgroup>
-      <col style="width: 5%;">
-      <col style="width: 25%;">
-      <col style="width: 10%;">
-      <col style="width: 10%;">
-      <col style="width: 15%;">
-      <col style="width: 20%;">
+      <col class="dashboard-table-index-column">
+      <col class="dashboard-table-description-column">
+      <col class="dashboard-table-examples-column">
+      <col class="dashboard-table-misconception-column">
+      <col class="dashboard-table-status-column">
+      <col class="dashboard-table-options-column">
     </colgroup>
     <tr>
       <th ng-repeat="key in $ctrl.SKILL_HEADINGS"
@@ -21,21 +21,21 @@
     </tr>
     <tr ng-repeat="skill in getSkillSummaries() track by $index"
         ng-click="selectSkill(skill)"
-        class="list-item protractor-test-skills-list-item">
+        class="list-item">
       <td>
         <[$ctrl.getSerialNumberForSkill($index)]>.
       </td>
-      <td>
+      <td class="protractor-test-skills-list-item">
         <a ng-href="<[getSkillEditorUrl(skill.id)]>" class="list-summary">
           <div class="skill-description protractor-test-skill-description"> <[skill.description]> </div>
           <div class="skill-topic">
-          <span ng-if="!skill.topic">
+            <span ng-if="!skill.topic">
             Unassigned
-            <i class="fa fa-exclamation-triangle"></i>
-          </span>
-          <span ng-if="skill.topic">
-            <[skill.topic]>
-          </span>
+              <i class="fa fa-exclamation-triangle"></i>
+            </span>
+            <span ng-if="skill.topic">
+              <[skill.topic]>
+            </span>
           </div>
         </a>
       </td>
@@ -60,25 +60,25 @@
         </a>
       </td>
       <td class="skill-edit-options">
-      <div ng-if="getEditableTopicSummaries().length > 0 && !isUnpublishedSkill()">
-        <button class="btn btn-secondary skills-list-action-button
-        protractor-test-assign-skill-to-topic-button" ng-click="$ctrl.assignSkillToTopic(skill.id)">
-          <span> Assign to Topic </span>
-        </button>
-      </div>
-      <div class="merge-skill" ng-if="getMergeableSkillSummaries().length > 0">
-        <div class="protractor-test-merge-skills-button merge-skill-icon"
-             ng-click="$ctrl.mergeSkill(skill)">
-          <span class="material-icons" title="Merge Skill">
-            merge_type
-          </span>
+        <div ng-if="getEditableTopicSummaries().length > 0 && !isUnpublishedSkill()">
+          <button class="btn btn-secondary skills-list-action-button
+          protractor-test-assign-skill-to-topic-button" ng-click="$ctrl.assignSkillToTopic(skill.id)">
+            <span> Assign to Topic </span>
+          </button>
         </div>
-      </div>
-      <div class="delete-icon">
-        <a ng-if="canDeleteSkill()" ng-click="$ctrl.deleteSkill(skill.id)" class="protractor-test-delete-skill-button">
-          <span class="fas fa-trash-alt list-summary"></span>
-        </a>
-      </div>
+        <div class="merge-skill" ng-if="getMergeableSkillSummaries().length > 0">
+          <div class="protractor-test-merge-skills-button merge-skill-icon"
+               ng-click="$ctrl.mergeSkill(skill)">
+            <span class="material-icons" title="Merge Skill">
+              merge_type
+            </span>
+          </div>
+        </div>
+        <div class="delete-icon">
+          <a ng-if="canDeleteSkill()" ng-click="$ctrl.deleteSkill(skill.id)" class="protractor-test-delete-skill-button">
+            <span class="fas fa-trash-alt list-summary"></span>
+          </a>
+        </div>
       </td>
     </tr>
   </table>
@@ -98,6 +98,25 @@
     height: 140px;
     text-align: left;
     vertical-align: baseline;
+  }
+
+  skills-list .dashboard-table-index-column {
+    width: 5%;
+  }
+  skills-list .dashboard-table-description-column {
+    width: 25%;
+  }
+  skills-list .dashboard-table-examples-column {
+    width: 10%;
+  }
+  skills-list .dashboard-table-misconception-column {
+    width: 10%;
+  }
+  skills-list .dashboard-table-skill-column {
+    width: 15%;
+  }
+  skills-list .dashboard-table-status-column {
+    width: 20%;
   }
 
   skills-list .list-item td {

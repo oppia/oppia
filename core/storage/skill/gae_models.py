@@ -242,17 +242,6 @@ class SkillSummaryModel(base_models.BaseModel):
         """
         return False
 
-    @classmethod
-    def get_in_batches(cls, order, limit, offset):
-        """Gets iterable of all entities of this class with the following offset.
-        Returns:
-        iterable. Filterable iterable of all entities of this class.
-        """
-        # query = cls.query().order(-cls.created_on).fetch(limit=10, offset=3)
-        query = cls.query().order(-cls.created_on).fetch(limit=200, offset=0)
-        print (cls.query().count())
-        return query
-
     @staticmethod
     def get_export_policy():
         """Model does not contain user data."""

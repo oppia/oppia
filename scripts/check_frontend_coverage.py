@@ -121,7 +121,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'create-activity-button.directive.ts',
     'create-activity-modal.controller.ts',
     'create-feedback-thread-modal.controller.ts',
-    'create-new-skill-modal.controller.ts',
     'creator-dashboard-page.component.ts',
     'csrf-token.service.ts',
     'current-interaction.service.ts',

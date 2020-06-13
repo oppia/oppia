@@ -233,34 +233,65 @@ def get_all_skill_summaries():
 
 
 def get_filtered_skill_dicts(status, classroom_name, keywords, sort_by):
+    """Returns all the skill summary dicts after filtering.
 
+    Args:
+        status: string. The status of the skill.
+        classroom_name: string. The classroom_name of the topic
+            to which skill is assigned to.
+        keywords: list(string). The keywords to look for
+            in the skill description.
+        sort_by: string. A string indicating how to sort the result.
+
+    Returns:
+        list(dict). The list of skill summary dicts matching the filters.
+    """
     skill_summary_dicts = get_all_skill_summary_dicts_with_topic_and_classroom()
 
-    filtered_skill_summary_dicts = filter_skills_by_status(skill_summary_dicts, status)
-    filtered_skill_summary_dicts = filter_skills_by_classroom(filtered_skill_summary_dicts, classroom_name)
-    filtered_skill_summary_dicts = filter_skills_by_keywords(filtered_skill_summary_dicts, keywords)
+    filtered_skill_summary_dicts = filter_skills_by_status(
+        skill_summary_dicts, status)
+    filtered_skill_summary_dicts = filter_skills_by_classroom(
+        filtered_skill_summary_dicts, classroom_name)
+    filtered_skill_summary_dicts = filter_skills_by_keywords(
+        filtered_skill_summary_dicts, keywords)
 
-    if sort_by == constants.TOPIC_SKILL_DASHBOARD_SORT_OPTIONS['DecreasingCreatedOn']:
-        return sorted(filtered_skill_summary_dicts, key=lambda x: x['skill_model_created_on'], reverse=True)
-    elif sort_by == constants.TOPIC_SKILL_DASHBOARD_SORT_OPTIONS['IncreasingUpdatedOn']:
-        return sorted(filtered_skill_summary_dicts, key=lambda x: x['skill_model_last_updated'])
-    elif sort_by == constants.TOPIC_SKILL_DASHBOARD_SORT_OPTIONS['DecreasingUpdatedOn']:
-        return sorted(filtered_skill_summary_dicts, key=lambda x: x['skill_model_last_updated'], reverse=True)
+    if sort_by == (
+            constants.TOPIC_SKILL_DASHBOARD_SORT_OPTIONS['DecreasingCreatedOn']):  # pylint: disable=line-too-long
+        return sorted(
+            filtered_skill_summary_dicts,
+            key=lambda x: x['skill_model_created_on'], reverse=True)
+    elif sort_by == (
+            constants.TOPIC_SKILL_DASHBOARD_SORT_OPTIONS['IncreasingUpdatedOn']):  # pylint: disable=line-too-long
+        return sorted(
+            filtered_skill_summary_dicts,
+            key=lambda x: x['skill_model_last_updated'])
+    elif sort_by == (
+            constants.TOPIC_SKILL_DASHBOARD_SORT_OPTIONS['DecreasingUpdatedOn']):  # pylint: disable=line-too-long
+        return sorted(
+            filtered_skill_summary_dicts,
+            key=lambda x: x['skill_model_last_updated'], reverse=True)
     else:
-        return sorted(filtered_skill_summary_dicts, key=lambda x: x['skill_model_created_on'])
+        return sorted(
+            filtered_skill_summary_dicts,
+            key=lambda x: x['skill_model_created_on'])
 
 
 def get_all_skill_summary_dicts_with_topic_and_classroom():
+    """Returns all the skill summary dicts after attaching topic and classroom.
+
+    Returns:
+        list(dict). The list of skill summary dicts matching the filters.
+    """
     skill_summaries = get_all_skill_summaries()
     total_skill_summaries = [summary.to_dict() for summary in skill_summaries]
 
     skill_ids_assigned_to_some_topic_with_topic_details = (
-        topic_services.get_all_skill_ids_assigned_to_some_topic_with_topic_details())
+        topic_services.get_all_skill_ids_assigned_to_some_topic_with_topic_details())  # pylint: disable=line-too-long
 
     for skill_summary_dict in total_skill_summaries:
         skill_summary_dict['topic'] = None
         skill_summary_dict['classroom'] = None
-        for assigned_skill in skill_ids_assigned_to_some_topic_with_topic_details:
+        for assigned_skill in skill_ids_assigned_to_some_topic_with_topic_details:  # pylint: disable=line-too-long
             if skill_summary_dict['id'] == assigned_skill[0]:
                 skill_summary_dict['topic'] = assigned_skill[1]
                 skill_summary_dict['classroom'] = assigned_skill[2]
@@ -269,6 +300,17 @@ def get_all_skill_summary_dicts_with_topic_and_classroom():
 
 
 def filter_skills_by_status(skill_summary_dicts, status):
+    """Returns the skill summary dicts after filtering by status.
+
+    Args:
+        skill_summary_dicts: list(dict). The list of skill summary dicts.
+        status: string. The classroom_name of the topic
+            to which skill is assigned to.
+
+    Returns:
+        list(dict). The list of skill summary dicts matching the given status.
+    """
+
     if not status or status == constants.SKILL_STATUS_OPTIONS['ALL']:
         return skill_summary_dicts
 
@@ -290,30 +332,62 @@ def filter_skills_by_status(skill_summary_dicts, status):
 
 
 def filter_skills_by_classroom(skill_summary_dicts, classroom_name):
+    """Returns the skill summary dicts after filtering by classroom_name.
+
+    Args:
+        skill_summary_dicts: list(dict). The list of skill summary dicts.
+        classroom_name: string. The name of the classroom.
+
+    Returns:
+        list(dict). The list of skill summary dicts matching the given status.
+    """
+
     if not classroom_name or classroom_name == 'All':
         return skill_summary_dicts
 
     skill_summaries_with_classroom_name = []
     for skill_summary in skill_summary_dicts:
-        if 'classroom' in skill_summary and skill_summary['classroom'] == classroom_name:
+        if ('classroom' in skill_summary and
+                skill_summary['classroom'] == classroom_name):
             skill_summaries_with_classroom_name.append(skill_summary)
 
     return skill_summaries_with_classroom_name
 
 
-def is_keyword_present_in_skill(skill, keywords):
+def is_keyword_present_in_skill(skill_summary_dict, keywords):
+    """Returns whether the keywords match the skill description.
+
+    Args:
+        skill_summary_dict: dict. The skill summary dict.
+        keywords: list(string). The keywords to match.
+
+    Returns:
+        bool(dict). The list of skill summary dicts matching the given status.
+    """
+
     for keyword in keywords:
-        if skill['description'].lower().find(keyword.lower()) != -1:
+        if skill_summary_dict['description'].lower().find(
+                keyword.lower()) != -1:
             return True
     return False
 
 
 def filter_skills_by_keywords(skill_summary_dicts, keywords):
+    """Returns whether the keywords match the skill description.
+
+    Args:
+        skill_summary_dicts: list(dict). The list of skill summary dicts.
+        keywords: list(string). The keywords to match.
+
+    Returns:
+        bool(dict). The list of skill summary dicts matching the given status.
+    """
+
     if not keywords:
         return skill_summary_dicts
 
-    return filter(lambda skill_summary: is_keyword_present_in_skill(
-        skill_summary, keywords), skill_summary_dicts)
+    return [(lambda skill_summary: is_keyword_present_in_skill(
+        skill_summary, keywords), skill_summary_dicts)]
 
 
 def get_multi_skill_summaries(skill_ids):

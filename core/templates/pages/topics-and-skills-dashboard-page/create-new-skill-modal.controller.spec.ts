@@ -13,11 +13,11 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the create-new-skill-modal-controller.
+ * @fileoverview Unit tests for the Create new skill modal controller.
  */
 
 import { UpgradedServices } from 'services/UpgradedServices';
-import {RubricObjectFactory} from 'domain/skill/RubricObjectFactory';
+import { RubricObjectFactory } from 'domain/skill/RubricObjectFactory';
 
 describe('Create new skill modal', function() {
   beforeEach(angular.mock.module('oppia'));

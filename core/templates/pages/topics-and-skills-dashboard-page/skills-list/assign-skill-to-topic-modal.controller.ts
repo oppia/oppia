@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for the merge skill modal.
+ * @fileoverview Controller for the Assign Skill to Topic Modal.
  */
 
 angular.module('oppia').controller('AssignSkillToTopicModalController', [

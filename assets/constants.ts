@@ -37,7 +37,7 @@ export = {
   "DEFAULT_CATEGORY_ICON": "Lightbulb",
 
   "SKILL_STATUS_OPTIONS": {
-    "ALL":  "All",
+    "ALL": "All",
     "ASSIGNED": "Assigned",
     "UNASSIGNED": "Unassigned"
   },

@@ -310,7 +310,8 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(skill_summary.misconception_count, 1)
 
     def test_get_all_skill_summary_dicts_with_topic_and_classroom(self):
-        skill_summaries_dicts = skill_services.get_all_skill_summary_dicts_with_topic_and_classroom()
+        skill_summaries_dicts = (
+            skill_services.get_all_skill_summary_dicts_with_topic_and_classroom()) # pylint: disable=line-too-long
         self.assertEqual(len(skill_summaries_dicts), 1)
         self.assertEqual(skill_summaries_dicts[0]['id'], self.SKILL_ID)
         self.assertEqual(skill_summaries_dicts[0]['description'], 'Description')
@@ -323,16 +324,17 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         skill_id = self.SKILL_ID
 
         def mock_topic_function():
-            return [(skill_id, 'topic1', 'math'),]
+            return [(skill_id, 'topic1', 'math')]
         with self.swap(
-                topic_services,
-                'get_all_skill_ids_assigned_to_some_topic_with_topic_details', mock_topic_function):
+            topic_services,
+            'get_all_skill_ids_assigned_to_some_topic_with_topic_details',
+            mock_topic_function):
             skill_summaries = (
-                skill_services.get_all_skill_summary_dicts_with_topic_and_classroom())
+                skill_services.get_all_skill_summary_dicts_with_topic_and_classroom())  #pylint: disable=line-too-long
             self.assertEqual(skill_summaries[0]['topic'], 'topic1')
 
     def test_get_filtered_skill_dicts(self):
-        self.skill2 = self.save_new_skill(
+        self.save_new_skill(
             self.SKILL_ID2, self.USER_ID, description='Description2',
             prerequisite_skill_ids=['skill_id_1', 'skill_id_2'])
         skill_summaries_dicts = skill_services.get_filtered_skill_dicts(
@@ -384,24 +386,30 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             'id': '3FmfRppeAbJA',
             'worked_examples_count': 1}
 
-        filtered_skills = skill_services.filter_skills_by_status([skill_dict1, skill_dict2], None)
+        filtered_skills = skill_services.filter_skills_by_status(
+            [skill_dict1, skill_dict2], None)
         self.assertEqual(filtered_skills, [skill_dict1, skill_dict2])
 
-        filtered_skills = skill_services.filter_skills_by_status([skill_dict1, skill_dict2], 'All')
+        filtered_skills = skill_services.filter_skills_by_status(
+            [skill_dict1, skill_dict2], 'All')
         self.assertEqual(filtered_skills, [skill_dict1, skill_dict2])
 
         skill_dict2['topic'] = 'topic1'
-        filtered_skills = skill_services.filter_skills_by_status([skill_dict1, skill_dict2], 'Assigned')
+        filtered_skills = skill_services.filter_skills_by_status(
+            [skill_dict1, skill_dict2], 'Assigned')
         self.assertEqual(filtered_skills, [skill_dict2])
 
-        filtered_skills = skill_services.filter_skills_by_status([skill_dict1, skill_dict2], 'Unassigned')
+        filtered_skills = skill_services.filter_skills_by_status(
+            [skill_dict1, skill_dict2], 'Unassigned')
         self.assertEqual(filtered_skills, [skill_dict1])
 
         skill_dict1['topic'] = 'topic2'
-        filtered_skills = skill_services.filter_skills_by_status([skill_dict1, skill_dict2], 'Assigned')
+        filtered_skills = skill_services.filter_skills_by_status(
+            [skill_dict1, skill_dict2], 'Assigned')
         self.assertEqual(filtered_skills, [skill_dict1, skill_dict2])
 
-        filtered_skills = skill_services.filter_skills_by_status([skill_dict1, skill_dict2], 'Unassigned')
+        filtered_skills = skill_services.filter_skills_by_status(
+            [skill_dict1, skill_dict2], 'Unassigned')
         self.assertEqual(filtered_skills, [])
 
     def test_filter_by_classroom(self):
@@ -429,15 +437,18 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             'id': '3FmfRppeAbJA',
             'worked_examples_count': 1}
 
-        filtered_skills = skill_services.filter_skills_by_classroom([skill_dict1, skill_dict2], None)
+        filtered_skills = skill_services.filter_skills_by_classroom(
+            [skill_dict1, skill_dict2], None)
         self.assertEqual(filtered_skills, [skill_dict1, skill_dict2])
 
-        filtered_skills = skill_services.filter_skills_by_classroom([skill_dict1, skill_dict2], 'All')
+        filtered_skills = skill_services.filter_skills_by_classroom(
+            [skill_dict1, skill_dict2], 'All')
         self.assertEqual(filtered_skills, [skill_dict1, skill_dict2])
 
         skill_dict1['classroom'] = 'math'
 
-        filtered_skills = skill_services.filter_skills_by_classroom([skill_dict1, skill_dict2], 'math')
+        filtered_skills = skill_services.filter_skills_by_classroom(
+            [skill_dict1, skill_dict2], 'math')
         self.assertEqual(filtered_skills, [skill_dict1])
 
     def test_filter_skills_by_keywords(self):
@@ -465,19 +476,24 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             'id': '3FmfRppeAbJA',
             'worked_examples_count': 1}
 
-        filtered_skills = skill_services.filter_skills_by_keywords([skill_dict1, skill_dict2], None)
+        filtered_skills = skill_services.filter_skills_by_keywords(
+            [skill_dict1, skill_dict2], None)
         self.assertEqual(filtered_skills, [skill_dict1, skill_dict2])
 
-        filtered_skills = skill_services.filter_skills_by_keywords([skill_dict1, skill_dict2], ['subtract'])
+        filtered_skills = skill_services.filter_skills_by_keywords(
+            [skill_dict1, skill_dict2], ['subtract'])
         self.assertEqual(filtered_skills, [skill_dict2])
 
-        filtered_skills = skill_services.filter_skills_by_keywords([skill_dict1, skill_dict2], ['add'])
+        filtered_skills = skill_services.filter_skills_by_keywords(
+            [skill_dict1, skill_dict2], ['add'])
         self.assertEqual(filtered_skills, [skill_dict1])
 
-        filtered_skills = skill_services.filter_skills_by_keywords([skill_dict1, skill_dict2], ['add', 'tract'])
+        filtered_skills = skill_services.filter_skills_by_keywords(
+            [skill_dict1, skill_dict2], ['add', 'tract'])
         self.assertEqual(filtered_skills, [skill_dict1, skill_dict2])
 
-        filtered_skills = skill_services.filter_skills_by_keywords([skill_dict1, skill_dict2], ['multiply'])
+        filtered_skills = skill_services.filter_skills_by_keywords(
+            [skill_dict1, skill_dict2], ['multiply'])
         self.assertEqual(filtered_skills, [])
 
     def test_update_skill(self):

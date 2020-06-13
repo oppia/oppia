@@ -20,6 +20,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from constants import constants
+from core.domain import config_services
 from core.domain import exp_services
 from core.domain import rights_manager
 from core.domain import story_domain
@@ -247,6 +248,19 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             topic_services.get_all_skill_ids_assigned_to_some_topic(),
             set([self.skill_id_1, self.skill_id_2, 'skill_3']))
+
+    def test_get_all_skill_ids_assigned_to_some_topic_with_topic_details(self):
+        self.assertEqual(
+            topic_services.get_all_skill_ids_assigned_to_some_topic_with_topic_details(), # pylint: disable=line-too-long
+            [(u'skill_1', u'Name', None), (u'skill_2', u'Name', None)])
+
+        config_services.set_property(
+            self.user_id_admin, 'topic_ids_for_classroom_pages', [{
+                'name': 'math', 'topic_ids': [self.TOPIC_ID]}])
+
+        self.assertEqual(
+            topic_services.get_all_skill_ids_assigned_to_some_topic_with_topic_details(),  #pylint: disable=line-too-long
+            [(u'skill_1', u'Name', 'math'), (u'skill_2', u'Name', 'math')])
 
     def test_cannot_create_topic_change_class_with_invalid_changelist(self):
         with self.assertRaisesRegexp(

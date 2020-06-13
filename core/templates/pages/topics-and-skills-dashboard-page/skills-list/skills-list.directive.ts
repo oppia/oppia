@@ -22,16 +22,20 @@ require(
 require(
   'components/skill-selector/skill-selector.directive.ts');
 require(
-  'pages/topics-and-skills-dashboard-page/topic-selector/' +
-  'topic-selector.directive.ts');
-require(
   'domain/topics_and_skills_dashboard/' +
     'topics-and-skills-dashboard-backend-api.service.ts');
 require('domain/skill/skill-backend-api.service.ts');
 require('domain/topic/editable-topic-backend-api.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
-require('pages/topics-and-skills-dashboard-page/skills-list/merge-skill-modal.controller.ts');
-require('pages/topics-and-skills-dashboard-page/skills-list/assign-skill-to-topic-modal.controller.ts');
+require(
+  'pages/topics-and-skills-dashboard-page/' +
+  'skills-list/merge-skill-modal.controller.ts');
+require(
+  'pages/topics-and-skills-dashboard-page/' +
+  'skills-list/assign-skill-to-topic-modal.controller.ts');
+require(
+  'pages/topics-and-skills-dashboard-page/topic-selector/' +
+    'topic-selector.directive.ts');
 require('services/alerts.service.ts');
 
 require(
@@ -71,7 +75,11 @@ angular.module('oppia').directive('skillsList', [
           var ctrl = this;
 
           ctrl.getSkillEditorUrl = function(skillId) {
-            return '/skill_editor/' + skillId;
+            var SKILL_EDITOR_URL_TEMPLATE = '/skill_editor/<skill_id>';
+            return UrlInterpolationService.interpolateUrl(
+              SKILL_EDITOR_URL_TEMPLATE, {
+                skill_id: skillId
+              });
           };
 
           ctrl.deleteSkill = function(skillId) {
@@ -118,6 +126,7 @@ angular.module('oppia').directive('skillsList', [
                 cmd: 'add_uncategorized_skill_id',
                 new_uncategorized_skill_id: skillId
               }];
+              var topicSummaries = $scope.getEditableTopicSummaries();
               for (var i = 0; i < topicIds.length; i++) {
                 for (var j = 0; j < topicSummaries.length; j++) {
                   if (topicSummaries[j].id === topicIds[i]) {
