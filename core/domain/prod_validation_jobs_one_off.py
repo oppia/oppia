@@ -1724,7 +1724,7 @@ class SentEmailModelValidator(BaseModelValidator):
                 recipient_model_class_model_id_model_tuples):
             if recipient_model is None or recipient_model.deleted:
                 cls.errors['recipient_id field check'].append((
-                    'Entity id %s: based on field recipient_ids having'
+                    'Entity id %s: based on field recipient_id having'
                     ' value %s, expect model %s with id %s but it doesn\'t'
                     ' exist' % (
                         item.id, model_id, model_class.__name__, model_id)))
@@ -2197,8 +2197,11 @@ class ExpSummaryModelValidator(BaseSummaryModelValidator):
     def _get_custom_validation_functions(cls):
         return [
             cls._validate_first_published_msec,
-            cls._validate_contributors_summary,
-            cls._validate_exploration_model_last_updated]
+            cls._validate_contributors_summary]
+
+    @classmethod
+    def _get_external_instance_custom_validation_functions(cls):
+        return [_validate_exploration_model_last_updated]
 
 
 class GeneralFeedbackThreadModelValidator(BaseModelValidator):
@@ -2320,7 +2323,7 @@ class GeneralFeedbackMessageModelValidator(BaseModelValidator):
                         feedback_thread_model.id))
 
     @classmethod
-    def _get_custom_validation_functions(cls):
+    def _get_external_instance_custom_validation_functions(cls):
         return [cls._validate_message_id]
 
 
@@ -3301,8 +3304,11 @@ class GeneralSuggestionModelValidator(BaseModelValidator):
     def _get_custom_validation_functions(cls):
         return [
             cls._validate_target_type,
-            cls._validate_target_version_at_submission,
             cls._validate_final_reveiwer_id]
+
+    @classmethod
+    def _get_external_instance_custom_validation_functions(cls):
+        return [_validate_target_version_at_submission]
 
 
 class GeneralVoiceoverApplicationModelValidator(BaseModelValidator):
@@ -4304,9 +4310,11 @@ class UserSubscriptionsModelValidator(BaseUserModelValidator):
 
     @classmethod
     def _get_custom_validation_functions(cls):
-        return [
-            cls._validate_last_checked,
-            cls._validate_user_id_in_subscriber_ids]
+        return [cls._validate_last_checked]
+
+    @classmethod
+    def _get_external_instance_custom_validation_functions(cls):
+        return [cls._validate_user_id_in_subscriber_ids]
 
 
 class UserSubscribersModelValidator(BaseUserModelValidator):
@@ -4673,14 +4681,11 @@ class CollectionProgressModelValidator(BaseUserModelValidator):
                         item.id, invalid_exp_ids, collection_model.id))
 
     @classmethod
-    def _get_custom_validation_functions(cls):
-        return [cls._validate_completed_exploration]
-
-    @classmethod
     def _get_external_instance_custom_validation_functions(cls):
         return [
             cls._validate_explorations_are_public,
-            cls._validate_collections_are_public
+            cls._validate_collections_are_public,
+            cls._validate_completed_exploration
         ]
 
 
@@ -4899,7 +4904,7 @@ class UserQueryModelValidator(BaseUserModelValidator):
                             item.id, recipient_user_ids[index]))
 
     @classmethod
-    def _get_custom_validation_functions(cls):
+    def _get_external_instance_custom_validation_functions(cls):
         return [cls._validate_sender_and_recipient_ids]
 
 
@@ -4944,7 +4949,7 @@ class UserBulkEmailsModelValidator(BaseUserModelValidator):
                     'of BulkEmailModel with id %s' % (item.id, email_model.id))
 
     @classmethod
-    def _get_custom_validation_functions(cls):
+    def _get_external_instance_custom_validation_functions(cls):
         return [cls._validate_user_id_in_recipient_id_for_emails]
 
 
