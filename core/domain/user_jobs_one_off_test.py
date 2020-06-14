@@ -223,8 +223,7 @@ class DraftChangesMathValidationOneOffJobTests(test_utils.GenericTestBase):
             self.EXP_ID_1, self.user_a_id, end_state_name='End')
 
     def test_draft_changes_with_invalid_tags(self):
-        """Creates the ExplorationUserDataModel objects for testing."""
-        # Explorations with draft set.
+        """Find invalid math tags in draft changes with invalid math tags."""
 
         invalid_html_content1 = (
             '<p>Value</p><oppia-noninteractive-math></oppia-noninteractive-m'
@@ -423,8 +422,7 @@ class DraftChangesMathValidationOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(len(output), 1)
 
     def test_draft_changes_with_valid_tags(self):
-        """Creates the ExplorationUserDataModel objects for testing."""
-        # Explorations with draft set.
+        """Find invalid math tags in draft changes with no invalid math tags."""
 
         valid_html_content = (
             '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&a'

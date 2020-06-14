@@ -389,15 +389,14 @@ class DraftChangesMathValidationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         error_list = (
             html_validation_service.validate_math_tags_in_html(html_string))
         if len(error_list) > 0:
-            yield ({
-                'draft_id': item.id,
+            value_dict = {
+                'error_list': error_list,
                 'exp_id': item.exploration_id,
                 'last_updated': last_update_time,
-                'exploration_status': exploration_status
-            }, {
-                'error_list': error_list,
+                'exploration_status': exploration_status,
                 'no_of_invalid_tags': len(error_list)
-            })
+            }
+            yield (item.id, value_dict)
 
     @staticmethod
     def reduce(key, values):

@@ -323,13 +323,15 @@ class ExplorationMathTagValidationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             error_list = (
                 html_validation_service.validate_math_tags_in_html(html_string))
             if len(error_list) > 0:
-                yield ({
-                    'exp_id': item.id,
-                    'exploration_status': exploration_status
-                }, {
+                key = (
+                    'exp_id: %s, exp_status: %s' % (
+                        item.id, exploration_status))
+                value_dict = {
                     'state_name': state_name,
-                    'error_list': error_list
-                })
+                    'error_list': error_list,
+                    'no_of_invalid_tags': len(error_list)
+                }
+                yield (key, value_dict)
 
     @staticmethod
     def reduce(key, values):
