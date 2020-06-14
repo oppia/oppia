@@ -1,21 +1,63 @@
-<div class="list-group">
-  <md-card layout="row" class="list-view-item protractor-test-skill-select-header">
-    Search By Skill
-    <input type="text" class="form-control protractor-test-skill-name-input" placeholder="Enter a skill name" ng-model="skillFilterText" autofocus>
-  </md-card>
-  <div style="max-height: 50vh; overflow-y: auto;">
-    <a class="list-group-item protractor-test-skills-list-item"
-       ng-repeat="skillSummary in skillSummariesInitial | filter:skillFilterText"
-       ng-click="selectSkill(skillSummary.id)"
-       ng-class="{'list-group-item-success': (skillSummary.id === selectedSkillId)}">
-      <label class="list-group-item-heading"><[skillSummary.description]></label>
-    </a>
-    <hr ng-if="skillSummariesInitial.length > 0">
-    <a class="list-group-item protractor-test-skills-list-item"
-       ng-repeat="skillSummary in skillSummariesFinal | filter:skillFilterText"
-       ng-click="selectSkill(skillSummary.id)"
-       ng-class="{'list-group-item-success': (skillSummary.id === selectedSkillId)}">
-      <label class="list-group-item-heading protractor-test-skills-list-item"><[skillSummary.description]></label>
-    </a>
+<div class="skill-container" style="display:flex;  flex-direction: row;">
+  <div class="list-group" style="width:70%">
+    <md-card layout="row" class="list-view-item protractor-test-skill-select-header">
+      Search By Skill
+      <input type="text" class="form-control protractor-test-skill-name-input" placeholder="Enter a skill name" ng-model="skillFilterText" autofocus>
+    </md-card>
+    <div style="max-height: 50vh; overflow-y: auto;">
+      <md-radio-group ng-model="selectedSkill" ng-change="setSelectedSkillId()">
+        <md-card ng-if="!hasUntriagedSkills(topicName)" ng-repeat="(topicName, subtopics) in categorizedSkills" class="list-view-item">
+          <md-card layout="row" class="list-view-item">
+            <h2><label style="padding-left:10px"><[topicName]></label></h2>
+          </md-card>
+          <div ng-if="!checkIfEmpty(skills)" ng-repeat="(subtopicName, skills) in subtopics" class="list-view-item ">
+            <md-card class="list-view-item">
+              <label style="padding-top:20px;padding-bottom:20px;padding-left:10px"><[subtopicName]></label>
+              <md-radio-button style="margin-left:10px" class="protractor-test-skills-list-item" ng-repeat="skill in skills | filter:skillFilterText" ng-value="skill.skill_id" aria-label="<[skill.skill_description]>">
+                <[skill.skill_description]>
+              </md-radio-button>
+            </md-card>
+          </div>
+        </md-card>
+        <md-card ng-if="hasUntriagedSkills(topicName)" ng-repeat="(topicName, skills) in categorizedSkills" class="list-view-item">
+          <md-card layout="row" class="list-view-item">
+            <h2><label style="padding-left:10px">Untriaged Skills</label></h2>
+          </md-card>
+          <div ng-if="!checkIfEmpty(skills)" class="list-view-item ">
+            <md-card class="list-view-item">
+              <md-radio-button style="margin-left:10px" class="protractor-test-skills-list-item" ng-repeat="skill in skills | filter:skillFilterText" ng-value="skill.skill_id" aria-label="<[skill.skill_description]>">
+                <[skill.skill_description]>
+              </md-radio-button>
+            </md-card>
+          </div>
+        </md-card>
+      </md-radio-group>
+    </div>
+  </div>
+  <div class="list-group" style="width:30%; padding-left:20px">
+    <md-card ng-if="canAllowSkillsFromOtherTopics()" style="padding-left:10px" layout="row" class="list-view-item">
+      <label>Filter By Topics</label>
+    </md-card>
+    <div ng-if="canAllowSkillsFromOtherTopics()" style="max-height: 25vh; overflow-y: auto;">
+      <md-card class="list-view-item ">
+        <md-checkbox style="margin-left:10px" ng-repeat="topic in topicFilterList" ng-model="topic.checked" ng-change="updateSkillsListOnTopicFilterChange()"><[topic.topicName]></md-checkbox>
+      </md-card>
+    </div>
+    <br>
+    <md-card style="padding-left:10px" layout="row" class="list-view-item">
+      <label>Filter By Subtopic</label>
+    </md-card>
+    <div style="max-height: 25vh; overflow-y: auto;">
+      <md-card class="list-view-item">
+        <div ng-repeat="(topicName, subtopics) in subTopicFilterDict">
+          <h3><label class="list-group-item-heading" style="padding-left:10px"><[topicName]></label></h3>
+          <md-card class="list-view-item">
+            <md-checkbox style="margin-left:10px" ng-repeat="subtopic in subtopics" ng-model="subtopic.checked" ng-change="updateSkillsListOnSubtopicFilterChange()"><[subtopic.subTopicName]></md-checkbox>
+          </md-card>
+        </div>
+      </md-card>
+    </div>
+    <br>
+    <button class="btn btn-secondary"  ng-click="clearAllFilters()">Clear All Filters</button>
   </div>
 </div>
