@@ -31,7 +31,6 @@ describe('Maintenance page', function() {
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
     }
-    $provide.constant('DEV_MODE', true);
   }));
 
   beforeEach(angular.mock.inject(function($injector, $controller) {
@@ -51,7 +50,6 @@ describe('Maintenance page', function() {
     ctrl.$onInit();
 
     expect($scope.currentLang).toBe('en');
-    expect($scope.DEV_MODE).toBe(true);
     expect(DocumentAttributeCustomizationService.addAttribute)
       .toHaveBeenCalledWith('lang', 'en');
   });

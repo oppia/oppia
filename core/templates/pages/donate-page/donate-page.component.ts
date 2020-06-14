@@ -30,7 +30,7 @@ require('base-components/base-content.directive.ts');
 
 @Component({
   selector: 'donate-page',
-  template: require('./donate-page.component.html'),
+  templateUrl: './donate-page.component.html',
   styleUrls: []
 })
 export class DonatePageComponent implements OnInit {
