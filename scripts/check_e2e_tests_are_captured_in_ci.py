@@ -207,7 +207,7 @@ def main():
                         'but it is missing.'
                         .format(SAMPLE_TEST_SUITE_THAT_IS_KNOWN_TO_EXIST))
 
-    if not (protractor_test_suites == travis_e2e_scripts):
+    if protractor_test_suites != travis_e2e_scripts:
         raise Exception(
             'Protractor test suites and Travis Ci test suites are not in sync.')
 
