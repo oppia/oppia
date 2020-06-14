@@ -88,7 +88,7 @@ describe('NumericInputValidationService', () => {
     answerGroups = [agof.createNew(
       [equalsZeroRule, betweenNegativeOneAndOneRule],
       goodDefaultOutcome,
-      false,
+      null,
       null
     )];
   });

@@ -118,7 +118,7 @@ describe('DragAndDropSortInputValidationService', () => {
     answerGroups = [agof.createNew(
       [equalsListWithAllowedValuesRule],
       goodDefaultOutcome,
-      false,
+      null,
       null
     )];
   });

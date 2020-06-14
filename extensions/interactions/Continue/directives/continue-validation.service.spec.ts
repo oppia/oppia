@@ -59,7 +59,7 @@ describe('ContinueValidationService', () => {
       missing_prerequisite_skill_id: null
     });
 
-    goodAnswerGroups = [agof.createNew([], goodDefaultOutcome, false, null)];
+    goodAnswerGroups = [agof.createNew([], goodDefaultOutcome, null, null)];
     customizationArguments = {
       buttonText: {
         value: 'Some Button Text'
