@@ -22,6 +22,7 @@ import logicProofTeacher from 'interactions/LogicProof/static/js/teacher.ts';
 import logicProofData from 'interactions/LogicProof/static/js/data.ts';
 import logicProofTeacher2
   from 'interactions/LogicProof/static/js/tools/teacher2.ts';
+import defaultStrings from 'interactions/LogicProof/static/js/tools/strings.ts';
 
 var logicDemo = angular.module('logicDemo', []);
 
@@ -44,9 +45,10 @@ logicDemo.controller('LogicDemoTestController', ['$scope', function($scope) {
 
   $scope.questionData = {
     language: logicProofData.BASE_STUDENT_LANGUAGE,
-    vocabulary: DEFAULT_VOCABULARY,
+    vocabulary: defaultStrings.DEFAULT_VOCABULARY,
     mistake_table: [[], [], [], []],
-    general_messages: logicProofData.BASE_GENERAL_MESSAGES
+    general_messages: logicProofData.BASE_GENERAL_MESSAGES,
+    control_functions: defaultStrings.DEFAULT_CONTROL_FUNCTION_STRINGS
   };
 
   $scope.proofString = (
@@ -54,16 +56,19 @@ logicDemo.controller('LogicDemoTestController', ['$scope', function($scope) {
     'Q\u2227P');
 
   $scope.displayMessage = function(message, line) {
+    var MAX_LENGTH_PER_LINE = 70;
     $scope.proofError = '';
     for (var i = 0; i < line; i++) {
       $scope.proofError += ' \n';
     }
     var pointer = 0;
     while (pointer < message.length) {
-      var nextSpace = message.slice(pointer, pointer + 70).lastIndexOf(' ');
+      var nextSpace = message.slice(
+        pointer, pointer + MAX_LENGTH_PER_LINE).lastIndexOf(' ');
       var breakPoint = (
-        (nextSpace <= 0 || pointer + 70 >= message.length) ? 70 :
-        nextSpace + 1);
+        (nextSpace <= 0 || pointer + MAX_LENGTH_PER_LINE >= message.length) ?
+          MAX_LENGTH_PER_LINE :
+          nextSpace + 1);
       $scope.proofError += (
         message.slice(pointer, pointer + breakPoint) + '\n');
       pointer += breakPoint;
@@ -157,7 +162,7 @@ logicDemo.controller('LogicDemoTestController', ['$scope', function($scope) {
   $scope.submitQuestion();
 
   // LINE TEMPLATES
-  $scope.lineTemplateStrings = DEFAULT_LINE_TEMPLATE_STRINGS;
+  $scope.lineTemplateStrings = defaultStrings.DEFAULT_LINE_TEMPLATE_STRINGS;
   $scope.lineTemplateIndexer = $scope.buildIndexer(
     $scope.lineTemplateStrings.length);
   $scope.submitLineTemplates = function() {
@@ -183,16 +188,16 @@ logicDemo.controller('LogicDemoTestController', ['$scope', function($scope) {
   // MISTAKE TABLE
   $scope.mistakeStrings = [{
     name: 'layout',
-    entries: DEFAULT_LAYOUT_MISTAKE_STRINGS
+    entries: defaultStrings.DEFAULT_LAYOUT_MISTAKE_STRINGS
   }, {
     name: 'variables',
-    entries: DEFAULT_VARIABLE_MISTAKE_STRINGS
+    entries: defaultStrings.DEFAULT_VARIABLE_MISTAKE_STRINGS
   }, {
     name: 'logic',
-    entries: DEFAULT_LOGIC_MISTAKE_STRINGS
+    entries: defaultStrings.DEFAULT_LOGIC_MISTAKE_STRINGS
   }, {
     name: 'target',
-    entries: DEFAULT_TARGET_MISTAKE_STRINGS
+    entries: defaultStrings.DEFAULT_TARGET_MISTAKE_STRINGS
   }];
   $scope.mistakeIndexer = $scope.buildIndexer($scope.mistakeStrings.length);
   $scope.mistakeSectionIndexer = [];
@@ -226,7 +231,8 @@ logicDemo.controller('LogicDemoTestController', ['$scope', function($scope) {
   };
 
   // CONTROL FUNCTIONS
-  $scope.controlFunctionStrings = DEFAULT_CONTROL_FUNCTION_STRINGS;
+  $scope.controlFunctionStrings = (
+    defaultStrings.DEFAULT_CONTROL_FUNCTION_STRINGS);
   $scope.controlFunctionIndexer = $scope.buildIndexer(
     $scope.controlFunctionStrings.length);
   $scope.submitControlFunctions = function() {
