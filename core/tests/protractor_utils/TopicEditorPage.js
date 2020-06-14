@@ -131,7 +131,7 @@ var TopicEditorPage = function() {
 
   this.submitSubtopicThumbnail = async function(imgPath) {
     return await workflow.submitImage(
-      subtopicThumbnailButton, thumbnailContainer, imgPath);
+      subtopicThumbnailButton, thumbnailContainer, imgPath, false);
   };
 
   this.publishTopic = async function() {

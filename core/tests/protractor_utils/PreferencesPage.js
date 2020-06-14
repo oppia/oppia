@@ -61,12 +61,12 @@ var PreferencesPage = function() {
   };
 
   this.uploadProfilePhoto = async function(imgPath) {
-    return await workflow.uploadImage(profilePhotoClickable, imgPath);
+    return await workflow.uploadImage(profilePhotoClickable, imgPath, false);
   };
 
   this.submitProfilePhoto = async function(imgPath) {
     return await workflow.submitImage(
-      profilePhotoClickable, profilePhotoCropper, imgPath);
+      profilePhotoClickable, profilePhotoCropper, imgPath, false);
   };
 
   this.getProfilePhotoSource = async function() {

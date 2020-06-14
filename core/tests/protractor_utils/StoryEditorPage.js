@@ -130,12 +130,12 @@ var StoryEditorPage = function() {
 
   this.submitStoryThumbnail = async function(imgPath) {
     return await workflow.submitImage(
-      storyThumbnailButton, thumbnailContainer, imgPath);
+      storyThumbnailButton, thumbnailContainer, imgPath, false);
   };
 
   this.submitChapterThumbnail = async function(imgPath) {
     return await workflow.submitImage(
-      chapterThumbnailButton, thumbnailContainer, imgPath);
+      chapterThumbnailButton, thumbnailContainer, imgPath, false);
   };
 
   this.publishStory = async function() {
