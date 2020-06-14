@@ -4087,6 +4087,18 @@ title: Old Title
         self.assertEqual(
             exploration.init_state.interaction.solution.to_dict(),
             solution)
+        solution = None
+        exp_services.update_exploration(
+            self.albert_id, self.NEW_EXP_ID, [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION,
+                'state_name': exploration.init_state_name,
+                'new_value': solution
+            })], 'Changed interaction_solutions.')
+        exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
+        self.assertEqual(
+            exploration.init_state.interaction.solution,
+            None)
 
     def test_cannot_update_recorded_voiceovers_with_invalid_type(self):
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)

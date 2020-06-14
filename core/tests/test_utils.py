@@ -2202,7 +2202,9 @@ class AppEngineTestBase(TestBase):
                 state_domain.SubtitledHtml('hint_1', '<p>This is a hint.</p>')
             )
         ]
-        state.update_interaction_solution(solution_dict)
+        solution = state_domain.Solution.from_dict(
+            state.interaction.id, solution_dict)
+        state.update_interaction_solution(solution)
         state.update_interaction_hints(hints_list)
         state.interaction.customization_args = {
             'placeholder': 'Enter text here',
