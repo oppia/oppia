@@ -216,7 +216,7 @@ export class PlaythroughService {
         a => a.actionType === AppConstants.ACTION_TYPE_ANSWER_SUBMIT) ||
       // Learners who leave the exploration quickly are probably just browsing.
       this.expDurationInSecs <
-      ServicesConstants.MIN_PLAYTHROUGH_DURATION_IN_SECS);
+          ServicesConstants.MIN_PLAYTHROUGH_DURATION_IN_SECS);
   }
 
   initSession(
@@ -303,13 +303,11 @@ export class PlaythroughService {
   }
 
   storePlaythrough(): void {
-    if (this.playthrough === null || this.playthrough.issueType === null) {
-      return;
-    }
     if (!this.isPlaythroughRecordingEnabled()) {
       return;
     }
-    if (this.isLearnerJustBrowsing()) {
+    if (this.playthrough === null || this.playthrough.issueType === null ||
+        this.isLearnerJustBrowsing()) {
       return;
     }
     this.playthroughBackendApiService.storePlaythrough(this.playthrough);
