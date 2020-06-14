@@ -537,9 +537,10 @@ def check_bad_pattern_in_file(filepath, file_content, pattern):
                    for excluded_file in pattern['excluded_files'])):
         bad_pattern_count = 0
         for line_num, line in enumerate(file_content):
-            if line.endswith('disable-bad-pattern-check'):
+            stripped_line = line.strip()
+            if stripped_line.endswith('disable-bad-pattern-check'):
                 continue
-            if regexp.search(line):
+            if regexp.search(stripped_line):
                 python_utils.PRINT('%s --> Line %s: %s' % (
                     filepath, line_num, pattern['message']))
                 python_utils.PRINT('')
