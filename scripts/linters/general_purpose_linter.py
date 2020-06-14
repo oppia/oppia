@@ -537,7 +537,7 @@ def check_bad_pattern_in_file(filepath, file_content, pattern):
                    for excluded_file in pattern['excluded_files'])):
         bad_pattern_count = 0
         for line_num, line in enumerate(file_content):
-            stripped_line = line.strip()
+            stripped_line = line.rstrip()
             if stripped_line.endswith('disable-bad-pattern-check'):
                 continue
             if regexp.search(stripped_line):
