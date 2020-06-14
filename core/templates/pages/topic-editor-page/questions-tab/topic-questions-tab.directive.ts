@@ -29,6 +29,9 @@ require('domain/skill/skill-backend-api.service.ts');
 require('domain/skill/MisconceptionObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require(
+  'domain/topics_and_skills_dashboard/' +
+  'topics-and-skills-dashboard-backend-api.service.ts');
+require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
@@ -48,6 +51,7 @@ angular.module('oppia').directive('questionsTab', [
         '$scope', '$q', '$uibModal', '$window',
         'AlertsService', 'TopicEditorStateService', 'QuestionCreationService',
         'UrlService', 'EditableQuestionBackendApiService',
+        'TopicsAndSkillsDashboardBackendApiService',
         'SkillBackendApiService', 'MisconceptionObjectFactory',
         'QuestionObjectFactory', 'QuestionsListService',
         'EVENT_QUESTION_SUMMARIES_INITIALIZED', 'StateEditorService',
@@ -57,6 +61,7 @@ angular.module('oppia').directive('questionsTab', [
             $scope, $q, $uibModal, $window,
             AlertsService, TopicEditorStateService, QuestionCreationService,
             UrlService, EditableQuestionBackendApiService,
+            TopicsAndSkillsDashboardBackendApiService,
             SkillBackendApiService, MisconceptionObjectFactory,
             QuestionObjectFactory, QuestionsListService,
             EVENT_QUESTION_SUMMARIES_INITIALIZED, StateEditorService,
@@ -68,6 +73,7 @@ angular.module('oppia').directive('questionsTab', [
             QuestionsListService.getQuestionSummariesAsync;
           $scope.getGroupedSkillSummaries =
             TopicEditorStateService.getGroupedSkillSummaries;
+          $scope.getSkillsCategorizedByTopics = null;
           $scope.isLastQuestionBatch =
             QuestionsListService.isLastQuestionBatch;
           var _initTab = function() {
@@ -85,6 +91,11 @@ angular.module('oppia').directive('questionsTab', [
               $scope.allSkillSummaries = $scope.allSkillSummaries.concat(
                 subtopic.getSkillSummaries());
             }
+            TopicsAndSkillsDashboardBackendApiService.fetchDashboardData().then(
+              function(response) {
+                $scope.getSkillsCategorizedByTopics = (
+                  response.categorized_skills_dict);
+              });
             $scope.canEditQuestion = $scope.topicRights.canEditTopic();
             $scope.misconceptions = [];
             $scope.questionIsBeingUpdated = false;
