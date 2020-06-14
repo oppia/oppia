@@ -17,6 +17,8 @@
  */
 
 export namespace ImprovementsConstants {
+  export const TASK_ENTITY_TYPE_EXPLORATION: string = 'exploration';
+
   export const TASK_TYPE_HIGH_BOUNCE_RATE: string = 'high_bounce_rate';
 
   export const TASK_STATUS_TYPE_OPEN: string = 'open';
@@ -27,5 +29,5 @@ export namespace ImprovementsConstants {
 
   export const HIGH_BOUNCE_RATE_THRESHOLD_HIGH: number = 0.25;
   export const HIGH_BOUNCE_RATE_THRESHOLD_LOW: number = 0.20;
-  export const HIGH_BOUNCE_RATE_MINIMUM_EXPLORATION_STARTS: number = 100;
+  export const HIGH_BOUNCE_RATE_MIN_EXP_STARTS: number = 100;
 }

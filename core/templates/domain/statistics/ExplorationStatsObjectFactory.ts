@@ -66,9 +66,11 @@ export class ExplorationStatsObjectFactory {
       backendDict: IExplorationStatsBackendDict): ExplorationStats {
     const stateStatsMapping = new Map(
       Object.entries(backendDict.state_stats_mapping).map(
-        ([s, d]) => [s, this.stateStatsObjectFactory.createFromBackendDict(d)])
-    );
-
+        ([stateName, stateStatsBackendDict]) => [
+          stateName,
+          this.stateStatsObjectFactory.createFromBackendDict(
+            stateStatsBackendDict)
+        ]));
     return new ExplorationStats(
       backendDict.exp_id, backendDict.exp_version, backendDict.num_starts,
       backendDict.num_actual_starts, backendDict.num_completions,

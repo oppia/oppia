@@ -31,17 +31,23 @@ describe('Task entry', function() {
 
   it('should use same values from backend dict', () => {
     const taskBackendDict: ITaskEntryBackendDict = {
+      entity_type: 'exploration',
+      entity_id: 'eid',
+      entity_version: 1,
       task_type: 'high_bounce_rate',
       target_type: 'state',
       target_id: 'Introduction',
       issue_description: '20% of learners dropped at this state',
       status: 'resolved',
-      closed_by: 'uuid',
-      closed_on_msecs: 123456789,
+      resolver_username: 'test_user',
+      resolved_on_msecs: 123456789,
     };
     const task: TaskEntry = (
       taskEntryObjectFactory.createFromBackendDict(taskBackendDict));
 
+    expect(task.entityType).toEqual('exploration');
+    expect(task.entityId).toEqual('eid');
+    expect(task.entityVersion).toEqual(1);
     expect(task.taskType).toEqual('high_bounce_rate');
     expect(task.targetType).toEqual('state');
     expect(task.targetId).toEqual('Introduction');
@@ -50,8 +56,8 @@ describe('Task entry', function() {
     expect(task.isResolved()).toBeTrue();
     expect(task.isObsolete()).toBeFalse();
     expect(task.isOpen()).toBeFalse();
-    expect(task.getClosedBy()).toEqual('uuid');
-    expect(task.getClosedOnMsecs()).toEqual(123456789);
+    expect(task.resolverUsername).toEqual('test_user');
+    expect(task.resolvedOnMsecs).toEqual(123456789);
 
     expect(task.toBackendDict()).toEqual(taskBackendDict);
   });

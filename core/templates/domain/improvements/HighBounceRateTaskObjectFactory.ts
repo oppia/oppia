@@ -28,42 +28,61 @@ import { ImprovementsConstants } from
 
 export class HighBounceRateTask extends TaskEntry {
   constructor(
+      expId: string,
+      expVersion: number,
       stateName: string,
       issueDescription: string = null,
-      taskStatus: string = ImprovementsConstants.TASK_STATUS_TYPE_OBSOLETE,
-      closedBy: string = null,
-      closedOnMsecs: number = null) {
+      taskStatus: string = ImprovementsConstants.TASK_STATUS_TYPE_OBSOLETE) {
     super(
+      ImprovementsConstants.TASK_ENTITY_TYPE_EXPLORATION, expId, expVersion,
       ImprovementsConstants.TASK_TYPE_HIGH_BOUNCE_RATE,
       ImprovementsConstants.TASK_TARGET_TYPE_STATE,
-      stateName, issueDescription, taskStatus, closedBy, closedOnMsecs);
+      stateName, null, null, issueDescription, taskStatus);
   }
 
-  public resolve(userId: string): void {
-    this.markAsResolved(userId);
+  public resolve(): void {
+    this.markAsResolved();
   }
 
-  public refreshStatus(explorationStats: ExplorationStats): void {
-    if (explorationStats.numStarts <
-        ImprovementsConstants.HIGH_BOUNCE_RATE_MINIMUM_EXPLORATION_STARTS) {
-      return;
+  public refreshStatus(expStats: ExplorationStats): void {
+    if (expStats.expId !== this.entityId ||
+        expStats.expVersion !== this.entityVersion) {
+      throw Error(
+        'Expected stats for exploration ' + (
+          'id="' + this.entityId + '" v' + this.entityVersion) +
+        ' but given stats are for exploration ' + (
+          'id="' + expStats.expId + '" v' + expStats.expVersion));
     }
-    const bounceRate = explorationStats.getBounceRate(this.targetId);
-    if (this.isObsolete() &&
-        bounceRate >= ImprovementsConstants.HIGH_BOUNCE_RATE_THRESHOLD_HIGH) {
+    const expStarts = expStats.numStarts;
+    const bounceRate = expStats.getBounceRate(this.targetId);
+    if (this.meetsCreationConditions(expStarts, bounceRate)) {
       this.markAsOpen();
       this.generateIssueDescription(bounceRate);
-    } else if (this.isOpen() &&
-               bounceRate <
-                   ImprovementsConstants.HIGH_BOUNCE_RATE_THRESHOLD_LOW) {
+    } else if (this.meetsObsoletionConditions(expStarts, bounceRate)) {
       this.markAsObsolete();
     }
   }
 
+  private meetsCreationConditions(
+      expStarts: number, bounceRate: number): boolean {
+    return (
+      this.isObsolete() &&
+      expStarts >= ImprovementsConstants.HIGH_BOUNCE_RATE_MIN_EXP_STARTS &&
+      bounceRate >= ImprovementsConstants.HIGH_BOUNCE_RATE_THRESHOLD_HIGH);
+  }
+
+  private meetsObsoletionConditions(
+      expStarts: number, bounceRate: number): boolean {
+    return (
+      this.isOpen() &&
+      expStarts >= ImprovementsConstants.HIGH_BOUNCE_RATE_MIN_EXP_STARTS &&
+      bounceRate < ImprovementsConstants.HIGH_BOUNCE_RATE_THRESHOLD_LOW);
+  }
+
   private generateIssueDescription(bounceRate: number): void {
-    const bonceRateAsPercentString = Math.round(100 * bounceRate) + '%';
+    const bounceRateAsPercentString = Math.round(100 * bounceRate) + '%';
     this.issueDescription = (
-      bonceRateAsPercentString + ' of learners had dropped off at this card.');
+      bounceRateAsPercentString + ' of learners had dropped off at this card.');
   }
 }
 
@@ -72,14 +91,17 @@ export class HighBounceRateTask extends TaskEntry {
 })
 export class HighBounceRateTaskObjectFactory {
   /**
-   * Returns a new task for the given state when the stats demonstrate a high
-   * bounce rate for the given state. Otherwise, returns null.
+   * Returns list of tasks for each of the given state names when their stats
+   * demonstrate a high bounce rate. Otherwise, correspoding index will be null.
    */
   createFromExplorationStats(
-      stats: ExplorationStats, stateName: string): HighBounceRateTask | null {
-    const task = new HighBounceRateTask(stateName);
-    task.refreshStatus(stats);
-    return task.isOpen() ? task : null;
+      expStats: ExplorationStats, stateNames: string[]): HighBounceRateTask[] {
+    const { expId, expVersion } = expStats;
+    return stateNames.map(stateName => {
+      const task = new HighBounceRateTask(expId, expVersion, stateName);
+      task.refreshStatus(expStats);
+      return task.isOpen() ? task : null;
+    });
   }
 
   /**
@@ -87,18 +109,28 @@ export class HighBounceRateTaskObjectFactory {
    * not represent a high bounce rate task.
    */
   createFromBackendDict(
-      backendDict: ITaskEntryBackendDict): HighBounceRateTask | null {
+      backendDict: ITaskEntryBackendDict): HighBounceRateTask {
+    if (backendDict.entity_type !==
+        ImprovementsConstants.TASK_ENTITY_TYPE_EXPLORATION) {
+      throw new Error(
+        `backend dict has entity_type "${backendDict.entity_type}" ` +
+        `but expected "${ImprovementsConstants.TASK_ENTITY_TYPE_EXPLORATION}"`);
+    }
     if (backendDict.task_type !==
-            ImprovementsConstants.TASK_TYPE_HIGH_BOUNCE_RATE) {
-      return null;
+        ImprovementsConstants.TASK_TYPE_HIGH_BOUNCE_RATE) {
+      throw new Error(
+        `backend dict has task_type "${backendDict.task_type}" ` +
+        `but expected "${ImprovementsConstants.TASK_TYPE_HIGH_BOUNCE_RATE}"`);
     }
     if (backendDict.target_type !==
-            ImprovementsConstants.TASK_TARGET_TYPE_STATE) {
-      return null;
+        ImprovementsConstants.TASK_TARGET_TYPE_STATE) {
+      throw new Error(
+        `backend dict has target_type "${backendDict.target_type}" ` +
+        `but expected "${ImprovementsConstants.TASK_TARGET_TYPE_STATE}"`);
     }
     return new HighBounceRateTask(
-      backendDict.target_id, backendDict.issue_description, backendDict.status,
-      backendDict.closed_by, backendDict.closed_on_msecs);
+      backendDict.entity_id, backendDict.entity_version, backendDict.target_id,
+      backendDict.issue_description, backendDict.status);
   }
 }
 

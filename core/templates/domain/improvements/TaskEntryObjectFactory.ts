@@ -23,34 +23,43 @@ import { ImprovementsConstants } from
   'domain/improvements/improvements.constants';
 
 export interface ITaskEntryBackendDict {
+  'entity_type': string;
+  'entity_id': string;
+  'entity_version': number;
   'task_type': string;
   'target_type': string;
   'target_id': string;
+  'resolver_username': string;
+  'resolved_on_msecs': number;
   'issue_description': string;
   'status': string;
-  'closed_by': string;
-  'closed_on_msecs': number;
 }
 
 export class TaskEntry {
   constructor(
+      public readonly entityType: string,
+      public readonly entityId: string,
+      public readonly entityVersion: number,
       public readonly taskType: string,
       public readonly targetType: string,
       public readonly targetId: string,
+      public readonly resolverUsername: string,
+      public readonly resolvedOnMsecs: number,
       protected issueDescription: string,
-      private taskStatus: string,
-      private closedBy: string,
-      private closedOnMsecs: number) {}
+      private taskStatus: string) {}
 
   public toBackendDict(): ITaskEntryBackendDict {
     return {
+      entity_type: this.entityType,
+      entity_id: this.entityId,
+      entity_version: this.entityVersion,
       task_type: this.taskType,
       target_type: this.targetType,
       target_id: this.targetId,
-      status: this.taskStatus,
-      closed_by: this.closedBy,
-      closed_on_msecs: this.closedOnMsecs,
+      resolver_username: this.resolverUsername,
+      resolved_on_msecs: this.resolvedOnMsecs,
       issue_description: this.issueDescription,
+      status: this.taskStatus,
     };
   }
 
@@ -70,33 +79,15 @@ export class TaskEntry {
     return this.taskStatus === ImprovementsConstants.TASK_STATUS_TYPE_RESOLVED;
   }
 
-  public getClosedBy(): string {
-    return this.closedBy;
-  }
-
-  public getClosedOnMsecs(): number {
-    return this.closedOnMsecs;
-  }
-
-  // NOTE TO DEVELOPERS: Only subclasses can change the task status, and only
-  // through the following 3 methods. This ensures that the three status fields
-  // (taskStatus, closedBy, closedOnMsecs) are always kept in sync.
-
   protected markAsOpen(): void {
-    this.closedOnMsecs = null;
-    this.closedBy = null;
     this.taskStatus = ImprovementsConstants.TASK_STATUS_TYPE_OPEN;
   }
 
   protected markAsObsolete(): void {
-    this.closedOnMsecs = null;
-    this.closedBy = null;
     this.taskStatus = ImprovementsConstants.TASK_STATUS_TYPE_OBSOLETE;
   }
 
-  protected markAsResolved(userId: string): void {
-    this.closedOnMsecs = new Date().getUTCMilliseconds();
-    this.closedBy = userId;
+  protected markAsResolved(): void {
     this.taskStatus = ImprovementsConstants.TASK_STATUS_TYPE_RESOLVED;
   }
 }
@@ -107,9 +98,11 @@ export class TaskEntry {
 export class TaskEntryObjectFactory {
   createFromBackendDict(backendDict: ITaskEntryBackendDict): TaskEntry {
     return new TaskEntry(
-      backendDict.task_type, backendDict.target_type, backendDict.target_id,
-      backendDict.issue_description, backendDict.status, backendDict.closed_by,
-      backendDict.closed_on_msecs);
+      backendDict.entity_type, backendDict.entity_id,
+      backendDict.entity_version, backendDict.task_type,
+      backendDict.target_type, backendDict.target_id,
+      backendDict.resolver_username, backendDict.resolved_on_msecs,
+      backendDict.issue_description, backendDict.status);
   }
 }
 
