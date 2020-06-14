@@ -47,7 +47,7 @@ export class HighBounceRateTask extends TaskEntry {
   public refreshStatus(expStats: ExplorationStats): void {
     if (expStats.expId !== this.entityId ||
         expStats.expVersion !== this.entityVersion) {
-      throw Error(
+      throw new Error(
         'Expected stats for exploration ' + (
           'id="' + this.entityId + '" v' + this.entityVersion) +
         ' but given stats are for exploration ' + (
