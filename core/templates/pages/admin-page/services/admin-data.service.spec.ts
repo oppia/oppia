@@ -58,12 +58,12 @@ describe('Admin Data Service', () => {
         language_code: 'en'
       }
     ],
-    one_off_job_specs: [],
+    one_off_job_status_summaries: [],
     updatable_roles: {
       TOPIC_MANAGER: 'topic manager'
     },
     human_readable_current_time: 'June 03 15:31:20',
-    audit_job_specs: [],
+    audit_job_status_summaries: [],
     demo_collections: [],
     config_properties: {
       oppia_csrf_secret: {

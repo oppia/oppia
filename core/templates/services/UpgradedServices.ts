@@ -225,8 +225,8 @@ import { InteractionRulesRegistryService } from
 import { InteractionSpecsService } from 'services/interaction-specs.service';
 import { JobDataObjectFactory } from
   'domain/admin/job-data-object.factory';
-import { JobSpecObjectFactory } from
-  'domain/admin/job-spec-object.factory';
+import { JobStausSummaryObjectFactory } from
+  'domain/admin/job-status-summary-object.factory';
 import { InteractiveMapValidationService } from
   'interactions/InteractiveMap/directives/interactive-map-validation.service';
 import { ItemSelectionInputValidationService } from
@@ -627,7 +627,8 @@ export class UpgradedServices {
       new InteractionDetailsCacheService();
     upgradedServices['InteractionSpecsService'] = new InteractionSpecsService();
     upgradedServices['JobDataObjectFactory'] = new JobDataObjectFactory();
-    upgradedServices['JobSpecObjectFactory'] = new JobSpecObjectFactory();
+    upgradedServices['JobStausSummaryObjectFactory'] =
+      new JobStausSummaryObjectFactory();
     upgradedServices['LearnerActionObjectFactory'] =
       new LearnerActionObjectFactory();
     upgradedServices['LearnerAnswerDetailsObjectFactory'] =

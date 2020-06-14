@@ -35,10 +35,10 @@ import {
   JobDataObjectFactory
 } from 'domain/admin/job-data-object.factory';
 import {
-  IJobSpecBackendDict,
-  JobSpec,
-  JobSpecObjectFactory
-} from 'domain/admin/job-spec-object.factory';
+  IJobStatusSummaryBackendDict,
+  JobStatusSummary,
+  JobStausSummaryObjectFactory
+} from 'domain/admin/job-status-summary-object.factory';
 
 interface IUserRoles {
   [role: string]: string;
@@ -62,9 +62,9 @@ export interface IAdminDataBackendDict {
   'demo_explorations': string[][];
   'demo_collections': string[][];
   'demo_exploration_ids': string[];
-  'one_off_job_specs': IJobSpecBackendDict[];
+  'one_off_job_status_summaries': IJobStatusSummaryBackendDict[];
   'human_readable_current_time': string;
-  'audit_job_specs': IJobSpecBackendDict[];
+  'audit_job_status_summaries': IJobStatusSummaryBackendDict[];
   'updatable_roles': IUserRoles;
   'role_graph_data': IRoleGraphData;
   'config_properties': IConfigProperties;
@@ -79,9 +79,9 @@ export class AdminData {
   demoExplorations: string[][];
   demoCollections: string[][];
   demoExplorationIds: string[];
-  oneOffJobSpecs: JobSpec[];
+  oneOffJobStatusSummaries: JobStatusSummary[];
   humanReadableCurrentTime: string;
-  auditJobSpecs: JobSpec[];
+  auditJobStatusSummaries: JobStatusSummary[];
   updatableRoles: IUserRoles;
   roleGraphData: IRoleGraphData;
   viewableRoles: IUserRoles;
@@ -93,8 +93,10 @@ export class AdminData {
 
   constructor(
       demoExplorations: string[][], demoCollections: string[][],
-      demoExplorationIds: string[], oneOffJobSpecs: JobSpec[],
-      humanReadableCurrentTime: string, auditJobSpecs: JobSpec[],
+      demoExplorationIds: string[],
+      oneOffJobStatusSummaries: JobStatusSummary[],
+      humanReadableCurrentTime: string,
+      auditJobStatusSummaries: JobStatusSummary[],
       updatableRoles: IUserRoles, roleGraphData: IRoleGraphData,
       viewableRoles: IUserRoles, unfinishedJobData: Job[],
       recentJobData: Job[], continuousComputationsData: ComputationData[],
@@ -102,9 +104,9 @@ export class AdminData {
     this.demoExplorations = demoExplorations;
     this.demoCollections = demoCollections;
     this.demoExplorationIds = demoExplorationIds;
-    this.oneOffJobSpecs = oneOffJobSpecs;
+    this.oneOffJobStatusSummaries = oneOffJobStatusSummaries;
     this.humanReadableCurrentTime = humanReadableCurrentTime;
-    this.auditJobSpecs = auditJobSpecs;
+    this.auditJobStatusSummaries = auditJobStatusSummaries;
     this.updatableRoles = updatableRoles;
     this.roleGraphData = roleGraphData;
     this.viewableRoles = viewableRoles;
@@ -123,15 +125,15 @@ export class AdminDataObjectFactory {
   constructor(
     private computationDataObjectFactory: ComputationDataObjectFactory,
     private jobDataObjectFactory: JobDataObjectFactory,
-    private jobSpecObjectFactory: JobSpecObjectFactory,
+    private jobSpecObjectFactory: JobStausSummaryObjectFactory,
     private topicSummaryObjectFactory: TopicSummaryObjectFactory) {}
 
   createFromBackendDict(backendDict: IAdminDataBackendDict): AdminData {
-    let oneOffSpecsObject = backendDict.one_off_job_specs.map((
+    let oneOffSpecsObject = backendDict.one_off_job_status_summaries.map((
         jobSpecDict) => {
       return this.jobSpecObjectFactory.createFromBackendDict(jobSpecDict);
     });
-    let auditJobSpecsObject = backendDict.audit_job_specs.map((
+    let auditJobSpecsObject = backendDict.audit_job_status_summaries.map((
         auditJobSpec) => {
       return this.jobSpecObjectFactory.createFromBackendDict(auditJobSpec);
     });

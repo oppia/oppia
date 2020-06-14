@@ -22,8 +22,8 @@ import { ComputationDataObjectFactory } from
   'domain/admin/computation-data-object.factory';
 import { JobDataObjectFactory } from
   'domain/admin/job-data-object.factory';
-import { JobSpecObjectFactory } from
-  'domain/admin/job-spec-object.factory';
+import { JobStausSummaryObjectFactory } from
+  'domain/admin/job-status-summary-object.factory';
 import { TopicSummaryObjectFactory } from
   'domain/topic/TopicSummaryObjectFactory';
 
@@ -31,18 +31,18 @@ describe('Admin Data Object Factory', () => {
   let adof: AdminDataObjectFactory;
   let cdof: ComputationDataObjectFactory;
   let jdof: JobDataObjectFactory;
-  let jsof: JobSpecObjectFactory;
+  let jsof: JobStausSummaryObjectFactory;
   let tsof: TopicSummaryObjectFactory;
 
   beforeEach(() => {
     cdof = new ComputationDataObjectFactory();
     jdof = new JobDataObjectFactory();
-    jsof = new JobSpecObjectFactory();
+    jsof = new JobStausSummaryObjectFactory();
     tsof = new TopicSummaryObjectFactory();
 
     adof = new AdminDataObjectFactory(
       new ComputationDataObjectFactory(), new JobDataObjectFactory(),
-      new JobSpecObjectFactory(), new TopicSummaryObjectFactory());
+      new JobStausSummaryObjectFactory(), new TopicSummaryObjectFactory());
   });
 
   it('should corrrectly convert backend dict to AdminData Object.', () => {
@@ -76,7 +76,7 @@ describe('Admin Data Object Factory', () => {
           language_code: 'en'
         }
       ],
-      audit_job_specs: [
+      audit_job_status_summaries: [
         {
           is_queued_or_running: false,
           job_type: 'ActivityReferencesModelAuditOneOffJob'
@@ -112,7 +112,7 @@ describe('Admin Data Object Factory', () => {
       demo_exploration_ids: [
         '17'
       ],
-      one_off_job_specs: [
+      one_off_job_status_summaries: [
         {
           is_queued_or_running: true,
           job_type: 'ActivityContributorsSummaryOneOffJob'
@@ -155,11 +155,11 @@ describe('Admin Data Object Factory', () => {
       cdof.createFromBackendDict);
     let topicSummaryObjects = backendDict.topic_summaries.map(
       tsof.createFromBackendDict);
-    let auditJobObjects = backendDict.audit_job_specs.map(
+    let auditJobObjects = backendDict.audit_job_status_summaries.map(
       jsof.createFromBackendDict);
     let unifinishedDataObjects = backendDict.unfinished_job_data.map(
       jdof.createFromBackendDict);
-    let oneOffSpecObjects = backendDict.one_off_job_specs.map(
+    let oneOffSpecObjects = backendDict.one_off_job_status_summaries.map(
       jsof.createFromBackendDict);
     let recentJobDataObjects = backendDict.recent_job_data.map(
       jdof.createFromBackendDict);
@@ -168,7 +168,7 @@ describe('Admin Data Object Factory', () => {
       computationDataObjects);
     expect(adminDataObject.configProperties).toEqual({});
     expect(adminDataObject.topicSummaries).toEqual(topicSummaryObjects);
-    expect(adminDataObject.auditJobSpecs).toEqual(auditJobObjects);
+    expect(adminDataObject.auditJobStatusSummaries).toEqual(auditJobObjects);
     expect(adminDataObject.viewableRoles).toEqual({
       COLLECTION_EDITOR: 'collection editor'
     });
@@ -183,7 +183,7 @@ describe('Admin Data Object Factory', () => {
     expect(adminDataObject.humanReadableCurrentTime).toEqual(
       'June 04 12:18:03');
     expect(adminDataObject.demoExplorationIds).toEqual(['17']);
-    expect(adminDataObject.oneOffJobSpecs).toEqual(oneOffSpecObjects);
+    expect(adminDataObject.oneOffJobStatusSummaries).toEqual(oneOffSpecObjects);
     expect(adminDataObject.demoCollections).toEqual([[
       '0',
       'welcome_to_collections.yaml'
