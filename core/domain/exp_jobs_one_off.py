@@ -327,7 +327,7 @@ class ExplorationMathTagValidationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                     'exp_id': item.id,
                     'exploration_status': exploration_status
                 }, {
-                    'state': state_name,
+                    'state_name': state_name,
                     'error_list': error_list
                 })
 
