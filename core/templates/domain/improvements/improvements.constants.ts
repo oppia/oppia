@@ -17,15 +17,13 @@
  */
 
 export namespace ImprovementsConstants {
-  export const TASK_ENTITY_TYPE_EXPLORATION: string = 'exploration';
-
   export const TASK_TYPE_HIGH_BOUNCE_RATE: string = 'high_bounce_rate';
+  export const TASK_ENTITY_TYPE_EXPLORATION: string = 'exploration';
+  export const TASK_TARGET_TYPE_STATE: string = 'state';
 
   export const TASK_STATUS_TYPE_OPEN: string = 'open';
   export const TASK_STATUS_TYPE_OBSOLETE: string = 'obsolete';
   export const TASK_STATUS_TYPE_RESOLVED: string = 'resolved';
-
-  export const TASK_TARGET_TYPE_STATE: string = 'state';
 
   export const HIGH_BOUNCE_RATE_THRESHOLD_HIGH: number = 0.25;
   export const HIGH_BOUNCE_RATE_THRESHOLD_LOW: number = 0.20;
