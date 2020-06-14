@@ -16,15 +16,15 @@
  * @fileoverview Unit tests for the math editor.
  */
 
-describe('AlgebraicExpressionEditor', function() {
-  var MathEditorCtrl = null;
+fdescribe('AlgebraicExpressionEditor', function() {
+  var AlgebraicExpressionEditorCtrl = null;
   class MockGuppy {
     constructor(id: string, config: Object) {}
 
     event(name: string, handler: Function): void {
       handler();
     }
-    asciimath(): string {
+    asciimath() {
       return 'Dummy value';
     }
     render(): void {}
@@ -32,14 +32,45 @@ describe('AlgebraicExpressionEditor', function() {
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.inject(function($componentController) {
-    MathEditorCtrl = $componentController('mathEditor');
+    AlgebraicExpressionEditorCtrl = $componentController(
+      'algebraicExpressionEditor');
     (<any>window).Guppy = MockGuppy;
-
-    MathEditorCtrl.$onInit();
   }));
 
-  it('should assign random id to the guppy div', function() {
-    var guppyDivId = MathEditorCtrl.assignIdToGuppyDiv();
-    expect(guppyDivId).toMatch(/guppy_[0-9]{1,8}/);
+  it('should assign a random id to the guppy divs', function() {
+    var mockDocument = document.createElement('div');
+    mockDocument.setAttribute('class', 'guppy-div-creator');
+    angular.element(document).find('body').append(mockDocument.outerHTML);
+
+    AlgebraicExpressionEditorCtrl.$onInit();
+
+    var guppyDivs = document.querySelectorAll('.guppy-div-creator');
+    for(var i = 0; i < guppyDivs.length; i++) {
+      expect(guppyDivs[i].getAttribute('id')).toMatch(/guppy_[0-9]{1,8}/);
+    }
   });
+
+  it('should initialize ctrl.value with an empty string', function() {
+    AlgebraicExpressionEditorCtrl.value = null;
+    AlgebraicExpressionEditorCtrl.$onInit();
+    expect(AlgebraicExpressionEditorCtrl.value).not.toBeNull();
+  });
+
+  it('should correctly validate current answer', function() {
+    AlgebraicExpressionEditorCtrl.value = 'a/';
+    expect(AlgebraicExpressionEditorCtrl.isCurrentAnswerValid()).toBeFalse();
+    expect(AlgebraicExpressionEditorCtrl.warningText).toBe('/ is an incorrect postfix operator');
+
+    AlgebraicExpressionEditorCtrl.value = '12+sqrt(4)';
+    expect(AlgebraicExpressionEditorCtrl.isCurrentAnswerValid()).toBeFalse();
+    expect(AlgebraicExpressionEditorCtrl.warningText).toBe(
+      'It looks like you have entered only numbers. Make sure to include the' +
+      'necessary variables mentioned in the question.');
+
+    AlgebraicExpressionEditorCtrl.value = '12+sqrt(4)';
+    expect(AlgebraicExpressionEditorCtrl.isCurrentAnswerValid()).toBeFalse();
+    expect(AlgebraicExpressionEditorCtrl.warningText).toBe(
+      'It looks like you have entered only numbers. Make sure to include the' +
+      'necessary variables mentioned in the question.');
+  })
 });
