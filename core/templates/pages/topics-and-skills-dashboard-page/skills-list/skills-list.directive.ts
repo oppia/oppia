@@ -20,7 +20,7 @@ require('components/skill-selector/merge-skill-modal.controller.ts');
 require(
   'components/skill-selector/skill-selector.directive.ts');
 require(
-  'pages/topics-and-skills-dashboard-page/templates/' +
+  'pages/topics-and-skills-dashboard-page/skills-list/' +
   'assign-skill-to-topic-modal.controller.ts');
 require(
   'pages/topics-and-skills-dashboard-page/topic-selector/' +

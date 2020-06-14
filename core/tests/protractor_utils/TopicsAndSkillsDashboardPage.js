@@ -94,6 +94,8 @@ var TopicsAndSkillsDashboardPage = function() {
     by.css('.protractor-test-photo-button'));
   var thumbnailContainer = element(
     by.css('.protractor-test-thumbnail-container'));
+  var skillStatusFilter = element(
+    by.css('.protractor-test-select-skill-status-dropdown'));
 
   // Returns a promise of all topics with the given name.
   var _getTopicElements = async function(topicName) {
@@ -240,8 +242,6 @@ var TopicsAndSkillsDashboardPage = function() {
   };
 
   this.filterSkillsByStatus = async function(status) {
-    var skillStatusFilter =
-      element(by.css('.protractor-test-select-skill-status-dropdown'));
     await waitFor.visibilityOf(
       skillStatusFilter,
       'Skill Dashboard status filter taking too long to appear.');

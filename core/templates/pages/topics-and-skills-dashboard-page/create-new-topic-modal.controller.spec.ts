@@ -70,7 +70,7 @@ describe('Create new topic modal', function() {
     expect($uibModalInstance.close).toHaveBeenCalledWith(newlyCreatedTopic);
   });
 
-  it('should close return validity of the topic', function() {
+  it('should return whether the topic is valid', function() {
     var newlyCreatedTopic = NewlyCreatedTopicObjectFactory.createDefault();
     expect($scope.isValid()).toEqual(false);
     newlyCreatedTopic.name = 'name';

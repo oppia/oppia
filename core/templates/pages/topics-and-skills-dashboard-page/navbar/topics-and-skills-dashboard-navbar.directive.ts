@@ -19,7 +19,7 @@
 require(
   'components/review-material-editor/review-material-editor.directive.ts');
 require(
-  'pages/topics-and-skills-dashboard-page/templates/' +
+  'pages/topics-and-skills-dashboard-page/' +
   'create-new-skill-modal.controller.ts');
 
 require('components/entity-creation-services/skill-creation.service.ts');
