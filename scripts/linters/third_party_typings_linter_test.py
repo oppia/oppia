@@ -69,8 +69,8 @@ class ThirdPartyTypingsLinterTests(test_utils.GenericTestBase):
 
     def test_check_third_party_libs_type_defs(self):
         expected_summary_messages = [
-            '%s  Third party type defs check passed' % (
-                linter_utils.MESSAGE_TYPE_SUCCESS)]
+            '%s Third party type defs check passed' % (
+                linter_utils.SUCCESS_MESSAGE_PREFIX)]
         with self.open_file_swap, self.listdir_swap:
             summary_messages = (
                 third_party_typings_linter.check_third_party_libs_type_defs(
@@ -80,8 +80,8 @@ class ThirdPartyTypingsLinterTests(test_utils.GenericTestBase):
     def test_check_third_party_libs_type_defs_verbose(self):
         self.verbose_mode_enabled = True
         expected_summary_messages = [
-            '%s  Third party type defs check passed' % (
-                linter_utils.MESSAGE_TYPE_SUCCESS)]
+            '%s Third party type defs check passed' % (
+                linter_utils.SUCCESS_MESSAGE_PREFIX)]
         with self.open_file_swap, self.listdir_swap:
             summary_messages = (
                 third_party_typings_linter.check_third_party_libs_type_defs(
@@ -91,9 +91,9 @@ class ThirdPartyTypingsLinterTests(test_utils.GenericTestBase):
     def test_check_third_party_libs_type_defs_multiple(self):
         self.files_in_typings_dir.append('guppy-defs-0.2.d.ts')
         expected_summary_messages = [
-            '%s  Third party type defs check failed, see messages '
+            '%s Third party type defs check failed, see messages '
             'above for more detail.' % (
-                linter_utils.MESSAGE_TYPE_FAILED)]
+                linter_utils.FAILED_MESSAGE_PREFIX)]
         with self.open_file_swap, self.listdir_swap, self.print_swap:
             summary_messages = (
                 third_party_typings_linter.check_third_party_libs_type_defs(
@@ -112,9 +112,9 @@ class ThirdPartyTypingsLinterTests(test_utils.GenericTestBase):
             'nerdamer-defs-0.6.d.ts'
         ]
         expected_summary_messages = [
-            '%s  Third party type defs check failed, see messages '
+            '%s Third party type defs check failed, see messages '
             'above for more detail.' % (
-                linter_utils.MESSAGE_TYPE_FAILED)]
+                linter_utils.FAILED_MESSAGE_PREFIX)]
         with self.open_file_swap, self.listdir_swap, self.print_swap:
             summary_messages = (
                 third_party_typings_linter.check_third_party_libs_type_defs(
@@ -134,9 +134,9 @@ class ThirdPartyTypingsLinterTests(test_utils.GenericTestBase):
             'nerdamer-defs-0.6.d.ts'
         ]
         expected_summary_messages = [
-            '%s  Third party type defs check failed, see messages '
+            '%s Third party type defs check failed, see messages '
             'above for more detail.' % (
-                linter_utils.MESSAGE_TYPE_FAILED)]
+                linter_utils.FAILED_MESSAGE_PREFIX)]
         with self.open_file_swap, self.listdir_swap, self.print_swap:
             summary_messages = (
                 third_party_typings_linter.check_third_party_libs_type_defs(

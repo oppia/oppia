@@ -6,4 +6,3 @@ This folder contains the scripts for Oppia backend & frontend.
 - storage: Definitions for storage models on Google App engine.
 - templates: All the frontend directive, controllers, filters & services.
 - tests: E2E tests for various Oppia pages.
-

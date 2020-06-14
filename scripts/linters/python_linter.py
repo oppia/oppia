@@ -47,9 +47,6 @@ import pycodestyle # isort:skip
 # pylint: enable=wrong-import-order
 # pylint: enable=wrong-import-position
 
-_MESSAGE_TYPE_SUCCESS = 'SUCCESS'
-_MESSAGE_TYPE_FAILED = 'FAILED'
-
 
 class PythonLintChecksManager(python_utils.OBJECT):
     """Manages all the Python linting functions.
@@ -105,14 +102,15 @@ class PythonLintChecksManager(python_utils.OBJECT):
             python_utils.PRINT('')
             if failed:
                 summary_message = (
-                    '%s   Import order checks failed, file imports should be '
+                    '%s Import order checks failed, file imports should be '
                     'alphabetized, see affect files above.' % (
-                        _MESSAGE_TYPE_FAILED))
+                        linter_utils.FAILED_MESSAGE_PREFIX))
                 python_utils.PRINT(summary_message)
                 summary_messages.append(summary_message)
             else:
                 summary_message = (
-                    '%s   Import order checks passed' % _MESSAGE_TYPE_SUCCESS)
+                    '%s Import order checks passed' % (
+                        linter_utils.SUCCESS_MESSAGE_PREFIX))
                 python_utils.PRINT(summary_message)
                 summary_messages.append(summary_message)
         return summary_messages
@@ -151,11 +149,11 @@ class PythonLintChecksManager(python_utils.OBJECT):
                 summary_message = (
                     '%s Function defintion checks failed,'
                     'see affect files above.'
-                    % (linter_utils.MESSAGE_TYPE_FAILED))
+                    % (linter_utils.FAILED_MESSAGE_PREFIX))
             else:
                 summary_message = (
                     '%s Function definition checks passed'
-                    % (linter_utils.MESSAGE_TYPE_SUCCESS))
+                    % (linter_utils.SUCCESS_MESSAGE_PREFIX))
 
             python_utils.PRINT(summary_message)
             summary_messages.append(summary_message)
@@ -268,9 +266,9 @@ class PythonLintChecksManager(python_utils.OBJECT):
             summary_messages.append(summary_message)
 
         summary_message = (
-            '%s   Job registry check %s' % (
-                (_MESSAGE_TYPE_FAILED, 'failed') if failed else
-                (_MESSAGE_TYPE_SUCCESS, 'passed')))
+            '%s Job registry check %s' % (
+                (linter_utils.FAILED_MESSAGE_PREFIX, 'failed') if failed else
+                (linter_utils.SUCCESS_MESSAGE_PREFIX, 'passed')))
         python_utils.PRINT(summary_message)
         summary_messages.append(summary_message)
         return summary_messages
@@ -376,11 +374,14 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
             current_batch_start_index = current_batch_end_index
 
         if are_there_errors:
-            summary_message = ('%s    Python linting failed' % (
-                _MESSAGE_TYPE_FAILED))
+            summary_message = (
+                '%s Python linting failed' % (
+                    linter_utils.FAILED_MESSAGE_PREFIX))
         else:
-            summary_message = ('%s   %s Python files linted (%.1f secs)' % (
-                _MESSAGE_TYPE_SUCCESS, num_py_files, time.time() - start_time))
+            summary_message = (
+                '%s %s Python files linted (%.1f secs)' % (
+                    linter_utils.SUCCESS_MESSAGE_PREFIX, num_py_files,
+                    time.time() - start_time))
 
         python_utils.PRINT(summary_message)
         summary_messages.append(summary_message)
@@ -450,13 +451,13 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
 
         if any_errors:
             summary_message = (
-                '%s    Python linting for Python 3 compatibility failed'
-                % _MESSAGE_TYPE_FAILED)
+                '%s Python linting for Python 3 compatibility failed'
+                % linter_utils.FAILED_MESSAGE_PREFIX)
         else:
             summary_message = (
-                '%s   %s Python files linted for Python 3 compatibility '
+                '%s %s Python files linted for Python 3 compatibility '
                 '(%.1f secs)'
-                % (_MESSAGE_TYPE_SUCCESS, num_py_files, (
+                % (linter_utils.SUCCESS_MESSAGE_PREFIX, num_py_files, (
                     time.time() - start_time)))
 
         python_utils.PRINT(summary_message)

@@ -26,10 +26,8 @@ import time
 
 import python_utils
 
+from . import linter_utils
 from .. import common
-
-_MESSAGE_TYPE_SUCCESS = 'SUCCESS'
-_MESSAGE_TYPE_FAILED = 'FAILED'
 
 
 class ThirdPartyCSSLintChecksManager(python_utils.OBJECT):
@@ -111,11 +109,12 @@ class ThirdPartyCSSLintChecksManager(python_utils.OBJECT):
             for error in result_list:
                 python_utils.PRINT(error)
                 summary_messages.append(error)
-            summary_message = ('%s    %s CSS file' % (
-                _MESSAGE_TYPE_FAILED, num_files_with_errors))
+            summary_message = ('%s %s CSS file' % (
+                linter_utils.FAILED_MESSAGE_PREFIX, num_files_with_errors))
         else:
-            summary_message = ('%s   %s CSS file linted (%.1f secs)' % (
-                _MESSAGE_TYPE_SUCCESS, num_css_files, time.time() - start_time))
+            summary_message = ('%s %s CSS file linted (%.1f secs)' % (
+                linter_utils.SUCCESS_MESSAGE_PREFIX, num_css_files,
+                time.time() - start_time))
         python_utils.PRINT(summary_message)
         summary_messages.append(summary_message)
 

@@ -97,4 +97,3 @@ angular.module('oppia').controller(
       init();
     }
   ]);
-

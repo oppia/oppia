@@ -28,9 +28,6 @@ import python_utils
 
 from . import linter_utils
 
-_MESSAGE_TYPE_SUCCESS = 'SUCCESS'
-_MESSAGE_TYPE_FAILED = 'FAILED'
-
 CODEOWNER_FILEPATH = '.github/CODEOWNERS'
 
 # This list needs to be in sync with the important patterns in the CODEOWNERS
@@ -284,12 +281,12 @@ def check_codeowner_file(verbose_mode_enabled):
 
         if failed:
             summary_message = (
-                '%s   CODEOWNERS file coverage check failed, see messages '
+                '%s CODEOWNERS file coverage check failed, see messages '
                 'above for files that need to be added or patterns that need '
-                'to be fixed.' % _MESSAGE_TYPE_FAILED)
+                'to be fixed.' % linter_utils.FAILED_MESSAGE_PREFIX)
         else:
-            summary_message = '%s  CODEOWNERS file check passed' % (
-                _MESSAGE_TYPE_SUCCESS)
+            summary_message = '%s CODEOWNERS file check passed' % (
+                linter_utils.SUCCESS_MESSAGE_PREFIX)
             python_utils.PRINT(summary_message)
 
         summary_messages.append(summary_message)
