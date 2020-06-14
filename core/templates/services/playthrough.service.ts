@@ -89,7 +89,7 @@ class CyclicStateTransitionsTracker {
    * visited states.
    *
    * If appending the new state would introduce a duplicate state name, then a
-   * cycle has been found. Specifically, if pusing the newest state (N) onto the
+   * cycle has been found. Specifically, if pushing the new state `N` onto the
    * path would result in the following pattern:
    *
    *    [ ..., N , ... ] => [ ..., N , ..., N ]
