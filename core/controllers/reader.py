@@ -277,13 +277,13 @@ class StorePlaythroughHandler(base.BaseHandler):
             issue_schema_version: int. The version of the issue schema.
 
         Returns:
-            ExplorationIssue.
+            ExplorationIssue. The corresponding exploration issue.
         """
         for issue in exp_issues.unresolved_issues:
             if issue.issue_type == playthrough.issue_type:
                 issue_customization_args = issue.issue_customization_args
                 identifying_arg = (
-                    stats_models.ISSUE_IDENTIFIYING_CUSTOMIZATION_ARG[
+                    stats_models.CUSTOMIZATION_ARG_WHICH_IDENTIFIES_ISSUE[
                         issue.issue_type])
                 # NOTE TO DEVELOPERS: When identifying_arg is 'state_names', the
                 # ordering of the list is important (i.e. [a, b, c] is different

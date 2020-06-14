@@ -95,6 +95,7 @@ class CyclicStateTransitionsTracker {
    *    [ ..., N , ... ] => [ ..., N , ..., N ]
    *
    * ...then we update this tracker's latest cycle discovery.
+   *
    * The cycle is defined as the current path of visited states with all states
    * prior to the first occurrence of N discarded.
    *
@@ -105,6 +106,10 @@ class CyclicStateTransitionsTracker {
    *
    * Finally, the path of visited states is reset to a value of [ N ], in hopes
    * that the exact same cycle is built enough times to be considered an issue.
+   *
+   * Note that 1-cycles (N -> N) are ignored. When a 1-cycle is discovered, the
+   * tracker still resets itself to stay consistent with the behavior taken for
+   * other cycles.
    */
   recordStateTransition(destStateName: string): void {
     if (!this.pathOfVisitedStates.includes(destStateName)) {
@@ -299,6 +304,9 @@ export class PlaythroughService {
 
   storePlaythrough(): void {
     if (this.playthrough === null || this.playthrough.issueType === null) {
+      return;
+    }
+    if (!this.isPlaythroughRecordingEnabled()) {
       return;
     }
     if (this.isLearnerJustBrowsing()) {
