@@ -61,6 +61,23 @@ anchor_for_job_defaults: &job_defaults
     - image: *docker_image
 
 commands:
+  install_chrome:
+    description: "Install chrome version 77.0.3865.75-1. This should be consistent with the version installed in Travis CI."
+    steps:
+      - run:
+          name:  Install chrome version 77.0.3865.75-1
+          command: |
+            sudo apt-get update
+            sudo apt-get install lsb-release
+
+            curl -L -o google-chrome.deb https://github.com/webnicer/chrome-downloads/raw/master/x64.deb/google-chrome-stable_77.0.3865.75-1_amd64.deb
+            sudo dpkg -i google-chrome.deb
+            sudo sed -i ‘s|HERE/chrome"|HERE/chrome" --disable-setuid-sandbox|g’
+            /bin/sh -c CHROME_VERSION="$(google-chrome --version)"
+
+            /opt/google/chrome/google-chrome
+            rm google-chrome.deb
+
   merge_target_branch:
     description: "Merge to target branch"
     steps:
@@ -113,21 +130,21 @@ jobs:
             - oppia/third_party/
             - oppia_tools/
 
-  lint_tests:
-    <<: *job_defaults
-    steps:
-      - checkout
-      - merge_target_branch
-      - attach_workspace:
-          at: /home/circleci/
-      - run:
-          name: Run lint tests
-          # All the python scripts should behave as modules. Files like the
-          # pre_commit_linter and third_party_size_check need to import other
-          # Python files and that is only possible if we treat it as a module.
-          command: |
-            python -m scripts.third_party_size_check
-            python -m scripts.linters.pre_commit_linter --path=. --verbose
+  # lint_tests:
+  #   <<: *job_defaults
+  #   steps:
+  #     - checkout
+  #     - merge_target_branch
+  #     - attach_workspace:
+  #         at: /home/circleci/
+  #     - run:
+  #         name: Run lint tests
+  #         # All the python scripts should behave as modules. Files like the
+  #         # pre_commit_linter and third_party_size_check need to import other
+  #         # Python files and that is only possible if we treat it as a module.
+  #         command: |
+  #           python -m scripts.third_party_size_check
+  #           python -m scripts.linters.pre_commit_linter --path=. --verbose
 
   typescript_tests:
     <<: *job_defaults
@@ -159,17 +176,17 @@ jobs:
             codecov --file ../karma_coverage_reports/lcov.info -F frontend
           when: on_success
 
-  backend_tests:
-    <<: *job_defaults
-    steps:
-      - checkout
-      - merge_target_branch
-      - attach_workspace:
-          at: /home/circleci/
-      - run:
-          name: Run backend tests
-          command: |
-            python -m scripts.run_backend_tests --generate_coverage_report --exclude_load_tests
+  # backend_tests:
+  #   <<: *job_defaults
+  #   steps:
+  #     - checkout
+  #     - merge_target_branch
+  #     - attach_workspace:
+  #         at: /home/circleci/
+  #     - run:
+  #         name: Run backend tests
+  #         command: |
+  #           python -m scripts.run_backend_tests --generate_coverage_report --exclude_load_tests
 
   # Production environment e2e tests
   # The following e2e tests are run in the production environment. Tests that require uploading files
@@ -198,115 +215,115 @@ jobs:
             - oppia/build/
             - oppia/third_party/generated/
 
-  e2e_library_and_collections:
-    <<: *job_defaults
-    steps:
-      - checkout
-      - attach_workspace:
-          at: /home/circleci/
-      - run:
-          name: Run e2e publication test
-          command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="publication" --prod_env
-      - run:
-          name: Run e2e library test
-          command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="library" --prod_env
-      - run:
-          name: Run e2e classroomPage test
-          command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="classroomPage" --prod_env
-      - run:
-          name: Run e2e collections test
-          command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="collections" --prod_env
+  # e2e_library_and_collections:
+  #   <<: *job_defaults
+  #   steps:
+  #     - checkout
+  #     - attach_workspace:
+  #         at: /home/circleci/
+  #     - run:
+  #         name: Run e2e publication test
+  #         command: |
+  #           python -m scripts.run_e2e_tests --skip-install --skip-build --suite="publication" --prod_env
+  #     - run:
+  #         name: Run e2e library test
+  #         command: |
+  #           python -m scripts.run_e2e_tests --skip-install --skip-build --suite="library" --prod_env
+  #     - run:
+  #         name: Run e2e classroomPage test
+  #         command: |
+  #           python -m scripts.run_e2e_tests --skip-install --skip-build --suite="classroomPage" --prod_env
+  #     - run:
+  #         name: Run e2e collections test
+  #         command: |
+  #           python -m scripts.run_e2e_tests --skip-install --skip-build --suite="collections" --prod_env
 
-  e2e_users:
-    <<: *job_defaults
-    steps:
-      - checkout
-      - attach_workspace:
-          at: /home/circleci/
-      - run:
-          name: Run e2e users test
-          command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="users" --prod_env
-      - run:
-          name: Run e2e subscriptions test
-          command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="subscriptions" --prod_env
-      - run:
-          name: Run e2e profileMenu test
-          command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="profileMenu" --prod_env
-      - run:
-          name: Run e2e preferences test
-          command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="preferences" --prod_env
-      - run:
-          name: Run e2e profileFeatures test
-          command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="profileFeatures" --prod_env
+  # e2e_users:
+  #   <<: *job_defaults
+  #   steps:
+  #     - checkout
+  #     - attach_workspace:
+  #         at: /home/circleci/
+  #     - run:
+  #         name: Run e2e users test
+  #         command: |
+  #           python -m scripts.run_e2e_tests --skip-install --skip-build --suite="users" --prod_env
+  #     - run:
+  #         name: Run e2e subscriptions test
+  #         command: |
+  #           python -m scripts.run_e2e_tests --skip-install --skip-build --suite="subscriptions" --prod_env
+  #     - run:
+  #         name: Run e2e profileMenu test
+  #         command: |
+  #           python -m scripts.run_e2e_tests --skip-install --skip-build --suite="profileMenu" --prod_env
+  #     - run:
+  #         name: Run e2e preferences test
+  #         command: |
+  #           python -m scripts.run_e2e_tests --skip-install --skip-build --suite="preferences" --prod_env
+  #     - run:
+  #         name: Run e2e profileFeatures test
+  #         command: |
+  #           python -m scripts.run_e2e_tests --skip-install --skip-build --suite="profileFeatures" --prod_env
 
-  e2e_accessibility_and_embedding:
-    <<: *job_defaults
-    steps:
-      - checkout
-      - attach_workspace:
-          at: /home/circleci/
-      - run:
-          name: Run e2e accessibility test
-          command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="accessibility" --prod_env
-      - run:
-          name: Run e2e embedding test
-          command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="embedding" --prod_env
+  # e2e_accessibility_and_embedding:
+  #   <<: *job_defaults
+  #   steps:
+  #     - checkout
+  #     - attach_workspace:
+  #         at: /home/circleci/
+  #     - run:
+  #         name: Run e2e accessibility test
+  #         command: |
+  #           python -m scripts.run_e2e_tests --skip-install --skip-build --suite="accessibility" --prod_env
+  #     - run:
+  #         name: Run e2e embedding test
+  #         command: |
+  #           python -m scripts.run_e2e_tests --skip-install --skip-build --suite="embedding" --prod_env
 
-  # Non-prod e2e Tests
-  # The following tests must be run in a non-production environment because they are uploading files.
-  # All other e2e tests should be run in prod mode.
-  e2e_file_upload_features:
-    <<: *job_defaults
-    steps:
-      - checkout
-      - merge_target_branch
-      - attach_workspace:
-          at: /home/circleci/
-      - run:
-          name: Run e2e file upload features test
-          command: |
-            python -m scripts.run_e2e_tests --skip-install --suite="fileUploadFeatures"
-      - persist_to_workspace:
-          root: /home/circleci/
-          paths:
-            - oppia/assets/hashes.json
-            - oppia/third_party/generated/
-            - oppia/webpack_bundles
+  # # Non-prod e2e Tests
+  # # The following tests must be run in a non-production environment because they are uploading files.
+  # # All other e2e tests should be run in prod mode.
+  # e2e_file_upload_features:
+  #   <<: *job_defaults
+  #   steps:
+  #     - checkout
+  #     - merge_target_branch
+  #     - attach_workspace:
+  #         at: /home/circleci/
+  #     - run:
+  #         name: Run e2e file upload features test
+  #         command: |
+  #           python -m scripts.run_e2e_tests --skip-install --suite="fileUploadFeatures"
+  #     - persist_to_workspace:
+  #         root: /home/circleci/
+  #         paths:
+  #           - oppia/assets/hashes.json
+  #           - oppia/third_party/generated/
+  #           - oppia/webpack_bundles
 
-  e2e_classroom_page:
-    <<: *job_defaults
-    steps:
-      - checkout
-      - merge_target_branch
-      - attach_workspace:
-          at: /home/circleci/
-      - run:
-          name: Run e2e classroom page test
-          command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="classroomPageFileUploadFeatures"
+  # e2e_classroom_page:
+  #   <<: *job_defaults
+  #   steps:
+  #     - checkout
+  #     - merge_target_branch
+  #     - attach_workspace:
+  #         at: /home/circleci/
+  #     - run:
+  #         name: Run e2e classroom page test
+  #         command: |
+  #           python -m scripts.run_e2e_tests --skip-install --skip-build --suite="classroomPageFileUploadFeatures"
 
-  e2e_topic_and_story_editor:
-    <<: *job_defaults
-    steps:
-      - checkout
-      - merge_target_branch
-      - attach_workspace:
-          at: /home/circleci/
-      - run:
-          name: Run e2e topic and story editor test
-          command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="topicAndStoryEditorFileUploadFeatures"
+  # e2e_topic_and_story_editor:
+  #   <<: *job_defaults
+  #   steps:
+  #     - checkout
+  #     - merge_target_branch
+  #     - attach_workspace:
+  #         at: /home/circleci/
+  #     - run:
+  #         name: Run e2e topic and story editor test
+  #         command: |
+  #           python -m scripts.run_e2e_tests --skip-install --skip-build --suite="topicAndStoryEditorFileUploadFeatures"
 
 notify:
   webhooks:
