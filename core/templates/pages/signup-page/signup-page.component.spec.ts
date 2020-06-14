@@ -69,7 +69,8 @@ describe('Signup page', function() {
     loadingMessage = '';
     LoaderService = $injector.get('LoaderService');
     UrlService = $injector.get('UrlService');
-    subscriptions.push(LoaderService.getLoadingMessageSubject().subscribe(
+
+    subscriptions.push(LoaderService.onLoadingMessageChange.subscribe(
       (message: string) => loadingMessage = message
     ));
 
@@ -224,14 +225,14 @@ describe('Signup page', function() {
     it('should submit prerequisites form when return url is creator dashboard',
       function() {
         spyOn(UrlService, 'getUrlParams').and.returnValue({
-          return_url: '/creator_dashboard'
+          return_url: '/creator-dashboard'
         });
 
         $httpBackend.expect('POST', '/signuphandler/data').respond(200);
         ctrl.submitPrerequisitesForm(true, 'myUsername', true);
         $httpBackend.flush();
 
-        expect(mockWindow.location.href).toBe('/creator_dashboard');
+        expect(mockWindow.location.href).toBe('/creator-dashboard');
       });
 
     it('should submit prerequisites form when return url is not creator ' +

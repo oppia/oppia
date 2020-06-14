@@ -24,10 +24,8 @@ require(
 require('domain/exploration/read-only-exploration-backend-api.service.ts');
 require('domain/exploration/StatesObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
-require('filters/string-utility-filters/camel-case-to-hyphens.filter.ts');
 require('pages/exploration-editor-page/services/exploration-data.service.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
-require('pages/exploration-editor-page/services/router.service.ts');
 require(
   'pages/exploration-editor-page/statistics-tab/services/' +
   'state-improvement-suggestion.service.ts'
@@ -35,12 +33,12 @@ require(
 require('services/alerts.service.ts');
 require('services/compute-graph.service.ts');
 require('services/date-time-format.service.ts');
-require('services/exploration-features.service.ts');
 require('services/state-interaction-stats.service.ts');
 require('visualizations/oppia-visualization-bar-chart.directive.ts');
 require(
   'visualizations/oppia-visualization-enumerated-frequency-table.directive.ts');
 require('visualizations/oppia-visualization-frequency-table.directive.ts');
+require('visualizations/oppia-visualization-sorted-tiles.directive.ts');
 
 require(
   'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
@@ -58,19 +56,17 @@ angular.module('oppia').directive('statisticsTab', [
       controller: [
         '$http', '$scope', '$uibModal', 'AlertsService', 'ComputeGraphService',
         'DateTimeFormatService', 'ExplorationDataService',
-        'ExplorationFeaturesService', 'ExplorationStatesService',
-        'ReadOnlyExplorationBackendApiService', 'RouterService',
-        'StateImprovementSuggestionService',
-        'StateInteractionStatsService', 'StatesObjectFactory',
-        'UrlInterpolationService', 'IMPROVE_TYPE_INCOMPLETE',
+        'ExplorationStatesService', 'ReadOnlyExplorationBackendApiService',
+        'StateImprovementSuggestionService', 'StateInteractionStatsService',
+        'StatesObjectFactory', 'UrlInterpolationService',
+        'IMPROVE_TYPE_INCOMPLETE',
         function(
             $http, $scope, $uibModal, AlertsService, ComputeGraphService,
             DateTimeFormatService, ExplorationDataService,
-            ExplorationFeaturesService, ExplorationStatesService,
-            ReadOnlyExplorationBackendApiService, RouterService,
-            StateImprovementSuggestionService,
-            StateInteractionStatsService, StatesObjectFactory,
-            UrlInterpolationService, IMPROVE_TYPE_INCOMPLETE) {
+            ExplorationStatesService, ReadOnlyExplorationBackendApiService,
+            StateImprovementSuggestionService, StateInteractionStatsService,
+            StatesObjectFactory, UrlInterpolationService,
+            IMPROVE_TYPE_INCOMPLETE) {
           var ctrl = this;
           var _EXPLORATION_STATS_VERSION_ALL = 'all';
           var stateStatsModalIsOpen = false;
@@ -164,8 +160,16 @@ angular.module('oppia').directive('statisticsTab', [
                   return stats.visualizations_info;
                 }
               },
-            }).result.then(null, () => AlertsService.clearWarnings()));
+            }).result.then(
+              () => {
+                stateStatsModalIsOpen = false;
+              },
+              () => {
+                AlertsService.clearWarnings();
+                stateStatsModalIsOpen = false;
+              }));
           };
+
           ctrl.$onInit = function() {
             $scope.$on('refreshStatisticsTab', function() {
               ctrl.refreshExplorationStatistics(_EXPLORATION_STATS_VERSION_ALL);
