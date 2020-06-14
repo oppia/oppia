@@ -93,11 +93,45 @@ class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
 
         untriaged_skill_summary_dicts = []
         mergeable_skill_summary_dicts = []
+        categorized_skills_dict = {}
+        topics = topic_fetchers.get_all_topics()
+        for topic in topics:
+            subtopics = topic.subtopics
+            categorized_skills_dict[topic.name] = {}
+            uncategorized_skills = (
+                skill_services.get_descriptions_of_skills(
+                    topic.uncategorized_skill_ids)[0])
+            skills_list = []
+            for skill_id in topic.uncategorized_skill_ids:
+                skill_dict = {
+                    'skill_id': skill_id,
+                    'skill_description': uncategorized_skills[skill_id]
+                }
+                skills_list.append(skill_dict)
+            categorized_skills_dict[topic.name]['uncategorized'] = (
+                skills_list)
+            for subtopic in subtopics:
+                skills = (skill_services.get_descriptions_of_skills(
+                    subtopic.skill_ids))[0]
+                skills_list = []
+                for skill_id in subtopic.skill_ids:
+                    skill_dict = {
+                        'skill_id': skill_id,
+                        'skill_description': skills[skill_id]
+                    }
+                    skills_list.append(skill_dict)
+                categorized_skills_dict[topic.name][
+                    subtopic.title] = skills_list
+        categorized_skills_dict['untriaged_skills'] = []
         for skill_summary_dict in skill_summary_dicts:
             skill_id = skill_summary_dict['id']
             if (skill_id not in skill_ids_assigned_to_some_topic) and (
                     skill_id not in merged_skill_ids):
                 untriaged_skill_summary_dicts.append(skill_summary_dict)
+                categorized_skills_dict['untriaged_skills'].append({
+                    'skill_id': skill_id,
+                    'skill_description': skill_summary_dict['description']
+                })
             if (skill_id in skill_ids_assigned_to_some_topic) and (
                     skill_id not in merged_skill_ids):
                 mergeable_skill_summary_dicts.append(skill_summary_dict)
@@ -122,7 +156,8 @@ class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
             'can_delete_topic': can_delete_topic,
             'can_create_topic': can_create_topic,
             'can_delete_skill': can_delete_skill,
-            'can_create_skill': can_create_skill
+            'can_create_skill': can_create_skill,
+            'categorized_skills_dict': categorized_skills_dict
         })
         self.render_json(self.values)
 
