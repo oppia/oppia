@@ -16,13 +16,15 @@
  * @fileoverview NormalizeWhitespacePunctuationAndCase pipe for Oppia.
  */
 
-import { Pipe, PipeTransform } from '@angular/core';
+import { Injectable, Pipe, PipeTransform } from '@angular/core';
 
 // Filter that takes a string, trims and normalizes spaces within each
 // line, and removes blank lines. Note that any spaces whose removal does not
 // result in two alphanumeric "words" being joined together are also removed,
 // so "hello ? " becomes "hello?".
-
+@Injectable({
+  providedIn: 'root'
+})
 @Pipe({name: 'normalizeWhitespacePunctuationAndCase'})
 export class NormalizeWhitespacePunctuationAndCasePipe
 implements PipeTransform {

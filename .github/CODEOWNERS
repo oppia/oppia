@@ -18,6 +18,10 @@
 
 # Angular Migration team
 /core/templates/components/shared-component.module.ts @bansalnitish
+/core/templates/services/loader.service*.ts @bansalnitish
+/core/templates/components/oppia-angular-root.component.ts @bansalnitish
+/core/templates/base-components/oppia-root.directive.ts @bansalnitish
+/core/templates/base-components/oppia-root.directive.html @bansalnitish
 /core/templates/filters/translate.pipe.ts @bansalnitish
 /core/templates/services/contextual/logger.service.ts @bansalnitish
 /core/templates/services/contextual/logger.service.spec.ts @bansalnitish
