@@ -88,4 +88,3 @@ angular.module('oppia').controller('QuestionSuggestionEditorModalController', [
     };
   }
 ]);
-
