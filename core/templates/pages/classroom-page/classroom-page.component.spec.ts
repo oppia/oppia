@@ -55,7 +55,7 @@ describe('Classroom page', () => {
     PageTitleService = $injector.get('PageTitleService');
     UrlService = $injector.get('UrlService');
 
-    subscriptions.push(LoaderService.getLoadingMessageSubject().subscribe(
+    subscriptions.push(LoaderService.onLoadingMessageChange.subscribe(
       (message: string) => loadingMessage = message
     ));
 
