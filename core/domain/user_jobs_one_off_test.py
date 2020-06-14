@@ -419,7 +419,6 @@ class DraftChangesMathValidationOneOffJobTests(test_utils.GenericTestBase):
                 list_starting_index:list_finishing_index + 1])
         # The length of the list here indicates the no of invalid tags.
         length_of_list = len(stringified_error_list.split('>,'))
-
         self.assertEqual(length_of_list, 17)
         self.assertEqual(len(output), 1)
 

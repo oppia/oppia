@@ -340,7 +340,13 @@ class DraftChangesMathValidationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     def map(item):
         """Implements the map function for this job."""
         draft_change_list = item.draft_change_list
+        exploration_status = (
+            rights_manager.get_exploration_rights(
+                item.exploration_id).status)
+        last_update_time = (
+            item.draft_change_list_last_updated.strftime('%m/%d/%Y, %H:%M:%S'))
         html_list = []
+
         for change in draft_change_list:
             if not change['cmd'] == exp_domain.CMD_EDIT_STATE_PROPERTY:
                 continue
@@ -386,7 +392,8 @@ class DraftChangesMathValidationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             yield ({
                 'draft_id': item.id,
                 'exp_id': item.exploration_id,
-                'user_id': item.user_id,
+                'last_updated': last_update_time,
+                'exploration_status': exploration_status
             }, {
                 'error_list': error_list,
                 'no_of_invalid_tags': len(error_list)
