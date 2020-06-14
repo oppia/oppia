@@ -14,7 +14,7 @@
 
 
 /**
- * @fileoverview TODO
+ * @fileoverview Unit tests for the ExplorationStatsBackendApiService.
  */
 
 import { HttpClientTestingModule, HttpTestingController } from
