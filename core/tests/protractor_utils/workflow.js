@@ -288,10 +288,13 @@ var uploadImage = async function(
   await imageClickableElement.click();
 
   if (resetExistingImage) {
-    await waitFor.visibilityOf(
+    expect(await thumbnailResetButton.isPresent()).toBe(true);
+    await waitFor.elementToBeClickable(
       thumbnailResetButton,
       'Topic thumbnail reset button taking too long to appear.');
     await thumbnailResetButton.click();
+  } else {
+    expect(await thumbnailResetButton.isPresent()).toBe(false);
   }
 
   absPath = path.resolve(__dirname, imgPath);

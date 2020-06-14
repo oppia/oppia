@@ -100,7 +100,8 @@ describe('Topic editor functionality', function() {
     await topicEditorPage.changeSubtopicTitle('Modified Title');
     await topicEditorPage.changeSubtopicPageContents(
       await forms.toRichText('Subtopic Contents'));
-    await topicEditorPage.submitSubtopicThumbnail('../data/test2_svg.svg');
+    await topicEditorPage.submitSubtopicThumbnail(
+      '../data/test2_svg.svg', false);
     var updatedSubtopicThumbnailSrc = (
       await topicEditorPage.getSubtopicThumbnailSource());
     expect(defaultThumbnailSrc).not.toEqual(updatedSubtopicThumbnailSrc);
@@ -221,7 +222,8 @@ describe('Chapter editor functionality', function() {
       defaultThumbnailImageSrc);
     await storyEditorPage.createInitialChapter('Chapter 1');
     await storyEditorPage.selectInitialChapterByName('Chapter 1');
-    await storyEditorPage.submitChapterThumbnail('../data/test2_svg.svg');
+    await storyEditorPage.submitChapterThumbnail(
+      '../data/test2_svg.svg', false);
     expect(await storyEditorPage.getChapterThumbnailSource()).not.toEqual(
       defaultThumbnailImageSrc);
     await storyEditorPage.changeNodeOutline(

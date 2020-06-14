@@ -129,9 +129,9 @@ var TopicEditorPage = function() {
       resetExistingImage);
   };
 
-  this.submitSubtopicThumbnail = async function(imgPath) {
+  this.submitSubtopicThumbnail = async function(imgPath, resetExistingImage) {
     return await workflow.submitImage(
-      subtopicThumbnailButton, thumbnailContainer, imgPath, false);
+      subtopicThumbnailButton, thumbnailContainer, imgPath, resetExistingImage);
   };
 
   this.publishTopic = async function() {
