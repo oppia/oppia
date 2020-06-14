@@ -61,7 +61,7 @@ ALLOWED_ACTION_TYPES = [
 # mapping is useful to uniquely identify issues by the combination of their
 # issue type and other type-specific information (such as the list of states
 # involved).
-ISSUE_TYPE_KEYNAME_MAPPING = {
+ISSUE_IDENTIFIYING_CUSTOMIZATION_ARG = {
     'EarlyQuit': 'state_name',
     'MultipleIncorrectSubmissions': 'state_name',
     'CyclicStateTransitions': 'state_names'

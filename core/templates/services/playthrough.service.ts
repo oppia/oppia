@@ -60,44 +60,68 @@ class MultipleIncorrectAnswersTracker {
 }
 
 class CyclicStateTransitionsTracker {
-  pathOfUniqueStates: string[];
-  cycleOfStates: string[] = null;
   numLoops: number = 0;
+  // A path of visited states without any cycles/repeated states.
+  pathOfVisitedStates: string[];
+  // A cycle of visited states discovered by the tracker.
+  cycleOfVisitedStates: string[] = null;
 
   constructor(initStateName: string) {
-    this.pathOfUniqueStates = [initStateName];
+    this.pathOfVisitedStates = [initStateName];
   }
 
   private makeCycle(collisionIndex: number): string[] {
-    const collision = this.pathOfUniqueStates[collisionIndex];
-    const cycleWithoutCollision = this.pathOfUniqueStates.slice(collisionIndex);
-    return [...cycleWithoutCollision, collision];
+    const collision = this.pathOfVisitedStates[collisionIndex];
+    const cycleWithNoCollision = this.pathOfVisitedStates.slice(collisionIndex);
+    return [...cycleWithNoCollision, collision];
   }
 
   private currStateName(): string {
-    return this.pathOfUniqueStates[this.pathOfUniqueStates.length - 1];
+    return this.pathOfVisitedStates[this.pathOfVisitedStates.length - 1];
   }
 
   foundAnIssue(): boolean {
     return this.numLoops >= ServicesConstants.NUM_REPEATED_CYCLES_THRESHOLD;
   }
 
+  /**
+   * Records learner's transition to a new state into this tracker's path of
+   * visited states.
+   *
+   * If appending the new state would introduce a duplicate state name, then a
+   * cycle has been found. Specifically, if pusing the newest state (N) onto the
+   * path would result in the following pattern:
+   *
+   *    [ ..., N , ... ] => [ ..., N , ..., N ]
+   *
+   * ...then we update this tracker's latest cycle discovery.
+   * The cycle is defined as the current path of visited states with all states
+   * prior to the first occurrence of N discarded.
+   *
+   * If this *exact* cycle has been discovered before (NOTE: rotations of a
+   * cycle are considered to be different from each other), then we increase the
+   * tracked number of cycle occurrences.
+   * Otherwise, the tracker is completely reset to 1.
+   *
+   * Finally, the path of visited states is reset to a value of [ N ], in hopes
+   * that the exact same cycle is built enough times to be considered an issue.
+   */
   recordStateTransition(destStateName: string): void {
-    if (!this.pathOfUniqueStates.includes(destStateName)) {
-      this.pathOfUniqueStates.push(destStateName);
+    if (!this.pathOfVisitedStates.includes(destStateName)) {
+      this.pathOfVisitedStates.push(destStateName);
       return;
     }
     if (this.currStateName() !== destStateName) {
-      const cycleOfStates = (
-        this.makeCycle(this.pathOfUniqueStates.indexOf(destStateName)));
-      if (angular.equals(this.cycleOfStates, cycleOfStates)) {
+      const cycleOfVisitedStates = (
+        this.makeCycle(this.pathOfVisitedStates.indexOf(destStateName)));
+      if (angular.equals(this.cycleOfVisitedStates, cycleOfVisitedStates)) {
         this.numLoops += 1;
       } else {
-        this.cycleOfStates = cycleOfStates;
+        this.cycleOfVisitedStates = cycleOfVisitedStates;
         this.numLoops = 1;
       }
     }
-    this.pathOfUniqueStates = [destStateName];
+    this.pathOfVisitedStates = [destStateName];
   }
 }
 
@@ -162,7 +186,7 @@ export class PlaythroughService {
         AppConstants.ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS);
       this.playthrough.issueCustomizationArgs = (
         <ICyclicStateTransitionsCustomizationArgs>{
-          state_names: {value: this.cstTracker.cycleOfStates}
+          state_names: {value: this.cstTracker.cycleOfVisitedStates}
         });
     } else if (this.eqTracker && this.eqTracker.foundAnIssue()) {
       this.playthrough.issueType = AppConstants.ISSUE_TYPE_EARLY_QUIT;
@@ -183,9 +207,11 @@ export class PlaythroughService {
   private isLearnerJustBrowsing(): boolean {
     return (
       // Learners who never enter an answer are probably just browsing.
-      !this.playthrough.actions.some(a => a.actionType === 'AnswerSubmit') ||
+      !this.playthrough.actions.some(
+        a => a.actionType === AppConstants.ACTION_TYPE_ANSWER_SUBMIT) ||
       // Learners who leave the exploration quickly are probably just browsing.
-      this.expDurationInSecs < 45);
+      this.expDurationInSecs <
+      ServicesConstants.MIN_PLAYTHROUGH_DURATION_IN_SECS);
   }
 
   initSession(
@@ -230,7 +256,8 @@ export class PlaythroughService {
       stateName: string, destStateName: string, interactionId: string,
       answer: string, feedback: string, timeSpentInStateSecs: number): void {
     if (this.playthrough === null ||
-        this.playthrough.getLastAction().actionType === 'ExplorationQuit') {
+        this.playthrough.getLastAction().actionType ===
+            AppConstants.ACTION_TYPE_EXPLORATION_QUIT) {
       return;
     }
 
@@ -252,7 +279,8 @@ export class PlaythroughService {
   recordExplorationQuitAction(
       stateName: string, timeSpentInStateSecs: number): void {
     if (this.playthrough === null ||
-        this.playthrough.getLastAction().actionType === 'ExplorationQuit') {
+        this.playthrough.getLastAction().actionType ===
+            AppConstants.ACTION_TYPE_EXPLORATION_QUIT) {
       return;
     }
 

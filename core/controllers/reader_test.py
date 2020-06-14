@@ -1750,7 +1750,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
         """
         self.post_json('/explorehandler/store_playthrough/%s' % (self.exp_id), {
             'playthrough_data': self.playthrough_data,
-        }, csrf_token=self.csrf_token, expected_status_int=400)
+        }, csrf_token=self.csrf_token, expected_status_int=500)
 
     def test_error_on_invalid_playthrough_dict(self):
         """Test that passing an invalid playthrough dict raises an exception."""

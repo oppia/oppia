@@ -236,67 +236,7 @@ class PretestHandler(base.BaseHandler):
 
 
 class StorePlaythroughHandler(base.BaseHandler):
-    """Handles a useful playthrough coming in from the frontend to store it. If
-    the playthrough already exists, it is updated in the datastore.
-    """
-
-    def _get_matching_exp_issue(self, playthrough, exp_issues):
-        """Finds an issue with the equivalent issue_type and associated states
-        as the given playthrough in the unresolved issues list of the
-        exploration issues model.
-
-        Args:
-            playthrough: Playthrough. The playthrough domain object.
-            exp_issues: ExplorationIssues. The exploration issues domain object.
-
-        Returns:
-            ExplorationIssue or None.
-        """
-        for issue in exp_issues.unresolved_issues:
-            if issue.issue_type == playthrough.issue_type:
-                issue_customization_args = issue.issue_customization_args
-                # NOTE TO DEVELOPERS: When issue_key is 'state_names', the
-                # ordering of the list is important (i.e. [a, b, c] is different
-                # from [b, c, a]).
-                issue_key = (
-                    stats_models.ISSUE_TYPE_KEYNAME_MAPPING[issue.issue_type])
-                if (issue_customization_args[issue_key] ==
-                        playthrough.issue_customization_args[issue_key]):
-                    return issue
-        return None
-
-    def _assign_playthrough_to_issue(
-            self, playthrough, exp_issues, issue_schema_version):
-        """Assigns newly created playthrough to its correct issue or makes a new
-        issue.
-
-        Args:
-            playthrough: Playthrough. The playthrough domain object.
-            exp_issues: ExplorationIssues. The exploration issues domain object.
-            issue_schema_version: int. The version of the issue schema.
-
-        Returns:
-            bool. Whether a playthrough was stored.
-        """
-        issue = self._get_matching_exp_issue(playthrough, exp_issues)
-        if issue is not None:
-            if len(issue.playthrough_ids) == feconf.MAX_PLAYTHROUGHS_FOR_ISSUE:
-                return False
-            playthrough_id = stats_models.PlaythroughModel.create(
-                playthrough.exp_id, playthrough.exp_version,
-                playthrough.issue_type, playthrough.issue_customization_args,
-                [action.to_dict() for action in playthrough.actions])
-            issue.playthrough_ids.append(playthrough_id)
-        else:
-            playthrough_id = stats_models.PlaythroughModel.create(
-                playthrough.exp_id, playthrough.exp_version,
-                playthrough.issue_type, playthrough.issue_customization_args,
-                [action.to_dict() for action in playthrough.actions])
-            issue = stats_domain.ExplorationIssue(
-                playthrough.issue_type, playthrough.issue_customization_args,
-                [playthrough_id], issue_schema_version, is_valid=True)
-            exp_issues.unresolved_issues.append(issue)
-        return True
+    """Commits a playthrough recorded on the frontend to storage."""
 
     @acl_decorators.can_play_exploration
     def post(self, exploration_id):
@@ -306,9 +246,8 @@ class StorePlaythroughHandler(base.BaseHandler):
         Args:
             exploration_id: str. The ID of the exploration.
         """
-        try:
-            issue_schema_version = self.payload['issue_schema_version']
-        except KeyError as e:
+        issue_schema_version = self.payload.get('issue_schema_version')
+        if issue_schema_version is None:
             raise self.InvalidInputException(e)
 
         playthrough_data = self.payload.get('playthrough_data')
@@ -321,10 +260,68 @@ class StorePlaythroughHandler(base.BaseHandler):
             stats_models.ExplorationIssuesModel.get_model(
                 exploration_id, playthrough.exp_version))
 
-        if self._assign_playthrough_to_issue(
+        if self._assign_playthrough_to_corresponding_issue(
                 playthrough, exp_issues, issue_schema_version):
             stats_services.save_exp_issues_model_transactional(exp_issues)
         self.render_json({})
+
+    def _get_corresponding_exp_issue(
+            self, playthrough, exp_issues, issue_schema_version):
+        """Returns the unique exploration issue model expected to own the given
+        playthrough. If it does not exist yet, then it will be created.
+
+        Args:
+            playthrough: Playthrough. The playthrough domain object.
+            exp_issues: ExplorationIssues. The exploration issues domain object
+                which manages each individual exploration issue.
+            issue_schema_version: int. The version of the issue schema.
+
+        Returns:
+            ExplorationIssue.
+        """
+        for issue in exp_issues.unresolved_issues:
+            if issue.issue_type == playthrough.issue_type:
+                issue_customization_args = issue.issue_customization_args
+                identifying_arg = (
+                    stats_models.ISSUE_IDENTIFIYING_CUSTOMIZATION_ARG[
+                        issue.issue_type])
+                # NOTE TO DEVELOPERS: When identifying_arg is 'state_names', the
+                # ordering of the list is important (i.e. [a, b, c] is different
+                # from [b, c, a]).
+                if (issue_customization_args[identifying_arg] ==
+                        playthrough.issue_customization_args[identifying_arg]):
+                    return issue
+        issue = stats_domain.ExplorationIssue(
+            playthrough.issue_type, playthrough.issue_customization_args,
+            [], issue_schema_version, is_valid=True)
+        exp_issues.unresolved_issues.append(issue)
+        return issue
+
+    def _assign_playthrough_to_corresponding_issue(
+            self, playthrough, exp_issues, issue_schema_version):
+        """Stores the given playthrough as a new model into its corresponding
+        exploration issue. When the corresponding exploration issue does not
+        exist, a new one is created.
+
+        Args:
+            playthrough: Playthrough. The playthrough domain object.
+            exp_issues: ExplorationIssues. The exploration issues domain object.
+            issue_schema_version: int. The version of the issue schema.
+
+        Returns:
+            bool. Whether the playthrough was stored successfully.
+        """
+        issue = self._get_corresponding_exp_issue(
+            playthrough, exp_issues, issue_schema_version)
+        if len(issue.playthrough_ids) < feconf.MAX_PLAYTHROUGHS_FOR_ISSUE:
+            issue.playthrough_ids.append(
+                stats_models.PlaythroughModel.create(
+                    playthrough.exp_id, playthrough.exp_version,
+                    playthrough.issue_type,
+                    playthrough.issue_customization_args,
+                    [action.to_dict() for action in playthrough.actions]))
+            return True
+        return False
 
 
 class StatsEventsHandler(base.BaseHandler):

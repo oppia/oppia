@@ -49,6 +49,7 @@ export class ServicesConstants {
     '/explorehandler/store_playthrough/<exploration_id>';
 
   // Enables recording playthroughs from learner sessions.
+  public static MIN_PLAYTHROUGH_DURATION_IN_SECS = 45;
   public static EARLY_QUIT_THRESHOLD_IN_SECS = 300;
   public static NUM_INCORRECT_ANSWERS_THRESHOLD = 3;
   public static NUM_REPEATED_CYCLES_THRESHOLD = 3;
