@@ -1855,8 +1855,10 @@ class ExplorationMathTagValidationOneOffJobTests(test_utils.GenericTestBase):
         actual_output_list = ast.literal_eval(actual_output[0])
         no_of_invalid_tags = 0
         for output in actual_output_list[1]:
+            list_starting_index = output.find('[')
+            list_finishing_index = output.find(']')
             stringified_error_list = (
-                output[output.find('['):output.find(']') + 1])
+                output[list_starting_index:list_finishing_index + 1])
             length_of_list = len(stringified_error_list.split('>,'))
             no_of_invalid_tags = (
                 no_of_invalid_tags + length_of_list)

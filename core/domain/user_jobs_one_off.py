@@ -387,9 +387,9 @@ class DraftChangesMathValidationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 'draft_id': item.id,
                 'exp_id': item.exploration_id,
                 'user_id': item.user_id,
-                'no_of_invalid_tags': len(error_list)
             }, {
-                'error_list': error_list
+                'error_list': error_list,
+                'no_of_invalid_tags': len(error_list)
             })
 
     @staticmethod

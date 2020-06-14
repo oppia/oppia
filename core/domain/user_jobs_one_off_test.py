@@ -411,9 +411,17 @@ class DraftChangesMathValidationOneOffJobTests(test_utils.GenericTestBase):
 
         output = self._run_one_off_job()
         output_list = ast.literal_eval(output[0])
-        key_dict = ast.literal_eval(output_list[0])
+        stringified_value_dict = output_list[1][0]
+        list_starting_index = stringified_value_dict.find('[')
+        list_finishing_index = stringified_value_dict.find(']')
+        stringified_error_list = (
+            stringified_value_dict[
+                list_starting_index:list_finishing_index + 1])
+        # The length of the list here indicates the no of invalid tags.
+        length_of_list = len(stringified_error_list.split('>,'))
+
+        self.assertEqual(length_of_list, 17)
         self.assertEqual(len(output), 1)
-        self.assertEqual(key_dict['no_of_invalid_tags'], 17)
 
     def test_draft_changes_with_valid_tags(self):
         """Creates the ExplorationUserDataModel objects for testing."""

@@ -1526,7 +1526,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             ('<oppia-noninteractive-math invalid_tag-with-value="&amp;quot;+,'
              '-,-,+&amp;quot;"></oppia-noninteractive-math>'),
             ('<oppia-noninteractive-math raw_latex-with-value="&amp;quot;+,-,'
-             '-,+&amp;quot;"></oppia-noninteractive-math>'),
+             '-,+&amp;quot;"></oppia-noninteractive-math>')
         ]
         invalid_tags = (
             html_validation_service.validate_math_tags_in_html(html_string))
