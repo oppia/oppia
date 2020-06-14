@@ -50,7 +50,7 @@ describe('Email Dashboard Page', function() {
     UserService = $injector.get('UserService');
     loadingMessage = '';
     LoaderService = $injector.get('LoaderService');
-    subscriptions.push(LoaderService.getLoadingMessageSubject().subscribe(
+    subscriptions.push(LoaderService.onLoadingMessageChange.subscribe(
       (message: string) => loadingMessage = message
     ));
     $q = $injector.get('$q');

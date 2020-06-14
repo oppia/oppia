@@ -76,7 +76,7 @@ angular.module('oppia').directive('questionsTab', [
           ctrl.$onInit = function() {
             _init();
             ctrl.directiveSubscriptions.add(
-              SkillEditorStateService.getSkillChangedSubject().subscribe(
+              SkillEditorStateService.onSkillChange.subscribe(
                 () => _init())
             );
           };
