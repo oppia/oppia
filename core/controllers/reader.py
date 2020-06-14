@@ -248,7 +248,7 @@ class StorePlaythroughHandler(base.BaseHandler):
         """
         issue_schema_version = self.payload.get('issue_schema_version')
         if issue_schema_version is None:
-            raise self.InvalidInputException(e)
+            raise self.InvalidInputException('missing issue_schema_version')
 
         playthrough_data = self.payload.get('playthrough_data')
         try:
