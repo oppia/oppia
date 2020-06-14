@@ -315,6 +315,9 @@ class ExplorationMathTagValidationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             return
 
         exploration = exp_fetchers.get_exploration_from_model(item)
+        exploration_status = (
+            rights_manager.get_exploration_rights(
+                item.id).status)
         for state_name, state in exploration.states.items():
             html_string = ''.join(state.get_all_html_content_strings())
             error_list = (
@@ -322,14 +325,11 @@ class ExplorationMathTagValidationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             if len(error_list) > 0:
                 yield ({
                     'exp_id': item.id,
-                    'exploration_rights': (
-                        rights_manager.get_exploration_rights(
-                            item.id).status)
-                    }, {
-                        'state': state_name,
-                        'error_list': python_utils.UNICODE(error_list),
-                        'no_of_invalid_tags': len(error_list)
-                    })
+                    'exploration_status': exploration_status
+                }, {
+                    'state': state_name,
+                    'error_list': error_list
+                })
 
     @staticmethod
     def reduce(key, values):

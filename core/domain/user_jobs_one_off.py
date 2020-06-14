@@ -388,9 +388,9 @@ class DraftChangesMathValidationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 'exp_id': item.exploration_id,
                 'user_id': item.user_id,
                 'no_of_invalid_tags': len(error_list)
-                }, {
-                    'error_list': python_utils.UNICODE(error_list)
-                })
+            }, {
+                'error_list': error_list
+            })
 
     @staticmethod
     def reduce(key, values):

@@ -916,9 +916,7 @@ def validate_math_tags_in_html(html_string):
         html_string: str. The HTML string.
 
     Returns:
-        list(dict). A list of dicts having invalid math tags. Each dict has
-        2 keys, one key is for the invalid tag and the other key is the error
-        raised because of the invalid tag.
+        list. A list of invalid math tags in the HTML string.
     """
 
     soup = bs4.BeautifulSoup(
@@ -933,19 +931,10 @@ def validate_math_tags_in_html(html_string):
                 raw_latex = (
                     json.loads(unescape_html(math_tag['raw_latex-with-value'])))
                 objects.UnicodeString.normalize(raw_latex)
-            except Exception as e:
-                error_message = (
-                    'Invalid raw_latex value found in the math tag : %s' % (
-                        python_utils.UNICODE(e)))
-                error_list.append({
-                    'tag': math_tag,
-                    'error': error_message
-                })
+            except Exception:
+                error_list.append(math_tag)
         else:
-            error_list.append({
-                'tag': math_tag,
-                'error': 'Invalid math tag with no proper attribute found'
-            })
+            error_list.append(math_tag)
     return error_list
 
 
