@@ -16,10 +16,14 @@
  * @fileoverview Directive for the navbar of the collection editor.
  */
 
-require('components/entity-creation-services/skill-creation.service.ts');
-require('components/entity-creation-services/topic-creation.service.ts');
 require(
   'components/review-material-editor/review-material-editor.directive.ts');
+require(
+  'pages/topics-and-skills-dashboard-page/templates/' +
+  'create-new-skill-modal.controller.ts');
+
+require('components/entity-creation-services/skill-creation.service.ts');
+require('components/entity-creation-services/topic-creation.service.ts');
 require('domain/skill/RubricObjectFactory.ts');
 require('domain/skill/SkillObjectFactory.ts');
 require('domain/topic/editable-topic-backend-api.service.ts');

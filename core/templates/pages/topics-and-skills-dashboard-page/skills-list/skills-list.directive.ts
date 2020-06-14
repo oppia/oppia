@@ -16,11 +16,15 @@
  * @fileoverview Controller for the skills list viewer.
  */
 
-require(
-  'components/common-layout-directives/common-elements/' +
-  'confirm-or-cancel-modal.controller.ts');
+require('components/skill-selector/merge-skill-modal.controller.ts');
 require(
   'components/skill-selector/skill-selector.directive.ts');
+require(
+  'pages/topics-and-skills-dashboard-page/templates/' +
+  'assign-skill-to-topic-modal.controller.ts');
+require(
+  'pages/topics-and-skills-dashboard-page/topic-selector/' +
+  'topic-selector.directive.ts');
 require(
   'domain/topics_and_skills_dashboard/' +
     'topics-and-skills-dashboard-backend-api.service.ts');
@@ -73,6 +77,9 @@ angular.module('oppia').directive('skillsList', [
             TopicsAndSkillsDashboardBackendApiService,
             EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED) {
           var ctrl = this;
+          $scope.highlightColumns = function(index) {
+            $scope.highlightedIndex = index;
+          };
 
           ctrl.getSkillEditorUrl = function(skillId) {
             var SKILL_EDITOR_URL_TEMPLATE = '/skill_editor/<skill_id>';
