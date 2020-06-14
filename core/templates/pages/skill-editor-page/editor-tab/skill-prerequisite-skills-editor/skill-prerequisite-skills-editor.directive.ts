@@ -24,13 +24,18 @@ require('domain/skill/skill-update.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/skill-editor-page/services/skill-editor-state.service.ts');
 require('services/alerts.service.ts');
+require(
+  'domain/topics_and_skills_dashboard/' +
+  'topics-and-skills-dashboard-backend-api.service.ts');
 
 require('pages/skill-editor-page/skill-editor-page.constants.ajs.ts');
 
 angular.module('oppia').directive('skillPrerequisiteSkillsEditor', [
-  'SkillEditorStateService', 'SkillUpdateService', 'UrlInterpolationService',
+  'SkillEditorStateService', 'SkillUpdateService',
+  'TopicsAndSkillsDashboardBackendApiService', 'UrlInterpolationService',
   function(
-      SkillEditorStateService, SkillUpdateService, UrlInterpolationService) {
+      SkillEditorStateService, SkillUpdateService
+      , TopicsAndSkillsDashboardBackendApiService, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
@@ -43,6 +48,11 @@ angular.module('oppia').directive('skillPrerequisiteSkillsEditor', [
         function(
             $scope, $filter, $uibModal, AlertsService) {
           var ctrl = this;
+          var categorizedSkills = null;
+          TopicsAndSkillsDashboardBackendApiService.fetchDashboardData().then(
+            function(response) {
+              categorizedSkills = response.categorized_skills_dict;
+            });
           var groupedSkillSummaries =
             SkillEditorStateService.getGroupedSkillSummaries();
 
@@ -61,16 +71,20 @@ angular.module('oppia').directive('skillPrerequisiteSkillsEditor', [
               groupedSkillSummaries.current.length;
             var sortedSkillSummaries = groupedSkillSummaries.current.concat(
               groupedSkillSummaries.others);
-
+            var allowSkillsFromOtherTopics = true;
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/components/skill-selector/select-skill-modal.template.html'),
               backdrop: true,
               resolve: {
                 skillsInSameTopicCount: () => skillsInSameTopicCount,
-                sortedSkillSummaries: () => sortedSkillSummaries
+                sortedSkillSummaries: () => sortedSkillSummaries,
+                categorizedSkills: () => categorizedSkills,
+                allowSkillsFromOtherTopics: () => allowSkillsFromOtherTopics
               },
-              controller: 'SelectSkillModalController'
+              controller: 'SelectSkillModalController',
+              windowClass: 'skill-select-modal',
+              size: 'xl'
             }).result.then(function(skillId) {
               if (skillId === $scope.skill.getId()) {
                 AlertsService.addInfoMessage(
