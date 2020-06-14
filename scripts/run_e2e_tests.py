@@ -34,7 +34,7 @@ from scripts import install_third_party_libs
 from scripts import setup
 from scripts import setup_gae
 
-CHROME_DRIVER_VERSION = '77.0.3865.40'
+CHROME_DRIVER_VERSION = '2.41'
 
 WEB_DRIVER_PORT = 4444
 GOOGLE_APP_ENGINE_PORT = 9001
@@ -411,8 +411,21 @@ def start_google_app_engine_server(dev_mode_setting):
     SUBPROCESSES.append(p)
 
 
+def get_chrome_driver_version():
+    output = os.popen('google-chrome --version').read()
+    chrome_version = ''.join(re.findall(r'([0-9]|\.)', output))
+    chrome_version = '.'.join(chrome_version.split('.')[:-1])
+    response = python_utils.url_open(
+        'https://chromedriver.storage.googleapis.com/LATEST_RELEASE_%s'
+        % chrome_version)
+    return response.read()
+
+
 def main(args=None):
     """Run the scripts to start end-to-end tests."""
+    global CHROME_DRIVER_VERSION
+
+    CHROME_DRIVER_VERSION = get_chrome_driver_version()
 
     parsed_args = _PARSER.parse_args(args=args)
     oppia_instance_is_already_running = is_oppia_server_already_running()
