@@ -16,6 +16,9 @@
  * @fileoverview Data and controllers for the Oppia profile page.
  */
 
+import { OppiaAngularRootComponent } from
+  'components/oppia-angular-root.component';
+
 require('base-components/base-content.directive.ts');
 require(
   'components/common-layout-directives/common-elements/' +
@@ -35,12 +38,13 @@ angular.module('oppia').component('profilePage', {
     '$http', '$log', '$window',
     'DateTimeFormatService', 'LoaderService',
     'UrlInterpolationService', 'UserService',
-    'ProfilePageBackendApiService',
     function($http, $log, $window,
         DateTimeFormatService, LoaderService,
-        UrlInterpolationService, UserService,
-        ProfilePageBackendApiService) {
+        UrlInterpolationService, UserService) {
       var ctrl = this;
+      let ProfilePageBackendApiService = (
+        OppiaAngularRootComponent.profilePageBackendApiService);
+
       var DEFAULT_PROFILE_PICTURE_URL = UrlInterpolationService
         .getStaticImageUrl('/general/no_profile_picture.png');
 

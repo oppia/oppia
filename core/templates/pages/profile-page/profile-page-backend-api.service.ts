@@ -38,22 +38,16 @@ export class ProfilePageBackendApiService {
   ) {}
 
   _postSubscribe(creatorUsername: string): Promise<Object> {
-    let data = new FormData();
-    data.append('creator_username', creatorUsername);
-
     return this.http.post(
       ProfilePageDomainConstants.PROFILE_SUBSCRIBE_URL,
-      data
+      { creator_username: creatorUsername }
     ).toPromise();
   }
 
   _postUnsubscribe(creatorUsername: string): Promise<Object> {
-    let data = new FormData();
-    data.append('creator_username', creatorUsername);
-
     return this.http.post(
       ProfilePageDomainConstants.PROFILE_UNSUBSCRIBE_URL,
-      data
+      { creator_username: creatorUsername }
     ).toPromise();
   }
 
@@ -85,7 +79,7 @@ export class ProfilePageBackendApiService {
   /**
    * Fetches the profile for username in URL.
    */
-  fetchProfileData(): Promise<Object> {
+  fetchProfileData(): Promise<any> {
     return this._fetchProfileData();
   }
 }
