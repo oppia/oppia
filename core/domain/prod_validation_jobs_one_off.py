@@ -5053,7 +5053,7 @@ class PlaythroughModelValidator(BaseModelValidator):
 
     @classmethod
     def _get_model_id_regex(cls, unused_item):
-        return '^[A-Za-z0-9-_]{1,%s}\.[A-Za-z0-9-_]{1,%s}$' % (
+        return r'^[A-Za-z0-9-_]{1,%s}\.[A-Za-z0-9-_]{1,%s}$' % (
             base_models.ID_LENGTH, base_models.ID_LENGTH)
 
     @classmethod
@@ -5061,60 +5061,75 @@ class PlaythroughModelValidator(BaseModelValidator):
         return stats_services.get_playthrough_from_model(item)
 
     @classmethod
-    def _map_to_audit_data(cls, item):
+    def _validate_exploration_id_in_whitelist(cls, item):
+        """Validate the exploration id in playthrough model is in
+        the whitelist.
+
+        Args:
+            item: ndb.Model. PlaythroughModel to validate.
+        """
+        whitelisted_exp_ids_for_playthroughs = (
+            config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS.value)
+
+        if item.exp_id not in whitelisted_exp_ids_for_playthroughs:
+            cls.errors['exploration id check'].append(
+                'Entity id %s: recorded in exploration_id:%s which '
+                'has not been curated for recording.' % (
+                    item.id, item.exp_id)
+            )
+
+    @classmethod
+    def _validate_reference(cls, item):
+        """Validate the playthrough is referenced by some issues of
+        the corresponding exploration.
+
+        Args:
+            item: ndb.Model. PlaythroughModel to validate.
+        """
         exp_id = item.exp_id
         exp_version = item.exp_version
         exp_issues = (
             stats_models.ExplorationIssuesModel.get_model(exp_id, exp_version))
-        reference_error = (
-            'This playthrough was not found as a reference in the containing '
-            'ExplorationIssuesModel (id=%s)' % (exp_issues.id))
+
+        has_reference_error = True
         for exp_issue_dict in exp_issues.unresolved_issues:
             if item.id in exp_issue_dict['playthrough_ids']:
-                reference_error = None
+                has_reference_error = False
                 break
-
-        audit_data = {
-            'exp_id': item.exp_id,
-            'created_on': item.created_on.strftime('%Y-%m-%d'),
-            'reference_error': reference_error,
-        }
-
-        return audit_data
-
-    @classmethod
-    def _validate(cls, item):
-        audit_data = cls._map_to_audit_data(item)
-        whitelisted_exp_ids_for_playthroughs = (
-            config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS.value)
-
-        if audit_data['exp_id'] not in whitelisted_exp_ids_for_playthroughs:
-            cls.errors['exploration id check'].append(
-                'Entity id %s: recorded in exploration_id:%s which '
-                'has not been curated for recording.' % (
-                    item.id, audit_data['exp_id'])
+        if has_reference_error:
+            error_message = (
+                'This playthrough was not found as a reference in the '
+                'containing ExplorationIssuesModel (id=%s)' % (exp_issues.id))
+            cls.errors['reference check'].append(
+                'Entity id %s: not referenced by any issue. Details: %s.' % (
+                    item.id, error_message)
             )
 
-        created_on_datetime = datetime.datetime.strptime(
-            audit_data['created_on'], '%Y-%m-%d')
+    @classmethod
+    def _validate_created_datetime(cls, item):
+        """Validate the playthrough is created after the GSoC 2018 submission
+        deadline.
+
+        Args:
+            item: ndb.Model. PlaythroughModel to validate.
+        """
+        created_on_datetime = item.created_on
         if created_on_datetime < cls.PLAYTHROUGH_PROJECT_RELEASE_DATETIME:
             cls.errors['create datetime check'].append(
                 'Entity id %s: released on %s, which is before the '
                 'GSoC 2018 submission deadline (2018-09-01) and should '
-                'therefore not exist.' % (item.id, audit_data['created_on'],)
-            )
-
-        if audit_data['reference_error'] is not None:
-            cls.errors['reference check'].append(
-                'Entity id %s: not referenced by any issue. Details: %s.' % (
-                    item.id, audit_data['reference_error'])
+                'therefore not exist.' % (
+                    item.id, item.created_on.strftime('%Y-%m-%d'))
             )
 
     @classmethod
     def _get_custom_validation_functions(cls):
         return [
-            cls._validate,
+            cls._validate_exploration_id_in_whitelist,
+            cls._validate_reference,
+            cls._validate_created_datetime,
         ]
+
 
 MODEL_TO_VALIDATOR_MAPPING = {
     activity_models.ActivityReferencesModel: ActivityReferencesModelValidator,
