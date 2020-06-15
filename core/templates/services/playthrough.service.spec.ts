@@ -139,6 +139,27 @@ describe('PlaythroughService', () => {
       expect(backendApiStorePlaythroughSpy).toHaveBeenCalled();
     });
 
+    it('should identify no issue for a playthrough without any issues', () => {
+      spyOn(stopwatchObjectFactory, 'create').and.returnValue(
+        jasmine.createSpyObj('Stopwatch', {getTimeInSecs: 180, reset: null}));
+
+      playthroughService.recordExplorationStartAction('stateName1');
+      playthroughService.recordAnswerSubmitAction(
+        'stateName1', 'stateName2', 'TextInput', 'Hello', 'Try again', 30);
+      playthroughService.recordAnswerSubmitAction(
+        'stateName2', 'stateName3', 'TextInput', 'Hello', 'Try again', 30);
+      playthroughService.recordAnswerSubmitAction(
+        'stateName3', 'stateName4', 'TextInput', 'Hello', 'Try again', 30);
+      playthroughService.recordAnswerSubmitAction(
+        'stateName4', 'stateName5', 'TextInput', 'Hello', 'Try again', 30);
+      playthroughService.recordExplorationQuitAction('stateName1', 60);
+
+      let playthrough = playthroughService.getPlaythrough();
+      expect(playthrough).not.toBeNull();
+      expect(playthrough.issueType).toBeNull();
+      expect(playthrough.issueCustomizationArgs).toBeNull();
+    });
+
     it('should identify multiple incorrect submissions', () => {
       spyOn(stopwatchObjectFactory, 'create').and.returnValue(
         jasmine.createSpyObj('Stopwatch', {getTimeInSecs: 240, reset: null}));
