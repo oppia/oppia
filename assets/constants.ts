@@ -5101,8 +5101,8 @@ export = {
       "LogicProof",
       "NumericInput",
       "SetInput",
-      "MathExpressionInput",
       "AlgebraicExpressionInput",
+      "MathExpressionInput",
       "NumberWithUnits"
     ]
   }, {

@@ -472,8 +472,8 @@ var constants = {
         "LogicProof",
         "NumericInput",
         "SetInput",
-        "MathExpressionInput",
         "AlgebraicExpressionInput",
+        "MathExpressionInput",
         "NumberWithUnits"
     ]
   }, {
