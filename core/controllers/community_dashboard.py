@@ -40,7 +40,6 @@ class CommunityDashboardPage(base.BaseHandler):
         self.render_template('community-dashboard-page.mainpage.html')
 
 
-
 class ContributionOpportunitiesHandler(base.BaseHandler):
     """Provides data for opportunities available in different categories."""
 
