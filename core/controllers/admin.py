@@ -453,7 +453,7 @@ class AdminHandler(base.BaseHandler):
                 story.update_node_exploration_id(
                     '%s%d' % (story_domain.NODE_ID_PREFIX, node_id), exp_id)
 
-                if node_id != len(story_node_dicts) - 1:
+                if node_id != len(story_node_dicts):
                     story.update_node_destination_node_ids(
                         '%s%d' % (story_domain.NODE_ID_PREFIX, node_id),
                         ['%s%d' % (story_domain.NODE_ID_PREFIX, node_id + 1)])
