@@ -155,4 +155,3 @@ export class NumberWithUnitsValidationService {
 angular.module('oppia').factory(
   'NumberWithUnitsValidationService', downgradeInjectable(
     NumberWithUnitsValidationService));
-
