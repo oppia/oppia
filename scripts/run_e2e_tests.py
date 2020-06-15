@@ -34,8 +34,6 @@ from scripts import install_third_party_libs
 from scripts import setup
 from scripts import setup_gae
 
-CHROME_DRIVER_VERSION = '2.41'
-
 WEB_DRIVER_PORT = 4444
 GOOGLE_APP_ENGINE_PORT = 9001
 OPPIA_SERVER_PORT = 8181
@@ -238,7 +236,8 @@ def run_webdriver_manager(parameters):
     """
     web_driver_command = [common.NODE_BIN_PATH, WEBDRIVER_MANAGER_BIN_PATH]
     web_driver_command.extend(parameters)
-    python_utils.PRINT(common.run_cmd(web_driver_command))
+    p = subprocess.Popen(web_driver_command)
+    p.communicate()
 
 
 def update_community_dashboard_status_in_feconf_file(
@@ -334,11 +333,12 @@ def undo_webdriver_tweak():
 
 def start_webdriver_manager():
     """Update and start webdriver manager."""
+    chrome_driver_version = get_chrome_driver_version()
     with tweak_webdriver_manager():
         run_webdriver_manager(
-            ['update', '--versions.chrome', CHROME_DRIVER_VERSION])
+            ['update', '--versions.chrome', chrome_driver_version])
         run_webdriver_manager(
-            ['start', '--versions.chrome', CHROME_DRIVER_VERSION,
+            ['start', '--versions.chrome', chrome_driver_version,
              '--detach', '--quiet'])
 
 
@@ -428,6 +428,20 @@ def start_google_app_engine_server(dev_mode_setting):
             common.CURRENT_PYTHON_BIN, common.GOOGLE_APP_ENGINE_HOME,
             GOOGLE_APP_ENGINE_PORT, app_yaml_filepath), shell=True)
     SUBPROCESSES.append(p)
+
+
+def get_chrome_driver_version():
+    """Fetches the latest supported version of chromedriver depending on the
+    Chrome version.
+    https://chromedriver.chromium.org/downloads/version-selection
+    """
+    output = os.popen('google-chrome --version').read()
+    chrome_version = ''.join(re.findall(r'([0-9]|\.)', output))
+    chrome_version = '.'.join(chrome_version.split('.')[:-1])
+    response = python_utils.url_open(
+        'https://chromedriver.storage.googleapis.com/LATEST_RELEASE_%s'
+        % chrome_version)
+    return response.read()
 
 
 def main(args=None):
