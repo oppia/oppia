@@ -21,17 +21,21 @@ require(
   'components/common-layout-directives/common-elements/' +
   'background-banner.component.ts');
 
+require('domain/utilities/url-interpolation.service.ts');
+require('services/page-title.service.ts');
+require('services/site-analytics.service.ts');
+
 require(
   'pages/landing-pages/topic-landing-page/topic-landing-page.constants.ajs.ts');
 
 angular.module('oppia').component('topicLandingPage', {
   template: require('./topic-landing-page.component.html'),
   controller: [
-    '$timeout', 'PageTitleService',
+    '$filter', '$timeout', 'PageTitleService',
     'SiteAnalyticsService', 'UrlInterpolationService', 'WindowRef',
     'TOPIC_LANDING_PAGE_DATA',
     function(
-        $timeout, PageTitleService,
+        $filter, $timeout, PageTitleService,
         SiteAnalyticsService, UrlInterpolationService, WindowRef,
         TOPIC_LANDING_PAGE_DATA) {
       var ctrl = this;
@@ -87,7 +91,7 @@ angular.module('oppia').component('topicLandingPage', {
 
       ctrl.onClickExploreLessonsButton = function() {
         $timeout(function() {
-          WindowRef.nativeWindow.location = '/library';
+          WindowRef.nativeWindow.location = '/community-library';
         }, 150);
       };
       ctrl.$onInit = function() {

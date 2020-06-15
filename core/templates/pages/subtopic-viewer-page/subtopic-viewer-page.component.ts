@@ -31,15 +31,16 @@ require('services/alerts.service.ts');
 require('services/page-title.service.ts');
 require('services/contextual/url.service.ts');
 require('services/contextual/window-dimensions.service.ts');
+
 angular.module('oppia').component('subtopicViewerPage', {
   template: require('./subtopic-viewer-page.component.html'),
   controller: [
-    'AlertsService', 'LoaderService', 'PageTitleService',
-    'SubtopicViewerBackendApiService', 'UrlService',
+    '$rootScope', '$window', 'AlertsService', 'LoaderService',
+    'PageTitleService', 'SubtopicViewerBackendApiService', 'UrlService',
     'WindowDimensionsService', 'FATAL_ERROR_CODES',
     function(
-        AlertsService, LoaderService, PageTitleService,
-        SubtopicViewerBackendApiService, UrlService,
+        $rootScope, $window, AlertsService, LoaderService,
+        PageTitleService, SubtopicViewerBackendApiService, UrlService,
         WindowDimensionsService, FATAL_ERROR_CODES) {
       var ctrl = this;
       ctrl.nextSubtopicSummaryIsShown = false;
@@ -69,6 +70,7 @@ angular.module('oppia').component('subtopicViewerPage', {
             }
 
             LoaderService.hideLoadingScreen();
+            $rootScope.$apply();
           },
           function(errorResponse) {
             if (FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1) {

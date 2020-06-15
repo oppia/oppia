@@ -60,7 +60,7 @@
                       on-click-continue-button="showUpcomingCard()">
         </progress-nav>
       </div>
-      <div ng-if="inStoryMode  || (collectionSummary && isOnTerminalCard() && isCurrentCardAtEndOfTranscript() && recommendedExplorationSummaries.length > 0)" class="conversation-skin-next-lesson-wrapper">
+      <div ng-if="recommendedExplorationSummaries.length > 0 && (inStoryMode  || (collectionSummary && isOnTerminalCard() && isCurrentCardAtEndOfTranscript()))" class="conversation-skin-next-lesson-wrapper">
         <div style="cursor: default">
           <span class="conversation-skin-next-lesson-text">Next Lesson</span>
           <span><[recommendedExplorationSummaries[0].title]></span>
@@ -140,7 +140,7 @@
     <a ng-href="<[storyViewerUrl]>" class="conversation-skin-back-to-collection" translate="I18N_PLAYER_RETURN_TO_STORY"></a>
   </div>
   <div ng-if="!collectionSummary && !isRefresherExploration && !inStoryMode" class="conversation-skin-back-to-collection-container">
-    <a ng-href="/library" class="conversation-skin-back-to-collection" translate="I18N_PLAYER_RETURN_TO_LIBRARY"></a>
+    <a ng-href="/community-library" class="conversation-skin-back-to-collection" translate="I18N_PLAYER_RETURN_TO_LIBRARY"></a>
   </div>
   <div ng-if="collectionSummary && !isRefresherExploration" class="conversation-skin-back-to-collection-container">
     <a ng-href="/collection/<[collectionId]>" class="conversation-skin-back-to-collection" translate="I18N_PLAYER_BACK_TO_COLLECTION"></a>
@@ -222,7 +222,7 @@ otherwise they will interfere with the iframed conversation skin directive.
     display: -webkit-flex;
     display: flex;
     justify-content: center;
-    margin: 0 auto 0;
+    margin: 0 auto 150px;
     max-width: 1400px;
     padding: 56px 14px 0;
     width: 100%;
@@ -339,7 +339,7 @@ otherwise they will interfere with the iframed conversation skin directive.
   .conversation-skin-final-ratings {
     text-align: center;
     background-color: white;
-    width: 41%;
+    width: 38%;
     margin: 0 auto 60px;
     padding: 11px;
   }

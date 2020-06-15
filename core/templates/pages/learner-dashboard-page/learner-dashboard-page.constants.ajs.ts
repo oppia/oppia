@@ -40,4 +40,3 @@ angular.module('oppia').constant(
 angular.module('oppia').constant(
   'FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS',
   LearnerDashboardPageConstants.FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS);
-
