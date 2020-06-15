@@ -789,9 +789,22 @@ class JobRegistryTests(test_utils.GenericTestBase):
         for klass in jobs_registry.ONE_OFF_JOB_MANAGERS:
             self.assertTrue(issubclass(klass, jobs.BaseJobManager))
 
+    def test_is_abstract_function(self):
+        class TestMockAbstractClass(python_utils.OBJECT):
+            """A sample Abstract Class."""
+            pass
+
+        mock_ABSTRACT_BASE_CLASS = TestMockAbstractClass()
+        with self.swap(
+            jobs, 'ABSTRACT_BASE_CLASSES', mock_ABSTRACT_BASE_CLASS):
+            self.assertRaisesRegexp(
+                Exception, "Tried to directly create a job using the abstract base*")
+
     def test_each_one_off_class_is_not_abstract(self):
         for klass in jobs_registry.ONE_OFF_JOB_MANAGERS:
-            self.assertFalse(klass._is_abstract())  # pylint: disable=protected-access
+            # Function create_new() itself raises an Exception
+            # if the class is abstract
+            klass.create_new()
 
     def test_validity_of_each_continuous_computation_class(self):
         for klass in jobs_registry.ALL_CONTINUOUS_COMPUTATION_MANAGERS:
