@@ -18,9 +18,9 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
-import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
+import { fakeAsync, flushMicrotasks, TestBed } from '@angular/core/testing';
 
 import { AnswerClassificationResultObjectFactory } from
   'domain/classifier/AnswerClassificationResultObjectFactory';
@@ -53,6 +53,7 @@ fdescribe('Learner answer info service', () => {
   let learnerAnswerInfoService: LearnerAnswerInfoService = null;
   let answerClassificationService: AnswerClassificationService = null;
   let DEFAULT_OUTCOME_CLASSIFICATION;
+  let httpTestingController;
 
   beforeEach(() => {
     stateDict = {
@@ -146,19 +147,21 @@ fdescribe('Learner answer info service', () => {
       imports: [HttpClientTestingModule],
       providers: [CamelCaseToHyphensPipe, ConvertToPlainTextPipe]
     });
+    httpTestingController = TestBed.get(HttpTestingController);
     sof = TestBed.get(StateObjectFactory);
     oof = TestBed.get(OutcomeObjectFactory);
     acrof = TestBed.get(AnswerClassificationResultObjectFactory);
-    answerClassificationService = TestBed.get(AnswerClassificationService);
-    ladbas = TestBed.get(LearnerAnswerDetailsBackendApiService);
-    console.log(JSON.stringify(ladbas)+"ladbas");
-    learnerAnswerInfoService = TestBed.get(LearnerAnswerInfoService);
-    console.log(JSON.stringify(learnerAnswerInfoService)+"lais");
-    DEFAULT_OUTCOME_CLASSIFICATION = TestBed.get(
-      DEFAULT_OUTCOME_CLASSIFICATION);
     firstState = sof.createFromBackendDict('new state', stateDict);
     secondState = sof.createFromBackendDict('fake state', stateDict);
     thirdState = sof.createFromBackendDict('demo state', stateDict);
+    learnerAnswerInfoService = TestBed.get(LearnerAnswerInfoService);
+    console.log(JSON.stringify(learnerAnswerInfoService)+"lais");
+    ladbas = TestBed.get(LearnerAnswerDetailsBackendApiService);
+    DEFAULT_OUTCOME_CLASSIFICATION = TestBed.get(
+      DEFAULT_OUTCOME_CLASSIFICATION);
+    console.log(JSON.stringify(DEFAULT_OUTCOME_CLASSIFICATION)+"DOC");
+    answerClassificationService = TestBed.get(AnswerClassificationService);
+    console.log(JSON.stringify(answerClassificationService)+"acs");
     spyOn(answerClassificationService, 'getMatchingClassificationResult')
       .and.returnValue(acrof.createNew(
         oof.createNew('default', 'default_outcome', '', []), 2, 0,
@@ -178,6 +181,10 @@ fdescribe('Learner answer info service', () => {
     // canAskLearnerAnswerInfo which is a boolean variable as true as every
     // probability index is greater than 0.
     spyOn(Math, 'random').and.returnValue(0);
+  });
+
+  afterEach(() => {
+    httpTestingController.verify();
   });
 
   fdescribe('.initLearnerAnswerInfo', () => {
