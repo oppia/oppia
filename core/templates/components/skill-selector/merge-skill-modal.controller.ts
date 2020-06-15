@@ -21,14 +21,18 @@ require(
   'confirm-or-cancel-modal.controller.ts');
 
 angular.module('oppia').controller('MergeSkillModalController', [
-  '$controller', '$scope', '$uibModalInstance', 'skill', 'skillSummaries',
-  function($controller, $scope, $uibModalInstance, skill, skillSummaries) {
+  '$controller', '$scope', '$uibModalInstance', 'categorizedSkills', 'skill',
+  'skillSummaries',
+  function($controller, $scope, $uibModalInstance, categorizedSkills, skill,
+      skillSummaries) {
     $controller('ConfirmOrCancelModalController', {
       $scope: $scope,
       $uibModalInstance: $uibModalInstance
     });
 
     $scope.skillSummaries = skillSummaries;
+    $scope.categorizedSkills = categorizedSkills;
+    $scope.allowSkillsFromOtherTopics = true;
     $scope.selectedSkillId = '';
     $scope.confirm = function() {
       $uibModalInstance.close(
