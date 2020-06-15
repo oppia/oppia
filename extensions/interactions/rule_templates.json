@@ -236,5 +236,21 @@
     "FuzzyEquals": {
       "description": "is equal to {{x|NormalizedString}}, misspelled by at most one character"
     }
+  },
+  "RulesHtmlMapping": {
+    "ListOfSetsOfHtmlStrings": [
+      ["DragAndDropSortInput", "IsEqualToOrdering", "x"],
+      ["DragAndDropSortInput", "IsEqualToOrderingWithOneItemAtIncorrectPosition", "x"]
+    ],
+    "DragAndDropHtmlString": [
+      ["DragAndDropSortInput", "HasElementXAtPositionY", "x"],
+      ["DragAndDropSortInput", "HasElementXBeforeElementY", "x", "y"]
+    ],
+    "SetOfHtmlString": [
+      ["ItemSelectionInput", "Equals", "x"],
+      ["ItemSelectionInput", "ContainsAtLeastOneOf", "x"],
+      ["ItemSelectionInput", "DoesNotContainAtLeastOneOf", "x"],
+      ["ItemSelectionInput", "IsProperSubsetOf", "x"]
+    ]
   }
 }

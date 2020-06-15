@@ -223,7 +223,9 @@ class DraftChangesMathValidationOneOffJobTests(test_utils.GenericTestBase):
             self.EXP_ID_1, self.user_a_id, end_state_name='End')
 
     def test_draft_changes_with_invalid_tags(self):
-        """Find invalid math tags in draft changes with invalid math tags."""
+        """Tests for the case when there are invalid math tags in draft
+        changes.
+        """
 
         invalid_html_content1 = (
             '<p>Value</p><oppia-noninteractive-math></oppia-noninteractive-m'
@@ -258,7 +260,7 @@ class DraftChangesMathValidationOneOffJobTests(test_utils.GenericTestBase):
                     'rule_specs': [{
                         'rule_type': 'Equals',
                         'inputs': {
-                            'x': [invalid_html_content1]
+                            'x': [invalid_html_content1, invalid_html_content1]
                         }
                     }, {
                         'rule_type': 'ContainsAtLeastOneOf',
@@ -418,11 +420,13 @@ class DraftChangesMathValidationOneOffJobTests(test_utils.GenericTestBase):
                 list_starting_index:list_finishing_index + 1])
         # The length of the list here indicates the no of invalid tags.
         length_of_list = len(stringified_error_list.split('>,'))
-        self.assertEqual(length_of_list, 17)
+        self.assertEqual(length_of_list, 18)
         self.assertEqual(len(output), 1)
 
     def test_draft_changes_with_valid_tags(self):
-        """Find invalid math tags in draft changes with no invalid math tags."""
+        """Tests for the case when there are no invalid math tags in draft
+        changes.
+        """
 
         valid_html_content = (
             '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&a'

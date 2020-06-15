@@ -1713,7 +1713,9 @@ class ExplorationMathTagValidationOneOffJobTests(test_utils.GenericTestBase):
         self.process_and_flush_pending_tasks()
 
     def test_explorations_with_invalid_math_tags(self):
-        """Find invalid math tags in exploration with invalid math tags."""
+        """Tests for the case when there are invalid math tags in the
+        explorations.
+        """
 
         exploration = exp_domain.Exploration.create_default_exploration(
             self.VALID_EXP_ID, title=self.EXP_TITLE, category='category')
@@ -1894,7 +1896,9 @@ class ExplorationMathTagValidationOneOffJobTests(test_utils.GenericTestBase):
             exp_jobs_one_off.ExplorationMathTagValidationOneOffJob)
 
     def test_explorations_with_valid_math_tags(self):
-        """Find invalid math tags in exploration with no invalid math tags."""
+        """Tests for the case when there are no invalid math tags in the
+        explorations.
+        """
 
         exploration = exp_domain.Exploration.create_default_exploration(
             self.VALID_EXP_ID, title=self.EXP_TITLE, category='category')

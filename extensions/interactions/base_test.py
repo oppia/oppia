@@ -19,6 +19,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import json
 import os
 import re
 import string
@@ -245,6 +246,46 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 'is between {{a|Real}} and {{b|Real}}, inclusive'),
             'IsWithinTolerance': 'is within {{tol|Real}} of {{x|Real}}'
         })
+
+    def test_rules_html_mapping_are_valid(self):
+        """Test that the RulesHtmlMapping in the file rule_descriptions.json are
+        valid.
+        """
+        rules_index_dict = json.loads(
+            utils.get_file_contents(feconf.RULES_DESCRIPTIONS_FILE_PATH))
+        rules_html_mapping = rules_index_dict['RulesHtmlMapping']
+        self.assertEqual(len(rules_html_mapping['SetOfHtmlString']), 4)
+        expected_set_of_html_strings_rules = (
+            ['Equals', 'ContainsAtLeastOneOf', 'DoesNotContainAtLeastOneOf',
+             'IsProperSubsetOf'])
+        expected_drag_and_drop_html_string_rules = (
+            ['HasElementXAtPositionY', 'HasElementXBeforeElementY'])
+        expected_list_of_sets_of_html_strings_rules = (
+            ['IsEqualToOrdering',
+             'IsEqualToOrderingWithOneItemAtIncorrectPosition'])
+        for param_index, param in enumerate(
+                rules_html_mapping['SetOfHtmlString']):
+            self.assertEqual(param[0], 'ItemSelectionInput')
+            # Verify the rules types belonging to SetOfHtmlString.
+            self.assertEqual(
+                param[1], expected_set_of_html_strings_rules[param_index])
+        for param_index, param in enumerate(
+                rules_html_mapping['DragAndDropHtmlString']):
+            self.assertEqual(param[0], 'DragAndDropSortInput')
+            # Verify the rules types belonging to DragAndDropHtmlString.
+            self.assertEqual(
+                param[1], expected_drag_and_drop_html_string_rules[param_index])
+            if param[1] == 'HasElementXBeforeElementY':
+                self.assertTrue('y' in param)
+            else:
+                self.assertTrue('y' not in param)
+        for param_index, param in enumerate(
+                rules_html_mapping['ListOfSetsOfHtmlStrings']):
+            self.assertEqual(param[0], 'DragAndDropSortInput')
+            # Verify the rules types belonging to ListOfSetsOfHtmlStrings.
+            self.assertEqual(
+                param[1],
+                expected_list_of_sets_of_html_strings_rules[param_index])
 
     def test_default_interactions_are_valid(self):
         """Test that the default interactions are valid."""

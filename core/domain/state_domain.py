@@ -21,6 +21,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import collections
 import copy
+import json
 import logging
 
 from constants import constants
@@ -159,30 +160,46 @@ class AnswerGroup(python_utils.OBJECT):
 
         outcome_html = self.outcome.feedback.html
         html_list = html_list + [outcome_html]
+        # NOTE TO DEVELOPERS:
+        # The rules_index_dict below is used to  igure out the assembly of the
+        # html in the rule specs.
+        # See issue: https://github.com/oppia/oppia/issues/9413. We cannot use
+        # the interaction-id from the rules_index_dict dict until issue-9413
+        # has been fixed, because this method has no reference to the
+        # interaction type.
+
+        rules_index_dict = json.loads(
+            utils.get_file_contents(feconf.RULES_DESCRIPTIONS_FILE_PATH))
+
+        set_of_html_strings_rules = (
+            [rule[1] for rule in rules_index_dict['RulesHtmlMapping'][
+                'SetOfHtmlString']])
+        drag_and_drop_html_string_rules = (
+            [rule[1] for rule in rules_index_dict['RulesHtmlMapping'][
+                'DragAndDropHtmlString']])
+        list_of_sets_of_html_strings_rules = (
+            [rule[1] for rule in rules_index_dict['RulesHtmlMapping'][
+                'ListOfSetsOfHtmlStrings']])
+
         for rule_spec in self.rule_specs:
-            if rule_spec.rule_type == 'IsEqualToOrdering':
-                rule_spec_html_list = rule_spec.inputs['x']
-                for rule_spec_html in rule_spec_html_list:
-                    html_list = html_list + rule_spec_html
-            elif (rule_spec.rule_type ==
-                  'IsEqualToOrderingWithOneItemAtIncorrectPosition'):
-                rule_spec_html_list = rule_spec.inputs['x']
-                for rule_spec_html in rule_spec_html_list:
-                    html_list = html_list + rule_spec_html
-            elif rule_spec.rule_type == 'HasElementXAtPositionY':
-                html_list = html_list + [rule_spec.inputs['x']]
-            elif rule_spec.rule_type == 'HasElementXBeforeElementY':
-                html_list = (
-                    html_list + [rule_spec.inputs['y']] +
-                    [rule_spec.inputs['x']])
-            elif rule_spec.rule_type in (
-                    'ContainsAtLeastOneOf', 'IsProperSubsetOf',
-                    'DoesNotContainAtLeastOneOf', 'Equals'):
+            if rule_spec.rule_type in set_of_html_strings_rules:
                 if isinstance(rule_spec.inputs['x'], list):
                     for value in rule_spec.inputs['x']:
                         if isinstance(value, python_utils.BASESTRING):
-                            rule_spec_html = rule_spec.inputs['x']
-                            html_list = html_list + rule_spec_html
+                            html_list = html_list + [value]
+            elif rule_spec.rule_type in drag_and_drop_html_string_rules:
+                index_of_rule = (
+                    drag_and_drop_html_string_rules.index(rule_spec.rule_type))
+                if ('y' in
+                        rules_index_dict['RulesHtmlMapping'][
+                            'DragAndDropHtmlString'][index_of_rule]):
+                    html_list = html_list + [rule_spec.inputs['y']]
+                html_list = html_list + [rule_spec.inputs['x']]
+
+            elif rule_spec.rule_type in list_of_sets_of_html_strings_rules:
+                rule_spec_html_list = rule_spec.inputs['x']
+                for rule_spec_html in rule_spec_html_list:
+                    html_list = html_list + rule_spec_html
 
         return html_list
 
