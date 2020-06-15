@@ -27,7 +27,6 @@ import subprocess
 import python_utils
 from scripts import build
 from scripts import common
-from scripts import install_third_party_libs
 
 _PARSER = argparse.ArgumentParser()
 
@@ -85,9 +84,8 @@ def start_proxy_server():
 
     python_utils.PRINT('Starting proxy server...')
     start_server_command = ['sudo', 'nginx', '-c', filepath]
-    p = subprocess.Popen(start_server_command)
+    subprocess.Popen(start_server_command)
 
-    RUNNING_PROCESSES.append(p)
 
 
 def run_lighthouse_checks_with_compression():
@@ -119,8 +117,7 @@ def cleanup():
     """Kill the running subprocesses and server fired in this program."""
     dev_appserver_path = '%s/dev_appserver.py' % common.GOOGLE_APP_ENGINE_HOME
     processes_to_kill = [
-        '.*%s.*' % re.escape(dev_appserver_path),
-        '.*%s.*' % re.escape('nginx')
+        '.*%s.*' % re.escape(dev_appserver_path)
     ]
 
     for p in RUNNING_PROCESSES:
@@ -128,6 +125,9 @@ def cleanup():
 
     for p in processes_to_kill:
         common.kill_processes_based_on_regex(p)
+
+    stop_server_command = ['sudo', 'service', 'nginx', 'stop']
+    subprocess.Popen(stop_server_command)
 
 
 def main(args=None):
@@ -142,7 +142,6 @@ def main(args=None):
         run_lighthouse_checks()
     else:
         run_lighthouse_checks_with_compression()
-
 
 
 if __name__ == '__main__':
