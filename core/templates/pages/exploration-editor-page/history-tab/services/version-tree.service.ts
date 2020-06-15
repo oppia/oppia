@@ -22,14 +22,45 @@ import cloneDeep from 'lodash/cloneDeep';
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
+import { IExplorationChangeList } from
+  'domain/exploration/ExplorationDraftObjectFactory';
+
+
+interface ICreateCommitCmd {
+  cmd: string;
+  category: string;
+  title: string;
+}
+
+interface IRevertCommitCmd {
+  'cmd': string;
+  'version_number': number;
+}
+
+type IExplorationCommitCmd = (
+  IExplorationChangeList | ICreateCommitCmd | IRevertCommitCmd);
+
+interface IExplorationSnapshot {
+  'commit_message': string;
+  'committer_id': string;
+  'commit_type': string;
+  'version_number': number;
+  'created_on_ms': number;
+  'commit_cmds': IExplorationCommitCmd[];
+}
+
+interface IExplorationSnapshots {
+  [version: number]: IExplorationSnapshot;
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class VersionTreeService {
-  private _snapshots: {} = null;
+  private _snapshots: IExplorationSnapshots = null;
   private _treeParents: {} = null;
 
-  init(snapshotsData: any[]): void {
+  init(snapshotsData: IExplorationSnapshot[]): void {
     this._treeParents = {};
     this._snapshots = {};
     var numberOfVersions = snapshotsData.length;
@@ -47,7 +78,8 @@ export class VersionTreeService {
           if (this._snapshots[versionNum].commit_cmds[i].cmd ===
               'AUTO_revert_version_number') {
             this._treeParents[versionNum] =
-              this._snapshots[versionNum].commit_cmds[i].version_number;
+              (<IRevertCommitCmd> this._snapshots[versionNum].commit_cmds[i])
+                .version_number;
           }
         }
       } else {
@@ -126,11 +158,7 @@ export class VersionTreeService {
    * for 'revert':
    *  - 'version_number': version number reverted to
    */
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because '_snapshots[version].commit_cmds' is an array of dicts with
-  // underscore_cased keys which give tslint errors against underscore_casing
-  // in favor of camelCasing.
-  getChangeList(version: number): any {
+  getChangeList(version: number): IExplorationCommitCmd[] {
     if (this._snapshots === null) {
       throw new Error('snapshots is not initialized');
     } else if (version === 1) {
