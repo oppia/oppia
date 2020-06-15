@@ -339,7 +339,7 @@ class BaseModelValidator(python_utils.OBJECT):
 
         This method can be overridden by subclasses, if needed.
 
-        Each validation function should accept two arg, which are the
+        Each validation function should accept two args, which are the
         model instance to validate and the external instances for the class.
 
         Returns:
