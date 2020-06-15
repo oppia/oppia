@@ -323,7 +323,7 @@ WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS = ConfigProperty(
 TOPIC_IDS_FOR_CLASSROOM_PAGES = ConfigProperty(
     'topic_ids_for_classroom_pages', SET_OF_CLASSROOM_DICTS_SCHEMA,
     'The set of topic IDs for each classroom page.', [{
-        'name': 'Math',
+        'name': 'math',
         'topic_ids': []
     }]
 )
@@ -335,9 +335,13 @@ RECORD_PLAYTHROUGH_PROBABILITY = ConfigProperty(
 IS_IMPROVEMENTS_TAB_ENABLED = ConfigProperty(
     'is_improvements_tab_enabled', BOOL_SCHEMA,
     'Exposes the Improvements Tab for creators in the exploration editor.',
-    True)
+    False)
 
 ALWAYS_ASK_LEARNERS_FOR_ANSWER_DETAILS = ConfigProperty(
     'always_ask_learners_for_answer_details', BOOL_SCHEMA,
     'Always ask learners for answer details. For testing -- do not use',
     False)
+
+CLASSROOM_PAGE_IS_SHOWN = ConfigProperty(
+    'classroom_page_is_shown', BOOL_SCHEMA,
+    'Show classroom components.', False)

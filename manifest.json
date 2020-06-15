@@ -2,17 +2,17 @@
   "dependencies": {
     "backend": {
       "backports.functools_lru_cache ": {
-        "version": "1.5",
+        "version": "1.6.1",
         "downloadFormat": "tar",
-        "url": "https://pypi.python.org/packages/57/d4/156eb5fbb08d2e85ab0a632e2bebdad355798dece07d4752f66a8d02d1ea/backports.functools_lru_cache-1.5.tar.gz#md5=2e271cab23c4c4d1de2f7ee80a1736bb",
+        "url": "https://files.pythonhosted.org/packages/ad/2e/aa84668861c3de458c5bcbfb9813f0e26434e2232d3e294469e96efac884/backports.functools_lru_cache-1.6.1.tar.gz#md5=103000b21a8e683647e2ce41929f2a9d",
         "tarRootDirPrefix": "backports.functools_lru_cache-",
         "rootDirPrefix": "backports.functools_lru_cache-",
         "targetDirPrefix": "backports.functools_lru_cache-"
       },
       "bleach": {
-        "version": "3.1.0",
+        "version": "3.1.5",
         "downloadFormat": "zip",
-        "url": "https://github.com/jsocol/bleach/archive/v3.1.0.zip",
+        "url": "https://github.com/jsocol/bleach/archive/v3.1.5.zip",
         "rootDirPrefix": "bleach-",
         "targetDirPrefix": "bleach-"
       },
@@ -55,10 +55,18 @@
         "rootDirPrefix": "html5lib-python-",
         "targetDirPrefix": "html5lib-python-"
       },
-      "simpleJson": {
-        "version": "3.16.0",
+      "packaging": {
+        "version": "20.3",
         "downloadFormat": "tar",
-        "url": "https://files.pythonhosted.org/packages/e3/24/c35fb1c1c315fc0fffe61ea00d3f88e85469004713dab488dee4f35b0aff/simplejson-3.16.0.tar.gz",
+        "url": "https://files.pythonhosted.org/packages/65/37/83e3f492eb52d771e2820e88105f605335553fe10422cba9d256faeb1702/packaging-20.3.tar.gz#md5=19e0d1f82a9007b448650ccfeffd0a26",
+        "tarRootDirPrefix": "packaging-",
+        "rootDirPrefix": "packaging-",
+        "targetDirPrefix": "packaging-"
+      },
+      "simpleJson": {
+        "version": "3.17.0",
+        "downloadFormat": "tar",
+        "url": "https://files.pythonhosted.org/packages/98/87/a7b98aa9256c8843f92878966dc3d8d914c14aad97e2c5ce4798d5743e07/simplejson-3.17.0.tar.gz",
         "tarRootDirPrefix": "simplejson-",
         "rootDirPrefix": "simplejson-",
         "targetDirPrefix": "simplejson-"
@@ -88,25 +96,25 @@
         "targetDirPrefix": "callbacks-"
       },
       "beautifulSoup": {
-        "version": "4.7.1",
+        "version": "4.9.0",
         "downloadFormat": "tar",
-        "url": "https://pypi.python.org/packages/80/f2/f6aca7f1b209bb9a7ef069d68813b091c8c3620642b568dac4eb0e507748/beautifulsoup4-4.7.1.tar.gz#md5=321d73746d06bd9a8fcc3787b3fb7598",
+        "url": "https://files.pythonhosted.org/packages/3b/e4/7cfc641f11e0eef60123912611a5c9ee7d4638da7325878b695b9ae4bb6f/beautifulsoup4-4.9.0.tar.gz#md5=54e86045e37b578036f34b0e4927c85f",
         "tarRootDirPrefix": "beautifulsoup4-",
         "rootDirPrefix": "beautifulsoup4-",
         "targetDirPrefix": "beautifulsoup4-"
       },
       "mutagen": {
-        "version": "1.42.0",
+        "version": "1.43.0",
         "downloadFormat": "tar",
-        "url": "https://files.pythonhosted.org/packages/30/4c/5ad1a6e1ccbcfaf6462db727989c302d9d721beedd9b09c11e6f0c7065b0/mutagen-1.42.0.tar.gz",
+        "url": "https://files.pythonhosted.org/packages/aa/fd/ed738775442e3614849fefdf41417d7bff3ccb010d49c8f729432cc3c1e5/mutagen-1.43.0.tar.gz#md5=3154511015860685b3882c068258ae65",
         "tarRootDirPrefix": "mutagen-",
         "rootDirPrefix": "mutagen-",
         "targetDirPrefix": "mutagen-"
       },
       "soupsieve": {
-        "version": "1.9.1",
+        "version": "1.9.5",
         "downloadFormat": "tar",
-        "url": "https://files.pythonhosted.org/packages/fb/9e/2e236603b058daa6820193d4d95f4dcfbbbd0d3c709bec8c6ef1b1902501/soupsieve-1.9.1.tar.gz",
+        "url": "https://files.pythonhosted.org/packages/92/cf/57dfed8a00f4ba33af3a6615d693bb65a19a11e26ab13293f62359216417/soupsieve-1.9.5.tar.gz#md5=9b6c71b20fb1a73d2594f9e609464132",
         "tarRootDirPrefix": "soupsieve-",
         "rootDirPrefix": "soupsieve-",
         "targetDirPrefix": "soupsieve-"
@@ -129,7 +137,7 @@
         ],
         "bundle": {
           "js": [
-            "angular-animate.js", "angular-resource.js", "angular-sanitize.js",
+            "angular-animate.js", "angular-sanitize.js",
             "angular-touch.js", "angular-aria.js"
           ]
         }
@@ -156,7 +164,7 @@
         "downloadFormat": "files",
         "url": "https://code.angularjs.org/1.7.9",
         "targetDirPrefix": "angularjs-",
-        "files": ["angular-mocks.js", "angular-scenario.js"]
+        "files": ["angular-mocks.js"]
       },
       "angularTranslate": {
         "version": "2.18.1",
@@ -178,16 +186,6 @@
         "files": ["angular-translate-loader-static-files.min.js"],
         "bundle": {
           "js": ["angular-translate-loader-static-files.min.js"]
-        }
-      },
-      "angularCookiesRev": {
-        "version": "1.7.9",
-        "downloadFormat": "zip",
-        "url": "https://github.com/angular/bower-angular-cookies/archive/v1.7.9.zip",
-        "rootDirPrefix": "bower-angular-cookies-",
-        "targetDirPrefix": "bower-angular-cookies-",
-        "bundle": {
-          "js": ["angular-cookies.min.js"]
         }
       },
       "angularDragAndDrop": {
@@ -311,7 +309,12 @@
         "rootDir": "fontawesome-free-5.9.0-web",
         "targetDir": "fontawesome-free-5.9.0-web",
         "bundle": {
-          "css": ["css/all.css"],
+          "css": [
+            "css/fontawesome.min.css",
+            "css/brands.min.css",
+            "css/regular.min.css",
+            "css/solid.min.css"
+          ],
           "fontsPath": "webfonts"
         }
       },
@@ -346,26 +349,13 @@
         "rootDirPrefix": "guppy-",
         "targetDir": "guppy-b5055b"
       },
-      "hammerJs": {
-        "version": "2.0.8",
-        "downloadFormat": "zip",
-        "url": "https://github.com/hammerjs/hammer.js/archive/v2.0.8.zip",
-        "rootDirPrefix": "hammer.js-",
-        "targetDirPrefix": "hammer-js-",
-        "bundle": {
-          "js": ["hammer.js"]
-        }
-      },
       "headroomJs": {
         "version": "0.9.4",
         "downloadFormat": "files",
         "url": "https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4",
         "rootDirPrefix": "headroom-js-",
         "targetDirPrefix": "headroom-js-",
-        "files": ["angular.headroom.min.js", "headroom.min.js"],
-        "bundle": {
-          "js": []
-        }
+        "files": ["angular.headroom.min.js", "headroom.min.js"]
       },
       "jquery": {
         "version": "3.4.1",
@@ -373,10 +363,7 @@
         "url": "https://ajax.googleapis.com/ajax/libs/jquery/3.4.1",
         "rootDirPrefix": "jquery-",
         "targetDirPrefix": "jquery-",
-        "files": ["jquery.js", "jquery.min.js", "jquery.min.js.map"],
-        "bundle": {
-          "js": []
-        }
+        "files": ["jquery.js", "jquery.min.js", "jquery.min.js.map"]
       },
       "jqueryUI": {
         "version": "1.12.1",
@@ -384,10 +371,7 @@
         "url": "https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1",
         "rootDirPrefix": "jqueryui-",
         "targetDirPrefix": "jqueryui-",
-        "files": ["jquery-ui.min.js"],
-        "bundle": {
-          "js": []
-        }
+        "files": ["jquery-ui.min.js"]
       },
       "jqueryUITouchPunch": {
         "version": "0.3.1",
@@ -410,17 +394,6 @@
         "rootDirPrefix": "MathJax-",
         "targetDirPrefix": "MathJax-"
       },
-      "mathJs": {
-        "version": "5.10.3",
-        "downloadFormat": "files",
-        "url": "https://cdnjs.cloudflare.com/ajax/libs/mathjs/5.10.3",
-        "rootDirPrefix": "math-js-",
-        "targetDirPrefix": "math-js-",
-        "files": ["math.js", "math.min.js", "math.min.map"],
-        "bundle": {
-          "js": ["math.js"]
-        }
-      },
       "midiJs": {
         "version": "a8a84257afa70721ae462448048a87301fc1554a",
         "downloadFormat": "zip",
@@ -437,17 +410,6 @@
         "bundle": {
           "css": ["ng-joyride.css"],
           "js": ["ng-joyride.js"]
-        }
-      },
-      "ngImageCrop": {
-        "version": "0.3.2",
-        "downloadFormat": "zip",
-        "url": "https://github.com/alexk111/ngImgCrop/archive/v0.3.2.zip",
-        "rootDirPrefix": "ngImgCrop-",
-        "targetDirPrefix": "ng-img-crop-",
-        "bundle": {
-          "css": ["compile/minified/ng-img-crop.css"],
-          "js": ["compile/minified/ng-img-crop.js"]
         }
       },
       "ngInfiniteScroll": {
@@ -471,6 +433,14 @@
           "css": ["dist/css/select2.css"],
           "js": ["dist/js/select2.full.js"]
         }
+      },
+      "literallycanvas": {
+        "version": "0.5.2",
+        "downloadFormat": "tar",
+        "url": "https://github.com/literallycanvas/literallycanvas/archive/v0.5.2.tar.gz",
+        "tarRootDirPrefix": "literallycanvas-",
+        "rootDirPrefix": "literallycanvas-",
+        "targetDirPrefix": "literallycanvas-"
       },
       "ckeditor": {
         "version": "4.12.1",
@@ -532,25 +502,14 @@
           "js": ["dist/angular-ui-tree.js"]
         }
       },
-      "uiUtils": {
-        "version": "0.1.1",
+      "uiValidate": {
+        "version": "1.2.3",
         "downloadFormat": "zip",
-        "url": "https://github.com/angular-ui/ui-utils/archive/v0.1.1.zip",
-        "rootDirPrefix": "ui-utils-",
-        "targetDirPrefix": "ui-utils-",
+        "url": "https://github.com/angular-ui/ui-validate/archive/1.2.3.zip",
+        "rootDirPrefix": "ui-validate-",
+        "targetDirPrefix": "ui-validate-",
         "bundle": {
-          "js": ["ui-utils.js"]
-        }
-      },
-      "waveSurferJs": {
-        "version": "2.2.1",
-        "downloadFormat": "files",
-        "url": "https://unpkg.com/wavesurfer.js@2.2.1/dist",
-        "rootDirPrefix": "waveSurfer-js-",
-        "targetDirPrefix": "wave-surfer-js-",
-        "files": ["wavesurfer.min.js"],
-        "bundle": {
-          "js": ["wavesurfer.min.js"]
+          "js": ["src/validate.js"]
         }
       }
     },
@@ -561,13 +520,6 @@
         "url": "https://github.com/yui/yuicompressor/releases/download/v2.4.8",
         "files": ["yuicompressor-2.4.8.jar"],
         "targetDirPrefix": "yuicompressor-"
-      },
-      "browsermob-proxy": {
-        "version": "2.1.1",
-        "downloadFormat": "zip",
-        "url": "https://github.com/lightbody/browsermob-proxy/releases/download/browsermob-proxy-2.1.1/browsermob-proxy-2.1.1-bin.zip",
-        "rootDirPrefix": "browsermob-proxy-",
-        "targetDirPrefix": "browsermob-proxy-"
       }
     }
   }

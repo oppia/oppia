@@ -52,20 +52,37 @@ class InstallThirdPartyLibsImportTests(test_utils.GenericTestBase):
     def setUp(self):
         super(InstallThirdPartyLibsImportTests, self).setUp()
         self.commands = []
+        # pylint: disable=unused-argument
+        # pylint: disable=super-init-not-called
+        def mock_popen_error_call(unused_cmd_tokens, *args, **kwargs):
+            class Ret(test_utils.GenericTestBase):
+                """Return object that gives user-prefix error."""
+                def __init__(self):
+                    self.returncode = 1
+                def communicate(self):
+                    """Return user-prefix error as stderr."""
+                    return '', 'can\'t combine user with prefix'
+            return Ret()
         def mock_check_call(cmd_tokens):
             self.commands.extend(cmd_tokens)
+        self.Popen_swap = self.swap(
+            subprocess, 'Popen', mock_popen_error_call)
         self.check_call_swap = self.swap(
             subprocess, 'check_call', mock_check_call)
+        # pylint: enable=unused-argument
+        # pylint: enable=super-init-not-called
 
     def test_import_with_missing_packages(self):
         def mock_exists(unused_path):
             return False
         exists_swap = self.swap(os.path, 'exists', mock_exists)
-        with self.check_call_swap, exists_swap:
+        with self.Popen_swap, self.check_call_swap, exists_swap:
             from scripts import install_third_party_libs # pylint: disable=unused-variable
         self.assertEqual(
             self.commands, [
                 sys.executable, '-m', 'pip', 'install', 'pyyaml==5.1.2',
                 '--target', '../oppia_tools/pyyaml-5.1.2',
+                '--user', '--prefix=', '--system',
                 sys.executable, '-m', 'pip', 'install',
-                'future==0.17.1', '--target', 'third_party/future-0.17.1'])
+                'future==0.17.1', '--target', 'third_party/future-0.17.1',
+                '--user', '--prefix=', '--system'])

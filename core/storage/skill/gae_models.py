@@ -28,26 +28,12 @@ from google.appengine.ext import ndb
 
 class SkillSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for a skill snapshot."""
-
-    @staticmethod
-    def get_export_policy():
-        """This model's export_data function implementation is still pending.
-
-       TODO(#8523): Implement this function.
-       """
-        return base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED
+    pass
 
 
 class SkillSnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content of a skill snapshot."""
-
-    @staticmethod
-    def get_export_policy():
-        """This model's export_data function implementation is still pending.
-
-       TODO(#8523): Implement this function.
-       """
-        return base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED
+    pass
 
 
 class SkillModel(base_models.VersionedModel):
@@ -173,8 +159,7 @@ class SkillCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     A new instance of this model is created and saved every time a commit to
     SkillModel occurs.
 
-    The id for this model is of the form
-    'skill-{{SKILL_ID}}-{{SKILL_VERSION}}'.
+    The id for this model is of the form 'skill-[skill_id]-[version]'.
     """
     # The id of the skill being edited.
     skill_id = ndb.StringProperty(indexed=True, required=True)

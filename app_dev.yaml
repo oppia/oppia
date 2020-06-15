@@ -57,22 +57,22 @@ handlers:
   secure: always
   application_readable: true
   expiration: "0"
-# Serve js scripts and css files under core/templates/dev/head.
+# Serve js scripts and css files under core/templates.
 # This regex allows us to recursively serve js scripts.
 # "\1" inserts text captured by the capture group in the URL pattern.
-- url: /templates/dev/head/(.*\.(css))$
-  static_files: core/templates/dev/head/\1
-  upload: core/templates/dev/head/(.*\.(css))$
+- url: /templates/(.*\.(css))$
+  static_files: core/templates/\1
+  upload: core/templates/(.*\.(css))$
   secure: always
   expiration: "0"
-- url: /templates/dev/head/(.*\.(js))$
-  static_files: local_compiled_js/core/templates/dev/head/\1
-  upload: local_compiled_js/core/templates/dev/head/(.*\.(js))$
+- url: /templates/(.*\.(js))$
+  static_files: local_compiled_js/core/templates/\1
+  upload: local_compiled_js/core/templates/(.*\.(js))$
   secure: always
   expiration: "0"
-- url: /templates/dev/head/(.*\.(html))$
-  static_files: core/templates/dev/head/\1
-  upload: core/templates/dev/head/(.*\.(html))$
+- url: /templates/(.*\.(html))$
+  static_files: core/templates/\1
+  upload: core/templates/(.*\.(html))$
   secure: always
   expiration: "0"
   application_readable: true
@@ -154,6 +154,17 @@ handlers:
     X-Xss-Protection: "1; mode=block"
   secure: always
   expiration: "0"
+- url: /community-dashboard
+  static_files: webpack_bundles/community-dashboard-page.mainpage.html
+  upload: webpack_bundles/community-dashboard-page.mainpage.html
+  http_headers:
+    Pragma: no-cache
+    Strict-Transport-Security: "max-age=31536000; includeSubDomains"
+    X-Content-Type-Options: "nosniff"
+    X-Frame-Options: "DENY"
+    X-Xss-Protection: "1; mode=block"
+  secure: always
+  expiration: "0"
 - url: /contact
   static_files: webpack_bundles/contact-page.mainpage.html
   upload: webpack_bundles/contact-page.mainpage.html
@@ -176,7 +187,7 @@ handlers:
     X-Xss-Protection: "1; mode=block"
   secure: always
   expiration: "0"
-- url: /get_started
+- url: /get-started
   static_files: webpack_bundles/get-started-page.mainpage.html
   upload: webpack_bundles/get-started-page.mainpage.html
   http_headers:
@@ -187,20 +198,9 @@ handlers:
     X-Xss-Protection: "1; mode=block"
   secure: always
   expiration: "0"
-- url: /privacy
+- url: /privacy-policy
   static_files: webpack_bundles/privacy-page.mainpage.html
   upload: webpack_bundles/privacy-page.mainpage.html
-  http_headers:
-    Pragma: no-cache
-    Strict-Transport-Security: "max-age=31536000; includeSubDomains"
-    X-Content-Type-Options: "nosniff"
-    X-Frame-Options: "DENY"
-    X-Xss-Protection: "1; mode=block"
-  secure: always
-  expiration: "0"
-- url: /splash
-  static_files: webpack_bundles/splash-page.mainpage.html
-  upload: webpack_bundles/splash-page.mainpage.html
   http_headers:
     Pragma: no-cache
     Strict-Transport-Security: "max-age=31536000; includeSubDomains"
@@ -292,7 +292,7 @@ skip_files:
 - third_party/static/bower-angular-translate-loader-partial-2.18.1/
 - third_party/static/bower-angular-translate-loader-static-files-2.18.1/
 - third_party/static/bower-angular-cookies-1.7.9/
-- third_party/static/bower-angular-translate-storage-cookie-2.18.1,/
+- third_party/static/bower-angular-translate-storage-cookie-2.18.1/
 - third_party/static/bower-material-1.1.19/
 # CKEditor-4.12.1 plugins in the download from the CKEditor website include
 # only a11yhelp, about, clipboard, colordialog, copyformatting, dialog, div,
@@ -369,6 +369,22 @@ skip_files:
 - third_party/static/fontawesome-free-5.9.0-web/
 - third_party/static/guppy-b5055b/site/
 - third_party/static/guppy-b5055b/test/
+# LiterallyCanvas is used from the npm package and only the images
+# are used from the third_party library. So we exclude all other folders.
+- third_party/static/literallycanvas-0.5.2/demo/
+- third_party/static/literallycanvas-0.5.2/lib/css/
+- third_party/static/literallycanvas-0.5.2/lib/js/
+- third_party/static/literallycanvas-0.5.2/scss/
+- third_party/static/literallycanvas-0.5.2/src/
+- third_party/static/literallycanvas-0.5.2/.babelrc
+- third_party/static/literallycanvas-0.5.2/.gitignore
+- third_party/static/literallycanvas-0.5.2/CHANGES.txt
+- third_party/static/literallycanvas-0.5.2/gulpfile.js
+- third_party/static/literallycanvas-0.5.2/literallycanvas.sublime-project
+- third_party/static/literallycanvas-0.5.2/Makefile
+- third_party/static/literallycanvas-0.5.2/package.json
+- third_party/static/literallycanvas-0.5.2/README.md
+- third_party/static/literallycanvas-0.5.2/yarn.lock
 - third_party/static/MathJax-2.7.5/docs/
 - third_party/static/MathJax-2.7.5/fonts/HTML-CSS/Gyre-Pagella/
 - third_party/static/MathJax-2.7.5/fonts/HTML-CSS/Gyre-Termes/
@@ -419,6 +435,5 @@ skip_files:
 - third_party/static/MathJax-2.7.5/test/
 - third_party/static/MathJax-2.7.5/unpacked/
 - third_party/static/messageformat-2.0.5/
-- third_party/static/ng-img-crop-0.3.2/
 - third_party/static/nginfinitescroll-1.0.0/
 - third_party/static/popperJs-1.15.0/

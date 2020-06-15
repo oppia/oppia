@@ -24,6 +24,7 @@ import copy
 import logging
 
 from constants import constants
+from core.domain import android_validation_constants
 from core.domain import customization_args_util
 from core.domain import html_cleaner
 from core.domain import interaction_registry
@@ -377,6 +378,55 @@ class InteractionInstance(python_utils.OBJECT):
         return self.id and interaction_registry.Registry.get_interaction_by_id(
             self.id).is_terminal
 
+    def is_supported_on_android_app(self):
+        """Determines whether the interaction is a valid interaction that is
+        supported by the Android app.
+
+        Returns:
+            bool. Whether the interaction is supported by the Android app.
+        """
+        if self.id:
+            return (
+                self.id in
+                android_validation_constants.VALID_INTERACTION_IDS)
+
+        return True
+
+    def is_rte_content_supported_on_android(
+            self, require_valid_component_names):
+        """Determines whether the RTE content in interaction answer groups,
+        hints and solution is supported by Android app.
+
+        Args:
+            require_valid_component_names: function. Function to check
+                whether the RTE tags in the html string are whitelisted.
+
+        Returns:
+            bool. Whether the RTE content is valid.
+        """
+        for answer_group in self.answer_groups:
+            if require_valid_component_names(
+                    answer_group.outcome.feedback.html):
+                return False
+
+        if (
+                self.default_outcome and self.default_outcome.feedback and
+                require_valid_component_names(
+                    self.default_outcome.feedback.html)):
+            return False
+
+        for hint in self.hints:
+            if require_valid_component_names(hint.hint_content.html):
+                return False
+
+        if (
+                self.solution and self.solution.explanation and
+                require_valid_component_names(
+                    self.solution.explanation.html)):
+            return False
+
+        return True
+
     def get_all_outcomes(self):
         """Returns a list of all outcomes of this interaction, taking into
         consideration every answer group and the default outcome.
@@ -659,6 +709,7 @@ class Voiceover(python_utils.OBJECT):
             'filename': self.filename,
             'file_size_bytes': self.file_size_bytes,
             'needs_update': self.needs_update,
+            'duration_secs': self.duration_secs
         }
 
     @classmethod
@@ -675,9 +726,10 @@ class Voiceover(python_utils.OBJECT):
         return cls(
             voiceover_dict['filename'],
             voiceover_dict['file_size_bytes'],
-            voiceover_dict['needs_update'])
+            voiceover_dict['needs_update'],
+            voiceover_dict['duration_secs'])
 
-    def __init__(self, filename, file_size_bytes, needs_update):
+    def __init__(self, filename, file_size_bytes, needs_update, duration_secs):
         """Initializes a Voiceover domain object.
 
         Args:
@@ -686,6 +738,8 @@ class Voiceover(python_utils.OBJECT):
                 potential bandwidth usage to the learner before they download
                 the file.
             needs_update: bool. Whether voiceover is marked for needing review.
+            duration_secs: float. The duration in seconds for the voiceover
+                recording.
         """
         # str. The corresponding audio file path, e.g.
         # "content-en-2-h7sjp8s.mp3".
@@ -695,6 +749,8 @@ class Voiceover(python_utils.OBJECT):
         self.file_size_bytes = file_size_bytes
         # bool. Whether audio is marked for needing review.
         self.needs_update = needs_update
+        # float. The duration in seconds for the voiceover recording.
+        self.duration_secs = duration_secs
 
     def validate(self):
         """Validates properties of the Voiceover.
@@ -731,6 +787,15 @@ class Voiceover(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Expected needs_update to be a bool, received %s' %
                 self.needs_update)
+        if not isinstance(self.duration_secs, float):
+            raise utils.ValidationError(
+                'Expected duration_secs to be a float, received %s' %
+                self.duration_secs)
+        if self.duration_secs < 0:
+            raise utils.ValidationError(
+                'Expected duration_secs to be positive number, '
+                'or zero if not yet specified %s' %
+                self.duration_secs)
 
 
 class WrittenTranslation(python_utils.OBJECT):
@@ -798,7 +863,13 @@ class WrittenTranslations(python_utils.OBJECT):
     """
 
     def __init__(self, translations_mapping):
-        """Initializes a WrittenTranslations domain object."""
+        """Initializes a WrittenTranslations domain object.
+
+        Args:
+            translations_mapping: dict. A dict mapping the content Ids
+                to the dicts which is the map of abbreviated code of the
+                languages to WrittenTranslation objects.
+        """
         self.translations_mapping = translations_mapping
 
     def to_dict(self):
@@ -1018,7 +1089,13 @@ class RecordedVoiceovers(python_utils.OBJECT):
     """
 
     def __init__(self, voiceovers_mapping):
-        """Initializes a RecordedVoiceovers domain object."""
+        """Initializes a RecordedVoiceovers domain object.
+
+          Args:
+            voiceovers_mapping: dict. A dict mapping the content Ids
+                to the dicts which is the map of abbreviated code of the
+                languages to the Voiceover objects.
+        """
         self.voiceovers_mapping = voiceovers_mapping
 
     def to_dict(self):
@@ -1340,7 +1417,15 @@ class SubtitledHtml(python_utils.OBJECT):
 
     @classmethod
     def create_default_subtitled_html(cls, content_id):
-        """Create a default SubtitledHtml domain object."""
+        """Create a default SubtitledHtml domain object.
+
+        Args:
+            content_id: str. the id of the content.
+
+        Returns:
+            SubtitledHtml. A default SubtitledHtml domain object, some
+            attribute of that object will be ''.
+        """
         return cls(content_id, '')
 
 
@@ -1466,7 +1551,7 @@ class State(python_utils.OBJECT):
         """Returns the content belongs to a given content id of the object.
 
         Args:
-            content_id: The id of the content.
+            content_id: str. The id of the content.
 
         Returns:
             str. The html content corresponding to the given content id.
@@ -1480,8 +1565,46 @@ class State(python_utils.OBJECT):
 
         return content_id_to_html[content_id]
 
+    def is_rte_content_supported_on_android(self):
+        """Checks whether the RTE components used in the state are supported by
+        Android.
+
+        Returns:
+            bool. Whether the RTE components in the state is valid.
+        """
+        def require_valid_component_names(html):
+            """Checks if the provided html string contains only whitelisted
+            RTE tags.
+
+            Args:
+                html: str. The html string.
+
+            Returns:
+                bool. Whether all RTE tags in the html are whitelisted.
+            """
+            component_name_prefix = 'oppia-noninteractive-'
+            component_names = set([
+                component['id'].replace(component_name_prefix, '')
+                for component in html_cleaner.get_rte_components(html)])
+            return any(component_names.difference(
+                android_validation_constants.VALID_RTE_COMPONENTS))
+
+        if self.content and require_valid_component_names(
+                self.content.html):
+            return False
+
+        return self.interaction.is_rte_content_supported_on_android(
+            require_valid_component_names)
+
     def get_training_data(self):
-        """Retrieves training data from the State domain object."""
+        """Retrieves training data from the State domain object.
+
+        Returns:
+            list(dict). A list of dicts, each of which has two key-value pairs.
+                One pair maps 'answer_group_index' to the index of the answer
+                group and the other maps 'answers' to the answer group's
+                training data.
+        """
         state_training_data_by_answer_group = []
         for (answer_group_index, answer_group) in enumerate(
                 self.interaction.answer_groups):
@@ -1723,12 +1846,11 @@ class State(python_utils.OBJECT):
         self._update_content_ids_in_assets(
             old_content_id_list, new_content_id_list)
 
-    def update_interaction_default_outcome(self, default_outcome_dict):
+    def update_interaction_default_outcome(self, default_outcome):
         """Update the default_outcome of InteractionInstance domain object.
 
         Args:
-            default_outcome_dict: dict. Dict that represents Outcome domain
-                object.
+            default_outcome: Outcome. Object representing the new Outcome.
         """
         old_content_id_list = []
         new_content_id_list = []
@@ -1736,13 +1858,8 @@ class State(python_utils.OBJECT):
             old_content_id_list.append(
                 self.interaction.default_outcome.feedback.content_id)
 
-        if default_outcome_dict:
-            if not isinstance(default_outcome_dict, dict):
-                raise Exception(
-                    'Expected default_outcome_dict to be a dict, received %s'
-                    % default_outcome_dict)
-            self.interaction.default_outcome = Outcome.from_dict(
-                default_outcome_dict)
+        if default_outcome:
+            self.interaction.default_outcome = default_outcome
             new_content_id_list.append(
                 self.interaction.default_outcome.feedback.content_id)
         else:
@@ -1775,8 +1892,7 @@ class State(python_utils.OBJECT):
         """Update the list of hints.
 
         Args:
-            hints_list: list(dict). A list of dict; each dict represents a Hint
-                object.
+            hints_list: list(Hint). A list of Hint objects.
 
         Raises:
             Exception: 'hints_list' is not a list.
@@ -1787,24 +1903,21 @@ class State(python_utils.OBJECT):
                 % hints_list)
         old_content_id_list = [
             hint.hint_content.content_id for hint in self.interaction.hints]
-        self.interaction.hints = [
-            Hint.from_dict(hint_dict)
-            for hint_dict in hints_list]
+        self.interaction.hints = copy.deepcopy(hints_list)
 
         new_content_id_list = [
             hint.hint_content.content_id for hint in self.interaction.hints]
         self._update_content_ids_in_assets(
             old_content_id_list, new_content_id_list)
 
-    def update_interaction_solution(self, solution_dict):
+    def update_interaction_solution(self, solution):
         """Update the solution of interaction.
 
         Args:
-            solution_dict: dict or None. The dict representation of
-                Solution object.
+            solution: Solution. Object of class Solution.
 
         Raises:
-            Exception: 'solution_dict' is not a dict.
+            Exception: 'solution' is not a domain object.
         """
         old_content_id_list = []
         new_content_id_list = []
@@ -1812,13 +1925,12 @@ class State(python_utils.OBJECT):
             old_content_id_list.append(
                 self.interaction.solution.explanation.content_id)
 
-        if solution_dict is not None:
-            if not isinstance(solution_dict, dict):
+        if solution is not None:
+            if not isinstance(solution, Solution):
                 raise Exception(
-                    'Expected solution to be a dict, received %s'
-                    % solution_dict)
-            self.interaction.solution = Solution.from_dict(
-                self.interaction.id, solution_dict)
+                    'Expected solution to be a Solution object,recieved %s'
+                    % solution)
+            self.interaction.solution = solution
             new_content_id_list.append(
                 self.interaction.solution.explanation.content_id)
         else:

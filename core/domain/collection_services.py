@@ -992,28 +992,18 @@ def compute_summary_of_collection(collection, contributor_id_to_add):
     # Update the contributor id list if necessary (contributors
     # defined as humans who have made a positive (i.e. not just
     # a revert) change to an collection's content).
-    if collection_summary_model:
-        contributor_ids = collection_summary_model.contributor_ids
-        contributors_summary = collection_summary_model.contributors_summary
-    else:
-        contributor_ids = []
-        contributors_summary = {}
+    contributors_summary = (
+        collection_summary_model.contributors_summary
+        if collection_summary_model else {})
 
-    if (contributor_id_to_add is not None and
-            contributor_id_to_add not in constants.SYSTEM_USER_IDS and
-            contributor_id_to_add not in contributor_ids):
-        contributor_ids.append(contributor_id_to_add)
-
-    if contributor_id_to_add not in constants.SYSTEM_USER_IDS:
-        if contributor_id_to_add is None:
-            # Revert commit or other non-positive commit.
-            contributors_summary = compute_collection_contributors_summary(
-                collection.id)
-        else:
-            if contributor_id_to_add in contributors_summary:
-                contributors_summary[contributor_id_to_add] += 1
-            else:
-                contributors_summary[contributor_id_to_add] = 1
+    if contributor_id_to_add is None:
+        # Recalculate the contributors because revert was done.
+        contributors_summary = compute_collection_contributors_summary(
+            collection.id)
+    elif contributor_id_to_add not in constants.SYSTEM_USER_IDS:
+        contributors_summary[contributor_id_to_add] = (
+            contributors_summary.get(contributor_id_to_add, 0) + 1)
+    contributor_ids = list(contributors_summary.keys())
 
     collection_model_last_updated = collection.last_updated
     collection_model_created_on = collection.created_on
@@ -1068,29 +1058,37 @@ def save_collection_summary(collection_summary):
         collection_summary: The collection summary object to be saved in the
             datastore.
     """
-    collection_summary_model = collection_models.CollectionSummaryModel(
-        id=collection_summary.id,
-        title=collection_summary.title,
-        category=collection_summary.category,
-        objective=collection_summary.objective,
-        language_code=collection_summary.language_code,
-        tags=collection_summary.tags,
-        status=collection_summary.status,
-        community_owned=collection_summary.community_owned,
-        owner_ids=collection_summary.owner_ids,
-        editor_ids=collection_summary.editor_ids,
-        viewer_ids=collection_summary.viewer_ids,
-        contributor_ids=collection_summary.contributor_ids,
-        contributors_summary=collection_summary.contributors_summary,
-        version=collection_summary.version,
-        node_count=collection_summary.node_count,
-        collection_model_last_updated=(
+    collection_summary_dict = {
+        'title': collection_summary.title,
+        'category': collection_summary.category,
+        'objective': collection_summary.objective,
+        'language_code': collection_summary.language_code,
+        'tags': collection_summary.tags,
+        'status': collection_summary.status,
+        'community_owned': collection_summary.community_owned,
+        'owner_ids': collection_summary.owner_ids,
+        'editor_ids': collection_summary.editor_ids,
+        'viewer_ids': collection_summary.viewer_ids,
+        'contributor_ids': collection_summary.contributor_ids,
+        'contributors_summary': collection_summary.contributors_summary,
+        'version': collection_summary.version,
+        'node_count': collection_summary.node_count,
+        'collection_model_last_updated': (
             collection_summary.collection_model_last_updated),
-        collection_model_created_on=(
+        'collection_model_created_on': (
             collection_summary.collection_model_created_on)
-    )
+    }
 
-    collection_summary_model.put()
+    collection_summary_model = (
+        collection_models.CollectionSummaryModel.get_by_id(
+            collection_summary.id))
+    if collection_summary_model is not None:
+        collection_summary_model.populate(**collection_summary_dict)
+        collection_summary_model.put()
+    else:
+        collection_summary_dict['id'] = collection_summary.id
+        collection_models.CollectionSummaryModel(
+            **collection_summary_dict).put()
 
 
 def delete_collection_summaries(collection_ids):

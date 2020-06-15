@@ -1,4 +1,4 @@
-{ 
+{
   "extends": "stylelint-config-recommended",
   "processors": ["@mapbox/stylelint-processor-arbitrary-tags"],
   "rules": {
@@ -7,7 +7,7 @@
     "selector-type-no-unknown": [
       true,
       {
-        ignore: ["custom-elements"]
+        "ignore": ["custom-elements"]
       }
     ],
     "block-closing-brace-newline-after": "always",
@@ -17,6 +17,6 @@
     "block-opening-brace-space-after": "always-single-line",
     "block-opening-brace-space-before": "always",
     "declaration-colon-space-after": "always",
-    "declaration-colon-space-before": "never",
+    "declaration-colon-space-before": "never"
   }
 }

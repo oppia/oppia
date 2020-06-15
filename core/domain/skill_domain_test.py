@@ -35,24 +35,34 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(SkillDomainUnitTests, self).setUp()
+        example_1 = skill_domain.WorkedExample(
+            state_domain.SubtitledHtml('2', '<p>Example Question 1</p>'),
+            state_domain.SubtitledHtml('3', '<p>Example Explanation 1</p>')
+        )
         skill_contents = skill_domain.SkillContents(
             state_domain.SubtitledHtml(
-                '1', '<p>Explanation</p>'), [
-                    state_domain.SubtitledHtml('2', '<p>Example 1</p>')],
-            state_domain.RecordedVoiceovers.from_dict(
-                {'voiceovers_mapping': {'1': {}, '2': {}}}),
-            state_domain.WrittenTranslations.from_dict(
-                {'translations_mapping': {'1': {}, '2': {}}}))
+                '1', '<p>Explanation</p>'), [example_1],
+            state_domain.RecordedVoiceovers.from_dict({
+                'voiceovers_mapping': {
+                    '1': {}, '2': {}, '3': {}
+                }
+            }),
+            state_domain.WrittenTranslations.from_dict({
+                'translations_mapping': {
+                    '1': {}, '2': {}, '3': {}
+                }
+            })
+        )
         misconceptions = [skill_domain.Misconception(
             self.MISCONCEPTION_ID, 'name', '<p>notes</p>',
             '<p>default_feedback</p>', True)]
         rubrics = [
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], '<p>Explanation 1</p>'),
+                constants.SKILL_DIFFICULTIES[0], ['<p>Explanation 1</p>']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], '<p>Explanation 2</p>'),
+                constants.SKILL_DIFFICULTIES[1], ['<p>Explanation 2</p>']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], '<p>Explanation 3</p>')]
+                constants.SKILL_DIFFICULTIES[2], ['<p>Explanation 3</p>'])]
         self.skill = skill_domain.Skill(
             self.SKILL_ID, 'Description', misconceptions, rubrics,
             skill_contents, feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION,
@@ -82,16 +92,21 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             'Expected misconception ID to be an integer')
 
+    def test_get_all_html_content_strings(self):
+        html_strings = self.skill.get_all_html_content_strings()
+        self.assertEqual(len(html_strings), 8)
+
     def test_valid_misconception_name(self):
         misconception_name = 'This string is smaller than 50'
         self.skill.update_misconception_name(0, misconception_name)
         self.skill.validate()
-        misconception_name = ('This string is a larger string'
-                              'and it is greater than 50 chars.')
+        misconception_name = (
+            'etiam non quam lacus suspendisse faucibus interdum posuere lorem '
+            'ipsum dolor sit amet consectetur adipiscing elit duis tristique '
+            'sollicitudin nibh sit amet commodo nulla facilisi')
         self.skill.update_misconception_name(0, misconception_name)
         self._assert_validation_error(
-            'The length of misconception_name should '
-            'be between 1 and 50 characters'
+            'Misconception name should be less than 100 chars'
         )
 
     def test_valid_misconception_must_be_addressed(self):
@@ -117,31 +132,36 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
 
         self.skill.rubrics = [
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], '<p>Explanation</p>'),
+                constants.SKILL_DIFFICULTIES[0], ['<p>Explanation</p>']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], '<p>Another Explanation</p>')]
+                constants.SKILL_DIFFICULTIES[0], ['<p>Another Explanation</p>'])
+        ]
         self._assert_validation_error('Duplicate rubric found')
 
     def test_valid_rubric_difficulty(self):
         self.skill.rubrics = [skill_domain.Rubric(
-            'invalid_difficulty', '<p>Explanation</p>')]
+            'invalid_difficulty', ['<p>Explanation</p>'])]
         self._assert_validation_error('Invalid difficulty received for rubric')
 
     def test_valid_rubric_difficulty_type(self):
-        self.skill.rubrics = [skill_domain.Rubric(10, '<p>Explanation</p>')]
+        self.skill.rubrics = [skill_domain.Rubric(10, ['<p>Explanation</p>'])]
         self._assert_validation_error('Expected difficulty to be a string')
 
     def test_valid_rubric_explanation(self):
-        self.skill.rubrics[0].explanation = 0
-        self._assert_validation_error('Expected explanation to be a string')
+        self.skill.rubrics[0].explanations = 0
+        self._assert_validation_error('Expected explanations to be a list')
+
+        self.skill.rubrics[0].explanations = [0]
+        self._assert_validation_error(
+            'Expected each explanation to be a string')
 
     def test_rubric_present_for_all_difficulties(self):
         self.skill.validate()
         self.skill.rubrics = [
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], '<p>Explanation 1</p>'),
+                constants.SKILL_DIFFICULTIES[0], ['<p>Explanation 1</p>']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], '<p>Explanation 2</p>')
+                constants.SKILL_DIFFICULTIES[1], ['<p>Explanation 2</p>'])
         ]
         self._assert_validation_error(
             'All 3 difficulties should be addressed in rubrics')
@@ -149,11 +169,11 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
     def test_order_of_rubrics(self):
         self.skill.rubrics = [
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], '<p>Explanation 1</p>'),
+                constants.SKILL_DIFFICULTIES[1], ['<p>Explanation 1</p>']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], '<p>Explanation 2</p>'),
+                constants.SKILL_DIFFICULTIES[2], ['<p>Explanation 2</p>']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], '<p>Explanation 3</p>')
+                constants.SKILL_DIFFICULTIES[0], ['<p>Explanation 3</p>'])
         ]
         self._assert_validation_error(
             'The difficulties should be ordered as follows')
@@ -161,6 +181,13 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
     def test_description_validation(self):
         self.skill.description = 0
         self._assert_validation_error('Description should be a string')
+
+        self.skill.description = (
+            'etiam non quam lacus suspendisse faucibus interdum posuere lorem '
+            'ipsum dolor sit amet consectetur adipiscing elit duis tristique '
+            'sollicitudin nibh sit amet commodo nulla facilisi')
+        self._assert_validation_error(
+            'Skill description should be less than 100 chars')
 
     def test_prerequisite_skill_ids_validation(self):
         self.skill.prerequisite_skill_ids = 0
@@ -232,7 +259,19 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
 
         self.skill.skill_contents.worked_examples = [1]
         self._assert_validation_error(
-            'Expected worked example to be a SubtitledHtml object')
+            'Expected worked example to be a WorkedExample object')
+
+        example = skill_domain.WorkedExample('question', 'explanation')
+        self.skill.skill_contents.worked_examples = [example]
+        self._assert_validation_error(
+            'Expected example question to be a SubtitledHtml object')
+
+        example = skill_domain.WorkedExample(
+            state_domain.SubtitledHtml(
+                '2', '<p>Example Question 1</p>'), 'explanation')
+        self.skill.skill_contents.worked_examples = [example]
+        self._assert_validation_error(
+            'Expected example explanation to be a SubtitledHtml object')
 
         self.skill.skill_contents.explanation = 'explanation'
         self._assert_validation_error(
@@ -244,7 +283,16 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
 
     def test_validate_duplicate_content_id(self):
         self.skill.skill_contents.worked_examples = (
-            [self.skill.skill_contents.explanation])
+            [skill_domain.WorkedExample(
+                self.skill.skill_contents.explanation,
+                self.skill.skill_contents.explanation)])
+        self._assert_validation_error('Found a duplicate content id 1')
+
+        example_1 = skill_domain.WorkedExample(
+            state_domain.SubtitledHtml('4', '<p>Example Question 1</p>'),
+            state_domain.SubtitledHtml('1', '<p>Example Explanation 1</p>')
+        )
+        self.skill.skill_contents.worked_examples = [example_1]
         self._assert_validation_error('Found a duplicate content id 1')
 
     def test_misconception_id_validation(self):
@@ -274,13 +322,13 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         rubrics = [
             skill_domain.Rubric(
                 constants.SKILL_DIFFICULTIES[0],
-                '<p>[NOTE: Creator should fill this in]</p>'),
+                ['<p>[NOTE: Creator should fill this in]</p>']),
             skill_domain.Rubric(
                 constants.SKILL_DIFFICULTIES[1],
-                '<p>[NOTE: Creator should fill this in]</p>'),
+                ['<p>[NOTE: Creator should fill this in]</p>']),
             skill_domain.Rubric(
                 constants.SKILL_DIFFICULTIES[2],
-                '<p>[NOTE: Creator should fill this in]</p>')]
+                ['<p>[NOTE: Creator should fill this in]</p>'])]
         skill = skill_domain.Skill.create_default_skill(
             self.SKILL_ID, 'Description', rubrics)
         expected_skill_dict = {
@@ -327,13 +375,23 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         """Test that to_dict and from_dict preserve all data within a
         skill_contents and misconception object.
         """
+        example_1 = skill_domain.WorkedExample(
+            state_domain.SubtitledHtml('2', '<p>Example Question 1</p>'),
+            state_domain.SubtitledHtml('3', '<p>Example Answer 1</p>')
+        )
         skill_contents = skill_domain.SkillContents(
-            state_domain.SubtitledHtml('1', '<p>Explanation</p>'), [
-                state_domain.SubtitledHtml('2', '<p>Example 1</p>')],
-            state_domain.RecordedVoiceovers.from_dict(
-                {'voiceovers_mapping': {'1': {}, '2': {}}}),
-            state_domain.WrittenTranslations.from_dict(
-                {'translations_mapping': {'1': {}, '2': {}}}))
+            state_domain.SubtitledHtml('1', '<p>Explanation</p>'), [example_1],
+            state_domain.RecordedVoiceovers.from_dict({
+                'voiceovers_mapping': {
+                    '1': {}, '2': {}, '3': {}
+                }
+            }),
+            state_domain.WrittenTranslations.from_dict({
+                'translations_mapping': {
+                    '1': {}, '2': {}, '3': {}
+                }
+            })
+        )
         skill_contents_dict = skill_contents.to_dict()
         skill_contents_from_dict = skill_domain.SkillContents.from_dict(
             skill_contents_dict)
@@ -346,7 +404,7 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
             misconceptions_dict)
 
         rubric = skill_domain.Rubric(
-            constants.SKILL_DIFFICULTIES[0], '<p>Explanation</p>')
+            constants.SKILL_DIFFICULTIES[0], ['<p>Explanation</p>'])
         rubric_dict = rubric.to_dict()
         rubric_from_dict = skill_domain.Rubric.from_dict(rubric_dict)
         self.assertEqual(
@@ -369,16 +427,32 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
             observed_skill_mastery.to_dict())
 
     def test_update_worked_examples(self):
+        question_1 = {
+            'content_id': 'question_1',
+            'html': '<p>Worked example question 1</p>'
+        }
+        explanation_1 = {
+            'content_id': 'explanation_1',
+            'html': '<p>Worked example explanation 1</p>'
+        }
+        question_2 = {
+            'content_id': 'question_2',
+            'html': '<p>Worked example question 2</p>'
+        }
+        explanation_2 = {
+            'content_id': 'explanation_2',
+            'html': '<p>Worked example explanation 2</p>'
+        }
         worked_examples_dict_list = [{
-            'content_id': 'worked_example_1',
-            'html': '<p>Worked example</p>'
+            'question': question_1,
+            'explanation': explanation_1
         }, {
-            'content_id': 'worked_example_2',
-            'html': '<p>Another worked example</p>'
+            'question': question_2,
+            'explanation': explanation_2
         }]
 
         worked_examples_object_list = [
-            state_domain.SubtitledHtml.from_dict(worked_example)
+            skill_domain.WorkedExample.from_dict(worked_example)
             for worked_example in worked_examples_dict_list]
 
         self.skill.update_worked_examples(worked_examples_object_list)
@@ -493,13 +567,14 @@ class SkillChangeTests(test_utils.GenericTestBase):
         skill_change_object = skill_domain.SkillChange({
             'cmd': 'update_rubrics',
             'difficulty': constants.SKILL_DIFFICULTIES[0],
-            'explanation': '<p>Explanation</p>'
+            'explanations': ['<p>Explanation</p>']
         })
 
         self.assertEqual(skill_change_object.cmd, 'update_rubrics')
         self.assertEqual(
             skill_change_object.difficulty, constants.SKILL_DIFFICULTIES[0])
-        self.assertEqual(skill_change_object.explanation, '<p>Explanation</p>')
+        self.assertEqual(
+            skill_change_object.explanations, ['<p>Explanation</p>'])
 
     def test_skill_change_object_with_delete_skill_misconception(self):
         skill_change_object = skill_domain.SkillChange({

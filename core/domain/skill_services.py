@@ -20,6 +20,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import copy
 import logging
 
+from core.domain import html_cleaner
 from core.domain import opportunity_services
 from core.domain import role_services
 from core.domain import skill_domain
@@ -342,6 +343,19 @@ def get_skill_summary_from_model(skill_summary_model):
     )
 
 
+def get_image_filenames_from_skill(skill):
+    """Get the image filenames from the skill.
+
+    Args:
+        skill: Skill. The skill itself.
+
+    Returns:
+       list(str). List containing the name of the image files in skill.
+    """
+    html_list = skill.get_all_html_content_strings()
+    return html_cleaner.get_image_filenames_from_html_strings(html_list)
+
+
 def get_skill_by_id(skill_id, strict=True, version=None):
     """Returns a domain object representing a skill.
 
@@ -500,15 +514,18 @@ def apply_change_list(skill_id, change_list, committer_id):
             elif change.cmd == skill_domain.CMD_UPDATE_SKILL_CONTENTS_PROPERTY:
                 if (change.property_name ==
                         skill_domain.SKILL_CONTENTS_PROPERTY_EXPLANATION):
-                    skill.update_explanation(change.new_value)
+                    skill.update_explanation(
+                        state_domain.SubtitledHtml.from_dict(change.new_value))
                 elif (change.property_name ==
                       skill_domain.SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES):
                     worked_examples_list = [
-                        state_domain.SubtitledHtml.from_dict(worked_example)
+                        skill_domain.WorkedExample.from_dict(worked_example)
                         for worked_example in change.new_value]
                     skill.update_worked_examples(worked_examples_list)
             elif change.cmd == skill_domain.CMD_ADD_SKILL_MISCONCEPTION:
-                skill.add_misconception(change.new_misconception_dict)
+                misconception = skill_domain.Misconception.from_dict(
+                    change.new_misconception_dict)
+                skill.add_misconception(misconception)
             elif change.cmd == skill_domain.CMD_DELETE_SKILL_MISCONCEPTION:
                 skill.delete_misconception(change.misconception_id)
             elif change.cmd == skill_domain.CMD_ADD_PREREQUISITE_SKILL:
@@ -517,7 +534,7 @@ def apply_change_list(skill_id, change_list, committer_id):
                 skill.delete_prerequisite_skill(change.skill_id)
             elif change.cmd == skill_domain.CMD_UPDATE_RUBRICS:
                 skill.update_rubric(
-                    change.difficulty, change.explanation)
+                    change.difficulty, change.explanations)
             elif (change.cmd ==
                   skill_domain.CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY):
                 if (change.property_name ==
@@ -730,20 +747,26 @@ def save_skill_summary(skill_summary):
         skill_summary: The skill summary object to be saved in the
             datastore.
     """
-    skill_summary_model = skill_models.SkillSummaryModel(
-        id=skill_summary.id,
-        description=skill_summary.description,
-        language_code=skill_summary.language_code,
-        version=skill_summary.version,
-        misconception_count=skill_summary.misconception_count,
-        worked_examples_count=skill_summary.worked_examples_count,
-        skill_model_last_updated=(
+    skill_summary_dict = {
+        'description': skill_summary.description,
+        'language_code': skill_summary.language_code,
+        'version': skill_summary.version,
+        'misconception_count': skill_summary.misconception_count,
+        'worked_examples_count': skill_summary.worked_examples_count,
+        'skill_model_last_updated': (
             skill_summary.skill_model_last_updated),
-        skill_model_created_on=(
+        'skill_model_created_on': (
             skill_summary.skill_model_created_on)
-    )
+    }
 
-    skill_summary_model.put()
+    skill_summary_model = (
+        skill_models.SkillSummaryModel.get_by_id(skill_summary.id))
+    if skill_summary_model is not None:
+        skill_summary_model.populate(**skill_summary_dict)
+        skill_summary_model.put()
+    else:
+        skill_summary_dict['id'] = skill_summary.id
+        skill_models.SkillSummaryModel(**skill_summary_dict).put()
 
 
 def create_user_skill_mastery(user_id, skill_id, degree_of_mastery):
@@ -866,3 +889,31 @@ def skill_has_associated_questions(skill_id):
         question_models.QuestionSkillLinkModel.get_all_question_ids_linked_to_skill_id( # pylint: disable=line-too-long
             skill_id))
     return len(question_ids) > 0
+
+
+def filter_skills_by_mastery(user_id, skill_ids):
+    """Given a list of skill_ids, it returns a list of
+    feconf.MAX_NUMBER_OF_SKILL_IDS skill_ids in which the user has
+    the least mastery.(Please note that python 2.7 considers the None
+    type smaller than any value, so None types will be returned first)
+
+    Args:
+        user_id: str. The unique user ID of the user.
+        skill_ids: list(str). The skill_ids that are to be filtered.
+
+    Returns:
+        list(str). A list of the filtered skill_ids.
+    """
+    degrees_of_mastery = get_multi_user_skill_mastery(user_id, skill_ids)
+
+    sorted_skill_ids = sorted(
+        degrees_of_mastery, key=degrees_of_mastery.get)
+
+    filtered_skill_ids = sorted_skill_ids[:feconf.MAX_NUMBER_OF_SKILL_IDS]
+
+    # Arranges the skill_ids in the order as it was received.
+    arranged_filtered_skill_ids = []
+    for i in python_utils.RANGE(len(skill_ids)):
+        if skill_ids[i] in filtered_skill_ids:
+            arranged_filtered_skill_ids.append(skill_ids[i])
+    return arranged_filtered_skill_ids

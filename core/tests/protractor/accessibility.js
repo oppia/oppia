@@ -29,28 +29,30 @@ describe('screenreader and keyboard user accessibility features', function() {
     libraryPage = new LibraryPage.LibraryPage();
   });
 
-  it('should skip to the main content element', function() {
-    libraryPage.get();
-    browser.actions().sendKeys(protractor.Key.TAB).perform();
+  it('should skip to the main content element', async function() {
+    await libraryPage.get();
+    await browser.actions().sendKeys(protractor.Key.TAB).perform();
     var skipLink = element(by.css('.protractor-test-skip-link'));
-    waitFor.elementToBeClickable(skipLink, 'Could not click skip link');
-    skipLink.click();
+    await waitFor.elementToBeClickable(skipLink, 'Could not click skip link');
+    await skipLink.click();
     var mainContent = element(by.css('.protractor-test-main-content'));
-    expect(mainContent.getAttribute('id'))
-      .toEqual(browser.driver.switchTo().activeElement().getAttribute('id'));
+    expect(await mainContent.getAttribute('id')).toEqual(
+      await (await browser.driver.switchTo().activeElement())
+        .getAttribute('id'));
   });
 
-  afterEach(function() {
-    general.checkForConsoleErrors([]);
+  afterEach(async function() {
+    await general.checkForConsoleErrors([]);
   });
 });
 
 describe('Cache Slugs', function() {
-  it('should check that errors get logged for missing resources', function() {
-    browser.get('/console_errors');
-    var expectedErrors = [
-      'http://localhost:9001/build/fail/logo/288x128_logo_white.png'
-    ];
-    general.checkConsoleErrorsExist(expectedErrors);
-  });
+  it('should check that errors get logged for missing resources',
+    async function() {
+      await browser.get('/console_errors');
+      var expectedErrors = [
+        'http://localhost:9001/build/fail/logo/288x128_logo_white.png'
+      ];
+      await general.checkForConsoleErrors(expectedErrors);
+    });
 });

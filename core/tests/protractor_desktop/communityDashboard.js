@@ -25,21 +25,22 @@ describe('Community dashboard page', function() {
   var communityDashboardPage = null;
   var communityDashboardTranslateTextTab = null;
 
-  beforeAll(function() {
+  beforeAll(async function() {
     communityDashboardPage = (
       new CommunityDashboardPage.CommunityDashboardPage());
     communityDashboardTranslateTextTab = (
       communityDashboardPage.getTranslateTextTab());
-    browser.get('/community_dashboard');
+    await browser.get('/community-dashboard');
   });
 
-  it('should allow user to switch to translate text tab', function() {
-    communityDashboardPage.navigateToTranslateTextTab();
-    communityDashboardTranslateTextTab.changeLanguage('Hindi');
-    communityDashboardTranslateTextTab.expectSelectedLanguageToBe('Hindi');
+  it('should allow user to switch to translate text tab', async function() {
+    await communityDashboardPage.navigateToTranslateTextTab();
+    await communityDashboardTranslateTextTab.changeLanguage('Hindi');
+    await communityDashboardTranslateTextTab.expectSelectedLanguageToBe(
+      'Hindi');
   });
 
-  afterEach(function() {
-    general.checkForConsoleErrors([]);
+  afterEach(async function() {
+    await general.checkForConsoleErrors([]);
   });
 });

@@ -1356,7 +1356,6 @@ def can_modify_exploration_roles(handler):
     """Decorators to check whether user can manage rights related to an
     exploration.
 
-
     Args:
         handler: function. The function to be decorated.
 
@@ -1562,6 +1561,11 @@ def can_edit_topic(handler):
         """
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
+
+        try:
+            topic_domain.Topic.require_valid_topic_id(topic_id)
+        except Exception as e:
+            raise self.PageNotFoundException(e)
 
         topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
         topic_rights = topic_services.get_topic_rights(topic_id, strict=False)
@@ -1772,6 +1776,11 @@ def can_add_new_story_to_topic(handler):
         """
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
+
+        try:
+            topic_domain.Topic.require_valid_topic_id(topic_id)
+        except Exception as e:
+            raise self.PageNotFoundException(e)
 
         topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
         topic_rights = topic_services.get_topic_rights(topic_id, strict=False)
@@ -2046,6 +2055,11 @@ def can_delete_topic(handler):
         if not self.user_id:
             raise self.NotLoggedInException
 
+        try:
+            topic_domain.Topic.require_valid_topic_id(topic_id)
+        except Exception as e:
+            raise self.PageNotFoundException(e)
+
         user_actions_info = user_services.UserActionsInfo(self.user_id)
 
         if role_services.ACTION_DELETE_TOPIC in user_actions_info.actions:
@@ -2174,7 +2188,10 @@ def can_view_any_topic_editor(handler):
         """
         if not self.user_id:
             raise self.NotLoggedInException
-        topic_domain.Topic.require_valid_topic_id(topic_id)
+        try:
+            topic_domain.Topic.require_valid_topic_id(topic_id)
+        except Exception as e:
+            raise self.PageNotFoundException(e)
 
         user_actions_info = user_services.UserActionsInfo(self.user_id)
 
@@ -2246,10 +2263,11 @@ def can_change_topic_publication_status(handler):
             if the user can publish or unpublish a topic.
     """
 
-    def test_can_change_topic_publication_status(self, **kwargs):
+    def test_can_change_topic_publication_status(self, topic_id, **kwargs):
         """Checks whether the user can can publish or unpublish a topic.
 
         Args:
+            topic_id: str. The topic id.
             **kwargs: *. Keyword arguments.
 
         Returns:
@@ -2263,12 +2281,17 @@ def can_change_topic_publication_status(handler):
         if not self.user_id:
             raise self.NotLoggedInException
 
+        try:
+            topic_domain.Topic.require_valid_topic_id(topic_id)
+        except Exception as e:
+            raise self.PageNotFoundException(e)
+
         user_actions_info = user_services.UserActionsInfo(self.user_id)
 
         if (
                 role_services.ACTION_CHANGE_TOPIC_STATUS in
                 user_actions_info.actions):
-            return handler(self, **kwargs)
+            return handler(self, topic_id, **kwargs)
         else:
             raise self.UnauthorizedUserException(
                 '%s does not have enough rights to publish or unpublish the '
@@ -2502,9 +2525,23 @@ def get_decorator_for_accepting_suggestion(decorator):
             if suggestion is None:
                 raise self.PageNotFoundException
 
+            # TODO(#6671): Currently, the check_user_can_review_in_category is
+            # not in use as the suggestion scoring system is not enabled.
+            # Remove this check once the new scoring structure gets implemented.
             if suggestion_services.check_user_can_review_in_category(
                     self.user_id, suggestion.score_category):
                 return handler(self, target_id, suggestion_id, **kwargs)
+
+            if suggestion.suggestion_type == (
+                    suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT):
+                if user_services.can_review_translation_suggestions(
+                        self.user_id,
+                        language_code=suggestion.change.language_code):
+                    return handler(self, target_id, suggestion_id, **kwargs)
+            elif suggestion.suggestion_type == (
+                    suggestion_models.SUGGESTION_TYPE_ADD_QUESTION):
+                if user_services.can_review_question_suggestions(self.user_id):
+                    return handler(self, target_id, suggestion_id, **kwargs)
 
             return decorator(handler)(self, target_id, suggestion_id, **kwargs)
 
@@ -2512,6 +2549,50 @@ def get_decorator_for_accepting_suggestion(decorator):
         return test_can_accept_suggestion
 
     return generate_decorator_for_handler
+
+
+def can_view_reviewable_suggestions(handler):
+    """Decorator to check whether user can view the list of suggestions that
+    they are allowed to review.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now checks
+            if the user can view reviewable suggestions.
+    """
+    def test_can_view_reviewable_suggestions(
+            self, target_type, suggestion_type, **kwargs):
+        """Checks whether the user can view reviewable suggestions.
+
+        Args:
+            target_type: str. The entity type of the target of the suggestion.
+            suggestion_type: str. The type of the suggestion.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            PageNotFoundException: The given page cannot be found.
+        """
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+        if suggestion_type == (
+                suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT):
+            if user_services.can_review_translation_suggestions(self.user_id):
+                return handler(self, target_type, suggestion_type, **kwargs)
+        elif suggestion_type == (
+                suggestion_models.SUGGESTION_TYPE_ADD_QUESTION):
+            if user_services.can_review_question_suggestions(self.user_id):
+                return handler(self, target_type, suggestion_type, **kwargs)
+        else:
+            raise self.PageNotFoundException
+
+    test_can_view_reviewable_suggestions.__wrapped__ = True
+
+    return test_can_view_reviewable_suggestions
 
 
 def can_edit_entity(handler):

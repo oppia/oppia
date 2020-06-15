@@ -223,8 +223,8 @@ class SubtopicPage(python_utils.OBJECT):
     def update_page_contents_from_model(
             cls, versioned_page_contents, current_version):
         """Converts the page_contents blob contained in the given
-        versioned_skill_contents dict from current_version to
-        current_version + 1. Note that the versioned_skill_contents being
+        versioned_page_contents dict from current_version to
+        current_version + 1. Note that the versioned_page_contents being
         passed in is modified in-place.
 
         Args:

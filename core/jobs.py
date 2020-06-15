@@ -195,13 +195,20 @@ class BaseJobManager(python_utils.OBJECT):
         cls._post_start_hook(job_id)
 
     @classmethod
-    def register_completion(cls, job_id, output_list):
+    def register_completion(
+            cls, job_id, output_list, max_output_len_chars=None):
         """Marks a job as completed.
 
         Args:
             job_id: str. The ID of the job to complete.
             output_list: list(object). The output produced by the job.
+            max_output_len_chars: int or None. Max length of output_list.
+                If None, the default maximum output length is used.
         """
+        _default_max_len_chars = 900000
+        _max_output_len_chars = (
+            _default_max_len_chars if max_output_len_chars is None else
+            max_output_len_chars)
         # Ensure that preconditions are met.
         model = job_models.JobModel.get(job_id, strict=True)
         cls._require_valid_transition(
@@ -210,14 +217,15 @@ class BaseJobManager(python_utils.OBJECT):
 
         model.status_code = STATUS_CODE_COMPLETED
         model.time_finished_msec = utils.get_current_time_in_millisecs()
-        model.output = cls._compress_output_list(output_list)
+        model.output = cls._compress_output_list(
+            output_list, _max_output_len_chars)
         model.put()
 
         cls._post_completed_hook(job_id)
 
     @classmethod
     def _compress_output_list(
-            cls, output_list, test_only_max_output_len_chars=None):
+            cls, output_list, max_output_len_chars):
         """Returns compressed list of strings within a max length of chars.
 
         Ensures that the payload (i.e.,
@@ -226,13 +234,11 @@ class BaseJobManager(python_utils.OBJECT):
 
         Args:
             output_list: list(*). Collection of objects to be stringified.
-            test_only_max_output_len_chars: int or None. Overrides the intended
-                max output len limit when not None.
+            max_output_len_chars: int. Maximum length of output_list.
 
         Returns:
             list(str). The compressed stringified output values.
         """
-        _max_output_len_chars = 900000
 
         class _OrderedCounter(collections.Counter, collections.OrderedDict):
             """Counter that remembers the order elements are first encountered.
@@ -252,9 +258,7 @@ class BaseJobManager(python_utils.OBJECT):
         ]
 
         # Truncate outputs to fit within given max length.
-        remaining_len = (
-            _max_output_len_chars if test_only_max_output_len_chars is None else
-            test_only_max_output_len_chars)
+        remaining_len = max_output_len_chars
         for idx, output_str in enumerate(output_str_list):
             remaining_len -= len(output_str)
             if remaining_len < 0:
@@ -1429,11 +1433,16 @@ class BaseContinuousComputationManager(python_utils.OBJECT):
 
     @classmethod
     def _kickoff_batch_job(cls):
-        """Create and enqueue a new batch job."""
+        """Create and enqueue a new batch job.
+
+        Returns:
+            str. The unique id of the new batch job.
+        """
         job_manager = cls._get_batch_job_manager_class()
         job_id = job_manager.create_new()
         job_manager.enqueue(
             job_id, taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS)
+        return job_id
 
     @classmethod
     def _register_end_of_batch_job_and_return_status(cls):
@@ -1472,6 +1481,10 @@ class BaseContinuousComputationManager(python_utils.OBJECT):
     def start_computation(cls):
         """(Re)starts the continuous computation corresponding to this class.
 
+        Returns:
+            str. The unique id of the new batch job beginning/continuing the
+                computation.
+
         Raises:
             Exception: The computation wasn't idle before trying to start.
         """
@@ -1501,7 +1514,7 @@ class BaseContinuousComputationManager(python_utils.OBJECT):
 
         cls._clear_inactive_realtime_layer(datetime.datetime.utcnow())
 
-        cls._kickoff_batch_job()
+        return cls._kickoff_batch_job()
 
     @classmethod
     def stop_computation(cls, user_id):
@@ -1595,8 +1608,12 @@ class BaseContinuousComputationManager(python_utils.OBJECT):
 
     @classmethod
     def _kickoff_batch_job_after_previous_one_ends(cls):
-        """Seam that can be overridden by tests."""
-        cls._kickoff_batch_job()
+        """Seam that can be overridden by tests.
+
+        Returns:
+            str. The unique id of the next batch job to be run.
+        """
+        return cls._kickoff_batch_job()
 
     @classmethod
     def on_batch_job_completion(cls):

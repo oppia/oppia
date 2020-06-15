@@ -17,17 +17,17 @@
  * end-to-end testing with Protractor.js
  */
 
-var objects = require('../../objects/protractor.js');
+var objects = require(process.cwd() + '/extensions/objects/protractor.js');
 
-var customizeComponent = function(modal, rawLatex) {
-  objects.MathLatexStringEditor(
+var customizeComponent = async function(modal, rawLatex) {
+  await objects.MathLatexStringEditor(
     modal.element(by.tagName('math-latex-string-editor'))
   ).setValue(rawLatex);
 };
 
-var expectComponentDetailsToMatch = function(elem, rawLatex) {
+var expectComponentDetailsToMatch = async function(elem, rawLatex) {
   // TODO(Jacob): Check that the actual latex being displayed is correct.
-  expect(elem.getAttribute('raw_latex-with-value')).toMatch(rawLatex);
+  expect(await elem.getAttribute('raw_latex-with-value')).toMatch(rawLatex);
 };
 
 exports.customizeComponent = customizeComponent;

@@ -758,3 +758,60 @@ class GeneralVoiceoverApplicationModelUnitTests(test_utils.GenericTestBase):
         model.author_id = 'author_1'
         model.final_reviewer_id = 'user_non_id'
         self.assertFalse(model.verify_model_user_ids_exist())
+
+    def test_export_data_trivial(self):
+        user_data = (
+            suggestion_models.GeneralVoiceoverApplicationModel
+            .export_data('non_existent_user'))
+        test_data = {}
+        self.assertEqual(user_data, test_data)
+
+    def test_export_data_nontrivial(self):
+        suggestion_models.GeneralVoiceoverApplicationModel(
+            id='application_1_id',
+            target_type='exploration',
+            target_id='exp_id',
+            status=suggestion_models.STATUS_IN_REVIEW,
+            author_id='author_1',
+            final_reviewer_id='reviewer_id',
+            language_code='en',
+            filename='application_audio.mp3',
+            content='<p>Some content</p>',
+            rejection_message=None).put()
+
+        suggestion_models.GeneralVoiceoverApplicationModel(
+            id='application_2_id',
+            target_type='exploration',
+            target_id='exp_id',
+            status=suggestion_models.STATUS_IN_REVIEW,
+            author_id='author_1',
+            final_reviewer_id=None,
+            language_code='en',
+            filename='application_audio.mp3',
+            content='<p>Some content</p>',
+            rejection_message=None).put()
+
+        expected_data = {
+            'application_1_id': {
+                'target_type': 'exploration',
+                'target_id': 'exp_id',
+                'status': 'review',
+                'language_code': 'en',
+                'filename': 'application_audio.mp3',
+                'content': '<p>Some content</p>',
+                'rejection_message': None
+            },
+            'application_2_id': {
+                'target_type': 'exploration',
+                'target_id': 'exp_id',
+                'status': 'review',
+                'language_code': 'en',
+                'filename': 'application_audio.mp3',
+                'content': '<p>Some content</p>',
+                'rejection_message': None
+            }
+        }
+        user_data = (
+            suggestion_models.GeneralVoiceoverApplicationModel
+            .export_data('author_1'))
+        self.assertEqual(expected_data, user_data)
