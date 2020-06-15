@@ -25,18 +25,14 @@ import cloneDeep from 'lodash/cloneDeep';
 
 import { ConceptCardObjectFactory, IConceptCardBackendDict} from
   'domain/skill/ConceptCardObjectFactory';
-import { RecordedVoiceoversObjectFactory } from
-  'domain/exploration/RecordedVoiceoversObjectFactory';
 import { SkillDomainConstants } from
   'domain/skill/skill-domain.constants';
-import { SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
-import { VoiceoverObjectFactory } from
-  'domain/exploration/VoiceoverObjectFactory';
-import { WorkedExampleObjectFactory } from
-  'domain/skill/WorkedExampleObjectFactory';
+
+interface IConceptCardBackendDicts {
+  concept_card_dicts: IConceptCardBackendDict[];
+}
 
 @Injectable({
   providedIn: 'root'
@@ -61,7 +57,7 @@ export class ConceptCardBackendApiService {
 
     var conceptCardObjects = [];
 
-    this.http.get<IConceptCardBackendDict[]>(conceptCardDataUrl).toPromise()
+    this.http.get<IConceptCardBackendDicts>(conceptCardDataUrl).toPromise()
       .then((response) => {
         if (successCallback) {
           var conceptCardDicts = response.concept_card_dicts;
