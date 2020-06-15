@@ -108,7 +108,7 @@ class CyclicStateTransitionsTracker {
   }
 
   foundAnIssue(): boolean {
-    const [ _, occurrences ] = this.getMostCommonCycle();
+    const [_, occurrences] = this.getMostCommonCycle();
     return occurrences >= ServicesConstants.NUM_REPEATED_CYCLES_THRESHOLD;
   }
 
