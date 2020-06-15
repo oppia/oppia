@@ -118,15 +118,51 @@ ALLOWED_SCORE_CATEGORIES = (
     VALID_SCORE_CATEGORIES_FOR_TYPE_QUESTION)
 
 
+class ExternalModelFetcher(python_utils.OBJECT):
+    """Value object representing details to fetch and external model."""
+
+    def __init__(
+            self, field_name, class_name, model_ids):
+        """Initializes a ExternalModelReference domain object.
+
+        Args:
+            field_name: str. A specific name used as an identifier by the
+                storgae model to which the external model reference is related.
+            class_name: str. The name of model class.
+            model_ids: list(str). The list of model ids to fetch..
+        """
+        self.field_name = field_name
+        self.class_name = class_name
+        self.model_ids = model_ids
+
+
+class ExternalModelReference(python_utils.OBJECT):
+    """Value object representing a external model linked to a storgae model."""
+
+    def __init__(
+            self, class_name, model_id, model_instance):
+        """Initializes a ExternalModelReference domain object.
+
+        Args:
+            class_name: str. The name of model class.
+            model_id: str. The id of the model.
+            model_instance: ndb.Model. The gae model object.
+        """
+        self.class_name = class_name
+        self.model_id = model_id
+        self.model_instance = model_instance
+
+
 class BaseModelValidator(python_utils.OBJECT):
     """Base class for validating models."""
 
     # The dict to store errors found during audit of model.
     errors = collections.defaultdict(list)
-    # external_instance_details is keyed by field name. Each value consists
-    # of a list of (model class, external_key, external_model_instance)
-    # tuples.
-    external_instance_details = {}
+    # external_instance_details is keyed by field name. The field name
+    # donates a unique identifier provided by the storage model for
+    # which the external model is being fetched. Each value consists
+    # of a list of ExternalModelReference objects.
+    external_instance_details = collections.defaultdict(list)
 
     @classmethod
     def _get_model_id_regex(cls, unused_item):
@@ -200,9 +236,9 @@ class BaseModelValidator(python_utils.OBJECT):
             item: ndb.Model. Entity to validate.
 
         Returns:
-            dict(str, (ndb.Model, list(str)). A dictionary whose keys are
-            field names of the model to validate, and whose values are tuples
-            that consist of the external model class and list of keys to fetch.
+            list(ExternalModelFetcher). A list whose values are
+                ExternalModelFetcher instances each representing
+                the details for a single type of external model to fetch.
 
         Raises:
             NotImplementedError. This function has not yet been implemented.
@@ -217,10 +253,13 @@ class BaseModelValidator(python_utils.OBJECT):
         Args:
             item: ndb.Model. Entity to validate.
         """
-        for field_name, model_class_model_id_model_tuples in (
+        for field_name, external_model_references in (
                 cls.external_instance_details.items()):
-            for model_class, model_id, model in (
-                    model_class_model_id_model_tuples):
+            for external_model_reference in external_model_references:
+                model_class = external_model_reference.class_name
+                model_id = external_model_reference.model_id
+                model = external_model_reference.model_instance
+
                 if model is None or model.deleted:
                     cls.errors['%s field check' % field_name].append((
                         'Entity id %s: based on field %s having'
@@ -238,23 +277,26 @@ class BaseModelValidator(python_utils.OBJECT):
         Args:
             item: ndb.Model. Entity to validate.
         """
-        multiple_models_keys_to_fetch = {}
-        for field_name_debug, (model_class, keys_to_fetch) in (
-                cls._get_external_id_relationships(item).items()):
-            multiple_models_keys_to_fetch[field_name_debug] = (
-                model_class, keys_to_fetch)
-        fetched_model_instances = (
+        multiple_models_ids_to_fetch = {}
+
+        for external_model_fetcher in cls._get_external_id_relationships(item):
+            multiple_models_ids_to_fetch[external_model_fetcher.field_name] = (
+                external_model_fetcher.class_name,
+                external_model_fetcher.model_ids)
+
+        fetched_model_instances_for_all_ids = (
             datastore_services.fetch_multiple_entities_by_ids_and_models(
-                list(multiple_models_keys_to_fetch.values())))
-        for (
-                field_name, (model_class, field_values)), (
-                    external_instance_details) in python_utils.ZIP(
-                        iter(multiple_models_keys_to_fetch.items()),
-                        fetched_model_instances):
-            cls.external_instance_details[field_name] = (
-                list(python_utils.ZIP(
-                    [model_class] * len(field_values),
-                    field_values, external_instance_details)))
+                list(multiple_models_ids_to_fetch.values())))
+
+        for index, field_name in enumerate(multiple_models_ids_to_fetch):
+            (model_class, model_ids) = multiple_models_ids_to_fetch[field_name]
+            fetched_model_instances = fetched_model_instances_for_all_ids[index]
+
+            for (model_id, model_instance) in python_utils.ZIP(
+                    model_ids, fetched_model_instances):
+                cls.external_instance_details[field_name].append(
+                    ExternalModelReference(
+                        model_class, model_id, model_instance))
 
     @classmethod
     def _validate_model_time_fields(cls, item):
@@ -369,11 +411,14 @@ class BaseSummaryModelValidator(BaseModelValidator):
                 external_model_properties_dict
             ) in cls._get_external_model_properties():
 
-            external_model_class_model_id_model_tuples = (
+            external_model_references = (
                 external_instance_details[external_model_field_key])
 
-            for (model_class, model_id, external_model) in (
-                    external_model_class_model_id_model_tuples):
+            for external_model_reference in external_model_references:
+                model_class = external_model_reference.class_name
+                model_id = external_model_reference.model_id
+                external_model = external_model_reference.model_instance
+
                 if external_model is None or external_model.deleted:
                     cls.errors[
                         '%s field check' % external_model_field_key].append((
@@ -457,12 +502,16 @@ class BaseSnapshotContentModelValidator(BaseModelValidator):
         capitalized_external_model_name = ('').join([
             val.capitalize() for val in name_split_by_space])
 
-        external_model_class_model_id_model_tuples = (
+        external_model_references = (
             external_instance_details['%s_ids' % key_to_fetch])
 
         version = item.id[item.id.rfind('-') + 1:]
-        for (model_class, model_id, external_model) in (
-                external_model_class_model_id_model_tuples):
+
+        for external_model_reference in external_model_references:
+            model_class = external_model_reference.class_name
+            model_id = external_model_reference.model_id
+            external_model = external_model_reference.model_instance
+
             if external_model is None or external_model.deleted:
                 cls.errors['%s_ids field check' % key_to_fetch].append((
                     'Entity id %s: based on field %s_ids having'
@@ -662,10 +711,14 @@ class BaseUserModelValidator(BaseModelValidator):
             return
 
         exp_ids = []
-        exploration_model_class_model_id_model_tuples = (
+        exploration_model_references = (
             external_instance_details['exploration_ids'])
-        for (model_class, model_id, exploration_model) in (
-                exploration_model_class_model_id_model_tuples):
+
+        for exploration_model_reference in exploration_model_references:
+            model_class = exploration_model_reference.class_name
+            model_id = exploration_model_reference.model_id
+            exploration_model = exploration_model_reference.model_instance
+
             if exploration_model is None or exploration_model.deleted:
                 cls.errors['exploration_ids field check'].append((
                     'Entity id %s: based on field exploration_ids having'
@@ -697,10 +750,14 @@ class BaseUserModelValidator(BaseModelValidator):
             return
 
         col_ids = []
-        collection_model_class_model_id_model_tuples = (
+        collection_model_references = (
             external_instance_details['collection_ids'])
-        for (model_class, model_id, collection_model) in (
-                collection_model_class_model_id_model_tuples):
+
+        for collection_model_reference in collection_model_references:
+            model_class = collection_model_reference.class_name
+            model_id = collection_model_reference.model_id
+            collection_model = collection_model_reference.model_instance
+
             if collection_model is None or collection_model.deleted:
                 cls.errors['collection_ids field check'].append((
                     'Entity id %s: based on field collection_ids having'
@@ -817,11 +874,14 @@ class ActivityReferencesModelValidator(BaseModelValidator):
                 'with the error %s') % (item.id, e))
             return {}
 
-        return {
-            'exploration_ids': (exp_models.ExplorationModel, exploration_ids),
-            'collection_ids': (
-                collection_models.CollectionModel, collection_ids),
-        }
+        return [
+            ExternalModelFetcher(
+                'exploration_ids', exp_models.ExplorationModel,
+                exploration_ids),
+            ExternalModelFetcher(
+                'collection_ids', collection_models.CollectionModel,
+                collection_ids)
+        ]
 
 
 class RoleQueryAuditModelValidator(BaseModelValidator):
