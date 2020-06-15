@@ -25,7 +25,7 @@ require(
 require(
   'pages/exploration-player-page/services/current-interaction.service.ts');
 
-const nerdamer = require('nerdamer');
+var nerdamer = require('nerdamer');
 
 angular.module('oppia').component('oppiaInteractiveAlgebraicExpressionInput', {
   template: require('./algebraic-expression-input-interaction.component.html'),

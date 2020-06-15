@@ -20,7 +20,7 @@
 // may be additional customization options for the editor that should be passed
 // in via initArgs.
 
-const nerdamer = require('nerdamer');
+var nerdamer = require('nerdamer');
 
 angular.module('oppia').component('algebraicExpressionEditor', {
   bindings: {
