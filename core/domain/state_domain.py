@@ -160,26 +160,25 @@ class AnswerGroup(python_utils.OBJECT):
 
         outcome_html = self.outcome.feedback.html
         html_list = html_list + [outcome_html]
-        # NOTE TO DEVELOPERS:
-        # The rules_index_dict below is used to  igure out the assembly of the
-        # html in the rule specs.
+        # TODO(#9413):Find a way to include a reference to the interaction type
+        # in the Draft change lists.
         # See issue: https://github.com/oppia/oppia/issues/9413. We cannot use
-        # the interaction-id from the rules_index_dict dict until issue-9413
-        # has been fixed, because this method has no reference to the
-        # interaction type.
+        # the interaction-id from the rules_index_dict until issue-9413 has
+        # been fixed, because this method has no reference to the interaction
+        # type and draft changes use this method. The rules_index_dict below
+        # is used to figure out the assembly of the html in the rulespecs.
 
-        rules_index_dict = json.loads(
-            utils.get_file_contents(feconf.RULES_DESCRIPTIONS_FILE_PATH))
+        rules_html_mapping_dict = json.loads(
+            utils.get_file_contents(feconf.RULES_SPECS_HTML_MAPPING_FILE_PATH))
 
         set_of_html_strings_rules = (
-            [rule[1] for rule in rules_index_dict['RulesHtmlMapping'][
-                'SetOfHtmlString']])
+            rules_html_mapping_dict['SetOfHtmlString']['ruleTypes'].keys())
         drag_and_drop_html_string_rules = (
-            [rule[1] for rule in rules_index_dict['RulesHtmlMapping'][
-                'DragAndDropHtmlString']])
+            rules_html_mapping_dict['DragAndDropHtmlString'][
+                'ruleTypes'].keys())
         list_of_sets_of_html_strings_rules = (
-            [rule[1] for rule in rules_index_dict['RulesHtmlMapping'][
-                'ListOfSetsOfHtmlStrings']])
+            rules_html_mapping_dict['ListOfSetsOfHtmlStrings'][
+                'ruleTypes'].keys())
 
         for rule_spec in self.rule_specs:
             if rule_spec.rule_type in set_of_html_strings_rules:
@@ -188,11 +187,10 @@ class AnswerGroup(python_utils.OBJECT):
                         if isinstance(value, python_utils.BASESTRING):
                             html_list = html_list + [value]
             elif rule_spec.rule_type in drag_and_drop_html_string_rules:
-                index_of_rule = (
-                    drag_and_drop_html_string_rules.index(rule_spec.rule_type))
-                if ('y' in
-                        rules_index_dict['RulesHtmlMapping'][
-                            'DragAndDropHtmlString'][index_of_rule]):
+                input_variables = (
+                    rules_html_mapping_dict['DragAndDropHtmlString'][
+                        'ruleTypes'][rule_spec.rule_type]['inputVariable'])
+                if 'y' in input_variables:
                     html_list = html_list + [rule_spec.inputs['y']]
                 html_list = html_list + [rule_spec.inputs['x']]
 

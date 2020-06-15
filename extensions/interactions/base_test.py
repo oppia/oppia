@@ -248,44 +248,46 @@ class InteractionUnitTests(test_utils.GenericTestBase):
         })
 
     def test_rules_html_mapping_are_valid(self):
-        """Test that the RulesHtmlMapping in the file rule_descriptions.json are
+        """Test that the structure of the file rule_spec_html_mapping.json are
         valid.
         """
+        # The file having the information about the assembly of the html in the
+        # rule specs.
+        rules_html_mapping_dict = json.loads(
+            utils.get_file_contents(feconf.RULES_SPECS_HTML_MAPPING_FILE_PATH))
+
+        # The file having the templates for the structure of the rule specs.
+        # Contents of the file rule_spec_html_mapping.json will be verified
+        # against this file.
         rules_index_dict = json.loads(
             utils.get_file_contents(feconf.RULES_DESCRIPTIONS_FILE_PATH))
-        rules_html_mapping = rules_index_dict['RulesHtmlMapping']
-        self.assertEqual(len(rules_html_mapping['SetOfHtmlString']), 4)
-        expected_set_of_html_strings_rules = (
-            ['Equals', 'ContainsAtLeastOneOf', 'DoesNotContainAtLeastOneOf',
-             'IsProperSubsetOf'])
-        expected_drag_and_drop_html_string_rules = (
-            ['HasElementXAtPositionY', 'HasElementXBeforeElementY'])
-        expected_list_of_sets_of_html_strings_rules = (
-            ['IsEqualToOrdering',
-             'IsEqualToOrderingWithOneItemAtIncorrectPosition'])
-        for param_index, param in enumerate(
-                rules_html_mapping['SetOfHtmlString']):
-            self.assertEqual(param[0], 'ItemSelectionInput')
-            # Verify the rules types belonging to SetOfHtmlString.
-            self.assertEqual(
-                param[1], expected_set_of_html_strings_rules[param_index])
-        for param_index, param in enumerate(
-                rules_html_mapping['DragAndDropHtmlString']):
-            self.assertEqual(param[0], 'DragAndDropSortInput')
-            # Verify the rules types belonging to DragAndDropHtmlString.
-            self.assertEqual(
-                param[1], expected_drag_and_drop_html_string_rules[param_index])
-            if param[1] == 'HasElementXBeforeElementY':
-                self.assertTrue('y' in param)
-            else:
-                self.assertTrue('y' not in param)
-        for param_index, param in enumerate(
-                rules_html_mapping['ListOfSetsOfHtmlStrings']):
-            self.assertEqual(param[0], 'DragAndDropSortInput')
-            # Verify the rules types belonging to ListOfSetsOfHtmlStrings.
-            self.assertEqual(
-                param[1],
-                expected_list_of_sets_of_html_strings_rules[param_index])
+
+        for html_type in rules_html_mapping_dict.keys():
+            self.assertTrue(
+                isinstance(rules_html_mapping_dict[html_type], dict))
+            interaction_id = (
+                rules_html_mapping_dict[html_type]['interactionId'])
+            # Verify that the interaction id is present in the rules_templates
+            # json file.
+            self.assertTrue(interaction_id in rules_index_dict.keys())
+            self.assertTrue(
+                isinstance(
+                    rules_html_mapping_dict[html_type]['ruleTypes'], dict))
+            rule_types = (
+                set(rules_html_mapping_dict[html_type]['ruleTypes'].keys()))
+            # Verify that the all the rule types are present in the
+            # rules_templates json file.
+            self.assertTrue(
+                rule_types.issubset(rules_index_dict[interaction_id].keys()))
+            for rule_type in rule_types:
+                self.assertTrue(
+                    isinstance(
+                        rules_html_mapping_dict[html_type]['ruleTypes'][
+                            rule_type], dict))
+                self.assertTrue(
+                    isinstance(
+                        rules_html_mapping_dict[html_type]['ruleTypes'][
+                            rule_type]['inputVariable'], list))
 
     def test_default_interactions_are_valid(self):
         """Test that the default interactions are valid."""

@@ -260,7 +260,7 @@ class DraftChangesMathValidationOneOffJobTests(test_utils.GenericTestBase):
                     'rule_specs': [{
                         'rule_type': 'Equals',
                         'inputs': {
-                            'x': [invalid_html_content1, invalid_html_content1]
+                            'x': [invalid_html_content1]
                         }
                     }, {
                         'rule_type': 'ContainsAtLeastOneOf',
