@@ -140,24 +140,30 @@ describe('PlaythroughService', () => {
     });
 
     it('should identify no issue for a playthrough without any issues', () => {
+      const backendApiStorePlaythroughSpy = (
+        spyOn(playthroughBackendApiService, 'storePlaythrough'));
       spyOn(stopwatchObjectFactory, 'create').and.returnValue(
-        jasmine.createSpyObj('Stopwatch', {getTimeInSecs: 180, reset: null}));
+        jasmine.createSpyObj('Stopwatch', {getTimeInSecs: 360, reset: null}));
 
       playthroughService.recordExplorationStartAction('stateName1');
       playthroughService.recordAnswerSubmitAction(
-        'stateName1', 'stateName2', 'TextInput', 'Hello', 'Try again', 30);
+        'stateName1', 'stateName2', 'TextInput', 'Hello', 'Try again', 60);
       playthroughService.recordAnswerSubmitAction(
-        'stateName2', 'stateName3', 'TextInput', 'Hello', 'Try again', 30);
+        'stateName2', 'stateName3', 'TextInput', 'Hello', 'Try again', 60);
       playthroughService.recordAnswerSubmitAction(
-        'stateName3', 'stateName4', 'TextInput', 'Hello', 'Try again', 30);
+        'stateName3', 'stateName4', 'TextInput', 'Hello', 'Try again', 60);
       playthroughService.recordAnswerSubmitAction(
-        'stateName4', 'stateName5', 'TextInput', 'Hello', 'Try again', 30);
-      playthroughService.recordExplorationQuitAction('stateName1', 60);
+        'stateName4', 'stateName5', 'TextInput', 'Hello', 'Try again', 60);
+      playthroughService.recordAnswerSubmitAction(
+        'stateName5', 'stateName6', 'TextInput', 'Hello', 'Try again', 60);
+      playthroughService.recordExplorationQuitAction('stateName6', 60);
+      playthroughService.storePlaythrough();
 
       let playthrough = playthroughService.getPlaythrough();
       expect(playthrough).not.toBeNull();
       expect(playthrough.issueType).toBeNull();
       expect(playthrough.issueCustomizationArgs).toBeNull();
+      expect(backendApiStorePlaythroughSpy).not.toHaveBeenCalled();
     });
 
     it('should identify multiple incorrect submissions', () => {

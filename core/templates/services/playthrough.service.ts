@@ -57,6 +57,14 @@ class MultipleIncorrectAnswersTracker {
       this.numTries = 0;
     }
   }
+
+  generateIssueCustomizationArgs(
+  ): IMultipleIncorrectSubmissionsCustomizationArgs {
+    return {
+      state_name: {value: this.currStateName},
+      num_times_answered_incorrectly: {value: this.numTries},
+    };
+  }
 }
 
 class CyclicStateTransitionsTracker {
@@ -86,13 +94,20 @@ class CyclicStateTransitionsTracker {
     return occurrences >= ServicesConstants.NUM_REPEATED_CYCLES_THRESHOLD;
   }
 
+  generateIssueCustomizationArgs(): ICyclicStateTransitionsCustomizationArgs {
+    const [stateNames, _] = this.getMostCommonCycle();
+    return {
+      state_names: {value: stateNames},
+    };
+  }
+
   private currStateName(): string {
     return this.pathOfVisitedStates[this.pathOfVisitedStates.length - 1];
   }
 
   private trackCycle(cycle: string[]): void {
     for (const [trackedCycle, occurrences] of this.cycleOccurrences.entries()) {
-      if (this.isRotation(cycle, trackedCycle)) {
+      if (this.isSameCycleOfStateNames(cycle, trackedCycle)) {
         this.cycleOccurrences.set(trackedCycle, occurrences + 1);
         return;
       }
@@ -107,22 +122,17 @@ class CyclicStateTransitionsTracker {
   }
 
   /**
-   * Returns whether the given arrays are rotations of each other.
+   * Returns whether the two given cycles are the same sequence of state names,
+   * even when their starting element is different.
    *
-   * Assumes that the only repeated element in each array is their first and
-   * last element.
-   *
-   * Rotations are best described through illustration. The following arrays are
-   * all rotations of each other (element A is highlighed to demonstrate the
-   * pattern):
-   *
-   *    [ *A* ,  B  ,  C  ,  D  ,  E  ]
-   *    [  E  , *A* ,  B  ,  C  ,  D  ]
-   *    [  D  ,  E  , *A* ,  B  ,  C  ]
-   *    [  C  ,  D  ,  E  , *A* ,  B  ]
-   *    [  B  ,  C  ,  D  ,  E  , *A* ]
+   * We check this by verifying whether the cycles can be rotated to become
+   * another. An array rotation is an operation which moves N elements from one
+   * end of the array to the other. For example:
+   *     RotateRight([1, 2, 3, 4, 5], 2) => [4, 5, 1, 2, 3].
+   *     RotateLeft([1, 2, 3, 4, 5], 2) => [3, 4, 5, 1, 2].
    */
-  private isRotation(cycle: string[], cycleToCheck: string[]): boolean {
+  private isSameCycleOfStateNames(
+      cycle: string[], cycleToCheck: string[]): boolean {
     if (cycle.length !== cycleToCheck.length) {
       return false;
     }
@@ -130,11 +140,10 @@ class CyclicStateTransitionsTracker {
     const arrayWithAllCycleRotations = [...cycle.slice(1), ...cycle.slice(1)];
     const startIndex = arrayWithAllCycleRotations.indexOf(rotationToFind[0]);
     return startIndex !== -1 && rotationToFind.every(
-      (stateName, i) => arrayWithAllCycleRotations[startIndex + i] === stateName
-    );
+      (state, i) => arrayWithAllCycleRotations[startIndex + i] === state);
   }
 
-  public getMostCommonCycle(): [string[], number] {
+  private getMostCommonCycle(): [string[], number] {
     let mostCommonCycle = null;
     let mostCommonCycleOccurrences = 0;
     for (const [cycle, occurrences] of this.cycleOccurrences.entries()) {
@@ -151,18 +160,25 @@ class CyclicStateTransitionsTracker {
 class EarlyQuitTracker {
   constructor(
       public stateName: string = null,
-      public timeSpentInStateSecs: number = null) {}
+      public expDurationInSecs: number = null) {}
 
   foundAnIssue(): boolean {
     return (
-      this.timeSpentInStateSecs !== null &&
-      this.timeSpentInStateSecs < ServicesConstants.EARLY_QUIT_THRESHOLD_IN_SECS
-    );
+      this.expDurationInSecs !== null &&
+      this.expDurationInSecs < ServicesConstants.EARLY_QUIT_THRESHOLD_IN_SECS);
   }
 
-  recordExplorationQuit(stateName: string, timeSpentInStateSecs: number): void {
+  recordExplorationQuit(
+      stateName: string, expDurationInSecs: number): void {
     this.stateName = stateName;
-    this.timeSpentInStateSecs = timeSpentInStateSecs;
+    this.expDurationInSecs = expDurationInSecs;
+  }
+
+  generateIssueCustomizationArgs(): IEarlyQuitCustomizationArgs {
+    return {
+      state_name: {value: this.stateName},
+      time_spent_in_exp_in_msecs: {value: this.expDurationInSecs * 1000},
+    };
   }
 }
 
@@ -200,24 +216,16 @@ export class PlaythroughService {
       this.playthrough.issueType = (
         AppConstants.ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS);
       this.playthrough.issueCustomizationArgs = (
-        <IMultipleIncorrectSubmissionsCustomizationArgs>{
-          state_name: {value: this.misTracker.currStateName},
-          num_times_answered_incorrectly: {value: this.misTracker.numTries}
-        });
+        this.misTracker.generateIssueCustomizationArgs());
     } else if (this.cstTracker && this.cstTracker.foundAnIssue()) {
       this.playthrough.issueType = (
         AppConstants.ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS);
       this.playthrough.issueCustomizationArgs = (
-        <ICyclicStateTransitionsCustomizationArgs>{
-          state_names: {value: this.cstTracker.getMostCommonCycle()[0]}
-        });
+        this.cstTracker.generateIssueCustomizationArgs());
     } else if (this.eqTracker && this.eqTracker.foundAnIssue()) {
       this.playthrough.issueType = AppConstants.ISSUE_TYPE_EARLY_QUIT;
       this.playthrough.issueCustomizationArgs = (
-        <IEarlyQuitCustomizationArgs>{
-          state_name: {value: this.eqTracker.stateName},
-          time_spent_in_exp_in_msecs: {value: this.expDurationInSecs * 1000}
-        });
+        this.eqTracker.generateIssueCustomizationArgs());
     }
   }
 
@@ -308,7 +316,7 @@ export class PlaythroughService {
     }
 
     this.expDurationInSecs = this.stopwatch.getTimeInSecs();
-    this.eqTracker.recordExplorationQuit(stateName, timeSpentInStateSecs);
+    this.eqTracker.recordExplorationQuit(stateName, this.expDurationInSecs);
 
     const explorationQuitAction = (
       this.learnerActionObjectFactory.createExplorationQuitAction({
