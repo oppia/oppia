@@ -76,7 +76,7 @@ angular.module('oppia').directive('conceptCard', [
               if (ctrl.currentConceptCard.getWorkedExamples().length > 0) {
                 ctrl.numberOfWorkedExamplesShown = 1;
               }
-              // TODO(#8472): Remove when this directive is migrated to Angular.
+              // TODO(#8521): Remove when this directive is migrated to Angular.
               $rootScope.$apply();
             });
           };
