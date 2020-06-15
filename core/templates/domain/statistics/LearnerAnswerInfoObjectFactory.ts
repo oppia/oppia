@@ -21,12 +21,10 @@ import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
 export interface LearnerAnswerInfoBackendDict {
-  id: string;
-  answer: string;
-  /* eslint-disable camelcase */
-  answer_details: string;
-  created_on: number;
-  /* eslint-enable camelcase */
+  'id': string;
+  'answer': string;
+  'answer_details': string;
+  'created_on': number;
 }
 
 export class LearnerAnswerInfo {

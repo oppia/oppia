@@ -20,6 +20,16 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
+interface IStorySummaryBackendDict {
+  'id': string;
+  'title': string;
+  'node_titles': string[];
+  'thumbnail_filename': string;
+  'thumbnail_bg_color': string;
+  'description': string;
+  'story_is_published': boolean;
+}
+
 export class StorySummary {
   constructor(
     private _id: string,
@@ -64,19 +74,8 @@ export class StorySummary {
   providedIn: 'root'
 })
 export class StorySummaryObjectFactory {
-  createFromBackendDict(storySummaryBackendDict: {
-    id: string;
-    title: string;
-    // eslint-disable-next-line camelcase
-    node_titles: Array<string>;
-    // eslint-disable-next-line camelcase
-    thumbnail_filename: string;
-    // eslint-disable-next-line camelcase
-    thumbnail_bg_color: string;
-    description: string;
-    // eslint-disable-next-line camelcase
-    story_is_published: boolean;
-  }): StorySummary {
+  createFromBackendDict(
+      storySummaryBackendDict: IStorySummaryBackendDict): StorySummary {
     return new StorySummary(
       storySummaryBackendDict.id,
       storySummaryBackendDict.title,

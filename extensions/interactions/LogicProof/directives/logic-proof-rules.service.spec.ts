@@ -19,18 +19,16 @@
 import { LogicProofRulesService } from
   'interactions/LogicProof/directives/logic-proof-rules.service';
 
-/* eslint-disable camelcase */
 interface Answer {
-  assumptions_string: string,
-  target_string: string,
-  proof_string: string,
-  correct: boolean,
-  error_category?: string,
-  error_code?: string,
-  error_message?: string,
-  error_line_number?: number
+  'assumptions_string': string,
+  'target_string': string,
+  'proof_string': string,
+  'correct': boolean,
+  'error_category'?: string,
+  'error_code'?: string,
+  'error_message'?: string,
+  'error_line_number'?: number
 }
-/* eslint-enable camelcase */
 
 describe('Logic Proof rules service', () => {
   let lprs: LogicProofRulesService = null;

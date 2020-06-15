@@ -34,15 +34,12 @@ import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 
 interface MultipleIncorrectStateNames {
-  // eslint-disable-next-line camelcase
-  state_name: string;
-  // eslint-disable-next-line camelcase
-  num_times_incorrect: number;
+  'state_name': string;
+  'num_times_incorrect': number;
 }
 interface CycleIdentifier {
-  cycle: string;
-  // eslint-disable-next-line camelcase
-  num_cycles: number;
+  'cycle': string;
+  'num_cycles': number;
 }
 
 @Injectable({
@@ -225,8 +222,7 @@ export class PlaythroughService {
       if (isNewPlaythrough) {
         promise.then((
             response: {
-                // eslint-disable-next-line camelcase
-                playthrough_stored: boolean, playthrough_id: string }) => {
+                'playthrough_stored': boolean, 'playthrough_id': string }) => {
           if (response.playthrough_stored) {
             // In cases where maximum number of playthroughs already exists, the
             // above flag is not True and playthrough ID is not set.

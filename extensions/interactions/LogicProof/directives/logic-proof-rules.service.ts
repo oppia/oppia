@@ -19,18 +19,16 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-/* eslint-disable camelcase */
 interface Answer {
-  assumptions_string: string,
-  target_string: string,
-  proof_string: string,
-  correct: boolean,
-  error_category?: string,
-  error_code?: string,
-  error_message?: string,
-  error_line_number?: number
+  'assumptions_string': string,
+  'target_string': string,
+  'proof_string': string,
+  'correct': boolean,
+  'error_category'?: string,
+  'error_code'?: string,
+  'error_message'?: string,
+  'error_line_number'?: number
 }
-/* eslint-enable camelcase */
 
 @Injectable({
   providedIn: 'root'

@@ -22,9 +22,8 @@ require('services/rte-helper.service.ts');
 
 interface UiConfig {
   (): UiConfig;
-  // eslint-disable-next-line camelcase
-  hide_complex_extensions: boolean;
-  startupFocusEnabled?: boolean;
+  'hide_complex_extensions': boolean;
+  'startupFocusEnabled'?: boolean;
 }
 
 interface CkeditorCustomScope extends ng.IScope {

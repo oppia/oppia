@@ -42,13 +42,11 @@ export interface IExplorationSummaries {
   summaries: IExplorationSummary[];
 }
 type RecommendationsUrlParams = {
-  /* eslint-disable camelcase */
-  stringified_author_recommended_ids: string;
-  collection_id?: string;
-  story_id?: string;
-  current_node_id?: string;
-  include_system_recommendations: string;
-  /* eslint-enable camelcase */
+  'stringified_author_recommended_ids': string;
+  'collection_id'?: string;
+  'story_id'?: string;
+  'current_node_id'?: string;
+  'include_system_recommendations': string;
 };
 
 @Injectable({
