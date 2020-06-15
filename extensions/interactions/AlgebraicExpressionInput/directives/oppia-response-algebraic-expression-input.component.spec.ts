@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the AlgebraicExpressionInput response component.
  */
 
-  
+
 require('./oppia-response-algebraic-expression-input.component.ts');
 
 describe('AlgebraicExpressionInputResponse', function() {
@@ -36,6 +36,4 @@ describe('AlgebraicExpressionInputResponse', function() {
     ctrl.$onInit();
     expect(ctrl.answer).toBe('answer');
   });
-
 });
-    

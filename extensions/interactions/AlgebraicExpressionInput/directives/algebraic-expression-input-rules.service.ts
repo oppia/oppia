@@ -19,7 +19,7 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-const nerdamer = require('../../../../node_modules/nerdamer');
+const nerdamer = require('nerdamer');
 
 @Injectable({
   providedIn: 'root'

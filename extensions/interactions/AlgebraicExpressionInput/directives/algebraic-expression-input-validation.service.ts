@@ -40,7 +40,7 @@ export class AlgebraicExpressionInputValidationService {
   getAllWarnings(
       stateName: string,
       customizationArgs: IAlgebraicExpressionInputCustomizationArgs,
-      answerGroups: AnswerGroup[],  defaultOutcome: Outcome): IWarning[] {
+      answerGroups: AnswerGroup[], defaultOutcome: Outcome): IWarning[] {
     var warningsList = [];
 
     warningsList = warningsList.concat(
@@ -51,10 +51,9 @@ export class AlgebraicExpressionInputValidationService {
     for (var i = 0; i < answerGroups.length; i++) {
       var rules = answerGroups[i].rules;
       for (var j = 0; j < rules.length; j++) {
-        if(rules[j].type === 'IsEquivalentTo') {
+        if (rules[j].type === 'IsEquivalentTo') {
           seenIsEquivalentTo = true;
-        }
-        else if(seenIsEquivalentTo) {
+        } else if (seenIsEquivalentTo) {
           warningsList.push({
             type: AppConstants.WARNING_TYPES.ERROR,
             message: (

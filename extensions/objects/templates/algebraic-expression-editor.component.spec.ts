@@ -44,7 +44,7 @@ describe('AlgebraicExpressionEditor', function() {
     ctrl.$onInit();
 
     var guppyDivs = document.querySelectorAll('.guppy-div-creator');
-    for(var i = 0; i < guppyDivs.length; i++) {
+    for (var i = 0; i < guppyDivs.length; i++) {
       expect(guppyDivs[i].getAttribute('id')).toMatch(/guppy_[0-9]{1,8}/);
     }
   });
@@ -56,7 +56,6 @@ describe('AlgebraicExpressionEditor', function() {
   });
 
   it('should correctly validate current answer', function() {
-    
     // This should be validated as true if the editor hasn't been touched.
     ctrl.value = '';
     expect(ctrl.isCurrentAnswerValid()).toBeTrue();
@@ -86,5 +85,5 @@ describe('AlgebraicExpressionEditor', function() {
     expect(ctrl.warningText).toBe(
       'It looks like you have entered an equation/inequality.' +
       ' Please enter an algebraic expression instead.');
-  })
+  });
 });

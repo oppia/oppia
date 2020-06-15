@@ -20,7 +20,7 @@
 // may be additional customization options for the editor that should be passed
 // in via initArgs.
 
-const nerdamer = require('../../../node_modules/nerdamer');
+const nerdamer = require('nerdamer');
 
 angular.module('oppia').component('algebraicExpressionEditor', {
   bindings: {
@@ -36,7 +36,7 @@ angular.module('oppia').component('algebraicExpressionEditor', {
       var guppyDivs = document.querySelectorAll('.guppy-div-creator');
       var divId, guppyInstance;
       ctrl.hasBeenTouched = false;
-      for(var i = 0; i < guppyDivs.length; i++) {
+      for (var i = 0; i < guppyDivs.length; i++) {
         divId = 'guppy_' + Math.floor(Math.random() * 100000000);
         // Dynamically assigns a unique id to the guppy div.
         guppyDivs[i].setAttribute('id', divId);
@@ -54,31 +54,31 @@ angular.module('oppia').component('algebraicExpressionEditor', {
 
     var cleanErrorMessage = function(errorMessage) {
       var semiColonIndex = errorMessage.indexOf(':');
-      if(semiColonIndex !== -1) {
+      if (semiColonIndex !== -1) {
         errorMessage = errorMessage.slice(0, semiColonIndex);
       }
       var atColonIndex = errorMessage.indexOf(' at ');
-      if(atColonIndex !== -1) {
+      if (atColonIndex !== -1) {
         errorMessage = errorMessage.slice(0, atColonIndex);
       }
-      if(errorMessage[errorMessage.length - 1] !== '.') {
+      if (errorMessage[errorMessage.length - 1] !== '.') {
         errorMessage += '.';
       }
       return errorMessage;
     };
 
     ctrl.isCurrentAnswerValid = function() {
-      if(ctrl.hasBeenTouched) {
+      if (ctrl.hasBeenTouched) {
         try {
           var containsVariables = nerdamer(ctrl.value).variables().length > 0;
-          if(ctrl.value.length === 0) {
+          if (ctrl.value.length === 0) {
             throw new Error('Please enter a non-empty answer.');
-          } else if(ctrl.value.indexOf('=') !== -1 || ctrl.value.indexOf(
+          } else if (ctrl.value.indexOf('=') !== -1 || ctrl.value.indexOf(
             '<') !== -1 || ctrl.value.indexOf('>') !== -1) {
-              throw new Error('It looks like you have entered an ' +
-                'equation/inequality. Please enter an algebraic ' +
-                'expression instead.');
-          } else if(!containsVariables) {
+            throw new Error('It looks like you have entered an ' +
+              'equation/inequality. Please enter an algebraic ' +
+              'expression instead.');
+          } else if (!containsVariables) {
             throw new Error('It looks like you have entered only ' +
               'numbers. Make sure to include the necessary variables' +
               ' mentioned in the question.');
@@ -94,7 +94,7 @@ angular.module('oppia').component('algebraicExpressionEditor', {
 
     ctrl.$onInit = function() {
       ctrl.alwaysEditable = true;
-      if(ctrl.value === null) {
+      if (ctrl.value === null) {
         ctrl.value = '';
       }
       ctrl.initializeGuppy();

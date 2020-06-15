@@ -13,10 +13,11 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the AlgebraicExpressionInput short response component.
+ * @fileoverview Unit tests for the AlgebraicExpressionInput short response
+ * component.
  */
 
-  
+
 require('./oppia-short-response-algebraic-expression-input.component.ts');
 
 describe('AlgebraicExpressionInputShortResponse', function() {
@@ -36,6 +37,4 @@ describe('AlgebraicExpressionInputShortResponse', function() {
     ctrl.$onInit();
     expect(ctrl.answer).toBe('answer');
   });
-
 });
-    

@@ -136,8 +136,9 @@ describe('Interaction Rules Registry Service', () => {
     () => {
       expect(this.registry.getRulesServiceByInteractionId(
         'AlgebraicExpressionInput')).toBe(
-          this.algebraicExpressionInputRulesService);
-  });
+        this.algebraicExpressionInputRulesService);
+    }
+  );
 
   it('should return the correct rules service for CodeRepl', () => {
     expect(this.registry.getRulesServiceByInteractionId('CodeRepl'))

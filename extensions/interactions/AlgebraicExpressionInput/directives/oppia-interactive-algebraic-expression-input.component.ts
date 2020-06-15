@@ -19,14 +19,13 @@
  * into the directive is: the name of the parameter, followed by 'With',
  * followed by the name of the arg.
  */
-
 require(
   'interactions/AlgebraicExpressionInput/directives/' +
   'algebraic-expression-input-rules.service.ts');
 require(
   'pages/exploration-player-page/services/current-interaction.service.ts');
 
-const nerdamer = require('../../../../node_modules/nerdamer');
+const nerdamer = require('nerdamer');
 
 angular.module('oppia').component('oppiaInteractiveAlgebraicExpressionInput', {
   template: require('./algebraic-expression-input-interaction.component.html'),
@@ -34,86 +33,86 @@ angular.module('oppia').component('oppiaInteractiveAlgebraicExpressionInput', {
     '$scope', 'CurrentInteractionService',
     'AlgebraicExpressionInputRulesService',
     function(
-      $scope, CurrentInteractionService,
-      AlgebraicExpressionInputRulesService) {
-        const ctrl = this;
-        ctrl.value = '';
+        $scope, CurrentInteractionService,
+        AlgebraicExpressionInputRulesService) {
+      const ctrl = this;
+      ctrl.value = '';
+      ctrl.hasBeenTouched = false;
+      ctrl.warningText = '';
+
+      ctrl.initializeGuppy = function() {
+        var guppyDivs = document.querySelectorAll('.guppy-div-learner');
+        var divId, guppyInstance;
         ctrl.hasBeenTouched = false;
-        ctrl.warningText = '';
+        for (var i = 0; i < guppyDivs.length; i++) {
+          divId = 'guppy_' + Math.floor(Math.random() * 100000000);
+          // Dynamically assigns a unique id to the guppy div.
+          guppyDivs[i].setAttribute('id', divId);
+          // Create a new guppy instance for that div.
+          guppyInstance = new Guppy(divId, {});
+          guppyInstance.event('change', (e) => {
+            ctrl.value = guppyInstance.asciimath();
+            ctrl.hasBeenTouched = true;
+            // Need to manually trigger the digest cycle
+            // to make any 'watchers' aware of changes in ctrl.value.
+            $scope.$apply();
+          });
+        }
+      };
 
-        ctrl.initializeGuppy = function() {
-          var guppyDivs = document.querySelectorAll('.guppy-div-learner');
-          var divId, guppyInstance;
-          ctrl.hasBeenTouched = false;
-          for(var i = 0; i < guppyDivs.length; i++) {
-            divId = 'guppy_' + Math.floor(Math.random() * 100000000);
-            // Dynamically assigns a unique id to the guppy div.
-            guppyDivs[i].setAttribute('id', divId);
-            // Create a new guppy instance for that div.
-            guppyInstance = new Guppy(divId, {});
-            guppyInstance.event('change', (e) => {
-              ctrl.value = guppyInstance.asciimath();
-              ctrl.hasBeenTouched = true;
-              // Need to manually trigger the digest cycle
-              // to make any 'watchers' aware of changes in ctrl.value.
-              $scope.$apply();
-            });
-          }
-        };
+      var cleanErrorMessage = function(errorMessage) {
+        var semiColonIndex = errorMessage.indexOf(':');
+        if (semiColonIndex !== -1) {
+          errorMessage = errorMessage.slice(0, semiColonIndex);
+        }
+        var atColonIndex = errorMessage.indexOf(' at ');
+        if (atColonIndex !== -1) {
+          errorMessage = errorMessage.slice(0, atColonIndex);
+        }
+        if (errorMessage[errorMessage.length - 1] !== '.') {
+          errorMessage += '.';
+        }
+        return errorMessage;
+      };
 
-        var cleanErrorMessage = function(errorMessage) {
-          var semiColonIndex = errorMessage.indexOf(':');
-          if(semiColonIndex !== -1) {
-            errorMessage = errorMessage.slice(0, semiColonIndex);
-          }
-          var atColonIndex = errorMessage.indexOf(' at ');
-          if(atColonIndex !== -1) {
-            errorMessage = errorMessage.slice(0, atColonIndex);
-          }
-          if(errorMessage[errorMessage.length - 1] !== '.') {
-            errorMessage += '.';
-          }
-          return errorMessage;
-        };
-    
-        ctrl.isCurrentAnswerValid = function() {
-          if(ctrl.hasBeenTouched) {
-            try {
-              var containsVariables = nerdamer(ctrl.value).variables().length > 0;
-              if(ctrl.value.length === 0) {
-                throw new Error('Please enter a non-empty answer.');
-              } else if(ctrl.value.indexOf('=') !== -1 || ctrl.value.indexOf(
-                '<') !== -1 || ctrl.value.indexOf('>') !== -1) {
-                  throw new Error('It looks like you have entered an ' +
-                    'equation/inequality. Please enter an algebraic ' +
-                    'expression instead.');
-              } else if(!containsVariables) {
-                throw new Error('It looks like you have entered only ' +
-                  'numbers. Make sure to include the necessary variables' +
-                  ' mentioned in the question.');
-              }
-            } catch (err) {
-              ctrl.warningText = cleanErrorMessage(err.message);
-              return false;
+      ctrl.isCurrentAnswerValid = function() {
+        if (ctrl.hasBeenTouched) {
+          try {
+            var containsVariables = nerdamer(ctrl.value).variables().length > 0;
+            if (ctrl.value.length === 0) {
+              throw new Error('Please enter a non-empty answer.');
+            } else if (ctrl.value.indexOf('=') !== -1 || ctrl.value.indexOf(
+              '<') !== -1 || ctrl.value.indexOf('>') !== -1) {
+              throw new Error('It looks like you have entered an ' +
+                'equation/inequality. Please enter an algebraic ' +
+                'expression instead.');
+            } else if (!containsVariables) {
+              throw new Error('It looks like you have entered only ' +
+                'numbers. Make sure to include the necessary variables' +
+                ' mentioned in the question.');
             }
+          } catch (err) {
+            ctrl.warningText = cleanErrorMessage(err.message);
+            return false;
           }
-          ctrl.warningText = '';
-          return true;
-        };
+        }
+        ctrl.warningText = '';
+        return true;
+      };
 
-        ctrl.submitAnswer = function() {
-          if (!ctrl.isCurrentAnswerValid()) {
-            return;
-          }
-          CurrentInteractionService.onSubmit(
-            ctrl.value, AlgebraicExpressionInputRulesService);
-        };
+      ctrl.submitAnswer = function() {
+        if (!ctrl.isCurrentAnswerValid()) {
+          return;
+        }
+        CurrentInteractionService.onSubmit(
+          ctrl.value, AlgebraicExpressionInputRulesService);
+      };
 
-        ctrl.$onInit = function() {
-          ctrl.initializeGuppy();
-          CurrentInteractionService.registerCurrentInteraction(
-            ctrl.submitAnswer, ctrl.isCurrentAnswerValid);
-        };
+      ctrl.$onInit = function() {
+        ctrl.initializeGuppy();
+        CurrentInteractionService.registerCurrentInteraction(
+          ctrl.submitAnswer, ctrl.isCurrentAnswerValid);
+      };
     }
   ]
 });
