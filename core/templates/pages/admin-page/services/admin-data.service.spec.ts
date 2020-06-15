@@ -22,13 +22,25 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { AdminDataService } from
   'pages/admin-page/services/admin-data.service';
-import { AdminData, AdminDataObjectFactory } from
-  'domain/admin/admin-data-object.factory';
+import { AdminPageData } from
+  'domain/admin/admin-backend-api.service';
+import { ComputationDataObjectFactory } from
+  'domain/admin/computation-data-object.factory';
+import { JobDataObjectFactory } from
+  'domain/admin/job-data-object.factory';
+import { JobStausSummaryObjectFactory } from
+  'domain/admin/job-status-summary-object.factory';
+import { TopicSummaryObjectFactory } from
+  'domain/topic/TopicSummaryObjectFactory';
+
 
 describe('Admin Data Service', () => {
   let adminDataService: AdminDataService = null;
+  let cdof: ComputationDataObjectFactory;
+  let jdof: JobDataObjectFactory;
+  let jsof: JobStausSummaryObjectFactory;
+  let tsof: TopicSummaryObjectFactory;
   let httpTestingController: HttpTestingController;
-  let adminDataObjectFactory: AdminDataObjectFactory;
   var sampleAdminData = {
     unfinished_job_data: [],
     role_graph_data: {
@@ -98,19 +110,45 @@ describe('Admin Data Service', () => {
       TOPIC_MANAGER: 'topic manager'
     }
   };
-  let adminDataResponse: AdminData;
+  let adminDataResponse: AdminPageData;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [AdminDataService, AdminDataObjectFactory]
+      providers: [AdminDataService]
     });
-    adminDataService = TestBed.get(
-      AdminDataService);
+    adminDataService = TestBed.get(AdminDataService);
+    cdof = TestBed.get(ComputationDataObjectFactory);
+    jdof = TestBed.get(JobDataObjectFactory);
+    jsof = TestBed.get(JobStausSummaryObjectFactory);
+    tsof = TestBed.get(TopicSummaryObjectFactory);
     httpTestingController = TestBed.get(HttpTestingController);
-    adminDataObjectFactory = TestBed.get(AdminDataObjectFactory);
-    adminDataResponse = adminDataObjectFactory.createFromBackendDict(
-      sampleAdminData);
+    adminDataResponse = {
+      demoExplorations: sampleAdminData.demo_explorations,
+      demoCollections: sampleAdminData.demo_collections,
+      demoExplorationIds: sampleAdminData.demo_exploration_ids,
+      oneOffJobStatusSummaries:
+        sampleAdminData.one_off_job_status_summaries.map(
+          jsof.createFromBackendDict),
+      humanReadableCurrentTime:
+      sampleAdminData.human_readable_current_time,
+      auditJobStatusSummaries:
+        sampleAdminData.audit_job_status_summaries.map(
+          jsof.createFromBackendDict),
+      updatableRoles: sampleAdminData.updatable_roles,
+      roleGraphData: sampleAdminData.role_graph_data,
+      configProperties: sampleAdminData.config_properties,
+      viewableRoles: sampleAdminData.viewable_roles,
+      unfinishedJobData: sampleAdminData.unfinished_job_data.map(
+        jdof.createFromBackendDict),
+      recentJobData: sampleAdminData.recent_job_data.map(
+        jdof.createFromBackendDict),
+      continuousComputationsData:
+        sampleAdminData.continuous_computations_data.map(
+          cdof.createFromBackendDict),
+      topicSummaries: sampleAdminData.topic_summaries.map(
+        tsof.createFromBackendDict)
+    };
   });
 
   afterEach(() => {

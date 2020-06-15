@@ -19,22 +19,21 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { AdminBackendApiService } from
+import { AdminPageData, AdminBackendApiService } from
   'domain/admin/admin-backend-api.service';
-import { AdminData } from 'domain/admin/admin-data-object.factory';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AdminDataService {
-  dataPromise: Promise<AdminData>;
+  dataPromise: Promise<AdminPageData>;
 
   constructor(
     private adminBackendApiService: AdminBackendApiService) {
     this.dataPromise = null;
   }
 
-  _getDataAsync(): Promise<AdminData> {
+  _getDataAsync(): Promise<AdminPageData> {
     if (this.dataPromise) {
       return this.dataPromise;
     }
@@ -44,7 +43,7 @@ export class AdminDataService {
     return this.dataPromise;
   }
 
-  getDataAsync(): Promise<AdminData> {
+  getDataAsync(): Promise<AdminPageData> {
     return this._getDataAsync();
   }
 }

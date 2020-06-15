@@ -20,14 +20,23 @@ import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-import { AdminBackendApiService } from
+import { AdminPageData, AdminBackendApiService } from
   'domain/admin/admin-backend-api.service';
-import { AdminDataObjectFactory, AdminData } from
-  'domain/admin/admin-data-object.factory';
+import { ComputationDataObjectFactory } from
+  'domain/admin/computation-data-object.factory';
+import { JobDataObjectFactory } from
+  'domain/admin/job-data-object.factory';
+import { JobStausSummaryObjectFactory } from
+  'domain/admin/job-status-summary-object.factory';
+import { TopicSummaryObjectFactory } from
+  'domain/topic/TopicSummaryObjectFactory';
 
 describe('Admin backend api service', () => {
   let abas: AdminBackendApiService;
-  let adof: AdminDataObjectFactory;
+  let cdof: ComputationDataObjectFactory;
+  let jdof: JobDataObjectFactory;
+  let jsof: JobStausSummaryObjectFactory;
+  let tsof: TopicSummaryObjectFactory;
   let httpTestingController: HttpTestingController;
   let adminBackendResponse = {
     unfinished_job_data: [],
@@ -98,7 +107,7 @@ describe('Admin backend api service', () => {
       TOPIC_MANAGER: 'topic manager'
     }
   };
-  let adminDataObject: AdminData;
+  let adminDataObject: AdminPageData;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -106,9 +115,37 @@ describe('Admin backend api service', () => {
     });
 
     abas = TestBed.get(AdminBackendApiService);
-    adof = TestBed.get(AdminDataObjectFactory);
+    cdof = TestBed.get(ComputationDataObjectFactory);
+    jdof = TestBed.get(JobDataObjectFactory);
+    jsof = TestBed.get(JobStausSummaryObjectFactory);
+    tsof = TestBed.get(TopicSummaryObjectFactory);
     httpTestingController = TestBed.get(HttpTestingController);
-    adminDataObject = adof.createFromBackendDict(adminBackendResponse);
+    adminDataObject = {
+      demoExplorations: adminBackendResponse.demo_explorations,
+      demoCollections: adminBackendResponse.demo_collections,
+      demoExplorationIds: adminBackendResponse.demo_exploration_ids,
+      oneOffJobStatusSummaries:
+        adminBackendResponse.one_off_job_status_summaries.map(
+          jsof.createFromBackendDict),
+      humanReadableCurrentTime:
+        adminBackendResponse.human_readable_current_time,
+      auditJobStatusSummaries:
+        adminBackendResponse.audit_job_status_summaries.map(
+          jsof.createFromBackendDict),
+      updatableRoles: adminBackendResponse.updatable_roles,
+      roleGraphData: adminBackendResponse.role_graph_data,
+      configProperties: adminBackendResponse.config_properties,
+      viewableRoles: adminBackendResponse.viewable_roles,
+      unfinishedJobData: adminBackendResponse.unfinished_job_data.map(
+        jdof.createFromBackendDict),
+      recentJobData: adminBackendResponse.recent_job_data.map(
+        jdof.createFromBackendDict),
+      continuousComputationsData:
+        adminBackendResponse.continuous_computations_data.map(
+          cdof.createFromBackendDict),
+      topicSummaries: adminBackendResponse.topic_summaries.map(
+        tsof.createFromBackendDict)
+    };
   });
 
   afterEach(() => {
