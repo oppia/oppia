@@ -13,10 +13,10 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the math editor.
+ * @fileoverview Unit tests for the algebraic expression editor.
  */
 
-fdescribe('AlgebraicExpressionEditor', function() {
+describe('AlgebraicExpressionEditor', function() {
   var AlgebraicExpressionEditorCtrl = null;
   class MockGuppy {
     constructor(id: string, config: Object) {}
@@ -57,20 +57,35 @@ fdescribe('AlgebraicExpressionEditor', function() {
   });
 
   it('should correctly validate current answer', function() {
+    
+    // This should be validated as true if the editor hasn't been touched.
+    AlgebraicExpressionEditorCtrl.value = '';
+    expect(AlgebraicExpressionEditorCtrl.isCurrentAnswerValid()).toBeTrue();
+    expect(AlgebraicExpressionEditorCtrl.warningText).toBe('');
+
+
+    AlgebraicExpressionEditorCtrl.hasBeenTouched = true;
+
+    AlgebraicExpressionEditorCtrl.value = '';
+    expect(AlgebraicExpressionEditorCtrl.isCurrentAnswerValid()).toBeFalse();
+    expect(AlgebraicExpressionEditorCtrl.warningText).toBe(
+      'Please enter a non-empty answer.');
+
     AlgebraicExpressionEditorCtrl.value = 'a/';
     expect(AlgebraicExpressionEditorCtrl.isCurrentAnswerValid()).toBeFalse();
-    expect(AlgebraicExpressionEditorCtrl.warningText).toBe('/ is an incorrect postfix operator');
+    expect(AlgebraicExpressionEditorCtrl.warningText).toBe(
+      '/ is not a valid postfix operator.');
 
     AlgebraicExpressionEditorCtrl.value = '12+sqrt(4)';
     expect(AlgebraicExpressionEditorCtrl.isCurrentAnswerValid()).toBeFalse();
     expect(AlgebraicExpressionEditorCtrl.warningText).toBe(
-      'It looks like you have entered only numbers. Make sure to include the' +
-      'necessary variables mentioned in the question.');
+      'It looks like you have entered only numbers. Make sure to include' +
+      ' the necessary variables mentioned in the question.');
 
-    AlgebraicExpressionEditorCtrl.value = '12+sqrt(4)';
+    AlgebraicExpressionEditorCtrl.value = 'x-y=0';
     expect(AlgebraicExpressionEditorCtrl.isCurrentAnswerValid()).toBeFalse();
     expect(AlgebraicExpressionEditorCtrl.warningText).toBe(
-      'It looks like you have entered only numbers. Make sure to include the' +
-      'necessary variables mentioned in the question.');
+      'It looks like you have entered an equation/inequality.' +
+      ' Please enter an algebraic expression instead.');
   })
 });

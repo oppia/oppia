@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for math editor.
+ * @fileoverview Component for algebraic expression editor.
  */
 
 // Every editor directive should implement an alwaysEditable option. There
@@ -29,13 +29,13 @@ angular.module('oppia').component('algebraicExpressionEditor', {
   template: require('./algebraic-expression-editor.component.html'),
   controller: ['$scope', function($scope) {
     const ctrl = this;
-    var hasBeenTouched;
+    ctrl.hasBeenTouched = false;
     ctrl.warningText = '';
 
     ctrl.initializeGuppy = function() {
       var guppyDivs = document.querySelectorAll('.guppy-div-creator');
       var divId, guppyInstance;
-      hasBeenTouched = false;
+      ctrl.hasBeenTouched = false;
       for(var i = 0; i < guppyDivs.length; i++) {
         divId = 'guppy_' + Math.floor(Math.random() * 100000000);
         // Dynamically assigns a unique id to the guppy div.
@@ -44,42 +44,45 @@ angular.module('oppia').component('algebraicExpressionEditor', {
         guppyInstance = new Guppy(divId, {});
         guppyInstance.event('change', (e) => {
           ctrl.value = guppyInstance.asciimath();
-          hasBeenTouched = true;
+          ctrl.hasBeenTouched = true;
           // Need to manually trigger the digest cycle
           // to make any 'watchers' aware of changes in answer.
           $scope.$apply();
         });
       }
-    }
+    };
 
     var cleanErrorMessage = function(errorMessage) {
       var semiColonIndex = errorMessage.indexOf(':');
       if(semiColonIndex !== -1) {
         errorMessage = errorMessage.slice(0, semiColonIndex);
       }
-      var atColonIndex = errorMessage.indexOf('at');
+      var atColonIndex = errorMessage.indexOf(' at ');
       if(atColonIndex !== -1) {
-        return errorMessage.slice(0, atColonIndex);
+        errorMessage = errorMessage.slice(0, atColonIndex);
+      }
+      if(errorMessage[errorMessage.length - 1] !== '.') {
+        errorMessage += '.';
       }
       return errorMessage;
-    }
+    };
 
     ctrl.isCurrentAnswerValid = function() {
-      if(hasBeenTouched) {
+      if(ctrl.hasBeenTouched) {
         try {
           var containsVariables = nerdamer(ctrl.value).variables().length > 0;
           if(ctrl.value.length === 0) {
             throw new Error('Please enter a non-empty answer.');
+          } else if(ctrl.value.indexOf('=') !== -1 || ctrl.value.indexOf(
+            '<') !== -1 || ctrl.value.indexOf('>') !== -1) {
+              throw new Error('It looks like you have entered an ' +
+                'equation/inequality. Please enter an algebraic ' +
+                'expression instead.');
           } else if(!containsVariables) {
             throw new Error('It looks like you have entered only ' +
               'numbers. Make sure to include the necessary variables' +
               ' mentioned in the question.');
-          } else if(ctrl.value.indexOf('=') !== -1 || ctrl.value.indexOf(
-              '<') !== -1 || ctrl.value.indexOf('>') !== -1) {
-                throw new Error('It looks like you have entered an' +
-                  'equation/inequality. Please enter an algebraic' +
-                  'expression instead.');
-            }
+          }
         } catch (err) {
           ctrl.warningText = cleanErrorMessage(err.message);
           return false;
