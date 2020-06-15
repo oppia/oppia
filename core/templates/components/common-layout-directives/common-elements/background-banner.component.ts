@@ -23,7 +23,7 @@ import { downgradeComponent } from '@angular/upgrade/static';
 
 @Component({
   selector: 'background-banner',
-  template: require('./background-banner.component.html')
+  templateUrl: './background-banner.component.html'
 })
 export class BackgroundBannerComponent implements OnInit {
   constructor(private urlInterpolationService: UrlInterpolationService) {}

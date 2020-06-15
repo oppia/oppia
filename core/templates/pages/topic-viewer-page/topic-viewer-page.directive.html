@@ -18,7 +18,7 @@
             </a>
           </div>
         </li>
-        <li ng-class="{'topic-viewer-tabs-active': $ctrl.activeTab === 'practice'}">
+        <li ng-class="{'topic-viewer-tabs-active': $ctrl.activeTab === 'practice'}" ng-show="$ctrl.trainTabShouldBeDisplayed">
           <div class="topic-viewer-tabs-text" ng-click="$ctrl.setActiveTab('practice')">
             <img class="tab-icon" ng-src="<[$ctrl.getStaticImageUrl('/icons/train_icon_24px.svg')]>">
             <a class="tab-title"
@@ -112,21 +112,19 @@
   }
 
   .oppia-topic-viewer-tabs-container .topic-viewer-tabs {
-    display: -webkit-flex;
-    display: flex;
-    flex-wrap: wrap;
+    display: -webkit-inline-flex;
+    display: inline-flex;
+    justify-content: space-evenly;
     margin-bottom: 0;
     padding-left: 0;
     padding-top: 20px;
     text-align: center;
+    width: 100%;
   }
 
   .oppia-topic-viewer-tabs-container .topic-viewer-tabs li {
-    display: -webkit-flex;
-    display: flex;
+    list-style: none;
     margin-bottom: 0;
-    width: 250px;
-    flex: 1;
   }
 
   .oppia-topic-viewer-tabs-container .topic-viewer-tabs .topic-viewer-tabs-text {
@@ -185,8 +183,9 @@
       width: 80vw;
     }
 
-    .oppia-topic-viewer-tabs-container .topic-viewer-tabs {
-      justify-content: center;
+    .oppia-topic-viewer-tabs-container .topic-viewer-tabs li {
+      flex: 1;
+      width: auto;
     }
   }
 
@@ -204,10 +203,6 @@
       width: 90vw;
     }
 
-    .oppia-topic-viewer-tabs-container .topic-viewer-tabs {
-      justify-content: center;
-    }
-
     .oppia-topic-viewer-tabs-container .topic-viewer-tabs .tab-icon {
       height: 30px;
     }
@@ -217,6 +212,7 @@
     }
 
     .oppia-topic-viewer-tabs-container .topic-viewer-tabs li {
+      flex: 1;
       width: auto;
     }
   }

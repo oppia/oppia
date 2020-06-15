@@ -169,7 +169,6 @@ import { FeedbackThreadSummaryObjectFactory } from
   'domain/feedback_thread/FeedbackThreadSummaryObjectFactory';
 import { FileDownloadRequestObjectFactory } from
   'domain/utilities/FileDownloadRequestObjectFactory';
-import { FormatTimePipe } from 'filters/format-timer.pipe';
 import { FractionInputValidationService } from
   'interactions/FractionInput/directives/fraction-input-validation.service';
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
@@ -186,6 +185,7 @@ import { GuestCollectionProgressService } from
   'domain/collection/guest-collection-progress.service';
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
 import { HtmlEscaperService } from 'services/html-escaper.service';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { IdGenerationService } from 'services/id-generation.service';
 import { ImageClickInputValidationService } from
   // eslint-disable-next-line max-len
@@ -587,6 +587,7 @@ export class UpgradedServices {
     upgradedServices['GraphUtilsService'] = new GraphUtilsService();
     upgradedServices['GuestCollectionProgressObjectFactory'] =
       new GuestCollectionProgressObjectFactory();
+    upgradedServices['I18nLanguageCodeService'] = new I18nLanguageCodeService();
     upgradedServices['IdGenerationService'] = new IdGenerationService();
     upgradedServices['ImageFileObjectFactory'] = new ImageFileObjectFactory();
     upgradedServices['ImprovementActionButtonObjectFactory'] =
@@ -1135,7 +1136,8 @@ export class UpgradedServices {
         upgradedServices['TextInputPredictionService']);
     upgradedServices['ReadOnlySubtopicPageObjectFactory'] =
       new ReadOnlySubtopicPageObjectFactory(
-        upgradedServices['SubtopicPageContentsObjectFactory']);
+        upgradedServices['SubtopicPageContentsObjectFactory'],
+        upgradedServices['SubtopicObjectFactory']);
     upgradedServices['SolutionObjectFactory'] = new SolutionObjectFactory(
       upgradedServices['SubtitledHtmlObjectFactory'],
       upgradedServices['ExplorationHtmlFormatterService']);
@@ -1182,7 +1184,6 @@ export class UpgradedServices {
       upgradedServices['WrittenTranslationsObjectFactory']);
     upgradedServices['StateInteractionStatsService'] =
       new StateInteractionStatsService(
-        upgradedServices['AngularNameService'],
         upgradedServices['AnswerClassificationService'],
         upgradedServices['ContextService'],
         upgradedServices['FractionObjectFactory'],
