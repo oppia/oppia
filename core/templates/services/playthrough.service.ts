@@ -135,7 +135,7 @@ class CyclicStateTransitionsTracker {
   /**
    * Returns whether the given arrays are rotations of each other.
    *
-   * Assumes that the only repeated element in each array `c` is their first and
+   * Assumes that the only repeated element in each array is their first and
    * last element.
    *
    * Rotations are best described through illustration. The following arrays are
@@ -164,8 +164,8 @@ class CyclicStateTransitionsTracker {
     let mostCommonCycle = null;
     let mostCommonCycleOccurrences = 0;
     for (const [cycle, occurrences] of this.cycleOccurrences.entries()) {
+      // When cycles have equal occurrences, take the most recent one.
       if (occurrences >= mostCommonCycleOccurrences) {
-        // When cycles have equal occurrences, take the most recent one.
         mostCommonCycle = cycle;
         mostCommonCycleOccurrences = occurrences;
       }
