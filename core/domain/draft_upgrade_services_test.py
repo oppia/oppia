@@ -147,7 +147,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             self.assertEqual(
                 python_utils.UNICODE(
                     exploration.states_schema_version),
-                    schema_version_to_upgrade)
+                     schema_version_to_upgrade)
 
     def test_convert_to_latest_schema_version_implemented(self):
         state_schema_version = feconf.CURRENT_STATE_SCHEMA_VERSION

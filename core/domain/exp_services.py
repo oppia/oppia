@@ -489,19 +489,23 @@ def apply_change_list(exploration_id, change_list):
             elif (
                     change.cmd ==
                     exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION):
-                    # Make sure that the version that you're trying to migrate to is the latest 
-                    # version. 
-                    if (change.to_version != python_utils.UNICODE(feconf.CURRENT_STATE_SCHEMA_VERSION)):
-                        raise Exception(
-                            'Expected to migrate to the latest state schema version %s, '
-                            'received %s' % (feconf.CURRENT_STATE_SCHEMA_VERSION, change.to_version))
-
+                # Make sure that the version that you're trying to migrate to
+                # is the latest version.
+                if (
+                        change.to_version !=
+                        python_utils.UNICODE(
+                            feconf.CURRENT_STATE_SCHEMA_VERSION)):
+                    raise Exception(
+                        'Expected to migrate to the latest state schema '
+                        'version %s, received %s' % (
+                            feconf.CURRENT_STATE_SCHEMA_VERSION,
+                            change.to_version))
                 # Loading the exploration model from the datastore into an
                 # Exploration domain object automatically converts it to use
                 # the latest states schema version. As a result, simply
                 # resaving the exploration is sufficient to apply the states
                 # schema update.
-                    continue
+                continue
         return exploration
 
     except Exception as e:
