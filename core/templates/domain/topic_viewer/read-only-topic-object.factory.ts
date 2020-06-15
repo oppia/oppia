@@ -23,7 +23,7 @@ import { Injectable } from '@angular/core';
 import { SkillSummary, SkillSummaryObjectFactory } from
   'domain/skill/SkillSummaryObjectFactory';
 import { StorySummary } from 'domain/story/StorySummaryObjectFactory';
-import { Subtopic, SubtopicObjectFactory } from
+import { ISubtopicBackendDict, Subtopic, SubtopicObjectFactory } from
   'domain/topic/SubtopicObjectFactory';
 
 export interface ISkillDescriptions {
@@ -37,6 +37,7 @@ export interface IDegreesOfMastery {
 export class ReadOnlyTopic {
   _topicName: string;
   _topicId: string;
+  _topicDescription: string;
   _canonicalStorySummaries: Array<StorySummary>;
   _additionalStorySummaries: Array<StorySummary>;
   _uncategorizedSkillSummaries: Array<SkillSummary>;
@@ -46,7 +47,7 @@ export class ReadOnlyTopic {
   _trainTabShouldBeDisplayed: boolean;
 
   constructor(
-      topicName: string, topicId: string,
+      topicName: string, topicId: string, topicDescription: string,
       canonicalStorySummaries: Array<StorySummary>,
       additionalStorySummaries: Array<StorySummary>,
       uncategorizedSkillSummaries: Array<SkillSummary>,
@@ -56,6 +57,7 @@ export class ReadOnlyTopic {
       trainTabShouldBeDisplayed: boolean) {
     this._topicName = topicName;
     this._topicId = topicId;
+    this._topicDescription = topicDescription;
     this._canonicalStorySummaries = canonicalStorySummaries;
     this._additionalStorySummaries = additionalStorySummaries;
     this._uncategorizedSkillSummaries = uncategorizedSkillSummaries;
@@ -67,6 +69,10 @@ export class ReadOnlyTopic {
 
   getTopicName(): string {
     return this._topicName;
+  }
+
+  getTopicDescription(): string {
+    return this._topicDescription;
   }
 
   getTopicId(): string {
@@ -120,7 +126,7 @@ export class ReadOnlyTopicObjectFactory {
   // which give tslint errors against underscore_casing in favor of camelCasing.
   createFromBackendDict(topicDataDict: any): ReadOnlyTopic {
     let subtopics: Array<Subtopic> = topicDataDict.subtopics.map(
-      (subtopic: Subtopic) => {
+      (subtopic: ISubtopicBackendDict) => {
         return this._subtopicObjectFactory.create(
           subtopic, topicDataDict.skill_descriptions);
       });
@@ -137,18 +143,21 @@ export class ReadOnlyTopicObjectFactory {
         topicDataDict.canonical_story_dicts.map(
           (storyDict: any) => {
             return new StorySummary(
-              storyDict.id, storyDict.title, storyDict.node_count,
+              storyDict.id, storyDict.title, storyDict.node_titles,
+              storyDict.thumbnail_filename, storyDict.thumbnail_bg_color,
               storyDict.description, true);
           });
     let additionalStories: Array<StorySummary> =
         topicDataDict.additional_story_dicts.map(
           (storyDict: any) => {
             return new StorySummary(
-              storyDict.id, storyDict.title, storyDict.node_count,
+              storyDict.id, storyDict.title, storyDict.node_titles,
+              storyDict.thumbnail_filename, storyDict.thumbnail_bg_color,
               storyDict.description, true);
           });
     return new ReadOnlyTopic(
-      topicDataDict.topic_name, topicDataDict.topic_id, canonicalStories,
+      topicDataDict.topic_name, topicDataDict.topic_id,
+      topicDataDict.topic_description, canonicalStories,
       additionalStories, uncategorizedSkills, subtopics, degreesOfMastery,
       skillDescriptions, topicDataDict.train_tab_should_be_displayed);
   }

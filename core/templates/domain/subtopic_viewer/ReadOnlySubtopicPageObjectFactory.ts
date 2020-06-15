@@ -20,24 +20,53 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { SubtopicPageContentsObjectFactory } from
-  'domain/topic/SubtopicPageContentsObjectFactory';
+import {
+  ISubtopicPageContentsBackendDict,
+  SubtopicPageContents,
+  SubtopicPageContentsObjectFactory
+} from 'domain/topic/SubtopicPageContentsObjectFactory';
+import { ISubtopicBackendDict, Subtopic, SubtopicObjectFactory } from
+  'domain/topic/SubtopicObjectFactory';
+
+export interface ISubtopicDataBackendDict {
+  'subtopic_title': string;
+  'page_contents': ISubtopicPageContentsBackendDict;
+  'next_subtopic_dict': ISubtopicBackendDict | null,
+  'topic_id': string
+}
 
 export class ReadOnlySubtopicPageData {
-  subtopicTitle;
-  pageContents;
+  parentTopicId: string;
+  subtopicTitle: string;
+  pageContents: SubtopicPageContents;
+  nextSubtopic: Subtopic | null;
 
-  constructor(subtopicTitle, pageContents) {
+  constructor(
+      parentTopicId: string,
+      subtopicTitle: string,
+      pageContents: SubtopicPageContents,
+      nextSubtopic: Subtopic | null
+  ) {
+    this.parentTopicId = parentTopicId;
     this.subtopicTitle = subtopicTitle;
     this.pageContents = pageContents;
+    this.nextSubtopic = nextSubtopic;
   }
 
-  getSubtopicTitle() {
+  getParentTopicId(): string {
+    return this.parentTopicId;
+  }
+
+  getSubtopicTitle(): string {
     return this.subtopicTitle;
   }
 
-  getPageContents() {
+  getPageContents(): SubtopicPageContents {
     return this.pageContents;
+  }
+
+  getNextSubtopic(): Subtopic | null {
+    return this.nextSubtopic;
   }
 }
 
@@ -46,19 +75,25 @@ export class ReadOnlySubtopicPageData {
 })
 export class ReadOnlySubtopicPageObjectFactory {
   constructor(
-    private subtopicPageContentsObjectFactory: SubtopicPageContentsObjectFactory
+    private subtopicPageContentsObjectFactory:
+      SubtopicPageContentsObjectFactory,
+    private subtopicObjectFactory: SubtopicObjectFactory
   ) {}
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'subtopicDataBackendDict' is a dict with underscore_cased
-  // keys which give tslint errors against underscore_casing in favor of
-  // camelCasing.
-  createFromBackendDict(subtopicDataBackendDict: any):
+
+  createFromBackendDict(subtopicDataBackendDict: ISubtopicDataBackendDict):
     ReadOnlySubtopicPageData {
+    let nextSubtopic = subtopicDataBackendDict.next_subtopic_dict ? (
+      this.subtopicObjectFactory
+        .create(subtopicDataBackendDict.next_subtopic_dict, {})
+    ) : null;
+
     return new ReadOnlySubtopicPageData(
+      subtopicDataBackendDict.topic_id,
       subtopicDataBackendDict.subtopic_title,
       this.subtopicPageContentsObjectFactory.createFromBackendDict(
         subtopicDataBackendDict.page_contents
-      )
+      ),
+      nextSubtopic
     );
   }
 }

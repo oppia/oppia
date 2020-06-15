@@ -19,7 +19,7 @@
 require('base-components/base-content.directive.ts');
 require(
   'components/common-layout-directives/common-elements/' +
-  'background-banner.directive.ts');
+  'background-banner.component.ts');
 
 require('domain/utilities/url-interpolation.service.ts');
 require('services/page-title.service.ts');
@@ -99,7 +99,7 @@ angular.module('oppia').directive('topicLandingPage', [
 
           ctrl.onClickExploreLessonsButton = function() {
             $timeout(function() {
-              WindowRef.nativeWindow.location = '/library';
+              WindowRef.nativeWindow.location = '/community-library';
             }, 150);
           };
           ctrl.$onInit = function() {

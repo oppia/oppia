@@ -133,7 +133,9 @@ def get_story_summary_from_model(story_summary_model):
         story_summary_model.description,
         story_summary_model.language_code,
         story_summary_model.version,
-        story_summary_model.node_count,
+        story_summary_model.node_titles,
+        story_summary_model.thumbnail_bg_color,
+        story_summary_model.thumbnail_filename,
         story_summary_model.story_model_created_on,
         story_summary_model.story_model_last_updated
     )
@@ -178,6 +180,7 @@ def get_story_summary_by_id(story_id, strict=True):
         story_id: str. ID of the story summary.
         strict: bool. Whether to fail noisily if no story summary with the given
             id exists in the datastore.
+
     Returns:
         StorySummary. The story summary domain object corresponding to
         a story with the given story_id.

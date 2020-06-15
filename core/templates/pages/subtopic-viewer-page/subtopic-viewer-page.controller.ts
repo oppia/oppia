@@ -21,9 +21,10 @@ require('rich_text_components/richTextComponentsRequires.ts');
 require('base-components/base-content.directive.ts');
 require(
   'components/common-layout-directives/common-elements/' +
-  'background-banner.directive.ts');
+  'background-banner.component.ts');
 require('directives/angular-html-bind.directive.ts');
 require('directives/mathjax-bind.directive.ts');
+require('components/summary-tile/subtopic-summary-tile.directive.ts');
 
 require('domain/subtopic_viewer/subtopic-viewer-backend-api.service.ts');
 require('services/alerts.service.ts');
@@ -42,14 +43,15 @@ angular.module('oppia').directive('subtopicViewerPage', [
         '/pages/subtopic-viewer-page/subtopic-viewer-page.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$window', 'AlertsService', 'LoaderService',
+        '$rootScope', '$window', 'AlertsService', 'LoaderService',
         'PageTitleService', 'SubtopicViewerBackendApiService', 'UrlService',
         'WindowDimensionsService', 'FATAL_ERROR_CODES',
         function(
-            $window, AlertsService, LoaderService,
+            $rootScope, $window, AlertsService, LoaderService,
             PageTitleService, SubtopicViewerBackendApiService, UrlService,
             WindowDimensionsService, FATAL_ERROR_CODES) {
           var ctrl = this;
+          ctrl.nextSubtopicSummaryIsShown = false;
 
           ctrl.checkMobileView = function() {
             return (WindowDimensionsService.getWidth() < 500);
@@ -66,7 +68,17 @@ angular.module('oppia').directive('subtopicViewerPage', [
                   subtopicDataObject.getPageContents().getSubtitledHtml());
                 ctrl.subtopicTitle = subtopicDataObject.getSubtopicTitle();
                 PageTitleService.setPageTitle(ctrl.subtopicTitle + ' - Oppia');
+
+                let nextSubtopic = (
+                  subtopicDataObject.getNextSubtopic());
+                if (nextSubtopic) {
+                  ctrl.parentTopicId = subtopicDataObject.getParentTopicId();
+                  ctrl.nextSubtopic = nextSubtopic;
+                  ctrl.nextSubtopicSummaryIsShown = true;
+                }
+
                 LoaderService.hideLoadingScreen();
+                $rootScope.$apply();
               },
               function(errorResponse) {
                 if (FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1) {

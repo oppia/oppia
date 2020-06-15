@@ -403,7 +403,11 @@ def apply_change_list(exploration_id, change_list):
                 elif (
                         change.property_name ==
                         exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION):
-                    state.update_interaction_solution(change.new_value)
+                    new_solution = None
+                    if change.new_value is not None:
+                        new_solution = state_domain.Solution.from_dict(
+                            state.interaction.id, change.new_value)
+                    state.update_interaction_solution(new_solution)
                 elif (
                         change.property_name ==
                         exp_domain.STATE_PROPERTY_SOLICIT_ANSWER_DETAILS):
@@ -1070,33 +1074,38 @@ def save_exploration_summary(exp_summary):
     Args:
         exp_summary: ExplorationSummary. The exploration summary to save.
     """
-    exp_summary_model = exp_models.ExpSummaryModel(
-        id=exp_summary.id,
-        title=exp_summary.title,
-        category=exp_summary.category,
-        objective=exp_summary.objective,
-        language_code=exp_summary.language_code,
-        tags=exp_summary.tags,
-        ratings=exp_summary.ratings,
-        scaled_average_rating=exp_summary.scaled_average_rating,
-        status=exp_summary.status,
-        community_owned=exp_summary.community_owned,
-        owner_ids=exp_summary.owner_ids,
-        editor_ids=exp_summary.editor_ids,
-        voice_artist_ids=exp_summary.voice_artist_ids,
-        viewer_ids=exp_summary.viewer_ids,
-        contributor_ids=exp_summary.contributor_ids,
-        contributors_summary=exp_summary.contributors_summary,
-        version=exp_summary.version,
-        exploration_model_last_updated=(
+    exp_summary_dict = {
+        'title': exp_summary.title,
+        'category': exp_summary.category,
+        'objective': exp_summary.objective,
+        'language_code': exp_summary.language_code,
+        'tags': exp_summary.tags,
+        'ratings': exp_summary.ratings,
+        'scaled_average_rating': exp_summary.scaled_average_rating,
+        'status': exp_summary.status,
+        'community_owned': exp_summary.community_owned,
+        'owner_ids': exp_summary.owner_ids,
+        'editor_ids': exp_summary.editor_ids,
+        'voice_artist_ids': exp_summary.voice_artist_ids,
+        'viewer_ids': exp_summary.viewer_ids,
+        'contributor_ids': exp_summary.contributor_ids,
+        'contributors_summary': exp_summary.contributors_summary,
+        'version': exp_summary.version,
+        'exploration_model_last_updated': (
             exp_summary.exploration_model_last_updated),
-        exploration_model_created_on=(
+        'exploration_model_created_on': (
             exp_summary.exploration_model_created_on),
-        first_published_msec=(
+        'first_published_msec': (
             exp_summary.first_published_msec)
-    )
+    }
 
-    exp_summary_model.put()
+    exp_summary_model = (exp_models.ExpSummaryModel.get_by_id(exp_summary.id))
+    if exp_summary_model is not None:
+        exp_summary_model.populate(**exp_summary_dict)
+        exp_summary_model.put()
+    else:
+        exp_summary_dict['id'] = exp_summary.id
+        exp_models.ExpSummaryModel(**exp_summary_dict).put()
 
     # The index should be updated after saving the exploration
     # summary instead of after saving the exploration since the
@@ -1362,6 +1371,7 @@ def get_next_page_of_all_non_private_commits(
             - bool. indicating whether there are (likely) more results after
               this batch. If False, there are no more results; if True, there
               are probably more results.
+
     Raises:
         ValueError: The argument max_age is not datetime.timedelta or None.
     """
@@ -1397,18 +1407,9 @@ def get_image_filenames_from_exploration(exploration):
                 'imageAndRegions']['value']['imagePath'])
 
     html_list = exploration.get_all_html_content_strings()
-    rte_components_in_exp = []
-    for html_string in html_list:
-        rte_components_in_exp = (
-            rte_components_in_exp + html_cleaner.get_rte_components(
-                html_string))
-
-    for rte_comp in rte_components_in_exp:
-        if 'id' in rte_comp and rte_comp['id'] == 'oppia-noninteractive-image':
-            filenames.append(
-                rte_comp['customization_args']['filepath-with-value'])
-    # This is done because the ItemSelectInput may repeat the image names.
-    return list(set(filenames))
+    filenames.extend(
+        html_cleaner.get_image_filenames_from_html_strings(html_list))
+    return filenames
 
 
 def get_number_of_ratings(ratings):

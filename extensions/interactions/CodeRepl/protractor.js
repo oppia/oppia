@@ -20,36 +20,36 @@
 var waitFor = require(
   process.cwd() + '/core/tests/protractor_utils/waitFor.js');
 
-var customizeInteraction = function(interactionEditor, placeHolderText) {
-  browser.executeScript(
+var customizeInteraction = async function(interactionEditor, placeHolderText) {
+  await browser.executeScript(
     "var editor = $('schema-based-editor .CodeMirror')[0].CodeMirror;" +
     "editor.setValue('" + placeHolderText + "');");
 };
 
-var expectInteractionDetailsToMatch = function(elem, placeHolderText) {
+var expectInteractionDetailsToMatch = async function(elem, placeHolderText) {
   expect(
-    elem.element(by.css('.CodeMirror')).isPresent()
+    await elem.element(by.css('.CodeMirror')).isPresent()
   ).toBe(true);
   // The \n must be included in the check because the editor inserts a newline.
   // For testing purposes it is required that the order of
   // the quotes is single-quotes within double-quotes
   /* eslint-disable quotes */
-  var testValue = browser.executeScript(
+  var testValue = await browser.executeScript(
     "var elem = $('.protractor-test-preview-tab .CodeMirror')[0].CodeMirror;" +
     "return elem.getValue()");
   /* eslint-enable quotes */
   expect(testValue).toEqual(placeHolderText + '\n');
 };
 
-var submitAnswer = function(conversationInput, answerCode) {
-  browser.executeScript(
+var submitAnswer = async function(conversationInput, answerCode) {
+  await browser.executeScript(
     "var elem = $('.protractor-test-preview-tab .CodeMirror')[0].CodeMirror;" +
     "elem.setValue('" + answerCode + "');");
   var submitAnswerButton = element(by.css(
     '.protractor-test-submit-answer-button'));
-  waitFor.elementToBeClickable(
+  await waitFor.elementToBeClickable(
     submitAnswerButton, 'Submit Answer button is not clickable');
-  submitAnswerButton.click();
+  await submitAnswerButton.click();
 };
 
 var answerObjectType = 'CodeString';
@@ -69,4 +69,3 @@ exports.expectInteractionDetailsToMatch = expectInteractionDetailsToMatch;
 exports.submitAnswer = submitAnswer;
 exports.answerObjectType = answerObjectType;
 exports.testSuite = testSuite;
-

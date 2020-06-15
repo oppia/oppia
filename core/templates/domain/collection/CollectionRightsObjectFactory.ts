@@ -22,12 +22,12 @@ import cloneDeep from 'lodash/cloneDeep';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-export interface ICollectionRights {
-  getCollectionId: () => number;
-  canEdit: () => boolean;
-  isPrivate: () => boolean;
-  canUnpublish: () => boolean;
-  getOwnerNames: () => string[];
+export interface ICollectionRightsBackendDict {
+  'collection_id'?: number;
+  'can_edit'?: boolean;
+  'can_unpublish'?: boolean;
+  'is_private'?: boolean;
+  'owner_names': string[];
 }
 
 export class CollectionRights {
@@ -37,11 +37,7 @@ export class CollectionRights {
   _isPrivate: boolean;
   _ownerNames: string[];
 
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'collectionRightsObject' is a dict with
-  // underscore_cased keys which give tslint errors against underscore_casing
-  // in favor of camelCasing.
-  constructor(collectionRightsObject: any) {
+  constructor(collectionRightsObject: ICollectionRightsBackendDict) {
     this._collectionId = collectionRightsObject.collection_id;
     this._canEdit = collectionRightsObject.can_edit;
     this._canUnpublish = collectionRightsObject.can_unpublish;
@@ -113,7 +109,7 @@ export class CollectionRights {
   // internal, bindable objects are changed within this collection rights.
   // Note that the collection nodes within this collection will be completely
   // redefined as copies from the specified collection rights
-  copyFromCollectionRights(otherCollectionRights: ICollectionRights): void {
+  copyFromCollectionRights(otherCollectionRights: CollectionRights): void {
     this._collectionId = otherCollectionRights.getCollectionId();
     this._canEdit = otherCollectionRights.canEdit();
     this._isPrivate = otherCollectionRights.isPrivate();
@@ -129,11 +125,9 @@ export class CollectionRightsObjectFactory {
   // Static class methods. Note that "this" is not available in static
   // contexts. This function takes a JSON object which represents a backend
   // collection python dict.
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'collectionRightsBackendObject' is a dict with
-  // underscore_cased keys which give tslint errors against underscore_casing
-  // in favor of camelCasing.
-  create(collectionRightsBackendObject: any): CollectionRights {
+  create(
+      collectionRightsBackendObject: ICollectionRightsBackendDict):
+      CollectionRights {
     return new CollectionRights(cloneDeep(collectionRightsBackendObject));
   }
 

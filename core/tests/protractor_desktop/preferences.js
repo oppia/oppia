@@ -18,6 +18,7 @@
 var PreferencesPage = require('../protractor_utils/PreferencesPage.js');
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
+var waitFor = require('../protractor_utils/waitFor.js');
 
 describe('Preferences', function() {
   var preferencesPage = null;
@@ -26,116 +27,135 @@ describe('Preferences', function() {
     preferencesPage = new PreferencesPage.PreferencesPage();
   });
 
-  it('should let a user upload a profile photo', function() {
-    users.createUser('eve@preferences.com', 'evePreferences');
-    users.login('eve@preferences.com');
-    preferencesPage.get();
-    expect(preferencesPage.getProfilePhotoSource())
-      .not
-      .toEqual(
-        preferencesPage.submitProfilePhoto('../data/img.png')
-          .then(function() {
-            return preferencesPage.getProfilePhotoSource();
-          })
-      );
+  it('should let a user upload a profile photo', async function() {
+    await users.createUser('eve@preferences.com', 'evePreferences');
+    await users.login('eve@preferences.com');
+    await preferencesPage.get();
+    var defaultProfilePhotoSource = (
+      await preferencesPage.getProfilePhotoSource());
+    await preferencesPage.submitProfilePhoto('../data/img.png');
+    var newProfilePhotoSource = await preferencesPage.getProfilePhotoSource();
+    expect(defaultProfilePhotoSource).not.toEqual(newProfilePhotoSource);
   });
 
-  it('should show an error if uploaded photo is too large', function() {
-    users.createUser('lou@preferences.com', 'louPreferences');
-    users.login('lou@preferences.com');
-    preferencesPage.get();
-    preferencesPage.uploadProfilePhoto(
-      '../data/dummyLargeImage.jpg')
-      .then(function() {
-        preferencesPage.expectUploadError();
-      });
+  it('should show an error if uploaded photo is too large', async function() {
+    await users.createUser('lou@preferences.com', 'louPreferences');
+    await users.login('lou@preferences.com');
+    await preferencesPage.get();
+    await waitFor.pageToFullyLoad();
+    await preferencesPage.uploadProfilePhoto('../data/dummyLargeImage.jpg');
+    await preferencesPage.expectUploadError();
   });
 
-  it('should change editor role email checkbox value', function() {
-    users.createUser('alice@preferences.com', 'alicePreferences');
-    users.login('alice@preferences.com');
-    preferencesPage.get();
-    expect(preferencesPage.isEditorRoleEmailsCheckboxSelected()).toBe(true);
-    preferencesPage.toggleEditorRoleEmailsCheckbox();
-    expect(preferencesPage.isEditorRoleEmailsCheckboxSelected()).toBe(false);
-    browser.refresh();
-    expect(preferencesPage.isEditorRoleEmailsCheckboxSelected()).toBe(false);
+  it('should change editor role email checkbox value', async function() {
+    await users.createUser('alice@preferences.com', 'alicePreferences');
+    await users.login('alice@preferences.com');
+    await preferencesPage.get();
+    await waitFor.pageToFullyLoad();
+    expect(await preferencesPage.isEditorRoleEmailsCheckboxSelected()).toBe(
+      true);
+    await preferencesPage.toggleEditorRoleEmailsCheckbox();
+    expect(await preferencesPage.isEditorRoleEmailsCheckboxSelected()).toBe(
+      false);
+    await browser.refresh();
+    await waitFor.pageToFullyLoad();
+    expect(await preferencesPage.isEditorRoleEmailsCheckboxSelected()).toBe(
+      false);
   });
 
-  it('should change feedback message email checkbox value', function() {
-    users.createUser('bob@preferences.com', 'bobPreferences');
-    users.login('bob@preferences.com');
-    preferencesPage.get();
-    expect(preferencesPage.isFeedbackEmailsCheckboxSelected()).toBe(true);
-    preferencesPage.toggleFeedbackEmailsCheckbox();
-    expect(preferencesPage.isFeedbackEmailsCheckboxSelected()).toBe(false);
-    browser.refresh();
-    expect(preferencesPage.isFeedbackEmailsCheckboxSelected()).toBe(false);
+  it('should change feedback message email checkbox value', async function() {
+    await users.createUser('bob@preferences.com', 'bobPreferences');
+    await users.login('bob@preferences.com');
+    await preferencesPage.get();
+    await waitFor.pageToFullyLoad();
+    expect(await preferencesPage.isFeedbackEmailsCheckboxSelected()).toBe(true);
+    await preferencesPage.toggleFeedbackEmailsCheckbox();
+    expect(await preferencesPage.isFeedbackEmailsCheckboxSelected()).toBe(
+      false);
+    await browser.refresh();
+    await waitFor.pageToFullyLoad();
+    expect(await preferencesPage.isFeedbackEmailsCheckboxSelected()).toBe(
+      false);
   });
 
-  it('should set and edit bio in user profile', function() {
-    users.createUser('lisa@preferences.com', 'lisaPreferences');
-    users.login('lisa@preferences.com');
-    preferencesPage.get();
-    preferencesPage.setUserBio('I am Lisa');
-    browser.refresh();
-    preferencesPage.expectUserBioToBe('I am Lisa');
-    preferencesPage.setUserBio('Junior student');
-    browser.refresh();
-    preferencesPage.expectUserBioToBe('Junior student');
-    preferencesPage.editUserBio(' from USA');
-    preferencesPage.editUserBio(' studying CS!');
-    browser.refresh();
-    preferencesPage.expectUserBioToBe('Junior student from USA studying CS!');
+  it('should set and edit bio in user profile', async function() {
+    await users.createUser('lisa@preferences.com', 'lisaPreferences');
+    await users.login('lisa@preferences.com');
+    await preferencesPage.get();
+    await preferencesPage.setUserBio('I am Lisa');
+    await browser.refresh();
+    await waitFor.pageToFullyLoad();
+    await preferencesPage.expectUserBioToBe('I am Lisa');
+
+    await preferencesPage.setUserBio('Junior student');
+    await browser.refresh();
+    await waitFor.pageToFullyLoad();
+    await preferencesPage.expectUserBioToBe('Junior student');
+
+    await preferencesPage.editUserBio(' from USA');
+    await preferencesPage.editUserBio(' studying CS!');
+    await browser.refresh();
+    await waitFor.pageToFullyLoad();
+    await preferencesPage.expectUserBioToBe(
+      'Junior student from USA studying CS!');
   });
 
-  it('should change prefered audio language of the learner', function() {
-    users.createUser('paul@preferences.com', 'paulPreferences');
-    users.login('paul@preferences.com');
-    preferencesPage.get();
+  it('should change prefered audio language of the learner', async function() {
+    await users.createUser('paul@preferences.com', 'paulPreferences');
+    await users.login('paul@preferences.com');
+    await preferencesPage.get();
     expect(preferencesPage.preferredAudioLanguageSelector).toBeUndefined();
-    preferencesPage.selectPreferredAudioLanguage('Hindi');
-    preferencesPage.expectPreferredAudioLanguageToBe('Hindi');
-    browser.refresh();
-    preferencesPage.expectPreferredAudioLanguageToBe('Hindi');
-    preferencesPage.selectPreferredAudioLanguage('Arabic');
-    preferencesPage.expectPreferredAudioLanguageToBe('Arabic');
-    browser.refresh();
-    preferencesPage.expectPreferredAudioLanguageToBe('Arabic');
+    await preferencesPage.selectPreferredAudioLanguage('Hindi');
+    await preferencesPage.expectPreferredAudioLanguageToBe('Hindi');
+    await browser.refresh();
+    await waitFor.pageToFullyLoad();
+
+    await preferencesPage.expectPreferredAudioLanguageToBe('Hindi');
+    await preferencesPage.selectPreferredAudioLanguage('Arabic');
+    await preferencesPage.expectPreferredAudioLanguageToBe('Arabic');
+    await browser.refresh();
+    await waitFor.pageToFullyLoad();
+
+    await preferencesPage.expectPreferredAudioLanguageToBe('Arabic');
   });
 
-  it('should change prefered site language of the learner', function() {
-    users.createUser('john@preferences.com', 'johnPreferences');
-    users.login('john@preferences.com');
-    preferencesPage.get();
+  it('should change prefered site language of the learner', async function() {
+    await users.createUser('john@preferences.com', 'johnPreferences');
+    await users.login('john@preferences.com');
+    await preferencesPage.get();
     expect(preferencesPage.systemLanguageSelector).toBeUndefined();
-    preferencesPage.selectSystemLanguage('Español');
-    preferencesPage.expectPreferredSiteLanguageToBe('Español');
-    browser.refresh();
-    preferencesPage.expectPreferredSiteLanguageToBe('Español');
-    preferencesPage.selectSystemLanguage('English');
-    preferencesPage.expectPreferredSiteLanguageToBe('English');
-    browser.refresh();
-    preferencesPage.expectPreferredSiteLanguageToBe('English');
+    await preferencesPage.selectSystemLanguage('Español');
+    await preferencesPage.expectPreferredSiteLanguageToBe('Español');
+    await browser.refresh();
+    await waitFor.pageToFullyLoad();
+
+    await preferencesPage.expectPreferredSiteLanguageToBe('Español');
+    await preferencesPage.selectSystemLanguage('English');
+    await preferencesPage.expectPreferredSiteLanguageToBe('English');
+    await browser.refresh();
+    await waitFor.pageToFullyLoad();
+
+    await preferencesPage.expectPreferredSiteLanguageToBe('English');
   });
 
-  it('should load the correct dashboard according to selection', function() {
-    users.createUser('lorem@preferences.com', 'loremPreferences');
-    users.login('lorem@preferences.com');
-    preferencesPage.get();
-    preferencesPage.selectCreatorDashboard();
-    general.goToHomePage();
-    expect(browser.getCurrentUrl()).toEqual(
-      'http://localhost:9001/creator_dashboard');
-    preferencesPage.get();
-    preferencesPage.selectLearnerDashboard();
-    general.goToHomePage();
-    expect(browser.getCurrentUrl()).toEqual(
-      'http://localhost:9001/learner_dashboard');
-  });
+  it('should load the correct dashboard according to selection',
+    async function() {
+      await users.createUser('lorem@preferences.com', 'loremPreferences');
+      await users.login('lorem@preferences.com');
+      await preferencesPage.get();
+      await preferencesPage.selectCreatorDashboard();
+      await general.goToHomePage();
+      expect(await browser.getCurrentUrl()).toEqual(
+        'http://localhost:9001/creator-dashboard');
+      await preferencesPage.get();
+      await preferencesPage.selectLearnerDashboard();
+      await general.goToHomePage();
+      expect(await browser.getCurrentUrl()).toEqual(
+        'http://localhost:9001/learner-dashboard');
+    });
 
-  afterEach(function() {
-    general.checkForConsoleErrors([]);
-    users.logout();
+  afterEach(async function() {
+    await general.checkForConsoleErrors([]);
+    await users.logout();
   });
 });

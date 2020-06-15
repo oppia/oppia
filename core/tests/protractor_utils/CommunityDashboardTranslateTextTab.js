@@ -25,18 +25,18 @@ var CommunityDashboardTranslateTextTab = function() {
   var selectedLanguageElement = selectableLanguageElements.element(
     by.css('option:checked'));
 
-  var _selectLanguage = function(language) {
-    selectableLanguageElements.element(
+  var _selectLanguage = async function(language) {
+    await selectableLanguageElements.element(
       by.cssContainingText('option', language)).click();
   };
 
-  this.changeLanguage = function(language) {
-    _selectLanguage(language);
-    waitFor.pageToFullyLoad();
+  this.changeLanguage = async function(language) {
+    await _selectLanguage(language);
+    await waitFor.pageToFullyLoad();
   };
 
-  this.expectSelectedLanguageToBe = function(language) {
-    expect(selectedLanguageElement.getText()).toMatch(language);
+  this.expectSelectedLanguageToBe = async function(language) {
+    expect(await selectedLanguageElement.getText()).toMatch(language);
   };
 };
 exports.CommunityDashboardTranslateTextTab = CommunityDashboardTranslateTextTab;

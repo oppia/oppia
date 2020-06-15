@@ -20,6 +20,6 @@
 // main module the elements are attached to.
 require('pages/about-page/about-page.module.ts');
 require('App.ts');
+require('base-components/oppia-root.directive.ts');
 
-require('pages/about-page/about-page.controller.ts');
 require('base-components/base-content.directive.ts');
