@@ -33,15 +33,12 @@ import { Stopwatch, StopwatchObjectFactory } from
   'domain/utilities/StopwatchObjectFactory';
 
 interface MultipleIncorrectStateNames {
-  // eslint-disable-next-line camelcase
-  state_name: string;
-  // eslint-disable-next-line camelcase
-  num_times_incorrect: number;
+  'state_name': string;
+  'num_times_incorrect': number;
 }
 interface CycleIdentifier {
-  cycle: string;
-  // eslint-disable-next-line camelcase
-  num_cycles: number;
+  'cycle': string;
+  'num_cycles': number;
 }
 
 @Injectable({

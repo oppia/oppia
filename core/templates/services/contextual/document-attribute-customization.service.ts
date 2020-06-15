@@ -36,4 +36,3 @@ export class DocumentAttributeCustomizationService {
 angular.module('oppia').factory(
   'DocumentAttributeCustomizationService',
   downgradeInjectable(DocumentAttributeCustomizationService));
-
