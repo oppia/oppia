@@ -40,6 +40,9 @@ export class SchemaDefaultValueService {
       return '';
     } else if (schema.type === 'list') {
       var that = this;
+      if (!Array.isArray(schema.items)) {
+        return [];
+      }
       return schema.items.map(function(item) {
         return that.getDefaultValue(item);
       });

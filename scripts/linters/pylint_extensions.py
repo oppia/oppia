@@ -1062,30 +1062,31 @@ class SingleNewlineAboveArgsChecker(checkers.BaseChecker):
             node: astroid.scoped_nodes.Function. Node to access module content.
         """
 
-        in_multi_line_comment = False
-        multi_line_indicator = b'"""'
+        in_class_or_function = False
+        in_docstring = False
         file_content = read_from_node(node)
         file_length = len(file_content)
         blank_line_counter = 0
+        prev_line = ''
 
         for line_num in python_utils.RANGE(file_length):
             line = file_content[line_num].strip()
 
-            # Single multi-line comment, ignore it.
-            if line.count(multi_line_indicator) == 2:
-                continue
+            if line_num > 0:
+                prev_line = file_content[line_num - 1].strip()
 
-            # Flip multi-line boolean depending on whether or not we see
-            # the multi-line indicator. Possible for multiline comment to
-            # be somewhere other than the start of a line (e.g. func arg),
-            # so we can't look at start of or end of a line, which is why
-            # the case where two indicators in a single line is handled
-            # separately (i.e. one line comment with multi-line strings).
-            if multi_line_indicator in line:
-                in_multi_line_comment = not in_multi_line_comment
+            # Check if it is a docstring and not some multi-line string.
+            if (prev_line.startswith(b'class ') or
+                    prev_line.startswith(b'def ') or in_class_or_function):
+                in_class_or_function = True
+                if prev_line.endswith(b'):') and line.startswith(b'"""'):
+                    in_docstring = True
+                    in_class_or_function = False
 
-            # Ignore anything inside a multi-line comment.
-            if in_multi_line_comment:
+            if line.endswith(b'"""'):
+                in_docstring = False
+
+            if not in_docstring:
                 continue
 
             if file_content[line_num] == b'\n':
@@ -1163,7 +1164,8 @@ class DivisionOperatorChecker(checkers.BaseChecker):
             if line.count(string_indicator) >= 2:
                 continue
 
-            if re.search(br'[^/]/[^/]', line):
+            if (re.search(br'[^/]/[^/]', line) and
+                    not line.endswith(multi_line_indicator)):
                 self.add_message(
                     'division-operator-used', line=line_num + 1)
 
@@ -1270,12 +1272,14 @@ class SingleLineCommentChecker(checkers.BaseChecker):
 
                 # Check if variable name is used.
                 underscore_is_present = '_' in line.split()[1]
+                if underscore_is_present:
+                    continue
 
                 # Check if allowed prefix is used.
                 allowed_prefix_is_present = any(
                     line[2:].startswith(word) for word in (
                         allowed_comment_prefixes))
-                if allowed_prefix_is_present or underscore_is_present:
+                if allowed_prefix_is_present:
                     continue
 
             # Comments must start with a capital letter.

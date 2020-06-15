@@ -403,7 +403,11 @@ def apply_change_list(exploration_id, change_list):
                 elif (
                         change.property_name ==
                         exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION):
-                    state.update_interaction_solution(change.new_value)
+                    new_solution = None
+                    if change.new_value is not None:
+                        new_solution = state_domain.Solution.from_dict(
+                            state.interaction.id, change.new_value)
+                    state.update_interaction_solution(new_solution)
                 elif (
                         change.property_name ==
                         exp_domain.STATE_PROPERTY_SOLICIT_ANSWER_DETAILS):
@@ -1367,6 +1371,7 @@ def get_next_page_of_all_non_private_commits(
             - bool. indicating whether there are (likely) more results after
               this batch. If False, there are no more results; if True, there
               are probably more results.
+
     Raises:
         ValueError: The argument max_age is not datetime.timedelta or None.
     """

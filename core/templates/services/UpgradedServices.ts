@@ -169,7 +169,6 @@ import { FeedbackThreadSummaryObjectFactory } from
   'domain/feedback_thread/FeedbackThreadSummaryObjectFactory';
 import { FileDownloadRequestObjectFactory } from
   'domain/utilities/FileDownloadRequestObjectFactory';
-import { FormatTimePipe } from 'filters/format-timer.pipe';
 import { FractionInputValidationService } from
   'interactions/FractionInput/directives/fraction-input-validation.service';
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
@@ -186,6 +185,7 @@ import { GuestCollectionProgressService } from
   'domain/collection/guest-collection-progress.service';
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
 import { HtmlEscaperService } from 'services/html-escaper.service';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { IdGenerationService } from 'services/id-generation.service';
 import { ImageClickInputValidationService } from
   // eslint-disable-next-line max-len
@@ -248,6 +248,8 @@ import { MusicNotesInputValidationService } from
 import { MusicPhrasePlayerService } from
   // eslint-disable-next-line max-len
   'interactions/MusicNotesInput/directives/music-phrase-player.service';
+import { NewlyCreatedTopicObjectFactory } from
+  'domain/topics_and_skills_dashboard/NewlyCreatedTopicObjectFactory';
 import { NormalizeWhitespacePipe } from
   'filters/string-utility-filters/normalize-whitespace.pipe';
 import { NormalizeWhitespacePunctuationAndCasePipe } from
@@ -466,6 +468,12 @@ import { TopicsAndSkillsDashboardBackendApiService } from
   'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 import { TopicSummaryObjectFactory } from
   'domain/topic/TopicSummaryObjectFactory';
+import { TopicsAndSkillsDashboardFilterObjectFactory } from
+  // eslint-disable-next-line max-len
+  'domain/topics_and_skills_dashboard/TopicsAndSkillsDashboardFilterObjectFactory';
+import { TopicsAndSkillsDashboardPageService } from
+  // eslint-disable-next-line max-len
+  'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.service';
 import { TopicViewerBackendApiService } from
   'domain/topic_viewer/topic-viewer-backend-api.service';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
@@ -577,6 +585,7 @@ export class UpgradedServices {
     upgradedServices['GraphUtilsService'] = new GraphUtilsService();
     upgradedServices['GuestCollectionProgressObjectFactory'] =
       new GuestCollectionProgressObjectFactory();
+    upgradedServices['I18nLanguageCodeService'] = new I18nLanguageCodeService();
     upgradedServices['IdGenerationService'] = new IdGenerationService();
     upgradedServices['ImageFileObjectFactory'] = new ImageFileObjectFactory();
     upgradedServices['ImprovementActionButtonObjectFactory'] =
@@ -605,6 +614,8 @@ export class UpgradedServices {
     upgradedServices['NormalizeWhitespacePunctuationAndCasePipe'] =
       new NormalizeWhitespacePunctuationAndCasePipe();
     upgradedServices['NumberAttemptsService'] = new NumberAttemptsService();
+    upgradedServices['NewlyCreatedTopicObjectFactory'] =
+        new NewlyCreatedTopicObjectFactory();
     upgradedServices['ParamChangeObjectFactory'] =
       new ParamChangeObjectFactory();
     upgradedServices['ParamMetadataObjectFactory'] =
@@ -659,6 +670,10 @@ export class UpgradedServices {
     upgradedServices['ThreadStatusDisplayService'] =
       new ThreadStatusDisplayService();
     upgradedServices['Title'] = new Title({});
+    upgradedServices['TopicsAndSkillsDashboardFilterObjectFactory'] =
+        new TopicsAndSkillsDashboardFilterObjectFactory();
+    upgradedServices['TopicsAndSkillsDashboardPageService'] =
+        new TopicsAndSkillsDashboardPageService();
     upgradedServices['TopicRightsObjectFactory'] =
       new TopicRightsObjectFactory();
     upgradedServices['TopicSummaryObjectFactory'] =
@@ -791,6 +806,8 @@ export class UpgradedServices {
     upgradedServices['SetInputValidationService'] =
       new SetInputValidationService(
         upgradedServices['baseInteractionValidationService']);
+    upgradedServices['SkillCreationBackendApiService'] =
+        new SkillCreationBackendApiService(upgradedServices['HttpClient']);
     upgradedServices['SVMPredictionService'] = new SVMPredictionService(
       upgradedServices['PredictionResultObjectFactory']);
     upgradedServices['SchemaDefaultValueService'] =
@@ -818,6 +835,12 @@ export class UpgradedServices {
     upgradedServices['ThreadMessageObjectFactory'] =
       new ThreadMessageObjectFactory(
         upgradedServices['ThreadMessageSummaryObjectFactory']);
+    upgradedServices['TopicsAndSkillsDashboardBackendApiService'] =
+        new TopicsAndSkillsDashboardBackendApiService(
+          upgradedServices['HttpClient']);
+    upgradedServices['TopicCreationBackendApiService'] =
+        new TopicCreationBackendApiService(
+          upgradedServices['HttpClient']);
     upgradedServices['UrlService'] = new UrlService(
       upgradedServices['WindowRef']);
     upgradedServices['WindowDimensionsService'] = new WindowDimensionsService(
@@ -1105,7 +1128,8 @@ export class UpgradedServices {
         upgradedServices['TextInputPredictionService']);
     upgradedServices['ReadOnlySubtopicPageObjectFactory'] =
       new ReadOnlySubtopicPageObjectFactory(
-        upgradedServices['SubtopicPageContentsObjectFactory']);
+        upgradedServices['SubtopicPageContentsObjectFactory'],
+        upgradedServices['SubtopicObjectFactory']);
     upgradedServices['SolutionObjectFactory'] = new SolutionObjectFactory(
       upgradedServices['SubtitledHtmlObjectFactory'],
       upgradedServices['ExplorationHtmlFormatterService']);
@@ -1152,7 +1176,6 @@ export class UpgradedServices {
       upgradedServices['WrittenTranslationsObjectFactory']);
     upgradedServices['StateInteractionStatsService'] =
       new StateInteractionStatsService(
-        upgradedServices['AngularNameService'],
         upgradedServices['AnswerClassificationService'],
         upgradedServices['ContextService'],
         upgradedServices['FractionObjectFactory'],
