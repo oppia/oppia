@@ -1,19 +1,19 @@
-<link rel="stylesheet" href="/third_party/static/guppy-f94402/build/guppy-default.min.css">
-<link rel="stylesheet" href="/third_party/static/guppy-f94402/build/guppy-default-osk.min.css">
+<link rel="stylesheet" href="/third_party/static/guppy-175999/build/guppy-default.min.css">
+<link rel="stylesheet" href="/third_party/static/guppy-175999/build/guppy-default-osk.min.css">
 <script>
   // Use the normal default browser eventlistener without passive set to false.
   // TODO(#8833): Use passive listeners when guppy supports it.
   EventTarget.prototype.addEventListener = (
     EventTarget.prototype.addEventListener._original);
 </script>
-<script type="text/javascript" src="/third_party/static/guppy-f94402/build/guppy.min.js"></script>
-<script type="text/javascript" src="/third_party/static/guppy-f94402/build/guppy_osk.min.js"></script>
+<script type="text/javascript" src="/third_party/static/guppy-175999/build/guppy.min.js"></script>
+<script type="text/javascript" src="/third_party/static/guppy-175999/build/guppy_osk.min.js"></script>
 
 <script type="text/javascript">
   var osk = new GuppyOSK({'goto_tab':'arithmetic'});
   Guppy.use_osk(osk);
   Guppy.init({
-    'path': '/third_party/static/guppy-f94402/build'
+    'path': '/third_party/static/guppy-175999/build'
   });
   Guppy.configure('buttons', ['osk', 'controls']);
   Guppy.configure('empty_content', '\\color{grey}{\\text{\\small{Type a formula here.}}}')
