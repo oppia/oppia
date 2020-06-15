@@ -25,6 +25,7 @@ from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.tests import test_utils
 import feconf
+import python_utils
 import utils
 
 
@@ -40,7 +41,8 @@ class DraftUpgradeUnitTests(test_utils.GenericTestBase):
     EXP_MIGRATION_CHANGE_LIST = [exp_domain.ExplorationChange({
         'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
         'from_version': '0',
-        'to_version': '1'
+        'to_version': python_utils.UNICODE(
+            feconf.CURRENT_STATE_SCHEMA_VERSION)
     })]
     DRAFT_CHANGELIST = [exp_domain.ExplorationChange({
         'cmd': 'edit_exploration_property',
@@ -101,57 +103,51 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
     EXP_ID = 'exp_id'
     USER_ID = 'user_id'
 
-    # Creates and saves a default exploration.
-    def setUp(self):
-        super(DraftUpgradeUtilUnitTests, self).setUp()
-        self.save_new_valid_exploration(self.EXP_ID, self.USER_ID)
+    def perform_and_assert_exploration_states_schema_migration(
+            self, current_schema_version, schema_version_to_upgrade):
+        """Creates an exploration and applies a state schema migration to it.
 
-    def helper_to_test_schema_verison_updates(
-            self, current_schema_version, schema_version_to_upgrade,
-            draft_change_list):
-        """Helper that uses the try_upgrading_draft_to_exp_version public
-        method to call the corresponding private method to update the draft
-        change list schema. For example, if the current_schema_version is 29
-        and the schema_version_to_upgrade is 30 then this helper would use the
-        try_upgrading_draft_to_exp_version public method to return the new
-        draft change list that has been updated according to the
-        _convert_states_v29_dict_to_v30_dict private method.
+        Creates an exploration and migrates its state schema from version
+        current_schema_version to schema_version_to_upgrade. Asserts that the
+        exploration was successfully migrated.
 
         Args:
             current_schema_version: string. The current schema version of the
-            draft change list (eg. '29')
+            exploration (eg. '29')
             schema_version_to_upgrade: string. The schema version to upgrade
-            the draft change list to (eg. '30')
-            draft_change_list: list(ExplorationChange). The list of
-                ExplorationChange domain objects to upgrade.
-
-        Returns:
-            list(ExplorationChange). The converted draft_change_list.
+            the exploration to (eg. '30')
         """
 
-        # Create an exploration change list with the command that will suggest
-        # migrating the schema from current_schema_version to
-        # schema_version_to_upgrade.
+        # Create an exploration change list with the command that will migrate
+        # the schema from current_schema_version to schema_version_to_upgrade.
         exp_migration_change_list = [exp_domain.ExplorationChange({
             'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
             'from_version': current_schema_version,
             'to_version': schema_version_to_upgrade,
-            })]
-        # Apply that change list to the exploration so that it gets stored in
-        # the data store.
-        exp_services.update_exploration(
-            self.USER_ID, self.EXP_ID, exp_migration_change_list,
-            'Ran Exploration Migration job.')
-        exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
-        # Since we applied an update, the version of the exploration is 2.
-        self.assertEqual(exploration.version, 2)
-        # Use the try_upgrading_draft_to_exp_version to call the corresponding
-        # private method.
-        expected_draft_change_list = (
-            draft_upgrade_services.try_upgrading_draft_to_exp_version(
-                draft_change_list, 1, exploration.version, self.EXP_ID)
-            )
-        return expected_draft_change_list
+        })]
+
+        # The migration will automatically migrate the exploration to the latest
+        # state schema version, so we set the latest schema version to
+        # schema_version_to_upgrade.
+        with self.swap(
+            feconf, 'CURRENT_STATE_SCHEMA_VERSION',
+            int(schema_version_to_upgrade)):
+
+            # Create and migrate the exploration.
+            self.save_new_valid_exploration(self.EXP_ID, self.USER_ID)
+            exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
+            exp_services.update_exploration(
+                self.USER_ID, self.EXP_ID, exp_migration_change_list,
+                'Ran Exploration Migration job.')
+
+            # Assert that the update was applied and that the exploration state
+            # schema was successfully updated.
+            exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
+            self.assertEqual(exploration.version, 2)
+            self.assertEqual(
+                python_utils.UNICODE(
+                    exploration.states_schema_version),
+                    schema_version_to_upgrade)
 
     def test_convert_to_latest_schema_version_implemented(self):
         state_schema_version = feconf.CURRENT_STATE_SCHEMA_VERSION
@@ -243,11 +239,17 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                     }
                 }
             })]
-        expected_draft_change_list = self.helper_to_test_schema_verison_updates(
-            '32', '33', draft_change_list_v32)
-        self.assertEqual(expected_draft_change_list[0].to_dict(),
+        # Migrate exploration to state schema version 33.
+        self.perform_and_assert_exploration_states_schema_migration('32', '33')
+        # Migrate the draft change list's state schema to the migrated
+        # explorations's schema.
+        migrated_draft_change_list_v33 = (
+            draft_upgrade_services.try_upgrading_draft_to_exp_version(
+                draft_change_list_v32, 1, 2, self.EXP_ID)
+        )
+        self.assertEqual(migrated_draft_change_list_v33[0].to_dict(),
                          draft_change_list_v33[0].to_dict())
-        self.assertEqual(expected_draft_change_list[1].to_dict(),
+        self.assertEqual(migrated_draft_change_list_v33[1].to_dict(),
                          draft_change_list_v33[1].to_dict())
 
     def test_convert_states_v31_dict_to_v32_dict(self):
@@ -258,9 +260,15 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 'property_name': 'content',
                 'new_value': 'new value'
             })]
-        expected_draft_change_list = self.helper_to_test_schema_verison_updates(
-            '31', '32', draft_change_list)
-        self.assertEqual(expected_draft_change_list[0].to_dict(),
+        # Migrate exploration to state schema version 32.
+        self.perform_and_assert_exploration_states_schema_migration('31', '32')
+        # Migrate the draft change list's state schema to the migrated
+        # explorations's schema.
+        migrated_draft_change_list_v32 = (
+            draft_upgrade_services.try_upgrading_draft_to_exp_version(
+                draft_change_list, 1, 2, self.EXP_ID)
+        )
+        self.assertEqual(migrated_draft_change_list_v32[0].to_dict(),
                          draft_change_list[0].to_dict())
 
     def test_convert_states_v30_dict_to_v31_dict(self):
@@ -300,9 +308,15 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                     }
                 }
             })]
-        expected_draft_change_list = self.helper_to_test_schema_verison_updates(
-            '30', '31', draft_change_list_v30)
-        self.assertEqual(expected_draft_change_list[0].to_dict(),
+        # Migrate exploration to state schema version 31.
+        self.perform_and_assert_exploration_states_schema_migration('30', '31')
+        # Migrate the draft change list's state schema to the migrated
+        # explorations's schema.
+        migrated_draft_change_list_v31 = (
+            draft_upgrade_services.try_upgrading_draft_to_exp_version(
+                draft_change_list_v30, 1, 2, self.EXP_ID)
+        )
+        self.assertEqual(migrated_draft_change_list_v31[0].to_dict(),
                          draft_change_list_v31[0].to_dict())
 
     def test_convert_states_v29_dict_to_v30_dict(self):
@@ -373,9 +387,15 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                     'tagged_skill_misconception_id': None
                 }
             })]
-        expected_draft_change_list = self.helper_to_test_schema_verison_updates(
-            '29', '30', draft_change_list_v29)
-        self.assertEqual(expected_draft_change_list[0].to_dict(),
+        # Migrate exploration to state schema version 30.
+        self.perform_and_assert_exploration_states_schema_migration('29', '30')
+        # Migrate the draft change list's state schema to the migrated
+        # explorations's schema.
+        migrated_draft_change_list_v30 = (
+            draft_upgrade_services.try_upgrading_draft_to_exp_version(
+                draft_change_list_v29, 1, 2, self.EXP_ID)
+        )
+        self.assertEqual(migrated_draft_change_list_v30[0].to_dict(),
                          draft_change_list_v30[0].to_dict())
 
     def test_convert_states_v28_dict_to_v29_dict(self):
@@ -386,9 +406,15 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 'property_name': 'content',
                 'new_value': 'new value'
             })]
-        expected_draft_change_list = self.helper_to_test_schema_verison_updates(
-            '28', '29', draft_change_list)
-        self.assertEqual(expected_draft_change_list[0].to_dict(),
+        # Migrate exploration to state schema version 29.
+        self.perform_and_assert_exploration_states_schema_migration('28', '29')
+        # Migrate the draft change list's state schema to the migrated
+        # explorations's schema.
+        migrated_draft_change_list_v29 = (
+            draft_upgrade_services.try_upgrading_draft_to_exp_version(
+                draft_change_list, 1, 2, self.EXP_ID)
+        )
+        self.assertEqual(migrated_draft_change_list_v29[0].to_dict(),
                          draft_change_list[0].to_dict())
 
     def test_convert_states_v27_dict_to_v28_dict(self):
@@ -407,7 +433,14 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 'state_name': 'State B',
                 'new_value': {'voiceovers_mapping': 'new value'}
             })]
-        expected_draft_change_list = self.helper_to_test_schema_verison_updates(
-            '27', '28', draft_change_list_v27)
-        self.assertEqual(expected_draft_change_list[0].to_dict(),
-                         draft_change_list_v28[0].to_dict())
+        # Migrate exploration to state schema version 28.
+        self.perform_and_assert_exploration_states_schema_migration('27', '28')
+        # Migrate the draft change list's state schema to the migrated
+        # explorations's schema.
+        migrated_draft_change_list_v28 = (
+            draft_upgrade_services.try_upgrading_draft_to_exp_version(
+                draft_change_list_v27, 1, 2, self.EXP_ID)
+        )
+        self.assertEqual(
+            migrated_draft_change_list_v28[0].to_dict(),
+            draft_change_list_v28[0].to_dict())
