@@ -972,6 +972,9 @@ angular.module('oppia').directive('conversationSkin', [
                             hasContinueButton: true
                           });
                         }
+                        // TODO(#8521): Remove when this directive is migrated
+                        // to Angular.
+                        $rootScope.$apply();
                       });
                     }
                     if (refreshInteraction) {
