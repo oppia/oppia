@@ -289,11 +289,104 @@ describe('PlaythroughService', () => {
         'stateName3', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
       playthroughService.recordExplorationQuitAction('stateName2', 60);
 
-      let playthrough = playthroughService.getPlaythrough();
+      const playthrough = playthroughService.getPlaythrough();
       expect(playthrough.issueType).toEqual('CyclicStateTransitions');
       expect(playthrough.issueCustomizationArgs).toEqual({
         state_names: {
           value: ['stateName1', 'stateName2', 'stateName3', 'stateName1']
+        },
+      });
+    });
+
+    it('should identify disjoint cycle rotations', () => {
+      spyOn(stopwatchObjectFactory, 'create').and.returnValue(
+        jasmine.createSpyObj('Stopwatch', {getTimeInSecs: 370, reset: null}));
+
+      playthroughService.recordExplorationStartAction('stateName1');
+      // 1 -> 2 -> 3 -> 1
+      playthroughService.recordAnswerSubmitAction(
+        'stateName1', 'stateName2', 'TextInput', 'Hello', 'Try again', 30);
+      playthroughService.recordAnswerSubmitAction(
+        'stateName2', 'stateName3', 'TextInput', 'Hello', 'Try again', 30);
+      playthroughService.recordAnswerSubmitAction(
+        'stateName3', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
+      playthroughService.recordAnswerSubmitAction(
+        'stateName1', 'stateName2', 'TextInput', 'Hello', 'Try again', 30);
+
+      // 2 -> 3 -> 2
+      playthroughService.recordAnswerSubmitAction(
+        'stateName2', 'stateName3', 'TextInput', 'Hello', 'Try again', 30);
+      playthroughService.recordAnswerSubmitAction(
+        'stateName3', 'stateName2', 'TextInput', 'Hello', 'Try again', 30);
+
+      // 2 -> 3 -> 1 -> 2 (A rotation of 1 -> 2 -> 3 -> 1)
+      playthroughService.recordAnswerSubmitAction(
+        'stateName2', 'stateName3', 'TextInput', 'Hello', 'Try again', 30);
+      playthroughService.recordAnswerSubmitAction(
+        'stateName3', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
+      playthroughService.recordAnswerSubmitAction(
+        'stateName1', 'stateName2', 'TextInput', 'Hello', 'Try again', 30);
+      playthroughService.recordAnswerSubmitAction(
+        'stateName2', 'stateName3', 'TextInput', 'Hello', 'Try again', 30);
+      playthroughService.recordAnswerSubmitAction(
+        'stateName3', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
+      playthroughService.recordAnswerSubmitAction(
+        'stateName1', 'stateName2', 'TextInput', 'Hello', 'Try again', 30);
+      playthroughService.recordExplorationQuitAction('stateName1', 10);
+
+      const playthrough = playthroughService.getPlaythrough();
+      expect(playthrough).not.toBeNull();
+      expect(playthrough.issueType).toEqual('CyclicStateTransitions');
+      expect(playthrough.issueCustomizationArgs).toEqual({
+        state_names: {
+          value: ['stateName1', 'stateName2', 'stateName3', 'stateName1']
+        },
+      });
+    });
+
+    it('should return most recent cycle if occurrences have a tie', () => {
+      spyOn(stopwatchObjectFactory, 'create').and.returnValue(
+        jasmine.createSpyObj('Stopwatch', {getTimeInSecs: 420, reset: null}));
+
+      playthroughService.recordExplorationStartAction('stateName1');
+      // [1 -> 2 -> 1] x3
+      playthroughService.recordAnswerSubmitAction(
+        'stateName1', 'stateName2', 'TextInput', 'Hello', 'Try again', 30);
+      playthroughService.recordAnswerSubmitAction(
+        'stateName2', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
+      playthroughService.recordAnswerSubmitAction(
+        'stateName1', 'stateName2', 'TextInput', 'Hello', 'Try again', 30);
+      playthroughService.recordAnswerSubmitAction(
+        'stateName2', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
+      playthroughService.recordAnswerSubmitAction(
+        'stateName1', 'stateName2', 'TextInput', 'Hello', 'Try again', 30);
+      playthroughService.recordAnswerSubmitAction(
+        'stateName2', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
+
+      playthroughService.recordAnswerSubmitAction(
+        'stateName1', 'stateName3', 'TextInput', 'Hello', 'Try again', 30);
+
+      // [ 3 -> 4 -> 3] x3
+      playthroughService.recordAnswerSubmitAction(
+        'stateName3', 'stateName4', 'TextInput', 'Hello', 'Try again', 30);
+      playthroughService.recordAnswerSubmitAction(
+        'stateName4', 'stateName3', 'TextInput', 'Hello', 'Try again', 30);
+      playthroughService.recordAnswerSubmitAction(
+        'stateName3', 'stateName4', 'TextInput', 'Hello', 'Try again', 30);
+      playthroughService.recordAnswerSubmitAction(
+        'stateName4', 'stateName3', 'TextInput', 'Hello', 'Try again', 30);
+      playthroughService.recordAnswerSubmitAction(
+        'stateName3', 'stateName4', 'TextInput', 'Hello', 'Try again', 30);
+      playthroughService.recordAnswerSubmitAction(
+        'stateName4', 'stateName3', 'TextInput', 'Hello', 'Try again', 30);
+      playthroughService.recordExplorationQuitAction('stateName3', 30);
+
+      const playthrough = playthroughService.getPlaythrough();
+      expect(playthrough).not.toBeNull();
+      expect(playthrough.issueType).toEqual('CyclicStateTransitions');
+      expect(playthrough.issueCustomizationArgs).toEqual({
+        state_names: {
+          value: ['stateName3', 'stateName4', 'stateName3']
         },
       });
     });

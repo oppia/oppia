@@ -60,30 +60,12 @@ class MultipleIncorrectAnswersTracker {
 }
 
 class CyclicStateTransitionsTracker {
-  cycleOccurrences: number;
-  // A path of visited states without any cycles/repeated states.
   pathOfVisitedStates: string[];
-  // A cycle of visited states discovered by the tracker.
-  cycleOfVisitedStates: string[];
+  cycleOccurrences: Map<string[], number>;
 
   constructor(initStateName: string) {
-    this.cycleOccurrences = 0;
     this.pathOfVisitedStates = [initStateName];
-  }
-
-  private makeCycle(collisionIndex: number): string[] {
-    const collision = this.pathOfVisitedStates[collisionIndex];
-    const cycleWithNoCollision = this.pathOfVisitedStates.slice(collisionIndex);
-    return [...cycleWithNoCollision, collision];
-  }
-
-  private currStateName(): string {
-    return this.pathOfVisitedStates[this.pathOfVisitedStates.length - 1];
-  }
-
-  foundAnIssue(): boolean {
-    return (
-      this.cycleOccurrences >= ServicesConstants.NUM_REPEATED_CYCLES_THRESHOLD);
+    this.cycleOccurrences = new Map();
   }
 
   /**
@@ -116,19 +98,79 @@ class CyclicStateTransitionsTracker {
     if (this.currStateName() === destStateName) {
       return;
     }
-    if (!this.pathOfVisitedStates.includes(destStateName)) {
+    const destStateNameIndex = this.pathOfVisitedStates.indexOf(destStateName);
+    if (destStateNameIndex === -1) {
       this.pathOfVisitedStates.push(destStateName);
     } else {
-      const cycleOfVisitedStates = (
-        this.makeCycle(this.pathOfVisitedStates.indexOf(destStateName)));
-      if (angular.equals(this.cycleOfVisitedStates, cycleOfVisitedStates)) {
-        this.cycleOccurrences += 1;
-      } else {
-        this.cycleOfVisitedStates = cycleOfVisitedStates;
-        this.cycleOccurrences = 1;
-      }
+      this.trackCycle(this.makeCycleOfVisitedStates(destStateNameIndex));
       this.pathOfVisitedStates = [destStateName];
     }
+  }
+
+  foundAnIssue(): boolean {
+    const [ _, occurrences ] = this.getMostCommonCycle();
+    return occurrences >= ServicesConstants.NUM_REPEATED_CYCLES_THRESHOLD;
+  }
+
+  private currStateName(): string {
+    return this.pathOfVisitedStates[this.pathOfVisitedStates.length - 1];
+  }
+
+  private trackCycle(cycle: string[]): void {
+    for (const [trackedCycle, occurrences] of this.cycleOccurrences.entries()) {
+      if (this.isRotation(cycle, trackedCycle)) {
+        this.cycleOccurrences.set(trackedCycle, occurrences + 1);
+        return;
+      }
+    }
+    this.cycleOccurrences.set(cycle, 1);
+  }
+
+  private makeCycleOfVisitedStates(collisionIndex: number): string[] {
+    const collision = this.pathOfVisitedStates[collisionIndex];
+    const cycleWithNoCollision = this.pathOfVisitedStates.slice(collisionIndex);
+    return [...cycleWithNoCollision, collision];
+  }
+
+  /**
+   * Returns whether the given arrays are rotations of each other.
+   *
+   * Assumes that the only repeated element in each array `c` is their first and
+   * last element.
+   *
+   * Rotations are best described through illustration. The following arrays are
+   * all rotations of each other (element A is highlighed to demonstrate the
+   * pattern):
+   *
+   *    [ *A* ,  B  ,  C  ,  D  ,  E  ]
+   *    [  E  , *A* ,  B  ,  C  ,  D  ]
+   *    [  D  ,  E  , *A* ,  B  ,  C  ]
+   *    [  C  ,  D  ,  E  , *A* ,  B  ]
+   *    [  B  ,  C  ,  D  ,  E  , *A* ]
+   */
+  private isRotation(cycle: string[], cycleToCheck: string[]): boolean {
+    if (cycle.length !== cycleToCheck.length) {
+      return false;
+    }
+    const rotationToFind = cycleToCheck.slice(1);
+    const arrayWithAllCycleRotations = [...cycle.slice(1), ...cycle.slice(1)];
+    const startIndex = arrayWithAllCycleRotations.indexOf(rotationToFind[0]);
+    return startIndex !== -1 && rotationToFind.every(
+      (stateName, i) => arrayWithAllCycleRotations[startIndex + i] === stateName
+    );
+  }
+
+  public getMostCommonCycle(): [string[], number] {
+    let mostCommonCycle = null;
+    let mostCommonCycleOccurrences = 0;
+    for (const [cycle, occurrences] of this.cycleOccurrences.entries()) {
+      if (occurrences >= mostCommonCycleOccurrences) {
+        // When cycles have equal occurrences, take the most recent one.
+        mostCommonCycle = cycle;
+        mostCommonCycleOccurrences = occurrences;
+      }
+    }
+    return [mostCommonCycle, mostCommonCycleOccurrences];
   }
 }
 
@@ -193,7 +235,7 @@ export class PlaythroughService {
         AppConstants.ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS);
       this.playthrough.issueCustomizationArgs = (
         <ICyclicStateTransitionsCustomizationArgs>{
-          state_names: {value: this.cstTracker.cycleOfVisitedStates}
+          state_names: {value: this.cstTracker.getMostCommonCycle()[0]}
         });
     } else if (this.eqTracker && this.eqTracker.foundAnIssue()) {
       this.playthrough.issueType = AppConstants.ISSUE_TYPE_EARLY_QUIT;
