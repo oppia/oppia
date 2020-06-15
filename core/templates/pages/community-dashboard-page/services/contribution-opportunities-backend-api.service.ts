@@ -152,7 +152,7 @@ export class ContributionOpportunitiesBackendApiService {
             .createFromBackendDict(backendDict)
       );
     } catch (error) {
-      return error.message;
+      throw (error.message);
     }
   }
 }

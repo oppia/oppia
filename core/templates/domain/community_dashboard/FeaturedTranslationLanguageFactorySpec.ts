@@ -43,4 +43,3 @@ describe('Featured Translation Language object factory', () => {
     expect(sampleFTL.description).toEqual('English');
   });
 });
-

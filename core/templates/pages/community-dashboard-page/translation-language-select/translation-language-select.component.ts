@@ -50,11 +50,13 @@ export class TranslationLanguageSelectComponent implements OnInit {
   ngOnInit() {
     this.options.forEach(({id, description}) =>
       this.languageIdToDescription[id] = description);
-    this.contributionOpportunitiesBackendApiService
-      .fetchFeaturedTranslationLanguages()
-      .then((data: FeaturedTranslationLanguage[]) => {
-        this.featuredLanguages = data;
-      });
+    try {
+      this.contributionOpportunitiesBackendApiService
+        .fetchFeaturedTranslationLanguages()
+        .then((data: FeaturedTranslationLanguage[]) => {
+          this.featuredLanguages = data;
+        });
+    } catch {}
   }
 
   toggleDropdown() {

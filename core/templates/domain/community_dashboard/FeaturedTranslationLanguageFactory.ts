@@ -49,4 +49,3 @@ export class FeaturedTranslationLanguageFactory {
 angular.module('oppia').factory(
   'FeaturedTranslationLanguageFactory',
   downgradeInjectable(FeaturedTranslationLanguageFactory));
-
