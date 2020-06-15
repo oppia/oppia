@@ -54,10 +54,10 @@
           "assertions": {
             "time-to-first-byte": ["off", {"minScore": 1}],
             "render-blocking-resources": ["error", {"minScore": 0}],
-            "unminified-css": ["error", {"minScore": 0}],
-            "unminified-javascript": ["error", {"minScore": 0}],
+            "unminified-css": ["error", {"minScore": 1}],
+            "unminified-javascript": ["error", {"minScore": 1}],
             "unused-css-rules": ["error", {"minScore": 0}],
-            "uses-text-compression": ["error", {"minScore": 0}],
+            "uses-text-compression": ["error", {"minScore": 1}],
             "uses-http2": ["error", {"minScore": 0}]
           }
         },
@@ -66,10 +66,10 @@
           "assertions": {
             "offscreen-images": ["error", {"minScore": 0}],
             "render-blocking-resources": ["error", {"minScore": 0}],
-            "unminified-css": ["error", {"minScore": 0}],
-            "unminified-javascript": ["error", {"minScore": 0}],
+            "unminified-css": ["error", {"minScore": 1}],
+            "unminified-javascript": ["error", {"minScore": 1}],
             "unused-css-rules": ["error", {"minScore": 0}],
-            "uses-text-compression": ["error", {"minScore": 0}],
+            "uses-text-compression": ["error", {"minScore": 1}],
             "uses-http2": ["error", {"minScore": 0}]
           }
         },
@@ -79,10 +79,10 @@
             "offscreen-images": ["error", {"minScore": 0}],
             "uses-webp-images": ["error", {"minScore": 1}],
             "render-blocking-resources": ["error", {"minScore": 0}],
-            "unminified-css": ["error", {"minScore": 0}],
-            "unminified-javascript": ["error", {"minScore": 0}],
+            "unminified-css": ["error", {"minScore": 1}],
+            "unminified-javascript": ["error", {"minScore": 1}],
             "unused-css-rules": ["error", {"minScore": 0}],
-            "uses-text-compression": ["error", {"minScore": 0}],
+            "uses-text-compression": ["error", {"minScore": 1}],
             "uses-http2": ["error", {"minScore": 0}],
             "errors-in-console": ["error", {"minScore": 0}]
           }
@@ -93,10 +93,10 @@
             "offscreen-images": ["error", {"minScore": 1}],
             "uses-webp-images": ["error", {"minScore": 0}],
             "render-blocking-resources": ["error", {"minScore": 0}],
-            "unminified-css": ["error", {"minScore": 0}],
-            "unminified-javascript": ["error", {"minScore": 0}],
+            "unminified-css": ["error", {"minScore": 1}],
+            "unminified-javascript": ["error", {"minScore": 1}],
             "unused-css-rules": ["error", {"minScore": 0}],
-            "uses-text-compression": ["error", {"minScore": 0}],
+            "uses-text-compression": ["error", {"minScore": 1}],
             "uses-http2": ["error", {"minScore": 0}],
             "errors-in-console": ["error", {"minScore": 0}]
           }
@@ -107,10 +107,10 @@
             "offscreen-images": ["error", {"minScore": 0}],
             "uses-webp-images": ["error", {"minScore": 1}],
             "render-blocking-resources": ["error", {"minScore": 0}],
-            "unminified-css": ["error", {"minScore": 0}],
-            "unminified-javascript": ["error", {"minScore": 0}],
+            "unminified-css": ["error", {"minScore": 1}],
+            "unminified-javascript": ["error", {"minScore": 1}],
             "unused-css-rules": ["error", {"minScore": 0}],
-            "uses-text-compression": ["error", {"minScore": 0}],
+            "uses-text-compression": ["error", {"minScore": 1}],
             "uses-http2": ["error", {"minScore": 0}],
             "errors-in-console": ["error", {"minScore": 0}]
           }
@@ -121,10 +121,10 @@
             "offscreen-images": ["error", {"minScore": 1}],
             "uses-webp-images": ["error", {"minScore": 0}],
             "render-blocking-resources": ["error", {"minScore": 0}],
-            "unminified-css": ["error", {"minScore": 0}],
-            "unminified-javascript": ["error", {"minScore": 0}],
+            "unminified-css": ["error", {"minScore": 1}],
+            "unminified-javascript": ["error", {"minScore": 1}],
             "unused-css-rules": ["error", {"minScore": 0}],
-            "uses-text-compression": ["error", {"minScore": 0}],
+            "uses-text-compression": ["error", {"minScore": 1}],
             "uses-http2": ["error", {"minScore": 0}],
             "errors-in-console": ["error", {"minScore": 0}]
           }
@@ -135,10 +135,10 @@
             "offscreen-images": ["error", {"minScore": 1}],
             "uses-webp-images": ["error", {"minScore": 1}],
             "render-blocking-resources": ["error", {"minScore": 0}],
-            "unminified-css": ["error", {"minScore": 0}],
-            "unminified-javascript": ["error", {"minScore": 0}],
+            "unminified-css": ["error", {"minScore": 1}],
+            "unminified-javascript": ["error", {"minScore": 1}],
             "unused-css-rules": ["error", {"minScore": 0}],
-            "uses-text-compression": ["error", {"minScore": 0}],
+            "uses-text-compression": ["error", {"minScore": 1}],
             "uses-http2": ["error", {"minScore": 0}],
             "errors-in-console": ["error", {"minScore": 0}]
           }
@@ -149,10 +149,10 @@
             "offscreen-images": ["error", {"minScore": 0}],
             "uses-webp-images": ["error", {"minScore": 1}],
             "render-blocking-resources": ["error", {"minScore": 0}],
-            "unminified-css": ["error", {"minScore": 0}],
-            "unminified-javascript": ["error", {"minScore": 0}],
+            "unminified-css": ["error", {"minScore": 1}],
+            "unminified-javascript": ["error", {"minScore": 1}],
             "unused-css-rules": ["error", {"minScore": 0}],
-            "uses-text-compression": ["error", {"minScore": 0}],
+            "uses-text-compression": ["error", {"minScore": 1}],
             "uses-http2": ["error", {"minScore": 0}],
             "errors-in-console": ["error", {"minScore": 0}]
           }
@@ -163,10 +163,10 @@
             "offscreen-images": ["error", {"minScore": 1}],
             "uses-webp-images": ["error", {"minScore": 1}],
             "render-blocking-resources": ["error", {"minScore": 0}],
-            "unminified-css": ["error", {"minScore": 0}],
-            "unminified-javascript": ["error", {"minScore": 0}],
+            "unminified-css": ["error", {"minScore": 1}],
+            "unminified-javascript": ["error", {"minScore": 1}],
             "unused-css-rules": ["error", {"minScore": 0}],
-            "uses-text-compression": ["error", {"minScore": 0}],
+            "uses-text-compression": ["error", {"minScore": 1}],
             "uses-http2": ["error", {"minScore": 0}],
             "errors-in-console": ["error", {"minScore": 0}]
           }
@@ -177,10 +177,10 @@
             "offscreen-images": ["error", {"minScore": 0}],
             "uses-webp-images": ["error", {"minScore": 1}],
             "render-blocking-resources": ["error", {"minScore": 0}],
-            "unminified-css": ["error", {"minScore": 0}],
-            "unminified-javascript": ["error", {"minScore": 0}],
+            "unminified-css": ["error", {"minScore": 1}],
+            "unminified-javascript": ["error", {"minScore": 1}],
             "unused-css-rules": ["error", {"minScore": 0}],
-            "uses-text-compression": ["error", {"minScore": 0}],
+            "uses-text-compression": ["error", {"minScore": 1}],
             "uses-http2": ["error", {"minScore": 0}],
             "errors-in-console": ["error", {"minScore": 0}]
           }
