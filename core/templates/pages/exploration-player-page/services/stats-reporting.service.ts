@@ -32,22 +32,20 @@ import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 
 interface IStateStats {
-  /* eslint-disable camelcase */
-  total_answers_count: number;
-  useful_feedback_count: number;
-  total_hit_count: number;
-  first_hit_count: number;
-  num_times_solution_viewed: number;
-  num_completions: number;
-  /* eslint-enable camelcase */
+  'total_answers_count': number;
+  'useful_feedback_count': number;
+  'total_hit_count': number;
+  'first_hit_count': number;
+  'num_times_solution_viewed': number;
+  'num_completions': number;
 }
 interface IAggregatedStats {
-  /* eslint-disable camelcase */
-  num_starts: number;
-  num_completions: number;
-  num_actual_starts: number;
-  state_stats_mapping: {[stateName: string]: IStateStats};
-  /* eslint-enable camelcase */
+  'num_starts': number;
+  'num_completions': number;
+  'num_actual_starts': number;
+  'state_stats_mapping': {
+    [stateName: string]: IStateStats
+  };
 }
 
 @Injectable({
