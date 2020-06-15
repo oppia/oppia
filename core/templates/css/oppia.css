@@ -962,7 +962,7 @@ textarea {
 }
 
 .navbar-light .navbar-container {
-  background: #009688;
+  background: #00645C;
   height: 56px;
   width: 100%;
 }
@@ -2428,6 +2428,23 @@ oppia-parameter {
   width: 400px;
   min-width: 200px;
 }
+.skill-select-modal .modal-xl {
+  width: 1000px;
+}
+@media (min-width: 768px) {
+  .skill-select-modal .modal-xl {
+    width: 1000px;
+    margin: 1.75rem auto;
+  }
+}
+
+@media (max-width: 576px) {
+  .skill-select-modal .modal-xl {
+    max-width: 500px;
+    margin: 1.75rem auto;
+  }
+}
+
 .oppia-save-exploration-wide-modal .modal-dialog {
   max-width: 1200px;
   width: 90%;
@@ -2593,10 +2610,14 @@ div#ng-curtain {
 }
 .oppia-logo-wide {
   margin-left: 25px;
-  width: 90px;
 }
 .oppia-logo-small {
   margin-left: 6px;
+}
+
+.oppia-navbar-back-button {
+  color: white;
+  padding: 6px;
 }
 
 .oppia-navbar-tabs {

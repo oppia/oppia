@@ -27,53 +27,55 @@ describe('Admin Page', function() {
     adminPage = new AdminPage.AdminPage();
   });
 
-  it('should allow assigning roles and show them', function() {
-    users.createUser('moderator1@adminTab.com', 'moderator1');
-    users.createUser('moderator2@adminTab.com', 'moderator2');
-    users.createUser('collectionEdtior1@adminTab.com', 'collectionEditor1');
-    users.createAndLoginAdminUser('management@adminTab.com', 'management');
-    adminPage.get();
-    adminPage.updateRole('moderator1', 'moderator');
-    adminPage.viewRolesbyUsername('moderator1');
-    adminPage.expectUsernamesToMatch(['moderator1']);
+  it('should allow assigning roles and show them', async function() {
+    await users.createUser('moderator1@adminTab.com', 'moderator1');
+    await users.createUser('moderator2@adminTab.com', 'moderator2');
+    await users.createUser(
+      'collectionEdtior1@adminTab.com', 'collectionEditor1');
+    await users.createAndLoginAdminUser(
+      'management@adminTab.com', 'management');
+    await adminPage.get();
+    await adminPage.updateRole('moderator1', 'moderator');
+    await adminPage.viewRolesbyUsername('moderator1');
+    await adminPage.expectUsernamesToMatch(['moderator1']);
 
-    adminPage.get();
-    adminPage.updateRole('moderator2', 'moderator');
-    adminPage.viewRolesbyUsername('moderator2');
-    adminPage.expectUsernamesToMatch(['moderator2']);
+    await adminPage.get();
+    await adminPage.updateRole('moderator2', 'moderator');
+    await adminPage.viewRolesbyUsername('moderator2');
+    await adminPage.expectUsernamesToMatch(['moderator2']);
 
-    adminPage.getUsersAsssignedToRole('moderator');
-    adminPage.expectUsernamesToMatch(['moderator1', 'moderator2']);
+    await adminPage.getUsersAsssignedToRole('moderator');
+    await adminPage.expectUsernamesToMatch(['moderator1', 'moderator2']);
 
-    adminPage.get();
-    adminPage.updateRole('collectionEditor1', 'collection editor');
-    adminPage.getUsersAsssignedToRole('collection editor');
-    adminPage.expectUsernamesToMatch(['collectionEditor1']);
-    users.logout();
+    await adminPage.get();
+    await adminPage.updateRole('collectionEditor1', 'collection editor');
+    await adminPage.getUsersAsssignedToRole('collection editor');
+    await adminPage.expectUsernamesToMatch(['collectionEditor1']);
+    await users.logout();
   });
 
-  it('should run,verify and stop one-off jobs', function() {
-    users.createAndLoginAdminUser('adminA@adminTab.com', 'alphaMan');
-    adminPage.getJobsTab();
+  it('should run,verify and stop one-off jobs', async function() {
+    await users.createAndLoginAdminUser('adminA@adminTab.com', 'alphaMan');
+    await adminPage.getJobsTab();
 
     // The following jobs are selected arbitrarily.
-    adminPage.startOneOffJob('FeedbackThreadCacheOneOffJob');
-    adminPage.expectJobToBeRunning('FeedbackThreadCacheOneOffJob');
-    adminPage.expectNumberOfRunningOneOffJobs(1);
+    await adminPage.startOneOffJob('FeedbackThreadCacheOneOffJob');
+    await adminPage.expectJobToBeRunning('FeedbackThreadCacheOneOffJob');
+    await adminPage.expectNumberOfRunningOneOffJobs(1);
 
-    adminPage.startOneOffJob('ExplorationValidityJobManager');
-    adminPage.expectJobToBeRunning('ExplorationValidityJobManager');
-    adminPage.expectNumberOfRunningOneOffJobs(2);
+    await adminPage.startOneOffJob('ExplorationValidityJobManager');
+    await adminPage.expectJobToBeRunning('ExplorationValidityJobManager');
+    await adminPage.expectNumberOfRunningOneOffJobs(2);
 
-    adminPage.stopOneOffJob('FeedbackThreadCacheOneOffJob');
-    adminPage.expectJobToBeRunning('ExplorationValidityJobManager');
-    adminPage.expectNumberOfRunningOneOffJobs(1);
+    await adminPage.stopOneOffJob('FeedbackThreadCacheOneOffJob');
+    await adminPage.expectJobToBeRunning('ExplorationValidityJobManager');
+    await adminPage.expectNumberOfRunningOneOffJobs(1);
 
-    adminPage.stopOneOffJob('ExplorationValidityJobManager');
-    adminPage.expectNumberOfRunningOneOffJobs(0);
+    await adminPage.stopOneOffJob('ExplorationValidityJobManager');
+    await adminPage.expectNumberOfRunningOneOffJobs(0);
   });
 
-  afterEach(function() {
-    general.checkForConsoleErrors([]);
+  afterEach(async function() {
+    await general.checkForConsoleErrors([]);
   });
 });

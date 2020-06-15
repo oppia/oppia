@@ -15,14 +15,16 @@ interface IKNN {
   };
 }
 
+interface IKernelParams {
+  kernel: string;
+  coef0: number;
+  degree: number;
+  gamma: number;
+}
+
 interface ISVM {
   classes: number[];
-  kernel_params: {
-    kernel: string;
-    coef0: number;
-    degree: number;
-    gamma: number;
-  };
+  kernel_params: IKernelParams;
   intercept: number[];
   n_support: number[];
   probA: number[];

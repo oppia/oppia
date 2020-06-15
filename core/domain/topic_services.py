@@ -220,6 +220,7 @@ def apply_change_list(topic_id, change_list):
     Raises:
         Exception. The incoming changelist had simultaneuous creation and
             deletion of subtopics.
+
     Returns:
         Topic, dict, list(int), list(int), list(SubtopicPageChange).
             The modified topic object, the modified subtopic pages dict keyed
@@ -816,23 +817,29 @@ def save_topic_summary(topic_summary):
         topic_summary: The topic summary object to be saved in the
             datastore.
     """
-    topic_summary_model = topic_models.TopicSummaryModel(
-        id=topic_summary.id,
-        name=topic_summary.name,
-        description=topic_summary.description,
-        canonical_name=topic_summary.canonical_name,
-        language_code=topic_summary.language_code,
-        version=topic_summary.version,
-        additional_story_count=topic_summary.additional_story_count,
-        canonical_story_count=topic_summary.canonical_story_count,
-        uncategorized_skill_count=topic_summary.uncategorized_skill_count,
-        subtopic_count=topic_summary.subtopic_count,
-        total_skill_count=topic_summary.total_skill_count,
-        topic_model_last_updated=topic_summary.topic_model_last_updated,
-        topic_model_created_on=topic_summary.topic_model_created_on
-    )
+    topic_summary_dict = {
+        'name': topic_summary.name,
+        'description': topic_summary.description,
+        'canonical_name': topic_summary.canonical_name,
+        'language_code': topic_summary.language_code,
+        'version': topic_summary.version,
+        'additional_story_count': topic_summary.additional_story_count,
+        'canonical_story_count': topic_summary.canonical_story_count,
+        'uncategorized_skill_count': topic_summary.uncategorized_skill_count,
+        'subtopic_count': topic_summary.subtopic_count,
+        'total_skill_count': topic_summary.total_skill_count,
+        'topic_model_last_updated': topic_summary.topic_model_last_updated,
+        'topic_model_created_on': topic_summary.topic_model_created_on
+    }
 
-    topic_summary_model.put()
+    topic_summary_model = (
+        topic_models.TopicSummaryModel.get_by_id(topic_summary.id))
+    if topic_summary_model is not None:
+        topic_summary_model.populate(**topic_summary_dict)
+        topic_summary_model.put()
+    else:
+        topic_summary_dict['id'] = topic_summary.id
+        topic_models.TopicSummaryModel(**topic_summary_dict).put()
 
 
 def get_topic_rights_from_model(topic_rights_model):

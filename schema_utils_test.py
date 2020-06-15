@@ -59,7 +59,7 @@ ALLOWED_SCHEMA_TYPES = [
 ALLOWED_CUSTOM_OBJ_TYPES = [
     'Filepath', 'LogicQuestion', 'MathLatexString', 'MusicPhrase',
     'ParameterName', 'SanitizedUrl', 'Graph', 'ImageWithRegions',
-    'ListOfTabs', 'SkillSelector']
+    'ListOfTabs', 'SkillSelector', 'SvgFilename']
 
 # Schemas for the UI config for the various types. All of these configuration
 # options are optional additions to the schema, and, if omitted, should not
@@ -150,7 +150,7 @@ VALIDATOR_SPECS = {
                 }],
             }
         },
-        'is_uniquified': {},
+        'is_uniquified': {}
     },
     SCHEMA_TYPE_UNICODE: {
         'matches_regex': {
@@ -164,6 +164,12 @@ VALIDATOR_SPECS = {
         'is_nonempty': {},
         'is_regex': {},
         'is_valid_email': {},
+        'is_valid_math_expression': {
+            'algebraic': {
+                'type': SCHEMA_TYPE_BOOL
+            }
+        },
+        'is_valid_math_equation': {}
     },
 }
 
@@ -473,6 +479,64 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
         """
         with self.assertRaises(Exception):
             schema_utils.get_validator('some invalid validator method name')
+
+    def test_is_valid_algebraic_expression_validator(self):
+        """Tests for the is_valid_math_expression static method with
+        algebraic type.
+        """
+        is_valid_math_expression = schema_utils.get_validator(
+            'is_valid_math_expression')
+
+        self.assertTrue(is_valid_math_expression('a+b*2'))
+        self.assertFalse(is_valid_math_expression('3+4/2'))
+
+    def test_is_valid_numeric_expression_validator(self):
+        """Tests for the is_valid_math_expression static method with
+        numeric type.
+        """
+        is_valid_math_expression = schema_utils.get_validator(
+            'is_valid_math_expression')
+
+        self.assertFalse(is_valid_math_expression('a+b*2', False))
+        self.assertTrue(is_valid_math_expression('3+4/2', False))
+
+    def test_is_valid_math_equation_validator(self):
+        """Tests for the is_valid_math_equation static method."""
+        is_valid_math_equation = schema_utils.get_validator(
+            'is_valid_math_equation')
+
+        self.assertTrue(is_valid_math_equation('a+b=c'))
+        self.assertTrue(is_valid_math_equation('x^2+y^2=z^2'))
+        self.assertTrue(is_valid_math_equation('y = m*x + b'))
+        self.assertTrue(is_valid_math_equation('alpha^a + beta^b = gamma^(-c)'))
+        self.assertTrue(is_valid_math_equation('a+b=0'))
+        self.assertTrue(is_valid_math_equation('0=a+b'))
+        self.assertTrue(is_valid_math_equation('(a/b)+c=(4^3)*a'))
+        self.assertTrue(is_valid_math_equation('2^alpha-(-3) = 3'))
+        self.assertTrue(is_valid_math_equation('(a+b)^2 = a^2 + b^2 + 2*a*b'))
+        self.assertTrue(is_valid_math_equation('x/a + y/b = 1'))
+        self.assertTrue(is_valid_math_equation('3 = -5 + pi^pi'))
+        self.assertTrue(is_valid_math_equation('pi = 3.1415'))
+        self.assertTrue(is_valid_math_equation('0.4 + 0.5 = alpha * 4'))
+        self.assertTrue(is_valid_math_equation('sqrt(a+b)=c - gamma/2.4'))
+        self.assertTrue(is_valid_math_equation('abs(35 - x) = 22.3'))
+
+        self.assertFalse(is_valid_math_equation('3 -= 2/a'))
+        self.assertFalse(is_valid_math_equation('3 == 2/a'))
+        self.assertFalse(is_valid_math_equation('x + y = '))
+        self.assertFalse(is_valid_math_equation('(a+b)^2 = a^2 + b^2 + 2ab'))
+        self.assertFalse(is_valid_math_equation('(a+b = 0)'))
+        self.assertFalse(is_valid_math_equation('a+b=0=a-b'))
+        self.assertFalse(is_valid_math_equation('alpha - beta/c'))
+        self.assertFalse(is_valid_math_equation('2^alpha-(-3*) = 3'))
+        self.assertFalse(is_valid_math_equation('a~b = 0'))
+        self.assertFalse(is_valid_math_equation('a+b<=0'))
+        self.assertFalse(is_valid_math_equation('a+b>=0'))
+        self.assertFalse(is_valid_math_equation('a+b<0'))
+        self.assertFalse(is_valid_math_equation('a+b>0'))
+        self.assertFalse(is_valid_math_equation('5+3=8'))
+        self.assertFalse(is_valid_math_equation('(a+(b)=0'))
+        self.assertFalse(is_valid_math_equation('a+b=c:)'))
 
 
 class SchemaNormalizationUnitTests(test_utils.GenericTestBase):

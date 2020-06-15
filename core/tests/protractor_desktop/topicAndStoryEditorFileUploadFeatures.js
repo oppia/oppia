@@ -35,139 +35,129 @@ describe('Topic editor functionality', function() {
   var topicEditorPage = null;
   var explorationEditorPage = null;
 
-  beforeAll(function() {
-    topicsAndSkillsDashboardPage =
-      new TopicsAndSkillsDashboardPage.TopicsAndSkillsDashboardPage();
+  beforeAll(async function() {
+    topicsAndSkillsDashboardPage = (
+      new TopicsAndSkillsDashboardPage.TopicsAndSkillsDashboardPage());
     topicEditorPage = new TopicEditorPage.TopicEditorPage();
     storyEditorPage = new StoryEditorPage.StoryEditorPage();
     skillEditorPage = new SkillEditorPage.SkillEditorPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
-    users.createAndLoginAdminUser(
+    await users.createAndLoginAdminUser(
       'creator@topicEditor.com', 'creatorTopicEditor');
-    users.logout();
+    await users.logout();
   });
 
-  beforeEach(function() {
-    users.login('creator@topicEditor.com');
-    topicsAndSkillsDashboardPage.get();
+  beforeEach(async function() {
+    await users.login('creator@topicEditor.com');
+    await topicsAndSkillsDashboardPage.get();
   });
 
   it('should edit topic name, thumbnail and description ' +
-    'correctly', function() {
+    'correctly', async function() {
     var TOPIC_NAME = 'TASEFUF_1';
+    var TOPIC_DESCRIPTION = 'TASEFUF_1 description';
     var EDITED_TOPIC_NAME = 'TASEFUF_1 edited';
-    topicsAndSkillsDashboardPage.get();
-    topicsAndSkillsDashboardPage.createTopic(TOPIC_NAME, false);
-    NEW_TOPIC_NAME = EDITED_TOPIC_NAME;
-    topicsAndSkillsDashboardPage.get();
-    topicsAndSkillsDashboardPage.editTopic(TOPIC_NAME);
-    topicEditorPage.changeTopicName(NEW_TOPIC_NAME);
-    expect(topicEditorPage.getTopicThumbnailSource())
-      .not
-      .toEqual(
-        topicEditorPage.submitTopicThumbnail('../data/test_svg.svg')
-          .then(function() {
-            return topicEditorPage.getTopicThumbnailSource();
-          })
-      );
-    topicEditorPage.changeTopicDescription('Topic Description');
-    topicEditorPage.saveTopic('Changed topic name and description.');
+    var NEW_TOPIC_NAME = EDITED_TOPIC_NAME;
+    await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.createTopic(TOPIC_NAME,
+      TOPIC_DESCRIPTION, false);
+    await topicEditorPage.changeTopicName(NEW_TOPIC_NAME);
+    var defaultThumbnailImageSrc = (
+      await topicEditorPage.getTopicThumbnailSource());
+    await topicEditorPage.submitTopicThumbnail('../data/test_svg.svg');
+    var updatedThumbnailImageSrc = (
+      await topicEditorPage.getTopicThumbnailSource());
+    expect(defaultThumbnailImageSrc).not.toEqual(updatedThumbnailImageSrc);
+    await topicEditorPage.changeTopicDescription('Topic Description');
+    await topicEditorPage.saveTopic('Changed topic name and description.');
 
-    topicsAndSkillsDashboardPage.get();
-    topicsAndSkillsDashboardPage.expectTopicNameToBe(NEW_TOPIC_NAME, 0);
+    await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.expectTopicNameToBe(NEW_TOPIC_NAME, 0);
 
-    topicsAndSkillsDashboardPage.editTopic(NEW_TOPIC_NAME);
-    topicEditorPage.expectTopicNameToBe(EDITED_TOPIC_NAME);
-    topicEditorPage.expectTopicDescriptionToBe('Topic Description');
+    await topicsAndSkillsDashboardPage.editTopic(NEW_TOPIC_NAME);
+    await topicEditorPage.expectTopicNameToBe(EDITED_TOPIC_NAME);
+    await topicEditorPage.expectTopicDescriptionToBe('Topic Description');
   });
 
-  it('should edit subtopic page contents correctly', function() {
+  it('should edit subtopic page contents correctly', async function() {
     var TOPIC_NAME = 'TASEFUF_2';
-    var defaultThumbnailImageSrc = null;
-    topicsAndSkillsDashboardPage.createTopic(TOPIC_NAME, false);
-    topicEditorPage.getTopicThumbnailSource().then(function(name) {
-      defaultThumbnailImageSrc = name;
-    });
-    expect(topicEditorPage.getTopicThumbnailSource())
-      .not
-      .toEqual(
-        topicEditorPage.submitTopicThumbnail('../data/test_svg.svg')
-          .then(function() {
-            return topicEditorPage.getTopicThumbnailSource();
-          })
-      );
-    topicEditorPage.changeTopicDescription('Topic Description');
-    topicEditorPage.saveTopic('Changed topic name and description.');
-    topicEditorPage.moveToSubtopicsTab();
-    topicEditorPage.addSubtopic('Subtopic 1');
-    topicEditorPage.editSubtopicWithIndex(0);
-    topicEditorPage.changeSubtopicTitle('Modified Title');
-    topicEditorPage.changeSubtopicPageContents(
-      forms.toRichText('Subtopic Contents'));
-    expect(topicEditorPage.getSubtopicThumbnailSource())
-      .not.toEqual(
-        topicEditorPage.submitSubtopicThumbnail('../data/test_svg.svg')
-          .then(function() {
-            return topicEditorPage.getTopicThumbnailSource();
-          }));
-    topicEditorPage.saveSubtopic();
-    topicEditorPage.saveTopic('Edited subtopic.');
+    var TOPIC_DESCRIPTION = 'TASEFUF_2 description';
 
-    topicsAndSkillsDashboardPage.get();
-    topicsAndSkillsDashboardPage.editTopic(TOPIC_NAME);
-    expect(topicEditorPage.getTopicThumbnailSource()).not.toEqual(
-      defaultThumbnailImageSrc);
-    topicEditorPage.expectTopicDescriptionToBe('Topic Description');
+    await topicsAndSkillsDashboardPage.createTopic(
+      TOPIC_NAME, TOPIC_DESCRIPTION, false);
+    var defaultThumbnailSrc = (
+      await topicEditorPage.getTopicThumbnailSource());
+    await topicEditorPage.submitTopicThumbnail('../data/test_svg.svg');
+    var updatedTopicThumbnailSrc = (
+      await topicEditorPage.getTopicThumbnailSource());
+    expect(defaultThumbnailSrc).not.toEqual(updatedTopicThumbnailSrc);
+    await topicEditorPage.changeTopicDescription('Topic Description');
+    await topicEditorPage.saveTopic('Changed topic name and description.');
+    await topicEditorPage.moveToSubtopicsTab();
+    await topicEditorPage.addSubtopic('Subtopic 1');
+    await topicEditorPage.editSubtopicWithIndex(0);
+    await topicEditorPage.changeSubtopicTitle('Modified Title');
+    await topicEditorPage.changeSubtopicPageContents(
+      await forms.toRichText('Subtopic Contents'));
+    await topicEditorPage.submitSubtopicThumbnail('../data/test_svg.svg');
+    var updatedSubtopicThumbnailSrc = (
+      await topicEditorPage.getSubtopicThumbnailSource());
+    expect(defaultThumbnailSrc).not.toEqual(updatedSubtopicThumbnailSrc);
+    await topicEditorPage.saveSubtopic();
+    await topicEditorPage.saveTopic('Edited subtopic.');
 
-    topicEditorPage.moveToSubtopicsTab();
-    topicEditorPage.expectTitleOfSubtopicWithIndexToMatch('Modified Title', 0);
-    topicEditorPage.editSubtopicWithIndex(0);
-    expect(topicEditorPage.getSubtopicThumbnailSource()).not.toEqual(
-      defaultThumbnailImageSrc);
-    topicEditorPage.expectSubtopicPageContentsToMatch('Subtopic Contents');
+    await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.editTopic(TOPIC_NAME);
+    expect(await topicEditorPage.getTopicThumbnailSource()).not.toEqual(
+      defaultThumbnailSrc);
+    await topicEditorPage.expectTopicDescriptionToBe('Topic Description');
+
+    await topicEditorPage.moveToSubtopicsTab();
+    await topicEditorPage.expectTitleOfSubtopicWithIndexToMatch(
+      'Modified Title', 0);
+    await topicEditorPage.editSubtopicWithIndex(0);
+    expect(await topicEditorPage.getSubtopicThumbnailSource()).not.toEqual(
+      defaultThumbnailSrc);
+    await topicEditorPage.expectSubtopicPageContentsToMatch(
+      'Subtopic Contents');
   });
 
-  it('should publish and unpublish a story correctly', function() {
+  it('should publish and unpublish a story correctly', async function() {
     var TOPIC_NAME = 'TASEFUF_3';
-    var defaultThumbnailImageSrc = null;
-    topicsAndSkillsDashboardPage.createTopic(TOPIC_NAME, false);
+    var TOPIC_DESCRIPTION = 'TASEFUF_3 description';
+    await topicsAndSkillsDashboardPage.createTopic(TOPIC_NAME,
+      TOPIC_DESCRIPTION, false);
 
-    topicEditorPage.expectNumberOfStoriesToBe(0);
-    topicEditorPage.createStory('Story Title');
-    storyEditorPage.returnToTopic();
+    await topicEditorPage.expectNumberOfStoriesToBe(0);
+    await topicEditorPage.createStory('Story Title');
+    await storyEditorPage.returnToTopic();
 
-    topicEditorPage.expectNumberOfStoriesToBe(1);
-    topicEditorPage.expectStoryPublicationStatusToBe('No', 0);
-    topicEditorPage.navigateToStoryWithIndex(0);
-    storyEditorPage.getStoryThumbnailSource().then(function(name) {
-      defaultThumbnailImageSrc = name;
-    });
-    expect(storyEditorPage.getStoryThumbnailSource())
-      .not
-      .toEqual(
-        storyEditorPage.submitStoryThumbnail('../data/test_svg.svg')
-          .then(function() {
-            return storyEditorPage.getStoryThumbnailSource();
-          })
-      );
-    storyEditorPage.saveStory('Added thumbnail.');
-    storyEditorPage.publishStory();
-    storyEditorPage.returnToTopic();
-
-    topicEditorPage.expectStoryPublicationStatusToBe('Yes', 0);
-    topicEditorPage.navigateToStoryWithIndex(0);
-    expect(storyEditorPage.getStoryThumbnailSource()).not.toEqual(
+    await topicEditorPage.expectNumberOfStoriesToBe(1);
+    await topicEditorPage.expectStoryPublicationStatusToBe('No', 0);
+    await topicEditorPage.navigateToStoryWithIndex(0);
+    var defaultThumbnailImageSrc = (
+      await storyEditorPage.getStoryThumbnailSource());
+    await storyEditorPage.submitStoryThumbnail('../data/test_svg.svg');
+    expect(await storyEditorPage.getStoryThumbnailSource()).not.toEqual(
       defaultThumbnailImageSrc);
-    storyEditorPage.unpublishStory();
-    storyEditorPage.returnToTopic();
+    await storyEditorPage.saveStory('Added thumbnail.');
+    await storyEditorPage.publishStory();
+    await storyEditorPage.returnToTopic();
 
-    topicEditorPage.expectStoryPublicationStatusToBe('No', 0);
+    await topicEditorPage.expectStoryPublicationStatusToBe('Yes', 0);
+    await topicEditorPage.navigateToStoryWithIndex(0);
+    expect(await storyEditorPage.getStoryThumbnailSource()).not.toEqual(
+      defaultThumbnailImageSrc);
+    await storyEditorPage.unpublishStory();
+    await storyEditorPage.returnToTopic();
+
+    await topicEditorPage.expectStoryPublicationStatusToBe('No', 0);
   });
 
-  afterEach(function() {
-    general.checkForConsoleErrors([]);
-    users.logout();
+  afterEach(async function() {
+    await general.checkForConsoleErrors([]);
+    await users.logout();
   });
 });
 
@@ -182,91 +172,76 @@ describe('Chapter editor functionality', function() {
   var TOPIC_NAME = 'TASEFUF_4';
   var USER_EMAIL = 'creator@chapterTest.com';
 
-  var createDummyExplorations = function(numExplorations) {
+  var createDummyExplorations = async function(numExplorations) {
     var ids = [];
     for (var i = 0; i < numExplorations; i++) {
       var info = dummyExplorationInfo.slice();
       info[0] += i.toString();
-      workflow.createAndPublishExploration.apply(workflow, info);
-      browser.getCurrentUrl().then(function(url) {
-        var id = url.split('/')[4].replace('#', '');
-        ids.push(id);
-      });
+      await workflow.createAndPublishExploration.apply(workflow, info);
+      var url = await browser.getCurrentUrl();
+      var id = url.split('/')[4].replace('#', '');
+      ids.push(id);
     }
     return ids;
   };
 
-  beforeAll(function() {
-    topicsAndSkillsDashboardPage =
-      new TopicsAndSkillsDashboardPage.TopicsAndSkillsDashboardPage();
+  beforeAll(async function() {
+    topicsAndSkillsDashboardPage = (
+      new TopicsAndSkillsDashboardPage.TopicsAndSkillsDashboardPage());
     topicEditorPage = new TopicEditorPage.TopicEditorPage();
     storyEditorPage = new StoryEditorPage.StoryEditorPage();
     skillEditorPage = new SkillEditorPage.SkillEditorPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
-    users.createAndLoginAdminUser(
+    await users.createAndLoginAdminUser(
       USER_EMAIL, 'creatorChapterTest');
-    dummyExplorationIds = createDummyExplorations(1);
-    users.logout();
+    dummyExplorationIds = await createDummyExplorations(1);
+    await users.logout();
   });
 
-  beforeEach(function() {
-    users.login(USER_EMAIL);
+  beforeEach(async function() {
+    await users.login(USER_EMAIL);
   });
 
-  it('should create a basic chapter with a thumbnail.', function() {
-    topicsAndSkillsDashboardPage.get();
+  it('should create a basic chapter with a thumbnail.', async function() {
+    await topicsAndSkillsDashboardPage.get();
     var defaultThumbnailImageSrc = null;
-    topicsAndSkillsDashboardPage.createTopic(TOPIC_NAME, false);
-    topicEditorPage.getTopicThumbnailSource().then(function(name) {
-      defaultThumbnailImageSrc = name;
-    });
-    expect(topicEditorPage.getTopicThumbnailSource())
-      .not
-      .toEqual(
-        topicEditorPage.submitTopicThumbnail('../data/test_svg.svg')
-          .then(function() {
-            return topicEditorPage.getTopicThumbnailSource();
-          })
-      );
-    topicEditorPage.changeTopicDescription('Topic Description');
-    topicEditorPage.expectTopicDescriptionToBe('Topic Description');
-    topicEditorPage.saveTopic('Changed topic name and description.');
-    topicEditorPage.createStory('Story 0');
-    expect(storyEditorPage.getStoryThumbnailSource())
-      .not
-      .toEqual(
-        storyEditorPage.submitStoryThumbnail('../data/test_svg.svg')
-          .then(function() {
-            return storyEditorPage.getStoryThumbnailSource();
-          })
-      );
-    storyEditorPage.createInitialChapter('Chapter 1');
-    storyEditorPage.selectInitialChapterByName('Chapter 1');
-    expect(storyEditorPage.getChapterThumbnailSource())
-      .not
-      .toEqual(
-        storyEditorPage.submitChapterThumbnail('../data/test_svg.svg')
-          .then(function() {
-            return storyEditorPage.getChapterThumbnailSource();
-          })
-      );
-    storyEditorPage.changeNodeOutline(forms.toRichText('First outline'));
-    storyEditorPage.expectNodeOutlineToMatch('First outline');
-    storyEditorPage.setChapterExplorationId(dummyExplorationIds[0]);
-    storyEditorPage.expectChapterExplorationIdToBe(dummyExplorationIds[0]);
-    storyEditorPage.saveStory('First save');
-    // Check if the thumbnail images persist on reload.
-    browser.refresh();
-    general.scrollToTop();
-    expect(storyEditorPage.getStoryThumbnailSource()).not.toEqual(
+    await topicsAndSkillsDashboardPage.createTopic(TOPIC_NAME,
+      'Topic description', false);
+    defaultThumbnailImageSrc = await topicEditorPage.getTopicThumbnailSource();
+    await topicEditorPage.submitTopicThumbnail('../data/test_svg.svg');
+    expect(await topicEditorPage.getTopicThumbnailSource()).not.toEqual(
       defaultThumbnailImageSrc);
-    general.scrollToTop();
-    expect(storyEditorPage.getChapterThumbnailSource()).not.toEqual(
+    await topicEditorPage.changeTopicDescription('Topic Description');
+    await topicEditorPage.expectTopicDescriptionToBe('Topic Description');
+    await topicEditorPage.saveTopic('Changed topic name and description.');
+    await topicEditorPage.createStory('Story 0');
+    await storyEditorPage.submitStoryThumbnail('../data/test_svg.svg');
+    expect(await storyEditorPage.getStoryThumbnailSource()).not.toEqual(
+      defaultThumbnailImageSrc);
+    await storyEditorPage.createInitialChapter('Chapter 1');
+    await storyEditorPage.selectInitialChapterByName('Chapter 1');
+    await storyEditorPage.submitChapterThumbnail('../data/test_svg.svg');
+    expect(await storyEditorPage.getChapterThumbnailSource()).not.toEqual(
+      defaultThumbnailImageSrc);
+    await storyEditorPage.changeNodeOutline(
+      await forms.toRichText('First outline'));
+    await storyEditorPage.expectNodeOutlineToMatch('First outline');
+    await storyEditorPage.setChapterExplorationId(dummyExplorationIds[0]);
+    await storyEditorPage.expectChapterExplorationIdToBe(
+      dummyExplorationIds[0]);
+    await storyEditorPage.saveStory('First save');
+    // Check if the thumbnail images persist on reload.
+    await browser.refresh();
+    await general.scrollToTop();
+    expect(await storyEditorPage.getStoryThumbnailSource()).not.toEqual(
+      defaultThumbnailImageSrc);
+    await general.scrollToTop();
+    expect(await storyEditorPage.getChapterThumbnailSource()).not.toEqual(
       defaultThumbnailImageSrc);
   });
 
-  afterAll(function() {
-    users.logout();
+  afterAll(async function() {
+    await users.logout();
   });
 });

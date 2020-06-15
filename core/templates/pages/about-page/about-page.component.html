@@ -1,0 +1,233 @@
+<div class="oppia-static-header">
+  <h1 [innerHTML]="'I18N_ABOUT_PAGE_HEADING' | translate"></h1>
+</div>
+<background-banner></background-banner>
+<div>
+  <div class="oppia-static-content-below-banner">
+    <div class="oppia-page-card oppia-static-content">
+      <div class="about-nav">
+        <ul class="oppia-about-tabs">
+          <li [ngClass]="{'oppia-about-tabs-active': activeTabName === TAB_ID_ABOUT}">
+            <a (click)="onTabClick(TAB_ID_ABOUT)" class="oppia-about-tabs-text" id="about" [innerHTML]="'I18N_ABOUT_PAGE_TABS_ABOUT' | translate"></a>
+          </li>
+          <li [ngClass]="{'oppia-about-tabs-active':activeTabName === TAB_ID_FOUNDATION}">
+            <a (click)="onTabClick(TAB_ID_FOUNDATION)" class="oppia-about-tabs-text" id="foundation" [innerHTML]="'I18N_ABOUT_PAGE_TABS_FOUNDATION' | translate"></a>
+          </li>
+          <li [ngClass]="{'oppia-about-tabs-active': activeTabName === TAB_ID_CREDITS}">
+            <a (click)="onTabClick(TAB_ID_CREDITS)" class="oppia-about-tabs-text" id="credits" [innerHTML]="'I18N_ABOUT_PAGE_TABS_CREDITS' | translate"></a>
+          </li>
+        </ul>
+      </div>
+
+      <div class="about-tab-container protractor-test-about-page" dir="auto">
+        <div class="about oppia-about-tab-content" [ngClass]="{'oppia-about-visible-content': activeTabName === TAB_ID_ABOUT}">
+          <div class="oppia-static-card-content oppia-static-card-content-narrow">
+            <h2 [innerHTML]="'I18N_ABOUT_PAGE_ABOUT_TAB_HEADING' | translate"></h2>
+            <div class="oppia-about-text-align">
+              <em>Oppia "O-pee-yah" (Finnish) - "to learn"</em>
+            </div>
+
+
+            <p [innerHTML]="'I18N_ABOUT_PAGE_ABOUT_TAB_PARAGRAPH_1' | translate">
+            </p>
+            <p [innerHTML]="'I18N_ABOUT_PAGE_ABOUT_TAB_PARAGRAPH_2' | translate">
+            </p>
+            <p [innerHTML]="'I18N_ABOUT_PAGE_ABOUT_TAB_PARAGRAPH_3' | translate: { numberOfExplorations: '11,000', numberofStudentsServed: '430,000' }">
+            </p>
+            <p [innerHTML]="'I18N_ABOUT_PAGE_ABOUT_TAB_PARAGRAPH_4' | translate">
+            </p>
+            <p [innerHTML]="'I18N_ABOUT_PAGE_ABOUT_TAB_PARAGRAPH_5' | translate">
+            </p>
+            <p [innerHTML]="'I18N_ABOUT_PAGE_ABOUT_TAB_PARAGRAPH_6' | translate">
+            </p>
+            <p [innerHTML]="'I18N_ABOUT_PAGE_ABOUT_TAB_PARAGRAPH_7' | translate">
+            </p>
+            <p [innerHTML]="'I18N_ABOUT_PAGE_ABOUT_TAB_PARAGRAPH_8' | translate">
+            </p>
+
+            <div class="oppia-about-three-cols-container">
+              <div class="oppia-about-three-cols-layout oppia-about-three-cols-feature">
+                <img [src]="getStaticImageUrl('/general/creator-create-exp.png')" alt="">
+                <h3 [innerHTML]="'I18N_ABOUT_PAGE_ABOUT_TAB_CREATE' | translate"></h3>
+                <p style="margin-top: -10px;" [innerHTML]="'I18N_ABOUT_PAGE_ABOUT_TAB_CREATE_TEXT' | translate">
+                </p>
+              </div>
+              <div class="oppia-about-three-cols-layout oppia-about-three-cols-feature">
+                <img [src]="getStaticImageUrl('/general/creator-pub-share.png')" alt="">
+                <h3 [innerHTML]="'I18N_ABOUT_PAGE_ABOUT_TAB_SHARE' | translate"></h3>
+                <p style="margin-top: -10px;" [innerHTML]="'I18N_ABOUT_PAGE_ABOUT_TAB_SHARE_TEXT' | translate">
+                </p>
+              </div>
+              <div class="oppia-about-three-cols-layout oppia-about-three-cols-feature">
+                <img [src]="getStaticImageUrl('/general/creator-feedback.png')" alt="">
+                <h3 [innerHTML]="'I18N_ABOUT_PAGE_ABOUT_TAB_FEEDBACK' | translate"></h3>
+                <p style="margin-top: -10px;" [innerHTML]="'I18N_ABOUT_PAGE_ABOUT_TAB_FEEDBACK_TEXT' | translate">
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="foundation oppia-about-tab-content" [ngClass]="{'oppia-about-visible-content': activeTabName === TAB_ID_FOUNDATION}">
+          <div class="oppia-static-card-content oppia-static-card-content-narrow">
+            <h2 [innerHTML]="'I18N_ABOUT_PAGE_FOUNDATION_TAB_HEADING' | translate"></h2>
+            <p [innerHTML]="'I18N_ABOUT_PAGE_FOUNDATION_TAB_PARAGRAPH_1' | translate">
+            </p>
+            <p [innerHTML]="'I18N_ABOUT_PAGE_FOUNDATION_TAB_PARAGRAPH_2' | translate">
+            </p>
+            <p [innerHTML]="'I18N_ABOUT_PAGE_FOUNDATION_TAB_PARAGRAPH_3' | translate">
+            </p>
+            <h3 [innerHTML]="'I18N_ABOUT_PAGE_FOUNDATION_TAB_PARAGRAPH_4_HEADING' | translate"></h3>
+            <p [innerHTML]="'I18N_ABOUT_PAGE_FOUNDATION_TAB_PARAGRAPH_4' | translate">
+            </p>
+            <a id="license">
+              <h1 style="padding-top: 70px; margin-top: -80px;"></h1>
+            </a>
+            <h3 [innerHTML]="'I18N_ABOUT_PAGE_FOUNDATION_TAB_PARAGRAPH_5_LICENSE_HEADING' | translate"></h3>
+            <p [innerHTML]="'I18N_ABOUT_PAGE_FOUNDATION_TAB_PARAGRAPH_5' | translate">
+            </p>
+            <p [innerHTML]="'I18N_ABOUT_PAGE_FOUNDATION_TAB_PARAGRAPH_6' | translate">
+            </p>
+            <div class="text-center">
+              <a href="/donate" class="btn oppia-about-button oppia-about-foundation-tab-anchor" [innerHTML]="'I18N_ABOUT_PAGE_FOUNDATION_TAB_DONATE_BUTTON' | translate">
+              </a>
+              <a href="/contact" class="btn oppia-about-button oppia-about-foundation-tab-anchor" [innerHTML]="'I18N_ABOUT_PAGE_FOUNDATION_TAB_GET_INVOLVED_BUTTON' | translate">
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div class="credits oppia-about-tab-content" [ngClass]="{'oppia-about-visible-content': activeTabName === TAB_ID_CREDITS}">
+          <div class="oppia-static-card-content oppia-static-card-content-wide">
+            <h2 [innerHTML]="'I18N_ABOUT_PAGE_CREDITS_TAB_HEADING' | translate"></h2>
+            <p [innerHTML]="'I18N_ABOUT_PAGE_CREDITS_TAB_TEXT' | translate">
+            </p>
+            <div class="oppia-about-credits-letter-groups three-col">
+              <div *ngFor="let credit of allCredits">
+                <span>{{ credit.letter }}</span>
+                <ul>
+                  <li *ngFor="let name of credit.names">{{ name }}</li>
+                </ul>
+              </div>
+            </div>
+            <p [innerHTML]="'I18N_ABOUT_PAGE_CREDITS_TAB_TEXT_BOTTOM' | translate :{listOfNames: listOfNames}">
+            </p>
+            <p [innerHTML]="'I18N_ABOUT_PAGE_CREDITS_THANK_TRANSLATEWIKI' | translate">
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="oppia-about-extra-container">
+      <div class="oppia-static-extra-content oppia-about-clearfix">
+        <div class="oppia-about-otter-container">
+          <img [src]="aboutPageMascotImgUrl" class="oppia-about-otter" alt="Otter">
+        </div>
+        <div class="oppia-about-otter-speech-card">
+          <blockquote class="oppia-about-otter-speech-bubble">
+            <h3 [innerHTML]="'I18N_ABOUT_PAGE_SPEECH_BUBBLE' | translate"></h3>
+          </blockquote>
+        </div>
+      </div>
+
+      <div class="oppia-about-extra-info oppia-about-page-extra-info">
+        <div class="oppia-static-content oppia-static-extra-content oppia-about-extra-content">
+          <div class="oppia-static-card-content oppia-static-card-content-wide oppia-about-buttons-container">
+            <a href="/community-library" class="btn oppia-about-button" [innerHTML]="'I18N_ABOUT_PAGE_LEARN_BUTTON' | translate"></a>
+            <a href="/teach" class="btn oppia-about-button" [innerHTML]="'I18N_ABOUT_PAGE_TEACH_BUTTON' | translate"></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="oppia-footer-padding-below-banner">
+</div>
+<style>
+  .oppia-about-foundation-tab-anchor {
+    background-color: #009788;
+    color: white;
+    width: 33%;
+  }
+  .oppia-about-foundation-tab-anchor:hover {
+    text-decoration: none;
+  }
+  .oppia-about-text-align {
+    text-align: center;
+  }
+  .oppia-about-three-cols-layout {
+    display: inline-block;
+    margin-right: 20px;
+    width: -webkit-calc((100% - 60px) / 3);
+    width: -moz-calc((100% - 60px) / 3);
+    width: -o-calc((100% - 60px) / 3);
+    width: calc((100% - 60px) / 3);
+  }
+  .oppia-about-three-cols-layout:last-of-type {
+    margin-right: 0;
+  }
+  @media only screen and (max-width: 500px) {
+    .oppia-about-three-cols-layout {
+      width: 100%;
+    }
+  }
+  .oppia-about-three-cols-feature,
+  .oppia-about-three-cols-feature p {
+    text-align: center;
+  }
+  .oppia-about-three-cols-feature,
+  .oppia-about-three-cols-feature h3 {
+    text-align: center;
+  }
+  .oppia-about-credits-letter-groups.three-col {
+    margin: 0 0 10% 0;
+    -moz-column-count: 3;
+    -moz-column-gap: 20px;
+    -webkit-column-count: 3;
+    -webkit-column-gap: 20px;
+    column-count: 3;
+    column-gap: 20px;
+  }
+  .oppia-about-credits-letter-groups span {
+    font-size: 1.8em;
+  }
+
+  .oppia-about-credits-letter-groups ul li {
+    list-style-type: none;
+  }
+  .oppia-about-clearfix {
+    clear: both;
+    content: "";
+    display: table;
+  }
+  .oppia-about-otter {
+    width: 200px;
+  }
+  .oppia-about-otter-container {
+    bottom: -2.3em;
+    display: inline-block;
+    position: absolute;
+  }
+  @media only screen and (max-width: 768px) {
+    .oppia-about-otter-container {
+      left: -3em;
+      bottom: -1.8em;
+    }
+    .oppia-about-otter {
+      width: 200px;
+    }
+  }
+  .oppia-about-otter-speech-card {
+    float: right;
+    width: 65%;
+  }
+  @media only screen and (max-width: 500px) {
+    .oppia-about-otter-speech-card {
+      width: 50%;
+    }
+  }
+  .oppia-about-page-extra-info {
+    height: 245px;
+  }
+</style>

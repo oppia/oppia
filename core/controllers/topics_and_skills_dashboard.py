@@ -19,8 +19,13 @@ are created.
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import logging
+
 from core.controllers import acl_decorators
 from core.controllers import base
+from core.domain import config_domain
+from core.domain import fs_services
+from core.domain import image_validation_services
 from core.domain import question_services
 from core.domain import role_services
 from core.domain import skill_domain
@@ -30,6 +35,7 @@ from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
 import feconf
+import utils
 
 
 class TopicsAndSkillsDashboardPage(base.BaseHandler):
@@ -74,13 +80,58 @@ class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
                             self.user, topic_rights)
                     )
 
+        all_classrooms_dict = config_domain.TOPIC_IDS_FOR_CLASSROOM_PAGES.value
+        all_classroom_names = [
+            classroom['name'] for classroom in all_classrooms_dict]
+
+        for topic_summary_dict in topic_summary_dicts:
+            topic_summary_dict['classroom'] = None
+            for classroom in all_classrooms_dict:
+                if topic_summary_dict['id'] in classroom['topic_ids']:
+                    topic_summary_dict['classroom'] = classroom['name']
+                    break
+
         untriaged_skill_summary_dicts = []
         mergeable_skill_summary_dicts = []
+        categorized_skills_dict = {}
+        topics = topic_fetchers.get_all_topics()
+        for topic in topics:
+            subtopics = topic.subtopics
+            categorized_skills_dict[topic.name] = {}
+            uncategorized_skills = (
+                skill_services.get_descriptions_of_skills(
+                    topic.uncategorized_skill_ids)[0])
+            skills_list = []
+            for skill_id in topic.uncategorized_skill_ids:
+                skill_dict = {
+                    'skill_id': skill_id,
+                    'skill_description': uncategorized_skills[skill_id]
+                }
+                skills_list.append(skill_dict)
+            categorized_skills_dict[topic.name]['uncategorized'] = (
+                skills_list)
+            for subtopic in subtopics:
+                skills = (skill_services.get_descriptions_of_skills(
+                    subtopic.skill_ids))[0]
+                skills_list = []
+                for skill_id in subtopic.skill_ids:
+                    skill_dict = {
+                        'skill_id': skill_id,
+                        'skill_description': skills[skill_id]
+                    }
+                    skills_list.append(skill_dict)
+                categorized_skills_dict[topic.name][
+                    subtopic.title] = skills_list
+        categorized_skills_dict['untriaged_skills'] = []
         for skill_summary_dict in skill_summary_dicts:
             skill_id = skill_summary_dict['id']
             if (skill_id not in skill_ids_assigned_to_some_topic) and (
                     skill_id not in merged_skill_ids):
                 untriaged_skill_summary_dicts.append(skill_summary_dict)
+                categorized_skills_dict['untriaged_skills'].append({
+                    'skill_id': skill_id,
+                    'skill_description': skill_summary_dict['description']
+                })
             if (skill_id in skill_ids_assigned_to_some_topic) and (
                     skill_id not in merged_skill_ids):
                 mergeable_skill_summary_dicts.append(skill_summary_dict)
@@ -101,10 +152,12 @@ class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
             'untriaged_skill_summary_dicts': untriaged_skill_summary_dicts,
             'mergeable_skill_summary_dicts': mergeable_skill_summary_dicts,
             'topic_summary_dicts': topic_summary_dicts,
+            'all_classroom_names': all_classroom_names,
             'can_delete_topic': can_delete_topic,
             'can_create_topic': can_create_topic,
             'can_delete_skill': can_delete_skill,
-            'can_create_skill': can_create_skill
+            'can_create_skill': can_create_skill,
+            'categorized_skills_dict': categorized_skills_dict
         })
         self.render_json(self.values)
 
@@ -117,6 +170,7 @@ class NewTopicHandler(base.BaseHandler):
         """Handles POST requests."""
         name = self.payload.get('name')
         abbreviated_name = self.payload.get('abbreviated_name')
+        description = self.payload.get('description')
         try:
             topic_domain.Topic.require_valid_name(name)
         except:
@@ -124,7 +178,7 @@ class NewTopicHandler(base.BaseHandler):
                 'Invalid topic name, received %s.' % name)
         new_topic_id = topic_services.get_new_topic_id()
         topic = topic_domain.Topic.create_default_topic(
-            new_topic_id, name, abbreviated_name)
+            new_topic_id, name, abbreviated_name, description)
         topic_services.save_new_topic(self.user_id, topic)
 
         self.render_json({
@@ -172,7 +226,35 @@ class NewSkillHandler(base.BaseHandler):
 
         skill.update_explanation(
             state_domain.SubtitledHtml.from_dict(explanation_dict))
+
+        image_filenames = skill_services.get_image_filenames_from_skill(skill)
+
         skill_services.save_new_skill(self.user_id, skill)
+
+        image_validation_error_message_suffix = (
+            'Please go to oppia.org/skill_editor/%s to edit '
+            'the image.' % skill.id)
+        for filename in image_filenames:
+            image = self.request.get(filename)
+            if not image:
+                logging.error(
+                    'Image not provided for file with name %s when the skill '
+                    'with id %s was created.' % (filename, skill.id))
+                raise self.InvalidInputException(
+                    'No image data provided for file with name %s. %s'
+                    % (filename, image_validation_error_message_suffix))
+            try:
+                file_format = (
+                    image_validation_services.validate_image_and_filename(
+                        image, filename))
+            except utils.ValidationError as e:
+                e = '%s %s' % (e, image_validation_error_message_suffix)
+                raise self.InvalidInputException(e)
+            image_is_compressible = (
+                file_format in feconf.COMPRESSIBLE_IMAGE_FORMATS)
+            fs_services.save_original_and_compressed_versions_of_image(
+                filename, feconf.ENTITY_TYPE_SKILL, skill.id, image,
+                'image', image_is_compressible)
 
         self.render_json({
             'skillId': new_skill_id

@@ -19,7 +19,7 @@
 
 export interface ISubtitledHtmlBackendDict {
   'content_id': string;
-  html: string;
+  'html': string;
 }
 
 import { Injectable } from '@angular/core';

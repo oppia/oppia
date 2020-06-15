@@ -40,6 +40,8 @@ describe('Subtopic data object factory', () => {
         SubtopicPageContentsObjectFactory);
 
       var sampleSubtopicDataBackendDict = {
+        topic_id: 'topic_id',
+        next_subtopic_dict: null,
         subtopic_title: 'sample_title',
         page_contents: {
           subtitled_html: {
@@ -52,7 +54,8 @@ describe('Subtopic data object factory', () => {
                 en: {
                   filename: 'test.mp3',
                   file_size_bytes: 100,
-                  needs_update: false
+                  needs_update: false,
+                  duration_secs: 10
                 }
               }
             }
@@ -65,6 +68,8 @@ describe('Subtopic data object factory', () => {
     });
 
     it('should be able to get all the values', function() {
+      expect(_sampleSubtopicData.getParentTopicId()).toEqual('topic_id');
+      expect(_sampleSubtopicData.getNextSubtopic()).toEqual(null);
       expect(_sampleSubtopicData.getSubtopicTitle()).toEqual('sample_title');
       expect(_sampleSubtopicData.getPageContents()).toEqual(
         subtopicPageContentsObjectFactory.createFromBackendDict({
@@ -78,7 +83,8 @@ describe('Subtopic data object factory', () => {
                 en: {
                   filename: 'test.mp3',
                   file_size_bytes: 100,
-                  needs_update: false
+                  needs_update: false,
+                  duration_secs: 10
                 }
               }
             }

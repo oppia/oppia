@@ -19,20 +19,22 @@
 import 'core-js/es7/reflect';
 import 'zone.js';
 
+angular.module('oppia', [
+  'dndLists', 'headroom', 'infinite-scroll', 'ngAnimate',
+  'ngAudio', require('angular-cookies'), 'ngJoyRide', 'ngMaterial',
+  'ngSanitize', 'ngTouch', 'pascalprecht.translate',
+  'toastr', 'ui.bootstrap', 'ui.sortable', 'ui.tree', 'ui.validate'
+]);
+
 import { Component, NgModule, StaticProvider } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { RequestInterceptor } from 'services/request-interceptor.service';
-
-// This component is needed to force-bootstrap Angular at the beginning of the
-// app.
-@Component({
-  selector: 'service-bootstrap',
-  template: ''
-})
-export class ServiceBootstrapComponent {}
+import { SharedComponentsModule } from 'components/shared-component.module';
+import { OppiaAngularRootComponent } from
+  'components/oppia-angular-root.component';
 
 import { AppConstants } from 'app.constants';
 import { InteractionsExtensionsConstants } from
@@ -43,13 +45,14 @@ import { ObjectsDomainConstants } from
 @NgModule({
   imports: [
     BrowserModule,
-    HttpClientModule
+    HttpClientModule,
+    SharedComponentsModule
   ],
   declarations: [
-    ServiceBootstrapComponent
+    OppiaAngularRootComponent
   ],
   entryComponents: [
-    ServiceBootstrapComponent
+    OppiaAngularRootComponent
   ],
   providers: [
     AppConstants,
@@ -78,17 +81,12 @@ const downgradedModule = downgradeModule(bootstrapFn);
 
 declare var angular: ng.IAngularStatic;
 
-angular.module('oppia', [
-  'dndLists', 'headroom', 'infinite-scroll', 'ngAnimate',
-  'ngAudio', require('angular-cookies'), 'ngJoyRide', 'ngMaterial',
-  'ngSanitize', 'ngTouch', 'pascalprecht.translate',
-  'toastr', 'ui.bootstrap', 'ui.sortable', 'ui.tree', 'ui.validate',
-  downgradedModule
-])
+angular.module('oppia').requires.push(downgradedModule);
+
+angular.module('oppia').directive(
   // This directive is the downgraded version of the Angular component to
   // bootstrap the Angular 8.
-  .directive(
-    'serviceBootstrap',
-    downgradeComponent({
-      component: ServiceBootstrapComponent
-    }) as angular.IDirectiveFactory);
+  'oppiaAngularRoot',
+  downgradeComponent({
+    component: OppiaAngularRootComponent
+  }) as angular.IDirectiveFactory);

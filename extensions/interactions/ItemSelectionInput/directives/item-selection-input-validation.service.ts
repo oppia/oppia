@@ -23,6 +23,8 @@ import { AnswerGroup } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { IWarning, baseInteractionValidationService } from
   'interactions/base-interaction-validation.service';
+import { IItemSelectionInputCustomizationArgs } from
+  'interactions/customization-args-defs';
 import { Outcome } from
   'domain/exploration/OutcomeObjectFactory';
 
@@ -36,11 +38,8 @@ export class ItemSelectionInputValidationService {
       private baseInteractionValidationServiceInstance:
         baseInteractionValidationService) {}
 
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'customizationArgs' is a dict with possible underscore_cased
-  // keys which give tslint errors against underscore_casing in favor of
-  // camelCasing.
-  getCustomizationArgsWarnings(customizationArgs: any): IWarning[] {
+  getCustomizationArgsWarnings(
+      customizationArgs: IItemSelectionInputCustomizationArgs): IWarning[] {
     var warningsList = [];
 
     this.baseInteractionValidationServiceInstance.requireCustomizationArguments(
@@ -111,7 +110,8 @@ export class ItemSelectionInputValidationService {
   }
 
   getAllWarnings(
-      stateName: string, customizationArgs: any, answerGroups: AnswerGroup[],
+      stateName: string, customizationArgs:
+      IItemSelectionInputCustomizationArgs, answerGroups: AnswerGroup[],
       defaultOutcome: Outcome): IWarning[] {
     var warningsList = [];
 
@@ -142,7 +142,7 @@ export class ItemSelectionInputValidationService {
       answerGroups.forEach((answerGroup, answerIndex) => {
         var rules = answerGroup.rules;
         rules.forEach((rule, ruleIndex) => {
-          var ruleInputs = rule.inputs.x;
+          var ruleInputs = (<string[]>rule.inputs.x);
           ruleInputs.forEach((ruleInput) => {
             var choiceIndex = answerChoiceToIndex[ruleInput];
             if (rule.type === 'Equals') {
@@ -190,7 +190,7 @@ export class ItemSelectionInputValidationService {
     answerGroups.forEach((answerGroup, answerIndex) => {
       var rules = answerGroup.rules;
       rules.forEach((rule, ruleIndex) => {
-        var ruleInputs = rule.inputs.x;
+        var ruleInputs = (<string[]>rule.inputs.x);
         ruleInputs.forEach((ruleInput) => {
           if (rule.type === 'IsProperSubsetOf') {
             if (ruleInputs.length < 2) {

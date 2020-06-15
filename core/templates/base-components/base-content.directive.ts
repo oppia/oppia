@@ -29,9 +29,12 @@ angular.module('oppia').directive('baseContent', [
     return {
       restrict: 'E',
       scope: {},
-      bindToController: {},
+      bindToController: {
+        backButtonShown: '<'
+      },
       transclude: {
         breadcrumb: '?navbarBreadcrumb',
+        preLogoAction: '?navbarPreLogoAction',
         content: 'content',
         footer: '?pageFooter',
         navOptions: '?navOptions',
@@ -72,7 +75,7 @@ angular.module('oppia').directive('baseContent', [
           ctrl.$onInit = function() {
             ctrl.iframed = UrlService.isIframed();
             ctrl.DEV_MODE = $rootScope.DEV_MODE;
-            LoaderService.getLoadingMessageSubject().subscribe(
+            LoaderService.onLoadingMessageChange.subscribe(
               (message: string) => this.loadingMessage = message
             );
           };

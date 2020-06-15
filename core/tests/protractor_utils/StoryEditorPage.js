@@ -115,189 +115,211 @@ var StoryEditorPage = function() {
     by.css('.story-node-thumbnail .protractor-test-custom-photo'));
   var chapterThumbnailButton = element(
     by.css('.story-node-thumbnail .protractor-test-photo-button'));
-  this.get = function(storyId) {
-    browser.get(EDITOR_URL_PREFIX + storyId);
-    return waitFor.pageToFullyLoad();
+  this.get = async function(storyId) {
+    await browser.get(EDITOR_URL_PREFIX + storyId);
+    await waitFor.pageToFullyLoad();
   };
 
-  this.getStoryThumbnailSource = function() {
-    return workflow.getImageSource(storyThumbnailImageElement);
+  this.getStoryThumbnailSource = async function() {
+    return await workflow.getImageSource(storyThumbnailImageElement);
   };
 
-  this.getChapterThumbnailSource = function() {
-    return workflow.getImageSource(chapterThumbnailImageElement);
+  this.getChapterThumbnailSource = async function() {
+    return await workflow.getImageSource(chapterThumbnailImageElement);
   };
 
-  this.submitStoryThumbnail = function(imgPath) {
-    return workflow.submitImage(
+  this.submitStoryThumbnail = async function(imgPath) {
+    return await workflow.submitImage(
       storyThumbnailButton, thumbnailContainer, imgPath);
   };
 
-  this.submitChapterThumbnail = function(imgPath) {
-    return workflow.submitImage(
+  this.submitChapterThumbnail = async function(imgPath) {
+    return await workflow.submitImage(
       chapterThumbnailButton, thumbnailContainer, imgPath);
   };
 
-  this.publishStory = function() {
-    publishStoryButton.click();
+  this.publishStory = async function() {
+    await publishStoryButton.click();
   };
 
-  this.unpublishStory = function() {
-    unpublishStoryButton.click();
+  this.unpublishStory = async function() {
+    await unpublishStoryButton.click();
   };
 
-  this.deleteChapterWithIndex = function(index) {
-    general.scrollToTop();
-    deleteChapterButtons.then(function(elems) {
-      elems[index].click();
-    });
-    confirmDeleteChapterButton.click();
+  this.deleteChapterWithIndex = async function(index) {
+    await general.scrollToTop();
+    await deleteChapterButtons.get(index).click();
+    await confirmDeleteChapterButton.click();
   };
 
-  this.createNewDestinationChapter = function(title) {
-    browser.actions().mouseMove(addDestinationChapterButton).perform();
-    addDestinationChapterButton.click();
-    newChapterTitleField.sendKeys(title);
-    confirmChapterCreationButton.click();
-    general.scrollToTop();
+  this.createNewDestinationChapter = async function(title) {
+    await browser.actions().mouseMove(addDestinationChapterButton).perform();
+    await waitFor.elementToBeClickable(
+      addDestinationChapterButton,
+      'Add destination chapter button takes too long to be clickable.');
+    await addDestinationChapterButton.click();
+    await waitFor.visibilityOf(
+      newChapterTitleField,
+      'New Chapter modal takes too long to appear.');
+    await newChapterTitleField.sendKeys(title);
+    await confirmChapterCreationButton.click();
+    await general.scrollToTop();
   };
 
-  this.removeDestination = function() {
-    deleteDestinationChapterButton.click();
+  this.removeDestination = async function() {
+    await deleteDestinationChapterButton.click();
   };
 
-  this.selectDestinationChapterByName = function(chapterName) {
+  this.selectDestinationChapterByName = async function(chapterName) {
     var destinationOption = destinationSelect.element(
       by.cssContainingText('option', chapterName));
-    destinationOption.click();
+    await destinationOption.click();
   };
 
-  this.expectDestinationToBe = function(chapterName) {
+  this.expectDestinationToBe = async function(chapterName) {
     var pattern = '\s*' + chapterName + '\s*';
-    return expect(nextChapterCard.getText()).toMatch(pattern);
+    return expect(await nextChapterCard.getText()).toMatch(pattern);
   };
 
-  this.expectNumberOfChaptersToBe = function(count) {
-    chapterTitles.then(function(items) {
-      expect(items.length).toEqual(count);
-    });
+  this.expectNumberOfChaptersToBe = async function(count) {
+    expect(await chapterTitles.count()).toEqual(count);
   };
 
-  this.createInitialChapter = function(title) {
-    createInitialChapterButton.click();
-    newChapterTitleField.sendKeys(title);
-    confirmChapterCreationButton.click();
+  this.createInitialChapter = async function(title) {
+    await waitFor.elementToBeClickable(
+      createInitialChapterButton,
+      'Create Initial Chapter button takes too long to be clickable.');
+    await createInitialChapterButton.click();
+    await waitFor.visibilityOf(
+      newChapterTitleField,
+      'New Chapter modal takes too long to appear.');
+    await newChapterTitleField.sendKeys(title);
+    await confirmChapterCreationButton.click();
+    await waitFor.invisibilityOf(
+      confirmChapterCreationButton,
+      'New Chapter modal takes too long to disappear.');
   };
 
-  this.expectNotesToBe = function(richTextInstructions) {
-    forms.expectRichText(storyNotes).toMatch(richTextInstructions);
+  this.expectNotesToBe = async function(richTextInstructions) {
+    await forms.expectRichText(storyNotes).toMatch(richTextInstructions);
   };
 
-  this.expectTitleToBe = function(title) {
-    expect(storyTitleField.getAttribute('value')).toEqual(title);
+  this.expectTitleToBe = async function(title) {
+    expect(await storyTitleField.getAttribute('value')).toEqual(title);
   };
 
-  this.expectDescriptionToBe = function(description) {
-    expect(storyDescriptionField.getAttribute('value')).toEqual(description);
+  this.expectDescriptionToBe = async function(description) {
+    expect(await storyDescriptionField.getAttribute('value')).toEqual(
+      description);
   };
 
-  this.changeStoryTitle = function(storyTitle) {
-    storyTitleField.clear();
-    storyTitleField.sendKeys(storyTitle);
+  this.changeStoryTitle = async function(storyTitle) {
+    await storyTitleField.clear();
+    await storyTitleField.sendKeys(storyTitle);
   };
 
-  this.returnToTopic = function() {
-    general.scrollToTop();
-    returnToTopicButton.click();
-    waitFor.pageToFullyLoad();
+  this.returnToTopic = async function() {
+    await general.scrollToTop();
+    await returnToTopicButton.click();
+    await waitFor.pageToFullyLoad();
   };
 
-  this.changeStoryDescription = function(storyDescription) {
-    storyDescriptionField.clear();
-    storyDescriptionField.sendKeys(storyDescription);
+  this.changeStoryDescription = async function(storyDescription) {
+    await storyDescriptionField.clear();
+    await storyDescriptionField.sendKeys(storyDescription);
   };
 
-  this.changeStoryNotes = function(richTextInstructions) {
-    openStoryNotesEditorButton.click();
-    var storyNotesEditor = forms.RichTextEditor(
+  this.changeStoryNotes = async function(richTextInstructions) {
+    await openStoryNotesEditorButton.click();
+    var storyNotesEditor = await forms.RichTextEditor(
       notesEditor);
-    storyNotesEditor.clear();
-    richTextInstructions(storyNotesEditor);
-    saveStoryNotesEditorButton.click();
+    await storyNotesEditor.clear();
+    await richTextInstructions(storyNotesEditor);
+    await saveStoryNotesEditorButton.click();
   };
 
-  this.saveStory = function(commitMessage) {
-    saveStoryButton.click();
-    commitMessageField.sendKeys(commitMessage);
+  this.saveStory = async function(commitMessage) {
+    await waitFor.elementToBeClickable(
+      saveStoryButton,
+      'Save story button takes too long to be clickable');
+    await saveStoryButton.click();
+    await waitFor.visibilityOf(
+      commitMessageField,
+      'Commit message modal takes too long to appear.');
+    await commitMessageField.sendKeys(commitMessage);
 
-    waitFor.elementToBeClickable(
+    await waitFor.elementToBeClickable(
       closeSaveModalButton,
       'Close save modal button takes too long to be clickable');
-    closeSaveModalButton.click();
-    waitFor.pageToFullyLoad();
+    await closeSaveModalButton.click();
+    await waitFor.invisibilityOf(
+      closeSaveModalButton,
+      'Commit message modal takes too long to disappear.');
+    await waitFor.pageToFullyLoad();
   };
 
-  this.expectSaveStoryDisabled = function() {
+  this.expectSaveStoryDisabled = async function() {
     return expect(
-      saveStoryButton.getAttribute('disabled')).toEqual('true');
+      await saveStoryButton.getAttribute('disabled')).toEqual('true');
   };
 
-  this.expectDisplayUnreachableChapterWarning = function() {
-    return expect(disconnectedChapterWarning.isPresent()).toBe(true);
+  this.expectDisplayUnreachableChapterWarning = async function() {
+    return expect(await disconnectedChapterWarning.isPresent()).toBe(true);
   };
 
-  this.setChapterExplorationId = function(explorationId) {
-    waitFor.visibilityOf(
+  this.setChapterExplorationId = async function(explorationId) {
+    await waitFor.visibilityOf(
       explorationIdInput,
       'ExplorationIdInput takes too long to be visible'
     );
 
-    explorationIdInput.sendKeys(explorationId);
-    waitFor.elementToBeClickable(
+    await explorationIdInput.sendKeys(explorationId);
+    await waitFor.elementToBeClickable(
       explorationIdSaveButton,
       'ExplorationIdSaveButton takes too long to be clickable'
     );
-    explorationIdSaveButton.click();
+    await explorationIdSaveButton.click();
   };
 
-  this.changeNodeDescription = function(nodeDescription) {
-    waitFor.visibilityOf(
+  this.changeNodeDescription = async function(nodeDescription) {
+    // scrollToTop is added to prevent nodeDescriptionInputField from
+    // being hidden by the navbar.
+    await general.scrollToTop();
+    await waitFor.visibilityOf(
       nodeDescriptionInputField,
       'NodeDescriptionInputField takes too long to be visible'
     );
-    nodeDescriptionInputField.clear();
-    nodeDescriptionInputField.sendKeys(nodeDescription);
+    await nodeDescriptionInputField.clear();
+    await nodeDescriptionInputField.sendKeys(nodeDescription);
   };
 
-  this.expectNodeDescription = function(nodeDescription) {
-    waitFor.visibilityOf(
+  this.expectNodeDescription = async function(nodeDescription) {
+    await waitFor.visibilityOf(
       nodeDescriptionInputField,
       'NodeDescriptionInputField takes too long to be visible'
     );
-    expect(nodeDescriptionInputField.getAttribute('value')).toMatch(
-      nodeDescription
-    );
+    await expect(await nodeDescriptionInputField.getAttribute('value'))
+      .toMatch(nodeDescription);
   };
 
   this.expectChapterExplorationIdToBe = function(id) {
     expect(explorationIdInput.getAttribute('value')).toEqual(id);
   };
 
-  this.changeNodeOutline = function(richTextInstructions) {
-    var editor = forms.RichTextEditor(
+  this.changeNodeOutline = async function(richTextInstructions) {
+    var editor = await forms.RichTextEditor(
       nodeOutlineEditor);
-    editor.clear();
-    richTextInstructions(editor);
-    nodeOutlineSaveButton.click();
+    await editor.clear();
+    await richTextInstructions(editor);
+    await nodeOutlineSaveButton.click();
   };
 
-  this.navigateToChapterByIndex = function(index) {
+  this.navigateToChapterByIndex = async function(index) {
     // scrollToTop is added to prevent chapterTitles from being hidden
     // by the navbar.
-    general.scrollToTop();
-    chapterTitles.then(function(elements) {
-      elements[index].click();
-    });
+    await general.scrollToTop();
+    var chapterTitleButton = await chapterTitles.get(index);
+    await chapterTitleButton.click();
   };
 
   this.expectNodeOutlineToMatch = function(nodeOutline) {
@@ -305,125 +327,111 @@ var StoryEditorPage = function() {
       nodeOutlineEditorRteContent.first().getText()).toEqual(nodeOutline);
   };
 
-  this.expectExplorationIdAlreadyExistWarningAndCloseIt = function() {
+  this.expectExplorationIdAlreadyExistWarningAndCloseIt = async function() {
     var warningToast = element(
       by.css('.protractor-test-toast-warning-message'));
-    waitFor.visibilityOf(
+    await waitFor.visibilityOf(
       warningToast,
       'warningToast takes too long to be visible.');
-    expect(warningToast.getText()).toEqual(
+    expect(await warningToast.getText()).toEqual(
       'The given exploration already exists in the story.');
     var closeToastButton = element(
       by.css('.protractor-test-close-toast-warning'));
-    waitFor.elementToBeClickable(
+    await waitFor.elementToBeClickable(
       closeToastButton,
       'closeToastButton takes too long to be clickable.');
-    closeToastButton.click();
+    await closeToastButton.click();
   };
 
-  this.getSelectSkillModal = function() {
-    waitFor.visibilityOf(
+  this.getSelectSkillModal = async function() {
+    await waitFor.visibilityOf(
       selectSkillModalHeader,
       'selectSkillModalHeader takes too long to be visible.');
     return {
-      _searchSkillByName: function(name) {
-        waitFor.visibilityOf(
+      _searchSkillByName: async function(name) {
+        await waitFor.visibilityOf(
           skillNameInputField,
           'skillNameInputField takes too long to be visible');
-        skillNameInputField.sendKeys(name);
+        await skillNameInputField.sendKeys(name);
       },
 
-      _selectSkillBasedOnIndex: function(index) {
-        skillListItems.then(function(elements) {
-          var selectedSkill = elements[index];
-          waitFor.elementToBeClickable(
-            selectedSkill,
-            'selectedSkill takes too long to be clickable.'
-          );
-          selectedSkill.click();
-        });
+      _selectSkillBasedOnIndex: async function(index) {
+        var selectedSkill = skillListItems.get(index);
+        await waitFor.elementToBeClickable(
+          selectedSkill,
+          'selectedSkill takes too long to be clickable.'
+        );
+        await selectedSkill.click();
       },
 
-      selectSkill: function(name) {
-        this._searchSkillByName(name);
-        this._selectSkillBasedOnIndex(0);
-        waitFor.elementToBeClickable(
+      selectSkill: async function(name) {
+        await this._searchSkillByName(name);
+        await this._selectSkillBasedOnIndex(0);
+        await waitFor.elementToBeClickable(
           skillSaveButton,
           'doneButton takes too long to be clickable');
-        skillSaveButton.click();
+        await skillSaveButton.click();
       },
     };
   };
 
-  this.addAcquiredSkill = function(skillName) {
-    waitFor.visibilityOf(
+  this.addAcquiredSkill = async function(skillName) {
+    await waitFor.visibilityOf(
       addAcquiredSkillButton,
       'addAcquiredSkillButton takes too long to be visible');
-    waitFor.elementToBeClickable(
+    await waitFor.elementToBeClickable(
       addAcquiredSkillButton,
       'addAcquiredSkillButton takes too long to be clickable');
-    addAcquiredSkillButton.click();
-    var selectSkillModal = this.getSelectSkillModal();
-    selectSkillModal.selectSkill(skillName);
+    await addAcquiredSkillButton.click();
+    var selectSkillModal = await this.getSelectSkillModal();
+    await selectSkillModal.selectSkill(skillName);
   };
 
-  this.addPrerequisiteSkill = function(skillName) {
-    waitFor.visibilityOf(
+  this.addPrerequisiteSkill = async function(skillName) {
+    await waitFor.visibilityOf(
       addPrerequisiteSkillButton,
       'addPrerequisitesSkillButton takes too long to be visible');
-    waitFor.elementToBeClickable(
+    await waitFor.elementToBeClickable(
       addPrerequisiteSkillButton,
       'addPrerequisitesSkillButton takes too long to be clickable');
-    addPrerequisiteSkillButton.click();
-    var selectSkillModal = this.getSelectSkillModal();
-    selectSkillModal.selectSkill(skillName);
+    await addPrerequisiteSkillButton.click();
+    var selectSkillModal = await this.getSelectSkillModal();
+    await selectSkillModal.selectSkill(skillName);
   };
 
-  this.deleteAcquiredSkillByIndex = function(index) {
-    deleteAcquiredSkillButton.then(function(elements) {
-      var toDelete = elements[index];
-      toDelete.click();
-    });
+  this.deleteAcquiredSkillByIndex = async function(index) {
+    await deleteAcquiredSkillButton.get(index).click();
   };
 
-  this.deletePrerequisiteSkillByIndex = function(index) {
-    deletePrerequisiteSkillButton.then(function(elements) {
-      var toDelete = elements[index];
-      toDelete.click();
-    });
+  this.deletePrerequisiteSkillByIndex = async function(index) {
+    await deletePrerequisiteSkillButton.get(index).click();
   };
 
-  this.expectAcquiredSkillDescriptionCardCount = function(number) {
-    expect(acquiredSkillDescriptionCard.count()).toBe(number);
+  this.expectAcquiredSkillDescriptionCardCount = async function(number) {
+    expect(await acquiredSkillDescriptionCard.count()).toBe(number);
   };
 
-  this.expectPrerequisiteSkillDescriptionCardCount = function(number) {
-    expect(prerequisiteSkillDescriptionCard.count()).toBe(number);
+  this.expectPrerequisiteSkillDescriptionCardCount = async function(number) {
+    expect(await prerequisiteSkillDescriptionCard.count()).toBe(number);
   };
 
-  this.selectInitialChapterByName = function(name) {
+  this.selectInitialChapterByName = async function(name) {
     var initialChapterOption = initialChapterSelect.element(
       by.cssContainingText('option', name));
-    initialChapterOption.click();
+    await initialChapterOption.click();
   };
 
-  this.expectWarningInIndicator = function(warning) {
-    browser.actions().mouseMove(warningIndicator).perform();
-    warningTextElements.then(function(elems) {
-      var p = new Promise(function(resolve, reject) {
-        elems.forEach(function(elem) {
-          elem.getText().then(function(text) {
-            if (warning.test(text)) {
-              resolve(true);
-            }
-          });
-        });
-        reject();
-      });
-      p.then(function(result) {
-        expect(result).toBe(true);
-      });
-    });
+  this.expectWarningInIndicator = async function(warning) {
+    await (await browser.actions().mouseMove(warningIndicator)).perform();
+    var warningElemCount = await warningTextElements.count();
+    matchFound = false;
+    for (var i = 0; i < warningElemCount; i++) {
+      var text = await (await warningTextElements.get(i)).getText();
+      if (warning.test(text)) {
+        matchFound = true;
+      }
+    }
+    expect(matchFound).toBe(true);
   };
 };
 

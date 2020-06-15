@@ -70,10 +70,10 @@ angular.module('oppia').directive('stewardsLandingPage', [
                 tabName === ctrl.TAB_NAME_TEACHERS) {
               return [{
                 text: 'Browse Lessons',
-                href: '/library'
+                href: '/community-library'
               }, {
                 text: 'Subscribe to our Newsletter',
-                href: 'https://tinyletter.com/oppia'
+                href: 'https://eepurl.com/g5v9Df'
               }];
             } else if (tabName === ctrl.TAB_NAME_NONPROFITS) {
               return [{
@@ -82,7 +82,7 @@ angular.module('oppia').directive('stewardsLandingPage', [
                   'https://www.oppiafoundation.org/partnerships#get-in-touch')
               }, {
                 text: 'Browse Lessons',
-                href: '/library'
+                href: '/community-library'
               }];
             } else if (tabName === ctrl.TAB_NAME_VOLUNTEERS) {
               // TODO(sll): Add "Get in Touch" link that points to contact form.

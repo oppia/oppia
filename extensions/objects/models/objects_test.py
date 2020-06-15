@@ -474,6 +474,28 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
             'denominator': denominator
         }
 
+    def test_position_of_terms_validation(self):
+        """Tests objects of type PositionOfTerms."""
+
+        mappings = [
+            ('lhs', 'lhs'), ('rhs', 'rhs'), ('both', 'both'),
+            ('irrelevant', 'irrelevant')]
+
+        invalid_values = [None, 2, 'string', 'item']
+
+        self.check_normalization(
+            objects.PositionOfTerms, mappings, invalid_values)
+
+    def test_algebraic_identifier_validation(self):
+        """Tests objects of type AlgebraicIdentifier."""
+
+        mappings = [('a', 'a'), ('alpha', 'alpha'), ('Z', 'Z')]
+
+        invalid_values = [None, 2, 'string', 'item']
+
+        self.check_normalization(
+            objects.AlgebraicIdentifier, mappings, invalid_values)
+
 
 class SchemaValidityTests(test_utils.GenericTestBase):
 
@@ -485,7 +507,7 @@ class SchemaValidityTests(test_utils.GenericTestBase):
                     schema_utils_test.validate_schema(member.SCHEMA)
                     count += 1
 
-        self.assertEqual(count, 39)
+        self.assertEqual(count, 44)
 
 
 class ObjectDefinitionTests(test_utils.GenericTestBase):

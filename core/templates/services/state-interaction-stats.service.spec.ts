@@ -26,7 +26,7 @@ import { NormalizeWhitespacePipe } from
 import { NormalizeWhitespacePunctuationAndCasePipe } from
   // eslint-disable-next-line max-len
   'filters/string-utility-filters/normalize-whitespace-punctuation-and-case.pipe';
-import { StateInteractionStatsService } from
+import { IStateInteractionStats, StateInteractionStatsService } from
   'services/state-interaction-stats.service';
 
 describe('State Interaction Stats Service', () => {
@@ -86,13 +86,91 @@ describe('State Interaction Stats Service', () => {
       spyOn(this.contextService, 'getExplorationId').and.returnValue('expid');
     });
 
+    it('should provide cached results after first call', fakeAsync(() => {
+      this.statsCaptured = [];
+      const captureStats = (stats: IStateInteractionStats) => {
+        expect(stats).toBeDefined();
+        this.statsCaptured.push(stats);
+      };
+
+      this.stateInteractionStatsService.computeStats(this.mockState)
+        .then(captureStats);
+      const req = this.httpTestingController.expectOne(
+        '/createhandler/state_interaction_stats/expid/Hola');
+      expect(req.request.method).toEqual('GET');
+      req.flush({
+        visualizations_info: [{
+          data: [
+            {answer: 'Ni Hao', frequency: 5},
+            {answer: 'Aloha', frequency: 3},
+            {answer: 'Hola', frequency: 1}
+          ]
+        }]
+      });
+      flushMicrotasks();
+
+      this.stateInteractionStatsService.computeStats(this.mockState)
+        .then(captureStats);
+      this.httpTestingController.expectNone(
+        '/createhandler/state_interaction_stats/expid/Hola');
+      flushMicrotasks();
+
+      expect(this.statsCaptured.length).toEqual(2);
+      const [statsFromFirstFetch, statsFromSecondFetch] = this.statsCaptured;
+      expect(statsFromSecondFetch).toBe(statsFromFirstFetch);
+    }));
+
+    it('should have separate caches for different states', fakeAsync(() => {
+      this.statsCaptured = [];
+      const captureStats = (stats: IStateInteractionStats) => {
+        expect(stats).toBeDefined();
+        this.statsCaptured.push(stats);
+      };
+
+      this.stateInteractionStatsService.computeStats(this.mockState)
+        .then(captureStats);
+      const holaReq = this.httpTestingController.expectOne(
+        '/createhandler/state_interaction_stats/expid/Hola');
+      expect(holaReq.request.method).toEqual('GET');
+      holaReq.flush({
+        visualizations_info: [{
+          data: [
+            {answer: 'Ni Hao', frequency: 5},
+            {answer: 'Aloha', frequency: 3},
+            {answer: 'Hola', frequency: 1}
+          ]
+        }]
+      });
+      flushMicrotasks();
+
+      this.mockState.name = 'Adios';
+      this.stateInteractionStatsService.computeStats(this.mockState)
+        .then(captureStats);
+      const adiosReq = this.httpTestingController.expectOne(
+        '/createhandler/state_interaction_stats/expid/Adios');
+      expect(adiosReq.request.method).toEqual('GET');
+      adiosReq.flush({
+        visualizations_info: [{
+          data: [
+            {answer: 'Zai Jian', frequency: 5},
+            {answer: 'Aloha', frequency: 3},
+            {answer: 'Adios', frequency: 1}
+          ]
+        }]
+      });
+      flushMicrotasks();
+
+      expect(this.statsCaptured.length).toEqual(2);
+      const [statsFromFirstFetch, statsFromSecondFetch] = this.statsCaptured;
+      expect(statsFromSecondFetch).not.toBe(statsFromFirstFetch);
+    }));
+
     it('should include answer frequencies in the response', fakeAsync(() => {
       this.onSuccess = jasmine.createSpy('success');
       this.onFailure = jasmine.createSpy('failure');
 
-      this.stateInteractionStatsService.computeStats(
-        this.mockState
-      ).then(this.onSuccess, this.onFailure);
+      this.stateInteractionStatsService.computeStats(this.mockState)
+        .then(this.onSuccess, this.onFailure);
 
       const req = this.httpTestingController.expectOne(
         '/createhandler/state_interaction_stats/expid/Hola');
@@ -126,9 +204,8 @@ describe('State Interaction Stats Service', () => {
         this.onSuccess = jasmine.createSpy('success');
         this.onFailure = jasmine.createSpy('failure');
 
-        this.stateInteractionStatsService.computeStats(
-          this.mockState
-        ).then(this.onSuccess, this.onFailure);
+        this.stateInteractionStatsService.computeStats(this.mockState)
+          .then(this.onSuccess, this.onFailure);
 
         const req = this.httpTestingController.expectOne(
           '/createhandler/state_interaction_stats/expid/Hola');

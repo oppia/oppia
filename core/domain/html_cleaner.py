@@ -117,6 +117,34 @@ def strip_html_tags(html_string):
     return bleach.clean(html_string, tags=[], attributes={}, strip=True)
 
 
+def get_image_filenames_from_html_strings(html_strings):
+    """Extracts the image filename from the oppia-noninteractive-image and
+    oppia-noninteractive-svgdiagram RTE component from all the html strings
+    passed in.
+
+    Args:
+        html_strings: list(str). List of HTML strings.
+
+    Returns:
+        list(str). List of image filenames from html_strings.
+    """
+    all_rte_components = []
+    filenames = []
+    for html_string in html_strings:
+        all_rte_components.extend(get_rte_components(html_string))
+
+    for rte_comp in all_rte_components:
+        if 'id' in rte_comp and rte_comp['id'] == 'oppia-noninteractive-image':
+            filenames.append(
+                rte_comp['customization_args']['filepath-with-value'])
+        elif ('id' in rte_comp and
+              rte_comp['id'] == 'oppia-noninteractive-svgdiagram'):
+            filenames.append(
+                rte_comp['customization_args']['svg_filename-with-value'])
+
+    return list(set(filenames))
+
+
 def get_rte_components(html_string):
     """Extracts the RTE components from an HTML string.
 
@@ -142,10 +170,8 @@ def get_rte_components(html_string):
             for attr in oppia_custom_tag_attrs[tag_name]:
                 # Unescape special HTML characters such as '&quot;'.
                 attr_val = parser.unescape(component_tag[attr])
-                # Adds escapes so that things like '\frac' aren't
-                # interpreted as special characters.
-                attr_val = attr_val.encode('unicode_escape')
                 customization_args[attr] = json.loads(attr_val)
+
             component['customization_args'] = customization_args
             components.append(component)
     return components

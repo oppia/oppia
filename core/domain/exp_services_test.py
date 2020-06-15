@@ -3629,19 +3629,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
         }
 
         # Check actual summaries equal expected summaries.
-        self.assertEqual(list(actual_summaries.keys()),
-                         list(expected_summaries.keys()))
-        simple_props = ['id', 'title', 'category', 'objective',
-                        'language_code', 'tags', 'ratings', 'status',
-                        'community_owned', 'owner_ids',
-                        'editor_ids', 'voice_artist_ids', 'viewer_ids',
-                        'contributor_ids', 'version',
-                        'exploration_model_created_on',
-                        'exploration_model_last_updated']
-        for exp_id in actual_summaries:
-            for prop in simple_props:
-                self.assertEqual(getattr(actual_summaries[exp_id], prop),
-                                 getattr(expected_summaries[exp_id], prop))
+        self.assertItemsEqual(actual_summaries, expected_summaries)
 
 
 class ExplorationConversionPipelineTests(ExplorationServicesUnitTests):
@@ -4099,6 +4087,18 @@ title: Old Title
         self.assertEqual(
             exploration.init_state.interaction.solution.to_dict(),
             solution)
+        solution = None
+        exp_services.update_exploration(
+            self.albert_id, self.NEW_EXP_ID, [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION,
+                'state_name': exploration.init_state_name,
+                'new_value': solution
+            })], 'Changed interaction_solutions.')
+        exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
+        self.assertEqual(
+            exploration.init_state.interaction.solution,
+            None)
 
     def test_cannot_update_recorded_voiceovers_with_invalid_type(self):
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)

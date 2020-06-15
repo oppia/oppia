@@ -21,7 +21,7 @@ var forms = require('./forms.js');
 var waitFor = require('./waitFor.js');
 
 var LibraryPage = function() {
-  var LIBRARY_URL_SUFFIX = '/library';
+  var LIBRARY_URL_SUFFIX = '/community-library';
   var allCollectionSummaryTile = element.all(
     by.css('.protractor-test-collection-summary-tile'));
   var allExplorationSummaryTile = element.all(
@@ -36,33 +36,35 @@ var LibraryPage = function() {
   };
 
   var categorySelector = forms.MultiSelectEditor(
-    element(by.css('.protractor-test-search-bar-category-selector'))
-  );
+    element(by.css(
+      '.protractor-library-page-search-bar ' +
+      '.protractor-test-search-bar-category-selector')));
   var explorationObjective = element(
     by.css('.protractor-test-exp-summary-tile-objective'));
   var createActivityButton = element(
     by.css('.protractor-test-create-activity')
   );
   var languageSelector = forms.MultiSelectEditor(
-    element(by.css('.protractor-test-search-bar-language-selector'))
-  );
+    element(by.css(
+      '.protractor-library-page-search-bar ' +
+      '.protractor-test-search-bar-language-selector')));
   var searchInputs = element.all(
     by.css('.protractor-test-search-input'));
   var mainHeader = element(by.css('.protractor-test-library-main-header'));
 
   // Returns a promise of all explorations with the given name.
-  var _getExplorationElements = function(name) {
-    return element.all(by.css('.protractor-test-exp-summary-tile')).filter(
-      function(tile) {
-        return tile.element(by.css('.protractor-test-exp-summary-tile-title')).
-          getText().then(function(tileTitle) {
-            return (tileTitle === name);
-          });
+  var _getExplorationElements = async function(name) {
+    return await element.all(
+      by.css('.protractor-test-exp-summary-tile')).filter(
+      async function(tile) {
+        var tileTitle = await tile.element(
+          by.css('.protractor-test-exp-summary-tile-title')).getText();
+        return (tileTitle === name);
       }
     );
   };
 
-  var _submitSearchQuery = function(searchQuery) {
+  var _submitSearchQuery = async function(searchQuery) {
     // The library page has two search bar input elements.
     // The first search bar input element is visible only in a desktop
     // browser and is invisible in case of a mobile browser.
@@ -71,132 +73,129 @@ var LibraryPage = function() {
 
     // get function is a zero-based index.
     var searchInput = (
-      browser.isMobile ? searchInputs.get(1) : searchInputs.first());
-    searchInput.clear();
-    searchInput.sendKeys(searchQuery);
+      browser.isMobile ? await searchInputs.get(1) :
+      await searchInputs.first());
+    await searchInput.clear();
+    await searchInput.sendKeys(searchQuery);
   };
 
-  this.get = function() {
-    browser.get(LIBRARY_URL_SUFFIX);
-    return waitFor.pageToFullyLoad();
+  this.get = async function() {
+    await browser.get(LIBRARY_URL_SUFFIX);
+    await waitFor.pageToFullyLoad();
   };
 
-  this.addSelectedExplorationToPlaylist = function() {
+  this.addSelectedExplorationToPlaylist = async function() {
     var addToPlaylistButton = element(by.css(
       '.protractor-test-add-to-playlist-btn')
     );
 
-    browser.actions().mouseMove(element(by.css(
+    await browser.actions().mouseMove(element(by.css(
       '.protractor-test-exp-summary-tile-title'))).perform();
 
-    waitFor.elementToBeClickable(
+    await waitFor.elementToBeClickable(
       addToPlaylistButton, 'Add to playlist Icon taking too long to load');
-    addToPlaylistButton.click();
+    await addToPlaylistButton.click();
   };
 
-  this.selectLanguages = function(languages) {
-    languageSelector.selectValues(languages);
+  this.selectLanguages = async function(languages) {
+    await languageSelector.selectValues(languages);
   };
 
-  this.deselectLanguages = function(languages) {
-    languageSelector.deselectValues(languages);
+  this.deselectLanguages = async function(languages) {
+    await languageSelector.deselectValues(languages);
   };
 
-  this.expectCurrentLanguageSelectionToBe = function(expectedLanguages) {
-    languageSelector.expectCurrentSelectionToBe(expectedLanguages);
+  this.expectCurrentLanguageSelectionToBe = async function(expectedLanguages) {
+    await languageSelector.expectCurrentSelectionToBe(expectedLanguages);
   };
 
-  this.selectCategories = function(categories) {
-    categorySelector.selectValues(categories);
+  this.selectCategories = async function(categories) {
+    await categorySelector.selectValues(categories);
   };
 
-  this.deselectCategories = function(categories) {
-    categorySelector.deselectValues(categories);
+  this.deselectCategories = async function(categories) {
+    await categorySelector.deselectValues(categories);
   };
 
-  this.expectCurrentCategorySelectionToBe = function(expectedCategories) {
-    categorySelector.expectCurrentSelectionToBe(expectedCategories);
+  this.expectCurrentCategorySelectionToBe = async function(
+      expectedCategories) {
+    await categorySelector.expectCurrentSelectionToBe(expectedCategories);
   };
 
-  this.expectMainHeaderTextToBe = function(expectedHeaderText) {
-    expect(mainHeader.getText()).toEqual(expectedHeaderText);
+  this.expectMainHeaderTextToBe = async function(expectedHeaderText) {
+    expect(await mainHeader.getText()).toEqual(expectedHeaderText);
   };
 
-  this.expectExplorationToBeVisible = function(name) {
-    _getExplorationElements(name).then(function(elems) {
-      expect(elems.length).not.toBe(0);
-    });
+  this.expectExplorationToBeVisible = async function(name) {
+    var elems = await _getExplorationElements(name);
+    expect(elems.length).not.toBe(0);
   };
 
-  this.expectExplorationToBeHidden = function(name) {
-    _getExplorationElements(name).then(function(elems) {
-      expect(elems.length).toBe(0);
-    });
+  this.expectExplorationToBeHidden = async function(name) {
+    var elems = await _getExplorationElements(name);
+    expect(elems.length).toBe(0);
   };
 
-  this.playCollection = function(collectionName) {
-    waitFor.pageToFullyLoad();
-    waitFor.visibilityOf(
+  this.playCollection = async function(collectionName) {
+    await waitFor.pageToFullyLoad();
+    await waitFor.visibilityOf(
       allCollectionSummaryTile.first(),
       'Library Page does not have any collections');
-    waitFor.visibilityOf(
+    await waitFor.visibilityOf(
       allCollectionsTitled(collectionName).first(),
       'Unable to find collection ' + collectionName);
-    allCollectionsTitled(collectionName).first().click();
-    waitFor.pageToFullyLoad();
+    await allCollectionsTitled(collectionName).first().click();
+    await waitFor.pageToFullyLoad();
   };
 
-  this.playExploration = function(explorationName) {
-    waitFor.pageToFullyLoad();
-    waitFor.visibilityOf(
-      allExplorationSummaryTile.first(),
+  this.playExploration = async function(explorationName) {
+    await waitFor.pageToFullyLoad();
+    await waitFor.visibilityOf(
+      await allExplorationSummaryTile.first(),
       'Library Page does not have any explorations');
-    waitFor.visibilityOf(
-      allExplorationsTitled(explorationName).first(),
-      'Unable to find exploration ' + explorationName);
-    allExplorationsTitled(explorationName).first().click();
-    waitFor.pageToFullyLoad();
+
+    var explorationCard = await allExplorationsTitled(explorationName).first();
+    await waitFor.visibilityOf(
+      explorationCard, 'Unable to find exploration ' + explorationName);
+    await explorationCard.click();
+    await waitFor.pageToFullyLoad();
   };
 
-  this.getExplorationObjective = function(name) {
-    return _getExplorationElements(name).then(function(elems) {
-      return elems[0].element(by.css(
-        '.protractor-test-exp-summary-tile-objective'
-      )).getText();
-    });
+  this.getExplorationObjective = async function(name) {
+    var elems = await _getExplorationElements(name);
+    return await elems[0].element(by.css(
+      '.protractor-test-exp-summary-tile-objective')).getText();
   };
 
-  this.expectExplorationRatingToEqual = function(name, ratingValue) {
-    _getExplorationElements(name).then(function(elems) {
-      waitFor.visibilityOf(elems[0], 'Rating card takes too long to appear');
-      elems[0].element(by.css(
-        '.protractor-test-exp-summary-tile-rating'
-      )).getText().then(function(value) {
-        expect(value).toBe(ratingValue);
-      });
-    });
+  this.expectExplorationRatingToEqual = async function(name, ratingValue) {
+    var elems = await _getExplorationElements(name);
+    await waitFor.visibilityOf(
+      elems[0], 'Rating card takes too long to appear');
+    var value = await elems[0].element(by.css(
+      '.protractor-test-exp-summary-tile-rating')).getText();
+    expect(value).toBe(ratingValue);
   };
 
-  this.clickCreateActivity = function() {
-    createActivityButton.click();
-    waitFor.pageToFullyLoad();
+  this.clickCreateActivity = async function() {
+    await createActivityButton.click();
+    await waitFor.pageToFullyLoad();
   };
 
-  this.clickExplorationObjective = function() {
-    waitFor.elementToBeClickable(
+  this.clickExplorationObjective = async function() {
+    await waitFor.elementToBeClickable(
       explorationObjective,
       'Exploration Objective takes too long to be clickable');
-    explorationObjective.click();
+    await explorationObjective.click();
   };
 
-  this.findExploration = function(explorationTitle) {
-    waitFor.pageToFullyLoad();
-    _submitSearchQuery(explorationTitle);
+  this.findExploration = async function(explorationTitle) {
+    await waitFor.pageToFullyLoad();
+    await _submitSearchQuery(explorationTitle);
   };
 
-  this.findCollection = function(collectionTitle) {
-    waitFor.pageToFullyLoad();
-    _submitSearchQuery(collectionTitle);
+  this.findCollection = async function(collectionTitle) {
+    await waitFor.pageToFullyLoad();
+    await _submitSearchQuery(collectionTitle);
   };
 };
 
