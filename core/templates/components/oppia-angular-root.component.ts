@@ -223,6 +223,7 @@ import { GuestCollectionProgressService } from
   'domain/collection/guest-collection-progress.service';
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
 import { HtmlEscaperService } from 'services/html-escaper.service';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { IdGenerationService } from 'services/id-generation.service';
 import { ImageClickInputValidationService } from
   // eslint-disable-next-line max-len
@@ -630,6 +631,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static guestCollectionProgressService: GuestCollectionProgressService;
   static hintObjectFactory: HintObjectFactory;
   static htmlEscaperService: HtmlEscaperService;
+  static i18nLanguageCodeService: I18nLanguageCodeService;
   static idGenerationService: IdGenerationService;
   static imageClickInputValidationService: ImageClickInputValidationService;
   static imageFileObjectFactory: ImageFileObjectFactory;
@@ -877,6 +879,7 @@ private guestCollectionProgressObjectFactory: GuestCollectionProgressObjectFacto
 private guestCollectionProgressService: GuestCollectionProgressService,
 private hintObjectFactory: HintObjectFactory,
 private htmlEscaperService: HtmlEscaperService,
+private i18nLanguageCodeService: I18nLanguageCodeService,
 private idGenerationService: IdGenerationService,
 private imageClickInputValidationService: ImageClickInputValidationService,
 private imageFileObjectFactory: ImageFileObjectFactory,
@@ -1125,6 +1128,7 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.guestCollectionProgressService = this.guestCollectionProgressService;
     OppiaAngularRootComponent.hintObjectFactory = this.hintObjectFactory;
     OppiaAngularRootComponent.htmlEscaperService = this.htmlEscaperService;
+    OppiaAngularRootComponent.i18nLanguageCodeService = this.i18nLanguageCodeService;
     OppiaAngularRootComponent.idGenerationService = this.idGenerationService;
     OppiaAngularRootComponent.imageClickInputValidationService = this.imageClickInputValidationService;
     OppiaAngularRootComponent.imageFileObjectFactory = this.imageFileObjectFactory;
