@@ -68,4 +68,43 @@ describe('Utils Service', () => {
     })).toBeFalse();
     expect(uts.isError(null)).toBeFalse();
   });
+
+  it('should check if the two objects are equal', () => {
+    const objA = {
+      k1: 'Value1',
+      k2: 'Value2',
+      k3: [1, 2, 3, 4, {a: 'b'}],
+      k4: {
+        x: [1, 2, 3, {a: [1, 2, 3]}],
+        y: 'abc'
+      }
+    };
+    const objB = {
+      k1: 'Value1',
+      k2: 'Value2',
+      k3: [1, 2, 3, 4, {a: 'b'}],
+      k4: {
+        x: [1, 2, 3, {a: [1, 2, 3]}],
+        y: 'abc'
+      }
+    };
+    const objC = {
+      name: 'test'
+    };
+    expect(uts.isEquivalent(objA, objB)).toBe(true);
+    expect(uts.isEquivalent(objA, objC)).toBe(false);
+  });
+
+  it('should check if an obj is defined or not', () => {
+    const objA = {};
+    const objB = {
+      key: 'value'
+    };
+    let objC;
+    const objD = null;
+    expect(uts.isDefined(objA)).toBe(true);
+    expect(uts.isDefined(objB)).toBe(true);
+    expect(uts.isDefined(objC)).toBe(false);
+    expect(uts.isDefined(objD)).toBe(false);
+  });
 });

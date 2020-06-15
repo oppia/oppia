@@ -223,7 +223,16 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'/communityreviewerrightsdatahandler',
         admin.CommunityReviewerRightsDataHandler),
+    get_redirect_route(
+        r'%s' % feconf.COMMUNITY_DASHBOARD_URL,
+        community_dashboard.CommunityDashboardPage),
 
+    get_redirect_route(
+        '/notifications_dashboard',
+        creator_dashboard.OldNotificationsDashboardRedirectPage),
+    get_redirect_route(
+        '/community_dashboard',
+        creator_dashboard.OldCommunityDashboardRedirectPage),
     get_redirect_route(
         feconf.NOTIFICATIONS_DASHBOARD_URL,
         creator_dashboard.NotificationsDashboardPage),
@@ -232,6 +241,9 @@ URLS = MAPREDUCE_HANDLERS + [
         creator_dashboard.NotificationsDashboardHandler),
     get_redirect_route(
         r'/notificationshandler', creator_dashboard.NotificationsHandler),
+    get_redirect_route(
+        '/creator_dashboard',
+        creator_dashboard.OldCreatorDashboardRedirectPage),
     get_redirect_route(
         r'%s' % feconf.CREATOR_DASHBOARD_URL,
         creator_dashboard.CreatorDashboardPage),
@@ -312,6 +324,9 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s' % feconf.UPLOAD_EXPLORATION_URL,
         creator_dashboard.UploadExplorationHandler),
     get_redirect_route(
+        '/learner_dashboard',
+        learner_dashboard.OldLearnerDashboardRedirectPage),
+    get_redirect_route(
         r'%s' % feconf.LEARNER_DASHBOARD_URL,
         learner_dashboard.LearnerDashboardPage),
     get_redirect_route(
@@ -373,6 +388,7 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s' % feconf.CUSTOM_VOLUNTEERS_LANDING_PAGE_URL,
         custom_landing_pages.StewardsLandingPage),
 
+    get_redirect_route('/library', library.OldLibraryRedirectPage),
     get_redirect_route(
         r'%s' % feconf.LIBRARY_INDEX_URL, library.LibraryPage),
     get_redirect_route(
