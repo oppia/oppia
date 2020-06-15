@@ -798,7 +798,7 @@ class JobRegistryTests(test_utils.GenericTestBase):
         with self.swap(
             jobs, 'ABSTRACT_BASE_CLASSES', mock_abstract_base_class):
             self.assertRaisesRegexp(
-                Exception, 
+                Exception,
                 'Tried to directly create a job using the abstract base*')
 
     def test_each_one_off_class_is_not_abstract(self):
