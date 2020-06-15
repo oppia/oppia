@@ -30,7 +30,6 @@ import { UrlInterpolationService } from
 import {
   FeaturedTranslationLanguageFactory,
   FeaturedTranslationLanguageBackendDict,
-  FeaturedTranslationLanguage
 } from
   'domain/community_dashboard/FeaturedTranslationLanguageFactory';
 
@@ -103,28 +102,6 @@ export class ContributionOpportunitiesBackendApiService {
     });
   }
 
-  _getFeaturedTranslationLanguages(
-      successCallback: (
-        featuredTranslationLanguages: FeaturedTranslationLanguage[]
-      ) => void,
-      errorCallback: (reason: string) => void
-  ) {
-    this.http.get('/getfeaturedtranslationlanguages').toPromise()
-      .then(
-        (data: any) => {
-          const featuredTranslationLanguages = (
-            data.featured_translation_languages.map(
-              (backendDict: FeaturedTranslationLanguageBackendDict) =>
-                this.featuredTranslationLanguageFactory
-                  .createFromBackendDict(backendDict)
-            ));
-          successCallback(featuredTranslationLanguages);
-        },
-        errorCallback
-      );
-  }
-
-
   fetchSkillOpportunities(cursor: string): Promise<Object> {
     const params: ContributionOpportunityParams = {
       cursor: cursor
@@ -161,10 +138,22 @@ export class ContributionOpportunitiesBackendApiService {
     });
   }
 
-  fetchFeaturedTranslationLanguages(): Promise<Object> {
-    return new Promise((resolve, reject) => {
-      this._getFeaturedTranslationLanguages(resolve, reject);
-    });
+  async fetchFeaturedTranslationLanguages(): Promise<Object> {
+    try {
+      let response = await this.http
+        .get('/getfeaturedtranslationlanguages')
+        .toPromise() as {
+          'featured_translation_languages':
+          FeaturedTranslationLanguageBackendDict[]
+        };
+      return response.featured_translation_languages.map(
+        (backendDict: FeaturedTranslationLanguageBackendDict) =>
+          this.featuredTranslationLanguageFactory
+            .createFromBackendDict(backendDict)
+      );
+    } catch (error) {
+      return error.message;
+    }
   }
 }
 
