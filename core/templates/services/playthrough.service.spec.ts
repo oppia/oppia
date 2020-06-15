@@ -251,6 +251,53 @@ describe('PlaythroughService', () => {
       });
     });
 
+    it('should identify cyclic state transitions containing 1-cycles', () => {
+      spyOn(stopwatchObjectFactory, 'create').and.returnValue(
+        jasmine.createSpyObj('Stopwatch', {getTimeInSecs: 480, reset: null}));
+
+      playthroughService.recordExplorationStartAction('stateName1');
+      playthroughService.recordAnswerSubmitAction(
+        'stateName1', 'stateName2', 'TextInput', 'Hello', 'Try again', 30);
+      playthroughService.recordAnswerSubmitAction(
+        'stateName2', 'stateName3', 'TextInput', 'Hello', 'Try again', 30);
+      playthroughService.recordAnswerSubmitAction(
+        'stateName3', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
+      playthroughService.recordAnswerSubmitAction(
+        'stateName1', 'stateName2', 'TextInput', 'Hello', 'Try again', 30);
+      playthroughService.recordAnswerSubmitAction(
+        'stateName2', 'stateName3', 'TextInput', 'Hello', 'Try again', 30);
+      playthroughService.recordAnswerSubmitAction(
+        'stateName3', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
+
+      // Revisiting the same state should not interrupt cyclic playthroughs.
+      playthroughService.recordAnswerSubmitAction(
+        'stateName1', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
+      playthroughService.recordAnswerSubmitAction(
+        'stateName1', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
+
+      playthroughService.recordAnswerSubmitAction(
+        'stateName1', 'stateName2', 'TextInput', 'Hello', 'Try again', 30);
+      playthroughService.recordAnswerSubmitAction(
+        'stateName2', 'stateName3', 'TextInput', 'Hello', 'Try again', 30);
+      playthroughService.recordAnswerSubmitAction(
+        'stateName3', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
+      playthroughService.recordAnswerSubmitAction(
+        'stateName1', 'stateName2', 'TextInput', 'Hello', 'Try again', 30);
+      playthroughService.recordAnswerSubmitAction(
+        'stateName2', 'stateName3', 'TextInput', 'Hello', 'Try again', 30);
+      playthroughService.recordAnswerSubmitAction(
+        'stateName3', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
+      playthroughService.recordExplorationQuitAction('stateName2', 60);
+
+      let playthrough = playthroughService.getPlaythrough();
+      expect(playthrough.issueType).toEqual('CyclicStateTransitions');
+      expect(playthrough.issueCustomizationArgs).toEqual({
+        state_names: {
+          value: ['stateName1', 'stateName2', 'stateName3', 'stateName1']
+        },
+      });
+    });
+
     it('should prioritize multiple incorrect answers issue types over cyclic ' +
       'state transitions and early quit', () => {
       spyOn(stopwatchObjectFactory, 'create').and.returnValue(

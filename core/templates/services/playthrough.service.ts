@@ -60,13 +60,14 @@ class MultipleIncorrectAnswersTracker {
 }
 
 class CyclicStateTransitionsTracker {
-  numLoops: number = 0;
+  cycleOccurrences: number;
   // A path of visited states without any cycles/repeated states.
   pathOfVisitedStates: string[];
   // A cycle of visited states discovered by the tracker.
-  cycleOfVisitedStates: string[] = null;
+  cycleOfVisitedStates: string[];
 
   constructor(initStateName: string) {
+    this.cycleOccurrences = 0;
     this.pathOfVisitedStates = [initStateName];
   }
 
@@ -81,7 +82,8 @@ class CyclicStateTransitionsTracker {
   }
 
   foundAnIssue(): boolean {
-    return this.numLoops >= ServicesConstants.NUM_REPEATED_CYCLES_THRESHOLD;
+    return (
+      this.cycleOccurrences >= ServicesConstants.NUM_REPEATED_CYCLES_THRESHOLD);
   }
 
   /**
@@ -107,26 +109,26 @@ class CyclicStateTransitionsTracker {
    * Finally, the path of visited states is reset to a value of [ N ], in hopes
    * that the exact same cycle is built enough times to be considered an issue.
    *
-   * Note that 1-cycles (N -> N) are ignored. When a 1-cycle is discovered, the
-   * tracker still resets itself to stay consistent with the behavior taken for
-   * other cycles.
+   * Note that 1-cycles (N -> N) are exceptional and ignored completely. They do
+   * not reset the tracker and do not increment the tracker's cycle occurrences.
    */
   recordStateTransition(destStateName: string): void {
-    if (!this.pathOfVisitedStates.includes(destStateName)) {
-      this.pathOfVisitedStates.push(destStateName);
+    if (this.currStateName() === destStateName) {
       return;
     }
-    if (this.currStateName() !== destStateName) {
+    if (!this.pathOfVisitedStates.includes(destStateName)) {
+      this.pathOfVisitedStates.push(destStateName);
+    } else {
       const cycleOfVisitedStates = (
         this.makeCycle(this.pathOfVisitedStates.indexOf(destStateName)));
       if (angular.equals(this.cycleOfVisitedStates, cycleOfVisitedStates)) {
-        this.numLoops += 1;
+        this.cycleOccurrences += 1;
       } else {
         this.cycleOfVisitedStates = cycleOfVisitedStates;
-        this.numLoops = 1;
+        this.cycleOccurrences = 1;
       }
+      this.pathOfVisitedStates = [destStateName];
     }
-    this.pathOfVisitedStates = [destStateName];
   }
 }
 
