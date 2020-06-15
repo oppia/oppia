@@ -191,6 +191,8 @@ import { ExplorationObjectFactory } from
 import { ExplorationOpportunitySummaryObjectFactory } from
   'domain/opportunity/ExplorationOpportunitySummaryObjectFactory';
 import { ExpressionParserService } from 'expressions/expression-parser.service';
+import { ExplorationRecommendationsService } from
+  'pages/exploration-player-page/services/exploration-recommendations.service';
 import { ExpressionSyntaxTreeService } from
   'expressions/expression-syntax-tree.service';
 import { ExtensionTagAssemblerService } from
@@ -273,6 +275,7 @@ import { LostChangeObjectFactory } from
 import { MathExpressionInputValidationService } from
   // eslint-disable-next-line max-len
   'interactions/MathExpressionInput/directives/math-expression-input-validation.service';
+import { MessengerService } from 'services/messenger.service';
 import { MetaTagCustomizationService } from
   'services/contextual/meta-tag-customization.service';
 import { MisconceptionObjectFactory } from
@@ -449,6 +452,8 @@ import { StateWrittenTranslationsService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-written-translations.service';
 import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
+import { StatsReportingService } from
+  'pages/exploration-player-page/services/stats-reporting.service';
 import { StopwatchObjectFactory } from
   'domain/utilities/StopwatchObjectFactory';
 import { StoryContentsObjectFactory } from
@@ -613,6 +618,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static explorationObjectFactory: ExplorationObjectFactory;
   static explorationOpportunitySummaryObjectFactory: ExplorationOpportunitySummaryObjectFactory;
   static expressionParserService: ExpressionParserService;
+  static explorationRecommendationsService: ExplorationRecommendationsService;
   static expressionSyntaxTreeService: ExpressionSyntaxTreeService;
   static extensionTagAssemblerService: ExtensionTagAssemblerService;
   static extractImageFilenamesFromStateService: ExtractImageFilenamesFromStateService;
@@ -658,6 +664,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static logicProofValidationService: LogicProofValidationService;
   static lostChangeObjectFactory: LostChangeObjectFactory;
   static mathExpressionInputValidationService: MathExpressionInputValidationService;
+  static messengerService: MessengerService;
   static metaTagCustomizationService: MetaTagCustomizationService;
   static misconceptionObjectFactory: MisconceptionObjectFactory;
   static multipleChoiceInputValidationService: MultipleChoiceInputValidationService;
@@ -743,6 +750,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static stateTopAnswersStatsBackendApiService: StateTopAnswersStatsBackendApiService;
   static stateWrittenTranslationsService: StateWrittenTranslationsService;
   static statesObjectFactory: StatesObjectFactory;
+  static statsReportingService: StatsReportingService;
   static stopwatchObjectFactory: StopwatchObjectFactory;
   static storyContentsObjectFactory: StoryContentsObjectFactory;
   static storyNodeObjectFactory: StoryNodeObjectFactory;
@@ -861,6 +869,7 @@ private explorationMetadataObjectFactory: ExplorationMetadataObjectFactory,
 private explorationObjectFactory: ExplorationObjectFactory,
 private explorationOpportunitySummaryObjectFactory: ExplorationOpportunitySummaryObjectFactory,
 private expressionParserService: ExpressionParserService,
+private explorationRecommendationsService: ExplorationRecommendationsService,
 private expressionSyntaxTreeService: ExpressionSyntaxTreeService,
 private extensionTagAssemblerService: ExtensionTagAssemblerService,
 private extractImageFilenamesFromStateService: ExtractImageFilenamesFromStateService,
@@ -906,6 +915,7 @@ private loggerService: LoggerService,
 private logicProofValidationService: LogicProofValidationService,
 private lostChangeObjectFactory: LostChangeObjectFactory,
 private mathExpressionInputValidationService: MathExpressionInputValidationService,
+private messengerService: MessengerService,
 private metaTagCustomizationService: MetaTagCustomizationService,
 private misconceptionObjectFactory: MisconceptionObjectFactory,
 private multipleChoiceInputValidationService: MultipleChoiceInputValidationService,
@@ -991,6 +1001,7 @@ private stateSolutionService: StateSolutionService,
 private stateTopAnswersStatsBackendApiService: StateTopAnswersStatsBackendApiService,
 private stateWrittenTranslationsService: StateWrittenTranslationsService,
 private statesObjectFactory: StatesObjectFactory,
+private statsReportingService: StatsReportingService,
 private stopwatchObjectFactory: StopwatchObjectFactory,
 private storyContentsObjectFactory: StoryContentsObjectFactory,
 private storyNodeObjectFactory: StoryNodeObjectFactory,
@@ -1110,6 +1121,7 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.explorationObjectFactory = this.explorationObjectFactory;
     OppiaAngularRootComponent.explorationOpportunitySummaryObjectFactory = this.explorationOpportunitySummaryObjectFactory;
     OppiaAngularRootComponent.expressionParserService = this.expressionParserService;
+    OppiaAngularRootComponent.explorationRecommendationsService = this.explorationRecommendationsService;
     OppiaAngularRootComponent.expressionSyntaxTreeService = this.expressionSyntaxTreeService;
     OppiaAngularRootComponent.extensionTagAssemblerService = this.extensionTagAssemblerService;
     OppiaAngularRootComponent.extractImageFilenamesFromStateService = this.extractImageFilenamesFromStateService;
@@ -1155,6 +1167,7 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.logicProofValidationService = this.logicProofValidationService;
     OppiaAngularRootComponent.lostChangeObjectFactory = this.lostChangeObjectFactory;
     OppiaAngularRootComponent.mathExpressionInputValidationService = this.mathExpressionInputValidationService;
+    OppiaAngularRootComponent.messengerService = this.messengerService;
     OppiaAngularRootComponent.metaTagCustomizationService = this.metaTagCustomizationService;
     OppiaAngularRootComponent.misconceptionObjectFactory = this.misconceptionObjectFactory;
     OppiaAngularRootComponent.multipleChoiceInputValidationService = this.multipleChoiceInputValidationService;
@@ -1240,6 +1253,7 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.stateTopAnswersStatsBackendApiService = this.stateTopAnswersStatsBackendApiService;
     OppiaAngularRootComponent.stateWrittenTranslationsService = this.stateWrittenTranslationsService;
     OppiaAngularRootComponent.statesObjectFactory = this.statesObjectFactory;
+    OppiaAngularRootComponent.statsReportingService = this.statsReportingService;
     OppiaAngularRootComponent.stopwatchObjectFactory = this.stopwatchObjectFactory;
     OppiaAngularRootComponent.storyContentsObjectFactory = this.storyContentsObjectFactory;
     OppiaAngularRootComponent.storyNodeObjectFactory = this.storyNodeObjectFactory;
