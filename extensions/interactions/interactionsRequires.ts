@@ -16,6 +16,7 @@
  * @fileoverview Requires for all the interactions.
  */
 
+require('interactions/AlgebraicExpressionInput/AlgebraicExpressionInput.ts');
 require('interactions/CodeRepl/CodeRepl.ts');
 require('interactions/Continue/Continue.ts');
 require('interactions/DragAndDropSortInput/DragAndDropSortInput.ts');
@@ -27,7 +28,6 @@ require('interactions/InteractiveMap/InteractiveMap.ts');
 require('interactions/ItemSelectionInput/ItemSelectionInput.ts');
 require('interactions/LogicProof/LogicProof.ts');
 require('interactions/MathExpressionInput/MathExpressionInput.ts');
-require('interactions/AlgebraicExpressionInput/AlgebraicExpressionInput.ts');
 require('interactions/MultipleChoiceInput/MultipleChoiceInput.ts');
 require('interactions/MusicNotesInput/MusicNotesInput.ts');
 require('interactions/NumberWithUnits/NumberWithUnits.ts');

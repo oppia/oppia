@@ -1,4 +1,12 @@
 {
+  "AlgebraicExpressionInput": {
+    "MatchesExactlyWith": {
+      "description": "matches exactly with {{x|AlgebraicExpression}}"
+    },
+    "IsEquivalentTo": {
+      "description": "is equivalent to {{x|AlgebraicExpression}}"
+    }
+  },
   "CodeRepl": {
     "CodeEquals": {
       "description": "has code equal to {{x|CodeString}}"
@@ -116,14 +124,6 @@
   "MathExpressionInput": {
     "IsMathematicallyEquivalentTo": {
       "description": "is mathematically equivalent to (LaTeX) {{x|UnicodeString}}"
-    }
-  },
-  "AlgebraicExpressionInput": {
-    "MatchesExactlyWith": {
-      "description": "matches exactly with {{x|AlgebraicExpression}}"
-    },
-    "IsEquivalentTo": {
-      "description": "is equivalent to {{x|AlgebraicExpression}}"
     }
   },
   "MultipleChoiceInput": {

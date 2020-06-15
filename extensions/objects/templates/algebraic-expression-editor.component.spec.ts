@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the algebraic expression editor.
  */
 
-fdescribe('AlgebraicExpressionEditor', function() {
+describe('AlgebraicExpressionEditor', function() {
   var ctrl = null;
   class MockGuppy {
     constructor(id: string, config: Object) {}

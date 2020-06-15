@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the position of terms component.
  */
 
-fdescribe('PositionOfTerms', function() {
+describe('PositionOfTerms', function() {
   var PositionOfTermsCtrl = null;
 
   beforeEach(angular.mock.module('oppia'));

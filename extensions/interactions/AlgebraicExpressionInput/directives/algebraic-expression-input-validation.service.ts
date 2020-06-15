@@ -23,6 +23,8 @@ import { AnswerGroup } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { IWarning, baseInteractionValidationService } from
   'interactions/base-interaction-validation.service';
+import { IAlgebraicExpressionInputCustomizationArgs } from
+  'extensions/interactions/customization-args-defs';
 import { Outcome } from
   'domain/exploration/OutcomeObjectFactory';
 import { AppConstants } from 'app.constants';
@@ -35,13 +37,10 @@ export class AlgebraicExpressionInputValidationService {
       private baseInteractionValidationServiceInstance:
         baseInteractionValidationService) {}
 
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'customizationArgs' is a dict with possible underscore_cased
-  // keys which give tslint errors against underscore_casing in favor of
-  // camelCasing.
   getAllWarnings(
-      stateName: string, customizationArgs: any, answerGroups: AnswerGroup[],
-      defaultOutcome: Outcome): IWarning[] {
+      stateName: string,
+      customizationArgs: IAlgebraicExpressionInputCustomizationArgs,
+      answerGroups: AnswerGroup[],  defaultOutcome: Outcome): IWarning[] {
     var warningsList = [];
 
     warningsList = warningsList.concat(
