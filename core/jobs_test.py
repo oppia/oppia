@@ -801,7 +801,7 @@ class JobRegistryTests(test_utils.GenericTestBase):
             'manager class TestMockAbstractClass, which is not allowed.'):
             with self.swap(
                 jobs, 'ABSTRACT_BASE_CLASSES', mock_abstract_base_class):
-                mock_abstract_base_class[0].create_new()
+                TestMockAbstractClass.create_new()
 
     def test_each_one_off_class_is_not_abstract(self):
         for klass in jobs_registry.ONE_OFF_JOB_MANAGERS:
