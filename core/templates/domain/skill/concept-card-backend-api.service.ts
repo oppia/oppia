@@ -23,7 +23,7 @@ import { HttpClient } from '@angular/common/http';
 
 import cloneDeep from 'lodash/cloneDeep';
 
-import { ConceptCardObjectFactory, IConceptCardBackendDict} from
+import { ConceptCard, IConceptCardBackendDict, ConceptCardObjectFactory} from
   'domain/skill/ConceptCardObjectFactory';
 import { SkillDomainConstants } from
   'domain/skill/skill-domain.constants';
@@ -39,15 +39,15 @@ interface IConceptCardBackendDicts {
 })
 export class ConceptCardBackendApiService {
   constructor(
+    private conceptCardObjectFactory: ConceptCardObjectFactory,
     private http: HttpClient,
-    private urlInterpolation: UrlInterpolationService,
-    private conceptCardObjectFactory: ConceptCardObjectFactory) {}
+    private urlInterpolation: UrlInterpolationService) {}
 
   // Maps previously loaded concept cards to their IDs.
   private _conceptCardCache = [];
 
   private _fetchConceptCards(
-      skillIds: Array<string>,
+      skillIds: string[],
       successCallback: (value?: Object | PromiseLike<Object>) => void,
       errorCallback: (reason?: string) => void): void {
     var conceptCardDataUrl = this.urlInterpolation.interpolateUrl(
@@ -58,7 +58,7 @@ export class ConceptCardBackendApiService {
     var conceptCardObjects = [];
 
     this.http.get<IConceptCardBackendDicts>(conceptCardDataUrl).toPromise()
-      .then((response) => {
+      .then(response => {
         if (successCallback) {
           var conceptCardDicts = response.concept_card_dicts;
           conceptCardDicts.forEach((conceptCardDict) => {
@@ -79,7 +79,7 @@ export class ConceptCardBackendApiService {
     return this._conceptCardCache.hasOwnProperty(skillId);
   }
 
-  private _getUncachedSkillIds(skillIds: Array<string>): Array<string> {
+  private _getUncachedSkillIds(skillIds: string[]): string[] {
     var uncachedSkillIds = [];
     skillIds.forEach((skillId) => {
       if (!this._isCached(skillId)) {
@@ -89,7 +89,7 @@ export class ConceptCardBackendApiService {
     return uncachedSkillIds;
   }
 
-  loadConceptCards(skillIds: Array<string>): Promise<object> {
+  loadConceptCards(skillIds: string[]): Promise<ConceptCard[]> {
     return new Promise((resolve, reject) => {
       var uncachedSkillIds = this._getUncachedSkillIds(skillIds);
       var conceptCards = [];
