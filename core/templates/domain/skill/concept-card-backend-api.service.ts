@@ -23,7 +23,7 @@ import { HttpClient } from '@angular/common/http';
 
 import cloneDeep from 'lodash/cloneDeep';
 
-import { ConceptCardObjectFactory } from
+import { ConceptCardObjectFactory, IConceptCardBackendDict} from
   'domain/skill/ConceptCardObjectFactory';
 import { RecordedVoiceoversObjectFactory } from
   'domain/exploration/RecordedVoiceoversObjectFactory';
@@ -44,11 +44,11 @@ import { WorkedExampleObjectFactory } from
 export class ConceptCardBackendApiService {
   constructor(
     private http: HttpClient,
-    private urlInterpolation: UrlInterpolationService) {}
+    private urlInterpolation: UrlInterpolationService,
+    private conceptCardObjectFactory: ConceptCardObjectFactory) {}
 
   // Maps previously loaded concept cards to their IDs.
   private _conceptCardCache = [];
-  private conceptCardObjectFactory = null;
 
   private _fetchConceptCards(
       skillIds: Array<string>,
@@ -58,20 +58,17 @@ export class ConceptCardBackendApiService {
       SkillDomainConstants.CONCEPT_CARD_DATA_URL_TEMPLATE, {
         comma_separated_skill_ids: skillIds.join(',')
       });
-      
-    var conceptCardObjects = [];
-    var conceptCardObjectFactory = new ConceptCardObjectFactory(
-      new SubtitledHtmlObjectFactory(),
-      new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()),
-      new WorkedExampleObjectFactory(new SubtitledHtmlObjectFactory()));
 
-    this.http.get(conceptCardDataUrl).toPromise().then(
-      (response: any) => {
+    var conceptCardObjects = [];
+
+    this.http.get<IConceptCardBackendDict[]>(conceptCardDataUrl).toPromise()
+      .then((response) => {
         if (successCallback) {
           var conceptCardDicts = response.concept_card_dicts;
           conceptCardDicts.forEach((conceptCardDict) => {
             conceptCardObjects.push(
-              conceptCardObjectFactory.createFromBackendDict(conceptCardDict));
+              this.conceptCardObjectFactory.createFromBackendDict(
+                conceptCardDict));
           });
           successCallback(conceptCardObjects);
         }

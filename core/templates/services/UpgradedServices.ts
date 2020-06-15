@@ -975,7 +975,8 @@ export class UpgradedServices {
     upgradedServices['ConceptCardBackendApiService'] =
       new ConceptCardBackendApiService(
         upgradedServices['HttpClient'],
-        upgradedServices['UrlInterpolationService']);
+        upgradedServices['UrlInterpolationService'],
+        upgradedServices['ConceptCardObjectFactory']);
     upgradedServices['ClassroomBackendApiService'] =
       new ClassroomBackendApiService(
         upgradedServices['UrlInterpolationService'],
