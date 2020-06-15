@@ -29,8 +29,7 @@ describe('Profile test backend API service', () => {
   let profilePageBackendApiService: ProfilePageBackendApiService = null;
   let httpTestingController: HttpTestingController;
   let urlService: UrlService = null;
-  let expectedBody = new FormData();
-  expectedBody.append('creator_username', 'testUsername' );
+  let expectedBody = { creator_username: 'testUsername' };
 
   let ERROR_STATUS_CODE = 500;
 
