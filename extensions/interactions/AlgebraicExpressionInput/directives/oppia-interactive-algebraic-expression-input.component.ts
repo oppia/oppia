@@ -37,7 +37,7 @@ angular.module('oppia').component('oppiaInteractiveAlgebraicExpressionInput', {
       $scope, CurrentInteractionService,
       AlgebraicExpressionInputRulesService) {
         const ctrl = this;
-        var answer = ''
+        ctrl.value = '';
         ctrl.hasBeenTouched = false;
         ctrl.warningText = '';
 
@@ -52,10 +52,10 @@ angular.module('oppia').component('oppiaInteractiveAlgebraicExpressionInput', {
             // Create a new guppy instance for that div.
             guppyInstance = new Guppy(divId, {});
             guppyInstance.event('change', (e) => {
-              answer = guppyInstance.asciimath();
+              ctrl.value = guppyInstance.asciimath();
               ctrl.hasBeenTouched = true;
               // Need to manually trigger the digest cycle
-              // to make any 'watchers' aware of changes in answer.
+              // to make any 'watchers' aware of changes in ctrl.value.
               $scope.$apply();
             });
           }
@@ -79,11 +79,11 @@ angular.module('oppia').component('oppiaInteractiveAlgebraicExpressionInput', {
         ctrl.isCurrentAnswerValid = function() {
           if(ctrl.hasBeenTouched) {
             try {
-              var containsVariables = nerdamer(answer).variables().length > 0;
-              if(answer.length === 0) {
+              var containsVariables = nerdamer(ctrl.value).variables().length > 0;
+              if(ctrl.value.length === 0) {
                 throw new Error('Please enter a non-empty answer.');
-              } else if(answer.indexOf('=') !== -1 || answer.indexOf(
-                '<') !== -1 || answer.indexOf('>') !== -1) {
+              } else if(ctrl.value.indexOf('=') !== -1 || ctrl.value.indexOf(
+                '<') !== -1 || ctrl.value.indexOf('>') !== -1) {
                   throw new Error('It looks like you have entered an ' +
                     'equation/inequality. Please enter an algebraic ' +
                     'expression instead.');
@@ -106,7 +106,7 @@ angular.module('oppia').component('oppiaInteractiveAlgebraicExpressionInput', {
             return;
           }
           CurrentInteractionService.onSubmit(
-            answer, AlgebraicExpressionInputRulesService);
+            ctrl.value, AlgebraicExpressionInputRulesService);
         };
 
         ctrl.$onInit = function() {

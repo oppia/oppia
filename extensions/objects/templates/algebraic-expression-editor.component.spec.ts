@@ -16,8 +16,8 @@
  * @fileoverview Unit tests for the algebraic expression editor.
  */
 
-describe('AlgebraicExpressionEditor', function() {
-  var AlgebraicExpressionEditorCtrl = null;
+fdescribe('AlgebraicExpressionEditor', function() {
+  var ctrl = null;
   class MockGuppy {
     constructor(id: string, config: Object) {}
 
@@ -32,8 +32,7 @@ describe('AlgebraicExpressionEditor', function() {
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.inject(function($componentController) {
-    AlgebraicExpressionEditorCtrl = $componentController(
-      'algebraicExpressionEditor');
+    ctrl = $componentController('algebraicExpressionEditor');
     (<any>window).Guppy = MockGuppy;
   }));
 
@@ -42,7 +41,7 @@ describe('AlgebraicExpressionEditor', function() {
     mockDocument.setAttribute('class', 'guppy-div-creator');
     angular.element(document).find('body').append(mockDocument.outerHTML);
 
-    AlgebraicExpressionEditorCtrl.$onInit();
+    ctrl.$onInit();
 
     var guppyDivs = document.querySelectorAll('.guppy-div-creator');
     for(var i = 0; i < guppyDivs.length; i++) {
@@ -51,40 +50,40 @@ describe('AlgebraicExpressionEditor', function() {
   });
 
   it('should initialize ctrl.value with an empty string', function() {
-    AlgebraicExpressionEditorCtrl.value = null;
-    AlgebraicExpressionEditorCtrl.$onInit();
-    expect(AlgebraicExpressionEditorCtrl.value).not.toBeNull();
+    ctrl.value = null;
+    ctrl.$onInit();
+    expect(ctrl.value).not.toBeNull();
   });
 
   it('should correctly validate current answer', function() {
     
     // This should be validated as true if the editor hasn't been touched.
-    AlgebraicExpressionEditorCtrl.value = '';
-    expect(AlgebraicExpressionEditorCtrl.isCurrentAnswerValid()).toBeTrue();
-    expect(AlgebraicExpressionEditorCtrl.warningText).toBe('');
+    ctrl.value = '';
+    expect(ctrl.isCurrentAnswerValid()).toBeTrue();
+    expect(ctrl.warningText).toBe('');
 
 
-    AlgebraicExpressionEditorCtrl.hasBeenTouched = true;
+    ctrl.hasBeenTouched = true;
 
-    AlgebraicExpressionEditorCtrl.value = '';
-    expect(AlgebraicExpressionEditorCtrl.isCurrentAnswerValid()).toBeFalse();
-    expect(AlgebraicExpressionEditorCtrl.warningText).toBe(
+    ctrl.value = '';
+    expect(ctrl.isCurrentAnswerValid()).toBeFalse();
+    expect(ctrl.warningText).toBe(
       'Please enter a non-empty answer.');
 
-    AlgebraicExpressionEditorCtrl.value = 'a/';
-    expect(AlgebraicExpressionEditorCtrl.isCurrentAnswerValid()).toBeFalse();
-    expect(AlgebraicExpressionEditorCtrl.warningText).toBe(
+    ctrl.value = 'a/';
+    expect(ctrl.isCurrentAnswerValid()).toBeFalse();
+    expect(ctrl.warningText).toBe(
       '/ is not a valid postfix operator.');
 
-    AlgebraicExpressionEditorCtrl.value = '12+sqrt(4)';
-    expect(AlgebraicExpressionEditorCtrl.isCurrentAnswerValid()).toBeFalse();
-    expect(AlgebraicExpressionEditorCtrl.warningText).toBe(
+    ctrl.value = '12+sqrt(4)';
+    expect(ctrl.isCurrentAnswerValid()).toBeFalse();
+    expect(ctrl.warningText).toBe(
       'It looks like you have entered only numbers. Make sure to include' +
       ' the necessary variables mentioned in the question.');
 
-    AlgebraicExpressionEditorCtrl.value = 'x-y=0';
-    expect(AlgebraicExpressionEditorCtrl.isCurrentAnswerValid()).toBeFalse();
-    expect(AlgebraicExpressionEditorCtrl.warningText).toBe(
+    ctrl.value = 'x-y=0';
+    expect(ctrl.isCurrentAnswerValid()).toBeFalse();
+    expect(ctrl.warningText).toBe(
       'It looks like you have entered an equation/inequality.' +
       ' Please enter an algebraic expression instead.');
   })
