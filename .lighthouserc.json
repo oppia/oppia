@@ -9,7 +9,7 @@
         "http://127.0.0.1:8181/donate",
         "http://127.0.0.1:8181/get-started",
         "http://127.0.0.1:8181/community-library",
-        "http://127.0.0.1:8181/privacy",
+        "http://127.0.0.1:8181/privacy-policy",
         "http://127.0.0.1:8181/teach",
         "http://127.0.0.1:8181/terms",
         "http://127.0.0.1:8181/thanks"
@@ -130,7 +130,7 @@
           }
         },
         {
-          "matchingUrlPattern": "http://[^/]+/privacy$",
+          "matchingUrlPattern": "http://[^/]+/privacy-policy$",
           "assertions": {
             "offscreen-images": ["error", {"minScore": 1}],
             "uses-webp-images": ["error", {"minScore": 1}],
