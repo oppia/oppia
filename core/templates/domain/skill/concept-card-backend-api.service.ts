@@ -68,14 +68,14 @@ export class ConceptCardBackendApiService {
           });
           successCallback(conceptCardObjects);
         }
-      }, (errorResponse) => {
+      }, errorResponse => {
         if (errorCallback) {
           errorCallback(errorResponse.error);
         }
       });
   }
 
-  private _isCached(skillId: string): Boolean {
+  private _isCached(skillId: string): boolean {
     return this._conceptCardCache.hasOwnProperty(skillId);
   }
 
