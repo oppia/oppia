@@ -139,6 +139,12 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             'translation_counts': {}
         }
 
+    def test_handler_with_disabled_dashboard_flag(self):
+        with self.swap(feconf, 'COMMUNITY_DASHBOARD_ENABLED', False):
+            self.get_json(
+                '%s/skill' % feconf.COMMUNITY_OPPORTUNITIES_DATA_URL,
+                params={}, expected_status_int=404)
+
     def test_get_skill_opportunity_data(self):
         with self.swap(feconf, 'COMMUNITY_DASHBOARD_ENABLED', True):
             response = self.get_json(
