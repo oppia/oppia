@@ -68,32 +68,6 @@ class CyclicStateTransitionsTracker {
     this.cycleOccurrences = new Map();
   }
 
-  /**
-   * Records learner's transition to a new state into this tracker's path of
-   * visited states.
-   *
-   * If appending the new state would introduce a duplicate state name, then a
-   * cycle has been found. Specifically, if pushing the new state `N` onto the
-   * path would result in the following pattern:
-   *
-   *    [ ..., N , ... ] => [ ..., N , ..., N ]
-   *
-   * ...then we update this tracker's latest cycle discovery.
-   *
-   * The cycle is defined as the current path of visited states with all states
-   * prior to the first occurrence of N discarded.
-   *
-   * If this *exact* cycle has been discovered before (NOTE: rotations of a
-   * cycle are considered to be different from each other), then we increase the
-   * tracked number of cycle occurrences.
-   * Otherwise, the tracker is completely reset to 1.
-   *
-   * Finally, the path of visited states is reset to a value of [ N ], in hopes
-   * that the exact same cycle is built enough times to be considered an issue.
-   *
-   * Note that 1-cycles (N -> N) are exceptional and ignored completely. They do
-   * not reset the tracker and do not increment the tracker's cycle occurrences.
-   */
   recordStateTransition(destStateName: string): void {
     if (this.currStateName() === destStateName) {
       return;
