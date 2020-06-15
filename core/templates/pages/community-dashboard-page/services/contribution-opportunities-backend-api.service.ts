@@ -139,7 +139,7 @@ export class ContributionOpportunitiesBackendApiService {
   }
 
   async fetchFeaturedTranslationLanguages(): Promise<Object> {
-    let response = await this.http
+    const response = await this.http
       .get('/getfeaturedtranslationlanguages')
       .toPromise() as {
         'featured_translation_languages':
