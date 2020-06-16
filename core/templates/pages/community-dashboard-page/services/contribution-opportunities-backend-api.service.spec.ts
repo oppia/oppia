@@ -29,10 +29,8 @@ import { SkillOpportunityObjectFactory } from
   'domain/opportunity/SkillOpportunityObjectFactory';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
-import {
-  FeaturedTranslationLanguageFactory
-} from
-  'domain/community_dashboard/FeaturedTranslationLanguageFactory';
+import { FeaturedTranslationLanguageFactory} from
+  'domain/opportunity/FeaturedTranslationLanguageFactory';
 
 describe('Contribution Opportunities backend API service', function() {
   let contributionOpportunitiesBackendApiService:

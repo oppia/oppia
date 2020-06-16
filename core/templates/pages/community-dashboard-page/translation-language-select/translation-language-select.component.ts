@@ -23,7 +23,7 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { ContributionOpportunitiesBackendApiService } from
   '../services/contribution-opportunities-backend-api.service';
 import { FeaturedTranslationLanguage } from
-  'domain/community_dashboard/FeaturedTranslationLanguageFactory';
+  'domain/opportunity/FeaturedTranslationLanguageFactory';
 
 @Component({
   selector: 'translation-language-select',

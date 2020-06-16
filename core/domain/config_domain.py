@@ -367,6 +367,5 @@ CLASSROOM_PAGE_IS_SHOWN = ConfigProperty(
 FEATURED_TRANSLATION_LANGUAGES = ConfigProperty(
     'featured_translation_languages',
     LIST_OF_FEATURED_TRANSLATION_LANGUAGES_DICTS_SCHEMA,
-    'Featured Translation Languages',
-    []
+    'Featured Translation Languages', []
 )

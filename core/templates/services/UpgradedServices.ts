@@ -162,7 +162,7 @@ import { ExtractImageFilenamesFromStateService } from
   // eslint-disable-next-line max-len
   'pages/exploration-player-page/services/extract-image-filenames-from-state.service';
 import { FeaturedTranslationLanguageFactory } from
-  'domain/community_dashboard/FeaturedTranslationLanguageFactory';
+  'domain/opportunity/FeaturedTranslationLanguageFactory';
 import { FeedbackMessageSummaryObjectFactory } from
   'domain/feedback_message/FeedbackMessageSummaryObjectFactory';
 import { FeedbackThreadObjectFactory } from

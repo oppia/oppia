@@ -29,9 +29,8 @@ import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import {
   FeaturedTranslationLanguageFactory,
-  FeaturedTranslationLanguageBackendDict,
-} from
-  'domain/community_dashboard/FeaturedTranslationLanguageFactory';
+  IFeaturedTranslationLanguageBackendDict,
+} from 'domain/opportunity/FeaturedTranslationLanguageFactory';
 
 const constants = require('constants.ts');
 
@@ -142,10 +141,10 @@ export class ContributionOpportunitiesBackendApiService {
       .get('/getfeaturedtranslationlanguages')
       .toPromise() as {
         'featured_translation_languages':
-        FeaturedTranslationLanguageBackendDict[]
+        IFeaturedTranslationLanguageBackendDict[]
       };
     return response.featured_translation_languages.map(
-      (backendDict: FeaturedTranslationLanguageBackendDict) =>
+      (backendDict: IFeaturedTranslationLanguageBackendDict) =>
         this.featuredTranslationLanguageFactory
           .createFromBackendDict(backendDict)
     );

@@ -19,7 +19,8 @@
 import { TestBed } from '@angular/core/testing';
 
 import { FeaturedTranslationLanguageFactory } from
-  './FeaturedTranslationLanguageFactory';
+  // eslint-disable-next-line max-len
+  'domain/opportunity/FeaturedTranslationLanguageFactory';
 
 describe('Featured Translation Language object factory', () => {
   let featuredTranslationLanguageFactory:

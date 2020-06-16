@@ -13,15 +13,18 @@
 // limitations under the License.
 
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+
 import { TranslationLanguageSelectComponent } from
-  './translation-language-select.component';
+  // eslint-disable-next-line max-len
+  'pages/community-dashboard-page/translation-language-select/translation-language-select.component.ts';
 import { ContributionOpportunitiesBackendApiService } from
-  '../services/contribution-opportunities-backend-api.service';
+  // eslint-disable-next-line max-len
+  'pages/community-dashboard-page/services/contribution-opportunities-backend-api.service.ts';
 import { FeaturedTranslationLanguageFactory } from
-  'domain/community_dashboard/FeaturedTranslationLanguageFactory';
+  'domain/opportunity/FeaturedTranslationLanguageFactory';
 
 /**
- * @fileoverview Unit tests for the translation language select
+ * @fileoverview Unit tests for the translation language select.
  */
 
 describe('Translation language select', () => {

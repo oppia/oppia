@@ -20,7 +20,7 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-export interface FeaturedTranslationLanguageBackendDict {
+export interface IFeaturedTranslationLanguageBackendDict {
   'language_code': string;
   description: string;
 }
@@ -37,7 +37,7 @@ export class FeaturedTranslationLanguage {
 })
 export class FeaturedTranslationLanguageFactory {
   createFromBackendDict(
-      featuredTranslationBackendDict:FeaturedTranslationLanguageBackendDict
+      featuredTranslationBackendDict:IFeaturedTranslationLanguageBackendDict
   ) : FeaturedTranslationLanguage {
     return new FeaturedTranslationLanguage(
       featuredTranslationBackendDict.language_code,
