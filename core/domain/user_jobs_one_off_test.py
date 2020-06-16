@@ -29,6 +29,7 @@ from core.domain import event_services
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import feedback_services
+from core.domain import html_validation_service
 from core.domain import rating_services
 from core.domain import rights_manager
 from core.domain import subscription_services
@@ -400,7 +401,6 @@ class DraftChangesMathValidationOneOffJobTests(test_utils.GenericTestBase):
             }).to_dict()
         ]
 
-
         user_models.ExplorationUserDataModel(
             id='%s.%s' % (self.user_a_id, self.EXP_ID_1),
             user_id=self.user_a_id,
@@ -418,9 +418,9 @@ class DraftChangesMathValidationOneOffJobTests(test_utils.GenericTestBase):
         stringified_error_list = (
             stringified_value_dict[
                 list_starting_index:list_finishing_index + 1])
-        # The length of the list here indicates the no of invalid tags.
-        length_of_list = len(stringified_error_list.split('>,'))
-        self.assertEqual(length_of_list, 17)
+        self.assertEqual(
+            len(html_validation_service.validate_math_tags_in_html(
+                stringified_error_list)), 17)
         self.assertEqual(len(output), 1)
 
     def test_draft_changes_with_valid_tags(self):
@@ -600,7 +600,6 @@ class DraftChangesMathValidationOneOffJobTests(test_utils.GenericTestBase):
                 'new_state_name': 'Introduction',
             }).to_dict()
         ]
-
 
         user_models.ExplorationUserDataModel(
             id='%s.%s' % (self.user_a_id, self.EXP_ID_1),

@@ -247,47 +247,138 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             'IsWithinTolerance': 'is within {{tol|Real}} of {{x|Real}}'
         })
 
-    def test_rules_html_mapping_are_valid(self):
-        """Test that the structure of the file rule_spec_html_mapping.json are
-        valid.
+    def test_html_field_types_to_rule_specs_mapping_are_valid(self):
+        """Test that the structure of the file html_field_types_to_rule_specs.
+        json are valid.
         """
         # The file having the information about the assembly of the html in the
         # rule specs.
-        rules_html_mapping_dict = json.loads(
-            utils.get_file_contents(feconf.RULES_SPECS_HTML_MAPPING_FILE_PATH))
+        html_field_types_to_rule_specs_dict = json.loads(
+            utils.get_file_contents(
+                feconf.HTML_FIELD_TYPES_TO_RULE_SPECS_FILE_PATH))
 
         # The file having the templates for the structure of the rule specs.
-        # Contents of the file rule_spec_html_mapping.json will be verified
-        # against this file.
-        rules_index_dict = json.loads(
+        # Contents of the file html_field_types_to_rule_specs.json will be
+        # verified against this file.
+        rule_descriptions_dict = json.loads(
             utils.get_file_contents(feconf.RULES_DESCRIPTIONS_FILE_PATH))
 
-        for html_type in rules_html_mapping_dict.keys():
-            self.assertTrue(
-                isinstance(rules_html_mapping_dict[html_type], dict))
-            interaction_id = (
-                rules_html_mapping_dict[html_type]['interactionId'])
-            # Verify that the interaction id is present in the rules_templates
-            # json file.
-            self.assertTrue(interaction_id in rules_index_dict.keys())
-            self.assertTrue(
-                isinstance(
-                    rules_html_mapping_dict[html_type]['ruleTypes'], dict))
+
+        # In the following part, we generate the html_field_types_to_rule_specs
+        # dict based on the values in the rule_descriptions.json file.
+        generated_html_field_types_dict = {}
+        html_types = (
+            [{
+                'type': 'DragAndDropHtmlString',
+                'format': 'string'
+            }, {
+                'type': 'ListOfSetsOfHtmlStrings',
+                'format': 'listOfSets'
+            }, {
+                'type': 'SetOfHtmlString',
+                'format': 'set'
+            }])
+
+        for interaction_id, interaction_rules in (
+                rule_descriptions_dict.items()):
+            for rule_type, rule_description in interaction_rules.items():
+                description = rule_description['description']
+                for html_type in html_types:
+                    if html_type['type'] in description:
+                        if (
+                                html_type['type'] not in
+                                generated_html_field_types_dict):
+                            generated_html_field_types_dict[
+                                html_type['type']] = {}
+                        generated_html_field_types_dict[
+                            html_type['type']]['interactionId'] = (
+                                interaction_id)
+                        generated_html_field_types_dict[html_type['type']][
+                            'format'] = html_type['format']
+                        if (
+                                'ruleTypes' not in
+                                generated_html_field_types_dict[
+                                    html_type['type']]):
+                            generated_html_field_types_dict[html_type['type']][
+                                'ruleTypes'] = {}
+                        generated_html_field_types_dict[html_type['type']][
+                            'ruleTypes'][rule_type] = {}
+                        generated_html_field_types_dict[html_type['type']][
+                            'ruleTypes'][rule_type]['inputVariable'] = ['x']
+                        if '{{y|%s}}' % html_type['type'] in description:
+                            generated_html_field_types_dict[html_type['type']][
+                                'ruleTypes'][rule_type][
+                                    'inputVariable'].append('y')
+
+        # Assert that the generated dict matches dict in the stored file.
+        self.assertEqual(
+            html_field_types_to_rule_specs_dict,
+            generated_html_field_types_dict)
+
+        # We verify the structure of the new file by generating a schema from
+        # the generated dict and normalizing and validating the stored file
+        # against the generated schema.
+        schema = {
+            'type': 'dict',
+            'properties': []
+        }
+        # Generate the property list for the html_type dict.
+        for html_type, interaction_and_rule_details in (
+                generated_html_field_types_dict.items()):
             rule_types = (
-                set(rules_html_mapping_dict[html_type]['ruleTypes'].keys()))
-            # Verify that the all the rule types are present in the
-            # rules_templates json file.
-            self.assertTrue(
-                rule_types.issubset(rules_index_dict[interaction_id].keys()))
+                set(interaction_and_rule_details['ruleTypes'].keys()))
+            rule_type_schema_dict_properties = []
+            # Generate the property list for the rule_type dict.
             for rule_type in rule_types:
-                self.assertTrue(
-                    isinstance(
-                        rules_html_mapping_dict[html_type]['ruleTypes'][
-                            rule_type], dict))
-                self.assertTrue(
-                    isinstance(
-                        rules_html_mapping_dict[html_type]['ruleTypes'][
-                            rule_type]['inputVariable'], list))
+                rule_type_schema_dict_property = {
+                    'name': rule_type,
+                    'schema': {
+                        'type': 'dict',
+                        'properties': [{
+                            'name': 'inputVariable',
+                            'schema': {
+                                'type': 'list',
+                                'items': {
+                                    'type': 'unicode'
+                                }
+                            }
+                        }]
+                    }
+                }
+                rule_type_schema_dict_properties.append(
+                    rule_type_schema_dict_property)
+
+            schema_dict_property = {
+                'name': html_type,
+                'schema': {
+                    'type': 'dict',
+                    'properties': [{
+                        'name': 'interactionId',
+                        'schema': {
+                            'type': 'unicode'
+                        }
+                    }, {
+                        'name': 'format',
+                        'schema': {
+                            'type': 'unicode'
+                        }
+                    }, {
+                        'name': 'ruleTypes',
+                        'schema': {
+                            'type': 'dict',
+                            'properties': rule_type_schema_dict_properties
+                        }
+                    }]
+                }
+            }
+            schema['properties'].append(schema_dict_property)
+
+        normalized_and_validated_dict = (
+            schema_utils.normalize_against_schema(
+                html_field_types_to_rule_specs_dict, schema))
+        # Assert that the structure of the stored file is valid.
+        self.assertEqual(
+            normalized_and_validated_dict, html_field_types_to_rule_specs_dict)
 
     def test_default_interactions_are_valid(self):
         """Test that the default interactions are valid."""

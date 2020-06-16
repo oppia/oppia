@@ -1,6 +1,7 @@
 {
   "ListOfSetsOfHtmlStrings": {
     "interactionId": "DragAndDropSortInput",
+    "format": "listOfSets",
     "ruleTypes": {
       "IsEqualToOrdering": {
         "inputVariable": ["x"]
@@ -12,6 +13,7 @@
   },
   "DragAndDropHtmlString": {
     "interactionId": "DragAndDropSortInput",
+    "format": "string",
     "ruleTypes": {
       "HasElementXAtPositionY": {
         "inputVariable": ["x"]
@@ -23,6 +25,7 @@
   },
   "SetOfHtmlString": {
     "interactionId": "ItemSelectionInput",
+    "format": "set",
     "ruleTypes": {
       "Equals": {
         "inputVariable": ["x"]

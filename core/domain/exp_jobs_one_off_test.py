@@ -27,6 +27,7 @@ from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_jobs_one_off
 from core.domain import exp_services
+from core.domain import html_validation_service
 from core.domain import rights_manager
 from core.domain import state_domain
 from core.domain import user_services
@@ -1856,17 +1857,15 @@ class ExplorationMathTagValidationOneOffJobTests(test_utils.GenericTestBase):
             .ExplorationMathTagValidationOneOffJob.get_output(job_id))
 
         actual_output_list = ast.literal_eval(actual_output[0])
-        no_of_invalid_tags = 0
+        stringified_error_list = ''
         for output in actual_output_list[1]:
             list_starting_index = output.find('[')
             list_finishing_index = output.find(']')
             stringified_error_list = (
+                stringified_error_list +
                 output[list_starting_index:list_finishing_index + 1])
-            length_of_list = len(stringified_error_list.split('>,'))
-            no_of_invalid_tags = (
-                no_of_invalid_tags + length_of_list)
-        self.assertEqual(no_of_invalid_tags, 12)
-
+        self.assertEqual(len(html_validation_service.validate_math_tags_in_html(
+            stringified_error_list)), 12)
 
     def test_no_action_is_performed_for_deleted_exploration(self):
         """Test that no action is performed on deleted explorations."""

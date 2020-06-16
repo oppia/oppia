@@ -168,36 +168,35 @@ class AnswerGroup(python_utils.OBJECT):
         # type and draft changes use this method. The rules_index_dict below
         # is used to figure out the assembly of the html in the rulespecs.
 
-        rules_html_mapping_dict = json.loads(
-            utils.get_file_contents(feconf.RULES_SPECS_HTML_MAPPING_FILE_PATH))
-
-        set_of_html_strings_rules = (
-            rules_html_mapping_dict['SetOfHtmlString']['ruleTypes'].keys())
-        drag_and_drop_html_string_rules = (
-            rules_html_mapping_dict['DragAndDropHtmlString'][
-                'ruleTypes'].keys())
-        list_of_sets_of_html_strings_rules = (
-            rules_html_mapping_dict['ListOfSetsOfHtmlStrings'][
-                'ruleTypes'].keys())
+        html_field_types_to_rule_specs_dict = json.loads(
+            utils.get_file_contents(
+                feconf.HTML_FIELD_TYPES_TO_RULE_SPECS_FILE_PATH))
 
         for rule_spec in self.rule_specs:
-            if rule_spec.rule_type in set_of_html_strings_rules:
-                if isinstance(rule_spec.inputs['x'], list):
-                    for value in rule_spec.inputs['x']:
-                        if isinstance(value, python_utils.BASESTRING):
-                            html_list = html_list + [value]
-            elif rule_spec.rule_type in drag_and_drop_html_string_rules:
-                input_variables = (
-                    rules_html_mapping_dict['DragAndDropHtmlString'][
-                        'ruleTypes'][rule_spec.rule_type]['inputVariable'])
-                if 'y' in input_variables:
-                    html_list = html_list + [rule_spec.inputs['y']]
-                html_list = html_list + [rule_spec.inputs['x']]
-
-            elif rule_spec.rule_type in list_of_sets_of_html_strings_rules:
-                rule_spec_html_list = rule_spec.inputs['x']
-                for rule_spec_html in rule_spec_html_list:
-                    html_list = html_list + rule_spec_html
+            for interaction_and_rule_details in (
+                    html_field_types_to_rule_specs_dict.values()):
+                if (
+                        rule_spec.rule_type in
+                        interaction_and_rule_details['ruleTypes'].keys()):
+                    if interaction_and_rule_details['format'] == 'string':
+                        input_variables = (
+                            html_field_types_to_rule_specs_dict[
+                                'DragAndDropHtmlString']['ruleTypes'][
+                                    rule_spec.rule_type]['inputVariable'])
+                        for input_variable in rule_spec.inputs.keys():
+                            if input_variable in input_variables:
+                                html_list = (
+                                    html_list +
+                                    [rule_spec.inputs[input_variable]])
+                    elif interaction_and_rule_details['format'] == 'set':
+                        if isinstance(rule_spec.inputs['x'], list):
+                            for value in rule_spec.inputs['x']:
+                                if isinstance(value, python_utils.BASESTRING):
+                                    html_list = html_list + [value]
+                    elif interaction_and_rule_details['format'] == 'listOfSets':
+                        rule_spec_html_list = rule_spec.inputs['x']
+                        for rule_spec_html in rule_spec_html_list:
+                            html_list = html_list + rule_spec_html
 
         return html_list
 

@@ -88,8 +88,9 @@ OBJECT_DEFAULT_VALUES_FILE_PATH = os.path.join(
     'extensions', 'objects', 'object_defaults.json')
 RULES_DESCRIPTIONS_FILE_PATH = os.path.join(
     os.getcwd(), 'extensions', 'interactions', 'rule_templates.json')
-RULES_SPECS_HTML_MAPPING_FILE_PATH = os.path.join(
-    os.getcwd(), 'extensions', 'interactions', 'rule_specs_html_mapping.json')
+HTML_FIELD_TYPES_TO_RULE_SPECS_FILE_PATH = os.path.join(
+    os.getcwd(), 'extensions', 'interactions',
+    'html_field_types_to_rule_specs.json')
 # A mapping of interaction ids to classifier properties.
 INTERACTION_CLASSIFIER_MAPPING = {
     'TextInput': {
