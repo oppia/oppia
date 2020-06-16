@@ -87,7 +87,6 @@ def start_proxy_server():
     subprocess.Popen(start_server_command)
 
 
-
 def run_lighthouse_checks_with_compression():
     """Run lighthouse checks with compression enabled."""
     try:
