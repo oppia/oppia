@@ -293,8 +293,7 @@ var ExplorationEditorTranslationTab = function() {
     await this.exitTutorial();
     await this.changeLanguage(language);
     await this.openUploadAudioModal();
-    await this.uploadAudio(
-      relativePathOfAudioToUpload);
+    await this.uploadAudio(relativePathOfAudioToUpload);
   };
 
   this.setTranslation = async function(richTextInstructions) {

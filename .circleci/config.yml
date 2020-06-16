@@ -296,9 +296,9 @@ jobs:
           command: |
             python -m scripts.run_e2e_tests --skip-install --skip-build --suite="classroomPageFileUploadFeatures"
       - run:
-          name: Run e2e play translations test
+          name: Run e2e play voiceovers test
           command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="playTranslations"
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="playVoiceovers"
 
   e2e_topic_and_story_editor:
     <<: *job_defaults

@@ -21,16 +21,14 @@ var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
 
-var ExplorationEditorPage =
-    require('../protractor_utils/ExplorationEditorPage.js');
-var CreatorDashboardPage =
-    require('../protractor_utils/CreatorDashboardPage.js');
-var ExplorationPlayerPage =
-    require('../protractor_utils/ExplorationPlayerPage.js');
-var LibraryPage =
-    require('../protractor_utils/LibraryPage.js');
+var ExplorationEditorPage = require(
+  '../protractor_utils/ExplorationEditorPage.js');
+var CreatorDashboardPage = require('../protractor_utils/CreatorDashboardPage.js');
+var ExplorationPlayerPage = require(
+  '../protractor_utils/ExplorationPlayerPage.js');
+var LibraryPage = require('../protractor_utils/LibraryPage.js');
 
-describe('Test if Translations Play', function() {
+describe('Voiceover player', function() {
   var creatorDashboardPage = null;
   var explorationEditorPage = null;
   var explorationEditorMainTab = null;
@@ -49,9 +47,9 @@ describe('Test if Translations Play', function() {
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
     libraryPage = new LibraryPage.LibraryPage();
 
-    await users.createUser('testTranslations@translations.com',
-      'testTranslations');
-    await users.login('testTranslations@translations.com');
+    await users.createUser('testVoiceovers@voiceovers.com',
+      'testVoiceovers');
+    await users.login('testVoiceovers@voiceovers.com');
     await workflow.createExploration();
     await explorationEditorMainTab.exitTutorial();
     await explorationEditorMainTab.setStateName('First');
@@ -63,44 +61,43 @@ describe('Test if Translations Play', function() {
       'Hindi', '../data/cafe.mp3');
     await explorationEditorPage.saveChanges();
     await explorationEditorPage.navigateToSettingsTab();
-    await explorationEditorSettingsTab.setTitle('translationPlayerTest');
+    await explorationEditorSettingsTab.setTitle('voiceoverPlayerTest');
     await explorationEditorSettingsTab.setCategory('Languages');
     await explorationEditorSettingsTab.setLanguage('English');
     await explorationEditorSettingsTab.setObjective(
-      'Testing if translations works');
+      'Testing if voiceovers work');
     await explorationEditorPage.saveChanges('Done.');
     await workflow.publishExploration();
     await users.logout();
   });
 
   it('should play and pause voiceovers', async function() {
-    await users.login('testTranslations@translations.com');
+    await users.login('testVoiceovers@voiceovers.com');
     await libraryPage.get();
-    await libraryPage.playExploration('translationPlayerTest');
-    await explorationPlayerPage.clickAudioBar();
-    await explorationPlayerPage.playAudio();
+    await libraryPage.playExploration('voiceoverPlayerTest');
+    await explorationPlayerPage.expandAudioBar();
+    await explorationPlayerPage.pressPlayButton();
     await explorationPlayerPage.expectAudioToBePlaying();
-    await explorationPlayerPage.pauseAudio();
+    await explorationPlayerPage.pressPauseButton();
     await explorationPlayerPage.expectAudioToBePaused();
   });
 
-  it('should play translations for multiple languages', async function() {
+  it('should play voiceovers for multiple languages', async function() {
     await creatorDashboardPage.get();
-    await creatorDashboardPage.editExploration('translationPlayerTest');
+    await creatorDashboardPage.editExploration('voiceoverPlayerTest');
     await explorationEditorPage.navigateToTranslationTab();
     await explorationEditorTranslationTab.uploadAudioFileForLanguage(
       'Arabic', '../data/ambient-noise.mp3');
-    await explorationEditorPage.saveChanges('Added another translation');
+    await explorationEditorPage.saveChanges('Added another voiceover');
     await libraryPage.get();
-    await libraryPage.playExploration('translationPlayerTest');
-    await explorationPlayerPage.clickAudioBar();
-    await explorationPlayerPage.playAudio();
+    await libraryPage.playExploration('voiceoverPlayerTest');
+    await explorationPlayerPage.expandAudioBar();
+    await explorationPlayerPage.changeVoiceoverLanguage('Hindi');
+    await explorationPlayerPage.pressPlayButton();
     await explorationPlayerPage.expectAudioToBePlaying();
-    await explorationPlayerPage.pauseAudio();
-    await browser.refresh();
-    await explorationPlayerPage.clickAudioBar();
-    await explorationPlayerPage.changeLanguage('Arabic');
-    await explorationPlayerPage.playAudio();
+    await explorationPlayerPage.pressPauseButton();
+    await explorationPlayerPage.changeVoiceoverLanguage('Arabic');
+    await explorationPlayerPage.pressPlayButton();
     await explorationPlayerPage.expectAudioToBePlaying();
   });
 });
