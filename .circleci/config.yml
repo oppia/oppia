@@ -70,8 +70,8 @@ commands:
             if [[ -n ${CIRCLE_PULL_REQUEST} ]]
             then
 
-              git config --global user.email $( git log --format='%ae' $CIRCLE_SHA1^! )
-              git config --global user.name $( git log --format='%an' $CIRCLE_SHA1^! )
+              git config --global user.email "$( git log --format='%ae' $CIRCLE_SHA1^! )"
+              git config --global user.name "$( git log --format='%an' $CIRCLE_SHA1^! )"
 
               regexp="[[:digit:]]\+$"
               PR_NUMBER=`echo $CIRCLE_PULL_REQUEST | grep -o $regexp`
