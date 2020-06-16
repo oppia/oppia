@@ -45,8 +45,7 @@ angular.module('oppia').component('classroomPage', {
         ClassroomBackendApiService, LoaderService, PageTitleService,
         UrlInterpolationService, UrlService, FATAL_ERROR_CODES) {
       var ctrl = this;
-      ClassroomBackendApiService = (
-        OppiaAngularRootComponent.classroomBackendApiService);
+
       ctrl.$onInit = function() {
         var classroomName = UrlService.getClassroomNameFromUrl();
         ctrl.bannerImageFileUrl = UrlInterpolationService.getStaticImageUrl(
