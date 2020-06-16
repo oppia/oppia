@@ -74,6 +74,7 @@ def set_project(project_name):
 
 def initiate_backup_restoration_process():
     """Initiate the backup restoration process on backup migration server."""
+    common.open_new_tab_in_browser_if_possible(LIST_OF_BUCKETS_URL)
     python_utils.PRINT(
         'Navigate into the newest backup folder. \n'
         'There should be a file here of the form '
@@ -82,7 +83,6 @@ def initiate_backup_restoration_process():
         '20200213-090001.overall_export_metadata". '
         'This is the file you want to import.\n'
         'Please copy and enter the full path of this file\n')
-    common.open_new_tab_in_browser_if_possible(LIST_OF_BUCKETS_URL)
     export_metadata_filepath = python_utils.INPUT().strip()
     if not re.match(
             r'^oppia-export-backups/(\d{8}-\d{6})/\1\.overall_export_metadata$',
