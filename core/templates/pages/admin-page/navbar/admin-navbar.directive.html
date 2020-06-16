@@ -37,13 +37,8 @@
 <nav class="navbar navbar-default navbar-light oppia-navbar oppia-prevent-selection oppia-navbar-admin" role="navigation">
   <div class="navbar-container" style="background-color: #00376d">
     <div class="navbar-header protractor-test-navbar-header float-left">
-<<<<<<< HEAD
-      <a class="oppia-navbar-brand-name oppia-transition-200 float-left" href="/library">
-        <img ng-src="<[$ctrl.logoWhiteImgUrl]>" class="oppia-logo" ng-class="'oppia-logo-wide'" alt="Oppia Logo">
-=======
       <a class="oppia-navbar-brand-name oppia-transition-200 float-left" href="/community-library">
-        <img ng-src="<[$ctrl.logoWhiteImgUrl]>" class="oppia-logo" ng-class="'oppia-logo-wide'">
->>>>>>> 32e12b905ea0e0fdb811b61b31b1818db1c87a98
+        <img ng-src="<[$ctrl.logoWhiteImgUrl]>" class="oppia-logo" ng-class="'oppia-logo-wide'" alt="Oppia Logo">
       </a>
       <ul class="nav navbar-nav oppia-navbar-breadcrumb">
         <li>
@@ -150,7 +145,6 @@
                     <[$ctrl.getUserEmail()]>
                   </div>
                 </div>
-<<<<<<< HEAD
               </a>
               <ul uib-dropdown-menu class="dropdown-menu uib-dropdown-menu ng-cloak oppia-navbar-dropdown"
                   role="menu"
@@ -168,7 +162,7 @@
                 <hr class="oppia-top-right-menu-item-separator">
                 <li>
                   <a ng-click="$ctrl.onMouseoutProfilePictureOrDropdown($event)"
-                     href="/creator_dashboard"
+                     href="/creator-dashboard"
                      class="dropdown-item"
                      style="color: #00376d">
                     Creator Dashboard
@@ -176,7 +170,7 @@
                 </li>
                 <li>
                   <a ng-click="$ctrl.onMouseoutProfilePictureOrDropdown($event)"
-                     href="/notifications_dashboard"
+                     href="/notifications"
                      class="dropdown-item"
                      style="color: #00376d">
                     Notifications
@@ -223,80 +217,6 @@
             </li>
           </ul>
         </li>
-=======
-              </div>
-            </a>
-            <ul uib-dropdown-menu class="dropdown-menu uib-dropdown-menu ng-cloak oppia-navbar-dropdown"
-                role="menu"
-                ng-mouseover="$ctrl.onMouseoverProfilePictureOrDropdown($event)"
-                ng-mouseleave="$ctrl.onMouseoutProfilePictureOrDropdown($event)"
-                ng-show="$ctrl.profileDropdownIsActive">
-              <li>
-                <a ng-click="$ctrl.onMouseoutProfilePictureOrDropdown($event)"
-                   ng-href="<[$ctrl.profileUrl]>"
-                   style="color: #00376d"
-                   class="dropdown-item">
-                  <strong><[$ctrl.username]></strong>
-                </a>
-              </li>
-              <hr class="oppia-top-right-menu-item-separator">
-              <li>
-                <a ng-click="$ctrl.onMouseoutProfilePictureOrDropdown($event)"
-                   href="/creator-dashboard"
-                   class="dropdown-item"
-                   style="color: #00376d">
-                  Creator Dashboard
-                </a>
-              </li>
-              <li>
-                <a ng-click="$ctrl.onMouseoutProfilePictureOrDropdown($event)"
-                   href="/notifications"
-                   class="dropdown-item"
-                   style="color: #00376d">
-                  Notifications
-                </a>
-              </li>
-              <li>
-                <a ng-click="$ctrl.onMouseoutProfilePictureOrDropdown($event)"
-                   href="/preferences"
-                   class="dropdown-item"
-                   style="color: #00376d">
-                  Preferences
-                </a>
-              </li>
-              <li ng-if="$ctrl.isModerator">
-                <a ng-click="$ctrl.onMouseoutProfilePictureOrDropdown($event)"
-                   href="/moderator"
-                   target="_blank"
-                   rel="noopener"
-                   class="dropdown-item"
-                   style="color: #00376d">
-                  Moderator Page
-                </a>
-              </li>
-              <li ng-if="$ctrl.isSuperAdmin">
-                <a ng-click="$ctrl.onMouseoutProfilePictureOrDropdown($event)"
-                   href="/admin"
-                   target="_blank"
-                   rel="noopener"
-                   class="dropdown-item"
-                   style="color: #00376d">
-                  Admin Page
-                </a>
-              </li>
-              <hr class="oppia-top-right-menu-item-separator">
-              <li>
-                <a ng-click="$ctrl.onMouseoutProfilePictureOrDropdown($event)"
-                   ng-href="<[$ctrl.logoutUrl]>"
-                   class="dropdown-item"
-                   style="color: #00376d">
-                  Logout
-                </a>
-              </li>
-            </ul>
-          </li>
-        </ul>
->>>>>>> 32e12b905ea0e0fdb811b61b31b1818db1c87a98
       </ul>
     </div>
   </div>
