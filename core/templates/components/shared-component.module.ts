@@ -25,13 +25,16 @@ import { AttributionGuideComponent } from
   './common-layout-directives/common-elements/attribution-guide.component';
 import { BackgroundBannerComponent } from
   './common-layout-directives/common-elements/background-banner.component';
+import { TranslatePipe } from 'filters/translate.pipe';
 
 
 @NgModule({
   imports: [CommonModule],
-  declarations: [AttributionGuideComponent, BackgroundBannerComponent],
+  declarations: [
+    AttributionGuideComponent, BackgroundBannerComponent, TranslatePipe],
   entryComponents: [AttributionGuideComponent, BackgroundBannerComponent],
-  exports: [AttributionGuideComponent, BackgroundBannerComponent]
+  exports: [
+    AttributionGuideComponent, BackgroundBannerComponent, TranslatePipe]
 })
 
 export class SharedComponentsModule { }

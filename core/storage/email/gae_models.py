@@ -36,8 +36,7 @@ class SentEmailModel(base_models.BaseModel):
     """Records the content and metadata of an email sent from Oppia.
 
     This model is read-only; entries cannot be modified once created. The
-    id/key of instances of this class has the form
-        [INTENT].[random hash].
+    id/key of instances of this class has the form '[intent].[random hash]'.
     """
     # TODO(sll): Implement functionality to get all emails sent to a particular
     # user with a given intent within a given time period.
@@ -302,7 +301,6 @@ class SentEmailModel(base_models.BaseModel):
         return all(model is not None for model in user_settings_models)
 
 
-
 class BulkEmailModel(base_models.BaseModel):
     """Records the content of an email sent from Oppia to multiple users.
 
@@ -404,7 +402,7 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
 
     This unique_id is used in reply-to email address in outgoing feedback and
     suggestion emails. The id/key of instances of this model has form of
-    [USER_ID].[THREAD_ID]
+    [user_id].[thread_id]
     """
 
     user_id = ndb.StringProperty(required=True, indexed=True)

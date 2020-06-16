@@ -23,9 +23,7 @@ import datetime
 import hashlib
 import imghdr
 import logging
-import math
 import re
-import time
 
 from constants import constants
 from core.domain import role_services
@@ -834,8 +832,7 @@ def create_new_user(gae_id, email):
     if user_settings is not None:
         raise Exception('User %s already exists.' % gae_id)
 
-    # TODO(#7848): Generate user_id together with the migration.
-    user_id = gae_id
+    user_id = user_models.UserSettingsModel.get_new_id('')
     user_settings = UserSettings(
         user_id, gae_id, email, feconf.ROLE_ID_EXPLORATION_EDITOR,
         preferred_language_codes=[constants.DEFAULT_LANGUAGE_CODE])
@@ -2023,8 +2020,8 @@ def log_username_change(committer_id, old_username, new_username):
         new_username: str. The new username that the current one is being
             changed to.
     """
-    model_id = '%s.%s' % (committer_id, int(math.floor(time.time())))
 
+    model_id = '%s.%d' % (committer_id, utils.get_current_time_in_millisecs())
     audit_models.UsernameChangeAuditModel(
         id=model_id, committer_id=committer_id, old_username=old_username,
         new_username=new_username).put()

@@ -20,7 +20,7 @@
 var waitFor = require('./waitFor.js');
 
 var LearnerDashboardPage = function() {
-  var LEARNER_DASHBOARD_URL = '/learner_dashboard';
+  var LEARNER_DASHBOARD_URL = '/learner-dashboard';
   var completedSection =
     element(by.css('.protractor-test-completed-section'));
   var playLaterSection =
@@ -123,14 +123,6 @@ var LearnerDashboardPage = function() {
     await subscriptionsSection.click();
   };
 
-  this.expectTitleOfCollectionSummaryTileToBeHidden = function(title) {
-    element.all(by.cssContainingText(
-      '.protractor-test-collection-summary-tile-title', title))
-      .then(function(items) {
-        expect(items.length).toBe(0);
-      });
-  };
-
   this.expectTitleOfCollectionSummaryTileToMatch = async function(title) {
     var collectionTitle = element(by.cssContainingText(
       '.protractor-test-collection-summary-tile-title', title));
@@ -139,11 +131,10 @@ var LearnerDashboardPage = function() {
     expect(await collectionTitle.isDisplayed()).toBe(true);
   };
 
-  this.expectTitleOfExplorationSummaryTileToBeHidden = function(title) {
-    element.all(by.cssContainingText(
-      '.protractor-test-exp-summary-tile-title', title)).then(function(items) {
-      expect(items.length).toBe(0);
-    });
+  this.expectTitleOfExplorationSummaryTileToBeHidden = async function(title) {
+    var items = element.all(by.cssContainingText(
+      '.protractor-test-exp-summary-tile-title', title));
+    expect(await items.count()).toBe(0);
   };
 
   this.expectTitleOfExplorationSummaryTileToMatch = async function(title) {
