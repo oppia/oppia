@@ -249,7 +249,9 @@ class InteractionUnitTests(test_utils.GenericTestBase):
 
     def test_html_field_types_to_rule_specs_mapping_are_valid(self):
         """Test that the structure of the file html_field_types_to_rule_specs.
-        json are valid.
+        json are valid. This test ensures that whenever any new type of
+        interaction or rule type with HTML string is added, the file
+        html_field_types_to_rule_specs.json should be updated accordingly.
         """
         # The file having the information about the assembly of the html in the
         # rule specs.
