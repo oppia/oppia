@@ -35,14 +35,14 @@ require('pages/profile-page/profile-page-backend-api.service');
 angular.module('oppia').component('profilePage', {
   template: require('./profile-page.component.html'),
   controller: [
-    '$http', '$log', '$window',
+    '$scope', '$log', '$window',
     'DateTimeFormatService', 'LoaderService',
     'UrlInterpolationService', 'UserService',
-    function($http, $log, $window,
+    function($scope, $log, $window,
         DateTimeFormatService, LoaderService,
         UrlInterpolationService, UserService) {
       var ctrl = this;
-      let ProfilePageBackendApiService = (
+      const ProfilePageBackendApiService = (
         OppiaAngularRootComponent.profilePageBackendApiService);
 
       var DEFAULT_PROFILE_PICTURE_URL = UrlInterpolationService
@@ -126,10 +126,16 @@ angular.module('oppia').component('profilePage', {
             } else {
               if (!ctrl.isAlreadySubscribed) {
                 ProfilePageBackendApiService.subscribe(data.profile_username)
-                  .then(() => ctrl.isAlreadySubscribed = true);
+                  .then(() => {
+                    ctrl.isAlreadySubscribed = true;
+                    $scope.$apply();
+                  });
               } else {
                 ProfilePageBackendApiService.unsubscribe(data.profile_username)
-                  .then(() => ctrl.isAlreadySubscribed = false);
+                  .then(() => {
+                    ctrl.isAlreadySubscribed = false;
+                    $scope.$apply();
+                  });
               }
               ctrl.updateSubscriptionButtonPopoverText();
             }
