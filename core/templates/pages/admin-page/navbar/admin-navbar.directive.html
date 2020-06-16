@@ -134,14 +134,14 @@
                  ng-mouseleave="$ctrl.onMouseoutProfilePictureOrDropdown($event)">
                 <div class="oppia-navbar-profile-picture-container float-left" ng-cloak>
                   <div ng-if="$ctrl.profilePictureDataUrl">
+                    <!--
+                      Lighthouse flags <img> elements that don't have alt attributes:
+                      If the image acts as decoration and does not provide any useful content, give it an empty alt=""
+                      https://web.dev/image-alt/?utm_source=lighthouse&utm_medium=devtools#how-to-add-alternative-text-to-images
+                    -->
                     <img ng-src="<[$ctrl.profilePictureDataUrl]>"
                          class="dropdown-toggle oppia-navbar-profile-picture rounded-circle"
                          alt="">
-                         <!--
-                           Lighthouse flags <img> elements that don't have alt attributes:
-                           If the image acts as decoration and does not provide any useful content, give it an empty alt=""
-                           https://web.dev/image-alt/?utm_source=lighthouse&utm_medium=devtools#how-to-add-alternative-text-to-images
-                          -->
                   </div>
                   <div ng-if="!$ctrl.profilePictureDataUrl" class="dropdown-toggle">
                     <i class="material-icons md-40" style="margin-top: -1px;">&#xE853;</i>
