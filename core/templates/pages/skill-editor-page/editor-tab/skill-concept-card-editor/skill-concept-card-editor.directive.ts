@@ -162,7 +162,7 @@ angular.module('oppia').directive('skillConceptCardEditor', [
             $scope.skill = SkillEditorStateService.getSkill();
             initBindableFieldsDict();
             ctrl.directiveSubscriptions.add(
-              SkillEditorStateService.getSkillChangedSubject().subscribe(
+              SkillEditorStateService.onSkillChange.subscribe(
                 () => initBindableFieldsDict())
             );
 

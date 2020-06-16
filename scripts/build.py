@@ -112,7 +112,6 @@ FILEPATHS_NOT_TO_RENAME = (
     '*.bundle.js',
     '*.bundle.js.map',
     'webpack_bundles/about-page.mainpage.html',
-    'webpack_bundles/community-dashboard-page.mainpage.html',
     'webpack_bundles/contact-page.mainpage.html',
     'webpack_bundles/donate-page.mainpage.html',
     'webpack_bundles/get-started-page.mainpage.html',
