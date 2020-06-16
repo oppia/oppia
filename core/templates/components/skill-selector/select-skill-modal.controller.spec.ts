@@ -57,7 +57,7 @@ describe('Select Skill Modal Controller', function() {
     expect($scope.countOfSkillsToPrioritize).toBe(skillsInSameTopicCount);
   });
 
-  it('should init the variables', function() {
+  it('should save skill with its id', function() {
     $scope.selectedSkillId = '2';
     $scope.save();
     expect($scope.selectedSkillId).toBe('2');
