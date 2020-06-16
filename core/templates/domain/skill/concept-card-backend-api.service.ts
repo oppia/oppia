@@ -31,7 +31,7 @@ import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 
 interface IConceptCardBackendDicts {
-  concept_card_dicts: IConceptCardBackendDict[];
+  'concept_card_dicts': IConceptCardBackendDict[];
 }
 
 @Injectable({
