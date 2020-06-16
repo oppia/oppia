@@ -67,9 +67,9 @@ import utils
     config_models, email_models, exp_models,
     feedback_models, improvements_models, job_models,
     opportunity_models, question_models,
-    recommendations_models, skill_models,
+    recommendations_models, skill_models, stats_models,
     story_models, suggestion_models, topic_models,
-    user_models, stats_models) = (
+    user_models,) = (
         models.Registry.import_models([
             models.NAMES.activity, models.NAMES.audit, models.NAMES.base_model,
             models.NAMES.classifier, models.NAMES.collection,
@@ -77,8 +77,8 @@ import utils
             models.NAMES.feedback, models.NAMES.improvements, models.NAMES.job,
             models.NAMES.opportunity, models.NAMES.question,
             models.NAMES.recommendations, models.NAMES.skill,
-            models.NAMES.story, models.NAMES.suggestion, models.NAMES.topic,
-            models.NAMES.user, models.NAMES.statistics]))
+            models.NAMES.statistics, models.NAMES.story,
+            models.NAMES.suggestion, models.NAMES.topic, models.NAMES.user]))
 datastore_services = models.Registry.import_datastore_services()
 
 ALLOWED_AUDIO_EXTENSIONS = list(feconf.ACCEPTED_AUDIO_EXTENSIONS.keys())
@@ -5091,19 +5091,40 @@ class PlaythroughModelValidator(BaseModelValidator):
         exp_issues = (
             stats_models.ExplorationIssuesModel.get_model(exp_id, exp_version))
 
-        has_reference_error = True
-        for exp_issue_dict in exp_issues.unresolved_issues:
-            if item.id in exp_issue_dict['playthrough_ids']:
-                has_reference_error = False
-                break
-        if has_reference_error:
-            error_message = (
-                'This playthrough was not found as a reference in the '
-                'containing ExplorationIssuesModel (id=%s)' % (exp_issues.id))
+        issues = []
+        for issue in exp_issues.unresolved_issues:
+            issue_type = issue['issue_type']
+            if (item.id in issue['playthrough_ids'] and
+                    issue_type == item.issue_type):
+                issue_customization_args = issue['issue_customization_args']
+                identifying_arg = (
+                    stats_models.ISSUE_TYPE_KEYNAME_MAPPING[issue_type])
+                if (issue_customization_args[identifying_arg] ==
+                        item.issue_customization_args[identifying_arg]):
+                    issues.append(issue)
+
+        if len(issues) == 0:
             cls.errors['reference check'].append(
-                'Entity id %s: not referenced by any issue. Details: %s.' % (
-                    item.id, error_message)
+                'Entity id %s: not referenced by any issue for the'
+                ' corresponding exploration (id=%s, version=%s)' % (
+                    item.id, exp_id, exp_version)
             )
+        elif len(issues) > 1:
+            cls.errors['reference check'].append(
+                'Entity id %s: referenced by more than one issues.' % (
+                    item.id,)
+            )
+        else:
+            issue = issues[0]
+            reference_count = 0
+            for playthrough_id in issue['playthrough_ids']:
+                if playthrough_id == item.id:
+                    reference_count += 1
+            if reference_count > 1:
+                cls.errors['reference check'].append(
+                    'Entity id %s: referenced multiple times in an issue.' % (
+                        item.id,)
+                )
 
     @classmethod
     def _validate_created_datetime(cls, item):

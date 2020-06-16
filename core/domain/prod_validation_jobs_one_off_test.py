@@ -79,9 +79,9 @@ CURRENT_DATETIME = datetime.datetime.utcnow()
     config_models, email_models, exp_models,
     feedback_models, improvements_models, job_models,
     opportunity_models, question_models,
-    recommendations_models, skill_models,
+    recommendations_models, skill_models, stats_models,
     story_models, suggestion_models, topic_models,
-    user_models, stats_models,) = (
+    user_models,) = (
         models.Registry.import_models([
             models.NAMES.activity, models.NAMES.audit, models.NAMES.base_model,
             models.NAMES.classifier, models.NAMES.collection,
@@ -89,8 +89,8 @@ CURRENT_DATETIME = datetime.datetime.utcnow()
             models.NAMES.feedback, models.NAMES.improvements, models.NAMES.job,
             models.NAMES.opportunity, models.NAMES.question,
             models.NAMES.recommendations, models.NAMES.skill,
-            models.NAMES.story, models.NAMES.suggestion, models.NAMES.topic,
-            models.NAMES.user, models.NAMES.statistics]))
+            models.NAMES.statistics, models.NAMES.story,
+            models.NAMES.suggestion, models.NAMES.topic, models.NAMES.user]))
 
 OriginalDatetimeType = datetime.datetime
 
@@ -15243,9 +15243,42 @@ class PlaythroughModelValidatorTests(test_utils.GenericTestBase):
             (
                 u'[u\'failed validation check for reference check of '
                 'PlaythroughModel\', [u\'Entity id %s: not referenced'
-                ' by any issue. Details: This playthrough was not found as '
-                'a reference in the containing ExplorationIssuesModel '
-                '(id=EXP_ID.1).\']]' % (playthrough.id,)
+                ' by any issue for the corresponding exploration '
+                '(id=%s, version=%s)\']]' % (
+                    playthrough.id, playthrough.exp_id, playthrough.exp_version
+                )
+            )
+        ]
+        run_job_and_check_output(self, expected_output)
+
+    def test_output_for_multiple_references(self):
+        self.set_config_property(
+            config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
+            [self.exp.id])
+        playthrough = self.create_playthrough()
+        self.create_exp_issues_with_playthroughs(
+            [[playthrough.id], [playthrough.id]])
+        expected_output = [
+            (
+                u'[u\'failed validation check for reference check of '
+                'PlaythroughModel\', [u\'Entity id %s: referenced by '
+                'more than one issues.\']]' % (playthrough.id,)
+            )
+        ]
+        run_job_and_check_output(self, expected_output)
+
+    def test_output_for_duplicate_references_in_one_issue(self):
+        self.set_config_property(
+            config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
+            [self.exp.id])
+        playthrough = self.create_playthrough()
+        self.create_exp_issues_with_playthroughs(
+            [[playthrough.id, playthrough.id]])
+        expected_output = [
+            (
+                u'[u\'failed validation check for reference check of '
+                'PlaythroughModel\', [u\'Entity id %s: referenced multiple '
+                'times in an issue.\']]' % (playthrough.id,)
             )
         ]
         run_job_and_check_output(self, expected_output)
