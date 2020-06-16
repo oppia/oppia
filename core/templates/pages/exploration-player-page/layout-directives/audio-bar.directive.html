@@ -11,9 +11,9 @@
         <a ng-click="onPlayButtonClicked()"
            uib-tooltip="<[!isAudioAvailableInCurrentLanguage() ? ('I18N_PLAYER_AUDIO_NOT_AVAILABLE_IN' | translate:{languageDescription:getCurrentAudioLanguageDescription()}) : '']>"
            tooltip-append-to-body="true" tooltip-placement="right">
-          <i class="fas oppia-audio-controls-button-icon protractor-test-play-circle"
-            ng-class="{'fa-ellipsis-h': audioLoadingIndicatorIsShown, 'fa-play-circle': !isAudioPlaying(), 'fa-pause-circle protractor-test-pause-circle': isAudioPlaying(), 'audio-controls-audio-not-available': !isAudioAvailableInCurrentLanguage() || audioIsLoading}">
-            </i>
+          <i class="fas oppia-audio-controls-button-icon"
+             ng-class="{'fa-ellipsis-h': audioLoadingIndicatorIsShown, 'fa-play-circle protractor-test-play-circle': !isAudioPlaying(), 'fa-pause-circle protractor-test-pause-circle': isAudioPlaying(), 'audio-controls-audio-not-available': !isAudioAvailableInCurrentLanguage() || audioIsLoading}">
+          </i>
         </a>
         <a ng-click="onForwardButtonClicked()">
           <span class="oppia-replay-white-circle oppia-replay-white-circle-forward" ng-if="progressBarIsShown">
