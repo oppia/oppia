@@ -160,8 +160,8 @@ class AnswerGroup(python_utils.OBJECT):
 
         outcome_html = self.outcome.feedback.html
         html_list = html_list + [outcome_html]
-        # TODO(#9413):Find a way to include a reference to the interaction type
-        # in the Draft change lists.
+        # TODO(#9413): Find a way to include a reference to the interaction
+        # type in the Draft change lists.
         # See issue: https://github.com/oppia/oppia/issues/9413. We cannot use
         # the interaction-id from the rules_index_dict until issue-9413 has
         # been fixed, because this method has no reference to the interaction
@@ -182,7 +182,7 @@ class AnswerGroup(python_utils.OBJECT):
                         input_variables = (
                             html_field_types_to_rule_specs_dict[
                                 'DragAndDropHtmlString']['ruleTypes'][
-                                    rule_spec.rule_type]['inputVariable'])
+                                    rule_spec.rule_type]['htmlInputVariables'])
                         for input_variable in rule_spec.inputs.keys():
                             if input_variable in input_variables:
                                 html_list = (

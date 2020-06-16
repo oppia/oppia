@@ -4,10 +4,10 @@
     "format": "listOfSets",
     "ruleTypes": {
       "IsEqualToOrdering": {
-        "inputVariable": ["x"]
+        "htmlInputVariables": ["x"]
       },
       "IsEqualToOrderingWithOneItemAtIncorrectPosition": {
-        "inputVariable": ["x"]
+        "htmlInputVariables": ["x"]
       }
     }
   },
@@ -16,10 +16,10 @@
     "format": "string",
     "ruleTypes": {
       "HasElementXAtPositionY": {
-        "inputVariable": ["x"]
+        "htmlInputVariables": ["x"]
       },
       "HasElementXBeforeElementY": {
-        "inputVariable": ["x", "y"]
+        "htmlInputVariables": ["x", "y"]
       }
     }
   },
@@ -28,16 +28,16 @@
     "format": "set",
     "ruleTypes": {
       "Equals": {
-        "inputVariable": ["x"]
+        "htmlInputVariables": ["x"]
       },
       "ContainsAtLeastOneOf": {
-        "inputVariable": ["x"]
+        "htmlInputVariables": ["x"]
       },
       "DoesNotContainAtLeastOneOf": {
-        "inputVariable": ["x"]
+        "htmlInputVariables": ["x"]
       },
       "IsProperSubsetOf": {
-        "inputVariable": ["x"]
+        "htmlInputVariables": ["x"]
       }
     }
   }

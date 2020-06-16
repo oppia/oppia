@@ -304,11 +304,12 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                         generated_html_field_types_dict[html_type['type']][
                             'ruleTypes'][rule_type] = {}
                         generated_html_field_types_dict[html_type['type']][
-                            'ruleTypes'][rule_type]['inputVariable'] = ['x']
+                            'ruleTypes'][rule_type]['htmlInputVariables'] = (
+                                ['x'])
                         if '{{y|%s}}' % html_type['type'] in description:
                             generated_html_field_types_dict[html_type['type']][
                                 'ruleTypes'][rule_type][
-                                    'inputVariable'].append('y')
+                                    'htmlInputVariables'].append('y')
 
         # Assert that the generated dict matches dict in the stored file.
         self.assertEqual(
@@ -335,7 +336,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                     'schema': {
                         'type': 'dict',
                         'properties': [{
-                            'name': 'inputVariable',
+                            'name': 'htmlInputVariables',
                             'schema': {
                                 'type': 'list',
                                 'items': {
