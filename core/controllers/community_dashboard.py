@@ -239,6 +239,8 @@ class UserCommunityRightsDataHandler(base.BaseHandler):
 class FeaturedTranslationLanguagesHandler(base.BaseHandler):
     """Provides featured translation languages set in admin config."""
 
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""

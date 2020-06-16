@@ -23,7 +23,7 @@ var CommunityDashboardTranslateTextTab = function() {
   var selectableLanguageElements = element(
     by.css('.protractor-test-language-selector'));
   var selectedLanguageElement = selectableLanguageElements.element(
-    by.css('option:checked'));
+    by.css('.oppia-translation-language-select-dropdown-option-selected'));
 
   var _selectLanguage = async function(language) {
     await selectableLanguageElements.click();
