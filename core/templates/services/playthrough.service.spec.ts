@@ -47,6 +47,33 @@ describe('PlaythroughService', () => {
     stopwatchObjectFactory = TestBed.get(StopwatchObjectFactory);
   });
 
+  beforeEach(() => {
+    this.recordStateTransitions = (...stateNames: string[]) => {
+      for (let i = 0; i < stateNames.length - 1; ++i) {
+        playthroughService.recordAnswerSubmitAction(
+          stateNames[i], stateNames[i + 1],
+          'TextInput', 'Hello', 'Correct', 30);
+      }
+    }
+
+    this.recordWrongAnswers = (times: number, stateName: string) => {
+      for (let i = 0; i < times; ++i) {
+        playthroughService.recordAnswerSubmitAction(
+          stateName, stateName, 'TextInput', 'Hello', 'Wrong', 30);
+      }
+    };
+
+    this.recordCycle = (times: number, ...stateNames: string[]) => {
+      for (let i = 0; i < times; ++i) {
+        for (let j = 0; j < stateNames.length; ++j) {
+          playthroughService.recordAnswerSubmitAction(
+            stateNames[j], stateNames[(j + 1) % stateNames.length],
+            'TextInput', 'Hello', 'Correct', 30);
+        }
+      }
+    };
+  });
+
   describe('recording exploration playthroughs', () => {
     beforeEach(() => {
       this.expId = 'expId';
@@ -120,22 +147,23 @@ describe('PlaythroughService', () => {
         spyOn(playthroughBackendApiService, 'storePlaythrough'));
 
       playthroughService.recordExplorationStartAction('initStateName1');
-      expect(playthroughService.getPlaythrough()).not.toBeNull();
-
       playthroughService.storePlaythrough();
+
+      expect(playthroughService.getPlaythrough()).not.toBeNull();
       expect(backendApiStorePlaythroughSpy).not.toHaveBeenCalled();
 
       playthroughService.recordAnswerSubmitAction(
         'stateName1', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
-      expect(playthroughService.getPlaythrough().issueType).toBeNull();
-
       playthroughService.storePlaythrough();
+
+      expect(playthroughService.getPlaythrough().issueType).toBeNull();
       expect(backendApiStorePlaythroughSpy).not.toHaveBeenCalled();
 
       playthroughService.recordExplorationQuitAction('End', 30);
-      expect(playthroughService.getPlaythrough().issueType).not.toBeNull();
-
       playthroughService.storePlaythrough();
+
+      expect(playthroughService.getPlaythrough().issueType)
+        .toEqual('EarlyQuit');
       expect(backendApiStorePlaythroughSpy).toHaveBeenCalled();
     });
 
@@ -146,16 +174,9 @@ describe('PlaythroughService', () => {
         jasmine.createSpyObj('Stopwatch', {getTimeInSecs: 360, reset: null}));
 
       playthroughService.recordExplorationStartAction('stateName1');
-      playthroughService.recordAnswerSubmitAction(
-        'stateName1', 'stateName2', 'TextInput', 'Hello', 'Try again', 60);
-      playthroughService.recordAnswerSubmitAction(
-        'stateName2', 'stateName3', 'TextInput', 'Hello', 'Try again', 60);
-      playthroughService.recordAnswerSubmitAction(
-        'stateName3', 'stateName4', 'TextInput', 'Hello', 'Try again', 60);
-      playthroughService.recordAnswerSubmitAction(
-        'stateName4', 'stateName5', 'TextInput', 'Hello', 'Try again', 60);
-      playthroughService.recordAnswerSubmitAction(
-        'stateName5', 'stateName6', 'TextInput', 'Hello', 'Try again', 60);
+      this.recordStateTransitions(
+        'stateName1', 'stateName2', 'stateName3', 'stateName4', 'stateName5',
+        'stateName6');
       playthroughService.recordExplorationQuitAction('stateName6', 60);
       playthroughService.storePlaythrough();
 
@@ -168,26 +189,17 @@ describe('PlaythroughService', () => {
 
     it('should identify multiple incorrect submissions', () => {
       spyOn(stopwatchObjectFactory, 'create').and.returnValue(
-        jasmine.createSpyObj('Stopwatch', {getTimeInSecs: 240, reset: null}));
+        jasmine.createSpyObj('Stopwatch', {getTimeInSecs: 360, reset: null}));
 
       playthroughService.recordExplorationStartAction('stateName1');
-      playthroughService.recordAnswerSubmitAction(
-        'stateName1', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
-      playthroughService.recordAnswerSubmitAction(
-        'stateName1', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
-      playthroughService.recordAnswerSubmitAction(
-        'stateName1', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
-      playthroughService.recordAnswerSubmitAction(
-        'stateName1', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
-      playthroughService.recordAnswerSubmitAction(
-        'stateName1', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
+      this.recordWrongAnswers(5, 'stateName1');
       playthroughService.recordExplorationQuitAction('stateName1', 60);
 
       let playthrough = playthroughService.getPlaythrough();
       expect(playthrough.issueType).toEqual('MultipleIncorrectSubmissions');
       expect(playthrough.issueCustomizationArgs).toEqual({
         state_name: {value: 'stateName1'},
-        num_times_answered_incorrectly: {value: 5}
+        num_times_answered_incorrectly: {value: 5},
       });
     });
 
@@ -210,27 +222,10 @@ describe('PlaythroughService', () => {
 
     it('should identify cyclic state transitions', () => {
       spyOn(stopwatchObjectFactory, 'create').and.returnValue(
-        jasmine.createSpyObj('Stopwatch', {getTimeInSecs: 300, reset: null}));
+        jasmine.createSpyObj('Stopwatch', {getTimeInSecs: 360, reset: null}));
 
       playthroughService.recordExplorationStartAction('stateName1');
-      playthroughService.recordAnswerSubmitAction(
-        'stateName1', 'stateName2', 'TextInput', 'Hello', 'Try again', 30);
-      playthroughService.recordAnswerSubmitAction(
-        'stateName2', 'stateName3', 'TextInput', 'Hello', 'Try again', 30);
-      playthroughService.recordAnswerSubmitAction(
-        'stateName3', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
-      playthroughService.recordAnswerSubmitAction(
-        'stateName1', 'stateName2', 'TextInput', 'Hello', 'Try again', 30);
-      playthroughService.recordAnswerSubmitAction(
-        'stateName2', 'stateName3', 'TextInput', 'Hello', 'Try again', 30);
-      playthroughService.recordAnswerSubmitAction(
-        'stateName3', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
-      playthroughService.recordAnswerSubmitAction(
-        'stateName1', 'stateName2', 'TextInput', 'Hello', 'Try again', 30);
-      playthroughService.recordAnswerSubmitAction(
-        'stateName2', 'stateName3', 'TextInput', 'Hello', 'Try again', 30);
-      playthroughService.recordAnswerSubmitAction(
-        'stateName3', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
+      this.recordCycle(3, 'stateName1', 'stateName2', 'stateName3');
       playthroughService.recordExplorationQuitAction('stateName1', 30);
 
       let playthrough = playthroughService.getPlaythrough();
@@ -243,58 +238,35 @@ describe('PlaythroughService', () => {
     });
 
     it('should identify p-shaped cyclic state transitions', () => {
-      // A p-shaped cycle looks like:
-      // [1] -> [2] -> [3] -> [4]
-      //                ^      v
-      //               [6] <- [5]
-      // 1, 2, 3, 4, 5, 6, 3, 4, 5, 6, 3, 4, 5, 6...
-      //
-      // or
-      // [1] -> [2] <-> [3]
       spyOn(stopwatchObjectFactory, 'create').and.returnValue(
-        jasmine.createSpyObj('Stopwatch', {getTimeInSecs: 270, reset: null}));
+        jasmine.createSpyObj('Stopwatch', {getTimeInSecs: 360, reset: null}));
 
       playthroughService.recordExplorationStartAction('stateName1');
       playthroughService.recordAnswerSubmitAction(
         'stateName1', 'stateName2', 'TextInput', 'Hello', 'Try again', 30);
       playthroughService.recordAnswerSubmitAction(
         'stateName2', 'stateName3', 'TextInput', 'Hello', 'Try again', 30);
-      playthroughService.recordAnswerSubmitAction(
-        'stateName3', 'stateName2', 'TextInput', 'Hello', 'Try again', 30);
-      playthroughService.recordAnswerSubmitAction(
-        'stateName2', 'stateName3', 'TextInput', 'Hello', 'Try again', 30);
-      playthroughService.recordAnswerSubmitAction(
-        'stateName3', 'stateName2', 'TextInput', 'Hello', 'Try again', 30);
-      playthroughService.recordAnswerSubmitAction(
-        'stateName2', 'stateName3', 'TextInput', 'Hello', 'Try again', 30);
-      playthroughService.recordAnswerSubmitAction(
-        'stateName3', 'stateName2', 'TextInput', 'Hello', 'Try again', 30);
-      playthroughService.recordExplorationQuitAction('stateName2', 60);
+      this.recordCycle(
+        3, 'stateName3', 'stateName4', 'stateName5', 'stateName6');
+      playthroughService.recordExplorationQuitAction('stateName3', 60);
 
       let playthrough = playthroughService.getPlaythrough();
       expect(playthrough.issueType).toEqual('CyclicStateTransitions');
       expect(playthrough.issueCustomizationArgs).toEqual({
-        state_names: {value: ['stateName2', 'stateName3', 'stateName2']},
+        state_names: {
+          value: [
+            'stateName3', 'stateName4', 'stateName5', 'stateName6', 'stateName3'
+          ],
+        },
       });
     });
 
     it('should identify cyclic state transitions containing 1-cycles', () => {
       spyOn(stopwatchObjectFactory, 'create').and.returnValue(
-        jasmine.createSpyObj('Stopwatch', {getTimeInSecs: 480, reset: null}));
+        jasmine.createSpyObj('Stopwatch', {getTimeInSecs: 360, reset: null}));
 
       playthroughService.recordExplorationStartAction('stateName1');
-      playthroughService.recordAnswerSubmitAction(
-        'stateName1', 'stateName2', 'TextInput', 'Hello', 'Try again', 30);
-      playthroughService.recordAnswerSubmitAction(
-        'stateName2', 'stateName3', 'TextInput', 'Hello', 'Try again', 30);
-      playthroughService.recordAnswerSubmitAction(
-        'stateName3', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
-      playthroughService.recordAnswerSubmitAction(
-        'stateName1', 'stateName2', 'TextInput', 'Hello', 'Try again', 30);
-      playthroughService.recordAnswerSubmitAction(
-        'stateName2', 'stateName3', 'TextInput', 'Hello', 'Try again', 30);
-      playthroughService.recordAnswerSubmitAction(
-        'stateName3', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
+      this.recordCycle(2, 'stateName1', 'stateName2', 'stateName3');
 
       // Revisiting the same state should not interrupt cyclic playthroughs.
       playthroughService.recordAnswerSubmitAction(
@@ -302,19 +274,8 @@ describe('PlaythroughService', () => {
       playthroughService.recordAnswerSubmitAction(
         'stateName1', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
 
-      playthroughService.recordAnswerSubmitAction(
-        'stateName1', 'stateName2', 'TextInput', 'Hello', 'Try again', 30);
-      playthroughService.recordAnswerSubmitAction(
-        'stateName2', 'stateName3', 'TextInput', 'Hello', 'Try again', 30);
-      playthroughService.recordAnswerSubmitAction(
-        'stateName3', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
-      playthroughService.recordAnswerSubmitAction(
-        'stateName1', 'stateName2', 'TextInput', 'Hello', 'Try again', 30);
-      playthroughService.recordAnswerSubmitAction(
-        'stateName2', 'stateName3', 'TextInput', 'Hello', 'Try again', 30);
-      playthroughService.recordAnswerSubmitAction(
-        'stateName3', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
-      playthroughService.recordExplorationQuitAction('stateName2', 60);
+      this.recordCycle(2, 'stateName1', 'stateName2', 'stateName3');
+      playthroughService.recordExplorationQuitAction('stateName1', 60);
 
       const playthrough = playthroughService.getPlaythrough();
       expect(playthrough.issueType).toEqual('CyclicStateTransitions');
@@ -327,38 +288,12 @@ describe('PlaythroughService', () => {
 
     it('should identify disjoint cycle rotations', () => {
       spyOn(stopwatchObjectFactory, 'create').and.returnValue(
-        jasmine.createSpyObj('Stopwatch', {getTimeInSecs: 370, reset: null}));
+        jasmine.createSpyObj('Stopwatch', {getTimeInSecs: 360, reset: null}));
 
       playthroughService.recordExplorationStartAction('stateName1');
-      // 1 -> 2 -> 3 -> 1
-      playthroughService.recordAnswerSubmitAction(
-        'stateName1', 'stateName2', 'TextInput', 'Hello', 'Try again', 30);
-      playthroughService.recordAnswerSubmitAction(
-        'stateName2', 'stateName3', 'TextInput', 'Hello', 'Try again', 30);
-      playthroughService.recordAnswerSubmitAction(
-        'stateName3', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
-      playthroughService.recordAnswerSubmitAction(
-        'stateName1', 'stateName2', 'TextInput', 'Hello', 'Try again', 30);
-
-      // 2 -> 3 -> 2
-      playthroughService.recordAnswerSubmitAction(
-        'stateName2', 'stateName3', 'TextInput', 'Hello', 'Try again', 30);
-      playthroughService.recordAnswerSubmitAction(
-        'stateName3', 'stateName2', 'TextInput', 'Hello', 'Try again', 30);
-
-      // 2 -> 3 -> 1 -> 2 (A rotation of 1 -> 2 -> 3 -> 1)
-      playthroughService.recordAnswerSubmitAction(
-        'stateName2', 'stateName3', 'TextInput', 'Hello', 'Try again', 30);
-      playthroughService.recordAnswerSubmitAction(
-        'stateName3', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
-      playthroughService.recordAnswerSubmitAction(
-        'stateName1', 'stateName2', 'TextInput', 'Hello', 'Try again', 30);
-      playthroughService.recordAnswerSubmitAction(
-        'stateName2', 'stateName3', 'TextInput', 'Hello', 'Try again', 30);
-      playthroughService.recordAnswerSubmitAction(
-        'stateName3', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
-      playthroughService.recordAnswerSubmitAction(
-        'stateName1', 'stateName2', 'TextInput', 'Hello', 'Try again', 30);
+      this.recordCycle(2, 'stateName1', 'stateName2', 'stateName3');
+      this.recordCycle(2, 'stateName1', 'stateName2');
+      this.recordCycle(2, 'stateName1', 'stateName2', 'stateName3');
       playthroughService.recordExplorationQuitAction('stateName1', 10);
 
       const playthrough = playthroughService.getPlaythrough();
@@ -373,47 +308,24 @@ describe('PlaythroughService', () => {
 
     it('should return most recent cycle if occurrences have a tie', () => {
       spyOn(stopwatchObjectFactory, 'create').and.returnValue(
-        jasmine.createSpyObj('Stopwatch', {getTimeInSecs: 420, reset: null}));
+        jasmine.createSpyObj('Stopwatch', {getTimeInSecs: 360, reset: null}));
 
       playthroughService.recordExplorationStartAction('stateName1');
-      // [1 -> 2 -> 1] x3
-      playthroughService.recordAnswerSubmitAction(
-        'stateName1', 'stateName2', 'TextInput', 'Hello', 'Try again', 30);
-      playthroughService.recordAnswerSubmitAction(
-        'stateName2', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
-      playthroughService.recordAnswerSubmitAction(
-        'stateName1', 'stateName2', 'TextInput', 'Hello', 'Try again', 30);
-      playthroughService.recordAnswerSubmitAction(
-        'stateName2', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
-      playthroughService.recordAnswerSubmitAction(
-        'stateName1', 'stateName2', 'TextInput', 'Hello', 'Try again', 30);
-      playthroughService.recordAnswerSubmitAction(
-        'stateName2', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
-
+      this.recordCycle(3, 'stateName1', 'stateName2');
       playthroughService.recordAnswerSubmitAction(
         'stateName1', 'stateName3', 'TextInput', 'Hello', 'Try again', 30);
-
-      // [ 3 -> 4 -> 3] x3
+      this.recordCycle(3, 'stateName3', 'stateName4');
       playthroughService.recordAnswerSubmitAction(
-        'stateName3', 'stateName4', 'TextInput', 'Hello', 'Try again', 30);
-      playthroughService.recordAnswerSubmitAction(
-        'stateName4', 'stateName3', 'TextInput', 'Hello', 'Try again', 30);
-      playthroughService.recordAnswerSubmitAction(
-        'stateName3', 'stateName4', 'TextInput', 'Hello', 'Try again', 30);
-      playthroughService.recordAnswerSubmitAction(
-        'stateName4', 'stateName3', 'TextInput', 'Hello', 'Try again', 30);
-      playthroughService.recordAnswerSubmitAction(
-        'stateName3', 'stateName4', 'TextInput', 'Hello', 'Try again', 30);
-      playthroughService.recordAnswerSubmitAction(
-        'stateName4', 'stateName3', 'TextInput', 'Hello', 'Try again', 30);
-      playthroughService.recordExplorationQuitAction('stateName3', 30);
+        'stateName3', 'stateName5', 'TextInput', 'Hello', 'Try again', 30);
+      this.recordCycle(3, 'stateName5', 'stateName6');
+      playthroughService.recordExplorationQuitAction('stateName6', 30);
 
       const playthrough = playthroughService.getPlaythrough();
       expect(playthrough).not.toBeNull();
       expect(playthrough.issueType).toEqual('CyclicStateTransitions');
       expect(playthrough.issueCustomizationArgs).toEqual({
         state_names: {
-          value: ['stateName3', 'stateName4', 'stateName3']
+          value: ['stateName5', 'stateName6', 'stateName5']
         },
       });
     });
@@ -421,32 +333,11 @@ describe('PlaythroughService', () => {
     it('should prioritize multiple incorrect answers issue types over cyclic ' +
       'state transitions and early quit', () => {
       spyOn(stopwatchObjectFactory, 'create').and.returnValue(
-        jasmine.createSpyObj('Stopwatch', {getTimeInSecs: 60, reset: null}));
+        jasmine.createSpyObj('Stopwatch', {getTimeInSecs: 360, reset: null}));
 
       playthroughService.recordExplorationStartAction('stateName1');
-      playthroughService.recordAnswerSubmitAction(
-        'stateName1', 'stateName2', 'TextInput', 'Hello', 'Try again', 5);
-      playthroughService.recordAnswerSubmitAction(
-        'stateName2', 'stateName1', 'TextInput', 'Hello', 'Try again', 5);
-      playthroughService.recordAnswerSubmitAction(
-        'stateName1', 'stateName2', 'TextInput', 'Hello', 'Try again', 5);
-      playthroughService.recordAnswerSubmitAction(
-        'stateName2', 'stateName1', 'TextInput', 'Hello', 'Try again', 5);
-      playthroughService.recordAnswerSubmitAction(
-        'stateName1', 'stateName2', 'TextInput', 'Hello', 'Try again', 5);
-      // Eligible for CyclicStateTransitions.
-      playthroughService.recordAnswerSubmitAction(
-        'stateName2', 'stateName1', 'TextInput', 'Hello', 'Try again', 5);
-      playthroughService.recordAnswerSubmitAction(
-        'stateName1', 'stateName1', 'TextInput', 'Hola', 'Try again', 5);
-      playthroughService.recordAnswerSubmitAction(
-        'stateName1', 'stateName1', 'TextInput', 'Hola', 'Try again', 5);
-      playthroughService.recordAnswerSubmitAction(
-        'stateName1', 'stateName1', 'TextInput', 'Hola', 'Try again', 5);
-      // Eligible for MultipleIncorrectSubmissions.
-      playthroughService.recordAnswerSubmitAction(
-        'stateName1', 'stateName1', 'TextInput', 'Hola', 'Try again', 5);
-      // Eligible for EarlyQuit.
+      this.recordCycle(3, 'stateName1', 'stateName2');
+      this.recordWrongAnswers(4, 'stateName1');
       playthroughService.recordExplorationQuitAction('stateName1', 10);
 
       expect(playthroughService.getPlaythrough().issueType)
@@ -456,23 +347,10 @@ describe('PlaythroughService', () => {
     it('should prioritize cyclic state transitions issue types over early quit',
       () => {
         spyOn(stopwatchObjectFactory, 'create').and.returnValue(
-          jasmine.createSpyObj('Stopwatch', {getTimeInSecs: 65, reset: null}));
+          jasmine.createSpyObj('Stopwatch', {getTimeInSecs: 360, reset: null}));
 
         playthroughService.recordExplorationStartAction('stateName1');
-        playthroughService.recordAnswerSubmitAction(
-          'stateName1', 'stateName2', 'TextInput', 'Hello', 'Try again', 10);
-        playthroughService.recordAnswerSubmitAction(
-          'stateName2', 'stateName1', 'TextInput', 'Hello', 'Try again', 10);
-        playthroughService.recordAnswerSubmitAction(
-          'stateName1', 'stateName2', 'TextInput', 'Hello', 'Try again', 10);
-        playthroughService.recordAnswerSubmitAction(
-          'stateName2', 'stateName1', 'TextInput', 'Hello', 'Try again', 10);
-        playthroughService.recordAnswerSubmitAction(
-          'stateName1', 'stateName2', 'TextInput', 'Hello', 'Try again', 10);
-        // Eligible for CyclicStateTransitions.
-        playthroughService.recordAnswerSubmitAction(
-          'stateName2', 'stateName1', 'TextInput', 'Hello', 'Try again', 5);
-        // Eligible for EarlyQuit.
+        this.recordCycle(3, 'stateName1', 'stateName2');
         playthroughService.recordExplorationQuitAction('stateName1', 10);
 
         expect(playthroughService.getPlaythrough().issueType)
@@ -484,19 +362,10 @@ describe('PlaythroughService', () => {
         const backendApiStorePlaythroughSpy = (
           spyOn(playthroughBackendApiService, 'storePlaythrough'));
         spyOn(stopwatchObjectFactory, 'create').and.returnValue(
-          jasmine.createSpyObj('Stopwatch', {getTimeInSecs: 35, reset: null}));
+          jasmine.createSpyObj('Stopwatch', {getTimeInSecs: 30, reset: null}));
 
         playthroughService.recordExplorationStartAction('stateName1');
-        playthroughService.recordAnswerSubmitAction(
-          'stateName1', 'stateName1', 'TextInput', 'Hello', 'Try again', 5);
-        playthroughService.recordAnswerSubmitAction(
-          'stateName1', 'stateName1', 'TextInput', 'Hello', 'Try again', 5);
-        playthroughService.recordAnswerSubmitAction(
-          'stateName1', 'stateName1', 'TextInput', 'Hello', 'Try again', 5);
-        playthroughService.recordAnswerSubmitAction(
-          'stateName1', 'stateName1', 'TextInput', 'Hello', 'Try again', 5);
-        playthroughService.recordAnswerSubmitAction(
-          'stateName1', 'stateName1', 'TextInput', 'Hello', 'Try again', 5);
+        this.recordWrongAnswers(5, 'stateName1');
         playthroughService.recordExplorationQuitAction('stateName1', 10);
 
         expect(playthroughService.getPlaythrough().issueType)
@@ -509,7 +378,7 @@ describe('PlaythroughService', () => {
         const backendApiStorePlaythroughSpy = (
           spyOn(playthroughBackendApiService, 'storePlaythrough'));
         spyOn(stopwatchObjectFactory, 'create').and.returnValue(
-          jasmine.createSpyObj('Stopwatch', {getTimeInSecs: 180, reset: null}));
+          jasmine.createSpyObj('Stopwatch', {getTimeInSecs: 360, reset: null}));
 
         playthroughService.recordExplorationStartAction('stateName1');
         playthroughService.recordExplorationQuitAction('stateName1', 180);
@@ -523,12 +392,12 @@ describe('PlaythroughService', () => {
   });
 
   it('should not record learner actions when recording is disabled', () => {
+    const backendApiStorePlaythroughSpy = (
+      spyOn(playthroughBackendApiService, 'storePlaythrough'));
     spyOn(explorationFeaturesService, 'isPlaythroughRecordingEnabled')
       .and.returnValue(false);
     spyOn(stopwatchObjectFactory, 'create').and.returnValue(
       jasmine.createSpyObj('Stopwatch', {getTimeInSecs: 50, reset: null}));
-    const backendApiStorePlaythroughSpy = (
-      spyOn(playthroughBackendApiService, 'storePlaythrough'));
 
     this.expId = 'expId';
     this.expVersion = 1;
