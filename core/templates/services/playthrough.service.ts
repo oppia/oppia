@@ -69,6 +69,12 @@ class MultipleIncorrectAnswersTracker {
 
 class CyclicStateTransitionsTracker {
   pathOfVisitedStates: string[];
+  /**
+   * Mapping of all disjoint cycles discovered by this tracker to the number of
+   * times they've been encountered (including isomorphic cycles).
+   *
+   * Map is in insertion-order.
+   */
   cycleOccurrences: Map<string[], number>;
 
   constructor(initStateName: string) {
@@ -122,25 +128,25 @@ class CyclicStateTransitionsTracker {
   }
 
   /**
-   * Returns whether the two given cycles are the same sequence of state names,
-   * even when their starting element is different.
+   * Returns true when the two given cycles represent the same sequence of state
+   * names, regardless of their starting element.
    *
-   * We check this by verifying whether the cycles can be rotated to become
-   * another. An array rotation is an operation which moves N elements from one
-   * end of the array to the other. For example:
+   * Implementation does this by verifying whether one cycle is a "rotation" of
+   * the other. An array rotation is an operation which moves N elements from
+   * one end of an array to the other. For example:
    *     RotateRight([1, 2, 3, 4, 5], 2) => [4, 5, 1, 2, 3].
    *     RotateLeft([1, 2, 3, 4, 5], 2) => [3, 4, 5, 1, 2].
    */
   private isSameCycleOfStateNames(
       cycle: string[], cycleToCheck: string[]): boolean {
-    if (cycle.length !== cycleToCheck.length) {
+    if (cycleToCheck.length !== cycle.length) {
       return false;
     }
     const rotationToFind = cycleToCheck.slice(1);
     const arrayWithAllCycleRotations = [...cycle.slice(1), ...cycle.slice(1)];
     const startIndex = arrayWithAllCycleRotations.indexOf(rotationToFind[0]);
     return startIndex !== -1 && rotationToFind.every(
-      (state, i) => arrayWithAllCycleRotations[startIndex + i] === state);
+      (value, i) => arrayWithAllCycleRotations[startIndex + i] === value);
   }
 
   private getMostCommonCycle(): [string[], number] {
