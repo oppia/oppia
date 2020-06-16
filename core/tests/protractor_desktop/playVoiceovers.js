@@ -23,7 +23,8 @@ var workflow = require('../protractor_utils/workflow.js');
 
 var ExplorationEditorPage = require(
   '../protractor_utils/ExplorationEditorPage.js');
-var CreatorDashboardPage = require('../protractor_utils/CreatorDashboardPage.js');
+var CreatorDashboardPage = require(
+  '../protractor_utils/CreatorDashboardPage.js');
 var ExplorationPlayerPage = require(
   '../protractor_utils/ExplorationPlayerPage.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
