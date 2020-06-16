@@ -70,8 +70,15 @@ describe('Classroom page', () => {
     }
   });
 
+  it('should return undefined when trying to get a service from' +
+    ' OppiaAngularRootComponent', function() {
+    expect(ctrl.getClassroomBackendApiService()).toBeUndefined();
+  });
+
   describe('when fetching dashboard data successfully', function() {
     beforeEach(function() {
+      spyOn(ctrl, 'getClassroomBackendApiService').and.returnValue(
+        ClassroomBackendApiService);
       spyOn(ClassroomBackendApiService, 'fetchClassroomData').and.returnValue(
         $q.resolve(topicSummaryObjects));
       spyOn($rootScope, '$broadcast').and.callThrough();
@@ -101,6 +108,8 @@ describe('Classroom page', () => {
 
   describe('when fetching dashboard data fails', function() {
     beforeEach(function() {
+      spyOn(ctrl, 'getClassroomBackendApiService').and.returnValue(
+        ClassroomBackendApiService);
       spyOn(ClassroomBackendApiService, 'fetchClassroomData').and.returnValue(
         $q.reject({
           status: 404

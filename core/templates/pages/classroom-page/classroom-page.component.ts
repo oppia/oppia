@@ -37,14 +37,21 @@ require('pages/library-page/search-bar/search-bar.directive.ts');
 angular.module('oppia').component('classroomPage', {
   template: require('./classroom-page.component.html'),
   controller: [
-    '$filter', '$rootScope', 'AlertsService',
-    'ClassroomBackendApiService', 'LoaderService', 'PageTitleService',
-    'UrlInterpolationService', 'UrlService', 'FATAL_ERROR_CODES',
+    '$filter', '$rootScope', 'AlertsService', 'LoaderService',
+    'PageTitleService', 'UrlInterpolationService', 'UrlService',
+    'FATAL_ERROR_CODES',
     function(
-        $filter, $rootScope, AlertsService,
-        ClassroomBackendApiService, LoaderService, PageTitleService,
-        UrlInterpolationService, UrlService, FATAL_ERROR_CODES) {
+        $filter, $rootScope, AlertsService, LoaderService,
+        PageTitleService, UrlInterpolationService, UrlService,
+        FATAL_ERROR_CODES) {
       var ctrl = this;
+
+      var classroomBackendApiService = (
+        OppiaAngularRootComponent.classroomBackendApiService);
+
+      ctrl.getClassroomBackendApiService = function() {
+        return classroomBackendApiService;
+      };
 
       ctrl.$onInit = function() {
         var classroomName = UrlService.getClassroomNameFromUrl();
@@ -57,7 +64,7 @@ angular.module('oppia').component('classroomPage', {
           ctrl.classroomDisplayName + ' Classroom | Oppia');
 
         LoaderService.showLoadingScreen('Loading');
-        ClassroomBackendApiService.fetchClassroomData(
+        ctrl.getClassroomBackendApiService().fetchClassroomData(
           classroomName).then(function(topicSummaryObjects) {
           ctrl.topicSummaries = topicSummaryObjects;
           LoaderService.hideLoadingScreen();
