@@ -224,6 +224,19 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
             'core/templates/Polyfills.ts',
             'core/templates/filters/translate.pipe.spec.ts'),
         'excluded_dirs': ('core/tests/',)
+    },
+    {
+        'regexp': re.compile(
+            r'eslint-(disable|enable)(-next-line)? camelcase'),
+        'message': (
+            'Please do not use eslint disable for camelcase. '
+            'If you are using this statement to define properties '
+            'in an interface for a backend dict. Wrap the property '
+            'name in single quotes instead.'),
+        'excluded_files': (
+            'typings/guppy-defs-b5055b963fdbea5c6c1e92dbf58fdaf3ea0cd8ba.d.ts',
+            'core/templates/services/UpgradedServices.ts'),
+        'excluded_dirs': ()
     }
 ]
 

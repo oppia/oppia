@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Primary controller for the skill editor page.
+ * @fileoverview Component for the skill editor page.
  */
 
 require('interactions/interactionsQuestionsRequires.ts');
@@ -33,28 +33,19 @@ require(
 require('pages/skill-editor-page/skill-editor-page.constants.ajs.ts');
 require('pages/interaction-specs.constants.ajs.ts');
 
-angular.module('oppia').directive('skillEditorPage', [
-  'UrlInterpolationService', function(
-      UrlInterpolationService) {
-    return {
-      restrict: 'E',
-      scope: {},
-      bindToController: {},
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/skill-editor-page/skill-editor-page.directive.html'),
-      controllerAs: '$ctrl',
-      controller: [
-        'SkillEditorRoutingService', 'SkillEditorStateService', 'UrlService',
-        function(
-            SkillEditorRoutingService, SkillEditorStateService, UrlService) {
-          var ctrl = this;
-          ctrl.getActiveTabName = function() {
-            return SkillEditorRoutingService.getActiveTabName();
-          };
-          ctrl.$onInit = function() {
-            SkillEditorStateService.loadSkill(UrlService.getSkillIdFromUrl());
-          };
-        }
-      ]
-    };
-  }]);
+angular.module('oppia').component('skillEditorPage', {
+  template: require('./skill-editor-page.component.html'),
+  controller: [
+    'SkillEditorRoutingService', 'SkillEditorStateService', 'UrlService',
+    function(
+        SkillEditorRoutingService, SkillEditorStateService, UrlService) {
+      var ctrl = this;
+      ctrl.getActiveTabName = function() {
+        return SkillEditorRoutingService.getActiveTabName();
+      };
+      ctrl.$onInit = function() {
+        SkillEditorStateService.loadSkill(UrlService.getSkillIdFromUrl());
+      };
+    }
+  ]
+});
