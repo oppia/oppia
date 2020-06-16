@@ -169,7 +169,8 @@ VALIDATOR_SPECS = {
                 'type': SCHEMA_TYPE_BOOL
             }
         },
-        'is_valid_math_equation': {}
+        'is_valid_math_equation': {},
+        'is_valid_translation_language_code': {}
     },
 }
 
