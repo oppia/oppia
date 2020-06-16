@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controllers for the 'thanks' page.
+ * @fileoverview Component for the 'thanks' page.
  */
 
 require(
