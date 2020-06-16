@@ -28,8 +28,6 @@ import python_utils
 from . import linter_utils
 from .. import common
 
-_MESSAGE_TYPE_SUCCESS = 'SUCCESS'
-_MESSAGE_TYPE_FAILED = 'FAILED'
 
 EXCLUDED_PATHS = (
     'third_party/*', 'build/*', '.git/*', '*.pyc', 'CHANGELOG',
@@ -166,6 +164,7 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
         'excluded_files': (
             'core/templates/pages/exploration-player-page/'
             'FeedbackPopupDirective.js',
+            '.component.ts'
         ),
         'excluded_dirs': (
             'extensions/answer_summarizers/',
@@ -221,8 +220,23 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
     {
         'regexp': re.compile(r'innerHTML'),
         'message': 'Please do not use innerHTML property.',
-        'excluded_files': ('core/templates/Polyfills.ts',),
+        'excluded_files': (
+            'core/templates/Polyfills.ts',
+            'core/templates/filters/translate.pipe.spec.ts'),
         'excluded_dirs': ('core/tests/',)
+    },
+    {
+        'regexp': re.compile(
+            r'eslint-(disable|enable)(-next-line)? camelcase'),
+        'message': (
+            'Please do not use eslint disable for camelcase. '
+            'If you are using this statement to define properties '
+            'in an interface for a backend dict. Wrap the property '
+            'name in single quotes instead.'),
+        'excluded_files': (
+            'typings/guppy-defs-b5055b963fdbea5c6c1e92dbf58fdaf3ea0cd8ba.d.ts',
+            'core/templates/services/UpgradedServices.ts'),
+        'excluded_dirs': ()
     }
 ]
 
@@ -530,7 +544,8 @@ def check_bad_pattern_in_file(filepath, file_content, pattern):
     regexp = pattern['regexp']
     if not (any(filepath.startswith(excluded_dir)
                 for excluded_dir in pattern['excluded_dirs'])
-            or filepath in pattern['excluded_files']):
+            or any(filepath.endswith(excluded_file)
+                   for excluded_file in pattern['excluded_files'])):
         bad_pattern_count = 0
         for line_num, line in enumerate(file_content.split('\n'), 1):
             if line.endswith('disable-bad-pattern-check'):
@@ -664,12 +679,13 @@ class GeneralPurposeLinter(python_utils.OBJECT):
 
             if failed:
                 summary_message = (
-                    '%s  Mandatory pattern check failed, see errors above for'
-                    'patterns that should be added.' % _MESSAGE_TYPE_FAILED)
+                    '%s Mandatory pattern check failed, see errors above for'
+                    'patterns that should be added.' % (
+                        linter_utils.FAILED_MESSAGE_PREFIX))
             else:
                 summary_message = (
-                    '%s  Mandatory pattern check passed' % (
-                        _MESSAGE_TYPE_SUCCESS))
+                    '%s Mandatory pattern check passed' % (
+                        linter_utils.SUCCESS_MESSAGE_PREFIX))
             python_utils.PRINT(summary_message)
 
         python_utils.PRINT('')
@@ -728,11 +744,11 @@ class GeneralPurposeLinter(python_utils.OBJECT):
                 summary_message = (
                     '%s Pattern check failed, see errors above '
                     'for patterns that should be removed.' % (
-                        _MESSAGE_TYPE_FAILED))
+                        linter_utils.FAILED_MESSAGE_PREFIX))
                 summary_messages.append(summary_message)
             else:
                 summary_message = '%s Pattern checks passed' % (
-                    _MESSAGE_TYPE_SUCCESS)
+                    linter_utils.SUCCESS_MESSAGE_PREFIX)
                 summary_messages.append(summary_message)
 
             python_utils.PRINT('')
@@ -744,6 +760,43 @@ class GeneralPurposeLinter(python_utils.OBJECT):
                 python_utils.PRINT(summary_message)
         return summary_messages
 
+    def _check_newline_at_eof(self):
+        """This function is used to detect newline at the end of file."""
+        if self.verbose_mode_enabled:
+            python_utils.PRINT(
+                'Starting newline at eof check\n'
+                '----------------------------------------')
+        summary_messages = []
+        files_to_lint = self.all_filepaths
+        failed = False
+
+        with linter_utils.redirect_stdout(sys.stdout):
+            for filepath in files_to_lint:
+                file_content = FILE_CACHE.readlines(filepath)
+                file_length = len(file_content)
+                if (
+                        file_length >= 1 and
+                        not re.search(r'[^\n]\n', file_content[-1])):
+                    summary_message = (
+                        '%s --> There should be a single newline at the '
+                        'end of file.' % filepath)
+                    summary_messages.append(summary_message)
+                    python_utils.PRINT(summary_message)
+                    failed = True
+
+            if failed:
+                summary_message = (
+                    '%s Newline at the eof check failed.' % (
+                        linter_utils.FAILED_MESSAGE_PREFIX))
+            else:
+                summary_message = (
+                    '%s Newline at the eof check passed.' % (
+                        linter_utils.SUCCESS_MESSAGE_PREFIX))
+            summary_messages.append(summary_message)
+            python_utils.PRINT(summary_message)
+
+        return summary_messages
+
     def perform_all_lint_checks(self):
         """Perform all the lint checks and returns the messages returned by all
         the checks.
@@ -753,8 +806,11 @@ class GeneralPurposeLinter(python_utils.OBJECT):
         """
         mandatory_patterns_messages = self._check_mandatory_patterns()
         pattern_messages = self._check_bad_patterns()
+        newline_at_eof_messages = self._check_newline_at_eof()
 
-        all_messages = mandatory_patterns_messages + pattern_messages
+        all_messages = (
+            mandatory_patterns_messages + pattern_messages +
+            newline_at_eof_messages)
         return all_messages
 
 
