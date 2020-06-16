@@ -426,15 +426,15 @@ def get_datetime_from_millisecs(millisecs):
     """Returns corresponding datetime from milliseconds since the UTC Epoch.
 
     Args:
-        milliseconds: float. Milliseconds since the UTC Epoch.
+        millisecs: float. Milliseconds since the UTC Epoch.
 
     Returns:
         datetime.datetime. The corresponding datetime.
     """
-    secs = python_utils.divide(millisecs, 1000)
-    msecs = millisecs % 1000
-    return datetime.datetime.fromtimestamp(secs, tz=pytz.utc).replace(
-        microsecond=int(msecs * 1000), tzinfo=None)
+    seconds = python_utils.divide(millisecs, 1000)
+    remainder_millisecs = millisecs % 1000
+    return datetime.datetime.fromtimestamp(seconds, tz=pytz.utc).replace(
+        microsecond=int(remainder_millisecs * 1000), tzinfo=None)
 
 
 def get_current_time_in_millisecs():
