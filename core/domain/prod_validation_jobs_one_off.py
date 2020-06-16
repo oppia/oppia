@@ -5047,7 +5047,7 @@ class PlaythroughModelValidator(BaseModelValidator):
     @classmethod
     def _get_external_id_relationships(cls, item):
         return {
-            'exp_id': (
+            'exp_ids': (
                 exp_models.ExplorationModel, [item.exp_id]),
         }
 
