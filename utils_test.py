@@ -363,3 +363,13 @@ class UtilsTests(test_utils.GenericTestBase):
             'Expected a filename ending in svg, received name.jpg', 'name.jpg')
         filename = 'filename.svg'
         utils.require_valid_thumbnail_filename(filename)
+
+    def test_time_helper_functions(self):
+        dt = datetime.datetime(2020, 6, 15)
+        msecs = utils.get_time_in_millisecs(dt)
+        self.assertEqual(dt, utils.get_datetime_from_millisecs(msecs))
+
+    def test_time_helper_functions_with_complicated_time(self):
+        dt = datetime.datetime(2020, 6, 15, 5, 18, 23, microsecond=123456)
+        msecs = utils.get_time_in_millisecs(dt)
+        self.assertEqual(dt, utils.get_datetime_from_millisecs(msecs))
