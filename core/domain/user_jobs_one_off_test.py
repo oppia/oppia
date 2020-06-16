@@ -29,7 +29,6 @@ from core.domain import event_services
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import feedback_services
-from core.domain import html_validation_service
 from core.domain import rating_services
 from core.domain import rights_manager
 from core.domain import subscription_services
@@ -232,6 +231,14 @@ class DraftChangesMathValidationOneOffJobTests(test_utils.GenericTestBase):
             '<p>Value</p><oppia-noninteractive-math></oppia-noninteractive-m'
             'ath>')
 
+        invalid_html_content2 = (
+            '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="'
+            '+,-,-,+"></oppia-noninteractive-math>')
+
+        valid_html_content = (
+            '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&a'
+            'mp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>')
+
         draft_change_list = [
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
@@ -240,7 +247,7 @@ class DraftChangesMathValidationOneOffJobTests(test_utils.GenericTestBase):
                 'new_value': {
                     'choices': {
                         'value': [
-                            '<p>1</p>',
+                            invalid_html_content2,
                             '<p>2</p>',
                             invalid_html_content1,
                             '<p>4</p>'
@@ -266,12 +273,12 @@ class DraftChangesMathValidationOneOffJobTests(test_utils.GenericTestBase):
                     }, {
                         'rule_type': 'ContainsAtLeastOneOf',
                         'inputs': {
-                            'x': [invalid_html_content1]
+                            'x': [invalid_html_content2]
                         }
                     }, {
                         'rule_type': 'IsProperSubsetOf',
                         'inputs': {
-                            'x': [invalid_html_content1]
+                            'x': [invalid_html_content2]
                         }
                     }, {
                         'rule_type': 'DoesNotContainAtLeastOneOf',
@@ -298,13 +305,13 @@ class DraftChangesMathValidationOneOffJobTests(test_utils.GenericTestBase):
                         'rule_type': 'HasElementXBeforeElementY',
                         'inputs': {
                             'x': invalid_html_content1,
-                            'y': invalid_html_content1
+                            'y': valid_html_content
                         }
                     }, {
                         'rule_type': (
                             'IsEqualToOrderingWithOneItemAtIncorrectPosition'),
                         'inputs': {
-                            'x': [[invalid_html_content1]]
+                            'x': [[invalid_html_content2]]
                         }
                     }],
                     'outcome': {
@@ -337,7 +344,7 @@ class DraftChangesMathValidationOneOffJobTests(test_utils.GenericTestBase):
                     'translations_mapping': {
                         'content1': {
                             'en': {
-                                'html': invalid_html_content1,
+                                'html': valid_html_content,
                                 'needs_update': True
                             },
                             'hi': {
@@ -347,7 +354,7 @@ class DraftChangesMathValidationOneOffJobTests(test_utils.GenericTestBase):
                         },
                         'feedback_1': {
                             'hi': {
-                                'html': invalid_html_content1,
+                                'html': invalid_html_content2,
                                 'needs_update': False
                             },
                             'en': {
@@ -377,7 +384,7 @@ class DraftChangesMathValidationOneOffJobTests(test_utils.GenericTestBase):
                     'param_changes': [],
                     'feedback': {
                         'content_id': 'default_outcome',
-                        'html': invalid_html_content1
+                        'html': invalid_html_content2
                     },
                     'dest': 'Introduction',
                     'refresher_exploration_id': None,
@@ -417,10 +424,20 @@ class DraftChangesMathValidationOneOffJobTests(test_utils.GenericTestBase):
         list_finishing_index = stringified_value_dict.find(']')
         stringified_error_list = (
             stringified_value_dict[
-                list_starting_index:list_finishing_index + 1])
+                list_starting_index + 1:list_finishing_index])
+        invalid_tags_in_output = stringified_error_list.split(', ')
+        invalid_tag1 = (
+            '<oppia-noninteractive-math></oppia-noninteractive-math>')
+        invalid_tag2 = (
+            '<oppia-noninteractive-math raw_latex-with-value="+,-,-,+"></oppi'
+            'a-noninteractive-math>')
+        expected_invalid_tags = [invalid_tag1, invalid_tag2]
+
+        for invalid_tag in invalid_tags_in_output:
+            self.assertTrue(invalid_tag in expected_invalid_tags)
+
         self.assertEqual(
-            len(html_validation_service.validate_math_tags_in_html(
-                stringified_error_list)), 17)
+            len(invalid_tags_in_output), 16)
         self.assertEqual(len(output), 1)
 
     def test_draft_changes_with_valid_tags(self):
