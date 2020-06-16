@@ -312,26 +312,16 @@ describe('PlaythroughService', () => {
         jasmine.createSpyObj('Stopwatch', {getTimeInSecs: 360, reset: null}));
 
       playthroughService.recordExplorationStartAction('stateName1');
-      this.recordCycle(3, 'A', 'B');
-      this.recordStateTransitions('A', 'C');
-      this.recordCycle(3, 'C', 'D');
-      this.recordStateTransitions('C', 'E');
-      this.recordCycle(3, 'E', 'F');
-      this.recordStateTransitions('E', 'G');
-      this.recordCycle(3, 'G', 'H');
-      this.recordStateTransitions('G', 'I');
-      this.recordCycle(3, 'I', 'J');
-      this.recordStateTransitions('I', 'K');
-      this.recordCycle(3, 'K', 'L');
-      this.recordStateTransitions('K', 'M');
-      this.recordCycle(3, 'M', 'N');
-      this.recordStateTransitions('M', 'O');
-      this.recordCycle(3, 'O', 'P');
-      this.recordStateTransitions('O', 'Q');
-      this.recordCycle(3, 'Q', 'R');
-      this.recordStateTransitions('Q', 'S');
-      this.recordCycle(3, 'S', 'T');
-      this.recordStateTransitions('S', 'U');
+      this.recordCycle(3, 'A', 'B'); this.recordStateTransitions('A', 'C');
+      this.recordCycle(3, 'C', 'D'); this.recordStateTransitions('C', 'E');
+      this.recordCycle(3, 'E', 'F'); this.recordStateTransitions('E', 'G');
+      this.recordCycle(3, 'G', 'H'); this.recordStateTransitions('G', 'I');
+      this.recordCycle(3, 'I', 'J'); this.recordStateTransitions('I', 'K');
+      this.recordCycle(3, 'K', 'L'); this.recordStateTransitions('K', 'M');
+      this.recordCycle(3, 'M', 'N'); this.recordStateTransitions('M', 'O');
+      this.recordCycle(3, 'O', 'P'); this.recordStateTransitions('O', 'Q');
+      this.recordCycle(3, 'Q', 'R'); this.recordStateTransitions('Q', 'S');
+      this.recordCycle(3, 'S', 'T'); this.recordStateTransitions('S', 'U');
       playthroughService.recordExplorationQuitAction('stateName6', 30);
 
       const playthrough = playthroughService.getPlaythrough();
@@ -339,6 +329,28 @@ describe('PlaythroughService', () => {
       expect(playthrough.issueType).toEqual('CyclicStateTransitions');
       expect(playthrough.issueCustomizationArgs).toEqual({
         state_names: {value: ['S', 'T', 'S']},
+      });
+    });
+
+    it('should only track inner-most cycle of nested cycles', () => {
+      spyOn(stopwatchObjectFactory, 'create').and.returnValue(
+        jasmine.createSpyObj('Stopwatch', {getTimeInSecs: 360, reset: null}));
+
+      playthroughService.recordExplorationStartAction('stateName1');
+      this.recordCycle(5, 'A', 'B', 'C', 'D', 'E');
+      this.recordStateTransitions('E', 'F', 'A');
+      this.recordCycle(
+        2,
+        'A', 'B',
+        'C', 'D', 'C', 'D', 'C', 'D', 'C', // Inner cycles.
+        'D', 'E');
+      playthroughService.recordExplorationQuitAction('stateName1', 60);
+
+      const playthrough = playthroughService.getPlaythrough();
+      expect(playthrough).not.toBeNull();
+      expect(playthrough.issueType).toEqual('CyclicStateTransitions');
+      expect(playthrough.issueCustomizationArgs).toEqual({
+        state_names: {value: ['C', 'D', 'C']},
       });
     });
 
