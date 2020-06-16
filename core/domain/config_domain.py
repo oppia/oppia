@@ -37,7 +37,10 @@ LIST_OF_FEATURED_TRANSLATION_LANGUAGES_DICTS_SCHEMA = {
         'properties': [{
             'name': 'language_code',
             'schema': {
-                'type': 'unicode'
+                'type': 'unicode',
+                'validators': [{
+                    'id': 'is_valid_translation_language_code',
+                }]
             },
         }, {
             'name': 'description',
