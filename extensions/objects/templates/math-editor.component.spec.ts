@@ -17,7 +17,7 @@
  */
 
 describe('MathEditor', function() {
-  var MathEditorCtrl = null;
+  var MathEditorCtrl = null, $window = null;
   class MockGuppy {
     constructor(id: string, config: Object) {}
 
@@ -31,9 +31,10 @@ describe('MathEditor', function() {
   }
 
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.inject(function($componentController) {
+  beforeEach(angular.mock.inject(function($injector, $componentController) {
+    $window = $injector.get('$window');
     MathEditorCtrl = $componentController('mathEditor');
-    (<any>window).Guppy = MockGuppy;
+    $window.Guppy = MockGuppy;
 
     MathEditorCtrl.$onInit();
   }));

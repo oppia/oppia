@@ -2,7 +2,6 @@
 // Code - third_party/static/guppy-175999/src/guppy.js
 // This guppy version corresponds to the commit on June 15 2020. 
 // For reference, visit:
-// eslint-disable-next-line max-len
 // https://github.com/daniel3735928559/guppy/tree/1759992a3885cb99d3ead04241f318a074c9f963
 
 interface GuppyConfig {

@@ -15,10 +15,11 @@
   Guppy.configure('empty_content', '\\color{grey}{\\text{\\small{Type a formula here.}}}');
 
   // Remove symbols since they are not supported.
-  var symbols_to_remove = ['norm', 'utf8', 'text', 'sym_name', 'eval', 'floor',
-    'factorial', 'sub', 'int', 'defi', 'deriv', 'sum', 'prod', 'root', 'vec',
-    'point', 'infinity', 'leq', 'less', 'geq', 'greater', 'neq'];
-  for(var symbol of symbols_to_remove) {
+  var symbols_to_remove = [
+    'norm', 'utf8', 'text', 'sym_name', 'eval', 'floor', 'factorial', 'sub',
+    'int', 'defi', 'deriv', 'sum', 'prod', 'root', 'vec', 'point', 'infinity',
+    'leq', 'less', 'geq', 'greater', 'neq'];
+  for (var symbol of symbols_to_remove) {
     Guppy.remove_global_symbol(symbol);
   }
 </script>
