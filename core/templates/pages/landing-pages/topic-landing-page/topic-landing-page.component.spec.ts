@@ -18,8 +18,11 @@
 
 import { WindowRef } from 'services/contextual/window-ref.service';
 
+require(
+  'pages/landing-pages/topic-landing-page/topic-landing-page.component.ts');
+
 describe('Topic Landing Page', function() {
-  var $scope = null, ctrl = null;
+  var ctrl = null;
   var $timeout = null, $window = null;
   var SiteAnalyticsService = null;
   var windowRef = new WindowRef();
@@ -31,17 +34,12 @@ describe('Topic Landing Page', function() {
       setPageTitle: function() {}
     });
   }));
-  beforeEach(angular.mock.inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector, $componentController) {
     $timeout = $injector.get('$timeout');
     $window = $injector.get('$window');
     SiteAnalyticsService = $injector.get('SiteAnalyticsService');
 
-    var $rootScope = $injector.get('$rootScope');
-    $scope = $rootScope.$new();
-    var directive = $injector.get('topicLandingPageDirective')[0];
-    ctrl = $injector.instantiate(directive.controller, {
-      $scope: $scope
-    });
+    ctrl = $componentController('topicLandingPage');
   }));
 
   it('should get information from topic identified at pathname', function() {
