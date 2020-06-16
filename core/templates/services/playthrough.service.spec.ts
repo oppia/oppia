@@ -54,7 +54,7 @@ describe('PlaythroughService', () => {
           stateNames[i], stateNames[i + 1],
           'TextInput', 'Hello', 'Correct', 30);
       }
-    }
+    };
 
     this.recordWrongAnswers = (times: number, stateName: string) => {
       for (let i = 0; i < times; ++i) {
@@ -312,22 +312,33 @@ describe('PlaythroughService', () => {
         jasmine.createSpyObj('Stopwatch', {getTimeInSecs: 360, reset: null}));
 
       playthroughService.recordExplorationStartAction('stateName1');
-      this.recordCycle(3, 'stateName1', 'stateName2');
-      playthroughService.recordAnswerSubmitAction(
-        'stateName1', 'stateName3', 'TextInput', 'Hello', 'Try again', 30);
-      this.recordCycle(3, 'stateName3', 'stateName4');
-      playthroughService.recordAnswerSubmitAction(
-        'stateName3', 'stateName5', 'TextInput', 'Hello', 'Try again', 30);
-      this.recordCycle(3, 'stateName5', 'stateName6');
+      this.recordCycle(3, 'A', 'B');
+      this.recordStateTransitions('A', 'C');
+      this.recordCycle(3, 'C', 'D');
+      this.recordStateTransitions('C', 'E');
+      this.recordCycle(3, 'E', 'F');
+      this.recordStateTransitions('E', 'G');
+      this.recordCycle(3, 'G', 'H');
+      this.recordStateTransitions('G', 'I');
+      this.recordCycle(3, 'I', 'J');
+      this.recordStateTransitions('I', 'K');
+      this.recordCycle(3, 'K', 'L');
+      this.recordStateTransitions('K', 'M');
+      this.recordCycle(3, 'M', 'N');
+      this.recordStateTransitions('M', 'O');
+      this.recordCycle(3, 'O', 'P');
+      this.recordStateTransitions('O', 'Q');
+      this.recordCycle(3, 'Q', 'R');
+      this.recordStateTransitions('Q', 'S');
+      this.recordCycle(3, 'S', 'T');
+      this.recordStateTransitions('S', 'U');
       playthroughService.recordExplorationQuitAction('stateName6', 30);
 
       const playthrough = playthroughService.getPlaythrough();
       expect(playthrough).not.toBeNull();
       expect(playthrough.issueType).toEqual('CyclicStateTransitions');
       expect(playthrough.issueCustomizationArgs).toEqual({
-        state_names: {
-          value: ['stateName5', 'stateName6', 'stateName5']
-        },
+        state_names: {value: ['S', 'T', 'S']},
       });
     });
 
