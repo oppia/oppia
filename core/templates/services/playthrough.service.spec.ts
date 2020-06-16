@@ -292,8 +292,9 @@ describe('PlaythroughService', () => {
 
       playthroughService.recordExplorationStartAction('stateName1');
       this.recordCycle(2, 'stateName1', 'stateName2', 'stateName3');
-      this.recordCycle(2, 'stateName1', 'stateName2');
-      this.recordCycle(2, 'stateName1', 'stateName2', 'stateName3');
+      this.recordStateTransitions(
+        'stateName1', 'stateName2', 'stateName1', 'stateName2');
+      this.recordCycle(2, 'stateName2', 'stateName3', 'stateName1');
       playthroughService.recordExplorationQuitAction('stateName1', 10);
 
       const playthrough = playthroughService.getPlaythrough();
