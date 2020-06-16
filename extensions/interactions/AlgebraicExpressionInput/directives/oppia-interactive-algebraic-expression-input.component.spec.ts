@@ -92,13 +92,11 @@ describe('AlgebraicExpressionInputInteractive', function() {
     // This should be validated as false if the editor has been touched.
     ctrl.value = '';
     expect(ctrl.isCurrentAnswerValid()).toBeFalse();
-    expect(ctrl.warningText).toBe(
-      'Please enter a non-empty answer.');
+    expect(ctrl.warningText).toBe('Please enter a non-empty answer.');
 
     ctrl.value = 'a/';
     expect(ctrl.isCurrentAnswerValid()).toBeFalse();
-    expect(ctrl.warningText).toBe(
-      '/ is not a valid postfix operator.');
+    expect(ctrl.warningText).toBe('/ is not a valid postfix operator.');
 
     ctrl.value = '12+sqrt(4)';
     expect(ctrl.isCurrentAnswerValid()).toBeFalse();

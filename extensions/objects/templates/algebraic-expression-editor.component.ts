@@ -53,9 +53,9 @@ angular.module('oppia').component('algebraicExpressionEditor', {
     };
 
     var cleanErrorMessage = function(errorMessage) {
-      var semiColonIndex = errorMessage.indexOf(':');
-      if (semiColonIndex !== -1) {
-        errorMessage = errorMessage.slice(0, semiColonIndex);
+      var colonIndex = errorMessage.indexOf(':');
+      if (colonIndex !== -1) {
+        errorMessage = errorMessage.slice(0, colonIndex);
       }
       var atColonIndex = errorMessage.indexOf(' at ');
       if (atColonIndex !== -1) {

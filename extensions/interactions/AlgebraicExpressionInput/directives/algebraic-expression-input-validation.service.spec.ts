@@ -73,14 +73,14 @@ describe('AlgebraicExpressionInputValidationService', () => {
     matchesExactlyWith = rof.createFromBackendDict({
       rule_type: 'MatchesExactlyWith',
       inputs: {
-        x: 'x'
+        x: 'x * x'
       }
     });
 
     isEquivalentTo = rof.createFromBackendDict({
       rule_type: 'IsEquivalentTo',
       inputs: {
-        x: 'x'
+        x: 'x^2'
       }
     });
 
@@ -98,15 +98,44 @@ describe('AlgebraicExpressionInputValidationService', () => {
     expect(warnings).toEqual([]);
   });
 
-  it('should catch redundancy of rules', () => {
+  it('should catch redundancy of rules with matching inputs', () => {
     answerGroups[0].rules = [isEquivalentTo, matchesExactlyWith];
 
     var warnings = validatorService.getAllWarnings(currentState,
       customizationArgs, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: 'Rule 2 from answer group 1 will never be matched ' +
-          'because it is preceded by an \'IsEquivalentToRule\'.'
+      message: 'Rule 2 from answer group 1 will never be matched because it' +
+      ' is preceded by an \'IsEquivalentToRule\' with a matching input.'
     }]);
+  });
+
+  it('should not catch redundancy of rules with non-matching inputs', () => {
+    matchesExactlyWith = rof.createFromBackendDict({
+      rule_type: 'MatchesExactlyWith',
+      inputs: {
+        x: 'x * y'
+      }
+    });
+    isEquivalentTo = rof.createFromBackendDict({
+      rule_type: 'IsEquivalentTo',
+      inputs: {
+        x: 'x + y'
+      }
+    });
+
+    answerGroups[0].rules = [isEquivalentTo, matchesExactlyWith];
+
+    var warnings = validatorService.getAllWarnings(currentState,
+      customizationArgs, answerGroups, goodDefaultOutcome);
+    expect(warnings).toEqual([]);
+  });
+
+  it('should not catch rules that are ordered correctly', () => {
+    answerGroups[0].rules = [matchesExactlyWith, isEquivalentTo];
+
+    var warnings = validatorService.getAllWarnings(currentState,
+      customizationArgs, answerGroups, goodDefaultOutcome);
+    expect(warnings).toEqual([]);
   });
 });
