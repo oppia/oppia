@@ -64,7 +64,7 @@ describe('Remove Activity From Learner Dashboard Modal Controller',
         expect($scope.activityTitle).toEqual(activity.title);
       });
 
-      it('should remove', function() {
+      it('should remove activity', function() {
         $httpBackend.expectDELETE(
           '/learnerplaylistactivityhandler/exploration/1').respond(200);
         $scope.remove();
@@ -109,7 +109,7 @@ describe('Remove Activity From Learner Dashboard Modal Controller',
         });
       }));
 
-      it('should remove', function() {
+      it('should remove activity', function() {
         $httpBackend.expectDELETE(
           '/learnerincompleteactivityhandler/collection/1').respond(200);
         $scope.remove();
@@ -147,7 +147,7 @@ describe('Remove Activity From Learner Dashboard Modal Controller',
         expect($scope.activityTitle).toEqual(activity.title);
       });
 
-      it('should not remove', function() {
+      it('should not remove activity', function() {
         expect(function() {
           $scope.remove();
         }).toThrowError('Subsection name is not valid.');
@@ -176,7 +176,7 @@ describe('Remove Activity From Learner Dashboard Modal Controller',
         });
       }));
 
-      it('should remove', function() {
+      it('should remove activity', function() {
         expect(function() {
           $scope.remove();
         }).toThrowError('Section name is not valid.');
