@@ -409,7 +409,7 @@ def base64_from_int(value):
 
 
 def get_time_in_millisecs(datetime_obj):
-    """Returns time in milliseconds since the Epoch.
+    """Returns time in milliseconds since the UTC Epoch.
 
     Args:
         datetime_obj: datetime. An object of type datetime.datetime.
@@ -422,19 +422,17 @@ def get_time_in_millisecs(datetime_obj):
     return (utc_dt - utc_epoch).total_seconds() * 1000
 
 
-def get_datetime_from_millisecs(millisecs):
+def get_datetime_from_millisecs(msecs):
     """Returns corresponding datetime from milliseconds since the UTC Epoch.
 
     Args:
-        millisecs: float. Milliseconds since the UTC Epoch.
+        msecs: float. Milliseconds since the UTC Epoch.
 
     Returns:
         datetime.datetime. The corresponding datetime.
     """
-    seconds = python_utils.divide(millisecs, 1000)
-    remainder_millisecs = millisecs % 1000
-    return datetime.datetime.fromtimestamp(seconds, tz=pytz.utc).replace(
-        microsecond=int(remainder_millisecs * 1000), tzinfo=None)
+    return datetime.datetime.fromtimestamp(
+        python_utils.divide(msecs, 1000.0), tz=pytz.utc).replace(tzinfo=None)
 
 
 def get_current_time_in_millisecs():
