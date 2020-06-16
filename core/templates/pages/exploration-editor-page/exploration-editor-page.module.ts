@@ -43,6 +43,9 @@ import { SharedComponentsModule } from 'components/shared-component.module';
 export class ServiceBootstrapComponent {}
 
 import { AppConstants } from 'app.constants';
+import { CkEditorCopyToolbar } from
+  /* eslint-disable max-len */
+  'components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.component';
 import { ClassifiersExtensionConstants } from
   'classifiers/classifiers-extension.constants';
 import { CollectionSummaryTileConstants } from
@@ -70,9 +73,11 @@ import { ExplorationEditorPageConstants } from
     SharedComponentsModule
   ],
   declarations: [
+    CkEditorCopyToolbar,
     ServiceBootstrapComponent
   ],
   entryComponents: [
+    CkEditorCopyToolbar,
     ServiceBootstrapComponent
   ],
   providers: [

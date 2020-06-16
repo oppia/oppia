@@ -136,7 +136,10 @@ angular.module('oppia').directive('stateTranslation', [
           };
 
           $scope.onContentClick = function($event) {
-            CkEditorCopyContentService.broadcastCopy($scope, $event.target);
+            console.log($scope.copyMode)
+            if ($scope.copyMode) {
+              CkEditorCopyContentService.broadcastCopy($scope, $event.target);
+            }
           };
 
           $scope.onTabClick = function(tabId) {
@@ -358,6 +361,7 @@ angular.module('oppia').directive('stateTranslation', [
             }
             $scope.onTabClick($scope.TAB_ID_CONTENT);
           };
+
           ctrl.$onInit = function() {
             // Define tab constants.
             $scope.TAB_ID_CONTENT = COMPONENT_NAME_CONTENT;
@@ -373,6 +377,7 @@ angular.module('oppia').directive('stateTranslation', [
 
             $scope.activeHintIndex = null;
             $scope.activeAnswerGroupIndex = null;
+            $scope.copyMode = false;
             $scope.stateContent = null;
             $scope.stateInteractionId = null;
             $scope.stateAnswerGroups = [];

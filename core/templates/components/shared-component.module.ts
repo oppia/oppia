@@ -24,6 +24,8 @@ import { CommonModule } from '@angular/common';
 import { BackgroundBannerComponent } from
   './common-layout-directives/common-elements/background-banner.component';
 import { TranslatePipe } from 'filters/translate.pipe';
+import { CkEditorCopyToolbar } from
+  './ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.component';
 
 
 @NgModule({
