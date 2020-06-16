@@ -28,8 +28,6 @@ angular.module('oppia').component('thanksPage', {
       UrlInterpolationService) {
     var ctrl = this;
     ctrl.$onInit = function() {
-      ctrl.thanksImgUrl = UrlInterpolationService.
-        getStaticImageUrl('/general/donate.webp');
       ctrl.getStaticImageUrl = function(imagePath) {
         return UrlInterpolationService.getStaticImageUrl(imagePath);
       };

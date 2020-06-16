@@ -36,9 +36,4 @@ describe('Thanks page', function() {
   beforeEach(angular.mock.inject(function($componentController) {
     ctrl = $componentController('thanksPage');
   }));
-
-  it('should set thanks image url when $onInit is called', function() {
-    ctrl.$onInit();
-    expect(ctrl.thanksImgUrl).toBe('/assets/images/general/donate.webp');
-  });
 });
