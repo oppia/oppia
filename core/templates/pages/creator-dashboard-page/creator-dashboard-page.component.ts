@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the creator dashboard.
+ * @fileoverview Component for the creator dashboard.
  */
 
 require('base-components/base-content.directive.ts');

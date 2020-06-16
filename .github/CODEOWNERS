@@ -108,20 +108,20 @@
 
 # Dev workflow team.
 /.circleci/ @kevinlee12
-/.eslintignore @kevinlee12
-/.eslintrc @kevinlee12
-/.htmllintrc @kevinlee12
-/.coveragerc @kevinlee12
+/.eslintignore @bansalnitish @Hudda
+/.eslintrc @bansalnitish @Hudda
+/.htmllintrc @bansalnitish @Hudda
+/.coveragerc @bansalnitish @Hudda
 /.gitattributes @kevinlee12
 /.gitignore @kevinlee12
-/.isort.cfg @kevinlee12
-/.pylintrc @kevinlee12
-/.stylelintrc @kevinlee12
+/.isort.cfg @bansalnitish @Hudda
+/.pylintrc @bansalnitish @Hudda
+/.stylelintrc @bansalnitish @Hudda
 /.travis.yml @kevinlee12
 /.yarnrc @kevinlee12
-/codecov.yml @kevinlee12
-/core/templates/css/.stylelintrc @kevinlee12
-/tox.ini @kevinlee12
+/codecov.yml @nithusha21
+/core/templates/css/.stylelintrc @bansalnitish @Hudda
+/tox.ini @bansalnitish @Hudda
 /scripts/*.py @DubeySandeep
 /scripts/check_e2e_tests_are_captured_in_ci*.py @Showtim3 @DubeySandeep
 /scripts/check_frontend_coverage*.py @nithusha21 @DubeySandeep
@@ -411,7 +411,7 @@
 /core/domain/__init__.py @nithusha21
 /core/domain/config*.py @DubeySandeep
 /core/domain/change_domain.py @ankita240796
-/core/templates/tests/ @kevinlee12 @nithusha21
+/core/templates/tests/ @nithusha21
 /core/templates/domain/utilities/ @bansalnitish
 /core/templates/Polyfills.ts @ankita240796
 /schema_utils*.py @seanlip
@@ -570,10 +570,10 @@
 /core/storage/ @seanlip
 /core/domain/user*.py @seanlip
 /export/ @seanlip
-/manifest.json @vojtechjelinek @kevinlee12
-/package.json @vojtechjelinek @kevinlee12
-/yarn.lock @vojtechjelinek @kevinlee12
-/scripts/install_third_party_libs.py @vojtechjelinek @kevinlee12
+/manifest.json @vojtechjelinek
+/package.json @vojtechjelinek
+/yarn.lock @vojtechjelinek
+/scripts/install_third_party_libs.py @vojtechjelinek
 /.github/ @kevinlee12
 /.github/CODEOWNERS @DubeySandeep
 /.github/stale.yml @ankita240796
