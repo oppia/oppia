@@ -794,13 +794,13 @@ class JobRegistryTests(test_utils.GenericTestBase):
             """A sample Abstract Class."""
             pass
 
-        mock_abstract_base_class = [TestMockAbstractClass]
+        mock_abstract_base_classes = [TestMockAbstractClass]
         with self.assertRaisesRegexp(
             Exception,
             'Tried to directly create a job using the abstract base '
             'manager class TestMockAbstractClass, which is not allowed.'):
             with self.swap(
-                jobs, 'ABSTRACT_BASE_CLASSES', mock_abstract_base_class):
+                jobs, 'ABSTRACT_BASE_CLASSES', mock_abstract_base_classes):
                 TestMockAbstractClass.create_new()
 
     def test_each_one_off_class_is_not_abstract(self):
