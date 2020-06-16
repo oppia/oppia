@@ -27,7 +27,7 @@ import { VoiceoverObjectFactory } from
 
 const constants = require('constants.ts');
 
-fdescribe('States object factory', () => {
+describe('States object factory', () => {
   describe('StatesObjectFactory', () => {
     var scope, sof, ssof, statesDict, statesWithCyclicOutcomeDict, statesWithAudioDict, vof;
     const oldNewStateTemplate = constants.NEW_STATE_TEMPLATE;
