@@ -282,7 +282,7 @@ jobs:
           command: |
             python -m scripts.run_e2e_tests --skip-install --suite="topicsAndSkillsDashboard"
       - run:
-          name: Run e2e topics and skills dashboard test
+          name: Run e2e topics and story editor
           command: |
             python -m scripts.run_e2e_tests --skip-install --suite="topicAndStoryEditor"
       - persist_to_workspace:

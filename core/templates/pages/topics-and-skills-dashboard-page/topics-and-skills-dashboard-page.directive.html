@@ -49,7 +49,7 @@
               </div>
               <div>
                 <i class="fa fa-angle-left topic-pagination-arrow" ng-click="$ctrl.changePageByOne($ctrl.MOVE_TO_PREV_PAGE)"></i>
-                <span class="dashboard-list-pagination-value" ng-repeat="n in $ctrl.generateNumbersTillRange($ctrl.currentCount/$ctrl.itemsPerPage)" ng-click="$ctrl.changePage($index)">
+                <span class="dashboard-list-pagination-value" ng-repeat="n in $ctrl.generateNumbersTillRange($ctrl.currentCount/$ctrl.itemsPerPage) track by $index" ng-click="$ctrl.goToPageNumber($index)">
                   <span ng-if="$ctrl.pageNumber===$index" class="dashboard-list-pagination-active"><[$index+1]></span>
                   <span ng-if="$ctrl.pageNumber!==$index"><[$index+1]></span>
                 </span>
@@ -105,7 +105,7 @@
             </div>
           </div>
         </div>
-        <div class="topic-skill-filter">
+        <div class="topic-skill-filter" ng-if="$ctrl.activeTab===$ctrl.TAB_NAME_TOPICS">
           <div class="topic-skill-filter-content">
             <div class="topic-skill-filter-header">
               <span class="topic-skill-filter-heading">Filter</span>
