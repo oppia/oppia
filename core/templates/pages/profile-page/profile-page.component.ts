@@ -32,10 +32,10 @@ require('services/date-time-format.service.ts');
 angular.module('oppia').component('profilePage', {
   template: require('./profile-page.component.html'),
   controller: [
-    '$http', '$log', '$window', 'DateTimeFormatService', 'LoaderService',
-    'UrlInterpolationService', 'UrlService', 'UserService',
-    function($http, $log, $window, DateTimeFormatService, LoaderService,
-        UrlInterpolationService, UrlService, UserService) {
+    '$http', '$log', 'DateTimeFormatService', 'LoaderService',
+    'UrlInterpolationService', 'UrlService', 'UserService', 'WindowRef',
+    function($http, $log, DateTimeFormatService, LoaderService,
+        UrlInterpolationService, UrlService, UserService, WindowRef) {
       var ctrl = this;
       var profileDataUrl = (
         '/profilehandler/data/' + UrlService.getUsernameFromProfileUrl());
@@ -110,9 +110,9 @@ angular.module('oppia').component('profilePage', {
               UserService.getLoginUrlAsync().then(
                 function(loginUrl) {
                   if (loginUrl) {
-                    window.location.href = loginUrl;
+                    WindowRef.nativeWindow.location.href = loginUrl;
                   } else {
-                    $window.location.reload();
+                    WindowRef.nativeWindow.location.reload();
                   }
                 }
               );
@@ -120,13 +120,18 @@ angular.module('oppia').component('profilePage', {
               if (!ctrl.isAlreadySubscribed) {
                 $http.post('/subscribehandler', {
                   creator_username: data.profile_username
-                }).then(() => ctrl.isAlreadySubscribed = true);
+                }).then(() => {
+                  ctrl.isAlreadySubscribed = true;
+                  ctrl.updateSubscriptionButtonPopoverText();
+                });
               } else {
                 $http.post('/unsubscribehandler', {
                   creator_username: data.profile_username
-                }).then(() => ctrl.isAlreadySubscribed = false);
+                }).then(() => {
+                  ctrl.isAlreadySubscribed = false;
+                  ctrl.updateSubscriptionButtonPopoverText();
+                });
               }
-              ctrl.updateSubscriptionButtonPopoverText();
             }
           };
 
