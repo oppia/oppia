@@ -16,6 +16,9 @@
  * @fileoverview Directive for the classroom.
  */
 
+import { OppiaAngularRootComponent } from
+  'components/oppia-angular-root.component';
+
 require('base-components/base-content.directive.ts');
 require(
   'components/common-layout-directives/common-elements/' +
@@ -32,7 +35,7 @@ require('services/contextual/window-dimensions.service.ts');
 require('pages/library-page/search-bar/search-bar.directive.ts');
 
 angular.module('oppia').component('classroomPage', {
-  templateUrl: require('./classroom-page.component.html'),
+  template: require('./classroom-page.component.html'),
   controller: [
     '$filter', '$rootScope', 'AlertsService',
     'ClassroomBackendApiService', 'LoaderService', 'PageTitleService',
@@ -42,6 +45,8 @@ angular.module('oppia').component('classroomPage', {
         ClassroomBackendApiService, LoaderService, PageTitleService,
         UrlInterpolationService, UrlService, FATAL_ERROR_CODES) {
       var ctrl = this;
+      ClassroomBackendApiService = (
+        OppiaAngularRootComponent.classroomBackendApiService);
       ctrl.$onInit = function() {
         var classroomName = UrlService.getClassroomNameFromUrl();
         ctrl.bannerImageFileUrl = UrlInterpolationService.getStaticImageUrl(
