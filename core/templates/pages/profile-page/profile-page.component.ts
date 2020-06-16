@@ -35,12 +35,10 @@ require('pages/profile-page/profile-page-backend-api.service');
 angular.module('oppia').component('profilePage', {
   template: require('./profile-page.component.html'),
   controller: [
-    '$scope', '$log', '$window',
-    'DateTimeFormatService', 'LoaderService',
-    'UrlInterpolationService', 'UserService',
-    function($scope, $log, $window,
-        DateTimeFormatService, LoaderService,
-        UrlInterpolationService, UserService) {
+    '$scope', '$log', 'DateTimeFormatService', 'LoaderService',
+    'UrlInterpolationService', 'UserService', 'WindowRef',
+    function($scope, $log, DateTimeFormatService, LoaderService,
+        UrlInterpolationService, UserService, WindowRef) {
       var ctrl = this;
       const ProfilePageBackendApiService = (
         OppiaAngularRootComponent.profilePageBackendApiService);
@@ -117,9 +115,9 @@ angular.module('oppia').component('profilePage', {
               UserService.getLoginUrlAsync().then(
                 function(loginUrl) {
                   if (loginUrl) {
-                    window.location.href = loginUrl;
+                    WindowRef.nativeWindow.location.href = loginUrl;
                   } else {
-                    $window.location.reload();
+                    WindowRef.nativeWindow.location.reload();
                   }
                 }
               );
@@ -129,15 +127,16 @@ angular.module('oppia').component('profilePage', {
                   .then(() => {
                     ctrl.isAlreadySubscribed = true;
                     $scope.$apply();
+                    ctrl.updateSubscriptionButtonPopoverText();
                   });
               } else {
                 ProfilePageBackendApiService.unsubscribe(data.profile_username)
                   .then(() => {
                     ctrl.isAlreadySubscribed = false;
                     $scope.$apply();
+                    ctrl.updateSubscriptionButtonPopoverText();
                   });
               }
-              ctrl.updateSubscriptionButtonPopoverText();
             }
           };
 
