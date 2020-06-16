@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Data and controllers for the Oppia profile page.
+ * @fileoverview Component for the Oppia profile page.
  */
 
 require('base-components/base-content.directive.ts');

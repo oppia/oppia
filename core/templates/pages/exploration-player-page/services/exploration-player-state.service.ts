@@ -17,6 +17,9 @@
  *  like engine service.
  */
 
+import { OppiaAngularRootComponent } from
+  'components/oppia-angular-root.component';
+
 require('domain/exploration/editable-exploration-backend-api.service.ts');
 require('domain/exploration/read-only-exploration-backend-api.service.ts');
 require('domain/question/pretest-question-backend-api.service.ts');
@@ -64,6 +67,8 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
       ReadOnlyExplorationBackendApiService, StateClassifierMappingService,
       StatsReportingService, UrlInterpolationService, UrlService,
       EXPLORATION_MODE) {
+    StatsReportingService = (
+      OppiaAngularRootComponent.statsReportingService);
     var currentEngineService = null;
     var explorationMode = EXPLORATION_MODE.OTHER;
     var editorPreviewMode = ContextService.isInExplorationEditorPage();

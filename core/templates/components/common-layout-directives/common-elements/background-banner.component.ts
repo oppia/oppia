@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the background banner.
+ * @fileoverview Component for the background banner.
  */
 
 import { Component, OnInit } from '@angular/core';

@@ -22,4 +22,4 @@ require('pages/landing-pages/topic-landing-page/topic-landing-page.module.ts');
 require('App.ts');
 
 require(
-  'pages/landing-pages/topic-landing-page/topic-landing-page.controller.ts');
+  'pages/landing-pages/topic-landing-page/topic-landing-page.component.ts');

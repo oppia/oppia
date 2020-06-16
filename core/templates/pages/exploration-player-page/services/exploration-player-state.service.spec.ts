@@ -139,7 +139,7 @@ describe('Exploration Player State Service', () => {
     ExplorationPlayerStateService = _ExplorationPlayerStateService_;
   }));
 
-  it('should properly initialize player', (done) => {
+  it('should properly initialize player', () => {
     let deferred = $q.defer();
     deferred.resolve([{
       version: 1,
@@ -168,7 +168,8 @@ describe('Exploration Player State Service', () => {
       expect(version).toEqual(1);
       callback();
     });
-    ExplorationPlayerStateService.initializePlayer(() => done());
-    $rootScope.$apply();
+    ExplorationPlayerStateService.initializePlayer(() => {
+      $rootScope.$apply();
+    });
   });
 });

@@ -24,4 +24,4 @@ require('App.ts');
 
 require(
   'pages/landing-pages/stewards-landing-page/' +
-  'stewards-landing-page.controller.ts');
+  'stewards-landing-page.component.ts');

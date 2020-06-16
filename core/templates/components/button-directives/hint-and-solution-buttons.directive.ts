@@ -16,6 +16,9 @@
  * @fileoverview Directive for hint and solution buttons.
  */
 
+import { OppiaAngularRootComponent } from
+  'components/oppia-angular-root.component';
+
 require(
   'pages/exploration-player-page/services/exploration-player-state.service.ts');
 require(
@@ -54,6 +57,8 @@ angular.module('oppia').directive('hintAndSolutionButtons', [
             PlayerPositionService, EVENT_ACTIVE_CARD_CHANGED,
             EVENT_NEW_CARD_OPENED, INTERACTION_SPECS, StatsReportingService) {
           var ctrl = this;
+          StatsReportingService = (
+            OppiaAngularRootComponent.statsReportingService);
           var _editorPreviewMode = ContextService.isInExplorationEditorPage();
           var resetLocalHintsArray = function() {
             ctrl.hintIndexes = [];

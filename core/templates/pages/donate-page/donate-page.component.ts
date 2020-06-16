@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the donate page.
+ * @fileoverview Component for the donate page.
  */
 
 import { Component, OnInit } from '@angular/core';

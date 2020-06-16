@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview About page component.
+ * @fileoverview Component for the about page.
  */
 
 import { Component, OnInit } from '@angular/core';

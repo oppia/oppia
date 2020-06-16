@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Data and controllers for the Oppia 'edit preferences' page.
+ * @fileoverview Component for the Oppia 'edit preferences' page.
  */
 
 require('base-components/base-content.directive.ts');
