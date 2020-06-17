@@ -120,19 +120,6 @@ class TaskEntryTests(test_utils.GenericTestBase):
 
         self.assertTrue(task.apply_changes(task_model))
 
-    def test_apply_changes_to_issue_description(self):
-        task = improvements_domain.TaskEntry(
-            improvements_models.TASK_ENTITY_TYPE_EXPLORATION, self.exp_id, 1,
-            improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
-            improvements_models.TASK_TARGET_TYPE_STATE,
-            feconf.DEFAULT_INIT_STATE_NAME, 'issue description',
-            improvements_models.TASK_STATUS_RESOLVED, self.owner_id,
-            self.MOCK_DATE)
-        task_model = task.to_model()
-        task_model.issue_description = 'new issue description'
-
-        self.assertTrue(task.apply_changes(task_model))
-
     def test_apply_no_changes(self):
         task = improvements_domain.TaskEntry(
             improvements_models.TASK_ENTITY_TYPE_EXPLORATION, self.exp_id, 1,
