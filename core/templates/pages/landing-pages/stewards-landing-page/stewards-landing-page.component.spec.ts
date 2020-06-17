@@ -22,6 +22,10 @@ import { WindowDimensionsService } from
 import { UrlService } from
   'services/contextual/url.service';
 
+require(
+  'pages/landing-pages/stewards-landing-page/' +
+  'stewards-landing-page.component.ts');
+
 describe('Stewards Landing Page', function() {
   var $scope = null, ctrl = null;
   var $timeout = null;
@@ -40,14 +44,13 @@ describe('Stewards Landing Page', function() {
       }
     });
   }));
-  beforeEach(angular.mock.inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector, $componentController) {
     $timeout = $injector.get('$timeout');
     SiteAnalyticsService = $injector.get('SiteAnalyticsService');
 
     var $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
-    var directive = $injector.get('stewardsLandingPageDirective')[0];
-    ctrl = $injector.instantiate(directive.controller, {
+    ctrl = $componentController('stewardsLandingPage', {
       $scope: $scope
     });
   }));
