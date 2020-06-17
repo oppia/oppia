@@ -61,7 +61,7 @@ export class ConceptCardBackendApiService {
       .then(response => {
         if (successCallback) {
           var conceptCardDicts = response.concept_card_dicts;
-          conceptCardDicts.forEach((conceptCardDict) => {
+          conceptCardDicts.forEach(conceptCardDict => {
             conceptCardObjects.push(
               this.conceptCardObjectFactory.createFromBackendDict(
                 conceptCardDict));
@@ -81,7 +81,7 @@ export class ConceptCardBackendApiService {
 
   private _getUncachedSkillIds(skillIds: string[]): string[] {
     var uncachedSkillIds = [];
-    skillIds.forEach((skillId) => {
+    skillIds.forEach(skillId => {
       if (!this._isCached(skillId)) {
         uncachedSkillIds.push(skillId);
       }
@@ -99,7 +99,7 @@ export class ConceptCardBackendApiService {
         // locally.
         this._fetchConceptCards(
           uncachedSkillIds, (uncachedConceptCards) => {
-            skillIds.forEach((skillId) => {
+            skillIds.forEach(skillId => {
               if (uncachedSkillIds.includes(skillId)) {
                 conceptCards.push(
                   uncachedConceptCards[uncachedSkillIds.indexOf(skillId)]);
@@ -116,7 +116,7 @@ export class ConceptCardBackendApiService {
           }, reject);
       } else {
         // Case where all of the concept cards are cached locally.
-        skillIds.forEach((skillId) => {
+        skillIds.forEach(skillId => {
           conceptCards.push(cloneDeep(this._conceptCardCache[skillId]));
         });
         if (resolve) {

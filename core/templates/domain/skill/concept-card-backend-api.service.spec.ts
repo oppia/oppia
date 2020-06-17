@@ -178,8 +178,8 @@ describe('Concept card backend API service', () => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
 
-      let conceptCardDataUrl =
-        '/concept_card_handler/' + encodeURIComponent('1,2');
+      let conceptCardDataUrl = (
+        '/concept_card_handler/' + encodeURIComponent('1,2'));
 
       conceptCardBackendApiService.loadConceptCards(['1', '2']).then(
         successHandler, failHandler);
