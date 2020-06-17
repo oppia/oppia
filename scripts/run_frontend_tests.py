@@ -59,9 +59,6 @@ def main(args=None):
     """Runs the frontend tests."""
     parsed_args = _PARSER.parse_args(args=args)
 
-    setup.main(args=[])
-    setup_gae.main(args=[])
-
     if not parsed_args.skip_install:
         install_third_party_libs.main()
 
