@@ -20,17 +20,13 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
-import time
 
 from core.domain import user_services
 from core.platform import models
-import python_utils
 import utils
 
 (improvements_models,) = (
     models.Registry.import_models([models.NAMES.improvements]))
-
-_MODEL = improvements_models.TaskEntryModel
 
 
 class TaskEntry(object):
@@ -68,53 +64,69 @@ class TaskEntry(object):
 
     @property
     def task_id(self):
+        """Returns the unique identifier of this task.
+
+        Returns:
+            str. The ID of this task.
+        """
         return improvements_models.TaskEntryModel.generate_task_id(
             self.entity_type, self.entity_id, self.entity_version,
             self.task_type, self.target_type, self.target_id)
 
     @property
     def composite_entity_id(self):
+        """Returns value of helper field for identifying the task's target
+        entity.
+
+        Returns:
+            str. The value of the helper field.
+        """
         return improvements_models.TaskEntryModel.generate_composite_entity_id(
             self.entity_type, self.entity_id, self.entity_version)
 
     def open(self):
+        """Marks this task as open and resets the corresponding fields for
+        tracking who is responsible and when the action took place.
+        """
         self.status = improvements_models.TASK_STATUS_OPEN
         self.resolver_id = None
         self.resolved_on = None
 
     def obsolete(self):
+        """Marks this task as obsolete and resets the corresponding fields for
+        tracking who is responsible and when the action took place.
+        """
         self.status = improvements_models.TASK_STATUS_OBSOLETE
         self.resolver_id = None
         self.resolved_on = None
 
     def resolve(self, user_id):
+        """Marks this task as resolved and updates the corresponding fields for
+        tracking who is responsible and when the action took place.
+
+        Args:
+            user_id: str. The ID of the user who has resolved this issue.
+        """
         self.status = improvements_models.TASK_STATUS_RESOLVED
         self.resolver_id = user_id
         self.resolved_on = datetime.datetime.utcnow()
 
-    def to_model(self):
-        return _MODEL(
-            id=self.task_id,
-            composite_entity_id=self.composite_entity_id,
-            entity_type=self.entity_type,
-            entity_id=self.entity_id,
-            entity_version=self.entity_version,
-            task_type=self.task_type,
-            target_type=self.target_type,
-            target_id=self.target_id,
-            issue_description=self.issue_description,
-            status=self.status,
-            resolver_id=self.resolver_id,
-            resolved_on=self.resolved_on)
+    def apply_changes(self, task_entry_model):
+        """Makes changes to the given model if any differences are found.
 
-    @classmethod
-    def from_model(cls, task_entry_model):
-        return cls(
-            task_entry_model.entity_type, task_entry_model.entity_id,
-            task_entry_model.entity_version, task_entry_model.task_type,
-            task_entry_model.target_type, task_entry_model.target_id,
-            task_entry_model.issue_description, task_entry_model.status,
-            task_entry_model.resolver_id, task_entry_model.resolved_on)
+        Args:
+            task_entry_model: improvements_models.TaskEntryModel.
+        """
+        if task_entry_model.id != self.task_id:
+            raise Exception('Applying changes to wrong model')
+        if task_entry_model.issue_description != self.issue_description:
+            task_entry_model.issue_description = self.issue_description
+        if task_entry_model.status != self.status:
+            task_entry_model.status = self.status
+        if task_entry_model.resolver_id != self.resolver_id:
+            task_entry_model.resolver_id = self.resolver_id
+        if task_entry_model.resolved_on != self.resolved_on:
+            task_entry_model.resolved_on = self.resolved_on
 
     def to_dict(self):
         """Returns a dict-representation of the task.
@@ -177,3 +189,42 @@ class TaskEntry(object):
             task_dict['entity_version'], task_dict['task_type'],
             task_dict['target_type'], task_dict['target_id'],
             task_dict['issue_description'], task_dict['status'], None, None)
+
+    def to_model(self):
+        """Constructs a new ndb model instance from the values of self. The
+        model is not retrieved from storage or placed into storage by this
+        method.
+
+        Returns:
+            improvements_models.TaskEntryModel.
+        """
+        return improvements_models.TaskEntryModel(
+            id=self.task_id,
+            composite_entity_id=self.composite_entity_id,
+            entity_type=self.entity_type,
+            entity_id=self.entity_id,
+            entity_version=self.entity_version,
+            task_type=self.task_type,
+            target_type=self.target_type,
+            target_id=self.target_id,
+            issue_description=self.issue_description,
+            status=self.status,
+            resolver_id=self.resolver_id,
+            resolved_on=self.resolved_on)
+
+    @classmethod
+    def from_model(cls, task_entry_model):
+        """Returns a new domain object from the values in the given ndb model.
+
+        Args:
+            task_entry_model: improvements_models.TaskEntryModel.
+
+        Returns:
+            TaskEntry.
+        """
+        return cls(
+            task_entry_model.entity_type, task_entry_model.entity_id,
+            task_entry_model.entity_version, task_entry_model.task_type,
+            task_entry_model.target_type, task_entry_model.target_id,
+            task_entry_model.issue_description, task_entry_model.status,
+            task_entry_model.resolver_id, task_entry_model.resolved_on)
