@@ -53,6 +53,11 @@ angular.module('oppia').component('algebraicExpressionEditor', {
     };
 
     var cleanErrorMessage = function(errorMessage) {
+      // The error thrown by nerdamer includes the index of the violation which
+      // starts with a colon. That part needs to be removed before displaying
+      // the error to the end user. Same rationale applies for stripping the
+      // error message from 'at', since some errors from nerdamer use 'at' to
+      // to show the location.
       var colonIndex = errorMessage.indexOf(':');
       if (colonIndex !== -1) {
         errorMessage = errorMessage.slice(0, colonIndex);
@@ -69,22 +74,26 @@ angular.module('oppia').component('algebraicExpressionEditor', {
 
     ctrl.isCurrentAnswerValid = function() {
       if (ctrl.hasBeenTouched) {
+        var expression;
         try {
-          var containsVariables = nerdamer(ctrl.value).variables().length > 0;
-          if (ctrl.value.length === 0) {
-            throw new Error('Please enter a non-empty answer.');
-          } else if (ctrl.value.indexOf('=') !== -1 || ctrl.value.indexOf(
-            '<') !== -1 || ctrl.value.indexOf('>') !== -1) {
-            throw new Error('It looks like you have entered an ' +
-              'equation/inequality. Please enter an algebraic ' +
-              'expression instead.');
-          } else if (!containsVariables) {
-            throw new Error('It looks like you have entered only ' +
-              'numbers. Make sure to include the necessary variables' +
-              ' mentioned in the question.');
-          }
+          expression = nerdamer(ctrl.value);
         } catch (err) {
           ctrl.warningText = cleanErrorMessage(err.message);
+          return false;
+        }
+        if (ctrl.value.length === 0) {
+          ctrl.warningText = 'Please enter a non-empty answer.';
+          return false;
+        } else if (ctrl.value.indexOf('=') !== -1 || ctrl.value.indexOf(
+          '<') !== -1 || ctrl.value.indexOf('>') !== -1) {
+          ctrl.warningText = 'It looks like you have entered an ' +
+            'equation/inequality. Please enter an algebraic ' +
+            'expression instead.';
+          return false;
+        } else if (expression.variables().length === 0) {
+          ctrl.warningText = 'It looks like you have entered only ' +
+            'numbers. Make sure to include the necessary variables' +
+            ' mentioned in the question.';
           return false;
         }
       }
