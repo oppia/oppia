@@ -28,4 +28,4 @@ require('App.ts');
 require('pages/skill-editor-page/navbar/skill-editor-navbar.directive.ts');
 require(
   'pages/skill-editor-page/navbar/skill-editor-navbar-breadcrumb.directive.ts');
-require('pages/skill-editor-page/skill-editor-page.controller.ts');
+require('pages/skill-editor-page/skill-editor-page.component.ts');

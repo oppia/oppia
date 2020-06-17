@@ -28,4 +28,4 @@ require(
   'pages/subtopic-viewer-page/navbar-pre-logo-action/' +
   'subtopic-viewer-navbar-pre-logo-action.component.ts');
 
-require('pages/subtopic-viewer-page/subtopic-viewer-page.controller.ts');
+require('pages/subtopic-viewer-page/subtopic-viewer-page.component.ts');
