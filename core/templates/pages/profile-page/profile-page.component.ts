@@ -126,15 +126,15 @@ angular.module('oppia').component('profilePage', {
                 ProfilePageBackendApiService.subscribe(data.profile_username)
                   .then(() => {
                     ctrl.isAlreadySubscribed = true;
-                    $scope.$apply();
                     ctrl.updateSubscriptionButtonPopoverText();
+                    $scope.$apply();
                   });
               } else {
                 ProfilePageBackendApiService.unsubscribe(data.profile_username)
                   .then(() => {
                     ctrl.isAlreadySubscribed = false;
-                    $scope.$apply();
                     ctrl.updateSubscriptionButtonPopoverText();
+                    $scope.$apply();
                   });
               }
             }
