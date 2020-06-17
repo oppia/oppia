@@ -115,8 +115,10 @@ export class ExplorationDiffService {
   }
 
   _postprocessStateIdsAndData(
-      originalStateIds: IStateIds, stateIds: IStateIds,
-      stateData: IStateData, v1States: IStateObjectsDict,
+      originalStateIds: IStateIds,
+      stateIds: IStateIds,
+      stateData: IStateData,
+      v1States: IStateObjectsDict,
       v2States: IStateObjectsDict): IProcessedStateIdsAndData {
     // Ignore changes that were canceled out by later changes
     for (let stateId in stateData) {
@@ -190,7 +192,8 @@ export class ExplorationDiffService {
    * number, and false if changes are compared in decreasing version number.
    */
   _getDiffGraphData(
-      v1States: IStateObjectsDict, v2States: IStateObjectsDict,
+      v1States: IStateObjectsDict,
+      v2States: IStateObjectsDict,
       changeListData: IExplorationGraphChangeList[]):
     IProcessedStateIdsAndData {
     let v1Info = this._generateInitialStateIdsAndData(v1States);
@@ -198,7 +201,7 @@ export class ExplorationDiffService {
     let stateIds = v1Info.stateIds;
     let originalStateIds = cloneDeep(stateIds);
 
-    changeListData.forEach((changeListDatum) => {
+    changeListData.forEach(changeListDatum => {
       let changeList = changeListDatum.changeList;
       let directionForwards = changeListDatum.directionForwards;
       changeList.forEach(change => {
@@ -287,8 +290,8 @@ export class ExplorationDiffService {
    * - maxId: the maximum id in states and stateIds.
    */
   _getAdjMatrix(
-      states: IStateObjectsDict, stateIds: IStateIds,
-      maxId: number): IAdjMatrix {
+      states: IStateObjectsDict,
+      stateIds: IStateIds, maxId: number): IAdjMatrix {
     let adjMatrix = {};
     for (let stateId = 1; stateId <= maxId; stateId++) {
       adjMatrix[stateId] = {};
@@ -321,8 +324,10 @@ export class ExplorationDiffService {
    *  - 'linkProperty': 'added', 'deleted' or 'unchanged'
    */
   _compareLinks(
-      v1States: IStateObjectsDict, originalStateIds: IStateIds,
-      v2States: IStateObjectsDict, newestStateIds: IStateIds): IStateLink[] {
+      v1States: IStateObjectsDict,
+      originalStateIds: IStateIds,
+      v2States: IStateObjectsDict,
+      newestStateIds: IStateIds): IStateLink[] {
     let links = [];
     let adjMatrixV1 = this._getAdjMatrix(v1States, originalStateIds,
       this._maxId);

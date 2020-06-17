@@ -34,7 +34,7 @@ import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
-import { VersionTreeService } from
+import { IExplorationSnapshot, VersionTreeService } from
   'pages/exploration-editor-page/history-tab/services/version-tree.service';
 import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory';
@@ -189,7 +189,7 @@ describe('Compare versions service', function() {
       };
     };
 
-    var testSnapshots1 = [{
+    const testSnapshots1: IExplorationSnapshot[] = [{
       commit_type: 'create',
       version_number: 1,
       committer_id: 'admin',
@@ -208,7 +208,8 @@ describe('Compare versions service', function() {
         old_value: {
           content_id: 'content',
           html: ''
-        }
+        },
+        property_name: 'property'
       }],
       version_number: 2,
       committer_id: 'admin',
@@ -269,7 +270,8 @@ describe('Compare versions service', function() {
         old_value: {
           content_id: 'content',
           html: ''
-        }
+        },
+        property_name: 'property'
       }],
       version_number: 7,
       committer_id: 'admin',
@@ -317,7 +319,8 @@ describe('Compare versions service', function() {
         old_value: {
           content_id: 'content',
           html: 'Some text'
-        }
+        },
+        property_name: 'property'
       }],
       version_number: 11,
       committer_id: 'admin',
@@ -695,7 +698,7 @@ describe('Compare versions service', function() {
       }
     );
 
-    var testSnapshots2 = [{
+    var testSnapshots2: IExplorationSnapshot[] = [{
       commit_type: 'create',
       version_number: 1,
       committer_id: 'admin',
@@ -775,7 +778,8 @@ describe('Compare versions service', function() {
         old_value: {
           content_id: 'content',
           html: ''
-        }
+        },
+        property_name: 'property'
       }],
       version_number: 8,
       committer_id: 'admin',
@@ -964,7 +968,7 @@ describe('Compare versions service', function() {
 
     // Represents snapshots and exploration data for tests for links
     // Only includes information accessed by getDiffGraphData()
-    var testSnapshots3 = [{
+    var testSnapshots3: IExplorationSnapshot[] = [{
       commit_type: 'create',
       version_number: 1,
       committer_id: 'admin',
@@ -1006,7 +1010,16 @@ describe('Compare versions service', function() {
       commit_type: 'edit',
       commit_cmds: [{
         cmd: 'edit_state_property',
-        state_name: 'D'
+        state_name: 'D',
+        new_value: {
+          content_id: 'content',
+          html: 'Some text'
+        },
+        old_value: {
+          content_id: 'content',
+          html: ''
+        },
+        property_name: 'property'
       }],
       version_number: 5,
       committer_id: 'admin',
@@ -1016,7 +1029,16 @@ describe('Compare versions service', function() {
       commit_type: 'edit',
       commit_cmds: [{
         cmd: 'edit_state_property',
-        state_name: 'D'
+        state_name: 'D',
+        new_value: {
+          content_id: 'content',
+          html: 'Some text'
+        },
+        old_value: {
+          content_id: 'content',
+          html: ''
+        },
+        property_name: 'property'
       }],
       version_number: 6,
       committer_id: 'admin',

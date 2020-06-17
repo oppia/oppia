@@ -22,31 +22,16 @@ import cloneDeep from 'lodash/cloneDeep';
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-import { IExplorationChangeList } from
+import { IRevertChangeList, IExplorationChangeList } from
   'domain/exploration/ExplorationDraftObjectFactory';
 
-
-interface ICreateCommitCmd {
-  cmd: string;
-  category: string;
-  title: string;
-}
-
-interface IRevertCommitCmd {
-  'cmd': string;
-  'version_number': number;
-}
-
-type IExplorationCommitCmd = (
-  IExplorationChangeList | ICreateCommitCmd | IRevertCommitCmd);
-
-interface IExplorationSnapshot {
+export interface IExplorationSnapshot {
   'commit_message': string;
   'committer_id': string;
   'commit_type': string;
   'version_number': number;
   'created_on_ms': number;
-  'commit_cmds': IExplorationCommitCmd[];
+  'commit_cmds': IExplorationChangeList[];
 }
 
 interface IExplorationSnapshots {
@@ -78,7 +63,7 @@ export class VersionTreeService {
           if (this._snapshots[versionNum].commit_cmds[i].cmd ===
               'AUTO_revert_version_number') {
             this._treeParents[versionNum] =
-              (<IRevertCommitCmd> this._snapshots[versionNum].commit_cmds[i])
+              (<IRevertChangeList> this._snapshots[versionNum].commit_cmds[i])
                 .version_number;
           }
         }
@@ -158,7 +143,7 @@ export class VersionTreeService {
    * for 'revert':
    *  - 'version_number': version number reverted to
    */
-  getChangeList(version: number): IExplorationCommitCmd[] {
+  getChangeList(version: number): IExplorationChangeList[] {
     if (this._snapshots === null) {
       throw new Error('snapshots is not initialized');
     } else if (version === 1) {

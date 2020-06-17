@@ -136,8 +136,8 @@ describe('EndExplorationValidationService', () => {
 
   it('should catch non-string value for recommended exploration ID',
     () => {
-      // Ts ignore is used because here knowingly we are assigning the
-      // wrong type of value to test warnings.
+      // TS ignore is used here because we are assigning the wrong type of
+      // value to test the warnings.
       // @ts-ignore
       customizationArguments.recommendedExplorationIds.value = [1];
       var warnings = validatorService.getAllWarnings(
@@ -150,8 +150,8 @@ describe('EndExplorationValidationService', () => {
 
   it('should have warnings for non-list format of recommended exploration IDs',
     () => {
-      // Ts ignore is used because here knowingly we are assigning the
-      // wrong type of value to test warnings.
+      // TS ignore is used here because we are assigning the wrong type of
+      // value to test the warnings.
       // @ts-ignore
       customizationArguments.recommendedExplorationIds.value = 'ExpID0';
       var warnings = validatorService.getAllWarnings(

@@ -21,19 +21,24 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 export interface IAddStateNameChangeList {
-  'cmd': string;
+  'cmd': 'add_state';
+  'state_name': string;
+}
+
+export interface IDeleteStateChangeList {
+  'cmd': 'delete_state';
   'state_name': string;
 }
 
 export interface IEditExplorationPropertyChangeList {
-  'cmd': string;
+  'cmd': 'edit_exploration_property';
   'new_value': Object;
   'old_value': Object;
   'property_name': string;
 }
 
 export interface IEditStatePropertyChangeList {
-  'cmd': string;
+  'cmd': 'edit_state_property';
   'new_value': Object;
   'old_value': Object;
   'property_name': string;
@@ -41,14 +46,37 @@ export interface IEditStatePropertyChangeList {
 }
 
 export interface IRenameStateChangeList {
-  'cmd': string;
+  'cmd': 'rename_state';
   'new_state_name': string;
   'old_state_name': string;
 }
 
+export interface IRevertChangeList {
+  'cmd': 'AUTO_revert_version_number';
+  'version_number': number;
+}
+
+export interface ICreateChangeList {
+  cmd: 'create_new';
+  category: string;
+  title: string;
+}
+
+export interface IMigrateStatesVersionChangeList {
+  'cmd': 'migrate_states_schema_to_latest_version';
+  'from_version': number;
+  'to_version': number;
+}
+
 export type IExplorationChangeList = (
-  IAddStateNameChangeList | IEditExplorationPropertyChangeList |
-  IEditStatePropertyChangeList | IRenameStateChangeList);
+  IAddStateNameChangeList |
+  IDeleteStateChangeList |
+  IEditExplorationPropertyChangeList |
+  IEditStatePropertyChangeList |
+  IRenameStateChangeList |
+  IRevertChangeList |
+  ICreateChangeList |
+  IMigrateStatesVersionChangeList);
 
 export interface IExplorationDraftDict {
   draftChanges: IExplorationChangeList[];

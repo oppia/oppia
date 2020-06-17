@@ -45,7 +45,8 @@ export class ParamType {
    *
    * @param {Function.<?, Boolean>} validateFunction - Returns true when a value
    *    is valid.
-   * @param {?} defaultValue - simple value any parameter of this type can take.
+   * @param {Object} defaultValue - simple value any parameter of this type can
+   * take.
    */
 
   constructor(typeDefinitionObject: ITypeDefinitionObject) {
