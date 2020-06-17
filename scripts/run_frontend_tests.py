@@ -28,8 +28,6 @@ from . import build
 from . import check_frontend_coverage
 from . import common
 from . import install_third_party_libs
-from . import setup
-from . import setup_gae
 
 _PARSER = argparse.ArgumentParser(description="""
 Run this script from the oppia root folder:

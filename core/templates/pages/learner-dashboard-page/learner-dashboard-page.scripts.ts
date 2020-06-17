@@ -22,4 +22,4 @@ require('pages/learner-dashboard-page/learner-dashboard-page.module.ts');
 require('App.ts');
 
 require('base-components/base-content.directive.ts');
-require('pages/learner-dashboard-page/learner-dashboard-page.controller.ts');
+require('pages/learner-dashboard-page/learner-dashboard-page.component.ts');

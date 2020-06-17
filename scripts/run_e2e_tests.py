@@ -31,8 +31,6 @@ from scripts import build
 from scripts import common
 from scripts import install_chrome_on_travis
 from scripts import install_third_party_libs
-from scripts import setup
-from scripts import setup_gae
 
 CHROME_DRIVER_VERSION = '2.41'
 

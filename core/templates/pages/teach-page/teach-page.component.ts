@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the teach page.
+ * @fileoverview Component for the teach page.
  */
 
 require('base-components/base-content.directive.ts');
