@@ -461,6 +461,8 @@ import { ThreadStatusDisplayService } from
 import { TopicCreationBackendApiService } from
   'domain/topic/topic-creation-backend-api.service.ts';
 import { TopicObjectFactory } from 'domain/topic/TopicObjectFactory';
+import { TopicRightsBackendApiService } from
+  'domain/topic/topic-rights-backend-api.service';
 import { TopicRightsObjectFactory } from
   'domain/topic/TopicRightsObjectFactory';
 import { TopicsAndSkillsDashboardBackendApiService } from
@@ -1095,6 +1097,10 @@ export class UpgradedServices {
       upgradedServices['SkillSummaryObjectFactory']);
     upgradedServices['TopicCreationBackendApiService'] =
       new TopicCreationBackendApiService(upgradedServices['HttpClient']);
+    upgradedServices['TopicRightsBackendApiService'] =
+      new TopicRightsBackendApiService(
+        upgradedServices['HttpClient'],
+        upgradedServices['UrlInterpolationService']);
     upgradedServices['TopicsAndSkillsDashboardBackendApiService'] =
       new TopicsAndSkillsDashboardBackendApiService(
         upgradedServices['HttpClient']);

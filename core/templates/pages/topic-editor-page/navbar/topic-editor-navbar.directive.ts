@@ -109,6 +109,7 @@ angular.module('oppia').directive('topicEditorNavbar', [
                   var successToast = 'Mail Sent.';
                   AlertsService.addSuccessMessage(
                     successToast, 1000);
+                  $rootScope.$apply();
                 });
               }, function() {
                 // Note to developers:
@@ -133,6 +134,7 @@ angular.module('oppia').directive('topicEditorNavbar', [
               }
               AlertsService.addSuccessMessage(
                 successToast, 1000);
+              $rootScope.$apply();
             });
           };
 
@@ -194,6 +196,7 @@ angular.module('oppia').directive('topicEditorNavbar', [
               function() {
                 $scope.topicRights.markTopicAsUnpublished();
                 TopicEditorStateService.setTopicRights($scope.topicRights);
+                $rootScope.$apply();
               });
           };
 

@@ -16,162 +16,188 @@
  * @fileoverview Service to change the rights of topic in the backend.
  */
 
-require('domain/utilities/url-interpolation.service.ts');
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
-require('domain/topic/topic-domain.constants.ajs.ts');
+import { HttpClient } from '@angular/common/http';
 
-angular.module('oppia').factory('TopicRightsBackendApiService', [
-  '$http', '$q', 'UrlInterpolationService',
-  'TOPIC_RIGHTS_URL_TEMPLATE',
-  function($http, $q, UrlInterpolationService,
-      TOPIC_RIGHTS_URL_TEMPLATE) {
-    // Maps previously loaded topic rights to their IDs.
-    var topicRightsCache = {};
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
 
-    var _fetchTopicRights = function(topicId, successCallback,
-        errorCallback) {
-      var topicRightsUrl = UrlInterpolationService.interpolateUrl(
-        TOPIC_RIGHTS_URL_TEMPLATE, {
-          topic_id: topicId
-        });
+import { TopicDomainConstants } from
+  'domain/topic/topic-domain.constants';
+import cloneDeep from 'lodash/cloneDeep';
 
-      $http.get(topicRightsUrl).then(function(response) {
+@Injectable({
+  providedIn: 'root'
+})
+export class TopicRightsBackendApiService {
+  constructor(
+    private http: HttpClient,
+    private urlInterpolation: UrlInterpolationService) {}
+  // Maps previously loaded topic rights to their IDs.
+  private topicRightsCache = {};
+
+  private _fetchTopicRights(
+      topicId: string,
+      successCallback: (value?: Object | PromiseLike<Object>) => void,
+      errorCallback: (reason?: any) => void): void {
+    var topicRightsUrl = this.urlInterpolation.interpolateUrl(
+      TopicDomainConstants.TOPIC_RIGHTS_URL_TEMPLATE, {
+        topic_id: topicId
+      });
+
+    this.http.get(
+      topicRightsUrl, { observe: 'response' }).toPromise().then(
+      (response) => {
         if (successCallback) {
-          successCallback(response.data);
+          successCallback(response.body);
         }
-      }, function(errorResponse) {
+      }, (error) => {
         if (errorCallback) {
-          errorCallback(errorResponse.data);
+          errorCallback(error.data);
         }
       });
+  }
+
+  private _setTopicStatus(
+      topicId: string,
+      publishStatus: boolean,
+      successCallback: (value?: Object | PromiseLike<Object>) => void,
+      errorCallback: (reason?: any) => void): void {
+    var changeTopicStatusUrl = this.urlInterpolation.interpolateUrl(
+      '/rightshandler/change_topic_status/<topic_id>', {
+        topic_id: topicId
+      });
+
+    var putParams = {
+      publish_status: publishStatus
     };
 
-    var _setTopicStatus = function(
-        topicId, publishStatus, successCallback, errorCallback) {
-      var changeTopicStatusUrl = UrlInterpolationService.interpolateUrl(
-        '/rightshandler/change_topic_status/<topic_id>', {
-          topic_id: topicId
-        });
-
-      var putParams = {
-        publish_status: publishStatus
-      };
-
-      $http.put(changeTopicStatusUrl, putParams).then(function(response) {
-        topicRightsCache[topicId] = response.data;
+    this.http.put(
+      // eslint-disable-next-line max-len
+      changeTopicStatusUrl, putParams, { observe: 'response' }).toPromise().then(
+      (response) => {
+        this.topicRightsCache[topicId] = response.body;
         if (successCallback) {
-          successCallback(response.data);
+          successCallback(response.body);
         }
-      }, function(errorResponse) {
+      }, (error) => {
         if (errorCallback) {
-          errorCallback(errorResponse.data);
+          errorCallback(error.data);
         }
       });
+  }
+
+  private _sendMail(
+      topicId: string,
+      topicName: string,
+      successCallback: (value?: Object | PromiseLike<Object>) => void,
+      errorCallback: (reason?: any) => void): void {
+    var sendMailUrl = this.urlInterpolation.interpolateUrl(
+      '/rightshandler/send_topic_publish_mail/<topic_id>', {
+        topic_id: topicId
+      });
+
+    var putParams = {
+      topic_name: topicName
     };
 
-    var _sendMail = function(topicId, topicName, successCallback,
-        errorCallback) {
-      var sendMailUrl = UrlInterpolationService.interpolateUrl(
-        '/rightshandler/send_topic_publish_mail/<topic_id>', {
-          topic_id: topicId
-        });
-
-      var putParams = {
-        topic_name: topicName
-      };
-
-      $http.put(sendMailUrl, putParams).then(function(response) {
+    this.http.put(sendMailUrl, putParams).toPromise().then(
+      (response) => {
         if (successCallback) {
           successCallback();
         }
-      }, function(errorResponse) {
+      }, (error) => {
         if (errorCallback) {
-          errorCallback(errorResponse.data);
+          errorCallback(error.data);
         }
       });
-    };
-
-    var _isCached = function(topicId) {
-      return topicRightsCache.hasOwnProperty(topicId);
-    };
-
-    return {
-      /**
-       * Gets a topic's rights, given its ID.
-       */
-      fetchTopicRights: function(topicId) {
-        return $q(function(resolve, reject) {
-          _fetchTopicRights(topicId, resolve, reject);
-        });
-      },
-
-      /**
-       * Behaves exactly as fetchTopicRights (including callback
-       * behavior and returning a promise object), except this function will
-       * attempt to see whether the given topic rights has been
-       * cached. If it has not yet been cached, it will fetch the topic
-       * rights from the backend. If it successfully retrieves the topic
-       * rights from the backend, it will store it in the cache to avoid
-       * requests from the backend in further function calls.
-       */
-      loadTopicRights: function(topicId) {
-        return $q(function(resolve, reject) {
-          if (_isCached(topicId)) {
-            if (resolve) {
-              resolve(topicRightsCache[topicId]);
-            }
-          } else {
-            _fetchTopicRights(topicId, function(topicRights) {
-              // Save the fetched topic rights to avoid future fetches.
-              topicRightsCache[topicId] = topicRights;
-              if (resolve) {
-                resolve(topicRightsCache[topicId]);
-              }
-            }, reject);
-          }
-        });
-      },
-
-      /**
-       * Returns whether the given topic rights is stored within the
-       * local data cache or if it needs to be retrieved from the backend
-       * upon a laod.
-       */
-      isCached: function(topicId) {
-        return _isCached(topicId);
-      },
-
-      /**
-       * Replaces the current topic rights in the cache given by the
-       * specified topic ID with a new topic rights object.
-       */
-      cacheTopicRights: function(topicId, topicRights) {
-        topicRightsCache[topicId] = angular.copy(topicRights);
-      },
-
-      /**
-       * Publishes a topic.
-       */
-      publishTopic: function(topicId) {
-        return $q(function(resolve, reject) {
-          _setTopicStatus(topicId, true, resolve, reject);
-        });
-      },
-
-      sendMail: function(topicId, topicName) {
-        return $q(function(resolve, reject) {
-          _sendMail(topicId, topicName, resolve, reject);
-        });
-      },
-
-      /**
-       * Unpublishes a topic.
-       */
-      unpublishTopic: function(topicId) {
-        return $q(function(resolve, reject) {
-          _setTopicStatus(topicId, false, resolve, reject);
-        });
-      }
-    };
   }
-]);
+
+  private _isCached(
+      topicId: string): boolean {
+    return this.topicRightsCache.hasOwnProperty(topicId);
+  }
+
+  /**
+   * Gets a topic's rights, given its ID.
+   */
+  fetchTopicRights(topicId: string): Promise<Object> {
+    return new Promise((resolve, reject) => {
+      this._fetchTopicRights(topicId, resolve, reject);
+    });
+  }
+
+  /**
+   * Behaves exactly as fetchTopicRights (including callback
+   * behavior and returning a promise object), except this function will
+   * attempt to see whether the given topic rights has been
+   * cached. If it has not yet been cached, it will fetch the topic
+   * rights from the backend. If it successfully retrieves the topic
+   * rights from the backend, it will store it in the cache to avoid
+   * requests from the backend in further function calls.
+   */
+  loadTopicRights(topicId: string): Promise<Object> {
+    return new Promise((resolve, reject) => {
+      if (this._isCached(topicId)) {
+        if (resolve) {
+          resolve(this.topicRightsCache[topicId]);
+        }
+      } else {
+        this._fetchTopicRights(topicId, (topicRights) => {
+          // Save the fetched topic rights to avoid future fetches.
+          this.topicRightsCache[topicId] = topicRights;
+          if (resolve) {
+            resolve(this.topicRightsCache[topicId]);
+          }
+        }, reject);
+      }
+    });
+  }
+
+  /**
+   * Returns whether the given topic rights is stored within the
+   * local data cache or if it needs to be retrieved from the backend
+   * upon a laod.
+   */
+  isCached(topicId: string): boolean {
+    return this._isCached(topicId);
+  }
+
+  /**
+   * Replaces the current topic rights in the cache given by the
+   * specified topic ID with a new topic rights object.
+   */
+  cacheTopicRights(topicId: string, topicRights: any): void {
+    this.topicRightsCache[topicId] = cloneDeep(topicRights);
+  }
+
+  /**
+   * Publishes a topic.
+   */
+  publishTopic(topicId: string): Promise<Object> {
+    return new Promise((resolve, reject) => {
+      this._setTopicStatus(topicId, true, resolve, reject);
+    });
+  }
+
+  sendMail(topicId: string, topicName): Promise<Object> {
+    return new Promise((resolve, reject) => {
+      this._sendMail(topicId, topicName, resolve, reject);
+    });
+  }
+
+  /**
+   * Unpublishes a topic.
+   */
+  unpublishTopic(topicId: string): Promise<Object> {
+    return new Promise((resolve, reject) => {
+      this._setTopicStatus(topicId, false, resolve, reject);
+    });
+  }
+}
+
+angular.module('oppia').factory(
+  'TopicRightsBackendApiService',
+  downgradeInjectable(TopicRightsBackendApiService));
