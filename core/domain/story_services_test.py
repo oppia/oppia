@@ -102,7 +102,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(story_summary.id, self.STORY_ID)
         self.assertEqual(story_summary.title, 'Title')
         self.assertEqual(story_summary.description, 'Description')
-        self.assertEqual(story_summary.node_count, 1)
+        self.assertEqual(story_summary.node_titles, ['Title 1'])
+        self.assertEqual(story_summary.thumbnail_bg_color, None)
+        self.assertEqual(story_summary.thumbnail_filename, None)
 
     def test_get_new_story_id(self):
         new_story_id = story_services.get_new_story_id()
@@ -160,7 +162,11 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
 
         story_summary = story_fetchers.get_story_summary_by_id(self.STORY_ID)
         self.assertEqual(story_summary.title, 'New Title')
-        self.assertEqual(story_summary.node_count, 1)
+        self.assertEqual(story_summary.node_titles, ['Title 1'])
+        self.assertEqual(
+            story_summary.thumbnail_bg_color,
+            constants.ALLOWED_THUMBNAIL_BG_COLORS['story'][0])
+        self.assertEqual(story_summary.thumbnail_filename, 'image.svg')
 
     def test_update_story_node_properties(self):
         changelist = [
@@ -237,7 +243,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(story.version, 3)
 
         story_summary = story_fetchers.get_story_summary_by_id(self.STORY_ID)
-        self.assertEqual(story_summary.node_count, 2)
+        self.assertEqual(story_summary.node_titles, ['Title 1', 'Title 2'])
 
         changelist = [
             story_domain.StoryChange({
@@ -272,7 +278,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             'Removed a story node.')
         story_summary = story_fetchers.get_story_summary_by_id(self.STORY_ID)
         story = story_fetchers.get_story_by_id(self.STORY_ID)
-        self.assertEqual(story_summary.node_count, 1)
+        self.assertEqual(story_summary.node_titles, ['Modified title 2'])
         self.assertEqual(
             story.story_contents.nodes[0].title, 'Modified title 2')
         self.assertEqual(
@@ -355,7 +361,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(story_summaries[0].title, 'Title')
         self.assertEqual(story_summaries[0].description, 'Description')
         self.assertEqual(story_summaries[0].language_code, 'en')
-        self.assertEqual(story_summaries[0].node_count, 1)
+        self.assertEqual(story_summaries[0].node_titles, ['Title 1'])
+        self.assertEqual(story_summaries[0].thumbnail_filename, None)
+        self.assertEqual(story_summaries[0].thumbnail_bg_color, None)
         self.assertEqual(story_summaries[0].version, 2)
 
     def test_cannot_update_story_with_non_story_change_changelist(self):
@@ -1044,8 +1052,11 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 'new_value': {
                     'content_id': 'content',
                     'html': (
-                        '<p><oppia-noninteractive-collapsible>'
-                        '</oppia-noninteractive-collapsible></p>')
+                        '<oppia-noninteractive-collapsible content-with-value='
+                        '"&amp;quot;&amp;lt;p&amp;gt;Hello&amp;lt;/p&amp;gt;'
+                        '&amp;quot;" heading-with-value="&amp;quot;'
+                        'SubCollapsible&amp;quot;">'
+                        '</oppia-noninteractive-collapsible>')
                 }
             })],
             'Updated State Content.')

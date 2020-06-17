@@ -910,6 +910,29 @@ class Skill(python_utils.OBJECT):
 
         versioned_rubrics['rubrics'] = updated_rubrics
 
+    def get_all_html_content_strings(self):
+        """Returns all html strings that are part of the skill
+        (or any of its subcomponents).
+
+        Returns:
+            list(str). The list of html contents.
+        """
+        html_content_strings = [self.skill_contents.explanation.html]
+
+        for rubric in self.rubrics:
+            for explanation in rubric.explanations:
+                html_content_strings.append(explanation)
+
+        for example in self.skill_contents.worked_examples:
+            html_content_strings.append(example.question.html)
+            html_content_strings.append(example.explanation.html)
+
+        for misconception in self.misconceptions:
+            html_content_strings.append(misconception.notes)
+            html_content_strings.append(misconception.feedback)
+
+        return html_content_strings
+
     def update_description(self, description):
         """Updates the description of the skill.
 
@@ -1021,21 +1044,16 @@ class Skill(python_utils.OBJECT):
                 return ind
         return None
 
-    def add_misconception(self, misconception_dict):
+    def add_misconception(self, misconception):
         """Adds a new misconception to the skill.
 
         Args:
-            misconception_dict: dict. The misconception to be added.
+            misconception: Misconception. The misconception to be added.
         """
-        misconception = Misconception(
-            misconception_dict['id'],
-            misconception_dict['name'],
-            misconception_dict['notes'],
-            misconception_dict['feedback'],
-            misconception_dict['must_be_addressed'])
+
         self.misconceptions.append(misconception)
         self.next_misconception_id = self.get_incremented_misconception_id(
-            misconception_dict['id'])
+            misconception.id)
 
     def _find_prerequisite_skill_id_index(self, skill_id_to_find):
         """Returns the index of the skill_id in the prerequisite_skill_ids

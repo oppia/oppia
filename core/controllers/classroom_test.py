@@ -37,12 +37,24 @@ class BaseClassroomControllerTests(test_utils.GenericTestBase):
 class ClassroomPageTests(BaseClassroomControllerTests):
 
     def test_any_user_can_access_classroom_page(self):
+        config_property = config_domain.Registry.get_config_property(
+            'classroom_page_is_shown')
+        config_property.set_value('committer_id', True)
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             response = self.get_html_response('/math')
             self.assertIn('<classroom-page></classroom-page>', response)
+        config_property.set_value('committer_id', False)
 
     def test_get_fails_when_new_structures_not_enabled(self):
+        config_property = config_domain.Registry.get_config_property(
+            'classroom_page_is_shown')
+        config_property.set_value('committer_id', True)
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', False):
+            self.get_html_response('/math', expected_status_int=404)
+        config_property.set_value('committer_id', False)
+
+    def test_get_fails_when_classroom_page_is_shown_not_enabled(self):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             self.get_html_response('/math', expected_status_int=404)
 
 
@@ -57,10 +69,10 @@ class ClassroomDataHandlerTests(BaseClassroomControllerTests):
         topic_id_1 = topic_services.get_new_topic_id()
         topic_id_2 = topic_services.get_new_topic_id()
         private_topic = topic_domain.Topic.create_default_topic(
-            topic_id_1, 'private_topic_name', 'abbrev')
+            topic_id_1, 'private_topic_name', 'abbrev', 'description')
         topic_services.save_new_topic(admin_id, private_topic)
         public_topic = topic_domain.Topic.create_default_topic(
-            topic_id_2, 'public_topic_name', 'abbrev')
+            topic_id_2, 'public_topic_name', 'abbrev', 'description')
         public_topic.thumbnail_filename = 'Topic.svg'
         public_topic.thumbnail_bg_color = (
             constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0])
@@ -106,3 +118,22 @@ class ClassroomDataHandlerTests(BaseClassroomControllerTests):
             self.get_json(
                 '%s/%s' % (feconf.CLASSROOM_DATA_HANDLER, 'math'),
                 expected_status_int=404)
+
+
+class ClassroomPageStatusHandlerTests(BaseClassroomControllerTests):
+    """Unit test for ClassroomPageStatusHandler."""
+    def test_get_request_returns_correct_status(self):
+        self.set_config_property(config_domain.CLASSROOM_PAGE_IS_SHOWN, False)
+
+        response = self.get_json('/classroom_page_status_handler')
+        self.assertEqual(
+            response, {
+                'classroom_page_is_shown': False
+            })
+
+        self.set_config_property(config_domain.CLASSROOM_PAGE_IS_SHOWN, True)
+        response = self.get_json('/classroom_page_status_handler')
+        self.assertEqual(
+            response, {
+                'classroom_page_is_shown': True,
+            })

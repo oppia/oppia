@@ -22,44 +22,52 @@ var users = require('../protractor_utils/users.js');
 var waitFor = require('../protractor_utils/waitFor.js');
 var workflow = require('../protractor_utils/workflow.js');
 
+var AdminPage = require('../protractor_utils/AdminPage.js');
 var ClassroomPage = require('../protractor_utils/ClassroomPage.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
 
 describe('Classroom page functionality', function() {
+  var adminPage = null;
   var classroomPage = null;
   var libraryPage = null;
 
-  beforeAll(function() {
+  beforeAll(async function() {
+    adminPage = new AdminPage.AdminPage();
     classroomPage = new ClassroomPage.ClassroomPage();
     libraryPage = new LibraryPage.LibraryPage();
 
-    users.createAndLoginAdminUser(
+    await users.createAndLoginAdminUser(
       'creator@classroomPage.com', 'creatorClassroomPage');
+    await adminPage.editConfigProperty(
+      'Show classroom components.',
+      'Boolean', async function(elem) {
+        await elem.setValue(true);
+      });
   });
 
-  beforeEach(function() {
-    users.login('creator@classroomPage.com');
+  beforeEach(async function() {
+    await users.login('creator@classroomPage.com');
   });
 
-  it('should search for explorations from classroom page', function() {
-    workflow.createAndPublishExploration(
+  it('should search for explorations from classroom page', async function() {
+    await workflow.createAndPublishExploration(
       'Exploration Title',
       'Algorithms',
       'This is the objective.',
       'English');
-    classroomPage.get('math');
-    libraryPage.findExploration('Title');
-    libraryPage.expectExplorationToBeVisible('Exploration Title');
+    await classroomPage.get('math');
+    await libraryPage.findExploration('Title');
+    await libraryPage.expectExplorationToBeVisible('Exploration Title');
 
-    libraryPage.selectLanguages(['English']);
-    libraryPage.expectCurrentLanguageSelectionToBe(['English']);
+    await libraryPage.selectLanguages(['English']);
+    await libraryPage.expectCurrentLanguageSelectionToBe(['English']);
 
-    libraryPage.selectCategories(['Algorithms']);
-    libraryPage.expectCurrentCategorySelectionToBe(['Algorithms']);
-    users.logout();
+    await libraryPage.selectCategories(['Algorithms']);
+    await libraryPage.expectCurrentCategorySelectionToBe(['Algorithms']);
+    await users.logout();
   });
 
-  afterEach(function() {
-    general.checkForConsoleErrors([]);
+  afterEach(async function() {
+    await general.checkForConsoleErrors([]);
   });
 });

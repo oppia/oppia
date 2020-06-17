@@ -31,6 +31,9 @@ import threading
 
 import python_utils
 
+SUCCESS_MESSAGE_PREFIX = 'SUCCESS '
+FAILED_MESSAGE_PREFIX = 'FAILED '
+
 
 def memoize(func):
     """Decorator which provides thread-safe, cached-access to the return values

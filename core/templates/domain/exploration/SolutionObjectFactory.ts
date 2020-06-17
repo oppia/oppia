@@ -34,18 +34,14 @@ import { SubtitledHtml, SubtitledHtmlObjectFactory } from
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory.ts';
 
 export interface ExplanationBackendDict {
-  /* eslint-disable camelcase */
-  content_id: string;
-  /* eslint-enable camelcase */
-  html: string;
+  'content_id': string;
+  'html': string;
 }
 
 export interface SolutionBackendDict {
-  /* eslint-disable camelcase */
-  answer_is_exclusive: boolean;
-  correct_answer: string;
-  /* eslint-enable camelcase */
-  explanation: ExplanationBackendDict;
+  'answer_is_exclusive': boolean;
+  'correct_answer': string;
+  'explanation': ExplanationBackendDict;
 }
 
 export class Solution {
@@ -136,7 +132,6 @@ export class SolutionObjectFactory {
     private shof: SubtitledHtmlObjectFactory,
     private ehfs: ExplorationHtmlFormatterService) {}
   createFromBackendDict(solutionBackendDict: SolutionBackendDict): Solution {
-  /* eslint-enable dot-notation */
     return new Solution(
       this.ehfs,
       this.shof,
@@ -146,10 +141,7 @@ export class SolutionObjectFactory {
         solutionBackendDict.explanation));
   }
 
-  // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
-  /* eslint-disable dot-notation */
   createNew(
-  /* eslint-enable dot-notation */
       answerIsExclusive: boolean, correctAnswer: any, explanationHtml: string,
       explanationId: string): Solution {
     return new Solution(

@@ -4830,6 +4830,9 @@ export = {
     "id": "es",
     "text": "Español"
   }, {
+    "id": "fr",
+    "text": "français (French)"
+  }, {
     "id": "pt-br",
     "text": "Português (Brasil)"
   }, {
@@ -5175,6 +5178,7 @@ export = {
   },
 
   "ENABLE_PREREQUISITE_SKILLS": false,
+  "ENABLE_LITERALLY_CANVAS_EDITOR": false,
 
   // For the full new structures viewer features, both
   // ENABLE_NEW_STRUCTURE_PLAYERS and ENABLE_NEW_STRUCTURE_VIEWER_UPDATES has
@@ -5183,7 +5187,7 @@ export = {
   // This is split up so as to access the viewers in production without
   // exposing the POST and PUT endpoints just yet.
   "ENABLE_NEW_STRUCTURE_PLAYERS": true,
-  "ENABLE_NEW_STRUCTURE_VIEWER_UPDATES": false,
+  "ENABLE_NEW_STRUCTURE_VIEWER_UPDATES": true,
 
   "ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE": true,
 
@@ -5282,8 +5286,8 @@ export = {
   // Used to disable account data export until it is fully implemented.
   "ENABLE_ACCOUNT_EXPORT": false,
 
-  // Used to hide the callout to classroom until it is ready.
-  "SHOW_CLASSROOM_CALLOUT": false,
+  // Maximum allowed length of a username.
+  "MAX_USERNAME_LENGTH": 30,
 
   "DEV_MODE": true
 };

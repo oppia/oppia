@@ -223,7 +223,16 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'/communityreviewerrightsdatahandler',
         admin.CommunityReviewerRightsDataHandler),
+    get_redirect_route(
+        r'%s' % feconf.COMMUNITY_DASHBOARD_URL,
+        community_dashboard.CommunityDashboardPage),
 
+    get_redirect_route(
+        '/notifications_dashboard',
+        creator_dashboard.OldNotificationsDashboardRedirectPage),
+    get_redirect_route(
+        '/community_dashboard',
+        creator_dashboard.OldCommunityDashboardRedirectPage),
     get_redirect_route(
         feconf.NOTIFICATIONS_DASHBOARD_URL,
         creator_dashboard.NotificationsDashboardPage),
@@ -232,6 +241,9 @@ URLS = MAPREDUCE_HANDLERS + [
         creator_dashboard.NotificationsDashboardHandler),
     get_redirect_route(
         r'/notificationshandler', creator_dashboard.NotificationsHandler),
+    get_redirect_route(
+        '/creator_dashboard',
+        creator_dashboard.OldCreatorDashboardRedirectPage),
     get_redirect_route(
         r'%s' % feconf.CREATOR_DASHBOARD_URL,
         creator_dashboard.CreatorDashboardPage),
@@ -309,6 +321,9 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s' % feconf.UPLOAD_EXPLORATION_URL,
         creator_dashboard.UploadExplorationHandler),
     get_redirect_route(
+        '/learner_dashboard',
+        learner_dashboard.OldLearnerDashboardRedirectPage),
+    get_redirect_route(
         r'%s' % feconf.LEARNER_DASHBOARD_URL,
         learner_dashboard.LearnerDashboardPage),
     get_redirect_route(
@@ -370,6 +385,7 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s' % feconf.CUSTOM_VOLUNTEERS_LANDING_PAGE_URL,
         custom_landing_pages.StewardsLandingPage),
 
+    get_redirect_route('/library', library.OldLibraryRedirectPage),
     get_redirect_route(
         r'%s' % feconf.LIBRARY_INDEX_URL, library.LibraryPage),
     get_redirect_route(
@@ -537,8 +553,8 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/createhandler/statistics/<exploration_id>',
         editor.ExplorationStatisticsHandler),
     get_redirect_route(
-        r'/createhandler/state_rules_stats/<exploration_id>/<escaped_state_name>',  # pylint: disable=line-too-long
-        editor.StateRulesStatsHandler),
+        r'/createhandler/state_interaction_stats/<exploration_id>/<escaped_state_name>',  # pylint: disable=line-too-long
+        editor.StateInteractionStatsHandler),
     get_redirect_route(
         r'%s/<exploration_id>' % feconf.EXPLORATION_STATE_ANSWER_STATS_PREFIX,
         editor.StateAnswerStatisticsHandler),
@@ -698,6 +714,9 @@ URLS = MAPREDUCE_HANDLERS + [
         feconf.VALIDATE_STORY_EXPLORATIONS_URL_PREFIX,
         story_editor.ValidateExplorationsHandler),
 
+    get_redirect_route(
+        '/classroom_page_status_handler', classroom.ClassroomPageStatusHandler),
+
     get_redirect_route(r'/emaildashboard', email_dashboard.EmailDashboardPage),
     get_redirect_route(
         r'/emaildashboarddatahandler',
@@ -719,7 +738,8 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'/explorationdataextractionhandler', admin.DataExtractionQueryHandler),
     get_redirect_route(
-        r'/sendDummyMailToAdminHandler', admin.SendDummyMailToAdminHandler),
+        r'/senddummymailtoadminhandler', admin.SendDummyMailToAdminHandler),
+    get_redirect_route(r'/updateusernamehandler', admin.UpdateUsernameHandler),
     get_redirect_route(r'/frontend_errors', FrontendErrorHandler),
     get_redirect_route(r'/logout', base.LogoutPage),
 
@@ -758,22 +778,5 @@ for subject in feconf.AVAILABLE_LANDING_PAGES:
 # 404 error handler (Needs to be at the end of the URLS list).
 URLS.append(get_redirect_route(r'/<:.*>', base.Error404Handler))
 
-URLS_TO_SERVE = []
-
-if (feconf.ENABLE_MAINTENANCE_MODE and
-        not current_user_services.is_current_user_super_admin()):
-    # Show only the maintenance mode page.
-    URLS_TO_SERVE = [
-        get_redirect_route(r'%s' % feconf.ADMIN_URL, admin.AdminPage),
-        get_redirect_route(r'/adminhandler', admin.AdminHandler),
-        get_redirect_route(r'/adminrolehandler', admin.AdminRoleHandler),
-        get_redirect_route(r'/adminjoboutput', admin.AdminJobOutputHandler),
-        get_redirect_route(
-            r'/admintopicscsvdownloadhandler',
-            admin.AdminTopicsCsvFileDownloader),
-        get_redirect_route(r'/<:.*>', pages.MaintenancePage)]
-else:
-    URLS_TO_SERVE = URLS
-
 app = transaction_services.toplevel_wrapper(  # pylint: disable=invalid-name
-    webapp2.WSGIApplication(URLS_TO_SERVE, debug=feconf.DEBUG))
+    webapp2.WSGIApplication(URLS, debug=feconf.DEBUG))

@@ -28,6 +28,7 @@ module.exports = function(config) {
       // and extensions/... are switched. The test framework may be flaky.
       'core/templates/**/*_directive.html',
       'core/templates/**/*.directive.html',
+      'core/templates/**/*.component.html',
       'core/templates/**/*.template.html',
       // Any of the *.module.ts files could be used here, we use
       // about-page.module.ts because it is first alphabetically.
@@ -38,12 +39,19 @@ module.exports = function(config) {
       // unknown reason.
       'core/templates/combined-tests.spec.ts',
       {
+        pattern: 'third_party/static/literallycanvas-0.5.2/lib/img/*.png',
+        watched: false,
+        served: true,
+        included: false
+      },
+      {
         pattern: 'extensions/**/*.png',
         watched: false,
         served: true,
         included: false
       },
       'extensions/interactions/**/*.directive.html',
+      'extensions/interactions/**/*.component.html',
       'extensions/interactions/rule_templates.json',
       'core/tests/data/*.json',
       {
@@ -63,6 +71,7 @@ module.exports = function(config) {
       // We access files directly in our code, for example /folder/,
       // so we need to proxy the requests from /folder/ to /base/folder/.
       '/assets/': '/base/assets/',
+      '/third_party/': '/base/third_party',
       '/extensions/': '/base/extensions/'
     },
     preprocessors: {
@@ -74,8 +83,10 @@ module.exports = function(config) {
       // list above.
       'core/templates/**/*_directive.html': ['ng-html2js'],
       'core/templates/**/*.directive.html': ['ng-html2js'],
+      'core/templates/**/*.component.html': ['ng-html2js'],
       'core/templates/**/*.template.html': ['ng-html2js'],
       'extensions/interactions/**/*.directive.html': ['ng-html2js'],
+      'extensions/interactions/**/*.component.html': ['ng-html2js'],
       'extensions/interactions/rule_templates.json': ['json_fixtures'],
       'core/tests/data/*.json': ['json_fixtures']
     },
@@ -168,12 +179,23 @@ module.exports = function(config) {
                   // this is needed for thread-loader to work correctly
                   happyPackMode: true
                 }
+              },
+              {
+                loader: 'angular2-template-loader'
               }
             ]
           },
           {
             test: /\.html$/,
+            exclude: /(directive|component)\.html$/,
             loader: 'underscore-template-loader'
+          },
+          {
+            test: /(directive|component)\.html$/,
+            loader: 'html-loader',
+            options: {
+              attributes: false,
+            },
           },
           {
             // Exclude all the spec files from the report.

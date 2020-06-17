@@ -65,6 +65,7 @@ FRONTEND_TEST_CMDS = [
     PYTHON_CMD, '-m', 'scripts.run_frontend_tests', '--check_coverage']
 TRAVIS_CI_PROTRACTOR_CHECK_CMDS = [
     PYTHON_CMD, '-m', 'scripts.check_e2e_tests_are_captured_in_ci']
+TYPESCRIPT_CHECKS_CMDS = [PYTHON_CMD, '-m', 'scripts.typescript_checks']
 GIT_IS_DIRTY_CMD = 'git status --porcelain --untracked-files=no'
 
 
@@ -156,12 +157,15 @@ def get_remote_name():
 
 def git_diff_name_status(left, right, diff_filter=''):
     """Compare two branches/commits etc with git.
+
     Parameter:
         left: the lefthand comperator
         right: the righthand comperator
         diff_filter: arguments given to --diff-filter (ACMRTD...)
+
     Returns:
         List of FileDiffs (tuple with name/status)
+
     Raises:
         ValueError if git command fails.
     """
@@ -192,14 +196,17 @@ def git_diff_name_status(left, right, diff_filter=''):
 
 def compare_to_remote(remote, local_branch, remote_branch=None):
     """Compare local with remote branch with git diff.
+
     Parameter:
         remote: Git remote being pushed to
         local_branch: Git branch being pushed to
         remote_branch: The branch on the remote to test against. If None same
             as local branch.
+
     Returns:
         List of file names that are modified, changed, renamed or added
         but not deleted
+
     Raises:
         ValueError if git command fails.
     """
@@ -221,9 +228,11 @@ def extract_files_to_lint(file_diffs):
 
 def collect_files_being_pushed(ref_list, remote):
     """Collect modified files and filter those that need linting.
+
     Parameter:
         ref_list: list of references to parse (provided by git in stdin)
         remote: the remote being pushed to
+
     Returns:
         dict: Dict mapping branch names to 2-tuples of the form (list of
             changed files, list of files to lint).
@@ -328,36 +337,52 @@ def install_hook():
         raise ValueError(err_chmod_cmd)
 
 
-def does_diff_include_js_or_ts_files(files_to_lint):
+def does_diff_include_js_or_ts_files(diff_files):
     """Returns true if diff includes JavaScript or TypeScript files.
 
     Args:
-        files_to_lint: list(str). List of files to be linted.
+        diff_files: list(str). List of files changed.
 
     Returns:
         bool. Whether the diff contains changes in any JavaScript or TypeScript
             files.
     """
 
-    for filename in files_to_lint:
-        if filename.endswith('.ts') or filename.endswith('.js'):
+    for file_path in diff_files:
+        if file_path.endswith('.ts') or file_path.endswith('.js'):
             return True
     return False
 
 
-def does_diff_include_travis_yml_or_js_files(files_to_lint):
+def does_diff_include_ts_files(diff_files):
+    """Returns true if diff includes TypeScript files.
+
+    Args:
+        diff_files: list(str). List of files changed.
+
+    Returns:
+        bool. Whether the diff contains changes in any TypeScript files.
+    """
+
+    for file_path in diff_files:
+        if file_path.endswith('.ts'):
+            return True
+    return False
+
+
+def does_diff_include_travis_yml_or_js_files(diff_files):
     """Returns true if diff includes .travis.yml or Javascript files.
 
     Args:
-        files_to_lint: list(str). List of files to be linted.
+        diff_files: list(str). List of files changed.
 
     Returns:
         bool. Whether the diff contains changes in travis.yml or
         Javascript files.
     """
 
-    for filename in files_to_lint:
-        if filename.endswith('.js') or filename.endswith('.travis.yml'):
+    for file_path in diff_files:
+        if file_path.endswith('.js') or file_path.endswith('.travis.yml'):
             return True
     return False
 
@@ -396,6 +421,16 @@ def main(args=None):
                     python_utils.PRINT(
                         'Push failed, please correct the linting issues above.')
                     sys.exit(1)
+
+            typescript_checks_status = 0
+            if does_diff_include_ts_files(files_to_lint):
+                typescript_checks_status = run_script_and_get_returncode(
+                    TYPESCRIPT_CHECKS_CMDS)
+            if typescript_checks_status != 0:
+                python_utils.PRINT(
+                    'Push aborted due to failing typescript checks.')
+                sys.exit(1)
+
             frontend_status = 0
             travis_ci_check_status = 0
             if does_diff_include_js_or_ts_files(files_to_lint):
