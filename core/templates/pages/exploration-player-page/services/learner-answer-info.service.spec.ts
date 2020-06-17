@@ -155,13 +155,13 @@ fdescribe('Learner answer info service', () => {
     secondState = sof.createFromBackendDict('fake state', stateDict);
     thirdState = sof.createFromBackendDict('demo state', stateDict);
     learnerAnswerInfoService = TestBed.get(LearnerAnswerInfoService);
-    console.log(JSON.stringify(learnerAnswerInfoService)+"lais");
-    ladbas = TestBed.get(LearnerAnswerDetailsBackendApiService);
+      console.log(JSON.stringify(learnerAnswerInfoService)+"lais");
     DEFAULT_OUTCOME_CLASSIFICATION = TestBed.get(
       DEFAULT_OUTCOME_CLASSIFICATION);
-    console.log(JSON.stringify(DEFAULT_OUTCOME_CLASSIFICATION)+"DOC");
+    console.log(JSON.parse(DEFAULT_OUTCOME_CLASSIFICATION)+"DOC");
+    ladbas = TestBed.get(LearnerAnswerDetailsBackendApiService);
     answerClassificationService = TestBed.get(AnswerClassificationService);
-    console.log(JSON.stringify(answerClassificationService)+"acs");
+    //console.log(JSON.parse(answerClassificationService)+"acs");
     spyOn(answerClassificationService, 'getMatchingClassificationResult')
       .and.returnValue(acrof.createNew(
         oof.createNew('default', 'default_outcome', '', []), 2, 0,
@@ -193,6 +193,8 @@ fdescribe('Learner answer info service', () => {
         '10', firstState, mockAnswer, mockInteractionRulesService, false);
     });
     fit('should return can ask learner for answer info true', function() {
+      console.log(JSON.stringify(ladbas)+"ladbas");
+      console.log(DEFAULT_OUTCOME_CLASSIFICATION+"DOC1");
       expect(learnerAnswerInfoService.getCanAskLearnerForAnswerInfo()).toBe(
         true);
     });

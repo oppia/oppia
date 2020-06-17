@@ -34,7 +34,7 @@ interface ProbabilityIndexes {
 
 @Injectable({
   providedIn: 'root'
-})
+});
 export class LearnerAnswerInfoService {
   constructor(
     private answerClassificationService: AnswerClassificationService,
