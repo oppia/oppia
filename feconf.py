@@ -144,6 +144,9 @@ TASK_STATUS_RESOLVED = 'resolved'
 
 TASK_TARGET_TYPE_STATE = 'state'
 
+MAX_TASK_MODELS_PER_FETCH = 25
+MAX_TASK_MODELS_PER_HISTORY_PAGE = 10
+
 # The maximum number of activities allowed in the playlist of the learner. This
 # limit applies to both the explorations playlist and the collections playlist.
 MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT = 10
