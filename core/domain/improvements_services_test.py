@@ -21,10 +21,10 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 
-from core.platform import models
-from core.tests import test_utils
 from core.domain import improvements_domain
 from core.domain import improvements_services
+from core.platform import models
+from core.tests import test_utils
 import feconf
 
 base_models, improvements_models = models.Registry.import_models(
