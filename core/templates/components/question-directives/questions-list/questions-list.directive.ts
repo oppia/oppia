@@ -79,7 +79,8 @@ angular.module('oppia').directive('questionsList', [
         canEditQuestion: '&',
         getSkillIdToRubricsObject: '&skillIdToRubricsObject',
         getSelectedSkillId: '&selectedSkillId',
-        getGroupedSkillSummaries: '='
+        getGroupedSkillSummaries: '=',
+        getSkillsCategorizedByTopics: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/question-directives/questions-list/' +
@@ -459,6 +460,7 @@ angular.module('oppia').directive('questionsList', [
             var misconceptionsBySkill = ctrl.misconceptionsBySkill;
             var associatedSkillSummaries = ctrl.associatedSkillSummaries;
             var newQuestionIsBeingCreated = ctrl.newQuestionIsBeingCreated;
+            var categorizedSkills = ctrl.getSkillsCategorizedByTopics;
             QuestionUndoRedoService.clearChanges();
             ctrl.editorIsOpen = true;
             var groupedSkillSummaries = ctrl.getGroupedSkillSummaries();
@@ -493,6 +495,7 @@ angular.module('oppia').directive('questionsList', [
               resolve: {
                 associatedSkillSummaries: () => associatedSkillSummaries,
                 canEditQuestion: () => canEditQuestion,
+                categorizedSkills: () => categorizedSkills,
                 groupedSkillSummaries: () => groupedSkillSummaries,
                 misconceptionsBySkill: () => misconceptionsBySkill,
                 newQuestionIsBeingCreated: () => newQuestionIsBeingCreated,

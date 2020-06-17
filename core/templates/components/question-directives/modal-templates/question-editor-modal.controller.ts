@@ -33,7 +33,7 @@ angular.module('oppia').controller('QuestionEditorModalController', [
   'QuestionUndoRedoService', 'QuestionValidationService',
   'SkillSummaryObjectFactory', 'UrlInterpolationService',
   'associatedSkillSummaries', 'canEditQuestion',
-  'groupedSkillSummaries', 'misconceptionsBySkill',
+  'categorizedSkills', 'groupedSkillSummaries', 'misconceptionsBySkill',
   'newQuestionIsBeingCreated', 'question', 'questionId', 'questionStateData',
   'rubrics', 'skillNames',
   function(
@@ -41,7 +41,7 @@ angular.module('oppia').controller('QuestionEditorModalController', [
       QuestionUndoRedoService, QuestionValidationService,
       SkillSummaryObjectFactory, UrlInterpolationService,
       associatedSkillSummaries, canEditQuestion,
-      groupedSkillSummaries, misconceptionsBySkill,
+      categorizedSkills, groupedSkillSummaries, misconceptionsBySkill,
       newQuestionIsBeingCreated, question, questionId, questionStateData,
       rubrics, skillNames) {
     var returnModalObject = {
@@ -93,6 +93,7 @@ angular.module('oppia').controller('QuestionEditorModalController', [
       var sortedSkillSummaries =
         groupedSkillSummaries.current.concat(
           groupedSkillSummaries.others);
+      var allowSkillsFromOtherTopics = true;
       $uibModal.open({
         templateUrl:
           UrlInterpolationService.getDirectiveTemplateUrl(
@@ -102,8 +103,12 @@ angular.module('oppia').controller('QuestionEditorModalController', [
         resolve: {
           skillsInSameTopicCount: () => skillsInSameTopicCount,
           sortedSkillSummaries: () => sortedSkillSummaries,
+          categorizedSkills: () => categorizedSkills,
+          allowSkillsFromOtherTopics: () => allowSkillsFromOtherTopics
         },
-        controller: 'SelectSkillModalController'
+        controller: 'SelectSkillModalController',
+        windowClass: 'skill-select-modal',
+        size: 'xl'
       }).result.then(function(summary) {
         for (var idx in $scope.associatedSkillSummaries) {
           if (

@@ -22,6 +22,10 @@ import { WindowDimensionsService } from
 import { UrlService } from
   'services/contextual/url.service';
 
+require(
+  'pages/landing-pages/stewards-landing-page/' +
+  'stewards-landing-page.component.ts');
+
 describe('Stewards Landing Page', function() {
   var $scope = null, ctrl = null;
   var $timeout = null;
@@ -40,14 +44,13 @@ describe('Stewards Landing Page', function() {
       }
     });
   }));
-  beforeEach(angular.mock.inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector, $componentController) {
     $timeout = $injector.get('$timeout');
     SiteAnalyticsService = $injector.get('SiteAnalyticsService');
 
     var $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
-    var directive = $injector.get('stewardsLandingPageDirective')[0];
-    ctrl = $injector.instantiate(directive.controller, {
+    ctrl = $componentController('stewardsLandingPage', {
       $scope: $scope
     });
   }));
@@ -66,7 +69,7 @@ describe('Stewards Landing Page', function() {
     expect(ctrl.activeTabName).toBe(activeTabName);
     expect(ctrl.buttonDefinitions).toEqual([{
       text: 'Browse Lessons',
-      href: '/library'
+      href: '/community-library'
     }, {
       text: 'Subscribe to our Newsletter',
       href: 'https://eepurl.com/g5v9Df'
@@ -88,7 +91,7 @@ describe('Stewards Landing Page', function() {
     expect(ctrl.activeTabName).toBe(activeTabName);
     expect(ctrl.buttonDefinitions).toEqual([{
       text: 'Browse Lessons',
-      href: '/library'
+      href: '/community-library'
     }, {
       text: 'Subscribe to our Newsletter',
       href: 'https://eepurl.com/g5v9Df'
@@ -114,7 +117,7 @@ describe('Stewards Landing Page', function() {
         'https://www.oppiafoundation.org/partnerships#get-in-touch')
     }, {
       text: 'Browse Lessons',
-      href: '/library'
+      href: '/community-library'
     }]);
     expect(ctrl.isActiveTab(activeTabName)).toBe(true);
     expect(ctrl.isActiveTab('Teachers')).toBe(false);
@@ -174,7 +177,7 @@ describe('Stewards Landing Page', function() {
     var activeTabName = 'Parents';
     var buttonDefinition = {
       text: 'Browse Lessons',
-      href: '/library'
+      href: '/community-library'
     };
     ctrl.setActiveTabName(activeTabName);
     ctrl.onClickButton(buttonDefinition);
@@ -210,7 +213,7 @@ describe('Stewards Landing Page', function() {
     expect(ctrl.getActiveTabNameInSingularForm()).toBe('Parent');
     expect(ctrl.buttonDefinitions).toEqual([{
       text: 'Browse Lessons',
-      href: '/library'
+      href: '/community-library'
     }, {
       text: 'Subscribe to our Newsletter',
       href: 'https://eepurl.com/g5v9Df'

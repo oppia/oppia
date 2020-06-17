@@ -20,6 +20,8 @@
 // the code corresponding to the spec is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
 
+require('pages/email-dashboard-pages/email-dashboard-page.component.ts');
+
 describe('Email Dashboard Page', function() {
   var $scope = null;
   var ctrl = null;
@@ -45,20 +47,19 @@ describe('Email Dashboard Page', function() {
       $provide.value(key, value);
     }
   }));
-  beforeEach(angular.mock.inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector, $componentController) {
     EmailDashboardDataService = $injector.get('EmailDashboardDataService');
     UserService = $injector.get('UserService');
     loadingMessage = '';
     LoaderService = $injector.get('LoaderService');
-    subscriptions.push(LoaderService.getLoadingMessageSubject().subscribe(
+    subscriptions.push(LoaderService.onLoadingMessageChange.subscribe(
       (message: string) => loadingMessage = message
     ));
     $q = $injector.get('$q');
 
     var $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
-    var directive = $injector.get('emailDashboardPageDirective')[0];
-    ctrl = $injector.instantiate(directive.controller, {
+    ctrl = $componentController('emailDashboardPage', {
       $rootScope: $scope
     });
 
