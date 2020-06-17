@@ -489,8 +489,8 @@ def apply_change_list(exploration_id, change_list):
             elif (
                     change.cmd ==
                     exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION):
-                # Check that the version that you're trying to migrate to
-                # is the latest version.
+                # Check that the version that the user is trying to migrate
+                # to is the latest version.
                 target_version_is_current_state_schema_version = (
                     change.to_version ==
                     python_utils.UNICODE(feconf.CURRENT_STATE_SCHEMA_VERSION))

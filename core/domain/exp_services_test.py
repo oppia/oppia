@@ -2659,7 +2659,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 exploration.states_schema_version),
             latest_schema_version)
 
-    def test_migrate_exploration_to_not_the_lastest_schema_version_fails(self):
+    def test_migrate_exploration_to_not_the_latest_schema_version_fails(self):
         """Test migrate state schema to not the latest version fails."""
         latest_schema_version = feconf.CURRENT_STATE_SCHEMA_VERSION
         not_latest_schema_version = python_utils.UNICODE(

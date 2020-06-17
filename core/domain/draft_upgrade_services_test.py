@@ -113,9 +113,9 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
 
         Args:
             current_schema_version: string. The current schema version of the
-                exploration (eg. '29')
+                exploration (eg. '29').
             target_schema_version: string. The schema version to upgrade
-                the exploration to (eg. '30')
+                the exploration to (eg. '30').
         """
 
         # Create an exploration change list with the command that will migrate
@@ -200,9 +200,9 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 }
             })
         ]
-        # Version 33 adds a showChoicesInShuffledOrder bool, doesn't impact
-        # the second ExplorationChange because it will only impact it if
-        # 'choices' is the only key for new_value.
+        # Version 33 adds a showChoicesInShuffledOrder bool, which doesn't
+        # impact the second ExplorationChange because it will only impact
+        # it if 'choices' is the only key for new_value.
         expected_draft_change_list_v33 = [
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
@@ -252,12 +252,17 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             draft_upgrade_services.try_upgrading_draft_to_exp_version(
                 draft_change_list_v32, 1, 2, self.EXP_ID)
         )
+        # Change draft change lists into a list of dicts so that it is
+        # easy to compare the whole draft change list.
+        expected_draft_change_list_v33_dict_list = [
+            change.to_dict() for change in expected_draft_change_list_v33
+        ]
+        migrated_draft_change_list_v33_dict_list = [
+            change.to_dict() for change in migrated_draft_change_list_v33
+        ]
         self.assertEqual(
-            expected_draft_change_list_v33[0].to_dict(),
-            migrated_draft_change_list_v33[0].to_dict())
-        self.assertEqual(
-            expected_draft_change_list_v33[1].to_dict(),
-            migrated_draft_change_list_v33[1].to_dict())
+            expected_draft_change_list_v33_dict_list,
+            migrated_draft_change_list_v33_dict_list)
 
     def test_convert_states_v31_dict_to_v32_dict(self):
         draft_change_list_v31 = [
@@ -279,9 +284,17 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             draft_upgrade_services.try_upgrading_draft_to_exp_version(
                 draft_change_list_v31, 1, 2, self.EXP_ID)
         )
+        # Change draft change lists into a list of dicts so that it is
+        # easy to compare the whole draft change list.
+        draft_change_list_v31_dict_list = [
+            change.to_dict() for change in draft_change_list_v31
+        ]
+        migrated_draft_change_list_v32_dict_list = [
+            change.to_dict() for change in migrated_draft_change_list_v32
+        ]
         self.assertEqual(
-            draft_change_list_v31[0].to_dict(),
-            migrated_draft_change_list_v32[0].to_dict())
+            draft_change_list_v31_dict_list,
+            migrated_draft_change_list_v32_dict_list)
 
     def test_convert_states_v30_dict_to_v31_dict(self):
         draft_change_list_v30 = [
@@ -330,9 +343,17 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             draft_upgrade_services.try_upgrading_draft_to_exp_version(
                 draft_change_list_v30, 1, 2, self.EXP_ID)
         )
+        # Change draft change lists into a list of dicts so that it is
+        # easy to compare the whole draft change list.
+        expected_draft_change_list_v31_dict_list = [
+            change.to_dict() for change in expected_draft_change_list_v31
+        ]
+        migrated_draft_change_list_v31_dict_list = [
+            change.to_dict() for change in migrated_draft_change_list_v31
+        ]
         self.assertEqual(
-            expected_draft_change_list_v31[0].to_dict(),
-            migrated_draft_change_list_v31[0].to_dict())
+            expected_draft_change_list_v31_dict_list,
+            migrated_draft_change_list_v31_dict_list)
 
     def test_convert_states_v29_dict_to_v30_dict(self):
         draft_change_list_v29 = [
@@ -411,9 +432,17 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             draft_upgrade_services.try_upgrading_draft_to_exp_version(
                 draft_change_list_v29, 1, 2, self.EXP_ID)
         )
+        # Change draft change lists into a list of dicts so that it is
+        # easy to compare the whole draft change list.
+        expected_draft_change_list_v30_dict_list = [
+            change.to_dict() for change in expected_draft_change_list_v30
+        ]
+        migrated_draft_change_list_v30_dict_list = [
+            change.to_dict() for change in migrated_draft_change_list_v30
+        ]
         self.assertEqual(
-            expected_draft_change_list_v30[0].to_dict(),
-            migrated_draft_change_list_v30[0].to_dict())
+            expected_draft_change_list_v30_dict_list,
+            migrated_draft_change_list_v30_dict_list)
 
     def test_convert_states_v28_dict_to_v29_dict(self):
         draft_change_list_v28 = [
@@ -435,9 +464,17 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             draft_upgrade_services.try_upgrading_draft_to_exp_version(
                 draft_change_list_v28, 1, 2, self.EXP_ID)
         )
+        # Change draft change lists into a list of dicts so that it is
+        # easy to compare the whole draft change list.
+        draft_change_list_v28_dict_list = [
+            change.to_dict() for change in draft_change_list_v28
+        ]
+        migrated_draft_change_list_v29_dict_list = [
+            change.to_dict() for change in migrated_draft_change_list_v29
+        ]
         self.assertEqual(
-            draft_change_list_v28[0].to_dict(),
-            migrated_draft_change_list_v29[0].to_dict())
+            draft_change_list_v28_dict_list,
+            migrated_draft_change_list_v29_dict_list)
 
     def test_convert_states_v27_dict_to_v28_dict(self):
         draft_change_list_v27 = [
@@ -465,6 +502,14 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             draft_upgrade_services.try_upgrading_draft_to_exp_version(
                 draft_change_list_v27, 1, 2, self.EXP_ID)
         )
+        # Change draft change lists into a list of dicts so that it is
+        # easy to compare the whole draft change list.
+        expected_draft_change_list_v28_dict_list = [
+            change.to_dict() for change in expected_draft_change_list_v28
+        ]
+        migrated_draft_change_list_v28_dict_list = [
+            change.to_dict() for change in migrated_draft_change_list_v28
+        ]
         self.assertEqual(
-            expected_draft_change_list_v28[0].to_dict(),
-            migrated_draft_change_list_v28[0].to_dict())
+            expected_draft_change_list_v28_dict_list,
+            migrated_draft_change_list_v28_dict_list)
