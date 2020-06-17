@@ -122,9 +122,9 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
         # the schema from current_schema_version to target_schema_version.
         exp_migration_change_list = [
             exp_domain.ExplorationChange({
-            'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
-            'from_version': current_schema_version,
-            'to_version': target_schema_version
+                'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
+                'from_version': current_schema_version,
+                'to_version': target_schema_version
             })
         ]
 
@@ -282,7 +282,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             draft_change_list_v31[0].to_dict(),
             migrated_draft_change_list_v32[0].to_dict())
-                         
+
     def test_convert_states_v30_dict_to_v31_dict(self):
         draft_change_list_v30 = [
             exp_domain.ExplorationChange({
@@ -368,7 +368,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 }
             })
         ]
-        # Version 30 replaces the tagged_misconception_id in version 29 
+        # Version 30 replaces the tagged_misconception_id in version 29
         # with tagged_skill_misconception_id.
         expected_draft_change_list_v30 = [
             exp_domain.ExplorationChange({
@@ -428,7 +428,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
         self.create_and_migrate_new_exploration('28', '29')
         # Migrate the draft change list's state schema to the migrated
         # exploration's schema. In this case there are no change to the
-        # draft change list since version 29 adds the 
+        # draft change list since version 29 adds the
         # solicit_answer_details boolean variable to the exploration
         # state, for which there should be no changes to drafts.
         migrated_draft_change_list_v29 = (

@@ -492,7 +492,7 @@ def apply_change_list(exploration_id, change_list):
                 # Check that the version that you're trying to migrate to
                 # is the latest version.
                 target_version_is_current_state_schema_version = (
-                    change.to_version == 
+                    change.to_version ==
                     python_utils.UNICODE(feconf.CURRENT_STATE_SCHEMA_VERSION))
                 if not target_version_is_current_state_schema_version:
                     raise Exception(
