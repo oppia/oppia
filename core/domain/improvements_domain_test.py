@@ -55,6 +55,97 @@ class TaskEntryTests(test_utils.GenericTestBase):
             task.task_id,
             'exploration.eid.1.high_bounce_rate.state.Introduction')
 
+    def test_apply_changes_raises_for_mismatched_task_ids(self):
+        task = improvements_domain.TaskEntry(
+            improvements_models.TASK_ENTITY_TYPE_EXPLORATION, self.exp_id, 1,
+            improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
+            improvements_models.TASK_TARGET_TYPE_STATE,
+            feconf.DEFAULT_INIT_STATE_NAME, 'issue description',
+            improvements_models.TASK_STATUS_RESOLVED, self.owner_id,
+            self.MOCK_DATE)
+        task_model = task.to_model()
+        task.entity_version = 2
+        with self.assertRaisesRegexp(
+                Exception, 'Applying changes to wrong model'):
+            task.apply_changes(task_model)
+
+    def test_apply_changes_to_status(self):
+        task = improvements_domain.TaskEntry(
+            improvements_models.TASK_ENTITY_TYPE_EXPLORATION, self.exp_id, 1,
+            improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
+            improvements_models.TASK_TARGET_TYPE_STATE,
+            feconf.DEFAULT_INIT_STATE_NAME, 'issue description',
+            improvements_models.TASK_STATUS_RESOLVED, self.owner_id,
+            self.MOCK_DATE)
+        task_model = task.to_model()
+        task_model.status = improvements_models.TASK_STATUS_OBSOLETE
+
+        self.assertTrue(task.apply_changes(task_model))
+
+    def test_apply_changes_to_resolver_id(self):
+        task = improvements_domain.TaskEntry(
+            improvements_models.TASK_ENTITY_TYPE_EXPLORATION, self.exp_id, 1,
+            improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
+            improvements_models.TASK_TARGET_TYPE_STATE,
+            feconf.DEFAULT_INIT_STATE_NAME, 'issue description',
+            improvements_models.TASK_STATUS_RESOLVED, self.owner_id,
+            self.MOCK_DATE)
+        task_model = task.to_model()
+        task_model.resolver_id = 'new-%s' % (self.owner_id,)
+
+        self.assertTrue(task.apply_changes(task_model))
+
+    def test_apply_changes_to_resolved_on(self):
+        task = improvements_domain.TaskEntry(
+            improvements_models.TASK_ENTITY_TYPE_EXPLORATION, self.exp_id, 1,
+            improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
+            improvements_models.TASK_TARGET_TYPE_STATE,
+            feconf.DEFAULT_INIT_STATE_NAME, 'issue description',
+            improvements_models.TASK_STATUS_RESOLVED, self.owner_id,
+            self.MOCK_DATE)
+        task_model = task.to_model()
+        task_model.resolved_on = self.MOCK_DATE + datetime.timedelta(days=1)
+
+        self.assertTrue(task.apply_changes(task_model))
+
+    def test_apply_changes_to_issue_description(self):
+        task = improvements_domain.TaskEntry(
+            improvements_models.TASK_ENTITY_TYPE_EXPLORATION, self.exp_id, 1,
+            improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
+            improvements_models.TASK_TARGET_TYPE_STATE,
+            feconf.DEFAULT_INIT_STATE_NAME, 'issue description',
+            improvements_models.TASK_STATUS_RESOLVED, self.owner_id,
+            self.MOCK_DATE)
+        task_model = task.to_model()
+        task_model.issue_description = 'new issue description'
+
+        self.assertTrue(task.apply_changes(task_model))
+
+    def test_apply_changes_to_issue_description(self):
+        task = improvements_domain.TaskEntry(
+            improvements_models.TASK_ENTITY_TYPE_EXPLORATION, self.exp_id, 1,
+            improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
+            improvements_models.TASK_TARGET_TYPE_STATE,
+            feconf.DEFAULT_INIT_STATE_NAME, 'issue description',
+            improvements_models.TASK_STATUS_RESOLVED, self.owner_id,
+            self.MOCK_DATE)
+        task_model = task.to_model()
+        task_model.issue_description = 'new issue description'
+
+        self.assertTrue(task.apply_changes(task_model))
+
+    def test_apply_no_changes(self):
+        task = improvements_domain.TaskEntry(
+            improvements_models.TASK_ENTITY_TYPE_EXPLORATION, self.exp_id, 1,
+            improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
+            improvements_models.TASK_TARGET_TYPE_STATE,
+            feconf.DEFAULT_INIT_STATE_NAME, 'issue description',
+            improvements_models.TASK_STATUS_RESOLVED, self.owner_id,
+            self.MOCK_DATE)
+        task_model = task.to_model()
+
+        self.assertFalse(task.apply_changes(task_model))
+
     def test_composite_entity_id(self):
         task = improvements_domain.TaskEntry(
             improvements_models.TASK_ENTITY_TYPE_EXPLORATION, self.exp_id, 1,
@@ -163,8 +254,8 @@ class TaskEntryTests(test_utils.GenericTestBase):
         self.assertEqual(task.target_id, feconf.DEFAULT_INIT_STATE_NAME)
         self.assertEqual(task.issue_description, 'issue description')
         self.assertEqual(task.status, improvements_models.TASK_STATUS_RESOLVED)
-        self.assertEqual(task.resolver_id, None)
-        self.assertEqual(task.resolved_on, None)
+        self.assertIsNone(task.resolver_id)
+        self.assertIsNone(task.resolved_on)
 
     def test_open(self):
         task = improvements_domain.TaskEntry(
@@ -180,8 +271,8 @@ class TaskEntryTests(test_utils.GenericTestBase):
 
         task.open()
         self.assertEqual(task.status, improvements_models.TASK_STATUS_OPEN)
-        self.assertEqual(task.resolver_id, None)
-        self.assertEqual(task.resolved_on, None)
+        self.assertIsNone(task.resolver_id)
+        self.assertIsNone(task.resolved_on)
 
     def test_obsolete(self):
         task = improvements_domain.TaskEntry(
@@ -197,8 +288,8 @@ class TaskEntryTests(test_utils.GenericTestBase):
 
         task.obsolete()
         self.assertEqual(task.status, improvements_models.TASK_STATUS_OBSOLETE)
-        self.assertEqual(task.resolver_id, None)
-        self.assertEqual(task.resolved_on, None)
+        self.assertIsNone(task.resolver_id)
+        self.assertIsNone(task.resolved_on)
 
     def test_resolve(self):
         task = improvements_domain.TaskEntry(
@@ -208,8 +299,8 @@ class TaskEntryTests(test_utils.GenericTestBase):
             feconf.DEFAULT_INIT_STATE_NAME, 'issue description',
             improvements_models.TASK_STATUS_OPEN, None, None)
         self.assertEqual(task.status, improvements_models.TASK_STATUS_OPEN)
-        self.assertEqual(task.resolver_id, None)
-        self.assertEqual(task.resolved_on, None)
+        self.assertIsNone(task.resolver_id)
+        self.assertIsNone(task.resolved_on)
 
         with self.mock_datetime_utcnow(self.MOCK_DATE):
             task.resolve(self.owner_id)

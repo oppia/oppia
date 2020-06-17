@@ -116,17 +116,26 @@ class TaskEntry(object):
 
         Args:
             task_entry_model: improvements_models.TaskEntryModel.
+
+        Returns:
+            bool. Whether any change was made to the model.
         """
         if task_entry_model.id != self.task_id:
             raise Exception('Applying changes to wrong model')
+        changes_made = False
         if task_entry_model.issue_description != self.issue_description:
             task_entry_model.issue_description = self.issue_description
+            changes_made = True
         if task_entry_model.status != self.status:
             task_entry_model.status = self.status
+            changes_made = True
         if task_entry_model.resolver_id != self.resolver_id:
             task_entry_model.resolver_id = self.resolver_id
+            changes_made = True
         if task_entry_model.resolved_on != self.resolved_on:
             task_entry_model.resolved_on = self.resolved_on
+            changes_made = True
+        return changes_made
 
     def to_dict(self):
         """Returns a dict-representation of the task.
@@ -159,7 +168,9 @@ class TaskEntry(object):
             'resolver_username': (
                 self.resolver_id and
                 user_services.get_username(self.resolver_id)),
-            'resolved_on_msecs': utils.get_time_in_millisecs(self.resolved_on),
+            'resolved_on_msecs': (
+                self.resolved_on and
+                utils.get_time_in_millisecs(self.resolved_on)),
         }
 
     @classmethod

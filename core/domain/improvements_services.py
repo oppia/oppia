@@ -34,18 +34,16 @@ import python_utils
 _MODEL = improvements_models.TaskEntryModel
 
 
-def _yield_all_tasks_ordered_by_status(entity_type, entity_id, entity_version):
-    """Yields all tasks in storage corresponding to the given entity."""
+def _yield_all_tasks_ordered_by_status(composite_entity_id):
+    """Yields all tasks corresponding to the given entity in storage."""
     query = _MODEL.query(
-        _MODEL.composite_entity_id == _MODEL.generate_composite_entity_id(
-            entity_type, entity_id, entity_version)).order(_MODEL.status)
-    while True:
+        _MODEL.composite_entity_id == composite_entity_id).order(_MODEL.status)
+    cursor, has_more = (None, True)
+    while has_more:
         task_models, cursor, has_more = query.fetch_page(
             feconf.MAX_TASK_MODELS_PER_FETCH, start_cursor=cursor)
         for task_model in task_models:
             yield improvements_domain.TaskEntry.from_model(task_model)
-        if not has_more:
-            break
 
 
 def fetch_exploration_tasks(exploration):
@@ -62,15 +60,17 @@ def fetch_exploration_tasks(exploration):
                 names to the list of resolved task types. Absent keys imply that
                 the state has no resolved tasks.
     """
+    composite_entity_id = (
+        improvements_models.TaskEntryModel.generate_composite_entity_id(
+            improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
+            exploration.id, exploration.version))
     tasks_grouped_by_status = itertools.groupby(
-        _yield_all_tasks_ordered_by_status(
-            improvements_models.TASK_ENTITY_TYPE_EXPLORATION, exploration.id,
-            exploration.version),
+        _yield_all_tasks_ordered_by_status(composite_entity_id),
         operator.attrgetter('status'))
 
     open_tasks = []
     resolved_task_types_by_state_name = collections.defaultdict(list)
-    for tasks, status_group in tasks_grouped_by_status:
+    for status_group, tasks in tasks_grouped_by_status:
         if status_group == improvements_models.TASK_STATUS_OPEN:
             open_tasks.extend(tasks)
         elif status_group == improvements_models.TASK_STATUS_RESOLVED:
@@ -80,11 +80,28 @@ def fetch_exploration_tasks(exploration):
     return (open_tasks, resolved_task_types_by_state_name)
 
 
-def fetch_task_history_page(entity_type, entity_id, cursor=None):
+def fetch_exploration_task_history_page(exploration, cursor=None):
+    """Fetches a page of tasks from the provided entity's history of tasks.
+
+    Args:
+        exploration: exp_domain.Exploration.
+        cursor: *. Starting point for search. When None, the starting point is
+            the very beginning of the history results.
+
+    Returns:
+        tuple. Contains the following three items:
+            results: list. The query results.
+            cursor: a query cursor pointing to the "next" batch of results. If
+                there are no more results, this might be None.
+            more: bool. Indicates whether there are (likely) more results after
+                this batch. If False, there are no more results; if True, there
+                are probably more results.
+    """
     return (
         _MODEL.query(
-            _MODEL.entity_type == entity_type,
-            _MODEL.entity_id == entity_id,
+            _MODEL.entity_type == (
+                improvements_models.TASK_ENTITY_TYPE_EXPLORATION),
+            _MODEL.entity_id == exploration.id,
             _MODEL.status == improvements_models.TASK_STATUS_RESOLVED)
         .order(-_MODEL.last_updated)
         .fetch_page(
@@ -92,10 +109,21 @@ def fetch_task_history_page(entity_type, entity_id, cursor=None):
 
 
 def put_tasks(tasks, update_last_updated_time=True):
+    """Puts each of the given tasks into storage, optionally updating their last
+    updated time.
+
+    Args:
+        tasks: list(improvements_domain.TaskEntry). Domain object instances for
+            each task to be placed into stored.
+        update_last_updated_time: bool. Whether to update the last_updated field
+            of the task models.
+    """
     models = _MODEL.get_multi([t.task_id for t in tasks])
-    for (task, model), i in enumerate(python_utils.ZIP(tasks, models)):
+    for i, (task, model) in enumerate(python_utils.ZIP(tasks, models)):
         if model is None:
             models[i] = task.to_model()
-        else:
-            task.apply_changes(model)
-    _MODEL.put_multi(models, update_last_updated_time=update_last_updated_time)
+        elif not task.apply_changes(model):
+            models[i] = None
+    _MODEL.put_multi(
+       [m for m in models if m is not None],
+       update_last_updated_time=update_last_updated_time)
