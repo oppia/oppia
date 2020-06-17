@@ -88,9 +88,10 @@ class CyclicStateTransitionsTracker {
       this.visitedStates.add(destStateName);
     } else {
       const newStateRegression = [this.currStateName, destStateName];
+      const stateRegressionOccurrences = (
+        this.stateRegressionOccurrences.entries());
       let stateRegressionFound = false;
-      for (const [stateRegression, occurrences] of
-           this.stateRegressionOccurrences.entries()) {
+      for (const [stateRegression, occurrences] of stateRegressionOccurrences) {
         if (this.isSameStateRegression(stateRegression, newStateRegression)) {
           this.stateRegressionOccurrences.set(stateRegression, occurrences + 1);
           stateRegressionFound = true;
@@ -124,8 +125,9 @@ class CyclicStateTransitionsTracker {
   private getMostCommonStateRegression(): [string[], number] {
     let mostCommonStateRegression = null;
     let mostCommonStateRegressionOccurrences = 0;
-    for (const [stateRegression, occurrences] of
-         this.stateRegressionOccurrences.entries()) {
+    const stateRegressionOccurrences = (
+      this.stateRegressionOccurrences.entries());
+    for (const [stateRegression, occurrences] of stateRegressionOccurrences) {
       // When two state transitions have the same number of occurrences, we take
       // the most recent one (which would appear later in the map).
       if (occurrences >= mostCommonStateRegressionOccurrences) {
