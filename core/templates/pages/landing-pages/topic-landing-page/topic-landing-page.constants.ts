@@ -25,42 +25,22 @@ export class TopicLandingPageConstants {
       fractions: {
         topicTitle: 'Fractions',
         topicTagline: 'Add, Subtract, Multiply and Divide',
-        collectionId: '4UgTQUc1tala'
+        collectionId: '4UgTQUc1tala',
+        chapters: ['The meaning of equal parts', 'Comparing fractions']
       },
       'negative-numbers': {
         topicTitle: 'Negative Numbers',
         topicTagline: 'Add, Subtract, Multiply and Divide',
-        collectionId: 'GdYIgsfRZwG7'
+        collectionId: 'GdYIgsfRZwG7',
+        chapters: [
+          'The meaning of the number line', 'Calculating with negative numbers']
       },
       ratios: {
         topicTitle: 'Ratios',
         topicTagline: 'Equivalent Ratios, Combining Ratios',
-        collectionId: '53gXGLIR044l'
+        collectionId: '53gXGLIR044l',
+        chapters: ['The meaning of equivalent ratios', 'Combining Ratios']
       }
     }
   };
-
-  public static LESSON_QUALITIES_DATA = [{
-    title: 'Fun storytelling',
-    description: (
-      'Oppia\'s lessons tell stories using video and images to ' +
-      'help learners apply math concepts in everyday life.'),
-    imageFilename: 'fun_storytelling.png',
-    imageAlt: 'An image of a lesson journey illustrated on top of an open book.'
-  }, {
-    title: 'Accessible lessons',
-    description: (
-      'Our lessons come with audio translations in different ' +
-      'languages, require little bandwidth, and are mobile friendly.'),
-    imageFilename: 'accessible_lessons.png',
-    imageAlt: 'A speaker emitting sound next to text and a Play button.'
-  }, {
-    title: 'Suitable for all',
-    description: (
-      'No matter your level, there\'s a lesson for you! From ' +
-      'learning the meaning of equal parts, to comparing fractions ' +
-      '- Oppia has you covered.'),
-    imageFilename: 'suitable_for_all.png',
-    imageAlt: 'A selection of characters from the lessons.'
-  }];
 }

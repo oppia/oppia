@@ -3,7 +3,11 @@
     <div class="oppia-landing-section-inner">
       <div class="oppia-flex-box oppia-flex-row oppia-flex-mobile-column oppia-flex-mobile-align-center">
         <div class="oppia-flex-item oppia-landing-page-image-container oppia-flex-mobile-order-2">
-          <img class="oppia-devices-image" ng-src="<[$ctrl.lessonInDevicesImageSrc]>" alt="Oppia lesson in different devices.">
+          <picture>
+            <source type="image/webp" ng-srcset="<[$ctrl.lessonInDevicesWebpImageSrc]>">
+            <source type="image/png" ng-srcset="<[$ctrl.lessonInDevicesPngImageSrc]>">
+            <img class="oppia-devices-image" ng-src="<[$ctrl.lessonInDevicesPngImageSrc]>" alt="Oppia lesson in different devices.">
+          </picture>
         </div>
         <div class="oppia-flex-item oppia-flex-box oppia-flex-column">
           <div class="oppia-flex-item oppia-text-align-left">
@@ -26,7 +30,11 @@
       <div class="oppia-flex-box oppia-flex-mobile-column oppia-flex-row">
         <div class="oppia-flex-box oppia-flex-column oppia-flex-mobile-row oppia-flex-item oppia-flex-mobile-align-center oppia-container-margin" ng-repeat="quality in $ctrl.lessonsQualities">
           <div class="oppia-flex-item oppia-landing-page-image-container">
-            <img ng-src="<[$ctrl.getLessonQualityImageSrc(quality.imageFilename)]>" alt="<[quality.imageAlt]>">
+            <picture>
+              <source type="image/webp" ng-srcset="<[$ctrl.getLessonQualityImageSrc(quality.imageWebpFilename)]>">
+              <source type="image/png" ng-srcset="<[$ctrl.getLessonQualityImageSrc(quality.imagePngFilename)]>">
+              <img ng-src="<[$ctrl.getLessonQualityImageSrc(quality.imagePngFilename)]>" alt="<[quality.imageAlt]>">
+            </picture>
           </div>
           <div class="oppia-flex-item oppia-flex-box oppia-flex-column">
             <div class="oppia-flex-item oppia-text-align-left">
@@ -59,10 +67,11 @@
 </div>
 
 <style>
-  .oppia-landing-page h1, h2, button {
+  .oppia-landing-page h2, button {
     font-family: "Capriola", "Roboto", Arial, sans-serif;
   }
-  .oppia-landing-page h1, h2, h3, p {
+  .oppia-landing-page h3, p {
+    font-weight: 500;
     line-height: 1.4;
   }
   .oppia-landing-section-inner {

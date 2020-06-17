@@ -39,6 +39,35 @@ angular.module('oppia').component('topicLandingPage', {
         SiteAnalyticsService, UrlInterpolationService, WindowRef,
         TOPIC_LANDING_PAGE_DATA) {
       var ctrl = this;
+
+      var getLessonQualities = function() {
+        return [{
+          title: 'Fun storytelling',
+          description: (
+            'Oppia\'s lessons tell stories using video and images to ' +
+            'help learners apply math concepts in everyday life.'),
+          imagePngFilename: 'fun_storytelling.png',
+          imageWebpFilename: 'fun_storytelling.webp',
+          imageAlt: 'Storytelling lessons presentation.'
+        }, {
+          title: 'Accessible lessons',
+          description: (
+            'Our lessons come with audio translations in different ' +
+            'languages, require little bandwidth, and are mobile friendly.'),
+          imagePngFilename: 'accessible_lessons.png',
+          imageWebpFilename: 'accessible_lessons.webp',
+          imageAlt: 'Lesson accessibility presentation.'
+        }, {
+          title: 'Suitable for all',
+          description: (
+            'No matter your level, there\'s a lesson for you! From learning ' +
+            topicData.chapters[0].toLowerCase() + ', to ' +
+            topicData.chapters[1].toLowerCase() + ' - Oppia has you covered.'),
+          imagePngFilename: 'suitable_for_all.png',
+          imageWebpFilename: 'suitable_for_all.webp',
+          imageAlt: 'Lesson viewers and learners.'
+        }];
+      };
       var topicData = null;
 
       ctrl.getLessonQualityImageSrc = function(filename) {
@@ -71,18 +100,30 @@ angular.module('oppia').component('topicLandingPage', {
         var topicName = pathArray[2];
         topicData = TOPIC_LANDING_PAGE_DATA[subjectName][topicName];
         ctrl.topicTitle = topicData.topicTitle;
-        ctrl.lessonsQualities = LESSON_QUALITIES_DATA;
+
+        ctrl.lessonsQualities = getLessonQualities();
         ctrl.backgroundBannerUrl = (
           UrlInterpolationService.getStaticImageUrl(
             '/background/bannerB.svg'));
-        ctrl.lessonInDevicesImageSrc = (
+
+        var topicImageUrlTemplate = '/landing/<subject>/<topic>/<filename>';
+        ctrl.lessonInDevicesPngImageSrc = (
           UrlInterpolationService.getStaticImageUrl(
             UrlInterpolationService.interpolateUrl(
-              '/landing/<subject>/<topic>/<filename>', {
+              topicImageUrlTemplate, {
                 subject: subjectName,
                 topic: topicName,
                 filename: 'lesson_in_devices.png'
               })));
+        ctrl.lessonInDevicesWebpImageSrc = (
+          UrlInterpolationService.getStaticImageUrl(
+            UrlInterpolationService.interpolateUrl(
+              topicImageUrlTemplate, {
+                subject: subjectName,
+                topic: topicName,
+                filename: 'lesson_in_devices.webp'
+              })));
+
         PageTitleService.setPageTitle(
           [ctrl.topicTitle, topicData.topicTagline, 'Oppia'].join(' | '));
       };
