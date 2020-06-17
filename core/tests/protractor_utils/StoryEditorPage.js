@@ -128,14 +128,14 @@ var StoryEditorPage = function() {
     return await workflow.getImageSource(chapterThumbnailImageElement);
   };
 
-  this.submitStoryThumbnail = async function(imgPath) {
+  this.submitStoryThumbnail = async function(imgPath, resetExistingImage) {
     return await workflow.submitImage(
-      storyThumbnailButton, thumbnailContainer, imgPath);
+      storyThumbnailButton, thumbnailContainer, imgPath, resetExistingImage);
   };
 
-  this.submitChapterThumbnail = async function(imgPath) {
+  this.submitChapterThumbnail = async function(imgPath, resetExistingImage) {
     return await workflow.submitImage(
-      chapterThumbnailButton, thumbnailContainer, imgPath);
+      chapterThumbnailButton, thumbnailContainer, imgPath, resetExistingImage);
   };
 
   this.publishStory = async function() {
