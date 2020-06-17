@@ -71,3 +71,17 @@ script:
 - if [ "$RUN_E2E_TESTS_SKILL_EDITOR" == 'true' ]; then python -m scripts.run_e2e_tests --suite="skillEditor" --prod_env; fi
 - if [ "$RUN_E2E_TESTS_TOPIC" == 'true' ]; then python -m scripts.run_e2e_tests --suite="topicAndStoryEditor" --prod_env; python -m scripts.run_e2e_tests --skip-build --skip-install --suite="topicsAndSkillsDashboard" --prod_env; fi
 - if [ "$RUN_E2E_ACCESSIBILITY_EMBEDDING" == 'true' ]; then python -m scripts.run_e2e_tests --suite="accessibility" --prod_env; python -m scripts.run_e2e_tests --skip-build --skip-install --suite="embedding" --prod_env; fi
+
+cache:
+  # Cache Oppia's dependencies.
+  directories:
+    - ../oppia_tools/
+    - node_modules/
+    - third_party/
+    - $HOME/.cache/pip
+    - $HOME/.cache/TravisChrome/
+
+before_cache:
+  # Delete python bytecode to prevent cache rebuild.
+  - find third_party -name "*.pyc" -print -delete
+  - find backend_prod_files/extensions/ -name "*.pyc" -print -delete
