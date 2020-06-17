@@ -24,6 +24,16 @@ import { BrowserCheckerService } from
   'domain/utilities/browser-checker.service';
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
 
+interface ExplorationLanguageInfo {
+  /**
+   * This inteface is used to keep track of the audio language code (value)
+   * and the audio language description to display (displayed) for the
+   * _languagesInExploration property.
+   */
+  value: string,
+  displayed: string
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -35,7 +45,7 @@ export class AudioTranslationLanguageService {
   _allAudioLanguageCodesInExploration: Array<string> = null;
   _explorationLanguageCode: string = null;
   _automaticTextToSpeechEnabled: boolean = null;
-  _languagesInExploration: Array<{ value: string, displayed: string }> = [];
+  _languagesInExploration: Array<ExplorationLanguageInfo> = [];
 
   attemptToSetAudioLanguageToExplorationLanguage(): void {
     // We minimize the number of related languages, because we want to
@@ -158,11 +168,12 @@ export class AudioTranslationLanguageService {
   }
 
   /**
-   * @return {Array<{ value: string, displayed: string }>}
-   * An array of the audio language codes (value) as well as their displayed
-   * description (displayed) in exploration.
+   * @return {Array<ExplorationLanguageInfo>}
+   * An array of ExplorationLanguageInfo objects which consist of audio
+   * language codes as well as their displayed language description for
+   * the exploration.
    */
-  getLanguageOptionsForDropdown(): Array<{ value: string, displayed: string }> {
+  getLanguageOptionsForDropdown(): Array<ExplorationLanguageInfo> {
     return this._languagesInExploration;
   }
 
