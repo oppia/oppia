@@ -225,14 +225,14 @@ describe('Concept card backend API service', () => {
         successHandler, failHandler);
       var req = httpTestingController.expectOne('/concept_card_handler/1');
       expect(req.request.method).toEqual('GET');
-      req.flush(null, {
+      req.flush('Error loading skill 1.', {
         status: 500, statusText: 'Error loading skill 1.'
       });
 
       flushMicrotasks();
 
       expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith('Error loading skill 1.');
     }));
 
   it('should not fetch the same concept card', fakeAsync(() => {
