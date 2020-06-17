@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controllers for the error page.
+ * @fileoverview Component for the error page.
  */
 
 require('domain/utilities/url-interpolation.service.ts');
