@@ -1089,11 +1089,6 @@ export class UpgradedServices {
         upgradedServices['CamelCaseToHyphensPipe'],
         upgradedServices['ExtensionTagAssemblerService'],
         upgradedServices['HtmlEscaperService']);
-    upgradedServices['ExplorationRecommendationsService'] =
-      new ExplorationRecommendationsService(
-        upgradedServices['ContextService'],
-        upgradedServices['HttpClient'],
-        upgradedServices['UrlService']);
     upgradedServices['LearnerAnswerDetailsBackendApiService'] =
         new LearnerAnswerDetailsBackendApiService(
           upgradedServices['HttpClient'],
@@ -1227,6 +1222,11 @@ export class UpgradedServices {
     upgradedServices['EmailDashboardDataService'] =
         new EmailDashboardDataService(
           upgradedServices['EmailDashboardBackendApiService']);
+    upgradedServices['ExplorationRecommendationsService'] =
+      new ExplorationRecommendationsService(
+        upgradedServices['ContextService'],
+        upgradedServices['UrlService'],
+        upgradedServices['ExplorationRecommendationsBackendApiService']);
     upgradedServices['PredictionAlgorithmRegistryService'] =
       new PredictionAlgorithmRegistryService(
         upgradedServices['CodeReplPredictionService'],
