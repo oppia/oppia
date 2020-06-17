@@ -25,4 +25,4 @@ require('base-components/base-content.directive.ts');
 require(
   'pages/story-editor-page/navbar/story-editor-navbar-breadcrumb.directive.ts');
 require('pages/story-editor-page/navbar/story-editor-navbar.directive.ts');
-require('pages/story-editor-page/story-editor-page.controller.ts');
+require('pages/story-editor-page/story-editor-page.component.ts');
