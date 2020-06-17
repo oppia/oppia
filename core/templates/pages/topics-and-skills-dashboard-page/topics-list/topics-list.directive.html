@@ -25,7 +25,11 @@
       </td>
       <td>
         <div class="list-summary list-summary-name protractor-test-topics-list-item">
-          <div><span class="topic-name protractor-test-topic-name"><[topic.name]></span></div>
+          <div>
+            <a class="topic-name protractor-test-topic-name"
+               ng-href="<[$ctrl.getTopicEditorUrl(topic.id)]>"><[topic.name]>
+            </a>
+          </div>
           <div>
             <span class="topic-classroom protractor-test-topic-classroom">
               <span ng-if="topic.classroom"><[topic.classroom]></span>
@@ -60,13 +64,13 @@
       <td class="text-center topic-list-status">
         <span class="topic-list-status-text" ng-if="topic.is_published"> Published </span>
         <span class="topic-list-status-text" ng-if="!topic.is_published"> Not Published </span>
-        <p class="fas fa-ellipsis-v protractor-test-topic-edit-box" ng-mouseover="$ctrl.enableEditOptions(topic.id)"></p>
+        <p class="fas fa-ellipsis-v topic-edit-box-icon protractor-test-topic-edit-box" ng-click="$ctrl.enableEditOptions(topic.id)"></p>
         <div ng-if="$ctrl.showEditOptions(topic.id)" class="topic-edit-options" ng-mouseleave="$ctrl.enableEditOptions(null)">
           <a class="topic-edit-options-edit protractor-test-edit-topic-button" ng-href="<[$ctrl.getTopicEditorUrl(topic.id)]>">
             <i class="fa fa-pen"></i>
             <span>Edit</span>
           </a>
-          <a ng-if="canDeleteTopic()" ng-click="$ctrl.deleteTopic(topic.id)">
+          <a ng-if="canDeleteTopic()" ng-click="$ctrl.deleteTopic(topic.id, topic.name)">
             <i class="fas fa-trash-alt protractor-test-delete-topic-button"></i>
             <span>Delete</span>
           </a>
@@ -98,19 +102,21 @@
     width: 10%;
   }
   topics-list .dashboard-table-status-column {
-    width: 12%;
+    width: 8%;
   }
   topics-list .dashboard-table {
     font-size: 15px;
     width: 100%;
   }
   topics-list .topic-list-status {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
     position: relative;
   }
-  topics-list .topic-list-status-text {
-    display: inline-block;
-    text-align: right;
-    width: 90%;
+  topics-list .topic-edit-box-icon {
+    cursor: pointer;
+    margin: 0;
   }
   topics-list .topic-edit-options {
     background-color: #ffffff;
@@ -130,6 +136,8 @@
     text-decoration: none;
   }
   topics-list .topic-edit-options-edit {
+    text-decoration: none;
+    color: inherit;
     border-bottom: 1px solid black;
   }
   topics-list .topic-edit-options a:hover,
@@ -155,8 +163,10 @@
     width: 100%;
   }
   topics-list .topic-name {
+    color: inherit;
     font-size: 17px;
     font-weight: bold;
+    text-decoration: none;
   }
   topics-list .topic-classroom {
     font-size: 15px;
@@ -176,7 +186,7 @@
   }
 
   topics-list .list-item {
-    height: 140px;
+    height: 150px;
     text-align: left;
     vertical-align: baseline;
   }
@@ -202,6 +212,7 @@
     display: inline-block;
     line-height: normal;
     vertical-align: middle;
+    word-break: break-all;
   }
 
   @media (max-width: 768px) {

@@ -30,15 +30,18 @@ require(
   'pages/topics-and-skills-dashboard-page/' +
     'create-new-topic-modal.controller.ts');
 require('services/alerts.service.ts');
+require('services/image-local-storage.service.ts');
 require('services/image-upload-helper.service.ts');
 
 angular.module('oppia').factory('TopicCreationService', [
   '$rootScope', '$uibModal', '$window', 'AlertsService',
-  'TopicCreationBackendApiService', 'UrlInterpolationService',
+  'ImageLocalStorageService', 'TopicCreationBackendApiService',
+  'UrlInterpolationService',
   'EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED',
   function(
       $rootScope, $uibModal, $window, AlertsService,
-      TopicCreationBackendApiService, UrlInterpolationService,
+      ImageLocalStorageService, TopicCreationBackendApiService,
+      UrlInterpolationService,
       EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED) {
     var TOPIC_EDITOR_URL_TEMPLATE = '/topic_editor/<topic_id>';
     var topicCreationInProgress = false;
@@ -68,11 +71,15 @@ angular.module('oppia').factory('TopicCreationService', [
           // new tab is created as soon as the user clicks the 'Create' button
           // and filled with URL once the details are fetched from the backend.
           var newTab = $window.open();
-          TopicCreationBackendApiService.createTopic(newlyCreatedTopic).then(
+          var imagesData = ImageLocalStorageService.getStoredImagesData();
+          var bgColor = ImageLocalStorageService.getImageBgColor();
+          TopicCreationBackendApiService.createTopic(
+            newlyCreatedTopic, imagesData, bgColor).then(
             function(response) {
               $rootScope.$broadcast(
                 EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED);
               topicCreationInProgress = false;
+              ImageLocalStorageService.flushStoredImagesData();
               newTab.location.href = UrlInterpolationService.interpolateUrl(
                 TOPIC_EDITOR_URL_TEMPLATE, {
                   topic_id: response.topicId

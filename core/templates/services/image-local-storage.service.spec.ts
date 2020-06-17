@@ -82,4 +82,11 @@ describe('ImageLocalStorageService', function() {
       expect(AlertsService.messages.length).toEqual(1);
     }
   );
+
+  it('should set and clear the thumbnail background color', function() {
+    expect(ImageLocalStorageService.getImageBgColor()).toEqual(null);
+    let bgColor = '#e34d43';
+    ImageLocalStorageService.setImageBgColor(bgColor);
+    expect(ImageLocalStorageService.getImageBgColor()).toEqual(bgColor);
+  });
 });

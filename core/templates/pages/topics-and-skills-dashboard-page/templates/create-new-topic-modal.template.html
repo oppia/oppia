@@ -30,7 +30,9 @@
     <div class="create-new-topic-input-field">
       <label class="create-new-topic-input-label">Topic Thumbnail</label>
       <thumbnail-uploader aspect-ratio="'4:3'"
-                          disabled="true"
+                          disabled="false"
+                          use-local-storage="true"
+                          allowed-bg-colors="allowedBgColors"
                           preview-description-bg-color="'#2F6687'">
       </thumbnail-uploader>
     </div>
@@ -38,7 +40,7 @@
 
   <div class="modal-footer">
     <button class="btn btn-secondary" ng-click="cancel()" type="button">Cancel</button>
-    <button class="btn btn-success protractor-test-confirm-topic-creation-button" type="submit" ng-disabled="!newlyCreatedTopic.isValid()">
+    <button class="btn btn-success protractor-test-confirm-topic-creation-button" type="submit" ng-disabled="!isValid()">
       <span>Create Topic</span>
     </button>
   </div>

@@ -11,6 +11,10 @@
            ng-src="<[editableThumbnailDataUrl]>"
            class="img-thumbnail protractor-test-custom-photo"
            ng-style="{background: getBgColor()}">
+
+      <img ng-if="useLocalStorage && newThumbnailDataUrl"
+           ng-src="<[newThumbnailDataUrl]>"
+           class="img-thumbnail protractor-test-custom-photo">
     </div>
   </div>
 </div>

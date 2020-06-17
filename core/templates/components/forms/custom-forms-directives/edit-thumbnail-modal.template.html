@@ -43,8 +43,8 @@
           </span>
         </div>
       </div>
-      <div class="oppia-thumbnail-container protractor-test-thumbnail-container" ng-show="uploadedImage" ng-style="{background: getPreviewDescriptionBgColor(), color: getPreviewDescriptionBgColor() ? '#FFFFFF' : '', width: aspectRatio === '4:3' ? '248px' : '320px' }">
-        <button class="btn btn-secondary oppia-thumbnail-reset-button" ng-click="reset()">
+      <div class="oppia-thumbnail-container protractor-test-thumbnail-container" ng-if="uploadedImage" ng-style="{background: getPreviewDescriptionBgColor(), color: getPreviewDescriptionBgColor() ? '#FFFFFF' : '', width: aspectRatio === '4:3' ? '248px' : '320px' }">
+        <button class="btn btn-secondary oppia-thumbnail-reset-button protractor-thumbnail-reset-button" ng-click="reset()">
           <i class="material-icons oppia-vcenter">&#xE14C;</i>
         </button>
         <div>

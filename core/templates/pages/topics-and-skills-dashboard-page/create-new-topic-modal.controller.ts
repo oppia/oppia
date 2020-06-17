@@ -19,20 +19,34 @@
 require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
+require('services/context.service.ts');
+require('services/image-local-storage.service.ts');
+
+const topicPropertiesConstants = require('constants.ts');
 
 angular.module('oppia').controller('CreateNewTopicModalController', [
   '$controller', '$scope', '$uibModalInstance',
+  'ContextService', 'ImageLocalStorageService',
   'NewlyCreatedTopicObjectFactory', 'MAX_CHARS_IN_TOPIC_DESCRIPTION',
   'MAX_CHARS_IN_TOPIC_NAME',
   function(
       $controller, $scope, $uibModalInstance,
+      ContextService, ImageLocalStorageService,
       NewlyCreatedTopicObjectFactory, MAX_CHARS_IN_TOPIC_DESCRIPTION,
       MAX_CHARS_IN_TOPIC_NAME) {
     $controller('ConfirmOrCancelModalController', {
       $scope: $scope,
       $uibModalInstance: $uibModalInstance
     });
+    $scope.allowedBgColors = (
+      topicPropertiesConstants.ALLOWED_THUMBNAIL_BG_COLORS.topic);
 
+    $scope.isValid = function() {
+      return Boolean($scope.newlyCreatedTopic.isValid() &&
+          ImageLocalStorageService.getStoredImagesData().length > 0);
+    };
+
+    ContextService.setImageSaveDestinationToLocalStorage();
     $scope.newlyCreatedTopic = (
       NewlyCreatedTopicObjectFactory.createDefault());
     $scope.MAX_CHARS_IN_TOPIC_NAME = MAX_CHARS_IN_TOPIC_NAME;

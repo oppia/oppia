@@ -35,12 +35,13 @@
           </ul>
         </div>
         <div class="dashboard-list">
-          <div class="dashboard-list-header" ng-if="$ctrl.topicSummaries.length>0">
+          <div class="dashboard-list-header" ng-if="$ctrl.topicSummaries.length>0 && $ctrl.activeTab === $ctrl.TAB_NAME_TOPICS">
             <div class="dashboard-list-header-count">
               <span>Displaying <[$ctrl.pageNumber*$ctrl.itemsPerPage + 1]> - <[$ctrl.pageNumber*$ctrl.itemsPerPage+10]> of <[$ctrl.currentCount]></span>
             </div>
             <div class="dashboard-list-pagination">
               <div>
+                <span>Items Per Page: </span>
                 <select ng-options="choice as choice for choice in $ctrl.itemsPerPageChoice"
                         ng-model="$ctrl.itemsPerPage"
                         ng-change="$ctrl.refreshPagination()">
@@ -48,7 +49,7 @@
               </div>
               <div>
                 <i class="fa fa-angle-left topic-pagination-arrow" ng-click="$ctrl.changePageByOne($ctrl.MOVE_TO_PREV_PAGE)"></i>
-                <span class="dashboard-list-pagination-value" ng-repeat="n in $ctrl.generateNumbersTillRange($ctrl.currentCount/$ctrl.itemsPerPage)" ng-click="$ctrl.changePage($index)">
+                <span class="dashboard-list-pagination-value" ng-repeat="n in $ctrl.generateNumbersTillRange($ctrl.currentCount/$ctrl.itemsPerPage) track by $index" ng-click="$ctrl.goToPageNumber($index)">
                   <span ng-if="$ctrl.pageNumber===$index" class="dashboard-list-pagination-active"><[$index+1]></span>
                   <span ng-if="$ctrl.pageNumber!==$index"><[$index+1]></span>
                 </span>
@@ -104,7 +105,7 @@
             </div>
           </div>
         </div>
-        <div class="topic-skill-filter">
+        <div class="topic-skill-filter" ng-if="$ctrl.activeTab===$ctrl.TAB_NAME_TOPICS">
           <div class="topic-skill-filter-content">
             <div class="topic-skill-filter-header">
               <span class="topic-skill-filter-heading">Filter</span>
@@ -166,6 +167,7 @@
                                     choices="$ctrl.filterObject.keywords"
                                     allow-multiple-choices="true"
                                     new-choice-regex="<[::$ctrl.TAG_REGEX_STRING]>"
+                                    placeholder="Multiple allowed"
                                     width="100%"
                                     on-selection-change="$ctrl.applyFilters()">
                   </select2-dropdown>
@@ -217,6 +219,7 @@
     border-radius: 8px;
     display: inline-block;
     margin-bottom: 50px;
+    overflow: auto;
     width: 70%;
   }
   .oppia-topics-and-skills-dashboard .dashboard-content-secondary {
@@ -273,8 +276,8 @@
   .oppia-topics-and-skills-dashboard .create-topic-skill span {
     color: #00645C;
     display: inline-block;
-    font-size: 14px;
-    line-height: 15px;
+    font-size: 16px;
+    line-height: 17px;
     width: 100%;
   }
   .oppia-topics-and-skills-dashboard .topic-skill-filter-content {
@@ -406,7 +409,7 @@
   .oppia-topics-and-skills-dashboard .dashboard-tabs .dashboard-tabs-text {
     border-bottom: 2px solid #aaaac1;
     color: #009688;
-    font-size: 1em;
+    font-size: 16px;
     padding: 10px;
     text-decoration: none;
     text-transform: uppercase;
@@ -416,11 +419,12 @@
   .oppia-topics-and-skills-dashboard .dashboard-tabs-active .dashboard-tabs-text:hover {
     background-color: #d8f4f2;
     border-bottom: 4px solid #009688;
+    border-radius: 8px 8px 0 0;
     color: #009688;
   }
   .oppia-topics-and-skills-dashboard .dashboard-tabs .dashboard-tabs-text:hover {
     color: #009688;
-    font-size: 1em;
+    font-size: 16px;
     padding: 10px;
     text-decoration: none;
     text-transform: uppercase;

@@ -36,6 +36,7 @@ angular.module('oppia').directive('thumbnailUploader', [
       restrict: 'E',
       scope: {
         disabled: '=',
+        useLocalStorage: '=',
         getAllowedBgColors: '&allowedBgColors',
         getAspectRatio: '&aspectRatio',
         getBgColor: '&bgColor',
@@ -52,10 +53,10 @@ angular.module('oppia').directive('thumbnailUploader', [
         'thumbnail-uploader.directive.html'),
       controller: ['$rootScope', '$scope', '$uibModal',
         'AlertsService', 'ContextService', 'CsrfTokenService',
-        'ImageUploadHelperService',
+        'ImageLocalStorageService', 'ImageUploadHelperService',
         function($rootScope, $scope, $uibModal,
             AlertsService, ContextService, CsrfTokenService,
-            ImageUploadHelperService) {
+            ImageLocalStorageService, ImageUploadHelperService) {
           var placeholderImageDataUrl = (
             UrlInterpolationService.getStaticImageUrl(
               '/icons/story-image-icon.png'));
@@ -195,19 +196,28 @@ angular.module('oppia').directive('thumbnailUploader', [
               controller: 'EditThumbnailModalController',
             }).result.then(function(data) {
               $scope.thumbnailIsLoading = true;
-              if (data.openInUploadMode) {
-                tempImageName = (
-                  ImageUploadHelperService.generateImageFilename(
-                    data.dimensions.height, data.dimensions.width, 'svg'));
-                saveThumbnailImageData(data.newThumbnailDataUrl, function() {
-                  uploadedImage = data.newThumbnailDataUrl;
-                  $scope.updateFilename(tempImageName);
+              var filename = ImageUploadHelperService.generateImageFilename(
+                data.dimensions.height, data.dimensions.width, 'svg');
+              ImageLocalStorageService.saveImage(
+                filename, data.newThumbnailDataUrl);
+              ImageLocalStorageService.setImageBgColor(data.newBgColor);
+              $scope.newThumbnailDataUrl = data.newThumbnailDataUrl;
+              ContextService.setImageSaveDestinationToLocalStorage();
+              if (!$scope.useLocalStorage) {
+                if (data.openInUploadMode) {
+                  tempImageName = (
+                    ImageUploadHelperService.generateImageFilename(
+                      data.dimensions.height, data.dimensions.width, 'svg'));
+                  saveThumbnailImageData(data.newThumbnailDataUrl, function() {
+                    uploadedImage = data.newThumbnailDataUrl;
+                    $scope.updateFilename(tempImageName);
+                    saveThumbnailBgColor(data.newBgColor);
+                    $rootScope.$apply();
+                  });
+                } else {
                   saveThumbnailBgColor(data.newBgColor);
-                  $rootScope.$apply();
-                });
-              } else {
-                saveThumbnailBgColor(data.newBgColor);
-                $scope.thumbnailIsLoading = false;
+                  $scope.thumbnailIsLoading = false;
+                }
               }
             }, function() {
               // Note to developers:
