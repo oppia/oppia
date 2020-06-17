@@ -158,10 +158,12 @@ class RteComponentExtractorUnitTests(test_utils.GenericTestBase):
         test_data = (
             '<p>Test text&nbsp;'
             '<oppia-noninteractive-math '
-            'raw_latex-with-value="&amp;quot;\\frac{x}{y}&amp;quot;">'
+            'raw_latex-with-value="&amp;quot;\\\\frac{x}{y}&amp;quot;">'
             '</oppia-noninteractive-math></p><p>&nbsp;'
             '<oppia-noninteractive-link '
-            'text-with-value="&amp;quot;Link&amp;quot;" '
+            'text-with-value='
+            '"&amp;quot;Link\\&amp;quot;quoted text\\&amp;quot;'
+            '&amp;#39;singlequotes&amp;#39;&amp;quot;" '
             'url-with-value="&amp;quot;https://www.example.com&amp;quot;">'
             '</oppia-noninteractive-link>.</p>'
             '<p>Video</p>'
@@ -175,7 +177,7 @@ class RteComponentExtractorUnitTests(test_utils.GenericTestBase):
         expected_components = [
             {
                 'customization_args': {
-                    'text-with-value': u'Link',
+                    'text-with-value': u'Link"quoted text"\'singlequotes\'',
                     'url-with-value': u'https://www.example.com'},
                 'id': 'oppia-noninteractive-link'
             },
@@ -203,3 +205,36 @@ class RteComponentExtractorUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(components), len(expected_components))
         for component in components:
             self.assertIn(component, expected_components)
+
+    def test_get_image_filenames_from_html_strings(self):
+        html_strings = [
+            '<oppia-noninteractive-image '
+            'filepath-with-value="&quot;img.svg&quot;" caption-with-value='
+            '"&quot;&quot;" alt-with-value="&quot;Image&quot;">'
+            '</oppia-noninteractive-image><oppia-noninteractive-image '
+            'filepath-with-value="&quot;img2.svg&quot;" caption-with-value='
+            '"&quot;&quot;" alt-with-value="&quot;Image&quot;">'
+            '</oppia-noninteractive-image>',
+            '<oppia-noninteractive-image '
+            'filepath-with-value="&quot;img3.svg&quot;" caption-with-value='
+            '"&quot;&quot;" alt-with-value="&quot;Image&quot;">'
+            '</oppia-noninteractive-image><oppia-noninteractive-image '
+            'filepath-with-value="&quot;img4.svg&quot;" caption-with-value='
+            '"&quot;&quot;" alt-with-value="&quot;Image&quot;">'
+            '</oppia-noninteractive-image>',
+            '<oppia-noninteractive-svgdiagram '
+            'svg_filename-with-value="&quot;img5.svg&quot;"'
+            ' alt-with-value="&quot;Image&quot;">'
+            '</oppia-noninteractive-svgdiagram><oppia-noninteractive-svgdiag'
+            'ram svg_filename-with-value="&quot;img6.svg&quot;"'
+            ' alt-with-value="&quot;Image&quot;">'
+            '</oppia-noninteractive-svgdiagram><oppia-noninteractive-image '
+            'filepath-with-value="&quot;img7.svg&quot;" caption-with-value='
+            '"&quot;&quot;" alt-with-value="&quot;Image&quot;">'
+            '</oppia-noninteractive-image>'
+        ]
+        self.assertItemsEqual(
+            [
+                'img.svg', 'img2.svg', 'img3.svg', 'img4.svg',
+                'img5.svg', 'img6.svg', 'img7.svg'],
+            html_cleaner.get_image_filenames_from_html_strings(html_strings))

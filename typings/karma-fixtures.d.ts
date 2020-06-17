@@ -1,47 +1,48 @@
-/* eslint-disable camelcase */
 interface IKNN {
-  occurrence: number;
-  K: number;
-  T: number;
-  top: number;
-  fingerprint_data: {
+  'occurrence': number;
+  'K': number;
+  'T': number;
+  'top': number;
+  'fingerprint_data': {
     [key: number]: {
       class: number;
       fingerprint: number[][]
     }
   };
-  token_to_id: {
+  'token_to_id': {
     [key: string]: number;
   };
 }
 
+interface IKernelParams {
+  kernel: string;
+  coef0: number;
+  degree: number;
+  gamma: number;
+}
+
 interface ISVM {
-  classes: number[];
-  kernel_params: {
-    kernel: string;
-    coef0: number;
-    degree: number;
-    gamma: number;
-  };
-  intercept: number[];
-  n_support: number[];
-  probA: number[];
-  support_vectors: number[][];
-  probB: number[];
-  dual_coef: number[][];
+  'classes': number[];
+  'kernel_params': IKernelParams;
+  'intercept': number[];
+  'n_support': number[];
+  'probA': number[];
+  'support_vectors': number[][];
+  'probB': number[];
+  'dual_coef': number[][];
 }
 
 interface IClassifierData {
-  KNN: IKNN;
-  SVM: ISVM;
-  cv_vocabulary: {
+  'KNN': IKNN;
+  'SVM': ISVM;
+  'cv_vocabulary': {
     [key: string]: number;
   };
 }
 
 type IClassifierAccuracyTest = {
-  answer_group_index: number;
-  answers: {
+  'answer_group_index': number;
+  'answers': {
     code: string
   }[];
 }[];
@@ -67,26 +68,26 @@ interface IInplaceReplaceTest {
 interface ITestCasesRTE {
   RTE_TYPE_TEXTANGULAR: {
     TEST_CASES: {
-      html_content: string;
-      expected_output: string;
-      case: string;
+      'html_content': string;
+      'expected_output': string;
+      'case': string;
     }[];
   };
 }
 
 type ITextClassifierResults = {
-  answer_group_index: number;
-  answers: string[];
+  'answer_group_index': number;
+  'answers': string[];
 }[];
 
 interface ITextInputClassifierData {
-  best_params: {
+  'best_params': {
     kernel: string;
     C: number;
   };
-  best_score: number;
-  SVM: ISVM;
-  cv_vocabulary: {
+  'best_score': number;
+  'SVM': ISVM;
+  'cv_vocabulary': {
     [key: string]: number;
   };
 }

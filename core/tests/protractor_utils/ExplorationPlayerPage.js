@@ -80,119 +80,120 @@ var ExplorationPlayerPage = function() {
   var suggestionPopupLink =
     element(by.css('.protractor-test-exploration-suggestion-popup-link'));
 
-  this.clickThroughToNextCard = function() {
-    waitFor.elementToBeClickable(
+  this.clickThroughToNextCard = async function() {
+    await waitFor.elementToBeClickable(
       nextCardButton, '"Next Card" button takes too long to be clickable');
-    nextCardButton.click();
+    await nextCardButton.click();
   };
 
-  this.clickSuggestChangesButton = function() {
-    waitFor.elementToBeClickable(suggestionPopupLink,
+  this.clickSuggestChangesButton = async function() {
+    await waitFor.elementToBeClickable(suggestionPopupLink,
       'Suggest changes button taking too long to appear');
-    suggestionPopupLink.click();
+    await suggestionPopupLink.click();
   };
 
-  this.expectNextCardButtonTextToBe = function(text) {
-    var buttonText = nextCardButton.getText();
+  this.expectNextCardButtonTextToBe = async function(text) {
+    var buttonText = await nextCardButton.getText();
     expect(buttonText).toMatch(text);
   };
 
-  this.fillAndSubmitSuggestion = function(
+  this.fillAndSubmitSuggestion = async function(
       suggestionTitle, suggestionDescription) {
     var suggestionModal = element(
       by.css('.protractor-test-exploration-suggestion-modal'));
-    waitFor.visibilityOf(suggestionModal,
+    await waitFor.visibilityOf(suggestionModal,
       'Suggestion Modal is taking too long to appear.');
     var suggestionHeader = element(by.css('.oppia-rte'));
-    suggestionHeader.click();
-    suggestionHeader.sendKeys(suggestionTitle);
+    await suggestionHeader.click();
+    await suggestionHeader.sendKeys(suggestionTitle);
     var suggestionModalDescription = element(
       by.css('.protractor-test-suggestion-description-input'));
-    suggestionModalDescription.click();
-    suggestionModalDescription.sendKeys(suggestionDescription);
+    await suggestionModalDescription.click();
+    await suggestionModalDescription.sendKeys(suggestionDescription);
     var submitSuggestionBtn = element(
       by.css('.protractor-test-suggestion-submit-btn'));
 
-    submitSuggestionBtn.click();
+    await submitSuggestionBtn.click();
     var AFTER_SUBMIT_RESPONSE_STRING =
         'Your suggestion has been forwarded to the ' +
         'exploration author for review.';
-    var afterSubmitModalText = element(by.tagName('p')).getText();
+    var afterSubmitModalText = await element(by.tagName('p')).getText();
     expect(afterSubmitModalText).toMatch(AFTER_SUBMIT_RESPONSE_STRING);
   };
 
-  this.reportExploration = function() {
-    waitFor.elementToBeClickable(reportExplorationButton,
+  this.reportExploration = async function() {
+    await waitFor.elementToBeClickable(reportExplorationButton,
       'Report Exploration Button takes too long to be clickable');
-    reportExplorationButton.click();
-    let radioButton = element.all(by.tagName('input')).get(0);
-    waitFor.visibilityOf(radioButton, 'Radio Buttons takes too long to appear');
-    radioButton.click();
+    await reportExplorationButton.click();
+    let radioButton = await element.all(by.tagName('input')).get(0);
+    await waitFor.visibilityOf(
+      radioButton, 'Radio Buttons takes too long to appear');
+    await radioButton.click();
     let textArea = element(by.tagName('textarea'));
-    textArea.sendKeys('Reporting this exploration');
-    let submitButton = element.all(by.tagName('button')).get(1);
-    submitButton.click();
-    let afterSubmitText = element(by.tagName('p')).getText();
+    await textArea.sendKeys('Reporting this exploration');
+    let submitButton = await element.all(by.tagName('button')).get(1);
+    await submitButton.click();
+    let afterSubmitText = await element(by.tagName('p')).getText();
     expect(afterSubmitText).toMatch(
       'Your report has been forwarded to the moderators for review.');
   };
 
-  this.viewHint = function() {
+  this.viewHint = async function() {
     // We need to wait some time for the solution to activate.
-    waitFor.elementToBeClickable(
+    await waitFor.elementToBeClickable(
       viewHintButton, '"View Hint" button takes too long to be clickable');
-    viewHintButton.click();
-    clickGotItButton();
+    await viewHintButton.click();
+    await clickGotItButton();
   };
 
-  this.viewSolution = function() {
+  this.viewSolution = async function() {
     // We need to wait some time for the solution to activate.
-    waitFor.elementToBeClickable(
+    await waitFor.elementToBeClickable(
       viewSolutionButton,
       '"View Solution" button takes too long to be clickable');
-    viewSolutionButton.click();
-    waitFor.elementToBeClickable(
+    await viewSolutionButton.click();
+    await waitFor.elementToBeClickable(
       continueToSolutionButton,
       '"Continue Solution" button takes too long to be clickable');
-    continueToSolutionButton.click();
-    clickGotItButton();
+    await continueToSolutionButton.click();
+    await clickGotItButton();
   };
 
-  var clickGotItButton = function() {
-    waitFor.elementToBeClickable(
+  var clickGotItButton = async function() {
+    await waitFor.elementToBeClickable(
       gotItButton, '"Got It" button takes too long to be clickable');
-    gotItButton.click();
+    await gotItButton.click();
   };
 
-  this.clickConfirmRedirectionButton = function() {
-    waitFor.elementToBeClickable(
+  this.clickConfirmRedirectionButton = async function() {
+    await waitFor.elementToBeClickable(
       confirmRedirectionButton,
       '"Confirm Redirect" button takes too long to be clickable');
-    confirmRedirectionButton.click();
-    waitFor.pageToFullyLoad();
+    await confirmRedirectionButton.click();
+    await waitFor.pageToFullyLoad();
   };
 
-  this.clickCancelRedirectionButton = function() {
-    waitFor.elementToBeClickable(
+  this.clickCancelRedirectionButton = async function() {
+    await waitFor.elementToBeClickable(
       cancelRedirectionButton,
       '"Cancel Redirect" button takes too long to be clickable');
-    cancelRedirectionButton.click();
+    await cancelRedirectionButton.click();
   };
 
-  this.clickOnReturnToParentButton = function() {
-    waitFor.elementToBeClickable(
+  this.clickOnReturnToParentButton = async function() {
+    await waitFor.elementToBeClickable(
       returnToParentButton,
       '"Return to Parent" button takes too long to be clickable');
-    returnToParentButton.click();
-    waitFor.pageToFullyLoad();
+    await returnToParentButton.click();
+    await waitFor.pageToFullyLoad();
   };
 
-  this.clickOnCloseSuggestionModalButton = function() {
-    waitFor.elementToBeClickable(
+  this.clickOnCloseSuggestionModalButton = async function() {
+    await waitFor.elementToBeClickable(
       closeSuggestionModalButton,
       '"Close suggestion modal" button takes too long to be clickable');
-    closeSuggestionModalButton.click();
-    waitFor.pageToFullyLoad();
+    await closeSuggestionModalButton.click();
+    await waitFor.pageToFullyLoad();
   };
 
   // This verifies the question just asked, including formatting and
@@ -200,121 +201,114 @@ var ExplorationPlayerPage = function() {
   // sent a handler (as given in forms.RichTextChecker) to which calls such as
   //   handler.readItalicText('slanted');
   // can then be sent.
-  this.expectContentToMatch = function(richTextInstructions) {
-    forms.expectRichText(
-      conversationContent.last()
+  this.expectContentToMatch = async function(richTextInstructions) {
+    await waitFor.visibilityOf(
+      await conversationContent.first(), 'Conversation not visible');
+    await forms.expectRichText(
+      await conversationContent.last()
     ).toMatch(richTextInstructions);
   };
 
-  this.expectExplorationToBeOver = function() {
+  this.expectExplorationToBeOver = async function() {
     expect(
-      conversationContent.last().getText()
+      await (await conversationContent.last()).getText()
     ).toEqual('Congratulations, you have finished!');
   };
 
-  this.expectExplorationToNotBeOver = function() {
+  this.expectExplorationToNotBeOver = async function() {
     expect(
-      conversationContent.last().getText()
+      await (await conversationContent.last()).getText()
     ).not.toEqual('Congratulations, you have finished!');
   };
 
   // Additional arguments may be sent to this function, and they will be
   // passed on to the relevant interaction's detail checker.
-  this.expectInteractionToMatch = function(interactionId) {
+  this.expectInteractionToMatch = async function(interactionId) {
     // Convert additional arguments to an array to send on.
     var args = [conversationInput];
     for (var i = 1; i < arguments.length; i++) {
       args.push(arguments[i]);
     }
-    interactions.getInteraction(interactionId).
-      expectInteractionDetailsToMatch.apply(null, args);
+    var interaction = await interactions.getInteraction(interactionId);
+    await interaction.expectInteractionDetailsToMatch.apply(null, args);
   };
 
   // Note that the 'latest' feedback may be on either the current or a
   // previous card.
-  this.expectLatestFeedbackToMatch = function(richTextInstructions) {
-    forms.expectRichText(
-      conversationFeedback.last()
+  this.expectLatestFeedbackToMatch = async function(richTextInstructions) {
+    await forms.expectRichText(
+      await conversationFeedback.last()
     ).toMatch(richTextInstructions);
   };
 
-  this.expectExplorationNameToBe = function(name) {
+  this.expectExplorationNameToBe = async function(name) {
     expect(
-      explorationHeader.getText()
+      await explorationHeader.getText()
     ).toBe(name);
   };
 
-  this.expectExplorationRatingOnInformationCardToEqual = function(ratingValue) {
-    explorationInfoIcon.click();
-    infoCardRating.getText().then(function(value) {
-      expect(value).toBe(ratingValue);
-    });
+  this.expectExplorationRatingOnInformationCardToEqual = async function(
+      ratingValue) {
+    await explorationInfoIcon.click();
+    var value = await infoCardRating.getText();
+    expect(value).toBe(ratingValue);
   };
 
-  this.rateExploration = function(ratingValue) {
-    ratingStars.then(function(elements) {
-      waitFor.elementToBeClickable(
-        elements[ratingValue - 1],
-        'Rating Star takes too long to be clickable');
-      elements[ratingValue - 1].click();
-      waitFor.elementToBeClickable(
-        feedbackCloseButton, 'Close Feedback button is not clickable');
-      feedbackCloseButton.click();
-
-      waitFor.invisibilityOf(
-        feedbackCloseButton, 'Close Feedback button does not disappear');
-    });
+  this.rateExploration = async function(ratingValue) {
+    var elements = ratingStars;
+    await waitFor.elementToBeClickable(
+      await elements.get(ratingValue - 1),
+      'Rating Star takes too long to be clickable');
+    await (await elements.get(ratingValue - 1)).click();
+    await waitFor.elementToBeClickable(
+      feedbackCloseButton, 'Close Feedback button is not clickable');
+    await feedbackCloseButton.click();
+    await waitFor.invisibilityOf(
+      feedbackCloseButton, 'Close Feedback button does not disappear');
   };
 
   // `answerData` is a variable that is passed to the
   // corresponding interaction's protractor utilities.
   // Its definition and type are interaction-specific.
-  this.submitAnswer = function(interactionId, answerData) {
+  this.submitAnswer = async function(interactionId, answerData) {
     // The .first() targets the inline interaction, if it exists. Otherwise,
     // it will get the supplemental interaction.
-    interactions.getInteraction(interactionId).submitAnswer(
+    await interactions.getInteraction(interactionId).submitAnswer(
       conversationInput, answerData);
-    waitFor.invisibilityOf(
+    await waitFor.invisibilityOf(
       waitingForResponseElem, 'Response takes too long to appear');
   };
 
-  this.submitAnswerDetails = function(answerDetails) {
-    answerDetailsTextArea.sendKeys(answerDetails);
-    waitFor.elementToBeClickable(
-      answerDetailsSubmitButton,
-      'Answer details submit button takes too long to be clickable');
-    answerDetailsSubmitButton.click();
-  };
-
-  this.submitFeedback = function(feedback) {
-    waitFor.elementToBeClickable(
+  this.submitFeedback = async function(feedback) {
+    await waitFor.elementToBeClickable(
       feedbackPopupLink, 'Feedback Popup link takes too long to be clickable');
-    feedbackPopupLink.click();
-    feedbackTextArea.sendKeys(feedback);
-    waitFor.elementToBeClickable(
+    await feedbackPopupLink.click();
+    await feedbackTextArea.sendKeys(feedback);
+    await waitFor.elementToBeClickable(
       feedbackSubmitButton,
       'Feedback Submit button takes too long to be clickable');
-    feedbackSubmitButton.click();
-    waitFor.invisibilityOf(
+    await feedbackSubmitButton.click();
+    await waitFor.invisibilityOf(
       feedbackSubmitButton, 'Feedback popup takes too long to disappear');
   };
 
-  this.submitSuggestion = function(suggestion, description) {
-    waitFor.elementToBeClickable(
+  this.submitSuggestion = async function(suggestion, description) {
+    await waitFor.elementToBeClickable(
       suggestionPopupLink, 'Suggestion Popup link takes too long to appear');
-    suggestionPopupLink.click();
-    forms.RichTextEditor(explorationSuggestionModal).setPlainText(suggestion);
-    suggestionDescriptionInput.sendKeys(description);
-    waitFor.elementToBeClickable(
+    await suggestionPopupLink.click();
+    var editor = await forms.RichTextEditor(explorationSuggestionModal);
+    await editor.setPlainText(suggestion);
+    await suggestionDescriptionInput.sendKeys(description);
+    await waitFor.elementToBeClickable(
       suggestionSubmitButton,
       'Suggestion Submit button takes too long to be clickable');
-    suggestionSubmitButton.click();
-    waitFor.invisibilityOf(
+    await suggestionSubmitButton.click();
+    await waitFor.invisibilityOf(
       suggestionSubmitButton, 'Suggestion popup takes too long to disappear');
   };
 
-  this.expectCorrectFeedback = function() {
-    waitFor.visibilityOf(
+  this.expectCorrectFeedback = async function() {
+    await waitFor.visibilityOf(
       correctFeedbackElement,
       'Correct feedback footer takes too long to appear');
   };

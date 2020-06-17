@@ -1,4 +1,4 @@
-<table class="dashboard-table">
+<table class="dashboard-table protractor-test-story-list-table">
   <colgroup>
     <col style="width: 40%;">
     <col style="width: 30%;">
@@ -8,7 +8,7 @@
     <th ng-repeat="key in STORY_TABLE_COLUMN_HEADINGS"
         class="dashboard-table-headings">
       <p ng-if="key === 'title'"> Title </p>
-      <p ng-if="key === 'node_count'"> Node Count </p>
+      <p ng-if="key === 'node_count'"> Chapter Count </p>
       <p ng-if="key === 'publication_status'"> Is Story Published? </p>
     </th>
   </tr>
@@ -21,7 +21,7 @@
     </td>
     <td>
       <a ng-click="openStoryEditor(summary.getId())" class="list-summary">
-        <span> <[summary.getNodeCount()]> </span>
+        <span> <[summary.getNodeTitles().length]> </span>
       </a>
     </td>
     <td>

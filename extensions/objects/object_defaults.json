@@ -41,5 +41,9 @@
         "denominator": 1
       },
       "units": []
-    }
+    },
+    "AlgebraicExpression": "x",
+    "AlgebraicIdentifier": "x",
+    "MathEquation": "x=y",
+    "PositionOfTerms": "both"
 }

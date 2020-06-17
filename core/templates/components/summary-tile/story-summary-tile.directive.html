@@ -1,42 +1,147 @@
-<a title="<[$ctrl.getStoryTitle()]>" ng-href="<[$ctrl.getStoryLink()]>">
-  <div class="oppia-story-image">
-    <img ng-src="<[$ctrl.getStaticImageUrl('/subjects/Lightbulb.svg')]>" alt="">
+<div class="story-summary-tile">
+  <div class="oppia-story-title">
+    <strong class="title-text">
+      <a ng-href="<[$ctrl.getStoryLink()]>"><[$ctrl.getStorySummary().getTitle()]> </a>
+    </strong>
+    <span style="padding-left: 10px; font-size: 0.75em; color: #404040;">
+       <[$ctrl.nodeCount]> <span translate="I18N_TOPIC_VIEWER_CHAPTER"></span><[($ctrl.nodeCount > 1) ? 's' : '']>
+    </span>
   </div>
-  <div class="oppia-story-details">
-    <div class="oppia-story-title">
-      <[::$ctrl.getStoryTitle()]>
+  <div class="story-details">
+    <div class="story-thumbnail"
+         ng-style="{background: $ctrl.getStorySummary().getThumbnailBgColor()}">
+      <img ng-src="<[$ctrl.thumbnailUrl]>"
+           class="img-thumbnail"
+           ng-style="{background: $ctrl.getStorySummary().getThumbnailBgColor()}">
     </div>
-    <div class="oppia-story-description">
-      <[::$ctrl.getStoryDescription()]>
+    <div class="chapter-details">
+      <div ng-class="{'border-bottom': $index < $ctrl.chaptersDisplayed}" class="chapter-title" ng-repeat="title in $ctrl.getStorySummary().getNodeTitles()">
+        <span ng-if="$index < $ctrl.chaptersDisplayed">
+          <span translate="I18N_TOPIC_VIEWER_CHAPTER"></span> <[$index + 1]>: <[title]>
+        </span>
+      </div>
+      <div ng-click="$ctrl.showAllChapters()"
+           ng-if="$ctrl.showButton && ($ctrl.chaptersDisplayed < $ctrl.nodeCount)"
+           class="view-button">
+        <span translate="I18N_TOPIC_VIEWER_VIEW_ALL"></span>
+        <span class="material-icons"> arrow_drop_down </span>
+      </div>
+      <div ng-click="$ctrl.hideExtraChapters()"
+           ng-if="$ctrl.showButton && ($ctrl.chaptersDisplayed === $ctrl.nodeCount)"
+           class="view-button">
+        <span translate="I18N_TOPIC_VIEWER_VIEW_LESS"></span>
+        <span class="material-icons"> arrow_drop_up </span>
+      </div>
     </div>
   </div>
-</a>
+
+</div>
 <style>
-  story-summary-tile .oppia-story-image {
-    background-color: #cd672b;
-    padding: 0 34px 0 34px;
-    z-index: 1;
-  }
-  story-summary-tile .oppia-story-details {
-    padding: 10px;
-  }
   story-summary-tile .oppia-story-title {
     display: block;
-    color: #4a4a4a;
-    text-align: center;
     font-size: 1.4em;
-    font-weight: bold;
     padding-bottom: 20px;
   }
-  story-summary-tile .oppia-story-description {
-    display: block;
-    color: #4a4a4a;
+
+  story-summary-tile .view-button {
+    color: #00645C;
+    cursor: pointer;
+    font-weight: bold;
+    margin-top: 1.5vh;
     text-align: center;
+    width: 100%;
+  }
+
+  story-summary-tile .view-button:focus {
+    outline: 0;
+  }
+
+  story-summary-tile .chapter-title {
+    display: block;
     font-size: 1.1em;
-    position: absolute;
+    margin-bottom: 0.7vh;
+  }
+
+  story-summary-tile .chapter-details {
+    border: 1px solid #7B7B7B;
+    border-radius: 0.25rem;
+    display: inline-block;
+    margin-left: 0.8vw;
+    padding: 1.5vh 1.75vw 1vh 1.75vw;
+    width: 65%;
+  }
+
+  story-summary-tile .story-details {
+    display: flex;
+  }
+
+  story-summary-tile .story-summary-tile {
+    margin-left: 3vw;
+    padding-bottom: 7vh;
+  }
+
+  story-summary-tile .title-text {
+    border-right: 1px solid #7B7B7B;
     padding-right: 10px;
   }
+
+  story-summary-tile .img-thumbnail {
+    max-height: 100%;
+    max-width: 100%;
+    border: none;
+  }
+
+  story-summary-tile .story-thumbnail {
+    border-radius: 0.4em;
+    display: table-cell;
+    float: left;
+    height: 150px;
+    text-align: center;
+    vertical-align: middle;
+    width: 205px;
+  }
+
+  story-summary-tile a {
+    color: #000000;
+  }
+
   story-summary-tile a:hover {
+    cursor: pointer;
     text-decoration: none;
+  }
+
+  @media (max-width: 640px) {
+    story-summary-tile .story-details {
+      box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.2);
+      border-radius: 0.4em;
+      display: inherit;
+      width: 205px;
+    }
+
+    story-summary-tile .story-thumbnail {
+      border: none;
+      border-radius: 0.4em 0.4em 0 0;
+    }
+
+    story-summary-tile .chapter-details {
+      border: none;
+      margin-left: 0;
+      padding: 2vh 3vw 2vh 4vw;
+      width: 205px;
+    }
+  }
+
+  @media (max-width: 360px) {
+    story-summary-tile .story-details {
+      box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.2);
+      border-radius: 0.4em;
+      display: inherit;
+      width: 205px;
+    }
+
+    story-summary-tile .story-thumbnail {
+      height: 150px;
+      width: 205px;
+    }
   }
 </style>

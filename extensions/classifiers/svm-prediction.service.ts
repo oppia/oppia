@@ -32,13 +32,6 @@ import { Injectable } from '@angular/core';
 import { PredictionResult, PredictionResultObjectFactory } from
   'domain/classifier/PredictionResultObjectFactory';
 
-export class IKernelParams {
-  kernel: string;
-  coef0: number;
-  degree: number;
-  gamma: number;
-}
-
 @Injectable({
   providedIn: 'root'
 })
@@ -160,11 +153,8 @@ export class SVMPredictionService {
     return P;
   }
 
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'classifierData' is a dict with underscore_cased keys which
-  // give tslint errors against underscore_casing in favor of camelCasing. Same
-  // goes for 'input'.
-  predict(classifierData: any, input: any): PredictionResult {
+  predict(
+      classifierData: ISVM, input: number[]): PredictionResult {
     var nSupport = classifierData.n_support;
     var supportVectors = classifierData.support_vectors;
     var dualCoef = classifierData.dual_coef;
