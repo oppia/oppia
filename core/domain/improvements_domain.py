@@ -23,13 +23,14 @@ import datetime
 
 from core.domain import user_services
 from core.platform import models
+import python_utils
 import utils
 
 (improvements_models,) = (
     models.Registry.import_models([models.NAMES.improvements]))
 
 
-class TaskEntry(object):
+class TaskEntry(python_utils.OBJECT):
     """Domain object representing a task entry model in storage.
 
     Attributes:
