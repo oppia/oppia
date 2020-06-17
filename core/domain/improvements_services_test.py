@@ -26,6 +26,7 @@ from core.domain import improvements_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
+import python_utils
 
 base_models, improvements_models = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.improvements])
@@ -47,6 +48,17 @@ class ImprovementsServicesTestBase(test_utils.GenericTestBase):
             self, state_name=feconf.DEFAULT_INIT_STATE_NAME,
             task_type=improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
             exploration_version=1):
+        """Constructs a new default obsolete task with the provided values.
+
+        Args:
+            state_name: str. The name of the state the task should target.
+            task_type: str. The type of the task.
+            exploration_version: int. The version of the exploration the task
+                should target.
+
+        Returns:
+            improvements_domain.TaskEntry.
+        """
         return improvements_domain.TaskEntry(
             entity_type=improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
             entity_id=self.EXP_ID,
@@ -63,6 +75,17 @@ class ImprovementsServicesTestBase(test_utils.GenericTestBase):
             self, state_name=feconf.DEFAULT_INIT_STATE_NAME,
             task_type=improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
             exploration_version=1):
+        """Constructs a new default open task with the provided values.
+
+        Args:
+            state_name: str. The name of the state the task should target.
+            task_type: str. The type of the task.
+            exploration_version: int. The version of the exploration the task
+                should target.
+
+        Returns:
+            improvements_domain.TaskEntry.
+        """
         task = self._new_obsolete_task(
             state_name=state_name, task_type=task_type,
             exploration_version=exploration_version)
@@ -73,6 +96,17 @@ class ImprovementsServicesTestBase(test_utils.GenericTestBase):
             self, state_name=feconf.DEFAULT_INIT_STATE_NAME,
             task_type=improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
             exploration_version=1):
+        """Constructs a new default resolved task with the provided values.
+
+        Args:
+            state_name: str. The name of the state the task should target.
+            task_type: str. The type of the task.
+            exploration_version: int. The version of the exploration the task
+                should target.
+
+        Returns:
+            improvements_domain.TaskEntry.
+        """
         task = self._new_obsolete_task(
             state_name=state_name, task_type=task_type,
             exploration_version=exploration_version)
@@ -213,21 +247,34 @@ class FetchExplorationTasksTests(ImprovementsServicesTestBase):
     def test_returns_resolved_task_mapping(self):
         tasks = [
             self._new_resolved_task(
-                'A', improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE),
+                state_name='A',
+                task_type=improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE),
             self._new_resolved_task(
-                'B', improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE),
+                state_name='B',
+                task_type=improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE),
             self._new_resolved_task(
-                'B', improvements_models.TASK_TYPE_NEEDS_GUIDING_RESPONSES),
+                state_name='B',
+                task_type=(
+                    improvements_models.TASK_TYPE_NEEDS_GUIDING_RESPONSES)),
             self._new_resolved_task(
-                'C', improvements_models.TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP),
+                state_name='C',
+                task_type=(
+                    improvements_models.TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP)),
             self._new_resolved_task(
-                'D', improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE),
+                state_name='D',
+                task_type=improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE),
             self._new_resolved_task(
-                'D', improvements_models.TASK_TYPE_NEEDS_GUIDING_RESPONSES),
+                state_name='D',
+                task_type=(
+                    improvements_models.TASK_TYPE_NEEDS_GUIDING_RESPONSES)),
             self._new_resolved_task(
-                'D', improvements_models.TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP),
+                state_name='D',
+                task_type=(
+                    improvements_models.TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP)),
             self._new_resolved_task(
-                'D', improvements_models.TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS)
+                state_name='D',
+                task_type=(
+                    improvements_models.TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS))
         ]
         improvements_services.put_tasks(tasks)
         open_tasks, resolved_task_types_by_state_name = (
@@ -259,7 +306,7 @@ class FetchExplorationTasksTests(ImprovementsServicesTestBase):
 
     def test_ignores_obsolete_tasks(self):
         tasks = [
-            self._new_obsolete_task('State %d' % (i,))
+            self._new_obsolete_task(state_name='State %d' % (i,))
             for i in python_utils.RANGE(50)
         ]
         improvements_services.put_tasks(tasks)
@@ -271,7 +318,7 @@ class FetchExplorationTasksTests(ImprovementsServicesTestBase):
 
     def test_tasks_for_most_recent_version_are_fetched(self):
         tasks = [
-            # Version 1:
+            # Version 1 tasks.
             self._new_open_task(
                 state_name='A',
                 task_type=improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
@@ -284,7 +331,7 @@ class FetchExplorationTasksTests(ImprovementsServicesTestBase):
                 state_name='C',
                 task_type=improvements_models.TASK_TYPE_NEEDS_GUIDING_RESPONSES,
                 exploration_version=1),
-            # Version 2:
+            # Version 2 tasks.
             self._new_open_task(
                 state_name='A',
                 task_type=improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
@@ -341,7 +388,7 @@ class FetchTaskHistoryPageTests(ImprovementsServicesTestBase):
         while has_more:
             task_page, cursor, has_more = (
                 improvements_services.fetch_exploration_task_history_page(
-                    self.exp, cursor))
+                    self.exp, cursor=cursor))
             aggregated_tasks.extend(task_page)
 
         self.assertEqual([t.target_id for t in aggregated_tasks], [
@@ -360,7 +407,7 @@ class FetchTaskHistoryPageTests(ImprovementsServicesTestBase):
         self.assertTrue(has_more)
         # Make a call for the second page.
         improvements_services.fetch_exploration_task_history_page(
-            self.exp, second_page_cursor)
+            self.exp, cursor=second_page_cursor)
         # Make another call for the first page.
         repeated_first_page, repeated_second_page_cursor, repeated_has_more = (
             improvements_services.fetch_exploration_task_history_page(self.exp))

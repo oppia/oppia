@@ -125,5 +125,5 @@ def put_tasks(tasks, update_last_updated_time=True):
         elif not task.apply_changes(model):
             models[i] = None
     _MODEL.put_multi(
-       [m for m in models if m is not None],
-       update_last_updated_time=update_last_updated_time)
+        [m for m in models if m is not None],
+        update_last_updated_time=update_last_updated_time)
