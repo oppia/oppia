@@ -845,6 +845,67 @@ class JsTsLintChecksManager(python_utils.OBJECT):
 
         return summary_messages
 
+    def _check_comments(self):
+        """This function ensures that comments follow correct style."""
+        if self.verbose_mode_enabled:
+            python_utils.PRINT(
+                'Starting comment checks\n'
+                '----------------------------------------')
+        summary_messages = []
+        files_to_check = self.all_filepaths
+        allowed_terminating_punctuations = ['.', '?']
+        failed = False
+        with linter_utils.redirect_stdout(sys.stdout):
+            for filepath in files_to_check:
+                file_content = FILE_CACHE.readlines(filepath)
+                file_length = len(file_content)
+                for line_num in python_utils.RANGE(file_length):
+                    line = file_content[line_num].strip()
+                    next_line = ''
+                    previous_line = ''
+                    if line_num + 1 < file_length:
+                        next_line = file_content[line_num + 1].strip()
+                    if line_num > 0:
+                        previous_line = file_content[line_num - 1].strip()
+
+                    if line.startswith('//') and not next_line.startswith('//'):
+                        # Check that the comment ends with the proper
+                        # punctuation.
+                        last_char_is_invalid = line[-1] not in (
+                            allowed_terminating_punctuations)
+                        if last_char_is_invalid:
+                            failed = True
+                            summary_message = (
+                                '%s --> Line %s: Invalid punctuation used at '
+                                'the end of the comment.' % (
+                                    filepath, line_num + 1))
+                            summary_messages.append(summary_message)
+                            python_utils.PRINT('')
+
+                    # Check that comment starts with a capital letter.
+                    if (not previous_line.startswith('//') and
+                            re.search(r'^// [a-z][A-Za-z]* .*$', line)):
+                        failed = True
+                        summary_message = (
+                            '%s --> Line %s: There should be a capital letter'
+                            ' at the beginning of the comment.' % (
+                                filepath, line_num + 1))
+                        summary_messages.append(summary_message)
+                        python_utils.PRINT(summary_message)
+                        python_utils.PRINT('')
+
+            if failed:
+                summary_message = (
+                    '%s Comments check failed, fix files that have bad '
+                    'comment formatting.' % linter_utils.FAILED_MESSAGE_PREFIX)
+            else:
+                summary_message = (
+                    '%s Comments check passed' % (
+                        linter_utils.SUCCESS_MESSAGE_PREFIX))
+            python_utils.PRINT(summary_message)
+            summary_messages.append(summary_message)
+        return summary_messages
+
     def perform_all_lint_checks(self):
         """Perform all the lint checks and returns the messages returned by all
         the checks.
@@ -871,11 +932,13 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         sorted_dependencies_messages = self._check_sorted_dependencies()
         controller_dependency_messages = (
             self._match_line_breaks_in_controller_dependencies())
+        comments_style_messages = self._check_comments()
 
         all_messages = (
             any_type_messages + extra_js_files_messages +
             js_and_ts_component_messages + directive_scope_messages +
-            sorted_dependencies_messages + controller_dependency_messages)
+            sorted_dependencies_messages + controller_dependency_messages +
+            comments_style_messages)
         return all_messages
 
 
