@@ -118,12 +118,12 @@ def put_tasks(tasks, update_last_updated_time=True):
         update_last_updated_time: bool. Whether to update the last_updated field
             of the task models.
     """
-    models = _MODEL.get_multi([t.task_id for t in tasks])
-    for i, (task, model) in enumerate(python_utils.ZIP(tasks, models)):
+    task_models = _MODEL.get_multi([t.task_id for t in tasks])
+    for i, (task, model) in enumerate(python_utils.ZIP(tasks, task_models)):
         if model is None:
-            models[i] = task.to_model()
+            task_models[i] = task.to_model()
         elif not task.apply_changes(model):
-            models[i] = None
+            task_models[i] = None
     _MODEL.put_multi(
-        [m for m in models if m is not None],
+        [m for m in task_models if m is not None],
         update_last_updated_time=update_last_updated_time)
