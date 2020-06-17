@@ -57,13 +57,13 @@ export class ParamType {
 
     /** @member {String} */
     this._name = null;
-    /** @member {Function.<?, Boolean>} */
+    /** @member {Function.<Object, Boolean>} */
     this.valueIsValid = typeDefinitionObject.validate;
-    /** @member {?} */
+    /** @member {Object} */
     this.defaultValue = typeDefinitionObject.default_value;
   }
 
-  /** @returns {?} - A valid default value for this particular type. */
+  /** @returns {Object} - A valid default value for this particular type. */
   createDefaultValue(): Object {
     return cloneDeep(this.defaultValue);
   }
