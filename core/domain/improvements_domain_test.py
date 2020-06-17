@@ -65,8 +65,7 @@ class TaskEntryTests(test_utils.GenericTestBase):
             self.MOCK_DATE)
         task_model = task.to_model()
         task.entity_version = 2
-        with self.assertRaisesRegexp(
-                Exception, 'Applying changes to wrong model'):
+        with self.assertRaisesRegexp(Exception, 'Wrong model was provided'):
             task.apply_changes(task_model)
 
     def test_apply_changes_to_status(self):

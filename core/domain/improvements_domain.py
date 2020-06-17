@@ -122,7 +122,7 @@ class TaskEntry(python_utils.OBJECT):
             bool. Whether any change was made to the model.
         """
         if task_entry_model.id != self.task_id:
-            raise Exception('Applying changes to wrong model')
+            raise Exception('Wrong model was provided')
         changes_made = False
         if task_entry_model.issue_description != self.issue_description:
             task_entry_model.issue_description = self.issue_description

@@ -287,22 +287,24 @@ class FetchExplorationTasksTests(ImprovementsServicesTestBase):
             'C',
             'D',
         ])
-        self.assertItemsEqual(resolved_task_types_by_state_name['A'], [
-            'high_bounce_rate',
-        ])
-        self.assertItemsEqual(resolved_task_types_by_state_name['B'], [
-            'high_bounce_rate',
-            'needs_guiding_responses',
-        ])
-        self.assertItemsEqual(resolved_task_types_by_state_name['C'], [
-            'ineffective_feedback_loop',
-        ])
-        self.assertItemsEqual(resolved_task_types_by_state_name['D'], [
-            'high_bounce_rate',
-            'needs_guiding_responses',
-            'ineffective_feedback_loop',
-            'successive_incorrect_answers',
-        ])
+        self.assertItemsEqual(
+            resolved_task_types_by_state_name['A'], ['high_bounce_rate'])
+        self.assertItemsEqual(
+            resolved_task_types_by_state_name['B'], [
+                'high_bounce_rate',
+                'needs_guiding_responses',
+            ])
+        self.assertItemsEqual(
+            resolved_task_types_by_state_name['C'], [
+                'ineffective_feedback_loop',
+            ])
+        self.assertItemsEqual(
+            resolved_task_types_by_state_name['D'], [
+                'high_bounce_rate',
+                'needs_guiding_responses',
+                'ineffective_feedback_loop',
+                'successive_incorrect_answers',
+            ])
 
     def test_ignores_obsolete_tasks(self):
         tasks = [
@@ -353,10 +355,11 @@ class FetchExplorationTasksTests(ImprovementsServicesTestBase):
 
         self.assertItemsEqual(
             [t.to_dict() for t in open_tasks], [tasks[3].to_dict()])
-        self.assertEqual(resolved_task_types_by_state_name, {
-            'B': ['high_bounce_rate'],
-            'C': ['needs_guiding_responses'],
-        })
+        self.assertEqual(
+            resolved_task_types_by_state_name, {
+                'B': ['high_bounce_rate'],
+                'C': ['needs_guiding_responses'],
+            })
 
 
 class FetchTaskHistoryPageTests(ImprovementsServicesTestBase):
