@@ -1336,12 +1336,17 @@ class DocstringChecker(checkers.BaseChecker):
         """
 
         is_docstring = False
+        is_docstring_arg = False
+        is_docstring_return = False
+        is_docstring_raise = False
         is_class_or_function = False
+        outerIndentationInSpaces = 0
         file_content = read_from_node(node)
         file_length = len(file_content)
 
         for line_num in python_utils.RANGE(file_length):
-            line = file_content[line_num].strip()
+            line_with_spaces = file_content[line_num]
+            line = line_with_spaces.strip()
             prev_line = ''
 
             if line_num > 0:
@@ -1403,6 +1408,30 @@ class DocstringChecker(checkers.BaseChecker):
                     self.add_message(
                         'no-newline-used-at-end', line=line_num + 1)
                 is_docstring = False
+            elif is_docstring:
+                currentIndentation = len(line) - len(line.lstrip())
+                if line.startswith("Args:"):
+                    is_docstring_arg = True
+                    is_docstring_return = False
+                    is_docstring_raise = False
+                    outerIndentationInSpaces = currentIndentation
+                    #process
+                elif line.startswith("Return:"):
+                    is_docstring_arg = False
+                    is_docstring_return = True
+                    is_docstring_raise = False
+                    outerIndentationInSpaces = currentIndentation
+                    #process
+                elif line.startswith("Raises:"):
+                    is_docstring_arg = False
+                    is_docstring_return = False
+                    is_docstring_raise = True
+                    outerIndentationInSpaces = currentIndentation
+                elif re.search(br'[a-z_]+[a-zA-Z0-9_]*:') and is_docstring_arg:
+                    if(currentIndentation!=outerIndentationInSpaces+4):
+                        #adda a message
+                elif re.search(br'[a-z_]+[a-zA-Z0-9_]*:') and is_docstring_return:
+                    #process
 
 
 class BlankLineBelowFileOverviewChecker(checkers.BaseChecker):
