@@ -4957,7 +4957,7 @@ class TaskEntryModelValidator(BaseModelValidator):
     @classmethod
     def _get_external_id_relationships(cls, item):
         return {
-            'resolver_id_ids': (
+            'resolver_ids': (
                 user_models.UserSettingsModel,
                 [item.resolver_id] if item.resolver_id is not None else []),
             'entity_ids': (exp_models.ExplorationModel, [item.entity_id])

@@ -14859,7 +14859,7 @@ class TaskEntryModelValidatorTests(test_utils.GenericTestBase):
              ['Entity id %s: exploration with id "exp_id" does not exist at '
               'version 2' % (task_id,)]])
 
-    def test_invalid_resolver_id_ids(self):
+    def test_invalid_resolver_ids(self):
         task_id = improvements_models.TaskEntryModel.create(
             improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
             'exp_id',
@@ -14872,9 +14872,9 @@ class TaskEntryModelValidatorTests(test_utils.GenericTestBase):
             resolver_id='invalid_user_id',
             resolved_on=CURRENT_DATETIME)
         self.run_job_and_check_output(
-            ['failed validation check for resolver_id_ids field check of '
+            ['failed validation check for resolver_ids field check of '
              'TaskEntryModel',
-             ['Entity id %s: based on field resolver_id_ids having value '
+             ['Entity id %s: based on field resolver_ids having value '
               'invalid_user_id, expect model UserSettingsModel with id '
               'invalid_user_id but it doesn\'t exist' % (task_id,)]])
 
