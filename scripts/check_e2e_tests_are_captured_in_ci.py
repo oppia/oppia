@@ -33,7 +33,9 @@ TEST_SUITES_NOT_RUN_ON_TRAVIS = [
     'classroomPageFileUploadFeatures', 'collections', 'embedding',
     'fileUploadFeatures', 'library', 'navigation', 'playVoiceovers',
     'preferences', 'profileFeatures', 'profileMenu', 'publication',
-    'subscriptions', 'topicAndStoryEditorFileUploadFeatures', 'users']
+    'subscriptions', 'topicsAndSkillsDashboard', 'topicAndStoryEditor',
+    'topicAndStoryEditorFileUploadFeatures', 'users']
+
 
 TRAVIS_CI_FILE_PATH = os.path.join(os.getcwd(), '.travis.yml')
 PROTRACTOR_CONF_FILE_PATH = os.path.join(
