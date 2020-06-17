@@ -13,8 +13,12 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for the Assign Skill to Topic Modal.
+ * @fileoverview Controller for assign skill to topic modal.
  */
+
+require(
+  'components/common-layout-directives/common-elements/' +
+  'confirm-or-cancel-modal.controller.ts');
 
 angular.module('oppia').controller('AssignSkillToTopicModalController', [
   '$controller', '$scope', '$uibModalInstance', 'topicSummaries',
@@ -25,4 +29,5 @@ angular.module('oppia').controller('AssignSkillToTopicModalController', [
     });
     $scope.topicSummaries = topicSummaries;
     $scope.selectedTopicIds = [];
-  }]);
+  }
+]);

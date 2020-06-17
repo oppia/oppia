@@ -40,13 +40,7 @@ workflows:
       - e2e_classroom_page:
           requires:
             - e2e_file_upload_features
-      - e2e_topic_and_story_editor_file_upload_features:
-          requires:
-            - e2e_file_upload_features
       - e2e_topic_and_story_editor:
-          requires:
-            - e2e_file_upload_features
-      - e2e_topics_and_skills_dashboard:
           requires:
             - e2e_file_upload_features
       - e2e_library_and_collections:
@@ -310,18 +304,6 @@ jobs:
           command: |
             python -m scripts.run_e2e_tests --skip-install --skip-build --suite="classroomPageFileUploadFeatures"
 
-  e2e_topic_and_story_editor_file_upload_features:
-    <<: *job_defaults
-    steps:
-      - checkout
-      - merge_target_branch
-      - attach_workspace:
-          at: /home/circleci/
-      - run:
-          name: Run e2e topic and story editor file upload features test
-          command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="topicAndStoryEditorFileUploadFeatures"
-
   e2e_topic_and_story_editor:
     <<: *job_defaults
     steps:
@@ -332,19 +314,7 @@ jobs:
       - run:
           name: Run e2e topic and story editor test
           command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="topicAndStoryEditor"
-
-  e2e_topics_and_skills_dashboard:
-    <<: *job_defaults
-    steps:
-      - checkout
-      - merge_target_branch
-      - attach_workspace:
-          at: /home/circleci/
-      - run:
-          name: Run e2e topics and skills dashboard test
-          command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="topicsAndSkillsDashboard"
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="topicAndStoryEditorFileUploadFeatures"
 
 notify:
   webhooks:

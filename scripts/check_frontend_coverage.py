@@ -234,7 +234,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'math-expression-input-validation.service.ts',
     'math-latex-string-editor.directive.ts',
     'mathjax-bind.directive.ts',
-    'merge-skill-modal.controller.ts',
     'messenger.service.ts',
     'misconception-editor.directive.ts',
     'moderator-unpublish-exploration-modal.controller.ts',

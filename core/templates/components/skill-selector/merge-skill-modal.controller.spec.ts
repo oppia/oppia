@@ -13,10 +13,10 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for DeleteTopicModalController.
+ * @fileoverview Unit tests for MergeSkillModalController.
  */
 
-describe('Delete Topic Modal Controller', function() {
+describe('Merge Skill Modal Controller', function() {
   var $scope = null;
   var $uibModalInstance = null;
   var skillDict = {
@@ -39,12 +39,15 @@ describe('Delete Topic Modal Controller', function() {
       $scope: $scope,
       $uibModalInstance: $uibModalInstance,
       skillSummaries: [skillDict],
-      skill: skillDict
+      skill: skillDict,
+      categorizedSkills: []
     });
   }));
 
   it('should close modal with the correct value', function() {
     expect($scope.skillSummaries).toEqual([skillDict]);
+    expect($scope.allowSkillsFromOtherTopics).toEqual(true);
+    expect($scope.categorizedSkills).toEqual([]);
     var result = {
       skill: skillDict,
       supersedingSkillId: $scope.selectedSkillId

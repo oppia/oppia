@@ -68,9 +68,8 @@ export interface ITopicSummaryBackendDict {
   }
 
 interface ISkillsDashboardDataBackendDict {
-    /* eslint-disable camelcase */
-    skill_summary_dicts: ISkillSummaryBackendDict[];
-    total_skill_count: number
+    'skill_summary_dicts': ISkillSummaryBackendDict[];
+    'total_skill_count': number
 }
 
 @Injectable({

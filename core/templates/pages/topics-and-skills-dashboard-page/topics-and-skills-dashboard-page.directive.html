@@ -35,7 +35,7 @@
           </ul>
         </div>
         <div class="dashboard-list">
-          <div class="dashboard-list-header" ng-if="$ctrl.topicSummaries.length>0 && $ctrl.activeTab === $ctrl.TAB_NAME_TOPICS">
+          <div class="dashboard-list-header" ng-if="$ctrl.topicSummaries.length>0">
             <div class="dashboard-list-header-count">
               <span>Displaying <[$ctrl.pageNumber*$ctrl.itemsPerPage + 1]> - <[($ctrl.pageNumber*$ctrl.itemsPerPage)+$ctrl.itemsPerPage]> of <[$ctrl.currentCount]></span>
             </div>
@@ -107,7 +107,7 @@
             </div>
           </div>
         </div>
-        <div class="topic-skill-filter" ng-if="$ctrl.activeTab===$ctrl.TAB_NAME_TOPICS">
+        <div class="topic-skill-filter">
           <div class="topic-skill-filter-content">
             <div class="topic-skill-filter-header">
               <span class="topic-skill-filter-heading">Filter</span>
@@ -122,6 +122,7 @@
                   <select2-dropdown class="protractor-test-select-status-dropdown"
                                     choices="$ctrl.statusOptions"
                                     item="$ctrl.filterObject.status"
+                                    placeholder="Status options"
                                     width="100%"
                                     on-selection-change="$ctrl.applyFilters()">
                   </select2-dropdown>
@@ -130,6 +131,7 @@
                   <select2-dropdown class="protractor-test-select-skill-status-dropdown"
                                     choices="$ctrl.skillStatusOptions"
                                     item="$ctrl.filterObject.status"
+                                    placeholder="Status options"
                                     width="100%"
                                     on-selection-change="$ctrl.applyFilters()">
                   </select2-dropdown>
@@ -145,6 +147,7 @@
                   <select2-dropdown item="$ctrl.filterObject.classroom"
                                     class="classroom-dropdown protractor-test-select-classroom-dropdown"
                                     choices="$ctrl.classrooms"
+                                    placeholder="Classrooms"
                                     width="100%"
                                     on-selection-change="$ctrl.applyFilters()">
                   </select2-dropdown>
@@ -160,6 +163,7 @@
                   <select2-dropdown class="protractor-test-select-sort-dropdown"
                                     choices="$ctrl.sortOptions"
                                     item="$ctrl.filterObject.sort"
+                                    placeholder="Status Options"
                                     width="100%"
                                     on-selection-change="$ctrl.applyFilters()">
                   </select2-dropdown>

@@ -27,19 +27,16 @@ require(
   'topic-selector.directive.ts');
 require(
   'domain/topics_and_skills_dashboard/' +
-    'topics-and-skills-dashboard-backend-api.service.ts');
+  'topics-and-skills-dashboard-backend-api.service.ts');
 require('domain/skill/skill-backend-api.service.ts');
 require('domain/topic/editable-topic-backend-api.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require(
   'pages/topics-and-skills-dashboard-page/' +
-  'skills-list/merge-skill-modal.controller.ts');
-require(
-  'pages/topics-and-skills-dashboard-page/' +
   'skills-list/assign-skill-to-topic-modal.controller.ts');
 require(
   'pages/topics-and-skills-dashboard-page/topic-selector/' +
-    'topic-selector.directive.ts');
+  'topic-selector.directive.ts');
 require('services/alerts.service.ts');
 
 require(
@@ -78,9 +75,6 @@ angular.module('oppia').directive('skillsList', [
             TopicsAndSkillsDashboardBackendApiService,
             EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED) {
           var ctrl = this;
-          $scope.highlightColumns = function(index) {
-            $scope.highlightedIndex = index;
-          };
 
           ctrl.getSkillEditorUrl = function(skillId) {
             var SKILL_EDITOR_URL_TEMPLATE = '/skill_editor/<skill_id>';
@@ -124,9 +118,7 @@ angular.module('oppia').directive('skillsList', [
                 'assign-skill-to-topic-modal.template.html'),
               backdrop: true,
               resolve: {
-                topicSummaries: function() {
-                  return topicSummaries;
-                }
+                topicSummaries: () => topicSummaries
               },
               controller: 'AssignSkillToTopicModalController'
             }).result.then(function(topicIds) {
@@ -211,14 +203,12 @@ angular.module('oppia').directive('skillsList', [
             return (skillSerialNumber + 1);
           };
 
-
           ctrl.$onInit = function() {
             ctrl.getPageNumber = $scope.getPageNumber;
             ctrl.getItemsPerPage = $scope.getItemsPerPage;
             ctrl.SKILL_HEADINGS = [
               'index', 'description', 'worked_examples_count',
               'misconception_count', 'status', 'options'];
-            ctrl.highlightedIndex = null;
           };
         }
       ]
