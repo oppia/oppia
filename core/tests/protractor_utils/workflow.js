@@ -30,6 +30,8 @@ var imageUploadInput = element(
   by.css('.protractor-test-photo-upload-input'));
 var imageSubmitButton = element(
   by.css('.protractor-test-photo-upload-submit'));
+var thumbnailResetButton = element(by.css(
+  '.protractor-thumbnail-reset-button'));
 
 // check if the save roles button is clickable
 var canAddRolesToUsers = async function() {
@@ -278,21 +280,33 @@ var getImageSource = async function(customImageElement) {
   return await customImageElement.getAttribute('src');
 };
 
-var uploadImage = async function(imageClickableElement, imgPath) {
+var uploadImage = async function(
+    imageClickableElement, imgPath, resetExistingImage) {
   await waitFor.visibilityOf(
     imageClickableElement,
     'Image element is taking too long to appear.');
   await imageClickableElement.click();
+
+  if (resetExistingImage) {
+    expect(await thumbnailResetButton.isPresent()).toBe(true);
+    await waitFor.elementToBeClickable(
+      thumbnailResetButton,
+      'Topic thumbnail reset button taking too long to appear.');
+    await thumbnailResetButton.click();
+  } else {
+    expect(await thumbnailResetButton.isPresent()).toBe(false);
+  }
+
   absPath = path.resolve(__dirname, imgPath);
   return await imageUploadInput.sendKeys(absPath);
 };
 
 var submitImage = async function(
-    imageClickableElement, imageContainer, imgPath) {
+    imageClickableElement, imageContainer, imgPath, resetExistingImage) {
   await waitFor.visibilityOf(
     imageClickableElement,
     'Image element is taking too long to appear.');
-  await uploadImage(imageClickableElement, imgPath);
+  await uploadImage(imageClickableElement, imgPath, resetExistingImage);
   await waitFor.visibilityOf(
     imageContainer, 'Image container is taking too long to appear');
   await imageSubmitButton.click();
