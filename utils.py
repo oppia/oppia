@@ -37,10 +37,7 @@ import python_utils
 
 _YAML_PATH = os.path.join(os.getcwd(), '..', 'oppia_tools', 'pyyaml-5.1.2')
 sys.path.insert(0, _YAML_PATH)
-_PYTZ_PATH = os.path.join(os.getcwd(), '..', 'oppia_tools', 'pytz-2020.1')
-sys.path.insert(0, _PYTZ_PATH)
 
-import pytz  # isort:skip  #pylint: disable=wrong-import-position
 import yaml  # isort:skip  #pylint: disable=wrong-import-position
 
 
@@ -409,7 +406,7 @@ def base64_from_int(value):
 
 
 def get_time_in_millisecs(datetime_obj):
-    """Returns time in milliseconds since the UTC Epoch.
+    """Returns time in milliseconds since the Epoch.
 
     Args:
         datetime_obj: datetime. An object of type datetime.datetime.
@@ -417,22 +414,8 @@ def get_time_in_millisecs(datetime_obj):
     Returns:
         float. The time in milliseconds since the Epoch.
     """
-    utc_dt = datetime_obj.replace(tzinfo=pytz.utc)
-    utc_epoch = datetime.datetime(1970, 1, 1, tzinfo=pytz.utc)
-    return (utc_dt - utc_epoch).total_seconds() * 1000
-
-
-def get_datetime_from_millisecs(msecs):
-    """Returns corresponding datetime from milliseconds since the UTC Epoch.
-
-    Args:
-        msecs: float. Milliseconds since the UTC Epoch.
-
-    Returns:
-        datetime.datetime. The corresponding datetime.
-    """
-    return datetime.datetime.fromtimestamp(
-        python_utils.divide(msecs, 1000.0), tz=pytz.utc).replace(tzinfo=None)
+    msecs = time.mktime(datetime_obj.timetuple()) * 1000
+    return msecs + python_utils.divide(datetime_obj.microsecond, 1000.0)
 
 
 def get_current_time_in_millisecs():

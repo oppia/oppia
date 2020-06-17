@@ -364,12 +364,16 @@ class UtilsTests(test_utils.GenericTestBase):
         filename = 'filename.svg'
         utils.require_valid_thumbnail_filename(filename)
 
-    def test_time_helper_functions(self):
+    def test_get_time_in_millisecs(self):
         dt = datetime.datetime(2020, 6, 15)
         msecs = utils.get_time_in_millisecs(dt)
-        self.assertEqual(dt, utils.get_datetime_from_millisecs(msecs))
+        self.assertEqual(
+            dt,
+            datetime.datetime.fromtimestamp(python_utils.divide(msecs, 1000.0)))
 
-    def test_time_helper_functions_with_complicated_time(self):
+    def test_get_time_in_millisecs_with_complicated_time(self):
         dt = datetime.datetime(2020, 6, 15, 5, 18, 23, microsecond=123456)
         msecs = utils.get_time_in_millisecs(dt)
-        self.assertEqual(dt, utils.get_datetime_from_millisecs(msecs))
+        self.assertEqual(
+            dt,
+            datetime.datetime.fromtimestamp(python_utils.divide(msecs, 1000.0)))
