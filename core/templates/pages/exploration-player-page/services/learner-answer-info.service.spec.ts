@@ -39,6 +39,11 @@ import { OutcomeObjectFactory } from
 import { State, StateObjectFactory } from 'domain/state/StateObjectFactory.ts';
 import { UpgradedServices } from 'services/UpgradedServices';
 
+class MockLearnerAnswerDetailsBackendApiService {}
+class MockAnswerClassificationService {
+  getMatchingClassificationResult() {}
+}
+
 fdescribe('Learner answer info service', () => {
   let sof: StateObjectFactory = null;
   let oof: OutcomeObjectFactory = null;
@@ -145,8 +150,18 @@ fdescribe('Learner answer info service', () => {
 
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [CamelCaseToHyphensPipe, ConvertToPlainTextPipe]
-    });
+      providers: [
+      {
+        provide: LearnerAnswerDetailsBackendApiService,
+        useClass: MockLearnerAnswerDetailsBackendApiService
+      },
+      {
+        provide: AnswerClassificationService,
+        useClass: MockAnswerClassificationService
+      },
+      CamelCaseToHyphensPipe,
+      ConvertToPlainTextPipe]
+    }).compileComponents();
     httpTestingController = TestBed.get(HttpTestingController);
     sof = TestBed.get(StateObjectFactory);
     oof = TestBed.get(OutcomeObjectFactory);
@@ -154,13 +169,13 @@ fdescribe('Learner answer info service', () => {
     firstState = sof.createFromBackendDict('new state', stateDict);
     secondState = sof.createFromBackendDict('fake state', stateDict);
     thirdState = sof.createFromBackendDict('demo state', stateDict);
+    ladbas = TestBed.get(LearnerAnswerDetailsBackendApiService);
+    answerClassificationService = TestBed.get(AnswerClassificationService);
     learnerAnswerInfoService = TestBed.get(LearnerAnswerInfoService);
-      console.log(JSON.stringify(learnerAnswerInfoService)+"lais");
+    //console.log(JSON.stringify(learnerAnswerInfoService)+"lais");
     DEFAULT_OUTCOME_CLASSIFICATION = TestBed.get(
       DEFAULT_OUTCOME_CLASSIFICATION);
     console.log(JSON.parse(DEFAULT_OUTCOME_CLASSIFICATION)+"DOC");
-    ladbas = TestBed.get(LearnerAnswerDetailsBackendApiService);
-    answerClassificationService = TestBed.get(AnswerClassificationService);
     //console.log(JSON.parse(answerClassificationService)+"acs");
     spyOn(answerClassificationService, 'getMatchingClassificationResult')
       .and.returnValue(acrof.createNew(
