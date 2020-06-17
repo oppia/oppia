@@ -89,7 +89,7 @@ _PARSER.add_argument(
     '--verbose',
     help='verbose mode. All details will be printed.',
     action='store_true')
-_EXCLUSIVE_GROUP.add_argument(
+_PARSER.add_argument(
     '--only-check-file-extensions',
     nargs='+',
     choices=['html', 'css', 'js', 'ts', 'py', 'other'],
@@ -551,12 +551,12 @@ def main(args=None):
         semaphore.acquire()
         _get_task_output(lint_messages, task, semaphore)
 
-    lint_messages += codeowner_linter.check_codeowner_file(
-        verbose_mode_enabled)
+    # lint_messages += codeowner_linter.check_codeowner_file(
+    #     verbose_mode_enabled)
 
-    lint_messages += (
-        third_party_typings_linter.check_third_party_libs_type_defs(
-            verbose_mode_enabled))
+    # lint_messages += (
+    #     third_party_typings_linter.check_third_party_libs_type_defs(
+    #         verbose_mode_enabled))
 
     _print_complete_summary_of_lint_messages(lint_messages)
 

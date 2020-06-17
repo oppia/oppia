@@ -45,6 +45,11 @@
     margin-bottom: 7px;
   }
 
+  response-header .oppia-badge-primary {
+    bottom: 4px;
+    position: relative;
+  }
+
   /* This is to break the line only when screen is too narrow to have both divs
      in same line.*/
   @media screen and (min-width: 370px) {
@@ -60,7 +65,7 @@
     <i class="material-icons md-18 oppia-response-tick-cross  protractor-test-correct-tick-mark" ng-if="$ctrl.isCorrect() && $ctrl.isCorrectnessFeedbackEnabled() && $ctrl.isResponse() && !$ctrl.isCurrentInteractionLinear()">&#10004;</i>
     <span ng-if="!$ctrl.isActive()" ng-attr-title="<[$ctrl.getSummary()]>">
       <[$ctrl.getShortSummary()]>
-      <span ng-if="$ctrl.getNumRules() > 1" class="badge badge-primary" style="position: relative; bottom: 4px;">
+      <span ng-if="$ctrl.getNumRules() > 1" class="badge badge-primary" class="oppia-badge-primary">
         +<[$ctrl.getNumRules() - 1]>
       </span>
     </span>

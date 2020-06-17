@@ -1,6 +1,6 @@
-<div style="height: 100%;">
+<div class="oppia-editor">
   <div ng-if="!$ctrl.explanationEditorIsOpen"
-       style="height: 100%;"
+       class="oppia-editor"
        ng-attr-title="<[$ctrl.isEditable ? 'Edit explanation' : '']>">
     <div class="oppia-readonly-rule-tile"
          ng-class="{'oppia-editable-section': $ctrl.isEditable}">
@@ -44,7 +44,16 @@
         </button>
       </div>
 
-      <div style="clear: both;"></div>
+      <div class="oppia-clear"></div>
     </div>
   </div>
 </div>
+
+<style>
+  .oppia-editor {
+    height: 100%;
+  }
+  .oppia-clear {
+    clear: both;
+  }
+</style>

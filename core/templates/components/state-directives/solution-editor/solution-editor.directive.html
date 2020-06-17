@@ -1,6 +1,6 @@
-<div style="height: 100%;">
+<div class="oppia-editor">
   <div ng-if="!$ctrl.solutionEditorIsOpen"
-       style="height: 100%;"
+       class="oppia-editor"
        ng-attr-title="Edit solution">
     <div class="oppia-readonly-rule-tile"
          ng-class="{'oppia-editable-section': true}">
@@ -26,3 +26,9 @@
                                show-mark-all-audio-as-needing-update-modal-if-required="$ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired">
   </solution-explanation-editor>
 </div>
+
+<style>
+  .oppia-editor {
+    height: 100%;
+  }
+</style>
