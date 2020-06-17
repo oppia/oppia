@@ -23,7 +23,6 @@ import datetime
 
 from core.platform import models
 from core.tests import test_utils
-from core.domain import exp_fetchers
 from core.domain import improvements_domain
 from core.domain import improvements_services
 import feconf
@@ -200,7 +199,8 @@ class FetchExplorationTasksTests(ImprovementsServicesTestBase):
     def test_returns_all_open_tasks_even_when_per_fetch_limit_exceeded(self):
         tasks = [
             self._new_open_task(state_name='State %d' % (i,))
-            for i in range(int(feconf.MAX_TASK_MODELS_PER_FETCH * 2.5))
+            for i in python_utils.RANGE(
+                int(feconf.MAX_TASK_MODELS_PER_FETCH * 2.5))
         ]
         improvements_services.put_tasks(tasks)
         open_tasks, resolved_task_types_by_state_name = (
@@ -234,7 +234,7 @@ class FetchExplorationTasksTests(ImprovementsServicesTestBase):
             improvements_services.fetch_exploration_tasks(self.exp))
 
         self.assertEqual(open_tasks, [])
-        self.assertItemsEqual(resolved_task_types_by_state_name.keys(), [
+        self.assertItemsEqual(list(resolved_task_types_by_state_name.keys()), [
             'A',
             'B',
             'C',
@@ -258,7 +258,10 @@ class FetchExplorationTasksTests(ImprovementsServicesTestBase):
         ])
 
     def test_ignores_obsolete_tasks(self):
-        tasks = [self._new_obsolete_task('State %d' % (i,)) for i in range(50)]
+        tasks = [
+            self._new_obsolete_task('State %d' % (i,))
+            for i in python_utils.RANGE(50)
+        ]
         improvements_services.put_tasks(tasks)
         open_tasks, resolved_task_types_by_state_name = (
             improvements_services.fetch_exploration_tasks(self.exp))
@@ -315,7 +318,7 @@ class FetchTaskHistoryPageTests(ImprovementsServicesTestBase):
     def setUp(self):
         super(FetchTaskHistoryPageTests, self).setUp()
         timedelta = datetime.timedelta(minutes=5)
-        for i in range(1, 26):
+        for i in python_utils.RANGE(1, 26):
             task = self._new_obsolete_task(
                 state_name='State %d' % (i,), exploration_version=i)
             with self.mock_datetime_utcnow(self.MOCK_DATE + (timedelta * i)):
