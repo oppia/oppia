@@ -1,4 +1,4 @@
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,12 +13,20 @@
 // limitations under the License.
 
 /**
- * @fileoverview Scripts for the practice session.
+ * @fileoverview Controller for the delete topic confirmation modal.
  */
 
-// The module needs to be loaded before everything else since it defines the
-// main module the elements are attached to.
-require('pages/practice-session-page/practice-session-page.module.ts');
-require('App.ts');
+angular.module('oppia').controller('DeleteTopicModalController', [
+  '$controller', '$scope', '$uibModalInstance', 'topicName',
+  function($controller, $scope, $uibModalInstance, topicName) {
+    $controller('ConfirmOrCancelModalController', {
+      $scope: $scope,
+      $uibModalInstance: $uibModalInstance
+    });
 
-require('pages/practice-session-page/practice-session-page.component.ts');
+    $scope.init = function() {
+      $scope.topicName = topicName;
+    };
+    $scope.init();
+  }
+]);

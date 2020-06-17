@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the community dashboard page.
+ * @fileoverview Component for the community dashboard page.
  */
 
 require('base-components/base-content.directive.ts');
