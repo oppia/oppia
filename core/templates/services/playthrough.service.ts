@@ -68,98 +68,72 @@ class MultipleIncorrectAnswersTracker {
 }
 
 class CyclicStateTransitionsTracker {
-  pathOfVisitedStates: string[];
-  /**
-   * Mapping of all disjoint cycles discovered by this tracker to the number of
-   * times they've been encountered (including isomorphic cycles).
-   *
-   * Map is in insertion-order.
-   */
-  cycleOccurrences: Map<string[], number>;
+  private currStateName: string;
+  private visitedStates: Set<string>;
+  // Maps [fromState, destState] to their number of occurrences. Map is kept in
+  // insertion-order (most recent appears at the end).
+  private stateRegressionOccurrences: Map<string[], number>;
 
   constructor(initStateName: string) {
-    this.pathOfVisitedStates = [initStateName];
-    this.cycleOccurrences = new Map();
+    this.currStateName = initStateName;
+    this.visitedStates = new Set([initStateName]);
+    this.stateRegressionOccurrences = new Map();
   }
 
   recordStateTransition(destStateName: string): void {
-    if (this.currStateName() === destStateName) {
+    if (this.currStateName === destStateName) {
       return;
     }
-    const destStateNameIndex = this.pathOfVisitedStates.indexOf(destStateName);
-    if (destStateNameIndex === -1) {
-      this.pathOfVisitedStates.push(destStateName);
+    if (!this.visitedStates.has(destStateName)) {
+      this.visitedStates.add(destStateName);
     } else {
-      this.trackCycle(this.makeCycleOfVisitedStates(destStateNameIndex));
-      this.pathOfVisitedStates = [destStateName];
+      const newStateRegression = [this.currStateName, destStateName];
+      let stateRegressionFound = false;
+      for (const [stateRegression, occurrences] of
+           this.stateRegressionOccurrences.entries()) {
+        if (this.isSameStateRegression(stateRegression, newStateRegression)) {
+          this.stateRegressionOccurrences.set(stateRegression, occurrences + 1);
+          stateRegressionFound = true;
+          break;
+        }
+      }
+      if (!stateRegressionFound) {
+        this.stateRegressionOccurrences.set(newStateRegression, 1);
+      }
     }
+    this.currStateName = destStateName;
+  }
+
+  private isSameStateRegression(
+      stateRegression: string[], otherStateRegression: string[]): boolean {
+    const [fromState, destState] = stateRegression;
+    const [otherFromState, otherDestState] = otherStateRegression;
+    return fromState === otherFromState && destState === otherDestState;
   }
 
   foundAnIssue(): boolean {
-    const [_, occurrences] = this.getMostCommonCycle();
+    const [_, occurrences] = this.getMostCommonStateRegression();
     return occurrences >= ServicesConstants.NUM_REPEATED_CYCLES_THRESHOLD;
   }
 
   generateIssueCustomizationArgs(): ICyclicStateTransitionsCustomizationArgs {
-    const [stateNames, _] = this.getMostCommonCycle();
-    return {
-      state_names: {value: stateNames},
-    };
+    const [stateRegression, _] = this.getMostCommonStateRegression();
+    return {state_names: {value: stateRegression}};
   }
 
-  private currStateName(): string {
-    return this.pathOfVisitedStates[this.pathOfVisitedStates.length - 1];
-  }
-
-  private trackCycle(cycle: string[]): void {
-    for (const [trackedCycle, occurrences] of this.cycleOccurrences.entries()) {
-      if (this.isSameCycleOfStateNames(cycle, trackedCycle)) {
-        this.cycleOccurrences.set(trackedCycle, occurrences + 1);
-        return;
+  private getMostCommonStateRegression(): [string[], number] {
+    let mostCommonStateRegression = null;
+    let mostCommonStateRegressionOccurrences = 0;
+    for (const [stateRegression, occurrences] of
+         this.stateRegressionOccurrences.entries()) {
+      // When two state transitions have the same number of occurrences, we take
+      // the most recent one (which would appear later in the map).
+      if (occurrences >= mostCommonStateRegressionOccurrences) {
+        mostCommonStateRegression = stateRegression;
+        mostCommonStateRegressionOccurrences = occurrences;
       }
     }
-    this.cycleOccurrences.set(cycle, 1);
-  }
-
-  private makeCycleOfVisitedStates(collisionIndex: number): string[] {
-    const collision = this.pathOfVisitedStates[collisionIndex];
-    const cycleWithNoCollision = this.pathOfVisitedStates.slice(collisionIndex);
-    return [...cycleWithNoCollision, collision];
-  }
-
-  /**
-   * Returns true when the two given cycles represent the same sequence of state
-   * names, regardless of their starting element.
-   *
-   * Implementation does this by verifying whether one cycle is a "rotation" of
-   * the other. An array rotation is an operation which moves N elements from
-   * one end of an array to the other. For example:
-   *     RotateRight([1, 2, 3, 4, 5], 2) => [4, 5, 1, 2, 3].
-   *     RotateLeft([1, 2, 3, 4, 5], 2) => [3, 4, 5, 1, 2].
-   */
-  private isSameCycleOfStateNames(
-      cycle: string[], cycleToCheck: string[]): boolean {
-    if (cycleToCheck.length !== cycle.length) {
-      return false;
-    }
-    const rotationToFind = cycleToCheck.slice(1);
-    const arrayWithAllCycleRotations = [...cycle.slice(1), ...cycle.slice(1)];
-    const startIndex = arrayWithAllCycleRotations.indexOf(rotationToFind[0]);
-    return startIndex !== -1 && rotationToFind.every(
-      (value, i) => arrayWithAllCycleRotations[startIndex + i] === value);
-  }
-
-  private getMostCommonCycle(): [string[], number] {
-    let mostCommonCycle = null;
-    let mostCommonCycleOccurrences = 0;
-    for (const [cycle, occurrences] of this.cycleOccurrences.entries()) {
-      // When cycles have equal occurrences, take the most recent one.
-      if (occurrences >= mostCommonCycleOccurrences) {
-        mostCommonCycle = cycle;
-        mostCommonCycleOccurrences = occurrences;
-      }
-    }
-    return [mostCommonCycle, mostCommonCycleOccurrences];
+    return [mostCommonStateRegression, mostCommonStateRegressionOccurrences];
   }
 }
 
