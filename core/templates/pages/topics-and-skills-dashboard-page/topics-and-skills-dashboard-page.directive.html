@@ -35,12 +35,13 @@
           </ul>
         </div>
         <div class="dashboard-list">
-          <div class="dashboard-list-header" ng-if="$ctrl.topicSummaries.length>0">
+          <div class="dashboard-list-header" ng-if="$ctrl.topicSummaries.length>0 && $ctrl.activeTab === $ctrl.TAB_NAME_TOPICS">
             <div class="dashboard-list-header-count">
               <span>Displaying <[$ctrl.pageNumber*$ctrl.itemsPerPage + 1]> - <[($ctrl.pageNumber*$ctrl.itemsPerPage)+$ctrl.itemsPerPage]> of <[$ctrl.currentCount]></span>
             </div>
             <div class="dashboard-list-pagination">
               <div>
+                <span>Items Per Page: </span>
                 <select ng-options="choice as choice for choice in $ctrl.itemsPerPageChoice"
                         ng-model="$ctrl.itemsPerPage"
                         ng-change="$ctrl.refreshPagination()">
@@ -48,7 +49,7 @@
               </div>
               <div>
                 <i class="fa fa-angle-left topic-pagination-arrow" ng-click="$ctrl.changePageByOne($ctrl.MOVE_TO_PREV_PAGE)"></i>
-                <span class="dashboard-list-pagination-value" ng-repeat="n in $ctrl.generateNumbersTillRange($ctrl.currentCount/$ctrl.itemsPerPage)" ng-click="$ctrl.goToPageNumber($index)">
+                <span class="dashboard-list-pagination-value" ng-repeat="n in $ctrl.generateNumbersTillRange($ctrl.currentCount/$ctrl.itemsPerPage) track by $index" ng-click="$ctrl.goToPageNumber($index)">
                   <span ng-if="$ctrl.pageNumber===$index" class="dashboard-list-pagination-active"><[$index+1]></span>
                   <span ng-if="$ctrl.pageNumber!==$index"><[$index+1]></span>
                 </span>
@@ -64,7 +65,7 @@
                          ng-if="$ctrl.topicSummaries.length > 0"
                          user-can-delete-topic="$ctrl.userCanDeleteTopic">
             </topics-list>
-            <p class="intro-card-message" ng-if="!$ctrl.topicSummaries.length" style="padding-top: 6px;">
+            <p class="intro-card-message" ng-if="!$ctrl.topicSummaries.length">
               No topics to display.
             </p>
           </div>
@@ -76,9 +77,10 @@
                          editable-topic-summaries="$ctrl.editableTopicSummaries"
                          mergeable-skill-summaries="$ctrl.mergeableSkillSummaries"
                          user-can-create-skill="$ctrl.userCanCreateSkill"
-                         user-can-delete-skill="$ctrl.userCanDeleteSkill">
+                         user-can-delete-skill="$ctrl.userCanDeleteSkill"
+                         skills-categorized-by-topics="$ctrl.skillsCategorizedByTopics">
             </skills-list>
-            <p class="intro-card-message" ng-if="$ctrl.isSkillsTabHelpTextVisible()" style="padding-top: 6px;">
+            <p class="intro-card-message" ng-if="$ctrl.isSkillsTabHelpTextVisible()">
               There are no pending unused skills.
             </p>
           </div>
@@ -105,7 +107,7 @@
             </div>
           </div>
         </div>
-        <div class="topic-skill-filter">
+        <div class="topic-skill-filter" ng-if="$ctrl.activeTab===$ctrl.TAB_NAME_TOPICS">
           <div class="topic-skill-filter-content">
             <div class="topic-skill-filter-header">
               <span class="topic-skill-filter-heading">Filter</span>
@@ -284,8 +286,8 @@
   .oppia-topics-and-skills-dashboard .create-topic-skill span {
     color: #00645C;
     display: inline-block;
-    font-size: 14px;
-    line-height: 15px;
+    font-size: 16px;
+    line-height: 17px;
     width: 100%;
   }
   .oppia-topics-and-skills-dashboard .topic-skill-filter-content {
