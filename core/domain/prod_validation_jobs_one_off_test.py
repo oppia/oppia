@@ -15164,7 +15164,7 @@ class PlaythroughModelValidatorTests(test_utils.GenericTestBase):
                 for playthrough_ids in playthrough_ids_list
             ])
 
-    def test_output_for_good_playthrough(self):
+    def test_output_for_valid_playthrough(self):
         self.set_config_property(
             config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
             [self.exp.id])
@@ -15174,7 +15174,7 @@ class PlaythroughModelValidatorTests(test_utils.GenericTestBase):
         expected_output = [u'[u\'fully-validated PlaythroughModel\', 1]']
         run_job_and_check_output(self, expected_output)
 
-    def test_output_for_pre_release_playthrough(self):
+    def test_output_for_pre_released_playthrough(self):
         self.set_config_property(
             config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
             [self.exp.id])

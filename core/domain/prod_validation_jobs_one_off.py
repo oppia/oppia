@@ -5046,9 +5046,18 @@ class PlaythroughModelValidator(BaseModelValidator):
 
     @classmethod
     def _get_external_id_relationships(cls, item):
+        exp_id = item.exp_id
+        exp_version = item.exp_version
+        exp_issues_id = (
+            stats_models.ExplorationIssuesModel.get_entity_id(
+                exp_id, exp_version)
+        )
+
         return {
             'exp_ids': (
                 exp_models.ExplorationModel, [item.exp_id]),
+            'exp_issues': (
+                stats_models.ExplorationIssuesModel, [exp_issues_id])
         }
 
     @classmethod
@@ -5080,51 +5089,56 @@ class PlaythroughModelValidator(BaseModelValidator):
 
     @classmethod
     def _validate_reference(cls, item):
-        """Validate the playthrough is referenced by some issues of
-        the corresponding exploration.
+        """Validate the playthrough reference relations.
 
         Args:
             item: ndb.Model. PlaythroughModel to validate.
         """
-        exp_id = item.exp_id
-        exp_version = item.exp_version
-        exp_issues = (
-            stats_models.ExplorationIssuesModel.get_model(exp_id, exp_version))
+        exp_issues_tuples = cls.external_instance_details['exp_issues']
+        for _, _, exp_issues in exp_issues_tuples:
+            # The case for missing ExplorationIssues external model is
+            # ignored here since errors for missing email external model
+            # are already checked and stored in
+            # _validate_external_id_relationships function.
+            exp_id = item.exp_id
+            exp_version = item.exp_version
 
-        issues = []
-        for issue in exp_issues.unresolved_issues:
-            issue_type = issue['issue_type']
-            if (item.id in issue['playthrough_ids'] and
-                    issue_type == item.issue_type):
-                issue_customization_args = issue['issue_customization_args']
-                identifying_arg = (
-                    stats_models.ISSUE_TYPE_KEYNAME_MAPPING[issue_type])
-                if (issue_customization_args[identifying_arg] ==
-                        item.issue_customization_args[identifying_arg]):
-                    issues.append(issue)
+            issues = []
+            for issue in exp_issues.unresolved_issues:
+                issue_type = issue['issue_type']
+                if (
+                        item.id in issue['playthrough_ids']
+                        and issue_type == item.issue_type):
+                    issue_customization_args = issue['issue_customization_args']
+                    identifying_arg = (
+                        stats_models.ISSUE_TYPE_KEYNAME_MAPPING[issue_type])
+                    if (
+                            issue_customization_args[identifying_arg] ==
+                            item.issue_customization_args[identifying_arg]):
+                        issues.append(issue)
 
-        if len(issues) == 0:
-            cls.errors['reference check'].append(
-                'Entity id %s: not referenced by any issue for the'
-                ' corresponding exploration (id=%s, version=%s)' % (
-                    item.id, exp_id, exp_version)
-            )
-        elif len(issues) > 1:
-            cls.errors['reference check'].append(
-                'Entity id %s: referenced by more than one issues.' % (
-                    item.id,)
-            )
-        else:
-            issue = issues[0]
-            reference_count = 0
-            for playthrough_id in issue['playthrough_ids']:
-                if playthrough_id == item.id:
-                    reference_count += 1
-            if reference_count > 1:
+            if len(issues) == 0:
                 cls.errors['reference check'].append(
-                    'Entity id %s: referenced multiple times in an issue.' % (
+                    'Entity id %s: not referenced by any issue for the'
+                    ' corresponding exploration (id=%s, version=%s)' % (
+                        item.id, exp_id, exp_version)
+                )
+            elif len(issues) > 1:
+                cls.errors['reference check'].append(
+                    'Entity id %s: referenced by more than one issues.' % (
                         item.id,)
                 )
+            else:
+                issue = issues[0]
+                reference_count = 0
+                for playthrough_id in issue['playthrough_ids']:
+                    if playthrough_id == item.id:
+                        reference_count += 1
+                if reference_count > 1:
+                    cls.errors['reference check'].append(
+                        'Entity id %s: referenced multiple times in an '
+                        'issue.' % (item.id,)
+                    )
 
     @classmethod
     def _validate_created_datetime(cls, item):
