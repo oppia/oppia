@@ -47,7 +47,7 @@ export class TaskEntry {
   public readonly resolverProfilePictureDataUrl: string;
   public readonly resolvedOnMsecs: number;
   protected issueDescription: string;
-  private taskStatus: string
+  private taskStatus: string;
 
   constructor(backendDict: ITaskEntryBackendDict) {
     this.entityType = backendDict.entity_type;
