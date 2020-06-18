@@ -20,6 +20,8 @@
 // main module the elements are attached to.
 require('pages/landing-pages/topic-landing-page/topic-landing-page.module.ts');
 require('App.ts');
+require('base-components/oppia-root.directive.ts');
+require('base-components/base-content.directive.ts');
 
 require(
   'pages/landing-pages/topic-landing-page/topic-landing-page.component.ts');

@@ -4,24 +4,25 @@
     @load('base-components/header.template.html', {"title": "Join the community - Oppia"})
   </head>
   <body>
-    <service-bootstrap></service-bootstrap>
-    <div ng-controller="Base">
-      <base-content>
-        <navbar-breadcrumb>
-          <ul class="nav navbar-nav oppia-navbar-breadcrumb">
-            <li>
-              <span class="oppia-navbar-breadcrumb-separator"></span>
-              <span translate="I18N_SIGNUP_REGISTRATION"></span>
-            </li>
-          </ul>
-        </navbar-breadcrumb>
+    <oppia-root>
+      <div ng-controller="Base">
+        <base-content>
+          <navbar-breadcrumb>
+            <ul class="nav navbar-nav oppia-navbar-breadcrumb">
+              <li>
+                <span class="oppia-navbar-breadcrumb-separator"></span>
+                <span translate="I18N_SIGNUP_REGISTRATION"></span>
+              </li>
+            </ul>
+          </navbar-breadcrumb>
 
-        <content>
-          <signup-page></signup-page>
-        </content>
-      </base-content>
-    </div>
+          <content>
+            <signup-page></signup-page>
+          </content>
+        </base-content>
+      </div>
 
+    </oppia-root>
     @load('pages/footer_js_libs.html')
   </body>
 </html>

@@ -24,6 +24,8 @@ require('interactions/codemirrorRequires.ts');
 // main module the elements are attached to.
 require('pages/topic-editor-page/topic-editor-page.module.ts');
 require('App.ts');
+require('base-components/oppia-root.directive.ts');
+require('base-components/base-content.directive.ts');
 
 require(
   'pages/topic-editor-page/navbar/topic-editor-navbar-breadcrumb.directive.ts');

@@ -20,5 +20,7 @@
 // main module the elements are attached to.
 require('./delete-account-page.module.ts');
 require('App.ts');
+require('base-components/oppia-root.directive.ts');
+require('base-components/base-content.directive.ts');
 
 require('./delete-account-page.component.ts');

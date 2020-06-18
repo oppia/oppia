@@ -20,6 +20,8 @@
 // main module the elements are attached to.
 require('pages/subtopic-viewer-page/subtopic-viewer-page.module.ts');
 require('App.ts');
+require('base-components/oppia-root.directive.ts');
+require('base-components/base-content.directive.ts');
 
 require(
   'pages/subtopic-viewer-page/navbar-breadcrumb/' +
