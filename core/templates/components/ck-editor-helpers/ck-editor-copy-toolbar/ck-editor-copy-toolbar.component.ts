@@ -1,4 +1,4 @@
-// Copyright 2016 The Oppia Authors. All Rights Reserved.
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,19 +16,16 @@
  * @fileoverview About page component.
  */
 
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 @Component({
   selector: 'ck-editor-copy-toolbar',
   templateUrl: './ck-editor-copy-toolbar.component.html'
 })
-export class CkEditorCopyToolbar implements OnInit {
+export class CkEditorCopyToolbar {
   @Input() toolActive = false;
   @Output() setToolActive = new EventEmitter<boolean>();
-
-  ngOnInit() {
-  }
 
   toggleToolActive() {
     this.setToolActive.emit(!this.toolActive);

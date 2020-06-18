@@ -78,7 +78,7 @@
                     <[getEmptyContentMessage()]>
                   </span>
                   <span>
-                    <angular-html-bind html-data="getRequiredHtml(answerGroup.outcome.feedback)" class="oppia-rte-editor">
+                    <angular-html-bind html-data="getRequiredHtml(answerGroup.outcome.feedback)" class="oppia-rte-editor" ng-class="{'oppia-rte-editor-unfocused': !copyMode.isActive}">
                     </angular-html-bind>
                   </span>
                 </div>
@@ -111,7 +111,7 @@
             <div ng-if="activeAnswerGroupIndex === stateAnswerGroups.length">
               <div class="oppia-editor-card-section protractor-test-feedback-<[stateAnswerGroups.length]>-text">
                 <div class="oppia-rule-body-container">
-                  <angular-html-bind html-data="getRequiredHtml(stateDefaultOutcome.feedback)" class="oppia-rte-editor">
+                  <angular-html-bind html-data="getRequiredHtml(stateDefaultOutcome.feedback)" class="oppia-rte-editor" ng-class="{'oppia-rte-editor-unfocused': !copyMode.isActive}">
                   </angular-html-bind>
                 </div>
               </div>
@@ -144,7 +144,7 @@
                 <[getEmptyContentMessage()]>
               </span>
               <span>
-                <angular-html-bind html-data="getRequiredHtml(hint.hintContent)" class="oppia-rte-editor">
+                <angular-html-bind html-data="getRequiredHtml(hint.hintContent)" class="oppia-rte-editor" ng-class="{'oppia-rte-editor-unfocused': !copyMode.isActive}">
                 </angular-html-bind>
               </span>
             </div>
@@ -158,7 +158,7 @@
         <[getEmptyContentMessage()]>
       </span>
       <span>
-        <angular-html-bind html-data="getRequiredHtml(stateSolution.explanation)" class="oppia-rte-editor">
+        <angular-html-bind html-data="getRequiredHtml(stateSolution.explanation)" class="oppia-rte-editor" ng-class="{'oppia-rte-editor-unfocused': !copyMode.isActive}">
         </angular-html-bind>
       </span>
     </div>
