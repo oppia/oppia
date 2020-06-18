@@ -26,10 +26,10 @@ import { FeaturedTranslationLanguage } from
   'domain/opportunity/FeaturedTranslationLanguageFactory';
 
 @Component({
-  selector: 'translation-language-select',
-  templateUrl: './translation-language-select.component.html'
+  selector: 'translation-language-selector',
+  templateUrl: './translation-language-selector.component.html'
 })
-export class TranslationLanguageSelectComponent implements OnInit {
+export class TranslationLanguageSelectorComponent implements OnInit {
   @Input() options: {id: string, description: string}[];
   @Input() value: string;
   @Output() setValue: EventEmitter<string> = new EventEmitter();
@@ -92,9 +92,9 @@ export class TranslationLanguageSelectComponent implements OnInit {
 }
 
 angular.module('oppia').directive(
-  'translationLanguageSelect',
+  'translationLanguageSelector',
   downgradeComponent({
-    component: TranslationLanguageSelectComponent,
+    component: TranslationLanguageSelectorComponent,
     inputs: ['options', 'value'],
     outputs: ['setValue']
   }));

@@ -23,13 +23,13 @@ var CommunityDashboardTranslateTextTab = function() {
   var selectableLanguageElements = element(
     by.css('.protractor-test-language-selector'));
   var selectedLanguageElement = selectableLanguageElements.element(
-    by.css('.oppia-translation-language-select-inner-container'));
+    by.css('.oppia-translation-language-selector-inner-container'));
 
   var _selectLanguage = async function(language) {
     await selectableLanguageElements.click();
     await selectableLanguageElements.element(
       by.cssContainingText(
-        '.oppia-translation-language-select-dropdown-option',
+        '.oppia-translation-language-selector-dropdown-option',
         language
       )).click();
   };

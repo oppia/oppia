@@ -44,8 +44,8 @@ export class ServiceBootstrapComponent {}
 import { AppConstants } from 'app.constants';
 import { CommunityDashboardConstants } from
   'pages/community-dashboard-page/community-dashboard-page.constants';
-import { TranslationLanguageSelectComponent } from
-  './translation-language-select/translation-language-select.component';
+import { TranslationLanguageSelectorComponent } from
+  './translation-language-selector/translation-language-selector.component';
 
 @NgModule({
   imports: [
@@ -55,11 +55,11 @@ import { TranslationLanguageSelectComponent } from
   ],
   declarations: [
     ServiceBootstrapComponent,
-    TranslationLanguageSelectComponent
+    TranslationLanguageSelectorComponent
   ],
   entryComponents: [
     ServiceBootstrapComponent,
-    TranslationLanguageSelectComponent
+    TranslationLanguageSelectorComponent
   ],
   providers: [
     AppConstants,

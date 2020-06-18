@@ -54,10 +54,10 @@
         <[$ctrl.tabsDetails[$ctrl.activeTabName].description]>
         <div class="oppia-dashboard-language-container" ng-if="$ctrl.showLanguageSelector()">
           <span class="oppia-dashboard-language-container-label">Translate to</span>
-          <translation-language-select [options]="$ctrl.languageCodesAndDescriptions"
+          <translation-language-selector [options]="$ctrl.languageCodesAndDescriptions"
                                        [value]="$ctrl.languageCode"
                                        (set-value)="$ctrl.onChangeLanguage($event)">
-          </translation-language-select>
+          </translation-language-selector>
         </div>
 
       </div>

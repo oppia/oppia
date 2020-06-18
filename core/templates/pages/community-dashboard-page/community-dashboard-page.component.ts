@@ -27,8 +27,8 @@ require(
   'pages/community-dashboard-page/contributions-and-review/' +
   'contributions-and-review.directive.ts');
 require(
-  'pages/community-dashboard-page/translation-language-select/' +
-  'translation-language-select.component.ts');
+  'pages/community-dashboard-page/translation-language-selector/' +
+  'translation-language-selector.component.ts');
 require(
   'pages/community-dashboard-page/question-opportunities/' +
   'question-opportunities.directive.ts');

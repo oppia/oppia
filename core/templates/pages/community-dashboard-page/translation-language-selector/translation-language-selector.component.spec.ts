@@ -14,9 +14,9 @@
 
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { TranslationLanguageSelectComponent } from
+import { TranslationLanguageSelectorComponent } from
   // eslint-disable-next-line max-len
-  'pages/community-dashboard-page/translation-language-select/translation-language-select.component.ts';
+  'pages/community-dashboard-page/translation-language-selector/translation-language-selector.component.ts';
 import { ContributionOpportunitiesBackendApiService } from
   // eslint-disable-next-line max-len
   'pages/community-dashboard-page/services/contribution-opportunities-backend-api.service.ts';
@@ -28,8 +28,8 @@ import { FeaturedTranslationLanguageFactory } from
  */
 
 describe('Translation language select', () => {
-  let component: TranslationLanguageSelectComponent;
-  let fixture: ComponentFixture<TranslationLanguageSelectComponent>;
+  let component: TranslationLanguageSelectorComponent;
+  let fixture: ComponentFixture<TranslationLanguageSelectorComponent>;
 
   let featuredTranslationLanguageFactory =
     new FeaturedTranslationLanguageFactory();
@@ -55,7 +55,7 @@ describe('Translation language select', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [TranslationLanguageSelectComponent],
+      declarations: [TranslationLanguageSelectorComponent],
       providers: [{
         provide: ContributionOpportunitiesBackendApiService,
         useValue: contributionOpportunitiesBackendApiServiceStub
@@ -65,7 +65,7 @@ describe('Translation language select', () => {
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(TranslationLanguageSelectComponent);
+    fixture = TestBed.createComponent(TranslationLanguageSelectorComponent);
     component = fixture.componentInstance;
 
     component.options = [
@@ -81,14 +81,14 @@ describe('Translation language select', () => {
   beforeEach(() => {
     clickDropdown = () => {
       fixture.debugElement.nativeElement
-        .querySelector('.oppia-translation-language-select-inner-container')
+        .querySelector('.oppia-translation-language-selector-inner-container')
         .click();
       fixture.detectChanges();
     };
 
     getDropdownOptionsContainer = () => {
       return fixture.debugElement.nativeElement
-        .querySelector('.oppia-translation-language-select-dropdown-container');
+        .querySelector('.oppia-translation-language-selector-dropdown-container');
     };
   });
 
@@ -110,7 +110,7 @@ describe('Translation language select', () => {
 
   it('should correctly initialize dropdown value', () => {
     const dropdown = (fixture.nativeElement
-      .querySelector('.oppia-translation-language-select-inner-container'));
+      .querySelector('.oppia-translation-language-selector-inner-container'));
 
     expect(dropdown.firstChild.textContent.trim()).toEqual('English');
   });
@@ -154,7 +154,7 @@ describe('Translation language select', () => {
       fixture.detectChanges();
 
       let allOptions = fixture.debugElement.nativeElement
-        .querySelectorAll('.oppia-translation-language-select-dropdown-option');
+        .querySelectorAll('.oppia-translation-language-selector-dropdown-option');
 
       expect(allOptions.length).toEqual(6);
       expect(allOptions[0].firstChild.textContent.trim()).toEqual('French');
