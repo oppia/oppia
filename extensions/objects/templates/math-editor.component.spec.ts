@@ -28,6 +28,9 @@ describe('MathEditor', function() {
       return 'Dummy value';
     }
     render(): void {}
+    configure(name: string, val: Object): void {}
+    // eslint-disable-next-line camelcase
+    static remove_global_symbol(symbol: string): void {}
   }
 
   beforeEach(angular.mock.module('oppia'));

@@ -107,4 +107,5 @@ namespace Guppy {
   export function remove_global_symbol(name: string): void;
   export function use_osk(osk: GuppyOSK): void;
   export function event(name: string, handler: Function): void;
+  export function configure(name: string, val: Object): void;
 }
