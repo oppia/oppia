@@ -41,7 +41,7 @@ transaction_services = models.Registry.import_transaction_services()
 
 
 # TODO(bhenning): Test CollectionSummaryModel changes if collections are
-# updated, reverted, deleted, created, rights changed. See TODO(msl): at
+# updated, reverted, deleted, created, rights changed. See TODO(msl): At
 # the top of exp_services_test for more original context.
 
 
