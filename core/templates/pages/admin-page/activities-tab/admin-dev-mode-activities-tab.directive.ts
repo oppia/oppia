@@ -202,7 +202,7 @@ angular.module('oppia').directive('adminDevModeActivitiesTab', [
             demoExplorationIds = response.demo_exploration_ids;
             ctrl.reloadingAllExplorationPossible = true;
             // TODO(#8521): Remove the use of $rootScope.$apply()
-            // once the directive is migrated to angular
+            // once the directive is migrated to angular.
             $rootScope.$apply();
           });
         };

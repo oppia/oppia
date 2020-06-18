@@ -74,7 +74,7 @@ angular.module('oppia').component('preferencesPage', {
       // Select2 dropdown cannot automatically refresh its display
       // after being translated.
       // Use ctrl.select2DropdownIsShown in its ng-if attribute
-      // and this function to force it to reload
+      // and this function to force it to reload.
       var _forceSelect2Refresh = function() {
         ctrl.select2DropdownIsShown = false;
         $timeout(function() {

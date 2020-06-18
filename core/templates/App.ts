@@ -63,7 +63,7 @@ require('services/user.service.ts');
 require('google-analytics.initializer.ts');
 
 // The following file uses constants in app.constants.ts and hence needs to be
-// loaded *after* app.constants.ts
+// loaded *after* app.constants.ts.
 require('I18nFooter.ts');
 
 require('Polyfills.ts');

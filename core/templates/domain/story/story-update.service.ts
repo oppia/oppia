@@ -127,7 +127,7 @@ angular.module('oppia').factory('StoryUpdateService', [
         _applyStoryPropertyChange(
           story, STORY_PROPERTY_TITLE, oldTitle, title,
           function(changeDict, story) {
-            // Apply
+            // Apply.
             var title = _getNewPropertyValueFromChangeDict(changeDict);
             story.setTitle(title);
           }, function(changeDict, story) {
@@ -145,7 +145,7 @@ angular.module('oppia').factory('StoryUpdateService', [
         _applyStoryPropertyChange(
           story, STORY_PROPERTY_THUMBNAIL_FILENAME, oldThumbnailFilename,
           newThumbnailFilename, function(changeDict, story) {
-            // Apply
+            // Apply.
             var thumbnailFilename = (
               _getNewPropertyValueFromChangeDict(changeDict));
             story.setThumbnailFilename(thumbnailFilename);
@@ -164,7 +164,7 @@ angular.module('oppia').factory('StoryUpdateService', [
         _applyStoryPropertyChange(
           story, STORY_PROPERTY_THUMBNAIL_BG_COLOR, oldThumbnailBgColor,
           newThumbnailBgColor, function(changeDict, story) {
-            // Apply
+            // Apply.
             var thumbnailBgColor = (
               _getNewPropertyValueFromChangeDict(changeDict));
             story.setThumbnailBgColor(thumbnailBgColor);
@@ -183,7 +183,7 @@ angular.module('oppia').factory('StoryUpdateService', [
         _applyStoryPropertyChange(
           story, STORY_PROPERTY_DESCRIPTION, oldDescription, description,
           function(changeDict, story) {
-            // Apply
+            // Apply.
             var description = _getNewPropertyValueFromChangeDict(changeDict);
             story.setDescription(description);
           }, function(changeDict, story) {
@@ -201,7 +201,7 @@ angular.module('oppia').factory('StoryUpdateService', [
         _applyStoryPropertyChange(
           story, STORY_PROPERTY_NOTES, oldNotes, notes,
           function(changeDict, story) {
-            // Apply
+            // Apply.
             var notes = _getNewPropertyValueFromChangeDict(changeDict);
             story.setNotes(notes);
           }, function(changeDict, story) {

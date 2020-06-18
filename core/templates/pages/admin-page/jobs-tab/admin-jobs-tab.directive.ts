@@ -132,7 +132,7 @@ angular.module('oppia').directive('adminJobsTab', [
             ctrl.AUDIT_JOB_SPECS = response.audit_job_specs;
             ctrl.RECENT_JOB_DATA = response.recent_job_data;
             // TODO(#8521): Remove the use of $rootScope.$apply()
-            // once the directive is migrated to angular
+            // once the directive is migrated to angular.
             $rootScope.$apply();
           });
 

@@ -123,7 +123,7 @@ angular.module('oppia').factory('TopicUpdateService', [
         _applyTopicPropertyChange(
           topic, TOPIC_PROPERTY_NAME, name, oldName,
           function(changeDict, topic) {
-            // Apply
+            // Apply.
             var name = _getNewPropertyValueFromChangeDict(changeDict);
             topic.setName(name);
           }, function(changeDict, topic) {
@@ -142,7 +142,7 @@ angular.module('oppia').factory('TopicUpdateService', [
           topic, TOPIC_PROPERTY_ABBREVIATED_NAME,
           abbreviatedName, oldAbbreviatedName,
           function(changeDict, topic) {
-            // Apply
+            // Apply.
             var name = _getNewPropertyValueFromChangeDict(changeDict);
             topic.setAbbreviatedName(name);
           }, function(changeDict, topic) {
@@ -161,7 +161,7 @@ angular.module('oppia').factory('TopicUpdateService', [
           topic, TOPIC_PROPERTY_THUMBNAIL_FILENAME,
           thumbnailFilename, oldThumbnailFilename,
           function(changeDict, topic) {
-            // Apply
+            // Apply.
             var thumbnailFilename = (
               _getNewPropertyValueFromChangeDict(changeDict));
             topic.setThumbnailFilename(thumbnailFilename);
@@ -181,7 +181,7 @@ angular.module('oppia').factory('TopicUpdateService', [
           topic, TOPIC_PROPERTY_THUMBNAIL_BG_COLOR,
           thumbnailBgColor, oldThumbnailBgColor,
           function(changeDict, topic) {
-            // Apply
+            // Apply.
             var thumbnailBgColor = (
               _getNewPropertyValueFromChangeDict(changeDict));
             topic.setThumbnailBgColor(thumbnailBgColor);
@@ -200,7 +200,7 @@ angular.module('oppia').factory('TopicUpdateService', [
         _applyTopicPropertyChange(
           topic, TOPIC_PROPERTY_DESCRIPTION, description, oldDescription,
           function(changeDict, topic) {
-            // Apply
+            // Apply.
             var description = _getNewPropertyValueFromChangeDict(changeDict);
             topic.setDescription(description);
           }, function(changeDict, topic) {
@@ -442,7 +442,7 @@ angular.module('oppia').factory('TopicUpdateService', [
           topic, SUBTOPIC_PROPERTY_THUMBNAIL_FILENAME, subtopicId,
           thumbnailFilename, oldThumbnailFilename,
           function(changeDict, topic) {
-            // Apply
+            // Apply.
             var thumbnailFilename = (
               _getNewPropertyValueFromChangeDict(changeDict));
             subtopic.setThumbnailFilename(thumbnailFilename);
@@ -468,7 +468,7 @@ angular.module('oppia').factory('TopicUpdateService', [
           topic, SUBTOPIC_PROPERTY_THUMBNAIL_BG_COLOR, subtopicId,
           thumbnailBgColor, oldThumbnailBgColor,
           function(changeDict, topic) {
-            // Apply
+            // Apply.
             var thumbnailBgColor = (
               _getNewPropertyValueFromChangeDict(changeDict));
             subtopic.setThumbnailBgColor(thumbnailBgColor);

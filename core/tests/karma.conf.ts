@@ -176,7 +176,7 @@ module.exports = function(config) {
               {
                 loader: 'ts-loader',
                 options: {
-                  // this is needed for thread-loader to work correctly
+                  // This is needed for thread-loader to work correctly.
                   happyPackMode: true
                 }
               },

@@ -157,7 +157,7 @@ describe('Site language', function() {
     await waitFor.pageToFullyLoad();
     var url = await browser.getCurrentUrl();
     var pathname = url.split('/');
-    // in the url a # is added at the end that is not part of collection ID
+    // In the url a # is added at the end that is not part of collection ID.
     collectionId = pathname[5].slice(0, -1);
     // Add existing explorations.
     await collectionEditorPage.addExistingExploration(firstExplorationId);
@@ -172,7 +172,7 @@ describe('Site language', function() {
   });
 
   beforeEach(async function() {
-    // Starting language is English
+    // Starting language is English.
     await browser.get('/about');
     await waitFor.pageToFullyLoad();
     await _selectLanguage('English');
@@ -228,7 +228,7 @@ describe('Site language', function() {
       await libraryPage.expectMainHeaderTextToBe(
         'Imagina lo que podrías aprender hoy...');
 
-      // The preference page shows the last selected language
+      // The preference page shows the last selected language.
       await preferencesPage.get();
       await preferencesPage.expectPreferredSiteLanguageToBe('Español');
       await general.ensurePageHasNoTranslationIds();
@@ -275,7 +275,7 @@ describe('Site language', function() {
   );
 
   afterEach(async function() {
-    // Reset language back to English
+    // Reset language back to English.
     await browser.get('/about');
     await waitFor.pageToFullyLoad();
     await _selectLanguage('English');

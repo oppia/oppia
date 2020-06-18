@@ -56,12 +56,12 @@ angular.module('oppia').directive('historyTab', [
             DateTimeFormatService, EditabilityService, ExplorationDataService,
             UrlInterpolationService, VersionTreeService) {
           var ctrl = this;
-          // explorationSnapshots is a list of all snapshots for the
+          // Variable explorationSnapshots is a list of all snapshots for the
           // exploration in ascending order.
           var explorationSnapshots = null;
           var versionTreeParents = null;
-          // nodesData is an object whose keys are nodeIds (assigned in version
-          // comparison), and whose values are an object containing
+          // Variable nodesData is an object whose keys are nodeIds (assigned in
+          // version comparison), and whose values are an object containing
           // 'newestStateName', 'originalStateName' and 'stateProperty'.
           var nodesData = null;
           var currentPage = 0;
@@ -176,7 +176,7 @@ angular.module('oppia').directive('historyTab', [
           };
 
           // Function to set compared version metadata, download YAML and
-          // generate diff graph and legend when selection is changed
+          // generate diff graph and legend when selection is changed.
           ctrl.changeCompareVersion = function() {
             ctrl.diffData = null;
 
@@ -205,7 +205,7 @@ angular.module('oppia').directive('historyTab', [
             );
           };
 
-          // Check if valid versions were selected
+          // Check if valid versions were selected.
           ctrl.areCompareVersionsSelected = function() {
             return (
               ctrl.compareVersions && ctrl.selectedVersionsArray.length === 2);
@@ -268,7 +268,7 @@ angular.module('oppia').directive('historyTab', [
           };
           ctrl.$onInit = function() {
             $scope.$on('refreshVersionHistory', function(evt, data) {
-              // Uncheck all checkboxes when page is refreshed
+              // Uncheck all checkboxes when page is refreshed.
               angular.forEach(ctrl.versionCheckboxArray, function(
                   versionCheckbox) {
                 versionCheckbox.selected = false;

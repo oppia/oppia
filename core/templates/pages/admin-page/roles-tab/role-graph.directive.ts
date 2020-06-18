@@ -33,7 +33,7 @@ angular.module('oppia').directive('roleGraph', [
         //            'source': id of source node
         //            'target': id of target node
         //  - 'initStateId': The initial state id
-        //  - 'finalStateIds': The list of ids corresponding to terminal states
+        //  - 'finalStateIds': The list of ids corresponding to terminal states.
         graphData: '=',
         // A boolean value to signify whether graphData is completely loaded.
         graphDataLoaded: '='
@@ -86,7 +86,7 @@ angular.module('oppia').directive('roleGraph', [
               return $filter('truncate')(nodeLabel, MAX_NODE_LABEL_LENGTH);
             };
 
-            // creating list of nodes to display.
+            // Creating list of nodes to display.
             ctrl.nodeList = [];
             for (var nodeId in nodeData) {
               ctrl.nodeList.push(nodeData[nodeId]);

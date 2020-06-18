@@ -853,7 +853,12 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                 '----------------------------------------')
         summary_messages = []
         files_to_check = self.all_filepaths
-        allowed_terminating_punctuations = ['.', '?']
+        allowed_terminating_punctuations = [
+            '.', '?', ';', ',', '{', '^', ')', '}']
+        excluded_phrases = [
+            '@ts-ignore', '--params', 'eslint-disable', 'eslint-enable',
+            'http://', 'https://']
+
         failed = False
         with linter_utils.redirect_stdout(sys.stdout):
             for filepath in files_to_check:
@@ -867,6 +872,16 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                         next_line = file_content[line_num + 1].strip()
                     if line_num > 0:
                         previous_line = file_content[line_num - 1].strip()
+
+                    # Check if comment contains any excluded phrase.
+                    word_is_present_in_excluded_phrases = any(
+                        word in line for word in excluded_phrases)
+
+                    # Comments may include a lowercase character at beginning
+                    # or may not use a punctuation at end if it contains a
+                    # excluded phrase e.g. "// eslint-disable".
+                    if word_is_present_in_excluded_phrases:
+                        continue
 
                     if line.startswith('//') and not next_line.startswith('//'):
                         # Check that the comment ends with the proper

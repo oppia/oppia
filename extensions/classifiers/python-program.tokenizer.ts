@@ -330,7 +330,7 @@ export class PythonProgramTokenizer {
                 [this.PythonProgramTokenType.STRING, token]);
             }
           } else if (namechars.indexOf(initial) !== -1) {
-            // Ordinary name
+            // Ordinary name.
             tokenizedProgram.push([this.PythonProgramTokenType.NAME, token]);
           } else if (initial === '\\') {
             // Continued statement.
@@ -351,7 +351,7 @@ export class PythonProgramTokenizer {
       }
     }
 
-    // Pop remaining indent levels
+    // Pop remaining indent levels.
     for (let indent in indents.slice(1)) {
       tokenizedProgram.push([this.PythonProgramTokenType.DEDENT, '']);
     }
