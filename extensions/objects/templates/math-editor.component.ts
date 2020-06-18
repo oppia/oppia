@@ -28,7 +28,7 @@ angular.module('oppia').component('mathEditor', {
   },
   template: require('./math-editor.component.html'),
   controller: ['$scope', 'GuppyConfigurationService', function(
-    $scope, GuppyConfigurationService) {
+      $scope, GuppyConfigurationService) {
     const ctrl = this;
 
     ctrl.initializeGuppy = function() {
@@ -51,7 +51,7 @@ angular.module('oppia').component('mathEditor', {
           'empty_content',
           '\\color{grey}{\\text{\\small{Type a formula here.}}}');
       }
-    }
+    };
 
     ctrl.$onInit = function() {
       ctrl.alwaysEditable = true;
