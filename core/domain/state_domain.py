@@ -184,13 +184,18 @@ class AnswerGroup(python_utils.OBJECT):
                         interaction_and_rule_details['ruleTypes'][
                             rule_spec.rule_type][
                                 'htmlInputVariables'])
+                    if len(rule_spec.inputs.keys()) == 0:
+                        raise Exception(
+                            'Rule spec should have atleast one input variable.')
                     for input_variable in rule_spec.inputs.keys():
                         if input_variable in input_variables_from_html_mapping:
                             rule_input_variable = (
                                 rule_spec.inputs[input_variable])
-                            if html_type_format == 'string':
+                            if (html_type_format ==
+                                    feconf.HTML_TYPE_FORMAT_STRING):
                                 html_list = html_list + [rule_input_variable]
-                            elif html_type_format == 'set':
+                            elif (html_type_format ==
+                                  feconf.HTML_TYPE_FORMAT_SET):
                                 # Here we are checking the type of the
                                 # rule_specs.inputs because the rule type
                                 # 'Equals' is used by other interactions as
@@ -201,13 +206,14 @@ class AnswerGroup(python_utils.OBJECT):
                                         if isinstance(
                                                 value, python_utils.BASESTRING):
                                             html_list = html_list + [value]
-                            elif html_type_format == 'listOfSets':
+                            elif (html_type_format ==
+                                  feconf.HTML_TYPE_FORMAT_LIST_OF_SETS):
                                 for rule_spec_html in rule_input_variable:
                                     html_list = html_list + rule_spec_html
                             else:
                                 raise Exception(
                                     'The rule spec does not belong to a valid'
-                                    'format.')
+                                    ' format.')
         return html_list
 
 

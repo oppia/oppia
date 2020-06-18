@@ -19,6 +19,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import collections
 import json
 import os
 import re
@@ -267,9 +268,11 @@ class InteractionUnitTests(test_utils.GenericTestBase):
 
         # In the following part, we generate the html_field_types_to_rule_specs
         # dict based on the values in the rule_descriptions.json file.
-        generated_html_field_types_dict = {}
-        html_types = []
-        allowed_html_type_formats = ['listOfSets', 'set', 'string']
+        generated_html_field_types_dict = (
+            collections.defaultdict(lambda: collections.defaultdict(
+                lambda: collections.defaultdict(lambda: collections.defaultdict(
+                    lambda: collections.defaultdict(set))))))
+
         # Verify that each html_type dict has a format key, which must be
         # unique. After verification we delete the key for comparison with
         # the generated html_field_types_to_rule_specs dict. We compare
@@ -279,59 +282,44 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 html_field_types_to_rule_specs_dict.items()):
             self.assertTrue('format' in html_type_dict)
             self.assertTrue(
-                html_type_dict['format'] in allowed_html_type_formats)
+                html_type_dict['format'] in feconf.ALLOWED_HTML_TYPE_FORMATS)
             del html_type_dict['format']
 
+        html_types = []
         for interaction_id, interaction_rules in (
                 rule_descriptions_dict.items()):
             for rule_type, rule_description in interaction_rules.items():
                 description = rule_description['description']
-                # Extract the html_types from the rule description.
-                html_types_in_description = (
-                    re.findall(r'{{[a-z]\|([^}]*)}', description))
-                for html_type in html_types_in_description:
-                    if 'Html' in html_type and html_type not in html_types:
-                        html_types.append(html_type)
+                # Extract the input variables and html_types from the rule
+                # description.
+                input_variables_with_html_type = (
+                    re.findall(r'{{([a-z])\|([^}]*)}', description))
+                input_variables = []
+                for value in input_variables_with_html_type:
+                    if 'Html' in value[1] and value[1] not in html_types:
+                        html_types.append(value[1])
+                    # Check that the input variable belongs to a rule
+                    # spec having html in it.
+                    if value[1] in html_types:
+                        input_variables.append(value[0])
 
+                # We need to iterate through through the html_types for
+                # each rule_type, because only after visiting each rule_type
+                # the inner dict structure for each html_type gets generated
+                # completely.
                 for html_type in html_types:
                     if html_type in description:
-                        if html_type not in generated_html_field_types_dict:
-                            generated_html_field_types_dict[html_type] = {}
                         html_type_dict = (
                             generated_html_field_types_dict[html_type])
                         html_type_dict['interactionId'] = interaction_id
-                        if 'ruleTypes' not in html_type_dict:
-                            html_type_dict['ruleTypes'] = {}
-                        rule_types_dict = html_type_dict['ruleTypes']
-                        rule_types_dict[rule_type] = {}
-                        is_input_variables_key_created = (
-                            'htmlInputVariables' in rule_types_dict[rule_type])
-                        if not is_input_variables_key_created:
-                            rule_types_dict[rule_type]['htmlInputVariables'] = (
-                                [])
-                        # Extract the input variables of the rule specs from the
-                        # description.
-                        input_variables_with_html_type = (
-                            re.findall(r'{{([a-z])\|([^}]*)}', description))
-                        for input_variable_with_html_type in (
-                                input_variables_with_html_type):
-                            input_var = input_variable_with_html_type[0]
-                            input_var_html_type = (
-                                input_variable_with_html_type[1])
-                            # Check that the input variable belongs to a rule
-                            # spec having html in it.
-                            if input_var_html_type in html_types:
-                                is_input_var_present_in_list = (
-                                    input_var in rule_types_dict[rule_type][
-                                        'htmlInputVariables'])
-                                if not is_input_var_present_in_list:
-                                    rule_types_dict[rule_type][
-                                        'htmlInputVariables'].append(input_var)
+                        unique_input_variables = sorted(set(input_variables))
+                        html_type_dict['ruleTypes'][rule_type][
+                            'htmlInputVariables'] = unique_input_variables
 
         # Assert that the generated dict matches dict in the stored file.
         self.assertEqual(
             html_field_types_to_rule_specs_dict,
-            generated_html_field_types_dict)
+            dict(generated_html_field_types_dict))
 
     def test_default_interactions_are_valid(self):
         """Test that the default interactions are valid."""
