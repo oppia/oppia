@@ -156,8 +156,7 @@ angular.module('oppia').directive('stateTranslationEditor', [
           };
 
           $scope.setCopyMode = function(active: boolean) {
-            $scope.copyMode = active;
-            $scope.$apply();
+            $scope.copyMode.isActive = active;
           };
 
           ctrl.$onInit = function() {

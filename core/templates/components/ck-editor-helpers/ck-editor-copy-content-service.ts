@@ -20,12 +20,15 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 import { IRootScopeService } from 'angular';
+import { HtmlEscaperService } from 'services/html-escaper.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CkEditorCopyContentService {
   readonly COPY_EVENT = 'copy-element-to-translation-editor';
+
+  constructor(private htmlEscaperService: HtmlEscaperService) {}
 
   /**
    * Traverses up and down element ancestors/descendants, searching for widget
@@ -97,10 +100,10 @@ export class CkEditorCopyContentService {
 
       while ((match = valueMatcher.exec(html)) !== null) {
         const key = match[1];
-        const value = match[3];
-        startupData[key] = value
-          .replace(/&amp;quot;/g, '"')
-          .replace('\\\\', '\\');
+        const value = match[3].replace(/&amp;/g, '&').replace('\\\\', '\\');
+
+        startupData[key] = this.htmlEscaperService
+          .escapedStrToUnescapedStr(value);
 
         if (widgetName !== 'oppiatabs') {
           startupData[key] = startupData[key]

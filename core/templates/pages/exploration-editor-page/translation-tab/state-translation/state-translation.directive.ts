@@ -136,9 +136,9 @@ angular.module('oppia').directive('stateTranslation', [
           };
 
           $scope.onContentClick = function($event) {
-            console.log($scope.copyMode)
-            if ($scope.copyMode) {
+            if ($scope.copyMode.isActive) {
               CkEditorCopyContentService.broadcastCopy($scope, $event.target);
+              $scope.copyMode.isActive = false;
             }
           };
 
@@ -377,7 +377,7 @@ angular.module('oppia').directive('stateTranslation', [
 
             $scope.activeHintIndex = null;
             $scope.activeAnswerGroupIndex = null;
-            $scope.copyMode = false;
+            $scope.copyMode = {isActive: false};
             $scope.stateContent = null;
             $scope.stateInteractionId = null;
             $scope.stateAnswerGroups = [];

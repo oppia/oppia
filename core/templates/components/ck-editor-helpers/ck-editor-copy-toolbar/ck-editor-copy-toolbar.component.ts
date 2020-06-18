@@ -32,6 +32,20 @@ export class CkEditorCopyToolbar implements OnInit {
 
   toggleToolActive() {
     this.setToolActive.emit(!this.toolActive);
+    if (!this.toolActive) {
+      document.body.style.cursor = 'copy';
+
+      document.querySelectorAll('.oppia-rte-editor')
+        .forEach((editor: HTMLElement) => {
+          editor.focus();
+        });
+    } else {
+      document.body.style.cursor = 'auto';
+      document.querySelectorAll('.oppia-rte-editor')
+        .forEach((editor: HTMLElement) => {
+          editor.blur();
+        });
+    }
   }
 }
 
