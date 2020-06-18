@@ -106,6 +106,16 @@ jobs:
       - run:
           name: Check that all e2e test files are captured in protractor.conf.js
           command: python -m scripts.check_e2e_tests_are_captured_in_ci
+      - run:
+          name: Check if all tests should be run
+          command: |
+            files_changed=$(git diff --name-only HEAD...$TRAVIS_BRANCH)
+            if [ "$files_changed" != "AUTHORS CHANGELOG CONTRIBUTORS core/templates/pages/about-page/about-page.constants.ts" ]; then
+              echo 'export RUN_TESTS=true' >> $BASH_ENV
+            else
+              echo 'export RUN_TESTS=false' >> $BASH_ENV
+            fi
+            source $BASH_ENV
       - persist_to_workspace:
           root: /home/circleci/
           paths:
@@ -169,8 +179,7 @@ jobs:
       - run:
           name: Run backend tests
           command: |
-            files_changed=$(git diff --name-only HEAD...$TRAVIS_BRANCH)
-            if [ "$files_changed" != "AUTHORS CHANGELOG CONTRIBUTORS core/templates/pages/about-page/about-page.constants.ts" ]; then
+            if [ "$RUN_TESTS" == 'true' ]; then
               python -m scripts.run_backend_tests --generate_coverage_report --exclude_load_tests
             fi
   # Production environment e2e tests
@@ -189,8 +198,7 @@ jobs:
       - run:
           name: Run e2e admin page test
           command: |
-            files_changed=$(git diff --name-only HEAD...$TRAVIS_BRANCH)
-            if [ "$files_changed" != "AUTHORS CHANGELOG CONTRIBUTORS core/templates/pages/about-page/about-page.constants.ts" ]; then
+            if [ "$RUN_TESTS" == 'true' ]; then
               python -m scripts.run_e2e_tests --skip-install --skip-build --suite="adminPage" --prod_env
             fi
       - persist_to_workspace:
@@ -212,29 +220,25 @@ jobs:
       - run:
           name: Run e2e publication test
           command: |
-            files_changed=$(git diff --name-only HEAD...$TRAVIS_BRANCH)
-            if [ "$files_changed" != "AUTHORS CHANGELOG CONTRIBUTORS core/templates/pages/about-page/about-page.constants.ts" ]; then
+            if [ "$RUN_TESTS" == 'true' ]; then
               python -m scripts.run_e2e_tests --skip-install --skip-build --suite="publication" --prod_env
             fi
       - run:
           name: Run e2e library test
           command: |
-            files_changed=$(git diff --name-only HEAD...$TRAVIS_BRANCH)
-            if [ "$files_changed" != "AUTHORS CHANGELOG CONTRIBUTORS core/templates/pages/about-page/about-page.constants.ts" ]; then
+            if [ "$RUN_TESTS" == 'true' ]; then
               python -m scripts.run_e2e_tests --skip-install --skip-build --suite="library" --prod_env
             fi
       - run:
           name: Run e2e classroomPage test
           command: |
-            files_changed=$(git diff --name-only HEAD...$TRAVIS_BRANCH)
-            if [ "$files_changed" != "AUTHORS CHANGELOG CONTRIBUTORS core/templates/pages/about-page/about-page.constants.ts" ]; then
+            if [ "$RUN_TESTS" == 'true' ]; then
               python -m scripts.run_e2e_tests --skip-install --skip-build --suite="classroomPage" --prod_env
             fi
       - run:
           name: Run e2e collections test
           command: |
-            files_changed=$(git diff --name-only HEAD...$TRAVIS_BRANCH)
-            if [ "$files_changed" != "AUTHORS CHANGELOG CONTRIBUTORS core/templates/pages/about-page/about-page.constants.ts" ]; then
+            if [ "$RUN_TESTS" == 'true' ]; then
               python -m scripts.run_e2e_tests --skip-install --skip-build --suite="collections" --prod_env
             fi
   e2e_users:
@@ -246,36 +250,31 @@ jobs:
       - run:
           name: Run e2e users test
           command: |
-            files_changed=$(git diff --name-only HEAD...$TRAVIS_BRANCH)
-            if [ "$files_changed" != "AUTHORS CHANGELOG CONTRIBUTORS core/templates/pages/about-page/about-page.constants.ts" ]; then
+            if [ "$RUN_TESTS" == 'true' ]; then
               python -m scripts.run_e2e_tests --skip-install --skip-build --suite="users" --prod_env
             fi
       - run:
           name: Run e2e subscriptions test
           command: |
-            files_changed=$(git diff --name-only HEAD...$TRAVIS_BRANCH)
-            if [ "$files_changed" != "AUTHORS CHANGELOG CONTRIBUTORS core/templates/pages/about-page/about-page.constants.ts" ]; then
+            if [ "$RUN_TESTS" == 'true' ]; then
               python -m scripts.run_e2e_tests --skip-install --skip-build --suite="subscriptions" --prod_env
             fi
       - run:
           name: Run e2e profileMenu test
           command: |
-            files_changed=$(git diff --name-only HEAD...$TRAVIS_BRANCH)
-            if [ "$files_changed" != "AUTHORS CHANGELOG CONTRIBUTORS core/templates/pages/about-page/about-page.constants.ts" ]; then
+            if [ "$RUN_TESTS" == 'true' ]; then
               python -m scripts.run_e2e_tests --skip-install --skip-build --suite="profileMenu" --prod_env
             fi
       - run:
           name: Run e2e preferences test
           command: |
-            files_changed=$(git diff --name-only HEAD...$TRAVIS_BRANCH)
-            if [ "$files_changed" != "AUTHORS CHANGELOG CONTRIBUTORS core/templates/pages/about-page/about-page.constants.ts" ]; then
+            if [ "$RUN_TESTS" == 'true' ]; then
               python -m scripts.run_e2e_tests --skip-install --skip-build --suite="preferences" --prod_env
             fi
       - run:
           name: Run e2e profileFeatures test
           command: |
-            files_changed=$(git diff --name-only HEAD...$TRAVIS_BRANCH)
-            if [ "$files_changed" != "AUTHORS CHANGELOG CONTRIBUTORS core/templates/pages/about-page/about-page.constants.ts" ]; then
+            if [ "$RUN_TESTS" == 'true' ]; then
               python -m scripts.run_e2e_tests --skip-install --skip-build --suite="profileFeatures" --prod_env
             fi
   e2e_accessibility_and_embedding:
@@ -287,15 +286,13 @@ jobs:
       - run:
           name: Run e2e accessibility test
           command: |
-            files_changed=$(git diff --name-only HEAD...$TRAVIS_BRANCH)
-            if [ "$files_changed" != "AUTHORS CHANGELOG CONTRIBUTORS core/templates/pages/about-page/about-page.constants.ts" ]; then
+            if [ "$RUN_TESTS" == 'true' ]; then
               python -m scripts.run_e2e_tests --skip-install --skip-build --suite="accessibility" --prod_env
             fi
       - run:
           name: Run e2e embedding test
           command: |
-            files_changed=$(git diff --name-only HEAD...$TRAVIS_BRANCH)
-            if [ "$files_changed" != "AUTHORS CHANGELOG CONTRIBUTORS core/templates/pages/about-page/about-page.constants.ts" ]; then
+            if [ "$RUN_TESTS" == 'true' ]; then
               python -m scripts.run_e2e_tests --skip-install --skip-build --suite="embedding" --prod_env
             fi
   # Non-prod e2e Tests
@@ -311,22 +308,19 @@ jobs:
       - run:
           name: Run e2e file upload features test
           command: |
-            files_changed=$(git diff --name-only HEAD...$TRAVIS_BRANCH)
-            if [ "$files_changed" != "AUTHORS CHANGELOG CONTRIBUTORS core/templates/pages/about-page/about-page.constants.ts" ]; then
+            if [ "$RUN_TESTS" == 'true' ]; then
               python -m scripts.run_e2e_tests --skip-install --suite="fileUploadFeatures"
             fi
       - run:
           name: Run e2e topics and skills dashboard test
           command: |
-            files_changed=$(git diff --name-only HEAD...$TRAVIS_BRANCH)
-            if [ "$files_changed" != "AUTHORS CHANGELOG CONTRIBUTORS core/templates/pages/about-page/about-page.constants.ts" ]; then
+            if [ "$RUN_TESTS" == 'true' ]; then
               python -m scripts.run_e2e_tests --skip-install --suite="topicsAndSkillsDashboard"
             fi
       - run:
           name: Run e2e topics and story editor
           command: |
-            files_changed=$(git diff --name-only HEAD...$TRAVIS_BRANCH)
-            if [ "$files_changed" != "AUTHORS CHANGELOG CONTRIBUTORS core/templates/pages/about-page/about-page.constants.ts" ]; then
+            if [ "$RUN_TESTS" == 'true' ]; then
               python -m scripts.run_e2e_tests --skip-install --suite="topicAndStoryEditor"
             fi
       - persist_to_workspace:
@@ -346,8 +340,7 @@ jobs:
       - run:
           name: Run e2e classroom page test
           command: |
-            files_changed=$(git diff --name-only HEAD...$TRAVIS_BRANCH)
-            if [ "$files_changed" != "AUTHORS CHANGELOG CONTRIBUTORS core/templates/pages/about-page/about-page.constants.ts" ]; then
+            if [ "$RUN_TESTS" == 'true' ]; then
               python -m scripts.run_e2e_tests --skip-install --skip-build --suite="classroomPageFileUploadFeatures"
             fi
   e2e_topic_and_story_editor:
@@ -360,8 +353,7 @@ jobs:
       - run:
           name: Run e2e topic and story editor test
           command: |
-            files_changed=$(git diff --name-only HEAD...$TRAVIS_BRANCH)
-            if [ "$files_changed" != "AUTHORS CHANGELOG CONTRIBUTORS core/templates/pages/about-page/about-page.constants.ts" ]; then
+            if [ "$RUN_TESTS" == 'true' ]; then
               python -m scripts.run_e2e_tests --skip-install --skip-build --suite="topicAndStoryEditorFileUploadFeatures"
             fi
 notify:
