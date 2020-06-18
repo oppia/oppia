@@ -70,7 +70,6 @@ PROTRACTOR_CONFIG_FILE_PATH = os.path.join(
     'core', 'tests', 'protractor.conf.js')
 BROWSER_STACK_CONFIG_FILE_PATH = os.path.join(
     'core', 'tests', 'protractor-browserstack.conf.js')
-HASHES_FILE_PATH = os.path.join('assets', 'hashes.json')
 
 _PARSER = argparse.ArgumentParser(description="""
 Run this script from the oppia root folder:
