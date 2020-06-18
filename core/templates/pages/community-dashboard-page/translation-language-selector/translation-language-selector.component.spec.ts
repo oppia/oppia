@@ -87,8 +87,8 @@ describe('Translation language select', () => {
     };
 
     getDropdownOptionsContainer = () => {
-      return fixture.debugElement.nativeElement
-        .querySelector('.oppia-translation-language-selector-dropdown-container');
+      return fixture.debugElement.nativeElement.querySelector(
+        '.oppia-translation-language-selector-dropdown-container');
     };
   });
 
@@ -153,8 +153,8 @@ describe('Translation language select', () => {
     fixture.whenStable().then(() => {
       fixture.detectChanges();
 
-      let allOptions = fixture.debugElement.nativeElement
-        .querySelectorAll('.oppia-translation-language-selector-dropdown-option');
+      let allOptions = fixture.debugElement.nativeElement.querySelectorAll(
+        '.oppia-translation-language-selector-dropdown-option');
 
       expect(allOptions.length).toEqual(6);
       expect(allOptions[0].firstChild.textContent.trim()).toEqual('French');
