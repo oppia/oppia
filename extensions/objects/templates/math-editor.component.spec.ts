@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the math editor component.
  */
 
-fdescribe('MathEditor', function() {
+describe('MathEditor', function() {
   var MathEditorCtrl = null, $window = null;
   class MockGuppy {
     constructor(id: string, config: Object) {}
