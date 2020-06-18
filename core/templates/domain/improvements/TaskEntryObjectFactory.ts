@@ -36,6 +36,17 @@ export interface ITaskEntryBackendDict {
   'resolved_on_msecs': number;
 }
 
+export interface ITaskEntryPayloadDict {
+  'entity_type': string;
+  'entity_id': string;
+  'entity_version': number;
+  'task_type': string;
+  'target_type': string;
+  'target_id': string;
+  'issue_description': string;
+  'status': string;
+}
+
 export class TaskEntry {
   public readonly entityType: string;
   public readonly entityId: string;
@@ -64,7 +75,7 @@ export class TaskEntry {
     this.resolvedOnMsecs = backendDict.resolved_on_msecs;
   }
 
-  public toBackendDict(): ITaskEntryBackendDict {
+  public toPayloadDict(): ITaskEntryPayloadDict {
     return {
       entity_type: this.entityType,
       entity_id: this.entityId,
@@ -74,9 +85,6 @@ export class TaskEntry {
       target_id: this.targetId,
       issue_description: this.issueDescription,
       status: this.taskStatus,
-      resolver_username: this.resolverUsername,
-      resolver_profile_picture_data_url: this.resolverProfilePictureDataUrl,
-      resolved_on_msecs: this.resolvedOnMsecs,
     };
   }
 
