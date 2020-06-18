@@ -20,6 +20,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import functools
+import json
 import logging
 import os
 import re
@@ -43,19 +44,23 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
     """Test methods operating on states."""
 
     def test_get_all_html_content_strings(self):
-        exploration = self.save_new_valid_exploration(
-            'exp_id', 'owner_id', end_state_name='END',
-            interaction_id='DragAndDropSortInput')
-
-        html_string = '<p>list_of_sets_of_html_strings</p>'
-        list_of_sets_of_html_strings = [html_string]
-
-        answer_group_dict = {
+        """Test the method for extracting all the HTML from a state."""
+        exploration = exp_domain.Exploration.create_default_exploration(
+            'exp_id')
+        exploration.add_states(['State1', 'State2'])
+        init_state = exploration.states[exploration.init_state_name]
+        state1 = exploration.states['State1']
+        state2 = exploration.states['State2']
+        state1_content_dict = {
+            'content_id': 'content',
+            'html': '<p>state 1 content html</p>'
+        }
+        state1_answer_group_dict = {
             'outcome': {
                 'dest': exploration.init_state_name,
                 'feedback': {
                     'content_id': 'feedback_1',
-                    'html': '<p>Feedback</p>'
+                    'html': '<p>state 1 outcome html</p>'
                 },
                 'labelled_as_correct': False,
                 'param_changes': [],
@@ -64,43 +69,243 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             },
             'rule_specs': [{
                 'inputs': {
-                    'x': [list_of_sets_of_html_strings]
+                    'x': 'Test'
+                },
+                'rule_type': 'Equals'
+            }],
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }
+
+        state2_content_dict = {
+            'content_id': 'content',
+            'html': '<p>state2 content html</p>'
+        }
+        state2_customization_args_dict = {
+            'choices': {
+                'value': [
+                    '<p>state 2 customization arg html 1</p>',
+                    '<p>state 2 customization arg html 2</p>',
+                    '<p>state 2 customization arg html 3</p>',
+                    '<p>state 2 customization arg html 4</p>'
+                ]
+            },
+            'allowMultipleItemsInSamePosition': {
+                'value': False
+            }
+        }
+
+        state2_answer_group_dict = {
+            'outcome': {
+                'dest': 'Introduction',
+                'feedback': {
+                    'content_id': 'feedback_1',
+                    'html': '<p>State 2 Feedback</p>'
+                },
+                'labelled_as_correct': False,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'rule_specs': [{
+                'inputs': {
+                    'x': [['<p>IsEqualToOrdering rule_spec htmls</p>']]
                 },
                 'rule_type': 'IsEqualToOrdering'
             }, {
                 'rule_type': 'HasElementXAtPositionY',
                 'inputs': {
-                    'x': html_string,
+                    'x': '<p>HasElementXAtPositionY rule_spec html</p>',
                     'y': 2
                 }
             }, {
                 'rule_type': 'HasElementXBeforeElementY',
                 'inputs': {
-                    'x': html_string,
-                    'y': html_string
+                    'x': '<p>x input for HasElementXAtPositionY rule_spec </p>',
+                    'y': '<p>y input for HasElementXAtPositionY rule_spec </p>'
                 }
             }, {
                 'rule_type': 'IsEqualToOrderingWithOneItemAtIncorrectPosition',
                 'inputs': {
-                    'x': [list_of_sets_of_html_strings]
+                    'x': [[(
+                        '<p>IsEqualToOrderingWithOneItemAtIncorrectPosition r'
+                        'ule_spec htmls</p>')]]
                 }
             }],
             'training_data': [],
             'tagged_skill_misconception_id': None
         }
-        exploration.init_state.interaction.answer_groups = [
-            state_domain.AnswerGroup.from_dict(answer_group_dict)]
+        state_2_written_translations_dict = {
+            'translations_mapping': {
+                'content': {
+                    'en': {
+                        'html': '<p>state2 written_translation content-en</p>',
+                        'needs_update': True
+                    },
+                    'hi': {
+                        'html': '<p>state2 written_translation content-hi</p>',
+                        'needs_update': False
+                    }
+                },
+                'default_outcome': {
+                    'hi': {
+                        'html': '<p>state2 written_translation outcome-hi</p>',
+                        'needs_update': False
+                    },
+                    'en': {
+                        'html': '<p>state2 written_translation outcome-en</p>',
+                        'needs_update': False
+                    }
+                },
+                'feedback_1': {
+                    'hi': {
+                        'html': '<p>state2 written_translation feedback-hi</p>',
+                        'needs_update': False
+                    },
+                    'en': {
+                        'html': '<p>state2 written_translation feedback-en</p>',
+                        'needs_update': False
+                    }
+                }
+            }
+        }
+        init_state_customization_args_dict = {
+            'maxAllowableSelectionCount': {
+                'value': 1
+            },
+            'minAllowableSelectionCount': {
+                'value': 1
+            },
+            'choices': {
+                'value': [
+                    '<p>init_state customization arg html 1</p>',
+                    '<p>init_state customization arg html 2</p>',
+                    '<p>init_state customization arg html 3</p>',
+                    '<p>init_state customization arg html 4</p>'
+                ]
+            }
+        }
+        init_state_answer_groups = [{
+            'rule_specs': [{
+                'rule_type': 'Equals',
+                'inputs': {
+                    'x': ['<p>Equals rule_spec html</p>']
+                }
+            }, {
+                'rule_type': 'ContainsAtLeastOneOf',
+                'inputs': {
+                    'x': ['<p>ContainsAtLeastOneOf rule_spec html</p>']
+                }
+            }, {
+                'rule_type': 'IsProperSubsetOf',
+                'inputs': {
+                    'x': ['<p>IsProperSubsetOf rule_spec html</p>']
+                }
+            }, {
+                'rule_type': 'DoesNotContainAtLeastOneOf',
+                'inputs': {
+                    'x': ['<p>DoesNotContainAtLeastOneOf rule_spec html</p>']
+                }
+            }],
+            'outcome': {
+                'dest': 'State2',
+                'feedback': {
+                    'content_id': 'feedback',
+                    'html': '<p>init_state outcome html</p>'
+                },
+                'param_changes': [],
+                'labelled_as_correct': False,
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }]
+        state1.update_content(
+            state_domain.SubtitledHtml.from_dict(state1_content_dict))
+        state1.update_interaction_id('TextInput')
+        state1.update_interaction_answer_groups(
+            [state1_answer_group_dict])
+        init_state.update_interaction_id('ItemSelectionInput')
+        init_state.update_interaction_customization_args(
+            init_state_customization_args_dict)
+        init_state.update_interaction_answer_groups(init_state_answer_groups)
+        state2.update_content(
+            state_domain.SubtitledHtml.from_dict(state2_content_dict))
+        state2.update_interaction_id('DragAndDropSortInput')
+        state2.update_interaction_customization_args(
+            state2_customization_args_dict)
+        state2.update_interaction_answer_groups([state2_answer_group_dict])
+        state2.update_written_translations(
+            state_domain.WrittenTranslations.from_dict(
+                state_2_written_translations_dict))
+
+        exp_services.save_new_exploration('owner_id', exploration)
 
         html_list = (
-            exploration.init_state.interaction.get_all_html_content_strings())
+            init_state.get_all_html_content_strings() +
+            state2.get_all_html_content_strings() +
+            state1.get_all_html_content_strings())
         self.assertEqual(
             html_list,
             [
-                '<p>Feedback</p>', '<p>list_of_sets_of_html_strings</p>',
-                '<p>list_of_sets_of_html_strings</p>',
-                '<p>list_of_sets_of_html_strings</p>',
-                '<p>list_of_sets_of_html_strings</p>',
-                '<p>list_of_sets_of_html_strings</p>', '', ''])
+                '<p>init_state outcome html</p>',
+                '<p>Equals rule_spec html</p>',
+                '<p>ContainsAtLeastOneOf rule_spec html</p>',
+                '<p>IsProperSubsetOf rule_spec html</p>',
+                '<p>DoesNotContainAtLeastOneOf rule_spec html</p>',
+                '',
+                '<p>init_state customization arg html 1</p>',
+                '<p>init_state customization arg html 2</p>',
+                '<p>init_state customization arg html 3</p>',
+                '<p>init_state customization arg html 4</p>',
+                '',
+                '<p>state2 written_translation content-hi</p>',
+                '<p>state2 written_translation content-en</p>',
+                '<p>state2 written_translation outcome-hi</p>',
+                '<p>state2 written_translation outcome-en</p>',
+                '<p>state2 written_translation feedback-hi</p>',
+                '<p>state2 written_translation feedback-en</p>',
+                '<p>State 2 Feedback</p>',
+                '<p>IsEqualToOrdering rule_spec htmls</p>',
+                '<p>HasElementXAtPositionY rule_spec html</p>',
+                '<p>y input for HasElementXAtPositionY rule_spec </p>',
+                '<p>x input for HasElementXAtPositionY rule_spec </p>',
+                ('<p>IsEqualToOrderingWithOneItemAtIncorrectPosition rule_s'
+                 'pec htmls</p>'), '',
+                '<p>state 2 customization arg html 1</p>',
+                '<p>state 2 customization arg html 2</p>',
+                '<p>state 2 customization arg html 3</p>',
+                '<p>state 2 customization arg html 4</p>',
+                '<p>state2 content html</p>',
+                '<p>state 1 outcome html</p>', '',
+                '<p>state 1 content html</p>'])
+
+        html_field_types_to_rule_specs_dict = json.loads(
+            utils.get_file_contents(
+                feconf.HTML_FIELD_TYPES_TO_RULE_SPECS_FILE_PATH))
+        for html_type_dict in (
+                html_field_types_to_rule_specs_dict.values()):
+            html_type_dict['format'] = 'invalid format'
+
+        def mock_get_file_contents(unused_file_path):
+            return json.dumps(html_field_types_to_rule_specs_dict)
+
+        with self.swap(utils, 'get_file_contents', mock_get_file_contents):
+            with self.assertRaisesRegexp(
+                Exception,
+                'The rule spec does not belong to a validformat.'):
+                html_list = (
+                    init_state.get_all_html_content_strings() +
+                    state2.get_all_html_content_strings() +
+                    state1.get_all_html_content_strings())
+        exploration_with_no_html = (
+            exp_domain.Exploration.create_default_exploration('exp_id2'))
+        init_state = (
+            exploration_with_no_html.states[
+                exploration_with_no_html.init_state_name])
+        html_list = init_state.get_all_html_content_strings()
+        self.assertEqual(html_list, ['', ''])
 
     def test_export_state_to_dict(self):
         """Test exporting a state to a dict."""

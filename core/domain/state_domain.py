@@ -175,29 +175,39 @@ class AnswerGroup(python_utils.OBJECT):
         for rule_spec in self.rule_specs:
             for interaction_and_rule_details in (
                     html_field_types_to_rule_specs_dict.values()):
-                if (
-                        rule_spec.rule_type in
-                        interaction_and_rule_details['ruleTypes'].keys()):
-                    if interaction_and_rule_details['format'] == 'string':
-                        input_variables = (
-                            html_field_types_to_rule_specs_dict[
-                                'DragAndDropHtmlString']['ruleTypes'][
-                                    rule_spec.rule_type]['htmlInputVariables'])
-                        for input_variable in rule_spec.inputs.keys():
-                            if input_variable in input_variables:
-                                html_list = (
-                                    html_list +
-                                    [rule_spec.inputs[input_variable]])
-                    elif interaction_and_rule_details['format'] == 'set':
-                        if isinstance(rule_spec.inputs['x'], list):
-                            for value in rule_spec.inputs['x']:
-                                if isinstance(value, python_utils.BASESTRING):
-                                    html_list = html_list + [value]
-                    elif interaction_and_rule_details['format'] == 'listOfSets':
-                        rule_spec_html_list = rule_spec.inputs['x']
-                        for rule_spec_html in rule_spec_html_list:
-                            html_list = html_list + rule_spec_html
-
+                rule_type_has_html = (
+                    rule_spec.rule_type in
+                    interaction_and_rule_details['ruleTypes'].keys())
+                if rule_type_has_html:
+                    html_type_format = interaction_and_rule_details['format']
+                    input_variables_from_html_mapping = (
+                        interaction_and_rule_details['ruleTypes'][
+                            rule_spec.rule_type][
+                                'htmlInputVariables'])
+                    for input_variable in rule_spec.inputs.keys():
+                        if input_variable in input_variables_from_html_mapping:
+                            rule_input_variable = (
+                                rule_spec.inputs[input_variable])
+                            if html_type_format == 'string':
+                                html_list = html_list + [rule_input_variable]
+                            elif html_type_format == 'set':
+                                # Here we are checking the type of the
+                                # rule_specs.inputs because the rule type
+                                # 'Equals' is used by other interactions as
+                                # well which don't have HTML and we don't have
+                                # a reference to the interaction ID.
+                                if isinstance(rule_input_variable, list):
+                                    for value in rule_input_variable:
+                                        if isinstance(
+                                                value, python_utils.BASESTRING):
+                                            html_list = html_list + [value]
+                            elif html_type_format == 'listOfSets':
+                                for rule_spec_html in rule_input_variable:
+                                    html_list = html_list + rule_spec_html
+                            else:
+                                raise Exception(
+                                    'The rule spec does not belong to a valid'
+                                    'format.')
         return html_list
 
 

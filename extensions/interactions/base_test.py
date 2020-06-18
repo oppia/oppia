@@ -265,123 +265,73 @@ class InteractionUnitTests(test_utils.GenericTestBase):
         rule_descriptions_dict = json.loads(
             utils.get_file_contents(feconf.RULES_DESCRIPTIONS_FILE_PATH))
 
-
         # In the following part, we generate the html_field_types_to_rule_specs
         # dict based on the values in the rule_descriptions.json file.
         generated_html_field_types_dict = {}
-        html_types = (
-            [{
-                'type': 'DragAndDropHtmlString',
-                'format': 'string'
-            }, {
-                'type': 'ListOfSetsOfHtmlStrings',
-                'format': 'listOfSets'
-            }, {
-                'type': 'SetOfHtmlString',
-                'format': 'set'
-            }])
+        html_types = []
+        allowed_html_type_formats = ['listOfSets', 'set', 'string']
+        # Verify that each html_type dict has a format key, which must be
+        # unique. After verification we delete the key for comparison with
+        # the generated html_field_types_to_rule_specs dict. We compare
+        # everything except the format, because the format can't be generated
+        # from the rule_descriptions.json file.
+        for html_type, html_type_dict in (
+                html_field_types_to_rule_specs_dict.items()):
+            self.assertTrue('format' in html_type_dict)
+            self.assertTrue(
+                html_type_dict['format'] in allowed_html_type_formats)
+            del html_type_dict['format']
 
         for interaction_id, interaction_rules in (
                 rule_descriptions_dict.items()):
             for rule_type, rule_description in interaction_rules.items():
                 description = rule_description['description']
+                # Extract the html_types from the rule description.
+                html_types_in_description = (
+                    re.findall(r'{{[a-z]\|([^}]*)}', description))
+                for html_type in html_types_in_description:
+                    if 'Html' in html_type and html_type not in html_types:
+                        html_types.append(html_type)
+
                 for html_type in html_types:
-                    if html_type['type'] in description:
-                        if (
-                                html_type['type'] not in
-                                generated_html_field_types_dict):
-                            generated_html_field_types_dict[
-                                html_type['type']] = {}
-                        generated_html_field_types_dict[
-                            html_type['type']]['interactionId'] = (
-                                interaction_id)
-                        generated_html_field_types_dict[html_type['type']][
-                            'format'] = html_type['format']
-                        if (
-                                'ruleTypes' not in
-                                generated_html_field_types_dict[
-                                    html_type['type']]):
-                            generated_html_field_types_dict[html_type['type']][
-                                'ruleTypes'] = {}
-                        generated_html_field_types_dict[html_type['type']][
-                            'ruleTypes'][rule_type] = {}
-                        generated_html_field_types_dict[html_type['type']][
-                            'ruleTypes'][rule_type]['htmlInputVariables'] = (
-                                ['x'])
-                        if '{{y|%s}}' % html_type['type'] in description:
-                            generated_html_field_types_dict[html_type['type']][
-                                'ruleTypes'][rule_type][
-                                    'htmlInputVariables'].append('y')
+                    if html_type in description:
+                        if html_type not in generated_html_field_types_dict:
+                            generated_html_field_types_dict[html_type] = {}
+                        html_type_dict = (
+                            generated_html_field_types_dict[html_type])
+                        html_type_dict['interactionId'] = interaction_id
+                        if 'ruleTypes' not in html_type_dict:
+                            html_type_dict['ruleTypes'] = {}
+                        rule_types_dict = html_type_dict['ruleTypes']
+                        rule_types_dict[rule_type] = {}
+                        is_input_variables_key_created = (
+                            'htmlInputVariables' in rule_types_dict[rule_type])
+                        if not is_input_variables_key_created:
+                            rule_types_dict[rule_type]['htmlInputVariables'] = (
+                                [])
+                        # Extract the input variables of the rule specs from the
+                        # description.
+                        input_variables_with_html_type = (
+                            re.findall(r'{{([a-z])\|([^}]*)}', description))
+                        for input_variable_with_html_type in (
+                                input_variables_with_html_type):
+                            input_var = input_variable_with_html_type[0]
+                            input_var_html_type = (
+                                input_variable_with_html_type[1])
+                            # Check that the input variable belongs to a rule
+                            # spec having html in it.
+                            if input_var_html_type in html_types:
+                                is_input_var_present_in_list = (
+                                    input_var in rule_types_dict[rule_type][
+                                        'htmlInputVariables'])
+                                if not is_input_var_present_in_list:
+                                    rule_types_dict[rule_type][
+                                        'htmlInputVariables'].append(input_var)
 
         # Assert that the generated dict matches dict in the stored file.
         self.assertEqual(
             html_field_types_to_rule_specs_dict,
             generated_html_field_types_dict)
-
-        # We verify the structure of the new file by generating a schema from
-        # the generated dict and normalizing and validating the stored file
-        # against the generated schema.
-        schema = {
-            'type': 'dict',
-            'properties': []
-        }
-        # Generate the property list for the html_type dict.
-        for html_type, interaction_and_rule_details in (
-                generated_html_field_types_dict.items()):
-            rule_types = (
-                set(interaction_and_rule_details['ruleTypes'].keys()))
-            rule_type_schema_dict_properties = []
-            # Generate the property list for the rule_type dict.
-            for rule_type in rule_types:
-                rule_type_schema_dict_property = {
-                    'name': rule_type,
-                    'schema': {
-                        'type': 'dict',
-                        'properties': [{
-                            'name': 'htmlInputVariables',
-                            'schema': {
-                                'type': 'list',
-                                'items': {
-                                    'type': 'unicode'
-                                }
-                            }
-                        }]
-                    }
-                }
-                rule_type_schema_dict_properties.append(
-                    rule_type_schema_dict_property)
-
-            schema_dict_property = {
-                'name': html_type,
-                'schema': {
-                    'type': 'dict',
-                    'properties': [{
-                        'name': 'interactionId',
-                        'schema': {
-                            'type': 'unicode'
-                        }
-                    }, {
-                        'name': 'format',
-                        'schema': {
-                            'type': 'unicode'
-                        }
-                    }, {
-                        'name': 'ruleTypes',
-                        'schema': {
-                            'type': 'dict',
-                            'properties': rule_type_schema_dict_properties
-                        }
-                    }]
-                }
-            }
-            schema['properties'].append(schema_dict_property)
-
-        normalized_and_validated_dict = (
-            schema_utils.normalize_against_schema(
-                html_field_types_to_rule_specs_dict, schema))
-        # Assert that the structure of the stored file is valid.
-        self.assertEqual(
-            normalized_and_validated_dict, html_field_types_to_rule_specs_dict)
 
     def test_default_interactions_are_valid(self):
         """Test that the default interactions are valid."""

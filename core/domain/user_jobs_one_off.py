@@ -327,7 +327,7 @@ class UserFirstContributionMsecOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
 
 class DraftChangesMathValidationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """Job that checks the html content of an exploration Draft change List and
+    """Job that checks the html content of an exploration draft change list and
      validates all the Math tags in the HTML.
     """
 
