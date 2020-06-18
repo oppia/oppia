@@ -21,4 +21,4 @@
 require('pages/practice-session-page/practice-session-page.module.ts');
 require('App.ts');
 
-require('pages/practice-session-page/practice-session-page.controller.ts');
+require('pages/practice-session-page/practice-session-page.component.ts');

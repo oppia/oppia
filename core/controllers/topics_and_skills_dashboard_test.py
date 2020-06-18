@@ -178,10 +178,19 @@ class NewTopicHandlerTests(BaseTopicsAndSkillsDashboardTests):
         payload = {
             'name': 'Topic name',
             'abbreviated_name': 'name',
-            'description': 'Topic description'
+            'description': 'Topic description',
+            'filename': 'test_svg.svg',
+            'thumbnailBgColor': '#C6DCDA',
         }
+
+        with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
+            mode='rb', encoding=None) as f:
+            raw_image = f.read()
         json_response = self.post_json(
-            self.url, payload, csrf_token=csrf_token)
+            self.url, payload, csrf_token=csrf_token,
+            upload_files=(('image', 'unused_filename', raw_image),)
+        )
         topic_id = json_response['topicId']
         self.assertEqual(len(topic_id), 12)
         self.assertIsNotNone(
@@ -198,6 +207,31 @@ class NewTopicHandlerTests(BaseTopicsAndSkillsDashboardTests):
         self.post_json(
             self.url, payload, csrf_token=csrf_token, expected_status_int=400)
         self.logout()
+
+    def test_topic_creation_with_invalid_image(self):
+        self.login(self.ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        payload = {
+            'name': 'Topic name',
+            'abbreviated_name': 'name',
+            'description': 'Topic description',
+            'filename': 'cafe.flac',
+            'thumbnailBgColor': '#C6DCDA',
+        }
+
+        with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'cafe.flac'),
+            mode='rb', encoding=None) as f:
+            raw_image = f.read()
+
+        json_response = self.post_json(
+            self.url, payload, csrf_token=csrf_token,
+            upload_files=(('image', 'unused_filename', raw_image),),
+            expected_status_int=400
+        )
+
+        self.assertEqual(
+            json_response['error'], 'Image exceeds file size limit of 100 KB.')
 
 
 class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):

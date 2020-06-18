@@ -48,10 +48,10 @@ workflows:
             - e2e_navigation_and_admin
       - e2e_users:
           requires:
-              - e2e_navigation_and_admin
+            - e2e_navigation_and_admin
       - e2e_accessibility_and_embedding:
           requires:
-              - e2e_navigation_and_admin
+            - e2e_navigation_and_admin
 
 var_for_docker_image: &docker_image circleci/python:2.7.17-browsers
 
@@ -277,6 +277,14 @@ jobs:
           name: Run e2e file upload features test
           command: |
             python -m scripts.run_e2e_tests --skip-install --suite="fileUploadFeatures"
+      - run:
+          name: Run e2e topics and skills dashboard test
+          command: |
+            python -m scripts.run_e2e_tests --skip-install --suite="topicsAndSkillsDashboard"
+      - run:
+          name: Run e2e topics and story editor
+          command: |
+            python -m scripts.run_e2e_tests --skip-install --suite="topicAndStoryEditor"
       - persist_to_workspace:
           root: /home/circleci/
           paths:
