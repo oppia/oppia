@@ -29,8 +29,7 @@ const constants = require('constants.ts');
 
 describe('States object factory', () => {
   describe('StatesObjectFactory', () => {
-    var scope, sof, ssof, statesDict,
-      statesWithCyclicOutcomeDict, statesWithAudioDict, vof;
+    var scope, sof, ssof, statesDict, statesWithCyclicOutcomeDict, statesWithAudioDict, vof;
     const oldNewStateTemplate = constants.NEW_STATE_TEMPLATE;
 
     beforeEach(() => {
@@ -448,11 +447,10 @@ describe('States object factory', () => {
       constants.NEW_STATE_TEMPLATE = oldNewStateTemplate;
     });
 
-    it('should create a new state given a state name and set ' +
-      'that state to a terminal state', () => {
+    it('should create a new state given a state name and set that state to a terminal state', () => {
       var newStates = ssof.createFromBackendDict(statesDict);
       newStates.addState('new state');
-
+      
       expect(newStates.getState('new state')).toEqual(
         sof.createFromBackendDict('new state', {
           classifier_model_id: null,
@@ -501,113 +499,114 @@ describe('States object factory', () => {
           },
         }));
 
-      expect(newStates.hasState('new state')).toBe(true);
-      expect(newStates.getStateNames()).toEqual(['first state', 'new state']);
-      expect((Object.keys(newStates.getStateObjects())).length).not.toBe(0);
+        expect(newStates.hasState('new state')).toBe(true);
+        expect(newStates.getStateNames()).toEqual(['first state', 'new state']);
+        expect((Object.keys(newStates.getStateObjects())).length).not.toBe(0);
 
-      newStates.setState('new state',
+        newStates.setState('new state', 
         sof.createFromBackendDict('new state', {
-          classifier_model_id: null,
-          content: {
-            content_id: 'content',
-            html: ''
-          },
-          recorded_voiceovers: {
-            voiceovers_mapping: {
-              content: {},
-              default_outcome: {}
-            }
-          },
-          interaction: {
-            id: 'EndExploration',
-            answer_groups: [],
-            confirmed_unclassified_answers: [],
-            customization_args: {
-              rows: {
-                value: 1
-              },
-              placeholder: {
-                value: 'Type your answer here.'
+            classifier_model_id: null,
+            content: {
+              content_id: 'content',
+              html: ''
+            },
+            recorded_voiceovers: {
+              voiceovers_mapping: {
+                content: {},
+                default_outcome: {}
               }
             },
-            default_outcome: {
-              dest: 'new state',
-              feedback: {
-                content_id: 'default_outcome',
-                html: ''
+            interaction: {
+              id: "EndExploration",
+              answer_groups: [],
+              confirmed_unclassified_answers: [],
+              customization_args: {
+                rows: {
+                  value: 1
+                },
+                placeholder: {
+                  value: 'Type your answer here.'
+                }
               },
-              param_changes: [],
-              labelled_as_correct: false,
-              refresher_exploration_id: null,
-              missing_prerequisite_skill_id: null
+              default_outcome: {
+                dest: 'new state',
+                feedback: {
+                  content_id: 'default_outcome',
+                  html: ''
+                },
+                param_changes: [],
+                labelled_as_correct: false,
+                refresher_exploration_id: null,
+                missing_prerequisite_skill_id: null
+              },
+              hints: [],
             },
-            hints: [],
-          },
-          param_changes: [],
-          solicit_answer_details: false,
-          written_translations: {
-            translations_mapping: {
-              content: {},
-              default_outcome: {}
-            }
-          },
+            param_changes: [],
+            solicit_answer_details: false,
+            written_translations: {
+              translations_mapping: {
+                content: {},
+                default_outcome: {}
+              }
+            },
         }));
 
-      expect(newStates.hasState('new state')).toBe(true);
-      expect(newStates.getStateNames()).toEqual(['first state', 'new state']);
+        expect(newStates.hasState('new state')).toBe(true);
+        expect(newStates.getStateNames()).toEqual(['first state', 'new state']);
+        //expect(newStates.getFinalStateNames()).toEqual['new state'];
     });
 
     it('should correctly retrieve the terminal states', () => {
       var newStates = ssof.createFromBackendDict(statesDict);
 
-      newStates.setState('first state',
+        newStates.setState('first state', 
         sof.createFromBackendDict('first state', {
-          classifier_model_id: null,
-          content: {
-            content_id: 'content',
-            html: ''
-          },
-          recorded_voiceovers: {
-            voiceovers_mapping: {
-              content: {},
-              default_outcome: {}
-            }
-          },
-          interaction: {
-            id: 'EndExploration',
-            answer_groups: [],
-            confirmed_unclassified_answers: [],
-            customization_args: {
-              rows: {
-                value: 1
-              },
-              placeholder: {
-                value: 'Type your answer here.'
+            classifier_model_id: null,
+            content: {
+              content_id: 'content',
+              html: ''
+            },
+            recorded_voiceovers: {
+              voiceovers_mapping: {
+                content: {},
+                default_outcome: {}
               }
             },
-            default_outcome: {
-              dest: 'new state',
-              feedback: {
-                content_id: 'default_outcome',
-                html: ''
+            interaction: {
+              id: "EndExploration",
+              answer_groups: [],
+              confirmed_unclassified_answers: [],
+              customization_args: {
+                rows: {
+                  value: 1
+                },
+                placeholder: {
+                  value: 'Type your answer here.'
+                }
               },
-              param_changes: [],
-              labelled_as_correct: false,
-              refresher_exploration_id: null,
-              missing_prerequisite_skill_id: null
+              default_outcome: {
+                dest: 'new state',
+                feedback: {
+                  content_id: 'default_outcome',
+                  html: ''
+                },
+                param_changes: [],
+                labelled_as_correct: false,
+                refresher_exploration_id: null,
+                missing_prerequisite_skill_id: null
+              },
+              hints: [],
             },
-            hints: [],
-          },
-          param_changes: [],
-          solicit_answer_details: false,
-          written_translations: {
-            translations_mapping: {
-              content: {},
-              default_outcome: {}
-            }
-          },
+            param_changes: [],
+            solicit_answer_details: false,
+            written_translations: {
+              translations_mapping: {
+                content: {},
+                default_outcome: {}
+              }
+            },
         }));
-      expect(newStates.getFinalStateNames()).toEqual['new state'];
+        expect(newStates.getFinalStateNames()).toEqual['new state'];
     });
 
     it('should correctly delete a state', () => {
@@ -676,8 +675,7 @@ describe('States object factory', () => {
       }));
     });
 
-    it('should correctly reset iteraction outcomes ' +
-      'and default outcomes of deleted state', () => {
+    it('should correctly reset iteraction outcomes and default outcomes of deleted state', () => {
       var states = ssof.createFromBackendDict(statesWithCyclicOutcomeDict);
       states.renameState('first state', 'third state');
       states.deleteState('second state');
@@ -736,37 +734,37 @@ describe('States object factory', () => {
             }
           },
         },
-      }));
-    });
-
-    it('should correctly get all audio language codes in states', () => {
-      var statesWithAudio = ssof.createFromBackendDict(statesWithAudioDict);
-      expect(statesWithAudio.getAllVoiceoverLanguageCodes())
-        .toEqual(['en', 'hi-en', 'he', 'zh', 'es', 'cs', 'de']);
-    });
-
-    it('should correctly get all audio translations in states', () => {
-      var statesWithAudio = ssof.createFromBackendDict(statesWithAudioDict);
-      expect(statesWithAudio.getAllVoiceovers('hi-en'))
-        .toEqual({
-          'first state': [vof.createFromBackendDict({
-            filename: 'myfile3.mp3',
-            file_size_bytes: 0.8,
-            needs_update: false,
-            duration_secs: 0.8
-          }), vof.createFromBackendDict({
-            filename: 'myfile8.mp3',
-            file_size_bytes: 1.2,
-            needs_update: false,
-            duration_secs: 1.2
-          })],
-          'second state': [vof.createFromBackendDict({
-            filename: 'myfile2.mp3',
-            file_size_bytes: 0.8,
-            needs_update: false,
-            duration_secs: 0.8
-          })]
-        });
-    });
+    }));
   });
+
+  it('should correctly get all audio language codes in states', () => {
+    var statesWithAudio = ssof.createFromBackendDict(statesWithAudioDict);
+    expect(statesWithAudio.getAllVoiceoverLanguageCodes())
+      .toEqual(['en', 'hi-en', 'he', 'zh', 'es', 'cs', 'de']);
+  });
+
+  it('should correctly get all audio translations in states', () => {
+    var statesWithAudio = ssof.createFromBackendDict(statesWithAudioDict);
+    expect(statesWithAudio.getAllVoiceovers('hi-en'))
+      .toEqual({
+        'first state': [vof.createFromBackendDict({
+          filename: 'myfile3.mp3',
+          file_size_bytes: 0.8,
+          needs_update: false,
+          duration_secs: 0.8
+        }), vof.createFromBackendDict({
+          filename: 'myfile8.mp3',
+          file_size_bytes: 1.2,
+          needs_update: false,
+          duration_secs: 1.2
+        })],
+        'second state': [vof.createFromBackendDict({
+          filename: 'myfile2.mp3',
+          file_size_bytes: 0.8,
+          needs_update: false,
+          duration_secs: 0.8
+        })]
+      });
+  });
+});
 });
