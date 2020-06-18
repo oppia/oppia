@@ -551,6 +551,7 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
         self.assertFalse(is_valid_translation_language_code('zz'))
         self.assertFalse(is_valid_translation_language_code('test'))
 
+
 class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
     """Test schema-based normalization of objects."""
 
