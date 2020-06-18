@@ -27,6 +27,10 @@ angular.module('oppia').component('mathEditor', {
   template: require('./math-editor.component.html'),
   controller: [function() {
     const ctrl = this;
+    const SYMBOLS_TO_REMOVE = [
+      'norm', 'utf8', 'text', 'sym_name', 'eval', 'floor', 'factorial', 'sub',
+      'int', 'defi', 'deriv', 'sum', 'prod', 'root', 'vec', 'point',
+      'infinity', 'leq', 'less', 'geq', 'greater', 'neq'];
 
     ctrl.assignIdToGuppyDiv = function() {
       // Dynamically assigns a unique id to the guppy-div
@@ -52,11 +56,7 @@ angular.module('oppia').component('mathEditor', {
         '\\color{grey}{\\text{\\small{Type a formula here.}}}');
 
       // Remove symbols since they are not supported.
-      var symbolsToRemove = [
-        'norm', 'utf8', 'text', 'sym_name', 'eval', 'floor', 'factorial', 'sub',
-        'int', 'defi', 'deriv', 'sum', 'prod', 'root', 'vec', 'point',
-        'infinity', 'leq', 'less', 'geq', 'greater', 'neq'];
-      for (var symbol of symbolsToRemove) {
+      for (var symbol of SYMBOLS_TO_REMOVE) {
         Guppy.remove_global_symbol(symbol);
       }
     };
