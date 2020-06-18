@@ -282,7 +282,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 html_field_types_to_rule_specs_dict.items()):
             self.assertTrue('format' in html_type_dict)
             self.assertTrue(
-                html_type_dict['format'] in feconf.ALLOWED_HTML_TYPE_FORMATS)
+                html_type_dict['format'] in feconf.ALLOWED_HTML_RULE_VARIABLE_FORMATS)
             del html_type_dict['format']
 
         html_types = []
