@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the math editor component.
  */
 
-describe('MathEditor', function() {
+fdescribe('MathEditor', function() {
   var MathEditorCtrl = null, $window = null;
   class MockGuppy {
     constructor(id: string, config: Object) {}
@@ -41,8 +41,16 @@ describe('MathEditor', function() {
     MathEditorCtrl.$onInit();
   }));
 
-  it('should assign random id to the guppy div', function() {
-    var guppyDivId = MathEditorCtrl.assignIdToGuppyDiv();
-    expect(guppyDivId).toMatch(/guppy_[0-9]{1,8}/);
+  it('should assign a random id to the guppy divs', function() {
+    var mockDocument = document.createElement('div');
+    mockDocument.setAttribute('class', 'guppy-div');
+    angular.element(document).find('body').append(mockDocument.outerHTML);
+
+    MathEditorCtrl.$onInit();
+
+    var guppyDivs = document.querySelectorAll('.guppy-div');
+    for (var i = 0; i < guppyDivs.length; i++) {
+      expect(guppyDivs[i].getAttribute('id')).toMatch(/guppy_[0-9]{1,8}/);
+    }
   });
 });

@@ -25,35 +25,38 @@ angular.module('oppia').component('mathEditor', {
     value: '='
   },
   template: require('./math-editor.component.html'),
-  controller: [function() {
+  controller: ['$scope', function($scope) {
     const ctrl = this;
     const SYMBOLS_TO_REMOVE = [
       'norm', 'utf8', 'text', 'sym_name', 'eval', 'floor', 'factorial', 'sub',
       'int', 'defi', 'deriv', 'sum', 'prod', 'root', 'vec', 'point',
       'infinity', 'leq', 'less', 'geq', 'greater', 'neq'];
 
-    ctrl.assignIdToGuppyDiv = function() {
-      // Dynamically assigns a unique id to the guppy-div
-      var divId = 'guppy_' + Math.floor(Math.random() * 100000000);
-      $('.guppy-div').attr('id', divId);
-      return divId;
-    };
-
-    ctrl.createGuppyInstance = function(divId: string) {
-      return new Guppy(divId, {});
+    ctrl.initializeGuppy = function() {
+      var guppyDivs = document.querySelectorAll('.guppy-div');
+      var divId, guppyInstance;
+      for (var i = 0; i < guppyDivs.length; i++) {
+        divId = 'guppy_' + Math.floor(Math.random() * 100000000);
+        // Dynamically assigns a unique id to the guppy div.
+        guppyDivs[i].setAttribute('id', divId);
+        // Create a new guppy instance for that div.
+        guppyInstance = new Guppy(divId, {});
+        guppyInstance.event('change', (e) => {
+          ctrl.value = guppyInstance.asciimath();
+          // Need to manually trigger the digest cycle
+          // to make any 'watchers' aware of changes in ctrl.value.
+          $scope.$apply();
+        });
+        guppyInstance.configure('buttons', ['controls']);
+        guppyInstance.configure(
+          'empty_content',
+          '\\color{grey}{\\text{\\small{Type a formula here.}}}');
+      }
     };
 
     ctrl.$onInit = function() {
       ctrl.alwaysEditable = true;
-      var divId = ctrl.assignIdToGuppyDiv();
-      var guppyInstance = ctrl.createGuppyInstance(divId);
-      guppyInstance.event('change', (e) => {
-        ctrl.value = guppyInstance.asciimath();
-      });
-      guppyInstance.configure('buttons', ['controls']);
-      guppyInstance.configure(
-        'empty_content',
-        '\\color{grey}{\\text{\\small{Type a formula here.}}}');
+      ctrl.initializeGuppy();
 
       // Remove symbols since they are not supported.
       for (var symbol of SYMBOLS_TO_REMOVE) {
