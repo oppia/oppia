@@ -58,7 +58,7 @@ export class ExplorationRecommendationsService {
     let collectionId = this.urlService.getCollectionIdFromExplorationUrl();
     let storyId = this.urlService.getUrlParams().story_id;
     let currentNodeId = this.urlService.getUrlParams().node_id;
-    let explorationId = this.explorationId;
+    let explorationId = this.contextService.getExplorationId();
 
     let includeSystemRecommendations = 'false';
 
