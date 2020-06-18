@@ -21,6 +21,19 @@
 // implement a setValue() function to which a single argument can be sent
 // that will completely determine the object.
 
+var AlgebraicExpressionEditor = function(elem) {
+  return {
+    setValue: async function(text) {
+      await elem.click();
+      var algebraicInputElem = element(by.css('.guppy_active'));
+      var present = await algebraicInputElem.isPresent();
+      if (present) {
+        await algebraicInputElem.sendKeys(text);
+      }
+    }
+  };
+};
+
 var BooleanEditor = function(elem) {
   return {
     setValue: async function(value) {
@@ -180,6 +193,7 @@ var UnicodeStringEditor = function(elem) {
 };
 
 var OBJECT_EDITORS = {
+  AlgebraicExpression: AlgebraicExpressionEditor,
   Boolean: BooleanEditor,
   CoordTwoDim: CoordTwoDim,
   Filepath: FilepathEditor,
@@ -195,6 +209,7 @@ var OBJECT_EDITORS = {
   UnicodeString: UnicodeStringEditor
 };
 
+exports.AlgebraicExpressionEditor = AlgebraicExpressionEditor;
 exports.BooleanEditor = BooleanEditor;
 exports.CoordTwoDim = CoordTwoDim;
 exports.FractionEditor = FractionEditor;
