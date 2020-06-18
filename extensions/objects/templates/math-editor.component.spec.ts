@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the math editor component.
  */
 
-describe('MathEditor', function() {
+fdescribe('MathEditor', function() {
   var MathEditorCtrl = null, $window = null;
   class MockGuppy {
     constructor(id: string, config: Object) {}
@@ -29,8 +29,7 @@ describe('MathEditor', function() {
     }
     render(): void {}
     configure(name: string, val: Object): void {}
-    // eslint-disable-next-line camelcase
-    static remove_global_symbol(symbol: string): void {}
+    static 'remove_global_symbol'(symbol: string): void {}
   }
 
   beforeEach(angular.mock.module('oppia'));
