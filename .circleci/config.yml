@@ -110,7 +110,7 @@ jobs:
           name: Check if all tests should be run
           command: |
             files_changed=$(git diff --name-only HEAD...$TRAVIS_BRANCH)
-            echo $files_changed
+            echo '$files_changed'
             if [ "$files_changed" != "AUTHORS CHANGELOG CONTRIBUTORS core/templates/pages/about-page/about-page.constants.ts" ]; then
               echo 'export RUN_TESTS=true' >> $BASH_ENV
             else
@@ -180,7 +180,7 @@ jobs:
       - run:
           name: Run backend tests
           command: |
-            echo $RUN_TESTS
+            echo '$RUN_TESTS'
             if [ "$RUN_TESTS" == 'true' ]; then
               python -m scripts.run_backend_tests --generate_coverage_report --exclude_load_tests
             fi
@@ -200,6 +200,7 @@ jobs:
       - run:
           name: Run e2e admin page test
           command: |
+            echo '$RUN_TESTS'
             if [ "$RUN_TESTS" == 'true' ]; then
               python -m scripts.run_e2e_tests --skip-install --skip-build --suite="adminPage" --prod_env
             fi
