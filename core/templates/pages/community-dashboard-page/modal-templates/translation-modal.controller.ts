@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+
 /**
  * @fileoverview Controller for the translation modal.
  */
@@ -29,12 +30,12 @@ require('services/context.service.ts');
 
 angular.module('oppia').controller('TranslationModalController', [
   '$controller', '$scope', '$uibModalInstance', 'AlertsService',
-  'ContextService', 'TranslateTextService', 'TranslationLanguageService',
-  'opportunity', 'userIsLoggedIn', 'ENTITY_TYPE',
+  'CkEditorCopyContentService', 'ContextService', 'TranslateTextService',
+  'TranslationLanguageService', 'opportunity', 'userIsLoggedIn', 'ENTITY_TYPE',
   function(
       $controller, $scope, $uibModalInstance, AlertsService,
-      ContextService, TranslateTextService, TranslationLanguageService,
-      opportunity, userIsLoggedIn, ENTITY_TYPE) {
+      CkEditorCopyContentService, ContextService, TranslateTextService,
+      TranslationLanguageService, opportunity, userIsLoggedIn, ENTITY_TYPE) {
     $controller('ConfirmOrCancelModalController', {
       $scope: $scope,
       $uibModalInstance: $uibModalInstance
@@ -53,6 +54,7 @@ angular.module('oppia').controller('TranslationModalController', [
         hide_complex_extensions: 'true'
       }
     };
+    $scope.copyMode = { isActive: false };
     $scope.subheading = opportunity.subheading;
     $scope.heading = opportunity.heading;
     $scope.loadingData = true;
@@ -100,6 +102,13 @@ angular.module('oppia').controller('TranslationModalController', [
       }
       if (!$scope.moreAvailable) {
         $uibModalInstance.close();
+      }
+    };
+
+    $scope.onContentClick = function($event) {
+      if ($scope.copyMode.isActive) {
+        CkEditorCopyContentService.broadcastCopy($scope, $event.target);
+        $scope.copyMode.isActive = false;
       }
     };
   }
