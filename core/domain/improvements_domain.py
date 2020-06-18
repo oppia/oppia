@@ -93,7 +93,7 @@ class TaskEntry(python_utils.OBJECT):
     @classmethod
     def from_payload_dict(cls, payload_dict, resolver_id=None):
         """Returns a new TaskEntry domain object from the given payload dict and
-        resolver ID (only used when payload dict is resolved).
+        optional resolver ID.
 
         Args:
             payload_dict: dict. Contains the following keys:
@@ -112,14 +112,14 @@ class TaskEntry(python_utils.OBJECT):
                     describe why the task was created.
                 status: str. Tracks the state/progress of the task entry.
             resolver_id: str or None. The corresponding user who resolved this
-                task. Only used when payload suggests that the task is resolved.
+                task. Only used when payload dict's status is resolved.
 
         Returns:
             improvements_domain.TaskEntry.
 
         Raises:
-            Exception. When payload suggests a resolved task, but the
-            resolver_id is missing.
+            Exception. When payload's status is resolved, but the resolver_id
+            is missing.
         """
         if payload_dict['status'] == improvements_models.TASK_STATUS_RESOLVED:
             if resolver_id is None:
@@ -127,6 +127,7 @@ class TaskEntry(python_utils.OBJECT):
             else:
                 resolved_on = datetime.datetime.utcnow()
         else:
+            resolver_id = None
             resolved_on = None
         return cls(
             payload_dict['entity_type'], payload_dict['entity_id'],

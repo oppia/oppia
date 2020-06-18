@@ -197,3 +197,55 @@ class TaskEntryTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(Exception, 'Missing resolver id'):
             improvements_domain.TaskEntry.from_payload_dict(
                 payload_dict, resolver_id=None)
+
+    def test_from_payload_dict_ignores_resolver_id_when_task_is_open(self):
+        payload_dict = {
+            'entity_type': improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
+            'entity_id': self.exp_id,
+            'entity_version': 1,
+            'task_type': improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
+            'target_type': improvements_models.TASK_TARGET_TYPE_STATE,
+            'target_id': feconf.DEFAULT_INIT_STATE_NAME,
+            'issue_description': 'issue description',
+            'status': improvements_models.TASK_STATUS_OPEN,
+        }
+
+        task_entry = improvements_domain.TaskEntry.from_payload_dict(
+            payload_dict, resolver_id=self.owner_id)
+
+        self.assertEqual(task_entry.entity_type, 'exploration')
+        self.assertEqual(task_entry.entity_id, self.exp_id)
+        self.assertEqual(task_entry.entity_version, 1)
+        self.assertEqual(task_entry.task_type, 'high_bounce_rate')
+        self.assertEqual(task_entry.target_type, 'state')
+        self.assertEqual(task_entry.target_id, 'Introduction')
+        self.assertEqual(task_entry.issue_description, 'issue description')
+        self.assertEqual(task_entry.status, 'open')
+        self.assertIsNone(task_entry.resolver_id)
+        self.assertIsNone(task_entry.resolved_on)
+
+    def test_from_payload_dict_ignores_resolver_id_when_task_is_obsolete(self):
+        payload_dict = {
+            'entity_type': improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
+            'entity_id': self.exp_id,
+            'entity_version': 1,
+            'task_type': improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
+            'target_type': improvements_models.TASK_TARGET_TYPE_STATE,
+            'target_id': feconf.DEFAULT_INIT_STATE_NAME,
+            'issue_description': 'issue description',
+            'status': improvements_models.TASK_STATUS_OBSOLETE,
+        }
+
+        task_entry = improvements_domain.TaskEntry.from_payload_dict(
+            payload_dict, resolver_id=self.owner_id)
+
+        self.assertEqual(task_entry.entity_type, 'exploration')
+        self.assertEqual(task_entry.entity_id, self.exp_id)
+        self.assertEqual(task_entry.entity_version, 1)
+        self.assertEqual(task_entry.task_type, 'high_bounce_rate')
+        self.assertEqual(task_entry.target_type, 'state')
+        self.assertEqual(task_entry.target_id, 'Introduction')
+        self.assertEqual(task_entry.issue_description, 'issue description')
+        self.assertEqual(task_entry.status, 'obsolete')
+        self.assertIsNone(task_entry.resolver_id)
+        self.assertIsNone(task_entry.resolved_on)
