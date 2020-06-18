@@ -87,33 +87,6 @@ class TaskEntry(python_utils.OBJECT):
         return improvements_models.TaskEntryModel.generate_composite_entity_id(
             self.entity_type, self.entity_id, self.entity_version)
 
-    def open(self):
-        """Marks this task as open and resets the corresponding fields for
-        tracking who is responsible and when the action took place.
-        """
-        self.status = improvements_models.TASK_STATUS_OPEN
-        self.resolver_id = None
-        self.resolved_on = None
-
-    def obsolete(self):
-        """Marks this task as obsolete and resets the corresponding fields for
-        tracking who is responsible and when the action took place.
-        """
-        self.status = improvements_models.TASK_STATUS_OBSOLETE
-        self.resolver_id = None
-        self.resolved_on = None
-
-    def resolve(self, user_id):
-        """Marks this task as resolved and updates the corresponding fields for
-        tracking who is responsible and when the action took place.
-
-        Args:
-            user_id: str. The ID of the user who has resolved this issue.
-        """
-        self.status = improvements_models.TASK_STATUS_RESOLVED
-        self.resolver_id = user_id
-        self.resolved_on = datetime.datetime.utcnow()
-
     @classmethod
     def from_payload_dict(cls, payload_dict, resolver_id=None):
         """Returns a new TaskEntry domain object from the given payload dict and
