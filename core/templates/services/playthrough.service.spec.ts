@@ -206,8 +206,8 @@ describe('PlaythroughService', () => {
         playthroughService.recordExplorationQuitAction('C', 60);
 
         let playthrough = playthroughService.getPlaythrough();
-        expect(playthrough.issueType).toBeNull()
-        expect(playthrough.issueCustomizationArgs).toBeNull()
+        expect(playthrough.issueType).toBeNull();
+        expect(playthrough.issueCustomizationArgs).toBeNull();
       });
 
       it('should identify cyclic state transitions', () => {
