@@ -56,7 +56,7 @@ describe('PlaythroughService', () => {
       }
     };
 
-    this.recordWrongAnswers = (stateName: string, times: number) => {
+    this.recordIncorrectAnswers = (stateName: string, times: number) => {
       for (let i = 0; i < times; ++i) {
         playthroughService.recordAnswerSubmitAction(
           stateName, stateName, 'TextInput', 'Hello', 'Wrong', 30);
@@ -84,12 +84,7 @@ describe('PlaythroughService', () => {
 
   describe('Recording playthroughs', () => {
     beforeEach(() => {
-      this.expId = 'expId';
-      this.expVersion = 1;
-      this.playthroughRecordingProbability = 1.0;
-
-      playthroughService.initSession(
-        this.expId, this.expVersion, this.playthroughRecordingProbability);
+      playthroughService.initSession('expId', 1, 1.0);
       spyOn(explorationFeaturesService, 'isPlaythroughRecordingEnabled')
         .and.returnValue(true);
     });
@@ -118,7 +113,7 @@ describe('PlaythroughService', () => {
           'A', 'B', 'TextInput', 'Hello', 'Wrong!', 30);
         playthroughService.recordExplorationQuitAction('B', 40);
 
-        // Extra actions that should be ignored.
+        // Extra actions which should be ignored.
         playthroughService.recordExplorationStartAction('A');
         playthroughService.recordExplorationStartAction('B');
         playthroughService.recordAnswerSubmitAction(
@@ -153,7 +148,7 @@ describe('PlaythroughService', () => {
           spyOn(playthroughBackendApiService, 'storePlaythrough'));
 
         this.mockExplorationTimer(60);
-        playthroughService.recordExplorationStartAction('initStateName1');
+        playthroughService.recordExplorationStartAction('A');
         playthroughService.storePlaythrough();
 
         expect(playthroughService.getPlaythrough()).not.toBeNull();
@@ -176,27 +171,22 @@ describe('PlaythroughService', () => {
     });
 
     describe('Issue identification', () => {
-      it('should identify no issue for a playthrough without any issues',
-        () => {
-          const backendApiStorePlaythroughSpy = (
-            spyOn(playthroughBackendApiService, 'storePlaythrough'));
-          this.mockExplorationTimer(360);
-          playthroughService.recordExplorationStartAction('A');
-          this.recordStateTransitions('ABCDEF');
-          playthroughService.recordExplorationQuitAction('F', 60);
-          playthroughService.storePlaythrough();
+      it('should return null issue if playthrough has no problems', () => {
+        this.mockExplorationTimer(400);
+        playthroughService.recordExplorationStartAction('A');
+        this.recordStateTransitions('ABC');
+        playthroughService.recordExplorationQuitAction('C', 60);
 
-          let playthrough = playthroughService.getPlaythrough();
-          expect(playthrough).not.toBeNull();
-          expect(playthrough.issueType).toBeNull();
-          expect(playthrough.issueCustomizationArgs).toBeNull();
-          expect(backendApiStorePlaythroughSpy).not.toHaveBeenCalled();
-        });
+        let playthrough = playthroughService.getPlaythrough();
+        expect(playthrough).not.toBeNull();
+        expect(playthrough.issueType).toBeNull();
+        expect(playthrough.issueCustomizationArgs).toBeNull();
+      });
 
       it('should identify multiple incorrect submissions', () => {
-        this.mockExplorationTimer(360);
+        this.mockExplorationTimer(400);
         playthroughService.recordExplorationStartAction('A');
-        this.recordWrongAnswers('A', 5);
+        this.recordIncorrectAnswers('A', 5);
         playthroughService.recordExplorationQuitAction('A', 60);
 
         let playthrough = playthroughService.getPlaythrough();
@@ -207,23 +197,21 @@ describe('PlaythroughService', () => {
         });
       });
 
-      it('should identify early quits', () => {
-        this.mockExplorationTimer(50);
+      it('should return null if state with multiple incorrect submissions is ' +
+        'eventually completed', () => {
+        this.mockExplorationTimer(400);
         playthroughService.recordExplorationStartAction('A');
-        playthroughService.recordAnswerSubmitAction(
-          'A', 'A', 'TextInput', 'Hello', 'Try again', 30);
-        playthroughService.recordExplorationQuitAction('A', 20);
+        this.recordIncorrectAnswers('A', 5);
+        this.recordStateTransitions('ABC');
+        playthroughService.recordExplorationQuitAction('C', 60);
 
         let playthrough = playthroughService.getPlaythrough();
-        expect(playthrough.issueType).toEqual('EarlyQuit');
-        expect(playthrough.issueCustomizationArgs).toEqual({
-          state_name: {value: 'A'},
-          time_spent_in_exp_in_msecs: {value: 50000},
-        });
+        expect(playthrough.issueType).toBeNull()
+        expect(playthrough.issueCustomizationArgs).toBeNull()
       });
 
       it('should identify cyclic state transitions', () => {
-        this.mockExplorationTimer(360);
+        this.mockExplorationTimer(400);
         playthroughService.recordExplorationStartAction('A');
         this.recordCycle('ABC', 3);
         playthroughService.recordExplorationQuitAction('A', 30);
@@ -232,6 +220,20 @@ describe('PlaythroughService', () => {
         expect(playthrough.issueType).toEqual('CyclicStateTransitions');
         expect(playthrough.issueCustomizationArgs).toEqual({
           state_names: {value: ['C', 'A']},
+        });
+      });
+
+      it('should identify early quits', () => {
+        this.mockExplorationTimer(60);
+        playthroughService.recordExplorationStartAction('A');
+        this.recordIncorrectAnswers('A', 1);
+        playthroughService.recordExplorationQuitAction('A', 20);
+
+        let playthrough = playthroughService.getPlaythrough();
+        expect(playthrough.issueType).toEqual('EarlyQuit');
+        expect(playthrough.issueCustomizationArgs).toEqual({
+          state_name: {value: 'A'},
+          time_spent_in_exp_in_msecs: {value: 60000},
         });
       });
     });
@@ -244,33 +246,47 @@ describe('PlaythroughService', () => {
       it('should identify p-head cyclic state transitions', () => {
         playthroughService.recordExplorationStartAction('A');
         this.recordStateTransitions('ABC');
-        this.recordCycle('CDEF', 3);
+        this.recordCycle('CDE', 3);
         playthroughService.recordExplorationQuitAction('C', 60);
 
         let playthrough = playthroughService.getPlaythrough();
         expect(playthrough.issueType).toEqual('CyclicStateTransitions');
         expect(playthrough.issueCustomizationArgs).toEqual({
-          state_names: {value: ['F', 'C']},
+          state_names: {value: ['E', 'C']},
         });
       });
 
       it('should identify p-tail cyclic state transitions', () => {
         playthroughService.recordExplorationStartAction('A');
-        this.recordCycle('ABCD', 3);
-        this.recordStateTransitions('AEF');
+        this.recordCycle('ABC', 3);
+        this.recordStateTransitions('ADE');
         playthroughService.recordExplorationQuitAction('F', 60);
 
         let playthrough = playthroughService.getPlaythrough();
         expect(playthrough.issueType).toEqual('CyclicStateTransitions');
         expect(playthrough.issueCustomizationArgs).toEqual({
-          state_names: {value: ['D', 'A']},
+          state_names: {value: ['C', 'A']},
         });
       });
 
-      it('should identify cyclic state transitions with inner 1-cycles', () => {
+      it('should identify cycle within an otherwise linear path', () => {
+        playthroughService.recordExplorationStartAction('A');
+        this.recordStateTransitions('ABC');
+        this.recordCycle('CDE', 3);
+        this.recordStateTransitions('CFG');
+        playthroughService.recordExplorationQuitAction('G', 60);
+
+        let playthrough = playthroughService.getPlaythrough();
+        expect(playthrough.issueType).toEqual('CyclicStateTransitions');
+        expect(playthrough.issueCustomizationArgs).toEqual({
+          state_names: {value: ['E', 'C']},
+        });
+      });
+
+      it('should identify cycle with nested 1-cycles', () => {
         playthroughService.recordExplorationStartAction('A');
         this.recordCycle('ABC', 2);
-        this.recordWrongAnswers('A', 2);
+        this.recordIncorrectAnswers('A', 2);
         this.recordCycle('ABC', 2);
         playthroughService.recordExplorationQuitAction('A', 60);
 
@@ -281,12 +297,14 @@ describe('PlaythroughService', () => {
         });
       });
 
-      it('should identify disjoint cycle rotations', () => {
+      it('should identify rotations of cycles', () => {
         playthroughService.recordExplorationStartAction('A');
-        this.recordCycle('ABC', 2);
+        this.recordCycle('ABC', 1);
         this.recordStateTransitions('ADB');
-        this.recordCycle('BCA', 2);
-        playthroughService.recordExplorationQuitAction('A', 10);
+        this.recordCycle('BCA', 1);
+        this.recordStateTransitions('BEC');
+        this.recordCycle('CAB', 1);
+        playthroughService.recordExplorationQuitAction('C', 10);
 
         const playthrough = playthroughService.getPlaythrough();
         expect(playthrough).not.toBeNull();
@@ -296,8 +314,22 @@ describe('PlaythroughService', () => {
         });
       });
 
-      it('should return most recent cycle when there are multiple with same ' +
-        'occurrences', () => {
+      it('should be able to identify the outer-cycle of nested cycles', () => {
+        playthroughService.recordExplorationStartAction('A');
+        this.recordCycle('AB', 2);
+        this.recordCycle('A' + 'CDC' + 'B', 1);
+        playthroughService.recordExplorationQuitAction('A', 60);
+
+        const playthrough = playthroughService.getPlaythrough();
+        expect(playthrough).not.toBeNull();
+        expect(playthrough.issueType).toEqual('CyclicStateTransitions');
+        expect(playthrough.issueCustomizationArgs).toEqual({
+          state_names: {value: ['B', 'A']},
+        });
+      });
+
+      it('should return most recent cycle when there are many with same ' +
+        'number of occurrences', () => {
         playthroughService.recordExplorationStartAction('A');
         this.recordCycle('AB', 3); this.recordStateTransitions('AC');
         this.recordCycle('CD', 3); this.recordStateTransitions('CE');
@@ -319,18 +351,18 @@ describe('PlaythroughService', () => {
         });
       });
 
-      it('should identify outer-cycle when there are nested cycles', () => {
+      it('should not report issue if state is not visited from the same card ' +
+        'enough times', () => {
         playthroughService.recordExplorationStartAction('A');
-        this.recordCycle('AB', 2);
-        this.recordCycle('A' + 'CDC' + 'B', 1);
+        this.recordCycle('AB', 1);
+        this.recordCycle('AC', 1);
+        this.recordCycle('AD', 1);
         playthroughService.recordExplorationQuitAction('A', 60);
 
         const playthrough = playthroughService.getPlaythrough();
         expect(playthrough).not.toBeNull();
-        expect(playthrough.issueType).toEqual('CyclicStateTransitions');
-        expect(playthrough.issueCustomizationArgs).toEqual({
-          state_names: {value: ['B', 'A']},
-        });
+        expect(playthrough.issueType).toBeNull();
+        expect(playthrough.issueCustomizationArgs).toBeNull();
       });
     });
 
@@ -339,8 +371,8 @@ describe('PlaythroughService', () => {
         'transitions and early quit', () => {
         this.mockExplorationTimer(50);
         playthroughService.recordExplorationStartAction('A');
-        this.recordCycle('AB', 5);
-        this.recordWrongAnswers('A', 5);
+        this.recordCycle('AB', 3);
+        this.recordIncorrectAnswers('A', 5);
         playthroughService.recordExplorationQuitAction('A', 10);
 
         expect(playthroughService.getPlaythrough().issueType)
@@ -351,15 +383,14 @@ describe('PlaythroughService', () => {
         () => {
           this.mockExplorationTimer(50);
           playthroughService.recordExplorationStartAction('A');
-          this.recordWrongAnswers('A', 5);
+          this.recordIncorrectAnswers('A', 5);
           playthroughService.recordExplorationQuitAction('A', 10);
 
           expect(playthroughService.getPlaythrough().issueType)
             .toEqual('MultipleIncorrectSubmissions');
         });
 
-      it('should prioritize cyclic state transitions issue types over early ' +
-        'quit', () => {
+      it('should prioritize cyclic state transitions over early quit', () => {
         this.mockExplorationTimer(50);
         playthroughService.recordExplorationStartAction('A');
         this.recordCycle('AB', 3);
@@ -371,13 +402,13 @@ describe('PlaythroughService', () => {
     });
 
     describe('Identifying learners who are just browsing', () => {
-      it('should not store playthroughs if their duration is too short', () => {
+      it('should not store playthrough if learner quits too early', () => {
         const backendApiStorePlaythroughSpy = (
           spyOn(playthroughBackendApiService, 'storePlaythrough'));
 
         this.mockExplorationTimer(40);
         playthroughService.recordExplorationStartAction('A');
-        this.recordWrongAnswers('A', 5);
+        this.recordIncorrectAnswers('A', 5);
         playthroughService.recordExplorationQuitAction('A', 10);
 
         expect(playthroughService.getPlaythrough().issueType)
@@ -386,40 +417,36 @@ describe('PlaythroughService', () => {
         expect(backendApiStorePlaythroughSpy).not.toHaveBeenCalled();
       });
 
-      it('should not store playthroughs if they have no answer submissions',
+      it('should not store playthrough if learner did not submit any answers',
         () => {
           const backendApiStorePlaythroughSpy = (
             spyOn(playthroughBackendApiService, 'storePlaythrough'));
 
-          this.mockExplorationTimer(300);
+          this.mockExplorationTimer(60);
           playthroughService.recordExplorationStartAction('A');
-          playthroughService.recordExplorationQuitAction('A', 180);
-
-          expect(playthroughService.getPlaythrough()).not.toBeNull();
+          playthroughService.recordExplorationQuitAction('A', 60);
           playthroughService.storePlaythrough();
+
+          const playthrough = playthroughService.getPlaythrough();
+          expect(playthrough).not.toBeNull();
+          expect(playthrough.issueType).toEqual('EarlyQuit');
           expect(backendApiStorePlaythroughSpy).not.toHaveBeenCalled();
         });
     });
   });
 
-  describe('Disabling playthrough recording', () => {
+  describe('Disabling playthrough recordings', () => {
     it('should not record learner actions when recording is disabled', () => {
       const backendApiStorePlaythroughSpy = (
         spyOn(playthroughBackendApiService, 'storePlaythrough'));
       spyOn(explorationFeaturesService, 'isPlaythroughRecordingEnabled')
         .and.returnValue(false);
 
-      this.expId = 'expId';
-      this.expVersion = 1;
-      this.playthroughRecordingProbability = 1.0;
+      playthroughService.initSession('expId', 1, 1.0);
 
-      playthroughService.initSession(
-        this.expId, this.expVersion, this.playthroughRecordingProbability);
-
-      this.mockExplorationTimer(50);
-      playthroughService.recordExplorationStartAction('initStateName1');
-      playthroughService.recordAnswerSubmitAction(
-        'A', 'B', 'TextInput', 'Hello', 'Try again', 40);
+      this.mockExplorationTimer(400);
+      playthroughService.recordExplorationStartAction('A');
+      this.recordIncorrectAnswers('A', 5);
       playthroughService.recordExplorationQuitAction('A', 10);
       playthroughService.storePlaythrough();
 
@@ -427,29 +454,25 @@ describe('PlaythroughService', () => {
       expect(backendApiStorePlaythroughSpy).not.toHaveBeenCalled();
     });
 
-    it('should not record learner actions when not in sample population',
-      () => {
-        spyOn(explorationFeaturesService, 'isPlaythroughRecordingEnabled')
-          .and.returnValue(false);
-        const backendApiStorePlaythroughSpy = (
-          spyOn(playthroughBackendApiService, 'storePlaythrough'));
+    it('should not record learner that is not in sample population', () => {
+      spyOn(explorationFeaturesService, 'isPlaythroughRecordingEnabled')
+        .and.returnValue(false);
+      const backendApiStorePlaythroughSpy = (
+        spyOn(playthroughBackendApiService, 'storePlaythrough'));
 
-        this.expId = 'expId';
-        this.expVersion = 1;
-        this.playthroughRecordingProbability = 0.6;
-        spyOn(Math, 'random').and.returnValue(0.9); // Outside of probability.
+      const sampleSizePopulationProportion = 0.6;
+      spyOn(Math, 'random').and.returnValue(0.9); // Not in sample population.
 
-        this.mockExplorationTimer(50);
-        playthroughService.initSession(
-          this.expId, this.expVersion, this.playthroughRecordingProbability);
-        playthroughService.recordExplorationStartAction('initStateName1');
-        playthroughService.recordAnswerSubmitAction(
-          'A', 'B', 'TextInput', 'Hello', 'Try again', 40);
-        playthroughService.recordExplorationQuitAction('A', 10);
-        playthroughService.storePlaythrough();
+      this.mockExplorationTimer(400);
+      playthroughService.initSession(
+        'expId', 1, sampleSizePopulationProportion);
+      playthroughService.recordExplorationStartAction('A');
+      this.recordIncorrectAnswers('A', 5);
+      playthroughService.recordExplorationQuitAction('A', 10);
+      playthroughService.storePlaythrough();
 
-        expect(playthroughService.getPlaythrough()).toBeNull();
-        expect(backendApiStorePlaythroughSpy).not.toHaveBeenCalled();
-      });
+      expect(playthroughService.getPlaythrough()).toBeNull();
+      expect(backendApiStorePlaythroughSpy).not.toHaveBeenCalled();
+    });
   });
 });
