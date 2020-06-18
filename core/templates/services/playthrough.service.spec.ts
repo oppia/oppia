@@ -243,14 +243,14 @@ describe('PlaythroughService', () => {
         this.mockExplorationTimer(400);
       });
 
-      it('should identify p-shaped cyclic state transitions with linear ' +
+      it('should identify p-shaped cyclic state transitions with cyclic ' +
         'portion at the tail', () => {
         // P-shaped cycles look like:
         // A - B - C - D
         //         |   |
         //         F - E
         //
-        // For this test, we check when the linear portion appears at the end
+        // For this test, we check when the cyclic portion appears at the end
         // (tail) of the playthrough.
         playthroughService.recordExplorationStartAction('A');
         this.recordStateTransitions(['A', 'B', 'C']);
@@ -264,14 +264,14 @@ describe('PlaythroughService', () => {
         });
       });
 
-      it('should identify p-shaped cyclic state transitions with linear ' +
+      it('should identify p-shaped cyclic state transitions with cyclic ' +
         'portion at the head', () => {
         // P-shaped cycles look like:
         // D - A - E - F
         // |   |
         // C - B
         //
-        // For this test, we check when the linear portion appears at the start
+        // For this test, we check when the cyclic portion appears at the start
         // (head) of the playthrough.
         playthroughService.recordExplorationStartAction('A');
         this.recordCycle(['A', 'B', 'C'], 3);
