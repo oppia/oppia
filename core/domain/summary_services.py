@@ -195,7 +195,7 @@ def get_displayable_collection_summary_dicts_matching_ids(collection_ids):
     Args:
         collection_ids: list(str). A list of collection ids.
 
-    Return:
+    Returns:
         list(dict). Each element in this list is a collection summary dict.
         These elements are returned in the same order as that given
         in collection_ids.
@@ -296,7 +296,7 @@ def get_displayable_exp_summary_dicts_matching_ids(exploration_ids, user=None):
         user: UserActionsInfo or None. Object having user_id, role and actions
             for given user.
 
-    Return:
+    Returns:
         list(dict). A list of exploration summary dicts in human readable form.
         Example:
 
@@ -351,7 +351,7 @@ def get_displayable_exp_summary_dicts(exploration_summaries):
         exploration_summaries: list(ExplorationSummary). List of exploration
         summary objects.
 
-    Return:
+    Returns:
         list(dict). A list of exploration summary dicts in human readable form.
         Example:
 
@@ -420,7 +420,7 @@ def _get_displayable_collection_summary_dicts(collection_summaries):
         collection_summaries: list(CollectionSummary). List of collection
         summary domain object.
 
-    Return:
+    Returns:
         list(dict). A list of exploration summary dicts in human readable form.
         Example:
 
@@ -470,7 +470,7 @@ def get_library_groups(language_codes):
         language_codes: list(str). A list of language codes. Only explorations
             with these languages will be returned.
 
-    Return:
+    Returns:
         list(dict). A list of groups for the library index page. Each group is
         represented by a dict with the following keys and values:
             - activity_summary_dicts: list(dict). A list of dicts representing
@@ -618,7 +618,7 @@ def get_featured_activity_summary_dicts(language_codes):
         language_codes: list(str). A list of language codes. Only explorations
             with these languages will be returned.
 
-    Return:
+    Returns:
         list(dict). Each dict in this list represents a featured activity.
         For example:
 
@@ -676,7 +676,7 @@ def get_top_rated_exploration_summary_dicts(language_codes, limit):
             with these languages will be returned.
         limit: int. The maximum number of explorations to return.
 
-    Return:
+    Returns:
         list(dict). Each dict in this list represents a exploration summary in
         human readable form. The list is sorted in decreasing order of average
         rating. For example:
@@ -716,7 +716,7 @@ def get_recently_published_exp_summary_dicts(limit):
     Args:
         limit: int. The maximum number of explorations to return.
 
-    Return:
+    Returns:
         list(dict). Each dict in this list represents a featured activity in
         human readable form. For example:
 

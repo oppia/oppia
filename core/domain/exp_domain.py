@@ -1339,7 +1339,7 @@ class Exploration(python_utils.OBJECT):
         """Returns a list of language code in which the exploration translation
         is 100%.
 
-        Return:
+        Returns:
             list(str). A list of language code in which the translation for the
             exploration is complete i.e, 100%.
         """
@@ -1375,7 +1375,7 @@ class Exploration(python_utils.OBJECT):
 
         (The content field includes state content, feedback, hints, solutions.)
 
-        Return:
+        Returns:
             int. The total number of distinct content fields available inside
             the exploration.
         """

@@ -106,7 +106,7 @@ class UserExplorationPrefs(python_utils.OBJECT):
     def to_dict(self):
         """Return dictionary representation of UserExplorationPrefs.
 
-        Return:
+        Returns:
             dict. The keys of the dict are:
                 'mute_feedback_notifications': bool. Whether the given user has
                     muted feedback emails.
