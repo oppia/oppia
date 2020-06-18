@@ -31,29 +31,33 @@ import python_utils
 (improvements_models,) = (
     models.Registry.import_models([models.NAMES.improvements]))
 
-_MODEL = improvements_models.TaskEntryModel
 
+def get_task_entry_from_model(task_entry_model):
+    """Returns a domain instance for the corresponding task entry model.
 
-def _yield_all_tasks_ordered_by_status(composite_entity_id):
-    """Yields all tasks corresponding to the given entity in storage."""
-    query = _MODEL.query(
-        _MODEL.composite_entity_id == composite_entity_id).order(_MODEL.status)
-    cursor, has_more = (None, True)
-    while has_more:
-        task_models, cursor, has_more = query.fetch_page(
-            feconf.MAX_TASK_MODELS_PER_FETCH, start_cursor=cursor)
-        for task_model in task_models:
-            yield improvements_domain.TaskEntry.from_model(task_model)
+    Args:
+        task_entry_model: improvements_models.TaskEntryModel.
+
+    Returns:
+        improvements_domain.TaskEntry.
+    """
+    return improvements_domain.TaskEntry(
+        task_entry_model.entity_type, task_entry_model.entity_id,
+        task_entry_model.entity_version, task_entry_model.task_type,
+        task_entry_model.target_type, task_entry_model.target_id,
+        task_entry_model.issue_description, task_entry_model.status,
+        task_entry_model.resolver_id, task_entry_model.resolved_on)
 
 
 def fetch_exploration_tasks(exploration):
-    """Returns a dict describing all tasks for the given versioned exploration.
+    """Returns a tuple encoding all of the tasks corresponding to the provided
+    exploration.
 
     Args:
         exploration: exp_domain.Exploration.
 
     Returns:
-        tuple. Contains the following two items:
+        tuple. Contains the following 2 items:
             open_tasks: list(improvements_domain.TaskEntry). The list of the
                 tasks which are open.
             resolved_task_types_by_state_name: dict(str: list(str)). Maps state
@@ -85,27 +89,32 @@ def fetch_exploration_task_history_page(exploration, cursor=None):
 
     Args:
         exploration: exp_domain.Exploration.
-        cursor: *. Starting point for search. When None, the starting point is
-            the very beginning of the history results.
+        cursor: datastore_query.Cursor or None. Starting point for search. When
+            None, the starting point is the very beginning of the history
+            results (i.e., starting from the newest task entry).
 
     Returns:
-        tuple. Contains the following three items:
-            results: list. The query results.
-            cursor: a query cursor pointing to the "next" batch of results. If
-                there are no more results, this might be None.
+        tuple. Contains the following 3 items:
+            results: list(improvements_domain.TaskEntry). The query results.
+            cursor: datastore_query.Cursor or None. a query cursor pointing to
+                the "next" batch of results. If there are no more results, this
+                might be None.
             more: bool. Indicates whether there are (likely) more results after
                 this batch. If False, there are no more results; if True, there
                 are probably more results.
     """
-    return (
-        _MODEL.query(
-            _MODEL.entity_type == (
+    results, cursor, more = (
+        improvements_models.TaskEntryModel.query(
+            improvements_models.TaskEntryModel.entity_type == (
                 improvements_models.TASK_ENTITY_TYPE_EXPLORATION),
-            _MODEL.entity_id == exploration.id,
-            _MODEL.status == improvements_models.TASK_STATUS_RESOLVED)
-        .order(-_MODEL.last_updated)
+            improvements_models.TaskEntryModel.entity_id == exploration.id,
+            improvements_models.TaskEntryModel.status == (
+                improvements_models.TASK_STATUS_RESOLVED))
+        .order(-improvements_models.TaskEntryModel.last_updated)
         .fetch_page(
             feconf.MAX_TASK_MODELS_PER_HISTORY_PAGE, start_cursor=cursor))
+    return (
+        [get_task_entry_from_model(model) for model in results], cursor, more)
 
 
 def put_tasks(tasks, update_last_updated_time=True):
@@ -114,16 +123,71 @@ def put_tasks(tasks, update_last_updated_time=True):
 
     Args:
         tasks: list(improvements_domain.TaskEntry). Domain object instances for
-            each task to be placed into stored.
+            each task to be placed into storage.
         update_last_updated_time: bool. Whether to update the last_updated field
             of the task models.
     """
-    task_models = _MODEL.get_multi([t.task_id for t in tasks])
+    task_models = improvements_models.TaskEntryModel.get_multi(
+        [t.task_id for t in tasks])
     for i, (task, model) in enumerate(python_utils.ZIP(tasks, task_models)):
         if model is None:
-            task_models[i] = task.to_model()
-        elif not task.apply_changes(model):
+            task_models[i] = improvements_models.TaskEntryModel(
+                id=task.task_id, composite_entity_id=task.composite_entity_id,
+                entity_type=task.entity_type, entity_id=task.entity_id,
+                entity_version=task.entity_version, task_type=task.task_type,
+                target_type=task.target_type, target_id=task.target_id,
+                issue_description=task.issue_description, status=task.status,
+                resolver_id=task.resolver_id, resolved_on=task.resolved_on)
+        elif not apply_changes_to_model(task, model):
             task_models[i] = None
-    _MODEL.put_multi(
+    improvements_models.TaskEntryModel.put_multi(
         [m for m in task_models if m is not None],
         update_last_updated_time=update_last_updated_time)
+
+
+def apply_changes_to_model(task_entry, task_entry_model):
+    """Makes changes to the given model if any differences are found.
+
+    Args:
+        task_entry: improvements_domain.TaskEntry.
+        task_entry_model: improvements_models.TaskEntryModel.
+
+    Returns:
+        bool. Whether any change was made to the model.
+    """
+    if task_entry_model.id != task_entry.task_id:
+        raise Exception('Wrong model was provided')
+    any_change_made_to_model = False
+    if task_entry_model.issue_description != task_entry.issue_description:
+        task_entry_model.issue_description = task_entry.issue_description
+        any_change_made_to_model = True
+    if task_entry_model.status != task_entry.status:
+        task_entry_model.status = task_entry.status
+        task_entry_model.resolver_id = task_entry.resolver_id
+        task_entry_model.resolved_on = task_entry.resolved_on
+        any_change_made_to_model = True
+    return any_change_made_to_model
+
+
+def _yield_all_tasks_ordered_by_status(composite_entity_id):
+    """Yields all tasks corresponding to the given entity in storage.
+
+    Args:
+        composite_entity_id: str. The identifier for the specific entity being
+            queried. Must be generated from:
+            TaskEntryModel.generate_composite_entity_id.
+
+    Yields:
+        iterable(improvements_domain.TaskEntry). All of the task entries
+            corresponding to the given composite_entity_id.
+    """
+    query = improvements_models.TaskEntryModel.query(
+        improvements_models.TaskEntryModel.composite_entity_id == (
+            composite_entity_id)
+        ).order(improvements_models.TaskEntryModel.status)
+    cursor, more = (None, True)
+    while more:
+        results, cursor, more = query.fetch_page(
+            feconf.MAX_TASK_MODELS_PER_FETCH, start_cursor=cursor)
+        for task_model in results:
+            yield get_task_entry_from_model(task_model)
