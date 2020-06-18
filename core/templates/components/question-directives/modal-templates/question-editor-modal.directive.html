@@ -7,7 +7,7 @@
   <div class="rubric-details" ng-repeat="skillName in skillNames track by $index">
     <h4 ng-if="skillName"><strong>Skill: <[skillName]></strong></h4>
     <h4><strong>Difficulty: <[rubrics[$index].getDifficulty()]></strong></h4>
-    <h4 ng-if="rubrics[$index].getExplanations().length > 0"><strong>Explanations</strong></h4>
+    <h4 ng-if="rubrics[$index].getExplanations().length > 0"><strong>Difficulty Explanations</strong></h4>
     <ul>
       <li ng-repeat="explanation in rubrics[$index].getExplanations()">
         <span ng-bind-html="explanation"></span>
