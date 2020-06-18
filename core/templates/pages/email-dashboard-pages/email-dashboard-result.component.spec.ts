@@ -18,8 +18,10 @@
 
 import { WindowRef } from 'services/contextual/window-ref.service';
 
+require('pages/email-dashboard-pages/email-dashboard-result.component.ts');
+
 describe('Email Dashboard Result Page', function() {
-  var $scope = null, ctrl = null;
+  var ctrl = null;
   var $httpBackend = null;
   var CsrfService = null;
   var $timeout = null;
@@ -29,7 +31,7 @@ describe('Email Dashboard Result Page', function() {
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('WindowRef', windowRef);
   }));
-  beforeEach(angular.mock.inject(function($injector, $q) {
+  beforeEach(angular.mock.inject(function($injector, $q, $componentController) {
     $httpBackend = $injector.get('$httpBackend');
     $timeout = $injector.get('$timeout');
     CsrfService = $injector.get('CsrfTokenService');
@@ -40,12 +42,7 @@ describe('Email Dashboard Result Page', function() {
       return deferred.promise;
     });
 
-    var $rootScope = $injector.get('$rootScope');
-    $scope = $rootScope.$new();
-    var directive = $injector.get('emailDashboardResultPageDirective')[0];
-    ctrl = $injector.instantiate(directive.controller, {
-      $rootScope: $scope
-    });
+    ctrl = $componentController('emailDashboardResultPage');
 
     spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
       location: {
