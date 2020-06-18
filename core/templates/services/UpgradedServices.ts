@@ -539,8 +539,6 @@ export class UpgradedServices {
       new BrowserCheckerService(new WindowRef());
     upgradedServices['CamelCaseToHyphensPipe'] = new CamelCaseToHyphensPipe();
     upgradedServices['ChangeObjectFactory'] = new ChangeObjectFactory();
-    upgradedServices['CkEditorCopyContentService'] =
-      new CkEditorCopyContentService();
     upgradedServices['ClassifierObjectFactory'] = new ClassifierObjectFactory();
     upgradedServices['CodeNormalizerService'] = new CodeNormalizerService();
     upgradedServices['CollectionNodeObjectFactory'] =
@@ -860,6 +858,8 @@ export class UpgradedServices {
     upgradedServices['AnswerGroupObjectFactory'] = new AnswerGroupObjectFactory(
       upgradedServices['OutcomeObjectFactory'],
       upgradedServices['RuleObjectFactory']);
+    upgradedServices['CkEditorCopyContentService'] =
+      new CkEditorCopyContentService(upgradedServices['HtmlEscaperService']);
     upgradedServices['CodeReplPredictionService'] =
       new CodeReplPredictionService(
         upgradedServices['CountVectorizerService'],
