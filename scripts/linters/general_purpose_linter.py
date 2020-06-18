@@ -37,7 +37,7 @@ EXCLUDED_PATHS = (
     '*.mp3', '*.mp4', 'node_modules/*', 'typings/*', 'local_compiled_js/*',
     'webpack_bundles/*', 'core/tests/services_sources/*',
     'core/tests/release_sources/tmp_unzip.zip',
-    'core/tests/release_sources/tmp_unzip.tar.gz')
+    'core/tests/release_sources/tmp_unzip.tar.gz', 'tmpcompiledjs/*')
 
 GENERATED_FILE_PATHS = (
     'extensions/interactions/LogicProof/static/js/generatedDefaultData.ts',
