@@ -29,83 +29,83 @@ var ExplorationPlayerPage =
   require('../protractor_utils/ExplorationPlayerPage.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
 
-// describe('rich-text components', function() {
-//   var explorationEditorPage = null;
-//   var explorationEditorMainTab = null;
-//   var explorationPlayerPage = null;
+describe('rich-text components', function() {
+  var explorationEditorPage = null;
+  var explorationEditorMainTab = null;
+  var explorationPlayerPage = null;
 
-//   beforeEach(function() {
-//     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
-//     explorationEditorMainTab = explorationEditorPage.getMainTab();
-//     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
-//   });
+  beforeEach(function() {
+    explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
+    explorationEditorMainTab = explorationEditorPage.getMainTab();
+    explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
+  });
 
-//   it('should display correctly', async function() {
-//     await users.createUser(
-//       'user@richTextComponents.com', 'userRichTextComponents');
-//     await users.login('user@richTextComponents.com');
+  it('should display correctly', async function() {
+    await users.createUser(
+      'user@richTextComponents.com', 'userRichTextComponents');
+    await users.login('user@richTextComponents.com');
 
-//     await workflow.createExploration();
+    await workflow.createExploration();
 
-//     await explorationEditorMainTab.setContent(async function(richTextEditor) {
-//       await richTextEditor.appendBoldText('bold');
-//       await richTextEditor.appendPlainText(' ');
-//       // TODO(Jacob): add test for image RTE component
-//       await richTextEditor.addRteComponent('Link', 'http://google.com/', true);
-//       await richTextEditor.addRteComponent('Math', 'abc');
-//       await richTextEditor.addRteComponent(
-//         'Video', 'M7lc1UVf-VE', 10, 100, false);
-//       // We put these last as otherwise Protractor sometimes fails to scroll to
-//       // and click on them.
-//       await richTextEditor.addRteComponent(
-//         'Collapsible', 'title', await forms.toRichText('inner'));
-//       await richTextEditor.addRteComponent('Tabs', [{
-//         title: 'title 1',
-//         content: await forms.toRichText('contents 1')
-//       }, {
-//         title: 'title 1',
-//         content: await forms.toRichText('contents 2')
-//       }]);
-//     });
+    await explorationEditorMainTab.setContent(async function(richTextEditor) {
+      await richTextEditor.appendBoldText('bold');
+      await richTextEditor.appendPlainText(' ');
+      // TODO(Jacob): add test for image RTE component
+      await richTextEditor.addRteComponent('Link', 'http://google.com/', true);
+      await richTextEditor.addRteComponent('Math', 'abc');
+      await richTextEditor.addRteComponent(
+        'Video', 'M7lc1UVf-VE', 10, 100, false);
+      // We put these last as otherwise Protractor sometimes fails to scroll to
+      // and click on them.
+      await richTextEditor.addRteComponent(
+        'Collapsible', 'title', await forms.toRichText('inner'));
+      await richTextEditor.addRteComponent('Tabs', [{
+        title: 'title 1',
+        content: await forms.toRichText('contents 1')
+      }, {
+        title: 'title 1',
+        content: await forms.toRichText('contents 2')
+      }]);
+    });
 
-//     await explorationEditorPage.navigateToPreviewTab();
+    await explorationEditorPage.navigateToPreviewTab();
 
-//     await explorationPlayerPage.expectContentToMatch(
-//       async function(richTextChecker) {
-//         await richTextChecker.readBoldText('bold');
-//         await richTextChecker.readPlainText(' ');
-//         await richTextChecker.readRteComponent(
-//           'Link', 'http://google.com/', true);
-//         await richTextChecker.readRteComponent('Math', 'abc');
-//         await richTextChecker.readRteComponent(
-//           'Video', 'M7lc1UVf-VE', 10, 100, false);
-//         await richTextChecker.readRteComponent(
-//           'Collapsible', 'title', await forms.toRichText('inner'));
-//         await richTextChecker.readRteComponent('Tabs', [{
-//           title: 'title 1',
-//           content: await forms.toRichText('contents 1')
-//         }, {
-//           title: 'title 1',
-//           content: await forms.toRichText('contents 2')
-//         }]);
-//       });
+    await explorationPlayerPage.expectContentToMatch(
+      async function(richTextChecker) {
+        await richTextChecker.readBoldText('bold');
+        await richTextChecker.readPlainText(' ');
+        await richTextChecker.readRteComponent(
+          'Link', 'http://google.com/', true);
+        await richTextChecker.readRteComponent('Math', 'abc');
+        await richTextChecker.readRteComponent(
+          'Video', 'M7lc1UVf-VE', 10, 100, false);
+        await richTextChecker.readRteComponent(
+          'Collapsible', 'title', await forms.toRichText('inner'));
+        await richTextChecker.readRteComponent('Tabs', [{
+          title: 'title 1',
+          content: await forms.toRichText('contents 1')
+        }, {
+          title: 'title 1',
+          content: await forms.toRichText('contents 2')
+        }]);
+      });
 
-//     await explorationEditorPage.discardChanges();
-//     await users.logout();
-//   });
+    await explorationEditorPage.discardChanges();
+    await users.logout();
+  });
 
-//   // TODO(Jacob): Add in a test for the use of rich text inside collapsibles
-//   // and tabs. Previous attempts at such a test intermittently fail with the
-//   // rich-text checker unable to read the formatted text.
+  // TODO(Jacob): Add in a test for the use of rich text inside collapsibles
+  // and tabs. Previous attempts at such a test intermittently fail with the
+  // rich-text checker unable to read the formatted text.
 
-//   afterEach(async function() {
-//     await general.checkForConsoleErrors([
-//       // TODO(pranavsid98): This error is caused by the upgrade from Chrome 60
-//       // to Chrome 61. Chrome version at time of recording this is 61.0.3163.
-//       'chrome-extension://invalid/ - Failed to load resource: net::ERR_FAILED',
-//     ]);
-//   });
-// });
+  afterEach(async function() {
+    await general.checkForConsoleErrors([
+      // TODO(pranavsid98): This error is caused by the upgrade from Chrome 60
+      // to Chrome 61. Chrome version at time of recording this is 61.0.3163.
+      'chrome-extension://invalid/ - Failed to load resource: net::ERR_FAILED',
+    ]);
+  });
+});
 
 
 describe('Interactions', function() {
