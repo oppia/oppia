@@ -28,8 +28,8 @@ from core.tests import test_utils
 import feconf
 import utils
 
-base_models, improvements_models = models.Registry.import_models(
-    [models.NAMES.base_model, models.NAMES.improvements])
+(improvements_models,) = (
+    models.Registry.import_models([models.NAMES.improvements]))
 
 
 class TaskEntryTests(test_utils.GenericTestBase):

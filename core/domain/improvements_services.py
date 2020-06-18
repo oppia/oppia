@@ -32,8 +32,32 @@ import python_utils
     models.Registry.import_models([models.NAMES.improvements]))
 
 
+def _yield_all_tasks_ordered_by_status(composite_entity_id):
+    """Yields all tasks corresponding to the given entity in storage.
+
+    Args:
+        composite_entity_id: str. The identifier for the specific entity being
+            queried. Must be generated from:
+            TaskEntryModel.generate_composite_entity_id.
+
+    Yields:
+        iterable(improvements_domain.TaskEntry). All of the task entries
+            corresponding to the given composite_entity_id.
+    """
+    query = improvements_models.TaskEntryModel.query(
+        improvements_models.TaskEntryModel.composite_entity_id == (
+            composite_entity_id)
+        ).order(improvements_models.TaskEntryModel.status)
+    cursor, more = (None, True)
+    while more:
+        results, cursor, more = query.fetch_page(
+            feconf.MAX_TASK_MODELS_PER_FETCH, start_cursor=cursor)
+        for task_model in results:
+            yield get_task_entry_from_model(task_model)
+
+
 def get_task_entry_from_model(task_entry_model):
-    """Returns a domain instance for the corresponding task entry model.
+    """Returns a domain object for the corresponding task entry model.
 
     Args:
         task_entry_model: improvements_models.TaskEntryModel.
@@ -167,27 +191,3 @@ def apply_changes_to_model(task_entry, task_entry_model):
         task_entry_model.resolved_on = task_entry.resolved_on
         any_change_made_to_model = True
     return any_change_made_to_model
-
-
-def _yield_all_tasks_ordered_by_status(composite_entity_id):
-    """Yields all tasks corresponding to the given entity in storage.
-
-    Args:
-        composite_entity_id: str. The identifier for the specific entity being
-            queried. Must be generated from:
-            TaskEntryModel.generate_composite_entity_id.
-
-    Yields:
-        iterable(improvements_domain.TaskEntry). All of the task entries
-            corresponding to the given composite_entity_id.
-    """
-    query = improvements_models.TaskEntryModel.query(
-        improvements_models.TaskEntryModel.composite_entity_id == (
-            composite_entity_id)
-        ).order(improvements_models.TaskEntryModel.status)
-    cursor, more = (None, True)
-    while more:
-        results, cursor, more = query.fetch_page(
-            feconf.MAX_TASK_MODELS_PER_FETCH, start_cursor=cursor)
-        for task_model in results:
-            yield get_task_entry_from_model(task_model)
