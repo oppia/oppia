@@ -22,7 +22,7 @@ import {
 import { downgradeComponent } from '@angular/upgrade/static';
 import { ContributionOpportunitiesBackendApiService } from
   // eslint-disable-next-line max-len
-  'core/templates/pages/community-dashboard-page/services/contribution-opportunities-backend-api.service';
+  'pages/community-dashboard-page/services/contribution-opportunities-backend-api.service';
 import { FeaturedTranslationLanguage } from
   'domain/opportunity/FeaturedTranslationLanguageFactory';
 
