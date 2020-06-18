@@ -514,7 +514,7 @@ class ApplyChangesToModelTests(ImprovementsServicesTestBase):
         improvements_services.put_tasks([task_entry])
         task_entry_model = (
             improvements_models.TaskEntryModel.get_by_id(task_entry.task_id))
-        self.resolver_id = self.owner_id
+        task_entry.resolver_id = self.owner_id
 
         self.assertFalse(
             improvements_services.apply_changes_to_model(
@@ -529,7 +529,7 @@ class ApplyChangesToModelTests(ImprovementsServicesTestBase):
         improvements_services.put_tasks([task_entry])
         task_entry_model = (
             improvements_models.TaskEntryModel.get_by_id(task_entry.task_id))
-        self.resolved_on = self.owner_id
+        task_entry.resolved_on = self.owner_id
 
         self.assertFalse(
             improvements_services.apply_changes_to_model(
