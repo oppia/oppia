@@ -48,10 +48,10 @@ workflows:
             - e2e_navigation_and_admin
       - e2e_users:
           requires:
-              - e2e_navigation_and_admin
+            - e2e_navigation_and_admin
       - e2e_accessibility_and_embedding:
           requires:
-              - e2e_navigation_and_admin
+            - e2e_navigation_and_admin
 
 var_for_docker_image: &docker_image circleci/python:2.7.17-browsers
 
@@ -70,8 +70,8 @@ commands:
             if [[ -n ${CIRCLE_PULL_REQUEST} ]]
             then
 
-              git config --global user.email $( git log --format='%ae' $CIRCLE_SHA1^! )
-              git config --global user.name $( git log --format='%an' $CIRCLE_SHA1^! )
+              git config --global user.email "$( git log --format='%ae' $CIRCLE_SHA1^! )"
+              git config --global user.name "$( git log --format='%an' $CIRCLE_SHA1^! )"
 
               regexp="[[:digit:]]\+$"
               PR_NUMBER=`echo $CIRCLE_PULL_REQUEST | grep -o $regexp`
@@ -314,6 +314,20 @@ jobs:
             files_changed=$(git diff --name-only HEAD...$TRAVIS_BRANCH)
             if [ "$files_changed" != "AUTHORS CHANGELOG CONTRIBUTORS core/templates/pages/about-page/about-page.constants.ts" ]; then
               python -m scripts.run_e2e_tests --skip-install --suite="fileUploadFeatures"
+            fi
+      - run:
+          name: Run e2e topics and skills dashboard test
+          command: |
+            files_changed=$(git diff --name-only HEAD...$TRAVIS_BRANCH)
+            if [ "$files_changed" != "AUTHORS CHANGELOG CONTRIBUTORS core/templates/pages/about-page/about-page.constants.ts" ]; then
+              python -m scripts.run_e2e_tests --skip-install --suite="topicsAndSkillsDashboard"
+            fi
+      - run:
+          name: Run e2e topics and story editor
+          command: |
+            files_changed=$(git diff --name-only HEAD...$TRAVIS_BRANCH)
+            if [ "$files_changed" != "AUTHORS CHANGELOG CONTRIBUTORS core/templates/pages/about-page/about-page.constants.ts" ]; then
+              python -m scripts.run_e2e_tests --skip-install --suite="topicAndStoryEditor"
             fi
       - persist_to_workspace:
           root: /home/circleci/
