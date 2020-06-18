@@ -128,7 +128,7 @@ class CyclicStateTransitionsTracker {
     const stateRegressionOccurrences = (
       this.stateRegressionOccurrences.entries());
     for (const [stateRegression, occurrences] of stateRegressionOccurrences) {
-      // When two state transitions have the same number of occurrences, we take
+      // When two state regressions have the same number of occurrences, we take
       // the most recent one (which would appear later in the map).
       if (occurrences >= mostCommonStateRegressionOccurrences) {
         mostCommonStateRegression = stateRegression;
