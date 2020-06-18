@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview End-to-end tests for the functionality of voiceover upload.
+ * @fileoverview End-to-end tests for the functionality of the voiceover player.
  */
 
 var forms = require('../protractor_utils/forms.js');
@@ -42,8 +42,7 @@ describe('Voiceover player', function() {
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
-    explorationEditorTranslationTab =
-      explorationEditorPage.getTranslationTab();
+    explorationEditorTranslationTab=explorationEditorPage.getTranslationTab();
     explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
     libraryPage = new LibraryPage.LibraryPage();
@@ -58,9 +57,12 @@ describe('Voiceover player', function() {
       'This is the first card.'));
     await explorationEditorMainTab.setInteraction('EndExploration');
     await explorationEditorPage.navigateToTranslationTab();
+    await explorationEditorTranslationTab.exitTutorial();
     await explorationEditorTranslationTab.uploadAudioFileForLanguage(
       'Hindi', '../data/cafe.mp3');
-    await explorationEditorPage.saveChanges();
+    await explorationEditorTranslationTab.uploadAudioFileForLanguage(
+      'Arabic', '../data/ambient-noise.mp3');
+    await explorationEditorPage.saveChanges('Added voiceovers');
     await explorationEditorPage.navigateToSettingsTab();
     await explorationEditorSettingsTab.setTitle('voiceoverPlayerTest');
     await explorationEditorSettingsTab.setCategory('Languages');
@@ -72,8 +74,11 @@ describe('Voiceover player', function() {
     await users.logout();
   });
 
-  it('should play and pause voiceovers', async function() {
+  beforeEach(async function(){
     await users.login('testVoiceovers@voiceovers.com');
+  });
+
+  it('should play and pause voiceovers', async function() {
     await libraryPage.get();
     await libraryPage.playExploration('voiceoverPlayerTest');
     await explorationPlayerPage.expandAudioBar();
@@ -84,12 +89,6 @@ describe('Voiceover player', function() {
   });
 
   it('should play voiceovers for multiple languages', async function() {
-    await creatorDashboardPage.get();
-    await creatorDashboardPage.editExploration('voiceoverPlayerTest');
-    await explorationEditorPage.navigateToTranslationTab();
-    await explorationEditorTranslationTab.uploadAudioFileForLanguage(
-      'Arabic', '../data/ambient-noise.mp3');
-    await explorationEditorPage.saveChanges('Added another voiceover');
     await libraryPage.get();
     await libraryPage.playExploration('voiceoverPlayerTest');
     await explorationPlayerPage.expandAudioBar();
@@ -101,4 +100,9 @@ describe('Voiceover player', function() {
     await explorationPlayerPage.pressPlayButton();
     await explorationPlayerPage.expectAudioToBePlaying();
   });
+
+  afterEach(async function(){
+    await users.logout();
+  });
+
 });

@@ -290,7 +290,6 @@ var ExplorationEditorTranslationTab = function() {
 
   this.uploadAudioFileForLanguage = async function(
       language, relativePathOfAudioToUpload) {
-    await this.exitTutorial();
     await this.changeLanguage(language);
     await this.openUploadAudioModal();
     await this.uploadAudio(relativePathOfAudioToUpload);
