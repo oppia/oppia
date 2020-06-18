@@ -55,8 +55,8 @@
         <div class="oppia-dashboard-language-container" ng-if="$ctrl.showLanguageSelector()">
           <span class="oppia-dashboard-language-container-label">Translate to</span>
           <translation-language-selector [options]="$ctrl.languageCodesAndDescriptions"
-                                       [value]="$ctrl.languageCode"
-                                       (set-value)="$ctrl.onChangeLanguage($event)">
+                                         [value]="$ctrl.languageCode"
+                                         (set-value)="$ctrl.onChangeLanguage($event)">
           </translation-language-selector>
         </div>
 
