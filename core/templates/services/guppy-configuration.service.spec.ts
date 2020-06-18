@@ -40,6 +40,7 @@ describe('GuppyConfigurationService', () => {
   });
 
   it('should configure guppy if service is not initialized', () => {
+    GuppyConfigurationService.serviceIsInitialized = false;
     guppyConfigurationService.init();
     expect(Guppy.remove_global_symbol).toHaveBeenCalled();
   });
