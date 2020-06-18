@@ -1996,7 +1996,7 @@ class DocstringCheckerTests(unittest.TestCase):
 
         with self.checker_test_object.assertAddsMessages(message):
             temp_file.close()
-    
+
     def test_no_four_space_indentation_in_args_docstring(self):
         no_indentation_in_args = astroid.scoped_nodes.Module(
             name='test',
@@ -2037,15 +2037,16 @@ class DocstringCheckerTests(unittest.TestCase):
                 u"""class ABC(arg):
                         \"\"\"This is a docstring.
                             Args:
-                                doseq: bool. If true, individual key=value pairs separated by '&' are
-                                        generated for each element of the value sequence for the key.
+                                doseq: bool. If true,
+                                individual key=value pairs.
                         \"\"\"
                         Something
                 """)
         no_eight_space_indentation_in_args.file = filename
         no_eight_space_indentation_in_args.path = filename
 
-        self.checker_test_object.checker.process_module(no_eight_space_indentation_in_args)
+        self.checker_test_object.checker.process_module(
+            no_eight_space_indentation_in_args)
 
         message = testutils.Message(
             msg_id='eight-space-indentation-in-docstring',
@@ -2058,17 +2059,18 @@ class DocstringCheckerTests(unittest.TestCase):
             tmp.write(
                 u"""class ABC(arg):
                         \"\"\"This is a docstring.
-                            Raises:
-                                doseq: bool. If true, individual key=value pairs separated by '&' are
-                                    generated for each element of the value sequence for the key.
-                                generated for each element of the value sequence for the key.
+                            Returns:
+                                (str). If true,
+                                    individual key=value pairs
+                                        comment comment comment.
                         \"\"\"
                         Something
                 """)
         message = testutils.Message(
             msg_id='eight-space-indentation-in-docstring',
             line=6)
-        self.checker_test_object.checker.process_module(no_eight_space_indentation_in_args)
+        self.checker_test_object.checker.process_module(
+            no_eight_space_indentation_in_args)
         with self.checker_test_object.assertAddsMessages(message):
             temp_file.close()
 
@@ -2120,73 +2122,69 @@ class DocstringCheckerTests(unittest.TestCase):
             temp_file.close()
 
     def test_well_formed_multi_line_description_docstring(self):
-            node_with_no_error_message = astroid.scoped_nodes.Module(
-                name='test',
-                doc='Custom test')
-            temp_file = tempfile.NamedTemporaryFile()
-            filename = temp_file.name
+        node_with_no_error_message = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
 
-            #Test 1
-            with python_utils.open_file(filename, 'w') as tmp:
-                tmp.write(
-                    u"""class ABC(arg):
-                            \"\"\"This is a docstring.
-                                Args:
-                                    query: dict or tuple. The query to be encoded.
-                                    doseq: bool. If true, individual key=value pairs separated by '&' are
-                                        generated for each element of the value sequence for the key.
-                            \"\"\"
-                            Something
-                    """)
-            node_with_no_error_message.file = filename
-            node_with_no_error_message.path = filename
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""class ABC(arg):
+                        \"\"\"This is a docstring.
+                            Args:
+                                query: dict or tuple. The query to be encoded.
+                                doseq: bool. If true, individual key=value
+                                    pairs separated by '&' are
+                                    generated for each element of the value
+                                    sequence for the key.
+                        \"\"\"
+                        Something
+                """)
+        node_with_no_error_message.file = filename
+        node_with_no_error_message.path = filename
 
-            self.checker_test_object.checker.process_module(
-                node_with_no_error_message)
+        with self.checker_test_object.assertNoMessages():
+            temp_file.close()
 
-            with self.checker_test_object.assertNoMessages():
-                temp_file.close()
-            
-            #Test 2
-            with python_utils.open_file(filename, 'w') as tmp:
-                tmp.write(
-                    u"""class ABC(arg):
-                            \"\"\"This is a docstring.
-                                Raises:
-                                    doseq: bool. If true, individual key=value pairs separated by '&' are
-                                        generated for each element of the value sequence 
-                                        for the key temp temp temp temp.
-                                    query: dict or tuple. The query to be encoded.
-                            \"\"\"
-                            Something
-                    """)
-            message = testutils.Message(
-                msg_id='eight-space-indentation-in-docstring',
-                line=6)
-            self.checker_test_object.checker.process_module(node_with_no_error_message)
-            with self.checker_test_object.assertNoMessages():
-                    temp_file.close()
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""class ABC(arg):
+                        \"\"\"This is a docstring.
+                            Raises:
+                                doseq: bool. If true, individual
+                                    key=value pairs separated by '&' are
+                                    generated for each element of
+                                    the value sequence for the key
+                                    temp temp temp temp.
+                                query: dict or tuple. The query to be encoded.
+                        \"\"\"
+                        Something
+                """)
+        self.checker_test_object.checker.process_module(
+            node_with_no_error_message)
+        with self.checker_test_object.assertNoMessages():
+            temp_file.close()
 
-            #Test 3
-            with python_utils.open_file(filename, 'w') as tmp:
-                tmp.write(
-                    u"""class ABC(arg):
-                            \"\"\"This is a docstring.
-                                Return:
-                                    str. The string parsed using Jinja templating. Returns an error string
-                                        in case of error in parsing.
-                                Yields:
-                                    tuple. For ExplorationStatsModel, a 2-tuple of the form
-                                        (exp_id, value) where value is of the form.
-                            \"\"\"
-                            Something
-                    """)
-            message = testutils.Message(
-                msg_id='eight-space-indentation-in-docstring',
-                line=6)
-            self.checker_test_object.checker.process_module(node_with_no_error_message)
-            with self.checker_test_object.assertNoMessages():
-                    temp_file.close()
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""class ABC(arg):
+                        \"\"\"This is a docstring.
+                            Returns:
+                                str. The string parsed using
+                                    Jinja templating. Returns an error
+                                    string in case of error in parsing.
+                            Yields:
+                                tuple. For ExplorationStatsModel,
+                                    a 2-tuple of the form (exp_id, value)
+                                    where value is of the form.
+                        \"\"\"
+                        Something
+                """)
+        self.checker_test_object.checker.process_module(
+            node_with_no_error_message)
+        with self.checker_test_object.assertNoMessages():
+            temp_file.close()
 
 
 class BlankLineBelowFileOverviewCheckerTests(unittest.TestCase):
