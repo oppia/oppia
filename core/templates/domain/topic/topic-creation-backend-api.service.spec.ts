@@ -22,6 +22,7 @@ import { HttpClientTestingModule, HttpTestingController }
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { CsrfTokenService } from 'services/csrf-token.service';
+import { IImageData } from 'domain/skill/skill-creation-backend-api.service';
 import { NewlyCreatedTopic, NewlyCreatedTopicObjectFactory } from
   'domain/topics_and_skills_dashboard/NewlyCreatedTopicObjectFactory';
 import { TopicCreationBackendApiService, ITopicCreationBackend } from
@@ -33,9 +34,13 @@ describe('Topic creation backend api service', () => {
   let topicCreationBackendApiService: TopicCreationBackendApiService = null;
   let newlyCreatedTopicObjectFactory: NewlyCreatedTopicObjectFactory = null;
   let topic: NewlyCreatedTopic = null;
+  let imagesData: IImageData[] = null;
+  const thumbnailBgColor = '#e3e3e3';
   let postData: ITopicCreationBackend = {
     name: 'topic-name',
-    description: 'Description'
+    description: 'Description',
+    thumbnailBgColor: thumbnailBgColor,
+    filename: 'image.svg',
   };
 
   beforeEach(() => {
@@ -53,6 +58,12 @@ describe('Topic creation backend api service', () => {
     topic = newlyCreatedTopicObjectFactory.createDefault();
     topic.name = 'topic-name';
     topic.description = 'Description';
+    let imageBlob = new Blob(
+      ['data:image/png;base64,xyz']);
+    imagesData = [{
+      filename: 'image.svg',
+      imageBlob: imageBlob
+    }];
     spyOn(csrfService, 'getTokenAsync').and.returnValue(() => {
       return new Promise((resolve) => {
         resolve('sample-csrf-token');
@@ -68,12 +79,18 @@ describe('Topic creation backend api service', () => {
     fakeAsync(() => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
-      topicCreationBackendApiService.createTopic(topic).then(
+      topicCreationBackendApiService.createTopic(
+        topic, imagesData, thumbnailBgColor).then(
         successHandler);
       let req = httpTestingController.expectOne(
         '/topic_editor_handler/create_new');
       expect(req.request.method).toEqual('POST');
-      expect(req.request.body).toEqual(postData);
+
+      expect(req.request.body.get('payload')).toEqual(JSON.stringify(postData));
+      let sampleFormData = new FormData();
+      sampleFormData.append('image', imagesData[0].imageBlob);
+      expect(
+        req.request.body.get('image')).toEqual(sampleFormData.get('image'));
       req.flush(postData);
       flushMicrotasks();
       expect(successHandler).toHaveBeenCalled();
@@ -84,7 +101,8 @@ describe('Topic creation backend api service', () => {
     fakeAsync(() => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
-      topicCreationBackendApiService.createTopic(topic).then(
+      topicCreationBackendApiService.createTopic(
+        topic, imagesData, thumbnailBgColor).then(
         successHandler, failHandler);
       const errorResponse = new HttpErrorResponse({
         error: 'test 404 error',
@@ -95,7 +113,11 @@ describe('Topic creation backend api service', () => {
         '/topic_editor_handler/create_new');
       req.error(new ErrorEvent('Error'), errorResponse);
       expect(req.request.method).toEqual('POST');
-      expect(req.request.body).toEqual(postData);
+      expect(req.request.body.get('payload')).toEqual(JSON.stringify(postData));
+      let sampleFormData = new FormData();
+      sampleFormData.append('image', imagesData[0].imageBlob);
+      expect(
+        req.request.body.get('image')).toEqual(sampleFormData.get('image'));
       flushMicrotasks();
       expect(failHandler).toHaveBeenCalled();
       expect(successHandler).not.toHaveBeenCalled();

@@ -254,6 +254,14 @@ jobs:
           command: |
             python -m scripts.run_e2e_tests --skip-install --suite="fileUploadFeatures"
       - run:
+          name: Run e2e topics and skills dashboard test
+          command: |
+            python -m scripts.run_e2e_tests --skip-install --suite="topicsAndSkillsDashboard"
+      - run:
+          name: Run e2e topics and story editor
+          command: |
+            python -m scripts.run_e2e_tests --skip-install --suite="topicAndStoryEditor"
+      - run:
           name: Run e2e classroom page test
           command: |
             python -m scripts.run_e2e_tests --skip-install --skip-build --suite="classroomPageFileUploadFeatures"
