@@ -304,10 +304,9 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                     if value[1] in html_types:
                         input_variables.append(value[0])
 
-                # We need to iterate through through the html_types for
-                # each rule_type, because only after visiting each rule_type
-                # the inner dict structure for each html_type gets generated
-                # completely.
+                # We need to iterate through the html_types for each rule_type,
+                # because only after visiting each rule_type the inner dict
+                # structure for each html_type gets generated.
                 for html_type in html_types:
                     if html_type in description:
                         html_type_dict = (
