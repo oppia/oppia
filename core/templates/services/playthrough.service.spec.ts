@@ -79,7 +79,7 @@ describe('PlaythroughService', () => {
         reset: null,
       });
       spyOn(stopwatchObjectFactory, 'create').and.returnValue(mockStopwatch);
-    }
+    };
   });
 
   describe('Recording playthroughs', () => {
@@ -298,26 +298,26 @@ describe('PlaythroughService', () => {
 
       it('should return most recent cycle when there are multiple with same ' +
         'occurrences', () => {
-          playthroughService.recordExplorationStartAction('A');
-          this.recordCycle('AB', 3); this.recordStateTransitions('AC');
-          this.recordCycle('CD', 3); this.recordStateTransitions('CE');
-          this.recordCycle('EF', 3); this.recordStateTransitions('EG');
-          this.recordCycle('GH', 3); this.recordStateTransitions('GI');
-          this.recordCycle('IJ', 3); this.recordStateTransitions('IK');
-          this.recordCycle('KL', 3); this.recordStateTransitions('KM');
-          this.recordCycle('MN', 3); this.recordStateTransitions('MO');
-          this.recordCycle('OP', 3); this.recordStateTransitions('OQ');
-          this.recordCycle('QR', 3); this.recordStateTransitions('QS');
-          this.recordCycle('ST', 3); this.recordStateTransitions('SU');
-          playthroughService.recordExplorationQuitAction('U', 30);
+        playthroughService.recordExplorationStartAction('A');
+        this.recordCycle('AB', 3); this.recordStateTransitions('AC');
+        this.recordCycle('CD', 3); this.recordStateTransitions('CE');
+        this.recordCycle('EF', 3); this.recordStateTransitions('EG');
+        this.recordCycle('GH', 3); this.recordStateTransitions('GI');
+        this.recordCycle('IJ', 3); this.recordStateTransitions('IK');
+        this.recordCycle('KL', 3); this.recordStateTransitions('KM');
+        this.recordCycle('MN', 3); this.recordStateTransitions('MO');
+        this.recordCycle('OP', 3); this.recordStateTransitions('OQ');
+        this.recordCycle('QR', 3); this.recordStateTransitions('QS');
+        this.recordCycle('ST', 3); this.recordStateTransitions('SU');
+        playthroughService.recordExplorationQuitAction('U', 30);
 
-          const playthrough = playthroughService.getPlaythrough();
-          expect(playthrough).not.toBeNull();
-          expect(playthrough.issueType).toEqual('CyclicStateTransitions');
-          expect(playthrough.issueCustomizationArgs).toEqual({
-            state_names: {value: ['T', 'S']},
-          });
+        const playthrough = playthroughService.getPlaythrough();
+        expect(playthrough).not.toBeNull();
+        expect(playthrough.issueType).toEqual('CyclicStateTransitions');
+        expect(playthrough.issueCustomizationArgs).toEqual({
+          state_names: {value: ['T', 'S']},
         });
+      });
 
       it('should identify outer-cycle when there are nested cycles', () => {
         playthroughService.recordExplorationStartAction('A');
@@ -360,14 +360,14 @@ describe('PlaythroughService', () => {
 
       it('should prioritize cyclic state transitions issue types over early ' +
         'quit', () => {
-          this.mockExplorationTimer(50);
-          playthroughService.recordExplorationStartAction('A');
-          this.recordCycle('AB', 3);
-          playthroughService.recordExplorationQuitAction('A', 10);
+        this.mockExplorationTimer(50);
+        playthroughService.recordExplorationStartAction('A');
+        this.recordCycle('AB', 3);
+        playthroughService.recordExplorationQuitAction('A', 10);
 
-          expect(playthroughService.getPlaythrough().issueType)
-            .toEqual('CyclicStateTransitions');
-        });
+        expect(playthroughService.getPlaythrough().issueType)
+          .toEqual('CyclicStateTransitions');
+      });
     });
 
     describe('Identifying learners who are just browsing', () => {
