@@ -138,6 +138,7 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
                 if (ctrl.topicSummaries.length === 0 &&
                     ctrl.untriagedSkillSummaries.length !== 0) {
                   ctrl.activeTab = ctrl.TAB_NAME_SKILLS;
+                  ctrl.initSkillDashboard();
                 }
                 ctrl.classrooms = response.all_classroom_names;
                 // Adding this since karma tests adds

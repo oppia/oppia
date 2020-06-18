@@ -168,15 +168,15 @@ class SkillsDashboardPageDataHandler(base.BaseHandler):
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_access_topics_and_skills_dashboard
-    def get(self):
-        """Handles GET requests."""
+    def post(self):
+        """Handles POST requests."""
 
-        classroom_name = self.request.get('classroomName')
-        items_per_page = int(self.request.get('itemsPerPage'))
-        keywords = self.request.get('keywords')
-        page_number = int(self.request.get('pageNumber'))
-        sort_by = self.request.get('sort')
-        status = self.request.get('status')
+        classroom_name = self.payload.get('classroomName')
+        items_per_page = int(self.payload.get('itemsPerPage'))
+        keywords = self.payload.get('keywords')
+        page_number = int(self.payload.get('pageNumber'))
+        sort_by = self.payload.get('sort')
+        status = self.payload.get('status')
 
         skill_summary_dicts = skill_services.get_filtered_skill_dicts(
             status, classroom_name, keywords, sort_by)

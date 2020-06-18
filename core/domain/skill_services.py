@@ -382,12 +382,15 @@ def filter_skills_by_keywords(skill_summary_dicts, keywords):
     Returns:
         bool(dict). The list of skill summary dicts matching the given status.
     """
-
     if not keywords:
         return skill_summary_dicts
 
-    return [(lambda skill_summary: is_keyword_present_in_skill(
-        skill_summary, keywords), skill_summary_dicts)]
+    filtered_skill_summary_dicts = []
+    for skill_summary in skill_summary_dicts:
+        if is_keyword_present_in_skill(skill_summary, keywords):
+            filtered_skill_summary_dicts.append(skill_summary)
+
+    return filtered_skill_summary_dicts
 
 
 def get_multi_skill_summaries(skill_ids):

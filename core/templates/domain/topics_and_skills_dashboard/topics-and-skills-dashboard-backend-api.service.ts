@@ -87,16 +87,14 @@ export class TopicsAndSkillsDashboardBackendApiService {
   fetchSkillsDashboardData(
       filter: TopicsAndSkillsDashboardFilter,
       pageNumber, itemsPerPage): Promise<ISkillsDashboardDataBackendDict> {
-    return this.http.get<ISkillsDashboardDataBackendDict>(
+    return this.http.post<ISkillsDashboardDataBackendDict>(
       TopicsAndSkillsDashboardDomainConstants.SKILL_DASHBOARD_DATA_URL, {
-        params: {
-          classroomName: filter.classroom,
-          status: filter.status,
-          sort: filter.sort,
-          keywords: filter.keywords,
-          pageNumber,
-          itemsPerPage,
-        }
+        classroomName: filter.classroom,
+        status: filter.status,
+        sort: filter.sort,
+        keywords: filter.keywords,
+        pageNumber,
+        itemsPerPage,
       }).toPromise();
   }
 

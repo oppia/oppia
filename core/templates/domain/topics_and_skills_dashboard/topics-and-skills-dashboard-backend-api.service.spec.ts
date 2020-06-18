@@ -83,7 +83,7 @@ describe('Topics and Skills Dashboard backend API service', () => {
           null, 0, 10).then(
           successHandler, failHandler);
         let req = httpTestingController.expectOne(SKILLS_DASHBOARD_DATA_URL);
-        expect(req.request.method).toEqual('GET');
+        expect(req.request.method).toEqual('POST');
         req.flush({});
         expect(successHandler).not.toHaveBeenCalled();
         expect(failHandler).toHaveBeenCalled();
@@ -91,7 +91,7 @@ describe('Topics and Skills Dashboard backend API service', () => {
     );
 
 
-    it('should use rejection handler if dashboard data backend request failed',
+    it('should use fail handler if skills dashboard data failed',
       fakeAsync(() => {
         let successHandler = jasmine.createSpy('success');
         let failHandler = jasmine.createSpy('fail');
@@ -100,7 +100,7 @@ describe('Topics and Skills Dashboard backend API service', () => {
           successHandler, failHandler);
         let req = httpTestingController.expectOne(
           SKILLS_DASHBOARD_DATA_URL, 'Error Loading dashboard data.');
-        expect(req.request.method).toEqual('GET');
+        expect(req.request.method).toEqual('POST');
         req.flush('Error loading skills data.', {
           status: 500
         });
