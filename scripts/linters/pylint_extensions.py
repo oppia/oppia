@@ -801,7 +801,7 @@ class FunctionArgsOrderChecker(checkers.BaseChecker):
         function arguments order. It then adds a message accordingly.
 
         Args:
-         node: astroid.scoped_nodes.Function. Node for a function or method
+            node: astroid.scoped_nodes.Function. Node for a function or method
                 definition in the AST.
         """
 
@@ -832,8 +832,8 @@ class RestrictedImportChecker(checkers.BaseChecker):
         """Visits every import statement in the file.
 
         Args:
-         node: astroid.node_classes.Import. Node for a import statement
-                 in the AST.
+            node: astroid.node_classes.Import. Node for a import statement
+                in the AST.
         """
 
         modnode = node.root()
@@ -1327,16 +1327,15 @@ class DocstringChecker(checkers.BaseChecker):
         'C0026': (
             '4 space indentation in docstring.',
             'four-space-indentation-in-docstring',
-            ('Please use 4 space indentation in all args, returns, ' + 
-            'raises in docstring')
+            ('Please use 4 space indentation in all args, returns, ' +
+             'raises in docstring')
         ),
         'C0027': (
             '8 space indentation in docstring.',
             'eight-space-indentation-in-docstring',
             ('Please use 8 space indentation in wrap around messages' +
-            'for args, returns and raises')
+             'for args, returns and raises')
         )
-        
     }
 
     def process_module(self, node):
@@ -1354,7 +1353,7 @@ class DocstringChecker(checkers.BaseChecker):
         is_docstring_raise = False
         is_docstring_yield = False
         is_class_or_function = False
-        outerIndentationInSpaces = 0
+        outer_indentation_in_spaces = 0
         file_content = read_from_node(node)
         file_length = len(file_content)
 
@@ -1378,12 +1377,20 @@ class DocstringChecker(checkers.BaseChecker):
             if re.search(br'^""".+$', line) and is_docstring and (
                     line[3] == b' '):
                 is_docstring = False
+                is_docstring_arg = False
+                is_docstring_return = False
+                is_docstring_raise = False
+                is_docstring_yield = False
                 self.add_message(
                     'space-after-triple-quote', line=line_num + 1)
 
             # Check if single line docstring span two lines.
             if line == b'"""' and prev_line.startswith(b'"""') and is_docstring:
                 is_docstring = False
+                is_docstring_arg = False
+                is_docstring_return = False
+                is_docstring_raise = False
+                is_docstring_yield = False
                 self.add_message(
                     'single-line-docstring-span-two-lines', line=line_num + 1)
 
@@ -1396,6 +1403,10 @@ class DocstringChecker(checkers.BaseChecker):
                     self.add_message(
                         'no-period-used', line=line_num + 1)
                 is_docstring = False
+                is_docstring_arg = False
+                is_docstring_return = False
+                is_docstring_raise = False
+                is_docstring_yield = False
 
             # Check for mutliline docstring.
             elif line.endswith(b'"""') and is_docstring:
@@ -1422,66 +1433,70 @@ class DocstringChecker(checkers.BaseChecker):
                     self.add_message(
                         'no-newline-used-at-end', line=line_num + 1)
                 is_docstring = False
+                is_docstring_arg = False
+                is_docstring_return = False
+                is_docstring_raise = False
+                is_docstring_yield = False
             elif is_docstring:
-                currentIndentation = len(line_with_spaces) - len(line_with_spaces.lstrip())
-                if line.startswith("Args:"):
+                current_indentation = (len(line_with_spaces) -
+                                       len(line_with_spaces.lstrip()))
+                if line.startswith('Args:'):
                     is_docstring_arg = True
                     is_docstring_return = False
                     is_docstring_raise = False
                     is_docstring_yield = False
-                    outerIndentationInSpaces = currentIndentation
+                    outer_indentation_in_spaces = current_indentation
                     #process
-                elif line.startswith("Return:"):
+                elif line.startswith('Returns:'):
                     is_docstring_arg = False
                     is_docstring_return = True
                     is_docstring_raise = False
                     is_docstring_yield = False
-                    outerIndentationInSpaces = currentIndentation
+                    outer_indentation_in_spaces = current_indentation
                     #process
-                elif line.startswith("Raises:"):
+                elif line.startswith('Raises:'):
                     is_docstring_arg = False
                     is_docstring_return = False
                     is_docstring_raise = True
                     is_docstring_yield = False
-                    outerIndentationInSpaces = currentIndentation
-                elif line.startswith("Yields:"):
+                    outer_indentation_in_spaces = current_indentation
+                elif line.startswith('Yields:'):
                     is_docstring_arg = False
                     is_docstring_return = False
                     is_docstring_raise = False
                     is_docstring_yield = True
-                    outerIndentationInSpaces = currentIndentation
+                    outer_indentation_in_spaces = current_indentation
                 elif len(line) == 0:
                     continue
-                elif (is_docstring_arg or is_docstring_raise):
-                    if(re.search(br'^[a-z_]+[a-zA-Z0-9_]*:', line_with_spaces.lstrip())):
-                        if(currentIndentation!=outerIndentationInSpaces+4):
-                            # print("arg or raise line")
-                            # print(line)
-                            # print("currentIndentation: "+ str(currentIndentation))
-                            # print("outerIndentation: "+ str(outerIndentationInSpaces))
-                            self.add_message('four-space-indentation-in-docstring', line=line_num+1)
+                elif is_docstring_arg or is_docstring_raise:
+                    if re.search(br'^[a-z_]+[a-zA-Z0-9_]*:',
+                                 line_with_spaces.lstrip()):
+                        if current_indentation != (
+                                outer_indentation_in_spaces + 4):
+                            self.add_message(
+                                'four-space-indentation-in-docstring',
+                                line=line_num + 1)
                     else:
-                        if(currentIndentation!=outerIndentationInSpaces+8):
-                            # print("arg or raise content")
-                            # print(line_with_spaces)
-                            # print("currentIndentation: "+ str(currentIndentation))
-                            # print("outerIndentation: "+str(outerIndentationInSpaces))
-                            self.add_message('eight-space-indentation-in-docstring', line=line_num+1)
-                elif (is_docstring_return or is_docstring_yield):
-                    if(re.search(br'^[a-z_]+[a-zA-Z_]*\.', line_with_spaces.lstrip())):
-                        if(currentIndentation!=outerIndentationInSpaces+4):
-                            # print("arg or raise line")
-                            # print(line)
-                            # print("currentIndentation: "+ str(currentIndentation))
-                            # print("outerIndentation: "+ str(outerIndentationInSpaces))
-                            self.add_message('four-space-indentation-in-docstring', line=line_num+1)
+                        if current_indentation != (
+                                outer_indentation_in_spaces + 8):
+                            self.add_message(
+                                'eight-space-indentation-in-docstring',
+                                line=line_num + 1)
+                elif is_docstring_return or is_docstring_yield:
+                    if re.search(br'^[a-z_()]+[a-zA-Z_()]*\.',
+                                 line_with_spaces.lstrip()):
+                        if current_indentation != (
+                                outer_indentation_in_spaces + 4):
+                            self.add_message(
+                                'four-space-indentation-in-docstring',
+                                line=line_num + 1)
                     else:
-                        if(currentIndentation!=outerIndentationInSpaces+8):
-                            # print("arg or raise content")
-                            # print(line_with_spaces)
-                            # print("currentIndentation: "+ str(currentIndentation))
-                            # print("outerIndentation: "+str(outerIndentationInSpaces))
-                            self.add_message('eight-space-indentation-in-docstring', line=line_num+1)
+                        if current_indentation != (
+                                outer_indentation_in_spaces + 8):
+                            self.add_message(
+                                'eight-space-indentation-in-docstring',
+                                line=line_num + 1)
+
 
 class BlankLineBelowFileOverviewChecker(checkers.BaseChecker):
     """Checks if there is a single empty line below the fileoverview docstring.
