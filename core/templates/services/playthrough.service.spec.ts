@@ -347,16 +347,26 @@ describe('PlaythroughService', () => {
       it('should return most recent cycle when there are many with same ' +
         'number of occurrences', () => {
         playthroughService.recordExplorationStartAction('A');
-        this.recordCycle(['A', 'B'], 3); this.recordStateTransitions(['A', 'C']);
-        this.recordCycle(['C', 'D'], 3); this.recordStateTransitions(['C', 'E']);
-        this.recordCycle(['E', 'F'], 3); this.recordStateTransitions(['E', 'G']);
-        this.recordCycle(['G', 'H'], 3); this.recordStateTransitions(['G', 'I']);
-        this.recordCycle(['I', 'J'], 3); this.recordStateTransitions(['I', 'K']);
-        this.recordCycle(['K', 'L'], 3); this.recordStateTransitions(['K', 'M']);
-        this.recordCycle(['M', 'N'], 3); this.recordStateTransitions(['M', 'O']);
-        this.recordCycle(['O', 'P'], 3); this.recordStateTransitions(['O', 'Q']);
-        this.recordCycle(['Q', 'R'], 3); this.recordStateTransitions(['Q', 'S']);
-        this.recordCycle(['S', 'T'], 3); this.recordStateTransitions(['S', 'U']);
+        this.recordCycle(['A', 'B'], 3);
+        this.recordStateTransitions(['A', 'C']);
+        this.recordCycle(['C', 'D'], 3);
+        this.recordStateTransitions(['C', 'E']);
+        this.recordCycle(['E', 'F'], 3);
+        this.recordStateTransitions(['E', 'G']);
+        this.recordCycle(['G', 'H'], 3);
+        this.recordStateTransitions(['G', 'I']);
+        this.recordCycle(['I', 'J'], 3);
+        this.recordStateTransitions(['I', 'K']);
+        this.recordCycle(['K', 'L'], 3);
+        this.recordStateTransitions(['K', 'M']);
+        this.recordCycle(['M', 'N'], 3);
+        this.recordStateTransitions(['M', 'O']);
+        this.recordCycle(['O', 'P'], 3);
+        this.recordStateTransitions(['O', 'Q']);
+        this.recordCycle(['Q', 'R'], 3);
+        this.recordStateTransitions(['Q', 'S']);
+        this.recordCycle(['S', 'T'], 3);
+        this.recordStateTransitions(['S', 'U']);
         playthroughService.recordExplorationQuitAction('U', 30);
 
         const playthrough = playthroughService.getPlaythrough();
