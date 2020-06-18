@@ -42,7 +42,8 @@ describe('Voiceover player', function() {
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
-    explorationEditorTranslationTab=explorationEditorPage.getTranslationTab();
+    explorationEditorTranslationTab = (
+      explorationEditorPage.getTranslationTab());
     explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
     libraryPage = new LibraryPage.LibraryPage();
@@ -74,7 +75,7 @@ describe('Voiceover player', function() {
     await users.logout();
   });
 
-  beforeEach(async function(){
+  beforeEach(async function() {
     await users.login('testVoiceovers@voiceovers.com');
   });
 
@@ -101,8 +102,7 @@ describe('Voiceover player', function() {
     await explorationPlayerPage.expectAudioToBePlaying();
   });
 
-  afterEach(async function(){
+  afterEach(async function() {
     await users.logout();
   });
-
 });
