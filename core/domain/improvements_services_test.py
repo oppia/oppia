@@ -88,11 +88,17 @@ class ImprovementsServicesTestBase(test_utils.GenericTestBase):
         Returns:
             improvements_domain.TaskEntry.
         """
-        task_entry = self._new_obsolete_task(
-            state_name=state_name, task_type=task_type,
-            exploration_version=exploration_version)
-        task_entry.open()
-        return task_entry
+        return improvements_domain.TaskEntry(
+            entity_type=improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
+            entity_id=self.EXP_ID,
+            entity_version=exploration_version,
+            task_type=task_type,
+            target_type=improvements_models.TASK_TARGET_TYPE_STATE,
+            target_id=state_name,
+            issue_description='issue description',
+            status=improvements_models.TASK_STATUS_OPEN,
+            resolver_id=None,
+            resolved_on=None)
 
     def _new_resolved_task(
             self, state_name=feconf.DEFAULT_INIT_STATE_NAME,
@@ -109,12 +115,17 @@ class ImprovementsServicesTestBase(test_utils.GenericTestBase):
         Returns:
             improvements_domain.TaskEntry.
         """
-        task_entry = self._new_obsolete_task(
-            state_name=state_name, task_type=task_type,
-            exploration_version=exploration_version)
-        with self.mock_datetime_utcnow(self.MOCK_DATE):
-            task_entry.resolve(self.owner_id)
-        return task_entry
+        return improvements_domain.TaskEntry(
+            entity_type=improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
+            entity_id=self.EXP_ID,
+            entity_version=exploration_version,
+            task_type=task_type,
+            target_type=improvements_models.TASK_TARGET_TYPE_STATE,
+            target_id=state_name,
+            issue_description='issue description',
+            status=improvements_models.TASK_STATUS_RESOLVED,
+            resolver_id=self.owner_id,
+            resolved_on=self.MOCK_DATE)
 
 
 class GetTaskEntryFromModelTests(ImprovementsServicesTestBase):
@@ -295,14 +306,14 @@ class FetchTaskHistoryPageTests(ImprovementsServicesTestBase):
 
     def setUp(self):
         super(FetchTaskHistoryPageTests, self).setUp()
-        timedelta = datetime.timedelta(minutes=5)
+        task_entries = []
         for i in python_utils.RANGE(1, 26):
-            task_entry = self._new_obsolete_task(
+            task_entry = self._new_resolved_task(
                 state_name='State %d' % (i,), exploration_version=i)
-            with self.mock_datetime_utcnow(self.MOCK_DATE + (timedelta * i)):
-                task_entry.resolve(self.owner_id)
-                improvements_services.put_tasks([task_entry])
-
+            task_entry.resolved_on = (
+                self.MOCK_DATE + datetime.timedelta(minutes=5 * i))
+            task_entries.append(task_entry)
+        improvements_services.put_tasks(task_entries)
 
     def test_fetch_returns_first_page_of_history(self):
         results, cursor, more = (
@@ -396,8 +407,7 @@ class PutTasksTests(ImprovementsServicesTestBase):
         self.assertEqual(model.created_on, created_on)
         self.assertEqual(model.last_updated, created_on)
 
-        with self.mock_datetime_utcnow(self.MOCK_DATE):
-            task_entry.resolve(self.owner_id)
+        task_entry = self._new_resolved_task()
 
         with self.mock_datetime_utcnow(updated_on):
             improvements_services.put_tasks([task_entry])
@@ -441,8 +451,7 @@ class PutTasksTests(ImprovementsServicesTestBase):
         self.assertEqual(model.created_on, created_on)
         self.assertEqual(model.last_updated, created_on)
 
-        with self.mock_datetime_utcnow(self.MOCK_DATE):
-            task_entry.resolve(self.owner_id)
+        task_entry = self._new_resolved_task()
 
         with self.mock_datetime_utcnow(updated_on):
             improvements_services.put_tasks(
@@ -497,8 +506,7 @@ class ApplyChangesToModelTests(ImprovementsServicesTestBase):
         improvements_services.put_tasks([task_entry])
         task_entry_model = (
             improvements_models.TaskEntryModel.get_by_id(task_entry.task_id))
-        with self.mock_datetime_utcnow(self.MOCK_DATE):
-            task_entry.resolve(self.owner_id)
+        task_entry = self._new_resolved_task()
 
         self.assertTrue(
             improvements_services.apply_changes_to_model(
