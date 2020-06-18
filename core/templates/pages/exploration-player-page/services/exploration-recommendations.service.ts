@@ -58,7 +58,7 @@ export class ExplorationRecommendationsService {
     let collectionId = this.urlService.getCollectionIdFromExplorationUrl();
     let storyId = this.urlService.getUrlParams().story_id;
     let currentNodeId = this.urlService.getUrlParams().node_id;
-    let explorationId = this.contextService.getExplorationId();
+    this.explorationId = this.contextService.getExplorationId();
 
     let includeSystemRecommendations = 'false';
 
@@ -70,7 +70,7 @@ export class ExplorationRecommendationsService {
 
     this.expRecommendationBackendApiService.getRecommendedSummaryDicts(
       authorRecommendedExpIds, includeSystemRecommendations, collectionId,
-      storyId, currentNodeId, explorationId).then(expSummaries => {
+      storyId, currentNodeId, this.explorationId).then(expSummaries => {
       successCallback(expSummaries);
     });
   }
