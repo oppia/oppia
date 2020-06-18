@@ -20,17 +20,16 @@
 // may be additional customization options for the editor that should be passed
 // in via initArgs.
 
+require('services/guppy-configuration.service.ts');
+
 angular.module('oppia').component('mathEditor', {
   bindings: {
     value: '='
   },
   template: require('./math-editor.component.html'),
-  controller: ['$scope', function($scope) {
+  controller: ['$scope', 'GuppyConfigurationService', function(
+    $scope, GuppyConfigurationService) {
     const ctrl = this;
-    const SYMBOLS_TO_REMOVE = [
-      'norm', 'utf8', 'text', 'sym_name', 'eval', 'floor', 'factorial', 'sub',
-      'int', 'defi', 'deriv', 'sum', 'prod', 'root', 'vec', 'point',
-      'infinity', 'leq', 'less', 'geq', 'greater', 'neq'];
 
     ctrl.initializeGuppy = function() {
       var guppyDivs = document.querySelectorAll('.guppy-div');
@@ -43,8 +42,8 @@ angular.module('oppia').component('mathEditor', {
         guppyInstance = new Guppy(divId, {});
         guppyInstance.event('change', (e) => {
           ctrl.value = guppyInstance.asciimath();
-          // Need to manually trigger the digest cycle
-          // to make any 'watchers' aware of changes in ctrl.value.
+          // Need to manually trigger the digest cycle to make any 'watchers'
+          // aware of changes in ctrl.value.
           $scope.$apply();
         });
         guppyInstance.configure('buttons', ['controls']);
@@ -52,16 +51,12 @@ angular.module('oppia').component('mathEditor', {
           'empty_content',
           '\\color{grey}{\\text{\\small{Type a formula here.}}}');
       }
-    };
+    }
 
     ctrl.$onInit = function() {
       ctrl.alwaysEditable = true;
       ctrl.initializeGuppy();
-
-      // Remove symbols since they are not supported.
-      for (var symbol of SYMBOLS_TO_REMOVE) {
-        Guppy.remove_global_symbol(symbol);
-      }
+      GuppyConfigurationService.init();
     };
   }]
 });

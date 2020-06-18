@@ -29,10 +29,15 @@ describe('MathEditor', function() {
     }
     render(): void {}
     configure(name: string, val: Object): void {}
-    static 'remove_global_symbol'(symbol: string): void {}
+  }
+  class mockGuppyConfigurationService {
+    static init(): void {}
   }
 
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('GuppyConfigurationService', mockGuppyConfigurationService);
+  }));
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     $window = $injector.get('$window');
     MathEditorCtrl = $componentController('mathEditor');
