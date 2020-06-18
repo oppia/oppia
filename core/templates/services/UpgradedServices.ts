@@ -441,6 +441,8 @@ import { StateTopAnswersStatsBackendApiService } from
 import { StateWrittenTranslationsService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-written-translations.service';
+import { StatsReportingBackendApiService } from
+  'domain/exploration/stats-reporting-backend-api.service';
 import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
 import { StatsReportingService } from
   'pages/exploration-player-page/services/stats-reporting.service';
@@ -506,6 +508,8 @@ import { TopicsAndSkillsDashboardPageService } from
   'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.service';
 import { TopicViewerBackendApiService } from
   'domain/topic_viewer/topic-viewer-backend-api.service';
+import { TranslationsBackendApiService } from
+  'services/translations-backend-api.service';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
@@ -1174,6 +1178,11 @@ export class UpgradedServices {
       new StateTopAnswersStatsBackendApiService(
         upgradedServices['UrlInterpolationService'],
         upgradedServices['HttpClient']);
+    upgradedServices['StatsReportingBackendApiService'] =
+      new StatsReportingBackendApiService(
+        upgradedServices['ContextService'],
+        upgradedServices['HttpClient'],
+        upgradedServices['UrlInterpolationService']);
     upgradedServices['StoryViewerBackendApiService'] =
       new StoryViewerBackendApiService(
         upgradedServices['UrlInterpolationService'],
@@ -1200,6 +1209,9 @@ export class UpgradedServices {
       new TopicViewerBackendApiService(
         upgradedServices['HttpClient'],
         upgradedServices['UrlInterpolationService']);
+    upgradedServices['TranslationsBackendApiService'] =
+      new TranslationsBackendApiService(
+        upgradedServices['HttpClient']);
 
     // Topological level: 4.
 
@@ -1295,13 +1307,11 @@ export class UpgradedServices {
         upgradedServices['StateInteractionStatsBackendApiService']);
     upgradedServices['StatsReportingService'] = new StatsReportingService(
       upgradedServices['ContextService'],
-      upgradedServices['HttpClient'],
       upgradedServices['MessengerService'],
       upgradedServices['PlaythroughService'],
       upgradedServices['SiteAnalyticsService'],
-      upgradedServices['StopwatchObjectFactory'],
-      upgradedServices['UrlInterpolationService'],
-    );
+      upgradedServices['StatsReportingBackendApiService'],
+      upgradedServices['StopwatchObjectFactory']);
 
     // Topological level: 7.
     upgradedServices['StatesObjectFactory'] = new StatesObjectFactory(
