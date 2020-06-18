@@ -48,7 +48,7 @@ describe('PlaythroughService', () => {
   });
 
   beforeEach(() => {
-    this.recordStateTransitions = (stateNames: string) => {
+    this.recordStateTransitions = (stateNames: string[]) => {
       for (let i = 0; i < stateNames.length - 1; ++i) {
         playthroughService.recordAnswerSubmitAction(
           stateNames[i], stateNames[i + 1],
@@ -63,7 +63,7 @@ describe('PlaythroughService', () => {
       }
     };
 
-    this.recordCycle = (stateNames: string, times: number) => {
+    this.recordCycle = (stateNames: string[], times: number) => {
       for (let i = 0; i < times; ++i) {
         for (let j = 0; j < stateNames.length; ++j) {
           playthroughService.recordAnswerSubmitAction(
@@ -174,7 +174,7 @@ describe('PlaythroughService', () => {
       it('should return null issue if playthrough has no problems', () => {
         this.mockExplorationTimer(400);
         playthroughService.recordExplorationStartAction('A');
-        this.recordStateTransitions('ABC');
+        this.recordStateTransitions(['A', 'B', 'C']);
         playthroughService.recordExplorationQuitAction('C', 60);
 
         let playthrough = playthroughService.getPlaythrough();
@@ -202,7 +202,7 @@ describe('PlaythroughService', () => {
         this.mockExplorationTimer(400);
         playthroughService.recordExplorationStartAction('A');
         this.recordIncorrectAnswers('A', 5);
-        this.recordStateTransitions('ABC');
+        this.recordStateTransitions(['A', 'B', 'C']);
         playthroughService.recordExplorationQuitAction('C', 60);
 
         let playthrough = playthroughService.getPlaythrough();
@@ -213,7 +213,7 @@ describe('PlaythroughService', () => {
       it('should identify cyclic state transitions', () => {
         this.mockExplorationTimer(400);
         playthroughService.recordExplorationStartAction('A');
-        this.recordCycle('ABC', 3);
+        this.recordCycle(['A', 'B', 'C'], 3);
         playthroughService.recordExplorationQuitAction('A', 30);
 
         let playthrough = playthroughService.getPlaythrough();
@@ -243,10 +243,18 @@ describe('PlaythroughService', () => {
         this.mockExplorationTimer(400);
       });
 
-      it('should identify p-head cyclic state transitions', () => {
+      it('should identify p-shaped cyclic state transitions with linear ' +
+        'portion at the tail', () => {
+        // P-shaped cycles look like:
+        // A - B - C - D
+        //         |   |
+        //         F - E
+        //
+        // For this test, we check when the linear portion appears at the end
+        // (tail) of the playthrough.
         playthroughService.recordExplorationStartAction('A');
-        this.recordStateTransitions('ABC');
-        this.recordCycle('CDE', 3);
+        this.recordStateTransitions(['A', 'B', 'C']);
+        this.recordCycle(['C', 'D', 'E'], 3);
         playthroughService.recordExplorationQuitAction('C', 60);
 
         let playthrough = playthroughService.getPlaythrough();
@@ -256,10 +264,18 @@ describe('PlaythroughService', () => {
         });
       });
 
-      it('should identify p-tail cyclic state transitions', () => {
+      it('should identify p-shaped cyclic state transitions with linear ' +
+        'portion at the head', () => {
+        // P-shaped cycles look like:
+        // D - A - E - F
+        // |   |
+        // C - B
+        //
+        // For this test, we check when the linear portion appears at the start
+        // (head) of the playthrough.
         playthroughService.recordExplorationStartAction('A');
-        this.recordCycle('ABC', 3);
-        this.recordStateTransitions('ADE');
+        this.recordCycle(['A', 'B', 'C'], 3);
+        this.recordStateTransitions(['A', 'D', 'E']);
         playthroughService.recordExplorationQuitAction('F', 60);
 
         let playthrough = playthroughService.getPlaythrough();
@@ -271,9 +287,9 @@ describe('PlaythroughService', () => {
 
       it('should identify cycle within an otherwise linear path', () => {
         playthroughService.recordExplorationStartAction('A');
-        this.recordStateTransitions('ABC');
-        this.recordCycle('CDE', 3);
-        this.recordStateTransitions('CFG');
+        this.recordStateTransitions(['A', 'B', 'C']);
+        this.recordCycle(['C', 'D', 'E'], 3);
+        this.recordStateTransitions(['C', 'F', 'G']);
         playthroughService.recordExplorationQuitAction('G', 60);
 
         let playthrough = playthroughService.getPlaythrough();
@@ -285,9 +301,9 @@ describe('PlaythroughService', () => {
 
       it('should identify cycle with nested 1-cycles', () => {
         playthroughService.recordExplorationStartAction('A');
-        this.recordCycle('ABC', 2);
+        this.recordCycle(['A', 'B', 'C'], 2);
         this.recordIncorrectAnswers('A', 2);
-        this.recordCycle('ABC', 2);
+        this.recordCycle(['A', 'B', 'C'], 2);
         playthroughService.recordExplorationQuitAction('A', 60);
 
         const playthrough = playthroughService.getPlaythrough();
@@ -299,11 +315,11 @@ describe('PlaythroughService', () => {
 
       it('should identify rotations of cycles', () => {
         playthroughService.recordExplorationStartAction('A');
-        this.recordCycle('ABC', 1);
-        this.recordStateTransitions('ADB');
-        this.recordCycle('BCA', 1);
-        this.recordStateTransitions('BEC');
-        this.recordCycle('CAB', 1);
+        this.recordCycle(['A', 'B', 'C'], 1);
+        this.recordStateTransitions(['A', 'D', 'B']);
+        this.recordCycle(['B', 'C', 'A'], 1);
+        this.recordStateTransitions(['B', 'E', 'C']);
+        this.recordCycle(['C', 'A', 'B'], 1);
         playthroughService.recordExplorationQuitAction('C', 10);
 
         const playthrough = playthroughService.getPlaythrough();
@@ -316,8 +332,8 @@ describe('PlaythroughService', () => {
 
       it('should be able to identify the outer-cycle of nested cycles', () => {
         playthroughService.recordExplorationStartAction('A');
-        this.recordCycle('AB', 2);
-        this.recordCycle('A' + 'CDC' + 'B', 1);
+        this.recordCycle(['A', 'B'], 2);
+        this.recordCycle(['A', /* inner-cycle: CDC. */ 'C', 'D', 'C', 'B'], 1);
         playthroughService.recordExplorationQuitAction('A', 60);
 
         const playthrough = playthroughService.getPlaythrough();
@@ -331,16 +347,16 @@ describe('PlaythroughService', () => {
       it('should return most recent cycle when there are many with same ' +
         'number of occurrences', () => {
         playthroughService.recordExplorationStartAction('A');
-        this.recordCycle('AB', 3); this.recordStateTransitions('AC');
-        this.recordCycle('CD', 3); this.recordStateTransitions('CE');
-        this.recordCycle('EF', 3); this.recordStateTransitions('EG');
-        this.recordCycle('GH', 3); this.recordStateTransitions('GI');
-        this.recordCycle('IJ', 3); this.recordStateTransitions('IK');
-        this.recordCycle('KL', 3); this.recordStateTransitions('KM');
-        this.recordCycle('MN', 3); this.recordStateTransitions('MO');
-        this.recordCycle('OP', 3); this.recordStateTransitions('OQ');
-        this.recordCycle('QR', 3); this.recordStateTransitions('QS');
-        this.recordCycle('ST', 3); this.recordStateTransitions('SU');
+        this.recordCycle(['A', 'B'], 3); this.recordStateTransitions(['A', 'C']);
+        this.recordCycle(['C', 'D'], 3); this.recordStateTransitions(['C', 'E']);
+        this.recordCycle(['E', 'F'], 3); this.recordStateTransitions(['E', 'G']);
+        this.recordCycle(['G', 'H'], 3); this.recordStateTransitions(['G', 'I']);
+        this.recordCycle(['I', 'J'], 3); this.recordStateTransitions(['I', 'K']);
+        this.recordCycle(['K', 'L'], 3); this.recordStateTransitions(['K', 'M']);
+        this.recordCycle(['M', 'N'], 3); this.recordStateTransitions(['M', 'O']);
+        this.recordCycle(['O', 'P'], 3); this.recordStateTransitions(['O', 'Q']);
+        this.recordCycle(['Q', 'R'], 3); this.recordStateTransitions(['Q', 'S']);
+        this.recordCycle(['S', 'T'], 3); this.recordStateTransitions(['S', 'U']);
         playthroughService.recordExplorationQuitAction('U', 30);
 
         const playthrough = playthroughService.getPlaythrough();
@@ -354,9 +370,9 @@ describe('PlaythroughService', () => {
       it('should not report issue if state is not visited from the same card ' +
         'enough times', () => {
         playthroughService.recordExplorationStartAction('A');
-        this.recordCycle('AB', 1);
-        this.recordCycle('AC', 1);
-        this.recordCycle('AD', 1);
+        this.recordCycle(['A', 'B'], 1);
+        this.recordCycle(['A', 'C'], 1);
+        this.recordCycle(['A', 'D'], 1);
         playthroughService.recordExplorationQuitAction('A', 60);
 
         const playthrough = playthroughService.getPlaythrough();
@@ -371,7 +387,7 @@ describe('PlaythroughService', () => {
         'transitions and early quit', () => {
         this.mockExplorationTimer(50);
         playthroughService.recordExplorationStartAction('A');
-        this.recordCycle('AB', 3);
+        this.recordCycle(['A', 'B'], 3);
         this.recordIncorrectAnswers('A', 5);
         playthroughService.recordExplorationQuitAction('A', 10);
 
@@ -393,7 +409,7 @@ describe('PlaythroughService', () => {
       it('should prioritize cyclic state transitions over early quit', () => {
         this.mockExplorationTimer(50);
         playthroughService.recordExplorationStartAction('A');
-        this.recordCycle('AB', 3);
+        this.recordCycle(['A', 'B'], 3);
         playthroughService.recordExplorationQuitAction('A', 10);
 
         expect(playthroughService.getPlaythrough().issueType)
