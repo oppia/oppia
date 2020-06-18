@@ -174,7 +174,7 @@ def is_oppia_server_already_running():
     """Check if the ports are taken by any other processes. If any one of
     them is taken, it may indicate there is already one Oppia instance running.
 
-    Return:
+    Returns:
         bool: Whether there is a running Oppia instance.
     """
     running = False

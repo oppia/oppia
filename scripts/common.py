@@ -338,7 +338,7 @@ def is_port_open(port):
     Args:
         port: int. The port number.
 
-    Return:
+    Returns:
         bool. True if port is open else False.
     """
     with contextlib.closing(

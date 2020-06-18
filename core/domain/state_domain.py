@@ -922,7 +922,7 @@ class WrittenTranslations(python_utils.OBJECT):
         Args:
             language_code: str. The abbreviated code of the language.
 
-        Return:
+        Returns:
             list(str). A list of content ids in which the translations are
                 available in the given language.
         """

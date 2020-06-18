@@ -200,7 +200,7 @@ def return_json(filepath):
     Args:
         filepath: the path to the json file.
 
-    Return:
+    Returns:
         a parsed json objects.
     """
     response = get_file_contents(filepath)
