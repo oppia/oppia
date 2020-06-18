@@ -32,8 +32,6 @@ describe('EditProfilePictureModalController', function() {
     $uibModalInstance = jasmine.createSpyObj(
       '$uibModalInstance', ['close', 'dismiss']);
 
-    // spyOn(Cropper.prototype, 'constructor')
-
     $scope = $rootScope.$new();
     $controller('EditProfilePictureModalController', {
       $scope: $scope,
@@ -53,6 +51,7 @@ describe('EditProfilePictureModalController', function() {
 
     var element = $(document.createElement('div'));
 
+    // This is just a mock base 64 in order to test the FileReader event.
     var dataBase64Mock = 'VEhJUyBJUyBUSEUgQU5TV0VSCg==';
     const arrayBuffer = Uint8Array.from(
       window.atob(dataBase64Mock), c => c.charCodeAt(0));
