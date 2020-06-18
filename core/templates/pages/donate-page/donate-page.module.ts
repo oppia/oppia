@@ -37,8 +37,6 @@ import { ObjectsDomainConstants } from
   'domain/objects/objects-domain.constants';
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { SharedComponentsModule } from 'components/shared-component.module';
-import { OppiaAngularRootComponent } from
-  'components/oppia-angular-root.component';
 
 @NgModule({
   imports: [
