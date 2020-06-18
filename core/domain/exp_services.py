@@ -505,7 +505,6 @@ def apply_change_list(exploration_id, change_list):
                 # the latest states schema version. As a result, simply
                 # resaving the exploration is sufficient to apply the states
                 # schema update.
-                continue
         return exploration
 
     except Exception as e:
