@@ -206,7 +206,7 @@ angular.module('oppia').directive('oppiaInteractiveMathExpressionInput', [
             guppyInstance.event('done', (e) => {
               ctrl.submitAnswer();
             });
- 
+
             if (angular.equals(Guppy.Symbols.symbols, {})) {
               Guppy.init({
                 symbols: ['/third_party/static/guppy-175999/sym/symbols.json',
