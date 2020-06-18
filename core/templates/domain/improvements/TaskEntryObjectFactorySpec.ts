@@ -40,6 +40,7 @@ describe('Task entry', function() {
       issue_description: '20% of learners dropped at this state',
       status: 'resolved',
       resolver_username: 'test_user',
+      resolver_profile_picture_data_url: './image.png',
       resolved_on_msecs: 123456789,
     };
     const task: TaskEntry = (
@@ -57,6 +58,7 @@ describe('Task entry', function() {
     expect(task.isObsolete()).toBeFalse();
     expect(task.isOpen()).toBeFalse();
     expect(task.resolverUsername).toEqual('test_user');
+    expect(task.resolverProfilePictureDataUrl).toEqual('./image.png');
     expect(task.resolvedOnMsecs).toEqual(123456789);
 
     expect(task.toBackendDict()).toEqual(taskBackendDict);

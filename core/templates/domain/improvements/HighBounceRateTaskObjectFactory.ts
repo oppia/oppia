@@ -27,17 +27,26 @@ import { ImprovementsConstants } from
   'domain/improvements/improvements.constants';
 
 export class HighBounceRateTask extends TaskEntry {
-  constructor(
-      expId: string,
-      expVersion: number,
-      stateName: string,
-      issueDescription: string = null,
-      taskStatus: string = ImprovementsConstants.TASK_STATUS_TYPE_OBSOLETE) {
-    super(
-      ImprovementsConstants.TASK_ENTITY_TYPE_EXPLORATION, expId, expVersion,
-      ImprovementsConstants.TASK_TYPE_HIGH_BOUNCE_RATE,
-      ImprovementsConstants.TASK_TARGET_TYPE_STATE,
-      stateName, null, null, issueDescription, taskStatus);
+  constructor(backendDict: ITaskEntryBackendDict) {
+    if (backendDict.entity_type !==
+            ImprovementsConstants.TASK_ENTITY_TYPE_EXPLORATION) {
+      throw new Error(
+        `backend dict has entity_type "${backendDict.entity_type}" ` +
+        `but expected "${ImprovementsConstants.TASK_ENTITY_TYPE_EXPLORATION}"`);
+    }
+    if (backendDict.task_type !==
+            ImprovementsConstants.TASK_TYPE_HIGH_BOUNCE_RATE) {
+      throw new Error(
+        `backend dict has task_type "${backendDict.task_type}" ` +
+        `but expected "${ImprovementsConstants.TASK_TYPE_HIGH_BOUNCE_RATE}"`);
+    }
+    if (backendDict.target_type !==
+            ImprovementsConstants.TASK_TARGET_TYPE_STATE) {
+      throw new Error(
+        `backend dict has target_type "${backendDict.target_type}" ` +
+        `but expected "${ImprovementsConstants.TASK_TARGET_TYPE_STATE}"`);
+    }
+    super(backendDict);
   }
 
   public resolve(): void {
@@ -90,6 +99,24 @@ export class HighBounceRateTask extends TaskEntry {
   providedIn: 'root'
 })
 export class HighBounceRateTaskObjectFactory {
+  private createNewObsoleteTask(
+      expId: string, expVersion: number,
+      stateName: string): HighBounceRateTask {
+    return new HighBounceRateTask({
+      entity_type: ImprovementsConstants.TASK_ENTITY_TYPE_EXPLORATION,
+      entity_id: expId,
+      entity_version: expVersion,
+      task_type: ImprovementsConstants.TASK_TYPE_HIGH_BOUNCE_RATE,
+      target_type: ImprovementsConstants.TASK_TARGET_TYPE_STATE,
+      target_id: stateName,
+      issue_description: null,
+      status: ImprovementsConstants.TASK_STATUS_TYPE_OBSOLETE,
+      resolver_username: null,
+      resolver_profile_picture_data_url: null,
+      resolved_on_msecs: null,
+    });
+  }
+
   /**
    * Returns list of tasks for each of the given state names when their stats
    * demonstrate a high bounce rate. Otherwise, correspoding index will be null.
@@ -98,7 +125,7 @@ export class HighBounceRateTaskObjectFactory {
       expStats: ExplorationStats, stateNames: string[]): HighBounceRateTask[] {
     const { expId, expVersion } = expStats;
     return stateNames.map(stateName => {
-      const task = new HighBounceRateTask(expId, expVersion, stateName);
+      const task = this.createNewObsoleteTask(expId, expVersion, stateName);
       task.refreshStatus(expStats);
       return task.isOpen() ? task : null;
     });
@@ -110,27 +137,7 @@ export class HighBounceRateTaskObjectFactory {
    */
   createFromBackendDict(
       backendDict: ITaskEntryBackendDict): HighBounceRateTask {
-    if (backendDict.entity_type !==
-        ImprovementsConstants.TASK_ENTITY_TYPE_EXPLORATION) {
-      throw new Error(
-        `backend dict has entity_type "${backendDict.entity_type}" ` +
-        `but expected "${ImprovementsConstants.TASK_ENTITY_TYPE_EXPLORATION}"`);
-    }
-    if (backendDict.task_type !==
-        ImprovementsConstants.TASK_TYPE_HIGH_BOUNCE_RATE) {
-      throw new Error(
-        `backend dict has task_type "${backendDict.task_type}" ` +
-        `but expected "${ImprovementsConstants.TASK_TYPE_HIGH_BOUNCE_RATE}"`);
-    }
-    if (backendDict.target_type !==
-        ImprovementsConstants.TASK_TARGET_TYPE_STATE) {
-      throw new Error(
-        `backend dict has target_type "${backendDict.target_type}" ` +
-        `but expected "${ImprovementsConstants.TASK_TARGET_TYPE_STATE}"`);
-    }
-    return new HighBounceRateTask(
-      backendDict.entity_id, backendDict.entity_version, backendDict.target_id,
-      backendDict.issue_description, backendDict.status);
+    return new HighBounceRateTask(backendDict);
   }
 }
 

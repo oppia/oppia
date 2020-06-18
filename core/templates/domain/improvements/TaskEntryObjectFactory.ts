@@ -29,24 +29,40 @@ export interface ITaskEntryBackendDict {
   'task_type': string;
   'target_type': string;
   'target_id': string;
-  'resolver_username': string;
-  'resolved_on_msecs': number;
   'issue_description': string;
   'status': string;
+  'resolver_username': string;
+  'resolver_profile_picture_data_url': string;
+  'resolved_on_msecs': number;
 }
 
 export class TaskEntry {
-  constructor(
-      public readonly entityType: string,
-      public readonly entityId: string,
-      public readonly entityVersion: number,
-      public readonly taskType: string,
-      public readonly targetType: string,
-      public readonly targetId: string,
-      public readonly resolverUsername: string,
-      public readonly resolvedOnMsecs: number,
-      protected issueDescription: string,
-      private taskStatus: string) {}
+  public readonly entityType: string;
+  public readonly entityId: string;
+  public readonly entityVersion: number;
+  public readonly taskType: string;
+  public readonly targetType: string;
+  public readonly targetId: string;
+  public readonly resolverUsername: string;
+  public readonly resolverProfilePictureDataUrl: string;
+  public readonly resolvedOnMsecs: number;
+  protected issueDescription: string;
+  private taskStatus: string
+
+  constructor(backendDict: ITaskEntryBackendDict) {
+    this.entityType = backendDict.entity_type;
+    this.entityId = backendDict.entity_id;
+    this.entityVersion = backendDict.entity_version;
+    this.taskType = backendDict.task_type;
+    this.targetType = backendDict.target_type;
+    this.targetId = backendDict.target_id;
+    this.issueDescription = backendDict.issue_description;
+    this.taskStatus = backendDict.status;
+    this.resolverUsername = backendDict.resolver_username;
+    this.resolverProfilePictureDataUrl = (
+      backendDict.resolver_profile_picture_data_url);
+    this.resolvedOnMsecs = backendDict.resolved_on_msecs;
+  }
 
   public toBackendDict(): ITaskEntryBackendDict {
     return {
@@ -56,10 +72,11 @@ export class TaskEntry {
       task_type: this.taskType,
       target_type: this.targetType,
       target_id: this.targetId,
-      resolver_username: this.resolverUsername,
-      resolved_on_msecs: this.resolvedOnMsecs,
       issue_description: this.issueDescription,
       status: this.taskStatus,
+      resolver_username: this.resolverUsername,
+      resolver_profile_picture_data_url: this.resolverProfilePictureDataUrl,
+      resolved_on_msecs: this.resolvedOnMsecs,
     };
   }
 
@@ -97,12 +114,7 @@ export class TaskEntry {
 })
 export class TaskEntryObjectFactory {
   createFromBackendDict(backendDict: ITaskEntryBackendDict): TaskEntry {
-    return new TaskEntry(
-      backendDict.entity_type, backendDict.entity_id,
-      backendDict.entity_version, backendDict.task_type,
-      backendDict.target_type, backendDict.target_id,
-      backendDict.resolver_username, backendDict.resolved_on_msecs,
-      backendDict.issue_description, backendDict.status);
+    return new TaskEntry(backendDict);
   }
 }
 
