@@ -77,7 +77,7 @@ def fetch_exploration_tasks(exploration):
             for t in tasks:
                 resolved_task_types_by_state_name[t.target_id].append(
                     t.task_type)
-    return (open_tasks, resolved_task_types_by_state_name)
+    return (open_tasks, dict(resolved_task_types_by_state_name))
 
 
 def fetch_exploration_task_history_page(exploration, cursor=None):
