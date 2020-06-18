@@ -64,12 +64,12 @@ describe('PlaythroughService', () => {
     };
 
     this.recordCycle = (stateNames: string[], times: number) => {
-      for (let i = 0; i < times; ++i) {
-        for (let j = 0; j < stateNames.length; ++j) {
-          playthroughService.recordAnswerSubmitAction(
-            stateNames[j], stateNames[(j + 1) % stateNames.length],
-            'TextInput', 'Hello', 'Correct', 30);
-        }
+      const numAnswerSubmitActions = stateNames.length * times;
+      for (let i = 0; i < numAnswerSubmitActions; ++i) {
+        const fromState = stateNames[i % stateNames.length];
+        const destState = stateNames[(i + 1) % stateNames.length];
+        playthroughService.recordAnswerSubmitAction(
+          fromState, destState, 'TextInput', 'Hello', 'Correct', 30);
       }
     };
 
