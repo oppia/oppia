@@ -25,7 +25,7 @@ import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-fdescribe('Topic rights backend API service', () => {
+describe('Topic rights backend API service', () => {
   let topicRightsBackendApiService: TopicRightsBackendApiService = null;
   let csrfService: CsrfTokenService = null;
   let topicId: string = '0';
