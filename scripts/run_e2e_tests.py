@@ -34,6 +34,8 @@ from scripts import install_third_party_libs
 from scripts import setup
 from scripts import setup_gae
 
+CHROME_DRIVER_VERSION = '77.0.3865.40'
+
 WEB_DRIVER_PORT = 4444
 GOOGLE_APP_ENGINE_PORT = 9001
 OPPIA_SERVER_PORT = 8181
@@ -116,6 +118,12 @@ _PARSER.add_argument(
          'core/test/protractor/ dirs. e.g. for the file'
          'core/tests/protractor/accessibility.js use --suite=accessibility.'
          'For performing a full test, no argument is required.')
+
+_PARSER.add_argument(
+    '--auto_select_chromedriver',
+    help='Automatically sets the chromedriver version depending on the version '
+         'of Chrome installed in the environment.',
+    action='store_true')
 
 _PARSER.add_argument(
     '--debug_mode',
@@ -331,14 +339,17 @@ def undo_webdriver_tweak():
         os.rename(GECKO_PROVIDER_BAK_FILE_PATH, GECKO_PROVIDER_FILE_PATH)
 
 
-def start_webdriver_manager():
-    """Update and start webdriver manager."""
-    chrome_driver_version = get_chrome_driver_version()
+def start_webdriver_manager(version):
+    """Update and start webdriver manager.
+
+    Args:
+        version: str. The chromedriver version.
+    """
     with tweak_webdriver_manager():
         run_webdriver_manager(
-            ['update', '--versions.chrome', chrome_driver_version])
+            ['update', '--versions.chrome', version])
         run_webdriver_manager(
-            ['start', '--versions.chrome', chrome_driver_version,
+            ['start', '--versions.chrome', version,
              '--detach', '--quiet'])
 
 
@@ -464,7 +475,10 @@ def main(args=None):
     if not parsed_args.skip_build:
         build_js_files(
             dev_mode, deparallelize_terser=parsed_args.deparallelize_terser)
-    start_webdriver_manager()
+    version = (
+        get_chrome_driver_version() if parsed_args.auto_select_chromedriver
+        else CHROME_DRIVER_VERSION)
+    start_webdriver_manager(version)
 
     start_google_app_engine_server(dev_mode)
 
