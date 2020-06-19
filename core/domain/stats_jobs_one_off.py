@@ -204,7 +204,7 @@ class ClearExplorationIssuesOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         Yields:
             tuple. Contains the following two items:
                 reduce_key: str. Either REDUCE_KEY_CLEARED or REDUCE_KEY_DELETE.
-                reduce_value: tuple or str.
+                reduce_value: str or tuple.
                     When reduce_key is REDUCE_KEY_CLEARED, then each item is:
                         exp_issues_id: str. the ID of the corresponding
                             ExplorationIssuesModel which was cleared of
@@ -234,7 +234,7 @@ class ClearExplorationIssuesOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def reduce(reduce_key, stringified_values):
         """Yields details about the actions taken onto ExplorationIssuesModel
-        and PlaPlaythroughModel instances.
+        and PlaythroughModel instances.
 
         Args:
             reduce_key: str. Either REDUCE_KEY_CLEARED or REDUCE_KEY_DELETE.
