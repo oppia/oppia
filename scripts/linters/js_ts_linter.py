@@ -54,6 +54,7 @@ FILES_EXCLUDED_FROM_ANY_TYPE_CHECK_PATH = os.path.join(
 FILES_EXCLUDED_FROM_ANY_TYPE_CHECK = json.load(python_utils.open_file(
     FILES_EXCLUDED_FROM_ANY_TYPE_CHECK_PATH, 'r'))
 
+COMPILED_TYPESCRIPT_TMP_PATH = 'tmpcompiledjs/'
 
 def _get_expression_from_node_if_one_exists(
         parsed_node, components_to_check):
@@ -210,17 +211,26 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         return parsed_expressions_in_files
 
     def _get_compiled_ts_filepath(self, filepath):
-        """Returns the path for compiled ts file."""
+        """Returns the path for compiled ts file.
+        Args:
+            filepath: string. filepath of ts file
+
+        Returns:
+            string. filepath of compiled ts file.
+        """
         compiled_js_filepath = os.path.join(
             os.getcwd(),
-            'tmpcompiledjs/',
+            COMPILED_TYPESCRIPT_TMP_PATH,
             os.path.relpath(filepath).replace('.ts', '.js'))
         return compiled_js_filepath
 
-    def _compile_ts(self):
-        """Compiles all project typescript files."""
+    def _compile_all_ts_files(self):
+        """Compiles all project typescript files. Previously, we only compiled
+        the TS files that were needed, but when a relative import was used, the
+        linter would crash with a FileNotFound exception before being able to
+        run. For more details, please see issue #9458."""
         cmd = ('./node_modules/typescript/bin/tsc -p %s -outDir %s') % (
-            './tsconfig.json', 'tmpcompiledjs/')
+            './tsconfig.json', COMPILED_TYPESCRIPT_TMP_PATH)
         subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
 
     def _check_any_type(self):
@@ -857,8 +867,11 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                 'There are no JavaScript or Typescript files to lint.')
             return []
 
-        clean.delete_directory_tree('tmpcompiledjs/')
-        self._compile_ts()
+        # Clear temp compiled typescipt files from previous runs
+        clean.delete_directory_tree(COMPILED_TYPESCRIPT_TMP_PATH)
+        # Compiles all typescipt files into COMPILED_TYPESCRIPT_TMP_PATH dir
+        self._compile_all_ts_files()
+
         self.parsed_js_and_ts_files = self._validate_and_parse_js_and_ts_files()
         self.parsed_expressions_in_files = (
             self._get_expressions_from_parsed_script())
@@ -872,7 +885,8 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         controller_dependency_messages = (
             self._match_line_breaks_in_controller_dependencies())
 
-        clean.delete_directory_tree('tmpcompiledjs/')
+        # Clear temp compiled typescipt files
+        clean.delete_directory_tree(COMPILED_TYPESCRIPT_TMP_PATH)
 
         all_messages = (
             any_type_messages + extra_js_files_messages +
