@@ -115,16 +115,16 @@ def fetch_exploration_task_history_page(exploration, urlsafe_start_cursor=None):
 
     Args:
         exploration: exp_domain.Exploration.
-        urlsafe_cursor: str or None. Starting point for search. When None, the
-            starting point is the very beginning of the history results (i.e.,
-            starting from the newest task entry).
+        urlsafe_start_cursor: str or None. Starting point for search. When None,
+            the starting point is the very beginning of the history results
+            (i.e. starting from the most recently resolved task entry).
 
     Returns:
         tuple. Contains the following 3 items:
             results: list(improvements_domain.TaskEntry). The query results.
-            urlsafe_cursor: str or None. a query cursor pointing to the
-                "next" batch of results. If there are no more results, this
-                might be None.
+            urlsafe_cursor: str or None. a query cursor pointing to the "next"
+                batch of results. If there are no more results, this might be
+                None.
             more: bool. Indicates whether there are (likely) more results after
                 this batch. If False, there are no more results; if True, there
                 are probably more results.
