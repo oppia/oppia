@@ -216,7 +216,7 @@ class ClearExplorationIssuesOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         """
         if model.deleted:
             return
-        if isinstance(model, stats_models.ExplorationIssuesModel):
+        elif isinstance(model, stats_models.ExplorationIssuesModel):
             for exp_issue in model.unresolved_issues:
                 for playthrough_id in exp_issue['playthrough_ids']:
                     yield (
