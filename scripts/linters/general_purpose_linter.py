@@ -25,8 +25,8 @@ import sys
 
 import python_utils
 
-from . import linter_utils
 from . import js_ts_linter
+from . import linter_utils
 from .. import common
 
 EXCLUDED_PATHS = (
