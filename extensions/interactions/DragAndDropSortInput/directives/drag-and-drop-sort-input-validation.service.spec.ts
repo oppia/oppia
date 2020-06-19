@@ -163,9 +163,22 @@ describe('DragAndDropSortInputValidationService', () => {
 
   it('should not allow multiple items in same position', () => {
     customizationArgs.allowMultipleItemsInSamePosition = false;
+    var rules = [rof.createFromBackendDict({
+      rule_type: 'IsEqualToOrdering',
+      inputs: {
+        x: [['a', 'b']]
+      }
+    })];
+    answerGroups = [
+      agof.createNew(rules, customOutcome, false, null),
+      agof.createNew(rules, customOutcome, false, null)
+    ];
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArgs, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
+      type: WARNING_TYPES.ERROR,
+      message: 'Multiple items in a single position are not allowed.'
+    }, {
       type: WARNING_TYPES.ERROR,
       message: 'Multiple items in a single position are not allowed.'
     }]);
