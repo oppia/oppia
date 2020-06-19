@@ -63,28 +63,28 @@ export class HighBounceRateTask extends TaskEntry {
           'id="' + expStats.expId + '" v' + expStats.expVersion));
     }
     const expStarts = expStats.numStarts;
+    if (expStarts < ImprovementsConstants.HIGH_BOUNCE_RATE_MIN_EXP_STARTS) {
+      // Too few visits for calculating a meaningful bounce-rate. Not an error.
+      return;
+    }
     const bounceRate = expStats.getBounceRate(this.targetId);
-    if (this.meetsCreationConditions(expStarts, bounceRate)) {
+    if (this.meetsCreationConditions(bounceRate)) {
       this.markAsOpen();
       this.generateIssueDescription(bounceRate);
-    } else if (this.meetsObsoletionConditions(expStarts, bounceRate)) {
+    } else if (this.meetsObsoletionConditions(bounceRate)) {
       this.markAsObsolete();
     }
   }
 
-  private meetsCreationConditions(
-      expStarts: number, bounceRate: number): boolean {
+  private meetsCreationConditions(bounceRate: number): boolean {
     return (
       this.isObsolete() &&
-      expStarts >= ImprovementsConstants.HIGH_BOUNCE_RATE_MIN_EXP_STARTS &&
       bounceRate >= ImprovementsConstants.HIGH_BOUNCE_RATE_THRESHOLD_HIGH);
   }
 
-  private meetsObsoletionConditions(
-      expStarts: number, bounceRate: number): boolean {
+  private meetsObsoletionConditions(bounceRate: number): boolean {
     return (
       this.isOpen() &&
-      expStarts >= ImprovementsConstants.HIGH_BOUNCE_RATE_MIN_EXP_STARTS &&
       bounceRate < ImprovementsConstants.HIGH_BOUNCE_RATE_THRESHOLD_LOW);
   }
 
