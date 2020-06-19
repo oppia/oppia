@@ -215,10 +215,10 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         """Returns the path for compiled ts file.
 
         Args:
-            filepath: string. filepath of ts file
+            filepath: str. filepath of ts file
 
         Returns:
-            string. filepath of compiled ts file.
+            str. filepath of compiled ts file.
         """
         compiled_js_filepath = os.path.join(
             os.getcwd(),
