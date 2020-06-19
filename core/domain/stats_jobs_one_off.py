@@ -176,7 +176,7 @@ class ClearExplorationIssuesOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     each of them are completely deleted from storage.
     """
 
-    REDUCE_KEY_TO_DELETE = 'DELETED'
+    REDUCE_KEY_DELETE = 'DELETE'
     REDUCE_KEY_CLEARED = 'CLEARED'
 
     ITEM_KEY_ALL = 'ALL'
@@ -193,29 +193,36 @@ class ClearExplorationIssuesOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def map(model):
-        """Records the playthrough ids from the corresponding model, and yields
-        what action to take with them.
+        """For ExplorationIssuesModel will clear the list and yield each of its
+        tracked playthrough_ids, otherwise for PlaythroughModel will yield its
+        existence for the reduce key to handle.
 
         Args:
             model: ExplorationIssuesModel or PlaythroughModel.
 
         Yields:
             tuple. Contains the following two items:
-                reduce_key: str. Same as REDUCE_KEY.
-                playthrough_ids: tuple. Each contains the following 2 items:
-                    item_key: str. Either ITEM_KEY_TRACKED or
-                        ITEM_KEY_ALL.
-                    playthrough_id: str. Playthrough ID.
+                reduce_key: str. Either REDUCE_KEY_DELETE or REDUCE_KEY_CLEARED.
+                reduce_value: tuple or str.
+                    When reduce_key is REDUCE_KEY_DELETE, then each item is a
+                    tuple with the following values:
+                        item_key: str. Either ITEM_KEY_TRACKED or ITEM_KEY_ALL.
+                        playthrough_id: str. ID of a PlaythroughModel.
+
+                    Otherwise, when reduce_key is REDUCE_KEY_CLEARED, then:
+                        exp_issues_id: str. the ID of the corresponding
+                            ExplorationIssuesModel which was cleared of
+                            playthroughs.
         """
         if isinstance(model, stats_models.PlaythroughModel):
             yield (
-                ClearExplorationIssuesOneOffJob.REDUCE_KEY_TO_DELETE, (
+                ClearExplorationIssuesOneOffJob.REDUCE_KEY_DELETE, (
                     ClearExplorationIssuesOneOffJob.ITEM_KEY_ALL, model.id))
         elif isinstance(model, stats_models.ExplorationIssuesModel):
             for exp_issue in model.unresolved_issues:
                 for playthrough_id in exp_issue['playthrough_ids']:
                     yield (
-                        ClearExplorationIssuesOneOffJob.REDUCE_KEY_TO_DELETE, (
+                        ClearExplorationIssuesOneOffJob.REDUCE_KEY_DELETE, (
                             ClearExplorationIssuesOneOffJob.ITEM_KEY_TRACKED,
                             playthrough_id))
             model.unresolved_issues = []
@@ -224,27 +231,35 @@ class ClearExplorationIssuesOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def reduce(reduce_key, stringified_values):
-        """Yields errors in playthrough models. Must be declared @staticmethod.
+        """Yields details about the actions taken onto ExplorationIssuesModel
+        and PlaPlaythroughModel instances.
 
         Args:
-            reduce_key: str. Same as REDUCE_KEY.
-            stringified_values: list(str). Each string is a stringified tuple
-                with the following values:
-                    item_key: str. Either ITEM_KEY_TRACKED or
-                        ITEM_KEY_ALL.
+            reduce_key: str. Either REDUCE_KEY_DELETE or REDUCE_KEY_CLEARED.
+            stringified_values: list(str).
+
+                When reduce_key is REDUCE_KEY_DELETE, then each item is a
+                stringified tuple with the following values:
+                    item_key: str. Either ITEM_KEY_TRACKED or ITEM_KEY_ALL.
                     playthrough_id: str. ID of a PlaythroughModel.
+
+                Otherwise, when reduce_key is REDUCE_KEY_CLEARED, then:
+                    exp_issues_id: str. the ID of the corresponding
+                        ExplorationIssuesModel which was cleared of
+                        playthroughs.
 
         Yields:
             tuple. Contains the following 2 values:
-                result_key: str. Either RESULT_TRACKED_DELETES or
-                    RESULT_UNTRACKED_DELETES.
-                count: int. The number of deletions corresponding to the result.
+                result_key: str. Either RESULT_TRACKED_DELETES,
+                    RESULT_UNTRACKED_DELETES, or RESULT_CLEARED.
+                count: int. The number of operations corresponding to the
+                    result key.
         """
         if reduce_key == ClearExplorationIssuesOneOffJob.REDUCE_KEY_CLEARED:
             yield (
                 ClearExplorationIssuesOneOffJob.RESULT_CLEARED,
                 len(stringified_values))
-        elif reduce_key == ClearExplorationIssuesOneOffJob.REDUCE_KEY_TO_DELETE:
+        elif reduce_key == ClearExplorationIssuesOneOffJob.REDUCE_KEY_DELETE:
             map_results = [ast.literal_eval(v) for v in stringified_values]
             tracked_playthrough_ids_to_delete = set()
             all_playthrough_ids = set()
