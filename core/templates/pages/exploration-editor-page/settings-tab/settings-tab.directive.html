@@ -16,7 +16,7 @@
             </exploration-objective-editor>
 
             <div class="form-group" ng-class="{'has-error': !$ctrl.explorationCategoryService.displayed}">
-              <label for="explorationCategory" class="col-lg-2 col-md-2 col-sm-2 float-left" style="min-height: 24px;">Category</label>
+              <label for="explorationCategory" class="col-lg-2 col-md-2 col-sm-2 float-left oppia-category">Category</label>
               <div class="col-lg-10 col-md-10 col-sm-10">
                 <div ng-if="$ctrl.hasPageLoaded">
                   <select2-dropdown id="explorationCategory"
@@ -37,11 +37,11 @@
               <label for="explorationLanguageCode" class="col-lg-2 col-md-2 col-sm-2 float-left">Language</label>
               <div class="col-lg-10 col-md-10 col-sm-10">
                 <div class="row">
-                  <select id="explorationLanguageCode" class="form-control protractor-test-exploration-language-select float-right" ng-model="$ctrl.explorationLanguageCodeService.displayed" ng-change="$ctrl.saveExplorationLanguageCode()" ng-options="lc.code as lc.description for lc in $ctrl.explorationLanguageCodeService.getSupportedContentLanguages()" width="85%" style="margin-right: 0;">
+                  <select id="explorationLanguageCode" class="form-control oppia-form-control protractor-test-exploration-language-select float-right" ng-model="$ctrl.explorationLanguageCodeService.displayed" ng-change="$ctrl.saveExplorationLanguageCode()" ng-options="lc.code as lc.description for lc in $ctrl.explorationLanguageCodeService.getSupportedContentLanguages()" width="85%">
                   </select>
                 </div>
                 <div class="row">
-                  <span class="form-text" style="font-size: smaller">
+                  <span class="form-text oppia-form-text">
                     <em>
                       Don't see the language you want? <a href="https://github.com/oppia/oppia/issues/new?title=Please%20add%20a%20new%20language%20choice%20to%20the%20exploration%20settings%20tab&body=Please%20add%20the%20language%20choice%20%7B%7BYOUR_LANGUAGE_HERE%7D%7D%20to%20the%20exploration%20settings%20tab.%0A%0AHere%20is%20a%20link%20to%20an%20exploration%20that%20uses%20it:%20%7B%7BINSERT_LINK_HERE%7D%7D" target="_blank" rel="noopener">Tell us.</a>
                     </em>
@@ -57,7 +57,7 @@
                   </select>
                 </div>
                 <div class="row">
-                  <span class="form-text" style="font-size: smaller">
+                  <span class="form-text oppia-form-text">
                     <em>This is the first card the learner sees when playing your exploration.</em>
                   </span>
                 </div>
@@ -67,7 +67,7 @@
               <label for="explorationTags" class="col-lg-2 col-md-2 col-sm-2 float-left">Tags</label>
               <div class="col-lg-10 col-md-10 col-sm-10">
                 <div class="row">
-                  <div ng-if="$ctrl.hasPageLoaded" style="width:100%;">
+                  <div ng-if="$ctrl.hasPageLoaded" class="oppia-page-loaded">
                     <select2-dropdown item="$ctrl.explorationTagsService.displayed"
                                       choices="$ctrl.explorationTagsService.displayed"
                                       allow-multiple-choices="true"
@@ -80,8 +80,8 @@
                   </div>
                 </div>
               </div>
-              <div class="col-lg-10 col-md-10 col-sm-10 offset-2" style="padding-left:0;">
-                <span class="form-text" style="font-size: smaller">
+              <div class="col-lg-10 col-md-10 col-sm-10 offset-2 oppia-offset">
+                <span class="form-text oppia-form-text">
                   <em>Tags help learners discover your exploration when searching.</em>
                 </span>
               </div>
@@ -177,7 +177,7 @@
                 </label>
               </div>
             </span>
-            <span class="col-lg-12 col-md-12 col-sm-12 form-text" style="font-size: smaller;">
+            <span class="col-lg-12 col-md-12 col-sm-12 form-text oppia-form-text">
               Parameters are values that change as the learner moves between cards (<a href="http://oppia.github.io/#/Parameters" target="_blank" rel="noopener">more info</a>).
             </span>
           </div>
@@ -200,7 +200,7 @@
                 </label>
               </div>
             </span>
-            <span class="col-lg-12 col-md-12 col-sm-12 form-text" style="font-size: smaller;">
+            <span class="col-lg-12 col-md-12 col-sm-12 form-text oppia-form-text">
               Automatic text-to-speech generates audio from your content for learners to listen to. It is recommended that you disable this feature if creating an exploration whose content consists of multiple languages.
             </span>
           </div>
@@ -223,7 +223,7 @@
                 </label>
               </div>
             </span>
-            <span class="col-lg-12 col-md-12 col-sm-12 form-text" style="font-size: smaller;">
+            <span class="col-lg-12 col-md-12 col-sm-12 form-text oppia-form-text">
               Correctness feedback allows the user to categorise answer groups as correct or incorrect.
             </span>
           </div>
@@ -291,7 +291,7 @@
                 <br>
                 <label for="$ctrl.newMemberRole">Role of invited user</label>
                 <div>
-                  <select ng-model="$ctrl.newMemberRole" class="form-control protractor-test-role-select" ng-options="r.name for r in $ctrl.ROLES" style="width: 250px;">
+                  <select ng-model="$ctrl.newMemberRole" class="form-control oppia-member-role protractor-test-role-select" ng-options="r.name for r in $ctrl.ROLES">
                   </select>
                   <span class="form-text">
                     <p>Note that managers also have the permissions of collaborators, collaborators also have the permissions of voice artists, and voice artists also have the permissions of viewers. Please note that assigning roles is irreversible (though you can always assign somebody to a higher role).</p>
@@ -375,11 +375,11 @@
                  Unmute
               </button>
             </span>
-            <span class="col-lg-7 col-md-7 col-sm-7 form-text" style="font-size: smaller;"
+            <span class="col-lg-7 col-md-7 col-sm-7 form-text oppia-form-text"
                   ng-if="!$ctrl.UserEmailPreferencesService.areFeedbackNotificationsMuted()">
               You are currently receiving notifications of new feedback for this exploration.
             </span>
-            <span class="col-lg-7 col-md-7 col-sm-7 form-text" style="font-size: smaller;"
+            <span class="col-lg-7 col-md-7 col-sm-7 form-text oppia-form-text"
                   ng-if="$ctrl.UserEmailPreferencesService.areFeedbackNotificationsMuted()">
               You have muted feedback notifications for this exploration. You will not receive an email when new feedback is submitted.
             </span>
@@ -403,11 +403,11 @@
                  Unmute
               </button>
             </span>
-            <span class="col-lg-7 col-md-7 col-sm-7 form-text" style="font-size: smaller;"
+            <span class="col-lg-7 col-md-7 col-sm-7 form-text oppia-form-text"
                   ng-if="!$ctrl.UserEmailPreferencesService.areSuggestionNotificationsMuted()">
               You are currently receiving notifications of new suggestions for this exploration.
             </span>
-            <span class="col-lg-7 col-md-7 col-sm-7 form-text" style="font-size: smaller;"
+            <span class="col-lg-7 col-md-7 col-sm-7 form-text oppia-form-text"
                   ng-if="$ctrl.UserEmailPreferencesService.areSuggestionNotificationsMuted()">
               You have muted suggestion notifications for this exploration. You will not receive an email when new suggestion is submitted.
             </span>
@@ -481,8 +481,8 @@
 
     <h3>
       Initial parameter changes
-      <i class="material-icons md-18" uib-tooltip="These changes are applied before the learner begins the exploration."
-         tooltip-placement="right" style="padding-left: 4px; vertical-align: text-top;">
+      <i class="material-icons md-18 oppia-material-icons" uib-tooltip="These changes are applied before the learner begins the exploration."
+         tooltip-placement="right">
         &#xE88E;
       </i>
     </h3>
@@ -512,5 +512,27 @@
     height: auto;
     padding-right: 0;
     width: 610px;
+  }
+  .oppia-category {
+    min-height: 24px;
+  }
+  .oppia-form-text {
+    font-size: smaller;
+  }
+  .oppia-form-control {
+    margin-right: 0;
+  }
+  .oppia-page-loaded {
+    width: 100%;
+  }
+  .oppia-offset {
+    padding-left: 0;
+  }
+  .oppia-member-role {
+    width: 250px;
+  }
+  .oppia-material-icons {
+    padding-left: 4px;
+    vertical-align: text-top;
   }
 </style>

@@ -1,5 +1,5 @@
 <span ng-model="$ctrl.localValue" ui-validate="'$ctrl.validate($ctrl.value)'">
-  <span style="color: red;" ng-if="$ctrl.availableParamNames.length === 0">
+  <span class="oppia-available-parameters" ng-if="$ctrl.availableParamNames.length === 0">
     <em>No available parameters to follow. Please add one first.</em>
   </span>
 
@@ -8,3 +8,9 @@
     </schema-based-editor>
   </span>
 </span>
+
+<style>
+  .oppia-available-parameters {
+    color: red;
+  }
+</style>

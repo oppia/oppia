@@ -1,16 +1,16 @@
 <background-banner></background-banner>
 <div class="oppia-page-card oppia-static-content protractor-test-thanks-page">
-  <div class="oppia-static-card-content oppia-static-card-content-wide" style="height: 450px">
+  <div class="oppia-static-card-content oppia-static-card-content-wide oppia-static-card-content-extra">
     <h2>Thank you for donating to The Oppia Foundation!</h2>
     <br>
-    <div style="float:left;">
-      <img ng-src="<[$ctrl.thanksImgUrl]>" alt="Otter holding a gift" style="height: 250px;">
+    <div class="oppia-div-style">
+      <img ng-src="<[$ctrl.thanksImgUrl]>" alt="Otter holding a gift" class="oppia-thanks-img-url">
     </div>
-    <div style="float:right;">
+    <div class="oppia-contribution">
       <p>
         Your contribution will be used towards:
       </p>
-      <ul style="margin-left: 30px;">
+      <ul class="oppia-list-style">
         <li>Maintaining our servers</li>
         <li>Marketing</li>
         <li>Distributing learning materials to students</li>
@@ -21,3 +21,21 @@
     </div>
   </div>
 </div>
+
+<style>
+  .oppia-div-style {
+    float: left;
+  }
+  .oppia-thanks-img-url {
+    height: 250px;
+  }
+  .oppia-contribution {
+    float: right;
+  }
+  .oppia-list-style {
+    margin-left: 30px;
+  }
+  .oppia-static-card-content-extra {
+    height: 450px;
+  }
+</style>

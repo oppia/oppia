@@ -1,13 +1,14 @@
 <div class="pencil-code-editor-container">
-  <div style="height: 500px; position: relative;" class="pencil-code-editor-iframe">
+  <div class="pencil-code-editor-iframe oppia-pencil-code-editor-iframe">
     <div></div>
   </div>
-  <div style="margin-top: 4px;">
+  <div class="oppia-div-margin">
     <md-button class="md-button-success" ng-click="$ctrl.reset($ctrl.currentInitialValue)" ng-disabled="!$ctrl.interactionIsActive">
-      <span style="color: #333;">Reset Code</span>
+      <span class="oppia-reset-code">Reset Code</span>
     </md-button>
   </div>
 </div>
+
 <style>
   .pencil-code-editor-container {
     background: #fff;
@@ -15,6 +16,19 @@
     min-width: 560px;
     padding: 8px;
     width: 1000px;
+  }
+
+  .oppia-pencil-code-editor-iframe {
+    height: 500px;
+    position: relative;
+  }
+
+  .oppia-div-margin {
+    margin-top: 4px;
+  }
+
+  .oppia-reset-code {
+    color: #333;
   }
 
   @media screen and (max-width: 959px) {

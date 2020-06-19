@@ -15,10 +15,16 @@
     </mathjax-bind>
   </span>
   <span>
-    <mathjax-bind ng-if="!$ctrl.localValue.label" mathjax-data="$ctrl.placeholderText" style="color: #808080;">
+    <mathjax-bind ng-if="!$ctrl.localValue.label" mathjax-data="$ctrl.placeholderText" class="oppia-placeholder-text">
     </mathjax-bind>
   </span>
   <button type="button" class="btn btn-secondary"  ng-if="!$ctrl.alwaysEditable" ng-click="$ctrl.replaceValue($ctrl.localValue.label)">
     Close
   </button>
 </div>
+
+<style>
+  .oppia-placeholder-text {
+    color: #808080;
+  }
+</style>

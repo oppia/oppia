@@ -31,6 +31,20 @@
   param-changes-editor .oppia-delete-param-change-button:hover {
     opacity: 1;
   }
+  .oppia-form-control {
+    display: inline;
+    width: 110px;
+  }
+  .oppia-serious-warning-text-extra {
+    margin-bottom: 20px;
+    margin-top: 20px;
+  }
+  .oppia-clear {
+    clear: both;
+  }
+  .oppia-param-changes-display {
+    opacity: 0.7;
+  }
 </style>
 <!--
   We do not track by $index here, because if we do, then the select2 dropdown
@@ -54,9 +68,9 @@
                           width="143px">
         </select2-dropdown>
 
-        <select class="form-control" ng-model="paramChange.generatorId"
+        <select class="form-control oppia-form-control" ng-model="paramChange.generatorId"
                 ng-options="key as PREAMBLE_TEXT[key] for (key, value) in PREAMBLE_TEXT"
-                style="width: 110px; display: inline;" required
+                required
                 ng-change="onChangeGeneratorType(paramChange)">
         </select>
         <value-generator-editor generator-id="paramChange.generatorId"
@@ -78,8 +92,7 @@
     </button>
   </div>
 
-  <div ng-if="warningText" class="oppia-serious-warning-text"
-       style="margin-top: 20px; margin-bottom: 20px;">
+  <div ng-if="warningText" class="oppia-serious-warning-text oppia-serious-warning-text-extra">
     <i class="material-icons">&#xE002;</i>
     <[warningText]>
   </div>
@@ -91,7 +104,7 @@
     Save Changes
   </button>
   <button type="button" class="btn btn-secondary float-right" ng-click="cancelEdit()">Cancel</button>
-  <div style="clear: both;"></div>
+  <div class="oppia-clear"></div>
 </div>
 
 <div ng-if="!isParamChangesEditorOpen" ng-click="openParamChangesEditor()"
@@ -99,9 +112,9 @@
   <i ng-if="EditabilityService.isEditable()" class="material-icons oppia-editor-edit-icon"
      title="Edit Card Parameter Changes">&#xE254;
   </i>
-  <div class="oppia-param-changes-display oppia-transition-200"
+  <div class="oppia-param-changes-display oppia-param-changes-display-extra oppia-transition-200"
        ng-class="{'oppia-prevent-selection': EditabilityService.isEditable()}"
-       title="Card Parameter Changes" style="opacity: 0.7;">
+       title="Card Parameter Changes">
     <span ng-if="paramChangesService.savedMemento.length === 0">
       <em>No parameter changes.</em>
     </span>

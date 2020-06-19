@@ -1,4 +1,4 @@
-<div ng-repeat="action in $ctrl.nonSubmitActions track by $index" class="oppia-issues-learner-action" style="text-align: left; margin-left: 0.2rem;">
+<div ng-repeat="action in $ctrl.nonSubmitActions track by $index" class="oppia-issues-learner-action oppia-issues-learner-action-extra">
   <angular-html-bind html-data="$ctrl.renderLearnerAction(action, $ctrl.getLearnerActionIndex($index))">
   </angular-html-bind>
 </div>
@@ -17,3 +17,10 @@
 </table>
 <angular-html-bind html-data="$ctrl.renderLearnerAction($ctrl.finalBlock[$ctrl.index], $ctrl.tableIndex + 1)">
 </angular-html-bind>
+
+<style>
+  .oppia-issues-learner-action-extra {
+    margin-left: 0.2rem;
+    text-align: left;
+  }
+</style>

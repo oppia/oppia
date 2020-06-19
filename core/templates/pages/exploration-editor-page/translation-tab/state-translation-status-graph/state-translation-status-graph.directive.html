@@ -1,10 +1,24 @@
-<span style="font-size: 16px;">
+<span class="oppia-exploration-overview">
   <strong>Exploration Overview</strong>
 </span>
 
-<md-card style="background-color: white; margin: 20px 0; padding: 8px;">
+<md-card class="oppia-md-card">
   <div id="tutorialTranslationOverview" class="oppia-translation-state-graph-container protractor-test-translation-graph">
-    <div state-graph-visualization graph-data="getGraphData()" current-state-id="getActiveStateName()" on-click-function="onClickStateInMap" allow-panning="true" center-at-current-state="true" node-colors="nodeColors()" show-translation-warnings="true" style="height: 100%;">
+    <div state-graph-visualization graph-data="getGraphData()" current-state-id="getActiveStateName()" on-click-function="onClickStateInMap" allow-panning="true" center-at-current-state="true" node-colors="nodeColors()" show-translation-warnings="true" class="oppia-active-state">
     </div>
   </div>
 </md-card>
+
+<style>
+  .oppia-exploration-overview {
+    font-size: 16px;
+  }
+  .oppia-md-card {
+    background-color: white;
+    margin: 20px 0;
+    padding: 8px;
+  }
+  .oppia-active-state {
+    height: 100%;
+  }
+</style>

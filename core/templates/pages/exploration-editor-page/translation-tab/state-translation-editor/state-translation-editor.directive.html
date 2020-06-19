@@ -34,14 +34,14 @@
   <div ng-if="translationEditorIsOpen" class="protractor-test-state-translation-editor">
     <schema-based-editor schema="HTML_SCHEMA" local-value="activeWrittenTranslation.html">
     </schema-based-editor>
-    <div style="margin-top: 2px;">
+    <div class="oppia-success">
       <button type="button"
               class="btn btn-success oppia-save-state-item-button float-right protractor-test-save-translation"
               ng-click="onSaveTranslationButtonClicked()">
         Save
       </button>
       <button type="button" class="btn btn-secondary float-right" ng-click="cancelEdit()">Cancel</button>
-      <div style="clear: both;"></div>
+      <div class="oppia-clear"></div>
     </div>
   </div>
 </div>
@@ -75,5 +75,11 @@
   }
   .oppia-translation-editor {
     min-height: 160px;
+  }
+  .oppia-success {
+    margin-top: 2px;
+  }
+  .oppia-clear {
+    clear: both;
   }
 </style>

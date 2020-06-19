@@ -1,9 +1,9 @@
 <strong><[$ctrl.options.title]></strong>
 <table class="table">
   <colgroup>
-    <col span="1" style="width: 75%;">
-    <col span="1" style="width: 10%;">
-    <col span="1" style="width: 15%;">
+    <col span="1" class="oppia-column-one">
+    <col span="1" class="oppia-column-two">
+    <col span="1" class="oppia-column-three">
   </colgroup>
   <tr>
     <th><[$ctrl.options.column_headers[0]]></th>
@@ -21,6 +21,15 @@
 </table>
 
 <style>
+  oppia-visualization-frequency-table .oppia-column-one {
+    width: 75%;
+  }
+  oppia-visualization-frequency-table .oppia-column-two {
+    width: 10%;
+  }
+  oppia-visualization-frequency-table .oppia-column-three {
+    width: 15%;
+  }
   oppia-visualization-frequency-table table {
     margin-top: 12px;
     table-layout: fixed;

@@ -13,16 +13,16 @@
       <strong>Parameters:</strong>
       <table>
         <tr ng-repeat="(paramName, paramValue) in $ctrl.allParams">
-          <td style="padding: 1px 5px;"><[paramName]>:</td>
-          <td style="padding: 1px 5px;">
+          <td class="oppia-table-column"><[paramName]>:</td>
+          <td class="oppia-table-column">
             <[paramValue != "" ? paramValue : "[Not set]"]>
           </td>
         </tr>
       </table>
     </div>
     <button class="btn-lg" ng-click="$ctrl.resetPreview()">
-      <i class="material-icons" style="margin-bottom: 2px;">&#xE5D5;</i>
-      <span style="margin-left: 10px; padding-top: 20px;">Restart From Beginning</span>
+      <i class="material-icons oppia-material-icons">&#xE5D5;</i>
+      <span class="oppia-restart-from-beginning">Restart From Beginning</span>
     </button>
   </div>
 
@@ -72,5 +72,18 @@
     top: 63px;
     white-space: normal;
     z-index: 1060;
+  }
+
+  .oppia-table-column {
+    padding: 1px 5px;
+  }
+
+  .oppia-material-icons {
+    margin-bottom: 2px;
+  }
+
+  .oppia-restart-from-beginning {
+    margin-left: 10px;
+    padding-top: 20px;
   }
 </style>

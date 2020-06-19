@@ -20,14 +20,14 @@
   </div>
 
   <div class="section">
-    <div style="display: inline-block;">
+    <div class="oppia-card-entered">
       <p>
         <strong>Card entered</strong>
         : <[stateStats.total_hit_count]>
         <strong> times. </strong>
       </p>
     </div>
-    <div style="display: inline-block; padding-left: 170px;">
+    <div class="oppia-card-quit">
       <strong>Quit at this card</strong>
       : <[stateStats.total_hit_count - stateStats.num_completions]>
       <strong> times. </strong>
@@ -35,12 +35,12 @@
   </div>
 
   <div class="section" ng-if="hasExplorationBeenAnswered">
-    <div style="display: inline-block;">
+    <div class="oppia-card-entered">
       <pie-chart data="pieChartData1"
                  options="COMPLETION_RATE_PIE_CHART_OPTIONS1">
       </pie-chart>
     </div>
-    <div style="display: inline-block; padding-left: 76px;">
+    <div class="oppia-pie-chart-data">
       <pie-chart data="pieChartData2"
                  options="COMPLETION_RATE_PIE_CHART_OPTIONS2">
       </pie-chart>
@@ -67,5 +67,19 @@
     border-radius: 2px;
     padding: 12px;
     width: 100%;
+  }
+
+  .oppia-card-entered {
+    display: inline-block;
+  }
+
+  .oppia-card-quit {
+    display: inline-block;
+    padding-left: 170px;
+  }
+
+  .oppia-pie-chart-data {
+    display: inline-block;
+    padding-left: 76px;
   }
 </style>

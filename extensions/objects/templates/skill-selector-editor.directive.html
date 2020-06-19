@@ -3,22 +3,21 @@
     Search By Skill
     <input type="text" class="form-control protractor-test-skill-name-input" placeholder="Enter a skill name" ng-model="skillFilterText" autofocus>
   </md-card>
-  <div style="max-height: 50vh; overflow-y: auto;">
-    <div class="list-group-item protractor-test-rte-skill-selector-item"
+  <div class="oppia-item">
+    <div class="list-group-item oppia-list-group-item protractor-test-rte-skill-selector-item"
          ng-repeat="skill in $ctrl.skills | filter:skillFilterText"
          ng-click="$ctrl.selectSkill(skill.id, skill.description)"
-         ng-class="{'list-group-item-success': (skill.id === $ctrl.value)}"
-         style="color: black;">
+         ng-class="{'list-group-item-success': (skill.id === $ctrl.value)}">
       <label class="list-group-item-heading"><[skill.description]></label>
-      <div ng-if="skill.id === $ctrl.value" style="color: black;">
+      <div ng-if="skill.id === $ctrl.value" class="oppia-list-group-item">
         <strong> Explanation </strong>
-        <div style="padding-bottom: 10px; padding-top: 5px;">
+        <div class="oppia-skill-content">
           <angular-html-bind html-data="skill.skill_contents.explanation.html">
           </angular-html-bind>
         </div>
         <strong> Worked Examples </strong>
         <ul>
-          <li ng-repeat="example in skill.skill_contents.worked_examples" style="padding-top: 5px;">
+          <li ng-repeat="example in skill.skill_contents.worked_examples" class="oppia-question">
             <b> Question: </b>
             <angular-html-bind html-data="example.question.html">
             </angular-html-bind>
@@ -36,5 +35,19 @@
 <style>
   .worked-example-explanation-section {
     margin-top: 1.5vh;
+  }
+  .oppia-item {
+    max-height: 50vh;
+    overflow-y: auto;
+  }
+  .oppia-list-group-item {
+    color: black;
+  }
+  .oppia-skill-content {
+    padding-bottom: 10px;
+    padding-top: 5px;
+  }
+  .oppia-question {
+    padding-top: 5px;
   }
 </style>

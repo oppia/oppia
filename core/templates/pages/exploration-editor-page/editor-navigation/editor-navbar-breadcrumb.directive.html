@@ -3,12 +3,12 @@
     <span class="oppia-navbar-breadcrumb-separator"></span>
     <span ng-if="navbarTitle">
       <[navbarTitle]>
-      <span class="oppia-navbar-breadcrumb-separator" style="margin-left: 5px;"></span>
+      <span class="oppia-navbar-breadcrumb-separator oppia-navbar-breadcrumb-separator-extra"></span>
       <span>
         <[getCurrentTabName()]>
       </span>
     </span>
-    <span ng-if="navbarTitle === ''" ng-click="editTitle()" style="opacity: 0.6;">
+    <span ng-if="navbarTitle === ''" ng-click="editTitle()">
       Untitled Exploration
     </span>
     <span ng-if="navbarTitle === null">
@@ -16,3 +16,12 @@
     </span>
   </li>
 </ul>
+
+<style>
+  .oppia-navbar-breadcrumb-separator-extra {
+    margin-left: 5px;
+  }
+  .oppia-end-title {
+    opacity: 0.6;
+  }
+</style>
