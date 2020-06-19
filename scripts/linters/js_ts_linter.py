@@ -867,11 +867,8 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                 for line_num in python_utils.RANGE(file_length):
                     line = file_content[line_num].strip()
                     next_line = ''
-                    previous_line = ''
                     if line_num + 1 < file_length:
                         next_line = file_content[line_num + 1].strip()
-                    if line_num > 0:
-                        previous_line = file_content[line_num - 1].strip()
 
                     # Check if comment contains any excluded phrase.
                     word_is_present_in_excluded_phrases = any(
@@ -896,18 +893,6 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                                     filepath, line_num + 1))
                             summary_messages.append(summary_message)
                             python_utils.PRINT('')
-
-                    # Check that comment starts with a capital letter.
-                    if (not previous_line.startswith('//') and
-                            re.search(r'^// [a-z][A-Za-z]* .*$', line)):
-                        failed = True
-                        summary_message = (
-                            '%s --> Line %s: There should be a capital letter'
-                            ' at the beginning of the comment.' % (
-                                filepath, line_num + 1))
-                        summary_messages.append(summary_message)
-                        python_utils.PRINT(summary_message)
-                        python_utils.PRINT('')
 
             if failed:
                 summary_message = (
