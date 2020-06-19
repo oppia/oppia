@@ -109,7 +109,7 @@ describe('Signup page', function() {
       ctrl.updateWarningText(ctrl.username);
       ctrl.submitPrerequisitesForm(true, '', true);
 
-      expect(ctrl.warningI18nCode).toBe('Please enter a username.');
+      expect(ctrl.warningI18nCode).toBe('I18N_SIGNUP_ERROR_NO_USERNAME');
       $httpBackend.verifyNoOutstandingExpectation();
       $httpBackend.verifyNoOutstandingRequest();
     });
@@ -139,7 +139,7 @@ describe('Signup page', function() {
 
         var isRequestTheExpectOne = function(queryParams) {
           return decodeURIComponent(queryParams).match(
-            '"can_receive_email_updates": true');
+            '"can_receive_email_updates":true');
         };
 
         $httpBackend.expectPOST('/signuphandler/data', isRequestTheExpectOne)
@@ -160,7 +160,7 @@ describe('Signup page', function() {
 
         var isRequestTheExpectOne = function(queryParams) {
           return decodeURIComponent(queryParams).match(
-            '"can_receive_email_updates": false');
+            '"can_receive_email_updates":false');
         };
 
         $httpBackend.expectPOST('/signuphandler/data', isRequestTheExpectOne)
