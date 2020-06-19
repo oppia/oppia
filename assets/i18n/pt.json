@@ -521,6 +521,8 @@
 	"I18N_TEACH_PAGE_TAB_PARTICIPATION_PLAYBOOK": "Manual de participação",
 	"I18N_TEACH_PAGE_TAB_TEACH_WITH_OPPIA": "Ensinar com o Oppia",
 	"I18N_TOPIC_SUMMARY_TILE_LESSONS": "{lessonCount, plural, =1{1 lição} other{# lições}}",
+	"I18N_TOPIC_VIEWER_PRACTICE": "Conteúdo",
+	"I18N_TOPIC_VIEWER_STORY": "História",
 	"I18N_TOPNAV_ABOUT": "Sobre",
 	"I18N_TOPNAV_ABOUT_OPPIA": "Sobre o Oppia",
 	"I18N_TOPNAV_ADMIN_PAGE": "Página de administração",

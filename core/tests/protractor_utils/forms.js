@@ -512,7 +512,7 @@ var RichTextChecker = async function(arrayOfElems, arrayOfTexts, fullText) {
     readItalicText: async function(text) {
       await _readFormattedText(text, 'em');
     },
-    // TODO(Jacob): add functions for other rich text components.
+    // TODO(Jacob): Add functions for other rich text components.
     // Additional arguments may be sent to this function, and they will be
     // passed on to the relevant RTE component editor.
     readRteComponent: async function(componentName) {
