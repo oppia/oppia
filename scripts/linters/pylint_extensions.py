@@ -1335,6 +1335,11 @@ class DocstringChecker(checkers.BaseChecker):
             'eight-space-indentation-in-docstring',
             ('Please use 8 space indentation in wrap around messages' +
              'for args, returns and raises')
+        ),
+        'C0028': (
+            'malformed parameter',
+            'malformed-parameter',
+            'Please only use the argument names with separators'
         )
     }
 
@@ -1352,6 +1357,8 @@ class DocstringChecker(checkers.BaseChecker):
         is_docstring_return = False
         is_docstring_raise = False
         is_docstring_yield = False
+        free_form_return = False
+        description = False
         is_class_or_function = False
         outer_indentation_in_spaces = 0
         file_content = read_from_node(node)
@@ -1445,57 +1452,103 @@ class DocstringChecker(checkers.BaseChecker):
                     is_docstring_return = False
                     is_docstring_raise = False
                     is_docstring_yield = False
+                    free_form_return = False
+                    description = False
                     outer_indentation_in_spaces = current_indentation
-                    #process
                 elif line.startswith('Returns:'):
                     is_docstring_arg = False
                     is_docstring_return = True
                     is_docstring_raise = False
                     is_docstring_yield = False
+                    free_form_return = False
+                    description = False
                     outer_indentation_in_spaces = current_indentation
-                    #process
                 elif line.startswith('Raises:'):
                     is_docstring_arg = False
                     is_docstring_return = False
                     is_docstring_raise = True
                     is_docstring_yield = False
+                    free_form_return = False
+                    description = False
                     outer_indentation_in_spaces = current_indentation
                 elif line.startswith('Yields:'):
                     is_docstring_arg = False
                     is_docstring_return = False
                     is_docstring_raise = False
                     is_docstring_yield = True
+                    free_form_return = False
+                    description = False
                     outer_indentation_in_spaces = current_indentation
                 elif len(line) == 0:
                     continue
-                elif is_docstring_arg or is_docstring_raise:
-                    if re.search(br'^[a-z_]+[a-zA-Z0-9_]*:',
-                                 line_with_spaces.lstrip()):
+                elif is_docstring_arg:
+                    # Parameter
+                    if re.search(br'^[a-z_\*]+[a-z0-9_]*: ',
+                                 line):
                         if current_indentation != (
                                 outer_indentation_in_spaces + 4):
                             self.add_message(
                                 'four-space-indentation-in-docstring',
                                 line=line_num + 1)
-                    else:
+                        description = True
+                    # Possible malformed parameter
+                    elif ((re.search(br'^[^ ]+: ', line)
+                           or re.search(br'^- [^ ]+: ', line))
+                          and not description):
+                        self.add_message(
+                            'malformed-parameter',
+                            line=line_num + 1)
+                    # Description that must be indented by 8
+                    elif description:
+                        if current_indentation != (
+                                outer_indentation_in_spaces + 8):
+                            self.add_message(
+                                'eight-space-indentation-in-docstring',
+                                line=line_num + 1)
+                elif is_docstring_raise:
+                    # Parameter
+                    if re.search(br'^[a-zA-Z0-9_\.\*]+: ',
+                                 line):
+                        if current_indentation != (
+                                outer_indentation_in_spaces + 4):
+                            self.add_message(
+                                'four-space-indentation-in-docstring',
+                                line=line_num + 1)
+                        description = True
+                    # Possible malformed parameter
+                    elif re.search(br'^[^ ]+: ', line) and not description:
+                        self.add_message(
+                            'malformed-parameter',
+                            line=line_num + 1)
+                    # Description that must be indented by 8
+                    elif description:
                         if current_indentation != (
                                 outer_indentation_in_spaces + 8):
                             self.add_message(
                                 'eight-space-indentation-in-docstring',
                                 line=line_num + 1)
                 elif is_docstring_return or is_docstring_yield:
-                    if re.search(br'^[a-z_()]+[a-zA-Z_()]*\.',
-                                 line_with_spaces.lstrip()):
+                    # Parameter
+                    if (re.search(br'^[a-zA-Z_() -:,\*]+\. ',
+                                  line) and not description):
                         if current_indentation != (
                                 outer_indentation_in_spaces + 4):
                             self.add_message(
                                 'four-space-indentation-in-docstring',
                                 line=line_num + 1)
+                        if re.search(br':$', line):
+                            free_form_return = True
+                        description = True
+                    # Description
                     else:
-                        if current_indentation != (
-                                outer_indentation_in_spaces + 8):
+                        if (current_indentation != (
+                                outer_indentation_in_spaces + 4)
+                                and not free_form_return):
                             self.add_message(
-                                'eight-space-indentation-in-docstring',
+                                'four-space-indentation-in-docstring',
                                 line=line_num + 1)
+                        if re.search(br':$', line):
+                            free_form_return = True
 
 
 class BlankLineBelowFileOverviewChecker(checkers.BaseChecker):
