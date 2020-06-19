@@ -7,7 +7,7 @@
           <span ng-if="inTranslationMode">Translations</span> for language:
         </strong>
       </span>
-      <select id="audioTranslationLanguageCodeField" class="oppia-translation-language-selectoror protractor-test-translation-language-selectoror" ng-change="changeTranslationLanguage()" ng-model="languageCode"
+      <select id="audioTranslationLanguageCodeField" class="oppia-translation-language-selector protractor-test-translation-language-selector" ng-change="changeTranslationLanguage()" ng-model="languageCode"
               ng-options="language.id as language.description for language in languageCodesAndDescriptions">
       </select>
     </div>
@@ -57,7 +57,7 @@
     margin: 7px 0 7px 15px;
     width: 350px;
   }
-  .oppia-translation-language-selectoror {
+  .oppia-translation-language-selector {
     border-radius: 8px;
   }
   .oppia-numerical-progress-status {

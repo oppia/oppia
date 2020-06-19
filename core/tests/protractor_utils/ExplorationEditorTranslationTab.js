@@ -163,10 +163,10 @@ var ExplorationEditorTranslationTab = function() {
   var translationTabPlayRecordingAccessibility = element(
     by.css('.protractor-test-accessibility-translation-play-recorded-audio'));
   var selectedLanguageElement = element(
-    by.css('.protractor-test-translation-language-selectoror')).element(
+    by.css('.protractor-test-translation-language-selector')).element(
     by.css('option:checked'));
   var languageSelectorElement = element(
-    by.css('.protractor-test-translation-language-selectoror'));
+    by.css('.protractor-test-translation-language-selector'));
   var languageSelectorLabelElement = element(
     by.css('.protractor-test-language-selector-label'));
   var progressBarLabelElement = element(
