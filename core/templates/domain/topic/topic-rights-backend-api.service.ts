@@ -37,7 +37,8 @@ export class TopicRightsBackendApiService {
   constructor(
     private http: HttpClient,
     private urlInterpolation: UrlInterpolationService,
-    private topicRightsResponseObjectFactory: TopicRightsResponseObjectFactory) {}
+    private topicRightsResponseObjectFactory:
+      TopicRightsResponseObjectFactory) {}
   // Maps previously loaded topic rights to their IDs.
   private topicRightsCache = {};
 
@@ -49,14 +50,11 @@ export class TopicRightsBackendApiService {
       TopicDomainConstants.TOPIC_RIGHTS_URL_TEMPLATE, {
         topic_id: topicId
       });
-    console.log(topicRightsUrl);
 
     this.http.get(topicRightsUrl).toPromise().then(
       (response: ITopicRightsBackendDataDict) => {
-        console.log(typeof(response));
-        console.log(response, "c2");
-        console.log(successCallback);
-        let res = this.topicRightsResponseObjectFactory.createFromBackendDict(response);
+        let res =
+          this.topicRightsResponseObjectFactory.createFromBackendDict(response);
         if (successCallback) {
           successCallback(res);
         }
