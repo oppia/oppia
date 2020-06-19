@@ -214,6 +214,8 @@ class ClearExplorationIssuesOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                         item_key: str. Either ITEM_KEY_ALL or ITEM_KEY_TRACKED.
                         playthrough_id: str. ID of a PlaythroughModel.
         """
+        if model.deleted:
+            return
         if isinstance(model, stats_models.ExplorationIssuesModel):
             for exp_issue in model.unresolved_issues:
                 for playthrough_id in exp_issue['playthrough_ids']:

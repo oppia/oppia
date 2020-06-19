@@ -235,6 +235,24 @@ class ClearExplorationIssuesOneOffJobTests(OneOffJobTestBase):
     def test_job_reports_nothing_when_there_are_no_models(self):
         self.assertItemsEqual(self.run_one_off_job(), [])
 
+    def test_job_reports_nothing_when_items_are_already_deleted(self):
+        all_playthrough_ids = [
+            self.create_playthrough() for _ in python_utils.RANGE(2)
+        ]
+        exp_issues_id = self.create_exp_issues_with_playthroughs(
+            [all_playthrough_ids[0:1]])
+        exp_issues = (
+            stats_models.ExplorationIssuesModel.get_by_id(exp_issues_id))
+        exp_issues.deleted = True
+        exp_issues.put()
+        for playthrough_id in all_playthrough_ids:
+            playthrough = (
+                stats_models.PlaythroughModel.get_by_id(playthrough_id))
+            playthrough.deleted = True
+            playthrough.put()
+
+        self.assertItemsEqual(self.run_one_off_job(), [])
+
     def test_job_reports_cleared_exp_issues_without_any_playthroughs(self):
         exp_issues_id = self.create_exp_issues_with_playthroughs([
             [], [], [], # 3 exploration issues each referring to 0 playthroughs.
