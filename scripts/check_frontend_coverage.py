@@ -527,6 +527,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'topic-viewer-page.controller.ts',
     'topic-viewer-stories-list.directive.ts',
     'TopicObjectFactory.ts',
+    'TopicRightsResponseObjectFactory.ts',
     'topics-and-skills-dashboard-backend-api.service.ts',
     'topics-and-skills-dashboard-navbar-breadcrumb.directive.ts',
     'topics-and-skills-dashboard-navbar.directive.ts',
