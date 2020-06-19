@@ -20,6 +20,8 @@
 var waitFor = require('./waitFor.js');
 var workflow = require('../protractor_utils/workflow.js');
 var path = require('path');
+var general = require('../protractor_utils/general.js');
+
 
 var PreferencesPage = function() {
   var USER_PREFERENCES_URL = '/preferences';
@@ -28,7 +30,6 @@ var PreferencesPage = function() {
   var feedbackMessageEmailsCheckbox = element(
     by.css('.protractor-test-feedback-message-email-checkbox'));
   var languageOptionsList = element.all(by.css('.select2-results'));
-  var navBar = element(by.css('.oppia-navbar-dropdown-toggle'));
   var pageHeader = element(by.css('.protractor-test-preferences-title'));
   var preferencesLink = element(by.css('.protractor-test-preferences-link'));
   var preferredAudioLanguageSelector = element(
@@ -55,6 +56,18 @@ var PreferencesPage = function() {
     by.css('.protractor-test-photo-crop .cropper-container'));
   var profilePhotoUploadError = element(
     by.css('.protractor-test-upload-error'));
+  var savingNewChangesMessageElement = element(
+    by.css('.protractor-test-saving-new-changes-message'));
+  var savedNewChangesMessageElement = element(
+    by.css('.protractor-test-saved-new-changes-message'));
+
+  var saveNewChanges = async function() {
+    await general.scrollToTop();
+    await pageHeader.click();
+    await waitFor.visibilityOf(
+      savedNewChangesMessageElement,
+      'Saved new changes message takes too long to be visible.');
+  };
 
   this.expectUploadError = async function() {
     expect(await profilePhotoUploadError.isDisplayed()).toBe(true);
@@ -76,8 +89,7 @@ var PreferencesPage = function() {
 
   this.editUserBio = async function(bio) {
     await userBioElement.sendKeys(bio);
-    await navBar.click();
-    await preferencesLink.click();
+    await saveNewChanges();
   };
 
   this.get = async function() {
@@ -87,10 +99,12 @@ var PreferencesPage = function() {
 
   this.toggleEditorRoleEmailsCheckbox = async function() {
     await editorRoleEmailsCheckbox.click();
+    await saveNewChanges();
   };
 
   this.toggleFeedbackEmailsCheckbox = async function() {
     await feedbackMessageEmailsCheckbox.click();
+    await saveNewChanges();
   };
 
   this.selectSystemLanguage = async function(language) {
@@ -98,6 +112,7 @@ var PreferencesPage = function() {
     var option = element(
       by.cssContainingText('.select2-dropdown li', language));
     await option.click();
+    await saveNewChanges();
   };
 
   this.selectPreferredAudioLanguage = async function(language) {
@@ -105,6 +120,7 @@ var PreferencesPage = function() {
     var correctOption = element(
       by.cssContainingText('.select2-results li', language));
     await correctOption.click();
+    await saveNewChanges();
   };
 
   this.setUserBio = async function(bio) {
@@ -112,10 +128,7 @@ var PreferencesPage = function() {
       userBioElement, 'User bio field takes too long to appear.');
     await userBioElement.clear();
     await userBioElement.sendKeys(bio);
-    await navBar.click();
-    await waitFor.elementToBeClickable(
-      preferencesLink, 'Preferences takes too long to be clickable.');
-    await preferencesLink.click();
+    await saveNewChanges();
   };
 
   this.setUserInterests = async function(interests) {
@@ -123,6 +136,7 @@ var PreferencesPage = function() {
     await Promise.all(interests.map(async function(interest) {
       await userInterestsInput.sendKeys(interest, protractor.Key.RETURN);
     }));
+    await saveNewChanges();
   };
 
   this.isFeedbackEmailsCheckboxSelected = async function() {
@@ -177,10 +191,12 @@ var PreferencesPage = function() {
 
   this.selectCreatorDashboard = async function() {
     await createrDashboardRadio.click();
+    await saveNewChanges();
   };
 
   this.selectLearnerDashboard = async function() {
     await learnerDashboardRadio.click();
+    await saveNewChanges();
   };
 };
 

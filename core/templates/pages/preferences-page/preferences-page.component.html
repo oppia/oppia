@@ -4,6 +4,19 @@
       translate="I18N_PREFERENCES_HEADING">
   </h2>
   <em><div class="oppia-preferences-page-heading-subtext" translate="I18N_PREFERENCES_HEADING_SUBTEXT"></div></em>
+  <em>
+    <div class="oppia-preferences-page-saving-messages">
+      <div ng-if="$ctrl.savingNewChanges">
+        <span class="protractor-test-saving-new-changes-message">Saving new changes</span>
+        <span class="oppia-loading-dot-one">.</span>
+        <span class="oppia-loading-dot-two">.</span>
+        <span class="oppia-loading-dot-three">.</span>
+      </div>
+      <div ng-if="!$ctrl.savingNewChanges && $ctrl.newChangesSavedMessageVisiblePromise !== null">
+        <span class="protractor-test-saved-new-changes-message">Saved new changes</span>
+      </div>
+    </div>
+  </em>
   <md-card class="oppia-page-card">
     <div class="container">
       <div class="form-group row">
@@ -254,17 +267,23 @@
     font-size: 3em;
     margin-top: 0;
     margin-bottom: 10px;
-    padding-top: 45px;
+    padding-top: 30px;
     position: relative;
     text-align: center;
   }
 
-  .oppia-preferences-page-heading-subtext {
+  .oppia-preferences-page-heading-subtext,
+  .oppia-preferences-page-saving-messages {
     color: #01645c;
     font-family: 'Capriola', 'Roboto', Arial, sans-serif;
     font-size: 1.2em;
     position: relative;
     text-align: center;
+  }
+  .oppia-preferences-page-saving-messages {
+    font-size: 0.8em;
+    min-height: 20px;
+    margin-top: 10px;
   }
 
   .oppia-bio-border {

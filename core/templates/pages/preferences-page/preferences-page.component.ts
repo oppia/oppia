@@ -65,9 +65,20 @@ angular.module('oppia').component('preferencesPage', {
         return UrlInterpolationService.getStaticImageUrl(imagePath);
       };
       var _saveDataItem = function(updateType, data) {
+        if (ctrl.newChangesSavedMessageVisiblePromise !== null) {
+          $timeout.cancel(ctrl.newChangesSavedMessageVisiblePromise);
+          ctrl.newChangesSavedMessageVisiblePromise = null;
+        }
+        ctrl.savingNewChanges = true;
+
         $http.put(_PREFERENCES_DATA_URL, {
           update_type: updateType,
           data: data
+        }).then(function() {
+          ctrl.savingNewChanges = false;
+          ctrl.newChangesSavedMessageVisiblePromise = $timeout(function() {
+            ctrl.newChangesSavedMessageVisiblePromise = null;
+          }, 5000);
         });
       };
 
@@ -171,6 +182,8 @@ angular.module('oppia').component('preferencesPage', {
         ctrl.profilePictureDataUrl = '';
         ctrl.DASHBOARD_TYPE_CREATOR = DASHBOARD_TYPE_CREATOR;
         ctrl.DASHBOARD_TYPE_LEARNER = DASHBOARD_TYPE_LEARNER;
+        ctrl.savingNewChanges = false;
+        ctrl.newChangesSavedMessageVisiblePromise = null;
 
         ctrl.username = '';
         LoaderService.showLoadingScreen('Loading');
