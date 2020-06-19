@@ -154,6 +154,7 @@ describe('Collection Editor Pre Publish Modal Controller', function() {
     });
 
     it('should not save a collection if title is empty', function() {
+      ctrl.newTitle = '';
       ctrl.newObjective = 'New objective';
       ctrl.newCategory = 'Algorithm';
       expect(ctrl.isSavingAllowed()).toBe(false);
@@ -167,6 +168,7 @@ describe('Collection Editor Pre Publish Modal Controller', function() {
 
     it('should not save a collection if objective is empty', function() {
       ctrl.newTitle = 'New title';
+      ctrl.newObjective = '';
       ctrl.newCategory = 'Algorithm';
       expect(ctrl.isSavingAllowed()).toBe(false);
 
@@ -180,6 +182,7 @@ describe('Collection Editor Pre Publish Modal Controller', function() {
     it('should not save a collection if category is empty', function() {
       ctrl.newTitle = 'New title';
       ctrl.newObjective = 'New objective';
+      ctrl.newCategory = '';
       expect(ctrl.isSavingAllowed()).toBe(false);
 
       ctrl.save();
