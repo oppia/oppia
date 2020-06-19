@@ -311,11 +311,11 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                         generated_html_field_types_dict[html_type])
 
                     # TODO(#9588): This generation (and the format of the
-                    # html_field_types_dict) assume that there is at most one
+                    # html_field_types_dict) assumes that there is at most one
                     # interaction ID that uses a given HTML object type. If this
                     # changes in the future, the structure of the dict needs to
                     # be amended so that the each HTML object type can
-                    # accomodate more than one interaction. Corresponding
+                    # accommodate more than one interaction. Corresponding
                     # checks in state_domain.AnswerGroup
                     # get_all_html_content_strings() also needs to be updated.
                     if isinstance(
@@ -324,8 +324,8 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                         # The above type check is required because,
                         # all the keys in the generated html type
                         # dict is initialized as defaultdict object.
-                        # We raise an exception if the existing interactionID
-                        # overwritten by another interactionId.
+                        # Below, we raise an exception if the existing
+                        # interactionID is overwritten by another interactionId.
                         if (html_type_dict['interactionId'] !=
                                 interaction_id):
                             raise Exception(
