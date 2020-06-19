@@ -353,7 +353,7 @@ def main(personal_access_token):
         new_author_names = [name for name, _ in new_authors]
         existing_author_names = [name for name, _ in existing_authors]
 
-        # TODO(apb7): duplicate author handling due to email changes.
+        # TODO(apb7): Duplicate author handling due to email changes.
         out.write('\n%s' % release_constants.NEW_AUTHORS_HEADER)
         for name, email in new_authors:
             out.write('* %s <%s>\n' % (name, email))

@@ -18,11 +18,10 @@
 
 require('filters/string-utility-filters/underscores-to-camel-case.filter.ts');
 
-/* eslint-disable camelcase */
 interface InteractionValidator {
-  id: string;
-  min_value?: number;
-  max_value?: number;
+  'id': string;
+  'min_value'?: number;
+  'max_value'?: number;
 }
 
 interface ApplyValidationCustomScope extends ng.IScope {
