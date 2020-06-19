@@ -47,7 +47,7 @@ export class ExplorationStats {
 
   getBounceRate(stateName: string): number {
     if (this.numStarts === 0) {
-      throw new Error('Bounce rate requires non-zero exploration starts');
+      throw new Error('Can not get bounce rate of an unplayed exploration');
     }
     const { totalHitCount, numCompletions } = this.getStateStats(stateName);
     return (totalHitCount - numCompletions) / this.numStarts;

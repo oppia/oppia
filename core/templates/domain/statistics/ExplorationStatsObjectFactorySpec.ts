@@ -135,9 +135,9 @@ describe('Exploration stats', function() {
             num_completions: 0,
           },
         },
-      })
+      });
       expect(() => explorationStats.getBounceRate('Introduction'))
-        .toThrowError('Bounce rate requires non-zero exploration starts');
+        .toThrowError('Can not get bounce rate of an unplayed exploration');
     });
   });
 });
