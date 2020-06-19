@@ -26,7 +26,7 @@ from google.appengine.ext import ndb
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
-TASK_ENTITY_TYPE_EXPLORATION = feconf.ENTITY_TYPE_EXPLORATION
+TASK_ENTITY_TYPE_EXPLORATION = feconf.TASK_ENTITY_TYPE_EXPLORATION
 TASK_ENTITY_TYPES = (
     TASK_ENTITY_TYPE_EXPLORATION,
 )
