@@ -218,7 +218,7 @@ class ClearExplorationIssuesOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                         ClearExplorationIssuesOneOffJob.REDUCE_KEY_TO_DELETE, (
                             ClearExplorationIssuesOneOffJob.ITEM_KEY_TRACKED,
                             playthrough_id))
-                exp_issue['playthrough_ids'] = []
+            model.unresolved_issues = []
             model.put()
             yield (ClearExplorationIssuesOneOffJob.REDUCE_KEY_CLEARED, model.id)
 
