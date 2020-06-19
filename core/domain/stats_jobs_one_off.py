@@ -176,8 +176,8 @@ class ClearExplorationIssuesOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     each of them are completely cleared out/deleted from storage, respectively.
     """
 
-    REDUCE_KEY_DELETE = 'DELETE'
     REDUCE_KEY_CLEARED = 'CLEARED'
+    REDUCE_KEY_DELETE = 'DELETE'
 
     ITEM_KEY_ALL = 'ALL'
     ITEM_KEY_TRACKED = 'TRACKED'
@@ -203,23 +203,18 @@ class ClearExplorationIssuesOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
         Yields:
             tuple. Contains the following two items:
-                reduce_key: str. Either REDUCE_KEY_DELETE or REDUCE_KEY_CLEARED.
+                reduce_key: str. Either REDUCE_KEY_CLEARED or REDUCE_KEY_DELETE.
                 reduce_value: tuple or str.
-                    When reduce_key is REDUCE_KEY_DELETE, then each item is a
-                    tuple with the following values:
-                        item_key: str. Either ITEM_KEY_TRACKED or ITEM_KEY_ALL.
-                        playthrough_id: str. ID of a PlaythroughModel.
-
-                    Otherwise, when reduce_key is REDUCE_KEY_CLEARED, then:
+                    When reduce_key is REDUCE_KEY_CLEARED, then each item is:
                         exp_issues_id: str. the ID of the corresponding
                             ExplorationIssuesModel which was cleared of
                             playthroughs.
+                    Otherwise, when reduce_key is REDUCE_KEY_DELETE, then each
+                    item is a tuple with the following 2 items:
+                        item_key: str. Either ITEM_KEY_ALL or ITEM_KEY_TRACKED.
+                        playthrough_id: str. ID of a PlaythroughModel.
         """
-        if isinstance(model, stats_models.PlaythroughModel):
-            yield (
-                ClearExplorationIssuesOneOffJob.REDUCE_KEY_DELETE, (
-                    ClearExplorationIssuesOneOffJob.ITEM_KEY_ALL, model.id))
-        elif isinstance(model, stats_models.ExplorationIssuesModel):
+        if isinstance(model, stats_models.ExplorationIssuesModel):
             for exp_issue in model.unresolved_issues:
                 for playthrough_id in exp_issue['playthrough_ids']:
                     yield (
@@ -229,6 +224,10 @@ class ClearExplorationIssuesOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             model.unresolved_issues = []
             model.put()
             yield (ClearExplorationIssuesOneOffJob.REDUCE_KEY_CLEARED, model.id)
+        elif isinstance(model, stats_models.PlaythroughModel):
+            yield (
+                ClearExplorationIssuesOneOffJob.REDUCE_KEY_DELETE, (
+                    ClearExplorationIssuesOneOffJob.ITEM_KEY_ALL, model.id))
 
     @staticmethod
     def reduce(reduce_key, stringified_values):
@@ -236,18 +235,18 @@ class ClearExplorationIssuesOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         and PlaPlaythroughModel instances.
 
         Args:
-            reduce_key: str. Either REDUCE_KEY_DELETE or REDUCE_KEY_CLEARED.
+            reduce_key: str. Either REDUCE_KEY_CLEARED or REDUCE_KEY_DELETE.
             stringified_values: list(str).
 
-                When reduce_key is REDUCE_KEY_DELETE, then each item is a
-                stringified tuple with the following values:
-                    item_key: str. Either ITEM_KEY_TRACKED or ITEM_KEY_ALL.
-                    playthrough_id: str. ID of a PlaythroughModel.
-
-                Otherwise, when reduce_key is REDUCE_KEY_CLEARED, then:
+                When reduce_key is REDUCE_KEY_CLEARED, then each item is:
                     exp_issues_id: str. the ID of the corresponding
                         ExplorationIssuesModel which was cleared of
                         playthroughs.
+
+                Otherwise, when reduce_key is REDUCE_KEY_DELETE, then each item
+                is a stringified tuple with the following values:
+                    item_key: str. Either ITEM_KEY_ALL or ITEM_KEY_TRACKED.
+                    playthrough_id: str. ID of a PlaythroughModel.
 
         Yields:
             tuple. Contains the following 2 values:
@@ -260,16 +259,18 @@ class ClearExplorationIssuesOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             yield (
                 ClearExplorationIssuesOneOffJob.RESULT_CLEARED,
                 len(stringified_values))
+
         elif reduce_key == ClearExplorationIssuesOneOffJob.REDUCE_KEY_DELETE:
             map_results = [ast.literal_eval(v) for v in stringified_values]
-            tracked_playthrough_ids_to_delete = set()
-            all_playthrough_ids = set()
 
+            all_playthrough_ids = set()
+            tracked_playthrough_ids_to_delete = set()
             for item_key, playthrough_id in map_results:
-                if item_key == ClearExplorationIssuesOneOffJob.ITEM_KEY_TRACKED:
-                    tracked_playthrough_ids_to_delete.add(playthrough_id)
-                elif item_key == ClearExplorationIssuesOneOffJob.ITEM_KEY_ALL:
+                if item_key == ClearExplorationIssuesOneOffJob.ITEM_KEY_ALL:
                     all_playthrough_ids.add(playthrough_id)
+                elif (item_key ==
+                      ClearExplorationIssuesOneOffJob.ITEM_KEY_TRACKED):
+                    tracked_playthrough_ids_to_delete.add(playthrough_id)
             untracked_playthrough_ids_to_delete = (
                 all_playthrough_ids - tracked_playthrough_ids_to_delete)
 
