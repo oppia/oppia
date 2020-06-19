@@ -56,6 +56,7 @@ FILES_EXCLUDED_FROM_ANY_TYPE_CHECK = json.load(python_utils.open_file(
 
 COMPILED_TYPESCRIPT_TMP_PATH = 'tmpcompiledjs/'
 
+
 def _get_expression_from_node_if_one_exists(
         parsed_node, components_to_check):
     """This function first checks whether the parsed node represents
