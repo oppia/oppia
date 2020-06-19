@@ -28,7 +28,9 @@ export interface IExplorationStatsBackendDict {
   'num_starts': number;
   'num_actual_starts': number;
   'num_completions': number;
-  'state_stats_mapping': { [stateName: string]: IStateStatsBackendDict };
+  'state_stats_mapping': {
+    [stateName: string]: IStateStatsBackendDict;
+  };
 }
 
 @Injectable({
@@ -44,8 +46,15 @@ export class ExplorationStats {
       private readonly stateStatsMapping: Map<string, StateStats>) {}
 
   getBounceRate(stateName: string): number {
+    if (this.numStarts === 0) {
+      throw new Error('Bounce rate requires non-zero exploration starts');
+    }
     const { totalHitCount, numCompletions } = this.getStateStats(stateName);
     return (totalHitCount - numCompletions) / this.numStarts;
+  }
+
+  getStateNames(): string[] {
+    return [...this.stateStatsMapping.keys()];
   }
 
   getStateStats(stateName: string): StateStats {

@@ -71,6 +71,22 @@ describe('Exploration stats', function() {
             num_times_solution_viewed: 100,
             num_completions: 1,
           },
+          Middle: {
+            total_answers_count: 1,
+            useful_feedback_count: 1,
+            total_hit_count: 10,
+            first_hit_count: 10,
+            num_times_solution_viewed: 100,
+            num_completions: 1,
+          },
+          End: {
+            total_answers_count: 1,
+            useful_feedback_count: 1,
+            total_hit_count: 10,
+            first_hit_count: 10,
+            num_times_solution_viewed: 100,
+            num_completions: 1,
+          },
         },
       });
     });
@@ -78,6 +94,11 @@ describe('Exploration stats', function() {
     it('should return corresponding state stats', () => {
       const introductionStats = explorationStats.getStateStats('Introduction');
       expect(introductionStats).toBeInstanceOf(StateStats);
+    });
+
+    it('should return array of included state names', () => {
+      expect(explorationStats.getStateNames()).toEqual(
+        jasmine.arrayWithExactContents(['Introduction', 'Middle', 'End']));
     });
 
     it('should throw an error if state stats do not exist', () => {
@@ -94,6 +115,29 @@ describe('Exploration stats', function() {
 
       expect(explorationStats.getBounceRate('Introduction'))
         .toBeCloseTo((10 - 1) / 100);
+    });
+
+    it('should throw an error when trying to calculate bounce rate of an ' +
+      'unplayed exploration', () => {
+      explorationStats = explorationStatsObjectFactory.createFromBackendDict({
+        exp_id: 'eid',
+        exp_version: 0,
+        num_starts: 0,
+        num_actual_starts: 0,
+        num_completions: 0,
+        state_stats_mapping: {
+          Introduction: {
+            total_answers_count: 0,
+            useful_feedback_count: 0,
+            total_hit_count: 0,
+            first_hit_count: 0,
+            num_times_solution_viewed: 0,
+            num_completions: 0,
+          },
+        },
+      })
+      expect(() => explorationStats.getBounceRate('Introduction'))
+        .toThrowError('Bounce rate requires non-zero exploration starts');
     });
   });
 });
