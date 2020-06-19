@@ -215,18 +215,54 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'training_data': [],
             'tagged_skill_misconception_id': None
         }
+        state_default_outcome = state_domain.Outcome(
+            'State1', state_domain.SubtitledHtml(
+                'default_outcome', '<p>Default outcome for State1</p>'),
+            False, [], None, None
+        )
+        state_hint_list = [
+            state_domain.Hint(
+                state_domain.SubtitledHtml(
+                    'hint_1', '<p>Hello, this is html1 for state1</p>'
+                )
+            ),
+            state_domain.Hint(
+                state_domain.SubtitledHtml(
+                    'hint_2', '<p>Hello, this is html2 for state1</p>'
+                )
+            ),
+        ]
+        state_solution_dict = {
+            'interaction_id': '',
+            'answer_is_exclusive': True,
+            'correct_answer': 'Answer1',
+            'explanation': {
+                'content_id': 'solution',
+                'html': '<p>This is solution for state1</p>'
+            }
+        }
+
         state.update_content(
             state_domain.SubtitledHtml.from_dict(state_content_dict))
         state.update_interaction_id('TextInput')
         state.update_interaction_answer_groups(
             [state_answer_group_dict])
+        state.update_interaction_default_outcome(state_default_outcome)
+        state.update_interaction_hints(state_hint_list)
+        solution = state_domain.Solution.from_dict(
+            state.interaction.id, state_solution_dict)
+        state.update_interaction_solution(solution)
 
         exp_services.save_new_exploration('owner_id', exploration)
         html_list = state.get_all_html_content_strings()
         self.assertEqual(
             html_list,
             [
-                '<p>state outcome html</p>', '',
+                '<p>state outcome html</p>',
+                '<p>Default outcome for State1</p>',
+                '<p>Hello, this is html1 for state1</p>',
+                '<p>Hello, this is html2 for state1</p>',
+                '<p>This is solution for state1</p>',
                 '<p>state content html</p>'])
 
     def test_get_all_html_in_exploration_with_item_selection_interaction(self):
@@ -395,7 +431,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state_answer_groups = [{
             'rule_specs': [{
                 'rule_type': 'Equals',
-                'inputs': {}
+                'inputs': {
+                    'x': ['<p>init_state customization arg html 1</p>']
+                }
             }],
             'outcome': {
                 'dest': exploration.init_state_name,
@@ -411,13 +449,46 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'training_data': [],
             'tagged_skill_misconception_id': None
         }]
+        state_customization_args_dict = {
+            'maxAllowableSelectionCount': {
+                'value': 1
+            },
+            'minAllowableSelectionCount': {
+                'value': 1
+            },
+            'choices': {
+                'value': [
+                    '<p>init_state customization arg html 1</p>',
+                    '<p>init_state customization arg html 2</p>',
+                    '<p>init_state customization arg html 3</p>',
+                    '<p>init_state customization arg html 4</p>'
+                ]
+            }
+        }
 
         state.update_interaction_id('ItemSelectionInput')
+        state.update_interaction_customization_args(
+            state_customization_args_dict)
         state.update_interaction_answer_groups(state_answer_groups)
-        with self.assertRaisesRegexp(
-            Exception,
-            'Rule spec should have atleast one input variable.'):
-            state.get_all_html_content_strings()
+
+        mock_html_field_types_to_rule_specs_dict = json.loads(
+            utils.get_file_contents(
+                feconf.HTML_FIELD_TYPES_TO_RULE_SPECS_FILE_PATH))
+        for html_type_dict in (
+                mock_html_field_types_to_rule_specs_dict.values()):
+            if html_type_dict['interactionId'] == 'ItemSelectionInput':
+                html_type_dict['ruleTypes']['Equals']['htmlInputVariables'] = (
+                    ['y'])
+
+        def mock_get_file_contents(unused_file_path):
+            return json.dumps(mock_html_field_types_to_rule_specs_dict)
+
+        with self.swap(utils, 'get_file_contents', mock_get_file_contents):
+            with self.assertRaisesRegexp(
+                Exception,
+                'Rule spec should have atleast one input variable with Html '
+                'in it.'):
+                state.get_all_html_content_strings()
 
     def test_export_state_to_dict(self):
         """Test exporting a state to a dict."""

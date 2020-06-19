@@ -286,7 +286,6 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 feconf.ALLOWED_HTML_RULE_VARIABLE_FORMATS)
             del html_type_dict['format']
 
-        html_types = []
         for interaction_id, interaction_rules in (
                 rule_descriptions_dict.items()):
             for rule_type, rule_description in interaction_rules.items():
@@ -295,28 +294,23 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 # description.
                 input_variables_with_html_type = (
                     re.findall(r'{{([a-z])\|([^}]*)}', description))
-                input_variables = []
+                input_variables = set()
+                html_types = set()
                 for value in input_variables_with_html_type:
-                    if 'Html' in value[1] and value[1] not in html_types:
-                        html_types.append(value[1])
-                    # Check that the input variable belongs to a rule
-                    # spec having html in it.
-                    if value[1] in html_types:
-                        input_variables.append(value[0])
+                    if 'Html' in value[1]:
+                        html_types.add(value[1])
+                        input_variables.add(value[0])
 
                 # We need to iterate through the html_types for each rule_type,
                 # because only after visiting each rule_type the inner dict
                 # structure for each html_type gets generated.
                 for html_type in html_types:
-                    if html_type in description:
-                        html_type_dict = (
-                            generated_html_field_types_dict[html_type])
-                        html_type_dict['interactionId'] = interaction_id
-                        unique_input_variables = sorted(set(input_variables))
-                        html_type_dict['ruleTypes'][rule_type][
-                            'htmlInputVariables'] = unique_input_variables
+                    html_type_dict = (
+                        generated_html_field_types_dict[html_type])
+                    html_type_dict['interactionId'] = interaction_id
+                    html_type_dict['ruleTypes'][rule_type][
+                        'htmlInputVariables'] = sorted(input_variables)
 
-        # Assert that the generated dict matches dict in the stored file.
         self.assertEqual(
             html_field_types_to_rule_specs_dict,
             dict(generated_html_field_types_dict))

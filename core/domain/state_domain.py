@@ -184,11 +184,10 @@ class AnswerGroup(python_utils.OBJECT):
                         interaction_and_rule_details['ruleTypes'][
                             rule_spec.rule_type][
                                 'htmlInputVariables'])
-                    if len(rule_spec.inputs.keys()) == 0:
-                        raise Exception(
-                            'Rule spec should have atleast one input variable.')
+                    input_variable_match_found = False
                     for input_variable in rule_spec.inputs.keys():
                         if input_variable in input_variables_from_html_mapping:
+                            input_variable_match_found = True
                             rule_input_variable = (
                                 rule_spec.inputs[input_variable])
                             if (html_type_format ==
@@ -215,6 +214,11 @@ class AnswerGroup(python_utils.OBJECT):
                                 raise Exception(
                                     'The rule spec does not belong to a valid'
                                     ' format.')
+                    if not input_variable_match_found:
+                        raise Exception(
+                            'Rule spec should have atleast one input variable '
+                            'with Html in it.')
+
         return html_list
 
 
