@@ -193,9 +193,10 @@ class ClearExplorationIssuesOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def map(model):
-        """For ExplorationIssuesModel will clear the list and yield each of its
-        tracked playthrough_ids, otherwise for PlaythroughModel will yield its
-        existence for the reduce key to handle.
+        """For ExplorationIssuesModel, clear out its list of unresolved issues
+        and yield the playthrough ids it had managed so that it can be deleted
+        by the reduce function. Otherwise, for PlaythroughModel, will yield its
+        ID for the reduce function to delete just in case it is an orphan.
 
         Args:
             model: ExplorationIssuesModel or PlaythroughModel.
