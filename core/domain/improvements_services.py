@@ -28,6 +28,8 @@ from core.platform import models
 import feconf
 import python_utils
 
+from google.appengine.datastore import datastore_query
+
 (improvements_models,) = (
     models.Registry.import_models([models.NAMES.improvements]))
 
@@ -74,7 +76,7 @@ def get_task_entry_from_model(task_entry_model):
 
 
 def fetch_exploration_tasks(exploration):
-    """Returns a tuple encoding all of the tasks corresponding to the provided
+    """Returns a tuple encoding the open and resolved tasks corresponding to the
     exploration.
 
     Args:
@@ -108,25 +110,28 @@ def fetch_exploration_tasks(exploration):
     return (open_tasks, dict(resolved_task_types_by_state_name))
 
 
-def fetch_exploration_task_history_page(exploration, cursor=None):
+def fetch_exploration_task_history_page(exploration, urlsafe_start_cursor=None):
     """Fetches a page of tasks from the provided entity's history of tasks.
 
     Args:
         exploration: exp_domain.Exploration.
-        cursor: datastore_query.Cursor or None. Starting point for search. When
-            None, the starting point is the very beginning of the history
-            results (i.e., starting from the newest task entry).
+        urlsafe_cursor: str or None. Starting point for search. When None, the
+            starting point is the very beginning of the history results (i.e.,
+            starting from the newest task entry).
 
     Returns:
         tuple. Contains the following 3 items:
             results: list(improvements_domain.TaskEntry). The query results.
-            cursor: datastore_query.Cursor or None. a query cursor pointing to
-                the "next" batch of results. If there are no more results, this
+            urlsafe_cursor: str or None. a query cursor pointing to the
+                "next" batch of results. If there are no more results, this
                 might be None.
             more: bool. Indicates whether there are (likely) more results after
                 this batch. If False, there are no more results; if True, there
                 are probably more results.
     """
+    start_cursor = (
+        urlsafe_start_cursor and
+        datastore_query.Cursor(urlsafe=urlsafe_start_cursor))
     results, cursor, more = (
         improvements_models.TaskEntryModel.query(
             improvements_models.TaskEntryModel.entity_type == (
@@ -136,9 +141,11 @@ def fetch_exploration_task_history_page(exploration, cursor=None):
                 improvements_models.TASK_STATUS_RESOLVED))
         .order(-improvements_models.TaskEntryModel.last_updated)
         .fetch_page(
-            feconf.MAX_TASK_MODELS_PER_HISTORY_PAGE, start_cursor=cursor))
+            feconf.MAX_TASK_MODELS_PER_HISTORY_PAGE, start_cursor=start_cursor))
     return (
-        [get_task_entry_from_model(model) for model in results], cursor, more)
+        [get_task_entry_from_model(model) for model in results],
+        cursor and cursor.urlsafe(),
+        more)
 
 
 def put_tasks(tasks, update_last_updated_time=True):
@@ -181,13 +188,13 @@ def apply_changes_to_model(task_entry, task_entry_model):
     """
     if task_entry_model.id != task_entry.task_id:
         raise Exception('Wrong model was provided')
-    any_change_made_to_model = False
+    changes_were_made_to_model = False
     if task_entry_model.issue_description != task_entry.issue_description:
         task_entry_model.issue_description = task_entry.issue_description
-        any_change_made_to_model = True
+        changes_were_made_to_model = True
     if task_entry_model.status != task_entry.status:
         task_entry_model.status = task_entry.status
         task_entry_model.resolver_id = task_entry.resolver_id
         task_entry_model.resolved_on = task_entry.resolved_on
-        any_change_made_to_model = True
-    return any_change_made_to_model
+        changes_were_made_to_model = True
+    return changes_were_made_to_model

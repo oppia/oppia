@@ -331,7 +331,7 @@ class FetchTaskHistoryPageTests(ImprovementsServicesTestBase):
         while more:
             results, cursor, more = (
                 improvements_services.fetch_exploration_task_history_page(
-                    self.exp, cursor=cursor))
+                    self.exp, urlsafe_start_cursor=cursor))
             aggregated_tasks.extend(results)
 
         self.assertEqual([t.target_id for t in aggregated_tasks], [
@@ -351,7 +351,7 @@ class FetchTaskHistoryPageTests(ImprovementsServicesTestBase):
         self.assertTrue(initial_more)
         # Make a call for the second page.
         improvements_services.fetch_exploration_task_history_page(
-            self.exp, cursor=initial_cursor)
+            self.exp, urlsafe_start_cursor=initial_cursor)
         # Make another call for the first page.
         subsequent_results, subsequent_cursor, subsequent_more = (
             improvements_services.fetch_exploration_task_history_page(self.exp))

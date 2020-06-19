@@ -91,7 +91,8 @@ class TaskEntry(python_utils.OBJECT):
             self.entity_type, self.entity_id, self.entity_version)
 
     @classmethod
-    def from_payload_dict(cls, payload_dict, resolver_id=None):
+    def from_payload_dict(
+            cls, payload_dict, resolver_id=None, resolved_on=None):
         """Returns a new TaskEntry domain object from the given payload dict and
         optional resolver ID.
 
@@ -113,6 +114,8 @@ class TaskEntry(python_utils.OBJECT):
                 status: str. Tracks the state/progress of the task entry.
             resolver_id: str or None. The corresponding user who resolved this
                 task. Only used when payload dict's status is resolved.
+            resolved_on: datetime or None. The datetime at which this task was
+                resolved. Only used when payload dict's status is resolved.
 
         Returns:
             improvements_domain.TaskEntry.
@@ -122,10 +125,8 @@ class TaskEntry(python_utils.OBJECT):
             is missing.
         """
         if payload_dict['status'] == improvements_models.TASK_STATUS_RESOLVED:
-            if resolver_id is None:
-                raise Exception('Missing resolver id for the resolved task')
-            else:
-                resolved_on = datetime.datetime.utcnow()
+            if resolver_id is None or resolved_on is None:
+                raise Exception('Missing resolution arguments for the task')
         else:
             resolver_id = None
             resolved_on = None
