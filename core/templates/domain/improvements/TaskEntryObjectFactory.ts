@@ -67,12 +67,12 @@ export class TaskEntry {
     this.taskType = backendDict.task_type;
     this.targetType = backendDict.target_type;
     this.targetId = backendDict.target_id;
-    this.issueDescription = backendDict.issue_description;
-    this.taskStatus = backendDict.status;
     this.resolverUsername = backendDict.resolver_username;
     this.resolverProfilePictureDataUrl = (
       backendDict.resolver_profile_picture_data_url);
     this.resolvedOnMsecs = backendDict.resolved_on_msecs;
+    this.issueDescription = backendDict.issue_description;
+    this.taskStatus = backendDict.status;
   }
 
   public toPayloadDict(): ITaskEntryPayloadDict {

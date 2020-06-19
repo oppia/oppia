@@ -119,7 +119,8 @@ export class HighBounceRateTaskObjectFactory {
 
   /**
    * Returns list of tasks for each of the given state names when their stats
-   * demonstrate a high bounce rate. Otherwise, correspoding index will be null.
+   * demonstrate a high bounce rate. Otherwise, corresponding index will be
+   * null.
    */
   createFromExplorationStats(
       expStats: ExplorationStats, stateNames: string[]): HighBounceRateTask[] {
