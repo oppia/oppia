@@ -295,16 +295,18 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 input_variables_with_html_type = (
                     re.findall(r'{{([a-z])\|([^}]*)}', description))
                 input_variables = set()
-                html_types = set()
+                input_variables_to_html_type_mapping_dict = (
+                    collections.defaultdict(set))
                 for value in input_variables_with_html_type:
                     if 'Html' in value[1]:
-                        html_types.add(value[1])
-                        input_variables.add(value[0])
+                        input_variables_to_html_type_mapping_dict[
+                            value[1]].add(value[0])
 
                 # We need to iterate through the html_types for each rule_type,
                 # because only after visiting each rule_type the inner dict
                 # structure for each html_type gets generated.
-                for html_type in html_types:
+                for html_type, input_variables in (
+                        input_variables_to_html_type_mapping_dict.items()):
                     html_type_dict = (
                         generated_html_field_types_dict[html_type])
                     html_type_dict['interactionId'] = interaction_id
