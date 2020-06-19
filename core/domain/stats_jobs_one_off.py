@@ -237,12 +237,10 @@ class ClearExplorationIssuesOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         Args:
             reduce_key: str. Either REDUCE_KEY_CLEARED or REDUCE_KEY_DELETE.
             stringified_values: list(str).
-
                 When reduce_key is REDUCE_KEY_CLEARED, then each item is:
                     exp_issues_id: str. the ID of the corresponding
                         ExplorationIssuesModel which was cleared of
                         playthroughs.
-
                 Otherwise, when reduce_key is REDUCE_KEY_DELETE, then each item
                 is a stringified tuple with the following values:
                     item_key: str. Either ITEM_KEY_ALL or ITEM_KEY_TRACKED.
@@ -250,8 +248,8 @@ class ClearExplorationIssuesOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
         Yields:
             tuple. Contains the following 2 values:
-                result_key: str. Either RESULT_TRACKED_DELETES,
-                    RESULT_UNTRACKED_DELETES, or RESULT_CLEARED.
+                result_key: str. Either RESULT_CLEARED, RESULT_TRACKED_DELETES,
+                    or RESULT_UNTRACKED_DELETES.
                 count: int. The number of operations corresponding to the
                     result key.
         """
