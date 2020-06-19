@@ -546,6 +546,7 @@
 	"I18N_TEACH_PAGE_TAB_PARTICIPATION_PLAYBOOK": "Ammud n uttekki",
 	"I18N_TEACH_PAGE_TAB_TEACH_WITH_OPPIA": "Selmed s Oppia",
 	"I18N_TOPIC_SUMMARY_TILE_LESSONS": "{lessonCount, plural, =1{1 lesson} other{# lessons}}",
+	"I18N_TOPIC_VIEWER_STORY": "Taqsiḍt",
 	"I18N_TOPNAV_ABOUT": "Ɣef",
 	"I18N_TOPNAV_ABOUT_OPPIA": "Ɣef Oppia",
 	"I18N_TOPNAV_ADMIN_PAGE": "Asebter n unedbal",
