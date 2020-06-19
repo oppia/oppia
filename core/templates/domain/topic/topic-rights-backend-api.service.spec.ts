@@ -25,7 +25,7 @@ import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-describe('Topic rights backend API service', () => {
+fdescribe('Topic rights backend API service', () => {
   let topicRightsBackendApiService: TopicRightsBackendApiService = null;
   let csrfService: CsrfTokenService = null;
   let topicId: string = '0';
@@ -62,7 +62,11 @@ describe('Topic rights backend API service', () => {
     let req = httpTestingController.expectOne(
       '/rightshandler/get_topic_rights/' + topicId);
     expect(req.request.method).toEqual('GET');
-    req.flush(200);
+    req.flush({
+      topic_id: 0,
+      topic_is_published: true,
+      manager_ids: ['user_id']
+    });
 
     flushMicrotasks();
 
@@ -73,12 +77,6 @@ describe('Topic rights backend API service', () => {
   it('should not fetch a topic rights', fakeAsync(() => {
     var successHandler = jasmine.createSpy('success');
     var failHandler = jasmine.createSpy('fail');
-
-    // $httpBackend.expect('GET', '/rightshandler/get_topic_rights/' + topicId)
-    //   .respond(404);
-    // TopicRightsBackendApiService.fetchTopicRights(topicId).then(
-    //   successHandler, failHandler);
-    // $httpBackend.flush();
 
     topicRightsBackendApiService.fetchTopicRights(topicId).then(
       successHandler, failHandler);

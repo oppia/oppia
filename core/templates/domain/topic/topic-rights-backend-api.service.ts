@@ -18,7 +18,6 @@
 
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
-
 import { HttpClient } from '@angular/common/http';
 
 import { UrlInterpolationService } from
@@ -28,34 +27,42 @@ import { TopicDomainConstants } from
   'domain/topic/topic-domain.constants';
 import cloneDeep from 'lodash/cloneDeep';
 
+import { ITopicRightsBackendDataDict, TopicRightsResponseObjectFactory } from
+  'domain/topic/TopicRightsResponseObjectFactory';
+
 @Injectable({
   providedIn: 'root'
 })
 export class TopicRightsBackendApiService {
   constructor(
     private http: HttpClient,
-    private urlInterpolation: UrlInterpolationService) {}
+    private urlInterpolation: UrlInterpolationService,
+    private topicRightsResponseObjectFactory: TopicRightsResponseObjectFactory) {}
   // Maps previously loaded topic rights to their IDs.
   private topicRightsCache = {};
 
   private _fetchTopicRights(
       topicId: string,
       successCallback: (value?: Object | PromiseLike<Object>) => void,
-      errorCallback: (reason?: any) => void): void {
+      errorCallback: (reason?: string) => void): void {
     var topicRightsUrl = this.urlInterpolation.interpolateUrl(
       TopicDomainConstants.TOPIC_RIGHTS_URL_TEMPLATE, {
         topic_id: topicId
       });
+    console.log(topicRightsUrl);
 
-    this.http.get(
-      topicRightsUrl, { observe: 'response' }).toPromise().then(
-      (response) => {
+    this.http.get(topicRightsUrl).toPromise().then(
+      (response: ITopicRightsBackendDataDict) => {
+        console.log(typeof(response));
+        console.log(response, "c2");
+        console.log(successCallback);
+        let res = this.topicRightsResponseObjectFactory.createFromBackendDict(response);
         if (successCallback) {
-          successCallback(response.body);
+          successCallback(res);
         }
       }, (error) => {
         if (errorCallback) {
-          errorCallback(error.data);
+          errorCallback(error);
         }
       });
   }
@@ -64,7 +71,7 @@ export class TopicRightsBackendApiService {
       topicId: string,
       publishStatus: boolean,
       successCallback: (value?: Object | PromiseLike<Object>) => void,
-      errorCallback: (reason?: any) => void): void {
+      errorCallback: (reason?: string) => void): void {
     var changeTopicStatusUrl = this.urlInterpolation.interpolateUrl(
       '/rightshandler/change_topic_status/<topic_id>', {
         topic_id: topicId
@@ -75,16 +82,15 @@ export class TopicRightsBackendApiService {
     };
 
     this.http.put(
-      // eslint-disable-next-line max-len
-      changeTopicStatusUrl, putParams, { observe: 'response' }).toPromise().then(
-      (response) => {
-        this.topicRightsCache[topicId] = response.body;
+      changeTopicStatusUrl, putParams).toPromise().then(
+      (response: number) => {
+        this.topicRightsCache[topicId] = response;
         if (successCallback) {
-          successCallback(response.body);
+          successCallback(response);
         }
       }, (error) => {
         if (errorCallback) {
-          errorCallback(error.data);
+          errorCallback(error);
         }
       });
   }
@@ -93,7 +99,7 @@ export class TopicRightsBackendApiService {
       topicId: string,
       topicName: string,
       successCallback: (value?: Object | PromiseLike<Object>) => void,
-      errorCallback: (reason?: any) => void): void {
+      errorCallback: (reason?: string) => void): void {
     var sendMailUrl = this.urlInterpolation.interpolateUrl(
       '/rightshandler/send_topic_publish_mail/<topic_id>', {
         topic_id: topicId
@@ -104,13 +110,13 @@ export class TopicRightsBackendApiService {
     };
 
     this.http.put(sendMailUrl, putParams).toPromise().then(
-      (response) => {
+      (response: number) => {
         if (successCallback) {
           successCallback();
         }
       }, (error) => {
         if (errorCallback) {
-          errorCallback(error.data);
+          errorCallback(error);
         }
       });
   }
