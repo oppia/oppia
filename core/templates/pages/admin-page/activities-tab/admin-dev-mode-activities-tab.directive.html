@@ -30,11 +30,12 @@
       Use this form to generate dummy explorations with random titles.
     </p>
     <span class="row">
-      <label for="explorations to generate">Number of explorations to generate</label>
+      <label for="explorations-to-generate">Number of explorations to generate</label>
       <input class="form-control form-inline" style="margin-bottom: 5px"
              ng-model="$ctrl.numDummyExpsToGenerate"
-             placeholder="Explorations to generate" type="number" min="0">
-      <label for="explorations to publish">Number of explorations to publish</label>
+             placeholder="Explorations to generate" type="number" min="0"
+             id="explorations-to-generate">
+      <label for="explorations-to-publish">Number of explorations to publish</label>
       <em ng-show="$ctrl.numDummyExpsToGenerate"
           style="font-size: smaller;">
         (Publish <[$ctrl.numDummyExpsToPublish]> out of <[$ctrl.numDummyExpsToGenerate]> explorations)
@@ -42,7 +43,8 @@
       <input class="form-control form-inline"
              ng-model="$ctrl.numDummyExpsToPublish"
              placeholder="Explorations to Publish"
-             ng-disabled="!$ctrl.numDummyExpsToGenerate" type="number" min="0" >
+             ng-disabled="!$ctrl.numDummyExpsToGenerate" type="number" min="0"
+             id="explorations-to-publish">
       <button type="button"
               class="btn btn-primary"
               ng-click="$ctrl.generateDummyExplorations()"
