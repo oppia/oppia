@@ -235,7 +235,7 @@ class ClearExplorationIssuesOneOffJobTests(OneOffJobTestBase):
     def test_job_reports_nothing_when_there_are_no_models(self):
         self.assertItemsEqual(self.run_one_off_job(), [])
 
-    def test_job_reports_clears_even_if_they_had_no_playthroughs(self):
+    def test_job_reports_cleared_exp_issues_without_any_playthroughs(self):
         exp_issues_id = self.create_exp_issues_with_playthroughs([
             [], [], [], # 3 exploration issues each referring to 0 playthroughs.
         ])
@@ -250,7 +250,7 @@ class ClearExplorationIssuesOneOffJobTests(OneOffJobTestBase):
         self.assertEqual(exp_issues.unresolved_issues[1]['playthrough_ids'], [])
         self.assertEqual(exp_issues.unresolved_issues[2]['playthrough_ids'], [])
 
-    def test_job_reports_untracked_deleted_playthroughs(self):
+    def test_job_reports_deleted_untracked_playthroughs(self):
         playthrough_id = self.create_playthrough()
 
         self.assertItemsEqual(self.run_one_off_job(), [
@@ -260,11 +260,14 @@ class ClearExplorationIssuesOneOffJobTests(OneOffJobTestBase):
         self.assertIsNone(
             stats_models.PlaythroughModel.get_by_id(playthrough_id))
 
-    def test_job_reports_tracked_deleted_playthroughs(self):
+    def test_job_reports_deleted_tracked_playthroughs(self):
+        all_playthrough_ids = [
+            self.create_playthrough() for _ in python_utils.RANGE(6)
+        ]
         exp_issues_id = self.create_exp_issues_with_playthroughs([
-            [self.create_playthrough(), self.create_playthrough()],
-            [self.create_playthrough(), self.create_playthrough()],
-            [self.create_playthrough(), self.create_playthrough()],
+            all_playthrough_ids[0:2],
+            all_playthrough_ids[2:4],
+            all_playthrough_ids[4:6],
         ])
 
         self.assertItemsEqual(self.run_one_off_job(), [
@@ -277,15 +280,20 @@ class ClearExplorationIssuesOneOffJobTests(OneOffJobTestBase):
         self.assertEqual(exp_issues.unresolved_issues[0]['playthrough_ids'], [])
         self.assertEqual(exp_issues.unresolved_issues[1]['playthrough_ids'], [])
         self.assertEqual(exp_issues.unresolved_issues[2]['playthrough_ids'], [])
+        for playthrough_id in all_playthrough_ids:
+            self.assertIsNone(
+                stats_models.PlaythroughModel.get_by_id(playthrough_id))
 
-    def test_job_reports_untracked_and_tracked_deleted_playthroughs(self):
+    def test_job_reports_both_untracked_and_tracked_deleted_playthroughs(self):
+        all_playthrough_ids = [
+            self.create_playthrough() for _ in python_utils.RANGE(8)
+        ]
         exp_issues_id = self.create_exp_issues_with_playthroughs([
-            [self.create_playthrough(), self.create_playthrough()],
-            [self.create_playthrough(), self.create_playthrough()],
-            [self.create_playthrough(), self.create_playthrough()],
+            all_playthrough_ids[2:4],
+            all_playthrough_ids[4:6],
+            all_playthrough_ids[6:8],
         ])
-        self.create_playthrough()
-        self.create_playthrough()
+        # all_playthrough_ids[0:2] are left as untracked.
 
         self.assertItemsEqual(self.run_one_off_job(), [
             ['ExplorationIssuesModels cleared', 1],
@@ -298,6 +306,9 @@ class ClearExplorationIssuesOneOffJobTests(OneOffJobTestBase):
         self.assertEqual(exp_issues.unresolved_issues[0]['playthrough_ids'], [])
         self.assertEqual(exp_issues.unresolved_issues[1]['playthrough_ids'], [])
         self.assertEqual(exp_issues.unresolved_issues[2]['playthrough_ids'], [])
+        for playthrough_id in all_playthrough_ids:
+            self.assertIsNone(
+                stats_models.PlaythroughModel.get_by_id(playthrough_id))
 
 
 class RegenerateMissingV1StatsModelsOneOffJobTests(OneOffJobTestBase):

@@ -240,13 +240,11 @@ class ClearExplorationIssuesOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                     RESULT_UNTRACKED_DELETES.
                 count: int. The number of deletions corresponding to the result.
         """
-        if (reduce_key ==
-                ClearExplorationIssuesOneOffJob.REDUCE_KEY_CLEARED):
+        if reduce_key == ClearExplorationIssuesOneOffJob.REDUCE_KEY_CLEARED:
             yield (
                 ClearExplorationIssuesOneOffJob.RESULT_CLEARED,
                 len(stringified_values))
-        elif (reduce_key ==
-                ClearExplorationIssuesOneOffJob.REDUCE_KEY_TO_DELETE):
+        elif reduce_key == ClearExplorationIssuesOneOffJob.REDUCE_KEY_TO_DELETE:
             map_results = [ast.literal_eval(v) for v in stringified_values]
             tracked_playthrough_ids_to_delete = set()
             all_playthrough_ids = set()
