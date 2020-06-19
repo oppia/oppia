@@ -387,7 +387,7 @@ def _update_exploration_summary(activity_rights):
         activity_rights: ActivityRights. The rights object for the given
             activity.
     """
-    # TODO(msl): get rid of inline imports by refactoring code.
+    # TODO(msl): Get rid of inline imports by refactoring code.
     from core.domain import exp_services
     exp_services.update_exploration_summary(
         activity_rights.id, None)

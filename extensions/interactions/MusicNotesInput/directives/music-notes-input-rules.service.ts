@@ -64,7 +64,7 @@ export class MusicNotesInputRulesService {
     return MusicNotesInputRulesService._convertSequenceToMidi(
       answer).length > inputs.k;
   }
-  // TODO(wxy): validate that inputs.a <= inputs.b
+  // TODO(wxy): Validate that inputs.a <= inputs.b
   HasLengthInclusivelyBetween(
       answer: INote[], inputs: {x: INote[], a: number, b: number}): boolean {
     var answerLength:number = (

@@ -542,7 +542,7 @@ class StateHitEventHandler(base.BaseHandler):
             raise self.InvalidInputException(
                 'NONE EXP VERSION: State hit')
         session_id = self.payload.get('session_id')
-        # TODO(sll): why do we not record the value of this anywhere?
+        # TODO(sll): Why do we not record the value of this anywhere?
         client_time_spent_in_secs = self.payload.get(  # pylint: disable=unused-variable
             'client_time_spent_in_secs')
         old_params = self.payload.get('old_params')
