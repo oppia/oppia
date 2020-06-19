@@ -22,52 +22,51 @@ import { Injectable } from '@angular/core';
 
 
 export interface ITopicRightsBackendDataDict {
-	topic_id: number,
-	topic_is_published: boolean,
-	manager_ids: Array<string>
+  'topic_id': number,
+  'topic_is_published': boolean,
+  'manager_ids': Array<string>
 }
 
 export class TopicRightsResponseData {
-	topicId: number;
-	topicIsPublished: boolean;
-	managerIds: Array<string>;
-	constructor(
-		topicId: number,
-		topicIsPublished: boolean,
-		managerIds: Array<string>
-	) {
-		this.topicId = topicId;
-		this.topicIsPublished = topicIsPublished;
-		this.managerIds = managerIds;
-	}
+  topicId: number;
+  topicIsPublished: boolean;
+  managerIds: Array<string>;
+  constructor(
+      topicId: number,
+      topicIsPublished: boolean,
+      managerIds: Array<string>
+  ) {
+    this.topicId = topicId;
+    this.topicIsPublished = topicIsPublished;
+    this.managerIds = managerIds;
+  }
 
-	getTopicId(): number {
-		return this.topicId;
-	}
+  getTopicId(): number {
+    return this.topicId;
+  }
 
-	getTopicIsPublished(): boolean {
-		return this.topicIsPublished;
-	}
+  getTopicIsPublished(): boolean {
+    return this.topicIsPublished;
+  }
 
-	getManagerIds(): Array<string> {
-		return this.managerIds;
-	}
-
+  getManagerIds(): Array<string> {
+    return this.managerIds;
+  }
 }
 
 @Injectable({
-	providedIn: 'root'
+  providedIn: 'root'
 })
 export class TopicRightsResponseObjectFactory {
-	createFromBackendDict(
-		topicRightsBackendDataDict: ITopicRightsBackendDataDict): 
-		TopicRightsResponseData {
-		return new TopicRightsResponseData (
-			topicRightsBackendDataDict.topic_id,
-			topicRightsBackendDataDict.topic_is_published,
-			topicRightsBackendDataDict.manager_ids
-		);	
-	}
+  createFromBackendDict(
+      topicRightsBackendDataDict: ITopicRightsBackendDataDict):
+    TopicRightsResponseData {
+    return new TopicRightsResponseData (
+      topicRightsBackendDataDict.topic_id,
+      topicRightsBackendDataDict.topic_is_published,
+      topicRightsBackendDataDict.manager_ids
+    );
+  }
 }
 
 angular.module('oppia').factory(
