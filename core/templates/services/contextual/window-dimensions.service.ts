@@ -17,6 +17,7 @@
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
+import { fromEvent, Observable } from 'rxjs';
 import { HostListener, Injectable } from '@angular/core';
 import { WindowRef } from 'services/contextual/window-ref.service';
 
@@ -27,21 +28,14 @@ export class WindowDimensionsService {
   constructor(private windowRef: WindowRef) {}
   onResizeHooks: Array<Function> = [];
 
-  @HostListener('this.windowRef.nativeWindow:resize', ['$event'])
-  onResize(event: Event): void {
-    this.onResizeHooks.forEach(function(hookFn) {
-      hookFn();
-    });
+  getResizeEvent(): Observable<Event> {
+    return fromEvent(window, 'resize');
   }
 
   getWidth(): number {
     return (this.windowRef.nativeWindow.innerWidth ||
         this.windowRef.nativeWindow.document.documentElement.clientWidth ||
         this.windowRef.nativeWindow.document.body.clientWidth);
-  }
-
-  registerOnResizeHook(hookFn: Function): void {
-    this.onResizeHooks.push(hookFn);
   }
 
   isWindowNarrow(): boolean {

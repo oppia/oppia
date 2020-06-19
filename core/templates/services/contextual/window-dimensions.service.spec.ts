@@ -67,12 +67,4 @@ describe('Window Dimensions Service', () => {
 
     expect(wds.isWindowNarrow()).toBe(true);
   });
-
-  it('should add and call resize function hook', () => {
-    const resizeFnHookSpy = jasmine.createSpy('resizeFn');
-    wds.registerOnResizeHook(resizeFnHookSpy);
-    wds.onResize(Event);
-
-    expect(resizeFnHookSpy).toHaveBeenCalled();
-  });
 });
