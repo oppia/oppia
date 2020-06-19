@@ -62,6 +62,7 @@ ONE_OFF_JOB_MANAGERS = [
     question_jobs_one_off.QuestionMigrationOneOffJob,
     recommendations_jobs_one_off.ExplorationRecommendationsOneOffJob,
     skill_jobs_one_off.SkillMigrationOneOffJob,
+    stats_jobs_one_off.ClearExplorationIssuesOneOffJob,
     stats_jobs_one_off.ExplorationMissingStatsAudit,
     stats_jobs_one_off.PlaythroughAudit,
     stats_jobs_one_off.RecomputeStatisticsOneOffJob,
