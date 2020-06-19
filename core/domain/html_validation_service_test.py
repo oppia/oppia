@@ -1508,6 +1508,9 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 invalid_svg_string), ([], ['path:keytimes']))
 
     def test_validate_math_tags_in_html(self):
+        """Test that the validate_math_tags_in_html method validates an
+        HTML string and returns all the invalid tags.
+        """
         html_string = (
             '<p>Feedback</p><oppia-noninteractive-math raw_latex-with-valu'
             'e="+,-,-,+"></oppia-noninteractive-math><p>Feedback</p><oppia-n'

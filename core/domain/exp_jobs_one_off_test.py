@@ -1716,7 +1716,6 @@ class ExplorationMathTagValidationOneOffJobTests(test_utils.GenericTestBase):
         """Tests for the case when there are invalid math tags in the
         explorations.
         """
-
         exploration = exp_domain.Exploration.create_default_exploration(
             self.VALID_EXP_ID, title=self.EXP_TITLE, category='category')
         exploration.add_states(['State1', 'State2'])
@@ -1729,7 +1728,6 @@ class ExplorationMathTagValidationOneOffJobTests(test_utils.GenericTestBase):
         invalid_html_content2 = (
             '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="'
             '+,-,-,+"></oppia-noninteractive-math>')
-
 
         content1_dict = {
             'content_id': 'content',
@@ -1827,7 +1825,6 @@ class ExplorationMathTagValidationOneOffJobTests(test_utils.GenericTestBase):
                 }
             }
         }
-
 
         with self.swap(state_domain.SubtitledHtml, 'validate', mock_validate):
             state1.update_content(
