@@ -75,11 +75,12 @@ describe('DragAndDropSortInputValidationService', () => {
       dest: 'Third State',
       feedback: {
         html: '<p>great job!</p>',
-        audio_translations: {}
+        content_id: ''
       },
       labelled_as_correct: true,
       param_changes: [],
-      refresher_exploration_id: null
+      refresher_exploration_id: null,
+      missing_prerequisite_skill_id: ''
     });
 
     customizationArgs = {
@@ -145,12 +146,12 @@ describe('DragAndDropSortInputValidationService', () => {
       agof.createNew(
         [equalsListWithAllowedValuesRule],
         goodDefaultOutcome,
-        false,
+        null,
         null
       ), agof.createNew(
         [goodRule1, goodRule2],
         customOutcome,
-        false,
+        null,
         null
       )
     ];
@@ -171,8 +172,8 @@ describe('DragAndDropSortInputValidationService', () => {
       }
     })];
     answerGroups = [
-      agof.createNew(rules, customOutcome, false, null),
-      agof.createNew(rules, customOutcome, false, null)
+      agof.createNew(rules, customOutcome, null, null),
+      agof.createNew(rules, customOutcome, null, null)
     ];
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArgs, answerGroups, goodDefaultOutcome);
