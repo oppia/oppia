@@ -95,7 +95,7 @@ export class ExplorationDiffService {
     }
 
     // Track whether terminal nodes in v1 or v2
-    // TODO(bhenning): could show changes to terminal nodes in diff
+    // TODO(bhenning): Could show changes to terminal nodes in diff
     let finalStateIds = [];
     for (let stateId in stateData) {
       let oldState = v1States[stateData[stateId].originalStateName];
