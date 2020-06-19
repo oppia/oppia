@@ -55,7 +55,7 @@ class MockComponent {
 let guppyConfigurationService: GuppyConfigurationService = null;
 
 describe('GuppyConfigurationService', () => {
-  beforeEach(() => {
+  beforeAll(() => {
     guppyConfigurationService = TestBed.get(GuppyConfigurationService);
     window.Guppy = MockGuppy;
   });
@@ -95,7 +95,9 @@ describe('GuppyConfigurationService', () => {
       expect(Guppy.remove_global_symbol).toHaveBeenCalled();
     });
 
-    it('should not configure guppy on subsequent initializations', () => {
+    it('should not configure guppy on multiple initializations', () => {
+      MathEditorCtrl.$onInit();
+
       spyOn(Guppy, 'remove_global_symbol');
       MathEditorCtrl.$onInit();
       expect(Guppy.remove_global_symbol).not.toHaveBeenCalled();
