@@ -62,8 +62,9 @@ describe('DragAndDropSortInputValidationService', () => {
       dest: 'Second State',
       feedback: {
         html: '',
-        audio_translations: {}
+        content_id: ''
       },
+      missing_prerequisite_skill_id: null,
       labelled_as_correct: false,
       param_changes: [],
       refresher_exploration_id: null
@@ -117,7 +118,7 @@ describe('DragAndDropSortInputValidationService', () => {
     answerGroups = [agof.createNew(
       [equalsListWithAllowedValuesRule],
       goodDefaultOutcome,
-      false,
+      null,
       null
     )];
   });

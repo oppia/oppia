@@ -25,18 +25,18 @@ export interface ExplorationSummary {
   status: string;
 }
 
-interface IStoryNodeBackendDict {
-  id: string;
-  title: string;
-  description: string;
+export interface IStoryNodeBackendDict {
+  'id': string;
+  'title': string;
+  'description': string;
   'destination_node_ids': string[];
   'prerequisite_skill_ids': string[];
   'acquired_skill_ids': string[];
-  outline: string;
+  'outline': string;
   'outline_is_finalized': boolean;
   'exploration_id': string;
   'exp_summary_dict': ExplorationSummary;
-  completed: boolean;
+  'completed': boolean;
   'thumbnail_bg_color': string;
   'thumbnail_filename': string;
 }

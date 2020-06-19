@@ -22,6 +22,27 @@ import { Injectable } from '@angular/core';
 
 import { SuggestionsService } from 'services/suggestions.service';
 
+interface ISuggestionChangeValue {
+  html: string;
+}
+
+interface ISuggestionChangeBackendDict {
+  'state_name': string;
+  'new_value': ISuggestionChangeValue;
+  'old_value': ISuggestionChangeValue;
+}
+
+interface ISuggestionBackendDict {
+  'suggestion_type': string;
+  'suggestion_id': string;
+  'target_type': string;
+  'target_id': string;
+  'status': string;
+  'author_name': string;
+  'change': ISuggestionChangeBackendDict;
+  'last_updated_msecs': number;
+}
+
 export class Suggestion {
   suggestionType: string;
   suggestionId: string;
@@ -31,17 +52,15 @@ export class Suggestion {
   status: string;
   authorName: string;
   stateName: string;
-  // TODO(#7165): Replace 'any' with the exact type.
-  newValue: any;
-  // TODO(#7165): Replace 'any' with the exact type.
-  oldValue: any;
+  newValue: ISuggestionChangeValue;
+  oldValue: ISuggestionChangeValue;
   lastUpdatedMsecs: number;
 
   constructor(
       suggestionType: string, suggestionId: string, threadId: string,
       targetType: string, targetId: string, status: string, authorName: string,
-      stateName: string, newValue: string, oldValue: string,
-      lastUpdatedMsecs: number) {
+      stateName: string, newValue: ISuggestionChangeValue,
+      oldValue: ISuggestionChangeValue, lastUpdatedMsecs: number) {
     this.suggestionType = suggestionType;
     this.suggestionId = suggestionId;
     this.threadId = threadId;
@@ -63,11 +82,8 @@ export class Suggestion {
 @Injectable({providedIn: 'root'})
 export class SuggestionObjectFactory {
   constructor(private suggestionsService: SuggestionsService) {}
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'suggestionBackendDict' is a dict with underscore_cased
-  // keys which give tslint errors against underscore_casing in favor of
-  // camelCasing.
-  createFromBackendDict(suggestionBackendDict: any): Suggestion {
+  createFromBackendDict(
+      suggestionBackendDict: ISuggestionBackendDict): Suggestion {
     let threadId = this.suggestionsService.getThreadIdFromSuggestionBackendDict(
       suggestionBackendDict);
     return new Suggestion(

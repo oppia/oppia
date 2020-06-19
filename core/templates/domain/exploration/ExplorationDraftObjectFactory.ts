@@ -20,24 +20,75 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
+export interface IAddStateNameChangeList {
+  'cmd': 'add_state';
+  'state_name': string;
+}
+
+export interface IDeleteStateChangeList {
+  'cmd': 'delete_state';
+  'state_name': string;
+}
+
+export interface IEditExplorationPropertyChangeList {
+  'cmd': 'edit_exploration_property';
+  'new_value': Object;
+  'old_value': Object;
+  'property_name': string;
+}
+
+export interface IEditStatePropertyChangeList {
+  'cmd': 'edit_state_property';
+  'new_value': Object;
+  'old_value': Object;
+  'property_name': string;
+  'state_name': string;
+}
+
+export interface IRenameStateChangeList {
+  'cmd': 'rename_state';
+  'new_state_name': string;
+  'old_state_name': string;
+}
+
+export interface IRevertChangeList {
+  'cmd': 'AUTO_revert_version_number';
+  'version_number': number;
+}
+
+export interface ICreateChangeList {
+  cmd: 'create_new';
+  category: string;
+  title: string;
+}
+
+export interface IMigrateStatesVersionChangeList {
+  'cmd': 'migrate_states_schema_to_latest_version';
+  'from_version': number;
+  'to_version': number;
+}
+
+export type IExplorationChangeList = (
+  IAddStateNameChangeList |
+  IDeleteStateChangeList |
+  IEditExplorationPropertyChangeList |
+  IEditStatePropertyChangeList |
+  IRenameStateChangeList |
+  IRevertChangeList |
+  ICreateChangeList |
+  IMigrateStatesVersionChangeList);
+
 export interface IExplorationDraftDict {
-  // TODO(#7165): Replace 'any' with the exact type. This has been typed
-  // as 'any' since 'draftChanges' is an array of dicts with possible
-  // underscore_cased keys. A thorough check needs to be done to assure of
-  // its exact type.
-  draftChanges: any;
+  draftChanges: IExplorationChangeList[];
   draftChangeListId: number
 }
 
 export class ExplorationDraft {
-  // TODO(#7165): Replace 'any' with the exact type. This has been typed
-  // as 'any' since 'draftChanges' is an array of dicts with possible
-  // underscore_cased keys. A thorough check needs to be done to assure of
-  // its exact type.
-  draftChanges: any;
+  draftChanges: IExplorationChangeList[];
   draftChangeListId: number;
 
-  constructor(draftChanges: any, draftChangeListId: number) {
+  constructor(
+      draftChanges: IExplorationChangeList[], draftChangeListId: number) {
     this.draftChanges = draftChanges;
     this.draftChangeListId = draftChangeListId;
   }
@@ -54,11 +105,8 @@ export class ExplorationDraft {
   isValid(currentDraftId: number): boolean {
     return (currentDraftId === this.draftChangeListId);
   }
-  // TODO(#7165): Replace 'any' with the exact type. This has been typed
-  // as 'any' since 'draftChanges' is an array of dicts with possible
-  // underscore_cased keys. A thorough check needs to be done to assure of
-  // its exact type.
-  getChanges(): any {
+
+  getChanges(): IExplorationChangeList[] {
     return this.draftChanges;
   }
 }
@@ -74,11 +122,8 @@ export class ExplorationDraftObjectFactory {
       explorationDraftDict.draftChangeListId);
   }
   toLocalStorageDict(
-      // TODO(#7165): Replace 'any' with the exact type. This has been typed
-      // as 'any' since 'changeList' is an array of dicts with possible
-      // underscore_cased keys. A thorough check needs to be done to assure of
-      // its exact type.
-      changeList: any, draftChangeListId: number): IExplorationDraftDict {
+      changeList: IExplorationChangeList[],
+      draftChangeListId: number): IExplorationDraftDict {
     return {
       draftChanges: changeList,
       draftChangeListId: draftChangeListId

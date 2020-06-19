@@ -22,19 +22,27 @@ import cloneDeep from 'lodash/cloneDeep';
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
+import { IFractionDict } from 'domain/objects/FractionObjectFactory';
+import { IGraphBackendDict } from
+  'extensions/interactions/GraphInput/directives/graph-detail.service';
+import { INote } from
+  // eslint-disable-next-line max-len
+  'extensions/interactions/MusicNotesInput/directives/music-notes-input-rules.service';
+import { INumberWithUnitsBackendDict } from
+  'domain/objects/NumberWithUnitsObjectFactory';
+
+export type Answer = (
+  string | number | IFractionDict |
+  INumberWithUnitsBackendDict | string[] | INote[] |
+  number[] | IGraphBackendDict| string[][]);
+
 export interface IAnswerStatsBackendDict {
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' since 'answer' is a dict with underscore_cased keys which gives
-  // tslint errors against underscore_casing in favor of camelCasing.
-  answer: any;
+  answer: Answer;
   frequency: number;
 }
 
 export class AnswerStats {
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' since 'answer' is a dict with underscore_cased keys which gives
-  // tslint errors against underscore_casing in favor of camelCasing.
-  answer: any;
+  answer: Answer;
   answerHtml: string;
   frequency: number;
   isAddressed: boolean;
@@ -48,7 +56,7 @@ export class AnswerStats {
    *    associated state's answer groups.
    */
   constructor(
-      answer: any, answerHtml: string, frequency: number,
+      answer: Answer, answerHtml: string, frequency: number,
       isAddressed: boolean) {
     /** @type {*} */
     this.answer = cloneDeep(answer);

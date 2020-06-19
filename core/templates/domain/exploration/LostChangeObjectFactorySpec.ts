@@ -169,6 +169,10 @@ describe('Lost Change Object Factory', () => {
             content_id: 'feedback_2',
             html: 'Html'
           },
+          labelled_as_correct: false,
+          param_changes: [],
+          refresher_exploration_id: null,
+          missing_prerequisite_skill_id: null
         }),
         rules: [{
           type: 'Type1',
@@ -185,6 +189,10 @@ describe('Lost Change Object Factory', () => {
             content_id: 'feedback_2',
             html: 'Html'
           },
+          labelled_as_correct: false,
+          param_changes: [],
+          refresher_exploration_id: null,
+          missing_prerequisite_skill_id: null
         }),
         rules: [{
           type: 'Type1',
@@ -212,6 +220,10 @@ describe('Lost Change Object Factory', () => {
           content_id: 'feedback_2',
           html: 'Html'
         },
+        labelled_as_correct: false,
+        param_changes: [],
+        refresher_exploration_id: null,
+        missing_prerequisite_skill_id: null
       }),
       old_value: oof.createFromBackendDict({
         dest: 'outcome 1',
@@ -219,6 +231,10 @@ describe('Lost Change Object Factory', () => {
           content_id: 'feedback_2',
           html: 'Html'
         },
+        labelled_as_correct: false,
+        param_changes: [],
+        refresher_exploration_id: null,
+        missing_prerequisite_skill_id: null
       }),
       property_name: 'default_outcome'
     });

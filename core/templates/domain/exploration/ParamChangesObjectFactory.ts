@@ -20,18 +20,19 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-import { ParamChange, ParamChangeObjectFactory } from
-  'domain/exploration/ParamChangeObjectFactory.ts';
+import {
+  IParamChangeBackendDict,
+  ParamChange,
+  ParamChangeObjectFactory
+} from 'domain/exploration/ParamChangeObjectFactory.ts';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ParamChangesObjectFactory {
   constructor(private paramChangeObjectFactory: ParamChangeObjectFactory) {}
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'paramChangeBackendList' is a dict with underscore_cased keys
-  // which give tslint errors against underscore_casing in favor of camelCasing.
-  createFromBackendList(paramChangeBackendList: any): ParamChange[] {
+  createFromBackendList(
+      paramChangeBackendList: IParamChangeBackendDict[]): ParamChange[] {
     return paramChangeBackendList.map((paramChangeBackendDict) => {
       return this.paramChangeObjectFactory.createFromBackendDict(
         paramChangeBackendDict);

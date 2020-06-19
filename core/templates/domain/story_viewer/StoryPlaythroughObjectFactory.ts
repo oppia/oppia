@@ -20,13 +20,20 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { ReadOnlyStoryNodeObjectFactory, ReadOnlyStoryNode } from
-  'domain/story_viewer/ReadOnlyStoryNodeObjectFactory';
+import {
+  IStoryNodeBackendDict,
+  ReadOnlyStoryNodeObjectFactory,
+  ReadOnlyStoryNode
+} from 'domain/story_viewer/ReadOnlyStoryNodeObjectFactory';
+
+interface IStoryPlaythroughBackendDict {
+  'story_nodes': IStoryNodeBackendDict[];
+}
 
 export class StoryPlaythrough {
-  _nodes: Array<ReadOnlyStoryNode>;
+  _nodes: ReadOnlyStoryNode[];
 
-  constructor(nodes: Array<ReadOnlyStoryNode>) {
+  constructor(nodes: ReadOnlyStoryNode[]) {
     this._nodes = nodes;
   }
 
@@ -38,7 +45,7 @@ export class StoryPlaythrough {
     return this._nodes.length;
   }
 
-  getStoryNodes(): Array<ReadOnlyStoryNode> {
+  getStoryNodes(): ReadOnlyStoryNode[] {
     return this._nodes;
   }
 
@@ -66,19 +73,14 @@ export class StoryPlaythroughObjectFactory {
   constructor(private readOnlyStoryNodeObjectFactory:
       ReadOnlyStoryNodeObjectFactory) {}
 
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'subtopicDataBackendDict' is a dict with underscore_cased
-  // keys which give tslint errors against underscore_casing in favor of
-  // camelCasing.
-  createFromBackendDict(storyPlaythroughBackendDict: any): StoryPlaythrough {
-    var nodeObjects = [];
+  createFromBackendDict(
+      storyPlaythroughBackendDict:
+      IStoryPlaythroughBackendDict): StoryPlaythrough {
+    var nodeObjects: ReadOnlyStoryNode[] = [];
     var readOnlyStoryNodeObjectFactory = this.readOnlyStoryNodeObjectFactory;
 
     nodeObjects = storyPlaythroughBackendDict.story_nodes.map(
-      function(node) {
-        return readOnlyStoryNodeObjectFactory.createFromBackendDict(node);
-      }
-    );
+      readOnlyStoryNodeObjectFactory.createFromBackendDict);
 
     return new StoryPlaythrough(nodeObjects);
   }

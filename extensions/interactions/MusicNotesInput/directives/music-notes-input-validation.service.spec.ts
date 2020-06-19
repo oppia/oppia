@@ -49,14 +49,14 @@ describe('MusicNotesInputValidationService', () => {
       dest: 'Second State',
       feedback: {
         html: '',
-        audio_translations: {}
+        content_id: ''
       },
       labelled_as_correct: false,
       param_changes: [],
       refresher_exploration_id: null,
       missing_prerequisite_skill_id: null
     });
-    goodAnswerGroups = [agof.createNew([], goodDefaultOutcome, false, null)];
+    goodAnswerGroups = [agof.createNew([], goodDefaultOutcome, null, null)];
   });
 
   it('should be able to perform basic validation', () => {
