@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Data and controllers for the Oppia 'edit preferences' page.
+ * @fileoverview Component for the Oppia 'edit preferences' page.
  */
 
 require('cropperjs/dist/cropper.min.css');

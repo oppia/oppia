@@ -21,4 +21,4 @@
 require('pages/email-dashboard-pages/email-dashboard-page.module.ts');
 require('App.ts');
 
-require('pages/email-dashboard-pages/email-dashboard-page.controller.ts');
+require('pages/email-dashboard-pages/email-dashboard-page.component.ts');
