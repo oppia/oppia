@@ -171,7 +171,7 @@ describe('Preferences Controller', function() {
   it('should save email preferences', function() {
     var isRequestTheExpectOne = function(queryParams) {
       return decodeURIComponent(queryParams).match(
-        '"update_type":"email_preferences"');
+        '"update_type": "email_preferences"');
     };
     $httpBackend.expect(
       'PUT', '/preferenceshandler/data', isRequestTheExpectOne).respond(200);
@@ -185,7 +185,7 @@ describe('Preferences Controller', function() {
   it('should save preferred language codes', function() {
     var isRequestTheExpectOne = function(queryParams) {
       return decodeURIComponent(queryParams).match(
-        '"update_type":"preferred_language_codes"');
+        '"update_type": "preferred_language_codes"');
     };
     $httpBackend.expect(
       'PUT', '/preferenceshandler/data', isRequestTheExpectOne).respond(200);
@@ -199,7 +199,7 @@ describe('Preferences Controller', function() {
   it('should save default dashboard', function() {
     var isRequestTheExpectOne = function(queryParams) {
       return decodeURIComponent(queryParams).match(
-        '"update_type":"default_dashboard"');
+        '"update_type": "default_dashboard"');
     };
     $httpBackend.expect(
       'PUT', '/preferenceshandler/data', isRequestTheExpectOne).respond(200);

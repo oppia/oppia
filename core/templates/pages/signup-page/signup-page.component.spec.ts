@@ -35,7 +35,9 @@ describe('Signup page', function() {
   var AlertsService = null;
   var CsrfService = null;
   var LoaderService = null;
+  var SiteAnalyticsService = null;
   var UrlService = null;
+
   var alertsServiceSpy = null;
   var loadingMessage;
   var subscriptions = [];
@@ -68,6 +70,7 @@ describe('Signup page', function() {
     CsrfService = $injector.get('CsrfTokenService');
     loadingMessage = '';
     LoaderService = $injector.get('LoaderService');
+    SiteAnalyticsService = $injector.get('SiteAnalyticsService');
     UrlService = $injector.get('UrlService');
 
     subscriptions.push(LoaderService.onLoadingMessageChange.subscribe(
@@ -102,9 +105,13 @@ describe('Signup page', function() {
       $httpBackend.flush();
     });
 
-    it('should show a loading message until the data is retrieved', function() {
+    it('should show warning and not submit form', function() {
       ctrl.updateWarningText(ctrl.username);
       ctrl.submitPrerequisitesForm(true, '', true);
+
+      expect(ctrl.warningI18nCode).toBe('Please enter a username.');
+      $httpBackend.verifyNoOutstandingExpectation();
+      $httpBackend.verifyNoOutstandingRequest();
     });
 
     it('should show warning if email preferences is null but user can send' +
@@ -123,41 +130,47 @@ describe('Signup page', function() {
       expect(ctrl.emailPreferencesWarningText).toBe('');
     });
 
-    it('should send correct informat', function() {
-      spyOn(UrlService, 'getUrlParams').and.returnValue({
-        return_url: '/expected_url'
+    it('should send correct information if can receive email updates',
+      function() {
+        spyOn(UrlService, 'getUrlParams').and.returnValue({
+          return_url: '/expected_url'
+        });
+        spyOn(SiteAnalyticsService, 'registerNewSignupEvent').and.callThrough();
+
+        var isRequestTheExpectOne = function(queryParams) {
+          return decodeURIComponent(queryParams).match(
+            '"can_receive_email_updates": true');
+        };
+
+        $httpBackend.expectPOST('/signuphandler/data', isRequestTheExpectOne)
+          .respond(200);
+        ctrl.submitPrerequisitesForm(true, '', 'yes');
+        $httpBackend.flush();
+
+        expect(SiteAnalyticsService.registerNewSignupEvent).toHaveBeenCalled();
+        expect(mockWindow.location.href).toBe('/expected_url');
       });
 
-      var isRequestTheExpectOne = function(queryParams) {
-        return decodeURIComponent(queryParams).match(
-          '"can_receive_email_updates":true');
-      };
+    it('should send correct information if cannot receive email updates',
+      function() {
+        spyOn(UrlService, 'getUrlParams').and.returnValue({
+          return_url: '/expected_url'
+        });
+        spyOn(SiteAnalyticsService, 'registerNewSignupEvent').and.callThrough();
 
-      $httpBackend.expectPOST('/signuphandler/data', isRequestTheExpectOne)
-        .respond(200);
-      ctrl.submitPrerequisitesForm(true, '', 'yes');
-      $httpBackend.flush();
+        var isRequestTheExpectOne = function(queryParams) {
+          return decodeURIComponent(queryParams).match(
+            '"can_receive_email_updates": false');
+        };
 
-      expect(mockWindow.location.href).toBe('/expected_url');
-    });
+        $httpBackend.expectPOST('/signuphandler/data', isRequestTheExpectOne)
+          .respond(200);
+        ctrl.submitPrerequisitesForm(true, '', 'no');
+        $httpBackend.flush();
 
-    it('should show a loading message until the data is retrieved', function() {
-      spyOn(UrlService, 'getUrlParams').and.returnValue({
-        return_url: '/expected_url'
+        expect(SiteAnalyticsService.registerNewSignupEvent).toHaveBeenCalled();
+        expect(mockWindow.location.href).toBe('/expected_url');
       });
-
-      var isRequestTheExpectOne = function(queryParams) {
-        return decodeURIComponent(queryParams).match(
-          '"can_receive_email_updates":false');
-      };
-
-      $httpBackend.expectPOST('/signuphandler/data', isRequestTheExpectOne)
-        .respond(200);
-      ctrl.submitPrerequisitesForm(true, '', 'no');
-      $httpBackend.flush();
-
-      expect(mockWindow.location.href).toBe('/expected_url');
-    });
 
     it('should throw an error if email preferences is invalid', function() {
       expect(() => {
