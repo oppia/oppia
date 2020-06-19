@@ -2060,15 +2060,14 @@ class DocstringCheckerTests(unittest.TestCase):
                 u"""class ABC(arg):
                         \"\"\"This is a docstring.
                             Returns:
-                                (str). If true,
-                                    individual key=value pairs
-                                        comment comment comment.
+                                (str). If :true,
+                                    individual key=value pairs.
                         \"\"\"
                         Something
                 """)
         message = testutils.Message(
-            msg_id='eight-space-indentation-in-docstring',
-            line=6)
+            msg_id='four-space-indentation-in-docstring',
+            line=5)
         self.checker_test_object.checker.process_module(
             no_eight_space_indentation_in_args)
         with self.checker_test_object.assertAddsMessages(message):
@@ -2172,12 +2171,34 @@ class DocstringCheckerTests(unittest.TestCase):
                         \"\"\"This is a docstring.
                             Returns:
                                 str. The string parsed using
-                                    Jinja templating. Returns an error
-                                    string in case of error in parsing.
+                                Jinja templating. Returns an error
+                                string in case of error in parsing.
                             Yields:
                                 tuple. For ExplorationStatsModel,
-                                    a 2-tuple of the form (exp_id, value)
-                                    where value is of the form.
+                                a 2-tuple of the form (exp_id, value)
+                                where value is of the form.
+                        \"\"\"
+                        Something
+                """)
+        self.checker_test_object.checker.process_module(
+            node_with_no_error_message)
+        with self.checker_test_object.assertNoMessages():
+            temp_file.close()
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""class ABC(arg):
+                        \"\"\"This is a docstring.
+                            Returns:
+                                str. From this item there
+                                is things:
+                                    Jinja templating. Returns an error
+                                string in case of error in parsing.
+                            Yields:
+                                tuple. For ExplorationStatsModel:
+                                    {key
+                                        (sym)
+                                    }
                         \"\"\"
                         Something
                 """)
