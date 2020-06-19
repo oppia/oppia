@@ -30,7 +30,7 @@ describe('PositionOfTerms', function() {
   });
 
   it('should change ctrl.value when ctrl.localValue changes', function() {
-    // Initially default value of localValue is assigned.
+    // Initially, the default value of localValue is assigned.
     PositionOfTermsCtrl.onChangePosition();
     expect(PositionOfTermsCtrl.value).toBe('both');
 

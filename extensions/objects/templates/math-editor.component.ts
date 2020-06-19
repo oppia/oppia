@@ -31,7 +31,7 @@ angular.module('oppia').component('mathEditor', {
       $scope, GuppyConfigurationService) {
     const ctrl = this;
 
-    ctrl.initializeGuppy = function() {
+    ctrl.initializeNewGuppyInstance = function() {
       var guppyDivs = document.querySelectorAll('.guppy-div');
       var divId, guppyInstance;
       for (var i = 0; i < guppyDivs.length; i++) {
@@ -55,8 +55,8 @@ angular.module('oppia').component('mathEditor', {
 
     ctrl.$onInit = function() {
       ctrl.alwaysEditable = true;
-      ctrl.initializeGuppy();
       GuppyConfigurationService.init();
+      ctrl.initializeNewGuppyInstance();
     };
   }]
 });
