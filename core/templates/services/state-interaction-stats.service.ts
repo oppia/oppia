@@ -19,28 +19,17 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
+import { Answer } from 'domain/exploration/AnswerStatsObjectFactory';
 import { AnswerClassificationService } from
   'pages/exploration-player-page/services/answer-classification.service';
 import { ContextService } from 'services/context.service';
-import { FractionObjectFactory, IFractionDict } from
+import { IFractionDict, FractionObjectFactory } from
   'domain/objects/FractionObjectFactory';
-import { IGraphBackendDict } from
-  'extensions/interactions/GraphInput/directives/graph-detail.service';
-import { INote } from
-  // eslint-disable-next-line max-len
-  'extensions/interactions/MusicNotesInput/directives/music-notes-input-rules.service';
-import { INumberWithUnitsBackendDict } from
-  'domain/objects/NumberWithUnitsObjectFactory';
 import { InteractionRulesRegistryService } from
   'services/interaction-rules-registry.service';
 import { State } from 'domain/state/StateObjectFactory';
 import { StateInteractionStatsBackendApiService } from
   'domain/exploration/state-interaction-stats-backend-api.service';
-
-type Answer = (
-  string | number | IFractionDict |
-  INumberWithUnitsBackendDict | string[] | INote[] |
-  number[] | IGraphBackendDict| string[][]);
 
 type Option = string | string[];
 

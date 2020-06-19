@@ -24,19 +24,12 @@ import {
   AnswerClassificationResult, AnswerClassificationResultObjectFactory
 } from 'domain/classifier/AnswerClassificationResultObjectFactory';
 import { AnswerGroup } from 'domain/exploration/AnswerGroupObjectFactory';
+import { Answer } from 'domain/exploration/AnswerStatsObjectFactory';
 import { AppService } from 'services/app.service';
 import { ExplorationPlayerConstants } from
   'pages/exploration-player-page/exploration-player-page.constants';
 import { Interaction } from 'domain/exploration/InteractionObjectFactory';
 import { InteractionSpecsService } from 'services/interaction-specs.service';
-import { IFractionDict } from 'domain/objects/FractionObjectFactory';
-import { IGraphBackendDict } from
-  'extensions/interactions/GraphInput/directives/graph-detail.service';
-import { INote } from
-  // eslint-disable-next-line max-len
-  'extensions/interactions/MusicNotesInput/directives/music-notes-input-rules.service';
-import { INumberWithUnitsBackendDict } from
-  'domain/objects/NumberWithUnitsObjectFactory';
 import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
 import { PredictionAlgorithmRegistryService }
   // eslint-disable-next-line max-len
@@ -44,11 +37,6 @@ import { PredictionAlgorithmRegistryService }
 import { State } from 'domain/state/StateObjectFactory';
 import { StateClassifierMappingService } from
   'pages/exploration-player-page/services/state-classifier-mapping.service';
-
-type Answer = (
-  string | number | IFractionDict |
-  INumberWithUnitsBackendDict | string[] | INote[] |
-  number[] | IGraphBackendDict| string[][]);
 
 @Injectable({providedIn: 'root'})
 export class AnswerClassificationService {
