@@ -173,7 +173,7 @@ class PlaythroughAudit(jobs.BaseMapReduceOneOffJobManager):
 
 class ClearExplorationIssuesOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """Iterates through ExplorationIssuesModel and PlaythroughModel to ensure
-    each of them are completely deleted from storage.
+    each of them are completely cleared out/deleted from storage, respectively.
     """
 
     REDUCE_KEY_DELETE = 'DELETE'
