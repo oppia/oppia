@@ -54,53 +54,55 @@ class MockComponent {
 
 let guppyConfigurationService: GuppyConfigurationService = null;
 
-beforeEach(() => {
-  guppyConfigurationService = TestBed.get(GuppyConfigurationService);
-  window.Guppy = MockGuppy;
-});
-
 describe('GuppyConfigurationService', () => {
-  it('should configure guppy if service is not initialized', () => {
-    GuppyConfigurationService.serviceIsInitialized = false;
-    spyOn(Guppy, 'remove_global_symbol');
-    guppyConfigurationService.init();
-    expect(Guppy.remove_global_symbol).toHaveBeenCalled();
+  beforeEach(() => {
+    guppyConfigurationService = TestBed.get(GuppyConfigurationService);
+    window.Guppy = MockGuppy;
   });
-
-  it('should not configure guppy if service is initialized', () => {
-    GuppyConfigurationService.serviceIsInitialized = true;
-    spyOn(Guppy, 'remove_global_symbol');
-    guppyConfigurationService.init();
-    expect(Guppy.remove_global_symbol).not.toHaveBeenCalled();
+  
+  describe('Individual service', () => {
+    it('should configure guppy if service is not initialized', () => {
+      GuppyConfigurationService.serviceIsInitialized = false;
+      spyOn(Guppy, 'remove_global_symbol');
+      guppyConfigurationService.init();
+      expect(Guppy.remove_global_symbol).toHaveBeenCalled();
+    });
+  
+    it('should not configure guppy if service is initialized', () => {
+      GuppyConfigurationService.serviceIsInitialized = true;
+      spyOn(Guppy, 'remove_global_symbol');
+      guppyConfigurationService.init();
+      expect(Guppy.remove_global_symbol).not.toHaveBeenCalled();
+    });
   });
-});
-
-describe('Components calling the service', () => {
-  let MathEditorCtrl = null;
-
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value(
-      'GuppyConfigurationService', guppyConfigurationService);
-  }));
-  beforeEach(angular.mock.inject(function($componentController) {
-    MathEditorCtrl = $componentController('mathEditor');
-  }));
-
-  it('should configure guppy on the first initialization', () => {
-    GuppyConfigurationService.serviceIsInitialized = false;
-    spyOn(Guppy, 'remove_global_symbol');
-    MathEditorCtrl.$onInit();
-    expect(Guppy.remove_global_symbol).toHaveBeenCalled();
-  });
-
-  it('should not configure guppy on subsequent initializations', () => {
-    spyOn(Guppy, 'remove_global_symbol');
-    MathEditorCtrl.$onInit();
-    expect(Guppy.remove_global_symbol).not.toHaveBeenCalled();
-
-    let mockComponent = new MockComponent(guppyConfigurationService);
-    mockComponent.onInit();
-    expect(Guppy.remove_global_symbol).not.toHaveBeenCalled();
-  });
+  
+  describe('Components calling the service', () => {
+    let MathEditorCtrl = null;
+  
+    beforeEach(angular.mock.module('oppia'));
+    beforeEach(angular.mock.module('oppia', function($provide) {
+      $provide.value(
+        'GuppyConfigurationService', guppyConfigurationService);
+    }));
+    beforeEach(angular.mock.inject(function($componentController) {
+      MathEditorCtrl = $componentController('mathEditor');
+    }));
+  
+    it('should configure guppy on the first initialization', () => {
+      GuppyConfigurationService.serviceIsInitialized = false;
+      spyOn(Guppy, 'remove_global_symbol');
+      MathEditorCtrl.$onInit();
+      expect(Guppy.remove_global_symbol).toHaveBeenCalled();
+    });
+  
+    it('should not configure guppy on subsequent initializations', () => {
+      spyOn(Guppy, 'remove_global_symbol');
+      MathEditorCtrl.$onInit();
+      expect(Guppy.remove_global_symbol).not.toHaveBeenCalled();
+  
+      let mockComponent = new MockComponent(guppyConfigurationService);
+      mockComponent.onInit();
+      expect(Guppy.remove_global_symbol).not.toHaveBeenCalled();
+    });
+  });  
 });
