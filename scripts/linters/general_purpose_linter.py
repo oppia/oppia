@@ -99,7 +99,7 @@ BAD_PATTERNS = {
 
 BAD_PATTERNS_REGEXP = [
     {
-        'regexp': re.compile(r'TODO[^\(]*[^\)][^:]*[^\w]*$'),
+        'regexp': re.compile(r'TODO[^\(]*[^\)][^:]*[^A-Z]+[^\w]*$'),
         'message': 'Please assign TODO comments to a user '
                    'in the format TODO(username): XXX. ',
         'excluded_files': (),
