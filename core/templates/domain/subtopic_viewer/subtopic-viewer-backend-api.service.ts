@@ -20,9 +20,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
-import cloneDeep from 'lodash/cloneDeep';
-
-import { ReadOnlySubtopicPageObjectFactory } from
+import { ISubtopicDataBackendDict, ReadOnlySubtopicPageObjectFactory } from
   'domain/subtopic_viewer/ReadOnlySubtopicPageObjectFactory';
 import { SubtopicViewerDomainConstants } from
   'domain/subtopic_viewer/subtopic-viewer-domain.constants';
@@ -40,7 +38,7 @@ export class SubtopicViewerBackendApiService {
 
   private _fetchSubtopicData(
       topicName: string, subtopicId: string,
-      successCallback: (value?: Object | PromiseLike<Object>) => void,
+      successCallback: (value?: Object) => void,
       errorCallback: (reason?: any) => void): void {
     var subtopicDataUrl = this.urlInterpolation.interpolateUrl(
       SubtopicViewerDomainConstants.SUBTOPIC_DATA_URL_TEMPLATE, {
@@ -48,11 +46,12 @@ export class SubtopicViewerBackendApiService {
         subtopic_id: subtopicId
       });
 
-    this.http.get(subtopicDataUrl).toPromise().then((response) => {
-      let subtopicDataObject =
-      this.readOnlySubtopicPageFactory.createFromBackendDict(
-        cloneDeep(response)
-      );
+    this.http.get(subtopicDataUrl).toPromise().then((
+        response: ISubtopicDataBackendDict) => {
+      let subtopicDataObject = (
+        this.readOnlySubtopicPageFactory.createFromBackendDict(
+          response
+        ));
       if (successCallback) {
         successCallback(subtopicDataObject);
       }

@@ -52,7 +52,7 @@ describe('Topic rights object factory', () => {
     expect(sampleTopicRights.isPublished()).toBe(false);
 
     var exampleTopicRightsBackendObject = {
-      is_published: false,
+      published: false,
       can_edit_topic: true,
       can_publish_topic: false
     };

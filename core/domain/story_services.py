@@ -544,11 +544,12 @@ def compute_summary_of_story(story):
     Returns:
         StorySummary. The computed summary for the given story.
     """
-    story_model_node_count = len(story.story_contents.nodes)
+    story_model_node_titles = [
+        node.title for node in story.story_contents.nodes]
     story_summary = story_domain.StorySummary(
         story.id, story.title, story.description, story.language_code,
-        story.version, story_model_node_count,
-        story.created_on, story.last_updated
+        story.version, story_model_node_titles, story.thumbnail_bg_color,
+        story.thumbnail_filename, story.created_on, story.last_updated
     )
 
     return story_summary
@@ -573,20 +574,28 @@ def save_story_summary(story_summary):
         story_summary: The story summary object to be saved in the
             datastore.
     """
-    story_summary_model = story_models.StorySummaryModel(
-        id=story_summary.id,
-        title=story_summary.title,
-        description=story_summary.description,
-        language_code=story_summary.language_code,
-        version=story_summary.version,
-        node_count=story_summary.node_count,
-        story_model_last_updated=(
+    story_summary_dict = {
+        'title': story_summary.title,
+        'description': story_summary.description,
+        'language_code': story_summary.language_code,
+        'version': story_summary.version,
+        'node_titles': story_summary.node_titles,
+        'thumbnail_bg_color': story_summary.thumbnail_bg_color,
+        'thumbnail_filename': story_summary.thumbnail_filename,
+        'story_model_last_updated': (
             story_summary.story_model_last_updated),
-        story_model_created_on=(
+        'story_model_created_on': (
             story_summary.story_model_created_on)
-    )
+    }
 
-    story_summary_model.put()
+    story_summary_model = (
+        story_models.StorySummaryModel.get_by_id(story_summary.id))
+    if story_summary_model is not None:
+        story_summary_model.populate(**story_summary_dict)
+        story_summary_model.put()
+    else:
+        story_summary_dict['id'] = story_summary.id
+        story_models.StorySummaryModel(**story_summary_dict).put()
 
 
 def record_completed_node_in_story_context(user_id, story_id, node_id):

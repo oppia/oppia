@@ -28,9 +28,6 @@ import python_utils
 
 from . import linter_utils
 
-_MESSAGE_TYPE_SUCCESS = 'SUCCESS'
-_MESSAGE_TYPE_FAILED = 'FAILED'
-
 CODEOWNER_FILEPATH = '.github/CODEOWNERS'
 
 # This list needs to be in sync with the important patterns in the CODEOWNERS
@@ -48,7 +45,9 @@ CODEOWNER_IMPORTANT_PATHS = [
     '/package.json',
     '/yarn.lock',
     '/scripts/install_third_party_libs.py',
-    '/.github/']
+    '/.github/',
+    '/.github/CODEOWNERS',
+    '/.github/stale.yml']
 
 
 def _walk_with_gitignore(root, exclude_dirs):
@@ -97,6 +96,18 @@ def _is_path_ignored(path_to_check):
     # otherwise it returns 1. subprocess.call then returns this returncode.
 
     return subprocess.call(command) == 0
+
+
+def _is_path_contains_frontend_specs(path_to_check):
+    """Checks whether if a path contains all spec files.
+
+    Args:
+        path_to_check: str. A path to a file or a dir.
+
+    Returns:
+        bool. Whether the given path contains all spec files.
+    """
+    return '*.spec.ts' in path_to_check or '*Spec.ts' in path_to_check
 
 
 def check_for_important_patterns_at_bottom_of_codeowners(important_patterns):
@@ -205,15 +216,18 @@ def check_codeowner_file(verbose_mode_enabled):
                             % (CODEOWNER_FILEPATH, line_num + 1))
                         failed = True
 
-                    # The double asterisks pattern is supported by the
-                    # CODEOWNERS syntax but not the glob in Python 2.
-                    # The following condition checks this.
-                    if '**' in line_in_concern:
-                        python_utils.PRINT(
-                            '%s --> Pattern on line %s is invalid. '
-                            '\'**\' wildcard not allowed' % (
-                                CODEOWNER_FILEPATH, line_num + 1))
-                        failed = True
+                    # The double asterisks should be allowed only when path
+                    # includes all the frontend spec files.
+                    if not _is_path_contains_frontend_specs(line_in_concern):
+                        # The double asterisks pattern is supported by the
+                        # CODEOWNERS syntax but not the glob in Python 2.
+                        # The following condition checks this.
+                        if '**' in line_in_concern:
+                            python_utils.PRINT(
+                                '%s --> Pattern on line %s is invalid. '
+                                '\'**\' wildcard not allowed' % (
+                                    CODEOWNER_FILEPATH, line_num + 1))
+                            failed = True
                     # Adjustments to the dir paths in CODEOWNERS syntax
                     # for glob-style patterns to match correctly.
                     if line_in_concern.endswith('/'):
@@ -227,12 +241,15 @@ def check_codeowner_file(verbose_mode_enabled):
                     # be changed to './' for glob patterns to match
                     # correctly.
                     line_in_concern = line_in_concern.replace('/', './', 1)
-                    if not glob.glob(line_in_concern):
-                        python_utils.PRINT(
-                            '%s --> Pattern on line %s doesn\'t match '
-                            'any file or directory' % (
-                                CODEOWNER_FILEPATH, line_num + 1))
-                        failed = True
+                    # The checking for path existence won't happen if the path
+                    # is getting all the frontend spec files.
+                    if not _is_path_contains_frontend_specs(line_in_concern):
+                        if not glob.glob(line_in_concern):
+                            python_utils.PRINT(
+                                '%s --> Pattern on line %s doesn\'t match '
+                                'any file or directory' % (
+                                    CODEOWNER_FILEPATH, line_num + 1))
+                            failed = True
                     # The following list is being populated with the
                     # paths in the CODEOWNERS file with the removal of the
                     # leading '/' to aid in the glob pattern matching in
@@ -264,12 +281,12 @@ def check_codeowner_file(verbose_mode_enabled):
 
         if failed:
             summary_message = (
-                '%s   CODEOWNERS file coverage check failed, see messages '
+                '%s CODEOWNERS file coverage check failed, see messages '
                 'above for files that need to be added or patterns that need '
-                'to be fixed.' % _MESSAGE_TYPE_FAILED)
+                'to be fixed.' % linter_utils.FAILED_MESSAGE_PREFIX)
         else:
-            summary_message = '%s  CODEOWNERS file check passed' % (
-                _MESSAGE_TYPE_SUCCESS)
+            summary_message = '%s CODEOWNERS file check passed' % (
+                linter_utils.SUCCESS_MESSAGE_PREFIX)
             python_utils.PRINT(summary_message)
 
         summary_messages.append(summary_message)

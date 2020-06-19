@@ -21,6 +21,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import copy
 
+from core.domain import expression_parser
 import python_utils
 import schema_utils
 
@@ -443,6 +444,16 @@ class Filepath(BaseObject):
     """
 
     description = 'A string that represents a filepath'
+
+    SCHEMA = UnicodeString.SCHEMA
+
+
+class SvgFilename(BaseObject):
+    """A string representing a filename of the saved
+    svg file created using literallyCanvas.
+    """
+
+    description = 'A string representing the saved svg filename'
 
     SCHEMA = UnicodeString.SCHEMA
 
@@ -1035,3 +1046,66 @@ class DragAndDropPositiveInt(BaseObject):
     default_value = 1
 
     SCHEMA = PositiveInt.SCHEMA
+
+
+class AlgebraicExpression(BaseObject):
+    """Class for algebraic expressions. Stores a unicode string representing a
+    valid algebraic expression.
+    """
+
+    description = 'A unicode string for an algebraic expression.'
+    default_value = 'x'
+
+    SCHEMA = {
+        'type': 'unicode',
+        'validators': [{
+            'id': 'is_valid_math_expression',
+            'algebraic': True
+        }]
+    }
+
+
+class AlgebraicIdentifier(BaseObject):
+    """Class for an algebraic identifier.
+    An algebraic identifier could be an english alphabet (uppercase/lowercase)
+    or a greek letter represented as a single word.
+    """
+
+    description = 'A string representing an algebraic identifier.'
+    default_value = 'x'
+
+    SCHEMA = {
+        'type': 'unicode',
+        'choices': expression_parser.VALID_ALGEBRAIC_IDENTIFIERS
+    }
+
+
+class MathEquation(BaseObject):
+    """Class for math equations. Stores a unicode string representing a
+    valid math equation.
+    """
+
+    description = 'A unicode string for a math equation.'
+    default_value = 'x=y'
+
+    SCHEMA = {
+        'type': 'unicode',
+        'validators': [{
+            'id': 'is_valid_math_equation'
+        }]
+    }
+
+
+class PositionOfTerms(BaseObject):
+    """Class for position of terms. Denotes the position of terms relative to
+    the equals sign in a math equation.
+    """
+
+    description = (
+        'The position of terms relative to the equals sign in a math equation.')
+    default_value = 'both'
+
+    SCHEMA = {
+        'type': 'unicode',
+        'choices': ['lhs', 'rhs', 'both', 'irrelevant']
+    }

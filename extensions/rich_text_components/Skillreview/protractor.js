@@ -20,20 +20,20 @@
 var objects = require(process.cwd() + '/extensions/objects/protractor.js');
 var forms = require(process.cwd() + '/core/tests/protractor_utils/forms.js');
 
-var customizeComponent = function(modal, text, skillDescription) {
-  objects.UnicodeStringEditor(
+var customizeComponent = async function(modal, text, skillDescription) {
+  await objects.UnicodeStringEditor(
     modal.element(by.tagName('schema-based-unicode-editor'))
   ).setValue(text);
-  objects.SkillSelector(
+  await objects.SkillSelector(
     modal.element(by.tagName('skill-selector-editor'))
   ).setValue(skillDescription);
 };
 
-var expectComponentDetailsToMatch = function(elem, text, reviewMaterial) {
-  var link = elem.element(by.tagName('a')).getText();
-  expect(link).toBe(text);
-  link.click();
-  forms.expectRichText(
+var expectComponentDetailsToMatch = async function(elem, text, reviewMaterial) {
+  var link = elem.element(by.tagName('a'));
+  expect(await link.getText()).toBe(text);
+  await link.click();
+  await forms.expectRichText(
     element(by.css('.protractor-test-concept-card-explanation'))
   ).toMatch(reviewMaterial);
 };

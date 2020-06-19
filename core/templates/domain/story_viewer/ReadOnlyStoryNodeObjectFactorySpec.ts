@@ -32,6 +32,7 @@ describe('Read only story node object factory', () => {
     var sampleReadOnlyStoryNodeBackendDict = {
       id: 'node_1',
       title: 'Title 1',
+      description: 'Description',
       prerequisite_skill_ids: ['skill_1'],
       acquired_skill_ids: ['skill_2'],
       destination_node_ids: ['node_2'],
@@ -42,7 +43,9 @@ describe('Read only story node object factory', () => {
         title: 'Title',
         status: 'private'
       },
-      completed: true
+      completed: true,
+      thumbnail_bg_color: '#a33f40',
+      thumbnail_filename: 'image.png'
     };
     _sampleStoryNode = readOnlyStoryNodeObjectFactory.createFromBackendDict(
       sampleReadOnlyStoryNodeBackendDict);
@@ -51,6 +54,7 @@ describe('Read only story node object factory', () => {
   it('should correctly return all the values', function() {
     expect(_sampleStoryNode.getId()).toEqual('node_1');
     expect(_sampleStoryNode.getTitle()).toEqual('Title 1');
+    expect(_sampleStoryNode.getDescription()).toEqual('Description');
     expect(_sampleStoryNode.getExplorationId()).toEqual('exp_id');
     expect(_sampleStoryNode.isCompleted()).toEqual(true);
     expect(_sampleStoryNode.getExplorationSummaryObject()).toEqual({
@@ -60,5 +64,7 @@ describe('Read only story node object factory', () => {
     expect(_sampleStoryNode.getOutline()).toEqual('Outline');
     expect(_sampleStoryNode.getOutlineStatus()).toEqual(false);
     expect(_sampleStoryNode.getOutlineStatus()).toEqual(false);
+    expect(_sampleStoryNode.getThumbnailFilename()).toEqual('image.png');
+    expect(_sampleStoryNode.getThumbnailBgColor()).toEqual('#a33f40');
   });
 });

@@ -137,3 +137,14 @@ class EnumeratedFrequencyTable(BaseVisualization):
         'description': 'The title of the visualization.',
         'schema': {'type': 'unicode'}
     }]
+
+
+class SortedTiles(BaseVisualization):
+    """A visualization for showing a small group of answers as a sequence of
+    tiles.
+    """
+    _OPTIONS_SPECS = [{
+        'name': 'header',
+        'description': 'Header for the tiles.',
+        'schema': {'type': 'unicode'}
+    }]

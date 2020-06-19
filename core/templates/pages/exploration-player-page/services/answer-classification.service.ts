@@ -24,6 +24,7 @@ import {
   AnswerClassificationResult, AnswerClassificationResultObjectFactory
 } from 'domain/classifier/AnswerClassificationResultObjectFactory';
 import { AnswerGroup } from 'domain/exploration/AnswerGroupObjectFactory';
+import { Answer } from 'domain/exploration/AnswerStatsObjectFactory';
 import { AppService } from 'services/app.service';
 import { ExplorationPlayerConstants } from
   'pages/exploration-player-page/exploration-player-page.constants';
@@ -62,7 +63,7 @@ export class AnswerClassificationService {
    * @return AnswerClassificationResult domain object.
    */
   private classifyAnswer(
-      answer, answerGroups: AnswerGroup[], defaultOutcome: Outcome,
+      answer: Answer, answerGroups: AnswerGroup[], defaultOutcome: Outcome,
       interactionRulesService): AnswerClassificationResult {
     // Find the first group that contains a rule which returns true
     // TODO(bhenning): Implement training data classification.
@@ -105,7 +106,7 @@ export class AnswerClassificationService {
    * @return The resulting AnswerClassificationResult domain object.
    */
   getMatchingClassificationResult(
-      stateName: string, interactionInOldState: Interaction, answer: object,
+      stateName: string, interactionInOldState: Interaction, answer: Answer,
       interactionRulesService): AnswerClassificationResult {
     var answerClassificationResult = null;
 
@@ -175,7 +176,7 @@ export class AnswerClassificationService {
   }
 
   isClassifiedExplicitlyOrGoesToNewState(
-      stateName: string, state: State, answer: object,
+      stateName: string, state: State, answer: Answer,
       interactionRulesService): boolean {
     const result = this.getMatchingClassificationResult(
       stateName, state.interaction, answer, interactionRulesService);

@@ -22,7 +22,6 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import argparse
-import collections
 import datetime
 import os
 import subprocess
@@ -41,15 +40,22 @@ sys.path.insert(0, _PY_GITHUB_PATH)
 import github # isort:skip
 # pylint: enable=wrong-import-position
 
-ABOUT_PAGE_FILEPATH = os.path.join(
+ABOUT_PAGE_CONSTANTS_FILEPATH = os.path.join(
     'core', 'templates', 'pages', 'about-page',
-    'about-page.directive.html')
+    'about-page.constants.ts')
 AUTHORS_FILEPATH = os.path.join('', 'AUTHORS')
 CHANGELOG_FILEPATH = os.path.join('', 'CHANGELOG')
 CONTRIBUTORS_FILEPATH = os.path.join('', 'CONTRIBUTORS')
 GIT_CMD_CHECKOUT = 'git checkout -- %s %s %s %s' % (
     CHANGELOG_FILEPATH, AUTHORS_FILEPATH, CONTRIBUTORS_FILEPATH,
-    ABOUT_PAGE_FILEPATH)
+    ABOUT_PAGE_CONSTANTS_FILEPATH)
+
+# These constants should match the format defined in
+# about-page.constants.ts. If the patterns do not match,
+# update_changelog_and_credits_test will fail.
+CREDITS_START_LINE = '  public static CREDITS_CONSTANTS = [\n'
+CREDITS_END_LINE = '  ];\n'
+CREDITS_INDENT = '    '
 
 # This ordering should not be changed. The automatic updates to
 # changelog and credits performed using this script will work
@@ -237,6 +243,54 @@ def update_changelog(
     python_utils.PRINT('Updated Changelog!')
 
 
+def get_new_authors(release_summary_lines):
+    """Returns the list of new authors in release_summary_lines.
+
+    Args:
+        release_summary_lines: list(str). List of lines in
+            ../release_summary.md.
+
+    Returns:
+        list(str). The list of new authors.
+    """
+    start_index = release_summary_lines.index(
+        release_constants.NEW_AUTHORS_HEADER) + 1
+    end_index = release_summary_lines.index(
+        release_constants.EXISTING_AUTHORS_HEADER) - 1
+    new_authors = release_summary_lines[start_index:end_index]
+    new_authors = [
+        '%s\n' % (author.replace('* ', '').strip()) for author in new_authors]
+    return new_authors
+
+
+def get_new_contributors(release_summary_lines, return_only_names=False):
+    """Returns the list of new contributors in release_summary_lines.
+
+    Args:
+        release_summary_lines: list(str). List of lines in
+            ../release_summary.md.
+        return_only_names: bool. Whether to return names only or
+            names along with email ids.
+
+    Returns:
+        list(str). The list of new contributors.
+    """
+    start_index = release_summary_lines.index(
+        release_constants.NEW_CONTRIBUTORS_HEADER) + 1
+    end_index = release_summary_lines.index(
+        release_constants.EMAIL_HEADER) - 1
+    new_contributors = (
+        release_summary_lines[start_index:end_index])
+    new_contributors = [
+        '%s\n' % (
+            contributor.replace(
+                '* ', '').strip()) for contributor in new_contributors]
+    if not return_only_names:
+        return new_contributors
+    return [
+        contributor.split('<')[0].strip() for contributor in new_contributors]
+
+
 def update_authors(release_summary_lines):
     """Updates AUTHORS file.
 
@@ -245,13 +299,7 @@ def update_authors(release_summary_lines):
             ../release_summary.md.
     """
     python_utils.PRINT('Updating AUTHORS file...')
-    start_index = release_summary_lines.index(
-        release_constants.NEW_AUTHORS_HEADER) + 1
-    end_index = release_summary_lines.index(
-        release_constants.EXISTING_AUTHORS_HEADER) - 1
-    new_authors = release_summary_lines[start_index:end_index]
-    new_authors = [
-        '%s\n' % (author.replace('* ', '').strip()) for author in new_authors]
+    new_authors = get_new_authors(release_summary_lines)
     update_sorted_file(AUTHORS_FILEPATH, new_authors)
     python_utils.PRINT('Updated AUTHORS file!')
 
@@ -264,127 +312,38 @@ def update_contributors(release_summary_lines):
             ../release_summary.md.
     """
     python_utils.PRINT('Updating CONTRIBUTORS file...')
-    start_index = release_summary_lines.index(
-        release_constants.NEW_CONTRIBUTORS_HEADER) + 1
-    end_index = release_summary_lines.index(
-        release_constants.EMAIL_HEADER) - 1
-    new_contributors = (
-        release_summary_lines[start_index:end_index])
-    new_contributors = [
-        '%s\n' % (
-            contributor.replace(
-                '* ', '').strip()) for contributor in new_contributors]
+    new_contributors = get_new_contributors(release_summary_lines)
     update_sorted_file(CONTRIBUTORS_FILEPATH, new_contributors)
     python_utils.PRINT('Updated CONTRIBUTORS file!')
 
 
-def find_indentation(about_page_lines):
-    """Finds indentation used for span and li elements to list developer
-    names in about-page.directive.html.
-
-    Args:
-        about_page_lines: list(str). List of lines in
-            about-page.directive.html.
-
-    Returns:
-        tuple(str, str). A tuple of span indent and li indent.
-    """
-
-    span_text = '<span>A</span>'
-
-    span_line = ''
-    li_line = ''
-    for index, line in enumerate(about_page_lines):
-        if line.find(span_text) != -1:
-            span_line = line
-            if index + 2 < len(about_page_lines):
-                li_line = about_page_lines[index + 2]
-            break
-    if not span_line:
-        raise Exception(
-            'Expected about-page.directive.html to have %s.' % span_text)
-    span_indent = span_line[:span_line.find(span_text)]
-
-    if li_line.find('<li>') == -1:
-        # The format should be:
-        # <span>A</span>
-        #   <ul>
-        #     <li>A*</li>.
-        raise Exception(
-            'Expected %s text to be followed by an unordered list in '
-            'about-page.directive.html' % span_text)
-    li_indent = li_line[:li_line.find('<li>')]
-    return (span_indent, li_indent)
-
-
 def update_developer_names(release_summary_lines):
-    """Updates about-page.directive.html file.
+    """Updates about-page.constants.ts file.
 
     Args:
         release_summary_lines: list(str). List of lines in
             ../release_summary.md.
     """
     python_utils.PRINT('Updating about-page file...')
-    start_index = release_summary_lines.index(
-        release_constants.NEW_CONTRIBUTORS_HEADER) + 1
-    end_index = release_summary_lines.index(
-        release_constants.EMAIL_HEADER) - 1
-    new_contributors = (
-        release_summary_lines[start_index:end_index])
-    new_contributors = [
-        contributor.replace(
-            '* ', '') for contributor in new_contributors]
-    new_developer_names = [
-        contributor.split('<')[0].strip() for contributor in new_contributors]
-    new_developer_names.sort()
+    new_developer_names = get_new_contributors(
+        release_summary_lines, return_only_names=True)
 
-    with python_utils.open_file(ABOUT_PAGE_FILEPATH, 'r') as about_page_file:
+    with python_utils.open_file(
+        ABOUT_PAGE_CONSTANTS_FILEPATH, 'r') as about_page_file:
         about_page_lines = about_page_file.readlines()
+        start_index = about_page_lines.index(CREDITS_START_LINE) + 1
+        end_index = about_page_lines[start_index:].index(CREDITS_END_LINE) + 1
+        all_developer_names = about_page_lines[start_index:end_index]
+        for name in new_developer_names:
+            all_developer_names.append('%s\'%s\',\n' % (CREDITS_INDENT, name))
+        all_developer_names = sorted(
+            list(set(all_developer_names)), key=lambda s: s.lower())
+        about_page_lines[start_index:end_index] = all_developer_names
 
-        (span_indent, li_indent) = find_indentation(about_page_lines)
-
-        developer_name_dict = collections.defaultdict(list)
-        for developer_name in new_developer_names:
-            developer_name_dict[developer_name[0].upper()].append(
-                '%s<li>%s</li>\n' % (li_indent, developer_name))
-
-        for char in developer_name_dict:
-            # This case is only for developer names starting with Q since
-            # as of now we have no developers listed whose names start with
-            # a Q.
-            if '%s<span>%s</span>\n' % (
-                    span_indent, char) not in about_page_lines:
-                prev_char = chr(ord(char) - 1)
-                prev_start_index = about_page_lines.index(
-                    '%s<span>%s</span>\n' % (span_indent, prev_char)) + 2
-                prev_end_index = (
-                    prev_start_index + about_page_lines[
-                        prev_start_index:].index('%s</ul>\n' % span_indent))
-                developer_names = sorted(
-                    developer_name_dict[char], key=lambda s: s.lower())
-                span_elem = '%s<span>%s</span>\n' % (span_indent, char)
-                ul_start_elem = '%s<ul>\n' % span_indent
-                ul_end_elem = '%s</ul>\n' % span_indent
-                about_page_lines[prev_end_index + 1:prev_end_index + 1] = (
-                    [span_elem, ul_start_elem] + developer_names + [
-                        ul_end_elem])
-                continue
-
-            start_index = about_page_lines.index(
-                '%s<span>%s</span>\n' % (span_indent, char)) + 2
-            end_index = start_index + about_page_lines[start_index:].index(
-                '%s</ul>\n' % span_indent)
-
-            old_developer_names = about_page_lines[start_index:end_index]
-            updated_developer_names = list(set((
-                old_developer_names + developer_name_dict[char])))
-            updated_developer_names = sorted(
-                updated_developer_names, key=lambda s: s.lower())
-            about_page_lines[start_index:end_index] = updated_developer_names
-
-    with python_utils.open_file(ABOUT_PAGE_FILEPATH, 'w') as about_page_file:
+    with python_utils.open_file(
+        ABOUT_PAGE_CONSTANTS_FILEPATH, 'w') as about_page_file:
         for line in about_page_lines:
-            about_page_file.write(line)
+            about_page_file.write(python_utils.UNICODE(line))
     python_utils.PRINT('Updated about-page file!')
 
 
@@ -412,12 +371,14 @@ def remove_updates_and_delete_branch(repo_fork, target_branch):
 
 
 def create_branch(
-        repo_fork, target_branch, github_username,
+        repo, repo_fork, target_branch, github_username,
         current_release_version_number):
     """Creates a new branch with updates to AUTHORS, CHANGELOG,
     CONTRIBUTORS and about-page.
 
     Args:
+        repo: github.Repository.Repository. The PyGithub object for the
+            original repo.
         repo_fork: github.Repository.Repository. The PyGithub object for the
             forked repo.
         target_branch: str. The name of the target branch.
@@ -427,13 +388,13 @@ def create_branch(
     python_utils.PRINT(
         'Creating new branch with updates to AUTHORS, CONTRIBUTORS, '
         'CHANGELOG and about-page...')
-    sb = repo_fork.get_branch('develop')
+    sb = repo.get_branch('develop')
     repo_fork.create_git_ref(
         ref='refs/heads/%s' % target_branch, sha=sb.commit.sha)
 
     for filepath in [
             CHANGELOG_FILEPATH, AUTHORS_FILEPATH, CONTRIBUTORS_FILEPATH,
-            ABOUT_PAGE_FILEPATH]:
+            ABOUT_PAGE_CONSTANTS_FILEPATH]:
         contents = repo_fork.get_contents(filepath, ref=target_branch)
         with python_utils.open_file(filepath, 'r') as f:
             repo_fork.update_file(
@@ -464,17 +425,8 @@ def is_invalid_email_present(release_summary_lines):
     Returns:
         bool. Whether invalid email is present or not.
     """
-    authors_start_index = release_summary_lines.index(
-        release_constants.NEW_AUTHORS_HEADER) + 1
-    authors_end_index = release_summary_lines.index(
-        release_constants.EXISTING_AUTHORS_HEADER) - 1
-    new_authors = release_summary_lines[authors_start_index:authors_end_index]
-    contributors_start_index = release_summary_lines.index(
-        release_constants.NEW_CONTRIBUTORS_HEADER) + 1
-    contributors_end_index = release_summary_lines.index(
-        release_constants.EMAIL_HEADER) - 1
-    new_contributors = (
-        release_summary_lines[contributors_start_index:contributors_end_index])
+    new_authors = get_new_authors(release_summary_lines)
+    new_contributors = get_new_contributors(release_summary_lines)
     new_email_ids = new_authors + new_contributors
     invalid_email_ids = [
         email_id for email_id in new_email_ids
@@ -611,11 +563,11 @@ def main():
         'Please check the changes and make updates if required in the '
         'following files:\n1. %s\n2. %s\n3. %s\n4. %s\n' % (
             CHANGELOG_FILEPATH, AUTHORS_FILEPATH, CONTRIBUTORS_FILEPATH,
-            ABOUT_PAGE_FILEPATH))
+            ABOUT_PAGE_CONSTANTS_FILEPATH))
     common.ask_user_to_confirm(message)
 
     create_branch(
-        repo_fork, target_branch, github_username,
+        repo, repo_fork, target_branch, github_username,
         current_release_version_number)
 
 

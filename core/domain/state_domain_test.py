@@ -194,7 +194,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             init_state.get_content_html('hint_1'), '<p>Changed hint one</p>')
 
-    def test_android_validation(self):
+    def test_rte_content_validation_for_android(self):
         exploration = exp_domain.Exploration.create_default_exploration('0')
 
         init_state = exploration.states[exploration.init_state_name]
@@ -205,23 +205,31 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'explanation': {
                 'content_id': 'solution',
                 'html': (
-                    '<p><oppia-noninteractive-math>'
+                    '<p><oppia-noninteractive-math '
+                    'raw_latex-with-value="&amp;quot;\\frac{x}{y}&amp;quot;">'
                     '</oppia-noninteractive-math></p>')
             },
         }
 
-        init_state.update_interaction_solution(solution_dict)
+        solution = state_domain.Solution.from_dict(
+            init_state.interaction.id, solution_dict
+        )
+        init_state.update_interaction_solution(solution)
         self.assertFalse(init_state.is_rte_content_supported_on_android())
         solution_dict['explanation']['html'] = ''
-        init_state.update_interaction_solution(solution_dict)
+        init_state.update_interaction_solution(state_domain.Solution.from_dict(
+            init_state.interaction.id, solution_dict))
         self.assertTrue(init_state.is_rte_content_supported_on_android())
 
         hints_list = []
         hints_list.append(
             state_domain.Hint(
                 state_domain.SubtitledHtml(
-                    'hint_1', '<p><oppia-noninteractive-collapsible>'
-                    '</oppia-noninteractive-collapsible></p>'
+                    'hint_1',
+                    '<oppia-noninteractive-collapsible content-with-value='
+                    '"&amp;quot;&amp;lt;p&amp;gt;Hello&amp;lt;/p&amp;gt;&amp;'
+                    'quot;" heading-with-value="&amp;quot;SubCollapsible&amp;'
+                    'quot;"></oppia-noninteractive-collapsible><p>&nbsp;</p>'
                 )
             )
         )
@@ -234,7 +242,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         default_outcome = state_domain.Outcome(
             'Introduction', state_domain.SubtitledHtml(
                 'default_outcome', (
-                    '<p><oppia-noninteractive-math>'
+                    '<p><oppia-noninteractive-math '
+                    'raw_latex-with-value="&amp;quot;\\frac{x}{y}&amp;quot;">'
                     '</oppia-noninteractive-math></p>')),
             False, [], None, None
         )
@@ -251,11 +260,12 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'feedback': {
                     'content_id': 'feedback_1',
                     'html': (
-                        '<p><oppia-noninteractive-tabs tab_contents-with-value='
-                        '"{"title": "Hint introduction", "content": "This set '
-                        'of tabs shows some hints. Click on the other tabs to '
-                        'display the relevant hints."}">'
-                        '</oppia-noninteractive-tabs> Other Text </p>')
+                        '<oppia-noninteractive-tabs tab_contents-with-value'
+                        '=\"[{&amp;quot;content&amp;quot;:&amp;quot;&amp;lt;p'
+                        '&amp;gt;&amp;lt;i&amp;gt;lorem ipsum&amp;lt;/i&amp;'
+                        'gt;&amp;lt;/p&amp;gt;&amp;quot;,&amp;quot;title&amp;'
+                        'quot;:&amp;quot;hello&amp;quot;}]\">'
+                        '</oppia-noninteractive-tabs>')
                 },
                 'labelled_as_correct': False,
                 'param_changes': [],
@@ -276,7 +286,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             [answer_group_dict])
         self.assertFalse(init_state.is_rte_content_supported_on_android())
         answer_group_dict['outcome']['feedback']['html'] = (
-            '<p><oppia-noninteractive-image>'
+            '<p><oppia-noninteractive-image caption-with-value="&amp;quot;'
+            '&amp;quot;" filepath-with-value="&amp;quot;startBlue.png&amp;'
+            'quot;" alt-with-value="&amp;quot;&amp;quot;">'
             '</oppia-noninteractive-image></p>')
         init_state.update_interaction_answer_groups(
             [answer_group_dict])
@@ -286,18 +298,77 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             state_domain.SubtitledHtml.from_dict({
                 'content_id': 'content',
                 'html': (
-                    '<p><oppia-noninteractive-tabs>'
-                    '</oppia-noninteractive-tabs></p>')
+                    '<oppia-noninteractive-tabs tab_contents-with-value'
+                    '=\"[{&amp;quot;content&amp;quot;:&amp;quot;&amp;lt;p'
+                    '&amp;gt;&amp;lt;i&amp;gt;lorem ipsum&amp;lt;/i&amp;'
+                    'gt;&amp;lt;/p&amp;gt;&amp;quot;,&amp;quot;title&amp;'
+                    'quot;:&amp;quot;hello&amp;quot;}]\">'
+                    '</oppia-noninteractive-tabs>')
             }))
         self.assertFalse(init_state.is_rte_content_supported_on_android())
         init_state.update_content(
             state_domain.SubtitledHtml.from_dict({
                 'content_id': 'content',
                 'html': (
-                    '<p><oppia-noninteractive-link>'
-                    '</oppia-noninteractive-link></p>')
+                    '<p><oppia-noninteractive-link text-with-value="'
+                    '&amp;quot;What is a link?&amp;quot;" url-with-'
+                    'value="&amp;quot;htt://link.com&amp'
+                    ';quot;"></oppia-noninteractive-link></p>')
             }))
         self.assertTrue(init_state.is_rte_content_supported_on_android())
+        init_state.update_content(
+            state_domain.SubtitledHtml.from_dict({
+                'content_id': 'content',
+                'html': (
+                    '<p><oppia-noninteractive-skillreview text-with-value="'
+                    '&amp;quot;&amp;quot;" skill_id-with-value="&amp;quot;'
+                    '&amp;quot;"></oppia-noninteractive-skillreview></p>')
+            }))
+        self.assertTrue(init_state.is_rte_content_supported_on_android())
+
+    def test_interaction_validation_for_android(self):
+        exploration = exp_domain.Exploration.create_default_exploration('0')
+
+        init_state = exploration.states[exploration.init_state_name]
+        # Valid interactions.
+        init_state.update_interaction_id('Continue')
+        self.assertTrue(init_state.interaction.is_supported_on_android_app())
+        init_state.update_interaction_id('DragAndDropSortInput')
+        self.assertTrue(init_state.interaction.is_supported_on_android_app())
+        init_state.update_interaction_id('EndExploration')
+        self.assertTrue(init_state.interaction.is_supported_on_android_app())
+        init_state.update_interaction_id('FractionInput')
+        self.assertTrue(init_state.interaction.is_supported_on_android_app())
+        init_state.update_interaction_id('ItemSelectionInput')
+        self.assertTrue(init_state.interaction.is_supported_on_android_app())
+        init_state.update_interaction_id('MultipleChoiceInput')
+        self.assertTrue(init_state.interaction.is_supported_on_android_app())
+        init_state.update_interaction_id('NumberWithUnits')
+        self.assertTrue(init_state.interaction.is_supported_on_android_app())
+        init_state.update_interaction_id('NumericInput')
+        self.assertTrue(init_state.interaction.is_supported_on_android_app())
+        init_state.update_interaction_id('TextInput')
+        self.assertTrue(init_state.interaction.is_supported_on_android_app())
+
+        # Invalid interactions.
+        init_state.update_interaction_id('CodeRepl')
+        self.assertFalse(init_state.interaction.is_supported_on_android_app())
+        init_state.update_interaction_id('GraphInput')
+        self.assertFalse(init_state.interaction.is_supported_on_android_app())
+        init_state.update_interaction_id('ImageClickInput')
+        self.assertFalse(init_state.interaction.is_supported_on_android_app())
+        init_state.update_interaction_id('InteractiveMap')
+        self.assertFalse(init_state.interaction.is_supported_on_android_app())
+        init_state.update_interaction_id('LogicProof')
+        self.assertFalse(init_state.interaction.is_supported_on_android_app())
+        init_state.update_interaction_id('MathExpressionInput')
+        self.assertFalse(init_state.interaction.is_supported_on_android_app())
+        init_state.update_interaction_id('MusicNotesInput')
+        self.assertFalse(init_state.interaction.is_supported_on_android_app())
+        init_state.update_interaction_id('PencilCodeEditor')
+        self.assertFalse(init_state.interaction.is_supported_on_android_app())
+        init_state.update_interaction_id('SetInput')
+        self.assertFalse(init_state.interaction.is_supported_on_android_app())
 
     def test_get_content_html_with_invalid_content_id_raise_error(self):
         exploration = exp_domain.Exploration.create_default_exploration('0')
@@ -374,7 +445,10 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             },
         }
 
-        init_state.update_interaction_solution(solution_dict)
+        solution = state_domain.Solution.from_dict(
+            init_state.interaction.id, solution_dict)
+        init_state.update_interaction_solution(solution)
+
 
         written_translations_dict = {
             'translations_mapping': {
@@ -802,7 +876,10 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             },
         }
 
-        init_state.update_interaction_solution(solution_dict)
+        solution = state_domain.Solution.from_dict(
+            init_state.interaction.id, solution_dict
+        )
+        init_state.update_interaction_solution(solution)
         exploration.validate()
 
         hints_list.append(
@@ -846,7 +923,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             )
         ]
         init_state.update_interaction_hints(hints_list)
-        solution = {
+        solution_dict = {
             'answer_is_exclusive': False,
             'correct_answer': [0, 0],
             'explanation': {
@@ -859,9 +936,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         with self.assertRaises(AssertionError):
             init_state.interaction.solution = (
                 state_domain.Solution.from_dict(
-                    init_state.interaction.id, solution))
+                    init_state.interaction.id, solution_dict))
 
-        solution = {
+        solution_dict = {
             'answer_is_exclusive': False,
             'correct_answer': 'hello_world!',
             'explanation': {
@@ -869,7 +946,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'html': '<p>hello_world is a string</p>'
             }
         }
-        init_state.update_interaction_solution(solution)
+        init_state.update_interaction_solution(
+            state_domain.Solution.from_dict(
+                init_state.interaction.id, solution_dict))
         exploration.validate()
 
     def test_validate_state_solicit_answer_details(self):
@@ -907,7 +986,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         # Solution should be set to None as default.
         self.assertEqual(exploration.init_state.interaction.solution, None)
 
-        solution = {
+        solution_dict = {
             'answer_is_exclusive': False,
             'correct_answer': 'hello_world!',
             'explanation': {
@@ -920,12 +999,13 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 state_domain.SubtitledHtml('hint_1', '')
             )
         ]
-
+        solution = state_domain.Solution.from_dict(
+            exploration.init_state.interaction.id, solution_dict)
         exploration.init_state.update_interaction_hints(hints_list)
         exploration.init_state.update_interaction_solution(solution)
         exploration.validate()
 
-        solution = {
+        solution_dict = {
             'answer_is_exclusive': 1,
             'correct_answer': 'hello_world!',
             'explanation': {
@@ -933,7 +1013,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'html': '<p>hello_world is a string</p>'
             }
         }
-
+        solution = state_domain.Solution.from_dict(
+            exploration.init_state.interaction.id, solution_dict)
         exploration.init_state.update_interaction_solution(solution)
         with self.assertRaisesRegexp(
             Exception, 'Expected answer_is_exclusive to be bool, received 1'):
@@ -1028,7 +1109,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         hints_list = [state_domain.Hint(subtitled_html)]
 
         exploration.init_state.interaction.hints = hints_list
-        solution = {
+        solution_dict = {
             'answer_is_exclusive': True,
             'correct_answer': 'hello_world!',
             'explanation': {
@@ -1036,7 +1117,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'html': '<p>hello_world is a string</p>'
             }
         }
-
+        solution = state_domain.Solution.from_dict(
+            exploration.init_state.interaction.id, solution_dict)
         exploration.init_state.update_interaction_solution(solution)
         exploration.init_state.update_content(
             state_domain.SubtitledHtml.from_dict({
@@ -1252,7 +1334,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     'hint_1', '<p>Hello, this is html1 for state2</p>')
             )
         ]
-        solution = {
+        solution_dict = {
             'answer_is_exclusive': True,
             'correct_answer': u'hello_world!',
             'explanation': {
@@ -1260,16 +1342,19 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'html': u'<p>hello_world is a string</p>'
             }
         }
-
+        solution = state_domain.Solution.from_dict(
+            exploration.init_state.interaction.id, solution_dict)
         exploration.init_state.update_interaction_hints(hints_list)
         exploration.init_state.update_interaction_solution(solution)
 
         self.assertEqual(
-            exploration.init_state.interaction.solution.to_dict(), solution)
+            exploration.init_state.interaction.solution.to_dict(),
+            solution_dict)
 
         with self.assertRaisesRegexp(
-            Exception, 'Expected solution to be a dict'):
-            exploration.init_state.update_interaction_solution([])
+            Exception, 'Expected solution to be a Solution object,'
+            'recieved test string'):
+            exploration.init_state.update_interaction_solution('test string')
 
     def test_update_interaction_solution_with_no_solution(self):
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')

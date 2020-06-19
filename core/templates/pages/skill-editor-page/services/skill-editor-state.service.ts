@@ -26,17 +26,16 @@ require('domain/skill/skill-rights-backend-api.service.ts');
 require('pages/skill-editor-page/skill-editor-page.constants.ajs.ts');
 require('services/alerts.service.ts');
 require('services/questions-list.service.ts');
+import { EventEmitter } from '@angular/core';
 
 angular.module('oppia').factory('SkillEditorStateService', [
-  '$rootScope', 'AlertsService', 'QuestionsListService',
+  'AlertsService', 'QuestionsListService',
   'SkillBackendApiService', 'SkillObjectFactory',
   'SkillRightsBackendApiService', 'SkillRightsObjectFactory', 'UndoRedoService',
-  'EVENT_SKILL_INITIALIZED', 'EVENT_SKILL_REINITIALIZED',
   function(
-      $rootScope, AlertsService, QuestionsListService,
+      AlertsService, QuestionsListService,
       SkillBackendApiService, SkillObjectFactory,
-      SkillRightsBackendApiService, SkillRightsObjectFactory, UndoRedoService,
-      EVENT_SKILL_INITIALIZED, EVENT_SKILL_REINITIALIZED) {
+      SkillRightsBackendApiService, SkillRightsObjectFactory, UndoRedoService) {
     var _skill = SkillObjectFactory.createInterstitialSkill();
     var _skillRights = (
       SkillRightsObjectFactory.createInterstitialSkillRights());
@@ -47,14 +46,10 @@ angular.module('oppia').factory('SkillEditorStateService', [
       current: [],
       others: []
     };
-
+    var _skillChangedEventEmitter = new EventEmitter();
     var _setSkill = function(skill) {
       _skill.copyFromSkill(skill);
-      if (_skillIsInitialized) {
-        $rootScope.$broadcast(EVENT_SKILL_REINITIALIZED);
-      } else {
-        $rootScope.$broadcast(EVENT_SKILL_INITIALIZED);
-      }
+      _skillChangedEventEmitter.emit();
       _skillIsInitialized = true;
     };
 
@@ -200,6 +195,10 @@ angular.module('oppia').factory('SkillEditorStateService', [
             _skillIsBeingSaved = false;
           });
         return true;
+      },
+
+      get onSkillChange() {
+        return _skillChangedEventEmitter;
       },
 
       getSkillRights: function() {

@@ -72,7 +72,7 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
             self.publish_exploration(self.owner_id, exp.id)
 
         topic = topic_domain.Topic.create_default_topic(
-            topic_id=self.TOPIC_ID, name='topic', abbreviated_name='abbrev')
+            self.TOPIC_ID, 'topic', 'abbrev', 'description')
         topic_services.save_new_topic(self.owner_id, topic)
 
         story = story_domain.Story.create_default_story(
