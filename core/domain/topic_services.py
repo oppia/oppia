@@ -16,7 +16,7 @@
 
 """Commands for operations on topics, and related models."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import absolute_import, print_function  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import collections
@@ -98,17 +98,21 @@ def get_all_skill_ids_assigned_to_some_topic_with_topic_details():
         set([str, str, str]). The ids of all the skills linked to some topic
             with the topic and classroom name.
     """
-    skill_ids_with_topic_details = []
+    skill_ids_with_topic_details = {}
     all_topic_models = topic_models.TopicModel.get_all()
     all_topics = [
         topic_fetchers.get_topic_from_model(topic)
         for topic in all_topic_models]
 
     for topic in all_topics:
-        for skill_ids in topic.get_all_skill_ids():
+        print(topic.get_all_skill_ids())
+        for skill_id in topic.get_all_skill_ids():
             classroom_name = get_classroom_name_for_topic_with_id(topic.id)
-            obj = skill_ids, topic.name, classroom_name
-            skill_ids_with_topic_details.append(obj)
+            skill_ids_with_topic_details[skill_id] = {
+                'topic_name': topic.name,
+                'classroom_name': classroom_name
+            }
+
     return skill_ids_with_topic_details
 
 

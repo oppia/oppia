@@ -80,6 +80,9 @@
                          user-can-delete-skill="$ctrl.userCanDeleteSkill"
                          skills-categorized-by-topics="$ctrl.skillsCategorizedByTopics">
             </skills-list>
+            <div>
+              <button class="btn btn-success" ng-click="$ctrl.loadMoreSkills()">Load More</button>
+            </div>
             <p class="intro-card-message" ng-if="$ctrl.isSkillsTabHelpTextVisible()">
               There are no pending unused skills.
             </p>

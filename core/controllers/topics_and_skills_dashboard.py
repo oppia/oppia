@@ -60,7 +60,7 @@ class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
         topic_summary_dicts = [
             summary.to_dict() for summary in topic_summaries]
 
-        skill_summaries = skill_services.get_all_skill_summaries()
+        skill_summaries, next_cursor, more = skill_services.get_all_skill_summaries()
         skill_summary_dicts = [
             summary.to_dict() for summary in skill_summaries]
 
@@ -84,12 +84,16 @@ class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
         all_classroom_names = [
             classroom['name'] for classroom in all_classrooms_dict]
 
+        topic_classroom_dict = {}
+        for classroom in all_classrooms_dict:
+            for topic_id in classroom['topic_ids']:
+                topic_classroom_dict[topic_id] = classroom['name']
+
         for topic_summary_dict in topic_summary_dicts:
             topic_summary_dict['classroom'] = None
-            for classroom in all_classrooms_dict:
-                if topic_summary_dict['id'] in classroom['topic_ids']:
-                    topic_summary_dict['classroom'] = classroom['name']
-                    break
+            topic_id = topic_summary_dict['id']
+            if topic_id in topic_classroom_dict:
+                topic_summary_dict['classroom'] = topic_classroom_dict[topic_id]
 
         untriaged_skill_summary_dicts = []
         mergeable_skill_summary_dicts = []
@@ -177,15 +181,18 @@ class SkillsDashboardPageDataHandler(base.BaseHandler):
         page_number = int(self.payload.get('pageNumber'))
         sort_by = self.payload.get('sort')
         status = self.payload.get('status')
+        cursor = self.payload.get('nextCursor', None)
 
-        skill_summary_dicts = skill_services.get_filtered_skill_dicts(
-            status, classroom_name, keywords, sort_by)
-        skill_summary_dicts_paginated = skill_summary_dicts[
+        skill_summaries, next_cursor, more = skill_services.get_filtered_skill_dicts(
+            status, classroom_name, keywords, sort_by, cursor)
+        skill_summary_dicts_paginated = skill_summaries[
             page_number * items_per_page: ((page_number + 1) * items_per_page)]
-
+        skill_summary_dicts = [summary.to_dict() for summary in skill_summaries]
         self.render_json({
-            'skill_summary_dicts': skill_summary_dicts_paginated,
-            'total_skill_count': len(skill_summary_dicts)
+            'skill_summary_dicts': skill_summary_dicts,
+            'next_cursor': next_cursor,
+            'more': more,
+            'total_skill_count': len(skill_summaries)
         })
 
 

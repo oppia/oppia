@@ -218,21 +218,24 @@ def get_skill_from_model(skill_model):
         skill_model.last_updated)
 
 
-def get_all_skill_summaries():
+def get_all_skill_summaries(cursor=None, sort_by=None):
     """Returns the summaries of all skills present in the datastore.
 
     Returns:
         list(SkillSummary). The list of summaries of all skills present in the
             datastore.
     """
-    skill_summaries_models = skill_models.SkillSummaryModel.get_all()
+    # skill_summaries_models = skill_models.SkillSummaryModel.get_all()
+    num_queries_to_fetch = 2
+    skill_summaries_models, next_cursor, more = skill_models.SkillSummaryModel.fetch_page(
+        num_queries_to_fetch, cursor, sort_by)
     skill_summaries = [
         get_skill_summary_from_model(summary)
         for summary in skill_summaries_models]
-    return skill_summaries
+    return skill_summaries, next_cursor, more
 
 
-def get_filtered_skill_dicts(status, classroom_name, keywords, sort_by):
+def get_filtered_skill_dicts(status, classroom_name, keywords, sort_by, cursor):
     """Returns all the skill summary dicts after filtering.
 
     Args:
@@ -246,60 +249,51 @@ def get_filtered_skill_dicts(status, classroom_name, keywords, sort_by):
     Returns:
         list(dict). The list of skill summary dicts matching the filters.
     """
-    skill_summary_dicts = get_all_skill_summary_dicts_with_topic_and_classroom()
+    augmented_skill_summaries, next_cursor, more = get_all_skill_summary_dicts_with_topic_and_classroom(cursor, sort_by)
 
-    filtered_skill_summary_dicts = filter_skills_by_status(
-        skill_summary_dicts, status)
-    filtered_skill_summary_dicts = filter_skills_by_classroom(
-        filtered_skill_summary_dicts, classroom_name)
-    filtered_skill_summary_dicts = filter_skills_by_keywords(
-        filtered_skill_summary_dicts, keywords)
+    filtered_augmented_skill_summaries = filter_skills_by_status(
+        augmented_skill_summaries, status)
+    filtered_augmented_skill_summaries = filter_skills_by_classroom(
+        filtered_augmented_skill_summaries, classroom_name)
+    filtered_augmented_skill_summaries = filter_skills_by_keywords(
+        filtered_augmented_skill_summaries, keywords)
 
-    if sort_by == (
-            constants.TOPIC_SKILL_DASHBOARD_SORT_OPTIONS['DecreasingCreatedOn']):  # pylint: disable=line-too-long
-        return sorted(
-            filtered_skill_summary_dicts,
-            key=lambda x: x['skill_model_created_on'], reverse=True)
-    elif sort_by == (
-            constants.TOPIC_SKILL_DASHBOARD_SORT_OPTIONS['IncreasingUpdatedOn']):  # pylint: disable=line-too-long
-        return sorted(
-            filtered_skill_summary_dicts,
-            key=lambda x: x['skill_model_last_updated'])
-    elif sort_by == (
-            constants.TOPIC_SKILL_DASHBOARD_SORT_OPTIONS['DecreasingUpdatedOn']):  # pylint: disable=line-too-long
-        return sorted(
-            filtered_skill_summary_dicts,
-            key=lambda x: x['skill_model_last_updated'], reverse=True)
-    else:
-        return sorted(
-            filtered_skill_summary_dicts,
-            key=lambda x: x['skill_model_created_on'])
+    return filtered_augmented_skill_summaries, next_cursor, more
 
 
-def get_all_skill_summary_dicts_with_topic_and_classroom():
+def get_all_skill_summary_dicts_with_topic_and_classroom(cursor, sort_by):
     """Returns all the skill summary dicts after attaching topic and classroom.
 
     Returns:
         list(dict). The list of skill summary dicts matching the filters.
     """
-    skill_summaries = get_all_skill_summaries()
-    total_skill_summaries = [summary.to_dict() for summary in skill_summaries]
+    skill_summaries, next_cursor, more = get_all_skill_summaries(cursor, sort_by)
+    augmented_skill_summaries = [skill_domain.AugmentedSkillSummary(
+        summary.id,
+        summary.description,
+        summary.language_code,
+        summary.version,
+        summary.misconception_count,
+        summary.worked_examples_count,
+        summary.skill_model_created_on,
+        summary.skill_model_last_updated) for summary in skill_summaries]
 
-    skill_ids_assigned_to_some_topic_with_topic_details = (
-        topic_services.get_all_skill_ids_assigned_to_some_topic_with_topic_details())  # pylint: disable=line-too-long
+    assigned_skill_ids = (
+        topic_services.
+        get_all_skill_ids_assigned_to_some_topic_with_topic_details())
 
-    for skill_summary_dict in total_skill_summaries:
-        skill_summary_dict['topic'] = None
-        skill_summary_dict['classroom'] = None
-        for assigned_skill in skill_ids_assigned_to_some_topic_with_topic_details:  # pylint: disable=line-too-long
-            if skill_summary_dict['id'] == assigned_skill[0]:
-                skill_summary_dict['topic'] = assigned_skill[1]
-                skill_summary_dict['classroom'] = assigned_skill[2]
-                break
-    return total_skill_summaries
+    for augmented_skill_summary in augmented_skill_summaries:
+        skill_summary_id = augmented_skill_summary.id
+        if skill_summary_id in assigned_skill_ids:
+            augmented_skill_summary.update_topic_name(
+                assigned_skill_ids[skill_summary_id]['topic_name'])
+            augmented_skill_summary.update_classroom_name(
+                assigned_skill_ids[skill_summary_id]['classroom_name'])
+
+    return augmented_skill_summaries, next_cursor, more
 
 
-def filter_skills_by_status(skill_summary_dicts, status):
+def filter_skills_by_status(augmented_skill_summaries, status):
     """Returns the skill summary dicts after filtering by status.
 
     Args:
@@ -312,26 +306,26 @@ def filter_skills_by_status(skill_summary_dicts, status):
     """
 
     if not status or status == constants.SKILL_STATUS_OPTIONS['ALL']:
-        return skill_summary_dicts
+        return augmented_skill_summaries
 
     elif status == constants.SKILL_STATUS_OPTIONS['UNASSIGNED']:
-        unassigned_skill_summary_dicts = []
-        for skill_summary_dict in skill_summary_dicts:
-            if not skill_summary_dict['topic']:
-                unassigned_skill_summary_dicts.append(skill_summary_dict)
+        unassigned_augmented_skill_summaries = []
+        for augmented_skill_summary in augmented_skill_summaries:
+            if not augmented_skill_summary.topic:
+                unassigned_augmented_skill_summaries.append(augmented_skill_summary)
 
-        return unassigned_skill_summary_dicts
+        return unassigned_augmented_skill_summaries
 
     elif status == constants.SKILL_STATUS_OPTIONS['ASSIGNED']:
-        assigned_skill_dicts = []
-        for skill_summary_dict in skill_summary_dicts:
-            if skill_summary_dict['topic']:
-                assigned_skill_dicts.append(skill_summary_dict)
+        assigned_augmented_skill_summaries = []
+        for augmented_skill_summary in augmented_skill_summaries:
+            if augmented_skill_summary.topic_name:
+                assigned_augmented_skill_summaries.append(augmented_skill_summary)
 
-        return assigned_skill_dicts
+        return assigned_augmented_skill_summaries
 
 
-def filter_skills_by_classroom(skill_summary_dicts, classroom_name):
+def filter_skills_by_classroom(augmented_skill_summaries, classroom_name):
     """Returns the skill summary dicts after filtering by classroom_name.
 
     Args:
@@ -343,18 +337,19 @@ def filter_skills_by_classroom(skill_summary_dicts, classroom_name):
     """
 
     if not classroom_name or classroom_name == 'All':
-        return skill_summary_dicts
+        return augmented_skill_summaries
 
-    skill_summaries_with_classroom_name = []
-    for skill_summary in skill_summary_dicts:
-        if ('classroom' in skill_summary and
-                skill_summary['classroom'] == classroom_name):
-            skill_summaries_with_classroom_name.append(skill_summary)
+    augmented_skill_summaries_with_classroom_name = []
+    for augmented_skill_summary in augmented_skill_summaries:
+        if (augmented_skill_summary.classroom_name and
+                augmented_skill_summary == classroom_name):
+            augmented_skill_summaries_with_classroom_name.append(
+                augmented_skill_summary)
 
-    return skill_summaries_with_classroom_name
+    return augmented_skill_summaries_with_classroom_name
 
 
-def is_keyword_present_in_skill(skill_summary_dict, keywords):
+def is_keyword_present_in_skill(augmented_skill_summary, keywords):
     """Returns whether the keywords match the skill description.
 
     Args:
@@ -366,13 +361,13 @@ def is_keyword_present_in_skill(skill_summary_dict, keywords):
     """
 
     for keyword in keywords:
-        if skill_summary_dict['description'].lower().find(
+        if augmented_skill_summary.description.lower().find(
                 keyword.lower()) != -1:
             return True
     return False
 
 
-def filter_skills_by_keywords(skill_summary_dicts, keywords):
+def filter_skills_by_keywords(augmented_skill_summaries, keywords):
     """Returns whether the keywords match the skill description.
 
     Args:
@@ -383,14 +378,14 @@ def filter_skills_by_keywords(skill_summary_dicts, keywords):
         bool(dict). The list of skill summary dicts matching the given status.
     """
     if not keywords:
-        return skill_summary_dicts
+        return augmented_skill_summaries
 
-    filtered_skill_summary_dicts = []
-    for skill_summary in skill_summary_dicts:
-        if is_keyword_present_in_skill(skill_summary, keywords):
-            filtered_skill_summary_dicts.append(skill_summary)
+    filtered_augmented_skill_summaries = []
+    for augmented_skill_summary in augmented_skill_summaries:
+        if is_keyword_present_in_skill(augmented_skill_summary, keywords):
+            filtered_augmented_skill_summaries.append(augmented_skill_summary)
 
-    return filtered_skill_summary_dicts
+    return filtered_augmented_skill_summaries
 
 
 def get_multi_skill_summaries(skill_ids):

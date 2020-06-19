@@ -212,11 +212,25 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
               fetchSkillsDashboardData(
                 ctrl.filterObject, ctrl.pageNumber, ctrl.itemsPerPage).then(
                 (response) => {
+                console.log(response);
+                  ctrl.nextCursor = response.next_cursor;
                   ctrl.skillSummaries = response.skill_summary_dicts;
                   ctrl.currentCount = response.total_skill_count;
                   $scope.$applyAsync();
                 });
           };
+          ctrl.loadMoreSkills = function() {
+            TopicsAndSkillsDashboardBackendApiService.
+              fetchSkillsDashboardData(
+                ctrl.filterObject, ctrl.pageNumber, ctrl.itemsPerPage, ctrl.nextCursor).then(
+                (response) => {
+                console.log(response);
+                ctrl.skillSummaries.push(...response.skill_summary_dicts);
+                ctrl.currentCount = response.total_skill_count;
+                ctrl.nextCursor = response.next_cursor;
+                $scope.$applyAsync();
+                });
+          }
           /**
            * @param {String} direction - Direction, whether to change the
            * page to left or right by 1.
