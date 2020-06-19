@@ -102,8 +102,8 @@ describe('Exploration stats', function() {
     });
 
     it('should throw an error if state stats do not exist', () => {
-      expect(() => explorationStats.getStateStats('End'))
-        .toThrowError('no stats exist for state: End');
+      expect(() => explorationStats.getStateStats('Prelude'))
+        .toThrowError('no stats exist for state: Prelude');
     });
 
     it('should calculate bounce rate of state compared to exploration', () => {
