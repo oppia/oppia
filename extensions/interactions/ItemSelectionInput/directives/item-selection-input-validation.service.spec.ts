@@ -65,7 +65,7 @@ describe('ItemSelectionInputValidationService', () => {
       dest: 'Second State',
       feedback: {
         html: 'Feedback',
-        audio_translations: {}
+        content_id: ''
       },
       labelled_as_correct: false,
       param_changes: [],
@@ -92,7 +92,7 @@ describe('ItemSelectionInputValidationService', () => {
         }
       })],
       goodDefaultOutcome,
-      false,
+      null,
       null)
     ];
     ThreeInputsAnswerGroups = [agof.createNew(
@@ -103,7 +103,7 @@ describe('ItemSelectionInputValidationService', () => {
         }
       })],
       goodDefaultOutcome,
-      false,
+      null,
       null)
     ];
     OneInputAnswerGroups = [agof.createNew(
@@ -114,7 +114,7 @@ describe('ItemSelectionInputValidationService', () => {
         }
       })],
       goodDefaultOutcome,
-      false,
+      null,
       null)
     ];
     NoInputAnswerGroups = [agof.createNew(
@@ -125,7 +125,7 @@ describe('ItemSelectionInputValidationService', () => {
         }
       })],
       goodDefaultOutcome,
-      false,
+      null,
       null)
     ];
     IsProperSubsetValidOption = [agof.createNew(
@@ -136,7 +136,7 @@ describe('ItemSelectionInputValidationService', () => {
         }
       })],
       goodDefaultOutcome,
-      false,
+      null,
       null)
     ];
   });
