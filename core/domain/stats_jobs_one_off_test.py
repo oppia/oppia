@@ -171,6 +171,135 @@ class PlaythroughAuditTests(OneOffJobTestBase):
         self.assertIn('not found as a reference', output[0])
 
 
+class ClearExplorationIssuesOneOffJobTests(OneOffJobTestBase):
+    ONE_OFF_JOB_CLASS = stats_jobs_one_off.ClearExplorationIssuesOneOffJob
+
+    EXP_ID = 'EXP_ID'
+    EXP_VERSION = 1
+
+    def setUp(self):
+        super(ClearExplorationIssuesOneOffJobTests, self).setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+    def run_one_off_job(self):
+        """Begins the one off job and asserts it completes as expected.
+
+        Returns:
+            list(*). The output of the one off job.
+        """
+        return [
+            ast.literal_eval(o) for o in
+            super(ClearExplorationIssuesOneOffJobTests, self).run_one_off_job()
+        ]
+
+    def create_playthrough(self):
+        """Helper method to create and return a simple playthrough model.
+
+        Returns:
+            str. The ID of the new PlaythroughModel.
+        """
+        return stats_models.PlaythroughModel.create(
+            self.EXP_ID, self.EXP_VERSION, 'EarlyQuit', {
+                'state_name': {'value': 'state_name'},
+                'time_spent_in_exp_in_msecs': {'value': 200},
+            }, [])
+
+    def create_exp_issues_with_playthroughs(self, playthrough_ids_list):
+        """Helper method to create and return an ExplorationIssuesModel instance
+        with the given sets of playthrough ids as reference issues.
+
+        Args:
+            playthrough_ids_list: list(list(str)). The playthrough ids to assign
+                to each individual issue in the ExplorationIssuesModel.
+
+        Returns:
+            str. The ID of the new ExplorationIssuesModel.
+        """
+        self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
+        return stats_models.ExplorationIssuesModel.create(
+            self.EXP_ID, self.EXP_VERSION, unresolved_issues=[
+                {
+                    'issue_type': 'EarlyQuit',
+                    'issue_customization_args': {
+                        'state_name': {'value': 'state_name'},
+                        'time_spent_in_exp_in_msecs': {'value': 200},
+                    },
+                    'playthrough_ids': list(playthrough_ids),
+                    'schema_version': 1,
+                    'is_valid': True,
+                }
+                for playthrough_ids in playthrough_ids_list
+            ])
+
+    def test_job_reports_nothing_when_there_are_no_models(self):
+        self.assertItemsEqual(self.run_one_off_job(), [])
+
+    def test_job_reports_clears_even_if_they_had_no_playthroughs(self):
+        exp_issues_id = self.create_exp_issues_with_playthroughs([
+            [], [], [], # 3 exploration issues each referring to 0 playthroughs.
+        ])
+
+        self.assertItemsEqual(self.run_one_off_job(), [
+            ['ExplorationIssuesModels cleared', 1],
+        ])
+
+        exp_issues = (
+            stats_models.ExplorationIssuesModel.get_by_id(exp_issues_id))
+        self.assertEqual(exp_issues.unresolved_issues[0]['playthrough_ids'], [])
+        self.assertEqual(exp_issues.unresolved_issues[1]['playthrough_ids'], [])
+        self.assertEqual(exp_issues.unresolved_issues[2]['playthrough_ids'], [])
+
+    def test_job_reports_untracked_deleted_playthroughs(self):
+        playthrough_id = self.create_playthrough()
+
+        self.assertItemsEqual(self.run_one_off_job(), [
+            ['Orphan PlaythroughModels deleted', 1],
+        ])
+
+        self.assertIsNone(
+            stats_models.PlaythroughModel.get_by_id(playthrough_id))
+
+    def test_job_reports_tracked_deleted_playthroughs(self):
+        exp_issues_id = self.create_exp_issues_with_playthroughs([
+            [self.create_playthrough(), self.create_playthrough()],
+            [self.create_playthrough(), self.create_playthrough()],
+            [self.create_playthrough(), self.create_playthrough()],
+        ])
+
+        self.assertItemsEqual(self.run_one_off_job(), [
+            ['ExplorationIssuesModels cleared', 1],
+            ['PlaythroughModels deleted', 6],
+        ])
+
+        exp_issues = (
+            stats_models.ExplorationIssuesModel.get_by_id(exp_issues_id))
+        self.assertEqual(exp_issues.unresolved_issues[0]['playthrough_ids'], [])
+        self.assertEqual(exp_issues.unresolved_issues[1]['playthrough_ids'], [])
+        self.assertEqual(exp_issues.unresolved_issues[2]['playthrough_ids'], [])
+
+    def test_job_reports_untracked_and_tracked_deleted_playthroughs(self):
+        exp_issues_id = self.create_exp_issues_with_playthroughs([
+            [self.create_playthrough(), self.create_playthrough()],
+            [self.create_playthrough(), self.create_playthrough()],
+            [self.create_playthrough(), self.create_playthrough()],
+        ])
+        self.create_playthrough()
+        self.create_playthrough()
+
+        self.assertItemsEqual(self.run_one_off_job(), [
+            ['ExplorationIssuesModels cleared', 1],
+            ['PlaythroughModels deleted', 6],
+            ['Orphan PlaythroughModels deleted', 2]
+        ])
+
+        exp_issues = (
+            stats_models.ExplorationIssuesModel.get_by_id(exp_issues_id))
+        self.assertEqual(exp_issues.unresolved_issues[0]['playthrough_ids'], [])
+        self.assertEqual(exp_issues.unresolved_issues[1]['playthrough_ids'], [])
+        self.assertEqual(exp_issues.unresolved_issues[2]['playthrough_ids'], [])
+
+
 class RegenerateMissingV1StatsModelsOneOffJobTests(OneOffJobTestBase):
     """Unit tests for RegenerateMissingV1StatsModelsOneOffJob."""
     ONE_OFF_JOB_CLASS = (
