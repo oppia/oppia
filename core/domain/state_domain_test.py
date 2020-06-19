@@ -419,7 +419,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'The rule spec does not belong to a valid format.'):
                 state.get_all_html_content_strings()
 
-    def test_rule_spec_with_no_input_variable(self):
+    def test_rule_spec_with_invalid_input_variable(self):
         """Test the method for extracting all the HTML from a state
         when the rule_spec has no input variable.
         """
