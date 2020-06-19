@@ -17,18 +17,17 @@
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
-
-import { TopicDomainConstants } from
-  'domain/topic/topic-domain.constants';
-import cloneDeep from 'lodash/cloneDeep';
+import { Injectable } from '@angular/core';
 
 import { ITopicRightsBackendDataDict, TopicRightsResponseObjectFactory } from
   'domain/topic/TopicRightsResponseObjectFactory';
+import { TopicDomainConstants } from
+  'domain/topic/topic-domain.constants';
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
+
+import cloneDeep from 'lodash/cloneDeep';
 
 @Injectable({
   providedIn: 'root'
