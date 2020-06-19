@@ -212,6 +212,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
 
     def _get_compiled_ts_filepath(self, filepath):
         """Returns the path for compiled ts file.
+
         Args:
             filepath: string. filepath of ts file
 
@@ -225,10 +226,12 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         return compiled_js_filepath
 
     def _compile_all_ts_files(self):
-        """Compiles all project typescript files. Previously, we only compiled
+        """Compiles all project typescript files into
+        COMPILED_TYPESCRIPT_TMP_PATH. Previously, we only compiled
         the TS files that were needed, but when a relative import was used, the
         linter would crash with a FileNotFound exception before being able to
-        run. For more details, please see issue #9458."""
+        run. For more details, please see issue #9458.
+        """
         cmd = ('./node_modules/typescript/bin/tsc -p %s -outDir %s') % (
             './tsconfig.json', COMPILED_TYPESCRIPT_TMP_PATH)
         subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
@@ -867,9 +870,9 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                 'There are no JavaScript or Typescript files to lint.')
             return []
 
-        # Clear temp compiled typescipt files from previous runs
+        """Clear temp compiled typescipt files from previous runs."""
         clean.delete_directory_tree(COMPILED_TYPESCRIPT_TMP_PATH)
-        # Compiles all typescipt files into COMPILED_TYPESCRIPT_TMP_PATH dir
+        """Compiles all typescipt files into COMPILED_TYPESCRIPT_TMP_PATH."""
         self._compile_all_ts_files()
 
         self.parsed_js_and_ts_files = self._validate_and_parse_js_and_ts_files()
@@ -885,7 +888,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         controller_dependency_messages = (
             self._match_line_breaks_in_controller_dependencies())
 
-        # Clear temp compiled typescipt files
+        """Clear temp compiled typescipt files."""
         clean.delete_directory_tree(COMPILED_TYPESCRIPT_TMP_PATH)
 
         all_messages = (
