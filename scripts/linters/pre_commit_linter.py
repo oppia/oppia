@@ -69,6 +69,7 @@ from . import js_ts_linter
 from . import linter_utils
 from . import python_linter
 from . import third_party_typings_linter
+from . import webpack_config_linter
 from .. import common
 from .. import concurrent_task_utils
 from .. import install_third_party_libs
@@ -556,6 +557,9 @@ def main(args=None):
     lint_messages += (
         third_party_typings_linter.check_third_party_libs_type_defs(
             verbose_mode_enabled))
+
+    lint_messages += webpack_config_linter.check_webpack_config_file(
+        FILE_CACHE, verbose_mode_enabled)
 
     _print_complete_summary_of_lint_messages(lint_messages)
 
