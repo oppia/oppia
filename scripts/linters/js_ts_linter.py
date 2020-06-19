@@ -871,9 +871,9 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                 'There are no JavaScript or Typescript files to lint.')
             return []
 
-        """Clear temp compiled typescipt files from previous runs."""
+        # Clear temp compiled typescipt files from previous runs.
         clean.delete_directory_tree(COMPILED_TYPESCRIPT_TMP_PATH)
-        """Compiles all typescipt files into COMPILED_TYPESCRIPT_TMP_PATH."""
+        # Compiles all typescipt files into COMPILED_TYPESCRIPT_TMP_PATH.
         self._compile_all_ts_files()
 
         self.parsed_js_and_ts_files = self._validate_and_parse_js_and_ts_files()
@@ -889,7 +889,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         controller_dependency_messages = (
             self._match_line_breaks_in_controller_dependencies())
 
-        """Clear temp compiled typescipt files."""
+        # Clear temp compiled typescipt files.
         clean.delete_directory_tree(COMPILED_TYPESCRIPT_TMP_PATH)
 
         all_messages = (
