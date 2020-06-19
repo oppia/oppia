@@ -216,7 +216,7 @@ class AnswerGroup(python_utils.OBJECT):
                                     ' format.')
                     if not input_variable_match_found:
                         raise Exception(
-                            'Rule spec should have atleast one input variable '
+                            'Rule spec should have at least one input variable '
                             'with Html in it.')
 
         return html_list

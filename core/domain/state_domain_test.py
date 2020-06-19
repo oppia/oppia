@@ -486,7 +486,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         with self.swap(utils, 'get_file_contents', mock_get_file_contents):
             with self.assertRaisesRegexp(
                 Exception,
-                'Rule spec should have atleast one input variable with Html '
+                'Rule spec should have at least one input variable with Html '
                 'in it.'):
                 state.get_all_html_content_strings()
 
