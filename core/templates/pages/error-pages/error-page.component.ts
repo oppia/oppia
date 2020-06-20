@@ -38,8 +38,6 @@ angular.module('oppia').component('errorPage', {
       };
 
       ctrl.$onInit = function() {
-        ctrl.oopsMintImgUrl = UrlInterpolationService.getStaticImageUrl(
-          '/general/oops_mint.png');
         PageTitleService.setPageTitle(
           'Error ' + ctrl.statusCode + ' - Oppia');
       };

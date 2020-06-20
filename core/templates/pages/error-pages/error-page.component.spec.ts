@@ -46,8 +46,8 @@ describe('Error page', function() {
 
   it('should set images and page title when $onInit triggers', function() {
     ctrl.$onInit();
-
-    expect(ctrl.oopsMintImgUrl).toBe('/assets/images/general/oops_mint.png');
+    expect(ctrl.getStaticImageUrl('/general/oops_mint.webp'))
+      .toBe('/assets/images/general/oops_mint.webp');
     expect(Title.getTitle()).toBe('Error 404 - Oppia');
   });
 });
