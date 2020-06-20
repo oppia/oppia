@@ -22,7 +22,9 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import ast
 import itertools
 import logging
+import os
 import re
+import sys
 
 from constants import constants
 from core import jobs
@@ -34,7 +36,17 @@ from core.domain import rights_manager
 from core.platform import models
 import feconf
 import python_utils
+import schema_utils
 import utils
+
+CURR_DIR = os.path.abspath(os.getcwd())
+OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, os.pardir, 'oppia_tools')
+PYLATEXENC_PATH = os.path.join(OPPIA_TOOLS_DIR, 'pylatexenc-2.5')
+sys.path.insert(1, PYLATEXENC_PATH)
+
+# pylint: disable=wrong-import-position
+from pylatexenc import latex2text #isort:skip
+# pylint: enable=wrong-import-position
 
 (exp_models,) = models.Registry.import_models([
     models.NAMES.exploration])
@@ -116,10 +128,12 @@ class MultipleChoiceInteractionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         yield (key, values)
 
 
-class MathExpressionInputInteractionOneOffJob(jobs.BaseMapReduceOneOffJobManager):  # pylint: disable=line-too-long
-    """Job that produces a list of (exploration, state) pairs that use the Math
-    Expression Interaction and that have rules that contain [<, >, =] to
-    identify and prevent usage of equation/inequalities.
+class MathExpressionValidationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """Job that produces a list of explorations that use the MathExpressionInput
+    along with the validity and type(expression/equation) of the inputs present
+    in the exploration.
+    This validation is done by the 'is_valid_math_expression' or the
+    'is_valid_math_equation' function present in schema_utils.py.
     """
 
     @classmethod
@@ -128,19 +142,29 @@ class MathExpressionInputInteractionOneOffJob(jobs.BaseMapReduceOneOffJobManager
 
     @staticmethod
     def map(item):
+        is_valid_math_expression = schema_utils.get_validator(
+            'is_valid_math_expression')
+        is_valid_math_equation = schema_utils.get_validator(
+            'is_valid_math_equation')
+        ltt = latex2text.LatexNodes2Text()
+
         if not item.deleted:
             exploration = exp_fetchers.get_exploration_from_model(item)
             for state_name, state in exploration.states.items():
                 if state.interaction.id == 'MathExpressionInput':
                     for group in state.interaction.answer_groups:
                         for rule_spec in group.rule_specs:
-                            rule = rule_spec.inputs['x']
-                            if any(sep in rule for sep in SEPARATORS):
-                                yield (
-                                    item.id,
-                                    '%s: %s' % (
-                                        state_name.encode('utf-8'),
-                                        rule.encode('utf-8')))
+                            rule_input = ltt.latex_to_text(
+                                rule_spec.inputs['x'])
+                            validity = 'Invalid'
+                            if is_valid_math_expression(rule_input):
+                                validity = 'Valid Expression'
+                            elif is_valid_math_equation(rule_input):
+                                validity = 'Valid Equation'
+                            yield (
+                                item.id,
+                                u'%s: %s -- %s' % (
+                                    state_name, rule_input, validity))
 
     @staticmethod
     def reduce(key, values):

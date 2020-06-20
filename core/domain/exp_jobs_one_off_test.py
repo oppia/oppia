@@ -265,8 +265,7 @@ class MultipleChoiceInteractionOneOffJobTests(test_utils.GenericTestBase):
             self, exp_jobs_one_off.MultipleChoiceInteractionOneOffJob)
 
 
-
-class MathExpressionInputInteractionOneOffJobTests(test_utils.GenericTestBase):
+class MathExpressionValidationOneOffJobTests(test_utils.GenericTestBase):
 
     ALBERT_EMAIL = 'albert@example.com'
     ALBERT_NAME = 'albert'
@@ -276,7 +275,7 @@ class MathExpressionInputInteractionOneOffJobTests(test_utils.GenericTestBase):
     EXP_TITLE = 'title'
 
     def setUp(self):
-        super(MathExpressionInputInteractionOneOffJobTests, self).setUp()
+        super(MathExpressionValidationOneOffJobTests, self).setUp()
 
         # Setup user who will own the test explorations.
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
@@ -290,22 +289,22 @@ class MathExpressionInputInteractionOneOffJobTests(test_utils.GenericTestBase):
         exploration = exp_domain.Exploration.create_default_exploration(
             self.VALID_EXP_ID, title='title', category='category')
 
-        exploration.add_states(['State1', 'State2', 'State3'])
+        exploration.add_states(['State1', 'State2', 'State3', 'State4'])
 
         state1 = exploration.states['State1']
         state2 = exploration.states['State2']
         state3 = exploration.states['State3']
+        state4 = exploration.states['State4']
 
         state1.update_interaction_id('MathExpressionInput')
         state2.update_interaction_id('MathExpressionInput')
         state3.update_interaction_id('MathExpressionInput')
+        state4.update_interaction_id('MathExpressionInput')
 
-        # This exploration is valid (has no equation/inequalities) therefore
-        # it shouldn't be detected by this audit job.
         answer_group_list1 = [{
             'rule_specs': [{
                 'rule_type': 'IsMathematicallyEquivalentTo',
-                'inputs': {'x': u'[\'x+y-z\']'}
+                'inputs': {'x': 'x+y-z'}
             }],
             'outcome': {
                 'dest': 'Introduction',
@@ -325,24 +324,10 @@ class MathExpressionInputInteractionOneOffJobTests(test_utils.GenericTestBase):
         state1.update_interaction_answer_groups(answer_group_list1)
         exp_services.save_new_exploration(self.albert_id, exploration)
 
-        # Start MathExpressionInteractionOneOff job on sample exploration.
-        job_id = (
-            exp_jobs_one_off.MathExpressionInputInteractionOneOffJob.create_new(
-            ))
-        exp_jobs_one_off.MathExpressionInputInteractionOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
-
-        actual_output = (
-            exp_jobs_one_off.MathExpressionInputInteractionOneOffJob.get_output(
-                job_id))
-        self.assertEqual(actual_output, [])
-
-        # This exploration is invalid (has an equation) therefore
-        # it should be detected by this audit job.
         answer_group_list2 = [{
             'rule_specs': [{
                 'rule_type': 'IsMathematicallyEquivalentTo',
-                'inputs': {'x': u'[\'y=mx+c\']'}
+                'inputs': {'x': 'y=m*x+c'}
             }],
             'outcome': {
                 'dest': 'State1',
@@ -362,12 +347,10 @@ class MathExpressionInputInteractionOneOffJobTests(test_utils.GenericTestBase):
         state2.update_interaction_answer_groups(answer_group_list2)
         exp_services.save_new_exploration(self.albert_id, exploration)
 
-        # This exploration is invalid (has inequalities) therefore
-        # it should be detected by this audit job.
         answer_group_list3 = [{
             'rule_specs': [{
                 'rule_type': 'IsMathematicallyEquivalentTo',
-                'inputs': {'x': u'[\'x<y>z\']'}
+                'inputs': {'x': 'x<y>z'}
             }],
             'outcome': {
                 'dest': 'State2',
@@ -387,18 +370,43 @@ class MathExpressionInputInteractionOneOffJobTests(test_utils.GenericTestBase):
         state3.update_interaction_answer_groups(answer_group_list3)
         exp_services.save_new_exploration(self.albert_id, exploration)
 
+        answer_group_list4 = [{
+            'rule_specs': [{
+                'rule_type': 'IsMathematicallyEquivalentTo',
+                'inputs': {'x': r'\frac{x}{y}'}
+            }],
+            'outcome': {
+                'dest': 'State1',
+                'feedback': {
+                    'content_id': 'feedback',
+                    'html': '<p>Outcome for state4</p>'
+                },
+                'param_changes': [],
+                'labelled_as_correct': False,
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }]
+
+        state4.update_interaction_answer_groups(answer_group_list4)
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
         # Start MathExpressionInteractionOneOff job on sample exploration.
         job_id = (
-            exp_jobs_one_off.MathExpressionInputInteractionOneOffJob.create_new(
+            exp_jobs_one_off.MathExpressionValidationOneOffJob.create_new(
             ))
-        exp_jobs_one_off.MathExpressionInputInteractionOneOffJob.enqueue(job_id)
+        exp_jobs_one_off.MathExpressionValidationOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_tasks()
 
         actual_output = (
-            exp_jobs_one_off.MathExpressionInputInteractionOneOffJob.get_output(
+            exp_jobs_one_off.MathExpressionValidationOneOffJob.get_output(
                 job_id))
         expected_output = [(
-            u'[u\'exp_id0\', [u"State2: [\'y=mx+c\']", u"State3: [\'x<y>z\']"]]'
+            u'[u\'exp_id0\', [u\'State2: y=m*x+c -- Valid Equation\', u\'State1'
+            ': x+y-z -- Valid Expression\', u\'State3: x<y>z -- Invalid\', '
+            'u\'State4: x/y -- Valid Expression\']]'
         )]
         self.assertEqual(actual_output, expected_output)
 
@@ -441,7 +449,7 @@ class MathExpressionInputInteractionOneOffJobTests(test_utils.GenericTestBase):
         exp_services.delete_exploration(self.albert_id, self.VALID_EXP_ID)
 
         run_job_for_deleted_exp(
-            self, exp_jobs_one_off.MathExpressionInputInteractionOneOffJob)
+            self, exp_jobs_one_off.MathExpressionValidationOneOffJob)
 
 
 class OneOffExplorationFirstPublishedJobTests(test_utils.GenericTestBase):

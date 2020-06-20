@@ -178,6 +178,7 @@ def main():
         ('esprima', common.ESPRIMA_VERSION, common.OPPIA_TOOLS_DIR),
         ('PyGithub', common.PYGITHUB_VERSION, common.OPPIA_TOOLS_DIR),
         ('psutil', common.PSUTIL_VERSION, common.OPPIA_TOOLS_DIR),
+        ('pylatexenc', common.PYLATEXENC_VERSION, common.OPPIA_TOOLS_DIR),
     ]
 
     for package, version, path in pip_dependencies:
