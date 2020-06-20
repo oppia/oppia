@@ -41,7 +41,7 @@ PROTRACTOR_CONF_FILE_PATH = os.path.join(
 SAMPLE_TEST_SUITE_THAT_IS_KNOWN_TO_EXIST = 'coreEditorAndPlayerFeatures'
 
 
-def get_e2e_suite_names_from_jobs_travis_yml_file():
+def get_e2e_suite_names_from_suites_travis_yml_file():
     """Extracts the test suites from env/jobs section from
     the .travis.yml file.
 
@@ -180,13 +180,13 @@ def main():
 
     python_utils.PRINT('Checking e2e tests are captured in .travis.yml...')
     protractor_test_suites = get_e2e_suite_names_from_protractor_file()
-    travis_e2e_jobs = get_e2e_suite_names_from_jobs_travis_yml_file()
+    travis_e2e_suites = get_e2e_suite_names_from_suites_travis_yml_file()
     travis_e2e_scripts = get_e2e_suite_names_from_script_travis_yml_file()
 
     for excluded_test in TEST_SUITES_NOT_RUN_ON_TRAVIS:
         protractor_test_suites.remove(excluded_test)
 
-    if not travis_e2e_jobs:
+    if not travis_e2e_suites:
         raise Exception('The e2e test suites that have been extracted from '
                         'jobs section from travis.ci are empty.')
     if not travis_e2e_scripts:
