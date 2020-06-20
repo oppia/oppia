@@ -53,7 +53,8 @@ export class HighBounceRateTask extends TaskEntry {
     this.markAsResolved();
   }
 
-  public refreshStatus(expStats: ExplorationStats): void {
+  public refreshStatus(
+      expStats: ExplorationStats, numEarlyQuitPlaythroughs: number): void {
     if (expStats.expId !== this.entityId ||
         expStats.expVersion !== this.entityVersion) {
       throw new Error(
@@ -68,7 +69,7 @@ export class HighBounceRateTask extends TaskEntry {
       return;
     }
     const bounceRate = expStats.getBounceRate(this.targetId);
-    if (this.meetsCreationConditions(bounceRate)) {
+    if (this.meetsCreationConditions(bounceRate, numEarlyQuitPlaythroughs)) {
       this.markAsOpen();
       this.generateIssueDescription(bounceRate);
     } else if (this.meetsObsoletionConditions(bounceRate)) {
@@ -76,9 +77,11 @@ export class HighBounceRateTask extends TaskEntry {
     }
   }
 
-  private meetsCreationConditions(bounceRate: number): boolean {
+  private meetsCreationConditions(
+      bounceRate: number, numEarlyQuitPlaythroughs: number): boolean {
     return (
       this.isObsolete() &&
+      numEarlyQuitPlaythroughs > 0 &&
       bounceRate >= ImprovementsConstants.HIGH_BOUNCE_RATE_THRESHOLD_HIGH);
   }
 
@@ -123,11 +126,12 @@ export class HighBounceRateTaskObjectFactory {
    * null.
    */
   createFromExplorationStats(
-      expStats: ExplorationStats, stateNames: string[]): HighBounceRateTask[] {
+      expStats: ExplorationStats, stateNames: string[],
+      numEarlyQuitPlaythroughs: number): HighBounceRateTask[] {
     const { expId, expVersion } = expStats;
     return stateNames.map(stateName => {
       const task = this.createNewObsoleteTask(expId, expVersion, stateName);
-      task.refreshStatus(expStats);
+      task.refreshStatus(expStats, numEarlyQuitPlaythroughs);
       return task.isOpen() ? task : null;
     });
   }
