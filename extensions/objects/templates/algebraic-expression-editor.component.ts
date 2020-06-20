@@ -34,7 +34,7 @@ angular.module('oppia').component('algebraicExpressionEditor', {
 
     ctrl.initializeGuppy = function() {
       var guppyDivs = document.querySelectorAll('.guppy-div-creator');
-      var divId, guppyInstance;
+      var divId, guppyInstance, guppyInstances = [];
       ctrl.hasBeenTouched = false;
       for (var i = 0; i < guppyDivs.length; i++) {
         divId = 'guppy_' + Math.floor(Math.random() * 100000000);
@@ -42,14 +42,9 @@ angular.module('oppia').component('algebraicExpressionEditor', {
         guppyDivs[i].setAttribute('id', divId);
         // Create a new guppy instance for that div.
         guppyInstance = new Guppy(divId, {});
-        guppyInstance.event('change', (e) => {
-          ctrl.value = guppyInstance.asciimath();
-          ctrl.hasBeenTouched = true;
-          // Need to manually trigger the digest cycle
-          // to make any 'watchers' aware of changes in answer.
-          $scope.$apply();
-        });
+        guppyInstances.push([divId, guppyInstance]);
       }
+      return guppyInstances;
     };
 
     var cleanErrorMessage = function(errorMessage) {
@@ -106,7 +101,16 @@ angular.module('oppia').component('algebraicExpressionEditor', {
       if (ctrl.value === null) {
         ctrl.value = '';
       }
-      ctrl.initializeGuppy();
+      var guppyInstances = ctrl.initializeGuppy();
+      Guppy.event('change', () => {
+        var activeId = $('.guppy_active').attr('id');
+        for (var guppyInstance of guppyInstances) {
+          if (guppyInstance[0] === activeId) {
+            ctrl.value = guppyInstance[1].asciimath();
+            break;
+          }
+        }
+      });
     };
   }]
 });

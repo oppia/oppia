@@ -182,14 +182,6 @@ angular.module('oppia').directive('oppiaInteractiveMathExpressionInput', [
                 buttons: []
               },
               events: {
-                done: function(e) {
-                  ctrl.submitAnswer();
-                },
-                change: function(e) {
-                  // Need to manually trigger the digest cycle
-                  // to make any 'watchers' aware of changes in answer.
-                  $scope.$apply();
-                },
                 ready: function() {
                   if (DeviceInfoService.isMobileUserAgent() &&
                     DeviceInfoService.hasTouchEvents()) {
@@ -206,6 +198,15 @@ angular.module('oppia').directive('oppiaInteractiveMathExpressionInput', [
                 }
               }
             });
+            guppyInstance.event('change', (e) => {
+              // Need to manually trigger the digest cycle
+              // to make any 'watchers' aware of changes in answer.
+              $scope.$apply();
+            });
+            guppyInstance.event('done', (e) => {
+              ctrl.submitAnswer();
+            });
+
             if (angular.equals(Guppy.Symbols.symbols, {})) {
               Guppy.init({
                 symbols: ['/third_party/static/guppy-f944022/sym/symbols.json',

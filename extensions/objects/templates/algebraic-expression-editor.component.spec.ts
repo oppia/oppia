@@ -21,7 +21,7 @@ describe('AlgebraicExpressionEditor', function() {
   class MockGuppy {
     constructor(id: string, config: Object) {}
 
-    event(name: string, handler: Function): void {
+    static event(name: string, handler: Function): void {
       handler();
     }
     asciimath() {
@@ -38,7 +38,7 @@ describe('AlgebraicExpressionEditor', function() {
 
   it('should assign a random id to the guppy divs', function() {
     var mockDocument = document.createElement('div');
-    mockDocument.setAttribute('class', 'guppy-div-creator');
+    mockDocument.classList.add('guppy-div-creator', 'guppy_active');
     angular.element(document).find('body').append(mockDocument.outerHTML);
 
     ctrl.$onInit();
