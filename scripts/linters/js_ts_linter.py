@@ -318,17 +318,17 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                                 file_path))
                         python_utils.PRINT('')
 
-        if failed:
-            summary_message = (
-                '%s HTTP requests check failed' % (
-                    linter_utils.FAILED_MESSAGE_PREFIX))
-        else:
-            summary_message = (
-                '%s HTTP requests check passed' % (
-                    linter_utils.SUCCESS_MESSAGE_PREFIX))
+            if failed:
+                summary_message = (
+                    '%s HTTP requests check failed' % (
+                        linter_utils.FAILED_MESSAGE_PREFIX))
+            else:
+                summary_message = (
+                    '%s HTTP requests check passed' % (
+                        linter_utils.SUCCESS_MESSAGE_PREFIX))
 
-        python_utils.PRINT(summary_message)
-        python_utils.PRINT('')
+            python_utils.PRINT(summary_message)
+            python_utils.PRINT('')
 
         return [summary_message]
 
