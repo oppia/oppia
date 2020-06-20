@@ -103,19 +103,13 @@ class TaskEntryTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(Exception, 'User not found.'):
             task_entry.to_dict()
 
-    def test_from_payload_dict_returns_open_task_with_corresponding_value(self):
-        payload_dict = {
-            'entity_type': improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
-            'entity_id': self.exp_id,
-            'entity_version': 1,
-            'task_type': improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
-            'target_type': improvements_models.TASK_TARGET_TYPE_STATE,
-            'target_id': feconf.DEFAULT_INIT_STATE_NAME,
-            'issue_description': 'issue description',
-            'status': improvements_models.TASK_STATUS_OPEN,
-        }
-        task_entry = (
-            improvements_domain.TaskEntry.from_payload_dict(payload_dict))
+    def test_can_create_open_task_with_corresponding_values(self):
+        task_entry = improvements_domain.TaskEntry(
+            improvements_models.TASK_ENTITY_TYPE_EXPLORATION, self.exp_id, 1,
+            improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
+            improvements_models.TASK_TARGET_TYPE_STATE,
+            feconf.DEFAULT_INIT_STATE_NAME, 'issue description',
+            improvements_models.TASK_STATUS_OPEN)
 
         self.assertEqual(task_entry.entity_type, 'exploration')
         self.assertEqual(task_entry.entity_id, self.exp_id)
@@ -128,20 +122,13 @@ class TaskEntryTests(test_utils.GenericTestBase):
         self.assertIsNone(task_entry.resolver_id)
         self.assertIsNone(task_entry.resolved_on)
 
-    def test_from_payload_dict_returns_obsolete_task_with_corresponding_value(
-            self):
-        payload_dict = {
-            'entity_type': improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
-            'entity_id': self.exp_id,
-            'entity_version': 1,
-            'task_type': improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
-            'target_type': improvements_models.TASK_TARGET_TYPE_STATE,
-            'target_id': feconf.DEFAULT_INIT_STATE_NAME,
-            'issue_description': 'issue description',
-            'status': improvements_models.TASK_STATUS_OBSOLETE,
-        }
-        task_entry = (
-            improvements_domain.TaskEntry.from_payload_dict(payload_dict))
+    def test_can_create_obsolete_task_with_corresponding_values(self):
+        task_entry = improvements_domain.TaskEntry(
+            improvements_models.TASK_ENTITY_TYPE_EXPLORATION, self.exp_id, 1,
+            improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
+            improvements_models.TASK_TARGET_TYPE_STATE,
+            feconf.DEFAULT_INIT_STATE_NAME, 'issue description',
+            improvements_models.TASK_STATUS_OBSOLETE)
 
         self.assertEqual(task_entry.entity_type, 'exploration')
         self.assertEqual(task_entry.entity_id, self.exp_id)
@@ -154,21 +141,14 @@ class TaskEntryTests(test_utils.GenericTestBase):
         self.assertIsNone(task_entry.resolver_id)
         self.assertIsNone(task_entry.resolved_on)
 
-    def test_from_payload_dict_returns_resolved_task_with_corresponding_value(
-            self):
-        payload_dict = {
-            'entity_type': improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
-            'entity_id': self.exp_id,
-            'entity_version': 1,
-            'task_type': improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
-            'target_type': improvements_models.TASK_TARGET_TYPE_STATE,
-            'target_id': feconf.DEFAULT_INIT_STATE_NAME,
-            'issue_description': 'issue description',
-            'status': improvements_models.TASK_STATUS_RESOLVED,
-        }
-
-        task_entry = improvements_domain.TaskEntry.from_payload_dict(
-            payload_dict, resolver_id=self.owner_id, resolved_on=self.MOCK_DATE)
+    def test_can_create_resolved_task_with_corresponding_value(self):
+        task_entry = improvements_domain.TaskEntry(
+            improvements_models.TASK_ENTITY_TYPE_EXPLORATION, self.exp_id, 1,
+            improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
+            improvements_models.TASK_TARGET_TYPE_STATE,
+            feconf.DEFAULT_INIT_STATE_NAME, 'issue description',
+            improvements_models.TASK_STATUS_RESOLVED, resolver_id=self.owner_id,
+            resolved_on=self.MOCK_DATE)
 
         self.assertEqual(task_entry.entity_type, 'exploration')
         self.assertEqual(task_entry.entity_id, self.exp_id)
@@ -181,52 +161,34 @@ class TaskEntryTests(test_utils.GenericTestBase):
         self.assertEqual(task_entry.resolver_id, self.owner_id)
         self.assertEqual(task_entry.resolved_on, self.MOCK_DATE)
 
-    def test_from_payload_dict_raises_if_resolved_by_required_but_missing(self):
-        payload_dict = {
-            'entity_type': improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
-            'entity_id': self.exp_id,
-            'entity_version': 1,
-            'task_type': improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
-            'target_type': improvements_models.TASK_TARGET_TYPE_STATE,
-            'target_id': feconf.DEFAULT_INIT_STATE_NAME,
-            'issue_description': 'issue description',
-            'status': improvements_models.TASK_STATUS_RESOLVED,
-        }
-
+    def test_constructor_raises_if_resolved_by_arg_required_but_missing(self):
         with self.assertRaisesRegexp(Exception, 'Missing resolution arguments'):
-            improvements_domain.TaskEntry.from_payload_dict(
-                payload_dict, resolver_id=None, resolved_on=self.MOCK_DATE)
+            improvements_domain.TaskEntry(
+                improvements_models.TASK_ENTITY_TYPE_EXPLORATION, self.exp_id,
+                1, improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
+                improvements_models.TASK_TARGET_TYPE_STATE,
+                feconf.DEFAULT_INIT_STATE_NAME, 'issue description',
+                improvements_models.TASK_STATUS_RESOLVED, resolver_id=None,
+                resolved_on=self.MOCK_DATE)
 
-    def test_from_payload_dict_raises_if_resolved_on_required_but_missing(self):
-        payload_dict = {
-            'entity_type': improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
-            'entity_id': self.exp_id,
-            'entity_version': 1,
-            'task_type': improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
-            'target_type': improvements_models.TASK_TARGET_TYPE_STATE,
-            'target_id': feconf.DEFAULT_INIT_STATE_NAME,
-            'issue_description': 'issue description',
-            'status': improvements_models.TASK_STATUS_RESOLVED,
-        }
-
+    def test_constructor_raises_if_resolved_on_required_but_missing(self):
         with self.assertRaisesRegexp(Exception, 'Missing resolution arguments'):
-            improvements_domain.TaskEntry.from_payload_dict(
-                payload_dict, resolver_id=self.owner_id, resolved_on=None)
+            improvements_domain.TaskEntry(
+                improvements_models.TASK_ENTITY_TYPE_EXPLORATION, self.exp_id,
+                1, improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
+                improvements_models.TASK_TARGET_TYPE_STATE,
+                feconf.DEFAULT_INIT_STATE_NAME, 'issue description',
+                improvements_models.TASK_STATUS_RESOLVED,
+                resolver_id=self.owner_id, resolved_on=None)
 
-    def test_from_payload_dict_ignores_resolution_args_when_task_is_open(self):
-        payload_dict = {
-            'entity_type': improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
-            'entity_id': self.exp_id,
-            'entity_version': 1,
-            'task_type': improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
-            'target_type': improvements_models.TASK_TARGET_TYPE_STATE,
-            'target_id': feconf.DEFAULT_INIT_STATE_NAME,
-            'issue_description': 'issue description',
-            'status': improvements_models.TASK_STATUS_OPEN,
-        }
-
-        task_entry = improvements_domain.TaskEntry.from_payload_dict(
-            payload_dict, resolver_id=self.owner_id, resolved_on=self.MOCK_DATE)
+    def test_constructor_ignores_resolution_args_when_task_is_open(self):
+        task_entry = improvements_domain.TaskEntry(
+            improvements_models.TASK_ENTITY_TYPE_EXPLORATION, self.exp_id, 1,
+            improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
+            improvements_models.TASK_TARGET_TYPE_STATE,
+            feconf.DEFAULT_INIT_STATE_NAME, 'issue description',
+            improvements_models.TASK_STATUS_OPEN, resolver_id=self.owner_id,
+            resolved_on=self.MOCK_DATE)
 
         self.assertEqual(task_entry.entity_type, 'exploration')
         self.assertEqual(task_entry.entity_id, self.exp_id)
@@ -239,21 +201,14 @@ class TaskEntryTests(test_utils.GenericTestBase):
         self.assertIsNone(task_entry.resolver_id)
         self.assertIsNone(task_entry.resolved_on)
 
-    def test_from_payload_dict_ignores_resolution_args_when_task_is_obsolete(
-            self):
-        payload_dict = {
-            'entity_type': improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
-            'entity_id': self.exp_id,
-            'entity_version': 1,
-            'task_type': improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
-            'target_type': improvements_models.TASK_TARGET_TYPE_STATE,
-            'target_id': feconf.DEFAULT_INIT_STATE_NAME,
-            'issue_description': 'issue description',
-            'status': improvements_models.TASK_STATUS_OBSOLETE,
-        }
-
-        task_entry = improvements_domain.TaskEntry.from_payload_dict(
-            payload_dict, resolver_id=self.owner_id, resolved_on=self.MOCK_DATE)
+    def test_constructor_ignores_resolution_args_when_task_is_obsolete(self):
+        task_entry = improvements_domain.TaskEntry(
+            improvements_models.TASK_ENTITY_TYPE_EXPLORATION, self.exp_id, 1,
+            improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
+            improvements_models.TASK_TARGET_TYPE_STATE,
+            feconf.DEFAULT_INIT_STATE_NAME, 'issue description',
+            improvements_models.TASK_STATUS_OBSOLETE,
+            resolver_id=self.owner_id, resolved_on=self.MOCK_DATE)
 
         self.assertEqual(task_entry.entity_type, 'exploration')
         self.assertEqual(task_entry.entity_id, self.exp_id)

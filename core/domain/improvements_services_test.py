@@ -59,7 +59,7 @@ class ImprovementsServicesTestBase(test_utils.GenericTestBase):
                 should target.
 
         Returns:
-            improvements_domain.TaskEntry.
+            improvements_domain.TaskEntry. A new obsolete task entry.
         """
         return improvements_domain.TaskEntry(
             entity_type=improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
@@ -86,7 +86,7 @@ class ImprovementsServicesTestBase(test_utils.GenericTestBase):
                 should target.
 
         Returns:
-            improvements_domain.TaskEntry.
+            improvements_domain.TaskEntry. A new open task entry.
         """
         return improvements_domain.TaskEntry(
             entity_type=improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
@@ -113,7 +113,7 @@ class ImprovementsServicesTestBase(test_utils.GenericTestBase):
                 should target.
 
         Returns:
-            improvements_domain.TaskEntry.
+            improvements_domain.TaskEntry. A new resolved task entry.
         """
         return improvements_domain.TaskEntry(
             entity_type=improvements_models.TASK_ENTITY_TYPE_EXPLORATION,

@@ -65,7 +65,7 @@ def get_task_entry_from_model(task_entry_model):
         task_entry_model: improvements_models.TaskEntryModel.
 
     Returns:
-        improvements_domain.TaskEntry.
+        improvements_domain.TaskEntry. The corresponding domain object.
     """
     return improvements_domain.TaskEntry(
         task_entry_model.entity_type, task_entry_model.entity_id,
