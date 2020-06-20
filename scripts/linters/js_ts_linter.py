@@ -302,21 +302,21 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         with linter_utils.redirect_stdout(sys.stdout):
             failed = False
 
-        for file_path in self.all_filepaths:
-            if file_path in excluded_files:
-                continue
+            for file_path in self.all_filepaths:
+                if file_path in excluded_files:
+                    continue
 
-            file_content = FILE_CACHE.read(file_path)
+                file_content = FILE_CACHE.read(file_path)
 
-            if re.findall(http_client_pattern, file_content):
-                if not 'backend-api.service.ts' in file_path:
-                    failed = True
-                    python_utils.PRINT(
-                        '%s --> An instance of HttpClient is found in this '
-                        'file. You are not allowed to create http requests '
-                        'from files that are not backend api services.' % (
-                            file_path))
-                    python_utils.PRINT('')
+                if re.findall(http_client_pattern, file_content):
+                    if not file_path.endswith('backend-api.service.ts'):
+                        failed = True
+                        python_utils.PRINT(
+                            '%s --> An instance of HttpClient is found in this '
+                            'file. You are not allowed to create http requests '
+                            'from files that are not backend api services.' % (
+                                file_path))
+                        python_utils.PRINT('')
 
         if failed:
             summary_message = (
