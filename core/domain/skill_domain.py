@@ -1304,11 +1304,12 @@ class SkillSummary(python_utils.OBJECT):
 
 
 class AugmentedSkillSummary(python_utils.OBJECT):
+    """Domain object for Augmented Skill Summary."""
 
     def __init__(
             self, skill_id, description, language_code, version,
             misconception_count, worked_examples_count, skill_model_created_on,
-            skill_model_last_updated):
+            skill_model_last_updated, topic_name=None, classroom_name=None):
         """Constructs a SkillSummary domain object.
 
         Args:
@@ -1324,6 +1325,10 @@ class AugmentedSkillSummary(python_utils.OBJECT):
                 the skill model is created.
             skill_model_last_updated: datetime.datetime. Date and time
                 when the skill model was last updated.
+            topic_name: str. The name of the topic to which the skill
+                is assigned.
+            classroom_name: str. The name of the classroom to which the
+                skill is assigned.
         """
         self.id = skill_id
         self.description = description
@@ -1333,20 +1338,30 @@ class AugmentedSkillSummary(python_utils.OBJECT):
         self.worked_examples_count = worked_examples_count
         self.skill_model_created_on = skill_model_created_on
         self.skill_model_last_updated = skill_model_last_updated
-        self.topic_name = None
-        self.classroom_name = None
+        self.topic_name = topic_name
+        self.classroom_name = classroom_name
 
     def update_topic_name(self, topic_name):
+        """Updates the topic_name of the augmented skill.
+
+        Args:
+            topic_name: str. The name of the topic.
+        """
         self.topic_name = topic_name
 
     def update_classroom_name(self, classroom_name):
+        """Updates the classroom_name of the augmented skill.
+
+        Args:
+            classroom_name: str. The name of the classroom.
+        """
         self.classroom_name = classroom_name
 
     def to_dict(self):
         """Returns a dictionary representation of this domain object.
 
         Returns:
-            dict. A dict representing this SkillSummary object.
+            dict. A dict representing this AugmentedSkillSummary object.
         """
         return {
             'id': self.id,
@@ -1355,16 +1370,13 @@ class AugmentedSkillSummary(python_utils.OBJECT):
             'version': self.version,
             'misconception_count': self.misconception_count,
             'worked_examples_count': self.worked_examples_count,
-            'topic_name': self.worked_examples_count,
-            'classroom_name': self.worked_examples_count,
+            'topic_name': self.topic_name,
+            'classroom_name': self.classroom_name,
             'skill_model_created_on': utils.get_time_in_millisecs(
                 self.skill_model_created_on),
             'skill_model_last_updated': utils.get_time_in_millisecs(
                 self.skill_model_last_updated)
         }
-
-
-
 
 
 class UserSkillMastery(python_utils.OBJECT):

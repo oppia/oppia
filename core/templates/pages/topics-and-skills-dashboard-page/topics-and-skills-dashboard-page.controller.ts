@@ -175,10 +175,12 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
 
           ctrl.initSkillDashboard = function() {
             ctrl.skillStatusOptions = [];
+            ctrl.more = true;
+            ctrl.firstTimeFetchingSkills = true;
             for (let key in SKILL_STATUS_OPTIONS) {
               ctrl.skillStatusOptions.push(SKILL_STATUS_OPTIONS[key]);
             }
-            ctrl.fetchSkills();
+            ctrl.applyFilters();
           };
 
           ctrl.createTopic = function() {
@@ -203,34 +205,47 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
             } else if (ctrl.activeTab === ctrl.TAB_NAME_SKILLS) {
               ctrl.skillPageNumber = pageNumber;
               ctrl.pageNumber = ctrl.skillPageNumber;
-              ctrl.fetchSkills();
+              ctrl.displayedSkillSummaries = ctrl.skillSummaries.slice(
+                pageNumber * ctrl.itemsPerPage,
+                (pageNumber + 1) * ctrl.itemsPerPage);
             }
           };
 
           ctrl.fetchSkills = function() {
-            TopicsAndSkillsDashboardBackendApiService.
-              fetchSkillsDashboardData(
-                ctrl.filterObject, ctrl.pageNumber, ctrl.itemsPerPage).then(
-                (response) => {
-                console.log(response);
-                  ctrl.nextCursor = response.next_cursor;
-                  ctrl.skillSummaries = response.skill_summary_dicts;
-                  ctrl.currentCount = response.total_skill_count;
-                  $scope.$applyAsync();
-                });
+            if (ctrl.firstTimeFetchingSkills || ctrl.more) {
+              TopicsAndSkillsDashboardBackendApiService
+                .fetchSkillsDashboardData(
+                  ctrl.filterObject, ctrl.itemsPerPage, ctrl.nextCursor).then(
+                  (response) => {
+                    ctrl.more = response.more;
+                    ctrl.nextCursor = response.next_cursor;
+                    ctrl.currentCount = response.total_skill_count;
+                    if (ctrl.firstTimeFetchingSkills) {
+                      ctrl.skillSummaries.push(...response.skill_summary_dicts);
+                      ctrl.firstTimeFetchingSkills = false;
+                      ctrl.goToPageNumber(0);
+                    } else if (ctrl.currentCount > ((
+                      ctrl.pageNumber * ctrl.itemsPerPage) +
+                        ctrl.itemsPerPage)) {
+                      ctrl.skillSummaries.push(...response.skill_summary_dicts);
+                      ctrl.goToPageNumber(ctrl.pageNumber + 1);
+                    }
+                    $scope.$applyAsync();
+                  });
+            }
           };
-          ctrl.loadMoreSkills = function() {
-            TopicsAndSkillsDashboardBackendApiService.
-              fetchSkillsDashboardData(
-                ctrl.filterObject, ctrl.pageNumber, ctrl.itemsPerPage, ctrl.nextCursor).then(
-                (response) => {
-                console.log(response);
-                ctrl.skillSummaries.push(...response.skill_summary_dicts);
-                ctrl.currentCount = response.total_skill_count;
-                ctrl.nextCursor = response.next_cursor;
-                $scope.$applyAsync();
-                });
-          }
+
+          ctrl.navigateSkillPage = function(direction) {
+            if (direction === ctrl.MOVE_TO_NEXT_PAGE) {
+              ctrl.fetchSkills();
+            } else if (ctrl.pageNumber >= 1) {
+              ctrl.skillSummaries = ctrl.skillSummaries.slice(
+                0, (ctrl.skillSummaries.length -
+                      ctrl.displayedSkillSummaries.length));
+              ctrl.more = true;
+              ctrl.goToPageNumber(ctrl.pageNumber - 1);
+            }
+          };
           /**
            * @param {String} direction - Direction, whether to change the
            * page to left or right by 1.
@@ -248,6 +263,9 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
 
           ctrl.applyFilters = function() {
             if (ctrl.activeTab === ctrl.TAB_NAME_SKILLS) {
+              ctrl.more = true;
+              ctrl.firstTimeFetchingSkills = true;
+              ctrl.skillSummaries = [];
               ctrl.fetchSkills();
               return;
             }
@@ -296,6 +314,7 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
             ctrl.topicPageNumber = 0;
             ctrl.itemsPerPage = 10;
             ctrl.skillPageNumber = 0;
+            ctrl.lastSkillPage = 0;
             ctrl.selectedIndex = null;
             ctrl.itemsPerPageChoice = [10, 15, 20];
             ctrl.filterObject = (

@@ -80,7 +80,7 @@ describe('Topics and Skills Dashboard backend API service', () => {
         let successHandler = jasmine.createSpy('success');
         let failHandler = jasmine.createSpy('fail');
         topicsAndSkillsDashboardBackendApiService.fetchSkillsDashboardData(
-          null, 0, 10).then(
+          null, 0, null).then(
           successHandler, failHandler);
         let req = httpTestingController.expectOne(SKILLS_DASHBOARD_DATA_URL);
         expect(req.request.method).toEqual('POST');
@@ -90,16 +90,15 @@ describe('Topics and Skills Dashboard backend API service', () => {
       })
     );
 
-
     it('should use fail handler if skills dashboard data failed',
       fakeAsync(() => {
         let successHandler = jasmine.createSpy('success');
         let failHandler = jasmine.createSpy('fail');
         topicsAndSkillsDashboardBackendApiService.fetchSkillsDashboardData(
-          null, 0, 10).then(
+          null, 0, null).then(
           successHandler, failHandler);
         let req = httpTestingController.expectOne(
-          SKILLS_DASHBOARD_DATA_URL, 'Error Loading dashboard data.');
+          SKILLS_DASHBOARD_DATA_URL, 'Error loading dashboard data.');
         expect(req.request.method).toEqual('POST');
         req.flush('Error loading skills data.', {
           status: 500

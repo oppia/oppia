@@ -773,3 +773,42 @@ class SkillSummaryTests(test_utils.GenericTestBase):
                 'Expected worked_examples_count to be non-negative, '
                 'received \'-1\'')):
             self.skill_summary.validate()
+
+
+class AugmentedSkillSummaryTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(AugmentedSkillSummaryTests, self).setUp()
+        current_time = datetime.datetime.utcnow()
+        time_in_millisecs = utils.get_time_in_millisecs(current_time)
+        self.augmented_skill_summary_dict = {
+            'id': 'skill_id',
+            'description': 'description',
+            'language_code': 'en',
+            'version': 1,
+            'misconception_count': 1,
+            'worked_examples_count': 1,
+            'topic_name': 'topic1',
+            'classroom_name': 'math',
+            'skill_model_created_on': time_in_millisecs,
+            'skill_model_last_updated': time_in_millisecs
+        }
+
+        self.augmented_skill_summary = skill_domain.AugmentedSkillSummary(
+            'skill_id', 'description', 'en', 1, 1, 1,
+            current_time, current_time, 'topic1', 'math')
+
+    def test_skill_summary_gets_created(self):
+        self.assertEqual(
+            self.augmented_skill_summary.to_dict(),
+            self.augmented_skill_summary_dict)
+
+    def test_update_topic_name(self):
+        self.assertEqual(self.augmented_skill_summary.topic_name, 'topic1')
+        self.augmented_skill_summary.update_topic_name('topic2')
+        self.assertEqual(self.augmented_skill_summary.topic_name, 'topic2')
+
+    def test_update_classroom_name(self):
+        self.assertEqual(self.augmented_skill_summary.classroom_name, 'math')
+        self.augmented_skill_summary.update_classroom_name('english')
+        self.assertEqual(self.augmented_skill_summary.classroom_name, 'english')

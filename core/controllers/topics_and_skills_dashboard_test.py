@@ -174,8 +174,8 @@ class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
 
         json_response = self.post_json(
             feconf.SKILL_DASHBOARD_DATA_URL, {
-                'pageNumber': 0,
-                'itemsPerPage': 10
+                'items_per_page': '10',
+                'sort': 'Oldest Created'
             }, csrf_token=csrf_token)
 
         self.assertEqual(len(json_response['skill_summary_dicts']), 2)

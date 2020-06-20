@@ -60,7 +60,7 @@ class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
         topic_summary_dicts = [
             summary.to_dict() for summary in topic_summaries]
 
-        skill_summaries, next_cursor, more = skill_services.get_all_skill_summaries()
+        skill_summaries = skill_services.get_all_skill_summaries()
         skill_summary_dicts = [
             summary.to_dict() for summary in skill_summaries]
 
@@ -175,24 +175,25 @@ class SkillsDashboardPageDataHandler(base.BaseHandler):
     def post(self):
         """Handles POST requests."""
 
-        classroom_name = self.payload.get('classroomName')
-        items_per_page = int(self.payload.get('itemsPerPage'))
+        classroom_name = self.payload.get('classroom_name')
+        num_queries_to_fetch = int(self.payload.get('items_per_page'))
         keywords = self.payload.get('keywords')
-        page_number = int(self.payload.get('pageNumber'))
         sort_by = self.payload.get('sort')
         status = self.payload.get('status')
-        cursor = self.payload.get('nextCursor', None)
+        cursor = self.payload.get('next_cursor', None)
 
-        skill_summaries, next_cursor, more = skill_services.get_filtered_skill_dicts(
-            status, classroom_name, keywords, sort_by, cursor)
-        skill_summary_dicts_paginated = skill_summaries[
-            page_number * items_per_page: ((page_number + 1) * items_per_page)]
+        skill_summaries, next_cursor, more, total_count = (
+            skill_services.get_filtered_skill_summaries(
+                num_queries_to_fetch, status, classroom_name,
+                keywords, sort_by, cursor))
+
         skill_summary_dicts = [summary.to_dict() for summary in skill_summaries]
+
         self.render_json({
             'skill_summary_dicts': skill_summary_dicts,
             'next_cursor': next_cursor,
             'more': more,
-            'total_skill_count': len(skill_summaries)
+            'total_skill_count': total_count
         })
 
 

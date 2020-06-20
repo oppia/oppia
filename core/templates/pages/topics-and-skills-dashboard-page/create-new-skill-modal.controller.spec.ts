@@ -72,7 +72,6 @@ describe('Create new skill modal', function() {
     expect($scope.conceptCardExplanationEditorIsShown).toEqual(true);
   });
 
-
   it('should reset the error message', function() {
     expect($scope.errorMsg).toEqual('');
     $scope.errorMsg = 'Please enter a valid description';
@@ -113,6 +112,7 @@ describe('Create new skill modal', function() {
       $scope.createNewSkill();
       expect($scope.errorMsg).toEqual(errorString);
     });
+
   it('should close the modal with skill input values ', function() {
     var rubrics = [
       RubricObjectFactory.create(skillDifficulties[0], []),

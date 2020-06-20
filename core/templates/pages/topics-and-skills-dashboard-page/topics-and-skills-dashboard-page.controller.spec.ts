@@ -326,7 +326,9 @@ describe('Topics and Skills Dashboard Page', function() {
           var deferred = $q.defer();
           deferred.resolve({
             skill_summary_dicts: [],
-            total_skill_count: 10
+            total_skill_count: 40,
+            more: true,
+            next_cursor: 'kasfmk424'
           });
           return deferred.promise;
         }
@@ -340,6 +342,7 @@ describe('Topics and Skills Dashboard Page', function() {
       });
 
       ctrl.$onInit();
+      ctrl.displayedSkillSummaries = [];
       $rootScope.$apply();
     }));
 
@@ -354,7 +357,7 @@ describe('Topics and Skills Dashboard Page', function() {
         ctrl.fetchSkills();
         $rootScope.$apply();
         expect(ctrl.skillSummaries).toEqual([]);
-        expect(ctrl.currentCount).toEqual(10);
+        expect(ctrl.currentCount).toEqual(40);
       });
 
     it('should fetch skills when filters are applied', function() {
@@ -364,15 +367,38 @@ describe('Topics and Skills Dashboard Page', function() {
       expect(fetchSkillSpy).toHaveBeenCalled();
     });
 
-    it('should fetch skills when paginating', function() {
-      expect(ctrl.activeTab).toEqual('skills');
+    it('should change page number after fetching skills', function() {
+      ctrl.pageNumber = 1;
+      ctrl.firstTimeFetchingSkills = false;
+      ctrl.more = true;
+      ctrl.fetchSkills();
+      $rootScope.$apply();
+      expect(ctrl.pageNumber).toEqual(2);
+    });
 
+    it('should fetch skills when filters are applied', function() {
+      expect(ctrl.activeTab).toEqual('skills');
       var fetchSkillSpy = spyOn(ctrl, 'fetchSkills').and.callThrough();
-      ctrl.goToPageNumber(2);
-      expect(ctrl.skillPageNumber).toEqual(2);
-      expect(ctrl.skillPageNumber).toEqual(2);
-      ctrl.pageNumber = 2;
+      ctrl.applyFilters();
       expect(fetchSkillSpy).toHaveBeenCalled();
+    });
+
+    it('should navigate skill page forward', function() {
+      var skillSpy = spyOn(ctrl, 'fetchSkills');
+      ctrl.navigateSkillPage('next_page');
+      expect(skillSpy).toHaveBeenCalled();
+    });
+
+    it('should navigate skill page backward', function() {
+      ctrl.pageNumber = 3;
+      ctrl.navigateSkillPage('prev_page');
+      expect(ctrl.pageNumber).toEqual(2);
+    });
+
+    it('should navigate skill page backward', function() {
+      ctrl.pageNumber = 3;
+      ctrl.navigateSkillPage('prev_page');
+      expect(ctrl.pageNumber).toEqual(2);
     });
   });
 

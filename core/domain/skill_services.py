@@ -218,38 +218,81 @@ def get_skill_from_model(skill_model):
         skill_model.last_updated)
 
 
-def get_all_skill_summaries(cursor=None, sort_by=None):
+def get_all_skill_summaries():
     """Returns the summaries of all skills present in the datastore.
 
     Returns:
-        list(SkillSummary). The list of summaries of all skills present in the
-            datastore.
+        skill_summaries: list(SkillSummary). The list of summaries
+         of all skills present in the datastore.
     """
-    # skill_summaries_models = skill_models.SkillSummaryModel.get_all()
-    num_queries_to_fetch = 2
-    skill_summaries_models, next_cursor, more = skill_models.SkillSummaryModel.fetch_page(
-        num_queries_to_fetch, cursor, sort_by)
+    skill_summaries_models = skill_models.SkillSummaryModel.get_all()
     skill_summaries = [
         get_skill_summary_from_model(summary)
         for summary in skill_summaries_models]
-    return skill_summaries, next_cursor, more
+    return skill_summaries
 
 
-def get_filtered_skill_dicts(status, classroom_name, keywords, sort_by, cursor):
+def get_skill_summaries_in_batches(
+        num_queries_to_fetch, cursor=None, sort_by=None):
+    """Returns the summaries of all skills present in the datastore.
+
+    Args:
+        num_queries_to_fetch: number. Number of skills to fetch
+        cursor: str. The cursor to the next page.
+        sort_by: str. A string indicating how to sort the result.
+
+    Returns:
+        4-tuple(skill_summaries, next_cursor, more, total_count). where:
+            skill_summaries: list(AugmentedSkillSummary). The list of
+                skill summaries.
+            next_cursor: str or None. A query cursor pointing to the
+                next batch of results. If there are no more results,
+                 this might be None.
+            more: bool. If True, there are (probably) more results after this
+                batch. If False, there are no further results after this batch.
+            total_count: number. Total count of skill summaries.
+    """
+    skill_summaries_models, next_cursor, more, total_count = (
+        skill_models.SkillSummaryModel.fetch_page(
+            num_queries_to_fetch, cursor, sort_by))
+
+    skill_summaries = [
+        get_skill_summary_from_model(summary)
+        for summary in skill_summaries_models]
+    return skill_summaries, next_cursor, more, total_count
+
+
+def get_filtered_skill_summaries(
+        num_queries_to_fetch, status, classroom_name, keywords,
+        sort_by, cursor):
     """Returns all the skill summary dicts after filtering.
 
     Args:
-        status: string. The status of the skill.
+        num_queries_to_fetch: number. Number of skills to fetch
+        status: str. The status of the skill.
         classroom_name: string. The classroom_name of the topic
             to which skill is assigned to.
         keywords: list(string). The keywords to look for
             in the skill description.
         sort_by: string. A string indicating how to sort the result.
+        cursor: str or None. The cursor to the next page.
 
     Returns:
-        list(dict). The list of skill summary dicts matching the filters.
+        4-tuple(query_models, next_cursor, more, count). where:
+            skill_summaries: list(AugmentedSkillSummary). The list of
+                skill summaries.
+            next_cursor: str or None. A query cursor pointing to the
+                next batch of results. If there are no
+                more results, this might be None.
+            more: bool. If True, there are (probably) more results after this
+                batch. If False, there are no further results after this batch.
+            total_count: number. Total count of skill summaries.
     """
-    augmented_skill_summaries, next_cursor, more = get_all_skill_summary_dicts_with_topic_and_classroom(cursor, sort_by)
+    skill_summaries = []
+
+    augmented_skill_summaries, next_cursor, more, total_count = (
+        get_all_skill_summaries_with_topic_and_classroom(
+            num_queries_to_fetch, cursor, sort_by))
 
     filtered_augmented_skill_summaries = filter_skills_by_status(
         augmented_skill_summaries, status)
@@ -257,17 +300,43 @@ def get_filtered_skill_dicts(status, classroom_name, keywords, sort_by, cursor):
         filtered_augmented_skill_summaries, classroom_name)
     filtered_augmented_skill_summaries = filter_skills_by_keywords(
         filtered_augmented_skill_summaries, keywords)
+    skill_summaries.extend(filtered_augmented_skill_summaries)
 
-    return filtered_augmented_skill_summaries, next_cursor, more
+    while len(skill_summaries) < num_queries_to_fetch and more and next_cursor:
+        augmented_skill_summaries, next_cursor, more, total_count = (
+            get_all_skill_summaries_with_topic_and_classroom(
+                num_queries_to_fetch, next_cursor, sort_by))
+
+        filtered_augmented_skill_summaries = filter_skills_by_status(
+            augmented_skill_summaries, status)
+        filtered_augmented_skill_summaries = filter_skills_by_classroom(
+            filtered_augmented_skill_summaries, classroom_name)
+        filtered_augmented_skill_summaries = filter_skills_by_keywords(
+            filtered_augmented_skill_summaries, keywords)
+        skill_summaries.extend(filtered_augmented_skill_summaries)
+
+    return skill_summaries, next_cursor, more, total_count
 
 
-def get_all_skill_summary_dicts_with_topic_and_classroom(cursor, sort_by):
-    """Returns all the skill summary dicts after attaching topic and classroom.
+def get_all_skill_summaries_with_topic_and_classroom(
+        num_queries_to_fetch, cursor, sort_by):
+    """Returns all the Augmented skill summaries after attaching
+       topic and classroom.
 
     Returns:
-        list(dict). The list of skill summary dicts matching the filters.
+        4-tuple(query_models, next_cursor, more, total_count). where:
+            skill_summaries: list(AugmentedSkillSummary). The list of
+                skill summaries.
+            next_cursor: str or None. A query cursor pointing to the
+                next batch of results. If there are no
+                more results, this might be None.
+            more: bool. If True, there are (probably) more results after this
+                batch. If False, there are no further results after this batch.
+            total_count: number. Total count of skill summaries.
     """
-    skill_summaries, next_cursor, more = get_all_skill_summaries(cursor, sort_by)
+    skill_summaries, next_cursor, more, total_count = (
+        get_skill_summaries_in_batches(
+            num_queries_to_fetch, cursor=cursor, sort_by=sort_by))
     augmented_skill_summaries = [skill_domain.AugmentedSkillSummary(
         summary.id,
         summary.description,
@@ -290,19 +359,20 @@ def get_all_skill_summary_dicts_with_topic_and_classroom(cursor, sort_by):
             augmented_skill_summary.update_classroom_name(
                 assigned_skill_ids[skill_summary_id]['classroom_name'])
 
-    return augmented_skill_summaries, next_cursor, more
+    return augmented_skill_summaries, next_cursor, more, total_count
 
 
 def filter_skills_by_status(augmented_skill_summaries, status):
     """Returns the skill summary dicts after filtering by status.
 
     Args:
-        skill_summary_dicts: list(dict). The list of skill summary dicts.
-        status: string. The classroom_name of the topic
-            to which skill is assigned to.
+        augmented_skill_summaries: list(AugmentedSkillSummary). The list
+        of augmented skill summaries.
+        status: str. The status of the skill.
 
     Returns:
-        list(dict). The list of skill summary dicts matching the given status.
+        list(AugmentedSkillSummary). The list of AugmentedSkillSummaries
+        matching the given status.
     """
 
     if not status or status == constants.SKILL_STATUS_OPTIONS['ALL']:
@@ -311,8 +381,9 @@ def filter_skills_by_status(augmented_skill_summaries, status):
     elif status == constants.SKILL_STATUS_OPTIONS['UNASSIGNED']:
         unassigned_augmented_skill_summaries = []
         for augmented_skill_summary in augmented_skill_summaries:
-            if not augmented_skill_summary.topic:
-                unassigned_augmented_skill_summaries.append(augmented_skill_summary)
+            if not augmented_skill_summary.topic_name:
+                unassigned_augmented_skill_summaries.append(
+                    augmented_skill_summary)
 
         return unassigned_augmented_skill_summaries
 
@@ -320,7 +391,8 @@ def filter_skills_by_status(augmented_skill_summaries, status):
         assigned_augmented_skill_summaries = []
         for augmented_skill_summary in augmented_skill_summaries:
             if augmented_skill_summary.topic_name:
-                assigned_augmented_skill_summaries.append(augmented_skill_summary)
+                assigned_augmented_skill_summaries.append(
+                    augmented_skill_summary)
 
         return assigned_augmented_skill_summaries
 
@@ -329,11 +401,13 @@ def filter_skills_by_classroom(augmented_skill_summaries, classroom_name):
     """Returns the skill summary dicts after filtering by classroom_name.
 
     Args:
-        skill_summary_dicts: list(dict). The list of skill summary dicts.
+        augmented_skill_summaries: list(AugmentedSkillSummary).
+            The list of augmented skill summaries.
         classroom_name: string. The name of the classroom.
 
     Returns:
-        list(dict). The list of skill summary dicts matching the given status.
+        list(AugmentedSkillSummary). The list of augmented
+            skill summaries with the given classroom name.
     """
 
     if not classroom_name or classroom_name == 'All':
@@ -342,7 +416,7 @@ def filter_skills_by_classroom(augmented_skill_summaries, classroom_name):
     augmented_skill_summaries_with_classroom_name = []
     for augmented_skill_summary in augmented_skill_summaries:
         if (augmented_skill_summary.classroom_name and
-                augmented_skill_summary == classroom_name):
+                augmented_skill_summary.classroom_name == classroom_name):
             augmented_skill_summaries_with_classroom_name.append(
                 augmented_skill_summary)
 
@@ -353,13 +427,14 @@ def is_keyword_present_in_skill(augmented_skill_summary, keywords):
     """Returns whether the keywords match the skill description.
 
     Args:
-        skill_summary_dict: dict. The skill summary dict.
-        keywords: list(string). The keywords to match.
+        augmented_skill_summary: list(AugmentedSkillSummary).
+            The augmented skill summaries.
+        keywords: list(str). The keywords to match.
 
     Returns:
-        bool(dict). The list of skill summary dicts matching the given status.
+        bool. A boolean indicating if any of the keywords exist in the given
+        augmented skill summary.
     """
-
     for keyword in keywords:
         if augmented_skill_summary.description.lower().find(
                 keyword.lower()) != -1:
@@ -371,11 +446,13 @@ def filter_skills_by_keywords(augmented_skill_summaries, keywords):
     """Returns whether the keywords match the skill description.
 
     Args:
-        skill_summary_dicts: list(dict). The list of skill summary dicts.
+        augmented_skill_summaries: list(AugmentedSkillSummary).
+            The augmented skill summaries.
         keywords: list(string). The keywords to match.
 
     Returns:
-        bool(dict). The list of skill summary dicts matching the given status.
+        list(AugmentedSkillSummary). The list of augmented skill summaries
+        matching the given keywords.
     """
     if not keywords:
         return augmented_skill_summaries

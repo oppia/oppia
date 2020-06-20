@@ -11,12 +11,12 @@
     <tr>
       <th ng-repeat="key in $ctrl.SKILL_HEADINGS"
           class="dashboard-table-headings">
-        <p ng-if="key === 'index'"></p>
-        <p ng-if="key === 'description'" id="dashboard-table-heading-skills-description"> Skill Description </p>
-        <p ng-if="key === 'worked_examples_count'"> Worked Examples </p>
-        <p ng-if="key === 'misconception_count'"> Misconceptions </p>
-        <p ng-if="key === 'status'"> Status </p>
-        <p ng-if="key === 'options'"> Options </p>
+        <p ng-if="key === 'index'" class="text-center"></p>
+        <p ng-if="key === 'description'" class="text-left">Skill Description</p>
+        <p ng-if="key === 'worked_examples_count'" class="text-center">Worked Examples</p>
+        <p ng-if="key === 'misconception_count'" class="text-center">Misconceptions</p>
+        <p ng-if="key === 'status'" class="text-center">Status</p>
+        <p ng-if="key === 'options'" class="text-center">Options</p>
       </th>
     </tr>
     <tr ng-repeat="skill in getSkillSummaries() track by $index"
@@ -29,12 +29,12 @@
         <a ng-href="<[getSkillEditorUrl(skill.id)]>" class="list-summary">
           <div class="skill-description protractor-test-skill-description"> <[skill.description]> </div>
           <div class="skill-topic">
-            <span ng-if="!skill.topic">
-            Unassigned
+            <span ng-if="!skill.topic_name">
+              Unassigned
               <i class="fa fa-exclamation-triangle"></i>
             </span>
-            <span ng-if="skill.topic">
-              <[skill.topic]>
+            <span ng-if="skill.topic_name">
+              <[skill.topic_name]>
             </span>
           </div>
         </a>
@@ -51,10 +51,10 @@
       </td>
       <td>
         <a ng-href="<[getSkillEditorUrl(skill.id)]>" class="list-summary text-center">
-          <span ng-if="skill.topic">
+          <span ng-if="skill.topic_name">
             Assigned
           </span>
-          <span ng-if="!skill.topic">
+          <span ng-if="!skill.topic_name">
             Not Assigned
           </span>
         </a>
@@ -103,18 +103,23 @@
   skills-list .dashboard-table-index-column {
     width: 5%;
   }
+
   skills-list .dashboard-table-description-column {
     width: 25%;
   }
+
   skills-list .dashboard-table-examples-column {
     width: 10%;
   }
+
   skills-list .dashboard-table-misconception-column {
     width: 10%;
   }
+
   skills-list .dashboard-table-skill-column {
     width: 15%;
   }
+
   skills-list .dashboard-table-status-column {
     width: 20%;
   }
@@ -145,16 +150,8 @@
 
   skills-list .dashboard-table .dashboard-table-headings {
     border-bottom: 2px solid #bbb;
-    text-align: center;
     padding-bottom: 0.7em;
-  }
-  skills-list #dashboard-table-heading-skills-description {
-    text-align: left;
-    width: 100%;
-    display: inline-block;
-  }
-  skills-list .dashboard-table .dashboard-table-headings p {
-    display: inline;
+    text-align: center;
   }
 
   skills-list .list-summary,
@@ -170,10 +167,10 @@
   }
 
   skills-list .skill-edit-options {
+    align-items: center;
     display: flex;
     flex-wrap: wrap;
     justify-content: space-evenly;
-    align-items: center;
   }
 
   skills-list .hoverable-cell {
@@ -181,8 +178,8 @@
   }
 
   skills-list .merge-skill .merge-skill-icon {
-    width: 20px;
     cursor: pointer;
+    width: 20px;
   }
 
   skills-list .list-summary span {
@@ -197,8 +194,8 @@
 
   @media (max-width: 768px) {
     skills-list .list-view-item {
+      margin: 0;
       width: 100%;
-      margin: 0 0 0 0;
     }
   }
 </style>

@@ -255,23 +255,42 @@ class SkillSummaryModel(base_models.BaseModel):
 
     @classmethod
     def fetch_page(cls, page_size, cursor, sort_by):
+        """Returns the models according to values specified.
+
+        Args:
+            page_size: number. Number of skills to fetch
+            cursor: str. The cursor to the next page.
+            sort_by: str. A string indicating how to sort the result.
+
+        Returns:
+            4-tuple(query_models, next_cursor, more, total_count). where:
+                query_models: list(AugmentedSkillSummary). The list of summaries
+                    of skills starting at the given cursor.
+                next_cursor: str or None. A query cursor pointing to the next
+                    batch of results. If there are no more results,
+                    this might be None.
+                more: bool. If True, there are (probably) more results after
+                    this batch. If False, there are no further results
+                    after this batch.
+                total_count: number. Total count of skill models.
+        """
         cursor = datastore_query.Cursor(urlsafe=cursor)
-        sort = cls.skill_model_created_on
+        sort = -cls.skill_model_created_on
         if sort_by == (
                 constants.TOPIC_SKILL_DASHBOARD_SORT_OPTIONS[
                     'DecreasingCreatedOn']):
-            sort = -cls.skill_model_created_on
+            sort = cls.skill_model_created_on
         elif sort_by == (
                 constants.TOPIC_SKILL_DASHBOARD_SORT_OPTIONS[
                     'IncreasingUpdatedOn']):
-            sort = cls.skill_model_last_updated
+            sort = -cls.skill_model_last_updated
         elif sort_by == (
                 constants.TOPIC_SKILL_DASHBOARD_SORT_OPTIONS[
                     'DecreasingUpdatedOn']):
-            sort = -cls.skill_model_last_updated
+            sort = cls.skill_model_last_updated
 
         query_models, next_cursor, more = (
-            cls.query().order(sort).
-            fetch_page(page_size, start_cursor=cursor))
+            cls.query().order(sort).fetch_page(page_size, start_cursor=cursor))
         next_cursor = next_cursor.urlsafe() if (next_cursor and more) else None
-        return query_models, next_cursor, more
+        total_count = cls.get_all().count()
+        return query_models, next_cursor, more, total_count

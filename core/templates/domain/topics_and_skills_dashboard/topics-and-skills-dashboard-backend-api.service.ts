@@ -29,47 +29,47 @@ import {
 } from 'domain/topics_and_skills_dashboard/TopicsAndSkillsDashboardFilterObjectFactory';
 
 export interface ITopicSummaryBackendDict {
-    'id': string;
-    'name': string;
-    'classroom': string;
-    'language_code': string;
-    'description': string;
-    'version': number;
-    'is_published': boolean;
-    'canonical_story_count': number;
-    'additional_story_count': number;
-    'uncategorized_skill_count': number;
-    'subtopic_count': number;
-    'total_skill_count': number;
-    'topic_model_created_on': number;
-    'topic_model_last_updated': number;
-  }
+  'id': string;
+  'name': string;
+  'classroom': string;
+  'language_code': string;
+  'description': string;
+  'version': number;
+  'is_published': boolean;
+  'canonical_story_count': number;
+  'additional_story_count': number;
+  'uncategorized_skill_count': number;
+  'subtopic_count': number;
+  'total_skill_count': number;
+  'topic_model_created_on': number;
+  'topic_model_last_updated': number;
+}
 
-  interface ISkillSummaryBackendDict {
-    'id': string;
-    'description': string;
-    'language_code': string;
-    'version': number;
-    'misconception_count': number;
-    'worked_examples_count': number;
-    'skill_model_created_on': number;
-    'skill_model_last_updated': number;
-  }
+interface ISkillSummaryBackendDict {
+  'id': string;
+  'description': string;
+  'language_code': string;
+  'version': number;
+  'misconception_count': number;
+  'worked_examples_count': number;
+  'skill_model_created_on': number;
+  'skill_model_last_updated': number;
+}
 
-  interface ITopicsAndSkillsDashboardDataBackendDict {
-    'all_classroom_names': string[];
-    'untriaged_skill_summary_dicts': ISkillSummaryBackendDict[];
-    'mergeable_skill_summary_dicts': ISkillSummaryBackendDict[];
-    'topic_summary_dicts': ITopicSummaryBackendDict[];
-    'can_delete_topic': boolean;
-    'can_create_topic': boolean;
-    'can_delete_skill': boolean;
-    'can_create_Skill': boolean;
-  }
+interface ITopicsAndSkillsDashboardDataBackendDict {
+  'all_classroom_names': string[];
+  'untriaged_skill_summary_dicts': ISkillSummaryBackendDict[];
+  'mergeable_skill_summary_dicts': ISkillSummaryBackendDict[];
+  'topic_summary_dicts': ITopicSummaryBackendDict[];
+  'can_delete_topic': boolean;
+  'can_create_topic': boolean;
+  'can_delete_skill': boolean;
+  'can_create_Skill': boolean;
+}
 
 interface ISkillsDashboardDataBackendDict {
-    'skill_summary_dicts': ISkillSummaryBackendDict[];
-    'total_skill_count': number
+  'skill_summary_dicts': ISkillSummaryBackendDict[];
+  'total_skill_count': number
 }
 
 @Injectable({
@@ -86,16 +86,15 @@ export class TopicsAndSkillsDashboardBackendApiService {
 
   fetchSkillsDashboardData(
       filter: TopicsAndSkillsDashboardFilter,
-      pageNumber, itemsPerPage, nextCursor): Promise<ISkillsDashboardDataBackendDict> {
+      itemsPerPage, nextCursor): Promise<ISkillsDashboardDataBackendDict> {
     return this.http.post<ISkillsDashboardDataBackendDict>(
       TopicsAndSkillsDashboardDomainConstants.SKILL_DASHBOARD_DATA_URL, {
-        classroomName: filter.classroom,
+        classroom_name: filter.classroom,
         status: filter.status,
         sort: filter.sort,
         keywords: filter.keywords,
-        pageNumber,
-        itemsPerPage,
-        nextCursor: nextCursor
+        items_per_page: itemsPerPage,
+        next_cursor: nextCursor
       }).toPromise();
   }
 
