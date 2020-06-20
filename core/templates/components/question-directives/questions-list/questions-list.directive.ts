@@ -221,7 +221,7 @@ angular.module('oppia').directive('questionsList', [
             ctrl.questionStateData = ctrl.question.getStateData();
             ctrl.questionIsBeingUpdated = false;
             ctrl.newQuestionIsBeingCreated = true;
-            ctrl.openQuestionEditor();
+            ctrl.openQuestionEditor(ctrl.newQuestionSkillDifficulties[0]);
           };
 
           ctrl.createQuestion = function() {
@@ -466,6 +466,26 @@ angular.module('oppia').directive('questionsList', [
             var groupedSkillSummaries = ctrl.getGroupedSkillSummaries();
             var selectedSkillId = ctrl.selectedSkillId;
             $location.hash(questionId);
+            var skillIdToNameMapping = (
+              ctrl.getAllSkillSummaries().reduce((obj, skill) => (
+                obj[skill.getId()] = skill.getDescription(), obj), {}));
+            var skillIdToRubricMapping = ctrl.getSkillIdToRubricsObject();
+            var skillNames = [];
+            var rubrics = [];
+            if (ctrl.newQuestionIsBeingCreated &&
+                ctrl.selectSkillModalIsShown()) {
+              skillNames = ctrl.newQuestionSkillIds.map(
+                skillId => skillIdToNameMapping[skillId]);
+              rubrics = ctrl.newQuestionSkillIds.map(
+                (skillId, index) => skillIdToRubricMapping[skillId].find(
+                  rubric => rubric.getDifficulty() === ctrl.getDifficultyString(
+                    parseFloat(ctrl.newQuestionSkillDifficulties[index]))));
+            } else {
+              skillNames = [skillIdToNameMapping[ctrl.selectedSkillId]];
+              rubrics = [skillIdToRubricMapping[ctrl.selectedSkillId].find(
+                rubric => rubric.getDifficulty() === ctrl.getDifficultyString(
+                  parseFloat(questionDifficulty)))];
+            }
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/components/question-directives/modal-templates/' +
@@ -475,13 +495,15 @@ angular.module('oppia').directive('questionsList', [
               resolve: {
                 associatedSkillSummaries: () => associatedSkillSummaries,
                 canEditQuestion: () => canEditQuestion,
+                categorizedSkills: () => categorizedSkills,
                 groupedSkillSummaries: () => groupedSkillSummaries,
                 misconceptionsBySkill: () => misconceptionsBySkill,
                 newQuestionIsBeingCreated: () => newQuestionIsBeingCreated,
                 question: () => question,
                 questionId: () => questionId,
                 questionStateData: () => questionStateData,
-                categorizedSkills: () => categorizedSkills
+                rubrics: () => rubrics,
+                skillNames: () => skillNames
               },
               controller: 'QuestionEditorModalController',
             }).result.then(function(modalObject) {

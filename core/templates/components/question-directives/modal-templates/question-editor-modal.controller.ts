@@ -35,13 +35,15 @@ angular.module('oppia').controller('QuestionEditorModalController', [
   'associatedSkillSummaries', 'canEditQuestion',
   'categorizedSkills', 'groupedSkillSummaries', 'misconceptionsBySkill',
   'newQuestionIsBeingCreated', 'question', 'questionId', 'questionStateData',
+  'rubrics', 'skillNames',
   function(
       $scope, $uibModal, $uibModalInstance, AlertsService,
       QuestionUndoRedoService, QuestionValidationService,
       SkillSummaryObjectFactory, UrlInterpolationService,
       associatedSkillSummaries, canEditQuestion,
       categorizedSkills, groupedSkillSummaries, misconceptionsBySkill,
-      newQuestionIsBeingCreated, question, questionId, questionStateData) {
+      newQuestionIsBeingCreated, question, questionId, questionStateData,
+      rubrics, skillNames) {
     var returnModalObject = {
       skillLinkageModificationsArray: [],
       commitMessage: ''
@@ -54,6 +56,8 @@ angular.module('oppia').controller('QuestionEditorModalController', [
     $scope.misconceptionsBySkill = misconceptionsBySkill;
     $scope.canEditQuestion = canEditQuestion;
     $scope.newQuestionIsBeingCreated = newQuestionIsBeingCreated;
+    $scope.skillNames = skillNames;
+    $scope.rubrics = rubrics;
 
     $scope.getSkillEditorUrl = function(skillId) {
       return '/skill_editor/' + skillId;

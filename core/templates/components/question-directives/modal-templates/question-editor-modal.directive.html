@@ -4,6 +4,16 @@
   </h3>
 </div>
 <div class="modal-body" style="width: 96%; margin-left: 2%;">
+  <div class="rubric-details" ng-repeat="skillName in skillNames track by $index">
+    <h4 ng-if="skillName"><strong>Skill: <[skillName]></strong></h4>
+    <h4><strong>Difficulty: <[rubrics[$index].getDifficulty()]></strong></h4>
+    <h4 ng-if="rubrics[$index].getExplanations().length > 0"><strong>Difficulty Explanations</strong></h4>
+    <ul>
+      <li ng-repeat="explanation in rubrics[$index].getExplanations()">
+        <span ng-bind-html="explanation"></span>
+      </li>
+    </ul>
+  </div>
   <div ng-if="!newQuestionIsBeingCreated">
     <h4> <strong> Linked Skills </strong> </h4>
     <md-card class="question-skill-id" ng-repeat="skill in associatedSkillSummaries">
@@ -63,6 +73,9 @@
   }
   .question-skill-id:hover {
     background-color: #e0e0e0;
+  }
+  .rubric-details {
+    padding: 10px 0;
   }
   .skill-description-card {
     height: 2.5em;

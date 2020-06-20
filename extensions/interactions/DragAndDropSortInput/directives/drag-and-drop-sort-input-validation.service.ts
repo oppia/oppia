@@ -189,6 +189,19 @@ export class DragAndDropSortInputValidationService {
                 message: 'Please ensure the items are unique.'
               });
             }
+
+            if (!customizationArgs.allowMultipleItemsInSamePosition.value &&
+                rule.type === (
+                  'IsEqualToOrderingWithOneItemAtIncorrectPosition')) {
+              warningsList.push({
+                type: AppConstants.WARNING_TYPES.ERROR,
+                message: (
+                  'Rule ' + (j + 1) + ' from answer group ' +
+                  (i + 1) + ' will never be matched because there will be ' +
+                  'at least 2 elements at incorrect positions if multiple ' +
+                  'elements cannot occupy the same position.')
+              });
+            }
             break;
           default:
         }
