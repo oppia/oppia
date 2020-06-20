@@ -109,6 +109,8 @@ angular.module('oppia').directive('topicEditorNavbar', [
                   var successToast = 'Mail Sent.';
                   AlertsService.addSuccessMessage(
                     successToast, 1000);
+                  // TODO(#8521): Remove the use of $rootScope.$apply()
+                  // once the directive is migrated to angular
                   $rootScope.$apply();
                 });
               }, function() {
@@ -134,6 +136,8 @@ angular.module('oppia').directive('topicEditorNavbar', [
               }
               AlertsService.addSuccessMessage(
                 successToast, 1000);
+              // TODO(#8521): Remove the use of $rootScope.$apply()
+              // once the directive is migrated to angular
               $rootScope.$apply();
             });
           };
@@ -196,6 +200,8 @@ angular.module('oppia').directive('topicEditorNavbar', [
               function() {
                 $scope.topicRights.markTopicAsUnpublished();
                 TopicEditorStateService.setTopicRights($scope.topicRights);
+                // TODO(#8521): Remove the use of $rootScope.$apply()
+                // once the directive is migrated to angular
                 $rootScope.$apply();
               });
           };
