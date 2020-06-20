@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Domain object for a high bounce-rate improvements task.
+ * @fileoverview Domain object for a needs guiding responses improvements task.
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
@@ -93,11 +93,6 @@ export class NeedsGuidingResponsesTaskObjectFactory {
     });
   }
 
-  /**
-   * Returns list of tasks for each of the given state names when their stats
-   * demonstrate a high bounce rate. Otherwise, corresponding index will be
-   * null.
-   */
   createFromAnswerStats(
       expId: string, expVersion: number, stateName: string,
       answerStats: AnswerStats[]): NeedsGuidingResponsesTask {
@@ -106,10 +101,6 @@ export class NeedsGuidingResponsesTaskObjectFactory {
     return task;
   }
 
-  /**
-   * Returns a new task from the given backend dict, or null if the dict does
-   * not represent a high bounce rate task.
-   */
   createFromBackendDict(
       backendDict: ITaskEntryBackendDict): NeedsGuidingResponsesTask {
     return new NeedsGuidingResponsesTask(backendDict);

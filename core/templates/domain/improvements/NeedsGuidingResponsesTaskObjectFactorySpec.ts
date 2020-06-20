@@ -74,7 +74,7 @@ describe('Needs guiding responses task', function() {
     expect(task.isObsolete()).toBeTrue();
   });
 
-  it('should create from a need guiding responses task backend dict', () => {
+  it('should create from an NGR task backend dict', () => {
     const task = needsGuidingResponsesTaskObjectFactory.createFromBackendDict({
       entity_type: 'exploration',
       entity_id: 'eid',
