@@ -259,13 +259,13 @@ angular.module('oppia').component('svgFilenameEditor', {
           obj.removeAttribute('xml:space');
         });
         var elements = svg.querySelectorAll('*');
-        for (var i=0; i < elements.length; i++) {
+        for (var i = 0; i < elements.length; i++) {
           if (
             elements[i].getAttributeNames().indexOf('vector-effect') !== -1) {
-              elements[i].removeAttribute('vector-effect');
-              var style = elements[i].getAttribute('style');
-              style += ' vector-effect: non-scaling-stroke';
-              elements[i].setAttribute('style', style);
+            elements[i].removeAttribute('vector-effect');
+            var style = elements[i].getAttribute('style');
+            style += ' vector-effect: non-scaling-stroke';
+            elements[i].setAttribute('style', style);
           }
         }
         return svg.outerHTML;
