@@ -20,7 +20,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
-import { ITopicRightsBackendDataDict, TopicRightsResponseObjectFactory } from
+import { ITopicRightsBackendDict, TopicRightsResponseObjectFactory } from
   'domain/topic/TopicRightsResponseObjectFactory';
 import { TopicDomainConstants } from
   'domain/topic/topic-domain.constants';
@@ -35,9 +35,9 @@ import cloneDeep from 'lodash/cloneDeep';
 export class TopicRightsBackendApiService {
   constructor(
     private http: HttpClient,
-    private urlInterpolation: UrlInterpolationService,
     private topicRightsResponseObjectFactory:
-      TopicRightsResponseObjectFactory) {}
+      TopicRightsResponseObjectFactory,
+    private urlInterpolation: UrlInterpolationService) {}
   // Maps previously loaded topic rights to their IDs.
   private topicRightsCache = {};
 
@@ -50,8 +50,8 @@ export class TopicRightsBackendApiService {
         topic_id: topicId
       });
 
-    this.http.get(topicRightsUrl).toPromise().then(
-      (response: ITopicRightsBackendDataDict) => {
+    this.http.get<ITopicRightsBackendDict>(topicRightsUrl).toPromise().then(
+      (response) => {
         let res =
           this.topicRightsResponseObjectFactory.createFromBackendDict(response);
         if (successCallback) {
@@ -78,9 +78,9 @@ export class TopicRightsBackendApiService {
       publish_status: publishStatus
     };
 
-    this.http.put(
+    this.http.put<number>(
       changeTopicStatusUrl, putParams).toPromise().then(
-      (response: number) => {
+      (response) => {
         this.topicRightsCache[topicId] = response;
         if (successCallback) {
           successCallback(response);
@@ -106,8 +106,8 @@ export class TopicRightsBackendApiService {
       topic_name: topicName
     };
 
-    this.http.put(sendMailUrl, putParams).toPromise().then(
-      (response: number) => {
+    this.http.put<number>(sendMailUrl, putParams).toPromise().then(
+      (response) => {
         if (successCallback) {
           successCallback();
         }
@@ -172,7 +172,7 @@ export class TopicRightsBackendApiService {
    * Replaces the current topic rights in the cache given by the
    * specified topic ID with a new topic rights object.
    */
-  cacheTopicRights(topicId: string, topicRights: any): void {
+  cacheTopicRights(topicId: string, topicRights: ITopicRightsBackendDict): void {
     this.topicRightsCache[topicId] = cloneDeep(topicRights);
   }
 
@@ -185,7 +185,7 @@ export class TopicRightsBackendApiService {
     });
   }
 
-  sendMail(topicId: string, topicName): Promise<Object> {
+  sendMail(topicId: string, topicName: string): Promise<Object> {
     return new Promise((resolve, reject) => {
       this._sendMail(topicId, topicName, resolve, reject);
     });

@@ -21,7 +21,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 
-export interface ITopicRightsBackendDataDict {
+export interface ITopicRightsBackendDict {
   'topic_id': number,
   'topic_is_published': boolean,
   'manager_ids': Array<string>
@@ -30,11 +30,11 @@ export interface ITopicRightsBackendDataDict {
 export class TopicRightsResponseData {
   topicId: number;
   topicIsPublished: boolean;
-  managerIds: Array<string>;
+  managerIds: string[];
   constructor(
       topicId: number,
       topicIsPublished: boolean,
-      managerIds: Array<string>
+      managerIds: string[]
   ) {
     this.topicId = topicId;
     this.topicIsPublished = topicIsPublished;
@@ -49,7 +49,7 @@ export class TopicRightsResponseData {
     return this.topicIsPublished;
   }
 
-  getManagerIds(): Array<string> {
+  getManagerIds(): string[] {
     return this.managerIds;
   }
 }
@@ -59,7 +59,7 @@ export class TopicRightsResponseData {
 })
 export class TopicRightsResponseObjectFactory {
   createFromBackendDict(
-      topicRightsBackendDataDict: ITopicRightsBackendDataDict):
+      topicRightsBackendDataDict: ITopicRightsBackendDict):
     TopicRightsResponseData {
     return new TopicRightsResponseData (
       topicRightsBackendDataDict.topic_id,
