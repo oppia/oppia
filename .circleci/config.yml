@@ -111,6 +111,7 @@ jobs:
           command: |
             files_changed=$(git diff --name-only develop...$CIRCLE_BRANCH)
             echo $files_changed
+            echo 'hi'
             if [ "$files_changed" != "AUTHORS CHANGELOG CONTRIBUTORS core/templates/pages/about-page/about-page.constants.ts" ]; then
               echo 'export RUN_TESTS=true' >> $BASH_ENV
             else
@@ -181,6 +182,7 @@ jobs:
           name: Run backend tests
           command: |
             echo $RUN_TESTS
+            echo 'hi1'
             if [ "$RUN_TESTS" == 'true' ]; then
               python -m scripts.run_backend_tests --generate_coverage_report --exclude_load_tests
             fi

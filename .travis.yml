@@ -69,6 +69,9 @@ script:
 - files_changed=$(git diff --name-only develop...$TRAVIS_BRANCH)
 - RUN_TESTS=true
 - if [ "$files_changed" == "AUTHORS CHANGELOG CONTRIBUTORS core/templates/pages/about-page/about-page.constants.ts" ]; then RUN_TESTS=false; fi
+- echo $RUN_TESTS
+- echo $files_changed
+- echo 'hi'
 # Run the e2e tests in the production environment (using --prod_env).
 - if [ "$RUN_E2E_TESTS_ADDITIONAL_EDITOR_FEATURES" == 'true' ] && [ "$RUN_TESTS" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite="additionalEditorFeatures" --prod_env; fi
 - if [ "$RUN_E2E_TESTS_ADDITIONAL_PLAYER_FEATURES" == 'true' ] && [ "$RUN_TESTS" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite="additionalPlayerFeatures" --prod_env; fi
