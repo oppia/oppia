@@ -32,6 +32,11 @@ angular.module('oppia').component('errorPage', {
       ctrl.getStatusCode = function() {
         return Number(ctrl.statusCode);
       };
+
+      ctrl.getStaticImageUrl = function(imagePath) {
+        return UrlInterpolationService.getStaticImageUrl(imagePath);
+      };
+
       ctrl.$onInit = function() {
         ctrl.oopsMintImgUrl = UrlInterpolationService.getStaticImageUrl(
           '/general/oops_mint.png');
