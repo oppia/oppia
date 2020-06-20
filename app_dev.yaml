@@ -356,8 +356,8 @@ skip_files:
 - third_party/static/ckeditor-bootstrapck-1.0.0/skins/bootstrapck/sample/
 - third_party/static/ckeditor-bootstrapck-1.0.0/skins/bootstrapck/scss/
 - third_party/static/fontawesome-free-5.9.0-web/
-- third_party/static/guppy-b5055b/site/
-- third_party/static/guppy-b5055b/test/
+- third_party/static/guppy-175999/site/
+- third_party/static/guppy-175999/test/
 # LiterallyCanvas is used from the npm package and only the images
 # are used from the third_party library. So we exclude all other folders.
 - third_party/static/literallycanvas-0.5.2/demo/
