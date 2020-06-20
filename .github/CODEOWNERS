@@ -25,6 +25,7 @@
 /core/templates/filters/translate.pipe.ts @bansalnitish
 /core/templates/services/contextual/logger.service.ts @bansalnitish
 /core/templates/services/contextual/logger.service.spec.ts @bansalnitish
+/core/templates/services/guppy-configuration.service.ts @bansalnitish
 /core/templates/services/i18n-language-code.service.ts @bansalnitish
 /core/templates/services/loader.service*.ts @bansalnitish
 /core/templates/services/question-validation.service*.ts @bansalnitish
