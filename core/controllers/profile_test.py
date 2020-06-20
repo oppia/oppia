@@ -289,9 +289,8 @@ class PreferencesHandlerTests(test_utils.GenericTestBase):
         self.login(self.OWNER_EMAIL)
         csrf_token = self.get_new_csrf_token()
         user_settings = user_services.get_user_settings(self.owner_id)
-        self.assertTrue(
-            user_settings.profile_picture_data_url.startswith(
-                'data:image/png;'))
+        self.assertTrue(test_utils.check_image_png_or_webp(
+            user_settings.profile_picture_data_url))
         self.put_json(
             feconf.PREFERENCES_DATA_URL,
             payload={'update_type': 'profile_picture_data_url',
