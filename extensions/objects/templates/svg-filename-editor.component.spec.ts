@@ -59,8 +59,8 @@ describe('SvgFilenameEditor', function() {
     convertImageDataToImageFile: function(svgDataUri) {
       return new Blob();
     },
-    generateImageFilename: function(height, widht, extension) {
-      return height + '_' + widht + '.' + extension;
+    generateImageFilename: function(height, width, extension) {
+      return height + '_' + width + '.' + extension;
     },
     getInvalidSvgTagsAndAttrs: function(dataUri) {
       return { tags: [], attrs: [] };
