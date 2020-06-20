@@ -28,10 +28,24 @@ describe('Playthrough Issue Object Factory', () => {
 
   it('should create a new exploration issue', () => {
     playthroughIssueObject = new PlaythroughIssue(
-      'EarlyQuit', {}, [], 1, true);
+      'EarlyQuit', {
+        state_name: {
+          value: 'state'
+        },
+        time_spent_in_exp_in_msecs: {
+          value: 1.2
+        }
+      }, [], 1, true);
 
     expect(playthroughIssueObject.issueType).toEqual('EarlyQuit');
-    expect(playthroughIssueObject.issueCustomizationArgs).toEqual({});
+    expect(playthroughIssueObject.issueCustomizationArgs).toEqual({
+      state_name: {
+        value: 'state'
+      },
+      time_spent_in_exp_in_msecs: {
+        value: 1.2
+      }
+    });
     expect(playthroughIssueObject.playthroughIds).toEqual([]);
     expect(playthroughIssueObject.schemaVersion).toEqual(1);
     expect(playthroughIssueObject.isValid).toEqual(true);
@@ -40,14 +54,28 @@ describe('Playthrough Issue Object Factory', () => {
   it('should create a new exploration issue from a backend dict', () => {
     const playthroughIssueObject = piof.createFromBackendDict({
       issue_type: 'EarlyQuit',
-      issue_customization_args: {},
+      issue_customization_args: {
+        state_name: {
+          value: 'state'
+        },
+        time_spent_in_exp_in_msecs: {
+          value: 1.2
+        }
+      },
       playthrough_ids: [],
       schema_version: 1,
       is_valid: true
     });
 
     expect(playthroughIssueObject.issueType).toEqual('EarlyQuit');
-    expect(playthroughIssueObject.issueCustomizationArgs).toEqual({});
+    expect(playthroughIssueObject.issueCustomizationArgs).toEqual( {
+      state_name: {
+        value: 'state'
+      },
+      time_spent_in_exp_in_msecs: {
+        value: 1.2
+      }
+    });
     expect(playthroughIssueObject.playthroughIds).toEqual([]);
     expect(playthroughIssueObject.schemaVersion).toEqual(1);
     expect(playthroughIssueObject.isValid).toEqual(true);
@@ -56,7 +84,14 @@ describe('Playthrough Issue Object Factory', () => {
   it('should convert exploration issue to backend dict', () => {
     const playthroughDict = {
       issue_type: 'EarlyQuit',
-      issue_customization_args: {},
+      issue_customization_args: {
+        state_name: {
+          value: 'state'
+        },
+        time_spent_in_exp_in_msecs: {
+          value: 1.2
+        }
+      },
       playthrough_ids: [],
       schema_version: 1,
       is_valid: true

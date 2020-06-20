@@ -121,7 +121,10 @@ describe('PlaythroughIssuesBackendApiService', () => {
               state_name: { value: 'state_name1' }
             },
             schema_version: 1
-          }]
+          }],
+          playthrough_ids: ['pID'],
+          schema_version: 2,
+          is_valid: true
         };
 
         let successHandler = jasmine.createSpy('success');
