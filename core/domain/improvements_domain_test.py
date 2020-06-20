@@ -65,8 +65,7 @@ class TaskEntryTests(test_utils.GenericTestBase):
             feconf.DEFAULT_INIT_STATE_NAME, 'issue description',
             improvements_models.TASK_STATUS_RESOLVED, self.owner_id,
             self.MOCK_DATE)
-        self.assertEqual(
-            task_entry.composite_entity_id, 'exploration.eid.1')
+        self.assertEqual(task_entry.composite_entity_id, 'exploration.eid.1')
 
     def test_to_dict_has_expected_value(self):
         task_entry = improvements_domain.TaskEntry(
@@ -100,7 +99,7 @@ class TaskEntryTests(test_utils.GenericTestBase):
             feconf.DEFAULT_INIT_STATE_NAME, 'issue description',
             improvements_models.TASK_STATUS_RESOLVED, invalid_resolver_id,
             self.MOCK_DATE)
-        with self.assertRaisesRegexp(Exception, 'User not found.'):
+        with self.assertRaisesRegexp(Exception, 'User not found'):
             task_entry.to_dict()
 
     def test_can_create_open_task_with_corresponding_values(self):

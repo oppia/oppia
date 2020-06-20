@@ -60,14 +60,13 @@ TASK_TYPES = (
 
 
 class TaskEntryModel(base_models.BaseModel):
-    """Task entry corresponding to an actionable task in the improvements tab.
+    """Model representation of an actionable task from the improvements tab.
 
-    Instances have an ID of the form:
-        [entity_type].[entity_id].[entity_version].[task_type].[target_type].
-        [target_id]
+    Value has the form: "[entity_type].[entity_id].[entity_version].
+                         [task_type].[target_type].[target_id]"
     """
-    # Utility field that gives a speedup of ~20% compared to querying by each of
-    # the invididual fields.
+    # Utility field which results in a 20% speedup compared to querying by each
+    # of the invididual fields used to compose it.
     # Value has the form: "[entity_type].[entity_id].[entity_version]".
     composite_entity_id = ndb.StringProperty(
         required=True, indexed=True)

@@ -301,19 +301,24 @@ class FetchExplorationTasksTests(ImprovementsServicesTestBase):
             })
 
 
-class FetchTaskHistoryPageTests(ImprovementsServicesTestBase):
-    """Unit tests for the fetch_task_history_page function."""
+class FetchExplorationTaskHistoryPageTests(ImprovementsServicesTestBase):
+    """Unit tests for the fetch_exploration_task_history_page function."""
 
     def setUp(self):
-        super(FetchTaskHistoryPageTests, self).setUp()
+        super(FetchExplorationTaskHistoryPageTests, self).setUp()
         task_entries = []
         for i in python_utils.RANGE(1, 26):
             task_entry = self._new_resolved_task(
                 state_name='State %d' % (i,), exploration_version=i)
             task_entry.resolved_on = (
                 self.MOCK_DATE + datetime.timedelta(minutes=5 * i))
+            # last_updated of tasks are descending to ensure that the tasks
+            # returned are ordered by resolved_on instead.
+            task_entry.last_updated = (
+                self.MOCK_DATE - datetime.timedelta(minutes=5 * i))
             task_entries.append(task_entry)
-        improvements_services.put_tasks(task_entries)
+        improvements_services.put_tasks(
+            task_entries, update_last_updated_time=False)
 
     def test_fetch_returns_first_page_of_history(self):
         results, cursor, more = (
@@ -473,7 +478,7 @@ class ApplyChangesToModelTests(ImprovementsServicesTestBase):
             improvements_models.TaskEntryModel.get_by_id(task_entry.task_id))
         task_entry.target_id = 'Different State'
 
-        with self.assertRaisesRegexp(Exception, 'Wrong model was provided'):
+        with self.assertRaisesRegexp(Exception, 'Wrong model provided'):
             improvements_services.apply_changes_to_model(
                 task_entry, task_entry_model)
 

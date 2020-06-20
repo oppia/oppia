@@ -35,7 +35,7 @@ from google.appengine.datastore import datastore_query
 
 
 def _yield_all_tasks_ordered_by_status(composite_entity_id):
-    """Yields all tasks corresponding to the given entity in storage.
+    """Yields all of the tasks corresponding to the given entity in storage.
 
     Args:
         composite_entity_id: str. The identifier for the specific entity being
@@ -43,13 +43,12 @@ def _yield_all_tasks_ordered_by_status(composite_entity_id):
             TaskEntryModel.generate_composite_entity_id.
 
     Yields:
-        iterable(improvements_domain.TaskEntry). All of the task entries
-            corresponding to the given composite_entity_id.
+        improvements_domain.TaskEntry. All of the tasks corresponding to the
+            given composite_entity_id.
     """
     query = improvements_models.TaskEntryModel.query(
-        improvements_models.TaskEntryModel.composite_entity_id == (
-            composite_entity_id)
-        ).order(improvements_models.TaskEntryModel.status)
+        improvements_models.TaskEntryModel.composite_entity_id ==
+        composite_entity_id).order(improvements_models.TaskEntryModel.status)
     cursor, more = (None, True)
     while more:
         results, cursor, more = query.fetch_page(
@@ -59,7 +58,7 @@ def _yield_all_tasks_ordered_by_status(composite_entity_id):
 
 
 def get_task_entry_from_model(task_entry_model):
-    """Returns a domain object for the corresponding task entry model.
+    """Returns a domain object corresponding to the given task entry model.
 
     Args:
         task_entry_model: improvements_models.TaskEntryModel.
@@ -84,11 +83,12 @@ def fetch_exploration_tasks(exploration):
 
     Returns:
         tuple. Contains the following 2 items:
-            open_tasks: list(improvements_domain.TaskEntry). The list of the
-                tasks which are open.
+            open_tasks: list(improvements_domain.TaskEntry). The list of open
+                tasks.
             resolved_task_types_by_state_name: dict(str: list(str)). Maps state
-                names to the list of resolved task types. Absent keys imply that
-                the state has no resolved tasks.
+                names to the types of resolved tasks corresponding to them, if
+                any. Absent state names imply that the state has no resolved
+                tasks.
     """
     composite_entity_id = (
         improvements_models.TaskEntryModel.generate_composite_entity_id(
@@ -107,17 +107,17 @@ def fetch_exploration_tasks(exploration):
             for t in tasks:
                 resolved_task_types_by_state_name[t.target_id].append(
                     t.task_type)
-    return (open_tasks, dict(resolved_task_types_by_state_name))
+    return open_tasks, dict(resolved_task_types_by_state_name)
 
 
 def fetch_exploration_task_history_page(exploration, urlsafe_start_cursor=None):
-    """Fetches a page of tasks from the provided entity's history of tasks.
+    """Fetches a page from the given exploration's history of resolved tasks.
 
     Args:
         exploration: exp_domain.Exploration.
-        urlsafe_start_cursor: str or None. Starting point for search. When None,
-            the starting point is the very beginning of the history results
-            (i.e. starting from the most recently resolved task entry).
+        urlsafe_start_cursor: str or None. Starting point for the search. When
+            None, the starting point is the very beginning of the history
+            results (i.e. starting from the most recently resolved task entry).
 
     Returns:
         tuple. Contains the following 3 items:
@@ -139,7 +139,7 @@ def fetch_exploration_task_history_page(exploration, urlsafe_start_cursor=None):
             improvements_models.TaskEntryModel.entity_id == exploration.id,
             improvements_models.TaskEntryModel.status == (
                 improvements_models.TASK_STATUS_RESOLVED))
-        .order(-improvements_models.TaskEntryModel.last_updated)
+        .order(-improvements_models.TaskEntryModel.resolved_on)
         .fetch_page(
             feconf.MAX_TASK_MODELS_PER_HISTORY_PAGE, start_cursor=start_cursor))
     return (
@@ -149,35 +149,45 @@ def fetch_exploration_task_history_page(exploration, urlsafe_start_cursor=None):
 
 
 def put_tasks(tasks, update_last_updated_time=True):
-    """Puts each of the given tasks into storage, optionally updating their last
-    updated time.
+    """Puts each of the given tasks into storage if necessary, conditionally
+    updating their last updated time.
+
+    If the values of a task are the same as the corresponding model in storage,
+    then that model will not be updated as part of the put operation.
 
     Args:
-        tasks: list(improvements_domain.TaskEntry). Domain object instances for
-            each task to be placed into storage.
+        tasks: list(improvements_domain.TaskEntry). Domain objects for each task
+            being placed into storage.
         update_last_updated_time: bool. Whether to update the last_updated field
             of the task models.
     """
     task_models = improvements_models.TaskEntryModel.get_multi(
         [t.task_id for t in tasks])
+    models_to_put = []
     for i, (task, model) in enumerate(python_utils.ZIP(tasks, task_models)):
         if model is None:
-            task_models[i] = improvements_models.TaskEntryModel(
-                id=task.task_id, composite_entity_id=task.composite_entity_id,
-                entity_type=task.entity_type, entity_id=task.entity_id,
-                entity_version=task.entity_version, task_type=task.task_type,
-                target_type=task.target_type, target_id=task.target_id,
-                issue_description=task.issue_description, status=task.status,
-                resolver_id=task.resolver_id, resolved_on=task.resolved_on)
-        elif not apply_changes_to_model(task, model):
-            task_models[i] = None
+            models_to_put.append(
+                improvements_models.TaskEntryModel(
+                    id=task.task_id,
+                    composite_entity_id=task.composite_entity_id,
+                    entity_type=task.entity_type,
+                    entity_id=task.entity_id,
+                    entity_version=task.entity_version,
+                    task_type=task.task_type,
+                    target_type=task.target_type,
+                    target_id=task.target_id,
+                    issue_description=task.issue_description,
+                    status=task.status,
+                    resolver_id=task.resolver_id,
+                    resolved_on=task.resolved_on))
+        elif apply_changes_to_model(task, model):
+            models_to_put.append(model)
     improvements_models.TaskEntryModel.put_multi(
-        [m for m in task_models if m is not None],
-        update_last_updated_time=update_last_updated_time)
+        models_to_put, update_last_updated_time=update_last_updated_time)
 
 
 def apply_changes_to_model(task_entry, task_entry_model):
-    """Makes changes to the given model if any differences are found.
+    """Makes changes to the given model when differences are found.
 
     Args:
         task_entry: improvements_domain.TaskEntry.
@@ -187,7 +197,7 @@ def apply_changes_to_model(task_entry, task_entry_model):
         bool. Whether any change was made to the model.
     """
     if task_entry_model.id != task_entry.task_id:
-        raise Exception('Wrong model was provided')
+        raise Exception('Wrong model provided')
     changes_were_made_to_model = False
     if task_entry_model.issue_description != task_entry.issue_description:
         task_entry_model.issue_description = task_entry.issue_description
