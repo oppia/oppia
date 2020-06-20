@@ -135,7 +135,7 @@ class CollectionModel(base_models.VersionedModel):
 
         collection_rights = CollectionRightsModel.get_by_id(self.id)
 
-        # TODO(msl): test if put_async() leads to any problems (make
+        # TODO(msl): Test if put_async() leads to any problems (make
         # sure summary dicts get updated correctly when collections
         # are changed).
         collection_commit_log = CollectionCommitLogEntryModel.create(
@@ -394,7 +394,7 @@ class CollectionRightsModel(base_models.VersionedModel):
             committer_username = (
                 committer_user_settings_model.username
                 if committer_user_settings_model else '')
-            # TODO(msl): test if put_async() leads to any problems (make
+            # TODO(msl): Test if put_async() leads to any problems (make
             # sure summary dicts get updated correctly when collections
             # are changed).
             CollectionCommitLogEntryModel(
