@@ -172,7 +172,8 @@ export class TopicRightsBackendApiService {
    * Replaces the current topic rights in the cache given by the
    * specified topic ID with a new topic rights object.
    */
-  cacheTopicRights(topicId: string, topicRights: ITopicRightsBackendDict): void {
+  cacheTopicRights(topicId: string, topicRights: ITopicRightsBackendDict):
+  void {
     this.topicRightsCache[topicId] = cloneDeep(topicRights);
   }
 
