@@ -554,17 +554,15 @@ def check_bad_pattern_in_file(filepath, file_content, pattern):
             or any(filepath.endswith(excluded_file)
                    for excluded_file in pattern['excluded_files'])):
         bad_pattern_count = 0
-        for line_num, line in enumerate(file_content):
-            stripped_line = line.rstrip()
+        for line_num, line in enumerate(file_content, 1):
+            if line.endswith('\n'):
+                stripped_line = line[:-1]
+            else:
+                stripped_line = line
             if stripped_line.endswith('disable-bad-pattern-check'):
                 continue
-<<<<<<< HEAD
-            if regexp.search(line):
-                summary_message = ('%s --> Line %s: %s' % (
-=======
             if regexp.search(stripped_line):
-                python_utils.PRINT('%s --> Line %s: %s' % (
->>>>>>> upstream/develop
+                summary_message = ('%s --> Line %s: %s' % (
                     filepath, line_num, pattern['message']))
                 python_utils.PRINT(summary_message)
                 summary_messages.append(summary_message)
@@ -739,22 +737,7 @@ class GeneralPurposeLinter(python_utils.OBJECT):
         stdout = sys.stdout
         with linter_utils.redirect_stdout(stdout):
             for filepath in all_filepaths:
-<<<<<<< HEAD
-                file_content = self.file_cache.read(filepath)
-                total_files_checked += 1
-                for pattern in BAD_PATTERNS:
-                    if (pattern in file_content and
-                            not is_filepath_excluded_for_bad_patterns_check(
-                                pattern, filepath)):
-                        failed = True
-                        summary_message = ('%s --> %s' % (
-                            filepath, BAD_PATTERNS[pattern]['message']))
-                        python_utils.PRINT(summary_message)
-                        python_utils.PRINT('')
-                        summary_messages.append(summary_message)
-                        total_error_count += 1
-=======
-                file_content = FILE_CACHE.readlines(filepath)
+                file_content = self.file_cache.readlines(filepath)
                 total_files_checked += 1
                 for pattern in BAD_PATTERNS:
                     if is_filepath_excluded_for_bad_patterns_check(
@@ -770,7 +753,6 @@ class GeneralPurposeLinter(python_utils.OBJECT):
                             python_utils.PRINT(summary_message)
                             python_utils.PRINT('')
                             total_error_count += 1
->>>>>>> upstream/develop
 
                 for regexp in BAD_PATTERNS_REGEXP:
                     tmp_failed, bad_pattern_summary_messages = (
@@ -830,7 +812,7 @@ class GeneralPurposeLinter(python_utils.OBJECT):
 
         with linter_utils.redirect_stdout(sys.stdout):
             for filepath in files_to_lint:
-                file_content = FILE_CACHE.readlines(filepath)
+                file_content = self.file_cache.readlines(filepath)
                 file_length = len(file_content)
                 if (
                         file_length >= 1 and

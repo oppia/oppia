@@ -129,6 +129,7 @@ class LintTests(test_utils.GenericTestBase):
             """
             self.linter_stdout.append(
                 ' '.join(python_utils.UNICODE(arg) for arg in args))
+
         self.print_swap = self.swap(python_utils, 'PRINT', mock_print)
         self.sys_swap = self.swap(sys, 'exit', mock_exit)
         self.install_swap = self.swap_with_checks(
@@ -150,8 +151,10 @@ class PreCommitLinterTests(LintTests):
     def test_main_with_no_files(self):
         def mock_get_all_filepaths(unused_path, unused_files):
             return []
+
         all_filepath_swap = self.swap(
             pre_commit_linter, '_get_all_filepaths', mock_get_all_filepaths)
+
         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
             with self.install_swap, self.check_type_defs_swap:
                 with all_filepath_swap:
@@ -163,9 +166,11 @@ class PreCommitLinterTests(LintTests):
     def test_main_with_no_args(self):
         def mock_get_changed_filepaths():
             return []
+
         get_changed_filepaths_swap = self.swap(
             pre_commit_linter, '_get_changed_filepaths',
             mock_get_changed_filepaths)
+
         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
             with self.install_swap, self.check_type_defs_swap:
                 with get_changed_filepaths_swap:
@@ -183,6 +188,7 @@ class PreCommitLinterTests(LintTests):
     def test_main_with_error_message(self):
         all_errors_swap = self.swap(
             concurrent_task_utils, 'ALL_ERRORS', ['This is an error.'])
+
         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
             with self.install_swap, self.check_type_defs_swap, all_errors_swap:
                 pre_commit_linter.main(args=['--path=%s' % VALID_PY_FILEPATH])
@@ -223,9 +229,11 @@ class PreCommitLinterTests(LintTests):
         def mock_get_all_files_in_directory(
                 unused_input_path, unused_excluded_glob_patterns):
             return [VALID_PY_FILEPATH]
+
         get_all_files_swap = self.swap(
             pre_commit_linter, '_get_all_files_in_directory',
             mock_get_all_files_in_directory)
+
         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
             with self.install_swap, self.check_type_defs_swap:
                 with get_all_files_swap:
@@ -263,8 +271,10 @@ class PreCommitLinterTests(LintTests):
     def test_get_changed_filepaths(self):
         def mock_check_output(unused_list):
             return ''
+
         subprocess_swap = self.swap(
             subprocess, 'check_output', mock_check_output)
+
         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
             with self.install_swap, self.check_type_defs_swap, subprocess_swap:
                 pre_commit_linter.main()

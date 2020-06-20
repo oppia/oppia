@@ -279,11 +279,11 @@ class JsTsLintChecksManager(python_utils.OBJECT):
             if failed:
                 summary_message = (
                     '%s \'any\' type check failed' % (
-                        linter_utils.SUCCESS_MESSAGE_PREFIX))
+                        linter_utils.FAILED_MESSAGE_PREFIX))
             else:
                 summary_message = (
                     '%s \'any\' type check passed' % (
-                        linter_utils.FAILED_MESSAGE_PREFIX))
+                        linter_utils.SUCCESS_MESSAGE_PREFIX))
 
             python_utils.PRINT(summary_message)
             summary_messages.append(summary_message)
@@ -845,12 +845,12 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                     # constants.
 
                     # Check if const is declared outside the class.
-                    if parsed_nodes[1].declarations[0].init.callee.body:
-                        nodes = parsed_nodes[1]
+                    try:
+                        nodes = parsed_nodes[2]
                         angular_constants_nodes = (
                             nodes.declarations[0].init.callee.body.body)
-                    else:
-                        nodes = parsed_nodes[2]
+                    except Exception:
+                        nodes = parsed_nodes[3]
                         angular_constants_nodes = (
                             nodes.declarations[0].init.callee.body.body)
                     for angular_constant_node in angular_constants_nodes:

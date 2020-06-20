@@ -49,6 +49,8 @@ INVALID_GLYPHICON_FILEPATH = os.path.join(
 INVALID_CSS_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid.css')
 
 # Js and Ts filepaths.
+FILE_IN_EXCLUDED_PATH = os.path.join(
+    'core', 'tests', 'build_sources', 'assets', 'constants.js')
 INVALID_EXPLORE_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_explore.js')
 INVALID_PAUSE_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_pause.js')
 INVALID_SLEEP_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_sleep.js')
@@ -72,6 +74,8 @@ INVALID_TO_THROW_FILEPATH = os.path.join(
 INVALID_THROW_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_throw.ts')
 INVALID_THROW_WITH_STRING_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_throw_with_string.ts')
+INVALID_ESLINT_CAMELCASE_FILEPATH = os.path.join(
+    LINTER_TESTS_DIR, 'invalid_eslint_camelcase.ts')
 
 # PY filepaths.
 INVALID_ITERKEY_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_iterkeys.py')
@@ -130,6 +134,8 @@ INVALID_COPYRIGHT_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_copyright.py')
 INVALID_UNICODE_LITERAL_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_unicode_literal.py')
+INVALID_CRLF_ENDING_FILEPATH = os.path.join(
+    LINTER_TESTS_DIR, 'invalid_crlf_ending.py')
 INVALID_DEV_MODE_IN_CONSTANT_FILEPATH = 'constants.ts'
 
 
@@ -175,6 +181,7 @@ class LintTests(test_utils.GenericTestBase):
             """
             self.linter_stdout.append(
                 ' '.join(python_utils.UNICODE(arg) for arg in args))
+
         self.print_swap = self.swap(python_utils, 'PRINT', mock_print)
 
 
@@ -365,6 +372,19 @@ class JsTsLintTests(LintTests):
             appears_in_linter_stdout(
                 ['Line 27: Please use \'throw new Error\' instead of '
                  '\'throw\''],
+                self.linter_stdout))
+
+    def test_invalid_eslint_camelcase_comment(self):
+        with self.print_swap:
+            general_purpose_linter.GeneralPurposeLinter(
+                [INVALID_ESLINT_CAMELCASE_FILEPATH], FILE_CACHE, True
+            ).perform_all_lint_checks()
+        self.assertTrue(
+            appears_in_linter_stdout(
+                ['Line 24: Please do not use eslint disable for camelcase. If '
+                 'you are using this statement to define properties in an '
+                 'interface for a backend dict. Wrap the property name in '
+                 'single quotes instead.'],
                 self.linter_stdout))
 
 
@@ -710,11 +730,22 @@ class GeneralLintTests(LintTests):
     def test_invalid_tabs(self):
         with self.print_swap:
             general_purpose_linter.GeneralPurposeLinter(
-                [INVALID_TABS_FILEPATH], FILE_CACHE, True
+                [INVALID_TABS_FILEPATH, FILE_IN_EXCLUDED_PATH], FILE_CACHE, True
             ).perform_all_lint_checks()
         self.assertTrue(
             appears_in_linter_stdout(
                 ['Please use spaces instead of tabs.'],
+                self.linter_stdout))
+
+    def test_invalid_crlf_ending(self):
+        with self.print_swap:
+            general_purpose_linter.GeneralPurposeLinter(
+                [INVALID_CRLF_ENDING_FILEPATH], FILE_CACHE, True
+            ).perform_all_lint_checks()
+        self.assertTrue(
+            appears_in_linter_stdout(
+                ['Line 1: Please make sure all files only have LF endings '
+                 '(no CRLF).'],
                 self.linter_stdout))
 
     def test_invalid_merge_conflict(self):
@@ -783,11 +814,13 @@ class GeneralLintTests(LintTests):
                 self.linter_stdout))
 
     def test_invalid_dev_mode_in_constant_ts(self):
-        def mock_get_data(unused_self, unused_filepath, unused_mode):
-            return ['"DEV_MODE": false', 'Hello world']
-        get_data_swap = self.swap(
-            pre_commit_linter.FileCache, '_get_data', mock_get_data)
-        with self.print_swap, get_data_swap:
+        def mock_readlines(unused_self, unused_filepath):
+            return ('"DEV_MODE": false',)
+
+        readlines_swap = self.swap(
+            pre_commit_linter.FileCache, 'readlines', mock_readlines)
+
+        with self.print_swap, readlines_swap:
             general_purpose_linter.GeneralPurposeLinter(
                 [INVALID_DEV_MODE_IN_CONSTANT_FILEPATH], FILE_CACHE, True
             ).perform_all_lint_checks()

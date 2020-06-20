@@ -85,6 +85,7 @@ class CodeOwnerLinterTests(test_utils.GenericTestBase):
     def setUp(self):
         super(CodeOwnerLinterTests, self).setUp()
         self.linter_stdout = []
+
         def mock_print(*args):
             """Mock for python_utils.PRINT. Append the values to print to
             linter_stdout list.
@@ -95,13 +96,16 @@ class CodeOwnerLinterTests(test_utils.GenericTestBase):
             """
             self.linter_stdout.append(
                 ' '.join(python_utils.UNICODE(arg) for arg in args))
+
         self.print_swap = self.swap(python_utils, 'PRINT', mock_print)
 
     def test_extra_important_patterns_in_the_codeowner_file(self):
         mock_codeowner_important_paths = CODEOWNER_IMPORTANT_PATHS[:-1]
+
         codeowner_important_paths_swap = self.swap(
             codeowner_linter, 'CODEOWNER_IMPORTANT_PATHS',
             mock_codeowner_important_paths)
+
         with self.print_swap, codeowner_important_paths_swap:
             codeowner_linter.check_codeowner_file(FILE_CACHE, True)
         self.assertTrue(
@@ -115,6 +119,7 @@ class CodeOwnerLinterTests(test_utils.GenericTestBase):
     def test_duplicate_important_patterns_at_the_bottom_of_codeowners(self):
         codeowner_path_swap = self.swap(
             codeowner_linter, 'CODEOWNER_FILEPATH', MOCK_CODEOWNER_FILEPATH)
+
         with self.print_swap, codeowner_path_swap:
             codeowner_linter.check_codeowner_file(FILE_CACHE, True)
         self.assertTrue(
@@ -125,9 +130,11 @@ class CodeOwnerLinterTests(test_utils.GenericTestBase):
     def test_duplicate_important_patterns_in_list(self):
         mock_codeowner_important_paths = (
             CODEOWNER_IMPORTANT_PATHS + [CODEOWNER_IMPORTANT_PATHS[-1]])
+
         codeowner_important_paths_swap = self.swap(
             codeowner_linter, 'CODEOWNER_IMPORTANT_PATHS',
             mock_codeowner_important_paths)
+
         with self.print_swap, codeowner_important_paths_swap:
             codeowner_linter.check_codeowner_file(FILE_CACHE, True)
         self.assertTrue(
@@ -139,6 +146,7 @@ class CodeOwnerLinterTests(test_utils.GenericTestBase):
     def test_extra_important_patterns_in_important_pattern_list(self):
         codeowner_path_swap = self.swap(
             codeowner_linter, 'CODEOWNER_FILEPATH', MOCK_CODEOWNER_FILEPATH)
+
         with self.print_swap, codeowner_path_swap:
             codeowner_linter.check_codeowner_file(FILE_CACHE, True)
         self.assertTrue(
@@ -161,6 +169,7 @@ class CodeOwnerLinterTests(test_utils.GenericTestBase):
     def test_check_codeowner_file_without_codeowner(self):
         codeowner_swap = self.swap(
             codeowner_linter, 'CODEOWNER_FILEPATH', MOCK_CODEOWNER_FILEPATH)
+
         with self.print_swap, codeowner_swap:
             codeowner_linter.check_codeowner_file(FILE_CACHE, False)
             self.assertTrue(
@@ -171,6 +180,7 @@ class CodeOwnerLinterTests(test_utils.GenericTestBase):
     def test_check_codeowner_file_without_full_file_path(self):
         codeowner_swap = self.swap(
             codeowner_linter, 'CODEOWNER_FILEPATH', MOCK_CODEOWNER_FILEPATH)
+
         with self.print_swap, codeowner_swap:
             codeowner_linter.check_codeowner_file(FILE_CACHE, False)
         self.assertTrue(
@@ -182,6 +192,7 @@ class CodeOwnerLinterTests(test_utils.GenericTestBase):
     def test_check_codeowner_file_with_wildcard(self):
         codeowner_swap = self.swap(
             codeowner_linter, 'CODEOWNER_FILEPATH', MOCK_CODEOWNER_FILEPATH)
+
         with self.print_swap, codeowner_swap:
             codeowner_linter.check_codeowner_file(FILE_CACHE, False)
         self.assertTrue(
@@ -192,6 +203,7 @@ class CodeOwnerLinterTests(test_utils.GenericTestBase):
     def test_check_codeowner_file_with_no_valid_match(self):
         codeowner_swap = self.swap(
             codeowner_linter, 'CODEOWNER_FILEPATH', MOCK_CODEOWNER_FILEPATH)
+
         with self.print_swap, codeowner_swap:
             codeowner_linter.check_codeowner_file(FILE_CACHE, False)
         self.assertTrue(
@@ -202,6 +214,7 @@ class CodeOwnerLinterTests(test_utils.GenericTestBase):
     def test_check_codeowner_file_with_no_match_in_codeowners_file(self):
         codeowner_swap = self.swap(
             codeowner_linter, 'CODEOWNER_FILEPATH', MOCK_CODEOWNER_FILEPATH)
+
         with self.print_swap, codeowner_swap:
             codeowner_linter.check_codeowner_file(FILE_CACHE, True)
         self.assertTrue(

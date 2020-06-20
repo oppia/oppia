@@ -256,7 +256,8 @@ def _get_linters_for_file_extension(
 
     elif file_extension_to_lint == 'py':
         custom_linter, third_party_linter = python_linter.get_linters(
-            _FILES['.py'], verbose_mode_enabled=verbose_mode_enabled)
+            _FILES['.py'], FILE_CACHE,
+            verbose_mode_enabled=verbose_mode_enabled)
         custom_linters.append(custom_linter)
         third_party_linters.append(third_party_linter)
 
@@ -546,12 +547,12 @@ def main(args=None):
         semaphore.acquire()
         _get_task_output(lint_messages, task, semaphore)
 
-    lint_messages += codeowner_linter.check_codeowner_file(
-        FILE_CACHE, verbose_mode_enabled)
-
-    lint_messages += (
-        third_party_typings_linter.check_third_party_libs_type_defs(
-            verbose_mode_enabled))
+    # lint_messages += codeowner_linter.check_codeowner_file(
+    #     FILE_CACHE, verbose_mode_enabled)
+    #
+    # lint_messages += (
+    #     third_party_typings_linter.check_third_party_libs_type_defs(
+    #         verbose_mode_enabled))
 
     _print_complete_summary_of_lint_messages(lint_messages)
 

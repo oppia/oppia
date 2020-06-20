@@ -95,6 +95,7 @@ class CustomHTMLParserTests(test_utils.GenericTestBase):
             """
             self.linter_stdout.append(
                 ' '.join(python_utils.UNICODE(arg) for arg in args))
+
         self.print_swap = self.swap(python_utils, 'PRINT', mock_print)
 
     def test_custom_linter_with_invalid_style_indentation(self):
@@ -210,7 +211,7 @@ class CustomHTMLParserTests(test_utils.GenericTestBase):
                 [VALID_HTML_FILEPATH], True).perform_all_lint_checks()
         self.assertTrue(
             appears_in_linter_stdout(
-                ['SUCCESS   HTML linting passed'],
+                ['SUCCESS  HTML linting passed'],
                 self.linter_stdout))
 
     def test_third_party_linter_with_verbose_mode_disabled(self):
@@ -219,7 +220,7 @@ class CustomHTMLParserTests(test_utils.GenericTestBase):
                 [VALID_HTML_FILEPATH], False).perform_all_lint_checks()
         self.assertTrue(
             appears_in_linter_stdout(
-                ['SUCCESS   HTML linting passed'],
+                ['SUCCESS  HTML linting passed'],
                 self.linter_stdout))
 
     def test_third_party_linter_with_lint_errors(self):

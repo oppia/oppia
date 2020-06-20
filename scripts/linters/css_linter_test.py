@@ -91,6 +91,7 @@ class ThirdPartyCSSLintChecksManagerTests(test_utils.GenericTestBase):
             """
             self.linter_stdout.append(
                 ' '.join(python_utils.UNICODE(arg) for arg in args))
+
         self.print_swap = self.swap(python_utils, 'PRINT', mock_print)
 
     def test_all_filepaths(self):
@@ -113,7 +114,9 @@ class ThirdPartyCSSLintChecksManagerTests(test_utils.GenericTestBase):
     def test_perform_all_lint_checks_with_invalid_stylelint_path(self):
         def mock_join(*unused_args):
             return 'node_modules/stylelint/bin/stylelinter.js'
+
         join_swap = self.swap(os.path, 'join', mock_join)
+
         with self.print_swap, join_swap, self.assertRaises(SystemExit) as e:
             third_party_linter = css_linter.ThirdPartyCSSLintChecksManager(
                 CONFIG_PATH, [INVALID_CSS_FILEPATH], False)
@@ -130,8 +133,10 @@ class ThirdPartyCSSLintChecksManagerTests(test_utils.GenericTestBase):
             result.returncode = 0 # pylint: disable=attribute-defined-outside-init
             return result
         # pylint: enable=unused-argument
+
         popen_swap = self.swap_with_checks(
             subprocess, 'Popen', mock_popen)
+
         with self.print_swap, popen_swap, self.assertRaises(SystemExit) as e:
             third_party_linter = css_linter.ThirdPartyCSSLintChecksManager(
                 CONFIG_PATH, [VALID_CSS_FILEPATH], True)
@@ -155,7 +160,7 @@ class ThirdPartyCSSLintChecksManagerTests(test_utils.GenericTestBase):
             third_party_linter.perform_all_lint_checks()
         self.assertTrue(
             appears_in_linter_stdout(
-                ['SUCCESS   1 CSS file linted'],
+                ['SUCCESS  1 CSS file linted'],
                 self.linter_stdout))
 
     def test_get_linters(self):

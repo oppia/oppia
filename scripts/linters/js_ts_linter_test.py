@@ -69,9 +69,7 @@ INVALID_LINE_BREAK_IN_CONTROLLER_DEPENDENCIES_FILEPATH = os.path.join(
 INVALID_CONSTANT_IN_TS_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_constant_in_ts_file.ts')
 INVALID_CONSTANT_FILEPATH = os.path.join(
-    LINTER_TESTS_DIR, 'invalid.constants.ts')
-INVALID_CONSTANT_2_FILEPATH = os.path.join(
-    LINTER_TESTS_DIR, 'invalid_constant.constants.ts')
+    LINTER_TESTS_DIR, 'invalid_duplicate.constants.ts')
 
 
 def appears_in_linter_stdout(phrases, linter_stdout):
@@ -116,12 +114,15 @@ class JsTsLintTests(test_utils.GenericTestBase):
             """
             self.linter_stdout.append(
                 ' '.join(python_utils.UNICODE(arg) for arg in args))
+
         self.print_swap = self.swap(python_utils, 'PRINT', mock_print)
 
     def test_validate_and_parse_js_and_ts_files_with_exception(self):
         def mock_parse_script(unused_file_content):
             raise Exception()
+
         esprima_swap = self.swap(esprima, 'parseScript', mock_parse_script)
+
         with self.print_swap, esprima_swap, self.assertRaises(Exception):
             js_ts_linter.JsTsLintChecksManager(
                 [], [VALID_JS_FILEPATH], FILE_CACHE,
@@ -131,6 +132,7 @@ class JsTsLintTests(test_utils.GenericTestBase):
         excluded_files_swap = self.swap(
             js_ts_linter, 'FILES_EXCLUDED_FROM_ANY_TYPE_CHECK',
             [VALID_TS_FILEPATH])
+
         with self.print_swap, excluded_files_swap:
             js_ts_linter.JsTsLintChecksManager(
                 [], [INVALID_ANY_TYPE_FILEPATH, VALID_TS_FILEPATH], FILE_CACHE,
@@ -147,11 +149,18 @@ class JsTsLintTests(test_utils.GenericTestBase):
                 self.linter_stdout))
 
     def test_check_extra_js_files(self):
-        def mock_get_data(unused_self, unused_filepath, unused_mode):
-            return 'Hello World'
-        get_data_swap = self.swap(
-            pre_commit_linter.FileCache, '_get_data', mock_get_data)
-        with self.print_swap, get_data_swap:
+        def mock_readlines(unused_self, unused_filepath):
+            return ('var a = 10;\n',)
+
+        def mock_read(unused_self, unused_filepath):
+            return 'var a = 10;\n'
+
+        readlines_swap = self.swap(
+            pre_commit_linter.FileCache, 'readlines', mock_readlines)
+        read_swap = self.swap(
+            pre_commit_linter.FileCache, 'read', mock_read)
+
+        with self.print_swap, readlines_swap, read_swap:
             js_ts_linter.JsTsLintChecksManager(
                 [EXTRA_JS_FILEPATH], [], FILE_CACHE,
                 True).perform_all_lint_checks()
@@ -268,7 +277,7 @@ class JsTsLintTests(test_utils.GenericTestBase):
     def test_duplicate_constants_in_ajs_file(self):
         with self.print_swap:
             js_ts_linter.JsTsLintChecksManager(
-                [], [INVALID_CONSTANT_2_FILEPATH], FILE_CACHE,
+                [], [INVALID_CONSTANT_FILEPATH], FILE_CACHE,
                 True).perform_all_lint_checks()
         self.assertTrue(
             appears_in_linter_stdout(
@@ -317,7 +326,9 @@ class JsTsLintTests(test_utils.GenericTestBase):
     def test_third_party_linter_with_invalid_eslint_path(self):
         def mock_exists(unused_path):
             return False
+
         exists_swap = self.swap(os.path, 'exists', mock_exists)
+
         with self.print_swap, exists_swap, self.assertRaises(SystemExit) as e:
             js_ts_linter.ThirdPartyJsTsLintChecksManager(
                 [INVALID_SORTED_DEPENDENCIES_FILEPATH],
@@ -330,7 +341,7 @@ class JsTsLintTests(test_utils.GenericTestBase):
                 [VALID_TS_FILEPATH], True).perform_all_lint_checks()
         self.assertTrue(
             appears_in_linter_stdout(
-                ['SUCCESS   1 JavaScript and Typescript files linted'],
+                ['SUCCESS  1 JavaScript and Typescript files linted'],
                 self.linter_stdout))
 
     def test_custom_linter_with_no_files(self):
