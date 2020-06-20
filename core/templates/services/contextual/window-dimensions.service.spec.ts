@@ -67,4 +67,15 @@ describe('Window Dimensions Service', () => {
 
     expect(wds.isWindowNarrow()).toBe(true);
   });
+
+  it('should return observable on window resize', () => {
+    let mockWidth = 668;
+    spyOnProperty(wr.nativeWindow, 'innerWidth').and.returnValue(mockWidth);
+
+    let subscription = wds.getResizeEvent().subscribe(evt => {
+      expect(wds.getWidth()).toEqual(668);
+    });
+    window.dispatchEvent(new Event('resize'));
+    subscription.unsubscribe();
+  });
 });

@@ -21,6 +21,8 @@ import { WindowDimensionsService } from
   'services/contextual/window-dimensions.service';
 import { UrlService } from
   'services/contextual/url.service';
+import { of } from 'rxjs';
+
 
 require(
   'pages/landing-pages/stewards-landing-page/' +
@@ -56,8 +58,7 @@ describe('Stewards Landing Page', function() {
   }));
 
   afterEach(function() {
-    // This is to avoid functions from other test blocks to be executated.
-    windowDimensions.onResizeHooks = [];
+    ctrl.$onDestroy();
   });
 
   it('should change to parents tab', function() {
@@ -206,6 +207,8 @@ describe('Stewards Landing Page', function() {
       },
       innerWidth: 100
     });
+    spyOn(windowDimensions, 'getResizeEvent').and.returnValue(
+      of(new Event('resize')));
     ctrl.$onInit();
 
     expect(ctrl.activeTabName).toBe('Parents');
@@ -228,8 +231,9 @@ describe('Stewards Landing Page', function() {
       },
       innerWidth: 998
     });
+    spyOn(windowDimensions, 'getResizeEvent').and.returnValue(
+      of(new Event('resize')));
     ctrl.$onInit();
-    windowDimensions.onResize(new Event(''));
     expect(ctrl.windowIsNarrow).toBe(false);
   });
 
@@ -240,8 +244,9 @@ describe('Stewards Landing Page', function() {
       },
       innerWidth: 768
     });
+    spyOn(windowDimensions, 'getResizeEvent').and.returnValue(
+      of(new Event('resize')));
     ctrl.$onInit();
-    windowDimensions.onResize(new Event(''));
     expect(ctrl.windowIsNarrow).toBe(true);
   });
 });

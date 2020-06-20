@@ -26,10 +26,9 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 })
 export class WindowDimensionsService {
   constructor(private windowRef: WindowRef) {}
-  onResizeHooks: Array<Function> = [];
 
   getResizeEvent(): Observable<Event> {
-    return fromEvent(window, 'resize');
+    return fromEvent(this.windowRef.nativeWindow, 'resize');
   }
 
   getWidth(): number {
