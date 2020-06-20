@@ -25,24 +25,25 @@ var customizeInteraction = function() {
 
 var expectInteractionDetailsToMatch = async function(elem) {
   expect(
-    await algebraicExpressionInputTag(elem).isPresent()
+    await elem.element(by.tagName(
+      'oppia-interactive-algebraic-expression-input')).isPresent()
   ).toBe(true);
 };
 
 var submitAnswer = async function(elem, answer) {
   await objects.AlgebraicExpressionEditor(elem.element(by.tagName(
-    'oppia-interactive-math-expression-input'))).setValue(answer);
+    'oppia-interactive-algebraic-expression-input'))).setValue(answer);
   await element(by.css('.protractor-test-submit-answer-button')).click();
 };
 
-var answerObjectType = 'AlgebraicExpressionInput';
+var answerObjectType = 'AlgebraicExpression';
 
 var testSuite = [{
   interactionArguments: [],
-  ruleArguments: ['MatchesExactlyWith', '(a+b)^(2)'],
+  ruleArguments: ['MatchesExactlyWith', '((a+b))^(2)'],
   expectedInteractionDetails: [],
-  wrongAnswers: ['(a)^(2)+2*a*b+(b)^(2)', '(a+b)^(3)', '(a-b)^(2)'],
-  correctAnswers: ['(a+b)^(2)', '(b+a)^(2)', '(a+b)*(a+b)']
+  wrongAnswers: ['(a-b)^2', '(a-b)^3', 'a^2+2*a*b+b^2'],
+  correctAnswers: ['(a+b)^2', '(b+a)^2', '(a+b)*(a+b)']
 }];
 
 exports.customizeInteraction = customizeInteraction;
