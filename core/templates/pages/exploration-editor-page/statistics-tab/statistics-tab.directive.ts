@@ -80,6 +80,9 @@ angular.module('oppia').directive('statisticsTab', [
               '/createhandler/statistics/' +
               ExplorationDataService.explorationId);
 
+            // TODO(#8038): Update this to use ExplorationStatsService. Requires
+            // refactoring to all consumers of state_stats_mapping to use a Map
+            // rather than a plain object.
             $http.get(ctrl.explorationStatisticsUrl).then(function(
                 statsResponse) {
               var data = statsResponse.data;
