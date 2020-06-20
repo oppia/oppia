@@ -20,14 +20,14 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-interface IStorySummaryBackendDict {
+export interface IStorySummaryBackendDict {
   'id': string;
   'title': string;
   'node_titles': string[];
   'thumbnail_filename': string;
   'thumbnail_bg_color': string;
   'description': string;
-  'story_is_published': boolean;
+  'story_is_published'?: boolean;
 }
 
 export class StorySummary {

@@ -20,13 +20,36 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
+export interface IMultipleIncorrectSubmissionsCustomizationArgs {
+  'state_name': {value: string};
+  'num_times_answered_incorrectly': {value: number};
+}
+
+export interface ICyclicStateTransitionsCustomizationArgs {
+  'state_names': {value: string[]};
+}
+
+export interface IEarlyQuitCustomizationArgs {
+  'state_name': {value: string};
+  'time_spent_in_exp_in_msecs': {value: number};
+}
+
+export type IIssueCustomizationArgs = (
+  IMultipleIncorrectSubmissionsCustomizationArgs |
+  ICyclicStateTransitionsCustomizationArgs |
+  IEarlyQuitCustomizationArgs);
+
+export interface IExplorationIssueBackendDict {
+  'issue_type': string;
+  'issue_customization_args': IIssueCustomizationArgs;
+  'playthrough_ids': string[];
+  'schema_version': number;
+  'is_valid': boolean;
+}
+
 export class PlaythroughIssue {
   issueType: string;
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'issueCustomizationArgs' is a dict with possible
-  // underscore_cased keys which give tslint errors against underscore_casing
-  // in favor of camelCasing.
-  issueCustomizationArgs: any;
+  issueCustomizationArgs: IIssueCustomizationArgs;
   playthroughIds: string[];
   schemaVersion: number;
   isValid: boolean;
@@ -40,13 +63,9 @@ export class PlaythroughIssue {
    * @param {number} schemaVersion - schema version of the class instance.
    * @param {boolean} isValid - whether the issue is valid.
    */
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'issueCustomizationArgs' is a dict with possible
-  // underscore_cased keys which give tslint errors against underscore_casing
-  // in favor of camelCasing.
   constructor(
-      issueType: string, issueCustomizationArgs: any, playthroughIds: string[],
-      schemaVersion: number, isValid: boolean) {
+      issueType: string, issueCustomizationArgs: IIssueCustomizationArgs,
+      playthroughIds: string[], schemaVersion: number, isValid: boolean) {
     /** @type {string} */
     this.issueType = issueType;
     /** @type {Object.<string, *>} */
@@ -62,10 +81,7 @@ export class PlaythroughIssue {
   /**
    * @returns {ExplorationIssueBackendDict}
    */
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because the return type is a dict with underscore_cased keys which
-  // give tslint errors against underscore_casing in favor of camelCasing.
-  toBackendDict(): any {
+  toBackendDict(): IExplorationIssueBackendDict {
     return {
       issue_type: this.issueType,
       issue_customization_args: this.issueCustomizationArgs,
@@ -93,11 +109,9 @@ export class PlaythroughIssueObjectFactory {
    * @param {ExplorationIssueBackendDict} explorationIssueBackendDict
    * @returns {PlaythroughIssue}
    */
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'explorationIssueBackendDict' is a dict with underscore_cased
-  // keys which give tslint errors against underscore_casing in favor of
-  // camelCasing.
-  createFromBackendDict(explorationIssueBackendDict: any): PlaythroughIssue {
+  createFromBackendDict(
+      explorationIssueBackendDict:
+      IExplorationIssueBackendDict): PlaythroughIssue {
     return new PlaythroughIssue(
       explorationIssueBackendDict.issue_type,
       explorationIssueBackendDict.issue_customization_args,

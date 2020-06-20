@@ -23,12 +23,38 @@ import { Injectable } from '@angular/core';
 import { StatisticsDomainConstants } from
   'domain/statistics/statistics-domain.constants';
 
+export interface IExplorationStartCustomizationArgs {
+  'state_name': {value: string};
+}
+
+export interface IAnswerSubmitCustomizationArgs {
+  'state_name': {value: string};
+  'dest_state_name': {value: string};
+  'interaction_id': {value: string};
+  'submitted_answer': {value: string};
+  'feedback': {value: string};
+  'time_spent_state_in_msecs': {value: number};
+}
+
+export interface IExplorationQuitCustomizationArgs {
+  'state_name': {value: string};
+  'time_spent_in_state_in_msecs': {value: number};
+}
+
+export type ILearnerActionCustomizationArgs = (
+  IExplorationStartCustomizationArgs |
+  IAnswerSubmitCustomizationArgs |
+  IExplorationQuitCustomizationArgs);
+
+export interface ILearnerActionBackendDict {
+  'action_type': string;
+  'schema_version': number;
+  'action_customization_args': ILearnerActionCustomizationArgs;
+}
+
 export class LearnerAction {
   actionType: string;
-  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'outcome' is an outcome domain object and this can be
-  // directly typed to 'Outcome' type once 'OutcomeObjectFactory' is upgraded.
-  actionCustomizationArgs: any;
+  actionCustomizationArgs: ILearnerActionCustomizationArgs;
   schemaVersion: number;
   /**
    * @constructor
@@ -37,11 +63,10 @@ export class LearnerAction {
    *   for an action.
    * @param {number} schemaVersion - schema version of the class instance.
    */
-  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'outcome' is an outcome domain object and this can be
-  // directly typed to 'Outcome' type once 'OutcomeObjectFactory' is upgraded.
   constructor(
-      actionType: string, actionCustomizationArgs: any, schemaVersion: number) {
+      actionType: string,
+      actionCustomizationArgs: ILearnerActionCustomizationArgs,
+      schemaVersion: number) {
     if (schemaVersion < 1) {
       throw new Error('given invalid schema version');
     }
@@ -54,11 +79,7 @@ export class LearnerAction {
     this.schemaVersion = schemaVersion;
   }
 
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because the return type is a dict with underscore_cased
-  // keys which give tslint errors against underscore_casing in favor of
-  // camelCasing.
-  toBackendDict(): any {
+  toBackendDict(): ILearnerActionBackendDict {
     return {
       action_type: this.actionType,
       action_customization_args: this.actionCustomizationArgs,
@@ -80,7 +101,8 @@ export class LearnerActionObjectFactory {
    * @returns {LearnerAction}
    */
   createNew(
-      actionType: string, actionCustomizationArgs: any,
+      actionType: string,
+      actionCustomizationArgs: ILearnerActionCustomizationArgs,
       schemaVersion: number): LearnerAction {
     schemaVersion = schemaVersion ||
       StatisticsDomainConstants.LEARNER_ACTION_SCHEMA_LATEST_VERSION;
@@ -101,11 +123,8 @@ export class LearnerActionObjectFactory {
    * @param {LearnerActionBackendDict} learnerActionBackendDict
    * @returns {LearnerAction}
    */
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'learnerActionBackendDict' is a dict with underscore_cased
-  // keys which give tslint errors against underscore_casing in favor of
-  // camelCasing.
-  createFromBackendDict(learnerActionBackendDict: any): LearnerAction {
+  createFromBackendDict(
+      learnerActionBackendDict: ILearnerActionBackendDict): LearnerAction {
     return new LearnerAction(
       learnerActionBackendDict.action_type,
       learnerActionBackendDict.action_customization_args,

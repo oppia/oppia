@@ -22,16 +22,30 @@ import { Injectable } from '@angular/core';
 
 import { SkillSummary, SkillSummaryObjectFactory } from
   'domain/skill/SkillSummaryObjectFactory';
-import { StorySummary } from 'domain/story/StorySummaryObjectFactory';
-import { ISubtopicBackendDict, Subtopic, SubtopicObjectFactory } from
-  'domain/topic/SubtopicObjectFactory';
-
-export interface ISkillDescriptions {
-  [skillId: string]: string | null;
-}
+import { IStorySummaryBackendDict, StorySummary } from
+  'domain/story/StorySummaryObjectFactory';
+import {
+  ISkillIdToDescriptionMap,
+  ISubtopicBackendDict,
+  Subtopic,
+  SubtopicObjectFactory
+} from 'domain/topic/SubtopicObjectFactory';
 
 export interface IDegreesOfMastery {
   [skillId: string]: number | null;
+}
+
+interface IReadOnlyTopicBackendDict {
+  'subtopics': ISubtopicBackendDict[];
+  'skill_descriptions': ISkillIdToDescriptionMap;
+  'uncategorized_skill_ids': string[];
+  'degrees_of_mastery': IDegreesOfMastery;
+  'canonical_story_dicts': IStorySummaryBackendDict[];
+  'additional_story_dicts': IStorySummaryBackendDict[];
+  'topic_name': string;
+  'topic_id': string;
+  'topic_description': string;
+  'train_tab_should_be_displayed': boolean;
 }
 
 export class ReadOnlyTopic {
@@ -43,7 +57,7 @@ export class ReadOnlyTopic {
   _uncategorizedSkillSummaries: Array<SkillSummary>;
   _subtopics: Array<Subtopic>;
   _degreesOfMastery: IDegreesOfMastery;
-  _skillDescriptions: ISkillDescriptions;
+  _skillDescriptions: ISkillIdToDescriptionMap;
   _trainTabShouldBeDisplayed: boolean;
 
   constructor(
@@ -53,7 +67,7 @@ export class ReadOnlyTopic {
       uncategorizedSkillSummaries: Array<SkillSummary>,
       subtopics: Array<Subtopic>,
       degreesOfMastery: IDegreesOfMastery,
-      skillDescriptions: ISkillDescriptions,
+      skillDescriptions: ISkillIdToDescriptionMap,
       trainTabShouldBeDisplayed: boolean) {
     this._topicName = topicName;
     this._topicId = topicId;
@@ -99,7 +113,7 @@ export class ReadOnlyTopic {
     return this._degreesOfMastery;
   }
 
-  getSkillDescriptions(): ISkillDescriptions {
+  getSkillDescriptions(): ISkillIdToDescriptionMap {
     return this._skillDescriptions;
   }
 
@@ -121,40 +135,35 @@ export class ReadOnlyTopicObjectFactory {
     this._subtopicObjectFactory = subtopicObjectFactory;
     this._skillSummaryObjectFactory = skillSummaryObjectFactory;
   }
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'topicDataDict' is a dict with underscore_cased keys
-  // which give tslint errors against underscore_casing in favor of camelCasing.
-  createFromBackendDict(topicDataDict: any): ReadOnlyTopic {
-    let subtopics: Array<Subtopic> = topicDataDict.subtopics.map(
-      (subtopic: ISubtopicBackendDict) => {
-        return this._subtopicObjectFactory.create(
-          subtopic, topicDataDict.skill_descriptions);
-      });
+
+  createFromBackendDict(
+      topicDataDict: IReadOnlyTopicBackendDict): ReadOnlyTopic {
+    let subtopics: Array<Subtopic> = topicDataDict.subtopics.map(subtopic => {
+      return this._subtopicObjectFactory.create(
+        subtopic, topicDataDict.skill_descriptions);
+    });
     let uncategorizedSkills: Array<SkillSummary> =
-        topicDataDict.uncategorized_skill_ids.map(
-          (skillId: string) => {
-            return this._skillSummaryObjectFactory.create(
-              skillId, topicDataDict.skill_descriptions[skillId]);
-          });
+        topicDataDict.uncategorized_skill_ids.map(skillId => {
+          return this._skillSummaryObjectFactory.create(
+            skillId, topicDataDict.skill_descriptions[skillId]);
+        });
     let degreesOfMastery: IDegreesOfMastery = topicDataDict.degrees_of_mastery;
-    let skillDescriptions: ISkillDescriptions =
+    let skillDescriptions: ISkillIdToDescriptionMap =
         topicDataDict.skill_descriptions;
     let canonicalStories: Array<StorySummary> =
-        topicDataDict.canonical_story_dicts.map(
-          (storyDict: any) => {
-            return new StorySummary(
-              storyDict.id, storyDict.title, storyDict.node_titles,
-              storyDict.thumbnail_filename, storyDict.thumbnail_bg_color,
-              storyDict.description, true);
-          });
+        topicDataDict.canonical_story_dicts.map(storyDict => {
+          return new StorySummary(
+            storyDict.id, storyDict.title, storyDict.node_titles,
+            storyDict.thumbnail_filename, storyDict.thumbnail_bg_color,
+            storyDict.description, true);
+        });
     let additionalStories: Array<StorySummary> =
-        topicDataDict.additional_story_dicts.map(
-          (storyDict: any) => {
-            return new StorySummary(
-              storyDict.id, storyDict.title, storyDict.node_titles,
-              storyDict.thumbnail_filename, storyDict.thumbnail_bg_color,
-              storyDict.description, true);
-          });
+        topicDataDict.additional_story_dicts.map(storyDict => {
+          return new StorySummary(
+            storyDict.id, storyDict.title, storyDict.node_titles,
+            storyDict.thumbnail_filename, storyDict.thumbnail_bg_color,
+            storyDict.description, true);
+        });
     return new ReadOnlyTopic(
       topicDataDict.topic_name, topicDataDict.topic_id,
       topicDataDict.topic_description, canonicalStories,
