@@ -161,24 +161,6 @@ class TaskEntryTests(test_utils.GenericTestBase):
         self.assertEqual(task_entry.resolver_id, self.owner_id)
         self.assertEqual(task_entry.resolved_on, self.MOCK_DATE)
 
-    def test_constructor_raises_if_resolved_by_arg_required_but_missing(self):
-        with self.assertRaisesRegexp(Exception, 'Missing resolution arguments'):
-            improvements_domain.TaskEntry(
-                improvements_models.TASK_ENTITY_TYPE_EXPLORATION, self.exp_id,
-                1, improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
-                improvements_models.TASK_TARGET_TYPE_STATE,
-                feconf.DEFAULT_INIT_STATE_NAME, 'issue description',
-                improvements_models.TASK_STATUS_RESOLVED, None, self.MOCK_DATE)
-
-    def test_constructor_raises_if_resolved_on_required_but_missing(self):
-        with self.assertRaisesRegexp(Exception, 'Missing resolution arguments'):
-            improvements_domain.TaskEntry(
-                improvements_models.TASK_ENTITY_TYPE_EXPLORATION, self.exp_id,
-                1, improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
-                improvements_models.TASK_TARGET_TYPE_STATE,
-                feconf.DEFAULT_INIT_STATE_NAME, 'issue description',
-                improvements_models.TASK_STATUS_RESOLVED, self.owner_id, None)
-
     def test_constructor_ignores_resolution_args_when_task_is_open(self):
         task_entry = improvements_domain.TaskEntry(
             improvements_models.TASK_ENTITY_TYPE_EXPLORATION, self.exp_id, 1,

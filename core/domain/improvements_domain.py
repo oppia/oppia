@@ -73,18 +73,17 @@ class TaskEntry(python_utils.OBJECT):
                 why the task was created.
             status: str. Tracks the state/progress of the task entry.
             resolver_id: str. The corresponding user who resolved this task.
-                Only used when payload dict's status is resolved.
+                Only used when payload dict's status is resolved, otherwise will
+                be assigned as None.
             resolved_on: datetime. The datetime at which this task was resolved.
-                Only used when payload dict's status is resolved.
+                Only used when payload dict's status is resolved, otherwise will
+                be assigned as None.
 
         Raises:
             Exception. When status is resolved but the resolution arguments
             (resolver_id, resolved_on) are missing.
         """
-        if status == improvements_models.TASK_STATUS_RESOLVED:
-            if resolver_id is None or resolved_on is None:
-                raise Exception('Missing resolution arguments for the task')
-        else:
+        if status != improvements_models.TASK_STATUS_RESOLVED:
             resolver_id = None
             resolved_on = None
         self.entity_type = entity_type
