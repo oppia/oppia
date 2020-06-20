@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the topics and skills dashboard page.
+ * @fileoverview Unit tests for the topics and skills dashboard controller.
  */
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
