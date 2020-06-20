@@ -30,7 +30,7 @@ const constants = require('constants.ts');
 describe('States object factory', () => {
   describe('StatesObjectFactory', () => {
     var scope, sof, ssof, statesDict, newState, newState2,
-      secondState, statesWithCyclicOutcomeDict, 
+      secondState, statesWithCyclicOutcomeDict,
       statesWithAudioDict, vof;
     const oldNewStateTemplate = constants.NEW_STATE_TEMPLATE;
 
@@ -41,6 +41,7 @@ describe('States object factory', () => {
       ssof = TestBed.get(StatesObjectFactory);
       sof = TestBed.get(StateObjectFactory);
       vof = TestBed.get(VoiceoverObjectFactory);
+
       newState = {
         classifier_model_id: null,
         content: {
@@ -86,7 +87,8 @@ describe('States object factory', () => {
             default_outcome: {}
           }
         },
-      }
+      };
+
       newState2 = {
         classifier_model_id: null,
         content: {
@@ -132,7 +134,7 @@ describe('States object factory', () => {
             default_outcome: {}
           }
         },
-      }
+      };
 
       secondState = {
         content: {
@@ -192,7 +194,8 @@ describe('States object factory', () => {
             default_outcome: {}
           }
         }
-      }
+      };
+
       statesDict = {
         'first state': newState2
       };
