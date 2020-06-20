@@ -44,7 +44,7 @@ describe('Read only topic object Factory', () => {
         node_titles: ['Chapter 1'],
         thumbnail_filename: 'image.svg',
         thumbnail_bg_color: '#F8BF74',
-        published: true
+        story_is_published: true
       }],
       additional_story_dicts: [{
         id: '1',
@@ -53,7 +53,7 @@ describe('Read only topic object Factory', () => {
         node_titles: ['Chapter 1'],
         thumbnail_filename: 'image.svg',
         thumbnail_bg_color: '#F8BF74',
-        published: true
+        story_is_published: true
       }],
       uncategorized_skill_ids: ['skill_id_1'],
       subtopics: [{

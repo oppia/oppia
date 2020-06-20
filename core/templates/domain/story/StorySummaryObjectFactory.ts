@@ -27,7 +27,7 @@ export interface IStorySummaryBackendDict {
   'thumbnail_filename': string;
   'thumbnail_bg_color': string;
   'description': string;
-  'story_is_published'?: boolean;
+  'story_is_published': boolean;
 }
 
 export class StorySummary {
