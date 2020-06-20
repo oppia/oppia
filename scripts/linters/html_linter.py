@@ -32,9 +32,6 @@ from .. import common
 import html.parser # isort:skip
 # pylint: enable=wrong-import-position
 
-_MESSAGE_TYPE_SUCCESS = 'SUCCESS'
-_MESSAGE_TYPE_FAILED = 'FAILED'
-
 
 class TagMismatchException(Exception):
     """Error class for mismatch between start and end tags."""
@@ -297,14 +294,15 @@ class HTMLLintChecksManager(python_utils.OBJECT):
 
             if failed:
                 summary_message = (
-                    '%s   HTML tag and attribute check failed, fix the HTML '
-                    'files listed above.' % _MESSAGE_TYPE_FAILED)
+                    '%s HTML tag and attribute check failed, fix the HTML '
+                    'files listed above.' % linter_utils.FAILED_MESSAGE_PREFIX)
                 python_utils.PRINT(summary_message)
                 summary_messages.append(summary_message)
                 summary_messages.extend(parser.summary_messages)
             else:
-                summary_message = '%s  HTML tag and attribute check passed' % (
-                    _MESSAGE_TYPE_SUCCESS)
+                summary_message = (
+                    '%s HTML tag and attribute check passed' % (
+                        linter_utils.SUCCESS_MESSAGE_PREFIX))
 
                 python_utils.PRINT(summary_message)
                 summary_messages.append(summary_message)
@@ -407,12 +405,13 @@ class ThirdPartyHTMLLintChecksManager(python_utils.OBJECT):
                 python_utils.PRINT('(%s files checked, %s errors found)' % (
                     total_files_checked, total_error_count))
                 summary_message = (
-                    '%s   HTML linting failed, '
-                    'fix the HTML files listed above.' % _MESSAGE_TYPE_FAILED)
+                    '%s HTML linting failed, fix the HTML files listed above'
+                    '.' % linter_utils.FAILED_MESSAGE_PREFIX)
                 summary_messages.append(summary_message)
             else:
-                summary_message = '%s   HTML linting passed' % (
-                    _MESSAGE_TYPE_SUCCESS)
+                summary_message = (
+                    '%s HTML linting passed' % (
+                        linter_utils.SUCCESS_MESSAGE_PREFIX))
                 summary_messages.append(summary_message)
 
             python_utils.PRINT('')

@@ -20,9 +20,11 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import os
 
 from constants import constants
+from core.domain import config_services
 from core.domain import question_services
 from core.domain import skill_services
 from core.domain import state_domain
+from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.tests import test_utils
@@ -50,12 +52,19 @@ class BaseTopicsAndSkillsDashboardTests(test_utils.GenericTestBase):
         self.linked_skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(
             self.linked_skill_id, self.admin_id, description='Description 3')
+        subtopic_skill_id = skill_services.get_new_skill_id()
+        self.save_new_skill(
+            subtopic_skill_id, self.admin_id, description='Subtopic Skill')
+
+        subtopic = topic_domain.Subtopic.create_default_subtopic(
+            1, 'Subtopic Title')
+        subtopic.skill_ids = [subtopic_skill_id]
         self.save_new_topic(
             self.topic_id, self.admin_id, name='Name',
             description='Description', canonical_story_ids=[],
             additional_story_ids=[],
             uncategorized_skill_ids=[self.linked_skill_id],
-            subtopics=[], next_subtopic_id=1)
+            subtopics=[subtopic], next_subtopic_id=2)
 
 
 class TopicsAndSkillsDashboardPageDataHandlerTests(
@@ -74,6 +83,9 @@ class TopicsAndSkillsDashboardPageDataHandlerTests(
 
         # Check that admins can access the topics and skills dashboard data.
         self.login(self.ADMIN_EMAIL)
+        config_services.set_property(
+            self.admin_id, 'topic_ids_for_classroom_pages', [{
+                'name': 'math', 'topic_ids': [self.topic_id]}])
         json_response = self.get_json(
             feconf.TOPICS_AND_SKILLS_DASHBOARD_DATA_URL)
         self.assertEqual(len(json_response['topic_summary_dicts']), 1)
@@ -85,10 +97,13 @@ class TopicsAndSkillsDashboardPageDataHandlerTests(
         self.assertEqual(
             len(json_response['untriaged_skill_summary_dicts']), 1)
         self.assertEqual(
-            len(json_response['mergeable_skill_summary_dicts']), 1)
+            len(json_response['mergeable_skill_summary_dicts']), 2)
+
+        for skill_dict in json_response['mergeable_skill_summary_dicts']:
+            if skill_dict['description'] == 'Description 3':
+                self.assertEqual(skill_dict['id'], self.linked_skill_id)
         self.assertEqual(
-            json_response['mergeable_skill_summary_dicts'][0]['id'],
-            self.linked_skill_id)
+            len(json_response['categorized_skills_dict']), 2)
         self.assertEqual(
             json_response['untriaged_skill_summary_dicts'][0]['id'],
             skill_id)
@@ -119,13 +134,17 @@ class TopicsAndSkillsDashboardPageDataHandlerTests(
         self.assertEqual(
             len(json_response['untriaged_skill_summary_dicts']), 1)
         self.assertEqual(
-            len(json_response['mergeable_skill_summary_dicts']), 1)
-        self.assertEqual(
-            json_response['mergeable_skill_summary_dicts'][0]['id'],
-            self.linked_skill_id)
+            len(json_response['mergeable_skill_summary_dicts']), 2)
+        for skill_dict in json_response['mergeable_skill_summary_dicts']:
+            if skill_dict['description'] == 'Description 3':
+                self.assertEqual(skill_dict['id'], self.linked_skill_id)
         self.assertEqual(
             json_response['untriaged_skill_summary_dicts'][0]['id'],
             skill_id)
+        self.assertEqual(
+            len(json_response['all_classroom_names']), 1)
+        self.assertEqual(
+            json_response['all_classroom_names'], ['math'])
         self.assertEqual(
             json_response['can_delete_topic'], False)
         self.assertEqual(
@@ -158,10 +177,20 @@ class NewTopicHandlerTests(BaseTopicsAndSkillsDashboardTests):
         csrf_token = self.get_new_csrf_token()
         payload = {
             'name': 'Topic name',
-            'abbreviated_name': 'name'
+            'abbreviated_name': 'name',
+            'description': 'Topic description',
+            'filename': 'test_svg.svg',
+            'thumbnailBgColor': '#C6DCDA',
         }
+
+        with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
+            mode='rb', encoding=None) as f:
+            raw_image = f.read()
         json_response = self.post_json(
-            self.url, payload, csrf_token=csrf_token)
+            self.url, payload, csrf_token=csrf_token,
+            upload_files=(('image', 'unused_filename', raw_image),)
+        )
         topic_id = json_response['topicId']
         self.assertEqual(len(topic_id), 12)
         self.assertIsNotNone(
@@ -178,6 +207,31 @@ class NewTopicHandlerTests(BaseTopicsAndSkillsDashboardTests):
         self.post_json(
             self.url, payload, csrf_token=csrf_token, expected_status_int=400)
         self.logout()
+
+    def test_topic_creation_with_invalid_image(self):
+        self.login(self.ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        payload = {
+            'name': 'Topic name',
+            'abbreviated_name': 'name',
+            'description': 'Topic description',
+            'filename': 'cafe.flac',
+            'thumbnailBgColor': '#C6DCDA',
+        }
+
+        with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'cafe.flac'),
+            mode='rb', encoding=None) as f:
+            raw_image = f.read()
+
+        json_response = self.post_json(
+            self.url, payload, csrf_token=csrf_token,
+            upload_files=(('image', 'unused_filename', raw_image),),
+            expected_status_int=400
+        )
+
+        self.assertEqual(
+            json_response['error'], 'Image exceeds file size limit of 100 KB.')
 
 
 class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
