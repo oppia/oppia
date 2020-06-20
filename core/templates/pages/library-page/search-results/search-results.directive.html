@@ -22,7 +22,11 @@
   </div>
   <div ng-if="!$ctrl.someResultsExist" class="oppia-search-results-intro" ng-cloak>
     <div class="oppia-search-results-no-match">
-      <img ng-src="<[$ctrl.noExplorationsImgUrl]>" alt="No explorations found">
+      <picture>
+        <source type="image/webp" ng-srcset="<[$ctrl.getStaticImageUrl('/general/no_explorations_found.webp')]>">
+        <source type="image/png" ng-srcset="<[$ctrl.getStaticImageUrl('/general/no_explorations_found.png')]>">
+        <img ng-if="!$ctrl.profilePictureDataUrl" ng-src="<[$ctrl.getStaticImageUrl('/general/no_explorations_found.png')]>">
+      </picture>
       <p style="text-align: center;">
         <span translate="I18N_LIBRARY_NO_EXPLORATION_FOR_QUERY"></span><br><br>
         <a ng-if="!$ctrl.userIsLoggedIn" href="" ng-click="$ctrl.onRedirectToLogin('/creator-dashboard?mode=create')"

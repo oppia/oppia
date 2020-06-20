@@ -243,17 +243,13 @@ angular.module('oppia').directive('stateInteractionEditor', [
               AlertsService.clearWarnings();
             });
           };
+
           ctrl.$onInit = function() {
             $scope.EditabilityService = EditabilityService;
 
             $scope.StateInteractionIdService = StateInteractionIdService;
             $scope.hasLoaded = false;
             $scope.customizationModalReopened = false;
-
-            $scope.userBlueImgUrl = UrlInterpolationService.getStaticImageUrl(
-              '/avatar/user_blue_72px.png');
-            $scope.userBlackImgUrl = UrlInterpolationService.getStaticImageUrl(
-              '/avatar/user_black_72px.png');
             $scope.$on('stateEditorInitialized', function(evt, stateData) {
               if (stateData === undefined || $.isEmptyObject(stateData)) {
                 throw new Error(
@@ -273,6 +269,10 @@ angular.module('oppia').directive('stateInteractionEditor', [
               _updateInteractionPreviewAndAnswerChoices();
               $scope.hasLoaded = true;
             });
+
+            $scope.getStaticImageUrl = function(imagePath) {
+              return UrlInterpolationService.getStaticImageUrl(imagePath);
+            };
 
             $rootScope.$broadcast('interactionEditorInitialized');
             StateEditorService.updateStateInteractionEditorInitialised();

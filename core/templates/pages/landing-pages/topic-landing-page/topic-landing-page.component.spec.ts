@@ -60,11 +60,13 @@ describe('Topic Landing Page', function() {
     ]);
     expect(ctrl.bookImageUrl).toBe('/assets/images/splash/books.svg');
     expect(ctrl.image1).toEqual({
-      src: '/assets/images/landing/math/ratios/ratios_James.png',
+      src_png: '/assets/images/landing/math/ratios/ratios_James.png',
+      src_webp: '/assets/images/landing/math/ratios/ratios_James.webp',
       alt: 'A boy showing 2 is to 3 ratio on a card.'
     });
     expect(ctrl.image2).toEqual({
-      src: '/assets/images/landing/math/ratios/ratios_question.png',
+      src_png: '/assets/images/landing/math/ratios/ratios_question.png',
+      src_webp: '/assets/images/landing/math/ratios/ratios_question.webp',
       alt: 'A smoothie shop and a card having question "What does a' +
       ' ratio tell us?" with options.'
     });

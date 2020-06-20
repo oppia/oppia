@@ -38,7 +38,11 @@
   <div class="navbar-container" style="background-color: #00376d">
     <div class="navbar-header protractor-test-navbar-header float-left">
       <a class="oppia-navbar-brand-name oppia-transition-200 float-left" href="/community-library">
-        <img ng-src="<[$ctrl.logoWhiteImgUrl]>" class="oppia-logo" ng-class="'oppia-logo-wide'" alt="Oppia Logo">
+        <picture>
+          <source type="image/webp" ng-srcset="<[$ctrl.getStaticImageUrl('/logo/288x128_logo_white.webp')]>">
+          <source type="image/png" ng-srcset="<[$ctrl.getStaticImageUrl('/logo/288x128_logo_white.png')]>">
+          <img ng-src="<[$ctrl.getStaticImageUrl('/logo/288x128_logo_white.png')]>" class="oppia-logo" ng-class="'oppia-logo-wide'">
+        </picture>
       </a>
       <ul class="nav navbar-nav oppia-navbar-breadcrumb">
         <li>

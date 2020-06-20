@@ -82,6 +82,10 @@ angular.module('oppia').directive('adminNavbar', [
             ctrl.profilePictureDataUrl = dataUrl;
           });
 
+          ctrl.getStaticImageUrl = function(imagePath) {
+            return UrlInterpolationService.getStaticImageUrl(imagePath);
+          };
+
           ctrl.username = '';
           ctrl.isModerator = null;
           ctrl.isSuperAdmin = null;
@@ -97,9 +101,6 @@ angular.module('oppia').directive('adminNavbar', [
               })
             );
           });
-
-          ctrl.logoWhiteImgUrl = UrlInterpolationService.getStaticImageUrl(
-            '/logo/288x128_logo_white.png');
 
           ctrl.logoutUrl = LOGOUT_URL;
 

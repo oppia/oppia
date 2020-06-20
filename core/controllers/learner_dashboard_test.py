@@ -414,9 +414,8 @@ class LearnerDashboardFeedbackThreadHandlerTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             messages_summary['author_username'], self.EDITOR_USERNAME)
-        self.assertTrue(
-            messages_summary['author_picture_data_url'].startswith(
-                'data:image/png;'))
+        self.assertTrue(test_utils.check_image_png_or_webp(
+            messages_summary['author_picture_data_url']))
         self.assertFalse(messages_summary.get('suggestion_html'))
         self.assertFalse(messages_summary.get('current_content_html'))
         self.assertFalse(messages_summary.get('description'))
@@ -448,9 +447,8 @@ class LearnerDashboardFeedbackThreadHandlerTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             messages_summary['author_username'], self.EDITOR_USERNAME)
-        self.assertTrue(
-            messages_summary['author_picture_data_url'].startswith(
-                'data:image/png;'))
+        self.assertTrue(test_utils.check_image_png_or_webp(
+            messages_summary['author_picture_data_url']))
         self.assertEqual(
             utils.get_time_in_millisecs(first_suggestion.created_on),
             messages_summary['created_on_msecs'])

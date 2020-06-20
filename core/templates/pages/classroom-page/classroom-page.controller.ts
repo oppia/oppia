@@ -52,6 +52,11 @@ angular.module('oppia').directive('classroomPage', [
             TopicSummaryObjectFactory, UrlService,
             WindowDimensionsService, FATAL_ERROR_CODES) {
           var ctrl = this;
+
+          ctrl.getStaticImageUrl = function(imagePath) {
+            return UrlInterpolationService.getStaticImageUrl(imagePath);
+          };
+
           ctrl.$onInit = function() {
             var classroomName = UrlService.getClassroomNameFromUrl();
             ctrl.bannerImageFileUrl = UrlInterpolationService.getStaticImageUrl(

@@ -77,6 +77,10 @@ angular.module('oppia').directive('sharingLinks', [
                 'collection player or the exploration player');
             }
 
+            ctrl.getStaticImageUrl = function(imagePath) {
+              return UrlInterpolationService.getStaticImageUrl(imagePath);
+            };
+
             ctrl.serverName = (
               $window.location.protocol + '//' + $window.location.host);
 
@@ -85,7 +89,7 @@ angular.module('oppia').directive('sharingLinks', [
                 DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR));
 
             ctrl.classroomUrl = UrlInterpolationService.getStaticImageUrl(
-              '/general/classroom.png');
+              '/general/classroom.webp');
           };
         }
       ]

@@ -211,6 +211,10 @@ angular.module('oppia').directive('paramChangesEditor', [
                 $scope.saveParamChanges();
               }
             });
+
+            $scope.getStaticImageUrl = function(imagePath) {
+              return UrlInterpolationService.getStaticImageUrl(imagePath);
+            };
             // This is a local variable that is used by the select2 dropdowns
             // for choosing parameter names. It may not accurately reflect the
             // content of ExplorationParamSpecsService, since it's possible that
@@ -260,8 +264,6 @@ angular.module('oppia').directive('paramChangesEditor', [
                 $scope.$apply();
               }
             };
-            $scope.dragDotsImgUrl = UrlInterpolationService.getStaticImageUrl(
-              '/general/drag_dots.png');
           };
         }
       ]

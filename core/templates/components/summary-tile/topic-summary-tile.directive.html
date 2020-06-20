@@ -1,6 +1,10 @@
 <a ng-href="<[$ctrl.getTopicLink()]>">
   <div class="oppia-topic-image">
-    <img ng-src="<[$ctrl.getStaticImageUrl('/landing/math/fractions/matthew_paper.png')]>" alt="" class="topic-thumbnail">
+    <picture>
+      <source type="image/webp" ng-srcset="<[$ctrl.getStaticImageUrl('/landing/math/fractions/matthew_paper.webp')]>">
+      <source type="image/png" ng-srcset="<[$ctrl.getStaticImageUrl('/landing/math/fractions/matthew_paper.png')]>">
+      <img ng-src="<[$ctrl.getStaticImageUrl('/landing/math/fractions/matthew_paper.png')]>" alt="" class="topic-thumbnail">
+    </picture>
   </div>
   <div class="oppia-topic-details">
     <div class="oppia-topic-name">

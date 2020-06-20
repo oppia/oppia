@@ -15,7 +15,11 @@
 
   <li>
     <a title="Google Classroom" ng-href="https://classroom.google.com/share?url=<[$ctrl.serverName]>/<[$ctrl.activityType]>/<[$ctrl.activityId]>" onclick="return !window.open(this.href, '', 'height=460, width=640')" ng-click="$ctrl.registerShareEvent('classroom')" target="_window">
-      <img class="share-option-img" ng-src="<[$ctrl.classroomUrl]>" alt="Classroom">
+      <picture>
+        <source type="image/webp" ng-srcset="<[$ctrl.getStaticImageUrl('/general/classroom.webp')]>">
+        <source type="image/png" ng-srcset="<[$ctrl.getStaticImageUrl('/general/classroom.png')]>">
+        <img class="share-option-img" ng-src="<[$ctrl.getStaticImageUrl('/general/classroom.png')]>" alt="Classroom">
+      </picture>
     </a>
   </li>
 

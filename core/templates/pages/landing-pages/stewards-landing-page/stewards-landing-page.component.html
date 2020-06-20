@@ -4,7 +4,11 @@
       <div class="container-fluid">
         <div class="row">
           <div class="col-sm-6 col-sm-push-6" style="height: auto; z-index: 20;">
-            <img ng-src="<[$ctrl.getStaticImageUrl('/general/partner.png')]>" class="oppia-stewards-landing-image">
+            <picture>
+              <source type="image/webp" ng-srcset="<[$ctrl.getStaticImageUrl('/general/partner.webp')]>">
+              <source type="image/png" ng-srcset="<[$ctrl.getStaticImageUrl('/general/partner.png')]>">
+              <img ng-src="<[$ctrl.getStaticImageUrl('/general/partner.png')]>" class="oppia-stewards-landing-image">
+            </picture>
           </div>
           <div class="col-sm-6 col-sm-pull-6" style="z-index: 20">
             <div class="oppia-stewards-landing-top-section">

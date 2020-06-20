@@ -50,7 +50,12 @@ angular.module('oppia').component('topicLandingPage', {
               file_name: landingPageData[imageKey].file_name
             });
           return {
-            src: UrlInterpolationService.getStaticImageUrl(imagePath),
+            src_png: UrlInterpolationService.getStaticImageUrl(
+              imagePath + '.png'
+            ),
+            src_webp: UrlInterpolationService.getStaticImageUrl(
+              imagePath + '.webp'
+            ),
             alt: landingPageData[imageKey].alt
           };
         }
