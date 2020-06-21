@@ -360,7 +360,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'question-player-concept-card-modal.controller.ts',
     'question-player-engine.service.ts',
     'question-player.directive.ts',
-    'question-suggestion.service.ts',
     'question-update.service.ts',
     'questions-list-select-skill-and-difficulty-modal.controller.ts',
     'questions-list-select-skill-modal.controller.ts',

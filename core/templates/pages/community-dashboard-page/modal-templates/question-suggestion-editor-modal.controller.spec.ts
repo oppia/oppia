@@ -17,10 +17,12 @@
  */
 
 describe('Question Suggestion Editor Modal Controller', function() {
+  var $httpBackend = null;
   var $uibModal = null;
   var $uibModalInstance = null;
   var $q = null;
   var $scope = null;
+  var CsrfTokenService = null;
   var QuestionObjectFactory = null;
   var QuestionSuggestionService = null;
   var QuestionUndoRedoService = null;
@@ -37,9 +39,11 @@ describe('Question Suggestion Editor Modal Controller', function() {
 
   describe('when question is valid', function() {
     beforeEach(angular.mock.inject(function($injector, $controller) {
+      $httpBackend = $injector.get('$httpBackend');
       $uibModal = $injector.get('$uibModal');
       $q = $injector.get('$q');
       var $rootScope = $injector.get('$rootScope');
+      CsrfTokenService = $injector.get('CsrfTokenService');
       QuestionObjectFactory = $injector.get('QuestionObjectFactory');
       QuestionSuggestionService = $injector.get('QuestionSuggestionService');
       QuestionUndoRedoService = $injector.get('QuestionUndoRedoService');
@@ -48,6 +52,9 @@ describe('Question Suggestion Editor Modal Controller', function() {
 
       $uibModalInstance = jasmine.createSpyObj(
         '$uibModalInstance', ['close', 'dismiss']);
+
+      spyOn(CsrfTokenService, 'getTokenAsync')
+        .and.returnValue($q.resolve('sample-csrf-token'));
 
       var skillContentsDict = {
         explanation: {
@@ -166,10 +173,10 @@ describe('Question Suggestion Editor Modal Controller', function() {
     });
 
     it('should successfully submit a question', function() {
-      spyOn(QuestionSuggestionService, 'submitSuggestion').and.callThrough();
+      $httpBackend.expectPOST('/suggestionhandler/').respond(200);
       $scope.done();
+      $httpBackend.flush();
 
-      expect(QuestionSuggestionService.submitSuggestion).toHaveBeenCalled();
       expect($uibModalInstance.close).toHaveBeenCalled();
     });
 
