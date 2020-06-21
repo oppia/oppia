@@ -70,6 +70,12 @@ describe('Classroom page', () => {
     }
   });
 
+  it('should get static image url', function() {
+    var imagePath = '/path/to/image.png';
+    expect(ctrl.getStaticImageUrl(imagePath)).toBe(
+      '/assets/images/path/to/image.png');
+  });
+
   it('should return undefined when trying to get a service from' +
     ' OppiaAngularRootComponent', function() {
     expect(ctrl.getClassroomBackendApiService()).toBeUndefined();
