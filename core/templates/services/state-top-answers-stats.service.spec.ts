@@ -17,10 +17,9 @@
  * statistics for a particular state.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// StateTopAnswersStatsService.ts is upgraded to Angular 8.
 import { AngularNameService } from
   'pages/exploration-editor-page/services/angular-name.service';
+import { Answer } from 'domain/exploration//AnswerStatsObjectFactory';
 import { AnswerClassificationResultObjectFactory } from
   'domain/classifier/AnswerClassificationResultObjectFactory';
 import { AnswerGroupObjectFactory } from
@@ -72,15 +71,12 @@ require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require('services/state-top-answers-stats.service.ts');
 
 class MockAnswerStats {
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' since 'answer' is a dict with underscore_cased keys which gives
-  // tslint errors against underscore_casing in favor of camelCasing.
-  answer: any;
+  answer: Answer;
   answerHtml: string;
   frequency: number;
   isAddressed: boolean;
   constructor(
-      answer: any, answerHtml: string, frequency: number,
+      answer: Answer, answerHtml: string, frequency: number,
       isAddressed: boolean) {
     this.answer = angular.copy(answer);
     this.answerHtml = answerHtml;

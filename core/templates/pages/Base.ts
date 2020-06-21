@@ -108,8 +108,8 @@ angular.module('oppia').controller('Base', [
         {
           propertyType: 'property',
           propertyValue: 'og:image',
-          content: $scope.getAssetUrl(
-            '/assets/images/logo/288x288_logo_mint.png')
+          content: UrlInterpolationService.getStaticImageUrl(
+            '/logo/288x288_logo_mint.webp')
         }
       ]);
 
