@@ -21,7 +21,6 @@ require(
   'confirm-or-cancel-modal.controller.ts');
 
 require('pages/exploration-editor-page/services/router.service.ts');
-require('services/html-escaper.service.ts');
 
 angular.module('oppia').controller('StateStatsModalController', [
   '$controller', '$scope', '$uibModalInstance',
