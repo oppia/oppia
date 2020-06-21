@@ -21,8 +21,4 @@ angular.module('oppia').directive('oppiaVisualizationSortedTiles', () => ({
   scope: { data: '<', options: '<' },
   template: require('./oppia-visualization-sorted-tiles.directive.html'),
   style: require('./oppia-visualization-sorted-tiles.directive.css'),
-  controller: function() {
-    // Kept defined despite having no body to provide a meaningful unit test.
-    this.$onInit = () => {};
-  },
 }));
