@@ -16,6 +16,13 @@
  * @fileoverview Service for the 'embed exploration' modal.
  */
 
+import { downgradeInjectable } from '@angular/upgrade/static';
+
+// @Injectable({
+//   providedIn: 'root'
+// })
+// export class ExplorationEmbedButtonService {}
+
 require(
   'components/button-directives/' +
   'exploration-embed-button-modal.controller.ts');

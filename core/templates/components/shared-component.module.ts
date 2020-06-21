@@ -21,16 +21,30 @@ import 'zone.js';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
+import { FlexLayoutModule } from '@angular/flex-layout';
+
 import { BackgroundBannerComponent } from
   './common-layout-directives/common-elements/background-banner.component';
 import { TranslatePipe } from 'filters/translate.pipe';
+import { SharingLinksComponent } from
+  './common-layout-directives/common-elements/sharing-links.directive';
+import { ExplorationEmbedButtonModalComponent } from
+  './button-directives/exploration-embed-button-modal.component';
+import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
 
 
 @NgModule({
-  imports: [CommonModule],
-  declarations: [BackgroundBannerComponent, TranslatePipe],
-  entryComponents: [BackgroundBannerComponent],
-  exports: [BackgroundBannerComponent, TranslatePipe]
+  imports: [CommonModule, FlexLayoutModule, NgbModalModule],
+  declarations: [BackgroundBannerComponent, TranslatePipe,
+    SharingLinksComponent, ExplorationEmbedButtonModalComponent],
+  entryComponents: [BackgroundBannerComponent, SharingLinksComponent,
+    // These elements will remain here even after migration
+    ExplorationEmbedButtonModalComponent
+  ],
+  exports: [
+    BackgroundBannerComponent, FlexLayoutModule, TranslatePipe,
+    SharingLinksComponent,
+  ],
 })
 
 export class SharedComponentsModule { }
