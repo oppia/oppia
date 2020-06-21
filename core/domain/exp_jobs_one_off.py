@@ -52,7 +52,7 @@ from pylatexenc import latex2text #isort:skip
     models.NAMES.exploration])
 gae_image_services = models.Registry.import_gae_image_services()
 
-SEPARATORS = ['<', '>', '=']
+MATH_VALID_EXP_LIMIT = 200
 ADDED_THREE_VERSIONS_TO_GCS = 'Added the three versions'
 _COMMIT_TYPE_REVERT = 'revert'
 ALL_IMAGES_VERIFIED = 'Images verified'
@@ -132,9 +132,12 @@ class MathExpressionValidationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """Job that produces a list of explorations that use the MathExpressionInput
     along with the validity and type(expression/equation) of the inputs present
     in the exploration.
+
     This validation is done by the 'is_valid_math_expression' or the
     'is_valid_math_equation' function present in schema_utils.py.
     """
+
+    valid_exps_seen = 0
 
     @classmethod
     def entity_classes_to_map_over(cls):
@@ -159,15 +162,20 @@ class MathExpressionValidationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                             validity = 'Invalid'
                             if is_valid_math_expression(rule_input):
                                 validity = 'Valid Expression'
+                                MathExpressionValidationOneOffJob.valid_exps_seen += 1
                             elif is_valid_math_equation(rule_input):
                                 validity = 'Valid Equation'
-                            yield (
-                                item.id,
-                                u'%s: %s -- %s' % (
-                                    state_name, rule_input, validity))
+                                MathExpressionValidationOneOffJob.valid_exps_seen += 1
+                            if MathExpressionValidationOneOffJob.valid_exps_seen <= MATH_VALID_EXP_LIMIT:
+                                yield (
+                                    validity,
+                                    u'%s: %s' % (state_name, rule_input))
 
     @staticmethod
     def reduce(key, values):
+        # Resetting the class variable back to 0 to avoid inconsistencies upon
+        # multiple consecutive runs of this job.
+        MathExpressionValidationOneOffJob.valid_exps_seen = 0
         yield (key, values)
 
 
