@@ -21,14 +21,23 @@ require(
   'confirm-or-cancel-modal.controller.ts');
 require(
   'components/forms/custom-forms-directives/thumbnail-uploader.directive.ts');
-
+require('components/entity-creation-services/skill-creation.service.ts');
+require(
+  'components/forms/custom-forms-directives/' +
+    'edit-thumbnail-modal.controller.ts');
 require('components/entity-creation-services/story-creation.service.ts');
 require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/topic/topic-update.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
+require('pages/topic-editor-page/services/topic-editor-routing.service.ts');
+require('pages/topic-editor-page/services/topic-editor-helper.service.ts');
 require(
   'pages/topic-editor-page/editor-tab/topic-editor-stories-list.directive.ts');
+
+require('pages/topic-editor-page/modal-templates/' +
+    'preview-thubmnail.directive.ts');
+
 require('services/alerts.service.ts');
 require('services/context.service.ts');
 require('services/csrf-token.service.ts');
@@ -48,19 +57,21 @@ angular.module('oppia').directive('topicEditorTab', [
       controller: [
         '$scope', '$uibModal', 'AlertsService',
         'ContextService', 'CsrfTokenService', 'ImageUploadHelperService',
+        'SkillCreationService', 'StoryCreationService',
+        'TopicEditorHelperService', 'TopicEditorRoutingService',
         'TopicEditorStateService', 'TopicUpdateService', 'UndoRedoService',
-        'UrlInterpolationService', 'StoryCreationService',
-        'EVENT_STORY_SUMMARIES_INITIALIZED', 'EVENT_TOPIC_INITIALIZED',
-        'EVENT_TOPIC_REINITIALIZED', 'MAX_CHARS_IN_TOPIC_DESCRIPTION',
-        'MAX_CHARS_IN_TOPIC_NAME',
+        'UrlInterpolationService', 'MAX_CHARS_IN_TOPIC_DESCRIPTION',
+        'MAX_CHARS_IN_TOPIC_NAME', 'EVENT_STORY_SUMMARIES_INITIALIZED',
+        'EVENT_TOPIC_INITIALIZED', 'EVENT_TOPIC_REINITIALIZED',
         function(
             $scope, $uibModal, AlertsService,
             ContextService, CsrfTokenService, ImageUploadHelperService,
+            SkillCreationService, StoryCreationService,
+            TopicEditorHelperService, TopicEditorRoutingService,
             TopicEditorStateService, TopicUpdateService, UndoRedoService,
-            UrlInterpolationService, StoryCreationService,
-            EVENT_STORY_SUMMARIES_INITIALIZED, EVENT_TOPIC_INITIALIZED,
-            EVENT_TOPIC_REINITIALIZED, MAX_CHARS_IN_TOPIC_DESCRIPTION,
-            MAX_CHARS_IN_TOPIC_NAME) {
+            UrlInterpolationService, MAX_CHARS_IN_TOPIC_DESCRIPTION,
+            MAX_CHARS_IN_TOPIC_NAME, EVENT_STORY_SUMMARIES_INITIALIZED,
+            EVENT_TOPIC_INITIALIZED, EVENT_TOPIC_REINITIALIZED) {
           var ctrl = this;
           $scope.MAX_CHARS_IN_TOPIC_NAME = MAX_CHARS_IN_TOPIC_NAME;
           $scope.MAX_CHARS_IN_TOPIC_DESCRIPTION = (
@@ -78,6 +89,16 @@ angular.module('oppia').directive('topicEditorTab', [
             $scope.editableDescriptionIsEmpty = (
               $scope.editableDescription === '');
             $scope.topicDescriptionChanged = false;
+            $scope.subtopics = $scope.topic.getSubtopics();
+            $scope.uncategorizedSkillSummaries = (
+              $scope.topic.getUncategorizedSkillSummaries());
+
+            $scope.editableThumbnailDataUrl = (
+              ImageUploadHelperService
+                .getTrustedResourceUrlForThumbnailFilename(
+                  $scope.topic.getThumbnailFilename(),
+                  ContextService.getEntityType(),
+                  ContextService.getEntityId()));
           };
 
           var _initStorySummaries = function() {
@@ -108,6 +129,14 @@ angular.module('oppia').directive('topicEditorTab', [
             }
           };
 
+          $scope.createSkill = function() {
+            TopicEditorHelperService.createSkill();
+          };
+
+          $scope.createSubtopic = function() {
+            TopicEditorHelperService.createSubtopic($scope.topic);
+          };
+
           $scope.updateTopicDescriptionStatus = function(description) {
             $scope.editableDescriptionIsEmpty = (description === '');
             $scope.topicDescriptionChanged = true;
@@ -119,14 +148,6 @@ angular.module('oppia').directive('topicEditorTab', [
             }
             TopicUpdateService.setTopicName($scope.topic, newName);
             $scope.topicNameEditorIsShown = false;
-          };
-
-          $scope.updateAbbreviatedName = function(newAbbreviatedName) {
-            if (newAbbreviatedName === $scope.topic.getAbbreviatedName()) {
-              return;
-            }
-            TopicUpdateService.setAbbreviatedTopicName(
-              $scope.topic, newAbbreviatedName);
           };
 
           $scope.updateTopicThumbnailFilename = function(newThumbnailFilename) {
@@ -152,7 +173,23 @@ angular.module('oppia').directive('topicEditorTab', [
             }
           };
 
+          $scope.togglePreview = function() {
+            $scope.showPreview = !($scope.showPreview);
+          };
+
+          $scope.deleteSubtopic = function(subtopicId) {
+            TopicEditorStateService.deleteSubtopicPage(
+              $scope.topic.getId(), subtopicId);
+            TopicUpdateService.deleteSubtopic($scope.topic, subtopicId);
+            _initEditor();
+          };
+
+          $scope.navigateToSubtopic = function(subtopicId) {
+            TopicEditorRoutingService.navigateToSubtopicEditorWithId(
+              subtopicId);
+          };
           ctrl.$onInit = function() {
+            $scope.showPreview = false;
             $scope.$on(EVENT_TOPIC_INITIALIZED, _initEditor);
             $scope.$on(EVENT_TOPIC_REINITIALIZED, _initEditor);
             $scope.$on(EVENT_STORY_SUMMARIES_INITIALIZED, _initStorySummaries);

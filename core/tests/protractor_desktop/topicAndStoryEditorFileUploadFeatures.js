@@ -94,14 +94,15 @@ describe('Topic editor functionality', function() {
     expect(defaultThumbnailSrc).not.toEqual(updatedTopicThumbnailSrc);
     await topicEditorPage.changeTopicDescription('Topic Description');
     await topicEditorPage.saveTopic('Changed topic name and description.');
-    await topicEditorPage.moveToSubtopicsTab();
-    await topicEditorPage.addSubtopic('Subtopic 1');
+    await topicEditorPage.navigateToTopicEditorTab();
+    await topicEditorPage.addSubtopic(
+      'Subtopic 1', '../data/test_svg.svg', 'Subtopic1 content');
+    await topicEditorPage.navigateToTopicEditorTab();
     await topicEditorPage.editSubtopicWithIndex(0);
     await topicEditorPage.changeSubtopicTitle('Modified Title');
-    await topicEditorPage.changeSubtopicPageContents(
-      await forms.toRichText('Subtopic Contents'));
+    await topicEditorPage.changeSubtopicPageContents('Subtopic Contents');
     await topicEditorPage.submitSubtopicThumbnail(
-      '../data/test2_svg.svg', false);
+      '../data/test2_svg.svg', true);
     var updatedSubtopicThumbnailSrc = (
       await topicEditorPage.getSubtopicThumbnailSource());
     expect(defaultThumbnailSrc).not.toEqual(updatedSubtopicThumbnailSrc);
@@ -114,7 +115,6 @@ describe('Topic editor functionality', function() {
       defaultThumbnailSrc);
     await topicEditorPage.expectTopicDescriptionToBe('Topic Description');
 
-    await topicEditorPage.moveToSubtopicsTab();
     await topicEditorPage.expectTitleOfSubtopicWithIndexToMatch(
       'Modified Title', 0);
     await topicEditorPage.editSubtopicWithIndex(0);

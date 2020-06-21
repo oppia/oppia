@@ -1,0 +1,57 @@
+<h3>
+    Back to <a ng-click="navigateToSubtopic()"><[editableTitle]></a>
+</h3>
+<div>
+  <div class="content-box">
+    <div class="left-menu">
+      <div class="left-menu-item" ng-click="changeContent(SHOW_THUMBNAIL)"><span>Card</span></div>
+      <div class="left-menu-item" ng-click="changeContent(SHOW_CONTENT)"><span>Content</span></div>
+    </div>
+    <div class="content">
+      <preview-thumbnail ng-if="showThumbnail" name="editableName"
+                         description="editableDescription"
+                         preview-footer="topic.getCanonicalStoryIds().length"
+                         filename = "editableThumbnailFilename"
+                         thumbnail-bg-color="editableThumbnailBgColor"
+                         bg-color="'#2F6687'">
+      </preview-thumbnail>
+
+      <angular-html-bind ng-if="!showThumbnail" html-data="pageContents.getHtml()">
+      </angular-html-bind>
+    </div>
+  </div>
+</div>
+
+<style>
+  .content-box {
+    box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+    width: 60%;
+    margin: 0 auto;
+    background-color: #FFFFFF;
+    border: 2px solid black;
+    top: 20vh;
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .left-menu {
+    width: 30%;
+    border-right: 2px solid black;
+  }
+
+  .content {
+    width: 65%;
+    padding: 30px;
+  }
+
+  .left-menu-item {
+    border-bottom: 2px solid black;
+    margin: 10px 0;
+    padding: 10px 0 10px 5px;
+  }
+
+  .left-menu-item span {
+    font-size: 18px;
+    font-weight: bold;
+  }
+</style>
