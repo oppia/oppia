@@ -23,7 +23,6 @@ import { UrlService } from
   'services/contextual/url.service';
 import { of } from 'rxjs';
 
-
 require(
   'pages/landing-pages/stewards-landing-page/' +
   'stewards-landing-page.component.ts');
