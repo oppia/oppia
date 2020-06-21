@@ -109,16 +109,13 @@ jobs:
       - run:
           name: Check if all tests should be run
           command: |
-            files_changed=$(git diff --name-only develop...$CIRCLE_BRANCH)
-            echo $CIRCLE_BRANCH
+            files_changed=$(git diff --name-only HEAD...develop)
             echo $files_changed
-            echo 'hi'
             if [ "$files_changed" != "AUTHORS CHANGELOG CONTRIBUTORS core/templates/pages/about-page/about-page.constants.ts" ]; then
               echo 'export RUN_TESTS=true' >> $BASH_ENV
             else
               echo 'export RUN_TESTS=false' >> $BASH_ENV
             fi
-            echo $RUN_TESTS
             source $BASH_ENV
       - persist_to_workspace:
           root: /home/circleci/
