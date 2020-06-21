@@ -20,6 +20,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
+import contextlib
 import itertools
 import logging
 import re
@@ -29,8 +30,10 @@ from core import jobs
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
+from core.domain import html_cleaner
 from core.domain import html_validation_service
 from core.domain import rights_manager
+from core.domain import state_domain
 from core.platform import models
 import feconf
 import python_utils
@@ -75,6 +78,27 @@ SUCCESSFUL_EXPLORATION_MIGRATION = 'Successfully migrated exploration'
 AUDIO_FILE_PREFIX = 'audio'
 AUDIO_ENTITY_TYPE = 'exploration'
 AUDIO_DURATION_SECS_MIN_STATE_SCHEMA_VERSION = 31
+
+
+# This method should be only used by ExplorationMockMathMigrationOneOffJob.
+# The job migrates all the math tags in the exploration to the new schema
+# but does not save the migrated exploration. This method will be used to
+# swap the clean function in html_cleaner, because after migrating the math
+# to new schema in the one-off job, we want to prevent the cleaning of the
+# math tag with new-schema.
+@contextlib.contextmanager
+def mock_swap(obj, attr, newvalue):
+    """Swap an object's attribute value within the context of a
+    'with' statement. The object can be anything that supports
+    getattr and setattr, such as class instances, modules.
+    """
+
+    original = getattr(obj, attr)
+    setattr(obj, attr, newvalue)
+    try:
+        yield
+    finally:
+        setattr(obj, attr, original)
 
 
 class MultipleChoiceInteractionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
@@ -324,7 +348,70 @@ class ExplorationMathTagValidationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 html_validation_service.validate_math_tags_in_html(html_string))
             if len(error_list) > 0:
                 key = (
-                    'exp_id: %s, exp_status: %s' % (
+                    'exp_id: %s, exp_status: %s failed validation.' % (
+                        item.id, exploration_status))
+                value_dict = {
+                    'state_name': state_name,
+                    'error_list': error_list,
+                    'no_of_invalid_tags': len(error_list)
+                }
+                yield (key, value_dict)
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, values)
+
+
+class ExplorationMockMathMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """Job that migrates all the math tags in the exploration to the new schema
+    but does not save the migrated exploration. This job is used to verify
+    that the actual migration will be possible for all the explorations.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    @staticmethod
+    def map(item):
+        if item.deleted:
+            return
+
+        exploration = exp_fetchers.get_exploration_from_model(item)
+        exploration_status = (
+            rights_manager.get_exploration_rights(
+                item.id).status)
+        for state_name, state in exploration.states.items():
+            try:
+                converted_state_dict = (
+                    state_domain.State.convert_html_fields_in_state(
+                        state.to_dict(),
+                        html_validation_service.
+                        add_math_content_to_math_rte_components))
+                with mock_swap(html_cleaner, 'clean', lambda html: html):
+                    converted_state = (
+                        state_domain.State.from_dict(converted_state_dict))
+                    converted_state.validate(exploration.param_specs, True)
+            except Exception as e:
+                key = (
+                    'exp_id: %s, exp_status: %s failed test migration' % (
+                        item.id, exploration_status))
+                value_dict = {
+                    'state_name': state_name,
+                    'exception': [python_utils.UNICODE(e)],
+                }
+                yield (key, value_dict)
+                continue
+
+            html_string = ''.join(
+                converted_state.get_all_html_content_strings())
+            error_list = (
+                html_validation_service.
+                validate_math_tags_in_html_for_new_schema(html_string))
+            if len(error_list) > 0:
+                key = (
+                    'exp_id: %s, exp_status: %s failed validation after migrat'
+                    'ion' % (
                         item.id, exploration_status))
                 value_dict = {
                     'state_name': state_name,
