@@ -31,7 +31,7 @@ describe('Question Suggestion Editor Modal Controller', function() {
   var questionId = null;
   var questionStateData = null;
   var skill = null;
-  var skillDifficulty = 'Easy';
+  var skillDifficulty = 0.3;
 
   beforeEach(angular.mock.module('oppia'));
 
@@ -157,6 +157,7 @@ describe('Question Suggestion Editor Modal Controller', function() {
       expect($scope.questionId).toBe(questionId);
       expect($scope.questionStateData).toEqual(questionStateData);
       expect($scope.skillDifficulty).toBe(skillDifficulty);
+      expect($scope.skillDifficultyString).toBe('Easy');
       expect($scope.skill).toEqual(skill);
     });
 

@@ -53,6 +53,8 @@ describe('Question Editor Modal Controller', function() {
   var question = null;
   var questionId = null;
   var questionStateData = null;
+  var rubrics = [];
+  var skillNames = [];
   var associatedSkillSummaries = null;
 
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -153,7 +155,9 @@ describe('Question Editor Modal Controller', function() {
         newQuestionIsBeingCreated: newQuestionIsBeingCreated,
         question: question,
         questionId: questionId,
-        questionStateData: questionStateData
+        questionStateData: questionStateData,
+        rubrics: rubrics,
+        skillNames: skillNames
       });
     }));
 
@@ -165,6 +169,8 @@ describe('Question Editor Modal Controller', function() {
       expect($scope.misconceptionsBySkill).toEqual(misconceptionsBySkill);
       expect($scope.canEditQuestion).toBe(canEditQuestion);
       expect($scope.newQuestionIsBeingCreated).toBe(newQuestionIsBeingCreated);
+      expect($scope.rubrics).toEqual(rubrics);
+      expect($scope.skillNames).toEqual(skillNames);
     });
 
     it('should get skill editor url', function() {
@@ -469,7 +475,9 @@ describe('Question Editor Modal Controller', function() {
         newQuestionIsBeingCreated: newQuestionIsBeingCreated,
         question: question,
         questionId: questionId,
-        questionStateData: questionStateData
+        questionStateData: questionStateData,
+        rubrics: rubrics,
+        skillNames: skillNames
       });
     }));
 

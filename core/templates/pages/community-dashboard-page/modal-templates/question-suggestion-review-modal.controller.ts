@@ -37,7 +37,7 @@ angular.module('oppia').controller('QuestionSuggestionReviewModalController', [
     const getRubricExplanation = skillDifficultyLabel => {
       for (const rubric of skillRubrics) {
         if (rubric.difficulty === skillDifficultyLabel) {
-          return rubric.explanation;
+          return rubric.explanations;
         }
       }
       return 'This rubric has not yet been specified.';
@@ -64,7 +64,7 @@ angular.module('oppia').controller('QuestionSuggestionReviewModalController', [
     $scope.canEditQuestion = false;
     $scope.misconceptionsBySkill = misconceptionsBySkill;
     $scope.skillDifficultyLabel = getSkillDifficultyLabel();
-    $scope.skillRubricExplanation = getRubricExplanation(
+    $scope.skillRubricExplanations = getRubricExplanation(
       $scope.skillDifficultyLabel);
 
     $scope.questionChanged = function() {

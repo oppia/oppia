@@ -526,7 +526,7 @@
 	"I18N_START_HERE": "Click here to start!",
 	"I18N_STORY_VIEWER_COMPLETED_CHAPTER": "The title for a chapter icon, in the story viewer, that is completed by the learner.",
 	"I18N_SUBSCRIBE_BUTTON_TEXT": "The text that appears on the subscribe button, which allows users to subscribe to creators.\n{{Identical|Subscribe}}",
-    "I18N_SUBTOPIC_VIEWER_NEXT_SKILL": "Text appears next to a skill summary card, labelling it as the next skill to complete",
+	"I18N_SUBTOPIC_VIEWER_NEXT_SKILL": "Text appears next to a skill summary card, labelling it as the next skill to complete",
 	"I18N_TEACH_PAGE_COMMUNITY_GUIDELINES_GUIDELINE_1": "Text on Oppia's Teach page outlining the Community Guidelines.",
 	"I18N_TEACH_PAGE_COMMUNITY_GUIDELINES_GUIDELINE_2": "Text on Oppia's Teach page outlining the Community Guidelines.",
 	"I18N_TEACH_PAGE_COMMUNITY_GUIDELINES_GUIDELINE_3": "Text on Oppia's Teach page outlining the Community Guidelines.",

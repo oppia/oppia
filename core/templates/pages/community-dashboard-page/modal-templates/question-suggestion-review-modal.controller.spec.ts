@@ -44,7 +44,7 @@ describe('Question Suggestion Review Modal Controller', function() {
 
   describe('when skill rubrics is specified', function() {
     var skillRubrics = [{
-      explanation: ['explanation'],
+      explanations: ['explanation'],
       difficulty: 'Easy'
     }];
 
@@ -143,7 +143,7 @@ describe('Question Suggestion Review Modal Controller', function() {
       expect($scope.canEditQuestion).toBe(false);
       expect($scope.misconceptionsBySkill).toEqual(misconceptionsBySkill);
       expect($scope.skillDifficultyLabel).toBe('Easy');
-      expect($scope.skillRubricExplanation).toEqual(['explanation']);
+      expect($scope.skillRubricExplanations).toEqual(['explanation']);
     });
 
     it('should define validation error as null', function() {
@@ -270,7 +270,7 @@ describe('Question Suggestion Review Modal Controller', function() {
     }));
 
     it('should skill rubric explanation', function() {
-      expect($scope.skillRubricExplanation).toBe(
+      expect($scope.skillRubricExplanations).toBe(
         'This rubric has not yet been specified.');
     });
   });
