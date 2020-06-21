@@ -52,14 +52,4 @@ describe('Revert Exploration Modal Controller', function() {
     expect($scope.getExplorationUrl('1')).toBe('/explore/exp1?v=1');
     expect($scope.getExplorationUrl()).toBe('/explore/exp1?v=undefined');
   });
-
-  it('should close modal on confirm', function() {
-    $scope.confirm();
-    expect($uibModalInstance.close).toHaveBeenCalled();
-  });
-
-  it('should cancel the modal on dismiss', function() {
-    $scope.cancel();
-    expect($uibModalInstance.dismiss).toHaveBeenCalledWith('cancel');
-  });
 });

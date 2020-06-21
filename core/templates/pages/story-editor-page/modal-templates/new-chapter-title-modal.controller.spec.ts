@@ -62,9 +62,4 @@ describe('New Chapter Title Modal Controller', function() {
     expect($scope.errorMsg).toBe(null);
     expect($uibModalInstance.close).toHaveBeenCalledWith('title 4');
   });
-
-  it('should cancel the modal on dismiss', function() {
-    $scope.cancel();
-    expect($uibModalInstance.dismiss).toHaveBeenCalledWith('cancel');
-  });
 });

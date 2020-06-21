@@ -39,14 +39,4 @@ describe('Preview Set Parameters Modal Controller', function() {
   it('should init the variables', function() {
     expect($scope.manualParamChanges).toEqual(manualParamChanges);
   });
-
-  it('should close modal on confirm', function() {
-    $scope.confirm();
-    expect($uibModalInstance.close).toHaveBeenCalled();
-  });
-
-  it('should cancel the modal on dismiss', function() {
-    $scope.cancel();
-    expect($uibModalInstance.dismiss).toHaveBeenCalledWith('cancel');
-  });
 });

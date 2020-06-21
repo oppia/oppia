@@ -74,11 +74,6 @@ describe('Remove Activity From Learner Dashboard Modal Controller',
         $httpBackend.verifyNoOutstandingExpectation();
         $httpBackend.verifyNoOutstandingRequest();
       });
-
-      it('should cancel the modal on dismiss', function() {
-        $scope.cancel();
-        expect($uibModalInstance.dismiss).toHaveBeenCalledWith('cancel');
-      });
     });
 
     describe('when section name is incomplete and subsection name is' +

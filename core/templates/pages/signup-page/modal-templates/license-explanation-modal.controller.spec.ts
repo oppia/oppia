@@ -37,14 +37,4 @@ describe('License Explanation Modal Controller', function() {
   it('should init the variables', function() {
     expect($scope.siteName).toBe('Oppia.org');
   });
-
-  it('should close modal on confirm', function() {
-    $scope.confirm();
-    expect($uibModalInstance.close).toHaveBeenCalled();
-  });
-
-  it('should cancel the modal on dismiss', function() {
-    $scope.cancel();
-    expect($uibModalInstance.dismiss).toHaveBeenCalledWith('cancel');
-  });
 });

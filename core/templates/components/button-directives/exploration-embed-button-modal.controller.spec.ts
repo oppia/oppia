@@ -72,14 +72,4 @@ describe('Exploration Embed Button Modal Controller', function() {
     expect(removeAllRanges).toHaveBeenCalled();
     expect(addRange).toHaveBeenCalledWith(document.createRange());
   });
-
-  it('should close modal on confirm', function() {
-    $scope.confirm();
-    expect($uibModalInstance.close).toHaveBeenCalled();
-  });
-
-  it('should cancel the modal on dismiss', function() {
-    $scope.cancel();
-    expect($uibModalInstance.dismiss).toHaveBeenCalledWith('cancel');
-  });
 });

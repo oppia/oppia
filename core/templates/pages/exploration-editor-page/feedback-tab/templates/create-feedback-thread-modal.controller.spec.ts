@@ -72,9 +72,4 @@ describe('Create Feedback Thread Modal Controller', function() {
       newThreadText: 'text'
     });
   });
-
-  it('should cancel the modal on dismiss', function() {
-    $scope.cancel();
-    expect($uibModalInstance.dismiss).toHaveBeenCalledWith('cancel');
-  });
 });
