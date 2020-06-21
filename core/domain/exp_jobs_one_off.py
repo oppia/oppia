@@ -162,11 +162,11 @@ class MathExpressionValidationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                             validity = 'Invalid'
                             if is_valid_math_expression(rule_input):
                                 validity = 'Valid Expression'
-                                MathExpressionValidationOneOffJob.valid_exps_seen += 1
+                                MathExpressionValidationOneOffJob.valid_exps_seen += 1  #pylint: disable=line-too-long
                             elif is_valid_math_equation(rule_input):
                                 validity = 'Valid Equation'
-                                MathExpressionValidationOneOffJob.valid_exps_seen += 1
-                            if MathExpressionValidationOneOffJob.valid_exps_seen <= MATH_VALID_EXP_LIMIT:
+                                MathExpressionValidationOneOffJob.valid_exps_seen += 1  #pylint: disable=line-too-long
+                            if MathExpressionValidationOneOffJob.valid_exps_seen <= MATH_VALID_EXP_LIMIT:   #pylint: disable=line-too-long
                                 yield (
                                     validity,
                                     u'%s: %s' % (state_name, rule_input))
