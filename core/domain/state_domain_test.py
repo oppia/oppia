@@ -1004,6 +1004,167 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         init_state = exploration.states[exploration.init_state_name]
         self.assertEqual(init_state.solicit_answer_details, False)
 
+    def test_convert_html_fields_in_state(self):
+        """Test conversion of html strings in state."""
+        state_dict = {
+            'content': {
+                'content_id': 'content', 'html': 'Hello!'
+            },
+            'param_changes': [],
+            'content_ids_to_audio_translations': {'content': {}},
+            'solicit_answer_details': False,
+            'classifier_model_id': None,
+            'interaction': {
+                'solution': None,
+                'answer_groups': [],
+                'default_outcome': {
+                    'param_changes': [], 'feedback': {
+                        'content_id': 'default_outcome', 'html': (
+                            '<p><oppia-noninteractive-image filepath'
+                            '-with-value="&amp;quot;random.png&amp;'
+                            'quot;"></oppia-noninteractive-image>'
+                            'Hello this is test case to check '
+                            'image tag inside p tag</p>'
+                        )
+                    },
+                    'dest': 'Introduction',
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None,
+                    'labelled_as_correct': False
+                },
+                'customization_args': {},
+                'confirmed_unclassified_answers': [],
+                'id': None,
+                'hints': []
+            }
+        }
+
+        state_dict_in_textangular = {
+            'content': {
+                'content_id': 'content', 'html': '<p>Hello!</p>'
+            },
+            'param_changes': [],
+            'content_ids_to_audio_translations': {'content': {}},
+            'solicit_answer_details': False,
+            'classifier_model_id': None,
+            'interaction': {
+                'solution': None,
+                'answer_groups': [],
+                'default_outcome': {
+                    'param_changes': [], 'feedback': {
+                        'content_id': 'default_outcome', 'html': (
+                            '<p><oppia-noninteractive-image filepath'
+                            '-with-value="&amp;quot;random.png&amp;'
+                            'quot;"></oppia-noninteractive-image>'
+                            'Hello this is test case to check '
+                            'image tag inside p tag</p>'
+                        )
+                    },
+                    'dest': 'Introduction',
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None,
+                    'labelled_as_correct': False
+                },
+                'customization_args': {},
+                'confirmed_unclassified_answers': [],
+                'id': None,
+                'hints': []
+            }
+        }
+
+        state_dict_with_image_caption = {
+            'content': {
+                'content_id': 'content', 'html': '<p>Hello!</p>'
+            },
+            'param_changes': [],
+            'content_ids_to_audio_translations': {'content': {}},
+            'solicit_answer_details': False,
+            'classifier_model_id': None,
+            'interaction': {
+                'solution': None,
+                'answer_groups': [],
+                'default_outcome': {
+                    'param_changes': [], 'feedback': {
+                        'content_id': 'default_outcome', 'html': (
+                            '<p><oppia-noninteractive-image caption-'
+                            'with-value="&amp;quot;&amp;quot;" filepath'
+                            '-with-value="&amp;quot;random.png&amp;'
+                            'quot;"></oppia-noninteractive-image>'
+                            'Hello this is test case to check '
+                            'image tag inside p tag</p>'
+                        )
+                    },
+                    'dest': 'Introduction',
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None,
+                    'labelled_as_correct': False
+                },
+                'customization_args': {},
+                'confirmed_unclassified_answers': [],
+                'id': None,
+                'hints': []
+            }
+        }
+
+        state_dict_with_image_dimensions = {
+            'content': {
+                'content_id': 'content', 'html': '<p>Hello!</p>'
+            },
+            'param_changes': [],
+            'content_ids_to_audio_translations': {'content': {}},
+            'solicit_answer_details': False,
+            'classifier_model_id': None,
+            'interaction': {
+                'solution': None,
+                'answer_groups': [],
+                'default_outcome': {
+                    'param_changes': [], 'feedback': {
+                        'content_id': 'default_outcome', 'html': (
+                            u'<p><oppia-noninteractive-image '
+                            'caption-with-value="&amp;quot;&amp;quot;" '
+                            'filepath-with-value="&amp;quot;'
+                            'random_height_490_width_120.png&amp;'
+                            'quot;"></oppia-noninteractive-image>Hello this '
+                            'is test case to check image tag inside p tag</p>'
+                        )
+                    },
+                    'dest': 'Introduction',
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None,
+                    'labelled_as_correct': False
+                },
+                'customization_args': {},
+                'confirmed_unclassified_answers': [],
+                'id': None,
+                'hints': []
+            }
+        }
+
+        self.assertEqual(
+            state_domain.State.convert_html_fields_in_state(
+                state_dict,
+                html_validation_service.convert_to_textangular),
+            state_dict_in_textangular)
+
+        self.assertEqual(
+            state_domain.State.convert_html_fields_in_state(
+                state_dict,
+                html_validation_service.add_caption_attr_to_image),
+            state_dict_with_image_caption)
+
+        add_dimensions_to_image_tags = functools.partial(
+            html_validation_service.add_dimensions_to_image_tags,
+            'eid')
+
+        with self.swap(
+            html_validation_service, 'get_filename_with_dimensions',
+            mock_get_filename_with_dimensions):
+
+            self.assertEqual(
+                state_domain.State.convert_html_fields_in_state(
+                    state_dict, add_dimensions_to_image_tags),
+                state_dict_with_image_dimensions)
+
     def test_convert_html_fields_in_state_with_drag_and_drop_interaction(self):
         """Test the method for converting all the HTML in a state having
         DragAndDropSortInput interaction.
@@ -1250,7 +1411,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 html_validation_service.
                 add_math_content_to_math_rte_components),
             state_dict_with_new_math_schema)
-
 
     def test_convert_html_fields_in_state_with_item_selection_interaction(self):
         """Test the method for converting all the HTML in a state having
@@ -1619,7 +1779,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 add_math_content_to_math_rte_components),
             state_dict_with_new_math_schema)
 
-
     def test_convert_html_fields_in_state_having_rule_spec_with_invalid_format(
             self):
         """Test the method for converting the HTML in a state
@@ -1723,7 +1882,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     state_dict_with_old_math_schema,
                     html_validation_service.
                     add_math_content_to_math_rte_components)
-
 
     def test_convert_html_fields_in_rule_spec_with_invalid_input_variable(self):
         """Test the method for converting the HTML in a state
@@ -1830,168 +1988,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     state_dict_with_old_math_schema,
                     html_validation_service.
                     add_math_content_to_math_rte_components)
-
-    def test_convert_html_fields_in_state(self):
-        """Test conversion of html strings in state."""
-        state_dict = {
-            'content': {
-                'content_id': 'content', 'html': 'Hello!'
-            },
-            'param_changes': [],
-            'content_ids_to_audio_translations': {'content': {}},
-            'solicit_answer_details': False,
-            'classifier_model_id': None,
-            'interaction': {
-                'solution': None,
-                'answer_groups': [],
-                'default_outcome': {
-                    'param_changes': [], 'feedback': {
-                        'content_id': 'default_outcome', 'html': (
-                            '<p><oppia-noninteractive-image filepath'
-                            '-with-value="&amp;quot;random.png&amp;'
-                            'quot;"></oppia-noninteractive-image>'
-                            'Hello this is test case to check '
-                            'image tag inside p tag</p>'
-                        )
-                    },
-                    'dest': 'Introduction',
-                    'refresher_exploration_id': None,
-                    'missing_prerequisite_skill_id': None,
-                    'labelled_as_correct': False
-                },
-                'customization_args': {},
-                'confirmed_unclassified_answers': [],
-                'id': None,
-                'hints': []
-            }
-        }
-
-        state_dict_in_textangular = {
-            'content': {
-                'content_id': 'content', 'html': '<p>Hello!</p>'
-            },
-            'param_changes': [],
-            'content_ids_to_audio_translations': {'content': {}},
-            'solicit_answer_details': False,
-            'classifier_model_id': None,
-            'interaction': {
-                'solution': None,
-                'answer_groups': [],
-                'default_outcome': {
-                    'param_changes': [], 'feedback': {
-                        'content_id': 'default_outcome', 'html': (
-                            '<p><oppia-noninteractive-image filepath'
-                            '-with-value="&amp;quot;random.png&amp;'
-                            'quot;"></oppia-noninteractive-image>'
-                            'Hello this is test case to check '
-                            'image tag inside p tag</p>'
-                        )
-                    },
-                    'dest': 'Introduction',
-                    'refresher_exploration_id': None,
-                    'missing_prerequisite_skill_id': None,
-                    'labelled_as_correct': False
-                },
-                'customization_args': {},
-                'confirmed_unclassified_answers': [],
-                'id': None,
-                'hints': []
-            }
-        }
-
-        state_dict_with_image_caption = {
-            'content': {
-                'content_id': 'content', 'html': '<p>Hello!</p>'
-            },
-            'param_changes': [],
-            'content_ids_to_audio_translations': {'content': {}},
-            'solicit_answer_details': False,
-            'classifier_model_id': None,
-            'interaction': {
-                'solution': None,
-                'answer_groups': [],
-                'default_outcome': {
-                    'param_changes': [], 'feedback': {
-                        'content_id': 'default_outcome', 'html': (
-                            '<p><oppia-noninteractive-image caption-'
-                            'with-value="&amp;quot;&amp;quot;" filepath'
-                            '-with-value="&amp;quot;random.png&amp;'
-                            'quot;"></oppia-noninteractive-image>'
-                            'Hello this is test case to check '
-                            'image tag inside p tag</p>'
-                        )
-                    },
-                    'dest': 'Introduction',
-                    'refresher_exploration_id': None,
-                    'missing_prerequisite_skill_id': None,
-                    'labelled_as_correct': False
-                },
-                'customization_args': {},
-                'confirmed_unclassified_answers': [],
-                'id': None,
-                'hints': []
-            }
-        }
-
-        state_dict_with_image_dimensions = {
-            'content': {
-                'content_id': 'content', 'html': '<p>Hello!</p>'
-            },
-            'param_changes': [],
-            'content_ids_to_audio_translations': {'content': {}},
-            'solicit_answer_details': False,
-            'classifier_model_id': None,
-            'interaction': {
-                'solution': None,
-                'answer_groups': [],
-                'default_outcome': {
-                    'param_changes': [], 'feedback': {
-                        'content_id': 'default_outcome', 'html': (
-                            u'<p><oppia-noninteractive-image '
-                            'caption-with-value="&amp;quot;&amp;quot;" '
-                            'filepath-with-value="&amp;quot;'
-                            'random_height_490_width_120.png&amp;'
-                            'quot;"></oppia-noninteractive-image>Hello this '
-                            'is test case to check image tag inside p tag</p>'
-                        )
-                    },
-                    'dest': 'Introduction',
-                    'refresher_exploration_id': None,
-                    'missing_prerequisite_skill_id': None,
-                    'labelled_as_correct': False
-                },
-                'customization_args': {},
-                'confirmed_unclassified_answers': [],
-                'id': None,
-                'hints': []
-            }
-        }
-
-        self.assertEqual(
-            state_domain.State.convert_html_fields_in_state(
-                state_dict,
-                html_validation_service.convert_to_textangular),
-            state_dict_in_textangular)
-
-        self.assertEqual(
-            state_domain.State.convert_html_fields_in_state(
-                state_dict,
-                html_validation_service.add_caption_attr_to_image),
-            state_dict_with_image_caption)
-
-        add_dimensions_to_image_tags = functools.partial(
-            html_validation_service.add_dimensions_to_image_tags,
-            'eid')
-
-        with self.swap(
-            html_validation_service, 'get_filename_with_dimensions',
-            mock_get_filename_with_dimensions):
-
-            self.assertEqual(
-                state_domain.State.convert_html_fields_in_state(
-                    state_dict, add_dimensions_to_image_tags),
-                state_dict_with_image_dimensions)
-
 
     def test_subtitled_html_validation_with_invalid_html_type(self):
         """Test validation of subtitled HTML with invalid html type."""
