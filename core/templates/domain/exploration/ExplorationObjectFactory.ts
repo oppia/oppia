@@ -120,7 +120,7 @@ export class Exploration {
 
   // TODO(#7165): Replace any with exact type
   getInteractionThumbnailSrc(stateName: string): any {
-    // TODO(sll): unify this with the 'choose interaction' modal in
+    // TODO(sll): Unify this with the 'choose interaction' modal in
     // state_editor_interaction.html.
     let interactionId = this.getInteractionId(stateName);
     return interactionId ? (

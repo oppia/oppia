@@ -53,6 +53,10 @@ angular.module('oppia').component('classroomPage', {
         return classroomBackendApiService;
       };
 
+      ctrl.getStaticImageUrl = function(imagePath) {
+        return UrlInterpolationService.getStaticImageUrl(imagePath);
+      };
+
       ctrl.$onInit = function() {
         var classroomName = UrlService.getClassroomNameFromUrl();
         ctrl.bannerImageFileUrl = UrlInterpolationService.getStaticImageUrl(
