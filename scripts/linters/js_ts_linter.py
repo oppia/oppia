@@ -299,6 +299,8 @@ class JsTsLintChecksManager(python_utils.OBJECT):
             'core/templates/services/request-interceptor.service.spec.ts'
         ]
 
+        summary_messages = []
+
         with linter_utils.redirect_stdout(sys.stdout):
             failed = False
 
@@ -306,31 +308,37 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                 if file_path in excluded_files:
                     continue
 
+                if file_path.endswith('backend-api.service.ts'):
+                    continue
+
                 file_content = FILE_CACHE.read(file_path)
 
                 if re.findall(http_client_pattern, file_content):
-                    if not file_path.endswith('backend-api.service.ts'):
-                        failed = True
-                        python_utils.PRINT(
-                            '%s --> An instance of HttpClient is found in this '
-                            'file. You are not allowed to create http requests '
-                            'from files that are not backend api services.' % (
-                                file_path))
-                        python_utils.PRINT('')
+                    failed = True
+                    summary_message = (
+                        '%s --> An instance of HttpClient is found in this '
+                        'file. You are not allowed to create http requests '
+                        'from files that are not backend api services.' % (
+                            file_path))
+                    summary_messages.append(summary_message)
+                    python_utils.PRINT(summary_message)
+                    python_utils.PRINT('')
 
             if failed:
                 summary_message = (
                     '%s HTTP requests check failed' % (
                         linter_utils.FAILED_MESSAGE_PREFIX))
+                summary_messages.append(summary_message)
             else:
                 summary_message = (
                     '%s HTTP requests check passed' % (
                         linter_utils.SUCCESS_MESSAGE_PREFIX))
+                summary_messages.append(summary_message)
 
             python_utils.PRINT(summary_message)
             python_utils.PRINT('')
 
-        return [summary_message]
+        return summary_messages
 
     def _check_extra_js_files(self):
         """Checks if the changes made include extra js files in core
