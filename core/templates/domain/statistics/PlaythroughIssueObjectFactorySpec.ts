@@ -16,18 +16,21 @@
  * @fileoverview Unit tests for the PlaythroughIssueObjectFactory.
  */
 
-import { PlaythroughIssueObjectFactory, PlaythroughIssue } from
-  'domain/statistics/PlaythroughIssueObjectFactory';
+import {
+  PlaythroughIssueObjectFactory,
+  IEarlyQuitPlaythroughIssueBackendDict,
+  EarlyQuitPlaythroughIssue
+} from 'domain/statistics/PlaythroughIssueObjectFactory';
 
 describe('Playthrough Issue Object Factory', () => {
   let piof: PlaythroughIssueObjectFactory;
-  let playthroughIssueObject: PlaythroughIssue;
+  let playthroughIssueObject: EarlyQuitPlaythroughIssue;
   beforeEach(() => {
     piof = new PlaythroughIssueObjectFactory();
   });
 
   it('should create a new exploration issue', () => {
-    playthroughIssueObject = new PlaythroughIssue(
+    playthroughIssueObject = new EarlyQuitPlaythroughIssue(
       'EarlyQuit', {
         state_name: {
           value: 'state'
@@ -82,7 +85,7 @@ describe('Playthrough Issue Object Factory', () => {
   });
 
   it('should convert exploration issue to backend dict', () => {
-    const playthroughDict = {
+    const playthroughDict: IEarlyQuitPlaythroughIssueBackendDict = {
       issue_type: 'EarlyQuit',
       issue_customization_args: {
         state_name: {
@@ -99,5 +102,31 @@ describe('Playthrough Issue Object Factory', () => {
     const playthroughIssueObject = piof.createFromBackendDict(playthroughDict);
 
     expect(playthroughIssueObject.toBackendDict()).toEqual(playthroughDict);
+  });
+
+  it('should throw error on invalid backend dict', () => {
+    const playthroughDict = {
+      issue_type: 'InvalidType',
+      issue_customization_args: {
+        state_name: {
+          value: 'state'
+        },
+        time_spent_in_exp_in_msecs: {
+          value: 1.2
+        }
+      },
+      playthrough_ids: [],
+      schema_version: 1,
+      is_valid: true
+    };
+
+    expect(() => {
+      // TS ignore is used because playthrough dict is assigned a invalid type
+      // to test errors.
+      // @ts-ignore
+      piof.createFromBackendDict(playthroughDict);
+    }).toThrowError(
+      'Backend dict does not match any known issue type: ' +
+      JSON.stringify(playthroughDict));
   });
 });

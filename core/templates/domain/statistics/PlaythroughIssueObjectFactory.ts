@@ -20,104 +20,121 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-export interface IMultipleIncorrectSubmissionsCustomizationArgs {
+export interface IEarlyQuitCustomizationArgs {
   'state_name': {value: string};
-  'num_times_answered_incorrectly': {value: number};
+  'time_spent_in_exp_in_msecs': {value: number};
 }
 
 export interface ICyclicStateTransitionsCustomizationArgs {
   'state_names': {value: string[]};
 }
 
-export interface IEarlyQuitCustomizationArgs {
+export interface IMultipleIncorrectSubmissionsCustomizationArgs {
   'state_name': {value: string};
-  'time_spent_in_exp_in_msecs': {value: number};
+  'num_times_answered_incorrectly': {value: number};
 }
 
-export type IIssueCustomizationArgs = (
-  IMultipleIncorrectSubmissionsCustomizationArgs |
-  ICyclicStateTransitionsCustomizationArgs |
-  IEarlyQuitCustomizationArgs);
-
-export interface IExplorationIssueBackendDict {
+// NOTE TO DEVELOPERS: Treat this as an implementation detail; do not export it.
+interface IPlaythroughIssueBackendDictBase<ICustomizationArgs> {
   'issue_type': string;
-  'issue_customization_args': IIssueCustomizationArgs;
+  'issue_customization_args': ICustomizationArgs;
   'playthrough_ids': string[];
   'schema_version': number;
   'is_valid': boolean;
 }
 
-export class PlaythroughIssue {
-  issueType: string;
-  issueCustomizationArgs: IIssueCustomizationArgs;
-  playthroughIds: string[];
-  schemaVersion: number;
-  isValid: boolean;
-
-  /**
-   * @constructor
-   * @param {string} issueType - type of an issue.
-   * @param {Object.<string, *>} issueCustomizationArgs - customization dict for
-   *   an issue.
-   * @param {string[]} playthroughIds - list of playthrough IDs.
-   * @param {number} schemaVersion - schema version of the class instance.
-   * @param {boolean} isValid - whether the issue is valid.
-   */
+// NOTE TO DEVELOPERS: Treat this as an implementation detail; do not export it.
+class PlaythroughIssueBase<ICustomizationArgs> {
   constructor(
-      issueType: string, issueCustomizationArgs: IIssueCustomizationArgs,
-      playthroughIds: string[], schemaVersion: number, isValid: boolean) {
-    /** @type {string} */
-    this.issueType = issueType;
-    /** @type {Object.<string, *>} */
-    this.issueCustomizationArgs = issueCustomizationArgs;
-    /** @type {string[]} */
-    this.playthroughIds = playthroughIds;
-    /** @type {number} */
-    this.schemaVersion = schemaVersion;
-    /** @type {boolean} */
-    this.isValid = isValid;
-  }
+      public readonly issueType: string,
+      public issueCustomizationArgs: ICustomizationArgs,
+      public playthroughIds: string[],
+      public schemaVersion: number,
+      public isValid: boolean) {}
 
-  /**
-   * @returns {ExplorationIssueBackendDict}
-   */
-  toBackendDict(): IExplorationIssueBackendDict {
+  toBackendDict(): IPlaythroughIssueBackendDictBase<ICustomizationArgs> {
     return {
       issue_type: this.issueType,
       issue_customization_args: this.issueCustomizationArgs,
       playthrough_ids: this.playthroughIds,
       schema_version: this.schemaVersion,
-      is_valid: this.isValid
+      is_valid: this.isValid,
     };
   }
 }
+
+export interface IEarlyQuitPlaythroughIssueBackendDict extends
+    IPlaythroughIssueBackendDictBase<IEarlyQuitCustomizationArgs> {
+  'issue_type': 'EarlyQuit';
+}
+
+export interface ICyclicStateTransitionsPlaythroughIssueBackendDict
+    extends IPlaythroughIssueBackendDictBase<
+      ICyclicStateTransitionsCustomizationArgs>{
+  'issue_type': 'CyclicStateTransitions';
+}
+
+export interface IMultipleIncorrectSubmissionsPlaythroughIssueBackendDict
+    extends IPlaythroughIssueBackendDictBase<
+      IMultipleIncorrectSubmissionsCustomizationArgs>{
+  'issue_type': 'MultipleIncorrectSubmissions';
+}
+
+export class EarlyQuitPlaythroughIssue extends
+  PlaythroughIssueBase<IEarlyQuitCustomizationArgs> {
+  public readonly issueType: 'EarlyQuit';
+}
+
+export class CyclicStateTransitionsPlaythroughIssue extends
+  PlaythroughIssueBase<ICyclicStateTransitionsCustomizationArgs> {
+  public readonly issueType: 'CyclicStateTransitions';
+}
+
+export class MultipleIncorrectSubmissionsPlaythroughIssue extends
+  PlaythroughIssueBase<IMultipleIncorrectSubmissionsCustomizationArgs> {
+  public readonly issueType: 'MultipleIncorrectSubmissions';
+}
+
+export type IPlaythroughIssueBackendDict = (
+  IEarlyQuitPlaythroughIssueBackendDict |
+  ICyclicStateTransitionsPlaythroughIssueBackendDict |
+  IMultipleIncorrectSubmissionsPlaythroughIssueBackendDict);
+
+export type PlaythroughIssue = (
+  EarlyQuitPlaythroughIssue |
+  CyclicStateTransitionsPlaythroughIssue |
+  MultipleIncorrectSubmissionsPlaythroughIssue);
+
 
 @Injectable({
   providedIn: 'root'
 })
 export class PlaythroughIssueObjectFactory {
-  /**
-   * @typedef ExplorationIssueBackendDict
-   * @property {string} issueType - type of an issue.
-   * @property {Object.<string, *>} issueCustomizationArgs - customization dict
-   *   for an issue.
-   * @property {string[]} playthroughIds - list of playthrough IDs.
-   * @property {number} schemaVersion - schema version of the class instance.
-   * @property {boolean} isValid - whether the issue is valid.
-   */
-  /**
-   * @param {ExplorationIssueBackendDict} explorationIssueBackendDict
-   * @returns {PlaythroughIssue}
-   */
   createFromBackendDict(
-      explorationIssueBackendDict:
-      IExplorationIssueBackendDict): PlaythroughIssue {
-    return new PlaythroughIssue(
-      explorationIssueBackendDict.issue_type,
-      explorationIssueBackendDict.issue_customization_args,
-      explorationIssueBackendDict.playthrough_ids,
-      explorationIssueBackendDict.schema_version,
-      explorationIssueBackendDict.is_valid);
+      backendDict: IPlaythroughIssueBackendDict): PlaythroughIssue {
+    switch (backendDict.issue_type) {
+      case 'EarlyQuit':
+        return new EarlyQuitPlaythroughIssue(
+          backendDict.issue_type, backendDict.issue_customization_args,
+          backendDict.playthrough_ids, backendDict.schema_version,
+          backendDict.is_valid);
+      case 'CyclicStateTransitions':
+        return new CyclicStateTransitionsPlaythroughIssue(
+          backendDict.issue_type, backendDict.issue_customization_args,
+          backendDict.playthrough_ids, backendDict.schema_version,
+          backendDict.is_valid);
+      case 'MultipleIncorrectSubmissions':
+        return new MultipleIncorrectSubmissionsPlaythroughIssue(
+          backendDict.issue_type, backendDict.issue_customization_args,
+          backendDict.playthrough_ids, backendDict.schema_version,
+          backendDict.is_valid);
+      default:
+        break;
+    }
+    const invalidBackendDict: never = backendDict;
+    throw new Error(
+      'Backend dict does not match any known issue type: ' +
+      JSON.stringify(invalidBackendDict));
   }
 }
 
