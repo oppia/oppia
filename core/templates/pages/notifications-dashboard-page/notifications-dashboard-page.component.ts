@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Data and controllers for the user's notifications dashboard.
+ * @fileoverview Component for the user's notifications dashboard.
  */
 
 require('base-components/base-content.directive.ts');

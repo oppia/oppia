@@ -34,7 +34,11 @@
             <span class="oppia-worked-example-sort-handle"
                   ng-if="bindableFieldsDict.displayedWorkedExamples.length > 1"
                   ng-mousedown="changeActiveWorkedExampleIndex(-1)">
-              <img ng-src="<[dragDotsImgUrl]>" width="10">
+              <picture>
+                <source type="image/webp" ng-srcset="<[getStaticImageUrl('/general/drag_dots.webp')]>">
+                <source type="image/png" ng-srcset="<[getStaticImageUrl('/general/drag_dots.png')]>">
+                <img ng-src="<[getStaticImageUrl('/general/drag_dots.png')]>" width="10">
+              </picture>
             </span>
             <a ng-click="changeActiveWorkedExampleIndex($index)"
                class="oppia-rule-tab protractor-test-worked-example-<[$index]>"

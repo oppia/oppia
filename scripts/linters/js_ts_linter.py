@@ -53,9 +53,6 @@ FILES_EXCLUDED_FROM_ANY_TYPE_CHECK_PATH = os.path.join(
 FILES_EXCLUDED_FROM_ANY_TYPE_CHECK = json.load(python_utils.open_file(
     FILES_EXCLUDED_FROM_ANY_TYPE_CHECK_PATH, 'r'))
 
-_MESSAGE_TYPE_SUCCESS = 'SUCCESS'
-_MESSAGE_TYPE_FAILED = 'FAILED'
-
 
 def _get_expression_from_node_if_one_exists(
         parsed_node, components_to_check):
@@ -275,10 +272,12 @@ class JsTsLintChecksManager(python_utils.OBJECT):
 
             if failed:
                 summary_message = (
-                    '%s ANY type check failed' % _MESSAGE_TYPE_FAILED)
+                    '%s ANY type check failed' % (
+                        linter_utils.FAILED_MESSAGE_PREFIX))
             else:
                 summary_message = (
-                    '%s ANY type check passed' % _MESSAGE_TYPE_SUCCESS)
+                    '%s ANY type check passed' % (
+                        linter_utils.SUCCESS_MESSAGE_PREFIX))
 
             python_utils.PRINT(summary_message)
             python_utils.PRINT('')
@@ -317,12 +316,13 @@ class JsTsLintChecksManager(python_utils.OBJECT):
 
             if failed:
                 summary_message = (
-                    '%s  Extra JS files check failed, see '
+                    '%s Extra JS files check failed, see '
                     'message above on resolution steps.' % (
-                        _MESSAGE_TYPE_FAILED))
+                        linter_utils.FAILED_MESSAGE_PREFIX))
             else:
-                summary_message = '%s  Extra JS files check passed' % (
-                    _MESSAGE_TYPE_SUCCESS)
+                summary_message = (
+                    '%s Extra JS files check passed' % (
+                        linter_utils.SUCCESS_MESSAGE_PREFIX))
             summary_messages.append(summary_message)
             python_utils.PRINT(summary_message)
             python_utils.PRINT('')
@@ -367,15 +367,15 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         with linter_utils.redirect_stdout(stdout):
             if failed:
                 summary_message = (
-                    '%s  JS and TS Component name and count check failed, '
+                    '%s JS and TS Component name and count check failed, '
                     'see messages above for duplicate names.' % (
-                        _MESSAGE_TYPE_FAILED))
+                        linter_utils.FAILED_MESSAGE_PREFIX))
                 python_utils.PRINT(summary_message)
                 summary_messages.append(summary_message)
             else:
                 summary_message = (
-                    '%s  JS and TS Component name and count check passed' %
-                    (_MESSAGE_TYPE_SUCCESS))
+                    '%s JS and TS Component name and count check passed' %
+                    (linter_utils.SUCCESS_MESSAGE_PREFIX))
                 python_utils.PRINT(summary_message)
                 summary_messages.append(summary_message)
 
@@ -499,14 +499,15 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         with linter_utils.redirect_stdout(stdout):
             if failed:
                 summary_message = (
-                    '%s   Directive scope check failed, '
+                    '%s Directive scope check failed, '
                     'see messages above for suggested fixes.' % (
-                        _MESSAGE_TYPE_FAILED))
+                        linter_utils.FAILED_MESSAGE_PREFIX))
                 python_utils.PRINT(summary_message)
                 summary_messages.append(summary_message)
             else:
-                summary_message = '%s  Directive scope check passed' % (
-                    _MESSAGE_TYPE_SUCCESS)
+                summary_message = (
+                    '%s Directive scope check passed' % (
+                        linter_utils.SUCCESS_MESSAGE_PREFIX))
                 python_utils.PRINT(summary_message)
                 summary_messages.append(summary_message)
 
@@ -594,13 +595,13 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         with linter_utils.redirect_stdout(stdout):
             if failed:
                 summary_message = (
-                    '%s  Sorted dependencies check failed, fix files that '
+                    '%s Sorted dependencies check failed, fix files that '
                     'that don\'t have sorted dependencies mentioned above.' % (
-                        _MESSAGE_TYPE_FAILED))
+                        linter_utils.FAILED_MESSAGE_PREFIX))
             else:
                 summary_message = (
-                    '%s  Sorted dependencies check passed' % (
-                        _MESSAGE_TYPE_SUCCESS))
+                    '%s Sorted dependencies check passed' % (
+                        linter_utils.SUCCESS_MESSAGE_PREFIX))
 
         summary_messages.append(summary_message)
         python_utils.PRINT('')
@@ -654,15 +655,15 @@ class JsTsLintChecksManager(python_utils.OBJECT):
 
             if failed:
                 summary_message = (
-                    '%s   Controller dependency line break check failed, '
+                    '%s Controller dependency line break check failed, '
                     'see messages above for the affected files.' % (
-                        _MESSAGE_TYPE_FAILED))
+                        linter_utils.FAILED_MESSAGE_PREFIX))
                 python_utils.PRINT(summary_message)
                 summary_messages.append(summary_message)
             else:
                 summary_message = (
-                    '%s  Controller dependency line break check passed' % (
-                        _MESSAGE_TYPE_SUCCESS))
+                    '%s Controller dependency line break check passed' % (
+                        linter_utils.SUCCESS_MESSAGE_PREFIX))
                 python_utils.PRINT(summary_message)
                 summary_messages.append(summary_message)
 
@@ -832,12 +833,13 @@ class JsTsLintChecksManager(python_utils.OBJECT):
 
             if failed:
                 summary_message = (
-                    '%s  Constants declaration check failed, '
+                    '%s Constants declaration check failed, '
                     'see messages above for constants with errors.' % (
-                        _MESSAGE_TYPE_FAILED))
+                        linter_utils.FAILED_MESSAGE_PREFIX))
             else:
-                summary_message = '%s  Constants declaration check passed' % (
-                    _MESSAGE_TYPE_SUCCESS)
+                summary_message = (
+                    '%s Constants declaration check passed' % (
+                        linter_utils.SUCCESS_MESSAGE_PREFIX))
             summary_messages.append(summary_message)
             python_utils.PRINT(summary_message)
 
@@ -950,12 +952,13 @@ class ThirdPartyJsTsLintChecksManager(python_utils.OBJECT):
             for error in result_list:
                 python_utils.PRINT(error)
                 summary_messages.append(error)
-            summary_message = ('%s    %s JavaScript and Typescript files' % (
-                _MESSAGE_TYPE_FAILED, num_files_with_errors))
+            summary_message = (
+                '%s %s JavaScript and Typescript files' % (
+                    linter_utils.FAILED_MESSAGE_PREFIX, num_files_with_errors))
         else:
             summary_message = (
-                '%s   %s JavaScript and Typescript files linted (%.1f secs)' % (
-                    _MESSAGE_TYPE_SUCCESS, num_js_and_ts_files,
+                '%s %s JavaScript and Typescript files linted (%.1f secs)' % (
+                    linter_utils.SUCCESS_MESSAGE_PREFIX, num_js_and_ts_files,
                     time.time() - start_time))
         python_utils.PRINT(summary_message)
         summary_messages.append(summary_message)

@@ -31,6 +31,7 @@ describe('Story playthrough object factory', () => {
 
     var firstSampleReadOnlyStoryNodeBackendDict = {
       id: 'node_1',
+      description: 'description',
       title: 'Title 1',
       prerequisite_skill_ids: [],
       acquired_skill_ids: [],
@@ -42,10 +43,13 @@ describe('Story playthrough object factory', () => {
         title: 'Title',
         status: 'private'
       },
-      completed: true
+      completed: true,
+      thumbnail_bg_color: '#bb8b2f',
+      thumbnail_filename: 'filename'
     };
     var secondSampleReadOnlyStoryNodeBackendDict = {
       id: 'node_2',
+      description: 'description',
       title: 'Title 2',
       prerequisite_skill_ids: [],
       acquired_skill_ids: [],
@@ -57,7 +61,9 @@ describe('Story playthrough object factory', () => {
         title: 'Title',
         status: 'private'
       },
-      completed: false
+      completed: false,
+      thumbnail_bg_color: '#bb8b2f',
+      thumbnail_filename: 'filename'
     };
     var storyPlaythroughBackendObject = {
       story_nodes: [

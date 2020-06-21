@@ -31,19 +31,21 @@ require('services/context.service.ts');
 require('services/image-local-storage.service.ts');
 
 angular.module('oppia').controller('QuestionEditorModalController', [
-  '$scope', '$uibModal', '$uibModalInstance', 'AlertsService', 'ContextService',
-  'ImageLocalStorageService', 'QuestionUndoRedoService',
-  'QuestionValidationService', 'SkillSummaryObjectFactory',
-  'UrlInterpolationService', 'associatedSkillSummaries', 'canEditQuestion',
-  'groupedSkillSummaries', 'misconceptionsBySkill',
+  '$scope', '$uibModal', '$uibModalInstance', 'AlertsService',
+  'QuestionUndoRedoService', 'QuestionValidationService',
+  'SkillSummaryObjectFactory', 'UrlInterpolationService',
+  'associatedSkillSummaries', 'canEditQuestion',
+  'categorizedSkills', 'groupedSkillSummaries', 'misconceptionsBySkill',
   'newQuestionIsBeingCreated', 'question', 'questionId', 'questionStateData',
+  'rubrics', 'skillNames',
   function(
-      $scope, $uibModal, $uibModalInstance, AlertsService, ContextService,
-      ImageLocalStorageService, QuestionUndoRedoService,
-      QuestionValidationService, SkillSummaryObjectFactory,
-      UrlInterpolationService, associatedSkillSummaries, canEditQuestion,
-      groupedSkillSummaries, misconceptionsBySkill,
-      newQuestionIsBeingCreated, question, questionId, questionStateData) {
+      $scope, $uibModal, $uibModalInstance, AlertsService,
+      QuestionUndoRedoService, QuestionValidationService,
+      SkillSummaryObjectFactory, UrlInterpolationService,
+      associatedSkillSummaries, canEditQuestion,
+      categorizedSkills, groupedSkillSummaries, misconceptionsBySkill,
+      newQuestionIsBeingCreated, question, questionId, questionStateData,
+      rubrics, skillNames) {
     var returnModalObject = {
       skillLinkageModificationsArray: [],
       commitMessage: ''
@@ -56,6 +58,8 @@ angular.module('oppia').controller('QuestionEditorModalController', [
     $scope.misconceptionsBySkill = misconceptionsBySkill;
     $scope.canEditQuestion = canEditQuestion;
     $scope.newQuestionIsBeingCreated = newQuestionIsBeingCreated;
+    $scope.skillNames = skillNames;
+    $scope.rubrics = rubrics;
 
     $scope.getSkillEditorUrl = function(skillId) {
       return '/skill_editor/' + skillId;
@@ -92,6 +96,7 @@ angular.module('oppia').controller('QuestionEditorModalController', [
       var sortedSkillSummaries =
         groupedSkillSummaries.current.concat(
           groupedSkillSummaries.others);
+      var allowSkillsFromOtherTopics = true;
       $uibModal.open({
         templateUrl:
           UrlInterpolationService.getDirectiveTemplateUrl(
@@ -101,8 +106,12 @@ angular.module('oppia').controller('QuestionEditorModalController', [
         resolve: {
           skillsInSameTopicCount: () => skillsInSameTopicCount,
           sortedSkillSummaries: () => sortedSkillSummaries,
+          categorizedSkills: () => categorizedSkills,
+          allowSkillsFromOtherTopics: () => allowSkillsFromOtherTopics
         },
-        controller: 'SelectSkillModalController'
+        controller: 'SelectSkillModalController',
+        windowClass: 'skill-select-modal',
+        size: 'xl'
       }).result.then(function(summary) {
         for (var idx in $scope.associatedSkillSummaries) {
           if (
