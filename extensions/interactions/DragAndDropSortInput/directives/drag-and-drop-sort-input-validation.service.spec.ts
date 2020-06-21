@@ -30,19 +30,18 @@ import { Rule, RuleObjectFactory } from
   'domain/exploration/RuleObjectFactory';
 
 import { AppConstants } from 'app.constants';
+import { WARNING_TYPES_CONSTANT } from 'app-type.constants';
 
 describe('DragAndDropSortInputValidationService', () => {
   let validatorService: DragAndDropSortInputValidationService;
-  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'WARNING_TYPES' is a constant and its type needs to be
-  // preferably in the constants file itself.
-  let WARNING_TYPES: any;
+  let WARNING_TYPES: WARNING_TYPES_CONSTANT;
 
   let currentState: string;
   let answerGroups: AnswerGroup[], goodDefaultOutcome: Outcome;
+  let customOutcome: Outcome;
   let equalsListWithEmptyValuesRule: Rule, equalsListWithDuplicatesRule: Rule,
     equalsListWithAllowedValuesRule: Rule, equalsListWithValuesRule: Rule,
-    hasXBeforeYRule: Rule;
+    goodRule1: Rule, goodRule2: Rule, hasXBeforeYRule: Rule;
   let customizationArgs: any;
   let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory,
     rof: RuleObjectFactory;
@@ -64,11 +63,24 @@ describe('DragAndDropSortInputValidationService', () => {
       dest: 'Second State',
       feedback: {
         html: '',
-        audio_translations: {}
+        content_id: ''
       },
+      missing_prerequisite_skill_id: null,
       labelled_as_correct: false,
       param_changes: [],
       refresher_exploration_id: null
+    });
+
+    customOutcome = oof.createFromBackendDict({
+      dest: 'Third State',
+      feedback: {
+        html: '<p>great job!</p>',
+        content_id: ''
+      },
+      labelled_as_correct: true,
+      param_changes: [],
+      refresher_exploration_id: null,
+      missing_prerequisite_skill_id: ''
     });
 
     customizationArgs = {
@@ -79,6 +91,20 @@ describe('DragAndDropSortInputValidationService', () => {
         value: true
       }
     };
+
+    goodRule1 = rof.createFromBackendDict({
+      rule_type: 'IsEqualToOrdering',
+      inputs: {
+        x: [['a'], ['b'], ['c'], ['d']]
+      }
+    });
+
+    goodRule2 = rof.createFromBackendDict({
+      rule_type: 'IsEqualToOrdering',
+      inputs: {
+        x: [['d'], ['c'], ['b'], ['a']]
+      }
+    });
 
     equalsListWithAllowedValuesRule = rof.createFromBackendDict({
       rule_type: 'IsEqualToOrdering',
@@ -116,12 +142,19 @@ describe('DragAndDropSortInputValidationService', () => {
       }
     });
 
-    answerGroups = [agof.createNew(
-      [equalsListWithAllowedValuesRule],
-      goodDefaultOutcome,
-      false,
-      null
-    )];
+    answerGroups = [
+      agof.createNew(
+        [equalsListWithAllowedValuesRule],
+        goodDefaultOutcome,
+        null,
+        null
+      ), agof.createNew(
+        [goodRule1, goodRule2],
+        customOutcome,
+        null,
+        null
+      )
+    ];
   });
 
   it('should be able to perform basic validation', () => {
@@ -132,9 +165,22 @@ describe('DragAndDropSortInputValidationService', () => {
 
   it('should not allow multiple items in same position', () => {
     customizationArgs.allowMultipleItemsInSamePosition = false;
+    var rules = [rof.createFromBackendDict({
+      rule_type: 'IsEqualToOrdering',
+      inputs: {
+        x: [['a', 'b']]
+      }
+    })];
+    answerGroups = [
+      agof.createNew(rules, customOutcome, null, null),
+      agof.createNew(rules, customOutcome, null, null)
+    ];
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArgs, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
+      type: WARNING_TYPES.ERROR,
+      message: 'Multiple items in a single position are not allowed.'
+    }, {
       type: WARNING_TYPES.ERROR,
       message: 'Multiple items in a single position are not allowed.'
     }]);
@@ -224,4 +270,22 @@ describe('DragAndDropSortInputValidationService', () => {
           'because both the selected elements are same.'
     }]);
   });
+
+  it(
+    'should throw an error if ' +
+    'IsEqualToOrderingWithOneItemAtIncorrectPosition rule is used but ' +
+    'multiple choices in the same position are note allowed',
+    () => {
+      answerGroups[0].rules = [equalsListWithValuesRule];
+      customizationArgs.allowMultipleItemsInSamePosition = false;
+      var warnings = validatorService.getAllWarnings(
+        currentState, customizationArgs, answerGroups, goodDefaultOutcome);
+      expect(warnings).toEqual([{
+        type: WARNING_TYPES.ERROR,
+        message: 'Rule 1 from answer group 1 will never be matched because ' +
+          'there will be at least 2 elements at incorrect positions if ' +
+          'multiple elements cannot occupy the same position.'
+      }]);
+      customizationArgs.allowMultipleItemsInSamePosition = true;
+    });
 });

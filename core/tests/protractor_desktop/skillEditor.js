@@ -37,154 +37,152 @@ describe('Skill Editor functionality', function() {
   var explorationEditorPage = null;
   var explorationEditorMainTab = null;
 
-  beforeAll(function() {
-    topicsAndSkillsDashboardPage =
-      new TopicsAndSkillsDashboardPage.TopicsAndSkillsDashboardPage();
-    skillEditorPage =
-      new SkillEditorPage.SkillEditorPage();
+  beforeAll(async function() {
+    topicsAndSkillsDashboardPage = (
+      new TopicsAndSkillsDashboardPage.TopicsAndSkillsDashboardPage());
+    skillEditorPage = new SkillEditorPage.SkillEditorPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
-    users.createAndLoginAdminUser(
+    await users.createAndLoginAdminUser(
       'creator@skillEditor.com', 'creatorSkillEditor');
-    topicsAndSkillsDashboardPage.get();
-    browser.getWindowHandle().then(function(handle) {
-      topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
-        'Skill 1', 'Concept card explanation', false);
-      browser.getCurrentUrl().then(function(url) {
-        skillId = url.split('/')[4];
-        general.closeCurrentTabAndSwitchTo(handle);
-      }, function() {
-        // Note to developers:
-        // Promise is returned by getCurrentUrl which is handled here.
-        // No further action is needed.
-      });
-    });
+    await topicsAndSkillsDashboardPage.get();
+    var handle = await browser.getWindowHandle();
+    await topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
+      'Skill 1', 'Concept card explanation', false);
+    var url = await browser.getCurrentUrl();
+    skillId = url.split('/')[4];
+    await general.closeCurrentTabAndSwitchTo(handle);
   });
 
-  beforeEach(function() {
-    users.login('creator@skillEditor.com');
-    skillEditorPage.get(skillId);
+  beforeEach(async function() {
+    await users.login('creator@skillEditor.com');
+    await skillEditorPage.get(skillId);
   });
 
-  it('should edit description and concept card explanation', function() {
-    skillEditorPage.changeSkillDescription('Skill 1 edited');
-    skillEditorPage.editConceptCard('Test concept card explanation');
-    skillEditorPage.saveOrPublishSkill(
+  it('should edit description and concept card explanation', async function() {
+    await skillEditorPage.changeSkillDescription('Skill 1 edited');
+    await skillEditorPage.editConceptCard('Test concept card explanation');
+    await skillEditorPage.saveOrPublishSkill(
       'Changed skill description and added review material.');
 
-    topicsAndSkillsDashboardPage.get();
-    topicsAndSkillsDashboardPage.expectSkillDescriptionToBe(
+    await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.expectSkillDescriptionToBe(
       'Skill 1 edited', 0);
 
-    skillEditorPage.get(skillId);
-    skillEditorPage.expectSkillDescriptionToBe('Skill 1 edited');
-    skillEditorPage.expectConceptCardExplanationToMatch(
+    await skillEditorPage.get(skillId);
+    await skillEditorPage.expectSkillDescriptionToBe('Skill 1 edited');
+    await skillEditorPage.expectConceptCardExplanationToMatch(
       'Test concept card explanation');
   });
 
-  it('should create and delete worked examples', function() {
-    skillEditorPage.addWorkedExample(
+  it('should create and delete worked examples', async function() {
+    await skillEditorPage.addWorkedExample(
       'Example Question 1', 'Example Explanation 1');
-    skillEditorPage.addWorkedExample(
+    await skillEditorPage.addWorkedExample(
       'Example Question 2', 'Example Explanation 2');
-    skillEditorPage.saveOrPublishSkill('Added worked examples');
+    await skillEditorPage.saveOrPublishSkill('Added worked examples');
 
-    skillEditorPage.get(skillId);
-    skillEditorPage.expectWorkedExampleSummariesToMatch(
+    await skillEditorPage.get(skillId);
+    await skillEditorPage.expectWorkedExampleSummariesToMatch(
       ['Example Question 1', 'Example Question 2'],
       ['Example Explanation 1', 'Example Explanation 2']
     );
 
-    skillEditorPage.deleteWorkedExampleWithIndex(0);
-    skillEditorPage.saveOrPublishSkill('Deleted a worked example');
+    await skillEditorPage.deleteWorkedExampleWithIndex(0);
+    await skillEditorPage.saveOrPublishSkill('Deleted a worked example');
 
-    skillEditorPage.get(skillId);
-    skillEditorPage.expectWorkedExampleSummariesToMatch(
+    await skillEditorPage.get(skillId);
+    await skillEditorPage.expectWorkedExampleSummariesToMatch(
       ['Example Question 2'], ['Example Explanation 2']
     );
   });
 
-  it('should edit rubrics for the skill', function() {
-    skillEditorPage.expectRubricExplanationsToMatch(
+  it('should edit rubrics for the skill', async function() {
+    await skillEditorPage.expectRubricExplanationsToMatch(
       'Easy', ['Explanation for easy difficulty']);
-    skillEditorPage.expectRubricExplanationsToMatch(
+    await skillEditorPage.expectRubricExplanationsToMatch(
       'Medium', ['Skill 1', 'Explanation for medium difficulty']);
-    skillEditorPage.expectRubricExplanationsToMatch(
+    await skillEditorPage.expectRubricExplanationsToMatch(
       'Hard', ['Explanation for hard difficulty']);
 
-    skillEditorPage.addRubricExplanationForDifficulty(
+    await skillEditorPage.addRubricExplanationForDifficulty(
       'Easy', 'Second explanation for easy difficulty.');
-    skillEditorPage.addRubricExplanationForDifficulty(
+    await skillEditorPage.addRubricExplanationForDifficulty(
       'Medium', 'Second explanation for medium difficulty.');
-    skillEditorPage.addRubricExplanationForDifficulty(
+    await skillEditorPage.addRubricExplanationForDifficulty(
       'Hard', 'Second explanation for hard difficulty.');
 
-    skillEditorPage.editRubricExplanationWithIndex(
+    await skillEditorPage.editRubricExplanationWithIndex(
       'Easy', 0, 'Easy explanation 1 edited');
-    skillEditorPage.editRubricExplanationWithIndex(
+    await skillEditorPage.editRubricExplanationWithIndex(
       'Easy', 1, 'Easy explanation 2 edited');
-    skillEditorPage.editRubricExplanationWithIndex(
+    await skillEditorPage.editRubricExplanationWithIndex(
       'Medium', 1, 'Medium explanation 1 edited');
-    skillEditorPage.editRubricExplanationWithIndex(
+    await skillEditorPage.editRubricExplanationWithIndex(
       'Medium', 2, 'Medium explanation 2 edited');
-    skillEditorPage.deleteRubricExplanationWithIndex('Medium', 0);
-    skillEditorPage.editRubricExplanationWithIndex(
+    await skillEditorPage.deleteRubricExplanationWithIndex('Medium', 0);
+    await skillEditorPage.editRubricExplanationWithIndex(
       'Hard', 0, 'Hard explanation 1 edited');
-    skillEditorPage.editRubricExplanationWithIndex(
+    await skillEditorPage.editRubricExplanationWithIndex(
       'Hard', 1, 'Hard explanation 2 edited');
 
-    skillEditorPage.saveOrPublishSkill('Edited rubrics');
+    await skillEditorPage.saveOrPublishSkill('Edited rubrics');
 
-    skillEditorPage.get(skillId);
-    skillEditorPage.expectRubricExplanationsToMatch(
-      'Easy', ['Easy explanation 1 edited', 'Easy explanation 2 edited']);
-    skillEditorPage.expectRubricExplanationsToMatch(
-      'Medium', ['Medium explanation 1 edited', 'Medium explanation 2 edited']);
-    skillEditorPage.expectRubricExplanationsToMatch(
+    await skillEditorPage.get(skillId);
+    await skillEditorPage.expectRubricExplanationsToMatch(
+      'Easy', ['Easy explanation 1 edited', 'Easy explanation 2 edited']
+    );
+    await skillEditorPage.expectRubricExplanationsToMatch(
+      'Medium', ['Medium explanation 1 edited', 'Medium explanation 2 edited']
+    );
+    await skillEditorPage.expectRubricExplanationsToMatch(
       'Hard', ['Hard explanation 1 edited', 'Hard explanation 2 edited']);
   });
 
-  it('should create a question for the skill', function() {
-    skillEditorPage.moveToQuestionsTab();
-    skillEditorPage.clickCreateQuestionButton();
-    skillEditorPage.confirmSkillDifficulty();
-    explorationEditorMainTab.setContent(forms.toRichText('Question 1'));
-    explorationEditorMainTab.setInteraction('TextInput', 'Placeholder', 5);
-    explorationEditorMainTab.addResponse(
-      'TextInput', forms.toRichText('Correct Answer'), null, false,
+  it('should create a question for the skill', async function() {
+    await skillEditorPage.moveToQuestionsTab();
+    await skillEditorPage.clickCreateQuestionButton();
+    await skillEditorPage.confirmSkillDifficulty();
+    await explorationEditorMainTab.setContent(
+      await forms.toRichText('Question 1'));
+    await explorationEditorMainTab.setInteraction(
+      'TextInput', 'Placeholder', 5);
+    await explorationEditorMainTab.addResponse(
+      'TextInput', await forms.toRichText('Correct Answer'), null, false,
       'FuzzyEquals', 'correct');
-    explorationEditorMainTab.getResponseEditor(0).markAsCorrect();
-    explorationEditorMainTab.addHint('Hint 1');
-    explorationEditorMainTab.addSolution('TextInput', {
+    var responseEditor = await explorationEditorMainTab.getResponseEditor(0);
+    await responseEditor.markAsCorrect();
+    await explorationEditorMainTab.addHint('Hint 1');
+    await explorationEditorMainTab.addSolution('TextInput', {
       correctAnswer: 'correct',
       explanation: 'It is correct'
     });
-    skillEditorPage.saveQuestion();
+    await skillEditorPage.saveQuestion();
 
-    skillEditorPage.get(skillId);
-    skillEditorPage.moveToQuestionsTab();
-    skillEditorPage.expectNumberOfQuestionsToBe(1);
+    await skillEditorPage.get(skillId);
+    await skillEditorPage.moveToQuestionsTab();
+    await skillEditorPage.expectNumberOfQuestionsToBe(1);
   });
 
-  it('should create and delete misconceptions', function() {
-    skillEditorPage.addMisconception(
+  it('should create and delete misconceptions', async function() {
+    await skillEditorPage.addMisconception(
       'Misconception 1', 'Notes 1', 'Feedback 1');
-    skillEditorPage.addMisconception(
+    await skillEditorPage.addMisconception(
       'Misconception 2', 'Notes 2', 'Feedback 2');
-    skillEditorPage.saveOrPublishSkill('Added misconceptions');
+    await skillEditorPage.saveOrPublishSkill('Added misconceptions');
 
-    skillEditorPage.get(skillId);
-    skillEditorPage.expectNumberOfMisconceptionsToBe(2);
+    await skillEditorPage.get(skillId);
+    await skillEditorPage.expectNumberOfMisconceptionsToBe(2);
 
-    skillEditorPage.deleteMisconception(1);
-    skillEditorPage.saveOrPublishSkill('Deleted a misconception');
+    await skillEditorPage.deleteMisconception(1);
+    await skillEditorPage.saveOrPublishSkill('Deleted a misconception');
 
-    skillEditorPage.get(skillId);
-    skillEditorPage.expectNumberOfMisconceptionsToBe(1);
+    await skillEditorPage.get(skillId);
+    await skillEditorPage.expectNumberOfMisconceptionsToBe(1);
   });
 
-  afterEach(function() {
-    general.checkForConsoleErrors([]);
-    users.logout();
+  afterEach(async function() {
+    await general.checkForConsoleErrors([]);
+    await users.logout();
   });
 });

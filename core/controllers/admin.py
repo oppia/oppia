@@ -293,17 +293,16 @@ class AdminHandler(base.BaseHandler):
 
         state.update_recorded_voiceovers(recorded_voiceovers)
         state.update_written_translations(written_translations)
-        solution_dict = (
-            state_domain.Solution(
-                'TextInput', False, 'Solution', state_domain.SubtitledHtml(
-                    'solution', '<p>This is a solution.</p>')).to_dict())
+        solution = state_domain.Solution(
+            'TextInput', False, 'Solution', state_domain.SubtitledHtml(
+                'solution', '<p>This is a solution.</p>'))
         hints_list = [
             state_domain.Hint(
                 state_domain.SubtitledHtml('hint_1', '<p>This is a hint.</p>')
             )
         ]
 
-        state.update_interaction_solution(solution_dict)
+        state.update_interaction_solution(solution)
         state.update_interaction_hints(hints_list)
         state.update_interaction_customization_args({
             'placeholder': 'Enter text here',
@@ -393,9 +392,9 @@ class AdminHandler(base.BaseHandler):
                 self.user_id, question_id_3, skill_id_3, 0.7)
 
             topic_1 = topic_domain.Topic.create_default_topic(
-                topic_id_1, 'Dummy Topic 1', 'abbrev')
+                topic_id_1, 'Dummy Topic 1', 'abbrev', 'description')
             topic_2 = topic_domain.Topic.create_default_topic(
-                topic_id_2, 'Empty Topic', 'abbrev')
+                topic_id_2, 'Empty Topic', 'abbrev', 'description')
 
             topic_1.add_canonical_story(story_id)
             topic_1.add_uncategorized_skill_id(skill_id_1)
@@ -412,25 +411,61 @@ class AdminHandler(base.BaseHandler):
             # for published stories.
             self._reload_exploration('15')
             self._reload_exploration('25')
+            self._reload_exploration('13')
+
             story = story_domain.Story.create_default_story(
-                story_id, 'Dummy Story 1', topic_id_1)
-            story.add_node(
-                '%s%d' % (story_domain.NODE_ID_PREFIX, 1), 'Dummy Chapter 1')
-            story.update_node_destination_node_ids(
-                '%s%d' % (story_domain.NODE_ID_PREFIX, 1), [
-                    '%s%d' % (story_domain.NODE_ID_PREFIX, 2)])
-            story.update_node_exploration_id(
-                '%s%d' % (story_domain.NODE_ID_PREFIX, 1), '15')
-            exp_services.update_exploration(
-                self.user_id, '15', [exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                    'property_name': 'category',
-                    'new_value': 'Astronomy'
-                })], 'Change category')
-            story.add_node(
-                '%s%d' % (story_domain.NODE_ID_PREFIX, 2), 'Dummy Chapter 2')
-            story.update_node_exploration_id(
-                '%s%d' % (story_domain.NODE_ID_PREFIX, 2), '25')
+                story_id, 'Help Jaime win the Arcade', topic_id_1)
+
+            story_node_dicts = [{
+                'exp_id': '15',
+                'title': 'What are the place values?',
+                'description': 'Jaime learns the place value of each digit ' +
+                               'in a big number.'
+            }, {
+                'exp_id': '25',
+                'title': 'Finding the value of a number',
+                'description': 'Jaime understands the value of his ' +
+                               'arcade score.'
+            }, {
+                'exp_id': '13',
+                'title': 'Comparing Numbers',
+                'description': 'Jaime learns if a number is smaller or ' +
+                               'greater than another number.'
+            }]
+
+            def generate_dummy_story_nodes(node_id, exp_id, title, description):
+                """Generates and connects sequential story nodes.
+
+                Args:
+                    node_id: int. The node id.
+                    exp_id: str. The exploration id.
+                    title: str. The title of the story node.
+                    description: str. The description of the story node.
+                """
+
+                story.add_node(
+                    '%s%d' % (story_domain.NODE_ID_PREFIX, node_id),
+                    title)
+                story.update_node_description(
+                    '%s%d' % (story_domain.NODE_ID_PREFIX, node_id),
+                    description)
+                story.update_node_exploration_id(
+                    '%s%d' % (story_domain.NODE_ID_PREFIX, node_id), exp_id)
+
+                if node_id != len(story_node_dicts):
+                    story.update_node_destination_node_ids(
+                        '%s%d' % (story_domain.NODE_ID_PREFIX, node_id),
+                        ['%s%d' % (story_domain.NODE_ID_PREFIX, node_id + 1)])
+
+                exp_services.update_exploration(
+                    self.user_id, exp_id, [exp_domain.ExplorationChange({
+                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                        'property_name': 'category',
+                        'new_value': 'Astronomy'
+                    })], 'Change category')
+
+            for i, story_node_dict in enumerate(story_node_dicts):
+                generate_dummy_story_nodes(i + 1, **story_node_dict)
 
             skill_services.save_new_skill(self.user_id, skill_1)
             skill_services.save_new_skill(self.user_id, skill_2)
@@ -854,3 +889,48 @@ class SendDummyMailToAdminHandler(base.BaseHandler):
             self.render_json({})
         else:
             raise self.InvalidInputException('This app cannot send emails.')
+
+
+class UpdateUsernameHandler(base.BaseHandler):
+    """Handler for renaming usernames."""
+
+    @acl_decorators.can_access_admin_page
+    def put(self):
+        old_username = self.payload.get('old_username', None)
+        new_username = self.payload.get('new_username', None)
+
+        if old_username is None:
+            raise self.InvalidInputException(
+                'Invalid request: The old username must be specified.')
+
+        if new_username is None:
+            raise self.InvalidInputException(
+                'Invalid request: A new username must be specified.')
+
+        if not isinstance(old_username, python_utils.UNICODE):
+            raise self.InvalidInputException(
+                'Expected old username to be a unicode string, received %s'
+                % old_username)
+
+        if not isinstance(new_username, python_utils.UNICODE):
+            raise self.InvalidInputException(
+                'Expected new username to be a unicode string, received %s'
+                % new_username)
+
+        user_id = user_services.get_user_id_from_username(old_username)
+        if user_id is None:
+            raise self.InvalidInputException(
+                'Invalid username: %s' % old_username)
+
+        if len(new_username) > constants.MAX_USERNAME_LENGTH:
+            raise self.InvalidInputException(
+                'Expected new username to be less than %s characters, '
+                'received %s' % (constants.MAX_USERNAME_LENGTH, new_username))
+
+        if user_services.is_username_taken(new_username):
+            raise self.InvalidInputException('Username already taken.')
+
+        user_services.set_username(user_id, new_username)
+        user_services.log_username_change(
+            self.user_id, old_username, new_username)
+        self.render_json({})

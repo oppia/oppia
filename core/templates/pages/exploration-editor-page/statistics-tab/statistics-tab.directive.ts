@@ -18,30 +18,30 @@
  */
 
 require(
-  'components/common-layout-directives/common-elements/' +
-  'confirm-or-cancel-modal.controller.ts');
+  'pages/exploration-editor-page/statistics-tab/templates/' +
+  'state-stats-modal.controller.ts');
+
 require('domain/exploration/read-only-exploration-backend-api.service.ts');
 require('domain/exploration/StatesObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
-require('filters/string-utility-filters/camel-case-to-hyphens.filter.ts');
-require(
-  'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
 require('pages/exploration-editor-page/services/exploration-data.service.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
-require('pages/exploration-editor-page/services/router.service.ts');
 require(
   'pages/exploration-editor-page/statistics-tab/services/' +
-  'state-improvement-suggestion.service.ts');
+  'state-improvement-suggestion.service.ts'
+);
 require('services/alerts.service.ts');
 require('services/compute-graph.service.ts');
 require('services/date-time-format.service.ts');
-require('services/exploration-features.service.ts');
 require('services/state-interaction-stats.service.ts');
 require('visualizations/oppia-visualization-bar-chart.directive.ts');
-require('visualizations/oppia-visualization-click-hexbins.directive.ts');
 require(
   'visualizations/oppia-visualization-enumerated-frequency-table.directive.ts');
 require('visualizations/oppia-visualization-frequency-table.directive.ts');
+require('visualizations/oppia-visualization-sorted-tiles.directive.ts');
+
+require(
+  'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
 
 angular.module('oppia').directive('statisticsTab', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -56,81 +56,61 @@ angular.module('oppia').directive('statisticsTab', [
       controller: [
         '$http', '$scope', '$uibModal', 'AlertsService', 'ComputeGraphService',
         'DateTimeFormatService', 'ExplorationDataService',
-        'ExplorationFeaturesService', 'ExplorationStatesService',
-        'ReadOnlyExplorationBackendApiService', 'RouterService',
+        'ExplorationStatesService', 'ReadOnlyExplorationBackendApiService',
         'StateImprovementSuggestionService', 'StateInteractionStatsService',
         'StatesObjectFactory', 'UrlInterpolationService',
         'IMPROVE_TYPE_INCOMPLETE',
         function(
             $http, $scope, $uibModal, AlertsService, ComputeGraphService,
             DateTimeFormatService, ExplorationDataService,
-            ExplorationFeaturesService, ExplorationStatesService,
-            ReadOnlyExplorationBackendApiService, RouterService,
+            ExplorationStatesService, ReadOnlyExplorationBackendApiService,
             StateImprovementSuggestionService, StateInteractionStatsService,
             StatesObjectFactory, UrlInterpolationService,
             IMPROVE_TYPE_INCOMPLETE) {
-          const ctrl = this;
-          const newCompletionRatePieChartOptions = title => ({
-            chartAreaWidth: 240,
-            colors: ['#d8d8d8', '#008808', 'blue'],
-            height: 270,
-            left: 20,
-            legendPosition: 'right',
-            pieHole: 0.6,
-            pieSliceBorderColor: 'black',
-            pieSliceTextStyleColor: 'black',
-            title: title,
-            width: 240,
-          });
+          var ctrl = this;
+          var _EXPLORATION_STATS_VERSION_ALL = 'all';
+          var stateStatsModalIsOpen = false;
 
-          const loadLatestExploration = () => {
-            return ReadOnlyExplorationBackendApiService.loadLatestExploration(
-              ExplorationDataService.explorationId
-            ).then(response => {
-              const { init_state_name: initStateName, states } = (
-                response.exploration);
-              ctrl.states = (
-                StatesObjectFactory.createFromBackendDict(states));
-              ctrl.statsGraphData = (
-                ComputeGraphService.compute(initStateName, ctrl.states));
-              ctrl.playthroughsAreAvailable = (
-                ExplorationFeaturesService.isPlaythroughRecordingEnabled() &&
-                !ExplorationFeaturesService.isImprovementsTabEnabled());
-            });
+          ctrl.getLocaleAbbreviatedDatetimeString = function(millisSinceEpoch) {
+            return DateTimeFormatService.getLocaleAbbreviatedDatetimeString(
+              millisSinceEpoch);
           };
+          ctrl.refreshExplorationStatistics = function(version) {
+            ctrl.explorationStatisticsUrl = (
+              '/createhandler/statistics/' +
+              ExplorationDataService.explorationId);
 
-          ctrl.getLocaleAbbreviatedDatetimeString = (
-            DateTimeFormatService.getLocaleAbbreviatedDatetimeString);
+            // TODO(#8038): Update this to use ExplorationStatsService. Requires
+            // refactoring to all consumers of state_stats_mapping to use a Map
+            // rather than a plain object.
+            $http.get(ctrl.explorationStatisticsUrl).then(function(
+                statsResponse) {
+              var data = statsResponse.data;
+              var numStarts = data.num_starts;
+              var numActualStarts = data.num_actual_starts;
+              var numCompletions = data.num_completions;
+              ctrl.stateStats = data.state_stats_mapping;
 
-          ctrl.refreshExplorationStatistics = () => {
-            // TODO(#8038): Move this into a backend-api.service module.
-            return $http.get(
-              UrlInterpolationService.interpolateUrl(
-                '/createhandler/statistics/<exploration_id>', {
-                  exploration_id: ExplorationDataService.explorationId
-                })
-            ).then(response => {
-              const {
-                num_actual_starts: numActualStarts,
-                num_completions: numCompletions,
-                num_starts: numStarts,
-                state_stats_mapping: stateStats,
-              } = response.data;
+              ReadOnlyExplorationBackendApiService.loadLatestExploration(
+                ExplorationDataService.explorationId).then(function(response) {
+                var statesDict = response.exploration.states;
+                var states = StatesObjectFactory.createFromBackendDict(
+                  statesDict);
+                var initStateName = response.exploration.init_state_name;
 
-              ctrl.stateStats = stateStats;
-
-              loadLatestExploration().then(() => {
-                const improvementSuggestions = (
+                ctrl.statsGraphData = ComputeGraphService.compute(
+                  initStateName, states);
+                var improvements = (
                   StateImprovementSuggestionService.getStateImprovements(
-                    ctrl.states, ctrl.stateStats));
-
+                    states, ctrl.stateStats));
                 ctrl.highlightStates = {};
-                improvementSuggestions.forEach(item => {
-                  // TODO(bhenning): This is the feedback for improvement
-                  // types and should be included with the definitions of the
+                improvements.forEach(function(impItem) {
+                  // TODO(bhenning): This is the feedback for improvement types
+                  // and should be included with the definitions of the
                   // improvement types.
-                  if (item.type === IMPROVE_TYPE_INCOMPLETE) {
-                    ctrl.highlightStates[item.stateName] = 'May be confusing';
+                  if (impItem.type === IMPROVE_TYPE_INCOMPLETE) {
+                    ctrl.highlightStates[impItem.stateName] = (
+                      'May be confusing');
                   }
                 });
               });
@@ -147,125 +127,56 @@ angular.module('oppia').directive('statisticsTab', [
               ];
             });
           };
-
-          ctrl.onClickStateInStatsGraph = stateName => {
-            if (!ctrl.stateStatsModalIsOpen) {
-              ctrl.stateStatsModalIsOpen = true;
+          ctrl.onClickStateInStatsGraph = function(stateName) {
+            if (!stateStatsModalIsOpen) {
+              stateStatsModalIsOpen = true;
               ctrl.showStateStatsModal(
                 stateName, ctrl.highlightStates[stateName]);
             }
           };
 
-          ctrl.showStateStatsModal = (stateName, improvementType) => {
-            const state = ExplorationStatesService.getState(stateName);
+          ctrl.showStateStatsModal = function(stateName, improvementType) {
             AlertsService.clearWarnings();
 
-            StateInteractionStatsService.computeStats(state).then(stats => {
-              $uibModal.open({
-                templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                  '/pages/exploration-editor-page/statistics-tab/templates/' +
-                  'state-stats-modal.template.html'),
-                backdrop: true,
-                resolve: {
-                  customizationArgs: (
-                    () => Object.entries(state.interaction.customizationArgs)),
-                  improvementType: () => improvementType,
-                  stateName: () => stateName,
-                  stateStats: () => ctrl.stateStats[stateName],
-                  visualizationsInfo: () => stats.visualizations_info,
+            StateInteractionStatsService.computeStats(
+              ExplorationStatesService.getState(stateName)
+            ).then(stats => $uibModal.open({
+              controller: 'StateStatsModalController',
+              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                '/pages/exploration-editor-page/statistics-tab/templates/' +
+                'state-stats-modal.template.html'),
+              backdrop: true,
+              resolve: {
+                improvementType: function() {
+                  return improvementType;
                 },
-                controller: [
-                  '$controller', '$scope', '$uibModalInstance', '$filter',
-                  'customizationArgs', 'stateName', 'stateStats',
-                  'improvementType', 'visualizationsInfo', 'HtmlEscaperService',
-                  function(
-                      $controller, $scope, $uibModalInstance, $filter,
-                      customizationArgs, stateName, stateStats,
-                      improvementType, visualizationsInfo, HtmlEscaperService) {
-                    $controller('ConfirmOrCancelModalController', {
-                      $scope: $scope,
-                      $uibModalInstance: $uibModalInstance,
-                    });
-
-                    $scope.stateName = stateName;
-                    $scope.stateStats = stateStats;
-                    $scope.improvementType = improvementType;
-
-                    $scope.COMPLETION_RATE_PIE_CHART_OPTIONS1 = (
-                      newCompletionRatePieChartOptions(
-                        'Answer feedback statistics'));
-
-                    $scope.COMPLETION_RATE_PIE_CHART_OPTIONS2 = (
-                      newCompletionRatePieChartOptions(
-                        'Solution usage statistics'));
-
-                    const usefulFeedbackCount = (
-                      $scope.stateStats.useful_feedback_count);
-                    const totalAnswersCount = (
-                      $scope.stateStats.total_answers_count);
-                    const numTimesSolutionViewed = (
-                      $scope.stateStats.num_times_solution_viewed);
-
-                    if (totalAnswersCount > 0) {
-                      $scope.hasExplorationBeenAnswered = true;
-                    }
-
-                    $scope.pieChartData1 = [
-                      ['Type', 'Number'],
-                      ['Default feedback',
-                        totalAnswersCount - usefulFeedbackCount],
-                      ['Specific feedback', usefulFeedbackCount],
-                    ];
-
-                    $scope.pieChartData2 = [
-                      ['Type', 'Number'],
-                      ['Solutions used to answer', numTimesSolutionViewed],
-                      ['Solutions not used',
-                        totalAnswersCount - numTimesSolutionViewed]
-                    ];
-
-                    $scope.visualizationsHtml = visualizationsInfo.map(info => {
-                      const vizElement = $(
-                        '<oppia-visualization-' +
-                        $filter('camelCaseToHyphens')(info.id) + '/>');
-
-                      const addAttr = (camelCaseName, value) => vizElement.attr(
-                        $filter('camelCaseToHyphens')(camelCaseName),
-                        HtmlEscaperService.objToEscapedJson(value));
-
-                      addAttr('escapedData', info.data);
-                      addAttr('escapedOptions', info.options);
-                      addAttr(
-                        'addressedInfoIsSupported',
-                        info.addressed_info_is_supported);
-                      customizationArgs.forEach(argDefinition => {
-                        const [name, arg] = argDefinition;
-                        addAttr(name + 'WithValue', arg.value);
-                      });
-
-                      return vizElement.get(0).outerHTML;
-                    }).join('');
-
-                    $scope.navigateToStateEditor = () => {
-                      $scope.cancel();
-                      RouterService.navigateToMainTab(stateName);
-                    };
-
-                    $scope.$on('$destroy', () => {
-                      ctrl.stateStatsModalIsOpen = false;
-                    });
-                  }
-                ]
-              }).result.then(() => {}, () => AlertsService.clearWarnings());
-            });
+                stateName: function() {
+                  return stateName;
+                },
+                stateStats: function() {
+                  return ctrl.stateStats[stateName];
+                },
+                stateStatsModalIsOpen: function() {
+                  return stateStatsModalIsOpen;
+                },
+                visualizationsInfo: function() {
+                  return stats.visualizations_info;
+                }
+              },
+            }).result.then(
+              () => {
+                stateStatsModalIsOpen = false;
+              },
+              () => {
+                AlertsService.clearWarnings();
+                stateStatsModalIsOpen = false;
+              }));
           };
 
-          ctrl.$onInit = () => {
-            $scope.$on(
-              'refreshStatisticsTab', ctrl.refreshExplorationStatistics);
-
-            ctrl.COMPLETION_RATE_PIE_CHART_OPTIONS = (
-              newCompletionRatePieChartOptions(''));
+          ctrl.$onInit = function() {
+            $scope.$on('refreshStatisticsTab', function() {
+              ctrl.refreshExplorationStatistics(_EXPLORATION_STATS_VERSION_ALL);
+            });
             ctrl.COMPLETION_RATE_CHART_OPTIONS = {
               chartAreaWidth: 300,
               colors: ['green', 'firebrick'],
@@ -273,10 +184,23 @@ angular.module('oppia').directive('statisticsTab', [
               legendPosition: 'right',
               width: 500
             };
+            ctrl.COMPLETION_RATE_PIE_CHART_OPTIONS = {
+              title: '',
+              left: 230,
+              pieHole: 0.6,
+              pieSliceTextStyleColor: 'black',
+              pieSliceBorderColor: 'black',
+              chartAreaWidth: 500,
+              colors: ['#008808', '#d8d8d8'],
+              height: 300,
+              legendPosition: 'right',
+              width: 600
+            };
+            ctrl.currentVersion = _EXPLORATION_STATS_VERSION_ALL;
+
+            ctrl.hasTabLoaded = false;
 
             ctrl.explorationHasBeenVisited = false;
-            ctrl.hasTabLoaded = false;
-            ctrl.stateStatsModalIsOpen = false;
           };
         }
       ]

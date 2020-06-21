@@ -86,7 +86,10 @@ describe('Collection editor state service', function() {
     var _fetchCollectionRights = function() {
       return $q(function(resolve, reject) {
         if (!self.failure) {
-          resolve(self.backendCollectionRightsObject);
+          resolve(
+            collectionRightsObjectFactory.create(
+              self.backendCollectionRightsObject
+            ));
         } else {
           reject();
         }

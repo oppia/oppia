@@ -4,6 +4,16 @@
   </h3>
 </div>
 <div class="modal-body" style="width: 96%; margin-left: 2%;">
+  <div class="rubric-details" ng-repeat="skillName in skillNames track by $index">
+    <h4 ng-if="skillName"><strong>Skill: <[skillName]></strong></h4>
+    <h4><strong>Difficulty: <[rubrics[$index].getDifficulty()]></strong></h4>
+    <h4 ng-if="rubrics[$index].getExplanations().length > 0"><strong>Difficulty Explanations</strong></h4>
+    <ul>
+      <li ng-repeat="explanation in rubrics[$index].getExplanations()">
+        <span ng-bind-html="explanation"></span>
+      </li>
+    </ul>
+  </div>
   <div ng-if="!newQuestionIsBeingCreated">
     <h4> <strong> Linked Skills </strong> </h4>
     <md-card class="question-skill-id" ng-repeat="skill in associatedSkillSummaries">
@@ -17,7 +27,7 @@
       </div>
     </md-card>
     <button class="btn btn-success btn-sm" ng-click="addSkill()">Link Another Skill</button>
-    <button class="btn btn-primary btn-sm" ng-click="undo()">Undo Skill Changes</button>
+    <button class="btn btn-primary btn-sm" ng-click="undo()" ng-if="getSkillLinkageModificationsArray().length > 0">Undo Skill Changes</button>
   </div>
 
   <h4 ng-if="!newQuestionIsBeingCreated" style="margin-top: 4vh;"> <strong> Question Editor </strong> </h4>
@@ -28,13 +38,16 @@
                    can-edit-question="canEditQuestion"
                    question-changed="questionChanged">
   </question-editor>
-  <div class="alert alert-danger" ng-if="validationError">
-    <[validationError]>
-    <span class="oppia-transition-200"
-          ng-click="removeErrors()"
-          style="float: right;">
-      <i class="material-icons md-18">&#xE5CD;</i>
-    </span>
+  <div class="alert alert-danger" ng-if="question.getStateData().interaction.id && question.getValidationErrorMessage()">
+    <[question.getValidationErrorMessage()]>
+  </div>
+  <div class="alert alert-danger" ng-if="question.getStateData().interaction.id && !question.getValidationErrorMessage() && question.getUnaddressedMisconceptionNames(misconceptionsBySkill).length">
+    Remaining misconceptions that need to be addressed:
+    <ul>
+      <li ng-repeat="misconceptionName in question.getUnaddressedMisconceptionNames(misconceptionsBySkill)">
+        <[misconceptionName]>
+      </li>
+    </ul>
   </div>
 </div>
 <div class="modal-footer">
@@ -43,7 +56,7 @@
           title="To Save please add: interaction, hint, solution and address all misconceptions"
           class="btn btn-success protractor-test-save-question-button"
           ng-click="done()"
-          ng-disabled="isSaveButtonDisabled()">
+          ng-disabled="!isQuestionValid()">
     Done
   </button>
   <button ng-if="!newQuestionIsBeingCreated"
@@ -60,6 +73,9 @@
   }
   .question-skill-id:hover {
     background-color: #e0e0e0;
+  }
+  .rubric-details {
+    padding: 10px 0;
   }
   .skill-description-card {
     height: 2.5em;

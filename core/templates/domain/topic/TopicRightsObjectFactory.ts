@@ -20,10 +20,10 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-export interface ITopicRights {
-  isPublished: () => boolean;
-  canEditTopic: () => boolean;
-  canPublishTopic: () => boolean;
+interface ITopicRightsBackendDict {
+  'published': boolean;
+  'can_publish_topic': boolean;
+  'can_edit_topic': boolean;
 }
 
 export class TopicRights {
@@ -67,7 +67,7 @@ export class TopicRights {
   // Reassigns all values within this topic to match the existing
   // topic rights. This is performed as a deep copy such that none of the
   // internal, bindable objects are changed within this topic rights.
-  copyFromTopicRights(otherTopicRights: ITopicRights) {
+  copyFromTopicRights(otherTopicRights: TopicRights) {
     this._published = otherTopicRights.isPublished();
     this._canEditTopic = otherTopicRights.canEditTopic();
     this._canPublishTopic = otherTopicRights.canPublishTopic();
@@ -80,11 +80,8 @@ export class TopicRights {
 export class TopicRightsObjectFactory {
   // This function takes a JSON object which represents a backend
   // topic python dict.
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'topicRightsBackendObject' is a dict with underscore_cased
-  // keys which give tslint errors against underscore_casing in favor of
-  // camelCasing.
-  createFromBackendDict(topicRightsBackendObject: any) {
+  createFromBackendDict(
+      topicRightsBackendObject: ITopicRightsBackendDict) {
     return new TopicRights(
       topicRightsBackendObject.published,
       topicRightsBackendObject.can_publish_topic,

@@ -140,7 +140,7 @@ export class AppConstants {
 
   public static SITE_NAME = 'Oppia.org';
 
-  public static DEFAULT_PROFILE_IMAGE_PATH = '/avatar/user_blue_72px.png';
+  public static DEFAULT_PROFILE_IMAGE_PATH = '/avatar/user_blue_72px.webp';
 
   public static LOGOUT_URL = '/logout';
 
@@ -168,6 +168,10 @@ export class AppConstants {
     SUBTOPIC: 'subtopic',
     QUESTION: 'question'
   };
+
+  public static IMAGE_SAVE_DESTINATION_SERVER = 'imageSaveDestinationServer';
+  public static IMAGE_SAVE_DESTINATION_LOCAL_STORAGE =
+    'imageSaveDestinationLocalStorage';
 }
 
 const constants = require('constants.ts');
