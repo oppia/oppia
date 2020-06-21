@@ -259,7 +259,8 @@ angular.module('oppia').component('svgFilenameEditor', {
           obj.removeAttribute('xml:space');
         });
         var elements = svg.querySelectorAll('*');
-        // Fabric js adds vector-effect as an attribute, so here it is removed
+        // Fabric js adds vector-effect as an attribute which is not part of
+        // the svg attribute whitelist, so here it is removed
         // and added as part of the style attribute.
         for (var i = 0; i < elements.length; i++) {
           if (
@@ -385,7 +386,8 @@ angular.module('oppia').component('svgFilenameEditor', {
                   var text = new fabric.Textbox(obj.text, obj.toObject());
                   text.set({
                     text: value,
-                    type: 'textbox'
+                    type: 'textbox',
+                    strokeUniform: true
                   });
                   ctrl.canvas.add(text);
                 } else {
@@ -423,6 +425,7 @@ angular.module('oppia').component('svgFilenameEditor', {
         var line = new fabric.Line([10, 10, 50, 50], {
           stroke: ctrl.fabricjsOptions.stroke,
           strokeWidth: parseInt(size.substring(0, size.length - 2)),
+          strokeUniform: true
         });
         ctrl.canvas.add(line);
       };

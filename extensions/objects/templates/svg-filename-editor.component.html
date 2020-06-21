@@ -15,24 +15,29 @@
     <div class="vertical-toolbar">
       <div>
         <button class="icon-tool toolbar-button thin-button" ng-class="{'disabled' : !$ctrl.isPencilEnabled()}"
-                style="background-image:url(/assets/svg_diagram_editor/pencil.svg);" ng-click="$ctrl.togglePencilDrawing()"
+                ng-click="$ctrl.togglePencilDrawing()"
                 tooltip-placement="left" uib-tooltip="Pencil" ng-disabled="!$ctrl.isPencilEnabled()">
+          <i class="fas fa-pencil-alt"></i>
         </button>
         <button class="icon-tool toolbar-button thin-button" ng-class="{'disabled' : !$ctrl.areAllToolsEnabled()}"
-                style="background-image:url(/assets/svg_diagram_editor/line.svg);" ng-click="$ctrl.createLine()"
+                ng-click="$ctrl.createLine()"
                 tooltip-placement="right" uib-tooltip="Line" ng-disabled="!$ctrl.areAllToolsEnabled()">
+          <i class="fas fa-slash" style="font-size: 19px;"></i>
         </button>
         <button class="icon-tool toolbar-button thin-button" ng-class="{'disabled' : !$ctrl.areAllToolsEnabled()}"
-                style="background-image:url(/assets/svg_diagram_editor/rectangle.svg);" ng-click="$ctrl.createRect()"
+                ng-click="$ctrl.createRect()"
                 tooltip-placement="left" uib-tooltip="Rectangle" ng-disabled="!$ctrl.areAllToolsEnabled()">
+          <i class="far fa-square"></i>
         </button>
         <button class="icon-tool toolbar-button thin-button" ng-class="{'disabled' : !$ctrl.areAllToolsEnabled()}"
-                style="background-image:url(/assets/svg_diagram_editor/circle.svg);" ng-click="$ctrl.createCircle()"
+                ng-click="$ctrl.createCircle()"
                 tooltip-placement="right" uib-tooltip="Circle" ng-disabled="!$ctrl.areAllToolsEnabled()">
+          <i class="far fa-circle"></i>
         </button>
         <button class="icon-tool toolbar-button thin-button" ng-class="{'disabled' : !$ctrl.areAllToolsEnabled()}"
-                style="background-image:url(/assets/svg_diagram_editor/text.svg);" ng-click="$ctrl.createText()"
+                ng-click="$ctrl.createText()"
                 tooltip-placement="left" uib-tooltip="Text" ng-disabled="!$ctrl.areAllToolsEnabled()">
+          <i class="fas fa-font"></i>
         </button>
         <button class="icon-tool toolbar-button thin-button" ng-class="{'disabled' : !$ctrl.isClosedPolygonEnabled()}"
                 style="background-image:url(/assets/svg_diagram_editor/closed_polygon.svg);"
@@ -45,8 +50,9 @@
                 ng-disabled="!$ctrl.isOpenPolygonEnabled()">
         </button>
         <button class="icon-tool toolbar-button thin-button" ng-class="{'disabled' : !$ctrl.isEyeDropperEnabled()}"
-                style="background-image:url(/assets/svg_diagram_editor/eye-dropper.svg);" ng-click="$ctrl.copyColor()"
+                ng-click="$ctrl.copyColor()"
                 tooltip-placement="right" uib-tooltip="Eye Dropper" ng-disabled="!$ctrl.isEyeDropperEnabled()">
+          <i class="fas fa-eye-dropper"></i>
         </button>
         <div class="vert-bottom-toolbar">
           <div>
@@ -65,12 +71,14 @@
           </div>
           <div>
             <button class="icon-tool toolbar-button thin-button" ng-class="{'disabled' : !$ctrl.objectUndoStack.length}"
-                    style="background-image:url(/assets/svg_diagram_editor/undo.svg);" ng-click="$ctrl.onUndo()"
+                    ng-click="$ctrl.onUndo()"
                     ng-disabled="!$ctrl.objectUndoStack.length">
+              <i class="fas fa-undo"></i>
             </button>
             <button class="icon-tool toolbar-button thin-button" ng-class="{'disabled' : !$ctrl.objectRedoStack.length}"
-                    style="background-image:url(/assets/svg_diagram_editor/redo.svg);" ng-click="$ctrl.onRedo()"
+                    ng-click="$ctrl.onRedo()"
                     ng-disabled="!$ctrl.objectRedoStack.length">
+              <i class="fas fa-redo"></i>
             </button>
           </div>
           <button class="toolbar-button fat-button" ng-click="$ctrl.removeShape()"
@@ -203,6 +211,7 @@
     background-position: center center;
     background-repeat: no-repeat;
     background-size: 100% auto;
+    font-size: 24px;
   }
 
   .svg-editor .vertical-toolbar .icon-tool.disabled {
