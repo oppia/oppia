@@ -56,16 +56,16 @@ describe('AlgebraicExpressionInputValidationService', () => {
     WARNING_TYPES = AppConstants.WARNING_TYPES;
 
     currentState = 'First State';
-
     goodDefaultOutcome = oof.createFromBackendDict({
       dest: 'Second State',
       feedback: {
         html: '',
-        audio_translations: {}
+        content_id: ''
       },
       labelled_as_correct: false,
       param_changes: [],
-      refresher_exploration_id: null
+      refresher_exploration_id: null,
+      missing_prerequisite_skill_id: null
     });
 
     customizationArgs = {};
@@ -84,12 +84,7 @@ describe('AlgebraicExpressionInputValidationService', () => {
       }
     });
 
-    answerGroups = [agof.createNew(
-      [matchesExactlyWith],
-      goodDefaultOutcome,
-      false,
-      null
-    )];
+    answerGroups = [agof.createNew([], goodDefaultOutcome, null, null)];
   });
 
   it('should be able to perform basic validation', () => {
