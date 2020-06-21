@@ -377,8 +377,8 @@ describe('SvgFilenameEditor initialized with value attribute',
       'xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="494" ' +
       'height="367" viewBox="0 0 494 367">' +
       '<desc>Created with Fabric.js 3.6.3</desc><defs></defs>' +
-      '<rect x="0" y="0" width="100%" height="100%" fill="rgba(242,47,47,1)"/>' +
-      '<g transform="matrix(1 0 0 1 126.5 116.5)">' +
+      '<rect x="0" y="0" width="100%" height="100%" ' +
+      'fill="rgba(242,47,47,1)"/><g transform="matrix(1 0 0 1 126.5 116.5)">' +
       '<rect style="stroke: rgb(0,0,0); stroke-width: 9; stroke-dasharray: ' +
       'none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: ' +
       'miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-opacity: 0; ' +
@@ -390,8 +390,8 @@ describe('SvgFilenameEditor initialized with value attribute',
       'stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; ' +
       'stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); ' +
       'fill-rule: nonzero; opacity: 1; white-space: pre;"><tspan x="-21.51"' +
-      ' y="-6.14">Enter</tspan><tspan x="-21.51" y="17.45" style="white-space:' +
-      ' pre; "> Text</tspan></text></g></svg>');
+      ' y="-6.14">Enter</tspan><tspan x="-21.51" y="17.45" ' +
+      'style="white-space: pre; "> Text</tspan></text></g></svg>');
     var mockAssetsBackendApiService = {
       getImageUrlForPreview: function(contentType, contentId, filepath) {
         return '/imageurl_' + contentType + '_' + contentId + '_' + filepath;
