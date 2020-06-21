@@ -70,31 +70,28 @@ export class AlgebraicExpressionInputValidationService {
           var seenInput = <string> seenRule.inputs.x;
           var seenRuleType = <string> seenRule.type;
 
-          if (seenRuleType === 'IsEquivalentTo') {
+          if (seenRuleType === 'IsEquivalentTo' && (
+            aeirs.IsEquivalentTo(seenInput, {x: currentInput}))) {
             // This rule will make all of the following matching
             // inputs obsolete.
-            if (aeirs.IsEquivalentTo(seenInput, {x: currentInput})) {
-              warningsList.push({
-                type: AppConstants.WARNING_TYPES.ERROR,
-                message: (
-                  'Rule ' + (j + 1) + ' from answer group ' + (i + 1) +
-                  ' will never be matched because it is preceded ' +
-                  'by an \'IsEquivalentTo\' rule with a matching input.')
-              });
-            }
-          } else {
+            warningsList.push({
+              type: AppConstants.WARNING_TYPES.ERROR,
+              message: (
+                'Rule ' + (j + 1) + ' from answer group ' + (i + 1) +
+                ' will never be matched because it is preceded ' +
+                'by an \'IsEquivalentTo\' rule with a matching input.')
+            });
+          } else if (currentRuleType === 'MatchesExactlyWith' && (
+            aeirs.MatchesExactlyWith(seenInput, {x: currentInput}))) {
             // This rule will make the following inputs with MatchesExactlyWith
             // rule obsolete.
-            if (currentRuleType === 'MatchesExactlyWith' && (
-              aeirs.MatchesExactlyWith(seenInput, {x: currentInput}))) {
-              warningsList.push({
-                type: AppConstants.WARNING_TYPES.ERROR,
-                message: (
-                  'Rule ' + (j + 1) + ' from answer group ' + (i + 1) +
-                  ' will never be matched because it is preceded ' +
-                  'by a \'MatchesExactlyWith\' rule with a matching input.')
-              });
-            }
+            warningsList.push({
+              type: AppConstants.WARNING_TYPES.ERROR,
+              message: (
+                'Rule ' + (j + 1) + ' from answer group ' + (i + 1) +
+                ' will never be matched because it is preceded ' +
+                'by a \'MatchesExactlyWith\' rule with a matching input.')
+            });
           }
         }
         seenRules.push(rules[j]);

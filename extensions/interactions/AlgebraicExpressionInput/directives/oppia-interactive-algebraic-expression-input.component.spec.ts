@@ -28,8 +28,9 @@ require(
   'algebraic-expression-input-rules.service.ts');
 require(
   'pages/exploration-player-page/services/current-interaction.service.ts');
-
-require('./oppia-interactive-algebraic-expression-input.component.ts');
+require(
+  'interactions/AlgebraicExpressionInput/directives/' +
+  'oppia-interactive-algebraic-expression-input.component.ts');
 
 describe('AlgebraicExpressionInputInteractive', function() {
   var ctrl = null, $window = null;

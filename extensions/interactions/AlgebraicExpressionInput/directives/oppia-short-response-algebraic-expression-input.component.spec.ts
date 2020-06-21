@@ -17,8 +17,9 @@
  * component.
  */
 
-
-require('./oppia-short-response-algebraic-expression-input.component.ts');
+require(
+  'interactions/AlgebraicExpressionInput/directives/' +
+  'oppia-short-response-algebraic-expression-input.component.ts');
 
 describe('AlgebraicExpressionInputShortResponse', function() {
   var ctrl = null;

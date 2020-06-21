@@ -32,7 +32,7 @@ export class MathInteractionsService {
     // starts with a colon. That part needs to be removed before displaying
     // the error to the end user. Same rationale applies for stripping the
     // error message from 'at', since some errors from nerdamer use 'at' to
-    // to show the location.
+    // show the location.
     var colonIndex = errorMessage.indexOf(':');
     if (colonIndex !== -1) {
       errorMessage = errorMessage.slice(0, colonIndex);
@@ -49,16 +49,17 @@ export class MathInteractionsService {
 
   validateAnswer(answer: string): boolean {
     var expression;
+    if (answer.length === 0) {
+      this.warningText = 'Please enter a non-empty answer.';
+      return false;
+    }
     try {
       expression = nerdamer(answer);
     } catch (err) {
       this.warningText = this.cleanErrorMessage(err.message);
       return false;
     }
-    if (answer.length === 0) {
-      this.warningText = 'Please enter a non-empty answer.';
-      return false;
-    } else if (answer.indexOf('=') !== -1 || answer.indexOf(
+    if (answer.indexOf('=') !== -1 || answer.indexOf(
       '<') !== -1 || answer.indexOf('>') !== -1) {
       this.warningText = 'It looks like you have entered an ' +
         'equation/inequality. Please enter an algebraic ' +

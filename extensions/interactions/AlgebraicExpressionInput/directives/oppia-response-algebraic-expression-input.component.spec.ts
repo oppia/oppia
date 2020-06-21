@@ -16,8 +16,9 @@
  * @fileoverview Unit tests for the AlgebraicExpressionInput response component.
  */
 
-
-require('./oppia-response-algebraic-expression-input.component.ts');
+require(
+  'interactions/AlgebraicExpressionInput/directives/' +
+  'oppia-response-algebraic-expression-input.component.ts');
 
 describe('AlgebraicExpressionInputResponse', function() {
   var ctrl = null;
