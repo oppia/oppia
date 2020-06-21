@@ -27,6 +27,8 @@ import { ImprovementsConstants } from
   'domain/improvements/improvements.constants';
 
 export class HighBounceRateTask extends TaskEntry {
+  public readonly taskType: 'high_bounce_rate';
+
   constructor(backendDict: ITaskEntryBackendDict) {
     if (backendDict.entity_type !==
             ImprovementsConstants.TASK_ENTITY_TYPE_EXPLORATION) {

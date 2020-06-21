@@ -13,7 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Domain object for a needs guiding responses improvements task.
+ * @fileoverview Domain object for a ineffective feedback loop improvements
+ *    task.
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
@@ -25,6 +26,8 @@ import { ImprovementsConstants } from
   'domain/improvements/improvements.constants';
 
 export class IneffectiveFeedbackLoopTask extends TaskEntry {
+  public readonly taskType: 'ineffective_feedback_loop';
+
   constructor(backendDict: ITaskEntryBackendDict) {
     if (backendDict.entity_type !==
             ImprovementsConstants.TASK_ENTITY_TYPE_EXPLORATION) {
