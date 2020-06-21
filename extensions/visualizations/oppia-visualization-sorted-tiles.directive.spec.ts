@@ -17,35 +17,39 @@
  * visualization.
  */
 
-// TODO(#7222): Remove the following import once corresponding directive is
-// upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-
 require('visualizations/oppia-visualization-sorted-tiles.directive.ts');
 
-describe('Oppia sorted tiles visualization', () => {
-  beforeEach(angular.mock.module('directiveTemplates'));
-  beforeEach(angular.mock.module('oppia', $provide => {
-    const ugs = new UpgradedServices();
-    for (const [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
-  beforeEach(angular.mock.inject(($componentController, HtmlEscaperService) => {
-    this.ctrl = $componentController('oppiaVisualizationSortedTiles', {
-      $attrs: {
-        escapedData: '[{"answer": "foo", "frequency": 5}]',
-        escapedOptions: '{"header": "Pretty Tiles!"}',
-        addressedInfoIsSupported: true,
-      },
-      HtmlEscaperService: HtmlEscaperService,
-    }, {});
-    this.ctrl.$onInit();
+describe('Oppia sorted tiles visualization', function() {
+  let $compile, $rootScope, element: JQuery;
+
+  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.inject(function(_$compile_, _$rootScope_) {
+    $compile = _$compile_;
+    $rootScope = _$rootScope_;
   }));
 
-  it('should interpret the escaped attributes', () => {
-    expect(this.ctrl.addressedInfoIsSupported).toBeTrue();
-    expect(this.ctrl.data).toEqual([{answer: 'foo', frequency: 5}]);
-    expect(this.ctrl.options).toEqual({header: 'Pretty Tiles!'});
+  beforeEach(() => {
+    const elementHtml = (
+      '<oppia-visualization-sorted-tiles data="data" options="options">' +
+      '</oppia-visualization-sorted-tiles>');
+    const $scope = $rootScope.$new();
+    $scope.data = [
+      {answer: 'foo', frequency: 3},
+      {answer: 'bar', frequency: 1},
+    ];
+    $scope.options = {
+      header: 'Pretty Tiles!'
+    };
+    element = $compile(elementHtml)($scope);
+    $rootScope.$digest();
+  });
+
+  it('should render the provided scope bindings', () => {
+    expect(element.find('strong').text()).toEqual('Pretty Tiles!');
+    expect(element.find('li > div').map((_, el) => el.textContent).toArray())
+      .toEqual([
+        'foo', '3 times',
+        'bar', '1 times',
+      ]);
   });
 });
