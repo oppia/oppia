@@ -109,12 +109,10 @@ angular.module('oppia').directive('historyTab', [
             ExplorationDataService.getData().then(function(data) {
               var currentVersion = data.version;
               ctrl.currentVersion = currentVersion;
-              /**
-               * ctrl.compareVersionMetadata is an object with keys
-               * 'earlierVersion' and 'laterVersion' whose values are the
-               * metadata of the compared versions, containing 'committerId',
-               * 'createdOnMsecs', 'commitMessage', and 'versionNumber'.
-               */
+              // The ctrl.compareVersionMetadata is an object with keys
+              // 'earlierVersion' and 'laterVersion' whose values are the
+              // metadata of the compared versions, containing 'committerId',
+              // 'createdOnMsecs', 'commitMessage', and 'versionNumber'.
               ctrl.compareVersions = {};
               ctrl.compareVersionMetadata = {};
 

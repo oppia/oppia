@@ -83,7 +83,7 @@ export class PythonProgramTokenizer {
   // Tail end of """ string.
   private double3 = '[^"\\\\]*(?:(?:\\\\.|"(?!""))[^"\\\\]*)*"""';
   private triple = this.groupOfRegEx("[uUbB]?[rR]?'''", '[uUbB]?[rR]?"""');
-  // single-line ' or " string.
+  // Single-line ' or " string.
   private str = this.groupOfRegEx(
     "[uUbB]?[rR]?'[^\\n'\\\\]*(?:\\\\.[^\\n'\\\\]*)*'",
     '[uUbB]?[rR]?"[^\\n"\\\\]*(?:\\\\.[^\\n"\\\\]*)*"');

@@ -228,7 +228,7 @@ angular.module('oppia').config([
                 warningMessage = rejection.data.error;
               }
               AlertsService.addWarning(warningMessage);
-              // rejection.config is an optional parameter.
+              // The rejection.config is an optional parameter.
               // see https://docs.angularjs.org/api/ng/service/$http
               var rejectionUrl = typeof rejection.config !== 'undefined' ? (
                 rejection.config.url) : '';

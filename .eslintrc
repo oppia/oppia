@@ -55,6 +55,7 @@
       "error",
       "always",
       {
+        "ignorePattern": "disable-bad-pattern-check|fall-through",
         "ignoreConsecutiveComments": true
       }
     ],
