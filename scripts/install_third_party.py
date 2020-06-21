@@ -1,4 +1,3 @@
-# coding: utf-8
 # Copyright 2014 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,7 +18,6 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import argparse
-import codecs
 import contextlib
 import json
 import os
@@ -332,37 +330,10 @@ def download_manifest_files(filepath):
                     dependency_tar_root_name, dependency_target_root_name)
 
 
-def remove_emojis_from_guppy(guppy_file_path):
-    """The emoji symbols present in the guppy.min.js file are not compatible
-    with all platforms, hence they must be removed from the file. Leaving these
-    leads to console warnings which cause the e2e tests to fail.
-    For reference: https://github.com/daniel3735928559/guppy/issues/138
-
-    Args:
-        guppy_file_path: str. Path of the guppy.min.js file.
-    """
-
-    text_to_remove = (
-        u'utf8chars:{template:"utf8char",values:{banana:{char:"🍌"},pineapple:'
-        u'{char:"🍍"},mango:{char:"🥭"},kiwi:{char:"🥝"}}},')
-
-    with codecs.open(guppy_file_path, mode='r', encoding='utf-8') as f:
-        file_content = f.read()
-
-    file_content = file_content.replace(text_to_remove, u'')
-
-    with codecs.open(guppy_file_path, mode='w', encoding='utf-8') as f:
-        f.write(file_content)
-
-
 def main(args=None):
     """Installs all the third party libraries."""
     unused_parsed_args = _PARSER.parse_args(args=args)
     download_manifest_files(MANIFEST_FILE_PATH)
-
-    guppy_file_path = os.path.join(
-        THIRD_PARTY_STATIC_DIR, 'guppy-f944022', 'build', 'guppy.min.js')
-    remove_emojis_from_guppy(guppy_file_path)
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because

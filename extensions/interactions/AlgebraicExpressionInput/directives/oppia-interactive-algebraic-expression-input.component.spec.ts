@@ -17,6 +17,12 @@
  * component.
  */
 
+import { GuppyConfigurationService } from
+  'services/guppy-configuration.service.ts';
+import { MathInteractionsService } from
+  'services/math-interactions.service.ts';
+import { GuppyInitializationService } from
+  'services/guppy-initialization.service.ts';
 require(
   'interactions/AlgebraicExpressionInput/directives/' +
   'algebraic-expression-input-rules.service.ts');
@@ -26,7 +32,7 @@ require(
 require('./oppia-interactive-algebraic-expression-input.component.ts');
 
 describe('AlgebraicExpressionInputInteractive', function() {
-  var ctrl = null;
+  var ctrl = null, $window = null;
   var mockCurrentInteractionService = {
     onSubmit: function(answer, rulesService) {},
     registerCurrentInteraction: function(submitAnswerFn, validateAnswerFn) {
@@ -34,42 +40,55 @@ describe('AlgebraicExpressionInputInteractive', function() {
     }
   };
   var mockAlgebraicExpressionInputRulesService = {};
+  var mockGuppyObject = {
+    guppyInstance: {
+      asciimath: function() {
+        return 'Dummy value';
+      }
+    }
+  };
+  var guppyConfigurationService = null;
+  var mathInteractionsService = null;
+  var guppyInitializationService = null;
 
   class MockGuppy {
     constructor(id: string, config: Object) {}
 
-    event(name: string, handler: Function): void {
-      handler();
-    }
     asciimath() {
       return 'Dummy value';
     }
-    render(): void {}
+    static event(name: string, handler: Function): void {
+      handler();
+    }
+    static configure(name: string, val: Object): void {}
+    static 'remove_global_symbol'(symbol: string): void {}
   }
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
+    guppyConfigurationService = new GuppyConfigurationService();
+    mathInteractionsService = new MathInteractionsService();
+    guppyInitializationService = new GuppyInitializationService();
+
     $provide.value('CurrentInteractionService',
       mockCurrentInteractionService);
     $provide.value('AlgebraicExpressionInputRulesService',
       mockAlgebraicExpressionInputRulesService);
+    $provide.value('GuppyConfigurationService', guppyConfigurationService);
+    $provide.value('MathInteractionsService', mathInteractionsService);
+    $provide.value('GuppyInitializationService', guppyInitializationService);
   }));
-  beforeEach(angular.mock.inject(function($componentController) {
+  beforeEach(angular.mock.inject(function($injector, $componentController) {
+    $window = $injector.get('$window');
     ctrl = $componentController('oppiaInteractiveAlgebraicExpressionInput');
-    (<any>window).Guppy = MockGuppy;
+    $window.Guppy = MockGuppy;
   }));
 
-  it('should assign a random id to the guppy divs', function() {
-    var mockDocument = document.createElement('div');
-    mockDocument.setAttribute('class', 'guppy-div-learner');
-    angular.element(document).find('body').append(mockDocument.outerHTML);
-
+  it('should add the change handler to guppy', function() {
+    spyOn(guppyInitializationService, 'findActiveGuppyObject').and.returnValue(
+      mockGuppyObject);
     ctrl.$onInit();
-
-    var guppyDivs = document.querySelectorAll('.guppy-div-learner');
-    for (var i = 0; i < guppyDivs.length; i++) {
-      expect(guppyDivs[i].getAttribute('id')).toMatch(/guppy_[0-9]{1,8}/);
-    }
+    expect(guppyInitializationService.findActiveGuppyObject).toHaveBeenCalled();
   });
 
   it('should not submit the answer if invalid', function() {
@@ -93,21 +112,5 @@ describe('AlgebraicExpressionInputInteractive', function() {
     ctrl.value = '';
     expect(ctrl.isCurrentAnswerValid()).toBeFalse();
     expect(ctrl.warningText).toBe('Please enter a non-empty answer.');
-
-    ctrl.value = 'a/';
-    expect(ctrl.isCurrentAnswerValid()).toBeFalse();
-    expect(ctrl.warningText).toBe('/ is not a valid postfix operator.');
-
-    ctrl.value = '12+sqrt(4)';
-    expect(ctrl.isCurrentAnswerValid()).toBeFalse();
-    expect(ctrl.warningText).toBe(
-      'It looks like you have entered only numbers. Make sure to include' +
-      ' the necessary variables mentioned in the question.');
-
-    ctrl.value = 'x-y=0';
-    expect(ctrl.isCurrentAnswerValid()).toBeFalse();
-    expect(ctrl.warningText).toBe(
-      'It looks like you have entered an equation/inequality.' +
-      ' Please enter an algebraic expression instead.');
   });
 });

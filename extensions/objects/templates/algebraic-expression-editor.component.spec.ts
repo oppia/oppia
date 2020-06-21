@@ -16,37 +16,59 @@
  * @fileoverview Unit tests for the algebraic expression editor.
  */
 
+import { GuppyConfigurationService } from
+  'services/guppy-configuration.service.ts';
+import { MathInteractionsService } from
+  'services/math-interactions.service.ts';
+import { GuppyInitializationService } from
+  'services/guppy-initialization.service.ts';
+
 describe('AlgebraicExpressionEditor', function() {
-  var ctrl = null;
+  var ctrl = null, $window = null;
+  var mockGuppyObject = {
+    guppyInstance: {
+      asciimath: function() {
+        return 'Dummy value';
+      }
+    }
+  };
+  var guppyConfigurationService = null;
+  var mathInteractionsService = null;
+  var guppyInitializationService = null;
+
   class MockGuppy {
     constructor(id: string, config: Object) {}
 
-    static event(name: string, handler: Function): void {
-      handler();
-    }
     asciimath() {
       return 'Dummy value';
     }
-    render(): void {}
+    static event(name: string, handler: Function): void {
+      handler();
+    }
+    static configure(name: string, val: Object): void {}
+    static 'remove_global_symbol'(symbol: string): void {}
   }
 
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.inject(function($componentController) {
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    guppyConfigurationService = new GuppyConfigurationService();
+    mathInteractionsService = new MathInteractionsService();
+    guppyInitializationService = new GuppyInitializationService();
+    $provide.value('GuppyConfigurationService', guppyConfigurationService);
+    $provide.value('MathInteractionsService', mathInteractionsService);
+    $provide.value('GuppyInitializationService', guppyInitializationService);
+  }));
+  beforeEach(angular.mock.inject(function($injector, $componentController) {
+    $window = $injector.get('$window');
     ctrl = $componentController('algebraicExpressionEditor');
-    (<any>window).Guppy = MockGuppy;
+    $window.Guppy = MockGuppy;
   }));
 
-  it('should assign a random id to the guppy divs', function() {
-    var mockDocument = document.createElement('div');
-    mockDocument.classList.add('guppy-div-creator', 'guppy_active');
-    angular.element(document).find('body').append(mockDocument.outerHTML);
-
+  it('should add the change handler to guppy', function() {
+    spyOn(guppyInitializationService, 'findActiveGuppyObject').and.returnValue(
+      mockGuppyObject);
     ctrl.$onInit();
-
-    var guppyDivs = document.querySelectorAll('.guppy-div-creator');
-    for (var i = 0; i < guppyDivs.length; i++) {
-      expect(guppyDivs[i].getAttribute('id')).toMatch(/guppy_[0-9]{1,8}/);
-    }
+    expect(guppyInitializationService.findActiveGuppyObject).toHaveBeenCalled();
   });
 
   it('should initialize ctrl.value with an empty string', function() {
@@ -61,29 +83,10 @@ describe('AlgebraicExpressionEditor', function() {
     expect(ctrl.isCurrentAnswerValid()).toBeTrue();
     expect(ctrl.warningText).toBe('');
 
-
     ctrl.hasBeenTouched = true;
-
+    // This should be validated as false if the editor has been touched.
     ctrl.value = '';
     expect(ctrl.isCurrentAnswerValid()).toBeFalse();
-    expect(ctrl.warningText).toBe(
-      'Please enter a non-empty answer.');
-
-    ctrl.value = 'a/';
-    expect(ctrl.isCurrentAnswerValid()).toBeFalse();
-    expect(ctrl.warningText).toBe(
-      '/ is not a valid postfix operator.');
-
-    ctrl.value = '12+sqrt(4)';
-    expect(ctrl.isCurrentAnswerValid()).toBeFalse();
-    expect(ctrl.warningText).toBe(
-      'It looks like you have entered only numbers. Make sure to include' +
-      ' the necessary variables mentioned in the question.');
-
-    ctrl.value = 'x-y=0';
-    expect(ctrl.isCurrentAnswerValid()).toBeFalse();
-    expect(ctrl.warningText).toBe(
-      'It looks like you have entered an equation/inequality.' +
-      ' Please enter an algebraic expression instead.');
+    expect(ctrl.warningText).toBe('Please enter a non-empty answer.');
   });
 });

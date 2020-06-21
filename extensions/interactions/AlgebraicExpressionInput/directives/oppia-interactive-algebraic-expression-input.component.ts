@@ -19,6 +19,10 @@
  * into the directive is: the name of the parameter, followed by 'With',
  * followed by the name of the arg.
  */
+
+require('services/guppy-configuration.service.ts');
+require('services/math-interactions.service.ts');
+require('services/guppy-initialization.service.ts');
 require(
   'interactions/AlgebraicExpressionInput/directives/' +
   'algebraic-expression-input-rules.service.ts');
@@ -30,80 +34,24 @@ var nerdamer = require('nerdamer');
 angular.module('oppia').component('oppiaInteractiveAlgebraicExpressionInput', {
   template: require('./algebraic-expression-input-interaction.component.html'),
   controller: [
-    '$scope', 'CurrentInteractionService',
-    'AlgebraicExpressionInputRulesService',
+    '$scope', 'CurrentInteractionService', 'GuppyConfigurationService',
+    'AlgebraicExpressionInputRulesService', 'MathInteractionsService',
+    'GuppyInitializationService',
     function(
-        $scope, CurrentInteractionService,
-        AlgebraicExpressionInputRulesService) {
+        $scope, CurrentInteractionService, GuppyConfigurationService,
+        AlgebraicExpressionInputRulesService, MathInteractionsService,
+        GuppyInitializationService) {
       const ctrl = this;
       ctrl.value = '';
       ctrl.hasBeenTouched = false;
       ctrl.warningText = '';
 
-      ctrl.initializeGuppy = function() {
-        var guppyDivs = document.querySelectorAll('.guppy-div-learner');
-        var divId, guppyInstance;
-        ctrl.hasBeenTouched = false;
-        for (var i = 0; i < guppyDivs.length; i++) {
-          divId = 'guppy_' + Math.floor(Math.random() * 100000000);
-          // Dynamically assigns a unique id to the guppy div.
-          guppyDivs[i].setAttribute('id', divId);
-          // Create a new guppy instance for that div.
-          guppyInstance = new Guppy(divId, {});
-          guppyInstance.event('change', (e) => {
-            ctrl.value = guppyInstance.asciimath();
-            ctrl.hasBeenTouched = true;
-            // Need to manually trigger the digest cycle
-            // to make any 'watchers' aware of changes in ctrl.value.
-            $scope.$apply();
-          });
-        }
-      };
-
-      var cleanErrorMessage = function(errorMessage) {
-        // The error thrown by nerdamer includes the index of the violation
-        // which starts with a colon. That part needs to be removed before
-        // displaying the error to the end user. Same rationale applies for
-        // stripping the error message from 'at', since some errors from
-        // nerdamer use 'at' to to show the location.
-        var colonIndex = errorMessage.indexOf(':');
-        if (colonIndex !== -1) {
-          errorMessage = errorMessage.slice(0, colonIndex);
-        }
-        var atColonIndex = errorMessage.indexOf(' at ');
-        if (atColonIndex !== -1) {
-          errorMessage = errorMessage.slice(0, atColonIndex);
-        }
-        if (errorMessage[errorMessage.length - 1] !== '.') {
-          errorMessage += '.';
-        }
-        return errorMessage;
-      };
-
       ctrl.isCurrentAnswerValid = function() {
         if (ctrl.hasBeenTouched) {
-          var expression;
-          try {
-            expression = nerdamer(ctrl.value);
-          } catch (err) {
-            ctrl.warningText = cleanErrorMessage(err.message);
-            return false;
-          }
-          if (ctrl.value.length === 0) {
-            ctrl.warningText = 'Please enter a non-empty answer.';
-            return false;
-          } else if (ctrl.value.indexOf('=') !== -1 || ctrl.value.indexOf(
-            '<') !== -1 || ctrl.value.indexOf('>') !== -1) {
-            ctrl.warningText = 'It looks like you have entered an ' +
-              'equation/inequality. Please enter an algebraic ' +
-              'expression instead.';
-            return false;
-          } else if (expression.variables().length === 0) {
-            ctrl.warningText = 'It looks like you have entered only ' +
-              'numbers. Make sure to include the necessary variables' +
-              ' mentioned in the question.';
-            return false;
-          }
+          var answerIsValid = MathInteractionsService.validateAnswer(
+            ctrl.value);
+          ctrl.warningText = MathInteractionsService.getWarningText();
+          return answerIsValid;
         }
         ctrl.warningText = '';
         return true;
@@ -118,7 +66,21 @@ angular.module('oppia').component('oppiaInteractiveAlgebraicExpressionInput', {
       };
 
       ctrl.$onInit = function() {
-        ctrl.initializeGuppy();
+        ctrl.hasBeenTouched = false;
+        GuppyConfigurationService.init();
+        GuppyInitializationService.init('guppy-div-learner');
+        Guppy.event('change', () => {
+          var activeGuppyObject = (
+            GuppyInitializationService.findActiveGuppyObject());
+          if (activeGuppyObject !== undefined) {
+            ctrl.hasBeenTouched = true;
+            ctrl.value = activeGuppyObject.guppyInstance.asciimath();
+            // Need to manually trigger the digest cycle to make any 'watchers'
+            // aware of changes in answer.
+            $scope.$apply();
+          }
+        });
+
         CurrentInteractionService.registerCurrentInteraction(
           ctrl.submitAnswer, ctrl.isCurrentAnswerValid);
       };

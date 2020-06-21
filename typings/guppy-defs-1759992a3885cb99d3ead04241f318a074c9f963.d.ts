@@ -1,16 +1,8 @@
 /* eslint-disable camelcase */
-<<<<<<< HEAD:typings/guppy-defs-f9440220a73685ea9011c285a4af798f381de53a.d.ts
-// Code - third_party/static/guppy-f944022/src/guppy.js
-// This guppy version corresponds to the commit on June 5 2019. 
-// For reference, visit:
-// eslint-disable-next-line max-len
-// https://github.com/daniel3735928559/guppy/tree/f9440220a73685ea9011c285a4af798f381de53a
-=======
 // Code - third_party/static/guppy-175999/src/guppy.js
 // This guppy version corresponds to the commit on June 15 2020. 
 // For reference, visit:
 // https://github.com/daniel3735928559/guppy/tree/1759992a3885cb99d3ead04241f318a074c9f963
->>>>>>> 7481a5df3b3410ffa0ef83e12496f3286299a2ae:typings/guppy-defs-1759992a3885cb99d3ead04241f318a074c9f963.d.ts
 
 interface GuppyConfig {
   events?: Object;
@@ -58,11 +50,7 @@ interface GuppySymbols {
 
 class Guppy {
   activate: () => void;
-<<<<<<< HEAD:typings/guppy-defs-f9440220a73685ea9011c285a4af798f381de53a.d.ts
-  asciimath: () => string;
-=======
   asciimath: () => void;
->>>>>>> 7481a5df3b3410ffa0ef83e12496f3286299a2ae:typings/guppy-defs-1759992a3885cb99d3ead04241f318a074c9f963.d.ts
   configure: () => void;
   deactivate: () => void;
   doc: () => Object;
@@ -120,8 +108,5 @@ namespace Guppy {
   export function remove_global_symbol(name: string): void;
   export function use_osk(osk: GuppyOSK): void;
   export function event(name: string, handler: Function): void;
-<<<<<<< HEAD:typings/guppy-defs-f9440220a73685ea9011c285a4af798f381de53a.d.ts
-=======
   export function configure(name: string, val: Object): void;
->>>>>>> 7481a5df3b3410ffa0ef83e12496f3286299a2ae:typings/guppy-defs-1759992a3885cb99d3ead04241f318a074c9f963.d.ts
 }

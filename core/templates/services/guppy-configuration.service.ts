@@ -38,6 +38,10 @@ export class GuppyConfigurationService {
     for (var symbol of SYMBOLS_TO_REMOVE) {
       Guppy.remove_global_symbol(symbol);
     }
+    Guppy.configure('buttons', ['controls']);
+    Guppy.configure(
+      'empty_content',
+      '\\color{grey}{\\text{\\small{Type a formula here.}}}');
     GuppyConfigurationService.serviceIsInitialized = true;
   }
 }
