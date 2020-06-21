@@ -57,10 +57,10 @@ angular.module('oppia').component('svgFilenameEditor', {
       const DRAW_MODE_PENCIL = 'pencil';
       const DRAW_MODE_EYE_DROPPER = 'eyedropper';
       const DRAW_MODE_NONE = 'none';
-      const OPEN_POLY_MODE = 'open';
-      const CLOSED_POLY_MODE = 'closed';
+      const OPEN_POLYGON_MODE = 'open';
+      const CLOSED_POLYGON_MODE = 'closed';
       ctrl.drawMode = DRAW_MODE_NONE;
-      ctrl.polyMode = CLOSED_POLY_MODE;
+      ctrl.polygonMode = CLOSED_POLYGON_MODE;
       ctrl.polyOptions = {
         x: 0,
         y: 0,
@@ -259,6 +259,8 @@ angular.module('oppia').component('svgFilenameEditor', {
           obj.removeAttribute('xml:space');
         });
         var elements = svg.querySelectorAll('*');
+        // Fabric js adds vector-effect as an attribute, so here it is removed
+        // and added as part of the style attribute.
         for (var i = 0; i < elements.length; i++) {
           if (
             elements[i].getAttributeNames().indexOf('vector-effect') !== -1) {
@@ -462,7 +464,7 @@ angular.module('oppia').component('svgFilenameEditor', {
         return ctrl.drawMode === DRAW_MODE_PENCIL;
       };
 
-      ctrl.isPencilEnabeled = function() {
+      ctrl.isPencilEnabled = function() {
         return (
           ctrl.areAllToolsEnabled() || ctrl.isDrawModePencil());
       };
@@ -479,15 +481,16 @@ angular.module('oppia').component('svgFilenameEditor', {
         }
       };
 
-      var PolyPoint = function(x, y) {
+      var polyPoint = function(x, y) {
         this.x = x;
         this.y = y;
       };
 
       var makePolygon = function() {
         var startPt = ctrl.polyOptions.bboxPoints[0];
-        if (ctrl.polyMode === CLOSED_POLY_MODE) {
-          ctrl.polyOptions.bboxPoints.push(new PolyPoint(startPt.x, startPt.y));
+        if (ctrl.polygonMode === CLOSED_POLYGON_MODE) {
+          ctrl.polyOptions.bboxPoints.push(
+            new polyPoint(startPt.x, startPt.y));
         }
         var size = ctrl.fabricjsOptions.size;
         var shape = new fabric.Polyline(ctrl.polyOptions.bboxPoints, {
@@ -542,31 +545,34 @@ angular.module('oppia').component('svgFilenameEditor', {
         return ctrl.drawMode === DRAW_MODE_POLY;
       };
 
-      ctrl.isOpenPolygonEnabeled = function() {
+      ctrl.isOpenPolygonEnabled = function() {
         return (
           ctrl.areAllToolsEnabled() || (
-            ctrl.isDrawModePolygon() && ctrl.polyMode === OPEN_POLY_MODE));
+            ctrl.isDrawModePolygon() &&
+            ctrl.polygonMode === OPEN_POLYGON_MODE));
       };
 
       ctrl.createOpenPolygon = function() {
-        ctrl.polyMode = OPEN_POLY_MODE;
+        ctrl.polygonMode = OPEN_POLYGON_MODE;
         createPolygon();
       };
 
-      ctrl.isClosedPolygonEnabeled = function() {
+      ctrl.isClosedPolygonEnabled = function() {
         return (
           ctrl.areAllToolsEnabled() || (
-            ctrl.isDrawModePolygon() && ctrl.polyMode === CLOSED_POLY_MODE));
+            ctrl.isDrawModePolygon() &&
+            ctrl.polygonMode === CLOSED_POLYGON_MODE));
       };
 
       ctrl.createClosedPolygon = function() {
-        ctrl.polyMode = CLOSED_POLY_MODE;
+        ctrl.polygonMode = CLOSED_POLYGON_MODE;
         createPolygon();
       };
 
-      ctrl.isEyeDropperEnabeled = function() {
+      ctrl.isEyeDropperEnabled = function() {
         return (
-          ctrl.areAllToolsEnabled() || ctrl.drawMode === DRAW_MODE_EYE_DROPPER);
+          ctrl.areAllToolsEnabled() ||
+          ctrl.drawMode === DRAW_MODE_EYE_DROPPER);
       };
 
       ctrl.copyColor = function() {
@@ -748,7 +754,7 @@ angular.module('oppia').component('svgFilenameEditor', {
             setPolyStartingPoint(options);
             var x = ctrl.polyOptions.x;
             var y = ctrl.polyOptions.y;
-            ctrl.polyOptions.bboxPoints.push(new PolyPoint(x, y));
+            ctrl.polyOptions.bboxPoints.push(new polyPoint(x, y));
             var points = [x, y, x, y];
             var size = ctrl.fabricjsOptions.size;
             var line = new fabric.Line(points, {

@@ -14,9 +14,9 @@
     </div>
     <div class="vertical-toolbar">
       <div>
-        <button class="icon-tool toolbar-button thin-button" ng-class="{'disabled' : !$ctrl.isPencilEnabeled()}"
+        <button class="icon-tool toolbar-button thin-button" ng-class="{'disabled' : !$ctrl.isPencilEnabled()}"
                 style="background-image:url(/assets/svg_diagram_editor/pencil.svg);" ng-click="$ctrl.togglePencilDrawing()"
-                tooltip-placement="left" uib-tooltip="Pencil" ng-disabled="!$ctrl.isPencilEnabeled()">
+                tooltip-placement="left" uib-tooltip="Pencil" ng-disabled="!$ctrl.isPencilEnabled()">
         </button>
         <button class="icon-tool toolbar-button thin-button" ng-class="{'disabled' : !$ctrl.areAllToolsEnabled()}"
                 style="background-image:url(/assets/svg_diagram_editor/line.svg);" ng-click="$ctrl.createLine()"
@@ -34,19 +34,19 @@
                 style="background-image:url(/assets/svg_diagram_editor/text.svg);" ng-click="$ctrl.createText()"
                 tooltip-placement="left" uib-tooltip="Text" ng-disabled="!$ctrl.areAllToolsEnabled()">
         </button>
-        <button class="icon-tool toolbar-button thin-button" ng-class="{'disabled' : !$ctrl.isClosedPolygonEnabeled()}"
+        <button class="icon-tool toolbar-button thin-button" ng-class="{'disabled' : !$ctrl.isClosedPolygonEnabled()}"
                 style="background-image:url(/assets/svg_diagram_editor/closed_polygon.svg);"
                 ng-click="$ctrl.createClosedPolygon()" tooltip-placement="right" uib-tooltip="Closed Polygon"
-                ng-disabled="!$ctrl.isClosedPolygonEnabeled()">
+                ng-disabled="!$ctrl.isClosedPolygonEnabled()">
         </button>
-        <button class="icon-tool toolbar-button thin-button" ng-class="{'disabled' : !$ctrl.isOpenPolygonEnabeled()}"
+        <button class="icon-tool toolbar-button thin-button" ng-class="{'disabled' : !$ctrl.isOpenPolygonEnabled()}"
                 style="background-image:url(/assets/svg_diagram_editor/open_polygon.svg);"
                 ng-click="$ctrl.createOpenPolygon()" tooltip-placement="left" uib-tooltip="Open Polygon"
-                ng-disabled="!$ctrl.isOpenPolygonEnabeled()">
+                ng-disabled="!$ctrl.isOpenPolygonEnabled()">
         </button>
-        <button class="icon-tool toolbar-button thin-button" ng-class="{'disabled' : !$ctrl.isEyeDropperEnabeled()}"
+        <button class="icon-tool toolbar-button thin-button" ng-class="{'disabled' : !$ctrl.isEyeDropperEnabled()}"
                 style="background-image:url(/assets/svg_diagram_editor/eye-dropper.svg);" ng-click="$ctrl.copyColor()"
-                tooltip-placement="right" uib-tooltip="Eye Dropper" ng-disabled="!$ctrl.isEyeDropperEnabeled()">
+                tooltip-placement="right" uib-tooltip="Eye Dropper" ng-disabled="!$ctrl.isEyeDropperEnabled()">
         </button>
         <div class="vert-bottom-toolbar">
           <div>
@@ -83,7 +83,7 @@
         </div>
       </div>
     </div>
-    <div class="horz-toolbar">
+    <div class="horizontal-toolbar">
       <div class="input-tag" ng-if="$ctrl.displayFontStyles">
         <input type="checkbox" ng-model="$ctrl.fabricjsOptions.italic" ng-change="$ctrl.onItalicToggle()">
         <span style="padding-left: 3px;">Italic</span>
@@ -131,10 +131,10 @@
   }
 
   .diagram-editor-saved-image-container .edit-icon {
-    color: black;
+    color: #000000;
     position: absolute;
     right: 6px;
-    text-shadow: 0px 0px 1px #fff;
+    text-shadow: 0px 0px 1px #ffffff;
     top: 6px;
   }
 
@@ -164,7 +164,7 @@
     top: 0;
   }
 
-  .svg-editor .horz-toolbar {
+  .svg-editor .horizontal-toolbar {
     background-color: #ffffff;
     border: 1px solid #555555;
     height: 31px;
@@ -173,10 +173,10 @@
     bottom: 0;
   }
 
-  .svg-editor .horz-toolbar .input-tag {
+  .svg-editor .horizontal-toolbar .input-tag {
     border-radius: 3px;
     float: left;
-    font-size: small;
+    font-size: 13px;
     height: 28px;
     margin: 1px;
     padding-left: 3px;
@@ -195,7 +195,7 @@
 
   .svg-editor .vertical-toolbar .fat-button {
     clear: both;
-    font-size: small;
+    font-size: 13px;
     width: 57px
   }
 
