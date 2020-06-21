@@ -843,16 +843,13 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                         is_corresponding_angularjs_filepath):
                     # Ignore if file contains only type definitions for
                     # constants.
-
-                    # Check if const is declared outside the class.
-                    try:
-                        nodes = parsed_nodes[2]
-                        angular_constants_nodes = (
-                            nodes.declarations[0].init.callee.body.body)
-                    except Exception:
-                        nodes = parsed_nodes[3]
-                        angular_constants_nodes = (
-                            nodes.declarations[0].init.callee.body.body)
+                    for node in parsed_nodes:
+                        if 'declarations' in node.keys():
+                            try:
+                                angular_constants_nodes = (
+                                    node.declarations[0].init.callee.body.body)
+                            except Exception:
+                                continue
                     for angular_constant_node in angular_constants_nodes:
                         if not angular_constant_node.expression:
                             continue
