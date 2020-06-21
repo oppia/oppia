@@ -53,7 +53,6 @@ describe('GuppyInitializationService', () => {
     var mockDocument = document.createElement('div');
     mockDocument.classList.add('guppy-div', 'guppy_active');
     angular.element(document).find('body').append(mockDocument.outerHTML);
-    console.log(mockDocument.outerHTML);
 
     guppyInitializationService.init('guppy-div');
 
