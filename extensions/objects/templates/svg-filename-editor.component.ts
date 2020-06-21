@@ -111,7 +111,7 @@ angular.module('oppia').component('svgFilenameEditor', {
       ctrl.svgContainerStyle = {};
       ctrl.fabricjsOptions = {
         stroke: 'rgba(0, 0, 0, 1)',
-        fill: 'rgba(0, 0, 0, 1)',
+        fill: 'rgba(0, 0, 0, 0)',
         bg: 'rgba(0, 0, 0, 0)',
         fontFamily: 'helvetica',
         size: '9px',
@@ -442,6 +442,10 @@ angular.module('oppia').component('svgFilenameEditor', {
       };
 
       ctrl.createText = function() {
+        ctrl.canvas.discardActiveObject();
+        ctrl.fillPicker.setOptions({
+          color: 'rgba(0,0,0,1)'
+        });
         ctrl.fabricjsOptions.size = '18px';
         var size = ctrl.fabricjsOptions.size;
         var text = new fabric.Textbox('Enter Text', {

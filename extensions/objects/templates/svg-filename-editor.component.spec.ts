@@ -26,25 +26,27 @@ describe('SvgFilenameEditor', function() {
   var svgFilenameCtrl = null;
   var $scope = null;
   var samplesvg = (
-    '<svg xmlns="http://www.w3.org/2000/svg" ' +
-    'xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="494" ' +
-    'height="367" viewBox="0 0 494 367">' +
-    '<desc>Created with Fabric.js 3.6.3</desc><defs></defs>' +
-    '<rect x="0" y="0" width="100%" height="100%" fill="rgba(242,47,47,1)"/>' +
-    '<g transform="matrix(1 0 0 1 126.5 116.5)">' +
-    '<rect style="stroke: rgb(0,0,0); stroke-width: 9; stroke-dasharray: ' +
-    'none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: ' +
-    'miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-opacity: 0; ' +
-    'fill-rule: nonzero; opacity: 1; vector-effect: non-scaling-stroke"' +
-    ' x="-30" y="-35" rx="0" ry="0" width="60" height="70"/></g>' +
-    '<g transform="matrix(2.74 0 0 2.74 287.28 170.53)" style="">' +
-    '<text font-family="helvetica" font-size="18" font-style="normal" ' +
-    'font-weight="normal" style="stroke: none; stroke-width: 1; ' +
-    'stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; ' +
-    'stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); ' +
-    'fill-rule: nonzero; opacity: 1; white-space: pre;"><tspan x="-21.51"' +
-    ' y="-6.14">Enter</tspan><tspan x="-21.51" y="17.45" style="white-space:' +
-    ' pre; "> Text</tspan></text></g></svg>');
+    '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/' +
+    '1999/xlink" version="1.1" width="494" height="367" viewBox="0 0 494 367' +
+    '"><desc>Created with Fabric.js 3.6.3</desc><defs></defs><rect x="0" y="' +
+    '0" width="100%" height="100%" fill="rgba(10,245,49,0.607)"/><g transfor' +
+    'm="matrix(1 0 0 1 273.5 177.5)"><rect style="stroke: rgb(0,0,0); stroke' +
+    '-width: 9; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoff' +
+    'set: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0);' +
+    ' fill-rule: nonzero; opacity: 1;" vector-effect="non-scaling-stroke" x=' +
+    '"-30" y="-35" rx="0" ry="0" width="60" height="70"/></g><g transform="m' +
+    'atrix(1 0 0 1 169.5 182.5)"><circle style="stroke: rgb(0,0,0); stroke-w' +
+    'idth: 9; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffse' +
+    't: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); f' +
+    'ill-rule: nonzero; opacity: 1;" vector-effect="non-scaling-stroke" cx="' +
+    '0" cy="0" r="30"/></g><g transform="matrix(1 0 0 2.15 100.49 123.68)" s' +
+    'tyle=""><text font-family="helvetica" font-size="18" font-style="nor' +
+    'mal" font-weight="normal" style="stroke: none; stroke-width: 1; stroke-' +
+    'dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-lin' +
+    'ejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzer' +
+    'o; opacity: 1; white-space: pre;"><tspan x="-43.99" y="-17.94" style="w' +
+    'hite-space: pre; ">Enter </tspan><tspan x="-43.99" y="29.25">Text</tspa' +
+    'n></text></g></svg>');
   var dataUrl = 'data:image/svg+xml;utf8,' + samplesvg;
 
   var mockAssetsBackendApiService = {
@@ -139,6 +141,12 @@ describe('SvgFilenameEditor', function() {
     svgFilenameCtrl.$onInit();
     svgFilenameCtrl.canvas = new fabric.Canvas(svgFilenameCtrl.canvasID);
     svgFilenameCtrl.initializeMouseEvents();
+    var mockFillPicker = {
+      setOptions: function(data) {
+        return 'The value is set.';
+      }
+    };
+    svgFilenameCtrl.fillPicker = mockFillPicker;
   }));
 
   it('should update diagram size', function() {
@@ -284,13 +292,7 @@ describe('SvgFilenameEditor', function() {
         };
       }
     };
-    var mockFillPicker = {
-      setOptions: function(data) {
-        return 'The value is set.';
-      }
-    };
     svgFilenameCtrl.canvasElement = mockCanvasElement;
-    svgFilenameCtrl.fillPicker = mockFillPicker;
     svgFilenameCtrl.canvas.trigger('mouse:down', {
       e: {
         pageX: 0,
@@ -360,6 +362,7 @@ describe('SvgFilenameEditor', function() {
   });
 
   it('should allow user to continue editing the diagram', function() {
+    svgFilenameCtrl.savedSVGDiagram = 'saved';
     svgFilenameCtrl.savedSVGDiagram = samplesvg;
     svgFilenameCtrl.continueDiagramEditing();
     expect(svgFilenameCtrl.diagramStatus).toBe('editing');
@@ -373,25 +376,10 @@ describe('SvgFilenameEditor initialized with value attribute',
     var $httpBackend = null;
     var contextService = null;
     var samplesvg = (
-      '<svg xmlns="http://www.w3.org/2000/svg" ' +
-      'xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="494" ' +
-      'height="367" viewBox="0 0 494 367">' +
-      '<desc>Created with Fabric.js 3.6.3</desc><defs></defs>' +
-      '<rect x="0" y="0" width="100%" height="100%" ' +
-      'fill="rgba(242,47,47,1)"/><g transform="matrix(1 0 0 1 126.5 116.5)">' +
-      '<rect style="stroke: rgb(0,0,0); stroke-width: 9; stroke-dasharray: ' +
-      'none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: ' +
-      'miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-opacity: 0; ' +
-      'fill-rule: nonzero; opacity: 1; vector-effect: non-scaling-stroke"' +
-      ' x="-30" y="-35" rx="0" ry="0" width="60" height="70"/></g>' +
-      '<g transform="matrix(2.74 0 0 2.74 287.28 170.53)" style="">' +
-      '<text font-family="helvetica" font-size="18" font-style="normal" ' +
-      'font-weight="normal" style="stroke: none; stroke-width: 1; ' +
-      'stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; ' +
-      'stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); ' +
-      'fill-rule: nonzero; opacity: 1; white-space: pre;"><tspan x="-21.51"' +
-      ' y="-6.14">Enter</tspan><tspan x="-21.51" y="17.45" ' +
-      'style="white-space: pre; "> Text</tspan></text></g></svg>');
+      '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.or' +
+      'g/1999/xlink" version="1.1" width="494" height="367" viewBox="0 0 494' +
+      ' 367"><desc>Created with Fabric.js 3.6.3</desc><rect x="0" y="0" ' +
+      'width="100%" height="100%" fill="rgba(10,245,49,0.607)"/></svg>');
     var mockAssetsBackendApiService = {
       getImageUrlForPreview: function(contentType, contentId, filepath) {
         return '/imageurl_' + contentType + '_' + contentId + '_' + filepath;
@@ -456,25 +444,10 @@ describe('SvgFilenameEditor with image save destination as ' +
   var contextService = null;
   var svgFilenameCtrl = null;
   var samplesvg = (
-    '<svg xmlns="http://www.w3.org/2000/svg" ' +
-    'xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="494" ' +
-    'height="367" viewBox="0 0 494 367">' +
-    '<desc>Created with Fabric.js 3.6.3</desc><defs></defs>' +
-    '<rect x="0" y="0" width="100%" height="100%" fill="rgba(242,47,47,1)"/>' +
-    '<g transform="matrix(1 0 0 1 126.5 116.5)">' +
-    '<rect style="stroke: rgb(0,0,0); stroke-width: 9; stroke-dasharray: ' +
-    'none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: ' +
-    'miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-opacity: 0; ' +
-    'fill-rule: nonzero; opacity: 1; vector-effect: non-scaling-stroke"' +
-    ' x="-30" y="-35" rx="0" ry="0" width="60" height="70"/></g>' +
-    '<g transform="matrix(2.74 0 0 2.74 287.28 170.53)" style="">' +
-    '<text font-family="helvetica" font-size="18" font-style="normal" ' +
-    'font-weight="normal" style="stroke: none; stroke-width: 1; ' +
-    'stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; ' +
-    'stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); ' +
-    'fill-rule: nonzero; opacity: 1; white-space: pre;"><tspan x="-21.51"' +
-    ' y="-6.14">Enter</tspan><tspan x="-21.51" y="17.45" style="white-space:' +
-    ' pre; "> Text</tspan></text></g></svg>');
+    '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.or' +
+    'g/1999/xlink" version="1.1" width="494" height="367" viewBox="0 0 494' +
+    ' 367"><desc>Created with Fabric.js 3.6.3</desc><rect x="0" y="0" ' +
+    'width="100%" height="100%" fill="rgba(10,245,49,0.607)"/></svg>');
   var dataUrl = 'data:image/svg+xml;utf8,' + samplesvg;
 
   var mockilss = {
@@ -591,6 +564,7 @@ describe('SvgFilenameEditor with image save destination as ' +
   it('should allow user to continue editing the diagram and delete the ' +
     'image from local storage', function() {
     svgFilenameCtrl.data.savedSVGFileName = 'image.svg';
+    svgFilenameCtrl.savedSVGDiagram = 'saved';
     svgFilenameCtrl.savedSVGDiagram = samplesvg;
     svgFilenameCtrl.continueDiagramEditing();
     expect(svgFilenameCtrl.diagramStatus).toBe('editing');
