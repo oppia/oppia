@@ -25,22 +25,26 @@ export interface ExplorationSummary {
   status: string;
 }
 
-interface IStoryNodeBackendDict {
-  id: string;
-  title: string;
+export interface IStoryNodeBackendDict {
+  'id': string;
+  'title': string;
+  'description': string;
   'destination_node_ids': string[];
   'prerequisite_skill_ids': string[];
   'acquired_skill_ids': string[];
-  outline: string;
+  'outline': string;
   'outline_is_finalized': boolean;
   'exploration_id': string;
   'exp_summary_dict': ExplorationSummary;
-  completed: boolean;
+  'completed': boolean;
+  'thumbnail_bg_color': string;
+  'thumbnail_filename': string;
 }
 
 export class ReadOnlyStoryNode {
   _id: string;
   _title: string;
+  _description: string;
   _destinationNodeIds: Array<string>;
   _prerequisiteSkillIds: Array<string>;
   _acquiredSkillIds: Array<string>;
@@ -49,13 +53,18 @@ export class ReadOnlyStoryNode {
   _explorationId: string;
   _explorationSummary: ExplorationSummary;
   _completed: boolean;
+  _thumbnailBgColor: string;
+  _thumbnailFilename: string;
 
-  constructor(id: string, title: string, destinationNodeIds: Array<string>,
-      prerequisiteSkillIds: Array<string>, acquiredSkillIds: Array<string>,
-      outline: string, outlineIsFinalized: boolean, explorationId: string,
-      explorationSummary: ExplorationSummary, completed: boolean) {
+  constructor(id: string, title: string, description: string,
+      destinationNodeIds: Array<string>, prerequisiteSkillIds: Array<string>,
+      acquiredSkillIds: Array<string>, outline: string,
+      outlineIsFinalized: boolean, explorationId: string,
+      explorationSummary: ExplorationSummary, completed: boolean,
+      thumbnailBgColor: string, thumbnailFilename: string) {
     this._id = id;
     this._title = title;
+    this._description = description;
     this._destinationNodeIds = destinationNodeIds;
     this._prerequisiteSkillIds = prerequisiteSkillIds;
     this._acquiredSkillIds = acquiredSkillIds;
@@ -64,6 +73,8 @@ export class ReadOnlyStoryNode {
     this._explorationId = explorationId;
     this._explorationSummary = explorationSummary;
     this._completed = completed;
+    this._thumbnailBgColor = thumbnailBgColor;
+    this._thumbnailFilename = thumbnailFilename;
   }
 
   getId(): string {
@@ -72,6 +83,10 @@ export class ReadOnlyStoryNode {
 
   getTitle(): string {
     return this._title;
+  }
+
+  getDescription(): string {
+    return this._description;
   }
 
   getExplorationId(): string {
@@ -93,6 +108,14 @@ export class ReadOnlyStoryNode {
   getOutlineStatus(): boolean {
     return this._outlineIsFinalized;
   }
+
+  getThumbnailFilename(): string {
+    return this._thumbnailFilename;
+  }
+
+  getThumbnailBgColor(): string {
+    return this._thumbnailBgColor;
+  }
 }
 
 @Injectable({
@@ -103,6 +126,7 @@ export class ReadOnlyStoryNodeObjectFactory {
       storyNodeBackendDict: IStoryNodeBackendDict): ReadOnlyStoryNode {
     return new ReadOnlyStoryNode(storyNodeBackendDict.id,
       storyNodeBackendDict.title,
+      storyNodeBackendDict.description,
       storyNodeBackendDict.destination_node_ids,
       storyNodeBackendDict.prerequisite_skill_ids,
       storyNodeBackendDict.acquired_skill_ids,
@@ -110,7 +134,9 @@ export class ReadOnlyStoryNodeObjectFactory {
       storyNodeBackendDict.outline_is_finalized,
       storyNodeBackendDict.exploration_id,
       storyNodeBackendDict.exp_summary_dict,
-      storyNodeBackendDict.completed);
+      storyNodeBackendDict.completed,
+      storyNodeBackendDict.thumbnail_bg_color,
+      storyNodeBackendDict.thumbnail_filename);
   }
 }
 

@@ -19,147 +19,195 @@
  * be attempted due to cross-domain security issues.)
  */
 
-angular.module('oppia').factory('MessengerService', [
-  '$log', '$window', function($log, $window) {
-    var isPositiveInteger = function(n) {
-      return (typeof n === 'number' && n % 1 === 0 && n > 0);
-    };
-    var isBoolean = function(b) {
-      return typeof b === 'boolean';
-    };
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
-    var SUPPORTED_HASHDICT_VERSIONS = [
-      '0.0.0', '0.0.1', '0.0.2', '0.0.3'
-    ];
+import { LoggerService } from 'services/contextual/logger.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
 
-    var MESSAGE_VALIDATORS = {
-      heightChange: function(payload) {
-        return isPositiveInteger(payload.height) && isBoolean(payload.scroll);
-      },
-      explorationLoaded: function() {
-        return true;
-      },
-      stateTransition: function(payload) {
-        return Boolean(payload.oldStateName) || Boolean(payload.newStateName);
-      },
-      explorationReset: function(payload) {
-        return Boolean(payload.stateName);
-      },
-      explorationCompleted: function() {
-        return true;
-      }
-    };
+interface IHeightChangeData {
+  height: number;
+  scroll: number;
+}
 
-    var getPayload = {
-      heightChange: function(data) {
-        return {
-          height: data.height,
-          scroll: data.scroll
-        };
-      },
-      explorationLoaded: function(data) {
-        return {
-          explorationVersion: data.explorationVersion,
-          explorationTitle: data.explorationTitle
-        };
-      },
-      stateTransition: function(data) {
-        return {
-          explorationVersion: data.explorationVersion,
-          oldStateName: data.oldStateName,
-          jsonAnswer: data.jsonAnswer,
-          newStateName: data.newStateName
-        };
-      },
-      explorationCompleted: function(data) {
-        return {
-          explorationVersion: data.explorationVersion
-        };
-      },
-      // DEPRECATED
-      explorationReset: function(data) {
-        return {
-          stateName: data
-        };
-      }
-    };
+interface IExplorationLoadedData {
+  explorationVersion: number;
+  explorationTitle: string;
+}
 
-    var messenger = {
-      HEIGHT_CHANGE: 'heightChange',
-      EXPLORATION_LOADED: 'explorationLoaded',
-      STATE_TRANSITION: 'stateTransition',
-      EXPLORATION_RESET: 'explorationReset',
-      EXPLORATION_COMPLETED: 'explorationCompleted',
-      sendMessage: function(messageTitle, messageData) {
-        // TODO(sll): For the stateTransition and explorationCompleted events,
-        // we now send paramValues in the messageData. We should broadcast these
-        // to the parent page as well.
-        // TODO(sll): Delete/deprecate 'reset exploration' from the list of
-        // events sent to a container page.
+interface IStateTransitionData {
+  explorationVersion: number;
+  oldStateName: string;
+  jsonAnswer: string;
+  newStateName: string;
+}
 
-        // Only send a message to the parent if the oppia window is iframed and
-        // a hash is passed in.
-        var rawHash = $window.location.hash.substring(1);
-        if ($window.parent !== $window && rawHash &&
-            MESSAGE_VALIDATORS.hasOwnProperty(messageTitle)) {
-          // Protractor tests may prepend a / to this hash, which we remove:
-          var hash =
-            (rawHash.charAt(0) === '/') ? rawHash.substring(1) : rawHash;
-          var hashParts = hash.split('&');
-          var hashDict = {
-            version: null,
-            secret: null,
-            tagid: null
-          };
-          for (var i = 0; i < hashParts.length; i++) {
-            if (hashParts[i].indexOf('=') === -1) {
-              $log.error('Invalid hash for embedding: ' + hash);
-              return;
-            }
+interface IExplorationCompletedData {
+  explorationVersion: number;
+}
 
-            var separatorLocation = hashParts[i].indexOf('=');
-            hashDict[hashParts[i].substring(0, separatorLocation)] = (
-              hashParts[i].substring(separatorLocation + 1));
-          }
+interface IMessageValidatorsType {
+  heightChange(payload: IHeightChangeData): boolean;
+  explorationLoaded(): boolean;
+  stateTransition(payload: IStateTransitionData): boolean;
+  explorationReset(payload: {stateName: string}): boolean;
+  explorationCompleted(): boolean;
+}
 
-          if (!hashDict.version || !hashDict.secret) {
-            $log.error('Invalid hash for embedding: ' + hash);
-            return;
-          }
+interface IGetPayloadType {
+  heightChange(data: IHeightChangeData): IHeightChangeData;
+  explorationLoaded(data: IExplorationLoadedData): IExplorationLoadedData;
+  stateTransition(data: IStateTransitionData): IStateTransitionData;
+  explorationCompleted(
+    data: IExplorationCompletedData): IExplorationCompletedData;
+  explorationReset(data: string): {stateName: string};
+}
 
-          if (SUPPORTED_HASHDICT_VERSIONS.indexOf(hashDict.version) !== -1) {
-            $log.info('Posting message to parent: ' + messageTitle);
+@Injectable({
+  providedIn: 'root'
+})
+export class MessengerService {
+  constructor(
+    private loggerService: LoggerService, private windowRef: WindowRef) {}
 
-            var payload = getPayload[messageTitle](messageData);
-            if (!MESSAGE_VALIDATORS[messageTitle](payload)) {
-              $log.error('Error validating payload: ' + payload);
-              return;
-            }
+  // TODO(brianrodri): Move these into a .constants.ts file.
+  HEIGHT_CHANGE: string = 'heightChange';
+  EXPLORATION_LOADED: string = 'explorationLoaded';
+  STATE_TRANSITION: string = 'stateTransition';
+  EXPLORATION_RESET: string = 'explorationReset';
+  EXPLORATION_COMPLETED: string = 'explorationCompleted';
 
-            $log.info(payload);
+  SUPPORTED_HASHDICT_VERSIONS: Set<string> = (
+    new Set(['0.0.0', '0.0.1', '0.0.2', '0.0.3']));
 
-            var objToSendToParent = {
-              title: messageTitle,
-              payload: payload,
-              sourceTagId: null,
-              secret: null
-            };
-            if (hashDict.version === '0.0.0') {
-              // Ensure backwards-compatibility.
-              objToSendToParent.sourceTagId = hashDict.tagid;
-              objToSendToParent.secret = hashDict.secret;
-            }
+  MESSAGE_VALIDATORS: IMessageValidatorsType = {
+    heightChange(payload: IHeightChangeData): boolean {
+      const {height, scroll} = payload;
+      return (
+        Number.isInteger(height) && height > 0 && typeof scroll === 'boolean');
+    },
+    explorationLoaded(): boolean {
+      return true;
+    },
+    stateTransition(payload: IStateTransitionData): boolean {
+      return Boolean(payload.oldStateName) || Boolean(payload.newStateName);
+    },
+    explorationReset(payload: {stateName: string}): boolean {
+      return Boolean(payload.stateName);
+    },
+    explorationCompleted(): boolean {
+      return true;
+    }
+  };
 
-            // The targetOrigin needs to be * because any page can iframe an
-            // exploration.
-            $window.parent.postMessage(JSON.stringify(objToSendToParent), '*');
-          } else {
-            $log.error('Unknown version for embedding: ' + hashDict.version);
-            return;
-          }
+  getPayload: IGetPayloadType = {
+    heightChange(data: IHeightChangeData): IHeightChangeData {
+      return {
+        height: data.height,
+        scroll: data.scroll
+      };
+    },
+    explorationLoaded(data: IExplorationLoadedData): IExplorationLoadedData {
+      return {
+        explorationVersion: data.explorationVersion,
+        explorationTitle: data.explorationTitle
+      };
+    },
+    stateTransition(data: IStateTransitionData): IStateTransitionData {
+      return {
+        explorationVersion: data.explorationVersion,
+        oldStateName: data.oldStateName,
+        jsonAnswer: data.jsonAnswer,
+        newStateName: data.newStateName
+      };
+    },
+    explorationCompleted(
+        data: IExplorationCompletedData): IExplorationCompletedData {
+      return {
+        explorationVersion: data.explorationVersion
+      };
+    },
+    // DEPRECATED
+    explorationReset(data: string): {stateName: string} {
+      return {
+        stateName: data
+      };
+    }
+  };
+
+  // The argument messageData is of type Object since it can have
+  // different properties based on the messageTitle.
+  sendMessage(messageTitle: string, messageData: Object): void {
+    // TODO(sll): For the stateTransition and explorationCompleted events,
+    // we now send paramValues in the messageData. We should broadcast these
+    // to the parent page as well.
+    // TODO(sll): Delete/deprecate 'reset exploration' from the list of
+    // events sent to a container page.
+
+    // Only send a message to the parent if the oppia window is iframed and
+    // a hash is passed in.
+    let window = this.windowRef.nativeWindow;
+    let rawHash = window.location.hash.substring(1);
+    if (window.parent !== window && rawHash &&
+        this.MESSAGE_VALIDATORS.hasOwnProperty(messageTitle)) {
+      // Protractor tests may prepend a / to this hash, which we remove:
+      let hash =
+        (rawHash.charAt(0) === '/') ? rawHash.substring(1) : rawHash;
+      let hashParts = hash.split('&');
+      let hashDict = {
+        version: null,
+        secret: null,
+        tagid: null
+      };
+      for (let i = 0; i < hashParts.length; i++) {
+        if (hashParts[i].indexOf('=') === -1) {
+          this.loggerService.error('Invalid hash for embedding: ' + hash);
+          return;
         }
-      }
-    };
 
-    return messenger;
-  }]);
+        let separatorLocation = hashParts[i].indexOf('=');
+        hashDict[hashParts[i].substring(0, separatorLocation)] = (
+          hashParts[i].substring(separatorLocation + 1));
+      }
+
+      if (!hashDict.version || !hashDict.secret) {
+        this.loggerService.error('Invalid hash for embedding: ' + hash);
+        return;
+      }
+
+      if (this.SUPPORTED_HASHDICT_VERSIONS.has(hashDict.version)) {
+        this.loggerService.info('Posting message to parent: ' + messageTitle);
+
+        let payload = this.getPayload[messageTitle](messageData);
+        if (!this.MESSAGE_VALIDATORS[messageTitle](payload)) {
+          this.loggerService.error('Error validating payload: ' + payload);
+          return;
+        }
+
+        this.loggerService.info(payload);
+
+        let objToSendToParent = {
+          title: messageTitle,
+          payload: payload,
+          sourceTagId: null,
+          secret: null
+        };
+        if (hashDict.version === '0.0.0') {
+          // Ensure backwards-compatibility.
+          objToSendToParent.sourceTagId = hashDict.tagid;
+          objToSendToParent.secret = hashDict.secret;
+        }
+
+        // The targetOrigin needs to be * because any page can iframe an
+        // exploration.
+        window.parent.postMessage(JSON.stringify(objToSendToParent), '*');
+      } else {
+        this.loggerService.error(
+          'Unknown version for embedding: ' + hashDict.version);
+        return;
+      }
+    }
+  }
+}
+angular.module('oppia').factory('MessengerService',
+  downgradeInjectable(MessengerService));

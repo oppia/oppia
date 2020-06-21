@@ -414,8 +414,8 @@ def get_time_in_millisecs(datetime_obj):
     Returns:
         float. The time in milliseconds since the Epoch.
     """
-    seconds = time.mktime(datetime_obj.utctimetuple()) * 1000
-    return seconds + python_utils.divide(datetime_obj.microsecond, 1000.0)
+    msecs = time.mktime(datetime_obj.timetuple()) * 1000.0
+    return msecs + python_utils.divide(datetime_obj.microsecond, 1000.0)
 
 
 def get_current_time_in_millisecs():

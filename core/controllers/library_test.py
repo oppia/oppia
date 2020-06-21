@@ -39,6 +39,18 @@ import utils
 CAN_EDIT_STR = 'can_edit'
 
 
+class OldLibraryRedirectPageTest(test_utils.GenericTestBase):
+    """Test for redirecting the old library page URL to the new one."""
+
+    def test_old_library_page_url(self):
+        """Test to validate that the old library page url redirects
+        to the new one.
+        """
+        response = self.get_html_response('/library', expected_status_int=301)
+        self.assertEqual(
+            'http://localhost/community-library', response.headers['location'])
+
+
 class LibraryPageTests(test_utils.GenericTestBase):
 
     def setUp(self):

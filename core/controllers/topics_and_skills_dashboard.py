@@ -23,6 +23,7 @@ import logging
 
 from core.controllers import acl_decorators
 from core.controllers import base
+from core.domain import config_domain
 from core.domain import fs_services
 from core.domain import image_validation_services
 from core.domain import question_services
@@ -79,13 +80,58 @@ class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
                             self.user, topic_rights)
                     )
 
+        all_classrooms_dict = config_domain.TOPIC_IDS_FOR_CLASSROOM_PAGES.value
+        all_classroom_names = [
+            classroom['name'] for classroom in all_classrooms_dict]
+
+        for topic_summary_dict in topic_summary_dicts:
+            topic_summary_dict['classroom'] = None
+            for classroom in all_classrooms_dict:
+                if topic_summary_dict['id'] in classroom['topic_ids']:
+                    topic_summary_dict['classroom'] = classroom['name']
+                    break
+
         untriaged_skill_summary_dicts = []
         mergeable_skill_summary_dicts = []
+        categorized_skills_dict = {}
+        topics = topic_fetchers.get_all_topics()
+        for topic in topics:
+            subtopics = topic.subtopics
+            categorized_skills_dict[topic.name] = {}
+            uncategorized_skills = (
+                skill_services.get_descriptions_of_skills(
+                    topic.uncategorized_skill_ids)[0])
+            skills_list = []
+            for skill_id in topic.uncategorized_skill_ids:
+                skill_dict = {
+                    'skill_id': skill_id,
+                    'skill_description': uncategorized_skills[skill_id]
+                }
+                skills_list.append(skill_dict)
+            categorized_skills_dict[topic.name]['uncategorized'] = (
+                skills_list)
+            for subtopic in subtopics:
+                skills = (skill_services.get_descriptions_of_skills(
+                    subtopic.skill_ids))[0]
+                skills_list = []
+                for skill_id in subtopic.skill_ids:
+                    skill_dict = {
+                        'skill_id': skill_id,
+                        'skill_description': skills[skill_id]
+                    }
+                    skills_list.append(skill_dict)
+                categorized_skills_dict[topic.name][
+                    subtopic.title] = skills_list
+        categorized_skills_dict['untriaged_skills'] = []
         for skill_summary_dict in skill_summary_dicts:
             skill_id = skill_summary_dict['id']
             if (skill_id not in skill_ids_assigned_to_some_topic) and (
                     skill_id not in merged_skill_ids):
                 untriaged_skill_summary_dicts.append(skill_summary_dict)
+                categorized_skills_dict['untriaged_skills'].append({
+                    'skill_id': skill_id,
+                    'skill_description': skill_summary_dict['description']
+                })
             if (skill_id in skill_ids_assigned_to_some_topic) and (
                     skill_id not in merged_skill_ids):
                 mergeable_skill_summary_dicts.append(skill_summary_dict)
@@ -106,10 +152,12 @@ class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
             'untriaged_skill_summary_dicts': untriaged_skill_summary_dicts,
             'mergeable_skill_summary_dicts': mergeable_skill_summary_dicts,
             'topic_summary_dicts': topic_summary_dicts,
+            'all_classroom_names': all_classroom_names,
             'can_delete_topic': can_delete_topic,
             'can_create_topic': can_create_topic,
             'can_delete_skill': can_delete_skill,
-            'can_create_skill': can_create_skill
+            'can_create_skill': can_create_skill,
+            'categorized_skills_dict': categorized_skills_dict
         })
         self.render_json(self.values)
 
@@ -122,6 +170,11 @@ class NewTopicHandler(base.BaseHandler):
         """Handles POST requests."""
         name = self.payload.get('name')
         abbreviated_name = self.payload.get('abbreviated_name')
+        description = self.payload.get('description')
+        thumbnail_filename = self.payload.get('filename')
+        thumbnail_bg_color = self.payload.get('thumbnailBgColor')
+        raw_image = self.request.get('image')
+
         try:
             topic_domain.Topic.require_valid_name(name)
         except:
@@ -129,8 +182,36 @@ class NewTopicHandler(base.BaseHandler):
                 'Invalid topic name, received %s.' % name)
         new_topic_id = topic_services.get_new_topic_id()
         topic = topic_domain.Topic.create_default_topic(
-            new_topic_id, name, abbreviated_name)
+            new_topic_id, name, abbreviated_name, description)
         topic_services.save_new_topic(self.user_id, topic)
+
+        try:
+            file_format = image_validation_services.validate_image_and_filename(
+                raw_image, thumbnail_filename)
+        except utils.ValidationError as e:
+            raise self.InvalidInputException(e)
+
+        entity_id = new_topic_id
+        filename_prefix = 'thumbnail'
+
+        image_is_compressible = (
+            file_format in feconf.COMPRESSIBLE_IMAGE_FORMATS)
+        fs_services.save_original_and_compressed_versions_of_image(
+            thumbnail_filename, feconf.ENTITY_TYPE_TOPIC, entity_id, raw_image,
+            filename_prefix, image_is_compressible)
+
+        topic_services.update_topic_and_subtopic_pages(
+            self.user_id, new_topic_id, [topic_domain.TopicChange({
+                'cmd': 'update_topic_property',
+                'property_name': 'thumbnail_filename',
+                'old_value': None,
+                'new_value': thumbnail_filename
+            }), topic_domain.TopicChange({
+                'cmd': 'update_topic_property',
+                'property_name': 'thumbnail_bg_color',
+                'old_value': None,
+                'new_value': thumbnail_bg_color
+            }), ], 'Add topic thumbnail.')
 
         self.render_json({
             'topicId': new_topic_id

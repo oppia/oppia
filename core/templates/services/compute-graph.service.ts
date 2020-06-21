@@ -20,14 +20,29 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
+import { States } from 'domain/exploration/StatesObjectFactory';
+
+interface IGraphLink {
+  source: string;
+  target: string;
+}
+
+interface IGraphNodes {
+  [stateName: string]: string;
+}
+
+interface IGraphData {
+  finalStateIds: string[];
+  initStateId: string;
+  links: IGraphLink[];
+  nodes: IGraphNodes;
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class ComputeGraphService {
-  // TODO(#7176): Replace 'any' with exact type.As states.getFinalStateNames()
-  // is being called hence we can't just set the states type to Object
-  // since it will cause the typescript compilation to fail
-  _computeGraphData(initStateId: string, states: any): any {
+  _computeGraphData(initStateId: string, states: States): IGraphData {
     let nodes = {};
     let links = [];
     let finalStateIds = states.getFinalStateNames();
@@ -60,9 +75,9 @@ export class ComputeGraphService {
       nodes: nodes
     };
   }
-  // TODO(#7176): Replace 'any' with the exact type.
-  _computeBfsTraversalOfStates(initStateId: string, states: any,
-      sourceStateName: string): Array<any> {
+
+  _computeBfsTraversalOfStates(
+      initStateId: string, states: States, sourceStateName: string): string[] {
     let stateGraph = this._computeGraphData(initStateId, states);
     let stateNamesInBfsOrder = [];
     let queue = [];
@@ -83,13 +98,13 @@ export class ComputeGraphService {
     }
     return stateNamesInBfsOrder;
   }
-  // TODO(#7176): Replace 'any' with the exact type.
-  compute(initStateId: string, states: any): Object {
+
+  compute(initStateId: string, states: States): IGraphData {
     return this._computeGraphData(initStateId, states);
   }
-  // TODO(#7176): Replace 'any' with the exact type.
-  computeBfsTraversalOfStates(initStateId: string, states: any,
-      sourceStateName: any): Array<any> {
+
+  computeBfsTraversalOfStates(
+      initStateId: string, states: States, sourceStateName: string): string[] {
     return this._computeBfsTraversalOfStates(
       initStateId, states, sourceStateName);
   }

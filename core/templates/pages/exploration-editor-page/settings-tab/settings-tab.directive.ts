@@ -30,6 +30,12 @@ require(
 require(
   'pages/exploration-editor-page/param-changes-editor/' +
   'param-changes-editor.directive.ts');
+require(
+  'pages/exploration-editor-page/settings-tab/templates/' +
+  'moderator-unpublish-exploration-modal.controller.ts');
+require(
+  'pages/exploration-editor-page/settings-tab/templates/' +
+  'preview-summary-tile-modal.controller.ts');
 
 require('domain/exploration/editable-exploration-backend-api.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
@@ -43,7 +49,7 @@ require(
   'pages/exploration-editor-page/services/' +
   'exploration-correctness-feedback.service.ts');
 require('pages/exploration-editor-page/services/exploration-data.service.ts');
-require('pages/exploration-editor-page/exploration-editor-page.controller.ts');
+require('pages/exploration-editor-page/exploration-editor-page.component.ts');
 require(
   'pages/exploration-editor-page/services/' +
   'exploration-init-state-name.service.ts');
@@ -122,7 +128,7 @@ angular.module('oppia').directive('settingsTab', [
             EXPLORATION_TITLE_INPUT_FOCUS_LABEL, TAG_REGEX) {
           var ctrl = this;
 
-          var CREATOR_DASHBOARD_PAGE_URL = '/creator_dashboard';
+          var CREATOR_DASHBOARD_PAGE_URL = '/creator-dashboard';
           var EXPLORE_PAGE_PREFIX = '/explore/';
 
           ctrl.getExplorePageUrl = function() {
@@ -279,42 +285,7 @@ angular.module('oppia').directive('settingsTab', [
                 '/pages/exploration-editor-page/settings-tab/templates/' +
                 'preview-summary-tile-modal.template.html'),
               backdrop: true,
-              controller: [
-                '$controller', '$scope', '$uibModalInstance', function(
-                    $controller, $scope, $uibModalInstance) {
-                  $controller('ConfirmOrCancelModalController', {
-                    $scope: $scope,
-                    $uibModalInstance: $uibModalInstance
-                  });
-
-                  $scope.getExplorationTitle = function() {
-                    return ExplorationTitleService.displayed;
-                  };
-                  $scope.getExplorationObjective = function() {
-                    return ExplorationObjectiveService.displayed;
-                  };
-                  $scope.getExplorationCategory = function() {
-                    return ExplorationCategoryService.displayed;
-                  };
-                  $scope.getThumbnailIconUrl = function() {
-                    var category = ExplorationCategoryService.displayed;
-                    if (ALL_CATEGORIES.indexOf(category) === -1) {
-                      category = DEFAULT_CATEGORY_ICON;
-                    }
-                    return '/subjects/' + category + '.svg';
-                  };
-                  $scope.getThumbnailBgColor = function() {
-                    var category = ExplorationCategoryService.displayed;
-                    var color = null;
-                    if (!CATEGORIES_TO_COLORS.hasOwnProperty(category)) {
-                      color = DEFAULT_COLOR;
-                    } else {
-                      color = CATEGORIES_TO_COLORS[category];
-                    }
-                    return color;
-                  };
-                }
-              ]
+              controller: 'PreviewSummaryTileModalController'
             }).result.then(function() {}, function() {
               AlertsService.clearWarnings();
             });
@@ -375,29 +346,7 @@ angular.module('oppia').directive('settingsTab', [
                     return draftEmailBody;
                   }
                 },
-                controller: [
-                  '$controller', '$scope', '$uibModalInstance',
-                  'draftEmailBody',
-                  function($controller, $scope, $uibModalInstance,
-                      draftEmailBody) {
-                    $controller('ConfirmOrCancelModalController', {
-                      $scope: $scope,
-                      $uibModalInstance: $uibModalInstance
-                    });
-
-                    $scope.willEmailBeSent = Boolean(draftEmailBody);
-                    $scope.emailBody = draftEmailBody;
-
-                    if ($scope.willEmailBeSent) {
-                      $scope.EMAIL_BODY_SCHEMA = {
-                        type: 'unicode',
-                        ui_config: {
-                          rows: 20
-                        }
-                      };
-                    }
-                  }
-                ]
+                controller: 'ModeratorUnpublishExplorationModalController'
               }).result.then(function(emailBody) {
                 ExplorationRightsService.saveModeratorChangeToBackend(
                   emailBody);
