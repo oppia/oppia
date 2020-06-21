@@ -1,45 +1,27 @@
-<link rel="stylesheet" href="/third_party/static/guppy-f944022/build/guppy-default.min.css">
-<link rel="stylesheet" href="/third_party/static/guppy-f944022/build/guppy-default-osk.min.css">
+<link rel="stylesheet" href="/third_party/static/guppy-175999/build/guppy-default.min.css">
 <script>
   // Use the normal default browser eventlistener without passive set to false.
   // TODO(#8833): Use passive listeners when guppy supports it.
   EventTarget.prototype.addEventListener = (
     EventTarget.prototype.addEventListener._original);
 </script>
-<script type="text/javascript" src="/third_party/static/guppy-f944022/build/guppy.min.js"></script>
-<script type="text/javascript" src="/third_party/static/guppy-f944022/build/guppy_osk.min.js"></script>
-
-<script type="text/javascript">
-  var osk = new GuppyOSK({'goto_tab':'arithmetic'});
-  Guppy.use_osk(osk);
-  Guppy.init({
-    'path': '/third_party/static/guppy-f944022/build'
-  });
-  Guppy.configure('buttons', ['osk', 'controls']);
-  Guppy.configure('empty_content', '\\color{grey}{\\text{\\small{Type a formula here.}}}')
-  document.addEventListener('keydown', function (event) {
-    if(event.key == 'Escape') {
-      osk.detach();
-    }
-  });
-</script>
+<script type="text/javascript" src="/third_party/static/guppy-175999/build/guppy.min.js"></script>
 
 <style>
   /* Some of the style attributes have been marked with '!important' since they
   are directly applied to the element's style attributes in the third-party lib
-  and thus need to be overriden with '!important'. */
+  and thus need to be overriden with '!important'. The styles are being added
+  here: https://github.com/daniel3735928559/guppy/blob/1759992a3885cb99d3ead04241f318a074c9f963/build/guppy.js#L4292*/
+
   .guppy_help {
     top: 4% !important;
-    left: 15% !important;
-    width: 70%;
-    z-index: 1051;
-  }
-
-  .guppy_osk {
-    z-index: 1051;
+    left: 12% !important;
+    width: 80%;
+    z-index: 1052;
   }
 
   .guppy_active {
+    width: 550px;
     border: 1px solid rgba(81, 203, 238, 1);
     height: 100px;
     overflow: auto;
@@ -50,10 +32,9 @@
   }
 
   .guppy_inactive {
+    width: 550px;
     background: #ffffff;
     border: 1px solid #000000;
-    height: 100px;
-    width: 100%;
   }
 
   .guppy_active .main_cursor {
