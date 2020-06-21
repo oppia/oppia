@@ -1,4 +1,4 @@
-// Copyright 2014 The Oppia Authors. All Rights Reserved.
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,8 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the controller of the page showing the
- * user's explorations.
+ * @fileoverview Unit tests for creator dashboard page component.
  */
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
