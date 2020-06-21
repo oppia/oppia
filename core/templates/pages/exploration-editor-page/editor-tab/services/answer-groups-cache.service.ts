@@ -24,6 +24,9 @@ import cloneDeep from 'lodash/cloneDeep';
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
+import { IAnswerGroupBackendDict } from
+  'domain/exploration/AnswerGroupObjectFactory';
+
 @Injectable({
   providedIn: 'root'
 })
@@ -38,10 +41,7 @@ export class AnswerGroupsCacheService {
     return AnswerGroupsCacheService._cache.hasOwnProperty(interactionId);
   }
 
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'answerGroups' is a dict with underscore_cased keys which
-  // give tslint errors against underscore_casing in favor of camelCasing.
-  set(interactionId: string, answerGroups: any): void {
+  set(interactionId: string, answerGroups: IAnswerGroupBackendDict): void {
     AnswerGroupsCacheService._cache[interactionId] = cloneDeep(answerGroups);
   }
 
