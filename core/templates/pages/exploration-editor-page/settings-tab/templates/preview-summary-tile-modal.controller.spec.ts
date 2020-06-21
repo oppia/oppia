@@ -77,14 +77,4 @@ describe('Preview Summary Tile Modal Controller', function() {
     ExplorationCategoryService.init('Astrology');
     expect($scope.getThumbnailBgColor()).toBe('#a33f40');
   });
-
-  it('should close modal on confirm', function() {
-    $scope.confirm();
-    expect($uibModalInstance.close).toHaveBeenCalled();
-  });
-
-  it('should cancel the modal on dismiss', function() {
-    $scope.cancel();
-    expect($uibModalInstance.dismiss).toHaveBeenCalledWith('cancel');
-  });
 });

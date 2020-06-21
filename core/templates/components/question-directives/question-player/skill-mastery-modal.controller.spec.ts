@@ -54,14 +54,4 @@ describe('Skill Mastery Modal Controller', function() {
     $scope.openConceptCardModal();
     expect(openConceptCardModal).toHaveBeenCalledWith([skillId]);
   });
-
-  it('should close modal on confirm', function() {
-    $scope.confirm();
-    expect($uibModalInstance.close).toHaveBeenCalled();
-  });
-
-  it('should cancel the modal on dismiss', function() {
-    $scope.cancel();
-    expect($uibModalInstance.dismiss).toHaveBeenCalledWith('cancel');
-  });
 });

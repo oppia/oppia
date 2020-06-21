@@ -62,9 +62,4 @@ describe('Merge Skill Modal Controller', function() {
       supersedingSkillId: ''
     });
   });
-
-  it('should cancel the modal on dismiss', function() {
-    $scope.cancel();
-    expect($uibModalInstance.dismiss).toHaveBeenCalledWith('cancel');
-  });
 });

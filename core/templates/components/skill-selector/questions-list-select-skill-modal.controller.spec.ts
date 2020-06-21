@@ -58,9 +58,4 @@ describe('Questions List Select Skill Modal Controller', function() {
     expect($uibModalInstance.close).toHaveBeenCalledWith(
       sortedSkillSummaries[1]);
   });
-
-  it('should cancel the modal on dismiss', function() {
-    $scope.cancel();
-    expect($uibModalInstance.dismiss).toHaveBeenCalledWith('cancel');
-  });
 });

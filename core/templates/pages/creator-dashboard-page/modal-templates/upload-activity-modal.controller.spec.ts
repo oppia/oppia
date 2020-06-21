@@ -73,9 +73,4 @@ describe('Upload Activity Modal Controller', function() {
       'Empty file detected.');
     expect($uibModalInstance.close).not.toHaveBeenCalled();
   });
-
-  it('should cancel the modal on dismiss', function() {
-    $scope.cancel();
-    expect($uibModalInstance.dismiss).toHaveBeenCalledWith('cancel');
-  });
 });
