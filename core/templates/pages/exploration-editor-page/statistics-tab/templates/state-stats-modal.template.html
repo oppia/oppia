@@ -53,6 +53,10 @@
                                      data="vizInfo.data"
                                      options="vizInfo.options">
       </oppia-visualization-bar-chart>
+      <oppia-visualization-click-hexbins ng-switch-when="ClickHexbins"
+                                         data="vizInfo.data"
+                                         interaction-args="interactionArgs">
+      </oppia-visualization-click-hexbins>
       <oppia-visualization-enumerated-frequency-table ng-switch-when="EnumeratedFrequencyTable"
                                                       data="vizInfo.data"
                                                       options="vizInfo.options"

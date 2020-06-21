@@ -23,13 +23,13 @@ require(
 require('pages/exploration-editor-page/services/router.service.ts');
 
 angular.module('oppia').controller('StateStatsModalController', [
-  '$controller', '$scope', '$uibModalInstance',
-  'RouterService', 'improvementType', 'stateName', 'stateStats',
-  'stateStatsModalIsOpen', 'visualizationsInfo',
+  '$controller', '$scope', '$uibModalInstance', 'RouterService',
+  'improvementType', 'interactionArgs', 'stateName', 'stateStats',
+  'visualizationsInfo',
   function(
-      $controller, $scope, $uibModalInstance,
-      RouterService, improvementType, stateName, stateStats,
-      stateStatsModalIsOpen, visualizationsInfo) {
+      $controller, $scope, $uibModalInstance, RouterService,
+      improvementType, interactionArgs, stateName, stateStats,
+      visualizationsInfo) {
     $controller('ConfirmOrCancelModalController', {
       $scope: $scope,
       $uibModalInstance: $uibModalInstance
@@ -83,11 +83,8 @@ angular.module('oppia').controller('StateStatsModalController', [
         numTimesSolutionViewed)]
     ];
 
+    $scope.interactionArgs = interactionArgs;
     $scope.visualizationsInfo = visualizationsInfo;
-
-    $scope.$on('$destroy', function() {
-      stateStatsModalIsOpen = false;
-    });
 
     $scope.navigateToStateEditor = function() {
       $scope.cancel();

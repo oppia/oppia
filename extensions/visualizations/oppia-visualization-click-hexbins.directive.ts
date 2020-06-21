@@ -25,134 +25,123 @@ interface IHexBin {
  * @fileoverview Visualization for click statistics providing a hexbin-heatmap.
  */
 
-angular.module('oppia').directive('oppiaVisualizationClickHexbins', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
-    return {
-      restrict: 'E',
-      scope: {},
-      bindToController: {},
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/visualizations/oppia-visualization-click-hexbins.directive.html'),
-      controllerAs: '$ctrl',
-      controller: [
-        '$attrs', '$element', 'AssetsBackendApiService', 'ContextService',
-        'HtmlEscaperService', 'ImagePreloaderService',
-        function(
-            $attrs, $element, AssetsBackendApiService, ContextService,
-            HtmlEscaperService, ImagePreloaderService) {
-          const ctrl = this;
-          const data = HtmlEscaperService.escapedJsonToObj(
-            $attrs.escapedData);
-          const options = HtmlEscaperService.escapedJsonToObj(
-            $attrs.escapedOptions);
-          const imageAndRegions = HtmlEscaperService.escapedJsonToObj(
-            $attrs.imageAndRegionsWithValue);
+angular.module('oppia').directive('oppiaVisualizationClickHexbins', () => ({
+  restrict: 'E',
+  scope: { data: '<', interactionArgs: '<' },
+  template: require('./oppia-visualization-click-hexbins.directive.html'),
+  style: require('./oppia-visualization-click-hexbins.directive.css'),
+  controller: [
+    '$scope', 'AssetsBackendApiService', 'ContextService',
+    'ImagePreloaderService',
+    function(
+        $scope, AssetsBackendApiService, ContextService,
+        ImagePreloaderService) {
+      const imageAndRegions = $scope.interactionArgs.imageAndRegions.value;
+      const ctrl = this;
 
-          const showTooltip = (hexBin: IHexBin) => {
-            if (hexBin.length === 0) {
-              return;
-            }
-            d3.select('#click-hexbin-chart-tooltip')
-              .style('visibility', 'visible')
-              .style('left', `${hexBin.x}px`)
-              .style('top', `${hexBin.y + 16}px`)
-              .text(`${hexBin.length} click${hexBin.length > 1 ? 's' : ''}`);
-          };
-
-          const moveTooltip = (hexBin: IHexBin) => {
-            if (hexBin.length === 0) {
-              return;
-            }
-            d3.select('#click-hexbin-chart-tooltip')
-              .style('visibility', 'visible');
-          };
-
-          const hideTooltip = (hexBin: IHexBin) => {
-            d3.select('#click-hexbin-chart-tooltip')
-              .style('visibility', 'hidden');
-          };
-
-          const imageUrl = AssetsBackendApiService.getImageUrlForPreview(
-            ContextService.getEntityType(), ContextService.getEntityId(),
-            imageAndRegions.imagePath);
-          const imageDimensions = ImagePreloaderService.getDimensionsOfImage(
-            imageAndRegions.imagePath);
-          const imageAspectRatio = (
-            imageDimensions.height / imageDimensions.width);
-
-          const containerWidth = $('#click-hexbin-chart').width();
-          const containerHeight = Math.round(containerWidth * imageAspectRatio);
-
-          ctrl.$onInit = function() {
-            d3.select('#click-hexbin-chart-tooltip')
-              .style('visibility', 'hidden');
-
-            // Define the data for the hexbins.
-            const hexbin = d3Hexbin.hexbin()
-              .x(d => (d.answer.clickPosition[0] * containerWidth))
-              .y(d => (d.answer.clickPosition[1] * containerHeight))
-              .radius(16)
-              .size([containerWidth, containerHeight]);
-            const bins = hexbin(data);
-
-            // Define the color of hexbins, using the number of grouped clicks
-            // to change their opacity.
-            const rgbaScaleEndPoints = [
-              'rgba(255,255,255,0.25)',
-              'rgba(255,255,255,0.75)'
-            ];
-            const color = d3.scaleLinear()
-              .domain([0, d3.max(bins, (b: IHexBin) => b.length)])
-              // NOTE TO DEVELOPERS: the range type is wrong; rgba string-values
-              // are supported.
-              // @ts-ignore
-              .range(rgbaScaleEndPoints);
-
-            // Construct and add the SVG element for holding the hexbin graph.
-            const svg = d3.select('#click-hexbin-chart').append('svg')
-              .attr('viewBox', `0 0 ${containerWidth} ${containerHeight}`);
-
-            // Draw the image in which the clicks happened.
-            svg.append('image')
-              .attr('xlink:href', imageUrl)
-              .attr('width', `${containerWidth}px`)
-              .attr('height', `${containerHeight}px`);
-
-            // Draw an overlay over the image to help distinguish the hexagons.
-            svg.append('rect')
-              .attr('x', 0).attr('y', 0)
-              .attr('width', containerWidth).attr('height', containerHeight)
-              .style('fill', 'rgba(0,0,0,0.35)');
-
-            // Draw the mesh of hexagons to help distinguish each group.
-            const clipPath = svg.append('clipPath').attr('id', 'clip');
-            clipPath.append('rect')
-              .attr('class', 'mesh')
-              .attr('width', containerWidth)
-              .attr('height', containerHeight);
-
-            svg.append('svg:path')
-              .attr('clip-path', 'url(#clip)')
-              .attr('d', hexbin.mesh())
-              .style('stroke-width', .5)
-              .style('stroke', '#FFF')
-              .style('stroke-opacity', 0.12)
-              .style('fill', 'none');
-
-            // Draw the individual hexbins with non-zero points.
-            const graph = svg.append('g')
-              .selectAll('path')
-              .data(bins).enter();
-            graph.append('path')
-              .attr('transform', (b: IHexBin) => `translate(${b.x}, ${b.y})`)
-              .attr('fill', (b: IHexBin) => color(b.length))
-              .attr('d', hexbin.hexagon())
-              .on('mouseover', showTooltip)
-              .on('mousemove', moveTooltip)
-              .on('mouseout', hideTooltip);
-          };
+      const showTooltip = (hexBin: IHexBin) => {
+        if (hexBin.length === 0) {
+          return;
         }
-      ]
-    };
-  }
-]);
+        d3.select('.click-hexbin-chart-tooltip')
+          .style('visibility', 'visible')
+          .style('left', `${hexBin.x}px`)
+          .style('top', `${hexBin.y + 16}px`)
+          .text(`${hexBin.length} click${hexBin.length > 1 ? 's' : ''}`);
+      };
+
+      const moveTooltip = (hexBin: IHexBin) => {
+        if (hexBin.length === 0) {
+          return;
+        }
+        d3.select('.click-hexbin-chart-tooltip')
+          .style('visibility', 'visible');
+      };
+
+      const hideTooltip = (hexBin: IHexBin) => {
+        d3.select('.click-hexbin-chart-tooltip')
+          .style('visibility', 'hidden');
+      };
+
+      const imageUrl = AssetsBackendApiService.getImageUrlForPreview(
+        ContextService.getEntityType(), ContextService.getEntityId(),
+        imageAndRegions.imagePath);
+      const imageDimensions = ImagePreloaderService.getDimensionsOfImage(
+        imageAndRegions.imagePath);
+      const imageAspectRatio = (
+        imageDimensions.height / imageDimensions.width);
+
+      const containerWidth = $('.click-hexbin-chart').width();
+      const containerHeight = Math.round(containerWidth * imageAspectRatio);
+
+      ctrl.$onInit = function() {
+        d3.select('.click-hexbin-chart-tooltip')
+          .style('visibility', 'hidden');
+
+        // Define the data for the hexbins.
+        const hexbin = d3Hexbin.hexbin()
+          .x(d => (d.answer.clickPosition[0] * containerWidth))
+          .y(d => (d.answer.clickPosition[1] * containerHeight))
+          .radius(16)
+          .size([containerWidth, containerHeight]);
+        const bins = hexbin($scope.data);
+
+        // Define the color of hexbins, using the number of grouped clicks
+        // to change their opacity.
+        const rgbaScaleEndPoints = [
+          'rgba(255,255,255,0.25)',
+          'rgba(255,255,255,0.75)'
+        ];
+        const color = d3.scaleLinear()
+          .domain([0, d3.max(bins, (b: IHexBin) => b.length)])
+        // NOTE TO DEVELOPERS: the range type is wrong; rgba string-values
+        // are supported.
+        // @ts-ignore
+          .range(rgbaScaleEndPoints);
+
+        // Construct and add the SVG element for holding the hexbin graph.
+        const svg = d3.select('.click-hexbin-chart').append('svg')
+          .attr('viewBox', `0 0 ${containerWidth} ${containerHeight}`);
+
+        // Draw the image in which the clicks happened.
+        svg.append('image')
+          .attr('xlink:href', imageUrl)
+          .attr('width', `${containerWidth}px`)
+          .attr('height', `${containerHeight}px`);
+
+        // Draw an overlay over the image to help distinguish the hexagons.
+        svg.append('rect')
+          .attr('x', 0).attr('y', 0)
+          .attr('width', containerWidth).attr('height', containerHeight)
+          .style('fill', 'rgba(0,0,0,0.35)');
+
+        // Draw the mesh of hexagons to help distinguish each group.
+        const clipPath = svg.append('clipPath').attr('id', 'clip');
+        clipPath.append('rect')
+          .attr('class', 'mesh')
+          .attr('width', containerWidth)
+          .attr('height', containerHeight);
+
+        svg.append('svg:path')
+          .attr('clip-path', 'url(#clip)')
+          .attr('d', hexbin.mesh())
+          .style('stroke-width', .5)
+          .style('stroke', '#FFF')
+          .style('stroke-opacity', 0.12)
+          .style('fill', 'none');
+
+        // Draw the individual hexbins with non-zero points.
+        const graph = svg.append('g')
+          .selectAll('path')
+          .data(bins).enter();
+        graph.append('path')
+          .attr('transform', (b: IHexBin) => `translate(${b.x}, ${b.y})`)
+          .attr('fill', (b: IHexBin) => color(b.length))
+          .attr('d', hexbin.hexagon())
+          .on('mouseover', showTooltip)
+          .on('mousemove', moveTooltip)
+          .on('mouseout', hideTooltip);
+      };
+    }
+  ]
+}));
