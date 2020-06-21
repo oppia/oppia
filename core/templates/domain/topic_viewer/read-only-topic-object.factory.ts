@@ -52,20 +52,20 @@ export class ReadOnlyTopic {
   _topicName: string;
   _topicId: string;
   _topicDescription: string;
-  _canonicalStorySummaries: Array<StorySummary>;
-  _additionalStorySummaries: Array<StorySummary>;
-  _uncategorizedSkillSummaries: Array<SkillSummary>;
-  _subtopics: Array<Subtopic>;
+  _canonicalStorySummaries: StorySummary[];
+  _additionalStorySummaries: StorySummary[];
+  _uncategorizedSkillSummaries: SkillSummary[];
+  _subtopics: Subtopic[];
   _degreesOfMastery: IDegreesOfMastery;
   _skillDescriptions: ISkillIdToDescriptionMap;
   _trainTabShouldBeDisplayed: boolean;
 
   constructor(
       topicName: string, topicId: string, topicDescription: string,
-      canonicalStorySummaries: Array<StorySummary>,
-      additionalStorySummaries: Array<StorySummary>,
-      uncategorizedSkillSummaries: Array<SkillSummary>,
-      subtopics: Array<Subtopic>,
+      canonicalStorySummaries: StorySummary[],
+      additionalStorySummaries: StorySummary[],
+      uncategorizedSkillSummaries: SkillSummary[],
+      subtopics: Subtopic[],
       degreesOfMastery: IDegreesOfMastery,
       skillDescriptions: ISkillIdToDescriptionMap,
       trainTabShouldBeDisplayed: boolean) {
@@ -93,19 +93,19 @@ export class ReadOnlyTopic {
     return this._topicId;
   }
 
-  getCanonicalStorySummaries(): Array<StorySummary> {
+  getCanonicalStorySummaries(): StorySummary[] {
     return this._canonicalStorySummaries.slice();
   }
 
-  getAdditionalStorySummaries(): Array<StorySummary> {
+  getAdditionalStorySummaries(): StorySummary[] {
     return this._additionalStorySummaries.slice();
   }
 
-  getUncategorizedSkillsSummaries(): Array<SkillSummary> {
+  getUncategorizedSkillsSummaries(): SkillSummary[] {
     return this._uncategorizedSkillSummaries.slice();
   }
 
-  getSubtopics(): Array<Subtopic> {
+  getSubtopics(): Subtopic[] {
     return this._subtopics.slice();
   }
 
@@ -126,38 +126,32 @@ export class ReadOnlyTopic {
   providedIn: 'root'
 })
 export class ReadOnlyTopicObjectFactory {
-  _subtopicObjectFactory: SubtopicObjectFactory;
-  _skillSummaryObjectFactory: SkillSummaryObjectFactory;
-
   constructor(
     private subtopicObjectFactory: SubtopicObjectFactory,
-    private skillSummaryObjectFactory: SkillSummaryObjectFactory) {
-    this._subtopicObjectFactory = subtopicObjectFactory;
-    this._skillSummaryObjectFactory = skillSummaryObjectFactory;
-  }
+    private skillSummaryObjectFactory: SkillSummaryObjectFactory) {}
 
   createFromBackendDict(
       topicDataDict: IReadOnlyTopicBackendDict): ReadOnlyTopic {
-    let subtopics: Array<Subtopic> = topicDataDict.subtopics.map(subtopic => {
-      return this._subtopicObjectFactory.create(
+    let subtopics = topicDataDict.subtopics.map(subtopic => {
+      return this.subtopicObjectFactory.create(
         subtopic, topicDataDict.skill_descriptions);
     });
-    let uncategorizedSkills: Array<SkillSummary> =
+    let uncategorizedSkills =
         topicDataDict.uncategorized_skill_ids.map(skillId => {
-          return this._skillSummaryObjectFactory.create(
+          return this.skillSummaryObjectFactory.create(
             skillId, topicDataDict.skill_descriptions[skillId]);
         });
     let degreesOfMastery: IDegreesOfMastery = topicDataDict.degrees_of_mastery;
     let skillDescriptions: ISkillIdToDescriptionMap =
         topicDataDict.skill_descriptions;
-    let canonicalStories: Array<StorySummary> =
+    let canonicalStories =
         topicDataDict.canonical_story_dicts.map(storyDict => {
           return new StorySummary(
             storyDict.id, storyDict.title, storyDict.node_titles,
             storyDict.thumbnail_filename, storyDict.thumbnail_bg_color,
             storyDict.description, true);
         });
-    let additionalStories: Array<StorySummary> =
+    let additionalStories =
         topicDataDict.additional_story_dicts.map(storyDict => {
           return new StorySummary(
             storyDict.id, storyDict.title, storyDict.node_titles,

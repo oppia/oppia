@@ -18,19 +18,20 @@
 
 import {
   PlaythroughIssueObjectFactory,
-  IEarlyQuitPlaythroughIssueBackendDict,
-  EarlyQuitPlaythroughIssue
+  IEarlyQuitCustomizationArgs,
+  IPlaythroughIssueBackendDict,
+  PlaythroughIssue
 } from 'domain/statistics/PlaythroughIssueObjectFactory';
 
 describe('Playthrough Issue Object Factory', () => {
   let piof: PlaythroughIssueObjectFactory;
-  let playthroughIssueObject: EarlyQuitPlaythroughIssue;
+  let playthroughIssueObject: PlaythroughIssue<IEarlyQuitCustomizationArgs>;
   beforeEach(() => {
     piof = new PlaythroughIssueObjectFactory();
   });
 
   it('should create a new exploration issue', () => {
-    playthroughIssueObject = new EarlyQuitPlaythroughIssue(
+    playthroughIssueObject = new PlaythroughIssue(
       'EarlyQuit', {
         state_name: {
           value: 'state'
@@ -85,7 +86,7 @@ describe('Playthrough Issue Object Factory', () => {
   });
 
   it('should convert exploration issue to backend dict', () => {
-    const playthroughDict: IEarlyQuitPlaythroughIssueBackendDict = {
+    const playthroughDict: IPlaythroughIssueBackendDict = {
       issue_type: 'EarlyQuit',
       issue_customization_args: {
         state_name: {

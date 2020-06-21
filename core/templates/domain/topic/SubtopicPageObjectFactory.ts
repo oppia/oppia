@@ -36,53 +36,46 @@ interface ISubtopicPageBackendDict {
 }
 
 export class SubtopicPage {
-  _id: string;
-  _topicId: string;
-  _pageContents: SubtopicPageContents;
-  _languageCode: string;
   constructor(
-      subtopicPageId: string, topicId: string,
-      pageContents: SubtopicPageContents, languageCode: string) {
-    this._id = subtopicPageId;
-    this._topicId = topicId;
-    this._pageContents = pageContents;
-    this._languageCode = languageCode;
-  }
+    private id: string,
+    private topicId: string,
+    private pageContents: SubtopicPageContents,
+    private languageCode: string) {}
 
   // Returns the id of the subtopic page.
   getId(): string {
-    return this._id;
+    return this.id;
   }
 
   setId(id: string): void {
-    this._id = id;
+    this.id = id;
   }
 
   // Returns the topic id that the subtopic page is linked to.
   getTopicId(): string {
-    return this._topicId;
+    return this.topicId;
   }
 
   // Returns the page data for the subtopic page.
   getPageContents(): SubtopicPageContents {
-    return this._pageContents;
+    return this.pageContents;
   }
 
   // Sets the page data for the subtopic page.
   setPageContents(pageContents: SubtopicPageContents): void {
-    this._pageContents = cloneDeep(pageContents);
+    this.pageContents = cloneDeep(pageContents);
   }
 
   // Returns the language code for the subtopic page.
   getLanguageCode(): string {
-    return this._languageCode;
+    return this.languageCode;
   }
 
   copyFromSubtopicPage(otherSubtopicPage: SubtopicPage): void {
-    this._id = otherSubtopicPage.getId();
-    this._topicId = otherSubtopicPage.getTopicId();
-    this._pageContents = cloneDeep(otherSubtopicPage.getPageContents());
-    this._languageCode = otherSubtopicPage.getLanguageCode();
+    this.id = otherSubtopicPage.getId();
+    this.topicId = otherSubtopicPage.getTopicId();
+    this.pageContents = cloneDeep(otherSubtopicPage.getPageContents());
+    this.languageCode = otherSubtopicPage.getLanguageCode();
   }
 }
 
