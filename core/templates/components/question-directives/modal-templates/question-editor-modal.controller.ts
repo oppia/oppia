@@ -169,7 +169,6 @@ angular.module('oppia').controller('QuestionEditorModalController', [
           !$scope.isQuestionValid();
     };
 
-
     $scope.done = function() {
       if (!$scope.isQuestionValid()) {
         return;
