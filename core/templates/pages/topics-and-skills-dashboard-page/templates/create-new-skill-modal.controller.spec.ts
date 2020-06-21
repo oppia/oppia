@@ -153,14 +153,4 @@ describe('Create New Skill Modal Controller', function() {
       }
     });
   });
-
-  it('should close the modal on confirm', function() {
-    $scope.confirm();
-    expect($uibModalInstance.close).toHaveBeenCalled();
-  });
-
-  it('should cancel the modal on dismiss', function() {
-    $scope.cancel();
-    expect($uibModalInstance.dismiss).toHaveBeenCalledWith('cancel');
-  });
 });

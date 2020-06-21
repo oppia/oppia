@@ -191,10 +191,5 @@ describe('Collection Editor Pre Publish Modal Controller', function() {
         'Please specify a category');
       expect($uibModalInstance.close).not.toHaveBeenCalled();
     });
-
-    it('should cancel the modal on dismiss', function() {
-      ctrl.cancel();
-      expect($uibModalInstance.dismiss).toHaveBeenCalledWith('cancel');
-    });
   });
 });

@@ -51,14 +51,4 @@ describe('Assign Skill To Topic Modal Controller', function() {
     expect($scope.topicSummaries).toEqual(topicSummaries);
     expect($scope.selectedTopicIds).toEqual([]);
   });
-
-  it('should close the modal on confirm', function() {
-    $scope.confirm();
-    expect($uibModalInstance.close).toHaveBeenCalled();
-  });
-
-  it('should cancel the modal on dismiss', function() {
-    $scope.cancel();
-    expect($uibModalInstance.dismiss).toHaveBeenCalledWith('cancel');
-  });
 });

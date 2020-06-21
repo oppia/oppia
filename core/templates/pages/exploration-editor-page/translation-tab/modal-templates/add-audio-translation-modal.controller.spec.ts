@@ -119,9 +119,4 @@ describe('Add Audio Translation Modal Controller', function() {
     $scope.clearUploadedFile();
     expect($scope.errorMessage).toBe(null);
   });
-
-  it('should cancel the modal on dismiss', function() {
-    $scope.cancel();
-    expect($uibModalInstance.dismiss).toHaveBeenCalledWith('cancel');
-  });
 });

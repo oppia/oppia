@@ -90,13 +90,8 @@ describe('EditProfilePictureModalController', function() {
       });
       $scope.confirm();
 
-      expect($scope.uploadedImage).not.toBe(null);
+      expect($scope.croppedImageDataUrl).toBe(mockUrl);
       expect($uibModalInstance.close).toHaveBeenCalledWith(mockUrl);
     }, 800);
-  });
-
-  it('should cancel the modal on dismiss', function() {
-    $scope.cancel();
-    expect($uibModalInstance.dismiss).toHaveBeenCalledWith('cancel');
   });
 });

@@ -50,14 +50,4 @@ describe('Collection Editor Save Modal Controller', function() {
   it('should init the variables', function() {
     expect($scope.isCollectionPrivate).toBe(isPrivate);
   });
-
-  it('should close the modal on confirm', function() {
-    $scope.confirm();
-    expect($uibModalInstance.close).toHaveBeenCalled();
-  });
-
-  it('should cancel the modal on dismiss', function() {
-    $scope.cancel();
-    expect($uibModalInstance.dismiss).toHaveBeenCalledWith('cancel');
-  });
 });

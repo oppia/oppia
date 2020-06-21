@@ -46,9 +46,4 @@ describe('Add Worked Example Modal Controller', function() {
       workedExampleExplanationHtml: ''
     });
   });
-
-  it('should cancel the modal on dismiss', function() {
-    $scope.cancel();
-    expect($uibModalInstance.dismiss).toHaveBeenCalledWith('cancel');
-  });
 });

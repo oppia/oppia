@@ -97,9 +97,4 @@ describe('Delete Misconception Modal Controller', function() {
       id: '2'
     });
   });
-
-  it('should cancel the modal on dismiss', function() {
-    $scope.cancel();
-    expect($uibModalInstance.dismiss).toHaveBeenCalledWith('cancel');
-  });
 });

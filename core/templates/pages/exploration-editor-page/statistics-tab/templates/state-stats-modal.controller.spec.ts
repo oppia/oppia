@@ -89,9 +89,4 @@ describe('State Stats Modal Controller', function() {
     expect($uibModalInstance.dismiss).toHaveBeenCalledWith('cancel');
     expect(RouterService.navigateToMainTab).toHaveBeenCalledWith(stateName);
   });
-
-  it('should close the modal on confirm', function() {
-    $scope.confirm();
-    expect($uibModalInstance.close).toHaveBeenCalled();
-  });
 });
