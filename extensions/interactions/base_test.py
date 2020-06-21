@@ -325,7 +325,8 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                         # all the keys in the generated html type
                         # dict is initialized as defaultdict object.
                         # Below, we raise an exception if the existing
-                        # interactionID is overwritten by another interactionId.
+                        # interaction ID is overwritten by another
+                        # interaction ID.
                         if (html_type_dict['interactionId'] !=
                                 interaction_id):
                             raise Exception(
