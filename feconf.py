@@ -89,6 +89,10 @@ OBJECT_DEFAULT_VALUES_FILE_PATH = os.path.join(
 RULES_DESCRIPTIONS_FILE_PATH = os.path.join(
     os.getcwd(), 'extensions', 'interactions', 'rule_templates.json')
 
+HTML_FIELD_TYPES_TO_RULE_SPECS_FILE_PATH = os.path.join(
+    os.getcwd(), 'extensions', 'interactions',
+    'html_field_types_to_rule_specs.json')
+
 # A mapping of interaction ids to classifier properties.
 INTERACTION_CLASSIFIER_MAPPING = {
     'TextInput': {
@@ -124,6 +128,17 @@ ALLOWED_TRAINING_JOB_STATUS_CHANGES = {
                                   TRAINING_JOB_STATUS_FAILED],
     TRAINING_JOB_STATUS_FAILED: [TRAINING_JOB_STATUS_NEW]
 }
+
+# Allowed formats of how HTML is present in rule specs.
+HTML_RULE_VARIABLE_FORMAT_SET = 'set'
+HTML_RULE_VARIABLE_FORMAT_STRING = 'string'
+HTML_RULE_VARIABLE_FORMAT_LIST_OF_SETS = 'listOfSets'
+
+ALLOWED_HTML_RULE_VARIABLE_FORMATS = [
+    HTML_RULE_VARIABLE_FORMAT_SET,
+    HTML_RULE_VARIABLE_FORMAT_STRING,
+    HTML_RULE_VARIABLE_FORMAT_LIST_OF_SETS
+]
 
 ENTITY_TYPE_EXPLORATION = 'exploration'
 ENTITY_TYPE_TOPIC = 'topic'
