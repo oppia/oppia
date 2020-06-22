@@ -1138,7 +1138,7 @@ class WrittenTranslations(python_utils.OBJECT):
         return translation_counts
 
     def get_all_html_content_strings(self):
-        """Gets all html content strings used in the written translations.
+        """Gets all html content strings used in the WrittenTranslations.
 
         Returns:
             list(str). The list of html content strings.
