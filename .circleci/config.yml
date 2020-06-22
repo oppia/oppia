@@ -264,11 +264,11 @@ jobs:
       - run:
           name: Run e2e topics and skills dashboard test
           command: |
-            python -m scripts.run_e2e_tests --skip-install --suite="topicsAndSkillsDashboard"
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="topicsAndSkillsDashboard"
       - run:
           name: Run e2e topics and story editor
           command: |
-            python -m scripts.run_e2e_tests --skip-install --suite="topicAndStoryEditor"
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="topicAndStoryEditor"
       - run:
           name: Run e2e classroom page test
           command: |
