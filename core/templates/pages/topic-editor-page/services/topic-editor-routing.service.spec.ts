@@ -35,11 +35,13 @@ describe('Topic editor routing service', function() {
 
   var $rootScope = null;
   var $location = null;
+  var $window = null;
   var TopicEditorRoutingService = null;
 
   beforeEach(angular.mock.inject(function($injector) {
     $rootScope = $injector.get('$rootScope');
     $location = $injector.get('$location');
+    $window = $injector.get('$window');
     TopicEditorRoutingService = $injector.get('TopicEditorRoutingService');
   }));
 
@@ -79,5 +81,14 @@ describe('Topic editor routing service', function() {
     $location.path('');
     $rootScope.$apply();
     expect(TopicEditorRoutingService.getActiveTabName()).toEqual('main');
+  });
+
+  it('should navigate to skill editor', function() {
+    spyOn($window, 'open' ).and.callFake( function() {
+      return true;
+    } );
+    TopicEditorRoutingService.navigateToSkillEditorWithId('10');
+    expect( $window.open ).toHaveBeenCalled();
+    expect( $window.open ).toHaveBeenCalledWith( '/skill_editor/10' );
   });
 });

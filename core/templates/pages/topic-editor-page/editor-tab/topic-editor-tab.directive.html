@@ -47,7 +47,7 @@
         </span>
         <div>
           <button class="btn btn-secondary" ng-click="togglePreview()">Show/Hide Preview</button>
-          <div ng-if="topic.getId() && showPreview">
+          <div ng-if="topic.getId() && topicPreviewCardIsShown">
             <preview-thumbnail name="editableName"
                                description="editableDescription"
                                preview-footer="topic.getCanonicalStoryIds().length"
@@ -96,12 +96,15 @@
       <div ng-if="uncategorizedSkillSummaries.length">
         <div class="list-header">
           <span>Name</span>
-          <span># of Questions</span>
         </div>
-        <div ng-repeat="skill in uncategorizedSkillSummaries">
-          <a ng-click="navigateToSkillEditor(skill.getId())" class="skills-list-item">
-            <span><[skill.getDescription()]></span>
+        <div ng-repeat="skillSummary in uncategorizedSkillSummaries" class="skills-list-item">
+          <a ng-href="<[getSkillEditorUrl(skillSummary.getId())]>" target="_blank" rel="noopener">
+            <span><[skillSummary.getDescription()]></span>
           </a>
+          <button class="btn btn-secondary"
+                  ng-click="deleteUncategorizedSkillFromTopic(skillSummary)">
+            Delete
+          </button>
         </div>
       </div>
     </md-card>
@@ -189,6 +192,17 @@
 
   .topic-editor .story-count {
     border-right: none;
+  }
+
+  .topic-editor .skills-list-item {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+
+  .topic-editor .skills-list-item a {
+    color: inherit;
+    text-decoration: none;
   }
 
   .topic-editor .subtopic-count-value,

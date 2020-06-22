@@ -23,19 +23,19 @@ require(
   'confirm-or-cancel-modal.controller.ts');
 require('domain/topic/topic-update.service.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
-require('pages/topic-editor-page/services/topic-editor-helper.service.ts');
+require('pages/topic-editor-page/services/subtopic-validation-service.ts');
 require('domain/topic/SubtopicPageObjectFactory.ts');
 
 const createSubtopicConstants = require('constants.ts');
 
 angular.module('oppia').controller('CreateNewSubtopicModalController', [
   '$controller', '$scope', '$uibModalInstance',
-  'SubtopicPageObjectFactory', 'TopicEditorHelperService',
+  'SubtopicPageObjectFactory', 'SubtopicValidationService',
   'TopicEditorStateService', 'TopicUpdateService',
   'topic', 'MAX_CHARS_IN_SUBTOPIC_TITLE',
   function(
       $controller, $scope, $uibModalInstance,
-      SubtopicPageObjectFactory, TopicEditorHelperService,
+      SubtopicPageObjectFactory, SubtopicValidationService,
       TopicEditorStateService, TopicUpdateService,
       topic, MAX_CHARS_IN_SUBTOPIC_TITLE) {
     $controller('ConfirmOrCancelModalController', {
@@ -100,7 +100,7 @@ angular.module('oppia').controller('CreateNewSubtopicModalController', [
     };
 
     ctrl.save = function() {
-      if (!TopicEditorHelperService.checkValidSubtopicName(
+      if (!SubtopicValidationService.checkValidSubtopicName(
         ctrl.subtopicTitle)) {
         ctrl.errorMsg = 'A subtopic with this title already exists';
         return;

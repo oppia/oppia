@@ -36,7 +36,9 @@ describe('Subtopic editor tab directive', function() {
   var directive = null;
   var TopicEditorStateService = null;
   var TopicUpdateService = null;
-  var TopicEditorHelperService = null;
+  var EntityCreationService = null;
+  var SubtopicValidationService = null;
+  var TopicEditorRoutingService = null;
   var TopicObjectFactory = null;
   var SubtopicObjectFactory = null;
   var SkillSummaryObjectFactory = null;
@@ -48,7 +50,9 @@ describe('Subtopic editor tab directive', function() {
     ContextService = $injector.get('ContextService');
     TopicEditorStateService = $injector.get('TopicEditorStateService');
     TopicUpdateService = $injector.get('TopicUpdateService');
-    TopicEditorHelperService = $injector.get('TopicEditorHelperService');
+    SubtopicValidationService = $injector.get('SubtopicValidationService');
+    EntityCreationService = $injector.get('EntityCreationService');
+    TopicEditorRoutingService = $injector.get('TopicEditorRoutingService');
     SubtopicObjectFactory = $injector.get('SubtopicObjectFactory');
     SubtopicPageObjectFactory = $injector.get('SubtopicPageObjectFactory');
     SkillSummaryObjectFactory = $injector.get('SkillSummaryObjectFactory');
@@ -67,7 +71,7 @@ describe('Subtopic editor tab directive', function() {
     spyOn(TopicEditorStateService, 'getTopic').and.returnValue(topic);
     spyOn(TopicEditorStateService,
       'getSubtopicPage').and.returnValue(subtopicPage);
-    spyOn(TopicEditorHelperService, 'getSubtopicIdFromUrl')
+    spyOn(TopicEditorRoutingService, 'getSubtopicIdFromUrl')
       .and.returnValue('1');
 
     ctrl = $injector.instantiate(directive.controller, {
@@ -187,14 +191,14 @@ describe('Subtopic editor tab directive', function() {
     });
 
   it('should call SkillCreationService to create skill', function() {
-    var skillSpy = spyOn(TopicEditorHelperService, 'createSkill');
+    var skillSpy = spyOn(EntityCreationService, 'createSkill');
     ctrl.createSkill();
     expect(skillSpy).toHaveBeenCalled();
   });
 
   it('should set the error message if subtopic title is invalid', function() {
     expect(ctrl.errorMsg).toEqual(null);
-    spyOn(TopicEditorHelperService, 'checkValidSubtopicName')
+    spyOn(SubtopicValidationService, 'checkValidSubtopicName')
       .and.callFake(() => false);
     ctrl.updateSubtopicTitle('New Subtopic1');
     expect(ctrl.errorMsg).toEqual(
@@ -202,7 +206,7 @@ describe('Subtopic editor tab directive', function() {
   });
 
   it('should reset the error message', function() {
-    spyOn(TopicEditorHelperService, 'checkValidSubtopicName')
+    spyOn(SubtopicValidationService, 'checkValidSubtopicName')
       .and.callFake(() => false);
     ctrl.updateSubtopicTitle('New Subtopic1');
     expect(ctrl.errorMsg).toEqual(

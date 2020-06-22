@@ -13,15 +13,17 @@
 // limitations under the License.
 
 /**
- * @fileoverview Service to maintain the state of a single topic shared
- * throughout the topic editor. This service provides functionality for
- * retrieving the topic, saving it, and listening for changes.
+ * @fileoverview Service to help with creating various entities. This is needed
+ * so that we don't have to write redundant code every time we want to create
+ * an entity.
  */
 
 require('base-components/base-content.directive.ts');
 require(
   'components/common-layout-directives/common-elements/' +
     'background-banner.component.ts');
+require(
+  'components/review-material-editor/review-material-editor.directive.ts');
 require(
   'components/forms/custom-forms-directives/select2-dropdown.directive.ts');
 require('components/entity-creation-services/skill-creation.service.ts');
@@ -37,13 +39,13 @@ require('pages/topic-editor-page/modal-templates/' +
 require('services/context.service.ts');
 require('services/image-local-storage.service.ts');
 
-angular.module('oppia').factory('TopicEditorHelperService', [
-  '$location', '$uibModal', '$window', 'ContextService',
+angular.module('oppia').factory('EntityCreationService', [
+  '$uibModal', 'ContextService',
   'ImageLocalStorageService', 'RubricObjectFactory', 'SkillCreationService',
   'TopicEditorRoutingService', 'TopicEditorStateService',
   'UrlInterpolationService', 'SKILL_DIFFICULTIES',
   function(
-      $location, $uibModal, $window, ContextService,
+      $uibModal, ContextService,
       ImageLocalStorageService, RubricObjectFactory, SkillCreationService,
       TopicEditorRoutingService, TopicEditorStateService,
       UrlInterpolationService, SKILL_DIFFICULTIES) {
@@ -51,7 +53,7 @@ angular.module('oppia').factory('TopicEditorHelperService', [
       $uibModal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/topic-editor-page/modal-templates/' +
-                    'create-new-subtopic-modal.template.html'),
+                'create-new-subtopic-modal.template.html'),
         backdrop: true,
         resolve: {
           topic: () => topic
@@ -63,19 +65,6 @@ angular.module('oppia').factory('TopicEditorHelperService', [
       });
     };
 
-    var getSubtopicIdFromUrl = function() {
-      return $location.path().split('/')[2];
-    };
-
-    var navigateToSkillEditorWithId = function(skillId) {
-      var SKILL_EDITOR_URL_TEMPLATE = '/skill_editor/<skill_id>';
-
-      var skillEditorUrl = UrlInterpolationService.interpolateUrl(
-        SKILL_EDITOR_URL_TEMPLATE, {
-          skill_id: skillId
-        });
-      $window.open(skillEditorUrl);
-    };
     var createSkill = function() {
       var topicId = TopicEditorStateService.getTopic().getId();
       var rubrics = [
@@ -102,22 +91,9 @@ angular.module('oppia').factory('TopicEditorHelperService', [
       });
     };
 
-    var checkValidSubtopicName = function(title) {
-      var subtopicTitles = [];
-      var topic = TopicEditorStateService.getTopic();
-      topic.getSubtopics().forEach(
-        function(subtopic) {
-          return subtopicTitles.push(subtopic.getTitle());
-        });
-      return (subtopicTitles.indexOf(title) === -1);
-    };
-
     return {
       createSubtopic: createSubtopic,
-      createSkill: createSkill,
-      checkValidSubtopicName: checkValidSubtopicName,
-      getSubtopicIdFromUrl: getSubtopicIdFromUrl,
-      navigateToSkillEditorWithId: navigateToSkillEditorWithId
+      createSkill: createSkill
     };
   }
 ]);

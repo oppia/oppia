@@ -31,7 +31,7 @@ require('domain/topic/topic-update.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 require('pages/topic-editor-page/services/topic-editor-routing.service.ts');
-require('pages/topic-editor-page/services/topic-editor-helper.service.ts');
+require('pages/topic-editor-page/services/entity-creation.service.ts');
 require(
   'pages/topic-editor-page/editor-tab/topic-editor-stories-list.directive.ts');
 
@@ -42,6 +42,8 @@ require('services/alerts.service.ts');
 require('services/context.service.ts');
 require('services/csrf-token.service.ts');
 require('services/image-upload-helper.service.ts');
+require('domain/question/question-backend-api.service.ts');
+
 
 // TODO(#9186): Change variable name to 'constants' once this file
 // is migrated to Angular.
@@ -58,7 +60,7 @@ angular.module('oppia').directive('topicEditorTab', [
         '$scope', '$uibModal', 'AlertsService',
         'ContextService', 'CsrfTokenService', 'ImageUploadHelperService',
         'SkillCreationService', 'StoryCreationService',
-        'TopicEditorHelperService', 'TopicEditorRoutingService',
+        'EntityCreationService', 'TopicEditorRoutingService',
         'TopicEditorStateService', 'TopicUpdateService', 'UndoRedoService',
         'UrlInterpolationService', 'MAX_CHARS_IN_TOPIC_DESCRIPTION',
         'MAX_CHARS_IN_TOPIC_NAME', 'EVENT_STORY_SUMMARIES_INITIALIZED',
@@ -67,7 +69,7 @@ angular.module('oppia').directive('topicEditorTab', [
             $scope, $uibModal, AlertsService,
             ContextService, CsrfTokenService, ImageUploadHelperService,
             SkillCreationService, StoryCreationService,
-            TopicEditorHelperService, TopicEditorRoutingService,
+            EntityCreationService, TopicEditorRoutingService,
             TopicEditorStateService, TopicUpdateService, UndoRedoService,
             UrlInterpolationService, MAX_CHARS_IN_TOPIC_DESCRIPTION,
             MAX_CHARS_IN_TOPIC_NAME, EVENT_STORY_SUMMARIES_INITIALIZED,
@@ -92,7 +94,6 @@ angular.module('oppia').directive('topicEditorTab', [
             $scope.subtopics = $scope.topic.getSubtopics();
             $scope.uncategorizedSkillSummaries = (
               $scope.topic.getUncategorizedSkillSummaries());
-
             $scope.editableThumbnailDataUrl = (
               ImageUploadHelperService
                 .getTrustedResourceUrlForThumbnailFilename(
@@ -130,11 +131,11 @@ angular.module('oppia').directive('topicEditorTab', [
           };
 
           $scope.createSkill = function() {
-            TopicEditorHelperService.createSkill();
+            EntityCreationService.createSkill();
           };
 
           $scope.createSubtopic = function() {
-            TopicEditorHelperService.createSubtopic($scope.topic);
+            EntityCreationService.createSubtopic($scope.topic);
           };
 
           $scope.updateTopicDescriptionStatus = function(description) {
@@ -173,8 +174,14 @@ angular.module('oppia').directive('topicEditorTab', [
             }
           };
 
+          $scope.deleteUncategorizedSkillFromTopic = function(skillSummary) {
+            TopicUpdateService.removeUncategorizedSkill(
+              $scope.topic, skillSummary);
+            _initEditor();
+          };
+
           $scope.togglePreview = function() {
-            $scope.showPreview = !($scope.showPreview);
+            $scope.topicPreviewCardIsShown = !($scope.topicPreviewCardIsShown);
           };
 
           $scope.deleteSubtopic = function(subtopicId) {
@@ -188,8 +195,22 @@ angular.module('oppia').directive('topicEditorTab', [
             TopicEditorRoutingService.navigateToSubtopicEditorWithId(
               subtopicId);
           };
+
+          $scope.getSkillEditorUrl = function(skillId) {
+            var SKILL_EDITOR_URL_TEMPLATE = '/skill_editor/<skillId>';
+            return UrlInterpolationService.interpolateUrl(
+              SKILL_EDITOR_URL_TEMPLATE, {
+                skillId: skillId
+              }
+            );
+          };
+
+          $scope.navigateToSkill = function(skillId) {
+            TopicEditorRoutingService.navigateToSkillEditorWithId(skillId);
+          };
+
           ctrl.$onInit = function() {
-            $scope.showPreview = false;
+            $scope.topicPreviewCardIsShown = false;
             $scope.$on(EVENT_TOPIC_INITIALIZED, _initEditor);
             $scope.$on(EVENT_TOPIC_REINITIALIZED, _initEditor);
             $scope.$on(EVENT_STORY_SUMMARIES_INITIALIZED, _initStorySummaries);

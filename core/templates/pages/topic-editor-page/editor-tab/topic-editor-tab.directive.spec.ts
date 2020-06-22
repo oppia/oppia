@@ -42,7 +42,7 @@ describe('Topic editor tab directive', function() {
   var TopicEditorStateService = null;
   var TopicObjectFactory = null;
   var SkillCreationService = null;
-  var TopicEditorHelperService = null;
+  var EntityCreationService = null;
   var TopicUpdateService = null;
   var StoryCreationService = null;
   var UndoRedoService = null;
@@ -69,7 +69,7 @@ describe('Topic editor tab directive', function() {
     TopicUpdateService = $injector.get('TopicUpdateService');
     StoryCreationService = $injector.get('StoryCreationService');
     UndoRedoService = $injector.get('UndoRedoService');
-    TopicEditorHelperService = $injector.get('TopicEditorHelperService');
+    EntityCreationService = $injector.get('EntityCreationService');
     TopicEditorRoutingService = $injector.get('TopicEditorRoutingService');
     ctrl = $injector.instantiate(directive.controller, {
       $scope: $scope,
@@ -82,7 +82,7 @@ describe('Topic editor tab directive', function() {
       TopicEditorRoutingService: TopicEditorRoutingService,
       StoryCreationService: StoryCreationService,
       TopicEditorStateService: TopicEditorStateService,
-      TopicEditorHelperService: TopicEditorHelperService
+      EntityCreationService: EntityCreationService
     });
     topic = TopicObjectFactory.createInterstitialTopic();
     spyOn(TopicEditorStateService, 'getTopic').and.returnValue(topic);
@@ -95,14 +95,14 @@ describe('Topic editor tab directive', function() {
     expect($scope.topicDescriptionChanged).toEqual(false);
   });
 
-  it('should call TopicEditorHelperService to create skill', function() {
-    var skillSpy = spyOn(TopicEditorHelperService, 'createSkill');
+  it('should call EntityCreationService to create skill', function() {
+    var skillSpy = spyOn(EntityCreationService, 'createSkill');
     $scope.createSkill();
     expect(skillSpy).toHaveBeenCalled();
   });
 
-  it('should call TopicEditorHelperService to create subtopic', function() {
-    var skillSpy = spyOn(TopicEditorHelperService, 'createSubtopic');
+  it('should call EntityCreationService to create subtopic', function() {
+    var skillSpy = spyOn(EntityCreationService, 'createSubtopic');
     $scope.createSubtopic();
     expect(skillSpy).toHaveBeenCalled();
   });
@@ -158,6 +158,14 @@ describe('Topic editor tab directive', function() {
       expect(topicDescriptionSpy).not.toHaveBeenCalled();
     });
 
+  it('should call the TopicUpdateService if skill is deleted from topic',
+    function() {
+      var topicDeleteSpy = (
+        spyOn(TopicUpdateService, 'removeUncategorizedSkill'));
+      $scope.deleteUncategorizedSkillFromTopic();
+      expect(topicDeleteSpy).toHaveBeenCalled();
+    });
+
   it('should call the TopicUpdateService if thumbnail bg color is updated',
     function() {
       var topicThumbnailBGSpy = (
@@ -165,6 +173,19 @@ describe('Topic editor tab directive', function() {
       $scope.updateTopicThumbnailBgColor('#FFFFFF');
       expect(topicThumbnailBGSpy).toHaveBeenCalled();
     });
+
+  it('should call TopicEditorRoutingService to navigate to skill', function() {
+    var topicThumbnailBGSpy = (
+      spyOn(TopicEditorRoutingService, 'navigateToSkillEditorWithId'));
+    $scope.navigateToSkill('id1');
+    expect(topicThumbnailBGSpy).toHaveBeenCalledWith('id1');
+  });
+
+  it('should return skill editor URL', function() {
+    var skillId = 'asd4242a';
+    expect($scope.getSkillEditorUrl(skillId)).toEqual(
+      '/skill_editor/' + skillId);
+  });
 
   it('should not call the TopicUpdateService if thumbnail bg color is same',
     function() {
@@ -175,10 +196,10 @@ describe('Topic editor tab directive', function() {
       expect(topicThumbnailBGSpy).not.toHaveBeenCalled();
     });
 
-  it('should toggle preview', function() {
-    expect($scope.showPreview).toEqual(false);
+  it('should toggle topic preview', function() {
+    expect($scope.topicPreviewCardIsShown).toEqual(false);
     $scope.togglePreview();
-    expect($scope.showPreview).toEqual(true);
+    expect($scope.topicPreviewCardIsShown).toEqual(true);
   });
 
   it('should return image path', function() {

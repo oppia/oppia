@@ -1,4 +1,4 @@
-// Copyright 2018 The Oppia Authors. All Rights Reserved.
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,9 +21,7 @@
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
-require('pages/topic-editor-page/services/topic-editor-helper.service.ts');
-
-describe('Topic editor helper service', function() {
+describe('Entity creation service', function() {
   beforeEach(angular.mock.module('oppia'));
 
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -42,7 +40,7 @@ describe('Topic editor helper service', function() {
   var TopicObjectFactory = null;
   var TopicEditorStateService = null;
   var TopicEditorRoutingService = null;
-  var TopicEditorHelperService = null;
+  var EntityCreationService = null;
   var SubtopicObjectFactory = null;
 
   beforeEach(angular.mock.inject(function($injector) {
@@ -56,7 +54,7 @@ describe('Topic editor helper service', function() {
     TopicObjectFactory = $injector.get('TopicObjectFactory');
     SubtopicObjectFactory = $injector.get('SubtopicObjectFactory');
     TopicEditorStateService = $injector.get('TopicEditorStateService');
-    TopicEditorHelperService = $injector.get('TopicEditorHelperService');
+    EntityCreationService = $injector.get('EntityCreationService');
 
     var topic = TopicObjectFactory.createInterstitialTopic();
     var subtopic1 = SubtopicObjectFactory.createFromTitle(1, 'Subtopic1');
@@ -77,42 +75,20 @@ describe('Topic editor helper service', function() {
 
       var routingSpy = (
         spyOn(TopicEditorRoutingService, 'navigateToSubtopicEditorWithId'));
-      TopicEditorHelperService.createSubtopic();
+      EntityCreationService.createSubtopic();
       $rootScope.$apply();
       expect(routingSpy).toHaveBeenCalledWith('1');
     });
 
   it('should open create subtopic modal with resolve', function() {
     var spy = spyOn($uibModal, 'open').and.callThrough();
-    TopicEditorHelperService.createSubtopic();
+    EntityCreationService.createSubtopic();
 
     expect(spy).toHaveBeenCalled();
   });
 
   it('should return subtopic Id from URL', function() {
     $location.path('/subtopic_editor/2');
-    expect(TopicEditorHelperService.getSubtopicIdFromUrl()).toEqual('2');
-  });
-
-  it('should navigate to skill editor', function() {
-    spyOn($window, 'open' ).and.callFake( function() {
-      return true;
-    } );
-    TopicEditorHelperService.navigateToSkillEditorWithId('10');
-    expect( $window.open ).toHaveBeenCalled();
-    expect( $window.open ).toHaveBeenCalledWith( '/skill_editor/10' );
-  });
-
-  it('should return if subtopic name is valid', function() {
-    expect(TopicEditorHelperService.checkValidSubtopicName(
-      'Random name')).toEqual(true);
-    expect(TopicEditorHelperService.checkValidSubtopicName(
-      'Subtopic1')).toEqual(false);
-    expect(TopicEditorHelperService.checkValidSubtopicName(
-      'Subtopic2')).toEqual(false);
-    expect(TopicEditorHelperService.checkValidSubtopicName(
-      'Subtopic3')).toEqual(false);
-    expect(TopicEditorHelperService.checkValidSubtopicName(
-      'Subtopic4')).toEqual(true);
+    expect(TopicEditorRoutingService.getSubtopicIdFromUrl()).toEqual('2');
   });
 });

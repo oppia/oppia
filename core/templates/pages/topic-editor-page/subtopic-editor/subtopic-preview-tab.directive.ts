@@ -30,7 +30,6 @@ require('domain/utilities/url-interpolation.service.ts');
 require('services/contextual/url.service.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 require('pages/topic-editor-page/services/topic-editor-routing.service.ts');
-require('pages/topic-editor-page/services/topic-editor-helper.service.ts');
 require('pages/topic-viewer-page/subtopics-list/subtopics-list.directive.ts');
 
 angular.module('oppia').directive('subtopicPreviewTab', [
@@ -43,14 +42,14 @@ angular.module('oppia').directive('subtopicPreviewTab', [
                 'subtopic-preview-tab.directive.html'),
       controller: [
         '$location', '$scope', '$uibModal', 'SubtopicPageObjectFactory',
-        'TopicEditorHelperService', 'TopicEditorStateService',
+        'EntityCreationService', 'TopicEditorStateService',
         'TopicEditorRoutingService', 'TopicUpdateService',
         'UndoRedoService', 'UrlInterpolationService', 'UrlService',
         'EVENT_TOPIC_INITIALIZED', 'EVENT_TOPIC_REINITIALIZED',
         'EVENT_SUBTOPIC_PAGE_LOADED',
         function(
             $location, $scope, $uibModal, SubtopicPageObjectFactory,
-            TopicEditorHelperService, TopicEditorStateService,
+            EntityCreationService, TopicEditorStateService,
             TopicEditorRoutingService, TopicUpdateService,
             UndoRedoService, UrlInterpolationService, UrlService,
             EVENT_TOPIC_INITIALIZED, EVENT_TOPIC_REINITIALIZED,
@@ -58,7 +57,8 @@ angular.module('oppia').directive('subtopicPreviewTab', [
           var ctrl = this;
           var _initEditor = function() {
             $scope.topic = TopicEditorStateService.getTopic();
-            $scope.subtopicId = TopicEditorHelperService.getSubtopicIdFromUrl();
+            $scope.subtopicId = (
+              TopicEditorRoutingService.getSubtopicIdFromUrl());
             $scope.subtopic = (
               $scope.topic.getSubtopicById(parseInt($scope.subtopicId)));
 

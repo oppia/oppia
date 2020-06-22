@@ -29,7 +29,7 @@ require('domain/topic/topic-update.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('services/contextual/url.service.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
-require('pages/topic-editor-page/services/topic-editor-helper.service.ts');
+require('pages/topic-editor-page/services/entity-creation.service.ts');
 require('pages/topic-viewer-page/subtopics-list/subtopics-list.directive.ts');
 
 angular.module('oppia').directive('subtopicEditorTab', [
@@ -42,14 +42,18 @@ angular.module('oppia').directive('subtopicEditorTab', [
         'subtopic-editor-tab.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', 'TopicEditorStateService', 'TopicUpdateService',
-        'TopicEditorHelperService',
+        '$scope', 'SubtopicValidationService', 'TopicEditorStateService',
+        'TopicUpdateService',
+        'EntityCreationService',
+        'TopicEditorRoutingService',
         'UrlInterpolationService', 'EVENT_TOPIC_REINITIALIZED',
         'EVENT_TOPIC_INITIALIZED', 'EVENT_SUBTOPIC_PAGE_LOADED',
         'MAX_CHARS_IN_SUBTOPIC_TITLE',
         function(
-            $scope, TopicEditorStateService, TopicUpdateService,
-            TopicEditorHelperService,
+            $scope, SubtopicValidationService, TopicEditorStateService,
+            TopicUpdateService,
+            EntityCreationService,
+            TopicEditorRoutingService,
             UrlInterpolationService, EVENT_TOPIC_REINITIALIZED,
             EVENT_TOPIC_INITIALIZED, EVENT_SUBTOPIC_PAGE_LOADED,
             MAX_CHARS_IN_SUBTOPIC_TITLE) {
@@ -58,7 +62,7 @@ angular.module('oppia').directive('subtopicEditorTab', [
           ctrl.MAX_CHARS_IN_SUBTOPIC_TITLE = MAX_CHARS_IN_SUBTOPIC_TITLE;
           var _initEditor = function() {
             ctrl.topic = TopicEditorStateService.getTopic();
-            ctrl.subtopicId = TopicEditorHelperService.getSubtopicIdFromUrl();
+            ctrl.subtopicId = TopicEditorRoutingService.getSubtopicIdFromUrl();
             ctrl.subtopic = ctrl.topic.getSubtopicById(
               parseInt(ctrl.subtopicId));
             ctrl.errorMsg = null;
@@ -89,7 +93,7 @@ angular.module('oppia').directive('subtopicEditorTab', [
               return;
             }
 
-            if (!TopicEditorHelperService.checkValidSubtopicName(title)) {
+            if (!SubtopicValidationService.checkValidSubtopicName(title)) {
               ctrl.errorMsg = 'A subtopic with this title already exists';
               return;
             }
@@ -194,7 +198,7 @@ angular.module('oppia').directive('subtopicEditorTab', [
           };
 
           ctrl.createSkill = function() {
-            TopicEditorHelperService.createSkill();
+            EntityCreationService.createSkill();
           };
 
           ctrl.$onInit = function() {

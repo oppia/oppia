@@ -33,7 +33,7 @@ require(
 
 require('pages/topic-editor-page/services/topic-editor-routing.service.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
-require('pages/topic-editor-page/services/topic-editor-helper.service.ts');
+require('pages/topic-editor-page/services/entity-creation.service.ts');
 require('services/context.service.ts');
 require('services/contextual/url.service.ts');
 require('services/page-title.service.ts');
@@ -53,13 +53,13 @@ angular.module('oppia').directive('topicEditorPage', [
       controllerAs: '$ctrl',
       controller: [
         '$scope', '$window', 'AlertsService', 'ContextService',
-        'PageTitleService', 'TopicEditorHelperService',
+        'PageTitleService', 'EntityCreationService',
         'TopicEditorRoutingService', 'TopicEditorStateService',
         'UndoRedoService', 'UrlService', 'EVENT_TOPIC_INITIALIZED',
         'EVENT_TOPIC_REINITIALIZED', 'EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED',
         'TOPIC_VIEWER_URL_TEMPLATE',
         function($scope, $window, AlertsService, ContextService,
-            PageTitleService, TopicEditorHelperService,
+            PageTitleService, EntityCreationService,
             TopicEditorRoutingService, TopicEditorStateService,
             UndoRedoService, UrlService, EVENT_TOPIC_INITIALIZED,
             EVENT_TOPIC_REINITIALIZED, EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED,
@@ -99,7 +99,7 @@ angular.module('oppia').directive('topicEditorPage', [
                   }
                 ), 'blank');
             } else {
-              var subtopicId = TopicEditorHelperService.getSubtopicIdFromUrl();
+              var subtopicId = TopicEditorRoutingService.getSubtopicIdFromUrl();
               TopicEditorRoutingService.navigateToSubtopicPreviewTab(
                 subtopicId);
             }

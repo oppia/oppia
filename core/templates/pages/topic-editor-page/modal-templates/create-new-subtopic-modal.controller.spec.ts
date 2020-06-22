@@ -36,7 +36,7 @@ describe('Create new subtopic modal', function() {
   var $uibModalInstance = null;
   var NewlyCreatedTopicObjectFactory = null;
   var TopicObjectFactory = null;
-  var TopicEditorHelperService = null;
+  var SubtopicValidationService = null;
   var topic = null;
   beforeEach(angular.mock.inject(function($injector, $controller) {
     var $rootScope = $injector.get('$rootScope');
@@ -47,14 +47,13 @@ describe('Create new subtopic modal', function() {
             $injector.get('NewlyCreatedTopicObjectFactory');
     TopicObjectFactory =
             $injector.get('TopicObjectFactory');
-    TopicEditorHelperService = $injector.get('TopicEditorHelperService');
+    SubtopicValidationService = $injector.get('SubtopicValidationService');
     $scope = $rootScope.$new();
     topic = TopicObjectFactory.createInterstitialTopic();
     ctrl = $controller('CreateNewSubtopicModalController', {
       $scope: $scope,
       $uibModalInstance: $uibModalInstance,
-      topic: topic,
-      TopicEditorHelperService: TopicEditorHelperService
+      topic: topic
     });
   }));
 
@@ -85,7 +84,7 @@ describe('Create new subtopic modal', function() {
 
   it('should show error message if subtopic name is invalid', function() {
     expect(ctrl.errorMsg).toEqual(null);
-    spyOn(TopicEditorHelperService,
+    spyOn(SubtopicValidationService,
       'checkValidSubtopicName').and.returnValue(false);
     ctrl.subtopicTitle = 'Subtopic1';
     ctrl.save();
@@ -96,7 +95,7 @@ describe('Create new subtopic modal', function() {
 
   it('should show reset the error message ', function() {
     expect(ctrl.errorMsg).toEqual(null);
-    spyOn(TopicEditorHelperService,
+    spyOn(SubtopicValidationService,
       'checkValidSubtopicName').and.returnValue(false);
     ctrl.subtopicTitle = 'Subtopic1';
     ctrl.save();

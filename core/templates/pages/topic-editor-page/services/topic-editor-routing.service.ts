@@ -15,12 +15,13 @@
 /**
  * @fileoverview Service that handles routing for the topic editor page.
  */
+require('domain/utilities/url-interpolation.service.ts');
 
 
 angular.module('oppia').factory('TopicEditorRoutingService', [
-  '$location', '$rootScope',
+  '$location', '$rootScope', '$window', 'UrlInterpolationService',
   function(
-      $location, $rootScope) {
+      $location, $rootScope, $window, UrlInterpolationService) {
     var MAIN_TAB = 'main';
     var SUBTOPIC_EDITOR_TAB = 'subtopic_editor';
     var SUBTOPIC_PREVIEW_TAB = 'subtopic_preview';
@@ -68,6 +69,18 @@ angular.module('oppia').factory('TopicEditorRoutingService', [
       },
       navigateToQuestionsTab: function() {
         $location.path('/questions');
+      },
+      getSubtopicIdFromUrl: function() {
+        return $location.path().split('/')[2];
+      },
+      navigateToSkillEditorWithId: function(skillId) {
+        var SKILL_EDITOR_URL_TEMPLATE = '/skill_editor/<skill_id>';
+
+        var skillEditorUrl = UrlInterpolationService.interpolateUrl(
+          SKILL_EDITOR_URL_TEMPLATE, {
+            skill_id: skillId
+          });
+        $window.open(skillEditorUrl);
       }
     };
 
