@@ -1,33 +1,41 @@
-<link rel="stylesheet" href="/third_party/static/guppy-b5055b/build/guppy-default.min.css">
+<link rel="stylesheet" href="/third_party/static/guppy-175999/build/guppy-default.min.css">
 <script>
   // Use the normal default browser eventlistener without passive set to false.
   // TODO(#8833): Use passive listeners when guppy supports it.
   EventTarget.prototype.addEventListener = (
     EventTarget.prototype.addEventListener._original);
 </script>
-<script type="text/javascript" src="/third_party/static/guppy-b5055b/build/guppy.min.js"></script>
-
-<script type="text/javascript">
-  Guppy.init({
-    "path": "/third_party/static/guppy-b5055b/build"
-  });
-</script>
+<script type="text/javascript" src="/third_party/static/guppy-175999/build/guppy.min.js"></script>
 
 <style>
+  /* Some of the style attributes have been marked with '!important' since they
+  are directly applied to the element's style attributes in the third-party lib
+  and thus need to be overriden with '!important'. The styles are being added
+  here: https://github.com/daniel3735928559/guppy/blob/1759992a3885cb99d3ead04241f318a074c9f963/build/guppy.js#L4292*/
+
+  .guppy_help {
+    top: 4% !important;
+    left: 12% !important;
+    width: 80%;
+    z-index: 1052;
+  }
+
   .guppy_active {
+    width: 550px;
     border: 1px solid rgba(81, 203, 238, 1);
   }
 
   .guppy_inactive {
+    width: 550px;
     background: #ffffff;
-    border: 1px solid black;
+    border: 1px solid #000000;
   }
 
   .guppy_active .main_cursor {
     animation: guppy-blink-animation 1s steps(2, start) infinite;
     -webkit-animation: guppy-blink-animation 1s steps(2, start) infinite;
     /* Overrides the inline styling and sets the cursor color to black. */
-    color: black !important;
+    color: #000000 !important;
   }
 
   @keyframes guppy-blink-animation {
