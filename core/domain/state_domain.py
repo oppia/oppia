@@ -281,8 +281,8 @@ class Solution(python_utils.OBJECT):
             interaction_id: str. The interaction id.
             answer_is_exclusive: bool. True if is the only correct answer;
                 False if is one of possible answer.
-            correct_answer: str. The correct answer; this answer enables the
-                learner to progress to the next card.
+            correct_answer: BaseInteraction.answer_type. The correct answer;
+                this answer enables the learner to progress to the next card.
             explanation: SubtitledHtml. Contains text and text id to link audio
                 translations for the solution's explanation.
         """
@@ -620,10 +620,13 @@ class InteractionInstance(python_utils.OBJECT):
         if self.solution:
             solution_html = self.solution.explanation.html
             html_list = html_list + [solution_html]
-            if (self.solution.correct_answer and
-                    isinstance(self.solution.correct_answer, list)):
-                for value in self.solution.correct_answer:
-                    if isinstance(value, list):
+            if self.solution.correct_answer:
+                interaction = (
+                    interaction_registry.Registry.get_interaction_by_id(
+                        self.id).to_dict())
+                if (interaction['answer_type'] ==
+                        feconf.ANSWER_TYPE_LIST_OF_SETS_OF_HTML):
+                    for value in self.solution.correct_answer:
                         html_list = html_list + [value[0]]
 
         if self.id in (
