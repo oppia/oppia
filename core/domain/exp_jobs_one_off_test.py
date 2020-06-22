@@ -371,7 +371,7 @@ class MathExpressionValidationOneOffJobTests(test_utils.GenericTestBase):
         answer_group_list4 = [{
             'rule_specs': [{
                 'rule_type': 'IsMathematicallyEquivalentTo',
-                'inputs': {'x': r'\frac{x}{y}'}
+                'inputs': {'x': r'\sqrt{\frac{x}{y}}'}
             }],
             'outcome': {
                 'dest': 'State1',
@@ -403,32 +403,36 @@ class MathExpressionValidationOneOffJobTests(test_utils.GenericTestBase):
         expected_output = [
             u'[u\'Invalid\', [u\'State3: x<y>z\']]',
             u'[u\'Valid Equation\', [u\'State2: y=m*x+c\']]',
-            u'[u\'Valid Expression\', [u\'State1: x+y-z\', u\'State4: x/y\']]']
+            u'[u\'Valid Expression\', [u\'State1: x+y-z\', '
+            u'u\'State4: sqrt(x/y)\']]']
 
         self.assertEqual(actual_output, expected_output)
 
     def test_no_of_valid_exps_yielded_is_under_limit(self):
         """Checks that the number of valid explorations yielded is less than
-        the limit mentioned by the MATH_VALID_EXP_LIMIT constant.
+        the limit mentioned by the VALID_MATH_EXP_YIELD_LIMIT constant.
         """
 
         # Resetting the threshold only for testing purposes.
-        exp_jobs_one_off.MATH_VALID_EXP_LIMIT = 3
+        exp_jobs_one_off.VALID_MATH_EXP_YIELD_LIMIT = 3
 
         exploration = exp_domain.Exploration.create_default_exploration(
             self.VALID_EXP_ID, title='title', category='category')
 
-        exploration.add_states(['State1', 'State2', 'State3', 'State4'])
+        exploration.add_states([
+            'State1', 'State2', 'State3', 'State4', 'State5'])
 
         state1 = exploration.states['State1']
         state2 = exploration.states['State2']
         state3 = exploration.states['State3']
         state4 = exploration.states['State4']
+        state5 = exploration.states['State5']
 
         state1.update_interaction_id('MathExpressionInput')
         state2.update_interaction_id('MathExpressionInput')
         state3.update_interaction_id('MathExpressionInput')
         state4.update_interaction_id('MathExpressionInput')
+        state5.update_interaction_id('MathExpressionInput')
 
         answer_group_list1 = [{
             'rule_specs': [{
@@ -479,7 +483,7 @@ class MathExpressionValidationOneOffJobTests(test_utils.GenericTestBase):
         answer_group_list3 = [{
             'rule_specs': [{
                 'rule_type': 'IsMathematicallyEquivalentTo',
-                'inputs': {'x': r'\frac{x}{y}'}
+                'inputs': {'x': r'\sqrt{\frac{x}{y}}'}
             }],
             'outcome': {
                 'dest': 'State2',
@@ -522,6 +526,29 @@ class MathExpressionValidationOneOffJobTests(test_utils.GenericTestBase):
         state4.update_interaction_answer_groups(answer_group_list4)
         exp_services.save_new_exploration(self.albert_id, exploration)
 
+        answer_group_list5 = [{
+            'rule_specs': [{
+                'rule_type': 'IsMathematicallyEquivalentTo',
+                'inputs': {'x': r'\pi \cdot r^2'}
+            }],
+            'outcome': {
+                'dest': 'State1',
+                'feedback': {
+                    'content_id': 'feedback',
+                    'html': '<p>Outcome for state5</p>'
+                },
+                'param_changes': [],
+                'labelled_as_correct': False,
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }]
+
+        state5.update_interaction_answer_groups(answer_group_list5)
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
         # Start MathExpressionInteractionOneOff job on sample exploration.
         job_id = (
             exp_jobs_one_off.MathExpressionValidationOneOffJob.create_new(
@@ -535,7 +562,8 @@ class MathExpressionValidationOneOffJobTests(test_utils.GenericTestBase):
         # Only 3 exploration details should be yielded since the threshold is 3.
         expected_output = [
             u'[u\'Valid Equation\', [u\'State2: y=m*x+c\']]',
-            u'[u\'Valid Expression\', [u\'State1: x+y-z\', u\'State3: x/y\']]']
+            u'[u\'Valid Expression\', [u\'State3: sqrt(x/y)\', '
+            u'u\'State1: x+y-z\', u\'State5: pi* r^2\']]']
 
         self.assertEqual(actual_output, expected_output)
 

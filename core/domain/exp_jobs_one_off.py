@@ -33,16 +33,24 @@ from core.domain import html_validation_service
 from core.domain import rights_manager
 from core.platform import models
 import feconf
-from pylatexenc import latex2text
 import python_utils
 import schema_utils
 import utils
+
+from pylatexenc import latex2text
 
 (exp_models,) = models.Registry.import_models([
     models.NAMES.exploration])
 gae_image_services = models.Registry.import_gae_image_services()
 
-MATH_VALID_EXP_LIMIT = 200
+# This threshold puts a cap on the number of valid explorations that can be
+# yielded by the MathExpressionValidationOneOffJob.
+VALID_MATH_EXP_YIELD_LIMIT = 200
+UNICODE_TO_TEXT = {
+    u'\u221a': 'sqrt',
+    u'\u03c0': 'pi',
+    u'\xb7': '*'
+}
 ADDED_THREE_VERSIONS_TO_GCS = 'Added the three versions'
 _COMMIT_TYPE_REVERT = 'revert'
 ALL_IMAGES_VERIFIED = 'Images verified'
@@ -120,7 +128,7 @@ class MultipleChoiceInteractionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
 class MathExpressionValidationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """Job that produces a list of explorations that use the MathExpressionInput
-    along with the validity and type(expression/equation) of the inputs present
+    along with the validity and type (expression/equation) of the inputs present
     in the exploration.
 
     This validation is done by the 'is_valid_math_expression' or the
@@ -138,7 +146,6 @@ class MathExpressionValidationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         is_valid_math_equation = schema_utils.get_validator(
             'is_valid_math_equation')
         ltt = latex2text.LatexNodes2Text()
-        valid_exps_seen = 0
 
         if not item.deleted:
             exploration = exp_fetchers.get_exploration_from_model(item)
@@ -148,21 +155,31 @@ class MathExpressionValidationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                         for rule_spec in group.rule_specs:
                             rule_input = ltt.latex_to_text(
                                 rule_spec.inputs['x'])
+
+                            # The pylatexenc lib outputs the unicode values of
+                            # special characters like sqrt and pi, which is why
+                            # they need to be replaced with their corresponding
+                            # text values before performing validation.
+                            for unicode_char, text in UNICODE_TO_TEXT.items():
+                                rule_input = rule_input.replace(
+                                    unicode_char, text)
+
                             validity = 'Invalid'
                             if is_valid_math_expression(rule_input):
                                 validity = 'Valid Expression'
-                                valid_exps_seen += 1
                             elif is_valid_math_equation(rule_input):
                                 validity = 'Valid Equation'
-                                valid_exps_seen += 1
-                            if valid_exps_seen <= MATH_VALID_EXP_LIMIT:
-                                yield (
-                                    validity,
-                                    u'%s: %s' % (state_name, rule_input))
+
+                            yield (
+                                validity,
+                                u'%s: %s' % (state_name, rule_input))
 
     @staticmethod
     def reduce(key, values):
-        yield (key, values)
+        if key.startswith('Valid'):
+            yield (key, values[:VALID_MATH_EXP_YIELD_LIMIT])
+        else:
+            yield (key, values)
 
 
 class ExplorationFirstPublishedOneOffJob(jobs.BaseMapReduceOneOffJobManager):

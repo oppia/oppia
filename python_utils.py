@@ -30,6 +30,10 @@ sys.path.insert(0, _FUTURE_PATH)
 _YAML_PATH = os.path.join(os.getcwd(), '..', 'oppia_tools', 'pyyaml-5.1.2')
 sys.path.insert(0, _YAML_PATH)
 
+_PYLATEXENC_PATH = os.path.join(
+    os.getcwd(), '..', 'oppia_tools', 'pylatexenc-2.5')
+sys.path.insert(0, _PYLATEXENC_PATH)
+
 # pylint: disable=wrong-import-position
 # pylint: disable=wrong-import-order
 import yaml  # isort:skip
