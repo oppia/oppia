@@ -35,6 +35,8 @@ export interface IMultipleIncorrectSubmissionsCustomizationArgs {
 }
 
 // NOTE TO DEVELOPERS: Treat this as an implementation detail; do not export it.
+// This type takes one of the values of the above customization args based
+// on the type of IssueType.
 type IssueCustomizationArgs<IssueType> = (
   IssueType extends 'EarlyQuit' ? IEarlyQuitCustomizationArgs :
   IssueType extends 'CyclicStateTransitions' ?

@@ -42,6 +42,8 @@ export interface IExplorationQuitCustomizationArgs {
 }
 
 // NOTE TO DEVELOPERS: Treat this as an implementation detail; do not export it.
+// This type takes one of the values of the above customization args based
+// on the type of ActionType.
 type ActionCustomizationArgs<ActionType> = (
   ActionType extends 'ExplorationStart' ?
   IExplorationStartCustomizationArgs :
