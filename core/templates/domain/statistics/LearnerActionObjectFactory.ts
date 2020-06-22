@@ -50,6 +50,8 @@ type ActionCustomizationArgs<ActionType> = (
   IExplorationQuitCustomizationArgs : never);
 
 // NOTE TO DEVELOPERS: Treat this as an implementation detail; do not export it.
+// This interface takes the type of backend dict according to the ActionType
+// parameter.
 interface ILearnerActionBackendDictBase<ActionType> {
   'action_type': ActionType;
   'action_customization_args': ActionCustomizationArgs<ActionType>;
@@ -71,6 +73,7 @@ export type ILearnerActionBackendDict = (
   IExplorationQuitLearnerActionBackendDict);
 
 // NOTE TO DEVELOPERS: Treat this as an implementation detail; do not export it.
+// This class takes the type according to the ActionType parameter.
 class LearnerActionBase<ActionType> {
   constructor(
       public readonly actionType: ActionType,
@@ -109,33 +112,30 @@ export type LearnerAction = (
 })
 export class LearnerActionObjectFactory {
   createNewExplorationStartAction(
-      actionType: 'ExplorationStart',
       actionCustomizationArgs: IExplorationStartCustomizationArgs,
       schemaVersion?: number): ExplorationStartLearnerAction {
     schemaVersion = schemaVersion ||
       StatisticsDomainConstants.LEARNER_ACTION_SCHEMA_LATEST_VERSION;
     return new ExplorationStartLearnerAction(
-      actionType, actionCustomizationArgs, schemaVersion);
+      'ExplorationStart', actionCustomizationArgs, schemaVersion);
   }
 
   createNewAnswerSubmitAction(
-      actionType: 'AnswerSubmit',
       actionCustomizationArgs: IAnswerSubmitCustomizationArgs,
       schemaVersion?: number): AnswerSubmitLearnerAction {
     schemaVersion = schemaVersion ||
     StatisticsDomainConstants.LEARNER_ACTION_SCHEMA_LATEST_VERSION;
     return new AnswerSubmitLearnerAction(
-      actionType, actionCustomizationArgs, schemaVersion);
+      'AnswerSubmit', actionCustomizationArgs, schemaVersion);
   }
 
   createNewExplorationQuitAction(
-      actionType: 'ExplorationQuit',
       actionCustomizationArgs: IExplorationQuitCustomizationArgs,
       schemaVersion?: number): ExplorationQuitLearnerAction {
     schemaVersion = schemaVersion ||
     StatisticsDomainConstants.LEARNER_ACTION_SCHEMA_LATEST_VERSION;
     return new ExplorationQuitLearnerAction(
-      actionType, actionCustomizationArgs, schemaVersion);
+      'ExplorationQuit', actionCustomizationArgs, schemaVersion);
   }
 
   /**

@@ -37,14 +37,11 @@ describe('Learner Action Object Factory', () => {
 
   it('should create a new learner action', () => {
     var answerSubmitlearnerActionObject =
-      this.LearnerActionObjectFactory.createNewAnswerSubmitAction(
-        'AnswerSubmit', {});
+      this.LearnerActionObjectFactory.createNewAnswerSubmitAction({});
     var explorationStartlearnerActionObject =
-      this.LearnerActionObjectFactory.createNewExplorationStartAction(
-        'ExplorationStart', {});
+      this.LearnerActionObjectFactory.createNewExplorationStartAction({});
     var explorationQuitlearnerActionObject =
-      this.LearnerActionObjectFactory.createNewExplorationQuitAction(
-        'ExplorationQuit', {});
+      this.LearnerActionObjectFactory.createNewExplorationQuitAction({});
 
     expect(answerSubmitlearnerActionObject.actionType).toEqual('AnswerSubmit');
     expect(answerSubmitlearnerActionObject.actionCustomizationArgs).toEqual({});
@@ -70,14 +67,13 @@ describe('Learner Action Object Factory', () => {
 
     expect(() => {
       return LearnerActionObjectFactoryLocalReference.
-        createNewAnswerSubmitAction('AnswerSubmit', {}, -1);
+        createNewAnswerSubmitAction({}, -1);
     }).toThrowError('given invalid schema version');
   });
 
   it('should use a specific schema version if provided', () => {
     var learnerActionObject =
-        this.LearnerActionObjectFactory.createNewAnswerSubmitAction(
-          'AnswerSubmit', {}, 99);
+        this.LearnerActionObjectFactory.createNewAnswerSubmitAction({}, 99);
 
     expect(learnerActionObject.schemaVersion).toEqual(99);
   });
@@ -97,8 +93,7 @@ describe('Learner Action Object Factory', () => {
 
   it('should convert a learner action to a backend dict', () => {
     var learnerActionObject =
-        this.LearnerActionObjectFactory.createNewAnswerSubmitAction(
-          'AnswerSubmit', {}, 1);
+        this.LearnerActionObjectFactory.createNewAnswerSubmitAction({}, 1);
 
     var learnerActionDict = learnerActionObject.toBackendDict();
     expect(learnerActionDict).toEqual({

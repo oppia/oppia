@@ -34,8 +34,7 @@ describe('Playthrough Object Factory', () => {
   });
 
   it('should create a new playthrough', () => {
-    var actions = [this.laof.createNewAnswerSubmitAction(
-      'AnswerSubmit', {}, 1)];
+    var actions = [this.laof.createNewExplorationStartAction({}, 1)];
     var playthroughObject = this.pof.createNew(
       'playthroughId1', 'expId1', 1, 'EarlyQuit', {}, actions);
 
@@ -69,12 +68,11 @@ describe('Playthrough Object Factory', () => {
     expect(playthroughObject.issueType).toEqual('EarlyQuit');
     expect(playthroughObject.issueCustomizationArgs).toEqual({});
     expect(playthroughObject.actions).toEqual(
-      [this.laof.createNewAnswerSubmitAction('AnswerSubmit', {}, 1)]);
+      [this.laof.createNewAnswerSubmitAction({}, 1)]);
   });
 
   it('should convert a playthrough to a backend dict', () => {
-    var actions = [this.laof.createNewAnswerSubmitAction(
-      'AnswerSubmit', {}, 1)];
+    var actions = [this.laof.createNewAnswerSubmitAction({}, 1)];
     var playthroughObject = this.pof.createNew(
       'playthroughId1', 'expId1', 1, 'EarlyQuit', {}, actions);
 

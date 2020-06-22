@@ -43,6 +43,8 @@ type IssueCustomizationArgs<IssueType> = (
   IMultipleIncorrectSubmissionsCustomizationArgs : never);
 
 // NOTE TO DEVELOPERS: Treat this as an implementation detail; do not export it.
+// This interface takes the type of backend dict according to the IssueType
+// parameter.
 interface IPlaythroughIssueBackendDictBase<IssueType> {
   'issue_type': IssueType;
   'issue_customization_args': IssueCustomizationArgs<IssueType>;
@@ -66,6 +68,7 @@ export type IPlaythroughIssueBackendDict = (
   ICyclicStateTransitionsPlaythroughIssueBackendDict);
 
 // NOTE TO DEVELOPERS: Treat this as an implementation detail; do not export it.
+// This class takes the type according to the IssueType parameter.
 class PlaythroughIssueBase<IssueType> {
   constructor(
     public readonly issueType: IssueType,
