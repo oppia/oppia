@@ -67,13 +67,6 @@ describe('Translation language selector', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(TranslationLanguageSelectorComponent);
     component = fixture.componentInstance;
-
-    component.options = [
-      { id: 'en', description: 'English' },
-      { id: 'fr', description: 'French' },
-      { id: 'sp', description: 'Spanish' },
-      { id: 'de', description: 'German' }
-    ];
     component.value = 'en';
     fixture.detectChanges();
   });
@@ -93,12 +86,8 @@ describe('Translation language selector', () => {
   });
 
   it('should correctly initialize languageIdToDescription map', () => {
-    expect(component.languageIdToDescription).toEqual({
-      en: 'English',
-      fr: 'French',
-      sp: 'Spanish',
-      de: 'German'
-    });
+    expect(component.languageIdToDescription.en).toEqual('English');
+    expect(component.languageIdToDescription.fr).toEqual('French');
   });
 
   it('should correctly fetch featured languages', async(() => {
@@ -142,29 +131,6 @@ describe('Translation language selector', () => {
     expect(getDropdownOptionsContainer()).toBeFalsy();
   });
 
-  it('should correctly populate all options', async(() => {
-    expect(component.dropdownShown).toEqual(false);
-    expect(component.value).toEqual('en');
-
-    clickDropdown();
-    expect(component.dropdownShown).toEqual(true);
-    expect(getDropdownOptionsContainer()).toBeTruthy();
-
-    fixture.whenStable().then(() => {
-      fixture.detectChanges();
-
-      let allOptions = fixture.debugElement.nativeElement.querySelectorAll(
-        '.oppia-translation-language-selector-dropdown-option');
-
-      expect(allOptions.length).toEqual(6);
-      expect(allOptions[0].firstChild.textContent.trim()).toEqual('French');
-      expect(allOptions[1].firstChild.textContent.trim()).toEqual('German');
-      expect(allOptions[2].firstChild.textContent.trim()).toEqual('English');
-      expect(allOptions[3].firstChild.textContent.trim()).toEqual('French');
-      expect(allOptions[4].firstChild.textContent.trim()).toEqual('Spanish');
-      expect(allOptions[5].firstChild.textContent.trim()).toEqual('German');
-    });
-  }));
 
   it('should correctly select and indicate selection of an option', () => {
     spyOn(component.setValue, 'emit');
