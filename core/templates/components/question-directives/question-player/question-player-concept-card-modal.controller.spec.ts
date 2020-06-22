@@ -109,7 +109,7 @@ describe('Question Player Concept Card Modal Controller', function() {
     });
   }));
 
-  it('should init the variables', function() {
+  it('should check properties set after controller is initialized', function() {
     expect($scope.skillIds).toEqual(skillIds);
     expect($scope.skills).toEqual(skillsObject);
     expect($scope.index).toBe(0);

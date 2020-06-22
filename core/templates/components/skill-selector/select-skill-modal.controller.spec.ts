@@ -48,7 +48,7 @@ describe('Select Skill Modal Controller', function() {
     });
   }));
 
-  it('should init the variables', function() {
+  it('should check properties set after controller is initialized', function() {
     expect($scope.skillSummaries).toEqual(sortedSkillSummaries);
     expect($scope.categorizedSkills).toEqual(categorizedSkills);
     expect($scope.allowSkillsFromOtherTopics).toEqual(
@@ -58,10 +58,10 @@ describe('Select Skill Modal Controller', function() {
   });
 
   it('should save skill with its id', function() {
-    $scope.selectedSkillId = '2';
+    $scope.selectedSkillId = 2;
     $scope.save();
-    expect($scope.selectedSkillId).toBe('2');
 
-    expect($uibModalInstance.close).toHaveBeenCalledWith('2');
+    expect($scope.selectedSkillId).toBe(2);
+    expect($uibModalInstance.close).toHaveBeenCalledWith(2);
   });
 });

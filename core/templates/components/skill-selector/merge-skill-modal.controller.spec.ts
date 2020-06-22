@@ -40,7 +40,7 @@ describe('Merge Skill Modal Controller', function() {
     });
   }));
 
-  it('should init the variables', function() {
+  it('should check properties set after controller is initialized', function() {
     expect($scope.skillSummaries).toBe(skillSummaries);
     expect($scope.categorizedSkills).toBe(categorizedSkills);
     expect($scope.allowSkillsFromOtherTopics).toBe(true);

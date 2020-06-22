@@ -61,7 +61,7 @@ describe('Create Activity Modal Controller', function() {
     $scope.$apply();
   }));
 
-  it('should init the variables', function() {
+  it('should check properties set after controller is initialized', function() {
     expect($scope.canCreateCollections).toEqual(true);
     expect($scope.explorationImgUrl).toBe(
       '/assets/images/activity/exploration.svg');

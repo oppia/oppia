@@ -36,7 +36,7 @@ describe('Moderator Unpublish Exploration Modal Controller', function() {
     });
   }));
 
-  it('should init the variables', function() {
+  it('should check properties set after controller is initialized', function() {
     expect($scope.willEmailBeSent).toBe(true);
     expect($scope.emailBody).toBe(draftEmailBody);
     expect($scope.EMAIL_BODY_SCHEMA).toEqual({

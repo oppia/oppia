@@ -28,12 +28,7 @@ describe('Preview Summary Tile Modal Controller', function() {
   var ExplorationObjectiveService = null;
   var ExplorationTitleService = null;
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
+  beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.inject(function($injector, $controller) {
     var $rootScope = $injector.get('$rootScope');
     ExplorationCategoryService = $injector.get('ExplorationCategoryService');

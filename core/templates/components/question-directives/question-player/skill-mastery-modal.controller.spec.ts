@@ -44,7 +44,7 @@ describe('Skill Mastery Modal Controller', function() {
     });
   }));
 
-  it('should init the variables', function() {
+  it('should check properties set after controller is initialized', function() {
     expect($scope.userIsLoggedIn).toEqual(userIsLoggedIn);
     expect($scope.skillId).toEqual(skillId);
     expect($scope.masteryChange).toEqual('mastery change');
