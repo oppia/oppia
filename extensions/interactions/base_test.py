@@ -368,10 +368,12 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                     '%s-response.component.html' % hyphenated_interaction_id)
                 short_response_component_html = os.path.join(
                     directives_dir,
-                    '%s-short-response.component.html' % hyphenated_interaction_id)
+                    '%s-short-response.component.html' %
+                    hyphenated_interaction_id)
                 self.assertTrue(os.path.isfile(interaction_component_ts_file))
                 self.assertTrue(os.path.isfile(response_component_ts_file))
-                self.assertTrue(os.path.isfile(short_response_component_ts_file))
+                self.assertTrue(os.path.isfile(
+                    short_response_component_ts_file))
                 self.assertTrue(os.path.isfile(rules_service_ts_file))
                 self.assertTrue(os.path.isfile(validation_service_ts_file))
                 self.assertTrue(os.path.isfile(interaction_component_html))
@@ -388,14 +390,15 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                     img_data = f.read()
                     width, height = struct.unpack('>LL', img_data[16:24])
                     self.assertEqual(int(width), INTERACTION_THUMBNAIL_WIDTH_PX)
-                    self.assertEqual(int(height), INTERACTION_THUMBNAIL_HEIGHT_PX)
+                    self.assertEqual(
+                        int(height), INTERACTION_THUMBNAIL_HEIGHT_PX)
 
                 interaction_component_ts_file_content = utils.get_file_contents(
                     interaction_component_ts_file)
                 response_component_ts_file_content = utils.get_file_contents(
                     response_component_ts_file)
-                short_response_component_ts_file_content = utils.get_file_contents(
-                    short_response_component_ts_file)
+                short_response_component_ts_file_content = (
+                    utils.get_file_contents(short_response_component_ts_file))
                 ts_file_content = utils.get_file_contents(ts_file)
                 rules_service_ts_file_content = utils.get_file_contents(
                     rules_service_ts_file)
@@ -421,11 +424,11 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 # Check that the html template includes js script for the
                 # interaction.
                 self.assertIn(
-                    'oppia-interactive-%s.component.ts' % hyphenated_interaction_id,
-                    ts_file_content)
+                    'oppia-interactive-%s.component.ts' %
+                    hyphenated_interaction_id, ts_file_content)
                 self.assertIn(
-                    'oppia-response-%s.component.ts' % hyphenated_interaction_id,
-                    ts_file_content)
+                    'oppia-response-%s.component.ts' %
+                    hyphenated_interaction_id, ts_file_content)
                 self.assertIn(
                     'oppia-short-response-%s.component.ts'
                     % hyphenated_interaction_id, ts_file_content)
@@ -436,10 +439,13 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                     '%s-validation.service.ts' % hyphenated_interaction_id,
                     ts_file_content)
 
-                self.assertNotIn('<script>', interaction_component_ts_file_content)
-                self.assertNotIn('</script>', interaction_component_ts_file_content)
+                self.assertNotIn(
+                    '<script>',interaction_component_ts_file_content)
+                self.assertNotIn(
+                    '</script>', interaction_component_ts_file_content)
                 self.assertNotIn('<script>', response_component_ts_file_content)
-                self.assertNotIn('</script>', response_component_ts_file_content)
+                self.assertNotIn(
+                    '</script>', response_component_ts_file_content)
                 self.assertNotIn(
                     '<script>', short_response_component_ts_file_content)
                 self.assertNotIn(
@@ -447,7 +453,8 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 self.assertNotIn('<script>', rules_service_ts_file_content)
                 self.assertNotIn('</script>', rules_service_ts_file_content)
                 self.assertNotIn('<script>', validation_service_ts_file_content)
-                self.assertNotIn('</script>', validation_service_ts_file_content)
+                self.assertNotIn(
+                    '</script>', validation_service_ts_file_content)
             else:
                 interaction_directive_ts_file = os.path.join(
                     directives_dir, 'oppia-interactive-%s.directive.ts' % (
@@ -472,10 +479,12 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                     '%s-response.directive.html' % hyphenated_interaction_id)
                 short_response_directive_html = os.path.join(
                     directives_dir,
-                    '%s-short-response.directive.html' % hyphenated_interaction_id)
+                    '%s-short-response.directive.html' %
+                    hyphenated_interaction_id)
                 self.assertTrue(os.path.isfile(interaction_directive_ts_file))
                 self.assertTrue(os.path.isfile(response_directive_ts_file))
-                self.assertTrue(os.path.isfile(short_response_directive_ts_file))
+                self.assertTrue(
+                    os.path.isfile(short_response_directive_ts_file))
                 self.assertTrue(os.path.isfile(rules_service_ts_file))
                 self.assertTrue(os.path.isfile(validation_service_ts_file))
                 self.assertTrue(os.path.isfile(interaction_directive_html))
@@ -492,14 +501,15 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                     img_data = f.read()
                     width, height = struct.unpack('>LL', img_data[16:24])
                     self.assertEqual(int(width), INTERACTION_THUMBNAIL_WIDTH_PX)
-                    self.assertEqual(int(height), INTERACTION_THUMBNAIL_HEIGHT_PX)
+                    self.assertEqual(
+                        int(height), INTERACTION_THUMBNAIL_HEIGHT_PX)
 
                 interaction_directive_ts_file_content = utils.get_file_contents(
                     interaction_directive_ts_file)
                 response_directive_ts_file_content = utils.get_file_contents(
                     response_directive_ts_file)
-                short_response_directive_ts_file_content = utils.get_file_contents(
-                    short_response_directive_ts_file)
+                short_response_directive_ts_file_content = (
+                    utils.get_file_contents(short_response_directive_ts_file))
                 ts_file_content = utils.get_file_contents(ts_file)
                 rules_service_ts_file_content = utils.get_file_contents(
                     rules_service_ts_file)
@@ -525,11 +535,11 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 # Check that the html template includes js script for the
                 # interaction.
                 self.assertIn(
-                    'oppia-interactive-%s.directive.ts' % hyphenated_interaction_id,
-                    ts_file_content)
+                    'oppia-interactive-%s.directive.ts' %
+                    hyphenated_interaction_id, ts_file_content)
                 self.assertIn(
-                    'oppia-response-%s.directive.ts' % hyphenated_interaction_id,
-                    ts_file_content)
+                    'oppia-response-%s.directive.ts' %
+                    hyphenated_interaction_id, ts_file_content)
                 self.assertIn(
                     'oppia-short-response-%s.directive.ts'
                     % hyphenated_interaction_id, ts_file_content)
@@ -540,10 +550,13 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                     '%s-validation.service.ts' % hyphenated_interaction_id,
                     ts_file_content)
 
-                self.assertNotIn('<script>', interaction_directive_ts_file_content)
-                self.assertNotIn('</script>', interaction_directive_ts_file_content)
+                self.assertNotIn(
+                    '<script>', interaction_directive_ts_file_content)
+                self.assertNotIn(
+                    '</script>', interaction_directive_ts_file_content)
                 self.assertNotIn('<script>', response_directive_ts_file_content)
-                self.assertNotIn('</script>', response_directive_ts_file_content)
+                self.assertNotIn(
+                    '</script>', response_directive_ts_file_content)
                 self.assertNotIn(
                     '<script>', short_response_directive_ts_file_content)
                 self.assertNotIn(
@@ -551,7 +564,8 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 self.assertNotIn('<script>', rules_service_ts_file_content)
                 self.assertNotIn('</script>', rules_service_ts_file_content)
                 self.assertNotIn('<script>', validation_service_ts_file_content)
-                self.assertNotIn('</script>', validation_service_ts_file_content)
+                self.assertNotIn(
+                    '</script>', validation_service_ts_file_content)
 
             interaction = interaction_registry.Registry.get_interaction_by_id(
                 interaction_id)
