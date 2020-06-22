@@ -21,6 +21,5 @@
 require('pages/classroom-page/classroom-page.module.ts');
 require('App.ts');
 require('base-components/oppia-root.directive.ts');
-require('base-components/base-content.directive.ts');
 
 require('pages/classroom-page/classroom-page.controller.ts');

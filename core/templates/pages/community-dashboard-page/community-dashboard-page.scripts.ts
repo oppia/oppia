@@ -19,7 +19,6 @@
 require('pages/community-dashboard-page/community-dashboard-page.module.ts');
 require('App.ts');
 require('base-components/oppia-root.directive.ts');
-require('base-components/base-content.directive.ts');
 
 require('pages/community-dashboard-page/' +
   'community-dashboard-page.component.ts');
