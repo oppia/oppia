@@ -110,7 +110,7 @@ export class HighBounceRateTaskObjectFactory {
       target_type: ImprovementsConstants.TASK_TARGET_TYPE_STATE,
       target_id: stateName,
       issue_description: null,
-      status: ImprovementsConstants.TASK_STATUS_TYPE_OBSOLETE,
+      status: ImprovementsConstants.TASK_STATUS_OBSOLETE,
       resolver_username: null,
       resolver_profile_picture_data_url: null,
       resolved_on_msecs: null,
