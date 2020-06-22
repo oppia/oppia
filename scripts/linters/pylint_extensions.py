@@ -302,6 +302,17 @@ class DocstringParameterChecker(checkers.BaseChecker):
                   'differing-type-doc',
                   'Please check parameter names in type declarations.',
                  ),
+        'W9019': (
+            '4 space indentation for args parameters in docstring',
+            'four-space-indentation-for-arg-parameters-doc',
+            ('Please use 4 space indentation in parameter definitions' +
+             'for args')
+        ),
+        'C9020': (
+            'eight space indentation for arg parameter description in docstring',
+            'eight-space-indentation-for-arg-parameter-descriptions-doc',
+            'Please indent wrap around descriptions by 8'
+        )
     }
 
     options = (('accept-no-param-doc',
@@ -384,6 +395,45 @@ class DocstringParameterChecker(checkers.BaseChecker):
         self.check_arguments_in_docstring(
             node_doc, node.args, node,
             accept_no_param_doc=node_allow_no_param)
+        self.check_indentation_args(node.args, node, node_doc)
+        
+        #self.check_indentation_args(self, doc, arguments_node, warning_node)
+
+    def check_indentation_args(self, arguments_node, node, node_doc):
+        parameter_names = {"Args:", "Raises:", "Returns:", "Yields:"}
+        expected_argument_names = set(
+            None  if(arg.name == 'self') else (arg.name+":") for arg in arguments_node.args)
+        is_docstring_args = False
+        free_form_args = False
+        outer_indentation = 0
+        for line in node.doc.splitlines():
+            current_indentation = (len(line) -
+                                       len(line.lstrip()))
+            if len(line.strip()) == 0:
+                continue
+            if line.lstrip().startswith("Args:"):
+                outer_indentation = current_indentation
+                is_docstring_args = True
+            elif (is_docstring_args and re.search('^[^:]+:', line.lstrip()) 
+                and (re.search('^[^:]+:', line.lstrip()).group(0) in expected_argument_names)):
+                free_form_args = False
+                if current_indentation != (
+                        outer_indentation + 4):
+                    self.add_message(
+                    'four-space-indentation-for-arg-parameters-doc', node=node)
+                if line.endswith(":"):
+                    free_form_args = True
+                #print(line + ": parameter")
+            elif line.strip() in parameter_names:
+                break
+            elif is_docstring_args:
+                #print(line +  ": description")
+                if not free_form_args and current_indentation != (
+                        outer_indentation + 8):
+                    self.add_message(
+                    'eight-space-indentation-for-arg-parameter-descriptions-doc', node=node)
+                if line.endswith(":"):
+                    free_form_args = True
 
     def check_functiondef_returns(self, node, node_doc):
         """Checks whether a function documented with a return value actually has
@@ -1353,7 +1403,6 @@ class DocstringChecker(checkers.BaseChecker):
         """
 
         is_docstring = False
-        is_docstring_arg = False
         is_docstring_return = False
         is_docstring_raise = False
         is_docstring_yield = False
@@ -1384,7 +1433,6 @@ class DocstringChecker(checkers.BaseChecker):
             if re.search(br'^""".+$', line) and is_docstring and (
                     line[3] == b' '):
                 is_docstring = False
-                is_docstring_arg = False
                 is_docstring_return = False
                 is_docstring_raise = False
                 is_docstring_yield = False
@@ -1394,7 +1442,6 @@ class DocstringChecker(checkers.BaseChecker):
             # Check if single line docstring span two lines.
             if line == b'"""' and prev_line.startswith(b'"""') and is_docstring:
                 is_docstring = False
-                is_docstring_arg = False
                 is_docstring_return = False
                 is_docstring_raise = False
                 is_docstring_yield = False
@@ -1410,7 +1457,6 @@ class DocstringChecker(checkers.BaseChecker):
                     self.add_message(
                         'no-period-used', line=line_num + 1)
                 is_docstring = False
-                is_docstring_arg = False
                 is_docstring_return = False
                 is_docstring_raise = False
                 is_docstring_yield = False
@@ -1440,23 +1486,13 @@ class DocstringChecker(checkers.BaseChecker):
                     self.add_message(
                         'no-newline-used-at-end', line=line_num + 1)
                 is_docstring = False
-                is_docstring_arg = False
                 is_docstring_return = False
                 is_docstring_raise = False
                 is_docstring_yield = False
             elif is_docstring:
                 current_indentation = (len(line_with_spaces) -
                                        len(line_with_spaces.lstrip()))
-                if line.startswith('Args:'):
-                    is_docstring_arg = True
-                    is_docstring_return = False
-                    is_docstring_raise = False
-                    is_docstring_yield = False
-                    free_form_return = False
-                    description = False
-                    outer_indentation_in_spaces = current_indentation
-                elif line.startswith('Returns:'):
-                    is_docstring_arg = False
+                if line.startswith('Returns:'):
                     is_docstring_return = True
                     is_docstring_raise = False
                     is_docstring_yield = False
@@ -1464,7 +1500,6 @@ class DocstringChecker(checkers.BaseChecker):
                     description = False
                     outer_indentation_in_spaces = current_indentation
                 elif line.startswith('Raises:'):
-                    is_docstring_arg = False
                     is_docstring_return = False
                     is_docstring_raise = True
                     is_docstring_yield = False
@@ -1472,7 +1507,6 @@ class DocstringChecker(checkers.BaseChecker):
                     description = False
                     outer_indentation_in_spaces = current_indentation
                 elif line.startswith('Yields:'):
-                    is_docstring_arg = False
                     is_docstring_return = False
                     is_docstring_raise = False
                     is_docstring_yield = True
@@ -1481,34 +1515,6 @@ class DocstringChecker(checkers.BaseChecker):
                     outer_indentation_in_spaces = current_indentation
                 elif len(line) == 0:
                     continue
-                elif is_docstring_arg:
-                    # Parameter
-                    if re.search(br'^[a-z_\*]+[a-z0-9_]*: ',
-                                 line):
-                        if current_indentation != (
-                                outer_indentation_in_spaces + 4):
-                            self.add_message(
-                                'four-space-indentation-in-docstring',
-                                line=line_num + 1)
-                        free_form_return = line.endswith(':')
-                        description = True
-                    # Possible malformed parameter
-                    elif ((re.search(br'^[^ ]+: ', line)
-                           or re.search(br'^- [^ ]+: ', line))
-                          and not description):
-                        self.add_message(
-                            'malformed-parameter',
-                            line=line_num + 1)
-                    elif line.endswith(':'):
-                        free_form_return = True
-                    # Description that must be indented by 8
-                    elif description:
-                        if (current_indentation != (
-                                outer_indentation_in_spaces + 8)
-                                and not free_form_return):
-                            self.add_message(
-                                'eight-space-indentation-in-docstring',
-                                line=line_num + 1)
                 elif is_docstring_raise:
                     # Parameter
                     if re.search(br'^[a-zA-Z0-9_\.\*]+: ',
