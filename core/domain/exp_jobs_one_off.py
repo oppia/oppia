@@ -22,9 +22,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import ast
 import itertools
 import logging
-import os
 import re
-import sys
 
 from constants import constants
 from core import jobs
@@ -35,18 +33,10 @@ from core.domain import html_validation_service
 from core.domain import rights_manager
 from core.platform import models
 import feconf
+from pylatexenc import latex2text
 import python_utils
 import schema_utils
 import utils
-
-CURR_DIR = os.path.abspath(os.getcwd())
-OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, os.pardir, 'oppia_tools')
-PYLATEXENC_PATH = os.path.join(OPPIA_TOOLS_DIR, 'pylatexenc-2.5')
-sys.path.insert(1, PYLATEXENC_PATH)
-
-# pylint: disable=wrong-import-position
-from pylatexenc import latex2text #isort:skip
-# pylint: enable=wrong-import-position
 
 (exp_models,) = models.Registry.import_models([
     models.NAMES.exploration])
@@ -137,8 +127,6 @@ class MathExpressionValidationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     'is_valid_math_equation' function present in schema_utils.py.
     """
 
-    valid_exps_seen = 0
-
     @classmethod
     def entity_classes_to_map_over(cls):
         return [exp_models.ExplorationModel]
@@ -150,6 +138,7 @@ class MathExpressionValidationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         is_valid_math_equation = schema_utils.get_validator(
             'is_valid_math_equation')
         ltt = latex2text.LatexNodes2Text()
+        valid_exps_seen = 0
 
         if not item.deleted:
             exploration = exp_fetchers.get_exploration_from_model(item)
@@ -162,20 +151,17 @@ class MathExpressionValidationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                             validity = 'Invalid'
                             if is_valid_math_expression(rule_input):
                                 validity = 'Valid Expression'
-                                MathExpressionValidationOneOffJob.valid_exps_seen += 1  #pylint: disable=line-too-long
+                                valid_exps_seen += 1
                             elif is_valid_math_equation(rule_input):
                                 validity = 'Valid Equation'
-                                MathExpressionValidationOneOffJob.valid_exps_seen += 1  #pylint: disable=line-too-long
-                            if MathExpressionValidationOneOffJob.valid_exps_seen <= MATH_VALID_EXP_LIMIT:   #pylint: disable=line-too-long
+                                valid_exps_seen += 1
+                            if valid_exps_seen <= MATH_VALID_EXP_LIMIT:
                                 yield (
                                     validity,
                                     u'%s: %s' % (state_name, rule_input))
 
     @staticmethod
     def reduce(key, values):
-        # Resetting the class variable back to 0 to avoid inconsistencies upon
-        # multiple consecutive runs of this job.
-        MathExpressionValidationOneOffJob.valid_exps_seen = 0
         yield (key, values)
 
 

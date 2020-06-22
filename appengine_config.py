@@ -89,6 +89,10 @@ if os.path.isdir(oppia_tools_path):
         raise Exception('Invalid path for oppia_tools library: %s' % pil_path)
     sys.path.insert(0, pil_path)
 
+OPPIA_TOOLS = [
+    os.path.join(oppia_tools_path, 'pylatexenc-2.5')
+]
+
 THIRD_PARTY_LIBS = [
     os.path.join(ROOT_PATH, 'third_party', 'backports.functools_lru_cache-1.6.1'),
     os.path.join(ROOT_PATH, 'third_party', 'beautifulsoup4-4.9.0'),
@@ -108,7 +112,7 @@ THIRD_PARTY_LIBS = [
     os.path.join(ROOT_PATH, 'third_party', 'webencodings-0.5.1'),
 ]
 
-for lib_path in THIRD_PARTY_LIBS:
+for lib_path in THIRD_PARTY_LIBS + OPPIA_TOOLS:
     if not os.path.isdir(lib_path):
         raise Exception('Invalid path for third_party library: %s' % lib_path)
     sys.path.insert(0, lib_path)
