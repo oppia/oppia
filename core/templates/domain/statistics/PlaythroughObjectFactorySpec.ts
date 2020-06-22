@@ -62,7 +62,26 @@ describe('Playthrough Object Factory', () => {
         issue_customization_args: {},
         actions: [{
           action_type: 'AnswerSubmit',
-          action_customization_args: {},
+          action_customization_args: {
+            state_name: {
+              value: 'state'
+            },
+            dest_state_name: {
+              value: 'dest_state'
+            },
+            interaction_id: {
+              value: 'interaction_id'
+            },
+            submitted_answer: {
+              value: 'answer'
+            },
+            feedback: {
+              value: 'feedback'
+            },
+            time_spent_state_in_msecs: {
+              value: 2
+            }
+          },
           schema_version: 1
         }]
       }
@@ -129,7 +148,26 @@ describe('Playthrough Object Factory', () => {
       issue_customization_args: {},
       actions: [{
         action_type: 'AnswerSubmit',
-        action_customization_args: {},
+        action_customization_args: {
+          state_name: {
+            value: 'state'
+          },
+          dest_state_name: {
+            value: 'dest_state'
+          },
+          interaction_id: {
+            value: 'interaction_id'
+          },
+          submitted_answer: {
+            value: 'answer'
+          },
+          feedback: {
+            value: 'feedback'
+          },
+          time_spent_state_in_msecs: {
+            value: 2
+          }
+        },
         schema_version: 1
       }]
     });
