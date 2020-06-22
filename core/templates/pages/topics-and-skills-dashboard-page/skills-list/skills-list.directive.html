@@ -26,7 +26,7 @@
         <[$ctrl.getSerialNumberForSkill($index)]>.
       </td>
       <td class="protractor-test-skills-list-item">
-        <a ng-href="<[getSkillEditorUrl(skill.id)]>" class="list-summary">
+        <a ng-href="<[$ctrl.getSkillEditorUrl(skill.id)]>" class="list-summary">
           <div class="skill-description protractor-test-skill-description"> <[skill.description]> </div>
           <div class="skill-topic">
             <span ng-if="!skill.topic_name">
@@ -40,24 +40,24 @@
         </a>
       </td>
       <td>
-        <a ng-href="<[getSkillEditorUrl(skill.id)]>" class="list-summary text-center">
+        <span class="list-summary text-center">
           <span> <[skill.worked_examples_count]> </span>
-        </a>
+        </span>
       </td>
       <td>
-        <a ng-href="<[getSkillEditorUrl(skill.id)]>" class="list-summary text-center">
+        <span class="list-summary text-center">
           <span> <[skill.misconception_count]> </span>
-        </a>
+        </span>
       </td>
       <td>
-        <a ng-href="<[getSkillEditorUrl(skill.id)]>" class="list-summary text-center">
+        <span class="list-summary text-center">
           <span ng-if="skill.topic_name">
             Assigned
           </span>
           <span ng-if="!skill.topic_name">
             Not Assigned
           </span>
-        </a>
+        </span>
       </td>
       <td class="skill-edit-options">
         <div ng-if="getEditableTopicSummaries().length > 0 && !isUnpublishedSkill()">

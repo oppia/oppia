@@ -90,10 +90,8 @@ class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
                 topic_classroom_dict[topic_id] = classroom['name']
 
         for topic_summary_dict in topic_summary_dicts:
-            topic_summary_dict['classroom'] = None
-            topic_id = topic_summary_dict['id']
-            if topic_id in topic_classroom_dict:
-                topic_summary_dict['classroom'] = topic_classroom_dict[topic_id]
+            topic_summary_dict['classroom'] = topic_classroom_dict.get(
+                topic_summary_dict['id'], None)
 
         untriaged_skill_summary_dicts = []
         mergeable_skill_summary_dicts = []
@@ -156,6 +154,7 @@ class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
             'untriaged_skill_summary_dicts': untriaged_skill_summary_dicts,
             'mergeable_skill_summary_dicts': mergeable_skill_summary_dicts,
             'topic_summary_dicts': topic_summary_dicts,
+            'total_skill_count': len(skill_summary_dicts),
             'all_classroom_names': all_classroom_names,
             'can_delete_topic': can_delete_topic,
             'can_create_topic': can_create_topic,
@@ -176,15 +175,15 @@ class SkillsDashboardPageDataHandler(base.BaseHandler):
         """Handles POST requests."""
 
         classroom_name = self.payload.get('classroom_name')
-        num_queries_to_fetch = int(self.payload.get('items_per_page'))
+        num_items_to_fetch = int(self.payload.get('num_items_to_fetch'))
         keywords = self.payload.get('keywords')
         sort_by = self.payload.get('sort')
         status = self.payload.get('status')
         cursor = self.payload.get('next_cursor', None)
 
-        skill_summaries, next_cursor, more, total_count = (
+        skill_summaries, next_cursor, more = (
             skill_services.get_filtered_skill_summaries(
-                num_queries_to_fetch, status, classroom_name,
+                num_items_to_fetch, status, classroom_name,
                 keywords, sort_by, cursor))
 
         skill_summary_dicts = [summary.to_dict() for summary in skill_summaries]
@@ -193,7 +192,6 @@ class SkillsDashboardPageDataHandler(base.BaseHandler):
             'skill_summary_dicts': skill_summary_dicts,
             'next_cursor': next_cursor,
             'more': more,
-            'total_skill_count': total_count
         })
 
 

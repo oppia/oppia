@@ -115,6 +115,7 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
                     return summary.can_edit_topic === true;
                   }
                 ));
+                ctrl.totalSkillCount = response.total_skill_count;
                 ctrl.skillsCategorizedByTopics = (
                   response.categorized_skills_dict);
                 ctrl.untriagedSkillSummaries = (
@@ -146,7 +147,6 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
                 if (!ctrl.classrooms.includes(TOPIC_FILTER_CLASSROOM_ALL)) {
                   ctrl.classrooms.unshift(TOPIC_FILTER_CLASSROOM_ALL);
                 }
-                ctrl.applyFilters();
                 $rootScope.$apply();
               },
               function(errorResponse) {
@@ -158,6 +158,14 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
                 }
               }
             );
+          };
+
+          ctrl.isSkillPresent = function() {
+            var totalSkillsPresent = ctrl.skillSummaries.length;
+            var numberOfSkillsRequired = (
+              (ctrl.skillPageNumber + 2) * ctrl.itemsPerPage);
+
+            return totalSkillsPresent >= numberOfSkillsRequired;
           };
 
           /**
@@ -212,37 +220,37 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
           };
 
           ctrl.fetchSkills = function() {
-            if (ctrl.firstTimeFetchingSkills || ctrl.more) {
+            if (ctrl.more) {
               TopicsAndSkillsDashboardBackendApiService
                 .fetchSkillsDashboardData(
                   ctrl.filterObject, ctrl.itemsPerPage, ctrl.nextCursor).then(
                   (response) => {
                     ctrl.more = response.more;
                     ctrl.nextCursor = response.next_cursor;
-                    ctrl.currentCount = response.total_skill_count;
+                    ctrl.skillSummaries.push(...response.skill_summary_dicts);
+                    ctrl.currentCount = ctrl.skillSummaries.length;
                     if (ctrl.firstTimeFetchingSkills) {
-                      ctrl.skillSummaries.push(...response.skill_summary_dicts);
-                      ctrl.firstTimeFetchingSkills = false;
                       ctrl.goToPageNumber(0);
-                    } else if (ctrl.currentCount > ((
-                      ctrl.pageNumber * ctrl.itemsPerPage) +
-                        ctrl.itemsPerPage)) {
-                      ctrl.skillSummaries.push(...response.skill_summary_dicts);
+                      ctrl.firstTimeFetchingSkills = false;
+                    } else {
                       ctrl.goToPageNumber(ctrl.pageNumber + 1);
                     }
                     $scope.$applyAsync();
                   });
+            } else if (ctrl.skillSummaries.length >
+                ((ctrl.skillPageNumber + 1) * ctrl.itemsPerPage)) {
+              ctrl.goToPageNumber(ctrl.pageNumber + 1);
             }
           };
 
           ctrl.navigateSkillPage = function(direction) {
             if (direction === ctrl.MOVE_TO_NEXT_PAGE) {
-              ctrl.fetchSkills();
+              if (ctrl.isSkillPresent()) {
+                ctrl.goToPageNumber(ctrl.pageNumber + 1);
+              } else {
+                ctrl.fetchSkills();
+              }
             } else if (ctrl.pageNumber >= 1) {
-              ctrl.skillSummaries = ctrl.skillSummaries.slice(
-                0, (ctrl.skillSummaries.length -
-                      ctrl.displayedSkillSummaries.length));
-              ctrl.more = true;
               ctrl.goToPageNumber(ctrl.pageNumber - 1);
             }
           };
@@ -266,7 +274,10 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
               ctrl.more = true;
               ctrl.firstTimeFetchingSkills = true;
               ctrl.skillSummaries = [];
+              ctrl.nextCursor = null;
               ctrl.fetchSkills();
+              $scope.$applyAsync();
+              _forceSelect2Refresh();
               return;
             }
             ctrl.topicSummaries = (

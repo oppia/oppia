@@ -91,11 +91,11 @@ def get_all_skill_ids_assigned_to_some_topic():
 
 def get_all_skill_ids_assigned_to_some_topic_with_topic_details():
     """Returns the ids of all the skills that are linked to some topics
-       and name of the classroom to which the topic is assigned to.
+    and name of the classroom to which the topic is assigned to.
 
     Returns:
         dict. A dict with skill_id as key and topic and classroom
-        name as values.
+            name as values.
     """
     skill_ids_with_topic_details = {}
 
@@ -103,32 +103,21 @@ def get_all_skill_ids_assigned_to_some_topic_with_topic_details():
     all_topic_ids = [topic_model.id for topic_model in all_topic_models]
     all_topics = topic_fetchers.get_topics_by_ids(all_topic_ids)
 
-    for topic in all_topics:
-        for skill_id in topic.get_all_skill_ids():
-            classroom_name = get_classroom_name_for_topic_with_id(topic.id)
-            skill_ids_with_topic_details[skill_id] = {
-                'topic_name': topic.name,
-                'classroom_name': classroom_name
-            }
-
-    return skill_ids_with_topic_details
-
-
-def get_classroom_name_for_topic_with_id(topic_id):
-    """Return the name of the classroom to which the topic
-    with the given topic id is assigned.
-
-    Returns:
-        str. The name of the classroom assigned to the topic with the given id.
-    """
+    topic_classroom_dict = {}
     all_classrooms_dict = config_domain.TOPIC_IDS_FOR_CLASSROOM_PAGES.value
 
     for classroom in all_classrooms_dict:
-        if topic_id in classroom['topic_ids']:
-            classroom_name = classroom['name']
-            return classroom_name
+        for topic_id in classroom['topic_ids']:
+            topic_classroom_dict[topic_id] = classroom['name']
 
-    return None
+    for topic in all_topics:
+        for skill_id in topic.get_all_skill_ids():
+            skill_ids_with_topic_details[skill_id] = {
+                'topic_name': topic.name,
+                'classroom_name': topic_classroom_dict.get(topic.id, None)
+            }
+
+    return skill_ids_with_topic_details
 
 
 def get_topic_summary_from_model(topic_summary_model):

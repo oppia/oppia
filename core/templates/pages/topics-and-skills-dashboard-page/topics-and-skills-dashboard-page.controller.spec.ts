@@ -325,8 +325,11 @@ describe('Topics and Skills Dashboard Page', function() {
         fetchSkillsDashboardData: () => {
           var deferred = $q.defer();
           deferred.resolve({
-            skill_summary_dicts: [],
-            total_skill_count: 40,
+            skill_summary_dicts: [
+              {id: 'id1', description: 'description1'},
+              {id: 'id2', description: 'description2'},
+              {id: 'id3', description: 'description3'},
+              {id: 'id4', description: 'description4'}],
             more: true,
             next_cursor: 'kasfmk424'
           });
@@ -351,21 +354,36 @@ describe('Topics and Skills Dashboard Page', function() {
         expect(ctrl.activeTab).toEqual('skills');
       });
 
-    it('should fetch skills',
-      function() {
-        expect(ctrl.activeTab).toEqual('skills');
-        ctrl.fetchSkills();
-        $rootScope.$apply();
-        expect(ctrl.skillSummaries).toEqual([]);
-        expect(ctrl.currentCount).toEqual(40);
-      });
-
     it('should fetch skills when filters are applied', function() {
       expect(ctrl.activeTab).toEqual('skills');
       var fetchSkillSpy = spyOn(ctrl, 'fetchSkills').and.callThrough();
       ctrl.applyFilters();
       expect(fetchSkillSpy).toHaveBeenCalled();
     });
+
+    it('should paginate if skills are present in memory instead of fetching',
+      function() {
+        expect(ctrl.activeTab).toEqual('skills');
+        ctrl.more = true;
+        ctrl.fetchSkills();
+        ctrl.itemsPerPage = 1;
+        ctrl.skillPageNumber = 1;
+        var paginateSkillSpy = spyOn(ctrl, 'goToPageNumber');
+        ctrl.more = false;
+        ctrl.fetchSkills();
+        expect(paginateSkillSpy).toHaveBeenCalled();
+      });
+
+
+    it('should paginate forward without fetching if skills are present',
+      function() {
+        expect(ctrl.activeTab).toEqual('skills');
+        ctrl.more = false;
+        spyOn(ctrl, 'isSkillPresent').and.returnValue(true);
+        var paginateSkillSpy = spyOn(ctrl, 'goToPageNumber');
+        ctrl.navigateSkillPage('next_page');
+        expect(paginateSkillSpy).toHaveBeenCalled();
+      });
 
     it('should change page number after fetching skills', function() {
       ctrl.pageNumber = 1;

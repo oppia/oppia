@@ -1304,13 +1304,16 @@ class SkillSummary(python_utils.OBJECT):
 
 
 class AugmentedSkillSummary(python_utils.OBJECT):
-    """Domain object for Augmented Skill Summary."""
+    """Domain object for Augmented Skill Summary, which have all the properties
+    of SkillSummary along with the topic name to which the skill is assigned
+    and the classroom name to which the topic is assigned.
+    """
 
     def __init__(
             self, skill_id, description, language_code, version,
-            misconception_count, worked_examples_count, skill_model_created_on,
-            skill_model_last_updated, topic_name=None, classroom_name=None):
-        """Constructs a SkillSummary domain object.
+            misconception_count, worked_examples_count, topic_name,
+            classroom_name, skill_model_created_on, skill_model_last_updated):
+        """Constructs a AugmentedSkillSummary domain object.
 
         Args:
             skill_id: str. The unique id of the skill.
@@ -1321,14 +1324,14 @@ class AugmentedSkillSummary(python_utils.OBJECT):
                 with the skill.
             worked_examples_count: int. The number of worked examples in the
                 skill.
-            skill_model_created_on: datetime.datetime. Date and time when
-                the skill model is created.
-            skill_model_last_updated: datetime.datetime. Date and time
-                when the skill model was last updated.
             topic_name: str. The name of the topic to which the skill
                 is assigned.
             classroom_name: str. The name of the classroom to which the
                 skill is assigned.
+            skill_model_created_on: datetime.datetime. Date and time when
+                the skill model is created.
+            skill_model_last_updated: datetime.datetime. Date and time
+                when the skill model was last updated.
         """
         self.id = skill_id
         self.description = description
@@ -1339,22 +1342,6 @@ class AugmentedSkillSummary(python_utils.OBJECT):
         self.skill_model_created_on = skill_model_created_on
         self.skill_model_last_updated = skill_model_last_updated
         self.topic_name = topic_name
-        self.classroom_name = classroom_name
-
-    def update_topic_name(self, topic_name):
-        """Updates the topic_name of the augmented skill.
-
-        Args:
-            topic_name: str. The name of the topic.
-        """
-        self.topic_name = topic_name
-
-    def update_classroom_name(self, classroom_name):
-        """Updates the classroom_name of the augmented skill.
-
-        Args:
-            classroom_name: str. The name of the classroom.
-        """
         self.classroom_name = classroom_name
 
     def to_dict(self):

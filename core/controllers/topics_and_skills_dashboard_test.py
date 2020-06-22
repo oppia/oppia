@@ -52,13 +52,13 @@ class BaseTopicsAndSkillsDashboardTests(test_utils.GenericTestBase):
         self.linked_skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(
             self.linked_skill_id, self.admin_id, description='Description 3')
-        subtopic_skill_id = skill_services.get_new_skill_id()
+        self.subtopic_skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(
-            subtopic_skill_id, self.admin_id, description='Subtopic Skill')
+            self.subtopic_skill_id, self.admin_id, description='Subtopic Skill')
 
         subtopic = topic_domain.Subtopic.create_default_subtopic(
             1, 'Subtopic Title')
-        subtopic.skill_ids = [subtopic_skill_id]
+        subtopic.skill_ids = [self.subtopic_skill_id]
         self.save_new_topic(
             self.topic_id, self.admin_id, name='Name',
             description='Description', canonical_story_ids=[],
@@ -174,13 +174,105 @@ class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
 
         json_response = self.post_json(
             feconf.SKILL_DASHBOARD_DATA_URL, {
-                'items_per_page': '10',
+                'num_items_to_fetch': '10',
                 'sort': 'Oldest Created'
             }, csrf_token=csrf_token)
 
         self.assertEqual(len(json_response['skill_summary_dicts']), 2)
         self.assertEqual(
             json_response['skill_summary_dicts'][0]['id'], self.linked_skill_id)
+        self.assertEqual(
+            json_response['skill_summary_dicts'][1]['id'],
+            self.subtopic_skill_id)
+        self.assertFalse(json_response['more'])
+        self.assertEqual(json_response['next_cursor'], None)
+
+        json_response = self.post_json(
+            feconf.SKILL_DASHBOARD_DATA_URL, {
+                'num_items_to_fetch': '10',
+                'sort': 'Newly Created'
+            }, csrf_token=csrf_token)
+
+        self.assertEqual(len(json_response['skill_summary_dicts']), 2)
+        self.assertEqual(
+            json_response['skill_summary_dicts'][0]['id'],
+            self.subtopic_skill_id)
+        self.assertEqual(
+            json_response['skill_summary_dicts'][1]['id'], self.linked_skill_id)
+
+        json_response = self.post_json(
+            feconf.SKILL_DASHBOARD_DATA_URL, {
+                'num_items_to_fetch': '10',
+                'sort': 'Most Recently Updated'
+            }, csrf_token=csrf_token)
+
+        self.assertEqual(len(json_response['skill_summary_dicts']), 2)
+        self.assertEqual(
+            json_response['skill_summary_dicts'][0]['id'],
+            self.subtopic_skill_id)
+        self.assertEqual(
+            json_response['skill_summary_dicts'][1]['id'], self.linked_skill_id)
+        self.assertFalse(json_response['more'])
+        self.assertEqual(json_response['next_cursor'], None)
+
+    def test_post_with_keywords(self):
+        self.login(self.ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        json_response = self.post_json(
+            feconf.SKILL_DASHBOARD_DATA_URL, {
+                'num_items_to_fetch': '10',
+                'keywords': ['description']
+            }, csrf_token=csrf_token)
+
+        self.assertEqual(len(json_response['skill_summary_dicts']), 1)
+        self.assertEqual(
+            json_response['skill_summary_dicts'][0]['id'], self.linked_skill_id)
+        self.assertEqual(
+            json_response['skill_summary_dicts'][0]['description'],
+            'Description 3')
+        self.assertFalse(json_response['more'])
+        self.assertEqual(json_response['next_cursor'], None)
+
+        json_response = self.post_json(
+            feconf.SKILL_DASHBOARD_DATA_URL, {
+                'num_items_to_fetch': '10',
+                'keywords': ['subtopic']
+            }, csrf_token=csrf_token)
+
+        self.assertEqual(len(json_response['skill_summary_dicts']), 1)
+        self.assertEqual(
+            json_response['skill_summary_dicts'][0]['id'],
+            self.subtopic_skill_id)
+        self.assertEqual(
+            json_response['skill_summary_dicts'][0]['description'],
+            'Subtopic Skill')
+        self.assertFalse(json_response['more'])
+        self.assertEqual(json_response['next_cursor'], None)
+
+    def test_post_with_status(self):
+        self.login(self.ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        json_response = self.post_json(
+            feconf.SKILL_DASHBOARD_DATA_URL, {
+                'num_items_to_fetch': '10',
+                'status': 'Assigned'
+            }, csrf_token=csrf_token)
+
+        self.assertEqual(len(json_response['skill_summary_dicts']), 2)
+        self.assertFalse(json_response['more'])
+        self.assertEqual(json_response['next_cursor'], None)
+
+        json_response = self.post_json(
+            feconf.SKILL_DASHBOARD_DATA_URL, {
+                'num_items_to_fetch': '10',
+                'status': 'Unassigned'
+            }, csrf_token=csrf_token)
+
+        self.assertEqual(len(json_response['skill_summary_dicts']), 0)
+        self.assertFalse(json_response['more'])
+        self.assertEqual(json_response['next_cursor'], None)
 
 
 class NewTopicHandlerTests(BaseTopicsAndSkillsDashboardTests):

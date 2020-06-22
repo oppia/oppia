@@ -114,33 +114,31 @@ class SkillSummaryModelUnitTest(test_utils.GenericTestBase):
             skill_model_created_on=datetime.datetime.utcnow()
         ).put()
 
-        skill_summaries, next_cursor, more, total_count = (
+        skill_summaries, next_cursor, more = (
             skill_models.SkillSummaryModel.fetch_page(1, None, None))
         self.assertEqual(skill_summaries[0].id, 'skill_id2')
         self.assertTrue(more)
-        self.assertEqual(total_count, 2)
         self.assertTrue(isinstance(next_cursor, python_utils.BASESTRING))
 
-        skill_summaries, next_cursor, more, total_count = (
+        skill_summaries, next_cursor, more = (
             skill_models.SkillSummaryModel.fetch_page(10, None, None))
         self.assertEqual(skill_summaries[0].id, 'skill_id2')
         self.assertFalse(more)
-        self.assertEqual(total_count, 2)
         self.assertEqual(next_cursor, None)
 
-        skill_summaries, next_cursor, more, total_count = (
+        skill_summaries, next_cursor, more = (
             skill_models.SkillSummaryModel.fetch_page(
                 10, None, 'Oldest Created'))
         self.assertEqual(skill_summaries[0].id, 'skill_id1')
         self.assertEqual(skill_summaries[1].id, 'skill_id2')
 
-        skill_summaries, next_cursor, more, total_count = (
+        skill_summaries, next_cursor, more = (
             skill_models.SkillSummaryModel.fetch_page(
                 10, None, 'Most Recently Updated'))
         self.assertEqual(skill_summaries[0].id, 'skill_id2')
         self.assertEqual(skill_summaries[1].id, 'skill_id1')
 
-        skill_summaries, next_cursor, more, total_count = (
+        skill_summaries, next_cursor, more = (
             skill_models.SkillSummaryModel.fetch_page(
                 10, None, 'Least Recently Updated'))
         self.assertEqual(skill_summaries[0].id, 'skill_id1')
