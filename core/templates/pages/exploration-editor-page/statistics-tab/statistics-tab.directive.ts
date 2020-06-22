@@ -153,13 +153,6 @@ angular.module('oppia').directive('statisticsTab', () => ({
 
       this.$onInit = () => {
         $scope.explorationHasBeenVisited = false;
-        $scope.COMPLETION_RATE_CHART_OPTIONS = {
-          chartAreaWidth: 300,
-          colors: ['green', 'firebrick'],
-          height: 100,
-          legendPosition: 'right',
-          width: 500
-        };
         $scope.COMPLETION_RATE_PIE_CHART_OPTIONS = {
           chartAreaWidth: 500,
           colors: ['#008808', '#d8d8d8'],
