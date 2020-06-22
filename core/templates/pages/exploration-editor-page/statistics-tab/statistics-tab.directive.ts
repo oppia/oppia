@@ -120,17 +120,13 @@ angular.module('oppia').directive('statisticsTab', [
           this.$onInit = () => {
             this.stateStatsModalIsOpen = false;
             $scope.onClickStateInStatsGraph = (stateName: string) => {
-              console.log(this.stateStatsModalIsOpen);
               if (!this.stateStatsModalIsOpen) {
-                console.log('opened');
                 this.stateStatsModalIsOpen = true;
                 openStateStatsModal(stateName).then(
                   () => {
-                    console.log('success');
                     this.stateStatsModalIsOpen = false;
                   },
                   () => {
-                    console.log('failure');
                     AlertsService.clearWarnings();
                     this.stateStatsModalIsOpen = false;
                   });
