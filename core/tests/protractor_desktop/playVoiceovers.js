@@ -104,5 +104,6 @@ describe('Voiceover player', function() {
 
   afterEach(async function() {
     await users.logout();
+    await general.checkForConsoleErrors(['The play()']);
   });
 });
