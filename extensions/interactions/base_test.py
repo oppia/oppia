@@ -405,8 +405,9 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 validation_service_ts_file_content = utils.get_file_contents(
                     validation_service_ts_file)
 
-                self.assertIn('oppiaInteractive%s' % interaction_id,
-                                interaction_component_ts_file_content)
+                self.assertIn(
+                    'oppiaInteractive%s' % interaction_id,
+                    interaction_component_ts_file_content)
                 self.assertIn(
                     'oppiaResponse%s' % interaction_id,
                     response_component_ts_file_content)
@@ -440,7 +441,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                     ts_file_content)
 
                 self.assertNotIn(
-                    '<script>',interaction_component_ts_file_content)
+                    '<script>', interaction_component_ts_file_content)
                 self.assertNotIn(
                     '</script>', interaction_component_ts_file_content)
                 self.assertNotIn('<script>', response_component_ts_file_content)
@@ -516,8 +517,9 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 validation_service_ts_file_content = utils.get_file_contents(
                     validation_service_ts_file)
 
-                self.assertIn('oppiaInteractive%s' % interaction_id,
-                                interaction_directive_ts_file_content)
+                self.assertIn(
+                    'oppiaInteractive%s' % interaction_id,
+                    interaction_directive_ts_file_content)
                 self.assertIn(
                     'oppiaResponse%s' % interaction_id,
                     response_directive_ts_file_content)
