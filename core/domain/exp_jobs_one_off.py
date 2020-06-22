@@ -43,14 +43,6 @@ from pylatexenc import latex2text
     models.NAMES.exploration])
 gae_image_services = models.Registry.import_gae_image_services()
 
-# This threshold puts a cap on the number of valid explorations that can be
-# yielded by the MathExpressionValidationOneOffJob.
-VALID_MATH_EXP_YIELD_LIMIT = 200
-UNICODE_TO_TEXT = {
-    u'\u221a': 'sqrt',
-    u'\u03c0': 'pi',
-    u'\xb7': '*'
-}
 ADDED_THREE_VERSIONS_TO_GCS = 'Added the three versions'
 _COMMIT_TYPE_REVERT = 'revert'
 ALL_IMAGES_VERIFIED = 'Images verified'
@@ -135,6 +127,15 @@ class MathExpressionValidationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     'is_valid_math_equation' function present in schema_utils.py.
     """
 
+    # This threshold puts a cap on the number of valid inputs, i.e.,
+    # expressions/equations that can be yielded by this one-off job.
+    VALID_MATH_INPUTS_YIELD_LIMIT = 200
+    UNICODE_TO_TEXT = {
+        u'\u221a': 'sqrt',
+        u'\u03c0': 'pi',
+        u'\xb7': '*'
+    }
+
     @classmethod
     def entity_classes_to_map_over(cls):
         return [exp_models.ExplorationModel]
@@ -160,7 +161,7 @@ class MathExpressionValidationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                             # special characters like sqrt and pi, which is why
                             # they need to be replaced with their corresponding
                             # text values before performing validation.
-                            for unicode_char, text in UNICODE_TO_TEXT.items():
+                            for unicode_char, text in MathExpressionValidationOneOffJob.UNICODE_TO_TEXT.items(): #pylint: disable=line-too-long
                                 rule_input = rule_input.replace(
                                     unicode_char, text)
 
@@ -177,7 +178,7 @@ class MathExpressionValidationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def reduce(key, values):
         if key.startswith('Valid'):
-            yield (key, values[:VALID_MATH_EXP_YIELD_LIMIT])
+            yield (key, values[:MathExpressionValidationOneOffJob.VALID_MATH_INPUTS_YIELD_LIMIT]) #pylint: disable=line-too-long
         else:
             yield (key, values)
 

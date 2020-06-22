@@ -414,7 +414,7 @@ class MathExpressionValidationOneOffJobTests(test_utils.GenericTestBase):
         """
 
         # Resetting the threshold only for testing purposes.
-        exp_jobs_one_off.VALID_MATH_EXP_YIELD_LIMIT = 3
+        exp_jobs_one_off.MathExpressionValidationOneOffJob.VALID_MATH_INPUTS_YIELD_LIMIT = 3 #pylint: disable=line-too-long
 
         exploration = exp_domain.Exploration.create_default_exploration(
             self.VALID_EXP_ID, title='title', category='category')
