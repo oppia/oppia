@@ -17,79 +17,87 @@
  * in the test session.
  */
 
-angular.module('oppia').factory('QuestionPlayerStateService', [
-  function() {
-    var questionPlayerState = {};
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
-    var getCurrentTime = function() {
-      return new Date().getTime();
+@Injectable({
+  providedIn: 'root'
+})
+export class QuestionPlayerStateService {
+  constructor(){}
+  private questionPlayerState = {};
+
+  private getCurrentTime(): number { 
+    return new Date().getTime();
+  }
+
+  private createNewQuestionPlayerState(
+      questionId, linkedSkillIds): void {
+    this.questionPlayerState[questionId] = {
+      linkedSkillIds: linkedSkillIds,
+      answers: [],
+      usedHints: []
     };
+  }
 
-    var createNewQuestionPlayerState = function(
-        questionId, linkedSkillIds) {
-      questionPlayerState[questionId] = {
-        linkedSkillIds: linkedSkillIds,
-        answers: [],
-        usedHints: []
-      };
-    };
+  private _hintUsed(question): void {
+    console.log(question);
+    var questionId = question.getId();
+    if (!this.questionPlayerState[questionId]) {
+      this.createNewQuestionPlayerState(
+        questionId,
+        question.getLinkedSkillIds());
+    }
+    this.questionPlayerState[questionId].usedHints.push(
+      {timestamp: this.getCurrentTime()});
+  }
 
-    var _hintUsed = function(question) {
-      var questionId = question.getId();
-      if (!questionPlayerState[questionId]) {
-        createNewQuestionPlayerState(
-          questionId,
-          question.getLinkedSkillIds());
-      }
-      questionPlayerState[questionId].usedHints.push(
-        {timestamp: getCurrentTime()});
-    };
+  private _solutionViewed(question): void {
+    var questionId = question.getId();
+    if (!this.questionPlayerState[questionId]) {
+      this.createNewQuestionPlayerState(
+        questionId,
+        question.getLinkedSkillIds());
+    }
+    this.questionPlayerState[questionId].viewedSolution = {
+      timestamp: this.getCurrentTime()};
+  };
 
-    var _solutionViewed = function(question) {
-      var questionId = question.getId();
-      if (!questionPlayerState[questionId]) {
-        createNewQuestionPlayerState(
-          questionId,
-          question.getLinkedSkillIds());
-      }
-      questionPlayerState[questionId].viewedSolution = {
-        timestamp: getCurrentTime()};
-    };
-
-    var _answerSubmitted = function(
-        question, isCorrect, taggedSkillMisconceptionId) {
-      var questionId = question.getId();
-      if (!questionPlayerState[questionId]) {
-        createNewQuestionPlayerState(
-          questionId,
-          question.getLinkedSkillIds());
-      }
-      // Don't store a correct answer in the case where
-      // the learner viewed the solution for this question.
-      if (isCorrect && questionPlayerState[questionId].viewedSolution) {
-        return;
-      }
-      questionPlayerState[questionId].answers.push(
-        {isCorrect: isCorrect,
-          timestamp: getCurrentTime(),
-          taggedSkillMisconceptionId: taggedSkillMisconceptionId
-        });
-    };
+  private _answerSubmitted(
+      question, isCorrect, taggedSkillMisconceptionId): void {
+    var questionId = question.getId();
+    if (!this.questionPlayerState[questionId]) {
+      this.createNewQuestionPlayerState(
+        questionId,
+        question.getLinkedSkillIds());
+    }
+    // Don't store a correct answer in the case where
+    // the learner viewed the solution for this question.
+    if (isCorrect && this.questionPlayerState[questionId].viewedSolution) {
+      return;
+    }
+    this.questionPlayerState[questionId].answers.push(
+      {isCorrect: isCorrect,
+        timestamp: this.getCurrentTime(),
+        taggedSkillMisconceptionId: taggedSkillMisconceptionId
+      });
+  }
 
 
-    return {
-      hintUsed: function(question) {
-        _hintUsed(question);
-      },
-      solutionViewed: function(question) {
-        _solutionViewed(question);
-      },
-      answerSubmitted: function(
-          question, isCorrect, taggedSkillMisconceptionId) {
-        _answerSubmitted(question, isCorrect, taggedSkillMisconceptionId);
-      },
-      getQuestionPlayerStateData: function() {
-        return questionPlayerState;
-      }
-    };
-  }]);
+  hintUsed(question): void {
+    this._hintUsed(question);
+  }
+  solutionViewed(question): void {
+    this._solutionViewed(question);
+  }
+  answerSubmitted(
+      question, isCorrect, taggedSkillMisconceptionId): void {
+    this._answerSubmitted(question, isCorrect, taggedSkillMisconceptionId);
+  }
+  getQuestionPlayerStateData() {
+    return this.questionPlayerState;
+  }
+};
+
+angular.module('oppia').factory('QuestionPlayerStateService',
+  downgradeInjectable(QuestionPlayerStateService));

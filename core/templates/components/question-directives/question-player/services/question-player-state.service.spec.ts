@@ -16,87 +16,24 @@
  * @fileoverview Unit tests for the question player state service.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// question-player-state.service.ts is upgraded to Angular 8.
-import { AnswerGroupObjectFactory } from
-  'domain/exploration/AnswerGroupObjectFactory';
-import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
-import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
-import { OutcomeObjectFactory } from
-  'domain/exploration/OutcomeObjectFactory';
-import { ParamChangeObjectFactory } from
-  'domain/exploration/ParamChangeObjectFactory';
-import { ParamChangesObjectFactory } from
-  'domain/exploration/ParamChangesObjectFactory';
-import { RecordedVoiceoversObjectFactory } from
-  'domain/exploration/RecordedVoiceoversObjectFactory';
-import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
-import { SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
-import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
-import { VoiceoverObjectFactory } from
-  'domain/exploration/VoiceoverObjectFactory';
-import { WrittenTranslationObjectFactory } from
-  'domain/exploration/WrittenTranslationObjectFactory';
-import { WrittenTranslationsObjectFactory } from
-  'domain/exploration/WrittenTranslationsObjectFactory';
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
+import { TestBed } from '@angular/core/testing';
 
-require(
-  'components/question-directives/question-player/services/' +
-  'question-player-state.service.ts');
-require('domain/question/QuestionObjectFactory.ts');
+import { QuestionPlayerStateService } from
+  'components/question-directives/question-player/services/question-player-state.service';
 
-describe('Question player state service', function() {
-  var qpservice;
-  var QuestionObjectFactory;
-  var questionId = 'question_1';
-  var question;
+import { QuestionObjectFactory, Question } from
+  'domain/question/QuestionObjectFactory'; 
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value(
-      'AnswerGroupObjectFactory', new AnswerGroupObjectFactory(
-        new OutcomeObjectFactory(new SubtitledHtmlObjectFactory()),
-        new RuleObjectFactory()));
-    $provide.value('FractionObjectFactory', new FractionObjectFactory());
-    $provide.value(
-      'HintObjectFactory', new HintObjectFactory(
-        new SubtitledHtmlObjectFactory()));
-    $provide.value(
-      'OutcomeObjectFactory', new OutcomeObjectFactory(
-        new SubtitledHtmlObjectFactory()));
-    $provide.value('ParamChangeObjectFactory', new ParamChangeObjectFactory());
-    $provide.value(
-      'ParamChangesObjectFactory', new ParamChangesObjectFactory(
-        new ParamChangeObjectFactory()));
-    $provide.value(
-      'RecordedVoiceoversObjectFactory',
-      new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()));
-    $provide.value('RuleObjectFactory', new RuleObjectFactory());
-    $provide.value(
-      'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
-    $provide.value('UnitsObjectFactory', new UnitsObjectFactory());
-    $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
-    $provide.value(
-      'WrittenTranslationObjectFactory',
-      new WrittenTranslationObjectFactory());
-    $provide.value(
-      'WrittenTranslationsObjectFactory',
-      new WrittenTranslationsObjectFactory(
-        new WrittenTranslationObjectFactory()));
-  }));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
-  beforeEach(angular.mock.inject(function($injector) {
-    qpservice = $injector.get('QuestionPlayerStateService');
-    QuestionObjectFactory = $injector.get('QuestionObjectFactory');
-    question = QuestionObjectFactory.createFromBackendDict({
+fdescribe('Question player state service', () => {
+  let qpservice: QuestionPlayerStateService;
+  let questionObjectFactory: QuestionObjectFactory;
+  let questionId: string = 'question_1';
+  let question: Question;
+
+  beforeEach(() => {
+    qpservice = TestBed.get(QuestionPlayerStateService);
+    questionObjectFactory = TestBed.get(QuestionObjectFactory);
+    question = questionObjectFactory.createFromBackendDict({
       id: questionId,
       question_state_data: {
         content: {
@@ -177,15 +114,15 @@ describe('Question player state service', function() {
       version: 1,
       linked_skill_ids: ['skill_id1', 'skill_id2']
     });
-  }));
+  })
 
-  it('should return an empty question state dictionary', function() {
+  it('should return an empty question state dictionary', ()=> {
     expect(qpservice.getQuestionPlayerStateData()).toEqual({});
   });
 
-  it('should add a hint to the question state data', function() {
+  it('should add a hint to the question state data', () => {
     qpservice.hintUsed(question);
-    var stateData = qpservice.getQuestionPlayerStateData();
+    let stateData = qpservice.getQuestionPlayerStateData();
     expect(stateData[questionId]).toBeTruthy();
     expect(stateData[questionId].usedHints).toBeDefined();
     expect(stateData[questionId].usedHints.length).toEqual(1);
@@ -197,9 +134,9 @@ describe('Question player state service', function() {
   });
 
   it('should record a wrong answer was submitted to the question state data',
-    function() {
+    () => {
       qpservice.answerSubmitted(question, false, 'skill_id_1-0');
-      var stateData = qpservice.getQuestionPlayerStateData();
+      let stateData = qpservice.getQuestionPlayerStateData();
       expect(stateData[questionId]).toBeTruthy();
       expect(stateData[questionId].answers).toBeDefined();
       expect(stateData[questionId].answers.length).toEqual(1);
@@ -213,9 +150,9 @@ describe('Question player state service', function() {
     });
 
   it('should record a right answer was submitted to the question state data',
-    function() {
+    () => {
       qpservice.answerSubmitted(question, true, 'skill_id_1-0');
-      var stateData = qpservice.getQuestionPlayerStateData();
+      let stateData = qpservice.getQuestionPlayerStateData();
       expect(stateData[questionId]).toBeTruthy();
       expect(stateData[questionId].answers).toBeDefined();
       expect(stateData[questionId].answers.length).toEqual(1);
@@ -229,9 +166,9 @@ describe('Question player state service', function() {
     });
 
   it('should record that a solution was viewed',
-    function() {
+    () => {
       qpservice.solutionViewed(question);
-      var stateData = qpservice.getQuestionPlayerStateData();
+      let stateData = qpservice.getQuestionPlayerStateData();
       expect(stateData[questionId]).toBeTruthy();
       expect(stateData[questionId].viewedSolution).toBeDefined();
       expect(stateData[questionId].viewedSolution.timestamp).toBeDefined();
@@ -243,15 +180,15 @@ describe('Question player state service', function() {
     });
 
   it('should shouldn\'t record a correct answer if a solution was viewed',
-    function() {
+    () => {
       qpservice.solutionViewed(question);
-      var stateData = qpservice.getQuestionPlayerStateData();
+      let stateData = qpservice.getQuestionPlayerStateData();
       expect(stateData[questionId]).toBeTruthy();
       expect(stateData[questionId].viewedSolution).toBeDefined();
       expect(stateData[questionId].viewedSolution.timestamp).toBeDefined();
       expect(
         stateData[questionId].viewedSolution.timestamp).toBeGreaterThan(0);
-      qpservice.answerSubmitted(question, true);
+      qpservice.answerSubmitted(question, true, '0');
       expect(stateData[questionId]).toBeTruthy();
       expect(stateData[questionId].answers.length).toEqual(0);
       expect(stateData[questionId].linkedSkillIds).toBeTruthy();
