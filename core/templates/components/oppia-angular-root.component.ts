@@ -191,6 +191,8 @@ import { ExplorationObjectFactory } from
 import { ExplorationOpportunitySummaryObjectFactory } from
   'domain/opportunity/ExplorationOpportunitySummaryObjectFactory';
 import { ExpressionParserService } from 'expressions/expression-parser.service';
+import { ExplorationRecommendationsService } from
+  'pages/exploration-player-page/services/exploration-recommendations.service';
 import { ExpressionSyntaxTreeService } from
   'expressions/expression-syntax-tree.service';
 import { ExtensionTagAssemblerService } from
@@ -223,6 +225,7 @@ import { GuestCollectionProgressService } from
   'domain/collection/guest-collection-progress.service';
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
 import { HtmlEscaperService } from 'services/html-escaper.service';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { IdGenerationService } from 'services/id-generation.service';
 import { ImageClickInputValidationService } from
   // eslint-disable-next-line max-len
@@ -272,6 +275,7 @@ import { LostChangeObjectFactory } from
 import { MathExpressionInputValidationService } from
   // eslint-disable-next-line max-len
   'interactions/MathExpressionInput/directives/math-expression-input-validation.service';
+import { MessengerService } from 'services/messenger.service';
 import { MetaTagCustomizationService } from
   'services/contextual/meta-tag-customization.service';
 import { MisconceptionObjectFactory } from
@@ -338,6 +342,8 @@ import { PredictionResultObjectFactory } from
   'domain/classifier/PredictionResultObjectFactory';
 import { PretestQuestionBackendApiService } from
   'domain/question/pretest-question-backend-api.service';
+import { ProfilePageBackendApiService } from
+  'pages/profile-page/profile-page-backend-api.service';
 import { PythonProgramTokenizer } from 'classifiers/python-program.tokenizer';
 import { QuestionBackendApiService } from
   'domain/question/question-backend-api.service.ts';
@@ -448,6 +454,8 @@ import { StateWrittenTranslationsService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-written-translations.service';
 import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
+import { StatsReportingService } from
+  'pages/exploration-player-page/services/stats-reporting.service';
 import { StopwatchObjectFactory } from
   'domain/utilities/StopwatchObjectFactory';
 import { StoryContentsObjectFactory } from
@@ -612,6 +620,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static explorationObjectFactory: ExplorationObjectFactory;
   static explorationOpportunitySummaryObjectFactory: ExplorationOpportunitySummaryObjectFactory;
   static expressionParserService: ExpressionParserService;
+  static explorationRecommendationsService: ExplorationRecommendationsService;
   static expressionSyntaxTreeService: ExpressionSyntaxTreeService;
   static extensionTagAssemblerService: ExtensionTagAssemblerService;
   static extractImageFilenamesFromStateService: ExtractImageFilenamesFromStateService;
@@ -630,6 +639,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static guestCollectionProgressService: GuestCollectionProgressService;
   static hintObjectFactory: HintObjectFactory;
   static htmlEscaperService: HtmlEscaperService;
+  static i18nLanguageCodeService: I18nLanguageCodeService;
   static idGenerationService: IdGenerationService;
   static imageClickInputValidationService: ImageClickInputValidationService;
   static imageFileObjectFactory: ImageFileObjectFactory;
@@ -656,6 +666,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static logicProofValidationService: LogicProofValidationService;
   static lostChangeObjectFactory: LostChangeObjectFactory;
   static mathExpressionInputValidationService: MathExpressionInputValidationService;
+  static messengerService: MessengerService;
   static metaTagCustomizationService: MetaTagCustomizationService;
   static misconceptionObjectFactory: MisconceptionObjectFactory;
   static multipleChoiceInputValidationService: MultipleChoiceInputValidationService;
@@ -688,6 +699,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static predictionAlgorithmRegistryService: PredictionAlgorithmRegistryService;
   static predictionResultObjectFactory: PredictionResultObjectFactory;
   static pretestQuestionBackendApiService: PretestQuestionBackendApiService;
+  static profilePageBackendApiService: ProfilePageBackendApiService;
   static pythonProgramTokenizer: PythonProgramTokenizer;
   static questionBackendApiService: QuestionBackendApiService;
   static questionCreationService: QuestionCreationService;
@@ -741,6 +753,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static stateTopAnswersStatsBackendApiService: StateTopAnswersStatsBackendApiService;
   static stateWrittenTranslationsService: StateWrittenTranslationsService;
   static statesObjectFactory: StatesObjectFactory;
+  static statsReportingService: StatsReportingService;
   static stopwatchObjectFactory: StopwatchObjectFactory;
   static storyContentsObjectFactory: StoryContentsObjectFactory;
   static storyNodeObjectFactory: StoryNodeObjectFactory;
@@ -859,6 +872,7 @@ private explorationMetadataObjectFactory: ExplorationMetadataObjectFactory,
 private explorationObjectFactory: ExplorationObjectFactory,
 private explorationOpportunitySummaryObjectFactory: ExplorationOpportunitySummaryObjectFactory,
 private expressionParserService: ExpressionParserService,
+private explorationRecommendationsService: ExplorationRecommendationsService,
 private expressionSyntaxTreeService: ExpressionSyntaxTreeService,
 private extensionTagAssemblerService: ExtensionTagAssemblerService,
 private extractImageFilenamesFromStateService: ExtractImageFilenamesFromStateService,
@@ -877,6 +891,7 @@ private guestCollectionProgressObjectFactory: GuestCollectionProgressObjectFacto
 private guestCollectionProgressService: GuestCollectionProgressService,
 private hintObjectFactory: HintObjectFactory,
 private htmlEscaperService: HtmlEscaperService,
+private i18nLanguageCodeService: I18nLanguageCodeService,
 private idGenerationService: IdGenerationService,
 private imageClickInputValidationService: ImageClickInputValidationService,
 private imageFileObjectFactory: ImageFileObjectFactory,
@@ -903,6 +918,7 @@ private loggerService: LoggerService,
 private logicProofValidationService: LogicProofValidationService,
 private lostChangeObjectFactory: LostChangeObjectFactory,
 private mathExpressionInputValidationService: MathExpressionInputValidationService,
+private messengerService: MessengerService,
 private metaTagCustomizationService: MetaTagCustomizationService,
 private misconceptionObjectFactory: MisconceptionObjectFactory,
 private multipleChoiceInputValidationService: MultipleChoiceInputValidationService,
@@ -935,6 +951,7 @@ private playthroughService: PlaythroughService,
 private predictionAlgorithmRegistryService: PredictionAlgorithmRegistryService,
 private predictionResultObjectFactory: PredictionResultObjectFactory,
 private pretestQuestionBackendApiService: PretestQuestionBackendApiService,
+private profilePageBackendApiService: ProfilePageBackendApiService,
 private pythonProgramTokenizer: PythonProgramTokenizer,
 private questionBackendApiService: QuestionBackendApiService,
 private questionCreationService: QuestionCreationService,
@@ -988,6 +1005,7 @@ private stateSolutionService: StateSolutionService,
 private stateTopAnswersStatsBackendApiService: StateTopAnswersStatsBackendApiService,
 private stateWrittenTranslationsService: StateWrittenTranslationsService,
 private statesObjectFactory: StatesObjectFactory,
+private statsReportingService: StatsReportingService,
 private stopwatchObjectFactory: StopwatchObjectFactory,
 private storyContentsObjectFactory: StoryContentsObjectFactory,
 private storyNodeObjectFactory: StoryNodeObjectFactory,
@@ -1107,6 +1125,7 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.explorationObjectFactory = this.explorationObjectFactory;
     OppiaAngularRootComponent.explorationOpportunitySummaryObjectFactory = this.explorationOpportunitySummaryObjectFactory;
     OppiaAngularRootComponent.expressionParserService = this.expressionParserService;
+    OppiaAngularRootComponent.explorationRecommendationsService = this.explorationRecommendationsService;
     OppiaAngularRootComponent.expressionSyntaxTreeService = this.expressionSyntaxTreeService;
     OppiaAngularRootComponent.extensionTagAssemblerService = this.extensionTagAssemblerService;
     OppiaAngularRootComponent.extractImageFilenamesFromStateService = this.extractImageFilenamesFromStateService;
@@ -1125,6 +1144,7 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.guestCollectionProgressService = this.guestCollectionProgressService;
     OppiaAngularRootComponent.hintObjectFactory = this.hintObjectFactory;
     OppiaAngularRootComponent.htmlEscaperService = this.htmlEscaperService;
+    OppiaAngularRootComponent.i18nLanguageCodeService = this.i18nLanguageCodeService;
     OppiaAngularRootComponent.idGenerationService = this.idGenerationService;
     OppiaAngularRootComponent.imageClickInputValidationService = this.imageClickInputValidationService;
     OppiaAngularRootComponent.imageFileObjectFactory = this.imageFileObjectFactory;
@@ -1151,6 +1171,7 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.logicProofValidationService = this.logicProofValidationService;
     OppiaAngularRootComponent.lostChangeObjectFactory = this.lostChangeObjectFactory;
     OppiaAngularRootComponent.mathExpressionInputValidationService = this.mathExpressionInputValidationService;
+    OppiaAngularRootComponent.messengerService = this.messengerService;
     OppiaAngularRootComponent.metaTagCustomizationService = this.metaTagCustomizationService;
     OppiaAngularRootComponent.misconceptionObjectFactory = this.misconceptionObjectFactory;
     OppiaAngularRootComponent.multipleChoiceInputValidationService = this.multipleChoiceInputValidationService;
@@ -1183,6 +1204,7 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.predictionAlgorithmRegistryService = this.predictionAlgorithmRegistryService;
     OppiaAngularRootComponent.predictionResultObjectFactory = this.predictionResultObjectFactory;
     OppiaAngularRootComponent.pretestQuestionBackendApiService = this.pretestQuestionBackendApiService;
+    OppiaAngularRootComponent.profilePageBackendApiService = this.profilePageBackendApiService;
     OppiaAngularRootComponent.pythonProgramTokenizer = this.pythonProgramTokenizer;
     OppiaAngularRootComponent.questionBackendApiService = this.questionBackendApiService;
     OppiaAngularRootComponent.questionCreationService = this.questionCreationService;
@@ -1236,6 +1258,7 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.stateTopAnswersStatsBackendApiService = this.stateTopAnswersStatsBackendApiService;
     OppiaAngularRootComponent.stateWrittenTranslationsService = this.stateWrittenTranslationsService;
     OppiaAngularRootComponent.statesObjectFactory = this.statesObjectFactory;
+    OppiaAngularRootComponent.statsReportingService = this.statsReportingService;
     OppiaAngularRootComponent.stopwatchObjectFactory = this.stopwatchObjectFactory;
     OppiaAngularRootComponent.storyContentsObjectFactory = this.storyContentsObjectFactory;
     OppiaAngularRootComponent.storyNodeObjectFactory = this.storyNodeObjectFactory;

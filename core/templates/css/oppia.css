@@ -748,7 +748,7 @@ textarea {
 
 
 .input-group-addon.oppia-search-bar-icon {
-  padding: 6px 12px;
+  padding: 7px 12px;
   font-size: 14px;
   font-weight: normal;
   line-height: 1;
@@ -3077,7 +3077,7 @@ md-card.preview-conversation-skin-supplemental-card {
   text-align: center;
 }
 .oppia-navbar-nav.oppia-navbar-profile > li:hover {
-  background-color: #009688
+  background-color: #00645C
 }
 .oppia-activity-summary-tile.small-width .metrics li {
   display: block;
