@@ -115,7 +115,7 @@ angular.module('oppia').directive('statisticsTab', () => ({
         });
       };
 
-      const showStateStatsModal = (stateName, improvementType) => {
+      const openStateStatsModal = (stateName, improvementType) => {
         AlertsService.clearWarnings();
         StateInteractionStatsService
           .computeStats(ExplorationStatesService.getState(stateName))
@@ -147,7 +147,7 @@ angular.module('oppia').directive('statisticsTab', () => ({
       $scope.onClickStateInStatsGraph = (stateName) => {
         if (!stateStatsModalIsOpen) {
           stateStatsModalIsOpen = true;
-          showStateStatsModal(stateName, $scope.highlightStates[stateName]);
+          openStateStatsModal(stateName, $scope.highlightStates[stateName]);
         }
       };
 
