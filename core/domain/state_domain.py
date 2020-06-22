@@ -221,82 +221,6 @@ class AnswerGroup(python_utils.OBJECT):
 
         return html_list
 
-    @staticmethod
-    def convert_html_in_answer_group(answer_group_dict, conversion_fn):
-        """Checks for HTML fields in an answer group dict and converts it
-        according to the conversion function.
-
-        Args:
-            answer_group_dict: dict. The answer group dict.
-            conversion_fn: function. The function to be used for converting the
-                HTML.
-
-        Returns:
-                    dict. The converted answer group dict.
-        """
-        answer_group_dict['outcome']['feedback']['html'] = conversion_fn(
-            answer_group_dict['outcome']['feedback']['html'])
-        for rule_spec_index, rule_spec in enumerate(
-                answer_group_dict['rule_specs']):
-
-            html_field_types_to_rule_specs_dict = json.loads(
-                utils.get_file_contents(
-                    feconf.HTML_FIELD_TYPES_TO_RULE_SPECS_FILE_PATH))
-            for interaction_and_rule_details in (
-                    html_field_types_to_rule_specs_dict.values()):
-                rule_type_has_html = (
-                    rule_spec['rule_type'] in
-                    interaction_and_rule_details['ruleTypes'].keys())
-                if rule_type_has_html:
-                    html_type_format = interaction_and_rule_details['format']
-                    input_variables_from_html_mapping = (
-                        interaction_and_rule_details['ruleTypes'][
-                            rule_spec['rule_type']][
-                                'htmlInputVariables'])
-                    input_variable_match_found = False
-                    for input_variable in rule_spec['inputs'].keys():
-                        if input_variable in input_variables_from_html_mapping:
-                            input_variable_match_found = True
-                            rule_input_variable = (
-                                rule_spec['inputs'][input_variable])
-                            if (html_type_format ==
-                                    feconf.HTML_RULE_VARIABLE_FORMAT_STRING):
-                                rule_spec['inputs'][input_variable] = (
-                                    conversion_fn(rule_input_variable))
-                            elif (html_type_format ==
-                                  feconf.HTML_RULE_VARIABLE_FORMAT_SET):
-                                # Here we are checking the type of the
-                                # rule_specs.inputs because the rule type
-                                # 'Equals' is used by other interactions as
-                                # well which don't have HTML and we don't have
-                                # a reference to the interaction ID.
-                                if isinstance(rule_input_variable, list):
-                                    for value_index, value in enumerate(
-                                            rule_input_variable):
-                                        if isinstance(
-                                                value, python_utils.BASESTRING):
-                                            rule_spec['inputs'][input_variable][
-                                                value_index] = (
-                                                    conversion_fn(value))
-                            elif (html_type_format ==
-                                  feconf.
-                                  HTML_RULE_VARIABLE_FORMAT_LIST_OF_SETS):
-                                for value_index, value in enumerate(
-                                        rule_input_variable):
-                                    rule_spec['inputs'][input_variable][
-                                        value_index][0] = (
-                                            conversion_fn(value[0]))
-                            else:
-                                raise Exception(
-                                    'The rule spec does not belong to a valid'
-                                    ' format.')
-                    if not input_variable_match_found:
-                        raise Exception(
-                            'Rule spec should have at least one valid input '
-                            'variable with Html in it.')
-            answer_group_dict['rule_specs'][rule_spec_index] = rule_spec
-        return answer_group_dict
-
 
 class Hint(python_utils.OBJECT):
     """Value object representing a hint."""
@@ -335,23 +259,6 @@ class Hint(python_utils.OBJECT):
     def validate(self):
         """Validates all properties of Hint."""
         self.hint_content.validate()
-
-    @staticmethod
-    def convert_html_in_hint(hint_dict, conversion_fn):
-        """Checks for HTML fields in the hints and converts it
-        according to the conversion function.
-
-        Args:
-            hint_dict: dict. The hints dict.
-            conversion_fn: function. The function to be used for converting the
-                HTML.
-
-        Returns:
-            dict. The converted hints dict.
-        """
-        hint_dict['hint_content']['html'] = (
-            conversion_fn(hint_dict['hint_content']['html']))
-        return hint_dict
 
 
 class Solution(python_utils.OBJECT):
@@ -433,23 +340,6 @@ class Solution(python_utils.OBJECT):
         interaction_registry.Registry.get_interaction_by_id(
             interaction_id).normalize_answer(self.correct_answer)
         self.explanation.validate()
-
-    @staticmethod
-    def convert_html_in_solution(solution_dict, conversion_fn):
-        """Checks for HTML fields in a solution and convert it according
-        to the conversion function.
-
-        Args:
-            solution_dict: dict. The Solution dict.
-            conversion_fn: function. The function to be used for converting the
-                HTML.
-
-        Returns:
-            dict. The converted Solution dict.
-        """
-        solution_dict['explanation']['html'] = (
-            conversion_fn(solution_dict['explanation']['html']))
-        return solution_dict
 
 
 class InteractionInstance(python_utils.OBJECT):
@@ -861,23 +751,6 @@ class Outcome(python_utils.OBJECT):
                     'Expected outcome refresher_exploration_id to be a string, '
                     'received %s' % self.refresher_exploration_id)
 
-    @staticmethod
-    def convert_html_in_outcome(outcome_dict, conversion_fn):
-        """Checks for HTML fields in the outcome and converts it
-        according to the conversion function.
-
-        Args:
-            outcome_dict: dict. The outcome dict.
-            conversion_fn: function. The function to be used for converting the
-                HTML.
-
-        Returns:
-            dict. The converted outcome dict.
-        """
-        outcome_dict['feedback']['html'] = (
-            conversion_fn(outcome_dict['feedback']['html']))
-        return outcome_dict
-
 
 class Voiceover(python_utils.OBJECT):
     """Value object representing an voiceover."""
@@ -1275,30 +1148,6 @@ class WrittenTranslations(python_utils.OBJECT):
             for translation in translations.values():
                 html_string_list.append(translation.html)
         return html_string_list
-
-    @staticmethod
-    def convert_html_in_written_translations(
-            written_translations_dict, conversion_fn):
-        """Checks for HTML fields in the written translations and converts it
-        according to the conversion function.
-
-        Args:
-            written_translations_dict: dict. The written translations dict.
-            conversion_fn: function. The function to be used for converting the
-                HTML.
-
-        Returns:
-            dict. The converted written translations dict.
-        """
-        for content_id, language_code_to_written_translation in (
-                written_translations_dict['translations_mapping'].items()):
-            for language_code in (
-                    language_code_to_written_translation.keys()):
-                written_translations_dict['translations_mapping'][
-                    content_id][language_code]['html'] = conversion_fn(
-                        written_translations_dict['translations_mapping'][
-                            content_id][language_code]['html'])
-        return written_translations_dict
 
 
 class RecordedVoiceovers(python_utils.OBJECT):
@@ -2328,35 +2177,39 @@ class State(python_utils.OBJECT):
         state_dict['content']['html'] = (
             conversion_fn(state_dict['content']['html']))
         if state_dict['interaction']['default_outcome']:
-            state_dict['interaction']['default_outcome'] = (
-                Outcome.convert_html_in_outcome(
-                    state_dict['interaction']['default_outcome'],
-                    conversion_fn))
+            interaction_feedback_html = state_dict[
+                'interaction']['default_outcome']['feedback']['html']
+            state_dict['interaction']['default_outcome']['feedback'][
+                'html'] = conversion_fn(interaction_feedback_html)
 
         for answer_group_index, answer_group in enumerate(
                 state_dict['interaction']['answer_groups']):
-            state_dict['interaction']['answer_groups'][answer_group_index] = (
-                AnswerGroup.convert_html_in_answer_group(
-                    answer_group, conversion_fn))
-
-        if 'written_translations' in state_dict.keys():
-            state_dict['written_translations'] = (
-                WrittenTranslations.
-                convert_html_in_written_translations(
-                    state_dict['written_translations'], conversion_fn))
-
-        for hint_index, hint in enumerate(state_dict['interaction']['hints']):
-            state_dict['interaction']['hints'][hint_index] = (
-                Hint.convert_html_in_hint(hint, conversion_fn))
+            answer_group_html = answer_group['outcome']['feedback']['html']
+            state_dict['interaction']['answer_groups'][
+                answer_group_index]['outcome']['feedback']['html'] = (
+                    conversion_fn(answer_group_html))
+            if state_dict['interaction']['id'] == 'ItemSelectionInput':
+                for rule_spec_index, rule_spec in enumerate(
+                        answer_group['rule_specs']):
+                    for x_index, x in enumerate(rule_spec['inputs']['x']):
+                        state_dict['interaction']['answer_groups'][
+                            answer_group_index]['rule_specs'][
+                                rule_spec_index]['inputs']['x'][x_index] = (
+                                    conversion_fn(x))
+        for hint_index, hint in enumerate(
+                state_dict['interaction']['hints']):
+            hint_html = hint['hint_content']['html']
+            state_dict['interaction']['hints'][hint_index][
+                'hint_content']['html'] = conversion_fn(hint_html)
 
         if state_dict['interaction']['solution']:
-            state_dict['interaction']['solution'] = (
-                Solution.convert_html_in_solution(
-                    state_dict['interaction']['solution'], conversion_fn))
+            solution_html = state_dict[
+                'interaction']['solution']['explanation']['html']
+            state_dict['interaction']['solution']['explanation']['html'] = (
+                conversion_fn(solution_html))
 
         if state_dict['interaction']['id'] in (
-                'ItemSelectionInput', 'MultipleChoiceInput',
-                'DragAndDropSortInput'):
+                'ItemSelectionInput', 'MultipleChoiceInput'):
             for value_index, value in enumerate(
                     state_dict['interaction']['customization_args'][
                         'choices']['value']):
