@@ -109,4 +109,3 @@ export class IneffectiveFeedbackLoopTaskObjectFactory {
 angular.module('oppia').factory(
   'IneffectiveFeedbackLoopTaskObjectFactory',
   downgradeInjectable(IneffectiveFeedbackLoopTaskObjectFactory));
-

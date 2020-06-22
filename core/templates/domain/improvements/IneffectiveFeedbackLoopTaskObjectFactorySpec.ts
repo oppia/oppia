@@ -183,4 +183,3 @@ describe('Ineffective feedback loop task', function() {
       'At least 7 learners had quit after revisiting this card several times.');
   });
 });
-
