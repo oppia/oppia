@@ -75,8 +75,7 @@ def get_e2e_suite_names_from_script_travis_yml_file():
     script_str = python_utils.convert_to_bytes(travis_file_content['script'])
     # The following line extracts the test suites from patterns like
     # python -m scripts.run_e2e_tests --suite="accessibility".
-    e2e_test_suite_regex = re.compile(
-        r'--suite="([a-zA-Z_-]*)"')
+    e2e_test_suite_regex = re.compile(r'--suite="([a-zA-Z_-]*)"')
     suites_list = e2e_test_suite_regex.findall(script_str)
 
     return sorted(suites_list)
