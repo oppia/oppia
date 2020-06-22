@@ -42,8 +42,6 @@ angular.module('oppia').factory('EditableQuestionBackendApiService', [
     var _createQuestion = function(
         skillIds, skillDifficulties,
         questionDict, imagesData, successCallback, errorCallback) {
-      console.log("in backedn quwarion")
-      console.log(imagesData)
       var postData = {
         question_dict: questionDict,
         skill_ids: skillIds,
@@ -169,7 +167,8 @@ angular.module('oppia').factory('EditableQuestionBackendApiService', [
     };
 
     return {
-      createQuestion: function(skillIds, skillDifficulties, questionDict, imagesData) {
+      createQuestion: function(
+          skillIds, skillDifficulties, questionDict, imagesData) {
         return $q(function(resolve, reject) {
           _createQuestion(skillIds, skillDifficulties,
             questionDict, imagesData, resolve, reject);

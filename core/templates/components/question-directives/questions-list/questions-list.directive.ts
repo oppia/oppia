@@ -90,7 +90,8 @@ angular.module('oppia').directive('questionsList', [
       controllerAs: '$ctrl',
       controller: [
         '$scope', '$filter', '$http', '$q', '$timeout', '$uibModal', '$window',
-        '$location', 'AlertsService', 'ContextService', 'ImageLocalStorageService', 'QuestionCreationService', 'UrlService',
+        '$location', 'AlertsService', 'ContextService',
+        'ImageLocalStorageService', 'QuestionCreationService', 'UrlService',
         'NUM_QUESTIONS_PER_PAGE', 'EditableQuestionBackendApiService',
         'SkillBackendApiService', 'MisconceptionObjectFactory',
         'QuestionObjectFactory', 'SkillDifficultyObjectFactory',
@@ -100,7 +101,8 @@ angular.module('oppia').directive('questionsList', [
         'QuestionUndoRedoService', 'UndoRedoService', 'QuestionsListService',
         function(
             $scope, $filter, $http, $q, $timeout, $uibModal, $window,
-            $location, AlertsService, ContextService, ImageLocalStorageService, QuestionCreationService, UrlService,
+            $location, AlertsService, ContextService,
+            ImageLocalStorageService, QuestionCreationService, UrlService,
             NUM_QUESTIONS_PER_PAGE, EditableQuestionBackendApiService,
             SkillBackendApiService, MisconceptionObjectFactory,
             QuestionObjectFactory, SkillDifficultyObjectFactory,
@@ -180,9 +182,6 @@ angular.module('oppia').directive('questionsList', [
             _reInitializeSelectedSkillIds();
             if (!ctrl.questionIsBeingUpdated) {
               var imagesData = ImageLocalStorageService.getStoredImagesData();
-
-              console.log("in question list directive")
-              console.log(imagesData)
               ImageLocalStorageService.flushStoredImagesData();
               EditableQuestionBackendApiService.createQuestion(
                 ctrl.newQuestionSkillIds, ctrl.newQuestionSkillDifficulties,
@@ -473,7 +472,7 @@ angular.module('oppia').directive('questionsList', [
             var groupedSkillSummaries = ctrl.getGroupedSkillSummaries();
             var selectedSkillId = ctrl.selectedSkillId;
             if (newQuestionIsBeingCreated) {
-               ContextService.setImageSaveDestinationToLocalStorage();
+              ContextService.setImageSaveDestinationToLocalStorage();
             } else {
               ImageLocalStorageService.flushStoredImagesData();
             }

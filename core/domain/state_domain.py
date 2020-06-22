@@ -152,6 +152,7 @@ class AnswerGroup(python_utils.OBJECT):
 
     def get_all_html_content_strings(self):
         """Get all html content strings in the AnswerGroup.
+
         Returns:
             list(str). The list of all html content strings in the interaction.
         """
@@ -219,6 +220,7 @@ class AnswerGroup(python_utils.OBJECT):
                             'variable with Html in it.')
 
         return html_list
+
 
 class Hint(python_utils.OBJECT):
     """Value object representing a hint."""
@@ -605,7 +607,7 @@ class InteractionInstance(python_utils.OBJECT):
         html_list = []
 
         for answer_group in self.answer_groups:
-             html_list = html_list + answer_group.get_all_html_content_strings()
+            html_list = html_list + answer_group.get_all_html_content_strings()
 
         if self.default_outcome:
             default_outcome_html = self.default_outcome.feedback.html
@@ -1137,6 +1139,7 @@ class WrittenTranslations(python_utils.OBJECT):
 
     def get_all_html_content_strings(self):
         """Gets all html content strings used in the written translations.
+
         Returns:
             list(str). The list of html content strings.
         """
@@ -2217,6 +2220,7 @@ class State(python_utils.OBJECT):
 
     def get_all_html_content_strings(self):
         """Get all html content strings in the state.
+
         Returns:
             list(str). The list of all html content strings in the interaction.
         """
@@ -2224,3 +2228,4 @@ class State(python_utils.OBJECT):
             self.written_translations.get_all_html_content_strings() +
             self.interaction.get_all_html_content_strings() + [
                 self.content.html])
+        return html_list

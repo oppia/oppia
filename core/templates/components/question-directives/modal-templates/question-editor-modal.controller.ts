@@ -31,18 +31,18 @@ require('services/context.service.ts');
 require('services/image-local-storage.service.ts');
 
 angular.module('oppia').controller('QuestionEditorModalController', [
-  '$scope', '$uibModal', '$uibModalInstance', 'AlertsService',
-  'QuestionUndoRedoService', 'QuestionValidationService',
-  'SkillSummaryObjectFactory', 'UrlInterpolationService',
-  'associatedSkillSummaries', 'canEditQuestion',
+  '$scope', '$uibModal', '$uibModalInstance', 'AlertsService', 'ContextService',
+  'ImageLocalStorageService', 'QuestionUndoRedoService',
+  'QuestionValidationService', 'SkillSummaryObjectFactory',
+  'UrlInterpolationService', 'associatedSkillSummaries', 'canEditQuestion',
   'categorizedSkills', 'groupedSkillSummaries', 'misconceptionsBySkill',
   'newQuestionIsBeingCreated', 'question', 'questionId', 'questionStateData',
   'rubrics', 'skillNames',
   function(
-      $scope, $uibModal, $uibModalInstance, AlertsService,
-      QuestionUndoRedoService, QuestionValidationService,
-      SkillSummaryObjectFactory, UrlInterpolationService,
-      associatedSkillSummaries, canEditQuestion,
+      $scope, $uibModal, $uibModalInstance, AlertsService, ContextService,
+      ImageLocalStorageService, QuestionUndoRedoService,
+      QuestionValidationService, SkillSummaryObjectFactory,
+      UrlInterpolationService, associatedSkillSummaries, canEditQuestion,
       categorizedSkills, groupedSkillSummaries, misconceptionsBySkill,
       newQuestionIsBeingCreated, question, questionId, questionStateData,
       rubrics, skillNames) {
@@ -64,8 +64,6 @@ angular.module('oppia').controller('QuestionEditorModalController', [
     $scope.getSkillEditorUrl = function(skillId) {
       return '/skill_editor/' + skillId;
     };
-    console.log("save dest")
-    console.log(ContextService.getImageSaveDestination())
     $scope.removeSkill = function(skillId) {
       if ($scope.associatedSkillSummaries.length === 1) {
         AlertsService.addInfoMessage(
@@ -182,7 +180,6 @@ angular.module('oppia').controller('QuestionEditorModalController', [
         return;
       }
       ContextService.resetImageSaveDestination();
-
       $uibModalInstance.close(returnModalObject);
     };
     // Checking if Question contains all requirement to enable
@@ -204,7 +201,6 @@ angular.module('oppia').controller('QuestionEditorModalController', [
         }).result.then(function() {
           ContextService.resetImageSaveDestination();
           ImageLocalStorageService.flushStoredImagesData();
-
           $uibModalInstance.dismiss('cancel');
         }, function() {
           // Note to developers:
