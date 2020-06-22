@@ -1520,6 +1520,8 @@ class DocstringChecker(checkers.BaseChecker):
                         self.add_message(
                             'malformed-parameter',
                             line=line_num + 1)
+                    elif re.search(br':$', line) and description:
+                        free_form_return = True
                     # Description that must be indented by 8
                     elif description:
                         if current_indentation != (
