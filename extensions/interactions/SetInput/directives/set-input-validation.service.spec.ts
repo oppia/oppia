@@ -64,7 +64,7 @@ describe('SetInputValidationService', () => {
       dest: 'Second State',
       feedback: {
         html: '',
-        audio_translations: {}
+        content_id: ''
       },
       labelled_as_correct: false,
       param_changes: [],
@@ -72,12 +72,12 @@ describe('SetInputValidationService', () => {
       missing_prerequisite_skill_id: null
     });
 
-    goodAnswerGroups = [agof.createNew([], goodDefaultOutcome, false, null)];
+    goodAnswerGroups = [agof.createNew([], goodDefaultOutcome, null, null)];
 
     createAnswerGroupByRules = (rules) => agof.createNew(
       rules,
       goodDefaultOutcome,
-      false,
+      null,
       null
     );
   });

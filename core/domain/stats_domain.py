@@ -1325,7 +1325,7 @@ class StateAnswersCalcOutput(python_utils.OBJECT):
 
         output_data = self.calculation_output.to_raw_type()
         if sys.getsizeof(output_data) > max_bytes_per_calc_output_data:
-            # TODO(msl): find a better way to deal with big
+            # TODO(msl): Find a better way to deal with big
             # calculation output data, e.g. just skip. At the moment,
             # too long answers produce a ValidationError.
             raise utils.ValidationError(
