@@ -281,7 +281,9 @@ class Solution(python_utils.OBJECT):
             interaction_id: str. The interaction id.
             answer_is_exclusive: bool. True if is the only correct answer;
                 False if is one of possible answer.
-            correct_answer: BaseInteraction.answer_type. The correct answer;
+            correct_answer: list(set) or str. The type of correct_answer is
+                determined by the value of BaseInteraction.answer_type.
+                The correct answer;
                 this answer enables the learner to progress to the next card.
             explanation: SubtitledHtml. Contains text and text id to link audio
                 translations for the solution's explanation.
@@ -605,6 +607,13 @@ class InteractionInstance(python_utils.OBJECT):
             list(str): The list of all html content strings in the interaction.
         """
         html_list = []
+        interaction = (
+            interaction_registry.Registry.get_interaction_by_id(
+                self.id))
+        html_field_types_to_rule_specs_dict = json.loads(
+            utils.get_file_contents(
+                feconf.HTML_FIELD_TYPES_TO_RULE_SPECS_FILE_PATH))
+
 
         for answer_group in self.answer_groups:
             html_list = html_list + answer_group.get_all_html_content_strings()
@@ -617,17 +626,22 @@ class InteractionInstance(python_utils.OBJECT):
             hint_html = hint.hint_content.html
             html_list = html_list + [hint_html]
 
-        if self.solution:
+        if interaction.can_have_solution:
             solution_html = self.solution.explanation.html
             html_list = html_list + [solution_html]
+
             if self.solution.correct_answer:
-                interaction = (
-                    interaction_registry.Registry.get_interaction_by_id(
-                        self.id).to_dict())
-                if (interaction['answer_type'] ==
-                        feconf.ANSWER_TYPE_LIST_OF_SETS_OF_HTML):
-                    for value in self.solution.correct_answer:
-                        html_list = html_list + [value[0]]
+                for html_type in html_field_types_to_rule_specs_dict.keys():
+                    if html_type == interaction.answer_type:
+                        if (
+                                html_type ==
+                                feconf.ANSWER_TYPE_LIST_OF_SETS_OF_HTML):
+                            for value in self.solution.correct_answer:
+                                html_list = html_list + value
+                        elif html_type == feconf.ANSWER_TYPE_SET_OF_HTML:
+                            for value in self.solution.correct_answer:
+                                html_list = html_list + [value]
+
 
         if self.id in (
                 'ItemSelectionInput', 'MultipleChoiceInput',

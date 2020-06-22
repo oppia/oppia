@@ -29,6 +29,7 @@ from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import html_validation_service
+from core.domain import interaction_registry
 from core.domain import state_domain
 from core.tests import test_utils
 import feconf
@@ -388,6 +389,27 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'training_data': [],
             'tagged_skill_misconception_id': None
         }]
+        state_solution_dict = {
+            'interaction_id': '',
+            'answer_is_exclusive': True,
+            'correct_answer': [
+                '<p>state customization arg html 1</p>',
+                '<p>state customization arg html 2</p>',
+                '<p>state customization arg html 3</p>',
+                '<p>state customization arg html 4</p>'
+            ],
+            'explanation': {
+                'content_id': 'solution',
+                'html': '<p>This is solution for state1</p>'
+            }
+        }
+        state_hint_list = [
+            state_domain.Hint(
+                state_domain.SubtitledHtml(
+                    'hint_1', '<p>Hello, this is html1 for hint 1</p>'
+                )
+            )
+        ]
 
         state.update_content(
             state_domain.SubtitledHtml.from_dict(state_content_dict))
@@ -395,8 +417,17 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state.update_interaction_answer_groups(state_answer_groups)
         state.update_interaction_customization_args(
             state_customization_args_dict)
+        state.update_interaction_hints(state_hint_list)
 
+        solution = state_domain.Solution.from_dict(
+            state.interaction.id, state_solution_dict)
+        state.update_interaction_solution(solution)
         exp_services.save_new_exploration('owner_id', exploration)
+
+        interaction = (
+            interaction_registry.Registry.get_interaction_by_id(
+                'ItemSelectionInput'))
+        interaction.can_have_solution = True
         html_list = state.get_all_html_content_strings()
         self.assertEqual(
             html_list,
@@ -406,6 +437,12 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 '<p>ContainsAtLeastOneOf rule_spec html</p>',
                 '<p>IsProperSubsetOf rule_spec html</p>',
                 '<p>DoesNotContainAtLeastOneOf rule_spec html</p>', '',
+                '<p>Hello, this is html1 for hint 1</p>',
+                '<p>This is solution for state1</p>',
+                '<p>state customization arg html 1</p>',
+                '<p>state customization arg html 2</p>',
+                '<p>state customization arg html 3</p>',
+                '<p>state customization arg html 4</p>',
                 '<p>init_state customization arg html 1</p>',
                 '<p>init_state customization arg html 2</p>',
                 '<p>init_state customization arg html 3</p>',
