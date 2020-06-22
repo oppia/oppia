@@ -36,13 +36,6 @@ var CommunityDashboardTranslateTextTab = function() {
     by.css('.protractor-test-language-selector-featured-explanation'));
 
   var _openSelector = async function() {
-    try {
-      let dropdownVisible = await dropdown.isDisplayed();
-      if (dropdownVisible) {
-        return;
-      }
-    } catch {}
-
     await waitFor.elementToBeClickable(
       selectorContainer,
       'Language selector taking too long to be clickable'
