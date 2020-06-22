@@ -231,8 +231,8 @@ class ExplorationCommitLogEntry(python_utils.OBJECT):
             commit_cmds: list(dict). A list of commands, describing changes
                 made in this model, which should give sufficient information to
                 reconstruct the commit. Each dict always contains the following
-                key:
-                    - cmd: str. Unique command.
+                key: 
+                    - cmd (str). Unique command.
                 and then additional arguments for that command.
             version: int. The version of the exploration after the commit.
             post_commit_status: str. The new exploration status after the
@@ -306,7 +306,7 @@ class ExpVersionReference(python_utils.OBJECT):
 
         Raises:
             ValidationError: One or more attributes of the ExpVersionReference
-            are invalid.
+                are invalid.
         """
         if not isinstance(self.exp_id, python_utils.BASESTRING):
             raise utils.ValidationError(
@@ -613,7 +613,7 @@ class Exploration(python_utils.OBJECT):
 
         Raises:
             ValidationError: One or more attributes of the Exploration are
-            invalid.
+                invalid.
         """
         if not isinstance(self.title, python_utils.BASESTRING):
             raise utils.ValidationError(
@@ -900,7 +900,7 @@ class Exploration(python_utils.OBJECT):
 
         Raises:
             ValidationError: One or more states are not reachable from the
-            initial state of the Exploration.
+                initial state of the Exploration.
         """
         # This queue stores state names.
         processed_queue = []
@@ -1134,7 +1134,7 @@ class Exploration(python_utils.OBJECT):
         """Update the param change dict.
 
         Args:
-           param_changes: list(ParamChange). List of ParamChange objects.
+            param_changes: list(ParamChange). List of ParamChange objects.
         """
         self.param_changes = param_changes
 
@@ -1178,7 +1178,7 @@ class Exploration(python_utils.OBJECT):
 
         Raises:
             ValueError: At least one of the new state names already exists in
-            the states dict.
+                the states dict.
         """
         for state_name in state_names:
             if state_name in self.states:
@@ -1197,7 +1197,7 @@ class Exploration(python_utils.OBJECT):
 
         Raises:
             ValueError: The old state name does not exist or the new state name
-            is already in states dict.
+                is already in states dict.
         """
         if old_state_name not in self.states:
             raise ValueError('State %s does not exist' % old_state_name)
@@ -1234,7 +1234,7 @@ class Exploration(python_utils.OBJECT):
 
         Raises:
             ValueError: The state does not exist or is the initial state of the
-            exploration.
+                exploration.
         """
         if state_name not in self.states:
             raise ValueError('State %s does not exist' % state_name)
@@ -1288,8 +1288,8 @@ class Exploration(python_utils.OBJECT):
 
         Returns:
             dict. The trainable states dict. This dict has three keys
-                representing state names with changed answer groups and
-                unchanged answer groups respectively.
+            representing state names with changed answer groups and
+            unchanged answer groups respectively.
         """
         trainable_states_dict = {
             'state_names_with_changed_answer_groups': [],
@@ -2215,7 +2215,7 @@ class Exploration(python_utils.OBJECT):
         content_ids_to_audio_translations keys, but the new validation will
         check whether both are equal.
 
-         Args:
+        Args:
             states_dict: dict. A dict where each key-value pair represents,
                 respectively, a state name and a dict used to initialize a
                 State domain object.
@@ -2277,7 +2277,7 @@ class Exploration(python_utils.OBJECT):
         """Converts from version 27 to 28. Version 28 replaces
         content_ids_to_audio_translations with recorded_voiceovers.
 
-         Args:
+        Args:
             states_dict: dict. A dict where each key-value pair represents,
                 respectively, a state name and a dict used to initialize a
                 State domain object.
@@ -2427,7 +2427,7 @@ class Exploration(python_utils.OBJECT):
 
         Args:
             versioned_exploration_states: dict. A dict with two keys:
-                - states_schema_version: int. The states schema version for the
+                states_schema_version: int. The states schema version for the
                     exploration.
                 - states: dict. The dict of states comprising the exploration.
                     The keys are state names and the values are dicts used to
