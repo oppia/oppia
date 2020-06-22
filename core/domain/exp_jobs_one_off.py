@@ -147,6 +147,7 @@ class MathExpressionValidationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         is_valid_math_equation = schema_utils.get_validator(
             'is_valid_math_equation')
         ltt = latex2text.LatexNodes2Text()
+        mevooj = MathExpressionValidationOneOffJob
 
         if not item.deleted:
             exploration = exp_fetchers.get_exploration_from_model(item)
@@ -161,7 +162,8 @@ class MathExpressionValidationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                             # special characters like sqrt and pi, which is why
                             # they need to be replaced with their corresponding
                             # text values before performing validation.
-                            for unicode_char, text in MathExpressionValidationOneOffJob.UNICODE_TO_TEXT.items(): #pylint: disable=line-too-long
+                            for unicode_char, text in (
+                                    mevooj.UNICODE_TO_TEXT.items()):
                                 rule_input = rule_input.replace(
                                     unicode_char, text)
 
@@ -177,8 +179,9 @@ class MathExpressionValidationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def reduce(key, values):
+        mevooj = MathExpressionValidationOneOffJob
         if key.startswith('Valid'):
-            yield (key, values[:MathExpressionValidationOneOffJob.VALID_MATH_INPUTS_YIELD_LIMIT]) #pylint: disable=line-too-long
+            yield (key, values[:mevooj.VALID_MATH_INPUTS_YIELD_LIMIT])
         else:
             yield (key, values)
 

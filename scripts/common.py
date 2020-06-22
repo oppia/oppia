@@ -52,7 +52,6 @@ YARN_VERSION = '1.22.4'
 
 # Versions of libraries used in backend.
 PILLOW_VERSION = '6.2.2'
-PYLATEXENC_VERSION = '2.5'
 
 RELEASE_BRANCH_NAME_PREFIX = 'release-'
 CURR_DIR = os.path.abspath(os.getcwd())

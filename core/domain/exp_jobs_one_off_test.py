@@ -412,9 +412,9 @@ class MathExpressionValidationOneOffJobTests(test_utils.GenericTestBase):
         """Checks that the number of valid explorations yielded is less than
         the limit mentioned by the VALID_MATH_EXP_YIELD_LIMIT constant.
         """
-
+        mevooj = exp_jobs_one_off.MathExpressionValidationOneOffJob
         # Resetting the threshold only for testing purposes.
-        exp_jobs_one_off.MathExpressionValidationOneOffJob.VALID_MATH_INPUTS_YIELD_LIMIT = 3 #pylint: disable=line-too-long
+        mevooj.VALID_MATH_INPUTS_YIELD_LIMIT = 3
 
         exploration = exp_domain.Exploration.create_default_exploration(
             self.VALID_EXP_ID, title='title', category='category')
