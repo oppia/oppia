@@ -12,7 +12,7 @@
         "http://127.0.0.1:8181/donate",
         "http://127.0.0.1:8181/get-started",
         "http://127.0.0.1:8181/community-library",
-        "http://127.0.0.1:8181/privacy",
+        "http://127.0.0.1:8181/privacy-policy",
         "http://127.0.0.1:8181/teach",
         "http://127.0.0.1:8181/terms",
         "http://127.0.0.1:8181/thanks"
@@ -32,7 +32,7 @@
             "uses-responsive-images": ["error", {"minScore": 1}],
             "uses-optimized-images": ["error", {"minScore": 1}],
             "uses-rel-preconnect": ["error", {"minScore": 0.5}],
-            "time-to-first-byte": ["error", {"minScore": 1}],
+            "time-to-first-byte": ["error", {"minScore": 0}],
             "redirects": ["error", {"minScore": 1}],
             "uses-rel-preload": ["error", {"minScore": 1}],
             "efficient-animated-content": ["error",{"minScore": 1}],
@@ -44,10 +44,10 @@
             "external-anchors-use-rel-noopener": ["error", {"minScore": 1}],
             "geolocation-on-start": ["error", {"minScore": 1}],
             "doctype": ["error", {"minScore": 1}],
-            "no-vulnerable-libraries": ["error", {"minScore": 1}],
+            "no-vulnerable-libraries": ["error", {"minScore": 0}],
             "js-libraries": ["error", {"minScore": 1}],
             "notification-on-start": ["error", {"minScore": 1}],
-            "deprecations": ["error", {"minScore": 1}],
+            "deprecations": ["error", {"minScore": 0}],
             "password-inputs-can-be-pasted-into": ["error", {"minScore": 1}],
             "image-aspect-ratio": ["error", {"minScore": 1}]
           }
@@ -55,7 +55,7 @@
         {
           "matchingUrlPattern": "http://[^/]+/$",
           "assertions": {
-            "time-to-first-byte": ["off", {"minScore": 1}],
+            "time-to-first-byte": ["off", {"minScore": 0}],
             "render-blocking-resources": ["error", {"minScore": 0}],
             "unminified-css": ["error", {"minScore": 0}],
             "unminified-javascript": ["error", {"minScore": 0}],
@@ -186,6 +186,45 @@
             "uses-text-compression": ["error", {"minScore": 0}],
             "uses-http2": ["error", {"minScore": 0}],
             "errors-in-console": ["error", {"minScore": 0}]
+          }
+        },
+        {
+          "matchingUrlPattern": "http://[^/]+/(|contact|about|donate|get-started|community-library|terms)$",
+          "assertions": {
+            "accesskeys": ["error", {"minScore": 1}],
+            "aria-allowed-attr": ["error", {"minScore": 1}],
+            "aria-required-attr": ["error", {"minScore": 1}],
+            "aria-required-children": ["error", {"minScore": 1}],
+            "aria-required-parent": ["error", {"minScore": 1}],
+            "aria-roles": ["error", {"minScore": 1}],
+            "aria-valid-attr-value": ["error", {"minScore": 1}],
+            "aria-valid-attr": ["error", {"minScore": 1}],
+            "audio-caption": ["error", {"minScore": 0}],
+            "button-name": ["error", {"minScore": 1}],
+            "bypass": ["error", {"minScore": 1}],
+            "dlitem": ["error", {"minScore": 1}],
+            "definition-list": ["error", {"minScore": 1}],
+            "document-title": ["error", {"minScore": 1}],
+            "duplicate-id": ["error", {"minScore": 0}],
+            "frame-title": ["error", {"minScore": 1}],
+            "html-has-lang": ["error", {"minScore": 1}],
+            "html-lang-valid": ["error", {"minScore": 1}],
+            "image-alt": ["error", {"minScore": 1}],
+            "input-image-alt": ["error", {"minScore": 1}],
+            "label": ["error", {"minScore": 1}],
+            "layout-table": ["error", {"minScore": 1}],
+            "link-name": ["error", {"minScore": 1}],
+            "list": ["error", {"minScore": 1}],
+            "listitem": ["error", {"minScore": 1}],
+            "meta-refresh": ["error", {"minScore": 1}],
+            "meta-viewport": ["error", {"minScore": 1}],
+            "object-alt": ["error", {"minScore": 1}],
+            "tabindex": ["error", {"minScore": 1}],
+            "td-headers-attr": ["error", {"minScore": 1}],
+            "th-has-data-cells": ["error", {"minScore": 1}],
+            "valid-lang": ["error", {"minScore": 1}],
+            "video-caption": ["error", {"minScore": 1}],
+            "video-description": ["error", {"minScore": 1}]
           }
         }
       ]
