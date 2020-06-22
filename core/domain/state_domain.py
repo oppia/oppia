@@ -620,6 +620,11 @@ class InteractionInstance(python_utils.OBJECT):
         if self.solution:
             solution_html = self.solution.explanation.html
             html_list = html_list + [solution_html]
+            if (self.solution.correct_answer and
+                    isinstance(self.solution.correct_answer, list)):
+                for value in self.solution.correct_answer:
+                    if isinstance(value, list):
+                        html_list = html_list + [value[0]]
 
         if self.id in (
                 'ItemSelectionInput', 'MultipleChoiceInput',

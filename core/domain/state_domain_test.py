@@ -140,15 +140,62 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                         'html': '<p>state written_translation feedback-en</p>',
                         'needs_update': False
                     }
+                },
+                'hint_1': {
+                    'hi': {
+                        'html': '<p>state written_translation hint_1-hi</p>',
+                        'needs_update': False
+                    },
+                    'en': {
+                        'html': '<p>state written_translation hint_1-en</p>',
+                        'needs_update': False
+                    }
+                },
+                'solution': {
+                    'hi': {
+                        'html': '<p>state written_translation solution-hi</p>',
+                        'needs_update': False
+                    },
+                    'en': {
+                        'html': '<p>state written_translation solution-en</p>',
+                        'needs_update': False
+                    }
                 }
             }
         }
+        state_hint_list = [
+            state_domain.Hint(
+                state_domain.SubtitledHtml(
+                    'hint_1', '<p>Hello, this is html1 for hint 1</p>'
+                )
+            )
+        ]
+
+        state_solution_dict = {
+            'interaction_id': '',
+            'answer_is_exclusive': True,
+            'correct_answer': [
+                ['<p>state customization arg html 1</p>'],
+                ['<p>state customization arg html 2</p>'],
+                ['<p>state customization arg html 3</p>'],
+                ['<p>state customization arg html 4</p>']
+            ],
+            'explanation': {
+                'content_id': 'solution',
+                'html': '<p>This is solution for state1</p>'
+            }
+        }
+
         state.update_content(
             state_domain.SubtitledHtml.from_dict(state_content_dict))
         state.update_interaction_id('DragAndDropSortInput')
         state.update_interaction_customization_args(
             state_customization_args_dict)
+        state.update_interaction_hints(state_hint_list)
 
+        solution = state_domain.Solution.from_dict(
+            state.interaction.id, state_solution_dict)
+        state.update_interaction_solution(solution)
         state.update_interaction_answer_groups(
             [state_answer_group_dict])
         state.update_written_translations(
@@ -167,6 +214,10 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 '<p>state written_translation outcome-en</p>',
                 '<p>state written_translation feedback-hi</p>',
                 '<p>state written_translation feedback-en</p>',
+                '<p>state written_translation hint_1-hi</p>',
+                '<p>state written_translation hint_1-en</p>',
+                '<p>state written_translation solution-hi</p>',
+                '<p>state written_translation solution-en</p>',
                 '<p>State Feedback</p>',
                 '<p>IsEqualToOrdering rule_spec htmls</p>',
                 '<p>HasElementXAtPositionY rule_spec html</p>',
@@ -174,6 +225,12 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 '<p>x input for HasElementXAtPositionY rule_spec </p>',
                 ('<p>IsEqualToOrderingWithOneItemAtIncorrectPosition rule_s'
                  'pec htmls</p>'), '',
+                '<p>Hello, this is html1 for hint 1</p>',
+                '<p>This is solution for state1</p>',
+                '<p>state customization arg html 1</p>',
+                '<p>state customization arg html 2</p>',
+                '<p>state customization arg html 3</p>',
+                '<p>state customization arg html 4</p>',
                 '<p>state customization arg html 1</p>',
                 '<p>state customization arg html 2</p>',
                 '<p>state customization arg html 3</p>',
