@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for thanks page component.
+ * @fileoverview Unit tests for skill editor page component.
  */
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
