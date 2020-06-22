@@ -1,4 +1,4 @@
-// Copyright 2018 The Oppia Authors. All Rights Reserved.
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,19 +22,18 @@ import { SkillMasteryObjectFactory } from
 describe('Skill mastery object factory', () => {
   let skillMasteryObjectFactory: SkillMasteryObjectFactory;
 
-  let skillMasteryDictSample = {
-    skillId1: 1.0,
-    skillId2: 0.3
-  };
-
   beforeEach(() => {
     skillMasteryObjectFactory = new SkillMasteryObjectFactory();
   });
 
   it('should be able to create a skill mastery object',
     () => {
-      let skillMastery = skillMasteryObjectFactory.createFromBackendDict(
-        skillMasteryDictSample);
+      const skillMastery = skillMasteryObjectFactory.createFromBackendDict(
+        {
+          skillId1: 1.0,
+          skillId2: 0.3
+        }
+      );
 
       expect(skillMastery.getMasteryDegree('skillId1')).toBe(1.0);
       expect(skillMastery.getMasteryDegree('skillId2')).toBe(0.3);
@@ -42,9 +41,13 @@ describe('Skill mastery object factory', () => {
 
   it('should be able to convert to a dict object',
     () => {
-      let skillMastery = skillMasteryObjectFactory.createFromBackendDict(
-        skillMasteryDictSample);
-      let skillMasteryBackendDict = skillMastery.toBackendDict();
+      const skillMastery = skillMasteryObjectFactory.createFromBackendDict(
+        {
+          skillId1: 1.0,
+          skillId2: 0.3
+        }
+      );
+      const skillMasteryBackendDict = skillMastery.toBackendDict();
 
       expect(skillMasteryBackendDict.skillId1).toBe(1.0);
       expect(skillMasteryBackendDict.skillId2).toBe(0.3);
@@ -52,8 +55,12 @@ describe('Skill mastery object factory', () => {
 
   it('should be able to set degree of mastery',
     () => {
-      let skillMastery = skillMasteryObjectFactory.createFromBackendDict(
-        skillMasteryDictSample);
+      const skillMastery = skillMasteryObjectFactory.createFromBackendDict(
+        {
+          skillId1: 1.0,
+          skillId2: 0.3
+        }
+      );
 
       expect(skillMastery.getMasteryDegree('skillId1')).toBe(1.0);
       skillMastery.setMasteryDegree('skillId1', 0.5);
