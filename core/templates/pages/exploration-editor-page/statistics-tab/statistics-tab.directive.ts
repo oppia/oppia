@@ -44,162 +44,136 @@ require('visualizations/oppia-visualization-sorted-tiles.directive.ts');
 require(
   'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
 
-angular.module('oppia').directive('statisticsTab', [() => ({
+angular.module('oppia').directive('statisticsTab', () => ({
   restrict: 'E',
-  scope: {},
-  bindToController: {},
   template: require('./statistics-tab.directive.html'),
-  controllerAs: '$ctrl',
   controller: [
     '$http', '$scope', '$uibModal', 'AlertsService', 'ComputeGraphService',
-    'DateTimeFormatService', 'ExplorationDataService',
+    'ExplorationDataService',
     'ExplorationStatesService', 'ReadOnlyExplorationBackendApiService',
     'StateImprovementSuggestionService', 'StateInteractionStatsService',
     'StatesObjectFactory', 'UrlInterpolationService',
     'IMPROVE_TYPE_INCOMPLETE',
     function(
         $http, $scope, $uibModal, AlertsService, ComputeGraphService,
-        DateTimeFormatService, ExplorationDataService,
+        ExplorationDataService,
         ExplorationStatesService, ReadOnlyExplorationBackendApiService,
         StateImprovementSuggestionService, StateInteractionStatsService,
         StatesObjectFactory, UrlInterpolationService,
         IMPROVE_TYPE_INCOMPLETE) {
-      var ctrl = this;
-      var _EXPLORATION_STATS_VERSION_ALL = 'all';
-      var stateStatsModalIsOpen = false;
+      let stateStatsModalIsOpen = false;
+      let states = null;
 
-      ctrl.getLocaleAbbreviatedDatetimeString = function(millisSinceEpoch) {
-        return DateTimeFormatService.getLocaleAbbreviatedDatetimeString(
-          millisSinceEpoch);
-      };
-
-      ctrl.refreshExplorationStatistics = function(version) {
-        ctrl.explorationStatisticsUrl = (
-          '/createhandler/statistics/' + ExplorationDataService.explorationId);
-
+      const refreshExplorationStatistics = () => {
         // TODO(#8038): Update this to use ExplorationStatsService. Requires
-        // refactoring to all consumers of state_stats_mapping to use a Map
-        // rather than a plain object.
-        $http.get(ctrl.explorationStatisticsUrl).then(function(statsResponse) {
-          var data = statsResponse.data;
-          var numStarts = data.num_starts;
-          var numActualStarts = data.num_actual_starts;
-          var numCompletions = data.num_completions;
-          ctrl.stateStats = data.state_stats_mapping;
+        // refactoring consumers of state_stats_mapping to use a Map rather than
+        // a plain object.
+        const explorationStatisticsUrl = UrlInterpolationService.interpolateUrl(
+          '/createhandler/statistics/<exploration_id>', {
+            exploration_id: ExplorationDataService.explorationId
+          });
 
-          ReadOnlyExplorationBackendApiService
-            .loadLatestExploration(ExplorationDataService.explorationId)
-            .then(function(response) {
-              ctrl.states = StatesObjectFactory.createFromBackendDict(
-                response.exploration.states);
-              var initStateName = response.exploration.init_state_name;
+        Promise.all([
+          ReadOnlyExplorationBackendApiService.loadLatestExploration(
+            ExplorationDataService.explorationId),
+          $http.get(explorationStatisticsUrl),
+        ]).then(responses => {
+          const [expResponse, statsResponse] = responses;
+          const initStateName = expResponse.exploration.init_state_name;
+          const numStarts = statsResponse.data.num_starts;
+          const numActualStarts = statsResponse.data.num_actual_starts;
+          const numCompletions = statsResponse.data.num_completions;
+          const stateStatsMapping = statsResponse.data.state_stats_mapping;
 
-              ctrl.statsGraphData = ComputeGraphService.compute(
-                initStateName, ctrl.states);
-              var improvements = (
-                StateImprovementSuggestionService.getStateImprovements(
-                  ctrl.states, ctrl.stateStats));
-              ctrl.highlightStates = {};
-              improvements.forEach(function(impItem) {
-                // TODO(bhenning): This is the feedback for improvement types
-                // and should be included with the definitions of the
-                // improvement types.
-                if (impItem.type === IMPROVE_TYPE_INCOMPLETE) {
-                  ctrl.highlightStates[impItem.stateName] = (
-                    'May be confusing');
-                }
-              });
-            });
+          states = StatesObjectFactory.createFromBackendDict(
+            expResponse.exploration.states);
+          $scope.stateStats = stateStatsMapping;
 
-          if (numActualStarts > 0) {
-            ctrl.explorationHasBeenVisited = true;
-          }
+          const improvements = (
+            StateImprovementSuggestionService.getStateImprovements(
+              states, $scope.stateStats));
 
-          ctrl.numPassersby = numStarts - numActualStarts;
-          ctrl.pieChartData = [
+          $scope.statsGraphData = (
+            ComputeGraphService.compute(initStateName, states));
+          $scope.highlightStates = {};
+          improvements.forEach(item => {
+            // TODO(bhenning): This is the feedback for improvement types
+            // and should be included with the definitions of the
+            // improvement types.
+            if (item.type === IMPROVE_TYPE_INCOMPLETE) {
+              $scope.highlightStates[item.stateName] = 'May be confusing';
+            }
+          });
+
+          $scope.explorationHasBeenVisited = numActualStarts > 0;
+          $scope.numPassersby = numStarts - numActualStarts;
+          $scope.pieChartData = [
             ['Type', 'Number'],
             ['Completions', numCompletions],
             ['Non-Completions', numActualStarts - numCompletions]
           ];
         });
       };
-      ctrl.onClickStateInStatsGraph = function(stateName) {
+
+      const showStateStatsModal = (stateName, improvementType) => {
+        AlertsService.clearWarnings();
+        StateInteractionStatsService
+          .computeStats(ExplorationStatesService.getState(stateName))
+          .then(stats => $uibModal.open({
+            controller: 'StateStatsModalController',
+            templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+              '/pages/exploration-editor-page/statistics-tab/templates/' +
+              'state-stats-modal.template.html'),
+            backdrop: true,
+            resolve: {
+              improvementType: () => improvementType,
+              stateName: () => stateName,
+              stateStats: () => $scope.stateStats[stateName],
+              visualizationsInfo: () => stats.visualizations_info,
+              interactionArgs: () => (
+                states.getState(stateName).interaction.customizationArgs)
+            },
+          }).result)
+          .then(
+            () => {
+              stateStatsModalIsOpen = false;
+            },
+            () => {
+              AlertsService.clearWarnings();
+              stateStatsModalIsOpen = false;
+            });
+      };
+
+      $scope.onClickStateInStatsGraph = (stateName) => {
         if (!stateStatsModalIsOpen) {
           stateStatsModalIsOpen = true;
-          ctrl.showStateStatsModal(
-            stateName, ctrl.highlightStates[stateName]);
+          showStateStatsModal(stateName, $scope.highlightStates[stateName]);
         }
       };
 
-      ctrl.showStateStatsModal = function(stateName, improvementType) {
-        AlertsService.clearWarnings();
-
-        StateInteractionStatsService.computeStats(
-          ExplorationStatesService.getState(stateName)
-        ).then(stats => $uibModal.open({
-          controller: 'StateStatsModalController',
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/exploration-editor-page/statistics-tab/templates/' +
-            'state-stats-modal.template.html'),
-          backdrop: true,
-          resolve: {
-            improvementType: function() {
-              return improvementType;
-            },
-            interactionArgs: function() {
-              return (
-                ctrl.states.getState(stateName).interaction.customizationArgs);
-            },
-            stateName: function() {
-              return stateName;
-            },
-            stateStats: function() {
-              return ctrl.stateStats[stateName];
-            },
-            visualizationsInfo: function() {
-              return stats.visualizations_info;
-            }
-          },
-        }).result.then(
-          () => {
-            stateStatsModalIsOpen = false;
-          },
-          () => {
-            AlertsService.clearWarnings();
-            stateStatsModalIsOpen = false;
-          }));
-      };
-
-      ctrl.$onInit = function() {
-        $scope.$on('refreshStatisticsTab', function() {
-          ctrl.refreshExplorationStatistics(_EXPLORATION_STATS_VERSION_ALL);
-        });
-        ctrl.COMPLETION_RATE_CHART_OPTIONS = {
+      this.$onInit = () => {
+        $scope.explorationHasBeenVisited = false;
+        $scope.COMPLETION_RATE_CHART_OPTIONS = {
           chartAreaWidth: 300,
           colors: ['green', 'firebrick'],
           height: 100,
           legendPosition: 'right',
           width: 500
         };
-        ctrl.COMPLETION_RATE_PIE_CHART_OPTIONS = {
-          title: '',
-          left: 230,
-          pieHole: 0.6,
-          pieSliceTextStyleColor: 'black',
-          pieSliceBorderColor: 'black',
+        $scope.COMPLETION_RATE_PIE_CHART_OPTIONS = {
           chartAreaWidth: 500,
           colors: ['#008808', '#d8d8d8'],
           height: 300,
+          left: 230,
           legendPosition: 'right',
-          width: 600
+          pieHole: 0.6,
+          pieSliceBorderColor: 'black',
+          pieSliceTextStyleColor: 'black',
+          title: '',
+          width: 600,
         };
-
-        ctrl.currentVersion = _EXPLORATION_STATS_VERSION_ALL;
-
-        ctrl.hasTabLoaded = false;
-
-        ctrl.explorationHasBeenVisited = false;
+        $scope.$on('refreshStatisticsTab', refreshExplorationStatistics);
       };
-    }
-  ]
-})]);
+    },
+  ],
+}));
