@@ -152,10 +152,10 @@
     </div>
   </div>
   <div class="oppia-content-wrapper oppia-recording-timer">
-    <div ng-if="isAudioAvailable && !isPlayingUploadedAudio()">
+    <div ng-if="isAudioAvailable && audioIsLoading">
       <[0 | formatTimer]> / <[durationSecs | formatTimer]>
     </div>
-    <div ng-if="audioTimerIsShown && isPlayingUploadedAudio()">
+    <div ng-if="audioTimerIsShown && !audioIsLoading">
       <[getUploadedAudioTimer()]>
     </div>
   </div>
@@ -202,9 +202,11 @@
   </span>
 </div>
 <div class="oppia-translation-bottom-proTip" ng-if="!showRecorderWarning && !audioBlob && !isAudioAvailable">
-  <span>
-    <strong>ProTip: </strong>Use the "R" key to start/stop recording.
-  </span>
+  <div class="alert alert-secondary">
+    <strong>ProTips</strong>
+    <div>Use the "R" key to start/stop recording.</div>
+    <div>Use a dedicated microphone for best results.</div>
+  </div>
 </div>
 <style>
   .oppia-drop-area {
