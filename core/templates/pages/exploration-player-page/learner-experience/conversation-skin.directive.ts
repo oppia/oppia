@@ -957,16 +957,17 @@ angular.module('oppia').directive('conversationSkin', [
                       $scope.displayedCard.markAsCompleted();
                       ConceptCardBackendApiService.loadConceptCards(
                         [missingPrerequisiteSkillId]
-                      ).then(function(conceptCardBackendDict) {
-                        $scope.conceptCard =
-                          ConceptCardObjectFactory.createFromBackendDict(
-                            conceptCardBackendDict);
+                      ).then(function(conceptCardObject) {
+                        $scope.conceptCard = conceptCardObject;
                         if (helpCardAvailable) {
                           $scope.$broadcast('helpCardAvailable', {
                             helpCardHtml: feedbackHtml,
                             hasContinueButton: true
                           });
                         }
+                        // TODO(#8521): Remove when this directive is migrated
+                        // to Angular.
+                        $rootScope.$apply();
                       });
                     }
                     if (refreshInteraction) {

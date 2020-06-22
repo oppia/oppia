@@ -66,11 +66,9 @@ angular.module('oppia').directive('conceptCard', [
             });
             ConceptCardBackendApiService.loadConceptCards(
               ctrl.getSkillIds()
-            ).then(function(conceptCardBackendDicts) {
-              conceptCardBackendDicts.forEach(function(conceptCardBackendDict) {
-                ctrl.conceptCards.push(
-                  ConceptCardObjectFactory.createFromBackendDict(
-                    conceptCardBackendDict));
+            ).then(function(conceptCardObjects) {
+              conceptCardObjects.forEach(function(conceptCardObject) {
+                ctrl.conceptCards.push(conceptCardObject);
               });
               ctrl.loadingMessage = '';
               ctrl.currentConceptCard = ctrl.conceptCards[ctrl.index];
@@ -78,6 +76,8 @@ angular.module('oppia').directive('conceptCard', [
               if (ctrl.currentConceptCard.getWorkedExamples().length > 0) {
                 ctrl.numberOfWorkedExamplesShown = 1;
               }
+              // TODO(#8521): Remove when this directive is migrated to Angular.
+              $rootScope.$apply();
             });
           };
         }

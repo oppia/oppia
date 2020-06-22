@@ -16,31 +16,35 @@
  * @fileoverview Unit tests for ConceptCardBackendApiService.
  */
 
-require('domain/skill/concept-card-backend-api.service.ts');
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
+import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+import { HttpClientTestingModule, HttpTestingController } from
+  '@angular/common/http/testing';
 
-describe('Concept card backend API service', function() {
-  var ConceptCardBackendApiService = null;
-  var $httpBackend = null;
-  var sampleResponse1 = null;
-  var sampleResponse2 = null;
-  var sampleResponse3 = null;
+import { ConceptCardBackendApiService } from
+  'domain/skill/concept-card-backend-api.service';
+import { ConceptCardObjectFactory } from
+  'domain/skill/ConceptCardObjectFactory';
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
+describe('Concept card backend API service', () => {
+  let conceptCardBackendApiService: ConceptCardBackendApiService = null;
+  let httpTestingController: HttpTestingController;
+  let conceptCardObjectFactory: ConceptCardObjectFactory;
+  let sampleResponse1 = null;
+  let sampleResponse2 = null;
+  let sampleResponse3 = null;
+  let conceptCardSampleResponse1 = null;
+  let conceptCardSampleResponse2 = null;
+  let conceptCardSampleResponse3 = null;
 
-  beforeEach(angular.mock.inject(function($injector) {
-    ConceptCardBackendApiService = $injector.get(
-      'ConceptCardBackendApiService');
-    $httpBackend = $injector.get('$httpBackend');
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [ConceptCardBackendApiService]
+    });
+
+    conceptCardBackendApiService = TestBed.get(ConceptCardBackendApiService);
+    httpTestingController = TestBed.get(HttpTestingController);
+    conceptCardObjectFactory = TestBed.get(ConceptCardObjectFactory);
 
     var example1 = {
       question: {
@@ -127,92 +131,124 @@ describe('Concept card backend API service', function() {
     sampleResponse3 = {
       concept_card_dicts: [conceptCardDict1, conceptCardDict2]
     };
-  }));
 
+    conceptCardSampleResponse1 = [];
+    sampleResponse1.concept_card_dicts.forEach((conceptCardDict) => {
+      conceptCardSampleResponse1.push(
+        conceptCardObjectFactory.createFromBackendDict(conceptCardDict));
+    });
 
-  afterEach(function() {
-    $httpBackend.verifyNoOutstandingExpectation();
-    $httpBackend.verifyNoOutstandingRequest();
+    conceptCardSampleResponse2 = [];
+    sampleResponse2.concept_card_dicts.forEach((conceptCardDict) => {
+      conceptCardSampleResponse2.push(
+        conceptCardObjectFactory.createFromBackendDict(conceptCardDict));
+    });
+
+    conceptCardSampleResponse3 = [];
+    sampleResponse3.concept_card_dicts.forEach((conceptCardDict) => {
+      conceptCardSampleResponse3.push(
+        conceptCardObjectFactory.createFromBackendDict(conceptCardDict));
+    });
+  });
+
+  afterEach(() => {
+    httpTestingController.verify();
   });
 
   it('should successfully fetch a concept card from the backend',
-    function() {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
+    fakeAsync(() => {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
 
-      $httpBackend.expect('GET', '/concept_card_handler/1').respond(
-        sampleResponse1);
-      ConceptCardBackendApiService.loadConceptCards(['1']).then(
+      conceptCardBackendApiService.loadConceptCards(['1']).then(
         successHandler, failHandler);
-      $httpBackend.flush();
+      var req = httpTestingController.expectOne('/concept_card_handler/1');
+      expect(req.request.method).toEqual('GET');
+      req.flush(sampleResponse1);
+
+      flushMicrotasks();
 
       expect(successHandler).toHaveBeenCalledWith(
-        sampleResponse1.concept_card_dicts);
+        conceptCardSampleResponse1);
       expect(failHandler).not.toHaveBeenCalled();
-    });
+    }));
 
   it('should succesfully fetch multiple concept cards from the backend',
-    function() {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
+    fakeAsync(() => {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
 
-      var conceptCardDataUrl =
-        '/concept_card_handler/' + encodeURIComponent('1,2');
-      $httpBackend.expect('GET', conceptCardDataUrl).respond(
-        sampleResponse3);
-      ConceptCardBackendApiService.loadConceptCards(['1', '2']).then(
+      let conceptCardDataUrl = (
+        '/concept_card_handler/' + encodeURIComponent('1,2'));
+
+      conceptCardBackendApiService.loadConceptCards(['1', '2']).then(
         successHandler, failHandler);
-      $httpBackend.flush();
+      var req = httpTestingController.expectOne(conceptCardDataUrl);
+      expect(req.request.method).toEqual('GET');
+      req.flush(sampleResponse3);
+
+      flushMicrotasks();
 
       expect(successHandler).toHaveBeenCalledWith(
-        sampleResponse3.concept_card_dicts);
+        conceptCardSampleResponse3);
       expect(failHandler).not.toHaveBeenCalled();
-    });
+    }));
 
   it('should get all concept cards even the one which was fetched before',
-    function() {
-      $httpBackend.expect('GET', '/concept_card_handler/' + '1').respond(
-        sampleResponse1);
-
-      ConceptCardBackendApiService.loadConceptCards(['1']).then(
-        function(conceptCards) {
-          $httpBackend.expect('GET', '/concept_card_handler/' + '2').respond(
-            sampleResponse2);
-          ConceptCardBackendApiService.loadConceptCards(['1', '2']).then(
-            function(conceptCards2) {
-              expect(conceptCards).toEqual(sampleResponse1.concept_card_dicts);
-              expect(conceptCards2).toEqual(sampleResponse3.concept_card_dicts);
+    fakeAsync(() => {
+      conceptCardBackendApiService.loadConceptCards(['1']).then(
+        (conceptCards) => {
+          conceptCardBackendApiService.loadConceptCards(['1', '2']).then(
+            (conceptCards2) => {
+              expect(conceptCards).toEqual(conceptCardSampleResponse1);
+              expect(conceptCards2).toEqual(conceptCardSampleResponse3);
             });
+
+          var req1 = httpTestingController.expectOne('/concept_card_handler/2');
+          expect(req1.request.method).toEqual('GET');
+          req1.flush(sampleResponse2);
         });
-      $httpBackend.flush();
-    });
+
+      var req2 = httpTestingController.expectOne('/concept_card_handler/1');
+      expect(req2.request.method).toEqual('GET');
+      req2.flush(sampleResponse1);
+
+      flushMicrotasks();
+    }));
 
   it('should use the rejection handler if backend request failed',
-    function() {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
+    fakeAsync(() => {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
 
-      $httpBackend.expect('GET', '/concept_card_handler/1').respond(
-        500, 'Error loading skill 1.');
-      ConceptCardBackendApiService.loadConceptCards(['1']).then(
+      conceptCardBackendApiService.loadConceptCards(['1']).then(
         successHandler, failHandler);
-      $httpBackend.flush();
+      var req = httpTestingController.expectOne('/concept_card_handler/1');
+      expect(req.request.method).toEqual('GET');
+      req.flush('Error loading skill 1.', {
+        status: 500, statusText: 'Error loading skill 1.'
+      });
+
+      flushMicrotasks();
 
       expect(successHandler).not.toHaveBeenCalled();
       expect(failHandler).toHaveBeenCalledWith('Error loading skill 1.');
-    });
+    }));
 
-  it('should not fetch the same concept card', function() {
-    $httpBackend.expect('GET', '/concept_card_handler/1').respond(
-      sampleResponse1);
-    ConceptCardBackendApiService.loadConceptCards(['1'])
-      .then(function(conceptCards) {
-        ConceptCardBackendApiService.loadConceptCards(['1'])
-          .then(function(conceptCards2) {
+  it('should not fetch the same concept card', fakeAsync(() => {
+    conceptCardBackendApiService.loadConceptCards(['1'])
+      .then((conceptCards) => {
+        conceptCardBackendApiService.loadConceptCards(['1'])
+          .then((conceptCards2) => {
             expect(conceptCards).toEqual(conceptCards2);
-            expect(conceptCards2).toEqual(sampleResponse1.concept_card_dicts);
+            expect(conceptCards2).toEqual(conceptCardSampleResponse1);
           });
       });
-    $httpBackend.flush();
-  });
+
+    var req = httpTestingController.expectOne('/concept_card_handler/1');
+    expect(req.request.method).toEqual('GET');
+    req.flush(sampleResponse1);
+
+    flushMicrotasks();
+  }));
 });

@@ -99,6 +99,8 @@ import { CollectionRightsObjectFactory } from
 import { CollectionValidationService } from
   'domain/collection/collection-validation.service';
 import { ComputeGraphService } from 'services/compute-graph.service';
+import { ConceptCardBackendApiService } from
+  'domain/skill/concept-card-backend-api.service';
 import { ConceptCardObjectFactory } from
   'domain/skill/ConceptCardObjectFactory';
 import { ContextService } from 'services/context.service';
@@ -1014,6 +1016,11 @@ export class UpgradedServices {
       new AudioTranslationLanguageService(
         upgradedServices['BrowserCheckerService'],
         upgradedServices['LanguageUtilService']);
+    upgradedServices['ConceptCardBackendApiService'] =
+      new ConceptCardBackendApiService(
+        upgradedServices['ConceptCardObjectFactory'],
+        upgradedServices['HttpClient'],
+        upgradedServices['UrlInterpolationService']);
     upgradedServices['ClassroomBackendApiService'] =
       new ClassroomBackendApiService(
         upgradedServices['UrlInterpolationService'],
