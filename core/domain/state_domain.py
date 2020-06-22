@@ -334,7 +334,7 @@ class Solution(python_utils.OBJECT):
 
         Raises:
             ValidationError: One or more attributes of the Solution are not
-            valid.
+                valid.
         """
         if not isinstance(self.answer_is_exclusive, bool):
             raise utils.ValidationError(
@@ -527,7 +527,7 @@ class InteractionInstance(python_utils.OBJECT):
 
         Raises:
             ValidationError: One or more attributes of the InteractionInstance
-            are invalid.
+                are invalid.
         """
         if not isinstance(self.id, python_utils.BASESTRING):
             raise utils.ValidationError(
@@ -843,7 +843,7 @@ class Voiceover(python_utils.OBJECT):
 
         Raises:
             ValidationError: One or more attributes of the Voiceover are
-            invalid.
+                invalid.
         """
         if not isinstance(self.filename, python_utils.BASESTRING):
             raise utils.ValidationError(
@@ -930,7 +930,7 @@ class WrittenTranslation(python_utils.OBJECT):
 
         Raises:
             ValidationError: One or more attributes of the WrittenTranslation
-            are invalid.
+                are invalid.
         """
         if not isinstance(self.html, python_utils.BASESTRING):
             raise utils.ValidationError(
@@ -1010,7 +1010,7 @@ class WrittenTranslations(python_utils.OBJECT):
 
         Returns:
             list(str). A list of content ids in which the translations are
-                available in the given language.
+            available in the given language.
         """
         correctly_translated_content_ids = []
         for content_id, translations in self.translations_mapping.items():
@@ -1037,11 +1037,11 @@ class WrittenTranslations(python_utils.OBJECT):
 
         Args:
             expected_content_id_list: A list of content id which are expected to
-            be inside they WrittenTranslations.
+                be inside they WrittenTranslations.
 
         Raises:
             ValidationError: One or more attributes of the WrittenTranslations
-            are invalid.
+                are invalid.
         """
         if expected_content_id_list is not None:
             if not set(self.translations_mapping.keys()) == (
@@ -1189,7 +1189,7 @@ class RecordedVoiceovers(python_utils.OBJECT):
     def __init__(self, voiceovers_mapping):
         """Initializes a RecordedVoiceovers domain object.
 
-          Args:
+        Args:
             voiceovers_mapping: dict. A dict mapping the content Ids
                 to the dicts which is the map of abbreviated code of the
                 languages to the Voiceover objects.
@@ -1244,11 +1244,11 @@ class RecordedVoiceovers(python_utils.OBJECT):
 
         Args:
             expected_content_id_list: A list of content id which are expected to
-            be inside they RecordedVoiceovers.
+                be inside they RecordedVoiceovers.
 
         Raises:
             ValidationError: One or more attributes of the RecordedVoiceovers
-            are invalid.
+                are invalid.
         """
         if expected_content_id_list is not None:
             if not set(self.voiceovers_mapping.keys()) == (
@@ -1394,8 +1394,8 @@ class RuleSpec(python_utils.OBJECT):
                 by this RuleSpec instance, to be used to validate the inputs of
                 this RuleSpec. Each element of the list represents a single
                 parameter and is a tuple with two elements:
-                    0: The name (string) of the parameter.
-                    1: The typed object instance for that
+                    0. The name (string) of the parameter.
+                    1. The typed object instance for that
                         parameter (e.g. Real).
             exp_param_specs_dict: A dict of specified parameters used in this
                 exploration. Keys are parameter names and values are ParamSpec
@@ -1405,7 +1405,7 @@ class RuleSpec(python_utils.OBJECT):
 
         Raises:
             ValidationError: One or more attributes of the RuleSpec are
-            invalid.
+                invalid.
         """
         if not isinstance(self.inputs, dict):
             raise utils.ValidationError(
@@ -1502,7 +1502,7 @@ class SubtitledHtml(python_utils.OBJECT):
 
         Raises:
             ValidationError: One or more attributes of the SubtitledHtml are
-            invalid.
+                invalid.
         """
         if not isinstance(self.content_id, python_utils.BASESTRING):
             raise utils.ValidationError(
@@ -1699,9 +1699,9 @@ class State(python_utils.OBJECT):
 
         Returns:
             list(dict). A list of dicts, each of which has two key-value pairs.
-                One pair maps 'answer_group_index' to the index of the answer
-                group and the other maps 'answers' to the answer group's
-                training data.
+            One pair maps 'answer_group_index' to the index of the answer
+            group and the other maps 'answers' to the answer group's
+            training data.
         """
         state_training_data_by_answer_group = []
         for (answer_group_index, answer_group) in enumerate(
@@ -1852,7 +1852,7 @@ class State(python_utils.OBJECT):
 
         Args:
             param_changes: list(ParamChange). List of param_change domain
-            objects that represents ParamChange domain object.
+                objects that represents ParamChange domain object.
         """
         self.param_changes = param_changes
 

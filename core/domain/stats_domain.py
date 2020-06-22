@@ -117,7 +117,7 @@ class ExplorationStats(python_utils.OBJECT):
 
         Returns:
             int. The number of learners who actually attempted
-                the exploration.
+            the exploration.
         """
         return self.num_actual_starts_v1 + self.num_actual_starts_v2
 
@@ -334,7 +334,7 @@ class StateStats(python_utils.OBJECT):
 
         Returns:
             int. Number of times the solution button was triggered to answer a
-                state only for events for schema version 2.
+            state only for events for schema version 2.
         """
         return self.num_times_solution_viewed_v2
 
@@ -477,7 +477,7 @@ class ExplorationIssues(python_utils.OBJECT):
 
         Returns:
             ExplorationIssues. The corresponding ExplorationIssues domain
-                object.
+            object.
         """
         unresolved_issues = [
             ExplorationIssue.from_dict(unresolved_issue_dict)
@@ -1122,8 +1122,8 @@ class AnswerOccurrence(python_utils.OBJECT):
             answer_occurrence_dict: dict. The specific answer dict in the
                 following format:
                 {
-                    'answer': *. The answer submitted by the learner.
-                    'frequency': int. The number of occurrences of the answer.
+                    'answer' (*). The answer submitted by the learner.
+                    'frequency' (int). The number of occurrences of the answer.
                 }
 
         Returns:
@@ -1161,11 +1161,11 @@ class AnswerFrequencyList(AnswerCalculationOutput):
 
         Returns:
             list(dict). A list of answer occurrence dicts. Each dict has the
-                following format:
-                {
-                    'answer': *. The answer submitted by the learner.
-                    'frequency': int. The number of occurrences of the answer.
-                }
+            following format:
+            {
+                'answer' (*). The answer submitted by the learner.
+                'frequency' (int). The number of occurrences of the answer.
+            }
         """
         return [
             answer_occurrence.to_raw_type()
@@ -1180,8 +1180,8 @@ class AnswerFrequencyList(AnswerCalculationOutput):
             answer_occurrence_list: list(dict). A list containing answer
                 occurrence dicts in the following format:
                 {
-                    'answer': *. The answer submitted by the learner.
-                    'frequency': int. The number of occurrences of the answer.
+                    'answer' (*). The answer submitted by the learner.
+                    'frequency' (int). The number of occurrences of the answer.
                 }
 
         Returns:
@@ -1212,12 +1212,12 @@ class CategorizedAnswerFrequencyLists(AnswerCalculationOutput):
 
         Returns:
             dict. A dict whose keys are category names and whose corresponding
-                values are lists of answer frequency dicts. Each answer
-                frequency dict has the following keys and values:
-                {
-                    'answer': *. The answer submitted by the learner.
-                    'frequency': int. The number of occurrences of the answer.
-                }
+            values are lists of answer frequency dicts. Each answer
+            frequency dict has the following keys and values:
+            {
+                'answer' (*). The answer submitted by the learner.
+                'frequency' (int). The number of occurrences of the answer.
+            }
         """
         return {
             category: answer_frequency_list.to_raw_type()
@@ -1236,13 +1236,13 @@ class CategorizedAnswerFrequencyLists(AnswerCalculationOutput):
                 values are lists of answer frequency dicts. Each answer
                 frequency dict has the following keys and values:
                 {
-                    'answer': *. The answer submitted by the learner.
-                    'frequency': int. The number of occurrences of the answer.
+                    'answer' (*). The answer submitted by the learner.
+                    'frequency' (int). The number of occurrences of the answer.
                 }
 
         Returns:
             CategorizedAnswerFrequencyLists. The domain object for categorized
-                answer frequency dict.
+            answer frequency dict.
         """
         return cls({
             category: AnswerFrequencyList.from_raw_type(answer_occurrence_list)
@@ -1405,7 +1405,7 @@ class LearnerAnswerDetails(python_utils.OBJECT):
 
         Returns:
             LearnerAnswerDetails. The corresponding LearnerAnswerDetails
-                domain object.
+            domain object.
         """
         return cls(
             learner_answer_details_dict['state_reference'],
