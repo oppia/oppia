@@ -17,20 +17,21 @@
 /core/domain/android_validation_constants*.py @BenHenning
 
 # Angular Migration team
-/core/templates/components/shared-component.module.ts @bansalnitish
-/core/templates/services/loader.service*.ts @bansalnitish
-/core/templates/components/oppia-angular-root.component.ts @bansalnitish
-/core/templates/base-components/oppia-root.directive.ts @bansalnitish
-/core/templates/base-components/oppia-root.directive.html @bansalnitish
-/core/templates/filters/translate.pipe.ts @bansalnitish
-/core/templates/services/contextual/logger.service.ts @bansalnitish
-/core/templates/services/contextual/logger.service.spec.ts @bansalnitish
-/core/templates/services/i18n-language-code.service.ts @bansalnitish
-/core/templates/services/loader.service*.ts @bansalnitish
-/core/templates/services/question-validation.service*.ts @bansalnitish
-/core/templates/services/request-interceptor.service*.ts @bansalnitish
-/core/templates/services/translate.service.ts @bansalnitish
-/core/templates/services/UpgradedServices.ts @bansalnitish
+/core/templates/components/shared-component.module.ts @bansalnitish @srijanreddy98
+/core/templates/services/loader.service*.ts @bansalnitish @srijanreddy98
+/core/templates/components/oppia-angular-root.component.ts @bansalnitish @srijanreddy98
+/core/templates/base-components/oppia-root.directive.ts @bansalnitish @srijanreddy98
+/core/templates/base-components/oppia-root.directive.html @bansalnitish @srijanreddy98
+/core/templates/filters/translate.pipe.ts @bansalnitish @srijanreddy98
+/core/templates/services/contextual/logger.service.ts @bansalnitish @srijanreddy98
+/core/templates/services/contextual/logger.service.spec.ts @bansalnitish @srijanreddy98
+/core/templates/services/guppy-configuration.service.ts @bansalnitish @srijanreddy98
+/core/templates/services/i18n-language-code.service.ts @bansalnitish @srijanreddy98
+/core/templates/services/loader.service*.ts @bansalnitish @srijanreddy98
+/core/templates/services/question-validation.service*.ts @bansalnitish @srijanreddy98
+/core/templates/services/request-interceptor.service*.ts @bansalnitish @srijanreddy98
+/core/templates/services/translate.service.ts @bansalnitish @srijanreddy98
+/core/templates/services/UpgradedServices.ts @bansalnitish @srijanreddy98
 /typings/ @ankita240796
 /tsconfig.json @ankita240796
 
@@ -260,6 +261,8 @@
 /core/domain/action_registry*.py @brianrodri
 /core/domain/calculation_registry*.py @brianrodri
 /core/domain/event_services*.py @brianrodri
+/core/domain/improvements_domain*.py @brianrodri
+/core/domain/improvements_services*.py @brianrodri
 /core/domain/playthrough_issue_registry*.py @brianrodri
 /core/domain/stats*.py @brianrodri
 /core/domain/visualization_registry*.py @brianrodri
@@ -267,8 +270,11 @@
 /core/storage/statistics/ @brianrodri
 /core/templates/components/common-layout-directives/common-elements/confirmation-modal.template.html @brianrodri
 /core/templates/domain/statistics/ @brianrodri
+/core/templates/domain/improvements/ @brianrodri
 /core/templates/pages/exploration-editor-page/improvements-tab/ @brianrodri
 /core/templates/pages/exploration-editor-page/statistics-tab/ @brianrodri
+/core/templates/services/exploration-stats.service*.ts @brianrodri
+/core/templates/services/exploration-stats-backend-api.service*.ts @brianrodri
 /core/templates/services/improvements.service*.ts @brianrodri
 /core/templates/services/messenger.service.ts @brianrodri
 /core/templates/services/playthrough*.ts @brianrodri
