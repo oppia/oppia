@@ -35,9 +35,9 @@ export class GuppyInitializationService {
   private guppyInstances: Array<GuppyObject> = [];
 
   init(guppyDivClassName: string): void {
-    var guppyDivs = document.querySelectorAll('.' + guppyDivClassName);
-    var divId, guppyInstance;
-    for (var i = 0; i < guppyDivs.length; i++) {
+    let guppyDivs = document.querySelectorAll('.' + guppyDivClassName);
+    let divId, guppyInstance;
+    for (let i = 0; i < guppyDivs.length; i++) {
       divId = 'guppy_' + Math.floor(Math.random() * 100000000);
       // Dynamically assigns a unique id to the guppy div.
       guppyDivs[i].setAttribute('id', divId);
@@ -48,8 +48,8 @@ export class GuppyInitializationService {
   }
 
   findActiveGuppyObject(): GuppyObject | undefined {
-    var activeId = $('.guppy_active').attr('id');
-    for (var guppyObject of this.guppyInstances) {
+    let activeId = $('.guppy_active').attr('id');
+    for (let guppyObject of this.guppyInstances) {
       if (guppyObject.divId === activeId) {
         return guppyObject;
       }

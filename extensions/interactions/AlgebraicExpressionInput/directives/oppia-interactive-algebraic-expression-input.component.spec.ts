@@ -19,10 +19,10 @@
 
 import { GuppyConfigurationService } from
   'services/guppy-configuration.service.ts';
-import { MathInteractionsService } from
-  'services/math-interactions.service.ts';
 import { GuppyInitializationService } from
   'services/guppy-initialization.service.ts';
+import { MathInteractionsService } from 'services/math-interactions.service.ts';
+
 require(
   'interactions/AlgebraicExpressionInput/directives/' +
   'algebraic-expression-input-rules.service.ts');
@@ -33,24 +33,24 @@ require(
   'oppia-interactive-algebraic-expression-input.component.ts');
 
 describe('AlgebraicExpressionInputInteractive', function() {
-  var ctrl = null, $window = null;
-  var mockCurrentInteractionService = {
+  let ctrl = null, $window = null;
+  let mockCurrentInteractionService = {
     onSubmit: function(answer, rulesService) {},
     registerCurrentInteraction: function(submitAnswerFn, validateAnswerFn) {
       submitAnswerFn();
     }
   };
-  var mockAlgebraicExpressionInputRulesService = {};
-  var mockGuppyObject = {
+  let mockAlgebraicExpressionInputRulesService = {};
+  let mockGuppyObject = {
     guppyInstance: {
       asciimath: function() {
         return 'Dummy value';
       }
     }
   };
-  var guppyConfigurationService = null;
-  var mathInteractionsService = null;
-  var guppyInitializationService = null;
+  let guppyConfigurationService = null;
+  let mathInteractionsService = null;
+  let guppyInitializationService = null;
 
   class MockGuppy {
     constructor(id: string, config: Object) {}

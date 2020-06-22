@@ -35,7 +35,7 @@ export class GuppyConfigurationService {
       return;
     }
     // Remove symbols since they are not supported.
-    for (var symbol of SYMBOLS_TO_REMOVE) {
+    for (let symbol of SYMBOLS_TO_REMOVE) {
       Guppy.remove_global_symbol(symbol);
     }
     Guppy.configure('buttons', ['controls']);

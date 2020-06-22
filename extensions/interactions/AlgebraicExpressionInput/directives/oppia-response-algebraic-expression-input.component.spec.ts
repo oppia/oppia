@@ -21,7 +21,7 @@ require(
   'oppia-response-algebraic-expression-input.component.ts');
 
 describe('AlgebraicExpressionInputResponse', function() {
-  var ctrl = null;
+  let ctrl = null;
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {

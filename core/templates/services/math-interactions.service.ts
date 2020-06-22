@@ -19,7 +19,7 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-var nerdamer = require('nerdamer');
+const nerdamer = require('nerdamer');
 
 @Injectable({
   providedIn: 'root'
@@ -33,11 +33,11 @@ export class MathInteractionsService {
     // the error to the end user. Same rationale applies for stripping the
     // error message from 'at', since some errors from nerdamer use 'at' to
     // show the location.
-    var colonIndex = errorMessage.indexOf(':');
+    let colonIndex = errorMessage.indexOf(':');
     if (colonIndex !== -1) {
       errorMessage = errorMessage.slice(0, colonIndex);
     }
-    var atColonIndex = errorMessage.indexOf(' at ');
+    let atColonIndex = errorMessage.indexOf(' at ');
     if (atColonIndex !== -1) {
       errorMessage = errorMessage.slice(0, atColonIndex);
     }
@@ -48,7 +48,7 @@ export class MathInteractionsService {
   }
 
   validateAnswer(answer: string): boolean {
-    var expression;
+    let expression;
     if (answer.length === 0) {
       this.warningText = 'Please enter a non-empty answer.';
       return false;

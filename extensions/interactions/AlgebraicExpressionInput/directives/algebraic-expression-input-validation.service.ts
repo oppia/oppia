@@ -43,8 +43,8 @@ export class AlgebraicExpressionInputValidationService {
       stateName: string,
       customizationArgs: IAlgebraicExpressionInputCustomizationArgs,
       answerGroups: AnswerGroup[], defaultOutcome: Outcome): IWarning[] {
-    var warningsList = [];
-    var aeirs = (
+    let warningsList = [];
+    let aeirs = (
       new AlgebraicExpressionInputRulesService());
 
     warningsList = warningsList.concat(
@@ -58,17 +58,17 @@ export class AlgebraicExpressionInputValidationService {
     // matching input, invalid.
     // A MatchesExactlyWith rule will make the following rules of the same rule
     // type and a matching input, invalid.
-    var seenRules = [];
+    let seenRules = [];
 
-    for (var i = 0; i < answerGroups.length; i++) {
-      var rules = answerGroups[i].rules;
-      for (var j = 0; j < rules.length; j++) {
-        var currentInput = <string> rules[j].inputs.x;
-        var currentRuleType = <string> rules[j].type;
+    for (let i = 0; i < answerGroups.length; i++) {
+      let rules = answerGroups[i].rules;
+      for (let j = 0; j < rules.length; j++) {
+        let currentInput = <string> rules[j].inputs.x;
+        let currentRuleType = <string> rules[j].type;
 
-        for (var seenRule of seenRules) {
-          var seenInput = <string> seenRule.inputs.x;
-          var seenRuleType = <string> seenRule.type;
+        for (let seenRule of seenRules) {
+          let seenInput = <string> seenRule.inputs.x;
+          let seenRuleType = <string> seenRule.type;
 
           if (seenRuleType === 'IsEquivalentTo' && (
             aeirs.IsEquivalentTo(seenInput, {x: currentInput}))) {

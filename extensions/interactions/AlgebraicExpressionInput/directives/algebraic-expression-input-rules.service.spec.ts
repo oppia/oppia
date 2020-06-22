@@ -22,7 +22,7 @@ import { AlgebraicExpressionInputRulesService } from
 
 describe('Algebraic expression input rules service', () => {
   let aeirs: AlgebraicExpressionInputRulesService = null;
-  var inputString;
+  let inputString;
 
   beforeEach(() => {
     aeirs = new AlgebraicExpressionInputRulesService();

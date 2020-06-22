@@ -29,8 +29,6 @@ require(
 require(
   'pages/exploration-player-page/services/current-interaction.service.ts');
 
-var nerdamer = require('nerdamer');
-
 angular.module('oppia').component('oppiaInteractiveAlgebraicExpressionInput', {
   template: require('./algebraic-expression-input-interaction.component.html'),
   controller: [
@@ -48,7 +46,7 @@ angular.module('oppia').component('oppiaInteractiveAlgebraicExpressionInput', {
 
       ctrl.isCurrentAnswerValid = function() {
         if (ctrl.hasBeenTouched) {
-          var answerIsValid = MathInteractionsService.validateAnswer(
+          let answerIsValid = MathInteractionsService.validateAnswer(
             ctrl.value);
           ctrl.warningText = MathInteractionsService.getWarningText();
           return answerIsValid;
@@ -70,7 +68,7 @@ angular.module('oppia').component('oppiaInteractiveAlgebraicExpressionInput', {
         GuppyConfigurationService.init();
         GuppyInitializationService.init('guppy-div-learner');
         Guppy.event('change', () => {
-          var activeGuppyObject = (
+          let activeGuppyObject = (
             GuppyInitializationService.findActiveGuppyObject());
           if (activeGuppyObject !== undefined) {
             ctrl.hasBeenTouched = true;

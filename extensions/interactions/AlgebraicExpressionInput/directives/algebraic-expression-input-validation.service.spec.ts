@@ -88,7 +88,7 @@ describe('AlgebraicExpressionInputValidationService', () => {
   });
 
   it('should be able to perform basic validation', () => {
-    var warnings = validatorService.getAllWarnings(
+    let warnings = validatorService.getAllWarnings(
       currentState, customizationArgs, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([]);
   });
@@ -97,7 +97,7 @@ describe('AlgebraicExpressionInputValidationService', () => {
     // The second rule will never get matched.
     answerGroups[0].rules = [isEquivalentTo, matchesExactlyWith];
 
-    var warnings = validatorService.getAllWarnings(currentState,
+    let warnings = validatorService.getAllWarnings(currentState,
       customizationArgs, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
@@ -106,13 +106,13 @@ describe('AlgebraicExpressionInputValidationService', () => {
     }]);
 
 
-    var isEquivalentTo1 = rof.createFromBackendDict({
+    let isEquivalentTo1 = rof.createFromBackendDict({
       rule_type: 'IsEquivalentTo',
       inputs: {
         x: '(a+b)^2'
       }
     });
-    var isEquivalentTo2 = rof.createFromBackendDict({
+    let isEquivalentTo2 = rof.createFromBackendDict({
       rule_type: 'IsEquivalentTo',
       inputs: {
         x: 'a^2 + 2*a*b + b^2'
@@ -122,7 +122,7 @@ describe('AlgebraicExpressionInputValidationService', () => {
     // The second rule will never get matched.
     answerGroups[0].rules = [isEquivalentTo1, isEquivalentTo2];
 
-    var warnings = validatorService.getAllWarnings(currentState,
+    let warnings = validatorService.getAllWarnings(currentState,
       customizationArgs, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
@@ -131,13 +131,13 @@ describe('AlgebraicExpressionInputValidationService', () => {
     }]);
 
 
-    var matchesExactlyWith1 = rof.createFromBackendDict({
+    let matchesExactlyWith1 = rof.createFromBackendDict({
       rule_type: 'MatchesExactlyWith',
       inputs: {
         x: 'x ^ 2 - 1'
       }
     });
-    var matchesExactlyWith2 = rof.createFromBackendDict({
+    let matchesExactlyWith2 = rof.createFromBackendDict({
       rule_type: 'MatchesExactlyWith',
       inputs: {
         x: '-1 + x*x'
@@ -147,7 +147,7 @@ describe('AlgebraicExpressionInputValidationService', () => {
     // The second rule will never get matched.
     answerGroups[0].rules = [matchesExactlyWith1, matchesExactlyWith2];
 
-    var warnings = validatorService.getAllWarnings(currentState,
+    let warnings = validatorService.getAllWarnings(currentState,
       customizationArgs, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
@@ -159,7 +159,7 @@ describe('AlgebraicExpressionInputValidationService', () => {
   it('should not catch redundancy of rules with non-matching inputs', () => {
     answerGroups[0].rules = [matchesExactlyWith, isEquivalentTo];
 
-    var warnings = validatorService.getAllWarnings(currentState,
+    let warnings = validatorService.getAllWarnings(currentState,
       customizationArgs, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([]);
 
@@ -179,7 +179,7 @@ describe('AlgebraicExpressionInputValidationService', () => {
 
     answerGroups[0].rules = [isEquivalentTo, matchesExactlyWith];
 
-    var warnings = validatorService.getAllWarnings(currentState,
+    let warnings = validatorService.getAllWarnings(currentState,
       customizationArgs, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([]);
   });

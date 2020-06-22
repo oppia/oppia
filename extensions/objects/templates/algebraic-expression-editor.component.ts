@@ -23,7 +23,6 @@
 require('services/guppy-configuration.service.ts');
 require('services/math-interactions.service.ts');
 require('services/guppy-initialization.service.ts');
-var nerdamer = require('nerdamer');
 
 angular.module('oppia').component('algebraicExpressionEditor', {
   bindings: {

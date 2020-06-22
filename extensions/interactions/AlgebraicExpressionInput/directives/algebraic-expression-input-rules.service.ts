@@ -19,7 +19,7 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-var nerdamer = require('nerdamer');
+const nerdamer = require('nerdamer');
 
 @Injectable({
   providedIn: 'root'
@@ -30,12 +30,12 @@ export class AlgebraicExpressionInputRulesService {
   }
 
   IsEquivalentTo(answer: string, inputs: {x: string}): boolean {
-    var expandedLearnerAnswer = nerdamer(`expand(${answer})`);
-    var simplifiedLearnerAnswer = nerdamer(
+    let expandedLearnerAnswer = nerdamer(`expand(${answer})`);
+    let simplifiedLearnerAnswer = nerdamer(
       `simplify(${expandedLearnerAnswer})`);
 
-    var expandedCreatorAnswer = nerdamer(`expand(${inputs.x})`);
-    var simplifiedCreatorAnswer = nerdamer(
+    let expandedCreatorAnswer = nerdamer(`expand(${inputs.x})`);
+    let simplifiedCreatorAnswer = nerdamer(
       `simplify(${expandedCreatorAnswer})`);
 
     return nerdamer(simplifiedLearnerAnswer).eq(simplifiedCreatorAnswer);

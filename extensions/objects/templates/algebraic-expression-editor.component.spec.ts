@@ -18,10 +18,9 @@
 
 import { GuppyConfigurationService } from
   'services/guppy-configuration.service.ts';
-import { MathInteractionsService } from
-  'services/math-interactions.service.ts';
 import { GuppyInitializationService } from
   'services/guppy-initialization.service.ts';
+import { MathInteractionsService } from 'services/math-interactions.service.ts';
 
 describe('AlgebraicExpressionEditor', function() {
   var ctrl = null, $window = null;

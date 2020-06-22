@@ -43,6 +43,7 @@ IGNORED_FILE_SUFFIXES = ['.pyc', '.DS_Store', '.swp']
 INTERACTION_THUMBNAIL_WIDTH_PX = 178
 INTERACTION_THUMBNAIL_HEIGHT_PX = 146
 TEXT_INPUT_ID = 'TextInput'
+INTERACTIONS_THAT_USE_COMPONENTS = ['AlgebraicExpressionInput']
 
 _INTERACTION_CONFIG_SCHEMA = [
     ('name', python_utils.BASESTRING),
@@ -343,109 +344,214 @@ class InteractionUnitTests(test_utils.GenericTestBase):
 
             hyphenated_interaction_id = (
                 utils.camelcase_to_hyphenated(interaction_id))
-            interaction_directive_ts_file = os.path.join(
-                directives_dir, 'oppia-interactive-%s.directive.ts' % (
-                    hyphenated_interaction_id))
-            response_directive_ts_file = os.path.join(
-                directives_dir, 'oppia-response-%s.directive.ts'
-                % hyphenated_interaction_id)
-            short_response_directive_ts_file = os.path.join(
-                directives_dir, 'oppia-short-response-%s.directive.ts' % (
-                    hyphenated_interaction_id))
-            rules_service_ts_file = os.path.join(
-                directives_dir, '%s-rules.service.ts'
-                % hyphenated_interaction_id)
-            validation_service_ts_file = os.path.join(
-                directives_dir, '%s-validation.service.ts'
-                % hyphenated_interaction_id)
-            interaction_directive_html = os.path.join(
-                directives_dir,
-                '%s-interaction.directive.html' % hyphenated_interaction_id)
-            response_directive_html = os.path.join(
-                directives_dir,
-                '%s-response.directive.html' % hyphenated_interaction_id)
-            short_response_directive_html = os.path.join(
-                directives_dir,
-                '%s-short-response.directive.html' % hyphenated_interaction_id)
-            self.assertTrue(os.path.isfile(interaction_directive_ts_file))
-            self.assertTrue(os.path.isfile(response_directive_ts_file))
-            self.assertTrue(os.path.isfile(short_response_directive_ts_file))
-            self.assertTrue(os.path.isfile(rules_service_ts_file))
-            self.assertTrue(os.path.isfile(validation_service_ts_file))
-            self.assertTrue(os.path.isfile(interaction_directive_html))
-            self.assertTrue(os.path.isfile(response_directive_html))
-            self.assertTrue(os.path.isfile(short_response_directive_html))
+            if interaction_id in INTERACTIONS_THAT_USE_COMPONENTS:
+                interaction_component_ts_file = os.path.join(
+                    directives_dir, 'oppia-interactive-%s.component.ts' % (
+                        hyphenated_interaction_id))
+                response_component_ts_file = os.path.join(
+                    directives_dir, 'oppia-response-%s.component.ts'
+                    % hyphenated_interaction_id)
+                short_response_component_ts_file = os.path.join(
+                    directives_dir, 'oppia-short-response-%s.component.ts' % (
+                        hyphenated_interaction_id))
+                rules_service_ts_file = os.path.join(
+                    directives_dir, '%s-rules.service.ts'
+                    % hyphenated_interaction_id)
+                validation_service_ts_file = os.path.join(
+                    directives_dir, '%s-validation.service.ts'
+                    % hyphenated_interaction_id)
+                interaction_component_html = os.path.join(
+                    directives_dir,
+                    '%s-interaction.component.html' % hyphenated_interaction_id)
+                response_component_html = os.path.join(
+                    directives_dir,
+                    '%s-response.component.html' % hyphenated_interaction_id)
+                short_response_component_html = os.path.join(
+                    directives_dir,
+                    '%s-short-response.component.html' % hyphenated_interaction_id)
+                self.assertTrue(os.path.isfile(interaction_component_ts_file))
+                self.assertTrue(os.path.isfile(response_component_ts_file))
+                self.assertTrue(os.path.isfile(short_response_component_ts_file))
+                self.assertTrue(os.path.isfile(rules_service_ts_file))
+                self.assertTrue(os.path.isfile(validation_service_ts_file))
+                self.assertTrue(os.path.isfile(interaction_component_html))
+                self.assertTrue(os.path.isfile(response_component_html))
+                self.assertTrue(os.path.isfile(short_response_component_html))
 
-            # Check that the PNG thumbnail image has the correct dimensions.
-            static_dir = os.path.join(interaction_dir, 'static')
-            self.assertTrue(os.path.isdir(static_dir))
-            png_file = os.path.join(
-                interaction_dir, 'static', '%s.png' % interaction_id)
-            self.assertTrue(os.path.isfile(png_file))
-            with python_utils.open_file(png_file, 'rb', encoding=None) as f:
-                img_data = f.read()
-                width, height = struct.unpack('>LL', img_data[16:24])
-                self.assertEqual(int(width), INTERACTION_THUMBNAIL_WIDTH_PX)
-                self.assertEqual(int(height), INTERACTION_THUMBNAIL_HEIGHT_PX)
+                # Check that the PNG thumbnail image has the correct dimensions.
+                static_dir = os.path.join(interaction_dir, 'static')
+                self.assertTrue(os.path.isdir(static_dir))
+                png_file = os.path.join(
+                    interaction_dir, 'static', '%s.png' % interaction_id)
+                self.assertTrue(os.path.isfile(png_file))
+                with python_utils.open_file(png_file, 'rb', encoding=None) as f:
+                    img_data = f.read()
+                    width, height = struct.unpack('>LL', img_data[16:24])
+                    self.assertEqual(int(width), INTERACTION_THUMBNAIL_WIDTH_PX)
+                    self.assertEqual(int(height), INTERACTION_THUMBNAIL_HEIGHT_PX)
 
-            interaction_directive_ts_file_content = utils.get_file_contents(
-                interaction_directive_ts_file)
-            response_directive_ts_file_content = utils.get_file_contents(
-                response_directive_ts_file)
-            short_response_directive_ts_file_content = utils.get_file_contents(
-                short_response_directive_ts_file)
-            ts_file_content = utils.get_file_contents(ts_file)
-            rules_service_ts_file_content = utils.get_file_contents(
-                rules_service_ts_file)
-            validation_service_ts_file_content = utils.get_file_contents(
-                validation_service_ts_file)
+                interaction_component_ts_file_content = utils.get_file_contents(
+                    interaction_component_ts_file)
+                response_component_ts_file_content = utils.get_file_contents(
+                    response_component_ts_file)
+                short_response_component_ts_file_content = utils.get_file_contents(
+                    short_response_component_ts_file)
+                ts_file_content = utils.get_file_contents(ts_file)
+                rules_service_ts_file_content = utils.get_file_contents(
+                    rules_service_ts_file)
+                validation_service_ts_file_content = utils.get_file_contents(
+                    validation_service_ts_file)
 
-            self.assertIn('oppiaInteractive%s' % interaction_id,
-                          interaction_directive_ts_file_content)
-            self.assertIn(
-                'oppiaResponse%s' % interaction_id,
-                response_directive_ts_file_content)
-            self.assertIn(
-                'oppiaShortResponse%s' % interaction_id,
-                short_response_directive_ts_file_content)
-            self.assertIn(
-                '%sRulesService' % (
-                    interaction_id[0] + interaction_id[1:]),
-                rules_service_ts_file_content)
-            self.assertIn(
-                '%sValidationService' % interaction_id,
-                validation_service_ts_file_content)
+                self.assertIn('oppiaInteractive%s' % interaction_id,
+                                interaction_component_ts_file_content)
+                self.assertIn(
+                    'oppiaResponse%s' % interaction_id,
+                    response_component_ts_file_content)
+                self.assertIn(
+                    'oppiaShortResponse%s' % interaction_id,
+                    short_response_component_ts_file_content)
+                self.assertIn(
+                    '%sRulesService' % (
+                        interaction_id[0] + interaction_id[1:]),
+                    rules_service_ts_file_content)
+                self.assertIn(
+                    '%sValidationService' % interaction_id,
+                    validation_service_ts_file_content)
 
-            # Check that the html template includes js script for the
-            # interaction.
-            self.assertIn(
-                'oppia-interactive-%s.directive.ts' % hyphenated_interaction_id,
-                ts_file_content)
-            self.assertIn(
-                'oppia-response-%s.directive.ts' % hyphenated_interaction_id,
-                ts_file_content)
-            self.assertIn(
-                'oppia-short-response-%s.directive.ts'
-                % hyphenated_interaction_id, ts_file_content)
-            self.assertIn(
-                '%s-rules.service.ts' % hyphenated_interaction_id,
-                ts_file_content)
-            self.assertIn(
-                '%s-validation.service.ts' % hyphenated_interaction_id,
-                ts_file_content)
+                # Check that the html template includes js script for the
+                # interaction.
+                self.assertIn(
+                    'oppia-interactive-%s.component.ts' % hyphenated_interaction_id,
+                    ts_file_content)
+                self.assertIn(
+                    'oppia-response-%s.component.ts' % hyphenated_interaction_id,
+                    ts_file_content)
+                self.assertIn(
+                    'oppia-short-response-%s.component.ts'
+                    % hyphenated_interaction_id, ts_file_content)
+                self.assertIn(
+                    '%s-rules.service.ts' % hyphenated_interaction_id,
+                    ts_file_content)
+                self.assertIn(
+                    '%s-validation.service.ts' % hyphenated_interaction_id,
+                    ts_file_content)
 
-            self.assertNotIn('<script>', interaction_directive_ts_file_content)
-            self.assertNotIn('</script>', interaction_directive_ts_file_content)
-            self.assertNotIn('<script>', response_directive_ts_file_content)
-            self.assertNotIn('</script>', response_directive_ts_file_content)
-            self.assertNotIn(
-                '<script>', short_response_directive_ts_file_content)
-            self.assertNotIn(
-                '</script>', short_response_directive_ts_file_content)
-            self.assertNotIn('<script>', rules_service_ts_file_content)
-            self.assertNotIn('</script>', rules_service_ts_file_content)
-            self.assertNotIn('<script>', validation_service_ts_file_content)
-            self.assertNotIn('</script>', validation_service_ts_file_content)
+                self.assertNotIn('<script>', interaction_component_ts_file_content)
+                self.assertNotIn('</script>', interaction_component_ts_file_content)
+                self.assertNotIn('<script>', response_component_ts_file_content)
+                self.assertNotIn('</script>', response_component_ts_file_content)
+                self.assertNotIn(
+                    '<script>', short_response_component_ts_file_content)
+                self.assertNotIn(
+                    '</script>', short_response_component_ts_file_content)
+                self.assertNotIn('<script>', rules_service_ts_file_content)
+                self.assertNotIn('</script>', rules_service_ts_file_content)
+                self.assertNotIn('<script>', validation_service_ts_file_content)
+                self.assertNotIn('</script>', validation_service_ts_file_content)
+            else:
+                interaction_directive_ts_file = os.path.join(
+                    directives_dir, 'oppia-interactive-%s.directive.ts' % (
+                        hyphenated_interaction_id))
+                response_directive_ts_file = os.path.join(
+                    directives_dir, 'oppia-response-%s.directive.ts'
+                    % hyphenated_interaction_id)
+                short_response_directive_ts_file = os.path.join(
+                    directives_dir, 'oppia-short-response-%s.directive.ts' % (
+                        hyphenated_interaction_id))
+                rules_service_ts_file = os.path.join(
+                    directives_dir, '%s-rules.service.ts'
+                    % hyphenated_interaction_id)
+                validation_service_ts_file = os.path.join(
+                    directives_dir, '%s-validation.service.ts'
+                    % hyphenated_interaction_id)
+                interaction_directive_html = os.path.join(
+                    directives_dir,
+                    '%s-interaction.directive.html' % hyphenated_interaction_id)
+                response_directive_html = os.path.join(
+                    directives_dir,
+                    '%s-response.directive.html' % hyphenated_interaction_id)
+                short_response_directive_html = os.path.join(
+                    directives_dir,
+                    '%s-short-response.directive.html' % hyphenated_interaction_id)
+                self.assertTrue(os.path.isfile(interaction_directive_ts_file))
+                self.assertTrue(os.path.isfile(response_directive_ts_file))
+                self.assertTrue(os.path.isfile(short_response_directive_ts_file))
+                self.assertTrue(os.path.isfile(rules_service_ts_file))
+                self.assertTrue(os.path.isfile(validation_service_ts_file))
+                self.assertTrue(os.path.isfile(interaction_directive_html))
+                self.assertTrue(os.path.isfile(response_directive_html))
+                self.assertTrue(os.path.isfile(short_response_directive_html))
+
+                # Check that the PNG thumbnail image has the correct dimensions.
+                static_dir = os.path.join(interaction_dir, 'static')
+                self.assertTrue(os.path.isdir(static_dir))
+                png_file = os.path.join(
+                    interaction_dir, 'static', '%s.png' % interaction_id)
+                self.assertTrue(os.path.isfile(png_file))
+                with python_utils.open_file(png_file, 'rb', encoding=None) as f:
+                    img_data = f.read()
+                    width, height = struct.unpack('>LL', img_data[16:24])
+                    self.assertEqual(int(width), INTERACTION_THUMBNAIL_WIDTH_PX)
+                    self.assertEqual(int(height), INTERACTION_THUMBNAIL_HEIGHT_PX)
+
+                interaction_directive_ts_file_content = utils.get_file_contents(
+                    interaction_directive_ts_file)
+                response_directive_ts_file_content = utils.get_file_contents(
+                    response_directive_ts_file)
+                short_response_directive_ts_file_content = utils.get_file_contents(
+                    short_response_directive_ts_file)
+                ts_file_content = utils.get_file_contents(ts_file)
+                rules_service_ts_file_content = utils.get_file_contents(
+                    rules_service_ts_file)
+                validation_service_ts_file_content = utils.get_file_contents(
+                    validation_service_ts_file)
+
+                self.assertIn('oppiaInteractive%s' % interaction_id,
+                                interaction_directive_ts_file_content)
+                self.assertIn(
+                    'oppiaResponse%s' % interaction_id,
+                    response_directive_ts_file_content)
+                self.assertIn(
+                    'oppiaShortResponse%s' % interaction_id,
+                    short_response_directive_ts_file_content)
+                self.assertIn(
+                    '%sRulesService' % (
+                        interaction_id[0] + interaction_id[1:]),
+                    rules_service_ts_file_content)
+                self.assertIn(
+                    '%sValidationService' % interaction_id,
+                    validation_service_ts_file_content)
+
+                # Check that the html template includes js script for the
+                # interaction.
+                self.assertIn(
+                    'oppia-interactive-%s.directive.ts' % hyphenated_interaction_id,
+                    ts_file_content)
+                self.assertIn(
+                    'oppia-response-%s.directive.ts' % hyphenated_interaction_id,
+                    ts_file_content)
+                self.assertIn(
+                    'oppia-short-response-%s.directive.ts'
+                    % hyphenated_interaction_id, ts_file_content)
+                self.assertIn(
+                    '%s-rules.service.ts' % hyphenated_interaction_id,
+                    ts_file_content)
+                self.assertIn(
+                    '%s-validation.service.ts' % hyphenated_interaction_id,
+                    ts_file_content)
+
+                self.assertNotIn('<script>', interaction_directive_ts_file_content)
+                self.assertNotIn('</script>', interaction_directive_ts_file_content)
+                self.assertNotIn('<script>', response_directive_ts_file_content)
+                self.assertNotIn('</script>', response_directive_ts_file_content)
+                self.assertNotIn(
+                    '<script>', short_response_directive_ts_file_content)
+                self.assertNotIn(
+                    '</script>', short_response_directive_ts_file_content)
+                self.assertNotIn('<script>', rules_service_ts_file_content)
+                self.assertNotIn('</script>', rules_service_ts_file_content)
+                self.assertNotIn('<script>', validation_service_ts_file_content)
+                self.assertNotIn('</script>', validation_service_ts_file_content)
 
             interaction = interaction_registry.Registry.get_interaction_by_id(
                 interaction_id)

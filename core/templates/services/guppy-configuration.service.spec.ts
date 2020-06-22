@@ -20,9 +20,9 @@ import { TestBed } from '@angular/core/testing';
 
 import { GuppyConfigurationService } from
   'services/guppy-configuration.service';
-import { MathInteractionsService } from 'services/math-interactions.service.ts';
 import { GuppyInitializationService } from
   'services/guppy-initialization.service.ts';
+import { MathInteractionsService } from 'services/math-interactions.service.ts';
 
 declare global {
   interface Window {
