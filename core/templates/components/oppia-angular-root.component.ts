@@ -1240,7 +1240,6 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.stateEditorService = this.stateEditorService;
     OppiaAngularRootComponent.stateGraphLayoutService = this.stateGraphLayoutService;
     OppiaAngularRootComponent.stateHintsService = this.stateHintsService;
-    OppiaAngularRootComponent.stateImprovementSuggestionService = this.stateImprovementSuggestionService;
     OppiaAngularRootComponent.stateInteractionIdService = this.stateInteractionIdService;
     OppiaAngularRootComponent.stateInteractionStatsService = this.stateInteractionStatsService;
     OppiaAngularRootComponent.stateNameService = this.stateNameService;
