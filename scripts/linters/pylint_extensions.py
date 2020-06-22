@@ -1490,6 +1490,10 @@ class DocstringChecker(checkers.BaseChecker):
                             self.add_message(
                                 'four-space-indentation-in-docstring',
                                 line=line_num + 1)
+                        if(line.endswith(':')):
+                            free_form_return = True
+                        else:
+                            free_form_return = False
                         description = True
                     # Possible malformed parameter
                     elif ((re.search(br'^[^ ]+: ', line)
@@ -1498,10 +1502,12 @@ class DocstringChecker(checkers.BaseChecker):
                         self.add_message(
                             'malformed-parameter',
                             line=line_num + 1)
+                    elif (line.endswith(':')):
+                        free_form_return = True
                     # Description that must be indented by 8
                     elif description:
                         if current_indentation != (
-                                outer_indentation_in_spaces + 8):
+                                outer_indentation_in_spaces + 8) and not free_form_return:
                             self.add_message(
                                 'eight-space-indentation-in-docstring',
                                 line=line_num + 1)

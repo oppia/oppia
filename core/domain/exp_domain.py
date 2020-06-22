@@ -231,8 +231,8 @@ class ExplorationCommitLogEntry(python_utils.OBJECT):
             commit_cmds: list(dict). A list of commands, describing changes
                 made in this model, which should give sufficient information to
                 reconstruct the commit. Each dict always contains the following
-                key: 
-                    - cmd (str). Unique command.
+                key:
+                - cmd (str). Unique command.
                 and then additional arguments for that command.
             version: int. The version of the exploration after the commit.
             post_commit_status: str. The new exploration status after the
@@ -2427,9 +2427,9 @@ class Exploration(python_utils.OBJECT):
 
         Args:
             versioned_exploration_states: dict. A dict with two keys:
-                states_schema_version: int. The states schema version for the
+                states_schema_version (int). The states schema version for the
                     exploration.
-                - states: dict. The dict of states comprising the exploration.
+                states (dict). The dict of states comprising the exploration.
                     The keys are state names and the values are dicts used to
                     initialize a State domain object.
             current_states_schema_version: int. The current states
@@ -2830,6 +2830,7 @@ class Exploration(python_utils.OBJECT):
     @classmethod
     def _convert_v16_dict_to_v17_dict(cls, exploration_dict):
         """Converts a v16 exploration dict into a v17 exploration dict.
+        Removes gadgets and skins.
 
         Args:
             exploration_dict: dict. The dict representation of an exploration
@@ -2838,8 +2839,6 @@ class Exploration(python_utils.OBJECT):
         Returns:
             dict. The dict representation of the Exploration domain object,
             following schema version v17.
-
-        Removes gadgets and skins.
         """
 
         exploration_dict['schema_version'] = 17
@@ -2876,6 +2875,7 @@ class Exploration(python_utils.OBJECT):
     @classmethod
     def _convert_v18_dict_to_v19_dict(cls, exploration_dict):
         """Converts a v18 exploration dict into a v19 exploration dict.
+        Adds audio translations to feedback, hints, and solutions.
 
         Args:
             exploration_dict: dict. The dict representation of an exploration
@@ -2884,8 +2884,6 @@ class Exploration(python_utils.OBJECT):
         Returns:
             dict. The dict representation of the Exploration domain object,
             following schema version v19.
-
-        Adds audio translations to feedback, hints, and solutions.
         """
 
         exploration_dict['schema_version'] = 19
@@ -2899,6 +2897,8 @@ class Exploration(python_utils.OBJECT):
     @classmethod
     def _convert_v19_dict_to_v20_dict(cls, exploration_dict):
         """Converts a v19 exploration dict into a v20 exploration dict.
+        Introduces a correctness property at the top level, and changes each
+        answer group's "correct" field to "labelled_as_correct" instead.
 
         Args:
             exploration_dict: dict. The dict representation of an exploration
@@ -2907,9 +2907,6 @@ class Exploration(python_utils.OBJECT):
         Returns:
             dict. The dict representation of the Exploration domain object,
             following schema version v20.
-
-        Introduces a correctness property at the top level, and changes each
-        answer group's "correct" field to "labelled_as_correct" instead.
         """
 
         exploration_dict['schema_version'] = 20
@@ -3952,9 +3949,9 @@ class ExplorationSummary(python_utils.OBJECT):
         Returns:
             A metadata dict for the given exploration summary.
             The metadata dict has three keys:
-                - 'id': str. The exploration ID.
-                - 'title': str. The exploration title.
-                - 'objective': str. The exploration objective.
+                - 'id' (str). The exploration ID.
+                - 'title' (str). The exploration title.
+                - 'objective' (str). The exploration objective.
         """
         return {
             'id': self.id,
