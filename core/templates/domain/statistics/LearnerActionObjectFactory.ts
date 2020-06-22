@@ -41,45 +41,31 @@ export interface IExplorationQuitCustomizationArgs {
   'time_spent_in_state_in_msecs': {value: number};
 }
 
-export type ILearnerActionCustomizationArgs = (
-  IExplorationStartCustomizationArgs |
-  IAnswerSubmitCustomizationArgs |
-  IExplorationQuitCustomizationArgs);
+// NOTE TO DEVELOPERS: Treat this as an implementation detail; do not export it.
+type ActionCustomizationArgs<ActionType> = (
+  ActionType extends 'ExplorationStart' ?
+  IExplorationStartCustomizationArgs :
+  ActionType extends 'AnswerSubmit' ? IAnswerSubmitCustomizationArgs :
+  ActionType extends 'ExplorationQuit' ?
+  IExplorationQuitCustomizationArgs : never);
 
-export interface ILearnerActionBackendDict {
-  'action_type': string;
+interface ILearnerActionBackendDict<ActionType> {
+  'action_type': ActionType;
+  'action_customization_args': ActionCustomizationArgs<ActionType>;
   'schema_version': number;
-  'action_customization_args': ILearnerActionCustomizationArgs;
 }
 
-export class LearnerAction {
-  actionType: string;
-  actionCustomizationArgs: ILearnerActionCustomizationArgs;
-  schemaVersion: number;
-  /**
-   * @constructor
-   * @param {string} actionType - type of an action.
-   * @param {Object.<string, *>} actionCustomizationArgs - customization dict
-   *   for an action.
-   * @param {number} schemaVersion - schema version of the class instance.
-   */
+export class LearnerAction<ActionType> {
   constructor(
-      actionType: string,
-      actionCustomizationArgs: ILearnerActionCustomizationArgs,
-      schemaVersion: number) {
+      public readonly actionType: ActionType,
+      public actionCustomizationArgs: ActionCustomizationArgs<ActionType>,
+      public schemaVersion: number) {
     if (schemaVersion < 1) {
       throw new Error('given invalid schema version');
     }
-
-    /** @type {string} */
-    this.actionType = actionType;
-    /** @type {Object.<string, *>} */
-    this.actionCustomizationArgs = actionCustomizationArgs;
-    /** @type {number} */
-    this.schemaVersion = schemaVersion;
   }
 
-  toBackendDict(): ILearnerActionBackendDict {
+  toBackendDict(): ILearnerActionBackendDict<ActionType> {
     return {
       action_type: this.actionType,
       action_customization_args: this.actionCustomizationArgs,
@@ -88,22 +74,17 @@ export class LearnerAction {
   }
 }
 
+export type GenericLearnerAction = (
+  LearnerAction<'ExplorationStart' | 'AnswerSubmit' | 'ExplorationQuit'>);
+
 @Injectable({
   providedIn: 'root'
 })
 export class LearnerActionObjectFactory {
-  /**
-   * @property {string} actionType - type of an action
-   * @property {Object.<string, *>} actionCustomizationArgs - customization
-   *   dict for an action
-   * @property {number} [schemaVersion=LEARNER_ACTION_SCHEMA_LATEST_VERSION]
-   *   - schema version of the class instance.
-   * @returns {LearnerAction}
-   */
-  createNew(
-      actionType: string,
-      actionCustomizationArgs: ILearnerActionCustomizationArgs,
-      schemaVersion: number): LearnerAction {
+  createNew<ActionType>(
+      actionType: ActionType,
+      actionCustomizationArgs: ActionCustomizationArgs<ActionType>,
+      schemaVersion: number): LearnerAction<ActionType> {
     schemaVersion = schemaVersion ||
       StatisticsDomainConstants.LEARNER_ACTION_SCHEMA_LATEST_VERSION;
     return new LearnerAction(
@@ -123,8 +104,9 @@ export class LearnerActionObjectFactory {
    * @param {LearnerActionBackendDict} learnerActionBackendDict
    * @returns {LearnerAction}
    */
-  createFromBackendDict(
-      learnerActionBackendDict: ILearnerActionBackendDict): LearnerAction {
+  createFromBackendDict<ActionType>(
+      learnerActionBackendDict:
+      ILearnerActionBackendDict<ActionType>): LearnerAction<ActionType> {
     return new LearnerAction(
       learnerActionBackendDict.action_type,
       learnerActionBackendDict.action_customization_args,

@@ -31,7 +31,8 @@ describe('PlaythroughIssuesBackendApiService', () => {
     PlaythroughIssuesBackendApiService = null;
   let playthroughIssueObjectFactory: PlaythroughIssueObjectFactory = null;
 
-  let backendIssues: IPlaythroughIssueBackendDict[] = [{
+  let backendIssues:
+  IPlaythroughIssueBackendDict<'MultipleIncorrectSubmissions'>[] = [{
     issue_type: 'MultipleIncorrectSubmissions',
     issue_customization_args: {
       state_name: { value: 'state_name1' },
@@ -107,7 +108,7 @@ describe('PlaythroughIssuesBackendApiService', () => {
 
     it('should return the playthrough data provided by the backend', fakeAsync(
       () => {
-        let backendPlaythrough: IPlaythroughIssueBackendDict = {
+        let backendPlaythrough: IPlaythroughIssueBackendDict<'EarlyQuit'> = {
           issue_type: 'EarlyQuit',
           issue_customization_args: {
             state_name: { value: 'state_name1' },

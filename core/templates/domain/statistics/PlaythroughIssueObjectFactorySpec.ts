@@ -17,15 +17,14 @@
  */
 
 import {
-  PlaythroughIssueObjectFactory,
-  IEarlyQuitCustomizationArgs,
   IPlaythroughIssueBackendDict,
+  PlaythroughIssueObjectFactory,
   PlaythroughIssue
 } from 'domain/statistics/PlaythroughIssueObjectFactory';
 
 describe('Playthrough Issue Object Factory', () => {
   let piof: PlaythroughIssueObjectFactory;
-  let playthroughIssueObject: PlaythroughIssue<IEarlyQuitCustomizationArgs>;
+  let playthroughIssueObject: PlaythroughIssue<'EarlyQuit'>;
   beforeEach(() => {
     piof = new PlaythroughIssueObjectFactory();
   });
@@ -56,7 +55,7 @@ describe('Playthrough Issue Object Factory', () => {
   });
 
   it('should create a new exploration issue from a backend dict', () => {
-    const playthroughIssueObject = piof.createFromBackendDict({
+    const playthroughIssueObject = piof.createFromBackendDict<'EarlyQuit'>({
       issue_type: 'EarlyQuit',
       issue_customization_args: {
         state_name: {
@@ -86,7 +85,7 @@ describe('Playthrough Issue Object Factory', () => {
   });
 
   it('should convert exploration issue to backend dict', () => {
-    const playthroughDict: IPlaythroughIssueBackendDict = {
+    const playthroughDict: IPlaythroughIssueBackendDict<'EarlyQuit'> = {
       issue_type: 'EarlyQuit',
       issue_customization_args: {
         state_name: {
@@ -103,31 +102,5 @@ describe('Playthrough Issue Object Factory', () => {
     const playthroughIssueObject = piof.createFromBackendDict(playthroughDict);
 
     expect(playthroughIssueObject.toBackendDict()).toEqual(playthroughDict);
-  });
-
-  it('should throw error on invalid backend dict', () => {
-    const playthroughDict = {
-      issue_type: 'InvalidType',
-      issue_customization_args: {
-        state_name: {
-          value: 'state'
-        },
-        time_spent_in_exp_in_msecs: {
-          value: 1.2
-        }
-      },
-      playthrough_ids: [],
-      schema_version: 1,
-      is_valid: true
-    };
-
-    expect(() => {
-      // TS ignore is used because playthrough dict is assigned a invalid type
-      // to test errors.
-      // @ts-ignore
-      piof.createFromBackendDict(playthroughDict);
-    }).toThrowError(
-      'Backend dict does not match any known issue type: ' +
-      JSON.stringify(playthroughDict));
   });
 });

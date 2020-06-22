@@ -22,7 +22,7 @@ import { Injectable } from '@angular/core';
 
 import {
   GenericPlaythroughIssue,
-  IPlaythroughIssueBackendDict,
+  GenericPlaythroughIssueBackendDict,
   PlaythroughIssueObjectFactory
 } from 'domain/statistics/PlaythroughIssueObjectFactory.ts';
 import { ServicesConstants } from 'services/services.constants.ts';
@@ -44,7 +44,7 @@ export class PlaythroughIssuesBackendApiService {
     if (this.cachedIssues !== null) {
       return Promise.resolve(this.cachedIssues);
     }
-    return this.httpClient.get<IPlaythroughIssueBackendDict[]>(
+    return this.httpClient.get<GenericPlaythroughIssueBackendDict[]>(
       this.getFetchIssuesUrl(explorationId), {
         params: { exp_version: explorationVersion.toString() }}).toPromise()
       .then(response => {
@@ -56,7 +56,7 @@ export class PlaythroughIssuesBackendApiService {
   fetchPlaythrough(
       explorationId: string,
       playthroughId: string): Promise<GenericPlaythroughIssue> {
-    return this.httpClient.get<IPlaythroughIssueBackendDict>(
+    return this.httpClient.get<GenericPlaythroughIssueBackendDict>(
       this.getFetchPlaythroughUrl(explorationId, playthroughId)).toPromise()
       .then(response => {
         return this.playthroughIssueObjectFactory.createFromBackendDict(
