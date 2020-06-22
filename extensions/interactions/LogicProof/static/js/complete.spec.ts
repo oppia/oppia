@@ -46,7 +46,7 @@ describe('Full system', function() {
   it('should accept fully correct proofs', function() {
     expect(completeCheck('p', 'p', 'we know p')).toBeUndefined();
 
-    // TODO(kevinlee12 @vojtechjelinek): add back additional tests from
+    // TODO(kevinlee12 @vojtechjelinek): Add back additional tests from
     // commit 2d9335019521 when speed issues are fixed.
 
     expect(

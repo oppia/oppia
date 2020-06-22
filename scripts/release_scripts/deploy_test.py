@@ -217,12 +217,16 @@ class DeployTests(test_utils.GenericTestBase):
             sys, 'argv', ['deploy.py', '--app_name=oppiaserver'])
         def mock_check_output(unused_cmd_tokens):
             return 'Invalid'
+        def mock_get_personal_access_token():
+            return 'test'
         out_swap = self.swap(
             subprocess, 'check_output', mock_check_output)
+        get_token_swap = self.swap(
+            common, 'get_personal_access_token', mock_get_personal_access_token)
         with self.get_branch_swap, self.install_swap, self.cwd_check_swap:
             with self.release_script_exist_swap, self.gcloud_available_swap:
                 with self.run_swap, self.create_swap, args_swap, out_swap:
-                    with self.assertRaisesRegexp(
+                    with get_token_swap, self.assertRaisesRegexp(
                         Exception, 'Invalid last commit message: Invalid.'):
                         deploy.execute_deployment()
 
@@ -230,7 +234,7 @@ class DeployTests(test_utils.GenericTestBase):
         args_swap = self.swap(
             sys, 'argv', ['deploy.py', '--app_name=oppiaserver'])
         feconf_swap = self.swap(
-            deploy, 'FECONF_PATH', MOCK_FECONF_FILEPATH)
+            common, 'FECONF_PATH', MOCK_FECONF_FILEPATH)
         def mock_main(unused_personal_access_token):
             pass
         def mock_get_personal_access_token():
@@ -333,7 +337,7 @@ class DeployTests(test_utils.GenericTestBase):
             check_function_calls['preprocess_release_gets_called'] = True
         def mock_update_and_check_indexes(unused_app_name):
             check_function_calls['update_and_check_indexes_gets_called'] = True
-        def mock_build_scripts():
+        def mock_build_scripts(unused_maintenance_mode):
             check_function_calls['build_scripts_gets_called'] = True
         def mock_deploy_application_and_write_log_entry(
                 unused_app_name, version_to_deploy_to,
@@ -404,7 +408,7 @@ class DeployTests(test_utils.GenericTestBase):
             check_function_calls['preprocess_release_gets_called'] = True
         def mock_update_and_check_indexes(unused_app_name):
             check_function_calls['update_and_check_indexes_gets_called'] = True
-        def mock_build_scripts():
+        def mock_build_scripts(unused_maintenance_mode):
             check_function_calls['build_scripts_gets_called'] = True
         def mock_deploy_application_and_write_log_entry(
                 unused_app_name, version_to_deploy_to,
@@ -501,7 +505,8 @@ class DeployTests(test_utils.GenericTestBase):
 
     def test_invalid_dev_mode(self):
         constants_swap = self.swap(
-            deploy, 'CONSTANTS_FILE_PATH',
+            common,
+            'CONSTANTS_FILE_PATH',
             INVALID_CONSTANTS_WITH_WRONG_DEV_MODE)
         with self.exists_swap, self.copyfile_swap, constants_swap:
             with self.listdir_swap, self.assertRaises(AssertionError):
@@ -509,7 +514,8 @@ class DeployTests(test_utils.GenericTestBase):
 
     def test_invalid_bucket_name(self):
         constants_swap = self.swap(
-            deploy, 'CONSTANTS_FILE_PATH',
+            common,
+            'CONSTANTS_FILE_PATH',
             INVALID_CONSTANTS_WITH_WRONG_BUCKET_NAME)
         with self.exists_swap, self.copyfile_swap, constants_swap:
             with self.listdir_swap, self.assertRaises(AssertionError):
@@ -517,16 +523,17 @@ class DeployTests(test_utils.GenericTestBase):
 
     def test_constants_are_updated_correctly(self):
         constants_swap = self.swap(
-            deploy, 'CONSTANTS_FILE_PATH', VALID_CONSTANTS)
+            common, 'CONSTANTS_FILE_PATH', VALID_CONSTANTS)
+        files_swap = self.swap(deploy, 'FILES_AT_ROOT', [])
+        images_dir_swap = self.swap(deploy, 'IMAGE_DIRS', [])
         with python_utils.open_file(VALID_CONSTANTS, 'r') as f:
             original_content = f.read()
         expected_content = original_content.replace(
-            '"DEV_MODE": true', '"DEV_MODE": false').replace(
-                '"GCS_RESOURCE_BUCKET_NAME": "None-resources",',
-                '"GCS_RESOURCE_BUCKET_NAME": "oppiaserver%s",' % (
-                    deploy.BUCKET_NAME_SUFFIX))
+            '"GCS_RESOURCE_BUCKET_NAME": "None-resources",',
+            '"GCS_RESOURCE_BUCKET_NAME": "oppiaserver%s",' % (
+                deploy.BUCKET_NAME_SUFFIX))
         try:
-            with self.exists_swap, self.copyfile_swap, constants_swap:
+            with self.exists_swap, constants_swap, files_swap, images_dir_swap:
                 with self.listdir_swap:
                     deploy.preprocess_release('oppiaserver', 'deploy_dir')
             with python_utils.open_file(VALID_CONSTANTS, 'r') as f:
@@ -573,10 +580,28 @@ class DeployTests(test_utils.GenericTestBase):
             return process
         # pylint: enable=unused-argument
         with self.swap(subprocess, 'Popen', mock_popen):
-            deploy.build_scripts()
+            deploy.build_scripts(False)
         self.assertEqual(
             cmd_tokens,
             ['python', '-m', 'scripts.build', '--prod_env', '--deploy_mode'])
+
+    def test_build_with_maintenance_mode(self):
+        process = subprocess.Popen(['echo', 'test'], stdout=subprocess.PIPE)
+        cmd_tokens = []
+        # pylint: disable=unused-argument
+        def mock_popen(tokens, stdout):
+            cmd_tokens.extend(tokens)
+            return process
+        # pylint: enable=unused-argument
+        with self.swap(subprocess, 'Popen', mock_popen):
+            deploy.build_scripts(True)
+        self.assertEqual(
+            cmd_tokens,
+            [
+                'python', '-m', 'scripts.build',
+                '--prod_env', '--deploy_mode', '--maintenance_mode'
+            ]
+        )
 
     def test_build_failure(self):
         process = subprocess.Popen(['test'], stdout=subprocess.PIPE)
@@ -589,7 +614,7 @@ class DeployTests(test_utils.GenericTestBase):
         # pylint: enable=unused-argument
         popen_swap = self.swap(subprocess, 'Popen', mock_popen)
         with popen_swap, self.assertRaisesRegexp(Exception, 'Build failed.'):
-            deploy.build_scripts()
+            deploy.build_scripts(False)
         self.assertEqual(
             cmd_tokens,
             ['python', '-m', 'scripts.build', '--prod_env', '--deploy_mode'])
@@ -768,7 +793,7 @@ class DeployTests(test_utils.GenericTestBase):
                 deploy.check_travis_and_circleci_tests('test-branch')
         self.assertEqual(
             self.urls_to_open, [
-                'https://travis-ci.org/oppia/oppia/branches',
+                'https://travis-ci.com/oppia/oppia/branches',
                 'https://circleci.com/gh/username/workflows/oppia'])
 
     def test_check_travis_and_circleci_tests_with_local_circleci_not_setup(

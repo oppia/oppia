@@ -217,8 +217,8 @@ class ComponentValidationUnitTests(test_utils.GenericTestBase):
         self.check_validation(
             components.Video, valid_items, invalid_items)
 
-    def test_svg_editor_validation(self):
-        """Tests svg editor component validation."""
+    def test_svg_diagram_validation(self):
+        """Tests svg diagram component validation."""
         valid_items = [{
             'svg_filename-with-value': 'random.svg',
             'alt-with-value': '1234'
@@ -238,7 +238,7 @@ class ComponentValidationUnitTests(test_utils.GenericTestBase):
         }]
 
         self.check_validation(
-            components.Svgeditor, valid_items, invalid_items)
+            components.Svgdiagram, valid_items, invalid_items)
 
 
 class ComponentDefinitionTests(test_utils.GenericTestBase):
@@ -292,7 +292,7 @@ class ComponentE2eTests(test_utils.GenericTestBase):
                 text_inside_constant = text_inside_constant[
                     text_inside_constant.find(',') + 1:]
 
-        # TODO(#9356): Add svgeditor to validations once the e2e tests for it
+        # TODO(#9356): Add svgdiagram to validations once the e2e tests for it
         # are created in the 2nd milestone.
-        actual_components.remove('Svgeditor')
+        actual_components.remove('Svgdiagram')
         self.assertEqual(set(actual_components), set(rte_components_with_test))

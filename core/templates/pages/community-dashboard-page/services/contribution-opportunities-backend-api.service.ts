@@ -34,9 +34,8 @@ type ContributionOpportunityCategoryType =
   'skill' | 'voiceover' | 'translation';
 
 type ContributionOpportunityParams = {
-  cursor: string;
-  // eslint-disable-next-line camelcase
-  language_code?: string;
+  'cursor': string;
+  'language_code'?: string;
 };
 
 @Injectable({
