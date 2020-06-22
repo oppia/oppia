@@ -175,7 +175,8 @@ class MathExpressionValidationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
                             yield (
                                 validity,
-                                u'%s: %s' % (state_name, rule_input))
+                                u'%s %s: %s' % (
+                                    item.id, state_name, rule_input))
 
     @staticmethod
     def reduce(key, values):

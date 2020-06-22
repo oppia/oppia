@@ -401,10 +401,10 @@ class MathExpressionValidationOneOffJobTests(test_utils.GenericTestBase):
             exp_jobs_one_off.MathExpressionValidationOneOffJob.get_output(
                 job_id))
         expected_output = [
-            u'[u\'Invalid\', [u\'State3: x<y>z\']]',
-            u'[u\'Valid Equation\', [u\'State2: y=m*x+c\']]',
-            u'[u\'Valid Expression\', [u\'State1: x+y-z\', '
-            u'u\'State4: sqrt(x/y)\']]']
+            u'[u\'Invalid\', [u\'exp_id0 State3: x<y>z\']]',
+            u'[u\'Valid Equation\', [u\'exp_id0 State2: y=m*x+c\']]',
+            u'[u\'Valid Expression\', [u\'exp_id0 State1: x+y-z\', '
+            u'u\'exp_id0 State4: sqrt(x/y)\']]']
 
         self.assertEqual(actual_output, expected_output)
 
@@ -561,9 +561,9 @@ class MathExpressionValidationOneOffJobTests(test_utils.GenericTestBase):
                 job_id))
         # Only 3 exploration details should be yielded since the threshold is 3.
         expected_output = [
-            u'[u\'Valid Equation\', [u\'State2: y=m*x+c\']]',
-            u'[u\'Valid Expression\', [u\'State3: sqrt(x/y)\', '
-            u'u\'State1: x+y-z\', u\'State5: pi* r^2\']]']
+            u'[u\'Valid Equation\', [u\'exp_id0 State2: y=m*x+c\']]',
+            u'[u\'Valid Expression\', [u\'exp_id0 State3: sqrt(x/y)\', '
+            u'u\'exp_id0 State1: x+y-z\', u\'exp_id0 State5: pi* r^2\']]']
 
         self.assertEqual(actual_output, expected_output)
 
