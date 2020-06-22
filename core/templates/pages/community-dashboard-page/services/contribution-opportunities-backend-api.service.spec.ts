@@ -29,8 +29,8 @@ import { SkillOpportunityObjectFactory } from
   'domain/opportunity/SkillOpportunityObjectFactory';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
-import { FeaturedTranslationLanguageFactory} from
-  'domain/opportunity/FeaturedTranslationLanguageFactory';
+import { FeaturedTranslationLanguageObjectFactory} from
+  'domain/opportunity/FeaturedTranslationLanguageObjectFactory';
 
 describe('Contribution Opportunities backend API service', function() {
   let contributionOpportunitiesBackendApiService:
@@ -45,7 +45,7 @@ describe('Contribution Opportunities backend API service', function() {
   const skillOpportunityResponse = {
     opportunities: [{
       id: 'skill_id',
-      skill_description: 'A new skill for question',
+      skill_explanation: 'A new skill for question',
       topic_name: 'A new topic',
       question_count: 30
     }],
@@ -184,27 +184,27 @@ describe('Contribution Opportunities backend API service', function() {
       const successHandler = jasmine.createSpy('success');
       const failHandler = jasmine.createSpy('fail');
 
-      const featuredTranslationLanguageFactory = TestBed.get(
-        FeaturedTranslationLanguageFactory);
+      const featuredTranslationLanguageObjectFactory = TestBed.get(
+        FeaturedTranslationLanguageObjectFactory);
 
       contributionOpportunitiesBackendApiService
         .fetchFeaturedTranslationLanguages()
         .then(successHandler, failHandler);
 
       const req = httpTestingController.expectOne(
-        '/getfeaturedtranslationlanguages'
+        '/retrivefeaturedtranslationlanguages'
       );
       expect(req.request.method).toEqual('GET');
       req.flush({
         featured_translation_languages:
-          [{ language_code: 'en', description: 'English' }]
+          [{ language_code: 'en', explanation: 'English' }]
       });
 
       flushMicrotasks();
 
       expect(successHandler).toHaveBeenCalledWith([
-        featuredTranslationLanguageFactory.createFromBackendDict(
-          { language_code: 'en', description: 'English' }
+        featuredTranslationLanguageObjectFactory.createFromBackendDict(
+          { language_code: 'en', explanation: 'English' }
         )
       ]);
       expect(failHandler).not.toHaveBeenCalled();

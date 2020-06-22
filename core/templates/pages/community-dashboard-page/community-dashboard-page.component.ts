@@ -139,16 +139,6 @@ angular.module('oppia').component('communityDashboardPage', {
           }
         });
 
-        ctrl.languageCodesAndDescriptions = (
-          allAudioLanguageCodes.map(function(languageCode) {
-            return {
-              id: languageCode,
-              description: (
-                LanguageUtilService.getAudioLanguageDescription(
-                  languageCode))
-            };
-          }));
-
         ctrl.languageCode = (
           allAudioLanguageCodes.indexOf(prevSelectedLanguageCode) !== -1 ?
           prevSelectedLanguageCode : DEFAULT_OPPORTUNITY_LANGUAGE_CODE);

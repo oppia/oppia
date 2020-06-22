@@ -266,7 +266,7 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/usercommunityrightsdatahandler',
         community_dashboard.UserCommunityRightsDataHandler),
     get_redirect_route(
-        r'/getfeaturedtranslationlanguages',
+        r'/retrivefeaturedtranslationlanguages',
         community_dashboard.FeaturedTranslationLanguagesHandler),
     get_redirect_route(
         r'%s' % feconf.NEW_SKILL_URL,

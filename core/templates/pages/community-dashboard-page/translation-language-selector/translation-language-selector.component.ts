@@ -24,40 +24,47 @@ import { ContributionOpportunitiesBackendApiService } from
   // eslint-disable-next-line max-len
   'pages/community-dashboard-page/services/contribution-opportunities-backend-api.service';
 import { FeaturedTranslationLanguage } from
-  'domain/opportunity/FeaturedTranslationLanguageFactory';
+  'domain/opportunity/FeaturedTranslationLanguageObjectFactory';
+import { LanguageUtilService } from 'domain/utilities/language-util.service';
 
 @Component({
   selector: 'translation-language-selector',
   templateUrl: './translation-language-selector.component.html'
 })
 export class TranslationLanguageSelectorComponent implements OnInit {
-  @Input() options: {id: string, description: string}[];
   @Input() value: string;
   @Output() setValue: EventEmitter<string> = new EventEmitter();
   @ViewChild('dropdown', {'static': false}) dropdownRef;
 
-  featuredLanguages: FeaturedTranslationLanguage[] = [];
+  options: {id: string, description: string}[];
   languageIdToDescription: {[id: string]: string} = {};
+  featuredLanguages: FeaturedTranslationLanguage[] = [];
+
   dropdownShown = false;
-  descriptionPopupShown = false;
-  descriptionPopupPxOffsetY = 0;
-  descriptionPopupContent = '';
+  explanationPopupShown = false;
+  explanationPopupPxOffsetY = 0;
+  explanationPopupContent = '';
 
   constructor(
     private contributionOpportunitiesBackendApiService:
-      ContributionOpportunitiesBackendApiService
+      ContributionOpportunitiesBackendApiService,
+    private languageUtilService: LanguageUtilService
   ) {}
 
   ngOnInit() {
-    this.options.forEach(({id, description}) =>
-      this.languageIdToDescription[id] = description);
-    try {
-      this.contributionOpportunitiesBackendApiService
-        .fetchFeaturedTranslationLanguages()
-        .then((data: FeaturedTranslationLanguage[]) => {
-          this.featuredLanguages = data;
-        });
-    } catch {}
+    this.options = this.languageUtilService
+      .getAllVoiceoverLanguageCodes().map(languageCode => {
+        const description = this.languageUtilService
+          .getAudioLanguageDescription(languageCode);
+        this.languageIdToDescription[languageCode] = description;
+        return { id: languageCode, description };
+      });
+
+    this.contributionOpportunitiesBackendApiService
+      .fetchFeaturedTranslationLanguages()
+      .then((featuredLanguages: FeaturedTranslationLanguage[]) => {
+        this.featuredLanguages = featuredLanguages;
+      });
   }
 
   toggleDropdown() {
@@ -69,17 +76,22 @@ export class TranslationLanguageSelectorComponent implements OnInit {
     this.dropdownShown = false;
   }
 
-  showDescriptionPopup(index: number) {
-    this.descriptionPopupPxOffsetY = 75 + 30 * index;
-    this.descriptionPopupContent = (
-      this.featuredLanguages[index].description);
-    this.descriptionPopupShown = true;
+  showExplanationPopup(index: number) {
+    // Align popup to mouse-overed info icon
+    this.explanationPopupPxOffsetY = 75 + 30 * index;
+    this.explanationPopupContent = (
+      this.featuredLanguages[index].explanation);
+    this.explanationPopupShown = true;
   }
 
-  hideDescriptionPopup() {
-    this.descriptionPopupShown = false;
+  hideExplanationPopup() {
+    this.explanationPopupShown = false;
   }
 
+  /**
+   * Close popup when outside elements are clicked
+   * @param event mouse click event
+   */
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent): void {
     const targetElement = event.target as HTMLElement;

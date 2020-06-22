@@ -18,28 +18,32 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { FeaturedTranslationLanguageFactory } from
-  'domain/opportunity/FeaturedTranslationLanguageFactory';
+import {
+  FeaturedTranslationLanguageObjectFactory,
+  FeaturedTranslationLanguage,
+  IFeaturedTranslationLanguageBackendDict
+} from
+  'domain/opportunity/FeaturedTranslationLanguageObjectFactory';
 
 describe('Featured Translation Language object factory', () => {
-  let featuredTranslationLanguageFactory:
-    FeaturedTranslationLanguageFactory = null;
-  let sampleFTL = null;
+  let featuredTranslationLanguageObjectFactory:
+    FeaturedTranslationLanguageObjectFactory = null;
+  let sampleFTL: FeaturedTranslationLanguage = null;
 
   beforeEach(() => {
-    featuredTranslationLanguageFactory = TestBed.get(
-      FeaturedTranslationLanguageFactory);
+    featuredTranslationLanguageObjectFactory = TestBed.get(
+      FeaturedTranslationLanguageObjectFactory);
 
-    let sampleFTLDict = {
+    let sampleFTLDict: IFeaturedTranslationLanguageBackendDict = {
       language_code: 'en',
-      description: 'English'
+      explanation: 'English'
     };
-    sampleFTL = featuredTranslationLanguageFactory
+    sampleFTL = featuredTranslationLanguageObjectFactory
       .createFromBackendDict(sampleFTLDict);
   });
 
   it('should correctly return all the values', function() {
     expect(sampleFTL.languageCode).toEqual('en');
-    expect(sampleFTL.description).toEqual('English');
+    expect(sampleFTL.explanation).toEqual('English');
   });
 });

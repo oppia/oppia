@@ -28,9 +28,9 @@ import { SkillOpportunity } from
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import {
-  FeaturedTranslationLanguageFactory,
+  FeaturedTranslationLanguageObjectFactory,
   IFeaturedTranslationLanguageBackendDict,
-} from 'domain/opportunity/FeaturedTranslationLanguageFactory';
+} from 'domain/opportunity/FeaturedTranslationLanguageObjectFactory';
 
 const constants = require('constants.ts');
 
@@ -50,8 +50,8 @@ export class ContributionOpportunitiesBackendApiService {
   constructor(
     private urlInterpolationService: UrlInterpolationService,
     private http: HttpClient,
-    private featuredTranslationLanguageFactory:
-      FeaturedTranslationLanguageFactory
+    private featuredTranslationLanguageObjectFactory:
+      FeaturedTranslationLanguageObjectFactory
   ) {}
 
   // TODO(#7165): Replace any with exact type.
@@ -138,14 +138,14 @@ export class ContributionOpportunitiesBackendApiService {
 
   async fetchFeaturedTranslationLanguages(): Promise<Object> {
     const response = await this.http
-      .get('/getfeaturedtranslationlanguages')
+      .get('/retrivefeaturedtranslationlanguages')
       .toPromise() as {
         'featured_translation_languages':
         IFeaturedTranslationLanguageBackendDict[]
       };
     return response.featured_translation_languages.map(
       (backendDict: IFeaturedTranslationLanguageBackendDict) =>
-        this.featuredTranslationLanguageFactory
+        this.featuredTranslationLanguageObjectFactory
           .createFromBackendDict(backendDict)
     );
   }

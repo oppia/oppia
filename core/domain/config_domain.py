@@ -39,11 +39,11 @@ LIST_OF_FEATURED_TRANSLATION_LANGUAGES_DICTS_SCHEMA = {
             'schema': {
                 'type': 'unicode',
                 'validators': [{
-                    'id': 'is_valid_translation_language_code',
+                    'id': 'is_supported_audio_language_code',
                 }]
             },
         }, {
-            'name': 'description',
+            'name': 'explanation',
             'schema': {
                 'type': 'unicode'
             }

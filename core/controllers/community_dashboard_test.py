@@ -459,14 +459,14 @@ class FeaturedTranslationLanguagesHandlerTest(test_utils.GenericTestBase):
     """Test for the FeaturedTranslationLanguagesHandler."""
 
     def test_get_featured_translation_languages(self):
-        response = self.get_json('/getfeaturedtranslationlanguages')
+        response = self.get_json('/retrivefeaturedtranslationlanguages')
         self.assertEqual(
             response,
             {'featured_translation_languages': []}
         )
 
         new_value = [
-            {'language_code': 'en', 'description': 'Partnership with ABC'}
+            {'language_code': 'en', 'explanation': 'Partnership with ABC'}
         ]
         config_services.set_property(
             'admin',
@@ -474,7 +474,7 @@ class FeaturedTranslationLanguagesHandlerTest(test_utils.GenericTestBase):
             new_value
         )
 
-        response = self.get_json('/getfeaturedtranslationlanguages')
+        response = self.get_json('/retrivefeaturedtranslationlanguages')
         self.assertEqual(
             response,
             {'featured_translation_languages': new_value}

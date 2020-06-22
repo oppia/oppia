@@ -20,27 +20,27 @@ import { TranslationLanguageSelectorComponent } from
 import { ContributionOpportunitiesBackendApiService } from
   // eslint-disable-next-line max-len
   'pages/community-dashboard-page/services/contribution-opportunities-backend-api.service.ts';
-import { FeaturedTranslationLanguageFactory } from
-  'domain/opportunity/FeaturedTranslationLanguageFactory';
+import { FeaturedTranslationLanguageObjectFactory } from
+  'domain/opportunity/FeaturedTranslationLanguageObjectFactory';
 
 /**
  * @fileoverview Unit tests for the translation language select.
  */
 
-describe('Translation language select', () => {
+describe('Translation language selector', () => {
   let component: TranslationLanguageSelectorComponent;
   let fixture: ComponentFixture<TranslationLanguageSelectorComponent>;
 
-  let featuredTranslationLanguageFactory =
-    new FeaturedTranslationLanguageFactory();
+  let featuredTranslationLanguageObjectFactory =
+    new FeaturedTranslationLanguageObjectFactory();
   let featuredLanguages = [
-    featuredTranslationLanguageFactory.createFromBackendDict({
+    featuredTranslationLanguageObjectFactory.createFromBackendDict({
       language_code: 'fr',
-      description: 'Partnership with ABC'
+      explanation: 'Partnership with ABC'
     }),
-    featuredTranslationLanguageFactory.createFromBackendDict({
+    featuredTranslationLanguageObjectFactory.createFromBackendDict({
       language_code: 'de',
-      description: 'Partnership with CBA'
+      explanation: 'Partnership with CBA'
     })
   ];
 
@@ -181,15 +181,16 @@ describe('Translation language select', () => {
     fixture.whenStable().then(() => {
       fixture.detectChanges();
 
-      component.showDescriptionPopup(0);
+      component.showexplanationPopup(0);
       fixture.detectChanges();
 
-      expect(component.descriptionPopupContent).toEqual('Partnership with ABC');
-      expect(component.descriptionPopupShown).toEqual(true);
+      expect(component.explanationPopupContent)
+        .toEqual('Partnership with ABC');
+      expect(component.explanationPopupShown).toEqual(true);
 
-      component.hideDescriptionPopup();
+      component.hideexplanationPopup();
       fixture.detectChanges();
-      expect(component.descriptionPopupShown).toEqual(false);
+      expect(component.explanationPopupShown).toEqual(false);
     });
   }));
 });

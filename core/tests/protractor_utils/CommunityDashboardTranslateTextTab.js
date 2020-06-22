@@ -20,16 +20,41 @@
 var waitFor = require('../protractor_utils/waitFor.js');
 
 var CommunityDashboardTranslateTextTab = function() {
-  var selectableLanguageElements = element(
+  var selectorContainer = element(
     by.css('.protractor-test-language-selector'));
-  var selectedLanguageElement = selectableLanguageElements.element(
-    by.css('.oppia-translation-language-selector-inner-container'));
+  var selectedLanguageElement = selectorContainer.element(
+    by.css('.protractor-test-language-selector-selected'));
+  var dropdown = selectorContainer.element(
+    by.css('.protractor-test-language-selector-dropdown'));
+  var featuredLanguageContainer = selectorContainer.element(
+    by.css('.protractor-test-featured-language-container'));
+  var featuredLanguageElements = selectorContainer.all(
+    by.css('.protractor-test-featured-language'));
+  var featuredLanguageTooltipElements = selectorContainer.all(
+    by.css('.protractor-test-featured-language-tooltip'));
+  var featuredLanguageExplanation = selectorContainer.element(
+    by.css('.protractor-test-language-selector-featured-explanation'));
+
+  var _openSelector = async function() {
+    try {
+      let dropdownVisible = await dropdown.isDisplayed();
+      if (dropdownVisible) {
+        return;
+      }
+    } catch {}
+
+    await waitFor.elementToBeClickable(
+      selectorContainer,
+      'Language selector taking too long to be clickable'
+    );
+    await selectorContainer.click();
+  };
 
   var _selectLanguage = async function(language) {
-    await selectableLanguageElements.click();
-    await selectableLanguageElements.element(
+    await _openSelector();
+    await selectorContainer.element(
       by.cssContainingText(
-        '.oppia-translation-language-selector-dropdown-option',
+        '.protractor-test-language-selector-option',
         language
       )).click();
   };
@@ -37,6 +62,38 @@ var CommunityDashboardTranslateTextTab = function() {
   this.changeLanguage = async function(language) {
     await _selectLanguage(language);
     await waitFor.pageToFullyLoad();
+  };
+
+  this.mouseoverFeaturedLanguageTooltip = async function(index) {
+    await _openSelector();
+    await waitFor.visibilityOf(
+      featuredLanguageContainer,
+      'Featured languages took too long to display'
+    );
+    await browser.actions().mouseMove(
+      featuredLanguageTooltipElements.get(index)
+    ).perform();
+  };
+
+  this.expectFeaturedLanguagesToBe = async function(languages) {
+    await _openSelector();
+    await waitFor.visibilityOf(
+      featuredLanguageContainer,
+      'Featured languages took too long to display'
+    );
+    var displayedFeaturedLanguages = await featuredLanguageElements
+      .map(async function(featuredLanguageElement) {
+        return (await featuredLanguageElement.getText()).replace('info\n', '');
+      });
+    expect(displayedFeaturedLanguages).toEqual(languages);
+  };
+
+  this.expectFeaturedLanguageExplanationToBe = async function(explanation) {
+    await waitFor.visibilityOf(
+      featuredLanguageExplanation,
+      'featured language explanation took too long to show'
+    );
+    expect(await featuredLanguageExplanation.getText()).toEqual(explanation);
   };
 
   this.expectSelectedLanguageToBe = async function(language) {
