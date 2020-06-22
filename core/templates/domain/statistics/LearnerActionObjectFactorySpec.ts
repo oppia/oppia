@@ -36,12 +36,31 @@ describe('Learner Action Object Factory', () => {
   });
 
   it('should create a new learner action', () => {
-    var learnerActionObject =
-        this.LearnerActionObjectFactory.createNew('AnswerSubmit', {});
+    var answerSubmitlearnerActionObject =
+      this.LearnerActionObjectFactory.createNewAnswerSubmitAction(
+        'AnswerSubmit', {});
+    var explorationStartlearnerActionObject =
+      this.LearnerActionObjectFactory.createNewExplorationStartAction(
+        'ExplorationStart', {});
+    var explorationQuitlearnerActionObject =
+      this.LearnerActionObjectFactory.createNewExplorationQuitAction(
+        'ExplorationQuit', {});
 
-    expect(learnerActionObject.actionType).toEqual('AnswerSubmit');
-    expect(learnerActionObject.actionCustomizationArgs).toEqual({});
-    expect(learnerActionObject.schemaVersion)
+    expect(answerSubmitlearnerActionObject.actionType).toEqual('AnswerSubmit');
+    expect(answerSubmitlearnerActionObject.actionCustomizationArgs).toEqual({});
+    expect(answerSubmitlearnerActionObject.schemaVersion)
+      .toEqual(this.LEARNER_ACTION_SCHEMA_LATEST_VERSION);
+    expect(explorationStartlearnerActionObject.actionType).toEqual(
+      'ExplorationStart');
+    expect(
+      explorationStartlearnerActionObject.actionCustomizationArgs).toEqual({});
+    expect(explorationStartlearnerActionObject.schemaVersion)
+      .toEqual(this.LEARNER_ACTION_SCHEMA_LATEST_VERSION);
+    expect(explorationQuitlearnerActionObject.actionType).toEqual(
+      'ExplorationQuit');
+    expect(
+      explorationQuitlearnerActionObject.actionCustomizationArgs).toEqual({});
+    expect(explorationQuitlearnerActionObject.schemaVersion)
       .toEqual(this.LEARNER_ACTION_SCHEMA_LATEST_VERSION);
   });
 
@@ -50,14 +69,15 @@ describe('Learner Action Object Factory', () => {
         this.LearnerActionObjectFactory;
 
     expect(() => {
-      return LearnerActionObjectFactoryLocalReference.createNew(
-        'AnswerSubmit', {}, -1);
+      return LearnerActionObjectFactoryLocalReference.
+        createNewAnswerSubmitAction('AnswerSubmit', {}, -1);
     }).toThrowError('given invalid schema version');
   });
 
   it('should use a specific schema version if provided', () => {
     var learnerActionObject =
-        this.LearnerActionObjectFactory.createNew('AnswerSubmit', {}, 99);
+        this.LearnerActionObjectFactory.createNewAnswerSubmitAction(
+          'AnswerSubmit', {}, 99);
 
     expect(learnerActionObject.schemaVersion).toEqual(99);
   });
@@ -65,19 +85,20 @@ describe('Learner Action Object Factory', () => {
   it('should create a new learner action from a backend dict', () => {
     var learnerActionObject =
         this.LearnerActionObjectFactory.createFromBackendDict({
-          action_type: 'AnswerSubmit',
+          action_type: 'ExplorationQuit',
           action_customization_args: {},
           schema_version: 1
         });
 
-    expect(learnerActionObject.actionType).toEqual('AnswerSubmit');
+    expect(learnerActionObject.actionType).toEqual('ExplorationQuit');
     expect(learnerActionObject.actionCustomizationArgs).toEqual({});
     expect(learnerActionObject.schemaVersion).toEqual(1);
   });
 
   it('should convert a learner action to a backend dict', () => {
     var learnerActionObject =
-        this.LearnerActionObjectFactory.createNew('AnswerSubmit', {}, 1);
+        this.LearnerActionObjectFactory.createNewAnswerSubmitAction(
+          'AnswerSubmit', {}, 1);
 
     var learnerActionDict = learnerActionObject.toBackendDict();
     expect(learnerActionDict).toEqual({
@@ -85,5 +106,19 @@ describe('Learner Action Object Factory', () => {
       action_customization_args: {},
       schema_version: 1
     });
+  });
+
+  it('should throw error on invalid backend dict', () => {
+    const playthroughDict = {
+      action_type: 'InvalidAction',
+      action_customization_args: {},
+      schema_version: 1
+    };
+
+    expect(() => {
+      this.LearnerActionObjectFactory.createFromBackendDict(playthroughDict);
+    }).toThrowError(
+      'Backend dict does not match any known action type: ' +
+      JSON.stringify(playthroughDict));
   });
 });

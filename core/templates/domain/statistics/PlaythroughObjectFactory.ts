@@ -20,7 +20,7 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { GenericLearnerAction, LearnerActionObjectFactory } from
+import { LearnerAction, LearnerActionObjectFactory } from
   'domain/statistics/LearnerActionObjectFactory';
 
 export class Playthrough {
@@ -43,7 +43,7 @@ export class Playthrough {
   constructor(
       playthroughId: string, expId: string, expVersion: number,
       issueType: string, issueCustomizationArgs: any,
-      actions: GenericLearnerAction[]) {
+      actions: LearnerAction[]) {
     /** @type {string} */
     this.playthroughId = playthroughId;
     /** @type {string} */
@@ -92,7 +92,7 @@ export class PlaythroughObjectFactory {
   createNew(
       playthroughId: string, expId: string, expVersion: number,
       issueType: string, issueCustomizationArgs: any,
-      actions: GenericLearnerAction[]): Playthrough {
+      actions: LearnerAction[]): Playthrough {
     return new Playthrough(
       playthroughId, expId, expVersion, issueType, issueCustomizationArgs,
       actions);

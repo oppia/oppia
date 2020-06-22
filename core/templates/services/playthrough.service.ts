@@ -274,14 +274,15 @@ export class PlaythroughService {
       if (this.isPlaythroughDiscarded()) {
         return;
       }
-      let expStartLearnerAction = this.learnerActionObjectFactory.createNew(
-        AppConstants.ACTION_TYPE_EXPLORATION_START,
-        {
-          state_name: {
-            value: initStateName
-          }
-        },
-        ServicesConstants.CURRENT_ACTION_SCHEMA_VERSION);
+      let expStartLearnerAction = this.learnerActionObjectFactory.
+        createNewExplorationStartAction(
+          AppConstants.ACTION_TYPE_EXPLORATION_START,
+          {
+            state_name: {
+              value: initStateName
+            }
+          },
+          ServicesConstants.CURRENT_ACTION_SCHEMA_VERSION);
 
       PlaythroughService.playthrough.actions.unshift(expStartLearnerAction);
 
@@ -306,7 +307,7 @@ export class PlaythroughService {
         this.createMultipleIncorrectIssueTracker(stateName);
       }
       PlaythroughService.playthrough.actions.push(
-        this.learnerActionObjectFactory.createNew(
+        this.learnerActionObjectFactory.createNewAnswerSubmitAction(
           AppConstants.ACTION_TYPE_ANSWER_SUBMIT,
           {
             state_name: {
@@ -347,7 +348,7 @@ export class PlaythroughService {
         return;
       }
       PlaythroughService.playthrough.actions.push(
-        this.learnerActionObjectFactory.createNew(
+        this.learnerActionObjectFactory.createNewExplorationQuitAction(
           AppConstants.ACTION_TYPE_EXPLORATION_QUIT,
           {
             state_name: {

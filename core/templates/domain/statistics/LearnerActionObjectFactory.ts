@@ -49,13 +49,29 @@ type ActionCustomizationArgs<ActionType> = (
   ActionType extends 'ExplorationQuit' ?
   IExplorationQuitCustomizationArgs : never);
 
-interface ILearnerActionBackendDict<ActionType> {
+// NOTE TO DEVELOPERS: Treat this as an implementation detail; do not export it.
+interface ILearnerActionBackendDictBase<ActionType> {
   'action_type': ActionType;
   'action_customization_args': ActionCustomizationArgs<ActionType>;
   'schema_version': number;
 }
 
-export class LearnerAction<ActionType> {
+export type IExplorationStartLearnerActionBackendDict = (
+  ILearnerActionBackendDictBase<'ExplorationStart'>);
+
+export type IAnswerSubmitLearnerActionBackendDict = (
+  ILearnerActionBackendDictBase<'AnswerSubmit'>);
+
+export type IExplorationQuitLearnerActionBackendDict = (
+  ILearnerActionBackendDictBase<'ExplorationQuit'>);
+
+export type ILearnerActionBackendDict = (
+  IExplorationStartLearnerActionBackendDict |
+  IAnswerSubmitLearnerActionBackendDict |
+  IExplorationQuitLearnerActionBackendDict);
+
+// NOTE TO DEVELOPERS: Treat this as an implementation detail; do not export it.
+class LearnerActionBase<ActionType> {
   constructor(
       public readonly actionType: ActionType,
       public actionCustomizationArgs: ActionCustomizationArgs<ActionType>,
@@ -65,7 +81,7 @@ export class LearnerAction<ActionType> {
     }
   }
 
-  toBackendDict(): ILearnerActionBackendDict<ActionType> {
+  toBackendDict(): ILearnerActionBackendDictBase<ActionType> {
     return {
       action_type: this.actionType,
       action_customization_args: this.actionCustomizationArgs,
@@ -74,20 +90,51 @@ export class LearnerAction<ActionType> {
   }
 }
 
-export type GenericLearnerAction = (
-  LearnerAction<'ExplorationStart' | 'AnswerSubmit' | 'ExplorationQuit'>);
+export class ExplorationStartLearnerAction extends
+  LearnerActionBase<'ExplorationStart'> {}
+
+export class AnswerSubmitLearnerAction extends
+  LearnerActionBase<'AnswerSubmit'> {}
+
+export class ExplorationQuitLearnerAction extends
+  LearnerActionBase<'ExplorationQuit'> {}
+
+export type LearnerAction = (
+  ExplorationStartLearnerAction |
+  AnswerSubmitLearnerAction |
+  ExplorationQuitLearnerAction);
 
 @Injectable({
   providedIn: 'root'
 })
 export class LearnerActionObjectFactory {
-  createNew<ActionType>(
-      actionType: ActionType,
-      actionCustomizationArgs: ActionCustomizationArgs<ActionType>,
-      schemaVersion: number): LearnerAction<ActionType> {
+  createNewExplorationStartAction(
+      actionType: 'ExplorationStart',
+      actionCustomizationArgs: IExplorationStartCustomizationArgs,
+      schemaVersion?: number): ExplorationStartLearnerAction {
     schemaVersion = schemaVersion ||
       StatisticsDomainConstants.LEARNER_ACTION_SCHEMA_LATEST_VERSION;
-    return new LearnerAction(
+    return new ExplorationStartLearnerAction(
+      actionType, actionCustomizationArgs, schemaVersion);
+  }
+
+  createNewAnswerSubmitAction(
+      actionType: 'AnswerSubmit',
+      actionCustomizationArgs: IAnswerSubmitCustomizationArgs,
+      schemaVersion?: number): AnswerSubmitLearnerAction {
+    schemaVersion = schemaVersion ||
+    StatisticsDomainConstants.LEARNER_ACTION_SCHEMA_LATEST_VERSION;
+    return new AnswerSubmitLearnerAction(
+      actionType, actionCustomizationArgs, schemaVersion);
+  }
+
+  createNewExplorationQuitAction(
+      actionType: 'ExplorationQuit',
+      actionCustomizationArgs: IExplorationQuitCustomizationArgs,
+      schemaVersion?: number): ExplorationQuitLearnerAction {
+    schemaVersion = schemaVersion ||
+    StatisticsDomainConstants.LEARNER_ACTION_SCHEMA_LATEST_VERSION;
+    return new ExplorationQuitLearnerAction(
       actionType, actionCustomizationArgs, schemaVersion);
   }
 
@@ -104,13 +151,31 @@ export class LearnerActionObjectFactory {
    * @param {LearnerActionBackendDict} learnerActionBackendDict
    * @returns {LearnerAction}
    */
-  createFromBackendDict<ActionType>(
-      learnerActionBackendDict:
-      ILearnerActionBackendDict<ActionType>): LearnerAction<ActionType> {
-    return new LearnerAction(
-      learnerActionBackendDict.action_type,
-      learnerActionBackendDict.action_customization_args,
-      learnerActionBackendDict.schema_version);
+  createFromBackendDict(
+      learnerActionBackendDict: ILearnerActionBackendDict): LearnerAction {
+    switch (learnerActionBackendDict.action_type) {
+      case 'ExplorationStart':
+        return new ExplorationStartLearnerAction(
+          learnerActionBackendDict.action_type,
+          learnerActionBackendDict.action_customization_args,
+          learnerActionBackendDict.schema_version);
+      case 'AnswerSubmit':
+        return new AnswerSubmitLearnerAction(
+          learnerActionBackendDict.action_type,
+          learnerActionBackendDict.action_customization_args,
+          learnerActionBackendDict.schema_version);
+      case 'ExplorationQuit':
+        return new ExplorationQuitLearnerAction(
+          learnerActionBackendDict.action_type,
+          learnerActionBackendDict.action_customization_args,
+          learnerActionBackendDict.schema_version);
+      default:
+        break;
+    }
+    const invalidBackendDict: never = learnerActionBackendDict;
+    throw new Error(
+      'Backend dict does not match any known action type: ' +
+      angular.toJson(invalidBackendDict));
   }
 }
 
