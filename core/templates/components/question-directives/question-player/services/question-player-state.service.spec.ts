@@ -19,12 +19,13 @@
 import { TestBed } from '@angular/core/testing';
 
 import { QuestionPlayerStateService } from
+// eslint-disable-next-line max-len
   'components/question-directives/question-player/services/question-player-state.service';
 
 import { QuestionObjectFactory, Question } from
-  'domain/question/QuestionObjectFactory'; 
+  'domain/question/QuestionObjectFactory';
 
-fdescribe('Question player state service', () => {
+describe('Question player state service', () => {
   let qpservice: QuestionPlayerStateService;
   let questionObjectFactory: QuestionObjectFactory;
   let questionId: string = 'question_1';
@@ -114,7 +115,7 @@ fdescribe('Question player state service', () => {
       version: 1,
       linked_skill_ids: ['skill_id1', 'skill_id2']
     });
-  })
+  });
 
   it('should return an empty question state dictionary', ()=> {
     expect(qpservice.getQuestionPlayerStateData()).toEqual({});

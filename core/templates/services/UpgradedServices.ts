@@ -320,6 +320,7 @@ import { QuestionBackendApiService } from
   'domain/question/question-backend-api.service.ts';
 import { QuestionCreationService } from
   'components/entity-creation-services/question-creation.service';
+import { QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
 import { QuestionSummaryForOneSkillObjectFactory }
   from 'domain/question/QuestionSummaryForOneSkillObjectFactory';
 import { QuestionSummaryObjectFactory } from
@@ -1263,6 +1264,8 @@ export class UpgradedServices {
     );
 
     // Topological level: 7.
+    upgradedServices['QuestionObjectFactory'] = new QuestionObjectFactory(
+      upgradedServices['StateObjectFactory']);
     upgradedServices['StatesObjectFactory'] = new StatesObjectFactory(
       upgradedServices['StateObjectFactory']);
 

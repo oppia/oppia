@@ -24,10 +24,10 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class QuestionPlayerStateService {
-  constructor(){}
+  constructor() {}
   private questionPlayerState = {};
 
-  private getCurrentTime(): number { 
+  private getCurrentTime(): number {
     return new Date().getTime();
   }
 
@@ -41,7 +41,6 @@ export class QuestionPlayerStateService {
   }
 
   private _hintUsed(question): void {
-    console.log(question);
     var questionId = question.getId();
     if (!this.questionPlayerState[questionId]) {
       this.createNewQuestionPlayerState(
@@ -61,7 +60,7 @@ export class QuestionPlayerStateService {
     }
     this.questionPlayerState[questionId].viewedSolution = {
       timestamp: this.getCurrentTime()};
-  };
+  }
 
   private _answerSubmitted(
       question, isCorrect, taggedSkillMisconceptionId): void {
@@ -97,7 +96,7 @@ export class QuestionPlayerStateService {
   getQuestionPlayerStateData() {
     return this.questionPlayerState;
   }
-};
+}
 
 angular.module('oppia').factory('QuestionPlayerStateService',
   downgradeInjectable(QuestionPlayerStateService));

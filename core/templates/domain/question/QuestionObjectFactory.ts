@@ -21,7 +21,7 @@
 
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
-import { StateObjectFactory } from 'domain/state/StateObjectFactory';
+import { StateObjectFactory, State } from 'domain/state/StateObjectFactory';
 
 
 export class Question {
@@ -31,8 +31,8 @@ export class Question {
   version;
   linkedSkillIds;
   constructor(
-    id: number, stateData: any, languageCode: string, version: number,
-    linkedSkillIds: string[]) {
+      id: number, stateData: State, languageCode: string, version: number,
+      linkedSkillIds: string[]) {
     this.id = id;
     this.stateData = stateData;
     this.languageCode = languageCode;
@@ -42,7 +42,7 @@ export class Question {
   getId(): number {
     return this.id;
   }
-  getStateData(): any {
+  getStateData(): State {
     return this.getStateData;
   }
   getLanguageCode(): string {
@@ -63,12 +63,12 @@ export class Question {
 export class QuestionObjectFactory {
   constructor(
   private stateObject: StateObjectFactory) {}
-  createDefaultQuestion(skillIds): Question {
+  createDefaultQuestion(skillIds: string[]): Question {
     return this.createFromBackendDict({
-      id: 0, 
-      question_state_data: this.stateObject.createDefaultState(''), 
-      language_code: 'en', 
-      version: 1, 
+      id: 0,
+      question_state_data: this.stateObject.createDefaultState(''),
+      language_code: 'en',
+      version: 1,
       linked_skill_ids: skillIds});
   }
 
@@ -80,7 +80,7 @@ export class QuestionObjectFactory {
       questionBackendDict.language_code, questionBackendDict.version,
       questionBackendDict.linked_skill_ids
     );
-  };
+  }
 }
 
 angular.module('oppia').factory('QuestionObjectFactory',
