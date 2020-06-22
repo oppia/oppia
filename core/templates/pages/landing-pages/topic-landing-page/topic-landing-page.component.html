@@ -5,7 +5,11 @@
         <background-banner class="oppia-landing-background-image"></background-banner>
         <div class="row oppia-landing-section-row">
           <div class="col-sm-6 col-sm-push-6 oppia-landing-image-div">
-            <img ng-src="<[$ctrl.image1.src]>" class="oppia-landing-image" alt="<[$ctrl.image1.alt]>">
+            <picture>
+              <source type="image/webp" ng-srcset="<[$ctrl.image1.src_webp]>">
+              <source type="image/png" ng-srcset="<[$ctrl.image1.src_png]>">
+              <img ng-src="<[$ctrl.image1.src_png]>" class="oppia-landing-image" alt="<[$ctrl.image1.alt]>">
+            </picture>
           </div>
           <div class="col-sm-6 col-sm-pull-6">
             <div class="oppia-landing-text-box-1">
@@ -25,7 +29,11 @@
       <div class="container-fluid">
         <div class="row oppia-landing-section-row">
           <div class="col-sm-6 col-sm-push-6 oppia-landing-image-div">
-            <img ng-src="<[$ctrl.image2.src]>" class="oppia-landing-image" alt="<[$ctrl.image2.alt]>">
+            <picture>
+              <source type="image/webp" ng-srcset="<[$ctrl.image2.src_webp]>">
+              <source type="image/png" ng-srcset="<[$ctrl.image2.src_png]>">
+              <img ng-src="<[$ctrl.image2.src_png]>" class="oppia-landing-image" alt="<[$ctrl.image2.alt]>">
+            </picture>
           </div>
           <div class="col-sm-6 col-sm-pull-6">
             <div class="oppia-landing-text-box-1">
@@ -139,7 +147,6 @@
     font-size: 2.8vw;
     margin: 0;
     text-align: left;
-    white-space: pre;
   }
   .oppia-landing-h2 {
     font-size: 1.95vmax;

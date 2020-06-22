@@ -266,10 +266,10 @@ angular.module('oppia').directive('storyNodeEditor', [
               controller: 'SelectSkillModalController',
               windowClass: 'skill-select-modal',
               size: 'xl'
-            }).result.then(function(skillId) {
+            }).result.then(function(summary) {
               try {
                 StoryUpdateService.addPrerequisiteSkillIdToNode(
-                  $scope.story, $scope.getId(), skillId);
+                  $scope.story, $scope.getId(), summary.id);
               } catch (err) {
                 AlertsService.addInfoMessage(
                   'Given skill is already a prerequisite skill', 5000);
@@ -302,10 +302,10 @@ angular.module('oppia').directive('storyNodeEditor', [
               controller: 'SelectSkillModalController',
               windowClass: 'skill-select-modal',
               size: 'xl'
-            }).result.then(function(skillId) {
+            }).result.then(function(summary) {
               try {
                 StoryUpdateService.addAcquiredSkillIdToNode(
-                  $scope.story, $scope.getId(), skillId);
+                  $scope.story, $scope.getId(), summary.id);
               } catch (err) {
                 AlertsService.addInfoMessage(
                   'Given skill is already an acquired skill', 5000);
