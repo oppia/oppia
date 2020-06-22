@@ -103,7 +103,7 @@ def get_filepath_from_filename(filename, rootdir):
 
     Returns:
         str | None. The path of the file if file is found otherwise
-            None.
+        None.
     """
     # This is required since error files are served according to error status
     # code. The file served is error-page.mainpage.html but it is compiled
@@ -595,7 +595,7 @@ tags: []
 
         Returns:
             str. A string that contains unicode characters and ends with the
-                given suffix.
+            given suffix.
         """
         return '%s%s' % (self.UNICODE_TEST_STRING, suffix)
 
@@ -1361,7 +1361,7 @@ tags: []
 
         Returns:
             Collection. A newly-created collection containing the corresponding
-                exploration details.
+            exploration details.
         """
         collection = collection_domain.Collection.create_default_collection(
             collection_id,
