@@ -1,0 +1,15 @@
+<strong><[options.title]></strong>
+<table class="table">
+  <tr>
+    <th><[options.column_headers[0]]></th>
+    <th><[options.column_headers[1]]></th>
+    <th ng-if="addressedInfoIsSupported">Addressed specifically?</th>
+  </tr>
+  <tr ng-repeat="row in data track by $index">
+    <td><[row.answer]></td>
+    <td><[row.frequency]></td>
+    <td ng-if="addressedInfoIsSupported">
+      <[row.is_addressed ? 'Yes' : 'No']>
+    </td>
+  </tr>
+</table>

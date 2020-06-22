@@ -1,0 +1,26 @@
+<strong><[options.title]></strong>
+<table class="table">
+  <tr>
+    <th><[options.column_headers[0]]></th>
+    <th><[options.column_headers[1]]></th>
+    <th ng-if="addressedInfoIsSupported">Addressed specifically?</th>
+  </tr>
+  <tr ng-repeat="row in data track by $index">
+    <td>
+      <a class="answer-rank" ng-click="toggleAnswerVisibility($index)">Answer Set #<[$index + 1]></a>
+      <table class="item table" ng-show="answerVisible[$index]">
+        <tr ng-repeat="item in row.answer">
+          <td>
+            <angular-html-bind html-data="item">
+            </angular-html-bind>
+          </td>
+        </tr>
+      </table>
+    </td>
+    <td><[row.frequency]></td>
+    <td ng-if="addressedInfoIsSupported">
+      <span ng-if="row.is_addressed">Yes</span>
+      <span ng-if="!row.is_addressed">No</span>
+    </td>
+  </tr>
+</table>
