@@ -3,7 +3,7 @@
     <div ng-if="explorationHasBeenVisited">
       <div class="oppia-statistics-display">
         <h3>Exploration Completion Rate</h3>
-        <pie-chart data="pieChartData" options="COMPLETION_RATE_PIE_CHART_OPTIONS">
+        <pie-chart data="pieChartData" options="pieChartOptions">
         </pie-chart>
         <p style="text-align: center;">
           <span ng-if="numPassersby"
@@ -23,8 +23,6 @@
               <div state-graph-visualization
                    graph-data="statsGraphData"
                    node-fill="darkseagreen"
-                   highlight-states="highlightStates"
-                   state-stats="stateStats"
                    on-click-function="onClickStateInStatsGraph">
               </div>
             </div>

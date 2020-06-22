@@ -420,9 +420,6 @@ import { StateGraphLayoutService } from
 import { StateHintsService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-hints.service';
-import { StateImprovementSuggestionService } from
-  // eslint-disable-next-line max-len
-  'pages/exploration-editor-page/statistics-tab/services/state-improvement-suggestion.service';
 import { StateInteractionIdService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-interaction-id.service';
@@ -737,7 +734,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static stateEditorService: StateEditorService;
   static stateGraphLayoutService: StateGraphLayoutService;
   static stateHintsService: StateHintsService;
-  static stateImprovementSuggestionService: StateImprovementSuggestionService;
   static stateInteractionIdService: StateInteractionIdService;
   static stateInteractionStatsService: StateInteractionStatsService;
   static stateNameService: StateNameService;
@@ -988,7 +984,6 @@ private stateCustomizationArgsService: StateCustomizationArgsService,
 private stateEditorService: StateEditorService,
 private stateGraphLayoutService: StateGraphLayoutService,
 private stateHintsService: StateHintsService,
-private stateImprovementSuggestionService: StateImprovementSuggestionService,
 private stateInteractionIdService: StateInteractionIdService,
 private stateInteractionStatsService: StateInteractionStatsService,
 private stateNameService: StateNameService,

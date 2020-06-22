@@ -19,10 +19,10 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { States }
-  from 'domain/exploration/StatesObjectFactory';
 import { ExplorationEditorPageConstants }
   from 'pages/exploration-editor-page/exploration-editor-page.constants';
+import { ExplorationStats } from
+  'domain/statistics/ExplorationStatsObjectFactory';
 
 interface RankedStates {
   rank: number;
@@ -30,31 +30,20 @@ interface RankedStates {
   type: string;
 }
 
-export interface StateStats {
-  'total_entry_count': number;
-  'no_submitted_answer_count': number;
-}
-
 @Injectable({
   providedIn: 'root'
 })
 export class StateImprovementSuggestionService {
-  getStateImprovements(
-      explorationStates: States,
-      allStateStats: {[state: string]: StateStats}): RankedStates[] {
+  getStateImprovements(explorationStats: ExplorationStats): RankedStates[] {
     const rankComparator = (lhs, rhs) => {
       return rhs.rank - lhs.rank;
     };
 
     const rankedStates = [];
-    explorationStates.getStateNames().forEach(stateName => {
-      if (!allStateStats.hasOwnProperty(stateName)) {
-        return;
-      }
-
-      const stateStats = allStateStats[stateName];
-      const totalEntryCount = stateStats.total_entry_count;
-      const noAnswerSubmittedCount = stateStats.no_submitted_answer_count;
+    explorationStats.getStateNames().forEach(stateName => {
+      const stateStats = explorationStats.getStateStats(stateName);
+      const totalEntryCount = stateStats.totalHitCount;
+      const noAnswerSubmittedCount = stateStats.totalAnswersCount;
 
       if (totalEntryCount === 0) {
         return;
@@ -62,8 +51,6 @@ export class StateImprovementSuggestionService {
 
       const threshold = 0.2 * totalEntryCount;
       const eligibleFlags = [];
-      const state = explorationStates.getState(stateName);
-      const stateInteraction = state.interaction;
       if (noAnswerSubmittedCount > threshold) {
         eligibleFlags.push({
           rank: noAnswerSubmittedCount,

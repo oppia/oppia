@@ -393,9 +393,6 @@ import { StateGraphLayoutService } from
 import { StateHintsService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-hints.service';
-import { StateImprovementSuggestionService } from
-  // eslint-disable-next-line max-len
-  'pages/exploration-editor-page/statistics-tab/services/state-improvement-suggestion.service';
 import { StateInteractionIdService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-interaction-id.service';
@@ -673,8 +670,6 @@ export class UpgradedServices {
     upgradedServices['SpeechSynthesisChunkerService'] =
       new SpeechSynthesisChunkerService();
     upgradedServices['StateGraphLayoutService'] = new StateGraphLayoutService();
-    upgradedServices['StateImprovementSuggestionService'] =
-      new StateImprovementSuggestionService();
     upgradedServices['StateNameService'] = new StateNameService();
     upgradedServices['StateStatsObjectFactory'] = new StateStatsObjectFactory();
     upgradedServices['StopwatchObjectFactory'] = new StopwatchObjectFactory();
