@@ -58,10 +58,12 @@ describe('Select Skill Modal Controller', function() {
   });
 
   it('should save skill with its id', function() {
-    $scope.selectedSkillId = 2;
+    $scope.selectedSkillId = '2';
     $scope.save();
 
-    expect($scope.selectedSkillId).toBe(2);
-    expect($uibModalInstance.close).toHaveBeenCalledWith(2);
+    expect($scope.selectedSkillId).toBe('2');
+    expect($uibModalInstance.close).toHaveBeenCalledWith({
+      id: '2'
+    });
   });
 });
