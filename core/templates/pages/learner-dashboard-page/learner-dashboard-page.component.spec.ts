@@ -383,6 +383,16 @@ describe('Learner dashboard page', function() {
     });
 
     it('should check if application is being used on a mobile', function() {
+      // This approach was choosen because spyOn() doesn't work on properties
+      // that doesn't have a get access type.
+      // Without this approach the test will fail because it'll throw
+      // 'Property innerWidth does not have access type get' error.
+      // eslint-disable-next-line max-len
+      // ref: https://developer.mozilla.org/pt-BR/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty
+      // ref: https://github.com/jasmine/jasmine/issues/1415
+      Object.defineProperty($window, 'innerWidth', {
+        get: () => undefined
+      });
       var innerWidthSpy = spyOnProperty($window, 'innerWidth');
       innerWidthSpy.and.returnValue(400);
       expect(ctrl.checkMobileView()).toBe(true);
