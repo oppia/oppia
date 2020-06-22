@@ -31,13 +31,14 @@ require('pages/exploration-editor-page/services/router.service.ts');
 
 angular.module('oppia').controller('StateStatsModalController', [
   '$controller', '$scope', '$uibModalInstance', 'RouterService',
-  'interactionArgs', 'stateName', 'stateStats',
-  'visualizationsInfo',
+  'interactionArgs', 'stateName', 'stateStats', 'visualizationsInfo',
   function(
       $controller, $scope, $uibModalInstance, RouterService,
-      interactionArgs, stateName, stateStats,
-      visualizationsInfo) {
+      interactionArgs, stateName, stateStats, visualizationsInfo) {
+    console.log('hello..?');
+
     $controller('ConfirmOrCancelModalController', {$scope, $uibModalInstance});
+
     var COMPLETION_RATE_PIE_CHART_OPTIONS = {
       left: 20,
       pieHole: 0.6,
@@ -83,9 +84,11 @@ angular.module('oppia').controller('StateStatsModalController', [
       ['Solutions not used', totalAnswersCount - numTimesSolutionViewed]
     ];
 
+    console.log(':o');
     $scope.navigateToStateEditor = function() {
       $scope.cancel();
       RouterService.navigateToMainTab(stateName);
     };
+    console.log(':)');
   }
 ]);

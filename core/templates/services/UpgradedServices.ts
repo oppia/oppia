@@ -1195,7 +1195,6 @@ export class UpgradedServices {
         upgradedServices['ReadOnlyCollectionBackendApiService'],
         upgradedServices['UrlInterpolationService']);
     upgradedServices['ExplorationStatsService'] = new ExplorationStatsService(
-      upgradedServices['ContextService'],
       upgradedServices['ExplorationStatsBackendApiService']);
     upgradedServices['PredictionAlgorithmRegistryService'] =
       new PredictionAlgorithmRegistryService(
@@ -1257,7 +1256,6 @@ export class UpgradedServices {
     upgradedServices['StateInteractionStatsService'] =
       new StateInteractionStatsService(
         upgradedServices['AnswerClassificationService'],
-        upgradedServices['ContextService'],
         upgradedServices['FractionObjectFactory'],
         upgradedServices['HttpClient'],
         upgradedServices['InteractionRulesRegistryService'],

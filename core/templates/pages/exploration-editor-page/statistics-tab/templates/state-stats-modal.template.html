@@ -7,13 +7,13 @@
     <div style="display: inline-block;">
       <p>
         <strong>Card entered</strong>
-        : <[stateStats.total_hit_count]>
+        : <[stateStats.totalHitCount]>
         <strong> times. </strong>
       </p>
     </div>
     <div style="display: inline-block; padding-left: 170px;">
       <strong>Quit at this card</strong>
-      : <[stateStats.total_hit_count - stateStats.num_completions]>
+      : <[stateStats.totalHitCount - stateStats.numCompletions]>
       <strong> times. </strong>
     </div>
   </div>
@@ -62,16 +62,3 @@
 <div class="modal-footer">
   <button class="btn btn-secondary" ng-click="cancel()">Close</button>
 </div>
-
-<style>
-  .oppia-state-stats-modal-body .section {
-    margin-top: 18px;
-  }
-
-  .oppia-state-stats-warning {
-    background: #f9edbe;
-    border-radius: 2px;
-    padding: 12px;
-    width: 100%;
-  }
-</style>

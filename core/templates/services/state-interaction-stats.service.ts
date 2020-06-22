@@ -23,7 +23,6 @@ import { Injectable } from '@angular/core';
 import { Answer } from 'domain/exploration/AnswerStatsObjectFactory';
 import { AnswerClassificationService } from
   'pages/exploration-player-page/services/answer-classification.service';
-import { ContextService } from 'services/context.service';
 import { IFractionDict, FractionObjectFactory } from
   'domain/objects/FractionObjectFactory';
 import { InteractionRulesRegistryService } from
@@ -73,7 +72,6 @@ export class StateInteractionStatsService {
 
   constructor(
       private answerClassificationService: AnswerClassificationService,
-      private contextService: ContextService,
       private fractionObjectFactory: FractionObjectFactory,
       private http: HttpClient,
       private interactionRulesRegistryService: InteractionRulesRegistryService,
@@ -100,11 +98,10 @@ export class StateInteractionStatsService {
    * Returns a promise which will provide details of the given state's
    * answer-statistics.
    */
-  computeStats(state: State): Promise<IStateInteractionStats> {
+  computeStats(expId: string, state: State): Promise<IStateInteractionStats> {
     if (this.statsCache.has(state.name)) {
       return this.statsCache.get(state.name);
     }
-    const explorationId = this.contextService.getExplorationId();
     const interactionRulesService = (
       this.interactionRulesRegistryService.getRulesServiceByInteractionId(
         state.interaction.id));
@@ -112,11 +109,11 @@ export class StateInteractionStatsService {
     const statsPromise = this.http.get<IStateInteractionStatsBackendDict>(
       this.urlInterpolationService.interpolateUrl(
         STATE_INTERACTION_STATS_URL_TEMPLATE, {
-          exploration_id: explorationId,
+          exploration_id: expId,
           state_name: state.name,
         })).toPromise()
       .then(response => ({
-        exploration_id: explorationId,
+        exploration_id: expId,
         state_name: state.name,
         visualizations_info: response.visualizations_info.map(vizInfo => ({
           id: vizInfo.id,

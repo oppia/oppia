@@ -17,9 +17,6 @@
  * exploration editor.
  */
 
-import { IStateInteractionStats } from
-  'services/state-interaction-stats.service';
-
 require(
   'pages/exploration-editor-page/statistics-tab/templates/' +
   'state-stats-modal.controller.ts');
@@ -54,11 +51,12 @@ angular.module('oppia').directive('statisticsTab', [
             ExplorationDataService, ExplorationStatsService,
             ReadOnlyExplorationBackendApiService, StateInteractionStatsService,
             StatesObjectFactory) {
+          const expId = ExplorationDataService.explorationId;
+
           const refreshExplorationStatistics = () => {
             Promise.all([
-              ReadOnlyExplorationBackendApiService.loadLatestExploration(
-                ExplorationDataService.explorationId),
-              ExplorationStatsService.getExplorationStats()
+              ReadOnlyExplorationBackendApiService.loadLatestExploration(expId),
+              ExplorationStatsService.getExplorationStats(expId)
             ]).then(responses => {
               const [expResponse, expStats] = responses;
               const initStateName = expResponse.exploration.init_state_name;
@@ -69,11 +67,8 @@ angular.module('oppia').directive('statisticsTab', [
                 expResponse.exploration.states);
               this.expStats = expStats;
 
-              console.log(JSON.stringify(expStats));
-
               $scope.statsGraphData = (
                 ComputeGraphService.compute(initStateName, this.states));
-              $scope.explorationHasBeenVisited = expStats.numActualStarts > 0;
               $scope.numPassersby = (
                 expStats.numStarts - expStats.numActualStarts);
               $scope.pieChartData = [
@@ -93,41 +88,52 @@ angular.module('oppia').directive('statisticsTab', [
                 title: '',
                 width: 600,
               };
+
+              if (expStats.numActualStarts > 0) {
+                $scope.explorationHasBeenVisited = true;
+              }
             });
           };
 
           const openStateStatsModal = (stateName: string) => {
             const state = this.states.getState(stateName);
             AlertsService.clearWarnings();
-            return StateInteractionStatsService.computeStats(state)
-              .then((stats: IStateInteractionStats) => $uibModal.open({
+            return StateInteractionStatsService.computeStats(expId, state)
+              .then(stats => $uibModal.open({
                 controller: 'StateStatsModalController',
                 templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                   '/pages/exploration-editor-page/statistics-tab/templates/' +
                   'state-stats-modal.template.html'),
+                styleUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                  '/pages/exploration-editor-page/statistics-tab/templates/' +
+                  'state-stats-modal.template.css'),
                 backdrop: true,
                 resolve: {
-                  interactionArgs: state.interaction.customizationArgs,
-                  stateName: stateName,
-                  stateStats: this.expStats.getStateStats(stateName),
-                  visualizationsInfo: stats.visualizations_info,
+                  interactionArgs: () => state.interaction.customizationArgs,
+                  stateName: () => stateName,
+                  stateStats: () => this.expStats.getStateStats(stateName),
+                  visualizationsInfo: () => stats.visualizations_info,
                 },
-              }).result).then(
-                () => {
-                  this.stateStatsModalIsOpen = false;
-                },
-                () => {
-                  AlertsService.clearWarnings();
-                  this.stateStatsModalIsOpen = false;
-                });
+              }).result);
           };
 
           this.$onInit = () => {
             this.stateStatsModalIsOpen = false;
             $scope.onClickStateInStatsGraph = (stateName: string) => {
+              console.log(this.stateStatsModalIsOpen);
               if (!this.stateStatsModalIsOpen) {
+                console.log('opened');
                 this.stateStatsModalIsOpen = true;
-                openStateStatsModal(stateName);
+                openStateStatsModal(stateName).then(
+                  () => {
+                    console.log('success');
+                    this.stateStatsModalIsOpen = false;
+                  },
+                  () => {
+                    console.log('failure');
+                    AlertsService.clearWarnings();
+                    this.stateStatsModalIsOpen = false;
+                  });
               }
             };
             $scope.explorationHasBeenVisited = false;
