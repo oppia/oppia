@@ -178,6 +178,7 @@ jobs:
     <<: *job_defaults
     steps:
       - checkout
+      - merge_target_branch
       - attach_workspace:
           at: /home/circleci/
       - run:
@@ -202,6 +203,7 @@ jobs:
     <<: *job_defaults
     steps:
       - checkout
+      - merge_target_branch
       - attach_workspace:
           at: /home/circleci/
       - run:
@@ -225,6 +227,7 @@ jobs:
     <<: *job_defaults
     steps:
       - checkout
+      - merge_target_branch
       - attach_workspace:
           at: /home/circleci/
       - run:
@@ -252,6 +255,7 @@ jobs:
     <<: *job_defaults
     steps:
       - checkout
+      - merge_target_branch
       - attach_workspace:
           at: /home/circleci/
       - run:
