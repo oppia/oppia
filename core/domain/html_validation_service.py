@@ -938,8 +938,11 @@ def validate_math_tags_in_html(html_string):
     return error_list
 
 
-def validate_math_tags_in_html_for_new_schema(html_string):
+def validate_math_tags_in_html_with_attribute_math_content(html_string):
     """Returns a list of all invalid new schema math tags in the given HTML.
+    The old schema has the attribute raw_latex-with-value while the new schema
+    has the attribute math-content-with-value which includes a field for storing
+    reference to SVGs.
 
     Args:
         html_string: str. The HTML string.

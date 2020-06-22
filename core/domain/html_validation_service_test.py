@@ -1603,9 +1603,9 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             self.assertEqual(
                 python_utils.UNICODE(invalid_tag), expected_invalid_tags[index])
 
-    def test_validate_math_tags_in_html_for_new_schema(self):
-        """Test that the validate_math_tags_in_html_for_new_schema method
-        validates an HTML string and returns all the invalid tags.
+    def test_validate_math_tags_in_html_with_attribute_math_content(self):
+        """Test that the validate_math_tags_in_html_with_attribute_math_content
+        method validates an HTML string and returns all the invalid tags.
         """
         html_string = (
             '<p>Feedback</p><oppia-noninteractive-math math_content-with-v'
@@ -1648,7 +1648,8 @@ class ContentMigrationTests(test_utils.GenericTestBase):
              ': &amp;quot;&amp;quot;}"></oppia-noninteractive-math>')
         ]
         invalid_tags = (
-            html_validation_service.validate_math_tags_in_html_for_new_schema(
+            html_validation_service.
+            validate_math_tags_in_html_with_attribute_math_content(
                 html_string))
 
         self.assertEqual(len(invalid_tags), 5)
