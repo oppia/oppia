@@ -43,6 +43,7 @@ describe('AlgebraicExpressionInputValidationService', () => {
   let customizationArgs: IAlgebraicExpressionInputCustomizationArgs;
   let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory,
     rof: RuleObjectFactory;
+  let warnings;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -88,7 +89,7 @@ describe('AlgebraicExpressionInputValidationService', () => {
   });
 
   it('should be able to perform basic validation', () => {
-    let warnings = validatorService.getAllWarnings(
+    warnings = validatorService.getAllWarnings(
       currentState, customizationArgs, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([]);
   });
@@ -97,7 +98,7 @@ describe('AlgebraicExpressionInputValidationService', () => {
     // The second rule will never get matched.
     answerGroups[0].rules = [isEquivalentTo, matchesExactlyWith];
 
-    let warnings = validatorService.getAllWarnings(currentState,
+    warnings = validatorService.getAllWarnings(currentState,
       customizationArgs, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
@@ -122,7 +123,7 @@ describe('AlgebraicExpressionInputValidationService', () => {
     // The second rule will never get matched.
     answerGroups[0].rules = [isEquivalentTo1, isEquivalentTo2];
 
-    let warnings = validatorService.getAllWarnings(currentState,
+    warnings = validatorService.getAllWarnings(currentState,
       customizationArgs, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
@@ -147,7 +148,7 @@ describe('AlgebraicExpressionInputValidationService', () => {
     // The second rule will never get matched.
     answerGroups[0].rules = [matchesExactlyWith1, matchesExactlyWith2];
 
-    let warnings = validatorService.getAllWarnings(currentState,
+    warnings = validatorService.getAllWarnings(currentState,
       customizationArgs, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
@@ -159,7 +160,7 @@ describe('AlgebraicExpressionInputValidationService', () => {
   it('should not catch redundancy of rules with non-matching inputs', () => {
     answerGroups[0].rules = [matchesExactlyWith, isEquivalentTo];
 
-    let warnings = validatorService.getAllWarnings(currentState,
+    warnings = validatorService.getAllWarnings(currentState,
       customizationArgs, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([]);
 
@@ -179,7 +180,7 @@ describe('AlgebraicExpressionInputValidationService', () => {
 
     answerGroups[0].rules = [isEquivalentTo, matchesExactlyWith];
 
-    let warnings = validatorService.getAllWarnings(currentState,
+    warnings = validatorService.getAllWarnings(currentState,
       customizationArgs, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([]);
   });
