@@ -16,16 +16,22 @@
  * @fileoverview Unit tests for profile page component.
  */
 
+import { TestBed } from '@angular/core/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+
 // TODO(#7222): Remove the following block of unnecessary imports once
 // thread-data.service.ts is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
+import { ProfilePageBackendApiService } from
+  './profile-page-backend-api.service';
+import { OppiaAngularRootComponent } from
+  'components/oppia-angular-root.component';
 
 require('pages/profile-page/profile-page.component.ts');
 
 describe('Profile page', function() {
   var $scope = null;
   var ctrl = null;
-  var $httpBackend = null;
   var $q = null;
   var UserService = null;
   var CsrfTokenService = null;
@@ -54,8 +60,17 @@ describe('Profile page', function() {
     $provide.value('WindowRef', windowRefMock);
   }));
 
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [ProfilePageBackendApiService]
+    });
+    OppiaAngularRootComponent.profilePageBackendApiService = (
+      TestBed.get(ProfilePageBackendApiService)
+    );
+  });
+
   beforeEach(angular.mock.inject(function($injector, $componentController) {
-    $httpBackend = $injector.get('$httpBackend');
     $q = $injector.get('$q');
     UserService = $injector.get('UserService');
     CsrfTokenService = $injector.get('CsrfTokenService');
@@ -117,10 +132,10 @@ describe('Profile page', function() {
     };
 
     beforeEach(function() {
-      $httpBackend.expect('GET', '/profilehandler/data/username1')
-        .respond(profileData);
+      spyOn(OppiaAngularRootComponent.profilePageBackendApiService,
+        'fetchProfileData').and.returnValue($q.resolve(profileData));
       ctrl.$onInit();
-      $httpBackend.flush();
+      $scope.$apply();
     });
 
     it('should get explorations to display when edited explorations are empty',
@@ -162,10 +177,10 @@ describe('Profile page', function() {
     };
 
     beforeEach(function() {
-      $httpBackend.expect('GET', '/profilehandler/data/username1')
-        .respond(profileData);
+      spyOn(OppiaAngularRootComponent.profilePageBackendApiService,
+        'fetchProfileData').and.returnValue($q.resolve(profileData));
       ctrl.$onInit();
-      $httpBackend.flush();
+      $scope.$apply();
     });
 
     it('should go back and forth between pages', function() {
@@ -205,10 +220,10 @@ describe('Profile page', function() {
     };
 
     beforeEach(function() {
-      $httpBackend.expect('GET', '/profilehandler/data/username1')
-        .respond(profileData);
+      spyOn(OppiaAngularRootComponent.profilePageBackendApiService,
+        'fetchProfileData').and.returnValue($q.resolve(profileData));
       ctrl.$onInit();
-      $httpBackend.flush();
+      $scope.$apply();
     });
 
     it('should not change subscription status and change to login page',
@@ -260,26 +275,28 @@ describe('Profile page', function() {
     };
 
     beforeEach(function() {
-      $httpBackend.expect('GET', '/profilehandler/data/username1')
-        .respond(profileData);
+      spyOn(OppiaAngularRootComponent.profilePageBackendApiService,
+        'fetchProfileData').and.returnValue($q.resolve(profileData));
       ctrl.$onInit();
-      $httpBackend.flush();
+      $scope.$apply();
     });
 
     it('should subscribe and unsubscribe from a profile', function() {
       expect(ctrl.isAlreadySubscribed).toBe(false);
-      $httpBackend.whenPOST('/subscribehandler').respond(200);
+      spyOn(OppiaAngularRootComponent.profilePageBackendApiService,
+        'subscribe').and.returnValue($q.resolve());
       ctrl.changeSubscriptionStatus();
-      $httpBackend.flush();
+      $scope.$apply();
 
       expect(ctrl.isAlreadySubscribed).toBe(true);
       expect(ctrl.subscriptionButtonPopoverText).toBe(
         'Unsubscribe to stop receiving email notifications regarding new' +
         ' explorations published by ' + profileData.profile_username + '.');
 
-      $httpBackend.whenPOST('/unsubscribehandler').respond(200);
+      spyOn(OppiaAngularRootComponent.profilePageBackendApiService,
+        'unsubscribe').and.returnValue($q.resolve());
       ctrl.changeSubscriptionStatus();
-      $httpBackend.flush();
+      $scope.$apply();
 
       expect(ctrl.isAlreadySubscribed).toBe(false);
       expect(ctrl.subscriptionButtonPopoverText).toBe(
