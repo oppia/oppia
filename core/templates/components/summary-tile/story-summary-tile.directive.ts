@@ -65,10 +65,15 @@ angular.module('oppia').directive('storySummaryTile', [
             if (ctrl.chaptersDisplayed !== ctrl.nodeCount) {
               ctrl.showButton = true;
             }
-            ctrl.thumbnailUrl = (
-              AssetsBackendApiService.getThumbnailUrlForPreview(
-                ENTITY_TYPE.STORY, ctrl.getStorySummary().getId(),
-                ctrl.getStorySummary().getThumbnailFilename()));
+
+            if (ctrl.getStorySummary().getThumbnailFilename()) {
+              ctrl.thumbnailUrl = (
+                AssetsBackendApiService.getThumbnailUrlForPreview(
+                  ENTITY_TYPE.STORY, ctrl.getStorySummary().getId(),
+                  ctrl.getStorySummary().getThumbnailFilename()));
+            } else {
+              ctrl.thumbnailUrl = null;
+            }
           };
         }
       ]

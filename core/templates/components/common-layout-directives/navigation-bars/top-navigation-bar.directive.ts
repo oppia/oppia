@@ -286,34 +286,45 @@ angular.module('oppia').directive('topNavigationBar', [
               ctrl.navElementsVisibilityStatus[NAV_ELEMENTS_ORDER[i]] = true;
             }
 
-            WindowDimensionsService.registerOnResizeHook(function() {
-              ctrl.windowIsNarrow = WindowDimensionsService.isWindowNarrow();
-              $scope.$applyAsync();
-              // If window is resized larger, try displaying the hidden
-              // elements.
-              if (
-                currentWindowWidth < WindowDimensionsService.getWidth()) {
-                for (var i = 0; i < NAV_ELEMENTS_ORDER.length; i++) {
-                  if (
-                    !ctrl.navElementsVisibilityStatus[NAV_ELEMENTS_ORDER[i]]) {
-                    ctrl.navElementsVisibilityStatus[NAV_ELEMENTS_ORDER[i]] =
-                      true;
+            ctrl.resizeSubscription = WindowDimensionsService.getResizeEvent().
+              subscribe(evt => {
+                ctrl.windowIsNarrow = WindowDimensionsService.isWindowNarrow();
+                // If window is resized larger, try displaying the hidden
+                // elements.
+                if (
+                  currentWindowWidth < WindowDimensionsService.getWidth()) {
+                  for (var i = 0; i < NAV_ELEMENTS_ORDER.length; i++) {
+                    if (
+                      !ctrl.navElementsVisibilityStatus[
+                        NAV_ELEMENTS_ORDER[i]]) {
+                      ctrl.navElementsVisibilityStatus[NAV_ELEMENTS_ORDER[i]] =
+                        true;
+                    }
                   }
                 }
-              }
 
-              // Close the sidebar, if necessary.
-              SidebarStatusService.closeSidebar();
-              ctrl.sidebarIsShown = SidebarStatusService.isSidebarShown();
-              currentWindowWidth = WindowDimensionsService.getWidth();
-              truncateNavbarDebounced();
-            });
+                // Close the sidebar, if necessary.
+                SidebarStatusService.closeSidebar();
+                ctrl.sidebarIsShown = SidebarStatusService.isSidebarShown();
+                currentWindowWidth = WindowDimensionsService.getWidth();
+                DebouncerService.debounce(truncateNavbar, 500);
+
+                // TODO(#8521): Remove the use of $rootScope.$apply()
+                // once the directive is migrated to angular
+                $scope.$apply();
+              });
             // The function needs to be run after i18n. A timeout of 0 appears
             // to run after i18n in Chrome, but not other browsers. The function
             // will check if i18n is complete and set a new timeout if it is
             // not. Since a timeout of 0 works for at least one browser,
             // it is used here.
             $timeout(truncateNavbar, 0);
+          };
+
+          ctrl.$onDestroy = function() {
+            if (ctrl.resizeSubscription) {
+              ctrl.resizeSubscription.unsubscribe();
+            }
           };
         }
       ]

@@ -45,7 +45,9 @@ angular.module('oppia').directive('topicInfoTab', ['UrlInterpolationService',
         '/pages/topic-viewer-page/info-tab/topic-info-tab.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        'WindowDimensionsService', function(WindowDimensionsService) {
+        '$rootScope', 'WindowDimensionsService',
+        function(
+            $rootScope, WindowDimensionsService) {
           var ctrl = this;
 
           ctrl.checkSmallScreenWidth = function() {
@@ -57,6 +59,20 @@ angular.module('oppia').directive('topicInfoTab', ['UrlInterpolationService',
 
           ctrl.$onInit = function() {
             ctrl.screenHasSmallWidth = ctrl.checkSmallScreenWidth();
+            ctrl.resizeSubscription = WindowDimensionsService.getResizeEvent().
+              subscribe(evt => {
+                ctrl.screenHasSmallWidth = ctrl.checkSmallScreenWidth();
+
+                // TODO(#8521): Remove the use of $rootScope.$apply()
+                // once the directive is migrated to angular
+                $rootScope.$apply();
+              });
+          };
+
+          ctrl.$onDestroy = function() {
+            if (ctrl.resizeSubscription) {
+              ctrl.resizeSubscription.unsubscribe();
+            }
           };
         }
       ]

@@ -29,6 +29,7 @@ require('domain/skill/SkillObjectFactory.ts');
 require('domain/topic/editable-topic-backend-api.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 
+require('services/contextual/window-dimensions.service.ts');
 require('services/image-local-storage.service.ts');
 
 require(
@@ -46,7 +47,8 @@ angular.module('oppia').directive('topicsAndSkillsDashboardNavbar', [
         '$scope', '$rootScope', '$uibModal', 'ContextService',
         'ImageLocalStorageService', 'EditableTopicBackendApiService',
         'RubricObjectFactory', 'SkillCreationService', 'SkillObjectFactory',
-        'TopicCreationService', 'EVENT_TYPE_SKILL_CREATION_ENABLED',
+        'TopicCreationService', 'WindowDimensionsService',
+        'EVENT_TYPE_SKILL_CREATION_ENABLED',
         'EVENT_TYPE_TOPIC_CREATION_ENABLED',
         'EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED',
         'MAX_CHARS_IN_SKILL_DESCRIPTION', 'SKILL_DIFFICULTIES',
@@ -55,7 +57,8 @@ angular.module('oppia').directive('topicsAndSkillsDashboardNavbar', [
             $scope, $rootScope, $uibModal, ContextService,
             ImageLocalStorageService, EditableTopicBackendApiService,
             RubricObjectFactory, SkillCreationService, SkillObjectFactory,
-            TopicCreationService, EVENT_TYPE_SKILL_CREATION_ENABLED,
+            TopicCreationService, WindowDimensionsService,
+            EVENT_TYPE_SKILL_CREATION_ENABLED,
             EVENT_TYPE_TOPIC_CREATION_ENABLED,
             EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED,
             MAX_CHARS_IN_SKILL_DESCRIPTION, SKILL_DIFFICULTIES,
@@ -89,6 +92,16 @@ angular.module('oppia').directive('topicsAndSkillsDashboardNavbar', [
             });
           };
           ctrl.$onInit = function() {
+            $scope.showButtons = (WindowDimensionsService.getWidth() >= 1200);
+            ctrl.resizeSubscription = WindowDimensionsService.getResizeEvent().
+              subscribe(evt => {
+                $scope.showButtons = (
+                  WindowDimensionsService.getWidth() >= 1200);
+
+                // TODO(#8521): Remove the use of $rootScope.$apply()
+                // once the directive is migrated to angular
+                $scope.$apply();
+              });
             $rootScope.$on(
               EVENT_TYPE_TOPIC_CREATION_ENABLED, function(evt, canCreateTopic) {
                 $scope.userCanCreateTopic = canCreateTopic;
@@ -99,6 +112,12 @@ angular.module('oppia').directive('topicsAndSkillsDashboardNavbar', [
                 $scope.userCanCreateSkill = canCreateSkill;
               }
             );
+          };
+
+          ctrl.$onDestroy = function() {
+            if (ctrl.resizeSubscription) {
+              ctrl.resizeSubscription.unsubscribe();
+            }
           };
         }
       ]

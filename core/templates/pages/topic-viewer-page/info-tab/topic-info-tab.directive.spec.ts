@@ -19,6 +19,7 @@
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
+import { of } from 'rxjs';
 // ^^^ This block is to be removed.
 
 require('App.ts');
@@ -44,6 +45,9 @@ describe('Topic info tab controller', function() {
       var mockWindowDimensionsService = {
         getWidth: function() {
           return windowWidth;
+        },
+        getResizeEvent: function() {
+          return of(new Event('resize'));
         }
       };
       angular.mock.module(function($provide) {
@@ -62,6 +66,10 @@ describe('Topic info tab controller', function() {
       ctrlScope = compiledElem[0].getLocalControllerScope();
     }));
 
+    afterEach(function() {
+      ctrlScope.$onDestroy();
+    });
+
     it('should correctly get wide screen width', function() {
       windowWidth = 1920;
       expect(ctrlScope.checkSmallScreenWidth()).toEqual(false);
@@ -70,6 +78,16 @@ describe('Topic info tab controller', function() {
     it('should correctly get narrow screen width', function() {
       windowWidth = 1000;
       expect(ctrlScope.checkSmallScreenWidth()).toEqual(true);
+    });
+
+    it('should set screen width correctly on resize event', function() {
+      windowWidth = 1000;
+
+      // The resize event is mocked in beforeEach where the mock
+      // WindowDimensionsService is declared.
+      ctrlScope.$onInit();
+      expect(ctrlScope.screenHasSmallWidth).toBe(true);
+      outerScope.$apply();
     });
   });
 });

@@ -52,10 +52,14 @@ angular.module('oppia').directive('subtopicSummaryTile', [
           };
 
           ctrl.$onInit = function() {
-            ctrl.thumbnailUrl = (
-              AssetsBackendApiService.getThumbnailUrlForPreview(
-                ENTITY_TYPE.TOPIC, ctrl.getTopicId(),
-                ctrl.getSubtopic().getThumbnailFilename()));
+            if (ctrl.getSubtopic().getThumbnailFilename()) {
+              ctrl.thumbnailUrl = (
+                AssetsBackendApiService.getThumbnailUrlForPreview(
+                  ENTITY_TYPE.TOPIC, ctrl.getTopicId(),
+                  ctrl.getSubtopic().getThumbnailFilename()));
+            } else {
+              ctrl.thumbnailUrl = null;
+            }
           };
         }
       ]
