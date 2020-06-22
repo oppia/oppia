@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Domain object for a high bounce-rate improvements task.
+ * @fileoverview Domain object for exploration improvement tasks.
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';

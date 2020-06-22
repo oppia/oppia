@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the IneffectiveFeedbackLoopTask domain object.
+ * @fileoverview Unit tests for the ExplorationTaskObjectFactory.
  */
 
 import { TestBed } from '@angular/core/testing';
