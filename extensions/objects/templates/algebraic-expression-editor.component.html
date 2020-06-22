@@ -5,3 +5,14 @@
 <div ng-show="!$ctrl.isCurrentAnswerValid()" class="oppia-algebraic-warning alert alert-danger mt-2 mb-4">
   <[$ctrl.warningText]>
 </div>
+
+<style>
+  .guppy-div-creator.guppy_active, .guppy-div-creator.guppy_inactive {
+    width: 550px;
+  }
+  @media only screen and (max-width: 767px) {
+    .guppy-div-creator.guppy_active, .guppy-div-creator.guppy_inactive {
+      width: 460px;
+    }
+  }
+</style>
