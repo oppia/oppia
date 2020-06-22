@@ -341,7 +341,7 @@ class ExplorationMathTagValidationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 class ExplorationMockMathMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """Job that migrates all the math tags in the exploration to the new schema
     but does not save the migrated exploration. The new schema has the attribute
-    math-content-with-value which includes a field for storing reference to 
+    math-content-with-value which includes a field for storing reference to
     SVGs.This job is used to verify that the actual migration will be possible
     for all the explorations.
     """
