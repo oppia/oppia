@@ -916,7 +916,7 @@ def validate_math_tags_in_html(html_string):
         html_string: str. The HTML string.
 
     Returns:
-        list. A list of invalid math tags in the HTML string.
+        list(str). A list of invalid math tags in the HTML string.
     """
 
     soup = bs4.BeautifulSoup(
@@ -948,7 +948,7 @@ def validate_math_tags_in_html_with_attribute_math_content(html_string):
         html_string: str. The HTML string.
 
     Returns:
-        list. A list of invalid math tags in the HTML string.
+        list(str). A list of invalid math tags in the HTML string.
     """
 
     soup = bs4.BeautifulSoup(
