@@ -106,8 +106,8 @@ def get_exploration_components_from_dir(dir_path):
         The filepath does not include the assets/ prefix.
 
     Raises:
-        Exception: if the following condition doesn't hold: "There is exactly one
-            file not in assets/, and this file has a .yaml suffix".
+        Exception: if the following condition doesn't hold: "There 
+            is exactly one file not in assets/, and this file has a .yaml suffix".
     """
     yaml_content = None
     assets_list = []
