@@ -181,14 +181,14 @@ describe('Translation language selector', () => {
     fixture.whenStable().then(() => {
       fixture.detectChanges();
 
-      component.showexplanationPopup(0);
+      component.showExplanationPopup(0);
       fixture.detectChanges();
 
       expect(component.explanationPopupContent)
         .toEqual('Partnership with ABC');
       expect(component.explanationPopupShown).toEqual(true);
 
-      component.hideexplanationPopup();
+      component.hideExplanationPopup();
       fixture.detectChanges();
       expect(component.explanationPopupShown).toEqual(false);
     });
