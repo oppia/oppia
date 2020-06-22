@@ -156,10 +156,20 @@ angular.module('oppia').directive('editorNavigation', [
               $scope.userIsLoggedIn = userInfo.isLoggedIn();
             });
             $scope.ExplorationRightsService = ExplorationRightsService;
-            WindowDimensionsService.registerOnResizeHook(function() {
-              $scope.isLargeScreen = (
-                WindowDimensionsService.getWidth() >= 1024);
-            });
+
+            ctrl.resizeSubscription = WindowDimensionsService.getResizeEvent().
+              subscribe(evt => {
+                $scope.isLargeScreen = (
+                  WindowDimensionsService.getWidth() >= 1024);
+
+                $scope.$apply();
+              });
+          };
+
+          ctrl.$onDestroy = function() {
+            if (ctrl.resizeSubscription) {
+              ctrl.resizeSubscription.unsubscribe();
+            }
           };
         }
       ]
