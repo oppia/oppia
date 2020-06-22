@@ -71,15 +71,7 @@ describe('State Stats Modal Controller', function() {
     expect($scope.stateName).toBe(stateName);
     expect($scope.stateStats).toEqual(stateStats);
     expect($scope.improvementType).toBe(improvementType);
-    expect($scope.visualizationsHtml).toBe(
-      '<oppia-visualization-' + visualizationsInfo[0].id +
-      ' escaped-data="&amp;quot;' + visualizationsInfo[0].data +
-      '&amp;quot;"' +
-      ' escaped-options="&amp;quot;' + visualizationsInfo[0].options +
-      '&amp;quot;"' +
-      ' addressed-info-is-supported="' +
-      visualizationsInfo[0].addressed_info_is_supported + '">' +
-      '</oppia-visualization-' + visualizationsInfo[0].id + '>');
+    expect($scope.visualizationsInfo).toEqual(visualizationsInfo);
   });
 
   it('should successfully navigate to state editor', function() {
