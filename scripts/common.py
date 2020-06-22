@@ -476,7 +476,7 @@ def check_prs_for_current_release_are_released(repo):
 
     Raises:
         Exception: Some pull requests for current release do not have a
-            PR: released label.
+        PR: released label.
     """
     current_release_label = repo.get_label(
         release_constants.LABEL_FOR_CURRENT_RELEASE_PRS)

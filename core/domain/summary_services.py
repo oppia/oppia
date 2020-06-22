@@ -220,9 +220,10 @@ def get_exp_metadata_dicts_matching_query(query_string, search_cursor, user):
             given user.
 
     Returns:
-        exploration_list: list(dict). A list of metadata dicts for explorations
-            matching the query.
-        new_search_cursor: str. New search cursor location.
+        (tuple). containing:
+            exploration_list list(dict). A list of metadata dicts for
+                explorations matching the query.
+            new_search_cursor (str). New search cursor location.
     """
     exp_ids, new_search_cursor = (
         exp_services.get_exploration_ids_matching_query(
@@ -349,7 +350,7 @@ def get_displayable_exp_summary_dicts(exploration_summaries):
 
     Args:
         exploration_summaries: list(ExplorationSummary). List of exploration
-        summary objects.
+            summary objects.
 
     Returns:
         list(dict). A list of exploration summary dicts in human readable form.
@@ -418,7 +419,7 @@ def _get_displayable_collection_summary_dicts(collection_summaries):
 
     Args:
         collection_summaries: list(CollectionSummary). List of collection
-        summary domain object.
+            summary domain object.
 
     Returns:
         list(dict). A list of exploration summary dicts in human readable form.

@@ -292,7 +292,7 @@ def _generate_copy_tasks_for_fonts(source_paths, target_path):
 
     Returns:
         deque(Thread). A deque that contains all copy tasks queued
-            to be processed.
+        to be processed.
     """
     copy_tasks = collections.deque()
     for font_path in source_paths:
@@ -405,8 +405,8 @@ def _compare_file_count(
     list matches the count of files in all the directories in the second list.
 
     Args:
-       first_dir_list: list(str). List of directories to compare.
-       second_dir_list: list(str). List of directories to compare.
+        first_dir_list: list(str). List of directories to compare.
+        second_dir_list: list(str). List of directories to compare.
 
     Raises:
         ValueError: The source directory list does not have the same file
@@ -462,9 +462,9 @@ def get_css_filepaths(dependency_bundle, dependency_dir):
 
     Args:
         dependency_bundle: dict(str, list(str) | str). The dict has three keys:
-            - 'js': List of paths to js files that need to be copied.
-            - 'css': List of paths to css files that need to be copied.
-            - 'fontsPath': Path to folder containing fonts that need to be
+            - 'js'. List of paths to js files that need to be copied.
+            - 'css'. List of paths to css files that need to be copied.
+            - 'fontsPath'. Path to folder containing fonts that need to be
                 copied.
         dependency_dir: str. Path to directory where the files that need to
             be copied are located.
@@ -481,9 +481,9 @@ def get_js_filepaths(dependency_bundle, dependency_dir):
 
     Args:
         dependency_bundle: dict(str, list(str) | str). The dict has three keys:
-            - 'js': List of paths to js files that need to be copied.
-            - 'css': List of paths to css files that need to be copied.
-            - 'fontsPath': Path to folder containing fonts that need to be
+            - 'js'. List of paths to js files that need to be copied.
+            - 'css'. List of paths to css files that need to be copied.
+            - 'fontsPath'. Path to folder containing fonts that need to be
                 copied.
         dependency_dir: str. Path to directory where the files that need to
             be copied are located.
@@ -500,9 +500,9 @@ def get_font_filepaths(dependency_bundle, dependency_dir):
 
     Args:
         dependency_bundle: dict(str, list(str) | str). The dict has three keys:
-            - 'js': List of paths to js files that need to be copied.
-            - 'css': List of paths to css files that need to be copied.
-            - 'fontsPath': Path to folder containing fonts that need to be
+            - 'js'. List of paths to js files that need to be copied.
+            - 'css'. List of paths to css files that need to be copied.
+            - 'fontsPath'. Path to folder containing fonts that need to be
                 copied.
         dependency_dir: str. Path to directory where the files that need to
             be copied are located.
@@ -532,9 +532,9 @@ def get_dependencies_filepaths():
 
     Returns:
         dict(str, list(str)). A dict mapping file types to lists of filepaths.
-            The dict has three keys: 'js', 'css' and 'fonts'. Each of the
-            corresponding values is a full list of dependency file paths of the
-            given type.
+        The dict has three keys: 'js', 'css' and 'fonts'. Each of the
+        corresponding values is a full list of dependency file paths of the
+        given type.
     """
     filepaths = {
         'js': [],
@@ -691,7 +691,7 @@ def generate_copy_tasks_to_copy_from_source_to_target(
 
     Returns:
         deque(Thread). A deque that contains all copy tasks queued
-            to be processed.
+        to be processed.
     """
     python_utils.PRINT('Processing %s' % os.path.join(os.getcwd(), source))
     python_utils.PRINT('Copying into %s' % os.path.join(os.getcwd(), target))
@@ -786,7 +786,7 @@ def get_file_hashes(directory_path):
 
     Returns:
         dict(str, str). Dictionary with keys specifying file paths and values
-            specifying file hashes.
+        specifying file hashes.
     """
     file_hashes = dict()
 
@@ -822,7 +822,7 @@ def filter_hashes(file_hashes):
 
     Returns:
         dict(str, str). Filtered dictionary of only filepaths that should be
-            provided to the frontend.
+        provided to the frontend.
     """
     filtered_hashes = dict()
     for filepath, file_hash in file_hashes.items():
@@ -911,7 +911,7 @@ def generate_build_tasks_to_build_all_files_in_directory(source, target):
 
     Returns:
         deque(Thread). A deque that contains all build tasks queued
-            to be processed.
+        to be processed.
     """
     python_utils.PRINT('Processing %s' % os.path.join(os.getcwd(), source))
     python_utils.PRINT('Generating into %s' % os.path.join(os.getcwd(), target))
@@ -947,7 +947,7 @@ def generate_build_tasks_to_build_files_from_filepaths(
 
     Returns:
         deque(Thread). A deque that contains all build tasks queued
-            to be processed.
+        to be processed.
     """
     build_tasks = collections.deque()
     for filepath in filepaths:
@@ -978,7 +978,7 @@ def generate_delete_tasks_to_remove_deleted_files(
 
     Returns:
         deque(Thread). A deque that contains all delete tasks
-            queued to be processed.
+        queued to be processed.
     """
     python_utils.PRINT(
         'Scanning directory %s to remove deleted file' % staging_directory)
@@ -1052,15 +1052,15 @@ def generate_build_tasks_to_build_directory(dirnames_dict):
     Args:
         dirnames_dict: dict(str, str). This dict should contain three keys,
             with corresponding values as follows:
-            - 'dev_dir': the directory that contains source files to be built.
-            - 'staging_dir': the directory that contains minified files waiting
+            - 'dev_dir'. the directory that contains source files to be built.
+            - 'staging_dir'. the directory that contains minified files waiting
                 for final copy process.
-            - 'out_dir': the final directory that contains built files with hash
+            - 'out_dir'. the final directory that contains built files with hash
                 inserted into filenames.
 
     Returns:
         deque(Thread). A deque that contains all build tasks queued
-            to be processed.
+        to be processed.
     """
     source_dir = dirnames_dict['dev_dir']
     staging_dir = dirnames_dict['staging_dir']
