@@ -89,19 +89,20 @@ def get_args_of_function(function_node, args_to_ignore):
             a.id for a in function_node.args.args if a.id not in args_to_ignore]
 
 
-def open_file(filename, mode, encoding='utf-8'):
+def open_file(filename, mode, encoding='utf-8', newline=None):
     """Open file and return a corresponding file object.
 
     Args:
         filename: str. The file to be opened.
         mode: str. Mode in which the file is opened.
         encoding: str. Encoding in which the file is opened.
+        newline: None|str. Controls how universal newlines work.
 
     Returns:
         _io.TextIOWrapper. The file object.
     """
     try:
-        return io.open(filename, mode, encoding=encoding)
+        return io.open(filename, mode, encoding=encoding, newline=newline)
     except:
         raise IOError('Unable to open file: %s' % filename)
 

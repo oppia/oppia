@@ -34,7 +34,7 @@ describe('Create new topic modal', function() {
   var $scope = null;
   var $uibModalInstance = null;
   var NewlyCreatedTopicObjectFactory = null;
-
+  var ImageLocalStorageService = null;
   beforeEach(angular.mock.inject(function($injector, $controller) {
     var $rootScope = $injector.get('$rootScope');
 
@@ -43,9 +43,15 @@ describe('Create new topic modal', function() {
     NewlyCreatedTopicObjectFactory =
         $injector.get('NewlyCreatedTopicObjectFactory');
     $scope = $rootScope.$new();
+    ImageLocalStorageService = $injector.get('ImageLocalStorageService');
+
+    spyOn(ImageLocalStorageService, 'getStoredImagesData').and.returnValue(
+      [{filename: 'a', image: 'faf'}]);
+
     $controller('CreateNewTopicModalController', {
       $scope: $scope,
       $uibModalInstance: $uibModalInstance,
+      ImageLocalStorageService: ImageLocalStorageService
     });
   }));
 
@@ -55,12 +61,22 @@ describe('Create new topic modal', function() {
     expect($scope.newlyCreatedTopic).toEqual(newlyCreatedTopic);
     expect($scope.MAX_CHARS_IN_TOPIC_NAME).toEqual(39);
     expect($scope.MAX_CHARS_IN_TOPIC_DESCRIPTION).toEqual(240);
+    expect($scope.allowedBgColors).toEqual(['#C6DCDA']);
   });
 
   it('should close modal with newlyCreatedTopic', function() {
     var newlyCreatedTopic = NewlyCreatedTopicObjectFactory.createDefault();
     $scope.save();
     expect($uibModalInstance.close).toHaveBeenCalledWith(newlyCreatedTopic);
+  });
+
+  it('should return whether the topic is valid', function() {
+    var newlyCreatedTopic = NewlyCreatedTopicObjectFactory.createDefault();
+    expect($scope.isValid()).toEqual(false);
+    newlyCreatedTopic.name = 'name';
+    newlyCreatedTopic.description = 'description';
+    $scope.newlyCreatedTopic = newlyCreatedTopic;
+    expect($scope.isValid()).toEqual(true);
   });
 
   it('should cancel the modal on dismiss', function() {

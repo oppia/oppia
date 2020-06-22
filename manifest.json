@@ -343,11 +343,11 @@
         "files": ["angular-simple-logger.min.js"]
       },
       "guppy": {
-        "version": "b5055b963fdbea5c6c1e92dbf58fdaf3ea0cd8ba",
+        "version": "1759992a3885cb99d3ead04241f318a074c9f963",
         "downloadFormat": "zip",
-        "url": "https://github.com/daniel3735928559/guppy/archive/b5055b963fdbea5c6c1e92dbf58fdaf3ea0cd8ba.zip",
+        "url": "https://github.com/daniel3735928559/guppy/archive/1759992a3885cb99d3ead04241f318a074c9f963.zip",
         "rootDirPrefix": "guppy-",
-        "targetDir": "guppy-b5055b"
+        "targetDir": "guppy-175999"
       },
       "headroomJs": {
         "version": "0.9.4",
