@@ -103,6 +103,8 @@ import { CollectionRightsObjectFactory } from
 import { CollectionValidationService } from
   'domain/collection/collection-validation.service';
 import { ComputeGraphService } from 'services/compute-graph.service';
+import { ConceptCardBackendApiService } from
+  'domain/skill/concept-card-backend-api.service';
 import { ConceptCardObjectFactory } from
   'domain/skill/ConceptCardObjectFactory';
 import { ContextService } from 'services/context.service';
@@ -339,6 +341,8 @@ import { PredictionResultObjectFactory } from
   'domain/classifier/PredictionResultObjectFactory';
 import { PretestQuestionBackendApiService } from
   'domain/question/pretest-question-backend-api.service';
+import { ProfilePageBackendApiService } from
+  'pages/profile-page/profile-page-backend-api.service';
 import { PythonProgramTokenizer } from 'classifiers/python-program.tokenizer';
 import { QuestionBackendApiService } from
   'domain/question/question-backend-api.service.ts';
@@ -1077,6 +1081,11 @@ export class UpgradedServices {
       new AudioTranslationLanguageService(
         upgradedServices['BrowserCheckerService'],
         upgradedServices['LanguageUtilService']);
+    upgradedServices['ConceptCardBackendApiService'] =
+      new ConceptCardBackendApiService(
+        upgradedServices['ConceptCardObjectFactory'],
+        upgradedServices['HttpClient'],
+        upgradedServices['UrlInterpolationService']);
     upgradedServices['ClassroomBackendApiService'] =
       new ClassroomBackendApiService(
         upgradedServices['UrlInterpolationService'],
@@ -1141,6 +1150,12 @@ export class UpgradedServices {
       new PretestQuestionBackendApiService(
         upgradedServices['UrlInterpolationService'],
         upgradedServices['HttpClient']);
+    upgradedServices['ProfilePageBackendApiService'] =
+      new ProfilePageBackendApiService(
+        upgradedServices['UrlInterpolationService'],
+        upgradedServices['HttpClient'],
+        upgradedServices['UrlService']
+      );
     upgradedServices['QuestionBackendApiService'] =
       new QuestionBackendApiService(
         upgradedServices['HttpClient'],
