@@ -22,9 +22,8 @@
     <div class="conversation-skin-cards-container conversation-skin-animate-cards"
          ng-class="{'animate-to-two-cards': isAnimatingToTwoCards, 'animate-to-one-card': isAnimatingToOneCard, 'with-supplementary-card': isCurrentSupplementalCardNonempty()}">
 
-      <div class="conversation-skin-main-tutor-card-embed"
-           ng-class="{ 'conversation-skin-animate-tutor-card-on-narrow': !canWindowShowTwoCards() && isCurrentSupplementalCardNonempty()}"
-           style="margin-bottom: 100px">
+      <div class="conversation-skin-main-tutor-card-embed oppia-conversation-skin-main-tutor-card-embed"
+           ng-class="{ 'conversation-skin-animate-tutor-card-on-narrow': !canWindowShowTwoCards() && isCurrentSupplementalCardNonempty()}">
         <tutor-card displayed-card="displayedCard"
                     start-card-change-animation="startCardChangeAnimation">
         </tutor-card>
@@ -541,6 +540,10 @@ directive. -->
   .conversation-skin-main-tutor-card .instructions-button {
     background: inherit;
     border: none;
+  }
+
+  .oppia-conversation-skin-main-tutor-card-embed {
+    margin-bottom: 100px;
   }
 
   @media screen and (max-width: 959px) {

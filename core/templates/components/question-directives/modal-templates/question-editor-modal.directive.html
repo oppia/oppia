@@ -3,7 +3,7 @@
     Question <span ng-if="!newQuestionIsBeingCreated"> and Linked Skills </span> Editor
   </h3>
 </div>
-<div class="modal-body" style="width: 96%; margin-left: 2%;">
+<div class="modal-body oppia-modal-body">
   <div class="rubric-details" ng-repeat="skillName in skillNames track by $index">
     <h4 ng-if="skillName"><strong>Skill: <[skillName]></strong></h4>
     <h4><strong>Difficulty: <[rubrics[$index].getDifficulty()]></strong></h4>
@@ -18,8 +18,8 @@
     <h4> <strong> Linked Skills </strong> </h4>
     <md-card class="question-skill-id" ng-repeat="skill in associatedSkillSummaries">
       <div class="skill-description-card">
-        <span style="float: right;" ng-click="removeSkill(skill.getId())" aria-hidden="true">
-          <i class="material-icons md-18" style="color: red;">&#xE14C;</i>
+        <span class="oppia-remove-skill" ng-click="removeSkill(skill.getId())" aria-hidden="true">
+          <i class="material-icons md-18 oppia-material-icons">&#xE14C;</i>
         </span>
         <a ng-href="<[getSkillEditorUrl(skill.getId())]>" target="_blank" rel="noopener">
           <[skill.getDescription()]>
@@ -30,7 +30,7 @@
     <button class="btn btn-primary btn-sm" ng-click="undo()" ng-if="getSkillLinkageModificationsArray().length > 0">Undo Skill Changes</button>
   </div>
 
-  <h4 ng-if="!newQuestionIsBeingCreated" style="margin-top: 4vh;"> <strong> Question Editor </strong> </h4>
+  <h4 ng-if="!newQuestionIsBeingCreated" class="oppia-question-editor"> <strong> Question Editor </strong> </h4>
   <question-editor question-id="questionId"
                    misconceptions-by-skill="misconceptionsBySkill"
                    question-state-data="questionStateData"
@@ -81,5 +81,18 @@
     height: 2.5em;
     padding-left: 10px;
     padding-top: 10px;
+  }
+  .oppia-modal-body {
+    margin-left: 2%;
+    width: 96%;
+  }
+  .oppia-remove-skill {
+    float: right;
+  }
+  .oppia-material-icons {
+    color: red;
+  }
+  .oppia-question-editor {
+    margin-top: 4vh;
   }
 </style>

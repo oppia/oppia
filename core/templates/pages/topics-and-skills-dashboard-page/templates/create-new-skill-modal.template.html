@@ -4,7 +4,7 @@
 
 <form ng-submit="createNewSkill()">
   <div class="modal-body">
-    <div class="oppia-rule-details-header" style="margin-bottom: 0.5em; margin-top: 1em;">
+    <div class="oppia-rule-details-header oppia-rule-details-header-extra">
       <strong>New Skill Description</strong>
     </div>
     <input type="text" class="form-control protractor-test-new-skill-description-field"
@@ -20,13 +20,13 @@
         <[errorMsg]>
       </i>
     </span>
-    <div class="oppia-rule-details-header" style="margin-bottom: 0.5em; margin-top: 1em;">
+    <div class="oppia-rule-details-header oppia-rule-details-header-extra">
       <strong>Review Material</strong>
     </div>
     <review-material-editor bindable-dict="bindableDict"
                             on-save-explanation="onSaveExplanation">
     </review-material-editor>
-    <div class="oppia-rule-details-header" style="margin-bottom: 0.5em; margin-top: 1em;">
+    <div class="oppia-rule-details-header oppia-rule-details-header-extra">
       <strong>Add Skill Rubrics</strong>
     </div>
     <rubrics-editor rubrics="rubrics"
@@ -49,5 +49,9 @@
     color: red;
     display: block;
     font-size: 0.8em;
+  }
+  .oppia-rule-details-header-extra {
+    margin-bottom: 0.5em;
+    margin-top: 1em;
   }
 </style>

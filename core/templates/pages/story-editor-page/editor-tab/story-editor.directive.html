@@ -34,7 +34,7 @@
                 ng-blur="updateStoryDescription(editableDescription)"
                 placeholder="Enter the description of the story">
       </textarea>
-      <span ng-if="editableDescriptionIsEmpty && storyDescriptionChanged" class="form-text" style="font-size: smaller">
+      <span ng-if="editableDescriptionIsEmpty && storyDescriptionChanged" class="form-text oppia-form-text">
         What does this story contain?
       </span>
     </div>
@@ -42,7 +42,7 @@
     <div class="story-notes">
       <div class="oppia-editor-card-body">
         <label class="form-heading">Notes</label>
-        <div ng-if="!notesEditorIsShown" style="padding-top: 0.5em; padding-bottom: 1em;">
+        <div ng-if="!notesEditorIsShown" class="oppia-notes-editor">
           <div ng-class="oppia-editable-section" ng-click="openNotesEditor()" class="protractor-test-open-story-notes-editor-button">
             <i class="material-icons oppia-editor-edit-icon float-right"
                title="Edit Story Notes">&#xE254;
@@ -73,7 +73,7 @@
               Save
             </button>
             <button type="button" class="btn btn-secondary float-right" ng-click="closeNotesEditor()">Cancel</button>
-            <div style="clear: both;"></div>
+            <div class="oppia-clear"></div>
           </div>
         </div>
       </div>
@@ -82,11 +82,10 @@
       <label for="storyNodes" class="form-heading">Chapters</label>
       <div ng-if="nodes.length > 0">
         Select Initial Chapter
-        <select class="form-control protractor-test-initial-chapter-select"
+        <select class="form-control oppia-initial-chapter-select protractor-test-initial-chapter-select"
                 ng-model="initialNodeId"
                 ng-if="nodes.length > 0"
                 ng-options="node.getId() as node.getTitle() for node in nodes"
-                style="width: 300px; margin-bottom: 10px;"
                 ng-click="markAsInitialNode(initialNodeId)">
         </select>
       </div>
@@ -107,7 +106,7 @@
             </span>
           </md-card>
           <div ng-if="$index < linearNodesList.length - 1">
-            <i style="font-size: 1.5em;" class="material-icons"> arrow_downward </i>
+            <i class="material-icons oppia-material-icons"> arrow_downward </i>
           </div>
         </div>
         <h3 class="protractor-test-disconnected-node-warning" ng-if="disconnectedNodes.length > 0">
@@ -116,7 +115,7 @@
         <em ng-if="disconnectedNodes.length > 0">
           (Please fix this before saving changes)
         </em>
-        <div ng-repeat="node in disconnectedNodes" style="padding-top: 2vh;">
+        <div ng-repeat="node in disconnectedNodes" class="oppia-node-div">
           <md-card class="story-editor-node"
                    ng-class="{'selected-node': (node.getId() === idOfNodeToEdit)}"
                    ng-click="setNodeToEdit(node.getId())">
@@ -148,12 +147,11 @@
         </div>
       </div>
     </div>
-    <div ng-if="linearNodesList.length === 0" style="text-align: center;">
-      <p class="no-chapters-message" style="padding-top: 6px;">
+    <div ng-if="linearNodesList.length === 0" class="oppia-node-list-div">
+      <p class="no-chapters-message oppia-no-chapters-message">
         This story has no chapters.
       </p>
-      <button class="btn oppia-dashboard-intro-button oppia-transition-200 protractor-test-create-chapter-button"
-              style="color: white; text-decoration: none;"
+      <button class="btn oppia-dashboard-intro-button oppia-dashboard-intro-button-extra oppia-transition-200 protractor-test-create-chapter-button"
               ng-click="createNode()">
         Create Chapter
       </button>
@@ -260,5 +258,44 @@
 
   story-editor .story-description textarea {
     height: 10vh;
+  }
+
+  story-editor .oppia-form-text {
+    font-size: smaller;
+  }
+
+  story-editor .oppia-notes-editor {
+    padding-bottom: 1em;
+    padding-top: 0.5em;
+  }
+
+  story-editor .oppia-clear {
+    clear: both;
+  }
+
+  story-editor .oppia-initial-chapter-select {
+    margin-bottom: 10px;
+    width: 300px;
+  }
+
+  story-editor .oppia-material-icons {
+    font-size: 1.5em;
+  }
+
+  story-editor .oppia-node-div {
+    padding-top: 2vh;
+  }
+
+  story-editor .oppia-node-list-div {
+    text-align: center;
+  }
+
+  story-editor .oppia-no-chapters-message {
+    padding-top: 6px;
+  }
+
+  story-editor .oppia-dashboard-intro-button-extra {
+    color: white;
+    text-decoration: none;
   }
 </style>

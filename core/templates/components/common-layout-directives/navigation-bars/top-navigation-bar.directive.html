@@ -160,7 +160,7 @@
             <img ng-src="<[$ctrl.profilePictureDataUrl]>" class="oppia-navbar-profile-picture rounded-circle" alt="User Avatar">
           </span>
           <span ng-if="!$ctrl.profilePictureDataUrl">
-            <i class="material-icons md-40" style="margin-top: -1px;">&#xE853;</i>
+            <i class="material-icons md-40 oppia-material-icons">&#xE853;</i>
             <span class="oppia-icon-accessibility-label">User Avatar</span>
           </span>
 
@@ -176,7 +176,7 @@
              from appearing off-center because 'A' is slightly thinner than 'M' in
              this font.
             -->
-            <span ng-if="$ctrl.isAdmin" class="oppia-navbar-role-text protractor-test-admin-text" style="right: 4px;">A</span>
+            <span ng-if="$ctrl.isAdmin" class="oppia-navbar-role-text oppia-navbar-role-text-extra protractor-test-admin-text">A</span>
             <span ng-if="$ctrl.isModerator && !$ctrl.isAdmin" class="oppia-navbar-role-text protract-test-moderator-text">M</span>
           </div>
         </div>
@@ -250,17 +250,15 @@
 
     <li uib-dropdown ng-if="!$ctrl.userIsLoggedIn && $ctrl.username !== ''" class="nav-item
      oppia-navbar-clickable-dropdown">
-      <div class="oppia-navbar-button-container" style="margin-right: 10px;">
+      <div class="oppia-navbar-button-container oppia-navbar-button-container-extra">
         <button class="btn dropdown-toggle oppia-navbar-button protractor-mobile-test-login"
                 ng-click="$ctrl.onLoginButtonClicked()">
           <span translate="I18N_TOPNAV_SIGN_IN"></span>
         </button>
       </div>
-      <ul uib-dropdown-menu class="uib-dropdown-menu oppia-navbar-dropdown" role="menu"
-          style="margin-right: 15px; padding: 0;">
+      <ul uib-dropdown-menu class="uib-dropdown-menu oppia-navbar-dropdown oppia-navbar-dropdown-extra" role="menu">
         <li class="nav-item">
-          <a href="" style="padding: 0; width: 190px;" ng-click="$ctrl.onLoginButtonClicked()"
-             class="nav-link">
+          <a href="" class="oppia-nav-link nav-link" ng-click="$ctrl.onLoginButtonClicked()">
             <div class="oppia-signin-google">
               <div class="oppia-signin-g-icon">
                 <img ng-src="<[$ctrl.googleSignInIconUrl]>">
@@ -273,7 +271,7 @@
     </li>
 
     <li uib-dropdown ng-if="$ctrl.username === ''" class="oppia-navbar-clickable-dropdown">
-      <div class="oppia-navbar-button-container" style="margin-right: 10px;">
+      <div class="oppia-navbar-button-container oppia-navbar-button-container">
       </div>
     </li>
   </ul>
@@ -382,5 +380,22 @@
   }
   .oppia-navbar-profile > li:hover {
     background-color: #fff;
+   }
+   .oppia-material-icons {
+     margin-top: -1px;
+   }
+   .oppia-navbar-role-text-extra {
+     right: 4px;
+   }
+   .oppia-navbar-button-container-extra {
+     margin-right: 10px;
+   }
+   .oppia-navbar-dropdown-extra {
+     margin-right: 15px;
+     padding: 0;
+   }
+   .oppia-nav-link {
+     padding: 0;
+     width: 190px;
    }
 </style>

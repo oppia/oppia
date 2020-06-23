@@ -1,4 +1,4 @@
-<ul class="nav ng-cloak navbar-nav oppia-navbar-nav float-right" style="margin-right: 0;">
+<ul class="nav ng-cloak navbar-nav oppia-navbar-nav oppia-navbar-nav-extra float-right">
   <li popover-placement="bottom" uib-popover-template="'<[$ctrl.getFeedbackPopoverUrl()]>'" popover-trigger="click" class="nav-item">
     <a href="" class="nav-link protractor-test-exploration-feedback-popup-link" uib-tooltip="<['I18N_PLAYER_FEEDBACK_TOOLTIP' | translate]>" tooltip-placement="bottom">
       <i class="material-icons">&#xE87F;</i>
@@ -24,3 +24,9 @@
     </a>
   </li>
 </ul>
+
+<style>
+  .oppia-navbar-nav-extra {
+    margin-right: 0;
+  }
+</style>

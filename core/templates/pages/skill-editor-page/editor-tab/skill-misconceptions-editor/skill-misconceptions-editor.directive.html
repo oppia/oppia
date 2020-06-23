@@ -1,22 +1,21 @@
 <md-card class="oppia-editor-card-with-avatar">
   <div class="oppia-editor-card-body">
     <div class="oppia-editor-card-section">
-      <strong style="font-size: 1.4em;">Misconceptions</strong>
-      <div style="padding-bottom: 12px; color: #595959;">
-        <span style="font-size:.79em;">
+      <strong class="oppia-misconceptions-text">Misconceptions</strong>
+      <div class="oppia-misconceptions-text-div">
+        <span class="oppia-misconceptions-text-span">
           <i>
             These misconceptions represent common mistakes that are made by students when trying to apply this skill.
           </i>
         </span>
       </div>
-      <div ng-if="misconceptions.length > 0" style="padding-bottom: 10px;">
+      <div ng-if="misconceptions.length > 0" class="oppia-option-list-div">
         <ul class="nav oppia-option-list nav-stacked nav-pills"
             role="tablist"
             ng-model="misconceptions">
           <li ng-repeat="misconception in misconceptions"
               ng-class="{'active': activeMisconceptionIndex === $index, 'last-element': $index === misconceptions.length - 1}"
-              class="oppia-rule-block oppia-prevent-selection protractor-test-misconception-list-item"
-              style="margin-top: 0;">
+              class="oppia-rule-block oppia-prevent-selection oppia-prevent-selection-extra protractor-test-misconception-list-item">
             <a ng-click="changeActiveMisconceptionIndex($index)"
                class="oppia-rule-tab protractor-test-misconception-<[$index]>"
                ng-class="{'oppia-rule-tab-active': activeMisconceptionIndex === $index}">
@@ -42,8 +41,7 @@
         </ul>
       </div>
       <button type="button"
-              class="btn protractor-test-add-misconception-modal-button"
-              style="background-color: rgba(5,140,166,0.9); color: white;"
+              class="btn protractor-test-add-misconception-modal-button oppia-add-misconception-modal-button"
               ng-click="openAddMisconceptionModal()">
         + Add Misconception
       </button>
@@ -53,5 +51,25 @@
 <style>
   skill-misconceptions-editor .last-element {
     border-bottom: 1px solid #ccc;
+  }
+  .oppia-misconceptions-text {
+    font-size: 1.4em;
+  }
+  .oppia-misconceptions-text-div {
+    color: #595959;
+    padding-bottom: 12px;
+  }
+  .oppia-misconceptions-text-span {
+    font-size: .79em;
+  }
+  .oppia-option-list-div {
+    padding-bottom: 10px;
+  }
+  .oppia-prevent-selection-extra {
+    margin-top: 0;
+  }
+  .oppia-add-misconception-modal-button {
+    background-color: rgba(5,140,166,0.9);
+    color: white;
   }
 </style>

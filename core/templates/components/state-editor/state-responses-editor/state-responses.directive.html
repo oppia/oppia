@@ -26,7 +26,7 @@
           ui-sortable documentation for more details. -->
           <!-- Note that adding "track by $index" here seems to mess up the final
           index in the stop() event handler. -->
-          <li ng-repeat="answerGroup in answerGroups" ng-class="{'active': activeAnswerGroupIndex === $index}" class="oppia-rule-block oppia-sortable-rule-block oppia-prevent-selection" style="margin-top: 0;">
+          <li ng-repeat="answerGroup in answerGroups" ng-class="{'active': activeAnswerGroupIndex === $index}" class="oppia-rule-block oppia-rule-block-extra oppia-sortable-rule-block oppia-prevent-selection">
             <span class="oppia-rule-sort-handle" ng-if="answerGroups.length > 1" ng-mousedown="changeActiveAnswerGroupIndex(-1)">
               <picture ng-if="EditabilityService.isEditable()">
                 <source type="image/webp" ng-srcset="<[getStaticImageUrl('/general/drag_dots.webp')]>">
@@ -122,7 +122,7 @@
     </div>
   </md-card>
 
-  <md-card style="margin: 0; padding: 0;">
+  <md-card class="oppia-md-card-style">
     <div ng-if="EditabilityService.isEditableOutsideTutorialMode() && !isCurrentInteractionLinear()">
       <button type="button" class="btn btn-secondary btn-lg oppia-add-response-button protractor-test-open-add-response-modal" ng-click="openAddAnswerGroupModal()">
         + Add New Oppia Response
@@ -130,3 +130,13 @@
     </div>
   </md-card>
 </div>
+
+<style>
+  .oppia-rule-block-extra {
+    margin-top: 0;
+  }
+  .oppia-md-card-style {
+    margin: 0;
+    padding: 0;
+  }
+</style>

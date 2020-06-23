@@ -1,6 +1,6 @@
 <div ng-if="!$ctrl.misconceptionEditorIsOpen && $ctrl.misconceptionName && !$ctrl.outcome.labelledAsCorrect"
      title="<[$ctrl.isEditable ? 'Edit Misconception' : '']>"
-     style="height: 100%; max-width: 95%;">
+     class="oppia-misconception-editor">
   <div class="oppia-readonly-rule-tile protractor-test-edit-misconception-button"
        ng-class="{'oppia-editable-section': $ctrl.isEditable}">
     <div class="oppia-transition-200">
@@ -28,8 +28,7 @@
 </div>
 <button type="button"
         ng-if="!$ctrl.misconceptionName && $ctrl.isEditable && $ctrl.rules && !$ctrl.outcome.labelledAsCorrect && $ctrl.containsMisconceptions()"
-        class="btn btn-primary btn-lg oppia-add-rule-button protractor-test-add-answer"
-        style="padding-top: 5px;"
+        class="btn btn-primary btn-lg oppia-add-rule-button oppia-add-rule-button-extra protractor-test-add-answer"
         ng-click="$ctrl.tagAnswerGroupWithMisconception()">
   Tag with misconception
 </button>
@@ -48,5 +47,12 @@
   }
   .oppia-tagged-misconception-title {
     margin-top: 10px;
+  }
+  .oppia-misconception-editor {
+    height: 100%;
+    max-width: 95%;
+  }
+  .oppia-add-rule-button-extra {
+    padding-top: 5px;
   }
 </style>

@@ -1,5 +1,5 @@
 <background-banner></background-banner>
-<div class="oppia-classroom-viewer-container" style="position: relative;">
+<div class="oppia-classroom-viewer-container oppia-classroom-viewer-container-extra">
   <div class="oppia-classroom-header">
     <div class="classroom-header" translate="I18N_CLASSROOM_PAGE_HEADING"></div>
     <div class="classroom-name"><[$ctrl.classroomDisplayName]></div>
@@ -15,8 +15,8 @@
   </div>
   <div class="oppia-classroom-search-section">
     <div class="classroom-page-help-text initial-help-text" translate="I18N_CLASSROOM_PAGE_SEARCH_BAR_HEADING"></div>
-    <div class="classroom-page-help-text" style="font-size: 1em;" translate="I18N_CLASSROOM_PAGE_SEARCH_BAR_SUBHEADING"></div>
-    <div style="margin-left: 15vw;">
+    <div class="classroom-page-help-text oppia-classroom-page-help-text-extra" translate="I18N_CLASSROOM_PAGE_SEARCH_BAR_SUBHEADING"></div>
+    <div class="oppia-search-bar-container">
       <search-bar enable-dropup="true"></search-bar>
     </div>
   </div>
@@ -85,6 +85,15 @@
     margin-left: 65vw;
     margin-top: -18vh;
     width: 25vw;
+  }
+  .oppia-classroom-viewer-container-extra {
+    position: relative;
+  }
+  .oppia-classroom-page-help-text-extra {
+    font-size: 1em;
+  }
+  .oppia-search-bar-container {
+    margin-left: 15vw;
   }
   @media (max-width: 750px) {
     .oppia-classroom-viewer-container .classroom-header {

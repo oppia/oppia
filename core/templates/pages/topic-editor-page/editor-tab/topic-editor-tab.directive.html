@@ -29,35 +29,33 @@
 
     <div class="topic-description" ng-class="{'has-error': editableDescriptionIsEmpty && topicDescriptionChanged}">
       <label for="topicDescription" class="form-heading protractor-test-topic-description-heading">Description</label>
-      <textarea type="text" class="form-control protractor-test-topic-description-field"
+      <textarea type="text" class="form-control oppia-topic-description-field protractor-test-topic-description-field"
                 ng-model="editableDescription" maxlength="<[MAX_CHARS_IN_TOPIC_DESCRIPTION]>"
                 ng-change="updateTopicDescriptionStatus(editableDescription)"
                 ng-blur="updateTopicDescription(editableDescription)"
-                placeholder="Enter the description of the topic"
-                style="height: 10vh;">
+                placeholder="Enter the description of the topic">
       </textarea>
       <span class="oppia-input-box-subtitle">
         <i>
           Topic description should be at most <[MAX_CHARS_IN_TOPIC_DESCRIPTION]> characters.
         </i>
       </span>
-      <span ng-if="editableDescriptionIsEmpty && topicDescriptionChanged" class="form-text" style="font-size: smaller">
+      <span ng-if="editableDescriptionIsEmpty && topicDescriptionChanged" class="form-text oppia-form-text">
         What does this topic contain?
       </span>
     </div>
 
     <div class="canonical-stories">
       <label class="form-heading"> Canonical Stories </label>
-      <button class="btn btn-secondary protractor-test-create-story-button"
-              ng-click="createCanonicalStory()"
-              style="float: right;">
+      <button class="btn btn-secondary oppia-create-story-button protractor-test-create-story-button"
+              ng-click="createCanonicalStory()">
         Create Story
       </button>
       <stories-list ng-if="topic.getCanonicalStoryIds().length > 0"
                     story-summaries="canonicalStorySummaries"
                     topic="topic">
       </stories-list>
-      <h4 ng-if="topic.getCanonicalStoryIds().length === 0" style="color: gray;">
+      <h4 ng-if="topic.getCanonicalStoryIds().length === 0" class="oppia-canonical-story">
         Click on Create Story to create a new canonical story for the topic
       </h4>
     </div>
@@ -92,5 +90,21 @@
 
   .topic-editor .topic-description textarea {
     height: 7vh;
+  }
+
+  .oppia-topic-description-field {
+    height: 10vh;
+  }
+
+  .oppia-form-text {
+    font-size: smaller;
+  }
+
+  .oppia-create-story-button {
+    float: right;
+  }
+
+  .oppia-canonical-story {
+    color: gray;
   }
 </style>

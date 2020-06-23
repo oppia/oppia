@@ -1,8 +1,7 @@
-
 <div class="subtopics-tab">
   <md-card class="subtopics">
     <h3> Subtopics </h3>
-    <h4 style="color: #6d6d6d">
+    <h4 class="oppia-assign-subtopics">
       (Drag and drop skills to assign them to subtopics)
     </h4>
     <div class="subtopics-container">
@@ -11,13 +10,13 @@
                dnd-list="subtopic.getSkillSummaries()"
                dnd-drop="endMoveSkill(subtopic.getId())">
         <div class="subtopic-header protractor-test-subtopic">
-          <strong class="protractor-test-subtopic-title" uib-tooltip="<[subtopic.getTitle()]>" tooltip-placement="bottom" ng-if="subtopic.getTitle().length < 17" style="padding-left: 1.5vw;"><[subtopic.getTitle()]></strong>
-          <strong class="protractor-test-subtopic-title" uib-tooltip="<[subtopic.getTitle()]>" tooltip-placement="bottom" ng-if="subtopic.getTitle().length >= 17" style="padding-left: 1.5vw;"><[subtopic.getTitle().substring(0,15)]>...</strong>
-          <div style="float: right;">
-            <span class="protractor-test-edit-subtopic-button" style="color: #1d7800;" ng-click="editSubtopic(subtopic)" aria-hidden="true">
+          <strong class="oppia-subtopic-title protractor-test-subtopic-title" uib-tooltip="<[subtopic.getTitle()]>" tooltip-placement="bottom" ng-if="subtopic.getTitle().length < 17"><[subtopic.getTitle()]></strong>
+          <strong class="oppia-subtopic-title protractor-test-subtopic-title" uib-tooltip="<[subtopic.getTitle()]>" tooltip-placement="bottom" ng-if="subtopic.getTitle().length >= 17"><[subtopic.getTitle().substring(0,15)]>...</strong>
+          <div class="oppia-edit-subtopic-container">
+            <span class="oppia-edit-subtopic-button protractor-test-edit-subtopic-button" ng-click="editSubtopic(subtopic)" aria-hidden="true">
               <i class="material-icons md-18">edit</i>
             </span>
-            <span class="protractor-test-delete-subtopic-button" style="color: #b50000;" ng-click="deleteSubtopic(subtopic)" aria-hidden="true">
+            <span class="oppia-delete-subtopic-button protractor-test-delete-subtopic-button" ng-click="deleteSubtopic(subtopic)" aria-hidden="true">
               <i class="material-icons md-18">&#xE14C;</i>
             </span>
           </div>
@@ -35,7 +34,7 @@
                  ng-href="<[getSkillEditorUrl(skillSummary.getId())]>" target="_blank" rel="noopener">
                 <[skillSummary.getDescription()]>
               </a>
-              <span ng-if="isSkillDeleted(skillSummary)" style="color: red;">
+              <span ng-if="isSkillDeleted(skillSummary)">
                 Skill Deleted
               </span>
             </div>
@@ -68,12 +67,12 @@
             <[skillSummary.getDescription()]>
           </a>
           <span class="fas fa-trash-alt delete-icon" ng-click="deleteUncategorizedSkillFromTopic(skillSummary)"></span>
-          <span ng-if="isSkillDeleted(skillSummary)" style="color: red;">
+          <span ng-if="isSkillDeleted(skillSummary)" class="opia-skill-deleted">
             Skill Deleted
           </span>
         </div>
       </md-card>
-      <p class="intro-card-message" ng-if="uncategorizedSkillSummaries.length === 0" style="padding-top: 6px;">
+      <p class="intro-card-message oppia-intro-card-message" ng-if="uncategorizedSkillSummaries.length === 0">
         There are no pending skills in the topic. To add skills to the topic, go to the skills list in the
         topics and skills dashboard and click 'Assign to Topic' for the required skill.
       </p>
@@ -195,6 +194,34 @@
   }
   subtopics-list-tab .skill-id:hover {
     background-color: #e0e0e0;
+  }
+
+  subtopics-list-tab .oppia-assign-subtopics {
+    color: #6d6d6d;
+  }
+
+  subtopics-list-tab .oppia-subtopic-title {
+    padding-left: 1.5vw;
+  }
+
+  subtopics-list-tab .oppia-edit-subtopic-container {
+    float: right;
+  }
+
+  subtopics-list-tab .oppia-edit-subtopic-button {
+    color: #1d7800;
+  }
+
+  subtopics-list-tab .oppia-delete-subtopic-button {
+    color: #b50000;
+  }
+
+  subtopics-list-tab .oppia-skill-deleted {
+    color: red;
+  }
+
+  subtopics-list-tab .oppia-intro-card-message {
+    padding-top: 6px;
   }
 
   @media (max-width: 830px) {

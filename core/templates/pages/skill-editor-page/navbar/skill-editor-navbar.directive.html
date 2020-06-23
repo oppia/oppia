@@ -1,10 +1,9 @@
 <ul class="nav navbar-nav oppia-navbar-nav float-right ng-cloak" ng-if="!isLoadingSkill()">
-  <li style="margin-right: 5px; margin-top: 8px;">
+  <li class="oppia-dropdown-list">
     <div uib-dropdown>
-      <button class="btn btn-light  oppia-save-changes-button oppia-save-publish-changes-button protractor-test-save-or-publish-skill"
+      <button class="btn btn-light oppia-save-changes-button oppia-save-changes-button-extra oppia-save-publish-changes-button protractor-test-save-or-publish-skill"
               ng-class="{'btn-success': isSkillSaveable()}"
               ng-click="saveChanges()"
-              style="float: left; width: 155px;"
               ng-disabled="!isSkillSaveable()">
         <span ng-if="!isSaveInProgress()">
           <span title="Publish Changes">
@@ -13,7 +12,7 @@
               &#xE161;
             </i>
             <span class="oppia-save-publish-button-label float-left">Publish Changes</span>
-            <span class="d-none d-md-block float-left" style="opacity:0.5;margin-left: 2px;"
+            <span class="d-none d-md-block float-left oppia-md-block"
                   ng-if="getChangeListCount() > 0">
               (<[getChangeListCount()]>)
             </span>
@@ -25,19 +24,19 @@
           <loading-dots></loading-dots>
         </span>
       </button>
-      <button type="button" style="height: 34px;" class="btn btn-light uib-dropdown-toggle dropdown-toggle"
+      <button type="button" class="btn btn-light uib-dropdown-toggle dropdown-toggle oppia-dropdown-toggle"
               ng-disabled="!getChangeListCount()" uib-dropdown-toggle>
       </button>
-      <ul uib-dropdown-menu role="menu" style="min-width: 125px; right: inherit;" ng-style="{ width: getChangeListCount() ? '150px' : '120px' }">
+      <ul uib-dropdown-menu role="menu" class="oppia-dropdown-menu" ng-style="{ width: getChangeListCount() ? '150px' : '120px' }">
         <li title="Discard all pending changes"><a ng-click="discardChanges()" ng-class="{'oppia-disabled-link': !getChangeListCount()}" class="dropdown-item">Discard Draft</a></li>
       </ul>
     </div>
   </li>
-  <li style="width: 40px;"
+  <li
       ng-class="{'uib-dropdown': getWarningsCount(), 'active': getActiveTabName() === 'main'}"
       ng-attr-uib-dropdown="<[getWarningsCount()]>"
       ng-click="selectMainTab()"
-      class="nav-item">
+      class="nav-item oppia-nav-item">
     <a uib-tooltip="Main Editor" tooltip-placement="bottom" class="nav-link protractor-test-main-tab">
       <i class="material-icons">&#xE254;</i>
     </a>
@@ -64,3 +63,28 @@
     </a>
   </li>
 </ul>
+
+<style>
+  .oppia-dropdown-list {
+    margin-right: 5px;
+    margin-top: 8px;
+  }
+  .oppia-save-changes-button-extra {
+    float: left;
+    width: 155px;
+  }
+  .oppia-md-block {
+    opacity: 0.5;
+    margin-left: 2px;
+  }
+  .oppia-dropdown-toggle {
+    height: 34px;
+  }
+  .oppia-dropdown-menu {
+    min-width: 125px;
+    right: inherit;
+  }
+  .oppia-nav-item {
+    width: 40px;
+  }
+</style>

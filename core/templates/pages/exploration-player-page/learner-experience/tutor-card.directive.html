@@ -83,17 +83,17 @@
     </div>
 
     <div ng-if="!isInteractionInline() && !conceptCardIsBeingShown"
-         class="conversation-skin-inline-interaction" style="opacity: 0.8;">
-      <div style="padding: 6px 12px;">
+         class="conversation-skin-inline-interaction oppia-conversation-skin-inline-interaction">
+      <div class="oppia-conversation-skin-instruction">
         <span ng-class="{'conversation-skin-instruction-disabled': !interactionIsActive}"> <[interactionInstructions]> </span>
-        <i ng-if="canWindowShowTwoCards()" ng-class="{'conversation-skin-instruction-disabled': !interactionIsActive}" class="material-icons md-18" style="position: relative;">&#xE5C8;</i>
-        <i ng-if="!canWindowShowTwoCards()" ng-class="{'conversation-skin-instruction-disabled': !interactionIsActive}" class="material-icons md-18" style="position: relative;">&#xE5DB;</i>
+        <i ng-if="canWindowShowTwoCards()" ng-class="{'conversation-skin-instruction-disabled': !interactionIsActive}" class="material-icons oppia-material-icons md-18">&#xE5C8;</i>
+        <i ng-if="!canWindowShowTwoCards()" ng-class="{'conversation-skin-instruction-disabled': !interactionIsActive}" class="material-icons oppia-material-icons md-18">&#xE5DB;</i>
       </div>
     </div>
 
     <div ng-if="!getDisplayedCard().getInteractionId() && !isOnTerminalCard() && !conceptCardIsBeingShown">
       <div class="conversation-skin-inline-interaction">
-        <span style="color: red;">
+        <span class="oppia-error-text">
           <strong>Error</strong>: No interaction specified for '<[getDisplayedCard().getStateName()]>'.
         </span>
       </div>
@@ -216,6 +216,22 @@
   .conversation-skin-inline-interaction .conversation-skin-user-avatar {
     left: -20px;
     top: 14px;
+  }
+
+  .oppia-conversation-skin-inline-interaction {
+    opacity: 0.8;
+  }
+
+  .oppia-conversation-skin-instruction-container {
+    padding: 6px 12px;
+  }
+
+  .oppia-material-icons {
+    position: relative;
+  }
+
+  .oppia-error-text {
+    color: red;
   }
 
   /* When the size of the browser is reduced, and the answer submitted is

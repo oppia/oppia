@@ -1,8 +1,7 @@
 <md-card class="oppia-editor-card-with-avatar">
   <div class="oppia-editor-card-body">
     <img ng-src="<[oppiaBlackImgUrl]>" alt="" class="oppia-editor-card-avatar">
-    <div id="tutorialStateContent" class="oppia-editor-card-section"
-         style="padding-top: 36px; padding-bottom: 36px;">
+    <div id="tutorialStateContent" class="oppia-editor-card-section oppia-editor-card-section-extra">
       <state-content-editor on-save-state-content="onSaveStateContent"
                             show-mark-all-audio-as-needing-update-modal-if-required="showMarkAllAudioAsNeedingUpdateModalIfRequired"
                             state-content-placeholder="getStateContentPlaceholder()"
@@ -44,3 +43,10 @@
     </state-solution-editor>
   </div>
 </div>
+
+<style>
+  .oppia-editor-card-section-extra {
+    padding-bottom: 36px;
+    padding-top: 36px;
+  }
+</style>

@@ -6,10 +6,9 @@
                          activity-active="$ctrl.collectionIsCurrentlyHoveredOver"
                          add-to-playlist-icon-is-shown="!$ctrl.isOwnedByCurrentUser()">
 </learner-dashboard-icons>
-<md-card class="oppia-activity-summary-tile"
-         ng-class="{'oppia-activity-playlist-tile': $ctrl.isPlaylistTile()}"
-         style="position: relative; z-index: 5;">
-  <a ng-href="<[$ctrl.getCollectionLink()]>" style="text-decoration: none;">
+<md-card class="oppia-activity-summary-tile oppia-activity-summary-tile-extra"
+         ng-class="{'oppia-activity-playlist-tile': $ctrl.isPlaylistTile()}">
+  <a ng-href="<[$ctrl.getCollectionLink()]>" class="oppia-collection-link">
     <div class="title-section" style="background-color: <[$ctrl.getThumbnailBgColor()]>;">
       <img class="collection-corner-image" ng-src="<[$ctrl.getStaticImageUrl('/general/collection_corner.svg')]>" alt="">
       <img class="thumbnail-image" ng-src="<[$ctrl.getCompleteThumbnailIconUrl()]>" alt="<[$ctrl.getCategory()]>" ng-style="$ctrl.isPlaylistTile() && {'top': '6px', 'width': '60px'}">
@@ -49,5 +48,14 @@
   .oppia-activity-summary-tile .collection-corner-image {
     position: absolute;
     width: 36px;
+  }
+
+  .oppia-activity-summary-tile-extra {
+    position: relative;
+    z-index: 5;
+  }
+
+  .oppia-collection-link {
+    text-decoration: none;
   }
 </style>

@@ -10,15 +10,14 @@
   </textarea>
 
   <span ng-if="!$ctrl.getCodingMode() && !$ctrl.getRows()">
-    <input type="text" ng-disabled="$ctrl.isDisabled()" class="form-control"
+    <input type="text" ng-disabled="$ctrl.isDisabled()" class="form-control oppia-form-control"
            ng-model="$ctrl.localValue" ng-blur="$ctrl.onInputBlur()"
            ng-focus="$ctrl.onInputFocus()" focus-on="<[$ctrl.labelForFocusTarget()]>"
-           ng-keypress="$ctrl.onKeypress($event)" placeholder="<[$ctrl.getPlaceholder()]>" apply-validation validators="$ctrl.validators()"
-           style="display: inline;">
+           ng-keypress="$ctrl.onKeypress($event)" placeholder="<[$ctrl.getPlaceholder()]>" apply-validation validators="$ctrl.validators()">
   </span>
 
   <!-- Note that we do not yet support ng-blur for the code editor. -->
-  <div ng-if="$ctrl.getCodingMode()" style="border: 1px solid #ccc;">
+  <div ng-if="$ctrl.getCodingMode()">
     <div ui-codemirror
          ng-model="$ctrl.localValue"
          ui-codemirror-opts="$ctrl.codemirrorOptions"
@@ -26,3 +25,12 @@
     </div>
   </div>
 </span>
+
+<style>
+  .oppia-form-control {
+    display: inline;
+  }
+  .oppia-coding-mode {
+    border: 1px solid #ccc;
+  }
+</style>

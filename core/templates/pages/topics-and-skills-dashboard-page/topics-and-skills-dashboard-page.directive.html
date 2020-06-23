@@ -1,5 +1,5 @@
 <background-banner></background-banner>
-<div class="oppia-topics-and-skills-dashboard" style="position: relative;">
+<div class="oppia-topics-and-skills-dashboard oppia-topics-and-skills-dashboard-extra">
   <div>
     <h2 class="dashboard-title" translate="I18N_DASHBOARD_TOPICS_AND_SKILLS_DASHBOARD"
         ng-if="($ctrl.totalTopicSummaries.length === 0 && $ctrl.untriagedSkillSummaries.length === 0)">
@@ -185,14 +185,12 @@
       <p class="intro-card-message">
         No topics or skills have been created yet.
       </p>
-      <button class="btn oppia-dashboard-intro-button oppia-transition-200"
-              style="color: white; text-decoration: none;"
+      <button class="btn oppia-dashboard-intro-button oppia-dashboard-intro-button-extra oppia-transition-200"
               ng-click="$ctrl.createTopic()"
               ng-if="$ctrl.userCanCreateTopic">
         Create Topic
       </button>
-      <button class="btn oppia-dashboard-intro-button oppia-transition-200 protractor-test-create-skill-button"
-              style="color: white; text-decoration: none;"
+      <button class="btn oppia-dashboard-intro-button oppia-dashboard-intro-button-extra oppia-transition-200 protractor-test-create-skill-button"
               ng-click="$ctrl.createSkill()"
               ng-if="$ctrl.userCanCreateSkill">
         Create Skill
@@ -438,6 +436,13 @@
     margin-left: auto;
     margin-right: 7.5px;
     width: auto;
+  }
+  .oppia-topics-and-skills-dashboard-extra {
+    position: relative;
+  }
+  .oppia-dashboard-intro-button-extra {
+    color: white;
+    text-decoration: none;
   }
   @media(max-width: 992px) {
     .oppia-topics-and-skills-dashboard .create-buttons {

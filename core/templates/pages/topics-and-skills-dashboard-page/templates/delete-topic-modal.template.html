@@ -3,8 +3,8 @@
     Delete Topic
   </h3>
 </div>
-<div class="modal-body" style="color: #666666">
-  Are you sure you want to delete <strong style="color: black"><[topicName]></strong>? This cannot be recovered.
+<div class="modal-body oppia-modal-body">
+  Are you sure you want to delete <strong class="oppia-topic-name"><[topicName]></strong>? This cannot be recovered.
 </div>
 <div class="modal-footer">
   <button class="btn btn-secondary" ng-click="cancel()">Cancel</button>
@@ -12,3 +12,12 @@
     <span>Delete Topic</span>
   </button>
 </div>
+
+<style>
+  .oppia-modal-body {
+    color: #666666;
+  }
+  .oppia-topic-name {
+    color: black;
+  }
+</style>

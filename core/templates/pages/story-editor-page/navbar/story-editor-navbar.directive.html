@@ -1,18 +1,17 @@
 <ul class="nav navbar-nav oppia-navbar-nav float-right ng-cloak">
-  <li style="margin-right: 5px; margin-top: 8px;">
+  <li class="oppia-list-style">
     <div uib-dropdown>
-      <button class="btn btn-light oppia-save-changes-button protractor-test-save-story-button"
+      <button class="btn btn-light oppia-save-changes-button oppia-save-changes-button-extra protractor-test-save-story-button"
               ng-class="{'btn-success': isStorySaveable()}"
               ng-click="saveChanges()"
-              style="float: left;"
               ng-disabled="!isStorySaveable()">
         <span ng-if="!isSaveInProgress()">
           <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
              alt="Save Story">
             &#xE161;
           </i>
-          <span class="oppia-save-publish-button-label float-left" style="width: 80px;">Save Draft</span>
-          <span class="d-none d-md-block float-left" style="opacity: 0.5;margin-left: 2px;"
+          <span class="oppia-save-publish-button-label oppia-save-publish-button-label-extra float-left">Save Draft</span>
+          <span class="d-none d-md-block float-left oppia-float-left"
                 ng-if="getChangeListLength() > 0">
             (<[getChangeListLength()]>)
           </span>
@@ -23,15 +22,15 @@
           <loading-dots></loading-dots>
         </span>
       </button>
-      <button type="button" style="height: 34px;" class="btn btn-light uib-dropdown-toggle dropdown-toggle"
+      <button type="button" class="btn btn-light uib-dropdown-toggle dropdown-toggle oppia-dropdown-toggle"
               ng-disabled="!getChangeListLength()" uib-dropdown-toggle>
       </button>
-      <ul uib-dropdown-menu role="menu" style="min-width: 125px; right: inherit;" ng-style="{ width: getChangeListLength() ? '150px' : '120px' }">
+      <ul uib-dropdown-menu role="menu" class="oppia-dropdown-menu" ng-style="{ width: getChangeListLength() ? '150px' : '120px' }">
         <li title="Discard all pending changes"><a ng-click="discardChanges()" ng-class="{'oppia-disabled-link': !getChangeListLength()}" class="dropdown-item">Discard Draft</a></li>
       </ul>
     </div>
   </li>
-  <li style="margin-right: 20px; margin-top: 8px;">
+  <li class="oppia-list-style-extra">
     <button type="button" ng-if="!isStoryPublished()"
             class="btn btn-secondary oppia-editor-publish-button protractor-test-publish-story-button"
             ng-click="publishStory()"
@@ -80,5 +79,30 @@
   .oppia-editor-warnings-text {
     width: 100%;
     word-wrap: break-word;
+  }
+  .oppia-list-style {
+    margin-right: 5px;
+    margin-top: 8px;
+  }
+  .oppia-list-style-extra {
+    margin-right: 20px;
+    margin-top: 8px;
+  }
+  .oppia-save-changes-button-extra {
+    float: left;
+  }
+  .oppia-save-publish-button-label-extra {
+    width: 80px;
+  }
+  .oppia-float-left {
+    margin-left: 2px;
+    opacity: 0.5;
+  }
+  .oppia-dropdown-toggle {
+    height: 34px;
+  }
+  .oppia-dropdown-menu {
+    min-width: 125px;
+    right: inherit;
   }
 </style>

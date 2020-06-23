@@ -8,7 +8,7 @@
     <p>
       Enter the title for the subtopic
     </p>
-    <input class="form-control protractor-test-new-subtopic-title-field" style="font-size: 12px;"
+    <input class="form-control oppia-new-subtopic-title-field protractor-test-new-subtopic-title-field"
            placeholder="Enter a brief description for the subtopic that students can easily understand, e.g. 'Adding Fractions'"
            ng-model="subtopicTitle" ng-change="resetErrorMsg()" maxlength="<[MAX_CHARS_IN_SUBTOPIC_TITLE]>" autofocus>
     <span class="oppia-input-box-subtitle">
@@ -16,7 +16,7 @@
         Subtopic title should be at most <[MAX_CHARS_IN_SUBTOPIC_TITLE]> characters.
       </i>
     </span>
-    <span class="form-text" style="font-size: smaller; color: red;" ng-if="errorMsg">
+    <span class="form-text oppia-form-text" ng-if="errorMsg">
       <em><[errorMsg]></em>
     </span>
   </div>
@@ -32,5 +32,12 @@
   .new-subtopic-title-editor .form-text {
     margin-left: 37.5%;
     margin-top: -3%;
+  }
+  .oppia-new-subtopic-title-field {
+    font-size: 12px;
+  }
+  .oppia-form-text {
+    color: red;
+    font-size: smaller;
   }
 </style>

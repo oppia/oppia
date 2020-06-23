@@ -17,8 +17,7 @@
             index in the stop() event handler. -->
             <li ng-repeat="hint in StateHintsService.displayed"
                 ng-class="{'active': StateHintsService.getActiveHintIndex() === $index}"
-                class="oppia-rule-block oppia-sortable-hint oppia-prevent-selection"
-                style="margin-top: 0;">
+                class="oppia-rule-block oppia-rule-block-extra oppia-sortable-hint oppia-prevent-selection">
               <span class="oppia-hint-sort-handle"
                     ng-if="StateHintsService.displayed.length > 1"
                     ng-mousedown="changeActiveHintIndex(null)">
@@ -54,7 +53,7 @@
       </div>
     </md-card>
 
-    <md-card style="margin: 0; padding: 0;">
+    <md-card class="oppia-md-card-style">
       <div ng-if="EditabilityService.isEditableOutsideTutorialMode()">
         <button type="button"
                 class="btn btn-primary btn-lg oppia-add-hint-button protractor-test-oppia-add-hint-button"
@@ -66,3 +65,13 @@
     </md-card>
   </div>
 </div>
+
+<style>
+  .oppia-rule-block-extra {
+    margin-top: 0;
+  }
+  .oppia-md-card-style {
+    margin: 0;
+    padding: 0;
+  }
+</style>

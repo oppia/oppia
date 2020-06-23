@@ -18,7 +18,7 @@
         Search By Skill
         <input type="text" class="form-control" placeholder="Enter a skill name" ng-model="skillFilterText" autofocus>
       </md-card>
-      <div style="max-height: 50vh; overflow-y: auto;">
+      <div class="oppia-list-group-item-container">
         <a class="list-group-item protractor-test-skill-item"
            ng-repeat="skillSummary in skillSummariesInitial | filter:skillFilterText"
            ng-click="selectOrDeselectSkill(skillSummary)"
@@ -63,8 +63,8 @@
       You can only set difficulty after selecting skills linked to the question. Please go back and link skill(s) to this question.
     </div>
     <div class="list-group">
-      <div class="list-group-item"  ng-repeat="skillWithDifficulty in linkedSkillsWithDifficulty track by $index">
-        <label class="list-group-item-heading" style="font-size: 1em;"><[skillWithDifficulty.getDescription()]></label>
+      <div class="list-group-item oppia-list-group-item-heading"  ng-repeat="skillWithDifficulty in linkedSkillsWithDifficulty track by $index">
+        <label class="list-group-item-heading oppia-list-group-item-heading"><[skillWithDifficulty.getDescription()]></label>
         <question-difficulty-selector skill-id-to-rubrics-object="skillIdToRubricsObject"
                                       skill-with-difficulty="skillWithDifficulty">
         </question-difficulty-selector>
@@ -84,3 +84,13 @@
     </div>
   </div>
 </div>
+
+<style>
+  .oppia-list-group-item-container {
+    max-height: 50vh;
+    overflow-y: auto;
+  }
+  .oppia-list-group-item-heading {
+    font-size: 1em;
+  }
+</style>

@@ -12,10 +12,23 @@
   schema-based-list-editor .oppia-delete-list-entry-button:hover {
     opacity: 1;
   }
+  schema-based-list-editor .oppia-list-editor-table {
+    width: 100%;
+  }
+  schema-based-list-editor .oppia-list-entry {
+    vertical-align: top;
+  }
+  schema-based-list-editor .oppia-add-list-entry-div {
+    height: 30px;
+    margin-top: 4px;
+  }
+  schema-based-list-editor .oppia-add-list-entry-div {
+    margin-left: 0;
+  }
 </style>
 
 <ng-form name="listEditorForm">
-  <table style="width: 100%;">
+  <table class="oppia-list-editor-table">
     <tr ng-repeat="item in localValue track by $index">
       <td>
         <schema-based-editor schema="itemSchema()" is-disabled="isDisabled()" local-value="localValue[$index]"
@@ -24,7 +37,7 @@
                              on-input-focus="($last ? hideAddItemButton : showAddItemButton)">
         </schema-based-editor>
       </td>
-      <td ng-if="!len && (!minListLength || localValue.length > minListLength) && localValue.length > 0" style="vertical-align: top;">
+      <td ng-if="!len && (!minListLength || localValue.length > minListLength) && localValue.length > 0" class="oppia-list-entry">
         <button class="oppia-delete-list-entry-button oppia-transition-200 protractor-test-delete-list-entry" type="button"
                 ng-click="deleteElement($index)"
                 ng-disabled="isDisabled()">
@@ -40,11 +53,11 @@
   </div>
 
   <!-- The margin-left is added here to left-align the button with the previous list items. -->
-  <div style="height: 30px; margin-top: 4px;">
+  <div class="oppia-add-list-entry-div">
     <button ng-show="!isOneLineInput || isAddItemButtonPresent || (localValue.length && localValue[localValue.length - 1].length)"
             ng-if="!len && (maxListLength === null || localValue.length < maxListLength)"
-            type="button" class="btn btn-secondary btn-sm protractor-test-add-list-entry" ng-click="addElement()"
-            ng-disabled="isDisabled()" style="margin-left: 0;">
+            type="button" class="btn btn-secondary btn-sm oppia-add-list-entry protractor-test-add-list-entry" ng-click="addElement()"
+            ng-disabled="isDisabled()">
       <[addElementText]>
     </button>
   </div>

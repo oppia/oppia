@@ -3,8 +3,8 @@
     <span class="oppia-navbar-breadcrumb-separator"></span>
     <h1 class="oppia-exploration-h1"><span class="protractor-test-exploration-header oppia-exploration-header" itemprop="description"><[$ctrl.explorationTitle]></span></h1>
   </li>
-  <li ng-click="$ctrl.showInformationCard()" uib-tooltip="<['I18N_PLAYER_INFO_TOOLTIP' | translate]>" tooltip-placement="bottom" style="cursor: pointer;" class="oppia-exploration-info-icon protractor-test-exploration-info-icon" tabindex="0">
-    <i class="material-icons oppia-navbar-breadcrumb-icon" style="font-size: 20px;">&#xE88E;</i>
+  <li ng-click="$ctrl.showInformationCard()" uib-tooltip="<['I18N_PLAYER_INFO_TOOLTIP' | translate]>" tooltip-placement="bottom" class="oppia-exploration-info-icon oppia-exploration-info-icon-extra protractor-test-exploration-info-icon" tabindex="0">
+    <i class="material-icons oppia-navbar-breadcrumb-icon oppia-navbar-breadcrumb-icon-extra">&#xE88E;</i>
     <span class="oppia-icon-accessibility-label"><['I18N_PLAYER_INFO_TOOLTIP' | translate]></span>
   </li>
 </ul>
@@ -22,5 +22,11 @@
     height: 56px;
     margin-top: -13px;
     padding-top: 12px;
+  }
+  .oppia-exploration-info-icon-extra {
+    cursor: pointer;
+  }
+  .oppia-navbar-breadcrumb-icon-extra {
+    font-size: 20px;
   }
 </style>

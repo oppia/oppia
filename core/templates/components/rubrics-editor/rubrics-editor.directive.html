@@ -2,7 +2,7 @@
   <label> <[rubric.getDifficulty()]> </label>
   <div ng-repeat="explanation in rubric.getExplanations()">
     <div ng-if="!$ctrl.explanationEditorIsOpen[rubric.getDifficulty()][$index]"
-         style="height: 100%; padding-top: 1vh;">
+         class="oppia-explanation-editor">
       <div class="oppia-readonly-rule-title"
            ng-class="{'oppia-editable-section': $ctrl.isEditable()}">
         <div class="oppia-rule-preview">
@@ -53,7 +53,7 @@
             Save
           </button>
         </div>
-        <div style="clear: both;"></div>
+        <div class="oppia-clear"></div>
       </div>
     </div>
   </div>
@@ -82,5 +82,14 @@
   rubrics-editor .rubric-editor {
     margin-right: 15px;
     margin-top: 2vh;
+  }
+
+  rubrics-editor .oppia-explanation-editor {
+    height: 100%;
+    padding-top: 1vh;
+  }
+
+  rubrics-editor .oppia-clear {
+    clear: both;
   }
 </style>

@@ -1,4 +1,4 @@
-<md-card class="oppia-page-card oppia-long-text" style="max-width: 700px">
+<md-card class="oppia-page-card oppia-long-text oppia-long-text-extra">
   <h3>Topic Similarities</h3>
   <div class="oppia-topic-similarities-container">
     Upload a csv file:<br>
@@ -9,12 +9,12 @@
   </div>
 </md-card>
 
-<md-card class="oppia-admin-page-card oppia-page-card oppia-long-text" style="">
+<md-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
   <h3>Search Index</h3>
   <button ng-click="$ctrl.clearSearchIndex()">Clear Search Index</button>
 </md-card>
 
-<md-card class="oppia-admin-page-card oppia-page-card oppia-long-text" style="">
+<md-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
   <h3>Flush migration bot contributions</h3>
   <button ng-click="$ctrl.flushMigrationBotContributions()">Flush contributions</button>
 </md-card>
@@ -112,5 +112,8 @@
   .oppia-topic-similarities-container > button {
     margin: 5px 0 5px 0;
     display: block;
+  }
+  .oppia-long-text-extra {
+    max-width: 700px;
   }
 </style>

@@ -5,9 +5,9 @@
 <md-card layout="row" class="list-view-item">
   <table class="dashboard-table text-break">
     <colgroup>
-      <col style="width: 50%;">
-      <col style="width: 25%;">
-      <col style="width: 25%;">
+      <col class="oppia-colgroup-col-1">
+      <col class="oppia-colgroup-col-2">
+      <col class="oppia-colgroup-col-3">
     </colgroup>
     <tr>
       <th ng-repeat="key in SKILL_HEADINGS"
@@ -63,7 +63,7 @@
     </tr>
   </table>
 </md-card>
-<span ng-if="!canCreateSkill()" style="margin-left: 12.5%;">
+<span ng-if="!canCreateSkill()" class="oppia-create-skill">
   <em>To create new skills, please talk to one of the lesson creation admins.</em>
 </span>
 
@@ -141,6 +141,18 @@
 
   skills-list .skills-list-action-button {
     min-width: 125px;
+  }
+
+  skills-list .oppia-colgroup-col-1 {
+    width: 50%;
+  }
+
+  skills-list .oppia-colgroup-col-2 .oppia-colgroup-col-3 {
+    width: 25%;
+  }
+
+  skills-list .oppia-create-skill {
+    margin-left: 12.5%;
   }
 
   @media (max-width: 768px) {

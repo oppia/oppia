@@ -1,12 +1,12 @@
 <md-card class="oppia-editor-card-with-avatar">
   <div class="oppia-editor-card-body">
     <div class="oppia-editor-card-section">
-      <strong style="font-size: 1.4em;">Prerequisite Skills</strong>
+      <strong class="oppia-prerequisite-skills-text">Prerequisite Skills</strong>
       <div>
         <md-card class="skill-id" ng-repeat="skillId in skill.getPrerequisiteSkillIds()">
           <div class="skill-description-card">
-            <span style="float: right;" ng-click="removeSkillId(skillId)" aria-hidden="true">
-              <i class="material-icons md-18" style="color: red;">&#xE14C;</i>
+            <span class="oppia-remove-skill" ng-click="removeSkillId(skillId)" aria-hidden="true">
+              <i class="material-icons md-18 oppia-material-icons">&#xE14C;</i>
             </span>
             <a ng-href="<[getSkillEditorUrl(skillId)]>" target="_blank" rel="noopener"><[skillIdToSummaryMap[skillId]]></a>
           </div>
@@ -28,5 +28,14 @@
     height: 2.5em;
     padding-left: 10px;
     padding-top: 10px;
+  }
+  .oppia-prerequisite-skills-text {
+    font-size: 1.4em;
+  }
+  .oppia-remove-skill {
+    float: right;
+  }
+  .oppia-material-icons {
+    color: red;
   }
 </style>

@@ -7,7 +7,7 @@
   <div class="modal-body">
     <div class="subtopic-thumbnail">
       <p>
-        <strong style="font-size: 1.2em;">Subtopic Thumbnail</strong>
+        <strong class="oppia-subtopic-style">Subtopic Thumbnail</strong>
       </p>
       <thumbnail-uploader filename="editableThumbnailFilename"
                           update-filename="updateSubtopicThumbnailFilename"
@@ -23,7 +23,7 @@
     </div>
     <div class="subtopic-title">
       <p>
-        <strong style="font-size: 1.2em;">Subtopic Title</strong>
+        <strong class="oppia-subtopic-style">Subtopic Title</strong>
       </p>
       <form class="form-horizontal" role="form">
         <input class="form-control protractor-test-subtopic-title-field"
@@ -38,16 +38,16 @@
           </i>
         </span>
       </form>
-      <span class="form-text" style="font-size: smaller; color: red;" ng-if="errorMsg">
+      <span class="form-text oppia-form-text" ng-if="errorMsg">
         <em><[errorMsg]></em>
       </span>
-      <span class="form-text" style="font-size: smaller; color: red;" ng-if="editableTitle.length === 80">
+      <span class="form-text oppia-form-text" ng-if="editableTitle.length === 80">
         <em>The maximum length of subtopic title is 80 characters.</em>
       </span>
     </div>
     <div class="subtopic-page-editor">
       <p>
-        <strong style="font-size: 1.2em;">Subtopic Page</strong>
+        <strong class="oppia-subtopic-style">Subtopic Page</strong>
       </p>
       <div class="oppia-editor-card-body">
         <schema-based-editor schema="SUBTOPIC_PAGE_SCHEMA"
@@ -78,5 +78,14 @@
 
   .subtopic-editor .modal-footer {
     margin-top: 50px;
+  }
+
+  .oppia-subtopic-style {
+    font-size: 1.2em;
+  }
+
+  .oppia-form-text {
+    color: red;
+    font-size: smaller;
   }
 </style>

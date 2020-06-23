@@ -11,11 +11,14 @@
     border-bottom-color: rgb(63, 81, 181);
     border-bottom-width: 2px;
   }
+  schema-based-int-editor .oppia-blue-on-focus-extra {
+    margin: 0;
+  }
 </style>
 
 <div class="input-group">
   <span ng-if="!expressionMode">
-    <md-input-group class="long oppia-blue-on-focus md-default-theme" style="margin: 0;">
+    <md-input-group class="long oppia-blue-on-focus oppia-blue-on-focus-extra md-default-theme">
       <input type="number" ng-model="$ctrl.localValue" ng-disabled="$ctrl.isDisabled()"
              required apply-validation validators="$ctrl.validators()" focus-on="<[$ctrl.labelForFocusTarget()]>"
              ng-blur="$ctrl.onInputBlur()" ng-focus="$ctrl.onInputFocus()">

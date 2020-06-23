@@ -65,7 +65,7 @@
     <i class="material-icons md-18 oppia-response-tick-cross  protractor-test-correct-tick-mark" ng-if="$ctrl.isCorrect() && $ctrl.isCorrectnessFeedbackEnabled() && $ctrl.isResponse() && !$ctrl.isCurrentInteractionLinear()">&#10004;</i>
     <span ng-if="!$ctrl.isActive()" ng-attr-title="<[$ctrl.getSummary()]>">
       <[$ctrl.getShortSummary()]>
-      <span ng-if="$ctrl.getNumRules() > 1" class="badge badge-primary" class="oppia-badge-primary">
+      <span ng-if="$ctrl.getNumRules() > 1" class="badge badge-primary oppia-badge-primary">
         +<[$ctrl.getNumRules() - 1]>
       </span>
     </span>

@@ -1,7 +1,7 @@
 <md-card class="oppia-editor-card-with-avatar">
   <div class="oppia-editor-card-body">
     <div class="oppia-editor-card-section">
-      <strong style="font-size: 1.4em;">Review Material</strong>
+      <strong class="oppia-review-material-text">Review Material</strong>
       <div class="concept-card-subtitle">
         This gives the learner a brief overview of how to perform the skill.
       </div>
@@ -15,22 +15,20 @@
 <md-card class="oppia-editor-card-with-avatar">
   <div class="oppia-editor-card-body">
     <div class="oppia-editor-card-section">
-      <div style="padding-bottom: 0.5em;">
-        <strong style="font-size: 1.4em;">Worked Examples</strong>
+      <div oppia-worked-examples-text-div>
+        <strong class="oppia-review-material-text">Worked Examples</strong>
         <div class="concept-card-subtitle">
           These will be displayed one-by-one to the learner, in order, if they ask for them.
         </div>
       </div>
-      <div ng-if="bindableFieldsDict.displayedWorkedExamples.length > 0" style="padding-bottom: 10px;">
-        <ul class="nav oppia-option-list nav-stacked nav-pills"
+      <div ng-if="bindableFieldsDict.displayedWorkedExamples.length > 0" class="oppia-option-list-container">
+        <ul class="nav oppia-option-list oppia-option-list-extra nav-stacked nav-pills"
             role="tablist"
             ui-sortable="WORKED_EXAMPLES_SORTABLE_OPTIONS"
-            ng-model="bindableFieldsDict.displayedWorkedExamples"
-            style="position: relative;">
+            ng-model="bindableFieldsDict.displayedWorkedExamples">
           <li ng-repeat="workedExample in bindableFieldsDict.displayedWorkedExamples"
               ng-class="{'active': activeWorkedExampleIndex === $index, 'last-element': $index === bindableFieldsDict.displayedWorkedExamples.length - 1}"
-              class="oppia-rule-block oppia-sortable-worked-example oppia-prevent-selection"
-              style="margin-top: 0;">
+              class="oppia-rule-block oppia-rule-block-extra oppia-sortable-worked-example oppia-prevent-selection">
             <span class="oppia-worked-example-sort-handle"
                   ng-if="bindableFieldsDict.displayedWorkedExamples.length > 1"
                   ng-mousedown="changeActiveWorkedExampleIndex(-1)">
@@ -65,8 +63,7 @@
         </ul>
       </div>
       <button type="button"
-              class="btn protractor-test-add-worked-example"
-              style="background-color: rgba(5,140,166,0.9); color: white;"
+              class="btn protractor-test-add-worked-example oppia-add-worked-example"
               ng-click="openAddWorkedExampleModal()">
         + Add Worked Example
       </button>
@@ -83,5 +80,34 @@
 
   skill-concept-card-editor .last-element {
     border-bottom: 1px solid #ccc;
+  }
+
+  .oppia-review-material-text {
+    font-size: 1.4em;
+  }
+
+  .oppia-worked-examples-text-div {
+    padding-bottom: 0.5em;
+  }
+
+  . {
+    font-size: 1.4em;
+  }
+
+  .oppia-option-list-container {
+    padding-bottom: 10px;
+  }
+
+  .oppia-option-list-extra {
+    position: relative;
+  }
+
+  .oppia-rule-block-extra {
+    margin-top: 0;
+  }
+
+  .oppia-add-worked-example {
+    color: white;
+    background-color: rgba(5,140,166,0.9);
   }
 </style>

@@ -1,6 +1,6 @@
-<div class="oppia-editor">
+<div class="oppia-hint-editor-container">
   <div ng-if="!$ctrl.hintEditorIsOpen"
-       class="oppia-editor"
+       class="oppia-hint-editor-container"
        ng-attr-title="<[$ctrl.isEditable ? 'Edit hint' : '']>">
     <div class="oppia-readonly-rule-tile"
          ng-class="{'oppia-editable-section': $ctrl.isEditable}">
@@ -57,7 +57,7 @@
 </div>
 
 <style>
-  hint-editor .oppia-editor {
+  hint-editor .oppia-hint-editor-container {
     height: 100%;
   }
 

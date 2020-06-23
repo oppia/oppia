@@ -8,7 +8,7 @@
   </div>
   <div class="concept-card-worked-examples" ng-if="$ctrl.numberOfWorkedExamplesShown > 0">
     <strong> Worked Examples </strong>
-    <div class="oppia-concept-card-worked-examples-top-margin"
+    <div class="oppia-concept-card-worked-example"
          ng-repeat="example in $ctrl.currentConceptCard.getWorkedExamples()"
          ng-if="$index < $ctrl.numberOfWorkedExamplesShown">
       <strong> Question: </strong>
@@ -70,7 +70,7 @@
     margin-bottom: 10px;
   }
 
-  .oppia-concept-card-worked-examples-top-margin {
+  .oppia-concept-card-worked-example {
     margin-top: 2vh;
   }
 </style>

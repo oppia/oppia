@@ -39,7 +39,7 @@
               <p translate="I18N_GET_STARTED_PAGE_PARAGRAPH_5">
 
               </p>
-              <ul style="margin-left: 40px;">
+              <ul class="oppia-ul-style">
                 <li><a href="https://www.oppia.org/explore/0" target="new">Welcome to Oppia</a></li>
                 <li><a href="https://www.oppia.org/collection/wqCTKpKA0LBe" target="new">Get Electrified!</a></li>
                 <li><a href="https://www.oppia.org/collection/inDXV0w8-p1C" target="new">Programming with Carla</a></li>
@@ -75,14 +75,17 @@
       </base-content>
     </div>
 
-    <style>
-      .oppia-get-started h2 {
-        font-size: 1.17em;
-        font-weight: bold;
-        text-align: left;
-      }
-    </style>
-
     @load('pages/footer_js_libs.html')
   </body>
 </html>
+
+<style>
+  .oppia-get-started h2 {
+    font-size: 1.17em;
+    font-weight: bold;
+    text-align: left;
+  }
+  .oppia-ul-style {
+    margin-left: 40px;
+  }
+</style>

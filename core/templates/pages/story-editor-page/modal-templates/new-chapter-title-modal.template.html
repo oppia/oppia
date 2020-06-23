@@ -8,7 +8,7 @@
     <p>
       Enter the title for the chapter
     </p>
-    <input class="form-control protractor-test-new-chapter-title-field" style="font-size: 12px;"
+    <input class="form-control oppia-new-chapter-title-field protractor-test-new-chapter-title-field"
            placeholder="Enter the title for this chapter to be displayed to learners in the story viewer page (can be edited later)"
            ng-model="nodeTitle" ng-change="resetErrorMsg()" maxlength="<[MAX_CHARS_IN_CHAPTER_TITLE]>" autofocus>
     <span class="oppia-input-box-subtitle">
@@ -16,7 +16,7 @@
         Chapter title should be at most <[MAX_CHARS_IN_CHAPTER_TITLE]> characters.
       </i>
     </span>
-    <span class="form-text" style="font-size: smaller; color: red;" ng-if="errorMsg">
+    <span class="form-text oppia-form-text" ng-if="errorMsg">
       <em><[errorMsg]></em>
     </span>
   </div>
@@ -27,3 +27,13 @@
     </button>
   </div>
 </form>
+
+<style>
+  .oppia-new-chapter-title-field {
+    font-size: 12px;
+  }
+  .oppia-form-text {
+    color: red;
+    font-size: smaller;
+  }
+</style>

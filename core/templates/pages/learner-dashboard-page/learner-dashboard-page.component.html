@@ -1,5 +1,5 @@
 <background-banner></background-banner>
-<div class="oppia-learner-dashboard-container" style="position: relative;">
+<div class="oppia-learner-dashboard-container oppia-learner-dashboard-container-extra">
   <div>
     <h2 class="oppia-learner-dashboard-title"
         translate="I18N_TOPNAV_LEARNER_DASHBOARD"
@@ -7,8 +7,7 @@
     </h2>
   </div>
 
-  <div class="oppia-dashboard-aggregated-stats oppia-learner-dashboard-main-content"
-       style="padding-top: 10px; margin: auto;"
+  <div class="oppia-dashboard-aggregated-stats oppia-learner-dashboard-main-content oppia-learner-dashboard-main-content-extra"
        ng-class="{'oppia-learner-dashboard-mobile-mode': $ctrl.checkMobileView()}"
        ng-if="!$ctrl.noActivity">
     <md-card layout="row"
@@ -28,13 +27,12 @@
     </md-card>
   </div>
 
-  <div class="row no-gutters"
+  <div class="row no-gutters oppia-flex"
        ng-style="$ctrl.checkMobileView() ? {'display': 'block'} : {'display': 'flex'}"
-       style="display: flex;"
        ng-if="$ctrl.noActivity">
     <div class="col-sm-2"
          ng-style="$ctrl.checkMobileView() ? {'text-align': 'center'} : {'text-align': 'left'}">
-      <div style="height: 100%;" ng-if="!$ctrl.checkMobileView()"></div>
+      <div class="oppia-mobile-view" ng-if="!$ctrl.checkMobileView()"></div>
       <img ng-src="<[$ctrl.getStaticImageUrl('/general/collection_mascot.svg')]>"
            ng-class="{'oppia-learner-dashboard-mascot-mobile': $ctrl.checkMobileView()}"
            class="oppia-learner-dashboard-mascot">
@@ -42,10 +40,10 @@
 
     <div class="col-sm-8">
       <blockquote class="oppia-learner-dashboard-intro-card">
-        <p class="oppia-learner-dashboard-intro-card-message" style="padding-top: 6px;"
+        <p class="oppia-learner-dashboard-intro-card-message oppia-learner-dashboard-intro-card-message-extra-1"
            translate="I18N_LEARNER_DASHBOARD_INTRO_MESSAGE_PART_ONE">
         </p>
-        <p class="oppia-learner-dashboard-intro-card-message" style="padding-top: 15px;"
+        <p class="oppia-learner-dashboard-intro-card-message oppia-learner-dashboard-intro-card-message-extra-2"
            translate="I18N_LEARNER_DASHBOARD_INTRO_MESSAGE_PART_TWO">
         </p>
         <a class="btn oppia-learner-dashboard-intro-button oppia-transition-200 protractor-mobile-test-learner-dashboard-intro-button"
@@ -60,10 +58,9 @@
     </div>
   </div>
 
-  <div class="row"
+  <div class="row oppia-flex"
        ng-style="$ctrl.checkMobileView() ? {'display': 'block'} : {'display': 'flex'}"
        ng-class="{'oppia-learner-dashboard-mobile-mode': $ctrl.checkMobileView()}"
-       style="display: flex;"
        ng-if="!$ctrl.noActivity">
     <div class="col-md-2 oppia-learner-dashboard-side-content"
          ng-class="{'oppia-learner-dashboard-mobile-mode': $ctrl.checkMobileView()}">
@@ -139,8 +136,7 @@
         <span class="oppia-learner-dashboard-main-content-title">
           <span translate="<[$ctrl.activeSection]>"></span>
           <span ng-if="$ctrl.activeSection !== $ctrl.LEARNER_DASHBOARD_SECTION_I18N_IDS.SUBSCRIPTIONS && $ctrl.activeSection !== $ctrl.LEARNER_DASHBOARD_SECTION_I18N_IDS.FEEDBACK">
-            <span class="oppia-navbar-breadcrumb-separator"
-                  style="margin: 0 1px;">
+            <span class="oppia-navbar-breadcrumb-separator oppia-navbar-breadcrumb-separator-extra">
             </span>
             <span translate="<[$ctrl.activeSubsection]>"></span>
             <i ng-if="$ctrl.activeSubsection === $ctrl.LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS" class="oppia-dashboard-tooltip material-icons">info</i>
@@ -151,10 +147,9 @@
         <span class="sort-explorations-select oppia-learner-dashboard-sort"
               ng-class="{'oppia-learner-dashboard-sort-mobile': $ctrl.checkMobileView()}"
               ng-if="$ctrl.activeSubsection === $ctrl.LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS && (($ctrl.activeSection === $ctrl.LEARNER_DASHBOARD_SECTION_I18N_IDS.COMPLETED && $ctrl.completedExplorationsList.length !== 0) || ($ctrl.activeSection === $ctrl.LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE && $ctrl.incompleteExplorationsList.length !== 0))">
-          <p class="sort-by-text" style="margin-top: 0;">Sort By</p>
+          <p class="sort-by-text oppia-sort-by-text">Sort By</p>
           <select ng-model="$ctrl.currentExpSortType"
-                  class="sort-options"
-                  style="margin-top: 0;"
+                  class="sort-options oppia-sort-by-text"
                   ng-change="$ctrl.setExplorationsSortingOptions($ctrl.currentExpSortType)"
                   ng-options="value['key'] as value['i18nId'] | translate for (key, value) in $ctrl.EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS">
           </select>
@@ -164,16 +159,14 @@
           </span>
         </span>
 
-        <span class="sort-explorations-select oppia-learner-dashboard-sort"
+        <span class="sort-explorations-select oppia-learner-dashboard-sort oppia-learner-dashboard-sort-extra"
               ng-if="$ctrl.activeSection === $ctrl.LEARNER_DASHBOARD_SECTION_I18N_IDS.SUBSCRIPTIONS && $ctrl.subscriptionsList.length !== 0"
-              ng-class="{'oppia-learner-dashboard-sort-mobile': $ctrl.checkMobileView()}"
-              style="margin-bottom: 7px;">
-          <p class="sort-by-text" style="margin-top: 0;">Sort By</p>
+              ng-class="{'oppia-learner-dashboard-sort-mobile': $ctrl.checkMobileView()}">
+          <p class="sort-by-text oppia-sort-by-text">Sort By</p>
           <select ng-model="$ctrl.currentSubscribersSortType"
-                  class="sort-options"
+                  class="sort-options oppia-sort-options"
                   ng-change="$ctrl.setSubscriptionSortingOptions($ctrl.currentSubscribersSortType)"
-                  ng-options="value['key'] as value['i18nId'] | translate for (key, value) in $ctrl.SUBSCRIPTION_SORT_BY_KEYS_AND_I18N_IDS"
-                  style="width: 160px;">
+                  ng-options="value['key'] as value['i18nId'] | translate for (key, value) in $ctrl.SUBSCRIPTION_SORT_BY_KEYS_AND_I18N_IDS">
           </select>
           <span class="sort-order fas"
                 ng-click="$ctrl.setSubscriptionSortingOptions($ctrl.currentSubscribersSortType)"
@@ -181,16 +174,14 @@
           </span>
         </span>
 
-        <span class="sort-explorations-select oppia-learner-dashboard-sort"
+        <span class="sort-explorations-select oppia-learner-dashboard-sort oppia-learner-dashboard-sort-extra"
               ng-if="$ctrl.activeSection === $ctrl.LEARNER_DASHBOARD_SECTION_I18N_IDS.FEEDBACK && $ctrl.threadSummaries.length !== 0 && !$ctrl.feedbackThreadActive"
-              ng-class="{'oppia-learner-dashboard-sort-mobile': $ctrl.checkMobileView()}"
-              style="margin-bottom: 7px;">
-          <p class="sort-by-text" style="margin-top: 0;">Sort By</p>
+              ng-class="{'oppia-learner-dashboard-sort-mobile': $ctrl.checkMobileView()}">
+          <p class="sort-by-text oppia-sort-by-text">Sort By</p>
           <select ng-model="$ctrl.currentFeedbackThreadsSortType"
-                  class="sort-options"
+                  class="sort-options oppia-sort-options"
                   ng-change="$ctrl.setFeedbackSortingOptions($ctrl.currentFeedbackThreadsSortType)"
-                  ng-options="value['key'] as value['i18nId']| translate for (key, value) in $ctrl.FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS"
-                  style="width: 160px;">
+                  ng-options="value['key'] as value['i18nId']| translate for (key, value) in $ctrl.FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS">
           </select>
           <span class="sort-order fas"
                 ng-click="$ctrl.setFeedbackSortingOptions($ctrl.currentFeedbackThreadsSortType)"
@@ -200,7 +191,7 @@
       </div>
       <div class="oppia-learner-dashboard-main-content-container">
         <div ng-if="$ctrl.activeSection === $ctrl.LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE && $ctrl.activeSubsection === $ctrl.LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS">
-          <span style="display: block; padding: 5px 7.5px;"
+          <span class="oppia-incomplete-exploration"
                 ng-if="$ctrl.numberNonexistentIncompleteExplorations !== 0">
             <span translate="I18N_LEARNER_DASHBOARD_NONEXISTENT_INCOMPLETE_EXPLORATIONS"
                   translate-values="{numberNonexistent: $ctrl.numberNonexistentIncompleteExplorations}"
@@ -216,16 +207,15 @@
               <p ng-if="$ctrl.noExplorationActivity" translate="I18N_LEARNER_DASHBOARD_NO_ACTIVITY_IN_EXPLORATION"></p>
               <p ng-if="!$ctrl.noExplorationActivity" translate="I18N_LEARNER_DASHBOARD_EMPTY_INCOMPLETE_EXPLORATIONS"></p>
 
-              <a class="btn oppia-dashboard-intro-button oppia-transition-200"
+              <a class="btn oppia-dashboard-intro-button oppia-dashboard-intro-button-extra oppia-transition-200"
                  translate="I18N_ACTION_BROWSE_LESSONS"
-                 ng-href="/community-library"
-                 style="width: 230px; margin-top: 13px;">
+                 ng-href="/community-library">
               </a>
             </div>
           </md-card>
 
           <div ng-repeat="tile in $ctrl.incompleteExplorationsList | orderBy:$ctrl.getValueOfExplorationSortKey:$ctrl.isCurrentExpSortDescending | limitTo:$ctrl.PAGE_SIZE:$ctrl.startIncompleteExpIndex track by tile.id"
-               style="display: inline-block; margin-left: 1px;"
+               class="oppia-incomplete-exploration-list"
                ng-mouseenter="showRemoveIcon=true" ng-mouseleave="showRemoveIcon=false">
             <i class="remove-icon fa fa-times"
                ng-show="showRemoveIcon"
@@ -258,7 +248,7 @@
         </div>
 
         <div ng-if="$ctrl.activeSection === $ctrl.LEARNER_DASHBOARD_SECTION_I18N_IDS.COMPLETED && $ctrl.activeSubsection === $ctrl.LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS">
-          <span style="display: block; padding: 5px 7.5px;"
+          <span class="oppia-incomplete-exploration"
                 ng-if="$ctrl.numberNonexistentCompletedExplorations !== 0">
             <span translate="I18N_LEARNER_DASHBOARD_NONEXISTENT_COMPLETED_EXPLORATIONS"
                   translate-values="{numberNonexistent: $ctrl.numberNonexistentCompletedExplorations}"
@@ -273,16 +263,15 @@
             <div>
               <p translate="I18N_LEARNER_DASHBOARD_EMPTY_COMPLETED_EXPLORATIONS"></p>
 
-              <a class="btn oppia-dashboard-intro-button oppia-transition-200"
+              <a class="btn oppia-dashboard-intro-button oppia-transition-200 oppia-dashboard-intro-button-extra"
                  translate="I18N_ACTION_BROWSE_LESSONS"
-                 ng-href="/community-library"
-                 style="width: 230px; margin-top: 13px;">
+                 ng-href="/community-library">
               </a>
             </div>
           </md-card>
 
           <div ng-repeat="tile in $ctrl.getVisibleExplorationList($ctrl.startCompletedExpIndex) | orderBy:$ctrl.getValueOfExplorationSortKey:$ctrl.isCurrentExpSortDescending track by tile.id"
-               style="display: inline-block; margin-left: 1px;">
+               class="oppia-incomplete-exploration-list">
             <exploration-summary-tile exploration-id="tile.id"
                                       exploration-title="tile.title"
                                       last-updated-msec="tile.last_updated_msec"
@@ -307,11 +296,11 @@
         </div>
 
         <div ng-if="$ctrl.activeSection === $ctrl.LEARNER_DASHBOARD_SECTION_I18N_IDS.PLAYLIST && $ctrl.activeSubsection === $ctrl.LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS">
-          <span style="display: block; padding: 5px 7.5px;"
+          <span class="oppia-incomplete-exploration"
                 ng-if="$ctrl.explorationPlaylist.length > 0">
             <span translate="I18N_LEARNER_DASHBOARD_REARRANGE_LEARNER_PLAYLIST_MESSAGE"></span>
           </span>
-          <span style="display: block; padding: 5px 7.5px;"
+          <span class="oppia-incomplete-exploration"
                 ng-if="$ctrl.numberNonexistentExplorationsFromPlaylist !== 0">
             <span translate="I18N_LEARNER_DASHBOARD_NONEXISTENT_EXPLORATIONS_FROM_PLAYLIST"
                   translate-values="{numberNonexistent: $ctrl.numberNonexistentExplorationsFromPlaylist}"
@@ -326,28 +315,25 @@
             <div>
               <p translate="I18N_LEARNER_DASHBOARD_EMPTY_EXPLORATION_PLAYLIST"></p>
 
-              <a class="btn oppia-dashboard-intro-button oppia-transition-200"
+              <a class="btn oppia-dashboard-intro-button oppia-transition-200 oppia-dashboard-intro-button-extra"
                  translate="I18N_ACTION_BROWSE_LESSONS"
-                 ng-href="/community-library"
-                 style="width: 230px; margin-top: 13px;">
+                 ng-href="/community-library">
               </a>
             </div>
           </md-card>
 
           <div ui-sortable="$ctrl.explorationPlaylistSortableOptions" ng-model="$ctrl.explorationPlaylist">
-            <div class="oppia-learner-playlist-tiles"
+            <div class="oppia-learner-playlist-tiles oppia-learner-playlist-tiles-extra"
                  ng-repeat="tile in $ctrl.explorationPlaylist track by $index"
-                 ng-mouseenter="showRemoveIcon=true" ng-mouseleave="showRemoveIcon=false"
-                 style="height: 145px; display: block;">
-              <i class="remove-icon fa fa-times"
+                 ng-mouseenter="showRemoveIcon=true" ng-mouseleave="showRemoveIcon=false">
+              <i class="remove-icon oppia-remove-icon fa fa-times"
                  ng-show="showRemoveIcon"
                  aria-hidden="true"
-                 style="color: black;"
                  ng-click="$ctrl.openRemoveActivityModal($ctrl.activeSection, $ctrl.activeSubsection, tile)"
                  uib-tooltip="Remove"
                  tooltip-placement="top">
               </i>
-              <exploration-summary-tile style="height: 145px;"
+              <exploration-summary-tile
                                         exploration-id="tile.id"
                                         exploration-title="tile.title"
                                         last-updated-msec="tile.last_updated_msec"
@@ -357,7 +343,7 @@
                                         num-views="tile.num_views"
                                         thumbnail-icon-url="tile.thumbnail_icon_url"
                                         thumbnail-bg-color="tile.thumbnail_bg_color"
-                                        class="protractor-test-exp-summary-tile"
+                                        class="protractor-test-exp-summary-tile oppia-exp-summary-tile"
                                         is-playlist-tile="true">
               </exploration-summary-tile>
             </div>
@@ -366,7 +352,7 @@
         </div>
 
         <div ng-if="$ctrl.activeSection === $ctrl.LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE && $ctrl.activeSubsection === $ctrl.LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS">
-          <span style="display: block; padding: 5px 7.5px;"
+          <span class="oppia-incomplete-exploration"
                 ng-if="$ctrl.numberNonexistentIncompleteCollections !== 0">
             <span translate="I18N_LEARNER_DASHBOARD_NONEXISTENT_INCOMPLETE_COLLECTIONS"
                   translate-values="{numberNonexistent: $ctrl.numberNonexistentIncompleteCollections}"
@@ -382,16 +368,15 @@
               <p ng-if="$ctrl.noCollectionActivity" translate="I18N_LEARNER_DASHBOARD_NO_ACTIVITY_IN_COLLECTION"></p>
               <p ng-if="!$ctrl.noCollectionActivity" translate="I18N_LEARNER_DASHBOARD_EMPTY_INCOMPLETE_COLLECTIONS"></p>
 
-              <a class="btn oppia-dashboard-intro-button oppia-transition-200"
+              <a class="btn oppia-dashboard-intro-button oppia-dashboard-intro-button-extra oppia-transition-200"
                  translate="I18N_ACTION_BROWSE_LESSONS"
-                 ng-href="/community-library"
-                 style="width: 230px; margin-top: 13px;">
+                 ng-href="/community-library">
               </a>
             </div>
           </md-card>
 
           <div ng-repeat="tile in $ctrl.incompleteCollectionsList"
-               style="display: inline-block; margin-left: 1px;"
+               class="oppia-incomplete-exploration-list"
                ng-mouseenter="showRemoveIcon=true" ng-mouseleave="showRemoveIcon=false">
             <i class="remove-icon fa fa-times"
                ng-show="showRemoveIcon"
@@ -423,11 +408,11 @@
         </div>
 
         <div ng-if="$ctrl.activeSection === $ctrl.LEARNER_DASHBOARD_SECTION_I18N_IDS.PLAYLIST && $ctrl.activeSubsection === $ctrl.LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS">
-          <span style="display: block; padding: 5px 7.5px;"
+          <span class="oppia-incomplete-exploration"
                 ng-if="$ctrl.collectionPlaylist.length > 0">
             <span translate="I18N_LEARNER_DASHBOARD_REARRANGE_LEARNER_PLAYLIST_MESSAGE"></span>
           </span>
-          <span style="display: block; padding: 5px 7.5px;"
+          <span class="oppia-incomplete-exploration"
                 ng-if="$ctrl.numberNonexistentCollectionsFromPlaylist !== 0">
             <span translate="I18N_LEARNER_DASHBOARD_NONEXISTENT_COLLECTIONS_FROM_PLAYLIST"
                   translate-values="{numberNonexistent: $ctrl.numberNonexistentCollectionsFromPlaylist}"
@@ -442,28 +427,25 @@
             <div>
               <p translate="I18N_LEARNER_DASHBOARD_EMPTY_COLLECTION_PLAYLIST"></p>
 
-              <a class="btn oppia-dashboard-intro-button oppia-transition-200"
+              <a class="btn oppia-dashboard-intro-button oppia-transition-200 oppia-dashboard-intro-button-extra"
                  translate="I18N_ACTION_BROWSE_LESSONS"
-                 ng-href="/community-library"
-                 style="width: 230px; margin-top: 13px;">
+                 ng-href="/community-library">
               </a>
             </div>
           </md-card>
 
           <div ui-sortable="$ctrl.collectionPlaylistSortableOptions" ng-model="$ctrl.collectionPlaylist">
-            <div class="oppia-learner-playlist-tiles"
+            <div class="oppia-learner-playlist-tiles oppia-learner-playlist-tiles-extra-info"
                  ng-repeat="tile in $ctrl.collectionPlaylist track by $index"
-                 style="display: inline-block; margin-left: 1px; height: 145px;"
                  ng-mouseenter="showRemoveIcon=true" ng-mouseleave="showRemoveIcon=false">
-              <i class="remove-icon fa fa-times"
+              <i class="remove-icon fa fa-times oppia-remove-icon"
                  ng-show="showRemoveIcon"
-                 style="color: black;"
                  aria-hidden="true"
                  ng-click="$ctrl.openRemoveActivityModal($ctrl.activeSection, $ctrl.activeSubsection, tile)"
                  uib-tooltip="Remove"
                  tooltip-placement="top">
               </i>
-              <collection-summary-tile style="height: 145px; display: block;"
+              <collection-summary-tile class="oppia-learner-playlist-tiles-extra"
                                        collection-id="tile.id"
                                        collection-title="tile.title"
                                        last-updated-msec="tile.last_updated_msec"
@@ -479,7 +461,7 @@
         </div>
 
         <div ng-if="$ctrl.activeSection === $ctrl.LEARNER_DASHBOARD_SECTION_I18N_IDS.COMPLETED && $ctrl.activeSubsection === $ctrl.LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS">
-          <span style="display: block; padding: 5px 7.5px;"
+          <span class="oppia-incomplete-exploration"
                 ng-if="$ctrl.completedToIncompleteCollections.length !== 0">
             <span translate="I18N_LEARNER_DASHBOARD_COMPLETED_TO_INCOMPLETE_COLLECTIONS"
                   translate-values="{numberMoved: $ctrl.completedToIncompleteCollections.length}">
@@ -491,7 +473,7 @@
             </span>
           </span>
 
-          <span style="display: block; padding: 5px 7.5px;"
+          <span class="oppia-incomplete-exploration"
                 ng-if="$ctrl.numberNonexistentCompletedCollections !== 0">
             <span translate="I18N_LEARNER_DASHBOARD_NONEXISTENT_COMPLETED_COLLECTIONS"
                   translate-values="{numberNonexistent: $ctrl.numberNonexistentCompletedCollections}"
@@ -506,16 +488,15 @@
             <div>
               <p translate="I18N_LEARNER_DASHBOARD_EMPTY_COMPLETED_COLLECTIONS"></p>
 
-              <a class="btn oppia-dashboard-intro-button oppia-transition-200"
+              <a class="btn oppia-dashboard-intro-button oppia-transition-200 oppia-dashboard-intro-button-extra"
                  translate="I18N_ACTION_BROWSE_LESSONS"
-                 ng-href="/community-library"
-                 style="width: 230px; margin-top: 13px;">
+                 ng-href="/community-library">
               </a>
             </div>
           </md-card>
 
           <div ng-repeat="tile in $ctrl.completedCollectionsList"
-               style="display: inline-block; margin-left: 1px;">
+               class="oppia-incomplete-exploration-list">
             <collection-summary-tile
                                      collection-id="tile.id"
                                      collection-title="tile.title"
@@ -538,28 +519,26 @@
           </div>
         </div>
 
-        <div ng-if="$ctrl.activeSection === $ctrl.LEARNER_DASHBOARD_SECTION_I18N_IDS.SUBSCRIPTIONS" style="margin-top: 5px;">
+        <div ng-if="$ctrl.activeSection === $ctrl.LEARNER_DASHBOARD_SECTION_I18N_IDS.SUBSCRIPTIONS" class="oppia-learner-dashboard-section">
           <md-card layout="row"
                    class="oppia-learner-dashboard-no-activity-card"
                    ng-if="$ctrl.subscriptionsList.length === 0">
             <div>
               <p translate="I18N_LEARNER_DASHBOARD_EMPTY_SUBSCRIPTIONS"></p>
 
-              <a class="btn oppia-dashboard-intro-button oppia-transition-200"
+              <a class="btn oppia-dashboard-intro-button oppia-transition-200 oppia-dashboard-intro-button-extra"
                  translate="I18N_ACTION_BROWSE_LESSONS"
-                 ng-href="/community-library"
-                 style="width: 230px; margin-top: 13px;">
+                 ng-href="/community-library">
               </a>
             </div>
           </md-card>
 
-          <md-card class="oppia-subscription-card"
-                   ng-repeat="subscription in $ctrl.subscriptionsList | orderBy:$ctrl.getValueOfSubscriptionSortKey:$ctrl.isCurrentSubscriptionSortDescending"
-                   style="margin: 0 8px 0 4px; width: 197px;">
+          <md-card class="oppia-subscription-card oppia-subscription-card-extra"
+                   ng-repeat="subscription in $ctrl.subscriptionsList | orderBy:$ctrl.getValueOfSubscriptionSortKey:$ctrl.isCurrentSubscriptionSortDescending">
             <a class="oppia-subscription-profile-link" href="/profile/<[subscription.creator_username]>" target="_blank" rel="noopener">
               <img ng-src="<[subscription.creator_picture_data_url]>" class="oppia-subscription-card-profile-picture rounded-circle">
-              <span class="oppia-subscription-card-summary" style="color: black;">
-                <div style="margin-bottom: 5px; font-size: 17.5px;">
+              <span class="oppia-subscription-card-summary oppia-remove-icon">
+                <div class="oppia-subscription-name-container">
                   <strong class="protractor-test-subscription-name"
                           popover-append-to-body
                           popover-trigger="<[$ctrl.showUsernamePopover(subscription.creator_username)]>"
@@ -567,7 +546,7 @@
                     <[subscription.creator_username| truncate:10]>
                   </strong>
                 </div>
-                <div style="font-size: 14.5px;">
+                <div class="oppia-impact-text">
                   <span>Impact</span>
                   <span><[subscription.creator_impact || 0]></span>
                 </div>
@@ -583,10 +562,9 @@
             <div>
               <p translate="I18N_LEARNER_DASHBOARD_EMPTY_FEEDBACK_THREADS"></p>
 
-              <a class="btn oppia-dashboard-intro-button oppia-transition-200"
+              <a class="btn oppia-dashboard-intro-button oppia-transition-200 oppia-dashboard-intro-button-extra"
                  translate="I18N_ACTION_BROWSE_LESSONS"
-                 ng-href="/community-library"
-                 style="width: 230px; margin-top: 13px;">
+                 ng-href="/community-library">
               </a>
             </div>
           </md-card>
@@ -598,7 +576,7 @@
               <td class="col-lg-1 col-md-1 col-sm-1">
                 <span ng-class="$ctrl.getLabelClass(thread.status)"><[$ctrl.getHumanReadableStatus(thread.status)]></span>
               </td>
-              <td class="col-lg-3 col-md-3 col-sm-3" style="width: 21%;">
+              <td class="col-lg-3 col-md-3 col-sm-3 oppia-col-3">
                 <span ng-if="thread.totalMessageCount > 1">
                   <span ng-if="thread.authorSecondLastMessage">
                     <span ng-if="thread.secondLastMessageRead"><[thread.authorSecondLastMessage | truncate:7]>, </span>
@@ -623,7 +601,7 @@
                 </span>
                 <span class="feedback-thread-message-count">(<[thread.totalMessageCount]>)</span>
               </td>
-              <td class="col-lg-6 col-md-6 col-sm-6" style="width: 58%;">
+              <td class="col-lg-6 col-md-6 col-sm-6 oppia-col-6">
                 <span ng-if="thread.totalMessageCount > 1 && thread.secondLastMessageRead && thread.lastMessageRead"><[thread.explorationTitle]> -</span>
                 <span class="protractor-test-feedback-exploration" ng-if="thread.totalMessageCount === 1 && thread.lastMessageRead"><[thread.explorationTitle]> -</span>
                 <span ng-if="thread.totalMessageCount === 1 && !thread.lastMessageRead">
@@ -650,41 +628,39 @@
             <tr>
               <td>
                 <button ng-click="$ctrl.showAllThreads()"
-                        class="btn btn-secondary"
-                        style="padding: 0 3px;">
+                        class="btn btn-secondary oppia-btn-secondary">
                   <i class="material-icons oppia-vcenter" title="<['I18N_LEARNER_DASHBOARD_RETURN_TO_FEEDBACK_THREADS_MESSAGE' | translate]>">&#xE5CB;</i>
                 </button>
-                <span style="margin-left: 7px; font-size: 105%;"><[$ctrl.explorationTitle]></span>
+                <span class="oppia-exploration-title"><[$ctrl.explorationTitle]></span>
               </td>
             </tr>
             <tr ng-if="$ctrl.loadingFeedbacks">
-              <td style="text-align: center;">
+              <td class="oppia-loading-text">
                 <span>
                   Loading
                   <loading-dots></loading-dots>
                 </span>
               </td>
             </tr>
-            <tr ng-if="!$ctrl.loadingFeedbacks" ng-repeat="message in $ctrl.messageSummaries" style="padding: 13px 8px 7px 8px;">
+            <tr ng-if="!$ctrl.loadingFeedbacks" ng-repeat="message in $ctrl.messageSummaries" class="oppia-loading-feedbacks">
               <td>
                 <div class="row">
                   <div class="col-sm-9">
                     <span class="feedback-message-header">
-                      <span ng-if="message.authorPictureDataUrl" style="display: inline-block;">
+                      <span ng-if="message.authorPictureDataUrl" class="oppia-author-picture">
                         <img ng-src="<[message.authorPictureDataUrl]>"
-                             class="oppia-navbar-profile-picture rounded-circle"
-                             alt="User Avatar"
-                             style="margin-top: 4px; min-width: 32px;">
+                             class="oppia-navbar-profile-picture oppia-navbar-profile-picture-extra rounded-circle"
+                             alt="User Avatar">
                       </span>
 
-                      <span ng-if="!message.authorPictureDataUrl" style="display: inline-block;">
-                        <i class="material-icons md-40" style="margin-top: 4px; min-width: 32px;">&#xE853;</i>
+                      <span ng-if="!message.authorPictureDataUrl" class="oppia-author-picture">
+                        <i class="material-icons md-40 oppia-navbar-profile-picture-extra">&#xE853;</i>
                       </span>
                     </span>
 
                     <span ng-if="message.authorUsername" class="feedback-message-author-name"><strong><[message.authorUsername]></strong></span>
                     <span ng-if="!message.authorUsername" class="feedback-message-author-name"><strong translate="I18N_FEEDBACK_MESSAGE_ANONYMOUS_AUTHOR"></strong></span>
-                    <span style="float: right; margin-right: 15px;"
+                    <span class="oppia-update-status"
                           ng-if="message.messageId !== 0 && message.updatedStatus">
                       <em translate="I18N_LEARNER_DASHBOARD_FEEDBACK_THREAD_STATUS_CHANGE_MESSAGE"
                           translate-values="{threadStatus: $ctrl.getHumanReadableStatus(message.updatedStatus)}">
@@ -697,13 +673,13 @@
                 </div>
 
                 <div class="row">
-                  <div class="col-sm-2 feedback-message-spacing" style="width: 8%;"></div>
+                  <div class="col-sm-2 feedback-message-spacing oppia-col-2"></div>
                   <div class="col-sm-10 feedback-thread-message-body">
                     <div>
                       <span class="protractor-test-feedback-message" ng-if="message.text"><[message.text]></span>
-                      <button style="margin-top: 5px;"
+                      <button
                               ng-if="message.currentContentHtml"
-                              class="btn btn-primary"
+                              class="btn btn-primary oppia-learner-dashboard-section"
                               ng-click="$ctrl.showSuggestionModal(message.suggestionHtml, message.currentContentHtml, message.description)"
                               translate="I18N_LEARNER_DASHBOARD_VIEW_SUGGESTION">
                       </button>
@@ -716,9 +692,9 @@
             <tr>
               <td>
                 <div class="row">
-                  <div class="col-sm-1 feedback-message-author-picture" style="width: 8%; padding: 0;">
+                  <div class="col-sm-1 feedback-message-author-picture oppia-col-1">
                     <span class="feedback-message-header">
-                      <span style="display: inline-block;">
+                      <span class="oppia-author-picture">
                         <img ng-src="<[$ctrl.profilePictureDataUrl]>"
                              class="oppia-navbar-profile-picture rounded-circle feedback-thread-learner-profile-pic"
                              alt="User Avatar">
@@ -729,8 +705,7 @@
                   <div class="col-sm-11">
                     <div class="feedback-thread-new-message">
                       <textarea class="form-control feedback-thread-reply-box"
-                                placeholder="<['I18N_LEARNER_DASHBOARD_FEEDBACK_THREAD_DEFAULT_MESSAGE' | translate]>" ng-model="$ctrl.newMessage.text"
-                                style="">
+                                placeholder="<['I18N_LEARNER_DASHBOARD_FEEDBACK_THREAD_DEFAULT_MESSAGE' | translate]>" ng-model="$ctrl.newMessage.text">
                       </textarea>
                     </div>
                     <div>
@@ -1160,6 +1135,147 @@
     margin-left: 1px;
     padding-right: 21px;
     width: 100%;
+  }
+
+  .oppia-learner-dashboard-container-extra {
+    position: relative;
+  }
+
+  .oppia-learner-dashboard-main-content-extra {
+    margin: auto;
+    padding-top: 10px;
+  }
+
+  .oppia-flex {
+    display: flex;
+  }
+
+  .oppia-mobile-view {
+    height: 100%;
+  }
+
+  .oppia-learner-dashboard-intro-card-message-extra-1 {
+    padding-top: 6px;
+  }
+
+  .oppia-learner-dashboard-intro-card-message-extra-2 {
+    padding-top: 15px;
+  }
+
+  .oppia-navbar-breadcrumb-separator-extra {
+    margin: 0 1px;
+  }
+
+  .oppia-sort-by-text {
+    margin-top: 0;
+  }
+
+  .oppia-learner-dashboard-sort-extra {
+    margin-bottom: 7px;
+  }
+
+  .oppia-sort-options {
+    width: 160px;
+  }
+
+  .oppia-incomplete-exploration {
+    display: block;
+    padding: 5px 7.5px;
+  }
+
+  .oppia-dashboard-intro-button-extra {
+    margin-top: 13px;
+    width: 230px;
+  }
+
+  .oppia-incomplete-exploration-list {
+    display: inline-block;
+    margin-left: 1px;
+  }
+
+  .oppia-learner-playlist-tiles-extra {
+    display: block;
+    height: 145px;
+  }
+
+  .oppia-remove-icon {
+    color: black;
+  }
+
+  .oppia-exp-summary-tile {
+    height: 145px;
+  }
+
+  .oppia-learner-playlist-tiles-extra-info {
+    display: inline-block;
+    height: 145px;
+    margin-left: 1px;
+  }
+
+  .oppia-learner-dashboard-section {
+    margin-top: 5px;
+  }
+
+  .oppia-subscription-card-extra {
+    margin: 0 8px 0 4px;
+    width: 197px;
+  }
+
+  .oppia-subscription-name-container {
+    font-size: 17.5px;
+    margin-bottom: 5px;
+  }
+
+  .oppia-impact-text {
+    font-size: 14.5px;
+  }
+
+  .oppia-col-3 {
+    width: 21%;
+  }
+
+  .oppia-col-6 {
+    width: 58%;
+  }
+
+  .oppia-btn-secondary {
+    padding: 0 3px;
+  }
+
+  .oppia-exploration-title {
+    font-size: 105%;
+    margin-left: 7px;
+  }
+
+  .oppia-loading-text {
+    text-align: center;
+  }
+
+  .oppia-loading-feedbacks {
+    padding: 13px 8px 7px 8px;
+  }
+
+  .oppia-author-picture {
+    display: inline-block;
+  }
+
+  .oppia-navbar-profile-picture-extra {
+    margin-top: 4px;
+    min-width: 32px;
+  }
+
+  .oppia-update-status {
+    float: right;
+    margin-right: 15px;
+  }
+
+  .oppia-col-2 {
+    width: 8%;
+  }
+
+  .oppia-col-1 {
+    padding: 0;
+    width: 8%;
   }
 
 </style>

@@ -2,7 +2,7 @@
   <h3>Upload Thumbnail</h3>
 </div>
 
-<div class="modal-body" style="min-height: 300px;">
+<div class="modal-body oppia-modal-body">
   <div class="oppia-thumbnail-uploader">
     <div ng-hide="uploadedImage">
       <strong>Please upload an SVG image.</strong>
@@ -17,13 +17,13 @@
       <image-uploader on-file-changed="onFileChanged">
       </image-uploader>
     </div>
-    <div class="oppia-form-error" ng-if="invalidImageWarningIsShown" style="margin-top: 15px;">
+    <div class="oppia-form-error oppia-form-error-extra" ng-if="invalidImageWarningIsShown">
       Please upload a valid SVG image.
     </div>
-    <div class="oppia-form-error" ng-if="invalidTagsAndAttributes.tags.length" style="margin-top: 15px;">
+    <div class="oppia-form-error oppia-form-error-extra" ng-if="invalidTagsAndAttributes.tags.length">
       Unsupported SVG tags found: <[invalidTagsAndAttributes.tags]>
     </div>
-    <div class="oppia-form-error" ng-if="invalidTagsAndAttributes.attrs.length" style="margin-top: 15px;">
+    <div class="oppia-form-error oppia-form-error-extra" ng-if="invalidTagsAndAttributes.attrs.length">
       Unsupported SVG attributes found: <[invalidTagsAndAttributes.attrs]>
     </div>
     <div ng-show="uploadedImage">
@@ -138,6 +138,12 @@
     padding: 10px 16px 10px 16px;
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+  .oppia-modal-body {
+    min-height: 300px;
+  }
+  .oppia-form-error-extra {
+    margin-top: 15px;
   }
 
 </style>

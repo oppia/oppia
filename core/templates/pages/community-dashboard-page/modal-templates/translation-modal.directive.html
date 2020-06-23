@@ -33,7 +33,7 @@
       <div class="oppia-login-required-message">
         Oops! You haven't logged in yet.
         <br>
-        Log in <a style="color: #009688;" ng-click="$ctrl.onLoginButtonClicked()">here</a> to start contributing!
+        Log in <a class="oppia-login-button" ng-click="$ctrl.onLoginButtonClicked()">here</a> to start contributing!
       </div>
     </div>
 
@@ -102,5 +102,8 @@
   }
   .oppia-upload-translated-text-button {
     min-width: 200px;
+  }
+  .oppia-login-button {
+    color: #009688;
   }
 </style>

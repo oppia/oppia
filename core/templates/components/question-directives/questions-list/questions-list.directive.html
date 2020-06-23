@@ -1,15 +1,14 @@
-<button class="btn btn-secondary protractor-test-create-question-button"
-        ng-click="$ctrl.createQuestion()"
-        style="float: right;">
+<button class="btn btn-secondary oppia-create-question-button oppia-create-question-button protractor-test-create-question-button"
+        ng-click="$ctrl.createQuestion()">
   Create Question
 </button>
 <table class="dashboard-table" ng-if="$ctrl.getQuestionSummariesForOneSkill().length > 0">
   <colgroup>
-    <col style="width: 5%;">
-    <col style="width: 40%;">
-    <col style="width: 35%;">
-    <col style="width: 10%;">
-    <col style="width: 10%;">
+    <col class="oppia-colgroup-col-1">
+    <col class="oppia-colgroup-col-2">
+    <col class="oppia-colgroup-col-3">
+    <col class="oppia-colgroup-col-4">
+    <col class="oppia-colgroup-col-5">
   </colgroup>
   <tr>
     <th class="dashboard-table-headings">
@@ -38,8 +37,7 @@
     </th>
   </tr>
   <tr ng-repeat="questionSummaryForOneSkill in $ctrl.getQuestionSummariesForOneSkill()"
-      class="list-item protractor-test-question-list-item"
-      style="height: 4em;"
+      class="list-item oppia-question-list-item protractor-test-question-list-item"
       ng-click="$ctrl.editQuestion(questionSummaryForOneSkill.getQuestionSummary(), questionSummaryForOneSkill.getSkillDifficulty())"
       ng-dblclick="$event.stopPropagation()">
     <td> <[$ctrl.getQuestionIndex($index)]> </td>
@@ -59,7 +57,7 @@
     </td>
   </tr>
 </table>
-<h4 ng-if="$ctrl.getQuestionSummariesForOneSkill().length === 0" style="color: gray;">
+<h4 ng-if="$ctrl.getQuestionSummariesForOneSkill().length === 0" class="oppia-create-question"">
   Click on Create Question to create a new question.
 </h4>
 
@@ -130,5 +128,33 @@
     questions-list .list-summary .additional-text {
       display: none;
     }
+  }
+
+  .oppia-create-question-button {
+    float: right;
+  }
+
+  .oppia-colgroup-col-1 {
+    width: 5%;
+  }
+
+  .oppia-colgroup-col-2 {
+    width: 40%;
+  }
+
+  .oppia-colgroup-col-3 {
+    width: 35%;
+  }
+
+  .oppia-colgroup-col-4 .oppia-colgroup-col-5 {
+    width: 10%;
+  }
+
+  .oppia-question-list-item {
+    height: 4em;
+  }
+
+  .oppia-create-question {
+    color: gray;
   }
 </style>
