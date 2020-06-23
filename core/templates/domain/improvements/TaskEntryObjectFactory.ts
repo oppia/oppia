@@ -93,27 +93,27 @@ export class TaskEntry {
   }
 
   public isOpen(): boolean {
-    return this.taskStatus === ImprovementsConstants.TASK_STATUS_TYPE_OPEN;
+    return this.taskStatus === ImprovementsConstants.TASK_STATUS_OPEN;
   }
 
   public isObsolete(): boolean {
-    return this.taskStatus === ImprovementsConstants.TASK_STATUS_TYPE_OBSOLETE;
+    return this.taskStatus === ImprovementsConstants.TASK_STATUS_OBSOLETE;
   }
 
   public isResolved(): boolean {
-    return this.taskStatus === ImprovementsConstants.TASK_STATUS_TYPE_RESOLVED;
+    return this.taskStatus === ImprovementsConstants.TASK_STATUS_RESOLVED;
   }
 
   protected markAsOpen(): void {
-    this.taskStatus = ImprovementsConstants.TASK_STATUS_TYPE_OPEN;
+    this.taskStatus = ImprovementsConstants.TASK_STATUS_OPEN;
   }
 
   protected markAsObsolete(): void {
-    this.taskStatus = ImprovementsConstants.TASK_STATUS_TYPE_OBSOLETE;
+    this.taskStatus = ImprovementsConstants.TASK_STATUS_OBSOLETE;
   }
 
   protected markAsResolved(): void {
-    this.taskStatus = ImprovementsConstants.TASK_STATUS_TYPE_RESOLVED;
+    this.taskStatus = ImprovementsConstants.TASK_STATUS_RESOLVED;
   }
 }
 

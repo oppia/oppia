@@ -13,12 +13,11 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the SortedTiles visualization.
+ * @fileoverview Constants for profile page domain.
  */
 
-angular.module('oppia').directive('oppiaVisualizationSortedTiles', () => ({
-  restrict: 'E',
-  scope: { data: '<', options: '<' },
-  template: require('./oppia-visualization-sorted-tiles.directive.html'),
-  style: require('./oppia-visualization-sorted-tiles.directive.css'),
-}));
+export class ProfilePageDomainConstants {
+  public static PROFILE_SUBSCRIBE_URL = '/subscribehandler';
+  public static PROFILE_UNSUBSCRIBE_URL = '/unsubscribehandler';
+  public static PROFILE_DATA_URL = '/profilehandler/data/<username>';
+}
