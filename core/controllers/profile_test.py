@@ -289,9 +289,8 @@ class PreferencesHandlerTests(test_utils.GenericTestBase):
         self.login(self.OWNER_EMAIL)
         csrf_token = self.get_new_csrf_token()
         user_settings = user_services.get_user_settings(self.owner_id)
-        self.assertTrue(
-            user_settings.profile_picture_data_url.startswith(
-                'data:image/png;'))
+        self.assertTrue(test_utils.check_image_png_or_webp(
+            user_settings.profile_picture_data_url))
         self.put_json(
             feconf.PREFERENCES_DATA_URL,
             payload={'update_type': 'profile_picture_data_url',
@@ -934,7 +933,7 @@ class ExportAccountHandlerTests(test_utils.GenericTestBase):
                 u'general_feedback_email_reply_to_id_data': {},
                 u'collection_rights_snapshot_metadata_data': {},
                 u'task_entry_data': {
-                    u'task_ids_closed_by_user': [],
+                    u'task_ids_resolved_by_user': [],
                 },
             }
             self.assertEqual(
