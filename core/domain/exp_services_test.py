@@ -186,7 +186,7 @@ class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
         self.assertEqual(
             exp_services.get_exploration_titles_and_categories(['A']), {
                 'A': {
-                    'category': 'A category',
+                    'category': 'Algebra',
                     'title': 'TitleA'
                 }
             })
@@ -195,25 +195,25 @@ class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
         self.assertEqual(
             exp_services.get_exploration_titles_and_categories(['A']), {
                 'A': {
-                    'category': 'A category',
+                    'category': 'Algebra',
                     'title': 'TitleA'
                 }
             })
         self.assertEqual(
             exp_services.get_exploration_titles_and_categories(['A', 'B']), {
                 'A': {
-                    'category': 'A category',
+                    'category': 'Algebra',
                     'title': 'TitleA',
                 },
                 'B': {
-                    'category': 'A category',
+                    'category': 'Algebra',
                     'title': 'TitleB',
                 },
             })
         self.assertEqual(
             exp_services.get_exploration_titles_and_categories(['A', 'C']), {
                 'A': {
-                    'category': 'A category',
+                    'category': 'Algebra',
                     'title': 'TitleA'
                 }
             })
@@ -3764,7 +3764,7 @@ title: Old Title
         exploration = self.save_new_default_exploration('exp_id', 'user_id')
 
         self.assertEqual(exploration.title, 'A title')
-        self.assertEqual(exploration.category, 'A category')
+        self.assertEqual(exploration.category, 'Algebra')
         self.assertEqual(
             exploration.objective, feconf.DEFAULT_EXPLORATION_OBJECTIVE)
         self.assertEqual(exploration.language_code, 'en')
@@ -3775,7 +3775,7 @@ title: Old Title
         exploration = exp_fetchers.get_exploration_by_id('exp_id')
 
         self.assertEqual(exploration.title, 'A title')
-        self.assertEqual(exploration.category, 'A category')
+        self.assertEqual(exploration.category, 'Algebra')
         self.assertEqual(
             exploration.objective, feconf.DEFAULT_EXPLORATION_OBJECTIVE)
         self.assertEqual(exploration.language_code, 'en')

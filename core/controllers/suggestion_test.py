@@ -270,7 +270,8 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                 'default_state').to_dict(),
             'language_code': 'en',
             'question_state_data_schema_version': (
-                feconf.CURRENT_STATE_SCHEMA_VERSION)
+                feconf.CURRENT_STATE_SCHEMA_VERSION),
+            'linked_skill_ids': ['skill_id']
         }
 
         exp_id = 'new_exp_id'
@@ -1046,7 +1047,7 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
         self.SKILL_DESCRIPTION = 'skill to link question to'
         exploration = self.save_new_valid_exploration(
             self.EXP_ID, self.owner_id, title='Exploration title',
-            end_state_name='End State')
+            category='Algebra', end_state_name='End State')
         self.publish_exploration(self.owner_id, self.EXP_ID)
 
         topic = topic_domain.Topic.create_default_topic(
@@ -1086,9 +1087,6 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
 
         # Login and create exploration and suggestions.
         self.login(self.EDITOR_EMAIL)
-        self.save_new_linear_exp_with_state_names_and_interactions(
-            self.EXP_ID, self.editor_id, ['State 1', 'State 2', 'State 3'],
-            ['TextInput'], category='Algebra')
 
         exp_services.update_exploration(
             self.owner_id, self.EXP_ID, [
