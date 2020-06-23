@@ -93,7 +93,7 @@ export class TopicsAndSkillsDashboardBackendApiService {
         status: filter.status,
         sort: filter.sort,
         keywords: filter.keywords,
-        num_skills_to_fetch: parseInt(itemsPerPage),
+        num_skills_to_fetch: itemsPerPage,
         next_cursor: nextCursor
       }).toPromise();
   }

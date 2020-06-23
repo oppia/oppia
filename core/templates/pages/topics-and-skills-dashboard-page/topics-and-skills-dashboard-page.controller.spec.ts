@@ -379,7 +379,7 @@ describe('Topics and Skills Dashboard Page', function() {
       function() {
         expect(ctrl.activeTab).toEqual('skills');
         ctrl.more = false;
-        spyOn(ctrl, 'isSkillPagePresent').and.returnValue(true);
+        spyOn(ctrl, 'isNextSkillPagePresent').and.returnValue(true);
         var paginateSkillSpy = spyOn(ctrl, 'goToPageNumber');
         ctrl.navigateSkillPage('next_page');
         expect(paginateSkillSpy).toHaveBeenCalled();

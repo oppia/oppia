@@ -163,15 +163,15 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
           /**
            * Tells whether the next skill page is present in memory or not.
            * This case occurs when the next page is fetched from the backend
-           * and then me move the page back, we the next page is still in
-           * memory. So instead of making the backend call, we just check if
-           * the next page is present in memory.
+           * and then me move back one page, but the next page is still in
+           * memory. So instead of making the backend call for the next page,
+           * we first check if the next page is present in memory.
            * @returns {Boolean} - Whether the next page is present or not.
            */
-          ctrl.isSkillPagePresent = function() {
+          ctrl.isNextSkillPagePresent = function() {
             var totalSkillsPresent = ctrl.skillSummaries.length;
             // Here +1 is used since we are checking the next page and
-            // another +1 because page numbers starts from 0.
+            // another +1 because page numbers start from 0.
             var numberOfSkillsRequired = (
               (ctrl.skillPageNumber + 2) * ctrl.itemsPerPage);
 
@@ -255,7 +255,7 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
 
           ctrl.navigateSkillPage = function(direction) {
             if (direction === ctrl.MOVE_TO_NEXT_PAGE) {
-              if (ctrl.isSkillPagePresent()) {
+              if (ctrl.isNextSkillPagePresent()) {
                 ctrl.goToPageNumber(ctrl.pageNumber + 1);
               } else {
                 ctrl.fetchSkills();

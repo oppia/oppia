@@ -258,7 +258,7 @@ def _get_skill_summaries_in_batches(
                 batch. If False, there are no further results after this batch.
     """
     # The fetched skills will be filtered afterwards and filtering may result
-    # in having less number of skills than requested. Hence,  fetching twice
+    # in having less number of skills than requested. Hence, fetching twice
     # the number of requested skills will help reduce the number of datastore
     # calls.
     skill_summaries_models, new_urlsafe_start_cursor, more = (
@@ -439,8 +439,8 @@ def _filter_skills_by_classroom(augmented_skill_summaries, classroom_name):
             is assigned to.
 
     Returns:
-        list(AugmentedSkillSummary). The list of augmented
-        skill summaries with the given classroom name.
+        list(AugmentedSkillSummary). The list of augmented skill summaries with
+         the given classroom name.
     """
 
     if classroom_name is None or classroom_name == 'All':

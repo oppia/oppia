@@ -286,7 +286,16 @@ class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
                 'num_skills_to_fetch': 1,
             }, csrf_token=csrf_token)
 
+        # Default sort is newly created first, and hence the following order
+        # because skill with skill_id is created last, then the skill with
+        # subtopic_skill_id and then the skill with linked_skill_id is created
+        # first.
         self.assertEqual(len(json_response['skill_summary_dicts']), 2)
+        self.assertEqual(
+            json_response['skill_summary_dicts'][0]['id'], skill_id)
+        self.assertEqual(
+            json_response['skill_summary_dicts'][1]['id'],
+            self.subtopic_skill_id)
         self.assertTrue(json_response['more'])
         self.assertTrue(
             isinstance(json_response['next_cursor'], python_utils.BASESTRING))
@@ -300,6 +309,8 @@ class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
             }, csrf_token=csrf_token)
 
         self.assertEqual(len(json_response['skill_summary_dicts']), 1)
+        self.assertEqual(
+            json_response['skill_summary_dicts'][0]['id'], self.linked_skill_id)
         self.assertFalse(json_response['more'])
         self.assertEqual(json_response['next_cursor'], None)
 
@@ -412,7 +423,7 @@ class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
             expected_status_int=400)
 
         self.assertEqual(
-            json_response['error'], 'Sort by should be a string.')
+            json_response['error'], 'Sort by value should be a string.')
 
 
 class NewTopicHandlerTests(BaseTopicsAndSkillsDashboardTests):
