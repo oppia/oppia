@@ -75,7 +75,7 @@ class CodeOwnerLinterTests(test_utils.GenericTestBase):
         self.print_swap = self.swap(python_utils, 'PRINT', mock_print)
 
     def test_extra_important_pattern_not_in_list_in_the_codeowner_file(self):
-        #Remove one important path from the end of list for testing purpose.
+        # Remove one important path from the end of list for testing purpose.
         mock_codeowner_important_paths = CODEOWNER_IMPORTANT_PATHS[:-1]
 
         codeowner_important_paths_swap = self.swap(
