@@ -1,73 +1,262 @@
 <div ng-model="$ctrl.data" ui-validate="'$ctrl.validate()'" class="fs-container">
-  <div ng-if="!$ctrl.isDiagramSaved()"  class="diagram-editor-size-toolbar">
-    Width: <input type="number" ng-model="$ctrl.diagramWidth" ng-blur="$ctrl.onWidthInputBlur()" max="$ctrl.maxDiagramWidth">
-    Height: <input type="number" ng-model="$ctrl.diagramHeight" ng-blur="$ctrl.onHeightInputBlur()" max="$ctrl.maxDiagramHeight">
-    <i class="material-icons"
-       title="<[$ctrl.getDiagramSizeInfo()]>">
-        &#xE887;
+  <div ng-if="!$ctrl.isDiagramSaved()" class="diagram-editor-size-toolbar">
+    Width: <input type="number" ng-model="$ctrl.diagramWidth" ng-blur="$ctrl.onWidthInputBlur()"
+                  max="$ctrl.maxDiagramWidth">
+    Height: <input type="number" ng-model="$ctrl.diagramHeight" ng-blur="$ctrl.onHeightInputBlur()"
+                   max="$ctrl.maxDiagramHeight">
+    <i class="material-icons" title="<[$ctrl.getDiagramSizeInfo()]>">
+      &#xE887;
     </i>
   </div>
-  <div ng-attr-id="<[$ctrl.lcID]>" ng-if="!$ctrl.isDiagramSaved()">
+  <div class="svg-editor" ng-if="!$ctrl.isDiagramSaved()">
+    <div class="fabric-canvas">
+      <canvas ng-attr-id="<[$ctrl.canvasID]>"></canvas>
+    </div>
+    <div class="vertical-toolbar">
+      <div>
+        <button class="icon-tool toolbar-button thin-button" ng-class="{'disabled' : !$ctrl.isPencilEnabled()}"
+                ng-click="$ctrl.togglePencilDrawing()"
+                tooltip-placement="left" uib-tooltip="Pencil" ng-disabled="!$ctrl.isPencilEnabled()">
+          <i class="fas fa-pencil-alt"></i>
+        </button>
+        <button class="icon-tool toolbar-button thin-button" ng-class="{'disabled' : !$ctrl.areAllToolsEnabled()}"
+                ng-click="$ctrl.createLine()"
+                tooltip-placement="right" uib-tooltip="Line" ng-disabled="!$ctrl.areAllToolsEnabled()">
+          <i class="fas fa-slash" style="font-size: 19px;"></i>
+        </button>
+        <button class="icon-tool toolbar-button thin-button" ng-class="{'disabled' : !$ctrl.areAllToolsEnabled()}"
+                ng-click="$ctrl.createRect()"
+                tooltip-placement="left" uib-tooltip="Rectangle" ng-disabled="!$ctrl.areAllToolsEnabled()">
+          <i class="far fa-square"></i>
+        </button>
+        <button class="icon-tool toolbar-button thin-button" ng-class="{'disabled' : !$ctrl.areAllToolsEnabled()}"
+                ng-click="$ctrl.createCircle()"
+                tooltip-placement="right" uib-tooltip="Circle" ng-disabled="!$ctrl.areAllToolsEnabled()">
+          <i class="far fa-circle"></i>
+        </button>
+        <button class="icon-tool toolbar-button thin-button" ng-class="{'disabled' : !$ctrl.areAllToolsEnabled()}"
+                ng-click="$ctrl.createText()"
+                tooltip-placement="left" uib-tooltip="Text" ng-disabled="!$ctrl.areAllToolsEnabled()">
+          <i class="fas fa-font"></i>
+        </button>
+        <button class="icon-tool toolbar-button thin-button" ng-class="{'disabled' : !$ctrl.isClosedPolygonEnabled()}"
+                style="background-image:url(/assets/svg_diagram_editor/closed_polygon.svg);"
+                ng-click="$ctrl.createClosedPolygon()" tooltip-placement="right" uib-tooltip="Closed Polygon"
+                ng-disabled="!$ctrl.isClosedPolygonEnabled()">
+        </button>
+        <button class="icon-tool toolbar-button thin-button" ng-class="{'disabled' : !$ctrl.isOpenPolygonEnabled()}"
+                style="background-image:url(/assets/svg_diagram_editor/open_polygon.svg);"
+                ng-click="$ctrl.createOpenPolygon()" tooltip-placement="left" uib-tooltip="Open Polygon"
+                ng-disabled="!$ctrl.isOpenPolygonEnabled()">
+        </button>
+        <button class="icon-tool toolbar-button thin-button" ng-class="{'disabled' : !$ctrl.isEyeDropperEnabled()}"
+                ng-click="$ctrl.copyColor()"
+                tooltip-placement="right" uib-tooltip="Eye Dropper" ng-disabled="!$ctrl.isEyeDropperEnabled()">
+          <i class="fas fa-eye-dropper"></i>
+        </button>
+        <div class="vert-bottom-toolbar">
+          <div>
+            <div class="color-well">
+              <div>Stroke</div>
+              <div id="stroke-color" class="colorPicker"></div>
+            </div>
+            <div class="color-well">
+              <div>Fill</div>
+              <div id="fill-color" class="colorPicker"></div>
+            </div>
+            <div class="color-well">
+              <div>bg</div>
+              <div id="bg-color" class="colorPicker"></div>
+            </div>
+          </div>
+          <div>
+            <button class="icon-tool toolbar-button thin-button" ng-class="{'disabled' : !$ctrl.objectUndoStack.length}"
+                    ng-click="$ctrl.onUndo()"
+                    ng-disabled="!$ctrl.objectUndoStack.length">
+              <i class="fas fa-undo"></i>
+            </button>
+            <button class="icon-tool toolbar-button thin-button" ng-class="{'disabled' : !$ctrl.objectRedoStack.length}"
+                    ng-click="$ctrl.onRedo()"
+                    ng-disabled="!$ctrl.objectRedoStack.length">
+              <i class="fas fa-redo"></i>
+            </button>
+          </div>
+          <button class="toolbar-button fat-button" ng-click="$ctrl.removeShape()"
+                  ng-disabled="!$ctrl.enableRemoveButton">
+            Remove
+          </button>
+          <button class="toolbar-button fat-button" ng-click="$ctrl.onClear()">
+            Clear
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="horizontal-toolbar">
+      <div class="input-tag" ng-if="$ctrl.displayFontStyles">
+        <input type="checkbox" ng-model="$ctrl.fabricjsOptions.italic" ng-change="$ctrl.onItalicToggle()">
+        <span style="padding-left: 3px;">Italic</span>
+      </div>
+      <div class="input-tag" ng-if="$ctrl.displayFontStyles">
+        <input type="checkbox" ng-model="$ctrl.fabricjsOptions.bold" ng-change="$ctrl.onBoldToggle()">
+        <span style="padding-left: 3px;">Bold</span>
+      </div>
+      <div class="input-tag" ng-if="$ctrl.displayFontStyles">
+        <select ng-model="$ctrl.fabricjsOptions.fontFamily" ng-options="font for font in $ctrl.fontFamily"
+                ng-change="$ctrl.onFontChange()">
+        </select>
+      </div>
+      <div class="input-tag">
+        <select ng-model="$ctrl.fabricjsOptions.size" ng-options="size for size in $ctrl.sizes"
+                ng-change="$ctrl.onSizeChange()">
+        </select>
+      </div>
+      <div class="input-tag" ng-if="$ctrl.isDrawModePencil()" style="color: #f00101;">
+        Click the pencil button to exit free drawing mode.
+      </div>
+      <div class="input-tag" ng-if="$ctrl.isDrawModePolygon()" style="color: #f00101;">
+        Double click to complete the polygon.
+      </div>
+    </div>
   </div>
   <div ng-if="$ctrl.isDiagramSaved()">
     <div class="diagram-editor-saved-image-container">
-      <i class="material-icons diagram-editor-edit"
-         ng-click="$ctrl.continueDiagramEditing()"
+      <i class="material-icons diagram-editor-edit edit-icon" ng-click="$ctrl.continueDiagramEditing()"
          title="Continue editing the diagram">
-         &#xE254;
+        &#xE254;
       </i>
       <img ng-src="<[$ctrl.data.savedSVGUrl]>" ng-style="$ctrl.svgContainerStyle">
     </div>
   </div>
   <div ng-if="$ctrl.isDiagramCreated()" class="diagram-editor-save-box">
-    <button type="button"
-            class="btn btn-success"
-            ng-click="$ctrl.saveSVGFile()"
-            ng-disabled="$ctrl.isUserDrawing()">
+    <button type="button" class="btn btn-success" ng-click="$ctrl.saveSVGFile()" ng-disabled="$ctrl.isUserDrawing()">
       Use This Image
     </button>
   </div>
 </div>
+<style>
+  .diagram-editor-saved-image-container {
+    position: relative;
+  }
 
-<style type="text/css">
-  .diagram-editor-edit {
+  .diagram-editor-saved-image-container .edit-icon {
     color: #000000;
     position: absolute;
     right: 6px;
     text-shadow: 0px 0px 1px #ffffff;
     top: 6px;
-    cursor: pointer;
   }
 
-  .diagram-editor-save-box {
-    margin-top: 6px;
-    text-align: right;
-  }
-
-  .diagram-editor-saved-image-container {
-    position: relative;
-    margin: 0 auto;
-    display: inline-block;
-    background-color: #ff0000;
-  }
-
-  .diagram-editor-saved-image-container img {
+  .svg-editor {
     background-color: #ffffff;
-  }
-
-  .diagram-editor-size-toolbar {
-    padding: 4px;
-    text-align: left;
-  }
-
-  .fs-container {
-    width: 100%;
-    margin: auto;
-  }
-
-  .literally {
-    width: 100%;
-    height: 100%;
+    min-height: 400px;
     position: relative;
+  }
+
+  .svg-editor>* {
+    position: absolute
+  }
+
+  .svg-editor,
+  .svg-editor * {
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box
+  }
+
+  .svg-editor .fabric-canvas {
+    border: 1px solid #555555;
+    bottom: 31px;
+    cursor: default;
+    left: 62px;
+    right: 0;
+    top: 0;
+  }
+
+  .svg-editor .horizontal-toolbar {
+    background-color: #ffffff;
+    border: 1px solid #555555;
+    height: 31px;
+    left: 62px;
+    right: 0;
+    bottom: 0;
+  }
+
+  .svg-editor .horizontal-toolbar .input-tag {
+    border-radius: 3px;
+    float: left;
+    font-size: 13px;
+    height: 28px;
+    margin: 1px;
+    padding-left: 3px;
+    padding-top: 5px;
+    position: relative;
+  }
+
+  .svg-editor .vertical-toolbar {
+    background-color: #ffffff;
+    border: 1px solid #555555;
+    bottom: 0;
+    left: 0;
+    top: 0;
+    width: 62px;
+  }
+
+  .svg-editor .vertical-toolbar .fat-button {
+    clear: both;
+    font-size: 13px;
+    width: 57px
+  }
+
+  .svg-editor .vertical-toolbar .icon-tool {
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: 100% auto;
+    font-size: 24px;
+  }
+
+  .svg-editor .vertical-toolbar .icon-tool.disabled {
+    opacity: 0.4;
+    filter: alpha(opacity=40);
+  }
+
+  .svg-editor .vertical-toolbar .thin-button {
+    float: left;
+    position: relative;
+    width: 26px;
+  }
+
+  .svg-editor .vertical-toolbar .toolbar-button {
+    background-color: #ffffff;
+    border: 2px solid transparent;
+    border-radius: 3px;
+    height: 26px;
+    line-height: 26px;
+    margin: 2px;
+    padding: 0;
+    text-align: center;
+  }
+
+  .svg-editor .vertical-toolbar .vert-bottom-toolbar {
+    bottom: 0;
+    left: 0;
+    position: absolute;
+    right: 0
+  }
+
+  .svg-editor .vertical-toolbar .vert-bottom-toolbar .color-well {
+    float: left;
+    font-size: 10px;
+    text-align: center;
+    padding-bottom: 3px;
+    width: 60px
+  }
+
+  .svg-editor .vertical-toolbar .vert-bottom-toolbar .color-well .colorPicker {
+    border: 1px solid #000000;
+    border-radius: 3px;
+    height: 28px;
+    margin: 0 auto;
+    width: 28px;
+    background-color: #000000;
   }
 </style>
