@@ -118,7 +118,7 @@ class UserSettings(python_utils.OBJECT):
                 picture as a dataURI string.
             default_dashboard: str|None. The default dashboard of the user.
             creator_dashboard_display_pref: str. The creator dashboard
-            dashboard of the user.
+                dashboard of the user.
             user_bio: str. User-specified biography.
             subject_interests: list(str) or None. Subject interests specified by
                 the user.
@@ -729,7 +729,7 @@ def _transform_user_settings(user_settings_model):
         user_settings_model: UserSettingsModel.
 
     Returns:
-         UserSettings. Domain object for user settings.
+        UserSettings. Domain object for user settings.
     """
     if user_settings_model:
         return UserSettings(
@@ -1126,7 +1126,7 @@ def get_human_readable_user_ids(user_ids):
 
     Raises:
         Exception: At least one of the user_ids does not correspond to a valid
-        UserSettingsModel.
+            UserSettingsModel.
     """
     users_settings = get_users_settings(user_ids)
     usernames = []

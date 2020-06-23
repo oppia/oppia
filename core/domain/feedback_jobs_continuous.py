@@ -64,8 +64,8 @@ class FeedbackAnalyticsAggregator(jobs.BaseContinuousComputationManager):
 
         Returns:
             ndb.model.MetaModel. Datastore class used by the
-                realtime layer, which should be a subclass of
-                BaseRealtimeDatastoreClassForContinuousComputations.
+            realtime layer, which should be a subclass of
+            BaseRealtimeDatastoreClassForContinuousComputations.
         """
         return FeedbackAnalyticsRealtimeModel
 
@@ -249,9 +249,9 @@ class FeedbackAnalyticsMRJobManager(
                 instance.
 
         Yields:
-            A tuple of two elements:
-              - str. The exploration id associated to the feedback thread.
-              - str. The feedback thread's status.
+            (tuple). A tuple of two elements:
+                - str. The exploration id associated to the feedback thread.
+                - str. The feedback thread's status.
         """
         yield (item.entity_id, item.status)
 

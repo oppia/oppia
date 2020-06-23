@@ -147,7 +147,7 @@ class GcsFileSystem(GeneralFileSystem):
 
         Returns:
             FileStream or None. It returns FileStream
-                domain object if the file exists. Otherwise, it returns None.
+            domain object if the file exists. Otherwise, it returns None.
         """
         if self.isfile(filepath):
             bucket_name = app_identity_services.get_gcs_resource_bucket_name()
@@ -162,7 +162,8 @@ class GcsFileSystem(GeneralFileSystem):
             return None
 
     def commit(self, filepath, raw_bytes, mimetype):
-        """Args:
+        """Commit to file.
+        Args:
             filepath: str. The path to the relevant file within the entity's
                 assets folder.
             raw_bytes: str. The content to be stored in the file.
