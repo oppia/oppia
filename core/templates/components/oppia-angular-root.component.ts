@@ -888,6 +888,7 @@ private explorationObjectFactory: ExplorationObjectFactory,
 private explorationOpportunitySummaryObjectFactory: ExplorationOpportunitySummaryObjectFactory,
 private expressionParserService: ExpressionParserService,
 private explorationRecommendationsService: ExplorationRecommendationsService,
+private explorationTaskObjectFactory: ExplorationTaskObjectFactory,
 private expressionSyntaxTreeService: ExpressionSyntaxTreeService,
 private extensionTagAssemblerService: ExtensionTagAssemblerService,
 private extractImageFilenamesFromStateService: ExtractImageFilenamesFromStateService,
@@ -904,6 +905,7 @@ private graphInputValidationService: GraphInputValidationService,
 private graphUtilsService: GraphUtilsService,
 private guestCollectionProgressObjectFactory: GuestCollectionProgressObjectFactory,
 private guestCollectionProgressService: GuestCollectionProgressService,
+private highBounceRateTaskObjectFactory: HighBounceRateTaskObjectFactory,
 private hintObjectFactory: HintObjectFactory,
 private htmlEscaperService: HtmlEscaperService,
 private i18nLanguageCodeService: I18nLanguageCodeService,
@@ -912,6 +914,7 @@ private imageClickInputValidationService: ImageClickInputValidationService,
 private imageFileObjectFactory: ImageFileObjectFactory,
 private improvementActionButtonObjectFactory: ImprovementActionButtonObjectFactory,
 private improvementsService: ImprovementsService,
+private ineffectiveFeedbackLoopTaskObjectFactory: IneffectiveFeedbackLoopTaskObjectFactory,
 private interactionDetailsCacheService: InteractionDetailsCacheService,
 private interactionObjectFactory: InteractionObjectFactory,
 private interactionRulesRegistryService: InteractionRulesRegistryService,
@@ -939,6 +942,7 @@ private misconceptionObjectFactory: MisconceptionObjectFactory,
 private multipleChoiceInputValidationService: MultipleChoiceInputValidationService,
 private musicNotesInputValidationService: MusicNotesInputValidationService,
 private musicPhrasePlayerService: MusicPhrasePlayerService,
+private needsGuidingResponsesTaskObjectFactory: NeedsGuidingResponsesTaskObjectFactory,
 private newlyCreatedTopicObjectFactory: NewlyCreatedTopicObjectFactory,
 private normalizeWhitespacePipe: NormalizeWhitespacePipe,
 private normalizeWhitespacePunctuationAndCasePipe: NormalizeWhitespacePunctuationAndCasePipe,
@@ -1034,6 +1038,7 @@ private subtopicObjectFactory: SubtopicObjectFactory,
 private subtopicPageContentsObjectFactory: SubtopicPageContentsObjectFactory,
 private subtopicPageObjectFactory: SubtopicPageObjectFactory,
 private subtopicViewerBackendApiService: SubtopicViewerBackendApiService,
+private successiveIncorrectAnswersTaskObjectFactory: SuccessiveIncorrectAnswersTaskObjectFactory,
 private suggestionModalService: SuggestionModalService,
 private suggestionObjectFactory: SuggestionObjectFactory,
 private suggestionThreadObjectFactory: SuggestionThreadObjectFactory,
@@ -1141,6 +1146,7 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.explorationOpportunitySummaryObjectFactory = this.explorationOpportunitySummaryObjectFactory;
     OppiaAngularRootComponent.expressionParserService = this.expressionParserService;
     OppiaAngularRootComponent.explorationRecommendationsService = this.explorationRecommendationsService;
+    OppiaAngularRootComponent.explorationTaskObjectFactory = this.explorationTaskObjectFactory;
     OppiaAngularRootComponent.expressionSyntaxTreeService = this.expressionSyntaxTreeService;
     OppiaAngularRootComponent.extensionTagAssemblerService = this.extensionTagAssemblerService;
     OppiaAngularRootComponent.extractImageFilenamesFromStateService = this.extractImageFilenamesFromStateService;
@@ -1157,6 +1163,7 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.graphUtilsService = this.graphUtilsService;
     OppiaAngularRootComponent.guestCollectionProgressObjectFactory = this.guestCollectionProgressObjectFactory;
     OppiaAngularRootComponent.guestCollectionProgressService = this.guestCollectionProgressService;
+    OppiaAngularRootComponent.highBounceRateTaskObjectFactory = this.highBounceRateTaskObjectFactory;
     OppiaAngularRootComponent.hintObjectFactory = this.hintObjectFactory;
     OppiaAngularRootComponent.htmlEscaperService = this.htmlEscaperService;
     OppiaAngularRootComponent.i18nLanguageCodeService = this.i18nLanguageCodeService;
@@ -1166,6 +1173,7 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.improvementActionButtonObjectFactory = this.improvementActionButtonObjectFactory;
     OppiaAngularRootComponent.improvementsService = this.improvementsService;
     OppiaAngularRootComponent.interactionDetailsCacheService = this.interactionDetailsCacheService;
+    OppiaAngularRootComponent.ineffectiveFeedbackLoopTaskObjectFactory = this.ineffectiveFeedbackLoopTaskObjectFactory;
     OppiaAngularRootComponent.interactionObjectFactory = this.interactionObjectFactory;
     OppiaAngularRootComponent.interactionRulesRegistryService = this.interactionRulesRegistryService;
     OppiaAngularRootComponent.interactionSpecsService = this.interactionSpecsService;
@@ -1193,6 +1201,7 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.musicNotesInputValidationService = this.musicNotesInputValidationService;
     OppiaAngularRootComponent.musicPhrasePlayerService = this.musicPhrasePlayerService;
     OppiaAngularRootComponent.newlyCreatedTopicObjectFactory = this.newlyCreatedTopicObjectFactory;
+    OppiaAngularRootComponent.needsGuidingResponsesTaskObjectFactory = this.needsGuidingResponsesTaskObjectFactory;
     OppiaAngularRootComponent.normalizeWhitespacePipe = this.normalizeWhitespacePipe;
     OppiaAngularRootComponent.normalizeWhitespacePunctuationAndCasePipe = this.normalizeWhitespacePunctuationAndCasePipe;
     OppiaAngularRootComponent.numberAttemptsService = this.numberAttemptsService;
@@ -1287,6 +1296,7 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.subtopicPageContentsObjectFactory = this.subtopicPageContentsObjectFactory;
     OppiaAngularRootComponent.subtopicPageObjectFactory = this.subtopicPageObjectFactory;
     OppiaAngularRootComponent.subtopicViewerBackendApiService = this.subtopicViewerBackendApiService;
+    OppiaAngularRootComponent.successiveIncorrectAnswersTaskObjectFactory = this.successiveIncorrectAnswersTaskObjectFactory;
     OppiaAngularRootComponent.suggestionModalService = this.suggestionModalService;
     OppiaAngularRootComponent.suggestionObjectFactory = this.suggestionObjectFactory;
     OppiaAngularRootComponent.suggestionThreadObjectFactory = this.suggestionThreadObjectFactory;
