@@ -1,45 +1,10 @@
-<div ng-if="$ctrl.options.header">
-  <strong><[$ctrl.options.header]></strong>
+<div ng-if="options.header">
+  <strong><[options.header]></strong>
   <hr>
 </div>
 <ol class="oppia-visualization-sorted-tiles">
-  <li class="oppia-visualization-sorted-tiles-tile" ng-repeat="datum in $ctrl.data">
-    <div class="oppia-visualization-sorted-tiles-tile-answer">
-      <[datum.answer]>
-    </div>
-    <div class="oppia-visualization-sorted-tiles-tile-frequency">
-      <[datum.frequency]> times
-    </div>
+  <li class="oppia-visualization-sorted-tiles-tile" ng-repeat="datum in data">
+    <div class="oppia-visualization-sorted-tiles-tile-answer"><[datum.answer]></div>
+    <div class="oppia-visualization-sorted-tiles-tile-frequency"><[datum.frequency]> times</div>
   </li>
 </ol>
-
-<style>
-  ol.oppia-visualization-sorted-tiles {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-  }
-  li.oppia-visualization-sorted-tiles-tile {
-    background-color: rgba(245,245,245,1);
-    border-radius: 27px;
-    display: inline-block;
-    margin-right: 22px;
-    min-width: 100px;
-    padding: 25px;
-  }
-  li.oppia-visualization-sorted-tiles-tile .oppia-visualization-sorted-tiles-tile-answer {
-    color: rgba(0,0,0,0.87);
-    font-family: "Roboto", Arial, sans-serif;
-    font-size: 14px;
-    letter-spacing: 0.22px;
-    line-height: 16px;
-  }
-  li.oppia-visualization-sorted-tiles-tile .oppia-visualization-sorted-tiles-tile-frequency {
-    color: rgba(0,0,0,0.54);
-    font-family: "Roboto", Arial, sans-serif;
-    font-size: 14px;
-    letter-spacing: 0.24px;
-    line-height: 16px;
-    margin-top: 7px;
-  }
-</style>
