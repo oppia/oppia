@@ -38,6 +38,7 @@ describe('Topic editor page', function() {
       $provide.value(key, value);
     }
   }));
+
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     var $rootScope = $injector.get('$rootScope');
     ContextService = $injector.get('ContextService');

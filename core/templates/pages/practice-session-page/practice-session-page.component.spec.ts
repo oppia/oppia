@@ -37,6 +37,7 @@ describe('Practice session page', function() {
       $provide.value(key, value);
     }
   }));
+
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     $httpBackend = $injector.get('$httpBackend');
     var $q = $injector.get('$q');

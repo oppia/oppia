@@ -42,12 +42,14 @@ describe('Story editor page', function() {
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('$window', mockedWindow);
   }));
+
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
     }
   }));
+
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     $q = $injector.get('$q');
     var $rootScope = $injector.get('$rootScope');
