@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for uploading images.
+ * @fileoverview Directive for previewing thumbnails.
  */
 
 require('services/image-upload-helper.service.ts');

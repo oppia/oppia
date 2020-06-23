@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for new subtopic title modal.
+ * @fileoverview Controller for create new subtopic modal controller.
  */
 
 require('domain/exploration/SubtitledHtmlObjectFactory.ts');

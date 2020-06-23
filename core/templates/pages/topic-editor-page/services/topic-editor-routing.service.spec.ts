@@ -1,4 +1,4 @@
-// Copyright 2018 The Oppia Authors. All Rights Reserved.
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@
  */
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
-// topic-editor-state.service.ts is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
@@ -84,11 +83,11 @@ describe('Topic editor routing service', function() {
   });
 
   it('should navigate to skill editor', function() {
-    spyOn($window, 'open' ).and.callFake( function() {
+    spyOn($window, 'open').and.callFake(function() {
       return true;
-    } );
+    });
     TopicEditorRoutingService.navigateToSkillEditorWithId('10');
-    expect( $window.open ).toHaveBeenCalled();
-    expect( $window.open ).toHaveBeenCalledWith( '/skill_editor/10' );
+    expect($window.open).toHaveBeenCalled();
+    expect($window.open).toHaveBeenCalledWith('/skill_editor/10');
   });
 });

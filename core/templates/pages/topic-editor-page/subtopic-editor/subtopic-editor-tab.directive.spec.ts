@@ -14,7 +14,7 @@
 
 
 /**
- * @fileoverview Unit tests for the topics and skills dashboard directive.
+ * @fileoverview Unit tests for the subtopic editor tab directive.
  */
 
 import { UpgradedServices } from 'services/UpgradedServices';

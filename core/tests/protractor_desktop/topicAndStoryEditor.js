@@ -73,7 +73,6 @@ describe('Topic editor functionality', function() {
 
     await topicEditorPage.get(topicId);
     await topicEditorPage.expectNumberOfSubtopicsToBe(1);
-
     await topicEditorPage.deleteSubtopicWithIndex(0);
     await topicEditorPage.expectNumberOfSubtopicsToBe(0);
   });

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for TopicEditorRoutingService.
+ * @fileoverview Unit tests for EntityCreationService.
  */
 
 // TODO(#7222): Remove the following block of unnnecessary imports once

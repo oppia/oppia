@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the topic editor page.
+ * @fileoverview Component for the topic editor page.
  */
 
 require('interactions/interactionsQuestionsRequires.ts');

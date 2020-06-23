@@ -14,7 +14,7 @@
 
 
 /**
- * @fileoverview Unit tests for the topics and skills dashboard directive.
+ * @fileoverview Unit tests for the topic editor tab directive.
  */
 
 // TODO(#7222): Remove the following block of unnnecessary imports once

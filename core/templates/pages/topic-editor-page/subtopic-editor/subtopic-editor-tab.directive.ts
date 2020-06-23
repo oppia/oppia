@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for the subtopics list editor.
+ * @fileoverview Controller for the subtopics editor tab directive.
  */
 require(
   'components/forms/custom-forms-directives/thumbnail-uploader.directive.ts');
