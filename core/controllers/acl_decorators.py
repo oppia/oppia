@@ -2034,7 +2034,7 @@ def can_delete_topic(handler):
 
     Returns:
         function. The newly decorated function that now also
-            checks if the user can delete a given topic.
+        checks if the user can delete a given topic.
     """
 
     def test_can_delete_topic(self, topic_id, **kwargs):
@@ -2484,8 +2484,8 @@ def get_decorator_for_accepting_suggestion(decorator):
 
         Returns:
             function. The newly decorated function that has common
-                checks and permissions specified by passed in
-                decorator.
+            checks and permissions specified by passed in
+            decorator.
 
         Raises:
             NotLoggedInException: The user is not logged in.
@@ -2502,7 +2502,7 @@ def get_decorator_for_accepting_suggestion(decorator):
 
             Returns:
                 function. The (possibly-decorated) handler for accepting a
-                    suggestion.
+                suggestion.
 
             Raises:
                 NotLoggedInException: The user is not logged in.
