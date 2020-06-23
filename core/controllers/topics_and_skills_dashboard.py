@@ -206,7 +206,7 @@ class SkillsDashboardPageDataHandler(base.BaseHandler):
         if (sort_by is not None and
                 not isinstance(sort_by, python_utils.BASESTRING)):
             raise self.InvalidInputException(
-                'Sort by value should be a string.')
+                'The value of sort_by should be a string.')
 
         if (status is not None and
                 not isinstance(status, python_utils.BASESTRING)):

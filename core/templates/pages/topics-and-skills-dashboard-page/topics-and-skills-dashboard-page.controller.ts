@@ -163,7 +163,7 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
           /**
            * Tells whether the next skill page is present in memory or not.
            * This case occurs when the next page is fetched from the backend
-           * and then me move back one page, but the next page is still in
+           * and then we move back one page, but the next page is still in
            * memory. So instead of making the backend call for the next page,
            * we first check if the next page is present in memory.
            * @returns {Boolean} - Whether the next page is present or not.

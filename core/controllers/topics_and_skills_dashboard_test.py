@@ -286,10 +286,12 @@ class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
                 'num_skills_to_fetch': 1,
             }, csrf_token=csrf_token)
 
-        # Default sort is newly created first, and hence the following order
-        # because skill with skill_id is created last, then the skill with
-        # subtopic_skill_id and then the skill with linked_skill_id is created
-        # first.
+        # Default sort is "Newly created first". So, the skill with id-skill_id
+        # is the most "Newly created", and therefore it comes first. The skill
+        # with id-subtopic_skill_id was created before the above skill,
+        # so it comes second. Then the skill with id-linked_skill_id was created
+        # before the other two skills, hence it comes last because it is the
+        # least "Newly Created".
         self.assertEqual(len(json_response['skill_summary_dicts']), 2)
         self.assertEqual(
             json_response['skill_summary_dicts'][0]['id'], skill_id)
@@ -423,7 +425,7 @@ class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
             expected_status_int=400)
 
         self.assertEqual(
-            json_response['error'], 'Sort by value should be a string.')
+            json_response['error'], 'The value of sort_by should be a string.')
 
 
 class NewTopicHandlerTests(BaseTopicsAndSkillsDashboardTests):
