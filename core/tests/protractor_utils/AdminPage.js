@@ -312,28 +312,28 @@ var AdminPage = function() {
     await waitFor.pageToFullyLoad();
   };
 
-  this.uploadTopicSimilarities = 
+  this.uploadTopicSimilarities =
     async function(relativePathToSimilaritiesFile) {
-    absPath = path.resolve(__dirname, relativePathToSimilaritiesFile);
-    await waitFor.visibilityOf(chooseSimilarityFileInput,
-      'Similarity upload form is not visible');
-    await chooseSimilarityFileInput.sendKeys(absPath);
-    await waitFor.elementToBeClickable(similarityFileUploadButton,
-      'Upload button taking too long to be clickable');
-    await similarityFileUploadButton.click();
-  };
+      absPath = path.resolve(__dirname, relativePathToSimilaritiesFile);
+      await waitFor.visibilityOf(chooseSimilarityFileInput,
+        'Similarity upload form is not visible');
+      await chooseSimilarityFileInput.sendKeys(absPath);
+      await waitFor.elementToBeClickable(similarityFileUploadButton,
+        'Upload button taking too long to be clickable');
+      await similarityFileUploadButton.click();
+    };
 
   this.expectSimilaritiesToBeUploaded = async function() {
     await waitFor.textToBePresentInElement(statusMessage,
-      'Topic similarities uploaded successfully.')
+      'Topic similarities uploaded successfully.');
     return true;
   };
 
   this.expectUploadError = async function() {
     await statusMessage.getText().then((text) => {
-      if(text.match('Server')) {
+      if (text.match('Server')) {
         return true;
-      };
+      }
       return false;
     });
   };
@@ -378,17 +378,17 @@ var AdminPage = function() {
     return true;
   };
 
-  this.fillAndSubmitExtractDataForm = async function(explorationID, 
-    explorationVersion, stateName, numAnswers) {
-      await waitFor.pageToFullyLoad();
-      await extractDataExplorationIdInput.sendKeys(explorationID);
-      await extractDataExplorationVersionInput.sendKeys(explorationVersion);
-      await extractDataStateNameInput.sendKeys(stateName);
-      await extractDataNumAnswersInput.sendKeys(numAnswers);
-      await waitFor.elementToBeClickable(extractDataFormSubmitButton,
-        'Extract data form submit button not clickable');
-      await extractDataFormSubmitButton.click();
-    };
+  this.fillAndSubmitExtractDataForm = async function(explorationID,
+      explorationVersion, stateName, numAnswers) {
+        await waitFor.pageToFullyLoad();
+        await extractDataExplorationIdInput.sendKeys(explorationID);
+        await extractDataExplorationVersionInput.sendKeys(explorationVersion);
+        await extractDataStateNameInput.sendKeys(stateName);
+        await extractDataNumAnswersInput.sendKeys(numAnswers);
+        await waitFor.elementToBeClickable(extractDataFormSubmitButton,
+          'Extract data form submit button not clickable');
+        await extractDataFormSubmitButton.click();
+      };
 
   this.expectAllDataToBeExtracted = async function() {
     await browser.getAllWindowHandles().then((handles) => {
@@ -432,7 +432,7 @@ var AdminPage = function() {
     await newUsernameInput.sendKeys(newUsername);
     await waitFor.elementToBeClickable(usernameChangeSubmitButton,
       'Username change submit button not clickable');
-    await usernameChangeSubmitButton.click();  
+    await usernameChangeSubmitButton.click();
   };
 
   this.expectUsernameToBeChanged = async function(oldUsername, newUsername) {
