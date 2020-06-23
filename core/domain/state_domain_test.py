@@ -673,7 +673,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         exp_services.save_new_exploration('owner_id', exploration)
         html_list = state.get_all_html_content_strings()
-        self.assertEqual(html_list, ['<p>state content html</p>'])
+        self.assertEqual(html_list, ['', '<p>state content html</p>'])
 
     def test_export_state_to_dict(self):
         """Test exporting a state to a dict."""

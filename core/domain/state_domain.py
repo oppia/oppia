@@ -608,16 +608,6 @@ class InteractionInstance(python_utils.OBJECT):
             list(str): The list of all html content strings in the interaction.
         """
         html_list = []
-        if self.id is None:
-            return html_list
-
-        interaction = (
-            interaction_registry.Registry.get_interaction_by_id(
-                self.id))
-        html_field_types_to_rule_specs_dict = json.loads(
-            utils.get_file_contents(
-                feconf.HTML_FIELD_TYPES_TO_RULE_SPECS_FILE_PATH))
-
 
         for answer_group in self.answer_groups:
             html_list = html_list + answer_group.get_all_html_content_strings()
@@ -630,9 +620,19 @@ class InteractionInstance(python_utils.OBJECT):
             hint_html = hint.hint_content.html
             html_list = html_list + [hint_html]
 
+        if self.id is None:
+            return html_list
+
+        interaction = (
+            interaction_registry.Registry.get_interaction_by_id(
+                self.id))
+
         if self.solution and interaction.can_have_solution:
             solution_html = self.solution.explanation.html
             html_list = html_list + [solution_html]
+            html_field_types_to_rule_specs_dict = json.loads(
+                utils.get_file_contents(
+                    feconf.HTML_FIELD_TYPES_TO_RULE_SPECS_FILE_PATH))
 
             if self.solution.correct_answer:
                 for html_type in html_field_types_to_rule_specs_dict.keys():
