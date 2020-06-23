@@ -781,7 +781,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static subtopicPageContentsObjectFactory: SubtopicPageContentsObjectFactory;
   static subtopicPageObjectFactory: SubtopicPageObjectFactory;
   static subtopicViewerBackendApiService: SubtopicViewerBackendApiService;
-  static SuccessiveIncorrectAnswersTaskObjectFactory: SuccessiveIncorrectAnswersTaskObjectFactory;
+  static successiveIncorrectAnswersTaskObjectFactory: SuccessiveIncorrectAnswersTaskObjectFactory;
   static suggestionModalService: SuggestionModalService;
   static suggestionObjectFactory: SuggestionObjectFactory;
   static suggestionThreadObjectFactory: SuggestionThreadObjectFactory;
