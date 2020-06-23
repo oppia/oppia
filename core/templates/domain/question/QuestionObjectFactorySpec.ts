@@ -16,38 +16,13 @@
  * @fileoverview Tests for QuestionContentsObjectFactory.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// QuestionObjectFactory.ts is upgraded to Angular 8.
-import { AnswerGroupObjectFactory } from
-  'domain/exploration/AnswerGroupObjectFactory';
-import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
-import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
-import { MisconceptionObjectFactory } from
-  'domain/skill/MisconceptionObjectFactory';
-import { OutcomeObjectFactory } from
-  'domain/exploration/OutcomeObjectFactory';
-import { ParamChangeObjectFactory } from
-  'domain/exploration/ParamChangeObjectFactory';
-import { ParamChangesObjectFactory } from
-  'domain/exploration/ParamChangesObjectFactory';
-import { RecordedVoiceoversObjectFactory } from
-  'domain/exploration/RecordedVoiceoversObjectFactory';
-import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
-import { SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
-import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
-import { VoiceoverObjectFactory } from
-  'domain/exploration/VoiceoverObjectFactory';
-import { WrittenTranslationObjectFactory } from
-  'domain/exploration/WrittenTranslationObjectFactory';
-import { WrittenTranslationsObjectFactory } from
-  'domain/exploration/WrittenTranslationsObjectFactory';
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
+
 
 
 import { TestBed } from '@angular/core/testing';
 
+import { MisconceptionObjectFactory } from
+  'domain/skill/MisconceptionObjectFactory';
 import { QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
 import { StateObjectFactory } from 'domain/state/StateObjectFactory';
 
@@ -155,23 +130,23 @@ describe('Question object factory', () => {
     sampleQuestion.setLinkedSkillIds(['skill_id1', 'skill_id2']);
     expect(sampleQuestion.getLinkedSkillIds()).toEqual(
       ['skill_id1', 'skill_id2']);
-    var stateData = sampleQuestion.getStateData();
+    let stateData = sampleQuestion.getStateData();
     expect(stateData.name).toEqual('question');
     expect(stateData.content.getHtml()).toEqual('Question 1');
-    var interaction = stateData.interaction;
+    let interaction = stateData.interaction;
     expect(interaction.id).toEqual('TextInput');
     expect(interaction.hints[0].hintContent.getHtml()).toEqual('Hint 1');
     expect(interaction.solution.explanation.getHtml()).toEqual(
       'Solution explanation');
     expect(interaction.solution.correctAnswer).toEqual(
       'This is the correct answer');
-    var defaultOutcome = interaction.defaultOutcome;
+    let defaultOutcome = interaction.defaultOutcome;
     expect(defaultOutcome.labelledAsCorrect).toEqual(false);
     expect(defaultOutcome.feedback.getHtml()).toEqual('Correct Answer');
   });
 
   it('should correctly get backend dict', () => {
-    var newQuestionBackendDict = sampleQuestion.toBackendDict(true);
+    let newQuestionBackendDict = sampleQuestion.toBackendDict(true);
     expect(newQuestionBackendDict.id).toEqual(null);
     expect(newQuestionBackendDict.linked_skill_ids).not.toBeDefined();
     expect(newQuestionBackendDict.version).toEqual(0);
@@ -179,14 +154,14 @@ describe('Question object factory', () => {
   });
 
   it('should correctly report unaddressed misconceptions', () => {
-    var interaction = sampleQuestion.getStateData().interaction;
-    var misconception1 = misconceptionObjectFactory.create(
+    let interaction = sampleQuestion.getStateData().interaction;
+    let misconception1 = misconceptionObjectFactory.create(
       'id', 'name', 'notes', 'feedback', true);
-    var misconception2 = misconceptionObjectFactory.create(
+    let misconception2 = misconceptionObjectFactory.create(
       'id_2', 'name_2', 'notes', 'feedback', true);
-    var misconception3 = misconceptionObjectFactory.create(
+    let misconception3 = misconceptionObjectFactory.create(
       'id_3', 'name_3', 'notes', 'feedback', false);
-    var misconceptionsDict = {
+    let misconceptionsDict = {
       skillId1: [misconception1],
       skillId2: [misconception2, misconception3]
     };
@@ -197,7 +172,7 @@ describe('Question object factory', () => {
   });
 
   it('should correctly validate question', () => {
-    var interaction = sampleQuestion.getStateData().interaction;
+    let interaction = sampleQuestion.getStateData().interaction;
 
     expect(sampleQuestion.getValidationErrorMessage()).toBeNull();
 
@@ -219,9 +194,9 @@ describe('Question object factory', () => {
   });
 
   it('should correctly create a Default Question', () => {
-    var sampleQuestion1 = questionObjectFactory.createDefaultQuestion(
+    let sampleQuestion1 = questionObjectFactory.createDefaultQuestion(
       ['skill_id3', 'skill_id4']);
-    var state = stateObjectFactory.createDefaultState(null);
+    let state = stateObjectFactory.createDefaultState(null);
     expect(sampleQuestion1.getId()).toEqual(null);
     expect(sampleQuestion1.getLanguageCode()).toEqual('en');
     expect(sampleQuestion1.getVersion()).toEqual(1);

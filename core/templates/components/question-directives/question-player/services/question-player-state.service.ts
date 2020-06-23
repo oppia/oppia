@@ -41,7 +41,7 @@ export class QuestionPlayerStateService {
   }
 
   private _hintUsed(question): void {
-    var questionId = question.getId();
+    let questionId = question.getId();
     if (!this.questionPlayerState[questionId]) {
       this.createNewQuestionPlayerState(
         questionId,
@@ -52,7 +52,7 @@ export class QuestionPlayerStateService {
   }
 
   private _solutionViewed(question): void {
-    var questionId = question.getId();
+    let questionId = question.getId();
     if (!this.questionPlayerState[questionId]) {
       this.createNewQuestionPlayerState(
         questionId,
@@ -64,7 +64,7 @@ export class QuestionPlayerStateService {
 
   private _answerSubmitted(
       question, isCorrect, taggedSkillMisconceptionId): void {
-    var questionId = question.getId();
+    let questionId = question.getId();
     if (!this.questionPlayerState[questionId]) {
       this.createNewQuestionPlayerState(
         questionId,
@@ -93,7 +93,7 @@ export class QuestionPlayerStateService {
       question, isCorrect, taggedSkillMisconceptionId): void {
     this._answerSubmitted(question, isCorrect, taggedSkillMisconceptionId);
   }
-  getQuestionPlayerStateData() {
+  getQuestionPlayerStateData(): Object {
     return this.questionPlayerState;
   }
 }

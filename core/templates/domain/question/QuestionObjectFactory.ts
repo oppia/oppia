@@ -24,11 +24,11 @@ import { Injectable } from '@angular/core';
 import { StateObjectFactory, State } from 'domain/state/StateObjectFactory';
 
 export class Question {
-  id;
-  stateData;
-  languageCode;
-  version;
-  linkedSkillIds;
+  id: number;
+  stateData: State;
+  languageCode: string;
+  version: number;
+  linkedSkillIds: string[];
   constructor(
       id: number, stateData: State, languageCode: string, version: number,
       linkedSkillIds: string[]) {
@@ -95,7 +95,7 @@ export class Question {
   }
 
   getUnaddressedMisconceptionNames(
-      misconceptionsBySkill) {
+      misconceptionsBySkill): string[] {
     var answerGroups = this.stateData.interaction.answerGroups;
     var taggedSkillMisconceptionIds = {};
     for (var i = 0; i < answerGroups.length; i++) {
@@ -123,7 +123,7 @@ export class Question {
     return unaddressedMisconceptionNames;
   }
 
-  toBackendDict(isNewQuestion: boolean) {
+  toBackendDict(isNewQuestion: boolean): Object {
     var questionBackendDict = {
       id: null,
       question_state_data: this.stateData.toBackendDict(),

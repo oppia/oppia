@@ -28,15 +28,14 @@ import { StateEditorService } from
 /* eslint-enable max-len */
 // ^^^ This block is to be removed.
 
+import { TestBed } from '@angular/core/testing';
+
 import { QuestionObjectFactory, Question } from
   'domain/question/QuestionObjectFactory';
 import { QuestionValidationService } from
   'services/question-validation.service';
-import { TestBed } from '@angular/core/testing';
-// require('domain/question/QuestionObjectFactory.ts');
-// require('services/question-validation.service.ts');
 
-describe('Question Validation Service', function() {
+describe('Question Validation Service', () => {
   let misconceptionObjectFactory: MisconceptionObjectFactory = null;
   let mockMisconceptionObject = null;
   let mockQuestionDict = null;
@@ -161,7 +160,7 @@ describe('Question Validation Service', function() {
 
 
   it('should return false if question validation fails', () => {
-    var interaction = mockQuestionDict.question_state_data.interaction;
+    let interaction = mockQuestionDict.question_state_data.interaction;
     interaction.answer_groups[0].outcome.labelled_as_correct = false;
     expect(
       qvs.isQuestionValid(
@@ -170,7 +169,7 @@ describe('Question Validation Service', function() {
   });
 
   it('should return false if misconceptions are not addressed', () => {
-    var interaction = mockQuestionDict.question_state_data.interaction;
+    let interaction = mockQuestionDict.question_state_data.interaction;
     interaction.answer_groups[1].tagged_skill_misconception_id = null;
     expect(
       qvs.isQuestionValid(
@@ -187,7 +186,7 @@ describe('Question Validation Service', function() {
   });
 
   it('should return true if validation is successful', () => {
-    var question = questionObjectFactory.createFromBackendDict(
+    let question = questionObjectFactory.createFromBackendDict(
       mockQuestionDict);
     expect(qvs.isQuestionValid(question, mockMisconceptionObject)).toBeTrue();
   });
