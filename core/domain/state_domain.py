@@ -1394,8 +1394,8 @@ class RuleSpec(python_utils.OBJECT):
                 by this RuleSpec instance, to be used to validate the inputs of
                 this RuleSpec. Each element of the list represents a single
                 parameter and is a tuple with two elements:
-                    0. The name (string) of the parameter.
-                    1. The typed object instance for that
+                    0: The name (string) of the parameter.
+                    1: The typed object instance for that
                         parameter (e.g. Real).
             exp_param_specs_dict: A dict of specified parameters used in this
                 exploration. Keys are parameter names and values are ParamSpec
