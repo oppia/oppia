@@ -1220,7 +1220,7 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
         self.SKILL_DESCRIPTION = 'skill to link question to'
         exploration = self.save_new_valid_exploration(
             self.EXP_ID, self.owner_id, title='Exploration title',
-            end_state_name='End State')
+            category='Algebra', end_state_name='End State')
         self.publish_exploration(self.owner_id, self.EXP_ID)
 
         topic = topic_domain.Topic.create_default_topic(
@@ -1261,11 +1261,8 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
         user_services.allow_user_to_review_question(self.reviewer_id)
         user_services.allow_user_to_review_translation_in_language(
             self.reviewer_id, 'hi')
-        # Login and create exploration and suggestions.
+        # Login and update exploration and suggestions.
         self.login(self.EDITOR_EMAIL)
-        self.save_new_linear_exp_with_state_names_and_interactions(
-            self.EXP_ID, self.editor_id, ['State 1', 'State 2', 'State 3'],
-            ['TextInput'], category='Algebra')
 
         exp_services.update_exploration(
             self.owner_id, self.EXP_ID, [
