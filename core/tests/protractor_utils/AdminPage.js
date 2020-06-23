@@ -378,17 +378,16 @@ var AdminPage = function() {
     return true;
   };
 
-  this.fillAndSubmitExtractDataForm = async function(explorationID,
-      explorationVersion, stateName, numAnswers) {
-        await waitFor.pageToFullyLoad();
-        await extractDataExplorationIdInput.sendKeys(explorationID);
-        await extractDataExplorationVersionInput.sendKeys(explorationVersion);
-        await extractDataStateNameInput.sendKeys(stateName);
-        await extractDataNumAnswersInput.sendKeys(numAnswers);
-        await waitFor.elementToBeClickable(extractDataFormSubmitButton,
-          'Extract data form submit button not clickable');
-        await extractDataFormSubmitButton.click();
-      };
+  this.fillExtractDataForm = async function(expID, expVer, state, ans) {
+    await waitFor.pageToFullyLoad();
+    await extractDataExplorationIdInput.sendKeys(expID);
+    await extractDataExplorationVersionInput.sendKeys(expVer);
+    await extractDataStateNameInput.sendKeys(state);
+    await extractDataNumAnswersInput.sendKeys(ans);
+    await waitFor.elementToBeClickable(extractDataFormSubmitButton,
+      'Extract data form submit button not clickable');
+    await extractDataFormSubmitButton.click();
+  };
 
   this.expectAllDataToBeExtracted = async function() {
     await browser.getAllWindowHandles().then((handles) => {
