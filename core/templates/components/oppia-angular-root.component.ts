@@ -193,6 +193,8 @@ import { ExplorationOpportunitySummaryObjectFactory } from
 import { ExpressionParserService } from 'expressions/expression-parser.service';
 import { ExplorationRecommendationsService } from
   'pages/exploration-player-page/services/exploration-recommendations.service';
+import { ExplorationTaskObjectFactory } from
+  'domain/improvements/ExplorationTaskObjectFactory';
 import { ExpressionSyntaxTreeService } from
   'expressions/expression-syntax-tree.service';
 import { ExtensionTagAssemblerService } from
@@ -235,6 +237,8 @@ import { ImageFileObjectFactory } from
 import { ImprovementActionButtonObjectFactory } from
   'domain/statistics/ImprovementActionButtonObjectFactory';
 import { ImprovementsService } from 'services/improvements.service';
+import { IneffectiveFeedbackLoopTaskObjectFactory } from
+  'domain/improvements/IneffectiveFeedbackLoopTaskObjectFactory';
 import { InteractionDetailsCacheService } from
   // eslint-disable-next-line max-len
   'pages/exploration-editor-page/editor-tab/services/interaction-details-cache.service';
@@ -289,6 +293,8 @@ import { MusicNotesInputValidationService } from
 import { MusicPhrasePlayerService } from
   // eslint-disable-next-line max-len
   'interactions/MusicNotesInput/directives/music-phrase-player.service';
+import { NeedsGuidingResponsesTaskObjectFactory } from
+  'domain/improvements/NeedsGuidingResponsesTaskObjectFactory';
 import { NewlyCreatedTopicObjectFactory } from
   'domain/topics_and_skills_dashboard/NewlyCreatedTopicObjectFactory';
 import { NormalizeWhitespacePipe } from
@@ -480,6 +486,8 @@ import { SubtopicPageObjectFactory } from
   'domain/topic/SubtopicPageObjectFactory';
 import { SubtopicViewerBackendApiService } from
   'domain/subtopic_viewer/subtopic-viewer-backend-api.service';
+import { SuccessiveIncorrectAnswersTaskObjectFactory } from
+  'domain/improvements/SuccessiveIncorrectAnswersTaskObjectFactory';
 import { SuggestionModalService } from 'services/suggestion-modal.service';
 import { SuggestionObjectFactory } from
   'domain/suggestion/SuggestionObjectFactory';
@@ -621,6 +629,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static explorationOpportunitySummaryObjectFactory: ExplorationOpportunitySummaryObjectFactory;
   static expressionParserService: ExpressionParserService;
   static explorationRecommendationsService: ExplorationRecommendationsService;
+  static explorationTaskObjectFactory: ExplorationTaskObjectFactory;
   static expressionSyntaxTreeService: ExpressionSyntaxTreeService;
   static extensionTagAssemblerService: ExtensionTagAssemblerService;
   static extractImageFilenamesFromStateService: ExtractImageFilenamesFromStateService;
@@ -645,6 +654,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static imageFileObjectFactory: ImageFileObjectFactory;
   static improvementActionButtonObjectFactory: ImprovementActionButtonObjectFactory;
   static improvementsService: ImprovementsService;
+  static ineffectiveFeedbackLoopTaskObjectFactory: IneffectiveFeedbackLoopTaskObjectFactory;
   static interactionDetailsCacheService: InteractionDetailsCacheService;
   static interactionObjectFactory: InteractionObjectFactory;
   static interactionRulesRegistryService: InteractionRulesRegistryService;
@@ -672,6 +682,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static multipleChoiceInputValidationService: MultipleChoiceInputValidationService;
   static musicNotesInputValidationService: MusicNotesInputValidationService;
   static musicPhrasePlayerService: MusicPhrasePlayerService;
+  static needsGuidingResponsesTaskObjectFactory: NeedsGuidingResponsesTaskObjectFactory;
   static newlyCreatedTopicObjectFactory: NewlyCreatedTopicObjectFactory;
   static normalizeWhitespacePipe: NormalizeWhitespacePipe;
   static normalizeWhitespacePunctuationAndCasePipe: NormalizeWhitespacePunctuationAndCasePipe;
@@ -767,6 +778,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static subtopicPageContentsObjectFactory: SubtopicPageContentsObjectFactory;
   static subtopicPageObjectFactory: SubtopicPageObjectFactory;
   static subtopicViewerBackendApiService: SubtopicViewerBackendApiService;
+  static SuccessiveIncorrectAnswersTaskObjectFactory: SuccessiveIncorrectAnswersTaskObjectFactory;
   static suggestionModalService: SuggestionModalService;
   static suggestionObjectFactory: SuggestionObjectFactory;
   static suggestionThreadObjectFactory: SuggestionThreadObjectFactory;
