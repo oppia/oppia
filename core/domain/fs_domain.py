@@ -163,6 +163,7 @@ class GcsFileSystem(GeneralFileSystem):
 
     def commit(self, filepath, raw_bytes, mimetype):
         """Commit to file.
+
         Args:
             filepath: str. The path to the relevant file within the entity's
                 assets folder.
