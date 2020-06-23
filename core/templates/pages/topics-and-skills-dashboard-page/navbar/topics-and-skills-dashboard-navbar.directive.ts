@@ -99,7 +99,7 @@ angular.module('oppia').directive('topicsAndSkillsDashboardNavbar', [
                   WindowDimensionsService.getWidth() >= 1200);
 
                 // TODO(#8521): Remove the use of $rootScope.$apply()
-                // once the directive is migrated to angular
+                // once the directive is migrated to angular.
                 $scope.$apply();
               });
             $rootScope.$on(

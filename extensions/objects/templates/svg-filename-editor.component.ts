@@ -748,7 +748,7 @@ angular.module('oppia').component('svgFilenameEditor', {
       };
 
       ctrl.initializeMouseEvents = function() {
-        // Adding event listener for polygon tool
+        // Adding event listener for polygon tool.
         ctrl.canvas.on('mouse:dblclick', function() {
           if (ctrl.drawMode === DRAW_MODE_POLY) {
             ctrl.drawMode = DRAW_MODE_NONE;
@@ -833,10 +833,10 @@ angular.module('oppia').component('svgFilenameEditor', {
 
       var initializeFabricJs = function() {
         ctrl.canvasElement = document.getElementById(ctrl.canvasID);
-        // Make it visually fill the positioned parent
+        // Make it visually fill the positioned parent.
         ctrl.canvasElement.style.width = '100%';
         ctrl.canvasElement.style.height = '100%';
-        // ...then set the internal size to match
+        // ...then set the internal size to match.
         ctrl.canvasElement.width = ctrl.canvasElement.offsetWidth;
         ctrl.canvasElement.height = ctrl.canvasElement.offsetHeight;
 
