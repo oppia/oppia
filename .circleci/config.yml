@@ -189,6 +189,10 @@ jobs:
           name: Run e2e admin page test
           command: |
             python -m scripts.run_e2e_tests --skip-install --skip-build --suite="adminPage" --prod_env
+      - run:
+          name: Run e2e admin page misc tab test
+          command: |
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="adminMiscTab"
       - persist_to_workspace:
           root: /home/circleci/
           paths:

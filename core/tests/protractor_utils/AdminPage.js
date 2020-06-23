@@ -20,6 +20,8 @@
 var forms = require('./forms.js');
 var general = require('./general.js');
 var waitFor = require('./waitFor.js');
+var path = require('path');
+var fs = require('fs');
 
 var AdminPage = function() {
   var ADMIN_URL_SUFFIX = '/admin';
@@ -45,6 +47,42 @@ var AdminPage = function() {
     '.protractor-test-unfinished-one-off-jobs-rows'));
   var unfinishedOffJobIDClassName = (
     '.protractor-test-unfinished-one-off-jobs-id');
+  
+  var miscTabButton = element(by.css('.protractor-test-misc-tab'));
+  var chooseSimilarityFileInput = element(
+    by.css('.protractor-test-similarities-input'));
+  var similarityFileUploadButton = element(
+    by.css('.protractor-test-similarity-upload-button'));
+  var similarityDownloadButton = element(
+    by.css('.protractor-test-similarity-download-button'));
+  var searchIndexClearButton = element(
+    by.css('.protractor-test-clear-search-index-button'));
+  var flushMigrationBotContributionsButton = element(
+    by.css('.protractor-test-migration-bot-flush-contributions-button'));
+  var extractDataExplorationIdInput = element(
+    by.css('.protractor-test-extract-data-exploration-id'));
+  var extractDataExplorationVersionInput = element(
+    by.css('.protractor-test-extract-data-exploration-version'));
+  var extractDataStateNameInput = element(
+    by.css('.protractor-test-extract-data-state-name'));
+  var extractDataNumAnswersInput = element(
+    by.css('.protractor-test-extract-data-number-of-answers'));
+  var extractDataFormSubmitButton = element(
+    by.css('.protractor-test-extract-data-submit-button'));
+  var regenerateContributionsTopicIdInput = element(
+    by.css('.protractor-test-regen-contributions-topic-id'));
+  var regenerateContributionsSubmitButton = element(
+    by.css('.protractor-test-regen-contributions-form-submit'));
+  var sendEmailButton = element(
+    by.css('.protractor-test-send-test-mail-button'));
+  var oldUsernameInput = element(
+    by.css('.protractor-test-old-username-input'));
+  var newUsernameInput = element(
+    by.css('.protractor-test-new-username-input'));
+  var usernameChangeSubmitButton = element(
+    by.css('.protractor-test-username-change-submit'));
+  var regenerationMessage = element(
+    by.css('.protractor-test-regeneration-error-message'));
 
   // The reload functions are used for mobile testing
   // done via Browserstack. These functions may cause
@@ -268,6 +306,145 @@ var AdminPage = function() {
       expect(name).toEqual(expectedUsernamesArray[j]);
     }
   };
+
+  this.getMiscTab = async function() {
+    await miscTabButton.click();
+    await waitFor.pageToFullyLoad();
+  };
+
+  this.uploadTopicSimilarities = async function(relativePathToSimilaritiesFile)
+  {
+    absPath = path.resolve(__dirname, relativePathToSimilaritiesFile);
+    await waitFor.visibilityOf(chooseSimilarityFileInput,
+      'Similarity upload form is not visible');
+    await chooseSimilarityFileInput.sendKeys(absPath);
+    await waitFor.elementToBeClickable(similarityFileUploadButton,
+      'Upload button taking too long to be clickable');
+    await similarityFileUploadButton.click();
+  };
+
+  this.expectSimilaritiesToBeUploaded = async function() {
+    await waitFor.textToBePresentInElement(statusMessage,
+      'Topic similarities uploaded successfully.')
+    return true;
+  }
+
+  this.expectUploadError = async function() {
+    await statusMessage.getText().then((text) => {
+      if(text.match('Server'))
+        return true;
+      return false;
+    });
+  };
+
+  this.downloadSimilarityFile = async function() {
+    await waitFor.elementToBeClickable(similarityDownloadButton,
+      'Download similarity file button not clickable');
+    await similarityDownloadButton.click();
+  };
+
+  this.expectFileToBeDownloaded = async function() {
+    var filename = global.downloadsPath + '/topic_similarities.csv';
+    browser.driver.wait(function(){
+      return fs.existsSync(filename);
+    }, 30000).then(function(){
+      console.log('File is not downloading.');
+    });
+  };
+
+  this.clearSearchIndex = async function() {
+    await waitFor.elementToBeClickable(searchIndexClearButton,
+      'Clear search index button not clickable');
+    await searchIndexClearButton.click();
+    await browser.switchTo().alert().accept();
+  };
+
+  this.expectSearchIndexToBeCleared = async function() {
+    await waitFor.textToBePresentInElement(statusMessage,
+      'Index successfully cleared.');
+    return true;
+  }
+
+  this.flushMigrationBotContributions = async function() {
+    await waitFor.elementToBeClickable(flushMigrationBotContributionsButton,
+      'Migration bot flush contributions button not clickable');
+    await flushMigrationBotContributionsButton.click();
+    await browser.switchTo().alert().accept();
+  };
+
+  this.expectMigrationBotContributionsToBeFlushed = async function() {
+    await waitFor.textToBePresentInElement(statusMessage,
+      'Migration bot contributions successfully flushed.',
+      'Migration bot cuntributions not flushing.');
+    return true;
+  }
+
+  this.fillAndSubmitExtractDataForm = async function(explorationID, 
+    explorationVersion, stateName, numAnswers)
+  {
+    await waitFor.pageToFullyLoad();
+    await extractDataExplorationIdInput.sendKeys(explorationID);
+    await extractDataExplorationVersionInput.sendKeys(explorationVersion);
+    await extractDataStateNameInput.sendKeys(stateName);
+    await extractDataNumAnswersInput.sendKeys(numAnswers);
+    await waitFor.elementToBeClickable(extractDataFormSubmitButton,
+      'Extract data form submit button not clickable');
+    await extractDataFormSubmitButton.click();
+  };
+
+  this.expectAllDataToBeExtracted = async function() {
+    await browser.getAllWindowHandles().then((handles) => {
+      expect(handles.length).toEqual(3);
+    });
+  }
+
+  this.regenerateContributionsForTopic = async function(topicId) {
+    await regenerateContributionsTopicIdInput.sendKeys(topicId);
+    await waitFor.elementToBeClickable(regenerateContributionsSubmitButton,
+      'Regenerate conributions form submit button not clickable');
+    await regenerateContributionsSubmitButton.click();
+    await browser.switchTo().alert().accept();
+  };
+
+  this.expectRegenerationError = async function(topic) {
+    var text = 'Server error: Entity for class TopicModel with id ' 
+      + topic + ' not found';
+    expect(regenerationMessage.getText()).toEqual(text);
+  };
+
+  this.expectConributionsToBeRegeneratedForTopic = async function() {
+    var text = 'No. of opportunities model created: 0';
+    expect(regenerationMessage.getText()).toEqual(text);
+  }
+
+  this.sendTestEmail = async function(){
+    await waitFor.elementToBeClickable(sendEmailButton,
+      'Send email button not clickable');
+    await sendEmailButton.click();
+  }
+
+  this.expectMailToBeSent = async function() {
+    await waitFor.textToBePresentInElement(statusMessage,
+      'Server error: This app cannot send emails.');
+    return true;
+  }
+
+  this.changeUsername = async function(oldUsername, newUsername)
+  {
+    await oldUsernameInput.sendKeys(oldUsername);
+    await newUsernameInput.sendKeys(newUsername);
+    await waitFor.elementToBeClickable(usernameChangeSubmitButton,
+      'Username change submit button not clickable');
+    await usernameChangeSubmitButton.click();  
+  }
+
+  this.expectUsernameToBeChanged = async function(oldUsername, newUsername)
+  {
+    var text = 'Successfully renamed ' + oldUsername + ' to ' + newUsername;
+    await waitFor.textToBePresentInElement(statusMessage, text);
+    return true;
+  }
+
 };
 
 exports.AdminPage = AdminPage;
