@@ -308,10 +308,16 @@ class DocstringParameterChecker(checkers.BaseChecker):
             ('Please use 4 space indentation in parameter definitions' +
              'for args')
         ),
-        'C9020': (
-            'eight space indentation for arg parameter description in docstring',
-            'eight-space-indentation-for-arg-parameter-descriptions-doc',
+        'W9020': (
+            ('eight space indentation for arg parameter description in' +
+             'docstring'),
+            'eight-space-indentation-for-arg-descriptions-doc',
             'Please indent wrap around descriptions by 8'
+        ),
+        'W9021': (
+            'incorrect args indentation',
+            'incorrect-indentation-for-arg-definition-doc',
+            'Please indent args at the same indentation level with docstring'
         )
     }
 
@@ -395,45 +401,63 @@ class DocstringParameterChecker(checkers.BaseChecker):
         self.check_arguments_in_docstring(
             node_doc, node.args, node,
             accept_no_param_doc=node_allow_no_param)
-        self.check_indentation_args(node.args, node, node_doc)
-        
-        #self.check_indentation_args(self, doc, arguments_node, warning_node)
+        self.check_indentation_args(node.args, node)
 
-    def check_indentation_args(self, arguments_node, node, node_doc):
-        parameter_names = {"Args:", "Raises:", "Returns:", "Yields:"}
+    def check_indentation_args(self, arguments_node, node):
+        """Checks whether all parameters in a function definition are
+        indented properly.
+
+        Args:
+            arguments_node: astroid.scoped_nodes.Arguments. Arguments node
+                for the function, method or class constructor.
+            node: astroid.scoped_nodes.Function. Node for a function or
+                method definition in the AST.
+        """
+        parameter_names = {'Args:', 'Raises:', 'Returns:', 'Yields:'}
         expected_argument_names = set(
-            None  if(arg.name == 'self') else (arg.name+":") for arg in arguments_node.args)
+            None if arg.name == 'self'
+            else (arg.name + ':') for arg in arguments_node.args)
+        expected_argument_names.add('args:')
+        expected_argument_names.add('kwargs:')
         is_docstring_args = False
         free_form_args = False
         outer_indentation = 0
-        for line in node.doc.splitlines():
-            current_indentation = (len(line) -
+        if node.doc:
+            for line in node.doc.splitlines():
+                current_indentation = (len(line) -
                                        len(line.lstrip()))
-            if len(line.strip()) == 0:
-                continue
-            if line.lstrip().startswith("Args:"):
-                outer_indentation = current_indentation
-                is_docstring_args = True
-            elif (is_docstring_args and re.search('^[^:]+:', line.lstrip()) 
-                and (re.search('^[^:]+:', line.lstrip()).group(0) in expected_argument_names)):
-                free_form_args = False
-                if current_indentation != (
-                        outer_indentation + 4):
-                    self.add_message(
-                    'four-space-indentation-for-arg-parameters-doc', node=node)
-                if line.endswith(":"):
-                    free_form_args = True
-                #print(line + ": parameter")
-            elif line.strip() in parameter_names:
-                break
-            elif is_docstring_args:
-                #print(line +  ": description")
-                if not free_form_args and current_indentation != (
-                        outer_indentation + 8):
-                    self.add_message(
-                    'eight-space-indentation-for-arg-parameter-descriptions-doc', node=node)
-                if line.endswith(":"):
-                    free_form_args = True
+                parameter = re.search('^[^:]+:', line.lstrip())
+                if len(line.strip()) == 0:
+                    continue
+                if line.lstrip().startswith('Args:'):
+                    outer_indentation = current_indentation
+                    if current_indentation % 4 != 0:
+                        self.add_message(
+                            'incorrect-indentation-for-arg-definition-doc',
+                            node=node)
+                    is_docstring_args = True
+                elif (is_docstring_args and parameter
+                      and ((parameter.group(0).strip('*')
+                            in expected_argument_names) or
+                           re.search(br'\*[^ ]+:', line.lstrip()))):
+                    free_form_args = False
+                    if current_indentation != (
+                            outer_indentation + 4):
+                        self.add_message(
+                            'four-space-indentation-for-arg-parameters-doc',
+                            node=node)
+                    if line.endswith(':'):
+                        free_form_args = True
+                elif line.strip() in parameter_names:
+                    break
+                elif is_docstring_args:
+                    if not free_form_args and current_indentation != (
+                            outer_indentation + 8):
+                        self.add_message(
+                            'eight-space-indentation-for-arg-descriptions-doc',
+                            node=node)
+                    if line.endswith(':'):
+                        free_form_args = True
 
     def check_functiondef_returns(self, node, node_doc):
         """Checks whether a function documented with a return value actually has
@@ -1633,18 +1657,18 @@ def register(linter):
     Args:
         linter: Pylinter. The Pylinter object.
     """
-    linter.register_checker(ExplicitKeywordArgsChecker(linter))
-    linter.register_checker(HangingIndentChecker(linter))
+    # linter.register_checker(ExplicitKeywordArgsChecker(linter))
+    # linter.register_checker(HangingIndentChecker(linter))
     linter.register_checker(DocstringParameterChecker(linter))
     linter.register_checker(ImportOnlyModulesChecker(linter))
-    linter.register_checker(BackslashContinuationChecker(linter))
-    linter.register_checker(FunctionArgsOrderChecker(linter))
-    linter.register_checker(RestrictedImportChecker(linter))
-    linter.register_checker(SingleCharAndNewlineAtEOFChecker(linter))
-    linter.register_checker(SingleSpaceAfterYieldChecker(linter))
-    linter.register_checker(ExcessiveEmptyLinesChecker(linter))
-    linter.register_checker(SingleNewlineAboveArgsChecker(linter))
-    linter.register_checker(DivisionOperatorChecker(linter))
-    linter.register_checker(SingleLineCommentChecker(linter))
+    # linter.register_checker(BackslashContinuationChecker(linter))
+    # linter.register_checker(FunctionArgsOrderChecker(linter))
+    # linter.register_checker(RestrictedImportChecker(linter))
+    # linter.register_checker(SingleCharAndNewlineAtEOFChecker(linter))
+    # linter.register_checker(SingleSpaceAfterYieldChecker(linter))
+    # linter.register_checker(ExcessiveEmptyLinesChecker(linter))
+    # linter.register_checker(SingleNewlineAboveArgsChecker(linter))
+    # linter.register_checker(DivisionOperatorChecker(linter))
+    # linter.register_checker(SingleLineCommentChecker(linter))
     linter.register_checker(DocstringChecker(linter))
-    linter.register_checker(BlankLineBelowFileOverviewChecker(linter))
+    # linter.register_checker(BlankLineBelowFileOverviewChecker(linter))
