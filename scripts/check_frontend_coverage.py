@@ -358,6 +358,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'question-difficulty-selector.directive.ts',
     'question-editor-modal.controller.ts',
     'question-editor.directive.ts',
+    'QuestionObjectFactory.ts',
     'question-opportunities-select-skill-and-difficulty-modal.controller.ts',
     'question-opportunities.directive.ts',
     'question-player-concept-card-modal.controller.ts',
