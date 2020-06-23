@@ -232,33 +232,33 @@ def _get_linters_for_file_extension(
         verbose_mode_enabled=verbose_mode_enabled)
     custom_linters.append(custom_linter)
 
-    # if file_extension_type_js_ts:
-    #     custom_linter, third_party_linter = js_ts_linter.get_linters(
-    #         _FILES['.js'], _FILES['.ts'],
-    #         verbose_mode_enabled=verbose_mode_enabled)
-    #     custom_linters.append(custom_linter)
-    #     third_party_linters.append(third_party_linter)
+    if file_extension_type_js_ts:
+        custom_linter, third_party_linter = js_ts_linter.get_linters(
+            _FILES['.js'], _FILES['.ts'],
+            verbose_mode_enabled=verbose_mode_enabled)
+        custom_linters.append(custom_linter)
+        third_party_linters.append(third_party_linter)
 
-    # elif file_extension_to_lint == 'html':
-    #     custom_linter, third_party_linter = html_linter.get_linters(
-    #         _FILES['.html'], verbose_mode_enabled=verbose_mode_enabled)
-    #     custom_linters.append(custom_linter)
-    #     third_party_linters.append(third_party_linter)
+    elif file_extension_to_lint == 'html':
+        custom_linter, third_party_linter = html_linter.get_linters(
+            _FILES['.html'], verbose_mode_enabled=verbose_mode_enabled)
+        custom_linters.append(custom_linter)
+        third_party_linters.append(third_party_linter)
 
-    #     config_path_for_css_in_html = os.path.join(
-    #         parent_dir, 'oppia', '.stylelintrc')
-    #     custom_linter, third_party_linter = css_linter.get_linters(
-    #         config_path_for_css_in_html, _FILES['.html'],
-    #         verbose_mode_enabled=verbose_mode_enabled)
-    #     third_party_linters.append(third_party_linter)
+        config_path_for_css_in_html = os.path.join(
+            parent_dir, 'oppia', '.stylelintrc')
+        custom_linter, third_party_linter = css_linter.get_linters(
+            config_path_for_css_in_html, _FILES['.html'],
+            verbose_mode_enabled=verbose_mode_enabled)
+        third_party_linters.append(third_party_linter)
 
-    # elif file_extension_to_lint == 'css':
-    #     config_path_for_oppia_css = os.path.join(
-    #         parent_dir, 'oppia', 'core', 'templates', 'css', '.stylelintrc')
-    #     custom_linter, third_party_linter = css_linter.get_linters(
-    #         config_path_for_oppia_css, _FILES['.css'],
-    #         verbose_mode_enabled=verbose_mode_enabled)
-    #     third_party_linters.append(third_party_linter)
+    elif file_extension_to_lint == 'css':
+        config_path_for_oppia_css = os.path.join(
+            parent_dir, 'oppia', 'core', 'templates', 'css', '.stylelintrc')
+        custom_linter, third_party_linter = css_linter.get_linters(
+            config_path_for_oppia_css, _FILES['.css'],
+            verbose_mode_enabled=verbose_mode_enabled)
+        third_party_linters.append(third_party_linter)
 
     if file_extension_to_lint == 'py':
         custom_linter, third_party_linter = python_linter.get_linters(
