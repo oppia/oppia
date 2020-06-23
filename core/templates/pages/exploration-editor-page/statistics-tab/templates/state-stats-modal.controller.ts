@@ -37,7 +37,10 @@ angular.module('oppia').controller('StateStatsModalController', [
       interactionArgs, stateName, stateStats, visualizationsInfo) {
     $controller('ConfirmOrCancelModalController', {$scope, $uibModalInstance});
 
-    var COMPLETION_RATE_PIE_CHART_OPTIONS = {
+    const numTimesSolutionViewed = stateStats.numTimesSolutionViewed;
+    const totalAnswersCount = stateStats.totalAnswersCount;
+    const usefulFeedbackCount = stateStats.usefulFeedbackCount;
+    const makeCompletionRatePieChartOptions = (title: string) => ({
       left: 20,
       pieHole: 0.6,
       pieSliceTextStyleColor: 'black',
@@ -46,43 +49,34 @@ angular.module('oppia').controller('StateStatsModalController', [
       colors: ['#d8d8d8', '#008808', 'blue'],
       height: 270,
       legendPosition: 'right',
+      title: title,
       width: 240
-    };
+    });
 
-    var title1 = 'Answer feedback statistics';
-    $scope.COMPLETION_RATE_PIE_CHART_OPTIONS1 = angular.copy(
-      COMPLETION_RATE_PIE_CHART_OPTIONS);
-    $scope.COMPLETION_RATE_PIE_CHART_OPTIONS1.title = title1;
-
-    var title2 = 'Solution usage statistics';
-    $scope.COMPLETION_RATE_PIE_CHART_OPTIONS2 = angular.copy(
-      COMPLETION_RATE_PIE_CHART_OPTIONS);
-    $scope.COMPLETION_RATE_PIE_CHART_OPTIONS2.title = title2;
-
-    $scope.stateName = stateName;
-    $scope.stateStats = stateStats;
+    $scope.hasExplorationBeenAnswered = totalAnswersCount > 0;
     $scope.interactionArgs = interactionArgs;
+    $scope.numEnters = stateStats.totalHitCount;
+    $scope.numQuits = stateStats.totalHitCount - stateStats.numCompletions;
+    $scope.stateName = stateName;
     $scope.visualizationsInfo = visualizationsInfo;
 
-    var usefulFeedbackCount = $scope.stateStats.usefulFeedbackCount;
-    var totalAnswersCount = $scope.stateStats.totalAnswersCount;
-    if (totalAnswersCount > 0) {
-      $scope.hasExplorationBeenAnswered = true;
-    }
-    $scope.pieChartData1 = [
+    $scope.answerFeedbackPieChartData = [
       ['Type', 'Number'],
       ['Default feedback', totalAnswersCount - usefulFeedbackCount],
       ['Specific feedback', usefulFeedbackCount],
     ];
+    $scope.answerFeedbackPieChartOptions = (
+      makeCompletionRatePieChartOptions('Answer feedback statistics'));
 
-    var numTimesSolutionViewed = $scope.stateStats.numTimesSolutionViewed;
-    $scope.pieChartData2 = [
+    $scope.solutionUsagePieChartData = [
       ['Type', 'Number'],
       ['Solutions used to answer', numTimesSolutionViewed],
       ['Solutions not used', totalAnswersCount - numTimesSolutionViewed]
     ];
+    $scope.solutionUsagePieChartOptions = (
+      makeCompletionRatePieChartOptions('Solution usage statistics'));
 
-    $scope.navigateToStateEditor = function() {
+    $scope.navigateToStateEditor = () => {
       $scope.cancel();
       RouterService.navigateToMainTab(stateName);
     };
