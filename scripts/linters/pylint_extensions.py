@@ -303,19 +303,19 @@ class DocstringParameterChecker(checkers.BaseChecker):
                   'Please check parameter names in type declarations.',
                  ),
         'W9019': (
-            '4 space indentation for args parameters in docstring',
+            '"%s" requires 4 space indentation relative to args',
             'four-space-indentation-for-arg-parameters-doc',
             ('Please use 4 space indentation in parameter definitions' +
              'for args')
         ),
         'W9020': (
-            ('eight space indentation for arg parameter description in' +
+            ('"%s" requires 8 space indentation relative to args' +
              'docstring'),
             'eight-space-indentation-for-arg-descriptions-doc',
             'Please indent wrap around descriptions by 8'
         ),
         'W9021': (
-            'incorrect args indentation',
+            'Args: indentation is incorrect, must be in column with docstring',
             'incorrect-indentation-for-arg-definition-doc',
             'Please indent args at the same indentation level with docstring'
         )
@@ -424,12 +424,13 @@ class DocstringParameterChecker(checkers.BaseChecker):
         outer_indentation = 0
         if node.doc:
             for line in node.doc.splitlines():
+                no_whitespace = line.lstrip()
                 current_indentation = (len(line) -
-                                       len(line.lstrip()))
-                parameter = re.search('^[^:]+:', line.lstrip())
+                                       len(no_whitespace))
+                parameter = re.search('^[^:]+:', no_whitespace)
                 if len(line.strip()) == 0:
                     continue
-                if line.lstrip().startswith('Args:'):
+                if no_whitespace.startswith('Args:'):
                     outer_indentation = current_indentation
                     if current_indentation % 4 != 0:
                         self.add_message(
@@ -439,13 +440,17 @@ class DocstringParameterChecker(checkers.BaseChecker):
                 elif (is_docstring_args and parameter
                       and ((parameter.group(0).strip('*')
                             in expected_argument_names) or
-                           re.search(br'\*[^ ]+:', line.lstrip()))):
+                           re.search(br'\*[^ ]+:', no_whitespace))):
                     free_form_args = False
                     if current_indentation != (
                             outer_indentation + 4):
+                        beginning_of_line = ((None) if
+                                             (not no_whitespace.split(' '))
+                                             else no_whitespace.split(' ')[0])
                         self.add_message(
                             'four-space-indentation-for-arg-parameters-doc',
-                            node=node)
+                            node=node,
+                            args=(beginning_of_line))
                     if line.endswith(':'):
                         free_form_args = True
                 elif line.strip() in parameter_names:
@@ -453,9 +458,13 @@ class DocstringParameterChecker(checkers.BaseChecker):
                 elif is_docstring_args:
                     if not free_form_args and current_indentation != (
                             outer_indentation + 8):
+                        beginning_of_line = ((None) if
+                                             (not no_whitespace.split(' '))
+                                             else no_whitespace.split(' ')[0])
                         self.add_message(
                             'eight-space-indentation-for-arg-descriptions-doc',
-                            node=node)
+                            node=node,
+                            args=(beginning_of_line))
                     if line.endswith(':'):
                         free_form_args = True
 
