@@ -263,7 +263,7 @@ class TopicSummaryModel(base_models.BaseModel):
 
         Args:
             unused_user_id: str. The (unused) ID of the user whose data should
-            be checked.
+                be checked.
 
         Returns:
             bool. Whether any models refer to the given user ID.
@@ -492,7 +492,7 @@ class TopicRightsModel(base_models.VersionedModel):
 
         Returns:
             list(TopicRightsModel). The list of TopicRightsModel objects in
-                which the given user is a manager.
+            which the given user is a manager.
         """
         topic_rights_models = cls.query(
             cls.manager_ids == user_id

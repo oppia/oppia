@@ -48,27 +48,27 @@ def add_documents_to_index(documents, index, retries=DEFAULT_NUM_RETRIES):
     """Adds a document to an index.
 
     Args:
-      - documents: a list of documents. Each document should be a dictionary.
-          Every key in the document is a field name, and the corresponding
-          value will be the field's value.
-          If there is a key named 'id', its value will be used as the
-          document's id.
-          If there is a key named 'rank', its value will be used as
-          the document's rank.
-          By default, search results are returned ordered by descending rank.
-          If there is a key named 'language_code', its value will be used as
-          the document's language. Otherwise, constants.DEFAULT_LANGUAGE_CODE is
-          used.
-      - index: the name of the index to insert the document into, a string.
-      - retries: the number of times to retry inserting the documents.
+        documents: a list of documents. Each document should be a dictionary.
+            Every key in the document is a field name, and the corresponding
+            value will be the field's value.
+            If there is a key named 'id', its value will be used as the
+            document's id.
+            If there is a key named 'rank', its value will be used as
+            the document's rank.
+            By default, search results are returned ordered by descending rank.
+            If there is a key named 'language_code', its value will be used as
+            the document's language. Otherwise, constants.DEFAULT_LANGUAGE_CODE
+            is used.
+        index: the name of the index to insert the document into, a string.
+        retries: the number of times to retry inserting the documents.
 
     Returns:
-      returns a list of document ids of the documents that were added.
+        returns a list of document ids of the documents that were added.
 
     Raises:
-      - SearchFailureError: raised when the indexing fails. If it fails for any
-        document, none will be inserted.
-      - ValueError: raised when invalid values are given.
+        SearchFailureError: raised when the indexing fails. If it fails for any
+            document, none will be inserted.
+        ValueError: raised when invalid values are given.
     """
     if not isinstance(index, python_utils.BASESTRING):
         raise ValueError(
@@ -187,14 +187,14 @@ def delete_documents_from_index(
     """Deletes documents from an index.
 
     Args:
-      - doc_ids: a list of document ids of documents to be deleted from the
-          index.
-      - index: the name of the index to delete the document from, a string.
-      - retries: the number of times to retry deleting the documents.
+        doc_ids: a list of document ids of documents to be deleted from the
+            index.
+        index: the name of the index to delete the document from, a string.
+        retries: the number of times to retry deleting the documents.
 
     Raises:
-      - SearchFailureError: raised when the deletion fails. If it fails for any
-        document, none will be deleted.
+        SearchFailureError: raised when the deletion fails. If it fails for any
+            document, none will be deleted.
     """
     if not isinstance(index, python_utils.BASESTRING):
         raise ValueError(
@@ -234,7 +234,7 @@ def clear_index(index_name):
     there are too many entries in the index.
 
     Args:
-      - index_name: the name of the index to delete the document from, a string.
+        index_name: the name of the index to delete the document from, a string.
     """
     index = gae_search.Index(index_name)
 
@@ -253,29 +253,29 @@ def search(query_string, index, cursor=None,
     """Searches for documents in an index.
 
     Args:
-      - query_string: the search query.
-          The syntax used is described here:
-          https://developers.google.com/appengine/docs/python/search/query_strings
-      - index: the name of the index to search.
-      - cursor: a cursor string, as returned by this function. Pass this in to
-          get the next 'page' of results. Leave as None to start at the
-          beginning.
-      - limit: the maximum number of documents to return.
-      - sort: a string indicating how to sort results. This should be a string
-          of space separated values. Each value should start with a '+' or a
-          '-' character indicating whether to sort in ascending or descending
-          order respectively. This character should be followed by a field name
-          to sort on.
-      - ids_only: whether to only return document ids.
-      - retries: the number of times to retry searching the index.
+        query_string: the search query.
+            The syntax used is described here:
+            https://developers.google.com/appengine/docs/python/search/query_strings
+        index: the name of the index to search.
+        cursor: a cursor string, as returned by this function. Pass this in to
+            get the next 'page' of results. Leave as None to start at the
+            beginning.
+        limit: the maximum number of documents to return.
+        sort: a string indicating how to sort results. This should be a string
+            of space separated values. Each value should start with a '+' or a
+            '-' character indicating whether to sort in ascending or descending
+            order respectively. This character should be followed by a field
+            name to sort on.
+        ids_only: whether to only return document ids.
+        retries: the number of times to retry searching the index.
 
     Returns:
-      returns a tuple with two elements:
-        - a list of dictionaries representing search documents. If ids_only is
-          True, this will be a list of strings, doc_ids.
-        - a cursor that you can pass back in to get the next page of results.
-          This wil be a web safe string that you can use in urls.
-          It will be None if there is no next page.
+        (tuple). Contains two elements:
+            a list of dictionaries representing search documents. If ids_only is
+                True, this will be a list of strings, doc_ids.
+            a cursor that you can pass back in to get the next page of results.
+                This wil be a web safe string that you can use in urls.
+                It will be None if there is no next page.
     """
     sort_options = None
 

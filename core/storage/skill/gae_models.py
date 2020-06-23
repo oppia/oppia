@@ -235,7 +235,7 @@ class SkillSummaryModel(base_models.BaseModel):
 
         Args:
             unused_user_id: str. The (unused) ID of the user whose data should
-            be checked.
+                be checked.
 
         Returns:
             bool. Whether any models refer to the given user ID.
