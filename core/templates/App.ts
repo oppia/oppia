@@ -84,11 +84,14 @@ import { UrlInterpolationService } from
 import { EntityContextObjectFactory } from
   'domain/utilities/EntityContextObjectFactory';
 import { ContextService } from 'services/context.service';
+import { IModule } from 'angular';
 // ^^^ This block is to be removed.
 
 
 const sourceMappedStackTrace = require('sourcemapped-stacktrace');
-
+interface CustomModule extends IModule {
+  provideValueAfterBootstrap: Function;
+}
 angular.module('oppia').config([
   '$compileProvider', '$cookiesProvider', '$httpProvider',
   '$interpolateProvider', '$locationProvider', '$provide', '$sanitizeProvider',
@@ -107,11 +110,12 @@ angular.module('oppia').config([
      * 3 - After angular has initialized we provide the angular sevices to ajs
      *     in oppia-root.directive.ts by using this function.
      */
-    angular.module('oppia').provideValueAfterBootstrap = function(
-        name, value) {
-      $provide.value( name, value );
-      return ( this );
-    };
+    (angular.module('oppia') as CustomModule).provideValueAfterBootstrap = (
+      function(
+          name, value) {
+        $provide.value( name, value );
+        return ( this );
+      });
     var csrfTokenService = new CsrfTokenService();
     var entityContextObjectFactory = new EntityContextObjectFactory();
     var loggerService = new LoggerService();
