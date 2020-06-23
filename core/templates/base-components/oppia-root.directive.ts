@@ -26,7 +26,7 @@ interface CustomModule extends IModule {
   provideValueAfterBootstrap: Function;
 }
 
-const ANGULAR_SERVICES = [
+export const ANGULAR_SERVICES = [
   'AdminDataService', 'AdminRouterService', 'AdminTaskManagerService',
   'AlertsService', 'AngularNameService',
   'AnswerClassificationResultObjectFactory', 'AnswerClassificationService',
