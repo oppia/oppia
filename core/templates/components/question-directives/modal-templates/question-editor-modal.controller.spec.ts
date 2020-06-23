@@ -235,7 +235,7 @@ describe('Question Editor Modal Controller', function() {
       expect($uibModal.open).toHaveBeenCalled();
     });
 
-    it('should not add a new skill if it\'s already exists', function() {
+    it('should not add a new skill when it\'s already exists', function() {
       spyOn(AlertsService, 'addInfoMessage').and.callThrough();
       spyOn($uibModal, 'open').and.returnValue({
         result: $q.resolve({
@@ -251,24 +251,27 @@ describe('Question Editor Modal Controller', function() {
     });
 
     it('should add a new skill successfully', function() {
-      spyOn(AlertsService, 'addInfoMessage').and.callThrough();
-      spyOn($uibModal, 'open').and.returnValue({
-        result: $q.resolve({
-          id: '4',
-          description: 'Description 4'
-        })
+      var skillSummaryDict = {
+        id: '4',
+        description: 'Description 4'
+      };
+      var openModalSpy = spyOn($uibModal, 'open');
+      openModalSpy.and.returnValue({
+        result: $q.resolve(skillSummaryDict)
       });
-
       expect($scope.associatedSkillSummaries.length).toEqual(3);
       expect($scope.getSkillLinkageModificationsArray().length).toBe(0);
       $scope.addSkill();
       $scope.$apply();
 
+      expect($scope.associatedSkillSummaries).toContain(
+        SkillSummaryObjectFactory.create(
+          skillSummaryDict.id, skillSummaryDict.description));
       expect($scope.associatedSkillSummaries.length).toEqual(4);
       expect($scope.getSkillLinkageModificationsArray().length).toBe(1);
     });
 
-    it('should not add skill if dismissing the add skill modal', function() {
+    it('should not add skill when dismissing the add skill modal', function() {
       spyOn($uibModal, 'open').and.returnValue({
         result: $q.reject()
       });
@@ -281,17 +284,22 @@ describe('Question Editor Modal Controller', function() {
       expect($scope.getSkillLinkageModificationsArray().length).toBe(0);
     });
 
-    it('should save and commit if there is no pending changes', function() {
+    it('should save and commit when there is no pending changes', function() {
+      var skillSummaryDict = {
+        id: '4',
+        description: 'Description 4'
+      };
       var openModalSpy = spyOn($uibModal, 'open');
       openModalSpy.and.returnValue({
-        result: $q.resolve({
-          id: '4',
-          description: 'Description 4'
-        })
+        result: $q.resolve(skillSummaryDict)
       });
 
       $scope.addSkill();
       $scope.$apply();
+
+      expect($scope.associatedSkillSummaries).toContain(
+        SkillSummaryObjectFactory.create(
+          skillSummaryDict.id, skillSummaryDict.description));
 
       spyOn(QuestionUndoRedoService, 'hasChanges').and.returnValue(false);
       expect($scope.isSaveAndCommitButtonDisabled()).toBe(false);
@@ -301,16 +309,21 @@ describe('Question Editor Modal Controller', function() {
     });
 
     it('should save and commit after modifying skills', function() {
+      var skillSummaryDict = {
+        id: '4',
+        description: 'Description 4'
+      };
       var openModalSpy = spyOn($uibModal, 'open');
       openModalSpy.and.returnValue({
-        result: $q.resolve({
-          id: '4',
-          description: 'Description 4'
-        })
+        result: $q.resolve(skillSummaryDict)
       });
 
       $scope.addSkill();
       $scope.$apply();
+
+      expect($scope.associatedSkillSummaries).toContain(
+        SkillSummaryObjectFactory.create(
+          skillSummaryDict.id, skillSummaryDict.description));
 
       spyOn(QuestionUndoRedoService, 'hasChanges').and.returnValue(true);
       expect($scope.isSaveAndCommitButtonDisabled()).toBe(false);
@@ -328,18 +341,23 @@ describe('Question Editor Modal Controller', function() {
       });
     });
 
-    it('should not save and commit if dismissing the add skill modal',
+    it('should not save and commit when dismissing the add skill modal',
       function() {
+        var skillSummaryDict = {
+          id: '4',
+          description: 'Description 4'
+        };
         var openModalSpy = spyOn($uibModal, 'open');
         openModalSpy.and.returnValue({
-          result: $q.resolve({
-            id: '4',
-            description: 'Description 4'
-          })
+          result: $q.resolve(skillSummaryDict)
         });
 
         $scope.addSkill();
         $scope.$apply();
+
+        expect($scope.associatedSkillSummaries).toContain(
+          SkillSummaryObjectFactory.create(
+            skillSummaryDict.id, skillSummaryDict.description));
 
         spyOn(QuestionUndoRedoService, 'hasChanges').and.returnValue(true);
         expect($scope.isSaveAndCommitButtonDisabled()).toBe(false);
@@ -352,13 +370,13 @@ describe('Question Editor Modal Controller', function() {
         expect($uibModalInstance.close).not.toHaveBeenCalled();
       });
 
-    it('should dismiss modal if there is no pendent changes', function() {
+    it('should dismiss modal when there is no pending changes', function() {
       spyOn(QuestionUndoRedoService, 'hasChanges').and.returnValue(false);
       $scope.cancel();
       expect($uibModalInstance.dismiss).toHaveBeenCalledWith('cancel');
     });
 
-    it('should dismiss modal if there is pendent changes which won\'t be' +
+    it('should dismiss modal when there is pending changes which won\'t be' +
       ' saved', function() {
       spyOn(QuestionUndoRedoService, 'hasChanges').and.returnValue(true);
       spyOn($uibModal, 'open').and.returnValue({
@@ -370,7 +388,7 @@ describe('Question Editor Modal Controller', function() {
       expect($uibModalInstance.dismiss).toHaveBeenCalledWith('cancel');
     });
 
-    it('should not dismiss modal if there is pendent changes which will be' +
+    it('should not dismiss modal when there is pending changes which will be' +
       ' saved', function() {
       spyOn(QuestionUndoRedoService, 'hasChanges').and.returnValue(true);
       spyOn($uibModal, 'open').and.returnValue({
