@@ -35,7 +35,7 @@ export class MathInteractionsService {
     // show the location.
     if (errorMessage.indexOf('bracket') !== -1) {
       // The error is about invalid bracket pairings.
-      return 'It looks like your answer has an invalid bracket pairing.'
+      return 'It looks like your answer has an invalid bracket pairing.';
     }
     let colonIndex = errorMessage.indexOf(':');
     if (colonIndex !== -1) {

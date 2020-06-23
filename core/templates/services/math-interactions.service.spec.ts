@@ -37,7 +37,7 @@ fdescribe('MathInteractionsService', () => {
 
     expect(mathInteractionsService.validateAnswer('a/2')).toBeTrue();
     expect(mathInteractionsService.getWarningText()).toBe('');
-    
+
     expect(mathInteractionsService.validateAnswer(
       'a^2 + 2*a*b + b^2')).toBeTrue();
     expect(mathInteractionsService.getWarningText()).toBe('');
@@ -78,17 +78,17 @@ fdescribe('MathInteractionsService', () => {
     expect(mathInteractionsService.getWarningText()).toBe(
       'It looks like you have entered an equation/inequality.' +
       ' Please enter an algebraic expression instead.');
-    
+
     expect(mathInteractionsService.validateAnswer('x^2 < 2.5')).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
       'It looks like you have entered an equation/inequality.' +
       ' Please enter an algebraic expression instead.');
-    
+
     expect(mathInteractionsService.validateAnswer('5 >= 2*alpha')).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
       'It looks like you have entered an equation/inequality.' +
       ' Please enter an algebraic expression instead.');
-    
+
     expect(mathInteractionsService.validateAnswer('(x+y)/0')).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
       'Division by zero not allowed.');
@@ -96,11 +96,11 @@ fdescribe('MathInteractionsService', () => {
     expect(mathInteractionsService.validateAnswer('(x+y)/(y-y)')).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
       'Division by zero not allowed.');
-    
+
     expect(mathInteractionsService.validateAnswer('a)(b')).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
       'It looks like your answer has an invalid bracket pairing.');
-    
+
     expect(mathInteractionsService.validateAnswer('3.4.5 + 45/a')).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
       'Invalid integer.');
