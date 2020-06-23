@@ -20,5 +20,6 @@
 // main module the elements are attached to.
 require('pages/maintenance-page/maintenance-page.module.ts');
 require('App.ts');
+require('base-components/oppia-root.directive.ts');
 
 require('pages/maintenance-page/maintenance-page.controller.ts');

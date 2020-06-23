@@ -33,13 +33,8 @@ import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { SharedComponentsModule } from 'components/shared-component.module';
-// This component is needed to force-bootstrap Angular at the beginning of the
-// app.
-@Component({
-  selector: 'service-bootstrap',
-  template: ''
-})
-export class ServiceBootstrapComponent {}
+import { OppiaAngularRootComponent } from
+  'components/oppia-angular-root.component';
 
 import { AppConstants } from 'app.constants';
 import { ClassroomDomainConstants } from
@@ -52,10 +47,10 @@ import { ClassroomDomainConstants } from
     SharedComponentsModule
   ],
   declarations: [
-    ServiceBootstrapComponent
+    OppiaAngularRootComponent
   ],
   entryComponents: [
-    ServiceBootstrapComponent
+    OppiaAngularRootComponent
   ],
   providers: [
     AppConstants,
@@ -88,7 +83,7 @@ angular.module('oppia').requires.push(downgradedModule);
 angular.module('oppia').directive(
   // This directive is the downgraded version of the Angular component to
   // bootstrap the Angular 8.
-  'serviceBootstrap',
+  'oppiaAngularRoot',
   downgradeComponent({
-    component: ServiceBootstrapComponent
+    component: OppiaAngularRootComponent
   }) as angular.IDirectiveFactory);

@@ -10,23 +10,24 @@
     </style>
   </head>
   <body>
-    <service-bootstrap></service-bootstrap>
-    <div ng-controller="Base">
-      <base-content>
-        <navbar-breadcrumb>
-          <search-bar class="protractor-library-page-search-bar" enable-dropup="false"></search-bar>
-        </navbar-breadcrumb>
+    <oppia-root>
+      <div ng-controller="Base">
+        <base-content>
+          <navbar-breadcrumb>
+            <search-bar class="protractor-library-page-search-bar" enable-dropup="false"></search-bar>
+          </navbar-breadcrumb>
 
-        <content>
-          <library-page></library-page>
-        </content>
+          <content>
+            <library-page></library-page>
+          </content>
 
-        <page-footer>
-          <library-footer></library-footer>
-        </page-footer>
-      </base-content>
-    </div>
+          <page-footer>
+            <library-footer></library-footer>
+          </page-footer>
+        </base-content>
+      </div>
 
+    </oppia-root>
     @load('pages/footer_js_libs.html')
   </body>
 </html>

@@ -4,17 +4,18 @@
     @load('base-components/header.template.html', {"title": "Oppia"})
   </head>
   <body>
-    <service-bootstrap></service-bootstrap>
-    <div ng-controller="Base">
-      <base-content>
+    <oppia-root>
+      <div ng-controller="Base">
+        <base-content>
 
-        <content>
-          <classroom-page></classroom-page>
-        </content>
+          <content>
+            <classroom-page></classroom-page>
+          </content>
 
-        <page-footer></page-footer>
-      </base-content>
-    </div>
+          <page-footer></page-footer>
+        </base-content>
+      </div>
+    </oppia-root>
     @load('pages/footer_js_libs.html')
   </body>
 </html>

@@ -21,99 +21,100 @@
     </style>
   </head>
   <body>
-    <service-bootstrap></service-bootstrap>
-    <!-- The transclusion components are not used in this page due to some issue noticed in the translation tab.
-      TODO(Jamesjay4199): Use transclusion components here #7359.
-    -->
-    <div ng-controller="Base">
-      <div ng-if="!iframed">
-        <div role="button" tabindex="0" ng-click="skipToMainContent()" class="oppia-skip-to-content protractor-test-skip-link">Skip to Main Content</div>
-        <promo-bar>
-        </promo-bar>
-        <div ng-if="isBackgroundMaskActive()" class="ng-cloak oppia-background-mask">
-        </div>
+    <oppia-root>
+      <!-- The transclusion components are not used in this page due to some issue noticed in the translation tab.
+        TODO(Jamesjay4199): Use transclusion components here #7359.
+      -->
+      <div ng-controller="Base">
+        <div ng-if="!iframed">
+          <div role="button" tabindex="0" ng-click="skipToMainContent()" class="oppia-skip-to-content protractor-test-skip-link">Skip to Main Content</div>
+          <promo-bar>
+          </promo-bar>
+          <div ng-if="isBackgroundMaskActive()" class="ng-cloak oppia-background-mask">
+          </div>
 
-        <div class="oppia-base-container"
-             ng-class="{'oppia-sidebar-menu-open': isSidebarShown(), 'oppia-sidebar-menu-closed': !isSidebarShown()}"
-             ng-swipe-left="closeSidebarOnSwipe()" ng-swipe-disable-mouse="false">
-          <div class="oppia-content-container">
-            <div id="wrapper">
-              <div class="oppia-main-body">
-                <nav class="navbar navbar-expand navbar-light oppia-navbar oppia-prevent-selection" role="navigation"
-                     headroom tolerance="0" offset="0">
-                  <div class="navbar-container">
-                    <top-navigation-bar></top-navigation-bar>
-                    <div class="collapse navbar-collapse oppia-navbar-collapse ng-cloak">
-                      <editor-navbar-breadcrumb></editor-navbar-breadcrumb>
+          <div class="oppia-base-container"
+               ng-class="{'oppia-sidebar-menu-open': isSidebarShown(), 'oppia-sidebar-menu-closed': !isSidebarShown()}"
+               ng-swipe-left="closeSidebarOnSwipe()" ng-swipe-disable-mouse="false">
+            <div class="oppia-content-container">
+              <div id="wrapper">
+                <div class="oppia-main-body">
+                  <nav class="navbar navbar-expand navbar-light oppia-navbar oppia-prevent-selection" role="navigation"
+                       headroom tolerance="0" offset="0">
+                    <div class="navbar-container">
+                      <top-navigation-bar></top-navigation-bar>
+                      <div class="collapse navbar-collapse oppia-navbar-collapse ng-cloak">
+                        <editor-navbar-breadcrumb></editor-navbar-breadcrumb>
 
-                      <exploration-save-and-publish-buttons class="ml-auto"></exploration-save-and-publish-buttons>
-                      <editor-navigation></editor-navigation>
-                    </div>
-                  </div>
-                </nav>
-
-                <div class="oppia-top-of-page-padding">
-                </div>
-
-                <div tabindex="0" aria-label="Oppia Main Content" id="oppia-main-content" class="protractor-test-main-content" ng-cloak>
-                  <div class="oppia-toast-container toast-top-center">
-                    <div ng-repeat="warning in (AlertsService.warnings | limitTo:5) track by $index" class="toast toast-warning oppia-toast">
-                      <button type="button" class="toast-close-button" ng-click="AlertsService.deleteWarning(warning)" role="button">&times;</button>
-                      <div class="toast-message">
-                        <[warning.content]>
+                        <exploration-save-and-publish-buttons class="ml-auto"></exploration-save-and-publish-buttons>
+                        <editor-navigation></editor-navigation>
                       </div>
                     </div>
+                  </nav>
+
+                  <div class="oppia-top-of-page-padding">
                   </div>
 
-                  <div>
-                    <div ng-repeat="message in AlertsService.messages track by $index">
-                      <alert-message message-object="message" message-index="$index"></alert-message>
+                  <div tabindex="0" aria-label="Oppia Main Content" id="oppia-main-content" class="protractor-test-main-content" ng-cloak>
+                    <div class="oppia-toast-container toast-top-center">
+                      <div ng-repeat="warning in (AlertsService.warnings | limitTo:5) track by $index" class="toast toast-warning oppia-toast">
+                        <button type="button" class="toast-close-button" ng-click="AlertsService.deleteWarning(warning)" role="button">&times;</button>
+                        <div class="toast-message">
+                          <[warning.content]>
+                        </div>
+                      </div>
                     </div>
-                  </div>
 
-                  <div ng-show="loadingMessage" class="oppia-loading-fullpage">
-                    <div class="oppia-align-center">
-                      <span translate="<[loadingMessage]>"></span>
-                      <span class="oppia-loading-dot-one">.</span>
-                      <span class="oppia-loading-dot-two">.</span>
-                      <span class="oppia-loading-dot-three">.</span>
+                    <div>
+                      <div ng-repeat="message in AlertsService.messages track by $index">
+                        <alert-message message-object="message" message-index="$index"></alert-message>
+                      </div>
                     </div>
-                  </div>
-                  <div ng-show="!loadingMessage">
-                    <exploration-editor-page></exploration-editor-page>
+
+                    <div ng-show="loadingMessage" class="oppia-loading-fullpage">
+                      <div class="oppia-align-center">
+                        <span translate="<[loadingMessage]>"></span>
+                        <span class="oppia-loading-dot-one">.</span>
+                        <span class="oppia-loading-dot-two">.</span>
+                        <span class="oppia-loading-dot-three">.</span>
+                      </div>
+                    </div>
+                    <div ng-show="!loadingMessage">
+                      <exploration-editor-page></exploration-editor-page>
+                    </div>
                   </div>
                 </div>
+
+                <noscript>
+                  <div class="oppia-page-cards-container">
+                    <div class="md-default-theme oppia-page-card oppia-long-text">
+                      <!-- Note to developers: We replicate the translated text inline because, without JavaScript enabled, the translation engine doesn't kick in.-->
+                      <h2>
+                        <span translate="I18N_SPLASH_JAVASCRIPT_ERROR_TITLE">We Need JavaScript in Your Browser</span>
+                        <i class="material-icons">&#xE811;</i>
+                      </h2>
+                      <p translate="I18N_SPLASH_JAVASCRIPT_ERROR_DESCRIPTION"
+                         translate-values="{hrefUrl: 'http://www.enable-javascript.com/'}">
+                        Oppia is a free, open-source learning platform full of interactive activities called 'explorations'.  Sadly, Oppia requires JavaScript to be enabled in your web browser in order to function properly and your web browser has JavaScript disabled.  If you need help enabling JavaScript, <a href="http://www.enable-javascript.com">click here.</a>
+                      </p>
+                      <p translate="I18N_SPLASH_JAVASCRIPT_ERROR_THANKS">Thank you.</p>
+                    </div>
+                  </div>
+                </noscript>
+
+                <side-navigation-bar></side-navigation-bar>
               </div>
-
-              <noscript>
-                <div class="oppia-page-cards-container">
-                  <div class="md-default-theme oppia-page-card oppia-long-text">
-                    <!-- Note to developers: We replicate the translated text inline because, without JavaScript enabled, the translation engine doesn't kick in.-->
-                    <h2>
-                      <span translate="I18N_SPLASH_JAVASCRIPT_ERROR_TITLE">We Need JavaScript in Your Browser</span>
-                      <i class="material-icons">&#xE811;</i>
-                    </h2>
-                    <p translate="I18N_SPLASH_JAVASCRIPT_ERROR_DESCRIPTION"
-                       translate-values="{hrefUrl: 'http://www.enable-javascript.com/'}">
-                      Oppia is a free, open-source learning platform full of interactive activities called 'explorations'.  Sadly, Oppia requires JavaScript to be enabled in your web browser in order to function properly and your web browser has JavaScript disabled.  If you need help enabling JavaScript, <a href="http://www.enable-javascript.com">click here.</a>
-                    </p>
-                    <p translate="I18N_SPLASH_JAVASCRIPT_ERROR_THANKS">Thank you.</p>
-                  </div>
-                </div>
-              </noscript>
-
-              <side-navigation-bar></side-navigation-bar>
             </div>
           </div>
-        </div>
 
-        <div ng-if="DEV_MODE" class="oppia-dev-mode" ng-cloak>
-          Dev Mode
-        </div>
+          <div ng-if="DEV_MODE" class="oppia-dev-mode" ng-cloak>
+            Dev Mode
+          </div>
 
+        </div>
       </div>
-    </div>
 
+    </oppia-root>
     @load('pages/footer_js_libs.html')
     <script src="/third_party/static/MathJax-2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     @loadExtensions('interactions/dependency_html.html')

@@ -4,20 +4,21 @@
     @load('base-components/header.template.html', {"title": "Community Dashboard - Oppia"})
   </head>
   <body>
-    <service-bootstrap></service-bootstrap>
-    <base-content>
-      <navbar-breadcrumb>
-      </navbar-breadcrumb>
+    <oppia-root>
+      <base-content>
+        <navbar-breadcrumb>
+        </navbar-breadcrumb>
 
-      <nav-options>
-      </nav-options>
+        <nav-options>
+        </nav-options>
 
-      <content>
-        <community-dashboard-page></community-dashboard-page>
-      </content>
-      <page-footer></page-footer>
-    </base-content>
+        <content>
+          <community-dashboard-page></community-dashboard-page>
+        </content>
+        <page-footer></page-footer>
+      </base-content>
 
+    </oppia-root>
     @load('pages/footer_js_libs.html')
     <script src="/third_party/static/MathJax-2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
   </body>

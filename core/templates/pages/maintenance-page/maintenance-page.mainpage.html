@@ -8,44 +8,44 @@
     @load('pages/header_js_libs.html')
   </head>
   <body>
-    <service-bootstrap></service-bootstrap>
-    <div class="oppia-base-container" ng-controller="Maintenance">
-      <div class="oppia-content-container">
-        <div id="wrapper">
-          <div class="oppia-main-body">
-            <nav class="navbar navbar-default oppia-navbar oppia-prevent-selection" role="navigation">
-              <div class="navbar-container">
-                <div class="navbar-header protractor-test-navbar-header float-left">
-                  <a class="oppia-navbar-brand-name oppia-transition-200" href="/">
-                    <picture>
-                      <source type="image/webp" ng-srcset="<[getStaticImageUrl('/logo/288x128_logo_mint.webp')]>">
-                      <source type="image/png" ng-srcset="<[getStaticImageUrl('/logo/288x128_logo_mint.png')]>">
-                      <img ng-src="<[getStaticImageUrl('/logo/288x128_logo_mint.png')]>"
-                           class="oppia-logo oppia-logo-wide" alt="Oppia Home">
-                    </picture>
-                  </a>
+    <oppia-root>
+      <div class="oppia-base-container" ng-controller="Maintenance">
+        <div class="oppia-content-container">
+          <div id="wrapper">
+            <div class="oppia-main-body">
+              <nav class="navbar navbar-default oppia-navbar oppia-prevent-selection" role="navigation">
+                <div class="navbar-container">
+                  <div class="navbar-header protractor-test-navbar-header float-left">
+                    <a class="oppia-navbar-brand-name oppia-transition-200" href="/">
+                      <picture>
+                        <source type="image/webp" ng-srcset="<[getStaticImageUrl('/logo/288x128_logo_mint.webp')]>">
+                        <source type="image/png" ng-srcset="<[getStaticImageUrl('/logo/288x128_logo_mint.png')]>">
+                        <img ng-src="<[getStaticImageUrl('/logo/288x128_logo_mint.png')]>"
+                             class="oppia-logo oppia-logo-wide" alt="Oppia Home">
+                      </picture>
+                    </a>
+                  </div>
+                  <div ng-cloak class="navbar-header float-right">
+                  </div>
                 </div>
-                <div ng-cloak class="navbar-header float-right">
-                </div>
+              </nav>
+
+              <div class="oppia-top-of-page-padding"></div>
+              <div class="oppia-page-cards-container">
+                <md-card class="oppia-page-card oppia-long-text">
+                  <h2>The Oppia site is temporarily unavailable.</h2>
+
+                  <p>
+                    Oppia is currently being upgraded, and the site should be up
+                    and running again in a few hours. Thanks for your patience!
+                  </p>
+                </md-card>
               </div>
-            </nav>
-
-            <div class="oppia-top-of-page-padding"></div>
-            <div class="oppia-page-cards-container">
-              <md-card class="oppia-page-card oppia-long-text">
-                <h2>The Oppia site is temporarily unavailable.</h2>
-
-                <p>
-                  Oppia is currently being upgraded, and the site should be up
-                  and running again in a few hours. Thanks for your patience!
-                </p>
-              </md-card>
             </div>
           </div>
         </div>
       </div>
-    </div>
-
+    </oppia-root>
     @load('pages/footer_js_libs.html')
   </body>
 </html>

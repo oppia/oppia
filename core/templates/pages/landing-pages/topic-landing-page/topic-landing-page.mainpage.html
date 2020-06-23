@@ -5,16 +5,17 @@
   </head>
 
   <body>
-    <service-bootstrap></service-bootstrap>
-    <div ng-controller="Base">
-      <base-content>
-        <content>
-          <topic-landing-page></topic-landing-page>
-        </content>
-        <page-footer></page-footer>
-      </base-content>
-    </div>
+    <oppia-root>
+      <div ng-controller="Base">
+        <base-content>
+          <content>
+            <topic-landing-page></topic-landing-page>
+          </content>
+          <page-footer></page-footer>
+        </base-content>
+      </div>
 
+    </oppia-root>
     @load('pages/footer_js_libs.html')
   </body>
 </html>

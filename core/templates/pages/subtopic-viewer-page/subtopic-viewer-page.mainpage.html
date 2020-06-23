@@ -4,27 +4,28 @@
     @load('base-components/header.template.html', {"title": "Oppia"})
   </head>
   <body>
-    <service-bootstrap></service-bootstrap>
-    <div ng-controller="Base">
-      <base-content>
-        <navbar-pre-logo-action>
-          <subtopic-viewer-navbar-pre-logo-action>
-          </subtopic-viewer-navbar-pre-logo-action>
-        </navbar-pre-logo-action>
+    <oppia-root>
+      <div ng-controller="Base">
+        <base-content>
+          <navbar-pre-logo-action>
+            <subtopic-viewer-navbar-pre-logo-action>
+            </subtopic-viewer-navbar-pre-logo-action>
+          </navbar-pre-logo-action>
 
-        <navbar-breadcrumb>
-          <subtopic-viewer-navbar-breadcrumb>
-          </subtopic-viewer-navbar-breadcrumb>
-        </navbar-breadcrumb>
+          <navbar-breadcrumb>
+            <subtopic-viewer-navbar-breadcrumb>
+            </subtopic-viewer-navbar-breadcrumb>
+          </navbar-breadcrumb>
 
-        <content>
-          <subtopic-viewer-page></subtopic-viewer-page>
-        </content>
+          <content>
+            <subtopic-viewer-page></subtopic-viewer-page>
+          </content>
 
-        <page-footer></page-footer>
-      </base-content>
-    </div>
+          <page-footer></page-footer>
+        </base-content>
+      </div>
 
+    </oppia-root>
     @load('pages/footer_js_libs.html')
     <script src="/third_party/static/MathJax-2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
   </body>
