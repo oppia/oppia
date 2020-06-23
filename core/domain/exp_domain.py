@@ -232,7 +232,7 @@ class ExplorationCommitLogEntry(python_utils.OBJECT):
                 made in this model, which should give sufficient information to
                 reconstruct the commit. Each dict always contains the following
                 key:
-                - cmd (str). Unique command.
+                    - cmd (str). Unique command.
                 and then additional arguments for that command.
             version: int. The version of the exploration after the commit.
             post_commit_status: str. The new exploration status after the
@@ -3949,9 +3949,9 @@ class ExplorationSummary(python_utils.OBJECT):
         Returns:
             dict. A metadata dict for the given exploration summary.
             The metadata dict has three keys:
-                - 'id' (str). The exploration ID.
-                - 'title' (str). The exploration title.
-                - 'objective' (str). The exploration objective.
+                - 'id': (str). The exploration ID.
+                - 'title': (str). The exploration title.
+                - 'objective': (str). The exploration objective.
         """
         return {
             'id': self.id,

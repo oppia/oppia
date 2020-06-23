@@ -462,9 +462,9 @@ def get_css_filepaths(dependency_bundle, dependency_dir):
 
     Args:
         dependency_bundle: dict(str, list(str) | str). The dict has three keys:
-            - 'js'. List of paths to js files that need to be copied.
-            - 'css'. List of paths to css files that need to be copied.
-            - 'fontsPath'. Path to folder containing fonts that need to be
+            - 'js': List of paths to js files that need to be copied.
+            - 'css': List of paths to css files that need to be copied.
+            - 'fontsPath': Path to folder containing fonts that need to be
                 copied.
         dependency_dir: str. Path to directory where the files that need to
             be copied are located.
@@ -481,9 +481,9 @@ def get_js_filepaths(dependency_bundle, dependency_dir):
 
     Args:
         dependency_bundle: dict(str, list(str) | str). The dict has three keys:
-            - 'js'. List of paths to js files that need to be copied.
-            - 'css'. List of paths to css files that need to be copied.
-            - 'fontsPath'. Path to folder containing fonts that need to be
+            - 'js': List of paths to js files that need to be copied.
+            - 'css': List of paths to css files that need to be copied.
+            - 'fontsPath': Path to folder containing fonts that need to be
                 copied.
         dependency_dir: str. Path to directory where the files that need to
             be copied are located.
@@ -500,8 +500,8 @@ def get_font_filepaths(dependency_bundle, dependency_dir):
 
     Args:
         dependency_bundle: dict(str, list(str) | str). The dict has three keys:
-            - 'js'. List of paths to js files that need to be copied.
-            - 'css'. List of paths to css files that need to be copied.
+            - 'js': List of paths to js files that need to be copied.
+            - 'css': List of paths to css files that need to be copied.
             - 'fontsPath'. Path to folder containing fonts that need to be
                 copied.
         dependency_dir: str. Path to directory where the files that need to

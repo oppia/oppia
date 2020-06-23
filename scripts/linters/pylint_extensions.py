@@ -413,7 +413,7 @@ class DocstringParameterChecker(checkers.BaseChecker):
             node: astroid.scoped_nodes.Function. Node for a function or
                 method definition in the AST.
         """
-        parameter_names = {'Args:', 'Raises:', 'Returns:', 'Yields:'}
+        parameter_names = {'Raises:', 'Returns:', 'Yields:'}
         expected_argument_names = set(
             None if arg.name == 'self'
             else (arg.name + ':') for arg in arguments_node.args)
@@ -428,8 +428,10 @@ class DocstringParameterChecker(checkers.BaseChecker):
                 current_indentation = (len(line) -
                                        len(no_whitespace))
                 parameter = re.search('^[^:]+:', no_whitespace)
+                # Check for empty lines
                 if len(line.strip()) == 0:
                     continue
+                # Check for Args section start
                 if no_whitespace.startswith('Args:'):
                     outer_indentation = current_indentation
                     if current_indentation % 4 != 0:
@@ -437,6 +439,7 @@ class DocstringParameterChecker(checkers.BaseChecker):
                             'incorrect-indentation-for-arg-definition-doc',
                             node=node)
                     is_docstring_args = True
+                # Check for a parameter that is part of the node args
                 elif (is_docstring_args and parameter
                       and ((parameter.group(0).strip('*')
                             in expected_argument_names) or
@@ -453,8 +456,11 @@ class DocstringParameterChecker(checkers.BaseChecker):
                             args=(beginning_of_line))
                     if line.endswith(':'):
                         free_form_args = True
+                # If we get to a different section followed we end the loop
                 elif line.strip() in parameter_names:
                     break
+                # Args checking for description based on whether or
+                # not we are checking the indentation
                 elif is_docstring_args:
                     if not free_form_args and current_indentation != (
                             outer_indentation + 8):
@@ -1549,7 +1555,7 @@ class DocstringChecker(checkers.BaseChecker):
                 elif len(line) == 0:
                     continue
                 elif is_docstring_raise:
-                    # Parameter
+                    # Parameter line (e.g NotImplementedException: )
                     if re.search(br'^[a-zA-Z0-9_\.\*]+: ',
                                  line):
                         if current_indentation != (
@@ -1558,14 +1564,14 @@ class DocstringChecker(checkers.BaseChecker):
                                 'four-space-indentation-in-docstring',
                                 line=line_num + 1)
                         description = True
-                    # Possible malformed parameter
+                    # Possible malformed parameter that confuses the check
                     elif re.search(br'^[^ ]+: ', line) and not description:
                         self.add_message(
                             'malformed-parameter',
                             line=line_num + 1)
                     elif re.search(br':$', line) and description:
                         free_form_return = True
-                    # Description that must be indented by 8
+                    # Description lines must be indented by 8 spaces
                     elif description:
                         if current_indentation != (
                                 outer_indentation_in_spaces + 8):
@@ -1573,7 +1579,8 @@ class DocstringChecker(checkers.BaseChecker):
                                 'eight-space-indentation-in-docstring',
                                 line=line_num + 1)
                 elif is_docstring_return or is_docstring_yield:
-                    # Parameter
+                    # Parameter line(should only be one for
+                    # docstring yield and return
                     if (re.search(br'^[a-zA-Z_() -:,\*]+\. ',
                                   line) and not description):
                         if current_indentation != (
@@ -1584,7 +1591,8 @@ class DocstringChecker(checkers.BaseChecker):
                         if re.search(br':$', line):
                             free_form_return = True
                         description = True
-                    # Description
+                    # Description should be indented on the same level
+                    # of the outer parameters
                     else:
                         if (current_indentation != (
                                 outer_indentation_in_spaces + 4)
