@@ -269,9 +269,10 @@ describe('Question Suggestion Review Modal Controller', function() {
       });
     }));
 
-    it('should evaluate skill rubric explanation injected', function() {
-      expect($scope.skillRubricExplanations).toBe(
-        'This rubric has not yet been specified.');
-    });
+    it('should validate that the skill rubric explanation has been injected',
+      function() {
+        expect($scope.skillRubricExplanations).toBe(
+          'This rubric has not yet been specified.');
+      });
   });
 });

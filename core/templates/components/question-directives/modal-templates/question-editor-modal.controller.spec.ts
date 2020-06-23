@@ -376,7 +376,7 @@ describe('Question Editor Modal Controller', function() {
       expect($uibModalInstance.dismiss).toHaveBeenCalledWith('cancel');
     });
 
-    it('should dismiss modal when there is pending changes which won\'t be' +
+    it('should dismiss modal when there are pending changes which won\'t be' +
       ' saved', function() {
       spyOn(QuestionUndoRedoService, 'hasChanges').and.returnValue(true);
       spyOn($uibModal, 'open').and.returnValue({
@@ -388,7 +388,7 @@ describe('Question Editor Modal Controller', function() {
       expect($uibModalInstance.dismiss).toHaveBeenCalledWith('cancel');
     });
 
-    it('should not dismiss modal when there is pending changes which will be' +
+    it('should not dismiss modal when there are pending changes which will be' +
       ' saved', function() {
       spyOn(QuestionUndoRedoService, 'hasChanges').and.returnValue(true);
       spyOn($uibModal, 'open').and.returnValue({
