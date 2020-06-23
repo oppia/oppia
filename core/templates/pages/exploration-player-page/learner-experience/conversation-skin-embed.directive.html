@@ -65,7 +65,11 @@
           <div class="nav-bar-bottom-visit-oppia">
             <span ng-if="isOnTerminalCard()" class="oppia-view-more-explorations">For more explorations, visit:</span>
             <a class="oppia-link" ng-click="onNavigateFromIframe()" href="https://www.oppia.org/" target="_blank" rel="noopener">
-              <img class="logo-bottom-nav-bar" ng-src="<[getStaticImageUrl('/logo/288x128_logo_white.png')]>">
+              <picture>
+                <source type="image/webp" ng-srcset="<[getStaticImageUrl('/logo/288x128_logo_white.webp')]>">
+                <source type="image/png" ng-srcset="<[getStaticImageUrl('/logo/288x128_logo_white.png')]>">
+                <img class="logo-bottom-nav-bar" ng-src="<[getStaticImageUrl('/logo/288x128_logo_white.png')]>">
+              </picture>
             </a>
           </div>
         </div>

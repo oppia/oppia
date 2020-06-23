@@ -47,19 +47,31 @@
 
             <div class="oppia-about-three-cols-container">
               <div class="oppia-about-three-cols-layout oppia-about-three-cols-feature">
-                <img [src]="getStaticImageUrl('/general/creator-create-exp.png')" alt="">
+                <picture>
+                  <source type="image/webp" [src]="getStaticImageUrl('/general/creator-create-exp.webp')">
+                  <source type="image/png" [src]="getStaticImageUrl('/general/creator-create-exp.png')">
+                  <img [src]="getStaticImageUrl('/general/creator-create-exp.png')" alt="">
+                </picture>
                 <h3 [innerHTML]="'I18N_ABOUT_PAGE_ABOUT_TAB_CREATE' | translate"></h3>
                 <p style="margin-top: -10px;" [innerHTML]="'I18N_ABOUT_PAGE_ABOUT_TAB_CREATE_TEXT' | translate">
                 </p>
               </div>
               <div class="oppia-about-three-cols-layout oppia-about-three-cols-feature">
-                <img [src]="getStaticImageUrl('/general/creator-pub-share.png')" alt="">
+                <picture>
+                  <source type="image/webp" [src]="getStaticImageUrl('/general/creator-pub-share.webp')">
+                  <source type="image/png" [src]="getStaticImageUrl('/general/creator-pub-share.png')">
+                  <img [src]="getStaticImageUrl('/general/creator-pub-share.png')" alt="">
+                </picture>
                 <h3 [innerHTML]="'I18N_ABOUT_PAGE_ABOUT_TAB_SHARE' | translate"></h3>
                 <p style="margin-top: -10px;" [innerHTML]="'I18N_ABOUT_PAGE_ABOUT_TAB_SHARE_TEXT' | translate">
                 </p>
               </div>
               <div class="oppia-about-three-cols-layout oppia-about-three-cols-feature">
-                <img [src]="getStaticImageUrl('/general/creator-feedback.png')" alt="">
+                <picture>
+                  <source type="image/webp" [src]="getStaticImageUrl('/general/creator-feedback.webp')">
+                  <source type="image/png" [src]="getStaticImageUrl('/general/creator-feedback.png')">
+                  <img [src]="getStaticImageUrl('/general/creator-feedback.png')" alt="">
+                </picture>
                 <h3 [innerHTML]="'I18N_ABOUT_PAGE_ABOUT_TAB_FEEDBACK' | translate"></h3>
                 <p style="margin-top: -10px;" [innerHTML]="'I18N_ABOUT_PAGE_ABOUT_TAB_FEEDBACK_TEXT' | translate">
                 </p>
@@ -122,7 +134,11 @@
     <div class="oppia-about-extra-container">
       <div class="oppia-static-extra-content oppia-about-clearfix">
         <div class="oppia-about-otter-container">
-          <img [src]="aboutPageMascotImgUrl" class="oppia-about-otter" alt="Otter">
+          <picture>
+            <source type="image/webp" [src]="getStaticImageUrl('/general/about_page_mascot.webp')">
+            <source type="image/png" [src]="getStaticImageUrl('/general/about_page_mascot.png')">
+            <img [src]="getStaticImageUrl('/general/about_page_mascot.png')" class="oppia-about-otter" alt="Otter">
+          </picture>
         </div>
         <div class="oppia-about-otter-speech-card">
           <blockquote class="oppia-about-otter-speech-bubble">

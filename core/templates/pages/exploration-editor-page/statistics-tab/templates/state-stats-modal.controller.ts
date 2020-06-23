@@ -21,14 +21,13 @@ require(
   'confirm-or-cancel-modal.controller.ts');
 
 require('pages/exploration-editor-page/services/router.service.ts');
-require('services/html-escaper.service.ts');
 
 angular.module('oppia').controller('StateStatsModalController', [
-  '$controller', '$filter', '$scope', '$uibModalInstance', 'HtmlEscaperService',
+  '$controller', '$scope', '$uibModalInstance',
   'RouterService', 'improvementType', 'stateName', 'stateStats',
   'stateStatsModalIsOpen', 'visualizationsInfo',
   function(
-      $controller, $filter, $scope, $uibModalInstance, HtmlEscaperService,
+      $controller, $scope, $uibModalInstance,
       RouterService, improvementType, stateName, stateStats,
       stateStatsModalIsOpen, visualizationsInfo) {
     $controller('ConfirmOrCancelModalController', {
@@ -84,29 +83,7 @@ angular.module('oppia').controller('StateStatsModalController', [
         numTimesSolutionViewed)]
     ];
 
-    var _getVisualizationsHtml = function() {
-      var htmlSnippets = visualizationsInfo.map(function(
-          vizInfo) {
-        var escapedData =
-          HtmlEscaperService.objToEscapedJson(vizInfo.data);
-        var escapedOptions =
-          HtmlEscaperService.objToEscapedJson(vizInfo.options);
-
-        var el = $(
-          '<oppia-visualization-' +
-          $filter('camelCaseToHyphens')(vizInfo.id) + '/>');
-        el.attr('escaped-data', escapedData);
-        el.attr('escaped-options', escapedOptions);
-        el.attr(
-          'addressed-info-is-supported',
-          vizInfo.addressed_info_is_supported);
-        return el.get(0).outerHTML;
-      });
-
-      return htmlSnippets.join('');
-    };
-
-    $scope.visualizationsHtml = _getVisualizationsHtml();
+    $scope.visualizationsInfo = visualizationsInfo;
 
     $scope.$on('$destroy', function() {
       stateStatsModalIsOpen = false;
