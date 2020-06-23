@@ -59,8 +59,8 @@ export class ProfileLinkImageComponent implements OnInit {
       });
   }
 
-  isUsernameLinkable(username: string): boolean {
-    return AppConstants.SYSTEM_USER_IDS.indexOf(username) === -1;
+  isUsernameLinkable(): boolean {
+    return AppConstants.SYSTEM_USER_IDS.indexOf(this.username) === -1;
   }
 }
 
