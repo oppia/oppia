@@ -55,6 +55,12 @@ angular.module('oppia').factory('EditableQuestionBackendApiService', [
         body.append(filenames[idx], imageBlobs[idx]);
       }
       $http.post(QUESTION_CREATION_URL, (body), {
+        // The actual header to be added for form-data is 'multipart/form-data',
+        // But adding it manually won't work because we will miss the boundary
+        // parameter. When we keep 'Content-Type' as undefined the browser
+        // automatically fills the boundary parameter according to the form
+        // data. Refer https://stackoverflow.com/questions/37039852/. and
+        // https://stackoverflow.com/questions/34983071/.
         headers: {
           'Content-Type': undefined
         }
