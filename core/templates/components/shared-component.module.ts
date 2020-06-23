@@ -18,14 +18,16 @@
 import 'core-js/es7/reflect';
 import 'zone.js';
 
+angular.module('oppia', [
+  'ngMaterial',
+]);
+
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { BackgroundBannerComponent } from
   './common-layout-directives/common-elements/background-banner.component';
 import { TranslatePipe } from 'filters/translate.pipe';
-import { CkEditorCopyToolbar } from
-  './ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.component';
 
 
 @NgModule({
