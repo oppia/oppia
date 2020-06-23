@@ -41,6 +41,6 @@ class FakeClass(python_utils.OBJECT):
         Yields:
             write(object). yield output.
         """
-        output = StringIO.StringIO()
+        output = StringIO.StringIO() # Use of StringIO is not allowed.
         output.write(name)
         yield output

@@ -15,7 +15,8 @@
 # limitations under the License.
 
 """Python file with invalid syntax, used by scripts/linters/
-python_linter_test.
+python_linter_test. This file is to use with
+invalid_duplicate_prod_validation_jobs_one_off.py
 """
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules

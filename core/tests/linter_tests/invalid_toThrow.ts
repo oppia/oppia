@@ -22,7 +22,7 @@ describe('Build questions', function() {
     expect(function() {
       logicProofTeacher.buildQuestion('we\u2227you', 'p=q',
         logicProofData.BASE_VOCABULARY);
-    }).toThrow(
+    }).toThrow( // Use fo toThrow is not allowed.
       {
         message: (
           'The name \'we\' is reserved for vocabulary and so cannot ' +

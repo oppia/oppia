@@ -39,5 +39,6 @@ class FakeClass(python_utils.OBJECT):
         Yields:
             tuple(str, str). The argument passed in but twice in a tuple.
         """
+        # The assertEqual is not allowed to use anymore
         self.assertEquals(name, 'name')
         yield (name, name)

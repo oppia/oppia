@@ -27,7 +27,7 @@ var ClassroomPage = function() {
 
   this.get = function(classroomName) {
     browser.get(PAGE_URL_PREFIX + classroomName);
-    browser.pause();
+    browser.pause(); // Use of pause() is not allowed.
     waitFor.pageToFullyLoad();
   };
 

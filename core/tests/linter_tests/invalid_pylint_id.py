@@ -39,4 +39,5 @@ class FakeClass(python_utils.OBJECT):
         Yields:
             tuple(str, str). The argument passed in but twice in a tuple.
         """
+        # Use of pylint ids is not allowed.
         yield (name, name) # pylint: disable=C0303

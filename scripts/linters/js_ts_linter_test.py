@@ -58,7 +58,7 @@ INVALID_ANY_TYPE_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_any_type.ts')
 EXTRA_JS_FILEPATH = os.path.join('core', 'templates', 'demo.js')
 INVALID_COMPONENT_FILEPATH = os.path.join(
-    LINTER_TESTS_DIR, 'invalid_component.ts')
+    LINTER_TESTS_DIR, 'invalid_two_component.ts')
 INVALID_SCOPE_TRUE_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_scope_true.ts')
 INVALID_SCOPE_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_scope.ts')
@@ -70,31 +70,6 @@ INVALID_CONSTANT_IN_TS_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_constant_in_ts_file.ts')
 INVALID_CONSTANT_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_duplicate.constants.ts')
-
-
-def appears_in_linter_stdout(phrases, linter_stdout):
-    """Checks to see if all of the phrases appear in at least one of the
-    linter_stdout outputs.
-
-    Args:
-        phrases: list(str). A list of phrases we are trying to find in
-        one of the linter_stdout outputs. For example, python linting
-        outputs a success string that includes data we don't have easy
-        access to, like how long the test took, so we may want to search
-        for a substring of that success string in linter_stdout.
-
-        linter_stdout: list(str). A list of the output results from the
-        linter's execution. Note that anything placed into the "result"
-        queue in pre_commit_linter will be in the same index.
-
-    Returns:
-        bool. True if and only if all of the phrases appear in at least
-        one of the results stored in linter_stdout.
-    """
-    for output in linter_stdout:
-        if all(phrase in output for phrase in phrases):
-            return True
-    return False
 
 
 class JsTsLintTests(test_utils.GenericTestBase):
@@ -138,12 +113,12 @@ class JsTsLintTests(test_utils.GenericTestBase):
                 [], [INVALID_ANY_TYPE_FILEPATH, VALID_TS_FILEPATH], FILE_CACHE,
                 True).perform_all_lint_checks()
         self.assertTrue(
-            appears_in_linter_stdout(
+            test_utils.assert_same_list_elements(
                 ['\'any\' type found at line 20. Please do not declare variable'
                  ' as \'any\' type'],
                 self.linter_stdout))
         self.assertTrue(
-            appears_in_linter_stdout(
+            test_utils.assert_same_list_elements(
                 ['\'any\' type found at line 22. Please do not declare variable'
                  ' as \'any\' type'],
                 self.linter_stdout))
@@ -165,11 +140,11 @@ class JsTsLintTests(test_utils.GenericTestBase):
                 [EXTRA_JS_FILEPATH], [], FILE_CACHE,
                 True).perform_all_lint_checks()
         self.assertTrue(
-            appears_in_linter_stdout(
+            test_utils.assert_same_list_elements(
                 ['Found extra .js file'],
                 self.linter_stdout))
         self.assertTrue(
-            appears_in_linter_stdout(
+            test_utils.assert_same_list_elements(
                 ['If you want the above files to be present as js files, add '
                  'them to the list JS_FILEPATHS_NOT_TO_BUILD in build.py. '
                  'Otherwise, rename them to .ts'],
@@ -181,7 +156,7 @@ class JsTsLintTests(test_utils.GenericTestBase):
                 [], [INVALID_COMPONENT_FILEPATH], FILE_CACHE,
                 True).perform_all_lint_checks()
         self.assertTrue(
-            appears_in_linter_stdout(
+            test_utils.assert_same_list_elements(
                 ['Please ensure that there is exactly one component '
                  'in the file.'],
                 self.linter_stdout))
@@ -192,7 +167,7 @@ class JsTsLintTests(test_utils.GenericTestBase):
                 [], [INVALID_SCOPE_TRUE_FILEPATH], FILE_CACHE,
                 True).perform_all_lint_checks()
         self.assertTrue(
-            appears_in_linter_stdout(
+            test_utils.assert_same_list_elements(
                 ['Please ensure that baseContent directive in ',
                  ' file does not have scope set to true.'],
                 self.linter_stdout))
@@ -203,7 +178,7 @@ class JsTsLintTests(test_utils.GenericTestBase):
                 [], [INVALID_SCOPE_FILEPATH], FILE_CACHE,
                 False).perform_all_lint_checks()
         self.assertTrue(
-            appears_in_linter_stdout(
+            test_utils.assert_same_list_elements(
                 ['Please ensure that baseContent directive in ',
                  ' file has a scope: {}.'],
                 self.linter_stdout))
@@ -214,14 +189,14 @@ class JsTsLintTests(test_utils.GenericTestBase):
                 [], [INVALID_SORTED_DEPENDENCIES_FILEPATH], FILE_CACHE,
                 True).perform_all_lint_checks()
         self.assertTrue(
-            appears_in_linter_stdout(
+            test_utils.assert_same_list_elements(
                 ['Please ensure that in SuggestionModalForCreatorViewController'
                  ' in file', 'the injected dependencies should be in the '
                  'following manner: dollar imports, regular imports and '
                  'constant imports, all in sorted order.'],
                 self.linter_stdout))
         self.assertTrue(
-            appears_in_linter_stdout(
+            test_utils.assert_same_list_elements(
                 ['Please ensure that in SuggestionModalForCreatorViewController'
                  ' in file ', 'the stringfied dependencies should be in the '
                  'following manner: dollar imports, regular imports and '
@@ -234,7 +209,7 @@ class JsTsLintTests(test_utils.GenericTestBase):
                 [], [INVALID_LINE_BREAK_IN_CONTROLLER_DEPENDENCIES_FILEPATH],
                 FILE_CACHE, True).perform_all_lint_checks()
         self.assertTrue(
-            appears_in_linter_stdout(
+            test_utils.assert_same_list_elements(
                 ['Please ensure that in file',
                  'the line breaks pattern between the dependencies mentioned as'
                  ' strings:\n[$rootScope,$window,BackgroundMaskService,\n'
@@ -250,11 +225,11 @@ class JsTsLintTests(test_utils.GenericTestBase):
                 [], [INVALID_CONSTANT_FILEPATH], FILE_CACHE,
                 True).perform_all_lint_checks()
         self.assertTrue(
-            appears_in_linter_stdout(
+            test_utils.assert_same_list_elements(
                 ['Duplicate constant declaration found.'],
                 self.linter_stdout))
         self.assertTrue(
-            appears_in_linter_stdout(
+            test_utils.assert_same_list_elements(
                 ['Please ensure that the constant ADMIN_TABS is initialized '
                  'from the value from the corresponding Angular constants file '
                  '(the *.constants.ts file). Please create one in the Angular '
@@ -268,7 +243,7 @@ class JsTsLintTests(test_utils.GenericTestBase):
                      INVALID_CONSTANT_IN_TS_FILEPATH],
                 FILE_CACHE, True).perform_all_lint_checks()
         self.assertTrue(
-            appears_in_linter_stdout(
+            test_utils.assert_same_list_elements(
                 ['The constant \'ADMIN_ROLE_HANDLER_URL\' is already declared '
                  'in', 'Please import the file where the constant is declared '
                  'or rename the constant.'],
@@ -280,7 +255,7 @@ class JsTsLintTests(test_utils.GenericTestBase):
                 [], [INVALID_CONSTANT_FILEPATH], FILE_CACHE,
                 True).perform_all_lint_checks()
         self.assertTrue(
-            appears_in_linter_stdout(
+            test_utils.assert_same_list_elements(
                 ['Duplicate constant declaration found.'],
                 self.linter_stdout))
 
@@ -290,7 +265,7 @@ class JsTsLintTests(test_utils.GenericTestBase):
                 [], [VALID_CONSTANT_OUTSIDE_CLASS_FILEPATH], FILE_CACHE,
                 True).perform_all_lint_checks()
         self.assertTrue(
-            appears_in_linter_stdout(
+            test_utils.assert_same_list_elements(
                 ['SUCCESS  Constants declaration check passed'],
                 self.linter_stdout))
 
@@ -300,7 +275,7 @@ class JsTsLintTests(test_utils.GenericTestBase):
                 [], [INVALID_CONSTANT_IN_TS_FILEPATH], FILE_CACHE,
                 True).perform_all_lint_checks()
         self.assertTrue(
-            appears_in_linter_stdout(
+            test_utils.assert_same_list_elements(
                 ['Constant declaration found at line 19. Please declare the '
                  'constants in a separate constants file.'],
                 self.linter_stdout))
@@ -311,7 +286,7 @@ class JsTsLintTests(test_utils.GenericTestBase):
                 [INVALID_SORTED_DEPENDENCIES_FILEPATH],
                 True).perform_all_lint_checks()
         self.assertTrue(
-            appears_in_linter_stdout(
+            test_utils.assert_same_list_elements(
                 ['You have an error in your DI configuration. Each items of '
                  'the array should match exactly one function parameter'],
                 self.linter_stdout))
@@ -340,7 +315,7 @@ class JsTsLintTests(test_utils.GenericTestBase):
             js_ts_linter.ThirdPartyJsTsLintChecksManager(
                 [VALID_TS_FILEPATH], True).perform_all_lint_checks()
         self.assertTrue(
-            appears_in_linter_stdout(
+            test_utils.assert_same_list_elements(
                 ['SUCCESS  1 JavaScript and Typescript files linted'],
                 self.linter_stdout))
 
@@ -349,7 +324,7 @@ class JsTsLintTests(test_utils.GenericTestBase):
             js_ts_linter.JsTsLintChecksManager(
                 [], [], FILE_CACHE, True).perform_all_lint_checks()
         self.assertTrue(
-            appears_in_linter_stdout(
+            test_utils.assert_same_list_elements(
                 ['There are no JavaScript or Typescript files to lint.'],
                 self.linter_stdout))
 
@@ -358,7 +333,7 @@ class JsTsLintTests(test_utils.GenericTestBase):
             js_ts_linter.ThirdPartyJsTsLintChecksManager(
                 [], True).perform_all_lint_checks()
         self.assertTrue(
-            appears_in_linter_stdout(
+            test_utils.assert_same_list_elements(
                 ['There are no JavaScript or Typescript files to lint.'],
                 self.linter_stdout))
 

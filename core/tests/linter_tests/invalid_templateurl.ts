@@ -21,7 +21,7 @@ import { Component } from '@angular/core';
 
 @Component({
   selector: 'app-root',
-  templateUrl: './app.component.html',
+  templateUrl: './app.component.html', // Use of templateUrl is not allowed.
   styleUrls: ['./app.component.css']
 })
 

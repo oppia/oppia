@@ -42,4 +42,5 @@ class FakeClass(python_utils.OBJECT):
         Returns:
             str. The full URL.
         """
+        # Use of urljoin is not allowed.
         return urlparse.urljoin(base_url, relative_url)

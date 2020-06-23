@@ -24,7 +24,7 @@ angular.module('oppia').directive('codemirrorMergeview', [
       link: function(scope, element, attrs) {
         // Require CodeMirror
         if (angular.isUndefined(window.CodeMirror)) {
-          throw 'CodeMirror not found.';
+          throw 'CodeMirror not found.'; // Use of throw is not allowed.
         }
       }
     };

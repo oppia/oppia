@@ -39,5 +39,5 @@ class FakeClass(python_utils.OBJECT):
         Yields:
             tuple(str, str). The argument passed in but twice in a tuple.
         """
-        print(name)
+        print(name) # Use of print is not allowed.
         yield (name, name)

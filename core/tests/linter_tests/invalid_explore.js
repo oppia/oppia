@@ -27,7 +27,7 @@ var ClassroomPage = function() {
 
   this.get = function(classroomName) {
     browser.get(PAGE_URL_PREFIX + classroomName);
-    browser.explore();
+    browser.explore(); // explore() is not allowed to use.
     waitFor.pageToFullyLoad();
   };
 

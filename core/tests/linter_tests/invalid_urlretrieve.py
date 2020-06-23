@@ -42,4 +42,5 @@ class FakeClass(python_utils.OBJECT):
         Returns:
             urlretrieve(object): Returns urlretrieve object.
         """
+        # Use of urlretrieve is not allowed.
         return urllib.urlretrieve(source_url, filename=filename)

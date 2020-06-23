@@ -23,7 +23,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import python_utils
 
-__author__ = 'Author Name'
+__author__ = 'Author Name' # The __author__ tag is not allowed to use.
 
 
 class FakeClass(python_utils.OBJECT):

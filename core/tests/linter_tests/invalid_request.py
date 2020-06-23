@@ -43,4 +43,5 @@ class FakeClass(python_utils.OBJECT):
         Returns:
             Request(object): Returns Request object.
         """
+        # Use of Request() is not allowed.
         return urllib2.Request(source_url, data, headers)

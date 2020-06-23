@@ -39,5 +39,5 @@ class FakeClass(python_utils.OBJECT):
         Yields:
             yields(open, open). Yields file contents.
         """
-        content = open(filename, 'w')
+        content = open(filename, 'w') # Use of open is not allowed.
         yield content

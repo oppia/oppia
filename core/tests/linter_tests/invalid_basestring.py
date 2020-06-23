@@ -39,5 +39,5 @@ class FakeClass(python_utils.OBJECT):
         Yields:
             tuple(bool, bool). The argument passed in but twice in a tuple.
         """
-        name = isinstance(name, basestring)
+        name = isinstance(name, basestring) # basestring is not allowed to use.
         yield (name, name)

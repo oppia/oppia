@@ -20,7 +20,7 @@
 angular.module('oppia').directive('baseContent', [
   function() {
     return {
-      scope: false,
+      scope: false, // Scope should not be false.
     }
   }
 ]);

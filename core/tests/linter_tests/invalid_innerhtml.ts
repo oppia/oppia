@@ -24,7 +24,7 @@ if (!('outerHTML' in SVGElement.prototype)) {
       $temp = document.createElement('div');
       $node = this.cloneNode(true);
       $temp.appendChild($node);
-      return $temp.innerHTML;
+      return $temp.innerHTML; // Use of innerHTML is not allowed.
     },
     enumerable: false,
     configurable: true

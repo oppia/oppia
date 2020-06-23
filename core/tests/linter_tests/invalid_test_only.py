@@ -30,6 +30,7 @@ class FakeClass(python_utils.OBJECT):
     def __init__(self, fake_arg):
         self.fake_arg = fake_arg
 
+    # Use of test_only is not allowed in non-test files.
     def test_only_method(self, name):
         """This doesn't do anything.
 

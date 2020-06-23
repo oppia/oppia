@@ -14,7 +14,7 @@
 
 /**
  * @fileoverview Invalid syntax .ts file, used by scripts/linters/
- * js_ts_linter_test.py.
+ * js_ts_linter_test.py. There are two constants in this file.
  */
 
 import { AdminPageConstants } from 'pages/admin-page/admin-page.constants';

@@ -43,7 +43,7 @@ class FakeClass(python_utils.OBJECT):
 
 class MyObject:
     """This is a fake docstring."""
-    __metaclass__ = FakeClass
+    __metaclass__ = FakeClass  # Use of __metaclass__ is not allowed
 
     def __init__(self, fake_arg):
         self.fake_arg = fake_arg

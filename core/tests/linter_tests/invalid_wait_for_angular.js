@@ -27,7 +27,7 @@ var ClassroomPage = function() {
 
   this.get = function(classroomName) {
     browser.get(PAGE_URL_PREFIX + classroomName);
-    browser.waitForAngular();
+    browser.waitForAngular(); // Use for waitForAngular is not allowed.
     waitFor.pageToFullyLoad();
   };
 

@@ -54,31 +54,6 @@ CODEOWNER_IMPORTANT_PATHS = [
     '/.github/stale.yml']
 
 
-def appears_in_linter_stdout(phrases, linter_stdout):
-    """Checks to see if all of the phrases appear in at least one of the
-    linter_stdout outputs.
-
-    Args:
-        phrases: list(str). A list of phrases we are trying to find in
-        one of the linter_stdout outputs. For example, python linting
-        outputs a success string that includes data we don't have easy
-        access to, like how long the test took, so we may want to search
-        for a substring of that success string in linter_stdout.
-
-        linter_stdout: list(str). A list of the output results from the
-        linter's execution. Note that anything placed into the "result"
-        queue in pre_commit_linter will be in the same index.
-
-    Returns:
-        bool. True if and only if all of the phrases appear in at least
-        one of the results stored in linter_stdout.
-    """
-    for output in linter_stdout:
-        if all(phrase in output for phrase in phrases):
-            return True
-    return False
-
-
 class CodeOwnerLinterTests(test_utils.GenericTestBase):
     """Test the methods for codeowner linter script."""
 
@@ -99,7 +74,8 @@ class CodeOwnerLinterTests(test_utils.GenericTestBase):
 
         self.print_swap = self.swap(python_utils, 'PRINT', mock_print)
 
-    def test_extra_important_patterns_in_the_codeowner_file(self):
+    def test_extra_important_pattern_not_in_list_in_the_codeowner_file(self):
+        #Remove one important path from the end of list for testing purpose.
         mock_codeowner_important_paths = CODEOWNER_IMPORTANT_PATHS[:-1]
 
         codeowner_important_paths_swap = self.swap(
@@ -109,7 +85,7 @@ class CodeOwnerLinterTests(test_utils.GenericTestBase):
         with self.print_swap, codeowner_important_paths_swap:
             codeowner_linter.check_codeowner_file(FILE_CACHE, True)
         self.assertTrue(
-            appears_in_linter_stdout(
+            test_utils.assert_same_list_elements(
                 ['.github/CODEOWNERS --> Rule /.github/stale.yml is not present'
                  ' in the CODEOWNER_IMPORTANT_PATHS list in scripts/linters/'
                  'pre_commit_linter.py. Please add this rule in the '
@@ -123,7 +99,7 @@ class CodeOwnerLinterTests(test_utils.GenericTestBase):
         with self.print_swap, codeowner_path_swap:
             codeowner_linter.check_codeowner_file(FILE_CACHE, True)
         self.assertTrue(
-            appears_in_linter_stdout(
+            test_utils.assert_same_list_elements(
                 ['Duplicate pattern(s) found in critical '
                  'rules section.'], self.linter_stdout))
 
@@ -138,7 +114,7 @@ class CodeOwnerLinterTests(test_utils.GenericTestBase):
         with self.print_swap, codeowner_important_paths_swap:
             codeowner_linter.check_codeowner_file(FILE_CACHE, True)
         self.assertTrue(
-            appears_in_linter_stdout(
+            test_utils.assert_same_list_elements(
                 ['Duplicate pattern(s) '
                  'found in CODEOWNER_IMPORTANT_PATHS list.'],
                 self.linter_stdout))
@@ -150,7 +126,7 @@ class CodeOwnerLinterTests(test_utils.GenericTestBase):
         with self.print_swap, codeowner_path_swap:
             codeowner_linter.check_codeowner_file(FILE_CACHE, True)
         self.assertTrue(
-            appears_in_linter_stdout(
+            test_utils.assert_same_list_elements(
                 ['Rule \'/.github/stale.yml\' is not present in '
                  'the \'Critical files\' '
                  'section. Please place it under the \'Critical files\' '
@@ -163,7 +139,7 @@ class CodeOwnerLinterTests(test_utils.GenericTestBase):
         with self.print_swap:
             codeowner_linter.check_codeowner_file(FILE_CACHE, False)
         self.assertTrue(
-            appears_in_linter_stdout(
+            test_utils.assert_same_list_elements(
                 ['SUCCESS  CODEOWNERS file check passed'], self.linter_stdout))
 
     def test_check_codeowner_file_without_codeowner(self):
@@ -173,7 +149,7 @@ class CodeOwnerLinterTests(test_utils.GenericTestBase):
         with self.print_swap, codeowner_swap:
             codeowner_linter.check_codeowner_file(FILE_CACHE, False)
             self.assertTrue(
-                appears_in_linter_stdout(
+                test_utils.assert_same_list_elements(
                     ['Pattern on line 41 doesn\'t have codeowner'],
                     self.linter_stdout))
 
@@ -184,7 +160,7 @@ class CodeOwnerLinterTests(test_utils.GenericTestBase):
         with self.print_swap, codeowner_swap:
             codeowner_linter.check_codeowner_file(FILE_CACHE, False)
         self.assertTrue(
-            appears_in_linter_stdout(
+            test_utils.assert_same_list_elements(
                 ['Pattern on line 40 is invalid. Use '
                  'full path relative to the root directory'],
                 self.linter_stdout))
@@ -196,7 +172,7 @@ class CodeOwnerLinterTests(test_utils.GenericTestBase):
         with self.print_swap, codeowner_swap:
             codeowner_linter.check_codeowner_file(FILE_CACHE, False)
         self.assertTrue(
-            appears_in_linter_stdout(
+            test_utils.assert_same_list_elements(
                 ['Pattern on line 39 is invalid. '
                  '\'**\' wildcard not allowed'], self.linter_stdout))
 
@@ -207,7 +183,7 @@ class CodeOwnerLinterTests(test_utils.GenericTestBase):
         with self.print_swap, codeowner_swap:
             codeowner_linter.check_codeowner_file(FILE_CACHE, False)
         self.assertTrue(
-            appears_in_linter_stdout(
+            test_utils.assert_same_list_elements(
                 ['Pattern on line 17 doesn\'t match '
                  'any file or directory'], self.linter_stdout))
 
@@ -218,6 +194,6 @@ class CodeOwnerLinterTests(test_utils.GenericTestBase):
         with self.print_swap, codeowner_swap:
             codeowner_linter.check_codeowner_file(FILE_CACHE, True)
         self.assertTrue(
-            appears_in_linter_stdout(
+            test_utils.assert_same_list_elements(
                 ['./.circleci/config.yml is not listed in the '
                  '.github/CODEOWNERS file.'], self.linter_stdout))

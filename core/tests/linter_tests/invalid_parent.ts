@@ -22,5 +22,5 @@ var ParentCtrl = function($scope) {
 };
 
 var ChildCtrl = function($scope) {
-  $scope.parentcities = $scope.$parent.cities;
+  $scope.parentcities = $scope.$parent.cities; // Use of parent is not allowed.
 };

@@ -22,7 +22,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 
-class FakeClass(object):
+class FakeClass(object): # Use of object is not allowed.
     """This is a fake docstring for invalid syntax purposes."""
 
     def __init__(self, fake_arg):

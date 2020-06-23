@@ -38,5 +38,6 @@ class FakeClass(python_utils.OBJECT):
         Yields:
             yields(datetime.time). Yields current time.
         """
+        # Function datetime.datetime.now() is not allowed to use.
         curr_time = datetime.datetime.now()
         yield curr_time

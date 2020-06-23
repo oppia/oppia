@@ -41,4 +41,5 @@ class FakeClass(python_utils.OBJECT):
         Returns:
             urlopen(object): Returns urlopen object.
         """
+        # Use of urlopen is not allowed.
         return urllib2.urlopen(source_url)

@@ -39,5 +39,5 @@ class FakeClass(python_utils.OBJECT):
         Yields:
             tuple(str, str). The argument passed in but twice in a tuple.
         """
-        num = str(num)
+        num = str(num) # Use of str is not allowed.
         yield (num, num)

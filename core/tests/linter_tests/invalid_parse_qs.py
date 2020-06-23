@@ -42,5 +42,5 @@ class FakeClass(python_utils.OBJECT):
             tuple(urlparse, urlparse). The argument passed in but twice in a
             tuple.
         """
-        name = urlparse.parse_qs(name)
+        name = urlparse.parse_qs(name) # Use of parse_qs() is not allowed.
         yield (name, name)

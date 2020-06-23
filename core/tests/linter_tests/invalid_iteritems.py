@@ -40,5 +40,5 @@ class FakeClass(python_utils.OBJECT):
             tuple(iteritems, iteritems). The argument passed in but twice
             in a tuple.
         """
-        name = name.iteritems()
+        name = name.iteritems() // # The iteritems() is not allowed to use.
         yield (name, name)   # disable-bad-pattern-check

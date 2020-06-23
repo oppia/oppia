@@ -27,7 +27,7 @@ var ClassroomPage = function() {
 
   this.get = function(classroomName) {
     browser.get(PAGE_URL_PREFIX + classroomName);
-    browser.sleep(100);
+    browser.sleep(100); // Sleep is not allowed to use.
     waitFor.pageToFullyLoad();
   };
 

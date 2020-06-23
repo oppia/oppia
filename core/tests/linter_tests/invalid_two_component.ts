@@ -14,7 +14,7 @@
 
 /**
  * @fileoverview Invalid syntax .ts file, used by scripts/linters/
- * js_ts_linter_test.py.
+ * js_ts_linter_test.py. Two components are used in file which is not allowed.
  */
 
 angular.module('oppia').directive('baseContent', [

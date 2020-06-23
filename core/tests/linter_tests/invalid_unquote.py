@@ -41,4 +41,4 @@ class FakeClass(python_utils.OBJECT):
         Returns:
             unquote(object). The unquoted string.
         """
-        return urllib.unquote(content)
+        return urllib.unquote(content) # Use of unquote is not allowed.

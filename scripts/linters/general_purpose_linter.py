@@ -543,8 +543,9 @@ def check_bad_pattern_in_file(filepath, file_content, pattern):
             Object containing details for the pattern to be checked.
 
     Returns:
-        failed: bool. True if there is bad pattern else false.
-        summary_messages: list(str). Summary of failed messages.
+        tuple(failed, summary_message). A 2-tuple whose first element is a bool
+        which set to True if there is bad pattern found else False, whose second
+        element is a list of failed messages.
     """
     summary_messages = []
     failed = False
@@ -582,9 +583,10 @@ def check_file_type_specific_bad_pattern(filepath, content):
         content: str. Contents of the file.
 
      Returns:
-        failed: bool. True if there is bad pattern else false.
-        total_error_count: int. The number of errors.
-        summary_messages: list(str). Summary of failed messages.
+        tuple(failed, total_error_count, summary_messages). A 3-tuple whose
+        first element is a bool which is True if there is a bad pattern found,
+        second element is an int which gives the number of errors and third
+        element is a list of failed messages.
     """
     summary_messages = []
     failed = False

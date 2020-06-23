@@ -39,5 +39,5 @@ class FakeClass(python_utils.OBJECT):
         Yields:
             tuple(int, int). The argument passed in but twice in a tuple.
         """
-        num = round(num)
+        num = round(num) # Use of round is not allowed.
         yield (num, num)

@@ -50,31 +50,6 @@ NAME_SPACE.files = pre_commit_linter.FileCache()
 FILE_CACHE = NAME_SPACE.files
 
 
-def appears_in_linter_stdout(phrases, linter_stdout):
-    """Checks to see if all of the phrases appear in at least one of the
-    linter_stdout outputs.
-
-    Args:
-        phrases: list(str). A list of phrases we are trying to find in
-        one of the linter_stdout outputs. For example, python linting
-        outputs a success string that includes data we don't have easy
-        access to, like how long the test took, so we may want to search
-        for a substring of that success string in linter_stdout.
-
-        linter_stdout: list(str). A list of the output results from the
-        linter's execution. Note that anything placed into the "result"
-        queue in pre_commit_linter will be in the same index.
-
-    Returns:
-        bool. True if and only if all of the phrases appear in at least
-        one of the results stored in linter_stdout.
-    """
-    for output in linter_stdout:
-        if all(phrase in output for phrase in phrases):
-            return True
-    return False
-
-
 class PythonLintChecksManagerTests(test_utils.GenericTestBase):
     """Test for python linter."""
 
@@ -101,7 +76,7 @@ class PythonLintChecksManagerTests(test_utils.GenericTestBase):
                 [INVALID_IMPORT_FILEPATH], FILE_CACHE,
                 True).perform_all_lint_checks()
         self.assertTrue(
-            appears_in_linter_stdout(
+            test_utils.assert_same_list_elements(
                 ['FAILED  Import order checks failed, file imports should be '
                  'alphabetized, see affect files above.'],
                 self.linter_stdout))
@@ -111,7 +86,7 @@ class PythonLintChecksManagerTests(test_utils.GenericTestBase):
             python_linter.PythonLintChecksManager(
                 [VALID_PY_FILEPATH], FILE_CACHE, True).perform_all_lint_checks()
         self.assertTrue(
-            appears_in_linter_stdout(
+            test_utils.assert_same_list_elements(
                 ['SUCCESS  Import order checks passed'],
                 self.linter_stdout))
 
@@ -121,11 +96,11 @@ class PythonLintChecksManagerTests(test_utils.GenericTestBase):
                 INVALID_JOBS_ONE_OFF_FILEPATHS + VALID_JOBS_ONE_OFF_FILEPATHS,
                 FILE_CACHE, True).perform_all_lint_checks()
         self.assertTrue(
-            appears_in_linter_stdout(
+            test_utils.assert_same_list_elements(
                 ['Found one-off jobs with duplicate names: '
                  'CollectionMigrationOneOffJob'], self.linter_stdout))
         self.assertTrue(
-            appears_in_linter_stdout(
+            test_utils.assert_same_list_elements(
                 ['Found one-off jobs not listed in jobs_registry file: '
                  'CollectionsMigrationOneOffJob'],
                 self.linter_stdout))
@@ -136,7 +111,7 @@ class PythonLintChecksManagerTests(test_utils.GenericTestBase):
                 VALID_JOBS_ONE_OFF_FILEPATHS, FILE_CACHE,
                 True).perform_all_lint_checks()
         self.assertTrue(
-            appears_in_linter_stdout(
+            test_utils.assert_same_list_elements(
                 ['SUCCESS  Job registry check passed'], self.linter_stdout))
 
     def test_all_jobs_are_listed_in_the_job_registry_file_with_prod_job(self):
@@ -145,12 +120,12 @@ class PythonLintChecksManagerTests(test_utils.GenericTestBase):
                 INVALID_PROD_VALIDATION_JOBS_ONE_OFF_FILEPATHS, FILE_CACHE,
                 True).perform_all_lint_checks()
         self.assertTrue(
-            appears_in_linter_stdout(
+            test_utils.assert_same_list_elements(
                 ['Found validation jobs with duplicate names: '
                  'PendingDeletionRequestModelAuditOneOffJob'],
                 self.linter_stdout))
         self.assertTrue(
-            appears_in_linter_stdout(
+            test_utils.assert_same_list_elements(
                 ['Found validation jobs not listed in jobs_registry file: '
                  'PendingDeletionRequestModelAuditOneOffJobs'],
                 self.linter_stdout))
@@ -161,8 +136,8 @@ class PythonLintChecksManagerTests(test_utils.GenericTestBase):
                 [INVALID_TEST_ONLY_FILEPATH], FILE_CACHE,
                 True).perform_all_lint_checks()
         self.assertTrue(
-            appears_in_linter_stdout(
-                ['Line 33: Please do not use \'test_only\' in the non-test '
+            test_utils.assert_same_list_elements(
+                ['Line 34: Please do not use \'test_only\' in the non-test '
                  'file.'], self.linter_stdout))
 
     def test_custom_linter_with_test_function_in_test_file(self):
@@ -171,7 +146,7 @@ class PythonLintChecksManagerTests(test_utils.GenericTestBase):
                 [VALID_TEST_FILEPATH], FILE_CACHE,
                 True).perform_all_lint_checks()
         self.assertTrue(
-            appears_in_linter_stdout(
+            test_utils.assert_same_list_elements(
                 ['SUCCESS  Function definition checks passed'],
                 self.linter_stdout))
 
@@ -180,10 +155,10 @@ class PythonLintChecksManagerTests(test_utils.GenericTestBase):
             python_linter.ThirdPartyPythonLintChecksManager(
                 [VALID_PY_FILEPATH], True).perform_all_lint_checks()
         self.assertTrue(
-            appears_in_linter_stdout(
+            test_utils.assert_same_list_elements(
                 ['SUCCESS  1 Python files linted'], self.linter_stdout))
         self.assertTrue(
-            appears_in_linter_stdout(
+            test_utils.assert_same_list_elements(
                 ['SUCCESS  1 Python files linted for Python 3 compatibility'],
                 self.linter_stdout))
 
@@ -192,7 +167,7 @@ class PythonLintChecksManagerTests(test_utils.GenericTestBase):
             python_linter.ThirdPartyPythonLintChecksManager(
                 [INVALID_IMPORT_FILEPATH], True).perform_all_lint_checks()
         self.assertTrue(
-            appears_in_linter_stdout(
+            test_utils.assert_same_list_elements(
                 ['C: 33, 0: Missing function docstring (missing-docstring)'],
                 self.linter_stdout))
 
@@ -201,7 +176,7 @@ class PythonLintChecksManagerTests(test_utils.GenericTestBase):
             python_linter.ThirdPartyPythonLintChecksManager(
                 [PYTHON_UTILS_FILEPATH], True).perform_all_lint_checks()
         self.assertTrue(
-            appears_in_linter_stdout(
+            test_utils.assert_same_list_elements(
                 ['There are no Python files to lint for Python 3 '
                  'compatibility.'], self.linter_stdout))
 
@@ -210,7 +185,7 @@ class PythonLintChecksManagerTests(test_utils.GenericTestBase):
             python_linter.ThirdPartyPythonLintChecksManager(
                 [INVALID_IMPORT_FILEPATH], True).perform_all_lint_checks()
         self.assertTrue(
-            appears_in_linter_stdout(
+            test_utils.assert_same_list_elements(
                 ['E: 34, 4: print statement used (print-statement)'],
                 self.linter_stdout))
 
@@ -219,7 +194,7 @@ class PythonLintChecksManagerTests(test_utils.GenericTestBase):
             python_linter.PythonLintChecksManager(
                 [], FILE_CACHE, True).perform_all_lint_checks()
         self.assertTrue(
-            appears_in_linter_stdout(
+            test_utils.assert_same_list_elements(
                 ['There are no Python files to lint.'], self.linter_stdout))
 
     def test_third_party_linter_with_no_files(self):
@@ -227,7 +202,7 @@ class PythonLintChecksManagerTests(test_utils.GenericTestBase):
             python_linter.ThirdPartyPythonLintChecksManager(
                 [], True).perform_all_lint_checks()
         self.assertTrue(
-            appears_in_linter_stdout(
+            test_utils.assert_same_list_elements(
                 ['There are no Python files to lint.'],
                 self.linter_stdout))
 

@@ -40,5 +40,5 @@ class FakeClass(python_utils.OBJECT):
             tuple(itervalues, itervalues). The argument passed in but twice in
             a tuple.
         """
-        name = name.itervalues()
+        name = name.itervalues() # The itervalues() is not allowed to use.
         yield (name, name)

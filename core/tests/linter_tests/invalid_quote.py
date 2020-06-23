@@ -41,4 +41,4 @@ class FakeClass(python_utils.OBJECT):
         Returns:
             quote(urllib object): Returns quote object.
         """
-        return urllib.quote(content)
+        return urllib.quote(content) # Use of quote() is not allowed.

@@ -42,5 +42,6 @@ class FakeClass(python_utils.OBJECT):
             tuple(urlsplit, urlsplit). The argument passed in but twice in a
             tuple.
         """
+        # Use of urlsplit() is not allowed.
         urlstring = urlparse.urlsplit(urlstring)
         yield (urlstring, urlstring)

@@ -17,6 +17,6 @@
  * js_ts_linter_test.py.
  */
 
-declare const require: any;
+declare const require: any; // Use of any type is not allowed.
 declare const require:
   any;

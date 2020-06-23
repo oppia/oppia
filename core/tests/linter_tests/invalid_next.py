@@ -40,5 +40,5 @@ class FakeClass(python_utils.OBJECT):
             tuple(str, str). The argument passed in but twice in a tuple.
         """
         n_list = iter(['abc', 'def'])
-        name = next(n_list)
+        name = next(n_list) # Use of next is not allowed.
         yield (name, name)

@@ -65,11 +65,6 @@ def mock_check_third_party_libs_type_defs(unused_verbose_mode_enabled):
     return []
 
 
-def mock_perform_all_lint_checks(unused_self):
-    """Mock for perform_all_lint_checks."""
-    return []
-
-
 def mock_install_third_party_libs_main():
     """Mock for install_third_party_libs."""
     return
@@ -86,31 +81,6 @@ def all_checks_passed(linter_stdout):
         bool. Whether all checks have passed or not.
     """
     return 'All Checks Passed.' in linter_stdout
-
-
-def appears_in_linter_stdout(phrases, linter_stdout):
-    """Checks to see if all of the phrases appear in at least one of the
-    linter_stdout outputs.
-
-    Args:
-        phrases: list(str). A list of phrases we are trying to find in
-        one of the linter_stdout outputs. For example, python linting
-        outputs a success string that includes data we don't have easy
-        access to, like how long the test took, so we may want to search
-        for a substring of that success string in linter_stdout.
-
-        linter_stdout: list(str). A list of the output results from the
-        linter's execution. Note that anything placed into the "result"
-        queue in pre_commit_linter will be in the same index.
-
-    Returns:
-        bool. True if and only if all of the phrases appear in at least
-        one of the results stored in linter_stdout.
-    """
-    for output in linter_stdout:
-        if all(phrase in output for phrase in phrases):
-            return True
-    return False
 
 
 class LintTests(test_utils.GenericTestBase):
@@ -160,7 +130,7 @@ class PreCommitLinterTests(LintTests):
                 with all_filepath_swap:
                     pre_commit_linter.main()
         self.assertTrue(
-            appears_in_linter_stdout(
+            test_utils.assert_same_list_elements(
                 ['No files to check'], self.linter_stdout))
 
     def test_main_with_no_args(self):
@@ -176,7 +146,7 @@ class PreCommitLinterTests(LintTests):
                 with get_changed_filepaths_swap:
                     pre_commit_linter.main()
         self.assertTrue(
-            appears_in_linter_stdout(
+            test_utils.assert_same_list_elements(
                 ['No files to check'], self.linter_stdout))
 
     def test_main_with_files_arg(self):
@@ -194,7 +164,7 @@ class PreCommitLinterTests(LintTests):
                 pre_commit_linter.main(args=['--path=%s' % VALID_PY_FILEPATH])
         self.assertFalse(all_checks_passed(self.linter_stdout))
         self.assertTrue(
-            appears_in_linter_stdout(
+            test_utils.assert_same_list_elements(
                 ['This is an error.'], self.linter_stdout))
 
     def test_main_with_path_arg(self):
@@ -204,7 +174,7 @@ class PreCommitLinterTests(LintTests):
                     args=['--path=%s' % INVALID_CSS_FILEPATH])
         self.assertFalse(all_checks_passed(self.linter_stdout))
         self.assertTrue(
-            appears_in_linter_stdout(
+            test_utils.assert_same_list_elements(
                 ['18:16',
                  'Unexpected whitespace before \":\"   declaration-colon-space-'
                  'before'], self.linter_stdout))
@@ -213,7 +183,7 @@ class PreCommitLinterTests(LintTests):
         with self.print_swap, self.assertRaises(SystemExit) as e:
             pre_commit_linter.main(args=['--path=invalid_file.py'])
         self.assertTrue(
-            appears_in_linter_stdout(
+            test_utils.assert_same_list_elements(
                 ['Could not locate file or directory'], self.linter_stdout))
         self.assertEqual(e.exception.code, 1)
 
@@ -221,7 +191,7 @@ class PreCommitLinterTests(LintTests):
         with self.print_swap, self.assertRaises(SystemExit) as e:
             pre_commit_linter.main(args=['--files=invalid_file.py'])
         self.assertTrue(
-            appears_in_linter_stdout(
+            test_utils.assert_same_list_elements(
                 ['The following file(s) do not exist'], self.linter_stdout))
         self.assertEqual(e.exception.code, 1)
 
@@ -254,7 +224,7 @@ class PreCommitLinterTests(LintTests):
                 args=['--path=%s' % VALID_TS_FILEPATH,
                       '--only-check-file-extensions', 'ts', 'js'])
         self.assertTrue(
-            appears_in_linter_stdout(
+            test_utils.assert_same_list_elements(
                 ['Please use only one of "js" or "ts", as we do not have '
                  'separate linters for JS and TS files. If both these options '
                  'are used together, then the JS/TS linter will be run twice.'],

@@ -41,5 +41,5 @@ class FakeClass(python_utils.OBJECT):
         """
         abc = ['1', '2', '3']
         ab = ['1', '2']
-        name = zip(abc, ab)
+        name = zip(abc, ab) # Use of zip is not allowed.
         yield (name, name)

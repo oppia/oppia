@@ -42,4 +42,5 @@ class FakeClass(python_utils.OBJECT):
         Returns:
             urlencode(object): Returns urlencode object.
         """
+        # Use of urlencode is not allowed.
         return urllib.urlencode(source_url, doseq=doseq)

@@ -8,13 +8,13 @@
     <div ng-controller="Base">
       <base-content>
 
-        <content>
+        <content> <!-- Indentation mismatch -->
           <% if (webpackConfig.mode == 'production') { %>
             <script src="/build/webpack_bundles/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
           <% } else { %>
             <script src="/webpack_bundles/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
           <% } %>
-      </content>
+      </content> <!-- Indentation mismatch -->
 
         <page-footer></page-footer>
       </base-content>

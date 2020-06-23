@@ -36,31 +36,6 @@ VALID_CSS_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'valid.css')
 INVALID_CSS_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid.css')
 
 
-def appears_in_linter_stdout(phrases, linter_stdout):
-    """Checks to see if all of the phrases appear in at least one of the
-    linter_stdout outputs.
-
-    Args:
-        phrases: list(str). A list of phrases we are trying to find in
-        one of the linter_stdout outputs. For example, python linting
-        outputs a success string that includes data we don't have easy
-        access to, like how long the test took, so we may want to search
-        for a substring of that success string in linter_stdout.
-
-        linter_stdout: list(str). A list of the output results from the
-        linter's execution. Note that anything placed into the "result"
-        queue in pre_commit_linter will be in the same index.
-
-    Returns:
-        bool. True if and only if all of the phrases appear in at least
-        one of the results stored in linter_stdout.
-    """
-    for output in linter_stdout:
-        if all(phrase in output for phrase in phrases):
-            return True
-    return False
-
-
 class MockProcessClass(python_utils.OBJECT):
     def __init__(self):
         pass
@@ -106,7 +81,7 @@ class ThirdPartyCSSLintChecksManagerTests(test_utils.GenericTestBase):
                 CONFIG_PATH, [INVALID_CSS_FILEPATH], True)
             third_party_linter.perform_all_lint_checks()
         self.assertTrue(
-            appears_in_linter_stdout(
+            test_utils.assert_same_list_elements(
                 ['18:16',
                  'Unexpected whitespace before \":\"   declaration-colon-space-'
                  'before'], self.linter_stdout))
@@ -149,7 +124,7 @@ class ThirdPartyCSSLintChecksManagerTests(test_utils.GenericTestBase):
                 CONFIG_PATH, [], False)
             third_party_linter.perform_all_lint_checks()
         self.assertTrue(
-            appears_in_linter_stdout(
+            test_utils.assert_same_list_elements(
                 ['There are no HTML or CSS files to lint.'],
                 self.linter_stdout))
 
@@ -159,7 +134,7 @@ class ThirdPartyCSSLintChecksManagerTests(test_utils.GenericTestBase):
                 CONFIG_PATH, [VALID_CSS_FILEPATH], False)
             third_party_linter.perform_all_lint_checks()
         self.assertTrue(
-            appears_in_linter_stdout(
+            test_utils.assert_same_list_elements(
                 ['SUCCESS  1 CSS file linted'],
                 self.linter_stdout))
 
