@@ -2433,15 +2433,15 @@ oppia-parameter {
 }
 @media (min-width: 768px) {
   .skill-select-modal .modal-xl {
-    width: 1000px;
     margin: 1.75rem auto;
+    width: 1000px;
   }
 }
 
 @media (max-width: 576px) {
   .skill-select-modal .modal-xl {
-    max-width: 500px;
     margin: 1.75rem auto;
+    max-width: 500px;
   }
 }
 
