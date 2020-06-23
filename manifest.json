@@ -434,14 +434,6 @@
           "js": ["dist/js/select2.full.js"]
         }
       },
-      "literallycanvas": {
-        "version": "0.5.2",
-        "downloadFormat": "tar",
-        "url": "https://github.com/literallycanvas/literallycanvas/archive/v0.5.2.tar.gz",
-        "tarRootDirPrefix": "literallycanvas-",
-        "rootDirPrefix": "literallycanvas-",
-        "targetDirPrefix": "literallycanvas-"
-      },
       "ckeditor": {
         "version": "4.12.1",
         "downloadFormat": "zip",
