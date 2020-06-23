@@ -872,7 +872,7 @@ states:
     interaction:
       answer_groups:
       - outcome:
-          dest: Code Editor
+          dest: Algebraic Expression Input
           feedback:
             content_id: feedback_1
             html: <p>That is exactly how you find the area of a circle! Good job!</p>
