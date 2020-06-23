@@ -28,13 +28,15 @@ describe('Admin misc test tab', function() {
   var topicsAndSkillsDashboardPage = null;
   var topicEditorPage = null;
   var topicId = null;
-  var allowedErrors = ['Failed to load resource', 'Object', 'Entity', '500', 'encode'];
+  var allowedErrors = ['Failed to load resource', 'Object', 'Entity',
+    '500', 'encode'];
 
   beforeAll(async function() {
     adminPage = new AdminPage.AdminPage();
-    topicsAndSkillsDashboardPage = (new TopicsAndSkillsDashboardPage.TopicsAndSkillsDashboardPage());
+    topicsAndSkillsDashboardPage = (
+      new TopicsAndSkillsDashboardPage.TopicsAndSkillsDashboardPage());
     topicEditorPage = new TopicEditorPage.TopicEditorPage();
-    
+
     await users.createAndLoginAdminUser(
       'miscTabTester@miscTab.com', 'miscTabTester');
 
@@ -51,7 +53,8 @@ describe('Admin misc test tab', function() {
   it('should upload similarity file', async function() {
     await adminPage.get();
     await adminPage.getMiscTab();
-    await adminPage.uploadTopicSimilarities('../data/sample_topic_similarities.csv');
+    await adminPage.uploadTopicSimilarities(
+      '../data/sample_topic_similarities.csv');
     await adminPage.expectSimilaritiesToBeUploaded();
     await adminPage.uploadTopicSimilarities('../data/cafe.mp3');
     await adminPage.expectUploadError();
@@ -61,7 +64,7 @@ describe('Admin misc test tab', function() {
     await adminPage.downloadSimilarityFile();
     await adminPage.expectFileToBeDownloaded();
   });
-  
+
   it('should clear the search index', async function() {
     await adminPage.clearSearchIndex();
     await adminPage.expectSearchIndexToBeCleared();
@@ -71,26 +74,26 @@ describe('Admin misc test tab', function() {
     await adminPage.flushMigrationBotContributions();
     await adminPage.expectMigrationBotContributionsToBeFlushed();
   });
-    
+
   it('should successfully change the username', async function() {
     await adminPage.changeUsername('miscTabTester', 'mTabChecker');
     await adminPage.expectUsernameToBeChanged('miscTabTester', 'mTabChecker');
   });
-  
-  it('should regenerate contribution opportunities for a topic', 
+
+  it('should regenerate contribution opportunities for a topic',
     async function() {
-    await adminPage.regenerateContributionsForTopic('0');
-    await adminPage.expectRegenerationError('0');
-    await adminPage.regenerateContributionsForTopic(topicId.substring(1));
-    await adminPage.expectConributionsToBeRegeneratedForTopic();
-  });
-  
+      await adminPage.regenerateContributionsForTopic('0');
+      await adminPage.expectRegenerationError('0');
+      await adminPage.regenerateContributionsForTopic(topicId.substring(1));
+      await adminPage.expectConributionsToBeRegeneratedForTopic();
+    });
+
   it('should fill out extract data form and extract data', async function() {
-    await adminPage.fillAndSubmitExtractDataForm(0,0,0,0);
+    await adminPage.fillAndSubmitExtractDataForm(0, 0, 0, 0);
     await adminPage.expectAllDataToBeExtracted();
   });
 
-  afterEach(async function(){
+  afterEach(async function() {
     await general.checkForConsoleErrors(allowedErrors);
   });
 });

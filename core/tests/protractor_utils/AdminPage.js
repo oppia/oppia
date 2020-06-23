@@ -47,7 +47,7 @@ var AdminPage = function() {
     '.protractor-test-unfinished-one-off-jobs-rows'));
   var unfinishedOffJobIDClassName = (
     '.protractor-test-unfinished-one-off-jobs-id');
-  
+
   var miscTabButton = element(by.css('.protractor-test-misc-tab'));
   var chooseSimilarityFileInput = element(
     by.css('.protractor-test-similarities-input'));
@@ -312,8 +312,8 @@ var AdminPage = function() {
     await waitFor.pageToFullyLoad();
   };
 
-  this.uploadTopicSimilarities = async function(relativePathToSimilaritiesFile)
-  {
+  this.uploadTopicSimilarities = 
+    async function(relativePathToSimilaritiesFile) {
     absPath = path.resolve(__dirname, relativePathToSimilaritiesFile);
     await waitFor.visibilityOf(chooseSimilarityFileInput,
       'Similarity upload form is not visible');
@@ -327,12 +327,13 @@ var AdminPage = function() {
     await waitFor.textToBePresentInElement(statusMessage,
       'Topic similarities uploaded successfully.')
     return true;
-  }
+  };
 
   this.expectUploadError = async function() {
     await statusMessage.getText().then((text) => {
-      if(text.match('Server'))
+      if(text.match('Server')) {
         return true;
+      };
       return false;
     });
   };
@@ -345,11 +346,9 @@ var AdminPage = function() {
 
   this.expectFileToBeDownloaded = async function() {
     var filename = global.downloadsPath + '/topic_similarities.csv';
-    browser.driver.wait(function(){
+    browser.driver.wait(function() {
       return fs.existsSync(filename);
-    }, 30000).then(function(){
-      console.log('File is not downloading.');
-    });
+    }, 30000);
   };
 
   this.clearSearchIndex = async function() {
@@ -363,7 +362,7 @@ var AdminPage = function() {
     await waitFor.textToBePresentInElement(statusMessage,
       'Index successfully cleared.');
     return true;
-  }
+  };
 
   this.flushMigrationBotContributions = async function() {
     await waitFor.elementToBeClickable(flushMigrationBotContributionsButton,
@@ -377,26 +376,25 @@ var AdminPage = function() {
       'Migration bot contributions successfully flushed.',
       'Migration bot cuntributions not flushing.');
     return true;
-  }
+  };
 
   this.fillAndSubmitExtractDataForm = async function(explorationID, 
-    explorationVersion, stateName, numAnswers)
-  {
-    await waitFor.pageToFullyLoad();
-    await extractDataExplorationIdInput.sendKeys(explorationID);
-    await extractDataExplorationVersionInput.sendKeys(explorationVersion);
-    await extractDataStateNameInput.sendKeys(stateName);
-    await extractDataNumAnswersInput.sendKeys(numAnswers);
-    await waitFor.elementToBeClickable(extractDataFormSubmitButton,
-      'Extract data form submit button not clickable');
-    await extractDataFormSubmitButton.click();
-  };
+    explorationVersion, stateName, numAnswers) {
+      await waitFor.pageToFullyLoad();
+      await extractDataExplorationIdInput.sendKeys(explorationID);
+      await extractDataExplorationVersionInput.sendKeys(explorationVersion);
+      await extractDataStateNameInput.sendKeys(stateName);
+      await extractDataNumAnswersInput.sendKeys(numAnswers);
+      await waitFor.elementToBeClickable(extractDataFormSubmitButton,
+        'Extract data form submit button not clickable');
+      await extractDataFormSubmitButton.click();
+    };
 
   this.expectAllDataToBeExtracted = async function() {
     await browser.getAllWindowHandles().then((handles) => {
       expect(handles.length).toEqual(3);
     });
-  }
+  };
 
   this.regenerateContributionsForTopic = async function(topicId) {
     await regenerateContributionsTopicIdInput.sendKeys(topicId);
@@ -407,44 +405,41 @@ var AdminPage = function() {
   };
 
   this.expectRegenerationError = async function(topic) {
-    var text = 'Server error: Entity for class TopicModel with id ' 
-      + topic + ' not found';
+    var text = 'Server error: Entity for class TopicModel with id ' +
+      topic + ' not found';
     expect(regenerationMessage.getText()).toEqual(text);
   };
 
   this.expectConributionsToBeRegeneratedForTopic = async function() {
     var text = 'No. of opportunities model created: 0';
     expect(regenerationMessage.getText()).toEqual(text);
-  }
+  };
 
-  this.sendTestEmail = async function(){
+  this.sendTestEmail = async function() {
     await waitFor.elementToBeClickable(sendEmailButton,
       'Send email button not clickable');
     await sendEmailButton.click();
-  }
+  };
 
   this.expectMailToBeSent = async function() {
     await waitFor.textToBePresentInElement(statusMessage,
       'Server error: This app cannot send emails.');
     return true;
-  }
+  };
 
-  this.changeUsername = async function(oldUsername, newUsername)
-  {
+  this.changeUsername = async function(oldUsername, newUsername) {
     await oldUsernameInput.sendKeys(oldUsername);
     await newUsernameInput.sendKeys(newUsername);
     await waitFor.elementToBeClickable(usernameChangeSubmitButton,
       'Username change submit button not clickable');
     await usernameChangeSubmitButton.click();  
-  }
+  };
 
-  this.expectUsernameToBeChanged = async function(oldUsername, newUsername)
-  {
+  this.expectUsernameToBeChanged = async function(oldUsername, newUsername) {
     var text = 'Successfully renamed ' + oldUsername + ' to ' + newUsername;
     await waitFor.textToBePresentInElement(statusMessage, text);
     return true;
-  }
-
+  };
 };
 
 exports.AdminPage = AdminPage;
