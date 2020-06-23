@@ -290,6 +290,7 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
         self.logout()
 
     def test_post_with_valid_images(self):
+        """Test question creation with valid images."""
         self.login(self.ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         filename = 'img.png'
@@ -327,6 +328,7 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
         self.logout()
 
     def test_post_with_invalid_images(self):
+        """Test question creation with invalid images."""
         self.login(self.ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         question_dict = self.question.to_dict()
