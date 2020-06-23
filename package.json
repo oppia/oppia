@@ -103,6 +103,7 @@
     "@angular/platform-browser-dynamic": "^8.0.0",
     "@angular/router": "^8.0.0",
     "@angular/upgrade": "^8.0.0",
+    "@types/d3-hexbin": "^0.2.3",
     "angular": "^1.7.9",
     "angular-cookies": "^1.7.9",
     "angular-route": "^1.7.9",
