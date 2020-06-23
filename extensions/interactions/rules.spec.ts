@@ -42,6 +42,8 @@ import { MultipleChoiceInputRulesService } from
   'interactions/MultipleChoiceInput/directives/multiple-choice-input-rules.service';
 import { ItemSelectionInputRulesService } from
   'interactions/ItemSelectionInput/directives/item-selection-input-rules.service';
+import { MathEquationInputRulesService } from
+  'interactions/MathEquationInput/directives/math-equation-input-rules.service';
 import { NumberWithUnitsRulesService } from
   'interactions/NumberWithUnits/directives/number-with-units-rules.service.ts';
 import { NumberWithUnitsObjectFactory } from
@@ -65,7 +67,6 @@ describe('Rule spec services', function() {
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('CodeNormalizerService', new CodeNormalizerService());
-    $provide.value('CodeNormalizerService', new CodeNormalizerService());
     $provide.value('GraphUtilsService', new GraphUtilsService());
     $provide.value('FractionObjectFactory', new FractionObjectFactory());
     $provide.value('SetInputRulesService', new SetInputRulesService());
@@ -74,6 +75,8 @@ describe('Rule spec services', function() {
     $provide.value(
       'DragAndDropSortInputRulesService',
       new DragAndDropSortInputRulesService());
+    $provide.value('MathEquationInputRulesService',
+      new MathEquationInputRulesService());
     $provide.value(
       'MultipleChoiceInputRulesService', new MultipleChoiceInputRulesService());
     $provide.value('NumericInputRulesService', new NumericInputRulesService());
