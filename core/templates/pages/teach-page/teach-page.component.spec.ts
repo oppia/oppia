@@ -16,7 +16,11 @@
  * @fileoverview Unit tests for the teach page.
  */
 import { WindowRef } from 'services/contextual/window-ref.service';
-
+import { TestBed } from '@angular/core/testing';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { ANGULAR_SERVICES, ANGULAR_SERVICES_NAMES } from
+  'tests/angular-services.index';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 require('pages/teach-page/teach-page.component.ts');
 
 describe('Teach Page', function() {
@@ -24,9 +28,20 @@ describe('Teach Page', function() {
   var $timeout = null;
   var SiteAnalyticsService = null;
   var windowRef = new WindowRef();
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [...ANGULAR_SERVICES],
+      schemas: [NO_ERRORS_SCHEMA]
+    });
+  });
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
+    for (let i in ANGULAR_SERVICES) {
+      $provide.value(ANGULAR_SERVICES_NAMES[i],
+        TestBed.get(ANGULAR_SERVICES[i]));
+    }
     $provide.value('WindowRef', windowRef);
   }));
   beforeEach(angular.mock.inject(function($injector, $componentController) {

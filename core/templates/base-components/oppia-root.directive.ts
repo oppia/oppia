@@ -22,7 +22,7 @@
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 import { IModule } from 'angular';
-interface CustomModule extends IModule {
+interface CustomOppiaModule extends IModule {
   provideValueAfterBootstrap: Function;
 }
 
@@ -160,7 +160,7 @@ angular.module('oppia').directive('oppiaRoot', [
           $scope.onInit = function() {
             for (let service of ANGULAR_SERVICES) {
               (angular.module(
-                'oppia') as CustomModule).provideValueAfterBootstrap(
+                'oppia') as CustomOppiaModule).provideValueAfterBootstrap(
                 service, OppiaAngularRootComponent[(
                   service[0].toLowerCase() + service.substring(1))]);
             }

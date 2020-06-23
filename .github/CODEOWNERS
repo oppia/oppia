@@ -32,6 +32,7 @@
 /core/templates/services/request-interceptor.service*.ts @bansalnitish @srijanreddy98
 /core/templates/services/translate.service.ts @bansalnitish @srijanreddy98
 /core/templates/services/UpgradedServices.ts @bansalnitish @srijanreddy98
+/core/templates/tests/angular-services.index.ts @bansalnitish @srijanreddy98
 /typings/ @ankita240796
 /tsconfig.json @ankita240796
 

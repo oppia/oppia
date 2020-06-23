@@ -16,6 +16,11 @@
  * @fileoverview Unit tests for topicLandingPage.
  */
 
+import { TestBed } from '@angular/core/testing';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { ANGULAR_SERVICES, ANGULAR_SERVICES_NAMES } from
+  'tests/angular-services.index';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { WindowRef } from 'services/contextual/window-ref.service';
 
 require(
@@ -27,8 +32,20 @@ describe('Topic Landing Page', function() {
   var SiteAnalyticsService = null;
   var windowRef = new WindowRef();
 
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [...ANGULAR_SERVICES],
+      schemas: [NO_ERRORS_SCHEMA]
+    });
+  });
+
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
+    for (let i in ANGULAR_SERVICES) {
+      $provide.value(ANGULAR_SERVICES_NAMES[i],
+        TestBed.get(ANGULAR_SERVICES[i]));
+    }
     $provide.value('WindowRef', windowRef);
     $provide.value('PageTitleService', {
       setPageTitle: function() {}
