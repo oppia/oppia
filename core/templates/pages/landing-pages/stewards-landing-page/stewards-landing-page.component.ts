@@ -130,11 +130,18 @@ angular.module('oppia').component('stewardsLandingPage', {
         ctrl.buttonDefinitions = getButtonDefinitions(ctrl.activeTabName);
         ctrl.windowIsNarrow = isWindowNarrow(
           WindowDimensionsService.getWidth());
-        WindowDimensionsService.registerOnResizeHook(function() {
-          ctrl.windowIsNarrow = isWindowNarrow(
-            WindowDimensionsService.getWidth());
-          $scope.$apply();
-        });
+        ctrl.resizeSubscription = WindowDimensionsService.getResizeEvent().
+          subscribe(evt => {
+            ctrl.windowIsNarrow = isWindowNarrow(
+              WindowDimensionsService.getWidth());
+            $scope.$apply();
+          });
+      };
+
+      ctrl.$onDestroy = function() {
+        if (ctrl.resizeSubscription) {
+          ctrl.resizeSubscription.unsubscribe();
+        }
       };
     }
   ]
