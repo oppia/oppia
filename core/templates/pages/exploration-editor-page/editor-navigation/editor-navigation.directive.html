@@ -18,10 +18,9 @@
   }
   editor-navigation .oppia-exploration-open-threads-color {
     background-color: #4078C0;
-    border: 1px solid rgb(243, 243, 243);
   }
   editor-navigation .oppia-exploration-open-threads-indicator {
-    border-radius: 10%;
+    border-radius: 50%;
     bottom: 5px;
     height: 15px;
     position: absolute;
@@ -260,7 +259,7 @@
     </a>
     <div ng-show="getOpenThreadsCount()" class="oppia-exploration-open-threads-indicator oppia-exploration-open-threads-color">
       <span class="oppia-exploration-open-threads-count">
-        <[getOpenThreadsCount()]>&nbsp;open
+        <[getOpenThreadsCount()]>
       </span>
     </div>
   </li>
