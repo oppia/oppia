@@ -62,8 +62,8 @@ def create_enum(*sequential, **names):
     """Creates a enumerated constant.
 
     Args:
-        sequential: *. Sequence List to generate the enumerations.
-        names: *. Names of the enumerration.
+        *sequential: *. Sequence List to generate the enumerations.
+        **names: *. Names of the enumerration.
 
     Returns:
         dict. Dictionary containing the enumerated constants.
@@ -484,7 +484,7 @@ def vfs_construct_path(base_path, *path_components):
 
     Args:
         base_path: str. The initial path upon which components would be added.
-        path_components: list(str). Components that would be added to the path.
+        *path_components: list(str). Components that would be added to the path.
 
     Returns:
         str. The path that is obtained after adding the components.
