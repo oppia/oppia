@@ -136,25 +136,26 @@ def update_stats(exp_id, exp_version, aggregated_stats):
     exploration_stats.num_actual_starts_v2 += aggregated_stats[
         'num_actual_starts']
 
-    for state_name in aggregated_stats['state_stats_mapping']:
-        exploration_stats.state_stats_mapping[
-            state_name].total_answers_count_v2 += aggregated_stats[
-                'state_stats_mapping'][state_name]['total_answers_count']
-        exploration_stats.state_stats_mapping[
-            state_name].useful_feedback_count_v2 += aggregated_stats[
-                'state_stats_mapping'][state_name]['useful_feedback_count']
-        exploration_stats.state_stats_mapping[
-            state_name].total_hit_count_v2 += aggregated_stats[
-                'state_stats_mapping'][state_name]['total_hit_count']
-        exploration_stats.state_stats_mapping[
-            state_name].first_hit_count_v2 += aggregated_stats[
-                'state_stats_mapping'][state_name]['first_hit_count']
-        exploration_stats.state_stats_mapping[
-            state_name].num_times_solution_viewed_v2 += aggregated_stats[
-                'state_stats_mapping'][state_name]['num_times_solution_viewed']
-        exploration_stats.state_stats_mapping[
-            state_name].num_completions_v2 += aggregated_stats[
-                'state_stats_mapping'][state_name]['num_completions']
+    for state_name, aggregated_state_stats in (
+            aggregated_stats['state_stats_mapping'].items()):
+        if state_name not in exploration_stats.state_stats_mapping:
+            state_stats = (
+                stats_domain.StateStats.create_default())
+            exploration_stats.state_stats_mapping[state_name] = state_stats
+        else:
+            state_stats = exploration_stats.state_stats_mapping[state_name]
+        state_stats.total_answers_count_v2 += (
+            aggregated_state_stats['total_answers_count'])
+        state_stats.useful_feedback_count_v2 += (
+            aggregated_state_stats['useful_feedback_count'])
+        state_stats.total_hit_count_v2 += (
+            aggregated_state_stats['total_hit_count'])
+        state_stats.first_hit_count_v2 += (
+            aggregated_state_stats['first_hit_count'])
+        state_stats.num_times_solution_viewed_v2 += (
+            aggregated_state_stats['num_times_solution_viewed'])
+        state_stats.num_completions_v2 += (
+            aggregated_state_stats['num_completions'])
 
     save_stats_model_transactional(exploration_stats)
 
