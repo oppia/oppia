@@ -368,11 +368,17 @@ angular.module('oppia').directive('libraryPage', [
             ctrl.libraryWindowIsNarrow = (
               WindowDimensionsService.getWidth() <= libraryWindowCutoffPx);
 
-            WindowDimensionsService.registerOnResizeHook(function() {
-              ctrl.libraryWindowIsNarrow = (
-                WindowDimensionsService.getWidth() <= libraryWindowCutoffPx);
-              $scope.$applyAsync();
-            });
+            ctrl.resizeSubscription = WindowDimensionsService.getResizeEvent().
+              subscribe(evt => {
+                ctrl.libraryWindowIsNarrow = (
+                  WindowDimensionsService.getWidth() <= libraryWindowCutoffPx);
+                $scope.$applyAsync();
+              });
+          };
+          ctrl.$onDestroy = function() {
+            if (ctrl.resizeSubscription) {
+              ctrl.resizeSubscription.unsubscribe();
+            }
           };
         }
       ]
