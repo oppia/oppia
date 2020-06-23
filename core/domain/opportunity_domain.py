@@ -80,7 +80,7 @@ class ExplorationOpportunitySummary(python_utils.OBJECT):
 
         Returns:
             ExplorationOpportunitySummary. The corresponding
-                ExplorationOpportunitySummary domain object.
+            ExplorationOpportunitySummary domain object.
         """
         return cls(
             exploration_opportunity_summary_dict['id'],
@@ -248,7 +248,7 @@ class SkillOpportunity(python_utils.OBJECT):
 
         Returns:
             SkillOpportunity. The corresponding
-                SkillOpportunity domain object.
+            SkillOpportunity domain object.
         """
         return cls(
             skill_opportunity_dict['id'],

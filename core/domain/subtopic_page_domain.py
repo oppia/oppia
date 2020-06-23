@@ -210,7 +210,7 @@ class SubtopicPage(python_utils.OBJECT):
 
         Returns:
             SubtopicPage. A subtopic object with given id, topic_id and default
-                page contents field.
+            page contents field.
         """
         subtopic_page_id = cls.get_subtopic_page_id(topic_id, subtopic_id)
         return cls(
@@ -265,7 +265,7 @@ class SubtopicPage(python_utils.OBJECT):
 
         Args:
             new_page_contents_audio: RecordedVoiceovers. The new audio for
-            the subtopic page.
+                the subtopic page.
         """
         self.page_contents.recorded_voiceovers = new_page_contents_audio
 
