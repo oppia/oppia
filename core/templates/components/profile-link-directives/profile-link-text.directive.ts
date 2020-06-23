@@ -16,26 +16,25 @@
  * @fileoverview Directives for creating text links to a user's profile page.
  */
 
-require('domain/utilities/url-interpolation.service.ts');
+import { Component, Input, OnInit } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
 
-angular.module('oppia').directive('profileLinkText', [
-  'UrlInterpolationService', 'SYSTEM_USER_IDS',
-  function(UrlInterpolationService, SYSTEM_USER_IDS) {
-    return {
-      restrict: 'E',
-      scope: {},
-      bindToController: {
-        username: '&'
-      },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/profile-link-directives/' +
-        'profile-link-text.directive.html'),
-      controllerAs: '$ctrl',
-      controller: [function() {
-        var ctrl = this;
-        ctrl.isUsernameLinkable = function(username) {
-          return SYSTEM_USER_IDS.indexOf(username) === -1;
-        };
-      }]
-    };
-  }]);
+import { AppConstants } from 'app.constants';
+
+@Component({
+  selector: 'profile-link-text',
+  template: require('./profile-link-text.directive.html'),
+  styleUrls: []
+})
+export class ProfileLinkTextComponent implements OnInit {
+  @Input() username: string;
+
+  ngOnInit() {}
+
+  isUsernameLinkable(username: string): boolean {
+    return AppConstants.SYSTEM_USER_IDS.indexOf(username) === -1;
+  }
+}
+
+angular.module('oppia').directive('profileLinkText', downgradeComponent(
+  {component: ProfileLinkTextComponent}));

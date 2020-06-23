@@ -172,6 +172,7 @@ export class AppConstants {
   public static IMAGE_SAVE_DESTINATION_SERVER = 'imageSaveDestinationServer';
   public static IMAGE_SAVE_DESTINATION_LOCAL_STORAGE =
     'imageSaveDestinationLocalStorage';
+  public static SYSTEM_USER_IDS = ['admin', 'OppiaMigrationBot'];
 }
 
 const constants = require('constants.ts');

@@ -1,5 +1,5 @@
-<a ng-if="$ctrl.isUsernameLinkable($ctrl.username())" ng-href="/profile/<[$ctrl.username()]>">
-  <img ng-src="<[$ctrl.profilePicture]>" alt="User Avatar" class="rounded-circle">
+<a *ngIf="isUsernameLinkable(username)" [href]="/profile/username">
+  <img [src]="profilePicture" alt="User Avatar" class="rounded-circle">
 </a>
 
-<img ng-if="!$ctrl.isUsernameLinkable($ctrl.username())" ng-src="<[$ctrl.profilePicture]>" alt="">
+<img *ngIf="!isUsernameLinkable(username)" [src]="profilePicture" alt="">

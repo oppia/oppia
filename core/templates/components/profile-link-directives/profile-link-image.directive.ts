@@ -16,47 +16,49 @@
  * @fileoverview Directive for creating image links to a user's profile page.
  */
 
-require('domain/utilities/url-interpolation.service.ts');
+import { Component, Input, OnInit } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { HttpClient } from '@angular/common/http';
 
-angular.module('oppia').directive('profileLinkImage', [
-  'UrlInterpolationService', 'SYSTEM_USER_IDS',
-  function(UrlInterpolationService, SYSTEM_USER_IDS) {
-    return {
-      restrict: 'E',
-      scope: {},
-      bindToController: {
-        username: '&'
-      },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/profile-link-directives/' +
-        'profile-link-image.directive.html'),
-      controllerAs: '$ctrl',
-      controller: [
-        '$http',
-        function($http) {
-          var ctrl = this;
-          var DEFAULT_PROFILE_IMAGE_PATH = (
-            UrlInterpolationService.getStaticImageUrl(
-              '/avatar/user_blue_72px.webp'));
-          ctrl.isUsernameLinkable = function(username) {
-            return SYSTEM_USER_IDS.indexOf(username) === -1;
-          };
-          ctrl.$onInit = function() {
-            ctrl.profileImageUrl = (
-              '/preferenceshandler/profile_picture_by_username/' +
-              ctrl.username());
-            ctrl.profilePicture = DEFAULT_PROFILE_IMAGE_PATH;
+import { AppConstants } from 'app.constants';
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
 
-            // Returns a promise for the user profile picture, or the default
-            // image if user is not logged in or has not uploaded a profile
-            // picture, or the player is in preview mode.
-            $http.get(ctrl.profileImageUrl).then(function(response) {
-              ctrl.profilePicture = (
-                response.data.profile_picture_data_url_for_username ||
-                DEFAULT_PROFILE_IMAGE_PATH);
-            });
-          };
-        }
-      ]
-    };
-  }]);
+@Component({
+  selector: 'profile-link-image',
+  template: require('./profile-link-image.directive.html'),
+  styleUrls: []
+})
+export class ProfileLinkImageComponent implements OnInit {
+  @Input() username: string;
+
+  constructor(
+    private http: HttpClient,
+    private urlInterpolationService: UrlInterpolationService) {}
+
+  DEFAULT_PROFILE_IMAGE_PATH: string = (
+    this.urlInterpolationService.getStaticImageUrl(
+      '/avatar/user_blue_72px.webp'));
+  profileImageUrl: string;
+  profilePicture: string;
+
+  ngOnInit() {
+    this.profileImageUrl = (
+      '/preferenceshandler/profile_picture_by_username/' +
+      this.username);
+
+    this.http.get(this.profileImageUrl).toPromise().then(
+      ({profile_picture_data_url_for_username}) => {
+        this.profilePicture = (
+          profile_picture_data_url_for_username ||
+          this.DEFAULT_PROFILE_IMAGE_PATH);
+      });
+  }
+
+  isUsernameLinkable(username: string): boolean {
+    return AppConstants.SYSTEM_USER_IDS.indexOf(username) === -1;
+  }
+}
+
+angular.module('oppia').directive('profileLinkImage', downgradeComponent(
+  {component: ProfileLinkImageComponent}));
