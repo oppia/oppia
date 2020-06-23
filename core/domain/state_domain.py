@@ -285,7 +285,7 @@ class Solution(python_utils.OBJECT):
                 enables the learner to progress to the next card. The type of
                 correct_answer is determined by the value of
                 BaseInteraction.answer_type. Some examples for the types are
-                list(set(str)), list(str), str, dict(str, str) etc.
+                list(set(str)), list(str), str, dict(str, str), etc.
             explanation: SubtitledHtml. Contains text and text id to link audio
                 translations for the solution's explanation.
         """
