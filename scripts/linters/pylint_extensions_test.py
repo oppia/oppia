@@ -199,6 +199,58 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             pylint_extensions.DocstringParameterChecker)
         self.checker_test_object.setup_method()
 
+    def test_check_arg_formatting_docstring(self):
+        self.checker_test_object = testutils.CheckerTestCase()
+        self.checker_test_object.CHECKER_CLASS = (
+            pylint_extensions.DocstringParameterChecker)
+        self.checker_test_object.setup_method()
+        invalid_param_func_node = astroid.extract_node("""
+        def func(test_var_one, test_var_two): #@
+            \"\"\"Function to test docstring parameters.
+
+            Args:
+                test_var_one: int. First test variable.
+                test_var_two: str. Second test variable.
+                Incorrect description indentation
+
+            Returns:
+                int. The test result.
+            \"\"\"
+            result = test_var_one + test_var_two
+            return result
+        """)
+        with self.checker_test_object.assertAddsMessages(
+            testutils.Message(
+                msg_id='eight-space-indentation-for-arg-descriptions-doc',
+                node=invalid_param_func_node,
+                args='Incorrect'
+            ),
+        ):
+            self.checker_test_object.checker.visit_functiondef(
+                invalid_param_func_node)
+        invalid_param_indentation_node = astroid.extract_node("""
+        def func(test_var_one): #@
+            \"\"\"Function to test docstring parameters.
+
+            Args:
+                 test_var_one: int. First test variable.
+
+            Returns:
+                int. The test result.
+            \"\"\"
+            result = test_var_one + test_var_two
+            return result
+        """)
+        with self.checker_test_object.assertAddsMessages(
+            testutils.Message(
+                msg_id='four-space-indentation-for-arg-parameters-doc',
+                node=invalid_param_indentation_node,
+                args='test_var_one:'
+            ),
+        ):
+            self.checker_test_object.checker.visit_functiondef(
+                invalid_param_indentation_node)
+
     def test_finds_docstring_parameter(self):
         self.checker_test_object = testutils.CheckerTestCase()
         self.checker_test_object.CHECKER_CLASS = (
@@ -512,6 +564,11 @@ class DocstringParameterCheckerTests(unittest.TestCase):
                 msg_id='differing-type-doc',
                 node=missing_param_func_node,
                 args=('invalid_var_name',),
+            ),
+            testutils.Message(
+                msg_id='eight-space-indentation-for-arg-descriptions-doc',
+                node=missing_param_func_node,
+                args='invalid_var_name:'
             ),
         ):
             self.checker_test_object.checker.visit_functiondef(
@@ -2008,8 +2065,8 @@ class DocstringCheckerTests(unittest.TestCase):
             tmp.write(
                 u"""class ABC(arg):
                         \"\"\"This is a docstring.
-                            Args:
-                            arg: variable.
+                            Raises:
+                            NoVariableException: variable.
                         \"\"\"
                         Something
                 """)
@@ -2025,7 +2082,7 @@ class DocstringCheckerTests(unittest.TestCase):
         with self.checker_test_object.assertAddsMessages(message):
             temp_file.close()
 
-    def test_no_eight_space_indentation_in_args_docstring(self):
+    def test_no_eight_space_indentation_in_raises_docstring(self):
         no_eight_space_indentation_in_args = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test')
@@ -2036,9 +2093,9 @@ class DocstringCheckerTests(unittest.TestCase):
             tmp.write(
                 u"""class ABC(arg):
                         \"\"\"This is a docstring.
-                            Args:
-                                doseq: bool. If true,
-                                individual key=value pairs.
+                            Raises:
+                                AssertionError: if the
+                                schema is not valid.
                         \"\"\"
                         Something
                 """)
