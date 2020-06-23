@@ -21,6 +21,7 @@ import logging
 import random
 
 from constants import constants
+from core.domain import config_services
 from core.domain import skill_domain
 from core.domain import skill_services
 from core.domain import state_domain
@@ -358,10 +359,11 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(augmented_skill_summaries[0].id, self.SKILL_ID)
         self.assertEqual(augmented_skill_summaries[1].id, self.SKILL_ID2)
 
-    def test_filter_skills_by_status(self):
+    def test_filter_skills_by_status_all(self):
         self.save_new_skill(
             self.SKILL_ID2, self.USER_ID, description='Description2',
             prerequisite_skill_ids=['skill_id_1', 'skill_id_2'])
+
         augmented_skill_summaries, next_cursor, more = (
             skill_services.get_filtered_skill_summaries(
                 self.num_queries_to_fetch, None, None, None,
@@ -372,10 +374,46 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
 
         augmented_skill_summaries, next_cursor, more = (
             skill_services.get_filtered_skill_summaries(
+                self.num_queries_to_fetch, 'All', None, None,
+                None, None))
+        self.assertEqual(len(augmented_skill_summaries), 2)
+        self.assertEqual(next_cursor, None)
+        self.assertFalse(more)
+
+    def test_filter_skills_by_status_assigned(self):
+        self.save_new_skill(
+            self.SKILL_ID2, self.USER_ID, description='Description2',
+            prerequisite_skill_ids=['skill_id_1', 'skill_id_2'])
+
+        augmented_skill_summaries, next_cursor, more = (
+            skill_services.get_filtered_skill_summaries(
                 self.num_queries_to_fetch, 'Assigned', None, None, None, None))
         self.assertEqual(len(augmented_skill_summaries), 0)
         self.assertEqual(next_cursor, None)
         self.assertFalse(more)
+
+        topic_id = topic_services.get_new_topic_id()
+        self.save_new_topic(
+            topic_id, self.USER_ID, name='topic1',
+            description='Description',
+            canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[self.SKILL_ID2],
+            subtopics=[], next_subtopic_id=1)
+
+        augmented_skill_summaries, next_cursor, more = (
+            skill_services.get_filtered_skill_summaries(
+                self.num_queries_to_fetch, 'Assigned', None,
+                None, None, None))
+        self.assertEqual(augmented_skill_summaries[0].topic_name, 'topic1')
+        self.assertEqual(augmented_skill_summaries[0].id, self.SKILL_ID2)
+        self.assertEqual(next_cursor, None)
+        self.assertFalse(more)
+
+    def test_filter_skills_by_status_unassigned(self):
+        self.save_new_skill(
+            self.SKILL_ID2, self.USER_ID, description='Description2',
+            prerequisite_skill_ids=['skill_id_1', 'skill_id_2'])
 
         augmented_skill_summaries, next_cursor, more = (
             skill_services.get_filtered_skill_summaries(
@@ -385,32 +423,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(next_cursor, None)
         self.assertFalse(more)
 
-        skill_id = self.SKILL_ID
-
-        def mock_topic_function():
-            return {skill_id: {
-                'topic_name': 'topic1',
-                'classroom_name': 'math'}}
-        with self.swap(
-            topic_services,
-            'get_all_skill_ids_assigned_to_some_topic_with_topic_details',
-            mock_topic_function):
-            augmented_skill_summaries, next_cursor, more = (
-                skill_services.get_filtered_skill_summaries(
-                    self.num_queries_to_fetch, 'Assigned', None,
-                    None, None, None))
-            self.assertEqual(augmented_skill_summaries[0].topic_name, 'topic1')
-            self.assertEqual(next_cursor, None)
-            self.assertFalse(more)
-
-    def test_filter_skills_by_classroom(self):
-        augmented_skill_summaries, next_cursor, more = (
-            skill_services.get_filtered_skill_summaries(
-                self.num_queries_to_fetch, None, None, None, None, None))
-        self.assertEqual(len(augmented_skill_summaries), 1)
-        self.assertEqual(next_cursor, None)
-        self.assertFalse(more)
-
+    def test_filter_skills_by_classroom_name(self):
         augmented_skill_summaries, next_cursor, more = (
             skill_services.get_filtered_skill_summaries(
                 self.num_queries_to_fetch, None, 'english', None, None, None))
@@ -418,25 +431,33 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(next_cursor, None)
         self.assertFalse(more)
 
-        skill_id = self.SKILL_ID
+        self.save_new_skill(
+            self.SKILL_ID2, self.USER_ID, description='Description2',
+            prerequisite_skill_ids=['skill_id_1', 'skill_id_2'])
 
-        def mock_topic_function():
-            return {skill_id: {
-                'topic_name': 'topic1',
-                'classroom_name': 'math'}}
-        with self.swap(
-            topic_services,
-            'get_all_skill_ids_assigned_to_some_topic_with_topic_details',
-            mock_topic_function):
-            augmented_skill_summaries, next_cursor, more = (
-                skill_services.get_filtered_skill_summaries(
-                    self.num_queries_to_fetch, None, 'math', None,
-                    None, None))
-            self.assertEqual(augmented_skill_summaries[0].topic_name, 'topic1')
-            self.assertEqual(
-                augmented_skill_summaries[0].classroom_name, 'math')
-            self.assertEqual(next_cursor, None)
-            self.assertFalse(more)
+        topic_id = topic_services.get_new_topic_id()
+        self.save_new_topic(
+            topic_id, self.USER_ID, name='topic1',
+            description='Description',
+            canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[self.SKILL_ID2],
+            subtopics=[], next_subtopic_id=1)
+
+        config_services.set_property(
+            self.user_id_admin, 'topic_ids_for_classroom_pages', [{
+                'name': 'math', 'topic_ids': [topic_id]}])
+
+        augmented_skill_summaries, next_cursor, more = (
+            skill_services.get_filtered_skill_summaries(
+                self.num_queries_to_fetch, None, 'math', None,
+                None, None))
+        self.assertEqual(augmented_skill_summaries[0].topic_name, 'topic1')
+        self.assertEqual(augmented_skill_summaries[0].id, self.SKILL_ID2)
+        self.assertEqual(
+            augmented_skill_summaries[0].classroom_name, 'math')
+        self.assertEqual(next_cursor, None)
+        self.assertFalse(more)
 
     def test_filter_skills_by_keywords(self):
         self.save_new_skill(

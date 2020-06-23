@@ -1304,7 +1304,7 @@ class SkillSummary(python_utils.OBJECT):
 
 
 class AugmentedSkillSummary(python_utils.OBJECT):
-    """Domain object for Augmented Skill Summary, which have all the properties
+    """Domain object for Augmented Skill Summary, which has all the properties
     of SkillSummary along with the topic name to which the skill is assigned
     and the classroom name to which the topic is assigned.
     """

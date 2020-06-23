@@ -780,7 +780,7 @@ class AugmentedSkillSummaryTests(test_utils.GenericTestBase):
     def setUp(self):
         super(AugmentedSkillSummaryTests, self).setUp()
         current_time = datetime.datetime.utcnow()
-        time_in_millisecs = utils.get_time_in_millisecs(current_time)
+        self.time_in_millisecs = utils.get_time_in_millisecs(current_time)
         self.augmented_skill_summary_dict = {
             'id': 'skill_id',
             'description': 'description',
@@ -790,15 +790,33 @@ class AugmentedSkillSummaryTests(test_utils.GenericTestBase):
             'worked_examples_count': 1,
             'topic_name': 'topic1',
             'classroom_name': 'math',
-            'skill_model_created_on': time_in_millisecs,
-            'skill_model_last_updated': time_in_millisecs
+            'skill_model_created_on': self.time_in_millisecs,
+            'skill_model_last_updated': self.time_in_millisecs
         }
 
         self.augmented_skill_summary = skill_domain.AugmentedSkillSummary(
             'skill_id', 'description', 'en', 1, 1, 1,
             'topic1', 'math', current_time, current_time)
 
-    def test_skill_summary_gets_created(self):
+    def test_augmented_skill_summary_gets_created(self):
         self.assertEqual(
             self.augmented_skill_summary.to_dict(),
             self.augmented_skill_summary_dict)
+
+    def test_augmented_skill_summary_to_dict(self):
+        augmented_skill_summary_dict = self.augmented_skill_summary.to_dict()
+        self.assertEqual(augmented_skill_summary_dict['id'], 'skill_id')
+        self.assertEqual(
+            augmented_skill_summary_dict['description'], 'description')
+        self.assertEqual(augmented_skill_summary_dict['language_code'], 'en')
+        self.assertEqual(augmented_skill_summary_dict['version'], 1)
+        self.assertEqual(augmented_skill_summary_dict['misconception_count'], 1)
+        self.assertEqual(
+            augmented_skill_summary_dict['worked_examples_count'], 1)
+        self.assertEqual(augmented_skill_summary_dict['classroom_name'], 'math')
+        self.assertEqual(
+            augmented_skill_summary_dict['skill_model_created_on'],
+            self.time_in_millisecs)
+        self.assertEqual(
+            augmented_skill_summary_dict['skill_model_last_updated'],
+            self.time_in_millisecs)

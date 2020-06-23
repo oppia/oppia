@@ -264,7 +264,7 @@ class SkillSummaryModel(base_models.BaseModel):
 
         Returns:
             3-tuple(query_models, urlsafe_start_cursor, more). where:
-                query_models: list(AugmentedSkillSummary). The list of summaries
+                query_models: list(SkillSummary). The list of summaries
                     of skills starting at the given cursor.
                 urlsafe_start_cursor: str or None. A query cursor pointing to
                     the next batch of results. If there are no more results,
@@ -290,5 +290,6 @@ class SkillSummaryModel(base_models.BaseModel):
 
         query_models, next_cursor, more = (
             cls.query().order(sort).fetch_page(page_size, start_cursor=cursor))
-        next_cursor = next_cursor.urlsafe() if (next_cursor and more) else None
-        return query_models, next_cursor, more
+        new_urlsafe_start_cursor = (
+            next_cursor.urlsafe() if (next_cursor and more) else None)
+        return query_models, new_urlsafe_start_cursor, more

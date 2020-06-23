@@ -35,6 +35,7 @@ from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
 import feconf
+import python_utils
 import utils
 
 
@@ -175,16 +176,47 @@ class SkillsDashboardPageDataHandler(base.BaseHandler):
         """Handles POST requests."""
 
         classroom_name = self.payload.get('classroom_name')
-        num_items_to_fetch = int(self.payload.get('num_items_to_fetch'))
+        urlsafe_start_cursor = self.payload.get('next_cursor', None)
         keywords = self.payload.get('keywords')
+        num_skills_to_fetch = self.payload.get('num_skills_to_fetch')
         sort_by = self.payload.get('sort')
         status = self.payload.get('status')
-        cursor = self.payload.get('next_cursor', None)
+
+        if (classroom_name is not None and
+                not isinstance(classroom_name, python_utils.BASESTRING)):
+            raise self.InvalidInputException(
+                'Classroom name should be a string.')
+
+        if (urlsafe_start_cursor is not None and
+                not isinstance(urlsafe_start_cursor, python_utils.BASESTRING)):
+            raise self.InvalidInputException(
+                'Next Cursor should be a string.')
+
+        if (num_skills_to_fetch is None or
+                not isinstance(num_skills_to_fetch, int)):
+            raise self.InvalidInputException(
+                'Number of skills to fetch should be a number.')
+
+        if (keywords is not None and (not isinstance(keywords, list) or not all(
+                [isinstance(keyword, python_utils.BASESTRING)
+                 for keyword in keywords]))):
+            raise self.InvalidInputException(
+                'Keywords should be a list of strings.')
+
+        if (sort_by is not None and
+                not isinstance(sort_by, python_utils.BASESTRING)):
+            raise self.InvalidInputException(
+                'Sort by should be a string.')
+
+        if (status is not None and
+                not isinstance(status, python_utils.BASESTRING)):
+            raise self.InvalidInputException(
+                'Status should be a string.')
 
         skill_summaries, next_cursor, more = (
             skill_services.get_filtered_skill_summaries(
-                num_items_to_fetch, status, classroom_name,
-                keywords, sort_by, cursor))
+                num_skills_to_fetch, status, classroom_name,
+                keywords, sort_by, urlsafe_start_cursor))
 
         skill_summary_dicts = [summary.to_dict() for summary in skill_summaries]
 
