@@ -341,7 +341,7 @@ angular.module('oppia').directive('stateGraphVisualization', [
                 nodeData[nodeId].style += ('fill: ' + $scope.nodeFill + '; ');
               }
 
-              // Color nodes.
+              // Color nodes
               var nodeColors = $scope.getNodeColors();
               if (nodeColors) {
                 nodeData[nodeId].style += (

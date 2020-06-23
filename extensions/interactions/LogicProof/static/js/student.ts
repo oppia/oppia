@@ -20,7 +20,7 @@ import logicProofShared from 'interactions/LogicProof/static/js/shared.ts';
 import logicProofData from 'interactions/LogicProof/static/js/data.ts';
 
 var logicProofStudent = (function() {
-  // BUILD INSTANCE.
+  // BUILD INSTANCE
 
   // These evaluation rules must all return an object of their specified output
   // type (boolean, integer, string, formula or set_of_formulas) or throw an
@@ -543,7 +543,7 @@ var logicProofStudent = (function() {
     };
   };
 
-  // BUILD PROOF.
+  // BUILD PROOF
 
   /**
    * This function identifies a way in which the expression is an instance of
@@ -1056,7 +1056,7 @@ var logicProofStudent = (function() {
     };
   };
 
-  // CHECK PROOF.
+  // CHECK PROOF
 
   /**
    * This function is a core component of the program - it takes an expression

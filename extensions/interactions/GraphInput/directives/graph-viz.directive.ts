@@ -257,7 +257,7 @@ angular.module('oppia').directive('graphViz', [
           // function to clear bits of ctrl.state
           // (e.g. currentlyDraggedVertex, addEdgeVertex).
 
-          // Vertex events.
+          // Vertex events
           ctrl.onClickVertex = function(index) {
             if (ctrl.state.currentMode === _MODES.DELETE) {
               if (ctrl.canDeleteVertex) {
@@ -348,7 +348,7 @@ angular.module('oppia').directive('graphViz', [
             }
           };
 
-          // Edge events.
+          // Edge events
           ctrl.onClickEdge = function(index) {
             if (ctrl.state.currentMode === _MODES.DELETE) {
               if (ctrl.canDeleteEdge) {
@@ -367,7 +367,7 @@ angular.module('oppia').directive('graphViz', [
             }
           };
 
-          // Document event.
+          // Document event
           ctrl.onMouseupDocument = function() {
             if (ctrl.isMobile) {
               return;
@@ -384,7 +384,7 @@ angular.module('oppia').directive('graphViz', [
               }
             }
           };
-          // Actions.
+          // Actions
           var beginAddEdge = function(startIndex) {
             ctrl.state.addEdgeVertex = startIndex;
           };

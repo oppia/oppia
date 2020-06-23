@@ -25,7 +25,7 @@ import logicProofParser from
   'interactions/LogicProof/static/js/generatedParser.ts';
 
 var logicProofTeacher2 = (function() {
-  // LINE TEMPLATES.
+  // LINE TEMPLATES
 
   // Ensures that lineTemplate has all its operators of a matchable kind
   // occuring in a non-substituted instance so that matching a line against
@@ -358,7 +358,7 @@ var logicProofTeacher2 = (function() {
     return output;
   };
 
-  // MISTAKE TABLE.
+  // MISTAKE TABLE
 
   /**
    * @param {MistakeEntry variation} mistakeEntry - a MistakeEntry object (but
@@ -552,7 +552,7 @@ var logicProofTeacher2 = (function() {
     return displayedSections;
   };
 
-  // CONTROL FUNCTIONS.
+  // CONTROL FUNCTIONS
 
   /**
    * @param {Expression} formulaLHS - an Expression representing the
@@ -799,7 +799,7 @@ var logicProofTeacher2 = (function() {
     return displayedEntries;
   };
 
-  // UTILITIES.
+  // UTILITIES
 
   var parseMessageStringFragment = function(fragmentString, typeOfMessage) {
     return (typeOfMessage === 'general') ? {

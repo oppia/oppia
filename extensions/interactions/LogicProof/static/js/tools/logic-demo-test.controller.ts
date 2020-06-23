@@ -125,7 +125,7 @@ logicDemo.controller('LogicDemoTestController', ['$scope', function($scope) {
     }
   };
 
-  // QUESTION.
+  // QUESTION
   $scope.assumptionsString = 'P\u2227Q';
   $scope.targetString = 'Q\u2227P';
   $scope.submitQuestion = function() {
@@ -156,7 +156,7 @@ logicDemo.controller('LogicDemoTestController', ['$scope', function($scope) {
 
   $scope.submitQuestion();
 
-  // LINE TEMPLATES.
+  // LINE TEMPLATES
   $scope.lineTemplateStrings = DEFAULT_LINE_TEMPLATE_STRINGS;
   $scope.lineTemplateIndexer = $scope.buildIndexer(
     $scope.lineTemplateStrings.length);
@@ -180,7 +180,7 @@ logicDemo.controller('LogicDemoTestController', ['$scope', function($scope) {
 
   $scope.submitLineTemplates();
 
-  // MISTAKE TABLE.
+  // MISTAKE TABLE
   $scope.mistakeStrings = [{
     name: 'layout',
     entries: DEFAULT_LAYOUT_MISTAKE_STRINGS
@@ -225,7 +225,7 @@ logicDemo.controller('LogicDemoTestController', ['$scope', function($scope) {
     }
   };
 
-  // CONTROL FUNCTIONS.
+  // CONTROL FUNCTIONS
   $scope.controlFunctionStrings = DEFAULT_CONTROL_FUNCTION_STRINGS;
   $scope.controlFunctionIndexer = $scope.buildIndexer(
     $scope.controlFunctionStrings.length);
@@ -285,7 +285,7 @@ logicDemo.controller('LogicDemoTestController', ['$scope', function($scope) {
     return output;
   };
 
-  // JAVASCRIPT CONSTRUCTION.
+  // JAVASCRIPT CONSTRUCTION
   $scope.requestJavascript = function() {
     if ($scope.questionSuccess && $scope.lineTemplateSuccess &&
         $scope.mistakeSuccess[0] && $scope.mistakeSuccess[1] &&

@@ -127,7 +127,7 @@ export class MessengerService {
         explorationVersion: data.explorationVersion
       };
     },
-    // DEPRECATED.
+    // DEPRECATED
     explorationReset(data: string): {stateName: string} {
       return {
         stateName: data

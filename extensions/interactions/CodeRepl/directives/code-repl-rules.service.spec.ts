@@ -71,7 +71,7 @@ describe('Code REPL rules service', () => {
         )
       }, RULE_INPUT)).toBe(true);
 
-      // Tab character.
+      // Tab character
       expect(crrs.CodeEquals({
         code: (
           'def x(): \t\n' +

@@ -854,7 +854,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         summary_messages = []
         files_to_check = self.all_filepaths
         allowed_terminating_punctuations = [
-            '.', '?', ';', ',', '{', '^', ')', '}']
+            '.', '?', ';', ',', '{', '^', ')', '}', '>']
         excluded_phrases = [
             '@ts-ignore', '--params', 'eslint-disable', 'eslint-enable',
             'http://', 'https://']
@@ -867,6 +867,9 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                 for line_num in python_utils.RANGE(file_length):
                     line = file_content[line_num].strip()
                     next_line = ''
+                    previous_line = ''
+                    if line_num + 1 < file_length:
+                        next_line = file_content[line_num + 1].strip()
                     if line_num + 1 < file_length:
                         next_line = file_content[line_num + 1].strip()
 
@@ -878,6 +881,13 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                     # or may not use a punctuation at end if it contains a
                     # excluded phrase e.g. "// eslint-disable".
                     if word_is_present_in_excluded_phrases:
+                        continue
+
+                    if (
+                            line.startswith('//') and len(line.split()) <= 3
+                            and not (
+                                next_line.startswith('//') and
+                                previous_line.startswith('//'))):
                         continue
 
                     if line.startswith('//') and not next_line.startswith('//'):
