@@ -37,12 +37,12 @@ describe('Logic demo test', function() {
     });
   }));
 
-  it('should buid indexer according to a number', function() {
+  it('should build indexer according to a number', function() {
     expect($scope.buildIndexer(10)).toEqual(
       [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
   });
 
-  it('should buid errors according to a number', function() {
+  it('should build errors according to a number', function() {
     var n = 10;
     expect($scope.buildErrors(n)).toEqual(new Array(n).fill(''));
   });

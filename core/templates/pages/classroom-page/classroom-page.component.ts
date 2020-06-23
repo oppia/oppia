@@ -46,12 +46,8 @@ angular.module('oppia').component('classroomPage', {
         FATAL_ERROR_CODES) {
       var ctrl = this;
 
-      var classroomBackendApiService = (
+      ctrl.classroomBackendApiService = (
         OppiaAngularRootComponent.classroomBackendApiService);
-
-      ctrl.getClassroomBackendApiService = function() {
-        return classroomBackendApiService;
-      };
 
       ctrl.getStaticImageUrl = function(imagePath) {
         return UrlInterpolationService.getStaticImageUrl(imagePath);
@@ -68,7 +64,7 @@ angular.module('oppia').component('classroomPage', {
           ctrl.classroomDisplayName + ' Classroom | Oppia');
 
         LoaderService.showLoadingScreen('Loading');
-        ctrl.getClassroomBackendApiService().fetchClassroomData(
+        ctrl.classroomBackendApiService.fetchClassroomData(
           classroomName).then(function(topicSummaryObjects) {
           ctrl.topicSummaries = topicSummaryObjects;
           LoaderService.hideLoadingScreen();

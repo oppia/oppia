@@ -62,6 +62,17 @@ describe('Classroom page', () => {
     ctrl = $componentController('classroomPage', {
       $rootScope: $rootScope
     });
+
+    // This approach was choosen because spyOn() doesn't work on properties
+    // that doesn't have a get access type.
+    // Without this approach the test will fail because it'll throw
+    // 'Property classroomBackendApiService does not have access type get'
+    // or 'Property classroomBackendApiService does not have access type set'
+    // error.
+    Object.defineProperty(ctrl, 'classroomBackendApiService', {
+      get: () => undefined,
+      set: () => {}
+    });
   }));
 
   afterEach(function() {
@@ -76,14 +87,9 @@ describe('Classroom page', () => {
       '/assets/images/path/to/image.png');
   });
 
-  it('should return undefined when trying to get a service from' +
-    ' OppiaAngularRootComponent', function() {
-    expect(ctrl.getClassroomBackendApiService()).toBeUndefined();
-  });
-
   describe('when fetching dashboard data successfully', function() {
     beforeEach(function() {
-      spyOn(ctrl, 'getClassroomBackendApiService').and.returnValue(
+      spyOnProperty(ctrl, 'classroomBackendApiService').and.returnValue(
         ClassroomBackendApiService);
       spyOn(ClassroomBackendApiService, 'fetchClassroomData').and.returnValue(
         $q.resolve(topicSummaryObjects));
@@ -93,7 +99,8 @@ describe('Classroom page', () => {
         'mock');
     });
 
-    it('should', function() {
+    it('should evaluate data get from backend, set page title and init' +
+      ' translation', function() {
       ctrl.$onInit();
       expect(loadingMessage).toBe('Loading');
 
@@ -114,7 +121,7 @@ describe('Classroom page', () => {
 
   describe('when fetching dashboard data fails', function() {
     beforeEach(function() {
-      spyOn(ctrl, 'getClassroomBackendApiService').and.returnValue(
+      spyOnProperty(ctrl, 'classroomBackendApiService').and.returnValue(
         ClassroomBackendApiService);
       spyOn(ClassroomBackendApiService, 'fetchClassroomData').and.returnValue(
         $q.reject({
@@ -125,7 +132,7 @@ describe('Classroom page', () => {
         'mock');
     });
 
-    it('should', function() {
+    it('should use reject handler', function() {
       ctrl.$onInit();
       expect(loadingMessage).toBe('Loading');
 
