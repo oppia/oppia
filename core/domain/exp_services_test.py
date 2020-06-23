@@ -2638,6 +2638,49 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                     self.init_state_name, 'written_translations',
                     [1, 2]), 'Added fake text translations.')
 
+    def test_migrate_exp_to_latest_version_migrates_to_version(self):
+        """Test migrate exploration state schema to the latest version."""
+        latest_schema_version = python_utils.UNICODE(
+            feconf.CURRENT_STATE_SCHEMA_VERSION)
+        migration_change_list = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
+                'from_version': '0',
+                'to_version': latest_schema_version
+            })
+        ]
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID, migration_change_list,
+            'Ran Exploration Migration job.')
+        exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
+        self.assertEqual(exploration.version, 2)
+        self.assertEqual(
+            python_utils.UNICODE(
+                exploration.states_schema_version),
+            latest_schema_version)
+
+    def test_migrate_exp_to_earlier_version_raises_exception(self):
+        """Test migrate state schema to earlier version raises exception."""
+        latest_schema_version = feconf.CURRENT_STATE_SCHEMA_VERSION
+        not_latest_schema_version = python_utils.UNICODE(
+            latest_schema_version - 1)
+        migration_change_list = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
+                'from_version': '0',
+                'to_version': not_latest_schema_version
+            })
+        ]
+        exception_string = (
+            'Expected to migrate to the latest state schema '
+            'version %s, received %s' % (
+                latest_schema_version, not_latest_schema_version)
+        )
+        with self.assertRaisesRegexp(Exception, exception_string):
+            exp_services.update_exploration(
+                self.owner_id, self.EXP_0_ID, migration_change_list,
+                'Ran Exploration Migration job.')
+
 
 class CommitMessageHandlingTests(ExplorationServicesUnitTests):
     """Test the handling of commit messages."""
