@@ -24,9 +24,13 @@ import { AppConstants } from 'app.constants';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 
+interface IProfileResponse {
+  'profile_picture_data_url_for_username': string;
+}
+
 @Component({
   selector: 'profile-link-image',
-  template: require('./profile-link-image.directive.html'),
+  templateUrl: './profile-link-image.component.html',
   styleUrls: []
 })
 export class ProfileLinkImageComponent implements OnInit {
@@ -48,9 +52,9 @@ export class ProfileLinkImageComponent implements OnInit {
       this.username);
 
     this.http.get(this.profileImageUrl).toPromise().then(
-      ({profile_picture_data_url_for_username}) => {
+      (response: IProfileResponse) => {
         this.profilePicture = (
-          profile_picture_data_url_for_username ||
+          response.profile_picture_data_url_for_username ||
           this.DEFAULT_PROFILE_IMAGE_PATH);
       });
   }

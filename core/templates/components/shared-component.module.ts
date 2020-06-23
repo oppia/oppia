@@ -23,14 +23,23 @@ import { CommonModule } from '@angular/common';
 
 import { BackgroundBannerComponent } from
   './common-layout-directives/common-elements/background-banner.component';
+import { CircularImageComponent } from
+  './profile-link-directives/circular-image.component';
+import { ProfileLinkImageComponent } from
+  './profile-link-directives/profile-link-image.component';
+import { ProfileLinkTextComponent } from
+  './profile-link-directives/profile-link-text.component';
 import { TranslatePipe } from 'filters/translate.pipe';
 
 
 @NgModule({
   imports: [CommonModule],
-  declarations: [BackgroundBannerComponent, TranslatePipe],
-  entryComponents: [BackgroundBannerComponent],
-  exports: [BackgroundBannerComponent, TranslatePipe]
+  declarations: [BackgroundBannerComponent, CircularImageComponent,
+    ProfileLinkImageComponent, ProfileLinkTextComponent, TranslatePipe],
+  entryComponents: [BackgroundBannerComponent, CircularImageComponent,
+    ProfileLinkImageComponent, ProfileLinkTextComponent],
+  exports: [BackgroundBannerComponent, CircularImageComponent,
+    ProfileLinkImageComponent, ProfileLinkTextComponent, TranslatePipe]
 })
 
 export class SharedComponentsModule { }

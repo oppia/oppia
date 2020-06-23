@@ -3,7 +3,6 @@
     "core/templates/components/entity-creation-services/collection-creation-backend-api.service.ts",
     "core/templates/components/entity-creation-services/question-creation.service.ts",
     "core/templates/components/graph-services/graph-layout.service.ts",
-    "core/templates/components/profile-link-directives/profile-link-image.directive.ts",
     "core/templates/components/state-editor/state-editor-properties-services/state-hints.service.ts",
     "core/templates/components/state-editor/state-editor-properties-services/state-property.service.ts",
     "core/templates/domain/classifier/AnswerClassificationResultObjectFactory.ts",

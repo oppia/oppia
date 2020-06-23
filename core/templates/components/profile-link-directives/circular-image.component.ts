@@ -1,4 +1,4 @@
-// Copyright 2014 The Oppia Authors. All Rights Reserved.
+// Copyright 2015 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,28 +13,26 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directives for creating text links to a user's profile page.
+ * @fileoverview Displays circled images with linking (when available).
  */
 
 import { Component, Input, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
-import { AppConstants } from 'app.constants';
-
 @Component({
-  selector: 'profile-link-text',
-  template: require('./profile-link-text.directive.html'),
+  selector: 'circular-image',
+  templateUrl: './circular-image.component.html',
   styleUrls: []
 })
-export class ProfileLinkTextComponent implements OnInit {
+export class CircularImageComponent implements OnInit {
   @Input() username: string;
+  @Input() link: string;
 
   ngOnInit() {}
-
-  isUsernameLinkable(username: string): boolean {
-    return AppConstants.SYSTEM_USER_IDS.indexOf(username) === -1;
+  isLinkAvailable(): boolean {
+    return this.link ? true : false;
   }
 }
 
-angular.module('oppia').directive('profileLinkText', downgradeComponent(
-  {component: ProfileLinkTextComponent}));
+angular.module('oppia').directive('circularImage', downgradeComponent(
+  {component: CircularImageComponent}));
