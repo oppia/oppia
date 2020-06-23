@@ -33,6 +33,10 @@ export class MathInteractionsService {
     // the error to the end user. Same rationale applies for stripping the
     // error message from 'at', since some errors from nerdamer use 'at' to
     // show the location.
+    if (errorMessage.indexOf('bracket') !== -1) {
+      // The error is about invalid bracket pairings.
+      return 'It looks like your answer has an invalid bracket pairing.'
+    }
     let colonIndex = errorMessage.indexOf(':');
     if (colonIndex !== -1) {
       errorMessage = errorMessage.slice(0, colonIndex);
@@ -40,6 +44,9 @@ export class MathInteractionsService {
     let atColonIndex = errorMessage.indexOf(' at ');
     if (atColonIndex !== -1) {
       errorMessage = errorMessage.slice(0, atColonIndex);
+    }
+    if (errorMessage[errorMessage.length - 1] === '!') {
+      errorMessage = errorMessage.slice(0, errorMessage.length - 1);
     }
     if (errorMessage[errorMessage.length - 1] !== '.') {
       errorMessage += '.';
@@ -52,6 +59,12 @@ export class MathInteractionsService {
     if (answer.length === 0) {
       this.warningText = 'Please enter a non-empty answer.';
       return false;
+    } else if (answer.indexOf('=') !== -1 || answer.indexOf(
+      '<') !== -1 || answer.indexOf('>') !== -1) {
+      this.warningText = 'It looks like you have entered an ' +
+        'equation/inequality. Please enter an algebraic ' +
+        'expression instead.';
+      return false;
     }
     try {
       expression = nerdamer(answer);
@@ -59,13 +72,7 @@ export class MathInteractionsService {
       this.warningText = this.cleanErrorMessage(err.message);
       return false;
     }
-    if (answer.indexOf('=') !== -1 || answer.indexOf(
-      '<') !== -1 || answer.indexOf('>') !== -1) {
-      this.warningText = 'It looks like you have entered an ' +
-        'equation/inequality. Please enter an algebraic ' +
-        'expression instead.';
-      return false;
-    } else if (expression.variables().length === 0) {
+    if (expression.variables().length === 0) {
       this.warningText = 'It looks like you have entered only ' +
         'numbers. Make sure to include the necessary variables' +
         ' mentioned in the question.';
