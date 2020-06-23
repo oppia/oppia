@@ -319,7 +319,6 @@ class ExplorationMathTagValidationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             rights_manager.get_exploration_rights(
                 item.id).status)
         for state_name, state in exploration.states.items():
-            import json
             html_string = ''.join(state.get_all_html_content_strings())
             error_list = (
                 html_validation_service.validate_math_tags_in_html(html_string))
