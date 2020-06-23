@@ -20,6 +20,7 @@ import {
   Component, OnInit, Input, Output, EventEmitter, HostListener, ViewChild
 } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
+
 import { ContributionOpportunitiesBackendApiService } from
   // eslint-disable-next-line max-len
   'pages/community-dashboard-page/services/contribution-opportunities-backend-api.service';
@@ -108,6 +109,6 @@ angular.module('oppia').directive(
   'translationLanguageSelector',
   downgradeComponent({
     component: TranslationLanguageSelectorComponent,
-    inputs: ['options', 'value'],
+    inputs: ['value'],
     outputs: ['setValue']
   }));
