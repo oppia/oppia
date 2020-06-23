@@ -139,11 +139,9 @@ def update_stats(exp_id, exp_version, aggregated_stats):
     for state_name, aggregated_state_stats in (
             aggregated_stats['state_stats_mapping'].items()):
         if state_name not in exploration_stats.state_stats_mapping:
-            state_stats = (
+            exploration_stats.state_stats_mapping[state_name] = (
                 stats_domain.StateStats.create_default())
-            exploration_stats.state_stats_mapping[state_name] = state_stats
-        else:
-            state_stats = exploration_stats.state_stats_mapping[state_name]
+        state_stats = exploration_stats.state_stats_mapping[state_name]
         state_stats.total_answers_count_v2 += (
             aggregated_state_stats['total_answers_count'])
         state_stats.useful_feedback_count_v2 += (
