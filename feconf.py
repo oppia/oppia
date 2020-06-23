@@ -133,16 +133,8 @@ ENTITY_TYPE_SUBTOPIC = 'subtopic'
 ENTITY_TYPE_QUESTION = 'question'
 ENTITY_TYPE_VOICEOVER_APPLICATION = 'voiceover_application'
 
-TASK_TYPE_HIGH_BOUNCE_RATE = 'high_bounce_rate'
-TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP = 'ineffective_feedback_loop'
-TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS = 'successive_incorrect_answers'
-TASK_TYPE_NEEDS_GUIDING_RESPONSES = 'needs_guiding_responses'
-
-TASK_STATUS_OPEN = 'open'
-TASK_STATUS_OBSOLETE = 'obsolete'
-TASK_STATUS_RESOLVED = 'resolved'
-
-TASK_TARGET_TYPE_STATE = 'state'
+MAX_TASK_MODELS_PER_FETCH = 25
+MAX_TASK_MODELS_PER_HISTORY_PAGE = 10
 
 # The maximum number of activities allowed in the playlist of the learner. This
 # limit applies to both the explorations playlist and the collections playlist.
@@ -433,6 +425,9 @@ AVERAGE_RATINGS_DASHBOARD_PRECISION = 2
 # database by non-admins.
 ENABLE_MAINTENANCE_MODE = False
 
+# Whether community dashboard is ready to use for contributors.
+COMMUNITY_DASHBOARD_ENABLED = False
+
 # The interactions permissible for a question.
 ALLOWED_QUESTION_INTERACTION_IDS = [
     'TextInput', 'MultipleChoiceInput', 'NumericInput']
@@ -657,6 +652,7 @@ COLLECTION_UNPUBLISH_PREFIX = '/collection_editor_handler/unpublish'
 COLLECTION_EDITOR_URL_PREFIX = '/collection_editor/create'
 COLLECTION_URL_PREFIX = '/collection'
 COMMUNITY_OPPORTUNITIES_DATA_URL = '/opportunitiessummaryhandler'
+COMMUNITY_DASHBOARD_URL = '/community-dashboard'
 CONCEPT_CARD_DATA_URL_PREFIX = '/concept_card_handler'
 CREATOR_DASHBOARD_DATA_URL = '/creatordashboardhandler/data'
 CREATOR_DASHBOARD_URL = '/creator-dashboard'

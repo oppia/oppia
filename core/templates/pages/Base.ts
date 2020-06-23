@@ -108,8 +108,8 @@ angular.module('oppia').controller('Base', [
         {
           propertyType: 'property',
           propertyValue: 'og:image',
-          content: $scope.getAssetUrl(
-            '/assets/images/logo/288x288_logo_mint.png')
+          content: UrlInterpolationService.getStaticImageUrl(
+            '/logo/288x288_logo_mint.webp')
         }
       ]);
 
@@ -120,7 +120,7 @@ angular.module('oppia').controller('Base', [
       $scope.siteFeedbackFormUrl = SITE_FEEDBACK_FORM_URL;
       DocumentAttributeCustomizationService.addAttribute(
         'lang', $scope.currentLang);
-      // TODO(sll): use 'touchstart' for mobile.
+      // TODO(sll): Use 'touchstart' for mobile.
       $document.on('click', function() {
         SidebarStatusService.onDocumentClick();
       });

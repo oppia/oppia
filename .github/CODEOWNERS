@@ -17,16 +17,21 @@
 /core/domain/android_validation_constants*.py @BenHenning
 
 # Angular Migration team
-/core/templates/components/shared-component.module.ts @bansalnitish
-/core/templates/filters/translate.pipe.ts @bansalnitish
-/core/templates/services/contextual/logger.service.ts @bansalnitish
-/core/templates/services/contextual/logger.service.spec.ts @bansalnitish
-/core/templates/services/i18n-language-code.service.ts @bansalnitish
-/core/templates/services/loader.service*.ts @bansalnitish
-/core/templates/services/question-validation.service*.ts @bansalnitish
-/core/templates/services/request-interceptor.service*.ts @bansalnitish
-/core/templates/services/translate.service.ts @bansalnitish
-/core/templates/services/UpgradedServices.ts @bansalnitish
+/core/templates/components/shared-component.module.ts @bansalnitish @srijanreddy98
+/core/templates/services/loader.service*.ts @bansalnitish @srijanreddy98
+/core/templates/components/oppia-angular-root.component.ts @bansalnitish @srijanreddy98
+/core/templates/base-components/oppia-root.directive.ts @bansalnitish @srijanreddy98
+/core/templates/base-components/oppia-root.directive.html @bansalnitish @srijanreddy98
+/core/templates/filters/translate.pipe.ts @bansalnitish @srijanreddy98
+/core/templates/services/contextual/logger.service.ts @bansalnitish @srijanreddy98
+/core/templates/services/contextual/logger.service.spec.ts @bansalnitish @srijanreddy98
+/core/templates/services/guppy-configuration.service.ts @bansalnitish @srijanreddy98
+/core/templates/services/i18n-language-code.service.ts @bansalnitish @srijanreddy98
+/core/templates/services/loader.service*.ts @bansalnitish @srijanreddy98
+/core/templates/services/question-validation.service*.ts @bansalnitish @srijanreddy98
+/core/templates/services/request-interceptor.service*.ts @bansalnitish @srijanreddy98
+/core/templates/services/translate.service.ts @bansalnitish @srijanreddy98
+/core/templates/services/UpgradedServices.ts @bansalnitish @srijanreddy98
 /typings/ @ankita240796
 /tsconfig.json @ankita240796
 
@@ -104,20 +109,20 @@
 
 # Dev workflow team.
 /.circleci/ @kevinlee12
-/.eslintignore @kevinlee12
-/.eslintrc @kevinlee12
-/.htmllintrc @kevinlee12
-/.coveragerc @kevinlee12
+/.eslintignore @bansalnitish @Hudda
+/.eslintrc @bansalnitish @Hudda
+/.htmllintrc @bansalnitish @Hudda
+/.coveragerc @bansalnitish @Hudda
 /.gitattributes @kevinlee12
 /.gitignore @kevinlee12
-/.isort.cfg @kevinlee12
-/.pylintrc @kevinlee12
-/.stylelintrc @kevinlee12
+/.isort.cfg @bansalnitish @Hudda
+/.pylintrc @bansalnitish @Hudda
+/.stylelintrc @bansalnitish @Hudda
 /.travis.yml @kevinlee12
 /.yarnrc @kevinlee12
-/codecov.yml @kevinlee12
-/core/templates/css/.stylelintrc @kevinlee12
-/tox.ini @kevinlee12
+/codecov.yml @nithusha21
+/core/templates/css/.stylelintrc @bansalnitish @Hudda
+/tox.ini @bansalnitish @Hudda
 /scripts/*.py @DubeySandeep
 /scripts/check_e2e_tests_are_captured_in_ci*.py @Showtim3 @DubeySandeep
 /scripts/check_frontend_coverage*.py @nithusha21 @DubeySandeep
@@ -256,6 +261,8 @@
 /core/domain/action_registry*.py @brianrodri
 /core/domain/calculation_registry*.py @brianrodri
 /core/domain/event_services*.py @brianrodri
+/core/domain/improvements_domain*.py @brianrodri
+/core/domain/improvements_services*.py @brianrodri
 /core/domain/playthrough_issue_registry*.py @brianrodri
 /core/domain/stats*.py @brianrodri
 /core/domain/visualization_registry*.py @brianrodri
@@ -263,8 +270,11 @@
 /core/storage/statistics/ @brianrodri
 /core/templates/components/common-layout-directives/common-elements/confirmation-modal.template.html @brianrodri
 /core/templates/domain/statistics/ @brianrodri
+/core/templates/domain/improvements/ @brianrodri
 /core/templates/pages/exploration-editor-page/improvements-tab/ @brianrodri
 /core/templates/pages/exploration-editor-page/statistics-tab/ @brianrodri
+/core/templates/services/exploration-stats.service*.ts @brianrodri
+/core/templates/services/exploration-stats-backend-api.service*.ts @brianrodri
 /core/templates/services/improvements.service*.ts @brianrodri
 /core/templates/services/messenger.service.ts @brianrodri
 /core/templates/services/playthrough*.ts @brianrodri
@@ -407,7 +417,7 @@
 /core/domain/__init__.py @nithusha21
 /core/domain/config*.py @DubeySandeep
 /core/domain/change_domain.py @ankita240796
-/core/templates/tests/ @kevinlee12 @nithusha21
+/core/templates/tests/ @nithusha21
 /core/templates/domain/utilities/ @bansalnitish
 /core/templates/Polyfills.ts @ankita240796
 /schema_utils*.py @seanlip
@@ -566,10 +576,10 @@
 /core/storage/ @seanlip
 /core/domain/user*.py @seanlip
 /export/ @seanlip
-/manifest.json @vojtechjelinek @kevinlee12
-/package.json @vojtechjelinek @kevinlee12
-/yarn.lock @vojtechjelinek @kevinlee12
-/scripts/install_third_party_libs.py @vojtechjelinek @kevinlee12
+/manifest.json @vojtechjelinek
+/package.json @vojtechjelinek
+/yarn.lock @vojtechjelinek
+/scripts/install_third_party_libs.py @vojtechjelinek
 /.github/ @kevinlee12
 /.github/CODEOWNERS @DubeySandeep
 /.github/stale.yml @ankita240796

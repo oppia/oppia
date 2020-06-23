@@ -126,8 +126,8 @@ export class DragAndDropSortInputValidationService {
         var rule = rules[j];
         if (!customizationArgs.allowMultipleItemsInSamePosition.value) {
           var xInputs = <string[][]>inputs.x;
-          for (var i = 0; i < xInputs.length; i++) {
-            if (xInputs[i].length > 1) {
+          for (var k = 0; k < xInputs.length; k++) {
+            if (xInputs[k].length > 1) {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
                 message: 'Multiple items in a single position are not allowed.'
@@ -187,6 +187,19 @@ export class DragAndDropSortInputValidationService {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
                 message: 'Please ensure the items are unique.'
+              });
+            }
+
+            if (!customizationArgs.allowMultipleItemsInSamePosition.value &&
+                rule.type === (
+                  'IsEqualToOrderingWithOneItemAtIncorrectPosition')) {
+              warningsList.push({
+                type: AppConstants.WARNING_TYPES.ERROR,
+                message: (
+                  'Rule ' + (j + 1) + ' from answer group ' +
+                  (i + 1) + ' will never be matched because there will be ' +
+                  'at least 2 elements at incorrect positions if multiple ' +
+                  'elements cannot occupy the same position.')
               });
             }
             break;
