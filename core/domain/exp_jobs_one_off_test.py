@@ -287,17 +287,20 @@ class MathExpressionValidationOneOffJobTests(test_utils.GenericTestBase):
         exploration = exp_domain.Exploration.create_default_exploration(
             self.VALID_EXP_ID, title='title', category='category')
 
-        exploration.add_states(['State1', 'State2', 'State3', 'State4'])
+        exploration.add_states([
+            'State1', 'State2', 'State3', 'State4', 'State5'])
 
         state1 = exploration.states['State1']
         state2 = exploration.states['State2']
         state3 = exploration.states['State3']
         state4 = exploration.states['State4']
+        state5 = exploration.states['State5']
 
         state1.update_interaction_id('MathExpressionInput')
         state2.update_interaction_id('MathExpressionInput')
         state3.update_interaction_id('MathExpressionInput')
         state4.update_interaction_id('MathExpressionInput')
+        state5.update_interaction_id('MathExpressionInput')
 
         answer_group_list1 = [{
             'rule_specs': [{
@@ -391,6 +394,29 @@ class MathExpressionValidationOneOffJobTests(test_utils.GenericTestBase):
         state4.update_interaction_answer_groups(answer_group_list4)
         exp_services.save_new_exploration(self.albert_id, exploration)
 
+        answer_group_list5 = [{
+            'rule_specs': [{
+                'rule_type': 'IsMathematicallyEquivalentTo',
+                'inputs': {'x': u'âéîôü'}
+            }],
+            'outcome': {
+                'dest': 'State1',
+                'feedback': {
+                    'content_id': 'feedback',
+                    'html': '<p>Outcome for state5</p>'
+                },
+                'param_changes': [],
+                'labelled_as_correct': False,
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }]
+
+        state5.update_interaction_answer_groups(answer_group_list5)
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
         job_id = (
             exp_jobs_one_off.MathExpressionValidationOneOffJob.create_new(
             ))
@@ -401,7 +427,8 @@ class MathExpressionValidationOneOffJobTests(test_utils.GenericTestBase):
             exp_jobs_one_off.MathExpressionValidationOneOffJob.get_output(
                 job_id))
         expected_output = [
-            u'[u\'Invalid\', [u\'exp_id0 State3: x<y>z\']]',
+            u'[u\'Invalid\', [u\'exp_id0 State3: x<y>z\', '
+            u'u\'exp_id0 State5: 226 233 238 244 252 \']]',
             u'[u\'Valid Equation\', [u\'exp_id0 State2: y=m*x+c\']]',
             u'[u\'Valid Expression\', [u\'exp_id0 State1: x+y-z\', '
             u'u\'exp_id0 State4: sqrt(x/y)\']]']
@@ -412,9 +439,9 @@ class MathExpressionValidationOneOffJobTests(test_utils.GenericTestBase):
         """Checks that the number of valid explorations yielded is less than
         the limit mentioned by the VALID_MATH_EXP_YIELD_LIMIT constant.
         """
-        mevooj = exp_jobs_one_off.MathExpressionValidationOneOffJob
+        one_off_job_cls = exp_jobs_one_off.MathExpressionValidationOneOffJob
         # Resetting the threshold only for testing purposes.
-        mevooj.VALID_MATH_INPUTS_YIELD_LIMIT = 3
+        one_off_job_cls.VALID_MATH_INPUTS_YIELD_LIMIT = 3
 
         exploration = exp_domain.Exploration.create_default_exploration(
             self.VALID_EXP_ID, title='title', category='category')

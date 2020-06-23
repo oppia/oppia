@@ -147,7 +147,8 @@ class MathExpressionValidationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         is_valid_math_equation = schema_utils.get_validator(
             'is_valid_math_equation')
         ltt = latex2text.LatexNodes2Text()
-        mevooj = MathExpressionValidationOneOffJob
+        unicode_to_text_mapping = (
+            MathExpressionValidationOneOffJob.UNICODE_TO_TEXT)
 
         if not item.deleted:
             exploration = exp_fetchers.get_exploration_from_model(item)
@@ -163,9 +164,19 @@ class MathExpressionValidationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                             # they need to be replaced with their corresponding
                             # text values before performing validation.
                             for unicode_char, text in (
-                                    mevooj.UNICODE_TO_TEXT.items()):
+                                    unicode_to_text_mapping.items()):
                                 rule_input = rule_input.replace(
                                     unicode_char, text)
+
+                            # Replacing out of range unicode characters with
+                            # their ordinal values.
+                            rule_input = list(rule_input)
+                            for i in python_utils.RANGE(len(rule_input)):
+                                if ord(rule_input[i]) >= 128:
+                                    rule_input[i] = (
+                                        python_utils.UNICODE(
+                                            ord(rule_input[i])) + ' ')
+                            rule_input = ''.join(rule_input)
 
                             validity = 'Invalid'
                             if is_valid_math_expression(rule_input):
@@ -180,9 +191,10 @@ class MathExpressionValidationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def reduce(key, values):
-        mevooj = MathExpressionValidationOneOffJob
+        valid_inputs_limit = (
+            MathExpressionValidationOneOffJob.VALID_MATH_INPUTS_YIELD_LIMIT)
         if key.startswith('Valid'):
-            yield (key, values[:mevooj.VALID_MATH_INPUTS_YIELD_LIMIT])
+            yield (key, values[:valid_inputs_limit])
         else:
             yield (key, values)
 
