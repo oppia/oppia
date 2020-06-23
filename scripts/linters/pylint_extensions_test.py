@@ -644,7 +644,7 @@ class BackslashContinuationCheckerTests(unittest.TestCase):
         with python_utils.open_file(filename, 'w') as tmp:
             tmp.write(
                 u"""message1 = 'abc'\\\n""" # pylint: disable=backslash-continuation
-                """'cde'\\\n""" # pylint: disable=backslash-continuation
+                """'cde'\\\n"""             # pylint: disable=backslash-continuation
                 """'xyz'
                 message2 = 'abc\\\\'
                 message3 = (
