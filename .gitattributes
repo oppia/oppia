@@ -1,8 +1,8 @@
 # Source files
 # ============
 *.pxd      text eol=lf
-*.py       text eol=lf
-*.py3      text eol=lf
+*.py       text eol=crlf
+*.py3      text eol=crlf
 *.pyw      text eol=lf
 *.pyx      text eol=lf
 *.sh       text eol=lf
