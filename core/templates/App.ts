@@ -110,7 +110,8 @@ angular.module('oppia').config([
      * 3 - After angular has initialized we provide the angular sevices to ajs
      *     in oppia-root.directive.ts by using this function.
      */
-    (angular.module('oppia') as CustomOppiaModule).provideValueAfterBootstrap = (
+    (angular.module(
+      'oppia') as CustomOppiaModule).provideValueAfterBootstrap = (
       function(
           name, value) {
         $provide.value( name, value );
