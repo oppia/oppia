@@ -13,8 +13,7 @@
 // limitations under the License.
 
 import * as d3 from 'd3';
-import * as d3Hexbin from 'd3-hexbin';
-import { HexbinBin } from 'd3-hexbin';
+import { hexbin, HexbinBin } from 'd3-hexbin';
 
 interface ClickOnImageAnswer {
   answer: {
@@ -24,7 +23,7 @@ interface ClickOnImageAnswer {
 }
 
 /**
- * @fileoverview Visualization for click statistics providing a hexbin-heatmap.
+ * @fileoverview Visualization for image clicks as a hexagonal heat-map.
  */
 
 angular.module('oppia').directive('oppiaVisualizationClickHexbins', () => ({
@@ -38,110 +37,71 @@ angular.module('oppia').directive('oppiaVisualizationClickHexbins', () => ({
     function(
         $scope, AssetsBackendApiService, ContextService,
         ImagePreloaderService) {
-      const imageAndRegions = $scope.interactionArgs.imageAndRegions.value;
+      $scope.tooltipVisibility = 'hidden';
+      $scope.tooltipLeft = 0;
+      $scope.tooltipTop = 0;
+      $scope.tooltipText = '';
 
-      const showTooltip = (hexBin: HexbinBin<ClickOnImageAnswer>) => {
-        if (hexBin.length === 0) {
+      let binTarget = null;
+
+      const showBinTooltip = (bin: HexbinBin<ClickOnImageAnswer>) => {
+        if (binTarget !== null || bin.length === 0) {
           return;
         }
-        d3.select('.click-hexbin-chart-tooltip')
-          .style('visibility', 'visible')
-          .style('left', `${hexBin.x}px`)
-          .style('top', `${hexBin.y + 16}px`)
-          .text(`${hexBin.length} click${hexBin.length > 1 ? 's' : ''}`);
+        binTarget = bin;
+        $scope.$apply(() => {
+          $scope.tooltipLeft = bin.x;
+          $scope.tooltipTop = bin.y;
+          $scope.tooltipText = (
+            `${bin.length} click${bin.length > 1 ? 's' : ''}`);
+          $scope.tooltipVisibility = 'visible';
+        });
       };
 
-      const moveTooltip = (hexBin: HexbinBin<ClickOnImageAnswer>) => {
-        if (hexBin.length === 0) {
+      const hideBinTooltip = (bin: HexbinBin<ClickOnImageAnswer>) => {
+        if (binTarget !== bin) {
           return;
         }
-        d3.select('.click-hexbin-chart-tooltip')
-          .style('visibility', 'visible');
+        binTarget = null;
+        $scope.$apply(() => {
+          $scope.tooltipVisibility = 'hidden';
+        });
       };
 
-      const hideTooltip = (_: HexbinBin<ClickOnImageAnswer>) => {
-        d3.select('.click-hexbin-chart-tooltip')
-          .style('visibility', 'hidden');
-      };
+      this.$onInit = () => {
+        const imagePath = (
+          $scope.interactionArgs.imageAndRegions.value.imagePath);
+        const { height, width } = (
+          ImagePreloaderService.getDimensionsOfImage(imagePath));
+        const containerWidth = $('.click-hexbin-wrapper').width();
+        const containerHeight = Math.round(containerWidth * height / width);
 
-      const imageUrl = AssetsBackendApiService.getImageUrlForPreview(
-        ContextService.getEntityType(), ContextService.getEntityId(),
-        imageAndRegions.imagePath);
-      const imageDimensions = ImagePreloaderService.getDimensionsOfImage(
-        imageAndRegions.imagePath);
-      const imageAspectRatio = (
-        imageDimensions.height / imageDimensions.width);
-
-      const containerWidth = $('.click-hexbin-chart').width();
-      const containerHeight = Math.round(containerWidth * imageAspectRatio);
-
-      this.$onInit = function() {
-        d3.select('.click-hexbin-chart-tooltip')
-          .style('visibility', 'hidden');
-
-        // Define the data for the hexbins.
-        const hexbin = d3Hexbin.hexbin<ClickOnImageAnswer>()
+        const hexbinGenerator = hexbin<ClickOnImageAnswer>()
           .x(d => (d.answer.clickPosition[0] * containerWidth))
           .y(d => (d.answer.clickPosition[1] * containerHeight))
           .radius(16)
           .size([containerWidth, containerHeight]);
-        const bins = hexbin($scope.data);
+        const bins = hexbinGenerator($scope.data);
 
-        // Define the color of hexbins, using the number of grouped clicks
-        // to change their opacity.
-        const rgbaScaleEndPoints = [
-          'rgba(255,255,255,0.25)',
-          'rgba(255,255,255,0.75)'
-        ];
-        const color = d3.scaleLinear()
+        const fillColor = d3.scaleLinear()
           .domain([0, d3.max(bins, b => b.length)])
-        // NOTE TO DEVELOPERS: the range type is wrong; rgba string-values
-        // are supported.
-        // @ts-ignore
-          .range(rgbaScaleEndPoints);
+          // @ts-ignore: range's type is wrong, rgba strings are supported.
+          .range(['rgba(255, 255, 255, 0.25)', 'rgba(255, 255, 255, 0.75)']);
 
-        // Construct and add the SVG element for holding the hexbin graph.
-        const svg = d3.select('.click-hexbin-chart').append('svg')
-          .attr('viewBox', `0 0 ${containerWidth} ${containerHeight}`);
-
-        // Draw the image in which the clicks happened.
-        svg.append('image')
-          .attr('xlink:href', imageUrl)
-          .attr('width', `${containerWidth}px`)
-          .attr('height', `${containerHeight}px`);
-
-        // Draw an overlay over the image to help distinguish the hexagons.
-        svg.append('rect')
-          .attr('x', 0).attr('y', 0)
-          .attr('width', containerWidth).attr('height', containerHeight)
-          .style('fill', 'rgba(0,0,0,0.35)');
-
-        // Draw the mesh of hexagons to help distinguish each group.
-        const clipPath = svg.append('clipPath').attr('id', 'clip');
-        clipPath.append('rect')
-          .attr('class', 'mesh')
-          .attr('width', containerWidth)
-          .attr('height', containerHeight);
-
-        svg.append('svg:path')
-          .attr('clip-path', 'url(#clip)')
-          .attr('d', hexbin.mesh())
-          .style('stroke-width', .5)
-          .style('stroke', '#FFF')
-          .style('stroke-opacity', 0.12)
-          .style('fill', 'none');
-
-        // Draw the individual hexbins with non-zero points.
-        const graph = svg.append('g')
-          .selectAll('path')
-          .data(bins).enter();
-        graph.append('path')
+        d3.select('g').selectAll('path').data(bins).enter()
+          .append('path')
           .attr('transform', b => `translate(${b.x}, ${b.y})`)
-          .attr('fill', b => color(b.length))
-          .attr('d', hexbin.hexagon())
-          .on('mouseover', showTooltip)
-          .on('mousemove', moveTooltip)
-          .on('mouseout', hideTooltip);
+          .attr('fill', b => fillColor(b.length))
+          .attr('d', hexbinGenerator.hexagon())
+          .on('mouseout', hideBinTooltip)
+          .on('mouseover', showBinTooltip);
+
+        $scope.imageUrl = AssetsBackendApiService.getImageUrlForPreview(
+          ContextService.getEntityType(), ContextService.getEntityId(),
+          imagePath);
+        $scope.containerWidth = containerWidth;
+        $scope.containerHeight = containerHeight;
+        $scope.hexbinMesh = hexbinGenerator.mesh();
       };
     }
   ]

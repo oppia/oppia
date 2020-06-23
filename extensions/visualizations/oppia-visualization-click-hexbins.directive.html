@@ -1,4 +1,24 @@
-<div class="click-hexbin-chart">
-  <div class="click-hexbin-chart-tooltip">
+<div class="click-hexbin-wrapper">
+  <div class="click-hexbin-chart-tooltip"
+       style="top: <[tooltipTop]>px; left: <[tooltipLeft]>px; visibility: <[tooltipVisibility]>">
+    <[tooltipText]>
   </div>
+  <svg class="click-hexbin-chart" ng-attr-view_box="0 0 <[containerWidth]> <[containerHeight]>">
+    <image ng-attr-href="<[imageUrl]>"
+           ng-attr-width="<[containerWidth]>px" ng-attr-height="<[containerHeight]>px">
+    </image>
+    <rect class="click-hexbin-image-overlay"
+          x="0" y="0" ng-attr-width="<[containerWidth]>" ng-attr-height="<[containerHeight]>">
+    </rect>
+    <clipPath class="click-hexbin-clip-path">
+      <rect class="mesh" ng-attr-width="<[containerWidth]>" ng-attr-height="<[containerHeight]>">
+      </rect>
+    </clipPath>
+    <svg class="click-hexbin-mesh" clip-path="url(.click-hexbin-clip-path)">
+      <path ng-attr-d="<[hexbinMesh]>">
+      </path>
+    </svg>
+    <g clip-path="url(.click-hexbin-clip-path)">
+    </g>
+  </svg>
 </div>
