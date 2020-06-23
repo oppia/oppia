@@ -450,7 +450,7 @@ class Filepath(BaseObject):
 
 class SvgFilename(BaseObject):
     """A string representing a filename of the saved
-    svg file created using literallyCanvas.
+    svg file created using svg editor.
     """
 
     description = 'A string representing the saved svg filename'
