@@ -321,10 +321,15 @@ import { QuestionBackendApiService } from
 import { QuestionCreationService } from
   'components/entity-creation-services/question-creation.service';
 import { QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
+import { QuestionPlayerStateService } from
+// eslint-disable-next-line max-len
+  'components/question-directives/question-player/services/question-player-state.service';
 import { QuestionSummaryForOneSkillObjectFactory }
   from 'domain/question/QuestionSummaryForOneSkillObjectFactory';
 import { QuestionSummaryObjectFactory } from
   'domain/question/QuestionSummaryObjectFactory';
+import { QuestionValidationService } from
+  'services/question-validation.service';
 import { RatingComputationService } from
   'components/ratings/rating-computation/rating-computation.service';
 import { ReadOnlyCollectionBackendApiService } from
@@ -648,6 +653,8 @@ export class UpgradedServices {
       new PlaythroughIssueObjectFactory();
     upgradedServices['PredictionResultObjectFactory'] =
       new PredictionResultObjectFactory();
+    upgradedServices['QuestionPlayerStateService'] =
+      new QuestionPlayerStateService();
     upgradedServices['QuestionSummaryObjectFactory'] =
       new QuestionSummaryObjectFactory();
     upgradedServices['RatingComputationService'] =
@@ -937,6 +944,9 @@ export class UpgradedServices {
         upgradedServices['NormalizeWhitespacePipe'],
         upgradedServices['NormalizeWhitespacePunctuationAndCasePipe'],
         upgradedServices['CodeNormalizerService']);
+    upgradedServices['QuestionValidationService'] =
+      new QuestionValidationService(
+        upgradedServices['StateEditorService']);
     upgradedServices['SidebarStatusService'] = new SidebarStatusService(
       upgradedServices['WindowDimensionsService']);
     upgradedServices['StateContentService'] = new StateContentService(

@@ -45,80 +45,24 @@ import { WrittenTranslationsObjectFactory } from
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
-require('domain/question/QuestionObjectFactory.ts');
-require('domain/state/StateObjectFactory.ts');
 
-describe('Question object factory', function() {
-  var QuestionObjectFactory = null;
-  var StateObjectFactory = null;
-  var sampleQuestion = null;
-  var sampleQuestionBackendDict = null;
-  var misconceptionObjectFactory = null;
+import { TestBed } from '@angular/core/testing';
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value(
-      'AnswerGroupObjectFactory', new AnswerGroupObjectFactory(
-        new OutcomeObjectFactory(new SubtitledHtmlObjectFactory()),
-        new RuleObjectFactory()));
-    $provide.value('FractionObjectFactory', new FractionObjectFactory());
-    $provide.value(
-      'HintObjectFactory', new HintObjectFactory(
-        new SubtitledHtmlObjectFactory()));
-    $provide.value(
-      'MisconceptionObjectFactory', new MisconceptionObjectFactory());
-    $provide.value(
-      'OutcomeObjectFactory', new OutcomeObjectFactory(
-        new SubtitledHtmlObjectFactory()));
-    $provide.value('ParamChangeObjectFactory', new ParamChangeObjectFactory());
-    $provide.value(
-      'ParamChangesObjectFactory', new ParamChangesObjectFactory(
-        new ParamChangeObjectFactory()));
-    $provide.value(
-      'RecordedVoiceoversObjectFactory',
-      new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()));
-    $provide.value('RuleObjectFactory', new RuleObjectFactory());
-    $provide.value(
-      'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
-    $provide.value('UnitsObjectFactory', new UnitsObjectFactory());
-    $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
-    $provide.value(
-      'WrittenTranslationObjectFactory',
-      new WrittenTranslationObjectFactory());
-    $provide.value(
-      'WrittenTranslationsObjectFactory',
-      new WrittenTranslationsObjectFactory(
-        new WrittenTranslationObjectFactory()));
-  }));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
+import { QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
+import { StateObjectFactory } from 'domain/state/StateObjectFactory';
 
-  beforeEach(function() {
-    angular.mock.module(function($provide) {
-      $provide.constant('INTERACTION_SPECS', {
-        TextInput: {
-          can_have_solution: true
-        }
-      });
-    });
-  });
 
-  beforeEach(angular.mock.inject(function($injector) {
-    QuestionObjectFactory = $injector.get('QuestionObjectFactory');
-    StateObjectFactory = $injector.get('StateObjectFactory');
-    // The injector is required because this service is directly used in this
-    // spec, therefore even though MisconceptionObjectFactory is upgraded to
-    // Angular, it cannot be used just by instantiating it by its class but
-    // instead needs to be injected. Note that 'misconceptionObjectFactory' is
-    // the injected service instance whereas 'MisconceptionObjectFactory' is the
-    // service class itself. Therefore, use the instance instead of the class in
-    // the specs.
-    misconceptionObjectFactory = $injector.get('MisconceptionObjectFactory');
+describe('Question object factory', () => {
+  let questionObjectFactory: QuestionObjectFactory = null;
+  let stateObjectFactory: StateObjectFactory = null;
+  let sampleQuestion = null;
+  let sampleQuestionBackendDict = null;
+  let misconceptionObjectFactory: MisconceptionObjectFactory = null;
 
+  beforeEach(() => {
+    questionObjectFactory = TestBed.get(QuestionObjectFactory);
+    stateObjectFactory = TestBed.get(StateObjectFactory);
+    misconceptionObjectFactory = TestBed.get(MisconceptionObjectFactory);
     sampleQuestionBackendDict = {
       id: 'question_id',
       question_state_data: {
@@ -198,11 +142,11 @@ describe('Question object factory', function() {
       language_code: 'en',
       version: 1
     };
-    sampleQuestion = QuestionObjectFactory.createFromBackendDict(
+    sampleQuestion = questionObjectFactory.createFromBackendDict(
       sampleQuestionBackendDict);
-  }));
+  });
 
-  it('should correctly get various fields of the question', function() {
+  it('should correctly get various fields of the question', () => {
     expect(sampleQuestion.getId()).toEqual('question_id');
     expect(sampleQuestion.getLanguageCode()).toEqual('en');
     sampleQuestion.setLanguageCode('cn');
@@ -226,7 +170,7 @@ describe('Question object factory', function() {
     expect(defaultOutcome.feedback.getHtml()).toEqual('Correct Answer');
   });
 
-  it('should correctly get backend dict', function() {
+  it('should correctly get backend dict', () => {
     var newQuestionBackendDict = sampleQuestion.toBackendDict(true);
     expect(newQuestionBackendDict.id).toEqual(null);
     expect(newQuestionBackendDict.linked_skill_ids).not.toBeDefined();
@@ -234,7 +178,7 @@ describe('Question object factory', function() {
     expect(sampleQuestion.toBackendDict(false).id).toEqual('question_id');
   });
 
-  it('should correctly report unaddressed misconceptions', function() {
+  it('should correctly report unaddressed misconceptions', () => {
     var interaction = sampleQuestion.getStateData().interaction;
     var misconception1 = misconceptionObjectFactory.create(
       'id', 'name', 'notes', 'feedback', true);
@@ -252,7 +196,7 @@ describe('Question object factory', function() {
       misconceptionsDict)).toEqual(['name_2']);
   });
 
-  it('should correctly validate question', function() {
+  it('should correctly validate question', () => {
     var interaction = sampleQuestion.getStateData().interaction;
 
     expect(sampleQuestion.getValidationErrorMessage()).toBeNull();
@@ -274,11 +218,10 @@ describe('Question object factory', function() {
       'An interaction must be specified');
   });
 
-  it('should correctly create a Default Question', function() {
-    var sampleQuestion1 = QuestionObjectFactory.createDefaultQuestion(
+  it('should correctly create a Default Question', () => {
+    var sampleQuestion1 = questionObjectFactory.createDefaultQuestion(
       ['skill_id3', 'skill_id4']);
-    var state = StateObjectFactory.createDefaultState(null);
-
+    var state = stateObjectFactory.createDefaultState(null);
     expect(sampleQuestion1.getId()).toEqual(null);
     expect(sampleQuestion1.getLanguageCode()).toEqual('en');
     expect(sampleQuestion1.getVersion()).toEqual(1);

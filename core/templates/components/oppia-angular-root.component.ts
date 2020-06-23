@@ -348,10 +348,14 @@ import { QuestionBackendApiService } from
 import { QuestionCreationService } from
   'components/entity-creation-services/question-creation.service';
 import { QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
+import { QuestionPlayerStateService } from
+// eslint-disable-next-line max-len
+  'components/question-directives/question-player/services/question-player-state.service';
 import { QuestionSummaryForOneSkillObjectFactory }
   from 'domain/question/QuestionSummaryForOneSkillObjectFactory';
 import { QuestionSummaryObjectFactory } from
   'domain/question/QuestionSummaryObjectFactory';
+import { QuestionValidationService } from 'services/question-validation.service';
 import { ReadOnlyCollectionBackendApiService } from
   'domain/collection/read-only-collection-backend-api.service';
 import { RatingComputationService } from
@@ -702,8 +706,10 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static questionBackendApiService: QuestionBackendApiService;
   static questionCreationService: QuestionCreationService;
   static questionObjectFactory: QuestionObjectFactory;
+  static questionPlayerStateService: QuestionPlayerStateService;
   static questionSummaryForOneSkillObjectFactory: QuestionSummaryForOneSkillObjectFactory;
   static questionSummaryObjectFactory: QuestionSummaryObjectFactory;
+  static questionValidationService: QuestionValidationService;
   static readOnlyCollectionBackendApiService: ReadOnlyCollectionBackendApiService;
   static ratingComputationService: RatingComputationService;
   static readOnlyStoryNodeObjectFactory: ReadOnlyStoryNodeObjectFactory;
@@ -954,8 +960,10 @@ private pythonProgramTokenizer: PythonProgramTokenizer,
 private questionBackendApiService: QuestionBackendApiService,
 private questionCreationService: QuestionCreationService,
 private questionObjectFactory: QuestionObjectFactory,
+private questionPlayerStateService: QuestionPlayerStateService,
 private questionSummaryForOneSkillObjectFactory: QuestionSummaryForOneSkillObjectFactory,
 private questionSummaryObjectFactory: QuestionSummaryObjectFactory,
+private questionValidationService: QuestionValidationService,
 private readOnlyCollectionBackendApiService: ReadOnlyCollectionBackendApiService,
 private ratingComputationService: RatingComputationService,
 private readOnlyStoryNodeObjectFactory: ReadOnlyStoryNodeObjectFactory,
@@ -1207,8 +1215,10 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.questionBackendApiService = this.questionBackendApiService;
     OppiaAngularRootComponent.questionCreationService = this.questionCreationService;
     OppiaAngularRootComponent.questionObjectFactory = this.questionObjectFactory;
+    OppiaAngularRootComponent.questionPlayerStateService = this.questionPlayerStateService;
     OppiaAngularRootComponent.questionSummaryForOneSkillObjectFactory = this.questionSummaryForOneSkillObjectFactory;
     OppiaAngularRootComponent.questionSummaryObjectFactory = this.questionSummaryObjectFactory;
+    OppiaAngularRootComponent.questionValidationService = this.questionValidationService;
     OppiaAngularRootComponent.readOnlyCollectionBackendApiService = this.readOnlyCollectionBackendApiService;
     OppiaAngularRootComponent.ratingComputationService = this.ratingComputationService;
     OppiaAngularRootComponent.readOnlyStoryNodeObjectFactory = this.readOnlyStoryNodeObjectFactory;

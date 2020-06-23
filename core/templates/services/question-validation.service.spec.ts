@@ -28,36 +28,27 @@ import { StateEditorService } from
 /* eslint-enable max-len */
 // ^^^ This block is to be removed.
 
-require('domain/question/QuestionObjectFactory.ts');
-require('services/question-validation.service.ts');
+import { QuestionObjectFactory, Question } from
+  'domain/question/QuestionObjectFactory';
+import { QuestionValidationService } from
+  'services/question-validation.service';
+import { TestBed } from '@angular/core/testing';
+// require('domain/question/QuestionObjectFactory.ts');
+// require('services/question-validation.service.ts');
 
 describe('Question Validation Service', function() {
-  var misconceptionObjectFactory = null;
-  var mockMisconceptionObject = null;
-  var mockQuestionDict = null;
-  var QuestionObjectFactory = null;
-  var qvs = null;
-  var ses = null;
+  let misconceptionObjectFactory: MisconceptionObjectFactory = null;
+  let mockMisconceptionObject = null;
+  let mockQuestionDict = null;
+  let questionObjectFactory: QuestionObjectFactory = null;
+  let qvs: QuestionValidationService = null;
+  let ses: jasmine.SpyObj<StateEditorService> = null;
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value(
-      'MisconceptionObjectFactory', new MisconceptionObjectFactory());
-    $provide.value(
-      'StateEditorService', new StateEditorService(
-        new SolutionValidityService()));
-  }));
-
-  beforeEach(angular.mock.inject(
-    function($injector) {
-      misconceptionObjectFactory = $injector.get('MisconceptionObjectFactory');
-      qvs = $injector.get('QuestionValidationService');
-      ses = $injector.get('StateEditorService');
-      QuestionObjectFactory = $injector.get('QuestionObjectFactory');
-      spyOn(ses, 'isCurrentSolutionValid').and.returnValue(true);
-    }));
-
-  beforeEach(function() {
+  beforeEach(() => {
+    qvs = TestBed.get(QuestionValidationService);
+    questionObjectFactory = TestBed.get(QuestionObjectFactory);
+    ses = TestBed.get(StateEditorService);
+    misconceptionObjectFactory = TestBed.get(MisconceptionObjectFactory);
     mockQuestionDict = {
       id: 'question_1',
       question_state_data: {
@@ -165,36 +156,38 @@ describe('Question Validation Service', function() {
           '2', 'misc2', 'notes2', 'feedback1', false)
       ]
     };
+    spyOn(ses, 'isCurrentSolutionValid').and.returnValue(true);
   });
 
-  it('should return false if question validation fails', function() {
+
+  it('should return false if question validation fails', () => {
     var interaction = mockQuestionDict.question_state_data.interaction;
     interaction.answer_groups[0].outcome.labelled_as_correct = false;
     expect(
       qvs.isQuestionValid(
-        QuestionObjectFactory.createFromBackendDict(mockQuestionDict),
+        questionObjectFactory.createFromBackendDict(mockQuestionDict),
         mockMisconceptionObject)).toBeFalse();
   });
 
-  it('should return false if misconceptions are not addressed', function() {
+  it('should return false if misconceptions are not addressed', () => {
     var interaction = mockQuestionDict.question_state_data.interaction;
     interaction.answer_groups[1].tagged_skill_misconception_id = null;
     expect(
       qvs.isQuestionValid(
-        QuestionObjectFactory.createFromBackendDict(mockQuestionDict),
+        questionObjectFactory.createFromBackendDict(mockQuestionDict),
         mockMisconceptionObject)).toBeFalse();
   });
 
-  it('should return false if solution is invalid', function() {
+  it('should return false if solution is invalid', () => {
     ses.isCurrentSolutionValid.and.returnValue(false);
     expect(
       qvs.isQuestionValid(
-        QuestionObjectFactory.createFromBackendDict(mockQuestionDict),
+        questionObjectFactory.createFromBackendDict(mockQuestionDict),
         mockMisconceptionObject)).toBeFalse();
   });
 
-  it('should return true if validation is successful', function() {
-    var question = QuestionObjectFactory.createFromBackendDict(
+  it('should return true if validation is successful', () => {
+    var question = questionObjectFactory.createFromBackendDict(
       mockQuestionDict);
     expect(qvs.isQuestionValid(question, mockMisconceptionObject)).toBeTrue();
   });

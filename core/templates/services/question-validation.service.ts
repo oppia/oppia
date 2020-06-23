@@ -17,21 +17,27 @@
  *
  */
 
-require(
-  'components/state-editor/state-editor-properties-services/' +
-  'state-editor.service.ts');
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
-angular.module('oppia').factory('QuestionValidationService', [
-  'StateEditorService',
-  function(StateEditorService) {
-    return {
-      isQuestionValid: function(question, misconceptionsBySkill) {
-        return !(
-          question.getValidationErrorMessage() ||
-          question.getUnaddressedMisconceptionNames(
-            misconceptionsBySkill).length > 0 ||
-          !StateEditorService.isCurrentSolutionValid());
-      }
-    };
+import { StateEditorService } from
+// eslint-disable-next-line max-len
+  'components/state-editor/state-editor-properties-services/state-editor.service';
+import { Question } from 'domain/question/QuestionObjectFactory';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class QuestionValidationService {
+  constructor(
+    private stateEditorService: StateEditorService) {}
+  isQuestionValid(question: Question, misconceptionsBySkill) {
+    return !(
+      question.getValidationErrorMessage() ||
+      question.getUnaddressedMisconceptionNames(
+        misconceptionsBySkill).length > 0 ||
+      !this.stateEditorService.isCurrentSolutionValid());
   }
-]);
+}
+angular.module('oppia').factory('QuestionValidationService',
+  downgradeInjectable(QuestionValidationService));
