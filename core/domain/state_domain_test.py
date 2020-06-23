@@ -655,6 +655,26 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'correct_answer type.'):
             state.get_all_html_content_strings()
 
+    def test_get_all_html_when_interaction_is_none(self):
+        """Test the method for extracting all the HTML from a state
+        when the state has no interaction.
+        """
+        exploration = exp_domain.Exploration.create_default_exploration(
+            'exp_id')
+        exploration.add_states(['State1'])
+        state = exploration.states['State1']
+        state_content_dict = {
+            'content_id': 'content',
+            'html': '<p>state content html</p>'
+        }
+
+        state.update_content(
+            state_domain.SubtitledHtml.from_dict(state_content_dict))
+
+        exp_services.save_new_exploration('owner_id', exploration)
+        html_list = state.get_all_html_content_strings()
+        self.assertEqual(html_list, ['<p>state content html</p>'])
+
     def test_export_state_to_dict(self):
         """Test exporting a state to a dict."""
         exploration = exp_domain.Exploration.create_default_exploration(

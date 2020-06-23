@@ -608,6 +608,9 @@ class InteractionInstance(python_utils.OBJECT):
             list(str): The list of all html content strings in the interaction.
         """
         html_list = []
+        if self.id is None:
+            return html_list
+
         interaction = (
             interaction_registry.Registry.get_interaction_by_id(
                 self.id))
@@ -627,7 +630,7 @@ class InteractionInstance(python_utils.OBJECT):
             hint_html = hint.hint_content.html
             html_list = html_list + [hint_html]
 
-        if interaction.can_have_solution:
+        if self.solution and interaction.can_have_solution:
             solution_html = self.solution.explanation.html
             html_list = html_list + [solution_html]
 
