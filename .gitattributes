@@ -1,34 +1,34 @@
 # Source files
 # ============
-*.pxd      text eol=crlf
-*.py       text eol=crlf
-*.py3      text eol=crlf
-*.pyw      text eol=crlf
-*.pyx      text eol=crlf
-*.sh       text eol=crlf
-*.js       text eol=crlf
-*.txt      text eol=crlf
-*.css      text eol=crlf
-*.html     text eol=crlf
-*.md       text eol=crlf
-*.yml      text eol=crlf
-*.yaml     text eol=crlf
-*.md       text eol=crlf
-*.json     text eol=crlf
-*.html     text eol=crlf
-*.txt      text eol=crlf
-*.xml      text eol=crlf
-*.pegjs    text eol=crlf
+*.pxd      text eol=lf
+*.py       text eol=lf
+*.py3      text eol=lf
+*.pyw      text eol=lf
+*.pyx      text eol=lf
+*.sh       text eol=lf
+*.js       text eol=lf
+*.txt      text eol=lf
+*.css      text eol=lf
+*.html     text eol=lf
+*.md       text eol=lf
+*.yml      text eol=lf
+*.yaml     text eol=lf
+*.md       text eol=lf
+*.json     text eol=lf
+*.html     text eol=lf
+*.txt      text eol=lf
+*.xml      text eol=lf
+*.pegjs    text eol=lf
 
 # Misc files
 # ==========
-.jscsrc      text eol=crlf
-.gitignore   text eol=crlf
-.pylintrc    text eol=crlf
-AUTHORS      text eol=crlf
-CHANGELOG    text eol=crlf
-CONTRIBUTORS text eol=crlf
-LICENSE      text eol=crlf
+.jscsrc      text eol=lf
+.gitignore   text eol=lf
+.pylintrc    text eol=lf
+AUTHORS      text eol=lf
+CHANGELOG    text eol=lf
+CONTRIBUTORS text eol=lf
+LICENSE      text eol=lf
 
 # Binary files
 # ============
