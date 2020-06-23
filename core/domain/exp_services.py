@@ -493,8 +493,18 @@ def apply_change_list(exploration_id, change_list):
                 # Exploration domain object automatically converts it to use
                 # the latest states schema version. As a result, simply
                 # resaving the exploration is sufficient to apply the states
-                # schema update.
-                continue
+                # schema update. Thus, no action is needed here other than
+                # to make sure that the version that the user is trying to
+                # migrate to is the latest version.
+                target_version_is_current_state_schema_version = (
+                    change.to_version ==
+                    python_utils.UNICODE(feconf.CURRENT_STATE_SCHEMA_VERSION))
+                if not target_version_is_current_state_schema_version:
+                    raise Exception(
+                        'Expected to migrate to the latest state schema '
+                        'version %s, received %s' % (
+                            feconf.CURRENT_STATE_SCHEMA_VERSION,
+                            change.to_version))
         return exploration
 
     except Exception as e:
