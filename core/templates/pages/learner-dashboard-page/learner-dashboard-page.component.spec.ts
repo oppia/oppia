@@ -177,7 +177,7 @@ describe('Learner dashboard page', function() {
         });
       }
 
-      // Generate incompleted explorationst
+      // Generate incomplete explorations.
       for (let i = 0; i < 12; i++) {
         learnerDashboardData.incomplete_explorations_list[i] = (
           ExplorationObjectFactory.createFromBackendDict(
@@ -205,7 +205,7 @@ describe('Learner dashboard page', function() {
         });
       }
 
-      // Generate incompleted collections
+      // Generate incomplete collections.
       for (let i = 0; i < 8; i++) {
         learnerDashboardData.incomplete_collections_list[i] = (
           CollectionObjectFactory.create(
