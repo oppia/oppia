@@ -151,7 +151,8 @@ describe('SetInputValidationService', () => {
           }]);
         });
 
-        it('should not generate errors with different rules', () => {
+        it('should not generate errors with non-redundant rules of the ' +
+          'same type', () => {
           let equalsRule1 = rof.createFromBackendDict({
             rule_type: 'Equals',
             inputs: {
@@ -203,7 +204,8 @@ describe('SetInputValidationService', () => {
           }]);
         });
 
-        it('should not generate errors with different rules', () => {
+        it('should not generate errors with non-redundant rules of the ' +
+          'same type', () => {
           let subsetRule1 = rof.createFromBackendDict({
             rule_type: 'IsSubsetOf',
             inputs: {
@@ -255,7 +257,8 @@ describe('SetInputValidationService', () => {
           }]);
         });
 
-        it('should not generate errors with different rules', () => {
+        it('should not generate errors with non-redundant rules of the ' +
+          'same type', () => {
           let hasElementsInRule1 = rof.createFromBackendDict({
             rule_type: 'HasElementsIn',
             inputs: {
@@ -307,7 +310,8 @@ describe('SetInputValidationService', () => {
           }]);
         });
 
-        it('should not generate errors with different rules', () => {
+        it('should not generate errors with non-redundant rules of the ' +
+          'same type', () => {
           let disjointRule1 = rof.createFromBackendDict({
             rule_type: 'IsDisjointFrom',
             inputs: {
@@ -359,7 +363,8 @@ describe('SetInputValidationService', () => {
           }]);
         });
 
-        it('should not generate errors with different rules', () => {
+        it('should not generate errors with non-redundant rules of the ' +
+          'same type', () => {
           let supersetRule1 = rof.createFromBackendDict({
             rule_type: 'IsSupersetOf',
             inputs: {
@@ -411,7 +416,8 @@ describe('SetInputValidationService', () => {
           }]);
         });
 
-        it('should not generate errors with different rules', () => {
+        it('should not generate errors with non-redundant rules of the ' +
+          'same type', () => {
           let hasElementNotInRule1 = rof.createFromBackendDict({
             rule_type: 'HasElementsNotIn',
             inputs: {
@@ -463,7 +469,8 @@ describe('SetInputValidationService', () => {
           }]);
         });
 
-        it('should not generate errors with different rules', () => {
+        it('should not generate errors with non-redundant rules of the ' +
+          'same type', () => {
           let omitElementRule1 = rof.createFromBackendDict({
             rule_type: 'OmitsElementsIn',
             inputs: {

@@ -143,7 +143,7 @@ export class SetInputValidationService {
             let prevRuleInput = <string[]>prevRule.rule.inputs.x;
             switch (rule.type) {
               case 'Equals':
-                // An 'Equals' rule is made redunt by another only when
+                // An 'Equals' rule is made redundant by another only when
                 // they are the same, which has been checked in the code above,
                 // using areSameRule method.
                 break;
