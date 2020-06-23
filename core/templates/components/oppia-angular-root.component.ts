@@ -225,6 +225,8 @@ import { GuestCollectionProgressObjectFactory } from
   'domain/collection/GuestCollectionProgressObjectFactory';
 import { GuestCollectionProgressService } from
   'domain/collection/guest-collection-progress.service';
+import { HighBounceRateObjectFactory } from
+  'domain/improvements/HighBounceRateTaskObjectFactory';
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
 import { HtmlEscaperService } from 'services/html-escaper.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
@@ -646,6 +648,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static graphUtilsService: GraphUtilsService;
   static guestCollectionProgressObjectFactory: GuestCollectionProgressObjectFactory;
   static guestCollectionProgressService: GuestCollectionProgressService;
+  static highBounceRateObjectFactory: HighBounceRateObjectFactory;
   static hintObjectFactory: HintObjectFactory;
   static htmlEscaperService: HtmlEscaperService;
   static i18nLanguageCodeService: I18nLanguageCodeService;
