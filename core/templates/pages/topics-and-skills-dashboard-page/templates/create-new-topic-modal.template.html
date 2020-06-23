@@ -7,7 +7,7 @@
   <div class="modal-body create-new-topic-form">
     <div class="create-new-topic-input-field" ng-class="{'has-error': !isTopicNameValid()}">
       <div><span class="create-new-topic-input-label">Name</span></div>
-      <input class="protractor-test-new-topic-name-field" ng-model="newlyCreatedTopic.name" maxlength="<[MAX_CHARS_IN_TOPIC_NAME]>">
+      <input class="protractor-test-new-topic-name-field" ng-model="newlyCreatedTopic.name" maxlength="<[MAX_CHARS_IN_TOPIC_NAME]>" autofocus>
       <div class="oppia-input-box-subtitle">
         <i>
           Topic name should be at most <[MAX_CHARS_IN_TOPIC_NAME]> characters.

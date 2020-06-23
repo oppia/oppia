@@ -28,7 +28,11 @@
           index in the stop() event handler. -->
           <li ng-repeat="answerGroup in answerGroups" ng-class="{'active': activeAnswerGroupIndex === $index}" class="oppia-rule-block oppia-sortable-rule-block oppia-prevent-selection" style="margin-top: 0;">
             <span class="oppia-rule-sort-handle" ng-if="answerGroups.length > 1" ng-mousedown="changeActiveAnswerGroupIndex(-1)">
-              <img ng-if="EditabilityService.isEditable()" ng-src="<[dragDotsImgUrl]>" width="10">
+              <picture ng-if="EditabilityService.isEditable()">
+                <source type="image/webp" ng-srcset="<[getStaticImageUrl('/general/drag_dots.webp')]>">
+                <source type="image/png" ng-srcset="<[getStaticImageUrl('/general/drag_dots.png')]>">
+                <img ng-src="<[getStaticImageUrl('/general/drag_dots.png')]>" width="10">
+              </picture>
             </span>
             <div class="oppia-rule-header-warning-placement" ng-if="isSelfLoopThatIsMarkedCorrect(answerGroup.outcome) || isSelfLoopWithNoFeedback(answerGroup.outcome)" ng-click="changeActiveAnswerGroupIndex($index)"
                  uib-tooltip="<[getOutcomeTooltip(answerGroup.outcome)]>" tooltip-placement="bottom">
