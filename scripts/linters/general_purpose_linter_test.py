@@ -134,8 +134,6 @@ INVALID_COPYRIGHT_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_copyright.py')
 INVALID_UNICODE_LITERAL_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_unicode_literal.py')
-INVALID_CRLF_ENDING_FILEPATH = os.path.join(
-    LINTER_TESTS_DIR, 'invalid_crlf_ending.py')
 INVALID_DEV_MODE_IN_CONSTANT_FILEPATH = 'constants.ts'
 
 
@@ -710,17 +708,6 @@ class GeneralLintTests(LintTests):
         self.assertTrue(
             test_utils.assert_same_list_elements(
                 ['Please use spaces instead of tabs.'],
-                self.linter_stdout))
-
-    def test_invalid_crlf_ending(self):
-        with self.print_swap:
-            general_purpose_linter.GeneralPurposeLinter(
-                [INVALID_CRLF_ENDING_FILEPATH], FILE_CACHE, True
-            ).perform_all_lint_checks()
-        self.assertTrue(
-            test_utils.assert_same_list_elements(
-                ['Line 1: Please make sure all files only have LF endings '
-                 '(no CRLF).'],
                 self.linter_stdout))
 
     def test_invalid_merge_conflict(self):
