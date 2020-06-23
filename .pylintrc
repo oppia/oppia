@@ -17,10 +17,10 @@ docstring-quote=double
 [BASIC]
 
 # Regular expression which should only match correct function names
-function-rgx=^[_a-z][a-z0-9_]*$
+function-rgx=^[a-z_][a-z0-9]+(_[a-z0-9]+)*$
 
 # Regular expression which should only match correct method names
-method-rgx=^([_a-z][a-z0-9_]*|__[a-z0-9]+__)$
+method-rgx=^[a-z_][a-z0-9]+(_[a-z0-9]+)*$
 
 # Regular expression which should only match correct constant names
 const-rgx=^(([A-Z_][A-Z0-9_]*)|(__.*__)|([a-z_]+_models)|([a-z_]+_services))$
@@ -32,13 +32,13 @@ good-names=e,_,d,f,i,l,p,w,fn,fs,id,pc,sc,zf,setUp,tearDown,longMessage,maxDiff
 dummy-variables-rgx=_|unused_*
 
 # Regular expression which should match good variable names
-variable-rgx=[a-z_][a-z0-9_]*$
+variable-rgx=^[a-z_][a-z0-9]+(_[a-z0-9]+)*$
 
 # Regular expression matching correct attribute names
-attr-rgx=[A-Za-z_][A-Za-z0-9_]*$
+attr-rgx=^[a-z_][a-z0-9]+(_[a-z0-9]+)*$
 
 # Regular expression matching correct argument names
-argument-rgx=[A-Za-z_][A-Za-z0-9_]*$
+argument-rgx=^[a-z_][a-z0-9]+(_[a-z0-9]+)*$
 
 # Regular expression matching correct module names
 module-rgx=[A-Za-z_][A-Za-z0-9_]*$
