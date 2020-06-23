@@ -193,6 +193,11 @@ import { ExplorationOpportunitySummaryObjectFactory } from
 import { ExpressionParserService } from 'expressions/expression-parser.service';
 import { ExplorationRecommendationsService } from
   'pages/exploration-player-page/services/exploration-recommendations.service';
+import { ExplorationStatsBackendApiService } from
+  'services/exploration-stats-backend-api.service';
+import { ExplorationStatsObjectFactory } from
+  'domain/statistics/ExplorationStatsObjectFactory';
+import { ExplorationStatsService } from 'services/exploration-stats.service';
 import { ExplorationTaskObjectFactory } from
   'domain/improvements/ExplorationTaskObjectFactory';
 import { ExpressionSyntaxTreeService } from
@@ -456,6 +461,8 @@ import { StateSolicitAnswerDetailsService } from
 import { StateSolutionService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-solution.service';
+import { StateStatsObjectFactory } from
+  'domain/statistics/StateStatsObjectFactory';
 import { StateTopAnswersStatsBackendApiService } from
   'services/state-top-answers-stats-backend-api.service';
 import { StateWrittenTranslationsService } from
@@ -631,6 +638,9 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static explorationOpportunitySummaryObjectFactory: ExplorationOpportunitySummaryObjectFactory;
   static expressionParserService: ExpressionParserService;
   static explorationRecommendationsService: ExplorationRecommendationsService;
+  static explorationStatsBackendApiService: ExplorationStatsBackendApiService;
+  static explorationStatsObjectFactory: ExplorationStatsObjectFactory;
+  static explorationStatsService: ExplorationStatsService;
   static explorationTaskObjectFactory: ExplorationTaskObjectFactory;
   static expressionSyntaxTreeService: ExpressionSyntaxTreeService;
   static extensionTagAssemblerService: ExtensionTagAssemblerService;
@@ -764,6 +774,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static stateRecordedVoiceoversService: StateRecordedVoiceoversService;
   static stateSolicitAnswerDetailsService: StateSolicitAnswerDetailsService;
   static stateSolutionService: StateSolutionService;
+  static stateStatsObjectFactory: StateStatsObjectFactory;
   static stateTopAnswersStatsBackendApiService: StateTopAnswersStatsBackendApiService;
   static stateWrittenTranslationsService: StateWrittenTranslationsService;
   static statesObjectFactory: StatesObjectFactory;
@@ -888,6 +899,9 @@ private explorationObjectFactory: ExplorationObjectFactory,
 private explorationOpportunitySummaryObjectFactory: ExplorationOpportunitySummaryObjectFactory,
 private expressionParserService: ExpressionParserService,
 private explorationRecommendationsService: ExplorationRecommendationsService,
+private explorationStatsBackendApiService: ExplorationStatsBackendApiService,
+private explorationStatsObjectFactory: ExplorationStatsObjectFactory,
+private explorationStatsService: ExplorationStatsService,
 private explorationTaskObjectFactory: ExplorationTaskObjectFactory,
 private expressionSyntaxTreeService: ExpressionSyntaxTreeService,
 private extensionTagAssemblerService: ExtensionTagAssemblerService,
@@ -1021,6 +1035,7 @@ private statePropertyService: StatePropertyService,
 private stateRecordedVoiceoversService: StateRecordedVoiceoversService,
 private stateSolicitAnswerDetailsService: StateSolicitAnswerDetailsService,
 private stateSolutionService: StateSolutionService,
+private stateStatsObjectFactory: StateStatsObjectFactory,
 private stateTopAnswersStatsBackendApiService: StateTopAnswersStatsBackendApiService,
 private stateWrittenTranslationsService: StateWrittenTranslationsService,
 private statesObjectFactory: StatesObjectFactory,
@@ -1146,6 +1161,9 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.explorationOpportunitySummaryObjectFactory = this.explorationOpportunitySummaryObjectFactory;
     OppiaAngularRootComponent.expressionParserService = this.expressionParserService;
     OppiaAngularRootComponent.explorationRecommendationsService = this.explorationRecommendationsService;
+    OppiaAngularRootComponent.explorationStatsBackendApiService = this.explorationStatsBackendApiService;
+    OppiaAngularRootComponent.explorationStatsObjectFactory = this.explorationStatsObjectFactory;
+    OppiaAngularRootComponent.explorationStatsService = this.explorationStatsService;
     OppiaAngularRootComponent.explorationTaskObjectFactory = this.explorationTaskObjectFactory;
     OppiaAngularRootComponent.expressionSyntaxTreeService = this.expressionSyntaxTreeService;
     OppiaAngularRootComponent.extensionTagAssemblerService = this.extensionTagAssemblerService;
@@ -1280,6 +1298,7 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.stateSolicitAnswerDetailsService = this.stateSolicitAnswerDetailsService;
     OppiaAngularRootComponent.stateSolutionService = this.stateSolutionService;
     OppiaAngularRootComponent.stateTopAnswersStatsBackendApiService = this.stateTopAnswersStatsBackendApiService;
+    OppiaAngularRootComponent.stateStatsObjectFactory = this.stateStatsObjectFactory;
     OppiaAngularRootComponent.stateWrittenTranslationsService = this.stateWrittenTranslationsService;
     OppiaAngularRootComponent.statesObjectFactory = this.statesObjectFactory;
     OppiaAngularRootComponent.statsReportingService = this.statsReportingService;
