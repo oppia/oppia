@@ -247,7 +247,7 @@ class ExplorationContextModel(base_models.BaseModel):
 
         Args:
             unused_user_id: str. The (unused) ID of the user whose data should
-            be checked.
+                be checked.
 
         Returns:
             bool. Whether any models refer to the given user ID.
@@ -654,7 +654,7 @@ class ExplorationCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
 
         Returns:
             str. A string containing exploration ID and
-                exploration version.
+            exploration version.
         """
         return 'exploration-%s-%s' % (exp_id, exp_version)
 
@@ -674,7 +674,7 @@ class ExplorationCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
                 commits are needed.
 
         Returns:
-            3-tuple of (results, cursor, more) which were created which were
+            3-tuple (results, cursor, more). Which were created which were
             created no earlier than max_age before the current time where:
                 results: List of query results.
                 cursor: str or None. A query cursor pointing to the next
@@ -868,7 +868,7 @@ class ExpSummaryModel(base_models.BaseModel):
 
         Returns:
             iterable. An iterable with the top rated exp summaries that are
-                public in descending order of scaled_average_rating.
+            public in descending order of scaled_average_rating.
         """
         return ExpSummaryModel.query().filter(
             ExpSummaryModel.status == constants.ACTIVITY_STATUS_PUBLIC
@@ -888,7 +888,7 @@ class ExpSummaryModel(base_models.BaseModel):
 
         Returns:
             iterable. An iterable with private exp summaries that are at least
-                viewable by the given user.
+            viewable by the given user.
         """
         return ExpSummaryModel.query().filter(
             ExpSummaryModel.status == constants.ACTIVITY_STATUS_PRIVATE
@@ -910,7 +910,7 @@ class ExpSummaryModel(base_models.BaseModel):
 
         Returns:
             iterable. An iterable with exp summaries that are at least
-                editable by the given user.
+            editable by the given user.
         """
         return ExpSummaryModel.query().filter(
             ndb.OR(ExpSummaryModel.owner_ids == user_id,
@@ -928,8 +928,8 @@ class ExpSummaryModel(base_models.BaseModel):
 
         Returns:
             An iterable with exp summaries that are recently published. The
-                returned list is sorted by the time of publication with latest
-                being first in the list.
+            returned list is sorted by the time of publication with latest
+            being first in the list.
         """
         return ExpSummaryModel.query().filter(
             ExpSummaryModel.status == constants.ACTIVITY_STATUS_PUBLIC
