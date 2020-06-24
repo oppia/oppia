@@ -49,7 +49,7 @@ PROCESSES = multiprocessing.Manager().dict()
 NAME_SPACE.files = pre_commit_linter.FileCache()
 FILE_CACHE = NAME_SPACE.files
 
-LINTER_TESTS_DIR = os.path.join(os.getcwd(), 'core', 'tests', 'linter_tests')
+LINTER_TESTS_DIR = os.path.join(os.getcwd(), 'scripts', 'linters', 'test_files')
 VALID_JS_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'valid.js')
 VALID_TS_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'valid.ts')
 VALID_CONSTANT_OUTSIDE_CLASS_FILEPATH = os.path.join(
@@ -84,7 +84,7 @@ class JsTsLintTests(test_utils.GenericTestBase):
             linter_stdout list.
 
             Args:
-                *args: Variable length argument list of values to print in
+                *args: str. Variable length argument list of values to print in
                 the same line of output.
             """
             self.linter_stdout.append(

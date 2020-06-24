@@ -31,7 +31,7 @@ PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 CONFIG_PATH = os.path.join(
     PARENT_DIR, 'oppia', 'core', 'templates', 'css', '.stylelintrc')
 
-LINTER_TESTS_DIR = os.path.join(os.getcwd(), 'core', 'tests', 'linter_tests')
+LINTER_TESTS_DIR = os.path.join(os.getcwd(), 'scripts', 'linters', 'test_files')
 VALID_CSS_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'valid.css')
 INVALID_CSS_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid.css')
 
@@ -61,7 +61,7 @@ class ThirdPartyCSSLintChecksManagerTests(test_utils.GenericTestBase):
             linter_stdout list.
 
             Args:
-                *args: Variable length argument list of values to print in
+                *args: str. Variable length argument list of values to print in
                 the same line of output.
             """
             self.linter_stdout.append(

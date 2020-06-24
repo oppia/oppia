@@ -34,7 +34,7 @@ EXCLUDED_PATHS = (
     'integrations/*', 'integrations_dev/*', '*.svg', '*.gif', '*.png',
     '*.webp', '*.zip', '*.ico', '*.jpg', '*.min.js', 'backend_prod_files/*',
     'assets/scripts/*', 'core/tests/data/*', 'core/tests/build_sources/*',
-    'core/tests/linter_tests/*', '*.mp3', '*.mp4', 'node_modules/*',
+    'scripts/linters/test_files/*', '*.mp3', '*.mp4', 'node_modules/*',
     'typings/*', 'local_compiled_js/*', 'webpack_bundles/*',
     'core/tests/services_sources/*', 'core/tests/release_sources/tmp_unzip.zip',
     'core/tests/release_sources/tmp_unzip.tar.gz')

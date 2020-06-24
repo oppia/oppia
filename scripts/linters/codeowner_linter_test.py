@@ -33,7 +33,7 @@ PROCESSES = multiprocessing.Manager().dict()
 NAME_SPACE.files = pre_commit_linter.FileCache()
 FILE_CACHE = NAME_SPACE.files
 
-LINTER_TESTS_DIR = os.path.join(os.getcwd(), 'core', 'tests', 'linter_tests')
+LINTER_TESTS_DIR = os.path.join(os.getcwd(), 'scripts', 'linters', 'test_files')
 MOCK_CODEOWNER_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_codeowners')
 
 CODEOWNER_IMPORTANT_PATHS = [
@@ -66,7 +66,7 @@ class CodeOwnerLinterTests(test_utils.GenericTestBase):
             linter_stdout list.
 
             Args:
-                *args: Variable length argument list of values to print in
+                *args: str. Variable length argument list of values to print in
                 the same line of output.
             """
             self.linter_stdout.append(
