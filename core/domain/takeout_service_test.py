@@ -18,6 +18,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
+import json
 
 from constants import constants
 from core.domain import exp_domain
@@ -32,15 +33,18 @@ import feconf
 import utils
 
 (
-    base_models, collection_models, email_models,
-    exploration_models, feedback_models, skill_models,
-    topic_models, suggestion_models, user_models,
-    story_models, question_models, config_models
+    base_models, collection_models, config_models,
+    email_models, exploration_models, feedback_models,
+    improvements_models, question_models, skill_models,
+    story_models, suggestion_models, topic_models,
+    user_models,
 ) = models.Registry.import_models([
-    models.NAMES.base_model, models.NAMES.collection, models.NAMES.email,
-    models.NAMES.exploration, models.NAMES.feedback, models.NAMES.skill,
-    models.NAMES.topic, models.NAMES.suggestion, models.NAMES.user,
-    models.NAMES.story, models.NAMES.question, models.NAMES.config])
+    models.NAMES.base_model, models.NAMES.collection, models.NAMES.config,
+    models.NAMES.email, models.NAMES.exploration, models.NAMES.feedback,
+    models.NAMES.improvements, models.NAMES.question, models.NAMES.skill,
+    models.NAMES.story, models.NAMES.suggestion, models.NAMES.topic,
+    models.NAMES.user,
+])
 
 
 class TakeoutServiceUnitTests(test_utils.GenericTestBase):
@@ -58,6 +62,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
     USER_1_EMAIL = 'user1@example.com'
     GENERIC_USERNAME = 'user'
     GENERIC_DATE = datetime.datetime(2019, 5, 20)
+    GENERIC_EPOCH = utils.get_time_in_millisecs(GENERIC_DATE)
     GENERIC_IMAGE_URL = 'www.example.com/example.png'
     GENERIC_USER_BIO = 'I am a user of Oppia!'
     GENERIC_SUBJECT_INTERESTS = ['Math', 'Science']
@@ -82,6 +87,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
     ]
     EXPLORATION_IDS = ['exp_1']
     CREATOR_IDS = ['4', '8', '16']
+    CREATOR_USERNAMES = ['username4', 'username8', 'username16']
     COLLECTION_IDS = ['23', '42', '4']
     ACTIVITY_IDS = ['8', '16', '23']
     GENERAL_FEEDBACK_THREAD_IDS = ['42', '4', '8']
@@ -103,9 +109,18 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
     MESSAGE_TEXT = 'Export test text.'
     MESSAGE_RECEIEVED_VIA_EMAIL = False
     CHANGE_CMD = {}
+    SCORE_CATEGORY_1 = 'category_1'
+    SCORE_CATEGORY_2 = 'category_2'
     SCORE_CATEGORY = (
         suggestion_models.SCORE_TYPE_TRANSLATION +
         suggestion_models.SCORE_CATEGORY_DELIMITER + 'English')
+    GENERIC_MODEL_ID = 'model-id-1'
+    COMMIT_TYPE = 'create'
+    COMMIT_MESSAGE = 'This is a commit.'
+    COMMIT_CMDS = [
+        {'cmd': 'some_command'},
+        {'cmd2': 'another_command'}
+    ]
 
     def set_up_non_trivial(self):
         """Set up all models for use in testing.
@@ -125,6 +140,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
         14) Creates new exploration rights.
         15) Populates user settings.
         16) Creates two reply-to ids for feedback.
+        17) Creates a task closed by the user.
         """
         super(TakeoutServiceUnitTests, self).setUp()
         # Setup for UserStatsModel.
@@ -153,11 +169,20 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             degree_of_mastery=self.DEGREE_OF_MASTERY).put()
 
         # Setup for UserSubscriptionsModel.
+        for creator_id in self.CREATOR_IDS:
+            user_models.UserSettingsModel(
+                id=creator_id,
+                gae_id='gae_' + creator_id,
+                username='username' + creator_id,
+                email=creator_id + '@example.com'
+            ).put()
+
         user_models.UserSubscriptionsModel(
             id=self.USER_ID_1, creator_ids=self.CREATOR_IDS,
             collection_ids=self.COLLECTION_IDS,
             activity_ids=self.ACTIVITY_IDS,
-            general_feedback_thread_ids=self.GENERAL_FEEDBACK_THREAD_IDS).put()
+            general_feedback_thread_ids=self.GENERAL_FEEDBACK_THREAD_IDS,
+            last_checked=self.GENERIC_DATE).put()
 
         # Setup for UserContributionsModel.
         self.save_new_valid_exploration(
@@ -319,6 +344,123 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             email_models.GeneralFeedbackEmailReplyToIdModel.create(
                 self.USER_ID_1, self.THREAD_ID_2).put()
 
+        suggestion_models.GeneralVoiceoverApplicationModel(
+            id='application_1_id',
+            target_type='exploration',
+            target_id='exp_id',
+            status=suggestion_models.STATUS_IN_REVIEW,
+            author_id=self.USER_ID_1,
+            final_reviewer_id='reviewer_id',
+            language_code='en',
+            filename='application_audio.mp3',
+            content='<p>Some content</p>',
+            rejection_message=None).put()
+
+        suggestion_models.GeneralVoiceoverApplicationModel(
+            id='application_2_id',
+            target_type='exploration',
+            target_id='exp_id',
+            status=suggestion_models.STATUS_IN_REVIEW,
+            author_id=self.USER_ID_1,
+            final_reviewer_id=None,
+            language_code='en',
+            filename='application_audio.mp3',
+            content='<p>Some content</p>',
+            rejection_message=None).put()
+
+        user_models.UserCommunityRightsModel(
+            id=self.USER_ID_1,
+            can_review_translation_for_language_codes=['hi', 'en'],
+            can_review_voiceover_for_language_codes=['hi'],
+            can_review_questions=True).put()
+
+        user_models.UserContributionScoringModel(
+            id='%s.%s' % (self.SCORE_CATEGORY_1, self.USER_ID_1),
+            user_id=self.USER_ID_1,
+            score_category=self.SCORE_CATEGORY_1,
+            score=1.5,
+            has_email_been_sent=False
+        ).put()
+        user_models.UserContributionScoringModel(
+            id='%s.%s' % (self.SCORE_CATEGORY_2, self.USER_ID_1),
+            user_id=self.USER_ID_1,
+            score_category=self.SCORE_CATEGORY_2,
+            score=2,
+            has_email_been_sent=False
+        ).put()
+
+        collection_models.CollectionRightsSnapshotMetadataModel(
+            id=self.GENERIC_MODEL_ID, committer_id=self.USER_ID_1,
+            commit_type=self.COMMIT_TYPE, commit_message=self.COMMIT_MESSAGE,
+            commit_cmds=self.COMMIT_CMDS
+        ).put()
+
+        collection_models.CollectionSnapshotMetadataModel(
+            id=self.GENERIC_MODEL_ID, committer_id=self.USER_ID_1,
+            commit_type=self.COMMIT_TYPE, commit_message=self.COMMIT_MESSAGE,
+            commit_cmds=self.COMMIT_CMDS
+        ).put()
+
+        skill_models.SkillSnapshotMetadataModel(
+            id=self.GENERIC_MODEL_ID, committer_id=self.USER_ID_1,
+            commit_type=self.COMMIT_TYPE, commit_message=self.COMMIT_MESSAGE,
+            commit_cmds=self.COMMIT_CMDS
+        ).put()
+        topic_models.SubtopicPageSnapshotMetadataModel(
+            id=self.GENERIC_MODEL_ID, committer_id=self.USER_ID_1,
+            commit_type=self.COMMIT_TYPE, commit_message=self.COMMIT_MESSAGE,
+            commit_cmds=self.COMMIT_CMDS
+        ).put()
+
+        topic_models.TopicRightsSnapshotMetadataModel(
+            id=self.GENERIC_MODEL_ID, committer_id=self.USER_ID_1,
+            commit_type=self.COMMIT_TYPE, commit_message=self.COMMIT_MESSAGE,
+            commit_cmds=self.COMMIT_CMDS
+        ).put()
+
+        topic_models.TopicSnapshotMetadataModel(
+            id=self.GENERIC_MODEL_ID, committer_id=self.USER_ID_1,
+            commit_type=self.COMMIT_TYPE, commit_message=self.COMMIT_MESSAGE,
+            commit_cmds=self.COMMIT_CMDS
+        ).put()
+
+        story_models.StorySnapshotMetadataModel(
+            id=self.GENERIC_MODEL_ID, committer_id=self.USER_ID_1,
+            commit_type=self.COMMIT_TYPE, commit_message=self.COMMIT_MESSAGE,
+            commit_cmds=self.COMMIT_CMDS
+        ).put()
+
+        question_models.QuestionSnapshotMetadataModel(
+            id=self.GENERIC_MODEL_ID, committer_id=self.USER_ID_1,
+            commit_type=self.COMMIT_TYPE, commit_message=self.COMMIT_MESSAGE,
+            commit_cmds=self.COMMIT_CMDS
+        ).put()
+
+        config_models.ConfigPropertySnapshotMetadataModel(
+            id=self.GENERIC_MODEL_ID, committer_id=self.USER_ID_1,
+            commit_type=self.COMMIT_TYPE, commit_message=self.COMMIT_MESSAGE,
+            commit_cmds=self.COMMIT_CMDS
+        ).put()
+
+        exploration_models.ExplorationRightsSnapshotMetadataModel(
+            id=self.GENERIC_MODEL_ID, committer_id=self.USER_ID_1,
+            commit_type=self.COMMIT_TYPE, commit_message=self.COMMIT_MESSAGE,
+            commit_cmds=self.COMMIT_CMDS
+        ).put()
+
+        improvements_models.TaskEntryModel(
+            id=self.GENERIC_MODEL_ID,
+            composite_entity_id=self.GENERIC_MODEL_ID,
+            entity_type=improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
+            entity_id=self.GENERIC_MODEL_ID,
+            entity_version=1,
+            task_type=improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
+            target_type=improvements_models.TASK_TARGET_TYPE_STATE,
+            target_id=self.GENERIC_MODEL_ID,
+            status=improvements_models.TASK_STATUS_OPEN,
+            resolver_id=self.USER_ID_1
+        ).put()
+
     def set_up_trivial(self):
         """Setup for trivial test of export_data functionality."""
         super(TakeoutServiceUnitTests, self).setUp()
@@ -391,14 +533,33 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
         subscriptions_data = {
             'activity_ids': [],
             'collection_ids': [],
-            'creator_ids': [],
+            'creator_usernames': [],
             'general_feedback_thread_ids': [],
             'last_checked': None
+        }
+        task_entry_data = {
+            'task_ids_resolved_by_user': []
         }
         topic_rights_data = {
             'managed_topic_ids': []
         }
-        expected_export = {
+
+        expected_voiceover_application_data = {}
+        expected_contrib_score_data = {}
+        expected_community_rights_data = {}
+        expected_collection_rights_sm = {}
+        expected_collection_sm = {}
+        expected_skill_sm = {}
+        expected_subtopic_page_sm = {}
+        expected_topic_rights_sm = {}
+        expected_topic_sm = {}
+        expected_story_sm = {}
+        expected_question_sm = {}
+        expected_config_property_sm = {}
+        expected_exploration_rights_sm = {}
+        expected_exploration_sm = {}
+
+        expected_data = {
             'user_stats_data': stats_data,
             'user_settings_data': settings_data,
             'user_subscriptions_data': subscriptions_data,
@@ -409,6 +570,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             'incomplete_activities_data': incomplete_activities_data,
             'exp_user_last_playthrough_data': last_playthrough_data,
             'learner_playlist_data': learner_playlist_data,
+            'task_entry_data': task_entry_data,
             'topic_rights_data': topic_rights_data,
             'collection_progress_data': collection_progress_data,
             'story_progress_data': story_progress_data,
@@ -419,17 +581,41 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             'collection_rights_data': collection_rights_data,
             'general_suggestion_data': general_suggestion_data,
             'exploration_rights_data': exploration_rights_data,
-            'general_feedback_email_reply_to_id_data': reply_to_data
+            'general_feedback_email_reply_to_id_data': reply_to_data,
+            'general_voiceover_application_data':
+                expected_voiceover_application_data,
+            'user_contribution_scoring_data': expected_contrib_score_data,
+            'user_community_rights_data': expected_community_rights_data,
+            'collection_rights_snapshot_metadata_data':
+                expected_collection_rights_sm,
+            'collection_snapshot_metadata_data':
+                expected_collection_sm,
+            'skill_snapshot_metadata_data':
+                expected_skill_sm,
+            'subtopic_page_snapshot_metadata_data':
+                expected_subtopic_page_sm,
+            'topic_rights_snapshot_metadata_data':
+                expected_topic_rights_sm,
+            'topic_snapshot_metadata_data': expected_topic_sm,
+            'story_snapshot_metadata_data': expected_story_sm,
+            'question_snapshot_metadata_data': expected_question_sm,
+            'config_property_snapshot_metadata_data':
+                expected_config_property_sm,
+            'exploration_rights_snapshot_metadata_data':
+                expected_exploration_rights_sm,
+            'exploration_snapshot_metadata_data': expected_exploration_sm,
         }
 
         # Perform export and compare.
-        exported_data = takeout_service.export_data_for_user(self.USER_ID_1)
-        self.assertEqual(expected_export, exported_data)
+        observed_data = takeout_service.export_data_for_user(self.USER_ID_1)
+        self.assertEqual(expected_data, observed_data)
+        observed_json = json.dumps(observed_data)
+        expected_json = json.dumps(expected_data)
+        self.assertEqual(json.loads(expected_json), json.loads(observed_json))
 
     def test_export_data_nontrivial(self):
         """Nontrivial test of export_data functionality."""
         self.set_up_non_trivial()
-
         # We set up the feedback_thread_model here so that we can easily
         # access it when computing the expected data later.
         feedback_thread_model = feedback_models.GeneralFeedbackThreadModel(
@@ -462,9 +648,9 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
         expected_exploration_data = {
             self.EXPLORATION_IDS[0]: {
                 'rating': 2,
-                'rated_on': self.GENERIC_DATE,
+                'rated_on': self.GENERIC_EPOCH,
                 'draft_change_list': {'new_content': {}},
-                'draft_change_list_last_updated': self.GENERIC_DATE,
+                'draft_change_list_last_updated': self.GENERIC_EPOCH,
                 'draft_change_list_exp_version': 3,
                 'draft_change_list_id': 1,
                 'mute_suggestion_notifications': (
@@ -520,7 +706,8 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
                 'has_suggestion': self.THREAD_HAS_SUGGESTION,
                 'summary': self.THREAD_SUMMARY,
                 'message_count': self.THREAD_MESSAGE_COUNT,
-                'last_updated': feedback_thread_model.last_updated
+                'last_updated_msec': utils.get_time_in_millisecs(
+                    feedback_thread_model.last_updated)
             },
             thread_id: {
                 'entity_type': self.THREAD_ENTITY_TYPE,
@@ -530,9 +717,10 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
                 'has_suggestion': False,
                 'summary': None,
                 'message_count': 2,
-                'last_updated': (feedback_models.
-                                 GeneralFeedbackThreadModel.
-                                 get(thread_id).last_updated)
+                'last_updated_msec': utils.get_time_in_millisecs(
+                    feedback_models.
+                    GeneralFeedbackThreadModel.
+                    get_by_id(thread_id).last_updated)
             }
         }
         expected_general_feedback_thread_user_data = {
@@ -590,11 +778,11 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             'role': feconf.ROLE_ID_ADMIN,
             'username': self.GENERIC_USERNAME,
             'normalized_username': self.GENERIC_USERNAME,
-            'last_agreed_to_terms': self.GENERIC_DATE,
-            'last_started_state_editor_tutorial': self.GENERIC_DATE,
-            'last_started_state_translation_tutorial': self.GENERIC_DATE,
-            'last_logged_in': self.GENERIC_DATE,
-            'last_edited_an_exploration': self.GENERIC_DATE,
+            'last_agreed_to_terms': self.GENERIC_EPOCH,
+            'last_started_state_editor_tutorial': self.GENERIC_EPOCH,
+            'last_started_state_translation_tutorial': self.GENERIC_EPOCH,
+            'last_logged_in': self.GENERIC_EPOCH,
+            'last_edited_an_exploration': self.GENERIC_EPOCH,
             'profile_picture_data_url': self.GENERIC_IMAGE_URL,
             'default_dashboard': 'learner',
             'creator_dashboard_display_pref': 'card',
@@ -612,19 +800,156 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
         }
 
         expected_subscriptions_data = {
-            'creator_ids': self.CREATOR_IDS,
+            'creator_usernames': self.CREATOR_USERNAMES,
             'collection_ids': self.COLLECTION_IDS,
             'activity_ids': self.ACTIVITY_IDS + self.EXPLORATION_IDS,
             'general_feedback_thread_ids': self.GENERAL_FEEDBACK_THREAD_IDS +
                                            [thread_id],
-            'last_checked': None
+            'last_checked': self.GENERIC_EPOCH
         }
 
+        expected_task_entry_data = {
+            'task_ids_resolved_by_user': [self.GENERIC_MODEL_ID]
+        }
         expected_topic_data = {
             'managed_topic_ids': [self.TOPIC_ID_1, self.TOPIC_ID_2]
         }
 
-        expected_export = {
+        expected_voiceover_application_data = {
+            'application_1_id': {
+                'target_type': 'exploration',
+                'target_id': 'exp_id',
+                'status': 'review',
+                'language_code': 'en',
+                'filename': 'application_audio.mp3',
+                'content': '<p>Some content</p>',
+                'rejection_message': None
+            },
+            'application_2_id': {
+                'target_type': 'exploration',
+                'target_id': 'exp_id',
+                'status': 'review',
+                'language_code': 'en',
+                'filename': 'application_audio.mp3',
+                'content': '<p>Some content</p>',
+                'rejection_message': None
+            }
+        }
+
+        expected_community_rights_data = {
+            'can_review_translation_for_language_codes': ['hi', 'en'],
+            'can_review_voiceover_for_language_codes': ['hi'],
+            'can_review_questions': True
+        }
+
+        expected_contrib_score_data = {
+            self.SCORE_CATEGORY_1: {
+                'has_email_been_sent': False,
+                'score': 1.5
+            },
+            self.SCORE_CATEGORY_2: {
+                'has_email_been_sent': False,
+                'score': 2
+            }
+        }
+        expected_collection_rights_sm = {
+            self.GENERIC_MODEL_ID: {
+                'commit_type': self.COMMIT_TYPE,
+                'commit_message': self.COMMIT_MESSAGE,
+                'commit_cmds': self.COMMIT_CMDS
+            }
+        }
+        expected_collection_sm = {
+            self.GENERIC_MODEL_ID: {
+                'commit_type': self.COMMIT_TYPE,
+                'commit_message': self.COMMIT_MESSAGE,
+                'commit_cmds': self.COMMIT_CMDS
+            }
+        }
+
+        expected_skill_sm = {
+            self.GENERIC_MODEL_ID: {
+                'commit_type': self.COMMIT_TYPE,
+                'commit_message': self.COMMIT_MESSAGE,
+                'commit_cmds': self.COMMIT_CMDS
+            }
+        }
+        expected_subtopic_page_sm = {
+            self.GENERIC_MODEL_ID: {
+                'commit_type': self.COMMIT_TYPE,
+                'commit_message': self.COMMIT_MESSAGE,
+                'commit_cmds': self.COMMIT_CMDS
+            }
+        }
+        expected_topic_rights_sm = {
+            self.GENERIC_MODEL_ID: {
+                'commit_type': self.COMMIT_TYPE,
+                'commit_message': self.COMMIT_MESSAGE,
+                'commit_cmds': self.COMMIT_CMDS
+            }
+        }
+        expected_topic_sm = {
+            self.GENERIC_MODEL_ID: {
+                'commit_type': self.COMMIT_TYPE,
+                'commit_message': self.COMMIT_MESSAGE,
+                'commit_cmds': self.COMMIT_CMDS
+            }
+        }
+
+        expected_story_sm = {
+            self.GENERIC_MODEL_ID: {
+                'commit_type': self.COMMIT_TYPE,
+                'commit_message': self.COMMIT_MESSAGE,
+                'commit_cmds': self.COMMIT_CMDS
+            }
+        }
+        expected_question_sm = {
+            self.GENERIC_MODEL_ID: {
+                'commit_type': self.COMMIT_TYPE,
+                'commit_message': self.COMMIT_MESSAGE,
+                'commit_cmds': self.COMMIT_CMDS
+            }
+        }
+        expected_config_property_sm = {
+            self.GENERIC_MODEL_ID: {
+                'commit_type': self.COMMIT_TYPE,
+                'commit_message': self.COMMIT_MESSAGE,
+                'commit_cmds': self.COMMIT_CMDS
+            }
+        }
+
+        expected_exploration_rights_sm = {
+            self.GENERIC_MODEL_ID: {
+                'commit_type': self.COMMIT_TYPE,
+                'commit_message': self.COMMIT_MESSAGE,
+                'commit_cmds': self.COMMIT_CMDS
+            }
+        }
+
+        expected_exploration_sm = {
+            'exp_1-1': {
+                'commit_type': 'create',
+                'commit_cmds': [{
+                    'category': 'A category',
+                    'cmd': 'create_new',
+                    'title': 'A title'
+                }],
+                'commit_message':
+                    'New exploration created with title \'A title\'.'
+            },
+            'exp_1-2': {
+                'commit_type': 'edit',
+                'commit_cmds': [{
+                    'new_value': 'the objective',
+                    'cmd': 'edit_exploration_property',
+                    'old_value': None,
+                    'property_name': 'objective'
+                }],
+                'commit_message': 'Test edit'
+            }
+        }
+
+        expected_data = {
             'user_stats_data': expected_stats_data,
             'user_settings_data': expected_settings_data,
             'user_subscriptions_data': expected_subscriptions_data,
@@ -635,6 +960,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             'incomplete_activities_data': expected_incomplete_activities_data,
             'exp_user_last_playthrough_data': expected_last_playthrough_data,
             'learner_playlist_data': expected_learner_playlist_data,
+            'task_entry_data': expected_task_entry_data,
             'topic_rights_data': expected_topic_data,
             'collection_progress_data': expected_collection_progress_data,
             'story_progress_data': expected_story_progress_data,
@@ -648,8 +974,32 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
                 expected_collection_rights_data,
             'general_suggestion_data': expected_general_suggestion_data,
             'exploration_rights_data': expected_exploration_rights_data,
-            'general_feedback_email_reply_to_id_data': expected_reply_to_data
+            'general_feedback_email_reply_to_id_data': expected_reply_to_data,
+            'general_voiceover_application_data':
+                expected_voiceover_application_data,
+            'user_contribution_scoring_data': expected_contrib_score_data,
+            'user_community_rights_data': expected_community_rights_data,
+            'collection_rights_snapshot_metadata_data':
+                expected_collection_rights_sm,
+            'collection_snapshot_metadata_data':
+                expected_collection_sm,
+            'skill_snapshot_metadata_data':
+                expected_skill_sm,
+            'subtopic_page_snapshot_metadata_data':
+                expected_subtopic_page_sm,
+            'topic_rights_snapshot_metadata_data':
+                expected_topic_rights_sm,
+            'topic_snapshot_metadata_data': expected_topic_sm,
+            'story_snapshot_metadata_data': expected_story_sm,
+            'question_snapshot_metadata_data': expected_question_sm,
+            'config_property_snapshot_metadata_data':
+                expected_config_property_sm,
+            'exploration_rights_snapshot_metadata_data':
+                expected_exploration_rights_sm,
+            'exploration_snapshot_metadata_data': expected_exploration_sm,
         }
-
-        exported_data = takeout_service.export_data_for_user(self.USER_ID_1)
-        self.assertEqual(exported_data, expected_export)
+        observed_data = takeout_service.export_data_for_user(self.USER_ID_1)
+        self.assertEqual(observed_data, expected_data)
+        observed_json = json.dumps(observed_data)
+        expected_json = json.dumps(expected_data)
+        self.assertEqual(json.loads(observed_json), json.loads(expected_json))

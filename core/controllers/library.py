@@ -71,6 +71,15 @@ def get_matching_activity_dicts(query_string, search_cursor):
     return activity_list, new_search_cursor
 
 
+class OldLibraryRedirectPage(base.BaseHandler):
+    """Redirects the old library URL to the new one."""
+
+    @acl_decorators.open_access
+    def get(self):
+        """Handles GET requests."""
+        self.redirect(feconf.LIBRARY_INDEX_URL, permanent=True)
+
+
 class LibraryPage(base.BaseHandler):
     """The main library page. Used for both the default list of categories and
     for search results.
@@ -143,14 +152,6 @@ class LibraryGroupPage(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-
-        self.values.update({
-            'meta_description': (
-                feconf.LIBRARY_GROUP_PAGE_DESCRIPTION),
-            'has_fully_registered': bool(
-                self.user_id and
-                user_services.has_fully_registered(self.user_id)),
-        })
         self.render_template('library-page.mainpage.html')
 
 
@@ -242,7 +243,7 @@ class LibraryRedirectPage(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        self.redirect('/library')
+        self.redirect('/community-library')
 
 
 class ExplorationSummariesHandler(base.BaseHandler):

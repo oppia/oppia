@@ -84,8 +84,14 @@ def get_file_contents(filepath, raw_bytes=False, mode='r'):
         *. Either the raw_bytes stream if the flag is set or the
             decoded stream in utf-8 format.
     """
-    with open(filepath, mode) as f:
-        return f.read() if raw_bytes else f.read().decode('utf-8')
+    if raw_bytes:
+        mode = 'rb'
+        encoding = None
+    else:
+        encoding = 'utf-8'
+
+    with python_utils.open_file(filepath, mode, encoding=encoding) as f:
+        return f.read()
 
 
 def get_exploration_components_from_dir(dir_path):
@@ -408,8 +414,8 @@ def get_time_in_millisecs(datetime_obj):
     Returns:
         float. The time in milliseconds since the Epoch.
     """
-    seconds = time.mktime(datetime_obj.utctimetuple()) * 1000
-    return seconds + python_utils.divide(datetime_obj.microsecond, 1000.0)
+    msecs = time.mktime(datetime_obj.timetuple()) * 1000.0
+    return msecs + python_utils.divide(datetime_obj.microsecond, 1000.0)
 
 
 def get_current_time_in_millisecs():
@@ -540,6 +546,36 @@ def require_valid_name(name, name_type, allow_empty=False):
             raise ValidationError(
                 'Invalid character %s in %s: %s' %
                 (character, name_type, name))
+
+
+def require_valid_thumbnail_filename(thumbnail_filename):
+    """Generic thumbnail filename validation.
+
+        Args:
+            thumbnail_filename: str. The thumbnail filename to validate.
+        """
+    if thumbnail_filename is not None:
+        if not isinstance(thumbnail_filename, python_utils.BASESTRING):
+            raise ValidationError(
+                'Expected thumbnail filename to be a string, received %s'
+                % thumbnail_filename)
+        if thumbnail_filename.rfind('.') == 0:
+            raise ValidationError(
+                'Thumbnail filename should not start with a dot.')
+        if '/' in thumbnail_filename or '..' in thumbnail_filename:
+            raise ValidationError(
+                'Thumbnail filename should not include slashes or '
+                'consecutive dot characters.')
+        if '.' not in thumbnail_filename:
+            raise ValidationError(
+                'Thumbnail filename should include an extension.')
+
+        dot_index = thumbnail_filename.rfind('.')
+        extension = thumbnail_filename[dot_index + 1:].lower()
+        if extension != 'svg':
+            raise ValidationError(
+                'Expected a filename ending in svg, received %s' %
+                thumbnail_filename)
 
 
 def capitalize_string(input_string):

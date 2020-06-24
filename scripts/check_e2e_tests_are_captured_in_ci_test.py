@@ -158,11 +158,6 @@ class CheckE2eTestsCapturedInCITests(test_utils.GenericTestBase):
             'get_e2e_suite_names_from_script_travis_yml_file',
             mock_get_e2e_suite_names)
 
-        mock_travis_jobs = self.swap(
-            check_e2e_tests_are_captured_in_ci,
-            'get_e2e_suite_names_from_jobs_travis_yml_file',
-            mock_get_e2e_suite_names)
-
         mock_protractor_test_suites = self.swap(
             check_e2e_tests_are_captured_in_ci,
             'get_e2e_suite_names_from_protractor_file',
@@ -174,21 +169,14 @@ class CheckE2eTestsCapturedInCITests(test_utils.GenericTestBase):
 
         with mock_travis_scripts:
             with self.assertRaisesRegexp(
-                Exception, 'explorationImprovementsTab is expected to be in '
+                Exception, 'coreEditorAndPlayerFeatures is expected to be in '
                            'the e2e test suites extracted from the script '
-                           'section of .travis.yml file, but it is missing.'):
-                check_e2e_tests_are_captured_in_ci.main()
-
-        with mock_travis_jobs:
-            with self.assertRaisesRegexp(
-                Exception, 'explorationImprovementsTab is expected to be in '
-                           'the e2e test suites extracted from the jobs '
                            'section of .travis.yml file, but it is missing.'):
                 check_e2e_tests_are_captured_in_ci.main()
 
         with mock_protractor_test_suites, mock_tests_not_on_travis:
             with self.assertRaisesRegexp(
-                Exception, 'explorationImprovementsTab is expected to be in '
+                Exception, 'coreEditorAndPlayerFeatures is expected to be in '
                            'the e2e test suites extracted from the '
                            'protractor.conf.js file, but it is missing.'):
                 check_e2e_tests_are_captured_in_ci.main()

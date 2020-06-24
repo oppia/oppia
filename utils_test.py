@@ -336,3 +336,44 @@ class UtilsTests(test_utils.GenericTestBase):
         self.assertEqual(camel_case_str1, 'userIdNumber')
         self.assertEqual(camel_case_str2, 'helloWorld')
         self.assertEqual(camel_case_str3, 'test1')
+
+    def _assert_valid_thumbnail_filename(
+            self, expected_error_substring, thumbnail_filename):
+        """Helper method for test_require_valid_thumbnail_filename."""
+        with self.assertRaisesRegexp(
+            utils.ValidationError, expected_error_substring):
+            utils.require_valid_thumbnail_filename(
+                thumbnail_filename)
+
+    def test_require_valid_thumbnail_filename(self):
+        """Test thumbnail filename validation."""
+        self._assert_valid_thumbnail_filename(
+            'Expected thumbnail filename to be a string, received 10', 10)
+        self._assert_valid_thumbnail_filename(
+            'Thumbnail filename should not start with a dot.', '.name')
+        self._assert_valid_thumbnail_filename(
+            'Thumbnail filename should not include slashes or '
+            'consecutive dot characters.', 'file/name')
+        self._assert_valid_thumbnail_filename(
+            'Thumbnail filename should not include slashes or '
+            'consecutive dot characters.', 'file..name')
+        self._assert_valid_thumbnail_filename(
+            'Thumbnail filename should include an extension.', 'name')
+        self._assert_valid_thumbnail_filename(
+            'Expected a filename ending in svg, received name.jpg', 'name.jpg')
+        filename = 'filename.svg'
+        utils.require_valid_thumbnail_filename(filename)
+
+    def test_get_time_in_millisecs(self):
+        dt = datetime.datetime(2020, 6, 15)
+        msecs = utils.get_time_in_millisecs(dt)
+        self.assertEqual(
+            dt,
+            datetime.datetime.fromtimestamp(python_utils.divide(msecs, 1000.0)))
+
+    def test_get_time_in_millisecs_with_complicated_time(self):
+        dt = datetime.datetime(2020, 6, 15, 5, 18, 23, microsecond=123456)
+        msecs = utils.get_time_in_millisecs(dt)
+        self.assertEqual(
+            dt,
+            datetime.datetime.fromtimestamp(python_utils.divide(msecs, 1000.0)))

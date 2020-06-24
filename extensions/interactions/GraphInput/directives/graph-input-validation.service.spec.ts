@@ -27,14 +27,15 @@ import { GraphInputValidationService } from
 import { Outcome, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
+import { IGraphBackendDict } from
+  'extensions/interactions/GraphInput/directives/graph-detail.service';
 
 import { AppConstants } from 'app.constants';
+import { WARNING_TYPES_CONSTANT } from 'app-type.constants';
 
 describe('GraphInputValidationService', () => {
-  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'WARNING_TYPES' is a constant and its type needs to be
-  // preferably in the constants file itself.
-  let WARNING_TYPES: any, validatorService: GraphInputValidationService;
+  let WARNING_TYPES: WARNING_TYPES_CONSTANT;
+  let validatorService: GraphInputValidationService;
   let currentState: string, customizationArguments: any;
   let answerGroups: AnswerGroup[], goodDefaultOutcome: Outcome;
   let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory;
@@ -55,7 +56,7 @@ describe('GraphInputValidationService', () => {
       dest: 'Second State',
       feedback: {
         html: '',
-        audio_translations: {}
+        content_id: ''
       },
       labelled_as_correct: false,
       param_changes: [],
@@ -96,7 +97,7 @@ describe('GraphInputValidationService', () => {
         rule_type: 'IsIsomorphicTo'
       })],
       goodDefaultOutcome,
-      false,
+      null,
       null
     );
     answerGroups = [answerGroup, cloneDeep(answerGroup)];
@@ -113,7 +114,8 @@ describe('GraphInputValidationService', () => {
     expect(() => {
       validatorService.getAllWarnings(
         currentState, {}, answerGroups, goodDefaultOutcome);
-    }).toThrow('Expected customization arguments to have properties: ' +
+    }).toThrowError(
+      'Expected customization arguments to have properties: ' +
       'graph, canEditEdgeWeight, canEditVertexLabel');
   });
 
@@ -134,9 +136,12 @@ describe('GraphInputValidationService', () => {
   it('The graph used in the rule x in group y exceeds supported maximum ' +
     'number of vertices of 10 for isomorphism check.',
   () => {
-    answerGroups[0].rules[0].inputs.g.vertices = new Array(11);
-    answerGroups[0].rules[1].inputs.g.vertices = new Array(11);
-    answerGroups[1].rules[0].inputs.g.vertices = new Array(11);
+    (<IGraphBackendDict>
+      answerGroups[0].rules[0].inputs.g).vertices = new Array(11);
+    (<IGraphBackendDict>
+      answerGroups[0].rules[1].inputs.g).vertices = new Array(11);
+    (<IGraphBackendDict>
+      answerGroups[1].rules[0].inputs.g).vertices = new Array(11);
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, answerGroups,
       goodDefaultOutcome);

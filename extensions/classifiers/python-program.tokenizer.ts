@@ -153,7 +153,7 @@ export class PythonProgramTokenizer {
 
   private tabsize = 8;
 
-  generateTokens(program: string[]): any[] {
+  generateTokens(program: string[]): string[][] {
     const tokenizedProgram = [];
     const lnum = 0;
     let parenlev = 0;

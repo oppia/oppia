@@ -434,53 +434,81 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
         self.assertIsNone(MockJobManagerOne.get_error(job2_id))
 
     def test_compress_output_list_with_single_char_outputs(self):
+        job_id = MockJobManagerOne.create_new()
         input_list = [1, 2, 3, 4, 5]
         expected_output = ['1', '2', '3', '<TRUNCATED>']
-        actual_output = jobs.BaseJobManager._compress_output_list(  # pylint: disable=protected-access
-            input_list, test_only_max_output_len_chars=3)
+        MockJobManagerOne.enqueue(job_id, taskqueue_services.QUEUE_NAME_DEFAULT)
+        MockJobManagerOne.register_start(job_id)
+        MockJobManagerOne.register_completion(
+            job_id, input_list, max_output_len_chars=3)
+        actual_output = MockJobManagerOne.get_output(job_id)
         self.assertEqual(actual_output, expected_output)
 
     def test_compress_output_list_with_multi_char_outputs(self):
+        job_id = MockJobManagerOne.create_new()
         input_list = ['abcd', 'efgh', 'ijkl']
         expected_output = ['abcd', 'efgh', 'ij <TRUNCATED>']
-        actual_output = jobs.BaseJobManager._compress_output_list(  # pylint: disable=protected-access
-            input_list, test_only_max_output_len_chars=10)
+        MockJobManagerOne.enqueue(job_id, taskqueue_services.QUEUE_NAME_DEFAULT)
+        MockJobManagerOne.register_start(job_id)
+        MockJobManagerOne.register_completion(
+            job_id, input_list, max_output_len_chars=10)
+        actual_output = MockJobManagerOne.get_output(job_id)
         self.assertEqual(actual_output, expected_output)
 
     def test_compress_output_list_with_zero_max_output_len(self):
+        job_id = MockJobManagerOne.create_new()
         input_list = [1, 2, 3]
         expected_output = ['<TRUNCATED>']
-        actual_output = jobs.BaseJobManager._compress_output_list(  # pylint: disable=protected-access
-            input_list, test_only_max_output_len_chars=0)
+        MockJobManagerOne.enqueue(job_id, taskqueue_services.QUEUE_NAME_DEFAULT)
+        MockJobManagerOne.register_start(job_id)
+        MockJobManagerOne.register_completion(
+            job_id, input_list, max_output_len_chars=0)
+        actual_output = MockJobManagerOne.get_output(job_id)
         self.assertEqual(actual_output, expected_output)
 
     def test_compress_output_list_with_exact_max_output_len(self):
+        job_id = MockJobManagerOne.create_new()
         input_list = ['abc']
         expected_output = ['abc']
-        actual_output = jobs.BaseJobManager._compress_output_list(  # pylint: disable=protected-access
-            input_list, test_only_max_output_len_chars=3)
+        MockJobManagerOne.enqueue(job_id, taskqueue_services.QUEUE_NAME_DEFAULT)
+        MockJobManagerOne.register_start(job_id)
+        MockJobManagerOne.register_completion(
+            job_id, input_list, max_output_len_chars=3)
+        actual_output = MockJobManagerOne.get_output(job_id)
         self.assertEqual(actual_output, expected_output)
 
     def test_compress_output_list_with_empty_outputs(self):
+        job_id = MockJobManagerOne.create_new()
         input_list = []
         expected_output = []
-        actual_output = jobs.BaseJobManager._compress_output_list(input_list)  # pylint: disable=protected-access
+        MockJobManagerOne.enqueue(job_id, taskqueue_services.QUEUE_NAME_DEFAULT)
+        MockJobManagerOne.register_start(job_id)
+        MockJobManagerOne.register_completion(job_id, input_list)
+        actual_output = MockJobManagerOne.get_output(job_id)
         self.assertEqual(actual_output, expected_output)
 
     def test_compress_output_list_with_duplicate_outputs(self):
+        job_id = MockJobManagerOne.create_new()
         input_list = ['bar', 'foo'] * 3
         expected_output = ['(3x) bar', '(3x) foo']
-        actual_output = jobs.BaseJobManager._compress_output_list(  # pylint: disable=protected-access
-            input_list,
-            # Make sure no output gets truncated.
-            test_only_max_output_len_chars=sum(len(s) for s in expected_output))
+        max_length_for_output = sum(len(s) for s in expected_output)
+        MockJobManagerOne.enqueue(
+            job_id, taskqueue_services.QUEUE_NAME_DEFAULT)
+        MockJobManagerOne.register_start(job_id)
+        MockJobManagerOne.register_completion(
+            job_id, input_list, max_output_len_chars=max_length_for_output)
+        actual_output = MockJobManagerOne.get_output(job_id)
         self.assertEqual(actual_output, expected_output)
 
     def test_compress_output_list_with_truncated_duplicate_outputs(self):
+        job_id = MockJobManagerOne.create_new()
         input_list = ['supercalifragilisticexpialidocious'] * 3
         expected_output = ['(3x) super <TRUNCATED>']
-        actual_output = jobs.BaseJobManager._compress_output_list(  # pylint: disable=protected-access
-            input_list, test_only_max_output_len_chars=10)
+        MockJobManagerOne.enqueue(job_id, taskqueue_services.QUEUE_NAME_DEFAULT)
+        MockJobManagerOne.register_start(job_id)
+        MockJobManagerOne.register_completion(
+            job_id, input_list, max_output_len_chars=10)
+        actual_output = MockJobManagerOne.get_output(job_id)
         self.assertEqual(actual_output, expected_output)
 
 
@@ -761,9 +789,23 @@ class JobRegistryTests(test_utils.GenericTestBase):
         for klass in jobs_registry.ONE_OFF_JOB_MANAGERS:
             self.assertTrue(issubclass(klass, jobs.BaseJobManager))
 
+    def test_is_abstract_method_raises_exception_for_abstract_classes(self):
+        class TestMockAbstractClass(jobs.BaseJobManager):
+            """A sample Abstract Class."""
+            pass
+
+        mock_abstract_base_classes = [TestMockAbstractClass]
+        with self.assertRaisesRegexp(
+            Exception,
+            'Tried to directly create a job using the abstract base '
+            'manager class TestMockAbstractClass, which is not allowed.'):
+            with self.swap(
+                jobs, 'ABSTRACT_BASE_CLASSES', mock_abstract_base_classes):
+                TestMockAbstractClass.create_new()
+
     def test_each_one_off_class_is_not_abstract(self):
         for klass in jobs_registry.ONE_OFF_JOB_MANAGERS:
-            self.assertFalse(klass._is_abstract())  # pylint: disable=protected-access
+            klass.create_new()
 
     def test_validity_of_each_continuous_computation_class(self):
         for klass in jobs_registry.ALL_CONTINUOUS_COMPUTATION_MANAGERS:
@@ -1154,7 +1196,7 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
                 stats_models.ExplorationAnnotationsModel.get(self.EXP_ID)
 
             # Launch the batch computation.
-            StartExplorationEventCounter.start_computation()
+            batch_job_id = StartExplorationEventCounter.start_computation()
             # Data in realtime layer 0 is still there.
             self.assertEqual(MockStartExplorationRealtimeModel.get(
                 '0:%s' % self.EXP_ID).count, 1)
@@ -1165,7 +1207,15 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
                     taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
+            self.assertTrue(
+                MockStartExplorationMRJobManager.is_active(batch_job_id))
+            self.assertFalse(
+                MockStartExplorationMRJobManager.has_finished(batch_job_id))
             self.process_and_flush_pending_tasks()
+            self.assertFalse(
+                MockStartExplorationMRJobManager.is_active(batch_job_id))
+            self.assertTrue(
+                MockStartExplorationMRJobManager.has_finished(batch_job_id))
             self.assertEqual(
                 stats_models.ExplorationAnnotationsModel.get(
                     self.EXP_ID).num_starts, 1)

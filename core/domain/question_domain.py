@@ -95,6 +95,24 @@ class QuestionChange(change_domain.BaseChange):
     }]
 
 
+class QuestionSuggestionChange(change_domain.BaseChange):
+    """Domain object for changes made to question suggestion object.
+
+    The allowed commands, together with the attributes:
+        - 'create_new_fully_specified_question' (with question_dict,
+        skill_id, skill_difficulty)
+    """
+
+    ALLOWED_COMMANDS = [
+        {
+            'name': CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
+            'required_attribute_names': [
+                'question_dict', 'skill_id', 'skill_difficulty'],
+            'optional_attribute_names': []
+        }
+    ]
+
+
 class Question(python_utils.OBJECT):
     """Domain object for a question."""
 
@@ -211,6 +229,82 @@ class Question(python_utils.OBJECT):
         for answer_group in answer_groups:
             answer_group['tagged_skill_misconception_id'] = None
             del answer_group['tagged_misconception_id']
+
+        return question_state_dict
+
+    @classmethod
+    def _convert_state_v30_dict_to_v31_dict(cls, question_state_dict):
+        """Converts from version 30 to 31. Version 31 updates the
+        Voiceover model to have an initialized duration_secs attribute of 0.0.
+
+        Args:
+            question_state_dict: dict. A dict where each key-value pair
+                represents respectively, a state name and a dict used to
+                initalize a State domain object.
+
+        Returns:
+            dict. The converted question_state_dict.
+        """
+        # Get the voiceovers_mapping metadata.
+        voiceovers_mapping = (question_state_dict['recorded_voiceovers']
+                              ['voiceovers_mapping'])
+        language_codes_to_audio_metadata = voiceovers_mapping.values()
+        for language_codes in language_codes_to_audio_metadata:
+            for audio_metadata in language_codes.values():
+                # Initialize duration_secs with 0.0 for every voiceover
+                # recording under Content, Feedback, Hints, and Solutions.
+                # This is necessary to keep the state functional
+                # when migrating to v31.
+                audio_metadata['duration_secs'] = 0.0
+        return question_state_dict
+
+    @classmethod
+    def _convert_state_v31_dict_to_v32_dict(cls, question_state_dict):
+        """Converts from version 31 to 32. Version 32 adds a new
+        customization arg to SetInput interaction which allows
+        creators to add custom text to the "Add" button.
+
+        Args:
+            question_state_dict: dict. A dict where each key-value pair
+                represents respectively, a state name and a dict used to
+                initialize a State domain object.
+
+        Returns:
+            dict. The converted question_state_dict.
+        """
+        if question_state_dict['interaction']['id'] == 'SetInput':
+            customization_args = question_state_dict[
+                'interaction']['customization_args']
+            customization_args.update({
+                'buttonText': {
+                    'value': 'Add item'
+                }
+            })
+
+        return question_state_dict
+
+    @classmethod
+    def _convert_state_v32_dict_to_v33_dict(cls, question_state_dict):
+        """Converts from version 32 to 33. Version 33 adds a new
+        customization arg to MultipleChoiceInput Interaction which allows
+        answer choices to be shuffled.
+
+        Args:
+            question_state_dict: dict. A dict where each key-value pair
+                represents respectively, a state name and a dict used to
+                initialize a State domain object.
+
+        Returns:
+            dict. The converted question_state_dict.
+        """
+        if question_state_dict['interaction']['id'] == 'MultipleChoiceInput':
+            customization_args = question_state_dict[
+                'interaction']['customization_args']
+            customization_args.update({
+                'showChoicesInShuffledOrder': {
+                    'value': True
+                }
+            })
 
         return question_state_dict
 

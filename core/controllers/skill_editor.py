@@ -114,10 +114,14 @@ class EditableSkillDataHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    @acl_decorators.can_edit_skill
+    @acl_decorators.open_access
     def get(self, skill_id):
         """Populates the data on the individual skill page."""
-        skill_domain.Skill.require_valid_skill_id(skill_id)
+        try:
+            skill_domain.Skill.require_valid_skill_id(skill_id)
+        except Exception:
+            raise self.PageNotFoundException(Exception('Invalid skill id.'))
+
         skill = skill_services.get_skill_by_id(skill_id, strict=False)
 
         if skill is None:
@@ -177,8 +181,13 @@ class EditableSkillDataHandler(base.BaseHandler):
     def delete(self, skill_id):
         """Handles Delete requests."""
         skill_domain.Skill.require_valid_skill_id(skill_id)
+        skill_ids_assigned_to_some_topic = (
+            topic_services.get_all_skill_ids_assigned_to_some_topic())
+        if skill_id in skill_ids_assigned_to_some_topic:
+            raise self.InvalidInputException(
+                'Cannot delete skill that is assigned to a topic.')
         if skill_services.skill_has_associated_questions(skill_id):
-            raise Exception(
+            raise self.InvalidInputException(
                 'Please delete all questions associated with this skill '
                 'first.')
 

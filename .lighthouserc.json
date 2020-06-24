@@ -1,0 +1,197 @@
+{
+  "ci": {
+    "collect": {
+      "numberOfRuns": 1,
+      "startServerCommand": "python -m scripts.start --no_browser --prod_env",
+      "startServerReadyPattern": "default: \"GET /_ah/warmup HTTP/1.1\"",
+      "startServerReadyTimeout": 250000,
+      "url": [
+        "http://127.0.0.1:8181/",
+        "http://127.0.0.1:8181/about",
+        "http://127.0.0.1:8181/contact",
+        "http://127.0.0.1:8181/donate",
+        "http://127.0.0.1:8181/get-started",
+        "http://127.0.0.1:8181/community-library",
+        "http://127.0.0.1:8181/privacy",
+        "http://127.0.0.1:8181/teach",
+        "http://127.0.0.1:8181/terms",
+        "http://127.0.0.1:8181/thanks"
+      ]
+    },
+    "assert": {
+      "assertMatrix": [
+        {
+          "matchingUrlPattern": ".*",
+          "assertions": {
+            "first-contentful-paint": [ "warn", {"maxNumericValue": 1230000}],
+            "first-meaningful-paint": ["warn", {"maxNumericValue": 1280000}],
+            "first-cpu-idle": ["warn", {"maxNumericValue": 1460000}],
+            "speed-index": ["warn", {"maxNumericValue": 1230000}],
+            "interactive": ["warn", {"maxNumericValue": 1540000}],
+            "max-potential-fid": ["warn", {"maxNumericValue": 130000}],
+            "uses-responsive-images": ["error", {"minScore": 1}],
+            "uses-optimized-images": ["error", {"minScore": 1}],
+            "uses-rel-preconnect": ["error", {"minScore": 0.5}],
+            "time-to-first-byte": ["error", {"minScore": 1}],
+            "redirects": ["error", {"minScore": 1}],
+            "uses-rel-preload": ["error", {"minScore": 1}],
+            "efficient-animated-content": ["error",{"minScore": 1}],
+            "appcache-manifest": ["error", {"minScore": 1}],
+            "errors-in-console": ["error", {"minScore": 1}],
+            "is-on-https": ["error", {"minScore": 1}],
+            "uses-passive-event-listeners": ["error", {"minScore": 1}],
+            "no-document-write": ["error", {"minScore": 1}],
+            "external-anchors-use-rel-noopener": ["error", {"minScore": 1}],
+            "geolocation-on-start": ["error", {"minScore": 1}],
+            "doctype": ["error", {"minScore": 1}],
+            "no-vulnerable-libraries": ["error", {"minScore": 1}],
+            "js-libraries": ["error", {"minScore": 1}],
+            "notification-on-start": ["error", {"minScore": 1}],
+            "deprecations": ["error", {"minScore": 1}],
+            "password-inputs-can-be-pasted-into": ["error", {"minScore": 1}],
+            "image-aspect-ratio": ["error", {"minScore": 1}]
+          }
+        },
+        {
+          "matchingUrlPattern": "http://[^/]+/$",
+          "assertions": {
+            "time-to-first-byte": ["off", {"minScore": 1}],
+            "render-blocking-resources": ["error", {"minScore": 0}],
+            "unminified-css": ["error", {"minScore": 0}],
+            "unminified-javascript": ["error", {"minScore": 0}],
+            "unused-css-rules": ["error", {"minScore": 0}],
+            "uses-text-compression": ["error", {"minScore": 0}],
+            "uses-http2": ["error", {"minScore": 0}]
+          }
+        },
+        {
+          "matchingUrlPattern": "http://[^/]+/about$",
+          "assertions": {
+            "offscreen-images": ["error", {"minScore": 0}],
+            "render-blocking-resources": ["error", {"minScore": 0}],
+            "unminified-css": ["error", {"minScore": 0}],
+            "unminified-javascript": ["error", {"minScore": 0}],
+            "unused-css-rules": ["error", {"minScore": 0}],
+            "uses-text-compression": ["error", {"minScore": 0}],
+            "uses-http2": ["error", {"minScore": 0}]
+          }
+        },
+        {
+          "matchingUrlPattern": "http://[^/]+/contact$",
+          "assertions": {
+            "offscreen-images": ["error", {"minScore": 0}],
+            "uses-webp-images": ["error", {"minScore": 1}],
+            "render-blocking-resources": ["error", {"minScore": 0}],
+            "unminified-css": ["error", {"minScore": 0}],
+            "unminified-javascript": ["error", {"minScore": 0}],
+            "unused-css-rules": ["error", {"minScore": 0}],
+            "uses-text-compression": ["error", {"minScore": 0}],
+            "uses-http2": ["error", {"minScore": 0}],
+            "errors-in-console": ["error", {"minScore": 0}]
+          }
+        },
+        {
+          "matchingUrlPattern": "http://[^/]+/donate$",
+          "assertions": {
+            "offscreen-images": ["error", {"minScore": 1}],
+            "uses-webp-images": ["error", {"minScore": 0}],
+            "render-blocking-resources": ["error", {"minScore": 0}],
+            "unminified-css": ["error", {"minScore": 0}],
+            "unminified-javascript": ["error", {"minScore": 0}],
+            "unused-css-rules": ["error", {"minScore": 0}],
+            "uses-text-compression": ["error", {"minScore": 0}],
+            "uses-http2": ["error", {"minScore": 0}],
+            "errors-in-console": ["error", {"minScore": 0}]
+          }
+        },
+        {
+          "matchingUrlPattern": "http://[^/]+/get-started$",
+          "assertions": {
+            "offscreen-images": ["error", {"minScore": 0}],
+            "uses-webp-images": ["error", {"minScore": 1}],
+            "render-blocking-resources": ["error", {"minScore": 0}],
+            "unminified-css": ["error", {"minScore": 0}],
+            "unminified-javascript": ["error", {"minScore": 0}],
+            "unused-css-rules": ["error", {"minScore": 0}],
+            "uses-text-compression": ["error", {"minScore": 0}],
+            "uses-http2": ["error", {"minScore": 0}],
+            "errors-in-console": ["error", {"minScore": 0}]
+          }
+        },
+        {
+          "matchingUrlPattern": "http://[^/]+/community-library$",
+          "assertions": {
+            "offscreen-images": ["error", {"minScore": 1}],
+            "uses-webp-images": ["error", {"minScore": 0}],
+            "render-blocking-resources": ["error", {"minScore": 0}],
+            "unminified-css": ["error", {"minScore": 0}],
+            "unminified-javascript": ["error", {"minScore": 0}],
+            "unused-css-rules": ["error", {"minScore": 0}],
+            "uses-text-compression": ["error", {"minScore": 0}],
+            "uses-http2": ["error", {"minScore": 0}],
+            "errors-in-console": ["error", {"minScore": 0}]
+          }
+        },
+        {
+          "matchingUrlPattern": "http://[^/]+/privacy$",
+          "assertions": {
+            "offscreen-images": ["error", {"minScore": 1}],
+            "uses-webp-images": ["error", {"minScore": 1}],
+            "render-blocking-resources": ["error", {"minScore": 0}],
+            "unminified-css": ["error", {"minScore": 0}],
+            "unminified-javascript": ["error", {"minScore": 0}],
+            "unused-css-rules": ["error", {"minScore": 0}],
+            "uses-text-compression": ["error", {"minScore": 0}],
+            "uses-http2": ["error", {"minScore": 0}],
+            "errors-in-console": ["error", {"minScore": 0}]
+          }
+        },
+        {
+          "matchingUrlPattern": "http://[^/]+/teach$",
+          "assertions": {
+            "offscreen-images": ["error", {"minScore": 0}],
+            "uses-webp-images": ["error", {"minScore": 1}],
+            "render-blocking-resources": ["error", {"minScore": 0}],
+            "unminified-css": ["error", {"minScore": 0}],
+            "unminified-javascript": ["error", {"minScore": 0}],
+            "unused-css-rules": ["error", {"minScore": 0}],
+            "uses-text-compression": ["error", {"minScore": 0}],
+            "uses-http2": ["error", {"minScore": 0}],
+            "errors-in-console": ["error", {"minScore": 0}]
+          }
+        },
+        {
+          "matchingUrlPattern": "http://[^/]+/terms$",
+          "assertions": {
+            "offscreen-images": ["error", {"minScore": 1}],
+            "uses-webp-images": ["error", {"minScore": 1}],
+            "render-blocking-resources": ["error", {"minScore": 0}],
+            "unminified-css": ["error", {"minScore": 0}],
+            "unminified-javascript": ["error", {"minScore": 0}],
+            "unused-css-rules": ["error", {"minScore": 0}],
+            "uses-text-compression": ["error", {"minScore": 0}],
+            "uses-http2": ["error", {"minScore": 0}],
+            "errors-in-console": ["error", {"minScore": 0}]
+          }
+        },
+        {
+          "matchingUrlPattern": "http://[^/]+/thanks$",
+          "assertions": {
+            "offscreen-images": ["error", {"minScore": 0}],
+            "uses-webp-images": ["error", {"minScore": 1}],
+            "render-blocking-resources": ["error", {"minScore": 0}],
+            "unminified-css": ["error", {"minScore": 0}],
+            "unminified-javascript": ["error", {"minScore": 0}],
+            "unused-css-rules": ["error", {"minScore": 0}],
+            "uses-text-compression": ["error", {"minScore": 0}],
+            "uses-http2": ["error", {"minScore": 0}],
+            "errors-in-console": ["error", {"minScore": 0}]
+          }
+        }
+      ]
+    },
+    "upload": {
+      "target": "temporary-public-storage"
+    }
+  }
+}

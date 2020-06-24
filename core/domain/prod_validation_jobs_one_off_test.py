@@ -52,6 +52,7 @@ from core.domain import subtopic_page_domain
 from core.domain import suggestion_services
 from core.domain import topic_domain
 from core.domain import topic_services
+from core.domain import user_id_migration
 from core.domain import user_query_services
 from core.domain import user_services
 from core.domain import wipeout_service
@@ -75,7 +76,7 @@ CURRENT_DATETIME = datetime.datetime.utcnow()
     activity_models, audit_models, base_models,
     classifier_models, collection_models,
     config_models, email_models, exp_models,
-    feedback_models, job_models,
+    feedback_models, improvements_models, job_models,
     opportunity_models, question_models,
     recommendations_models, skill_models,
     story_models, suggestion_models, topic_models,
@@ -84,7 +85,7 @@ CURRENT_DATETIME = datetime.datetime.utcnow()
             models.NAMES.activity, models.NAMES.audit, models.NAMES.base_model,
             models.NAMES.classifier, models.NAMES.collection,
             models.NAMES.config, models.NAMES.email, models.NAMES.exploration,
-            models.NAMES.feedback, models.NAMES.job,
+            models.NAMES.feedback, models.NAMES.improvements, models.NAMES.job,
             models.NAMES.opportunity, models.NAMES.question,
             models.NAMES.recommendations, models.NAMES.skill,
             models.NAMES.story, models.NAMES.suggestion, models.NAMES.topic,
@@ -479,6 +480,92 @@ class RoleQueryAuditModelValidatorTests(test_utils.GenericTestBase):
         run_job_and_check_output(self, expected_output, sort=True)
 
 
+class UsernameChangeAuditModelValidatorTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(UsernameChangeAuditModelValidatorTests, self).setUp()
+
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(USER_EMAIL, USER_NAME)
+
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+
+        admin_model = user_models.UserSettingsModel.get_by_id(self.admin_id)
+        admin_model.role = feconf.ROLE_ID_ADMIN
+        admin_model.put()
+
+        model_id = (
+            '%s.%d' % (self.admin_id, utils.get_current_time_in_millisecs()))
+        self.model_instance = audit_models.UsernameChangeAuditModel(
+            id=model_id, committer_id=self.admin_id,
+            old_username=USER_NAME, new_username='new')
+        self.model_instance.put()
+
+        self.job_class = (
+            prod_validation_jobs_one_off.UsernameChangeAuditModelAuditOneOffJob)
+
+    def test_standard_model(self):
+        expected_output = [
+            u'[u\'fully-validated UsernameChangeAuditModel\', 1]']
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_created_on_greater_than_last_updated(self):
+        self.model_instance.created_on = (
+            self.model_instance.last_updated + datetime.timedelta(days=1))
+        self.model_instance.put()
+        expected_output = [(
+            u'[u\'failed validation check for time field relation check '
+            'of UsernameChangeAuditModel\', '
+            '[u\'Entity id %s: The created_on field has a value '
+            '%s which is greater than the value '
+            '%s of last_updated field\']]') % (
+                self.model_instance.id, self.model_instance.created_on,
+                self.model_instance.last_updated
+            )]
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_last_updated_greater_than_current_time(self):
+        expected_output = [(
+            u'[u\'failed validation check for current time check of '
+            'UsernameChangeAuditModel\', '
+            '[u\'Entity id %s: The last_updated field has a '
+            'value %s which is greater than the time when the job was run\']]'
+        ) % (self.model_instance.id, self.model_instance.last_updated)]
+
+        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
+            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
+            update_datastore_types_for_mock_datetime()
+            run_job_and_check_output(self, expected_output)
+
+    def test_model_with_non_existent_user_id(self):
+        user_models.UserSettingsModel.get(self.admin_id).delete()
+        expected_output = [(
+            u'[u\'failed validation check for committer_ids field check of '
+            'UsernameChangeAuditModel\', '
+            '[u"Entity id %s: based on field committer_ids having value '
+            '%s, expect model UserSettingsModel with '
+            'id %s but it doesn\'t exist"]]') % (
+                self.model_instance.id, self.admin_id, self.admin_id)]
+
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_invalid_id(self):
+        model_invalid_id = (
+            '%d.%s' % (utils.get_current_time_in_millisecs(), self.admin_id))
+        model_instance_with_invalid_id = audit_models.UsernameChangeAuditModel(
+            id=model_invalid_id, committer_id=self.admin_id,
+            old_username=USER_NAME, new_username='new')
+        model_instance_with_invalid_id.put()
+        expected_output = [(
+            u'[u\'fully-validated UsernameChangeAuditModel\', 1]'
+        ), (
+            u'[u\'failed validation check for model id check of '
+            'UsernameChangeAuditModel\', '
+            '[u\'Entity id %s: Entity id does not match regex pattern\']]'
+        ) % model_invalid_id]
+        run_job_and_check_output(self, expected_output, sort=True)
+
+
 class ClassifierTrainingJobModelValidatorTests(test_utils.GenericTestBase):
 
     def setUp(self):
@@ -757,6 +844,8 @@ class CollectionModelValidatorTests(test_utils.GenericTestBase):
             collection.add_node('%s' % (index * 2))
             collection.add_node('%s' % (index * 2 + 1))
             collection_services.save_new_collection(self.owner_id, collection)
+            collection_models.CollectionRightsAllUsersModel(
+                id='%s' % index, all_user_ids=[self.owner_id]).put()
 
         self.model_instance_0 = collection_models.CollectionModel.get_by_id('0')
         self.model_instance_1 = collection_models.CollectionModel.get_by_id('1')
@@ -911,6 +1000,19 @@ class CollectionModelValidatorTests(test_utils.GenericTestBase):
                 '[u"Entity id 0: based on field snapshot_content_ids having '
                 'value 0-1, expect model CollectionSnapshotContentModel '
                 'with id 0-1 but it doesn\'t exist"]]'),
+            u'[u\'fully-validated CollectionModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_rights_all_users_failure(self):
+        collection_models.CollectionRightsAllUsersModel.get_by_id(
+            '0').delete()
+        expected_output = [
+            (
+                u'[u\'failed validation check for all_users_model_ids '
+                'field check of CollectionModel\', '
+                '[u"Entity id 0: based on field all_users_model_ids having '
+                'value 0, expect model CollectionRightsAllUsersModel '
+                'with id 0 but it doesn\'t exist"]]'),
             u'[u\'fully-validated CollectionModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 
@@ -1704,6 +1806,124 @@ class CollectionRightsSnapshotContentModelValidatorTests(
         run_job_and_check_output(self, expected_output, sort=True)
 
 
+class CollectionRightsAllUsersModelValidatorTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(CollectionRightsAllUsersModelValidatorTests, self).setUp()
+
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+        editor_email = 'user@editor.com'
+        self.signup(editor_email, 'editor')
+        self.editor_id = self.get_user_id_from_email(editor_email)
+        self.owner = user_services.UserActionsInfo(self.owner_id)
+
+        explorations = [exp_domain.Exploration.create_default_exploration(
+            '%s' % i,
+            title='title %d' % i,
+            category='category%d' % i,
+        ) for i in python_utils.RANGE(6)]
+        for exp in explorations:
+            exp_services.save_new_exploration(self.owner_id, exp)
+
+        collections = [collection_domain.Collection.create_default_collection(
+            '%s' % i,
+            title='title %d' % i,
+            category='category%d' % i,
+            objective='objective%d' % i,
+        ) for i in python_utils.RANGE(3)]
+        for index, collection in enumerate(collections):
+            collection.add_node('%s' % (index * 2))
+            collection.add_node('%s' % (index * 2 + 1))
+            collection_services.save_new_collection(self.owner_id, collection)
+
+        rights_manager.assign_role_for_collection(
+            self.owner, '0', self.editor_id, rights_manager.ROLE_EDITOR)
+
+        user_id_migration.AddAllUserIdsSnapshotContentVerificationJob.enqueue(
+            user_id_migration.AddAllUserIdsSnapshotContentVerificationJob
+            .create_new()
+        )
+        self.process_and_flush_pending_tasks()
+
+        self.model_instance_0 = (
+            collection_models.CollectionRightsAllUsersModel.get_by_id('0'))
+        self.model_instance_1 = (
+            collection_models.CollectionRightsAllUsersModel.get_by_id('1'))
+        self.model_instance_2 = (
+            collection_models.CollectionRightsAllUsersModel.get_by_id('2'))
+
+        self.job_class = (
+            prod_validation_jobs_one_off.
+            CollectionRightsAllUsersModelAuditOneOffJob)
+
+    def test_standard_operation(self):
+        expected_output = [
+            u'[u\'fully-validated CollectionRightsAllUsersModel\', 3]']
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_created_on_greater_than_last_updated(self):
+        self.model_instance_0.created_on = (
+            self.model_instance_0.last_updated + datetime.timedelta(days=1))
+        self.model_instance_0.put()
+        expected_output = [(
+            u'[u\'failed validation check for time field relation check '
+            'of CollectionRightsAllUsersModel\', '
+            '[u\'Entity id %s: The created_on field has a value '
+            '%s which is greater than the value '
+            '%s of last_updated field\']]') % (
+                self.model_instance_0.id,
+                self.model_instance_0.created_on,
+                self.model_instance_0.last_updated
+            ), (
+                u'[u\'fully-validated '
+                'CollectionRightsAllUsersModel\', 2]')]
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_last_updated_greater_than_current_time(self):
+        self.model_instance_1.delete()
+        self.model_instance_2.delete()
+        expected_output = [(
+            u'[u\'failed validation check for current time check of '
+            'CollectionRightsAllUsersModel\', '
+            '[u\'Entity id %s: The last_updated field has a '
+            'value %s which is greater than the time when the job was run\']]'
+        ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
+
+        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
+            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
+            update_datastore_types_for_mock_datetime()
+            run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_exploration_model_failure(self):
+        collection_models.CollectionRightsModel.get_by_id('0').delete(
+            self.owner_id, '', [])
+        expected_output = [
+            (
+                u'[u\'failed validation check for collection_rights_ids '
+                'field check of CollectionRightsAllUsersModel\', '
+                '[u"Entity id 0: based on field collection_rights_ids '
+                'having value 0, expect model CollectionRightsModel with '
+                'id 0 but it doesn\'t exist"]]'
+            ), u'[u\'fully-validated CollectionRightsAllUsersModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_user_settings_model_failure(self):
+        user_models.UserSettingsModel.get_by_id(self.editor_id).delete()
+        expected_output = [
+            (
+                u'[u\'failed validation check for all_user_ids '
+                'field check of CollectionRightsAllUsersModel\', '
+                '[u"Entity id 0: based on field all_user_ids '
+                'having value %s, expect model UserSettingsModel with '
+                'id %s but it doesn\'t exist"]]'
+            ) % (self.editor_id, self.editor_id),
+            u'[u\'fully-validated CollectionRightsAllUsersModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+
 class CollectionCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
 
     def setUp(self):
@@ -2236,9 +2456,10 @@ class ExplorationOpportunitySummaryModelValidatorTests(
 
         for exp in explorations:
             exp_services.save_new_exploration(self.owner_id, exp)
+            self.publish_exploration(self.owner_id, exp.id)
 
         topic = topic_domain.Topic.create_default_topic(
-            topic_id=self.TOPIC_ID, name='topic', abbreviated_name='abbrev')
+            self.TOPIC_ID, 'topic', 'abbrev', 'description')
         topic_services.save_new_topic(self.owner_id, topic)
 
         story = story_domain.Story.create_default_story(
@@ -3301,8 +3522,10 @@ class ExplorationModelValidatorTests(test_utils.GenericTestBase):
             language_code=language_codes[i]
         ) for i in python_utils.RANGE(3)]
 
-        for exp in explorations:
+        for index, exp in enumerate(explorations):
             exp_services.save_new_exploration(self.owner_id, exp)
+            exp_models.ExplorationRightsAllUsersModel(
+                id='%s' % index, all_user_ids=[self.owner_id]).put()
 
         self.model_instance_0 = exp_models.ExplorationModel.get_by_id('0')
         self.model_instance_1 = exp_models.ExplorationModel.get_by_id('1')
@@ -3441,6 +3664,18 @@ class ExplorationModelValidatorTests(test_utils.GenericTestBase):
                 '[u"Entity id 0: based on field snapshot_content_ids having '
                 'value 0-1, expect model ExplorationSnapshotContentModel '
                 'with id 0-1 but it doesn\'t exist"]]'),
+            u'[u\'fully-validated ExplorationModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_rights_all_users_failure(self):
+        exp_models.ExplorationRightsAllUsersModel.get_by_id('0').delete()
+        expected_output = [
+            (
+                u'[u\'failed validation check for all_users_model_ids '
+                'field check of ExplorationModel\', '
+                '[u"Entity id 0: based on field all_users_model_ids having '
+                'value 0, expect model ExplorationRightsAllUsersModel '
+                'with id 0 but it doesn\'t exist"]]'),
             u'[u\'fully-validated ExplorationModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 
@@ -4175,6 +4410,113 @@ class ExplorationRightsSnapshotContentModelValidatorTests(
             ), (
                 u'[u\'fully-validated ExplorationRightsSnapshotContentModel\', '
                 '3]')]
+        run_job_and_check_output(self, expected_output, sort=True)
+
+
+class ExplorationRightsAllUsersModelValidatorTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(ExplorationRightsAllUsersModelValidatorTests, self).setUp()
+
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.owner = user_services.UserActionsInfo(self.owner_id)
+
+        editor_email = 'user@editor.com'
+        self.signup(editor_email, 'editor')
+        self.editor_id = self.get_user_id_from_email(editor_email)
+
+        explorations = [exp_domain.Exploration.create_default_exploration(
+            '%s' % i,
+            title='title %d' % i,
+            category='category%d' % i,
+        ) for i in python_utils.RANGE(3)]
+        for exp in explorations:
+            exp_services.save_new_exploration(self.owner_id, exp)
+
+        rights_manager.assign_role_for_exploration(
+            self.owner, '0', self.editor_id, rights_manager.ROLE_EDITOR)
+
+        user_id_migration.AddAllUserIdsSnapshotContentVerificationJob.enqueue(
+            user_id_migration.AddAllUserIdsSnapshotContentVerificationJob
+            .create_new()
+        )
+        self.process_and_flush_pending_tasks()
+
+        self.model_instance_0 = (
+            exp_models.ExplorationRightsAllUsersModel.get_by_id('0'))
+        self.model_instance_1 = (
+            exp_models.ExplorationRightsAllUsersModel.get_by_id('1'))
+        self.model_instance_2 = (
+            exp_models.ExplorationRightsAllUsersModel.get_by_id('2'))
+
+        self.job_class = (
+            prod_validation_jobs_one_off.
+            ExplorationRightsAllUsersModelAuditOneOffJob)
+
+    def test_standard_operation(self):
+        expected_output = [
+            u'[u\'fully-validated ExplorationRightsAllUsersModel\', 3]']
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_created_on_greater_than_last_updated(self):
+        self.model_instance_0.created_on = (
+            self.model_instance_0.last_updated + datetime.timedelta(days=1))
+        self.model_instance_0.put()
+        expected_output = [(
+            u'[u\'failed validation check for time field relation check '
+            'of ExplorationRightsAllUsersModel\', '
+            '[u\'Entity id %s: The created_on field has a value '
+            '%s which is greater than the value '
+            '%s of last_updated field\']]') % (
+                self.model_instance_0.id,
+                self.model_instance_0.created_on,
+                self.model_instance_0.last_updated
+            ), (
+                u'[u\'fully-validated '
+                'ExplorationRightsAllUsersModel\', 2]')]
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_last_updated_greater_than_current_time(self):
+        self.model_instance_1.delete()
+        self.model_instance_2.delete()
+        expected_output = [(
+            u'[u\'failed validation check for current time check of '
+            'ExplorationRightsAllUsersModel\', '
+            '[u\'Entity id %s: The last_updated field has a '
+            'value %s which is greater than the time when the job was run\']]'
+        ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
+
+        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
+            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
+            update_datastore_types_for_mock_datetime()
+            run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_exploration_model_failure(self):
+        exp_models.ExplorationRightsModel.get_by_id('0').delete(
+            self.owner_id, '', [])
+        expected_output = [
+            (
+                u'[u\'failed validation check for exploration_rights_ids '
+                'field check of ExplorationRightsAllUsersModel\', '
+                '[u"Entity id 0: based on field exploration_rights_ids '
+                'having value 0, expect model ExplorationRightsModel with '
+                'id 0 but it doesn\'t exist"]]'
+            ), u'[u\'fully-validated ExplorationRightsAllUsersModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_user_settings_model_failure(self):
+        user_models.UserSettingsModel.get_by_id(self.editor_id).delete()
+        expected_output = [
+            (
+                u'[u\'failed validation check for all_user_ids '
+                'field check of ExplorationRightsAllUsersModel\', '
+                '[u"Entity id 0: based on field all_user_ids '
+                'having value %s, expect model UserSettingsModel with '
+                'id %s but it doesn\'t exist"]]'
+            ) % (self.editor_id, self.editor_id),
+            u'[u\'fully-validated ExplorationRightsAllUsersModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 
 
@@ -5536,11 +5878,11 @@ class QuestionModelValidatorTests(test_utils.GenericTestBase):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         rubrics = [
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
+                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
+                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
+                constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
         skills = [skill_domain.Skill.create_default_skill(
             '%s' % i,
             description='description %d' % i,
@@ -5715,11 +6057,11 @@ class QuestionSkillLinkModelValidatorTests(test_utils.GenericTestBase):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         rubrics = [
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
+                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
+                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
+                constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
         skills = [skill_domain.Skill.create_default_skill(
             '%s' % i,
             description='description %d' % i,
@@ -5834,6 +6176,109 @@ class QuestionSkillLinkModelValidatorTests(test_utils.GenericTestBase):
         run_job_and_check_output(self, expected_output, sort=True)
 
 
+class ExplorationContextModelValidatorTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(ExplorationContextModelValidatorTests, self).setUp()
+
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        stories = [story_domain.Story.create_default_story(
+            '%s' % i,
+            title='title %d' % i,
+            corresponding_topic_id='0'
+        ) for i in python_utils.RANGE(2)]
+
+        for story in stories:
+            story_services.save_new_story(self.owner_id, story)
+
+        explorations = [exp_domain.Exploration.create_default_exploration(
+            '%s' % i,
+            title='title %d' % i,
+            category='category%d' % i,
+        ) for i in python_utils.RANGE(3)]
+
+        for exp in explorations:
+            exp_services.save_new_exploration(self.owner_id, exp)
+
+        self.model_instance_0 = (
+            exp_models.ExplorationContextModel(id='0', story_id='0'))
+        self.model_instance_0.put()
+        self.model_instance_1 = (
+            exp_models.ExplorationContextModel(id='1', story_id='0'))
+        self.model_instance_1.put()
+        self.model_instance_2 = (
+            exp_models.ExplorationContextModel(id='2', story_id='1'))
+        self.model_instance_2.put()
+
+        self.job_class = (
+            prod_validation_jobs_one_off.ExplorationContextModelAuditOneOffJob)
+
+    def test_standard_operation(self):
+        expected_output = [
+            u'[u\'fully-validated ExplorationContextModel\', 3]']
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_created_on_greater_than_last_updated(self):
+        self.model_instance_0.created_on = (
+            self.model_instance_0.last_updated + datetime.timedelta(days=1))
+        self.model_instance_0.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for time field relation check '
+                'of ExplorationContextModel\', '
+                '[u\'Entity id %s: The created_on field has a value '
+                '%s which is greater than the value '
+                '%s of last_updated field\']]') % (
+                    self.model_instance_0.id,
+                    self.model_instance_0.created_on,
+                    self.model_instance_0.last_updated
+                ),
+            u'[u\'fully-validated ExplorationContextModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_last_updated_greater_than_current_time(self):
+        self.model_instance_1.delete()
+        self.model_instance_2.delete()
+        expected_output = [(
+            u'[u\'failed validation check for current time check of '
+            'ExplorationContextModel\', '
+            '[u\'Entity id %s: The last_updated field has a '
+            'value %s which is greater than the time when the job was run\']]'
+        ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
+
+        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
+            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
+            update_datastore_types_for_mock_datetime()
+            run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_story_model_failure(self):
+        story_models.StoryModel.get_by_id('1').delete(
+            feconf.SYSTEM_COMMITTER_ID, '', [])
+        expected_output = [
+            (
+                u'[u\'failed validation check for story_ids field '
+                'check of ExplorationContextModel\', '
+                '[u"Entity id 2: based on field story_ids '
+                'having value 1, expect model StoryModel with id 1 but it '
+                'doesn\'t exist"]]'),
+            u'[u\'fully-validated ExplorationContextModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_exp_model_failure(self):
+        exp_models.ExplorationModel.get_by_id('2').delete(
+            feconf.SYSTEM_COMMITTER_ID, '', [])
+        expected_output = [
+            (
+                u'[u\'failed validation check for '
+                'exp_ids field check of ExplorationContextModel\', '
+                '[u"Entity id 2: based on field '
+                'exp_ids having value 2, expect model ExplorationModel '
+                'with id 2 but it doesn\'t exist"]]'),
+            u'[u\'fully-validated ExplorationContextModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+
 class QuestionSnapshotMetadataModelValidatorTests(
         test_utils.GenericTestBase):
 
@@ -5847,11 +6292,11 @@ class QuestionSnapshotMetadataModelValidatorTests(
         self.user_id = self.get_user_id_from_email(USER_EMAIL)
         rubrics = [
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
+                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
+                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
+                constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
         skills = [skill_domain.Skill.create_default_skill(
             '%s' % i,
             description='description %d' % i,
@@ -6027,11 +6472,11 @@ class QuestionSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         rubrics = [
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
+                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
+                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
+                constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
         skills = [skill_domain.Skill.create_default_skill(
             '%s' % i,
             description='description %d' % i,
@@ -6157,11 +6602,11 @@ class QuestionCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         rubrics = [
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
+                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
+                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
+                constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
         skills = [skill_domain.Skill.create_default_skill(
             '%s' % i,
             description='description %d' % i,
@@ -6377,11 +6822,11 @@ class QuestionSummaryModelValidatorTests(test_utils.GenericTestBase):
         self.user_id = self.get_user_id_from_email(USER_EMAIL)
         rubrics = [
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
+                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
+                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
+                constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
         skills = [skill_domain.Skill.create_default_skill(
             '%s' % i,
             description='description %d' % i,
@@ -6791,11 +7236,11 @@ class SkillModelValidatorTests(test_utils.GenericTestBase):
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         rubrics = [
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
+                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
+                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
+                constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
         self.set_admins([self.ADMIN_USERNAME])
 
         language_codes = ['ar', 'en', 'en']
@@ -6807,27 +7252,41 @@ class SkillModelValidatorTests(test_utils.GenericTestBase):
 
         for i in python_utils.RANGE(2):
             skill = skill_domain.Skill.create_default_skill(
-                '%s' % (i + 3), description='description %d' % (i + 3),
+                '%s' % (i + 3),
+                description='description %d' % (i + 3),
                 rubrics=rubrics)
             skill_services.save_new_skill(self.owner_id, skill)
 
+        example_1 = skill_domain.WorkedExample(
+            state_domain.SubtitledHtml('2', '<p>Example Question 1</p>'),
+            state_domain.SubtitledHtml('3', '<p>Example Explanation 1</p>')
+        )
         skill_contents = skill_domain.SkillContents(
             state_domain.SubtitledHtml(
-                '1', '<p>Explanation</p>'), [
-                    state_domain.SubtitledHtml('2', '<p>Example 1</p>')],
-            state_domain.RecordedVoiceovers.from_dict(
-                {'voiceovers_mapping': {'1': {}, '2': {}}}),
-            state_domain.WrittenTranslations.from_dict(
-                {'translations_mapping': {'1': {}, '2': {}}}))
+                '1', '<p>Explanation</p>'), [example_1],
+            state_domain.RecordedVoiceovers.from_dict({
+                'voiceovers_mapping': {
+                    '1': {}, '2': {}, '3': {}
+                }
+            }),
+            state_domain.WrittenTranslations.from_dict({
+                'translations_mapping': {
+                    '1': {}, '2': {}, '3': {}
+                }
+            })
+        )
         misconception_dict = {
             'id': 0, 'name': 'name', 'notes': '<p>notes</p>',
             'feedback': '<p>default_feedback</p>',
             'must_be_addressed': True}
 
+        misconception = skill_domain.Misconception.from_dict(
+            misconception_dict)
+
         for index, skill in enumerate(skills):
             skill.language_code = language_codes[index]
             skill.skill_contents = skill_contents
-            skill.add_misconception(misconception_dict)
+            skill.add_misconception(misconception)
             if index < 2:
                 skill.superseding_skill_id = '%s' % (index + 3)
                 skill.all_questions_merged = True
@@ -7011,11 +7470,11 @@ class SkillSnapshotMetadataModelValidatorTests(
         self.set_admins([self.ADMIN_USERNAME])
         rubrics = [
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
+                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
+                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
+                constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
         language_codes = ['ar', 'en', 'en']
         skills = [skill_domain.Skill.create_default_skill(
             '%s' % i,
@@ -7023,23 +7482,37 @@ class SkillSnapshotMetadataModelValidatorTests(
             rubrics=rubrics
         ) for i in python_utils.RANGE(3)]
 
+        example_1 = skill_domain.WorkedExample(
+            state_domain.SubtitledHtml('2', '<p>Example Question 1</p>'),
+            state_domain.SubtitledHtml('3', '<p>Example Explanation 1</p>')
+        )
         skill_contents = skill_domain.SkillContents(
             state_domain.SubtitledHtml(
-                '1', '<p>Explanation</p>'), [
-                    state_domain.SubtitledHtml('2', '<p>Example 1</p>')],
-            state_domain.RecordedVoiceovers.from_dict(
-                {'voiceovers_mapping': {'1': {}, '2': {}}}),
-            state_domain.WrittenTranslations.from_dict(
-                {'translations_mapping': {'1': {}, '2': {}}}))
+                '1', '<p>Explanation</p>'), [example_1],
+            state_domain.RecordedVoiceovers.from_dict({
+                'voiceovers_mapping': {
+                    '1': {}, '2': {}, '3': {}
+                }
+            }),
+            state_domain.WrittenTranslations.from_dict({
+                'translations_mapping': {
+                    '1': {}, '2': {}, '3': {}
+                }
+            })
+        )
+
         misconception_dict = {
             'id': 0, 'name': 'name', 'notes': '<p>notes</p>',
             'feedback': '<p>default_feedback</p>',
             'must_be_addressed': True}
 
+        misconception = skill_domain.Misconception.from_dict(
+            misconception_dict)
+
         for index, skill in enumerate(skills):
             skill.language_code = language_codes[index]
             skill.skill_contents = skill_contents
-            skill.add_misconception(misconception_dict)
+            skill.add_misconception(misconception)
             if index == 0:
                 skill_services.save_new_skill(self.user_id, skill)
             else:
@@ -7199,11 +7672,11 @@ class SkillSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
         self.set_admins([self.ADMIN_USERNAME])
         rubrics = [
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
+                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
+                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
+                constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
         language_codes = ['ar', 'en', 'en']
         skills = [skill_domain.Skill.create_default_skill(
             '%s' % i,
@@ -7211,23 +7684,36 @@ class SkillSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
             rubrics=rubrics
         ) for i in python_utils.RANGE(3)]
 
+        example_1 = skill_domain.WorkedExample(
+            state_domain.SubtitledHtml('2', '<p>Example Question 1</p>'),
+            state_domain.SubtitledHtml('3', '<p>Example Explanation 1</p>')
+        )
         skill_contents = skill_domain.SkillContents(
             state_domain.SubtitledHtml(
-                '1', '<p>Explanation</p>'), [
-                    state_domain.SubtitledHtml('2', '<p>Example 1</p>')],
-            state_domain.RecordedVoiceovers.from_dict(
-                {'voiceovers_mapping': {'1': {}, '2': {}}}),
-            state_domain.WrittenTranslations.from_dict(
-                {'translations_mapping': {'1': {}, '2': {}}}))
+                '1', '<p>Explanation</p>'), [example_1],
+            state_domain.RecordedVoiceovers.from_dict({
+                'voiceovers_mapping': {
+                    '1': {}, '2': {}, '3': {}
+                }
+            }),
+            state_domain.WrittenTranslations.from_dict({
+                'translations_mapping': {
+                    '1': {}, '2': {}, '3': {}
+                }
+            })
+        )
         misconception_dict = {
             'id': 0, 'name': 'name', 'notes': '<p>notes</p>',
             'feedback': '<p>default_feedback</p>',
             'must_be_addressed': True}
 
+        misconception = skill_domain.Misconception.from_dict(
+            misconception_dict)
+
         for index, skill in enumerate(skills):
             skill.language_code = language_codes[index]
             skill.skill_contents = skill_contents
-            skill.add_misconception(misconception_dict)
+            skill.add_misconception(misconception)
             skill_services.save_new_skill(self.owner_id, skill)
 
         self.model_instance_0 = (
@@ -7337,11 +7823,11 @@ class SkillCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
         self.set_admins([self.ADMIN_USERNAME])
         rubrics = [
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
+                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
+                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
+                constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
         language_codes = ['ar', 'en', 'en']
         skills = [skill_domain.Skill.create_default_skill(
             '%s' % i,
@@ -7349,23 +7835,36 @@ class SkillCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
             rubrics=rubrics
         ) for i in python_utils.RANGE(3)]
 
+        example_1 = skill_domain.WorkedExample(
+            state_domain.SubtitledHtml('2', '<p>Example Question 1</p>'),
+            state_domain.SubtitledHtml('3', '<p>Example Explanation 1</p>')
+        )
         skill_contents = skill_domain.SkillContents(
             state_domain.SubtitledHtml(
-                '1', '<p>Explanation</p>'), [
-                    state_domain.SubtitledHtml('2', '<p>Example 1</p>')],
-            state_domain.RecordedVoiceovers.from_dict(
-                {'voiceovers_mapping': {'1': {}, '2': {}}}),
-            state_domain.WrittenTranslations.from_dict(
-                {'translations_mapping': {'1': {}, '2': {}}}))
+                '1', '<p>Explanation</p>'), [example_1],
+            state_domain.RecordedVoiceovers.from_dict({
+                'voiceovers_mapping': {
+                    '1': {}, '2': {}, '3': {}
+                }
+            }),
+            state_domain.WrittenTranslations.from_dict({
+                'translations_mapping': {
+                    '1': {}, '2': {}, '3': {}
+                }
+            })
+        )
         misconception_dict = {
             'id': 0, 'name': 'name', 'notes': '<p>notes</p>',
             'feedback': '<p>default_feedback</p>',
             'must_be_addressed': True}
 
+        misconception = skill_domain.Misconception.from_dict(
+            misconception_dict)
+
         for index, skill in enumerate(skills):
             skill.language_code = language_codes[index]
             skill.skill_contents = skill_contents
-            skill.add_misconception(misconception_dict)
+            skill.add_misconception(misconception)
             skill_services.save_new_skill(self.owner_id, skill)
 
         self.model_instance_0 = (
@@ -7563,11 +8062,11 @@ class SkillSummaryModelValidatorTests(test_utils.GenericTestBase):
         self.set_admins([self.ADMIN_USERNAME])
         rubrics = [
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
+                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
+                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
+                constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
         language_codes = ['ar', 'en', 'en']
         skills = [skill_domain.Skill.create_default_skill(
             '%s' % i,
@@ -7575,23 +8074,37 @@ class SkillSummaryModelValidatorTests(test_utils.GenericTestBase):
             rubrics=rubrics
         ) for i in python_utils.RANGE(3)]
 
+        example_1 = skill_domain.WorkedExample(
+            state_domain.SubtitledHtml('2', '<p>Example Question 1</p>'),
+            state_domain.SubtitledHtml('3', '<p>Example Explanation 1</p>')
+        )
         skill_contents = skill_domain.SkillContents(
             state_domain.SubtitledHtml(
-                '1', '<p>Explanation</p>'), [
-                    state_domain.SubtitledHtml('2', '<p>Example 1</p>')],
-            state_domain.RecordedVoiceovers.from_dict(
-                {'voiceovers_mapping': {'1': {}, '2': {}}}),
-            state_domain.WrittenTranslations.from_dict(
-                {'translations_mapping': {'1': {}, '2': {}}}))
+                '1', '<p>Explanation</p>'), [example_1],
+            state_domain.RecordedVoiceovers.from_dict({
+                'voiceovers_mapping': {
+                    '1': {}, '2': {}, '3': {}
+                }
+            }),
+            state_domain.WrittenTranslations.from_dict({
+                'translations_mapping': {
+                    '1': {}, '2': {}, '3': {}
+                }
+            })
+        )
+
         misconception_dict = {
             'id': 0, 'name': 'name', 'notes': '<p>notes</p>',
             'feedback': '<p>default_feedback</p>',
             'must_be_addressed': True}
 
+        misconception = skill_domain.Misconception.from_dict(
+            misconception_dict)
+
         for index, skill in enumerate(skills):
             skill.language_code = language_codes[index]
             skill.skill_contents = skill_contents
-            skill.add_misconception(misconception_dict)
+            skill.add_misconception(misconception)
             skill_services.save_new_skill(self.owner_id, skill)
 
         self.model_instance_0 = skill_models.SkillSummaryModel.get_by_id('0')
@@ -7684,8 +8197,10 @@ class SkillSummaryModelValidatorTests(test_utils.GenericTestBase):
                 'count check of SkillSummaryModel\', '
                 '[u"Entity id 0: Worked examples count: 10 does not '
                 'match the number of worked examples in skill_contents '
-                'in skill model: [{u\'content_id\': u\'2\', u\'html\': '
-                'u\'<p>Example 1</p>\'}]"]]'
+                'in skill model: [{u\'explanation\': {u\'content_id\': u\'3\', '
+                'u\'html\': u\'<p>Example Explanation 1</p>\'}, u\'question\': '
+                '{u\'content_id\': u\'2\', u\'html\': u\'<p>Example Question '
+                '1</p>\'}}]"]]'
             ), u'[u\'fully-validated SkillSummaryModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 
@@ -7721,9 +8236,10 @@ class StoryModelValidatorTests(test_utils.GenericTestBase):
 
         for exp in explorations:
             exp_services.save_new_exploration(self.owner_id, exp)
+            self.publish_exploration(self.owner_id, exp.id)
 
         topic = topic_domain.Topic.create_default_topic(
-            topic_id='0', name='topic', abbreviated_name='abbrev')
+            '0', 'topic', 'abbrev', 'description')
         topic_services.save_new_topic(self.owner_id, topic)
 
         language_codes = ['ar', 'en', 'en']
@@ -7926,7 +8442,7 @@ class StorySnapshotMetadataModelValidatorTests(
         self.user_id = self.get_user_id_from_email(USER_EMAIL)
 
         topic = topic_domain.Topic.create_default_topic(
-            topic_id='0', name='topic', abbreviated_name='abbrev')
+            '0', 'topic', 'abbrev', 'description')
 
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
@@ -8092,7 +8608,7 @@ class StorySnapshotContentModelValidatorTests(test_utils.GenericTestBase):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
         topic = topic_domain.Topic.create_default_topic(
-            topic_id='0', name='topic', abbreviated_name='abbrev')
+            '0', 'topic', 'abbrev', 'description')
 
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
@@ -8210,7 +8726,7 @@ class StoryCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
         topic = topic_domain.Topic.create_default_topic(
-            topic_id='0', name='topic', abbreviated_name='abbrev')
+            '0', 'topic', 'abbrev', 'description')
 
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
@@ -8434,7 +8950,7 @@ class StorySummaryModelValidatorTests(test_utils.GenericTestBase):
         language_codes = ['ar', 'en', 'en']
 
         topic = topic_domain.Topic.create_default_topic(
-            topic_id='0', name='topic', abbreviated_name='abbrev')
+            '0', 'topic', 'abbrev', 'description')
 
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
@@ -8516,14 +9032,15 @@ class StorySummaryModelValidatorTests(test_utils.GenericTestBase):
             u'[u\'fully-validated StorySummaryModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 
-    def test_model_with_invalid_node_count(self):
-        self.model_instance_0.node_count = 10
+    def test_model_with_invalid_node_titles(self):
+        self.model_instance_0.node_titles = ['Title 1']
         self.model_instance_0.put()
         expected_output = [
             (
-                u'[u\'failed validation check for node count check of '
-                'StorySummaryModel\', [u\'Entity id 0: Node count: 10 does '
-                'not match the number of nodes in story_contents dict: []\']]'
+                u'[u\'failed validation check for node titles check of '
+                'StorySummaryModel\', [u"Entity id 0: Node titles: '
+                '[u\'Title 1\'] does not match the nodes in story_contents '
+                'dict: []"]]'
             ), u'[u\'fully-validated StorySummaryModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 
@@ -8864,19 +9381,21 @@ class TopicModelValidatorTests(test_utils.GenericTestBase):
         self.set_admins([self.ADMIN_USERNAME])
 
         topics = [topic_domain.Topic.create_default_topic(
-            topic_id='%s' % i,
-            name='Topic%s' % i,
-            abbreviated_name='abbrev%s' % i) for i in python_utils.RANGE(3)]
+            '%s' % i,
+            'Topic%s' % i,
+            'abbrev%s' % i,
+            'description%s' % i) for i in python_utils.RANGE(3)]
         rubrics = [
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
+                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
+                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
+                constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
         skills = [
             skill_domain.Skill.create_default_skill(
-                skill_id='%s' % i, description='skill%s' % i, rubrics=rubrics)
+                skill_id='%s' % i,
+                description='skill%s' % i, rubrics=rubrics)
             for i in python_utils.RANGE(9)]
 
         for skill in skills:
@@ -8916,6 +9435,8 @@ class TopicModelValidatorTests(test_utils.GenericTestBase):
                     'new_subtopic_id': 1,
                     'skill_id': '%s' % (index * 3 + 1)
                 })], 'Changes.')
+            topic_models.TopicRightsAllUsersModel(
+                id='%s' % index, all_user_ids=[self.owner_id]).put()
 
         self.model_instance_0 = topic_models.TopicModel.get_by_id('0')
         self.model_instance_1 = topic_models.TopicModel.get_by_id('1')
@@ -9103,6 +9624,18 @@ class TopicModelValidatorTests(test_utils.GenericTestBase):
             u'[u\'fully-validated TopicModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 
+    def test_missing_rights_all_users_failure(self):
+        topic_models.TopicRightsAllUsersModel.get_by_id('0').delete()
+        expected_output = [
+            (
+                u'[u\'failed validation check for all_users_model_ids '
+                'field check of TopicModel\', '
+                '[u"Entity id 0: based on field all_users_model_ids having '
+                'value 0, expect model TopicRightsAllUsersModel '
+                'with id 0 but it doesn\'t exist"]]'),
+            u'[u\'fully-validated TopicModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
     def test_model_with_repeated_name(self):
         self.model_instance_0.name = 'Topic1'
         self.model_instance_0.canonical_name = 'topic1'
@@ -9141,40 +9674,6 @@ class TopicModelValidatorTests(test_utils.GenericTestBase):
             ), u'[u\'fully-validated TopicModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 
-    def test_model_with_abbreviated_name_is_empty(self):
-        self.model_instance_0.abbreviated_name = None
-        self.model_instance_0.commit(self.owner_id, '', [])
-        expected_output = [
-            (
-                u'[u\'failed validation check for abbreviated name check '
-                'of TopicModel\', '
-                '[u\'Entity id 0 : Topic name Topic0: Expected nonempty '
-                'abbreviated name, but received None.\']]'
-            ), (
-                u'[u\'failed validation check for domain object check '
-                'of TopicModel\', [u\'Entity id 0: Entity fails domain '
-                'validation with the error Abbreviated name should be a '
-                'string.\']]'
-            ), u'[u\'fully-validated TopicModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
-
-    def test_model_with_abbreviated_name_is_empty_string(self):
-        self.model_instance_0.abbreviated_name = ''
-        self.model_instance_0.commit(self.owner_id, '', [])
-        expected_output = [
-            (
-                u'[u\'failed validation check for abbreviated name check '
-                'of TopicModel\', '
-                '[u\'Entity id 0 : Topic name Topic0: Expected nonempty '
-                'abbreviated name, but received .\']]'
-            ), (
-                u'[u\'failed validation check for domain object check '
-                'of TopicModel\', [u\'Entity id 0: Entity fails domain '
-                'validation with the error Abbreviated name field should '
-                'not be empty.\']]'
-            ), u'[u\'fully-validated TopicModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
-
 
 class TopicSnapshotMetadataModelValidatorTests(
         test_utils.GenericTestBase):
@@ -9192,19 +9691,21 @@ class TopicSnapshotMetadataModelValidatorTests(
         self.set_admins([self.ADMIN_USERNAME])
 
         topics = [topic_domain.Topic.create_default_topic(
-            topic_id='%s' % i,
-            name='topic%s' % i,
-            abbreviated_name='abbrev%s' % i) for i in python_utils.RANGE(3)]
+            '%s' % i,
+            'topic%s' % i,
+            'abbrev%s' % i,
+            'description%s' % i) for i in python_utils.RANGE(3)]
         rubrics = [
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
+                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
+                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
+                constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
         skills = [
             skill_domain.Skill.create_default_skill(
-                skill_id='%s' % i, description='skill%s' % i, rubrics=rubrics)
+                skill_id='%s' % i,
+                description='skill%s' % i, rubrics=rubrics)
             for i in python_utils.RANGE(9)]
 
         for skill in skills:
@@ -9384,16 +9885,17 @@ class TopicSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
         self.set_admins([self.ADMIN_USERNAME])
 
         topics = [topic_domain.Topic.create_default_topic(
-            topic_id='%s' % i,
-            name='topic%s' % i,
-            abbreviated_name='abbrev%s' % i) for i in python_utils.RANGE(3)]
+            '%s' % i,
+            'topic%s' % i,
+            'abbrev%s' % i,
+            'description%s' % i) for i in python_utils.RANGE(3)]
         rubrics = [
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
+                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
+                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
+                constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
         skills = [
             skill_domain.Skill.create_default_skill(
                 skill_id='%s' % i, description='skill%s' % i, rubrics=rubrics)
@@ -9544,16 +10046,17 @@ class TopicRightsModelValidatorTests(test_utils.GenericTestBase):
         self.manager2 = user_services.UserActionsInfo(self.manager2_id)
 
         topics = [topic_domain.Topic.create_default_topic(
-            topic_id='%s' % i,
-            name='topic%s' % i,
-            abbreviated_name='abbrev%s' % i) for i in python_utils.RANGE(3)]
+            '%s' % i,
+            'topic%s' % i,
+            'abbrev%s' % i,
+            'description%s' % i) for i in python_utils.RANGE(3)]
         rubrics = [
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
+                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
+                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
+                constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
         skills = [
             skill_domain.Skill.create_default_skill(
                 skill_id='%s' % i, description='skill%s' % i, rubrics=rubrics)
@@ -9719,16 +10222,17 @@ class TopicRightsSnapshotMetadataModelValidatorTests(
         self.set_admins([self.ADMIN_USERNAME])
 
         topics = [topic_domain.Topic.create_default_topic(
-            topic_id='%s' % i,
-            name='topic%s' % i,
-            abbreviated_name='abbrev%s' % i) for i in python_utils.RANGE(3)]
+            '%s' % i,
+            'topic%s' % i,
+            'abbrev%s' % i,
+            'description%s' % i) for i in python_utils.RANGE(3)]
         rubrics = [
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
+                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
+                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
+                constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
         skills = [
             skill_domain.Skill.create_default_skill(
                 skill_id='%s' % i, description='skill%s' % i, rubrics=rubrics)
@@ -9923,16 +10427,17 @@ class TopicRightsSnapshotContentModelValidatorTests(
         self.set_admins([self.ADMIN_USERNAME])
 
         topics = [topic_domain.Topic.create_default_topic(
-            topic_id='%s' % i,
-            name='topic%s' % i,
-            abbreviated_name='abbrev%s' % i) for i in python_utils.RANGE(3)]
+            '%s' % i,
+            'topic%s' % i,
+            'abbrev%s' % i,
+            'description%s' % i) for i in python_utils.RANGE(3)]
         rubrics = [
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
+                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
+                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
+                constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
         skills = [
             skill_domain.Skill.create_default_skill(
                 skill_id='%s' % i, description='skill%s' % i, rubrics=rubrics)
@@ -10064,6 +10569,121 @@ class TopicRightsSnapshotContentModelValidatorTests(
         run_job_and_check_output(self, expected_output, sort=True)
 
 
+class TopicRightsAllUsersModelValidatorTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(TopicRightsAllUsersModelValidatorTests, self).setUp()
+
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.set_admins([self.ADMIN_USERNAME])
+        self.admin = user_services.UserActionsInfo(self.admin_id)
+
+        manager1_email = 'user@manager1.com'
+        self.signup(manager1_email, 'manager1')
+        self.set_topic_managers(['manager1'])
+        self.manager1_id = self.get_user_id_from_email(manager1_email)
+        self.manager1 = user_services.UserActionsInfo(self.manager1_id)
+
+        topics = [topic_domain.Topic.create_default_topic(
+            '%s' % i,
+            'topic%s' % i,
+            'abbrev%s' % i,
+            'description%s' % i) for i in python_utils.RANGE(3)]
+
+        language_codes = ['ar', 'en', 'en']
+        for index, topic in enumerate(topics):
+            topic.language_code = language_codes[index]
+            topic_services.save_new_topic(self.owner_id, topic)
+
+        topic_services.assign_role(
+            self.admin, self.manager1, topic_domain.ROLE_MANAGER, '0')
+
+        user_id_migration.AddAllUserIdsSnapshotContentVerificationJob.enqueue(
+            user_id_migration.AddAllUserIdsSnapshotContentVerificationJob
+            .create_new()
+        )
+        self.process_and_flush_pending_tasks()
+
+        self.model_instance_0 = (
+            topic_models.TopicRightsAllUsersModel.get_by_id('0'))
+        self.model_instance_1 = (
+            topic_models.TopicRightsAllUsersModel.get_by_id('1'))
+        self.model_instance_2 = (
+            topic_models.TopicRightsAllUsersModel.get_by_id('2'))
+
+        self.job_class = (
+            prod_validation_jobs_one_off.TopicRightsAllUsersModelAuditOneOffJob)
+
+    def test_standard_operation(self):
+        expected_output = [
+            u'[u\'fully-validated TopicRightsAllUsersModel\', 3]']
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_created_on_greater_than_last_updated(self):
+        self.model_instance_0.created_on = (
+            self.model_instance_0.last_updated + datetime.timedelta(days=1))
+        self.model_instance_0.put()
+        expected_output = [(
+            u'[u\'failed validation check for time field relation check '
+            'of TopicRightsAllUsersModel\', '
+            '[u\'Entity id %s: The created_on field has a value '
+            '%s which is greater than the value '
+            '%s of last_updated field\']]') % (
+                self.model_instance_0.id,
+                self.model_instance_0.created_on,
+                self.model_instance_0.last_updated
+            ), (
+                u'[u\'fully-validated '
+                'TopicRightsAllUsersModel\', 2]')]
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_last_updated_greater_than_current_time(self):
+        self.model_instance_1.delete()
+        self.model_instance_2.delete()
+        expected_output = [(
+            u'[u\'failed validation check for current time check of '
+            'TopicRightsAllUsersModel\', '
+            '[u\'Entity id %s: The last_updated field has a '
+            'value %s which is greater than the time when the job was run\']]'
+        ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
+
+        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
+            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
+            update_datastore_types_for_mock_datetime()
+            run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_topic_model_failure(self):
+        topic_models.TopicRightsModel.get_by_id('0').delete(
+            self.owner_id, '', [])
+        expected_output = [
+            (
+                u'[u\'failed validation check for topic_rights_ids '
+                'field check of TopicRightsAllUsersModel\', '
+                '[u"Entity id 0: based on field topic_rights_ids '
+                'having value 0, expect model TopicRightsModel with '
+                'id 0 but it doesn\'t exist"]]'
+            ), u'[u\'fully-validated TopicRightsAllUsersModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_user_settings_model_failure(self):
+        user_models.UserSettingsModel.get_by_id(self.manager1_id).delete()
+        expected_output = [
+            (
+                u'[u\'failed validation check for all_user_ids '
+                'field check of TopicRightsAllUsersModel\', '
+                '[u"Entity id 0: based on field all_user_ids '
+                'having value %s, expect model UserSettingsModel with '
+                'id %s but it doesn\'t exist"]]'
+            ) % (self.manager1_id, self.manager1_id),
+            u'[u\'fully-validated TopicRightsAllUsersModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+
 class TopicCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
 
     def setUp(self):
@@ -10081,16 +10701,17 @@ class TopicCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
         self.set_admins([self.ADMIN_USERNAME])
 
         topics = [topic_domain.Topic.create_default_topic(
-            topic_id='%s' % i,
-            name='topic%s' % i,
-            abbreviated_name='abbrev%s' % i) for i in python_utils.RANGE(3)]
+            '%s' % i,
+            'topic%s' % i,
+            'abbrev%s' % i,
+            'description%s' % i) for i in python_utils.RANGE(3)]
         rubrics = [
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
+                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
+                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
+                constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
         skills = [
             skill_domain.Skill.create_default_skill(
                 skill_id='%s' % i, description='skill%s' % i, rubrics=rubrics)
@@ -10363,16 +10984,17 @@ class TopicSummaryModelValidatorTests(test_utils.GenericTestBase):
         self.set_admins([self.ADMIN_USERNAME])
 
         topics = [topic_domain.Topic.create_default_topic(
-            topic_id='%s' % i,
-            name='topic%s' % i,
-            abbreviated_name='abbrev%s' % i) for i in python_utils.RANGE(3)]
+            '%s' % i,
+            'topic%s' % i,
+            'abbrev%s' % i,
+            'description%s' % i) for i in python_utils.RANGE(3)]
         rubrics = [
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
+                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
+                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
+                constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
         skills = [
             skill_domain.Skill.create_default_skill(
                 skill_id='%s' % i, description='skill%s' % i, rubrics=rubrics)
@@ -10550,12 +11172,12 @@ class TopicSummaryModelValidatorTests(test_utils.GenericTestBase):
         self.model_instance_0.put()
         expected_output = [
             (
-                u'[u\'failed validation check for subtopic count check '
-                'of TopicSummaryModel\', '
-                '[u"Entity id 0: Subtopic count: 10 does not match '
-                'the total number of subtopics in topic model: '
-                '[{u\'skill_ids\': [u\'0\', u\'1\'], u\'id\': 1, '
-                'u\'title\': u\'subtopic1\'}] "]]'
+                u'[u\'failed validation check for subtopic count check of Topi'
+                'cSummaryModel\', [u"Entity id 0: Subtopic count: 10 does not '
+                'match the total number of subtopics in topic model: [{u\'thum'
+                'bnail_bg_color\': None, u\'skill_ids\': [u\'0\', '
+                'u\'1\'], u\'id\': 1, u\'thumbnail_filename\': None, u\'title'
+                '\': u\'subtopic1\'}] "]]'
             ), u'[u\'fully-validated TopicSummaryModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 
@@ -10586,16 +11208,17 @@ class SubtopicPageModelValidatorTests(test_utils.GenericTestBase):
         self.set_admins([self.ADMIN_USERNAME])
 
         topics = [topic_domain.Topic.create_default_topic(
-            topic_id='%s' % i,
-            name='topic%s' % i,
-            abbreviated_name='abbrev%s' % i) for i in python_utils.RANGE(3)]
+            '%s' % i,
+            'topic%s' % i,
+            'abbrev%s' % i,
+            'description%s' % i) for i in python_utils.RANGE(3)]
         rubrics = [
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
+                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
+                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
+                constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
         skills = [
             skill_domain.Skill.create_default_skill(
                 skill_id='%s' % i, description='skill%s' % i, rubrics=rubrics)
@@ -10797,16 +11420,17 @@ class SubtopicPageSnapshotMetadataModelValidatorTests(
         self.set_admins([self.ADMIN_USERNAME])
 
         topics = [topic_domain.Topic.create_default_topic(
-            topic_id='%s' % i,
-            name='topic%s' % i,
-            abbreviated_name='abbrev%s' % i) for i in python_utils.RANGE(3)]
+            '%s' % i,
+            'topic%s' % i,
+            'abbrev%s' % i,
+            'description%s' % i) for i in python_utils.RANGE(3)]
         rubrics = [
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
+                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
+                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
+                constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
         skills = [
             skill_domain.Skill.create_default_skill(
                 skill_id='%s' % i, description='skill%s' % i, rubrics=rubrics)
@@ -11003,16 +11627,17 @@ class SubtopicPageSnapshotContentModelValidatorTests(
         self.set_admins([self.ADMIN_USERNAME])
 
         topics = [topic_domain.Topic.create_default_topic(
-            topic_id='%s' % i,
-            name='topic%s' % i,
-            abbreviated_name='abbrev%s' % i) for i in python_utils.RANGE(3)]
+            '%s' % i,
+            'topic%s' % i,
+            'abbrev%s' % i,
+            'description%s' % i) for i in python_utils.RANGE(3)]
         rubrics = [
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
+                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
+                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
+                constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
         skills = [
             skill_domain.Skill.create_default_skill(
                 skill_id='%s' % i, description='skill%s' % i, rubrics=rubrics)
@@ -11170,16 +11795,17 @@ class SubtopicPageCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
         self.set_admins([self.ADMIN_USERNAME])
 
         topics = [topic_domain.Topic.create_default_topic(
-            topic_id='%s' % i,
-            name='topic%s' % i,
-            abbreviated_name='abbrev%s' % i) for i in python_utils.RANGE(3)]
+            '%s' % i,
+            'topic%s' % i,
+            'abbrev%s' % i,
+            'description%s' % i) for i in python_utils.RANGE(3)]
         rubrics = [
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
+                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
+                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
+                constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
         skills = [
             skill_domain.Skill.create_default_skill(
                 skill_id='%s' % i, description='skill%s' % i, rubrics=rubrics)
@@ -11604,18 +12230,12 @@ class CompletedActivitiesModelValidatorTests(test_utils.GenericTestBase):
         intro_state.update_interaction_id('TextInput')
         end_state.update_interaction_id('EndExploration')
 
-        default_outcome_dict = {
-            'dest': 'End',
-            'feedback': {
-                'content_id': 'default_outcome',
-                'html': '<p>Introduction</p>'
-            },
-            'labelled_as_correct': False,
-            'param_changes': [],
-            'refresher_exploration_id': None,
-            'missing_prerequisite_skill_id': None
-        }
-        intro_state.update_interaction_default_outcome(default_outcome_dict)
+        default_outcome = state_domain.Outcome(
+            'End', state_domain.SubtitledHtml(
+                'default_outcome', '<p>Introduction</p>'),
+            False, [], None, None
+        )
+        intro_state.update_interaction_default_outcome(default_outcome)
         end_state.update_interaction_default_outcome(None)
 
         for exp in explorations:
@@ -11796,18 +12416,12 @@ class IncompleteActivitiesModelValidatorTests(test_utils.GenericTestBase):
             intro_state.update_interaction_id('TextInput')
             end_state.update_interaction_id('EndExploration')
 
-            default_outcome_dict = {
-                'dest': 'End',
-                'feedback': {
-                    'content_id': 'default_outcome',
-                    'html': '<p>Introduction</p>'
-                },
-                'labelled_as_correct': False,
-                'param_changes': [],
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            }
-            intro_state.update_interaction_default_outcome(default_outcome_dict)
+            default_outcome = state_domain.Outcome(
+                'End', state_domain.SubtitledHtml(
+                    'default_outcome', '<p>Introduction</p>'),
+                False, [], None, None
+            )
+            intro_state.update_interaction_default_outcome(default_outcome)
             end_state.update_interaction_default_outcome(None)
 
         for exp in explorations:
@@ -11989,18 +12603,12 @@ class ExpUserLastPlaythroughModelValidatorTests(
         intro_state.update_interaction_id('TextInput')
         end_state.update_interaction_id('EndExploration')
 
-        default_outcome_dict = {
-            'dest': 'End',
-            'feedback': {
-                'content_id': 'default_outcome',
-                'html': '<p>Introduction</p>'
-            },
-            'labelled_as_correct': False,
-            'param_changes': [],
-            'refresher_exploration_id': None,
-            'missing_prerequisite_skill_id': None
-        }
-        intro_state.update_interaction_default_outcome(default_outcome_dict)
+        default_outcome = state_domain.Outcome(
+            'End', state_domain.SubtitledHtml(
+                'default_outcome', '<p>Introduction</p>'),
+            False, [], None, None
+        )
+        intro_state.update_interaction_default_outcome(default_outcome)
         end_state.update_interaction_default_outcome(None)
 
         for exp in explorations:
@@ -12152,18 +12760,12 @@ class LearnerPlaylistModelValidatorTests(test_utils.GenericTestBase):
         intro_state.update_interaction_id('TextInput')
         end_state.update_interaction_id('EndExploration')
 
-        default_outcome_dict = {
-            'dest': 'End',
-            'feedback': {
-                'content_id': 'default_outcome',
-                'html': '<p>Introduction</p>'
-            },
-            'labelled_as_correct': False,
-            'param_changes': [],
-            'refresher_exploration_id': None,
-            'missing_prerequisite_skill_id': None
-        }
-        intro_state.update_interaction_default_outcome(default_outcome_dict)
+        default_outcome = state_domain.Outcome(
+            'End', state_domain.SubtitledHtml(
+                'default_outcome', '<p>Introduction</p>'),
+            False, [], None, None
+        )
+        intro_state.update_interaction_default_outcome(default_outcome)
         end_state.update_interaction_default_outcome(None)
 
         for exp in explorations:
@@ -12673,10 +13275,11 @@ class UserSubscriptionsModelValidatorTests(test_utils.GenericTestBase):
             (
                 u'[u\'failed validation check for general_feedback_thread_ids '
                 'field check of UserSubscriptionsModel\', '
-                '[u"Entity id 110211048197157141232: based on '
+                '[u"Entity id %s: based on '
                 'field general_feedback_thread_ids having value '
                 'nonexist_thread_id, expect model GeneralFeedbackThreadModel '
-                'with id nonexist_thread_id but it doesn\'t exist"]]'),
+                'with id nonexist_thread_id but it doesn\'t '
+                'exist"]]') % self.user_id,
             u'[u\'fully-validated UserSubscriptionsModel\', 1]']
         run_job_and_check_output(self, expected_output, sort=True)
 
@@ -13402,7 +14005,7 @@ class StoryProgressModelValidatorTests(test_utils.GenericTestBase):
             rights_manager.publish_exploration(self.owner, exp.id)
 
         topic = topic_domain.Topic.create_default_topic(
-            topic_id='0', name='topic', abbreviated_name='abbrev')
+            '0', 'topic', 'abbrev', 'description')
 
         story = story_domain.Story.create_default_story(
             'story',
@@ -13804,11 +14407,11 @@ class UserSkillMasteryModelValidatorTests(test_utils.GenericTestBase):
         self.set_admins([self.OWNER_USERNAME])
         rubrics = [
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
+                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
+                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
+                constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
         skill = skill_domain.Skill.create_default_skill(
             'skill', description='description', rubrics=rubrics)
         skill_services.save_new_skill(self.owner_id, skill)
@@ -13978,6 +14581,73 @@ class UserContributionScoringModelValidatorTests(test_utils.GenericTestBase):
         run_job_and_check_output(self, expected_output)
 
 
+class UserCommunityRightsModelValidatorTests(test_utils.GenericTestBase):
+
+    TRANSLATOR_EMAIL = 'translator@community.org'
+    TRANSLATOR_USERNAME = 'translator'
+
+    VOICE_ARTIST_EMAIL = 'voiceartist@community.org'
+    VOICE_ARTIST_USERNAME = 'voiceartist'
+
+    def setUp(self):
+        super(UserCommunityRightsModelValidatorTests, self).setUp()
+
+        self.signup(self.TRANSLATOR_EMAIL, self.TRANSLATOR_USERNAME)
+        self.translator_id = self.get_user_id_from_email(self.TRANSLATOR_EMAIL)
+        self.signup(self.VOICE_ARTIST_EMAIL, self.VOICE_ARTIST_USERNAME)
+        self.voice_artist_id = self.get_user_id_from_email(
+            self.VOICE_ARTIST_EMAIL)
+
+        user_services.allow_user_to_review_voiceover_in_language(
+            self.translator_id, 'hi')
+        user_services.allow_user_to_review_voiceover_in_language(
+            self.voice_artist_id, 'hi')
+
+        self.translator_model_instance = (
+            user_models.UserCommunityRightsModel.get_by_id(self.translator_id))
+        self.voice_artist_model_instance = (
+            user_models.UserCommunityRightsModel.get_by_id(
+                self.voice_artist_id))
+
+        self.job_class = (
+            prod_validation_jobs_one_off.UserCommunityRightsModelAuditOneOffJob)
+
+    def test_standard_operation(self):
+        expected_output = [
+            u'[u\'fully-validated UserCommunityRightsModel\', 2]']
+        run_job_and_check_output(self, expected_output)
+
+    def test_get_external_id_relationship_failure(self):
+        user_models.UserSettingsModel.get_by_id(self.translator_id).delete()
+
+        expected_output = [
+            (
+                u'[u\'failed validation check for user_settings_ids field '
+                'check of UserCommunityRightsModel\', [u"Entity id %s: based '
+                'on field user_settings_ids having value %s, expect model '
+                'UserSettingsModel with id %s but it doesn\'t exist"]]'
+            ) % (self.translator_id, self.translator_id, self.translator_id),
+            u'[u\'fully-validated UserCommunityRightsModel\', 1]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_object_validation_failure(self):
+        (
+            self.translator_model_instance
+            .can_review_voiceover_for_language_codes.append('invalid_lang_code')
+        )
+        self.translator_model_instance.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for domain object check of '
+                'UserCommunityRightsModel\', [u\'Entity id %s: Entity fails '
+                'domain validation with the error Invalid language_code: '
+                'invalid_lang_code\']]'
+            ) % self.translator_id,
+            u'[u\'fully-validated UserCommunityRightsModel\', 1]']
+
+        run_job_and_check_output(self, expected_output, sort=True)
+
+
 class PendingDeletionRequestModelValidatorTests(test_utils.GenericTestBase):
 
     def setUp(self):
@@ -14104,3 +14774,357 @@ class PendingDeletionRequestModelValidatorTests(test_utils.GenericTestBase):
                 '[u"Entity id %s: Collections with ids [u\'col_id\'] are '
                 'not marked as deleted"]]') % self.user_id]
         run_job_and_check_output(self, expected_output)
+
+
+class TaskEntryModelValidatorTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(TaskEntryModelValidatorTests, self).setUp()
+        self.signup(USER_EMAIL, USER_NAME)
+        self.user_id = self.get_user_id_from_email(USER_EMAIL)
+        self.save_new_valid_exploration('exp_id', self.user_id)
+        self.job_class = (
+            prod_validation_jobs_one_off.TaskEntryModelAuditOneOffJob)
+
+    def run_job_and_get_output(self):
+        """Helper method to run job and fetch the output.
+
+        Returns:
+            list([str, *]).
+        """
+        job_id = self.job_class.create_new()
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 0)
+        self.job_class.enqueue(job_id)
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_tasks()
+        return [ast.literal_eval(o) for o in self.job_class.get_output(job_id)]
+
+    def run_job_and_check_output(self, *expected_outputs):
+        """Helper method to run job and check for the expected output.
+
+        Args:
+            *expected_outputs: list(*). The items expected to be found in the
+                job's output.
+        """
+        self.assertItemsEqual(
+            self.run_job_and_get_output(), list(expected_outputs))
+
+    def test_no_models(self):
+        self.run_job_and_check_output()
+
+    def test_valid_model_check(self):
+        improvements_models.TaskEntryModel.create(
+            improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
+            'exp_id',
+            1,
+            improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
+            improvements_models.TASK_TARGET_TYPE_STATE,
+            feconf.DEFAULT_INIT_STATE_NAME)
+        self.run_job_and_check_output(['fully-validated TaskEntryModel', 1])
+
+    def test_invalid_entity_id(self):
+        task_id = improvements_models.TaskEntryModel.create(
+            improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
+            'invalid_exp_id',
+            1,
+            improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
+            improvements_models.TASK_TARGET_TYPE_STATE,
+            feconf.DEFAULT_INIT_STATE_NAME)
+        self.run_job_and_check_output(
+            ['failed validation check for entity_ids field check of '
+             'TaskEntryModel',
+             ['Entity id %s: based on field entity_ids having value '
+              'invalid_exp_id, expect model ExplorationModel with id '
+              'invalid_exp_id but it doesn\'t exist' % (task_id,)]],
+            ['failed validation check for target_id field check of '
+             'TaskEntryModel',
+             ['Entity id %s: exploration with id "invalid_exp_id" does not '
+              'exist at version 1' % (task_id,)]])
+
+    def test_invalid_entity_version(self):
+        task_id = improvements_models.TaskEntryModel.create(
+            improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
+            'exp_id',
+            2,
+            improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
+            improvements_models.TASK_TARGET_TYPE_STATE,
+            feconf.DEFAULT_INIT_STATE_NAME)
+        self.run_job_and_check_output(
+            ['failed validation check for target_id field check of '
+             'TaskEntryModel',
+             ['Entity id %s: exploration with id "exp_id" does not exist at '
+              'version 2' % (task_id,)]])
+
+    def test_invalid_resolver_ids(self):
+        task_id = improvements_models.TaskEntryModel.create(
+            improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
+            'exp_id',
+            1,
+            improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
+            improvements_models.TASK_TARGET_TYPE_STATE,
+            feconf.DEFAULT_INIT_STATE_NAME,
+            issue_description='issue description',
+            status=improvements_models.TASK_STATUS_RESOLVED,
+            resolver_id='invalid_user_id',
+            resolved_on=CURRENT_DATETIME)
+        self.run_job_and_check_output(
+            ['failed validation check for resolver_ids field check of '
+             'TaskEntryModel',
+             ['Entity id %s: based on field resolver_ids having value '
+              'invalid_user_id, expect model UserSettingsModel with id '
+              'invalid_user_id but it doesn\'t exist' % (task_id,)]])
+
+    def test_invalid_id(self):
+        improvements_models.TaskEntryModel(
+            id='bad_id',
+            composite_entity_id='exploration.exp_id.1',
+            entity_type=improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
+            entity_id='exp_id',
+            entity_version=1,
+            task_type=improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
+            target_type=improvements_models.TASK_TARGET_TYPE_STATE,
+            target_id=feconf.DEFAULT_INIT_STATE_NAME,
+            status=improvements_models.TASK_STATUS_OPEN).put()
+        self.run_job_and_check_output(
+            ['failed validation check for model id check of TaskEntryModel',
+             ['Entity id bad_id: Entity id does not match regex pattern']])
+
+    def test_invalid_composite_entity_id(self):
+        task_id = improvements_models.TaskEntryModel.generate_task_id(
+            improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
+            'exp_id',
+            1,
+            improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
+            improvements_models.TASK_TARGET_TYPE_STATE,
+            feconf.DEFAULT_INIT_STATE_NAME)
+        improvements_models.TaskEntryModel(
+            id=task_id,
+            composite_entity_id='bad_composite_id',
+            entity_type=improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
+            entity_id='exp_id',
+            entity_version=1,
+            task_type=improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
+            target_type=improvements_models.TASK_TARGET_TYPE_STATE,
+            target_id=feconf.DEFAULT_INIT_STATE_NAME,
+            status=improvements_models.TASK_STATUS_OPEN).put()
+        self.run_job_and_check_output(
+            ['failed validation check for composite_entity_id field check of '
+             'TaskEntryModel',
+             ['Entity id %s: composite_entity_id "bad_composite_id" should be '
+              '"exploration.exp_id.1"' % (
+                  task_id,)]])
+
+    def test_status_open_but_resolver_id_is_set(self):
+        task_id = improvements_models.TaskEntryModel.create(
+            improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
+            'exp_id',
+            1,
+            improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
+            improvements_models.TASK_TARGET_TYPE_STATE,
+            feconf.DEFAULT_INIT_STATE_NAME,
+            issue_description='issue description',
+            status=improvements_models.TASK_STATUS_OPEN,
+            resolver_id=self.user_id)
+        self.run_job_and_check_output(
+            ['failed validation check for status field check of TaskEntryModel',
+             ['Entity id %s: status is open but resolver_id is "%s", should be '
+              'empty.' % (task_id, self.user_id)]])
+
+    def test_status_open_but_resolved_on_is_set(self):
+        task_id = improvements_models.TaskEntryModel.create(
+            improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
+            'exp_id',
+            1,
+            improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
+            improvements_models.TASK_TARGET_TYPE_STATE,
+            feconf.DEFAULT_INIT_STATE_NAME,
+            issue_description='issue description',
+            status=improvements_models.TASK_STATUS_OPEN,
+            resolved_on=CURRENT_DATETIME)
+        self.run_job_and_check_output(
+            ['failed validation check for status field check of TaskEntryModel',
+             ['Entity id %s: status is open but resolved_on is "%s", should be '
+              'empty.' % (task_id, CURRENT_DATETIME)]])
+
+    def test_status_resolved_but_resolver_id_is_not_set(self):
+        task_id = improvements_models.TaskEntryModel.create(
+            improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
+            'exp_id',
+            1,
+            improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
+            improvements_models.TASK_TARGET_TYPE_STATE,
+            feconf.DEFAULT_INIT_STATE_NAME,
+            issue_description='issue description',
+            status=improvements_models.TASK_STATUS_RESOLVED,
+            resolver_id=None,
+            resolved_on=CURRENT_DATETIME)
+        self.run_job_and_check_output(
+            ['failed validation check for status field check of TaskEntryModel',
+             ['Entity id %s: status is resolved but resolver_id is not set' % (
+                 task_id,)]])
+
+    def test_status_resolved_but_resolved_on_is_not_set(self):
+        task_id = improvements_models.TaskEntryModel.create(
+            improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
+            'exp_id',
+            1,
+            improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
+            improvements_models.TASK_TARGET_TYPE_STATE,
+            feconf.DEFAULT_INIT_STATE_NAME,
+            issue_description='issue description',
+            status=improvements_models.TASK_STATUS_RESOLVED,
+            resolver_id=self.user_id,
+            resolved_on=None)
+        self.run_job_and_check_output(
+            ['failed validation check for status field check of TaskEntryModel',
+             ['Entity id %s: status is resolved but resolved_on is not set' % (
+                 task_id,)]])
+
+    def test_missing_state_name_for_exploration_task_types(self):
+        hbr_task_id = improvements_models.TaskEntryModel.create(
+            improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
+            'exp_id',
+            1,
+            improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
+            improvements_models.TASK_TARGET_TYPE_STATE,
+            'invalid_state_name')
+        ifl_task_id = improvements_models.TaskEntryModel.create(
+            improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
+            'exp_id',
+            1,
+            improvements_models.TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP,
+            improvements_models.TASK_TARGET_TYPE_STATE,
+            'invalid_state_name')
+        ngr_task_id = improvements_models.TaskEntryModel.create(
+            improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
+            'exp_id',
+            1,
+            improvements_models.TASK_TYPE_NEEDS_GUIDING_RESPONSES,
+            improvements_models.TASK_TARGET_TYPE_STATE,
+            'invalid_state_name')
+        sia_task_id = improvements_models.TaskEntryModel.create(
+            improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
+            'exp_id',
+            1,
+            improvements_models.TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS,
+            improvements_models.TASK_TARGET_TYPE_STATE,
+            'invalid_state_name')
+        output = self.run_job_and_get_output()
+        self.assertEqual(len(output), 1)
+        error_key, error_messages = output[0]
+
+        self.assertEqual(
+            error_key,
+            'failed validation check for target_id field check of '
+            'TaskEntryModel')
+        self.assertItemsEqual(
+            error_messages, [
+                'Entity id %s: exploration with id "exp_id" does not have a '
+                'state named "invalid_state_name" at version 1' % (
+                    hbr_task_id,),
+                'Entity id %s: exploration with id "exp_id" does not have a '
+                'state named "invalid_state_name" at version 1' % (
+                    ifl_task_id,),
+                'Entity id %s: exploration with id "exp_id" does not have a '
+                'state named "invalid_state_name" at version 1' % (
+                    ngr_task_id,),
+                'Entity id %s: exploration with id "exp_id" does not have a '
+                'state named "invalid_state_name" at version 1' % (
+                    sia_task_id,)
+            ])
+
+    def test_deleted_state_name_for_exploration_task_types(self):
+        self.save_new_linear_exp_with_state_names_and_interactions(
+            'linear_exp_id', 'owner_id',
+            ['State 1', 'State 2', 'State 3'],
+            ['TextInput', 'TextInput', 'EndExploration'])
+        improvements_models.TaskEntryModel.create(
+            improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
+            'linear_exp_id',
+            1,
+            improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
+            improvements_models.TASK_TARGET_TYPE_STATE,
+            'State 2')
+        improvements_models.TaskEntryModel.create(
+            improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
+            'linear_exp_id',
+            1,
+            improvements_models.TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP,
+            improvements_models.TASK_TARGET_TYPE_STATE,
+            'State 2')
+        improvements_models.TaskEntryModel.create(
+            improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
+            'linear_exp_id',
+            1,
+            improvements_models.TASK_TYPE_NEEDS_GUIDING_RESPONSES,
+            improvements_models.TASK_TARGET_TYPE_STATE,
+            'State 2')
+        improvements_models.TaskEntryModel.create(
+            improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
+            'linear_exp_id',
+            1,
+            improvements_models.TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS,
+            improvements_models.TASK_TARGET_TYPE_STATE,
+            'State 2')
+
+        exp_services.update_exploration( # v2
+            'owner_id', 'linear_exp_id', [
+                exp_domain.ExplorationChange(
+                    {'cmd': 'delete_state', 'state_name': 'State 2'})
+            ], 'Delete State 2')
+        new_hbr_task_id = improvements_models.TaskEntryModel.create(
+            improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
+            'linear_exp_id',
+            2,
+            improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
+            improvements_models.TASK_TARGET_TYPE_STATE,
+            'State 2')
+        new_ifl_task_id = improvements_models.TaskEntryModel.create(
+            improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
+            'linear_exp_id',
+            2,
+            improvements_models.TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP,
+            improvements_models.TASK_TARGET_TYPE_STATE,
+            'State 2')
+        new_ngr_task_id = improvements_models.TaskEntryModel.create(
+            improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
+            'linear_exp_id',
+            2,
+            improvements_models.TASK_TYPE_NEEDS_GUIDING_RESPONSES,
+            improvements_models.TASK_TARGET_TYPE_STATE,
+            'State 2')
+        new_sia_task_id = improvements_models.TaskEntryModel.create(
+            improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
+            'linear_exp_id',
+            2,
+            improvements_models.TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS,
+            improvements_models.TASK_TARGET_TYPE_STATE,
+            'State 2')
+
+        output = self.run_job_and_get_output()
+        self.assertEqual(len(output), 2)
+        self.assertEqual(output[0], ['fully-validated TaskEntryModel', 4])
+        error_key, error_messages = output[1]
+        self.assertEqual(
+            error_key,
+            'failed validation check for target_id field check of '
+            'TaskEntryModel')
+        self.assertItemsEqual(
+            error_messages, [
+                'Entity id %s: exploration with id "linear_exp_id" does not '
+                'have a state named "State 2" at version 2' % (
+                    new_ifl_task_id,),
+                'Entity id %s: exploration with id "linear_exp_id" does not '
+                'have a state named "State 2" at version 2' % (
+                    new_hbr_task_id,),
+                'Entity id %s: exploration with id "linear_exp_id" does not '
+                'have a state named "State 2" at version 2' % (
+                    new_ngr_task_id,),
+                'Entity id %s: exploration with id "linear_exp_id" does not '
+                'have a state named "State 2" at version 2' % (
+                    new_sia_task_id,)
+            ])

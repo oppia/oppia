@@ -60,7 +60,7 @@ class RoleQueryAuditModel(base_models.BaseModel):
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
-        """Check whether RoleQueryAuditModel exist for user.
+        """Check whether RoleQueryAuditModel exists for the given user.
 
         Args:
             user_id: str. The ID of the user whose data should be checked.
@@ -73,9 +73,54 @@ class RoleQueryAuditModel(base_models.BaseModel):
     @staticmethod
     def get_user_id_migration_policy():
         """RoleQueryAuditModel has one field that contains user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.COPY_AND_UPDATE_ONE_FIELD
+
+
+class UsernameChangeAuditModel(base_models.BaseModel):
+    """Records the changes made to usernames via the admin panel.
+
+    Instances of this class are keyed by a custom Id.
+    [committer_id].[timestamp_in_sec]
+    """
+
+    # The ID of the user that is making the change.
+    # (Note that this is typically an admin user, who would be a different user
+    # from the one whose username is being changed.)
+    committer_id = ndb.StringProperty(required=True, indexed=True)
+    # The old username that is being changed.
+    old_username = ndb.StringProperty(required=True, indexed=True)
+    # The new username that the old one is being changed to.
+    new_username = ndb.StringProperty(required=True, indexed=True)
+
+    @staticmethod
+    def get_deletion_policy():
+        """Audit logs are kept for investigation purposes."""
+        return base_models.DELETION_POLICY.KEEP
+
+    @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether UsernameChangeAuditModel exists for the given user.
+
+        Args:
+            user_id: str. The ID of the user who has made the username changes.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return cls.query(
+            cls.committer_id == user_id).get(keys_only=True) is not None
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """UsernameChangeAuditModel has one field that contains user ID."""
         return base_models.USER_ID_MIGRATION_POLICY.ONE_FIELD
 
     @classmethod
     def get_user_id_migration_field(cls):
         """Return field that contains user ID."""
-        return cls.user_id
+        return cls.committer_id

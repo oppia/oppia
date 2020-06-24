@@ -21,6 +21,10 @@
  */
 
 require(
+  'components/common-layout-directives/common-elements/' +
+  'confirm-or-cancel-modal.controller.ts');
+
+require(
   'pages/exploration-player-page/services/current-interaction.service.ts');
 require(
   'interactions/PencilCodeEditor/directives/' +
@@ -55,17 +59,7 @@ angular.module('oppia').directive('oppiaInteractivePencilCodeEditor', [
                 './pencil-code-reset-confirmation.directive.html'),
               backdrop: 'static',
               keyboard: false,
-              controller: [
-                '$scope', '$uibModalInstance',
-                function($scope, $uibModalInstance) {
-                  $scope.cancel = function() {
-                    $uibModalInstance.dismiss();
-                  };
-
-                  $scope.resetCode = function() {
-                    $uibModalInstance.close();
-                  };
-                }]
+              controller: 'ConfirmOrCancelModalController'
             }).result.then(function() {
               pce.setCode(ctrl.initialCode);
             }, function() {
@@ -144,24 +138,29 @@ angular.module('oppia').directive('oppiaInteractivePencilCodeEditor', [
               if (errorIsHappening || hasSubmittedAnswer) {
                 return;
               }
+              // The first argument in the method below gets executed in the
+              // pencilcode output-frame iframe context. The code input by the
+              // user is sanitized by pencilcode so there is no security
+              // issue in this case.
+              pce.eval(
+                'document.body.innerHTML', // disable-bad-pattern-check
+                function(pencilCodeHtml) {
+                  var normalizedCode = getNormalizedCode();
 
-              pce.eval('document.body.innerHTML', function(pencilCodeHtml) {
-                var normalizedCode = getNormalizedCode();
+                  // Get all the divs, and extract their textual content.
+                  var output = $.map(
+                    $(pencilCodeHtml).filter('div'), function(elem) {
+                      return $(elem).text();
+                    }).join('\n');
 
-                // Get all the divs, and extract their textual content.
-                var output = $.map(
-                  $(pencilCodeHtml).filter('div'), function(elem) {
-                    return $(elem).text();
-                  }).join('\n');
-
-                hasSubmittedAnswer = true;
-                CurrentInteractionService.onSubmit({
-                  code: normalizedCode,
-                  output: output || '',
-                  evaluation: '',
-                  error: ''
-                }, PencilCodeEditorRulesService);
-              }, true);
+                  hasSubmittedAnswer = true;
+                  CurrentInteractionService.onSubmit({
+                    code: normalizedCode,
+                    output: output || '',
+                    evaluation: '',
+                    error: ''
+                  }, PencilCodeEditorRulesService);
+                }, true);
             });
 
             pce.on('error', function(error) {

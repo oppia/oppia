@@ -133,6 +133,9 @@ ENTITY_TYPE_SUBTOPIC = 'subtopic'
 ENTITY_TYPE_QUESTION = 'question'
 ENTITY_TYPE_VOICEOVER_APPLICATION = 'voiceover_application'
 
+MAX_TASK_MODELS_PER_FETCH = 25
+MAX_TASK_MODELS_PER_HISTORY_PAGE = 10
+
 # The maximum number of activities allowed in the playlist of the learner. This
 # limit applies to both the explorations playlist and the collections playlist.
 MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT = 10
@@ -174,7 +177,7 @@ CURRENT_DASHBOARD_STATS_SCHEMA_VERSION = 1
 # incompatible changes are made to the states blob schema in the data store,
 # this version number must be changed and the exploration migration job
 # executed.
-CURRENT_STATE_SCHEMA_VERSION = 30
+CURRENT_STATE_SCHEMA_VERSION = 33
 
 # The current version of the all collection blob schemas (such as the nodes
 # structure within the Collection domain object). If any backward-incompatible
@@ -183,7 +186,7 @@ CURRENT_STATE_SCHEMA_VERSION = 30
 CURRENT_COLLECTION_SCHEMA_VERSION = 6
 
 # The current version of story contents dict in the story schema.
-CURRENT_STORY_CONTENTS_SCHEMA_VERSION = 1
+CURRENT_STORY_CONTENTS_SCHEMA_VERSION = 3
 
 # The current version of skill contents dict in the skill schema.
 CURRENT_SKILL_CONTENTS_SCHEMA_VERSION = 1
@@ -192,10 +195,10 @@ CURRENT_SKILL_CONTENTS_SCHEMA_VERSION = 1
 CURRENT_MISCONCEPTIONS_SCHEMA_VERSION = 2
 
 # The current version of rubric dict in the skill schema.
-CURRENT_RUBRIC_SCHEMA_VERSION = 1
+CURRENT_RUBRIC_SCHEMA_VERSION = 2
 
 # The current version of subtopics dict in the topic schema.
-CURRENT_SUBTOPIC_SCHEMA_VERSION = 1
+CURRENT_SUBTOPIC_SCHEMA_VERSION = 2
 
 # The current version of story reference dict in the topic schema.
 CURRENT_STORY_REFERENCE_SCHEMA_VERSION = 1
@@ -305,14 +308,24 @@ DEFAULT_VM_ID = 'vm_default'
 # Shared secret key for default VM.
 DEFAULT_VM_SHARED_SECRET = '1a2b3c4e'
 
+IMAGE_FORMAT_JPEG = 'jpeg'
+IMAGE_FORMAT_PNG = 'png'
+IMAGE_FORMAT_GIF = 'gif'
+IMAGE_FORMAT_SVG = 'svg'
+
 # An array containing the accepted image formats (as determined by the imghdr
 # module) and the corresponding allowed extensions in the filenames of uploaded
 # images.
 ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS = {
-    'jpeg': ['jpg', 'jpeg'],
-    'png': ['png'],
-    'gif': ['gif'],
+    IMAGE_FORMAT_JPEG: ['jpg', 'jpeg'],
+    IMAGE_FORMAT_PNG: ['png'],
+    IMAGE_FORMAT_GIF: ['gif'],
+    IMAGE_FORMAT_SVG: ['svg']
 }
+
+# An array containing the image formats that can be compressed.
+COMPRESSIBLE_IMAGE_FORMATS = [
+    IMAGE_FORMAT_JPEG, IMAGE_FORMAT_PNG, IMAGE_FORMAT_GIF]
 
 # An array containing the accepted audio extensions for uploaded files and
 # the corresponding MIME types.
@@ -445,6 +458,7 @@ EMAIL_INTENT_UNPUBLISH_EXPLORATION = 'unpublish_exploration'
 EMAIL_INTENT_DELETE_EXPLORATION = 'delete_exploration'
 EMAIL_INTENT_QUERY_STATUS_NOTIFICATION = 'query_status_notification'
 EMAIL_INTENT_ONBOARD_REVIEWER = 'onboard_reviewer'
+EMAIL_INTENT_REMOVE_REVIEWER = 'remove_reviewer'
 EMAIL_INTENT_REVIEW_SUGGESTIONS = 'review_suggestions'
 EMAIL_INTENT_VOICEOVER_APPLICATION_UPDATES = 'voiceover_application_updates'
 EMAIL_INTENT_ACCOUNT_DELETED = 'account_deleted'
@@ -500,9 +514,6 @@ MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME = 20
 # category.
 MINIMUM_SCORE_REQUIRED_TO_REVIEW = 10
 
-# The number of medium question skill difficulty.
-MEDIUM_SKILL_DIFFICULTY = 0.6
-
 # The maximum number of skills to be requested at one time when fetching
 # questions.
 MAX_NUMBER_OF_SKILL_IDS = 20
@@ -544,6 +555,9 @@ ALLOWED_RTE_EXTENSIONS = {
     },
     'Math': {
         'dir': os.path.join(RTE_EXTENSIONS_DIR, 'Math')
+    },
+    'Svgdiagram': {
+        'dir': os.path.join(RTE_EXTENSIONS_DIR, 'svgdiagram')
     },
     'Tabs': {
         'dir': os.path.join(RTE_EXTENSIONS_DIR, 'Tabs')
@@ -628,7 +642,6 @@ TASK_URL_SUGGESTION_EMAILS = (
 # TODO(sll): Add all other URLs here.
 ADMIN_URL = '/admin'
 ADMIN_ROLE_HANDLER_URL = '/adminrolehandler'
-CLASSROOM_URL_PREFIX = '/classroom'
 CLASSROOM_DATA_HANDLER = '/classroom_data_handler'
 COLLECTION_DATA_URL_PREFIX = '/collection_handler/data'
 COLLECTION_EDITOR_DATA_URL_PREFIX = '/collection_editor_handler/data'
@@ -638,11 +651,11 @@ COLLECTION_PUBLISH_PREFIX = '/collection_editor_handler/publish'
 COLLECTION_UNPUBLISH_PREFIX = '/collection_editor_handler/unpublish'
 COLLECTION_EDITOR_URL_PREFIX = '/collection_editor/create'
 COLLECTION_URL_PREFIX = '/collection'
-COMMUNITY_DASHBOARD_URL = '/community_dashboard'
 COMMUNITY_OPPORTUNITIES_DATA_URL = '/opportunitiessummaryhandler'
+COMMUNITY_DASHBOARD_URL = '/community-dashboard'
 CONCEPT_CARD_DATA_URL_PREFIX = '/concept_card_handler'
 CREATOR_DASHBOARD_DATA_URL = '/creatordashboardhandler/data'
-CREATOR_DASHBOARD_URL = '/creator_dashboard'
+CREATOR_DASHBOARD_URL = '/creator-dashboard'
 CSRF_HANDLER_URL = '/csrfhandler'
 CUSTOM_NONPROFITS_LANDING_PAGE_URL = '/nonprofits'
 CUSTOM_PARENTS_LANDING_PAGE_URL = '/parents'
@@ -672,23 +685,22 @@ FEEDBACK_THREAD_VIEW_EVENT_URL = '/feedbackhandler/thread_view_event'
 FETCH_SKILLS_URL_PREFIX = '/fetch_skills'
 FLAG_EXPLORATION_URL_PREFIX = '/flagexplorationhandler'
 FRACTIONS_LANDING_PAGE_URL = '/fractions'
-TOPIC_LANDING_PAGE_URL = '/learn/<subject>/<topic>'
 LEARNER_ANSWER_INFO_HANDLER_URL = (
     '/learneranswerinfohandler/learner_answer_details')
 LEARNER_ANSWER_DETAILS_SUBMIT_URL = '/learneranswerdetailshandler'
-LEARNER_DASHBOARD_URL = '/learner_dashboard'
+LEARNER_DASHBOARD_URL = '/learner-dashboard'
 LEARNER_DASHBOARD_DATA_URL = '/learnerdashboardhandler/data'
 LEARNER_DASHBOARD_IDS_DATA_URL = '/learnerdashboardidshandler/data'
 LEARNER_DASHBOARD_FEEDBACK_THREAD_DATA_URL = '/learnerdashboardthreadhandler'
 LEARNER_PLAYLIST_DATA_URL = '/learnerplaylistactivityhandler'
 LEARNER_INCOMPLETE_ACTIVITY_DATA_URL = '/learnerincompleteactivityhandler'
 LIBRARY_GROUP_DATA_URL = '/librarygrouphandler'
-LIBRARY_INDEX_URL = '/library'
+LIBRARY_INDEX_URL = '/community-library'
 LIBRARY_INDEX_DATA_URL = '/libraryindexhandler'
-LIBRARY_RECENTLY_PUBLISHED_URL = '/library/recently_published'
+LIBRARY_RECENTLY_PUBLISHED_URL = '/community-library/recently-published'
 LIBRARY_SEARCH_URL = '/search/find'
 LIBRARY_SEARCH_DATA_URL = '/searchhandler/data'
-LIBRARY_TOP_RATED_URL = '/library/top_rated'
+LIBRARY_TOP_RATED_URL = '/community-library/top-rated'
 MERGE_SKILLS_URL = '/merge_skills_handler'
 NEW_COLLECTION_URL = '/collection_editor_handler/create_new'
 NEW_EXPLORATION_URL = '/contributehandler/create_new'
@@ -697,7 +709,7 @@ NEW_SKILL_URL = '/skill_editor_handler/create_new'
 TOPIC_EDITOR_STORY_URL = '/topic_editor_story_handler'
 TOPIC_EDITOR_QUESTION_URL = '/topic_editor_question_handler'
 NEW_TOPIC_URL = '/topic_editor_handler/create_new'
-NOTIFICATIONS_DASHBOARD_URL = '/notifications_dashboard'
+NOTIFICATIONS_DASHBOARD_URL = '/notifications'
 PREFERENCES_URL = '/preferences'
 PRACTICE_SESSION_URL_PREFIX = '/practice_session'
 PRACTICE_SESSION_DATA_URL_PREFIX = '/practice_session/data'
@@ -710,6 +722,7 @@ RECENT_COMMITS_DATA_URL = '/recentcommitshandler/recent_commits'
 RECENT_FEEDBACK_MESSAGES_DATA_URL = '/recent_feedback_messages'
 DELETE_ACCOUNT_URL = '/delete-account'
 DELETE_ACCOUNT_HANDLER_URL = '/delete-account-handler'
+EXPORT_ACCOUNT_HANDLER_URL = '/export-account-handler'
 PENDING_ACCOUNT_DELETION_URL = '/pending-account-deletion'
 REVIEW_TEST_DATA_URL_PREFIX = '/review_test_handler/data'
 REVIEW_TEST_URL_PREFIX = '/review_test'
@@ -723,7 +736,6 @@ SKILL_EDITOR_URL_PREFIX = '/skill_editor'
 SKILL_EDITOR_QUESTION_URL = '/skill_editor_question_handler'
 SKILL_MASTERY_DATA_URL = '/skill_mastery_handler/data'
 SKILL_RIGHTS_URL_PREFIX = '/skill_editor_handler/rights'
-SPLASH_URL = '/splash'
 STORY_DATA_HANDLER = '/story_data_handler'
 STORY_EDITOR_URL_PREFIX = '/story_editor'
 STORY_EDITOR_DATA_URL_PREFIX = '/story_editor_handler/data'
@@ -745,12 +757,13 @@ TOPIC_RIGHTS_URL_PREFIX = '/rightshandler/get_topic_rights'
 TOPIC_SEND_MAIL_URL_PREFIX = '/rightshandler/send_topic_publish_mail'
 TOPIC_STATUS_URL_PREFIX = '/rightshandler/change_topic_status'
 TOPICS_AND_SKILLS_DASHBOARD_DATA_URL = '/topics_and_skills_dashboard/data'
-TOPICS_AND_SKILLS_DASHBOARD_URL = '/topics_and_skills_dashboard'
+TOPICS_AND_SKILLS_DASHBOARD_URL = '/topics-and-skills-dashboard'
 UNSUBSCRIBE_URL_PREFIX = '/unsubscribehandler'
 UPLOAD_EXPLORATION_URL = '/contributehandler/upload'
 USER_EXPLORATION_EMAILS_PREFIX = '/createhandler/notificationpreferences'
 USER_PERMISSIONS_URL_PREFIX = '/createhandler/permissions'
 USERNAME_CHECK_DATA_URL = '/usernamehandler/data'
+VALIDATE_STORY_EXPLORATIONS_URL_PREFIX = '/validate_story_explorations'
 
 # Event types.
 EVENT_TYPE_ALL_STATS = 'all_stats'
@@ -793,8 +806,6 @@ TOP_UNRESOLVED_ANSWERS_COUNT_DASHBOARD = 3
 OPEN_FEEDBACK_COUNT_DASHBOARD = 3
 # NOTE TO DEVELOPERS: This should be synchronized with App.js.
 ENABLE_ML_CLASSIFIERS = False
-SHOW_COLLECTION_NAVIGATION_TAB_HISTORY = False
-SHOW_COLLECTION_NAVIGATION_TAB_STATS = False
 
 # The regular expression used to identify whether a string contains float value.
 # The regex must match with regex that is stored in vmconf.py file of Oppia-ml.
@@ -845,25 +856,13 @@ LIBRARY_CATEGORY_RECENTLY_PUBLISHED = 'I18N_LIBRARY_GROUPS_RECENTLY_PUBLISHED'
 
 # The group name that appears at the end of the url for the recently published
 # page.
-LIBRARY_GROUP_RECENTLY_PUBLISHED = 'recently_published'
+LIBRARY_GROUP_RECENTLY_PUBLISHED = 'recently-published'
 # The group name that appears at the end of the url for the top rated page.
-LIBRARY_GROUP_TOP_RATED = 'top_rated'
+LIBRARY_GROUP_TOP_RATED = 'top-rated'
 
 # Defaults for topic similarities.
 DEFAULT_TOPIC_SIMILARITY = 0.5
 SAME_TOPIC_SIMILARITY = 1.0
-
-# The following are all page descriptions for the meta tag.
-CREATE_PAGE_DESCRIPTION = (
-    'Help others learn new things. Create lessons through explorations and '
-    'share your knowledge with the community.')
-CREATOR_DASHBOARD_PAGE_DESCRIPTION = (
-    'Keep track of the lessons you have created, as well as feedback from '
-    'learners.')
-LIBRARY_GROUP_PAGE_DESCRIPTION = (
-    'Discover top-rated or recently-published explorations on Oppia. Learn '
-    'from these explorations or help improve an existing one for the '
-    'community.')
 
 # The type of the response returned by a handler when an exception is raised.
 HANDLER_TYPE_HTML = 'html'
@@ -885,8 +884,8 @@ ROLE_ACTION_UPDATE = 'update'
 ROLE_ACTION_VIEW_BY_USERNAME = 'view_by_username'
 ROLE_ACTION_VIEW_BY_ROLE = 'view_by_role'
 
-VIEW_METHOD_ROLE = 'role'
-VIEW_METHOD_USERNAME = 'username'
+USER_FILTER_CRITERION_ROLE = 'role'
+USER_FILTER_CRITERION_USERNAME = 'username'
 
 QUESTION_BATCH_SIZE = 10
 
@@ -915,7 +914,8 @@ RTE_CONTENT_SPEC = {
             'oppia-noninteractive-image': ['b', 'i', 'li', 'p', 'pre'],
             'oppia-noninteractive-collapsible': ['b', 'i', 'li', 'p', 'pre'],
             'oppia-noninteractive-video': ['b', 'i', 'li', 'p', 'pre'],
-            'oppia-noninteractive-tabs': ['b', 'i', 'li', 'p', 'pre']
+            'oppia-noninteractive-tabs': ['b', 'i', 'li', 'p', 'pre'],
+            'oppia-noninteractive-svgdiagram': ['b', 'i', 'li', 'p', 'pre']
         },
         # Valid html tags in TextAngular.
         'ALLOWED_TAG_LIST': [
@@ -933,7 +933,8 @@ RTE_CONTENT_SPEC = {
             'oppia-noninteractive-image',
             'oppia-noninteractive-collapsible',
             'oppia-noninteractive-video',
-            'oppia-noninteractive-tabs'
+            'oppia-noninteractive-tabs',
+            'oppia-noninteractive-svgdiagram'
         ]
     },
     'RTE_TYPE_CKEDITOR': {
@@ -951,6 +952,9 @@ RTE_CONTENT_SPEC = {
             'oppia-noninteractive-link': ['strong', 'em', 'li', 'p', 'pre'],
             'oppia-noninteractive-math': ['strong', 'em', 'li', 'p', 'pre'],
             'oppia-noninteractive-image': ['blockquote', 'li', '[document]'],
+            'oppia-noninteractive-svgdiagram': [
+                'blockquote', 'li', '[document]'
+            ],
             'oppia-noninteractive-collapsible': [
                 'blockquote', 'li', '[document]'
             ],
@@ -973,7 +977,8 @@ RTE_CONTENT_SPEC = {
             'oppia-noninteractive-image',
             'oppia-noninteractive-collapsible',
             'oppia-noninteractive-video',
-            'oppia-noninteractive-tabs'
+            'oppia-noninteractive-tabs',
+            'oppia-noninteractive-svgdiagram'
         ]
 
     }
@@ -983,7 +988,11 @@ RTE_CONTENT_SPEC = {
 # of topics as the value.
 # Note: This dict needs to be keep in sync with frontend TOPIC_LANDING_PAGE_DATA
 # oppia constant defined in
-# core/templates/dev/head/pages/landing-pages/TopicLandingPage.js file.
+# core/templates/pages/landing-pages/TopicLandingPage.js file.
 AVAILABLE_LANDING_PAGES = {
-    'maths': ['fractions', 'negative-numbers', 'ratios']
+    'math': ['fractions', 'negative-numbers', 'ratios']
 }
+
+# Classroom page names for generating URLs. These need to be kept in sync with
+# TOPIC_IDS_FOR_CLASSROOM_PAGES property in config_domain.
+CLASSROOM_PAGES = ['math']

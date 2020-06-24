@@ -29,12 +29,11 @@ import { Outcome, OutcomeObjectFactory } from
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 
 import { AppConstants } from 'app.constants';
+import { WARNING_TYPES_CONSTANT } from 'app-type.constants';
 
 describe('ItemSelectionInputValidationService', () => {
-  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'WARNING_TYPES' is a constant and its type needs to be
-  // preferably in the constants file itself.
-  let WARNING_TYPES: any, validatorService: ItemSelectionInputValidationService;
+  let WARNING_TYPES: WARNING_TYPES_CONSTANT;
+  let validatorService: ItemSelectionInputValidationService;
 
   let currentState: string = null;
   let goodAnswerGroups: AnswerGroup[] = null,
@@ -66,7 +65,7 @@ describe('ItemSelectionInputValidationService', () => {
       dest: 'Second State',
       feedback: {
         html: 'Feedback',
-        audio_translations: {}
+        content_id: ''
       },
       labelled_as_correct: false,
       param_changes: [],
@@ -93,7 +92,7 @@ describe('ItemSelectionInputValidationService', () => {
         }
       })],
       goodDefaultOutcome,
-      false,
+      null,
       null)
     ];
     ThreeInputsAnswerGroups = [agof.createNew(
@@ -104,7 +103,7 @@ describe('ItemSelectionInputValidationService', () => {
         }
       })],
       goodDefaultOutcome,
-      false,
+      null,
       null)
     ];
     OneInputAnswerGroups = [agof.createNew(
@@ -115,7 +114,7 @@ describe('ItemSelectionInputValidationService', () => {
         }
       })],
       goodDefaultOutcome,
-      false,
+      null,
       null)
     ];
     NoInputAnswerGroups = [agof.createNew(
@@ -126,7 +125,7 @@ describe('ItemSelectionInputValidationService', () => {
         }
       })],
       goodDefaultOutcome,
-      false,
+      null,
       null)
     ];
     IsProperSubsetValidOption = [agof.createNew(
@@ -137,7 +136,7 @@ describe('ItemSelectionInputValidationService', () => {
         }
       })],
       goodDefaultOutcome,
-      false,
+      null,
       null)
     ];
   });
@@ -153,7 +152,8 @@ describe('ItemSelectionInputValidationService', () => {
     expect(() => {
       validatorService.getAllWarnings(
         currentState, {}, goodAnswerGroups, goodDefaultOutcome);
-    }).toThrow('Expected customization arguments to have property: choices');
+    }).toThrowError(
+      'Expected customization arguments to have property: choices');
   });
 
   it(
