@@ -24,7 +24,7 @@ import { Injectable } from '@angular/core';
 export interface ITopicRightsBackendDict {
   'topic_id': number,
   'topic_is_published': boolean,
-  'manager_ids': Array<string>
+  'manager_ids': string[]
 }
 
 export class TopicRightsResponseData {
