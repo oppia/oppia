@@ -27,7 +27,7 @@ var logicProofShared = (function() {
   // typings of an expression considered.
   var MAX_NUM_TYPINGS_PERMITTED = 1000;
 
-  // ERROR-HANDLING
+  // ---- ERROR-HANDLING ----
 
   // UserErrors have codes that refer to entries in the errorDictionary (which
   // is either logicProofData.BASE_GENERAL_MESSAGES or
@@ -112,7 +112,7 @@ var logicProofShared = (function() {
     }
   };
 
-  // DISPLAY
+  // ---- DISPLAY ----
 
   /**
    * @param {Expression} expression - an Expression, which is to be displayed
@@ -208,7 +208,7 @@ var logicProofShared = (function() {
     return processedArray.join(', ');
   };
 
-  // PARSING
+  // ---- PARSING ----
 
   /**
    * This function checks whether the string contains any symbol that occurs
@@ -482,7 +482,7 @@ var logicProofShared = (function() {
     }
   };
 
-  // TYPING ASSIGNMENT
+  // ---- TYPING ASSIGNMENT ----
 
   /**
    * This takes an array of TypingElements and converts it into an array of
@@ -848,7 +848,7 @@ var logicProofShared = (function() {
     }
   };
 
-  // UTILITIES
+  // ---- UTILITIES ----
 
   // Expressions with different dummy variables are considered different.
   var checkExpressionsAreEqual = function(expression1, expression2) {

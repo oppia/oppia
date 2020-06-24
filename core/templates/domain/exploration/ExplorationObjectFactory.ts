@@ -58,7 +58,7 @@ export class Exploration {
     this.urlInterpolationService = urlInterpolationService;
   }
 
-  // Instance methods
+  // ---- Instance methods ----
   isStateTerminal(stateName: string): boolean {
     return (
       stateName && this.getInteractionId(stateName) &&

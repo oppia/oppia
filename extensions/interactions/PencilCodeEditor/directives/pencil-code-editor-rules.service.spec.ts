@@ -75,7 +75,7 @@ describe('Pencil Code Editor rules service', () => {
         )
       }, RULE_INPUT)).toBe(true);
 
-      // Tab character
+      // ---- Tab character ----
       expect(pcers.CodeEquals({
         code: (
           'def x(): \t\n' +

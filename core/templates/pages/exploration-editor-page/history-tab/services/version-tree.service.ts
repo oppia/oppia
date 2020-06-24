@@ -112,7 +112,7 @@ export class VersionTreeService {
     pathToV2.push(1);
     pathToV2.reverse();
 
-    // Compare paths
+    // ---- Compare paths ----
     var maxIndex = Math.min(pathToV1.length, pathToV2.length) - 1;
     var lca = null;
     for (var i = maxIndex; i >= 0; i--) {

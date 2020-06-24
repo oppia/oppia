@@ -884,7 +884,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                         continue
 
                     if (
-                            line.startswith('//') and len(line.split()) <= 3
+                            line.startswith('//') and line.endswith('-')
                             and not (
                                 next_line.startswith('//') and
                                 previous_line.startswith('//'))):
@@ -902,6 +902,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                                 'the end of the comment.' % (
                                     filepath, line_num + 1))
                             summary_messages.append(summary_message)
+                            python_utils.PRINT(summary_message)
                             python_utils.PRINT('')
 
             if failed:

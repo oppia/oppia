@@ -348,7 +348,7 @@ exports.config = {
     reporter: 'list'
   },
 
-  // ----- Options to be passed to cucumber -----.
+  // ----- Options to be passed to cucumber -----
   cucumberOpts: {
     // Require files before executing the features.
     require: 'cucumber/stepDefinitions.js',
