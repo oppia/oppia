@@ -212,7 +212,6 @@ angular.module('oppia').component('preferencesPage', {
           ctrl.subscriptionList = data.subscription_list;
           ctrl.hasPageLoaded = true;
           _forceSelect2Refresh();
-        }).then(null, function onError(response) {
         });
 
         $q.all([userInfoPromise, preferencesPromise]).then(function() {
