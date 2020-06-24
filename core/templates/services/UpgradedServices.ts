@@ -612,6 +612,7 @@ export class UpgradedServices {
     upgradedServices['FractionObjectFactory'] = new FractionObjectFactory();
     upgradedServices['GenerateContentIdService'] =
       new GenerateContentIdService();
+    upgradedServices['GraphDetailService'] = new GraphDetailService();
     upgradedServices['GraphUtilsService'] = new GraphUtilsService();
     upgradedServices['GuestCollectionProgressObjectFactory'] =
       new GuestCollectionProgressObjectFactory();
@@ -950,7 +951,7 @@ export class UpgradedServices {
     upgradedServices['LearnerDashboardBackendApiService'] =
       new LearnerDashboardBackendApiService(upgradedServices['HttpClient']);
     upgradedServices['NumberWithUnitsValidationService'] =
-      new NumberWithUnitsObjectFactory(
+      new NumberWithUnitsValidationService(
         upgradedServices['NumberWithUnitsObjectFactory'],
         upgradedServices['baseInteractionValidationService']);
     upgradedServices['ParamSpecsObjectFactory'] = new ParamSpecsObjectFactory(

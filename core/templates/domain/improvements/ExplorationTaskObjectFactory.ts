@@ -68,7 +68,7 @@ export class ExplorationTaskObjectFactory {
       default:
         throw new Error(
           'Backend dict does not match any known task type: ' +
-          angular.toJson(backendDict));
+          JSON.stringify(backendDict));
     }
   }
 }
