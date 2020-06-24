@@ -502,7 +502,7 @@ def get_font_filepaths(dependency_bundle, dependency_dir):
         dependency_bundle: dict(str, list(str) | str). The dict has three keys:
             - 'js': List of paths to js files that need to be copied.
             - 'css': List of paths to css files that need to be copied.
-            - 'fontsPath'. Path to folder containing fonts that need to be
+            - 'fontsPath': Path to folder containing fonts that need to be
                 copied.
         dependency_dir: str. Path to directory where the files that need to
             be copied are located.
@@ -1052,10 +1052,10 @@ def generate_build_tasks_to_build_directory(dirnames_dict):
     Args:
         dirnames_dict: dict(str, str). This dict should contain three keys,
             with corresponding values as follows:
-            - 'dev_dir'. the directory that contains source files to be built.
-            - 'staging_dir'. the directory that contains minified files waiting
+            - 'dev_dir': the directory that contains source files to be built.
+            - 'staging_dir': the directory that contains minified files waiting
                 for final copy process.
-            - 'out_dir'. the final directory that contains built files with hash
+            - 'out_dir': the final directory that contains built files with hash
                 inserted into filenames.
 
     Returns:

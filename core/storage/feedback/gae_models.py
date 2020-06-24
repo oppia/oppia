@@ -485,7 +485,7 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
                 of the full list of messages.
 
         Returns:
-            3-tuple (results, cursor, more). where:
+            3-tuple (results, cursor, more). Where:
                 results: List of query results.
                 cursor: str or None. A query cursor pointing to the next
                     batch of results. If there are no more results, this might
@@ -544,7 +544,7 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
     @classmethod
     def generate_full_id(cls, user_id, thread_id):
         """Generates the full message id of the format:
-        <user_id.thread_id>.
+            <user_id.thread_id>.
 
         Args:
             user_id: str. The user id.

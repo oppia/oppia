@@ -103,8 +103,8 @@ def returns_something(return_node):
         return_node: astroid.Return. The return node to check.
 
     Returns:
-        bool. True if the return node returns a value
-        other than None, False otherwise.
+        bool. True if the return node returns a value other than None, False
+        otherwise.
     """
     returns = return_node.value
 

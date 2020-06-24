@@ -637,7 +637,7 @@ class Collection(python_utils.OBJECT):
             current_version: int. The current collection schema version.
 
         Raises:
-            Exception: The value of the key 'schema_version' in
+            Exception: The value of the key 'schema_version' in 
                 versioned_collection_contents is not valid.
         """
         if (versioned_collection_contents['schema_version'] + 1 >
@@ -673,8 +673,8 @@ class Collection(python_utils.OBJECT):
            the collection is empty, returns None.
 
         Returns:
-            str|None. The exploration ID of the first node,
-            or None if the collection is empty.
+            str|None. The exploration ID of the first node, or None if the
+            collection is empty.
         """
         if len(self.nodes) > 0:
             return self.nodes[0].exploration_id

@@ -809,7 +809,7 @@ def create_multi_user_skill_mastery(user_id, degrees_of_mastery):
 
     Args:
         user_id: str. The user ID of the user.
-        degrees_of_mastery: dict(str, float). The keys are the requested
+        dict(str, float). The keys are the requested
             skill IDs. The values are the corresponding mastery degree of
             the user.
     """
@@ -833,7 +833,7 @@ def get_user_skill_mastery(user_id, skill_id):
             requested.
 
     Returns:
-        degree_of_mastery: float or None. Mastery degree of the user for the
+        (float or None). Mastery degree of the user for the
         requested skill, or None if UserSkillMasteryModel does not exist
         for the skill.
     """
@@ -856,7 +856,7 @@ def get_multi_user_skill_mastery(user_id, skill_ids):
             requested.
 
     Returns:
-        degrees_of_mastery: dict(str, float|None). The keys are the requested
+        dict(str, float|None). The keys are the requested
         skill IDs. The values are the corresponding mastery degree of
         the user or None if UserSkillMasteryModel does not exist for the
         skill.
