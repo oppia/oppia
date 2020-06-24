@@ -199,12 +199,12 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             pylint_extensions.DocstringParameterChecker)
         self.checker_test_object.setup_method()
 
-    def test_check_arg_formatting_docstring(self):
+    def test_checks_args_formatting_docstring(self):
         self.checker_test_object = testutils.CheckerTestCase()
         self.checker_test_object.CHECKER_CLASS = (
             pylint_extensions.DocstringParameterChecker)
         self.checker_test_object.setup_method()
-        invalid_param_func_node = astroid.extract_node("""
+        invalid_args_description_node = astroid.extract_node("""
         def func(test_var_one, test_var_two): #@
             \"\"\"Function to test docstring parameters.
 
@@ -221,13 +221,13 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         """)
         with self.checker_test_object.assertAddsMessages(
             testutils.Message(
-                msg_id='eight-space-indentation-for-arg-descriptions-doc',
-                node=invalid_param_func_node,
+                msg_id='8-space-indentation-for-arg-in-descriptions-doc',
+                node=invalid_args_description_node,
                 args='Incorrect'
             ),
         ):
             self.checker_test_object.checker.visit_functiondef(
-                invalid_param_func_node)
+                invalid_args_description_node)
         invalid_param_indentation_node = astroid.extract_node("""
         def func(test_var_one): #@
             \"\"\"Function to test docstring parameters.
@@ -243,7 +243,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         """)
         with self.checker_test_object.assertAddsMessages(
             testutils.Message(
-                msg_id='four-space-indentation-for-arg-parameters-doc',
+                msg_id='4-space-indentation-for-arg-parameters-doc',
                 node=invalid_param_indentation_node,
                 args='test_var_one:'
             ),
@@ -566,7 +566,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
                 args=('invalid_var_name',),
             ),
             testutils.Message(
-                msg_id='eight-space-indentation-for-arg-descriptions-doc',
+                msg_id='8-space-indentation-for-arg-in-descriptions-doc',
                 node=missing_param_func_node,
                 args='invalid_var_name:'
             ),
@@ -2054,8 +2054,8 @@ class DocstringCheckerTests(unittest.TestCase):
         with self.checker_test_object.assertAddsMessages(message):
             temp_file.close()
 
-    def test_no_four_space_indentation_in_args_docstring(self):
-        no_indentation_in_args = astroid.scoped_nodes.Module(
+    def test_invalid_parameter_indentation_in_docstring(self):
+        raises_invalid_indentation_node = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test')
         temp_file = tempfile.NamedTemporaryFile()
@@ -2070,20 +2070,20 @@ class DocstringCheckerTests(unittest.TestCase):
                         \"\"\"
                         Something
                 """)
-        no_indentation_in_args.file = filename
-        no_indentation_in_args.path = filename
+        raises_invalid_indentation_node.file = filename
+        raises_invalid_indentation_node.path = filename
 
-        self.checker_test_object.checker.process_module(no_indentation_in_args)
+        self.checker_test_object.checker.process_module(raises_invalid_indentation_node)
 
         message = testutils.Message(
-            msg_id='four-space-indentation-in-docstring',
+            msg_id='4-space-indentation-in-docstring',
             line=4)
 
         with self.checker_test_object.assertAddsMessages(message):
             temp_file.close()
 
-    def test_no_eight_space_indentation_in_raises_docstring(self):
-        no_eight_space_indentation_in_args = astroid.scoped_nodes.Module(
+    def test_invalid_description_indentation_docstring(self):
+        invalid_description_indentation_node = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test')
         temp_file = tempfile.NamedTemporaryFile()
@@ -2099,14 +2099,14 @@ class DocstringCheckerTests(unittest.TestCase):
                         \"\"\"
                         Something
                 """)
-        no_eight_space_indentation_in_args.file = filename
-        no_eight_space_indentation_in_args.path = filename
+        invalid_description_indentation_node.file = filename
+        invalid_description_indentation_node.path = filename
 
         self.checker_test_object.checker.process_module(
-            no_eight_space_indentation_in_args)
+            invalid_description_indentation_node)
 
         message = testutils.Message(
-            msg_id='eight-space-indentation-in-docstring',
+            msg_id='8-space-indentation-in-docstring',
             line=5)
 
         with self.checker_test_object.assertAddsMessages(message):
@@ -2123,10 +2123,10 @@ class DocstringCheckerTests(unittest.TestCase):
                         Something
                 """)
         message = testutils.Message(
-            msg_id='four-space-indentation-in-docstring',
+            msg_id='4-space-indentation-in-docstring',
             line=5)
         self.checker_test_object.checker.process_module(
-            no_eight_space_indentation_in_args)
+            invalid_description_indentation_node)
         with self.checker_test_object.assertAddsMessages(message):
             temp_file.close()
 
