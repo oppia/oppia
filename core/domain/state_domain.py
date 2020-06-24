@@ -381,7 +381,7 @@ class Solution(python_utils.OBJECT):
         self.explanation.validate()
 
     @staticmethod
-    def convert_html_in_solution(solution_dict, conversion_fn):
+    def convert_html_in_solution(interaction_id, solution_dict, conversion_fn):
         """Checks for HTML fields in a solution and convert it according
         to the conversion function.
 
@@ -393,8 +393,45 @@ class Solution(python_utils.OBJECT):
         Returns:
             dict. The converted Solution dict.
         """
+        if interaction_id is None:
+            return solution_dict
+
+        interaction = (
+            interaction_registry.Registry.get_interaction_by_id(
+                interaction_id))
+
         solution_dict['explanation']['html'] = (
             conversion_fn(solution_dict['explanation']['html']))
+
+        if interaction.can_have_solution:
+            html_field_types_to_rule_specs_dict = json.loads(
+                utils.get_file_contents(
+                    feconf.HTML_FIELD_TYPES_TO_RULE_SPECS_FILE_PATH))
+
+            if solution_dict['correct_answer']:
+                for html_type in html_field_types_to_rule_specs_dict.keys():
+                    if html_type == interaction.answer_type:
+                        if (
+                                html_type ==
+                                feconf.ANSWER_TYPE_LIST_OF_SETS_OF_HTML):
+                            for list_index, html_list in enumerate(
+                                    solution_dict['correct_answer']):
+                                for answer_html_index, answer_html in enumerate(
+                                        html_list):
+                                    solution_dict['correct_answer'][list_index][
+                                        answer_html_index] = (
+                                            conversion_fn(answer_html))
+                        elif html_type == feconf.ANSWER_TYPE_SET_OF_HTML:
+                            for answer_html_index, answer_html in enumerate(
+                                    solution_dict['correct_answer']):
+                                solution_dict['correct_answer'][
+                                    answer_html_index] = (
+                                        conversion_fn(answer_html))
+                        else:
+                            raise Exception(
+                                'The solution does not have a valid '
+                                'correct_answer type.')
+
         return solution_dict
 
 
@@ -2400,6 +2437,7 @@ class State(python_utils.OBJECT):
         if state_dict['interaction']['solution']:
             state_dict['interaction']['solution'] = (
                 Solution.convert_html_in_solution(
+                    state_dict['interaction']['id'],
                     state_dict['interaction']['solution'], conversion_fn))
 
         if state_dict['interaction']['id'] in (
