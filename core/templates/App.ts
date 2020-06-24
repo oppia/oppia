@@ -89,6 +89,10 @@ import { IModule } from 'angular';
 
 
 const sourceMappedStackTrace = require('sourcemapped-stacktrace');
+
+// Creating an interface that extends IModule and has an extra field
+// called provideValueAfterBootstrap. This is a function that will be
+// used to provide angular services to ajs after bootstrap.
 interface CustomOppiaModule extends IModule {
   provideValueAfterBootstrap: Function;
 }

@@ -18,7 +18,11 @@
 
 /**
  * No changes should be made to this file. Treat this as a read-only
- * file. This is just to provide angular2+ services to 8 specs listed below:
+ * file. This is just to provide angular2+ services to 10 specs listed below.
+ * No more specs should be added to the list. The only edit that is allowed
+ * to this file is removing the file names from list.
+ *
+ * Filenames:
  *   01. stewards-landing-page.component.spec.ts
  *   02. topic-landing-page.component.spec.ts
  *   03. notifications-dashboard-page.component.spec.ts
