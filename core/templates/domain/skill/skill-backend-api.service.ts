@@ -27,25 +27,25 @@ import cloneDeep from 'lodash/cloneDeep';
 
 
 export interface ISkillUpdatePayload {
-  version: number,
-  commitMessage: string,
-  changeDicts: Array<IChangeDict>
+  'version': number,
+  'commitMessage': string,
+  'changeDicts': Array<IChangeDict>
 }
 
 export interface IChangeDict {
-  cmd?: string;
-  propertyName?: string;
-  oldValue?: string;
-  newValue?: string;
+  'cmd'?: string;
+  'propertyName'?: string;
+  'oldValue'?: string;
+  'newValue'?: string;
 }
 
 export interface ISkillResponse {
-  skill: Object;
-  grouped_skill_summaries: Object;
+  'skill': Object;
+  'grouped_skill_summaries': Object;
 }
 
 export interface IMultiSkillsResponse {
-  skills: Object;
+  'skills': Object;
 }
 
 @Injectable ({
