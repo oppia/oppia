@@ -130,13 +130,13 @@ def assert_same_list_elements(phrases, stdout):
 
     Args:
         phrases: list(str). A list of phrases we are trying to find in
-        one of the stdout outputs. For example, python linting
-        outputs a success string that includes data we don't have easy
-        access to, like how long the test took, so we may want to search
-        for a substring of that success string in stdout.
+            one of the stdout outputs. For example, python linting
+            outputs a success string that includes data we don't have easy
+            access to, like how long the test took, so we may want to search
+            for a substring of that success string in stdout.
 
         stdout: list(str). A list of the output results from the
-        method's execution.
+            method's execution.
 
     Returns:
         bool. True if and only if all of the phrases appear in at least
