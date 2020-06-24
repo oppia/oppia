@@ -204,7 +204,7 @@ var createAndPublishTwoCardExploration = async function(
   await publishExploration();
 };
 
-// Role management (state editor settings tab).
+// ---- Role management (state editor settings tab) ----
 
 // Here, 'roleName' is the user-visible form of the role name (e.g. 'Manager').
 var _addExplorationRole = async function(roleName, username) {

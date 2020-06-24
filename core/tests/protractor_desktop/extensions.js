@@ -50,7 +50,7 @@ describe('rich-text components', function() {
     await explorationEditorMainTab.setContent(async function(richTextEditor) {
       await richTextEditor.appendBoldText('bold');
       await richTextEditor.appendPlainText(' ');
-      // TODO(Jacob): add test for image RTE component.
+      // TODO(Jacob): Add test for image RTE component.
       await richTextEditor.addRteComponent('Link', 'http://google.com/', true);
       await richTextEditor.addRteComponent('Math', 'abc');
       await richTextEditor.addRteComponent(

@@ -435,7 +435,7 @@ var expectRichText = function(elem) {
     // We select all top-level non-paragraph elements, as well as all children
     // of paragraph elements. (Note that it is possible for <p> elements to
     // surround, e.g., <i> tags, so we can't just ignore the <p> elements
-    // altogether).
+    // altogether.)
     var XPATH_SELECTOR = './p/*|./*[not(self::p)]';
     var arrayOfTexts = await elem.all(by.xpath(XPATH_SELECTOR))
       .map(async function(entry) {
