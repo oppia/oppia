@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the ExplorationStatsBackendApiService.
+ * @fileoverview Unit tests for the ImprovementsBackendApiService.
  */
 
 import { HttpClientTestingModule, HttpTestingController } from

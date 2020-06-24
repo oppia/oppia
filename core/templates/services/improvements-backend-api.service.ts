@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Service for fetching exploration improvement tasks.
+ * @fileoverview Service for fetching improvement tasks from the backend.
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
