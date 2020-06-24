@@ -27,6 +27,10 @@ describe('Merge Skill Modal Controller', function() {
     version: 3,
     prerequisite_skill_ids: []
   };
+  var categorizedSkills = [];
+  var skill = {};
+  var skillSummaries = {};
+
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.inject(function($injector, $controller) {
     var $rootScope = $injector.get('$rootScope');
@@ -64,5 +68,32 @@ describe('Merge Skill Modal Controller', function() {
     };
     $scope.save();
     expect($uibModalInstance.close).toHaveBeenCalledWith(result);
+      categorizedSkills: categorizedSkills,
+      skill: skill,
+      skillSummaries: skillSummaries
+    });
+  }));
+
+  it('should check properties set after controller is initialized', function() {
+    expect($scope.skillSummaries).toBe(skillSummaries);
+    expect($scope.categorizedSkills).toBe(categorizedSkills);
+    expect($scope.allowSkillsFromOtherTopics).toBe(true);
+    expect($scope.selectedSkillId).toBe('');
+  });
+
+  it('should close modal on saving', function() {
+    $scope.save();
+    expect($uibModalInstance.close).toHaveBeenCalledWith({
+      skill: skill,
+      supersedingSkillId: ''
+    });
+  });
+
+  it('should close modal on confirm', function() {
+    $scope.confirm();
+    expect($uibModalInstance.close).toHaveBeenCalledWith({
+      skill: skill,
+      supersedingSkillId: ''
+    });
   });
 });
