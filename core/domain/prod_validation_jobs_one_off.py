@@ -5042,7 +5042,8 @@ class TaskEntryModelValidator(BaseModelValidator):
 class PlaythroughModelValidator(BaseModelValidator):
     """Class for validating PlaythroughModel."""
 
-    PLAYTHROUGH_PROJECT_RELEASE_DATETIME = datetime.datetime(2018, 9, 1)
+    # The playthrough design was finalized at the end of GSOC 2018: 2018-09-01.
+    PLAYTHROUGH_INTRODUCTION_DATETIME = datetime.datetime(2018, 9, 1)
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -5149,7 +5150,7 @@ class PlaythroughModelValidator(BaseModelValidator):
             item: ndb.Model. PlaythroughModel to validate.
         """
         created_on_datetime = item.created_on
-        if created_on_datetime < cls.PLAYTHROUGH_PROJECT_RELEASE_DATETIME:
+        if created_on_datetime < cls.PLAYTHROUGH_INTRODUCTION_DATETIME:
             cls.errors['create datetime check'].append(
                 'Entity id %s: released on %s, which is before the '
                 'GSoC 2018 submission deadline (2018-09-01) and should '
