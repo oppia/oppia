@@ -110,6 +110,20 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'training_data': [],
             'tagged_skill_misconception_id': None
         }
+        state_solution_dict = {
+            'interaction_id': '',
+            'answer_is_exclusive': True,
+            'correct_answer': [
+                '<p>state customization arg html 1</p>',
+                '<p>state customization arg html 2</p>',
+                '<p>state customization arg html 3</p>',
+                '<p>state customization arg html 4</p>'
+            ],
+            'explanation': {
+                'content_id': 'solution',
+                'html': '<p>This is solution for state1</p>'
+            }
+        }
         state_written_translations_dict = {
             'translations_mapping': {
                 'content': {

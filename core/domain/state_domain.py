@@ -244,6 +244,7 @@ class AnswerGroup(python_utils.OBJECT):
         return answer_group_dict
 
 
+
 class Hint(python_utils.OBJECT):
     """Value object representing a hint."""
 
@@ -320,8 +321,11 @@ class Solution(python_utils.OBJECT):
             interaction_id: str. The interaction id.
             answer_is_exclusive: bool. True if is the only correct answer;
                 False if is one of possible answer.
-            correct_answer: str. The correct answer; this answer enables the
-                learner to progress to the next card.
+            correct_answer: *. The correct answer; this answer
+                enables the learner to progress to the next card. The type of
+                correct_answer is determined by the value of
+                BaseInteraction.answer_type. Some examples for the types are
+                list(set(str)), list(str), str, dict(str, str), etc.
             explanation: SubtitledHtml. Contains text and text id to link audio
                 translations for the solution's explanation.
         """
@@ -1274,7 +1278,7 @@ class WrittenTranslations(python_utils.OBJECT):
         return translation_counts
 
     def get_all_html_content_strings(self):
-        """Gets all html content strings used in the written translations.
+        """Gets all html content strings used in the WrittenTranslations.
 
         Returns:
             list(str). The list of html content strings.
@@ -1290,12 +1294,10 @@ class WrittenTranslations(python_utils.OBJECT):
             written_translations_dict, conversion_fn):
         """Checks for HTML fields in the written translations and converts it
         according to the conversion function.
-
         Args:
             written_translations_dict: dict. The written translations dict.
             conversion_fn: function. The function to be used for converting the
                 HTML.
-
         Returns:
             dict. The converted written translations dict.
         """
