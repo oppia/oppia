@@ -160,6 +160,8 @@ import { ExplorationStatsBackendApiService } from
 import { ExplorationStatsObjectFactory } from
   'domain/statistics/ExplorationStatsObjectFactory';
 import { ExplorationStatsService } from 'services/exploration-stats.service';
+import { ExplorationTaskObjectFactory } from
+  'domain/improvements/ExplorationTaskObjectFactory';
 import { ExpressionParserService } from 'expressions/expression-parser.service';
 import { ExplorationRecommendationsService } from
   // eslint-disable-next-line max-len
@@ -207,6 +209,8 @@ import { ImageFileObjectFactory } from
 import { ImprovementActionButtonObjectFactory } from
   'domain/statistics/ImprovementActionButtonObjectFactory';
 import { ImprovementsService } from 'services/improvements.service';
+import { IneffectiveFeedbackLoopTaskObjectFactory } from
+  'domain/improvements/IneffectiveFeedbackLoopTaskObjectFactory';
 import { InteractionDetailsCacheService } from
   // eslint-disable-next-line max-len
   'pages/exploration-editor-page/editor-tab/services/interaction-details-cache.service';
@@ -261,6 +265,8 @@ import { MusicNotesInputValidationService } from
 import { MusicPhrasePlayerService } from
   // eslint-disable-next-line max-len
   'interactions/MusicNotesInput/directives/music-phrase-player.service';
+import { NeedsGuidingResponsesTaskObjectFactory } from
+  'domain/improvements/NeedsGuidingResponsesTaskObjectFactory';
 import { NewlyCreatedTopicObjectFactory } from
   'domain/topics_and_skills_dashboard/NewlyCreatedTopicObjectFactory';
 import { NormalizeWhitespacePipe } from
@@ -457,6 +463,8 @@ import { SubtopicPageObjectFactory } from
   'domain/topic/SubtopicPageObjectFactory';
 import { SubtopicViewerBackendApiService } from
   'domain/subtopic_viewer/subtopic-viewer-backend-api.service';
+import { SuccessiveIncorrectAnswersTaskObjectFactory } from
+  'domain/improvements/SuccessiveIncorrectAnswersTaskObjectFactory';
 import { SuggestionModalService } from 'services/suggestion-modal.service';
 import { SuggestionObjectFactory } from
   'domain/suggestion/SuggestionObjectFactory';
@@ -604,6 +612,7 @@ export class UpgradedServices {
     upgradedServices['FractionObjectFactory'] = new FractionObjectFactory();
     upgradedServices['GenerateContentIdService'] =
       new GenerateContentIdService();
+    upgradedServices['GraphDetailService'] = new GraphDetailService();
     upgradedServices['GraphUtilsService'] = new GraphUtilsService();
     upgradedServices['GuestCollectionProgressObjectFactory'] =
       new GuestCollectionProgressObjectFactory();
@@ -615,6 +624,8 @@ export class UpgradedServices {
     upgradedServices['ImprovementActionButtonObjectFactory'] =
       new ImprovementActionButtonObjectFactory();
     upgradedServices['ImprovementsService'] = new ImprovementsService();
+    upgradedServices['IneffectiveFeedbackLoopTaskObjectFactory'] =
+      new IneffectiveFeedbackLoopTaskObjectFactory();
     upgradedServices['InteractionDetailsCacheService'] =
       new InteractionDetailsCacheService();
     upgradedServices['InteractionSpecsService'] = new InteractionSpecsService();
@@ -635,6 +646,8 @@ export class UpgradedServices {
       new MisconceptionObjectFactory();
     upgradedServices['MusicPhrasePlayerService'] =
       new MusicPhrasePlayerService();
+    upgradedServices['NeedsGuidingResponsesTaskObjectFactory'] =
+      new NeedsGuidingResponsesTaskObjectFactory();
     upgradedServices['NormalizeWhitespacePunctuationAndCasePipe'] =
       new NormalizeWhitespacePunctuationAndCasePipe();
     upgradedServices['NumberAttemptsService'] = new NumberAttemptsService();
@@ -694,6 +707,8 @@ export class UpgradedServices {
       new StorySummaryObjectFactory();
     upgradedServices['SubtitledHtmlObjectFactory'] =
       new SubtitledHtmlObjectFactory();
+    upgradedServices['SuccessiveIncorrectAnswersTaskObjectFactory'] =
+      new SuccessiveIncorrectAnswersTaskObjectFactory();
     upgradedServices['SuggestionModalService'] = new SuggestionModalService();
     upgradedServices['SuggestionsService'] = new SuggestionsService();
     upgradedServices['TaskEntryObjectFactory'] = new TaskEntryObjectFactory();
@@ -756,6 +771,12 @@ export class UpgradedServices {
     upgradedServices['ExplorationStatsObjectFactory'] =
       new ExplorationStatsObjectFactory(
         upgradedServices['StateStatsObjectFactory']);
+    upgradedServices['ExplorationTaskObjectFactory'] =
+      new ExplorationTaskObjectFactory(
+        upgradedServices['HighBounceRateTaskObjectFactory'],
+        upgradedServices['IneffectiveFeedbackLoopTaskObjectFactory'],
+        upgradedServices['NeedsGuidingResponsesTaskObjectFactory'],
+        upgradedServices['SuccessiveIncorrectAnswersTaskObjectFactory']);
     upgradedServices['ExpressionSyntaxTreeService'] =
       new ExpressionSyntaxTreeService(
         upgradedServices['ExpressionParserService']);
@@ -930,7 +951,7 @@ export class UpgradedServices {
     upgradedServices['LearnerDashboardBackendApiService'] =
       new LearnerDashboardBackendApiService(upgradedServices['HttpClient']);
     upgradedServices['NumberWithUnitsValidationService'] =
-      new NumberWithUnitsObjectFactory(
+      new NumberWithUnitsValidationService(
         upgradedServices['NumberWithUnitsObjectFactory'],
         upgradedServices['baseInteractionValidationService']);
     upgradedServices['ParamSpecsObjectFactory'] = new ParamSpecsObjectFactory(

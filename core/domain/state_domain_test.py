@@ -29,6 +29,7 @@ from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import html_validation_service
+from core.domain import interaction_registry
 from core.domain import state_domain
 from core.tests import test_utils
 import feconf
@@ -140,15 +141,62 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                         'html': '<p>state written_translation feedback-en</p>',
                         'needs_update': False
                     }
+                },
+                'hint_1': {
+                    'hi': {
+                        'html': '<p>state written_translation hint_1-hi</p>',
+                        'needs_update': False
+                    },
+                    'en': {
+                        'html': '<p>state written_translation hint_1-en</p>',
+                        'needs_update': False
+                    }
+                },
+                'solution': {
+                    'hi': {
+                        'html': '<p>state written_translation solution-hi</p>',
+                        'needs_update': False
+                    },
+                    'en': {
+                        'html': '<p>state written_translation solution-en</p>',
+                        'needs_update': False
+                    }
                 }
             }
         }
+        state_hint_list = [
+            state_domain.Hint(
+                state_domain.SubtitledHtml(
+                    'hint_1', '<p>Hello, this is html1 for hint 1</p>'
+                )
+            )
+        ]
+
+        state_solution_dict = {
+            'interaction_id': '',
+            'answer_is_exclusive': True,
+            'correct_answer': [
+                ['<p>state customization arg html 1</p>'],
+                ['<p>state customization arg html 2</p>'],
+                ['<p>state customization arg html 3</p>'],
+                ['<p>state customization arg html 4</p>']
+            ],
+            'explanation': {
+                'content_id': 'solution',
+                'html': '<p>This is solution for state1</p>'
+            }
+        }
+
         state.update_content(
             state_domain.SubtitledHtml.from_dict(state_content_dict))
         state.update_interaction_id('DragAndDropSortInput')
         state.update_interaction_customization_args(
             state_customization_args_dict)
+        state.update_interaction_hints(state_hint_list)
 
+        solution = state_domain.Solution.from_dict(
+            state.interaction.id, state_solution_dict)
+        state.update_interaction_solution(solution)
         state.update_interaction_answer_groups(
             [state_answer_group_dict])
         state.update_written_translations(
@@ -167,6 +215,10 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 '<p>state written_translation outcome-en</p>',
                 '<p>state written_translation feedback-hi</p>',
                 '<p>state written_translation feedback-en</p>',
+                '<p>state written_translation hint_1-hi</p>',
+                '<p>state written_translation hint_1-en</p>',
+                '<p>state written_translation solution-hi</p>',
+                '<p>state written_translation solution-en</p>',
                 '<p>State Feedback</p>',
                 '<p>IsEqualToOrdering rule_spec htmls</p>',
                 '<p>HasElementXAtPositionY rule_spec html</p>',
@@ -174,6 +226,12 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 '<p>x input for HasElementXAtPositionY rule_spec </p>',
                 ('<p>IsEqualToOrderingWithOneItemAtIncorrectPosition rule_s'
                  'pec htmls</p>'), '',
+                '<p>Hello, this is html1 for hint 1</p>',
+                '<p>This is solution for state1</p>',
+                '<p>state customization arg html 1</p>',
+                '<p>state customization arg html 2</p>',
+                '<p>state customization arg html 3</p>',
+                '<p>state customization arg html 4</p>',
                 '<p>state customization arg html 1</p>',
                 '<p>state customization arg html 2</p>',
                 '<p>state customization arg html 3</p>',
@@ -331,6 +389,27 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'training_data': [],
             'tagged_skill_misconception_id': None
         }]
+        state_solution_dict = {
+            'interaction_id': '',
+            'answer_is_exclusive': True,
+            'correct_answer': [
+                '<p>state customization arg html 1</p>',
+                '<p>state customization arg html 2</p>',
+                '<p>state customization arg html 3</p>',
+                '<p>state customization arg html 4</p>'
+            ],
+            'explanation': {
+                'content_id': 'solution',
+                'html': '<p>This is solution for state1</p>'
+            }
+        }
+        state_hint_list = [
+            state_domain.Hint(
+                state_domain.SubtitledHtml(
+                    'hint_1', '<p>Hello, this is html1 for hint 1</p>'
+                )
+            )
+        ]
 
         state.update_content(
             state_domain.SubtitledHtml.from_dict(state_content_dict))
@@ -338,8 +417,17 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state.update_interaction_answer_groups(state_answer_groups)
         state.update_interaction_customization_args(
             state_customization_args_dict)
+        state.update_interaction_hints(state_hint_list)
 
+        solution = state_domain.Solution.from_dict(
+            state.interaction.id, state_solution_dict)
+        state.update_interaction_solution(solution)
         exp_services.save_new_exploration('owner_id', exploration)
+
+        interaction = (
+            interaction_registry.Registry.get_interaction_by_id(
+                'ItemSelectionInput'))
+        interaction.can_have_solution = True
         html_list = state.get_all_html_content_strings()
         self.assertEqual(
             html_list,
@@ -349,6 +437,12 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 '<p>ContainsAtLeastOneOf rule_spec html</p>',
                 '<p>IsProperSubsetOf rule_spec html</p>',
                 '<p>DoesNotContainAtLeastOneOf rule_spec html</p>', '',
+                '<p>Hello, this is html1 for hint 1</p>',
+                '<p>This is solution for state1</p>',
+                '<p>state customization arg html 1</p>',
+                '<p>state customization arg html 2</p>',
+                '<p>state customization arg html 3</p>',
+                '<p>state customization arg html 4</p>',
                 '<p>init_state customization arg html 1</p>',
                 '<p>init_state customization arg html 2</p>',
                 '<p>init_state customization arg html 3</p>',
@@ -489,6 +583,97 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'Rule spec should have at least one valid input variable with '
                 'Html in it.'):
                 state.get_all_html_content_strings()
+
+    def test_get_all_html_when_solution_has_invalid_answer_type(self):
+        """Test the method for extracting all the HTML from a state
+        when the interaction has a solution but the answer_type for the
+        corrent_answer is invalid.
+        """
+        exploration = exp_domain.Exploration.create_default_exploration(
+            'exp_id')
+        exploration.add_states(['State1'])
+        state = exploration.states['State1']
+        state_content_dict = {
+            'content_id': 'content',
+            'html': '<p>state content html</p>'
+        }
+        state_customization_args_dict = {
+            'choices': {
+                'value': [
+                    '<p>state customization arg html 1</p>',
+                    '<p>state customization arg html 2</p>',
+                    '<p>state customization arg html 3</p>',
+                    '<p>state customization arg html 4</p>'
+                ]
+            },
+            'allowMultipleItemsInSamePosition': {
+                'value': False
+            }
+        }
+
+        state_hint_list = [
+            state_domain.Hint(
+                state_domain.SubtitledHtml(
+                    'hint_1', '<p>Hello, this is html1 for hint 1</p>'
+                )
+            )
+        ]
+
+        state_solution_dict = {
+            'interaction_id': '',
+            'answer_is_exclusive': True,
+            'correct_answer': [
+                ['<p>state customization arg html 1</p>'],
+                ['<p>state customization arg html 2</p>'],
+                ['<p>state customization arg html 3</p>'],
+                ['<p>state customization arg html 4</p>']
+            ],
+            'explanation': {
+                'content_id': 'solution',
+                'html': '<p>This is solution for state1</p>'
+            }
+        }
+
+        state.update_content(
+            state_domain.SubtitledHtml.from_dict(state_content_dict))
+        state.update_interaction_id('DragAndDropSortInput')
+        state.update_interaction_customization_args(
+            state_customization_args_dict)
+        state.update_interaction_hints(state_hint_list)
+        solution = state_domain.Solution.from_dict(
+            state.interaction.id, state_solution_dict)
+        state.update_interaction_solution(solution)
+        exp_services.save_new_exploration('owner_id', exploration)
+
+        interaction = (
+            interaction_registry.Registry.get_interaction_by_id(
+                'DragAndDropSortInput'))
+        interaction.answer_type = 'DragAndDropHtmlString'
+        with self.assertRaisesRegexp(
+            Exception,
+            'The solution does not have a valid '
+            'correct_answer type.'):
+            state.get_all_html_content_strings()
+
+    def test_get_all_html_when_interaction_is_none(self):
+        """Test the method for extracting all the HTML from a state
+        when the state has no interaction.
+        """
+        exploration = exp_domain.Exploration.create_default_exploration(
+            'exp_id')
+        exploration.add_states(['State1'])
+        state = exploration.states['State1']
+        state_content_dict = {
+            'content_id': 'content',
+            'html': '<p>state content html</p>'
+        }
+
+        state.update_content(
+            state_domain.SubtitledHtml.from_dict(state_content_dict))
+
+        exp_services.save_new_exploration('owner_id', exploration)
+        html_list = state.get_all_html_content_strings()
+        self.assertEqual(html_list, ['', '<p>state content html</p>'])
 
     def test_export_state_to_dict(self):
         """Test exporting a state to a dict."""

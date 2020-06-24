@@ -281,8 +281,11 @@ class Solution(python_utils.OBJECT):
             interaction_id: str. The interaction id.
             answer_is_exclusive: bool. True if is the only correct answer;
                 False if is one of possible answer.
-            correct_answer: str. The correct answer; this answer enables the
-                learner to progress to the next card.
+            correct_answer: *. The correct answer; this answer
+                enables the learner to progress to the next card. The type of
+                correct_answer is determined by the value of
+                BaseInteraction.answer_type. Some examples for the types are
+                list(set(str)), list(str), str, dict(str, str), etc.
             explanation: SubtitledHtml. Contains text and text id to link audio
                 translations for the solution's explanation.
         """
@@ -617,9 +620,36 @@ class InteractionInstance(python_utils.OBJECT):
             hint_html = hint.hint_content.html
             html_list = html_list + [hint_html]
 
-        if self.solution:
+        if self.id is None:
+            return html_list
+
+        interaction = (
+            interaction_registry.Registry.get_interaction_by_id(
+                self.id))
+
+        if self.solution and interaction.can_have_solution:
             solution_html = self.solution.explanation.html
             html_list = html_list + [solution_html]
+            html_field_types_to_rule_specs_dict = json.loads(
+                utils.get_file_contents(
+                    feconf.HTML_FIELD_TYPES_TO_RULE_SPECS_FILE_PATH))
+
+            if self.solution.correct_answer:
+                for html_type in html_field_types_to_rule_specs_dict.keys():
+                    if html_type == interaction.answer_type:
+                        if (
+                                html_type ==
+                                feconf.ANSWER_TYPE_LIST_OF_SETS_OF_HTML):
+                            for value in self.solution.correct_answer:
+                                html_list = html_list + value
+                        elif html_type == feconf.ANSWER_TYPE_SET_OF_HTML:
+                            for value in self.solution.correct_answer:
+                                html_list = html_list + [value]
+                        else:
+                            raise Exception(
+                                'The solution does not have a valid '
+                                'correct_answer type.')
+
 
         if self.id in (
                 'ItemSelectionInput', 'MultipleChoiceInput',
@@ -1138,7 +1168,7 @@ class WrittenTranslations(python_utils.OBJECT):
         return translation_counts
 
     def get_all_html_content_strings(self):
-        """Gets all html content strings used in the written translations.
+        """Gets all html content strings used in the WrittenTranslations.
 
         Returns:
             list(str). The list of html content strings.
