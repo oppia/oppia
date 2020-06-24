@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview About page component.
+ * @fileoverview Ck editor copy toolbar component.
  */
 
 import { Component, Input, Output, EventEmitter } from '@angular/core';
