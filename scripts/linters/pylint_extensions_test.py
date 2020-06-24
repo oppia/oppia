@@ -2073,7 +2073,8 @@ class DocstringCheckerTests(unittest.TestCase):
         raises_invalid_indentation_node.file = filename
         raises_invalid_indentation_node.path = filename
 
-        self.checker_test_object.checker.process_module(raises_invalid_indentation_node)
+        self.checker_test_object.checker.process_module(
+            raises_invalid_indentation_node)
 
         message = testutils.Message(
             msg_id='4-space-indentation-in-docstring',

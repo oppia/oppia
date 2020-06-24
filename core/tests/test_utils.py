@@ -1955,8 +1955,8 @@ tags: []
             invoked.
 
             Args:
-                args: tuple. The args passed into `attr` function.
-                kwargs: dict. The key word args passed into `attr` function.
+                *args: tuple. The args passed into `attr` function.
+                **kwargs: dict. The key word args passed into `attr` function.
 
             Returns:
                 Result of `new_value`.
