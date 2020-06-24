@@ -5268,7 +5268,7 @@ export = {
   "ANALYTICS_ID": "",
   "SITE_NAME_FOR_ANALYTICS": "",
 
-  "ALLOW_YAML_FILE_UPLOAD": false,
+  "ALLOW_YAML_FILE_UPLOAD": true,
 
   // A regular expression for tags.
   "TAG_REGEX": "^[a-z ]+$",
