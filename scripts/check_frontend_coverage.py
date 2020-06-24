@@ -147,7 +147,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'exploration-automatic-text-to-speech.service.ts',
     'exploration-creation.service.ts',
     'exploration-diff.service.ts',
-    'exploration-editor-page.component.ts',
     'exploration-editor-tab.directive.ts',
     'exploration-embed-button-modal.controller.ts',
     'exploration-embed-button.service.ts',
