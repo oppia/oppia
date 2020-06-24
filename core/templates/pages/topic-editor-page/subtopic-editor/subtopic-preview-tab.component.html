@@ -4,11 +4,11 @@
 <div>
   <div class="content-box">
     <div class="left-menu">
-      <div class="left-menu-item" ng-click="changeContent(SHOW_THUMBNAIL)"><span>Card</span></div>
-      <div class="left-menu-item" ng-click="changeContent(SHOW_CONTENT)"><span>Content</span></div>
+      <div class="left-menu-item" ng-click="changeContent(THUMBNAIL)"><span>Card</span></div>
+      <div class="left-menu-item" ng-click="changeContent(CONTENT)"><span>Content</span></div>
     </div>
     <div class="content">
-      <preview-thumbnail ng-if="showThumbnail" name="editableName"
+      <preview-thumbnail ng-if="thumbnailIsShown" name="editableName"
                          description="editableDescription"
                          preview-footer="topic.getCanonicalStoryIds().length"
                          filename = "editableThumbnailFilename"
@@ -16,7 +16,7 @@
                          bg-color="'#2F6687'">
       </preview-thumbnail>
 
-      <angular-html-bind ng-if="!showThumbnail" html-data="pageContents.getHtml()">
+      <angular-html-bind ng-if="!thumbnailIsShown" html-data="pageContents.getHtml()">
       </angular-html-bind>
     </div>
   </div>
@@ -24,14 +24,14 @@
 
 <style>
   .content-box {
-    box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
-    width: 60%;
-    margin: 0 auto;
     background-color: #FFFFFF;
-    border: 2px solid black;
-    top: 20vh;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+    border: 2px solid #000000;
     display: flex;
     flex-wrap: wrap;
+    margin: 0 auto;
+    top: 20vh;
+    width: 60%;
   }
 
   .left-menu {
@@ -45,7 +45,7 @@
   }
 
   .left-menu-item {
-    border-bottom: 2px solid black;
+    border-bottom: 2px solid #000000;
     margin: 10px 0;
     padding: 10px 0 10px 5px;
   }

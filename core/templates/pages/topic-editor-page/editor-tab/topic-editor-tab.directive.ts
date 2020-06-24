@@ -34,9 +34,8 @@ require('pages/topic-editor-page/services/topic-editor-routing.service.ts');
 require('pages/topic-editor-page/services/entity-creation.service.ts');
 require(
   'pages/topic-editor-page/editor-tab/topic-editor-stories-list.directive.ts');
-
 require('pages/topic-editor-page/modal-templates/' +
-    'preview-thubmnail.directive.ts');
+    'preview-thumbnail.component.ts');
 
 require('services/alerts.service.ts');
 require('services/context.service.ts');
@@ -111,7 +110,7 @@ angular.module('oppia').directive('topicEditorTab', [
           // This is added because when we create a skill from the topic
           // editor, it gets assigned to that topic, and to reflect that
           // change, we need to fetch the topic again from the backend.
-          var _refreshTopic = function() {
+          $scope.refreshTopic = function() {
             TopicEditorStateService.loadTopic($scope.topic.getId());
           };
 
@@ -223,7 +222,8 @@ angular.module('oppia').directive('topicEditorTab', [
             $scope.$on(EVENT_TOPIC_REINITIALIZED, _initEditor);
             $scope.$on(EVENT_STORY_SUMMARIES_INITIALIZED, _initStorySummaries);
             $scope.$on(
-              EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED, _refreshTopic);
+              EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED,
+              $scope.refreshTopic);
             _initEditor();
             _initStorySummaries();
           };

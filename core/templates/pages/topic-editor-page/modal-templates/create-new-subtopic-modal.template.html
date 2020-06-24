@@ -16,7 +16,7 @@
         Subtopic title should be at most <[MAX_CHARS_IN_SUBTOPIC_TITLE]> characters.
       </i>
     </span>
-    <span class="form-text" style="font-size: smaller; color: red;" ng-if="$ctrl.errorMsg">
+    <span class="form-text error-msg" ng-if="$ctrl.errorMsg">
       <em><[errorMsg]></em>
     </span>
 
@@ -70,6 +70,11 @@
     margin: 25px 0;
   }
   .new-subtopic-editor .description-editor {
+    margin: 10px 0 0;
+  }
+  .new-subtopic-editor .error-msg {
+    color: red;
+    font-size: smaller;
     margin: 10px 0 0;
   }
 </style>

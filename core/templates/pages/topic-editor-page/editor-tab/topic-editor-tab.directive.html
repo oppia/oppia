@@ -33,12 +33,11 @@
 
       <div class="topic-description" ng-class="{'has-error': editableDescriptionIsEmpty && topicDescriptionChanged}">
         <label for="topicDescription" class="form-heading protractor-test-topic-description-heading">Description</label>
-        <textarea type="text" class="form-control protractor-test-topic-description-field"
+        <textarea type="text" class="form-control topic-description protractor-test-topic-description-field"
                   ng-model="editableDescription" maxlength="<[MAX_CHARS_IN_TOPIC_DESCRIPTION]>"
                   ng-change="updateTopicDescriptionStatus(editableDescription)"
                   ng-blur="updateTopicDescription(editableDescription)"
-                  placeholder="Enter the description of the topic"
-                  style="height: 10vh;">
+                  placeholder="Enter the description of the topic">
         </textarea>
         <span class="oppia-input-box-subtitle">
           <i>
@@ -121,7 +120,7 @@
                       story-summaries="canonicalStorySummaries"
                       topic="topic">
         </stories-list>
-        <h4 ng-if="topic.getCanonicalStoryIds().length === 0" style="color: gray;">
+        <h4 ng-if="topic.getCanonicalStoryIds().length === 0" class="text-secondary">
           Click on Create Story to create a new canonical story for the topic
         </h4>
       </div>
@@ -226,7 +225,7 @@
   }
 
   .topic-editor .topic-description textarea {
-    height: 7vh;
+    height: 10vh;
   }
 
   .topic-editor .add-subtopic-btn {
@@ -236,12 +235,12 @@
   }
 
   .oppia-subtopics-list-card {
-    font-family: "Roboto", Arial, sans-serif;
+    font-family: Roboto, Arial, sans-serif;
     padding: 30px 55px 30px 45px;
   }
 
   .topic-editor .list-header {
-    border-bottom: 2px solid black;
+    border-bottom: 2px solid #000000;
     display: flex;
     justify-content: space-between;
     margin: 25px 0;

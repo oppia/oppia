@@ -70,7 +70,7 @@ describe('Topic editor routing service', function() {
     expect(TopicEditorRoutingService.getActiveTabName()).toEqual('main');
   });
 
-  it('should handler calls with unexpect paths', function() {
+  it('should handle calls with unexpect paths', function() {
     expect(TopicEditorRoutingService.getActiveTabName()).toEqual('main');
 
     $location.path();

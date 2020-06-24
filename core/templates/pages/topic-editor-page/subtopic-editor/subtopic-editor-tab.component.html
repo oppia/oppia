@@ -19,10 +19,10 @@
               </i>
             </span>
           </form>
-          <span class="form-text" style="font-size: smaller; color: red;" ng-if="$ctrl.errorMsg">
+          <span class="form-text error-msg" ng-if="$ctrl.errorMsg">
             <em><[errorMsg]></em>
           </span>
-          <span class="form-text" style="font-size: smaller; color: red;" ng-if="$ctrl.editableTitle.length === 80">
+          <span class="form-text error-message" ng-if="$ctrl.editableTitle.length === 80">
             <em>The maximum length of subtopic title is 80 characters.</em>
           </span>
         </div>
@@ -78,13 +78,13 @@
 
       <md-card class="skills-card protractor-test-subtopic-column"
                dnd-list="$ctrl.subtopic.getSkillSummaries()"
-               dnd-drop="$ctrl.endMoveSkill($ctrl.subtopic.getId())">
+               dnd-drop="$ctrl.onMoveSkillFinish($ctrl.subtopic.getId())">
         <div class="subtopic-container">
           <h3>Drop Uncategorized skill here to assign it to this subtopic.</h3>
           <div class="skill-id protractor-test-subtopic-skillcard"
                ng-repeat="skillSummary in $ctrl.subtopic.getSkillSummaries() track by $index"
                dnd-draggable="skillSummary"
-               dnd-dragstart="$ctrl.startMoveSkill($ctrl.subtopic.getId(), skillSummary)"
+               dnd-dragstart="$ctrl.onMoveSkillStart($ctrl.subtopic.getId(), skillSummary)"
                dnd-effect-allowed="move"
                dnd-disable-if="$ctrl.isSkillDeleted(skillSummary)">
             <div class="skill-card">
@@ -103,14 +103,14 @@
 
       <md-card class="skills-card uncategorized-skill-ids protractor-test-uncategorized-skills-container"
                dnd-list="$ctrl.uncategorizedSkillSummaries"
-               dnd-drop="$ctrl.endMoveSkill(null)">
+               dnd-drop="$ctrl.onMoveSkillFinish(null)">
         <h3 class="list-header"> Uncategorized Skills(Drag from here) </h3>
         <div class="uncategorized-skills-container">
           <div class="skill-id protractor-test-uncategorized-skill-item"
                ng-repeat="skillSummary in $ctrl.uncategorizedSkillSummaries track by $index"
                dnd-draggable="skillSummary"
                dnd-effect-allowed="move"
-               dnd-dragstart="$ctrl.startMoveSkill(null, skillSummary)"
+               dnd-dragstart="$ctrl.onMoveSkillStart(null, skillSummary)"
                dnd-disable-if="$ctrl.isSkillDeleted(skillSummary)">
             <div class="subtopics-list-item skill-card protractor-test-skill-card">
               <a class="protractor-test-skill-card-text"
@@ -123,7 +123,7 @@
               </span>
             </div>
           </div>
-          <p class="intro-card-message" ng-if="$ctrl.uncategorizedSkillSummaries.length === 0" style="padding-top: 6px;">
+          <p class="intro-card-message" ng-if="$ctrl.uncategorizedSkillSummaries.length === 0">
              There are no pending skills in the topic. To add skills to the topic, go to the skills list in
              the topics and skills dashboard and click 'Assign to Topic' for the required skill.
           </p>
@@ -137,7 +137,7 @@
   .subtopic-content .skills-card,
   .subtopic-content .uncategorized-skill-ids {
       padding: 30px 55px 30px 45px;
-      font-family: "Roboto", Arial, sans-serif;
+      font-family: Roboto, Arial, sans-serif;
   }
 
   .subtopic-content .subtopic-content-box {
@@ -146,10 +146,15 @@
     justify-content: center;
   }
 
+  .subtopic-content .error-message {
+    color: red;
+    font-size: smaller;
+  }
+
   .subtopic-content .list-header {
     display: flex;
     margin: 25px 0;
-    border-bottom: 2px solid black;
+    border-bottom: 2px solid #000000;
     justify-content: space-between;
   }
 
@@ -166,7 +171,7 @@
   }
 
   .subtopic-content .add-skill-btn {
-    color: #fff;
+    color: #FFFFFF;
     background-color: #008098;
     margin: 15px 0;
   }

@@ -26,9 +26,9 @@ angular.module('oppia').factory('SubtopicValidationService', [
       var topic = TopicEditorStateService.getTopic();
       topic.getSubtopics().forEach(
         function(subtopic) {
-          return subtopicTitles.push(subtopic.getTitle());
+          subtopicTitles.push(subtopic.getTitle());
         });
-      return (subtopicTitles.indexOf(title) === -1);
+      return subtopicTitles.indexOf(title) === -1;
     };
 
     return {

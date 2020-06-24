@@ -33,14 +33,12 @@ describe('Preview Thumbnail Directive', function() {
   var $rootScope = null;
   var ContextService = null;
   var ImageUploadHelperService = null;
-  var directive = null;
 
-  beforeEach(angular.mock.inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector, $componentController) {
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
     ContextService = $injector.get('ContextService');
     ImageUploadHelperService = $injector.get('ImageUploadHelperService');
-    directive = $injector.get('previewThumbnailDirective')[0];
     var MockContextSerivce = {
       getEntityType: () => 'topic',
       getEntityId: () => '1'
@@ -50,17 +48,18 @@ describe('Preview Thumbnail Directive', function() {
           entityType,
           entityId) => (entityType + '/' + entityId + '/' + filename)
     };
-    $scope.getFilename = function() {
-      return 'img.svg';
-    };
-    ctrl = $injector.instantiate(directive.controller, {
-      $scope: $scope,
+
+    ctrl = $componentController('previewThumbnail', {
       ContextService: MockContextSerivce,
       ImageUploadHelperService: MockImageUploadHelperService,
     });
+    ctrl.getFilename = function() {
+      return 'img.svg';
+    };
+    ctrl.$onInit();
   }));
 
   it('should init the controller', function() {
-    expect($scope.editableThumbnailDataUrl).toEqual('topic/1/img.svg');
+    expect(ctrl.editableThumbnailDataUrl).toEqual('topic/1/img.svg');
   });
 });

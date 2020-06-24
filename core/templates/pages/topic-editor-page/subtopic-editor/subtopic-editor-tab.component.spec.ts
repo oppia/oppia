@@ -14,12 +14,12 @@
 
 
 /**
- * @fileoverview Unit tests for the subtopic editor tab directive.
+ * @fileoverview Unit tests for the subtopic editor tab component.
  */
 
 import { UpgradedServices } from 'services/UpgradedServices';
 
-describe('Subtopic editor tab directive', function() {
+describe('Subtopic editor tab', function() {
   beforeEach(angular.mock.module('oppia'));
 
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -44,7 +44,7 @@ describe('Subtopic editor tab directive', function() {
   var SkillSummaryObjectFactory = null;
   var SubtopicPageObjectFactory = null;
 
-  beforeEach(angular.mock.inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector, $componentController) {
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
     ContextService = $injector.get('ContextService');
@@ -74,9 +74,7 @@ describe('Subtopic editor tab directive', function() {
     spyOn(TopicEditorRoutingService, 'getSubtopicIdFromUrl')
       .and.returnValue('1');
 
-    ctrl = $injector.instantiate(directive.controller, {
-      $scope: $scope,
-    });
+    ctrl = $componentController('subtopicEditorTab');
     ctrl.$onInit();
   }));
 
@@ -164,21 +162,21 @@ describe('Subtopic editor tab directive', function() {
   it('should record skill summary to move and subtopic Id', function() {
     var skillSummary = SkillSummaryObjectFactory.create(
       '1', 'Skill description');
-    ctrl.startMoveSkill(1, skillSummary);
+    ctrl.onMoveSkillStart(1, skillSummary);
     expect(ctrl.skillSummaryToMove).toEqual(skillSummary);
     expect(ctrl.oldSubtopicId).toEqual(1);
   });
 
   it('should call TopicUpdateService when skill is moved', function() {
     var moveSkillSpy = spyOn(TopicUpdateService, 'moveSkillToSubtopic');
-    ctrl.endMoveSkill(1);
+    ctrl.onMoveSkillFinish(1);
     expect(moveSkillSpy).toHaveBeenCalled();
   });
 
   it('should call TopicUpdateService when skill is removed from subtopic',
     function() {
       var removeSkillSpy = spyOn(TopicUpdateService, 'removeSkillFromSubtopic');
-      ctrl.endMoveSkill(null);
+      ctrl.onMoveSkillFinish(null);
       expect(removeSkillSpy).toHaveBeenCalled();
     });
 
@@ -186,7 +184,7 @@ describe('Subtopic editor tab directive', function() {
     function() {
       var removeSkillSpy = spyOn(TopicUpdateService, 'removeSkillFromSubtopic');
       ctrl.oldSubtopicId = null;
-      ctrl.endMoveSkill(null);
+      ctrl.onMoveSkillFinish(null);
       expect(removeSkillSpy).not.toHaveBeenCalled();
     });
 
@@ -217,8 +215,8 @@ describe('Subtopic editor tab directive', function() {
 
   it('should call TopicUpdateService to update the SubtopicPageContent',
     function() {
-      var updateSubtopicSpy =
-        spyOn(TopicUpdateService, 'setSubtopicPageContentsHtml');
+      var updateSubtopicSpy = (
+        spyOn(TopicUpdateService, 'setSubtopicPageContentsHtml'));
       ctrl.htmlData = 'new html data';
       ctrl.updateHtmlData();
       expect(updateSubtopicSpy).toHaveBeenCalled();

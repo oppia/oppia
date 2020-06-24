@@ -55,7 +55,7 @@ describe('Subtopic validation service', function() {
     spyOn(TopicEditorStateService, 'getTopic').and.returnValue(topic);
   }));
 
-  it('should return if subtopic name is valid', function() {
+  it('should validate subtopic name correctly', function() {
     expect(SubtopicValidationService.checkValidSubtopicName(
       'Random name')).toEqual(true);
     expect(SubtopicValidationService.checkValidSubtopicName(

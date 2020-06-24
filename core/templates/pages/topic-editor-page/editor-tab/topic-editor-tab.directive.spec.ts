@@ -101,6 +101,14 @@ describe('Topic editor tab directive', function() {
     expect(skillSpy).toHaveBeenCalled();
   });
 
+  it('should call TopicEditorStateService to load topic when ' +
+      'topics and skills dashboard is reinitialized',
+  function() {
+    var refreshTopicSpy = spyOn(TopicEditorStateService, 'loadTopic');
+    $rootScope.$broadcast('topicsAndSkillsDashboardReinitialized');
+    expect(refreshTopicSpy).toHaveBeenCalled();
+  });
+
   it('should call EntityCreationService to create subtopic', function() {
     var skillSpy = spyOn(EntityCreationService, 'createSubtopic');
     $scope.createSubtopic();

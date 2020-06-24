@@ -468,7 +468,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'StoryContentsObjectFactory.ts',
     'StoryNodeObjectFactory.ts',
     'student.ts',
-    'subtopic-preview-tab.directive.ts',
+    'subtopic-preview-tab.component.ts',
     'subtopic-summary-tile.directive.ts',
     'subtopic-viewer-navbar-breadcrumb.directive.ts',
     'subtopic-viewer-page.component.ts',
