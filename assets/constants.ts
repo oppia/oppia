@@ -53,6 +53,19 @@ export = {
     "story": ["#F8BF74", "#D68F78", "#8EBBB6", "#B3D8F1"]
   },
 
+  "TASK_TYPE_HIGH_BOUNCE_RATE": "high_bounce_rate",
+  "TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP": "ineffective_feedback_loop",
+  "TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS": "successive_incorrect_answers",
+  "TASK_TYPE_NEEDS_GUIDING_RESPONSES": "needs_guiding_responses",
+
+  "TASK_STATUS_OPEN": "open",
+  "TASK_STATUS_OBSOLETE": "obsolete",
+  "TASK_STATUS_RESOLVED": "resolved",
+
+  "TASK_ENTITY_TYPE_EXPLORATION": "exploration",
+
+  "TASK_TARGET_TYPE_STATE": "state",
+
   // The SVG tag-specific attribute whitelist is based on the list of tags and
   // and attributes specified in this project:
   // https://github.com/cure53/DOMPurify
@@ -4830,6 +4843,9 @@ export = {
     "id": "es",
     "text": "Español"
   }, {
+    "id": "fr",
+    "text": "français (French)"
+  }, {
     "id": "pt-br",
     "text": "Português (Brasil)"
   }, {
@@ -5175,7 +5191,7 @@ export = {
   },
 
   "ENABLE_PREREQUISITE_SKILLS": false,
-  "ENABLE_LITERALLY_CANVAS_EDITOR": false,
+  "ENABLE_SVG_EDITOR_RTE": false,
 
   // For the full new structures viewer features, both
   // ENABLE_NEW_STRUCTURE_PLAYERS and ENABLE_NEW_STRUCTURE_VIEWER_UPDATES has

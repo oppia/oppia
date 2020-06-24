@@ -5,6 +5,15 @@
 
   <div class="modal-body">
     <div class="oppia-question-editor-section">
+      <h3>Selected Difficulty: <[skillDifficultyString]></h3>
+      <div ng-if="skill.getRubricExplanations(skillDifficultyString).length > 0">
+        <h3>Difficulty Explanations</h3>
+        <ul>
+          <li ng-repeat="explanation in skill.getRubricExplanations(skillDifficultyString)">
+            <span ng-bind-html="explanation"></span>
+          </li>
+        </ul>
+      </div>
       <h3>Question Editor</h3>
       <question-editor question-id="questionId"
                        misconceptions-by-skill="misconceptionsBySkill"

@@ -210,11 +210,18 @@ angular.module('oppia').directive('explorationSummaryTile', [
             $scope.isWindowLarge = (
               WindowDimensionsService.getWidth() >= $scope.mobileCutoffPx);
 
-            WindowDimensionsService.registerOnResizeHook(function() {
-              $scope.isWindowLarge = (
-                WindowDimensionsService.getWidth() >= $scope.mobileCutoffPx);
-              $scope.$apply();
-            });
+            ctrl.resizeSubscription = WindowDimensionsService.getResizeEvent().
+              subscribe(evt => {
+                $scope.isWindowLarge = (
+                  WindowDimensionsService.getWidth() >= $scope.mobileCutoffPx);
+                $scope.$apply();
+              });
+          };
+
+          ctrl.$onDestroy = function() {
+            if (ctrl.resizeSubscription) {
+              ctrl.resizeSubscription.unsubscribe();
+            }
           };
         }
       ]

@@ -66,6 +66,7 @@ from . import css_linter
 from . import general_purpose_linter
 from . import html_linter
 from . import js_ts_linter
+from . import linter_utils
 from . import python_linter
 from . import third_party_typings_linter
 from .. import common
@@ -142,8 +143,6 @@ _PATHS_TO_INSERT = [
 for path in _PATHS_TO_INSERT:
     sys.path.insert(0, path)
 
-_MESSAGE_TYPE_SUCCESS = 'SUCCESS'
-_MESSAGE_TYPE_FAILED = 'FAILED'
 _TARGET_STDOUT = python_utils.string_io()
 _STDOUT_LIST = multiprocessing.Manager().list()
 _FILES = multiprocessing.Manager().dict()
@@ -196,7 +195,7 @@ class FileCache(python_utils.OBJECT):
         """
         key = (filepath, mode)
         if key not in self._CACHE_DATA_DICT:
-            with python_utils.open_file(filepath, mode) as f:
+            with python_utils.open_file(filepath, mode, newline='') as f:
                 lines = f.readlines()
                 self._CACHE_DATA_DICT[key] = (''.join(lines), tuple(lines))
         return self._CACHE_DATA_DICT[key]
@@ -564,8 +563,8 @@ def main(args=None):
     if errors_stacktrace:
         _print_errors_stacktrace(errors_stacktrace)
 
-    if any([message.startswith(_MESSAGE_TYPE_FAILED) for message in
-            lint_messages]) or errors_stacktrace:
+    if any([message.startswith(linter_utils.FAILED_MESSAGE_PREFIX) for
+            message in lint_messages]) or errors_stacktrace:
         python_utils.PRINT('---------------------------')
         python_utils.PRINT('Checks Not Passed.')
         python_utils.PRINT('---------------------------')

@@ -19,9 +19,10 @@
 
 var waitFor = require('./waitFor.js');
 var SkillEditorPage = require('./SkillEditorPage.js');
+var workflow = require('./workflow.js');
 
 var TopicsAndSkillsDashboardPage = function() {
-  var DASHBOARD_URL = '/topics_and_skills_dashboard';
+  var DASHBOARD_URL = '/topics-and-skills-dashboard';
   var skillEditorPage = new SkillEditorPage.SkillEditorPage();
   var topicNames = element.all(by.css('.protractor-test-topic-name'));
   var skillDescriptions = element.all(
@@ -87,8 +88,11 @@ var TopicsAndSkillsDashboardPage = function() {
   var topicNamesInTopicSelectModal = element.all(
     by.css('.protractor-test-topic-name-in-topic-select-modal'));
   var topicsTabButton = element(
-    by.css('.protractor-test-topics-tab')
-  );
+    by.css('.protractor-test-topics-tab'));
+  var topicThumbnailButton = element(
+    by.css('.protractor-test-photo-button'));
+  var thumbnailContainer = element(
+    by.css('.protractor-test-thumbnail-container'));
 
   // Returns a promise of all topics with the given name.
   var _getTopicElements = async function(topicName) {
@@ -120,7 +124,7 @@ var TopicsAndSkillsDashboardPage = function() {
     await topicsAndSkillsDashboardLink.click();
     await waitFor.pageToFullyLoad();
     expect(await browser.getCurrentUrl()).toEqual(
-      'http://localhost:9001/topics_and_skills_dashboard');
+      'http://localhost:9001/topics-and-skills-dashboard');
   };
 
   this.mergeSkillWithIndexToSkillWithIndex = async function(
@@ -136,7 +140,7 @@ var TopicsAndSkillsDashboardPage = function() {
     await waitFor.visibilityOf(topicsTable,
       'Topic table taking too long to appear.');
     var topicEditOptionBox = topicEditOptions.get(index);
-    await browser.actions().mouseMove(topicEditOptionBox).perform();
+    await topicEditOptionBox.click();
     await waitFor.elementToBeClickable(
       editTopicButton,
       'Edit Topic button takes too long to be clickable');
@@ -197,6 +201,10 @@ var TopicsAndSkillsDashboardPage = function() {
       'Create Topic modal takes too long to appear.');
     await topicNameField.sendKeys(topicName);
     await topicDescriptionField.sendKeys(description);
+    await workflow.submitImage(
+      topicThumbnailButton, thumbnailContainer,
+      ('../data/test_svg.svg'), false);
+
     await confirmTopicCreationButton.click();
 
     await waitFor.newTabToBeCreated(
@@ -261,7 +269,7 @@ var TopicsAndSkillsDashboardPage = function() {
     await waitFor.visibilityOf(topicsTable,
       'Topic table taking too long to appear.');
     var topicEditOptionBox = topicEditOptions.get(index);
-    await browser.actions().mouseMove(topicEditOptionBox).perform();
+    await topicEditOptionBox.click();
     await waitFor.elementToBeClickable(
       deleteTopicButton,
       'Delete Topic button takes too long to be clickable');
