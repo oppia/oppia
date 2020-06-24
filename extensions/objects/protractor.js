@@ -21,7 +21,8 @@
 // implement a setValue() function to which a single argument can be sent
 // that will completely determine the object.
 
-var waitFor = require('../../core/tests/protractor_utils/waitFor.js');
+var waitFor = require(
+  process.cwd() + '/core/tests/protractor_utils/waitFor.js');
 
 var AlgebraicExpressionEditor = function(elem) {
   return {
