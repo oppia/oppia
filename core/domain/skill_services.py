@@ -45,10 +45,9 @@ def _migrate_skill_contents_to_latest_schema(versioned_skill_contents):
 
     Args:
         versioned_skill_contents: A dict with two keys:
-            - schema_version (int). The schema version
-                for the skill_contents dict.
-            - skill_contents (dict). The dict comprising
-                the skill contents.
+            - schema_version: int. The schema version for the skill_contents
+                dict.
+            - skill_contents: dict. The dict comprising the skill contents.
 
     Raises:
         Exception: The schema version of the skill_contents is outside of what
@@ -77,9 +76,9 @@ def _migrate_misconceptions_to_latest_schema(versioned_misconceptions):
 
     Args:
         versioned_misconceptions: dict. A dict with two keys:
-            - schema_version (int). The schema version for
-                the misconceptions dict.
-            - misconceptions list(dict). The list of dicts comprising the skill
+            - schema_version: int. The schema version for the misconceptions
+                dict.
+            - misconceptions: list(dict). The list of dicts comprising the skill
                 misconceptions.
 
     Raises:
@@ -109,13 +108,13 @@ def _migrate_rubrics_to_latest_schema(versioned_rubrics):
 
     Args:
         versioned_rubrics: dict. A dict with two keys:
-            - schema_version (int). The schema version for the rubrics dict.
-            - rubrics list(dict). The list of dicts comprising the skill
-              rubrics.
+            - schema_version: int. The schema version for the rubrics dict.
+            - rubrics: list(dict). The list of dicts comprising the skill
+                rubrics.
 
     Raises:
-        Exception: The schema version of rubrics is outside of what
-            is supported at present.
+        Exception: The schema version of rubrics is outside of what is supported
+            at present.
     """
     rubric_schema_version = versioned_rubrics['schema_version']
     if not (1 <= rubric_schema_version
@@ -162,12 +161,10 @@ def get_skill_from_model(skill_model):
     from the datastore.
 
     Args:
-        skill_model: SkillModel. The skill model loaded from the
-            datastore.
+        skill_model: SkillModel. The skill model loaded from the datastore.
 
     Returns:
-        skill. A Skill domain object corresponding to the given
-        skill model.
+        skill. A Skill domain object corresponding to the given skill model.
     """
 
     # Ensure the original skill model does not get altered.
@@ -402,8 +399,8 @@ def get_skill_summary_by_id(skill_id, strict=True):
             id exists in the datastore.
 
     Returns:
-        SkillSummary. The skill summary domain object corresponding to
-        a skill with the given skill_id.
+        SkillSummary. The skill summary domain object corresponding to a skill
+        with the given skill_id.
     """
     skill_summary_model = skill_models.SkillSummaryModel.get(
         skill_id, strict=strict)
@@ -594,8 +591,8 @@ def _save_skill(committer_id, skill, commit_message, change_list):
         change_list: list(SkillChange). List of changes applied to a skill.
 
     Raises:
-        Exception: The skill model and the incoming skill domain
-            object have different version numbers.
+        Exception: The skill model and the incoming skill domain object have
+            different version numbers.
         Exception: Received invalid change list.
     """
     if not change_list:
@@ -833,9 +830,8 @@ def get_user_skill_mastery(user_id, skill_id):
             requested.
 
     Returns:
-        float or None. Mastery degree of the user for the
-        requested skill, or None if UserSkillMasteryModel does not exist
-        for the skill.
+        float or None. Mastery degree of the user for the requested skill, or
+        None if UserSkillMasteryModel does not exist for the skill.
     """
     model_id = user_models.UserSkillMasteryModel.construct_model_id(
         user_id, skill_id)
@@ -856,10 +852,9 @@ def get_multi_user_skill_mastery(user_id, skill_ids):
             requested.
 
     Returns:
-        dict(str, float|None). The keys are the requested
-        skill IDs. The values are the corresponding mastery degree of
-        the user or None if UserSkillMasteryModel does not exist for the
-        skill.
+        dict(str, float|None). The keys are the requested skill IDs. The values
+        are the corresponding mastery degree of the user or None if
+        UserSkillMasteryModel does not exist for the skill.
     """
     degrees_of_mastery = {}
     model_ids = []

@@ -2595,7 +2595,7 @@ def can_edit_entity(handler):
 
     Returns:
         function. The newly decorated function that now checks
-        if the user can edit entity.
+        if the user can edit the entity.
     """
     def test_can_edit_entity(self, entity_type, entity_id, **kwargs):
         """Checks if the user can edit entity.
@@ -2645,7 +2645,7 @@ def can_play_entity(handler):
 
     Returns:
         function. The newly decorated function that now checks
-        if the user can play entity.
+        if the user can play the entity.
     """
     def test_can_play_entity(self, entity_type, entity_id, **kwargs):
         """Checks if the user can play entity.

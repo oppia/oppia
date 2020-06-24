@@ -570,9 +570,8 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
             user_id: str. The user_id denotes which user's data to extract.
 
         Returns:
-            dict. A dict whose keys are IDs of threads the user is
-            involved in. The corresponding value is the reply_to_id of that
-            thread.
+            dict. A dict whose keys are IDs of threads the user is involved in.
+            The corresponding value is the reply_to_id of that thread.
         """
         user_data = {}
         email_reply_models = cls.get_all().filter(cls.user_id == user_id)

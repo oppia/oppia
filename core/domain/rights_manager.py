@@ -513,8 +513,8 @@ def get_multiple_exploration_rights_by_ids(exp_ids):
         exp_ids: list(str). List of exploration ids.
 
     Returns:
-        list(ActivityRights or None). List of rights object containing
-        ActivityRights object for existing exploration or None.
+        list(ActivityRights or None). List of rights object --> ActivityRights
+        objects for existing exploration or None.
     """
     exp_rights_models = exp_models.ExplorationRightsModel.get_multi(
         exp_ids)

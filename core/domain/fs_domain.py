@@ -162,7 +162,7 @@ class GcsFileSystem(GeneralFileSystem):
             return None
 
     def commit(self, filepath, raw_bytes, mimetype):
-        """Commit to file.
+        """Commit raw_bytes to the relevant file in the entity's assets folder.
 
         Args:
             filepath: str. The path to the relevant file within the entity's

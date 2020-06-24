@@ -291,8 +291,8 @@ def _generate_copy_tasks_for_fonts(source_paths, target_path):
         target_path: str. Path where the fonts should be copied.
 
     Returns:
-        deque(Thread). A deque that contains all copy tasks queued
-        to be processed.
+        deque(Thread). A deque that contains all copy tasks queued to be
+        processed.
     """
     copy_tasks = collections.deque()
     for font_path in source_paths:
@@ -321,8 +321,8 @@ def ensure_directory_exists(filepath):
     """Ensures if directory tree exists, if not creates the directories.
 
     Args:
-        filepath: str. Path to file located in directory that we want to
-            ensure exists.
+        filepath: str. Path to file located in directory that we want to ensure
+            exists.
     """
     directory = os.path.dirname(filepath)
     if not os.path.exists(directory):

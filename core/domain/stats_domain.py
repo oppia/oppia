@@ -116,8 +116,7 @@ class ExplorationStats(python_utils.OBJECT):
         state of the exploration and traversed to the next state.
 
         Returns:
-            int. The number of learners who actually attempted
-            the exploration.
+            int. The number of learners who actually attempted the exploration.
         """
         return self.num_actual_starts_v1 + self.num_actual_starts_v2
 
@@ -1122,8 +1121,8 @@ class AnswerOccurrence(python_utils.OBJECT):
             answer_occurrence_dict: dict. The specific answer dict in the
                 following format:
                 {
-                    'answer' (*). The answer submitted by the learner.
-                    'frequency' (int). The number of occurrences of the answer.
+                    'answer': *. The answer submitted by the learner.
+                    'frequency': int. The number of occurrences of the answer.
                 }
 
         Returns:
@@ -1163,8 +1162,8 @@ class AnswerFrequencyList(AnswerCalculationOutput):
             list(dict). A list of answer occurrence dicts. Each dict has the
             following format:
             {
-                'answer' (*). The answer submitted by the learner.
-                'frequency' (int). The number of occurrences of the answer.
+                'answer': *. The answer submitted by the learner.
+                'frequency': int. The number of occurrences of the answer.
             }
         """
         return [
@@ -1180,8 +1179,8 @@ class AnswerFrequencyList(AnswerCalculationOutput):
             answer_occurrence_list: list(dict). A list containing answer
                 occurrence dicts in the following format:
                 {
-                    'answer' (*). The answer submitted by the learner.
-                    'frequency' (int). The number of occurrences of the answer.
+                    'answer': *. The answer submitted by the learner.
+                    'frequency': int. The number of occurrences of the answer.
                 }
 
         Returns:
@@ -1215,8 +1214,8 @@ class CategorizedAnswerFrequencyLists(AnswerCalculationOutput):
             values are lists of answer frequency dicts. Each answer
             frequency dict has the following keys and values:
             {
-                'answer' (*). The answer submitted by the learner.
-                'frequency' (int). The number of occurrences of the answer.
+                'answer': *. The answer submitted by the learner.
+                'frequency': int. The number of occurrences of the answer.
             }
         """
         return {
@@ -1236,8 +1235,8 @@ class CategorizedAnswerFrequencyLists(AnswerCalculationOutput):
                 values are lists of answer frequency dicts. Each answer
                 frequency dict has the following keys and values:
                 {
-                    'answer' (*). The answer submitted by the learner.
-                    'frequency' (int). The number of occurrences of the answer.
+                    'answer': *. The answer submitted by the learner.
+                    'frequency': int. The number of occurrences of the answer.
                 }
 
         Returns:

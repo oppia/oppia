@@ -306,21 +306,21 @@ class DocstringParameterChecker(checkers.BaseChecker):
             ('Line starting with "%s" requires 4 space indentation relative to'
              + ' args line indentation'),
             '4-space-indentation-for-arg-parameters-doc',
-            ('Please use 4 space indentation in parameter definitions' +
-             ' relative to the args line indentation.')
+            ('Please use 4 space indentation in parameter definitions relative'
+             + ' to the args line indentation.')
         ),
         'W9020': (
             ('Line starting with "%s" requires 8 space indentation relative to'
              + ' args line indentation'),
             '8-space-indentation-for-arg-in-descriptions-doc',
-            ('Please indent wrap around descriptions by 8 relative to the args'
+            ('Please indent wrap-around descriptions by 8 relative to the args'
              + ' line indentation.')
         ),
         'W9021': (
             ('Args: indentation is incorrect, must be at the outermost'
              + ' indentation level.'),
             'incorrect-indentation-for-arg-header-doc',
-            'Please indent args at the outermost indentation level.'
+            'Please indent args line to the outermost indentation level.'
         )
     }
 

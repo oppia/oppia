@@ -95,7 +95,7 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
                 are to be fetched.
 
         Returns:
-            3-tuple (results, cursor, more). As described in fetch_page() at:
+            3-tuple of (results, cursor, more). As described in fetch_page() at:
             https://developers.google.com/appengine/docs/python/ndb/queryclass,
             where:
                 results: list(ExplorationOpportunitySummaryModel)|None. A list
@@ -134,7 +134,7 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
                 to be fetched.
 
         Returns:
-            3-tuple (results, cursor, more). As described in fetch_page() at:
+            3-tuple of (results, cursor, more). As described in fetch_page() at:
             https://developers.google.com/appengine/docs/python/ndb/queryclass,
             where:
                 results: list(ExplorationOpportunitySummaryModel)|None. A list
@@ -229,7 +229,7 @@ class SkillOpportunityModel(base_models.BaseModel):
                 of the full list of entities.
 
         Returns:
-            3-tuple (results, cursor, more). As described in fetch_page() at:
+            3-tuple of (results, cursor, more). As described in fetch_page() at:
             https://developers.google.com/appengine/docs/python/ndb/queryclass,
             where:
                 results: list(SkillOpportunityModel)|None. A list

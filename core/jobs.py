@@ -679,10 +679,10 @@ class MapReduceJobPipeline(base_handler.PipelineBase):
                 MapreducePipeline.
 
         Yields:
-            MapreducePipeline. Ready to start processing:
-                Expects the output of that pipeline to be sent back.
-            StoreMapReduceResults. Will be constructed with:
-                whatever output the caller sends back to the coroutine.
+            MapreducePipeline. Ready to start processing. Expects the output of
+                that pipeline to be sent back.
+            StoreMapReduceResults. Will be constructed with whatever output the
+                caller sends back to the coroutine.
         """
         job_class = mapreduce_util.for_name(job_class_str)
         job_class.register_start(job_id, metadata={
@@ -1195,8 +1195,8 @@ class BaseRealtimeDatastoreClassForContinuousComputations(
 
         Returns:
             * or None. The entity instance that corresponds to the given id, or
-            None if strict == False and no undeleted entity with the given
-            id exists in the datastore.
+            None if strict == False and no undeleted entity with the given id
+            exists in the datastore.
 
         Raises:
             base_models.BaseModel.EntityNotFoundError: strict == True and no

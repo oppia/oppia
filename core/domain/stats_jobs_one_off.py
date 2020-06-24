@@ -83,8 +83,8 @@ class PlaythroughAudit(jobs.BaseMapReduceOneOffJobManager):
             playthrough_model: PlaythroughModel.
 
         Yields:
-            (2-tuple). A 2-tuple of the form (playthrough_model.id, audit_data),
-            where the structure of audit_data is:
+            2-tuple of (playthrough_model.id, audit_data). Where the structure
+            of audit_data is:
                 exp_id: str. The exploration the playthrough records.
                 created_on: str. The date the model was created in YYYY-MM-DD
                     format.
@@ -631,8 +631,8 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 the old_stats_model up to the next version.
 
         Returns:
-            dict. A dict representation of an ExplorationStatsModel
-            with updated state_stats_mapping and version.
+            dict. A dict representation of an ExplorationStatsModel with
+            updated state_stats_mapping and version.
         """
         relevant_commit_cmds = [
             exp_domain.CMD_ADD_STATE,

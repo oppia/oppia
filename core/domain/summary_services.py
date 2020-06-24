@@ -220,7 +220,7 @@ def get_exp_metadata_dicts_matching_query(query_string, search_cursor, user):
             given user.
 
     Returns:
-        (tuple). Containing 2 elements:
+        2-tuple of (exploration_list, new_search_cursor). Where:
             - exploration_list list(dict). A list of metadata dicts for
                 explorations matching the query.
             - new_search_cursor (str). New search cursor location.
