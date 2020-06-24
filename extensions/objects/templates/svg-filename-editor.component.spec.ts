@@ -16,47 +16,38 @@
  * @fileoverview Unit tests for the svg filename editor.
  */
 
+const { fabric } = require('fabric');
 import { AppConstants } from 'app.constants';
 
 describe('SvgFilenameEditor', function() {
   var alertSpy = null;
   var contextService = null;
   var CsrfService = null;
-  var LCDiagramEditorCtrl = null;
+  var svgFilenameCtrl = null;
   var $scope = null;
-  var defaultsvg = (
-    '<svg xmlns="http://www.w3.org/2000/svg" width="450" height="350" view' +
-    'Box="0 0 450 350"> <rect width="450" height="350" x="0" y="0" fill="t' +
-    'ransparent" /> <g transform="translate(0, 0)">  </g> </svg>');
-  var linesvg = (
-    '<svg xmlns="http://www.w3.org/2000/' +
-    'svg" width="450" height="350" viewBox="0 0 450 350"> <rect width="450" ' +
-    'height="350" x="0" y="0" fill="transparent" /> <g transform="translate(' +
-    '0, 0)"> <g id="line-241c7047-7297-9aa7-486d-818cfebd30d7"><line x1="105' +
-    '.5" y1="97.125" x2="145.5" y2="130.125" stroke="hsla(0, 0%, 0%, 1)" fil' +
-    'l="undefined" stroke-width="2" stroke-linecap="round"></line></g> </g> ' +
-    '</svg>');
-  var dataUrl = 'data:image/svg+xml;utf8,' + linesvg;
-
-  var mockLiterallyCanvas = {
-    currentSvg: defaultsvg,
-    _shapesInProgress: [],
-    setShapeInProgress: function(shape) {
-      this._shapesInProgress.push(shape);
-    },
-    setImageSize: function(width, height) {
-      var text = (
-        'The updated diagram width is ' + width +
-        ' and height is ' + height);
-      return text;
-    },
-    getSVGString: function() {
-      return this.currentSvg;
-    },
-    teardown: function() {
-      return 'LiterallyCanvas is removed';
-    }
-  };
+  var samplesvg = (
+    '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/' +
+    '1999/xlink" version="1.1" width="494" height="367" viewBox="0 0 494 367' +
+    '"><desc>Created with Fabric.js 3.6.3</desc><defs></defs><rect x="0" y="' +
+    '0" width="100%" height="100%" fill="rgba(10,245,49,0.607)"/><g transfor' +
+    'm="matrix(1 0 0 1 273.5 177.5)"><rect style="stroke: rgb(0,0,0); stroke' +
+    '-width: 9; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoff' +
+    'set: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0);' +
+    ' fill-rule: nonzero; opacity: 1;" vector-effect="non-scaling-stroke" x=' +
+    '"-30" y="-35" rx="0" ry="0" width="60" height="70"/></g><g transform="m' +
+    'atrix(1 0 0 1 169.5 182.5)"><circle style="stroke: rgb(0,0,0); stroke-w' +
+    'idth: 9; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffse' +
+    't: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); f' +
+    'ill-rule: nonzero; opacity: 1;" vector-effect="non-scaling-stroke" cx="' +
+    '0" cy="0" r="30"/></g><g transform="matrix(1 0 0 2.15 100.49 123.68)" s' +
+    'tyle=""><text font-family="helvetica" font-size="18" font-style="nor' +
+    'mal" font-weight="normal" style="stroke: none; stroke-width: 1; stroke-' +
+    'dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-lin' +
+    'ejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzer' +
+    'o; opacity: 1; white-space: pre;"><tspan x="-43.99" y="-17.94" style="w' +
+    'hite-space: pre; ">Enter </tspan><tspan x="-43.99" y="29.25">Text</tspa' +
+    'n></text></g></svg>');
+  var dataUrl = 'data:image/svg+xml;utf8,' + samplesvg;
 
   var mockAssetsBackendApiService = {
     getImageUrlForPreview: function(contentType, contentId, filepath) {
@@ -68,8 +59,8 @@ describe('SvgFilenameEditor', function() {
     convertImageDataToImageFile: function(svgDataUri) {
       return new Blob();
     },
-    generateImageFilename: function(height, widht, extension) {
-      return height + '_' + widht + '.' + extension;
+    generateImageFilename: function(height, width, extension) {
+      return height + '_' + width + '.' + extension;
     },
     getInvalidSvgTagsAndAttrs: function(dataUri) {
       return { tags: [], attrs: [] };
@@ -97,6 +88,11 @@ describe('SvgFilenameEditor', function() {
       this.onload();
     }
   }
+
+  var polyPoint = function(x, y) {
+    this.x = x;
+    this.y = y;
+  };
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -126,24 +122,42 @@ describe('SvgFilenameEditor', function() {
     // should be declared.
     spyOn(window, 'Image').and.returnValue(new mockImageObject());
 
-    LCDiagramEditorCtrl = $componentController('svgFilenameEditor');
+    svgFilenameCtrl = $componentController('svgFilenameEditor');
     var mockDocument = document.createElement('div');
-    mockDocument.setAttribute('id', LCDiagramEditorCtrl.lcID);
+    var strokeDiv = document.createElement('div');
+    strokeDiv.setAttribute('id', 'stroke-color');
+    var fillDiv = document.createElement('div');
+    fillDiv.setAttribute('id', 'fill-color');
+    var bgDiv = document.createElement('div');
+    bgDiv.setAttribute('id', 'bg-color');
+    mockDocument.appendChild(strokeDiv);
+    mockDocument.appendChild(fillDiv);
+    mockDocument.appendChild(bgDiv);
+    var mockCanvas = document.createElement('canvas');
+    mockCanvas.setAttribute('id', svgFilenameCtrl.canvasID);
+    mockDocument.appendChild(mockCanvas);
     var $document = angular.element(document);
     $document.find('body').append(mockDocument.outerHTML);
-    LCDiagramEditorCtrl.$onInit();
-    LCDiagramEditorCtrl.lc = mockLiterallyCanvas;
+    svgFilenameCtrl.$onInit();
+    svgFilenameCtrl.canvas = new fabric.Canvas(svgFilenameCtrl.canvasID);
+    svgFilenameCtrl.initializeMouseEvents();
+    var mockFillPicker = {
+      setOptions: function(data) {
+        return 'The value is set.';
+      }
+    };
+    svgFilenameCtrl.fillPicker = mockFillPicker;
   }));
 
   it('should update diagram size', function() {
     var WIDTH = 100;
     var HEIGHT = 100;
-    LCDiagramEditorCtrl.diagramWidth = WIDTH;
-    LCDiagramEditorCtrl.diagramHeight = HEIGHT;
-    LCDiagramEditorCtrl.onWidthInputBlur();
-    expect(LCDiagramEditorCtrl.currentDiagramWidth).toBe(WIDTH);
-    LCDiagramEditorCtrl.onHeightInputBlur();
-    expect(LCDiagramEditorCtrl.currentDiagramHeight).toBe(HEIGHT);
+    svgFilenameCtrl.diagramWidth = WIDTH;
+    svgFilenameCtrl.diagramHeight = HEIGHT;
+    svgFilenameCtrl.onWidthInputBlur();
+    expect(svgFilenameCtrl.currentDiagramWidth).toBe(WIDTH);
+    svgFilenameCtrl.onHeightInputBlur();
+    expect(svgFilenameCtrl.currentDiagramHeight).toBe(HEIGHT);
   });
 
   it('should return information on diagram size', function() {
@@ -153,23 +167,144 @@ describe('SvgFilenameEditor', function() {
       'This diagram has a maximum dimension of ' +
       maxDiagramWidth + 'px X ' + maxDiagramHeight +
       'px to ensure that it fits in the card.');
-    expect(LCDiagramEditorCtrl.getDiagramSizeInfo()).toBe(helpText);
+    expect(svgFilenameCtrl.getDiagramSizeInfo()).toBe(helpText);
   });
 
   it('should check if diagram is created', function() {
-    LCDiagramEditorCtrl.lc.currentSvg = defaultsvg;
-    expect(LCDiagramEditorCtrl.isDiagramCreated()).toBe(false);
-    LCDiagramEditorCtrl.lc.currentSvg = linesvg;
-    expect(LCDiagramEditorCtrl.isDiagramCreated()).toBe(true);
+    var rect = new fabric.Rect({
+      top: 10,
+      left: 10,
+      width: 60,
+      height: 70,
+    });
+    svgFilenameCtrl.canvas.add(rect);
+    expect(svgFilenameCtrl.isDiagramCreated()).toBe(true);
   });
 
-  it('should check whether user is drawing', function() {
-    expect(LCDiagramEditorCtrl.isUserDrawing()).toBe(false);
-    LCDiagramEditorCtrl.lc.setShapeInProgress('tool');
-    expect(LCDiagramEditorCtrl.isUserDrawing()).toBe(true);
+  it('should create different shapes', function() {
+    svgFilenameCtrl.createRect();
+    svgFilenameCtrl.createLine();
+    svgFilenameCtrl.createCircle();
+    svgFilenameCtrl.createText();
+    expect(svgFilenameCtrl.canvas.getObjects()[0].get('type')).toBe('rect');
+    expect(svgFilenameCtrl.canvas.getObjects()[1].get('type')).toBe('line');
+    expect(svgFilenameCtrl.canvas.getObjects()[2].get('type')).toBe('circle');
+    expect(svgFilenameCtrl.canvas.getObjects()[3].get('type')).toBe('textbox');
+
+    svgFilenameCtrl.togglePencilDrawing();
+    expect(svgFilenameCtrl.isPencilEnabled()).toBe(true);
+    svgFilenameCtrl.togglePencilDrawing();
+    svgFilenameCtrl.createOpenPolygon();
+    expect(svgFilenameCtrl.isOpenPolygonEnabled()).toBe(true);
+    svgFilenameCtrl.createOpenPolygon();
+    svgFilenameCtrl.polyOptions.lines.push(new fabric.Line([10, 10, 50, 50]));
+    svgFilenameCtrl.polyOptions.bboxPoints.push(new polyPoint(10, 10));
+    svgFilenameCtrl.createClosedPolygon();
+    expect(svgFilenameCtrl.isClosedPolygonEnabled()).toBe(true);
+    svgFilenameCtrl.createClosedPolygon();
+    svgFilenameCtrl.copyColor();
+    expect(svgFilenameCtrl.isEyeDropperEnabled()).toBe(true);
   });
 
-  it('should save svg file created by literallyCanvas', function() {
+  it('should undo and redo the creation of shapes', function() {
+    for (var i = 0; i < 6; i++) {
+      svgFilenameCtrl.createRect();
+    }
+    expect(svgFilenameCtrl.canvas.getObjects().length).toBe(6);
+    svgFilenameCtrl.onUndo();
+    expect(svgFilenameCtrl.canvas.getObjects().length).toBe(5);
+    svgFilenameCtrl.onRedo();
+    expect(svgFilenameCtrl.canvas.getObjects().length).toBe(6);
+    svgFilenameCtrl.canvas.setActiveObject(
+      svgFilenameCtrl.canvas.getObjects()[5]);
+    svgFilenameCtrl.removeShape();
+    expect(svgFilenameCtrl.canvas.getObjects().length).toBe(5);
+    svgFilenameCtrl.onUndo();
+    expect(svgFilenameCtrl.canvas.getObjects().length).toBe(6);
+    svgFilenameCtrl.onRedo();
+    expect(svgFilenameCtrl.canvas.getObjects().length).toBe(5);
+    svgFilenameCtrl.onClear();
+    expect(svgFilenameCtrl.objectUndoStack.length).toBe(0);
+  });
+
+  it('should change properties of a shape', function() {
+    svgFilenameCtrl.createRect();
+    svgFilenameCtrl.canvas.setActiveObject(
+      svgFilenameCtrl.canvas.getObjects()[0]);
+    var color = 'rgba(10, 10, 10, 1)';
+    svgFilenameCtrl.fabricjsOptions.stroke = color;
+    svgFilenameCtrl.fabricjsOptions.fill = color;
+    svgFilenameCtrl.fabricjsOptions.bg = color;
+    svgFilenameCtrl.fabricjsOptions.size = '10px';
+    svgFilenameCtrl.onStrokeChange();
+    svgFilenameCtrl.onFillChange();
+    svgFilenameCtrl.onBgChange();
+    svgFilenameCtrl.onSizeChange();
+    var rectShape = svgFilenameCtrl.canvas.getObjects()[0];
+    expect(rectShape.get('stroke')).toBe(color);
+    expect(rectShape.get('fill')).toBe(color);
+    expect(svgFilenameCtrl.canvas.backgroundColor).toBe(color);
+    expect(rectShape.get('strokeWidth')).toBe(10);
+    svgFilenameCtrl.createText();
+    svgFilenameCtrl.fabricjsOptions.bold = true;
+    svgFilenameCtrl.fabricjsOptions.italic = true;
+    svgFilenameCtrl.fabricjsOptions.fontFamily = 'comic sans ms';
+    svgFilenameCtrl.fabricjsOptions.size = '12px';
+    svgFilenameCtrl.canvas.discardActiveObject();
+    svgFilenameCtrl.canvas.setActiveObject(
+      svgFilenameCtrl.canvas.getObjects()[1]);
+    svgFilenameCtrl.onItalicToggle();
+    svgFilenameCtrl.onBoldToggle();
+    svgFilenameCtrl.onFontChange();
+    svgFilenameCtrl.onSizeChange();
+    var textObj = svgFilenameCtrl.canvas.getObjects()[1];
+    expect(textObj.get('fontStyle')).toBe('italic');
+    expect(textObj.get('fontWeight')).toBe('bold');
+    expect(textObj.get('fontFamily')).toBe('comic sans ms');
+    expect(textObj.get('fontSize')).toBe(12);
+  });
+
+  it('should trigger mouse events', function() {
+    svgFilenameCtrl.drawMode = 'polygon';
+    svgFilenameCtrl.canvas.trigger('mouse:down', {
+      e: {
+        pageX: 0,
+        pageY: 0
+      }
+    });
+    svgFilenameCtrl.canvas.trigger('mouse:move', {
+      e: {
+        pageX: 100,
+        pageY: 100
+      }
+    });
+    svgFilenameCtrl.canvas.trigger('mouse:dblclick');
+    expect(svgFilenameCtrl.canvas.getObjects()[0].get('type')).toBe('polyline');
+    svgFilenameCtrl.drawMode = 'eyedropper';
+    var mockCanvasElement = {
+      getContext: function(data) {
+        return {
+          getImageData: function(data) {
+            return {
+              data: [1, 2, 3, 4]
+            };
+          }
+        };
+      }
+    };
+    svgFilenameCtrl.canvasElement = mockCanvasElement;
+    svgFilenameCtrl.canvas.trigger('mouse:down', {
+      e: {
+        pageX: 0,
+        pageY: 0
+      }
+    });
+    expect(svgFilenameCtrl.fabricjsOptions.fill).toBe('rgba(1,2,3,4)');
+  });
+
+  it('should save svg file created by the editor', function() {
+    svgFilenameCtrl.createText();
+
     // responseText contains a XSSI Prefix, which is represented by )]}'
     // string. That's why double quotes is being used here. It's not
     // possible to use \' instead of ' so the XSSI Prefix won't be
@@ -178,7 +313,6 @@ describe('SvgFilenameEditor', function() {
     var responseText = ")]}'\n{ \"filename\": \"imageFile1.svg\" }";
     /* eslint-enable quotes */
 
-    LCDiagramEditorCtrl.lc.currentSvg = linesvg;
     // @ts-ignore in order to ignore JQuery properties that should
     // be declared.
     spyOn($, 'ajax').and.callFake(function() {
@@ -186,24 +320,23 @@ describe('SvgFilenameEditor', function() {
       d.resolve(responseText);
       return d.promise();
     });
-    LCDiagramEditorCtrl.saveSVGFile();
+    svgFilenameCtrl.saveSVGFile();
 
     // $q Promises need to be forcibly resolved through a JavaScript digest,
     // which is what $apply helps kick-start.
     $scope.$apply();
-    expect(LCDiagramEditorCtrl.data.savedSVGFileName).toBe('imageFile1.svg');
-    expect(LCDiagramEditorCtrl.data.savedSVGUrl.toString()).toBe(dataUrl);
-    expect(LCDiagramEditorCtrl.validate()).toBe(true);
+    expect(svgFilenameCtrl.data.savedSVGFileName).toBe('imageFile1.svg');
+    expect(svgFilenameCtrl.data.savedSVGUrl.toString()).toBe(dataUrl);
+    expect(svgFilenameCtrl.validate()).toBe(true);
   });
 
   it('should not save svg file when no diagram is created', function() {
-    LCDiagramEditorCtrl.lc.currentSvg = defaultsvg;
-    LCDiagramEditorCtrl.saveSVGFile();
+    svgFilenameCtrl.saveSVGFile();
     expect(alertSpy).toHaveBeenCalledWith('Custom Diagram not created.');
   });
 
   it('should handle rejection when saving an svg file fails', function() {
-    LCDiagramEditorCtrl.lc.currentSvg = linesvg;
+    svgFilenameCtrl.createRect();
     var errorMessage = 'Error on saving svg file';
     // @ts-ignore in order to ignore JQuery properties that should
     // be declared.
@@ -220,7 +353,7 @@ describe('SvgFilenameEditor', function() {
       });
       return d.promise();
     });
-    LCDiagramEditorCtrl.saveSVGFile();
+    svgFilenameCtrl.saveSVGFile();
 
     // $q Promises need to be forcibly resolved through a JavaScript digest,
     // which is what $apply helps kick-start.
@@ -229,27 +362,24 @@ describe('SvgFilenameEditor', function() {
   });
 
   it('should allow user to continue editing the diagram', function() {
-    LCDiagramEditorCtrl.savedSVGDiagram = linesvg;
-    LCDiagramEditorCtrl.continueDiagramEditing();
-    LCDiagramEditorCtrl.lc = mockLiterallyCanvas;
-    expect(LCDiagramEditorCtrl.diagramStatus).toBe('editing');
+    svgFilenameCtrl.savedSVGDiagram = 'saved';
+    svgFilenameCtrl.savedSVGDiagram = samplesvg;
+    svgFilenameCtrl.continueDiagramEditing();
+    expect(svgFilenameCtrl.diagramStatus).toBe('editing');
   });
 });
 
 
 describe('SvgFilenameEditor initialized with value attribute',
   function() {
-    var LCDiagramEditorCtrl = null;
+    var svgFilenameCtrl = null;
     var $httpBackend = null;
     var contextService = null;
-    var linesvg = (
-      '<svg xmlns="http://www.w3.org/2000/' +
-      'svg" width="450" height="350" viewBox="0 0 450 350"> <rect width="450' +
-      '" height="350" x="0" y="0" fill="transparent" /> <g transform="transl' +
-      'ate(0, 0)"> <g id="line-241c7047-7297-9aa7-486d-818cfebd30d7"><line x' +
-      '1="105.5" y1="97.125" x2="145.5" y2="130.125" stroke="hsla(0, 0%, 0%,' +
-      ' 1)" fill="undefined" stroke-width="2" stroke-linecap="round"></line>' +
-      '</g> </g> </svg>');
+    var samplesvg = (
+      '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.or' +
+      'g/1999/xlink" version="1.1" width="494" height="367" viewBox="0 0 494' +
+      ' 367"><desc>Created with Fabric.js 3.6.3</desc><rect x="0" y="0" ' +
+      'width="100%" height="100%" fill="rgba(10,245,49,0.607)"/></svg>');
     var mockAssetsBackendApiService = {
       getImageUrlForPreview: function(contentType, contentId, filepath) {
         return '/imageurl_' + contentType + '_' + contentId + '_' + filepath;
@@ -274,21 +404,37 @@ describe('SvgFilenameEditor initialized with value attribute',
       contextService = $injector.get('ContextService');
       spyOn(contextService, 'getEntityType').and.returnValue('exploration');
       spyOn(contextService, 'getEntityId').and.returnValue('1');
-      LCDiagramEditorCtrl = $componentController(
-        'svgFilenameEditor', null, {
-          value: 'svgimageFilename1.svg'
-        }
-      );
-      LCDiagramEditorCtrl.$onInit();
+
+      svgFilenameCtrl = $componentController('svgFilenameEditor', null, {
+        value: 'svgimageFilename1.svg'
+      });
+      var mockDocument = document.createElement('div');
+      var strokeDiv = document.createElement('div');
+      strokeDiv.setAttribute('id', 'stroke-color');
+      var fillDiv = document.createElement('div');
+      fillDiv.setAttribute('id', 'fill-color');
+      var bgDiv = document.createElement('div');
+      bgDiv.setAttribute('id', 'bg-color');
+      mockDocument.appendChild(strokeDiv);
+      mockDocument.appendChild(fillDiv);
+      mockDocument.appendChild(bgDiv);
+      var mockCanvas = document.createElement('canvas');
+      mockCanvas.setAttribute('id', svgFilenameCtrl.canvasID);
+      mockDocument.appendChild(mockCanvas);
+      var $document = angular.element(document);
+      $document.find('body').append(mockDocument.outerHTML);
+      svgFilenameCtrl.$onInit();
+      svgFilenameCtrl.canvas = new fabric.Canvas(svgFilenameCtrl.canvasID);
+      svgFilenameCtrl.initializeMouseEvents();
     }));
 
     it('should load the svg file', function() {
       $httpBackend.expect(
         'GET', '/imageurl_exploration_1_svgimageFilename1.svg'
-      ).respond(linesvg);
+      ).respond(samplesvg);
       $httpBackend.flush();
-      expect(LCDiagramEditorCtrl.diagramStatus).toBe('saved');
-      expect(LCDiagramEditorCtrl.savedSVGDiagram).toBe(linesvg);
+      expect(svgFilenameCtrl.diagramStatus).toBe('saved');
+      expect(svgFilenameCtrl.savedSVGDiagram).toBe(samplesvg);
     });
   }
 );
@@ -296,37 +442,13 @@ describe('SvgFilenameEditor initialized with value attribute',
 describe('SvgFilenameEditor with image save destination as ' +
   'local storage', function() {
   var contextService = null;
-  var LCDiagramEditorCtrl = null;
-  var defaultsvg = (
-    '<svg xmlns="http://www.w3.org/2000/svg" width="450" height="350" view' +
-    'Box="0 0 450 350"> <rect width="450" height="350" x="0" y="0" fill="t' +
-    'ransparent" /> <g transform="translate(0, 0)">  </g> </svg>');
-  var linesvg = (
-    '<svg xmlns="http://www.w3.org/2000/' +
-    'svg" width="450" height="350" viewBox="0 0 450 350"> <rect width="450" ' +
-    'height="350" x="0" y="0" fill="transparent" /> <g transform="translate(' +
-    '0, 0)"> <g id="line-241c7047-7297-9aa7-486d-818cfebd30d7"><line x1="105' +
-    '.5" y1="97.125" x2="145.5" y2="130.125" stroke="hsla(0, 0%, 0%, 1)" fil' +
-    'l="undefined" stroke-width="2" stroke-linecap="round"></line></g> </g> ' +
-    '</svg>');
-  var dataUrl = 'data:image/svg+xml;utf8,' + linesvg;
-
-  var mockLiterallyCanvas = {
-    currentSvg: defaultsvg,
-    _shapesInProgress: [],
-    setImageSize: function(width, height) {
-      var text = (
-        'The updated diagram width is ' + width +
-        ' and height is ' + height);
-      return text;
-    },
-    getSVGString: function() {
-      return this.currentSvg;
-    },
-    teardown: function() {
-      return 'LiterallyCanvas is removed';
-    }
-  };
+  var svgFilenameCtrl = null;
+  var samplesvg = (
+    '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.or' +
+    'g/1999/xlink" version="1.1" width="494" height="367" viewBox="0 0 494' +
+    ' 367"><desc>Created with Fabric.js 3.6.3</desc><rect x="0" y="0" ' +
+    'width="100%" height="100%" fill="rgba(10,245,49,0.607)"/></svg>');
+  var dataUrl = 'data:image/svg+xml;utf8,' + samplesvg;
 
   var mockilss = {
     getObjectUrlForImage: function(filename) {
@@ -407,34 +529,107 @@ describe('SvgFilenameEditor with image save destination as ' +
     // should be declared.
     spyOn(window, 'FileReader').and.returnValue(new mockReaderObject());
 
-    LCDiagramEditorCtrl = $componentController(
-      'svgFilenameEditor');
+    svgFilenameCtrl = $componentController('svgFilenameEditor');
     var mockDocument = document.createElement('div');
-    mockDocument.setAttribute('id', LCDiagramEditorCtrl.lcID);
+    var strokeDiv = document.createElement('div');
+    strokeDiv.setAttribute('id', 'stroke-color');
+    var fillDiv = document.createElement('div');
+    fillDiv.setAttribute('id', 'fill-color');
+    var bgDiv = document.createElement('div');
+    bgDiv.setAttribute('id', 'bg-color');
+    mockDocument.appendChild(strokeDiv);
+    mockDocument.appendChild(fillDiv);
+    mockDocument.appendChild(bgDiv);
+    var mockCanvas = document.createElement('canvas');
+    mockCanvas.setAttribute('id', svgFilenameCtrl.canvasID);
+    mockDocument.appendChild(mockCanvas);
     var $document = angular.element(document);
     $document.find('body').append(mockDocument.outerHTML);
-    LCDiagramEditorCtrl.$onInit();
-    LCDiagramEditorCtrl.lc = mockLiterallyCanvas;
+    svgFilenameCtrl.$onInit();
+    svgFilenameCtrl.canvas = new fabric.Canvas(svgFilenameCtrl.canvasID);
+    svgFilenameCtrl.initializeMouseEvents();
   }));
 
 
-  it('should save svg file to local storage created by literallyCanvas',
+  it('should save svg file to local storage created by the svg editor',
     function() {
-      LCDiagramEditorCtrl.lc.currentSvg = linesvg;
-      LCDiagramEditorCtrl.saveSVGFile();
-
-      expect(LCDiagramEditorCtrl.data.savedSVGFileName).toBe('350_450.svg');
-      expect(LCDiagramEditorCtrl.data.savedSVGUrl.toString()).toBe(dataUrl);
-      expect(LCDiagramEditorCtrl.validate()).toBe(true);
+      svgFilenameCtrl.createRect();
+      svgFilenameCtrl.saveSVGFile();
+      expect(svgFilenameCtrl.data.savedSVGFileName).toBe('350_450.svg');
+      expect(svgFilenameCtrl.data.savedSVGUrl.toString()).toBe(dataUrl);
+      expect(svgFilenameCtrl.validate()).toBe(true);
     }
   );
 
   it('should allow user to continue editing the diagram and delete the ' +
     'image from local storage', function() {
-    LCDiagramEditorCtrl.data.savedSVGFileName = 'image.svg';
-    LCDiagramEditorCtrl.savedSVGDiagram = linesvg;
-    LCDiagramEditorCtrl.continueDiagramEditing();
-    LCDiagramEditorCtrl.lc = mockLiterallyCanvas;
-    expect(LCDiagramEditorCtrl.diagramStatus).toBe('editing');
+    svgFilenameCtrl.data.savedSVGFileName = 'image.svg';
+    svgFilenameCtrl.savedSVGDiagram = 'saved';
+    svgFilenameCtrl.savedSVGDiagram = samplesvg;
+    svgFilenameCtrl.continueDiagramEditing();
+    expect(svgFilenameCtrl.diagramStatus).toBe('editing');
+  });
+});
+
+
+describe('should fail svg tag validation', function() {
+  var svgFilenameCtrl = null;
+  var mockImageUploadHelperService = {
+    getInvalidSvgTagsAndAttrs: function(dataURI) {
+      return { tags: ['script'], attrs: [] };
+    }
+  };
+
+  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('AssetsBackendApiService', {});
+    $provide.value('ImageLocalStorageService', {});
+    $provide.value('ImagePreloaderService', {});
+    $provide.value('ImageUploadHelperService', mockImageUploadHelperService);
+  }));
+  beforeEach(angular.mock.inject(function($componentController) {
+    svgFilenameCtrl = $componentController('svgFilenameEditor');
+  }));
+
+  it('should fail svg validation', function() {
+    var invalidSvgTag = (
+      '<svg width="100" height="100"><rect id="rectangle-de569866-9c11-b553-' +
+      'f5b7-4194e2380d9f" x="143" y="97" width="12" height29" stroke="hsla(0' +
+      ', 0%, 0%, 1)" fill="hsla(0, 0%, 100%, 1)" stroke-width="1"></rect>' +
+      '<script src="evil.com"></script></svg>');
+    expect(() => {
+      svgFilenameCtrl.isSvgTagValid(invalidSvgTag);
+    }).toThrowError('Invalid tags in svg:script');
+  });
+});
+
+describe('should fail svg attribute validation', function() {
+  var svgFilenameCtrl = null;
+  var mockImageUploadHelperService = {
+    getInvalidSvgTagsAndAttrs: function(dataURI) {
+      return { tags: [], attrs: ['widht'] };
+    }
+  };
+
+  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('AssetsBackendApiService', {});
+    $provide.value('ImageLocalStorageService', {});
+    $provide.value('ImagePreloaderService', {});
+    $provide.value('ImageUploadHelperService', mockImageUploadHelperService);
+  }));
+  beforeEach(angular.mock.inject(function($componentController) {
+    svgFilenameCtrl = $componentController('svgFilenameEditor');
+  }));
+
+  it('should fail svg validation', function() {
+    var invalidWidthAttribute = (
+      '<svg widht="100" height="100"><rect id="rectangle-de569866-9c11-b553-' +
+      'f5b7-4194e2380d9f" x="143" y="97" width="12" height="29" stroke="hsla' +
+      '(0, 0%, 0%, 1)" fill="hsla(0, 0%, 100%, 1)" stroke-width="1"></rect>' +
+      '</svg>');
+    expect(() => {
+      svgFilenameCtrl.isSvgTagValid(invalidWidthAttribute);
+    }).toThrowError('Invalid attributes in svg:widht');
   });
 });
