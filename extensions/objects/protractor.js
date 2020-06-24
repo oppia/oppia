@@ -21,9 +21,13 @@
 // implement a setValue() function to which a single argument can be sent
 // that will completely determine the object.
 
+var waitFor = require('../../core/tests/protractor_utils/waitFor.js');
+
 var AlgebraicExpressionEditor = function(elem) {
   return {
     setValue: async function(text) {
+      await waitFor.elementToBeClickable(
+        elem, '"Algebraic Input" editor takes too long to be clickable');
       await elem.click();
       var algebraicInputElem = element(by.css('.guppy_active'));
       var present = await algebraicInputElem.isPresent();
