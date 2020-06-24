@@ -41,7 +41,7 @@ export interface IChangeDict {
 
 export interface ISkillResponse {
   skill: Object;
-  groupedSkillSummaries: Object;
+  grouped_skill_summaries: Object;
 }
 
 export interface IMultiSkillsResponse {
