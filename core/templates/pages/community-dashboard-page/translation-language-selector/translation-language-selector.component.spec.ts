@@ -67,7 +67,7 @@ describe('Translation language selector', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(TranslationLanguageSelectorComponent);
     component = fixture.componentInstance;
-    component.value = 'en';
+    component.activeLanguageCode = 'en';
     fixture.detectChanges();
   });
 
@@ -97,7 +97,7 @@ describe('Translation language selector', () => {
     });
   }));
 
-  it('should correctly initialize dropdown value', () => {
+  it('should correctly initialize dropdown activeLanguageCode', () => {
     const dropdown = (fixture.nativeElement
       .querySelector('.oppia-translation-language-selector-inner-container'));
 
@@ -133,12 +133,12 @@ describe('Translation language selector', () => {
 
 
   it('should correctly select and indicate selection of an option', () => {
-    spyOn(component.setValue, 'emit');
+    spyOn(component.setActiveLanguageCode, 'emit');
 
     component.selectOption('fr');
     fixture.detectChanges();
 
-    expect(component.setValue.emit).toHaveBeenCalledWith('fr');
+    expect(component.setActiveLanguageCode.emit).toHaveBeenCalledWith('fr');
   });
 
   it('should show details of featured language', async(() => {
