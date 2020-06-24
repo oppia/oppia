@@ -38,7 +38,6 @@ describe('Community dashboard page', function() {
     await browser.get('/community-dashboard');
     await waitFor.pageToFullyLoad();
     await communityDashboardPage.navigateToTranslateTextTab();
-    await waitFor.pageToFullyLoad();
   });
 
   it('should allow user to switch to translate text tab', async function() {
@@ -61,7 +60,6 @@ describe('Community dashboard page', function() {
           await (await featured.editEntry(1, 'Unicode'))
             .setValue('Partnership with ABC');
         });
-
       await users.logout();
     });
 
