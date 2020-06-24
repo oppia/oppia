@@ -19,9 +19,13 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { StateObjectFactory } from 'domain/state/StateObjectFactory';
+import { StateObjectFactory, State } from 'domain/state/StateObjectFactory';
 
 const INTERACTION_SPECS = require('interactions/interaction_specs.json');
+
+export interface IStateObjectsDict {
+  [state: string]: State;
+}
 
 export class States {
   _stateObject;

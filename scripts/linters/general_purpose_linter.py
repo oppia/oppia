@@ -31,8 +31,8 @@ from .. import common
 
 EXCLUDED_PATHS = (
     'third_party/*', 'build/*', '.git/*', '*.pyc', 'CHANGELOG',
-    'integrations/*', 'integrations_dev/*', '*.svg', '*.gif',
-    '*.png', '*.zip', '*.ico', '*.jpg', '*.min.js', 'backend_prod_files/*',
+    'integrations/*', 'integrations_dev/*', '*.svg', '*.gif', '*.png',
+    '*.webp', '*.zip', '*.ico', '*.jpg', '*.min.js', 'backend_prod_files/*',
     'assets/scripts/*', 'core/tests/data/*', 'core/tests/build_sources/*',
     '*.mp3', '*.mp4', 'node_modules/*', 'typings/*', 'local_compiled_js/*',
     'webpack_bundles/*', 'core/tests/services_sources/*',
@@ -99,7 +99,7 @@ BAD_PATTERNS = {
 
 BAD_PATTERNS_REGEXP = [
     {
-        'regexp': re.compile(r'TODO[^\(]*[^\)][^:]*[^\w]*$'),
+        'regexp': re.compile(r'TODO[^\(]*[^\)][^:]*[^A-Z]+[^\w]*$'),
         'message': 'Please assign TODO comments to a user '
                    'in the format TODO(username): XXX. ',
         'excluded_files': (),
