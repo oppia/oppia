@@ -20,5 +20,6 @@
 // main module the elements are attached to.
 require('pages/creator-dashboard-page/creator-dashboard-page.module.ts');
 require('App.ts');
+require('base-components/oppia-root.directive.ts');
 
 require('pages/creator-dashboard-page/creator-dashboard-page.component.ts');
