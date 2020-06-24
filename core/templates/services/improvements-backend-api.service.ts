@@ -36,16 +36,16 @@ export interface IExplorationImprovementsResponseBackendDict {
   };
 }
 
-export class ExplorationImprovementsResponse {
-  constructor(
-      public readonly openTasks: ExplorationTask[],
-      public readonly resolvedTaskTypesByStateName: Map<string, string[]>) {}
-}
-
 export interface IExplorationImprovementsHistoryResponseBackendDict {
   'results': ITaskEntryBackendDict[];
   'cursor': string;
   'more': boolean;
+}
+
+export class ExplorationImprovementsResponse {
+  constructor(
+      public readonly openTasks: ExplorationTask[],
+      public readonly resolvedTaskTypesByStateName: Map<string, string[]>) {}
 }
 
 export class ExplorationImprovementsHistoryResponse {
@@ -72,10 +72,10 @@ export class ImprovementsBackendApiService {
       explorationImprovementsUrl
     ).toPromise().then(
       backendDict => new ExplorationImprovementsResponse(
-        backendDict.open_tasks.map(
-          d => this.explorationTaskObjectFactory.createFromBackendDict(d)),
-        new Map(
-          Object.entries(backendDict.resolved_task_types_by_state_name))));
+        backendDict.open_tasks
+          .map(d => this.explorationTaskObjectFactory.createFromBackendDict(d)),
+        new Map(Object.entries(backendDict.resolved_task_types_by_state_name)))
+    );
   }
 
   async postTasks(expId: string, tasks: ExplorationTask[]): Promise<void> {
@@ -105,8 +105,8 @@ export class ImprovementsBackendApiService {
       explorationImprovementsHistoryUrl, {params}
     ).toPromise().then(
       backendDict => new ExplorationImprovementsHistoryResponse(
-        backendDict.results.map(
-          t => this.explorationTaskObjectFactory.createFromBackendDict(t)),
+        backendDict.results
+          .map(d => this.explorationTaskObjectFactory.createFromBackendDict(d)),
         backendDict.cursor,
         backendDict.more));
   }

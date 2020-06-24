@@ -41,11 +41,8 @@ class ExplorationImprovementsHandler(base.BaseHandler):
 
     @acl_decorators.can_edit_exploration
     def get(self, exploration_id):
-        try:
-            exploration = (
-                exp_fetchers.get_exploration_by_id(exploration_id, strict=True))
-        except Exception as e:
-            raise self.InvalidInputException('Invalid exploration: %s' % (e,))
+        # The ACL decorator guarantees the exploration exists.
+        exploration = exp_fetchers.get_exploration_by_id(exploration_id)
 
         open_tasks, resolved_task_types_by_state_name = (
             improvements_services.fetch_exploration_tasks(exploration))
@@ -57,14 +54,12 @@ class ExplorationImprovementsHandler(base.BaseHandler):
 
     @acl_decorators.can_edit_exploration
     def post(self, exploration_id):
-        try:
-            exploration = (
-                exp_fetchers.get_exploration_by_id(exploration_id, strict=True))
-        except Exception as e:
-            raise self.InvalidInputException('Invalid exploration: %s' % (e,))
+        # The ACL decorator guarantees the exploration exists.
+        exploration = exp_fetchers.get_exploration_by_id(exploration_id)
+
         try:
             task_entries = []
-            for task_entry_payload in self.payload.get('task_entries', []):
+            for task_entry_payload in self.payload['task_entries']:
                 task_entries.append(
                     improvements_domain.TaskEntry(
                         improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
@@ -93,13 +88,9 @@ class ExplorationImprovementsHistoryHandler(base.BaseHandler):
 
     @acl_decorators.can_edit_exploration
     def get(self, exploration_id):
-        try:
-            exploration = (
-                exp_fetchers.get_exploration_by_id(exploration_id, strict=True))
-        except Exception as e:
-            raise self.InvalidInputException('Invalid exploration: %s' % (e,))
-
-        urlsafe_start_cursor = self.payload.get('cursor', None)
+        # The ACL decorator guarantees the exploration exists.
+        exploration = exp_fetchers.get_exploration_by_id(exploration_id)
+        urlsafe_start_cursor = self.request.get('cursor', None)
         try:
             results, urlsafe_cursor, more = (
                 improvements_services.fetch_exploration_task_history_page(
