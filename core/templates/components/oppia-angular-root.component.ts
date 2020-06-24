@@ -286,10 +286,10 @@ import { LostChangeObjectFactory } from
   'domain/exploration/LostChangeObjectFactory';
 import { MathEquationInputRulesService } from
   // eslint-disable-next-line max-len
-  'interactions/MathEquationInput/directives/algebraic-expression-input-rules.service';
+  'interactions/MathEquationInput/directives/math-equation-input-rules.service';
 import { MathEquationInputValidationService } from
   // eslint-disable-next-line max-len
-  'interactions/MathEquationInput/directives/algebraic-expression-input-validation.service';
+  'interactions/MathEquationInput/directives/math-equation-input-validation.service';
 import { MathExpressionInputValidationService } from
   // eslint-disable-next-line max-len
   'interactions/MathExpressionInput/directives/math-expression-input-validation.service';

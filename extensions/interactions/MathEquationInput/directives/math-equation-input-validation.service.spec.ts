@@ -33,7 +33,7 @@ import { IMathEquationInputCustomizationArgs } from
 import { AppConstants } from 'app.constants';
 import { WARNING_TYPES_CONSTANT } from 'app-type.constants';
 
-describe('MathEquationInputValidationService', () => {
+fdescribe('MathEquationInputValidationService', () => {
   let validatorService: MathEquationInputValidationService;
   let WARNING_TYPES: WARNING_TYPES_CONSTANT;
 
@@ -74,14 +74,15 @@ describe('MathEquationInputValidationService', () => {
     isEquivalentTo = rof.createFromBackendDict({
       rule_type: 'IsEquivalentTo',
       inputs: {
-        x: 'x^2'
+        x: 'y = c + m*x'
       }
     });
 
     matchesExactlyWith = rof.createFromBackendDict({
       rule_type: 'MatchesExactlyWith',
       inputs: {
-        x: 'x * x'
+        x: 'y = m*x + c',
+        y: 'both'
       }
     });
 
@@ -110,13 +111,13 @@ describe('MathEquationInputValidationService', () => {
     let isEquivalentTo1 = rof.createFromBackendDict({
       rule_type: 'IsEquivalentTo',
       inputs: {
-        x: '(a+b)^2'
+        x: '(a+b)^2 = 0'
       }
     });
     let isEquivalentTo2 = rof.createFromBackendDict({
       rule_type: 'IsEquivalentTo',
       inputs: {
-        x: 'a^2 + 2*a*b + b^2'
+        x: 'a^2 + 2*a*b + b^2 = 0'
       }
     });
 
@@ -135,13 +136,15 @@ describe('MathEquationInputValidationService', () => {
     let matchesExactlyWith1 = rof.createFromBackendDict({
       rule_type: 'MatchesExactlyWith',
       inputs: {
-        x: 'x ^ 2 - 1'
+        x: 'x ^ 2 = 1',
+        y: 'irrelevant'
       }
     });
     let matchesExactlyWith2 = rof.createFromBackendDict({
       rule_type: 'MatchesExactlyWith',
       inputs: {
-        x: '-1 + x*x'
+        x: '-1 + x*x = 0',
+        y: 'irrelevant'
       }
     });
 
@@ -168,13 +171,14 @@ describe('MathEquationInputValidationService', () => {
     matchesExactlyWith = rof.createFromBackendDict({
       rule_type: 'MatchesExactlyWith',
       inputs: {
-        x: 'x * y'
+        x: 'x * y = 0',
+        y: 'both'
       }
     });
     isEquivalentTo = rof.createFromBackendDict({
       rule_type: 'IsEquivalentTo',
       inputs: {
-        x: 'x + y'
+        x: 'x + y = 0'
       }
     });
 

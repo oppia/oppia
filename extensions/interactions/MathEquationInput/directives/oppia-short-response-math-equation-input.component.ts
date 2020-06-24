@@ -24,7 +24,7 @@ require('services/html-escaper.service.ts');
 
 angular.module('oppia').component(
   'oppiaShortResponseMathEquationInput', {
-    template: require('./algebraic-math-equation-response.component.html'),
+    template: require('./math-equation-input-short-response.component.html'),
     controller: ['$attrs', 'HtmlEscaperService',
       function($attrs, HtmlEscaperService) {
         const ctrl = this;

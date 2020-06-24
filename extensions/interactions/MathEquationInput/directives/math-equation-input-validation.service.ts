@@ -44,12 +44,59 @@ export class MathEquationInputValidationService {
       customizationArgs: IMathEquationInputCustomizationArgs,
       answerGroups: AnswerGroup[], defaultOutcome: Outcome): IWarning[] {
     let warningsList = [];
-    let meirs = (
-      new MathEquationInputRulesService());
+    let meirs = new MathEquationInputRulesService();
 
     warningsList = warningsList.concat(
       this.baseInteractionValidationServiceInstance.getAllOutcomeWarnings(
         answerGroups, defaultOutcome, stateName));
+
+    // This validations ensures that there are no redundant rules present in the
+    // answer groups.
+    // An IsEquivalentTo rule will make all of the following rules with a
+    // matching input, invalid.
+    // A MatchesExactlyWith rule will make the following rules of the same rule
+    // type and a matching input, invalid.
+    let seenRules = [];
+
+    for (let i = 0; i < answerGroups.length; i++) {
+      let rules = answerGroups[i].rules;
+      for (let j = 0; j < rules.length; j++) {
+        let currentInput = <string> rules[j].inputs.x;
+        let currentPositionOfTerms = <string> rules[j].inputs.y;
+        let currentRuleType = <string> rules[j].type;
+
+        for (let seenRule of seenRules) {
+          let seenInput = <string> seenRule.inputs.x;
+          let seenRuleType = <string> seenRule.type;
+
+          if (seenRuleType === 'IsEquivalentTo' && (
+            meirs.IsEquivalentTo(seenInput, {x: currentInput}))) {
+            // This rule will make all of the following matching
+            // inputs obsolete.
+            warningsList.push({
+              type: AppConstants.WARNING_TYPES.ERROR,
+              message: (
+                'Rule ' + (j + 1) + ' from answer group ' + (i + 1) +
+                ' will never be matched because it is preceded ' +
+                'by an \'IsEquivalentTo\' rule with a matching input.')
+            });
+          } else if (currentRuleType === 'MatchesExactlyWith' && (
+            meirs.MatchesExactlyWith(
+              seenInput, {x: currentInput, y: currentPositionOfTerms}))) {
+            // This rule will make the following inputs with MatchesExactlyWith
+            // rule obsolete.
+            warningsList.push({
+              type: AppConstants.WARNING_TYPES.ERROR,
+              message: (
+                'Rule ' + (j + 1) + ' from answer group ' + (i + 1) +
+                ' will never be matched because it is preceded ' +
+                'by a \'MatchesExactlyWith\' rule with a matching input.')
+            });
+          }
+        }
+        seenRules.push(rules[j]);
+      }
+    }
 
     return warningsList;
   }

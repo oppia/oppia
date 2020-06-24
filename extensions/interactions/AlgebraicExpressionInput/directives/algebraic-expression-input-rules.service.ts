@@ -30,11 +30,11 @@ export class AlgebraicExpressionInputRulesService {
   }
 
   IsEquivalentTo(answer: string, inputs: {x: string}): boolean {
-    let expandedLearnerAnswer = nerdamer(`expand(${answer})`);
+    let expandedLearnerAnswer = nerdamer(answer).expand();
     let simplifiedLearnerAnswer = nerdamer(
       `simplify(${expandedLearnerAnswer})`);
 
-    let expandedCreatorAnswer = nerdamer(`expand(${inputs.x})`);
+    let expandedCreatorAnswer = nerdamer(inputs.x).expand();
     let simplifiedCreatorAnswer = nerdamer(
       `simplify(${expandedCreatorAnswer})`);
 

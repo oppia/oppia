@@ -71,43 +71,44 @@ export class MathEquationInputRulesService {
 
     let aeirs = new AlgebraicExpressionInputRulesService();
 
-    // Check 1: If both sides match with their counterparts in the input string.
-    if (aeirs.IsEquivalentTo(lhsAnswer, {x: lhsInput}) && aeirs.IsEquivalentTo(
-      rhsAnswer, {x: rhsInput})) {
-      return true;
-    }
-    
-    // Check 2: If they don't match directly, we bring all terms on both
-    // equations to one side and then compare. We do this by multiplying RHS
-    // with -1 and adding to LHS. This would catch equations like
-    // 'x = y' and 'x - y = 0'.
-    let rhsAnswerModified = nerdamer(rhsAnswer).multiply('-1');
-    let expressionAnswer = nerdamer(rhsAnswerModified).add(lhsAnswer);
-    
-    let rhsInputModified = nerdamer(rhsInput).multiply('-1');
-    let expressionInput = nerdamer(rhsInputModified).add(lhsInput);
+    // We bring all terms in both equations to one side and then compare.
 
-    if (aeirs.IsEquivalentTo(expressionAnswer, {x: expressionInput})) {
+    // Check 1: Move terms by subtracting one side with from the other.
+    let expressionAnswer = nerdamer(lhsAnswer).subtract(rhsAnswer).text();
+
+    // We need to cover two cases: When terms are shifted from RHS to LHS and
+    // when they are shifted from LHS to RHS.
+    let expressionInput1 = nerdamer(lhsInput).subtract(rhsInput).text();
+    let expressionInput2 = nerdamer(rhsInput).subtract(lhsInput).text();
+
+    if (aeirs.IsEquivalentTo(
+      expressionAnswer, {x: expressionInput1}) || aeirs.IsEquivalentTo(
+      expressionAnswer, {x: expressionInput2})) {
       return true;
     }
 
-    // Check 3: If they still don't match, we divide the expressions formed by
-    // bringing all terms on one side and check if the result is a constant.
-    // This would catch equations like 'x+y=0' and '2*x+2*y=0'.
-    let expandedLearnerAnswer = nerdamer(`expand(${expressionAnswer})`);
-    let simplifiedLearnerAnswer = nerdamer(
-      `simplify(${expandedLearnerAnswer})`);
-
-    let expandedCreatorAnswer = nerdamer(`expand(${expressionInput})`);
-    let simplifiedCreatorAnswer = nerdamer(
-      `simplify(${expandedCreatorAnswer})`);
-
-    let divisionResult = nerdamer(
-      `divide(${simplifiedLearnerAnswer}, ${simplifiedCreatorAnswer})`);
-    if (nerdamer(divisionResult).variables().length === 0) {
-      // This would mean that the result is a constant.
-      return true;
+    // Check 2: Move terms by dividing one side with from the other.
+    if (nerdamer(rhsAnswer).eq('0')) {
+      expressionAnswer = nerdamer(lhsAnswer).text();
+    } else {
+      expressionAnswer = nerdamer(lhsAnswer).divide(rhsAnswer).text();
     }
+
+    // We need to cover two cases: When terms are shifted from RHS to LHS and
+    // when they are shifted from LHS to RHS.
+    // This check will never pass if either sides is equal to 0.
+    if (!nerdamer(lhsInput).eq('0') && !nerdamer(rhsInput).eq('0')) {
+      expressionInput1 = nerdamer(lhsInput).divide(rhsInput).text();
+      expressionInput2 = nerdamer(rhsInput).divide(lhsInput).text();
+
+      if (aeirs.IsEquivalentTo(
+        expressionAnswer, {x: expressionInput1}) || aeirs.IsEquivalentTo(
+        expressionAnswer, {x: expressionInput2})) {
+        return true;
+      }
+    }
+    // If none of the checks pass, the answer is not equivalent.
+    return false;
   }
 }
 
