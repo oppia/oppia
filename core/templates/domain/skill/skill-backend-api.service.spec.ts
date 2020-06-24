@@ -110,7 +110,7 @@ describe('Skill backend API service', () => {
 
     sampleResponse = {
       skill: skillDict,
-      groupedSkillSummaries: {}
+      grouped_skill_summaries: {}
     };
 
     sampleResponse2 = {
@@ -129,7 +129,7 @@ describe('Skill backend API service', () => {
 
       skillBackendApiService.fetchSkill('1').then(
         successHandler, failHandler);
-      var req = httpTestingController.expectOne(
+      let req = httpTestingController.expectOne(
         '/skill_editor_handler/data/1');
       expect(req.request.method).toEqual('GET');
       req.flush(sampleResponse);
@@ -138,7 +138,7 @@ describe('Skill backend API service', () => {
 
       expect(successHandler).toHaveBeenCalledWith({
         skill: sampleResponse.skill,
-        groupedSkillSummaries: sampleResponse.groupedSkillSummaries
+        groupedSkillSummaries: sampleResponse.grouped_skill_summaries
       });
       expect(failHandler).not.toHaveBeenCalled();
     }));
@@ -150,7 +150,7 @@ describe('Skill backend API service', () => {
 
       skillBackendApiService.fetchSkill('1').then(
         successHandler, failHandler);
-      var req = httpTestingController.expectOne(
+      let req = httpTestingController.expectOne(
         '/skill_editor_handler/data/1');
       expect(req.request.method).toEqual('GET');
       req.flush('Error loading skill 1.', {
@@ -174,7 +174,7 @@ describe('Skill backend API service', () => {
         (data) => {
           skillDict = data;
         });
-      var reqGet = httpTestingController.expectOne(
+      let reqGet = httpTestingController.expectOne(
         '/skill_editor_handler/data/1');
       expect(reqGet.request.method).toEqual('GET');
       reqGet.flush(sampleResponse);
@@ -184,7 +184,7 @@ describe('Skill backend API service', () => {
       skillBackendApiService.updateSkill(
         skillDict.skill.id, skillDict.version, 'commit message', []).then(
         successHandler, failHandler);
-      var reqPut = httpTestingController.expectOne(
+      let reqPut = httpTestingController.expectOne(
         '/skill_editor_handler/data/1');
       expect(reqPut.request.method).toEqual('PUT');
       reqPut.flush({ skill: skillDict });
@@ -205,7 +205,7 @@ describe('Skill backend API service', () => {
       (data) => {
         skillDict = data;
       });
-    var reqGet = httpTestingController.expectOne(
+    let reqGet = httpTestingController.expectOne(
       '/skill_editor_handler/data/1');
     expect(reqGet.request.method).toEqual('GET');
     reqGet.flush(sampleResponse);
@@ -215,7 +215,7 @@ describe('Skill backend API service', () => {
     skillBackendApiService.updateSkill(
       skillDict.skill.id, skillDict.version, 'commit message', []
     ).then(successHandler, failHandler);
-    var reqPut = httpTestingController.expectOne(
+    let reqPut = httpTestingController.expectOne(
       '/skill_editor_handler/data/1');
     expect(reqPut.request.method).toEqual('PUT');
     reqPut.flush('Error on update skill 1.', {
@@ -237,7 +237,7 @@ describe('Skill backend API service', () => {
       let skillDataUrl = '/skill_data_handler/' + encodeURIComponent('1,2');
       skillBackendApiService.fetchMultiSkills(['1', '2']).then(
         successHandler, failHandler);
-      var req = httpTestingController.expectOne(
+      let req = httpTestingController.expectOne(
         skillDataUrl);
       expect(req.request.method).toEqual('GET');
       req.flush(sampleResponse2);
@@ -256,7 +256,7 @@ describe('Skill backend API service', () => {
     let skillDataUrl = '/skill_data_handler/' + encodeURIComponent('1,2');
     skillBackendApiService.fetchMultiSkills(['1', '2']).then(
       successHandler, failHandler);
-    var req = httpTestingController.expectOne(
+    let req = httpTestingController.expectOne(
       skillDataUrl);
     expect(req.request.method).toEqual('GET');
     req.flush('Error on fetching skills 1 and 2.', {
@@ -277,7 +277,7 @@ describe('Skill backend API service', () => {
 
     skillBackendApiService.deleteSkill('1').then(
       successHandler, failHandler);
-    var req = httpTestingController.expectOne(
+    let req = httpTestingController.expectOne(
       '/skill_editor_handler/data/1');
     expect(req.request.method).toEqual('DELETE');
     req.flush(200);
@@ -290,12 +290,12 @@ describe('Skill backend API service', () => {
 
   it('should use the rejection handler if delete a existing skill fails',
     fakeAsync(() => {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
 
       skillBackendApiService.deleteSkill('1').then(
         successHandler, failHandler);
-      var req = httpTestingController.expectOne(
+      let req = httpTestingController.expectOne(
         '/skill_editor_handler/data/1');
       expect(req.request.method).toEqual('DELETE');
       let errorResponse = {

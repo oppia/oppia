@@ -40,11 +40,13 @@ export interface IChangeDict {
 }
 
 export interface ISkillResponse {
-  skill?: Object;
-  skills?: Object;
-  groupedSkillSummaries?: Object;
+  skill: Object;
+  groupedSkillSummaries: Object;
 }
 
+export interface IMultiSkillsResponse {
+  skills: Object;
+}
 
 @Injectable ({
   providedIn: 'root'
@@ -58,17 +60,17 @@ export class SkillBackendApiService {
       skillId: string,
       successCallback: (value?: Object | PromiseLike<Object>) => void,
       errorCallback: (reason?: Function) => void): void {
-    var skillDataUrl = this.urlInterpolation.interpolateUrl(
+    let skillDataUrl = this.urlInterpolation.interpolateUrl(
       SkillDomainConstants.EDITABLE_SKILL_DATA_URL_TEMPLATE, {
         skill_id: skillId
       });
 
     this.http.get(
-      skillDataUrl, { observe: 'body' }).toPromise().then(
+      skillDataUrl).toPromise().then(
       (response: ISkillResponse) => {
-        var skill = cloneDeep(response.skill);
-        var groupedSkillSummaryDicts = cloneDeep(
-          response.groupedSkillSummaries);
+        let skill = cloneDeep(response.skill);
+        let groupedSkillSummaryDicts = cloneDeep(
+          response.grouped_skill_summaries);
         if (successCallback) {
           successCallback({
             skill: skill,
@@ -86,15 +88,15 @@ export class SkillBackendApiService {
       skillIds: Array<string>,
       successCallback: (value?: Object | PromiseLike<Object>) => void,
       errorCallback: (reason?: Function) => void): void {
-    var skillDataUrl = this.urlInterpolation.interpolateUrl(
+    let skillDataUrl = this.urlInterpolation.interpolateUrl(
       SkillDomainConstants.SKILL_DATA_URL_TEMPLATE, {
         comma_separated_skill_ids: skillIds.join(',')
       });
 
     this.http.get(
-      skillDataUrl, { observe: 'body' }).toPromise().then(
-      (response: ISkillResponse) => {
-        var skills = cloneDeep(response.skills);
+      skillDataUrl).toPromise().then(
+      (response: IMultiSkillsResponse) => {
+        let skills = cloneDeep(response.skills);
         if (successCallback) {
           successCallback(skills);
         }
@@ -110,12 +112,12 @@ export class SkillBackendApiService {
       changeList: Array<IChangeDict>,
       successCallback: (value?: Object | PromiseLike<Object>) => void,
       errorCallback: (reason?: Function) => void): void {
-    var editableSkillDataUrl = this.urlInterpolation.interpolateUrl(
+    let editableSkillDataUrl = this.urlInterpolation.interpolateUrl(
       SkillDomainConstants.EDITABLE_SKILL_DATA_URL_TEMPLATE, {
         skill_id: skillId
       });
 
-    var putData: ISkillUpdatePayload = {
+    let putData: ISkillUpdatePayload = {
       version: skillVersion,
       commitMessage: commitMessage,
       changeDicts: changeList
@@ -125,7 +127,7 @@ export class SkillBackendApiService {
     this.http.put(
       editableSkillDataUrl, putData).toPromise().then(
       (response: ISkillResponse) => {
-        var skill = cloneDeep(response.skill);
+        let skill = cloneDeep(response.skill);
         if (successCallback) {
           successCallback(skill);
         }
@@ -140,7 +142,7 @@ export class SkillBackendApiService {
       skillId: string,
       successCallback: (value?: Object | PromiseLike<Object>) => void,
       errorCallback: (reason?: Function) => void): void {
-    var skillDataUrl = this.urlInterpolation.interpolateUrl(
+    let skillDataUrl = this.urlInterpolation.interpolateUrl(
       SkillDomainConstants.EDITABLE_SKILL_DATA_URL_TEMPLATE, {
         skill_id: skillId
       });
