@@ -1880,8 +1880,8 @@ class UserQueryModel(base_models.BaseModel):
                 datastore cursor.
 
         Returns:
-            3-tuple (query_models, cursor, more). As described in fetch_page()
-            at:
+            3-tuple of (query_models, cursor, more). As described in
+            fetch_page() at:
             https://developers.google.com/appengine/docs/python/ndb/queryclass,
             where:
                 query_models: List of UserQueryModel instances.

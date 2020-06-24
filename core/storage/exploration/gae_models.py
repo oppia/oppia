@@ -674,7 +674,7 @@ class ExplorationCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
                 commits are needed.
 
         Returns:
-            3-tuple (results, cursor, more). Created no earlier than the
+            3-tuple of (results, cursor, more). Created no earlier than the
             max_age before the current time where:
                 results: List of query results.
                 cursor: str or None. A query cursor pointing to the next

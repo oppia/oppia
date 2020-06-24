@@ -270,12 +270,12 @@ def search(query_string, index, cursor=None,
         retries: the number of times to retry searching the index.
 
     Returns:
-        (tuple). Contains two elements:
-            a list of dictionaries representing search documents. If ids_only is
+        2-tuple of (result_docs, result_cursor_str). Where:
+            result_docs: list(dict). Represents search documents. If ids_only is
                 True, this will be a list of strings, doc_ids.
-            a cursor that you can pass back in to get the next page of results.
-                This wil be a web safe string that you can use in urls.
-                It will be None if there is no next page.
+            result_cursor_str: str. a cursor that you can pass back in to get
+                the next page of results. This wil be a web safe string that you
+                can use in urls. It will be None if there is no next page.
     """
     sort_options = None
 

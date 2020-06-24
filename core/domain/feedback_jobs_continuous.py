@@ -201,11 +201,11 @@ class FeedbackAnalyticsAggregator(jobs.BaseContinuousComputationManager):
             exploration_id: str. ID of the exploration to get analytics for.
 
         Returns:
-            dict. Containing two keys:
-            - num_open_threads: int. The count of open feedback threads for
-                this exploration.
-            - num_total_threads: int. The count of all feedback
-                threads for this exploration.
+            dict. Contains two keys:
+                - num_open_threads: int. The count of open feedback threads for
+                    this exploration.
+                - num_total_threads: int. The count of all feedback
+                    threads for this exploration.
         """
         return FeedbackAnalyticsAggregator.get_thread_analytics_multi(
             [exploration_id])[0]
@@ -249,9 +249,10 @@ class FeedbackAnalyticsMRJobManager(
                 instance.
 
         Yields:
-            (tuple). A tuple of two elements:
-                - str. The exploration id associated to the feedback thread.
-                - str. The feedback thread's status.
+            2-tuple of (entity_id, status). Where:
+                - entity_id: str. The exploration id associated to the feedback
+                    thread.
+                - status: str. The feedback thread's status.
         """
         yield (item.entity_id, item.status)
 

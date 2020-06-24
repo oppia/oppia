@@ -61,8 +61,7 @@ def contains_balanced_brackets(expression):
         expression: str. A math expression (algebraic/numeric).
 
     Returns:
-        bool. Whether the given expression contains a balanced
-        bracket sequence.
+        bool. Whether the given expression contains a balanced bracket sequence.
     """
     openers, closers = '({[', ')}]'
     stack = []
@@ -86,8 +85,8 @@ def is_algebraic(expression):
         expression: str. A math expression.
 
     Returns:
-        bool. Whether the given expression contains at least one single
-        latin letter or greek symbol name.
+        bool. Whether the given expression contains at least one single latin
+        letter or greek symbol name.
 
     Raises:
         Exception: Invalid syntax.

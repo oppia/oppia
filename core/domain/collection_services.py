@@ -561,7 +561,7 @@ def get_collection_ids_matching_query(query_string, cursor=None):
             collections, to start the search from.
 
     Returns:
-        2-tuple of (returned_collection_ids, search_cursor). where:
+        2-tuple of (returned_collection_ids, search_cursor). Where:
             returned_collection_ids : list(str). A list with all collection ids
                 matching the given search query string, as well as a search
                 cursor for future fetches. The list contains exactly
@@ -604,8 +604,8 @@ def apply_change_list(collection_id, change_list):
     Args:
         collection_id: str. ID of the given collection.
         change_list: list(dict). A change list to be applied to the given
-            collection. Each entry is a dict that represents a
-            CollectionChange object.
+            collection. Each entry is a dict that represents a CollectionChange
+            object.
 
     Returns:
         Collection. The resulting collection domain object.

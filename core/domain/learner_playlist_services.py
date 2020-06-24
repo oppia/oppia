@@ -92,8 +92,8 @@ def mark_exploration_to_be_played_later(
     Returns:
         (bool, bool). The first boolean indicates whether the playlist limit
         of the user has been exceeded, and the second boolean indicates
-        whether the exploration is among one of the created or
-        edited explorations of the user.
+        whether the exploration is among one of the created or edited
+        explorations of the user.
     """
     learner_playlist_model = user_models.LearnerPlaylistModel.get(
         user_id, strict=False)
@@ -155,9 +155,9 @@ def mark_collection_to_be_played_later(
 
     Returns:
         (bool, bool). The first boolean indicates whether the playlist limit of
-        the user has been exceeded, and the second boolean indicates whether
-        the collection is among one of the created or edited collections of
-        the user.
+        the user has been exceeded, and the second boolean indicates whether the
+        collection is among one of the created or edited collections of the
+        user.
     """
     learner_playlist_model = user_models.LearnerPlaylistModel.get(
         user_id, strict=False)
