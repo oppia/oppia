@@ -94,16 +94,19 @@ def main(args=None):
     while True:
         line = task.stdout.readline()
         line = python_utils.UNICODE(line, 'utf-8')
+
+        # No more output from the subprocess, and the subprocess has ended.
         if len(line) == 0 and task.poll() is not None:
             break
+
         if line:
             python_utils.PRINT(line, end='')
             output_lines.append(line)
-    out = ''.join(output_lines)
+    concatenated_output = ''.join(output_lines)
 
     python_utils.PRINT('Done!')
 
-    if 'Trying to get the Angular injector' in out:
+    if 'Trying to get the Angular injector' in concatenated_output:
         python_utils.PRINT(
             'If you run into the error "Trying to get the Angular injector",'
             ' please see https://github.com/oppia/oppia/wiki/'
