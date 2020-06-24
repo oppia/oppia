@@ -63,9 +63,8 @@ def delete(key):
         key: a key (string) to delete.
 
     Returns:
-        return_code (int). 0 on network failure,
-        1 if the item does not exist, and 2 for a
-        successful delete.
+        int. 0 on network failure, 1 if the item does not exist, and
+        2 for a successful delete.
     """
     assert isinstance(key, python_utils.BASESTRING)
     return_code = memcache.delete(key)
@@ -79,9 +78,8 @@ def delete_multi(keys):
         keys: the keys (strings) to delete.
 
     Returns:
-        return_value (bool). True if all
-        operations complete successfully;
-        False otherwise.
+        bool. True if all operations complete successfully; False
+        otherwise.
     """
     for key in keys:
         assert isinstance(key, python_utils.BASESTRING)

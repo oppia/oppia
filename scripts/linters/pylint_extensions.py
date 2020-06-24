@@ -303,21 +303,24 @@ class DocstringParameterChecker(checkers.BaseChecker):
                   'Please check parameter names in type declarations.',
                  ),
         'W9019': (
-            '"%s" requires 4 space indentation relative to args',
-            'four-space-indentation-for-arg-parameters-doc',
+            ('Line starting with "%s" requires 4 space indentation relative to'
+             + ' args line indentation'),
+            '4-space-indentation-for-arg-parameters-doc',
             ('Please use 4 space indentation in parameter definitions' +
-             'for args')
+             ' relative to the args line indentation.')
         ),
         'W9020': (
-            ('"%s" requires 8 space indentation relative to args' +
-             'docstring'),
-            'eight-space-indentation-for-arg-descriptions-doc',
-            'Please indent wrap around descriptions by 8'
+            ('Line starting with "%s" requires 8 space indentation relative to'
+             + ' args line indentation'),
+            '8-space-indentation-for-arg-in-descriptions-doc',
+            ('Please indent wrap around descriptions by 8 relative to the args'
+             + ' line indentation.')
         ),
         'W9021': (
-            'Args: indentation is incorrect, must be in column with docstring',
-            'incorrect-indentation-for-arg-definition-doc',
-            'Please indent args at the same indentation level with docstring'
+            ('Args: indentation is incorrect, must be at the outermost'
+             + ' indentation level.'),
+            'incorrect-indentation-for-arg-header-doc',
+            'Please indent args at the outermost indentation level.'
         )
     }
 
@@ -350,6 +353,7 @@ class DocstringParameterChecker(checkers.BaseChecker):
 
     constructor_names = {'__init__', '__new__'}
     not_needed_param_in_docstring = {'self', 'cls'}
+    docstring_sections = {'Raises:', 'Returns:', 'Yields:'}
 
     def visit_functiondef(self, node):
         """Called for function and method definitions (def).
@@ -362,6 +366,7 @@ class DocstringParameterChecker(checkers.BaseChecker):
         self.check_functiondef_params(node, node_doc)
         self.check_functiondef_returns(node, node_doc)
         self.check_functiondef_yields(node, node_doc)
+        self.check_arg_section_indentation(node)
 
     def check_functiondef_params(self, node, node_doc):
         """Checks whether all parameters in a function definition are
@@ -401,78 +406,102 @@ class DocstringParameterChecker(checkers.BaseChecker):
         self.check_arguments_in_docstring(
             node_doc, node.args, node,
             accept_no_param_doc=node_allow_no_param)
-        self.check_indentation_args(node.args, node)
 
-    def check_indentation_args(self, arguments_node, node):
-        """Checks whether all parameters in a function definition are
-        indented properly.
+    def check_arg_section_indentation(self, node):
+        """Checks whether the function argument definitions (Args: section) are
+        indented properly. Parameters should be indented by 4 relative to the
+        'Arg: ' line and any wrap-around in_descriptions should be indented by
+        8. The rest of the docstring section checks are in DocstringChecker.
 
         Args:
-            arguments_node: astroid.scoped_nodes.Arguments. Arguments node
-                for the function, method or class constructor.
             node: astroid.scoped_nodes.Function. Node for a function or
                 method definition in the AST.
         """
-        parameter_names = {'Raises:', 'Returns:', 'Yields:'}
+        arguments_node = node.args
         expected_argument_names = set(
-            None if arg.name == 'self'
+            None if (arg.name in self.not_needed_param_in_docstring)
             else (arg.name + ':') for arg in arguments_node.args)
-        expected_argument_names.add('args:')
-        expected_argument_names.add('kwargs:')
-        is_docstring_args = False
-        free_form_args = False
-        outer_indentation = 0
+        currently_in_args_section = False
+        # When we are in the args section and a line ends in a colon,
+        # we can ignore the indentation styling in the next section of
+        # in_description, hence a freeform section.
+        currently_in_freeform_section = False
+        args_indentation = 0
         if node.doc:
+            # Process the docstring line by line.
             for line in node.doc.splitlines():
-                no_whitespace = line.lstrip()
-                current_indentation = (len(line) -
-                                       len(no_whitespace))
-                parameter = re.search('^[^:]+:', no_whitespace)
-                # Check for empty lines
+                line_with_no_leading_whitespaces = line.lstrip()
+                current_line_indentation = (
+                    len(line) - len(line_with_no_leading_whitespaces))
+                parameter = re.search(
+                    '^[^:]+:',
+                    line_with_no_leading_whitespaces)
+                # Check for empty lines and ignore them.
                 if len(line.strip()) == 0:
                     continue
-                # Check for Args section start
-                if no_whitespace.startswith('Args:'):
-                    outer_indentation = current_indentation
-                    if current_indentation % 4 != 0:
+                # Check for the start of an Args: section and check the correct
+                # indentation.
+                if line_with_no_leading_whitespaces.startswith('Args:'):
+                    args_indentation = current_line_indentation
+                    #The current args indentation is incorrect.
+                    if current_line_indentation % 4 != 0:
                         self.add_message(
-                            'incorrect-indentation-for-arg-definition-doc',
+                            'incorrect-indentation-for-arg-header-doc',
                             node=node)
-                    is_docstring_args = True
-                # Check for a parameter that is part of the node args
-                elif (is_docstring_args and parameter
+                        #Since other checks are based on relative indentation,
+                        #we need to fix this indentation first.
+                        break
+                    currently_in_args_section = True
+                # Check for parameter section header by checking that the
+                # parameter is in the function arguments set. We also check for
+                # arguments that start with * which means it's autofill and will
+                # not appear in the node args list so we handle those too.
+                elif (currently_in_args_section and parameter
                       and ((parameter.group(0).strip('*')
                             in expected_argument_names) or
-                           re.search(br'\*[^ ]+:', no_whitespace))):
-                    free_form_args = False
-                    if current_indentation != (
-                            outer_indentation + 4):
-                        beginning_of_line = ((None) if
-                                             (not no_whitespace.split(' '))
-                                             else no_whitespace.split(' ')[0])
+                           re.search(
+                               br'\*[^ ]+: ',
+                               line_with_no_leading_whitespaces))):
+                    currently_in_freeform_section = False
+                    # Check if the current parameter section indentation is
+                    # correct.
+                    if current_line_indentation != (
+                            args_indentation + 4):
+                        # Use the first word in the line to identify the error.
+                        beginning_of_line = (
+                            (None) if
+                            (not line_with_no_leading_whitespaces.split(' '))
+                            else line_with_no_leading_whitespaces.split(' ')[0])
                         self.add_message(
-                            'four-space-indentation-for-arg-parameters-doc',
+                            '4-space-indentation-for-arg-parameters-doc',
                             node=node,
                             args=(beginning_of_line))
+                    # If the line ends with a colon, that means
+                    # the next subsection of of in_description is free form.
                     if line.endswith(':'):
-                        free_form_args = True
-                # If we get to a different section followed we end the loop
-                elif line.strip() in parameter_names:
+                        currently_in_freeform_section = True
+                # If we get to a different section, we exit the loop.
+                elif line.strip() in self.docstring_sections:
                     break
-                # Args checking for description based on whether or
-                # not we are checking the indentation
-                elif is_docstring_args:
-                    if not free_form_args and current_indentation != (
-                            outer_indentation + 8):
-                        beginning_of_line = ((None) if
-                                             (not no_whitespace.split(' '))
-                                             else no_whitespace.split(' ')[0])
+                # All other lines can be treated as in_description.
+                elif currently_in_args_section:
+                    # If it is not a freeform section, we check the indentation.
+                    if (not currently_in_freeform_section
+                            and current_line_indentation != (
+                                args_indentation + 8)):
+                        # Use the first word in the line to identify the error.
+                        beginning_of_line = (
+                            (None) if
+                            (not line_with_no_leading_whitespaces.split(' '))
+                            else line_with_no_leading_whitespaces.split(' ')[0])
                         self.add_message(
-                            'eight-space-indentation-for-arg-descriptions-doc',
+                            '8-space-indentation-for-arg-in-descriptions-doc',
                             node=node,
                             args=(beginning_of_line))
+                    # If the line ends with a colon, that
+                    # means the next subsection of in_description is free form.
                     if line.endswith(':'):
-                        free_form_args = True
+                        currently_in_freeform_section = True
 
     def check_functiondef_returns(self, node, node_doc):
         """Checks whether a function documented with a return value actually has
@@ -1413,22 +1442,24 @@ class DocstringChecker(checkers.BaseChecker):
             'space-after-triple-quote',
             'Please do not use space after """ in docstring.'
         ),
-        'C0026': (
+        'W0026': (
             '4 space indentation in docstring.',
-            'four-space-indentation-in-docstring',
-            ('Please use 4 space indentation in all args, returns, ' +
-             'raises in docstring')
+            '4-space-indentation-in-docstring',
+            ('Please use 4 space indentation for parameters relative to section'
+             + ' headers.')
         ),
-        'C0027': (
+        'W0027': (
             '8 space indentation in docstring.',
-            'eight-space-indentation-in-docstring',
+            '8-space-indentation-in-docstring',
             ('Please use 8 space indentation in wrap around messages' +
-             'for args, returns and raises')
+             ' relative to section headers.')
         ),
-        'C0028': (
+        'W0028': (
             'malformed parameter',
             'malformed-parameter',
-            'Please only use the argument names with separators'
+            ('The parameter is incorrectly formatted: \nFor returns and yields,'
+             + ' headers should have this format: "type (elaboration). \n'
+             + 'For raises, headers should have the format: "exception: ')
         )
     }
 
@@ -1437,18 +1468,25 @@ class DocstringChecker(checkers.BaseChecker):
         arguments order in the function definition matches the order in the
         docstring.
 
+        Further, checks the raises, returns, and yields for correct indentation.
+        For args part of docstring checked in a DocstringParameterChecker.
+
         Args:
             node: astroid.scoped_nodes.Function. Node to access module content.
         """
 
-        is_docstring = False
-        is_docstring_return = False
-        is_docstring_raise = False
-        is_docstring_yield = False
-        free_form_return = False
-        description = False
-        is_class_or_function = False
-        outer_indentation_in_spaces = 0
+        in_docstring = False
+        in_docstring_returns_section = False
+        in_docstring_raises_section = False
+        in_docstring_yields_section = False
+
+        # Certain sections do not require indentation checks. These are
+        # delimited by a line ending in a : in the last line, hence free form.
+        in_freeform_section = False
+        in_description = False
+        in_class_or_function = False
+        args_indentation_in_spaces = 0
+
         file_content = read_from_node(node)
         file_length = len(file_content)
 
@@ -1462,46 +1500,46 @@ class DocstringChecker(checkers.BaseChecker):
 
             # Check if it is a docstring and not some multi-line string.
             if (prev_line.startswith(b'class ') or
-                    prev_line.startswith(b'def ')) or (is_class_or_function):
-                is_class_or_function = True
+                    prev_line.startswith(b'def ')) or (in_class_or_function):
+                in_class_or_function = True
                 if prev_line.endswith(b'):') and line.startswith(b'"""'):
-                    is_docstring = True
-                    is_class_or_function = False
+                    in_docstring = True
+                    in_class_or_function = False
 
             # Check for space after """ in docstring.
-            if re.search(br'^""".+$', line) and is_docstring and (
+            if re.search(br'^""".+$', line) and in_docstring and (
                     line[3] == b' '):
-                is_docstring = False
-                is_docstring_return = False
-                is_docstring_raise = False
-                is_docstring_yield = False
+                in_docstring = False
+                in_docstring_returns_section = False
+                in_docstring_raises_section = False
+                in_docstring_yields_section = False
                 self.add_message(
                     'space-after-triple-quote', line=line_num + 1)
 
             # Check if single line docstring span two lines.
-            if line == b'"""' and prev_line.startswith(b'"""') and is_docstring:
-                is_docstring = False
-                is_docstring_return = False
-                is_docstring_raise = False
-                is_docstring_yield = False
+            if line == b'"""' and prev_line.startswith(b'"""') and in_docstring:
+                in_docstring = False
+                in_docstring_returns_section = False
+                in_docstring_raises_section = False
+                in_docstring_yields_section = False
                 self.add_message(
                     'single-line-docstring-span-two-lines', line=line_num + 1)
 
             # Check for single line docstring.
-            elif re.search(br'^""".+"""$', line) and is_docstring:
-                # Check for punctuation at line[-4] since last three
-                # characters are double quotes.
+            elif re.search(br'^""".+"""$', line) and in_docstring:
+                # Check for punctuation at line[-4] since last three characters
+                # are double quotes.
                 if (len(line) > 6) and (
                         line[-4] not in ALLOWED_TERMINATING_PUNCTUATIONS):
                     self.add_message(
                         'no-period-used', line=line_num + 1)
-                is_docstring = False
-                is_docstring_return = False
-                is_docstring_raise = False
-                is_docstring_yield = False
+                in_docstring = False
+                in_docstring_returns_section = False
+                in_docstring_raises_section = False
+                in_docstring_yields_section = False
 
-            # Check for mutliline docstring.
-            elif line.endswith(b'"""') and is_docstring:
+            # Check for multiline docstring.
+            elif line.endswith(b'"""') and in_docstring:
                 # Case 1: line is """. This is correct for multiline docstring.
                 if line == b'"""':
                     # Check for empty line before the end of docstring.
@@ -1524,84 +1562,107 @@ class DocstringChecker(checkers.BaseChecker):
                 elif not any(word in line for word in EXCLUDED_PHRASES):
                     self.add_message(
                         'no-newline-used-at-end', line=line_num + 1)
-                is_docstring = False
-                is_docstring_return = False
-                is_docstring_raise = False
-                is_docstring_yield = False
-            elif is_docstring:
-                current_indentation = (len(line_with_spaces) -
-                                       len(line_with_spaces.lstrip()))
+                in_docstring = False
+                in_docstring_returns_section = False
+                in_docstring_raises_section = False
+                in_docstring_yields_section = False
+
+            # All other lines to be checked for returns, raises, yields.
+            elif in_docstring:
+                current_line_indentation = (
+                    len(line_with_spaces) - len(line_with_spaces.lstrip()))
+                # If line starts with Returns: , it is the header of a Returns
+                # subsection.
                 if line.startswith('Returns:'):
-                    is_docstring_return = True
-                    is_docstring_raise = False
-                    is_docstring_yield = False
-                    free_form_return = False
-                    description = False
-                    outer_indentation_in_spaces = current_indentation
+                    in_docstring_returns_section = True
+                    in_docstring_raises_section = False
+                    in_docstring_yields_section = False
+                    in_freeform_section = False
+                    in_description = False
+                    args_indentation_in_spaces = current_line_indentation
+                # If line starts with Raises: , it is the header of a Raises
+                # subsection.
                 elif line.startswith('Raises:'):
-                    is_docstring_return = False
-                    is_docstring_raise = True
-                    is_docstring_yield = False
-                    free_form_return = False
-                    description = False
-                    outer_indentation_in_spaces = current_indentation
+                    in_docstring_returns_section = False
+                    in_docstring_raises_section = True
+                    in_docstring_yields_section = False
+                    in_freeform_section = False
+                    in_description = False
+                    args_indentation_in_spaces = current_line_indentation
+                # If line starts with Yields: , it is the header of a Yields
+                # subsection.
                 elif line.startswith('Yields:'):
-                    is_docstring_return = False
-                    is_docstring_raise = False
-                    is_docstring_yield = True
-                    free_form_return = False
-                    description = False
-                    outer_indentation_in_spaces = current_indentation
+                    in_docstring_returns_section = False
+                    in_docstring_raises_section = False
+                    in_docstring_yields_section = True
+                    in_freeform_section = False
+                    in_description = False
+                    args_indentation_in_spaces = current_line_indentation
+                # Ignore lines that are empty.
                 elif len(line) == 0:
                     continue
-                elif is_docstring_raise:
-                    # Parameter line (e.g NotImplementedException: )
+                # Check if we are in a docstring raises section.
+                elif in_docstring_raises_section:
+                    # In the raises section, if we see this regex expression, we
+                    # can assume it's the start of a new parameter definition.
+                    # We check the indentation of the parameter definition.
                     if re.search(br'^[a-zA-Z0-9_\.\*]+: ',
                                  line):
-                        if current_indentation != (
-                                outer_indentation_in_spaces + 4):
+                        if current_line_indentation != (
+                                args_indentation_in_spaces + 4):
                             self.add_message(
-                                'four-space-indentation-in-docstring',
+                                '4-space-indentation-in-docstring',
                                 line=line_num + 1)
-                        description = True
-                    # Possible malformed parameter that confuses the check
-                    elif re.search(br'^[^ ]+: ', line) and not description:
+                        in_description = True
+                    # If the line starts off with a regex like this but failed
+                    # the last check, then it is a malformed parameter so we
+                    # notify the user.
+                    elif re.search(br'^[^ ]+: ', line) and not in_description:
                         self.add_message(
                             'malformed-parameter',
                             line=line_num + 1)
-                    elif re.search(br':$', line) and description:
-                        free_form_return = True
-                    # Description lines must be indented by 8 spaces
-                    elif description:
-                        if current_indentation != (
-                                outer_indentation_in_spaces + 8):
+                    # In a description line that is wrapped around (doesn't
+                    # start off with the parameter name), we need to make sure
+                    # the indentation is 8.
+                    elif in_description:
+                        if current_line_indentation != (
+                                args_indentation_in_spaces + 8):
                             self.add_message(
-                                'eight-space-indentation-in-docstring',
+                                '8-space-indentation-in-docstring',
                                 line=line_num + 1)
-                elif is_docstring_return or is_docstring_yield:
-                    # Parameter line(should only be one for
-                    # docstring yield and return
+                # Check if we are in a docstring returns or yields section.
+                # NOTE: Each function should only have one yield or return
+                # object. If a tuple is returned, wrap both in a tuple parameter
+                # section.
+                elif (in_docstring_returns_section
+                      or in_docstring_yields_section):
+                    # Check for the start of a new parameter definition in the
+                    # format "type (elaboration)." and check the indentation.
                     if (re.search(br'^[a-zA-Z_() -:,\*]+\. ',
-                                  line) and not description):
-                        if current_indentation != (
-                                outer_indentation_in_spaces + 4):
+                                  line) and not in_description):
+                        if current_line_indentation != (
+                                args_indentation_in_spaces + 4):
                             self.add_message(
-                                'four-space-indentation-in-docstring',
+                                '4-space-indentation-in-docstring',
                                 line=line_num + 1)
+                        # If the line ends with a colon, we can assume the rest
+                        # of the section is free form.
                         if re.search(br':$', line):
-                            free_form_return = True
-                        description = True
-                    # Description should be indented on the same level
-                    # of the outer parameters
-                    else:
-                        if (current_indentation != (
-                                outer_indentation_in_spaces + 4)
-                                and not free_form_return):
+                            in_freeform_section = True
+                        in_description = True
+                    # In a description line of a returns or yields, we keep the
+                    # indentation the same as the definition line.
+                    elif in_description:
+                        if (current_line_indentation != (
+                                args_indentation_in_spaces + 4)
+                                and not in_freeform_section):
                             self.add_message(
-                                'four-space-indentation-in-docstring',
+                                '4-space-indentation-in-docstring',
                                 line=line_num + 1)
+                        # If the description line ends with a colon, we can
+                        # assume the rest of the section is free form.
                         if re.search(br':$', line):
-                            free_form_return = True
+                            in_freeform_section = True
 
 
 class BlankLineBelowFileOverviewChecker(checkers.BaseChecker):
