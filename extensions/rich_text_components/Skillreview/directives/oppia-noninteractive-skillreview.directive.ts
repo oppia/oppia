@@ -17,7 +17,7 @@
  */
 
 require(
-  'extensions/rich_text_components/Skillreview/directives/' +
+  'rich_text_components/Skillreview/directives/' +
   'oppia-noninteractive-skillreview-concept-card-modal.controller.ts');
 
 require('components/concept-card/concept-card.directive.ts');

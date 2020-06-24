@@ -24,6 +24,7 @@ describe('Oppia Noninteractive Skillreview Concept Card Modal Controller',
 
     var skillId = 'skill1';
 
+    beforeEach(angular.mock.module('oppia'));
     beforeEach(angular.mock.inject(function($injector, $controller) {
       var $rootScope = $injector.get('$rootScope');
 
