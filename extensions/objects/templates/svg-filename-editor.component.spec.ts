@@ -16,6 +16,11 @@
  * @fileoverview Unit tests for the svg filename editor.
  */
 
+import { TestBed } from '@angular/core/testing';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { ANGULAR_SERVICES, ANGULAR_SERVICES_NAMES } from
+  'tests/angular-services.index';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 const { fabric } = require('fabric');
 import { AppConstants } from 'app.constants';
 
@@ -94,8 +99,19 @@ describe('SvgFilenameEditor', function() {
     this.y = y;
   };
 
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [...ANGULAR_SERVICES],
+      schemas: [NO_ERRORS_SCHEMA]
+    });
+  });
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
+    for (let i in ANGULAR_SERVICES) {
+      $provide.value(ANGULAR_SERVICES_NAMES[i],
+        TestBed.get(ANGULAR_SERVICES[i]));
+    }
     $provide.value('AssetsBackendApiService', mockAssetsBackendApiService);
     $provide.value('ImageLocalStorageService', {});
     $provide.value('ImagePreloaderService', mockImagePreloaderService);
@@ -393,8 +409,19 @@ describe('SvgFilenameEditor initialized with value attribute',
         };
       }
     };
+    beforeEach(() => {
+      TestBed.configureTestingModule({
+        imports: [HttpClientTestingModule],
+        providers: [...ANGULAR_SERVICES],
+        schemas: [NO_ERRORS_SCHEMA]
+      });
+    });
     beforeEach(angular.mock.module('oppia'));
     beforeEach(angular.mock.module('oppia', function($provide) {
+      for (let i in ANGULAR_SERVICES) {
+        $provide.value(ANGULAR_SERVICES_NAMES[i],
+          TestBed.get(ANGULAR_SERVICES[i]));
+      }
       $provide.value('AssetsBackendApiService', mockAssetsBackendApiService);
       $provide.value('ImagePreloaderService', mockImagePreloaderService);
       $provide.value('ImageUploadHelperService', {});
@@ -510,8 +537,19 @@ describe('SvgFilenameEditor with image save destination as ' +
     }
   }
 
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [...ANGULAR_SERVICES],
+      schemas: [NO_ERRORS_SCHEMA]
+    });
+  });
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
+    for (let i in ANGULAR_SERVICES) {
+      $provide.value(ANGULAR_SERVICES_NAMES[i],
+        TestBed.get(ANGULAR_SERVICES[i]));
+    }
     $provide.value('AssetsBackendApiService', {});
     $provide.value('ImageLocalStorageService', mockilss);
     $provide.value('ImagePreloaderService', mockImagePreloaderService);
@@ -580,8 +618,19 @@ describe('should fail svg tag validation', function() {
     }
   };
 
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [...ANGULAR_SERVICES],
+      schemas: [NO_ERRORS_SCHEMA]
+    });
+  });
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
+    for (let i in ANGULAR_SERVICES) {
+      $provide.value(ANGULAR_SERVICES_NAMES[i],
+        TestBed.get(ANGULAR_SERVICES[i]));
+    }
     $provide.value('AssetsBackendApiService', {});
     $provide.value('ImageLocalStorageService', {});
     $provide.value('ImagePreloaderService', {});
@@ -611,8 +660,19 @@ describe('should fail svg attribute validation', function() {
     }
   };
 
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [...ANGULAR_SERVICES],
+      schemas: [NO_ERRORS_SCHEMA]
+    });
+  });
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
+    for (let i in ANGULAR_SERVICES) {
+      $provide.value(ANGULAR_SERVICES_NAMES[i],
+        TestBed.get(ANGULAR_SERVICES[i]));
+    }
     $provide.value('AssetsBackendApiService', {});
     $provide.value('ImageLocalStorageService', {});
     $provide.value('ImagePreloaderService', {});

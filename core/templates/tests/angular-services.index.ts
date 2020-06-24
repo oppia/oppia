@@ -19,14 +19,16 @@
 /**
  * No changes should be made to this file. Treat this as a read-only
  * file. This is just to provide angular2+ services to 8 specs listed below:
- *   1. stewards-landing-page.component.spec.ts
- *   2. topic-landing-page.component.spec.ts
- *   3. notifications-dashboard-page.component.spec.ts
- *   4. splash-page.component.spec.ts
- *   5. teach-page.component.spec.ts
- *   6. nested-directives-recursion-timeout-prevention.service.spec.ts
- *   7. question-validation.service.spec.ts
- *   8. rte-helper-modal.controller.spec.ts
+ *   01. stewards-landing-page.component.spec.ts
+ *   02. topic-landing-page.component.spec.ts
+ *   03. notifications-dashboard-page.component.spec.ts
+ *   04. splash-page.component.spec.ts
+ *   05. teach-page.component.spec.ts
+ *   06. nested-directives-recursion-timeout-prevention.service.spec.ts
+ *   07. question-validation.service.spec.ts
+ *   08. rte-helper-modal.controller.spec.ts
+ *   09. svg-filename-editor.component.spec.ts
+ *   10. preview-summary-tile-modal.controller.spec.ts
  */
 
 /* eslint-disable max-len */
