@@ -50,7 +50,7 @@ describe('AutosaveInfoModalsService', () => {
     expect(modalOpenSpy).toHaveBeenCalled();
   });
 
-  it('should close non strict validation fail modal with no errors',
+  it('should close non strict validation fail modal successfully',
     () => {
       expect(AutosaveInfoModalsService.isModalOpen()).toBe(false);
       spyOn($uibModal, 'open').and.returnValue({
@@ -83,7 +83,7 @@ describe('AutosaveInfoModalsService', () => {
     expect(modalOpenSpy).toHaveBeenCalled();
   });
 
-  it('should close version mismatch modal with no errors', () => {
+  it('should close version mismatch modal successfully', () => {
     expect(AutosaveInfoModalsService.isModalOpen()).toBe(false);
     spyOn($uibModal, 'open').and.returnValue({
       result: $q.resolve()
@@ -95,18 +95,18 @@ describe('AutosaveInfoModalsService', () => {
     expect(AutosaveInfoModalsService.isModalOpen()).toBe(false);
   });
 
-  it('should handle rejects when closing version mismatch modal and throw' +
-    ' error', () => {
-    expect(AutosaveInfoModalsService.isModalOpen()).toBe(false);
-    spyOn($uibModal, 'open').and.returnValue({
-      result: $q.reject()
-    });
-    AutosaveInfoModalsService.showVersionMismatchModal(lostChanges);
-    expect(AutosaveInfoModalsService.isModalOpen()).toBe(true);
-    $rootScope.$apply();
+  it('should handle rejects when dismissing save version mismatch modal',
+    () => {
+      expect(AutosaveInfoModalsService.isModalOpen()).toBe(false);
+      spyOn($uibModal, 'open').and.returnValue({
+        result: $q.reject()
+      });
+      AutosaveInfoModalsService.showVersionMismatchModal(lostChanges);
+      expect(AutosaveInfoModalsService.isModalOpen()).toBe(true);
+      $rootScope.$apply();
 
-    expect(AutosaveInfoModalsService.isModalOpen()).toBe(false);
-  });
+      expect(AutosaveInfoModalsService.isModalOpen()).toBe(false);
+    });
 
   it('should call $uibModal open when opening show lost changes modal',
     () => {
@@ -116,7 +116,7 @@ describe('AutosaveInfoModalsService', () => {
       expect(modalOpenSpy).toHaveBeenCalled();
     });
 
-  it('should close show lost changes modal with no errors', () => {
+  it('should close show lost changes modal successfully', () => {
     expect(AutosaveInfoModalsService.isModalOpen()).toBe(false);
     spyOn($uibModal, 'open').and.returnValue({
       result: $q.resolve()
@@ -128,8 +128,7 @@ describe('AutosaveInfoModalsService', () => {
     expect(AutosaveInfoModalsService.isModalOpen()).toBe(false);
   });
 
-  it('should handler reject when closing show lost changes modal throw' +
-    ' error', () => {
+  it('should handler reject when dismissing show lost changes modal', () => {
     expect(AutosaveInfoModalsService.isModalOpen()).toBe(false);
     spyOn($uibModal, 'open').and.returnValue({
       result: $q.reject()
