@@ -76,14 +76,6 @@ class CheckFrontEndCoverageTests(test_utils.GenericTestBase):
             'LF:10\n'
             'LH:5\n'
             'end_of_record\n'
-            'SF:/oppia/invalid_file.ts\n'
-            'LF:10\n'
-            'LH:5\n'
-            'end_of_record\n'
-            'SF:/oppia/valid_file.ts\n'
-            'LF:10\n'
-            'LH:5\n'
-            'end_of_record\n'
         )
         with self.open_file_swap:
             stanzas = check_frontend_coverage.get_stanzas_from_lcov_file()
@@ -96,12 +88,6 @@ class CheckFrontEndCoverageTests(test_utils.GenericTestBase):
             self.assertEqual(stanzas[2].file_name, 'file3.ts')
             self.assertEqual(stanzas[2].total_lines, 10)
             self.assertEqual(stanzas[2].covered_lines, 5)
-            self.assertEqual(stanzas[3].file_name, 'invalid_file.ts')
-            self.assertEqual(stanzas[3].total_lines, 10)
-            self.assertEqual(stanzas[3].covered_lines, 5)
-            self.assertEqual(stanzas[4].file_name, 'valid_file.ts')
-            self.assertEqual(stanzas[4].total_lines, 10)
-            self.assertEqual(stanzas[4].covered_lines, 5)
 
     def test_get_stanzas_from_lcov_file_file_name_exception(self):
         self.lcov_items_list = (
@@ -210,26 +196,6 @@ class CheckFrontEndCoverageTests(test_utils.GenericTestBase):
                     r'\033\[1mfile.ts\033\[0m seems to be not completely'
                     ' tested. Make sure it\'s fully covered.\n'):
                     check_frontend_coverage.check_coverage_changes()
-
-    def test_check_coverage_changes_for_test_files(self):
-        self.lcov_items_list = (
-            'SF:/oppia/invalid_file.ts\n'
-            'LF:10\n'
-            'LH:5\n'
-            'end_of_record\n'
-            'SF:/oppia/valid_file.ts\n'
-            'LF:10\n'
-            'LH:5\n'
-            'end_of_record\n'
-        )
-        not_fully_covered_files_swap = self.swap(
-            check_frontend_coverage,
-            'NOT_FULLY_COVERED_FILENAMES', []
-        )
-
-        with self.exists_swap, self.open_file_swap, self.print_swap:
-            with not_fully_covered_files_swap:
-                check_frontend_coverage.check_coverage_changes()
 
     def test_check_coverage_changes_remove_file(self):
         self.lcov_items_list = (
