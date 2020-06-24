@@ -170,7 +170,7 @@ describe('Exploration stats backend api service', () => {
 
     const onSuccess = jasmine.createSpy('onSuccess');
     const onFailure = jasmine.createSpy('onFailure');
-    improvementsBackendApiService.postTasks('eid', [task])
+    improvementsBackendApiService.postTasksAsync('eid', [task])
       .then(onSuccess, onFailure);
 
     const req = (
