@@ -170,10 +170,8 @@ export class SpeechSynthesisChunkerService {
         ServicesConstants.RTE_COMPONENT_SPECS[componentSpec].frontend_id;
       });
     interface IMathExpressionContent {
-      // eslint-disable-next-line camelcase
-      raw_latex: String,
-      // eslint-disable-next-line camelcase
-      svg_filename: String
+      'raw_latex': String,
+      'svg_filename': String
     }
     var elt = $('<div>' + html + '</div>');
     // Convert links into speakable text by extracting the readable value.
@@ -199,8 +197,10 @@ export class SpeechSynthesisChunkerService {
           var mathContent = <IMathExpressionContent>(
             _this.htmlEscaper.escapedJsonToObj(
               element.attributes['math_content-with-value'].textContent));
+          /* eslint-disable dot-notation */
           const latexSpeakableText = _this._formatLatexToSpeakableText(
-            mathContent.raw_latex);
+            mathContent['raw_latex']);
+          /* eslint-enable dot-notation */
           return latexSpeakableText.length > 0 ? latexSpeakableText + ' ' : '';
         }
       });
