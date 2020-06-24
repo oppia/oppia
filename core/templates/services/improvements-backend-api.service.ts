@@ -78,7 +78,7 @@ export class ImprovementsBackendApiService {
     );
   }
 
-  async postTasks(expId: string, tasks: ExplorationTask[]): Promise<void> {
+  async postTasksAsync(expId: string, tasks: ExplorationTask[]): Promise<void> {
     const explorationImprovementsUrl = (
       this.urlInterpolationService.interpolateUrl(
         ImprovementsConstants.EXPLORATION_IMPROVEMENTS_URL, {
