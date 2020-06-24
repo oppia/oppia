@@ -294,7 +294,7 @@ angular.module('oppia').component('creatorDashboardPage', {
             for (var i = 0; i < numberOfCreatedSuggestions; i++) {
               if (responseData.created_suggestions_list.length !==
                   numberOfCreatedSuggestions) {
-                $log.error('Number of suggestions does not match number' +
+                $log.error('Number of suggestions does not match number ' +
                           'of suggestion threads');
               }
               for (var j = 0; j < numberOfCreatedSuggestions; j++) {
