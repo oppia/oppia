@@ -120,8 +120,7 @@ def get_subtopic_pages_with_ids(topic_id, subtopic_ids):
 
     Returns:
         list(SubtopicPage) or None. The list of domain objects representing the
-        subtopic pages corresponding to given ids list or None if none
-        exist.
+        subtopic pages corresponding to given ids list or None if none exist.
     """
     subtopic_page_ids = []
     for subtopic_id in subtopic_ids:

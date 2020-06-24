@@ -232,7 +232,7 @@ class ExplorationCommitLogEntry(python_utils.OBJECT):
                 made in this model, which should give sufficient information to
                 reconstruct the commit. Each dict always contains the following
                 key:
-                    - cmd (str). Unique command.
+                    - cmd: (str). Unique command.
                 and then additional arguments for that command.
             version: int. The version of the exploration after the commit.
             post_commit_status: str. The new exploration status after the
@@ -2427,9 +2427,9 @@ class Exploration(python_utils.OBJECT):
 
         Args:
             versioned_exploration_states: dict. A dict with two keys:
-                states_schema_version (int). The states schema version for the
-                    exploration.
-                states (dict). The dict of states comprising the exploration.
+                - states_schema_version: (int). The states schema version for
+                    the exploration.
+                - states: (dict). The dict of states comprising the exploration.
                     The keys are state names and the values are dicts used to
                     initialize a State domain object.
             current_states_schema_version: int. The current states
@@ -2830,6 +2830,7 @@ class Exploration(python_utils.OBJECT):
     @classmethod
     def _convert_v16_dict_to_v17_dict(cls, exploration_dict):
         """Converts a v16 exploration dict into a v17 exploration dict.
+
         Removes gadgets and skins.
 
         Args:
@@ -2875,6 +2876,7 @@ class Exploration(python_utils.OBJECT):
     @classmethod
     def _convert_v18_dict_to_v19_dict(cls, exploration_dict):
         """Converts a v18 exploration dict into a v19 exploration dict.
+
         Adds audio translations to feedback, hints, and solutions.
 
         Args:
@@ -2897,6 +2899,7 @@ class Exploration(python_utils.OBJECT):
     @classmethod
     def _convert_v19_dict_to_v20_dict(cls, exploration_dict):
         """Converts a v19 exploration dict into a v20 exploration dict.
+
         Introduces a correctness property at the top level, and changes each
         answer group's "correct" field to "labelled_as_correct" instead.
 
@@ -3256,6 +3259,7 @@ class Exploration(python_utils.OBJECT):
     @classmethod
     def _convert_v34_dict_to_v35_dict(cls, exploration_dict):
         """Converts a v34 exploration dict into a v35 exploration dict.
+
         Replaces tagged_misconception_id with tagged_skill_misconception_id,
         which contains the skill id and misconception id of the tagged
         misconception, connected by '-'.
@@ -3279,6 +3283,7 @@ class Exploration(python_utils.OBJECT):
     @classmethod
     def _convert_v35_dict_to_v36_dict(cls, exploration_dict):
         """Converts a v35 exploration dict into a v36 exploration dict.
+
         Updates existing explorations to match the Voiceover class to have
         the duration attribute initalised to 0.
 
@@ -3301,6 +3306,7 @@ class Exploration(python_utils.OBJECT):
     @classmethod
     def _convert_v36_dict_to_v37_dict(cls, exploration_dict):
         """Converts a v36 exploration dict into a v37 exploration dict.
+
         Adds a new customization arg to SetInput interactions
         which allows creators to customize the "Add item" button.
 
@@ -3323,7 +3329,8 @@ class Exploration(python_utils.OBJECT):
     @classmethod
     def _convert_v37_dict_to_v38_dict(cls, exploration_dict):
         """Converts a v37 exploration dict into a v38 exploration dict.
-        adds a new customization arg to MultipleChoiceInput which allows
+
+        Adds a new customization arg to MultipleChoiceInput which allows
         answer choices to be shuffled.
 
         Args:

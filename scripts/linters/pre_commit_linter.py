@@ -260,7 +260,7 @@ def _get_linters_for_file_extension(
             verbose_mode_enabled=verbose_mode_enabled)
         third_party_linters.append(third_party_linter)
 
-    if file_extension_to_lint == 'py':
+    elif file_extension_to_lint == 'py':
         custom_linter, third_party_linter = python_linter.get_linters(
             _FILES['.py'], verbose_mode_enabled=verbose_mode_enabled)
         custom_linters.append(custom_linter)

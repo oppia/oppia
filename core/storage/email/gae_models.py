@@ -551,8 +551,8 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
 
         Returns:
             dict. The FeedbackEmailReplyToIdModel instances corresponding to the
-            given list of user ids in dict format. The key is the unique
-            user id, and the corresponding value is the list of
+            given list of user ids in dict format. The key is the unique user id
+            and the corresponding value is the list of
             FeedbackEmailReplyToIdModel instances.
         """
         instance_ids = [cls._generate_id(user_id, thread_id)

@@ -119,7 +119,7 @@ class ActivityRights(python_utils.OBJECT):
         """Validates an ActivityRights object.
 
         Raises:
-            tils.ValidationError: if any of the owners, editors, voice artists
+            utils.ValidationError: if any of the owners, editors, voice artists
                 and viewers lists overlap, or if a community-owned exploration
                 has owners, editors, voice artists or viewers specified.
         """
