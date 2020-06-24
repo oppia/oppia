@@ -21,8 +21,8 @@
          class="conversation-skin-inline-interaction">
       <div class="oppia-interaction-instructions">
         <[upcomingInteractionInstructions]>
-        <i ng-if="canWindowShowTwoCards()" class="material-icons oppia-material-icons md-18">&#xE5C8;</i>
-        <i ng-if="!canWindowShowTwoCards()" class="material-icons oppia-material-icons md-18">&#xE5DB;</i>
+        <i ng-if="canWindowShowTwoCards()" class="material-icons oppia-show-two-cards-icon md-18">&#xE5C8;</i>
+        <i ng-if="!canWindowShowTwoCards()" class="material-icons oppia-show-two-cards-icon md-18">&#xE5DB;</i>
       </div>
     </div>
   </div>
@@ -396,7 +396,7 @@ otherwise they will interfere with the iframed conversation skin directive.
     padding: 6px 12px;
   }
 
-  .oppia-material-icons {
+  .oppia-show-two-cards-icon {
     position: relative;
   }
 

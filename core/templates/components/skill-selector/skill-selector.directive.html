@@ -4,16 +4,16 @@
       Search By Skill
       <input type="text" class="form-control protractor-test-skill-name-input" placeholder="Enter a skill name" ng-model="skillFilterText" autofocus>
     </md-card>
-    <div class="oppia-selected-skill-div">
+    <div class="oppia-selected-skill-container">
       <md-radio-group ng-model="selectedSkill" ng-change="setSelectedSkillId()">
         <md-card ng-if="!hasUntriagedSkills(topicName)" ng-repeat="(topicName, subtopics) in categorizedSkills" class="list-view-item">
           <md-card layout="row" class="list-view-item">
-            <h2><label class="oppia-label-style"><[topicName]></label></h2>
+            <h2><label class="oppia-skill-selector-text"><[topicName]></label></h2>
           </md-card>
           <div ng-if="!checkIfEmpty(skills)" ng-repeat="(subtopicName, skills) in subtopics" class="list-view-item ">
             <md-card class="list-view-item">
               <label class="oppia-subtopic-name"><[subtopicName]></label>
-              <md-radio-button class="oppia-skills-list-item protractor-test-skills-list-item" ng-repeat="skill in skills | filter:skillFilterText" ng-value="skill.skill_id" aria-label="<[skill.skill_description]>">
+              <md-radio-button class="oppia-skills-list-item-text protractor-test-skills-list-item" ng-repeat="skill in skills | filter:skillFilterText" ng-value="skill.skill_id" aria-label="<[skill.skill_description]>">
                 <[skill.skill_description]>
               </md-radio-button>
             </md-card>
@@ -21,11 +21,11 @@
         </md-card>
         <md-card ng-if="hasUntriagedSkills(topicName)" ng-repeat="(topicName, skills) in categorizedSkills" class="list-view-item">
           <md-card layout="row" class="list-view-item">
-            <h2><label class="oppia-label-style">Untriaged Skills</label></h2>
+            <h2><label class="oppia-skill-selector-text">Untriaged Skills</label></h2>
           </md-card>
           <div ng-if="!checkIfEmpty(skills)" class="list-view-item ">
             <md-card class="list-view-item">
-              <md-radio-button class="oppia-label-style protractor-test-skills-list-item" ng-repeat="skill in skills | filter:skillFilterText" ng-value="skill.skill_id" aria-label="<[skill.skill_description]>">
+              <md-radio-button class="oppia-skill-selector-text protractor-test-skills-list-item" ng-repeat="skill in skills | filter:skillFilterText" ng-value="skill.skill_id" aria-label="<[skill.skill_description]>">
                 <[skill.skill_description]>
               </md-radio-button>
             </md-card>
@@ -40,11 +40,11 @@
     </md-card>
     <div ng-if="canAllowSkillsFromOtherTopics()" class="oppia-allow-skills">
       <md-card class="list-view-item ">
-        <md-checkbox class="oppia-skills-list-item" ng-repeat="topic in topicFilterList" ng-model="topic.checked" ng-change="updateSkillsListOnTopicFilterChange()"><[topic.topicName]></md-checkbox>
+        <md-checkbox class="oppia-skills-list-item-text" ng-repeat="topic in topicFilterList" ng-model="topic.checked" ng-change="updateSkillsListOnTopicFilterChange()"><[topic.topicName]></md-checkbox>
       </md-card>
     </div>
     <br>
-    <md-card layout="row" class="list-view-item oppia-label-style">
+    <md-card layout="row" class="list-view-item oppia-skill-selector-text">
       <label>Filter By Subtopic</label>
     </md-card>
     <div class="oppia-allow-skills">
@@ -52,7 +52,7 @@
         <div ng-repeat="(topicName, subtopics) in subTopicFilterDict">
           <h3><label class="list-group-item-heading oppia-list-view-item"><[topicName]></label></h3>
           <md-card class="list-view-item">
-            <md-checkbox class="oppia-skills-list-item" ng-repeat="subtopic in subtopics" ng-model="subtopic.checked" ng-change="updateSkillsListOnSubtopicFilterChange()"><[subtopic.subTopicName]></md-checkbox>
+            <md-checkbox class="oppia-skills-list-item-text" ng-repeat="subtopic in subtopics" ng-model="subtopic.checked" ng-change="updateSkillsListOnSubtopicFilterChange()"><[subtopic.subTopicName]></md-checkbox>
           </md-card>
         </div>
       </md-card>
@@ -70,11 +70,11 @@
   .oppia-list-group {
     width: 70%;
   }
-  .oppia-selected-skill-div {
+  .oppia-selected-skill-container {
     max-height: 50vh;
     overflow-y: auto;
   }
-  .oppia-label-style {
+  .oppia-skill-selector-text {
     padding-left: 10px;
   }
   .oppia-subtopic-name {
@@ -82,7 +82,7 @@
     padding-left: 10px;
     padding-top: 20px;
   }
-  .oppia-skills-list-item {
+  .oppia-skills-list-item-text {
     margin-left: 10px;
   }
   .oppia-list-group-extra {

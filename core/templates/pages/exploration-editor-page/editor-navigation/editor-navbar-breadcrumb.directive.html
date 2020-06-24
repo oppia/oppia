@@ -8,7 +8,7 @@
         <[getCurrentTabName()]>
       </span>
     </span>
-    <span ng-if="navbarTitle === ''" ng-click="editTitle()">
+    <span ng-if="navbarTitle === ''" ng-click="editTitle()" class="oppia-untitled-exploration-text">
       Untitled Exploration
     </span>
     <span ng-if="navbarTitle === null">
@@ -21,7 +21,7 @@
   .oppia-navbar-breadcrumb-separator-extra {
     margin-left: 5px;
   }
-  .oppia-end-title {
+  .oppia-untitled-exploration-text {
     opacity: 0.6;
   }
 </style>

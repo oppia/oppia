@@ -1,4 +1,4 @@
-<div ng-if="!$ctrl.conceptCardExplanationEditorIsShown" class="review-material oppia-review-material-extra">
+<div ng-if="!$ctrl.conceptCardExplanationEditorIsShown" class="review-material">
   <div ng-class="oppia-editable-section"
        ng-click="$ctrl.openConceptCardExplanationEditor()">
     <i class="material-icons oppia-editor-edit-icon float-right protractor-test-edit-concept-card"
@@ -35,6 +35,7 @@
 <style>
   review-material-editor .review-material {
     padding-bottom: 36px;
+    padding-top: 0.5em;
   }
 
   review-material-editor .editor-buttons {
@@ -43,10 +44,6 @@
 
   review-material-editor .oppia-editor-edit-icon {
     position: inherit;
-  }
-
-  review-material-editor .oppia-review-material-extra {
-    padding-top: 0.5em;
   }
 
   review-material-editor .oppia-clear {

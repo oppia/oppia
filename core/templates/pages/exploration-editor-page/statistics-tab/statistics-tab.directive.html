@@ -6,10 +6,10 @@
         <pie-chart data="$ctrl.pieChartData"
                    options="$ctrl.COMPLETION_RATE_PIE_CHART_OPTIONS">
         </pie-chart>
-        <p class="oppia-paragraph"><span ng-if="$ctrl.numPassersby" class="oppia-num-passer-by protractor-test-num-passersby"><[$ctrl.numPassersby]></span><span ng-if="!$ctrl.numPassersby" class="oppia-num-passer-by">0</span> learners browsed this exploration. They left before reaching the second card.</p>
+        <p class="oppia-num-passer-by-container"><span ng-if="$ctrl.numPassersby" class="oppia-num-passer-by protractor-test-num-passersby"><[$ctrl.numPassersby]></span><span ng-if="!$ctrl.numPassersby" class="oppia-num-passer-by">0</span> learners browsed this exploration. They left before reaching the second card.</p>
 
         <h3>Card statistics</h3>
-        <div class="oppia-card-statistics" ng-if="lastUpdated">
+        <div class="oppia-last-updated-text" ng-if="lastUpdated">
           <em>Last updated: <[$ctrl.getLocaleAbbreviatedDatetimeString(lastUpdated)]></em>
         </div>
         <div class="container">
@@ -35,13 +35,13 @@
 </div>
 
 <style>
-  .oppia-paragraph {
+  .oppia-num-passer-by-container {
     text-align: center;
   }
   .oppia-num-passer-by {
     font-weight: bold;
   }
-  .oppia-card-statistics {
+  .oppia-last-updated-text {
     font-size: smaller;
   }
 </style>

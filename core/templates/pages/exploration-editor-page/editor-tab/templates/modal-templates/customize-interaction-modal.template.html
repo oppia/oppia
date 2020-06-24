@@ -1,4 +1,4 @@
-<div class="modal-header oppia-modal-header">
+<div class="modal-header oppia-customize-interaction-modal-header">
   <h3 ng-if="!StateInteractionIdService.displayed">
     Choose Interaction
   </h3>
@@ -33,7 +33,7 @@
       <schema-based-editor ng-class="{'boolean-checkbox': customizationArgSpec.schema.type === 'bool'}" local-value="StateCustomizationArgsService.displayed[customizationArgSpec.name].value" schema="customizationArgSpec.schema">
       </schema-based-editor>
       <div ng-if="customizationArgSpec.schema.type === 'bool'" class="oppia-interaction-customization-label"><[customizationArgSpec.description]></div>
-      <div class="oppia-div"></div>
+      <div class="oppia-empty-div"></div>
     </div>
     <div ng-if="getCustomizationArgsWarningMessage()" class="alert alert-danger oppia-units-input-error">
       <[getCustomizationArgsWarningMessage()]>
@@ -48,7 +48,7 @@
 <div class="modal-footer">
   <button class="btn btn-secondary" ng-click="cancel()" ng-if="!hasCustomizationArgs">Cancel</button>
   <!-- Do not show this button if an interaction is already selected. -->
-  <button class="btn btn-secondary oppia-btn-secondary" ng-click="returnToInteractionSelector()" ng-if="StateInteractionIdService.displayed && !StateInteractionIdService.savedMemento && hasCustomizationArgs">Change Interaction</button>
+  <button class="btn btn-secondary oppia-return-to-interaction-button" ng-click="returnToInteractionSelector()" ng-if="StateInteractionIdService.displayed && !StateInteractionIdService.savedMemento && hasCustomizationArgs">Change Interaction</button>
 
   <button class="btn btn-secondary" ng-click="cancel()" ng-if="hasCustomizationArgs">Cancel</button>
   <div class="btn-group"
@@ -74,14 +74,14 @@
     float: left;
     margin-right: 4px;
   }
-  .oppia-modal-header {
+  .oppia-customize-interaction-modal-header {
     border-bottom: 0;
     padding-bottom: 0;
   }
-  .oppia-div {
+  .oppia-empty-div {
     margin-bottom: 15px;
   }
-  .oppia-btn-secondary {
+  .oppia-return-to-interaction-button {
     float: left;
   }
 </style>

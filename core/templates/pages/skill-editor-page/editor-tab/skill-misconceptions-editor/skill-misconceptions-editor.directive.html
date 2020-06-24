@@ -2,14 +2,14 @@
   <div class="oppia-editor-card-body">
     <div class="oppia-editor-card-section">
       <strong class="oppia-misconceptions-text">Misconceptions</strong>
-      <div class="oppia-misconceptions-text-div">
-        <span class="oppia-misconceptions-text-span">
+      <div class="oppia-misconceptions-text-container">
+        <span class="oppia-misconceptions-explanation-text">
           <i>
             These misconceptions represent common mistakes that are made by students when trying to apply this skill.
           </i>
         </span>
       </div>
-      <div ng-if="misconceptions.length > 0" class="oppia-option-list-div">
+      <div ng-if="misconceptions.length > 0" class="oppia-option-list-container">
         <ul class="nav oppia-option-list nav-stacked nav-pills"
             role="tablist"
             ng-model="misconceptions">
@@ -55,14 +55,14 @@
   .oppia-misconceptions-text {
     font-size: 1.4em;
   }
-  .oppia-misconceptions-text-div {
+  .oppia-misconceptions-text-container {
     color: #595959;
     padding-bottom: 12px;
   }
-  .oppia-misconceptions-text-span {
+  .oppia-misconceptions-explanation-text {
     font-size: .79em;
   }
-  .oppia-option-list-div {
+  .oppia-option-list-container {
     padding-bottom: 10px;
   }
   .oppia-prevent-selection-extra {

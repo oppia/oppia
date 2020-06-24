@@ -32,7 +32,7 @@
        ng-if="$ctrl.noActivity">
     <div class="col-sm-2"
          ng-style="$ctrl.checkMobileView() ? {'text-align': 'center'} : {'text-align': 'left'}">
-      <div class="oppia-mobile-view" ng-if="!$ctrl.checkMobileView()"></div>
+      <div class="oppia-learner-dashboard-mascot-image-container" ng-if="!$ctrl.checkMobileView()"></div>
       <img ng-src="<[$ctrl.getStaticImageUrl('/general/collection_mascot.svg')]>"
            ng-class="{'oppia-learner-dashboard-mascot-mobile': $ctrl.checkMobileView()}"
            class="oppia-learner-dashboard-mascot">
@@ -1150,7 +1150,7 @@
     display: flex;
   }
 
-  .oppia-mobile-view {
+  .oppia-learner-dashboard-mascot-image-container {
     height: 100%;
   }
 

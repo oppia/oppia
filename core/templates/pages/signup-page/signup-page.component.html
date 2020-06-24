@@ -12,10 +12,10 @@ link before completing the signup process, they will be logged out.
           <label for="username" class="col-lg-3 col-md-3 col-sm-3" translate="I18N_SIGNUP_USERNAME"></label>
 
           <div class="col-lg-9 col-md-9 col-sm-9">
-            <input type="text" ng-model="$ctrl.username" id="username" class="form-control oppia-form-control protractor-test-username-input" ng-blur="$ctrl.onUsernameInputFormBlur($ctrl.username)" ng-change="$ctrl.updateWarningText($ctrl.username)" ng-trim="false" focus-on="usernameInputField" autofocus="true">
-            <span class="form-text oppia-form-text" translate="I18N_SIGNUP_USERNAME_EXPLANATION"></span>
-            <div class="oppia-div-style">
-              <p class="oppia-assertive-style" aria-live="assertive" ng-show="$ctrl.blurredAtLeastOnce" translate="<[$ctrl.warningI18nCode]>" translate-values="{maxUsernameLength: $ctrl.MAX_USERNAME_LENGTH}"></p>
+            <input type="text" ng-model="$ctrl.username" id="username" class="form-control oppia-username-input protractor-test-username-input" ng-blur="$ctrl.onUsernameInputFormBlur($ctrl.username)" ng-change="$ctrl.updateWarningText($ctrl.username)" ng-trim="false" focus-on="usernameInputField" autofocus="true">
+            <span class="form-text oppia-signup-username-explanation-text" translate="I18N_SIGNUP_USERNAME_EXPLANATION"></span>
+            <div class="oppia-user-info-text-container">
+              <p class="oppia-user-info-text" aria-live="assertive" ng-show="$ctrl.blurredAtLeastOnce" translate="<[$ctrl.warningI18nCode]>" translate-values="{maxUsernameLength: $ctrl.MAX_USERNAME_LENGTH}"></p>
             </div>
           </div>
         </div>
@@ -32,11 +32,11 @@ link before completing the signup process, they will be logged out.
                 <input type="radio" ng-model="$ctrl.canReceiveEmailUpdates" value="no" name="canReceiveEmailUpdates" ng-change="$ctrl.onSelectEmailPreference()">
                 <span translate="I18N_SIGNUP_DO_NOT_SEND_EMAILS"></span>
               </label>
-              <span class="form-text oppia-form-text-extra" translate="I18N_SIGNUP_EMAIL_PREFERENCES_EXPLAIN">
+              <span class="form-text oppia-signup-email-preferences-explain-text" translate="I18N_SIGNUP_EMAIL_PREFERENCES_EXPLAIN">
               </span>
             </div>
-            <div class="oppia-div-style">
-              <span class="oppia-assertive-style" aria-live="assertive" ng-show="$ctrl.blurredAtLeastOnce" translate="<[$ctrl.emailPreferencesWarningText]>">
+            <div class="oppia-user-info-text-container">
+              <span class="oppia-user-info-text" aria-live="assertive" ng-show="$ctrl.blurredAtLeastOnce" translate="<[$ctrl.emailPreferencesWarningText]>">
               </span>
             </div>
           </div>
@@ -50,7 +50,7 @@ link before completing the signup process, they will be logged out.
         </p>
       </div>
       <div class="oppia-long-text" ng-if="!$ctrl.hasEverRegistered">
-        <p class="oppia-site-name" translate="I18N_SIGNUP_SITE_DESCRIPTION" translate-values="{siteName: $ctrl.siteName}">
+        <p class="oppia-site-description-text" translate="I18N_SIGNUP_SITE_DESCRIPTION" translate-values="{siteName: $ctrl.siteName}">
 
         </p>
       </div>
@@ -86,24 +86,24 @@ link before completing the signup process, they will be logged out.
   .oppia-signup-page-container .oppia-long-text > label {
     font-weight: normal;
   }
-  .oppia-form-control {
+  .oppia-username-input {
     width: 260px;
   }
-  .oppia-form-text {
+  .oppia-signup-username-explanation-text {
     font-size: 0.8em;
   }
-  .oppia-div-style {
+  .oppia-user-info-text-container {
     height: 18px;
     width: 550px;
   }
-  .oppia-assertive-style {
+  .oppia-user-info-text {
     color: red;
     font-size: 0.8em;
   }
-  .oppia-form-text-extra {
+  .oppia-signup-email-preferences-explain-text {
     font-size: smaller;
   }
-  .oppia-site-name {
+  .oppia-site-description-text {
     font-size: 1em;
   }
 </style>

@@ -37,8 +37,8 @@
             <i class="material-icons oppia-vcenter" title="Return to list of feedback threads">&#xE5CB;</i>
           </button>
         </span>
-        <span class="oppia-thread" ng-show="!$ctrl.activeThread.isSuggestionThread()">Feedback Thread: <[$ctrl.activeThread.subject]></span>
-        <span class="oppia-thread" ng-show="$ctrl.activeThread.isSuggestionThread()">Suggestion Thread: <[$ctrl.activeThread.subject]></span>
+        <span class="oppia-suggestion-thread" ng-show="!$ctrl.activeThread.isSuggestionThread()">Feedback Thread: <[$ctrl.activeThread.subject]></span>
+        <span class="oppia-suggestion-thread" ng-show="$ctrl.activeThread.isSuggestionThread()">Suggestion Thread: <[$ctrl.activeThread.subject]></span>
       </div>
 
       <div class="col-lg-4 col-md-4 col-sm-4 float-right">
@@ -161,7 +161,7 @@
     clear: both;
   }
 
-  .oppia-thread {
+  .oppia-suggestion-thread {
     font-size: larger;
   }
 

@@ -22,7 +22,7 @@
         <button class="icon-tool toolbar-button thin-button" ng-class="{'disabled' : !$ctrl.areAllToolsEnabled()}"
                 ng-click="$ctrl.createLine()"
                 tooltip-placement="right" uib-tooltip="Line" ng-disabled="!$ctrl.areAllToolsEnabled()">
-          <i class="fas fa-slash" style="font-size: 19px;"></i>
+          <i class="fas fa-slash oppia-slash-icon"></i>
         </button>
         <button class="icon-tool toolbar-button thin-button" ng-class="{'disabled' : !$ctrl.areAllToolsEnabled()}"
                 ng-click="$ctrl.createRect()"
@@ -39,13 +39,11 @@
                 tooltip-placement="left" uib-tooltip="Text" ng-disabled="!$ctrl.areAllToolsEnabled()">
           <i class="fas fa-font"></i>
         </button>
-        <button class="icon-tool toolbar-button thin-button" ng-class="{'disabled' : !$ctrl.isClosedPolygonEnabled()}"
-                style="background-image:url(/assets/svg_diagram_editor/closed_polygon.svg);"
+        <button class="icon-tool toolbar-button thin-button oppia-close-polygon-image" ng-class="{'disabled' : !$ctrl.isClosedPolygonEnabled()}"
                 ng-click="$ctrl.createClosedPolygon()" tooltip-placement="right" uib-tooltip="Closed Polygon"
                 ng-disabled="!$ctrl.isClosedPolygonEnabled()">
         </button>
-        <button class="icon-tool toolbar-button thin-button" ng-class="{'disabled' : !$ctrl.isOpenPolygonEnabled()}"
-                style="background-image:url(/assets/svg_diagram_editor/open_polygon.svg);"
+        <button class="icon-tool toolbar-button thin-button oppia-open-polygon-image" ng-class="{'disabled' : !$ctrl.isOpenPolygonEnabled()}"
                 ng-click="$ctrl.createOpenPolygon()" tooltip-placement="left" uib-tooltip="Open Polygon"
                 ng-disabled="!$ctrl.isOpenPolygonEnabled()">
         </button>
@@ -94,11 +92,11 @@
     <div class="horizontal-toolbar">
       <div class="input-tag" ng-if="$ctrl.displayFontStyles">
         <input type="checkbox" ng-model="$ctrl.fabricjsOptions.italic" ng-change="$ctrl.onItalicToggle()">
-        <span style="padding-left: 3px;">Italic</span>
+        <span class="oppia-italic-text">Italic</span>
       </div>
       <div class="input-tag" ng-if="$ctrl.displayFontStyles">
         <input type="checkbox" ng-model="$ctrl.fabricjsOptions.bold" ng-change="$ctrl.onBoldToggle()">
-        <span style="padding-left: 3px;">Bold</span>
+        <span class="oppia-bold-text">Bold</span>
       </div>
       <div class="input-tag" ng-if="$ctrl.displayFontStyles">
         <select ng-model="$ctrl.fabricjsOptions.fontFamily" ng-options="font for font in $ctrl.fontFamily"
@@ -110,10 +108,10 @@
                 ng-change="$ctrl.onSizeChange()">
         </select>
       </div>
-      <div class="input-tag" ng-if="$ctrl.isDrawModePencil()" style="color: #f00101;">
+      <div class="input-tag oppia-draw-mode-pencil" ng-if="$ctrl.isDrawModePencil()">
         Click the pencil button to exit free drawing mode.
       </div>
-      <div class="input-tag" ng-if="$ctrl.isDrawModePolygon()" style="color: #f00101;">
+      <div class="input-tag oppia-draw-mode-pencil" ng-if="$ctrl.isDrawModePolygon()">
         Double click to complete the polygon.
       </div>
     </div>
@@ -258,5 +256,26 @@
     margin: 0 auto;
     width: 28px;
     background-color: #000000;
+  }
+
+  .oppia-slash-icon {
+    font-size: 19px;
+  }
+
+  .oppia-close-polygon-image {
+    background-image: url(/assets/svg_diagram_editor/closed_polygon.svg);
+  }
+
+  .oppia-open-polygon-image {
+    background-image: url(/assets/svg_diagram_editor/open_polygon.svg);
+  }
+
+  .oppia-italic-text
+  .oppia-bold-text {
+    padding-left: 3px;
+  }
+
+  .oppia-draw-mode-pencil {
+    color: #f00101;
   }
 </style>

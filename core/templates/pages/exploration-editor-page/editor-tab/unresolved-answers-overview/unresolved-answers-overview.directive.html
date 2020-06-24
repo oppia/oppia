@@ -17,7 +17,7 @@
     margin: 20px 0;
     padding: 8px;
   }
-  .oppia-md-card {
+  .oppia-add-response-button-card {
     margin: 20px 0;
     padding: 0;
   }
@@ -39,7 +39,7 @@
     </ul>
   </md-card>
 
-  <md-card class="oppia-md-card" ng-if="SHOW_TRAINABLE_UNRESOLVED_ANSWERS && isCurrentInteractionTrainable()">
+  <md-card class="oppia-add-response-button-card" ng-if="SHOW_TRAINABLE_UNRESOLVED_ANSWERS && isCurrentInteractionTrainable()">
     <div ng-if="isEditableOutsideTutorialMode() && !isCurrentInteractionLinear()">
       <button type="button" class="btn btn-secondary btn-lg oppia-add-response-button protractor-test-open-teach-modal" ng-click="openTeachOppiaModal()">
         Train Oppia

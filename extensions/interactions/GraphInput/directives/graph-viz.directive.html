@@ -21,7 +21,7 @@
   .oppia-unclickable-text-extra {
     text-anchor: middle;
   }
-  .oppia-selected-vertex {
+  .oppia-selected-vertex-header {
     float: right;
     height: 35px;
   }
@@ -135,7 +135,7 @@
 </div>
 <br>
 
-<div class="oppia-selected-vertex">
+<div class="oppia-selected-vertex-header">
   <div ng-if="$ctrl.state.selectedVertex !== null && $ctrl.graph.isLabeled && $ctrl.canEditVertexLabel">
     <input type="text" ng-model="$ctrl.selectedVertexLabelGetterSetter" ng-model-options="{getterSetter: true}" focus-on="$ctrl.vertexLabelEditBegun">
     <md-button class="md-raised" ng-click="$ctrl.state.selectedVertex = null;" translate="I18N_INTERACTIONS_GRAPH_UPDATE_LABEL"></md-button>

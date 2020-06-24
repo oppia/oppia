@@ -1,4 +1,4 @@
-<button class="btn btn-secondary oppia-create-question-button oppia-create-question-button protractor-test-create-question-button"
+<button class="btn btn-secondary oppia-create-question-button protractor-test-create-question-button"
         ng-click="$ctrl.createQuestion()">
   Create Question
 </button>
@@ -57,7 +57,7 @@
     </td>
   </tr>
 </table>
-<h4 ng-if="$ctrl.getQuestionSummariesForOneSkill().length === 0" class="oppia-create-question"">
+<h4 ng-if="$ctrl.getQuestionSummariesForOneSkill().length === 0" class="oppia-create-question-text">
   Click on Create Question to create a new question.
 </h4>
 
@@ -154,7 +154,7 @@
     height: 4em;
   }
 
-  .oppia-create-question {
+  .oppia-create-question-text {
     color: gray;
   }
 </style>

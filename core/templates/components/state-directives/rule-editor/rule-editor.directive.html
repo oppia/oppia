@@ -1,21 +1,21 @@
-<div class="oppia-position-relative">
+<div class="oppia-rule-details-container">
   <form class="form-inline protractor-test-rule-details" role="form" name="$ctrl.ruleEditForm.form">
     <div ng-if="$ctrl.rule.type != 'FuzzyMatches'" class="rule-parent">
       <rule-type-selector class="protractor-test-answer-description" local-value="<[$ctrl.rule.type]>" on-selection-change="$ctrl.onSelectNewRuleType">
       </rule-type-selector>
 
       <span ng-repeat="item in $ctrl.ruleDescriptionFragments track by $index" class="form-group oppia-rule-editor-span protractor-test-answer-description-fragment">
-        <span ng-if="item.type == 'select'">
+        <span ng-if="item.type == 'select'" class="oppia-rule-editor-item">
           <span ng-if="$ctrl.ruleDescriptionChoices.length === 1">
             "<[$ctrl.ruleDescriptionChoices[0].val|convertToPlainText|truncate]>"
           </span>
           <span ng-if="$ctrl.ruleDescriptionChoices.length !== 1">
-            <html-select class="oppia-rule-description" options="$ctrl.ruleDescriptionChoices" selection="$ctrl.rule.inputs[item.varName]">
+            <html-select class="oppia-rule-description-choices" options="$ctrl.ruleDescriptionChoices" selection="$ctrl.rule.inputs[item.varName]">
             </html-select>
           </span>
         </span>
 
-        <div class="oppia-check-boxes-div">
+        <div class="oppia-item-types-container">
           <span ng-if="item.type == 'checkboxes'" class="oppia-item-type">
             <object-editor obj-type="SetOfHtmlString" init-args="{choices: $ctrl.ruleDescriptionChoices}" value="$ctrl.rule.inputs[item.varName]"></object-editor>
           </span>
@@ -55,19 +55,19 @@
     width: 100%;
   }
 
-  .oppia-position-relative {
+  .oppia-rule-details-container {
     position: relative;
   }
 
-  .oppia-item-type {
+  .oppia-rule-editor-item {
     color: black;
   }
 
-  .oppia-rule-description {
+  .oppia-rule-description-choices {
     width: 250px;
   }
 
-  .oppia-check-boxes-div {
+  .oppia-item-types-container {
     max-height: 320px;
     overflow-y: auto;
     overflow-x: hidden;

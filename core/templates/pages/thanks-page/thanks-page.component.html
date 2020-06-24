@@ -3,18 +3,18 @@
   <div class="oppia-static-card-content oppia-static-card-content-wide oppia-static-card-content-extra">
     <h2>Thank you for donating to The Oppia Foundation!</h2>
     <br>
-    <div class="oppia-otter-image">
+    <div class="oppia-otter-image-container">
       <picture>
         <source type="image/webp" ng-srcset="<[$ctrl.getStaticImageUrl('/general/donate.webp')]>">
         <source type="image/png" ng-srcset="<[$ctrl.getStaticImageUrl('/general/donate.png')]>">
-        <img ng-src="<[$ctrl.getStaticImageUrl('/general/donate.png')]>" alt="Otter holding a gift", class="oppia-thanks-img-url">
+        <img ng-src="<[$ctrl.getStaticImageUrl('/general/donate.png')]>" alt="Otter holding a gift", class="oppia-otter-image">
       </picture>
     </div>
-    <div class="oppia-contribution">
+    <div class="oppia-contribution-contribution">
       <p>
         Your contribution will be used towards:
       </p>
-      <ul class="oppia-list-style">
+      <ul class="oppia-contribution-list">
         <li>Maintaining our servers</li>
         <li>Marketing</li>
         <li>Distributing learning materials to students</li>
@@ -27,16 +27,16 @@
 </div>
 
 <style>
-  .oppia-otter-image {
+  .oppia-otter-image-container {
     float: left;
   }
-  .oppia-thanks-img-url {
+  .oppia-otter-image {
     height: 250px;
   }
-  .oppia-contribution {
+  .oppia-contribution-contribution {
     float: right;
   }
-  .oppia-list-style {
+  .oppia-contribution-list {
     margin-left: 30px;
   }
   .oppia-static-card-content-extra {

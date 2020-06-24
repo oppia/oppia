@@ -7,7 +7,7 @@
     </a>
     <ul class="dropdown-menu oppia-save-publish-dropdown" aria-labelledby="dropdownMenuButton">
       <li class="dropdown-item" ng-if="showPublishButton()">
-        <div class="btn-group oppia-btn-group"
+        <div class="btn-group oppia-button-tooltip"
              uib-tooltip="<[getPublishExplorationButtonTooltip()]>"
              tooltip-placement="bottom"
              ng-class="{'disable-publish-button': isExplorationLockedForEditing() || countWarnings()}">
@@ -37,7 +37,7 @@
       </li>
 
       <li class="dropdown-item" ng-if="isEditableOutsideTutorialMode()">
-        <div uib-dropdown class="btn-group oppia-btn-group"
+        <div uib-dropdown class="btn-group oppia-button-tooltip"
              title="<[getSaveButtonTooltip()]>" ng-class="{'disable-save-button': !isExplorationSaveable()}">
           <button class="btn btn-light oppia-save-draft-button oppia-editor-publish-button-extra protractor-test-save-changes-for-small-screens" ng-class="{'btn-success': isExplorationSaveable()}" ng-click="saveChanges()" ng-disabled="!isExplorationSaveable()">
             <span ng-if="!saveIsInProcess">
@@ -82,7 +82,7 @@
 
   <!-- Start of html for large screens. -->
   <li class="nav-item d-none d-sm-block" ng-if="showPublishButton()">
-    <div class="btn-group oppia-btn-group"
+    <div class="btn-group oppia-button-tooltip"
          uib-tooltip="<[getPublishExplorationButtonTooltip()]>"
          tooltip-placement="bottom"
          ng-class="{'disable-publish-button': isExplorationLockedForEditing() || countWarnings()}">
@@ -112,7 +112,7 @@
   </li>
 
   <li class="nav-item d-none d-sm-block" ng-if="isEditableOutsideTutorialMode()">
-    <div uib-dropdown class="btn-group oppia-btn-group"
+    <div uib-dropdown class="btn-group oppia-button-tooltip"
          title="<[getSaveButtonTooltip()]>" ng-class="{'disable-save-button': !isExplorationSaveable()}">
       <button id="tutorialSaveButton"
               class="btn btn-light oppia-save-draft-button protractor-test-save-changes"
@@ -179,7 +179,7 @@
     border: none;
     margin-top: 8px;
   }
-  .oppia-btn-group {
+  .oppia-button-tooltip {
     margin-right: 10px;
     margin-top: 8px;
   }

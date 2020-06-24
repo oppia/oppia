@@ -106,7 +106,7 @@
             </span>
           </md-card>
           <div ng-if="$index < linearNodesList.length - 1">
-            <i class="material-icons oppia-material-icons"> arrow_downward </i>
+            <i class="material-icons oppia-arrow-downward-text"> arrow_downward </i>
           </div>
         </div>
         <h3 class="protractor-test-disconnected-node-warning" ng-if="disconnectedNodes.length > 0">
@@ -115,7 +115,7 @@
         <em ng-if="disconnectedNodes.length > 0">
           (Please fix this before saving changes)
         </em>
-        <div ng-repeat="node in disconnectedNodes" class="oppia-node-div">
+        <div ng-repeat="node in disconnectedNodes" class="oppia-story-editor-node-container">
           <md-card class="story-editor-node"
                    ng-class="{'selected-node': (node.getId() === idOfNodeToEdit)}"
                    ng-click="setNodeToEdit(node.getId())">
@@ -147,8 +147,8 @@
         </div>
       </div>
     </div>
-    <div ng-if="linearNodesList.length === 0" class="oppia-node-list-div">
-      <p class="no-chapters-message oppia-no-chapters-message">
+    <div ng-if="linearNodesList.length === 0" class="oppia-no-chapters-message-container">
+      <p class="no-chapters-message">
         This story has no chapters.
       </p>
       <button class="btn oppia-dashboard-intro-button oppia-dashboard-intro-button-extra oppia-transition-200 protractor-test-create-chapter-button"
@@ -169,6 +169,7 @@
   story-editor .no-chapters-message {
     font-family: 'Capriola', 'Roboto', Arial, sans-serif;
     font-size: 18px;
+    padding-top: 6px;
     text-align: center;
   }
 
@@ -278,20 +279,16 @@
     width: 300px;
   }
 
-  story-editor .oppia-material-icons {
+  story-editor .oppia-arrow-downward-text {
     font-size: 1.5em;
   }
 
-  story-editor .oppia-node-div {
+  story-editor .oppia-story-editor-node-container {
     padding-top: 2vh;
   }
 
-  story-editor .oppia-node-list-div {
+  story-editor .oppia-no-chapters-message-container {
     text-align: center;
-  }
-
-  story-editor .oppia-no-chapters-message {
-    padding-top: 6px;
   }
 
   story-editor .oppia-dashboard-intro-button-extra {

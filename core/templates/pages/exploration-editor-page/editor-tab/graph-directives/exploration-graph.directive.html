@@ -1,28 +1,28 @@
 <div ng-show="$ctrl.isGraphShown()" class="oppia-state-graph-animate-show">
-  <span class="oppia-exploration-overview">
+  <span class="oppia-exploration-overview-text">
     <strong>Exploration Overview</strong>
   </span>
 
-  <md-card class="oppia-md-card">
+  <md-card class="oppia-state-graph-card">
     <div class="oppia-state-graph-container protractor-test-exploration-graph">
-      <div state-graph-visualization graph-data="$ctrl.getGraphData()" current-state-id="$ctrl.getActiveStateName()" on-click-function="$ctrl.onClickStateInMinimap" on-delete-function="$ctrl.deleteState" on-maximize-function="$ctrl.openStateGraphModal" allow-panning="true" center-at-current-state="true" class="oppia-editable" is-editable="$ctrl.isEditable()" show-warning-sign="true">
+      <div state-graph-visualization graph-data="$ctrl.getGraphData()" current-state-id="$ctrl.getActiveStateName()" on-click-function="$ctrl.onClickStateInMinimap" on-delete-function="$ctrl.deleteState" on-maximize-function="$ctrl.openStateGraphModal" allow-panning="true" center-at-current-state="true" class="oppia-state-graph-visualization" is-editable="$ctrl.isEditable()" show-warning-sign="true">
       </div>
     </div>
   </md-card>
 </div>
 
 <style>
-  .oppia-exploration-overview {
+  .oppia-exploration-overview-text {
     font-size: 16px;
   }
 
-  .oppia-md-card {
+  .oppia-state-graph-card {
     background-color: white;
     margin: 20px 0;
     padding: 8px;
   }
 
-  .oppia-editable {
+  .oppia-state-graph-visualization {
     height: 100%;
   }
 </style>

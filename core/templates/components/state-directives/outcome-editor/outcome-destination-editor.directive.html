@@ -1,4 +1,4 @@
-<div class="form-inline oppia-outcome-destination-editor-form-inline protractor-test-dest-bubble">
+<div class="form-inline oppia-rule-details-container protractor-test-dest-bubble">
   <div class="oppia-rule-details-header">
     <strong ng-if="$ctrl.outcomeHasFeedback">And afterwards, directs the learner to...</strong>
     <strong ng-if="!$ctrl.outcomeHasFeedback">Oppia directs the learner to...</strong>
@@ -16,14 +16,14 @@
     <p ng-show="newStateNameForm.newStateName.$error.pattern" class="form-text oppia-form-text oppia-form-error">Please pick a card name consisting of alphanumeric characters, spaces and/or hyphens.</p>
   </ng-form>
 
-  <div ng-if="$ctrl.isSelfLoop() && $ctrl.canEditRefresherExplorationId" class="oppia-id">
+  <div ng-if="$ctrl.isSelfLoop() && $ctrl.canEditRefresherExplorationId" class="oppia-exploration-id">
     <b>Refresher exploration ID (optional):</b>
     <input type="text" name="refresherExplorationId" ng-model="$ctrl.outcome.refresherExplorationId" class="form-control protractor-test-add-refresher-exploration-id" tabindex="0" aria-invalid="false" ng-pattern="$ctrl.globalIdPattern">
   </div>
-  <div class="oppia-id" ng-if="$ctrl.canAddPrerequisiteSkill">
+  <div class="oppia-exploration-id" ng-if="$ctrl.canAddPrerequisiteSkill">
     <b>Prerequisite skill ID (optional):&nbsp;</b>
     <input type="text" name="missingPrerequisiteSkillId" ng-model="$ctrl.outcome.missingPrerequisiteSkillId" class="form-control" tabindex="0" aria-invalid="false" ng-model-options="{allowInvalid: true}" ng-pattern="$ctrl.explorationAndSkillIdPattern">
-    <p class="oppia-paragraph-font-size">
+    <p class="oppia-skill-info-text">
       <i> Mention the skill that this state requires so that a learner who is stuck in the state can quickly learn the
           required material and continue with the exploration.
       </i>
@@ -32,7 +32,7 @@
 </div>
 
 <style>
-  .oppia-outcome-destination-editor-form-inline {
+  .oppia-rule-details-container {
     margin-bottom: 10px;
   }
   .oppia-form-group {
@@ -44,10 +44,10 @@
   .oppia-form-text {
     font-size: 0.85em;
   }
-  .oppia-id {
+  .oppia-exploration-id {
     margin-top: 12px;
   }
-  .oppia-paragraph-font-size {
+  .oppia-skill-info-text {
     font-size: 0.8em;
   }
 </style>

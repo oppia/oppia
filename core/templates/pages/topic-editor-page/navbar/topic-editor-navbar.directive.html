@@ -12,7 +12,7 @@
             &#xE161;
           </i>
           <span class="oppia-save-publish-button-label float-left">Save Changes</span>
-          <span class="d-none d-md-block float-left oppia-d-md-block"
+          <span class="d-none d-md-block float-left oppia-change-list-text"
                 ng-if="getChangeListLength() > 0">
             (<[getChangeListLength()]>)
           </span>
@@ -53,7 +53,7 @@
   <li ng-class="{'active': getActiveTabName() === 'main', 'uib-dropdown': getTotalWarningsCount()}" ng-attr-uib-dropdown="<[getTotalWarningsCount()]>" class="nav-item icon">
     <a uib-tooltip="Main Editor" tooltip-placement="bottom" ng-click="selectMainTab()"
        class="nav-link">
-      <i class="material-icons">&#xE254;</i> <span class="oppia-topic">Topic</span>
+      <i class="material-icons">&#xE254;</i> <span class="oppia-topic-text">Topic</span>
     </a>
     <div ng-show="getTotalWarningsCount()"
          class="oppia-editor-warnings-indicator oppia-editor-warnings-error-color"
@@ -79,19 +79,19 @@
 
   <li ng-class="{'active': getActiveTabName() === 'subtopics'}" class="nav-item icon">
     <a class="nav-link protractor-test-subtopics-tab-button" uib-tooltip="Subtopics Editor" tooltip-placement="bottom" ng-click="selectSubtopicsTab()">
-      <i class="material-icons">&#xE254;</i><span class="oppia-subtopics">Subtopics</span>
+      <i class="material-icons">&#xE254;</i><span class="oppia-subtopics-text">Subtopics</span>
     </a>
   </li>
 
   <li ng-class="{'active': getActiveTabName() === 'questions'}" class="nav-item icon">
     <a class="nav-link protractor-test-questions-tab-button" uib-tooltip="Questions Editor" tooltip-placement="bottom" ng-click="selectQuestionsTab()">
-      <i class="material-icons">&#xE254;</i><span class="oppia-subtopics">Questions</span>
+      <i class="material-icons">&#xE254;</i><span class="oppia-subtopics-text">Questions</span>
     </a>
   </li>
 
   <li class="nav-item icon">
     <a ng-click="openTopicViewer()" class="nav-link" uib-tooltip="Preview (new tab)" tooltip-placement="bottom">
-      <i class="material-icons">&#xE037;</i><span class="oppia-subtopics">Preview</span>
+      <i class="material-icons">&#xE037;</i><span class="oppia-subtopics-text">Preview</span>
     </a>
   </li>
 </ul>
@@ -111,7 +111,7 @@
   topic-editor-navbar .oppia-save-changes-button-extra {
     float: left;
   }
-  topic-editor-navbar .oppia-d-md-block {
+  topic-editor-navbar .oppia-change-list-text {
     margin-left: 2px;
     opacity: 0.5;
   }
@@ -126,10 +126,10 @@
     margin-right: 20px;
     margin-top: 8px;
   }
-  topic-editor-navbar .oppia-topic {
+  topic-editor-navbar .oppia-topic-text {
     font-size: 0.8em;
   }
-  topic-editor-navbar .oppia-subtopics {
+  topic-editor-navbar .oppia-subtopics-text {
     font-size: 0.7em;
   }
 </style>

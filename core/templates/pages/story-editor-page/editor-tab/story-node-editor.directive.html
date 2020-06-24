@@ -52,18 +52,18 @@
       Save
     </button>
   </div>
-  <label class="form-heading oppia-exploration-id"> Exploration ID </label>
+  <label class="form-heading oppia-exploration-id-text"> Exploration ID </label>
   <form class="form-horizontal" role="form" ng-submit="updateExplorationId(explorationId)">
     <input class="protractor-test-exploration-id-input" type="text" ng-model="explorationId" ng-change="checkCanSaveExpId()">
     <span ng-if="!isStoryPublished()" ng-click="updateExplorationId(null)" class="fas fa-trash-alt list-summary"> </span>
-    <div class="oppia-form-text-div">
+    <div class="oppia-exploration-id-save-button-container">
       <button type="submit" class="protractor-test-exploration-id-save-button btn btn-success btn-sm" ng-disabled="!expIdCanBeSaved || (explorationId === currentExplorationId)">Save</button>
     </div>
     <span class="form-text error-message" ng-if="invalidExpErrorIsShown">
       <em>Please enter a valid exploration id.</em>
     </span>
   </form>
-  <label class="form-heading oppia-exploration-id"> Prerequisite Skill IDs </label>
+  <label class="form-heading oppia-exploration-id-text"> Prerequisite Skill IDs </label>
   <div class="oppia-placeholder">
     The skill should be one of the skills that are linked to this topic.
   </div>
@@ -71,14 +71,14 @@
     <md-card class="destination-node-id" ng-repeat="skillId in getPrerequisiteSkillIds()">
       <div class="skill-description-card protractor-test-prerequisite-skill-description-card">
         <span class="oppia-remove-prerequisite-skill protractor-test-remove-prerequisite-skill" ng-click="removePrerequisiteSkillId(skillId)" aria-hidden="true">
-          <i class="material-icons oppia-material-icons md-18">&#xE14C;</i>
+          <i class="material-icons oppia-remove-skill-button md-18">&#xE14C;</i>
         </span>
         <a ng-href="<[getSkillEditorUrl(skillId)]>" target="_blank" rel="noopener"><[skillIdToSummaryMap[skillId]]></a>
       </div>
     </md-card>
     <button class="btn btn-success btn-sm protractor-test-add-prerequisite-skill" ng-click="addPrerequisiteSkillId()">Add Prerequisite Skill</button>
   </div>
-  <label class="form-heading oppia-exploration-id"> Acquired Skill IDs </label>
+  <label class="form-heading oppia-exploration-id-text"> Acquired Skill IDs </label>
   <div class="oppia-placeholder">
     The skill should be one of the skills that are linked to this topic.
   </div>
@@ -86,7 +86,7 @@
     <md-card class="destination-node-id" ng-repeat="skillId in getAcquiredSkillIds()">
       <div class="skill-description-card protractor-test-acquired-skill-description-card">
         <span class="oppia-remove-prerequisite-skill protractor-test-remove-acquired-skill" ng-click="removeAcquiredSkillId(skillId)" aria-hidden="true">
-          <i class="material-icons md-18 oppia-material-icons">&#xE14C;</i>
+          <i class="material-icons md-18 oppia-remove-skill-button">&#xE14C;</i>
         </span>
         <a ng-href="<[getSkillEditorUrl(skillId)]>" target="_blank" rel="noopener"><[skillIdToSummaryMap[skillId]]></a>
       </div>
@@ -102,7 +102,7 @@
         <div class="repeating-card-wrapper protractor-test-next-chapter-card">
           <[nodeIdToTitleMap[nodeId]]>
           <span class="oppia-remove-prerequisite-skill protractor-test-remove-destination-button" ng-click="removeDestinationNodeId(nodeId)" aria-hidden="true">
-            <i class="material-icons md-18 oppia-material-icons">&#xE14C;</i>
+            <i class="material-icons md-18 oppia-remove-skill-button">&#xE14C;</i>
           </span>
         </div>
       </md-card>
@@ -172,11 +172,11 @@
     height: 10vh;
   }
 
-  story-editor .oppia-exploration-id {
+  story-editor .oppia-exploration-id-text {
     padding-top: 2em;
   }
 
-  story-editor .oppia-form-text-div {
+  story-editor .oppia-exploration-id-save-button-container {
     margin-top: 20px;
   }
 
@@ -184,7 +184,7 @@
     float: right;
   }
 
-  story-editor .oppia-material-icons {
+  story-editor .oppia-remove-skill-button {
     color: red;
   }
 

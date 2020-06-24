@@ -86,8 +86,8 @@
          class="conversation-skin-inline-interaction oppia-conversation-skin-inline-interaction">
       <div class="oppia-conversation-skin-instruction">
         <span ng-class="{'conversation-skin-instruction-disabled': !interactionIsActive}"> <[interactionInstructions]> </span>
-        <i ng-if="canWindowShowTwoCards()" ng-class="{'conversation-skin-instruction-disabled': !interactionIsActive}" class="material-icons oppia-material-icons md-18">&#xE5C8;</i>
-        <i ng-if="!canWindowShowTwoCards()" ng-class="{'conversation-skin-instruction-disabled': !interactionIsActive}" class="material-icons oppia-material-icons md-18">&#xE5DB;</i>
+        <i ng-if="canWindowShowTwoCards()" ng-class="{'conversation-skin-instruction-disabled': !interactionIsActive}" class="material-icons oppia-conversation-skin-instruction md-18">&#xE5C8;</i>
+        <i ng-if="!canWindowShowTwoCards()" ng-class="{'conversation-skin-instruction-disabled': !interactionIsActive}" class="material-icons oppia-conversation-skin-instruction md-18">&#xE5DB;</i>
       </div>
     </div>
 
@@ -226,7 +226,7 @@
     padding: 6px 12px;
   }
 
-  .oppia-material-icons {
+  .oppia-conversation-skin-instruction {
     position: relative;
   }
 

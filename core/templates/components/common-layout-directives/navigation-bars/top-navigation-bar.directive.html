@@ -160,7 +160,7 @@
             <img ng-src="<[$ctrl.profilePictureDataUrl]>" class="oppia-navbar-profile-picture rounded-circle" alt="User Avatar">
           </span>
           <span ng-if="!$ctrl.profilePictureDataUrl">
-            <i class="material-icons md-40 oppia-material-icons">&#xE853;</i>
+            <i class="material-icons md-40 oppia-profile-picture-icon">&#xE853;</i>
             <span class="oppia-icon-accessibility-label">User Avatar</span>
           </span>
 
@@ -258,7 +258,7 @@
       </div>
       <ul uib-dropdown-menu class="uib-dropdown-menu oppia-navbar-dropdown oppia-navbar-dropdown-extra" role="menu">
         <li class="nav-item">
-          <a href="" class="oppia-nav-link nav-link" ng-click="$ctrl.onLoginButtonClicked()">
+          <a href="" class="oppia-login-button-link nav-link" ng-click="$ctrl.onLoginButtonClicked()">
             <div class="oppia-signin-google">
               <div class="oppia-signin-g-icon">
                 <img ng-src="<[$ctrl.googleSignInIconUrl]>">
@@ -271,7 +271,7 @@
     </li>
 
     <li uib-dropdown ng-if="$ctrl.username === ''" class="oppia-navbar-clickable-dropdown">
-      <div class="oppia-navbar-button-container oppia-navbar-button-container">
+      <div class="oppia-navbar-button-container oppia-navbar-button-container-extra">
       </div>
     </li>
   </ul>
@@ -381,7 +381,7 @@
   .oppia-navbar-profile > li:hover {
     background-color: #fff;
    }
-   .oppia-material-icons {
+   .oppia-profile-picture-icon {
      margin-top: -1px;
    }
    .oppia-navbar-role-text-extra {
@@ -394,7 +394,7 @@
      margin-right: 15px;
      padding: 0;
    }
-   .oppia-nav-link {
+   .oppia-login-button-link {
      padding: 0;
      width: 190px;
    }

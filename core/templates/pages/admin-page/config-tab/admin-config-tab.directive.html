@@ -1,6 +1,6 @@
 <md-card class="oppia-page-card oppia-long-text oppia-long-text-extra">
   <h3>Configuration properties</h3>
-  <div class="container oppia-container" ng-if="$ctrl.isNonemptyObject($ctrl.configProperties)">
+  <div class="container oppia-admin-config-tab-container" ng-if="$ctrl.isNonemptyObject($ctrl.configProperties)">
     <div ng-repeat="(configPropertyId, configPropertyData) in $ctrl.configProperties">
       <div class="row oppia-config-property protractor-test-config-property">
         <span class="col-lg-2 col-md-2 col-sm-2">
@@ -31,7 +31,7 @@
   .oppia-long-text-extra {
     max-width: 1050px;
   }
-  .oppia-container {
+  .oppia-admin-config-tab-container {
     margin-left: 0;
   }
   .oppia-config-property {

@@ -1,7 +1,7 @@
 Selected Misconception: <[$ctrl.selectedMisconception && $ctrl.selectedMisconception.getName()]>
 <div ng-repeat="(skillId, misconceptions) in $ctrl.misconceptionsBySkill">
   <div ng-repeat="misconception in misconceptions">
-    <button class="btn btn-secondary misconception-button oppia-misconception-button-extra" ng-click="$ctrl.selectMisconception(misconception, skillId)">
+    <button class="btn btn-secondary misconception-button" ng-click="$ctrl.selectMisconception(misconception, skillId)">
       <b class="oppia-misconception-is-mandatory"><[misconception.isMandatory() ? '' : ' (Optional) ']><[misconception.getName()]></b>
       <angular-html-bind class="misconception-notes-container" html-data="misconception.getNotes()">
       </angular-html-bind>
@@ -24,6 +24,7 @@ Selected Misconception: <[$ctrl.selectedMisconception && $ctrl.selectedMisconcep
 <style>
   .misconception-button {
     text-align: left;
+    width: 100%;
   }
   .misconception-feedback-usage-checkbox {
     cursor: pointer;
@@ -33,9 +34,6 @@ Selected Misconception: <[$ctrl.selectedMisconception && $ctrl.selectedMisconcep
   }
   .misconception-notes-container > p {
     display: inline;
-  }
-  .oppia-misconception-button-extra {
-    width: 100%;
   }
   .oppia-misconception-is-mandatory {
     display: inline;

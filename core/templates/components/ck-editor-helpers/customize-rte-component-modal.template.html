@@ -6,9 +6,9 @@
   <!-- Provide a sink to move the focus into while the modal loads. -->
   <input ng-if="modalIsLoading" type="text" focus-on="tmpFocusPoint">
   <form name="form.schemaForm">
-    <div ng-repeat="customizationArgSpec in customizationArgSpecs track by $index" class="oppia-customization-args-specs">
+    <div ng-repeat="customizationArgSpec in customizationArgSpecs track by $index" class="oppia-customization-args-spec">
       <strong><[customizationArgSpec.description]></strong>
-      <div class="oppia-schema-based-editor-div">
+      <div class="oppia-schema-editor-container">
         <schema-based-editor local-value="tmpCustomizationArgs[$index].value" schema="customizationArgSpec.schema">
         </schema-based-editor>
       </div>
@@ -22,10 +22,10 @@
 </div>
 
 <style>
-  .oppia-customization-args-specs {
+  .oppia-customization-args-spec {
     margin-bottom: 25px;
   }
-  .oppia-schema-based-editor-div {
+  .oppia-schema-editor-container {
     margin-top: 15px;
   }
 </style>

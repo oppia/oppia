@@ -17,7 +17,7 @@
           </th>
         </tr>
         <tr ng-repeat="item in $ctrl.skillIdsAndMastery | orderBy: '-mastery'"
-            class="list-item oppia-list-item-extra"
+            class="list-item oppia-list-item"
             ng-click="$ctrl.openConceptCardModal(item.skillId)">
           <td> <[$ctrl.getSkillDescriptions()[item.skillId]]> </td>
           <td>
@@ -120,7 +120,7 @@
     width: 60%;
   }
 
-  .oppia-list-item-extra {
+  .oppia-list-item {
     height: 4em;
   }
 </style>

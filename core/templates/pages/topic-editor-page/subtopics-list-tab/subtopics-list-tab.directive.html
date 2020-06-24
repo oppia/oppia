@@ -1,7 +1,7 @@
 <div class="subtopics-tab">
   <md-card class="subtopics">
     <h3> Subtopics </h3>
-    <h4 class="oppia-assign-subtopics">
+    <h4 class="oppia-assign-subtopics-text">
       (Drag and drop skills to assign them to subtopics)
     </h4>
     <div class="subtopics-container">
@@ -34,7 +34,7 @@
                  ng-href="<[getSkillEditorUrl(skillSummary.getId())]>" target="_blank" rel="noopener">
                 <[skillSummary.getDescription()]>
               </a>
-              <span ng-if="isSkillDeleted(skillSummary)">
+              <span ng-if="isSkillDeleted(skillSummary)" class="oppia-skill-deleted-text">
                 Skill Deleted
               </span>
             </div>
@@ -67,12 +67,12 @@
             <[skillSummary.getDescription()]>
           </a>
           <span class="fas fa-trash-alt delete-icon" ng-click="deleteUncategorizedSkillFromTopic(skillSummary)"></span>
-          <span ng-if="isSkillDeleted(skillSummary)" class="opia-skill-deleted">
+          <span ng-if="isSkillDeleted(skillSummary)" class="opia-skill-deleted-text">
             Skill Deleted
           </span>
         </div>
       </md-card>
-      <p class="intro-card-message oppia-intro-card-message" ng-if="uncategorizedSkillSummaries.length === 0">
+      <p class="intro-card-message oppia-intro-card-message-text" ng-if="uncategorizedSkillSummaries.length === 0">
         There are no pending skills in the topic. To add skills to the topic, go to the skills list in the
         topics and skills dashboard and click 'Assign to Topic' for the required skill.
       </p>
@@ -196,7 +196,7 @@
     background-color: #e0e0e0;
   }
 
-  subtopics-list-tab .oppia-assign-subtopics {
+  subtopics-list-tab .oppia-assign-subtopics-text {
     color: #6d6d6d;
   }
 
@@ -216,11 +216,11 @@
     color: #b50000;
   }
 
-  subtopics-list-tab .oppia-skill-deleted {
+  subtopics-list-tab .oppia-skill-deleted-text {
     color: red;
   }
 
-  subtopics-list-tab .oppia-intro-card-message {
+  subtopics-list-tab .oppia-intro-card-message-text {
     padding-top: 6px;
   }
 

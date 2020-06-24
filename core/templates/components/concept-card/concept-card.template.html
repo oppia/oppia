@@ -1,14 +1,14 @@
 <div class="oppia-concept-card-viewer" ng-if="!$ctrl.loadingMessage">
   <div class="concept-card-explanation">
-    <div class="oppia-concept-card-bottom-margin">
+    <div class="oppia-concept-card-explanation-extra">
       <angular-html-bind class="protractor-test-concept-card-explanation"
                          html-data="$ctrl.currentConceptCard.getExplanation().getHtml()">
       </angular-html-bind>
     </div>
   </div>
-  <div class="concept-card-worked-examples" ng-if="$ctrl.numberOfWorkedExamplesShown > 0">
+  <div class="concept-card-worked-examples-container" ng-if="$ctrl.numberOfWorkedExamplesShown > 0">
     <strong> Worked Examples </strong>
-    <div class="oppia-concept-card-worked-example"
+    <div class="oppia-concept-card-worked-examples"
          ng-repeat="example in $ctrl.currentConceptCard.getWorkedExamples()"
          ng-if="$index < $ctrl.numberOfWorkedExamplesShown">
       <strong> Question: </strong>
@@ -44,7 +44,7 @@
     padding: 15px;
   }
 
-  .oppia-concept-card-viewer .concept-card-worked-examples {
+  .oppia-concept-card-viewer .concept-card-worked-examples-container {
     padding: 15px;
   }
 
@@ -66,11 +66,11 @@
     color: #FFFFFF;
   }
 
-  .oppia-concept-card-bottom-margin {
+  .oppia-concept-card-explanation-extra {
     margin-bottom: 10px;
   }
 
-  .oppia-concept-card-worked-example {
+  .oppia-concept-card-worked-examples {
     margin-top: 2vh;
   }
 </style>

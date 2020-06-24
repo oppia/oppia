@@ -4,23 +4,23 @@
     <div class="info-tab-content">
       <div class="info-tab-left-container" ng-if="!$ctrl.screenHasSmallWidth">
         <md-card class="info-tab-count">
-          <div class="oppia-count">
+          <div class="oppia-info-tab-count">
             <[$ctrl.getStoryCount()]>
           </div>
         </md-card>
         <span ng-if="$ctrl.getStoryCount() !== 1" translate="I18N_TOPIC_VIEWER_STORIES"></span>
         <span ng-if="$ctrl.getStoryCount() === 1" translate="I18N_TOPIC_VIEWER_STORY"></span>
 
-        <md-card class="info-tab-count oppia-info-tab-count">
-          <div class="oppia-count">
+        <md-card class="info-tab-count oppia-info-tab-count-card">
+          <div class="oppia-info-tab-count">
             <[$ctrl.getChapterCount()]>
           </div>
         </md-card>
         <span ng-if="$ctrl.getChapterCount() !== 1" translate="I18N_TOPIC_VIEWER_LESSONS"></span>
         <span ng-if="$ctrl.getChapterCount() === 1" translate="I18N_TOPIC_VIEWER_LESSON"></span>
 
-        <md-card class="info-tab-count oppia-info-tab-count">
-          <div class="oppia-count">
+        <md-card class="info-tab-count oppia-info-tab-count-card">
+          <div class="oppia-info-tab-count">
             <[$ctrl.getSubtopicCount()]>
           </div>
         </md-card>
@@ -100,11 +100,11 @@
     display: flex;
   }
 
-  topic-info-tab .oppia-count {
+  topic-info-tab .oppia-info-tab-count {
     padding-top: 12%;
   }
 
-  topic-info-tab .oppia-info-tab-count {
+  topic-info-tab .oppia-info-tab-count-card {
     margin-top: 20%;
   }
 

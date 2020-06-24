@@ -5,8 +5,8 @@
       <div>
         <md-card class="skill-id" ng-repeat="skillId in skill.getPrerequisiteSkillIds()">
           <div class="skill-description-card">
-            <span class="oppia-remove-skill" ng-click="removeSkillId(skillId)" aria-hidden="true">
-              <i class="material-icons md-18 oppia-material-icons">&#xE14C;</i>
+            <span class="oppia-remove-skill-container" ng-click="removeSkillId(skillId)" aria-hidden="true">
+              <i class="material-icons md-18 oppia-remove-skill-icon">&#xE14C;</i>
             </span>
             <a ng-href="<[getSkillEditorUrl(skillId)]>" target="_blank" rel="noopener"><[skillIdToSummaryMap[skillId]]></a>
           </div>
@@ -32,10 +32,10 @@
   .oppia-prerequisite-skills-text {
     font-size: 1.4em;
   }
-  .oppia-remove-skill {
+  .oppia-remove-skill-container {
     float: right;
   }
-  .oppia-material-icons {
+  .oppia-remove-skill-icon {
     color: red;
   }
 </style>

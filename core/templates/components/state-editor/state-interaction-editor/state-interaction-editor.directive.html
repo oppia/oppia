@@ -1,5 +1,5 @@
 <div id="tutorialStateInteraction">
-  <md-card class="oppia-md-card" ng-if="!interactionId">
+  <md-card class="oppia-add-interaction-button-card" ng-if="!interactionId">
     <div class="oppia-add-interaction-button-container">
       <button type="button" class="btn btn-secondary btn-lg oppia-add-interaction-button protractor-test-open-add-interaction-modal" ng-click="openInteractionCustomizerModal()">
         + Add Interaction
@@ -27,7 +27,7 @@
                    ng-if="EditabilityService.isEditable()">
               </div>
               <div>
-                <angular-html-bind html-data="interactionPreviewHtml">
+                <angular-html-bind html-data="interactionPreviewHtml" class="oppia-interaction-preview-extra-info">
                 </angular-html-bind>
               </div>
             </div>
@@ -39,7 +39,7 @@
 </div>
 
 <style>
-  .oppia-md-card {
+  .oppia-add-interaction-button-card {
     margin: 20px 0;
     padding: 0;
   }
@@ -51,7 +51,7 @@
     position: absolute;
     width: 100%;
   }
-  .oppia-interaction-preview {
+  .oppia-interaction-preview-extra-info {
     padding: 5px;
     pointer-events: none;
   }

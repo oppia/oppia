@@ -1,4 +1,4 @@
-<div class="modal-header oppia-modal-header">
+<div class="modal-header oppia-suggestion-thread-modal-header">
   <h3 class="oppia-get-title"><[getTitle()]></h3>
 
   <div class="text-left oppia-text-left">
@@ -27,7 +27,7 @@
       </div>
 
       <div ng-if="m.messageId !== 0"
-           class="oppia-message-id protractor-test-improvements-thread-message-status-change">
+           class="oppia-thread-message-status-change protractor-test-improvements-thread-message-status-change">
         <span ng-if="m.updatedStatus">
           <em>Status changed to '<[getHumanReadableStatus(m.updatedStatus)]>'</em>
         </span>
@@ -52,7 +52,7 @@
   </ol>
 </div>
 
-<div class="modal-footer oppia-modal-header">
+<div class="modal-footer oppia-suggestion-thread-modal-header">
   <div ng-if="isUserLoggedIn" class="text-left">
     <label for="tmpMessageText">Add new message</label>
     <textarea ng-model="tmpMessage.text" ng-disabled="messageSendingInProgress"
@@ -105,7 +105,7 @@
   ol.thread-messages li:first-child {
     padding-top: 0;
   }
-  .oppia-modal-header {
+  .oppia-suggestion-thread-modal-header {
     display: block;
   }
   .oppia-get-title {
@@ -127,7 +127,7 @@
   .oppia-text-right-extra {
     float: right;
   }
-  .oppia-message-id {
+  .oppia-thread-message-status-change {
     float: right;
     width: 28ch;
   }

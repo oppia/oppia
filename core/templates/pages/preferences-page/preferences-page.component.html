@@ -90,7 +90,7 @@
           <a class="oppia-subscription-profile-link" href="/profile/<[subscription.creator_username]>" rel="noopener" target="_blank">
             <img ng-src="<[subscription.creator_picture_data_url]>" class="oppia-subscription-card-profile-picture rounded-circle">
             <span class="oppia-subscription-card-summary">
-              <div class="oppia-subscription-card-div">
+              <div class="oppia-subscription-card-container">
                 <strong class="protractor-test-subscription-name"
                         popover-append-to-body
                         popover-trigger="<[$ctrl.showUsernamePopover(subscription.creator_username)]>"
@@ -98,7 +98,7 @@
                   <[subscription.creator_username| truncate:10]>
                 </strong>
               </div>
-              <div class="oppia-subscription-impact-div">
+              <div class="oppia-subscription-impact-text">
                 <span>Impact</span>
                 <span><[subscription.creator_impact || 0]></span>
               </div>
@@ -296,12 +296,12 @@
     margin: 0 8px 0 0;
   }
 
-  .oppia-subscription-card-div {
+  .oppia-subscription-card-container {
     font-size: 17.5px;
     margin-bottom: 5px;
   }
 
-  .oppia-subscription-impact-div {
+  .oppia-subscription-impact-text {
     font-size: 14.5px;
   }
 </style>

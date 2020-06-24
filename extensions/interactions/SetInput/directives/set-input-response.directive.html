@@ -1,7 +1,7 @@
 <div>
   <span ng-if="$ctrl.answer.length === 0" translate="I18N_INTERACTIONS_SET_INPUT_NO_ANSWER"></span>
   <span ng-if="$ctrl.answer.length > 0">
-    <ul class="oppia-padding-left">
+    <ul class="oppia-list-of-answers">
       <li ng-repeat="item in $ctrl.answer">
         <[item]>
       </li>
@@ -10,7 +10,7 @@
 </div>
 
 <style>
-  oppia-set-input-response .oppia-padding-left {
+  oppia-set-input-response .oppia-list-of-answers {
     padding-left: 12px;
   }
 </style>

@@ -53,7 +53,7 @@
                   <img [src]="getStaticImageUrl('/general/creator-create-exp.png')" alt="">
                 </picture>
                 <h3 [innerHTML]="'I18N_ABOUT_PAGE_ABOUT_TAB_CREATE' | translate"></h3>
-                <p class="oppia-about-tab-text" [innerHTML]="'I18N_ABOUT_PAGE_ABOUT_TAB_CREATE_TEXT' | translate">
+                <p class="oppia-about-three-cols-tab-create-text" [innerHTML]="'I18N_ABOUT_PAGE_ABOUT_TAB_CREATE_TEXT' | translate">
                 </p>
               </div>
               <div class="oppia-about-three-cols-layout oppia-about-three-cols-feature">
@@ -63,7 +63,7 @@
                   <img [src]="getStaticImageUrl('/general/creator-pub-share.png')" alt="">
                 </picture>
                 <h3 [innerHTML]="'I18N_ABOUT_PAGE_ABOUT_TAB_SHARE' | translate"></h3>
-                <p class="oppia-about-tab-text" [innerHTML]="'I18N_ABOUT_PAGE_ABOUT_TAB_SHARE_TEXT' | translate">
+                <p class="oppia-about-three-cols-tab-share-text" [innerHTML]="'I18N_ABOUT_PAGE_ABOUT_TAB_SHARE_TEXT' | translate">
                 </p>
               </div>
               <div class="oppia-about-three-cols-layout oppia-about-three-cols-feature">
@@ -73,7 +73,7 @@
                   <img [src]="getStaticImageUrl('/general/creator-feedback.png')" alt="">
                 </picture>
                 <h3 [innerHTML]="'I18N_ABOUT_PAGE_ABOUT_TAB_FEEDBACK' | translate"></h3>
-                <p class="oppia-about-tab-text" [innerHTML]="'I18N_ABOUT_PAGE_ABOUT_TAB_FEEDBACK_TEXT' | translate">
+                <p class="oppia-about-three-cols-tab-feedback-text" [innerHTML]="'I18N_ABOUT_PAGE_ABOUT_TAB_FEEDBACK_TEXT' | translate">
                 </p>
               </div>
             </div>
@@ -93,7 +93,7 @@
             <p [innerHTML]="'I18N_ABOUT_PAGE_FOUNDATION_TAB_PARAGRAPH_4' | translate">
             </p>
             <a id="license">
-              <h1 class="oppia-license"></h1>
+              <h1 class="oppia-license-h1"></h1>
             </a>
             <h3 [innerHTML]="'I18N_ABOUT_PAGE_FOUNDATION_TAB_PARAGRAPH_5_LICENSE_HEADING' | translate"></h3>
             <p [innerHTML]="'I18N_ABOUT_PAGE_FOUNDATION_TAB_PARAGRAPH_5' | translate">
@@ -246,10 +246,12 @@
   .oppia-about-page-extra-info {
     height: 245px;
   }
-  .oppia-about-tab-text {
+  .oppia-about-three-cols-tab-create-text
+  .oppia-about-three-cols-tab-share-text
+  .oppia-about-three-cols-tab-feedback-text {
     margin-top: -10px;
   }
-  .oppia-license {
+  .oppia-license-h1 {
     padding-top: 70px; margin-top: -80px;
   }
 </style>

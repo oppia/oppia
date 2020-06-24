@@ -16,7 +16,7 @@
             </exploration-objective-editor>
 
             <div class="form-group" ng-class="{'has-error': !$ctrl.explorationCategoryService.displayed}">
-              <label for="explorationCategory" class="col-lg-2 col-md-2 col-sm-2 float-left oppia-category">Category</label>
+              <label for="explorationCategory" class="col-lg-2 col-md-2 col-sm-2 float-left oppia-category-text">Category</label>
               <div class="col-lg-10 col-md-10 col-sm-10">
                 <div ng-if="$ctrl.hasPageLoaded">
                   <select2-dropdown id="explorationCategory"
@@ -291,7 +291,7 @@
                 <br>
                 <label for="$ctrl.newMemberRole">Role of invited user</label>
                 <div>
-                  <select ng-model="$ctrl.newMemberRole" class="form-control oppia-member-role protractor-test-role-select" ng-options="r.name for r in $ctrl.ROLES">
+                  <select ng-model="$ctrl.newMemberRole" class="form-control oppia-member-role-select protractor-test-role-select" ng-options="r.name for r in $ctrl.ROLES">
                   </select>
                   <span class="form-text">
                     <p>Note that managers also have the permissions of collaborators, collaborators also have the permissions of voice artists, and voice artists also have the permissions of viewers. Please note that assigning roles is irreversible (though you can always assign somebody to a higher role).</p>
@@ -481,7 +481,7 @@
 
     <h3>
       Initial parameter changes
-      <i class="material-icons md-18 oppia-material-icons" uib-tooltip="These changes are applied before the learner begins the exploration."
+      <i class="material-icons md-18 oppia-initial-parameter-changes" uib-tooltip="These changes are applied before the learner begins the exploration."
          tooltip-placement="right">
         &#xE88E;
       </i>
@@ -513,7 +513,7 @@
     padding-right: 0;
     width: 610px;
   }
-  .oppia-category {
+  .oppia-category-text {
     min-height: 24px;
   }
   .oppia-form-text {
@@ -528,10 +528,10 @@
   .oppia-offset {
     padding-left: 0;
   }
-  .oppia-member-role {
+  .oppia-member-role-select {
     width: 250px;
   }
-  .oppia-material-icons {
+  .oppia-initial-parameter-changes {
     padding-left: 4px;
     vertical-align: text-top;
   }

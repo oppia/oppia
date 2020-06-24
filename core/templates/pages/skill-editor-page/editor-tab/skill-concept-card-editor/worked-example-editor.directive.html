@@ -1,7 +1,7 @@
-<div class="oppia-div-height">
+<div class="oppia-question-editor">
   <!-- Question Editor -->
   <div ng-if="!questionEditorIsOpen"
-       class="oppia-div-height"
+       class="oppia-question-editor"
        ng-attr-title="Edit worked example question">
     <div class="oppia-readonly-rule-title"
          ng-class="{'oppia-editable-section': isEditable()}">
@@ -54,7 +54,7 @@
 
   <!-- Explanation Editor -->
   <div ng-if="!explanationEditorIsOpen"
-       class="worked-example-explanation-section oppia-div-height"
+       class="worked-example-explanation-section oppia-question-editor"
        ng-attr-title="Edit worked example explanation">
     <div class="oppia-readonly-rule-title"
          ng-class="{'oppia-editable-section': isEditable()}">
@@ -109,7 +109,7 @@
   .worked-example-explanation-section {
     margin-top: 2.5vh;
   }
-  .oppia-div-height {
+  .oppia-question-editor {
     height: 100%;
   }
   .oppia-clear {

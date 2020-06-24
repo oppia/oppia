@@ -15,14 +15,14 @@
   schema-based-list-editor .oppia-list-editor-table {
     width: 100%;
   }
-  schema-based-list-editor .oppia-list-entry {
+  schema-based-list-editor .oppia-delete-list-entry-container {
     vertical-align: top;
   }
-  schema-based-list-editor .oppia-add-list-entry-div {
+  schema-based-list-editor .oppia-add-list-entry-container {
     height: 30px;
     margin-top: 4px;
   }
-  schema-based-list-editor .oppia-add-list-entry-div {
+  schema-based-list-editor .oppia-add-list-entry {
     margin-left: 0;
   }
 </style>
@@ -37,7 +37,7 @@
                              on-input-focus="($last ? hideAddItemButton : showAddItemButton)">
         </schema-based-editor>
       </td>
-      <td ng-if="!len && (!minListLength || localValue.length > minListLength) && localValue.length > 0" class="oppia-list-entry">
+      <td ng-if="!len && (!minListLength || localValue.length > minListLength) && localValue.length > 0" class="oppia-delete-list-entry-container">
         <button class="oppia-delete-list-entry-button oppia-transition-200 protractor-test-delete-list-entry" type="button"
                 ng-click="deleteElement($index)"
                 ng-disabled="isDisabled()">
@@ -53,7 +53,7 @@
   </div>
 
   <!-- The margin-left is added here to left-align the button with the previous list items. -->
-  <div class="oppia-add-list-entry-div">
+  <div class="oppia-add-list-entry-container">
     <button ng-show="!isOneLineInput || isAddItemButtonPresent || (localValue.length && localValue[localValue.length - 1].length)"
             ng-if="!len && (maxListLength === null || localValue.length < maxListLength)"
             type="button" class="btn btn-secondary btn-sm oppia-add-list-entry protractor-test-add-list-entry" ng-click="addElement()"

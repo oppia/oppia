@@ -21,11 +21,11 @@
   </section>
   <div ng-show="reviewable" class="oppia-suggestion-review-message">
     Review message (required if rejecting):
-    <input class="oppia-suggestion-review-message-extra protractor-test-suggestion-review-message" type="text" ng-model="reviewMessage">
+    <input class="oppia-suggestion-review-message-input protractor-test-suggestion-review-message" type="text" ng-model="reviewMessage">
   </div>
   <div ng-show="reviewable" class="oppia-suggestion-review-message">
     Brief Description of Changes (required if accepting):
-    <input class="oppia-suggestion-review-message-extra protractor-test-suggestion-commit-message" type="text" ng-model="commitMessage">
+    <input class="oppia-suggestion-review-message-input protractor-test-suggestion-commit-message" type="text" ng-model="commitMessage">
   </div>
 </div>
 
@@ -50,7 +50,7 @@
   .oppia-suggestion-review-panel-container-right {
     float: right;
   }
-  .oppia-suggestion-review-message-extra {
+  .oppia-suggestion-review-message-input {
     width: 100%;
   }
 </style>

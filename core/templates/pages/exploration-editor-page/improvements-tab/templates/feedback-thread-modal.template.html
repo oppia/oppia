@@ -1,4 +1,4 @@
-<div class="modal-header oppia-modal-header">
+<div class="modal-header oppia-feedback-thread-header">
   <h3 class="oppia-get-title"><[getTitle()]></h3>
 
   <div class="text-right oppia-text-right">
@@ -46,7 +46,7 @@
   </ol>
 </div>
 
-<div class="modal-footer oppia-modal-header">
+<div class="modal-footer oppia-feedback-thread-header">
   <div class="text-left" ng-if="isUserLoggedIn">
     <label for="tmpMessageText">
       Add new message
@@ -66,7 +66,7 @@
       </select>
       <div ng-if="!tmpMessage.text && (tmpMessage.status === 'ignored' || tmpMessage.status === 'not_actionable')"
            class="oppia-tmp-message-status">
-        <span class="material-icons oppia-material-icons">error_outline</span>
+        <span class="material-icons oppia-error-outline-text">error_outline</span>
         Please specify a reason for setting the status to
         "<[getHumanReadableStatus(tmpMessage.status)]>".
       </div>
@@ -116,7 +116,7 @@
   ol.thread-messages li:first-child {
     padding-top: 0;
   }
-  .oppia-modal-header {
+  .oppia-feedback-thread-header {
     display: block;
   }
   .oppia-get-title {
@@ -150,7 +150,7 @@
     color: red;
     margin: 8px 0;
   }
-  .oppia-material-icons {
+  .oppia-error-outline-text {
     font-size: 19px;
   }
   .oppia-improvements-response-send-button {

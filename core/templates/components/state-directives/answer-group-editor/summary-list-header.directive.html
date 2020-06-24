@@ -29,7 +29,7 @@
     width: 80%;
   }
 
-  summary-list-header .oppia-badge-primary {
+  summary-list-header .oppia-example-item {
     bottom: 4px;
     position: relative;
   }
@@ -46,7 +46,7 @@
   <div class="oppia-example-header">
     <span ng-if="!$ctrl.isActive()" ng-attr-title="<[$ctrl.getSummary()]>">
       <[$ctrl.getShortSummary()]>
-      <span ng-if="$ctrl.getNumItems() > 1" class="badge badge-primary oppia-badge-primary">
+      <span ng-if="$ctrl.getNumItems() > 1" class="badge badge-primary oppia-example-item">
         +<[$ctrl.getNumItems() - 1]>
       </span>
     </span>

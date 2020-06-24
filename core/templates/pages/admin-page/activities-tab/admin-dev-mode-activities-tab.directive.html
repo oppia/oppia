@@ -1,5 +1,5 @@
 <md-card class="oppia-admin-page-card oppia-page-card oppia-long-text oppia-long-text-extra">
-  <div class="container oppia-container">
+  <div class="container oppia-dev-mode-activities-tab-container">
     <h3>Reload a single exploration</h3>
     <div ng-repeat="exploration in $ctrl.DEMO_EXPLORATIONS"
          class="row oppia-reload-exploration-row protractor-test-reload-exploration-row">
@@ -37,7 +37,7 @@
              id="explorations-to-generate">
       <label for="explorations-to-publish">Number of explorations to publish</label>
       <em ng-show="$ctrl.numDummyExpsToGenerate"
-          class="oppia-publish">
+          class="oppia-publish-exploration">
         (Publish <[$ctrl.numDummyExpsToPublish]> out of <[$ctrl.numDummyExpsToGenerate]> explorations)
       </em>
       <input class="form-control form-inline"
@@ -46,7 +46,7 @@
              ng-disabled="!$ctrl.numDummyExpsToGenerate" type="number" min="0"
              id="explorations-to-publish">
       <button type="button"
-              class="btn btn-primary oppia-btn-primary"
+              class="btn btn-primary oppia-generate-dummy-explorations-button"
               ng-click="$ctrl.generateDummyExplorations()"
               ng-disabled="!$ctrl.numDummyExpsToGenerate">
         Generate Explorations
@@ -56,7 +56,7 @@
 </md-card>
 
 <md-card class="oppia-page-card oppia-long-text oppia-long-text-extra">
-  <div class="container oppia-container">
+  <div class="container oppia-dev-mode-activities-tab-container">
     <h3>Reload a single collection</h3>
     <div ng-repeat="collection in $ctrl.DEMO_COLLECTIONS"
          class="row oppia-reload-collection-row protractor-test-reload-collection-row">
@@ -75,7 +75,7 @@
 </md-card>
 
 <md-card class="oppia-page-card oppia-long-text oppia-long-text-extra">
-  <div class="container oppia-container">
+  <div class="container oppia-dev-mode-activities-tab-container">
     <h3>Load dummy new structures data (only admins)</h3>
     <div class="row">
       <span class="col-lg-4 col-md-4 col-sm-4">
@@ -94,7 +94,7 @@
 </md-card>
 
 <md-card class="oppia-page-card oppia-long-text oppia-long-text-extra">
-  <div class="container oppia-container">
+  <div class="container oppia-dev-mode-activities-tab-container">
     <h3>Generate dummy skill with questions (only admins)</h3>
     <div class="row">
       <span class="col-lg-4 col-md-4 col-sm-4">
@@ -121,16 +121,16 @@
   .oppia-long-text-extra {
     max-width: 700px;
   }
-  .oppia-container {
+  .oppia-dev-mode-activities-tab-container {
     margin-left: 0;
   }
   .oppia-form-inline {
     margin-bottom: 5px;
   }
-  .oppia-btn-primary {
+  .oppia-generate-dummy-explorations-button {
     margin-top: 20px;
   }
-  .oppia-publish {
+  .oppia-publish-exploration {
     font-size: smaller;
   }
 </style>

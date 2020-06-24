@@ -2,7 +2,7 @@
   set-of-html-string-editor md-checkbox .md-label {
     vertical-align: top;
   }
-  set-of-html-string-editor md-checkbox .oppia-choice {
+  set-of-html-string-editor md-checkbox .oppia-item-select-option-container {
     max-width: 300px;
   }
 </style>
@@ -11,7 +11,7 @@
   <div ng-repeat="choice in $ctrl.choices track by $index">
     <md-checkbox ng-click="$ctrl.toggleSelection($index)"
                  ng-model="$ctrl.selections[$index]"
-                 class="oppia-choice" aria-label="choice">
+                 class="oppia-item-select-option-container" aria-label="choice">
       <span>
         <angular-html-bind class="protractor-test-html-item-select-option" html-data="choice.id">
         </angular-html-bind>

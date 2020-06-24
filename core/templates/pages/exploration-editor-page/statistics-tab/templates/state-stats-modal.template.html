@@ -20,14 +20,14 @@
   </div>
 
   <div class="section">
-    <div class="oppia-card-entered">
+    <div class="oppia-card-entered-text">
       <p>
         <strong>Card entered</strong>
         : <[stateStats.total_hit_count]>
         <strong> times. </strong>
       </p>
     </div>
-    <div class="oppia-card-quit">
+    <div class="oppia-card-quit-text">
       <strong>Quit at this card</strong>
       : <[stateStats.total_hit_count - stateStats.num_completions]>
       <strong> times. </strong>
@@ -35,7 +35,7 @@
   </div>
 
   <div class="section" ng-if="hasExplorationBeenAnswered">
-    <div class="oppia-card-entered">
+    <div class="oppia-card-entered-text">
       <pie-chart data="pieChartData1"
                  options="COMPLETION_RATE_PIE_CHART_OPTIONS1">
       </pie-chart>
@@ -87,11 +87,11 @@
     width: 100%;
   }
 
-  .oppia-card-entered {
+  .oppia-card-entered-text {
     display: inline-block;
   }
 
-  .oppia-card-quit {
+  .oppia-card-quit-text {
     display: inline-block;
     padding-left: 170px;
   }
