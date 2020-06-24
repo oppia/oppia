@@ -186,4 +186,3 @@ describe('Exploration stats backend api service', () => {
     expect(onFailure).not.toHaveBeenCalled();
   }));
 });
-
