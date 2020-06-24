@@ -105,7 +105,7 @@ class DragAndDropSortInputInteractionOneOffJob(
                             if value == '' or value == []:
                                 validation_errors.append(
                                     'State name: %s, AnswerGroup: %s,' % (
-                                        state_name.encode('utf-8'),
+                                        state_name,
                                         answer_group_index) +
                                     ' Rule input %s in rule with index %s'
                                     ' is empty. ' % (rule_input, rule_index))
