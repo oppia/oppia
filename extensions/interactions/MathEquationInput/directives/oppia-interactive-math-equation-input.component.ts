@@ -41,7 +41,7 @@ angular.module('oppia').component('oppiaInteractiveMathEquationInput', {
         GuppyInitializationService) {
       const ctrl = this;
       ctrl.value = '';
-      ctrl.hasBeenTouched = false
+      ctrl.hasBeenTouched = false;
       ctrl.warningText = '';
 
       ctrl.isCurrentAnswerValid = function() {
