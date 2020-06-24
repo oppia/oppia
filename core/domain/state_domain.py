@@ -21,6 +21,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import collections
 import copy
+import json
 import logging
 
 from constants import constants
@@ -149,6 +150,77 @@ class AnswerGroup(python_utils.OBJECT):
 
         self.outcome.validate()
 
+    def get_all_html_content_strings(self):
+        """Get all html content strings in the AnswerGroup.
+
+        Returns:
+            list(str). The list of all html content strings in the interaction.
+        """
+        html_list = []
+
+        outcome_html = self.outcome.feedback.html
+        html_list = html_list + [outcome_html]
+        # TODO(#9413): Find a way to include a reference to the interaction
+        # type in the Draft change lists.
+        # See issue: https://github.com/oppia/oppia/issues/9413. We cannot use
+        # the interaction-id from the rules_index_dict until issue-9413 has
+        # been fixed, because this method has no reference to the interaction
+        # type and draft changes use this method. The rules_index_dict below
+        # is used to figure out the assembly of the html in the rulespecs.
+
+        html_field_types_to_rule_specs_dict = json.loads(
+            utils.get_file_contents(
+                feconf.HTML_FIELD_TYPES_TO_RULE_SPECS_FILE_PATH))
+
+        for rule_spec in self.rule_specs:
+            for interaction_and_rule_details in (
+                    html_field_types_to_rule_specs_dict.values()):
+                rule_type_has_html = (
+                    rule_spec.rule_type in
+                    interaction_and_rule_details['ruleTypes'].keys())
+                if rule_type_has_html:
+                    html_type_format = interaction_and_rule_details['format']
+                    input_variables_from_html_mapping = (
+                        interaction_and_rule_details['ruleTypes'][
+                            rule_spec.rule_type][
+                                'htmlInputVariables'])
+                    input_variable_match_found = False
+                    for input_variable in rule_spec.inputs.keys():
+                        if input_variable in input_variables_from_html_mapping:
+                            input_variable_match_found = True
+                            rule_input_variable = (
+                                rule_spec.inputs[input_variable])
+                            if (html_type_format ==
+                                    feconf.HTML_RULE_VARIABLE_FORMAT_STRING):
+                                html_list = html_list + [rule_input_variable]
+                            elif (html_type_format ==
+                                  feconf.HTML_RULE_VARIABLE_FORMAT_SET):
+                                # Here we are checking the type of the
+                                # rule_specs.inputs because the rule type
+                                # 'Equals' is used by other interactions as
+                                # well which don't have HTML and we don't have
+                                # a reference to the interaction ID.
+                                if isinstance(rule_input_variable, list):
+                                    for value in rule_input_variable:
+                                        if isinstance(
+                                                value, python_utils.BASESTRING):
+                                            html_list = html_list + [value]
+                            elif (html_type_format ==
+                                  feconf.
+                                  HTML_RULE_VARIABLE_FORMAT_LIST_OF_SETS):
+                                for rule_spec_html in rule_input_variable:
+                                    html_list = html_list + rule_spec_html
+                            else:
+                                raise Exception(
+                                    'The rule spec does not belong to a valid'
+                                    ' format.')
+                    if not input_variable_match_found:
+                        raise Exception(
+                            'Rule spec should have at least one valid input '
+                            'variable with Html in it.')
+
+        return html_list
+
 
 class Hint(python_utils.OBJECT):
     """Value object representing a hint."""
@@ -209,8 +281,11 @@ class Solution(python_utils.OBJECT):
             interaction_id: str. The interaction id.
             answer_is_exclusive: bool. True if is the only correct answer;
                 False if is one of possible answer.
-            correct_answer: str. The correct answer; this answer enables the
-                learner to progress to the next card.
+            correct_answer: *. The correct answer; this answer
+                enables the learner to progress to the next card. The type of
+                correct_answer is determined by the value of
+                BaseInteraction.answer_type. Some examples for the types are
+                list(set(str)), list(str), str, dict(str, str), etc.
             explanation: SubtitledHtml. Contains text and text id to link audio
                 translations for the solution's explanation.
         """
@@ -535,23 +610,7 @@ class InteractionInstance(python_utils.OBJECT):
         html_list = []
 
         for answer_group in self.answer_groups:
-            outcome_html = answer_group.outcome.feedback.html
-            html_list = html_list + [outcome_html]
-
-        # Note that ItemSelectionInput replicates the customization arg HTML
-        # in its answer groups.
-        if self.id == 'ItemSelectionInput':
-            for answer_group in self.answer_groups:
-                for rule_spec in answer_group.rule_specs:
-                    rule_spec_html = rule_spec.inputs['x']
-                    html_list = html_list + rule_spec_html
-
-        if self.id == 'DragAndDropSortInput':
-            for answer_group in self.answer_groups:
-                for rule_spec in answer_group.rule_specs:
-                    rule_spec_html_list = rule_spec.inputs['x']
-                    for rule_spec_html in rule_spec_html_list:
-                        html_list = html_list + rule_spec_html
+            html_list = html_list + answer_group.get_all_html_content_strings()
 
         if self.default_outcome:
             default_outcome_html = self.default_outcome.feedback.html
@@ -561,9 +620,36 @@ class InteractionInstance(python_utils.OBJECT):
             hint_html = hint.hint_content.html
             html_list = html_list + [hint_html]
 
-        if self.solution:
+        if self.id is None:
+            return html_list
+
+        interaction = (
+            interaction_registry.Registry.get_interaction_by_id(
+                self.id))
+
+        if self.solution and interaction.can_have_solution:
             solution_html = self.solution.explanation.html
             html_list = html_list + [solution_html]
+            html_field_types_to_rule_specs_dict = json.loads(
+                utils.get_file_contents(
+                    feconf.HTML_FIELD_TYPES_TO_RULE_SPECS_FILE_PATH))
+
+            if self.solution.correct_answer:
+                for html_type in html_field_types_to_rule_specs_dict.keys():
+                    if html_type == interaction.answer_type:
+                        if (
+                                html_type ==
+                                feconf.ANSWER_TYPE_LIST_OF_SETS_OF_HTML):
+                            for value in self.solution.correct_answer:
+                                html_list = html_list + value
+                        elif html_type == feconf.ANSWER_TYPE_SET_OF_HTML:
+                            for value in self.solution.correct_answer:
+                                html_list = html_list + [value]
+                        else:
+                            raise Exception(
+                                'The solution does not have a valid '
+                                'correct_answer type.')
+
 
         if self.id in (
                 'ItemSelectionInput', 'MultipleChoiceInput',
@@ -1080,6 +1166,18 @@ class WrittenTranslations(python_utils.OBJECT):
                     translation_counts[language] += 1
 
         return translation_counts
+
+    def get_all_html_content_strings(self):
+        """Gets all html content strings used in the WrittenTranslations.
+
+        Returns:
+            list(str). The list of html content strings.
+        """
+        html_string_list = []
+        for translations in self.translations_mapping.values():
+            for translation in translations.values():
+                html_string_list.append(translation.html)
+        return html_string_list
 
 
 class RecordedVoiceovers(python_utils.OBJECT):
@@ -2149,3 +2247,15 @@ class State(python_utils.OBJECT):
                     'choices']['value'][value_index] = conversion_fn(value)
 
         return state_dict
+
+    def get_all_html_content_strings(self):
+        """Get all html content strings in the state.
+
+        Returns:
+            list(str). The list of all html content strings in the interaction.
+        """
+        html_list = (
+            self.written_translations.get_all_html_content_strings() +
+            self.interaction.get_all_html_content_strings() + [
+                self.content.html])
+        return html_list
