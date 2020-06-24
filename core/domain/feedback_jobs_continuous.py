@@ -201,11 +201,11 @@ class FeedbackAnalyticsAggregator(jobs.BaseContinuousComputationManager):
             exploration_id: str. ID of the exploration to get analytics for.
 
         Returns:
-            dict with two keys:
+            dict. Containing two keys:
             - num_open_threads: int. The count of open feedback threads for
-              this exploration.
+                this exploration.
             - num_total_threads: int. The count of all feedback
-              threads for this exploration.
+                threads for this exploration.
         """
         return FeedbackAnalyticsAggregator.get_thread_analytics_multi(
             [exploration_id])[0]

@@ -637,7 +637,7 @@ class Collection(python_utils.OBJECT):
             current_version: int. The current collection schema version.
 
         Raises:
-            Exception: The value of the key 'schema_version' in 
+            Exception: The value of the key 'schema_version' in
                 versioned_collection_contents is not valid.
         """
         if (versioned_collection_contents['schema_version'] + 1 >
