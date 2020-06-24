@@ -34,7 +34,7 @@ import feconf
 class ExplorationImprovementsHandler(base.BaseHandler):
     """Handles operations related to managing exploration improvement tasks.
 
-    NOTE: Only exploration creators can interface with tasks!
+    NOTE: Only exploration creators can interface with tasks.
     """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -55,8 +55,6 @@ class ExplorationImprovementsHandler(base.BaseHandler):
     @acl_decorators.can_edit_exploration
     def post(self, exploration_id):
         # The ACL decorator guarantees the exploration exists.
-        exploration = exp_fetchers.get_exploration_by_id(exploration_id)
-
         try:
             task_entries = []
             for task_entry_payload in self.payload['task_entries']:
@@ -81,7 +79,7 @@ class ExplorationImprovementsHandler(base.BaseHandler):
 class ExplorationImprovementsHistoryHandler(base.BaseHandler):
     """Handles fetching the history of resolved exploration tasks.
 
-    NOTE: Only exploration creators can interface with tasks!
+    NOTE: Only exploration creators can interface with tasks.
     """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
