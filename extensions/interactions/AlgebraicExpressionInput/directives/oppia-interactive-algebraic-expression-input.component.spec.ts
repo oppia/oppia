@@ -36,7 +36,7 @@ describe('AlgebraicExpressionInputInteractive', function() {
   let ctrl = null, $window = null;
   let mockCurrentInteractionService = {
     onSubmit: function(answer, rulesService) {},
-    registerCurrentInteraction: function(submitAnswerFn, validateAnswerFn) {
+    registerCurrentInteraction: function(submitAnswerFn, validateExpressionFn) {
       submitAnswerFn();
     }
   };

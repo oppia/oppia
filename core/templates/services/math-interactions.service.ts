@@ -54,31 +54,74 @@ export class MathInteractionsService {
     return errorMessage;
   }
 
-  validateAnswer(answer: string): boolean {
-    let expression;
-    if (answer.length === 0) {
+  validateExpression(expressionString: string, algebraic = true): boolean {
+    let expressionObject;
+    if (expressionString.length === 0) {
       this.warningText = 'Please enter a non-empty answer.';
       return false;
-    } else if (answer.indexOf('=') !== -1 || answer.indexOf(
-      '<') !== -1 || answer.indexOf('>') !== -1) {
+    } else if (expressionString.indexOf('=') !== -1 || expressionString.indexOf(
+      '<') !== -1 || expressionString.indexOf('>') !== -1) {
       this.warningText = 'It looks like you have entered an ' +
-        'equation/inequality. Please enter an algebraic ' +
-        'expression instead.';
+        'equation/inequality. Please enter an expression instead.';
       return false;
     }
     try {
-      expression = nerdamer(answer);
+      expressionObject = nerdamer(expressionString);
     } catch (err) {
       this.warningText = this.cleanErrorMessage(err.message);
       return false;
     }
-    if (expression.variables().length === 0) {
+    if (algebraic && expressionObject.variables().length === 0) {
       this.warningText = 'It looks like you have entered only ' +
         'numbers. Make sure to include the necessary variables' +
         ' mentioned in the question.';
       return false;
     }
+    if (!algebraic && expressionObject.variables().length !== 0) {
+      this.warningText = 'It looks like you have entered some non-numeric' +
+        ' values. Please enter numbers only.';
+      return false;
+    }
     return true;
+  }
+
+  validateEquation(equationString: string): boolean {
+    if (equationString.length === 0) {
+      this.warningText = 'Please enter a non-empty answer.';
+      return false;
+    } else if (equationString.indexOf(
+      '<') !== -1 || equationString.indexOf('>') !== -1) {
+      this.warningText = 'It looks like you have entered an ' +
+        'inequality. Please enter an equation instead.';
+      return false;
+    } else if (equationString.indexOf('=') === -1) {
+      this.warningText = 'It looks like you have entered an ' +
+        'expression. Please enter an equation instead.';
+      return false;
+    }
+    let splitString = equationString.split('=');
+    let lhsString = splitString[0], rhsString = splitString[1];
+    let lhsIsAlgebraicallyValid = this.validateExpression(lhsString);
+    let rhsIsAlgebraicallyValid = this.validateExpression(rhsString);
+    let lhsIsNumericallyValid = this.validateExpression(lhsString, false);
+    let rhsIsNumericallyValid = this.validateExpression(rhsString, false);
+
+    // At least one side must be algebraic. Purely numeric equations are
+    // considered as invalid.
+    if (lhsIsNumericallyValid && rhsIsNumericallyValid) {
+      this.warningText = 'The equation must contain at least one variable.';
+      return false;
+    }
+    if (lhsIsAlgebraicallyValid && rhsIsAlgebraicallyValid ||
+      lhsIsAlgebraicallyValid && rhsIsNumericallyValid ||
+      lhsIsNumericallyValid && rhsIsAlgebraicallyValid) {
+      this.warningText = '';
+      return true;
+    }
+    // Neither side is algebraically valid. Calling validation functions again
+    // to appropriately update the warningText.
+    this.validateExpression(lhsString);
+    return false;
   }
 
   getWarningText(): string {

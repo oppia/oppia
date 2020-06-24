@@ -16,8 +16,8 @@
  * @fileoverview Validator service for the MathEquationInput interaction.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { AnswerGroup } from
   'domain/exploration/AnswerGroupObjectFactory';

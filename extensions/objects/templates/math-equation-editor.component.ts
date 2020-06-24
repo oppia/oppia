@@ -41,7 +41,7 @@ angular.module('oppia').component('mathEquationEditor', {
 
       ctrl.isCurrentAnswerValid = function() {
         if (ctrl.hasBeenTouched) {
-          var answerIsValid = MathInteractionsService.validateAnswer(
+          var answerIsValid = MathInteractionsService.validateEquation(
             ctrl.value);
           ctrl.warningText = MathInteractionsService.getWarningText();
           return answerIsValid;

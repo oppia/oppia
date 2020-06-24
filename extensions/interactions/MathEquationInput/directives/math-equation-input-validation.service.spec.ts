@@ -33,7 +33,7 @@ import { IMathEquationInputCustomizationArgs } from
 import { AppConstants } from 'app.constants';
 import { WARNING_TYPES_CONSTANT } from 'app-type.constants';
 
-fdescribe('MathEquationInputValidationService', () => {
+describe('MathEquationInputValidationService', () => {
   let validatorService: MathEquationInputValidationService;
   let WARNING_TYPES: WARNING_TYPES_CONSTANT;
 

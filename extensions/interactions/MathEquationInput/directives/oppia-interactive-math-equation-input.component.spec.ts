@@ -36,7 +36,7 @@ describe('MathEquationInputInteractive', function() {
   let ctrl = null, $window = null;
   let mockCurrentInteractionService = {
     onSubmit: function(answer, rulesService) {},
-    registerCurrentInteraction: function(submitAnswerFn, validateAnswerFn) {
+    registerCurrentInteraction: function(submitAnswerFn, validateEquationFn) {
       submitAnswerFn();
     }
   };
@@ -95,11 +95,21 @@ describe('MathEquationInputInteractive', function() {
   it('should not submit the answer if invalid', function() {
     ctrl.hasBeenTouched = true;
     // Invalid answer.
-    ctrl.value = 'x/';
+    ctrl.value = '(x + y)) = 3';
 
     spyOn(mockCurrentInteractionService, 'onSubmit');
     ctrl.submitAnswer();
     expect(mockCurrentInteractionService.onSubmit).not.toHaveBeenCalled();
+  });
+
+  it('should submit the answer if valid', function() {
+    ctrl.hasBeenTouched = true;
+    // Invalid answer.
+    ctrl.value = '(x + y) = 3';
+
+    spyOn(mockCurrentInteractionService, 'onSubmit');
+    ctrl.submitAnswer();
+    expect(mockCurrentInteractionService.onSubmit).toHaveBeenCalled();
   });
 
   it('should correctly validate current answer', function() {

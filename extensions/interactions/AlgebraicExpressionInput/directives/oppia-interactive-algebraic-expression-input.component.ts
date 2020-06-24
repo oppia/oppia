@@ -46,7 +46,7 @@ angular.module('oppia').component('oppiaInteractiveAlgebraicExpressionInput', {
 
       ctrl.isCurrentAnswerValid = function() {
         if (ctrl.hasBeenTouched) {
-          let answerIsValid = MathInteractionsService.validateAnswer(
+          let answerIsValid = MathInteractionsService.validateExpression(
             ctrl.value);
           ctrl.warningText = MathInteractionsService.getWarningText();
           return answerIsValid;
