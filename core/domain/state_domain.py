@@ -1561,38 +1561,67 @@ class RuleSpec(python_utils.OBJECT):
         Returns:
             dict. The converted Rule Spec dict.
         """
-        # NOTE TO DEVELOPERS: This logic needs to be kept in sync with
-        # the code in the function get_all_html_content_strings() in the
-        # class InteractionInstance.
-        # See issue: https://github.com/oppia/oppia/issues/9413. We cannot make
-        # this declarative until issue-9413 has been fixed, because this method
-        # has no reference to the interaction type.
-        if rule_spec_dict['rule_type'] == 'HasElementXAtPositionY':
-            rule_spec_dict['inputs']['x'] = (
-                conversion_fn(rule_spec_dict['inputs']['x']))
-        elif rule_spec_dict['rule_type'] == 'HasElementXBeforeElementY':
-            rule_spec_dict['inputs']['x'] = (
-                conversion_fn(rule_spec_dict['inputs']['x']))
-            rule_spec_dict['inputs']['y'] = (
-                conversion_fn(rule_spec_dict['inputs']['y']))
-        elif rule_spec_dict['rule_type'] == 'IsEqualToOrdering':
-            for value_index, value in enumerate(rule_spec_dict['inputs']['x']):
-                rule_spec_dict['inputs']['x'][value_index][0] = (
-                    conversion_fn(value[0]))
-        elif (rule_spec_dict['rule_type'] ==
-              'IsEqualToOrderingWithOneItemAtIncorrectPosition'):
-            for value_index, value in enumerate(rule_spec_dict['inputs']['x']):
-                rule_spec_dict['inputs']['x'][value_index][0] = (
-                    conversion_fn(value[0]))
-        elif rule_spec_dict['rule_type'] in (
-                'ContainsAtLeastOneOf', 'IsProperSubsetOf',
-                'DoesNotContainAtLeastOneOf', 'Equals'):
-            if isinstance(rule_spec_dict['inputs']['x'], list):
-                for value_index, value in enumerate(
-                        rule_spec_dict['inputs']['x']):
-                    if isinstance(value, python_utils.BASESTRING):
-                        rule_spec_dict['inputs']['x'][value_index] = (
-                            conversion_fn(value))
+        html_field_types_to_rule_specs_dict = json.loads(
+            utils.get_file_contents(
+                feconf.HTML_FIELD_TYPES_TO_RULE_SPECS_FILE_PATH))
+
+        for interaction_and_rule_details in (
+                html_field_types_to_rule_specs_dict.values()):
+            rule_type_has_html = (
+                rule_spec_dict['rule_type'] in
+                interaction_and_rule_details['ruleTypes'].keys())
+            if rule_type_has_html:
+                html_type_format = interaction_and_rule_details['format']
+                input_variables_from_html_mapping = (
+                    interaction_and_rule_details['ruleTypes'][
+                        rule_spec_dict['rule_type']][
+                            'htmlInputVariables'])
+                input_variable_match_found = False
+                for input_variable in rule_spec_dict['inputs'].keys():
+                    if input_variable in input_variables_from_html_mapping:
+                        input_variable_match_found = True
+                        rule_input_variable = (
+                            rule_spec_dict['inputs'][input_variable])
+                        if (html_type_format ==
+                                feconf.HTML_RULE_VARIABLE_FORMAT_STRING):
+                            rule_spec_dict['inputs'][input_variable] = (
+                                conversion_fn(
+                                    rule_spec_dict['inputs'][input_variable]))
+                        elif (html_type_format ==
+                              feconf.HTML_RULE_VARIABLE_FORMAT_SET):
+                            # Here we are checking the type of the
+                            # rule_specs.inputs because the rule type
+                            # 'Equals' is used by other interactions as
+                            # well which don't have HTML and we don't have
+                            # a reference to the interaction ID.
+                            if isinstance(rule_input_variable, list):
+                                for value_index, value in enumerate(
+                                        rule_input_variable):
+                                    if isinstance(
+                                            value, python_utils.BASESTRING):
+                                        rule_spec_dict['inputs'][
+                                            input_variable][value_index] = (
+                                                conversion_fn(value))
+                        elif (html_type_format ==
+                              feconf.
+                              HTML_RULE_VARIABLE_FORMAT_LIST_OF_SETS):
+                            for list_index, html_list in enumerate(
+                                    rule_spec_dict['inputs'][input_variable]):
+                                for rule_html_index, rule_html in enumerate(
+                                        html_list):
+                                    rule_spec_dict['inputs'][input_variable][
+                                        list_index][rule_html_index] = (
+                                            conversion_fn(rule_html))
+                        else:
+                            raise Exception(
+                                'The rule spec does not belong to a valid'
+                                ' format.')
+                if not input_variable_match_found:
+                    raise Exception(
+                        'Rule spec should have at least one valid input '
+                        'variable with Html in it.')
+
+
         return rule_spec_dict
 
 
