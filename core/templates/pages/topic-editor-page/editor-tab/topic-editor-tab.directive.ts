@@ -65,6 +65,7 @@ angular.module('oppia').directive('topicEditorTab', [
         'UrlInterpolationService', 'MAX_CHARS_IN_TOPIC_DESCRIPTION',
         'MAX_CHARS_IN_TOPIC_NAME', 'EVENT_STORY_SUMMARIES_INITIALIZED',
         'EVENT_TOPIC_INITIALIZED', 'EVENT_TOPIC_REINITIALIZED',
+        'EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED',
         function(
             $scope, $uibModal, AlertsService,
             ContextService, CsrfTokenService, ImageUploadHelperService,
@@ -73,7 +74,8 @@ angular.module('oppia').directive('topicEditorTab', [
             TopicEditorStateService, TopicUpdateService, UndoRedoService,
             UrlInterpolationService, MAX_CHARS_IN_TOPIC_DESCRIPTION,
             MAX_CHARS_IN_TOPIC_NAME, EVENT_STORY_SUMMARIES_INITIALIZED,
-            EVENT_TOPIC_INITIALIZED, EVENT_TOPIC_REINITIALIZED) {
+            EVENT_TOPIC_INITIALIZED, EVENT_TOPIC_REINITIALIZED,
+            EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED) {
           var ctrl = this;
           $scope.MAX_CHARS_IN_TOPIC_NAME = MAX_CHARS_IN_TOPIC_NAME;
           $scope.MAX_CHARS_IN_TOPIC_DESCRIPTION = (
@@ -105,6 +107,12 @@ angular.module('oppia').directive('topicEditorTab', [
           var _initStorySummaries = function() {
             $scope.canonicalStorySummaries =
               TopicEditorStateService.getCanonicalStorySummaries();
+          };
+          // This is added because when we create a skill from the topic
+          // editor, it gets assigned to that topic, and to reflect that
+          // change, we need to fetch the topic again from the backend.
+          var _refreshTopic = function() {
+            TopicEditorStateService.loadTopic($scope.topic.getId());
           };
 
           $scope.getStaticImageUrl = function(imagePath) {
@@ -214,7 +222,8 @@ angular.module('oppia').directive('topicEditorTab', [
             $scope.$on(EVENT_TOPIC_INITIALIZED, _initEditor);
             $scope.$on(EVENT_TOPIC_REINITIALIZED, _initEditor);
             $scope.$on(EVENT_STORY_SUMMARIES_INITIALIZED, _initStorySummaries);
-
+            $scope.$on(
+              EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED, _refreshTopic);
             _initEditor();
             _initStorySummaries();
           };

@@ -203,7 +203,7 @@ var TopicEditorPage = function() {
     await saveSubtopicButton.click();
   };
 
-  this.changeSubtopicPageContents = async function(richTextInstructions) {
+  this.changeSubtopicPageContents = async function(content) {
     var subtopicPageContentButton = element(by.css(
       '.protractor-test-edit-html-content'));
     await waitFor.elementToBeClickable(subtopicPageContentButton,
@@ -214,11 +214,7 @@ var TopicEditorPage = function() {
     await waitFor.visibilityOf(pageEditor,
       'Subtopic html editor takes too long to appear');
     await (
-      await browser.switchTo().activeElement()).sendKeys(richTextInstructions);
-  };
-
-  this.editSubtopicWithIndex = async function(index) {
-    await this.navigateToSubtopicWithIndex(index);
+      await browser.switchTo().activeElement()).sendKeys(content);
   };
 
   this.expectNumberOfUncategorizedSkillsToBe = async function(count) {
@@ -256,7 +252,7 @@ var TopicEditorPage = function() {
       'Confirm subtopic creation button takes too long to be clickable');
     await confirmSubtopicCreationButton.click();
     await waitFor.invisibilityOf(
-      element(by.css('.new-subtopic-editor')),
+      element(by.css('.protractor-test-new-subtopic-editor')),
       'Create subtopic modal taking too long to disappear.');
   };
 
@@ -292,6 +288,7 @@ var TopicEditorPage = function() {
       'Topic editor tab taking too long to be clickable');
     await topicEditorTab.click();
   };
+
   this.navigateToSubtopicWithIndex = async function(subtopicIndex) {
     var subtopic = await subtopics.get(subtopicIndex);
     await subtopic.click();
@@ -305,9 +302,9 @@ var TopicEditorPage = function() {
     for (var i = 0; i < skillNamesCount; i++) {
       var skillCardTextElem = await skillNamesElems.get(i);
       var text = await skillCardTextElem.getText();
-      await expect(skillNames[i]).toEqual(text);
+      expect(skillNames[i]).toEqual(text);
     }
-    await expect(skillNamesCount).toEqual(skillNames.length);
+    expect(skillNamesCount).toEqual(skillNames.length);
   };
 
   this.moveToSubtopicsTab = async function() {

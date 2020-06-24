@@ -80,7 +80,7 @@ describe('Entity creation service', function() {
       expect(routingSpy).toHaveBeenCalledWith('1');
     });
 
-  it('should open create subtopic modal with resolve', function() {
+  it('should open create subtopic modal', function() {
     var spy = spyOn($uibModal, 'open').and.callThrough();
     EntityCreationService.createSubtopic();
 

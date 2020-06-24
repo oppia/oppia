@@ -4,10 +4,10 @@
   </h3>
 </div>
 <div>
-  <div class="modal-body new-subtopic-editor">
-    <p>
-      Enter the title for the subtopic
-    </p>
+  <div class="modal-body new-subtopic-editor protractor-test-new-subtopic-editor">
+    <div>
+      <strong>Enter the title for the subtopic</strong>
+    </div>
     <input class="form-control protractor-test-new-subtopic-title-field" style="font-size: 12px;"
            placeholder="Enter a brief description for the subtopic that students can easily understand, e.g. 'Adding Fractions'"
            ng-model="$ctrl.subtopicTitle" ng-change="$ctrl.resetErrorMsg()" maxlength="<[MAX_CHARS_IN_SUBTOPIC_TITLE]>" autofocus>
@@ -32,6 +32,9 @@
                           preview-description-bg-color="'#BE563C'"
                           preview-footer="">
       </thumbnail-uploader>
+    </div>
+    <div>
+      <strong>Enter the subtopic content</strong>
     </div>
     <div class="description-editor" ng-if="$ctrl.schemaEditorIsShown">
       <div class="oppia-editor-card-body" >
@@ -64,7 +67,7 @@
     margin-top: -3%;
   }
   .new-subtopic-editor .thumbnail-editor {
-    margin: 15px 0;
+    margin: 25px 0;
   }
   .new-subtopic-editor .description-editor {
     margin: 10px 0 0;

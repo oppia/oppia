@@ -194,12 +194,12 @@ describe('Topic editor functionality', function() {
 
       await topicEditorPage.navigateToTopicEditorTab();
       await topicEditorPage.navigateToSubtopicWithIndex(1);
-      await topicEditorPage.expectSubtopicToHaveSkills( []);
+      await topicEditorPage.expectSubtopicToHaveSkills([]);
 
       await topicEditorPage.navigateToTopicEditorTab();
       await topicEditorPage.navigateToSubtopicWithIndex(0);
       await topicEditorPage.dragSkillToSubtopic(0, 0);
-      await topicEditorPage.expectSubtopicToHaveSkills( ['Skill 2']);
+      await topicEditorPage.expectSubtopicToHaveSkills(['Skill 2']);
 
       await topicEditorPage.navigateToTopicEditorTab();
       await topicEditorPage.navigateToSubtopicWithIndex(0);
