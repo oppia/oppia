@@ -104,16 +104,16 @@ angular.module('oppia').config([
       $compileProvider, $cookiesProvider, $httpProvider,
       $interpolateProvider, $locationProvider, $provide, $sanitizeProvider) {
     /**
-     * Storing a reference to provide values after ajs app bootstarps itself.
-     * This is used in oppia-root.directive.ts to provide angularjs with
-     * angular services after angular app has been initialized.
+     * Storing a reference to provide values after AngularJS app bootstraps
+     * itself. This is used in oppia-root.directive.ts to provide AngularJS
+     * with Angular services after Angular app has been initialized.
      *
      * The timeline:
-     * 1 - angularjs bootstraps
-     * 2 - angularjs triggers angular to bootstrap and waits until angular app
-     *     is initialized.
-     * 3 - After angular has initialized we provide the angular sevices to ajs
-     *     in oppia-root.directive.ts by using this function.
+     *   1. AngularJS bootstraps.
+     *   2. AngularJS triggers Angular to bootstrap and waits until Angular
+     *      app is initialized.
+     *   3. After Angular has initialized we provide the Angular services
+     *      to AngularJS in oppia-root.directive.ts by using this function.
      */
     (
       angular.module(
