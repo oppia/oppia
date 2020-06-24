@@ -801,16 +801,24 @@ class Voiceover(python_utils.OBJECT):
 class WrittenTranslation(python_utils.OBJECT):
     """Value object representing a written translation for a content."""
 
-    def __init__(self, html, needs_update):
+    def __init__(self, translation_type, translation, needs_update):
         """Initializes a WrittenTranslation domain object.
 
         Args:
-            html: str. A piece of user submitted HTML. This is cleaned in such
-                a way as to contain a restricted set of HTML tags.
-            needs_update: bool. Whether html is marked for needing review.
+            translation_type: str. 'unicode' or 'html'. Indicates if translation
+                field is html or unicode
+            translation: str. A piece of user submitted HTML or unicode. If
+                html, this is cleaned in such a way as to contain a restricted
+                set of HTML tags.
+            needs_update: bool. Whether translation is marked for needing
+                review.
         """
-        self.html = html_cleaner.clean(html)
+        self.translation_type = translation_type
+        self.translation = translation
         self.needs_update = needs_update
+
+        if translation_type == 'html':
+            self.translation = html_cleaner.clean(self.translation)        
 
     def to_dict(self):
         """Returns a dict representing this WrittenTranslation domain object.
@@ -819,7 +827,8 @@ class WrittenTranslation(python_utils.OBJECT):
             dict. A dict, mapping all fields of WrittenTranslation instance.
         """
         return {
-            'html': self.html,
+            'translation_type': self.translation_type,
+            'translation': self.translation,
             'needs_update': self.needs_update,
         }
 
@@ -836,7 +845,8 @@ class WrittenTranslation(python_utils.OBJECT):
             object.
         """
         return cls(
-            written_translation_dict['html'],
+            written_translation_dict['translation_type'],
+            written_translation_dict['translation'],
             written_translation_dict['needs_update'])
 
     def validate(self):
@@ -846,9 +856,20 @@ class WrittenTranslation(python_utils.OBJECT):
             ValidationError: One or more attributes of the WrittenTranslation
             are invalid.
         """
-        if not isinstance(self.html, python_utils.BASESTRING):
+        if not isinstance(self.translation_type, python_utils.BASESTRING):
             raise utils.ValidationError(
-                'Invalid content HTML: %s' % self.html)
+                'Invalid translation_type: %s' % self.translation_type)
+
+        if not (
+            self.translation_type == 'unicode'
+            or self.translation_type == 'html'
+        ):
+            raise utils.ValidationError(
+                'Invalid translation_type: %s' % self.translation_type)
+
+        if not isinstance(self.translation, python_utils.BASESTRING):
+            raise utils.ValidationError(
+                'Invalid translation: %s' % self.translation)
 
         if not isinstance(self.needs_update, bool):
             raise utils.ValidationError(
@@ -942,7 +963,7 @@ class WrittenTranslations(python_utils.OBJECT):
             language_code: str. The language code of the translated html.
             html: str. The translated html.
         """
-        written_translation = WrittenTranslation(html, False)
+        written_translation = WrittenTranslation('html', html, False)
         self.translations_mapping[content_id][language_code] = (
             written_translation)
 

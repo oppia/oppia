@@ -20,24 +20,21 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
+type TranslationType = 'unicode' | 'html';
+
 export interface ITranslationBackendDict {
-  'html': string;
+  'translation_type': TranslationType;
+  'translation': string;
   'needs_update': boolean;
 }
 
 export class WrittenTranslation {
-  html: string;
-  needsUpdate: boolean;
-  constructor(html: string, needsUpdate: boolean) {
-    this.html = html;
-    this.needsUpdate = needsUpdate;
-  }
-  getHtml(): string {
-    return this.html;
-  }
-  setHtml(html: string): void {
-    this.html = html;
-  }
+  constructor(
+      public translationType: TranslationType,
+      public translation: string,
+      public needsUpdate: boolean
+  ) {}
+
   markAsNeedingUpdate(): void {
     this.needsUpdate = true;
   }
@@ -47,7 +44,8 @@ export class WrittenTranslation {
 
   toBackendDict(): ITranslationBackendDict {
     return {
-      html: this.html,
+      translation_type: this.translationType,
+      translation: this.translation,
       needs_update: this.needsUpdate
     };
   }
@@ -57,13 +55,14 @@ export class WrittenTranslation {
   providedIn: 'root'
 })
 export class WrittenTranslationObjectFactory {
-  createNew(html: string): WrittenTranslation {
-    return new WrittenTranslation(html, false);
+  createNewHtml(html: string): WrittenTranslation {
+    return new WrittenTranslation('html', html, false);
   }
 
   createFromBackendDict(translationBackendDict: ITranslationBackendDict) {
     return new WrittenTranslation(
-      translationBackendDict.html,
+      translationBackendDict.translation_type,
+      translationBackendDict.translation,
       translationBackendDict.needs_update);
   }
 }

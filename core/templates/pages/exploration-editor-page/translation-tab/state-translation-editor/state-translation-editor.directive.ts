@@ -128,7 +128,7 @@ angular.module('oppia').directive('stateTranslationEditor', [
               $scope.translationEditorIsOpen = true;
               if (!$scope.activeWrittenTranslation) {
                 $scope.activeWrittenTranslation = (
-                  WrittenTranslationObjectFactory.createNew(''));
+                  WrittenTranslationObjectFactory.createNewHtml(''));
               }
             }
           };

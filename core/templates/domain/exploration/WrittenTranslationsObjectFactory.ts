@@ -109,7 +109,7 @@ export class WrittenTranslations {
       throw new Error('Trying to add duplicate language code.');
     }
     writtenTranslations[languageCode] = (
-      this._writtenTranslationObjectFactory.createNew(html));
+      this._writtenTranslationObjectFactory.createNewHtml(html));
   }
 
   updateWrittenTranslationHtml(
@@ -118,7 +118,7 @@ export class WrittenTranslations {
     if (!writtenTranslations.hasOwnProperty(languageCode)) {
       throw new Error('Unable to find the given language code.');
     }
-    writtenTranslations[languageCode].setHtml(html);
+    writtenTranslations[languageCode].translation = html;
     // Marking translation updated.
     writtenTranslations[languageCode].needsUpdate = false;
   }

@@ -838,7 +838,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
     def test_written_translation_validation(self):
         """Test validation of translation script."""
-        written_translation = state_domain.WrittenTranslation('Test.', True)
+        written_translation = state_domain.WrittenTranslation(
+            'html', 'Test.', True)
         written_translation.validate()
 
         with self.assertRaisesRegexp(
