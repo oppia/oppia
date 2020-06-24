@@ -428,7 +428,7 @@ class MathExpressionValidationOneOffJobTests(test_utils.GenericTestBase):
                 job_id))
         expected_output = [
             u'[u\'Invalid\', [u\'exp_id0 State3: x<y>z\', '
-            u'u\'exp_id0 State5: 226 233 238 244 252 \']]',
+            u'u\'exp_id0 State5: \\xe2\\xe9\\xee\\xf4\\xfc\']]',
             u'[u\'Valid Equation\', [u\'exp_id0 State2: y=m*x+c\']]',
             u'[u\'Valid Expression\', [u\'exp_id0 State1: x+y-z\', '
             u'u\'exp_id0 State4: sqrt(x/y)\']]']

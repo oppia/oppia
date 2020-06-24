@@ -168,26 +168,16 @@ class MathExpressionValidationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                                 rule_input = rule_input.replace(
                                     unicode_char, text)
 
-                            # Replacing out of range unicode characters with
-                            # their ordinal values.
-                            rule_input = list(rule_input)
-                            for i in python_utils.RANGE(len(rule_input)):
-                                if ord(rule_input[i]) >= 128:
-                                    rule_input[i] = (
-                                        python_utils.UNICODE(
-                                            ord(rule_input[i])) + ' ')
-                            rule_input = ''.join(rule_input)
-
                             validity = 'Invalid'
                             if is_valid_math_expression(rule_input):
                                 validity = 'Valid Expression'
                             elif is_valid_math_equation(rule_input):
                                 validity = 'Valid Equation'
 
-                            yield (
-                                validity,
-                                u'%s %s: %s' % (
-                                    item.id, state_name, rule_input))
+                            output_values = '%s %s: %s' % (
+                                item.id, state_name, rule_input)
+
+                            yield (validity, output_values.encode('utf-8'))
 
     @staticmethod
     def reduce(key, values):
