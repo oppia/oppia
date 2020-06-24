@@ -146,6 +146,21 @@ def mock_load_template(filename):
     return file_content
 
 
+def check_image_png_or_webp(image_string):
+    """Checks if the image is in png or webp format only.
+
+    Args:
+        image_string: str. image url in base64 format.
+
+    Returns:
+        boolean. Returns true if image is in WebP format.
+    """
+    if (image_string.startswith('data:image/png') or
+            image_string.startswith('data:image/webp')):
+        return True
+    return False
+
+
 class URLFetchServiceMock(apiproxy_stub.APIProxyStub):
     """Mock for google.appengine.api.urlfetch."""
 
@@ -2231,7 +2246,9 @@ class AppEngineTestBase(TestBase):
                 state_domain.SubtitledHtml('hint_1', '<p>This is a hint.</p>')
             )
         ]
-        state.update_interaction_solution(solution_dict)
+        solution = state_domain.Solution.from_dict(
+            state.interaction.id, solution_dict)
+        state.update_interaction_solution(solution)
         state.update_interaction_hints(hints_list)
         state.interaction.customization_args = {
             'placeholder': 'Enter text here',

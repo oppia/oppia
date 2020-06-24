@@ -112,7 +112,6 @@ FILEPATHS_NOT_TO_RENAME = (
     '*.bundle.js',
     '*.bundle.js.map',
     'webpack_bundles/about-page.mainpage.html',
-    'webpack_bundles/community-dashboard-page.mainpage.html',
     'webpack_bundles/contact-page.mainpage.html',
     'webpack_bundles/donate-page.mainpage.html',
     'webpack_bundles/get-started-page.mainpage.html',
@@ -126,7 +125,7 @@ FILEPATHS_NOT_TO_RENAME = (
 # JS hashes object.
 FILEPATHS_PROVIDED_TO_FRONTEND = (
     'images/*', 'videos/*', 'i18n/*', '*_directive.html', '*.directive.html',
-    '*.template.html', '*.png', '*.json')
+    '*.template.html', '*.png', '*.json', '*.webp')
 
 HASH_BLOCK_SIZE = 2**20
 

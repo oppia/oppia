@@ -16,17 +16,79 @@
  * @fileoverview Unit tests for improvements service.
  */
 
+import { TestBed } from '@angular/core/testing';
+
+import { CamelCaseToHyphensPipe } from
+  'filters/string-utility-filters/camel-case-to-hyphens.pipe';
 import { ImprovementsService } from 'services/improvements.service';
+import { StateObjectFactory } from 'domain/state/StateObjectFactory';
+
 
 describe('ImprovementsService', () => {
   let improvementsService: ImprovementsService;
+  let stateObjectFactory: StateObjectFactory;
+
   beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [CamelCaseToHyphensPipe]
+    });
+
     improvementsService = new ImprovementsService();
+    stateObjectFactory = TestBed.get(StateObjectFactory);
   });
 
   describe('.isStateForcedToResolveOutstandingUnaddressedAnswers', () => {
     it('should return true for states with TextInput interactions', () => {
-      var mockState = {interaction: {id: 'TextInput'}};
+      let mockStateBackendDict = {
+        classifier_model_id: null,
+        content: {
+          html: '',
+          content_id: 'content'
+        },
+        interaction: {
+          id: 'TextInput',
+          customization_args: {
+            rows: {
+              value: 1
+            },
+            placeholder: {
+              value: 'Type your answer here.'
+            }
+          },
+          answer_groups: [],
+          default_outcome: {
+            dest: 'Introduction',
+            feedback: {
+              content_id: 'default_outcome',
+              html: ''
+            },
+            labelled_as_correct: false,
+            param_changes: [],
+            refresher_exploration_id: null,
+            missing_prerequisite_skill_id: null
+          },
+          confirmed_unclassified_answers: [],
+          hints: [],
+          solution: null
+        },
+        param_changes: [],
+        recorded_voiceovers: {
+          voiceovers_mapping: {
+            content: {},
+            default_outcome: {}
+          }
+        },
+        solicit_answer_details: false,
+        written_translations: {
+          translations_mapping: {
+            content: {},
+            default_outcome: {}
+          }
+        }
+      };
+
+      let mockState = stateObjectFactory.createFromBackendDict(
+        'stateName', mockStateBackendDict);
 
       expect(
         improvementsService
@@ -35,7 +97,49 @@ describe('ImprovementsService', () => {
     });
 
     it('should return false for states with FractionInput interactions', () => {
-      var mockState = {interaction: {id: 'FractionInput'}};
+      let mockStateBackendDict = {
+        classifier_model_id: null,
+        content: {
+          html: '',
+          content_id: 'content'
+        },
+        interaction: {
+          id: 'FractionInput',
+          customization_args: {},
+          answer_groups: [],
+          default_outcome: {
+            dest: 'Introduction',
+            feedback: {
+              content_id: 'default_outcome',
+              html: ''
+            },
+            labelled_as_correct: false,
+            param_changes: [],
+            refresher_exploration_id: null,
+            missing_prerequisite_skill_id: null
+          },
+          confirmed_unclassified_answers: [],
+          hints: [],
+          solution: null
+        },
+        param_changes: [],
+        recorded_voiceovers: {
+          voiceovers_mapping: {
+            content: {},
+            default_outcome: {}
+          }
+        },
+        solicit_answer_details: false,
+        written_translations: {
+          translations_mapping: {
+            content: {},
+            default_outcome: {}
+          }
+        }
+      };
+
+      let mockState = stateObjectFactory.createFromBackendDict(
+        'stateName', mockStateBackendDict);
 
       expect(
         improvementsService

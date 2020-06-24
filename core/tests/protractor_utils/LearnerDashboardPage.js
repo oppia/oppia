@@ -20,7 +20,7 @@
 var waitFor = require('./waitFor.js');
 
 var LearnerDashboardPage = function() {
-  var LEARNER_DASHBOARD_URL = '/learner_dashboard';
+  var LEARNER_DASHBOARD_URL = '/learner-dashboard';
   var completedSection =
     element(by.css('.protractor-test-completed-section'));
   var playLaterSection =
