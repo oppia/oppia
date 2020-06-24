@@ -77,10 +77,10 @@ AUDIO_ENTITY_TYPE = 'exploration'
 AUDIO_DURATION_SECS_MIN_STATE_SCHEMA_VERSION = 31
 
 
-class DragAndDropSortInputInteractionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+class DragAndDropSortInputInteractionOneOffJob(
+        jobs.BaseMapReduceOneOffJobManager):
     """Job that produces a list of all (exploration, state) pairs that use the
-    DragAndDropSortInput interaction and have rules that do not correspond to any
-    answer choices.
+    DragAndDropSortInput interaction and have invalid choices.
     """
 
     @classmethod
@@ -100,15 +100,15 @@ class DragAndDropSortInputInteractionOneOffJob(jobs.BaseMapReduceOneOffJobManage
                         state.interaction.answer_groups):
                     for rule_index, rule_spec in enumerate(
                             answer_group.rule_specs):
-                        for input in rule_spec.inputs:
-                            value = rule_spec.inputs[input]
+                        for rule_input in rule_spec.inputs:
+                            value = rule_spec.inputs[rule_input]
                             if value == '' or value == []:
                                 validation_errors.append(
                                     'State name: %s, AnswerGroup: %s,' % (
-                                    state_name.encode('utf-8'),
-                                    anwer_group_index) +
-                                    ' Rule input %s in rule with index %s is '
-                                    'empty. ' % (input, rule_index))
+                                        state_name.encode('utf-8'),
+                                        anwer_group_index) +
+                                    ' Rule input %s in rule with index %s'
+                                    ' is empty. ' % (rule_input, rule_index))
         if validation_errors:
             yield (item.id, validation_errors)
 
