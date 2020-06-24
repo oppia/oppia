@@ -90,9 +90,10 @@ import { IModule } from 'angular';
 
 const sourceMappedStackTrace = require('sourcemapped-stacktrace');
 
-// Creating an interface that extends IModule and has an extra field
-// called provideValueAfterBootstrap. This is a function that will be
-// used to provide angular services to ajs after bootstrap.
+// Creating an interface that extends IModule and has an extra field called
+// provideValueAfterBootstrap. This is a function that will be used to provide
+// angular services to ajs after the ajs app and the angular app bootstrap
+// themselves respectively.
 interface CustomOppiaModule extends IModule {
   provideValueAfterBootstrap: Function;
 }
@@ -103,9 +104,9 @@ angular.module('oppia').config([
       $compileProvider, $cookiesProvider, $httpProvider,
       $interpolateProvider, $locationProvider, $provide, $sanitizeProvider) {
     /**
-     * Storing a reference to provide values after bootstrap. This is used in
-     * oppia-root.directive.ts to provice angularjs with angular services after
-     * angular app has been initialized.
+     * Storing a reference to provide values after ajs app bootstarps itself.
+     * This is used in oppia-root.directive.ts to provide angularjs with
+     * angular services after angular app has been initialized.
      *
      * The timeline:
      * 1 - angularjs bootstraps
@@ -114,8 +115,9 @@ angular.module('oppia').config([
      * 3 - After angular has initialized we provide the angular sevices to ajs
      *     in oppia-root.directive.ts by using this function.
      */
-    (angular.module(
-      'oppia') as CustomOppiaModule).provideValueAfterBootstrap = (
+    (
+      angular.module(
+        'oppia') as CustomOppiaModule).provideValueAfterBootstrap = (
       function(
           name, value) {
         $provide.value( name, value );

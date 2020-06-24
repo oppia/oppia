@@ -23,9 +23,10 @@ import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 import { IModule } from 'angular';
 
-// Creating an interface that extends IModule and has an extra field
-// called provideValueAfterBootstrap. This is a function that will be
-// used to provide angular services to ajs after bootstrap.
+// Creating an interface that extends IModule and has an extra field called
+// provideValueAfterBootstrap. This is a function that will be used to provide
+// angular services to ajs after the ajs app and the angular app bootstrap
+// themselves respectively.
 interface CustomOppiaModule extends IModule {
   provideValueAfterBootstrap: Function;
 }
@@ -163,8 +164,9 @@ angular.module('oppia').directive('oppiaRoot', [
 
           $scope.onInit = function() {
             for (let service of ANGULAR_SERVICES) {
-              (angular.module(
-                'oppia') as CustomOppiaModule).provideValueAfterBootstrap(
+              (
+                angular.module(
+                  'oppia') as CustomOppiaModule).provideValueAfterBootstrap(
                 service, OppiaAngularRootComponent[(
                   service[0].toLowerCase() + service.substring(1))]);
             }
