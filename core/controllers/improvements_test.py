@@ -24,7 +24,6 @@ import datetime
 from core.domain import improvements_domain
 from core.domain import improvements_services
 from core.platform import models
-from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
 import feconf
 import python_utils
@@ -206,7 +205,7 @@ class ExplorationImprovementsHandlerTests(ImprovementsTestBase):
 
     def test_post_invalid_exploration_returns_invalid_input_page(self):
         with self.login_context(self.OWNER_EMAIL):
-            self.post_json(self.get_url('bad_exp_id'), {
+            self.post_json(self.get_url(exp_id='bad_exp_id'), {
                 'task_entries': [{
                     'entity_version': 1,
                     'task_type': 'high_bounce_rate',
@@ -237,7 +236,7 @@ class ExplorationImprovementsHandlerTests(ImprovementsTestBase):
         with self.login_context(self.OWNER_EMAIL):
             self.post_json(self.get_url(), {
                 'task_entries': [{
-                    # 'entity_version': 1,
+                    # 'entity_version': 1.
                     'task_type': 'high_bounce_rate',
                     'target_id': 'Introduction',
                     'issue_description': 'issue description',
@@ -250,7 +249,7 @@ class ExplorationImprovementsHandlerTests(ImprovementsTestBase):
             self.post_json(self.get_url(), {
                 'task_entries': [{
                     'entity_version': 1,
-                    # 'task_type': 'high_bounce_rate',
+                    # 'task_type': 'high_bounce_rate'.
                     'target_id': 'Introduction',
                     'issue_description': 'issue description',
                     'status': 'open',
@@ -263,7 +262,7 @@ class ExplorationImprovementsHandlerTests(ImprovementsTestBase):
                 'task_entries': [{
                     'entity_version': 1,
                     'task_type': 'high_bounce_rate',
-                    # 'target_id': 'Introduction',
+                    # 'target_id': 'Introduction'.
                     'issue_description': 'issue description',
                     'status': 'open',
                 }]
@@ -276,7 +275,7 @@ class ExplorationImprovementsHandlerTests(ImprovementsTestBase):
                     'entity_version': 1,
                     'task_type': 'high_bounce_rate',
                     'target_id': 'Introduction',
-                    # 'issue_description': 'issue description',
+                    # 'issue_description': 'issue description'.
                     'status': 'open',
                 }]
             }, csrf_token=self.get_new_csrf_token(), expected_status_int=400)
@@ -289,7 +288,7 @@ class ExplorationImprovementsHandlerTests(ImprovementsTestBase):
                     'task_type': 'high_bounce_rate',
                     'target_id': 'Introduction',
                     'issue_description': 'issue description',
-                    # 'status': 'open',
+                    # 'status': 'open'.
                 }]
             }, csrf_token=self.get_new_csrf_token(), expected_status_int=400)
 
@@ -336,7 +335,7 @@ class ExplorationImprovementsHandlerTests(ImprovementsTestBase):
         self.assertIsNone(task_entry_model.resolver_id)
         self.assertIsNone(task_entry_model.resolved_on)
 
-    def test_post_can_create_new_open_task_in_storage(self):
+    def test_post_can_create_new_obsolete_task_in_storage(self):
         with self.login_context(self.OWNER_EMAIL):
             self.post_json(self.get_url(), {
                 'task_entries': [{
@@ -441,6 +440,9 @@ class ExplorationImprovementsHistoryHandlerTests(ImprovementsTestBase):
         Args:
             exp_id: str. The exploration id to fetch. Uses self's EXP_ID
                 constant by default.
+            cursor: str or None. Starting point for the search. When None, the
+                starting point is the very beginning of the history results
+                (i.e. starting from the most recently resolved task entry).
 
         Returns:
             str. The URL of the handler.
@@ -478,7 +480,7 @@ class ExplorationImprovementsHistoryHandlerTests(ImprovementsTestBase):
         task_entries = [
             self._new_resolved_task(
                 state_name='State %d' % i,
-                resolved_on=self.MOCK_DATE + datetime.timedelta(minutes=i*5))
+                resolved_on=self.MOCK_DATE + datetime.timedelta(minutes=i * 5))
             for i in python_utils.RANGE(1, 26)]
         improvements_services.put_tasks(task_entries)
         with self.login_context(self.OWNER_EMAIL):
@@ -495,7 +497,7 @@ class ExplorationImprovementsHistoryHandlerTests(ImprovementsTestBase):
         task_entries = [
             self._new_resolved_task(
                 state_name='State %d' % i,
-                resolved_on=self.MOCK_DATE + datetime.timedelta(minutes=i*5))
+                resolved_on=self.MOCK_DATE + datetime.timedelta(minutes=i * 5))
             for i in python_utils.RANGE(1, 26)]
         improvements_services.put_tasks(task_entries)
 
