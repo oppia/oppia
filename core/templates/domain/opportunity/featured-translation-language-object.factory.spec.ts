@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for ReadOnlyStoryNodeObjectFactory.
+ * @fileoverview Tests for FeaturedTranslationLanguageObjectFactory.
  */
 
 import { TestBed } from '@angular/core/testing';

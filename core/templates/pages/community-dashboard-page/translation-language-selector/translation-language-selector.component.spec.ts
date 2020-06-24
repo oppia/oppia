@@ -24,7 +24,7 @@ import { FeaturedTranslationLanguageObjectFactory } from
   'domain/opportunity/FeaturedTranslationLanguageObjectFactory';
 
 /**
- * @fileoverview Unit tests for the translation language select.
+ * @fileoverview Unit tests for the translation language selector component.
  */
 
 describe('Translation language selector', () => {

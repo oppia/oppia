@@ -35,7 +35,7 @@ var CommunityDashboardTranslateTextTab = function() {
   var featuredLanguageExplanation = selectorContainer.element(
     by.css('.protractor-test-language-selector-featured-explanation'));
 
-  var _openSelector = async function() {
+  var _openLanguageSelector = async function() {
     await waitFor.elementToBeClickable(
       selectorContainer,
       'Language selector taking too long to be clickable'
@@ -44,7 +44,7 @@ var CommunityDashboardTranslateTextTab = function() {
   };
 
   var _selectLanguage = async function(language) {
-    await _openSelector();
+    await _openLanguageSelector();
     await selectorContainer.element(
       by.cssContainingText(
         '.protractor-test-language-selector-option',
@@ -58,7 +58,7 @@ var CommunityDashboardTranslateTextTab = function() {
   };
 
   this.mouseoverFeaturedLanguageTooltip = async function(index) {
-    await _openSelector();
+    await _openLanguageSelector();
     await waitFor.visibilityOf(
       featuredLanguageContainer,
       'Featured languages took too long to display'
@@ -69,7 +69,7 @@ var CommunityDashboardTranslateTextTab = function() {
   };
 
   this.expectFeaturedLanguagesToBe = async function(languages) {
-    await _openSelector();
+    await _openLanguageSelector();
     await waitFor.visibilityOf(
       featuredLanguageContainer,
       'Featured languages took too long to display'

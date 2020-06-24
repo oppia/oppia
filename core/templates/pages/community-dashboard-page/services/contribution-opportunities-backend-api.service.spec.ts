@@ -45,7 +45,7 @@ describe('Contribution Opportunities backend API service', function() {
   const skillOpportunityResponse = {
     opportunities: [{
       id: 'skill_id',
-      skill_explanation: 'A new skill for question',
+      skill_description: 'A new skill for question',
       topic_name: 'A new topic',
       question_count: 30
     }],

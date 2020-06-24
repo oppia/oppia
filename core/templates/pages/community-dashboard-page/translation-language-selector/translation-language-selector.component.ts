@@ -33,8 +33,8 @@ import { LanguageUtilService } from 'domain/utilities/language-util.service';
   templateUrl: './translation-language-selector.component.html'
 })
 export class TranslationLanguageSelectorComponent implements OnInit {
-  @Input() value: string;
-  @Output() setValue: EventEmitter<string> = new EventEmitter();
+  @Input() activeLanguageCode: string;
+  @Output() setActiveLanguageCode: EventEmitter<string> = new EventEmitter();
   @ViewChild('dropdown', {'static': false}) dropdownRef;
 
   options: {id: string, description: string}[];
@@ -72,13 +72,17 @@ export class TranslationLanguageSelectorComponent implements OnInit {
     this.dropdownShown = !this.dropdownShown;
   }
 
-  selectOption(value: string) {
-    this.setValue.emit(value);
+  selectOption(activeLanguageCode: string) {
+    this.setActiveLanguageCode.emit(activeLanguageCode);
     this.dropdownShown = false;
   }
 
   showExplanationPopup(index: number) {
-    // Align popup to mouse-overed info icon
+    /**
+     * Align popup to mouse-overed info icon.
+     * 75: approximate height of selector and featured languages label.
+     * 30: approximate height of each dropdown element.
+     */
     this.explanationPopupPxOffsetY = 75 + 30 * index;
     this.explanationPopupContent = (
       this.featuredLanguages[index].explanation);
@@ -90,7 +94,7 @@ export class TranslationLanguageSelectorComponent implements OnInit {
   }
 
   /**
-   * Close popup when outside elements are clicked
+   * Close dropdown when outside elements are clicked
    * @param event mouse click event
    */
   @HostListener('document:click', ['$event'])
@@ -109,6 +113,6 @@ angular.module('oppia').directive(
   'translationLanguageSelector',
   downgradeComponent({
     component: TranslationLanguageSelectorComponent,
-    inputs: ['value'],
-    outputs: ['setValue']
+    inputs: ['activeLanguageCode'],
+    outputs: ['setActiveLanguageCode']
   }));

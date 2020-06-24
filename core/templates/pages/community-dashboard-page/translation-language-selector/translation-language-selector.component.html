@@ -7,7 +7,7 @@
     </span>
   </div>
   <div class="oppia-translation-language-selector-inner-container protractor-test-language-selector-selected" (click)="toggleDropdown()">
-    {{languageIdToDescription[value]}}
+    {{languageIdToDescription[activeLanguageCode]}}
     <span class="material-icons oppia-translation-language-selector-inner-container-arrow" [ngStyle]="{ 'transform': dropdownShown ? 'scaleY(-1)' : 'scaleY(1)' }">
       arrow_drop_down
     </span>
@@ -20,7 +20,7 @@
         <div class="oppia-translation-language-selector-dropdown-option protractor-test-featured-language"
              *ngIf="languageIdToDescription[featuredOption.languageCode]"
              (click)="selectOption(featuredOption.languageCode)"
-             [ngClass]="{'oppia-translation-language-selector-dropdown-option-selected' : featuredOption.languageCode === value}">
+             [ngClass]="{'oppia-translation-language-selector-dropdown-option-selected' : featuredOption.languageCode === activeLanguageCode}">
           <span class="material-icons oppia-translation-language-selector-info-icon protractor-test-featured-language-tooltip"
                 *ngIf="featuredOption.explanation"
                 (mouseenter)="showExplanationPopup(i)"
@@ -36,7 +36,7 @@
     <div class="oppia-translation-language-selector-dropdown-option protractor-test-language-selector-option"
          *ngFor="let option of options"
          (click)="selectOption(option.id)"
-         [ngClass]="{'oppia-translation-language-selector-dropdown-option-selected' : option.id === value}">
+         [ngClass]="{'oppia-translation-language-selector-dropdown-option-selected' : option.id === activeLanguageCode}">
       {{option.description}}
     </div>
   </div>

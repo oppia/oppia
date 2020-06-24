@@ -450,7 +450,7 @@ class _Validators(python_utils.OBJECT):
         return False
 
     @staticmethod
-    def is_supported_audio_language_code(obj):
+    def is_supported_audio_language_code(language_code):
         """Checks if the given obj (a string) represents a valid language code.
 
         Args:
@@ -459,4 +459,4 @@ class _Validators(python_utils.OBJECT):
         Returns:
             bool. Whether the given object is a valid audio language code.
         """
-        return utils.is_supported_audio_language_code(obj)
+        return utils.is_supported_audio_language_code(language_code)
