@@ -209,8 +209,15 @@ import { ExplorationRecommendationsBackendApiService } from
   'domain/recommendations/exploration-recommendations-backend-api.service';
 import { ExplorationRecommendationsService } from
   'pages/exploration-player-page/services/exploration-recommendations.service';
+import { ExplorationStatsBackendApiService } from
+  'services/exploration-stats-backend-api.service';
+import { ExplorationStatsObjectFactory } from
+  'domain/statistics/ExplorationStatsObjectFactory';
+import { ExplorationStatsService } from 'services/exploration-stats.service';
 import { ExplorationSummaryObjectFactory } from
   'domain/summary/exploration-summary-object.factory';
+import { ExplorationTaskObjectFactory } from
+  'domain/improvements/ExplorationTaskObjectFactory';
 import { ExpressionSyntaxTreeService } from
   'expressions/expression-syntax-tree.service';
 import { ExtensionTagAssemblerService } from
@@ -241,6 +248,8 @@ import { GuestCollectionProgressObjectFactory } from
   'domain/collection/GuestCollectionProgressObjectFactory';
 import { GuestCollectionProgressService } from
   'domain/collection/guest-collection-progress.service';
+import { HighBounceRateTaskObjectFactory } from
+  'domain/improvements/HighBounceRateTaskObjectFactory';
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
 import { HtmlEscaperService } from 'services/html-escaper.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
@@ -253,6 +262,8 @@ import { ImageFileObjectFactory } from
 import { ImprovementActionButtonObjectFactory } from
   'domain/statistics/ImprovementActionButtonObjectFactory';
 import { ImprovementsService } from 'services/improvements.service';
+import { IneffectiveFeedbackLoopTaskObjectFactory } from
+  'domain/improvements/IneffectiveFeedbackLoopTaskObjectFactory';
 import { InteractionDetailsCacheService } from
   // eslint-disable-next-line max-len
   'pages/exploration-editor-page/editor-tab/services/interaction-details-cache.service';
@@ -311,6 +322,8 @@ import { MusicNotesInputValidationService } from
 import { MusicPhrasePlayerService } from
   // eslint-disable-next-line max-len
   'interactions/MusicNotesInput/directives/music-phrase-player.service';
+import { NeedsGuidingResponsesTaskObjectFactory } from
+  'domain/improvements/NeedsGuidingResponsesTaskObjectFactory';
 import { NewlyCreatedTopicObjectFactory } from
   'domain/topics_and_skills_dashboard/NewlyCreatedTopicObjectFactory';
 import { NormalizeWhitespacePipe } from
@@ -472,6 +485,8 @@ import { StateSolicitAnswerDetailsService } from
 import { StateSolutionService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-solution.service';
+import { StateStatsObjectFactory } from
+  'domain/statistics/StateStatsObjectFactory';
 import { StateTopAnswersStatsBackendApiService } from
   'services/state-top-answers-stats-backend-api.service';
 import { StateWrittenTranslationsService } from
@@ -506,6 +521,8 @@ import { SubtopicPageObjectFactory } from
   'domain/topic/SubtopicPageObjectFactory';
 import { SubtopicViewerBackendApiService } from
   'domain/subtopic_viewer/subtopic-viewer-backend-api.service';
+import { SuccessiveIncorrectAnswersTaskObjectFactory } from
+  'domain/improvements/SuccessiveIncorrectAnswersTaskObjectFactory';
 import { SuggestionModalService } from 'services/suggestion-modal.service';
 import { SuggestionObjectFactory } from
   'domain/suggestion/SuggestionObjectFactory';
@@ -657,7 +674,11 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static explorationPermissionsObjectFactory: ExplorationPermissionsObjectFactory;
   static explorationRecommendationsBackendApiService: ExplorationRecommendationsBackendApiService;
   static explorationRecommendationsService: ExplorationRecommendationsService;
+  static explorationStatsBackendApiService: ExplorationStatsBackendApiService;
+  static explorationStatsObjectFactory: ExplorationStatsObjectFactory;
+  static explorationStatsService: ExplorationStatsService;
   static explorationSummaryObjectFactory: ExplorationSummaryObjectFactory;
+  static explorationTaskObjectFactory: ExplorationTaskObjectFactory;
   static expressionSyntaxTreeService: ExpressionSyntaxTreeService;
   static extensionTagAssemblerService: ExtensionTagAssemblerService;
   static extractImageFilenamesFromStateService: ExtractImageFilenamesFromStateService;
@@ -674,6 +695,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static graphUtilsService: GraphUtilsService;
   static guestCollectionProgressObjectFactory: GuestCollectionProgressObjectFactory;
   static guestCollectionProgressService: GuestCollectionProgressService;
+  static highBounceRateTaskObjectFactory: HighBounceRateTaskObjectFactory;
   static hintObjectFactory: HintObjectFactory;
   static htmlEscaperService: HtmlEscaperService;
   static i18nLanguageCodeService: I18nLanguageCodeService;
@@ -682,6 +704,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static imageFileObjectFactory: ImageFileObjectFactory;
   static improvementActionButtonObjectFactory: ImprovementActionButtonObjectFactory;
   static improvementsService: ImprovementsService;
+  static ineffectiveFeedbackLoopTaskObjectFactory: IneffectiveFeedbackLoopTaskObjectFactory;
   static interactionDetailsCacheService: InteractionDetailsCacheService;
   static interactionObjectFactory: InteractionObjectFactory;
   static interactionRulesRegistryService: InteractionRulesRegistryService;
@@ -711,6 +734,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static multipleChoiceInputValidationService: MultipleChoiceInputValidationService;
   static musicNotesInputValidationService: MusicNotesInputValidationService;
   static musicPhrasePlayerService: MusicPhrasePlayerService;
+  static needsGuidingResponsesTaskObjectFactory: NeedsGuidingResponsesTaskObjectFactory;
   static newlyCreatedTopicObjectFactory: NewlyCreatedTopicObjectFactory;
   static normalizeWhitespacePipe: NormalizeWhitespacePipe;
   static normalizeWhitespacePunctuationAndCasePipe: NormalizeWhitespacePunctuationAndCasePipe;
@@ -790,6 +814,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static stateRecordedVoiceoversService: StateRecordedVoiceoversService;
   static stateSolicitAnswerDetailsService: StateSolicitAnswerDetailsService;
   static stateSolutionService: StateSolutionService;
+  static stateStatsObjectFactory: StateStatsObjectFactory;
   static stateTopAnswersStatsBackendApiService: StateTopAnswersStatsBackendApiService;
   static stateWrittenTranslationsService: StateWrittenTranslationsService;
   static statesObjectFactory: StatesObjectFactory;
@@ -808,6 +833,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static subtopicPageContentsObjectFactory: SubtopicPageContentsObjectFactory;
   static subtopicPageObjectFactory: SubtopicPageObjectFactory;
   static subtopicViewerBackendApiService: SubtopicViewerBackendApiService;
+  static successiveIncorrectAnswersTaskObjectFactory: SuccessiveIncorrectAnswersTaskObjectFactory;
   static suggestionModalService: SuggestionModalService;
   static suggestionObjectFactory: SuggestionObjectFactory;
   static suggestionThreadObjectFactory: SuggestionThreadObjectFactory;
@@ -923,7 +949,11 @@ private explorationPermissionsBackendApiService: ExplorationPermissionsBackendAp
 private explorationPermissionsObjectFactory: ExplorationPermissionsObjectFactory,
 private explorationRecommendationsBackendApiService: ExplorationRecommendationsBackendApiService,
 private explorationRecommendationsService: ExplorationRecommendationsService,
+private explorationStatsBackendApiService: ExplorationStatsBackendApiService,
+private explorationStatsObjectFactory: ExplorationStatsObjectFactory,
+private explorationStatsService: ExplorationStatsService,
 private explorationSummaryObjectFactory: ExplorationSummaryObjectFactory,
+private explorationTaskObjectFactory: ExplorationTaskObjectFactory,
 private expressionSyntaxTreeService: ExpressionSyntaxTreeService,
 private extensionTagAssemblerService: ExtensionTagAssemblerService,
 private extractImageFilenamesFromStateService: ExtractImageFilenamesFromStateService,
@@ -940,6 +970,7 @@ private graphInputValidationService: GraphInputValidationService,
 private graphUtilsService: GraphUtilsService,
 private guestCollectionProgressObjectFactory: GuestCollectionProgressObjectFactory,
 private guestCollectionProgressService: GuestCollectionProgressService,
+private highBounceRateTaskObjectFactory: HighBounceRateTaskObjectFactory,
 private hintObjectFactory: HintObjectFactory,
 private htmlEscaperService: HtmlEscaperService,
 private i18nLanguageCodeService: I18nLanguageCodeService,
@@ -948,6 +979,7 @@ private imageClickInputValidationService: ImageClickInputValidationService,
 private imageFileObjectFactory: ImageFileObjectFactory,
 private improvementActionButtonObjectFactory: ImprovementActionButtonObjectFactory,
 private improvementsService: ImprovementsService,
+private ineffectiveFeedbackLoopTaskObjectFactory: IneffectiveFeedbackLoopTaskObjectFactory,
 private interactionDetailsCacheService: InteractionDetailsCacheService,
 private interactionObjectFactory: InteractionObjectFactory,
 private interactionRulesRegistryService: InteractionRulesRegistryService,
@@ -977,6 +1009,7 @@ private misconceptionObjectFactory: MisconceptionObjectFactory,
 private multipleChoiceInputValidationService: MultipleChoiceInputValidationService,
 private musicNotesInputValidationService: MusicNotesInputValidationService,
 private musicPhrasePlayerService: MusicPhrasePlayerService,
+private needsGuidingResponsesTaskObjectFactory: NeedsGuidingResponsesTaskObjectFactory,
 private newlyCreatedTopicObjectFactory: NewlyCreatedTopicObjectFactory,
 private normalizeWhitespacePipe: NormalizeWhitespacePipe,
 private normalizeWhitespacePunctuationAndCasePipe: NormalizeWhitespacePunctuationAndCasePipe,
@@ -1056,6 +1089,7 @@ private statePropertyService: StatePropertyService,
 private stateRecordedVoiceoversService: StateRecordedVoiceoversService,
 private stateSolicitAnswerDetailsService: StateSolicitAnswerDetailsService,
 private stateSolutionService: StateSolutionService,
+private stateStatsObjectFactory: StateStatsObjectFactory,
 private stateTopAnswersStatsBackendApiService: StateTopAnswersStatsBackendApiService,
 private stateWrittenTranslationsService: StateWrittenTranslationsService,
 private statesObjectFactory: StatesObjectFactory,
@@ -1074,6 +1108,7 @@ private subtopicObjectFactory: SubtopicObjectFactory,
 private subtopicPageContentsObjectFactory: SubtopicPageContentsObjectFactory,
 private subtopicPageObjectFactory: SubtopicPageObjectFactory,
 private subtopicViewerBackendApiService: SubtopicViewerBackendApiService,
+private successiveIncorrectAnswersTaskObjectFactory: SuccessiveIncorrectAnswersTaskObjectFactory,
 private suggestionModalService: SuggestionModalService,
 private suggestionObjectFactory: SuggestionObjectFactory,
 private suggestionThreadObjectFactory: SuggestionThreadObjectFactory,
@@ -1190,7 +1225,11 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.explorationPermissionsObjectFactory = this.explorationPermissionsObjectFactory;
     OppiaAngularRootComponent.explorationRecommendationsBackendApiService = this.explorationRecommendationsBackendApiService;
     OppiaAngularRootComponent.explorationRecommendationsService = this.explorationRecommendationsService;
+    OppiaAngularRootComponent.explorationStatsBackendApiService = this.explorationStatsBackendApiService;
+    OppiaAngularRootComponent.explorationStatsObjectFactory = this.explorationStatsObjectFactory;
+    OppiaAngularRootComponent.explorationStatsService = this.explorationStatsService;
     OppiaAngularRootComponent.explorationSummaryObjectFactory = this.explorationSummaryObjectFactory;
+    OppiaAngularRootComponent.explorationTaskObjectFactory = this.explorationTaskObjectFactory;
     OppiaAngularRootComponent.expressionSyntaxTreeService = this.expressionSyntaxTreeService;
     OppiaAngularRootComponent.extensionTagAssemblerService = this.extensionTagAssemblerService;
     OppiaAngularRootComponent.extractImageFilenamesFromStateService = this.extractImageFilenamesFromStateService;
@@ -1207,6 +1246,7 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.graphUtilsService = this.graphUtilsService;
     OppiaAngularRootComponent.guestCollectionProgressObjectFactory = this.guestCollectionProgressObjectFactory;
     OppiaAngularRootComponent.guestCollectionProgressService = this.guestCollectionProgressService;
+    OppiaAngularRootComponent.highBounceRateTaskObjectFactory = this.highBounceRateTaskObjectFactory;
     OppiaAngularRootComponent.hintObjectFactory = this.hintObjectFactory;
     OppiaAngularRootComponent.htmlEscaperService = this.htmlEscaperService;
     OppiaAngularRootComponent.i18nLanguageCodeService = this.i18nLanguageCodeService;
@@ -1216,6 +1256,7 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.improvementActionButtonObjectFactory = this.improvementActionButtonObjectFactory;
     OppiaAngularRootComponent.improvementsService = this.improvementsService;
     OppiaAngularRootComponent.interactionDetailsCacheService = this.interactionDetailsCacheService;
+    OppiaAngularRootComponent.ineffectiveFeedbackLoopTaskObjectFactory = this.ineffectiveFeedbackLoopTaskObjectFactory;
     OppiaAngularRootComponent.interactionObjectFactory = this.interactionObjectFactory;
     OppiaAngularRootComponent.interactionRulesRegistryService = this.interactionRulesRegistryService;
     OppiaAngularRootComponent.interactionSpecsService = this.interactionSpecsService;
@@ -1245,6 +1286,7 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.musicNotesInputValidationService = this.musicNotesInputValidationService;
     OppiaAngularRootComponent.musicPhrasePlayerService = this.musicPhrasePlayerService;
     OppiaAngularRootComponent.newlyCreatedTopicObjectFactory = this.newlyCreatedTopicObjectFactory;
+    OppiaAngularRootComponent.needsGuidingResponsesTaskObjectFactory = this.needsGuidingResponsesTaskObjectFactory;
     OppiaAngularRootComponent.normalizeWhitespacePipe = this.normalizeWhitespacePipe;
     OppiaAngularRootComponent.normalizeWhitespacePunctuationAndCasePipe = this.normalizeWhitespacePunctuationAndCasePipe;
     OppiaAngularRootComponent.numberAttemptsService = this.numberAttemptsService;
@@ -1324,6 +1366,7 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.stateSolicitAnswerDetailsService = this.stateSolicitAnswerDetailsService;
     OppiaAngularRootComponent.stateSolutionService = this.stateSolutionService;
     OppiaAngularRootComponent.stateTopAnswersStatsBackendApiService = this.stateTopAnswersStatsBackendApiService;
+    OppiaAngularRootComponent.stateStatsObjectFactory = this.stateStatsObjectFactory;
     OppiaAngularRootComponent.stateWrittenTranslationsService = this.stateWrittenTranslationsService;
     OppiaAngularRootComponent.statesObjectFactory = this.statesObjectFactory;
     OppiaAngularRootComponent.statsReportingBackendApiService = this.statsReportingBackendApiService;
@@ -1341,6 +1384,7 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.subtopicPageContentsObjectFactory = this.subtopicPageContentsObjectFactory;
     OppiaAngularRootComponent.subtopicPageObjectFactory = this.subtopicPageObjectFactory;
     OppiaAngularRootComponent.subtopicViewerBackendApiService = this.subtopicViewerBackendApiService;
+    OppiaAngularRootComponent.successiveIncorrectAnswersTaskObjectFactory = this.successiveIncorrectAnswersTaskObjectFactory;
     OppiaAngularRootComponent.suggestionModalService = this.suggestionModalService;
     OppiaAngularRootComponent.suggestionObjectFactory = this.suggestionObjectFactory;
     OppiaAngularRootComponent.suggestionThreadObjectFactory = this.suggestionThreadObjectFactory;
