@@ -23,6 +23,7 @@
         {
           "matchingUrlPattern": ".*",
           "assertions": {
+            "categories:accessibility": ["error", {"minScore": 1}],
             "first-contentful-paint": [ "warn", {"maxNumericValue": 1230000}],
             "first-meaningful-paint": ["warn", {"maxNumericValue": 1280000}],
             "first-cpu-idle": ["warn", {"maxNumericValue": 1460000}],
@@ -186,45 +187,6 @@
             "uses-text-compression": ["error", {"minScore": 0}],
             "uses-http2": ["error", {"minScore": 0}],
             "errors-in-console": ["error", {"minScore": 0}]
-          }
-        },
-        {
-          "matchingUrlPattern": "http://[^/]+/(|contact|about|donate|get-started|community-library|terms)$",
-          "assertions": {
-            "accesskeys": ["error", {"minScore": 1}],
-            "aria-allowed-attr": ["error", {"minScore": 1}],
-            "aria-required-attr": ["error", {"minScore": 1}],
-            "aria-required-children": ["error", {"minScore": 1}],
-            "aria-required-parent": ["error", {"minScore": 1}],
-            "aria-roles": ["error", {"minScore": 1}],
-            "aria-valid-attr-value": ["error", {"minScore": 1}],
-            "aria-valid-attr": ["error", {"minScore": 1}],
-            "audio-caption": ["error", {"minScore": 0}],
-            "button-name": ["error", {"minScore": 1}],
-            "bypass": ["error", {"minScore": 1}],
-            "dlitem": ["error", {"minScore": 1}],
-            "definition-list": ["error", {"minScore": 1}],
-            "document-title": ["error", {"minScore": 1}],
-            "duplicate-id": ["error", {"minScore": 0}],
-            "frame-title": ["error", {"minScore": 1}],
-            "html-has-lang": ["error", {"minScore": 1}],
-            "html-lang-valid": ["error", {"minScore": 1}],
-            "image-alt": ["error", {"minScore": 1}],
-            "input-image-alt": ["error", {"minScore": 1}],
-            "label": ["error", {"minScore": 1}],
-            "layout-table": ["error", {"minScore": 1}],
-            "link-name": ["error", {"minScore": 1}],
-            "list": ["error", {"minScore": 1}],
-            "listitem": ["error", {"minScore": 1}],
-            "meta-refresh": ["error", {"minScore": 1}],
-            "meta-viewport": ["error", {"minScore": 1}],
-            "object-alt": ["error", {"minScore": 1}],
-            "tabindex": ["error", {"minScore": 1}],
-            "td-headers-attr": ["error", {"minScore": 1}],
-            "th-has-data-cells": ["error", {"minScore": 1}],
-            "valid-lang": ["error", {"minScore": 1}],
-            "video-caption": ["error", {"minScore": 1}],
-            "video-description": ["error", {"minScore": 1}]
           }
         }
       ]
