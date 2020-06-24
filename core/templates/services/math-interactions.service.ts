@@ -16,8 +16,8 @@
  * @fileoverview Service for providing helper functions for math interactions.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
 const nerdamer = require('nerdamer');
 
