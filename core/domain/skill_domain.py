@@ -1313,7 +1313,7 @@ class AugmentedSkillSummary(python_utils.OBJECT):
             self, skill_id, description, language_code, version,
             misconception_count, worked_examples_count, topic_name,
             classroom_name, skill_model_created_on, skill_model_last_updated):
-        """Constructs a AugmentedSkillSummary domain object.
+        """Constructs an AugmentedSkillSummary domain object.
 
         Args:
             skill_id: str. The unique id of the skill.

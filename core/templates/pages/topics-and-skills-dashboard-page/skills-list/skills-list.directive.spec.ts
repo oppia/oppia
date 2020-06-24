@@ -162,11 +162,13 @@ describe('Skills List Directive', function() {
       };
       var skillId = 'CdjnJUE332dd';
 
-      spyOn(EditableTopicBackendApiService, 'updateTopic').and.returnValue(
-        $q.resolve());
+      var topicUpdateSpy = (spyOn(
+        EditableTopicBackendApiService, 'updateTopic').and.returnValue(
+        $q.resolve()));
 
       ctrl.assignSkillToTopic(skillId);
       $timeout.flush(100);
+      expect(topicUpdateSpy).toHaveBeenCalled();
       expect(broadcastSpy).toHaveBeenCalledWith(
         'topicsAndSkillsDashboardReinitialized', true);
     });

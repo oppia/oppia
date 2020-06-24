@@ -302,23 +302,12 @@ def get_filtered_skill_summaries(
     """
     augmented_skill_summaries = []
 
-    augmented_skill_summaries_batch, new_urlsafe_start_cursor, more = (
-        _get_augmented_skill_summaries_in_batches(
-            num_skills_to_fetch, urlsafe_start_cursor, sort_by))
-    filtered_augmented_skill_summaries = _filter_skills_by_status(
-        augmented_skill_summaries_batch, status)
-    filtered_augmented_skill_summaries = _filter_skills_by_classroom(
-        filtered_augmented_skill_summaries, classroom_name)
+    more = True
 
-    filtered_augmented_skill_summaries = _filter_skills_by_keywords(
-        filtered_augmented_skill_summaries, keywords)
-    augmented_skill_summaries.extend(filtered_augmented_skill_summaries)
-
-    while (len(augmented_skill_summaries) < num_skills_to_fetch
-           and more and new_urlsafe_start_cursor):
+    while len(augmented_skill_summaries) < num_skills_to_fetch and more:
         augmented_skill_summaries_batch, new_urlsafe_start_cursor, more = (
             _get_augmented_skill_summaries_in_batches(
-                num_skills_to_fetch, new_urlsafe_start_cursor, sort_by))
+                num_skills_to_fetch, urlsafe_start_cursor, sort_by))
 
         filtered_augmented_skill_summaries = _filter_skills_by_status(
             augmented_skill_summaries_batch, status)
@@ -353,8 +342,9 @@ def _get_augmented_skill_summaries_in_batches(
     assigned_skill_ids = {}
 
     all_topic_models = topic_models.TopicModel.get_all()
-    all_topic_ids = [topic_model.id for topic_model in all_topic_models]
-    all_topics = topic_fetchers.get_topics_by_ids(all_topic_ids)
+    all_topics = [topic_fetchers.get_topic_from_model(topic_model)
+                  if topic_model is not None else None
+                  for topic_model in all_topic_models]
 
     topic_classroom_dict = {}
     all_classrooms_dict = config_domain.TOPIC_IDS_FOR_CLASSROOM_PAGES.value

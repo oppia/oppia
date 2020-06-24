@@ -122,7 +122,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'correctness-footer.directive.ts',
     'create-activity-button.directive.ts',
     'create-feedback-thread-modal.controller.ts',
-    'creator-dashboard-page.component.ts',
     'csrf-token.service.ts',
     'current-interaction.service.ts',
     'customize-interaction-modal.controller.ts',

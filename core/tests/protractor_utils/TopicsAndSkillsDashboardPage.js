@@ -69,8 +69,8 @@ var TopicsAndSkillsDashboardPage = function() {
   var confirmSkillDeletionButton = element(
     by.css('.protractor-test-confirm-skill-deletion-button')
   );
-  var unusedSkillsTabButton = element(
-    by.css('.protractor-test-unused-skills-tab')
+  var skillsTabButton = element(
+    by.css('.protractor-test-skills-tab')
   );
   var assignSkillToTopicButtons = element.all(
     by.css('.protractor-test-assign-skill-to-topic-button'));
@@ -80,8 +80,6 @@ var TopicsAndSkillsDashboardPage = function() {
     by.css('.protractor-test-merge-skills-button'));
   var confirmSkillsMergeButton = element(
     by.css('.protractor-test-confirm-skill-selection-button'));
-  var editConceptCardExplanationButton = element(
-    by.css('.protractor-test-edit-concept-card'));
   var openConceptCardExplanationButton = element(
     by.css('.protractor-test-open-concept-card'));
   var saveConceptCardExplanationButton = element(
@@ -94,7 +92,7 @@ var TopicsAndSkillsDashboardPage = function() {
     by.css('.protractor-test-photo-button'));
   var thumbnailContainer = element(
     by.css('.protractor-test-thumbnail-container'));
-  var skillStatusFilter = element(
+  var skillStatusFilterDropdown = element(
     by.css('.protractor-test-select-skill-status-dropdown'));
 
   // Returns a promise of all topics with the given name.
@@ -243,10 +241,10 @@ var TopicsAndSkillsDashboardPage = function() {
 
   this.filterSkillsByStatus = async function(status) {
     await waitFor.visibilityOf(
-      skillStatusFilter,
+      skillStatusFilterDropdown,
       'Skill Dashboard status filter taking too long to appear.');
 
-    await skillStatusFilter.click();
+    await skillStatusFilterDropdown.click();
     await (
       await browser.driver.switchTo().activeElement()
     ).sendKeys(status + '\n');
@@ -301,11 +299,11 @@ var TopicsAndSkillsDashboardPage = function() {
   };
 
   this.deleteSkillWithIndex = async function(index) {
-    var elems = await deleteSkillButtons;
+    var elems = await deleteSkillButtons.get(index);
     await waitFor.elementToBeClickable(
-      elems[0],
+      elems,
       'Delete skill button takes too long to be clickable');
-    await elems[0].click();
+    await elems.click();
     await waitFor.elementToBeClickable(
       confirmSkillDeletionButton,
       'Confirm Delete Skill button takes too long to be clickable');
@@ -365,12 +363,11 @@ var TopicsAndSkillsDashboardPage = function() {
     await waitFor.pageToFullyLoad();
   };
 
-  this.navigateToUnusedSkillsTab = async function() {
+  this.navigateToSkillsTab = async function() {
     await waitFor.elementToBeClickable(
-      unusedSkillsTabButton,
+      skillsTabButton,
       'Unused skills tab button taking too long to be clickable');
-    await unusedSkillsTabButton.click();
-    await this.filterSkillsByStatus('Unassigned');
+    await skillsTabButton.click();
   };
 
   this.expectNumberOfTopicsToBe = async function(number) {
@@ -399,9 +396,7 @@ var TopicsAndSkillsDashboardPage = function() {
   };
 
   this.expectNumberOfSkillsToBe = async function(number) {
-    await this.filterSkillsByStatus('Unassigned');
-    var elems = await skillsListItems;
-    expect(elems.length).toBe(number);
+    expect(await skillsListItems.count()).toEqual(number);
   };
 
   this.searchSkillByName = async function(name) {

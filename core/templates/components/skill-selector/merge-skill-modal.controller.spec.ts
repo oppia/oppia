@@ -19,14 +19,6 @@
 describe('Merge Skill Modal Controller', function() {
   var $scope = null;
   var $uibModalInstance = null;
-  var skillDict = {
-    id: '1',
-    description: 'test description',
-    misconceptions: [],
-    language_code: 'en',
-    version: 3,
-    prerequisite_skill_ids: []
-  };
   var categorizedSkills = [];
   var skill = {};
   var skillSummaries = {};
@@ -42,32 +34,6 @@ describe('Merge Skill Modal Controller', function() {
     $controller('MergeSkillModalController', {
       $scope: $scope,
       $uibModalInstance: $uibModalInstance,
-      skillSummaries: [skillDict],
-      skill: skillDict,
-      categorizedSkills: []
-    });
-  }));
-
-  it('should close modal with the correct value', function() {
-    expect($scope.skillSummaries).toEqual([skillDict]);
-    expect($scope.allowSkillsFromOtherTopics).toEqual(true);
-    expect($scope.categorizedSkills).toEqual([]);
-    var result = {
-      skill: skillDict,
-      supersedingSkillId: $scope.selectedSkillId
-    };
-    $scope.confirm();
-    expect($uibModalInstance.close).toHaveBeenCalledWith(result);
-  });
-
-
-  it('should dismiss modal with the correct value', function() {
-    var result = {
-      skill: skillDict,
-      supersedingSkillId: $scope.selectedSkillId
-    };
-    $scope.save();
-    expect($uibModalInstance.close).toHaveBeenCalledWith(result);
       categorizedSkills: categorizedSkills,
       skill: skill,
       skillSummaries: skillSummaries

@@ -379,10 +379,12 @@ describe('Topics and Skills Dashboard Page', function() {
       function() {
         expect(ctrl.activeTab).toEqual('skills');
         ctrl.more = false;
+        ctrl.pageNumber = 2;
         spyOn(ctrl, 'isNextSkillPagePresent').and.returnValue(true);
-        var paginateSkillSpy = spyOn(ctrl, 'goToPageNumber');
+        var paginateSkillSpy = spyOn(ctrl, 'goToPageNumber').and.callThrough();
         ctrl.navigateSkillPage('next_page');
         expect(paginateSkillSpy).toHaveBeenCalled();
+        expect(ctrl.pageNumber).toEqual(3);
       });
 
     it('should change page number after fetching skills', function() {
@@ -405,12 +407,6 @@ describe('Topics and Skills Dashboard Page', function() {
       var skillSpy = spyOn(ctrl, 'fetchSkills');
       ctrl.navigateSkillPage('next_page');
       expect(skillSpy).toHaveBeenCalled();
-    });
-
-    it('should navigate skill page backward', function() {
-      ctrl.pageNumber = 3;
-      ctrl.navigateSkillPage('prev_page');
-      expect(ctrl.pageNumber).toEqual(2);
     });
 
     it('should navigate skill page backward', function() {
