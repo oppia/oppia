@@ -390,6 +390,7 @@ class Solution(python_utils.OBJECT):
         to the conversion function.
 
         Args:
+            interaction_id: str. The interaction id.
             solution_dict: dict. The Solution dict.
             conversion_fn: function. The function to be used for converting the
                 HTML.
@@ -411,13 +412,14 @@ class Solution(python_utils.OBJECT):
             html_field_types_to_rule_specs_dict = json.loads(
                 utils.get_file_contents(
                     feconf.HTML_FIELD_TYPES_TO_RULE_SPECS_FILE_PATH))
-
             if solution_dict['correct_answer']:
                 for html_type in html_field_types_to_rule_specs_dict.keys():
                     if html_type == interaction.answer_type:
+
                         if (
                                 html_type ==
                                 feconf.ANSWER_TYPE_LIST_OF_SETS_OF_HTML):
+
                             for list_index, html_list in enumerate(
                                     solution_dict['correct_answer']):
                                 for answer_html_index, answer_html in enumerate(
@@ -1294,10 +1296,12 @@ class WrittenTranslations(python_utils.OBJECT):
             written_translations_dict, conversion_fn):
         """Checks for HTML fields in the written translations and converts it
         according to the conversion function.
+
         Args:
             written_translations_dict: dict. The written translations dict.
             conversion_fn: function. The function to be used for converting the
                 HTML.
+
         Returns:
             dict. The converted written translations dict.
         """
@@ -2442,9 +2446,19 @@ class State(python_utils.OBJECT):
                     state_dict['interaction']['id'],
                     state_dict['interaction']['solution'], conversion_fn))
 
-        if state_dict['interaction']['id'] in (
-                'ItemSelectionInput', 'MultipleChoiceInput',
-                'DragAndDropSortInput'):
+        if state_dict['interaction']['id'] is None:
+            return state_dict
+
+        interaction = (
+            interaction_registry.Registry.get_interaction_by_id(
+                state_dict['interaction']['id']))
+        interaction_customization_arg_has_html = False
+        for customization_arg_spec in interaction.customization_arg_specs:
+            schema = customization_arg_spec.schema
+            if schema['type'] == 'list' and schema['items']['type'] == 'html':
+                interaction_customization_arg_has_html = True
+
+        if interaction_customization_arg_has_html:
             for value_index, value in enumerate(
                     state_dict['interaction']['customization_args'][
                         'choices']['value']):

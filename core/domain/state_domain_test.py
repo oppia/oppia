@@ -668,6 +668,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'The solution does not have a valid '
             'correct_answer type.'):
             state.get_all_html_content_strings()
+        interaction.answer_type = 'ListOfSetsOfHtmlStrings'
 
     def test_get_all_html_when_interaction_is_none(self):
         """Test the method for extracting all the HTML from a state
@@ -1523,7 +1524,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'solicit_answer_details': False,
             'classifier_model_id': None,
             'interaction': {
-                'solution': None,
                 'answer_groups': [answer_group_dict_with_old_math_schema],
                 'default_outcome': {
                     'param_changes': [],
@@ -1554,12 +1554,39 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 },
                 'confirmed_unclassified_answers': [],
                 'id': 'DragAndDropSortInput',
-                'hints': []
+                'hints': [
+                    {
+                        'hint_content': {
+                            'content_id': 'hint_1',
+                            'html': html_with_old_math_schema
+                        }
+                    },
+                    {
+                        'hint_content': {
+                            'content_id': 'hint_2',
+                            'html': html_with_old_math_schema
+                        }
+                    }
+                ],
+                'solution': {
+                    'interaction_id': '',
+                    'answer_is_exclusive': True,
+                    'correct_answer': [
+                        [html_with_old_math_schema],
+                        ['<p>2</p>'],
+                        ['<p>3</p>'],
+                        ['<p>4</p>']
+                    ],
+                    'explanation': {
+                        'content_id': 'solution',
+                        'html': '<p>This is solution for state1</p>'
+                    }
+                }
+
             },
             'written_translations': (
                 written_translations_dict_with_old_math_schema)
         }
-
 
         state_dict_with_new_math_schema = {
             'content': {
@@ -1570,7 +1597,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'solicit_answer_details': False,
             'classifier_model_id': None,
             'interaction': {
-                'solution': None,
                 'answer_groups': [answer_group_dict_with_new_math_schema],
                 'default_outcome': {
                     'param_changes': [],
@@ -1601,7 +1627,35 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 },
                 'confirmed_unclassified_answers': [],
                 'id': 'DragAndDropSortInput',
-                'hints': []
+                'hints': [
+                    {
+                        'hint_content': {
+                            'content_id': 'hint_1',
+                            'html': html_with_new_math_schema
+                        }
+                    },
+                    {
+                        'hint_content': {
+                            'content_id': 'hint_2',
+                            'html': html_with_new_math_schema
+                        }
+                    }
+                ],
+                'solution': {
+                    'interaction_id': '',
+                    'answer_is_exclusive': True,
+                    'correct_answer': [
+                        [html_with_new_math_schema],
+                        ['<p>2</p>'],
+                        ['<p>3</p>'],
+                        ['<p>4</p>']
+                    ],
+                    'explanation': {
+                        'content_id': 'solution',
+                        'html': '<p>This is solution for state1</p>'
+                    }
+                }
+
             },
             'written_translations': (
                 written_translations_dict_with_new_math_schema)
@@ -1708,7 +1762,20 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'solicit_answer_details': False,
             'classifier_model_id': None,
             'interaction': {
-                'solution': None,
+                'solution': {
+                    'interaction_id': '',
+                    'answer_is_exclusive': True,
+                    'correct_answer': [
+                        html_with_old_math_schema,
+                        '<p>state customization arg html 2</p>',
+                        '<p>state customization arg html 3</p>',
+                        '<p>state customization arg html 4</p>'
+                    ],
+                    'explanation': {
+                        'content_id': 'solution',
+                        'html': '<p>This is solution for state1</p>'
+                    }
+                },
                 'answer_groups': answer_group_with_old_math_schema,
                 'default_outcome': {
                     'param_changes': [],
@@ -1749,7 +1816,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             }
         }
 
-
         state_dict_with_new_math_schema = {
             'content': {
                 'content_id': 'content', 'html': 'Hello!'
@@ -1759,7 +1825,20 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'solicit_answer_details': False,
             'classifier_model_id': None,
             'interaction': {
-                'solution': None,
+                'solution': {
+                    'interaction_id': '',
+                    'answer_is_exclusive': True,
+                    'correct_answer': [
+                        html_with_new_math_schema,
+                        '<p>state customization arg html 2</p>',
+                        '<p>state customization arg html 3</p>',
+                        '<p>state customization arg html 4</p>'
+                    ],
+                    'explanation': {
+                        'content_id': 'solution',
+                        'html': '<p>This is solution for state1</p>'
+                    }
+                },
                 'answer_groups': answer_group_with_new_math_schema,
                 'default_outcome': {
                     'param_changes': [],
@@ -1799,6 +1878,11 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'hints': []
             }
         }
+        interaction = (
+            interaction_registry.Registry.get_interaction_by_id(
+                'ItemSelectionInput'))
+        interaction.can_have_solution = True
+
         self.assertEqual(
             state_domain.State.convert_html_fields_in_state(
                 state_dict_with_old_math_schema,
@@ -2185,6 +2269,90 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 Exception,
                 'Rule spec should have at least one valid input variable with '
                 'Html in it.'):
+                state_domain.State.convert_html_fields_in_state(
+                    state_dict_with_old_math_schema,
+                    html_validation_service.
+                    add_math_content_to_math_rte_components)
+
+    def test_convert_html_fields_in_rule_spec_with_invalid_correct_answer(self):
+        """Test the method for converting the HTML in a state when the
+        interaction solution has invalid answer type.
+        """
+        html_with_old_math_schema = (
+            '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&a'
+            'mp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>')
+
+        state_dict_with_old_math_schema = {
+            'content': {
+                'content_id': 'content', 'html': html_with_old_math_schema
+            },
+            'param_changes': [],
+            'content_ids_to_audio_translations': {'content': {}},
+            'solicit_answer_details': False,
+            'classifier_model_id': None,
+            'interaction': {
+                'solution': {
+                    'interaction_id': '',
+                    'answer_is_exclusive': True,
+                    'correct_answer': 'Answer1',
+                    'explanation': {
+                        'content_id': 'solution',
+                        'html': html_with_old_math_schema
+                    }
+                },
+                'answer_groups': [],
+                'default_outcome': {
+                    'param_changes': [],
+                    'feedback': {
+                        'content_id': 'default_outcome',
+                        'html': html_with_old_math_schema
+                    },
+                    'dest': 'Introduction',
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None,
+                    'labelled_as_correct': False
+                },
+                'customization_args': {
+                    'rows': {
+                        'value': 1
+                    },
+                    'placeholder': {
+                        'value': ''
+                    }
+                },
+                'confirmed_unclassified_answers': [],
+                'id': 'TextInput',
+                'hints': [
+                    {
+                        'hint_content': {
+                            'content_id': 'hint_1',
+                            'html': html_with_old_math_schema
+                        }
+                    },
+                    {
+                        'hint_content': {
+                            'content_id': 'hint_2',
+                            'html': html_with_old_math_schema
+                        }
+                    }
+                ]
+            }
+        }
+
+        mock_html_field_types_to_rule_specs_dict = json.loads(
+            utils.get_file_contents(
+                feconf.HTML_FIELD_TYPES_TO_RULE_SPECS_FILE_PATH))
+        mock_html_field_types_to_rule_specs_dict['NormalizedString'] = (
+            mock_html_field_types_to_rule_specs_dict.pop('SetOfHtmlString'))
+
+        def mock_get_file_contents(unused_file_path):
+            return json.dumps(mock_html_field_types_to_rule_specs_dict)
+
+        with self.swap(utils, 'get_file_contents', mock_get_file_contents):
+            with self.assertRaisesRegexp(
+                Exception,
+                'The solution does not have a valid '
+                'correct_answer type.'):
                 state_domain.State.convert_html_fields_in_state(
                     state_dict_with_old_math_schema,
                     html_validation_service.

@@ -1025,53 +1025,6 @@ def validate_math_tags_in_html_with_attribute_math_content(html_string):
     return error_list
 
 
-def add_math_content_to_math_rte_components(html_string):
-    """Replaces the attribute raw_latex-with-value in all Math component tags
-    with a new attribute math_content-with-value. The new attribute has an
-    additional field for storing SVG filenames. The field for SVG filename will
-    be an empty string.
-
-    Args:
-        html_string: str. HTML string to modify.
-
-    Returns:
-        str. Updated HTML string with all Math component tags having the new
-        attribute.
-    """
-    soup = bs4.BeautifulSoup(
-        html_string.encode(encoding='utf-8'), 'html.parser')
-    for math_tag in soup.findAll(name='oppia-noninteractive-math'):
-        if math_tag.has_attr('raw_latex-with-value'):
-            try:
-                # The raw_latex attribute value should be enclosed in
-                # double quotes(&amp;quot;) and should be a valid unicode
-                # string.
-                raw_latex = (
-                    json.loads(unescape_html(math_tag['raw_latex-with-value'])))
-                normailzed_raw_latex = (
-                    objects.UnicodeString.normalize(raw_latex))
-            except Exception as e:
-                error_message = (
-                    'Invalid raw_latex value found in the math tag : %s' % (
-                        python_utils.UNICODE(e)))
-                raise Exception(error_message)
-            math_content_dict = {
-                'raw_latex': normailzed_raw_latex,
-                'svg_filename': ''
-            }
-            math_tag['math_content-with-value'] = (
-                escape_html(
-                    json.dumps(math_content_dict, sort_keys=True)))
-            # Delete the attribute raw_latex-with-value.
-            del math_tag['raw_latex-with-value']
-        else:
-            raise Exception(
-                'Invalid math tag with no proper attribute found.')
-    # We need to replace the <br/> tags (if any) with  <br> because for passing
-    # the textangular migration tests we need to have only <br> tags.
-    return python_utils.UNICODE(soup).replace('<br/>', '<br>')
-
-
 def is_parsable_as_xml(xml_string):
     """Checks if input string is parsable as XML.
 

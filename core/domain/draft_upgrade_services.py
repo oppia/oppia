@@ -142,9 +142,8 @@ class DraftUpgradeUtil(python_utils.OBJECT):
                     for hint_dict in new_value]
             elif (change.property_name ==
                   exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION):
-                new_value = (
-                    state_domain.Solution.convert_html_in_solution(
-                        new_value, conversion_fn))
+                new_value['explanation']['html'] = (
+                    conversion_fn(new_value['explanation']['html']))
             elif (change.property_name ==
                   exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
                 new_value = [
