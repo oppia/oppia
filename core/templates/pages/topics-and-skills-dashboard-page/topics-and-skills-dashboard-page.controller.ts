@@ -193,7 +193,7 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
 
           ctrl.initSkillDashboard = function() {
             ctrl.skillStatusOptions = [];
-            ctrl.more = true;
+            ctrl.moreSkillsPresent = true;
             ctrl.firstTimeFetchingSkills = true;
             for (let key in SKILL_STATUS_OPTIONS) {
               ctrl.skillStatusOptions.push(SKILL_STATUS_OPTIONS[key]);
@@ -230,12 +230,12 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
           };
 
           ctrl.fetchSkills = function() {
-            if (ctrl.more) {
+            if (ctrl.moreSkillsPresent) {
               TopicsAndSkillsDashboardBackendApiService
                 .fetchSkillsDashboardData(
                   ctrl.filterObject, ctrl.itemsPerPage, ctrl.nextCursor).then(
                   (response) => {
-                    ctrl.more = response.more;
+                    ctrl.moreSkillsPresent = response.more;
                     ctrl.nextCursor = response.next_cursor;
                     ctrl.skillSummaries.push(...response.skill_summary_dicts);
                     ctrl.currentCount = ctrl.skillSummaries.length;
@@ -281,7 +281,7 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
 
           ctrl.applyFilters = function() {
             if (ctrl.activeTab === ctrl.TAB_NAME_SKILLS) {
-              ctrl.more = true;
+              ctrl.moreSkillsPresent = true;
               ctrl.firstTimeFetchingSkills = true;
               ctrl.skillSummaries = [];
               ctrl.nextCursor = null;

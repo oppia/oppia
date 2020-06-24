@@ -364,12 +364,12 @@ describe('Topics and Skills Dashboard Page', function() {
     it('should paginate if skills are present in memory instead of fetching',
       function() {
         expect(ctrl.activeTab).toEqual('skills');
-        ctrl.more = true;
+        ctrl.moreSkillsPresent = true;
         ctrl.fetchSkills();
         ctrl.itemsPerPage = 1;
         ctrl.skillPageNumber = 1;
         var paginateSkillSpy = spyOn(ctrl, 'goToPageNumber');
-        ctrl.more = false;
+        ctrl.moreSkillsPresent = false;
         ctrl.fetchSkills();
         expect(paginateSkillSpy).toHaveBeenCalled();
       });
@@ -378,7 +378,7 @@ describe('Topics and Skills Dashboard Page', function() {
     it('should paginate forward without fetching if skills are present',
       function() {
         expect(ctrl.activeTab).toEqual('skills');
-        ctrl.more = false;
+        ctrl.moreSkillsPresent = false;
         ctrl.pageNumber = 2;
         spyOn(ctrl, 'isNextSkillPagePresent').and.returnValue(true);
         var paginateSkillSpy = spyOn(ctrl, 'goToPageNumber').and.callThrough();
@@ -390,7 +390,7 @@ describe('Topics and Skills Dashboard Page', function() {
     it('should change page number after fetching skills', function() {
       ctrl.pageNumber = 1;
       ctrl.firstTimeFetchingSkills = false;
-      ctrl.more = true;
+      ctrl.moreSkillsPresent = true;
       ctrl.fetchSkills();
       $rootScope.$apply();
       expect(ctrl.pageNumber).toEqual(2);

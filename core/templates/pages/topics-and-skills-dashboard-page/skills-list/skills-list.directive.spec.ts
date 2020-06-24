@@ -46,8 +46,8 @@ describe('Skills List Directive', function() {
     $httpBackend = $injector.get('$httpBackend');
     $timeout = $injector.get('$timeout');
     $q = $injector.get('$q');
-    TopicsAndSkillsDashboardBackendApiService =
-        $injector.get('TopicsAndSkillsDashboardBackendApiService');
+    TopicsAndSkillsDashboardBackendApiService = (
+      $injector.get('TopicsAndSkillsDashboardBackendApiService'));
     var MockTopicsAndSkillsDashboardBackendApiService = {
       mergeSkills: () => {
         var deferred = $q.defer();

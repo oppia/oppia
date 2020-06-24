@@ -301,13 +301,13 @@ def get_filtered_skill_summaries(
                 batch. If False, there are no further results after this batch.
     """
     augmented_skill_summaries = []
-
+    new_urlsafe_start_cursor = urlsafe_start_cursor
     more = True
 
     while len(augmented_skill_summaries) < num_skills_to_fetch and more:
         augmented_skill_summaries_batch, new_urlsafe_start_cursor, more = (
             _get_augmented_skill_summaries_in_batches(
-                num_skills_to_fetch, urlsafe_start_cursor, sort_by))
+                num_skills_to_fetch, new_urlsafe_start_cursor, sort_by))
 
         filtered_augmented_skill_summaries = _filter_skills_by_status(
             augmented_skill_summaries_batch, status)

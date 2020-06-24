@@ -3,13 +3,13 @@
 </div>
 
 <form ng-submit="createNewSkill()">
-  <div class="modal-body">
-    <div class="oppia-rule-details-header" style="margin-bottom: 0.5em; margin-top: 1em;">
+  <div class="modal-body create-new-skill-modal">
+    <div class="skill-description-header">
       <strong>Skill Description</strong>
     </div>
     <input type="text" class="form-control protractor-test-new-skill-description-field"
            placeholder="eg: Adding Fractions" ng-change="updateSkillDescription()" ng-model="newSkillDescription"
-           maxlength="<[MAX_CHARS_IN_SKILL_DESCRIPTION]>">
+           autofocus maxlength="<[MAX_CHARS_IN_SKILL_DESCRIPTION]>">
     <span class="oppia-input-box-subtitle">
       <i>
         Skill description should be at most <[MAX_CHARS_IN_SKILL_DESCRIPTION]> characters.
@@ -47,7 +47,13 @@
   </div>
 </form>
 <style>
-  .skill-description-error-message {
+  .create-new-skill-modal .skill-description-header {
+    margin-bottom: 6px;
+    margin-top: 1em;
+    width: 100%;
+  }
+
+  .create-new-skill-modal .skill-description-error-message {
     color: red;
     display: block;
     font-size: 0.8em;
