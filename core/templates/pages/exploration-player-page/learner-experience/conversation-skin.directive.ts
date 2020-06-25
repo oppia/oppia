@@ -49,6 +49,7 @@ require('domain/question/pretest-question-backend-api.service.ts');
 require('domain/skill/concept-card-backend-api.service.ts');
 require('domain/skill/ConceptCardObjectFactory.ts');
 require('domain/state_card/StateCardObjectFactory.ts');
+require('domain/state/StateObjectFactory.ts');
 require('domain/story_viewer/ReadOnlyStoryNodeObjectFactory.ts');
 require('domain/story_viewer/story-viewer-backend-api.service.ts');
 require('domain/topic_viewer/topic-viewer-domain.constants.ajs.ts');
@@ -362,7 +363,7 @@ angular.module('oppia').directive('conversationSkin', [
         'ReadOnlyCollectionBackendApiService',
         'RefresherExplorationConfirmationModalService',
         'SiteAnalyticsService',
-        'StateCardObjectFactory', 'StatsReportingService',
+        'StateCardObjectFactory', 'StateObjectFactory', 'StatsReportingService',
         'StoryViewerBackendApiService', 'UrlService', 'UserService',
         'WindowDimensionsService', 'COMPONENT_NAME_FEEDBACK',
         'CONTENT_FOCUS_LABEL_PREFIX', 'CONTINUE_BUTTON_FOCUS_LABEL',
@@ -393,7 +394,7 @@ angular.module('oppia').directive('conversationSkin', [
             ReadOnlyCollectionBackendApiService,
             RefresherExplorationConfirmationModalService,
             SiteAnalyticsService,
-            StateCardObjectFactory, StatsReportingService,
+            StateCardObjectFactory, StateObjectFactory, StatsReportingService,
             StoryViewerBackendApiService, UrlService, UserService,
             WindowDimensionsService, COMPONENT_NAME_FEEDBACK,
             CONTENT_FOCUS_LABEL_PREFIX, CONTINUE_BUTTON_FOCUS_LABEL,
@@ -433,7 +434,8 @@ angular.module('oppia').directive('conversationSkin', [
               entityId, state, answer, interactionRulesService,
               alwaysAskLearnerForAnswerInfo) {
             LearnerAnswerInfoService.initLearnerAnswerInfoService(
-              entityId, state, answer, interactionRulesService,
+              entityId, StateObjectFactory.createFromBackendDict('new state',
+                state), answer, interactionRulesService,
               alwaysAskLearnerForAnswerInfo);
           };
 
@@ -848,10 +850,12 @@ angular.module('oppia').directive('conversationSkin', [
             if (!ExplorationPlayerStateService.isInQuestionMode() &&
               !$scope.isInPreviewMode &&
               ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE) {
+              var tempState = ExplorationEngineService.getState();
+              tempState = StateObjectFactory.createFromBackendDict(
+                'new state', tempState);
               initLearnerAnswerInfoService(
-                $scope.explorationId, ExplorationEngineService.getState(),
-                answer, interactionRulesService,
-                alwaysAskLearnerForAnswerDetails());
+                $scope.explorationId, tempState, answer,
+                interactionRulesService, alwaysAskLearnerForAnswerDetails());
             }
 
             NumberAttemptsService.submitAttempt();

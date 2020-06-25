@@ -233,6 +233,8 @@ import { LearnerAnswerDetailsObjectFactory } from
   'domain/statistics/LearnerAnswerDetailsObjectFactory';
 import { LearnerAnswerInfoObjectFactory } from
   'domain/statistics/LearnerAnswerInfoObjectFactory';
+import { LearnerAnswerInfoService } from
+  'pages/exploration-player-page/services/learner-answer-info.service';
 import { LearnerDashboardActivityIdsObjectFactory } from
   'domain/learner_dashboard/LearnerDashboardActivityIdsObjectFactory';
 import { LearnerDashboardBackendApiService } from
@@ -1266,6 +1268,9 @@ export class UpgradedServices {
         upgradedServices['UrlInterpolationService']);
 
     // Topological level: 6.
+    upgradedServices['LearnerAnswerInfoService'] = new LearnerAnswerInfoService(
+      upgradedServices['AnswerClassificationService'],
+      upgradedServices['LearnerAnswerDetailsBackendApiService']);
     upgradedServices['PlaythroughService'] =
       new PlaythroughService(
         upgradedServices['HttpClient'],
