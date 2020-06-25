@@ -134,7 +134,7 @@ angular.module('oppia').component('stewardsLandingPage', {
           subscribe(evt => {
             ctrl.windowIsNarrow = isWindowNarrow(
               WindowDimensionsService.getWidth());
-            $scope.$apply();
+            $scope.$applyAsync();
           });
       };
 

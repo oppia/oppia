@@ -87,7 +87,6 @@ describe('Topic info tab controller', function() {
       // WindowDimensionsService is declared.
       ctrlScope.$onInit();
       expect(ctrlScope.screenHasSmallWidth).toBe(true);
-      outerScope.$apply();
     });
   });
 });

@@ -50,7 +50,7 @@ angular.module('oppia').directive('explorationFooter', [
               subscribe(evt => {
                 $scope.windowIsNarrow = (
                   WindowDimensionsService.isWindowNarrow());
-                $scope.$apply();
+                $scope.$applyAsync();
               });
             $scope.contributorNames = [];
             if (!ContextService.isInQuestionPlayerMode()) {
