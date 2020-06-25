@@ -13,7 +13,7 @@
 
 /*
   CSS file with valid syntax, used for testing in scripts/linters/
-  css_linter_test.py.
+  css_linter_test.py. This file contain valid file syntax.
 */
 @-webkit-keyframes dot {
   0% { opacity: 0; }

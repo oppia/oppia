@@ -136,8 +136,20 @@ class CodeOwnerLinterTests(test_utils.GenericTestBase):
                  'important rule.'], self.linter_stdout))
 
     def test_check_codeowner_file_with_success_message(self):
-        with self.print_swap:
-            codeowner_linter.check_codeowner_file(FILE_CACHE, False)
+        mock_valid_codeowner_filepath = os.path.join(
+            LINTER_TESTS_DIR, 'valid_codeowners')
+        codeowner_path_swap = self.swap(
+            codeowner_linter, 'CODEOWNER_FILEPATH',
+            mock_valid_codeowner_filepath)
+
+        mock_codeowner_important_paths = CODEOWNER_IMPORTANT_PATHS
+        codeowner_important_paths_swap = self.swap(
+            codeowner_linter, 'CODEOWNER_IMPORTANT_PATHS',
+            mock_codeowner_important_paths)
+
+        with self.print_swap, codeowner_path_swap:
+            with codeowner_important_paths_swap:
+                codeowner_linter.check_codeowner_file(FILE_CACHE, False)
         self.assertTrue(
             test_utils.assert_same_list_elements(
                 ['SUCCESS  CODEOWNERS file check passed'], self.linter_stdout))

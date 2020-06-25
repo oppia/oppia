@@ -14,7 +14,7 @@
 
 /**
  * @fileoverview Valid syntax .js file, used in scripts/linters/
- * js_ts_linter_test.py.
+ * js_ts_linter_test.py. This file contain valid js syntax.
  */
 
 var forms = require('/protractor_utils/forms.js');

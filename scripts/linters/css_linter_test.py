@@ -82,7 +82,7 @@ class ThirdPartyCSSLintChecksManagerTests(test_utils.GenericTestBase):
             third_party_linter.perform_all_lint_checks()
         self.assertTrue(
             test_utils.assert_same_list_elements(
-                ['18:16',
+                ['19:16',
                  'Unexpected whitespace before \":\"   declaration-colon-space-'
                  'before'], self.linter_stdout))
 

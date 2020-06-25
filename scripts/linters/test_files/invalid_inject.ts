@@ -14,7 +14,7 @@
 
 /**
  * @fileoverview Invalid syntax .ts file, used by scripts/linters/
- * js_ts_linter_test.py.
+ * js_ts_linter_test.py. This file is using inject which is not allowed.
  */
 
 describe('Mark All Audio And Translations AsNeeding Update Controller',

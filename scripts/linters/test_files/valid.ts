@@ -14,7 +14,7 @@
 
 /**
  * @fileoverview Valid syntax .ts file, used by scripts/linters/
- * js_ts_linter_test.py.
+ * js_ts_linter_test.py. This file contain valid ts file content.
  */
 
 const CodeMirror = require('static/code-mirror-5.17.0/lib/codemirror.js');

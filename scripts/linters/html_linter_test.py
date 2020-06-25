@@ -81,7 +81,7 @@ class CustomHTMLParserTests(test_utils.GenericTestBase):
         self.assertTrue(
             test_utils.assert_same_list_elements(
                 ['invalid_style_indentation.html --> Expected indentation of 6,'
-                 ' found indentation of 4 for content of style tag on line 6'],
+                 ' found indentation of 4 for content of style tag on line 7'],
                 self.linter_stdout))
 
     def test_custom_linter_with_invalid_indentation(self):
@@ -92,7 +92,7 @@ class CustomHTMLParserTests(test_utils.GenericTestBase):
         self.assertTrue(
             test_utils.assert_same_list_elements(
                 ['Expected indentation of 10, found indentation of 12 for '
-                 'classroom-page tag on line 13'],
+                 'classroom-page tag on line 14'],
                 self.linter_stdout))
 
     def test_custom_linter_with_invalid_quotes(self):
@@ -103,7 +103,7 @@ class CustomHTMLParserTests(test_utils.GenericTestBase):
         self.assertTrue(
             test_utils.assert_same_list_elements(
                 ['The value color:white; of attribute '
-                 'style for the tag content on line 11 should be enclosed '
+                 'style for the tag content on line 12 should be enclosed '
                  'within double quotes.'],
                 self.linter_stdout))
 
@@ -114,8 +114,8 @@ class CustomHTMLParserTests(test_utils.GenericTestBase):
                 debug=True).perform_all_lint_checks()
         self.assertTrue(
             test_utils.assert_same_list_elements(
-                ['Attribute for tag content on line 12 should align with the '
-                 'leftmost attribute on line 11'],
+                ['Attribute for tag content on line 13 should align with the '
+                 'leftmost attribute on line 12'],
                 self.linter_stdout))
 
     def test_custom_linter_with_invalid_tags(self):
@@ -132,7 +132,7 @@ class CustomHTMLParserTests(test_utils.GenericTestBase):
                 html_linter.HTMLLintChecksManager(
                     [INVALID_TAG_MISMATCH_HTML_FILEPATH], FILE_CACHE, True,
                     debug=True).perform_all_lint_checks()
-        self.assertTrue('Error in line 12 of file' in e.exception.message)
+        self.assertTrue('Error in line 13 of file' in e.exception.message)
 
     def test_custom_linter_with_mismatched_indentation(self):
         with self.print_swap:
@@ -141,8 +141,8 @@ class CustomHTMLParserTests(test_utils.GenericTestBase):
                 debug=True).perform_all_lint_checks()
         self.assertTrue(
             test_utils.assert_same_list_elements(
-                ['Indentation for end tag content on line 17 does not match the'
-                 ' indentation of the start tag content on line 11'],
+                ['Indentation for end tag content on line 18 does not match the'
+                 ' indentation of the start tag content on line 12'],
                 self.linter_stdout))
 
     def test_custom_without_html_end_tag(self):
@@ -204,7 +204,7 @@ class CustomHTMLParserTests(test_utils.GenericTestBase):
                 [INVALID_QUOTES_HTML_FILEPATH], True).perform_all_lint_checks()
         self.assertTrue(
             test_utils.assert_same_list_elements(
-                ['line 9, col 20, line contains trailing whitespace'],
+                ['line 10, col 20, line contains trailing whitespace'],
                 self.linter_stdout))
 
     def test_get_linters(self):

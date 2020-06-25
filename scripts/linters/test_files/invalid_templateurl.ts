@@ -14,7 +14,7 @@
 
 /**
  * @fileoverview Invalid syntax .ts file, used by scripts/linters/
- * js_ts_linter_test.py.
+ * js_ts_linter_test.py. This file is using templateUrl which is not allowed.
  */
 
 import { Component } from '@angular/core';

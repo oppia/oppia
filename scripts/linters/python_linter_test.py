@@ -138,7 +138,7 @@ class PythonLintChecksManagerTests(test_utils.GenericTestBase):
                 True).perform_all_lint_checks()
         self.assertTrue(
             test_utils.assert_same_list_elements(
-                ['Line 34: Please do not use \'test_only\' in the non-test '
+                ['Line 35: Please do not use \'test_only\' in the non-test '
                  'file.'], self.linter_stdout))
 
     def test_custom_linter_with_test_function_in_test_file(self):

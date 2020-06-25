@@ -15,7 +15,7 @@
 # limitations under the License.
 
 """Python file with valid syntax, used by scripts/linters/
-python_linter_test.
+python_linter_test. This file contains valid one_off_jobs.
 """
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules

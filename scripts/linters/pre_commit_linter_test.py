@@ -175,7 +175,7 @@ class PreCommitLinterTests(LintTests):
         self.assertFalse(all_checks_passed(self.linter_stdout))
         self.assertTrue(
             test_utils.assert_same_list_elements(
-                ['18:16',
+                ['19:16',
                  'Unexpected whitespace before \":\"   declaration-colon-space-'
                  'before'], self.linter_stdout))
 

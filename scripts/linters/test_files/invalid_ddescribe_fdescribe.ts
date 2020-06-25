@@ -14,7 +14,8 @@
 
 /**
  * @fileoverview Invalid syntax .ts file, used by scripts/linters/
- * js_ts_linter_test.py.
+ * js_ts_linter_test.py. This file use ddescribe and fdescribe which is not
+ * allowed.
  */
 
 import { CollectionNodeObjectFactory } from

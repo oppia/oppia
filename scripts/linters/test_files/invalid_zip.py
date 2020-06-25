@@ -15,7 +15,7 @@
 # limitations under the License.
 
 """Python file with invalid syntax, used by scripts/linters/
-python_linter_test.py.
+python_linter_test.py. This file using zip() which is not allowed.
 """
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules

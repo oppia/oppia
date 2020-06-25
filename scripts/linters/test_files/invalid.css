@@ -12,7 +12,8 @@
 */
 
 /*
-*  CSS file with invalid syntax, used by scripts/linters/css_linter_test.py.
+* CSS file with invalid syntax, used by scripts/linters/css_linter_test.py.
+* This file have space between property name and colon which is not allowed.
 */
 @-webkit-keyframes dot {
   0% { opacity : 0; }  /* Here we used space after opacity which is invalid */

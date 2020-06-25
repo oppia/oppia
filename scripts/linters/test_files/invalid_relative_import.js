@@ -14,7 +14,7 @@
 
 /**
  * @fileoverview Invalid syntax .ts file, used by scripts/linters/
- * js_ts_linter_test.py. This file contain relative import.
+ * js_ts_linter_test.py. This file contain relative import which is not allowed.
  */
 
 var forms = require('../protractor_utils/forms.js');

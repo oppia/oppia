@@ -168,7 +168,7 @@ class HTMLLintTests(LintTests):
             ).perform_all_lint_checks()
         self.assertTrue(
             test_utils.assert_same_list_elements(
-                ['Line 8: The directives must be directly referenced.'],
+                ['Line 9: The directives must be directly referenced.'],
                 self.linter_stdout))
 
     def test_invalid_trailing_whitespace(self):
@@ -178,7 +178,7 @@ class HTMLLintTests(LintTests):
             ).perform_all_lint_checks()
         self.assertTrue(
             test_utils.assert_same_list_elements(
-                ['Line 8: There should not be any trailing whitespaces.'],
+                ['Line 9: There should not be any trailing whitespaces.'],
                 self.linter_stdout))
 
     def test_invalid_parent(self):
@@ -188,7 +188,7 @@ class HTMLLintTests(LintTests):
             ).perform_all_lint_checks()
         self.assertTrue(
             test_utils.assert_same_list_elements(
-                ['Line 12: Please do not access parent properties using '
+                ['Line 13: Please do not access parent properties using '
                  '$parent. Use the scope object for this purpose.'],
                 self.linter_stdout))
 
@@ -244,11 +244,11 @@ class JsTsLintTests(LintTests):
             ).perform_all_lint_checks()
         self.assertTrue(
             test_utils.assert_same_list_elements(
-                ['Line 23: In tests, please use \'describe\' instead of '
+                ['Line 24: In tests, please use \'describe\' instead of '
                  '\'ddescribe\'or \'fdescribe\''], self.linter_stdout))
         self.assertTrue(
             test_utils.assert_same_list_elements(
-                ['Line 27: In tests, please use \'describe\' instead of '
+                ['Line 28: In tests, please use \'describe\' instead of '
                  '\'ddescribe\'or \'fdescribe\''], self.linter_stdout))
 
     def test_invalid_iit_fit(self):

@@ -15,7 +15,7 @@
 # limitations under the License.
 
 """Python file with valid syntax, used by scripts/linters/
-python_linter_test.py.
+python_linter_test.py. This is a valid test file.
 """
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules

@@ -14,7 +14,7 @@
 
 /**
  * @fileoverview Invalid syntax .ts file, used by scripts/linters/
- * js_ts_linter_test.py.
+ * js_ts_linter_test.py. This file use browser.explore() which is not allowed.
  */
 
 var forms = require('./forms.js');

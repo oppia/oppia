@@ -1,5 +1,5 @@
+# This file contains invalid codeowner syntax.
 # Per-directory ownership and automatic assignment for pull requests.
-
 # The paths to the directory/files must be relative to the location of this
 # file. Wildcards such as '**', '!' are not allowed. Only glob style patterns
 # are allowed. For information about supported glob patterns please refer

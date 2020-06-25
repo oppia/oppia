@@ -14,7 +14,7 @@
 
 /**
  * @fileoverview Invalid syntax .ts file, used by scripts/linters/
- * js_ts_linter_test.py.
+ * js_ts_linter_test.py. This file is using innerHTML which is not allowed.
  */
 
 if (!('outerHTML' in SVGElement.prototype)) {
