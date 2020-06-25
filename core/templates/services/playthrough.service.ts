@@ -274,9 +274,8 @@ export class PlaythroughService {
       if (this.isPlaythroughDiscarded()) {
         return;
       }
-      let expStartLearnerAction = this.learnerActionObjectFactory.createNew(
-        AppConstants.ACTION_TYPE_EXPLORATION_START,
-        {
+      let expStartLearnerAction = this.learnerActionObjectFactory.
+        createNewExplorationStartAction({
           state_name: {
             value: initStateName
           }
@@ -306,29 +305,27 @@ export class PlaythroughService {
         this.createMultipleIncorrectIssueTracker(stateName);
       }
       PlaythroughService.playthrough.actions.push(
-        this.learnerActionObjectFactory.createNew(
-          AppConstants.ACTION_TYPE_ANSWER_SUBMIT,
-          {
-            state_name: {
-              value: stateName
-            },
-            dest_state_name: {
-              value: destStateName
-            },
-            interaction_id: {
-              value: interactionId
-            },
-            submitted_answer: {
-              value: answer
-            },
-            feedback: {
-              value: feedback
-            },
-            time_spent_state_in_msecs: {
-              value: timeSpentInStateSecs
-            }
+        this.learnerActionObjectFactory.createNewAnswerSubmitAction({
+          state_name: {
+            value: stateName
           },
-          ServicesConstants.CURRENT_ACTION_SCHEMA_VERSION
+          dest_state_name: {
+            value: destStateName
+          },
+          interaction_id: {
+            value: interactionId
+          },
+          submitted_answer: {
+            value: answer
+          },
+          feedback: {
+            value: feedback
+          },
+          time_spent_state_in_msecs: {
+            value: timeSpentInStateSecs
+          }
+        },
+        ServicesConstants.CURRENT_ACTION_SCHEMA_VERSION
         ));
 
       let didNotMoveToNextState = (destStateName === stateName);
@@ -347,17 +344,15 @@ export class PlaythroughService {
         return;
       }
       PlaythroughService.playthrough.actions.push(
-        this.learnerActionObjectFactory.createNew(
-          AppConstants.ACTION_TYPE_EXPLORATION_QUIT,
-          {
-            state_name: {
-              value: stateName
-            },
-            time_spent_in_state_in_msecs: {
-              value: timeSpentInStateSecs
-            }
+        this.learnerActionObjectFactory.createNewExplorationQuitAction({
+          state_name: {
+            value: stateName
           },
-          ServicesConstants.CURRENT_ACTION_SCHEMA_VERSION
+          time_spent_in_state_in_msecs: {
+            value: timeSpentInStateSecs
+          }
+        },
+        ServicesConstants.CURRENT_ACTION_SCHEMA_VERSION
         ));
     }
 
