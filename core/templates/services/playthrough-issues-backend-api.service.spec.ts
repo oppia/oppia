@@ -22,7 +22,7 @@ import { fakeAsync, flushMicrotasks, TestBed } from '@angular/core/testing';
 
 import { PlaythroughIssuesBackendApiService } from
   'services/playthrough-issues-backend-api.service';
-import { PlaythroughIssueObjectFactory } from
+import { IPlaythroughIssueBackendDict, PlaythroughIssueObjectFactory } from
   'domain/statistics/PlaythroughIssueObjectFactory';
 
 describe('PlaythroughIssuesBackendApiService', () => {
@@ -31,7 +31,7 @@ describe('PlaythroughIssuesBackendApiService', () => {
     PlaythroughIssuesBackendApiService = null;
   let playthroughIssueObjectFactory: PlaythroughIssueObjectFactory = null;
 
-  let backendIssues = [{
+  let backendIssues: IPlaythroughIssueBackendDict[] = [{
     issue_type: 'MultipleIncorrectSubmissions',
     issue_customization_args: {
       state_name: { value: 'state_name1' },
@@ -107,21 +107,15 @@ describe('PlaythroughIssuesBackendApiService', () => {
 
     it('should return the playthrough data provided by the backend', fakeAsync(
       () => {
-        let backendPlaythrough = {
-          exp_id: 'exp_id1',
-          exp_version: 1,
+        let backendPlaythrough: IPlaythroughIssueBackendDict = {
           issue_type: 'EarlyQuit',
           issue_customization_args: {
             state_name: { value: 'state_name1' },
             time_spent_in_exp_in_msecs: { value: 200 }
           },
-          actions: [{
-            action_type: 'ExplorationStart',
-            action_customization_args: {
-              state_name: { value: 'state_name1' }
-            },
-            schema_version: 1
-          }]
+          playthrough_ids: ['pID'],
+          schema_version: 2,
+          is_valid: true
         };
 
         let successHandler = jasmine.createSpy('success');

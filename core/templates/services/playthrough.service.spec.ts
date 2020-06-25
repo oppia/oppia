@@ -78,9 +78,10 @@ describe('PlaythroughService', () => {
         let playthrough = playthroughService.getPlaythrough();
         let actionSchemaVersion = 1;
         expect(playthrough.actions).toEqual([
-          learnerActionObjectFactory.createNew('ExplorationStart', {
-            state_name: {value: 'initStateName1'},
-          }, actionSchemaVersion),
+          learnerActionObjectFactory.createNewExplorationStartAction(
+            {
+              state_name: {value: 'initStateName1'},
+            }, actionSchemaVersion),
         ]);
       });
     });
@@ -93,7 +94,7 @@ describe('PlaythroughService', () => {
         let playthrough = playthroughService.getPlaythrough();
         let actionSchemaVersion = 1;
         expect(playthrough.actions).toEqual([
-          learnerActionObjectFactory.createNew('AnswerSubmit', {
+          learnerActionObjectFactory.createNewAnswerSubmitAction({
             state_name: {value: 'stateName1'},
             dest_state_name: {value: 'stateName2'},
             interaction_id: {value: 'TextInput'},
@@ -112,7 +113,7 @@ describe('PlaythroughService', () => {
         let playthrough = playthroughService.getPlaythrough();
         let actionSchemaVersion = 1;
         expect(playthrough.actions).toEqual([
-          learnerActionObjectFactory.createNew('ExplorationQuit', {
+          learnerActionObjectFactory.createNewExplorationQuitAction({
             state_name: {value: 'stateName1'},
             time_spent_in_state_in_msecs: {value: 120}
           }, actionSchemaVersion),

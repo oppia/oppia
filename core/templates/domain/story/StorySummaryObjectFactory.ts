@@ -20,7 +20,7 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-interface IStorySummaryBackendDict {
+export interface IStorySummaryBackendDict {
   'id': string;
   'title': string;
   'node_titles': string[];
