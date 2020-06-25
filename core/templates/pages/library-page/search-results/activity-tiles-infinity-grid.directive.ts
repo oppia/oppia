@@ -74,7 +74,7 @@ angular.module('oppia').directive('activityTilesInfinityGrid', [
               subscribe(evt => {
                 ctrl.libraryWindowIsNarrow = (
                   WindowDimensionsService.getWidth() <= libraryWindowCutoffPx);
-                $scope.$apply();
+                $scope.$applyAsync();
               });
           };
 
