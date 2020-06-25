@@ -1,4 +1,4 @@
-// Copyright 2018 The Oppia Authors. All Rights Reserved.
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -42,8 +42,9 @@ describe('Featured Translation Language object factory', () => {
       .createFromBackendDict(sampleFTLDict);
   });
 
-  it('should correctly return all the values', function() {
-    expect(sampleFTL.languageCode).toEqual('en');
-    expect(sampleFTL.explanation).toEqual('English');
+  it('should correctly evaluate all the values based on backend' +
+     ' dict', function() {
+    expect(sampleFTL.languageCode).toBe('en');
+    expect(sampleFTL.explanation).toBe('English');
   });
 });

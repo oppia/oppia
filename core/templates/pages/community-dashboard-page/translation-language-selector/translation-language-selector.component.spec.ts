@@ -12,6 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @fileoverview Unit tests for the translation language selector component.
+ */
+
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { TranslationLanguageSelectorComponent } from
@@ -22,10 +26,6 @@ import { ContributionOpportunitiesBackendApiService } from
   'pages/community-dashboard-page/services/contribution-opportunities-backend-api.service.ts';
 import { FeaturedTranslationLanguageObjectFactory } from
   'domain/opportunity/FeaturedTranslationLanguageObjectFactory';
-
-/**
- * @fileoverview Unit tests for the translation language selector component.
- */
 
 describe('Translation language selector', () => {
   let component: TranslationLanguageSelectorComponent;
@@ -60,8 +60,7 @@ describe('Translation language selector', () => {
         provide: ContributionOpportunitiesBackendApiService,
         useValue: contributionOpportunitiesBackendApiServiceStub
       }]
-    })
-      .compileComponents();
+    }).compileComponents();
   }));
 
   beforeEach(() => {
@@ -86,8 +85,8 @@ describe('Translation language selector', () => {
   });
 
   it('should correctly initialize languageIdToDescription map', () => {
-    expect(component.languageIdToDescription.en).toEqual('English');
-    expect(component.languageIdToDescription.fr).toEqual('French');
+    expect(component.languageIdToDescription.en).toBe('English');
+    expect(component.languageIdToDescription.fr).toBe('French');
   });
 
   it('should correctly fetch featured languages', async(() => {
@@ -101,23 +100,23 @@ describe('Translation language selector', () => {
     const dropdown = (fixture.nativeElement
       .querySelector('.oppia-translation-language-selector-inner-container'));
 
-    expect(dropdown.firstChild.textContent.trim()).toEqual('English');
+    expect(dropdown.firstChild.textContent.trim()).toBe('English');
   });
 
   it('should correctly show and hide the dropdown', () => {
-    expect(component.dropdownShown).toEqual(false);
+    expect(component.dropdownShown).toBe(false);
     expect(getDropdownOptionsContainer()).toBeFalsy();
 
     clickDropdown();
-    expect(component.dropdownShown).toEqual(true);
+    expect(component.dropdownShown).toBe(true);
     expect(getDropdownOptionsContainer()).toBeTruthy();
 
     clickDropdown();
-    expect(component.dropdownShown).toEqual(false);
+    expect(component.dropdownShown).toBe(false);
     expect(getDropdownOptionsContainer()).toBeFalsy();
 
     clickDropdown();
-    expect(component.dropdownShown).toEqual(true);
+    expect(component.dropdownShown).toBe(true);
     expect(getDropdownOptionsContainer()).toBeTruthy();
 
     let fakeClickAwayEvent = new MouseEvent('click');
@@ -127,10 +126,9 @@ describe('Translation language selector', () => {
       {value: document.createElement('div')});
     component.onDocumentClick(fakeClickAwayEvent);
     fixture.detectChanges();
-    expect(component.dropdownShown).toEqual(false);
+    expect(component.dropdownShown).toBe(false);
     expect(getDropdownOptionsContainer()).toBeFalsy();
   });
-
 
   it('should correctly select and indicate selection of an option', () => {
     spyOn(component.setActiveLanguageCode, 'emit');
@@ -151,12 +149,12 @@ describe('Translation language selector', () => {
       fixture.detectChanges();
 
       expect(component.explanationPopupContent)
-        .toEqual('Partnership with ABC');
-      expect(component.explanationPopupShown).toEqual(true);
+        .toBe('Partnership with ABC');
+      expect(component.explanationPopupShown).toBe(true);
 
       component.hideExplanationPopup();
       fixture.detectChanges();
-      expect(component.explanationPopupShown).toEqual(false);
+      expect(component.explanationPopupShown).toBe(false);
     });
   }));
 });
