@@ -81,25 +81,25 @@ export interface IGraphInputCustomizationArgs {
     value: IGraphBackendDict;
   };
   canAddVertex?: {
-    value: string;
+    value: boolean;
   };
   canDeleteVertex?: {
-    value: string;
+    value: boolean;
   };
   canEditVertexLabel?: {
-    value: string;
+    value: boolean;
   };
   canMoveVertex?: {
-    value: string;
+    value: boolean;
   };
   canAddEdge?: {
-    value: string;
+    value: boolean;
   };
   canDeleteEdge?: {
-    value: string;
+    value: boolean;
   };
   canEditEdgeWeight?: {
-    value: string;
+    value: boolean;
   };
 }
 

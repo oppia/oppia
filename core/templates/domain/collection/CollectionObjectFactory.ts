@@ -28,7 +28,7 @@ import {
   CollectionNodeObjectFactory
 } from 'domain/collection/CollectionNodeObjectFactory';
 
-interface ICollectionBackendDict {
+export interface ICollectionBackendDict {
   'id'?: string;
   'title'?: string;
   'objective'?: string;
