@@ -268,7 +268,7 @@ class ExplorationImprovementsHandlerTests(ImprovementsTestBase):
                 }]
             }, csrf_token=self.get_new_csrf_token(), expected_status_int=400)
 
-    def test_post_with_missing_issue_description_returns_401_error(self):
+    def test_post_with_missing_issue_description_is_allowed(self):
         with self.login_context(self.OWNER_EMAIL):
             self.post_json(self.get_url(), {
                 'task_entries': [{
@@ -278,7 +278,19 @@ class ExplorationImprovementsHandlerTests(ImprovementsTestBase):
                     # 'issue_description': 'issue description'.
                     'status': 'open',
                 }]
-            }, csrf_token=self.get_new_csrf_token(), expected_status_int=400)
+            }, csrf_token=self.get_new_csrf_token())
+
+        task_entry_model = improvements_models.TaskEntryModel.get_by_id(
+            improvements_models.TaskEntryModel.generate_task_id(
+                improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
+                self.exp.id,
+                self.exp.version,
+                improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
+                improvements_models.TASK_TARGET_TYPE_STATE,
+                feconf.DEFAULT_INIT_STATE_NAME))
+
+        self.assertIsNotNone(task_entry_model)
+        self.assertIsNone(task_entry_model.issue_description)
 
     def test_post_with_missing_status_returns_401_error(self):
         with self.login_context(self.OWNER_EMAIL):
@@ -464,9 +476,9 @@ class ExplorationImprovementsHistoryHandlerTests(ImprovementsTestBase):
         with self.login_context(self.VIEWER_EMAIL):
             self.get_json(self.get_url(), expected_status_int=401)
 
-    def test_get_with_invalid_cursor_returns_400_error(self):
+    def test_get_with_invalid_cursor_returns_500_error(self):
         with self.login_context(self.OWNER_EMAIL):
-            self.get_json(self.get_url(cursor=234), expected_status_int=400)
+            self.get_json(self.get_url(cursor=234), expected_status_int=500)
 
     def test_get_when_no_tasks_exist_returns_response_with_empty_fields(self):
         with self.login_context(self.OWNER_EMAIL):

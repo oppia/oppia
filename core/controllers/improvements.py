@@ -41,11 +41,9 @@ class ExplorationImprovementsHandler(base.BaseHandler):
 
     @acl_decorators.can_edit_exploration
     def get(self, exploration_id):
-        # The ACL decorator guarantees the exploration exists.
-        exploration = exp_fetchers.get_exploration_by_id(exploration_id)
-
         open_tasks, resolved_task_types_by_state_name = (
-            improvements_services.fetch_exploration_tasks(exploration))
+            improvements_services.fetch_exploration_tasks(
+                exp_fetchers.get_exploration_by_id(exploration_id)))
         self.render_json({
             'open_tasks': [t.to_dict() for t in open_tasks],
             'resolved_task_types_by_state_name': (
@@ -54,25 +52,38 @@ class ExplorationImprovementsHandler(base.BaseHandler):
 
     @acl_decorators.can_edit_exploration
     def post(self, exploration_id):
-        # The ACL decorator guarantees the exploration exists.
-        try:
-            task_entries = []
-            for task_entry_payload in self.payload['task_entries']:
-                task_entries.append(
-                    improvements_domain.TaskEntry(
-                        improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
-                        exploration_id,
-                        task_entry_payload['entity_version'],
-                        task_entry_payload['task_type'],
-                        improvements_models.TASK_TARGET_TYPE_STATE,
-                        task_entry_payload['target_id'],
-                        task_entry_payload['issue_description'],
-                        task_entry_payload['status'],
-                        self.user_id, datetime.datetime.utcnow()))
-            improvements_services.put_tasks(task_entries)
-        except Exception as e:
-            raise self.InvalidInputException(
-                'Invalid task entry payload: %s' % (e,))
+        task_entries = self.payload.get('task_entries', None)
+        if task_entries is None:
+            raise self.InvalidInputException('No task_entries provided')
+        task_entries_to_put = []
+        for task_entry in task_entries:
+            entity_version = task_entry.get('entity_version', None)
+            if entity_version is None:
+                raise self.InvalidInputException('No entity_version provided')
+            task_type = task_entry.get('task_type', None)
+            if task_type is None:
+                raise self.InvalidInputException('No task_type provided')
+            target_id = task_entry.get('target_id', None)
+            if target_id is None:
+                raise self.InvalidInputException('No target_id provided')
+            status = task_entry.get('status', None)
+            if status is None:
+                raise self.InvalidInputException('No status provided')
+            # The issue_description is allowed to be None.
+            issue_description = task_entry.get('issue_description', None)
+            task_entries_to_put.append(
+                improvements_domain.TaskEntry(
+                    improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
+                    exploration_id,
+                    entity_version,
+                    task_type,
+                    improvements_models.TASK_TARGET_TYPE_STATE,
+                    target_id,
+                    issue_description,
+                    status,
+                    self.user_id,
+                    datetime.datetime.utcnow()))
+        improvements_services.put_tasks(task_entries_to_put)
         self.render_json({})
 
 
@@ -86,19 +97,15 @@ class ExplorationImprovementsHistoryHandler(base.BaseHandler):
 
     @acl_decorators.can_edit_exploration
     def get(self, exploration_id):
-        # The ACL decorator guarantees the exploration exists.
-        exploration = exp_fetchers.get_exploration_by_id(exploration_id)
         urlsafe_start_cursor = self.request.get('cursor', None)
-        try:
-            results, urlsafe_cursor, more = (
-                improvements_services.fetch_exploration_task_history_page(
-                    exploration, urlsafe_start_cursor=urlsafe_start_cursor))
-        except Exception as e:
-            raise self.InvalidInputException(
-                'Invalid history fetch attempt: %s' % (e,))
+
+        results, new_urlsafe_start_cursor, more = (
+            improvements_services.fetch_exploration_task_history_page(
+                exp_fetchers.get_exploration_by_id(exploration_id),
+                urlsafe_start_cursor=urlsafe_start_cursor))
 
         self.render_json({
             'results': [t.to_dict() for t in results],
-            'cursor': urlsafe_cursor,
+            'cursor': new_urlsafe_start_cursor,
             'more': more,
         })
