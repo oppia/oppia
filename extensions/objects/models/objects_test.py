@@ -34,8 +34,8 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
         """Test that values are normalized correctly.
 
         Args:
-            object_class: class. the class whose normalize() method is to be
-                tested.
+            object_class: child of BaseObject. the class whose normalize()
+                method is to be tested.
             mappings: a list of 2-element tuples. The first element of
                 each item is expected to be normalized to the second.
             invalid_items: a list of values. Each of these is expected to raise
