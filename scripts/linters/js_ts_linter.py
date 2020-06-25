@@ -846,7 +846,14 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         return summary_messages
 
     def _check_comments(self):
-        """This function ensures that comments follow correct style."""
+        """This function ensures that comments follow correct style. Below are
+        some formats of correct comment style:
+        1. A comment can end with the following symbols: ('.', '?', ';', ',',
+        '{', '^', ')', '}', '>'). Example: // Is this is comment?
+        2. If a line contain any of the following words or phrases('@ts-ignore',
+        '--params', 'eslint-disable', 'eslint-enable', 'http://', 'https://')
+        in the comment.
+        """
         if self.verbose_mode_enabled:
             python_utils.PRINT(
                 'Starting comment checks\n'
@@ -855,6 +862,12 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         files_to_check = self.all_filepaths
         allowed_terminating_punctuations = [
             '.', '?', ';', ',', '{', '^', ')', '}', '>']
+
+        # We need to ignore phrases below because if we use punctuation with
+        # these words it will mess up the whole meaning of the comment.
+        # Example: --params.login.user 'Joe'
+        # We can't use a period at the end of comment for such comment
+        # else it will mess up the whole meaning.
         excluded_phrases = [
             '@ts-ignore', '--params', 'eslint-disable', 'eslint-enable',
             'http://', 'https://']
