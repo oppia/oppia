@@ -24,6 +24,8 @@
     "SetOfHtmlString": [],
     "SetOfNormalizedString": [],
     "SetOfUnicodeString": [],
+    "TranslatableHtml": {"content_id": "", "html": ""},
+    "TranslatableUnicodeString": {"content_id": "", "unicode_str": ""},
     "UnicodeString": "",
     "Fraction": {
       "isNegative": false,

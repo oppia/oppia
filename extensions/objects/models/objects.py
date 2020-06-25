@@ -122,6 +122,26 @@ class UnicodeString(BaseObject):
     }
 
 
+class TranslatableUnicodeString(UnicodeString):
+    """Translatable Unicode string class."""
+
+    description = 'An Unicode string that supports translations.'
+    SCHEMA = {
+        'type': 'dict',
+        'properties': [{
+            'name': 'content_id',
+            'schema': UnicodeString.SCHEMA,
+        }, {
+            'name': 'unicode_str',
+            'schema': UnicodeString.SCHEMA,
+        }]
+    }
+    default_value = {
+        'content_id': '',
+        'unicode_str': ''
+    }
+
+
 class Html(BaseObject):
     """HTML string class."""
 
@@ -129,6 +149,26 @@ class Html(BaseObject):
 
     SCHEMA = {
         'type': 'html',
+    }
+
+
+class TranslatableHtml(BaseObject):
+    """Translatable HTML string class."""
+
+    description = 'An HTML string that supports translations.'
+    SCHEMA = {
+        'type': 'dict',
+        'properties': [{
+            'name': 'content_id',
+            'schema': UnicodeString.SCHEMA,
+        }, {
+            'name': 'html',
+            'schema': UnicodeString.SCHEMA,
+        }]
+    }
+    default_value = {
+        'content_id': '',
+        'html': ''
     }
 
 

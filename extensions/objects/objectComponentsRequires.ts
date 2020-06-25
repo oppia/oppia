@@ -47,4 +47,6 @@ require('objects/templates/set-of-html-string-editor.directive.ts');
 require('objects/templates/set-of-unicode-string-editor.directive.ts');
 require('objects/templates/skill-selector-editor.directive.ts');
 require('objects/templates/svg-filename-editor.component.ts');
+require('objects/templates/translatable-html-editor.directive.ts');
+require('objects/templates/translatable-unicode-string-editor.directive.ts');
 require('objects/templates/unicode-string-editor.directive.ts');

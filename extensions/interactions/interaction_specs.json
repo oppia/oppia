@@ -571,7 +571,8 @@
         "name": "choices",
         "schema": {
           "items": {
-            "type": "html",
+            "type": "custom",
+            "obj_type": "TranslatableHtml",
             "ui_config": {
               "hide_complex_extensions": true,
               "placeholder": "Enter an option for the learner to select"
@@ -588,9 +589,10 @@
             "add_element_text": "Add multiple choice option"
           }
         },
-        "default_value": [
-          ""
-        ]
+        "default_value": [{
+          "content_id": "interaction_choices_0",
+          "html": ""
+        }]
       }, {
         "name": "showChoicesInShuffledOrder",
         "description": "Shuffle answer choices",

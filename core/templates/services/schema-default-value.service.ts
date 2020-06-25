@@ -21,6 +21,8 @@ import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { LoggerService } from 'services/contextual/logger.service';
 
+const OBJECT_DEFAULTS = require('objects/object_defaults.json');
+
 @Injectable({
   providedIn: 'root'
 })
@@ -55,6 +57,8 @@ export class SchemaDefaultValueService {
       return result;
     } else if (schema.type === 'int' || schema.type === 'float') {
       return 0;
+    } else if (schema.type === 'custom') {
+      return angular.copy(OBJECT_DEFAULTS[schema.obj_type]);
     } else {
       this.logger.error('Invalid schema type: ' + schema.type);
     }

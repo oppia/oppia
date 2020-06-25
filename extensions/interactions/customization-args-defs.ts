@@ -24,6 +24,7 @@ import { IImageWithRegions } from
 import { IReadableNote } from
   // eslint-disable-next-line max-len
   'extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive';
+import { ISubtitledHtmlBackendDict } from 'domain/exploration/SubtitledHtmlObjectFactory';
 
 export interface ICodeReplCustomizationArgs {
   language?: {
@@ -147,7 +148,7 @@ export interface IMultipleChoiceInputCustomizationArgs {
     value: string;
   };
   choices?: {
-    value: string[];
+    value: ISubtitledHtmlBackendDict[];
   };
 }
 
