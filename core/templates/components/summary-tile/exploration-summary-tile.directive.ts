@@ -214,7 +214,7 @@ angular.module('oppia').directive('explorationSummaryTile', [
               subscribe(evt => {
                 $scope.isWindowLarge = (
                   WindowDimensionsService.getWidth() >= $scope.mobileCutoffPx);
-                $scope.$apply();
+                $scope.$applyAsync();
               });
           };
 
