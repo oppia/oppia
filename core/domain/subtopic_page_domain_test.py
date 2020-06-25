@@ -201,7 +201,8 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
             'translations_mapping': {
                 'content': {
                     'en': {
-                        'html': 'Translation in hindi.',
+                        'translation_type': 'html',
+                        'translation': 'Translation in hindi.',
                         'needs_update': False
                     }
                 }
@@ -321,7 +322,8 @@ class SubtopicPageContentsDomainUnitTests(test_utils.GenericTestBase):
                 'translations_mapping': {
                     'content': {
                         'en': {
-                            'html': 'Translation.',
+                            'translation_type': 'html',
+                            'translation': 'Translation.',
                             'needs_update': False
                         }
                     }

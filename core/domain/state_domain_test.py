@@ -454,7 +454,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'translations_mapping': {
                 'content': {
                     'hi': {
-                        'html': '<p>hello!</p>',
+                        'translation_type': 'html',
+                        'translation': '<p>hello!</p>',
                         'needs_update': False
                     }
                 },
@@ -776,6 +777,29 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             with self.swap(subtitled_html, 'content_id', 20):
                 subtitled_html.validate()
 
+    def test_subtitled_unicode_validation_with_invalid_html_type(self):
+        """Test validation of subtitled unicode with invalid unicode type."""
+        subtitled_unicode = state_domain.SubtitledUnicode(
+            'content_id', 'some string')
+        subtitled_unicode.validate()
+
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Invalid content unicode'
+            ):
+            with self.swap(subtitled_unicode, 'unicode_str', 20):
+                subtitled_unicode.validate()
+
+    def test_subtitled_unicode_validation_with_invalid_content(self):
+        """Test validation of subtitled unicode with invalid content."""
+        subtitled_unicode = state_domain.SubtitledUnicode(
+            'content_id', 'some html string')
+        subtitled_unicode.validate()
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected content id to be a string, ' +
+            'received 20'):
+            with self.swap(subtitled_unicode, 'content_id', 20):
+                subtitled_unicode.validate()
+
     def test_voiceover_validation(self):
         """Test validation of voiceover."""
         audio_voiceover = state_domain.Voiceover('a.mp3', 20, True, 24.5)
@@ -843,8 +867,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         written_translation.validate()
 
         with self.assertRaisesRegexp(
-            utils.ValidationError, 'Invalid content HTML'):
-            with self.swap(written_translation, 'html', 30):
+            utils.ValidationError, 'Invalid translation'):
+            with self.swap(written_translation, 'translation', 30):
                 written_translation.validate()
 
         with self.assertRaisesRegexp(
@@ -1173,7 +1197,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'translations_mapping': {
                 'content': {
                     'hi': {
-                        'html': '<p>Test!</p>',
+                        'translation_type': 'html',
+                        'translation': '<p>Test!</p>',
                         'needs_update': True
                     }
                 },
@@ -1254,13 +1279,15 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'translations_mapping': {
                 'hint_2': {
                     'hi': {
-                        'html': '<p>Test!</p>',
+                        'translation_type': 'html',
+                        'translation': '<p>Test!</p>',
                         'needs_update': True
                     }
                 },
                 'hint_1': {
                     'hi': {
-                        'html': '<p>Test1!</p>',
+                        'translation_type': 'html',
+                        'translation': '<p>Test1!</p>',
                         'needs_update': True
                     }
                 },
@@ -1573,21 +1600,25 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
             'translations_mapping': {
                 'content1': {
                     'en': {
-                        'html': 'hello',
+                        'translation_type': 'html',
+                        'translation': 'hello',
                         'needs_update': True
                     },
                     'hi': {
-                        'html': 'Hey!',
+                        'translation_type': 'html',
+                        'translation': 'Hey!',
                         'needs_update': False
                     }
                 },
                 'feedback_1': {
                     'hi': {
-                        'html': 'Testing!',
+                        'translation_type': 'html',
+                        'translation': 'Testing!',
                         'needs_update': False
                     },
                     'en': {
-                        'html': 'hello!',
+                        'translation_type': 'html',
+                        'translation': 'hello!',
                         'needs_update': False
                     }
                 }
@@ -1617,7 +1648,8 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
             'translations_mapping': {
                 'content': {
                     'en': {
-                        'html': '<p> In English.</p>',
+                        'translation_type': 'html',
+                        'translation': '<p> In English.</p>',
                         'needs_update': False
                     }
                 }
@@ -1637,7 +1669,8 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
             'translations_mapping': {
                 'content': {
                     'en': {
-                        'html': '<p> In English.</p>',
+                        'translation_type': 'html',
+                        'translation': '<p> In English.</p>',
                         'needs_update': False
                     }
                 }
@@ -1685,7 +1718,8 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
             'translations_mapping': {
                 'feedback_1': {
                     'en': {
-                        'html': 'hello!',
+                        'translation_type': 'html',
+                        'translation': 'hello!',
                         'needs_update': False
                     }
                 }
@@ -1705,7 +1739,8 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
             'translations_mapping': {
                 'content': {
                     'en': {
-                        'html': 'hello!',
+                        'translation_type': 'html',
+                        'translation': 'hello!',
                         'needs_update': False
                     }
                 }
@@ -1775,7 +1810,8 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
             'translations_mapping': {
                 'content': {
                     123: {
-                        'html': 'hello!',
+                        'translation_type': 'html',
+                        'translation': 'hello!',
                         'needs_update': False
                     }
                 }
@@ -1794,7 +1830,8 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
             'translations_mapping': {
                 'content': {
                     'ed': {
-                        'html': 'hello!',
+                        'translation_type': 'html',
+                        'translation': 'hello!',
                         'needs_update': False
                     }
                 }
@@ -1812,7 +1849,8 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
             'translations_mapping': {
                 'content': {
                     'en': {
-                        'html': '<p>hello!</p>',
+                        'translation_type': 'html',
+                        'translation': '<p>hello!</p>',
                         'needs_update': False
                     }
                 }
@@ -1849,7 +1887,8 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
             'translations_mapping': {
                 'content': {
                     'hi': {
-                        'html': '<p>hello!</p>',
+                        'translation_type': 'html',
+                        'translation': '<p>hello!</p>',
                         'needs_update': False
                     }
                 },
@@ -1868,7 +1907,8 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
             'translations_mapping': {
                 'content': {
                     'hi': {
-                        'html': '<p>hello!</p>',
+                        'translation_type': 'html',
+                        'translation': '<p>hello!</p>',
                         'needs_update': True
                     }
                 },

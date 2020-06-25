@@ -1040,7 +1040,8 @@ class WrittenTranslations(python_utils.OBJECT):
         """
         if content_id in self.translations_mapping:
             if language_code in self.translations_mapping[content_id]:
-                return self.translations_mapping[content_id][language_code].html
+                return (self.translations_mapping
+                    [content_id][language_code].translation)
             else:
                 raise Exception(
                     'Translation for the given content_id %s does not exist in '
@@ -1449,6 +1450,76 @@ class SubtitledHtml(python_utils.OBJECT):
         """
         return cls(content_id, '')
 
+
+class SubtitledUnicode(python_utils.OBJECT):
+    """Value object representing subtitled unicode."""
+
+    def __init__(self, content_id, unicode_str):
+        """Initializes a SubtitledUnicode domain object.
+
+        Args:
+            content_id: str. A unique id referring to the other assets for this
+                content.
+            html: str. A piece of user submitted unicode.
+        """
+        self.content_id = content_id
+        self.unicode_str = unicode_str
+        self.validate()
+
+    def to_dict(self):
+        """Returns a dict representing this SubtitledUnicode domain object.
+
+        Returns:
+            dict. A dict, mapping all fields of SubtitledUnicode instance.
+        """
+        return {
+            'content_id': self.content_id,
+            'unicode_str': self.unicode_str
+        }
+
+    @classmethod
+    def from_dict(cls, subtitled_unicode_dict):
+        """Return a SubtitledUnicode domain object from a dict.
+
+        Args:
+            subtitled_unicode_dict: dict. The dict representation of
+                SubtitledUnicode object.
+
+        Returns:
+            SubtitledUnicode. The corresponding SubtitledUnicode domain object.
+        """
+        return cls(
+            subtitled_unicode_dict['content_id'],
+            subtitled_unicode_dict['unicode_str']
+        )
+
+    def validate(self):
+        """Validates properties of the SubtitledUnicode.
+
+        Raises:
+            ValidationError: One or more attributes of the SubtitledUnicode are
+            invalid.
+        """
+        if not isinstance(self.content_id, python_utils.BASESTRING):
+            raise utils.ValidationError(
+                'Expected content id to be a string, received %s' %
+                self.content_id)
+
+        if not isinstance(self.unicode_str, python_utils.BASESTRING):
+            raise utils.ValidationError(
+                'Invalid content unicode: %s' % self.unicode_str)
+
+    @classmethod
+    def create_default_subtitled_unicode(cls, content_id):
+        """Create a default SubtitledUnicode domain object.
+
+        Args:
+            content_id: str. the id of the content.
+
+        Returns:
+            SubtitledUnicode. A default SubtitledUnicode domain object.
+        """
+        return cls(content_id, '')
 
 class State(python_utils.OBJECT):
     """Domain object for a state."""

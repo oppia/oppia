@@ -1046,13 +1046,15 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'translations_mapping': {
                 'content_1': {
                     'hi': {
-                        'html': '<p>Translation in Hindi.</p>',
+                        'translation_type': 'html',
+                        'translation': '<p>Translation in Hindi.</p>',
                         'needs_update': False
                     }
                 },
                 'default_outcome': {
                     'hi': {
-                        'html': '<p>Translation in Hindi.</p>',
+                        'translation_type': 'html',
+                        'translation': '<p>Translation in Hindi.</p>',
                         'needs_update': False
                     }
                 }
@@ -1073,13 +1075,15 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'translations_mapping': {
                 'content_1': {
                     'hi': {
-                        'html': '<p>Translation in Hindi.</p>',
+                        'translation_type': 'html',
+                        'translation': '<p>Translation in Hindi.</p>',
                         'needs_update': False
                     }
                 },
                 'default_outcome': {
                     'hi': {
-                        'html': '<p>Translation in Hindi.</p>',
+                        'translation_type': 'html',
+                        'translation': '<p>Translation in Hindi.</p>',
                         'needs_update': False
                     }
                 }
@@ -1094,13 +1098,15 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'translations_mapping': {
                 'content_1': {
                     'hi': {
-                        'html': '<p>New state translation in Hindi.</p>',
+                        'translation_type': 'html',
+                        'translation': '<p>New state translation in Hindi.</p>',
                         'needs_update': False
                     }
                 },
                 'default_outcome': {
                     'hi': {
-                        'html': '<p>New State translation in Hindi.</p>',
+                        'translation_type': 'html',
+                        'translation': '<p>New State translation in Hindi.</p>',
                         'needs_update': False
                     }
                 }
@@ -1120,13 +1126,15 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'translations_mapping': {
                 'content_1': {
                     'hi': {
-                        'html': '<p>Translation in Hindi.</p>',
+                        'translation_type': 'html',
+                        'translation': '<p>Translation in Hindi.</p>',
                         'needs_update': True
                     }
                 },
                 'default_outcome': {
                     'hi': {
-                        'html': '<p>Translation in Hindi.</p>',
+                        'translation_type': 'html',
+                        'translation': '<p>Translation in Hindi.</p>',
                         'needs_update': False
                     }
                 }
@@ -1147,17 +1155,20 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'translations_mapping': {
                 'content_1': {
                     'hi-en': {
-                        'html': '<p>Translation in Hindi.</p>',
+                        'translation_type': 'html',
+                        'translation': '<p>Translation in Hindi.</p>',
                         'needs_update': False
                     },
                     'hi': {
-                        'html': '<p>Translation in Hindi.</p>',
+                        'translation_type': 'html',
+                        'translation': '<p>Translation in Hindi.</p>',
                         'needs_update': False
                     }
                 },
                 'default_outcome': {
                     'hi': {
-                        'html': '<p>Translation in Hindi.</p>',
+                        'translation_type': 'html',
+                        'translation': '<p>Translation in Hindi.</p>',
                         'needs_update': False
                     }
                 }

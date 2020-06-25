@@ -2613,7 +2613,8 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             'translations_mapping': {
                 'content': {
                     'hi': {
-                        'html': '<p>Test!</p>',
+                        'translation_type': 'html',
+                        'translation': '<p>Test!</p>',
                         'needs_update': True
                     }
                 },
