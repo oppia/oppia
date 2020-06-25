@@ -1,5 +1,8 @@
 { 
   "extends": "stylelint-config-recommended",
+  "plugins": [
+    "stylelint-order"
+  ],
   "rules": {
     "block-closing-brace-newline-after": "always",
     "block-closing-brace-newline-before": "always-multi-line",
@@ -12,6 +15,7 @@
     "indentation": 2,
     "no-descending-specificity": true,
     "no-duplicate-selectors": true,
+    "order/properties-alphabetical-order": true,
     "selector-type-no-unknown": [
       true,
       {
