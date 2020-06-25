@@ -9,7 +9,7 @@
     </i>
   </div>
   <div class="svg-editor" ng-if="!$ctrl.isDiagramSaved()">
-    <div class="fabric-canvas" ng-attr-id="<[$ctrl.canvasContainerId]>" style="overflow: hidden;">
+    <div class="fabric-canvas" ng-attr-id="<[$ctrl.canvasContainerId]>">
       <canvas ng-attr-id="<[$ctrl.canvasID]>"></canvas>
     </div>
     <div class="vertical-toolbar">
@@ -168,6 +168,7 @@
     bottom: 31px;
     cursor: default;
     left: 62px;
+    overflow: hidden;
     right: 0;
     top: 31px;
   }
