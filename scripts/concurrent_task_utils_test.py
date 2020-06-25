@@ -20,6 +20,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import threading
+import time
 
 from core.tests import test_utils
 import python_utils
@@ -51,18 +52,59 @@ class ConcurrentTaskUtilsTests(test_utils.GenericTestBase):
                 ' '.join(python_utils.UNICODE(arg) for arg in args))
         self.print_swap = self.swap(python_utils, 'PRINT', mock_print)
 
+
+class CreateTaskTests(ConcurrentTaskUtilsTests):
+    """Tests for create_task method."""
     def test_create_task(self):
         task = concurrent_task_utils.create_task(
             test_function, True, self.semaphore)
         self.assertTrue(isinstance(task, concurrent_task_utils.TaskThread))
 
-    def test_execute_task(self):
+
+class TaskThreadTests(ConcurrentTaskUtilsTests):
+    """Tests for TaskThread class."""
+    def test_task_thread_with_success(self):
+        task = concurrent_task_utils.TaskThread(
+            test_function('unused_arg'), True, self.semaphore, name='test')
+        self.semaphore.acquire()
+        task.start_time = time.time()
+        with self.print_swap:
+            task.start()
+            task.join()
+        expected_output = [s for s in self.linter_stdout if 'FINISHED' in s]
+        self.assertTrue(len(expected_output) == 1)
+
+    def test_task_thread_with_exception(self):
+        task = concurrent_task_utils.TaskThread(
+            test_function, True, self.semaphore, name='test')
+        with self.print_swap:
+            task.start()
+            task.join()
+        self.assertTrue(
+            'test_function() takes exactly 1 argument '
+            '(0 given)' in self.linter_stdout)
+
+
+class ExecuteTasksTests(ConcurrentTaskUtilsTests):
+    """Tests for execute_tasks method."""
+    def test_execute_task_with_single_task(self):
         task = concurrent_task_utils.create_task(
             test_function('unused_arg'), True, self.semaphore, name='test')
         with self.print_swap:
             concurrent_task_utils.execute_tasks([task], self.semaphore)
         expected_output = [s for s in self.linter_stdout if 'FINISHED' in s]
         self.assertTrue(len(expected_output) == 1)
+
+    def test_execute_task_with_multiple_task(self):
+        task_list = []
+        for _ in python_utils.RANGE(6):
+            task = concurrent_task_utils.create_task(
+                test_function('unused_arg'), True, self.semaphore)
+            task_list.append(task)
+        with self.print_swap:
+            concurrent_task_utils.execute_tasks(task_list, self.semaphore)
+        expected_output = [s for s in self.linter_stdout if 'FINISHED' in s]
+        self.assertTrue(len(expected_output) == 6)
 
     def test_execute_task_with_exception(self):
         task_list = []
