@@ -32,6 +32,7 @@ It uses the following grammar in Backus-Naur form:
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import collections
 import re
 import string
 
@@ -45,13 +46,24 @@ _GREEK_LETTERS = [
 _MATH_FUNCTION_NAMES = [
     'log', 'ln', 'sqrt', 'abs', 'sin', 'cos', 'tan', 'sec', 'csc', 'cot',
     'arcsin', 'arccos', 'arctan', 'sinh', 'cosh', 'tanh']
-_VALID_OPERATORS = ['[', '{', '(', ')', '}', ']', '+', '-', '/', '*', '^']
+_OPENING_PARENS = ['[', '{', '(']
+_CLOSING_PARENS = [')', '}', ']']
+_VALID_OPERATORS = _OPENING_PARENS + _CLOSING_PARENS + ['+', '-', '/', '*', '^']
 VALID_ALGEBRAIC_IDENTIFIERS = list(string.ascii_letters) + _GREEK_LETTERS
 
 _TOKEN_CATEGORY_IDENTIFIER = 'identifier'
 _TOKEN_CATEGORY_FUNCTION = 'function'
 _TOKEN_CATEGORY_NUMBER = 'number'
 _TOKEN_CATEGORY_OPERATOR = 'operator'
+
+_OPENING_CATEGORIES = (
+    _TOKEN_CATEGORY_IDENTIFIER,
+    _TOKEN_CATEGORY_FUNCTION,
+    _TOKEN_CATEGORY_NUMBER)
+
+_CLOSING_CATEGORIES = (
+    _TOKEN_CATEGORY_IDENTIFIER,
+    _TOKEN_CATEGORY_NUMBER)
 
 
 def contains_balanced_brackets(expression):
@@ -113,14 +125,14 @@ def tokenize(expression):
             expression.
 
     Raises:
-        Exception: Invalid syntax: Unexpected token present in the expression.
+        Exception: Invalid token.
     """
     expression = expression.replace(' ', '')
 
     # Note: Greek letters and math functions are sorted in reverse by length so
     # that longer ones get matched before shorter ones.
     # For eg. 'x + epsilon' should be tokenized as ['x','+','epsilon'] and not
-    # ['x','+','e','*','psi','*','l','*','o','*','n'].
+    # ['x','+','e','*','psi','*','l','*','o','*','n']. a^2.
     re_string = r'(%s|[a-zA-Z]|[0-9]+\.[0-9]+|[0-9]+|[%s])' % (
         '|'.join(sorted(
             _GREEK_LETTERS + _MATH_FUNCTION_NAMES, reverse=True, key=len)),
@@ -128,10 +140,13 @@ def tokenize(expression):
 
     token_texts = re.findall(re_string, expression)
 
-    if sum([len(token_text) for token_text in token_texts]) != len(
-            expression):
-        raise Exception(
-            'Invalid syntax: Unexpected token present in the expression.')
+    original_exp_frequency = collections.Counter(expression)
+    tokenized_exp_frequency = collections.Counter(''.join(token_texts))
+
+    for character in original_exp_frequency:
+        if original_exp_frequency[
+                character] != tokenized_exp_frequency[character]:
+            raise Exception('Invalid token: %s.' % character)
 
     token_list = []
     for token_text in token_texts:
@@ -151,11 +166,14 @@ def tokenize(expression):
             final_token_list.append(token_list[i])
         else:
             final_token_list.append(token_list[i])
-            if (token_list[i].category in (
-                    _TOKEN_CATEGORY_IDENTIFIER, _TOKEN_CATEGORY_NUMBER) or (
-                        token_list[i].text == ')')) and (token_list[
-                            i + 1].category != _TOKEN_CATEGORY_OPERATOR or (
-                                token_list[i + 1].text == '(')):
+            # If a closing term is directly followed by a closing term, instead
+            # of an operator, we add the '*' operator.
+            if ((
+                    token_list[i].category in _CLOSING_CATEGORIES or
+                    token_list[i].text in _CLOSING_PARENS) and
+                    (
+                        token_list[i + 1].category in _OPENING_CATEGORIES or
+                        token_list[i + 1].text in _OPENING_PARENS)):
                 final_token_list.append(Token('*'))
 
     return final_token_list

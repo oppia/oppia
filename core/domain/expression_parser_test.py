@@ -146,6 +146,12 @@ class HelperFunctionsUnitTests(test_utils.GenericTestBase):
             lambda x: x.text, expression_parser.tokenize(expression))
         self.assertEqual(list(actual_output), expected_output)
 
+        expression = 'xalpha'
+        expected_output = ['x', '*', 'alpha']
+        actual_output = python_utils.MAP(
+            lambda x: x.text, expression_parser.tokenize(expression))
+        self.assertEqual(list(actual_output), expected_output)
+
         expression = '2.2gamma/23'
         expected_output = ['2.2', '*', 'gamma', '/', '23']
         actual_output = python_utils.MAP(
