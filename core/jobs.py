@@ -661,8 +661,8 @@ class BaseDeferredJobManager(BaseJobManager):
 
 
 class MapReduceJobPipeline(base_handler.PipelineBase):
-    #pylint: disable=8-space-indentation-in-docstring
-    #pylint: disable=4-space-indentation-in-docstring
+    # pylint: disable=8-space-indentation-in-docstring
+    # pylint: disable=4-space-indentation-in-docstring
     """This class inherits from the PipelineBase class which are used to
     connect various workflows/functional procedures together. It implements
     a run method which is called when this job is started by using start()
