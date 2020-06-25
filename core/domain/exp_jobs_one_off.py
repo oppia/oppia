@@ -534,6 +534,7 @@ class InteractionCustomizationArgsValidationJob(
             output_values.append(key[exp_id_index:])
             yield (key[:exp_id_index - 1], output_values)
 
+
 class VoiceoverDurationSecondsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """One-Off Job to set every voiceover's duration to duration_secs with
     the correct value.

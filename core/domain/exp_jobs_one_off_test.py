@@ -1699,6 +1699,7 @@ class InteractionCustomizationArgsValidationJobTests(
 
         self.assertEqual(actual_output, expected_output)
 
+
 class ExplorationMathTagValidationOneOffJobTests(test_utils.GenericTestBase):
 
     ALBERT_EMAIL = 'albert@example.com'
@@ -2217,6 +2218,7 @@ class ExplorationMockMathMigrationOneOffJobOneOffJobTests(
             exp_jobs_one_off
             .ExplorationMockMathMigrationOneOffJob.get_output(job_id))
         self.assertEqual(len(actual_output), 0)
+
 
 class VoiceoverDurationSecondsOneOffJobTests(test_utils.GenericTestBase):
     ONE_OFF_JOB_MANAGERS_FOR_TESTS = [
