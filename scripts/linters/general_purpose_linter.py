@@ -31,8 +31,8 @@ from .. import common
 
 EXCLUDED_PATHS = (
     'third_party/*', 'build/*', '.git/*', '*.pyc', 'CHANGELOG',
-    'integrations/*', 'integrations_dev/*', '*.svg', '*.gif',
-    '*.png', '*.zip', '*.ico', '*.jpg', '*.min.js', 'backend_prod_files/*',
+    'integrations/*', 'integrations_dev/*', '*.svg', '*.gif', '*.png',
+    '*.webp', '*.zip', '*.ico', '*.jpg', '*.min.js', 'backend_prod_files/*',
     'assets/scripts/*', 'core/tests/data/*', 'core/tests/build_sources/*',
     '*.mp3', '*.mp4', 'node_modules/*', 'typings/*', 'local_compiled_js/*',
     'webpack_bundles/*', 'core/tests/services_sources/*',
@@ -99,7 +99,7 @@ BAD_PATTERNS = {
 
 BAD_PATTERNS_REGEXP = [
     {
-        'regexp': re.compile(r'TODO[^\(]*[^\)][^:]*[^\w]*$'),
+        'regexp': re.compile(r'TODO[^\(]*[^\)][^:]*[^A-Z]+[^\w]*$'),
         'message': 'Please assign TODO comments to a user '
                    'in the format TODO(username): XXX. ',
         'excluded_files': (),
@@ -547,10 +547,11 @@ def check_bad_pattern_in_file(filepath, file_content, pattern):
             or any(filepath.endswith(excluded_file)
                    for excluded_file in pattern['excluded_files'])):
         bad_pattern_count = 0
-        for line_num, line in enumerate(file_content.split('\n'), 1):
-            if line.endswith('disable-bad-pattern-check'):
+        for line_num, line in enumerate(file_content):
+            stripped_line = line.rstrip()
+            if stripped_line.endswith('disable-bad-pattern-check'):
                 continue
-            if regexp.search(line):
+            if regexp.search(stripped_line):
                 python_utils.PRINT('%s --> Line %s: %s' % (
                     filepath, line_num, pattern['message']))
                 python_utils.PRINT('')
@@ -708,17 +709,22 @@ class GeneralPurposeLinter(python_utils.OBJECT):
         stdout = sys.stdout
         with linter_utils.redirect_stdout(stdout):
             for filepath in all_filepaths:
-                file_content = FILE_CACHE.read(filepath)
+                file_content = FILE_CACHE.readlines(filepath)
                 total_files_checked += 1
                 for pattern in BAD_PATTERNS:
-                    if (pattern in file_content and
-                            not is_filepath_excluded_for_bad_patterns_check(
-                                pattern, filepath)):
-                        failed = True
-                        python_utils.PRINT('%s --> %s' % (
-                            filepath, BAD_PATTERNS[pattern]['message']))
-                        python_utils.PRINT('')
-                        total_error_count += 1
+                    if is_filepath_excluded_for_bad_patterns_check(
+                            pattern, filepath):
+                        continue
+                    for line_num, line in enumerate(file_content):
+                        if pattern in line:
+                            failed = True
+                            summary_message = ('%s --> Line %s: %s' % (
+                                filepath, line_num + 1,
+                                BAD_PATTERNS[pattern]['message']))
+                            summary_messages.append(summary_message)
+                            python_utils.PRINT(summary_message)
+                            python_utils.PRINT('')
+                            total_error_count += 1
 
                 for regexp in BAD_PATTERNS_REGEXP:
                     if check_bad_pattern_in_file(

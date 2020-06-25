@@ -304,6 +304,93 @@ class ItemSelectionInteractionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         yield (key, values)
 
 
+class ExplorationMathTagValidationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """Job that checks the html content of an exploration and validates all the
+    Math tags in the HTML.
+    """
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    @staticmethod
+    def map(item):
+        if item.deleted:
+            return
+
+        exploration = exp_fetchers.get_exploration_from_model(item)
+        exploration_status = (
+            rights_manager.get_exploration_rights(
+                item.id).status)
+        for state_name, state in exploration.states.items():
+            html_string = ''.join(state.get_all_html_content_strings())
+            error_list = (
+                html_validation_service.validate_math_tags_in_html(html_string))
+            if len(error_list) > 0:
+                key = (
+                    'exp_id: %s, exp_status: %s failed validation.' % (
+                        item.id, exploration_status))
+                value_dict = {
+                    'state_name': state_name,
+                    'error_list': error_list,
+                    'no_of_invalid_tags': len(error_list)
+                }
+                yield (key, value_dict)
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, values)
+
+
+class ExplorationMockMathMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """Job that migrates all the math tags in the exploration to the new schema
+    but does not save the migrated exploration. The new schema has the attribute
+    math-content-with-value which includes a field for storing reference to
+    SVGs. This job is used to verify that the actual migration will be possible
+    for all the explorations.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    @staticmethod
+    def map(item):
+        if item.deleted:
+            return
+
+        exploration = exp_fetchers.get_exploration_from_model(item)
+        exploration_status = (
+            rights_manager.get_exploration_rights(
+                item.id).status)
+        for state_name, state in exploration.states.items():
+            html_string = ''.join(
+                state.get_all_html_content_strings())
+
+            converted_html_string = (
+                html_validation_service.add_math_content_to_math_rte_components(
+                    html_string))
+
+            error_list = (
+                html_validation_service.
+                validate_math_tags_in_html_with_attribute_math_content(
+                    converted_html_string))
+            if len(error_list) > 0:
+                key = (
+                    'exp_id: %s, exp_status: %s failed validation after '
+                    'migration' % (
+                        item.id, exploration_status))
+                value_dict = {
+                    'state_name': state_name,
+                    'error_list': error_list,
+                    'no_of_invalid_tags': len(error_list)
+                }
+                yield (key, value_dict)
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, values)
+
+
 class ViewableExplorationsAuditJob(jobs.BaseMapReduceOneOffJobManager):
     """Job that outputs a list of private explorations which are viewable."""
 
@@ -446,54 +533,6 @@ class InteractionCustomizationArgsValidationJob(
         else:
             output_values.append(key[exp_id_index:])
             yield (key[:exp_id_index - 1], output_values)
-
-
-class TranslatorToVoiceArtistOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """One-off job for migrating translator_ids to voice_artist_ids."""
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [exp_models.ExplorationRightsModel]
-
-    @staticmethod
-    def map(item):
-        if item.deleted:
-            return
-
-        translator_ids = item.translator_ids
-        commit_message = 'Migrate from translator to voice artist'
-        commit_cmds = [{
-            'cmd': 'change_role',
-            'assignee_id': translator_id,
-            # Using magic string because ROLE_TRANSLATOR is removed.
-            'old_role': 'translator',
-            'new_role': rights_manager.ROLE_VOICE_ARTIST
-        } for translator_id in translator_ids]
-
-        if len(translator_ids) > 0:
-            exp_summary_model = exp_models.ExpSummaryModel.get_by_id(item.id)
-
-            if exp_summary_model is None or exp_summary_model.deleted:
-                item.voice_artist_ids = translator_ids
-                item.translator_ids = []
-                item.commit('Admin', commit_message, commit_cmds)
-                yield ('Summary model does not exist or is deleted', item.id)
-            else:
-                exp_summary_model.voice_artist_ids = translator_ids
-                exp_summary_model.translator_ids = []
-                exp_summary_model.put()
-
-                item.voice_artist_ids = translator_ids
-                item.translator_ids = []
-                item.commit('Admin', commit_message, commit_cmds)
-                yield ('SUCCESS', item.id)
-
-    @staticmethod
-    def reduce(key, values):
-        if key == 'SUCCESS':
-            yield (key, len(values))
-        else:
-            yield (key, values)
-
 
 class VoiceoverDurationSecondsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """One-Off Job to set every voiceover's duration to duration_secs with

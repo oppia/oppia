@@ -31,12 +31,6 @@ import { UrlInterpolationService } from
   providedIn: 'root'
 })
 export class StoryViewerBackendApiService {
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'storyDataDict' is a dict with underscore_cased
-  // keys which give tslint errors against underscore_casing in favor of
-  // camelCasing.
-  storyDataDict: any = null;
-
   constructor(
     private urlInterpolationService: UrlInterpolationService,
     private http: HttpClient
@@ -51,9 +45,8 @@ export class StoryViewerBackendApiService {
       });
 
     this.http.get(storyDataUrl).toPromise().then((data) => {
-      this.storyDataDict = cloneDeep(data);
       if (successCallback) {
-        successCallback(this.storyDataDict);
+        successCallback(data);
       }
     }, (error) => {
       if (errorCallback) {
