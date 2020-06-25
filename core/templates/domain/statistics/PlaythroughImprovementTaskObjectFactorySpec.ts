@@ -124,7 +124,7 @@ describe('PlaythroughImprovementTaskObjectFactory', function() {
         });
       this.cyclicTransitionsIssue =
         this.PlaythroughIssueObjectFactory.createFromBackendDict({
-          issue_type: 'CyclicTransitions',
+          issue_type: 'CyclicStateTransitions',
           issue_customization_args: {
             state_names: {value: ['Hola', 'Me Llamo', 'Hola']},
           },
