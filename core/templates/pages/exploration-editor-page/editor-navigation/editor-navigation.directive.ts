@@ -162,7 +162,7 @@ angular.module('oppia').directive('editorNavigation', [
                 $scope.isLargeScreen = (
                   WindowDimensionsService.getWidth() >= 1024);
 
-                $scope.$apply();
+                $scope.$applyAsync();
               });
           };
 

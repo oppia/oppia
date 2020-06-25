@@ -23,6 +23,10 @@ export namespace ImprovementsConstants {
     constants.TASK_TYPE_HIGH_BOUNCE_RATE);
   export const TASK_TYPE_NEEDS_GUIDING_RESPONSES: string = (
     constants.TASK_TYPE_NEEDS_GUIDING_RESPONSES);
+  export const TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP: string = (
+    constants.TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP);
+  export const TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS: string = (
+    constants.TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS);
 
   export const TASK_ENTITY_TYPE_EXPLORATION: string = (
     constants.TASK_ENTITY_TYPE_EXPLORATION);

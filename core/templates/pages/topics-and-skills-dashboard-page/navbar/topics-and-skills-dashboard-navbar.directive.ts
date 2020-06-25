@@ -100,7 +100,7 @@ angular.module('oppia').directive('topicsAndSkillsDashboardNavbar', [
 
                 // TODO(#8521): Remove the use of $rootScope.$apply()
                 // once the directive is migrated to angular
-                $scope.$apply();
+                $scope.$applyAsync();
               });
             $rootScope.$on(
               EVENT_TYPE_TOPIC_CREATION_ENABLED, function(evt, canCreateTopic) {

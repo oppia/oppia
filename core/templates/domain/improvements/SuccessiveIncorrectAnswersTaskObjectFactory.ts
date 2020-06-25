@@ -13,20 +13,21 @@
 // limitations under the License.
 
 /**
- * @fileoverview Domain object for a needs guiding responses improvements task.
+ * @fileoverview Domain object for a successive incorrect answers improvements
+ *    task.
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { AnswerStats } from 'domain/exploration/AnswerStatsObjectFactory';
 import { ITaskEntryBackendDict, TaskEntry } from
   'domain/improvements/TaskEntryObjectFactory';
 import { ImprovementsConstants } from
   'domain/improvements/improvements.constants';
 
-export class NeedsGuidingResponsesTask extends TaskEntry {
-  public readonly taskType: 'needs_guiding_responses';
+export class SuccessiveIncorrectAnswersTask extends TaskEntry {
+  public readonly taskType: 'successive_incorrect_answers';
+
   constructor(backendDict: ITaskEntryBackendDict) {
     if (backendDict.entity_type !==
             ImprovementsConstants.TASK_ENTITY_TYPE_EXPLORATION) {
@@ -35,10 +36,10 @@ export class NeedsGuidingResponsesTask extends TaskEntry {
         `but expected "${ImprovementsConstants.TASK_ENTITY_TYPE_EXPLORATION}"`);
     }
     if (backendDict.task_type !==
-            ImprovementsConstants.TASK_TYPE_NEEDS_GUIDING_RESPONSES) {
+            ImprovementsConstants.TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS) {
       throw new Error(
         `backend dict has task_type "${backendDict.task_type}" but expected ` +
-        `"${ImprovementsConstants.TASK_TYPE_NEEDS_GUIDING_RESPONSES}"`);
+        `"${ImprovementsConstants.TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS}"`);
     }
     if (backendDict.target_type !==
             ImprovementsConstants.TASK_TARGET_TYPE_STATE) {
@@ -49,41 +50,39 @@ export class NeedsGuidingResponsesTask extends TaskEntry {
     super(backendDict);
   }
 
-  public refreshStatus(topStateAnswersStats: AnswerStats[]): void {
-    const numUnaddressedTopStateAnswers = (
-      topStateAnswersStats.filter(a => !a.isAddressed).length);
-    if (numUnaddressedTopStateAnswers === 0) {
-      if (this.isOpen()) {
-        this.markAsResolved();
-      }
-    } else {
-      if (this.isObsolete()) {
-        this.generateIssueDescription(numUnaddressedTopStateAnswers);
-      }
+  public resolve(): void {
+    this.markAsResolved();
+  }
+
+  public refreshStatus(
+      numMultipleIncorrectSubmissionsPlaythroughs: number): void {
+    if (this.isObsolete() && numMultipleIncorrectSubmissionsPlaythroughs > 0) {
+      this.generateIssueDescription(
+        numMultipleIncorrectSubmissionsPlaythroughs);
       this.markAsOpen();
     }
   }
 
   private generateIssueDescription(
-      numUnaddressedTopStateAnswers: number): void {
+      numMultipleIncorrectSubmissionsPlaythroughs: number): void {
     this.issueDescription = (
-      `${numUnaddressedTopStateAnswers} of the top 10 answers for this card ` +
-      'did not have explicit feedback from Oppia.');
+      `At least ${numMultipleIncorrectSubmissionsPlaythroughs} learners had ` +
+      'quit after entering many incorrect answers at this card.');
   }
 }
 
 @Injectable({
   providedIn: 'root'
 })
-export class NeedsGuidingResponsesTaskObjectFactory {
+export class SuccessiveIncorrectAnswersTaskObjectFactory {
   private createNewObsoleteTask(
       expId: string, expVersion: number, stateName: string
-  ): NeedsGuidingResponsesTask {
-    return new NeedsGuidingResponsesTask({
+  ): SuccessiveIncorrectAnswersTask {
+    return new SuccessiveIncorrectAnswersTask({
       entity_type: ImprovementsConstants.TASK_ENTITY_TYPE_EXPLORATION,
       entity_id: expId,
       entity_version: expVersion,
-      task_type: ImprovementsConstants.TASK_TYPE_NEEDS_GUIDING_RESPONSES,
+      task_type: ImprovementsConstants.TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS,
       target_type: ImprovementsConstants.TASK_TARGET_TYPE_STATE,
       target_id: stateName,
       issue_description: null,
@@ -94,20 +93,21 @@ export class NeedsGuidingResponsesTaskObjectFactory {
     });
   }
 
-  createFromAnswerStats(
+  createNew(
       expId: string, expVersion: number, stateName: string,
-      answerStats: AnswerStats[]): NeedsGuidingResponsesTask {
+      numMultipleIncorrectSubmissionsPlaythroughs: number
+  ): SuccessiveIncorrectAnswersTask {
     const task = this.createNewObsoleteTask(expId, expVersion, stateName);
-    task.refreshStatus(answerStats);
+    task.refreshStatus(numMultipleIncorrectSubmissionsPlaythroughs);
     return task;
   }
 
   createFromBackendDict(
-      backendDict: ITaskEntryBackendDict): NeedsGuidingResponsesTask {
-    return new NeedsGuidingResponsesTask(backendDict);
+      backendDict: ITaskEntryBackendDict): SuccessiveIncorrectAnswersTask {
+    return new SuccessiveIncorrectAnswersTask(backendDict);
   }
 }
 
 angular.module('oppia').factory(
-  'NeedsGuidingResponsesTaskObjectFactory',
-  downgradeInjectable(NeedsGuidingResponsesTaskObjectFactory));
+  'SuccessiveIncorrectAnswersTaskObjectFactory',
+  downgradeInjectable(SuccessiveIncorrectAnswersTaskObjectFactory));
