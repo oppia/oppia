@@ -117,10 +117,22 @@ def tokenize(expression):
     """
     expression = expression.replace(' ', '')
 
-    re_string = r'([a-zA-Z]+|[0-9]+\.[0-9]+|[0-9]+|[%s])' % '\\'.join(
-        _VALID_OPERATORS)
+    # Note: Greek letters and math functions are sorted in reverse by length so
+    # that longer ones get matched before shorter ones.
+    # For eg. 'x + epsilon' should be tokenized as ['x','+','epsilon'] and not
+    # ['x','+','e','*','psi','*','l','*','o','*','n'].
+    re_string = r'(%s|[a-zA-Z]|[0-9]+\.[0-9]+|[0-9]+|[%s])' % (
+        '|'.join(sorted(
+            _GREEK_LETTERS + _MATH_FUNCTION_NAMES, reverse=True, key=len)),
+        '\\'.join(_VALID_OPERATORS))
 
     token_texts = re.findall(re_string, expression)
+
+    if sum([len(token_text) for token_text in token_texts]) != len(
+            expression):
+        raise Exception(
+            'Invalid syntax: Unexpected token present in the expression.')
+
     token_list = []
     for token_text in token_texts:
         # Replacing all parens with '(' or ')' for simplicity while parsing.
@@ -131,11 +143,22 @@ def tokenize(expression):
         else:
             token_list.append(Token(token_text))
 
-    if sum([len(token.text) for token in token_list]) != len(expression):
-        raise Exception(
-            'Invalid syntax: Unexpected token present in the expression.')
+    # Adding '*' sign after identifiers, numbers and closing brackets if they
+    # are not followed by a valid operator.
+    final_token_list = []
+    for i in python_utils.RANGE(len(token_list)):
+        if i == len(token_list) - 1:
+            final_token_list.append(token_list[i])
+        else:
+            final_token_list.append(token_list[i])
+            if (token_list[i].category in (
+                    _TOKEN_CATEGORY_IDENTIFIER, _TOKEN_CATEGORY_NUMBER) or (
+                        token_list[i].text == ')')) and (token_list[
+                            i + 1].category != _TOKEN_CATEGORY_OPERATOR or (
+                                token_list[i + 1].text == '(')):
+                final_token_list.append(Token('*'))
 
-    return token_list
+    return final_token_list
 
 
 class Token(python_utils.OBJECT):
@@ -361,8 +384,7 @@ class Parser(python_utils.OBJECT):
 
     def parse(self, expression):
         """A wrapper around the _parse_expr method. This method creates a list
-        of tokens present in the expression and checks if all tokens have been
-        consumed by the _parse_expr method.
+        of tokens present in the expression and calls the _parse_expr method.
 
         Args:
             expression: str. String representing the math expression.
@@ -390,11 +412,7 @@ class Parser(python_utils.OBJECT):
         # reset to 0.
         self._next_token_index = 0
 
-        parsed_expr = self._parse_expr(token_list)
-        if self._next_token_index < len(token_list):
-            raise Exception('Invalid syntax: Unexpected end of expression.')
-
-        return parsed_expr
+        return self._parse_expr(token_list)
 
     def _parse_expr(self, token_list):
         """Function representing the following production rule of the grammar:
