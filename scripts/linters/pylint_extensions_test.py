@@ -228,6 +228,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         ):
             self.checker_test_object.checker.visit_functiondef(
                 invalid_args_description_node)
+
         invalid_param_indentation_node = astroid.extract_node("""
         def func(test_var_one): #@
             \"\"\"Function to test docstring parameters.
@@ -250,6 +251,74 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         ):
             self.checker_test_object.checker.visit_functiondef(
                 invalid_param_indentation_node)
+
+        invalid_header_indentation_node = astroid.extract_node("""
+        def func(test_var_one): #@
+            \"\"\"Function to test docstring parameters.
+
+             Args:
+                 test_var_one: int. First test variable.
+
+            Returns:
+                int. The test result.
+            \"\"\"
+            result = test_var_one + test_var_two
+            return result
+        """)
+        with self.checker_test_object.assertAddsMessages(
+            testutils.Message(
+                msg_id='incorrect-indentation-for-arg-header-doc',
+                node=invalid_header_indentation_node,
+            ),
+        ):
+            self.checker_test_object.checker.visit_functiondef(
+                invalid_header_indentation_node)
+
+    def test_correct_args_formatting_docstring(self):
+        self.checker_test_object = testutils.CheckerTestCase()
+        self.checker_test_object.CHECKER_CLASS = (
+            pylint_extensions.DocstringParameterChecker)
+        self.checker_test_object.setup_method()
+        valid_free_form_node = astroid.extract_node("""
+        def func(test_var_one, test_var_two): #@
+            \"\"\"Function to test docstring parameters.
+
+            Args:
+                test_var_one: int. First test variable.
+                test_var_two: str. Second test variable:
+                    Incorrect description indentation
+                        {
+                            key:
+                        }
+
+            Returns:
+                int. The test result.
+            \"\"\"
+            result = test_var_one + test_var_two
+            return result
+        """)
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_functiondef(
+                valid_free_form_node)
+
+        valid_indentation_node = astroid.extract_node("""
+        def func(test_var_one, test_var_two): #@
+            \"\"\"Function to test docstring parameters.
+
+            Args:
+                test_var_one: int. First test variable.
+                test_var_two: str. Second test variable:
+                    Correct indentaion.
+
+            Returns:
+                int. The test result.
+            \"\"\"
+            result = test_var_one + test_var_two
+            return result
+        """)
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_functiondef(
+                valid_indentation_node)
 
     def test_finds_docstring_parameter(self):
         self.checker_test_object = testutils.CheckerTestCase()
@@ -2118,8 +2187,26 @@ class DocstringCheckerTests(unittest.TestCase):
                 u"""class ABC(arg):
                         \"\"\"This is a docstring.
                             Returns:
-                                (str). If :true,
+                                str. If :true,
                                     individual key=value pairs.
+                        \"\"\"
+                        Something
+                """)
+        message = testutils.Message(
+            msg_id='4-space-indentation-in-docstring',
+            line=5)
+        self.checker_test_object.checker.process_module(
+            invalid_description_indentation_node)
+        with self.checker_test_object.assertAddsMessages(message):
+            temp_file.close()
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""class ABC(arg):
+                        \"\"\"This is a docstring.
+                            Yields:
+                                str. If :true,
+                                  incorrent indentation line.
                         \"\"\"
                         Something
                 """)
