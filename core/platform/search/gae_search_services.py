@@ -48,7 +48,7 @@ def add_documents_to_index(documents, index, retries=DEFAULT_NUM_RETRIES):
     """Adds a document to an index.
 
     Args:
-        documents: list. Each document should be a dictionary.
+        documents: list(dict(str, str)). Each document should be a dictionary.
             Every key in the document is a field name, and the corresponding
             value will be the field's value.
             If there is a key named 'id', its value will be used as the
@@ -59,16 +59,16 @@ def add_documents_to_index(documents, index, retries=DEFAULT_NUM_RETRIES):
             If there is a key named 'language_code', its value will be used as
             the document's language. Otherwise, constants.DEFAULT_LANGUAGE_CODE
             is used.
-        index: str. the name of the index to insert the document into
-        retries: int. the number of times to retry inserting the documents.
+        index: str. The name of the index to insert the document into
+        retries: int. The number of times to retry inserting the documents.
 
     Returns:
-        list. returns a list of document ids of the documents that were added.
+        list. Returns a list of document ids of the documents that were added.
 
     Raises:
-        SearchFailureError: raised when the indexing fails. If it fails for any
+        SearchFailureError: Raised when the indexing fails. If it fails for any
             document, none will be inserted.
-        ValueError: raised when invalid values are given.
+        ValueError: Raised when invalid values are given.
     """
     if not isinstance(index, python_utils.BASESTRING):
         raise ValueError(
@@ -172,8 +172,11 @@ def _validate_list(key, value):
     passed in to make better error messages.
 
     Args:
-        key: str. key value of the list.
-        value: list. list to be included in document fields.
+        key: str. Key value string that fills in the descriptor of this
+            particular list.
+        value: list. List to be validated where elements must be either a
+            python_utils.BASESTRING, datetime.date, datetime.datetime,
+            numbers.Number.
     """
 
     for ind, element in enumerate(value):
@@ -191,13 +194,13 @@ def delete_documents_from_index(
     """Deletes documents from an index.
 
     Args:
-        doc_ids: list(id). a list of document ids of documents to be deleted
+        doc_ids: list(str). A list of document ids of documents to be deleted
             from the index.
-        index: str. the name of the index to delete the document from
-        retries: int. the number of times to retry deleting the documents.
+        index: str. The name of the index to delete the document from
+        retries: int. The number of times to retry deleting the documents.
 
     Raises:
-        SearchFailureError: raised when the deletion fails. If it fails for any
+        SearchFailureError: Raised when the deletion fails. If it fails for any
             document, none will be deleted.
     """
     if not isinstance(index, python_utils.BASESTRING):
@@ -238,7 +241,7 @@ def clear_index(index_name):
     there are too many entries in the index.
 
     Args:
-        index_name: str. the name of the index to delete the document from.
+        index_name: str. The name of the index to delete the document from.
     """
     index = gae_search.Index(index_name)
 
@@ -257,21 +260,21 @@ def search(query_string, index, cursor=None,
     """Searches for documents in an index.
 
     Args:
-        query_string: str. the search query.
+        query_string: str. The search query.
             The syntax used is described here:
             https://developers.google.com/appengine/docs/python/search/query_strings
-        index: str. the name of the index to search.
-        cursor: str. a cursor string, as returned by this function. Pass this in
+        index: str. The name of the index to search.
+        cursor: str. A cursor string, as returned by this function. Pass this in
             to get the next 'page' of results. Leave as None to start at the
             beginning.
-        limit: int. the maximum number of documents to return.
-        sort: str. a string indicating how to sort results. This should be a
+        limit: int. The maximum number of documents to return.
+        sort: str. A string indicating how to sort results. This should be a
             string of space separated values. Each value should start with a '+'
             or a '-' character indicating whether to sort in ascending or
             descending order respectively. This character should be followed by
             a field name to sort on.
-        ids_only: bool. whether to only return document ids.
-        retries: int. the number of times to retry searching the index.
+        ids_only: bool. Whether to only return document ids.
+        retries: int. The number of times to retry searching the index.
 
     Returns:
         2-tuple of (result_docs, result_cursor_str). Where:
@@ -373,12 +376,12 @@ def _string_to_sort_expressions(input_string):
 def get_document_from_index(doc_id, index):
     """Returns a document with a give doc_id(s) from the index.
 
-    args:
-      - doc_id: str. a doc_id as a string.
-      - index: str. the name of an index.
+    Args:
+        doc_id: str. A doc_id as a string.
+        index: str. The name of an index.
 
-    returns
-      - the requested document as a dict.
+    Returns:
+        dict. The requested document as a dict.
     """
     index = gae_search.Index(index)
     return _search_document_to_dict(index.get(doc_id))

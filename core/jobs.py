@@ -661,8 +661,6 @@ class BaseDeferredJobManager(BaseJobManager):
 
 
 class MapReduceJobPipeline(base_handler.PipelineBase):
-    # pylint: disable=8-space-indentation-in-docstring
-    # pylint: disable=4-space-indentation-in-docstring
     """This class inherits from the PipelineBase class which are used to
     connect various workflows/functional procedures together. It implements
     a run method which is called when this job is started by using start()
@@ -680,10 +678,11 @@ class MapReduceJobPipeline(base_handler.PipelineBase):
 
         Yields:
             MapreducePipeline. Ready to start processing. Expects the output of
-                that pipeline to be sent back.
+            that pipeline to be sent back.
             StoreMapReduceResults. Will be constructed with whatever output the
-                caller sends back to the coroutine.
+            caller sends back to the coroutine.
         """
+
         job_class = mapreduce_util.for_name(job_class_str)
         job_class.register_start(job_id, metadata={
             job_class._OUTPUT_KEY_ROOT_PIPELINE_ID: self.root_pipeline_id  # pylint: disable=protected-access

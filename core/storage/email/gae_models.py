@@ -532,8 +532,8 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
                 instance id exists in the datastore. Default is True.
 
         Returns:
-            A FeedbackEmailReplyToIdModel instance that corresponds to the given
-            instance id if it is present in the datastore. Otherwise, None.
+            FeedbackEmailReplyToIdModel|None. An instance that corresponds to
+            the given instance id if it is present in the datastore.
         """
         instance_id = cls._generate_id(user_id, thread_id)
         return super(

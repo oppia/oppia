@@ -28,7 +28,7 @@ def get_multi(keys):
     """Looks up a list of keys in memcache.
 
     Args:
-        keys: list(str). a list of keys (strings) to look up.
+        keys: list(str). A list of keys (strings) to look up.
 
     Returns:
         dict. A dict of key-value pairs for the keys/values that were present in
@@ -49,7 +49,7 @@ def set_multi(key_value_mapping):
             < 1 MB. The total size of key_value_mapping should be at most 32 MB.
 
     Returns:
-        list. A list of the keys whose values were NOT set.
+        list(str). A list of the keys whose values were NOT set.
     """
     assert isinstance(key_value_mapping, dict)
     unset_keys = memcache.set_multi(key_value_mapping)
@@ -60,7 +60,7 @@ def delete(key):
     """Deletes a key in memcache.
 
     Args:
-        key: str. a key (string) to delete.
+        key: str. A key (string) to delete.
 
     Returns:
         int. 0 on network failure, 1 if the item does not exist, and
@@ -75,7 +75,7 @@ def delete_multi(keys):
     """Deletes multiple keys in memcache.
 
     Args:
-        keys: dict(str). the keys (strings) to delete.
+        keys: dict. The keys (strings) to delete.
 
     Returns:
         bool. True if all operations complete successfully; False

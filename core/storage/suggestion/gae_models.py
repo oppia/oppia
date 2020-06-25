@@ -476,7 +476,7 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
 
         Returns:
             list(GeneralVoiceoverApplicationModel). The list of voiceover
-            application submitted by the given user.
+            applications submitted by the given user.
         """
         if status in STATUS_CHOICES:
             return cls.query(ndb.AND(

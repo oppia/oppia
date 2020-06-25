@@ -35,7 +35,7 @@ class ComponentValidationUnitTests(test_utils.GenericTestBase):
         """Test that values are validated correctly.
 
         Args:
-            rte_component_class: child of BaseRTEComponent. the class whose
+            rte_component_class: child of BaseRTEComponent. The class whose
                 validate() method is to be tested.
             valid_items: a list of values. Each of these items is expected to
                 be validated without any Exception.

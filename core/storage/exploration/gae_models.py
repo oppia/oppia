@@ -927,9 +927,9 @@ class ExpSummaryModel(base_models.BaseModel):
             limit: int. The maximum number of results to return.
 
         Returns:
-            An iterable with exp summaries that are recently published. The
-            returned list is sorted by the time of publication with latest
-            being first in the list.
+            iterable. An iterable with exp summaries that are
+            recently published. The returned list is sorted by the time of
+            publication with latest being first in the list.
         """
         return ExpSummaryModel.query().filter(
             ExpSummaryModel.status == constants.ACTIVITY_STATUS_PUBLIC
