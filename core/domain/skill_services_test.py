@@ -359,7 +359,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(augmented_skill_summaries[0].id, self.SKILL_ID)
         self.assertEqual(augmented_skill_summaries[1].id, self.SKILL_ID2)
 
-    def test_get_filtered_skills_more_and_cursor(self):
+    def test_cursor_behaves_correctly_when_fetching_skills_in_batches(self):
         self.save_new_skill(
             self.SKILL_ID2, self.USER_ID, description='Description2',
             prerequisite_skill_ids=[])
@@ -378,7 +378,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             skill_services.get_filtered_skill_summaries(
                 self.num_queries_to_fetch, None, None, None, None, next_cursor))
         self.assertEqual(len(augmented_skill_summaries), 1)
-        self.assertEqual(next_cursor, None)
+        self.assertIsNone(next_cursor)
         self.assertFalse(more)
 
     def test_filter_skills_by_status_all(self):

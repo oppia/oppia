@@ -299,11 +299,11 @@ var TopicsAndSkillsDashboardPage = function() {
   };
 
   this.deleteSkillWithIndex = async function(index) {
-    var elems = await deleteSkillButtons.get(index);
+    var deleteSkillButton = await deleteSkillButtons.get(index);
     await waitFor.elementToBeClickable(
-      elems,
+      deleteSkillButton,
       'Delete skill button takes too long to be clickable');
-    await elems.click();
+    await deleteSkillButton.click();
     await waitFor.elementToBeClickable(
       confirmSkillDeletionButton,
       'Confirm Delete Skill button takes too long to be clickable');
