@@ -132,9 +132,37 @@ class MathExpressionValidationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     VALID_MATH_INPUTS_YIELD_LIMIT = 200
     UNICODE_TO_TEXT = {
         u'\u221a': 'sqrt',
+        u'\xb7': '*',
+        u'\u03b1': 'alpha',
+        u'\u03b2': 'beta',
+        u'\u03b3': 'gamma',
+        u'\u03b4': 'delta',
+        u'\u03b5': 'epsilon',
+        u'\u03b6': 'zeta',
+        u'\u03b7': 'eta',
+        u'\u03b8': 'theta',
+        u'\u03b9': 'iota',
+        u'\u03ba': 'kappa',
+        u'\u03bb': 'lambda',
+        u'\u03bc': 'mu',
+        u'\u03bd': 'nu',
+        u'\u03be': 'xi',
         u'\u03c0': 'pi',
-        u'\xb7': '*'
+        u'\u03c1': 'rho',
+        u'\u03c3': 'sigma',
+        u'\u03c4': 'tau',
+        u'\u03c5': 'upsilon',
+        u'\u03c6': 'phi',
+        u'\u03c7': 'chi',
+        u'\u03c8': 'psi',
+        u'\u03c8': 'omega',
     }
+    INVERSE_TRIG_FNS_MAPPING = {
+        'asin': 'arcsin',
+        'acos': 'arccos',
+        'atan': 'arctan'
+    }
+    TRIG_FNS = ['sin', 'cos', 'tan', 'csc', 'sec', 'cot']
 
     @classmethod
     def entity_classes_to_map_over(cls):
@@ -149,6 +177,9 @@ class MathExpressionValidationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         ltt = latex2text.LatexNodes2Text()
         unicode_to_text_mapping = (
             MathExpressionValidationOneOffJob.UNICODE_TO_TEXT)
+        inverse_trig_fns_mapping = (
+            MathExpressionValidationOneOffJob.INVERSE_TRIG_FNS_MAPPING)
+        trig_fns = MathExpressionValidationOneOffJob.TRIG_FNS
 
         if not item.deleted:
             exploration = exp_fetchers.get_exploration_from_model(item)
@@ -159,6 +190,20 @@ class MathExpressionValidationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                             rule_input = ltt.latex_to_text(
                                 rule_spec.inputs['x'])
 
+                            # Shifting powers in trig functions to the end.
+                            # For eg. sin^2(x) -> sin(x)^2
+                            for trig_fn in trig_fns:
+                                rule_input = re.sub(
+                                    r'%s(\^\d)\((.)\)' % trig_fn,
+                                    r'%s(\2)\1' % trig_fn, rule_input)
+                            
+                            # Adding parens to trig functions that don't have
+                            # any. For eg. cosA -> cos(A)
+                            for trig_fn in trig_fns:
+                                rule_input = re.sub(
+                                    r'%s(?!\()(.)' % trig_fn,
+                                    r'%s(\1)' % trig_fn, rule_input)
+
                             # The pylatexenc lib outputs the unicode values of
                             # special characters like sqrt and pi, which is why
                             # they need to be replaced with their corresponding
@@ -167,6 +212,13 @@ class MathExpressionValidationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                                     unicode_to_text_mapping.items()):
                                 rule_input = rule_input.replace(
                                     unicode_char, text)
+
+                            # Replacing trig functions that have format which is
+                            # incompatible with the validations.
+                            for invalid_trig_fn, valid_trig_fn in (
+                                    inverse_trig_fns_mapping.items()):
+                                rule_input = rule_input.replace(
+                                    invalid_trig_fn, valid_trig_fn)
 
                             validity = 'Invalid'
                             if is_valid_math_expression(rule_input):

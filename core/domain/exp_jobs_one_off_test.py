@@ -289,19 +289,24 @@ class MathExpressionValidationOneOffJobTests(test_utils.GenericTestBase):
             self.VALID_EXP_ID, title='title', category='category')
 
         exploration.add_states([
-            'State1', 'State2', 'State3', 'State4', 'State5'])
+            'State1', 'State2', 'State3', 'State4', 'State5', 'State6',
+            'State7'])
 
         state1 = exploration.states['State1']
         state2 = exploration.states['State2']
         state3 = exploration.states['State3']
         state4 = exploration.states['State4']
         state5 = exploration.states['State5']
+        state6 = exploration.states['State6']
+        state7 = exploration.states['State7']
 
         state1.update_interaction_id('MathExpressionInput')
         state2.update_interaction_id('MathExpressionInput')
         state3.update_interaction_id('MathExpressionInput')
         state4.update_interaction_id('MathExpressionInput')
         state5.update_interaction_id('MathExpressionInput')
+        state6.update_interaction_id('MathExpressionInput')
+        state7.update_interaction_id('MathExpressionInput')
 
         answer_group_list1 = [{
             'rule_specs': [{
@@ -418,6 +423,53 @@ class MathExpressionValidationOneOffJobTests(test_utils.GenericTestBase):
         state5.update_interaction_answer_groups(answer_group_list5)
         exp_services.save_new_exploration(self.albert_id, exploration)
 
+        answer_group_list6 = [{
+            'rule_specs': [{
+                'rule_type': 'IsMathematicallyEquivalentTo',
+                'inputs': {'x': u'sin^2(\u03b8) + cos^2(\u03b8) = 1'}
+            }],
+            'outcome': {
+                'dest': 'State1',
+                'feedback': {
+                    'content_id': 'feedback',
+                    'html': '<p>Outcome for state6</p>'
+                },
+                'param_changes': [],
+                'labelled_as_correct': False,
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }]
+
+        state6.update_interaction_answer_groups(answer_group_list6)
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        answer_group_list7 = [{
+            'rule_specs': [{
+                'rule_type': 'IsMathematicallyEquivalentTo',
+                'inputs': {
+                    'x': u'(asinA*cosB + cosA*asinB)/(cosA*acosB - asinA*sinB)'}
+            }],
+            'outcome': {
+                'dest': 'State1',
+                'feedback': {
+                    'content_id': 'feedback',
+                    'html': '<p>Outcome for state7</p>'
+                },
+                'param_changes': [],
+                'labelled_as_correct': False,
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }]
+
+        state7.update_interaction_answer_groups(answer_group_list7)
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
         job_id = (
             exp_jobs_one_off.MathExpressionValidationOneOffJob.create_new(
             ))
@@ -430,8 +482,11 @@ class MathExpressionValidationOneOffJobTests(test_utils.GenericTestBase):
         expected_output = [
             u'[u\'Invalid\', [u\'exp_id0 State3: x<y>z\', '
             u'u\'exp_id0 State5: \\xe2\\xe9\\xee\\xf4\\xfc\']]',
-            u'[u\'Valid Equation\', [u\'exp_id0 State2: y=m*x+c\']]',
+            u'[u\'Valid Equation\', [u\'exp_id0 State2: y=m*x+c\', '
+            u'u\'exp_id0 State6: sin(theta)^2 + cos(theta)^2 = 1\']]',
             u'[u\'Valid Expression\', [u\'exp_id0 State1: x+y-z\', '
+            u'u\'exp_id0 State7: (arcsin(A)*cos(B) + cos(A)*arcsin(B))/'
+            u'(cos(A)*arccos(B) - arcsin(A)*sin(B))\', '
             u'u\'exp_id0 State4: sqrt(x/y)\']]']
 
         self.assertEqual(actual_output, expected_output)
