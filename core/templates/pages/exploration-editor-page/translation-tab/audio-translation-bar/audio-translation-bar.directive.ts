@@ -532,6 +532,9 @@ angular.module('oppia').directive('audioTranslationBar', [
             $scope.waveSurfer = null;
 
             document.body.onkeyup = function(e) {
+              if (!$scope.canVoiceover) {
+                return;
+              }
               if (e.code === 'KeyR' && !$scope.isAudioAvailable) {
                 // Used as shortcut key for recording
                 toggleStartAndStopRecording();
