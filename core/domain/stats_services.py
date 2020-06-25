@@ -1084,7 +1084,7 @@ def get_learner_answer_details_from_model(learner_answer_details_model):
             answer details model loaded from the datastore.
 
     Returns:
-        LearnerAnswerDetails. A LearnerAnswerDetails domain object
+        LearnerAnswerDetails|None. A LearnerAnswerDetails domain object
         corresponding to the given model.
     """
     return stats_domain.LearnerAnswerDetails(

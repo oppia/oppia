@@ -314,7 +314,7 @@ def _get_file_extensions(file_extensions_to_lint):
 
     Args:
         file_extensions_to_lint: list(str). The list of file extensions to be
-            linted checked.
+            linted and checked.
 
     Returns:
         all_file_extensions_type: list(str). The list of all file extensions

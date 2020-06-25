@@ -2429,9 +2429,9 @@ class Exploration(python_utils.OBJECT):
             versioned_exploration_states: dict. A dict with two keys:
                 - states_schema_version: int. The states schema version for
                     the exploration.
-                - states: dict. The dict of states contains the exploration.
-                    The keys are state names and the values are dicts used to
-                    initialize a State domain object.
+                - states: dict. The dict of states which contains the
+                    exploration. The keys are state names and the values are
+                    dicts used to initialize a State domain object.
             current_states_schema_version: int. The current states
                 schema version.
             exploration_id: str. ID of the exploration.

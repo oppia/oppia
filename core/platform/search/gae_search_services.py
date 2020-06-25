@@ -48,7 +48,7 @@ def add_documents_to_index(documents, index, retries=DEFAULT_NUM_RETRIES):
     """Adds a document to an index.
 
     Args:
-        documents: a list of documents. Each document should be a dictionary.
+        documents: list. Each document should be a dictionary.
             Every key in the document is a field name, and the corresponding
             value will be the field's value.
             If there is a key named 'id', its value will be used as the
@@ -59,11 +59,11 @@ def add_documents_to_index(documents, index, retries=DEFAULT_NUM_RETRIES):
             If there is a key named 'language_code', its value will be used as
             the document's language. Otherwise, constants.DEFAULT_LANGUAGE_CODE
             is used.
-        index: the name of the index to insert the document into, a string.
-        retries: the number of times to retry inserting the documents.
+        index: str. the name of the index to insert the document into
+        retries: int. the number of times to retry inserting the documents.
 
     Returns:
-        returns a list of document ids of the documents that were added.
+        list. returns a list of document ids of the documents that were added.
 
     Raises:
         SearchFailureError: raised when the indexing fails. If it fails for any
@@ -170,6 +170,10 @@ def _make_fields(key, value):
 def _validate_list(key, value):
     """Validates a list to be included as document fields. The key is just
     passed in to make better error messages.
+
+    Args:
+        key: str. key value of the list.
+        value: list. list to be included in document fields.
     """
 
     for ind, element in enumerate(value):
@@ -187,10 +191,10 @@ def delete_documents_from_index(
     """Deletes documents from an index.
 
     Args:
-        doc_ids: a list of document ids of documents to be deleted from the
-            index.
-        index: the name of the index to delete the document from, a string.
-        retries: the number of times to retry deleting the documents.
+        doc_ids: list(id). a list of document ids of documents to be deleted
+            from the index.
+        index: str. the name of the index to delete the document from
+        retries: int. the number of times to retry deleting the documents.
 
     Raises:
         SearchFailureError: raised when the deletion fails. If it fails for any
@@ -234,7 +238,7 @@ def clear_index(index_name):
     there are too many entries in the index.
 
     Args:
-        index_name: the name of the index to delete the document from, a string.
+        index_name: str. the name of the index to delete the document from.
     """
     index = gae_search.Index(index_name)
 
@@ -253,21 +257,21 @@ def search(query_string, index, cursor=None,
     """Searches for documents in an index.
 
     Args:
-        query_string: the search query.
+        query_string: str. the search query.
             The syntax used is described here:
             https://developers.google.com/appengine/docs/python/search/query_strings
-        index: the name of the index to search.
-        cursor: a cursor string, as returned by this function. Pass this in to
-            get the next 'page' of results. Leave as None to start at the
+        index: str. the name of the index to search.
+        cursor: str. a cursor string, as returned by this function. Pass this in
+            to get the next 'page' of results. Leave as None to start at the
             beginning.
-        limit: the maximum number of documents to return.
-        sort: a string indicating how to sort results. This should be a string
-            of space separated values. Each value should start with a '+' or a
-            '-' character indicating whether to sort in ascending or descending
-            order respectively. This character should be followed by a field
-            name to sort on.
-        ids_only: whether to only return document ids.
-        retries: the number of times to retry searching the index.
+        limit: int. the maximum number of documents to return.
+        sort: str. a string indicating how to sort results. This should be a
+            string of space separated values. Each value should start with a '+'
+            or a '-' character indicating whether to sort in ascending or
+            descending order respectively. This character should be followed by
+            a field name to sort on.
+        ids_only: bool. whether to only return document ids.
+        retries: int. the number of times to retry searching the index.
 
     Returns:
         2-tuple of (result_docs, result_cursor_str). Where:
@@ -370,8 +374,8 @@ def get_document_from_index(doc_id, index):
     """Returns a document with a give doc_id(s) from the index.
 
     args:
-      - doc_id: a doc_id as a string.
-      - index: the name of an index, a string.
+      - doc_id: str. a doc_id as a string.
+      - index: str. the name of an index.
 
     returns
       - the requested document as a dict.

@@ -496,7 +496,7 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
 
         Returns:
             list(GeneralVoiceoverApplicationModel). The list of voiceover
-            application which the given user can review.
+            applications which the given user can review.
         """
         return cls.query(ndb.AND(
             cls.author_id != user_id,

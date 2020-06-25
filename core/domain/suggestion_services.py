@@ -41,11 +41,10 @@ def create_suggestion(
     """Creates a new SuggestionModel and the corresponding FeedbackThread.
 
     Args:
-        suggestion_type: str. The type of the suggestion.
-        target_type: str. The target entity being edited.
-
-            (The above 2 parameters should be one of the constants defined in
-            storage/suggestion/gae_models.py.)
+        suggestion_type: str. The type of the suggestion. This parameter should
+            be one of the constants defined in storage/suggestion/gae_models.py.
+        target_type: str. The target entity being edited. This parameter should
+            be one of the constants defined in storage/suggestion/gae_models.py.
 
         target_id: str. The ID of the target entity being suggested to.
         target_version_at_submission: int. The version number of the target

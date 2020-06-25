@@ -74,7 +74,7 @@ def send_mail(
 
     Raises:
         Exception: if the configuration in feconf.py forbids emails from being
-            ent.
+            sent.
         Exception: if mailgun api key is not stored in feconf.MAILGUN_API_KEY.
         Exception: if mailgun domain name is not stored in
             feconf.MAILGUN_DOMAIN_NAME.

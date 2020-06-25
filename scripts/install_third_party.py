@@ -82,8 +82,8 @@ def download_files(source_url_root, target_dir, source_filenames):
     Each file is downloaded only if it does not already exist.
 
     Args:
-        source_url_root: the URL to prepend to all the filenames.
-        target_dir: the directory to save the files to.
+        source_url_root: str. the URL to prepend to all the filenames.
+        target_dir: str. the directory to save the files to.
         source_filenames: a list of filenames. Each filename is appended to the
             end of the source_url_root in order to give the URL from which to
             download the file. The downloaded file is then placed in target_dir,

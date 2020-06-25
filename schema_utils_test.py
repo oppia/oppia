@@ -546,11 +546,13 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
         """Validates the schema and tests that values are normalized correctly.
 
         Args:
-            schema: the schema to normalize the value against.
-            mappings: a list of 2-element tuples. The first element of
+            schema: dict. the schema to normalize the value against. Each schema
+                is a dict with at least a key called 'type'. The 'type' can take
+                one of the SCHEMA_TYPE_* values declared above.
+            mappings: list. a list of 2-element tuples. The first element of
                 each item is expected to be normalized to the second.
-            invalid_items: a list of values. Each of these is expected to raise
-                an AssertionError when normalized.
+            invalid_items: list. a list of values. Each of these is expected to
+                raise an AssertionError when normalized.
         """
         validate_schema(schema)
 
