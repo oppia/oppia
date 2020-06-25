@@ -87,31 +87,31 @@ describe('Email Dashboard Page', function() {
 
   it('should reset form', function() {
     // Mock some values.
-    ctrl.has_not_logged_in_for_n_days = true;
-    ctrl.inactive_in_last_n_days = true;
-    ctrl.created_at_least_n_exps = true;
-    ctrl.created_fewer_than_n_exps = false;
-    ctrl.edited_at_least_n_exps = true;
-    ctrl.edited_fewer_than_n_exps = false;
+    ctrl.hasNotLoggedInForNDays = true;
+    ctrl.inactiveInLastNDays = true;
+    ctrl.createdAtLeastNExps = true;
+    ctrl.createdFewerThanNExps = false;
+    ctrl.editedAtLeastNExps = true;
+    ctrl.editedFewerThanNExps = false;
 
     ctrl.resetForm();
 
-    expect(ctrl.has_not_logged_in_for_n_days).toBe(null);
-    expect(ctrl.inactive_in_last_n_days).toBe(null);
-    expect(ctrl.created_at_least_n_exps).toBe(null);
-    expect(ctrl.created_fewer_than_n_exps).toBe(null);
-    expect(ctrl.edited_at_least_n_exps).toBe(null);
-    expect(ctrl.edited_fewer_than_n_exps).toBe(null);
+    expect(ctrl.hasNotLoggedInForNDays).toBe(null);
+    expect(ctrl.inactiveInLastNDays).toBe(null);
+    expect(ctrl.createdAtLeastNExps).toBe(null);
+    expect(ctrl.createdFewerThanNExps).toBe(null);
+    expect(ctrl.editedAtLeastNExps).toBe(null);
+    expect(ctrl.editedFewerThanNExps).toBe(null);
   });
 
   it('should submit query', function() {
     // Mock some values.
-    ctrl.has_not_logged_in_for_n_days = true;
-    ctrl.inactive_in_last_n_days = true;
-    ctrl.created_at_least_n_exps = true;
-    ctrl.created_fewer_than_n_exps = false;
-    ctrl.edited_at_least_n_exps = true;
-    ctrl.edited_fewer_than_n_exps = false;
+    ctrl.hasNotLoggedInForNDays = true;
+    ctrl.inactiveInLastNDays = true;
+    ctrl.createdAtLeastNExps = true;
+    ctrl.createdFewerThanNExps = false;
+    ctrl.editedAtLeastNExps = true;
+    ctrl.editedFewerThanNExps = false;
 
     spyOn(EmailDashboardDataService, 'submitQuery').and.callFake(function() {
       var deferred = $q.defer();
@@ -125,12 +125,12 @@ describe('Email Dashboard Page', function() {
     expect(ctrl.currentPageOfQueries).toEqual(firstPageQueries);
     expect(ctrl.showSuccessMessage).toBe(true);
 
-    expect(ctrl.has_not_logged_in_for_n_days).toBe(null);
-    expect(ctrl.inactive_in_last_n_days).toBe(null);
-    expect(ctrl.created_at_least_n_exps).toBe(null);
-    expect(ctrl.created_fewer_than_n_exps).toBe(null);
-    expect(ctrl.edited_at_least_n_exps).toBe(null);
-    expect(ctrl.edited_fewer_than_n_exps).toBe(null);
+    expect(ctrl.hasNotLoggedInForNDays).toBe(null);
+    expect(ctrl.inactiveInLastNDays).toBe(null);
+    expect(ctrl.createdAtLeastNExps).toBe(null);
+    expect(ctrl.createdFewerThanNExps).toBe(null);
+    expect(ctrl.editedAtLeastNExps).toBe(null);
+    expect(ctrl.editedFewerThanNExps).toBe(null);
   });
 
   it('should get next page of queries', function() {

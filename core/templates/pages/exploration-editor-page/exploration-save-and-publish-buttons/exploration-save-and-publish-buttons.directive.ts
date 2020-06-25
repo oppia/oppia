@@ -134,7 +134,7 @@ angular.module('oppia').directive('explorationSaveAndPublishButtons', [
             UserExplorationPermissionsService.getPermissionsAsync()
               .then(function(permissions) {
                 $scope.showPublishButton = function() {
-                  return permissions.can_publish && (
+                  return permissions.canPublish && (
                     ExplorationRightsService.isPrivate());
                 };
               });

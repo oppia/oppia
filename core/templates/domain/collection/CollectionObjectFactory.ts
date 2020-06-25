@@ -26,7 +26,7 @@ import {
   ICollectionNodeBackendDict,
   CollectionNode,
   CollectionNodeObjectFactory
-} from 'domain/collection/CollectionNodeObjectFactory';
+} from 'domain/collection/collection-node-object.factory';
 
 interface ICollectionBackendDict {
   'id'?: string;

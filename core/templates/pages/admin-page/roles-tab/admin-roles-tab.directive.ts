@@ -326,11 +326,11 @@ angular.module('oppia').directive('adminRolesTab', [
           ctrl.topicSummaries = {};
           ctrl.graphData = {};
           ctrl.graphDataLoaded = false;
-          AdminDataService.getDataAsync().then(function(response) {
-            ctrl.UPDATABLE_ROLES = response.updatable_roles;
-            ctrl.VIEWABLE_ROLES = response.viewable_roles;
-            ctrl.topicSummaries = response.topic_summaries;
-            ctrl.graphData = response.role_graph_data;
+          AdminDataService.getDataAsync().then(function(adminDataObject) {
+            ctrl.UPDATABLE_ROLES = adminDataObject.updatableRoles;
+            ctrl.VIEWABLE_ROLES = adminDataObject.viewableRoles;
+            ctrl.topicSummaries = adminDataObject.topicSummaries;
+            ctrl.graphData = adminDataObject.roleGraphData;
 
             ctrl.graphDataLoaded = false;
             // Calculating initStateId and finalStateIds for graphData

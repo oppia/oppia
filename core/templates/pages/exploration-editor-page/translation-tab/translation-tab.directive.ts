@@ -123,7 +123,7 @@ angular.module('oppia').directive('translationTab', [
             if (permissions === null) {
               return;
             }
-            if (permissions.can_voiceover) {
+            if (permissions.canVoiceover) {
               EditabilityService.onStartTutorial();
               $scope.translationTutorial = true;
             }

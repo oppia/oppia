@@ -91,12 +91,12 @@ class AdminHandler(base.BaseHandler):
 
         queued_or_running_job_types = set([
             job['job_type'] for job in unfinished_job_data])
-        one_off_job_specs = [{
+        one_off_job_status_summaries = [{
             'job_type': klass.__name__,
             'is_queued_or_running': (
                 klass.__name__ in queued_or_running_job_types)
         } for klass in jobs_registry.ONE_OFF_JOB_MANAGERS]
-        audit_job_specs = [{
+        audit_job_status_summaries = [{
             'job_type': klass.__name__,
             'is_queued_or_running': (
                 klass.__name__ in queued_or_running_job_types)
@@ -128,8 +128,8 @@ class AdminHandler(base.BaseHandler):
             'human_readable_current_time': (
                 utils.get_human_readable_time_string(
                     utils.get_current_time_in_millisecs())),
-            'one_off_job_specs': one_off_job_specs,
-            'audit_job_specs': audit_job_specs,
+            'one_off_job_status_summaries': one_off_job_status_summaries,
+            'audit_job_status_summaries': audit_job_status_summaries,
             'recent_job_data': recent_job_data,
             'unfinished_job_data': unfinished_job_data,
             'updatable_roles': {

@@ -58,7 +58,7 @@ angular.module('oppia').factory('PlaythroughImprovementTaskObjectFactory', [
       };
 
       UserExplorationPermissionsService.getPermissionsAsync().then(perms => {
-        if (!perms.can_edit) {
+        if (!perms.canEdit) {
           return;
         }
         this._actionButtons.push(

@@ -160,7 +160,7 @@ angular.module('oppia').directive('statisticsTab', [
                   return stateStatsModalIsOpen;
                 },
                 visualizationsInfo: function() {
-                  return stats.visualizations_info;
+                  return stats.visualizationsInfo;
                 }
               },
             }).result.then(
