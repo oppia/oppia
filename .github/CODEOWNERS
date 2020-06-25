@@ -108,18 +108,18 @@
 
 
 # Dev workflow team.
-/.circleci/ @kevinlee12
+/.circleci/ @BenHenning @vinitamurthi
 /.eslintignore @bansalnitish @Hudda
 /.eslintrc @bansalnitish @Hudda
 /.htmllintrc @bansalnitish @Hudda
 /.coveragerc @bansalnitish @Hudda
-/.gitattributes @kevinlee12
-/.gitignore @kevinlee12
+/.gitattributes @DubeySandeep
+/.gitignore @DubeySandeep
 /.isort.cfg @bansalnitish @Hudda
 /.pylintrc @bansalnitish @Hudda
 /.stylelintrc @bansalnitish @Hudda
-/.travis.yml @kevinlee12
-/.yarnrc @kevinlee12
+/.travis.yml @BenHenning @vinitamurthi
+/.yarnrc @DubeySandeep
 /codecov.yml @nithusha21
 /core/templates/css/.stylelintrc @bansalnitish @Hudda
 /tox.ini @bansalnitish @Hudda
@@ -131,7 +131,7 @@
 /scripts/typescript_checks*.py @ankita240796 @DubeySandeep
 /scripts/linters/ @DubeySandeep @Hudda
 /scripts/linters/excluded_any_type_files.json @nishantwrp
-/ubuntu_dockerfile @ezl-13 @kevinlee12
+/ubuntu_dockerfile @ezl-13 @DubeySandeep
 
 
 # Exploration project.
