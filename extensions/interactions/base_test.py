@@ -19,6 +19,8 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import collections
+import json
 import os
 import re
 import string
@@ -245,6 +247,99 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 'is between {{a|Real}} and {{b|Real}}, inclusive'),
             'IsWithinTolerance': 'is within {{tol|Real}} of {{x|Real}}'
         })
+
+    def test_html_field_types_to_rule_specs_mapping_are_valid(self):
+        """Test that the structure of the file html_field_types_to_rule_specs.
+        json are valid. This test ensures that whenever any new type of
+        interaction or rule type with HTML string is added, the file
+        html_field_types_to_rule_specs.json should be updated accordingly.
+        """
+        # The file having the information about the assembly of the html in the
+        # rule specs.
+        html_field_types_to_rule_specs_dict = json.loads(
+            utils.get_file_contents(
+                feconf.HTML_FIELD_TYPES_TO_RULE_SPECS_FILE_PATH))
+
+        # The file having the templates for the structure of the rule specs.
+        # Contents of the file html_field_types_to_rule_specs.json will be
+        # verified against this file.
+        rule_descriptions_dict = json.loads(
+            utils.get_file_contents(feconf.RULES_DESCRIPTIONS_FILE_PATH))
+
+        # In the following part, we generate the html_field_types_to_rule_specs
+        # dict based on the values in the rule_descriptions.json file.
+        generated_html_field_types_dict = (
+            collections.defaultdict(lambda: collections.defaultdict(
+                lambda: collections.defaultdict(lambda: collections.defaultdict(
+                    lambda: collections.defaultdict(set))))))
+
+        # Verify that each html_type dict has a format key, which must be
+        # unique. After verification we delete the key for comparison with
+        # the generated html_field_types_to_rule_specs dict. We compare
+        # everything except the format, because the format can't be generated
+        # from the rule_descriptions.json file.
+        for html_type, html_type_dict in (
+                html_field_types_to_rule_specs_dict.items()):
+            self.assertTrue('format' in html_type_dict)
+            self.assertTrue(
+                html_type_dict['format'] in
+                feconf.ALLOWED_HTML_RULE_VARIABLE_FORMATS)
+            del html_type_dict['format']
+
+        for interaction_id, interaction_rules in (
+                rule_descriptions_dict.items()):
+            for rule_type, rule_description in interaction_rules.items():
+                description = rule_description['description']
+                # Extract the input variables and html_types from the rule
+                # description.
+                input_variables_with_html_type = (
+                    re.findall(r'{{([a-z])\|([^}]*)}', description))
+                input_variables = set()
+                input_variables_to_html_type_mapping_dict = (
+                    collections.defaultdict(set))
+                for value in input_variables_with_html_type:
+                    if 'Html' in value[1]:
+                        input_variables_to_html_type_mapping_dict[
+                            value[1]].add(value[0])
+
+                # We need to iterate through the html_types for each rule_type,
+                # because only after visiting each rule_type the inner dict
+                # structure for each html_type gets generated.
+                for html_type, input_variables in (
+                        input_variables_to_html_type_mapping_dict.items()):
+                    html_type_dict = (
+                        generated_html_field_types_dict[html_type])
+
+                    # TODO(#9588): This generation (and the format of the
+                    # html_field_types_dict) assumes that there is at most one
+                    # interaction ID that uses a given HTML object type. If this
+                    # changes in the future, the structure of the dict needs to
+                    # be amended so that the each HTML object type can
+                    # accommodate more than one interaction. Corresponding
+                    # checks in state_domain.AnswerGroup
+                    # get_all_html_content_strings() also needs to be updated.
+                    if isinstance(
+                            html_type_dict['interactionId'],
+                            python_utils.BASESTRING):
+                        # The above type check is required because,
+                        # all the keys in the generated html type
+                        # dict is initialized as defaultdict object.
+                        # Below, we raise an exception if the existing
+                        # interaction ID is overwritten by another
+                        # interaction ID.
+                        if (html_type_dict['interactionId'] !=
+                                interaction_id):
+                            raise Exception(
+                                'Each html type should refer to only'
+                                ' one interaction_id.')
+
+                    html_type_dict['interactionId'] = interaction_id
+                    html_type_dict['ruleTypes'][rule_type][
+                        'htmlInputVariables'] = sorted(input_variables)
+
+        self.assertEqual(
+            html_field_types_to_rule_specs_dict,
+            dict(generated_html_field_types_dict))
 
     def test_default_interactions_are_valid(self):
         """Test that the default interactions are valid."""
