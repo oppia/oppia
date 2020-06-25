@@ -72,8 +72,8 @@ export class ImprovementsBackendApiService {
       explorationImprovementsUrl
     ).toPromise().then(
       backendDict => new ExplorationImprovementsResponse(
-        backendDict.open_tasks
-          .map(d => this.explorationTaskObjectFactory.createFromBackendDict(d)),
+        backendDict.open_tasks.map(
+          d => this.explorationTaskObjectFactory.createFromBackendDict(d)),
         new Map(Object.entries(backendDict.resolved_task_types_by_state_name)))
     );
   }
@@ -105,8 +105,8 @@ export class ImprovementsBackendApiService {
       explorationImprovementsHistoryUrl, {params}
     ).toPromise().then(
       backendDict => new ExplorationImprovementsHistoryResponse(
-        backendDict.results
-          .map(d => this.explorationTaskObjectFactory.createFromBackendDict(d)),
+        backendDict.results.map(
+          d => this.explorationTaskObjectFactory.createFromBackendDict(d)),
         backendDict.cursor,
         backendDict.more));
   }
