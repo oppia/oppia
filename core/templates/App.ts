@@ -205,6 +205,10 @@ angular.module('oppia').config([
               return $q(function(resolve, reject) {
                 // Get CSRF token before sending the request.
                 CsrfTokenService.getTokenAsync().then(function(token) {
+                  // If the request data is of the form Formdata we don't
+                  // need to add the payload again. This is similar to how
+                  // we modify requests for angular 8 http requests in
+                  // request-interceptor.service.ts
                   if ((config.data instanceof FormData)) {
                     config.data.append('csrf_token', token);
                     config.data.append('source', document.URL);
