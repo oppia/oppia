@@ -17,16 +17,16 @@
  */
 
 describe('Welcome Translation Modal Controller', function() {
-  var $scope = null;
-  var $uibModalInstance = null;
-  var ContextService = null;
-  var SiteAnalyticsService = null;
+  let $scope = null;
+  let $uibModalInstance = null;
+  let ContextService = null;
+  let SiteAnalyticsService = null;
 
-  var explorationId = 'exp1';
+  const explorationId = 'exp1';
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.inject(function($injector, $controller) {
-    var $rootScope = $injector.get('$rootScope');
+    const $rootScope = $injector.get('$rootScope');
     ContextService = $injector.get('ContextService');
     SiteAnalyticsService = $injector.get('SiteAnalyticsService');
 
@@ -44,7 +44,7 @@ describe('Welcome Translation Modal Controller', function() {
     });
   }));
 
-  it('should init the variables', function() {
+  it('should init the constiables', function() {
     expect($scope.explorationId).toBe(explorationId);
     expect(SiteAnalyticsService.registerTutorialModalOpenEvent)
       .toHaveBeenCalledWith(explorationId);

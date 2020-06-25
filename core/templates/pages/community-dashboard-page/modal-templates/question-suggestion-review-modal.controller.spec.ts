@@ -22,34 +22,34 @@ import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
 describe('Question Suggestion Review Modal Controller', function() {
-  var $scope = null;
-  var $uibModalInstance = null;
-  var QuestionObjectFactory = null;
-  var SuggestionModalService = null;
+  let $scope = null;
+  let $uibModalInstance = null;
+  let QuestionObjectFactory = null;
+  let SuggestionModalService = null;
 
-  var authorName = 'Username 1';
-  var contentHtml = 'Content html';
-  var misconceptionsBySkill = [];
-  var question = null;
-  var questionHeader = 'Question header';
-  var reviewable = true;
-  var skillDifficulty = 0.3;
+  const authorName = 'Username 1';
+  const contentHtml = 'Content html';
+  const misconceptionsBySkill = [];
+  let question = null;
+  const questionHeader = 'Question header';
+  const reviewable = true;
+  const skillDifficulty = 0.3;
 
   beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
+    const ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
     }
   }));
 
   describe('when skill rubrics is specified', function() {
-    var skillRubrics = [{
+    const skillRubrics = [{
       explanations: ['explanation'],
       difficulty: 'Easy'
     }];
 
     beforeEach(angular.mock.inject(function($injector, $controller) {
-      var $rootScope = $injector.get('$rootScope');
+      const $rootScope = $injector.get('$rootScope');
       QuestionObjectFactory = $injector.get('QuestionObjectFactory');
       SuggestionModalService = $injector.get('SuggestionModalService');
 
@@ -131,7 +131,7 @@ describe('Question Suggestion Review Modal Controller', function() {
       });
     }));
 
-    it('should init the variables', function() {
+    it('should init the constiables', function() {
       expect($scope.authorName).toBe(authorName);
       expect($scope.contentHtml).toBe(contentHtml);
       expect($scope.reviewable).toBe(reviewable);
@@ -184,10 +184,10 @@ describe('Question Suggestion Review Modal Controller', function() {
   });
 
   describe('when skill rubrics is not specified', function() {
-    var skillRubrics = [];
+    const skillRubrics = [];
 
     beforeEach(angular.mock.inject(function($injector, $controller) {
-      var $rootScope = $injector.get('$rootScope');
+      const $rootScope = $injector.get('$rootScope');
       QuestionObjectFactory = $injector.get('QuestionObjectFactory');
       SuggestionModalService = $injector.get('SuggestionModalService');
 

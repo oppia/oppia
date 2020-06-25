@@ -17,15 +17,15 @@
  */
 
 describe('Change Question Difficulty Modal Controller', function() {
-  var $scope = null;
-  var $uibModalInstance = null;
+  let $scope = null;
+  let $uibModalInstance = null;
 
-  var linkedSkillsWithDifficulty = {};
-  var skillIdToRubricsObject = 'skill1';
+  const linkedSkillsWithDifficulty = {};
+  const skillIdToRubricsObject = 'skill1';
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.inject(function($injector, $controller) {
-    var $rootScope = $injector.get('$rootScope');
+    const $rootScope = $injector.get('$rootScope');
 
     $uibModalInstance = jasmine.createSpyObj(
       '$uibModalInstance', ['close', 'dismiss']);
@@ -39,7 +39,7 @@ describe('Change Question Difficulty Modal Controller', function() {
     });
   }));
 
-  it('should init the variables', function() {
+  it('should init the constiables', function() {
     expect($scope.linkedSkillsWithDifficulty).toBe(
       linkedSkillsWithDifficulty);
     expect($scope.skillIdToRubricsObject).toBe(skillIdToRubricsObject);

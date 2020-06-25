@@ -17,23 +17,23 @@
  */
 
 describe('Question Suggestion Editor Modal Controller', function() {
-  var $httpBackend = null;
-  var $uibModal = null;
-  var $uibModalInstance = null;
-  var $q = null;
-  var $scope = null;
-  var CsrfTokenService = null;
-  var QuestionObjectFactory = null;
-  var QuestionSuggestionService = null;
-  var QuestionUndoRedoService = null;
-  var SkillObjectFactory = null;
-  var StateEditorService = null;
+  let $httpBackend = null;
+  let $uibModal = null;
+  let $uibModalInstance = null;
+  let $q = null;
+  let $scope = null;
+  let CsrfTokenService = null;
+  let QuestionObjectFactory = null;
+  let QuestionSuggestionService = null;
+  let QuestionUndoRedoService = null;
+  let SkillObjectFactory = null;
+  let StateEditorService = null;
 
-  var question = null;
-  var questionId = null;
-  var questionStateData = null;
-  var skill = null;
-  var skillDifficulty = 0.3;
+  let question = null;
+  let questionId = null;
+  let questionStateData = null;
+  let skill = null;
+  const skillDifficulty = 0.3;
 
   beforeEach(angular.mock.module('oppia'));
 
@@ -42,7 +42,7 @@ describe('Question Suggestion Editor Modal Controller', function() {
       $httpBackend = $injector.get('$httpBackend');
       $uibModal = $injector.get('$uibModal');
       $q = $injector.get('$q');
-      var $rootScope = $injector.get('$rootScope');
+      const $rootScope = $injector.get('$rootScope');
       CsrfTokenService = $injector.get('CsrfTokenService');
       QuestionObjectFactory = $injector.get('QuestionObjectFactory');
       QuestionSuggestionService = $injector.get('QuestionSuggestionService');
@@ -56,7 +56,7 @@ describe('Question Suggestion Editor Modal Controller', function() {
       spyOn(CsrfTokenService, 'getTokenAsync')
         .and.returnValue($q.resolve('sample-csrf-token'));
 
-      var skillContentsDict = {
+      const skillContentsDict = {
         explanation: {
           html: 'test explanation',
           content_id: 'explanation',
@@ -67,7 +67,7 @@ describe('Question Suggestion Editor Modal Controller', function() {
         }
       };
 
-      var skillDict = {
+      const skillDict = {
         id: '1',
         description: 'test description',
         misconceptions: [{
@@ -157,7 +157,7 @@ describe('Question Suggestion Editor Modal Controller', function() {
       });
     }));
 
-    it('should init the variables', function() {
+    it('should init the constiables', function() {
       expect($scope.canEditQuestion).toBe(true);
       expect($scope.newQuestionIsBeingCreated).toBe(true);
       expect($scope.question).toEqual(question);
@@ -180,13 +180,13 @@ describe('Question Suggestion Editor Modal Controller', function() {
       expect($uibModalInstance.close).toHaveBeenCalled();
     });
 
-    it('should dismiss modal if there is no pendent changes', function() {
+    it('should dismiss modal if there is no pending changes', function() {
       spyOn(QuestionUndoRedoService, 'hasChanges').and.returnValue(false);
       $scope.cancel();
       expect($uibModalInstance.dismiss).toHaveBeenCalledWith('cancel');
     });
 
-    it('should dismiss modal if there is pendent changes which won\'t be' +
+    it('should dismiss modal if there is pending changes which won\'t be' +
       ' saved', function() {
       spyOn(QuestionUndoRedoService, 'hasChanges').and.returnValue(true);
       spyOn($uibModal, 'open').and.returnValue({
@@ -198,7 +198,7 @@ describe('Question Suggestion Editor Modal Controller', function() {
       expect($uibModalInstance.dismiss).toHaveBeenCalledWith('cancel');
     });
 
-    it('should not dismiss modal if there is pendent changes which will be' +
+    it('should not dismiss modal if there is pending changes which will be' +
       ' saved', function() {
       spyOn(QuestionUndoRedoService, 'hasChanges').and.returnValue(true);
       spyOn($uibModal, 'open').and.returnValue({
@@ -215,7 +215,7 @@ describe('Question Suggestion Editor Modal Controller', function() {
     beforeEach(angular.mock.inject(function($injector, $controller) {
       $uibModal = $injector.get('$uibModal');
       $q = $injector.get('$q');
-      var $rootScope = $injector.get('$rootScope');
+      const $rootScope = $injector.get('$rootScope');
       QuestionObjectFactory = $injector.get('QuestionObjectFactory');
       QuestionSuggestionService = $injector.get('QuestionSuggestionService');
       QuestionUndoRedoService = $injector.get('QuestionUndoRedoService');
@@ -224,7 +224,7 @@ describe('Question Suggestion Editor Modal Controller', function() {
       $uibModalInstance = jasmine.createSpyObj(
         '$uibModalInstance', ['close', 'dismiss']);
 
-      var skillContentsDict = {
+      const skillContentsDict = {
         explanation: {
           html: 'test explanation',
           content_id: 'explanation',
@@ -235,7 +235,7 @@ describe('Question Suggestion Editor Modal Controller', function() {
         }
       };
 
-      var skillDict = {
+      const skillDict = {
         id: '1',
         description: 'test description',
         misconceptions: [],

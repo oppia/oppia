@@ -17,27 +17,27 @@
  */
 
 describe('Translation Modal Controller', function() {
-  var $httpBackend = null;
-  var $q = null;
-  var $scope = null;
-  var $uibModalInstance = null;
-  var CsrfTokenService = null;
-  var TranslateTextService = null;
-  var TranslationLanguageService = null;
+  let $httpBackend = null;
+  let $q = null;
+  let $scope = null;
+  let $uibModalInstance = null;
+  let CsrfTokenService = null;
+  let TranslateTextService = null;
+  let TranslationLanguageService = null;
 
-  var opportunity = {
+  const opportunity = {
     id: '1',
     subheading: 'Subheading',
     heading: 'Heading'
   };
-  var userIsLoggedIn = true;
-  var getTextToTranslateSpy;
+  const userIsLoggedIn = true;
+  let getTextToTranslateSpy = null;
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.inject(function($injector, $controller) {
     $httpBackend = $injector.get('$httpBackend');
     $q = $injector.get('$q');
-    var $rootScope = $injector.get('$rootScope');
+    const $rootScope = $injector.get('$rootScope');
     CsrfTokenService = $injector.get('CsrfTokenService');
     TranslateTextService = $injector.get('TranslateTextService');
     TranslationLanguageService = $injector.get('TranslationLanguageService');
@@ -78,7 +78,7 @@ describe('Translation Modal Controller', function() {
     });
   }));
 
-  it('should init the variables', function() {
+  it('should init the constiables', function() {
     expect($scope.userIsLoggedIn).toBe(userIsLoggedIn);
     expect($scope.uploadingTranslation).toBe(false);
     expect($scope.activeWrittenTranslation).toEqual({
@@ -121,7 +121,7 @@ describe('Translation Modal Controller', function() {
     expect($scope.uploadingTranslation).toBe(false);
   });
 
-  it('should close modal when there isn\'t more text to be translated',
+  it('should close modal when there is not more text to be translated',
     function() {
       $httpBackend.flush();
 

@@ -17,13 +17,13 @@
  */
 
 describe('Translation Tab Busy Modal Controller', function() {
-  var $scope = null;
-  var $uibModalInstance = null;
-  var message = 'This is a message';
+  let $scope = null;
+  let $uibModalInstance = null;
+  const message = 'This is a message';
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.inject(function($injector, $controller) {
-    var $rootScope = $injector.get('$rootScope');
+    const $rootScope = $injector.get('$rootScope');
 
     $uibModalInstance = jasmine.createSpyObj(
       '$uibModalInstance', ['close', 'dismiss']);
@@ -36,7 +36,7 @@ describe('Translation Tab Busy Modal Controller', function() {
     });
   }));
 
-  it('should init the variables', function() {
+  it('should init the constiables', function() {
     expect($scope.busyMessage).toBe(message);
   });
 });

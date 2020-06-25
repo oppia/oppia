@@ -22,23 +22,23 @@ import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
 describe('Translation Suggestion Review Modal Controller', function() {
-  var $scope = null;
-  var $uibModalInstance = null;
-  var SuggestionModalService = null;
+  let $scope = null;
+  let $uibModalInstance = null;
+  let SuggestionModalService = null;
 
-  var contentHtml = 'Content html';
-  var reviewable = true;
-  var translationHtml = 'Translation html';
+  const contentHtml = 'Content html';
+  const reviewable = true;
+  const translationHtml = 'Translation html';
 
   beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
+    const ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
     }
   }));
 
   beforeEach(angular.mock.inject(function($injector, $controller) {
-    var $rootScope = $injector.get('$rootScope');
+    const $rootScope = $injector.get('$rootScope');
     SuggestionModalService = $injector.get('SuggestionModalService');
 
     $uibModalInstance = jasmine.createSpyObj(
@@ -56,7 +56,7 @@ describe('Translation Suggestion Review Modal Controller', function() {
     });
   }));
 
-  it('should init the variables', function() {
+  it('should init the constiables', function() {
     expect($scope.contentHtml).toBe(contentHtml);
     expect($scope.contentHtml).toBe(contentHtml);
     expect($scope.reviewable).toBe(reviewable);

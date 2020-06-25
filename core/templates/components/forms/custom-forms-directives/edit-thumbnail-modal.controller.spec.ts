@@ -17,27 +17,27 @@
  */
 
 describe('Edit Thumbnail Modal Controller', function() {
-  var $q = null;
-  var $scope = null;
-  var $timeout = null;
-  var $uibModalInstance = null;
+  let $q = null;
+  let $scope = null;
+  let $timeout = null;
+  let $uibModalInstance = null;
 
-  var allowedBgColors = true;
-  var aspectRatio = '';
-  var dimensions = {};
-  var getPreviewDescription = () => {};
-  var getPreviewDescriptionBgColor = () => {};
-  var getPreviewFooter = () => {};
-  var getPreviewTitle = () => {};
-  var openInUploadMode = true;
-  var tempBgColor = '';
-  var uploadedImage = new File([], 'uploaded.png');
-  var uploadedImageMimeType = 'image/svg+xml';
+  const allowedBgColors = true;
+  const aspectRatio = '';
+  const dimensions = {};
+  const getPreviewDescription = () => {};
+  const getPreviewDescriptionBgColor = () => {};
+  const getPreviewFooter = () => {};
+  const getPreviewTitle = () => {};
+  const openInUploadMode = true;
+  const tempBgColor = '';
+  const uploadedImage = new File([], 'uploaded.png');
+  const uploadedImageMimeType = 'image/svg+xml';
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.inject(function($injector, $controller) {
     $q = $injector.get('$q');
-    var $rootScope = $injector.get('$rootScope');
+    const $rootScope = $injector.get('$rootScope');
     $timeout = $injector.get('$timeout');
 
     $uibModalInstance = jasmine.createSpyObj(
@@ -70,7 +70,7 @@ describe('Edit Thumbnail Modal Controller', function() {
     expect($scope.updateBackgroundColor).toHaveBeenCalled();
   });
 
-  it('should init the variables', function() {
+  it('should init the constiables', function() {
     expect($scope.uploadedImage).toBe(uploadedImage);
     expect($scope.invalidImageWarningIsShown).toBe(false);
     expect($scope.allowedBgColors).toBe(allowedBgColors);
@@ -92,23 +92,23 @@ describe('Edit Thumbnail Modal Controller', function() {
 
     // This is just a mocked base 64 in order to test the FileReader event
     // and its result property.
-    var dataBase64Mock = 'PHN2ZyB4bWxucz0iaHR0cDo';
-    var arrayBuffer = Uint8Array.from(
+    const dataBase64Mock = 'PHN2ZyB4bWxucz0iaHR0cDo';
+    const arrayBuffer = Uint8Array.from(
       window.atob(dataBase64Mock), c => c.charCodeAt(0));
-    var file = new File([arrayBuffer], 'thumbnail.png', {
+    const file = new File([arrayBuffer], 'thumbnail.png', {
       type: 'image/svg+xml'
     });
 
     // Mocking JQuery element method.
-    var element = $(document.createElement('div'));
+    const element = $(document.createElement('div'));
     // @ts-ignore
     spyOn(window, '$').withArgs('.oppia-thumbnail-uploader').and.returnValue(
       // @ts-ignore
       element);
-    var fadeInElementSpy = spyOn(element, 'fadeIn').and.callThrough();
+    const fadeInElementSpy = spyOn(element, 'fadeIn').and.callThrough();
 
     // spy Image constructor to handle its events.
-    var image = document.createElement('img');
+    const image = document.createElement('img');
     spyOn(window, 'Image').and.returnValue(image);
 
     expect($scope.invalidImageWarningIsShown).toBe(false);
@@ -148,10 +148,10 @@ describe('Edit Thumbnail Modal Controller', function() {
 
     // This is just a mocked base 64 in order to test the FileReader event
     // and its result property.
-    var dataBase64Mock = 'PHN2ZyB4bWxucz0iaHR0cDo';
-    var arrayBuffer = Uint8Array.from(
+    const dataBase64Mock = 'PHN2ZyB4bWxucz0iaHR0cDo';
+    const arrayBuffer = Uint8Array.from(
       window.atob(dataBase64Mock), c => c.charCodeAt(0));
-    var file = new File([arrayBuffer], 'thumbnail.png');
+    const file = new File([arrayBuffer], 'thumbnail.png');
 
     $scope.onFileChanged(file);
 

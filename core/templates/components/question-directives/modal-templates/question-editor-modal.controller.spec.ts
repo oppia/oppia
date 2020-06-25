@@ -22,17 +22,17 @@ import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
 describe('Question Editor Modal Controller', function() {
-  var $q = null;
-  var $scope = null;
-  var $uibModal = null;
-  var $uibModalInstance = null;
-  var AlertsService = null;
-  var QuestionObjectFactory = null;
-  var QuestionUndoRedoService = null;
-  var SkillSummaryObjectFactory = null;
-  var StateEditorService = null;
+  let $q = null;
+  let $scope = null;
+  let $uibModal = null;
+  let $uibModalInstance = null;
+  let AlertsService = null;
+  let QuestionObjectFactory = null;
+  let QuestionUndoRedoService = null;
+  let SkillSummaryObjectFactory = null;
+  let StateEditorService = null;
 
-  var associatedSkillSummariesDict = [{
+  const associatedSkillSummariesDict = [{
     id: '1',
     description: 'Description 1'
   }, {
@@ -42,23 +42,23 @@ describe('Question Editor Modal Controller', function() {
     id: '3',
     description: 'Description 3'
   }];
-  var canEditQuestion = true;
-  var categorizedSkills = [];
-  var groupedSkillSummaries = {
+  const canEditQuestion = true;
+  const categorizedSkills = [];
+  const groupedSkillSummaries = {
     current: [],
     others: []
   };
-  var misconceptionsBySkill = [];
-  var newQuestionIsBeingCreated = true;
-  var question = null;
-  var questionId = null;
-  var questionStateData = null;
-  var rubrics = [];
-  var skillNames = [];
-  var associatedSkillSummaries = null;
+  const misconceptionsBySkill = [];
+  const newQuestionIsBeingCreated = true;
+  let question = null;
+  let questionId = null;
+  let questionStateData = null;
+  const rubrics = [];
+  const skillNames = [];
+  let associatedSkillSummaries = null;
 
   beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
+    const ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
     }
@@ -68,7 +68,7 @@ describe('Question Editor Modal Controller', function() {
     beforeEach(angular.mock.inject(function($injector, $controller) {
       $uibModal = $injector.get('$uibModal');
       $q = $injector.get('$q');
-      var $rootScope = $injector.get('$rootScope');
+      const $rootScope = $injector.get('$rootScope');
       AlertsService = $injector.get('AlertsService');
       QuestionObjectFactory = $injector.get('QuestionObjectFactory');
       QuestionUndoRedoService = $injector.get('QuestionUndoRedoService');
@@ -161,7 +161,7 @@ describe('Question Editor Modal Controller', function() {
       });
     }));
 
-    it('should init the variables', function() {
+    it('should init the constiables', function() {
       expect($scope.question).toEqual(question);
       expect($scope.questionStateData).toBe(questionStateData);
       expect($scope.associatedSkillSummaries).toEqual(associatedSkillSummaries);
@@ -181,7 +181,7 @@ describe('Question Editor Modal Controller', function() {
 
     it('should try to remove all skill successfully and then undo changes',
       function() {
-        var skillId = '3';
+        let skillId = '3';
         $scope.removeSkill(skillId);
 
         expect($scope.getSkillLinkageModificationsArray().length).toBe(1);
@@ -193,7 +193,7 @@ describe('Question Editor Modal Controller', function() {
           'Description 2');
         expect($scope.associatedSkillSummaries[2]).toBe(undefined);
 
-        var skillId = '2';
+        skillId = '2';
         $scope.removeSkill(skillId);
 
         expect($scope.getSkillLinkageModificationsArray().length).toBe(2);
@@ -204,7 +204,7 @@ describe('Question Editor Modal Controller', function() {
 
         spyOn(AlertsService, 'addInfoMessage').and.callThrough();
 
-        var skillId = '1';
+        skillId = '1';
         $scope.removeSkill(skillId);
 
         expect(AlertsService.addInfoMessage).toHaveBeenCalledWith(
@@ -251,11 +251,11 @@ describe('Question Editor Modal Controller', function() {
     });
 
     it('should add a new skill successfully', function() {
-      var skillSummaryDict = {
+      const skillSummaryDict = {
         id: '4',
         description: 'Description 4'
       };
-      var openModalSpy = spyOn($uibModal, 'open');
+      const openModalSpy = spyOn($uibModal, 'open');
       openModalSpy.and.returnValue({
         result: $q.resolve(skillSummaryDict)
       });
@@ -285,11 +285,11 @@ describe('Question Editor Modal Controller', function() {
     });
 
     it('should save and commit when there is no pending changes', function() {
-      var skillSummaryDict = {
+      const skillSummaryDict = {
         id: '4',
         description: 'Description 4'
       };
-      var openModalSpy = spyOn($uibModal, 'open');
+      const openModalSpy = spyOn($uibModal, 'open');
       openModalSpy.and.returnValue({
         result: $q.resolve(skillSummaryDict)
       });
@@ -309,11 +309,11 @@ describe('Question Editor Modal Controller', function() {
     });
 
     it('should save and commit after modifying skills', function() {
-      var skillSummaryDict = {
+      const skillSummaryDict = {
         id: '4',
         description: 'Description 4'
       };
-      var openModalSpy = spyOn($uibModal, 'open');
+      const openModalSpy = spyOn($uibModal, 'open');
       openModalSpy.and.returnValue({
         result: $q.resolve(skillSummaryDict)
       });
@@ -327,7 +327,7 @@ describe('Question Editor Modal Controller', function() {
 
       spyOn(QuestionUndoRedoService, 'hasChanges').and.returnValue(true);
       expect($scope.isSaveAndCommitButtonDisabled()).toBe(false);
-      var commitMessage = 'Commiting skills';
+      const commitMessage = 'Commiting skills';
       openModalSpy.and.returnValue({
         result: $q.resolve(commitMessage)
       });
@@ -343,11 +343,11 @@ describe('Question Editor Modal Controller', function() {
 
     it('should not save and commit when dismissing the add skill modal',
       function() {
-        var skillSummaryDict = {
+        const skillSummaryDict = {
           id: '4',
           description: 'Description 4'
         };
-        var openModalSpy = spyOn($uibModal, 'open');
+        const openModalSpy = spyOn($uibModal, 'open');
         openModalSpy.and.returnValue({
           result: $q.resolve(skillSummaryDict)
         });
@@ -405,7 +405,7 @@ describe('Question Editor Modal Controller', function() {
     beforeEach(angular.mock.inject(function($injector, $controller) {
       $uibModal = $injector.get('$uibModal');
       $q = $injector.get('$q');
-      var $rootScope = $injector.get('$rootScope');
+      const $rootScope = $injector.get('$rootScope');
       AlertsService = $injector.get('AlertsService');
       QuestionObjectFactory = $injector.get('QuestionObjectFactory');
       QuestionUndoRedoService = $injector.get('QuestionUndoRedoService');
