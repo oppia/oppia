@@ -27,6 +27,7 @@ from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_jobs_one_off
 from core.domain import exp_services
+from core.domain import html_validation_service
 from core.domain import rights_manager
 from core.domain import state_domain
 from core.domain import user_services
@@ -1693,3 +1694,523 @@ class InteractionCustomizationArgsValidationJobTests(
             '[u\'exp_id0\']]' % feconf.CURRENT_STATE_SCHEMA_VERSION]
 
         self.assertEqual(actual_output, expected_output)
+
+
+class ExplorationMathTagValidationOneOffJobTests(test_utils.GenericTestBase):
+
+    ALBERT_EMAIL = 'albert@example.com'
+    ALBERT_NAME = 'albert'
+
+    VALID_EXP_ID = 'exp_id0'
+    EXP_TITLE = 'title'
+
+    def setUp(self):
+        super(
+            ExplorationMathTagValidationOneOffJobTests, self).setUp()
+
+        # Setup user who will own the test explorations.
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.process_and_flush_pending_tasks()
+
+    def test_explorations_with_invalid_math_tags_fails_validation(self):
+        """Tests for the case when there are invalid math tags in the
+        explorations.
+        """
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title=self.EXP_TITLE, category='category')
+        exploration.add_states(['State1', 'State2'])
+        state1 = exploration.states['State1']
+        state2 = exploration.states['State2']
+        invalid_html_content1 = (
+            '<p>Value</p><oppia-noninteractive-math></oppia-noninteractive-m'
+            'ath>')
+
+        invalid_html_content2 = (
+            '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="'
+            '+,-,-,+"></oppia-noninteractive-math>')
+
+        content1_dict = {
+            'content_id': 'content',
+            'html': invalid_html_content1
+        }
+        content2_dict = {
+            'content_id': 'content',
+            'html': invalid_html_content2
+        }
+        customization_args_dict = {
+            'choices': {
+                'value': [
+                    invalid_html_content1,
+                    '<p>2</p>',
+                    '<p>3</p>',
+                    '<p>4</p>'
+                ]
+            }
+        }
+
+        answer_group_dict = {
+            'outcome': {
+                'dest': 'Introduction',
+                'feedback': {
+                    'content_id': 'feedback_1',
+                    'html': '<p>Feedback</p>'
+                },
+                'labelled_as_correct': False,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'rule_specs': [{
+                'inputs': {
+                    'x': [[invalid_html_content1]]
+                },
+                'rule_type': 'IsEqualToOrdering'
+            }, {
+                'rule_type': 'HasElementXAtPositionY',
+                'inputs': {
+                    'x': invalid_html_content2,
+                    'y': 2
+                }
+            }, {
+                'rule_type': 'IsEqualToOrdering',
+                'inputs': {
+                    'x': [[invalid_html_content2]]
+                }
+            }, {
+                'rule_type': 'HasElementXBeforeElementY',
+                'inputs': {
+                    'x': invalid_html_content1,
+                    'y': invalid_html_content1
+                }
+            }, {
+                'rule_type': 'IsEqualToOrderingWithOneItemAtIncorrectPosition',
+                'inputs': {
+                    'x': [[invalid_html_content1]]
+                }
+            }],
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }
+        written_translations_dict = {
+            'translations_mapping': {
+                'content': {
+                    'en': {
+                        'html': invalid_html_content1,
+                        'needs_update': True
+                    },
+                    'hi': {
+                        'html': 'Hey!',
+                        'needs_update': False
+                    }
+                },
+                'default_outcome': {
+                    'hi': {
+                        'html': invalid_html_content2,
+                        'needs_update': False
+                    },
+                    'en': {
+                        'html': 'hello!',
+                        'needs_update': False
+                    }
+                },
+                'feedback_1': {
+                    'hi': {
+                        'html': invalid_html_content2,
+                        'needs_update': False
+                    },
+                    'en': {
+                        'html': 'hello!',
+                        'needs_update': False
+                    }
+                }
+            }
+        }
+
+        with self.swap(state_domain.SubtitledHtml, 'validate', mock_validate):
+            state1.update_content(
+                state_domain.SubtitledHtml.from_dict(content1_dict))
+            state2.update_content(
+                state_domain.SubtitledHtml.from_dict(content2_dict))
+            state2.update_interaction_id('DragAndDropSortInput')
+            state2.update_interaction_customization_args(
+                customization_args_dict)
+            state2.update_interaction_answer_groups([answer_group_dict])
+            state2.update_written_translations(
+                state_domain.WrittenTranslations.from_dict(
+                    written_translations_dict))
+
+            exp_services.save_new_exploration(self.albert_id, exploration)
+
+            job_id = (
+                exp_jobs_one_off
+                .ExplorationMathTagValidationOneOffJob.create_new())
+            exp_jobs_one_off.ExplorationMathTagValidationOneOffJob.enqueue(
+                job_id)
+            self.process_and_flush_pending_tasks()
+
+        actual_output = (
+            exp_jobs_one_off
+            .ExplorationMathTagValidationOneOffJob.get_output(job_id))
+
+        actual_output_list = ast.literal_eval(actual_output[0])
+        invalid_tag1 = (
+            '<oppia-noninteractive-math></oppia-noninteractive-math>')
+        invalid_tag2 = (
+            '<oppia-noninteractive-math raw_latex-with-value="+,-,-,+"></oppi'
+            'a-noninteractive-math>')
+        expected_invalid_tags = [invalid_tag1, invalid_tag2]
+
+        no_of_invalid_tags_in_output = 0
+        for output in actual_output_list[1]:
+            list_starting_index = output.find('[')
+            list_finishing_index = output.find(']')
+            stringified_error_list = (
+                output[list_starting_index + 1:list_finishing_index].split(
+                    ', '))
+            no_of_invalid_tags_in_output = (
+                no_of_invalid_tags_in_output + len(stringified_error_list))
+            for invalid_tag in stringified_error_list:
+                self.assertTrue(invalid_tag in expected_invalid_tags)
+
+        self.assertEqual(no_of_invalid_tags_in_output, 12)
+
+    def test_no_action_is_performed_for_deleted_exploration(self):
+        """Test that no action is performed on deleted explorations."""
+
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title=self.EXP_TITLE, category='category')
+
+        exploration.add_states(['State1'])
+        invalid_html_content = (
+            '<p>Value</p><oppia-noninteractive-math></oppia-noninteractive-m'
+            'ath>')
+        content_dict = {
+            'html': invalid_html_content,
+            'content_id': 'content'
+        }
+        state1 = exploration.states['State1']
+
+        with self.swap(state_domain.SubtitledHtml, 'validate', mock_validate):
+            state1.update_content(
+                state_domain.SubtitledHtml.from_dict(content_dict))
+            exp_services.save_new_exploration(self.albert_id, exploration)
+
+        exp_services.delete_exploration(self.albert_id, self.VALID_EXP_ID)
+
+        run_job_for_deleted_exp(
+            self,
+            exp_jobs_one_off.ExplorationMathTagValidationOneOffJob)
+
+    def test_explorations_with_valid_math_tags(self):
+        """Tests for the case when there are no invalid math tags in the
+        explorations.
+        """
+
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title=self.EXP_TITLE, category='category')
+        exploration.add_states(['State1', 'State2'])
+        state1 = exploration.states['State1']
+        state2 = exploration.states['State2']
+        valid_html_content = (
+            '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&a'
+            'mp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>')
+
+        content1_dict = {
+            'content_id': 'content',
+            'html': valid_html_content
+        }
+        content2_dict = {
+            'content_id': 'content',
+            'html': valid_html_content
+        }
+        customization_args_dict = {
+            'choices': {
+                'value': [
+                    valid_html_content,
+                    '<p>2</p>',
+                    '<p>3</p>',
+                    '<p>4</p>'
+                ]
+            }
+        }
+        with self.swap(state_domain.SubtitledHtml, 'validate', mock_validate):
+            state1.update_content(
+                state_domain.SubtitledHtml.from_dict(content1_dict))
+            state2.update_content(
+                state_domain.SubtitledHtml.from_dict(content2_dict))
+            state2.update_interaction_id('DragAndDropSortInput')
+            state2.update_interaction_customization_args(
+                customization_args_dict)
+            exp_services.save_new_exploration(self.albert_id, exploration)
+
+            job_id = (
+                exp_jobs_one_off
+                .ExplorationMathTagValidationOneOffJob.create_new())
+            exp_jobs_one_off.ExplorationMathTagValidationOneOffJob.enqueue(
+                job_id)
+            self.process_and_flush_pending_tasks()
+
+        actual_output = (
+            exp_jobs_one_off
+            .ExplorationMathTagValidationOneOffJob.get_output(job_id))
+
+        self.assertEqual(len(actual_output), 0)
+
+
+class ExplorationMockMathMigrationOneOffJobOneOffJobTests(
+        test_utils.GenericTestBase):
+
+    ALBERT_EMAIL = 'albert@example.com'
+    ALBERT_NAME = 'albert'
+
+    VALID_EXP_ID = 'exp_id0'
+    EXP_TITLE = 'title'
+
+    def setUp(self):
+        super(
+            ExplorationMockMathMigrationOneOffJobOneOffJobTests, self).setUp()
+
+        # Setup user who will own the test explorations.
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.process_and_flush_pending_tasks()
+
+    def test_explorations_with_unconverted_math_tags_after_migration(self):
+        """Tests for the case when the conversion function doesn not convert
+        the math-tags to the new schema. The old schema has the attribute
+        raw_latex-with-value while the new schema has the attribute
+        math-content-with-value which includes a field for storing reference to
+        SVGs.
+        """
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title=self.EXP_TITLE, category='category')
+        exploration.add_states(['State1'])
+        state1 = exploration.states['State1']
+        valid_html_content = (
+            '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&a'
+            'mp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>')
+
+        content1_dict = {
+            'content_id': 'content',
+            'html': valid_html_content
+        }
+        customization_args_dict = {
+            'choices': {
+                'value': [
+                    valid_html_content,
+                    '<p>2</p>',
+                    '<p>3</p>',
+                    '<p>4</p>'
+                ]
+            }
+        }
+
+        answer_group_dict = {
+            'outcome': {
+                'dest': 'Introduction',
+                'feedback': {
+                    'content_id': 'feedback_1',
+                    'html': '<p>Feedback</p>'
+                },
+                'labelled_as_correct': False,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'rule_specs': [{
+                'inputs': {
+                    'x': [[valid_html_content]]
+                },
+                'rule_type': 'IsEqualToOrdering'
+            }, {
+                'rule_type': 'HasElementXAtPositionY',
+                'inputs': {
+                    'x': valid_html_content,
+                    'y': 2
+                }
+            }, {
+                'rule_type': 'IsEqualToOrdering',
+                'inputs': {
+                    'x': [[valid_html_content]]
+                }
+            }, {
+                'rule_type': 'HasElementXBeforeElementY',
+                'inputs': {
+                    'x': valid_html_content,
+                    'y': valid_html_content
+                }
+            }, {
+                'rule_type': 'IsEqualToOrderingWithOneItemAtIncorrectPosition',
+                'inputs': {
+                    'x': [[valid_html_content]]
+                }
+            }],
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }
+        written_translations_dict = {
+            'translations_mapping': {
+                'content': {
+                    'en': {
+                        'html': valid_html_content,
+                        'needs_update': True
+                    },
+                    'hi': {
+                        'html': 'Hey!',
+                        'needs_update': False
+                    }
+                },
+                'default_outcome': {
+                    'hi': {
+                        'html': valid_html_content,
+                        'needs_update': False
+                    },
+                    'en': {
+                        'html': 'hello!',
+                        'needs_update': False
+                    }
+                },
+                'feedback_1': {
+                    'hi': {
+                        'html': valid_html_content,
+                        'needs_update': False
+                    },
+                    'en': {
+                        'html': 'hello!',
+                        'needs_update': False
+                    }
+                }
+            }
+        }
+
+        state1.update_content(
+            state_domain.SubtitledHtml.from_dict(content1_dict))
+        state1.update_interaction_id('DragAndDropSortInput')
+        state1.update_interaction_customization_args(
+            customization_args_dict)
+        state1.update_interaction_answer_groups([answer_group_dict])
+        state1.update_written_translations(
+            state_domain.WrittenTranslations.from_dict(
+                written_translations_dict))
+
+        exp_services.save_new_exploration(self.albert_id, exploration)
+        with self.swap(
+            html_validation_service,
+            'add_math_content_to_math_rte_components', lambda html: html):
+            job_id = (
+                exp_jobs_one_off
+                .ExplorationMockMathMigrationOneOffJob.create_new())
+            exp_jobs_one_off.ExplorationMockMathMigrationOneOffJob.enqueue(
+                job_id)
+            self.process_and_flush_pending_tasks()
+
+        actual_output = (
+            exp_jobs_one_off
+            .ExplorationMockMathMigrationOneOffJob.get_output(job_id))
+        actual_output_list = ast.literal_eval(actual_output[0])
+        self.assertEqual(
+            actual_output_list[0],
+            'exp_id: exp_id0, exp_status: private failed validation after mi'
+            'gration')
+        expected_invalid_tag = (
+            '<oppia-noninteractive-math raw_latex-with-value="&amp;quot;+,-,-,'
+            '+&amp;quot;"></oppia-noninteractive-math>')
+
+        expected_invalid_tags = [expected_invalid_tag]
+
+        no_of_invalid_tags_in_output = 0
+        for output in actual_output_list[1]:
+            list_starting_index = output.find('[')
+            list_finishing_index = output.find(']')
+            stringified_error_list = (
+                output[list_starting_index + 1:list_finishing_index].split(
+                    ', '))
+            no_of_invalid_tags_in_output = (
+                no_of_invalid_tags_in_output + len(stringified_error_list))
+            for invalid_tag in stringified_error_list:
+                self.assertTrue(invalid_tag in expected_invalid_tags)
+        self.assertEqual(no_of_invalid_tags_in_output, 11)
+
+    def test_no_action_is_performed_for_deleted_exploration(self):
+        """Test that no action is performed on deleted explorations."""
+
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title=self.EXP_TITLE, category='category')
+
+        exploration.add_states(['State1'])
+        invalid_html_content = (
+            '<p>Value</p><oppia-noninteractive-math></oppia-noninteractive-m'
+            'ath>')
+        content_dict = {
+            'html': invalid_html_content,
+            'content_id': 'content'
+        }
+        state1 = exploration.states['State1']
+
+        with self.swap(state_domain.SubtitledHtml, 'validate', mock_validate):
+            state1.update_content(
+                state_domain.SubtitledHtml.from_dict(content_dict))
+            exp_services.save_new_exploration(self.albert_id, exploration)
+
+        exp_services.delete_exploration(self.albert_id, self.VALID_EXP_ID)
+
+        run_job_for_deleted_exp(
+            self,
+            exp_jobs_one_off.ExplorationMockMathMigrationOneOffJob)
+
+    def test_explorations_with_valid_math_tags_passes_migration(self):
+        """Tests for the case when there are no invalid math tags in the
+        explorations and the migration converts all the math tags to the new
+        schema. The old schema has the attribute raw_latex-with-value while
+        the new schema has the attribute math-content-with-value which includes
+        a field for storing reference to SVGs.
+        """
+
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title=self.EXP_TITLE, category='category')
+        exploration.add_states(['State1', 'State2'])
+        state1 = exploration.states['State1']
+        state2 = exploration.states['State2']
+        valid_html_content = (
+            '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&a'
+            'mp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>')
+
+        content1_dict = {
+            'content_id': 'content',
+            'html': valid_html_content
+        }
+        content2_dict = {
+            'content_id': 'content',
+            'html': valid_html_content
+        }
+        customization_args_dict = {
+            'choices': {
+                'value': [
+                    valid_html_content,
+                    '<p>2</p>',
+                    '<p>3</p>',
+                    '<p>4</p>'
+                ]
+            }
+        }
+        with self.swap(state_domain.SubtitledHtml, 'validate', mock_validate):
+            state1.update_content(
+                state_domain.SubtitledHtml.from_dict(content1_dict))
+            state2.update_content(
+                state_domain.SubtitledHtml.from_dict(content2_dict))
+            state2.update_interaction_id('DragAndDropSortInput')
+            state2.update_interaction_customization_args(
+                customization_args_dict)
+            exp_services.save_new_exploration(self.albert_id, exploration)
+
+            job_id = (
+                exp_jobs_one_off
+                .ExplorationMockMathMigrationOneOffJob.create_new())
+            exp_jobs_one_off.ExplorationMockMathMigrationOneOffJob.enqueue(
+                job_id)
+            self.process_and_flush_pending_tasks()
+        actual_output = (
+            exp_jobs_one_off
+            .ExplorationMockMathMigrationOneOffJob.get_output(job_id))
+        self.assertEqual(len(actual_output), 0)
