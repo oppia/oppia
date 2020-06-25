@@ -471,10 +471,9 @@ angular.module('oppia').directive('questionsList', [
             ctrl.editorIsOpen = true;
             var groupedSkillSummaries = ctrl.getGroupedSkillSummaries();
             var selectedSkillId = ctrl.selectedSkillId;
+            ImageLocalStorageService.flushStoredImagesData();
             if (newQuestionIsBeingCreated) {
               ContextService.setImageSaveDestinationToLocalStorage();
-            } else {
-              ImageLocalStorageService.flushStoredImagesData();
             }
             $location.hash(questionId);
             var skillIdToNameMapping = (

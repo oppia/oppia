@@ -105,11 +105,17 @@ class QuestionCreationHandler(base.BaseHandler):
             raise self.InvalidInputException(
                 'Skill difficulties must be between 0 and 1')
 
+        question_services.add_question(self.user_id, question)
+        question_services.link_multiple_skills_for_question(
+            self.user_id,
+            question.id,
+            skill_ids,
+            skill_difficulties)
         html_list = question.question_state_data.get_all_html_content_strings()
         filenames = (
             html_cleaner.get_image_filenames_from_html_strings(html_list))
         image_validation_error_message_suffix = (
-            'Please go to oppia.org/question_editor/%s to edit '
+            'Please go to the question editor for question with id %s and edit '
             'the image.' % question.id)
         for filename in filenames:
             image = self.request.get(filename)
@@ -132,13 +138,6 @@ class QuestionCreationHandler(base.BaseHandler):
             fs_services.save_original_and_compressed_versions_of_image(
                 filename, feconf.ENTITY_TYPE_QUESTION, question.id, image,
                 'image', image_is_compressible)
-
-        question_services.add_question(self.user_id, question)
-        question_services.link_multiple_skills_for_question(
-            self.user_id,
-            question.id,
-            skill_ids,
-            skill_difficulties)
 
         self.values.update({
             'question_id': question.id

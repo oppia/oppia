@@ -365,12 +365,6 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
         self.assertIn(
             'Image exceeds file size limit of 100 KB.',
             response_dict['error'])
-        all_models = question_models.QuestionModel.get_all()
-        questions = [
-            question_fetchers.get_question_from_model(model)
-            for model in all_models
-        ]
-        self.assertEqual(len(questions), 1)
         self.logout()
 
 
