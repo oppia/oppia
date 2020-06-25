@@ -38,8 +38,23 @@ export class WrittenTranslation {
   markAsNeedingUpdate(): void {
     this.needsUpdate = true;
   }
+
   toggleNeedsUpdateAttribute(): void {
     this.needsUpdate = !this.needsUpdate;
+  }
+
+  getHtml(): string {
+    if (this.translationType !== 'html') {
+      throw new Error('This translation is not of type html');
+    }
+    return this.translation;
+  }
+
+  setHtml(html: string): void {
+    if (this.translationType !== 'html') {
+      throw new Error('This translation is not of type html');
+    }
+    this.translation = html;
   }
 
   toBackendDict(): ITranslationBackendDict {
