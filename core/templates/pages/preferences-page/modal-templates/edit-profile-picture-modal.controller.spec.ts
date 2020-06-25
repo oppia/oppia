@@ -46,8 +46,9 @@ describe('EditProfilePictureModalController', function() {
   });
 
   it('should get a file in onchange event and save it', function(done) {
-    document.getElementById = jasmine.createSpy('HTMLImageElement').and
-      .returnValue(document.createElement('img'));
+    spyOn(document, 'getElementById').and.callFake(function() {
+      return document.createElement('img');
+    });
 
     var element = $(document.createElement('div'));
 
@@ -57,6 +58,8 @@ describe('EditProfilePictureModalController', function() {
       window.atob(dataBase64Mock), c => c.charCodeAt(0));
     var file = new File([arrayBuffer], 'filename.mp3');
 
+    // window has strict type rules which will fail typescript lint tests
+    // without the @ts-ignore.
     // @ts-ignore
     spyOn(window, '$').withArgs('.oppia-profile-image-uploader').and
       // @ts-ignore
