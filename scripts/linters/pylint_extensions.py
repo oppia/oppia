@@ -801,7 +801,7 @@ class DocstringParameterChecker(checkers.BaseChecker):
         """Adds a message on :param:`node` for the missing exception type.
 
         Args:
-            missing_excs: list. A list of missing exception types.
+            missing_excs: list(Exception). A list of missing exception types.
             node: astroid.node_classes.NodeNG. The node show the message on.
         """
         if not missing_excs:

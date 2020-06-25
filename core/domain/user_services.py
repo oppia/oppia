@@ -1297,7 +1297,7 @@ def get_users_email_preferences(user_ids):
     """Get email preferences for the list of users.
 
     Args:
-        user_ids: list. A list of user IDs for whom we want to get email
+        user_ids: list(str). A list of user IDs for whom we want to get email
             preferences.
 
     Returns:
@@ -1381,7 +1381,7 @@ def get_users_email_preferences_for_exploration(user_ids, exploration_id):
     with given user_id.
 
     Args:
-        user_ids: list. A list of user IDs for whom we want to get email
+        user_ids: list(str). A list of user IDs for whom we want to get email
             preferences.
         exploration_id: str. The exploration id.
 

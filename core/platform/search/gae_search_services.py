@@ -63,7 +63,8 @@ def add_documents_to_index(documents, index, retries=DEFAULT_NUM_RETRIES):
         retries: int. The number of times to retry inserting the documents.
 
     Returns:
-        list. Returns a list of document ids of the documents that were added.
+        list(str). Returns a list of document ids of the documents that were
+            added.
 
     Raises:
         SearchFailureError: Raised when the indexing fails. If it fails for any

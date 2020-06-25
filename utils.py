@@ -158,7 +158,7 @@ def get_comma_sep_string_from_list(items):
     """Turns a list of items into a comma-separated string.
 
     Args:
-        items: list. List of the items.
+        items: list(str). List of the items.
 
     Returns:
         str. String containing the items in the list separated by commas.

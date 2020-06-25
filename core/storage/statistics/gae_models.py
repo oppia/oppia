@@ -1504,8 +1504,9 @@ class LearnerAnswerDetailsModel(base_models.BaseModel):
                 the form 'question_id'.
             interaction_id: str.  The ID of the interaction for which the
                 answer details are received.
-            learner_answer_info_list: list. The list of LearnerAnswerInfo
-                objects in dict format, which is defined in the stats_domain.
+            learner_answer_info_list: list(LearnerAnswerInfo). The list of
+                LearnerAnswerInfo objects in dict format, which is defined in
+                the stats_domain.
             learner_answer_info_schema_version: int. The version of
                 LearnerAnswerInfo dict, which is currently supported by
                 the Oppia.

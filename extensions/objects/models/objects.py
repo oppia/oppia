@@ -530,8 +530,8 @@ class LogicQuestion(BaseObject):
                             expression.
                         top_operator_name: str. The top operator name
                             in the expression.
-                        arguments: list. A list of arguments.
-                        dummies: list. A list of dummy values.
+                        arguments: list(str). A list of arguments.
+                        dummies: list(double). A list of dummy values.
                 results: list(dict(str, *)). The list containing the final
                     results of the required proof in the dict format
                     containing following key-value pairs:

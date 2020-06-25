@@ -74,7 +74,7 @@ class Registry(python_utils.OBJECT):
         """Get a list of instances of all issues.
 
         Returns:
-            list. A list of all issue class instances.
+            list(ValuesView). A list of all issue class instances.
         """
         if len(cls._issues) == 0:
             cls._refresh()

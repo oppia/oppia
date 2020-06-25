@@ -74,7 +74,7 @@ class Registry(python_utils.OBJECT):
         """Get a list of instances of all actions.
 
         Returns:
-            list. A list of all action class instances.
+            list(ValuesView). A list of all action class instances.
         """
         if len(cls._actions) == 0:
             cls._refresh()
