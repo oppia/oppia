@@ -52,9 +52,10 @@ describe('Upload Activity Modal Controller', function() {
       size: 100,
       name: 'file.mp3'
     };
-    spyOn(document, 'getElementById').and.returnValue(<any>{
-      files: [file]
-    });
+    document.getElementById = jasmine.createSpy('HTMLImageElement').and
+      .returnValue({
+        files: [file]
+      });
     $scope.save();
 
     expect($uibModalInstance.close).toHaveBeenCalledWith({
@@ -64,9 +65,10 @@ describe('Upload Activity Modal Controller', function() {
 
   it('should not save activity if file is empty', function() {
     spyOn(AlertsService, 'addWarning').and.callThrough();
-    spyOn(document, 'getElementById').and.returnValue(<any>{
-      files: []
-    });
+    document.getElementById = jasmine.createSpy('HTMLImageElement').and
+      .returnValue({
+        files: []
+      });
     $scope.save();
 
     expect(AlertsService.addWarning).toHaveBeenCalledWith(
