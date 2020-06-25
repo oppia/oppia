@@ -1469,6 +1469,53 @@ class BlankLineBelowFileOverviewChecker(checkers.BaseChecker):
                     line=closing_line_index_of_fileoverview + 1)
 
 
+class NewlineBelowClassDocstring(checkers.BaseChecker):
+    """Checks if there is a single newline below the class docstring."""
+
+    __implements__ = interfaces.IRawChecker
+    name = 'newline below class docstring'
+    priority = -1
+    msgs = {
+        'C0026': (
+            'No newline below class docstring.',
+            'no-newline-below-class-docstring',
+            'Please add a single newline below class docstring.'
+        )
+    }
+
+    def process_module(self, node):
+        """Process a module to ensure that there is a single newline below
+        class docstring.
+
+        Args:
+            node: astroid.scoped_nodes.Function. Node to access module content.
+        """
+
+        in_class = False
+        in_docstring = False
+        file_content = read_from_node(node)
+        file_length = len(file_content)
+        blank_line_counter = 0
+        prev_line = ''
+
+        for line_num in python_utils.RANGE(file_length):
+            line = file_content[line_num].strip()
+
+            if line_num > 0:
+                prev_line = file_content[line_num - 1].strip()
+
+            # Check if it is a docstring and not some multi-line string.
+            if (prev_line.startswith(b'class ') or in_class:
+                in_class = True
+                if prev_line.endswith(b'):') and line.startswith(b'"""'):
+                    in_docstring = True
+                    in_class = False
+
+            if line.endswith(b'"""'):
+                in_docstring = False
+
+
+
 def register(linter):
     """Registers the checker with pylint.
 

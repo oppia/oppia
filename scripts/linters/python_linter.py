@@ -352,7 +352,7 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
                 python_utils.PRINT('Linting Python files %s to %s...' % (
                     current_batch_start_index + 1, current_batch_end_index))
 
-            with linter_utils.redirect_stdout(stdout):
+            with linter_utils.redirect_stdout(sys.stdout):
                 # This line invokes Pylint and prints its output
                 # to the target stdout.
                 pylinter = lint.Run(
