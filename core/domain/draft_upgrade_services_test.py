@@ -319,6 +319,24 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             }), exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'state_name': 'Intro',
+                'property_name': 'solution',
+                'new_value': {
+                    'interaction_id': '',
+                    'answer_is_exclusive': True,
+                    'correct_answer': [
+                        [html_content],
+                        ['<p>2</p>'],
+                        ['<p>3</p>'],
+                        ['<p>4</p>']
+                    ],
+                    'explanation': {
+                        'content_id': 'solution',
+                        'html': '<p>This is solution for state1</p>'
+                    }
+                }
+            }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Intro',
                 'property_name': 'default_outcome',
                 'new_value': {
                     'param_changes': [],
@@ -508,9 +526,29 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                     },
                 }
             }).to_dict())
-
         self.assertEqual(
             expected_draft_change_list[5].to_dict(),
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Intro',
+                'property_name': 'solution',
+                'new_value': {
+                    'answer_is_exclusive': True,
+                    'correct_answer': [
+                        [expected_html_content],
+                        ['<p>2</p>'],
+                        ['<p>3</p>'],
+                        ['<p>4</p>']
+                    ],
+                    'explanation': {
+                        'content_id': 'solution',
+                        'html': '<p>This is solution for state1</p>'
+                    }
+                }
+            }).to_dict())
+
+        self.assertEqual(
+            expected_draft_change_list[6].to_dict(),
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'state_name': 'Intro',
@@ -529,7 +567,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             }).to_dict())
 
         self.assertEqual(
-            expected_draft_change_list[6].to_dict(),
+            expected_draft_change_list[7].to_dict(),
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'state_name': 'Intro',

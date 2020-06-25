@@ -1608,6 +1608,13 @@ class RuleSpec(python_utils.OBJECT):
             utils.get_file_contents(
                 feconf.HTML_FIELD_TYPES_TO_RULE_SPECS_FILE_PATH))
 
+        # TODO(#9413): Find a way to include a reference to the interaction
+        # type in the Draft change lists.
+        # See issue: https://github.com/oppia/oppia/issues/9413. We cannot use
+        # the interaction-id from the rules_index_dict until issue-9413 has
+        # been fixed, because this method has no reference to the interaction
+        # type and draft changes use this method. The rules_index_dict below
+        # is used to figure out the assembly of the html in the rulespecs.
         for interaction_and_rule_details in (
                 html_field_types_to_rule_specs_dict.values()):
             rule_type_has_html = (

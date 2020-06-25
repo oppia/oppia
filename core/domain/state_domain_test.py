@@ -111,7 +111,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'tagged_skill_misconception_id': None
         }
         state_solution_dict = {
-            'interaction_id': '',
             'answer_is_exclusive': True,
             'correct_answer': [
                 '<p>state customization arg html 1</p>',
@@ -187,7 +186,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         ]
 
         state_solution_dict = {
-            'interaction_id': '',
             'answer_is_exclusive': True,
             'correct_answer': [
                 ['<p>state customization arg html 1</p>'],
@@ -305,7 +303,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             ),
         ]
         state_solution_dict = {
-            'interaction_id': '',
             'answer_is_exclusive': True,
             'correct_answer': 'Answer1',
             'explanation': {
@@ -404,7 +401,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'tagged_skill_misconception_id': None
         }]
         state_solution_dict = {
-            'interaction_id': '',
             'answer_is_exclusive': True,
             'correct_answer': [
                 '<p>state customization arg html 1</p>',
@@ -1569,7 +1565,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     }
                 ],
                 'solution': {
-                    'interaction_id': '',
                     'answer_is_exclusive': True,
                     'correct_answer': [
                         [html_with_old_math_schema],
@@ -1642,7 +1637,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     }
                 ],
                 'solution': {
-                    'interaction_id': '',
                     'answer_is_exclusive': True,
                     'correct_answer': [
                         [html_with_new_math_schema],
@@ -1763,7 +1757,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'classifier_model_id': None,
             'interaction': {
                 'solution': {
-                    'interaction_id': '',
                     'answer_is_exclusive': True,
                     'correct_answer': [
                         html_with_old_math_schema,
@@ -1826,7 +1819,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'classifier_model_id': None,
             'interaction': {
                 'solution': {
-                    'interaction_id': '',
                     'answer_is_exclusive': True,
                     'correct_answer': [
                         html_with_new_math_schema,
@@ -1955,7 +1947,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'classifier_model_id': None,
             'interaction': {
                 'solution': {
-                    'interaction_id': '',
                     'answer_is_exclusive': True,
                     'correct_answer': 'Answer1',
                     'explanation': {
@@ -2012,7 +2003,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'classifier_model_id': None,
             'interaction': {
                 'solution': {
-                    'interaction_id': '',
                     'answer_is_exclusive': True,
                     'correct_answer': 'Answer1',
                     'explanation': {

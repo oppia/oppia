@@ -144,6 +144,26 @@ class DraftUpgradeUtil(python_utils.OBJECT):
                   exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION):
                 new_value['explanation']['html'] = (
                     conversion_fn(new_value['explanation']['html']))
+                # TODO(#9413): Find a way to include a reference to the
+                # interaction type in the Draft change lists.
+                # See issue: https://github.com/oppia/oppia/issues/9413.
+                # currently, only DragAndDropSortInput interaction allows
+                # solution correct answers having HTML in them.
+                # This code below should be updated if any new interaction
+                # is allowed to have HTML in the solution correct answer
+                # The typecheckings below can be avoided once #9413 is fixed.
+                if new_value['correct_answer']:
+                    if isinstance(new_value['correct_answer'], list):
+                        for list_index, html_list in enumerate(
+                                new_value['correct_answer']):
+                            if isinstance(html_list, list):
+                                for answer_html_index, answer_html in enumerate(
+                                        html_list):
+                                    if isinstance(
+                                            answer_html, python_utils.UNICODE):
+                                        new_value['correct_answer'][list_index][
+                                            answer_html_index] = (
+                                                conversion_fn(answer_html))
             elif (change.property_name ==
                   exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
                 new_value = [
