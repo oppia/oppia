@@ -63,7 +63,7 @@ var testSuite = [{
   expectedInteractionDetails: [],
   wrongAnswers: ['y-m*x=c', 'm*x+c=y', 'x=m*y+c'],
   correctAnswers: ['y=m*x+c', 'y=m*x^2+c', '2*y-y=m*x+c', 'y=0', 'y=m*x-c']
-},  {
+}, {
   interactionArguments: [],
   ruleArguments: ['MatchesExactlyWith', 'y=m*x+c', 'on both sides'],
   expectedInteractionDetails: [],

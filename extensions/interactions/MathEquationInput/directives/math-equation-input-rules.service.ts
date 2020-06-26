@@ -41,11 +41,11 @@ export class MathEquationInputRulesService {
 
     let aeirs = new AlgebraicExpressionInputRulesService();
 
-    if (positionOfTerms == 'lhs') {
+    if (positionOfTerms === 'lhs') {
       return aeirs.MatchesExactlyWith(lhsAnswer, {x: lhsInput});
-    } else if (positionOfTerms == 'rhs') {
+    } else if (positionOfTerms === 'rhs') {
       return aeirs.MatchesExactlyWith(rhsAnswer, {x: rhsInput});
-    } else if (positionOfTerms == 'both') {
+    } else if (positionOfTerms === 'both') {
       return (
         aeirs.MatchesExactlyWith(lhsAnswer, {x: lhsInput}) && (
           aeirs.MatchesExactlyWith(rhsAnswer, {x: rhsInput})));
@@ -54,7 +54,7 @@ export class MathEquationInputRulesService {
       // and perform an exact match.
       let rhsAnswerModified = nerdamer(rhsAnswer).multiply('-1');
       let expressionAnswer = nerdamer(rhsAnswerModified).add(lhsAnswer);
-      
+
       let rhsInputModified = nerdamer(rhsInput).multiply('-1');
       let expressionInput = nerdamer(rhsInputModified).add(lhsInput);
 
