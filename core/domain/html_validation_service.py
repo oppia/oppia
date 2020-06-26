@@ -880,6 +880,51 @@ def get_filename_with_dimensions(old_filename, exp_id):
     return new_filename
 
 
+def get_invalid_svg_tags_and_attrs(svg_string):
+    """Returns a set of all invalid tags and attributes for the provided SVG.
+
+    Args:
+        svg_string: str. The SVG string.
+
+    Returns:
+        tuple(list(str), list(str)). A 2-tuple, the first element of which
+        is a list of invalid tags, and the second element of which is a
+        list of invalid tag-specific attributes.
+        The format for the second element is <tag>:<attribute>, where the
+        <tag> represents the SVG tag for which the attribute is invalid
+        and <attribute> represents the invalid attribute.
+        eg. (['invalid-tag1', 'invalid-tag2'], ['path:invalid-attr'])
+    """
+    soup = bs4.BeautifulSoup(svg_string.encode('utf-8'), 'html.parser')
+    invalid_elements = []
+    invalid_attrs = []
+    for element in soup.find_all():
+        if element.name.lower() in constants.SVG_ATTRS_WHITELIST:
+            for attr in element.attrs:
+                if attr.lower() not in (
+                        constants.SVG_ATTRS_WHITELIST[element.name.lower()]):
+                    invalid_attrs.append('%s:%s' % (element.name, attr))
+        else:
+            invalid_elements.append(element.name)
+    return (invalid_elements, invalid_attrs)
+
+
+def check_for_math_component_in_html(html_string):
+    """Checks for existence of Math component tags inside an HTML string.
+
+    Args:
+        html_string: str. HTML string to check.
+
+    Returns:
+        str. Updated HTML string with all Math component tags having the new
+        attribute.
+    """
+    soup = bs4.BeautifulSoup(
+        html_string.encode(encoding='utf-8'), 'html.parser')
+    math_tags = soup.findAll(name='oppia-noninteractive-math')
+    return bool(math_tags)
+
+
 def add_math_content_to_math_rte_components(html_string):
     """Replaces the attribute raw_latex-with-value in all Math component tags
     with a new attribute math_content-with-value. The new attribute has an
@@ -932,35 +977,6 @@ def add_math_content_to_math_rte_components(html_string):
     # We need to replace the <br/> tags (if any) with  <br> because for passing
     # the textangular migration tests we need to have only <br> tags.
     return python_utils.UNICODE(soup).replace('<br/>', '<br>')
-
-
-def get_invalid_svg_tags_and_attrs(svg_string):
-    """Returns a set of all invalid tags and attributes for the provided SVG.
-
-    Args:
-        svg_string: str. The SVG string.
-
-    Returns:
-        tuple(list(str), list(str)). A 2-tuple, the first element of which
-        is a list of invalid tags, and the second element of which is a
-        list of invalid tag-specific attributes.
-        The format for the second element is <tag>:<attribute>, where the
-        <tag> represents the SVG tag for which the attribute is invalid
-        and <attribute> represents the invalid attribute.
-        eg. (['invalid-tag1', 'invalid-tag2'], ['path:invalid-attr'])
-    """
-    soup = bs4.BeautifulSoup(svg_string.encode('utf-8'), 'html.parser')
-    invalid_elements = []
-    invalid_attrs = []
-    for element in soup.find_all():
-        if element.name.lower() in constants.SVG_ATTRS_WHITELIST:
-            for attr in element.attrs:
-                if attr.lower() not in (
-                        constants.SVG_ATTRS_WHITELIST[element.name.lower()]):
-                    invalid_attrs.append('%s:%s' % (element.name, attr))
-        else:
-            invalid_elements.append(element.name)
-    return (invalid_elements, invalid_attrs)
 
 
 def validate_math_tags_in_html(html_string):
@@ -1023,22 +1039,6 @@ def validate_math_tags_in_html_with_attribute_math_content(html_string):
         else:
             error_list.append(math_tag)
     return error_list
-
-
-def check_for_math_component_in_html(html_string):
-    """Checks for existence of Math component tags inside an HTML string.
-
-    Args:
-        html_string: str. HTML string to check.
-
-    Returns:
-        str. Updated HTML string with all Math component tags having the new
-        attribute.
-    """
-    soup = bs4.BeautifulSoup(
-        html_string.encode(encoding='utf-8'), 'html.parser')
-    math_tags = soup.findAll(name='oppia-noninteractive-math')
-    return bool(math_tags)
 
 
 def is_parsable_as_xml(xml_string):

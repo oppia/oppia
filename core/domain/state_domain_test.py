@@ -664,7 +664,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'The solution does not have a valid '
             'correct_answer type.'):
             state.get_all_html_content_strings()
-        interaction.answer_type = 'ListOfSetsOfHtmlStrings'
 
     def test_get_all_html_when_interaction_is_none(self):
         """Test the method for extracting all the HTML from a state
