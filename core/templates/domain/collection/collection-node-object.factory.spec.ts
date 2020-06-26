@@ -17,7 +17,7 @@
  */
 
 import { CollectionNodeObjectFactory } from
-  'domain/collection/CollectionNodeObjectFactory';
+  'domain/collection/collection-node-object.factory';
 
 describe('Collection node object factory', () => {
   var collectionNodeObjectFactory: CollectionNodeObjectFactory = null;

@@ -69,7 +69,7 @@ describe('PlaythroughImprovementTaskObjectFactory', function() {
   describe('.createNew', function() {
     beforeEach(function() {
       spyOn(UserExplorationPermissionsService, 'getPermissionsAsync')
-        .and.returnValue($q.resolve({can_edit: true}));
+        .and.returnValue($q.resolve({canEdit: true}));
     });
 
     it('retrieves data from passed issue', function() {
@@ -140,7 +140,7 @@ describe('PlaythroughImprovementTaskObjectFactory', function() {
         ]));
 
       spyOn(UserExplorationPermissionsService, 'getPermissionsAsync')
-        .and.returnValue($q.resolve({can_edit: true}));
+        .and.returnValue($q.resolve({canEdit: true}));
     });
 
     it('returns task for each issue if recording is enabled', function(done) {
@@ -198,7 +198,7 @@ describe('PlaythroughImprovementTaskObjectFactory', function() {
       describe('for a user with edit permissions', function() {
         it('has the mark as resolved button', function() {
           spyOn(UserExplorationPermissionsService, 'getPermissionsAsync')
-            .and.returnValue($q.resolve({can_edit: true}));
+            .and.returnValue($q.resolve({canEdit: true}));
 
           var task = PlaythroughImprovementTaskObjectFactory.createNew(
             this.issue);
@@ -214,7 +214,7 @@ describe('PlaythroughImprovementTaskObjectFactory', function() {
       describe('for a user without edit permissions', function() {
         it('has no buttons', function() {
           spyOn(UserExplorationPermissionsService, 'getPermissionsAsync')
-            .and.returnValue($q.resolve({can_edit: false}));
+            .and.returnValue($q.resolve({canEdit: false}));
 
           var task = PlaythroughImprovementTaskObjectFactory.createNew(
             this.issue);
@@ -231,7 +231,7 @@ describe('PlaythroughImprovementTaskObjectFactory', function() {
     describe('Mark as Resolved Action Button', function() {
       beforeEach(function() {
         spyOn(UserExplorationPermissionsService, 'getPermissionsAsync')
-          .and.returnValue($q.resolve({can_edit: true}));
+          .and.returnValue($q.resolve({canEdit: true}));
 
         this.task = PlaythroughImprovementTaskObjectFactory.createNew(
           this.issue);
