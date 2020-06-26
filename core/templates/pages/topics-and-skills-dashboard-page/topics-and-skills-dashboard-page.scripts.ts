@@ -34,4 +34,4 @@ require(
 );
 require(
   'pages/topics-and-skills-dashboard-page/' +
-  'topics-and-skills-dashboard-page.controller.ts');
+  'topics-and-skills-dashboard-page.component.ts');

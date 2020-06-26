@@ -21,6 +21,10 @@
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
+require(
+  'pages/topics-and-skills-dashboard-page/' +
+  'topics-and-skills-dashboard-page.component.ts');
+
 describe('Topics and Skills Dashboard Page', function() {
   beforeEach(angular.mock.module('oppia'));
 
@@ -71,7 +75,7 @@ describe('Topics and Skills Dashboard Page', function() {
     };
     var SkillCreationService;
 
-    beforeEach(angular.mock.inject(function($injector) {
+    beforeEach(angular.mock.inject(function($injector, $componentController) {
       $rootScope = $injector.get('$rootScope');
       $scope = $rootScope.$new();
       $timeout = $injector.get('$timeout');
@@ -90,8 +94,8 @@ describe('Topics and Skills Dashboard Page', function() {
         }
       };
       SkillCreationService = $injector.get('SkillCreationService');
-      directive = $injector.get('topicsAndSkillsDashboardPageDirective')[0];
-      ctrl = $injector.instantiate(directive.controller, {
+
+      ctrl = $componentController('topicsAndSkillsDashboardPage', {
         $scope: $scope,
         TopicsAndSkillsDashboardBackendApiService:
         MockTopicsAndSkillsDashboardBackendApiService
@@ -171,6 +175,19 @@ describe('Topics and Skills Dashboard Page', function() {
       $rootScope.$apply();
       expect(skillSpy).toHaveBeenCalled();
     });
+
+    it('should reset skill when create skill modal is dismissed',
+      function() {
+        spyOn($uibModal, 'open').and.returnValue({
+          result: $q.reject()
+        });
+
+        var skillSpy = spyOn(
+          SkillCreationService, 'resetSkillDescriptionStatusMarker');
+        ctrl.createSkill();
+        $rootScope.$apply();
+        expect(skillSpy).toHaveBeenCalled();
+      });
 
     it('should navigate the page', function() {
       var totalEntityCountToDisplay = 50;
