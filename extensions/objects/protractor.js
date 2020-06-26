@@ -24,23 +24,23 @@
 var waitFor = require(
   process.cwd() + '/core/tests/protractor_utils/waitFor.js');
 
-var AlgebraicExpressionEditor = function(elem) {
+var MathEditor = function(elem) {
   return {
     setValue: async function(text) {
       await waitFor.elementToBeClickable(
-        elem, '"Algebraic Input" editor takes too long to be clickable');
+        elem, `"${elem.getTagName()}" takes too long to be clickable`);
       await elem.click();
-      var algebraicInputElem = element.all(by.css(
+      var mathInputElem = element.all(by.css(
         '.protractor-test-guppy-div')).last();
-      var present = await algebraicInputElem.isPresent();
+      var present = await mathInputElem.isPresent();
       if (present) {
-        await algebraicInputElem.sendKeys(text);
+        await mathInputElem.sendKeys(text);
       }
     },
     getValue: async function() {
-      var algebraicInputElem = element.all(by.css(
+      var mathInputElem = element.all(by.css(
         '.protractor-test-guppy-div')).last();
-      var present = await algebraicInputElem.isPresent();
+      var present = await mathInputElem.isPresent();
       if (present) {
         var contentElem = element.all(by.tagName('annotation')).first();
         present = await contentElem.isPresent();
@@ -173,6 +173,19 @@ var ParameterNameEditor = function(elem) {
   };
 };
 
+var PositionOfTermsEditor = function(elem) {
+  return {
+    setValue: async function(text) {
+      var options = await element.all(by.tagName('option'));
+      console.log('options:');
+      console.log(options);
+      if (options.indexOf(text) !== -1) {
+        options[options.indexOf(text)].click();
+      }
+    }
+  };
+};
+
 var SanitizedUrlEditor = function(elem) {
   return {
     setValue: async function(text) {
@@ -211,23 +224,25 @@ var UnicodeStringEditor = function(elem) {
 };
 
 var OBJECT_EDITORS = {
-  AlgebraicExpression: AlgebraicExpressionEditor,
+  AlgebraicExpression: MathEditor,
   Boolean: BooleanEditor,
   CoordTwoDim: CoordTwoDim,
   Filepath: FilepathEditor,
   Fraction: FractionEditor,
   Int: IntEditor,
+  MathEquation: MathEditor,
   MathLatexString: MathLatexStringEditor,
   NonnegativeInt: NonnegativeIntEditor,
   NormalizedString: NormalizedStringEditor,
   NumberWithUnits: NumberWithUnitsEditor,
   ParameterName: ParameterNameEditor,
+  PositionOfTerms: PositionOfTermsEditor,
   SanitizedUrl: SanitizedUrlEditor,
   SkillSelector: SkillSelector,
   UnicodeString: UnicodeStringEditor
 };
 
-exports.AlgebraicExpressionEditor = AlgebraicExpressionEditor;
+exports.MathEditor = MathEditor;
 exports.BooleanEditor = BooleanEditor;
 exports.CoordTwoDim = CoordTwoDim;
 exports.FractionEditor = FractionEditor;

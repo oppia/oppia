@@ -55,6 +55,7 @@ export class MathInteractionsService {
   }
 
   validateExpression(expressionString: string, algebraic = true): boolean {
+    expressionString = expressionString.split(" ").join("");
     let expressionObject;
     if (expressionString.length === 0) {
       this.warningText = 'Please enter a non-empty answer.';
@@ -86,6 +87,7 @@ export class MathInteractionsService {
   }
 
   validateEquation(equationString: string): boolean {
+    equationString = equationString.split(" ").join("");
     if (equationString.length === 0) {
       this.warningText = 'Please enter a non-empty answer.';
       return false;
@@ -97,6 +99,12 @@ export class MathInteractionsService {
     } else if (equationString.indexOf('=') === -1) {
       this.warningText = 'It looks like you have entered an ' +
         'expression. Please enter an equation instead.';
+      return false;
+    } else if (equationString.indexOf('=') == 0) {
+      this.warningText = 'The LHS of your equation is empty.';
+      return false;
+    } else if (equationString.indexOf('=') == equationString.length - 1) {
+      this.warningText = 'The RHS of your equation is empty.';
       return false;
     }
     let splitString = equationString.split('=');
