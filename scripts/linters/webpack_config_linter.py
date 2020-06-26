@@ -25,7 +25,8 @@ import sys
 import python_utils
 from . import linter_utils
 
-WEBPACK_CONFIG_FILEPATH = os.path.join(os.getcwd(), 'webpack.common.config.ts')
+WEBPACK_CONFIG_FILE_NAME = 'webpack.common.config.ts'
+WEBPACK_CONFIG_FILEPATH = os.path.join(os.getcwd(), WEBPACK_CONFIG_FILE_NAME)
 
 
 def check_webpack_config_file(file_cache, verbose_mode_enabled):
@@ -55,13 +56,16 @@ def check_webpack_config_file(file_cache, verbose_mode_enabled):
                 keys = [
                     'chunks', 'filename', 'meta', 'template', 'minify',
                     'inject']
-            elif stripped_line.startswith('}),'):
+            elif (
+                    htmlwebpackplugin_section_found and
+                    stripped_line.startswith('}),')):
                 htmlwebpackplugin_section_found = False
                 if keys:
                     summary_message = (
                         'Line %s: The following keys: %s are missing in '
-                        'HtmlWebpackPlugin block in webpack.common.config.'
-                        'ts' % (error_line_num + 1, ', '.join(keys)))
+                        'HtmlWebpackPlugin block in %s' % (
+                            error_line_num + 1, ', '.join(keys),
+                            WEBPACK_CONFIG_FILE_NAME))
                     summary_messages.append(summary_message)
                     python_utils.PRINT(summary_message)
                     python_utils.PRINT('')
@@ -75,8 +79,9 @@ def check_webpack_config_file(file_cache, verbose_mode_enabled):
             summary_message = (
                 '%s webpack config file checks failed, see messages above '
                 'for missing keys in HtmlWebpackPlugin block in '
-                'webpack.common.config.ts file' % (
-                    linter_utils.FAILED_MESSAGE_PREFIX))
+                '%s file' % (
+                    linter_utils.FAILED_MESSAGE_PREFIX,
+                    WEBPACK_CONFIG_FILE_NAME))
         else:
             summary_message = '%s webpack config file checks passed' % (
                 linter_utils.SUCCESS_MESSAGE_PREFIX)

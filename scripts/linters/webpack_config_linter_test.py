@@ -26,49 +26,84 @@ from core.tests import test_utils
 from . import pre_commit_linter
 from . import webpack_config_linter
 
-NAME_SPACE = multiprocessing.Manager().Namespace()
-PROCESSES = multiprocessing.Manager().dict()
-NAME_SPACE.files = pre_commit_linter.FileCache()
-FILE_CACHE = NAME_SPACE.files  # pylint: disable=redefined-builtin
 
-
-class AppDevLinterTests(test_utils.GenericTestBase):
+class WebpackConfigLinterTests(test_utils.GenericTestBase):
     """Tests for the webpack_config_linter.py."""
+
+    def setUp(self):
+        super(WebpackConfigLinterTests, self).setUp()
+        self.name_space = multiprocessing.Manager().Namespace()
+        self.name_space.files = pre_commit_linter.FileCache()
+        self.file_cache = self.name_space.files
 
     def test_check_valid_pattern(self):
         def mock_readlines(unused_self, unused_filepath):
             return (
-                'plugins: [', 'new HtmlWebpackPlugin({', 'chunks: [\'about\'],',
-                'filename: \'about-page.mainpage.html\',', 'meta: defaultMeta,',
-                'template:',
-                'commonPrefix + \'/pages/about-page/about-page.mainpage.'
-                'html\',', 'minify: htmlMinifyConfig,', 'inject: false', '}),]')
+                '// This is a comment.',
+                'plugins: [',
+                '   new HtmlWebpackPlugin({',
+                '       chunks: [\'about\'],',
+                '       filename: \'about-page.mainpage.html\',',
+                '       meta: defaultMeta,',
+                '       template: commonPrefix + \'/pages/about-page/about-page'
+                '.mainpage.html\',',
+                '       minify: htmlMinifyConfig,',
+                '       inject: false', '}),]'
+            )
 
         readlines_swap = self.swap(
             pre_commit_linter.FileCache, 'readlines', mock_readlines)
         with readlines_swap:
             summary_messages = (
                 webpack_config_linter.check_webpack_config_file(
-                    FILE_CACHE, True))
-            expected_summary_messages = [
-                'SUCCESS  webpack config file checks passed']
-            self.assertEqual(summary_messages, expected_summary_messages)
+                    self.file_cache, True))
+        expected_summary_messages = [
+            'SUCCESS  webpack config file checks passed']
+        self.assertEqual(summary_messages, expected_summary_messages)
 
-    def test_check_invalid_pattern(self):
+    def test_check_invalid_pattern_with_some_keys_missing(self):
         def mock_readlines(unused_self, unused_filepath):
             return (
-                'plugins: [', 'new HtmlWebpackPlugin({', '}),]')
+                'plugins: [',
+                '   new HtmlWebpackPlugin({',
+                '       chunks: [\'about\'],',
+                '       filename: \'about-page.mainpage.html\',',
+                '       minify: htmlMinifyConfig,',
+                '       inject: false', '}),]'
+            )
 
         readlines_swap = self.swap(
             pre_commit_linter.FileCache, 'readlines', mock_readlines)
         with readlines_swap:
             summary_messages = (
                 webpack_config_linter.check_webpack_config_file(
-                    FILE_CACHE, True))
-            expected_summary_messages = [
-                'Line 2: The following keys: chunks, filename, meta, template,'
-                ' minify, inject are missing in HtmlWebpackPlugin block in '
-                'webpack.common.config.ts', 'FAILED  webpack config file checks'
-                ' failed, see messages above for missing keys in '
-                'HtmlWebpackPlugin block in webpack.common.config.ts file']
-            self.assertEqual(summary_messages, expected_summary_messages)
+                    self.file_cache, True))
+        expected_summary_messages = [
+            'Line 2: The following keys: meta, template are missing in '
+            'HtmlWebpackPlugin block in webpack.common.config.ts',
+            'FAILED  webpack config file checks failed, see '
+            'messages above for missing keys in HtmlWebpackPlugin block in '
+            'webpack.common.config.ts file']
+        self.assertEqual(summary_messages, expected_summary_messages)
+
+    def test_check_invalid_pattern_without_all_keys(self):
+        def mock_readlines(unused_self, unused_filepath):
+            return (
+                'plugins: [',
+                '   new HtmlWebpackPlugin({',
+                '}),]'
+            )
+
+        readlines_swap = self.swap(
+            pre_commit_linter.FileCache, 'readlines', mock_readlines)
+        with readlines_swap:
+            summary_messages = (
+                webpack_config_linter.check_webpack_config_file(
+                    self.file_cache, True))
+        expected_summary_messages = [
+            'Line 2: The following keys: chunks, filename, meta, template,'
+            ' minify, inject are missing in HtmlWebpackPlugin block in '
+            'webpack.common.config.ts', 'FAILED  webpack config file checks'
+            ' failed, see messages above for missing keys in '
+            'HtmlWebpackPlugin block in webpack.common.config.ts file']
+        self.assertEqual(summary_messages, expected_summary_messages)
