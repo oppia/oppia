@@ -84,10 +84,10 @@ class BaseModel(ndb.Model):
     """Base model for all persistent object storage classes."""
 
     # When this entity was first created. This value should only modified with
-    # the put or put_multi methods.
+    # the update_timestamps method.
     created_on = ndb.DateTimeProperty(indexed=True, required=True)
     # When this entity was last updated. This value should only modified with
-    # the put or put_multi methods.
+    # the update_timestamps method.
     last_updated = ndb.DateTimeProperty(indexed=True, required=True)
     # Whether the current version of the model instance is deleted.
     deleted = ndb.BooleanProperty(indexed=True, default=False)
@@ -96,13 +96,6 @@ class BaseModel(ndb.Model):
     def id(self):
         """A unique id for this model instance."""
         return self.key.id()
-
-    def _pre_put_hook(self):
-        """This is run before model instances are saved to the datastore.
-
-        Subclasses of BaseModel should override this method.
-        """
-        pass
 
     class EntityNotFoundError(Exception):
         """Raised when no entity for a given id exists in the datastore."""
@@ -236,15 +229,12 @@ class BaseModel(ndb.Model):
                     entities[i] = None
         return entities
 
-    def put(self, update_last_updated_time=True):
-        """Stores the given ndb.Model instance to the datastore.
+    def update_timestamps(self, update_last_updated_time):
+        """Update the created_on and last_updated fields.
 
         Args:
             update_last_updated_time: bool. Whether to update the
-                last_updated_field of the model.
-
-        Returns:
-            Model. The entity that was stored.
+                last_updated field of the model.
         """
         if self.created_on is None:
             self.created_on = datetime.datetime.utcnow()
@@ -252,7 +242,31 @@ class BaseModel(ndb.Model):
         if update_last_updated_time or self.last_updated is None:
             self.last_updated = datetime.datetime.utcnow()
 
+    def put(self, update_last_updated_time=True):
+        """Stores the given ndb.Model instance to the datastore.
+
+        Args:
+            update_last_updated_time: bool. Whether to update the
+                last_updated field of the model.
+
+        Returns:
+            Model. The entity that was stored.
+        """
+        self.update_timestamps(update_last_updated_time)
         return super(BaseModel, self).put()
+
+    def put_async(self, update_last_updated_time=True):
+        """Stores the given ndb.Model instance to the datastore asynchronously.
+
+        Args:
+            update_last_updated_time: bool. Whether to update the
+                last_updated field of the model.
+
+        Returns:
+            Model. The entity that was stored.
+        """
+        self.update_timestamps(update_last_updated_time)
+        return super(BaseModel, self).put_async()
 
     @classmethod
     def put_multi(cls, entities, update_last_updated_time=True):
@@ -261,16 +275,26 @@ class BaseModel(ndb.Model):
         Args:
             entities: list(ndb.Model).
             update_last_updated_time: bool. Whether to update the
-                last_updated_field of the entities.
+                last_updated field of the entities.
         """
         for entity in entities:
-            if entity.created_on is None:
-                entity.created_on = datetime.datetime.utcnow()
-
-            if update_last_updated_time or entity.last_updated is None:
-                entity.last_updated = datetime.datetime.utcnow()
+            entity.update_timestamps(update_last_updated_time)
 
         ndb.put_multi(entities)
+
+    @classmethod
+    def put_multi_async(cls, entities, update_last_updated_time=True):
+        """Stores the given ndb.Model instances asynchronously.
+
+        Args:
+            entities: list(ndb.Model).
+            update_last_updated_time: bool. Whether to update the
+                last_updated field of the entities.
+        """
+        for entity in entities:
+            entity.update_timestamps(update_last_updated_time)
+
+        ndb.put_multi_async(entities)
 
     @classmethod
     def delete_multi(cls, entities):
@@ -380,6 +404,10 @@ class BaseCommitLogEntryModel(BaseModel):
     """Base Model for the models that store the log of commits to a
     construct.
     """
+
+    # Update superclass model to make these properties indexed.
+    # created_on = ndb.DateTimeProperty(auto_now_add=True, indexed=True)
+    # last_updated = ndb.DateTimeProperty(auto_now=True, indexed=True)
 
     # The id of the user.
     user_id = ndb.StringProperty(indexed=True, required=True)
