@@ -48,6 +48,12 @@ var ExplorationEditorHistoryTab = function() {
     by.css('.protractor-test-confirm-revert'));
 
   /*
+   * Display
+   */
+  var datesCommitsWereSaved = element.all(
+    by.css('.protractor-test-history-tab-commit-date'));
+
+  /*
    * Links
    */
   var historyGraphLink = historyGraph.all(by.css('.protractor-test-link'));
@@ -55,6 +61,29 @@ var ExplorationEditorHistoryTab = function() {
   /*
    * Workflows
    */
+  
+   this.expectCommitDatesToBeDisplayedInHistoryTab = async function() {
+    /*
+     * This method checks if the commit dates are being displayed in
+     * List of Changes section of the history tab.
+     */
+    var numCommitDates = await datesCommitsWereSaved.count();
+    for (var i = 0; i < numCommitDates; i++) {
+      var date = await (await datesCommitsWereSaved.get(i)).getText();
+      // The dates can be of format 'MM/DD/YY', eg. 02/02/20 or
+      // 'MMM DD', eg. Feb 12 or if it is the current day, the date
+      // will be in hours and minutes in 'HH:MM AM/PM'
+      // Regex for 'MM/DD/YY' is: /^(\d{1,2})\/(\d{1,2})\/(\d{2})$/
+      // Regex for 'MMM DD' is /^([A-Z][a-z][a-z])\s(\d{1,2})$/
+      // Regex For 'HH:MM AM/PM' is /^(\d{1,2})\:(\d{1,2})\s(A|P)M$/
+      // var regexDateString = (
+      //  '/' + '(^(\d{1,2})\/(\d{1,2})\/(\d{2})$)' + '|' + 
+      //  '(^([A-Z][a-z][a-z])\s(\d{1,2})$)' + '|' +
+      //  '(^(\d{1,2})\:(\d{1,2})\s(A|P)M$)' + '/'
+      // );
+      expect(date).toMatch('/\d/');
+    }
+   };
 
   this.getHistoryGraph = function() {
     return {

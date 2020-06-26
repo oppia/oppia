@@ -28,7 +28,7 @@ var ExplorationEditorPage =
 var ExplorationPlayerPage =
   require('../protractor_utils/ExplorationPlayerPage.js');
 
-describe('Exploration history', function() {
+fdescribe('Exploration history', function() {
   var explorationEditorPage = null;
   var explorationPlayerPage = null;
   var explorationEditorHistoryTab = null;
@@ -46,6 +46,20 @@ describe('Exploration history', function() {
     explorationEditorHistoryTab = explorationEditorPage.getHistoryTab();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
+  });
+
+  fit('should correctly display the dates the commits were created', async function() {
+    await users.createUser('user@historyTab.com', 'userHistoryTab');
+    await users.login('user@historyTab.com');
+
+    // Creating an exploration creates the first commit. Therefore, there
+    // should be a date associated with it.
+    await workflow.createExploration();
+
+    // Switch to the history tab because that is where the commit history
+    // is displayed.
+    await explorationEditorPage.navigateToHistoryTab();
+    await explorationEditorHistoryTab.expectCommitDatesToBeDisplayedInHistoryTab();
   });
 
   it('should display the history', async function() {
