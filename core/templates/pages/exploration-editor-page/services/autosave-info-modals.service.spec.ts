@@ -17,8 +17,11 @@
  */
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
-// RteHelperService.ts is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
+// the code corresponding to the spec is upgraded to Angular 8.
+import { LocalStorageService } from 'services/local-storage.service';
+import { TestBed } from '@angular/core/testing';
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
 // ^^^ This block is to be removed.
 
 describe('AutosaveInfoModalsService', () => {
@@ -29,13 +32,16 @@ describe('AutosaveInfoModalsService', () => {
   const explorationId = '0';
   const lostChanges = [];
 
-  beforeEach(angular.mock.module('oppia', ($provide) => {
-    const ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [
+        LocalStorageService,
+        UrlInterpolationService
+      ]
+    });
+  });
 
+  beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.inject(($injector) => {
     AutosaveInfoModalsService = $injector.get('AutosaveInfoModalsService');
     $uibModal = $injector.get('$uibModal');

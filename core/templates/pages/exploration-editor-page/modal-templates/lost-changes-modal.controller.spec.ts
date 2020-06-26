@@ -18,12 +18,11 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
-
 import { LostChangeObjectFactory } from
   'domain/exploration/LostChangeObjectFactory';
+import { TestBed } from '@angular/core/testing';
 import { UtilsService } from 'services/utils.service';
+// ^^^ This block is to be removed.
 
 describe('Lost Changes Modal Controller', () => {
   let $scope = null;
@@ -36,12 +35,13 @@ describe('Lost Changes Modal Controller', () => {
     state_name: 'State name',
   }];
 
-  beforeEach(angular.mock.module('oppia', ($provide) => {
-    const ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
+  beforeEach(function() {
+    TestBed.configureTestingModule({
+      providers: [
+        LostChangeObjectFactory
+      ]
+    });
+  });
 
   beforeEach(angular.mock.module('oppia', ($provide) => {
     $provide.value('LostChangeObjectFactory', (
