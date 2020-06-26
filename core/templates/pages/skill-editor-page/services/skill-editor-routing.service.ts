@@ -15,12 +15,11 @@
 /**
  * @fileoverview Service that handles routing for the skill editor page.
  */
-require('services/context.service.ts');
 
 angular.module('oppia').factory('SkillEditorRoutingService', [
-  '$location', '$rootScope', 'ContextService',
+  '$location', '$rootScope',
   function(
-      $location, $rootScope, ContextService) {
+      $location, $rootScope) {
     var MAIN_TAB = 'main';
     var QUESTIONS_TAB = 'questions';
     var PREVIEW_TAB = 'preview';
@@ -64,7 +63,6 @@ angular.module('oppia').factory('SkillEditorRoutingService', [
         $location.path('/questions');
       },
       navigateToPreviewTab: function() {
-        ContextService.setPageContext('question_player');
         $location.path('/preview');
       }
     };

@@ -15,10 +15,10 @@
           <strong class="status-key">
             Topic:
           </strong>
-          <span ng-if="topicName" class="status-value">
+          <span ng-if="getTopicName()" class="status-value">
             <[getTopicName()]>
           </span>
-          <span ng-if="!topicName" class="status-value">
+          <span ng-if="!getTopicName()" class="status-value">
             Unassigned
           </span>
         </div>
@@ -26,10 +26,10 @@
           <strong class="status-key">
             Subtopic:
           </strong>
-          <span ng-if="subtopicName" class="status-value">
-            <[getSubtopicName]>
+          <span ng-if="getSubtopicName()" class="status-value">
+            <[getSubtopicName()]>
           </span>
-          <span ng-if="!subtopicName" class="status-value">
+          <span ng-if="!getSubtopicName()" class="status-value">
             Unassigned
           </span>
         </div>

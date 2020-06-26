@@ -167,7 +167,7 @@ angular.module('oppia').directive('skillConceptCardEditor', [
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/skill-editor-page/editor-tab/' +
-                'skill-preview-modal.component.html'),
+                'skill-preview-modal.template.html'),
               backdrop: true,
               resolve: {
                 title: () => title,
