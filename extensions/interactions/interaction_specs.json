@@ -106,7 +106,8 @@
         "name": "choices",
         "schema": {
           "items": {
-            "type": "html",
+            "type": "custom",
+            "obj_type": "TranslatableHtml",
             "ui_config": {
               "hide_complex_extensions": true,
               "placeholder": "Enter an option for the learner to drag and drop."
@@ -124,7 +125,7 @@
           }
         },
         "default_value": [
-          ""
+          {"content_id": "", "html": ""}
         ]
       },
       {
@@ -192,7 +193,8 @@
         "name": "choices",
         "schema": {
           "items": {
-            "type": "html",
+            "type": "custom",
+            "obj_type": "TranslatableHtml",
             "ui_config": {
               "hide_complex_extensions": true,
               "placeholder": "Sample item answer"
@@ -204,7 +206,7 @@
           }
         },
         "default_value": [
-          ""
+          {"content_id": "", "html": ""}
         ]
       }
     ],
@@ -235,9 +237,10 @@
         "description": "Button label",
         "name": "buttonText",
         "schema": {
-          "type": "unicode"
+          "type": "custom",
+          "obj_type": "TranslatableUnicodeString"
         },
-        "default_value": "Continue"
+        "default_value": { "content_id": "", "unicode_str": "Continue" }
       }
     ],
     "is_terminal": false,
@@ -414,9 +417,10 @@
         "description": "Label for the 'Add Item' button",
         "name": "buttonText",
         "schema": {
-          "type": "unicode"
+          "type": "custom",
+          "obj_type": "TranslatableUnicodeString"
         },
-        "default_value": "Add item"
+        "default_value": {"content_id": "", "unicode_str": "Add item"}
       }
     ],
     "is_terminal": false,
@@ -664,9 +668,10 @@
         "description": "Placeholder text (optional)",
         "name": "placeholder",
         "schema": {
-          "type": "unicode"
+          "type": "custom",
+          "obj_type": "TranslatableUnicodeString"
         },
-        "default_value": ""
+        "default_value": {"content_id": "", "unicode_str": ""}
       },
       {
         "description": "Height (in rows)",
@@ -869,9 +874,10 @@
         "description": "Custom placeholder text (optional)",
         "name": "customPlaceholder",
         "schema": {
-          "type": "unicode"
+          "type": "custom",
+          "obj_type": "TranslatableUnicodeString"
         },
-        "default_value": ""
+        "default_value": {"content_id": "", "unicode_str": ""}
       }
     ],
     "is_terminal": false,

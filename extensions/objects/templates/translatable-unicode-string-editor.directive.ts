@@ -25,7 +25,7 @@ angular.module('oppia').directive('translatableUnicodeStringEditor', [
         value: '=',
         getInitArgs: '&'
       },
-      template: require('./translatable-html-editor.directive.html'),
+      template: require('./translatable-unicode-string-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;

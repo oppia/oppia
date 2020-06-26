@@ -48,9 +48,10 @@ class TextInput(base.BaseInteraction):
         'name': 'placeholder',
         'description': 'Placeholder text (optional)',
         'schema': {
-            'type': 'unicode',
+            'type': 'custom',
+            'obj_type': 'TranslatableUnicodeString'
         },
-        'default_value': ''
+        'default_value': {'content_id': '', 'unicode_str': ''}
     }, {
         'name': 'rows',
         'description': 'Height (in rows)',

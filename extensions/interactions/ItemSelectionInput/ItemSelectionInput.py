@@ -66,7 +66,8 @@ class ItemSelectionInput(base.BaseInteraction):
         'schema': {
             'type': 'list',
             'items': {
-                'type': 'html',
+                'type': 'custom',
+                'obj_type': 'TranslatableHtml',
                 'ui_config': {
                     'hide_complex_extensions': True,
                     'placeholder': 'Sample item answer',
@@ -76,7 +77,7 @@ class ItemSelectionInput(base.BaseInteraction):
                 'add_element_text': 'Add item for selection',
             }
         },
-        'default_value': [''],
+        'default_value': [{'content_id': '', 'html': ''}],
     }]
 
     _answer_visualization_specs = [{

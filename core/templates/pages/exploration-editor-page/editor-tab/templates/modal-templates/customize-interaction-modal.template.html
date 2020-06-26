@@ -31,6 +31,7 @@
     <div ng-repeat="customizationArgSpec in customizationArgSpecs track by $index">
 
       <[ StateCustomizationArgsService.displayed[customizationArgSpec.name] | json ]>
+      <[ customizationArgSpec.schema | json ]>
 
       <div ng-if="customizationArgSpec.schema.type !== 'bool'" class="oppia-interaction-customization-label"><[customizationArgSpec.description]></div>
       <schema-based-editor ng-class="{'boolean-checkbox': customizationArgSpec.schema.type === 'bool'}" local-value="StateCustomizationArgsService.displayed[customizationArgSpec.name].value" schema="customizationArgSpec.schema">

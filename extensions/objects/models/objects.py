@@ -669,7 +669,7 @@ class Graph(BaseObject):
             'schema': Real.SCHEMA
         }, {
             'name': 'label',
-            'schema': UnicodeString.SCHEMA
+            'schema': TranslatableUnicodeString.SCHEMA
         }]
     }
     _EDGE_SCHEMA = {
@@ -880,7 +880,7 @@ class ImageWithRegions(BaseObject):
                     'type': 'dict',
                     'properties': [{
                         'name': 'label',
-                        'schema': UnicodeString.SCHEMA
+                        'schema': TranslatableUnicodeString.SCHEMA
                     }, {
                         'name': 'region',
                         'schema': ImageRegion.SCHEMA
