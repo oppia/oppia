@@ -41,7 +41,7 @@ var MathEditor = function(elem) {
     },
     getValue: async function() {
       await waitFor.elementToBeClickable(
-        elem, '"Algebraic Input" editor takes too long to be clickable');
+        elem, `"${elem.getTagName()}" takes too long to be clickable`);
       // The active guppy div will be the one that is created last which is why
       // we fetch the last element.
       var mathInputElem = element.all(by.css(
@@ -179,19 +179,6 @@ var ParameterNameEditor = function(elem) {
   };
 };
 
-var PositionOfTermsEditor = function(elem) {
-  return {
-    setValue: async function(text) {
-      var options = await element.all(by.tagName('option'));
-      console.log('options:');
-      console.log(options);
-      if (options.indexOf(text) !== -1) {
-        options[options.indexOf(text)].click();
-      }
-    }
-  };
-};
-
 var SanitizedUrlEditor = function(elem) {
   return {
     setValue: async function(text) {
@@ -242,7 +229,7 @@ var OBJECT_EDITORS = {
   NormalizedString: NormalizedStringEditor,
   NumberWithUnits: NumberWithUnitsEditor,
   ParameterName: ParameterNameEditor,
-  PositionOfTerms: PositionOfTermsEditor,
+  PositionOfTerms: ParameterNameEditor,
   SanitizedUrl: SanitizedUrlEditor,
   SkillSelector: SkillSelector,
   UnicodeString: UnicodeStringEditor

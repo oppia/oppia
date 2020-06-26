@@ -32,7 +32,7 @@ var expectInteractionDetailsToMatch = async function(elem) {
   expect(
     await objects.MathEditor(elem.element(by.tagName(
       'oppia-interactive-math-equation-input'))).getValue()
-  ).toBe('');
+  ).toBe('\\color{grey}{\\text{\\small{Type a formula here.}}}');
 };
 
 var submitAnswer = async function(elem, answer) {
@@ -44,31 +44,31 @@ var submitAnswer = async function(elem, answer) {
 var answerObjectType = 'MathEquation';
 
 var testSuite = [{
-//   interactionArguments: [],
-//   ruleArguments: ['IsEquivalentTo', 'y=m*x+c'],
-//   expectedInteractionDetails: [],
-//   wrongAnswers: ['x=m*y+c', 'y+m*x+c=0', 'y=m*x+b', 'y=m*x'],
-//   correctAnswers: ['y=m*x+c', 'y=c+m*x', 'm*x+c=y', 'y-m*x=c', 'y-m*x-c=0']
-// }, {
-//   interactionArguments: [],
-//   ruleArguments: ['IsEquivalentTo', '(2*x+1)*(x-3)=0'],
-//   expectedInteractionDetails: [],
-//   wrongAnswers: ['x-y=x-y', 'x=3', '2*x+1=0', 'x=-1/2'],
-//   correctAnswers: [
-//     '(2*x+1)*(x-3)=0', '0=(2*x+1)*(x-3)', '2*x^2-6*x=3-x', '-2*x^2+5*x+3=0',
-//     '(2*x+1)*(-x+3)=0']
-// }, {
   interactionArguments: [],
-  ruleArguments: ['MatchesExactlyWith', 'y=m*x+c', 'lhs'],
+  ruleArguments: ['IsEquivalentTo', 'y=m*x+c'],
+  expectedInteractionDetails: [],
+  wrongAnswers: ['x=m*y+c', 'y+m*x+c=0', 'y=m*x+b', 'y=m*x'],
+  correctAnswers: ['y=m*x+c', 'y=c+m*x', 'm*x+c=y', 'y-m*x=c', 'y-m*x-c=0']
+}, {
+  interactionArguments: [],
+  ruleArguments: ['IsEquivalentTo', '(2*x+1)*(x-3)=0'],
+  expectedInteractionDetails: [],
+  wrongAnswers: ['x-y=x-y', 'x=3', '2*x+1=0', 'x=-1/2'],
+  correctAnswers: [
+    '(2*x+1)*(x-3)=0', '0=(2*x+1)*(x-3)', '2*x*x-6*x=3-x', '-2*x*x+5*x+3=0',
+    '(2*x+1)*(-x+3)=0']
+}, {
+  interactionArguments: [],
+  ruleArguments: ['MatchesExactlyWith', 'y=m*x+c', 'on LHS'],
   expectedInteractionDetails: [],
   wrongAnswers: ['y-m*x=c', 'm*x+c=y', 'x=m*y+c'],
   correctAnswers: ['y=m*x+c', 'y=m*x^2+c', '2*y-y=m*x+c', 'y=0', 'y=m*x-c']
-// },  {
-  // interactionArguments: [],
-  // ruleArguments: ['MatchesExactlyWith', 'y=m*x+c', 'both'],
-  // expectedInteractionDetails: [],
-  // wrongAnswers: ['y-m*x=c', 'm*x+c=y', 'x=m*y+c'],
-  // correctAnswers: ['y=m*x+c', 'y=c+m*x']
+},  {
+  interactionArguments: [],
+  ruleArguments: ['MatchesExactlyWith', 'y=m*x+c', 'on both sides'],
+  expectedInteractionDetails: [],
+  wrongAnswers: ['y-m*x=c', 'm*x+c=y', 'x=m*y+c'],
+  correctAnswers: ['y=m*x+c', 'y=c+m*x']
 }];
 
 exports.customizeInteraction = customizeInteraction;

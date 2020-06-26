@@ -232,7 +232,6 @@ exports.config = {
     browserName: 'chrome',
     chromeOptions: {
       args: [
-        '--headless',
         '--lang=en-EN',
         '--window-size=1285x1000',
         // These arguments let us simulate recording from a microphone
