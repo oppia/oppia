@@ -590,7 +590,7 @@
           }
         },
         "default_value": [{
-          "content_id": "interaction_choices_0",
+          "content_id": "",
           "html": ""
         }]
       }, {

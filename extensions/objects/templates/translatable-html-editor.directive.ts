@@ -22,16 +22,23 @@ angular.module('oppia').directive('translatableHtmlEditor', [
       restrict: 'E',
       scope: {},
       bindToController: {
-        value: '='
+        value: '=',
+        getInitArgs: '&'
       },
       template: require('./translatable-html-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;
         ctrl.$onInit = function() {
-          ctrl.schema = {
-            type: 'html'
-          };
+          ctrl.initArgs = ctrl.getInitArgs();
+          ctrl.schema = { type: 'html' };
+
+          if (ctrl.initArgs &&
+            ctrl.initArgs.schema &&
+            ctrl.initArgs.schema.ui_config
+          ) {
+            ctrl.schema.ui_config = ctrl.initArgs.schema.ui_config;
+          }
         };
       }]
     };
