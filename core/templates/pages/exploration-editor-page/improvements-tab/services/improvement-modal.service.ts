@@ -73,7 +73,7 @@ angular.module('oppia').factory('ImprovementModalService', [
           resolve: {
             isEditable: () => (
               UserExplorationPermissionsService.getPermissionsAsync()
-                .then(permissions => permissions.can_edit)),
+                .then(permissions => permissions.canEdit)),
             learnerAnswerDetails: () => learnerAnswerDetails
           },
           controller: 'ImprovementLearnerAnswerDetailsModalController'

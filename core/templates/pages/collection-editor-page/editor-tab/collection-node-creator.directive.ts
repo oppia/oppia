@@ -16,7 +16,7 @@
  * @fileoverview Directive for creating a new collection node.
  */
 
-require('domain/collection/CollectionNodeObjectFactory.ts');
+require('domain/collection/collection-node-object.factory.ts');
 require('domain/collection/collection-update.service.ts');
 require('domain/collection/search-explorations-backend-api.service.ts');
 require('domain/summary/exploration-summary-backend-api.service.ts');
