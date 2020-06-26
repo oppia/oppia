@@ -224,7 +224,6 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
     def test_create_suggestion_invalid_target_version_input(self):
         self.login(self.AUTHOR_EMAIL_2)
         csrf_token = self.get_new_csrf_token()
-        exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
 
         response = self.post_json(
             '%s/' % feconf.SUGGESTION_URL_PREFIX, {
