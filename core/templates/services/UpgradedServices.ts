@@ -721,7 +721,11 @@ export class UpgradedServices {
       new SkillRightsObjectFactory();
     upgradedServices['SkillSummaryObjectFactory'] =
       new SkillSummaryObjectFactory();
+    upgradedServices['SpeechSynthesisChunkerService'] =
+      new SpeechSynthesisChunkerService();
     upgradedServices['SolutionValidityService'] = new SolutionValidityService();
+    upgradedServices['SpeechSynthesisChunkerService'] =
+      new SpeechSynthesisChunkerService();
     upgradedServices['StateGraphLayoutService'] = new StateGraphLayoutService();
     upgradedServices['StateImprovementSuggestionService'] =
       new StateImprovementSuggestionService();
