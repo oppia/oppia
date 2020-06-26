@@ -1,0 +1,28 @@
+# Duplicate patterns are there on line 27 and 28.
+
+# Critical files.
+#
+# IMPORTANT NOTE: Please ensure that these files are always located at the end
+# of the CODEOWNERS file, since later rows override earlier ones. For details,
+# see the example at the bottom of this page:
+#
+#     https://help.github.com/en/articles/about-code-owners
+#
+# On modifying this list make sure to keep the CODEOWNER_IMPORTANT_PATHS list
+# in scripts/linters/pre_commit_linter.py in sync with the modifications.
+/core/controllers/acl_decorators*.py @seanlip
+/core/controllers/base*.py @seanlip
+/core/domain/html*.py @seanlip
+/core/domain/rights_manager*.py @seanlip
+/core/domain/role_services*.py @seanlip
+/core/storage/ @seanlip
+/core/domain/user*.py @seanlip
+/export/ @seanlip
+/manifest.json @vojtechjelinek
+/package.json @vojtechjelinek
+/yarn.lock @vojtechjelinek
+/scripts/install_third_party_libs.py @vojtechjelinek
+/.github/ @kevinlee12
+/.github/CODEOWNERS @DubeySandeep
+/.github/stale.yml @ankita240796
+/.github/stale.yml @ankita240796
