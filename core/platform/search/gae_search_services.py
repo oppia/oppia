@@ -48,7 +48,7 @@ def add_documents_to_index(documents, index, retries=DEFAULT_NUM_RETRIES):
     """Adds a document to an index.
 
     Args:
-        documents: list(dict(str, str)). Each document should be a dictionary.
+        documents: list(dict). Each document should be a dictionary.
             Every key in the document is a field name, and the corresponding
             value will be the field's value.
             If there is a key named 'id', its value will be used as the
@@ -106,7 +106,7 @@ def _dict_to_search_document(d):
     """Returns and converts the document dict into objects.
 
     Args:
-        d: dict(str, str). A dict containing field names as keys and
+        d: dict. A dict containing field names as keys and
             corresponding field values as values.
 
     Returns:
