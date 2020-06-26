@@ -93,7 +93,7 @@ angular.module('oppia').directive('audioTranslationBar', [
         }).then(function(permissions) {
           $('.oppia-translation-tab').on('dragover', function(evt) {
             evt.preventDefault();
-            scope.dropAreaIsAccessible = permissions.can_voiceover;
+            scope.dropAreaIsAccessible = permissions.canVoiceover;
             scope.userIsGuest = !userIsLoggedIn;
             scope.$digest();
             return false;
