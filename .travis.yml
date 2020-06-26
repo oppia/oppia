@@ -58,6 +58,7 @@ install:
 
 script:
 - files_changed=$(git diff --name-only HEAD...$TRAVIS_BRANCH)
+- echo $files_changed
 - RUN_TESTS=true
 - if [ "$files_changed" == "AUTHORS CHANGELOG CONTRIBUTORS core/templates/pages/about-page/about-page.constants.ts" ]; then RUN_TESTS=false; fi
 # Run the e2e tests in the production environment (using --prod_env).
