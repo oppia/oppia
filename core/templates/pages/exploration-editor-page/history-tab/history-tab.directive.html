@@ -12,7 +12,7 @@
       </div>
       <div class="col-sm-4 col-md-4 col-lg-4">
         <span>
-          <em><[$ctrl.explorationVersionMetadata[versionNumber].createdOnStr]></em>
+          <em class="protractor-test-history-tab-commit-date"><[$ctrl.explorationVersionMetadata[versionNumber].createdOnMsecsStr]></em>
           <span ng-if="versionNumber !== $ctrl.currentVersion && $ctrl.EditabilityService.isEditable()">
             | <a href="#" class="protractor-test-revert-version" ng-click="$ctrl.showRevertExplorationModal(versionNumber)">Revert</a>
           </span>
