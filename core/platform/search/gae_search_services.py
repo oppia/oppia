@@ -64,7 +64,7 @@ def add_documents_to_index(documents, index, retries=DEFAULT_NUM_RETRIES):
 
     Returns:
         list(str). Returns a list of document ids of the documents that were
-            added.
+        added.
 
     Raises:
         SearchFailureError: Raised when the indexing fails. If it fails for any

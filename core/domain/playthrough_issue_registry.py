@@ -75,7 +75,7 @@ class Registry(python_utils.OBJECT):
 
         Returns:
             list(*). A list of all issue class instances. Classes all have
-                "BaseExplorationIssueSpec" as an ancestor class.
+            "BaseExplorationIssueSpec" as an ancestor class.
         """
         if len(cls._issues) == 0:
             cls._refresh()
@@ -93,7 +93,7 @@ class Registry(python_utils.OBJECT):
 
         Returns:
             *. An instance of the corresponding issue class. This class has
-                "BaseExplorationIssueSpec" as an ancestor class.
+            "BaseExplorationIssueSpec" as an ancestor class.
         """
         if issue_type not in cls._issues:
             cls._refresh()
