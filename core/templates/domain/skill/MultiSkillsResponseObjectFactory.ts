@@ -19,53 +19,57 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { SkillObjectFactory, Skill, ISkillBackendDict } from 'domain/skill/SkillObjectFactory';
+import { SkillObjectFactory, Skill, ISkillBackendDict } from
+  'domain/skill/SkillObjectFactory';
 
 export interface IMultiSkillsResponseBackendDict {
-	'skills': ISkillBackendDict[];
+  'skills': ISkillBackendDict[];
 }
 
 export class MultiSkillsResponse {
-	_skills: Skill[];
-	constructor(skills: Skill[]) {
-		this._skills = skills;
-	}
+  _skills: Skill[];
+  constructor(skills: Skill[]) {
+    this._skills = skills;
+  }
 
-	copyFromMultiSkillsResponse(skillResponse: MultiSkillsResponse): void {
-		this._skills = skillResponse._skills;
-	}
+  copyFromMultiSkillsResponse(skillResponse: MultiSkillsResponse): void {
+    this._skills = skillResponse._skills;
+  }
 
-	getSkills(): Skill[] {
-		return this._skills;
-	}
+  getSkills(): Skill[] {
+    return this._skills;
+  }
 
-	toBackendDict(): IMultiSkillsResponseBackendDict {
-		return {
-			skills: this._skills.map((skill: Skill) => {
-				return skill.toBackendDict();
-			})
-		};
-	}
+  toBackendDict(): IMultiSkillsResponseBackendDict {
+    return {
+      skills: this._skills.map((skill: Skill) => {
+        return skill.toBackendDict();
+      })
+    };
+  }
 }
 
 @Injectable({
-	providedIn: 'root'
+  providedIn: 'root'
 })
 export class MultiSkillsResponseObjectFactory {
-	constructor(private skillObjectFactory: SkillObjectFactory) {}
+  constructor(private skillObjectFactory: SkillObjectFactory) {}
 
-	generateSkillsFromBackendDict(skillsBackendDicts: ISkillBackendDict[]) {
-		return skillsBackendDicts.map((skillsBackendDict) => {
-			return this.skillObjectFactory.createFromBackendDict(skillsBackendDict);
-		});
-	}
+  generateSkillsFromBackendDict(skillsBackendDicts: ISkillBackendDict[]) {
+    return skillsBackendDicts.map((skillsBackendDict) => {
+      return this.skillObjectFactory.createFromBackendDict(
+        skillsBackendDict);
+    });
+  }
 
-	createFromBackendDict(multiSkillsResponseBackendDict: IMultiSkillsResponseBackendDict): MultiSkillsResponse {
-		return new MultiSkillsResponse (
-			this.generateSkillsFromBackendDict(multiSkillsResponseBackendDict.skills)
-		);
-	}
+  createFromBackendDict(multiSkillsResponseBackendDict:
+    IMultiSkillsResponseBackendDict): MultiSkillsResponse {
+    return new MultiSkillsResponse (
+      this.generateSkillsFromBackendDict(
+        multiSkillsResponseBackendDict.skills)
+    );
+  }
 }
 
 angular.module('oppia').factory('MultiSkillsResponseObjectFactory',
-	downgradeInjectable(MultiSkillsResponseObjectFactory));
+  downgradeInjectable(MultiSkillsResponseObjectFactory));

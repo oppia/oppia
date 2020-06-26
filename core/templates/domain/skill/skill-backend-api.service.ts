@@ -25,8 +25,11 @@ import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import cloneDeep from 'lodash/cloneDeep';
 
-import { SkillResponseObjectFactory, SkillResponse, ISkillResponseBackendDict } from 'domain/skill/SkillResponseObjectFactory';
-import { MultiSkillsResponseObjectFactory, MultiSkillsResponse, IMultiSkillsResponseBackendDict } from 'domain/skill/MultiSkillsResponseObjectFactory';
+import { SkillResponseObjectFactory, SkillResponse,
+  ISkillResponseBackendDict } from 'domain/skill/SkillResponseObjectFactory';
+import { MultiSkillsResponseObjectFactory, MultiSkillsResponse,
+  IMultiSkillsResponseBackendDict } from
+  'domain/skill/MultiSkillsResponseObjectFactory';
 
 
 export interface ISkillUpdatePayload {
@@ -50,7 +53,8 @@ export class SkillBackendApiService {
     private http: HttpClient,
     private urlInterpolation: UrlInterpolationService,
     private skillResponseObjectFactory: SkillResponseObjectFactory,
-    private multiSkillsResponseObjectFactory: MultiSkillsResponseObjectFactory) {}
+    private multiSkillsResponseObjectFactory: MultiSkillsResponseObjectFactory
+  ) {}
 
   private _fetchSkill(
       skillId: string,
@@ -69,8 +73,8 @@ export class SkillBackendApiService {
           response.grouped_skill_summaries);
         if (successCallback) {
           successCallback(this.skillResponseObjectFactory.createFromBackendDict(
-            {skill: skill, 
-            grouped_skill_summaries: groupedSkillSummaryDicts}));
+            {skill: skill,
+              grouped_skill_summaries: groupedSkillSummaryDicts}));
         }
       }, (errorResponse) => {
         if (errorCallback) {
@@ -93,8 +97,9 @@ export class SkillBackendApiService {
       (response) => {
         let skills = cloneDeep(response.skills);
         if (successCallback) {
-          successCallback(this.multiSkillsResponseObjectFactory.createFromBackendDict({
-            skills: skills}));
+          successCallback(this.multiSkillsResponseObjectFactory.
+            createFromBackendDict({
+              skills: skills}));
         }
       }, (errorResponse) => {
         if (errorCallback) {

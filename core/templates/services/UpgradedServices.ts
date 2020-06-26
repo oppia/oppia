@@ -1164,8 +1164,10 @@ export class UpgradedServices {
       upgradedServices['OutcomeObjectFactory']);
     upgradedServices['SkillBackendApiService'] =
       new SkillBackendApiService(
+        upgradedServices['HttpClient'],
         upgradedServices['MultiSkillsResponseObjectFactory'],
-        upgradedServices['SkillResponseObjectFactory']);
+        upgradedServices['SkillResponseObjectFactory'],
+        upgradedServices['UrlInterpolationService']);
     upgradedServices['SubtopicViewerBackendApiService'] =
       new SubtopicViewerBackendApiService(
         upgradedServices['HttpClient'],

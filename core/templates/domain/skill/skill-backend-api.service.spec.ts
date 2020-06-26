@@ -25,10 +25,13 @@ import { SkillBackendApiService } from
   'domain/skill/skill-backend-api.service';
 
 import { NormalizeWhitespacePipe } from
-    'filters/string-utility-filters/normalize-whitespace.pipe';
+  'filters/string-utility-filters/normalize-whitespace.pipe';
 
-import { SkillResponseObjectFactory, SkillResponse, ISkillResponseBackendDict } from 'domain/skill/SkillResponseObjectFactory';
-import { MultiSkillsResponseObjectFactory, MultiSkillsResponse, IMultiSkillsResponseBackendDict } from 'domain/skill/MultiSkillsResponseObjectFactory';
+import { SkillResponseObjectFactory, SkillResponse,
+  ISkillResponseBackendDict } from 'domain/skill/SkillResponseObjectFactory';
+import { MultiSkillsResponseObjectFactory, MultiSkillsResponse,
+  IMultiSkillsResponseBackendDict } from
+  'domain/skill/MultiSkillsResponseObjectFactory';
 
 
 
@@ -51,7 +54,8 @@ describe('Skill backend API service', () => {
     skillBackendApiService = TestBed.get(SkillBackendApiService);
     csrfService = TestBed.get(CsrfTokenService);
     skillResponseObjectFactory = TestBed.get(SkillResponseObjectFactory);
-    multiSkillsResponseObjectFactory = TestBed.get(MultiSkillsResponseObjectFactory);
+    multiSkillsResponseObjectFactory = TestBed.get(
+      MultiSkillsResponseObjectFactory);
     spyOn(csrfService, 'getTokenAsync').and.callFake(() => {
       return new Promise((resolve) => {
         resolve('sample-csrf-token');
@@ -173,10 +177,11 @@ describe('Skill backend API service', () => {
 
       flushMicrotasks();
 
-      expect(successHandler).toHaveBeenCalledWith(skillResponseObjectFactory.createFromBackendDict({
-        skill: sampleResponse.skill,
-        grouped_skill_summaries: sampleResponse.grouped_skill_summaries
-      }));
+      expect(successHandler).toHaveBeenCalledWith(skillResponseObjectFactory.
+        createFromBackendDict({
+          skill: sampleResponse.skill,
+          grouped_skill_summaries: sampleResponse.grouped_skill_summaries
+        }));
       expect(failHandler).not.toHaveBeenCalled();
     }));
 
@@ -280,9 +285,10 @@ describe('Skill backend API service', () => {
 
       flushMicrotasks();
 
-      expect(successHandler).toHaveBeenCalledWith(multiSkillsResponseObjectFactory.createFromBackendDict({
-        skills: sampleResponse2.skills;
-      }));
+      expect(successHandler).toHaveBeenCalledWith(
+        multiSkillsResponseObjectFactory.createFromBackendDict({
+          skills: sampleResponse2.skills
+        }));
       expect(failHandler).not.toHaveBeenCalled();
     }));
 

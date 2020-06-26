@@ -19,55 +19,58 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { SkillObjectFactory, Skill, ISkillBackendDict } from 'domain/skill/SkillObjectFactory';
+import { SkillObjectFactory, Skill, ISkillBackendDict } from
+  'domain/skill/SkillObjectFactory';
 
 export interface ISkillResponseBackendDict {
-	'skill': ISkillBackendDict;
-	'grouped_skill_summaries': any;
+  'skill': ISkillBackendDict;
+  'grouped_skill_summaries': string;
 }
 
 export class SkillResponse {
-	_skill: Skill;
-	_groupedSkillSummaries: any;
-	constructor(skill: Skill, groupedSkillSummaries: any) {
-		this._skill = skill;
-		this._groupedSkillSummaries = groupedSkillSummaries;
-	}
+  _skill: Skill;
+  _groupedSkillSummaries: string;
+  constructor(skill: Skill, groupedSkillSummaries: string) {
+    this._skill = skill;
+    this._groupedSkillSummaries = groupedSkillSummaries;
+  }
 
-	copyFromSkillResponse(skillResponse: SkillResponse): void {
-		this._skill = skillResponse._skill;
-		this._groupedSkillSummaries = skillResponse._groupedSkillSummaries;
-	}
+  copyFromSkillResponse(skillResponse: SkillResponse): void {
+    this._skill = skillResponse._skill;
+    this._groupedSkillSummaries = skillResponse._groupedSkillSummaries;
+  }
 
-	getSkill(): Skill {
-		return this._skill;
-	}
+  getSkill(): Skill {
+    return this._skill;
+  }
 
-	getGroupedSkillSummaries(): any {
-		return this._groupedSkillSummaries;
-	}
+  getGroupedSkillSummaries(): string {
+    return this._groupedSkillSummaries;
+  }
 
-	toBackendDict(): ISkillResponseBackendDict {
-		return {
-			skill: this._skill.toBackendDict(),
-			grouped_skill_summaries: this._groupedSkillSummaries
-		};
-	}
+  toBackendDict(): ISkillResponseBackendDict {
+    return {
+      skill: this._skill.toBackendDict(),
+      grouped_skill_summaries: this._groupedSkillSummaries
+    };
+  }
 }
 
 @Injectable({
-	providedIn: 'root'
+  providedIn: 'root'
 })
 export class SkillResponseObjectFactory {
-	constructor(private skillObjectFactory: SkillObjectFactory) {}
+  constructor(private skillObjectFactory: SkillObjectFactory) {}
 
-	createFromBackendDict(skillResponseBackendDict: ISkillResponseBackendDict): SkillResponse {
-		return new SkillResponse (
-			this.skillObjectFactory.createFromBackendDict(skillResponseBackendDict.skill),
-			skillResponseBackendDict.grouped_skill_summaries
-		);
-	}
+  createFromBackendDict(skillResponseBackendDict: ISkillResponseBackendDict):
+    SkillResponse {
+    return new SkillResponse (
+      this.skillObjectFactory.createFromBackendDict(
+        skillResponseBackendDict.skill),
+      skillResponseBackendDict.grouped_skill_summaries
+    );
+  }
 }
 
 angular.module('oppia').factory('SkillResponseObjectFactory',
-	downgradeInjectable(SkillResponseObjectFactory));
+  downgradeInjectable(SkillResponseObjectFactory));
