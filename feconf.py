@@ -88,7 +88,9 @@ OBJECT_DEFAULT_VALUES_FILE_PATH = os.path.join(
     'extensions', 'objects', 'object_defaults.json')
 RULES_DESCRIPTIONS_FILE_PATH = os.path.join(
     os.getcwd(), 'extensions', 'interactions', 'rule_templates.json')
-
+HTML_FIELD_TYPES_TO_RULE_SPECS_FILE_PATH = os.path.join(
+    os.getcwd(), 'extensions', 'interactions',
+    'html_field_types_to_rule_specs.json')
 # A mapping of interaction ids to classifier properties.
 INTERACTION_CLASSIFIER_MAPPING = {
     'TextInput': {
@@ -125,6 +127,20 @@ ALLOWED_TRAINING_JOB_STATUS_CHANGES = {
     TRAINING_JOB_STATUS_FAILED: [TRAINING_JOB_STATUS_NEW]
 }
 
+# Allowed formats of how HTML is present in rule specs.
+HTML_RULE_VARIABLE_FORMAT_SET = 'set'
+HTML_RULE_VARIABLE_FORMAT_STRING = 'string'
+HTML_RULE_VARIABLE_FORMAT_LIST_OF_SETS = 'listOfSets'
+
+ALLOWED_HTML_RULE_VARIABLE_FORMATS = [
+    HTML_RULE_VARIABLE_FORMAT_SET,
+    HTML_RULE_VARIABLE_FORMAT_STRING,
+    HTML_RULE_VARIABLE_FORMAT_LIST_OF_SETS
+]
+
+ANSWER_TYPE_LIST_OF_SETS_OF_HTML = 'ListOfSetsOfHtmlStrings'
+ANSWER_TYPE_SET_OF_HTML = 'SetOfHtmlString'
+
 ENTITY_TYPE_EXPLORATION = 'exploration'
 ENTITY_TYPE_TOPIC = 'topic'
 ENTITY_TYPE_SKILL = 'skill'
@@ -133,16 +149,8 @@ ENTITY_TYPE_SUBTOPIC = 'subtopic'
 ENTITY_TYPE_QUESTION = 'question'
 ENTITY_TYPE_VOICEOVER_APPLICATION = 'voiceover_application'
 
-TASK_TYPE_HIGH_BOUNCE_RATE = 'high_bounce_rate'
-TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP = 'ineffective_feedback_loop'
-TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS = 'successive_incorrect_answers'
-TASK_TYPE_NEEDS_GUIDING_RESPONSES = 'needs_guiding_responses'
-
-TASK_STATUS_OPEN = 'open'
-TASK_STATUS_OBSOLETE = 'obsolete'
-TASK_STATUS_RESOLVED = 'resolved'
-
-TASK_TARGET_TYPE_STATE = 'state'
+MAX_TASK_MODELS_PER_FETCH = 25
+MAX_TASK_MODELS_PER_HISTORY_PAGE = 10
 
 # The maximum number of activities allowed in the playlist of the learner. This
 # limit applies to both the explorations playlist and the collections playlist.

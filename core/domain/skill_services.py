@@ -248,11 +248,12 @@ def get_multi_skill_summaries(skill_ids):
     return skill_summaries
 
 
-def get_multi_skills(skill_ids):
+def get_multi_skills(skill_ids, strict=True):
     """Returns a list of skills matching the skill IDs provided.
 
     Args:
         skill_ids: list(str). List of skill IDs to get skills for.
+        strict: bool. Whether to raise an error if a skill doesn't exist.
 
     Returns:
         list(Skill). The list of skills matching the provided IDs.
@@ -260,7 +261,7 @@ def get_multi_skills(skill_ids):
     local_skill_models = skill_models.SkillModel.get_multi(skill_ids)
     for skill_id, skill_model in python_utils.ZIP(
             skill_ids, local_skill_models):
-        if skill_model is None:
+        if strict and skill_model is None:
             raise Exception('No skill exists for ID %s' % skill_id)
     skills = [
         get_skill_from_model(skill_model)
@@ -279,12 +280,13 @@ def get_rubrics_of_skills(skill_ids):
         dict, list(str). The skill rubrics of skills keyed by their
             corresponding ids and the list of deleted skill ids, if any.
     """
-    backend_skill_models = skill_models.SkillModel.get_multi(skill_ids)
+    skills = get_multi_skills(skill_ids, strict=False)
     skill_id_to_rubrics_dict = {}
 
-    for skill_model in backend_skill_models:
-        if skill_model is not None:
-            skill_id_to_rubrics_dict[skill_model.id] = skill_model.rubrics
+    for skill in skills:
+        if skill is not None:
+            rubric_dicts = [rubric.to_dict() for rubric in skill.rubrics]
+            skill_id_to_rubrics_dict[skill.id] = rubric_dicts
 
     deleted_skill_ids = []
     for skill_id in skill_ids:
@@ -305,13 +307,13 @@ def get_descriptions_of_skills(skill_ids):
         dict, list(str). The skill descriptions of skills keyed by their
             corresponding ids and the list of deleted skill ids, if any.
     """
-    skill_summary_models = skill_models.SkillSummaryModel.get_multi(skill_ids)
+    skill_summaries = get_multi_skill_summaries(skill_ids)
     skill_id_to_description_dict = {}
 
-    for skill_summary_model in skill_summary_models:
-        if skill_summary_model is not None:
-            skill_id_to_description_dict[skill_summary_model.id] = (
-                skill_summary_model.description)
+    for skill_summary in skill_summaries:
+        if skill_summary is not None:
+            skill_id_to_description_dict[skill_summary.id] = (
+                skill_summary.description)
 
     deleted_skill_ids = []
     for skill_id in skill_ids:
