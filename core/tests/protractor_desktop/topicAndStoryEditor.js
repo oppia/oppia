@@ -41,6 +41,7 @@ describe('Topic editor functionality', function() {
   var skillEditorPage = null;
   var explorationEditorPage = null;
   var explorationEditorMainTab = null;
+  var UNASSIGNED = 'Unassigned';
 
   beforeAll(async function() {
     topicsAndSkillsDashboardPage = (
@@ -91,7 +92,7 @@ describe('Topic editor functionality', function() {
     await general.closeCurrentTabAndSwitchTo(handle);
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.navigateToSkillsTab();
-    await topicsAndSkillsDashboardPage.filterSkillsByStatus('Unassigned');
+    await topicsAndSkillsDashboardPage.filterSkillsByStatus(UNASSIGNED);
     await topicsAndSkillsDashboardPage.assignSkillWithIndexToTopic(0, 0);
 
     await topicEditorPage.get(topicId);
@@ -174,7 +175,7 @@ describe('Topic editor functionality', function() {
       TOPIC_DESCRIPTION, false);
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.navigateToSkillsTab();
-    await topicsAndSkillsDashboardPage.filterSkillsByStatus('Unassigned');
+    await topicsAndSkillsDashboardPage.filterSkillsByStatus(UNASSIGNED);
     await topicsAndSkillsDashboardPage.assignSkillWithIndexToTopicByTopicName(
       0, TOPIC_NAME);
 
