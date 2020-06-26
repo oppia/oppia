@@ -321,7 +321,6 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 'state_name': 'Intro',
                 'property_name': 'solution',
                 'new_value': {
-                    'interaction_id': '',
                     'answer_is_exclusive': True,
                     'correct_answer': [
                         [html_content],
@@ -371,11 +370,11 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             self.USER_ID, self.EXP_ID, self.EXP_MIGRATION_CHANGE_LIST,
             'Ran Exploration Migration job.')
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
-        expected_draft_change_list = (
+        migrated_draft_change_list = (
             draft_upgrade_services.try_upgrading_draft_to_exp_version(
                 draft_change_list, 1, exploration.version, self.EXP_ID))
         self.assertEqual(
-            expected_draft_change_list[0].to_dict(),
+            migrated_draft_change_list[0].to_dict(),
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'state_name': 'state2',
@@ -399,7 +398,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             }).to_dict())
 
         self.assertEqual(
-            expected_draft_change_list[1].to_dict(),
+            migrated_draft_change_list[1].to_dict(),
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'property_name': 'answer_groups',
@@ -470,7 +469,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 }]
             }).to_dict())
         self.assertEqual(
-            expected_draft_change_list[2].to_dict(),
+            migrated_draft_change_list[2].to_dict(),
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'state_name': 'Intro',
@@ -481,7 +480,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 }
             }).to_dict())
         self.assertEqual(
-            expected_draft_change_list[3].to_dict(),
+            migrated_draft_change_list[3].to_dict(),
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'state_name': 'Intro',
@@ -512,7 +511,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 }
             }).to_dict())
         self.assertEqual(
-            expected_draft_change_list[4].to_dict(),
+            migrated_draft_change_list[4].to_dict(),
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'state_name': 'Intro',
@@ -527,7 +526,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 }
             }).to_dict())
         self.assertEqual(
-            expected_draft_change_list[5].to_dict(),
+            migrated_draft_change_list[5].to_dict(),
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'state_name': 'Intro',
@@ -548,7 +547,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             }).to_dict())
 
         self.assertEqual(
-            expected_draft_change_list[6].to_dict(),
+            migrated_draft_change_list[6].to_dict(),
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'state_name': 'Intro',
@@ -567,7 +566,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             }).to_dict())
 
         self.assertEqual(
-            expected_draft_change_list[7].to_dict(),
+            migrated_draft_change_list[7].to_dict(),
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'state_name': 'Intro',
