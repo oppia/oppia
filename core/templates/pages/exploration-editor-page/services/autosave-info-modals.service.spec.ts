@@ -16,13 +16,10 @@
  * @fileoverview Unit tests for AutosaveInfoModalsService.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
 import { LocalStorageService } from 'services/local-storage.service';
 import { TestBed } from '@angular/core/testing';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
-// ^^^ This block is to be removed.
 
 describe('AutosaveInfoModalsService', () => {
   let AutosaveInfoModalsService = null;
