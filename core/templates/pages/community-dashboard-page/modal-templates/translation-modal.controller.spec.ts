@@ -78,7 +78,7 @@ describe('Translation Modal Controller', function() {
     });
   }));
 
-  it('should init the constiables', function() {
+  it('should init the variables', function() {
     expect($scope.userIsLoggedIn).toBe(userIsLoggedIn);
     expect($scope.uploadingTranslation).toBe(false);
     expect($scope.activeWrittenTranslation).toEqual({
