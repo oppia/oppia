@@ -5302,12 +5302,5 @@ export = {
   // Maximum allowed length of a username.
   "MAX_USERNAME_LENGTH": 30,
 
-  // Docstring section headers split up into arguments, returns, yields and
-  // and raises sections
-  "DOCSTRING_SECTION_ARGS": "args",
-  "DOCSTRING_SECTION_RETURNS": "returns",
-  "DOCSTRING_SECTION_YIELDS": "yields",
-  "DOCSTRING_SECTION_RAISES": "raises",
-
   "DEV_MODE": true
 };

@@ -173,11 +173,11 @@ def _validate_list(key, value):
     passed in to make better error messages.
 
     Args:
-        key: str. Key value string that fills in the descriptor of this
+        key: str. A string that represents the descriptor of this
             particular list.
-        value: list. List to be validated where elements must be either a
-            python_utils.BASESTRING, datetime.date, datetime.datetime,
-            numbers.Number.
+        value: list(*). The list to be validated. Each element of a valid list
+            must be either a python_utils.BASESTRING, datetime.date,
+            datetime.datetime, numbers.Number.
     """
 
     for ind, element in enumerate(value):

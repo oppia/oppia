@@ -1464,6 +1464,14 @@ class DocstringChecker(checkers.BaseChecker):
         )
     }
 
+    # Docstring section headers split up into arguments, returns, yields and
+    # and raises sections signifying that we are currently parsing the
+    # corresponding section of that docstring.
+    "DOCSTRING_SECTION_ARGS": "args",
+    "DOCSTRING_SECTION_RETURNS": "returns",
+    "DOCSTRING_SECTION_YIELDS": "yields",
+    "DOCSTRING_SECTION_RAISES": "raises",
+
     def process_module(self, node):
         """Process a module to ensure that docstring end in a period and the
         arguments order in the function definition matches the order in the
@@ -1570,7 +1578,7 @@ class DocstringChecker(checkers.BaseChecker):
                 # subsection.
                 elif line.startswith('Returns:'):
                     current_docstring_section = (
-                        constants.DOCSTRING_SECTION_RETURNS)
+                        DOCSTRING_SECTION_RETURNS)
                     in_freeform_section = False
                     in_description = False
                     args_indentation_in_spaces = current_line_indentation
@@ -1578,7 +1586,7 @@ class DocstringChecker(checkers.BaseChecker):
                 # subsection.
                 elif line.startswith('Raises:'):
                     current_docstring_section = (
-                        constants.DOCSTRING_SECTION_RAISES)
+                        DOCSTRING_SECTION_RAISES)
                     in_freeform_section = False
                     in_description = False
                     args_indentation_in_spaces = current_line_indentation
@@ -1586,14 +1594,14 @@ class DocstringChecker(checkers.BaseChecker):
                 # subsection.
                 elif line.startswith('Yields:'):
                     current_docstring_section = (
-                        constants.DOCSTRING_SECTION_YIELDS)
+                        DOCSTRING_SECTION_YIELDS)
                     in_freeform_section = False
                     in_description = False
                     args_indentation_in_spaces = current_line_indentation
                 # Check if we are in a docstring raises section.
                 elif (current_docstring_section and
                       (current_docstring_section ==
-                       constants.DOCSTRING_SECTION_RAISES)):
+                       DOCSTRING_SECTION_RAISES)):
                     # In the raises section, if we see this regex expression, we
                     # can assume it's the start of a new parameter definition.
                     # We check the indentation of the parameter definition.
@@ -1627,9 +1635,9 @@ class DocstringChecker(checkers.BaseChecker):
                 # section.
                 elif (current_docstring_section and
                       (current_docstring_section ==
-                       constants.DOCSTRING_SECTION_RETURNS)
+                       DOCSTRING_SECTION_RETURNS)
                       or (current_docstring_section ==
-                          constants.DOCSTRING_SECTION_YIELDS)):
+                          DOCSTRING_SECTION_YIELDS)):
                     # Check for the start of a new parameter definition in the
                     # format "type (elaboration)." and check the indentation.
                     if (re.search(br'^[a-zA-Z_() -:,\*]+\. ',

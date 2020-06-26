@@ -75,7 +75,7 @@ def delete_multi(keys):
     """Deletes multiple keys in memcache.
 
     Args:
-        keys: dict. The keys (strings) to delete.
+        keys: list(str). The keys (strings) to delete.
 
     Returns:
         bool. True if all operations complete successfully; False

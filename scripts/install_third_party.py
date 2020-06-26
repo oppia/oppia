@@ -205,7 +205,9 @@ def return_json(filepath):
         filepath: str. The path to the json file.
 
     Returns:
-        json. A parsed json object.
+        *. A parsed json object. Actual conversion is different based on input
+        to json.loads. More details can be found here:
+            https://docs.python.org/3/library/json.html#encoders-and-decoders
     """
     response = get_file_contents(filepath)
     return json.loads(response)

@@ -550,7 +550,7 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
                 against. Each schema is a dict with at least a key called
                 'type'. The 'type' can take one of the SCHEMA_TYPE_* values
                 declared above.
-            mappings: list(tuple(double, double)). A list of 2-element tuples.
+            mappings: list(tuple). A list of 2-element tuples.
                 The first element of each item is expected to be normalized to
                 the second.
             invalid_items: list(tuple(double, double)). Each of these is
