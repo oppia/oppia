@@ -17,11 +17,13 @@
  */
 import { ComponentFixture, fakeAsync, TestBed, async} from
   '@angular/core/testing';
+import { By } from '@angular/platform-browser';
+
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { ExplorationEmbedButtonModalComponent } from
   './exploration-embed-button-modal.component';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 class MockActiveModal {
   dismiss(): void {
@@ -38,6 +40,8 @@ class MockSiteAnalyticsService {
 describe('ExplorationEmbedButtonModalComponent', () => {
   let component: ExplorationEmbedButtonModalComponent;
   let fixture: ComponentFixture<ExplorationEmbedButtonModalComponent>;
+  let siteAnalyticsService: SiteAnalyticsService;
+  let ngbActiveModal: NgbActiveModal;
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [ExplorationEmbedButtonModalComponent],
@@ -55,64 +59,39 @@ describe('ExplorationEmbedButtonModalComponent', () => {
   }));
 
   beforeEach(() => {
-    // component = TestBed.createComponent(ExplorationEmbedButtonModalComponent);
+    fixture = TestBed.createComponent(ExplorationEmbedButtonModalComponent);
+    component = fixture.componentInstance;
+    siteAnalyticsService = TestBed.get(SiteAnalyticsService);
+    ngbActiveModal = TestBed.get(NgbActiveModal);
+    component.explorationId = '3f6cD869';
+    component.serverName = 'https://oppia.org';
+    fixture.detectChanges();
   });
-});
 
-describe('Exploration Embed Button Modal Controller', function() {
-  var $scope = null;
-  var $uibModalInstance = null;
-  var explorationId = 'exp1';
-  var mockWindow = {
-    location: {
-      protocol: 'https:',
-      host: 'www.oppia.org'
-    }
-  };
+  it('should call the siteanalytics service when initialized', () => {
+    const registerOpenEmbedInfoEventSpy = spyOn(
+      siteAnalyticsService, 'registerOpenEmbedInfoEvent'
+    ).and.callThrough();
+    component.ngOnInit();
+    expect(registerOpenEmbedInfoEventSpy).toHaveBeenCalledWith('3f6cD869');
+  });
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('$window', mockWindow);
-  }));
-  beforeEach(angular.mock.inject(function($injector, $controller) {
-    var $rootScope = $injector.get('$rootScope');
-
-    $uibModalInstance = jasmine.createSpyObj(
-      '$uibModalInstance', ['close', 'dismiss']);
-
-    $scope = $rootScope.$new();
-    $controller('ExplorationEmbedButtonModalController', {
-      $scope: $scope,
-      $uibModalInstance: $uibModalInstance,
-      explorationId: explorationId
-    });
+  it('should dismiss the modal when clicked on cancel', fakeAsync(() => {
+    const dismissSpy = spyOn(ngbActiveModal, 'dismiss').and.callThrough();
+    let closeButtonDE = fixture.debugElement.query(
+      By.css('.modal-footer .btn.btn-secondary'));
+    closeButtonDE.nativeElement.click();
+    fixture.detectChanges();
+    expect(dismissSpy).toHaveBeenCalled();
   }));
 
-  it('should init the variables', function() {
-    expect($scope.explorationId).toBe(explorationId);
-    expect($scope.serverName).toBe('https://www.oppia.org');
-  });
-
-  it('should add range from a click event', function() {
-    var removeAllRanges = jasmine.createSpy('removeAllRanges');
-    var addRange = jasmine.createSpy('addRange');
-    spyOn(window, 'getSelection').and.returnValue(<any>{
-      removeAllRanges: removeAllRanges,
-      addRange: addRange
-    });
-
-    var firstChild = document.createElement('div');
-    var lastChild = document.createElement('div');
-    var element = document.createElement('div');
-    element.appendChild(firstChild);
-    element.appendChild(lastChild);
-
-    element.onclick = function(event) {
-      $scope.selectText(event);
-    };
-
-    element.click();
-
-    expect(removeAllRanges).toHaveBeenCalled();
-    expect(addRange).toHaveBeenCalledWith(document.createRange());
-  });
+  it('should select the embed url', fakeAsync(() => {
+    let embedUrlDiv = fixture.debugElement.query(
+      By.css('.oppia-embed-modal-code'));
+    embedUrlDiv.nativeElement.click();
+    fixture.detectChanges();
+    expect(window.getSelection().getRangeAt(0).toString()).toBe(
+      '<iframe src="https://oppia.org/embed/exploration/3f6cD869" width="700" height="1000">'
+    );
+  }));
 });

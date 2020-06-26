@@ -146,7 +146,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'exploration-diff.service.ts',
     'exploration-editor-page.component.ts',
     'exploration-editor-tab.directive.ts',
-    'exploration-embed-button-modal.component.ts',
     'exploration-engine.service.ts',
     'exploration-footer.directive.ts',
     'exploration-graph-modal.controller.ts',

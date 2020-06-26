@@ -16,17 +16,14 @@
  * @fileoverview Controller for embed exploration modal.
  */
 
-require(
-  'components/common-layout-directives/common-elements/' +
-  'confirm-or-cancel-modal.controller.ts');
-
 import { Component, Input, OnInit } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 
 @Component({
   selector: 'exploration-embed-button-modal',
-  templateUrl: './exploration-embed-button-modal.component.html'
+  templateUrl: './exploration-embed-button-modal.component.html',
+  styleUrls: []
 })
 export class ExplorationEmbedButtonModalComponent implements OnInit {
   @Input() explorationId: string;
