@@ -162,10 +162,8 @@ def tokenize(expression):
     # are not followed by a valid operator.
     final_token_list = []
     for i in python_utils.RANGE(len(token_list)):
-        if i == len(token_list) - 1:
-            final_token_list.append(token_list[i])
-        else:
-            final_token_list.append(token_list[i])
+        final_token_list.append(token_list[i])
+        if i != len(token_list) - 1:
             # If a closing term is directly followed by a closing term, instead
             # of an operator, we add the '*' operator.
             if ((

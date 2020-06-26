@@ -60,6 +60,11 @@ class HelperFunctionsUnitTests(test_utils.GenericTestBase):
         self.assertTrue(expression_parser.is_algebraic('abs(alpha)'))
         self.assertTrue(expression_parser.is_algebraic('alpha/gamma'))
         self.assertTrue(expression_parser.is_algebraic('A + 2/3'))
+        # The following tests might seem as invalid but the individual letters
+        # will be joined via '*' during tokenization which makes them valid. 
+        self.assertTrue(expression_parser.is_algebraic('Alpha'))
+        self.assertTrue(expression_parser.is_algebraic('invalid + 2'))
+        self.assertTrue(expression_parser.is_algebraic('alpha + bet/22'))
 
         self.assertFalse(expression_parser.is_algebraic('1 + 2'))
         self.assertFalse(expression_parser.is_algebraic('1^2^3/4'))
@@ -130,6 +135,12 @@ class HelperFunctionsUnitTests(test_utils.GenericTestBase):
 
         expression = 'a**bc'
         expected_output = ['a', '*', '*', 'b', '*', 'c']
+        actual_output = python_utils.MAP(
+            lambda x: x.text, expression_parser.tokenize(expression))
+        self.assertEqual(list(actual_output), expected_output)
+
+        expression = 'Alpha'
+        expected_output = ['A', '*', 'l', '*', 'p', '*', 'h', '*', 'a']
         actual_output = python_utils.MAP(
             lambda x: x.text, expression_parser.tokenize(expression))
         self.assertEqual(list(actual_output), expected_output)
@@ -447,6 +458,8 @@ class ParserUnitTests(test_utils.GenericTestBase):
         self.assertTrue(expression_parser.is_valid_expression('ab/2'))
         self.assertTrue(expression_parser.is_valid_expression('a(b+c)'))
         self.assertTrue(expression_parser.is_valid_expression('2x + 3/2'))
+        self.assertTrue(expression_parser.is_valid_expression('alpha + bet/2'))
+        self.assertTrue(expression_parser.is_valid_expression('Alpha/2'))
         self.assertTrue(expression_parser.is_valid_expression(
             '42 - [5/a] (4)'))
         self.assertTrue(expression_parser.is_valid_expression(
