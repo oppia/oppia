@@ -221,6 +221,40 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(suggestions), 3)
         self.logout()
 
+    def test_create_suggestion_invalid_target_version_input(self):
+        self.login(self.AUTHOR_EMAIL_2)
+        csrf_token = self.get_new_csrf_token()
+        exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
+
+        response = self.post_json(
+            '%s/' % feconf.SUGGESTION_URL_PREFIX, {
+                'suggestion_type': (
+                    suggestion_models
+                    .SUGGESTION_TYPE_EDIT_STATE_CONTENT),
+                'target_type': (
+                    suggestion_models.TARGET_TYPE_EXPLORATION),
+                'target_id': 'exp1',
+                'target_version_at_submission': 'invalid target version',
+                'change': {
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                    'state_name': 'State 3',
+                    'new_value': self.new_content
+                },
+                'description': 'change again to state 3',
+            }, csrf_token=csrf_token, expected_status_int=400)
+        suggestions = self.get_json(
+            '%s?author_id=%s' % (
+                feconf.SUGGESTION_LIST_URL_PREFIX,
+                self.author_id_2))['suggestions']
+
+        self.assertEqual(
+            response['error'],
+            'Expected target_version_at_submission to be an int, received <type'
+            ' \'unicode\'>')
+        self.assertEqual(len(suggestions), 2)
+        self.logout()
+
     def test_suggestion_to_exploration_handler_with_invalid_suggestion_id(self):
         self.login(self.EDITOR_EMAIL)
 
