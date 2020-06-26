@@ -22,7 +22,7 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { StorePlaythroughResponse, PlaythroughBackendApiService } from
   'domain/statistics/playthrough-backend-api.service';
-import { PlaythroughObjectFactory } from
+import { IPlaythroughBackendDict, PlaythroughObjectFactory } from
   'domain/statistics/PlaythroughObjectFactory';
 
 describe('Playthrough backend api service', () => {
@@ -52,15 +52,22 @@ describe('Playthrough backend api service', () => {
 
     let expectedObject = new StorePlaythroughResponse(true, 'pId');
 
-    let playthroughDict = {
+    let playthroughDict: IPlaythroughBackendDict = {
       playthrough_id: 'playthroughId1',
       exp_id: 'expId1',
       exp_version: 1,
       issue_type: 'EarlyQuit',
-      issue_customization_args: {},
+      issue_customization_args: {
+        state_name: {
+          value: 'stateName'
+        },
+        time_spent_in_exp_in_msecs: {
+          value: 14.03
+        }
+      },
       actions: [{
         action_type: 'AnswerSubmit',
-        action_customization_args: {},
+        action_customization_args: null,
         schema_version: 1
       }]
     };

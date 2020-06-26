@@ -64,16 +64,17 @@ describe('Improvement Playthough Modal Controller', function() {
       PlaythroughObjectFactory = $injector.get('PlaythroughObjectFactory');
       AlertsService = $injector.get('AlertsService');
 
-      playthrough = PlaythroughObjectFactory.createNew(
-        0, '1', 1, 'MultipleIncorrectSubmissions', {
-          state_name: {
-            value: 'state_name1'
-          },
-          time_spent_in_exp_in_msecs: {
-            value: 200
-          }
-        }, playthoughActions
-      );
+      playthrough = PlaythroughObjectFactory.
+        createNewMultipleIncorrectSubmissionsPlaythrough(
+          0, '1', 1, {
+            state_name: {
+              value: 'state_name1'
+            },
+            time_spent_in_exp_in_msecs: {
+              value: 200
+            }
+          }, playthoughActions
+        );
 
       $uibModalInstance = jasmine.createSpyObj(
         '$uibModalInstance', ['close', 'dismiss']);
@@ -186,8 +187,8 @@ describe('Improvement Playthough Modal Controller', function() {
       PlaythroughObjectFactory = $injector.get('PlaythroughObjectFactory');
       AlertsService = $injector.get('AlertsService');
 
-      playthrough = PlaythroughObjectFactory.createNew(
-        0, '1', 1, 'EarlyQuit', {
+      playthrough = PlaythroughObjectFactory.createNewEarlyQuitPlaythrough(
+        0, '1', 1, {
           state_name: {
             value: 'state_name1'
           },

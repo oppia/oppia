@@ -189,6 +189,10 @@ export interface INumericInputCustomizationArgs {
 
 }
 
+export interface INumberWithUnitsCustomizationArgs {
+
+}
+
 export type IInteractionCustomizationArgs = (
   ICodeReplCustomizationArgs |
   IContinueCustomizationArgs |
@@ -206,4 +210,5 @@ export type IInteractionCustomizationArgs = (
   ISetInputCustomizationArgs |
   ITextInputCustomizationArgs |
   IMathExpressionCustomizationArgs |
-  INumericInputCustomizationArgs);
+  INumericInputCustomizationArgs |
+  INumberWithUnitsCustomizationArgs);

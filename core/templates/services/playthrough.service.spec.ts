@@ -55,7 +55,7 @@ describe('PlaythroughService', () => {
       expect(playthrough.expId).toEqual(this.expId);
       expect(playthrough.expVersion).toEqual(this.expVersion);
       expect(playthrough.actions).toEqual([]);
-      expect(playthrough.issueCustomizationArgs).toEqual({});
+      expect(playthrough.issueCustomizationArgs).toEqual(null);
     });
   });
 

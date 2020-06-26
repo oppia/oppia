@@ -173,9 +173,8 @@ export class PlaythroughService {
       let timeSpentInExpInSecs = (
         PlaythroughService.expStopwatch.getTimeInSecs());
       if (this.isMultipleIncorrectSubmissionsIssue()) {
-        PlaythroughService.playthrough.issueType = (
-          AppConstants.ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS);
-        PlaythroughService.playthrough.issueCustomizationArgs = {
+        const currentPlaythrough = PlaythroughService.playthrough;
+        const issueCustomizationArgs = {
           state_name: {
             value: PlaythroughService.multipleIncorrectStateName.state_name
           },
@@ -184,28 +183,47 @@ export class PlaythroughService {
               PlaythroughService.multipleIncorrectStateName.num_times_incorrect)
           }
         };
+
+        PlaythroughService.playthrough = (
+          this.playthroughObjectFactory
+            .createNewMultipleIncorrectSubmissionsPlaythrough(
+              currentPlaythrough.playthroughId, currentPlaythrough.expId,
+              currentPlaythrough.expVersion, issueCustomizationArgs,
+              currentPlaythrough.actions));
       } else if (this.isCyclicStateTransitionsIssue()) {
-        PlaythroughService.playthrough.issueType = (
-          AppConstants.ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS);
-        PlaythroughService.playthrough.issueCustomizationArgs = {
+        const currentPlaythrough = PlaythroughService.playthrough;
+        const issueCustomizationArgs = {
           state_names: {
             value: PlaythroughService.cycleIdentifier.cycle.split(',')
           }
         };
+
+        PlaythroughService.playthrough = (
+          this.playthroughObjectFactory
+            .createNewCyclicStateTransitionsPlaythrough(
+              currentPlaythrough.playthroughId, currentPlaythrough.expId,
+              currentPlaythrough.expVersion, issueCustomizationArgs,
+              currentPlaythrough.actions));
       } else if (this.isEarlyQuitIssue(timeSpentInExpInSecs)) {
-        PlaythroughService.playthrough.issueType = (
-          AppConstants.ISSUE_TYPE_EARLY_QUIT);
-        PlaythroughService.playthrough.issueCustomizationArgs = {
+        const currentPlaythrough = PlaythroughService.playthrough;
+        const issueCustomizationArgs = {
           state_name: {
             value:
               PlaythroughService.playthrough.actions[
                 PlaythroughService.playthrough.actions.length - 1
               ].actionCustomizationArgs.state_name.value
           },
-          time_spent_in_exp_in_secs: {
-            value: timeSpentInExpInSecs
+          time_spent_in_exp_in_msecs: {
+            value: timeSpentInExpInSecs * 1000
           }
         };
+
+        PlaythroughService.playthrough = (
+          this.playthroughObjectFactory
+            .createNewEarlyQuitPlaythrough(
+              currentPlaythrough.playthroughId, currentPlaythrough.expId,
+              currentPlaythrough.expVersion, issueCustomizationArgs,
+              currentPlaythrough.actions));
       }
     }
 
@@ -237,8 +255,9 @@ export class PlaythroughService {
         playthroughProbability: number): void {
       PlaythroughService.isLearnerInSamplePopulation =
         this.determineIfLearnerIsInSamplePopulation(playthroughProbability);
-      PlaythroughService.playthrough = this.playthroughObjectFactory.createNew(
-        null, explorationId, explorationVersion, null, {}, []);
+      PlaythroughService.playthrough = (
+        this.playthroughObjectFactory.createNewEmptyPlaythrough(
+          explorationId, explorationVersion));
       PlaythroughService.expStopwatch = this.stopwatchObjectFactory.create();
       PlaythroughService.multipleIncorrectStateName = {
         state_name: null,
