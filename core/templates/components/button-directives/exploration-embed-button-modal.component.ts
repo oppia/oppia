@@ -20,18 +20,25 @@ require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
 
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { SiteAnalyticsService } from 'services/site-analytics.service';
 
 @Component({
   selector: 'exploration-embed-button-modal',
   templateUrl: './exploration-embed-button-modal.component.html'
 })
-export class ExplorationEmbedButtonModalComponent {
+export class ExplorationEmbedButtonModalComponent implements OnInit {
   @Input() explorationId: string;
   @Input() serverName: string;
 
-  constructor(private activeModal: NgbActiveModal) {}
+  constructor(
+    private activeModal: NgbActiveModal,
+    private siteAnalyticsService: SiteAnalyticsService) {}
+
+  ngOnInit() {
+    this.siteAnalyticsService.registerOpenEmbedInfoEvent(this.explorationId);
+  }
 
   cancel() {
     this.activeModal.dismiss();

@@ -39,7 +39,7 @@ export class SharingLinksComponent implements OnInit {
   @Input() shareType: ShareType;
   @Input() explorationId: string;
   @Input() collectionId: string;
-  @Input() smallFont: Boolean;
+  @Input() smallFont: boolean;
   classroomUrl: string;
   activityId: string;
   serverName: string;
