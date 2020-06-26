@@ -47,9 +47,27 @@
     </div>
   </div>
 
-  <div>
-    <angular-html-bind class="section" html-data="visualizationsHtml">
-    </angular-html-bind>
+  <div ng-repeat="vizInfo in visualizationsInfo">
+    <div ng-switch="vizInfo.id">
+      <oppia-visualization-bar-chart ng-switch-when="BarChart"
+                                     data="vizInfo.data"
+                                     options="vizInfo.options">
+      </oppia-visualization-bar-chart>
+      <oppia-visualization-enumerated-frequency-table ng-switch-when="EnumeratedFrequencyTable"
+                                                      data="vizInfo.data"
+                                                      options="vizInfo.options"
+                                                      addressed-info-is-supported="vizInfo.addressedInfoIsSupported">
+      </oppia-visualization-enumerated-frequency-table>
+      <oppia-visualization-frequency-table ng-switch-when="FrequencyTable"
+                                           data="vizInfo.data"
+                                           options="vizInfo.options"
+                                           addressed-info-is-supported="vizInfo.addressedInfoIsSupported">
+      </oppia-visualization-frequency-table>
+      <oppia-visualization-sorted-tiles ng-switch-when="SortedTiles"
+                                        data="vizInfo.data"
+                                        options="vizInfo.options">
+      </oppia-visualization-sorted-tiles>
+    </div>
   </div>
 </div>
 

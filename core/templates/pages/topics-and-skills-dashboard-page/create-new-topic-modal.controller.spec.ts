@@ -56,7 +56,7 @@ describe('Create new topic modal', function() {
   }));
 
 
-  it('should init the variables', function() {
+  it('should check properties set after controller is initialized', function() {
     var newlyCreatedTopic = NewlyCreatedTopicObjectFactory.createDefault();
     expect($scope.newlyCreatedTopic).toEqual(newlyCreatedTopic);
     expect($scope.MAX_CHARS_IN_TOPIC_NAME).toEqual(39);

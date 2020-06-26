@@ -20,6 +20,7 @@
 // main module the elements are attached to.
 require('pages/collection-player-page/collection-player-page.module.ts');
 require('App.ts');
+require('base-components/oppia-root.directive.ts');
 
 require('base-components/base-content.directive.ts');
 require(
