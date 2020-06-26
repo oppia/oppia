@@ -89,7 +89,8 @@ angular.module('oppia').directive('questionsList', [
       controllerAs: '$ctrl',
       controller: [
         '$scope', '$filter', '$http', '$q', '$timeout', '$uibModal', '$window',
-        '$location', 'AlertsService', 'EditableQuestionBackendApiService',
+        '$location', 'AlertsService', 'ContextService',
+        'EditableQuestionBackendApiService', 'ImageLocalStorageService',
         'MisconceptionObjectFactory', 'QuestionObjectFactory',
         'QuestionsListService', 'QuestionUndoRedoService',
         'SkillBackendApiService', 'SkillDifficultyObjectFactory',
@@ -99,7 +100,8 @@ angular.module('oppia').directive('questionsList', [
         'MODE_SELECT_SKILL', 'NUM_QUESTIONS_PER_PAGE', 'SKILL_DIFFICULTIES',
         function(
             $scope, $filter, $http, $q, $timeout, $uibModal, $window,
-            $location, AlertsService, EditableQuestionBackendApiService,
+            $location, AlertsService, ContextService,
+            EditableQuestionBackendApiService, ImageLocalStorageService,
             MisconceptionObjectFactory, QuestionObjectFactory,
             QuestionsListService, QuestionUndoRedoService,
             SkillBackendApiService, SkillDifficultyObjectFactory,
