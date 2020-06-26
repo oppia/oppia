@@ -128,6 +128,8 @@ angular.module('oppia').directive('topicEditorNavbar', [
                 }
                 $scope.topicRights.markTopicAsPublished();
                 TopicEditorStateService.setTopicRights($scope.topicRights);
+                $rootScope.$apply();
+
               }
             ).then(function() {
               var successToast = 'Topic published.';
@@ -138,7 +140,6 @@ angular.module('oppia').directive('topicEditorNavbar', [
                 successToast, 1000);
               // TODO(#8521): Remove the use of $rootScope.$apply()
               // once the directive is migrated to angular
-              $rootScope.$apply();
             });
           };
 
