@@ -1019,7 +1019,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
             any_type_messages + extra_js_files_messages +
             http_requests_messages + js_and_ts_component_messages +
             directive_scope_messages + sorted_dependencies_messages +
-            controller_dependency_messages +comments_style_messages)
+            controller_dependency_messages + comments_style_messages)
         return all_messages
 
 
