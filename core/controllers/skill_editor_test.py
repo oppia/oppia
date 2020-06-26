@@ -19,6 +19,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import role_services
 from core.domain import skill_services
+from core.domain import topic_domain
 from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
@@ -51,11 +52,14 @@ class BaseSkillEditorControllerTests(test_utils.GenericTestBase):
         self.save_new_skill(
             self.skill_id_2, self.admin_id, description='Description')
         self.topic_id = topic_services.get_new_topic_id()
+        subtopic = topic_domain.Subtopic.create_default_subtopic(
+            1, 'Subtopic1')
+        subtopic.skill_ids = [self.skill_id]
         self.save_new_topic(
             self.topic_id, self.admin_id, name='Name',
             description='Description', canonical_story_ids=[],
-            additional_story_ids=[], uncategorized_skill_ids=[self.skill_id],
-            subtopics=[], next_subtopic_id=1)
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[subtopic], next_subtopic_id=2)
 
     def delete_skill_model_and_memcache(self, user_id, skill_id):
         """Deletes skill model and memcache corresponding to the given skill
@@ -165,8 +169,8 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
         # Check that admins can access the editable skill data.
         json_response = self.get_json(self.url)
         self.assertEqual(self.skill_id, json_response['skill']['id'])
-        self.assertEqual('Name', json_response['topic_name'])
-        self.assertIsNone(json_response['subtopic_name'])
+        self.assertEqual(json_response['topic_name'], 'Name')
+        self.assertEqual(json_response['subtopic_name'], 'Subtopic1')
         self.assertEqual(
             1, len(json_response['grouped_skill_summaries']['Name']))
         self.logout()
