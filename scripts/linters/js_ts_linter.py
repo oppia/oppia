@@ -318,7 +318,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                 if file_path.endswith('backend-api.service.ts'):
                     continue
 
-                file_content = FILE_CACHE.read(file_path)
+                file_content = self.file_cache.read(file_path)
 
                 if re.findall(http_client_pattern, file_content):
                     failed = True

@@ -54,6 +54,8 @@ VALID_JS_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'valid.js')
 VALID_TS_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'valid.ts')
 VALID_CONSTANT_OUTSIDE_CLASS_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'valid_constant_outside_class.constants.ts')
+VALID_BACKEND_API_SERVICE_FILEPATH = os.path.join(
+    LINTER_TESTS_DIR, 'valid-backend-api.service.ts')
 INVALID_ANY_TYPE_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_any_type.ts')
 EXTRA_JS_FILEPATH = os.path.join('core', 'templates', 'demo.js')
@@ -70,6 +72,8 @@ INVALID_CONSTANT_IN_TS_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_constant_in_ts_file.ts')
 INVALID_CONSTANT_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_duplicate.constants.ts')
+INVALID_HTTP_CLIENT_FILEPATH = os.path.join(
+    LINTER_TESTS_DIR, 'invalid_http_client_used.ts')
 
 
 class JsTsLintTests(test_utils.GenericTestBase):
@@ -326,6 +330,37 @@ class JsTsLintTests(test_utils.GenericTestBase):
             test_utils.assert_same_list_elements(
                 ['There are no JavaScript or Typescript files to lint.'],
                 self.linter_stdout))
+
+    def test_http_client_used_with_excluded_file(self):
+        excluded_file = (
+            'core/templates/services/request-interceptor.service.spec.ts')
+        with self.print_swap:
+            js_ts_linter.JsTsLintChecksManager(
+                [], [excluded_file], FILE_CACHE,
+                True).perform_all_lint_checks()
+        self.assertTrue(
+            test_utils.assert_same_list_elements(
+                ['SUCCESS  HTTP requests check passed'], self.linter_stdout))
+
+    def test_http_client_used_in_backend_api_service_file(self):
+        with self.print_swap:
+            js_ts_linter.JsTsLintChecksManager(
+                [], [VALID_BACKEND_API_SERVICE_FILEPATH], FILE_CACHE,
+                True).perform_all_lint_checks()
+        self.assertTrue(
+            test_utils.assert_same_list_elements(
+                ['SUCCESS  HTTP requests check passed'], self.linter_stdout))
+
+    def test_http_client_used_with_error_message(self):
+        with self.print_swap:
+            js_ts_linter.JsTsLintChecksManager(
+                [], [INVALID_HTTP_CLIENT_FILEPATH], FILE_CACHE,
+                True).perform_all_lint_checks()
+        self.assertTrue(
+            test_utils.assert_same_list_elements([
+                'An instance of HttpClient is found in this file. You are not '
+                'allowed to create http requests from files that are not '
+                'backend api services.'], self.linter_stdout))
 
     def test_get_linters_with_success(self):
         custom_linter, third_party = js_ts_linter.get_linters(
