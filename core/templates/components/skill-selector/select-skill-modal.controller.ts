@@ -35,7 +35,8 @@ angular.module('oppia').controller('SelectSkillModalController', [
     $scope.countOfSkillsToPrioritize =
       skillsInSameTopicCount;
     $scope.save = function() {
-      $scope.confirm($scope.selectedSkillId);
+      $scope.confirm($scope.skillSummaries.find(
+        summary => summary.id === $scope.selectedSkillId));
     };
   }
 ]);

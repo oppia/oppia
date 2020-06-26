@@ -5,7 +5,11 @@
         <background-banner class="oppia-landing-background-image"></background-banner>
         <div class="row oppia-landing-section-row">
           <div class="col-sm-6 col-sm-push-6 oppia-landing-image-div">
-            <img ng-src="<[$ctrl.image1.src]>" class="oppia-landing-image" alt="<[$ctrl.image1.alt]>">
+            <picture>
+              <source type="image/webp" ng-srcset="<[$ctrl.image1.src_webp]>">
+              <source type="image/png" ng-srcset="<[$ctrl.image1.src_png]>">
+              <img ng-src="<[$ctrl.image1.src_png]>" class="oppia-landing-image" alt="<[$ctrl.image1.alt]>">
+            </picture>
           </div>
           <div class="col-sm-6 col-sm-pull-6">
             <div class="oppia-landing-text-box-1">
@@ -25,7 +29,11 @@
       <div class="container-fluid">
         <div class="row oppia-landing-section-row">
           <div class="col-sm-6 col-sm-push-6 oppia-landing-image-div">
-            <img ng-src="<[$ctrl.image2.src]>" class="oppia-landing-image" alt="<[$ctrl.image2.alt]>">
+            <picture>
+              <source type="image/webp" ng-srcset="<[$ctrl.image2.src_webp]>">
+              <source type="image/png" ng-srcset="<[$ctrl.image2.src_png]>">
+              <img ng-src="<[$ctrl.image2.src_png]>" class="oppia-landing-image" alt="<[$ctrl.image2.alt]>">
+            </picture>
           </div>
           <div class="col-sm-6 col-sm-pull-6">
             <div class="oppia-landing-text-box-1">
@@ -129,8 +137,8 @@
     position: relative;
   }
   .oppia-landing-section-row {
-    display: flex;
     align-items: center;
+    display: flex;
   }
   .oppia-landing-background-image {
     zoom: 2;
@@ -139,7 +147,6 @@
     font-size: 2.8vw;
     margin: 0;
     text-align: left;
-    white-space: pre;
   }
   .oppia-landing-h2 {
     font-size: 1.95vmax;
@@ -149,8 +156,8 @@
     width: 80%;
   }
   .oppia-text-centered {
-    padding: 0 25%;
     margin: 2% 0;
+    padding: 0 25%;
     text-align: center;
     width: 100%;
   }
@@ -168,8 +175,8 @@
   }
   .oppia-landing-page-button {
     background-color: #015c53;
-    border-radius: 0;
     border: 4px solid #265a53;
+    border-radius: 0;
     color: #fff;
     font-size: 1.9vmax;
     margin-right: 15px;
@@ -204,8 +211,8 @@
     padding-right: 40px;
   }
   .oppia-landing-image {
-    max-width: 100%;
     max-height: 400px;
+    max-width: 100%;
   }
   .oppia-text-color-black {
     color: #242424;
@@ -214,13 +221,13 @@
     color: #005c5e;
   }
   .oppia-landing-video-frame {
+    background: #000000;
     border: 11px black solid;
-    border-top-width: 50px;
     border-bottom-width: 50px;
     border-radius: 36px;
-    background: #000000;
-    min-height: 500px;
+    border-top-width: 50px;
     margin: auto;
+    min-height: 500px;
     position: relative;
     width: 270px;
   }
