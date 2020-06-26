@@ -137,17 +137,22 @@ export class ContributionOpportunitiesBackendApiService {
   }
 
   async fetchFeaturedTranslationLanguages(): Promise<Object> {
-    const response = await this.http
-      .get('/retrivefeaturedtranslationlanguages')
-      .toPromise() as {
-        'featured_translation_languages':
-        IFeaturedTranslationLanguageBackendDict[]
-      };
-    return response.featured_translation_languages.map(
-      (backendDict: IFeaturedTranslationLanguageBackendDict) =>
-        this.featuredTranslationLanguageObjectFactory
-          .createFromBackendDict(backendDict)
-    );
+    try {
+      const response = await this.http
+        .get('/retrivefeaturedtranslationlanguages')
+        .toPromise() as {
+          'featured_translation_languages':
+          IFeaturedTranslationLanguageBackendDict[]
+        };
+
+      return response.featured_translation_languages.map(
+        (backendDict: IFeaturedTranslationLanguageBackendDict) =>
+          this.featuredTranslationLanguageObjectFactory
+            .createFromBackendDict(backendDict)
+      );
+    } catch {
+      return [];
+    }
   }
 }
 
