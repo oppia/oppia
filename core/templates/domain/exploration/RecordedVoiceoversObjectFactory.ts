@@ -25,9 +25,7 @@ export interface IRecordedVoiceOverBackendDict {
 }
 
 export interface IVoiceoverMapping {
-  [propName: string]: {
-    [propName: string]: Voiceover;
-  }
+  [propName: string]: IBindableVoiceovers;
 }
 
 export interface IBindableVoiceovers {

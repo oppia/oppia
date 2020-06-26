@@ -86,7 +86,7 @@ export interface IGraphInputCustomizationArgs {
   canDeleteVertex?: {
     value: boolean;
   };
-  canEditVertexLabel?: {
+  canEditVertexLabel: {
     value: boolean;
   };
   canMoveVertex?: {
@@ -98,7 +98,7 @@ export interface IGraphInputCustomizationArgs {
   canDeleteEdge?: {
     value: boolean;
   };
-  canEditEdgeWeight?: {
+  canEditEdgeWeight: {
     value: boolean;
   };
 }
