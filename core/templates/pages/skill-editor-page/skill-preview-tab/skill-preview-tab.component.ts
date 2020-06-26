@@ -61,7 +61,8 @@ angular.module('oppia').component('skillPreviewTab', {
         ctrl.displayCardIsInitialized = false;
         ctrl.questionsFetched = false;
         ctrl.ALLOWED_QUESTION_INTERACTION_IDS = [
-          'All', 'Text Input', 'Multiple Choice', 'Numeric Input'];
+          'All', 'Text Input', 'Multiple Choice', 'Numeric Input',
+          'Item Selection'];
         ctrl.skill = SkillEditorStateService.getSkill();
         ctrl.htmlData = ctrl.skill.getConceptCard().getExplanation().getHtml();
 
@@ -95,6 +96,9 @@ angular.module('oppia').component('skillPreviewTab', {
                             interactionType !== 'TextInput') {
               return false;
             } else if (ctrl.interactionFilter === 'Multiple Choice' &&
+                            interactionType !== 'MultipleChoiceInput') {
+              return false;
+            } else if (ctrl.interactionFilter === 'Item Selection' &&
                             interactionType !== 'ItemSelectionInput') {
               return false;
             } else if (ctrl.interactionFilter === 'Numeric Input' &&

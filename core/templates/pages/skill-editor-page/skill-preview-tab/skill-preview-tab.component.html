@@ -22,6 +22,9 @@
                     <["Text Input"]>
                   </span>
                   <span ng-if="question.question_state_data.interaction.id==='ItemSelectionInput'">
+                    <["Item Selection"]>
+                  </span>
+                  <span ng-if="question.question_state_data.interaction.id==='MultipleChoiceInput'">
                     <["Multiple Choice"]>
                   </span>
                   <span ng-if="question.question_state_data.interaction.id==='NumericInput'">
