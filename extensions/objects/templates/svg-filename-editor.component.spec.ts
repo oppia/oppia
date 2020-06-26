@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the svg filename editor.
  */
 
-const { fabric } = require('fabric');
+import { fabric } from 'fabric';
 import { AppConstants } from 'app.constants';
 
 describe('SvgFilenameEditor', function() {

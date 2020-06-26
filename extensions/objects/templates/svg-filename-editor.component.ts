@@ -25,7 +25,7 @@ require('services/csrf-token.service.ts');
 require('services/image-local-storage.service.ts');
 require('services/image-upload-helper.service.ts');
 
-const { fabric } = require('fabric');
+import { fabric } from 'fabric';
 import Picker from 'vanilla-picker';
 
 angular.module('oppia').component('svgFilenameEditor', {
