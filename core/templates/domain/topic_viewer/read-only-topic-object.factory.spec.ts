@@ -44,7 +44,7 @@ describe('Read only topic object Factory', () => {
         node_titles: ['Chapter 1'],
         thumbnail_filename: 'image.svg',
         thumbnail_bg_color: '#F8BF74',
-        published: true
+        story_is_published: true
       }],
       additional_story_dicts: [{
         id: '1',
@@ -53,13 +53,15 @@ describe('Read only topic object Factory', () => {
         node_titles: ['Chapter 1'],
         thumbnail_filename: 'image.svg',
         thumbnail_bg_color: '#F8BF74',
-        published: true
+        story_is_published: true
       }],
       uncategorized_skill_ids: ['skill_id_1'],
       subtopics: [{
         skill_ids: ['skill_id_2'],
         id: 1,
-        title: 'subtopic_name'
+        title: 'subtopic_name',
+        thumbnail_filename: 'image.svg',
+        thumbnail_bg_color: '#F8BF74'
       }],
       degrees_of_mastery: {
         skill_id_1: 0.5,
