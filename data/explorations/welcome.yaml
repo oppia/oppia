@@ -114,9 +114,9 @@ states:
     classifier_model_id: null
     content:
       audio_translations: {}
-      html: "<div>Let\_<oppia-noninteractive-math math_content-with-value=\"{&amp;quot;raw_latex&amp;quot;:&amp;quot;x=11&amp;quot;,&amp;quot;svg_filename&amp;quot;:&amp;quot;&amp;quot;}\"\
+      html: "<div>Let\_<oppia-noninteractive-math raw_latex-with-value=\"&amp;quot;x=11&amp;quot;\"\
         ></oppia-noninteractive-math>. What is the value of\_<oppia-noninteractive-math\
-        \ math_content-with-value=\"{&amp;quot;raw_latex&amp;quot;:&amp;quot;x^2&amp;quot;,&amp;quot;svg_filename&amp;quot;:&amp;quot;&amp;quot;}\"></oppia-noninteractive-math>?</div><div><br></div>"
+        \ raw_latex-with-value=\"&amp;quot;x^2&amp;quot;\"></oppia-noninteractive-math>?</div><div><br></div>"
     interaction:
       answer_groups:
       - correct: false
