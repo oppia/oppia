@@ -1587,7 +1587,6 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             html_validation_service.add_math_content_to_math_rte_components(
                 invalid_cases[1]['html_content'])
 
-
     def test_validate_math_tags_in_html(self):
         """Test that the validate_math_tags_in_html method validates an
         HTML string and returns all the invalid tags.
