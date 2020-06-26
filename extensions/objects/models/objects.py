@@ -586,6 +586,7 @@ class LogicQuestion(BaseObject):
             _validate_expression_array(raw['results'])
             assert isinstance(
                 raw['default_proof_string'], python_utils.BASESTRING)
+
             return copy.deepcopy(raw)
         except Exception:
             raise TypeError('Cannot convert to a logic question %s' % raw)
