@@ -235,7 +235,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'music-phrase-editor.directive.ts',
     'music-phrase-player.service.ts',
     'new-story-title-editor-modal.controller.ts',
-    'new-subtopic-title-modal.controller.ts',
     'nonnegative-int-editor.directive.ts',
     'normalize-whitespace-punctuation-and-case.pipe.ts',
     'normalized-string-editor.directive.ts',

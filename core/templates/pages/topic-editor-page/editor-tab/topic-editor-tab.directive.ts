@@ -138,7 +138,21 @@ angular.module('oppia').directive('topicEditorTab', [
           };
 
           $scope.createSkill = function() {
-            EntityCreationService.createSkill();
+            if (UndoRedoService.getChangeCount() > 0) {
+              $uibModal.open({
+                templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                  '/pages/topic-editor-page/modal-templates/' +
+                    'topic-save-pending-changes-modal.template.html'),
+                backdrop: true,
+                controller: 'ConfirmOrCancelModalController'
+              }).result.then(function() {}, function() {
+                // Note to developers:
+                // This callback is triggered when the Cancel button is clicked.
+                // No further action is needed.
+              });
+            } else {
+              EntityCreationService.createSkill();
+            }
           };
 
           $scope.createSubtopic = function() {
@@ -214,6 +228,15 @@ angular.module('oppia').directive('topicEditorTab', [
 
           $scope.navigateToSkill = function(skillId) {
             TopicEditorRoutingService.navigateToSkillEditorWithId(skillId);
+          };
+
+          $scope.getPreviewFooter = function() {
+            var canonicalStoriesLength = (
+              $scope.topic.getCanonicalStoryIds().length);
+            if ( canonicalStoriesLength === 0 || canonicalStoriesLength > 1) {
+              return canonicalStoriesLength + ' Stories';
+            }
+            return '1 Story';
           };
 
           ctrl.$onInit = function() {

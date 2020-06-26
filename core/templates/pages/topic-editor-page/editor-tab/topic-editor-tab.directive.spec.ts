@@ -36,6 +36,8 @@ describe('Topic editor tab directive', function() {
   var ctrl = null;
   var $rootScope = null;
   var topic = null;
+  var subtopic1 = null;
+  var subtopic2 = null;
   var ContextService = null;
   var ImageUploadHelperService = null;
   var directive = null;
@@ -45,6 +47,7 @@ describe('Topic editor tab directive', function() {
   var EntityCreationService = null;
   var TopicUpdateService = null;
   var StoryCreationService = null;
+  var StoryReferenceObjectFactory = null;
   var UndoRedoService = null;
   var TopicEditorRoutingService = null;
   beforeEach(angular.mock.inject(function($injector) {
@@ -70,6 +73,7 @@ describe('Topic editor tab directive', function() {
     StoryCreationService = $injector.get('StoryCreationService');
     UndoRedoService = $injector.get('UndoRedoService');
     EntityCreationService = $injector.get('EntityCreationService');
+    StoryReferenceObjectFactory = $injector.get('StoryReferenceObjectFactory');
     TopicEditorRoutingService = $injector.get('TopicEditorRoutingService');
     ctrl = $injector.instantiate(directive.controller, {
       $scope: $scope,
@@ -85,6 +89,9 @@ describe('Topic editor tab directive', function() {
       EntityCreationService: EntityCreationService
     });
     topic = TopicObjectFactory.createInterstitialTopic();
+    subtopic1 = StoryReferenceObjectFactory.createFromStoryId('storyId1');
+    subtopic2 = StoryReferenceObjectFactory.createFromStoryId('storyId2');
+    topic._canonicalStoryReferences = [subtopic1, subtopic2];
     spyOn(TopicEditorStateService, 'getTopic').and.returnValue(topic);
     ctrl.$onInit();
   }));
@@ -100,6 +107,14 @@ describe('Topic editor tab directive', function() {
     $scope.createSkill();
     expect(skillSpy).toHaveBeenCalled();
   });
+
+  it('should open save changes warning modal before creating skill',
+    function() {
+      spyOn(UndoRedoService, 'getChangeCount').and.returnValue(1);
+      var uibModalSpy = spyOn($uibModalInstance, 'open').and.callThrough();
+      $scope.createSkill();
+      expect(uibModalSpy).toHaveBeenCalled();
+    });
 
   it('should call TopicEditorStateService to load topic when ' +
       'topics and skills dashboard is reinitialized',
@@ -243,5 +258,13 @@ describe('Topic editor tab directive', function() {
     $scope.deleteSubtopic();
     expect(topicEditorSpy).toHaveBeenCalled();
     expect(topicUpdateSpy).toHaveBeenCalled();
+  });
+
+  it('should return preview footer text for topic preview', function() {
+    expect($scope.getPreviewFooter()).toEqual('2 Stories');
+    topic._canonicalStoryReferences = [];
+    expect($scope.getPreviewFooter()).toEqual('0 Stories');
+    topic._canonicalStoryReferences = [subtopic1];
+    expect($scope.getPreviewFooter()).toEqual('1 Story');
   });
 });
