@@ -28,6 +28,11 @@ var expectInteractionDetailsToMatch = async function(elem) {
     await elem.element(by.tagName(
       'oppia-interactive-algebraic-expression-input')).isPresent()
   ).toBe(true);
+  // Testing editor's value in default state.
+  expect(
+    await objects.AlgebraicExpressionEditor(elem.element(by.tagName(
+      'oppia-interactive-algebraic-expression-input'))).getValue()
+  ).toBe('');
 };
 
 var submitAnswer = async function(elem, answer) {
@@ -44,6 +49,24 @@ var testSuite = [{
   expectedInteractionDetails: [],
   wrongAnswers: ['(a-b)^2', '(a-b)^3', 'a^2+2*a*b+b^2'],
   correctAnswers: ['(a+b)^2', '(b+a)^2', '(a+b)*(a+b)']
+}, {
+  interactionArguments: [],
+  ruleArguments: ['MatchesExactlyWith', '((x^2)-x)/z'],
+  expectedInteractionDetails: [],
+  wrongAnswers: ['((x^3)-x)/z', 'x(x-1)/z', '((x^2)/z)-x/z'],
+  correctAnswers: ['((x^2)-x)/z', '((x*x)-x)*z^(-1)']
+}, {
+  interactionArguments: [],
+  ruleArguments: ['IsEquivalentTo', 'pi*r^2'],
+  expectedInteractionDetails: [],
+  wrongAnswers: ['pi*r', 'pi*r*2', 'pi', 'pi/r^2'],
+  correctAnswers: ['pi*r^2', 'pi*r*r', '(pi*r^3)/(2*r-r)']
+}, {
+  interactionArguments: [],
+  ruleArguments: ['IsEquivalentTo', '(9*x^2)-6*x+1'],
+  expectedInteractionDetails: [],
+  wrongAnswers: ['sqrt((3x-1)^(2))', '9*(x)^(2)-6*x-1', '((3*x-1))^(4)'],
+  correctAnswers: ['(9*x^2)-6*x+1', '(1-3x)^(2)']
 }];
 
 exports.customizeInteraction = customizeInteraction;

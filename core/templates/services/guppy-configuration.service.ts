@@ -16,8 +16,8 @@
  * @fileoverview Service for initializing Guppy instances.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
 const SYMBOLS_TO_REMOVE = [
   'norm', 'utf8', 'text', 'sym_name', 'eval', 'floor', 'factorial', 'sub',
