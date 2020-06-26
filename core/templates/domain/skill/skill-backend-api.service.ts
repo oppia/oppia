@@ -26,7 +26,7 @@ import { UrlInterpolationService } from
 import cloneDeep from 'lodash/cloneDeep';
 
 import { SkillResponseObjectFactory, SkillResponse, ISkillResponseBackendDict } from 'domain/skill/SkillResponseObjectFactory';
-import { MultiSkillsResponseObjectFactory, MultiSkillsResponse, IMultiSkillsResponseBackendDict } from '/usr/local/google/home/msainanee/opensource/oppia/core/templates/domain/skill/MultiSkillsResponseObjectFactory';
+import { MultiSkillsResponseObjectFactory, MultiSkillsResponse, IMultiSkillsResponseBackendDict } from 'domain/skill/MultiSkillsResponseObjectFactory';
 
 
 export interface ISkillUpdatePayload {
@@ -41,15 +41,6 @@ export interface IChangeDict {
   'oldValue'?: string;
   'newValue'?: string;
 }
-
-// export interface ISkillResponse {
-//   'skill': Object;
-//   'grouped_skill_summaries': Object;
-// }
-
-// export interface IMultiSkillsResponse {
-//   'skills': Object;
-// }
 
 @Injectable ({
   providedIn: 'root'

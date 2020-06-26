@@ -241,6 +241,8 @@ import { MisconceptionObjectFactory } from
 import { MultipleChoiceInputValidationService } from
   // eslint-disable-next-line max-len
   'interactions/MultipleChoiceInput/directives/multiple-choice-input-validation.service';
+import { MultiSkillsResponseObjectFactory } from
+  'domain/skill/MultiSkillsResponseObjectFactory';
 import { MusicNotesInputValidationService } from
   // eslint-disable-next-line max-len
   'interactions/MusicNotesInput/directives/music-notes-input-validation.service';
@@ -342,7 +344,7 @@ import { SetInputValidationService } from
 import { SVMPredictionService } from 'classifiers/svm-prediction.service';
 import { SidebarStatusService } from 'domain/sidebar/sidebar-status.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
-// import { SkillBackendApiService } from 'domain/skill/skill-backend-api.service';
+import { SkillBackendApiService } from 'domain/skill/skill-backend-api.service';
 import { SkillCreationBackendApiService } from
   'domain/skill/skill-creation-backend-api.service';
 import { SkillDifficultyObjectFactory } from
@@ -352,6 +354,8 @@ import { SkillMasteryBackendApiService } from
 import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
 import { SkillOpportunityObjectFactory } from
   'domain/opportunity/SkillOpportunityObjectFactory';
+import { SkillResponseObjectFactory } from
+  'domain/skill/SkillResponseObjectFactory';
 import { SkillRightsBackendApiService} from
   'domain/skill/skill-rights-backend-api.service.ts';
 import { SkillRightsObjectFactory } from
@@ -1048,10 +1052,6 @@ export class UpgradedServices {
       new SearchExplorationsBackendApiService(
         upgradedServices['HttpClient'],
         upgradedServices['UrlInterpolationService']);
-    // upgradedServices['SkillBackendApiService'] =
-    //   new SkillBackendApiService(
-    //     upgradedServices['HttpClient'],
-    //     upgradedServices['UrlInterpolationService']);
     upgradedServices['SkillCreationBackendApiService'] =
       new SkillCreationBackendApiService(
         upgradedServices['HttpClient']);
@@ -1125,6 +1125,9 @@ export class UpgradedServices {
         upgradedServices['HttpClient'],
         upgradedServices['ReadOnlyCollectionBackendApiService'],
         upgradedServices['UrlInterpolationService']);
+    upgradedServices['MultiSkillsResponseObjectFactory'] =
+      new MultiSkillsResponseObjectFactory(
+        upgradedServices['SkillObjectFactory']);
     upgradedServices['PredictionAlgorithmRegistryService'] =
       new PredictionAlgorithmRegistryService(
         upgradedServices['CodeReplPredictionService'],
@@ -1133,6 +1136,9 @@ export class UpgradedServices {
       new ReadOnlySubtopicPageObjectFactory(
         upgradedServices['SubtopicPageContentsObjectFactory'],
         upgradedServices['SubtopicObjectFactory']);
+    upgradedServices['SkillResponseObjectFactory'] =
+      new SkillResponseObjectFactory(
+        upgradedServices['SkillObjectFactory']);
     upgradedServices['SolutionObjectFactory'] = new SolutionObjectFactory(
       upgradedServices['SubtitledHtmlObjectFactory'],
       upgradedServices['ExplorationHtmlFormatterService']);
@@ -1156,6 +1162,10 @@ export class UpgradedServices {
       upgradedServices['HintObjectFactory'],
       upgradedServices['SolutionObjectFactory'],
       upgradedServices['OutcomeObjectFactory']);
+    upgradedServices['SkillBackendApiService'] =
+      new SkillBackendApiService(
+        upgradedServices['MultiSkillsResponseObjectFactory'],
+        upgradedServices['SkillResponseObjectFactory']);
     upgradedServices['SubtopicViewerBackendApiService'] =
       new SubtopicViewerBackendApiService(
         upgradedServices['HttpClient'],
