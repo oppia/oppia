@@ -73,7 +73,7 @@ var ExplorationEditorHistoryTab = function() {
       // The dates can be of varying format. To play it safe and to
       // keep it simple, we will just check if the date string contains
       // a digit.
-      expect(date).toMatch('/\d/');
+      expect(date).toMatch(/\d/);
     }
   };
 
