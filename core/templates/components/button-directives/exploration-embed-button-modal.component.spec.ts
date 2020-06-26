@@ -13,8 +13,51 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for ExplorationEmbedButtonModalController.
+ * @fileoverview Unit tests for ExplorationEmbedButtonModalComponent.
  */
+import { ComponentFixture, fakeAsync, TestBed, async} from
+  '@angular/core/testing';
+
+import { ExplorationEmbedButtonModalComponent } from
+  './exploration-embed-button-modal.component';
+import { SiteAnalyticsService } from 'services/site-analytics.service';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+
+class MockActiveModal {
+  dismiss(): void {
+    return;
+  }
+}
+
+class MockSiteAnalyticsService {
+  registerOpenEmbedInfoEvent(id: string): void {
+    return;
+  }
+}
+
+describe('ExplorationEmbedButtonModalComponent', () => {
+  let component: ExplorationEmbedButtonModalComponent;
+  let fixture: ComponentFixture<ExplorationEmbedButtonModalComponent>;
+  beforeEach(async(() => {
+    TestBed.configureTestingModule({
+      declarations: [ExplorationEmbedButtonModalComponent],
+      providers: [
+        {
+          provide: NgbActiveModal,
+          useClass: MockActiveModal
+        },
+        {
+          provide: SiteAnalyticsService,
+          useClass: MockSiteAnalyticsService
+        }
+      ]
+    }).compileComponents();
+  }));
+
+  beforeEach(() => {
+    // component = TestBed.createComponent(ExplorationEmbedButtonModalComponent);
+  });
+});
 
 describe('Exploration Embed Button Modal Controller', function() {
   var $scope = null;
