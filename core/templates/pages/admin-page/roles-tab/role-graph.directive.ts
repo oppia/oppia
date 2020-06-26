@@ -28,11 +28,11 @@ angular.module('oppia').directive('roleGraph', [
       bindToController: {
         // An object with these keys:
         //  - 'nodes': An object whose keys are node ids and whose values are
-        //             node labels
+        //             node labels.
         //  - 'links': A list of objects with keys:
-        //            'source': id of source node
-        //            'target': id of target node
-        //  - 'initStateId': The initial state id
+        //            'source': id of source node.
+        //            'target': id of target node.
+        //  - 'initStateId': The initial state id.
         //  - 'finalStateIds': The list of ids corresponding to terminal states.
         graphData: '=',
         // A boolean value to signify whether graphData is completely loaded.
