@@ -184,6 +184,14 @@ describe('MathInteractionsService', () => {
     expect(mathInteractionsService.getWarningText()).toBe(
       'Please enter a non-empty answer.');
 
+    expect(mathInteractionsService.validateEquation('a+b = ')).toBeFalse();
+    expect(mathInteractionsService.getWarningText()).toBe(
+      'The RHS of your equation is empty.');
+
+    expect(mathInteractionsService.validateEquation(' =(x-y)/2')).toBeFalse();
+    expect(mathInteractionsService.getWarningText()).toBe(
+      'The LHS of your equation is empty.');
+
     expect(mathInteractionsService.validateEquation('a/ = (-5)')).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
       '/ is not a valid postfix operator.');
