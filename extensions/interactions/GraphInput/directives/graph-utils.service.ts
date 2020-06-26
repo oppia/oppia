@@ -83,7 +83,7 @@ export class GraphUtilsService {
    */
   markAccessible(
       startVertex: number, adjacencyLists: number[][],
-      isVisited: (string | boolean)[]): void {
+      isVisited: boolean[]): void {
     isVisited[startVertex] = true;
     for (var i = 0; i < adjacencyLists[startVertex].length; i++) {
       var nextVertex = adjacencyLists[startVertex][i];
@@ -95,7 +95,7 @@ export class GraphUtilsService {
 
   findCycle(
       currentVertex: number, previousVertex: number,
-      adjacencyLists: number[][], isVisited: (string | boolean)[],
+      adjacencyLists: number[][], isVisited: string[],
       isDirected: boolean): boolean {
     isVisited[currentVertex] = this.DFS_STATUS.STILL_VISITING;
     for (var i = 0; i < adjacencyLists[currentVertex].length; i++) {

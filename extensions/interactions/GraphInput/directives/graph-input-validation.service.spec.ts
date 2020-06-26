@@ -80,6 +80,21 @@ describe('GraphInputValidationService', () => {
       },
       canEditVertexLabel: {
         value: false
+      },
+      canMoveVertex: {
+        value: false
+      },
+      canDeleteVertex: {
+        value: false
+      },
+      canDeleteEdge: {
+        value: false
+      },
+      canAddVertex: {
+        value: false
+      },
+      canAddEdge: {
+        value: false
       }
     };
 
