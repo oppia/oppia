@@ -135,6 +135,10 @@ describe('MathInteractionsService', () => {
     expect(mathInteractionsService.getWarningText()).toBe(
       'It looks like your answer has an invalid bracket pairing.');
 
+    expect(mathInteractionsService.validateExpression('a_2 + 3')).toBeFalse();
+    expect(mathInteractionsService.getWarningText()).toBe(
+      'Invalid character \'_\' present in the expression.');
+
     expect(mathInteractionsService.validateExpression(
       '3.4.5 + 45/a')).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
@@ -244,5 +248,22 @@ describe('MathInteractionsService', () => {
       '3.4.5 = 45/a')).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
       'Invalid integer.');
+  });
+
+  it('should insert missing multiplication signs', function() {
+    expect(mathInteractionsService.insertMultiplicationSigns(
+      'ab/2')).toBe('a*b/2');
+    expect(mathInteractionsService.insertMultiplicationSigns(
+      'alpha+ax^2')).toBe('alpha+a*x^2');
+    expect(mathInteractionsService.insertMultiplicationSigns(
+      'sqrt(xyz)')).toBe('sqrt(x*y*z)');
+    expect(mathInteractionsService.insertMultiplicationSigns(
+      'ax^2+2*ab+b^2')).toBe('a*x^2+2*a*b+b^2');
+    expect(mathInteractionsService.insertMultiplicationSigns(
+      'cos(theta/ab)+sin(xy)')).toBe('cos(theta/a*b)+sin(x*y)');
+    expect(mathInteractionsService.insertMultiplicationSigns(
+      'log(alpha/pi)')).toBe('log(alpha/pi)');
+    expect(mathInteractionsService.insertMultiplicationSigns(
+      'Al^2')).toBe('A*l^2');
   });
 });

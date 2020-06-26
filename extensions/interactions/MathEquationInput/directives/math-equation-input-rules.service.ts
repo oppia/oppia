@@ -24,13 +24,20 @@ const nerdamer = require('nerdamer');
 import { AlgebraicExpressionInputRulesService } from
   // eslint-disable-next-line max-len
   'interactions/AlgebraicExpressionInput/directives/algebraic-expression-input-rules.service.ts';
-import { split } from 'angular-animate';
+import { MathInteractionsService } from 'services/math-interactions.service.ts';
 
 @Injectable({
   providedIn: 'root'
 })
 export class MathEquationInputRulesService {
   MatchesExactlyWith(answer: string, inputs: {x: string, y: string}): boolean {
+    let aeirs = new AlgebraicExpressionInputRulesService();
+    let mis = new MathInteractionsService();
+
+    // Inserting '*' signs between variables if not present.
+    answer = mis.insertMultiplicationSigns(answer);
+    inputs.x = mis.insertMultiplicationSigns(inputs.x);
+
     let positionOfTerms = inputs.y;
 
     let splitAnswer = answer.split('=');
@@ -38,8 +45,6 @@ export class MathEquationInputRulesService {
 
     let splitInput = inputs.x.split('=');
     let lhsInput = splitInput[0], rhsInput = splitInput[1];
-
-    let aeirs = new AlgebraicExpressionInputRulesService();
 
     if (positionOfTerms === 'lhs') {
       return aeirs.MatchesExactlyWith(lhsAnswer, {x: lhsInput});
@@ -63,13 +68,20 @@ export class MathEquationInputRulesService {
   }
 
   IsEquivalentTo(answer: string, inputs: {x: string}): boolean {
+    let aeirs = new AlgebraicExpressionInputRulesService();
+    let mis = new MathInteractionsService();
+
     let splitAnswer = answer.split('=');
     let lhsAnswer = splitAnswer[0], rhsAnswer = splitAnswer[1];
 
     let splitInput = inputs.x.split('=');
     let lhsInput = splitInput[0], rhsInput = splitInput[1];
 
-    let aeirs = new AlgebraicExpressionInputRulesService();
+    // Inserting '*' signs between variables if not present.
+    lhsAnswer = mis.insertMultiplicationSigns(lhsAnswer);
+    rhsAnswer = mis.insertMultiplicationSigns(rhsAnswer);
+    lhsInput = mis.insertMultiplicationSigns(lhsInput);
+    rhsInput = mis.insertMultiplicationSigns(rhsInput);
 
     // We bring all terms in both equations to one side and then compare.
 

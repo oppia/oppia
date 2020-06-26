@@ -19,6 +19,8 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
+import { AppConstants } from 'app.constants';
+
 const nerdamer = require('nerdamer');
 
 @Injectable({
@@ -64,6 +66,9 @@ export class MathInteractionsService {
       '<') !== -1 || expressionString.indexOf('>') !== -1) {
       this.warningText = 'It looks like you have entered an ' +
         'equation/inequality. Please enter an expression instead.';
+      return false;
+    } else if (expressionString.indexOf('_') !== -1) {
+      this.warningText = 'Invalid character \'_\' present in the expression.';
       return false;
     }
     try {
@@ -134,6 +139,25 @@ export class MathInteractionsService {
 
   getWarningText(): string {
     return this.warningText;
+  }
+
+  insertMultiplicationSigns(expressionString: string) {
+    // Assumes that given expressionString is valid.
+    // Nerdamer allows multi-character variables so, 'ax+b' will be considered
+    // to have variables: [ax, b], but we want a and x to be considered as
+    // separate variables which is why we would assume that any such instance of
+    // consecutive characters means they are single characters multiplied with
+    // each other. So, 'ax+b' would be transformed to 'a*x+b' via this function.
+    let variables = nerdamer(expressionString).variables();
+    for (let variable of variables) {
+      // We wouldn't want to interpolate '*' signs between valid greek letters.
+      if (AppConstants.GREEK_LETTERS.indexOf(variable) === -1) {
+        let separatedVariables = variable.split('').join('*');
+        expressionString = expressionString.replace(
+          variable, separatedVariables);
+      }
+    }
+    return expressionString;
   }
 }
 

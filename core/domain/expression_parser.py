@@ -35,18 +35,15 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import re
 import string
 
+from constants import constants
 import python_utils
 
-_GREEK_LETTERS = [
-    'alpha', 'beta', 'gamma', 'delta', 'epsilon', 'zeta', 'eta', 'theta',
-    'iota', 'kappa', 'lambda', 'mu', 'nu', 'xi', 'pi', 'rho', 'sigma', 'tau',
-    'upsilon', 'phi', 'chi', 'psi', 'omega', 'Gamma', 'Delta', 'Theta',
-    'Lambda', 'Xi', 'Pi', 'Sigma', 'Phi', 'Psi', 'Omega']
 _MATH_FUNCTION_NAMES = [
     'log', 'ln', 'sqrt', 'abs', 'sin', 'cos', 'tan', 'sec', 'csc', 'cot',
     'arcsin', 'arccos', 'arctan', 'sinh', 'cosh', 'tanh']
 _VALID_OPERATORS = ['[', '{', '(', ')', '}', ']', '+', '-', '/', '*', '^']
-VALID_ALGEBRAIC_IDENTIFIERS = list(string.ascii_letters) + _GREEK_LETTERS
+VALID_ALGEBRAIC_IDENTIFIERS = (
+    list(string.ascii_letters) + constants.GREEK_LETTERS)
 
 _TOKEN_CATEGORY_IDENTIFIER = 'identifier'
 _TOKEN_CATEGORY_FUNCTION = 'function'

@@ -5281,6 +5281,14 @@ export = {
     "floor", "if", "log", "or", "pow", "round", "then"
   ],
 
+  // Greek letters allowed in math interactions.
+  "GREEK_LETTERS": [
+    "alpha", "beta", "gamma", "delta", "epsilon", "zeta", "eta", "theta",
+    "iota", "kappa", "lambda", "mu", "nu", "xi", "pi", "rho", "sigma", "tau",
+    "upsilon", "phi", "chi", "psi", "omega", "Gamma", "Delta", "Theta",
+    "Lambda", "Xi", "Pi", "Sigma", "Phi", "Psi", "Omega"
+  ],
+
   // Unfinished features.
   "SHOW_TRAINABLE_UNRESOLVED_ANSWERS": false,
 

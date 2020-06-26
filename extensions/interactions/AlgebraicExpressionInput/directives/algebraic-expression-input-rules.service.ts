@@ -19,6 +19,8 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
+import { MathInteractionsService } from 'services/math-interactions.service.ts';
+
 const nerdamer = require('nerdamer');
 
 @Injectable({
@@ -26,10 +28,20 @@ const nerdamer = require('nerdamer');
 })
 export class AlgebraicExpressionInputRulesService {
   MatchesExactlyWith(answer: string, inputs: {x: string}): boolean {
+    let mis = new MathInteractionsService();
+    // Inserting '*' signs between variables if not present.
+    answer = mis.insertMultiplicationSigns(answer);
+    inputs.x = mis.insertMultiplicationSigns(inputs.x);
+
     return nerdamer(answer).eq(inputs.x);
   }
 
   IsEquivalentTo(answer: string, inputs: {x: string}): boolean {
+    let mis = new MathInteractionsService();
+    // Inserting '*' signs between variables if not present.
+    answer = mis.insertMultiplicationSigns(answer);
+    inputs.x = mis.insertMultiplicationSigns(inputs.x);
+
     let expandedLearnerAnswer = nerdamer(answer).expand();
     let simplifiedLearnerAnswer = nerdamer(
       `simplify(${expandedLearnerAnswer})`);
