@@ -28,7 +28,7 @@ var ExplorationEditorPage =
 var ExplorationPlayerPage =
   require('../protractor_utils/ExplorationPlayerPage.js');
 
-fdescribe('Exploration history', function() {
+describe('Exploration history', function() {
   var explorationEditorPage = null;
   var explorationPlayerPage = null;
   var explorationEditorHistoryTab = null;
@@ -48,7 +48,7 @@ fdescribe('Exploration history', function() {
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
   });
 
-  fit('should correctly display the dates the commits were created', async function() {
+  it('should correctly display the dates of the commits', async function() {
     await users.createUser('user@historyTab.com', 'userHistoryTab');
     await users.login('user@historyTab.com');
 
@@ -59,7 +59,7 @@ fdescribe('Exploration history', function() {
     // Switch to the history tab because that is where the commit history
     // is displayed.
     await explorationEditorPage.navigateToHistoryTab();
-    await explorationEditorHistoryTab.expectCommitDatesToBeDisplayedInHistoryTab();
+    await explorationEditorHistoryTab.expectCommitDatesToBeDisplayed();
   });
 
   it('should display the history', async function() {
