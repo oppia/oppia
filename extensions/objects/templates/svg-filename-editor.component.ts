@@ -248,7 +248,7 @@ angular.module('oppia').component('svgFilenameEditor', {
               height: dimensions.height + 'px',
               width: dimensions.width + 'px'
             };
-            $scope.$apply();
+            $scope.$applyAsync();
           };
           img.src = getTrustedResourceUrlForSVGFileName(filename);
         };
@@ -335,13 +335,13 @@ angular.module('oppia').component('svgFilenameEditor', {
                   height: dimensions.height + 'px',
                   width: dimensions.width + 'px'
                 };
-                $scope.$apply();
+                $scope.$applyAsync();
               };
               img.src = getTrustedResourceUrlForSVGFileName(data.filename);
             }, function(parsedResponse) {
               AlertsService.addWarning(
                 parsedResponse.error || 'Error communicating with server.');
-              $scope.$apply();
+              $scope.$applyAsync();
             });
           }
         }
@@ -783,7 +783,7 @@ angular.module('oppia').component('svgFilenameEditor', {
               ctrl.polyOptions.lines[ctrl.polyOptions.lineCounter]);
             ctrl.polyOptions.lineCounter++;
           }
-          $scope.$apply();
+          $scope.$applyAsync();
         });
 
         ctrl.canvas.on('mouse:move', function(options) {
@@ -822,7 +822,7 @@ angular.module('oppia').component('svgFilenameEditor', {
           if (ctrl.canvas.getActiveObject().get('type') === 'textbox') {
             ctrl.displayFontStyles = true;
           }
-          $scope.$apply();
+          $scope.$applyAsync();
         });
 
         ctrl.canvas.on('selection:updated', function() {
@@ -835,14 +835,14 @@ angular.module('oppia').component('svgFilenameEditor', {
           if (ctrl.canvas.getActiveObject().get('type') === 'textbox') {
             ctrl.displayFontStyles = true;
           }
-          $scope.$apply();
+          $scope.$applyAsync();
         });
 
         ctrl.canvas.on('selection:cleared', function() {
           ctrl.enableRemoveButton = false;
           ctrl.displayFontStyles = false;
         });
-        $scope.$apply();
+        $scope.$applyAsync();
       };
 
       ctrl.setCanvasDimensions = function() {
@@ -861,7 +861,7 @@ angular.module('oppia').component('svgFilenameEditor', {
           ctrl.canvasMaxWidth = width;
         }
         ctrl.canvas.renderAll();
-        $scope.$apply();
+        $scope.$applyAsync();
       };
 
       var initializeFabricJs = function() {
