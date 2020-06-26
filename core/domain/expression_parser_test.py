@@ -61,7 +61,7 @@ class HelperFunctionsUnitTests(test_utils.GenericTestBase):
         self.assertTrue(expression_parser.is_algebraic('alpha/gamma'))
         self.assertTrue(expression_parser.is_algebraic('A + 2/3'))
         # The following tests might seem as invalid but the individual letters
-        # will be joined via '*' during tokenization which makes them valid. 
+        # will be joined via '*' during tokenization which makes them valid.
         self.assertTrue(expression_parser.is_algebraic('Alpha'))
         self.assertTrue(expression_parser.is_algebraic('invalid + 2'))
         self.assertTrue(expression_parser.is_algebraic('alpha + bet/22'))
