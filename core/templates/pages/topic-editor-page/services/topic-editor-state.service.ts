@@ -194,7 +194,6 @@ angular.module('oppia').factory('TopicEditorStateService', [
             'There was an error when loading the topic rights.');
           _topicIsLoading = false;
           $rootScope.$apply();
-
         });
       },
 
