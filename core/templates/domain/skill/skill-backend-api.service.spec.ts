@@ -118,7 +118,9 @@ describe('Skill backend API service', function() {
 
     sampleResponse = {
       skill: skillDict,
-      grouped_skill_summaries: {}
+      grouped_skill_summaries: {},
+      topic_name: 'topic1',
+      subtopic_name: 'subtopic1',
     };
 
     sampleResponse2 = {
@@ -145,7 +147,9 @@ describe('Skill backend API service', function() {
 
       expect(successHandler).toHaveBeenCalledWith({
         skill: sampleResponse.skill,
-        groupedSkillSummaries: sampleResponse.grouped_skill_summaries
+        groupedSkillSummaries: sampleResponse.grouped_skill_summaries,
+        topicName: sampleResponse.topic_name,
+        subtopicName: sampleResponse.subtopic_name,
       });
       expect(failHandler).not.toHaveBeenCalled();
     });

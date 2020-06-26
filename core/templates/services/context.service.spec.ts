@@ -54,6 +54,15 @@ describe('Context service', () => {
     it('should affirm that the page forbids editing of RTE components', () => {
       expect(ecs.canAddOrEditComponents()).toBe(false);
     });
+
+    it('should correct set and the page context', () => {
+      const questionPlayerContext = 'question_player';
+      ecs.setPageContext(questionPlayerContext);
+      expect(ecs.getPageContext()).toBe(questionPlayerContext);
+
+      ecs.clearPageContext();
+      expect(ecs.getPageContext()).toBe('learner');
+    });
   });
 
   describe('behavior in the exploration learner embed view', () => {

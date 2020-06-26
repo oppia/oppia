@@ -59,10 +59,14 @@ angular.module('oppia').directive('oppiaInteractiveTextInput', [
             return ctrl.answer.length > 0;
           };
           ctrl.$onInit = function() {
-            ctrl.placeholder = HtmlEscaperService.escapedJsonToObj(
-              $attrs.placeholderWithValue);
-            ctrl.rows = (
-              HtmlEscaperService.escapedJsonToObj($attrs.rowsWithValue));
+            if ($attrs.placeholderWithValue !== 'undefined') {
+              ctrl.placeholder = HtmlEscaperService.escapedJsonToObj(
+                $attrs.placeholderWithValue);
+            }
+            if ($attrs.rowsWithValue !== 'undefined') {
+              ctrl.rows = (
+                HtmlEscaperService.escapedJsonToObj($attrs.rowsWithValue));
+            }
             ctrl.answer = '';
             ctrl.labelForFocusTarget = $attrs.labelForFocusTarget || null;
 

@@ -46,6 +46,7 @@ angular.module('oppia').factory('QuestionPlayerEngineService', [
       QuestionObjectFactory, ReadOnlyExplorationBackendApiService,
       StateCardObjectFactory, UrlService, INTERACTION_DISPLAY_MODE_INLINE,
       INTERACTION_SPECS) {
+    ContextService.setPageContext('question_player');
     var _explorationId = ContextService.getExplorationId();
     var _questionPlayerMode = ContextService.isInQuestionPlayerMode();
     var version = UrlService.getExplorationVersionFromUrl();
@@ -131,6 +132,10 @@ angular.module('oppia').factory('QuestionPlayerEngineService', [
       successCallback(initialCard, nextFocusLabel);
     };
 
+    var _clearQuestions = function() {
+      questions = [];
+    };
+
     var _getCurrentStateData = function() {
       return questions[currentIndex].getStateData();
     };
@@ -188,6 +193,7 @@ angular.module('oppia').factory('QuestionPlayerEngineService', [
       getExplorationVersion: function() {
         return version;
       },
+      clearQuestions: _clearQuestions,
       getLanguageCode: function() {
         return questions[currentIndex].getLanguageCode();
       },

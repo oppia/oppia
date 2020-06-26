@@ -33,6 +33,7 @@ require(
   'skill-rubrics-editor.directive.ts');
 require('components/rubrics-editor/rubrics-editor.directive.ts');
 require('domain/utilities/url-interpolation.service.ts');
+require('pages/skill-editor-page/services/question-creation.service.ts');
 require('pages/skill-editor-page/services/skill-editor-state.service.ts');
 
 angular.module('oppia').directive('skillEditorMainTab', [
@@ -45,10 +46,30 @@ angular.module('oppia').directive('skillEditorMainTab', [
         '/pages/skill-editor-page/editor-tab/' +
         'skill-editor-main-tab.directive.html'),
       controller: [
-        '$scope', 'SkillEditorStateService',
-        function($scope, SkillEditorStateService) {
+        '$scope', 'SkillEditorStateService', 'QuestionCreationService',
+        function($scope, SkillEditorStateService, QuestionCreationService) {
+          var ctrl = this;
+          $scope.createQuestion = function() {
+            QuestionCreationService.createQuestion();
+          };
+
+          $scope.getSubtopicName = function() {
+            return (
+              $scope.subtopicName || SkillEditorStateService.getSubtopicName());
+          };
+
+          $scope.getTopicName = function() {
+            return $scope.topicName || SkillEditorStateService.getTopicName();
+          };
+
           $scope.hasLoadedSkill = function() {
             return SkillEditorStateService.hasLoadedSkill();
+          };
+
+          ctrl.$onInit = function() {
+            $scope.selectedTopic = null;
+            $scope.topicName = null;
+            $scope.subtopicName = null;
           };
         }
       ]

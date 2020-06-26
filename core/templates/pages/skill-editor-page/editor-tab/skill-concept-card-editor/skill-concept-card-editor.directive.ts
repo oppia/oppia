@@ -31,6 +31,8 @@ require(
   'pages/skill-editor-page/editor-tab/skill-concept-card-editor/' +
   'worked-example-editor.directive.ts');
 require(
+  'pages/skill-editor-page/editor-tab/skill-preview-modal.controller.ts');
+require(
   'pages/skill-editor-page/modal-templates/' +
   'add-worked-example-modal.controller.ts');
 
@@ -155,6 +157,23 @@ angular.module('oppia').directive('skillConceptCardEditor', [
               // Note to developers:
               // This callback is triggered when the Cancel button is clicked.
               // No further action is needed.
+            });
+          };
+
+          $scope.showSkillPreview = function() {
+            var title = SkillEditorStateService.getSkill().getDescription();
+            var content = (
+              $scope.bindableFieldsDict.displayedConceptCardExplanation);
+            $uibModal.open({
+              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                '/pages/skill-editor-page/editor-tab/' +
+                'skill-preview-modal.component.html'),
+              backdrop: true,
+              resolve: {
+                title: () => title,
+                content: () => content
+              },
+              controller: 'SkillPreviewModalController'
             });
           };
 

@@ -114,6 +114,15 @@ export class ContextService {
       return ServicesConstants.PAGE_CONTEXT.OTHER;
     }
   }
+  // This is required in cases like when we need to access question player
+  // from the skill editor preview tab.
+  setPageContext(pageContext): void {
+    this.pageContext = pageContext;
+  }
+
+  clearPageContext(): void {
+    this.pageContext = null;
+  }
 
   canEntityReferToSkills(): boolean {
     return (
