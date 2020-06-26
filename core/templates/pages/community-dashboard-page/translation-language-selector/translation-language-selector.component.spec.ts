@@ -31,8 +31,8 @@ describe('Translation language selector', () => {
   let component: TranslationLanguageSelectorComponent;
   let fixture: ComponentFixture<TranslationLanguageSelectorComponent>;
 
-  let featuredTranslationLanguageObjectFactory =
-    new FeaturedTranslationLanguageObjectFactory();
+  let featuredTranslationLanguageObjectFactory = (
+    new FeaturedTranslationLanguageObjectFactory());
   let featuredLanguages = [
     featuredTranslationLanguageObjectFactory.createFromBackendDict({
       language_code: 'fr',
