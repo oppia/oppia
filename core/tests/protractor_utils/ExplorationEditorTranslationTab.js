@@ -288,6 +288,13 @@ var ExplorationEditorTranslationTab = function() {
     await waitFor.pageToFullyLoad();
   };
 
+  this.uploadAudioFileForLanguage = async function(
+      language, relativePathOfAudioToUpload) {
+    await this.changeLanguage(language);
+    await this.openUploadAudioModal();
+    await this.uploadAudio(relativePathOfAudioToUpload);
+  };
+
   this.setTranslation = async function(richTextInstructions) {
     await waitFor.elementToBeClickable(
       editTranslationButtton,
