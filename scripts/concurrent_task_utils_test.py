@@ -55,7 +55,7 @@ class ConcurrentTaskUtilsTests(test_utils.GenericTestBase):
 
 class CreateTaskTests(ConcurrentTaskUtilsTests):
     """Tests for create_task method."""
-    def test_create_task(self):
+    def test_create_task_with_success(self):
         task = concurrent_task_utils.create_task(
             test_function, True, self.semaphore)
         self.assertTrue(isinstance(task, concurrent_task_utils.TaskThread))

@@ -189,8 +189,7 @@ def check_codeowner_file(file_cache, verbose_mode_enabled):
         verbose_mode_enabled: bool. True if verbose mode is enabled.
 
     Returns:
-        summary_messages: list(str). List of summary messages returned by the
-            lint checks.
+        list(str). List of summary messages returned by the lint checks.
     """
     stdout = sys.stdout
     if verbose_mode_enabled:

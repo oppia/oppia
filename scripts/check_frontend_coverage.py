@@ -642,7 +642,7 @@ def check_coverage_changes():
         total_lines = stanza.total_lines
         covered_lines = stanza.covered_lines
 
-        # Ignore files in core/tests/linter_tests/ directory, as these
+        # Ignore files in scripts/linters/test_files/ directory, as these
         # are test files used by linter.
         if file_name.startswith(('invalid', 'valid')):
             continue

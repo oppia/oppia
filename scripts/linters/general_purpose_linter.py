@@ -428,7 +428,7 @@ BAD_PATTERNS_PYTHON_REGEXP = [
         'excluded_dirs': ()
     },
     {
-        'regexp': re.compile(r'[^.|\s]\(map\('),
+        'regexp': re.compile(r'[^.|\w|\s]map\('),
         'message': 'Please use python_utils.MAP.',
         'excluded_files': (),
         'excluded_dirs': ()
@@ -543,7 +543,7 @@ def check_bad_pattern_in_file(filepath, file_content, pattern):
             Object containing details for the pattern to be checked.
 
     Returns:
-        tuple(failed, summary_message). A 2-tuple whose first element is a bool
+        tuple(bool, list(str)). A 2-tuple whose first element is a bool
         which set to True if there is bad pattern found else False, whose second
         element is a list of failed messages.
     """
@@ -583,7 +583,7 @@ def check_file_type_specific_bad_pattern(filepath, content):
         content: str. Contents of the file.
 
      Returns:
-        tuple(failed, total_error_count, summary_messages). A 3-tuple whose
+        tuple(bool, int, list(str)). A 3-tuple whose
         first element is a bool which is True if there is a bad pattern found,
         second element is an int which gives the number of errors and third
         element is a list of failed messages.
@@ -757,17 +757,21 @@ class GeneralPurposeLinter(python_utils.OBJECT):
                             total_error_count += 1
 
                 for regexp in BAD_PATTERNS_REGEXP:
-                    tmp_failed, bad_pattern_summary_messages = (
+                    bad_pattern_check_failed, bad_pattern_summary_messages = (
                         check_bad_pattern_in_file(
                             filepath, file_content, regexp))
-                    if tmp_failed:
+                    if bad_pattern_check_failed:
                         summary_messages.extend(bad_pattern_summary_messages)
                         total_error_count += 1
 
-                temp_failed, temp_count, bad_pattern_summary_messages = (
-                    check_file_type_specific_bad_pattern(
-                        filepath, file_content))
-                failed = failed or temp_failed or tmp_failed
+                (
+                    file_type_specific_bad_pattern_failed,
+                    temp_count, bad_pattern_summary_messages) = (
+                        check_file_type_specific_bad_pattern(
+                            filepath, file_content))
+                failed = (
+                    failed or file_type_specific_bad_pattern_failed or
+                    bad_pattern_check_failed)
                 total_error_count += temp_count
                 summary_messages.extend(bad_pattern_summary_messages)
 

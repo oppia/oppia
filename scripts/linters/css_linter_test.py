@@ -69,22 +69,22 @@ class ThirdPartyCSSLintChecksManagerTests(test_utils.GenericTestBase):
 
         self.print_swap = self.swap(python_utils, 'PRINT', mock_print)
 
-    def test_all_filepaths(self):
+    def test_all_filepaths_with_success(self):
         third_party_linter = css_linter.ThirdPartyCSSLintChecksManager(
             CONFIG_PATH, self.filepaths, True)
         returned_filepaths = third_party_linter.all_filepaths
         self.assertEqual(returned_filepaths, self.filepaths)
 
     def test_perform_all_lint_checks_with_invalid_file(self):
+        third_party_linter = css_linter.ThirdPartyCSSLintChecksManager(
+            CONFIG_PATH, [INVALID_CSS_FILEPATH], True)
         with self.print_swap:
-            third_party_linter = css_linter.ThirdPartyCSSLintChecksManager(
-                CONFIG_PATH, [INVALID_CSS_FILEPATH], True)
             third_party_linter.perform_all_lint_checks()
         self.assertTrue(
-            test_utils.assert_same_list_elements(
-                ['19:16',
-                 'Unexpected whitespace before \":\"   declaration-colon-space-'
-                 'before'], self.linter_stdout))
+            test_utils.assert_same_list_elements([
+                '19:16',
+                'Unexpected whitespace before \":\"   declaration-colon-space-'
+                'before'], self.linter_stdout))
 
     def test_perform_all_lint_checks_with_invalid_stylelint_path(self):
         def mock_join(*unused_args):
@@ -92,9 +92,9 @@ class ThirdPartyCSSLintChecksManagerTests(test_utils.GenericTestBase):
 
         join_swap = self.swap(os.path, 'join', mock_join)
 
+        third_party_linter = css_linter.ThirdPartyCSSLintChecksManager(
+            CONFIG_PATH, [INVALID_CSS_FILEPATH], False)
         with self.print_swap, join_swap, self.assertRaises(SystemExit) as e:
-            third_party_linter = css_linter.ThirdPartyCSSLintChecksManager(
-                CONFIG_PATH, [INVALID_CSS_FILEPATH], False)
             third_party_linter.perform_all_lint_checks()
         self.assertEqual(e.exception.code, 1)
 
@@ -112,16 +112,16 @@ class ThirdPartyCSSLintChecksManagerTests(test_utils.GenericTestBase):
         popen_swap = self.swap_with_checks(
             subprocess, 'Popen', mock_popen)
 
+        third_party_linter = css_linter.ThirdPartyCSSLintChecksManager(
+            CONFIG_PATH, [VALID_CSS_FILEPATH], True)
         with self.print_swap, popen_swap, self.assertRaises(SystemExit) as e:
-            third_party_linter = css_linter.ThirdPartyCSSLintChecksManager(
-                CONFIG_PATH, [VALID_CSS_FILEPATH], True)
             third_party_linter.perform_all_lint_checks()
         self.assertEqual(e.exception.code, 1)
 
     def test_perform_all_lint_checks_with_no_files(self):
+        third_party_linter = css_linter.ThirdPartyCSSLintChecksManager(
+            CONFIG_PATH, [], False)
         with self.print_swap:
-            third_party_linter = css_linter.ThirdPartyCSSLintChecksManager(
-                CONFIG_PATH, [], False)
             third_party_linter.perform_all_lint_checks()
         self.assertTrue(
             test_utils.assert_same_list_elements(
@@ -129,9 +129,9 @@ class ThirdPartyCSSLintChecksManagerTests(test_utils.GenericTestBase):
                 self.linter_stdout))
 
     def test_perform_all_lint_checks_with_valid_file(self):
+        third_party_linter = css_linter.ThirdPartyCSSLintChecksManager(
+            CONFIG_PATH, [VALID_CSS_FILEPATH], False)
         with self.print_swap:
-            third_party_linter = css_linter.ThirdPartyCSSLintChecksManager(
-                CONFIG_PATH, [VALID_CSS_FILEPATH], False)
             third_party_linter.perform_all_lint_checks()
         self.assertTrue(
             test_utils.assert_same_list_elements(

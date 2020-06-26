@@ -79,10 +79,10 @@ class CustomHTMLParserTests(test_utils.GenericTestBase):
                 [INVALID_STYLE_INDENTATION_HTML_FILEPATH], FILE_CACHE, True,
                 debug=True).perform_all_lint_checks()
         self.assertTrue(
-            test_utils.assert_same_list_elements(
-                ['invalid_style_indentation.html --> Expected indentation of 6,'
-                 ' found indentation of 4 for content of style tag on line 7'],
-                self.linter_stdout))
+            test_utils.assert_same_list_elements([
+                'invalid_style_indentation.html --> Expected indentation of 6,'
+                ' found indentation of 4 for content of style tag on line 7'
+                ], self.linter_stdout))
 
     def test_custom_linter_with_invalid_indentation(self):
         with self.print_swap:
@@ -90,10 +90,9 @@ class CustomHTMLParserTests(test_utils.GenericTestBase):
                 [INVALID_INDENTATION_HTML_FILEPATH], FILE_CACHE, True,
                 debug=True).perform_all_lint_checks()
         self.assertTrue(
-            test_utils.assert_same_list_elements(
-                ['Expected indentation of 10, found indentation of 12 for '
-                 'classroom-page tag on line 14'],
-                self.linter_stdout))
+            test_utils.assert_same_list_elements([
+                'Expected indentation of 10, found indentation of 12 for '
+                'classroom-page tag on line 14'], self.linter_stdout))
 
     def test_custom_linter_with_invalid_quotes(self):
         with self.print_swap:
@@ -101,11 +100,10 @@ class CustomHTMLParserTests(test_utils.GenericTestBase):
                 [INVALID_QUOTES_HTML_FILEPATH], FILE_CACHE, True,
                 debug=True).perform_all_lint_checks()
         self.assertTrue(
-            test_utils.assert_same_list_elements(
-                ['The value color:white; of attribute '
-                 'style for the tag content on line 12 should be enclosed '
-                 'within double quotes.'],
-                self.linter_stdout))
+            test_utils.assert_same_list_elements([
+                'The value color:white; of attribute '
+                'style for the tag content on line 12 should be enclosed '
+                'within double quotes.'], self.linter_stdout))
 
     def test_custom_linter_with_invalid_alignment(self):
         with self.print_swap:
@@ -113,10 +111,9 @@ class CustomHTMLParserTests(test_utils.GenericTestBase):
                 [INVALID_ALIGNMENT_HTML_FILEPATH], FILE_CACHE, True,
                 debug=True).perform_all_lint_checks()
         self.assertTrue(
-            test_utils.assert_same_list_elements(
-                ['Attribute for tag content on line 13 should align with the '
-                 'leftmost attribute on line 12'],
-                self.linter_stdout))
+            test_utils.assert_same_list_elements([
+                'Attribute for tag content on line 13 should align with the '
+                'leftmost attribute on line 12'], self.linter_stdout))
 
     def test_custom_linter_with_invalid_tags(self):
         with self.print_swap:
@@ -140,10 +137,10 @@ class CustomHTMLParserTests(test_utils.GenericTestBase):
                 [INVALID_MISMATCH_INDENTATION_HTML_FILEPATH], FILE_CACHE, True,
                 debug=True).perform_all_lint_checks()
         self.assertTrue(
-            test_utils.assert_same_list_elements(
-                ['Indentation for end tag content on line 18 does not match the'
-                 ' indentation of the start tag content on line 12'],
-                self.linter_stdout))
+            test_utils.assert_same_list_elements([
+                'Indentation for end tag content on line 18 does not match the'
+                ' indentation of the start tag content on line 12'
+                ], self.linter_stdout))
 
     def test_custom_without_html_end_tag(self):
         with self.print_swap:
@@ -207,7 +204,7 @@ class CustomHTMLParserTests(test_utils.GenericTestBase):
                 ['line 10, col 20, line contains trailing whitespace'],
                 self.linter_stdout))
 
-    def test_get_linters(self):
+    def test_get_linters_with_success(self):
         custom_linter, third_party_linter = html_linter.get_linters(
             [VALID_HTML_FILEPATH], FILE_CACHE, verbose_mode_enabled=True)
         self.assertTrue(
