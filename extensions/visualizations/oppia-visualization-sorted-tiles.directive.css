@@ -1,0 +1,28 @@
+ol.oppia-visualization-sorted-tiles {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+li.oppia-visualization-sorted-tiles-tile {
+  background-color: rgba(245,245,245,1);
+  border-radius: 27px;
+  display: inline-block;
+  margin-right: 22px;
+  min-width: 100px;
+  padding: 25px;
+}
+li.oppia-visualization-sorted-tiles-tile .oppia-visualization-sorted-tiles-tile-answer {
+  color: rgba(0,0,0,0.87);
+  font-family: "Roboto", Arial, sans-serif;
+  font-size: 14px;
+  letter-spacing: 0.22px;
+  line-height: 16px;
+}
+li.oppia-visualization-sorted-tiles-tile .oppia-visualization-sorted-tiles-tile-frequency {
+  color: rgba(0,0,0,0.54);
+  font-family: "Roboto", Arial, sans-serif;
+  font-size: 14px;
+  letter-spacing: 0.24px;
+  line-height: 16px;
+  margin-top: 7px;
+}

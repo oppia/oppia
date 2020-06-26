@@ -284,6 +284,62 @@ class JsTsLintChecksManager(python_utils.OBJECT):
 
         return [summary_message]
 
+    def _check_http_requests(self):
+        """Checks if the http requests are made only by
+        backend-api.service.ts.
+        """
+
+        if self.verbose_mode_enabled:
+            python_utils.PRINT('Starting HTTP requests check')
+            python_utils.PRINT('----------------------------------------')
+
+        http_client_pattern = r':\n? *HttpClient'
+
+        excluded_files = [
+            'core/templates/services/request-interceptor.service.spec.ts'
+        ]
+
+        summary_messages = []
+
+        with linter_utils.redirect_stdout(sys.stdout):
+            failed = False
+
+            for file_path in self.all_filepaths:
+                if file_path in excluded_files:
+                    continue
+
+                if file_path.endswith('backend-api.service.ts'):
+                    continue
+
+                file_content = FILE_CACHE.read(file_path)
+
+                if re.findall(http_client_pattern, file_content):
+                    failed = True
+                    summary_message = (
+                        '%s --> An instance of HttpClient is found in this '
+                        'file. You are not allowed to create http requests '
+                        'from files that are not backend api services.' % (
+                            file_path))
+                    summary_messages.append(summary_message)
+                    python_utils.PRINT(summary_message)
+                    python_utils.PRINT('')
+
+            if failed:
+                summary_message = (
+                    '%s HTTP requests check failed' % (
+                        linter_utils.FAILED_MESSAGE_PREFIX))
+                summary_messages.append(summary_message)
+            else:
+                summary_message = (
+                    '%s HTTP requests check passed' % (
+                        linter_utils.SUCCESS_MESSAGE_PREFIX))
+                summary_messages.append(summary_message)
+
+            python_utils.PRINT(summary_message)
+            python_utils.PRINT('')
+
+        return summary_messages
+
     def _check_extra_js_files(self):
         """Checks if the changes made include extra js files in core
         or extensions folder which are not specified in
@@ -865,6 +921,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
 
         any_type_messages = self._check_any_type()
         extra_js_files_messages = self._check_extra_js_files()
+        http_requests_messages = self._check_http_requests()
         js_and_ts_component_messages = (
             self._check_js_and_ts_component_name_and_count())
         directive_scope_messages = self._check_directive_scope()
@@ -874,8 +931,9 @@ class JsTsLintChecksManager(python_utils.OBJECT):
 
         all_messages = (
             any_type_messages + extra_js_files_messages +
-            js_and_ts_component_messages + directive_scope_messages +
-            sorted_dependencies_messages + controller_dependency_messages)
+            http_requests_messages + js_and_ts_component_messages +
+            directive_scope_messages + sorted_dependencies_messages +
+            controller_dependency_messages)
         return all_messages
 
 

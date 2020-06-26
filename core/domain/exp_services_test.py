@@ -2638,7 +2638,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                     self.init_state_name, 'written_translations',
                     [1, 2]), 'Added fake text translations.')
 
-    def test_migrate_exploration_to_the_latest_schema_version(self):
+    def test_migrate_exp_to_latest_version_migrates_to_version(self):
         """Test migrate exploration state schema to the latest version."""
         latest_schema_version = python_utils.UNICODE(
             feconf.CURRENT_STATE_SCHEMA_VERSION)
@@ -2659,8 +2659,8 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 exploration.states_schema_version),
             latest_schema_version)
 
-    def test_migrate_exploration_to_not_the_latest_schema_version_fails(self):
-        """Test migrate state schema to not the latest version fails."""
+    def test_migrate_exp_to_earlier_version_raises_exception(self):
+        """Test migrate state schema to earlier version raises exception."""
         latest_schema_version = feconf.CURRENT_STATE_SCHEMA_VERSION
         not_latest_schema_version = python_utils.UNICODE(
             latest_schema_version - 1)
