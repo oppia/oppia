@@ -164,8 +164,11 @@ def tokenize(expression):
     for i in python_utils.RANGE(len(token_list)):
         final_token_list.append(token_list[i])
         if i != len(token_list) - 1:
-            # If a closing term is directly followed by a closing term, instead
-            # of an operator, we add the '*' operator.
+            # If a closing term is directly followed by another closing term,
+            # instead of being followed by an operator, we assume that the
+            # operation to be performed is multiplication and insert a '*' sign
+            # to explicitly denote the operation. For eg. 'ab+x' would be
+            # transformed into 'a*b+x'.
             if ((
                     token_list[i].category in _CLOSING_CATEGORIES or
                     token_list[i].text in _CLOSING_PARENS) and
