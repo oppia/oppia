@@ -342,7 +342,7 @@ import { SetInputValidationService } from
 import { SVMPredictionService } from 'classifiers/svm-prediction.service';
 import { SidebarStatusService } from 'domain/sidebar/sidebar-status.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
-import { SkillBackendApiService } from 'domain/skill/skill-backend-api.service';
+// import { SkillBackendApiService } from 'domain/skill/skill-backend-api.service';
 import { SkillCreationBackendApiService } from
   'domain/skill/skill-creation-backend-api.service';
 import { SkillDifficultyObjectFactory } from
@@ -1048,10 +1048,10 @@ export class UpgradedServices {
       new SearchExplorationsBackendApiService(
         upgradedServices['HttpClient'],
         upgradedServices['UrlInterpolationService']);
-    upgradedServices['SkillBackendApiService'] =
-      new SkillBackendApiService(
-        upgradedServices['HttpClient'],
-        upgradedServices['UrlInterpolationService']);
+    // upgradedServices['SkillBackendApiService'] =
+    //   new SkillBackendApiService(
+    //     upgradedServices['HttpClient'],
+    //     upgradedServices['UrlInterpolationService']);
     upgradedServices['SkillCreationBackendApiService'] =
       new SkillCreationBackendApiService(
         upgradedServices['HttpClient']);

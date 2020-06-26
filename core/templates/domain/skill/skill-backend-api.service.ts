@@ -25,6 +25,9 @@ import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import cloneDeep from 'lodash/cloneDeep';
 
+import { SkillResponseObjectFactory, SkillResponse, ISkillResponseBackendDict } from 'domain/skill/SkillResponseObjectFactory';
+import { MultiSkillsResponseObjectFactory, MultiSkillsResponse, IMultiSkillsResponseBackendDict } from '/usr/local/google/home/msainanee/opensource/oppia/core/templates/domain/skill/MultiSkillsResponseObjectFactory';
+
 
 export interface ISkillUpdatePayload {
   'version': number,
@@ -39,14 +42,14 @@ export interface IChangeDict {
   'newValue'?: string;
 }
 
-export interface ISkillResponse {
-  'skill': Object;
-  'grouped_skill_summaries': Object;
-}
+// export interface ISkillResponse {
+//   'skill': Object;
+//   'grouped_skill_summaries': Object;
+// }
 
-export interface IMultiSkillsResponse {
-  'skills': Object;
-}
+// export interface IMultiSkillsResponse {
+//   'skills': Object;
+// }
 
 @Injectable ({
   providedIn: 'root'
@@ -54,7 +57,9 @@ export interface IMultiSkillsResponse {
 export class SkillBackendApiService {
   constructor(
     private http: HttpClient,
-    private urlInterpolation: UrlInterpolationService) {}
+    private urlInterpolation: UrlInterpolationService,
+    private skillResponseObjectFactory: SkillResponseObjectFactory,
+    private multiSkillsResponseObjectFactory: MultiSkillsResponseObjectFactory) {}
 
   private _fetchSkill(
       skillId: string,
@@ -65,17 +70,16 @@ export class SkillBackendApiService {
         skill_id: skillId
       });
 
-    this.http.get(
+    this.http.get<ISkillResponseBackendDict>(
       skillDataUrl).toPromise().then(
-      (response: ISkillResponse) => {
+      (response) => {
         let skill = cloneDeep(response.skill);
         let groupedSkillSummaryDicts = cloneDeep(
           response.grouped_skill_summaries);
         if (successCallback) {
-          successCallback({
-            skill: skill,
-            groupedSkillSummaries: groupedSkillSummaryDicts
-          });
+          successCallback(this.skillResponseObjectFactory.createFromBackendDict(
+            {skill: skill, 
+            grouped_skill_summaries: groupedSkillSummaryDicts}));
         }
       }, (errorResponse) => {
         if (errorCallback) {
@@ -93,12 +97,13 @@ export class SkillBackendApiService {
         comma_separated_skill_ids: skillIds.join(',')
       });
 
-    this.http.get(
+    this.http.get<IMultiSkillsResponseBackendDict>(
       skillDataUrl).toPromise().then(
-      (response: IMultiSkillsResponse) => {
+      (response) => {
         let skills = cloneDeep(response.skills);
         if (successCallback) {
-          successCallback(skills);
+          successCallback(this.multiSkillsResponseObjectFactory.createFromBackendDict({
+            skills: skills}));
         }
       }, (errorResponse) => {
         if (errorCallback) {
@@ -124,9 +129,9 @@ export class SkillBackendApiService {
     };
 
 
-    this.http.put(
+    this.http.put<ISkillResponseBackendDict>(
       editableSkillDataUrl, putData).toPromise().then(
-      (response: ISkillResponse) => {
+      (response) => {
         let skill = cloneDeep(response.skill);
         if (successCallback) {
           successCallback(skill);
