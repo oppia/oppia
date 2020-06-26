@@ -176,7 +176,7 @@ export class DragAndDropSortInputValidationService {
               }
             }
 
-            if (areAnyItemsEmpty) {
+            if (areAnyItemsEmpty || xInputs.length === 0) {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
                 message: 'Please ensure the items are nonempty.'

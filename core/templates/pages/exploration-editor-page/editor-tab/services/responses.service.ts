@@ -183,6 +183,12 @@ angular.module('oppia').factory('ResponsesService', [
       }
     };
 
+    var _updateAnswerChoices = function(newAnswerChoices) {
+      var oldAnswerChoices = angular.copy(_answerChoices);
+      _answerChoices = newAnswerChoices;
+      return oldAnswerChoices;
+    };
+
     return {
       // The 'data' arg is a list of interaction handlers for the
       // currently-active state.
@@ -320,13 +326,16 @@ angular.module('oppia').factory('ResponsesService', [
           confirmedUnclassifiedAnswers) {
         _saveConfirmedUnclassifiedAnswers(confirmedUnclassifiedAnswers);
       },
-      // Updates answer choices when the interaction requires it -- for
-      // example, the rules for multiple choice need to refer to the multiple
-      // choice interaction's customization arguments.
-      updateAnswerChoices: function(newAnswerChoices, callback) {
-        var oldAnswerChoices = angular.copy(_answerChoices);
-        _answerChoices = newAnswerChoices;
-
+      // Updates answer choices when the interaction is initialized or deleted.
+      // For example, the rules for multiple choice need to refer to the
+      // multiple choice interaction's customization arguments.
+      updateAnswerChoices: function(newAnswerChoices) {
+        _updateAnswerChoices(newAnswerChoices);
+      },
+      // Handles changes to custom args by updating the answer choices
+      // accordingly.
+      handleCustomArgsUpdate: function(newAnswerChoices, callback) {
+        var oldAnswerChoices = _updateAnswerChoices(newAnswerChoices);
         // If the interaction is ItemSelectionInput, update the answer groups
         // to refer to the new answer options.
         if (StateInteractionIdService.savedMemento === 'ItemSelectionInput' &&
@@ -391,6 +400,60 @@ angular.module('oppia').factory('ResponsesService', [
               rules: newRules
             }, callback);
           });
+        }
+
+        // If the interaction is DragAndDropSortInput, update the answer groups
+        // to refer to the new answer options.
+        if (StateInteractionIdService.savedMemento === 'DragAndDropSortInput' &&
+            oldAnswerChoices) {
+          // If the length of the answer choices array changes, then there is
+          // surely any deletion or modification or addition in the array. We
+          // simply set answer groups to refer to default value. If the length
+          // of the answer choices array remains the same and all the choices in
+          // the previous array are present, then no change is required.
+          // However, if any of the choices is not present, we set answer groups
+          // to refer to the default value containing new answer choices.
+          var anyChangesHappened = false;
+          if (oldAnswerChoices.length !== newAnswerChoices.length) {
+            anyChangesHappened = true;
+          } else {
+            // Check if any modification happened in answer choices.
+            var numAnswerChoices = oldAnswerChoices.length;
+            for (var i = 0; i < numAnswerChoices; i++) {
+              var choiceIsPresent = false;
+              for (var j = 0; j < numAnswerChoices; j++) {
+                if (oldAnswerChoices[i].val === newAnswerChoices[j].val) {
+                  choiceIsPresent = true;
+                  break;
+                }
+              }
+              if (choiceIsPresent === false) {
+                anyChangesHappened = true;
+                break;
+              }
+            }
+          }
+
+          if (anyChangesHappened) {
+            _answerGroups.forEach(function(answerGroup, answerGroupIndex) {
+              var newRules = angular.copy(answerGroup.rules);
+              newRules.forEach(function(rule) {
+                if (rule.type === 'HasElementXAtPositionY') {
+                  rule.inputs.x = newAnswerChoices[0].val;
+                  rule.inputs.y = 1;
+                } else if (rule.type === 'HasElementXBeforeElementY') {
+                  rule.inputs.x = newAnswerChoices[0].val;
+                  rule.inputs.y = newAnswerChoices[1].val;
+                } else {
+                  rule.inputs.x = newAnswerChoices.map(({val}) => [val]);
+                }
+              });
+
+              _updateAnswerGroup(answerGroupIndex, {
+                rules: newRules
+              }, callback);
+            });
+          }
         }
       },
       // This registers the change to the handlers in the list of changes.
