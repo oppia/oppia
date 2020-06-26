@@ -27,7 +27,7 @@ import { BackgroundBannerComponent } from
   './common-layout-directives/common-elements/background-banner.component';
 import { TranslatePipe } from 'filters/translate.pipe';
 import { SharingLinksComponent } from
-  './common-layout-directives/common-elements/sharing-links.directive';
+  './common-layout-directives/common-elements/sharing-links.component';
 import { ExplorationEmbedButtonModalComponent } from
   './button-directives/exploration-embed-button-modal.component';
 import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';

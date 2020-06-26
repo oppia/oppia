@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the Social Sharing Links.
+ * @fileoverview Component for the Social Sharing Links.
  */
 const constants = require('constants.ts');
 
@@ -30,7 +30,7 @@ import { ExplorationEmbedButtonModalComponent } from
 
 @Component({
   selector: 'sharing-links',
-  templateUrl: './sharing-links.directive.html',
+  templateUrl: './sharing-links.component.html',
   styleUrls: []
 })
 export class SharingLinksComponent implements OnInit {
@@ -39,11 +39,11 @@ export class SharingLinksComponent implements OnInit {
   @Input() shareType: ShareType;
   @Input() explorationId: string;
   @Input() collectionId: string;
+  @Input() smallFont: Boolean;
   classroomUrl: string;
   activityId: string;
   serverName: string;
   escapedTwitterText: string;
-  fontSize = '34px';
 
   constructor(
     private nbgModal: NgbModal,
@@ -52,8 +52,6 @@ export class SharingLinksComponent implements OnInit {
     private htmlEscaperService: HtmlEscaperService) {}
 
   ngOnInit() {
-    document.documentElement.style.setProperty(
-      '--sharing-links-icon-font-size', this.fontSize);
     if (this.shareType === 'exploration') {
       this.activityId = this.explorationId;
     } else if (this.shareType === 'collection') {

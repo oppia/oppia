@@ -417,7 +417,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'set-of-unicode-string-editor.directive.ts',
     'settings-tab.directive.ts',
     'shared.ts',
-    'sharing-links.directive.ts',
+    'sharing-links.component.ts',
     'side-navigation-bar.directive.ts',
     'signup-page.component.ts',
     'skill-concept-card-editor.directive.ts',
