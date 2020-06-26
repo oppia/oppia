@@ -50,7 +50,8 @@ class SuggestionMathRteAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def reduce(key, values):
         yield (
-            '%d suggestions have Math components in them.' % len(values))
+            '%d suggestions have Math components in them, with IDs: %s' % (
+                len(values), values))
 
 
 class SuggestionMathMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
@@ -59,6 +60,7 @@ class SuggestionMathMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """
     _ERROR_KEY_BEFORE_MIGRATION = 'validation_error'
     _ERROR_KEY_AFTER_MIGRATION = 'validation_error_after_migration'
+
     @classmethod
     def entity_classes_to_map_over(cls):
         return [suggestion_models.GeneralSuggestionModel]

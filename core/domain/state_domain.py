@@ -2447,14 +2447,14 @@ class State(python_utils.OBJECT):
             state_dict['interaction']['hints'][hint_index] = (
                 Hint.convert_html_in_hint(hint, conversion_fn))
 
+        if state_dict['interaction']['id'] is None:
+            return state_dict
+
         if state_dict['interaction']['solution']:
             state_dict['interaction']['solution'] = (
                 Solution.convert_html_in_solution(
                     state_dict['interaction']['id'],
                     state_dict['interaction']['solution'], conversion_fn))
-
-        if state_dict['interaction']['id'] is None:
-            return state_dict
 
         interaction = (
             interaction_registry.Registry.get_interaction_by_id(
@@ -2466,11 +2466,13 @@ class State(python_utils.OBJECT):
                 interaction_customization_arg_has_html = True
 
         if interaction_customization_arg_has_html:
-            for value_index, value in enumerate(
-                    state_dict['interaction']['customization_args'][
-                        'choices']['value']):
-                state_dict['interaction']['customization_args']['choices'][
-                    'value'][value_index] = conversion_fn(value)
+            if 'choices' in (
+                    state_dict['interaction']['customization_args'].keys()):
+                for value_index, value in enumerate(
+                        state_dict['interaction']['customization_args'][
+                            'choices']['value']):
+                    state_dict['interaction']['customization_args']['choices'][
+                        'value'][value_index] = conversion_fn(value)
 
         return state_dict
 

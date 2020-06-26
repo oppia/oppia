@@ -280,10 +280,9 @@ class SuggestionMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
         actual_output = (
             suggestion_jobs_one_off.
             SuggestionMathRteAuditOneOffJob.get_output(job_id))
-        expected_output = '[u\'2 suggestions have Math components in them.\']'
-        self.assertEqual(
-            python_utils.UNICODE(actual_output), python_utils.UNICODE(
-                expected_output))
+        self.assertRegexpMatches(
+            python_utils.UNICODE(actual_output),
+            '2 suggestions have Math components in them')
 
     def test_for_html_in_suggestion_edit_content_with_math_rte(self):
         """Checks that correct number of hints are tabulated when
@@ -379,10 +378,9 @@ class SuggestionMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
         actual_output = (
             suggestion_jobs_one_off.
             SuggestionMathRteAuditOneOffJob.get_output(job_id))
-        expected_output = '[u\'1 suggestions have Math components in them.\']'
-        self.assertEqual(
-            python_utils.UNICODE(actual_output), python_utils.UNICODE(
-                expected_output))
+        self.assertRegexpMatches(
+            python_utils.UNICODE(actual_output),
+            '1 suggestions have Math components in them')
 
     def test_for_html_in_suggestion_with_no_math_rte(self):
         html_content = '<p>This has no Math components</p>'

@@ -1673,6 +1673,45 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             self.assertTrue(
                 python_utils.UNICODE(invalid_tag) in expected_invalid_tags)
 
+    def test_check_for_math_component_in_html(self):
+        """Test that the check_for_math_component_in_html method checks for
+         math-tags in an HTML string and returns a boolean.
+        """
+        test_cases = [{
+            'html_content': (
+                '<p>Feedback</p><oppia-noninteractive-math raw_latex-with-valu'
+                'e="&amp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>'
+            ),
+            'expected_output': True
+        }, {
+            'html_content': (
+                '<oppia-noninteractive-math raw_latex-with-value="&amp;quot;+,'
+                '+,+,+&amp;quot;"></oppia-noninteractive-math>'
+            ),
+            'expected_output': True
+        }, {
+            'html_content': (
+                '<oppia-noninteractive-math raw_latex-with-value="&amp;quot;'
+                '(x - a_1)(x - a_2)(x - a_3)...(x - a_n)&amp;quot;"></oppia-'
+                'noninteractive-math>'
+            ),
+            'expected_output': True
+        }, {
+            'html_content': (
+                '<p><oppia-noninteractive-image filepath-with-value="abc1.png">'
+                '</oppia-noninteractive-image>Hello this is test case to check'
+                ' that dimensions are added to the oppia noninteractive image '
+                'tags.</p>'
+            ),
+            'expected_output': False
+        }]
+
+        for test_case in test_cases:
+            self.assertEqual(
+                html_validation_service.check_for_math_component_in_html(
+                    test_case['html_content']),
+                test_case['expected_output'])
+
     def test_parsable_as_xml(self):
         invalid_xml = 'aDRjSzNS'
         self.assertEqual(

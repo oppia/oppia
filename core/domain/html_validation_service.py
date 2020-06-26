@@ -903,7 +903,7 @@ def add_math_content_to_math_rte_components(html_string):
                 # string.
                 raw_latex = (
                     json.loads(unescape_html(math_tag['raw_latex-with-value'])))
-                normailzed_raw_latex = (
+                normalized_raw_latex = (
                     objects.UnicodeString.normalize(raw_latex))
             except Exception as e:
                 error_message = (
@@ -911,7 +911,7 @@ def add_math_content_to_math_rte_components(html_string):
                         python_utils.UNICODE(e)))
                 raise Exception(error_message)
             math_content_dict = {
-                'raw_latex': normailzed_raw_latex,
+                'raw_latex': normalized_raw_latex,
                 'svg_filename': ''
             }
             # Normalize and validate the value before adding to the math
@@ -1023,6 +1023,22 @@ def validate_math_tags_in_html_with_attribute_math_content(html_string):
         else:
             error_list.append(math_tag)
     return error_list
+
+
+def check_for_math_component_in_html(html_string):
+    """Checks for existence of Math component tags inside an HTML string.
+
+    Args:
+        html_string: str. HTML string to check.
+
+    Returns:
+        str. Updated HTML string with all Math component tags having the new
+        attribute.
+    """
+    soup = bs4.BeautifulSoup(
+        html_string.encode(encoding='utf-8'), 'html.parser')
+    math_tags = soup.findAll(name='oppia-noninteractive-math')
+    return bool(math_tags)
 
 
 def is_parsable_as_xml(xml_string):

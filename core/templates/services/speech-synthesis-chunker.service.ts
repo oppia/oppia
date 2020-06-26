@@ -197,10 +197,8 @@ export class SpeechSynthesisChunkerService {
           var mathContent = <IMathExpressionContent>(
             _this.htmlEscaper.escapedJsonToObj(
               element.attributes['math_content-with-value'].textContent));
-          /* eslint-disable dot-notation */
           const latexSpeakableText = _this._formatLatexToSpeakableText(
-            mathContent['raw_latex']);
-          /* eslint-enable dot-notation */
+            mathContent.raw_latex);
           return latexSpeakableText.length > 0 ? latexSpeakableText + ' ' : '';
         }
       });

@@ -2348,6 +2348,107 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     html_validation_service.
                     add_math_content_to_math_rte_components)
 
+    def test_convert_html_fields_in_state_when_interaction_is_none(self):
+        """Test the method for converting all the HTML in a state having
+        no interaction.
+        """
+        html_with_old_math_schema = (
+            '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&a'
+            'mp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>')
+        html_with_new_math_schema = (
+            '<p>Value</p><oppia-noninteractive-math math_content-with-value='
+            '"{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;, &'
+            'amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
+            '-noninteractive-math>')
+
+        state_dict_with_old_math_schema = {
+            'content': {
+                'content_id': 'content', 'html': html_with_old_math_schema
+            },
+            'param_changes': [],
+            'content_ids_to_audio_translations': {'content': {}},
+            'solicit_answer_details': False,
+            'classifier_model_id': None,
+            'interaction': {
+                'solution': None,
+                'answer_groups': [],
+                'default_outcome': {
+                    'param_changes': [],
+                    'feedback': {
+                        'content_id': 'default_outcome',
+                        'html': html_with_old_math_schema
+                    },
+                    'dest': 'Introduction',
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None,
+                    'labelled_as_correct': False
+                },
+                'customization_args': None,
+                'confirmed_unclassified_answers': [],
+                'id': None,
+                'hints': [
+                    {
+                        'hint_content': {
+                            'content_id': 'hint_1',
+                            'html': html_with_old_math_schema
+                        }
+                    },
+                    {
+                        'hint_content': {
+                            'content_id': 'hint_2',
+                            'html': html_with_old_math_schema
+                        }
+                    }]
+            }
+        }
+
+        state_dict_with_new_math_schema = {
+            'content': {
+                'content_id': 'content', 'html': html_with_new_math_schema
+            },
+            'param_changes': [],
+            'content_ids_to_audio_translations': {'content': {}},
+            'solicit_answer_details': False,
+            'classifier_model_id': None,
+            'interaction': {
+                'solution': None,
+                'answer_groups': [],
+                'default_outcome': {
+                    'param_changes': [],
+                    'feedback': {
+                        'content_id': 'default_outcome',
+                        'html': html_with_new_math_schema
+                    },
+                    'dest': 'Introduction',
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None,
+                    'labelled_as_correct': False
+                },
+                'customization_args': None,
+                'confirmed_unclassified_answers': [],
+                'id': None,
+                'hints': [
+                    {
+                        'hint_content': {
+                            'content_id': 'hint_1',
+                            'html': html_with_new_math_schema
+                        }
+                    },
+                    {
+                        'hint_content': {
+                            'content_id': 'hint_2',
+                            'html': html_with_new_math_schema
+                        }
+                    }]
+            }
+        }
+        self.assertEqual(
+            state_domain.State.convert_html_fields_in_state(
+                state_dict_with_old_math_schema,
+                html_validation_service.
+                add_math_content_to_math_rte_components),
+            state_dict_with_new_math_schema)
+
     def test_subtitled_html_validation_with_invalid_html_type(self):
         """Test validation of subtitled HTML with invalid html type."""
         subtitled_html = state_domain.SubtitledHtml(
