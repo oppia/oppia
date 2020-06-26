@@ -22,16 +22,23 @@ angular.module('oppia').directive('translatableUnicodeStringEditor', [
       restrict: 'E',
       scope: {},
       bindToController: {
-        value: '='
+        value: '=',
+        getInitArgs: '&'
       },
-      template: require('./translatable-unicode-string-editor.directive.html'),
+      template: require('./translatable-html-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;
         ctrl.$onInit = function() {
-          ctrl.schema = {
-            type: 'unicode'
-          };
+          ctrl.initArgs = ctrl.getInitArgs();
+          ctrl.schema = { type: 'unicode' };
+
+          if (ctrl.initArgs &&
+            ctrl.initArgs.schema &&
+            ctrl.initArgs.schema.ui_config
+          ) {
+            ctrl.schema.ui_config = ctrl.initArgs.schema.ui_config;
+          }
         };
       }]
     };
