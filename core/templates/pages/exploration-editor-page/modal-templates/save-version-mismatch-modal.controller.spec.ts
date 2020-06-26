@@ -49,8 +49,8 @@ describe('Save Version Mismatch Modal Controller', () => {
 
   beforeEach(angular.mock.module('oppia', ($provide) => {
     $provide.value('ExplorationDataService', mockExplorationData);
-    $provide.value('LostChangeObjectFactory', (
-      new LostChangeObjectFactory(new UtilsService)));
+    $provide.value('LostChangeObjectFactory', TestBed.get(
+      LostChangeObjectFactory));
     $provide.value('WindowRef', windowRef);
   }));
   beforeEach(angular.mock.inject(($injector, $controller) => {

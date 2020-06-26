@@ -38,14 +38,14 @@ describe('Lost Changes Modal Controller', () => {
   beforeEach(function() {
     TestBed.configureTestingModule({
       providers: [
-        LostChangeObjectFactory
+        UtilsService
       ]
     });
   });
 
   beforeEach(angular.mock.module('oppia', ($provide) => {
-    $provide.value('LostChangeObjectFactory', (
-      new LostChangeObjectFactory(new UtilsService)));
+    $provide.value('LostChangeObjectFactory', TestBed.get(
+      LostChangeObjectFactory));
   }));
 
   beforeEach(angular.mock.inject(($injector, $controller) => {
