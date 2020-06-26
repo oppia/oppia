@@ -30,6 +30,8 @@ var AlgebraicExpressionEditor = function(elem) {
       await waitFor.elementToBeClickable(
         elem, '"Algebraic Input" editor takes too long to be clickable');
       await elem.click();
+      // The active guppy div will be the one that is created last which is why
+      // we fetch the last element.
       var algebraicInputElem = element.all(by.css(
         '.protractor-test-guppy-div')).last();
       var present = await algebraicInputElem.isPresent();
@@ -38,11 +40,15 @@ var AlgebraicExpressionEditor = function(elem) {
       }
     },
     getValue: async function() {
+      await waitFor.elementToBeClickable(
+        elem, '"Algebraic Input" editor takes too long to be clickable');
+      // The active guppy div will be the one that is created last which is why
+      // we fetch the last element.
       var algebraicInputElem = element.all(by.css(
         '.protractor-test-guppy-div')).last();
       var present = await algebraicInputElem.isPresent();
       if (present) {
-        var contentElem = element.all(by.tagName('annotation')).first();
+        var contentElem = algebraicInputElem.element(by.tagName('annotation'));
         present = await contentElem.isPresent();
         if (present) {
           return contentElem.getText();
