@@ -4,23 +4,24 @@
     @load('base-components/header.template.html', {"title": "Oppia"})
   </head>
   <body>
-    <service-bootstrap></service-bootstrap>
-    <div ng-controller="Base">
-      <base-content>
-        <navbar-breadcrumb>
-          <div class="nav navbar-nav oppia-navbar-breadcrumb ng-cloak">
-            <span class="oppia-navbar-breadcrumb-separator"></span>
-            <span>
-              Review Test
-            </span>
-          </div>
-        </navbar-breadcrumb>
-        <content>
-          <review-test-page></review-test-page>
-        </content>
-        <page-footer></page-footer>
-      </base-content>
-    </div>
+    <oppia-root>
+      <div ng-controller="Base">
+        <base-content>
+          <navbar-breadcrumb>
+            <div class="nav navbar-nav oppia-navbar-breadcrumb ng-cloak">
+              <span class="oppia-navbar-breadcrumb-separator"></span>
+              <span>
+                Review Test
+              </span>
+            </div>
+          </navbar-breadcrumb>
+          <content>
+            <review-test-page></review-test-page>
+          </content>
+          <page-footer></page-footer>
+        </base-content>
+      </div>
+    </oppia-root>
     @load('pages/footer_js_libs.html')
     <script src="/third_party/static/MathJax-2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     @loadExtensions('interactions/codemirror.html')
