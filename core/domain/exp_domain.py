@@ -27,6 +27,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import collections
 import copy
 import functools
+import json
 import re
 import string
 
@@ -35,6 +36,7 @@ from core.domain import change_domain
 from core.domain import html_validation_service
 from core.domain import interaction_registry
 from core.domain import param_domain
+from core.domain import rte_component_registry
 from core.domain import state_domain
 from core.platform import models
 import feconf
@@ -2416,6 +2418,102 @@ class Exploration(python_utils.OBJECT):
 
 
     @classmethod
+    def _convert_states_v33_dict_to_v34_dict(cls, states_dict):
+        """Converts from version 33 to 34. Version 34 adds translation support
+        for interaction customization arguments.
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+
+
+        def convert_to_subtitled(
+            customization_arg_value, customization_arg_spec, obj_type
+        ):
+            """
+            """
+            if obj_type == 'TranslatableUnicodeString':
+                translation_value_key = 'unicode_str'
+            elif obj_type == 'TranslatableHtml':
+                translation_value_key = 'html'
+
+            if not translation_value_key:
+                raise Exception(
+                    'Invalid obj_type passed to convert_to_subtitled: %s' %
+                    obj_type
+                )
+
+            if isinstance(customization_arg_value, str):
+                customization_args.value.update({
+                    'content_id': '',
+                    translation_value_key: customization_args.value
+                })
+            elif isinstance(customization_arg_value, list):
+                for i in range(len(customization_args.value)):
+                    customization_args.value[i] = {
+                        'content_id': '',
+                        translation_value_key: customization_args.value[i]
+                    }
+            elif isinstance(customization_arg_value, dict):
+                customization_args.value[customization_arg_spec.name].update({
+                    'content_id': '',
+                    translation_value_key: customization_args.value
+                })
+
+
+        def convert_all_to_subtitled(customization_arg, customization_arg_spec):
+            """
+            """
+            if (customization_arg_spec.schema.type == "custom" and (
+                customization_arg_spec.schema.obj_type ==
+                "TranslatableUnicodeString" or 
+                customization_arg_spec.schema.obj_type == "TranslatableHtml"
+            )):
+                convert_to_subtitled(
+                    customization_arg,
+                    customization_arg_spec,
+                    customization_arg_spec.schema.obj_type)
+            elif (customization_arg_spec.schema.type == "list"):
+                convert_all_to_subtitled(
+                    customization_arg,
+                    customization_arg_spec.items)
+            elif (customization_arg_spec.schema.type == "dict"):
+                for i in range(len(customization_arg_spec.properties)):
+                    convert_all_to_subtitled(
+                        customization_arg,
+                        customization_arg_spec.properties[i].schema)
+            return
+
+        with python_utils.open_file(
+            feconf.INTERACTIONS_SPECS_FILE_PATH, 'r'
+        ) as interaction_specs_json:
+            interaction_specs = json.load(interaction_specs_json)
+
+            for state_dict in states_dict.values():
+                interaction_id = state_dict['interaction']['id']
+                if interaction_id is None:
+                    continue
+                
+                customization_arg_specs = interaction_specs[interaction_id][
+                    'customization_arg_specs']
+                customization_args = state_dict[
+                    'interaction']['customization_args']
+                
+                for customization_arg_spec in customization_arg_specs:
+                    print(customization_arg_spec)
+                    convert_all_to_subtitled(
+                        customization_args[customization_arg_spec.name],
+                        customization_arg_spec)
+
+        return states_dict
+
+
+    @classmethod
     def update_states_from_model(
             cls, versioned_exploration_states, current_states_schema_version,
             exploration_id):
@@ -2450,7 +2548,7 @@ class Exploration(python_utils.OBJECT):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 38
+    CURRENT_EXP_SCHEMA_VERSION = 39
     LAST_UNTITLED_SCHEMA_VERSION = 9
 
     @classmethod
@@ -3347,6 +3445,28 @@ class Exploration(python_utils.OBJECT):
 
 
     @classmethod
+    def _convert_v38_dict_to_v39_dict(cls, exploration_dict):
+        """Converts a v38 exploration dict into a v39 exploration dict.
+        Adds translation support to customization args.
+
+        Args:
+            exploration_dict: dict. The dict representation of an exploration
+                with schema version v38.
+
+        Returns:
+            dict. The dict representation of the Exploration domain object,
+            following schema version v39.
+        """
+        exploration_dict['schema_version'] = 39
+
+        exploration_dict['states'] = cls._convert_states_v33_dict_to_v34_dict(
+            exploration_dict['states'])
+        exploration_dict['states_schema_version'] = 34
+
+        return exploration_dict
+
+
+    @classmethod
     def _migrate_to_latest_yaml_version(
             cls, yaml_content, exp_id, title=None, category=None):
         """Return the YAML content of the exploration in the latest schema
@@ -3568,6 +3688,11 @@ class Exploration(python_utils.OBJECT):
             exploration_dict = cls._convert_v37_dict_to_v38_dict(
                 exploration_dict)
             exploration_schema_version = 38
+
+        if exploration_schema_version == 38:
+            exploration_dict = cls._convert_v38_dict_to_v39_dict(
+                exploration_dict)
+            exploration_schema_version = 39
 
         return (exploration_dict, initial_schema_version)
 
