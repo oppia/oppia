@@ -155,7 +155,7 @@ class MathExpressionValidationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         u'\u03c6': 'phi',
         u'\u03c7': 'chi',
         u'\u03c8': 'psi',
-        u'\u03c8': 'omega',
+        u'\u03c9': 'omega',
     }
     INVERSE_TRIG_FNS_MAPPING = {
         'asin': 'arcsin',
@@ -191,14 +191,14 @@ class MathExpressionValidationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                                 rule_spec.inputs['x'])
 
                             # Shifting powers in trig functions to the end.
-                            # For eg. sin^2(x) -> sin(x)^2
+                            # For eg. 'sin^2(x)' -> 'sin(x)^2'.
                             for trig_fn in trig_fns:
                                 rule_input = re.sub(
                                     r'%s(\^\d)\((.)\)' % trig_fn,
                                     r'%s(\2)\1' % trig_fn, rule_input)
-                            
+
                             # Adding parens to trig functions that don't have
-                            # any. For eg. cosA -> cos(A)
+                            # any. For eg. 'cosA' -> 'cos(A)'.
                             for trig_fn in trig_fns:
                                 rule_input = re.sub(
                                     r'%s(?!\()(.)' % trig_fn,
