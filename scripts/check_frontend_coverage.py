@@ -231,7 +231,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'moderator-unpublish-exploration-modal.controller.ts',
     'multiple-incorrect-issue.directive.ts',
     'multiple-incorrect-submissions-issue.directive.ts',
-    'MultiSkillsResponseObjectFactory,ts',
+    'MultiSkillsResponseObjectFactory.ts',
     'music-notes-input-rules.service.ts',
     'music-phrase-editor.directive.ts',
     'music-phrase-player.service.ts',
