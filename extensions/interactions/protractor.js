@@ -43,6 +43,7 @@
  */
 
 var INTERACTIONS = {
+  AlgebraicExpressionInput: require('./AlgebraicExpressionInput/protractor.js'),
   Continue: require('./Continue/protractor.js'),
   EndExploration: require('./EndExploration/protractor.js'),
   FractionInput: require('./FractionInput/protractor.js'),

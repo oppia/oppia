@@ -158,7 +158,9 @@ class RteComponentExtractorUnitTests(test_utils.GenericTestBase):
         test_data = (
             '<p>Test text&nbsp;'
             '<oppia-noninteractive-math '
-            'raw_latex-with-value="&amp;quot;\\\\frac{x}{y}&amp;quot;">'
+            'math_content-with-value="{&amp;quot;raw_latex&amp;quot;:&amp;qu'
+            'ot;\\\\frac{x}{y}&amp;quot;,&amp;quot;svg_filename&amp;quot;:'
+            '&amp;quot;&amp;quot;}">'
             '</oppia-noninteractive-math></p><p>&nbsp;'
             '<oppia-noninteractive-link '
             'text-with-value='
@@ -194,7 +196,10 @@ class RteComponentExtractorUnitTests(test_utils.GenericTestBase):
             },
             {
                 'customization_args': {
-                    'raw_latex-with-value': u'\\frac{x}{y}'
+                    'math_content-with-value': {
+                        u'raw_latex': u'\\frac{x}{y}',
+                        u'svg_filename': u''
+                    }
                 },
                 'id': 'oppia-noninteractive-math'
             }
