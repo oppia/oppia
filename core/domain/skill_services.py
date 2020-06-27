@@ -288,7 +288,7 @@ def get_filtered_skill_summaries(
 
     Returns:
         3-tuple(augmented_skill_summaries, new_urlsafe_start_cursor, more).
-        where:
+        Where:
             augmented_skill_summaries: list(AugmentedSkillSummary). The list of
                 augmented skill summaries. The number of returned skills might
                 include more than the requested number. Hence, the cursor
@@ -326,7 +326,7 @@ def _get_augmented_skill_summaries_in_batches(
     topic and classroom.
 
     Returns:
-        3-tuple(augmented_skill_summaries, urlsafe_start_cursor, more). where:
+        3-tuple(augmented_skill_summaries, urlsafe_start_cursor, more). Where:
             augmented_skill_summaries: list(AugmentedSkillSummary). The list of
                 skill summaries.
             urlsafe_start_cursor: str or None. A query cursor pointing to the
@@ -430,7 +430,7 @@ def _filter_skills_by_classroom(augmented_skill_summaries, classroom_name):
 
     Returns:
         list(AugmentedSkillSummary). The list of augmented skill summaries with
-         the given classroom name.
+        the given classroom name.
     """
 
     if classroom_name is None or classroom_name == 'All':

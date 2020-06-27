@@ -227,7 +227,7 @@ class SubtopicPage(python_utils.OBJECT):
 
         Args:
             page_contents_dict: dict. A dict used to initialize a SubtopicPage
-                 domain object.
+                domain object.
 
         Returns:
             dict. The converted page_contents_dict.

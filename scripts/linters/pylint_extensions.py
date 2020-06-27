@@ -1638,7 +1638,7 @@ class DocstringChecker(checkers.BaseChecker):
                           self.DOCSTRING_SECTION_YIELDS)):
                     # Check for the start of a new parameter definition in the
                     # format "type (elaboration)." and check the indentation.
-                    if (re.search(br'^[a-zA-Z_() -:,\*]+\. ',
+                    if (re.search(br'^[a-zA-Z_() -:,\*]+\.',
                                   line) and not in_description):
                         if current_line_indentation != (
                                 args_indentation_in_spaces + 4):
