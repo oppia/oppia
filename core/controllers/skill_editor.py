@@ -129,19 +129,28 @@ class EditableSkillDataHandler(base.BaseHandler):
                 Exception('The skill with the given id doesn\'t exist.'))
 
         topics = topic_fetchers.get_all_topics()
+        skill_ids_assigned_to_some_topic = (
+            topic_services.get_all_skill_ids_assigned_to_some_topic())
         grouped_skill_summary_dicts = {}
+        # It might be the case that the requested skill is not assigned to any
+        # topic, or it might be assigned to a topic and not a subtopic, so we
+        # return topic_name and subtopic_name if the skill is assigned or None
+        # if the skill is not yet assigned.
         topic_name = None
         subtopic_name = None
         for topic in topics:
-            topic_all_skill_ids = topic.get_all_skill_ids()
-            skill_summaries = skill_services.get_multi_skill_summaries(
-                topic_all_skill_ids)
-            if skill_id in topic_all_skill_ids:
-                topic_name = topic.name
-                for subtopic in topic.subtopics:
-                    if skill_id in subtopic.skill_ids:
-                        subtopic_name = subtopic.title
+            skill_ids_in_topic = topic.get_all_skill_ids()
+            if (skill_id in skill_ids_assigned_to_some_topic and
+                    topic_name is None):
+                if skill_id in skill_ids_in_topic:
+                    topic_name = topic.name
+                    for subtopic in topic.subtopics:
+                        if skill_id in subtopic.skill_ids:
+                            subtopic_name = subtopic.title
+                            break
 
+            skill_summaries = skill_services.get_multi_skill_summaries(
+                skill_ids_in_topic)
             skill_summary_dicts = [
                 summary.to_dict() for summary in skill_summaries]
             grouped_skill_summary_dicts[topic.name] = skill_summary_dicts

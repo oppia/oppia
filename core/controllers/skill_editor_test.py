@@ -175,6 +175,44 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
             1, len(json_response['grouped_skill_summaries']['Name']))
         self.logout()
 
+    def test_editable_skill_is_assigned_to_topic_and_not_subtopic(self):
+        skill_id = skill_services.get_new_skill_id()
+        self.save_new_skill(
+            skill_id, self.admin_id, description='DescriptionSkill')
+        topic_id = topic_services.get_new_topic_id()
+        self.save_new_topic(
+            topic_id, self.admin_id, name='TopicName1',
+            description='DescriptionTopic', canonical_story_ids=[],
+            additional_story_ids=[], uncategorized_skill_ids=[skill_id],
+            subtopics=[], next_subtopic_id=1)
+
+        url = '%s/%s' % (
+            feconf.SKILL_EDITOR_DATA_URL_PREFIX, skill_id)
+
+        json_response = self.get_json(url)
+        self.assertEqual(skill_id, json_response['skill']['id'])
+        self.assertEqual(json_response['topic_name'], 'TopicName1')
+        self.assertEqual(json_response['subtopic_name'], None)
+        self.assertEqual(
+            1, len(json_response['grouped_skill_summaries']['Name']))
+        self.logout()
+
+    def test_editable_skill_is_not_assigned_to_topic_or_subtopic(self):
+        skill_id = skill_services.get_new_skill_id()
+        self.save_new_skill(
+            skill_id, self.admin_id, description='DescriptionSkill')
+
+        url = '%s/%s' % (
+            feconf.SKILL_EDITOR_DATA_URL_PREFIX, skill_id)
+
+        json_response = self.get_json(url)
+        self.assertEqual(skill_id, json_response['skill']['id'])
+        self.assertEqual(json_response['topic_name'], None)
+        self.assertEqual(json_response['subtopic_name'], None)
+        self.assertEqual(
+            1, len(json_response['grouped_skill_summaries']['Name']))
+        self.logout()
+
     def test_editable_skill_handler_get_fails(self):
         self.login(self.NEW_USER_EMAIL)
         # Check GET returns 404 when cannot get skill by id.

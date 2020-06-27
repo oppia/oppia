@@ -19,8 +19,8 @@
 describe('Skill Preview Modal Controller', function() {
   var $scope = null;
   var $uibModalInstance = null;
-  var title = 'Title1';
-  var content = 'This is the content';
+  var skillDescription = 'Description1';
+  var skillContent = 'This is the content';
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.inject(function($injector, $controller) {
@@ -33,13 +33,13 @@ describe('Skill Preview Modal Controller', function() {
     $controller('SkillPreviewModalController', {
       $scope: $scope,
       $uibModalInstance: $uibModalInstance,
-      title: title,
-      content: content
+      skillDescription: skillDescription,
+      skillContent: skillContent
     });
   }));
 
-  it('should check initialize the variables', function() {
-    expect($scope.title).toEqual(title);
-    expect($scope.content).toEqual(content);
+  it('should initialize the variables', function() {
+    expect($scope.skillDescription).toEqual(skillDescription);
+    expect($scope.skillContent).toEqual(skillContent);
   });
 });

@@ -78,7 +78,7 @@ angular.module('oppia').directive('tutorCard', [
         onDismiss: '&',
         getDisplayedCard: '&displayedCard',
         startCardChangeAnimation: '=',
-        showHeaderIcon: '='
+        isAvatarImageShown: '&'
       },
       template: require('./tutor-card.directive.html'),
       controller: [

@@ -161,8 +161,9 @@ angular.module('oppia').directive('skillConceptCardEditor', [
           };
 
           $scope.showSkillPreview = function() {
-            var title = SkillEditorStateService.getSkill().getDescription();
-            var content = (
+            var skillDescription = (
+              SkillEditorStateService.getSkill().getDescription());
+            var skillContent = (
               $scope.bindableFieldsDict.displayedConceptCardExplanation);
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
@@ -170,8 +171,8 @@ angular.module('oppia').directive('skillConceptCardEditor', [
                 'skill-preview-modal.template.html'),
               backdrop: true,
               resolve: {
-                title: () => title,
-                content: () => content
+                skillDescription: () => skillDescription,
+                skillContent: () => skillContent
               },
               controller: 'SkillPreviewModalController'
             });

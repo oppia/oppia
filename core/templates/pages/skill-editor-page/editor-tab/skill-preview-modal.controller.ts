@@ -21,14 +21,16 @@ require(
     'confirm-or-cancel-modal.controller.ts');
 
 angular.module('oppia').controller('SkillPreviewModalController', [
-  '$controller', '$scope', '$uibModalInstance', 'content', 'title',
+  '$controller', '$scope', '$uibModalInstance', 'skillContent',
+  'skillDescription',
   function(
-      $controller, $scope, $uibModalInstance, content, title) {
+      $controller, $scope, $uibModalInstance, skillContent,
+      skillDescription) {
     $controller('ConfirmOrCancelModalController', {
       $scope: $scope,
       $uibModalInstance: $uibModalInstance
     });
-    $scope.title = title;
-    $scope.content = content;
+    $scope.skillContent = skillContent;
+    $scope.skillDescription = skillDescription;
   }
 ]);

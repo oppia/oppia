@@ -54,10 +54,11 @@ angular.module('oppia').component('skillPreviewTab', {
       var ctrl = this;
 
       ctrl.$onInit = function() {
+        ctrl.INTERATION_TYPE_ALL = 'All';
         ctrl.skillId = UrlService.getSkillIdFromUrl();
         SkillEditorStateService.loadSkill(ctrl.skillId);
         ctrl.questionTextFilter = '';
-        ctrl.interactionFilter = 'All';
+        ctrl.interactionFilter = ctrl.INTERATION_TYPE_ALL;
         ctrl.displayCardIsInitialized = false;
         ctrl.questionsFetched = false;
         ctrl.ALLOWED_QUESTION_INTERACTION_IDS = [
@@ -67,10 +68,10 @@ angular.module('oppia').component('skillPreviewTab', {
         ctrl.htmlData = ctrl.skill.getConceptCard().getExplanation().getHtml();
 
         QuestionBackendApiService.fetchQuestions(
-          [ctrl.skillId], 20, false).then((res) => {
+          [ctrl.skillId], 20, false).then((response) => {
           ctrl.questionsFetched = true;
-          ctrl.questionDicts = res;
-          ctrl.displayedQuestions = res;
+          ctrl.questionDicts = response;
+          ctrl.displayedQuestions = response;
           ctrl.selectQuestionToPreview(0);
         });
       };
@@ -90,7 +91,7 @@ angular.module('oppia').component('skillPreviewTab', {
             var htmlContentIsMatching = Boolean(
               contentData.toLowerCase().includes(
                 ctrl.questionTextFilter.toLowerCase()));
-            if (ctrl.interactionFilter === 'All') {
+            if (ctrl.interactionFilter === ctrl.INTERATION_TYPE_ALL) {
               return htmlContentIsMatching;
             } else if (ctrl.interactionFilter === 'Text Input' &&
                             interactionType !== 'TextInput') {

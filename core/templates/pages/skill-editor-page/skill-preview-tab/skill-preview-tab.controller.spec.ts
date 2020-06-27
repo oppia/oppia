@@ -53,6 +53,15 @@ describe('Skill preview tab', function() {
       }
     }
   };
+  var questionDict4 = {
+    question_state_data: {
+      content: {
+        html: 'question4'
+      }, interaction: {
+        id: 'MultipleChoiceInput'
+      }
+    }
+  };
   var questionDict = {
     id: 'question_id',
     question_state_data: {
@@ -155,7 +164,8 @@ describe('Skill preview tab', function() {
     expect(ctrl.displayCardIsInitialized).toEqual(false);
     expect(ctrl.questionsFetched).toEqual(false);
     expect(ctrl.ALLOWED_QUESTION_INTERACTION_IDS).toEqual([
-      'All', 'Text Input', 'Multiple Choice', 'Numeric Input']);
+      'All', 'Text Input', 'Multiple Choice', 'Numeric Input',
+      'Item Selection']);
   });
 
   it('should initialize the question card', function() {
@@ -165,7 +175,8 @@ describe('Skill preview tab', function() {
   });
 
   it('should filter the questions', function() {
-    ctrl.questionDicts = [questionDict1, questionDict2, questionDict3];
+    ctrl.questionDicts = [questionDict1, questionDict2,
+      questionDict3, questionDict4];
 
     ctrl.questionTextFilter = 'question1';
     ctrl.applyFilters();
@@ -176,13 +187,17 @@ describe('Skill preview tab', function() {
     expect(ctrl.displayedQuestions).toEqual([questionDict3]);
 
     ctrl.questionTextFilter = '';
-    ctrl.interactionFilter = 'Multiple Choice';
+    ctrl.interactionFilter = 'Item Selection';
     ctrl.applyFilters();
     expect(ctrl.displayedQuestions).toEqual([questionDict2]);
 
     ctrl.interactionFilter = 'Numeric Input';
     ctrl.applyFilters();
     expect(ctrl.displayedQuestions).toEqual([questionDict3]);
+
+    ctrl.interactionFilter = 'Multiple Choice';
+    ctrl.applyFilters();
+    expect(ctrl.displayedQuestions).toEqual([questionDict4]);
 
     ctrl.interactionFilter = 'Text Input';
     ctrl.applyFilters();
