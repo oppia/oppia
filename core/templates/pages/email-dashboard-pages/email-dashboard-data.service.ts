@@ -17,46 +17,31 @@
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
-export interface Query {
-  id: string,
-  status: string
-}
+import { IQueryData, EmailDashboardBackendApiService } from
+  'domain/email-dashboard/email-dashboard-backend-api.service';
+import { EmailDashboardQuery } from
+  'domain/email-dashboard/email-dashboard-query-object.factory';
 
 @Injectable({
   providedIn: 'root'
 })
 export class EmailDashboardDataService {
-  QUERY_DATA_URL: string = '/emaildashboarddatahandler';
-  QUERY_STATUS_CHECK_URL: string = '/querystatuscheck';
   // No. of query results to display on a single page.
   QUERIES_PER_PAGE: number = 10;
   // Store latest cursor value for fetching next query page.
   latestCursor: string = null;
   // Array containing all fetched queries.
-  queries: Array<Query> = [];
+  queries: Array<EmailDashboardQuery> = [];
   // Index of currently-shown page of query results.
   currentPageIndex: number = -1;
 
   constructor(
-    private http: HttpClient
+    private emailDashboardBackendApiService: EmailDashboardBackendApiService
   ) {}
 
-  fetchQueriesPage(pageSize: number, cursor: string): Promise<Object> {
-    let params: any = {
-      num_queries_to_fetch: pageSize
-    };
-    if (cursor) {
-      params.cursor = cursor;
-    }
-    return this.http.get(this.QUERY_DATA_URL, {
-      params: params
-    }).toPromise();
-  }
-
-  getQueries(): Array<Query> {
+  getQueries(): Array<EmailDashboardQuery> {
     return this.queries;
   }
 
@@ -68,23 +53,19 @@ export class EmailDashboardDataService {
     return this.latestCursor;
   }
 
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'data' is a dict with underscore_cased
-  // keys which give tslint errors against underscore_casing in favor of
-  // camelCasing.
-  submitQuery(data: any): Promise<Array<Query>> {
+  submitQuery(data: IQueryData): Promise<Array<EmailDashboardQuery>> {
     var startQueryIndex = this.currentPageIndex * this.QUERIES_PER_PAGE;
     var endQueryIndex = (this.currentPageIndex + 1) * this.QUERIES_PER_PAGE;
 
-    return this.http.post(this.QUERY_DATA_URL, {
-      data: data}).toPromise().then((data: any) => {
-      var newQueries = [data.query];
+    return this.emailDashboardBackendApiService.submitQuery(
+      data).then(query => {
+      var newQueries = [query];
       this.queries = newQueries.concat(this.queries);
       return this.queries.slice(startQueryIndex, endQueryIndex);
     });
   }
 
-  getNextQueries(): Promise<Array<Query>> {
+  getNextQueries(): Promise<Array<EmailDashboardQuery>> {
     var startQueryIndex = (this.currentPageIndex + 1) * this.QUERIES_PER_PAGE;
     var endQueryIndex = (this.currentPageIndex + 2) * this.QUERIES_PER_PAGE;
 
@@ -96,16 +77,16 @@ export class EmailDashboardDataService {
       });
     } else {
       this.currentPageIndex = this.currentPageIndex + 1;
-      return this.fetchQueriesPage(this.QUERIES_PER_PAGE, this.latestCursor)
-        .then((data: any) => {
-          this.queries = this.queries.concat(data.recent_queries);
-          this.latestCursor = data.cursor;
-          return this.queries.slice(startQueryIndex, endQueryIndex);
-        });
+      return this.emailDashboardBackendApiService.fetchQueriesPage(
+        this.QUERIES_PER_PAGE, this.latestCursor).then(data => {
+        this.queries = this.queries.concat(data.recentQueries);
+        this.latestCursor = data.cursor;
+        return this.queries.slice(startQueryIndex, endQueryIndex);
+      });
     }
   }
 
-  getPreviousQueries(): Array<Query> {
+  getPreviousQueries(): Array<EmailDashboardQuery> {
     var startQueryIndex = (this.currentPageIndex - 1) * this.QUERIES_PER_PAGE;
     var endQueryIndex = this.currentPageIndex * this.QUERIES_PER_PAGE;
     this.currentPageIndex = this.currentPageIndex - 1;
@@ -121,19 +102,16 @@ export class EmailDashboardDataService {
     return (this.currentPageIndex > 0);
   }
 
-  fetchQuery(queryId: string): Promise<Query> {
-    return this.http.get(this.QUERY_STATUS_CHECK_URL, {
-      params: {
-        query_id: queryId
-      }
-    }).toPromise().then((data: any) => {
-      this.queries.forEach(function(query, index, queries) {
-        if (query.id === queryId) {
-          queries[index] = data.query;
-        }
+  fetchQuery(queryId: string): Promise<EmailDashboardQuery> {
+    return this.emailDashboardBackendApiService.fetchQuery(queryId)
+      .then(newQuery => {
+        this.queries.forEach(function(query, index, queries) {
+          if (query.id === queryId) {
+            queries[index] = newQuery;
+          }
+        });
+        return newQuery;
       });
-      return data.query;
-    });
   }
 }
 
