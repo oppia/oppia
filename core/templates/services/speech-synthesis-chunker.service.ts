@@ -26,12 +26,15 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
+import { HtmlEscaperService } from 'services/html-escaper.service';
 import { ServicesConstants } from 'services/services.constants.ts';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SpeechSynthesisChunkerService {
+  constructor(private htmlEscaper: HtmlEscaperService) {}
+
   // Max number of characters to fit into one chunk.
   CHUNK_LENGTH: number = 160;
 
@@ -166,7 +169,10 @@ export class SpeechSynthesisChunkerService {
         this.RTE_COMPONENT_NAMES[componentSpec] =
         ServicesConstants.RTE_COMPONENT_SPECS[componentSpec].frontend_id;
       });
-
+    interface IMathExpressionContent {
+      'raw_latex': String,
+      'svg_filename': String
+    }
     var elt = $('<div>' + html + '</div>');
     // Convert links into speakable text by extracting the readable value.
     elt.find('oppia-noninteractive-' + this.RTE_COMPONENT_NAMES.Link)
@@ -187,9 +193,12 @@ export class SpeechSynthesisChunkerService {
     elt.find('oppia-noninteractive-' + this.RTE_COMPONENT_NAMES.Math)
       .replaceWith(function() {
         var element = <HTMLElement><any> this;
-        if (element.attributes['raw_latex-with-value'] !== undefined) {
+        if (element.attributes['math_content-with-value'] !== undefined) {
+          var mathContent = <IMathExpressionContent>(
+            _this.htmlEscaper.escapedJsonToObj(
+              element.attributes['math_content-with-value'].textContent));
           const latexSpeakableText = _this._formatLatexToSpeakableText(
-            element.attributes['raw_latex-with-value'].textContent);
+            mathContent.raw_latex);
           return latexSpeakableText.length > 0 ? latexSpeakableText + ' ' : '';
         }
       });
