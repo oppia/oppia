@@ -861,7 +861,6 @@ angular.module('oppia').component('svgFilenameEditor', {
           ctrl.canvasMaxWidth = width;
         }
         ctrl.canvas.renderAll();
-        $scope.$applyAsync();
       };
 
       var initializeFabricJs = function() {
@@ -871,6 +870,7 @@ angular.module('oppia').component('svgFilenameEditor', {
         ctrl.resizeSubscription = WindowDimensionsService.getResizeEvent().
           subscribe(evt => {
             ctrl.setCanvasDimensions();
+            $scope.$applyAsync();
           });
 
         ctrl.canvas.selection = false;
