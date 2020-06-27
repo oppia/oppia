@@ -47,6 +47,7 @@ angular.module('oppia').controller('RteHelperModalController', [
     $timeout(function() {
       $scope.modalIsLoading = false;
     });
+
     $scope.currentRteIsMathExpressionEditor = false;
     $scope.tmpCustomizationArgs = [];
     for (var i = 0; i < customizationArgSpecs.length; i++) {
@@ -79,6 +80,7 @@ angular.module('oppia').controller('RteHelperModalController', [
 
     $scope.save = function() {
       $scope.$broadcast('externalSave');
+
       var customizationArgsDict = {};
       let caName : string;
       if ($scope.currentRteIsMathExpressionEditor) {

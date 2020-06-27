@@ -180,6 +180,7 @@ angular.module('oppia').factory('AssetsBackendApiService', [
         });
       });
     };
+
     var _saveMathExpresionImage = function(
         resampledFile, filename, entityType, entityId, successCallback,
         errorCallback) {
