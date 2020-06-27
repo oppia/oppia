@@ -560,9 +560,6 @@ import { WrittenTranslationObjectFactory } from
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
 
-@Injectable({
-  providedIn: 'root'
-})
 export class UpgradedServices {
   getUpgradedServices() {
     var upgradedServices = {};
@@ -1391,7 +1388,3 @@ export class UpgradedServices {
     return upgradedServices;
   }
 }
-
-angular.module('oppia').factory(
-  'UpgradedServices',
-  downgradeInjectable(UpgradedServices));

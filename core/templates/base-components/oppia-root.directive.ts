@@ -74,6 +74,7 @@ export const ANGULAR_SERVICES = [
   'GenerateContentIdService', 'GraphDetailService',
   'GraphInputValidationService', 'GraphUtilsService',
   'GuestCollectionProgressObjectFactory', 'GuestCollectionProgressService',
+  'GuppyConfigurationService',
   'HighBounceRateTaskObjectFactory', 'HintObjectFactory', 'HtmlEscaperService',
   'I18nLanguageCodeService', 'IdGenerationService',
   'ImageClickInputValidationService', 'ImageFileObjectFactory',
