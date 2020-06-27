@@ -1,6 +1,7 @@
 // Code - https://github.com/jiggzson/nerdamer/blob/master/nerdamer.core.js
 
-interface MathExpr {
+namespace nerdamer {
+  interface Expression {
     // Returns all variables in the given MathExpr.
     variables: () => string[];
 
@@ -24,7 +25,7 @@ interface MathExpr {
 
     // Multiplies two MathExprs.
     multiply: (x: string) => MathExpr;
-    
+
     // Divides two MathExprs.
     divides: (x: string) => MathExpr;
 
@@ -45,4 +46,5 @@ interface MathExpr {
 
     // Checks if one MathExpr is greater than, or equal to, other.
     gte: (x: string) => boolean;
+  }
 }
