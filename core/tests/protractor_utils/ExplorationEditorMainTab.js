@@ -638,7 +638,6 @@ var ExplorationEditorMainTab = function() {
       SetInput: 'Math',
       AlgebraicExpressionInput: 'Math',
       MathEquationInput: 'Math',
-      MathExpressionInput: 'Math',
       NumberWithUnits: 'Math',
       CodeRepl: 'Programming',
       PencilCodeEditor: 'Programming',
