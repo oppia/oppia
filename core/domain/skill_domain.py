@@ -23,6 +23,7 @@ from constants import constants
 from core.domain import android_validation_constants
 from core.domain import change_domain
 from core.domain import html_cleaner
+from core.domain import html_validation_service
 from core.domain import state_domain
 import feconf
 import python_utils
@@ -802,6 +803,41 @@ class Skill(python_utils.OBJECT):
             constants.DEFAULT_LANGUAGE_CODE, 0, 0, None, False, [])
 
     @classmethod
+    def _convert_skill_contents_v1_dict_to_v2_dict(cls, skill_contents_dict):
+        """Converts v1 skill contents to the v2 schema. In the v2 schema,
+        the new Math components schema is introduced.
+
+        Args:
+            skill_contents_dict: dict. The v1 skill_contents_dict.
+
+        Returns:
+            dict. The converted skill_contents_dict.
+        """
+        skill_contents_dict['explanation']['html'] = (
+            html_validation_service.add_math_content_to_math_rte_components(
+                skill_contents_dict['explanation']['html']))
+        skill_contents_dict['written_translations'] = (
+            state_domain.WrittenTranslations.
+            convert_html_in_written_translations(
+                skill_contents_dict['written_translations'],
+                html_validation_service.
+                add_math_content_to_math_rte_components))
+
+        for value_index, value in enumerate(
+                skill_contents_dict['worked_examples']):
+            skill_contents_dict['worked_examples'][value_index][
+                'question']['html'] = (
+                    html_validation_service.
+                    add_math_content_to_math_rte_components(
+                        value['question']['html']))
+            skill_contents_dict['worked_examples'][value_index][
+                'explanation']['html'] = (
+                    html_validation_service.
+                    add_math_content_to_math_rte_components(
+                        value['explanation']['html']))
+        return skill_contents_dict
+
+    @classmethod
     def update_skill_contents_from_model(
             cls, versioned_skill_contents, current_version):
         """Converts the skill_contents blob contained in the given
@@ -868,6 +904,25 @@ class Skill(python_utils.OBJECT):
         return misconception_dict
 
     @classmethod
+    def _convert_misconception_v2_dict_to_v3_dict(cls, misconception_dict):
+        """Converts v2 misconception schema to the v3 schema. In the v3 schema,
+        the new Math components schema is introduced.
+
+        Args:
+            misconception_dict: dict. The v2 misconception dict.
+
+        Returns:
+            dict. The converted misconception_dict.
+        """
+        misconception_dict['notes'] = (
+            html_validation_service.add_math_content_to_math_rte_components(
+                misconception_dict['notes']))
+        misconception_dict['feedback'] = (
+            html_validation_service.add_math_content_to_math_rte_components(
+                misconception_dict['feedback']))
+        return misconception_dict
+
+    @classmethod
     def _convert_rubric_v1_dict_to_v2_dict(cls, rubric_dict):
         """Converts v1 rubric schema to the v2 schema. In the v2 schema,
         multiple explanations have been added for each difficulty.
@@ -881,6 +936,24 @@ class Skill(python_utils.OBJECT):
         explanation = rubric_dict['explanation']
         del rubric_dict['explanation']
         rubric_dict['explanations'] = [explanation]
+        return rubric_dict
+
+    @classmethod
+    def _convert_rubric_v2_dict_to_v3_dict(cls, rubric_dict):
+        """Converts v2 rubric schema to the v3 schema. In the v3 schema,
+        the new Math components schema is introduced.
+
+        Args:
+            rubric_dict: dict. The v2 rubric dict.
+
+        Returns:
+            dict. The converted rubric_dict.
+        """
+        for explanation_index, explanation in enumerate(
+                rubric_dict['explanations']):
+            rubric_dict['explanations'][explanation_index] = (
+                html_validation_service.add_math_content_to_math_rte_components(
+                    explanation))
         return rubric_dict
 
     @classmethod
