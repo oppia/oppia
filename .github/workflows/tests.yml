@@ -1,5 +1,11 @@
 name: CI Tests
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - develop
+  pull_request:
+    branches:
+      - develop
 
 jobs:
   backend:
@@ -35,9 +41,7 @@ jobs:
           architecture: 'x64'
       - name: Install third party
         run: python -m scripts.install_third_party_libs
+      - name: Suppress ENOSPC error from chokidar file watcher. See https://stackoverflow.com/a/32600959.
+        run: echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
       - name: Run frontend tests
-        run: |
-          # Suppresses ENOSPC error from chokidar file watcher: see https://stackoverflow.com/a/32600959.
-          # Probably due to GitHub Actions machines having low capacity.
-          echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
-          python -m scripts.run_frontend_tests --run_minified_tests --skip_install --check_coverage
+        run: python -m scripts.run_frontend_tests --run_minified_tests --skip_install --check_coverage
