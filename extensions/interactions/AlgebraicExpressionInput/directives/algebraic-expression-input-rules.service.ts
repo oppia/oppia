@@ -19,9 +19,9 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-import { MathInteractionsService } from 'services/math-interactions.service.ts';
+import nerdamer from 'nerdamer';
 
-const nerdamer = require('nerdamer');
+import { MathInteractionsService } from 'services/math-interactions.service.ts';
 
 @Injectable({
   providedIn: 'root'

@@ -19,7 +19,7 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-const nerdamer = require('nerdamer');
+import nerdamer from 'nerdamer';
 
 import { AlgebraicExpressionInputRulesService } from
   // eslint-disable-next-line max-len
