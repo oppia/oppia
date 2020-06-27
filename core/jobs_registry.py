@@ -56,6 +56,8 @@ ONE_OFF_JOB_MANAGERS = [
     exp_jobs_one_off.ViewableExplorationsAuditJob,
     exp_jobs_one_off.ExplorationContentValidationJobForCKEditor,
     exp_jobs_one_off.InteractionCustomizationArgsValidationJob,
+    exp_jobs_one_off.ExplorationMathTagValidationOneOffJob,
+    exp_jobs_one_off.ExplorationMockMathMigrationOneOffJob,
     feedback_jobs_one_off.FeedbackThreadCacheOneOffJob,
     opportunity_jobs_one_off.ExplorationOpportunitySummaryModelRegenerationJob,
     opportunity_jobs_one_off.SkillOpportunityModelRegenerationJob,
@@ -95,7 +97,7 @@ ONE_OFF_JOB_MANAGERS = [
     user_jobs_one_off.UserProfilePictureOneOffJob,
     user_jobs_one_off.UsernameLengthAuditOneOffJob,
     user_jobs_one_off.UsernameLengthDistributionOneOffJob,
-    exp_jobs_one_off.MathExpressionInputInteractionOneOffJob,
+    exp_jobs_one_off.MathExpressionValidationOneOffJob,
     exp_jobs_one_off.MultipleChoiceInteractionOneOffJob
 ]
 

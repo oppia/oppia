@@ -311,7 +311,7 @@ angular.module('oppia').directive('topNavigationBar', [
 
                 // TODO(#8521): Remove the use of $rootScope.$apply()
                 // once the directive is migrated to angular
-                $scope.$apply();
+                $scope.$applyAsync();
               });
             // The function needs to be run after i18n. A timeout of 0 appears
             // to run after i18n in Chrome, but not other browsers. The function
