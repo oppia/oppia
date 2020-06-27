@@ -135,11 +135,9 @@ class OppiaAngularRootLinter(python_utils.OBJECT):
             if total_error_count:
                 python_utils.PRINT('(%s files checked, %s errors found)' % (
                     total_files_checked, total_error_count))
-                error_message = 'OppiaAngularRootComponent linting failed,'
-                error_message += ' fix the errors listed below'
-                summary_message = (
-                    '%s ' + error_message + ''
-                    '.' % linter_utils.FAILED_MESSAGE_PREFIX)
+                summary_message = linter_utils.FAILED_MESSAGE_PREFIX
+                summary_message += 'OppiaAngularRootComponent linting failed,'
+                summary_message += ' fix the errors listed below'
                 summary_messages.append(summary_message)
             else:
                 summary_message = (
