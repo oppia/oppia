@@ -81,6 +81,7 @@ class OldLibraryRedirectPage(base.BaseHandler):
 
 
 class LibraryPage(base.BaseHandler):
+
     """The main library page. Used for both the default list of categories and
     for search results.
     """

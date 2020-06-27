@@ -97,6 +97,7 @@ class HomePageRedirectPage(base.BaseHandler):
     """When a request is made to '/', check the user's login status, and
     redirect them appropriately.
     """
+
     @acl_decorators.open_access
     def get(self):
         if self.user_id and user_services.has_fully_registered(self.user_id):
@@ -113,6 +114,7 @@ class HomePageRedirectPage(base.BaseHandler):
 
 class SplashRedirectPage(base.BaseHandler):
     """Redirect the old splash URL, '/splash' to the new one, '/'."""
+
     @acl_decorators.open_access
     def get(self):
         self.redirect('/')

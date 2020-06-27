@@ -943,6 +943,7 @@ class ThirdPartyJsTsLintChecksManager(python_utils.OBJECT):
     Attributes:
         verbose_mode_enabled: bool. True if verbose mode is enabled.
     """
+
     def __init__(
             self, files_to_lint, verbose_mode_enabled):
         """Constructs a ThirdPartyJsTsLintChecksManager object.

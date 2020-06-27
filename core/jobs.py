@@ -101,6 +101,7 @@ class BaseJobManager(python_utils.OBJECT):
     Each entire batch is not run in a transaction, but subclasses can still
     perform (a) or (c) transactionally if they wish to.
     """
+
     @classmethod
     def _is_abstract(cls):
         """Checks if the job is created using the abstract base manager class.
@@ -247,6 +248,7 @@ class BaseJobManager(python_utils.OBJECT):
             ordering, instead of simply using `collections.Counter` which has
             non-deterministic ordering.
             """
+
             pass
 
         # Consolidate the lines of output since repeating them isn't useful.
@@ -756,6 +758,7 @@ class BaseMapReduceJobManager(BaseJobManager):
     mapreduce/lib/pipeline internals. This is used to generate URLs pointing at
     the pipeline support UI.
     """
+
     _OUTPUT_KEY_ROOT_PIPELINE_ID = 'root_pipeline_id'
 
     @staticmethod
@@ -1050,6 +1053,7 @@ class BaseMapReduceJobManagerForContinuousComputations(BaseMapReduceJobManager):
     are used to perform background calculations that take place outside the
     usual client request/response cycle.
     """
+
     @classmethod
     def _get_continuous_computation_class(cls):
         """Returns the ContinuousComputationManager class associated with this
@@ -1137,6 +1141,7 @@ class BaseRealtimeDatastoreClassForContinuousComputations(
     when doing creations, gets, puts, and queries. This ensures that the
     relevant layer prefix gets appended.
     """
+
     realtime_layer = ndb.IntegerProperty(required=True, choices=[0, 1])
 
     @classmethod
@@ -1262,6 +1267,7 @@ class BaseContinuousComputationManager(python_utils.OBJECT):
     Queries arising during the time interval B will use the results of the
     second batch run, plus data from the realtime layer R0.
     """
+
     # TODO(sll): In the previous docstring, quantify what 'small' means
     # once we have some experience with this running in production.
 

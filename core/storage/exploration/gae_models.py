@@ -32,11 +32,13 @@ from google.appengine.ext import ndb
 
 class ExplorationSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for an exploration snapshot."""
+
     pass
 
 
 class ExplorationSnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content of an exploration snapshot."""
+
     pass
 
 
@@ -46,6 +48,7 @@ class ExplorationModel(base_models.VersionedModel):
     This class should only be imported by the exploration services file
     and the exploration model test file.
     """
+
     SNAPSHOT_METADATA_CLASS = ExplorationSnapshotMetadataModel
     SNAPSHOT_CONTENT_CLASS = ExplorationSnapshotContentModel
     ALLOW_REVERT = True
@@ -263,12 +266,14 @@ class ExplorationContextModel(base_models.BaseModel):
 class ExplorationRightsSnapshotMetadataModel(
         base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for an exploration rights snapshot."""
+
     pass
 
 
 class ExplorationRightsSnapshotContentModel(
         base_models.BaseSnapshotContentModel):
     """Storage model for the content of an exploration rights snapshot."""
+
     pass
 
 
@@ -464,6 +469,7 @@ class ExplorationRightsModel(base_models.VersionedModel):
                     cmd: str. Unique command.
                 and then additional arguments for that command.
         """
+
         super(ExplorationRightsModel, self)._trusted_commit(
             committer_id, commit_type, commit_message, commit_cmds)
 
@@ -536,6 +542,7 @@ class ExplorationRightsAllUsersModel(base_models.BaseModel):
 
     The id of each instance is the id of the corresponding exploration.
     """
+
     # The user_ids of users who are (or were in history) members of owner_ids,
     # editor_ids, voice_artist_ids or viewer_ids in corresponding rights model.
     all_user_ids = ndb.StringProperty(indexed=True, repeated=True)
@@ -607,6 +614,7 @@ class ExplorationCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     The id for this model is of the form
     'exploration-[exploration_id]-[version]'.
     """
+
     # The id of the exploration being edited.
     exploration_id = ndb.StringProperty(indexed=True, required=True)
 

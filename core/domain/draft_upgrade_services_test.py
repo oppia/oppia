@@ -31,6 +31,7 @@ import utils
 
 class DraftUpgradeUnitTests(test_utils.GenericTestBase):
     """Test the draft upgrade services module."""
+
     EXP_ID = 'exp_id'
     USER_ID = 'user_id'
     OTHER_CHANGE_LIST = [exp_domain.ExplorationChange({

@@ -619,6 +619,7 @@ class RecommendationsHandlerTests(test_utils.GenericTestBase):
     """Backend integration tests for recommended explorations for after an
     exploration is completed.
     """
+
     # Demo explorations.
     EXP_ID_0 = '0'
     EXP_ID_1 = '1'

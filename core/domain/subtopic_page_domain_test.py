@@ -29,6 +29,7 @@ import utils
 
 class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
     """Tests for subtopic page domain objects."""
+
     topic_id = 'topic_id'
     subtopic_id = 1
 

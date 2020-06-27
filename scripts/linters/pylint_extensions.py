@@ -1471,14 +1471,13 @@ class BlankLineBelowFileOverviewChecker(checkers.BaseChecker):
 
 class NewlineBelowClassDocstring(checkers.BaseChecker):
     """Checks if there is a single newline below the class docstring."""
-
     __implements__ = interfaces.IRawChecker
-    name = 'newline below class docstring'
+    name = 'newline-below-class-docstring'
     priority = -1
     msgs = {
         'C0026': (
-            'No newline below class docstring.',
-            'no-newline-below-class-docstring',
+            'No single newline below class docstring.',
+            'newline-below-class-docstring',
             'Please add a single newline below class docstring.'
         )
     }
@@ -1493,6 +1492,7 @@ class NewlineBelowClassDocstring(checkers.BaseChecker):
 
         in_class = False
         in_docstring = False
+        class_has_docstring = False
         file_content = read_from_node(node)
         file_length = len(file_content)
         blank_line_counter = 0
@@ -1505,15 +1505,41 @@ class NewlineBelowClassDocstring(checkers.BaseChecker):
                 prev_line = file_content[line_num - 1].strip()
 
             # Check if it is a docstring and not some multi-line string.
-            if (prev_line.startswith(b'class ') or in_class:
+            if prev_line.startswith(b'class ') or in_class:
                 in_class = True
-                if prev_line.endswith(b'):') and line.startswith(b'"""'):
-                    in_docstring = True
+                if prev_line.endswith(b'):'):
                     in_class = False
+                    if line.startswith(b'"""'):
+                        in_docstring = True
+                        class_has_docstring = True
 
             if line.endswith(b'"""'):
                 in_docstring = False
+                in_class = False
+                continue
 
+            if in_docstring:
+                continue
+
+            if class_has_docstring:
+                if file_content[line_num] == b'\n':
+                    blank_line_counter += 1
+
+                elif line.startswith(('class ', 'def', '@')):
+                    blank_line_counter = 0
+                    class_has_docstring = False
+
+                elif (
+                        blank_line_counter == 1 and
+                        file_content[line_num] != b'\n'):
+                    blank_line_counter = 0
+                    class_has_docstring = False
+
+                elif blank_line_counter != 1:
+                    class_has_docstring = False
+                    blank_line_counter = 0
+                    self.add_message(
+                        'newline-below-class-docstring', line=line_num + 1)
 
 
 def register(linter):
@@ -1537,3 +1563,4 @@ def register(linter):
     linter.register_checker(SingleLineCommentChecker(linter))
     linter.register_checker(DocstringChecker(linter))
     linter.register_checker(BlankLineBelowFileOverviewChecker(linter))
+    linter.register_checker(NewlineBelowClassDocstring(linter))

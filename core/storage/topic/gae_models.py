@@ -31,11 +31,13 @@ from google.appengine.ext import ndb
 
 class TopicSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for a topic snapshot."""
+
     pass
 
 
 class TopicSnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content of a topic snapshot."""
+
     pass
 
 
@@ -45,6 +47,7 @@ class TopicModel(base_models.VersionedModel):
     This class should only be imported by the topic services file
     and the topic model test file.
     """
+
     SNAPSHOT_METADATA_CLASS = TopicSnapshotMetadataModel
     SNAPSHOT_CONTENT_CLASS = TopicSnapshotContentModel
     ALLOW_REVERT = False
@@ -177,6 +180,7 @@ class TopicCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
 
     The id for this model is of the form 'topic-[topic_id]-[version]'.
     """
+
     # The id of the topic being edited.
     topic_id = ndb.StringProperty(indexed=True, required=True)
 

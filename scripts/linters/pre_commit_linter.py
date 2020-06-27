@@ -90,7 +90,7 @@ _PARSER.add_argument(
     '--verbose',
     help='verbose mode. All details will be printed.',
     action='store_true')
-_EXCLUSIVE_GROUP.add_argument(
+_PARSER.add_argument(
     '--only-check-file-extensions',
     nargs='+',
     choices=['html', 'css', 'js', 'ts', 'py', 'other'],
@@ -220,17 +220,17 @@ def _get_linters_for_file_extension(
     file_extension_type_js_ts = file_extension_to_lint == 'js' or (
         file_extension_to_lint == 'ts')
 
-    if file_extension_type_js_ts:
-        general_files_to_lint = _FILES['.js'] + _FILES['.ts']
-    elif file_extension_to_lint == 'other':
-        general_files_to_lint = _FILES['other']
-    else:
-        general_files_to_lint = _FILES['.%s' % file_extension_to_lint]
+    # if file_extension_type_js_ts:
+    #     general_files_to_lint = _FILES['.js'] + _FILES['.ts']
+    # elif file_extension_to_lint == 'other':
+    #     general_files_to_lint = _FILES['other']
+    # else:
+    #     general_files_to_lint = _FILES['.%s' % file_extension_to_lint]
 
-    custom_linter, third_party_linter = general_purpose_linter.get_linters(
-        general_files_to_lint,
-        verbose_mode_enabled=verbose_mode_enabled)
-    custom_linters.append(custom_linter)
+    # custom_linter, third_party_linter = general_purpose_linter.get_linters(
+    #     general_files_to_lint,
+    #     verbose_mode_enabled=verbose_mode_enabled)
+    # custom_linters.append(custom_linter)
 
     if file_extension_type_js_ts:
         custom_linter, third_party_linter = js_ts_linter.get_linters(
@@ -550,12 +550,12 @@ def main(args=None):
         semaphore.acquire()
         _get_task_output(lint_messages, task, semaphore)
 
-    lint_messages += codeowner_linter.check_codeowner_file(
-        verbose_mode_enabled)
-
-    lint_messages += (
-        third_party_typings_linter.check_third_party_libs_type_defs(
-            verbose_mode_enabled))
+    # lint_messages += codeowner_linter.check_codeowner_file(
+    #     verbose_mode_enabled)
+    #
+    # lint_messages += (
+    #     third_party_typings_linter.check_third_party_libs_type_defs(
+    #         verbose_mode_enabled))
 
     _print_complete_summary_of_lint_messages(lint_messages)
 

@@ -266,6 +266,7 @@ class VoiceArtistAutosaveTest(BaseVoiceArtistControllerTests):
 
 class TranslationFirstTimeTutorialTest(BaseVoiceArtistControllerTests):
     """This controller tests the first time tutorial for translations."""
+
     EXP_ID = 'exp1'
 
     def setUp(self):

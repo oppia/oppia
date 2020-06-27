@@ -31,6 +31,7 @@ import utils
 
 class TopicDomainUnitTests(test_utils.GenericTestBase):
     """Tests for topic domain objects."""
+
     topic_id = 'topic_id'
 
     def setUp(self):

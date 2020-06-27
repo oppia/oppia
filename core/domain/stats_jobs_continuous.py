@@ -40,6 +40,7 @@ class InteractionAnswerSummariesMRJobManager(
     """Job to calculate interaction view statistics, e.g. most frequent answers
     of multiple-choice interactions.
     """
+
     @classmethod
     def _get_continuous_computation_class(cls):
         """Returns the InteractionAnswerSummariesAggregator class associated
@@ -274,6 +275,7 @@ class InteractionAnswerSummariesRealtimeModel(
     # TODO(bhenning): Implement a real-time model for
     # InteractionAnswerSummariesAggregator.
     """Realtime model class for InteractionAnswerSummariesAggregator."""
+
     pass
 
 
@@ -282,6 +284,7 @@ class InteractionAnswerSummariesAggregator(
     """A continuous-computation job that listens to answers to states and
     updates StateAnswer view calculations.
     """
+
     @classmethod
     def get_event_types_listened_to(cls):
         """Returns a list of event types that this class subscribes to.
