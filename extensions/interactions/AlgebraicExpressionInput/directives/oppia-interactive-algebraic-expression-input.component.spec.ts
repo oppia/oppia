@@ -17,11 +17,13 @@
  * component.
  */
 
+import { DeviceInfoService } from 'services/contextual/device-info.service.ts';
 import { GuppyConfigurationService } from
   'services/guppy-configuration.service.ts';
 import { GuppyInitializationService } from
   'services/guppy-initialization.service.ts';
 import { MathInteractionsService } from 'services/math-interactions.service.ts';
+import { WindowRef } from 'services/contextual/window-ref.service.ts';
 
 require(
   'interactions/AlgebraicExpressionInput/directives/' +
@@ -67,7 +69,8 @@ describe('AlgebraicExpressionInputInteractive', function() {
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
-    guppyConfigurationService = new GuppyConfigurationService();
+    guppyConfigurationService = new GuppyConfigurationService(
+      new DeviceInfoService(new WindowRef()));
     mathInteractionsService = new MathInteractionsService();
     guppyInitializationService = new GuppyInitializationService();
 
