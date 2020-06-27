@@ -10,7 +10,7 @@
 // distributed under the License is distributed on an "AS-IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
-// limitations under the License.
+// limitations under the License. Minor change made to comment here (test).
 
 require('domain/user/UserInfoObjectFactory.ts');
 require('services/contextual/url.service.ts');
@@ -18,9 +18,6 @@ require('services/contextual/url.service.ts');
 /**
  * @fileoverview Service for user data.
  */
-
- //test commit and push
- 
 
 angular.module('oppia').factory('UserService', [
   '$http', '$q', '$window', 'UrlInterpolationService', 'UrlService',
