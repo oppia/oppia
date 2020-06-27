@@ -582,12 +582,17 @@ angular.module('oppia').directive('stateResponses', [
             });
 
             $scope.$on('updateAnswerChoices', function(evt, newAnswerChoices) {
-              ResponsesService.updateAnswerChoices(
-                newAnswerChoices, function(newAnswerGroups) {
-                  $scope.onSaveInteractionAnswerGroups(newAnswerGroups);
-                  $scope.refreshWarnings()();
-                });
+              ResponsesService.updateAnswerChoices(newAnswerChoices);
             });
+            $scope.$on(
+              'handleCustomArgsUpdate',
+              function(evt, newAnswerChoices) {
+                ResponsesService.handleCustomArgsUpdate(
+                  newAnswerChoices, function(newAnswerGroups) {
+                    $scope.onSaveInteractionAnswerGroups(newAnswerGroups);
+                    $scope.refreshWarnings()();
+                  });
+              });
             // When the page is scrolled so that the top of the page is above
             // the browser viewport, there are some bugs in the positioning of
             // the helper. This is a bug in jQueryUI that has not been fixed
