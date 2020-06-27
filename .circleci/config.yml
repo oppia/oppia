@@ -92,7 +92,7 @@ jobs:
       - run:
           name: Check if all tests should be run
           command: |
-            files_changed=$(git diff --name-only $(git merge-base $(git rev-parse --abbrev-ref HEAD) develop)..HEAD
+            files_changed=$(git diff --name-only $(git merge-base $(git rev-parse --abbrev-ref HEAD) develop)..HEAD)
             echo $files_changed
             if [ "$files_changed" != "AUTHORS CHANGELOG CONTRIBUTORS core/templates/pages/about-page/about-page.constants.ts" ]; then
               echo 'export RUN_TESTS=true' >> $BASH_ENV
