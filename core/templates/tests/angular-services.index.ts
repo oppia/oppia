@@ -97,7 +97,7 @@ import { CollectionCreationBackendService } from
 import { CollectionCreationService } from
   'components/entity-creation-services/collection-creation.service';
 import { CollectionNodeObjectFactory } from
-  'domain/collection/CollectionNodeObjectFactory';
+  'domain/collection/collection-node-object.factory';
 import { CollectionObjectFactory } from
   'domain/collection/CollectionObjectFactory';
 import { CollectionPlaythroughObjectFactory } from
@@ -320,8 +320,6 @@ import { ProfilePageBackendApiService } from
 import { PythonProgramTokenizer } from 'classifiers/python-program.tokenizer';
 import { QuestionBackendApiService } from
   'domain/question/question-backend-api.service.ts';
-import { QuestionCreationService } from
-  'components/entity-creation-services/question-creation.service';
 import { QuestionSummaryForOneSkillObjectFactory }
   from 'domain/question/QuestionSummaryForOneSkillObjectFactory';
 import { QuestionSummaryObjectFactory } from
@@ -591,7 +589,7 @@ export const ANGULAR_SERVICES = [
   PlaythroughService, PredictionAlgorithmRegistryService,
   PredictionResultObjectFactory, PretestQuestionBackendApiService,
   ProfilePageBackendApiService, PythonProgramTokenizer,
-  QuestionBackendApiService, QuestionCreationService,
+  QuestionBackendApiService,
   QuestionSummaryForOneSkillObjectFactory, QuestionSummaryObjectFactory,
   RatingComputationService, ReadOnlyCollectionBackendApiService,
   ReadOnlyStoryNodeObjectFactory, ReadOnlySubtopicPageObjectFactory,
@@ -709,7 +707,7 @@ export const ANGULAR_SERVICES_NAMES = [
   'PlaythroughService', 'PredictionAlgorithmRegistryService',
   'PredictionResultObjectFactory', 'PretestQuestionBackendApiService',
   'ProfilePageBackendApiService', 'PythonProgramTokenizer',
-  'QuestionBackendApiService', 'QuestionCreationService',
+  'QuestionBackendApiService',
   'QuestionSummaryForOneSkillObjectFactory', 'QuestionSummaryObjectFactory',
   'RatingComputationService', 'ReadOnlyCollectionBackendApiService',
   'ReadOnlyStoryNodeObjectFactory', 'ReadOnlySubtopicPageObjectFactory',

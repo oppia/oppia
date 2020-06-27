@@ -105,7 +105,7 @@ export const ANGULAR_SERVICES = [
   'PlaythroughService', 'PredictionAlgorithmRegistryService',
   'PredictionResultObjectFactory', 'PretestQuestionBackendApiService',
   'ProfilePageBackendApiService', 'PythonProgramTokenizer',
-  'QuestionBackendApiService', 'QuestionCreationService',
+  'QuestionBackendApiService',
   'QuestionSummaryForOneSkillObjectFactory', 'QuestionSummaryObjectFactory',
   'RatingComputationService', 'ReadOnlyCollectionBackendApiService',
   'ReadOnlyStoryNodeObjectFactory', 'ReadOnlySubtopicPageObjectFactory',
