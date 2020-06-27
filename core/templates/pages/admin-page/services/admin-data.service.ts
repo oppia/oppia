@@ -17,34 +17,33 @@
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
-import { AdminPageConstants } from
-  'pages/admin-page/admin-page.constants';
+import { AdminPageData, AdminBackendApiService } from
+  'domain/admin/admin-backend-api.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AdminDataService {
-  dataPromise: Promise<Object>;
+  dataPromise: Promise<AdminPageData>;
 
-  constructor(private http: HttpClient) {
+  constructor(
+    private adminBackendApiService: AdminBackendApiService) {
     this.dataPromise = null;
   }
 
-  _getDataAsync(): Promise<Object> {
+  _getDataAsync(): Promise<AdminPageData> {
     if (this.dataPromise) {
       return this.dataPromise;
     }
 
-    this.dataPromise = this.http.get(
-      AdminPageConstants.ADMIN_HANDLER_URL).toPromise();
+    this.dataPromise = this.adminBackendApiService.getData();
 
     return this.dataPromise;
   }
 
-  getDataAsync(): Promise<Object> {
+  getDataAsync(): Promise<AdminPageData> {
     return this._getDataAsync();
   }
 }

@@ -21,7 +21,7 @@ import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ANGULAR_SERVICES, ANGULAR_SERVICES_NAMES } from
   'tests/angular-services.index';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-const { fabric } = require('fabric');
+import { fabric } from 'fabric';
 import { AppConstants } from 'app.constants';
 
 describe('SvgFilenameEditor', function() {

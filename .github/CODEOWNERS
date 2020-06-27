@@ -31,6 +31,7 @@
 /core/templates/services/question-validation.service*.ts @bansalnitish @srijanreddy98
 /core/templates/services/request-interceptor.service*.ts @bansalnitish @srijanreddy98
 /core/templates/services/translate.service.ts @bansalnitish @srijanreddy98
+/core/templates/services/translations-backend-api.service.ts @bansalnitish @srijanreddy98
 /core/templates/services/UpgradedServices.ts @bansalnitish @srijanreddy98
 /core/templates/tests/angular-services.index.ts @bansalnitish @srijanreddy98
 /typings/ @ankita240796
@@ -101,6 +102,7 @@
 /core/domain/learner_progress*.py @nithusha21
 /core/domain/subscription_services*.py @nithusha21
 /core/templates/domain/creator_dashboard/ @nithusha21
+/core/templates/domain/email-dashboard/ @nithusha21
 /core/templates/domain/learner_dashboard/ @nithusha21
 /core/templates/pages/creator-dashboard-page/ @nithusha21
 /core/templates/pages/email-dashboard-pages/ @nithusha21
@@ -156,6 +158,7 @@
 /core/templates/components/version-diff-visualization/version-diff-visualization.directive.ts @aks681
 /core/templates/domain/editor/ @aks681 @kevintab95
 /core/templates/domain/exploration/ @aks681 @kevintab95
+/core/templates/domain/recommendations/ @kevintab95
 /core/templates/domain/state/ @kevintab95
 /core/templates/domain/summary/ @kevintab95
 /core/templates/domain/state_card/ @kevintab95
@@ -191,7 +194,7 @@
 # Global components and filters.
 /core/templates/components/button-directives/exploration-embed-button.service.ts @ankita240796
 /core/templates/components/button-directives/exploration-embed-button.directive.html @ankita240796
-/core/templates/components/button-directives/exploration-embed-button-modal.controller.ts @ankita240796
+/core/templates/components/button-directives/exploration-embed-button-modal.controller*.ts @ankita240796
 /core/templates/components/button-directives/social-buttons.directive.ts @ankita240796
 /core/templates/components/button-directives/social-buttons.directive.html @ankita240796
 /core/templates/components/common-layout-directives/common-elements/alert-message.directive.ts @ankita240796
@@ -311,7 +314,6 @@
 /core/domain/question*.py @aks681
 /core/storage/question/ @aks681
 /core/templates/components/concept-card/ @kevintab95
-/core/templates/components/entity-creation-services/question-creation.service.ts @kevintab95
 /core/templates/components/score-ring/ @kevintab95
 /core/templates/components/skill-mastery/ @kevintab95
 /core/templates/components/skills-mastery-list/ @kevintab95
@@ -430,6 +432,7 @@
 /core/controllers/moderator*.py @seanlip
 /core/controllers/recent_commits*.py @seanlip
 /core/domain/moderator_services*.py @seanlip
+/core/templates/domain/admin/ @DubeySandeep @nithusha21
 /core/templates/pages/admin-page/ @DubeySandeep @nithusha21
 /core/templates/pages/moderator-page/ @DubeySandeep @nithusha21
 
