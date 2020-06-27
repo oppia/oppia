@@ -20,6 +20,9 @@ import { TestBed } from '@angular/core/testing';
 
 import { GuppyConfigurationService } from
   'services/guppy-configuration.service';
+import { GuppyInitializationService } from
+  'services/guppy-initialization.service.ts';
+import { MathInteractionsService } from 'services/math-interactions.service.ts';
 
 declare global {
   interface Window {
@@ -30,14 +33,14 @@ declare global {
 class MockGuppy {
   constructor(id: string, config: Object) {}
 
-  event(name: string, handler: Function): void {
-    handler();
-  }
   asciimath(): string {
     return 'Dummy value';
   }
-  render(): void {}
   configure(name: string, val: Object): void {}
+  static event(name: string, handler: Function): void {
+    handler();
+  }
+  static configure(name: string, val: Object): void {}
   static 'remove_global_symbol'(symbol: string): void {}
 }
 
@@ -77,29 +80,32 @@ describe('GuppyConfigurationService', () => {
   });
 
   describe('Components calling the service', () => {
-    let MathEditorCtrl = null;
+    let ctrl = null;
 
     beforeEach(angular.mock.module('oppia'));
     beforeEach(angular.mock.module('oppia', function($provide) {
       $provide.value(
         'GuppyConfigurationService', guppyConfigurationService);
+      $provide.value('MathInteractionsService', new MathInteractionsService());
+      $provide.value('GuppyInitializationService',
+        new GuppyInitializationService());
     }));
     beforeEach(angular.mock.inject(function($componentController) {
-      MathEditorCtrl = $componentController('mathEditor');
+      ctrl = $componentController('algebraicExpressionEditor');
     }));
 
     it('should configure guppy on the first initialization', () => {
       GuppyConfigurationService.serviceIsInitialized = false;
       spyOn(Guppy, 'remove_global_symbol');
-      MathEditorCtrl.$onInit();
+      ctrl.$onInit();
       expect(Guppy.remove_global_symbol).toHaveBeenCalled();
     });
 
     it('should not configure guppy on multiple initializations', () => {
-      MathEditorCtrl.$onInit();
+      ctrl.$onInit();
 
       spyOn(Guppy, 'remove_global_symbol');
-      MathEditorCtrl.$onInit();
+      ctrl.$onInit();
       expect(Guppy.remove_global_symbol).not.toHaveBeenCalled();
 
       let mockComponent = new MockComponent(guppyConfigurationService);
