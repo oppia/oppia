@@ -30,6 +30,9 @@ require('directives/angular-html-bind.directive.ts');
 require(
   'pages/skill-editor-page/editor-tab/skill-concept-card-editor/' +
   'worked-example-editor.directive.ts');
+require(
+  'pages/skill-editor-page/modal-templates/' +
+  'add-worked-example-modal.controller.ts');
 
 require('domain/exploration/SubtitledHtmlObjectFactory.ts');
 require('domain/skill/skill-update.service.ts');
@@ -62,6 +65,11 @@ angular.module('oppia').directive('skillConceptCardEditor', [
         '$scope', '$filter', '$uibModal',
         function($scope, $filter, $uibModal) {
           var ctrl = this;
+
+          $scope.getStaticImageUrl = function(imagePath) {
+            return UrlInterpolationService.getStaticImageUrl(imagePath);
+          };
+
           ctrl.directiveSubscriptions = new Subscription();
           var initBindableFieldsDict = function() {
             $scope.bindableFieldsDict = {
@@ -123,32 +131,7 @@ angular.module('oppia').directive('skillConceptCardEditor', [
                 '/pages/skill-editor-page/modal-templates/' +
                 'add-worked-example-modal.directive.html'),
               backdrop: 'static',
-              controller: [
-                '$controller', '$scope', '$uibModalInstance',
-                function($controller, $scope, $uibModalInstance) {
-                  $controller('ConfirmOrCancelModalController', {
-                    $scope: $scope,
-                    $uibModalInstance: $uibModalInstance
-                  });
-
-                  $scope.WORKED_EXAMPLE_FORM_SCHEMA = {
-                    type: 'html',
-                    ui_config: {}
-                  };
-
-                  $scope.tmpWorkedExampleQuestionHtml = '';
-                  $scope.tmpWorkedExampleExplanationHtml = '';
-
-                  $scope.saveWorkedExample = function() {
-                    $uibModalInstance.close({
-                      workedExampleQuestionHtml:
-                        $scope.tmpWorkedExampleQuestionHtml,
-                      workedExampleExplanationHtml:
-                        $scope.tmpWorkedExampleExplanationHtml
-                    });
-                  };
-                }
-              ]
+              controller: 'AddWorkedExampleModalController'
             }).result.then(function(result) {
               var newExample = WorkedExampleObjectFactory.create(
                 SubtitledHtmlObjectFactory.createDefault(
@@ -177,11 +160,9 @@ angular.module('oppia').directive('skillConceptCardEditor', [
 
           ctrl.$onInit = function() {
             $scope.skill = SkillEditorStateService.getSkill();
-            $scope.dragDotsImgUrl = UrlInterpolationService.getStaticImageUrl(
-              '/general/drag_dots.png');
             initBindableFieldsDict();
             ctrl.directiveSubscriptions.add(
-              SkillEditorStateService.getSkillChangedSubject().subscribe(
+              SkillEditorStateService.onSkillChange.subscribe(
                 () => initBindableFieldsDict())
             );
 

@@ -31,8 +31,8 @@
         color: #01645c;
         font-family: Capriola, Roboto, Arial, sans-serif;
         font-size: 3em;
-        margin-top: 0;
         margin-bottom: 25px;
+        margin-top: 0;
         padding-top: 30px;
         text-align: center;
       }
@@ -79,8 +79,8 @@
       }
 
       .mobile-lesson-icon {
-        position: absolute;
         left: 50%;
+        position: absolute;
         transform: translate(-50%, -50%);
         width: 100px;
       }
@@ -99,8 +99,8 @@
 
       .oppia-lesson-icon-uncompleted {
         background-color: #ffffff;
-        border-radius: 50%;
         border: #296E5F 3px solid;
+        border-radius: 50%;
         height: 40px;
         left: 50%;
         position: absolute;
@@ -148,7 +148,7 @@
         box-shadow: 0px 2px 4px 2px rgba(0, 0, 0, 0.1);
         margin-top: 16px;
         overflow: hidden;
-        width: 300px;
+        width: 185px;
       }
 
       .oppia-story-viewer-card-description-box {
@@ -162,9 +162,10 @@
       }
 
       .oppia-story-viewer-mobile-card-description-box {
-        padding: 20px;
         max-height: 180px;
         min-height: 120px;
+        padding: 15px;
+        width: 185px;
       }
 
       .oppia-lesson-track {
@@ -186,7 +187,7 @@
         padding-top: 3px;
       }
 
-      @media (max-width: 768px) {
+      @media (max-width: 640px) {
         .oppia-story-viewer-title {
           margin-top: 20px;
           padding-left: 40px;
@@ -211,13 +212,13 @@
         }
 
         .oppia-lesson-icon-completed {
-          width: 55px;
           height: 55px;
+          width: 55px;
         }
 
         .oppia-lesson-icon-uncompleted {
-          width: 55px;
           height: 55px;
+          width: 55px;
         }
 
         .oppia-story-viewer-inner-container {
@@ -225,7 +226,13 @@
         }
       }
 
-      @media (min-width: 769px) {
+      @media (max-width: 500px) {
+        .oppia-story-viewer-card {
+          width: 40vw;
+        }
+      }
+
+      @media (min-width: 641px) {
         .oppia-story-viewer-mobile-card-content {
           display: none;
         }
@@ -253,24 +260,25 @@
     </style>
   </head>
   <body>
-    <service-bootstrap></service-bootstrap>
-    <div ng-controller="Base">
-      <base-content>
-        <navbar-breadcrumb>
-          <story-viewer-navbar-breadcrumb>
-          </story-viewer-navbar-breadcrumb>
-        </navbar-breadcrumb>
+    <oppia-root>
+      <div ng-controller="Base">
+        <base-content>
+          <navbar-breadcrumb>
+            <story-viewer-navbar-breadcrumb>
+            </story-viewer-navbar-breadcrumb>
+          </navbar-breadcrumb>
 
-        <content>
-          <background-banner></background-banner>
-          <story-viewer-page></story-viewer-page>
-        </content>
+          <content>
+            <background-banner></background-banner>
+            <story-viewer-page></story-viewer-page>
+          </content>
 
-        <page-footer></page-footer>
+          <page-footer></page-footer>
 
-      </base-content>
-    </div>
+        </base-content>
+      </div>
 
+    </oppia-root>
     @load('pages/footer_js_libs.html')
   </body>
 </html>

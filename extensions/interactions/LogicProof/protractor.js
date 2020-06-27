@@ -30,7 +30,7 @@ var expectInteractionDetailsToMatch = async function(elem) {
 };
 
 var submitAnswer = async function() {
-  // TODO(nithusha21): find a way to send keys to the code-mirror element.
+  // TODO(nithusha21): Find a way to send keys to the code-mirror element.
   // Temporarily pass the answer as defaultText in the customization args.
   await element(by.css('.oppia-learner-confirm-button')).click();
 };

@@ -17,6 +17,9 @@
  *  like engine service.
  */
 
+import { OppiaAngularRootComponent } from
+  'components/oppia-angular-root.component';
+
 require('domain/exploration/editable-exploration-backend-api.service.ts');
 require('domain/exploration/read-only-exploration-backend-api.service.ts');
 require('domain/question/pretest-question-backend-api.service.ts');
@@ -64,6 +67,8 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
       ReadOnlyExplorationBackendApiService, StateClassifierMappingService,
       StatsReportingService, UrlInterpolationService, UrlService,
       EXPLORATION_MODE) {
+    StatsReportingService = (
+      OppiaAngularRootComponent.statsReportingService);
     var currentEngineService = null;
     var explorationMode = EXPLORATION_MODE.OTHER;
     var editorPreviewMode = ContextService.isInExplorationEditorPage();
@@ -153,7 +158,7 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
         var featuresData = combinedData[1];
         if (doesMathExpressionInputInteractionExist(explorationData.states)) {
           Guppy.init({
-            symbols: ['/third_party/static/guppy-b5055b/sym/symbols.json',
+            symbols: ['/third_party/static/guppy-175999/sym/symbols.json',
               oppiaSymbolsUrl]});
         }
         ExplorationFeaturesService.init(explorationData, featuresData);
@@ -197,7 +202,7 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
           doesMathExpressionInputInteractionExist(
             explorationData.exploration.states)) {
           Guppy.init({
-            symbols: ['/third_party/static/guppy-b5055b/sym/symbols.json',
+            symbols: ['/third_party/static/guppy-175999/sym/symbols.json',
               oppiaSymbolsUrl]});
         }
         ExplorationFeaturesService.init(explorationData, featuresData);
@@ -250,7 +255,13 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
         return QuestionPlayerEngineService.getPretestQuestionCount();
       },
       moveToExploration: function(callback) {
-        setExplorationMode();
+        if (
+          UrlService.getUrlParams().hasOwnProperty('story_id') &&
+          UrlService.getUrlParams().hasOwnProperty('node_id')) {
+          setStoryChapterMode();
+        } else {
+          setExplorationMode();
+        }
         ExplorationEngineService.moveToExploration(callback);
       },
       getLanguageCode: function() {
