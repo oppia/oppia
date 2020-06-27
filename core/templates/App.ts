@@ -205,11 +205,30 @@ angular.module('oppia').config([
               return $q(function(resolve, reject) {
                 // Get CSRF token before sending the request.
                 CsrfTokenService.getTokenAsync().then(function(token) {
-                  config.data = $.param({
-                    csrf_token: token,
-                    payload: JSON.stringify(config.data),
-                    source: document.URL
-                  }, true);
+                  if ((config.data instanceof FormData )) {
+                    var hasPayload = false;
+                    // Check whether the FormData has payload in it.
+                    for (var key of config.data.keys()) {
+                      if (key === 'payload') {
+                        hasPayload = true;
+                        break;
+                      }
+                    }
+                    // If the payload is not created, create it and append it
+                    // to the request data.
+                    if (!hasPayload) {
+                      config.data.append(
+                        'payload', JSON.stringify(config.data));
+                    }
+                    config.data.append('csrf_token', token);
+                    config.data.append('source', document.URL);
+                  } else {
+                    config.data = $.param({
+                      csrf_token: token,
+                      payload: JSON.stringify(config.data),
+                      source: document.URL
+                    }, true);
+                  }
                   resolve(config);
                 });
               });
