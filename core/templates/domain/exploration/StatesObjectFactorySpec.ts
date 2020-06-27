@@ -532,8 +532,8 @@ describe('States Object Factory', () => {
     }));
   });
 
-  it('should correctly set any states\' interaction.defaultOutcomes that point '
-     + ' to a deleted or renamed state name', () => {
+  it('should correctly set any states\' interaction.defaultOutcomes that ' +
+     'point to a deleted or renamed state name', () => {
     let states = ssof.createFromBackendDict(statesWithCyclicOutcomeDict);
     states.renameState('first state', 'third state');
     states.deleteState('second state');
