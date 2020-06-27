@@ -39,7 +39,6 @@ describe('Creator dashboard controller', () => {
   var userInfo = {
     canCreateCollections: () => true
   };
-  var mockWindow = angular.element(window)[0];
   var resizeEvent = new Event('resize');
 
   beforeEach(angular.mock.module('oppia', $provide => {
@@ -47,10 +46,6 @@ describe('Creator dashboard controller', () => {
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
     }
-  }));
-
-  beforeEach(angular.mock.module('oppia', $provide => {
-    $provide.value('$window', mockWindow);
   }));
 
   beforeEach(angular.mock.inject(($injector, $componentController) => {
@@ -122,7 +117,7 @@ describe('Creator dashboard controller', () => {
         last_week_stats: {
           total_plays: 5
         },
-        display_preference: [],
+        display_preference: 'card',
         threads_for_created_suggestions_list: [{
           status: '',
           subject: '',
@@ -312,18 +307,41 @@ describe('Creator dashboard controller', () => {
 
       it('should update screen width on window resize', function() {
         var innerWidthSpy = spyOnProperty($window, 'innerWidth', 'get');
+        expect(ctrl.myExplorationsView).toBe('card');
 
         innerWidthSpy.and.returnValue(480);
-        mockWindow.dispatchEvent(resizeEvent);
+        $window.dispatchEvent(resizeEvent);
 
         expect(ctrl.myExplorationsView).toBe('card');
         expect(ctrl.publishText).toBe(
           'Publish the exploration to receive statistics.');
 
         innerWidthSpy.and.returnValue(768);
-        mockWindow.dispatchEvent(resizeEvent);
+        $window.dispatchEvent(resizeEvent);
 
         expect(ctrl.myExplorationsView).toBe('card');
+        expect(ctrl.publishText).toBe(
+          'This exploration is private. Publish it to receive statistics.');
+
+
+        $httpBackend.expect('POST', '/creatordashboardhandler/data').respond(
+          200);
+        ctrl.setMyExplorationsView('list');
+        $httpBackend.flush();
+
+        expect(ctrl.myExplorationsView).toBe('list');
+
+        innerWidthSpy.and.returnValue(480);
+        $window.dispatchEvent(resizeEvent);
+
+        expect(ctrl.myExplorationsView).toBe('card');
+        expect(ctrl.publishText).toBe(
+          'Publish the exploration to receive statistics.');
+
+        innerWidthSpy.and.returnValue(768);
+        $window.dispatchEvent(resizeEvent);
+
+        expect(ctrl.myExplorationsView).toBe('list');
         expect(ctrl.publishText).toBe(
           'This exploration is private. Publish it to receive statistics.');
       });
