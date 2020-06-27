@@ -267,7 +267,8 @@ var createSkillAndAssignTopic = async function(
   await topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
     skillDescription, material, true);
   await topicsAndSkillsDashboardPage.get();
-  await topicsAndSkillsDashboardPage.navigateToUnusedSkillsTab();
+  await topicsAndSkillsDashboardPage.navigateToSkillsTab();
+  await topicsAndSkillsDashboardPage.filterSkillsByStatus('Unassigned');
   await topicsAndSkillsDashboardPage.searchSkillByName(skillDescription);
   await topicsAndSkillsDashboardPage.assignSkillWithIndexToTopicByTopicName(
     0, topicName);
