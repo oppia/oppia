@@ -67,6 +67,7 @@ from . import general_purpose_linter
 from . import html_linter
 from . import js_ts_linter
 from . import linter_utils
+from . import oppia_angular_root_linter
 from . import python_linter
 from . import third_party_typings_linter
 from .. import common
@@ -236,6 +237,11 @@ def _get_linters_for_file_extension(
         custom_linter, third_party_linter = js_ts_linter.get_linters(
             _FILES['.js'], _FILES['.ts'],
             verbose_mode_enabled=verbose_mode_enabled)
+        custom_linters.append(custom_linter)
+        third_party_linters.append(third_party_linter)
+        custom_linter, third_party_linter = (
+            oppia_angular_root_linter.get_linters(_FILES['.ts'])
+        )
         custom_linters.append(custom_linter)
         third_party_linters.append(third_party_linter)
 
@@ -483,7 +489,11 @@ def main(args=None):
         python_utils.PRINT('No files to check.')
         python_utils.PRINT('---------------------------')
         return
-
+    # Adding these files for OppiaAngularRoot Linter.
+    all_filepaths.append(
+        './core/templates/components/oppia-angular-root.component.ts')
+    all_filepaths.append(
+        './core/templates/base-components/oppia-root.directive.ts')
     read_files(all_filepaths)
     categorize_files(all_filepaths)
 
