@@ -919,17 +919,18 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         allowed_terminating_punctuations = [
             '.', '?', ';', ',', '{', '^', ')', '}', '>']
 
-        # We are excluding individual comment line from this check if that
-        # line contain any of the below phrases anywhere in it. If we use
-        # punctuation at the end for the comment lines containing one of these
-        # phrases then it will mess up the whole meaning of the comment.
-        # Example: // eslint-disable-next-line max-len
-        # We can't use a period or any other symbol at the end of this line
-        # else eslint won't work as expected as this is a special comment for
-        # eslint.
-        allowed_comment_endings_without_period = [
-            '@ts-ignore', '--params', 'eslint-disable', 'eslint-enable',
-            'http://', 'https://']
+        # We allow comments to not have a terminating punctuation if any of the
+        # below phrases appears at the beginning of the comment.
+        # Example: // eslint-disable max-len
+        # This comment will be excluded from this check.
+        allowed_start_phrases = [
+            '@ts-ignore', '--params', 'eslint-disable', 'eslint-enable']
+
+        # We allow comments to not have a terminating punctuation if any of the
+        # below phrases appears in the last word of a comment.
+        # Example: // Ref: https://some.link.com
+        # This comment will be excluded from this check.
+        allowed_end_phrases = ['http://', 'https://']
 
         failed = False
         with linter_utils.redirect_stdout(sys.stdout):
@@ -942,19 +943,6 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                     previous_line = ''
                     if line_num + 1 < file_length:
                         next_line = file_content[line_num + 1].strip()
-                    if line_num + 1 < file_length:
-                        next_line = file_content[line_num + 1].strip()
-
-                    # Check if comment contains any excluded phrase.
-                    comment_includes_allowed_comment_phrases = any(
-                        word in line for word in
-                        allowed_comment_endings_without_period)
-
-                    # Comments may include a lowercase character at beginning
-                    # or may not use a punctuation at end if it contains a
-                    # excluded phrase e.g. "// eslint-disable".
-                    if comment_includes_allowed_comment_phrases:
-                        continue
 
                     # Exclude comment line containing heading.
                     # Example: // ---- Heading ----
@@ -967,6 +955,24 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                         continue
 
                     if line.startswith('//') and not next_line.startswith('//'):
+                        # Check if any of the allowed starting phrase is present
+                        # in comment and exclude that line from check.
+                        allowed_start_phrase_present = any(
+                            line.split()[1].startswith(word) for word in
+                            allowed_start_phrases)
+
+                        if allowed_start_phrase_present:
+                            continue
+
+                        # Check if any of the allowed ending phrase is present
+                        # in comment and exclude that line from check.
+                        allowed_end_phrase_present = any(
+                            word in line.split()[-1] for word in
+                            allowed_end_phrases)
+
+                        if allowed_end_phrase_present:
+                            continue
+
                         # Check that the comment ends with the proper
                         # punctuation.
                         last_char_is_invalid = line[-1] not in (
