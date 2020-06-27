@@ -136,6 +136,7 @@ _PATHS_TO_INSERT = [
     os.path.join('third_party', 'gae-pipeline-1.9.22.1'),
     os.path.join('third_party', 'mutagen-1.43.0'),
     os.path.join('third_party', 'packaging-20.3'),
+    os.path.join('third_party', 'pylatexenc-2.5'),
     os.path.join('third_party', 'soupsieve-1.9.5'),
     os.path.join('third_party', 'six-1.12.0'),
     os.path.join('third_party', 'webencodings-0.5.1'),

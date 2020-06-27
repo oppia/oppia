@@ -111,6 +111,14 @@
         "rootDirPrefix": "mutagen-",
         "targetDirPrefix": "mutagen-"
       },
+      "pylatexenc": {
+        "version": "2.5",
+        "downloadFormat": "tar",
+        "url": "https://files.pythonhosted.org/packages/a9/ce/13c6ec826af2a5a17e1d6e8b9915965f44993b5949cbf75f86317e2128c4/pylatexenc-2.5.tar.gz#md5=7bcdb761214f15003479638d86b5d6e6",
+        "tarRootDirPrefix": "pylatexenc-",
+        "rootDirPrefix": "pylatexenc-",
+        "targetDirPrefix": "pylatexenc-"
+      },
       "soupsieve": {
         "version": "1.9.5",
         "downloadFormat": "tar",
