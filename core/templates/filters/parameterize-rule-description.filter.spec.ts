@@ -85,23 +85,28 @@ describe('Testing filters', function() {
       var interactionIdMath = 'TextInput';
       var choicesMath = [
         {
-          label: '<oppia-noninteractive-math raw_latex-with-value="&amp;quot;' +
-            'x^3 - a x^2 - b x - c&amp;quot;"></oppia-noninteractive-math>',
+          label: '<oppia-noninteractive-math math_content-with-value="{&amp;' +
+            'quot;raw_latex&amp;quot;:&amp;quot;x^3 - a x^2 - b x - c&amp;' +
+            'quot;,&amp;quot;svg_filename&amp;quot;:&amp;quot;&amp;quot;}">' +
+            '</oppia-noninteractive-math>',
           val: 0
         }, {
-          label: '<oppia-noninteractive-math raw_latex-with-value="&amp;quot;' +
-            'x^3 + (a+b+c)x^2 + (ab+bc+ca)x + abc&amp;quot;">' +
-            '</oppia-noninteractive-math>',
+          label: '<oppia-noninteractive-math math_content-with-value="{&amp;' +
+            'quot;raw_latex&amp;quot;:&amp;quot;x^3 + (a+b+c)x^2 + (ab+bc' +
+            '+ca)x + abc&amp;quot;",&amp;quot;svg_filename&amp;quot;:&amp;' +
+            'quot;&amp;quot;}></oppia-noninteractive-math>',
           val: 1
         }, {
-          label: '<oppia-noninteractive-math raw_latex-with-value="&amp;quot;' +
-            'x^3 - (a+b+c)x^2 + (ab+bc+ca)x - abc&amp;quot;">' +
-            '</oppia-noninteractive-math>',
+          label: '<oppia-noninteractive-math math_content-with-value="{&amp;' +
+            'quot;raw_latex&amp;quot;:&amp;quot;x^3 - (a+b+c)x^2 + (ab+bc+' +
+            'ca)x - abc&amp;quot;,&amp;quot;svg_filename&amp;quot;:&amp;quot' +
+            ';&amp;quot;}"></oppia-noninteractive-math>',
           val: 2
         }, {
-          label: '<oppia-noninteractive-math raw_latex-with-value="&amp;quot;' +
-            'x^3 + (a+b+c)x^2 - (ab+bc+ca)x + abc&amp;quot;">' +
-            '</oppia-noninteractive-math>',
+          label: '<oppia-noninteractive-math math_content-with-value="{&amp;' +
+            'quot;raw_latex&amp;quot;:&amp;quot;x^3 + (a+b+c)x^2 - (ab+bc+' +
+            'ca)x + abc&amp;quot;,&amp;quot;svg_filename&amp;quot;:&amp;quot;' +
+            '&amp;quot;}"></oppia-noninteractive-math>',
           val: 3
         },
       ];
