@@ -18,7 +18,7 @@
 
 /**
  * No changes should be made to this file. Treat this as a read-only
- * file. This is just to provide angular2+ services to 10 specs listed below.
+ * file. This is just to provide angular2+ services to 11 specs listed below.
  * No more specs should be added to the list. The only edit that is allowed
  * to this file is removing the file names from list.
  *
@@ -33,6 +33,7 @@
  *   08. rte-helper-modal.controller.spec.ts
  *   09. svg-filename-editor.component.spec.ts
  *   10. preview-summary-tile-modal.controller.spec.ts
+ *   11. registration-session-expired-modal.controller.spec.ts
  */
 
 /* eslint-disable max-len */
