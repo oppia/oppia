@@ -30,6 +30,7 @@ import time
 import python_utils
 
 from . import linter_utils
+from .. import clean
 from .. import common
 
 CURR_DIR = os.path.abspath(os.getcwd())
@@ -52,6 +53,8 @@ FILES_EXCLUDED_FROM_ANY_TYPE_CHECK_PATH = os.path.join(
 
 FILES_EXCLUDED_FROM_ANY_TYPE_CHECK = json.load(python_utils.open_file(
     FILES_EXCLUDED_FROM_ANY_TYPE_CHECK_PATH, 'r'))
+
+COMPILED_TYPESCRIPT_TMP_PATH = 'tmpcompiledjs/'
 
 
 def _get_expression_from_node_if_one_exists(
@@ -175,13 +178,11 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                 if filepath.endswith('.js'):
                     raise
                 # Compile typescript file which has syntax invalid for JS file.
-                with linter_utils.temp_dir(prefix='tmpcompiledjs',
-                                           parent=os.getcwd()) as temp_dir:
-                    compiled_js_filepath = self._compile_ts_file(
-                        filepath, temp_dir)
-                    file_content = FILE_CACHE.read(compiled_js_filepath)
-                    parsed_js_and_ts_files[filepath] = esprima.parseScript(
-                        file_content)
+                compiled_js_filepath = self._get_compiled_ts_filepath(filepath)
+
+                file_content = FILE_CACHE.read(compiled_js_filepath)
+                parsed_js_and_ts_files[filepath] = esprima.parseScript(
+                    file_content)
 
         return parsed_js_and_ts_files
 
@@ -210,20 +211,31 @@ class JsTsLintChecksManager(python_utils.OBJECT):
 
         return parsed_expressions_in_files
 
-    def _compile_ts_file(self, filepath, dir_path):
-        """Compiles a typescript file and returns the path for compiled
-        js file.
+    def _get_compiled_ts_filepath(self, filepath):
+        """Returns the path for compiled ts file.
+
+        Args:
+            filepath: str. filepath of ts file
+
+        Returns:
+            str. filepath of compiled ts file.
         """
-        cmd = (
-            './node_modules/typescript/bin/tsc -outDir %s -allowJS %s '
-            '-lib %s -noImplicitUseStrict %s -skipLibCheck '
-            '%s -target %s -typeRoots %s %s typings/*') % (
-                dir_path, 'true', 'es2017,dom', 'true',
-                'true', 'es5', './node_modules/@types', filepath)
-        subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
         compiled_js_filepath = os.path.join(
-            dir_path, os.path.basename(filepath).replace('.ts', '.js'))
+            os.getcwd(),
+            COMPILED_TYPESCRIPT_TMP_PATH,
+            os.path.relpath(filepath).replace('.ts', '.js'))
         return compiled_js_filepath
+
+    def _compile_all_ts_files(self):
+        """Compiles all project typescript files into
+        COMPILED_TYPESCRIPT_TMP_PATH. Previously, we only compiled
+        the TS files that were needed, but when a relative import was used, the
+        linter would crash with a FileNotFound exception before being able to
+        run. For more details, please see issue #9458.
+        """
+        cmd = ('./node_modules/typescript/bin/tsc -p %s -outDir %s') % (
+            './tsconfig.json', COMPILED_TYPESCRIPT_TMP_PATH)
+        subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
 
     def _check_any_type(self):
         """Checks if the type of any variable is declared as 'any'
@@ -756,64 +768,64 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                     filename_without_extension = filepath[:-3]
                     corresponding_angularjs_filepath = (
                         filename_without_extension + '.ajs.ts')
-                    with linter_utils.temp_dir(parent=os.getcwd()) as temp_dir:
-                        if os.path.isfile(corresponding_angularjs_filepath):
-                            compiled_js_filepath = self._compile_ts_file(
-                                corresponding_angularjs_filepath, temp_dir)
-                            file_content = FILE_CACHE.read(
-                                compiled_js_filepath).decode('utf-8')
 
-                            parsed_script = esprima.parseScript(file_content)
-                            parsed_nodes = parsed_script.body
-                            angularjs_constants_list = []
-                            components_to_check = ['constant']
-                            for parsed_node in parsed_nodes:
-                                expression = (
-                                    _get_expression_from_node_if_one_exists(
-                                        parsed_node, components_to_check))
-                                if not expression:
-                                    continue
-                                else:
-                                    # The following block populates a set to
-                                    # store constants for the Angular-AngularJS
-                                    # constants file consistency check.
-                                    angularjs_constants_name = (
-                                        expression.arguments[0].value)
-                                    angularjs_constants_value = (
-                                        expression.arguments[1].property.name)
-                                    if angularjs_constants_value != (
-                                            angularjs_constants_name):
-                                        failed = True
-                                        python_utils.PRINT(
-                                            '%s --> Please ensure that the '
-                                            'constant %s is initialized '
-                                            'from the value from the '
-                                            'corresponding Angular constants'
-                                            ' file (the *.constants.ts '
-                                            'file). Please create one in the'
-                                            ' Angular constants file if it '
-                                            'does not exist there.' % (
-                                                filepath,
-                                                angularjs_constants_name))
-                                    angularjs_constants_list.append(
-                                        angularjs_constants_name)
-                            angularjs_constants_set = set(
-                                angularjs_constants_list)
-                            if len(angularjs_constants_set) != len(
-                                    angularjs_constants_list):
-                                failed = True
-                                python_utils.PRINT(
-                                    '%s --> Duplicate constant declaration '
-                                    'found.' % (
-                                        corresponding_angularjs_filepath))
-                            angularjs_source_filepaths_to_constants_dict[
-                                corresponding_angularjs_filepath] = (
-                                    angularjs_constants_set)
-                        else:
+                    if os.path.isfile(corresponding_angularjs_filepath):
+                        compiled_js_filepath = self._get_compiled_ts_filepath(
+                            corresponding_angularjs_filepath)
+                        file_content = FILE_CACHE.read(
+                            compiled_js_filepath).decode('utf-8')
+
+                        parsed_script = esprima.parseScript(file_content)
+                        parsed_nodes = parsed_script.body
+                        angularjs_constants_list = []
+                        components_to_check = ['constant']
+                        for parsed_node in parsed_nodes:
+                            expression = (
+                                _get_expression_from_node_if_one_exists(
+                                    parsed_node, components_to_check))
+                            if not expression:
+                                continue
+                            else:
+                                # The following block populates a set to
+                                # store constants for the Angular-AngularJS
+                                # constants file consistency check.
+                                angularjs_constants_name = (
+                                    expression.arguments[0].value)
+                                angularjs_constants_value = (
+                                    expression.arguments[1].property.name)
+                                if angularjs_constants_value != (
+                                        angularjs_constants_name):
+                                    failed = True
+                                    python_utils.PRINT(
+                                        '%s --> Please ensure that the '
+                                        'constant %s is initialized '
+                                        'from the value from the '
+                                        'corresponding Angular constants'
+                                        ' file (the *.constants.ts '
+                                        'file). Please create one in the'
+                                        ' Angular constants file if it '
+                                        'does not exist there.' % (
+                                            filepath,
+                                            angularjs_constants_name))
+                                angularjs_constants_list.append(
+                                    angularjs_constants_name)
+                        angularjs_constants_set = set(
+                            angularjs_constants_list)
+                        if len(angularjs_constants_set) != len(
+                                angularjs_constants_list):
                             failed = True
                             python_utils.PRINT(
-                                '%s --> Corresponding AngularJS constants '
-                                'file not found.' % filepath)
+                                '%s --> Duplicate constant declaration '
+                                'found.' % (
+                                    corresponding_angularjs_filepath))
+                        angularjs_source_filepaths_to_constants_dict[
+                            corresponding_angularjs_filepath] = (
+                                angularjs_constants_set)
+                    else:
+                        failed = True
+                        python_utils.PRINT(
+                            '%s --> Corresponding AngularJS constants '
+                            'file not found.' % filepath)
 
                 # Check that the constants are declared only in a
                 # *.constants.ajs.ts file.
@@ -915,6 +927,11 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                 'There are no JavaScript or Typescript files to lint.')
             return []
 
+        # Clear temp compiled typescipt files from previous runs.
+        clean.delete_directory_tree(COMPILED_TYPESCRIPT_TMP_PATH)
+        # Compiles all typescipt files into COMPILED_TYPESCRIPT_TMP_PATH.
+        self._compile_all_ts_files()
+
         self.parsed_js_and_ts_files = self._validate_and_parse_js_and_ts_files()
         self.parsed_expressions_in_files = (
             self._get_expressions_from_parsed_script())
@@ -928,6 +945,9 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         sorted_dependencies_messages = self._check_sorted_dependencies()
         controller_dependency_messages = (
             self._match_line_breaks_in_controller_dependencies())
+
+        # Clear temp compiled typescipt files.
+        clean.delete_directory_tree(COMPILED_TYPESCRIPT_TMP_PATH)
 
         all_messages = (
             any_type_messages + extra_js_files_messages +

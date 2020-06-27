@@ -25,9 +25,9 @@ import sys
 
 import python_utils
 
+from . import js_ts_linter
 from . import linter_utils
 from .. import common
-
 
 EXCLUDED_PATHS = (
     'third_party/*', 'build/*', '.git/*', '*.pyc', 'CHANGELOG',
@@ -37,7 +37,8 @@ EXCLUDED_PATHS = (
     '*.mp3', '*.mp4', 'node_modules/*', 'typings/*', 'local_compiled_js/*',
     'webpack_bundles/*', 'core/tests/services_sources/*',
     'core/tests/release_sources/tmp_unzip.zip',
-    'core/tests/release_sources/tmp_unzip.tar.gz')
+    'core/tests/release_sources/tmp_unzip.tar.gz',
+    '%s/*' % js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH)
 
 GENERATED_FILE_PATHS = (
     'extensions/interactions/LogicProof/static/js/generatedDefaultData.ts',
