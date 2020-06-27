@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Login script to access pages behind authentication for 
+ * @fileoverview Login script to access pages behind authentication for
  * lighthouse checks
  * @param {puppeteer.Browser} browser
  * @param {{url: string, options: LHCI.CollectCommand.Options}} context
