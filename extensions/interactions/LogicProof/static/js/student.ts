@@ -494,7 +494,7 @@ var logicProofStudent = (function() {
       logicProofData.BASE_CONTROL_LANGUAGE.operators);
     // NOTE: the javascript fails if we try to omit this function and define
     // evaluateExpression() directly inside the for loop. See
-    // http://jslinterrors.com/dont-make-functions-within-a-loop.
+    // http://jslinterrors.com/dont-make-functions-within-a-loop
     var makeEvaluateExpression = function(definition, variables) {
       return function(expression, inputs, model, evaluationParameters, cache) {
         var argumentValues = {};

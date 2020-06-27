@@ -36,7 +36,7 @@ export class SiteAnalyticsService {
   constructor(private windowRef: WindowRef) {}
 
   // For definitions of the various arguments, please see:
-  // developers.google.com/analytics/devguides/collection/analyticsjs/events.
+  // https://developers.google.com/analytics/devguides/collection/analyticsjs/events
   _sendEventToGoogleAnalytics(
       eventCategory: string, eventAction: string, eventLabel: string): void {
     if (this.windowRef.nativeWindow.ga && constants.CAN_SEND_ANALYTICS_EVENTS) {
