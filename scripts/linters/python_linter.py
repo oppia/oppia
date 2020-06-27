@@ -42,10 +42,29 @@ for path in _PATHS_TO_INSERT:
 # pylint: disable=wrong-import-order
 # pylint: disable=wrong-import-position
 from pylint import lint  # isort:skip
+from pylint.reporters.text import TextReporter # isort:skip
 import isort  # isort:skip
 import pycodestyle # isort:skip
 # pylint: enable=wrong-import-order
 # pylint: enable=wrong-import-position
+
+
+def _trimmer(lint_messages):
+    python_utils.PRINT('KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK')
+    # message_list = lint_messages.split('\n')
+    python_utils.PRINT(lint_messages)
+
+
+class WritableObject(object):
+    "dummy output stream for pylint"
+    def __init__(self):
+        self.content = []
+    def write(self, st):
+        "dummy write"
+        self.content.append(st)
+    def read(self):
+        "dummy read"
+        return self.content
 
 
 class PythonLintChecksManager(python_utils.OBJECT):
@@ -355,9 +374,11 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
             with linter_utils.redirect_stdout(stdout):
                 # This line invokes Pylint and prints its output
                 # to the target stdout.
+                pylint_output = WritableObject()
                 pylinter = lint.Run(
                     current_files_to_lint + [config_pylint],
-                    exit=False).linter
+                    reporter=TextReporter(pylint_output), exit=False).linter
+                _trimmer(pylint_output.read())
                 # These lines invoke Pycodestyle and print its output
                 # to the target stdout.
                 style_guide = pycodestyle.StyleGuide(
