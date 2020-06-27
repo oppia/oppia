@@ -1,4 +1,3 @@
-
 // Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -48,12 +47,12 @@ angular.module('oppia').controller('RteHelperModalController', [
     $timeout(function() {
       $scope.modalIsLoading = false;
     });
-    $scope.isRteMathExpressionEditor = false;
+    $scope.currentRteIsMathExpressionEditor = false;
     $scope.tmpCustomizationArgs = [];
     for (var i = 0; i < customizationArgSpecs.length; i++) {
       var caName = customizationArgSpecs[i].name;
       if (caName === 'math_content') {
-        $scope.isRteMathExpressionEditor = true;
+        $scope.currentRteIsMathExpressionEditor = true;
         var mathValueDict = {
           name: caName,
           value: (
@@ -82,7 +81,7 @@ angular.module('oppia').controller('RteHelperModalController', [
       $scope.$broadcast('externalSave');
       var customizationArgsDict = {};
       let caName : string;
-      if ($scope.isRteMathExpressionEditor) {
+      if ($scope.currentRteIsMathExpressionEditor) {
         var svgFile = $scope.tmpCustomizationArgs[0].value.svgFile;
         var svgFileName = $scope.tmpCustomizationArgs[0].value.svg_filename;
         if (
@@ -96,7 +95,7 @@ angular.module('oppia').controller('RteHelperModalController', [
           caName = 'math_content';
           customizationArgsDict[caName] = mathContentDict;
           $uibModalInstance.close(customizationArgsDict);
-          $scope.isRteMathExpressionEditor = false;
+          $scope.currentRteIsMathExpressionEditor = false;
           return;
         }
         var resampledFile = (
@@ -111,12 +110,12 @@ angular.module('oppia').controller('RteHelperModalController', [
           caName = 'math_content';
           customizationArgsDict[caName] = mathContentDict;
           $uibModalInstance.close(customizationArgsDict);
-          $scope.isRteMathExpressionEditor = false;
+          $scope.currentRteIsMathExpressionEditor = false;
         }, function(errorResponse) {
           AlertsService.addWarning(
             errorResponse.error || 'Error communicating with server.');
           $uibModalInstance.dismiss('cancel');
-          $scope.isRteMathExpressionEditor = false;
+          $scope.currentRteIsMathExpressionEditor = false;
         });
       } else {
         for (var i = 0; i < $scope.tmpCustomizationArgs.length; i++) {

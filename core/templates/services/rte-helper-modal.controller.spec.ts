@@ -117,7 +117,7 @@ describe('Rte Helper Modal Controller', function() {
 
     it('should load modal correctly', function() {
       expect($scope.customizationArgSpecs).toEqual(customizationArgSpecs);
-      expect($scope.isRteMathExpressionEditor).toBe(true);
+      expect($scope.currentRteIsMathExpressionEditor).toBe(true);
     });
 
     it('should close modal when clicking on cancel button', function() {
