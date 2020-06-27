@@ -233,6 +233,37 @@ describe('Assets Backend API Service', function() {
       $rootScope.$apply();
     });
 
+    it('should handle rejection when saving a math SVG fails ', function(done) {
+      var errorMessage = 'Math SVG was not successfully saved.';
+      // @ts-ignore in order to ignore JQuery properties that should
+      // be declarated.
+      spyOn($, 'ajax').and.callFake(function() {
+        var d = $.Deferred();
+        d.reject({
+          // responseText contains a XSSI Prefix, which is represented by )]}'
+          // string. That's why double quotes is being used here. It's not
+          // possible to use \' instead of ' so the XSSI Prefix won't be
+          // evaluated correctly.
+          /* eslint-disable quotes */
+          responseText: ")]}'\n{ \"message\": \"" + errorMessage + "\" }"
+          /* eslint-enable quotes */
+        });
+        return d.promise();
+      });
+      var imageFile = new Blob();
+      AssetsBackendApiService.saveMathImage(
+        imageFile, 'new.svg', 'exploration', 'expid12345')
+        .then(done, function(response) {
+          expect(response).toEqual({
+            message: errorMessage
+          });
+          done();
+        });
+      // $q Promises need to be forcibly resolved through a JavaScript digest,
+      // which is what $apply helps kick-start.
+      $rootScope.$apply();
+    });
+
     it('should handle rejection when saving a file fails', function(done) {
       var errorMessage = 'Error on saving audio';
       // @ts-ignore in order to ignore JQuery properties that should

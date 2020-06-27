@@ -204,11 +204,7 @@ angular.module('oppia').factory('AssetsBackendApiService', [
           processData: false,
           contentType: false,
           type: 'POST',
-          dataFilter: function(data) {
-            // Remove the XSSI prefix.
-            var transformedData = data.substring(5);
-            return JSON.parse(transformedData);
-          },
+          dataFilter: removeXSSIPrefix,
           dataType: 'text'
         }).done(function(data) {
           if (successCallback) {

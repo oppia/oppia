@@ -50,7 +50,7 @@ angular.module('oppia').directive('mathExpressionContentEditor', [
           MathJax.Hub.Queue(['Typeset', MathJax.Hub, outputElement[0]]);
           MathJax.Hub.Queue(function() {
             ctrl.svgString = (
-              outputElement[0].getElementsByTagName('span')[0].outerHTML);
+              outputElement[0].getElementsByTagName('svg')[0].outerHTML);
           });
         };
 
@@ -71,8 +71,8 @@ angular.module('oppia').directive('mathExpressionContentEditor', [
           var tags = invalidTagsAndAttributes.tags;
           var attrs = invalidTagsAndAttributes.attrs;
           if (tags.length === 0 && attrs.length === 0) {
-            ctrl.value.svgFileDict.svgData = dataURI;
-            ctrl.value.svgFileDict.fileName = fileName;
+            ctrl.value.svgFile = dataURI;
+            ctrl.value.svg_filename = fileName;
           } else {
             ctrl.value.raw_latex = '';
             ctrl.value.svg_filename = '';

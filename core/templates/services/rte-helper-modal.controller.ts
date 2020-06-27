@@ -61,10 +61,7 @@ angular.module('oppia').controller('RteHelperModalController', [
               angular.copy(attrsCustomizationArgsDict[caName]) :
               customizationArgSpecs[i].default_value)
         };
-        mathValueDict.value.svgFileDict = {
-          svgData: null,
-          fileName: ''
-        };
+        mathValueDict.value.svgFile = null;
         $scope.tmpCustomizationArgs.push(mathValueDict);
       } else {
         $scope.tmpCustomizationArgs.push({
@@ -86,15 +83,15 @@ angular.module('oppia').controller('RteHelperModalController', [
       var customizationArgsDict = {};
       let caName : string;
       if ($scope.isRteMathExpressionEditor) {
-        var svgFileDict = $scope.tmpCustomizationArgs[0].value.svgFileDict;
+        var svgFile = $scope.tmpCustomizationArgs[0].value.svgFile;
+        var svgFileName = $scope.tmpCustomizationArgs[0].value.svg_filename;
         if (
           ContextService.getImageSaveDestination() ===
           IMAGE_SAVE_DESTINATION_LOCAL_STORAGE) {
-          ImageLocalStorageService.saveImage(
-            svgFileDict.fileName, svgFileDict.svgData);
+          ImageLocalStorageService.saveImage(svgFileName, svgFile);
           var mathContentDict = {
             raw_latex: $scope.tmpCustomizationArgs[0].value.raw_latex,
-            svg_filename: svgFileDict.fileName
+            svg_filename: svgFileName
           };
           caName = 'math_content';
           customizationArgsDict[caName] = mathContentDict;
@@ -103,10 +100,9 @@ angular.module('oppia').controller('RteHelperModalController', [
           return;
         }
         var resampledFile = (
-          ImageUploadHelperService.convertImageDataToImageFile(
-            svgFileDict.svgData));
+          ImageUploadHelperService.convertImageDataToImageFile(svgFile));
         AssetsBackendApiService.saveMathImage(
-          resampledFile, svgFileDict.fileName, ContextService.getEntityType(),
+          resampledFile, svgFileName, ContextService.getEntityType(),
           ContextService.getEntityId()).then(function(response) {
           var mathContentDict = {
             raw_latex: $scope.tmpCustomizationArgs[0].value.raw_latex,
