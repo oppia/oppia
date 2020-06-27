@@ -716,15 +716,17 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         init_state.update_interaction_answer_groups(answer_groups_list)
         init_state.update_interaction_default_outcome(default_outcome)
         exploration.validate()
-
-        init_state.update_interaction_solution({
+        solution_dict = {
             'answer_is_exclusive': True,
             'correct_answer': 'hello_world!',
             'explanation': {
                 'content_id': 'solution',
                 'html': 'hello_world is a string'
                 }
-        })
+        }
+        solution = state_domain.Solution.from_dict(
+            init_state.interaction.id, solution_dict)
+        init_state.update_interaction_solution(solution)
         self._assert_validation_error(
             exploration,
             re.escape('Hint(s) must be specified if solution is specified'))
@@ -1210,7 +1212,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         ]
         init_state.update_interaction_hints(hints_list)
 
-        solution = {
+        solution_dict = {
             'answer_is_exclusive': False,
             'correct_answer': 'helloworld!',
             'explanation': {
@@ -1218,6 +1220,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 'html': '<p>hello_world is a string</p>'
             },
         }
+        solution = state_domain.Solution.from_dict(
+            init_state.interaction.id, solution_dict)
         init_state.update_interaction_solution(solution)
 
         self.assertEqual(exploration.get_content_count(), 7)
@@ -8328,7 +8332,7 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
         ]
         state2.update_interaction_hints(hint_list2)
 
-        solution_dict1 = {
+        solution_dict = {
             'interaction_id': '',
             'answer_is_exclusive': True,
             'correct_answer': 'Answer1',
@@ -8337,8 +8341,9 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
                 'html': '<p>This is solution for state1</p>'
             }
         }
-
-        state1.update_interaction_solution(solution_dict1)
+        solution = state_domain.Solution.from_dict(
+            state1.interaction.id, solution_dict)
+        state1.update_interaction_solution(solution)
 
         answer_group_list2 = [{
             'rule_specs': [{

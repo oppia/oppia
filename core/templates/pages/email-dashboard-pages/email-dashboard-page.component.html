@@ -1,0 +1,50 @@
+<div class="oppia-query-form">
+  <form class="form" ng-submit="$ctrl.submitQuery()">
+    Has not logged in for n days: <input type="number" min="0" ng-model="$ctrl.hasNotLoggedInForNDays">
+    <br>
+    Inactive in last n days: <input type="number" min="0" ng-model="$ctrl.inactiveInLastNDays">
+    <br>
+    Has created at least n exps: <input type="number" min="0" ng-model="$ctrl.createdAtLeastNExps">
+    <br>
+    Has created fewer than n exps: <input type="number" min="0" ng-model="$ctrl.createdFewerThanNExps">
+    <br>
+    Has edited at least n exps: <input type="number" min="0" ng-model="$ctrl.editedAtLeastNExps">
+    <br>
+    Has edited fewer than n exps: <input type="number" min="0" ng-model="$ctrl.editedFewerThanNExps">
+    <br>
+    <input type="submit" value="submit query">
+    <input type="reset" value="reset" ng-click="$ctrl.resetForm()">
+  </form>
+  <p class="success" ng-if="$ctrl.showSuccessMessage">Query has been submitted successfully. Check recent queries below.</p>
+  <div class="oppia-recent-queries">
+    <p>Recent queries:</p>
+    <table class="table" ng-if="$ctrl.currentPageOfQueries.length > 0">
+      <thead>
+        <tr>
+          <td>Query id</td>
+          <td>Submitted on</td>
+          <td>Submitted by</td>
+          <td>Status</td>
+          <td>No. of qualified users</td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr ng-repeat="q in $ctrl.currentPageOfQueries track by $index">
+          <td><[q.id]></td>
+          <td><[q.createdOn]></td>
+          <td><[q.submitterUsername]></td>
+          <td><[q.status]></td>
+          <td><[q.numQualifiedUsers]></td>
+          <td><button ng-click="$ctrl.recheckStatus($index)">Re-check status</button></td>
+          <td ng-if="$ctrl.showLinkToResultPage(q.submitterUsername, q.status)">
+            <a ng-href="/emaildashboardresult/<[q.id]>">
+              <button class="btn btn-link">Result</button>
+            </a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <button ng-if="$ctrl.showPreviousButton()" ng-click="$ctrl.getPreviousPageOfQueries()">Previous</button>
+    <button ng-if="$ctrl.showNextButton()" ng-click="$ctrl.getNextPageOfQueries()">Next</button>
+  </div>
+</div>

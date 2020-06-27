@@ -292,6 +292,20 @@ class CommonTests(test_utils.GenericTestBase):
             Exception, 'Invalid branch name: invalid-branch.'):
             common.get_current_release_version_number('invalid-branch')
 
+    def test_is_current_branch_a_hotfix_branch_with_non_hotfix_branch(self):
+        def mock_check_output(unused_cmd_tokens):
+            return 'On branch release-1.2.3'
+        with self.swap(
+            subprocess, 'check_output', mock_check_output):
+            self.assertEqual(common.is_current_branch_a_hotfix_branch(), False)
+
+    def test_is_current_branch_a_hotfix_branch_with_hotfix_branch(self):
+        def mock_check_output(unused_cmd_tokens):
+            return 'On branch release-1.2.3-hotfix-1'
+        with self.swap(
+            subprocess, 'check_output', mock_check_output):
+            self.assertEqual(common.is_current_branch_a_hotfix_branch(), True)
+
     def test_is_current_branch_a_release_branch_with_release_branch(self):
         def mock_check_output(unused_cmd_tokens):
             return 'On branch release-1.2.3'
