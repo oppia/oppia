@@ -34,7 +34,7 @@ require('services/contextual/url.service.ts');
 require('services/contextual/window-dimensions.service.ts');
 
 angular.module('oppia').component('subtopicViewerPage', {
-  template: require('./subtopic-viewer-page.component.html'),
+  template: require('./subtopic-viewer-page.directive.html'),
   controller: [
     '$rootScope', '$window', 'AlertsService', 'ContextService', 'LoaderService',
     'PageTitleService', 'SubtopicViewerBackendApiService', 'UrlService',

@@ -488,6 +488,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'subtopic-summary-tile.directive.ts',
     'subtopic-viewer-navbar-breadcrumb.directive.ts',
     'subtopic-viewer-page.controller.ts',
+    'subtopic-viewer-page.directive.ts',
     'SubtopicObjectFactory.ts',
     'SubtopicPageObjectFactory.ts',
     'subtopics-list-tab.directive.ts',
