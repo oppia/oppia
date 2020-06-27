@@ -25,107 +25,98 @@ require('services/alerts.service.ts');
 // may be additional customization options for the editor that should be passed
 // in via initArgs.
 
-angular.module('oppia').directive('mathExpressionContentEditor', [
-  'AlertsService', 'ImageUploadHelperService',
-  function(AlertsService, ImageUploadHelperService) {
-    return {
-      restrict: 'E',
-      scope: {},
-      bindToController: {
-        getAlwaysEditable: '&',
-        value: '='
-      },
-      template: require('./math-expression-content-editor.directive.html'),
-      controllerAs: '$ctrl',
-      controller: ['$scope', function($scope) {
-        var ctrl = this;
-        var convertLatexStringToSvg = function(inputLatexString) {
-          var emptyDiv = document.createElement('div');
-          var outputElement = angular.element(emptyDiv);
-          var $script = angular.element(
-            '<script type="math/tex">'
-          ).html(inputLatexString === undefined ? '' : inputLatexString);
-          outputElement.html('');
-          outputElement.append($script);
-          MathJax.Hub.Queue(['Typeset', MathJax.Hub, outputElement[0]]);
-          MathJax.Hub.Queue(function() {
-            ctrl.svgString = (
-              outputElement[0].getElementsByTagName('span')[0].outerHTML);
-          });
-        };
-
-        var processAndSaveSvg = function() {
-          var cleanedSvgString = (
-            ImageUploadHelperService.cleanMathExpressionSvgString(
-              ctrl.svgString));
-          var dimensions = (
-            ImageUploadHelperService.
-              extractDimensionsFromMathExpressionSvgString(cleanedSvgString));
-          var fileName = (
-            ImageUploadHelperService.generateMathExpressionImageFilename(
-              dimensions.height, dimensions.width, dimensions.verticalPadding));
-          var dataURI = 'data:image/svg+xml;base64,' + btoa(cleanedSvgString);
-          var invalidTagsAndAttributes = (
-            ImageUploadHelperService.getInvalidSvgTagsAndAttrs(
-              dataURI));
-          var tags = invalidTagsAndAttributes.tags;
-          var attrs = invalidTagsAndAttributes.attrs;
-          if (tags.length === 0 && attrs.length === 0) {
-            ctrl.value.svgFileDict.svgData = dataURI;
-            ctrl.value.svgFileDict.fileName = fileName;
-          } else {
-            ctrl.value.raw_latex = '';
-            ctrl.value.svg_filename = '';
-            AlertsService.addWarning('SVG failed validation.');
-          }
-        };
-
-        ctrl.$onInit = function() {
-          // Reset the component each time the value changes (e.g. if this is
-          // part of an editable list).
-          ctrl.svgString = '';
-          $scope.$watch('$ctrl.value', function() {
-            ctrl.localValue = {
-              label: ctrl.value.raw_latex || '',
-            };
-          }, true);
-          $scope.$on('externalSave', function() {
-            processAndSaveSvg();
-            if (ctrl.active) {
-              ctrl.replaceValue(ctrl.localValue.label);
-              // The $scope.$apply() call is needed to propagate the replaced
-              // value.
-              $scope.$apply();
-            }
-          });
-          ctrl.placeholderText = '\\frac{x}{y}';
-          ctrl.alwaysEditable = ctrl.getAlwaysEditable();
-          if (ctrl.alwaysEditable) {
-            $scope.$watch('$ctrl.localValue.label', function(newValue) {
-              ctrl.value.raw_latex = newValue;
-              convertLatexStringToSvg(ctrl.localValue.label);
-            });
-          } else {
-            ctrl.openEditor = function() {
-              ctrl.active = true;
-            };
-
-            ctrl.closeEditor = function() {
-              ctrl.active = false;
-            };
-
-            ctrl.replaceValue = function(newValue) {
-              ctrl.localValue = {
-                label: newValue
-              };
-              ctrl.value.raw_latex = newValue;
-              ctrl.closeEditor();
-            };
-
-            ctrl.closeEditor();
-          }
-        };
-      }]
+angular.module('oppia').component('mathExpressionContentEditor', {
+  bindings: {
+    value: '=',
+    getAlwaysEditable: '&'
+  },
+  template: require('./math-expression-content-editor.directive.html'),
+  controllerAs: '$ctrl',
+  controller: ['$scope', 'AlertsService', 'ImageUploadHelperService', function(
+      $scope, AlertsService, ImageUploadHelperService) {
+    var ctrl = this;
+    var convertLatexStringToSvg = function(inputLatexString) {
+      var emptyDiv = document.createElement('div');
+      var outputElement = angular.element(emptyDiv);
+      var $script = angular.element(
+        '<script type="math/tex">'
+      ).html(inputLatexString === undefined ? '' : inputLatexString);
+      outputElement.html('');
+      outputElement.append($script);
+      MathJax.Hub.Queue(['Typeset', MathJax.Hub, outputElement[0]]);
+      MathJax.Hub.Queue(function() {
+        ctrl.svgString = (
+          outputElement[0].getElementsByTagName('span')[0].outerHTML);
+      });
     };
-  }
-]);
+
+    var processAndSaveSvg = function() {
+      var cleanedSvgString = (
+        ImageUploadHelperService.cleanMathExpressionSvgString(
+          ctrl.svgString));
+      var dimensions = (
+        ImageUploadHelperService.
+          extractDimensionsFromMathExpressionSvgString(cleanedSvgString));
+      var fileName = (
+        ImageUploadHelperService.generateMathExpressionImageFilename(
+          dimensions.height, dimensions.width, dimensions.verticalPadding));
+      var dataURI = 'data:image/svg+xml;base64,' + btoa(cleanedSvgString);
+      var invalidTagsAndAttributes = (
+        ImageUploadHelperService.getInvalidSvgTagsAndAttrs(
+          dataURI));
+      var tags = invalidTagsAndAttributes.tags;
+      var attrs = invalidTagsAndAttributes.attrs;
+      if (tags.length === 0 && attrs.length === 0) {
+        ctrl.value.svgFileDict.svgData = dataURI;
+        ctrl.value.svgFileDict.fileName = fileName;
+      } else {
+        ctrl.value.raw_latex = '';
+        ctrl.value.svg_filename = '';
+        AlertsService.addWarning('SVG failed validation.');
+      }
+    };
+
+    ctrl.$onInit = function() {
+      // Reset the component each time the value changes (e.g. if this is
+      // part of an editable list).
+      ctrl.svgString = '';
+      $scope.$watch('$ctrl.value', function() {
+        ctrl.localValue = {
+          label: ctrl.value.raw_latex || '',
+        };
+      }, true);
+      $scope.$on('externalSave', function() {
+        processAndSaveSvg();
+        if (ctrl.active) {
+          ctrl.replaceValue(ctrl.localValue.label);
+          // The $scope.$apply() call is needed to propagate the replaced
+          // value.
+          $scope.$apply();
+        }
+      });
+      ctrl.placeholderText = '\\frac{x}{y}';
+      ctrl.alwaysEditable = ctrl.getAlwaysEditable();
+      if (ctrl.alwaysEditable) {
+        $scope.$watch('$ctrl.localValue.label', function(newValue) {
+          ctrl.value.raw_latex = newValue;
+          convertLatexStringToSvg(ctrl.localValue.label);
+        });
+      } else {
+        ctrl.openEditor = function() {
+          ctrl.active = true;
+        };
+        ctrl.closeEditor = function() {
+          ctrl.active = false;
+        };
+        ctrl.replaceValue = function(newValue) {
+          ctrl.localValue = {
+            label: newValue
+          };
+          ctrl.value.raw_latex = newValue;
+          ctrl.closeEditor();
+        };
+        ctrl.closeEditor();
+      }
+    };
+  }]
+});
