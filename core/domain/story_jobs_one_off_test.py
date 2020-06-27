@@ -47,7 +47,13 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
             'destination_node_ids': [],
             'exploration_id': None,
             'id': 'node_1',
-            'outline': '',
+            'outline': (
+                '<p>Value</p><oppia-noninteractive-'
+                'math math_content-with-value="{&amp;quot'
+                ';raw_latex&amp;quot;: &amp;quot;+,-,-,+'
+                '&amp;quot;, &amp;quot;svg_filename&amp;'
+                'quot;: &amp;quot;&amp;quot;}"></oppia'
+                '-noninteractive-math>'),
             'outline_is_finalized': False,
             'prerequisite_skill_ids': [],
             'description': '',
@@ -171,14 +177,17 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
                     'destination_node_ids': [],
                     'exploration_id': None,
                     'id': 'node_1',
-                    'outline': '',
+                    'outline': (
+                        '<p>Value</p><oppia-noninteractive-math raw_l'
+                        'atex-with-value="&amp;quot;+,-,-,+&amp;quot'
+                        ';"></oppia-noninteractive-math>'),
                     'outline_is_finalized': False,
                     'prerequisite_skill_ids': [],
                     'title': 'Chapter 1'
                 }]
             })
         story = story_fetchers.get_story_by_id(self.STORY_ID)
-        self.assertEqual(story.story_contents_schema_version, 3)
+        self.assertEqual(story.story_contents_schema_version, 4)
         self.assertEqual(
             story.story_contents.to_dict(),
             self.MIGRATED_STORY_CONTENTS_DICT)

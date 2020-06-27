@@ -16,6 +16,6 @@
  * @fileoverview Requires for object templates required for players.
  */
 
-require('objects/templates/math-latex-string-editor.directive.ts');
+require('objects/templates/math-expression-content-editor.directive.ts');
 require('objects/templates/sanitized-url-editor.directive.ts');
 require('objects/templates/list-of-tabs-editor.directive.ts');

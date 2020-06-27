@@ -57,7 +57,7 @@ ALLOWED_SCHEMA_TYPES = [
     SCHEMA_TYPE_BOOL, SCHEMA_TYPE_CUSTOM, SCHEMA_TYPE_DICT, SCHEMA_TYPE_FLOAT,
     SCHEMA_TYPE_HTML, SCHEMA_TYPE_INT, SCHEMA_TYPE_LIST, SCHEMA_TYPE_UNICODE]
 ALLOWED_CUSTOM_OBJ_TYPES = [
-    'Filepath', 'LogicQuestion', 'MathLatexString', 'MusicPhrase',
+    'Filepath', 'LogicQuestion', 'MathExpressionContent', 'MusicPhrase',
     'ParameterName', 'SanitizedUrl', 'Graph', 'ImageWithRegions',
     'ListOfTabs', 'SkillSelector', 'SvgFilename']
 
@@ -594,6 +594,7 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
         }
         mappings = [
             ('<script></script>', ''),
+            (b'<script></script>', ''),
             ('<a class="webLink" href="https'
              '://www.oppia.com/"><img src="images/oppia.png"></a>',
              '<a href="https://www.oppia.com/"></a>')]

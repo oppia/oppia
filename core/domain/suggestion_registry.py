@@ -227,6 +227,20 @@ class BaseSuggestion(python_utils.OBJECT):
             'Subclasses of BaseSuggestion should implement '
             'pre_update_validate.')
 
+    def get_all_html_content_strings(self):
+        """Gets all html content strings used in this suggestion."""
+        raise NotImplementedError(
+            'Subclasses of BaseSuggestion should implement '
+            'get_all_html_content_strings.')
+
+    def convert_html_in_suggestion_change(self, conversion_fn):
+        """Checks for HTML fields in a suggestion change and converts it
+        according to the conversion function.
+        """
+        raise NotImplementedError(
+            'Subclasses of BaseSuggestion should implement '
+            'convert_html_in_suggestion_change.')
+
     @property
     def is_handled(self):
         """Returns if the suggestion has either been accepted or rejected.
@@ -378,6 +392,32 @@ class SuggestionEditStateContent(BaseSuggestion):
             raise utils.ValidationError(
                 'The new html must not match the old html')
 
+    def get_all_html_content_strings(self):
+        """Gets all html content strings used in this suggestion.
+
+        Returns:
+            list(str). The list of html content strings.
+        """
+        html_string_list = [self.change.new_value['html']]
+        if self.change.old_value is not None:
+            html_string_list.append(self.change.old_value['html'])
+        return html_string_list
+
+
+    def convert_html_in_suggestion_change(self, conversion_fn):
+        """Checks for HTML fields in a suggestion change and converts it
+        according to the conversion function.
+
+        Args:
+            conversion_fn: function. The function to be used for converting the
+                HTML.
+        """
+        if self.change.old_value is not None:
+            self.change.old_value['html'] = (
+                conversion_fn(self.change.old_value['html']))
+        self.change.new_value['html'] = (
+            conversion_fn(self.change.new_value['html']))
+
 
 class SuggestionTranslateContent(BaseSuggestion):
     """Domain object for a suggestion of type
@@ -465,6 +505,27 @@ class SuggestionTranslateContent(BaseSuggestion):
         exp_services.update_exploration(
             self.final_reviewer_id, self.target_id, [self.change],
             commit_message, is_suggestion=True)
+
+    def get_all_html_content_strings(self):
+        """Gets all html content strings used in this suggestion.
+
+        Returns:
+            list(str). The list of html content strings.
+        """
+        return [self.change.translation_html, self.change.content_html]
+
+    def convert_html_in_suggestion_change(self, conversion_fn):
+        """Checks for HTML fields in a suggestion change and converts it
+        according to the conversion function.
+
+        Args:
+            conversion_fn: function. The function to be used for converting the
+                HTML.
+        """
+        self.change.content_html = (
+            conversion_fn(self.change.content_html))
+        self.change.translation_html = (
+            conversion_fn(self.change.translation_html))
 
 
 class SuggestionAddQuestion(BaseSuggestion):
@@ -653,6 +714,31 @@ class SuggestionAddQuestion(BaseSuggestion):
     def _get_skill_difficulty(self):
         """Returns the suggestion's skill difficulty."""
         return self.change.skill_difficulty
+
+    def get_all_html_content_strings(self):
+        """Gets all html content strings used in this suggestion.
+
+        Returns:
+            list(str). The list of html content strings.
+        """
+        state_object = (
+            state_domain.State.from_dict(
+                self.change.question_dict['question_state_data']))
+        html_string_list = state_object.get_all_html_content_strings()
+        return html_string_list
+
+    def convert_html_in_suggestion_change(self, conversion_fn):
+        """Checks for HTML fields in the suggestion change  and converts it
+        according to the conversion function.
+
+        Args:
+            conversion_fn: function. The function to be used for converting the
+                HTML.
+        """
+        self.change.question_dict['question_state_data'] = (
+            state_domain.State.convert_html_fields_in_state(
+                self.change.question_dict['question_state_data'],
+                conversion_fn))
 
 
 class BaseVoiceoverApplication(python_utils.OBJECT):

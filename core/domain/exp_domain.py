@@ -2414,6 +2414,25 @@ class Exploration(python_utils.OBJECT):
 
         return states_dict
 
+    @classmethod
+    def _convert_states_v33_dict_to_v34_dict(cls, states_dict):
+        """Converts from version 33 to 34. Version 34 adds a new
+        attribute math components. The new attribute has an additional field to
+        for storing SVG filenames.
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+        for key, state_dict in states_dict.items():
+            states_dict[key] = state_domain.State.convert_html_fields_in_state(
+                state_dict,
+                html_validation_service.add_math_content_to_math_rte_components)
+        return states_dict
 
     @classmethod
     def update_states_from_model(
@@ -2450,7 +2469,7 @@ class Exploration(python_utils.OBJECT):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 38
+    CURRENT_EXP_SCHEMA_VERSION = 39
     LAST_UNTITLED_SCHEMA_VERSION = 9
 
     @classmethod
@@ -3326,7 +3345,7 @@ class Exploration(python_utils.OBJECT):
     @classmethod
     def _convert_v37_dict_to_v38_dict(cls, exploration_dict):
         """Converts a v37 exploration dict into a v38 exploration dict.
-        adds a new customization arg to MultipleChoiceInput which allows
+        Adds a new customization arg to MultipleChoiceInput which allows
         answer choices to be shuffled.
 
         Args:
@@ -3345,6 +3364,27 @@ class Exploration(python_utils.OBJECT):
 
         return exploration_dict
 
+    @classmethod
+    def _convert_v38_dict_to_v39_dict(cls, exploration_dict):
+        """Converts a v38 exploration dict into a v39 exploration dict.
+        Adds a new attribute math components. The new attribute has an
+        additional field to for storing SVG filenames.
+
+        Args:
+            exploration_dict: dict. The dict representation of an exploration
+                with schema version v38.
+
+        Returns:
+            dict. The dict representation of the Exploration domain object,
+            following schema version v39.
+        """
+        exploration_dict['schema_version'] = 39
+
+        exploration_dict['states'] = cls._convert_states_v33_dict_to_v34_dict(
+            exploration_dict['states'])
+        exploration_dict['states_schema_version'] = 34
+
+        return exploration_dict
 
     @classmethod
     def _migrate_to_latest_yaml_version(
@@ -3568,6 +3608,11 @@ class Exploration(python_utils.OBJECT):
             exploration_dict = cls._convert_v37_dict_to_v38_dict(
                 exploration_dict)
             exploration_schema_version = 38
+
+        if exploration_schema_version == 38:
+            exploration_dict = cls._convert_v38_dict_to_v39_dict(
+                exploration_dict)
+            exploration_schema_version = 39
 
         return (exploration_dict, initial_schema_version)
 

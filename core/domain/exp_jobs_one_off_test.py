@@ -27,6 +27,7 @@ from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_jobs_one_off
 from core.domain import exp_services
+from core.domain import html_cleaner
 from core.domain import html_validation_service
 from core.domain import rights_manager
 from core.domain import state_domain
@@ -2181,7 +2182,10 @@ class ExplorationMathTagValidationOneOffJobTests(test_utils.GenericTestBase):
                 ]
             }
         }
-        with self.swap(state_domain.SubtitledHtml, 'validate', mock_validate):
+        # Since the Old math-schema with raw_latex attribute is no longer valid,
+        # it gets cleaned by html_cleaner. We need to prevent this for testing
+        # by swapping it.
+        with self.swap(html_cleaner, 'clean', lambda html: html):
             state1.update_content(
                 state_domain.SubtitledHtml.from_dict(content1_dict))
             state2.update_content(
@@ -2201,7 +2205,6 @@ class ExplorationMathTagValidationOneOffJobTests(test_utils.GenericTestBase):
         actual_output = (
             exp_jobs_one_off
             .ExplorationMathTagValidationOneOffJob.get_output(job_id))
-
         self.assertEqual(len(actual_output), 0)
 
 
@@ -2245,7 +2248,7 @@ class ExplorationMockMathMigrationOneOffJobOneOffJobTests(
         customization_args_dict = {
             'choices': {
                 'value': [
-                    valid_html_content,
+                    '<p>1</p>',
                     '<p>2</p>',
                     '<p>3</p>',
                     '<p>4</p>'
@@ -2330,27 +2333,31 @@ class ExplorationMockMathMigrationOneOffJobOneOffJobTests(
                 }
             }
         }
-
-        state1.update_content(
-            state_domain.SubtitledHtml.from_dict(content1_dict))
-        state1.update_interaction_id('DragAndDropSortInput')
-        state1.update_interaction_customization_args(
-            customization_args_dict)
-        state1.update_interaction_answer_groups([answer_group_dict])
-        state1.update_written_translations(
-            state_domain.WrittenTranslations.from_dict(
-                written_translations_dict))
+        # Since the Old math-schema with raw_latex attribute is no longer valid,
+        # it gets cleaned by html_cleaner. We need to prevent this for testing
+        # by swapping it.
+        with self.swap(html_cleaner, 'clean', lambda html: html):
+            state1.update_content(
+                state_domain.SubtitledHtml.from_dict(content1_dict))
+            state1.update_interaction_id('DragAndDropSortInput')
+            state1.update_interaction_customization_args(
+                customization_args_dict)
+            state1.update_interaction_answer_groups([answer_group_dict])
+            state1.update_written_translations(
+                state_domain.WrittenTranslations.from_dict(
+                    written_translations_dict))
 
         exp_services.save_new_exploration(self.albert_id, exploration)
         with self.swap(
             html_validation_service,
             'add_math_content_to_math_rte_components', lambda html: html):
-            job_id = (
-                exp_jobs_one_off
-                .ExplorationMockMathMigrationOneOffJob.create_new())
-            exp_jobs_one_off.ExplorationMockMathMigrationOneOffJob.enqueue(
-                job_id)
-            self.process_and_flush_pending_tasks()
+            with self.swap(html_cleaner, 'clean', lambda html: html):
+                job_id = (
+                    exp_jobs_one_off
+                    .ExplorationMockMathMigrationOneOffJob.create_new())
+                exp_jobs_one_off.ExplorationMockMathMigrationOneOffJob.enqueue(
+                    job_id)
+                self.process_and_flush_pending_tasks()
 
         actual_output = (
             exp_jobs_one_off
@@ -2377,7 +2384,7 @@ class ExplorationMockMathMigrationOneOffJobOneOffJobTests(
                 no_of_invalid_tags_in_output + len(stringified_error_list))
             for invalid_tag in stringified_error_list:
                 self.assertTrue(invalid_tag in expected_invalid_tags)
-        self.assertEqual(no_of_invalid_tags_in_output, 11)
+        self.assertEqual(no_of_invalid_tags_in_output, 10)
 
     def test_no_action_is_performed_for_deleted_exploration(self):
         """Test that no action is performed on deleted explorations."""
@@ -2431,24 +2438,58 @@ class ExplorationMockMathMigrationOneOffJobOneOffJobTests(
             'content_id': 'content',
             'html': valid_html_content
         }
-        customization_args_dict = {
-            'choices': {
-                'value': [
-                    valid_html_content,
-                    '<p>2</p>',
-                    '<p>3</p>',
-                    '<p>4</p>'
-                ]
-            }
+        answer_group_dict = {
+            'outcome': {
+                'dest': 'Introduction',
+                'feedback': {
+                    'content_id': 'feedback_1',
+                    'html': '<p>Feedback</p>'
+                },
+                'labelled_as_correct': False,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'rule_specs': [{
+                'inputs': {
+                    'x': [[valid_html_content]]
+                },
+                'rule_type': 'IsEqualToOrdering'
+            }, {
+                'rule_type': 'HasElementXAtPositionY',
+                'inputs': {
+                    'x': valid_html_content,
+                    'y': 2
+                }
+            }, {
+                'rule_type': 'IsEqualToOrdering',
+                'inputs': {
+                    'x': [[valid_html_content]]
+                }
+            }, {
+                'rule_type': 'HasElementXBeforeElementY',
+                'inputs': {
+                    'x': valid_html_content,
+                    'y': valid_html_content
+                }
+            }, {
+                'rule_type': 'IsEqualToOrderingWithOneItemAtIncorrectPosition',
+                'inputs': {
+                    'x': [[valid_html_content]]
+                }
+            }],
+            'training_data': [],
+            'tagged_skill_misconception_id': None
         }
-        with self.swap(state_domain.SubtitledHtml, 'validate', mock_validate):
+
+        with self.swap(html_cleaner, 'clean', lambda html: html):
             state1.update_content(
                 state_domain.SubtitledHtml.from_dict(content1_dict))
             state2.update_content(
                 state_domain.SubtitledHtml.from_dict(content2_dict))
             state2.update_interaction_id('DragAndDropSortInput')
-            state2.update_interaction_customization_args(
-                customization_args_dict)
+            state2.update_interaction_answer_groups(
+                [answer_group_dict])
             exp_services.save_new_exploration(self.albert_id, exploration)
 
             job_id = (

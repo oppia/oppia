@@ -43,6 +43,7 @@ from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import fs_domain
 from core.domain import html_cleaner
+from core.domain import html_validation_service
 from core.domain import opportunity_services
 from core.domain import param_domain
 from core.domain import rights_manager
@@ -1693,12 +1694,27 @@ def get_exp_with_draft_applied(exp_id, user_id):
                 if new_draft_change_list is not None:
                     draft_change_list = new_draft_change_list
                     draft_change_list_exp_version = exploration.version
+    updated_exploration = None
 
-    return (
-        apply_change_list(exp_id, draft_change_list)
-        if exp_user_data and exp_user_data.draft_change_list and
-        is_version_of_draft_valid(exp_id, draft_change_list_exp_version)
-        else None)
+    if (exp_user_data and exp_user_data.draft_change_list and
+            is_version_of_draft_valid(exp_id, draft_change_list_exp_version)):
+        updated_exploration = apply_change_list(exp_id, draft_change_list)
+        updated_exploration_has_no_invalid_math_tags = True
+        # verify that all the math-tags are valid before returning the
+        # updated exploration.
+        for state in updated_exploration.states.values():
+            html_string = ''.join(state.get_all_html_content_strings())
+            error_list = (
+                html_validation_service.
+                validate_math_tags_in_html_with_attribute_math_content(
+                    html_string))
+            if len(error_list) > 0:
+                updated_exploration_has_no_invalid_math_tags = False
+                break
+        if not updated_exploration_has_no_invalid_math_tags:
+            updated_exploration = None
+
+    return updated_exploration
 
 
 def discard_draft(exp_id, user_id):

@@ -123,7 +123,7 @@ var IntEditor = function(elem) {
   };
 };
 
-var MathLatexStringEditor = function(elem) {
+var MathExpressionContentEditor = function(elem) {
   return {
     setValue: async function(rawLatex) {
       await elem.element(by.tagName('textarea')).clear();
@@ -223,7 +223,7 @@ var OBJECT_EDITORS = {
   Filepath: FilepathEditor,
   Fraction: FractionEditor,
   Int: IntEditor,
-  MathLatexString: MathLatexStringEditor,
+  MathExpressionContent: MathExpressionContentEditor,
   NonnegativeInt: NonnegativeIntEditor,
   NormalizedString: NormalizedStringEditor,
   NumberWithUnits: NumberWithUnitsEditor,
@@ -239,7 +239,7 @@ exports.CoordTwoDim = CoordTwoDim;
 exports.FractionEditor = FractionEditor;
 exports.FilepathEditor = FilepathEditor;
 exports.IntEditor = IntEditor;
-exports.MathLatexStringEditor = MathLatexStringEditor;
+exports.MathExpressionContentEditor = MathExpressionContentEditor;
 exports.NonnegativeIntEditor = NonnegativeIntEditor;
 exports.NormalizedStringEditor = NormalizedStringEditor;
 exports.NumberWithUnitsEditor = NumberWithUnitsEditor;

@@ -122,8 +122,9 @@ describe('Speech Synthesis Chunker Service', () => {
     it('should properly convert the raw_latex-with-value attribute to' +
       ' speakable text', () => {
       const html = (
-        '<oppia-noninteractive-math raw_latex-with-value="5 - 1">' +
-        '</oppia-noninteractive-math>' +
+        '<oppia-noninteractive-math math_content-with-value="{&amp;quot;' +
+        'raw_latex&amp;quot;:&amp;quot;5-1&amp;quot;,&amp;quot;svg_filename&' +
+        'amp;quot;:&amp;quot;&amp;quot;}"></oppia-noninteractive-math>' +
         '<li>Speech</li>' +
         '<li>Text</li>'
       );
