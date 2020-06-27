@@ -5,7 +5,8 @@
 module.exports = async(browser, context) => {
   const page = await browser.newPage();
   await page.setDefaultNavigationTimeout(0);
-  await page.goTo(context.url);
+  // eslint-disable-next-line dot-notation
+  await page.goto(context.url);
   try {
     // Sign into Oppia
     await page.click('#admin');
