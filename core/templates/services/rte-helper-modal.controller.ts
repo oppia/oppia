@@ -84,7 +84,7 @@ angular.module('oppia').controller('RteHelperModalController', [
     $scope.save = function() {
       $scope.$broadcast('externalSave');
       var customizationArgsDict = {};
-
+      let caName : string;
       if ($scope.isRteMathExpressionEditor) {
         var svgFileDict = $scope.tmpCustomizationArgs[0].value.svgFileDict;
         if (
@@ -96,7 +96,7 @@ angular.module('oppia').controller('RteHelperModalController', [
             raw_latex: $scope.tmpCustomizationArgs[0].value.raw_latex,
             svg_filename: svgFileDict.fileName
           };
-          var caName = 'math_content';
+          caName = 'math_content';
           customizationArgsDict[caName] = mathContentDict;
           $uibModalInstance.close(customizationArgsDict);
           $scope.isRteMathExpressionEditor = false;
@@ -112,7 +112,7 @@ angular.module('oppia').controller('RteHelperModalController', [
             raw_latex: $scope.tmpCustomizationArgs[0].value.raw_latex,
             svg_filename: response.filename
           };
-          var caName = 'math_content';
+          caName = 'math_content';
           customizationArgsDict[caName] = mathContentDict;
           $uibModalInstance.close(customizationArgsDict);
           $scope.isRteMathExpressionEditor = false;
@@ -124,7 +124,7 @@ angular.module('oppia').controller('RteHelperModalController', [
         });
       } else {
         for (var i = 0; i < $scope.tmpCustomizationArgs.length; i++) {
-          var caName = $scope.tmpCustomizationArgs[i].name;
+          caName = $scope.tmpCustomizationArgs[i].name;
           if (caName === 'video_id') {
             var temp = $scope.tmpCustomizationArgs[i].value;
             customizationArgsDict[caName] = (
