@@ -151,6 +151,8 @@ export class MathInteractionsService {
     let variables = nerdamer(expressionString).variables();
     for (let variable of variables) {
       // We wouldn't want to interpolate '*' signs between valid greek letters.
+      // @ts-ignore: TODO(#7434): Remove this ignore after we find a way to get
+      // rid of the TS2339 error on AppConstants.
       if (AppConstants.GREEK_LETTERS.indexOf(variable) === -1) {
         let separatedVariables = variable.split('').join('*');
         expressionString = expressionString.replace(
