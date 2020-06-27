@@ -62,17 +62,18 @@ var ExplorationEditorHistoryTab = function() {
    * Workflows
    */
 
+  /*
+   * This method checks if the commit dates are being displayed in
+   * the "List of Changes" section of the history tab.
+  */
   this.expectCommitDatesToBeDisplayed = async function() {
-    /*
-     * This method checks if the commit dates are being displayed in
-     * List of Changes section of the history tab.
-     */
     var numCommitDates = await datesCommitsWereSaved.count();
     for (var i = 0; i < numCommitDates; i++) {
-      var date = await (await datesCommitsWereSaved.get(i)).getText();
-      // The dates can be of varying format. To play it safe and to
-      // keep it simple, we will just check if the date string contains
-      // a digit.
+      var date = await datesCommitsWereSaved.get(i).getText();
+      // The dates can be of varying format
+      // (see getLocaleAbbreviatedDatetimeString). To play it
+      // safe and to keep it simple, we will just check if the
+      // date string contains a digit.
       expect(date).toMatch(/\d/);
     }
   };
