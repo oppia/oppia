@@ -423,7 +423,7 @@
 /core/templates/Polyfills.ts @ankita240796
 /schema_utils*.py @seanlip
 /utils*.py @aks681
-/python_utils*.py @kevinlee12
+/python_utils*.py @DubeySandeep
 
 
 # Restricted pages.
@@ -582,6 +582,7 @@
 /package.json @vojtechjelinek
 /yarn.lock @vojtechjelinek
 /scripts/install_third_party_libs.py @vojtechjelinek
-/.github/ @kevinlee12
+/.github/ @DubeySandeep
 /.github/CODEOWNERS @DubeySandeep
 /.github/stale.yml @ankita240796
+/.github/workflows/ @BenHenning @vinitamurthi
