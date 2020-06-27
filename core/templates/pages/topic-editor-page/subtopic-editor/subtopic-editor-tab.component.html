@@ -9,7 +9,7 @@
           <form class="form-horizontal" role="form">
             <input class="form-control protractor-test-subtopic-title-field"
                    type="text"
-                   ng-blur="$ctrl.updateSubtopicTitle(editableTitle)"
+                   ng-blur="$ctrl.updateSubtopicTitle($ctrl.editableTitle)"
                    ng-model="$ctrl.editableTitle"
                    maxlength="<[$ctrl.MAX_CHARS_IN_SUBTOPIC_TITLE]>"
                    ng-change="$ctrl.resetErrorMsg()">
@@ -48,7 +48,7 @@
                                  class="protractor-test-edit-subtopic-page-contents"
                                  local-value="$ctrl.htmlData">
             </schema-based-editor>
-            <button class="btn btn-success btn-sm protractor-test-save-subtopic-button" ng-click="$ctrl.updateHtmlData()"> Save
+            <button class="btn btn-success btn-sm protractor-test-save-subtopic-content-button" ng-click="$ctrl.updateHtmlData()"> Save
             </button>
           </div>
           <div ng-if="!$ctrl.schemaEditorIsShown" ng-click="$ctrl.showSchemaEditor()" class="protractor-test-edit-html-content">

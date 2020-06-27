@@ -106,7 +106,6 @@ describe('Topic editor functionality', function() {
     var updatedSubtopicThumbnailSrc = (
       await topicEditorPage.getSubtopicThumbnailSource());
     expect(defaultThumbnailSrc).not.toEqual(updatedSubtopicThumbnailSrc);
-    await topicEditorPage.saveSubtopic();
     await topicEditorPage.saveTopic('Edited subtopic.');
 
     await topicsAndSkillsDashboardPage.get();

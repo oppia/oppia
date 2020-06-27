@@ -76,8 +76,6 @@ var TopicEditorPage = function() {
     by.css('.protractor-test-edit-subtopic-button'));
   var subtopicTitleField = element(
     by.css('.protractor-test-subtopic-title-field'));
-  var saveSubtopicButton = element(
-    by.css('.protractor-test-save-subtopic-button'));
   var subtopicTitles = element.all(by.css('.protractor-test-subtopic-title'));
   var questionsTabButton = element(
     by.css('.protractor-test-questions-tab-button'));
@@ -199,10 +197,6 @@ var TopicEditorPage = function() {
     await subtopicTitleField.sendKeys(title);
   };
 
-  this.saveSubtopic = async function() {
-    await saveSubtopicButton.click();
-  };
-
   this.changeSubtopicPageContents = async function(content) {
     var subtopicPageContentButton = element(by.css(
       '.protractor-test-edit-html-content'));
@@ -213,7 +207,15 @@ var TopicEditorPage = function() {
       '.protractor-test-edit-subtopic-page-contents'));
     await waitFor.visibilityOf(pageEditor,
       'Subtopic html editor takes too long to appear');
-    await (await browser.switchTo().activeElement()).sendKeys(content);
+    var pageEditorInput = pageEditor.element(by.css('.oppia-rte'));
+    await pageEditorInput.click();
+    await pageEditorInput.clear();
+    await pageEditorInput.sendKeys(content);
+    var saveSubtopicPageContentButton = element(by.css(
+      '.protractor-test-save-subtopic-content-button'));
+    await waitFor.elementToBeClickable(saveSubtopicPageContentButton,
+      'Save Subtopic Content button taking too long to be clickable');
+    await saveSubtopicPageContentButton.click();
   };
 
   this.expectNumberOfUncategorizedSkillsToBe = async function(count) {
@@ -239,12 +241,13 @@ var TopicEditorPage = function() {
     await waitFor.elementToBeClickable(subtopicPageContentButton,
       'Edit subtopic htm content button taking too long to be clickable');
     await subtopicPageContentButton.click();
-
     var pageEditor = element(by.css(
       '.protractor-test-create-subtopic-page-content'));
     await waitFor.visibilityOf(pageEditor,
       'Subtopic html editor takes too long to appear');
-    await (await browser.switchTo().activeElement()).sendKeys(htmlContent);
+    var pageEditorInput = pageEditor.element(by.css('.oppia-rte'));
+    await pageEditorInput.click();
+    await pageEditorInput.sendKeys(htmlContent);
 
     await waitFor.elementToBeClickable(
       confirmSubtopicCreationButton,

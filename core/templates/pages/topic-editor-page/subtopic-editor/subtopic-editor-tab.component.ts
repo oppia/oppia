@@ -137,22 +137,22 @@ angular.module('oppia').component('subtopicEditorTab', {
       };
 
       /**
-           * @param {string|null} oldSubtopicId - The id of the subtopic from
-           *    which the skill is to be moved, or null if the origin is the
-           *    uncategorized section.
-           * @param {SkillSummary} skillSummary - The summary of the skill
-           * that is to be moved.
-          */
+       * @param {string|null} oldSubtopicId - The id of the subtopic from
+       *    which the skill is to be moved, or null if the origin is the
+       *    uncategorized section.
+       * @param {SkillSummary} skillSummary - The summary of the skill
+       * that is to be moved.
+      */
       ctrl.onMoveSkillStart = function(oldSubtopicId, skillSummary) {
         ctrl.skillSummaryToMove = skillSummary;
         ctrl.oldSubtopicId = oldSubtopicId ? oldSubtopicId : null;
       };
 
       /**
-           * @param {string|null} newSubtopicId - The subtopic to which the
-           *    skill is to be moved, or null if the destination is the
-           *    uncategorized section.
-          */
+       * @param {string|null} newSubtopicId - The subtopic to which the
+       *    skill is to be moved, or null if the destination is the
+       *    uncategorized section.
+      */
       ctrl.onMoveSkillFinish = function(newSubtopicId) {
         if (newSubtopicId === ctrl.oldSubtopicId) {
           return;

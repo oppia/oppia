@@ -29,8 +29,7 @@ require(
 require('components/entity-creation-services/skill-creation.service.ts');
 require('domain/skill/RubricObjectFactory.ts');
 require('components/rubrics-editor/rubrics-editor.directive.ts');
-require(
-  'pages/topics-and-skills-dashboard-page/templates/' +
+require('pages/topics-and-skills-dashboard-page/' +
     'create-new-skill-modal.controller.ts');
 require('pages/topic-editor-page/services/topic-editor-routing.service.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
