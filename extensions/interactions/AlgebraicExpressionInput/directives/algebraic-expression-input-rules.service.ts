@@ -33,7 +33,7 @@ export class AlgebraicExpressionInputRulesService {
     answer = mis.insertMultiplicationSigns(answer);
     inputs.x = mis.insertMultiplicationSigns(inputs.x);
 
-    return nerdamer(answer).eq(inputs.x);
+    return nerdamer(nerdamer(answer).text()).eq(nerdamer(inputs.x).text());
   }
 
   IsEquivalentTo(answer: string, inputs: {x: string}): boolean {
@@ -42,13 +42,13 @@ export class AlgebraicExpressionInputRulesService {
     answer = mis.insertMultiplicationSigns(answer);
     inputs.x = mis.insertMultiplicationSigns(inputs.x);
 
-    let expandedLearnerAnswer = nerdamer(answer).expand();
+    let expandedLearnerAnswer = nerdamer(answer).expand().text();
     let simplifiedLearnerAnswer = nerdamer(
-      `simplify(${expandedLearnerAnswer})`);
+      `simplify(${expandedLearnerAnswer})`).text();
 
-    let expandedCreatorAnswer = nerdamer(inputs.x).expand();
+    let expandedCreatorAnswer = nerdamer(inputs.x).expand().text();
     let simplifiedCreatorAnswer = nerdamer(
-      `simplify(${expandedCreatorAnswer})`);
+      `simplify(${expandedCreatorAnswer})`).text();
 
     return nerdamer(simplifiedLearnerAnswer).eq(simplifiedCreatorAnswer);
   }

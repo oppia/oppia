@@ -32,11 +32,6 @@ import { MathInteractionsService } from 'services/math-interactions.service.ts';
 export class MathEquationInputRulesService {
   MatchesExactlyWith(answer: string, inputs: {x: string, y: string}): boolean {
     let aeirs = new AlgebraicExpressionInputRulesService();
-    let mis = new MathInteractionsService();
-
-    // Inserting '*' signs between variables if not present.
-    answer = mis.insertMultiplicationSigns(answer);
-    inputs.x = mis.insertMultiplicationSigns(inputs.x);
 
     let positionOfTerms = inputs.y;
 
@@ -57,11 +52,11 @@ export class MathEquationInputRulesService {
     } else {
       // Position of terms is irrelevant. So, we bring all terms on one side
       // and perform an exact match.
-      let rhsAnswerModified = nerdamer(rhsAnswer).multiply('-1');
-      let expressionAnswer = nerdamer(rhsAnswerModified).add(lhsAnswer);
+      let rhsAnswerModified = nerdamer(rhsAnswer).multiply('-1').text();
+      let expressionAnswer = nerdamer(rhsAnswerModified).add(lhsAnswer).text();
 
-      let rhsInputModified = nerdamer(rhsInput).multiply('-1');
-      let expressionInput = nerdamer(rhsInputModified).add(lhsInput);
+      let rhsInputModified = nerdamer(rhsInput).multiply('-1').text();
+      let expressionInput = nerdamer(rhsInputModified).add(lhsInput).text();
 
       return aeirs.MatchesExactlyWith(expressionAnswer, {x: expressionInput});
     }
@@ -69,19 +64,12 @@ export class MathEquationInputRulesService {
 
   IsEquivalentTo(answer: string, inputs: {x: string}): boolean {
     let aeirs = new AlgebraicExpressionInputRulesService();
-    let mis = new MathInteractionsService();
 
     let splitAnswer = answer.split('=');
     let lhsAnswer = splitAnswer[0], rhsAnswer = splitAnswer[1];
 
     let splitInput = inputs.x.split('=');
     let lhsInput = splitInput[0], rhsInput = splitInput[1];
-
-    // Inserting '*' signs between variables if not present.
-    lhsAnswer = mis.insertMultiplicationSigns(lhsAnswer);
-    rhsAnswer = mis.insertMultiplicationSigns(rhsAnswer);
-    lhsInput = mis.insertMultiplicationSigns(lhsInput);
-    rhsInput = mis.insertMultiplicationSigns(rhsInput);
 
     // We bring all terms in both equations to one side and then compare.
 
