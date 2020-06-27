@@ -175,7 +175,9 @@ describe('Topic editor functionality', function() {
       await topicsAndSkillsDashboardPage.createTopic(TOPIC_NAME,
         TOPIC_DESCRIPTION, false);
       await topicsAndSkillsDashboardPage.get();
-      await topicsAndSkillsDashboardPage.navigateToUnusedSkillsTab();
+      await topicsAndSkillsDashboardPage.navigateToSkillsTab();
+      await topicsAndSkillsDashboardPage.filterSkillsByStatus(
+        SKILL_STATUS_UNASSIGNED);
       await topicsAndSkillsDashboardPage.assignSkillWithIndexToTopicByTopicName(
         0, TOPIC_NAME);
 
