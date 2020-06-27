@@ -87,6 +87,231 @@ def run_job_for_deleted_exp(
         self.assertEqual(job_class.get_output(job_id), [])
 
 
+class DragAndDropSortInputInteractionOneOffJobTests(test_utils.GenericTestBase):
+
+    ALBERT_EMAIL = 'albert@example.com'
+    ALBERT_NAME = 'albert'
+
+    VALID_EXP_ID = 'exp_id0'
+    NEW_EXP_ID = 'exp_id1'
+    EXP_TITLE = 'title'
+
+    def setUp(self):
+        super(DragAndDropSortInputInteractionOneOffJobTests, self).setUp()
+
+        # Setup user who will own the test explorations.
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.process_and_flush_pending_tasks()
+
+    def test_exp_state_pairs_are_produced_only_for_desired_interactions(self):
+        """Checks output pairs are produced only for
+        desired interactions.
+        """
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+
+        exploration.add_states(['State1', 'State2'])
+
+        state1 = exploration.states['State1']
+        state2 = exploration.states['State2']
+
+        state1.update_interaction_id('DragAndDropSortInput')
+        state2.update_interaction_id('DragAndDropSortInput')
+
+        customization_args_dict1 = {
+            'choices': {'value': [
+                '<p>This is value1 for DragAndDropSortInput</p>',
+                '<p>This is value2 for DragAndDropSortInput</p>',
+            ]}
+        }
+
+        answer_group_list1 = [{
+            'rule_specs': [{
+                'rule_type': 'IsEqualToOrdering',
+                'inputs': {'x': [['a'], ['b']]}
+            }],
+            'outcome': {
+                'dest': 'Introduction',
+                'feedback': {
+                    'content_id': 'feedback1',
+                    'html': '<p>Outcome for state1</p>'
+                },
+                'param_changes': [],
+                'labelled_as_correct': False,
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }]
+
+        customization_args_dict2 = {
+            'choices': {'value': [
+                '<p>This is value1 for DragAndDropSortInput</p>',
+                '<p>This is value2 for DragAndDropSortInput</p>',
+            ]}
+        }
+
+        answer_group_list2 = [{
+            'rule_specs': [{
+                'rule_type': 'IsEqualToOrderingWithOneItemAtIncorrectPosition',
+                'inputs': {
+                    'x': []
+                }
+            }, {
+                'rule_type': 'IsEqualToOrdering',
+                'inputs': {'x': [['a']]}
+            }, {
+                'rule_type': 'HasElementXBeforeElementY',
+                'inputs': {
+                    'x': '',
+                    'y': ''
+                }
+            }, {
+                'rule_type': 'IsEqualToOrdering',
+                'inputs': {'x': []}
+            }],
+            'outcome': {
+                'dest': 'State1',
+                'feedback': {
+                    'content_id': 'feedback',
+                    'html': '<p>Outcome for state2</p>'
+                },
+                'param_changes': [],
+                'labelled_as_correct': False,
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }, {
+            'rule_specs': [{
+                'rule_type': 'HasElementXAtPositionY',
+                'inputs': {
+                    'x': '',
+                    'y': 1
+                }
+            }, {
+                'rule_type': 'HasElementXAtPositionY',
+                'inputs': {
+                    'x': 'a',
+                    'y': 2
+                }
+            }],
+            'outcome': {
+                'dest': 'Introduction',
+                'feedback': {
+                    'content_id': 'feedback2',
+                    'html': '<p>Outcome for state1</p>'
+                },
+                'param_changes': [],
+                'labelled_as_correct': False,
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }]
+
+        state1.update_interaction_customization_args(customization_args_dict1)
+        state1.update_interaction_answer_groups(answer_group_list1)
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        # Start DragAndDropSortInputInteractionOneOffJob on sample exploration.
+        job_id = (
+            exp_jobs_one_off.DragAndDropSortInputInteractionOneOffJob
+            .create_new())
+        exp_jobs_one_off.DragAndDropSortInputInteractionOneOffJob.enqueue(
+            job_id)
+        self.process_and_flush_pending_tasks()
+
+        actual_output = (
+            exp_jobs_one_off.DragAndDropSortInputInteractionOneOffJob
+            .get_output(job_id))
+        self.assertEqual(actual_output, [])
+
+        state2.update_interaction_customization_args(customization_args_dict2)
+        state2.update_interaction_answer_groups(answer_group_list2)
+
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        # Start DragAndDropSortInputInteractionOneOffJob on sample exploration.
+        job_id = (
+            exp_jobs_one_off.DragAndDropSortInputInteractionOneOffJob
+            .create_new())
+        exp_jobs_one_off.DragAndDropSortInputInteractionOneOffJob.enqueue(
+            job_id)
+        self.process_and_flush_pending_tasks()
+
+        actual_output = (
+            exp_jobs_one_off.DragAndDropSortInputInteractionOneOffJob
+            .get_output(job_id))
+        expected_output = [(
+            u'[u\'exp_id0\', [u"[u\'State name: State2, AnswerGroup: 0, Rule '
+            'input x in rule with index 0 is empty. \', u\'State name: State2,'
+            ' AnswerGroup: 0, Rule input y in rule with index 2 is empty. \', '
+            'u\'State name: State2, AnswerGroup: 0, Rule input x in rule with '
+            'index 2 is empty. \', u\'State name: State2, AnswerGroup: 0, Rule'
+            ' input x in rule with index 3 is empty. \', u\'State name: State2'
+            ', AnswerGroup: 1, Rule input x in rule with index 0 is empty. \']'
+            '"]]'
+        )]
+        self.assertEqual(actual_output, expected_output)
+
+    def test_no_action_is_performed_for_deleted_exploration(self):
+        """Test that no action is performed on deleted explorations."""
+
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+
+        exploration.add_states(['State1'])
+
+        state1 = exploration.states['State1']
+
+        state1.update_interaction_id('DragAndDropSortInput')
+
+        customization_args_dict = {
+            'choices': {'value': [
+                '<p>This is value1 for DragAndDropSortInput</p>',
+                '<p>This is value2 for DragAndDropSortInput</p>',
+            ]}
+        }
+
+        answer_group_list = [{
+            'rule_specs': [{
+                'rule_type': 'IsEqualToOrdering',
+                'inputs': {'x': []}
+            }, {
+                'rule_type': 'IsEqualToOrdering',
+                'inputs': {'x': []}
+            }],
+            'outcome': {
+                'dest': 'State1',
+                'feedback': {
+                    'content_id': 'feedback',
+                    'html': '<p>Outcome for state2</p>'
+                },
+                'param_changes': [],
+                'labelled_as_correct': False,
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }]
+
+        state1.update_interaction_customization_args(customization_args_dict)
+        state1.update_interaction_answer_groups(answer_group_list)
+
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        exp_services.delete_exploration(self.albert_id, self.VALID_EXP_ID)
+
+        run_job_for_deleted_exp(
+            self, exp_jobs_one_off.DragAndDropSortInputInteractionOneOffJob)
+
+
 class MultipleChoiceInteractionOneOffJobTests(test_utils.GenericTestBase):
 
     ALBERT_EMAIL = 'albert@example.com'
