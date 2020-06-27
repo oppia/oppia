@@ -48,6 +48,7 @@ class OppiaAngularRootLinter(python_utils.OBJECT):
             './core/templates/components/oppia-angular-root.component.ts')
         self.oppia_root = FILE_CACHE.read(
             './core/templates/base-components/oppia-root.directive.ts')
+        self.files_to_ignore = ['upgraded-services']
 
     def get_injectable_class_name(self, file_content):
         """Extarcts the class name from a file that has an Injectable class.
@@ -77,6 +78,10 @@ class OppiaAngularRootLinter(python_utils.OBJECT):
         total_error_count = 0
         total_files_checked = 0
         for file_path in self.file_paths:
+            if any(
+                    (ignore_file in file_path
+                     for ignore_file in self.files_to_ignore)):
+                continue
             file_content = FILE_CACHE.read(file_path)
             if '@Injectable({' in file_content:
                 total_files_checked += 1
