@@ -17,7 +17,6 @@
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
 import { Answer } from 'domain/exploration/AnswerStatsObjectFactory';
@@ -29,55 +28,44 @@ import { IFractionDict, FractionObjectFactory } from
 import { InteractionRulesRegistryService } from
   'services/interaction-rules-registry.service';
 import { State } from 'domain/state/StateObjectFactory';
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
+import { StateInteractionStatsBackendApiService } from
+  'domain/exploration/state-interaction-stats-backend-api.service';
 
 type Option = string | string[];
 
-export interface IAnswerData {
-  'answer': Answer;
-  'frequency': number;
-  // N/A when the visualization can not present addressed answers.
-  //
-  // For example, for SetInput interactions the individual answer elements are
-  // not generally intended to be used as a single response to SetInput
-  // interactions, so we omit addressed information entirely.
-  'is_addressed'?: boolean;
+interface IAnswerData {
+  answer: Answer;
+  frequency: number;
+  isAddressed: boolean;
 }
 
-export interface IVisualizationInfo {
-  'addressed_info_is_supported': boolean;
-  'data': IAnswerData[];
-  'id': string;
-  'options': {[name: string]: Option};
+interface IVisualizationInfo {
+  addressedInfoIsSupported: boolean;
+  data: IAnswerData[];
+  id: string;
+  options: {
+    [option: string]: Option;
+  };
 }
 
-export interface IStateInteractionStatsBackendDict {
-  'visualizations_info': IVisualizationInfo[];
+export interface IStateRulesStats {
+  explorationId: string;
+  stateName: string;
+  visualizationsInfo: IVisualizationInfo[];
 }
-
-export interface IStateInteractionStats {
-  'exploration_id': string;
-  'state_name': string;
-  'visualizations_info': IVisualizationInfo[];
-}
-
-// TODO(#8038): Move this constant into a backend-api.service module.
-const STATE_INTERACTION_STATS_URL_TEMPLATE: string = (
-  '/createhandler/state_interaction_stats/<exploration_id>/<state_name>');
 
 @Injectable({providedIn: 'root'})
 export class StateInteractionStatsService {
   // NOTE TO DEVELOPERS: Fulfilled promises can be reused indefinitely.
-  statsCache: Map<string, Promise<IStateInteractionStats>> = new Map();
+  statsCache: Map<string, Promise<IStateRulesStats>> = new Map();
 
   constructor(
       private answerClassificationService: AnswerClassificationService,
       private contextService: ContextService,
       private fractionObjectFactory: FractionObjectFactory,
-      private http: HttpClient,
       private interactionRulesRegistryService: InteractionRulesRegistryService,
-      private urlInterpolationService: UrlInterpolationService) {}
+      private stateInteractionStatsBackendApiService:
+      StateInteractionStatsBackendApiService) {}
 
   /**
    * Returns whether given state has an implementation for displaying the
@@ -100,7 +88,7 @@ export class StateInteractionStatsService {
    * Returns a promise which will provide details of the given state's
    * answer-statistics.
    */
-  computeStats(state: State): Promise<IStateInteractionStats> {
+  computeStats(state: State): Promise<IStateRulesStats> {
     if (this.statsCache.has(state.name)) {
       return this.statsCache.get(state.name);
     }
@@ -108,31 +96,27 @@ export class StateInteractionStatsService {
     const interactionRulesService = (
       this.interactionRulesRegistryService.getRulesServiceByInteractionId(
         state.interaction.id));
-    // TODO(#8038): Move this HTTP call into a backend-api.service module.
-    const statsPromise = this.http.get<IStateInteractionStatsBackendDict>(
-      this.urlInterpolationService.interpolateUrl(
-        STATE_INTERACTION_STATS_URL_TEMPLATE, {
-          exploration_id: explorationId,
-          state_name: state.name,
-        })).toPromise()
-      .then(response => ({
-        exploration_id: explorationId,
-        state_name: state.name,
-        visualizations_info: response.visualizations_info.map(vizInfo => ({
-          id: vizInfo.id,
-          options: vizInfo.options,
-          addressed_info_is_supported: vizInfo.addressed_info_is_supported,
-          data: vizInfo.data.map(datum => <IAnswerData>{
+
+    const statsPromise = this.stateInteractionStatsBackendApiService.getStats(
+      explorationId, state.name).then(vizInfo => <IStateRulesStats> {
+        explorationId: explorationId,
+        stateName: state.name,
+        visualizationsInfo: vizInfo.map(info => <IVisualizationInfo> ({
+          addressedInfoIsSupported: info.addressedInfoIsSupported,
+          data: info.data.map(datum => <IAnswerData>{
             answer: this.getReadableAnswerString(state, datum.answer),
             frequency: datum.frequency,
-            is_addressed: vizInfo.addressed_info_is_supported ?
+            isAddressed: (
+              info.addressedInfoIsSupported ?
               this.answerClassificationService
                 .isClassifiedExplicitlyOrGoesToNewState(
                   state.name, state, datum.answer, interactionRulesService) :
-              undefined,
+              undefined)
           }),
+          id: info.id,
+          options: info.options
         })),
-      }));
+      });
     this.statsCache.set(state.name, statsPromise);
     return statsPromise;
   }
