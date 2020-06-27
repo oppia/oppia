@@ -20,6 +20,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from constants import constants
 from core.platform import models
 
+from google.appengine.datastore import datastore_query
 from google.appengine.ext import ndb
 
 (base_models, user_models,) = models.Registry.import_models([
@@ -251,3 +252,44 @@ class SkillSummaryModel(base_models.BaseModel):
     def get_user_id_migration_policy():
         """SkillSummaryModel doesn't have any field with user ID."""
         return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
+
+    @classmethod
+    def fetch_page(cls, page_size, urlsafe_start_cursor, sort_by):
+        """Returns the models according to values specified.
+
+        Args:
+            page_size: int. Number of skills to fetch.
+            urlsafe_start_cursor: str. The cursor to the next page.
+            sort_by: str. A string indicating how to sort the result.
+
+        Returns:
+            3-tuple(query_models, urlsafe_start_cursor, more). where:
+                query_models: list(SkillSummary). The list of summaries
+                    of skills starting at the given cursor.
+                urlsafe_start_cursor: str or None. A query cursor pointing to
+                    the next batch of results. If there are no more results,
+                    this might be None.
+                more: bool. If True, there are (probably) more results after
+                    this batch. If False, there are no further results
+                    after this batch.
+        """
+        cursor = datastore_query.Cursor(urlsafe=urlsafe_start_cursor)
+        sort = -cls.skill_model_created_on
+        if sort_by == (
+                constants.TOPIC_SKILL_DASHBOARD_SORT_OPTIONS[
+                    'DecreasingCreatedOn']):
+            sort = cls.skill_model_created_on
+        elif sort_by == (
+                constants.TOPIC_SKILL_DASHBOARD_SORT_OPTIONS[
+                    'IncreasingUpdatedOn']):
+            sort = -cls.skill_model_last_updated
+        elif sort_by == (
+                constants.TOPIC_SKILL_DASHBOARD_SORT_OPTIONS[
+                    'DecreasingUpdatedOn']):
+            sort = cls.skill_model_last_updated
+
+        query_models, next_cursor, more = (
+            cls.query().order(sort).fetch_page(page_size, start_cursor=cursor))
+        new_urlsafe_start_cursor = (
+            next_cursor.urlsafe() if (next_cursor and more) else None)
+        return query_models, new_urlsafe_start_cursor, more

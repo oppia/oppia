@@ -26,18 +26,21 @@
                 Topics
               </a>
             </li>
-            <li ng-class="{'dashboard-tabs-active': $ctrl.activeTab === $ctrl.TAB_NAME_UNTRIAGED_SKILLS}">
-              <a class="dashboard-tabs-text protractor-test-unused-skills-tab"
-                 ng-click="$ctrl.setActiveTab($ctrl.TAB_NAME_UNTRIAGED_SKILLS)">
+            <li ng-class="{'dashboard-tabs-active': $ctrl.activeTab === $ctrl.TAB_NAME_SKILLS}">
+              <a class="dashboard-tabs-text protractor-test-skills-tab"
+                 ng-click="$ctrl.setActiveTab($ctrl.TAB_NAME_SKILLS)">
                 Skills
               </a>
             </li>
           </ul>
         </div>
         <div class="dashboard-list">
-          <div class="dashboard-list-header" ng-if="$ctrl.topicSummaries.length>0 && $ctrl.activeTab === $ctrl.TAB_NAME_TOPICS">
-            <div class="dashboard-list-header-count">
-              <span>Displaying <[$ctrl.pageNumber*$ctrl.itemsPerPage + 1]> - <[$ctrl.pageNumber*$ctrl.itemsPerPage+10]> of <[$ctrl.currentCount]></span>
+          <div class="dashboard-list-header" ng-if="$ctrl.topicSummaries.length>0 || $ctrl.skillSummaries.length>0">
+            <div class="dashboard-list-header-count" ng-if="$ctrl.activeTab === $ctrl.TAB_NAME_TOPICS">
+              <span>Displaying <[$ctrl.pageNumber*$ctrl.itemsPerPage + 1]> - <[($ctrl.pageNumber*$ctrl.itemsPerPage)+$ctrl.itemsPerPage]> of <[$ctrl.currentCount]></span>
+            </div>
+            <div class="dashboard-list-header-count" ng-if="$ctrl.activeTab === $ctrl.TAB_NAME_SKILLS">
+              <span>Displaying <[$ctrl.pageNumber*$ctrl.itemsPerPage + 1]> - <[($ctrl.pageNumber*$ctrl.itemsPerPage)+$ctrl.itemsPerPage]> of Many</span>
             </div>
             <div class="dashboard-list-pagination">
               <div>
@@ -47,13 +50,19 @@
                         ng-change="$ctrl.refreshPagination()">
                 </select>
               </div>
-              <div>
+              <div ng-if="$ctrl.activeTab === $ctrl.TAB_NAME_TOPICS">
                 <i class="fa fa-angle-left topic-pagination-arrow" ng-click="$ctrl.changePageByOne($ctrl.MOVE_TO_PREV_PAGE)"></i>
-                <span class="dashboard-list-pagination-value" ng-repeat="n in $ctrl.generateNumbersTillRange($ctrl.currentCount/$ctrl.itemsPerPage) track by $index" ng-click="$ctrl.goToPageNumber($index)">
+                <span class="dashboard-list-pagination-value"
+
+                      ng-repeat="n in $ctrl.generateNumbersTillRange($ctrl.currentCount/$ctrl.itemsPerPage) track by $index" ng-click="$ctrl.goToPageNumber($index)">
                   <span ng-if="$ctrl.pageNumber===$index" class="dashboard-list-pagination-active"><[$index+1]></span>
                   <span ng-if="$ctrl.pageNumber!==$index"><[$index+1]></span>
                 </span>
                 <i class="fa fa-angle-right topic-pagination-arrow" ng-click="$ctrl.changePageByOne($ctrl.MOVE_TO_NEXT_PAGE)"></i>
+              </div>
+              <div ng-if="$ctrl.activeTab === $ctrl.TAB_NAME_SKILLS">
+                <button class="btn btn-sm navigation-button" ng-click="$ctrl.navigateSkillPage($ctrl.MOVE_TO_PREV_PAGE)">Prev Page</button>
+                <button class="btn btn-sm navigation-button" ng-click="$ctrl.navigateSkillPage($ctrl.MOVE_TO_NEXT_PAGE)">Next Page</button>
               </div>
             </div>
           </div>
@@ -69,9 +78,11 @@
               No topics to display.
             </p>
           </div>
-          <div ng-if="$ctrl.activeTab === $ctrl.TAB_NAME_UNTRIAGED_SKILLS">
-            <skills-list skill-summaries="$ctrl.untriagedSkillSummaries"
-                         ng-if="$ctrl.untriagedSkillSummaries.length > 0"
+          <div ng-if="$ctrl.activeTab === $ctrl.TAB_NAME_SKILLS">
+            <skills-list skill-summaries="$ctrl.displayedSkillSummaries"
+                         ng-if="$ctrl.displayedSkillSummaries.length > 0"
+                         page-number="$ctrl.pageNumber"
+                         items-per-page="$ctrl.itemsPerPage"
                          editable-topic-summaries="$ctrl.editableTopicSummaries"
                          mergeable-skill-summaries="$ctrl.mergeableSkillSummaries"
                          user-can-create-skill="$ctrl.userCanCreateSkill"
@@ -91,7 +102,7 @@
             <span class="topic-count-text">Topics</span>
           </div>
           <div class="skill-count">
-            <span class="skill-count-value"><[$ctrl.totalUntriagedSkillSummaries.length]></span>
+            <span class="skill-count-value"><[$ctrl.totalSkillCount]></span>
             <span class="skill-count-text">Skills</span>
           </div>
           <div class="create-topic-skill">
@@ -105,7 +116,7 @@
             </div>
           </div>
         </div>
-        <div class="topic-skill-filter" ng-if="$ctrl.activeTab===$ctrl.TAB_NAME_TOPICS">
+        <div class="topic-skill-filter">
           <div class="topic-skill-filter-content">
             <div class="topic-skill-filter-header">
               <span class="topic-skill-filter-heading">Filter</span>
@@ -116,10 +127,20 @@
                 <span>Status</span>
               </div>
               <div class="topic-skill-filter-value">
-                <div ng-if="$ctrl.select2DropdownIsShown">
+                <div ng-if="$ctrl.select2DropdownIsShown && $ctrl.activeTab === $ctrl.TAB_NAME_TOPICS">
                   <select2-dropdown class="protractor-test-select-status-dropdown"
                                     choices="$ctrl.statusOptions"
                                     item="$ctrl.filterObject.status"
+                                    placeholder="Status options"
+                                    width="100%"
+                                    on-selection-change="$ctrl.applyFilters()">
+                  </select2-dropdown>
+                </div>
+                <div ng-if="$ctrl.select2DropdownIsShown && $ctrl.activeTab === $ctrl.TAB_NAME_SKILLS">
+                  <select2-dropdown class="protractor-test-select-skill-status-dropdown"
+                                    choices="$ctrl.skillStatusOptions"
+                                    item="$ctrl.filterObject.status"
+                                    placeholder="Status options"
                                     width="100%"
                                     on-selection-change="$ctrl.applyFilters()">
                   </select2-dropdown>
@@ -135,6 +156,7 @@
                   <select2-dropdown item="$ctrl.filterObject.classroom"
                                     class="classroom-dropdown protractor-test-select-classroom-dropdown"
                                     choices="$ctrl.classrooms"
+                                    placeholder="Classrooms"
                                     width="100%"
                                     on-selection-change="$ctrl.applyFilters()">
                   </select2-dropdown>
@@ -150,6 +172,7 @@
                   <select2-dropdown class="protractor-test-select-sort-dropdown"
                                     choices="$ctrl.sortOptions"
                                     item="$ctrl.filterObject.sort"
+                                    placeholder="Status Options"
                                     width="100%"
                                     on-selection-change="$ctrl.applyFilters()">
                   </select2-dropdown>
@@ -309,6 +332,12 @@
     position: absolute;
     right: 0;
   }
+
+  .oppia-topics-and-skills-dashboard .navigation-button {
+    background-color: #009688;
+    color: #FFFFFF;
+  }
+
   .oppia-topics-and-skills-dashboard .topic-skill-filter-row {
     display: flex;
     flex-wrap: wrap;
@@ -333,7 +362,7 @@
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
-    width: 30%;
+    width: 35%;
   }
   .oppia-topics-and-skills-dashboard .dashboard-list-pagination-value {
     cursor: pointer;

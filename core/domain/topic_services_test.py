@@ -246,7 +246,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             subtopics=[], next_subtopic_id=1)
         self.assertEqual(
             topic_services.get_all_skill_ids_assigned_to_some_topic(),
-            set([self.skill_id_1, self.skill_id_2, 'skill_3']))
+            {self.skill_id_1, self.skill_id_2, 'skill_3'})
 
     def test_cannot_create_topic_change_class_with_invalid_changelist(self):
         with self.assertRaisesRegexp(

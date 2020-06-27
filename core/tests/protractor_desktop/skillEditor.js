@@ -98,6 +98,13 @@ describe('Skill Editor functionality', function() {
   });
 
   it('should edit rubrics for the skill', async function() {
+    await skillEditorPage.addRubricExplanationForDifficulty(
+      'Easy', 'Explanation for easy difficulty');
+    await skillEditorPage.addRubricExplanationForDifficulty(
+      'Medium', 'Explanation for medium difficulty');
+    await skillEditorPage.addRubricExplanationForDifficulty(
+      'Hard', 'Explanation for hard difficulty');
+
     await skillEditorPage.expectRubricExplanationsToMatch(
       'Easy', ['Explanation for easy difficulty']);
     await skillEditorPage.expectRubricExplanationsToMatch(

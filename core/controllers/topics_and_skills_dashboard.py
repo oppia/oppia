@@ -35,6 +35,7 @@ from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
 import feconf
+import python_utils
 import utils
 
 
@@ -84,12 +85,14 @@ class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
         all_classroom_names = [
             classroom['name'] for classroom in all_classrooms_dict]
 
+        topic_classroom_dict = {}
+        for classroom in all_classrooms_dict:
+            for topic_id in classroom['topic_ids']:
+                topic_classroom_dict[topic_id] = classroom['name']
+
         for topic_summary_dict in topic_summary_dicts:
-            topic_summary_dict['classroom'] = None
-            for classroom in all_classrooms_dict:
-                if topic_summary_dict['id'] in classroom['topic_ids']:
-                    topic_summary_dict['classroom'] = classroom['name']
-                    break
+            topic_summary_dict['classroom'] = topic_classroom_dict.get(
+                topic_summary_dict['id'], None)
 
         untriaged_skill_summary_dicts = []
         mergeable_skill_summary_dicts = []
@@ -152,6 +155,7 @@ class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
             'untriaged_skill_summary_dicts': untriaged_skill_summary_dicts,
             'mergeable_skill_summary_dicts': mergeable_skill_summary_dicts,
             'topic_summary_dicts': topic_summary_dicts,
+            'total_skill_count': len(skill_summary_dicts),
             'all_classroom_names': all_classroom_names,
             'can_delete_topic': can_delete_topic,
             'can_create_topic': can_create_topic,
@@ -160,6 +164,67 @@ class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
             'categorized_skills_dict': categorized_skills_dict
         })
         self.render_json(self.values)
+
+
+class SkillsDashboardPageDataHandler(base.BaseHandler):
+    """Provides data for the user's skills dashboard page."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.can_access_topics_and_skills_dashboard
+    def post(self):
+        """Handles POST requests."""
+
+        classroom_name = self.payload.get('classroom_name')
+        urlsafe_start_cursor = self.payload.get('next_cursor', None)
+        keywords = self.payload.get('keywords')
+        num_skills_to_fetch = self.payload.get('num_skills_to_fetch')
+        sort_by = self.payload.get('sort')
+        status = self.payload.get('status')
+
+        if (classroom_name is not None and
+                not isinstance(classroom_name, python_utils.BASESTRING)):
+            raise self.InvalidInputException(
+                'Classroom name should be a string.')
+
+        if (urlsafe_start_cursor is not None and
+                not isinstance(urlsafe_start_cursor, python_utils.BASESTRING)):
+            raise self.InvalidInputException(
+                'Next Cursor should be a string.')
+
+        if (num_skills_to_fetch is None or
+                not isinstance(num_skills_to_fetch, int)):
+            raise self.InvalidInputException(
+                'Number of skills to fetch should be a number.')
+
+        if (keywords is not None and (not isinstance(keywords, list) or not all(
+                [isinstance(keyword, python_utils.BASESTRING)
+                 for keyword in keywords]))):
+            raise self.InvalidInputException(
+                'Keywords should be a list of strings.')
+
+        if (sort_by is not None and
+                not isinstance(sort_by, python_utils.BASESTRING)):
+            raise self.InvalidInputException(
+                'The value of sort_by should be a string.')
+
+        if (status is not None and
+                not isinstance(status, python_utils.BASESTRING)):
+            raise self.InvalidInputException(
+                'Status should be a string.')
+
+        skill_summaries, next_cursor, more = (
+            skill_services.get_filtered_skill_summaries(
+                num_skills_to_fetch, status, classroom_name,
+                keywords, sort_by, urlsafe_start_cursor))
+
+        skill_summary_dicts = [summary.to_dict() for summary in skill_summaries]
+
+        self.render_json({
+            'skill_summary_dicts': skill_summary_dicts,
+            'next_cursor': next_cursor,
+            'more': more,
+        })
 
 
 class NewTopicHandler(base.BaseHandler):
