@@ -16,16 +16,19 @@
  * @fileoverview Unit tests for AssignSkillToTopicModalController.
  */
 
+
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
-describe('Assign Skill To Topic Modal Controller', function() {
+describe('Assign Skill To Topic Modal', function() {
   var $scope = null;
   var $uibModalInstance = null;
+  var topicSummaryDict = null;
+  var TopicSummaryObjectFactory = null;
 
-  var topicSummaries = {};
+  beforeEach(angular.mock.module('oppia'));
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
@@ -33,22 +36,31 @@ describe('Assign Skill To Topic Modal Controller', function() {
       $provide.value(key, value);
     }
   }));
+
   beforeEach(angular.mock.inject(function($injector, $controller) {
     var $rootScope = $injector.get('$rootScope');
-
+    TopicSummaryObjectFactory = $injector.get('TopicSummaryObjectFactory');
     $uibModalInstance = jasmine.createSpyObj(
       '$uibModalInstance', ['close', 'dismiss']);
 
+    topicSummaryDict = TopicSummaryObjectFactory.createFromBackendDict({
+      id: '1',
+      name: 'topic1',
+      canonical_story_count: 2,
+      subtopic_count: 2,
+      total_skill_count: 10,
+      uncategorized_skill_count: 2
+    });
     $scope = $rootScope.$new();
     $controller('AssignSkillToTopicModalController', {
       $scope: $scope,
       $uibModalInstance: $uibModalInstance,
-      topicSummaries: topicSummaries
+      topicSummaries: [topicSummaryDict]
     });
   }));
 
-  it('should init the variables', function() {
-    expect($scope.topicSummaries).toEqual(topicSummaries);
+  it('should initialize the variables', function() {
+    expect($scope.topicSummaries).toEqual([topicSummaryDict]);
     expect($scope.selectedTopicIds).toEqual([]);
   });
 });

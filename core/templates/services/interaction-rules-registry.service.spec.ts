@@ -18,6 +18,9 @@
 
 import { TestBed } from '@angular/core/testing';
 
+import { AlgebraicExpressionInputRulesService } from
+  // eslint-disable-next-line max-len
+  'interactions/AlgebraicExpressionInput/directives/algebraic-expression-input-rules.service';
 import { CodeReplRulesService } from
   'interactions/CodeRepl/directives/code-repl-rules.service';
 import { ContinueRulesService } from
@@ -79,6 +82,8 @@ describe('Interaction Rules Registry Service', () => {
 
     this.registry = TestBed.get(InteractionRulesRegistryService);
 
+    this.algebraicExpressionInputRulesService = (
+      TestBed.get(AlgebraicExpressionInputRulesService));
     this.codeReplRulesService = TestBed.get(CodeReplRulesService);
     this.continueRulesService = TestBed.get(ContinueRulesService);
     this.dragAndDropSortInputRulesService = (
@@ -126,6 +131,14 @@ describe('Interaction Rules Registry Service', () => {
         .not.toThrowError();
     }
   });
+
+  it('should return the correct rules service for AlgebraicExpressionInput',
+    () => {
+      expect(this.registry.getRulesServiceByInteractionId(
+        'AlgebraicExpressionInput')).toBe(
+        this.algebraicExpressionInputRulesService);
+    }
+  );
 
   it('should return the correct rules service for CodeRepl', () => {
     expect(this.registry.getRulesServiceByInteractionId('CodeRepl'))
