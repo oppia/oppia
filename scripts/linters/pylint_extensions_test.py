@@ -2152,6 +2152,24 @@ class DocstringCheckerTests(unittest.TestCase):
         with self.checker_test_object.assertAddsMessages(message):
             temp_file.close()
 
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""class ABC(arg):
+                        \"\"\"This is a docstring.
+                            Returns:
+                            str. If :true,
+                                individual key=value pairs.
+                        \"\"\"
+                        Something
+                """)
+        message = testutils.Message(
+            msg_id='4-space-indentation-in-docstring',
+            line=4)
+        self.checker_test_object.checker.process_module(
+            raises_invalid_indentation_node)
+        with self.checker_test_object.assertAddsMessages(message):
+            temp_file.close()
+
     def test_invalid_description_indentation_docstring(self):
         invalid_description_indentation_node = astroid.scoped_nodes.Module(
             name='test',
@@ -2215,6 +2233,36 @@ class DocstringCheckerTests(unittest.TestCase):
             line=5)
         self.checker_test_object.checker.process_module(
             invalid_description_indentation_node)
+        with self.checker_test_object.assertAddsMessages(message):
+            temp_file.close()
+
+    def test_malformed_parameter_docstring(self):
+        invalid_parameter_name = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""class ABC(arg):
+                        \"\"\"This is a docstring.
+                            Raises:
+                                Incorrect-Exception: if the
+                                schema is not valid.
+                        \"\"\"
+                        Something
+                """)
+        invalid_parameter_name.file = filename
+        invalid_parameter_name.path = filename
+
+        self.checker_test_object.checker.process_module(
+            invalid_parameter_name)
+
+        message = testutils.Message(
+            msg_id='malformed-parameter',
+            line=4)
+
         with self.checker_test_object.assertAddsMessages(message):
             temp_file.close()
 
