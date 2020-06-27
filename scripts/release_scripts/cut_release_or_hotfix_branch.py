@@ -296,8 +296,9 @@ def execute_branch_cut(target_version, hotfix_number):
         subprocess.check_call(['git', 'checkout', '-b', new_branch_name])
 
     # Push the new release branch to GitHub.
-    python_utils.PRINT('Pushing new %s branch to GitHub.' % new_branch_type)
-    subprocess.check_call(['git', 'push', remote_alias, new_branch_name])
+    if new_branch_type == release_constants.BRANCH_TYPE_RELEASE:
+        python_utils.PRINT('Pushing new %s branch to GitHub.' % new_branch_type)
+        subprocess.check_call(['git', 'push', remote_alias, new_branch_name])
 
     python_utils.PRINT('')
     python_utils.PRINT(
