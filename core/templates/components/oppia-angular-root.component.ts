@@ -72,6 +72,12 @@ import { AdminRouterService } from
 import { AdminTaskManagerService } from
   'pages/admin-page/services/admin-task-manager.service';
 import { AlertsService } from 'services/alerts.service';
+import { AlgebraicExpressionInputRulesService } from
+  // eslint-disable-next-line max-len
+  'interactions/AlgebraicExpressionInput/directives/algebraic-expression-input-rules.service';
+import { AlgebraicExpressionInputValidationService } from
+  // eslint-disable-next-line max-len
+  'interactions/AlgebraicExpressionInput/directives/algebraic-expression-input-validation.service';
 import { AngularNameService } from
   'pages/exploration-editor-page/services/angular-name.service';
 import { AnswerClassificationResultObjectFactory } from
@@ -248,6 +254,12 @@ import { GuestCollectionProgressObjectFactory } from
   'domain/collection/GuestCollectionProgressObjectFactory';
 import { GuestCollectionProgressService } from
   'domain/collection/guest-collection-progress.service';
+import { GuppyConfigurationService } from
+  // eslint-disable-next-line max-len
+  'services/guppy-configuration.service';
+import { GuppyInitializationService } from
+  // eslint-disable-next-line max-len
+  'services/guppy-initialization.service';
 import { HighBounceRateTaskObjectFactory } from
   'domain/improvements/HighBounceRateTaskObjectFactory';
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
@@ -308,6 +320,7 @@ import { LostChangeObjectFactory } from
 import { MathExpressionInputValidationService } from
   // eslint-disable-next-line max-len
   'interactions/MathExpressionInput/directives/math-expression-input-validation.service';
+import { MathInteractionsService } from 'services/math-interactions.service';
 import { MessengerService } from 'services/messenger.service';
 import { MetaTagCustomizationService } from
   'services/contextual/meta-tag-customization.service';
@@ -601,6 +614,8 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static adminRouterService: AdminRouterService;
   static adminTaskManagerService: AdminTaskManagerService;
   static alertsService: AlertsService;
+  static algebraicExpressionInputRulesService: AlgebraicExpressionInputRulesService;
+  static algebraicExpressionInputValidationService: AlgebraicExpressionInputValidationService;
   static angularNameService: AngularNameService;
   static answerClassificationResultObjectFactory: AnswerClassificationResultObjectFactory;
   static answerClassificationService: AnswerClassificationService;
@@ -695,6 +710,8 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static graphUtilsService: GraphUtilsService;
   static guestCollectionProgressObjectFactory: GuestCollectionProgressObjectFactory;
   static guestCollectionProgressService: GuestCollectionProgressService;
+  static guppyConfigurationService: GuppyConfigurationService;
+  static guppyInitializationService: GuppyInitializationService;
   static highBounceRateTaskObjectFactory: HighBounceRateTaskObjectFactory;
   static hintObjectFactory: HintObjectFactory;
   static htmlEscaperService: HtmlEscaperService;
@@ -728,6 +745,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static logicProofValidationService: LogicProofValidationService;
   static lostChangeObjectFactory: LostChangeObjectFactory;
   static mathExpressionInputValidationService: MathExpressionInputValidationService;
+  static mathInteractionsService: MathInteractionsService;
   static messengerService: MessengerService;
   static metaTagCustomizationService: MetaTagCustomizationService;
   static misconceptionObjectFactory: MisconceptionObjectFactory;
@@ -876,6 +894,8 @@ private adminDataService: AdminDataService,
 private adminRouterService: AdminRouterService,
 private adminTaskManagerService: AdminTaskManagerService,
 private alertsService: AlertsService,
+private algebraicExpressionInputRulesService: AlgebraicExpressionInputRulesService,
+private algebraicExpressionInputValidationService: AlgebraicExpressionInputValidationService,
 private angularNameService: AngularNameService,
 private answerClassificationResultObjectFactory: AnswerClassificationResultObjectFactory,
 private answerClassificationService: AnswerClassificationService,
@@ -969,6 +989,8 @@ private graphDetailService: GraphDetailService,
 private graphInputValidationService: GraphInputValidationService,
 private graphUtilsService: GraphUtilsService,
 private guestCollectionProgressObjectFactory: GuestCollectionProgressObjectFactory,
+private guppyConfigurationService: GuppyConfigurationService,
+private guppyInitializationService: GuppyInitializationService,
 private guestCollectionProgressService: GuestCollectionProgressService,
 private highBounceRateTaskObjectFactory: HighBounceRateTaskObjectFactory,
 private hintObjectFactory: HintObjectFactory,
@@ -1003,6 +1025,7 @@ private loggerService: LoggerService,
 private logicProofValidationService: LogicProofValidationService,
 private lostChangeObjectFactory: LostChangeObjectFactory,
 private mathExpressionInputValidationService: MathExpressionInputValidationService,
+private mathInteractionsService: MathInteractionsService,
 private messengerService: MessengerService,
 private metaTagCustomizationService: MetaTagCustomizationService,
 private misconceptionObjectFactory: MisconceptionObjectFactory,
@@ -1152,6 +1175,8 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.adminRouterService = this.adminRouterService;
     OppiaAngularRootComponent.adminTaskManagerService = this.adminTaskManagerService;
     OppiaAngularRootComponent.alertsService = this.alertsService;
+    OppiaAngularRootComponent.algebraicExpressionInputRulesService = this.algebraicExpressionInputRulesService;
+    OppiaAngularRootComponent.algebraicExpressionInputValidationService = this.algebraicExpressionInputValidationService;
     OppiaAngularRootComponent.angularNameService = this.angularNameService;
     OppiaAngularRootComponent.answerClassificationResultObjectFactory = this.answerClassificationResultObjectFactory;
     OppiaAngularRootComponent.answerClassificationService = this.answerClassificationService;
@@ -1245,6 +1270,8 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.graphInputValidationService = this.graphInputValidationService;
     OppiaAngularRootComponent.graphUtilsService = this.graphUtilsService;
     OppiaAngularRootComponent.guestCollectionProgressObjectFactory = this.guestCollectionProgressObjectFactory;
+    OppiaAngularRootComponent.guppyConfigurationService = this.guppyConfigurationService;
+    OppiaAngularRootComponent.guppyInitializationService = this.guppyInitializationService;
     OppiaAngularRootComponent.guestCollectionProgressService = this.guestCollectionProgressService;
     OppiaAngularRootComponent.highBounceRateTaskObjectFactory = this.highBounceRateTaskObjectFactory;
     OppiaAngularRootComponent.hintObjectFactory = this.hintObjectFactory;
@@ -1279,6 +1306,7 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.logicProofValidationService = this.logicProofValidationService;
     OppiaAngularRootComponent.lostChangeObjectFactory = this.lostChangeObjectFactory;
     OppiaAngularRootComponent.mathExpressionInputValidationService = this.mathExpressionInputValidationService;
+    OppiaAngularRootComponent.mathInteractionsService = this.mathInteractionsService;
     OppiaAngularRootComponent.messengerService = this.messengerService;
     OppiaAngularRootComponent.metaTagCustomizationService = this.metaTagCustomizationService;
     OppiaAngularRootComponent.misconceptionObjectFactory = this.misconceptionObjectFactory;

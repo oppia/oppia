@@ -1,48 +1,48 @@
 // Code - https://github.com/jiggzson/nerdamer/blob/master/nerdamer.core.js
 
-interface Expression {
-    // Returns all variables in the given expression.
+interface MathExpr {
+    // Returns all variables in the given MathExpr.
     variables: () => string[];
 
-    // Returns the text representation of the expression.
+    // Returns the text representation of the MathExpr.
     text: (option: string, n: string) => string;
 
-    // Evaluates the expression into the simplest form.
-    evaluate: () => Expression;
+    // Evaluates the MathExpr into the simplest form.
+    evaluate: () => MathExpr;
 
     // Returns the numerator of the polynomial.
-    numerator: () => Expression;
+    numerator: () => MathExpr;
 
     // Returns the denominator of the polynomial.
-    denominator: () => Expression;
+    denominator: () => MathExpr;
 
-    // Adds two expressions.
-    add: (x: string) => Expression;
+    // Adds two MathExprs.
+    add: (x: string) => MathExpr;
 
-    // Subtracts two expressions.
-    subtract: (x: string) => Expression;
+    // Subtracts two MathExprs.
+    subtract: (x: string) => MathExpr;
 
-    // Multiplies two expressions.
-    multiply: (x: string) => Expression;
+    // Multiplies two MathExprs.
+    multiply: (x: string) => MathExpr;
     
-    // Divides two expressions.
-    divides: (x: string) => Expression;
+    // Divides two MathExprs.
+    divides: (x: string) => MathExpr;
 
-    // Raises one expression to another.
-    pow: (x: string) => Expression;
+    // Raises one MathExpr to another.
+    pow: (x: string) => MathExpr;
 
-    // Checks for equality of two expressions.
+    // Checks for equality of two MathExprs.
     eq: (x: string) => boolean;
 
-    // Checks if one expression is less than other.
+    // Checks if one MathExpr is less than other.
     lt: (x: string) => boolean;
 
-    // Checks if one expression is greater than other.
+    // Checks if one MathExpr is greater than other.
     gt: (x: string) => boolean;
 
-    // Checks if one expression is less than, or equal to, other.
+    // Checks if one MathExpr is less than, or equal to, other.
     lte: (x: string) => boolean;
 
-    // Checks if one expression is greater than, or equal to, other.
+    // Checks if one MathExpr is greater than, or equal to, other.
     gte: (x: string) => boolean;
 }

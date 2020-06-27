@@ -16,6 +16,7 @@
  * @fileoverview Requires for all the interactions.
  */
 
+require('interactions/AlgebraicExpressionInput/AlgebraicExpressionInput.ts');
 require('interactions/CodeRepl/CodeRepl.ts');
 require('interactions/Continue/Continue.ts');
 require('interactions/DragAndDropSortInput/DragAndDropSortInput.ts');

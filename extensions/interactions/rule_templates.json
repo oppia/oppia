@@ -1,4 +1,12 @@
 {
+  "AlgebraicExpressionInput": {
+    "MatchesExactlyWith": {
+      "description": "matches exactly with {{x|AlgebraicExpression}}"
+    },
+    "IsEquivalentTo": {
+      "description": "is equivalent to {{x|AlgebraicExpression}}"
+    }
+  },
   "CodeRepl": {
     "CodeEquals": {
       "description": "has code equal to {{x|CodeString}}"
