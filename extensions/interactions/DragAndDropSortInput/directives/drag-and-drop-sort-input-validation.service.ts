@@ -177,9 +177,10 @@ export class DragAndDropSortInputValidationService {
             }
 
             if (areAnyItemsEmpty || xInputs.length === 0) {
+              var message = areAnyItemsEmpty ? 'the items are' : 'the list is';
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
-                message: 'Please ensure the items are nonempty.'
+                message: `Please ensure ${message} nonempty.`
               });
             }
 
