@@ -4363,6 +4363,68 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
         self.assertEqual(exp_user_data.draft_change_list_exp_version, 1)
         self.assertEqual(exp_user_data.draft_change_list_id, 1)
 
+    def test_get_exp_with_draft_applied_when_draft_has_invalid_math_tags(self):
+        """Test the method get_exp_with_draft_applied when the draft_changes
+        have invalid math-tags in them.
+        """
+        exploration = exp_domain.Exploration.create_default_exploration(
+            'exp_id')
+        exploration.add_states(['State1'])
+        state = exploration.states['State1']
+        state_customization_args_dict = {
+            'choices': {
+                'value': [
+                    '<p>state customization arg html 1</p>',
+                    '<p>state customization arg html 2</p>',
+                    '<p>state customization arg html 3</p>',
+                    '<p>state customization arg html 4</p>'
+                ]
+            },
+            'maxAllowableSelectionCount': {
+                'value': 1
+            },
+            'minAllowableSelectionCount': {
+                'value': 1
+            }
+        }
+        state.update_interaction_id('ItemSelectionInput')
+        state.update_interaction_customization_args(
+            state_customization_args_dict)
+        exp_services.save_new_exploration(self.USER_ID, exploration)
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': 'State1',
+            'property_name': 'widget_customization_args',
+            'new_value': {
+                'choices': {
+                    'value': [
+                        '<p>1</p>',
+                        '<p>2</p>',
+                        ('<oppia-noninteractive-math raw_latex-with-value="&am'
+                         'p;quot;(x - a_1)(x - a_2)(x - a_3)...(x - a_n)&amp;q'
+                         'uot;"></oppia-noninteractive-math>'),
+                        '<p>4</p>'
+                    ]
+                },
+                'maxAllowableSelectionCount': {
+                    'value': 1
+                },
+                'minAllowableSelectionCount': {
+                    'value': 1
+                }
+            }
+        }).to_dict()]
+        user_models.ExplorationUserDataModel(
+            id='%s.%s' % (self.USER_ID, 'exp_id'), user_id=self.USER_ID,
+            exploration_id='exp_id',
+            draft_change_list=change_list,
+            draft_change_list_last_updated=self.DATETIME,
+            draft_change_list_exp_version=1,
+            draft_change_list_id=2).put()
+        updated_exploration = exp_services.get_exp_with_draft_applied(
+            'exp_id', self.USER_ID)
+        self.assertIsNone(updated_exploration)
+
 
 class ApplyDraftUnitTests(test_utils.GenericTestBase):
     """Test apply draft functions in exp_services."""

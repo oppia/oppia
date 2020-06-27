@@ -19,7 +19,7 @@
 require(
   'components/review-material-editor/review-material-editor.directive.ts');
 require(
-  'pages/topics-and-skills-dashboard-page/templates/' +
+  'pages/topics-and-skills-dashboard-page/' +
   'create-new-skill-modal.controller.ts');
 
 require('components/entity-creation-services/skill-creation.service.ts');
@@ -68,28 +68,8 @@ angular.module('oppia').directive('topicsAndSkillsDashboardNavbar', [
             TopicCreationService.createNewTopic();
           };
           $scope.createSkill = function() {
-            var rubrics = [
-              RubricObjectFactory.create(SKILL_DIFFICULTIES[0], []),
-              RubricObjectFactory.create(SKILL_DIFFICULTIES[1], ['']),
-              RubricObjectFactory.create(SKILL_DIFFICULTIES[2], [])];
             ContextService.setImageSaveDestinationToLocalStorage();
-            $uibModal.open({
-              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/topics-and-skills-dashboard-page/templates/' +
-                'create-new-skill-modal.template.html'),
-              backdrop: 'static',
-              resolve: {
-                rubrics: () => rubrics
-              },
-              controller: 'CreateNewSkillModalController',
-            }).result.then(function(result) {
-              ContextService.resetImageSaveDestination();
-              SkillCreationService.createNewSkill(
-                result.description, result.rubrics, result.explanation, []);
-            }, function() {
-              ImageLocalStorageService.flushStoredImagesData();
-              SkillCreationService.resetSkillDescriptionStatusMarker();
-            });
+            SkillCreationService.createNewSkill();
           };
           ctrl.$onInit = function() {
             $scope.showButtons = (WindowDimensionsService.getWidth() >= 1200);

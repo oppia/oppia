@@ -26,8 +26,10 @@ import { NormalizeWhitespacePipe } from
 import { NormalizeWhitespacePunctuationAndCasePipe } from
   // eslint-disable-next-line max-len
   'filters/string-utility-filters/normalize-whitespace-punctuation-and-case.pipe';
-import { IStateInteractionStats, StateInteractionStatsService } from
+import { IStateRulesStats, StateInteractionStatsService } from
   'services/state-interaction-stats.service';
+import { VisualizationInfoObjectFactory } from
+  'domain/exploration/visualization-info-object.factory';
 
 describe('State Interaction Stats Service', () => {
   beforeEach(() => {
@@ -38,6 +40,7 @@ describe('State Interaction Stats Service', () => {
       providers: [
         NormalizeWhitespacePipe,
         NormalizeWhitespacePunctuationAndCasePipe,
+        VisualizationInfoObjectFactory
       ],
     });
 
@@ -46,6 +49,8 @@ describe('State Interaction Stats Service', () => {
     this.httpTestingController = TestBed.get(HttpTestingController);
     this.stateInteractionStatsService = (
       TestBed.get(StateInteractionStatsService));
+    this.visualizationInfoObjectFactory = TestBed.get(
+      VisualizationInfoObjectFactory);
   });
 
   afterEach(() => this.httpTestingController.verify());
@@ -88,7 +93,7 @@ describe('State Interaction Stats Service', () => {
 
     it('should provide cached results after first call', fakeAsync(() => {
       this.statsCaptured = [];
-      const captureStats = (stats: IStateInteractionStats) => {
+      const captureStats = (stats: IStateRulesStats) => {
         expect(stats).toBeDefined();
         this.statsCaptured.push(stats);
       };
@@ -122,7 +127,7 @@ describe('State Interaction Stats Service', () => {
 
     it('should have separate caches for different states', fakeAsync(() => {
       this.statsCaptured = [];
-      const captureStats = (stats: IStateInteractionStats) => {
+      const captureStats = (stats: IStateRulesStats) => {
         expect(stats).toBeDefined();
         this.statsCaptured.push(stats);
       };
@@ -187,7 +192,7 @@ describe('State Interaction Stats Service', () => {
       flushMicrotasks();
 
       expect(this.onSuccess).toHaveBeenCalledWith(this.joC({
-        visualizations_info: [this.joC({
+        visualizationsInfo: [this.joC({
           data: [
             this.joC({answer: 'Ni Hao', frequency: 5}),
             this.joC({answer: 'Aloha', frequency: 3}),
@@ -219,11 +224,11 @@ describe('State Interaction Stats Service', () => {
         flushMicrotasks();
 
         expect(this.onSuccess).toHaveBeenCalledWith(this.joC({
-          visualizations_info: [this.joC({
+          visualizationsInfo: [this.joC({
             data: [
-              this.joC({answer: 'Ni Hao', is_addressed: false}),
-              this.joC({answer: 'Aloha', is_addressed: false}),
-              this.joC({answer: 'Hola', is_addressed: true})
+              this.joC({answer: 'Ni Hao', isAddressed: false}),
+              this.joC({answer: 'Aloha', isAddressed: false}),
+              this.joC({answer: 'Hola', isAddressed: true})
             ]
           })]
         }));
@@ -272,7 +277,7 @@ describe('State Interaction Stats Service', () => {
         flushMicrotasks();
 
         expect(this.onSuccess).toHaveBeenCalledWith(this.joC({
-          visualizations_info: [this.joC({
+          visualizationsInfo: [this.joC({
             data: [
               this.joC({ answer: '1/2' }),
               this.joC({ answer: '0' })

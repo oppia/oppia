@@ -17,7 +17,6 @@
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
 import { AppConstants } from 'app.constants';
@@ -27,11 +26,11 @@ import { LearnerActionObjectFactory } from
   'domain/statistics/LearnerActionObjectFactory';
 import { Playthrough, PlaythroughObjectFactory } from
   'domain/statistics/PlaythroughObjectFactory';
+import { PlaythroughBackendApiService } from
+  'domain/statistics/playthrough-backend-api.service';
 import { ServicesConstants } from 'services/services.constants';
 import { Stopwatch, StopwatchObjectFactory } from
   'domain/utilities/StopwatchObjectFactory';
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
 
 interface MultipleIncorrectStateNames {
   'state_name': string;
@@ -47,12 +46,11 @@ interface CycleIdentifier {
 })
 export class PlaythroughService {
   constructor(
-    private http: HttpClient,
-    private explorationFeaturesService: ExplorationFeaturesService,
-    private learnerActionObjectFactory: LearnerActionObjectFactory,
-    private playthroughObjectFactory: PlaythroughObjectFactory,
-    private stopwatchObjectFactory: StopwatchObjectFactory,
-    private urlInterpolationService: UrlInterpolationService) {}
+      private explorationFeaturesService: ExplorationFeaturesService,
+      private learnerActionObjectFactory: LearnerActionObjectFactory,
+      private playthroughBackendApiService: PlaythroughBackendApiService,
+      private playthroughObjectFactory: PlaythroughObjectFactory,
+      private stopwatchObjectFactory: StopwatchObjectFactory) {}
 
     static playthrough: Playthrough = null;
     static expStopwatch: Stopwatch = null;
@@ -214,30 +212,19 @@ export class PlaythroughService {
     private storePlaythrough(isNewPlaythrough: boolean): void {
       let playthroughId = (
         isNewPlaythrough ? null : PlaythroughService.playthrough.playthroughId);
-      let promise = this.http.post(this.getFullPlaythroughUrl(), {
-        playthrough_data: PlaythroughService.playthrough.toBackendDict(),
-        issue_schema_version: ServicesConstants.CURRENT_ISSUE_SCHEMA_VERSION,
-        playthrough_id: playthroughId
-      }).toPromise();
+      let promise = this.playthroughBackendApiService.storePlaythrough(
+        PlaythroughService.playthrough,
+        ServicesConstants.CURRENT_ISSUE_SCHEMA_VERSION, playthroughId);
       if (isNewPlaythrough) {
-        promise.then((
-            response: {
-                'playthrough_stored': boolean, 'playthrough_id': string }) => {
-          if (response.playthrough_stored) {
+        promise.then(response => {
+          if (response.playthroughStored) {
             // In cases where maximum number of playthroughs already exists, the
             // above flag is not True and playthrough ID is not set.
             PlaythroughService.playthrough.playthroughId = (
-              response.playthrough_id);
+              response.playthroughId);
           }
         });
       }
-    }
-
-    private getFullPlaythroughUrl(): string {
-      return this.urlInterpolationService.interpolateUrl(
-        ServicesConstants.STORE_PLAYTHROUGH_URL, {
-          exploration_id: PlaythroughService.playthrough.expId
-        });
     }
 
     private isPlaythroughDiscarded(): boolean {
