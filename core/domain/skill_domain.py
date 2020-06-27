@@ -1303,6 +1303,69 @@ class SkillSummary(python_utils.OBJECT):
         }
 
 
+class AugmentedSkillSummary(python_utils.OBJECT):
+    """Domain object for Augmented Skill Summary, which has all the properties
+    of SkillSummary along with the topic name to which the skill is assigned
+    and the classroom name to which the topic is assigned.
+    """
+
+    def __init__(
+            self, skill_id, description, language_code, version,
+            misconception_count, worked_examples_count, topic_name,
+            classroom_name, skill_model_created_on, skill_model_last_updated):
+        """Constructs an AugmentedSkillSummary domain object.
+
+        Args:
+            skill_id: str. The unique id of the skill.
+            description: str. The short description of the skill.
+            language_code: str. The language code of the skill.
+            version: int. The version of the skill.
+            misconception_count: int. The number of misconceptions associated
+                with the skill.
+            worked_examples_count: int. The number of worked examples in the
+                skill.
+            topic_name: str. The name of the topic to which the skill
+                is assigned.
+            classroom_name: str. The name of the classroom to which the
+                skill is assigned.
+            skill_model_created_on: datetime.datetime. Date and time when
+                the skill model is created.
+            skill_model_last_updated: datetime.datetime. Date and time
+                when the skill model was last updated.
+        """
+        self.id = skill_id
+        self.description = description
+        self.language_code = language_code
+        self.version = version
+        self.misconception_count = misconception_count
+        self.worked_examples_count = worked_examples_count
+        self.skill_model_created_on = skill_model_created_on
+        self.skill_model_last_updated = skill_model_last_updated
+        self.topic_name = topic_name
+        self.classroom_name = classroom_name
+
+    def to_dict(self):
+        """Returns a dictionary representation of this domain object.
+
+        Returns:
+            dict. A dict representing this AugmentedSkillSummary object.
+        """
+        return {
+            'id': self.id,
+            'description': self.description,
+            'language_code': self.language_code,
+            'version': self.version,
+            'misconception_count': self.misconception_count,
+            'worked_examples_count': self.worked_examples_count,
+            'topic_name': self.topic_name,
+            'classroom_name': self.classroom_name,
+            'skill_model_created_on': utils.get_time_in_millisecs(
+                self.skill_model_created_on),
+            'skill_model_last_updated': utils.get_time_in_millisecs(
+                self.skill_model_last_updated)
+        }
+
+
 class UserSkillMastery(python_utils.OBJECT):
     """Domain object for a user's mastery of a particular skill."""
 

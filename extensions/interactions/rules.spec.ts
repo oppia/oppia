@@ -67,6 +67,7 @@ describe('Rule spec services', function() {
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('CodeNormalizerService', new CodeNormalizerService());
+    $provide.value('CodeNormalizerService', new CodeNormalizerService());
     $provide.value('GraphUtilsService', new GraphUtilsService());
     $provide.value('FractionObjectFactory', new FractionObjectFactory());
     $provide.value('SetInputRulesService', new SetInputRulesService());
