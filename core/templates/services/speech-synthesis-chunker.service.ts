@@ -166,8 +166,8 @@ export class SpeechSynthesisChunkerService {
         ServicesConstants.RTE_COMPONENT_SPECS[componentSpec].frontend_id;
       });
     interface IMathExpressionContent {
-      'raw_latex': String,
-      'svg_filename': String
+      'raw_latex': string,
+      'svg_filename': string
     }
     var elt = $('<div>' + html + '</div>');
     // Convert links into speakable text by extracting the readable value.

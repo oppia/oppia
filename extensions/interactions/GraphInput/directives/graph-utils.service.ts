@@ -95,26 +95,26 @@ export class GraphUtilsService {
 
   findCycle(
       currentVertex: number, previousVertex: number,
-      adjacencyLists: number[][], isVisited: string[],
+      adjacencyLists: number[][], nodeStatus: string[],
       isDirected: boolean): boolean {
-    isVisited[currentVertex] = this.DFS_STATUS.STILL_VISITING;
+    nodeStatus[currentVertex] = this.DFS_STATUS.STILL_VISITING;
     for (var i = 0; i < adjacencyLists[currentVertex].length; i++) {
       var nextVertex = adjacencyLists[currentVertex][i];
       if (nextVertex === previousVertex && !isDirected) {
         continue;
       }
-      if (isVisited[nextVertex] === (
+      if (nodeStatus[nextVertex] === (
         this.DFS_STATUS.STILL_VISITING)) {
         return true;
       }
-      if (isVisited[nextVertex] === this.DFS_STATUS.UNVISITED &&
+      if (nodeStatus[nextVertex] === this.DFS_STATUS.UNVISITED &&
           this.findCycle(
-            nextVertex, currentVertex, adjacencyLists, isVisited,
+            nextVertex, currentVertex, adjacencyLists, nodeStatus,
             isDirected)) {
         return true;
       }
     }
-    isVisited[currentVertex] = this.DFS_STATUS.VISITED;
+    nodeStatus[currentVertex] = this.DFS_STATUS.VISITED;
     return false;
   }
 
