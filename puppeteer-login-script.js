@@ -17,7 +17,6 @@ module.exports = async(browser, context) => {
     await page.type('#username', 'username1');
     await page.click('#terms-checkbox');
     await page.waitFor(5000);
-    await page.evaluate(() => document.querySelector('#signup-submit').scrollIntoView());
 
     await Promise.all([
       page.waitForNavigation(),
@@ -25,8 +24,7 @@ module.exports = async(browser, context) => {
     ]);
 
     await page.close();
-  } 
-  catch(e) {
+  } catch (e) {
     // Logged in
   }
 };
