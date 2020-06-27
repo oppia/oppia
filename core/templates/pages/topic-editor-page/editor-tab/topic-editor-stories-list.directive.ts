@@ -83,7 +83,7 @@ angular.module('oppia').directive('storiesList', [
               TopicUpdateService.removeCanonicalStory(
                 $scope.getTopic(), storyId);
               for (var i = 0; i < $scope.storySummaries.length; i++) {
-                if ($scope.storySummaries[i].id === storyId) {
+                if ($scope.storySummaries[i].getId() === storyId) {
                   $scope.storySummaries.splice(i, 1);
                 }
               }

@@ -15,13 +15,16 @@
 /**
  * @fileoverview Service that handles routing for the topic editor page.
  */
+require('domain/utilities/url-interpolation.service.ts');
+
 
 angular.module('oppia').factory('TopicEditorRoutingService', [
-  '$location', '$rootScope',
+  '$location', '$rootScope', '$window', 'UrlInterpolationService',
   function(
-      $location, $rootScope) {
+      $location, $rootScope, $window, UrlInterpolationService) {
     var MAIN_TAB = 'main';
-    var SUBTOPICS_TAB = 'subtopics';
+    var SUBTOPIC_EDITOR_TAB = 'subtopic_editor';
+    var SUBTOPIC_PREVIEW_TAB = 'subtopic_preview';
     var QUESTIONS_TAB = 'questions';
 
     var activeTabName = MAIN_TAB;
@@ -42,10 +45,12 @@ angular.module('oppia').factory('TopicEditorRoutingService', [
 
       if (newPath === '/') {
         activeTabName = MAIN_TAB;
-      } else if (newPath === '/subtopics') {
-        activeTabName = SUBTOPICS_TAB;
       } else if (newPath === '/questions') {
         activeTabName = QUESTIONS_TAB;
+      } else if (newPath.startsWith('/subtopic_editor')) {
+        activeTabName = SUBTOPIC_EDITOR_TAB;
+      } else if (newPath.startsWith('/subtopic_preview')) {
+        activeTabName = SUBTOPIC_PREVIEW_TAB;
       }
     });
 
@@ -56,11 +61,26 @@ angular.module('oppia').factory('TopicEditorRoutingService', [
       navigateToMainTab: function() {
         $location.path('');
       },
-      navigateToSubtopicsTab: function() {
-        $location.path('/subtopics');
+      navigateToSubtopicPreviewTab: function(subtopicId) {
+        $location.path('/subtopic_preview/' + subtopicId);
+      },
+      navigateToSubtopicEditorWithId: function(subtopicId) {
+        $location.path('/subtopic_editor/' + subtopicId);
       },
       navigateToQuestionsTab: function() {
         $location.path('/questions');
+      },
+      getSubtopicIdFromUrl: function() {
+        return $location.path().split('/')[2];
+      },
+      navigateToSkillEditorWithId: function(skillId) {
+        var SKILL_EDITOR_URL_TEMPLATE = '/skill_editor/<skill_id>';
+
+        var skillEditorUrl = UrlInterpolationService.interpolateUrl(
+          SKILL_EDITOR_URL_TEMPLATE, {
+            skill_id: skillId
+          });
+        $window.open(skillEditorUrl);
       }
     };
 
