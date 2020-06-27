@@ -35,6 +35,9 @@ import { AdminRouterService } from
 import { AdminTaskManagerService } from
   'pages/admin-page/services/admin-task-manager.service';
 import { AlertsService } from 'services/alerts.service';
+import { AlgebraicExpressionInputValidationService } from
+  // eslint-disable-next-line max-len
+  'interactions/AlgebraicExpressionInput/directives/algebraic-expression-input-validation.service';
 import { AngularNameService } from
   'pages/exploration-editor-page/services/angular-name.service';
 import { AnswerClassificationResultObjectFactory } from
@@ -777,6 +780,9 @@ export class UpgradedServices {
       new ɵangular_packages_common_http_http_d();
 
     // Topological level: 1.
+    upgradedServices['AlgebraicExpressionInputValidationService'] =
+      new AlgebraicExpressionInputValidationService(
+        upgradedServices['baseInteractionValidationService']);
     upgradedServices['AlertsService'] = new AlertsService(
       upgradedServices['LoggerService']);
     upgradedServices['BrowserCheckerService'] = new BrowserCheckerService(
@@ -1079,6 +1085,7 @@ export class UpgradedServices {
         upgradedServices['ExplorationSummaryObjectFactory']);
     upgradedServices['InteractionRulesRegistryService'] =
       new InteractionRulesRegistryService(
+        upgradedServices['AlgebraicExpressionInputRulesService'],
         upgradedServices['CodeReplRulesService'],
         upgradedServices['ContinueRulesService'],
         upgradedServices['DragAndDropSortInputRulesService'],

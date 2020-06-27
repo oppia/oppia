@@ -21,6 +21,43 @@
 // implement a setValue() function to which a single argument can be sent
 // that will completely determine the object.
 
+var waitFor = require(
+  process.cwd() + '/core/tests/protractor_utils/waitFor.js');
+
+var AlgebraicExpressionEditor = function(elem) {
+  return {
+    setValue: async function(text) {
+      await waitFor.elementToBeClickable(
+        elem, '"Algebraic Input" editor takes too long to be clickable');
+      await elem.click();
+      // The active guppy div will be the one that is created last which is why
+      // we fetch the last element.
+      var algebraicInputElem = element.all(by.css(
+        '.protractor-test-guppy-div')).last();
+      var present = await algebraicInputElem.isPresent();
+      if (present) {
+        await algebraicInputElem.sendKeys(text);
+      }
+    },
+    getValue: async function() {
+      await waitFor.elementToBeClickable(
+        elem, '"Algebraic Input" editor takes too long to be clickable');
+      // The active guppy div will be the one that is created last which is why
+      // we fetch the last element.
+      var algebraicInputElem = element.all(by.css(
+        '.protractor-test-guppy-div')).last();
+      var present = await algebraicInputElem.isPresent();
+      if (present) {
+        var contentElem = algebraicInputElem.element(by.tagName('annotation'));
+        present = await contentElem.isPresent();
+        if (present) {
+          return contentElem.getText();
+        }
+      }
+    }
+  };
+};
+
 var BooleanEditor = function(elem) {
   return {
     setValue: async function(value) {
@@ -180,6 +217,7 @@ var UnicodeStringEditor = function(elem) {
 };
 
 var OBJECT_EDITORS = {
+  AlgebraicExpression: AlgebraicExpressionEditor,
   Boolean: BooleanEditor,
   CoordTwoDim: CoordTwoDim,
   Filepath: FilepathEditor,
@@ -195,6 +233,7 @@ var OBJECT_EDITORS = {
   UnicodeString: UnicodeStringEditor
 };
 
+exports.AlgebraicExpressionEditor = AlgebraicExpressionEditor;
 exports.BooleanEditor = BooleanEditor;
 exports.CoordTwoDim = CoordTwoDim;
 exports.FractionEditor = FractionEditor;
