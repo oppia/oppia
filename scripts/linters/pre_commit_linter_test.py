@@ -129,9 +129,8 @@ class PreCommitLinterTests(LintTests):
             with self.install_swap, self.check_type_defs_swap:
                 with all_filepath_swap:
                     pre_commit_linter.main()
-        self.assertTrue(
-            test_utils.assert_same_list_elements(
-                ['No files to check'], self.linter_stdout))
+        self.assert_same_list_elements(
+            ['No files to check'], self.linter_stdout)
 
     def test_main_with_no_args(self):
         def mock_get_changed_filepaths():
@@ -145,9 +144,8 @@ class PreCommitLinterTests(LintTests):
             with self.install_swap, self.check_type_defs_swap:
                 with get_changed_filepaths_swap:
                     pre_commit_linter.main()
-        self.assertTrue(
-            test_utils.assert_same_list_elements(
-                ['No files to check'], self.linter_stdout))
+        self.assert_same_list_elements(
+            ['No files to check'], self.linter_stdout)
 
     def test_main_with_files_arg(self):
         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
@@ -163,9 +161,8 @@ class PreCommitLinterTests(LintTests):
             with self.install_swap, self.check_type_defs_swap, all_errors_swap:
                 pre_commit_linter.main(args=['--path=%s' % VALID_PY_FILEPATH])
         self.assertFalse(all_checks_passed(self.linter_stdout))
-        self.assertTrue(
-            test_utils.assert_same_list_elements(
-                ['This is an error.'], self.linter_stdout))
+        self.assert_same_list_elements(
+            ['This is an error.'], self.linter_stdout)
 
     def test_main_with_path_arg(self):
         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
@@ -173,26 +170,23 @@ class PreCommitLinterTests(LintTests):
                 pre_commit_linter.main(
                     args=['--path=%s' % INVALID_CSS_FILEPATH])
         self.assertFalse(all_checks_passed(self.linter_stdout))
-        self.assertTrue(
-            test_utils.assert_same_list_elements([
-                '19:16',
-                'Unexpected whitespace before \":\"   declaration-colon-space-'
-                'before'], self.linter_stdout))
+        self.assert_same_list_elements([
+            '19:16',
+            'Unexpected whitespace before \":\"   declaration-colon-space-'
+            'before'], self.linter_stdout)
 
     def test_main_with_invalid_filepath_with_path_arg(self):
         with self.print_swap, self.assertRaises(SystemExit) as e:
             pre_commit_linter.main(args=['--path=invalid_file.py'])
-        self.assertTrue(
-            test_utils.assert_same_list_elements(
-                ['Could not locate file or directory'], self.linter_stdout))
+        self.assert_same_list_elements(
+            ['Could not locate file or directory'], self.linter_stdout)
         self.assertEqual(e.exception.code, 1)
 
     def test_main_with_invalid_filepath_with_file_arg(self):
         with self.print_swap, self.assertRaises(SystemExit) as e:
             pre_commit_linter.main(args=['--files=invalid_file.py'])
-        self.assertTrue(
-            test_utils.assert_same_list_elements(
-                ['The following file(s) do not exist'], self.linter_stdout))
+        self.assert_same_list_elements(
+            ['The following file(s) do not exist'], self.linter_stdout)
         self.assertEqual(e.exception.code, 1)
 
     def test_path_arg_with_directory_name(self):
@@ -223,12 +217,11 @@ class PreCommitLinterTests(LintTests):
             pre_commit_linter.main(
                 args=['--path=%s' % VALID_TS_FILEPATH,
                       '--only-check-file-extensions', 'ts', 'js'])
-        self.assertTrue(
-            test_utils.assert_same_list_elements([
-                'Please use only one of "js" or "ts", as we do not have '
-                'separate linters for JS and TS files. If both these options '
-                'are used together, then the JS/TS linter will be run twice.'
-                ], self.linter_stdout))
+        self.assert_same_list_elements([
+            'Please use only one of "js" or "ts", as we do not have '
+            'separate linters for JS and TS files. If both these options '
+            'are used together, then the JS/TS linter will be run twice.'
+            ], self.linter_stdout)
         self.assertEqual(e.exception.code, 1)
 
     def test_get_all_files_in_directory(self):

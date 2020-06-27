@@ -106,13 +106,12 @@ class CodeOwnerLinterTests(test_utils.GenericTestBase):
         with self.print_swap, self.listdir_swap, codeowner_important_paths_swap:
             with codeowner_filepath_swap:
                 codeowner_linter.check_codeowner_file(FILE_CACHE, True)
-        self.assertTrue(
-            test_utils.assert_same_list_elements([
-                'Rule /.github/stale.yml is not present'
-                ' in the CODEOWNER_IMPORTANT_PATHS list in scripts/linters/'
-                'pre_commit_linter.py. Please add this rule in the '
-                'mentioned list or remove this rule from the \'Critical files'
-                '\' section.'], self.linter_stdout))
+        self.assert_same_list_elements([
+            'Rule /.github/stale.yml is not present'
+            ' in the CODEOWNER_IMPORTANT_PATHS list in scripts/linters/'
+            'pre_commit_linter.py. Please add this rule in the '
+            'mentioned list or remove this rule from the \'Critical files'
+            '\' section.'], self.linter_stdout)
 
     def test_duplicate_important_patterns_at_the_bottom_of_codeowners(self):
         codeowner_path_swap = self.swap(
@@ -121,10 +120,9 @@ class CodeOwnerLinterTests(test_utils.GenericTestBase):
 
         with self.print_swap, self.listdir_swap, codeowner_path_swap:
             codeowner_linter.check_codeowner_file(FILE_CACHE, True)
-        self.assertTrue(
-            test_utils.assert_same_list_elements([
-                'Duplicate pattern(s) found in critical '
-                'rules section.'], self.linter_stdout))
+        self.assert_same_list_elements([
+            'Duplicate pattern(s) found in critical '
+            'rules section.'], self.linter_stdout)
 
     def test_duplicate_important_patterns_in_list(self):
         mock_codeowner_important_paths = (
@@ -139,10 +137,9 @@ class CodeOwnerLinterTests(test_utils.GenericTestBase):
         with self.print_swap, self.listdir_swap, codeowner_important_paths_swap:
             with codeowner_path_swap:
                 codeowner_linter.check_codeowner_file(FILE_CACHE, True)
-        self.assertTrue(
-            test_utils.assert_same_list_elements([
-                'Duplicate pattern(s) found '
-                'in CODEOWNER_IMPORTANT_PATHS list.'], self.linter_stdout))
+        self.assert_same_list_elements([
+            'Duplicate pattern(s) found '
+            'in CODEOWNER_IMPORTANT_PATHS list.'], self.linter_stdout)
 
     def test_missing_important_codeowner_path_from_critical_section(self):
         codeowner_path_swap = self.swap(
@@ -151,15 +148,14 @@ class CodeOwnerLinterTests(test_utils.GenericTestBase):
 
         with self.print_swap, self.listdir_swap, codeowner_path_swap:
             codeowner_linter.check_codeowner_file(FILE_CACHE, True)
-        self.assertTrue(
-            test_utils.assert_same_list_elements([
-                'Rule \'/.github/stale.yml\' is not present in '
-                'the \'Critical files\' '
-                'section. Please place it under the \'Critical files\' '
-                'section since it is an important rule. Alternatively please '
-                'remove it from the \'CODEOWNER_IMPORTANT_PATHS\' list in '
-                'scripts/linters/pre_commit_linter.py if it is no longer an '
-                'important rule.'], self.linter_stdout))
+        self.assert_same_list_elements([
+            'Rule \'/.github/stale.yml\' is not present in '
+            'the \'Critical files\' '
+            'section. Please place it under the \'Critical files\' '
+            'section since it is an important rule. Alternatively please '
+            'remove it from the \'CODEOWNER_IMPORTANT_PATHS\' list in '
+            'scripts/linters/pre_commit_linter.py if it is no longer an '
+            'important rule.'], self.linter_stdout)
 
     def test_check_codeowner_file_with_success_message(self):
         codeowner_path_swap = self.swap(
@@ -172,9 +168,8 @@ class CodeOwnerLinterTests(test_utils.GenericTestBase):
         with self.print_swap, self.listdir_swap, codeowner_important_paths_swap:
             with codeowner_path_swap:
                 codeowner_linter.check_codeowner_file(FILE_CACHE, False)
-        self.assertTrue(
-            test_utils.assert_same_list_elements(
-                ['SUCCESS  CODEOWNERS file check passed'], self.linter_stdout))
+        self.assert_same_list_elements(
+            ['SUCCESS  CODEOWNERS file check passed'], self.linter_stdout)
 
     def test_check_codeowner_file_without_codeowner_name(self):
         codeowner_swap = self.swap(
@@ -183,10 +178,9 @@ class CodeOwnerLinterTests(test_utils.GenericTestBase):
 
         with self.print_swap, self.listdir_swap, codeowner_swap:
             codeowner_linter.check_codeowner_file(FILE_CACHE, False)
-            self.assertTrue(
-                test_utils.assert_same_list_elements(
-                    ['Pattern on line 18 doesn\'t have codeowner'],
-                    self.linter_stdout))
+        self.assert_same_list_elements(
+            ['Pattern on line 18 doesn\'t have codeowner'],
+            self.linter_stdout)
 
     def test_check_codeowner_file_without_full_file_path(self):
         codeowner_swap = self.swap(
@@ -195,10 +189,9 @@ class CodeOwnerLinterTests(test_utils.GenericTestBase):
 
         with self.print_swap, self.listdir_swap, codeowner_swap:
             codeowner_linter.check_codeowner_file(FILE_CACHE, False)
-        self.assertTrue(
-            test_utils.assert_same_list_elements([
-                'Pattern on line 18 is invalid. Use full path '
-                'relative to the root directory'], self.linter_stdout))
+        self.assert_same_list_elements([
+            'Pattern on line 18 is invalid. Use full path '
+            'relative to the root directory'], self.linter_stdout)
 
     def test_check_codeowner_file_with_wildcard(self):
         codeowner_swap = self.swap(
@@ -207,10 +200,9 @@ class CodeOwnerLinterTests(test_utils.GenericTestBase):
 
         with self.print_swap, codeowner_swap:
             codeowner_linter.check_codeowner_file(FILE_CACHE, False)
-        self.assertTrue(
-            test_utils.assert_same_list_elements([
-                'Pattern on line 18 is invalid. '
-                '\'**\' wildcard not allowed'], self.linter_stdout))
+        self.assert_same_list_elements([
+            'Pattern on line 18 is invalid. '
+            '\'**\' wildcard not allowed'], self.linter_stdout)
 
     def test_check_codeowner_file_with_no_valid_match(self):
         codeowner_swap = self.swap(
@@ -219,7 +211,6 @@ class CodeOwnerLinterTests(test_utils.GenericTestBase):
 
         with self.print_swap, self.listdir_swap, codeowner_swap:
             codeowner_linter.check_codeowner_file(FILE_CACHE, False)
-        self.assertTrue(
-            test_utils.assert_same_list_elements([
-                'Pattern on line 18 doesn\'t match '
-                'any file or directory'], self.linter_stdout))
+        self.assert_same_list_elements([
+            'Pattern on line 18 doesn\'t match '
+            'any file or directory'], self.linter_stdout)

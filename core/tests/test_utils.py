@@ -124,30 +124,6 @@ def get_filepath_from_filename(filename, rootdir):
     return filepath
 
 
-def assert_same_list_elements(phrases, stdout):
-    """Checks to see if all of the phrases appear in at least one of the
-    stdout outputs.
-
-    Args:
-        phrases: list(str). A list of phrases we are trying to find in
-            one of the stdout outputs. For example, python linting
-            outputs a success string that includes data we don't have easy
-            access to, like how long the test took, so we may want to search
-            for a substring of that success string in stdout.
-
-        stdout: list(str). A list of the output results from the
-            method's execution.
-
-    Returns:
-        bool. True if and only if all of the phrases appear in at least
-        one of the results stored in stdout.
-    """
-    for output in stdout:
-        if all(phrase in output for phrase in phrases):
-            return True
-    return False
-
-
 def mock_load_template(filename):
     """Mock for load_template function. This mock is required for backend tests
     since we do not have webpack compilation before backend tests. The folder
@@ -2252,6 +2228,24 @@ class AppEngineTestBase(TestBase):
         state.interaction.default_outcome.labelled_as_correct = True
         state.interaction.default_outcome.dest = None
         return state
+
+    def assert_same_list_elements(self, phrases, stdout):
+        """Checks to see if all of the phrases appear in at least one of the
+        stdout outputs.
+
+        Args:
+            phrases: list(str). A list of phrases we are trying to find in
+                one of the stdout outputs. For example, python linting
+                outputs a success string that includes data we don't have easy
+                access to, like how long the test took, so we may want to search
+                for a substring of that success string in stdout.
+
+            stdout: list(str). A list of the output results from the
+                method's execution.
+        """
+        self.assertTrue(
+            any(all(phrase in output for phrase in phrases) for
+                output in stdout))
 
 
 GenericTestBase = AppEngineTestBase
