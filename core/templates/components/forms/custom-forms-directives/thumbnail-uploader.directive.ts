@@ -198,11 +198,7 @@ angular.module('oppia').directive('thumbnailUploader', [
               $scope.thumbnailIsLoading = true;
               var filename = ImageUploadHelperService.generateImageFilename(
                 data.dimensions.height, data.dimensions.width, 'svg');
-              ImageLocalStorageService.saveImage(
-                filename, data.newThumbnailDataUrl);
-              ImageLocalStorageService.setImageBgColor(data.newBgColor);
               $scope.newThumbnailDataUrl = data.newThumbnailDataUrl;
-              ContextService.setImageSaveDestinationToLocalStorage();
               if (!$scope.useLocalStorage) {
                 if (data.openInUploadMode) {
                   tempImageName = (
@@ -218,6 +214,10 @@ angular.module('oppia').directive('thumbnailUploader', [
                   saveThumbnailBgColor(data.newBgColor);
                   $scope.thumbnailIsLoading = false;
                 }
+              } else {
+                ImageLocalStorageService.saveImage(
+                  filename, data.newThumbnailDataUrl);
+                ImageLocalStorageService.setThumbnailBgColor(data.newBgColor);
               }
             }, function() {
               // Note to developers:
