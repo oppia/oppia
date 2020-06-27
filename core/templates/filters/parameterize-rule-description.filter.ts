@@ -158,7 +158,8 @@ angular.module('oppia').filter('parameterizeRuleDescription', [
           replacementText = inputs[varName] + '';
         } else if (
           varType === 'CodeString' || varType === 'UnicodeString' ||
-          varType === 'LogicErrorCategory' || varType === 'NormalizedString') {
+          varType === 'LogicErrorCategory' || varType === 'NormalizedString' ||
+          varType === 'AlgebraicExpression') {
           replacementText = inputs[varName];
         } else if (varType === 'ListOfCodeEvaluation') {
           replacementText = '[';
