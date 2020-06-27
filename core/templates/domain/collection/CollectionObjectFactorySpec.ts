@@ -19,7 +19,7 @@
 import { TestBed } from '@angular/core/testing';
 
 import { CollectionNodeObjectFactory } from
-  'domain/collection/CollectionNodeObjectFactory';
+  'domain/collection/collection-node-object.factory';
 import { Collection, CollectionObjectFactory } from
   'domain/collection/CollectionObjectFactory';
 

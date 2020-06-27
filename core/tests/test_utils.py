@@ -146,6 +146,21 @@ def mock_load_template(filename):
     return file_content
 
 
+def check_image_png_or_webp(image_string):
+    """Checks if the image is in png or webp format only.
+
+    Args:
+        image_string: str. image url in base64 format.
+
+    Returns:
+        boolean. Returns true if image is in WebP format.
+    """
+    if (image_string.startswith('data:image/png') or
+            image_string.startswith('data:image/webp')):
+        return True
+    return False
+
+
 class URLFetchServiceMock(apiproxy_stub.APIProxyStub):
     """Mock for google.appengine.api.urlfetch."""
 
@@ -374,7 +389,10 @@ class TestBase(unittest.TestCase):
 
     VERSION_1_STORY_CONTENTS_DICT = {
         'nodes': [{
-            'outline': u'',
+            'outline': (
+                '<p>Value</p><oppia-noninteractive-math ' +
+                'raw_latex-with-value="&amp;quot;+,-,-,+&amp;quot' +
+                ';"></oppia-noninteractive-math>'),
             'exploration_id': None,
             'destination_node_ids': [],
             'outline_is_finalized': False,
@@ -388,7 +406,10 @@ class TestBase(unittest.TestCase):
 
     VERSION_2_STORY_CONTENTS_DICT = {
         'nodes': [{
-            'outline': u'',
+            'outline': (
+                '<p>Value</p><oppia-noninteractive-math ' +
+                'raw_latex-with-value="&amp;quot;+,-,-,+&amp;quot' +
+                ';"></oppia-noninteractive-math>'),
             'exploration_id': None,
             'destination_node_ids': [],
             'outline_is_finalized': False,
@@ -404,7 +425,30 @@ class TestBase(unittest.TestCase):
 
     VERSION_3_STORY_CONTENTS_DICT = {
         'nodes': [{
-            'outline': u'',
+            'outline': (
+                '<p>Value</p><oppia-noninteractive-math ' +
+                'raw_latex-with-value="&amp;quot;+,-,-,+&amp;quot' +
+                ';"></oppia-noninteractive-math>'),
+            'exploration_id': None,
+            'destination_node_ids': [],
+            'outline_is_finalized': False,
+            'acquired_skill_ids': [],
+            'id': 'node_1',
+            'title': 'Chapter 1',
+            'description': '',
+            'prerequisite_skill_ids': [],
+            'thumbnail_filename': None,
+            'thumbnail_bg_color': None}],
+        'initial_node_id': 'node_1',
+        'next_node_id': 'node_2'
+    }
+    VERSION_4_STORY_CONTENTS_DICT = {
+        'nodes': [{
+            'outline': (
+                '<p>Value</p><oppia-noninteractive-'
+                'math math_content-with-value="{&amp;quot;raw_latex&amp;quot;'
+                ': &amp;quot;+,-,-,+&amp;quot;, &amp;quot;svg_filename&amp;'
+                'quot;: &amp;quot;&amp;quot;}"></oppia-noninteractive-math>'),
             'exploration_id': None,
             'destination_node_ids': [],
             'outline_is_finalized': False,
