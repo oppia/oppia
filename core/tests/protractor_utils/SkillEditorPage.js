@@ -104,7 +104,7 @@ var SkillEditorPage = function() {
   };
 
   this.selectDifficultyForRubric = async function(difficulty) {
-    await element(by.css('.protractor-select-rubric-difficulty'))
+    await element(by.css('.protractor-test-select-rubric-difficulty'))
       .element(by.cssContainingText('option', difficulty)).click();
   };
 
