@@ -18,19 +18,13 @@ workflows:
     # For an illustration of the stages, see https://github.com/oppia/oppia/wiki/images/circleCIWorkflow.png.
 
     jobs:
-      - setup
-      - frontend_tests:
-          requires:
-            - setup
-      - typescript_tests:
-          requires:
-            - frontend_tests
+      - setup_and_typescript_tests
       - e2e_non_prod_tests:
           requires:
-            - typescript_tests
+            - setup_and_typescript_tests
       - e2e_navigation_and_misc:
           requires:
-            - typescript_tests
+            - setup_and_typescript_tests
       - e2e_library_and_collections:
           requires:
             - e2e_navigation_and_misc
@@ -80,7 +74,7 @@ commands:
             fi
 
 jobs:
-  setup:
+  setup_and_typescript_tests:
     <<: *job_defaults
     steps:
       - checkout
@@ -91,42 +85,16 @@ jobs:
       - run:
           name: Check that all e2e test files are captured in protractor.conf.js
           command: python -m scripts.check_e2e_tests_are_captured_in_ci
+      - run:
+          name: Run typescript tests
+          command: |
+            python -m scripts.typescript_checks
       - persist_to_workspace:
           root: /home/circleci/
           paths:
             - oppia/node_modules/
             - oppia/third_party/
             - oppia_tools/
-
-  typescript_tests:
-    <<: *job_defaults
-    steps:
-      - checkout
-      - merge_target_branch
-      - attach_workspace:
-          at: /home/circleci/
-      - run:
-          name: Run typescript tests
-          command: |
-            python -m scripts.typescript_checks
-
-  frontend_tests:
-    <<: *job_defaults
-    steps:
-      - checkout
-      - merge_target_branch
-      - attach_workspace:
-          at: /home/circleci/
-      - run:
-          name: Run frontend tests
-          command: |
-            python -m scripts.run_frontend_tests --run_minified_tests --skip_install --check_coverage
-      - run:
-          name: Generate frontend coverage report
-          command: |
-            sudo pip install codecov
-            codecov --file ../karma_coverage_reports/lcov.info -F frontend
-          when: on_success
 
   # Production environment e2e tests
   # The following e2e tests are run in the production environment. Tests that require uploading files
