@@ -180,7 +180,7 @@ angular.module('oppia').factory('AssetsBackendApiService', [
         });
       });
     };
-    var _saveMathImage = function(
+    var _saveMathExpresionImage = function(
         resampledFile, filename, entityType, entityId, successCallback,
         errorCallback) {
       let form = new FormData();
@@ -189,8 +189,9 @@ angular.module('oppia').factory('AssetsBackendApiService', [
         filename: filename,
         filename_prefix: 'image'
       }));
-      var imageUploadUrlTemplate = '/createhandler/imageupload/' +
-        '<entity_type>/<entity_id>';
+      var imageUploadUrlTemplate = (
+        '/createhandler/imageupload/<entity_type>/<entity_id>'
+      );
       CsrfTokenService.getTokenAsync().then(function(token) {
         form.append('csrf_token', token);
         $.ajax({
@@ -281,9 +282,10 @@ angular.module('oppia').factory('AssetsBackendApiService', [
           _saveAudio(explorationId, filename, rawAssetData, resolve, reject);
         });
       },
-      saveMathImage: function(resampledFile, filename, entityType, entityId) {
+      saveMathExpresionImage: function(
+          resampledFile, filename, entityType, entityId) {
         return $q(function(resolve, reject) {
-          _saveMathImage(
+          _saveMathExpresionImage(
             resampledFile, filename, entityType, entityId, resolve, reject);
         });
       },

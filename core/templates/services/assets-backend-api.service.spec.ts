@@ -222,7 +222,7 @@ describe('Assets Backend API Service', function() {
         return d.promise();
       });
       var imageFile = new Blob();
-      AssetsBackendApiService.saveMathImage(
+      AssetsBackendApiService.saveMathExpresionImage(
         imageFile, 'new.svg', 'exploration', 'expid12345')
         .then(function(response) {
           expect(response).toBe(successMessage);
@@ -251,7 +251,7 @@ describe('Assets Backend API Service', function() {
         return d.promise();
       });
       var imageFile = new Blob();
-      AssetsBackendApiService.saveMathImage(
+      AssetsBackendApiService.saveMathExpresionImage(
         imageFile, 'new.svg', 'exploration', 'expid12345')
         .then(done, function(response) {
           expect(response).toEqual({

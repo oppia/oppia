@@ -101,7 +101,7 @@ angular.module('oppia').controller('RteHelperModalController', [
         }
         var resampledFile = (
           ImageUploadHelperService.convertImageDataToImageFile(svgFile));
-        AssetsBackendApiService.saveMathImage(
+        AssetsBackendApiService.saveMathExpresionImage(
           resampledFile, svgFileName, ContextService.getEntityType(),
           ContextService.getEntityId()).then(function(response) {
           var mathContentDict = {
