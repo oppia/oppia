@@ -1483,7 +1483,7 @@ class NewlineBelowClassDocstring(checkers.BaseChecker):
     priority = -1
     msgs = {
         'C0026': (
-            'No single newline below class docstring.',
+            'Missing single newline below class docstring.',
             'newline-below-class-docstring',
             'Please add a single newline below class docstring.'
         )
@@ -1501,11 +1501,10 @@ class NewlineBelowClassDocstring(checkers.BaseChecker):
         in_docstring = False
         class_has_docstring = False
         file_content = read_from_node(node)
-        file_length = len(file_content)
         blank_line_counter = 0
         prev_line = ''
 
-        for line_num in python_utils.RANGE(file_length):
+        for line_num, line in enumerate(file_content):
             line = file_content[line_num].strip()
 
             if line_num > 0:
@@ -1514,34 +1513,48 @@ class NewlineBelowClassDocstring(checkers.BaseChecker):
             # Check if it is a docstring and not some multi-line string.
             if prev_line.startswith(b'class ') or in_class:
                 in_class = True
+                # Check if a class has docstring or not.
                 if prev_line.endswith(b'):'):
                     in_class = False
                     if line.startswith(b'"""'):
                         in_docstring = True
                         class_has_docstring = True
 
+            # This line is checking if docstring ends.
             if line.endswith(b'"""'):
                 in_docstring = False
                 in_class = False
                 continue
 
+            # This line is checking if we are in a docstring.
             if in_docstring:
                 continue
 
             if class_has_docstring:
+                # This line is counting the empty lines.
                 if file_content[line_num] == b'\n':
                     blank_line_counter += 1
 
-                elif line.startswith(('class ', 'def', '@')):
+                # This line check if a class has no body if that is the case
+                # then skip check for this class. @ here is for the decorator.
+                elif (
+                        line.startswith(('class ', 'def', '@')) and
+                        not blank_line_counter == 0):
                     blank_line_counter = 0
                     class_has_docstring = False
 
+                # This line check if we reached to a non-empty line and
+                # setting the blank_line_counter to zero if that's true
+                # and setting the variable class_has_docstring to False so that
+                # we can skip further lines until we find a class.
                 elif (
                         blank_line_counter == 1 and
                         file_content[line_num] != b'\n'):
                     blank_line_counter = 0
                     class_has_docstring = False
 
+                # This line check if there is no newline or more than one
+                # newline below the class docstring.
                 elif blank_line_counter != 1:
                     class_has_docstring = False
                     blank_line_counter = 0

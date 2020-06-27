@@ -2255,7 +2255,7 @@ class NewlineBelowClassDocstringTests(unittest.TestCase):
         with python_utils.open_file(filename, 'w') as tmp:
             tmp.write(
                 u"""
-                    class ClassName(Class):
+                    class ClassName(dummy_class):
                         \"\"\"This is a docstring.\"\"\"
                         a = 1 + 2
                 """)
@@ -2283,7 +2283,7 @@ class NewlineBelowClassDocstringTests(unittest.TestCase):
         with python_utils.open_file(filename, 'w') as tmp:
             tmp.write(
                 u"""
-                    class ClassName(Class):
+                    class ClassName(dummy_class):
                         \"\"\"This is a docstring.\"\"\"
 
 
@@ -2313,7 +2313,7 @@ class NewlineBelowClassDocstringTests(unittest.TestCase):
         with python_utils.open_file(filename, 'w') as tmp:
             tmp.write(
                 u"""
-                    class ClassName(Class):
+                    class ClassName(dummy_class):
                         def func():
                             \"\"\"This is a docstring.\"\"\"
                             a = b + c
@@ -2338,7 +2338,7 @@ class NewlineBelowClassDocstringTests(unittest.TestCase):
         with python_utils.open_file(filename, 'w') as tmp:
             tmp.write(
                 u"""
-                    class ClassName(Class):
+                    class ClassName(dummy_class):
                         \"\"\"This is a docstring.\"\"\"
 
                     def func():
@@ -2353,6 +2353,66 @@ class NewlineBelowClassDocstringTests(unittest.TestCase):
         with self.checker_test_object.assertNoMessages():
             temp_file.close()
 
+    def test_decorated_function_after_class_docstring(self):
+        node_decorated_function_after_class_docstring = (
+            astroid.scoped_nodes.Module(
+                name='test',
+                doc='Custom test'))
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                    class ClassName(dummy_class):
+                        \"\"\"This is a docstring.\"\"\"
+                        @decorator()
+                        def func():
+                            a = 1 + 2
+                """)
+        node_decorated_function_after_class_docstring.file = filename
+        node_decorated_function_after_class_docstring.path = filename
+
+        self.checker_test_object.checker.process_module(
+            node_decorated_function_after_class_docstring)
+
+        message = testutils.Message(
+            msg_id='newline-below-class-docstring',
+            line=4)
+
+        with self.checker_test_object.assertAddsMessages(message):
+            temp_file.close()
+
+    def test_inline_comment_after_class_docstring(self):
+        node_inline_comment_after_class_docstring = (
+            astroid.scoped_nodes.Module(
+                name='test',
+                doc='Custom test'))
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                    class ClassName(dummy_class):
+                        \"\"\"This is a docstring.\"\"\"
+                        # This is a comment.
+                        def func():
+                            a = 1 + 2
+                """)
+        node_inline_comment_after_class_docstring.file = filename
+        node_inline_comment_after_class_docstring.path = filename
+
+        self.checker_test_object.checker.process_module(
+            node_inline_comment_after_class_docstring)
+
+        message = testutils.Message(
+            msg_id='newline-below-class-docstring',
+            line=4)
+
+        with self.checker_test_object.assertAddsMessages(message):
+            temp_file.close()
+
     def test_none_and_excessive_newline_below_class_docstring(self):
         node_none_and_excessive_newline_below_class_docstring = (
             astroid.scoped_nodes.Module(
@@ -2364,16 +2424,18 @@ class NewlineBelowClassDocstringTests(unittest.TestCase):
         with python_utils.open_file(filename, 'w') as tmp:
             tmp.write(
                 u"""
-                    class ClassName(Class):
+                    class ClassName(dummy_class):
                         \"\"\"This is a docstring.\"\"\"
 
                         a = 1 + 2
 
-                    class ClassName(Class):
+
+                    class ClassName(dummy_class):
                         \"\"\"This is a docstring.\"\"\"
                         a = 1 + 2
 
-                    class ClassName(Class):
+
+                    class ClassName(dummy_class):
                         \"\"\"This is a docstring.\"\"\"
 
 
@@ -2387,11 +2449,11 @@ class NewlineBelowClassDocstringTests(unittest.TestCase):
 
         message_with_no_newline = testutils.Message(
             msg_id='newline-below-class-docstring',
-            line=9)
+            line=10)
 
         message_with_excessive_newline = testutils.Message(
             msg_id='newline-below-class-docstring',
-            line=15)
+            line=17)
 
         with self.checker_test_object.assertAddsMessages(
             message_with_no_newline, message_with_excessive_newline):
@@ -2407,7 +2469,7 @@ class NewlineBelowClassDocstringTests(unittest.TestCase):
         with python_utils.open_file(filename, 'w') as tmp:
             tmp.write(
                 u"""
-                    class ClassName(Class):
+                    class ClassName(dummy_class):
                         \"\"\"This is a multiline.
                         docstring.
                         \"\"\"
