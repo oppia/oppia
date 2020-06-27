@@ -181,19 +181,6 @@ describe('Topics and Skills Dashboard Page', function() {
       expect(skillSpy).toHaveBeenCalled();
     });
 
-    it('should reset skill when create skill modal is dismissed',
-      function() {
-        spyOn($uibModal, 'open').and.returnValue({
-          result: $q.reject()
-        });
-
-        var skillSpy = spyOn(
-          SkillCreationService, 'resetSkillDescriptionStatusMarker');
-        ctrl.createSkill();
-        $rootScope.$apply();
-        expect(skillSpy).toHaveBeenCalled();
-      });
-
     it('should navigate the page', function() {
       var currentCount = 50;
       var itemsPerPage = 10;
@@ -390,7 +377,6 @@ describe('Topics and Skills Dashboard Page', function() {
         ctrl.fetchSkills();
         expect(paginateSkillSpy).toHaveBeenCalled();
       });
-
 
     it('should paginate forward without fetching if skills are present',
       function() {
