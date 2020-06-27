@@ -25,6 +25,11 @@ import { IReadableNote } from
   // eslint-disable-next-line max-len
   'extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive';
 
+
+export interface IAlgebraicExpressionInputCustomizationArgs {
+
+}
+
 export interface ICodeReplCustomizationArgs {
   language?: {
     value: string;
@@ -190,6 +195,7 @@ export interface INumericInputCustomizationArgs {
 }
 
 export type IInteractionCustomizationArgs = (
+  IAlgebraicExpressionInputCustomizationArgs |
   ICodeReplCustomizationArgs |
   IContinueCustomizationArgs |
   IDragAndDropSortInputCustomizationArgs |

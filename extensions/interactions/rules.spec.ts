@@ -34,6 +34,8 @@ import { LogicProofRulesService } from
 import { MusicNotesInputRulesService } from
   'interactions/MusicNotesInput/directives/music-notes-input-rules.service';
 /* eslint-disable max-len */
+import { AlgebraicExpressionInputRulesService } from
+  'interactions/AlgebraicExpressionInput/directives/algebraic-expression-input-rules.service';
 import { DragAndDropSortInputRulesService } from
   'interactions/DragAndDropSortInput/directives/drag-and-drop-sort-input-rules.service';
 import { MultipleChoiceInputRulesService } from
@@ -63,9 +65,12 @@ describe('Rule spec services', function() {
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('CodeNormalizerService', new CodeNormalizerService());
+    $provide.value('CodeNormalizerService', new CodeNormalizerService());
     $provide.value('GraphUtilsService', new GraphUtilsService());
     $provide.value('FractionObjectFactory', new FractionObjectFactory());
     $provide.value('SetInputRulesService', new SetInputRulesService());
+    $provide.value('AlgebraicExpressionInputRulesService',
+      new AlgebraicExpressionInputRulesService());
     $provide.value(
       'DragAndDropSortInputRulesService',
       new DragAndDropSortInputRulesService());

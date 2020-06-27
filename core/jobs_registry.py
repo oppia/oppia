@@ -33,6 +33,7 @@ from core.domain import skill_jobs_one_off
 from core.domain import stats_jobs_continuous
 from core.domain import stats_jobs_one_off
 from core.domain import story_jobs_one_off
+from core.domain import suggestion_jobs_one_off
 from core.domain import topic_jobs_one_off
 from core.domain import user_id_migration
 from core.domain import user_jobs_continuous
@@ -75,6 +76,8 @@ ONE_OFF_JOB_MANAGERS = [
     stats_jobs_one_off.StatisticsAudit,
     story_jobs_one_off.RegenerateStorySummaryOneOffJob,
     story_jobs_one_off.StoryMigrationOneOffJob,
+    suggestion_jobs_one_off.SuggestionMathMigrationOneOffJob,
+    suggestion_jobs_one_off.SuggestionMathRteAuditOneOffJob,
     topic_jobs_one_off.RemoveDeletedSkillsFromTopicOneOffJob,
     topic_jobs_one_off.TopicMigrationOneOffJob,
     user_id_migration.AddAllUserIdsSnapshotContentVerificationJob,
@@ -97,7 +100,7 @@ ONE_OFF_JOB_MANAGERS = [
     user_jobs_one_off.UserProfilePictureOneOffJob,
     user_jobs_one_off.UsernameLengthAuditOneOffJob,
     user_jobs_one_off.UsernameLengthDistributionOneOffJob,
-    exp_jobs_one_off.MathExpressionInputInteractionOneOffJob,
+    exp_jobs_one_off.MathExpressionValidationOneOffJob,
     exp_jobs_one_off.MultipleChoiceInteractionOneOffJob
 ]
 
