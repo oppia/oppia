@@ -118,6 +118,7 @@
     "mathjs": "^7.0.0",
     "moment": "^2.24.0",
     "nerdamer": "^1.1.4",
+    "puppeteer": "^4.0.1",
     "vanilla-picker": "^2.10.1",
     "wavesurfer.js": "^3.3.3"
   }

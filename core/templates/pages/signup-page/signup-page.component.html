@@ -66,7 +66,7 @@ link before completing the signup process, they will be logged out.
       <div class="checkbox oppia-long-text">
         <label>
           <input type="checkbox" ng-model="$ctrl.hasAgreedToLatestTerms"
-                 class="protractor-test-agree-to-terms-checkbox">
+                 class="protractor-test-agree-to-terms-checkbox" id="terms-checkbox">
           <span translate="I18N_SIGNUP_AGREE_LICENSE_DESCRIPTION" translate-value-sitename="<[$ctrl.siteName]>">
           </span>
         </label>
@@ -77,7 +77,8 @@ link before completing the signup process, they will be logged out.
       <button type="submit" class="btn btn-success protractor-test-register-user"
               ng-disabled="$ctrl.warningI18nCode || !$ctrl.hasAgreedToLatestTerms || $ctrl.submissionInProcess"
               ng-click="$ctrl.submitPrerequisitesForm($ctrl.hasAgreedToLatestTerms, $ctrl.username, $ctrl.canReceiveEmailUpdates)"
-              translate="I18N_SIGNUP_BUTTON_SUBMIT">
+              translate="I18N_SIGNUP_BUTTON_SUBMIT"
+              id="signup-submit">
       </button>
     </form>
   </md-card>

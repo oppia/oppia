@@ -2,7 +2,8 @@
   "ci": {
     "collect": {
       "numberOfRuns": 1,
-      "startServerCommand": "python -m scripts.start --no_browser --prod_env",
+      "startServerCommand": "python -m scripts.start",
+      "puppeteerScript": "puppeteer-login-script.js",
       "startServerReadyPattern": "default: \"GET /_ah/warmup HTTP/1.1\"",
       "startServerReadyTimeout": 250000,
       "url": [
@@ -15,7 +16,9 @@
         "http://127.0.0.1:8181/privacy-policy",
         "http://127.0.0.1:8181/teach",
         "http://127.0.0.1:8181/terms",
-        "http://127.0.0.1:8181/thanks"
+        "http://127.0.0.1:8181/thanks",
+        "http://127.0.0.1:8181/admin",
+        "http://127.0.0.1:8181/creator-dashboard"
       ]
     },
     "assert": {
