@@ -2330,6 +2330,7 @@ class VoiceoverApplicationEmailUnitTest(test_utils.GenericTestBase):
 
 class AccountDeletionEmailUnitTest(test_utils.GenericTestBase):
     """Unit test related to account deletion application emails."""
+
     APPLICANT_USERNAME = 'applicant'
     APPLICANT_EMAIL = 'applicant@example.com'
 

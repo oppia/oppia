@@ -28,11 +28,13 @@ from google.appengine.ext import ndb
 
 class StorySnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for a story snapshot."""
+
     pass
 
 
 class StorySnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content of a story snapshot."""
+
     pass
 
 
@@ -42,6 +44,7 @@ class StoryModel(base_models.VersionedModel):
     This class should only be imported by the story services file
     and the story model test file.
     """
+
     SNAPSHOT_METADATA_CLASS = StorySnapshotMetadataModel
     SNAPSHOT_CONTENT_CLASS = StorySnapshotContentModel
     ALLOW_REVERT = False
@@ -139,6 +142,7 @@ class StoryCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
 
     The id for this model is of the form 'story-[story_id]-[version]'.
     """
+
     # The id of the story being edited.
     story_id = ndb.StringProperty(indexed=True, required=True)
 

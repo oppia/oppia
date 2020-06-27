@@ -955,6 +955,7 @@ class MultipleDatastoreEntitiesInputReader(input_readers.InputReader):
     classes in the datastore and pass them to mapper functions in MapReduce
     jobs.
     """
+
     _ENTITY_KINDS_PARAM = MAPPER_PARAM_KEY_ENTITY_KINDS
     _READER_LIST_PARAM = 'readers'
 

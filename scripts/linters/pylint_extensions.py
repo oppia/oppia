@@ -69,6 +69,7 @@ class ExplicitKeywordArgsChecker(checkers.BaseChecker):
     """Custom pylint checker which checks for explicit keyword arguments
     in any function call.
     """
+
     __implements__ = interfaces.IAstroidChecker
 
     name = 'explicit-keyword-args'
@@ -168,6 +169,7 @@ class HangingIndentChecker(checkers.BaseChecker):
     """Custom pylint checker which checks for break after parenthesis in case
     of hanging indentation.
     """
+
     __implements__ = interfaces.IRawChecker
 
     name = 'hanging-indent'
@@ -246,6 +248,7 @@ class DocstringParameterChecker(checkers.BaseChecker):
     Args:
         linter: Pylinter. The linter object.
     """
+
     __implements__ = interfaces.IAstroidChecker
 
     name = 'parameter_documentation'
@@ -748,6 +751,7 @@ class BackslashContinuationChecker(checkers.BaseChecker):
     """Custom pylint checker which checks that backslash is not used
     for continuation.
     """
+
     __implements__ = interfaces.IRawChecker
 
     name = 'backslash-continuation'
@@ -918,6 +922,7 @@ class SingleSpaceAfterYieldChecker(checkers.BaseChecker):
     """Checks if only one space is used after a yield statement
     when applicable ('yield' is acceptable).
     """
+
     __implements__ = interfaces.IRawChecker
 
     name = 'single-space-after-yield'
@@ -974,6 +979,7 @@ class SingleSpaceAfterYieldChecker(checkers.BaseChecker):
 
 class ExcessiveEmptyLinesChecker(checkers.BaseChecker):
     """Checks if there are excessive newlines between method definitions."""
+
     __implements__ = interfaces.IRawChecker
 
     name = 'excessive-new-lines'
@@ -1471,6 +1477,7 @@ class BlankLineBelowFileOverviewChecker(checkers.BaseChecker):
 
 class NewlineBelowClassDocstring(checkers.BaseChecker):
     """Checks if there is a single newline below the class docstring."""
+
     __implements__ = interfaces.IRawChecker
     name = 'newline-below-class-docstring'
     priority = -1

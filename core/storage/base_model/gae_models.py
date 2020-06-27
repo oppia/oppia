@@ -105,6 +105,7 @@ class BaseModel(ndb.Model):
 
     class EntityNotFoundError(Exception):
         """Raised when no entity for a given id exists in the datastore."""
+
         pass
 
     @staticmethod
@@ -380,6 +381,7 @@ class BaseCommitLogEntryModel(BaseModel):
     """Base Model for the models that store the log of commits to a
     construct.
     """
+
     # Update superclass model to make these properties indexed.
     created_on = ndb.DateTimeProperty(auto_now_add=True, indexed=True)
     last_updated = ndb.DateTimeProperty(auto_now=True, indexed=True)
@@ -551,6 +553,7 @@ class VersionedModel(BaseModel):
     Note that commit() should be used for VersionedModels, as opposed to put()
     for direct subclasses of BaseModel.
     """
+
     # The class designated as the snapshot model. This should be a subclass of
     # BaseSnapshotMetadataModel.
     SNAPSHOT_METADATA_CLASS = None
@@ -1254,5 +1257,6 @@ class BaseMapReduceBatchResultsModel(BaseModel):
     shown after each MapReduce job run. Classes which are used by a MR job to
     store its batch results should subclass this class.
     """
+
     _use_cache = False
     _use_memcache = False
