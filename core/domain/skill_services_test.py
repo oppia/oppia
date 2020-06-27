@@ -21,9 +21,11 @@ import logging
 import random
 
 from constants import constants
+from core.domain import config_services
 from core.domain import skill_domain
 from core.domain import skill_services
 from core.domain import state_domain
+from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
@@ -63,7 +65,10 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         misconceptions = [skill_domain.Misconception(
             self.MISCONCEPTION_ID_1, 'name', '<p>description</p>',
             '<p>default_feedback</p>', True)]
+        self.num_queries_to_fetch = 10
         self.SKILL_ID = skill_services.get_new_skill_id()
+        self.SKILL_ID2 = skill_services.get_new_skill_id()
+        self.SKILL_ID3 = skill_services.get_new_skill_id()
 
         self.signup('a@example.com', 'A')
         self.signup(self.ADMIN_EMAIL, username=self.ADMIN_USERNAME)
@@ -306,6 +311,246 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(skill_summary.id, self.SKILL_ID)
         self.assertEqual(skill_summary.description, 'Description')
         self.assertEqual(skill_summary.misconception_count, 1)
+
+    def test_get_filtered_skill_summaries(self):
+        self.save_new_skill(
+            self.SKILL_ID2, self.USER_ID, description='Description2',
+            prerequisite_skill_ids=['skill_id_1', 'skill_id_2'])
+        augmented_skill_summaries, next_cursor, more = (
+            skill_services.get_filtered_skill_summaries(
+                self.num_queries_to_fetch, None, None, None, None, None))
+        self.assertEqual(next_cursor, None)
+        self.assertFalse(more)
+
+        self.assertEqual(len(augmented_skill_summaries), 2)
+        self.assertEqual(augmented_skill_summaries[0].id, self.SKILL_ID2)
+        self.assertEqual(augmented_skill_summaries[1].id, self.SKILL_ID)
+
+        augmented_skill_summaries, next_cursor, more = (
+            skill_services.get_filtered_skill_summaries(
+                1, None, 'english', None, None, None))
+
+        self.assertEqual(len(augmented_skill_summaries), 0)
+
+        augmented_skill_summaries, next_cursor, more = (
+            skill_services.get_filtered_skill_summaries(
+                self.num_queries_to_fetch, None, None, None,
+                'Oldest Created', None))
+
+        self.assertEqual(len(augmented_skill_summaries), 2)
+        self.assertEqual(augmented_skill_summaries[0].id, self.SKILL_ID)
+        self.assertEqual(augmented_skill_summaries[1].id, self.SKILL_ID2)
+
+        augmented_skill_summaries, next_cursor, more = (
+            skill_services.get_filtered_skill_summaries(
+                self.num_queries_to_fetch, None, None, None,
+                'Most Recently Updated', None))
+
+        self.assertEqual(len(augmented_skill_summaries), 2)
+        self.assertEqual(augmented_skill_summaries[0].id, self.SKILL_ID2)
+        self.assertEqual(augmented_skill_summaries[1].id, self.SKILL_ID)
+
+        augmented_skill_summaries, next_cursor, more = (
+            skill_services.get_filtered_skill_summaries(
+                self.num_queries_to_fetch, None, None, None,
+                'Least Recently Updated', None))
+
+        self.assertEqual(len(augmented_skill_summaries), 2)
+        self.assertEqual(augmented_skill_summaries[0].id, self.SKILL_ID)
+        self.assertEqual(augmented_skill_summaries[1].id, self.SKILL_ID2)
+
+    def test_cursor_behaves_correctly_when_fetching_skills_in_batches(self):
+        self.save_new_skill(
+            self.SKILL_ID2, self.USER_ID, description='Description2',
+            prerequisite_skill_ids=[])
+        self.save_new_skill(
+            self.SKILL_ID3, self.USER_ID, description='Description3',
+            prerequisite_skill_ids=[])
+
+        augmented_skill_summaries, next_cursor, more = (
+            skill_services.get_filtered_skill_summaries(
+                1, None, None, None, None, None))
+        self.assertEqual(len(augmented_skill_summaries), 2)
+        self.assertIsInstance(next_cursor, str)
+        self.assertTrue(more)
+
+        augmented_skill_summaries, next_cursor, more = (
+            skill_services.get_filtered_skill_summaries(
+                self.num_queries_to_fetch, None, None, None, None, next_cursor))
+        self.assertEqual(len(augmented_skill_summaries), 1)
+        self.assertIsNone(next_cursor)
+        self.assertFalse(more)
+
+    def test_filter_skills_by_status_all(self):
+        self.save_new_skill(
+            self.SKILL_ID2, self.USER_ID, description='Description2',
+            prerequisite_skill_ids=['skill_id_1', 'skill_id_2'])
+
+        augmented_skill_summaries, next_cursor, more = (
+            skill_services.get_filtered_skill_summaries(
+                self.num_queries_to_fetch, None, None, None,
+                None, None))
+        self.assertEqual(len(augmented_skill_summaries), 2)
+        self.assertEqual(next_cursor, None)
+        self.assertFalse(more)
+
+        augmented_skill_summaries, next_cursor, more = (
+            skill_services.get_filtered_skill_summaries(
+                self.num_queries_to_fetch, 'All', None, None,
+                None, None))
+        self.assertEqual(len(augmented_skill_summaries), 2)
+        self.assertEqual(next_cursor, None)
+        self.assertFalse(more)
+
+    def test_filter_skills_by_status_assigned(self):
+        self.save_new_skill(
+            self.SKILL_ID2, self.USER_ID, description='Description2',
+            prerequisite_skill_ids=['skill_id_1', 'skill_id_2'])
+
+        augmented_skill_summaries, next_cursor, more = (
+            skill_services.get_filtered_skill_summaries(
+                self.num_queries_to_fetch, 'Assigned', None, None, None, None))
+        self.assertEqual(len(augmented_skill_summaries), 0)
+        self.assertEqual(next_cursor, None)
+        self.assertFalse(more)
+
+        topic_id = topic_services.get_new_topic_id()
+        self.save_new_topic(
+            topic_id, self.USER_ID, name='topic1',
+            description='Description',
+            canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[self.SKILL_ID2],
+            subtopics=[], next_subtopic_id=1)
+
+        augmented_skill_summaries, next_cursor, more = (
+            skill_services.get_filtered_skill_summaries(
+                self.num_queries_to_fetch, 'Assigned', None,
+                None, None, None))
+        self.assertEqual(augmented_skill_summaries[0].topic_name, 'topic1')
+        self.assertEqual(augmented_skill_summaries[0].id, self.SKILL_ID2)
+        self.assertEqual(next_cursor, None)
+        self.assertFalse(more)
+
+    def test_filter_skills_by_status_unassigned(self):
+        self.save_new_skill(
+            self.SKILL_ID2, self.USER_ID, description='Description2',
+            prerequisite_skill_ids=['skill_id_1', 'skill_id_2'])
+
+        augmented_skill_summaries, next_cursor, more = (
+            skill_services.get_filtered_skill_summaries(
+                self.num_queries_to_fetch, 'Unassigned', None, None,
+                None, None))
+        self.assertEqual(len(augmented_skill_summaries), 2)
+        self.assertEqual(next_cursor, None)
+        self.assertFalse(more)
+
+    def test_filter_skills_by_classroom_name(self):
+        augmented_skill_summaries, next_cursor, more = (
+            skill_services.get_filtered_skill_summaries(
+                self.num_queries_to_fetch, None, 'english', None, None, None))
+        self.assertEqual(len(augmented_skill_summaries), 0)
+        self.assertEqual(next_cursor, None)
+        self.assertFalse(more)
+
+        self.save_new_skill(
+            self.SKILL_ID2, self.USER_ID, description='Description2',
+            prerequisite_skill_ids=['skill_id_1', 'skill_id_2'])
+
+        topic_id = topic_services.get_new_topic_id()
+        self.save_new_topic(
+            topic_id, self.USER_ID, name='topic1',
+            description='Description',
+            canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[self.SKILL_ID2],
+            subtopics=[], next_subtopic_id=1)
+
+        config_services.set_property(
+            self.user_id_admin, 'topic_ids_for_classroom_pages', [{
+                'name': 'math', 'topic_ids': [topic_id]}])
+
+        augmented_skill_summaries, next_cursor, more = (
+            skill_services.get_filtered_skill_summaries(
+                self.num_queries_to_fetch, None, 'math', None,
+                None, None))
+        self.assertEqual(augmented_skill_summaries[0].topic_name, 'topic1')
+        self.assertEqual(augmented_skill_summaries[0].id, self.SKILL_ID2)
+        self.assertEqual(
+            augmented_skill_summaries[0].classroom_name, 'math')
+        self.assertEqual(next_cursor, None)
+        self.assertFalse(more)
+
+    def test_filter_skills_by_keywords(self):
+        self.save_new_skill(
+            self.SKILL_ID2, self.USER_ID, description='Alpha',
+            misconceptions=None,
+            skill_contents=None,
+            prerequisite_skill_ids=[])
+        self.save_new_skill(
+            self.SKILL_ID3, self.USER_ID, description='Beta',
+            misconceptions=None,
+            skill_contents=None,
+            prerequisite_skill_ids=[])
+
+        augmented_skill_summaries, next_cursor, more = (
+            skill_services.get_filtered_skill_summaries(
+                self.num_queries_to_fetch, None, None, None, None, None))
+
+        self.assertEqual(len(augmented_skill_summaries), 3)
+        self.assertEqual(next_cursor, None)
+        self.assertFalse(more)
+
+        augmented_skill_summaries, next_cursor, more = (
+            skill_services.get_filtered_skill_summaries(
+                1, None, None, ['Non_existent'],
+                'Least Recently Updated', None))
+
+        self.assertEqual(len(augmented_skill_summaries), 0)
+
+        augmented_skill_summaries, next_cursor, more = (
+            skill_services.get_filtered_skill_summaries(
+                self.num_queries_to_fetch, None, None, [], None, None))
+
+        self.assertEqual(len(augmented_skill_summaries), 3)
+        self.assertEqual(next_cursor, None)
+        self.assertFalse(more)
+
+        augmented_skill_summaries, next_cursor, more = (
+            skill_services.get_filtered_skill_summaries(
+                self.num_queries_to_fetch, None, None, ['descr'], None, None))
+
+        self.assertEqual(len(augmented_skill_summaries), 1)
+        self.assertEqual(augmented_skill_summaries[0].id, self.SKILL_ID)
+        self.assertEqual(next_cursor, None)
+        self.assertFalse(more)
+
+        augmented_skill_summaries, next_cursor, more = (
+            skill_services.get_filtered_skill_summaries(
+                self.num_queries_to_fetch, None, None, ['alph'], None, None))
+
+        self.assertEqual(len(augmented_skill_summaries), 1)
+        self.assertEqual(augmented_skill_summaries[0].id, self.SKILL_ID2)
+        self.assertEqual(next_cursor, None)
+        self.assertFalse(more)
+
+        augmented_skill_summaries, next_cursor, more = (
+            skill_services.get_filtered_skill_summaries(
+                self.num_queries_to_fetch, None, None, ['bet'], None, None))
+
+        self.assertEqual(len(augmented_skill_summaries), 1)
+        self.assertEqual(augmented_skill_summaries[0].id, self.SKILL_ID3)
+        self.assertEqual(next_cursor, None)
+        self.assertFalse(more)
+
+        augmented_skill_summaries, next_cursor, more = (
+            skill_services.get_filtered_skill_summaries(
+                self.num_queries_to_fetch, None, None, ['alp', 'bet'],
+                None, None))
+
+        self.assertEqual(len(augmented_skill_summaries), 2)
+        self.assertEqual(next_cursor, None)
+        self.assertFalse(more)
 
     def test_update_skill(self):
         changelist = [

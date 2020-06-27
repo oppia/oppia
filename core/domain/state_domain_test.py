@@ -2441,12 +2441,27 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     }]
             }
         }
+        solution_dict = {
+            'answer_is_exclusive': True,
+            'correct_answer': 'Answer1',
+            'explanation': {
+                'content_id': 'solution',
+                'html': html_with_old_math_schema
+            }
+        }
         self.assertEqual(
             state_domain.State.convert_html_fields_in_state(
                 state_dict_with_old_math_schema,
                 html_validation_service.
                 add_math_content_to_math_rte_components),
             state_dict_with_new_math_schema)
+        # Assert that no action is performed on a solution dict when the
+        # interaction ID is None.
+        self.assertEqual(
+            state_domain.Solution.convert_html_in_solution(
+                None, solution_dict,
+                html_validation_service.
+                add_math_content_to_math_rte_components), solution_dict)
 
     def test_subtitled_html_validation_with_invalid_html_type(self):
         """Test validation of subtitled HTML with invalid html type."""
