@@ -35,6 +35,8 @@ FILE_CACHE = NAME_SPACE.files
 
 LINTER_TESTS_DIR = os.path.join(os.getcwd(), 'scripts', 'linters', 'test_files')
 VALID_CODEOWNER_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'valid_codeowners')
+VALID_CODEOWNER_FILEPATH_WITH_DIRECTORY = os.path.join(
+    LINTER_TESTS_DIR, 'valid_codeowner_file_with_directory')
 INVALID_DUPLICATE_CODEOWNER_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_duplicate_pattern_codeowner')
 INVALID_MISSING_IMPORTANT_PATTERN_CODEOWNER_FILEPATH = os.path.join(
@@ -50,19 +52,10 @@ INVALID_FILEPATH_MISSING_FROM_DIRECTORY = os.path.join(
 
 
 CODEOWNER_IMPORTANT_PATHS = [
-    '/core/controllers/acl_decorators*.py',
-    '/core/controllers/base*.py',
-    '/core/domain/html*.py',
-    '/core/domain/rights_manager*.py',
-    '/core/domain/role_services*.py',
-    '/core/domain/user*.py',
-    '/core/storage/',
-    '/export/',
     '/manifest.json',
     '/package.json',
     '/yarn.lock',
     '/scripts/install_third_party_libs.py',
-    '/.github/',
     '/.github/CODEOWNERS',
     '/.github/stale.yml']
 
@@ -85,7 +78,17 @@ class CodeOwnerLinterTests(test_utils.GenericTestBase):
             self.linter_stdout.append(
                 ' '.join(python_utils.UNICODE(arg) for arg in args))
 
+        def mock_listdir(unused_arg):
+            return [
+                'manifest.json',
+                'package.json',
+                'yarn.lock',
+                'scripts/install_third_party_libs.py',
+                '.github/CODEOWNERS',
+                '.github/stale.yml']
+
         self.print_swap = self.swap(python_utils, 'PRINT', mock_print)
+        self.listdir_swap = self.swap(os, 'listdir', mock_listdir)
 
     def test_missing_important_codeowner_path_from_list(self):
         # Remove '/.github/stale.yml' important path from the end of list
@@ -100,7 +103,7 @@ class CodeOwnerLinterTests(test_utils.GenericTestBase):
             codeowner_linter, 'CODEOWNER_FILEPATH',
             VALID_CODEOWNER_FILEPATH)
 
-        with self.print_swap, codeowner_important_paths_swap:
+        with self.print_swap, self.listdir_swap, codeowner_important_paths_swap:
             with codeowner_filepath_swap:
                 codeowner_linter.check_codeowner_file(FILE_CACHE, True)
         self.assertTrue(
@@ -116,7 +119,7 @@ class CodeOwnerLinterTests(test_utils.GenericTestBase):
             codeowner_linter, 'CODEOWNER_FILEPATH',
             INVALID_DUPLICATE_CODEOWNER_FILEPATH)
 
-        with self.print_swap, codeowner_path_swap:
+        with self.print_swap, self.listdir_swap, codeowner_path_swap:
             codeowner_linter.check_codeowner_file(FILE_CACHE, True)
         self.assertTrue(
             test_utils.assert_same_list_elements([
@@ -133,7 +136,7 @@ class CodeOwnerLinterTests(test_utils.GenericTestBase):
             codeowner_linter, 'CODEOWNER_IMPORTANT_PATHS',
             mock_codeowner_important_paths)
 
-        with self.print_swap, codeowner_important_paths_swap:
+        with self.print_swap, self.listdir_swap, codeowner_important_paths_swap:
             with codeowner_path_swap:
                 codeowner_linter.check_codeowner_file(FILE_CACHE, True)
         self.assertTrue(
@@ -146,7 +149,7 @@ class CodeOwnerLinterTests(test_utils.GenericTestBase):
             codeowner_linter, 'CODEOWNER_FILEPATH',
             INVALID_MISSING_IMPORTANT_PATTERN_CODEOWNER_FILEPATH)
 
-        with self.print_swap, codeowner_path_swap:
+        with self.print_swap, self.listdir_swap, codeowner_path_swap:
             codeowner_linter.check_codeowner_file(FILE_CACHE, True)
         self.assertTrue(
             test_utils.assert_same_list_elements([
@@ -159,8 +162,16 @@ class CodeOwnerLinterTests(test_utils.GenericTestBase):
                 'important rule.'], self.linter_stdout))
 
     def test_check_codeowner_file_with_success_message(self):
-        with self.print_swap:
-            codeowner_linter.check_codeowner_file(FILE_CACHE, False)
+        codeowner_path_swap = self.swap(
+            codeowner_linter, 'CODEOWNER_FILEPATH', VALID_CODEOWNER_FILEPATH)
+
+        codeowner_important_paths_swap = self.swap(
+            codeowner_linter, 'CODEOWNER_IMPORTANT_PATHS',
+            CODEOWNER_IMPORTANT_PATHS)
+
+        with self.print_swap, self.listdir_swap, codeowner_important_paths_swap:
+            with codeowner_path_swap:
+                codeowner_linter.check_codeowner_file(FILE_CACHE, False)
         self.assertTrue(
             test_utils.assert_same_list_elements(
                 ['SUCCESS  CODEOWNERS file check passed'], self.linter_stdout))
@@ -170,11 +181,11 @@ class CodeOwnerLinterTests(test_utils.GenericTestBase):
             codeowner_linter, 'CODEOWNER_FILEPATH',
             INVALID_MISSING_CODEOWNER_NAME_FILEPATH)
 
-        with self.print_swap, codeowner_swap:
+        with self.print_swap, self.listdir_swap, codeowner_swap:
             codeowner_linter.check_codeowner_file(FILE_CACHE, False)
             self.assertTrue(
                 test_utils.assert_same_list_elements(
-                    ['Pattern on line 27 doesn\'t have codeowner'],
+                    ['Pattern on line 18 doesn\'t have codeowner'],
                     self.linter_stdout))
 
     def test_check_codeowner_file_without_full_file_path(self):
@@ -182,11 +193,11 @@ class CodeOwnerLinterTests(test_utils.GenericTestBase):
             codeowner_linter, 'CODEOWNER_FILEPATH',
             INVALID_FULL_FILEPATH_CODEOWNER_FILEPATH)
 
-        with self.print_swap, codeowner_swap:
+        with self.print_swap, self.listdir_swap, codeowner_swap:
             codeowner_linter.check_codeowner_file(FILE_CACHE, False)
         self.assertTrue(
             test_utils.assert_same_list_elements([
-                'Pattern on line 27 is invalid. Use full path '
+                'Pattern on line 18 is invalid. Use full path '
                 'relative to the root directory'], self.linter_stdout))
 
     def test_check_codeowner_file_with_wildcard(self):
@@ -198,7 +209,7 @@ class CodeOwnerLinterTests(test_utils.GenericTestBase):
             codeowner_linter.check_codeowner_file(FILE_CACHE, False)
         self.assertTrue(
             test_utils.assert_same_list_elements([
-                'Pattern on line 27 is invalid. '
+                'Pattern on line 18 is invalid. '
                 '\'**\' wildcard not allowed'], self.linter_stdout))
 
     def test_check_codeowner_file_with_no_valid_match(self):
@@ -206,9 +217,9 @@ class CodeOwnerLinterTests(test_utils.GenericTestBase):
             codeowner_linter, 'CODEOWNER_FILEPATH',
             INVALID_FILEPATH_MISSING_FROM_DIRECTORY)
 
-        with self.print_swap, codeowner_swap:
+        with self.print_swap, self.listdir_swap, codeowner_swap:
             codeowner_linter.check_codeowner_file(FILE_CACHE, False)
         self.assertTrue(
             test_utils.assert_same_list_elements([
-                'Pattern on line 27 doesn\'t match '
+                'Pattern on line 18 doesn\'t match '
                 'any file or directory'], self.linter_stdout))
