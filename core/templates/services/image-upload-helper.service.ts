@@ -130,13 +130,13 @@ angular.module('oppia').factory('ImageUploadHelperService', [
           if (node.tagName.toLowerCase() === 'svg') {
             dimensions.height = (
               (node.getAttribute('height').match(/\d+\.\d+/g)[0]).replace(
-                '.', 'decimal'));
+                '.', 'd'));
             dimensions.width = (
               (node.getAttribute('width').match(/\d+\.\d+/g)[0]).replace(
-                '.', 'decimal'));
+                '.', 'd'));
             dimensions.verticalPadding = (
               (node.getAttribute('style').match(/\d+\.\d+/g)[0]).replace(
-                '.', 'decimal'));
+                '.', 'd'));
           }
         });
         return dimensions;
