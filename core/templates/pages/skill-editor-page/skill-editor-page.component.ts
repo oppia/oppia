@@ -48,15 +48,12 @@ angular.module('oppia').component('skillEditorPage', {
       ctrl.getActiveTabName = function() {
         return SkillEditorRoutingService.getActiveTabName();
       };
-
       ctrl.selectMainTab = function() {
         SkillEditorRoutingService.navigateToMainTab();
       };
-
       ctrl.selectPreviewTab = function() {
         SkillEditorRoutingService.navigateToPreviewTab();
       };
-
       ctrl.selectQuestionsTab = function() {
         // This check is needed because if a skill has unsaved changes to
         // misconceptions, then these will be reflected in the questions
@@ -78,9 +75,6 @@ angular.module('oppia').component('skillEditorPage', {
         } else {
           SkillEditorRoutingService.navigateToQuestionsTab();
         }
-      };
-      ctrl.getActiveTabName = function() {
-        return SkillEditorRoutingService.getActiveTabName();
       };
       ctrl.getWarningsCount = function() {
         return ctrl.skill.getValidationIssues().length;

@@ -40,8 +40,7 @@ angular.module('oppia').factory('SkillEditorStateService', [
     var _skillRights = (
       SkillRightsObjectFactory.createInterstitialSkillRights());
     var _skillIsInitialized = false;
-    var topicName = false;
-    var subtopicName = false;
+    var assignedSkillTopicData = null;
     var _skillIsBeingLoaded = false;
     var _skillIsBeingSaved = false;
     var _groupedSkillSummaries = {
@@ -112,8 +111,8 @@ angular.module('oppia').factory('SkillEditorStateService', [
         SkillBackendApiService.fetchSkill(
           skillId).then(
           function(newBackendSkillObject) {
-            topicName = newBackendSkillObject.topicName;
-            subtopicName = newBackendSkillObject.subtopicName;
+            assignedSkillTopicData = (
+              newBackendSkillObject.assignedSkillTopicData);
             _updateSkill(newBackendSkillObject.skill);
             _updateGroupedSkillSummaries(
               newBackendSkillObject.groupedSkillSummaries);
@@ -144,12 +143,8 @@ angular.module('oppia').factory('SkillEditorStateService', [
         return _skillIsBeingLoaded;
       },
 
-      getTopicName: function() {
-        return topicName;
-      },
-
-      getSubtopicName: function() {
-        return subtopicName;
+      getAssignedSkillTopicData: function() {
+        return assignedSkillTopicData;
       },
 
       getGroupedSkillSummaries: function() {

@@ -15,14 +15,14 @@
           <strong class="status-key">
             Topic:
           </strong>
-          <span ng-if="getTopicName()" class="status-value">
-            <[getTopicName()]>
-          </span>
-          <span ng-if="!getTopicName()" class="status-value">
-            Unassigned
-          </span>
+          <select class="form-control"
+                  ng-model="topicName"
+                  ng-options="topic as topic for (topic, subtopic) in getAssignedSkillTopicData()"
+                  ng-change="changeSelectedTopic(topicName)"
+                  ng-disabled="!isTopicDropdownEnabled()">
+          </select>
         </div>
-        <div class="status-box">
+        <div class="status-box" ng-if="isTopicDropdownEnabled()">
           <strong class="status-key">
             Subtopic:
           </strong>

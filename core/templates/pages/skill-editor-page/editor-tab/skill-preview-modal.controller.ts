@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for preview skill modal.
+ * @fileoverview Controller for skill preview modal.
  */
 
 require(

@@ -8,7 +8,7 @@
   </div>
   <div class="form-group">
     <span>
-      <select class="form-control rubric-options" ng-model="$ctrl.selectedRubricIndex"
+      <select class="form-control rubric-options protractor-select-rubric-difficulty" ng-model="$ctrl.selectedRubricIndex"
               ng-options="rubric.id as rubric.difficulty for rubric in $ctrl.rubricsOptions"  ng-change="$ctrl.onRubricSelectionChange()">
       </select>
     </span>
@@ -50,7 +50,7 @@
         </div>
 
         <div class="oppia-rule-save-cancel-buttons">
-          <div class="float-right">
+          <div>
             <button type="button"
                     class="btn btn-danger protractor-test-delete-rubric-explanation-button"
                     ng-click="$ctrl.deleteExplanation($ctrl.rubric.getDifficulty(), $index)">
@@ -107,5 +107,9 @@
   rubrics-editor .rubric-editor {
     margin-right: 15px;
     margin-top: 2vh;
+  }
+
+  rubrics-editor .oppia-rule-save-cancel-buttons {
+    text-align: right;
   }
 </style>

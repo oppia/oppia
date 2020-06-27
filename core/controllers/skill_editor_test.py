@@ -169,13 +169,14 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
         # Check that admins can access the editable skill data.
         json_response = self.get_json(self.url)
         self.assertEqual(self.skill_id, json_response['skill']['id'])
-        self.assertEqual(json_response['topic_name'], 'Name')
-        self.assertEqual(json_response['subtopic_name'], 'Subtopic1')
+        self.assertEqual(
+            json_response['assigned_skill_topic_data_dict']['Name'],
+            'Subtopic1')
         self.assertEqual(
             1, len(json_response['grouped_skill_summaries']['Name']))
         self.logout()
 
-    def test_editable_skill_is_assigned_to_topic_and_not_subtopic(self):
+    def test_skill_is_assigned_to_topic_but_not_subtopic(self):
         skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(
             skill_id, self.admin_id, description='DescriptionSkill')
@@ -191,13 +192,13 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
 
         json_response = self.get_json(url)
         self.assertEqual(skill_id, json_response['skill']['id'])
-        self.assertEqual(json_response['topic_name'], 'TopicName1')
-        self.assertEqual(json_response['subtopic_name'], None)
+        self.assertIsNone(
+            json_response['assigned_skill_topic_data_dict']['TopicName1'])
         self.assertEqual(
             1, len(json_response['grouped_skill_summaries']['Name']))
         self.logout()
 
-    def test_editable_skill_is_not_assigned_to_topic_or_subtopic(self):
+    def test_skill_is_not_assigned_to_any_topic(self):
         skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(
             skill_id, self.admin_id, description='DescriptionSkill')
@@ -207,8 +208,49 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
 
         json_response = self.get_json(url)
         self.assertEqual(skill_id, json_response['skill']['id'])
-        self.assertEqual(json_response['topic_name'], None)
-        self.assertEqual(json_response['subtopic_name'], None)
+        self.assertEqual(json_response['assigned_skill_topic_data_dict'], {})
+        self.assertEqual(
+            1, len(json_response['grouped_skill_summaries']['Name']))
+        self.logout()
+
+    def test_skill_is_assigned_to_multiple_topics(self):
+        skill_id = skill_services.get_new_skill_id()
+        self.save_new_skill(
+            skill_id, self.admin_id, description='DescriptionSkill')
+
+        subtopic = topic_domain.Subtopic.create_default_subtopic(
+            1, 'Addition')
+        subtopic.skill_ids = [skill_id]
+        topic_id = topic_services.get_new_topic_id()
+        self.save_new_topic(
+            topic_id, self.admin_id, name='Maths',
+            description='Description', canonical_story_ids=[],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[subtopic], next_subtopic_id=2)
+
+        subtopic = topic_domain.Subtopic.create_default_subtopic(
+            1, 'Chemistry')
+        subtopic.skill_ids = [skill_id]
+        topic_id = topic_services.get_new_topic_id()
+        self.save_new_topic(
+            topic_id, self.admin_id, name='Science',
+            description='Description', canonical_story_ids=[],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[subtopic], next_subtopic_id=2)
+
+        url = '%s/%s' % (
+            feconf.SKILL_EDITOR_DATA_URL_PREFIX, skill_id)
+
+        json_response = self.get_json(url)
+        self.assertEqual(skill_id, json_response['skill']['id'])
+        self.assertEqual(
+            2, len(json_response['assigned_skill_topic_data_dict']))
+        self.assertEqual(
+            json_response['assigned_skill_topic_data_dict']['Maths'],
+            'Addition')
+        self.assertEqual(
+            json_response['assigned_skill_topic_data_dict']['Science'],
+            'Chemistry')
         self.assertEqual(
             1, len(json_response['grouped_skill_summaries']['Name']))
         self.logout()

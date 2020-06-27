@@ -11,7 +11,7 @@
               <select ng-model="$ctrl.interactionFilter"
                       class="form-control"
                       ng-change="$ctrl.applyFilters()"
-                      ng-options="interaction for interaction in $ctrl.ALLOWED_QUESTION_INTERACTION_IDS">
+                      ng-options="interaction for interaction in $ctrl.ALLOWED_QUESTION_INTERACTIONS">
               </select>
             </div>
             <div ng-repeat="question in $ctrl.displayedQuestions track by $index" class="question-list-item">
@@ -56,7 +56,7 @@
         <div><span class="headings">Preview</span></div>
         <div class="preview-box" ng-if="$ctrl.displayCardIsInitialized">
           <tutor-card displayed-card="$ctrl.displayedCard"
-                      is-avatar-image-shown = "false"
+                      avatar-image-is-shown="false"
                       is-learn-again-button="$ctrl.isLearnAgainButton()"
                       start-card-change-animation="false">
           </tutor-card>
@@ -129,6 +129,7 @@
 
   .skill-editor-preview .question-data {
     align-items: center;
+    cursor: pointer;
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
@@ -144,6 +145,7 @@
   .skill-editor-preview .question-filters input {
     width: 60%;
   }
+
   .skill-editor-preview .question-filters select {
     width: 38%;
   }

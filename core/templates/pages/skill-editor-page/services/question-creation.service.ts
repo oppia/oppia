@@ -55,23 +55,26 @@ require(
     'topics-and-skills-dashboard-page.constants.ajs.ts');
 require('services/alerts.service.ts');
 require('services/contextual/url.service.ts');
+require('services/image-local-storage.service.ts');
 require('services/question-validation.service.ts');
 
 
 angular.module('oppia').factory('QuestionCreationService', [
   '$location', '$uibModal', 'AlertsService',
-  'EditableQuestionBackendApiService', 'MisconceptionObjectFactory',
-  'QuestionObjectFactory', 'QuestionUndoRedoService',
-  'SkillBackendApiService', 'SkillDifficultyObjectFactory',
-  'SkillEditorStateService', 'UrlInterpolationService',
-  'DEFAULT_SKILL_DIFFICULTY', 'MODE_SELECT_DIFFICULTY', 'SKILL_DIFFICULTIES',
+  'EditableQuestionBackendApiService', 'ImageLocalStorageService',
+  'MisconceptionObjectFactory', 'QuestionObjectFactory',
+  'QuestionUndoRedoService', 'SkillBackendApiService',
+  'SkillDifficultyObjectFactory', 'SkillEditorStateService',
+  'UrlInterpolationService', 'DEFAULT_SKILL_DIFFICULTY',
+  'MODE_SELECT_DIFFICULTY', 'SKILL_DIFFICULTIES',
   function(
       $location, $uibModal, AlertsService,
-      EditableQuestionBackendApiService, MisconceptionObjectFactory,
-      QuestionObjectFactory, QuestionUndoRedoService,
-      SkillBackendApiService, SkillDifficultyObjectFactory,
-      SkillEditorStateService, UrlInterpolationService,
-      DEFAULT_SKILL_DIFFICULTY, MODE_SELECT_DIFFICULTY, SKILL_DIFFICULTIES) {
+      EditableQuestionBackendApiService, ImageLocalStorageService,
+      MisconceptionObjectFactory, QuestionObjectFactory,
+      QuestionUndoRedoService, SkillBackendApiService,
+      SkillDifficultyObjectFactory, SkillEditorStateService,
+      UrlInterpolationService, DEFAULT_SKILL_DIFFICULTY,
+      MODE_SELECT_DIFFICULTY, SKILL_DIFFICULTIES) {
     var newQuestionSkillDifficulties = [];
     var question = null;
     var skill = null;
@@ -198,9 +201,11 @@ angular.module('oppia').factory('QuestionCreationService', [
           validationErrors || unaddressedMisconceptionsErrorString);
         return;
       }
+      var imagesData = ImageLocalStorageService.getStoredImagesData();
+      ImageLocalStorageService.flushStoredImagesData();
       EditableQuestionBackendApiService.createQuestion(
         newQuestionSkillIds, newQuestionSkillDifficulties,
-        question.toBackendDict(true)
+        question.toBackendDict(true), imagesData
       ).then(function() {
 
       });

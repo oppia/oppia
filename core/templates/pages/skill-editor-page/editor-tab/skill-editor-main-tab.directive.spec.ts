@@ -29,7 +29,7 @@ describe('Skill editor main tab directive', function() {
   var directive = null;
   var QuestionCreationService = null;
   var SkillEditorStateService = null;
-
+  var assignedSkillTopicData = {topic1: 'subtopic1', topic2: 'subtopic2'};
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
@@ -53,7 +53,6 @@ describe('Skill editor main tab directive', function() {
 
   it('should initialize the variables', function() {
     expect($scope.selectedTopic).toEqual(null);
-    expect($scope.topicName).toEqual(null);
     expect($scope.subtopicName).toEqual(null);
   });
 
@@ -69,15 +68,30 @@ describe('Skill editor main tab directive', function() {
     expect($scope.hasLoadedSkill()).toBe(true);
   });
 
-  it('should return topic name', function() {
-    expect($scope.topicName).toEqual(null);
-    $scope.topicName = 'Topic1';
-    expect($scope.getTopicName()).toEqual('Topic1');
+  it('should return assigned Skill Topic Data', function() {
+    expect($scope.assignedSkillTopicData).toEqual(null);
+    expect($scope.getAssignedSkillTopicData()).toEqual(null);
+    $scope.assignedSkillTopicData = assignedSkillTopicData;
+    expect($scope.getAssignedSkillTopicData()).toEqual(assignedSkillTopicData);
   });
 
   it('should return subtopic name', function() {
     expect($scope.subtopicName).toEqual(null);
     $scope.subtopicName = 'Subtopic1';
     expect($scope.getSubtopicName()).toEqual('Subtopic1');
+  });
+
+  it('should change subtopic when selected topic is changed', function() {
+    $scope.assignedSkillTopicData = assignedSkillTopicData;
+    $scope.changeSelectedTopic('topic1');
+    expect($scope.getSubtopicName()).toEqual(assignedSkillTopicData.topic1);
+    $scope.changeSelectedTopic('topic2');
+    expect($scope.getSubtopicName()).toEqual(assignedSkillTopicData.topic2);
+  });
+
+  it('should return whether the topic dropdown is enabled', function() {
+    expect($scope.isTopicDropdownEnabled()).toEqual(false);
+    $scope.assignedSkillTopicData = assignedSkillTopicData;
+    expect($scope.isTopicDropdownEnabled()).toEqual(true);
   });
 });

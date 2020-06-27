@@ -163,7 +163,7 @@ describe('Skill preview tab', function() {
     expect(ctrl.questionTextFilter).toEqual('');
     expect(ctrl.displayCardIsInitialized).toEqual(false);
     expect(ctrl.questionsFetched).toEqual(false);
-    expect(ctrl.ALLOWED_QUESTION_INTERACTION_IDS).toEqual([
+    expect(ctrl.ALLOWED_QUESTION_INTERACTIONS).toEqual([
       'All', 'Text Input', 'Multiple Choice', 'Numeric Input',
       'Item Selection']);
   });

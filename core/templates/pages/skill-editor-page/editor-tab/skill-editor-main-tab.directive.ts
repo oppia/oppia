@@ -54,12 +54,26 @@ angular.module('oppia').directive('skillEditorMainTab', [
           };
 
           $scope.getSubtopicName = function() {
-            return (
-              $scope.subtopicName || SkillEditorStateService.getSubtopicName());
+            return $scope.subtopicName;
           };
 
-          $scope.getTopicName = function() {
-            return $scope.topicName || SkillEditorStateService.getTopicName();
+          $scope.getAssignedSkillTopicData = function() {
+            if ($scope.assignedSkillTopicData) {
+              return $scope.assignedSkillTopicData;
+            }
+            $scope.assignedSkillTopicData = (
+              SkillEditorStateService.getAssignedSkillTopicData());
+            return $scope.assignedSkillTopicData;
+          };
+
+          $scope.isTopicDropdownEnabled = function() {
+            return Boolean($scope.assignedSkillTopicData &&
+                Object.keys($scope.assignedSkillTopicData).length);
+          };
+
+          $scope.changeSelectedTopic = function(topicName) {
+            $scope.subtopicName = (
+              $scope.assignedSkillTopicData[topicName]);
           };
 
           $scope.hasLoadedSkill = function() {
@@ -68,7 +82,7 @@ angular.module('oppia').directive('skillEditorMainTab', [
 
           ctrl.$onInit = function() {
             $scope.selectedTopic = null;
-            $scope.topicName = null;
+            $scope.assignedSkillTopicData = null;
             $scope.subtopicName = null;
           };
         }

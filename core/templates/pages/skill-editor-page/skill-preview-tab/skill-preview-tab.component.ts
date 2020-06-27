@@ -52,18 +52,25 @@ angular.module('oppia').component('skillPreviewTab', {
         QuestionObjectFactory, QuestionPlayerEngineService,
         SkillEditorStateService, StateCardObjectFactory, UrlService) {
       var ctrl = this;
-
+      const INTERACTION_TYPES = {
+        ALL: 'All',
+        TEXT_INPUT: 'Text Input',
+        MULTIPLE_CHOICE: 'Multiple Choice',
+        NUMERIC_INPUT: 'Numeric Input',
+        ITEM_SELECTION: 'Item Selection'
+      };
       ctrl.$onInit = function() {
-        ctrl.INTERATION_TYPE_ALL = 'All';
         ctrl.skillId = UrlService.getSkillIdFromUrl();
         SkillEditorStateService.loadSkill(ctrl.skillId);
         ctrl.questionTextFilter = '';
-        ctrl.interactionFilter = ctrl.INTERATION_TYPE_ALL;
+        ctrl.interactionFilter = INTERACTION_TYPES.ALL;
         ctrl.displayCardIsInitialized = false;
         ctrl.questionsFetched = false;
-        ctrl.ALLOWED_QUESTION_INTERACTION_IDS = [
-          'All', 'Text Input', 'Multiple Choice', 'Numeric Input',
-          'Item Selection'];
+        ctrl.ALLOWED_QUESTION_INTERACTIONS = [];
+        for (let interaction in INTERACTION_TYPES) {
+          ctrl.ALLOWED_QUESTION_INTERACTIONS.push(
+            INTERACTION_TYPES[interaction]);
+        }
         ctrl.skill = SkillEditorStateService.getSkill();
         ctrl.htmlData = ctrl.skill.getConceptCard().getExplanation().getHtml();
 
@@ -91,19 +98,23 @@ angular.module('oppia').component('skillPreviewTab', {
             var htmlContentIsMatching = Boolean(
               contentData.toLowerCase().includes(
                 ctrl.questionTextFilter.toLowerCase()));
-            if (ctrl.interactionFilter === ctrl.INTERATION_TYPE_ALL) {
+            if (ctrl.interactionFilter === INTERACTION_TYPES.ALL) {
               return htmlContentIsMatching;
-            } else if (ctrl.interactionFilter === 'Text Input' &&
-                            interactionType !== 'TextInput') {
+            } else if (ctrl.interactionFilter ===
+                INTERACTION_TYPES.TEXT_INPUT &&
+                  interactionType !== 'TextInput') {
               return false;
-            } else if (ctrl.interactionFilter === 'Multiple Choice' &&
-                            interactionType !== 'MultipleChoiceInput') {
+            } else if (ctrl.interactionFilter ===
+                INTERACTION_TYPES.MULTIPLE_CHOICE &&
+                  interactionType !== 'MultipleChoiceInput') {
               return false;
-            } else if (ctrl.interactionFilter === 'Item Selection' &&
-                            interactionType !== 'ItemSelectionInput') {
+            } else if (ctrl.interactionFilter ===
+                INTERACTION_TYPES.ITEM_SELECTION &&
+                  interactionType !== 'ItemSelectionInput') {
               return false;
-            } else if (ctrl.interactionFilter === 'Numeric Input' &&
-                            interactionType !== 'NumericInput') {
+            } else if (ctrl.interactionFilter ===
+                INTERACTION_TYPES.NUMERIC_INPUT &&
+                  interactionType !== 'NumericInput') {
               return false;
             }
             return htmlContentIsMatching;
