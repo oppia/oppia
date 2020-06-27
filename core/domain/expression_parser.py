@@ -138,6 +138,11 @@ def tokenize(expression):
 
     token_texts = re.findall(re_string, expression)
 
+    # There is a possibility that the regex string skips past an invalid
+    # character. In that case, we must raise an error and display the invalid
+    # character. The invalid character is the one who's frequency in the
+    # original expression does not match with the frequency in the tokenized
+    # expression. The counter is being used to verify that frequencies match.
     original_exp_frequency = collections.Counter(expression)
     tokenized_exp_frequency = collections.Counter(''.join(token_texts))
 
