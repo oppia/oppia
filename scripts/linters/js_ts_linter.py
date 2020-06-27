@@ -919,12 +919,15 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         allowed_terminating_punctuations = [
             '.', '?', ';', ',', '{', '^', ')', '}', '>']
 
-        # We need to ignore phrases below because if we use punctuation with
-        # these words it will mess up the whole meaning of the comment.
-        # Example: --params.login.user 'Joe'
-        # We can't use a period at the end of comment for such comment
-        # else it will mess up the whole meaning.
-        excluded_phrases = [
+        # We are excluding individual comment line from this check if that
+        # line contain any of the below phrases anywhere in it. If we use
+        # punctuation at the end for the comment lines containing one of these
+        # phrases then it will mess up the whole meaning of the comment.
+        # Example: // eslint-disable-next-line max-len
+        # We can't use a period or any other symbol at the end of this line
+        # else eslint won't work as expected as this is a special comment for
+        # eslint.
+        allowed_comment_endings_without_period = [
             '@ts-ignore', '--params', 'eslint-disable', 'eslint-enable',
             'http://', 'https://']
 
@@ -943,15 +946,19 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                         next_line = file_content[line_num + 1].strip()
 
                     # Check if comment contains any excluded phrase.
-                    word_is_present_in_excluded_phrases = any(
-                        word in line for word in excluded_phrases)
+                    comment_includes_allowed_comment_phrases = any(
+                        word in line for word in
+                        allowed_comment_endings_without_period)
 
                     # Comments may include a lowercase character at beginning
                     # or may not use a punctuation at end if it contains a
                     # excluded phrase e.g. "// eslint-disable".
-                    if word_is_present_in_excluded_phrases:
+                    if comment_includes_allowed_comment_phrases:
                         continue
 
+                    # Exclude comment line containing heading.
+                    # Example: // ---- Heading ----
+                    # These types of comments will be excluded from this check.
                     if (
                             line.startswith('//') and line.endswith('-')
                             and not (
