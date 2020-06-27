@@ -69,7 +69,7 @@ var TopicEditorPage = function() {
   var skillSelectorModal = element(
     by.css('.protractor-test-skill-select-modal'));
   var uncategorizedSkillItems = element.all(
-    by.css('.protractor-test-uncategorized-skill-item'));
+    by.css('.protractor-test-skill-item'));
   var uncategorizedSkillsContainer = element(
     by.css('.protractor-test-uncategorized-skills-container'));
   var editSubtopicButtons = element.all(
@@ -213,8 +213,7 @@ var TopicEditorPage = function() {
       '.protractor-test-edit-subtopic-page-contents'));
     await waitFor.visibilityOf(pageEditor,
       'Subtopic html editor takes too long to appear');
-    await (
-      await browser.switchTo().activeElement()).sendKeys(content);
+    await (await browser.switchTo().activeElement()).sendKeys(content);
   };
 
   this.expectNumberOfUncategorizedSkillsToBe = async function(count) {

@@ -108,7 +108,6 @@ describe('Topics and skills dashboard functionality', function() {
     await topicsAndSkillsDashboardPage.assignSkillWithIndexToTopic(0, 0);
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.navigateToTopicWithIndex(0);
-    await topicEditorPage.moveToSubtopicsTab();
     await topicEditorPage.expectNumberOfUncategorizedSkillsToBe(1);
   });
 
