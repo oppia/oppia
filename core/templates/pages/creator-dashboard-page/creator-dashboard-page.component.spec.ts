@@ -344,7 +344,6 @@ describe('Creator dashboard controller', () => {
         expect(ctrl.myExplorationsView).toBe('list');
         expect(ctrl.publishText).toBe(
           'This exploration is private. Publish it to receive statistics.');
-
       });
 
       it('should set active thread from my suggestions list', function() {
