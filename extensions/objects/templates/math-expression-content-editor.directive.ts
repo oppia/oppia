@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for math latex string editor.
+ * @fileoverview Directive for math expression content editor.
  */
 
 require('directives/mathjax-bind.directive.ts');
@@ -22,7 +22,7 @@ require('directives/mathjax-bind.directive.ts');
 // may be additional customization options for the editor that should be passed
 // in via initArgs.
 
-angular.module('oppia').directive('mathLatexStringEditor', [
+angular.module('oppia').directive('mathExpressionContentEditor', [
   function() {
     return {
       restrict: 'E',
@@ -31,7 +31,7 @@ angular.module('oppia').directive('mathLatexStringEditor', [
         getAlwaysEditable: '&',
         value: '='
       },
-      template: require('./math-latex-string-editor.directive.html'),
+      template: require('./math-expression-content-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$scope', function($scope) {
         var ctrl = this;
@@ -40,7 +40,7 @@ angular.module('oppia').directive('mathLatexStringEditor', [
           // part of an editable list).
           $scope.$watch('$ctrl.value', function() {
             ctrl.localValue = {
-              label: ctrl.value || ''
+              label: ctrl.value.raw_latex || ''
             };
           }, true);
           $scope.$on('externalSave', function() {
@@ -56,7 +56,7 @@ angular.module('oppia').directive('mathLatexStringEditor', [
 
           if (ctrl.alwaysEditable) {
             $scope.$watch('$ctrl.localValue.label', function(newValue) {
-              ctrl.value = newValue;
+              ctrl.value.raw_latex = newValue;
             });
           } else {
             ctrl.openEditor = function() {
@@ -71,7 +71,7 @@ angular.module('oppia').directive('mathLatexStringEditor', [
               ctrl.localValue = {
                 label: newValue
               };
-              ctrl.value = newValue;
+              ctrl.value.raw_latex = newValue;
               ctrl.closeEditor();
             };
 

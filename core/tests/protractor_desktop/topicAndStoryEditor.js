@@ -68,13 +68,11 @@ describe('Topic editor functionality', function() {
   });
 
   it('should add and delete subtopics correctly', async function() {
-    await topicEditorPage.moveToSubtopicsTab();
-    await topicEditorPage.addSubtopic('Subtopic 1');
-    await topicEditorPage.expectNumberOfSubtopicsToBe(1);
+    await topicEditorPage.addSubtopic(
+      'Subtopic 1', '../data/test2_svg.svg', 'Subtopic content');
     await topicEditorPage.saveTopic('Added subtopic.');
 
     await topicEditorPage.get(topicId);
-    await topicEditorPage.moveToSubtopicsTab();
     await topicEditorPage.expectNumberOfSubtopicsToBe(1);
     await topicEditorPage.deleteSubtopicWithIndex(0);
     await topicEditorPage.expectNumberOfSubtopicsToBe(0);
@@ -165,44 +163,54 @@ describe('Topic editor functionality', function() {
     await storyEditorPage.expectNumberOfChaptersToBe(1);
   });
 
-  it('should assign a skill to, between, and from subtopics', async function() {
-    await topicsAndSkillsDashboardPage.get();
-    await topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
-      'Skill 2', 'Concept card explanation', true);
-    var TOPIC_NAME = 'TASE2';
-    var TOPIC_DESCRIPTION = 'TASE2 description';
-    await topicsAndSkillsDashboardPage.get();
-    await topicsAndSkillsDashboardPage.createTopic(TOPIC_NAME,
-      TOPIC_DESCRIPTION, false);
-    await topicsAndSkillsDashboardPage.get();
-    await topicsAndSkillsDashboardPage.navigateToSkillsTab();
-    await topicsAndSkillsDashboardPage.filterSkillsByStatus(
-      SKILL_STATUS_UNASSIGNED);
-    await topicsAndSkillsDashboardPage.assignSkillWithIndexToTopicByTopicName(
-      0, TOPIC_NAME);
+  it('should assign a skill to, and from subtopics',
+    async function() {
+      await topicsAndSkillsDashboardPage.get();
+      await (
+        topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
+          'Skill 2', 'Concept card explanation', true));
+      var TOPIC_NAME = 'TASE2';
+      var TOPIC_DESCRIPTION = 'TASE2 description';
+      await topicsAndSkillsDashboardPage.get();
+      await topicsAndSkillsDashboardPage.createTopic(TOPIC_NAME,
+        TOPIC_DESCRIPTION, false);
+      await topicsAndSkillsDashboardPage.get();
+      await topicsAndSkillsDashboardPage.navigateToSkillsTab();
+      await topicsAndSkillsDashboardPage.filterSkillsByStatus(
+        SKILL_STATUS_UNASSIGNED);
+      await topicsAndSkillsDashboardPage.assignSkillWithIndexToTopicByTopicName(
+        0, TOPIC_NAME);
 
-    await topicsAndSkillsDashboardPage.get();
-    await topicsAndSkillsDashboardPage.editTopic(TOPIC_NAME);
-    await topicEditorPage.moveToSubtopicsTab();
-    await topicEditorPage.addSubtopic('Subtopic 1');
-    await topicEditorPage.addSubtopic('Subtopic 2');
-    await topicEditorPage.saveTopic('Added subtopics.');
+      await topicsAndSkillsDashboardPage.get();
+      await topicsAndSkillsDashboardPage.editTopic(TOPIC_NAME);
 
-    await topicEditorPage.expectSubtopicToHaveSkills(0, []);
-    await topicEditorPage.expectSubtopicToHaveSkills(1, []);
+      await topicEditorPage.addSubtopic(
+        'Subtopic 1', '../data/test2_svg.svg', 'Subtopic1 Content');
+      await topicEditorPage.saveTopic('Added subtopic.');
 
-    await topicEditorPage.dragSkillToSubtopic(0, 0);
-    await topicEditorPage.expectSubtopicToHaveSkills(0, ['Skill 2']);
-    await topicEditorPage.expectSubtopicToHaveSkills(1, []);
+      await topicEditorPage.navigateToTopicEditorTab();
+      await topicEditorPage.addSubtopic(
+        'Subtopic 2', '../data/test2_svg.svg', 'Subtopic2 Content');
+      await topicEditorPage.saveTopic('Added subtopics.');
 
-    await topicEditorPage.dragSkillBetweenSubtopics(0, 0, 1);
-    await topicEditorPage.expectSubtopicToHaveSkills(0, []);
-    await topicEditorPage.expectSubtopicToHaveSkills(1, ['Skill 2']);
+      await topicEditorPage.navigateToTopicEditorTab();
+      await topicEditorPage.navigateToSubtopicWithIndex(0);
+      await topicEditorPage.expectSubtopicToHaveSkills([]);
 
-    await topicEditorPage.dragSkillFromSubtopicToUncategorized(1, 0);
-    await topicEditorPage.expectSubtopicToHaveSkills(0, []);
-    await topicEditorPage.expectSubtopicToHaveSkills(1, []);
-  });
+      await topicEditorPage.navigateToTopicEditorTab();
+      await topicEditorPage.navigateToSubtopicWithIndex(1);
+      await topicEditorPage.expectSubtopicToHaveSkills([]);
+
+      await topicEditorPage.navigateToTopicEditorTab();
+      await topicEditorPage.navigateToSubtopicWithIndex(0);
+      await topicEditorPage.dragSkillToSubtopic(0, 0);
+      await topicEditorPage.expectSubtopicToHaveSkills(['Skill 2']);
+
+      await topicEditorPage.navigateToTopicEditorTab();
+      await topicEditorPage.navigateToSubtopicWithIndex(0);
+      await topicEditorPage.dragSkillFromSubtopicToUncategorized(0);
+      await topicEditorPage.expectSubtopicToHaveSkills([]);
+    });
 
   afterEach(async function() {
     await general.checkForConsoleErrors([]);
