@@ -36,6 +36,17 @@ export = {
   "DEFAULT_THUMBNAIL_ICON": "Lightbulb",
   "DEFAULT_CATEGORY_ICON": "Lightbulb",
 
+  "SKILL_STATUS_OPTIONS": {
+    "ALL": "All",
+    "ASSIGNED": "Assigned",
+    "UNASSIGNED": "Unassigned"
+  },
+  "TOPIC_SKILL_DASHBOARD_SORT_OPTIONS": {
+    "IncreasingCreatedOn": "Newly Created",
+    "DecreasingCreatedOn": "Oldest Created",
+    "IncreasingUpdatedOn": "Most Recently Updated",
+    "DecreasingUpdatedOn": "Least Recently Updated"
+  },
   // These categories are shown in the library navbar. The categories should
   // be in sorted order.
   "SEARCH_DROPDOWN_CATEGORIES": ["Algorithms", "Architecture", "Art",
@@ -5114,6 +5125,7 @@ export = {
       "LogicProof",
       "NumericInput",
       "SetInput",
+      "AlgebraicExpressionInput",
       "MathExpressionInput",
       "NumberWithUnits"
     ]
@@ -5191,7 +5203,7 @@ export = {
   },
 
   "ENABLE_PREREQUISITE_SKILLS": false,
-  "ENABLE_LITERALLY_CANVAS_EDITOR": false,
+  "ENABLE_SVG_EDITOR_RTE": false,
 
   // For the full new structures viewer features, both
   // ENABLE_NEW_STRUCTURE_PLAYERS and ENABLE_NEW_STRUCTURE_VIEWER_UPDATES has

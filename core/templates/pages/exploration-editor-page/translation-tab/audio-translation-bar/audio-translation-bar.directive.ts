@@ -93,7 +93,7 @@ angular.module('oppia').directive('audioTranslationBar', [
         }).then(function(permissions) {
           $('.oppia-translation-tab').on('dragover', function(evt) {
             evt.preventDefault();
-            scope.dropAreaIsAccessible = permissions.can_voiceover;
+            scope.dropAreaIsAccessible = permissions.canVoiceover;
             scope.userIsGuest = !userIsLoggedIn;
             scope.$digest();
             return false;
@@ -406,6 +406,7 @@ angular.module('oppia').directive('audioTranslationBar', [
               AudioPlayerService.load(audioTranslation.filename)
                 .then(function() {
                   $scope.audioLoadingIndicatorIsShown = false;
+                  $scope.audioIsLoading = false;
                   $scope.audioTimerIsShown = true;
                   AudioPlayerService.play();
                 });
@@ -439,11 +440,11 @@ angular.module('oppia').directive('audioTranslationBar', [
               $scope.contentId, $scope.languageCode);
             if (audioTranslationObject) {
               $scope.isAudioAvailable = true;
-              $scope.isLoadingAudio = true;
+              $scope.audioIsLoading = true;
               $scope.selectedRecording = false;
               $scope.audioNeedsUpdate = audioTranslationObject.needsUpdate;
               $scope.durationSecs =
-                Math.round(audioTranslationObject.duration_secs);
+                Math.round(audioTranslationObject.durationSecs);
             } else {
               $scope.isAudioAvailable = false;
               $scope.audioBlob = null;
@@ -531,6 +532,9 @@ angular.module('oppia').directive('audioTranslationBar', [
             $scope.waveSurfer = null;
 
             document.body.onkeyup = function(e) {
+              if (!$scope.canVoiceover) {
+                return;
+              }
               if (e.code === 'KeyR' && !$scope.isAudioAvailable) {
                 // Used as shortcut key for recording
                 toggleStartAndStopRecording();
