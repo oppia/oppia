@@ -65,7 +65,7 @@ describe('Topic editor functionality', function() {
     await topicEditorPage.changeTopicName(NEW_TOPIC_NAME);
     var defaultThumbnailImageSrc = (
       await topicEditorPage.getTopicThumbnailSource());
-    await topicEditorPage.submitTopicThumbnail('../data/test_svg.svg');
+    await topicEditorPage.submitTopicThumbnail('../data/test2_svg.svg', true);
     var updatedThumbnailImageSrc = (
       await topicEditorPage.getTopicThumbnailSource());
     expect(defaultThumbnailImageSrc).not.toEqual(updatedThumbnailImageSrc);
@@ -88,23 +88,24 @@ describe('Topic editor functionality', function() {
       TOPIC_NAME, TOPIC_DESCRIPTION, false);
     var defaultThumbnailSrc = (
       await topicEditorPage.getTopicThumbnailSource());
-    await topicEditorPage.submitTopicThumbnail('../data/test_svg.svg');
+    await topicEditorPage.submitTopicThumbnail('../data/test2_svg.svg', true);
     var updatedTopicThumbnailSrc = (
       await topicEditorPage.getTopicThumbnailSource());
     expect(defaultThumbnailSrc).not.toEqual(updatedTopicThumbnailSrc);
     await topicEditorPage.changeTopicDescription('Topic Description');
     await topicEditorPage.saveTopic('Changed topic name and description.');
-    await topicEditorPage.moveToSubtopicsTab();
-    await topicEditorPage.addSubtopic('Subtopic 1');
-    await topicEditorPage.editSubtopicWithIndex(0);
+    await topicEditorPage.navigateToTopicEditorTab();
+    await topicEditorPage.addSubtopic(
+      'Subtopic 1', '../data/test_svg.svg', 'Subtopic1 content');
+    await topicEditorPage.navigateToTopicEditorTab();
+    await topicEditorPage.navigateToSubtopicWithIndex(0);
     await topicEditorPage.changeSubtopicTitle('Modified Title');
-    await topicEditorPage.changeSubtopicPageContents(
-      await forms.toRichText('Subtopic Contents'));
-    await topicEditorPage.submitSubtopicThumbnail('../data/test_svg.svg');
+    await topicEditorPage.changeSubtopicPageContents('Subtopic Contents');
+    await topicEditorPage.submitSubtopicThumbnail(
+      '../data/test2_svg.svg', true);
     var updatedSubtopicThumbnailSrc = (
       await topicEditorPage.getSubtopicThumbnailSource());
     expect(defaultThumbnailSrc).not.toEqual(updatedSubtopicThumbnailSrc);
-    await topicEditorPage.saveSubtopic();
     await topicEditorPage.saveTopic('Edited subtopic.');
 
     await topicsAndSkillsDashboardPage.get();
@@ -113,10 +114,9 @@ describe('Topic editor functionality', function() {
       defaultThumbnailSrc);
     await topicEditorPage.expectTopicDescriptionToBe('Topic Description');
 
-    await topicEditorPage.moveToSubtopicsTab();
     await topicEditorPage.expectTitleOfSubtopicWithIndexToMatch(
       'Modified Title', 0);
-    await topicEditorPage.editSubtopicWithIndex(0);
+    await topicEditorPage.navigateToSubtopicWithIndex(0);
     expect(await topicEditorPage.getSubtopicThumbnailSource()).not.toEqual(
       defaultThumbnailSrc);
     await topicEditorPage.expectSubtopicPageContentsToMatch(
@@ -138,7 +138,7 @@ describe('Topic editor functionality', function() {
     await topicEditorPage.navigateToStoryWithIndex(0);
     var defaultThumbnailImageSrc = (
       await storyEditorPage.getStoryThumbnailSource());
-    await storyEditorPage.submitStoryThumbnail('../data/test_svg.svg');
+    await storyEditorPage.submitStoryThumbnail('../data/test2_svg.svg');
     expect(await storyEditorPage.getStoryThumbnailSource()).not.toEqual(
       defaultThumbnailImageSrc);
     await storyEditorPage.saveStory('Added thumbnail.');
@@ -209,19 +209,20 @@ describe('Chapter editor functionality', function() {
     await topicsAndSkillsDashboardPage.createTopic(TOPIC_NAME,
       'Topic description', false);
     defaultThumbnailImageSrc = await topicEditorPage.getTopicThumbnailSource();
-    await topicEditorPage.submitTopicThumbnail('../data/test_svg.svg');
+    await topicEditorPage.submitTopicThumbnail('../data/test2_svg.svg', true);
     expect(await topicEditorPage.getTopicThumbnailSource()).not.toEqual(
       defaultThumbnailImageSrc);
     await topicEditorPage.changeTopicDescription('Topic Description');
     await topicEditorPage.expectTopicDescriptionToBe('Topic Description');
     await topicEditorPage.saveTopic('Changed topic name and description.');
     await topicEditorPage.createStory('Story 0');
-    await storyEditorPage.submitStoryThumbnail('../data/test_svg.svg');
+    await storyEditorPage.submitStoryThumbnail('../data/test2_svg.svg');
     expect(await storyEditorPage.getStoryThumbnailSource()).not.toEqual(
       defaultThumbnailImageSrc);
     await storyEditorPage.createInitialChapter('Chapter 1');
     await storyEditorPage.selectInitialChapterByName('Chapter 1');
-    await storyEditorPage.submitChapterThumbnail('../data/test_svg.svg');
+    await storyEditorPage.submitChapterThumbnail(
+      '../data/test2_svg.svg', false);
     expect(await storyEditorPage.getChapterThumbnailSource()).not.toEqual(
       defaultThumbnailImageSrc);
     await storyEditorPage.changeNodeOutline(

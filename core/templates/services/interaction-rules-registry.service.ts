@@ -19,6 +19,9 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
+import { AlgebraicExpressionInputRulesService } from
+  // eslint-disable-next-line max-len
+  'interactions/AlgebraicExpressionInput/directives/algebraic-expression-input-rules.service';
 import { CodeReplRulesService } from
   'interactions/CodeRepl/directives/code-repl-rules.service';
 import { ContinueRulesService } from
@@ -67,6 +70,8 @@ export class InteractionRulesRegistryService {
   private rulesServiceRegistry: Map<string, object>;
 
   constructor(
+      private algebraicExpressionInputRulesService:
+        AlgebraicExpressionInputRulesService,
       private codeReplRulesService: CodeReplRulesService,
       private continueRulesService: ContinueRulesService,
       private dragAndDropSortInputRulesService:
@@ -87,6 +92,8 @@ export class InteractionRulesRegistryService {
       private setInputRulesService: SetInputRulesService,
       private textInputRulesService: TextInputRulesService) {
     this.rulesServiceRegistry = new Map(Object.entries({
+      AlgebraicExpressionInputRulesService:
+        this.algebraicExpressionInputRulesService,
       CodeReplRulesService: this.codeReplRulesService,
       ContinueRulesService: this.continueRulesService,
       DragAndDropSortInputRulesService: this.dragAndDropSortInputRulesService,

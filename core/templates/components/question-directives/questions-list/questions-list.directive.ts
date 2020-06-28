@@ -45,7 +45,6 @@ require(
   'pages/topic-editor-page/modal-templates/' +
   'questions-list-select-skill-and-difficulty-modal.controller.ts');
 
-require('components/entity-creation-services/question-creation.service.ts');
 require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/question/editable-question-backend-api.service.ts');
 require('domain/question/QuestionObjectFactory.ts');
@@ -61,7 +60,9 @@ require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
 require('services/alerts.service.ts');
+require('services/context.service.ts');
 require('services/contextual/url.service.ts');
+require('services/image-local-storage.service.ts');
 require('services/question-validation.service.ts');
 
 angular.module('oppia').directive('questionsList', [
@@ -88,24 +89,26 @@ angular.module('oppia').directive('questionsList', [
       controllerAs: '$ctrl',
       controller: [
         '$scope', '$filter', '$http', '$q', '$timeout', '$uibModal', '$window',
-        '$location', 'AlertsService', 'QuestionCreationService', 'UrlService',
-        'NUM_QUESTIONS_PER_PAGE', 'EditableQuestionBackendApiService',
-        'SkillBackendApiService', 'MisconceptionObjectFactory',
-        'QuestionObjectFactory', 'SkillDifficultyObjectFactory',
-        'SkillSummaryObjectFactory', 'DEFAULT_SKILL_DIFFICULTY',
+        '$location', 'AlertsService', 'ContextService',
+        'EditableQuestionBackendApiService', 'ImageLocalStorageService',
+        'MisconceptionObjectFactory', 'QuestionObjectFactory',
+        'QuestionsListService', 'QuestionUndoRedoService',
+        'SkillBackendApiService', 'SkillDifficultyObjectFactory',
+        'SkillSummaryObjectFactory', 'StateEditorService', 'UndoRedoService',
+        'UrlService', 'DEFAULT_SKILL_DIFFICULTY',
         'EVENT_QUESTION_SUMMARIES_INITIALIZED', 'MODE_SELECT_DIFFICULTY',
-        'MODE_SELECT_SKILL', 'SKILL_DIFFICULTIES', 'StateEditorService',
-        'QuestionUndoRedoService', 'UndoRedoService', 'QuestionsListService',
+        'MODE_SELECT_SKILL', 'NUM_QUESTIONS_PER_PAGE', 'SKILL_DIFFICULTIES',
         function(
             $scope, $filter, $http, $q, $timeout, $uibModal, $window,
-            $location, AlertsService, QuestionCreationService, UrlService,
-            NUM_QUESTIONS_PER_PAGE, EditableQuestionBackendApiService,
-            SkillBackendApiService, MisconceptionObjectFactory,
-            QuestionObjectFactory, SkillDifficultyObjectFactory,
-            SkillSummaryObjectFactory, DEFAULT_SKILL_DIFFICULTY,
+            $location, AlertsService, ContextService,
+            EditableQuestionBackendApiService, ImageLocalStorageService,
+            MisconceptionObjectFactory, QuestionObjectFactory,
+            QuestionsListService, QuestionUndoRedoService,
+            SkillBackendApiService, SkillDifficultyObjectFactory,
+            SkillSummaryObjectFactory, StateEditorService, UndoRedoService,
+            UrlService, DEFAULT_SKILL_DIFFICULTY,
             EVENT_QUESTION_SUMMARIES_INITIALIZED, MODE_SELECT_DIFFICULTY,
-            MODE_SELECT_SKILL, SKILL_DIFFICULTIES, StateEditorService,
-            QuestionUndoRedoService, UndoRedoService, QuestionsListService) {
+            MODE_SELECT_SKILL, NUM_QUESTIONS_PER_PAGE, SKILL_DIFFICULTIES) {
           var ctrl = this;
           var _reInitializeSelectedSkillIds = function() {
             ctrl.selectedSkillId = ctrl.getSelectedSkillId();
@@ -177,9 +180,11 @@ angular.module('oppia').directive('questionsList', [
             }
             _reInitializeSelectedSkillIds();
             if (!ctrl.questionIsBeingUpdated) {
+              var imagesData = ImageLocalStorageService.getStoredImagesData();
+              ImageLocalStorageService.flushStoredImagesData();
               EditableQuestionBackendApiService.createQuestion(
                 ctrl.newQuestionSkillIds, ctrl.newQuestionSkillDifficulties,
-                ctrl.question.toBackendDict(true)
+                ctrl.question.toBackendDict(true), imagesData
               ).then(function() {
                 QuestionsListService.resetPageNumber();
                 ctrl.getQuestionSummariesAsync(
@@ -221,7 +226,7 @@ angular.module('oppia').directive('questionsList', [
             ctrl.questionStateData = ctrl.question.getStateData();
             ctrl.questionIsBeingUpdated = false;
             ctrl.newQuestionIsBeingCreated = true;
-            ctrl.openQuestionEditor();
+            ctrl.openQuestionEditor(ctrl.newQuestionSkillDifficulties[0]);
           };
 
           ctrl.createQuestion = function() {
@@ -465,7 +470,31 @@ angular.module('oppia').directive('questionsList', [
             ctrl.editorIsOpen = true;
             var groupedSkillSummaries = ctrl.getGroupedSkillSummaries();
             var selectedSkillId = ctrl.selectedSkillId;
+            ImageLocalStorageService.flushStoredImagesData();
+            if (newQuestionIsBeingCreated) {
+              ContextService.setImageSaveDestinationToLocalStorage();
+            }
             $location.hash(questionId);
+            var skillIdToNameMapping = (
+              ctrl.getAllSkillSummaries().reduce((obj, skill) => (
+                obj[skill.getId()] = skill.getDescription(), obj), {}));
+            var skillIdToRubricMapping = ctrl.getSkillIdToRubricsObject();
+            var skillNames = [];
+            var rubrics = [];
+            if (ctrl.newQuestionIsBeingCreated &&
+                ctrl.selectSkillModalIsShown()) {
+              skillNames = ctrl.newQuestionSkillIds.map(
+                skillId => skillIdToNameMapping[skillId]);
+              rubrics = ctrl.newQuestionSkillIds.map(
+                (skillId, index) => skillIdToRubricMapping[skillId].find(
+                  rubric => rubric.getDifficulty() === ctrl.getDifficultyString(
+                    parseFloat(ctrl.newQuestionSkillDifficulties[index]))));
+            } else {
+              skillNames = [skillIdToNameMapping[ctrl.selectedSkillId]];
+              rubrics = [skillIdToRubricMapping[ctrl.selectedSkillId].find(
+                rubric => rubric.getDifficulty() === ctrl.getDifficultyString(
+                  parseFloat(questionDifficulty)))];
+            }
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/components/question-directives/modal-templates/' +
@@ -475,16 +504,19 @@ angular.module('oppia').directive('questionsList', [
               resolve: {
                 associatedSkillSummaries: () => associatedSkillSummaries,
                 canEditQuestion: () => canEditQuestion,
+                categorizedSkills: () => categorizedSkills,
                 groupedSkillSummaries: () => groupedSkillSummaries,
                 misconceptionsBySkill: () => misconceptionsBySkill,
                 newQuestionIsBeingCreated: () => newQuestionIsBeingCreated,
                 question: () => question,
                 questionId: () => questionId,
                 questionStateData: () => questionStateData,
-                categorizedSkills: () => categorizedSkills
+                rubrics: () => rubrics,
+                skillNames: () => skillNames
               },
               controller: 'QuestionEditorModalController',
             }).result.then(function(modalObject) {
+              ContextService.resetImageSaveDestination();
               $location.hash(null);
               ctrl.editorIsOpen = false;
               if (modalObject.skillLinkageModificationsArray.length > 0) {
@@ -502,9 +534,11 @@ angular.module('oppia').directive('questionsList', [
                     }, 500);
                   });
               } else {
+                ContextService.resetImageSaveDestination();
                 ctrl.saveAndPublishQuestion(modalObject.commitMessage);
               }
             }, function() {
+              ContextService.resetImageSaveDestination();
               ctrl.editorIsOpen = false;
               $location.hash(null);
             });

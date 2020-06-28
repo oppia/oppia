@@ -511,6 +511,7 @@ angular.module('oppia').directive('stateResponses', [
             var activeStateName = $scope.stateName;
             return outcome && (outcome.dest === activeStateName);
           };
+
           ctrl.$onInit = function() {
             $scope.SHOW_TRAINABLE_UNRESOLVED_ANSWERS = (
               SHOW_TRAINABLE_UNRESOLVED_ANSWERS);
@@ -520,8 +521,6 @@ angular.module('oppia').directive('stateResponses', [
               ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE);
             $scope.stateSolicitAnswerDetailsService = (
               StateSolicitAnswerDetailsService);
-            $scope.dragDotsImgUrl = UrlInterpolationService.getStaticImageUrl(
-              '/general/drag_dots.png');
             $scope.$on('initializeAnswerGroups', function(evt, data) {
               ResponsesService.init(data);
               $scope.answerGroups = ResponsesService.getAnswerGroups();
@@ -541,6 +540,10 @@ angular.module('oppia').directive('stateResponses', [
                 ResponsesService.getActiveAnswerGroupIndex());
               $rootScope.$broadcast('externalSave');
             });
+
+            $scope.getStaticImageUrl = function(imagePath) {
+              return UrlInterpolationService.getStaticImageUrl(imagePath);
+            };
 
             $scope.$on('onInteractionIdChanged', function(
                 evt, newInteractionId) {
@@ -579,12 +582,17 @@ angular.module('oppia').directive('stateResponses', [
             });
 
             $scope.$on('updateAnswerChoices', function(evt, newAnswerChoices) {
-              ResponsesService.updateAnswerChoices(
-                newAnswerChoices, function(newAnswerGroups) {
-                  $scope.onSaveInteractionAnswerGroups(newAnswerGroups);
-                  $scope.refreshWarnings()();
-                });
+              ResponsesService.updateAnswerChoices(newAnswerChoices);
             });
+            $scope.$on(
+              'handleCustomArgsUpdate',
+              function(evt, newAnswerChoices) {
+                ResponsesService.handleCustomArgsUpdate(
+                  newAnswerChoices, function(newAnswerGroups) {
+                    $scope.onSaveInteractionAnswerGroups(newAnswerGroups);
+                    $scope.refreshWarnings()();
+                  });
+              });
             // When the page is scrolled so that the top of the page is above
             // the browser viewport, there are some bugs in the positioning of
             // the helper. This is a bug in jQueryUI that has not been fixed
