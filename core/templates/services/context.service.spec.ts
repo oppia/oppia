@@ -175,22 +175,6 @@ describe('Context service', () => {
     });
   });
 
-  describe('behavior in the subtopic viewer view', () => {
-    beforeEach(() => {
-      ecs = TestBed.get(ContextService);
-      urlService = TestBed.get(UrlService);
-      spyOn(urlService, 'getPathname').and.returnValue('/subtopic/topic_id/1');
-    });
-
-    it('should correctly retrieve the topic id', () => {
-      expect(ecs.getEntityId()).toBe('topic_id');
-    });
-
-    it('should correctly retrieve the entity type', () => {
-      expect(ecs.getEntityType()).toBe('subtopic');
-    });
-  });
-
   describe('behavior in the story editor view', () => {
     beforeEach(() => {
       ecs = TestBed.get(ContextService);

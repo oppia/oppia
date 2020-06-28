@@ -217,7 +217,7 @@ angular.module('oppia').factory('QuestionPlayerEngineService', [
 
         // Use angular.copy() to clone the object
         // since classificationResult.outcome points
-        // at oldState.interaction.default_outcome
+        // at oldState.interaction.default_outcome.
         var outcome = angular.copy(classificationResult.outcome);
         // Compute the data for the next state.
         var oldParams = {
