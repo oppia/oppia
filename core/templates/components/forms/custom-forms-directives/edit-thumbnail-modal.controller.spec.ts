@@ -126,7 +126,7 @@ describe('Edit Thumbnail Modal Controller', function() {
     setTimeout(function() {
       $timeout.flush();
       done();
-      // Dispatch on load event
+      // ---- Dispatch on load event ----
       image.dispatchEvent(new Event('load'));
 
       expect(fadeInElementSpy).toHaveBeenCalled();
@@ -137,7 +137,7 @@ describe('Edit Thumbnail Modal Controller', function() {
       expect($scope.uploadedImage).toBe(null);
       expect($scope.invalidImageWarningIsShown).toBe(false);
 
-      // Save information
+      // ---- Save information ----
       $scope.confirm();
       expect($uibModalInstance.close).toHaveBeenCalled();
     }, 800);

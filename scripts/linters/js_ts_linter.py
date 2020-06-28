@@ -1130,8 +1130,8 @@ class ThirdPartyJsTsLintChecksManager(python_utils.OBJECT):
 
         if num_files_with_errors:
             for error in result_list:
-                python_utils.PRINT(error)
-                summary_messages.append(error)
+                python_utils.PRINT(python_utils.convert_to_bytes(error))
+                summary_messages.append(python_utils.convert_to_bytes(error))
             summary_message = (
                 '%s %s JavaScript and Typescript files' % (
                     linter_utils.FAILED_MESSAGE_PREFIX, num_files_with_errors))
