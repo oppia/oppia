@@ -16,17 +16,27 @@
  * @fileoverview Controller for edit thumbnail modal.
  */
 
+require(
+  'components/common-layout-directives/common-elements/' +
+  'confirm-or-cancel-modal.controller.ts');
+
 require('services/image-upload-helper.service.ts');
 
 angular.module('oppia').controller('EditThumbnailModalController', [
-  '$scope', '$timeout', '$uibModalInstance', 'ImageUploadHelperService',
-  'allowedBgColors', 'aspectRatio', 'dimensions', 'getPreviewDescription',
-  'getPreviewDescriptionBgColor', 'getPreviewFooter', 'getPreviewTitle',
-  'openInUploadMode', 'tempBgColor', 'uploadedImage', 'uploadedImageMimeType',
-  function($scope, $timeout, $uibModalInstance, ImageUploadHelperService,
-      allowedBgColors, aspectRatio, dimensions, getPreviewDescription,
-      getPreviewDescriptionBgColor, getPreviewFooter, getPreviewTitle,
-      openInUploadMode, tempBgColor, uploadedImage, uploadedImageMimeType) {
+  '$controller', '$scope', '$timeout', '$uibModalInstance',
+  'ImageUploadHelperService', 'allowedBgColors', 'aspectRatio',
+  'dimensions', 'getPreviewDescription', 'getPreviewDescriptionBgColor',
+  'getPreviewFooter', 'getPreviewTitle', 'openInUploadMode',
+  'tempBgColor', 'uploadedImage', 'uploadedImageMimeType',
+  function($controller, $scope, $timeout, $uibModalInstance,
+      ImageUploadHelperService, allowedBgColors, aspectRatio,
+      dimensions, getPreviewDescription, getPreviewDescriptionBgColor,
+      getPreviewFooter, getPreviewTitle, openInUploadMode,
+      tempBgColor, uploadedImage, uploadedImageMimeType) {
+    $controller('ConfirmOrCancelModalController', {
+      $scope: $scope,
+      $uibModalInstance: $uibModalInstance
+    });
     $scope.uploadedImage = uploadedImage;
     $scope.invalidImageWarningIsShown = false;
     $scope.invalidTagsAndAttributes = {
@@ -126,10 +136,6 @@ angular.module('oppia').controller('EditThumbnailModalController', [
         openInUploadMode: openInUploadMode,
         dimensions: dimensions
       });
-    };
-
-    $scope.cancel = function() {
-      $uibModalInstance.dismiss('cancel');
     };
 
     if (uploadedImage) {

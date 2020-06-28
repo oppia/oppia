@@ -83,8 +83,7 @@ angular.module('oppia').controller('QuestionSuggestionEditorModalController', [
           $uibModalInstance.dismiss('cancel');
         }, function() {
           // Note to developers:
-          // This callback is triggered when the Cancel button
-          // is clicked.
+          // This callback is triggered when the cancel button is clicked.
           // No further action is needed.
         });
       } else {
