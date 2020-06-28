@@ -19,6 +19,7 @@ angular.module('oppia').controller('SaveValidationFailModalController', [
   '$scope', '$timeout', '$uibModalInstance', 'WindowRef',
   function(
       $scope, $timeout, $uibModalInstance, WindowRef) {
+    var MSECS_TO_REFRESH = 20;
     var _refreshPage = function(delay) {
       $timeout(function() {
         WindowRef.nativeWindow.location.reload();
@@ -27,7 +28,7 @@ angular.module('oppia').controller('SaveValidationFailModalController', [
 
     $scope.closeAndRefresh = function() {
       $uibModalInstance.dismiss('cancel');
-      _refreshPage(20);
+      _refreshPage(MSECS_TO_REFRESH);
     };
   }
 ]);

@@ -131,7 +131,7 @@ describe('AutosaveInfoModalsService', () => {
     expect(AutosaveInfoModalsService.isModalOpen()).toBe(false);
   });
 
-  it('should handler reject when dismissing show lost changes modal', () => {
+  it('should handle reject when dismissing show lost changes modal', () => {
     expect(AutosaveInfoModalsService.isModalOpen()).toBe(false);
     spyOn($uibModal, 'open').and.returnValue({
       result: $q.reject()

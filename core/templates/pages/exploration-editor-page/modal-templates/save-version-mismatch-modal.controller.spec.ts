@@ -80,8 +80,8 @@ describe('Save Version Mismatch Modal Controller', () => {
           reload: reloadSpy
         }
       });
-      const discardDraftSpy = spyOn(mockExplorationData, 'discardDraft').and
-        .callThrough();
+      const discardDraftSpy = (
+        spyOn(mockExplorationData, 'discardDraft').and.callThrough());
 
       $scope.discardChanges();
       expect(discardDraftSpy).toHaveBeenCalled();

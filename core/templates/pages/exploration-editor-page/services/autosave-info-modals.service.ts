@@ -62,9 +62,7 @@ angular.module('oppia').factory('AutosaveInfoModalsService', [
           // Prevent modal from closing when the user clicks outside it.
           backdrop: 'static',
           resolve: {
-            lostChanges: function() {
-              return lostChanges;
-            }
+            lostChanges: () => lostChanges
           },
           controller: 'SaveVersionMismatchModalController',
           windowClass: 'oppia-autosave-version-mismatch-modal'
@@ -84,9 +82,7 @@ angular.module('oppia').factory('AutosaveInfoModalsService', [
           // Prevent modal from closing when the user clicks outside it.
           backdrop: 'static',
           resolve: {
-            lostChanges: function() {
-              return lostChanges;
-            }
+            lostChanges: () => lostChanges
           },
           controller: 'LostChangesModalController',
           windowClass: 'oppia-lost-changes-modal'

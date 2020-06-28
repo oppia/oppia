@@ -22,6 +22,7 @@ angular.module('oppia').controller('SaveVersionMismatchModalController', [
   function(
       $log, $scope, $timeout, ExplorationDataService,
       LostChangeObjectFactory, WindowRef, lostChanges) {
+    var MSECS_TO_REFRESH = 20;
     var _refreshPage = function(delay) {
       $timeout(function() {
         WindowRef.nativeWindow.location.reload();
@@ -31,7 +32,7 @@ angular.module('oppia').controller('SaveVersionMismatchModalController', [
     // to discard the draft and reload the page thereafter.
     $scope.discardChanges = function() {
       ExplorationDataService.discardDraft(function() {
-        _refreshPage(20);
+        _refreshPage(MSECS_TO_REFRESH);
       });
     };
 
