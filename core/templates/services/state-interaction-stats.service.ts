@@ -137,6 +137,7 @@ export class StateInteractionStatsService {
             answer: this.getReadableAnswerString(state, datum.answer),
             frequency: datum.frequency,
             is_addressed: vizInfo.addressed_info_is_supported ?
+              interactionRulesService &&
               this.answerClassificationService
                 .isClassifiedExplicitlyOrGoesToNewState(
                   state.name, state, datum.answer, interactionRulesService) :
