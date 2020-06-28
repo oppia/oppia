@@ -69,7 +69,7 @@ export class ContextService {
   // This is PAGE_CONTEXT.EXPLORATION_EDITOR or
   // PAGE_CONTEXT.EXPLORATION_PLAYER or PAGE_CONTEXT.QUESTION_EDITOR.
   // If the current page is not one in either EXPLORATION_EDITOR or
-  // EXPLORATION_PLAYER or QUESTION_EDITOR then return PAGE_CONTEXT.OTHER
+  // EXPLORATION_PLAYER or QUESTION_EDITOR then return PAGE_CONTEXT.OTHER.
   getPageContext(): string {
     if (this.pageContext) {
       return this.pageContext;
@@ -167,7 +167,7 @@ export class ContextService {
     return decodeURI(pathnameArray[2]);
   }
 
-  // add constants for entity type
+  // Add constants for entity type.
   getEntityType(): string {
     if (this.customEntityContext !== null) {
       return this.customEntityContext.getType();
