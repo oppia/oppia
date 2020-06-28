@@ -180,7 +180,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                 # Compile typescript file which has syntax invalid for JS file.
                 compiled_js_filepath = self._get_compiled_ts_filepath(filepath)
 
-                file_content = FILE_CACHE.read(compiled_js_filepath)
+                file_content = self.file_cache.read(compiled_js_filepath)
                 parsed_js_and_ts_files[filepath] = esprima.parseScript(
                     file_content)
 
@@ -796,7 +796,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                     if os.path.isfile(corresponding_angularjs_filepath):
                         compiled_js_filepath = self._get_compiled_ts_filepath(
                             corresponding_angularjs_filepath)
-                        file_content = FILE_CACHE.read(
+                        file_content = self.file_cache.read(
                             compiled_js_filepath).decode('utf-8')
 
                         parsed_script = esprima.parseScript(file_content)
@@ -819,12 +819,12 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                                     expression.arguments[1])
                                 # Check if const is declared outside the
                                 # class.
-                                if constants_arguments.property:
+                                if angularjs_constants_value.property:
                                     angularjs_constants_value = (
-                                        constants_arguments.property.name)
+                                        angularjs_constants_value.property.name)
                                 else:
                                     angularjs_constants_value = (
-                                        constants_arguments.name)
+                                        angularjs_constants_value.name)
                                 if angularjs_constants_value != (
                                         angularjs_constants_name):
                                     failed = True
