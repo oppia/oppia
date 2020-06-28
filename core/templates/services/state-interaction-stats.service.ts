@@ -96,6 +96,12 @@ export class StateInteractionStatsService {
     const interactionRulesService = (
       this.interactionRulesRegistryService.getRulesServiceByInteractionId(
         state.interaction.id));
+    const calculateIsAddressed = (answer: Answer): boolean => {
+      return (
+        interactionRulesService !== null &&
+        this.answerClassificationService.isClassifiedExplicitlyOrGoesToNewState(
+          state.name, state, answer, interactionRulesService));
+    };
 
     const statsPromise = this.stateInteractionStatsBackendApiService.getStats(
       explorationId, state.name).then(vizInfo => <IStateRulesStats> {
@@ -108,10 +114,7 @@ export class StateInteractionStatsService {
             frequency: datum.frequency,
             isAddressed: (
               info.addressedInfoIsSupported ?
-              this.answerClassificationService
-                .isClassifiedExplicitlyOrGoesToNewState(
-                  state.name, state, datum.answer, interactionRulesService) :
-              undefined)
+                calculateIsAddressed(datum.answer) : undefined)
           }),
           id: info.id,
           options: info.options
