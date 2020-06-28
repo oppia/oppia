@@ -46,6 +46,10 @@ angular.module('oppia').component('oppiaInteractiveMathEquationInput', {
 
       ctrl.isCurrentAnswerValid = function() {
         if (ctrl.hasBeenTouched) {
+          // Replacing abs symbol, '|x|', with text, 'abs(x)' since the symbol
+          // is not compatible with nerdamer or with the backend validations.
+          ctrl.value = MathInteractionsService.replaceAbsSymbolWithText(
+            ctrl.value);
           let answerIsValid = MathInteractionsService.validateEquation(
             ctrl.value);
           ctrl.warningText = MathInteractionsService.getWarningText();

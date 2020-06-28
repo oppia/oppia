@@ -266,4 +266,17 @@ describe('MathInteractionsService', () => {
     expect(mathInteractionsService.insertMultiplicationSigns(
       'Al^2')).toBe('A*l^2');
   });
+
+  it('should replace abs symbol with text', function() {
+    expect(mathInteractionsService.replaceAbsSymbolWithText(
+      '|x|')).toBe('abs(x)');
+    expect(mathInteractionsService.replaceAbsSymbolWithText(
+      '40alpha/|beta|')).toBe('40alpha/abs(beta)');
+    expect(mathInteractionsService.replaceAbsSymbolWithText(
+      'abs(xyz)')).toBe('abs(xyz)');
+    expect(mathInteractionsService.replaceAbsSymbolWithText(
+      '|sqrt(a+b^2)|')).toBe('abs(sqrt(a+b^2))');
+    expect(mathInteractionsService.replaceAbsSymbolWithText(
+      '||')).toBe('abs()');
+  });
 });

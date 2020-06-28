@@ -141,7 +141,7 @@ export class MathInteractionsService {
     return this.warningText;
   }
 
-  insertMultiplicationSigns(expressionString: string) {
+  insertMultiplicationSigns(expressionString: string): string {
     // Assumes that given expressionString is valid.
     // Nerdamer allows multi-character variables so, 'ax+b' will be considered
     // to have variables: [ax, b], but we want a and x to be considered as
@@ -160,6 +160,28 @@ export class MathInteractionsService {
       }
     }
     return expressionString;
+  }
+
+  replaceAbsSymbolWithText(expressionString: string): string {
+    // The guppy editor outputs abs as a symbol '|x|' but that is incompatible
+    // with nerdamer and the backend validations. Both of them need 'abs(x)',
+    // hence the replacement.
+    let opening = true;
+    let modifiedExpressionList = [];
+    for (let i = 0; i < expressionString.length; i++) {
+      if (expressionString[i] === '|') {
+        if (opening) {
+          modifiedExpressionList.push('abs(');
+          opening = false;
+        } else {
+          modifiedExpressionList.push(')');
+          opening = true;
+        }
+      } else {
+        modifiedExpressionList.push(expressionString[i]);
+      }
+    }
+    return modifiedExpressionList.join('');
   }
 }
 
