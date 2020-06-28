@@ -57,7 +57,7 @@ install:
 - python -m scripts.install_third_party_libs
 
 script:
-- files_changed=$(git diff --name-only HEAD...$TRAVIS_BRANCH)
+- files_changed=$(git diff --name-only HEAD...develop)
 - echo $files_changed
 - RUN_TESTS=true
 - if [ "$files_changed" == "AUTHORS CHANGELOG CONTRIBUTORS core/templates/pages/about-page/about-page.constants.ts" ]; then RUN_TESTS=false; fi
