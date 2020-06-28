@@ -197,7 +197,7 @@ describe('StateImprovementSuggestionService', () => {
       }
     };
 
-    // 2 states that are both self-looping
+    // 2 states that are both self-looping.
     var statesDict3 = {
       'State 1': {
         content: {

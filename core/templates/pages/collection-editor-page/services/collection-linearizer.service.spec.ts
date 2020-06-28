@@ -95,7 +95,7 @@ describe('Collection linearizer service', function() {
       thirdCollectionNodeBackendObject);
   }));
 
-  // The linear order of explorations is: exp_id0 -> exp_id1 -> exp_id2
+  // The linear order of explorations is: exp_id0 -> exp_id1 -> exp_id2.
   var createLinearCollection = function() {
     var collection = collectionObjectFactory.createEmptyCollection();
 

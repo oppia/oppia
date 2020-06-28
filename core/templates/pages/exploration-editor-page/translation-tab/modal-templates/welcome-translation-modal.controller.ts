@@ -38,7 +38,7 @@ angular.module('oppia').controller('WelcomeTranslationModalController', [
     SiteAnalyticsService.registerTutorialModalOpenEvent(
       $scope.explorationId);
 
-    // translation tutorial image url for modal
+    // Translation tutorial image url for modal.
     $scope.translationWelcomeImgUrl = (
       UrlInterpolationService.getStaticImageUrl(
         '/general/editor_welcome.svg'));

@@ -107,7 +107,7 @@ describe('Edit Thumbnail Modal Controller', function() {
       element);
     const fadeInElementSpy = spyOn(element, 'fadeIn').and.callThrough();
 
-    // spy Image constructor to handle its events.
+    // Spy Image constructor to handle its events.
     const image = document.createElement('img');
     spyOn(window, 'Image').and.returnValue(image);
 
@@ -117,7 +117,7 @@ describe('Edit Thumbnail Modal Controller', function() {
     expect($scope.invalidImageWarningIsShown).toBe(true);
     $scope.onFileChanged(file);
 
-    // setTimeout is being used here to not conflict with $timeout.flush
+    // The setTimeout is being used here to not conflict with $timeout.flush
     // for fadeIn Jquery method. This first setTimeout is to wait the default
     // time for fadeOut Jquery method to complete, which is 400 miliseconds.
     // 800ms is being used instead of 400ms just to be sure that fadeOut callbak
@@ -126,7 +126,7 @@ describe('Edit Thumbnail Modal Controller', function() {
     setTimeout(function() {
       $timeout.flush();
       done();
-      // Dispatch on load event
+      // ---- Dispatch on load event ----
       image.dispatchEvent(new Event('load'));
 
       expect(fadeInElementSpy).toHaveBeenCalled();
@@ -137,7 +137,7 @@ describe('Edit Thumbnail Modal Controller', function() {
       expect($scope.uploadedImage).toBe(null);
       expect($scope.invalidImageWarningIsShown).toBe(false);
 
-      // Save information
+      // ---- Save information ----
       $scope.confirm();
       expect($uibModalInstance.close).toHaveBeenCalled();
     }, 800);

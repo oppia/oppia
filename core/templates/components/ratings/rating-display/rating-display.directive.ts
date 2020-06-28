@@ -27,7 +27,7 @@ angular.module('oppia').directive('ratingDisplay', [
       //  - onEdit: should be supplied iff isEditable is true, and be a function
       //    that will be supplied with the new rating when the rating is
       //    changed.
-      //  - ratingValue: an integer 1-5 giving the rating
+      //  - ratingValue: an integer 1-5 giving the rating.
       restrict: 'E',
       scope: {
         isEditable: '=',

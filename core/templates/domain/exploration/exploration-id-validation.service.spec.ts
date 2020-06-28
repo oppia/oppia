@@ -77,7 +77,7 @@ describe('Exploration id validation service', function() {
   it('should correctly validate the invalid exploration ids',
     function() {
       // The service should respond false when the summaries array
-      // is empty
+      // is empty.
       $httpBackend.expectGET(/.*?explorationsummarieshandler?.*/g).respond({
         summaries: []
       });
@@ -88,7 +88,7 @@ describe('Exploration id validation service', function() {
       $httpBackend.flush();
 
       // The service should respond false when the summaries array
-      // contains null
+      // contains null.
       $httpBackend.expectGET(/.*?explorationsummarieshandler?.*/g).respond({
         summaries: [null]
       });
@@ -99,7 +99,7 @@ describe('Exploration id validation service', function() {
       $httpBackend.flush();
 
       // The service should respond false when the summaries array
-      // contains more than one element
+      // contains more than one element.
       $httpBackend.expectGET(/.*?explorationsummarieshandler?.*/g).respond({
         summaries: [
           'exp_1',

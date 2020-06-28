@@ -24,7 +24,7 @@ import { Injectable } from '@angular/core';
 })
 export class ConstructTranslationIdsService {
   // Construct a translation id for library from name and a prefix.
-  // Ex: 'categories', 'art' -> 'I18N_LIBRARY_CATEGORIES_ART'
+  // Ex: 'categories', 'art' -> 'I18N_LIBRARY_CATEGORIES_ART'.
   getLibraryId(prefix: string, name: string): string {
     return (
       'I18N_LIBRARY_' + prefix.toUpperCase() + '_' +

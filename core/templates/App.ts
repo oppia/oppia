@@ -63,7 +63,7 @@ require('services/user.service.ts');
 require('google-analytics.initializer.ts');
 
 // The following file uses constants in app.constants.ts and hence needs to be
-// loaded *after* app.constants.ts
+// loaded *after* app.constants.ts.
 require('I18nFooter.ts');
 
 require('Polyfills.ts');
@@ -248,7 +248,7 @@ angular.module('oppia').config([
                 warningMessage = rejection.data.error;
               }
               AlertsService.addWarning(warningMessage);
-              // rejection.config is an optional parameter.
+              // The rejection.config is an optional parameter.
               // see https://docs.angularjs.org/api/ng/service/$http
               var rejectionUrl = typeof rejection.config !== 'undefined' ? (
                 rejection.config.url) : '';

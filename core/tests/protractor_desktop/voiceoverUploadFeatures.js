@@ -114,7 +114,7 @@ describe('Voiceover upload features', function() {
       await browser.refresh();
       await explorationEditorTranslationTab.playAudioRecord();
 
-      // Try after logging out
+      // Try after logging out.
       await users.logout();
       await users.login(TEST_EMAIL);
       await creatorDashboardPage.get();
@@ -136,7 +136,7 @@ describe('Voiceover upload features', function() {
       await browser.refresh();
       await explorationEditorTranslationTab.playAudioRecord();
 
-      // Try after logging out
+      // Try after logging out.
       await users.logout();
       await users.login(TEST_EMAIL);
       await creatorDashboardPage.get();

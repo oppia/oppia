@@ -209,7 +209,7 @@ angular.module('oppia').directive('oppiaInteractiveCodeRepl', [
             ctrl.postCode = HtmlEscaperService.escapedJsonToObj(
               $attrs.postCodeWithValue);
 
-            // Make sure ctrl.preCode ends with a newline:
+            // Make sure ctrl.preCode ends with a newline.
             if (ctrl.preCode.trim().length === 0) {
               ctrl.preCode = '';
             } else if (ctrl.preCode.slice(-1) !== '\n') {
@@ -242,7 +242,7 @@ angular.module('oppia').directive('oppiaInteractiveCodeRepl', [
                 ctrl.output += out;
               },
               read: function(name) {
-                // This function is called when a builtin module is imported
+                // This function is called when a builtin module is imported.
                 if (Sk.builtinFiles.files[name] === undefined) {
                   // If corresponding module is not present then,
                   // removal of this block also results in failure of import.

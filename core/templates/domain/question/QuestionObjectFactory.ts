@@ -31,7 +31,7 @@ angular.module('oppia').factory('QuestionObjectFactory', [
       this._linkedSkillIds = linkedSkillIds;
     };
 
-    // Instance methods
+    // ---- Instance methods ----
 
     Question.prototype.getId = function() {
       return this._id;

@@ -36,8 +36,8 @@ angular.module('oppia').factory('ImagePreloaderService', [
     var _exploration = null;
     var _states = null;
     var _hasImagePreloaderServiceStarted = false;
-    // imageLoadedCallback is an object of objects (identified by the filenames
-    // which are being downloaded at the time they are required by the
+    // Variable imageLoadedCallback is an object of objects (identified by the
+    // filenames which are being downloaded at the time they are required by the
     // directive).The object contains the resolve method of the promise
     // attached with getInImageUrl method.
     var _imageLoadedCallback = {};

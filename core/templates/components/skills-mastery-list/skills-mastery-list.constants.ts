@@ -23,11 +23,11 @@ export class SkillMasteryListConstants {
   };
 
   public static MASTERY_COLORS = {
-    // color green
+    // Color green.
     GOOD_MASTERY_COLOR: 'rgb(0, 150, 136)',
-    // color orange
+    // Color orange.
     MEDIUM_MASTERY_COLOR: 'rgb(217, 92, 12)',
-    // color red
+    // Color red.
     BAD_MASTERY_COLOR: 'rgb(201, 80, 66)'
   };
 }

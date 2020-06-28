@@ -127,7 +127,7 @@ export class MessengerService {
         explorationVersion: data.explorationVersion
       };
     },
-    // DEPRECATED
+    // ---- DEPRECATED ----
     explorationReset(data: string): {stateName: string} {
       return {
         stateName: data
@@ -150,7 +150,7 @@ export class MessengerService {
     let rawHash = window.location.hash.substring(1);
     if (window.parent !== window && rawHash &&
         this.MESSAGE_VALIDATORS.hasOwnProperty(messageTitle)) {
-      // Protractor tests may prepend a / to this hash, which we remove:
+      // Protractor tests may prepend a / to this hash, which we remove.
       let hash =
         (rawHash.charAt(0) === '/') ? rawHash.substring(1) : rawHash;
       let hashParts = hash.split('&');

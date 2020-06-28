@@ -24,13 +24,13 @@ export class QuestionPlayerConstants {
   public static MAX_MASTERY_LOSS_PER_QUESTION = -0.1;
 
   public static COLORS_FOR_PASS_FAIL_MODE = {
-    // color orange
+    // Color orange.
     FAILED_COLOR: 'rgb(217, 92, 12)',
-    // color shallow orange
+    // Color shallow orange.
     FAILED_COLOR_OUTER: 'rgb(244, 206, 186)',
-    // color green
+    // Color green.
     PASSED_COLOR: 'rgb(0, 150, 136)',
-    // color shallow green
+    // Color shallow green.
     PASSED_COLOR_OUTER: 'rgb(143, 217, 209)'
   };
 

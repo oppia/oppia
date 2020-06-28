@@ -156,7 +156,7 @@ exports.config = {
   //
   // If the chromeOnly option is specified, no Selenium server will be started,
   // and chromeDriver will be used directly (from the location specified in
-  // chromeDriver)
+  // chromeDriver).
 
   // The location of the selenium standalone server .jar file, relative
   // to the location of this config. If no other method of starting selenium
@@ -209,7 +209,7 @@ exports.config = {
 
   // The timeout for each script run on the browser. This should be longer
   // than the maximum time your application needs to stabilize between tasks.
-  // (Note that the hint tooltip has a 60-second timeout.)
+  // (Note that the hint tooltip has a 60-second timeout).
   allScriptsTimeout: 180000,
 
 
@@ -234,7 +234,7 @@ exports.config = {
       args: [
         '--lang=en-EN',
         '--window-size=1285x1000',
-        // These arguments let us simulate recording from a microphone
+        // These arguments let us simulate recording from a microphone.
         '--use-fake-device-for-media-stream',
         '--use-fake-ui-for-media-stream',
         '--use-file-for-fake-audio-capture=data/cafe.mp3',
@@ -263,7 +263,7 @@ exports.config = {
   baseUrl: 'http://localhost:9001',
 
   // Selector for the element housing the angular app - this defaults to
-  // body, but is necessary if ng-app is on a descendant of <body>
+  // body, but is necessary if ng-app is on a descendant of <body>.
   rootElement: 'body',
 
   // A callback function called once protractor is ready and available, and
@@ -288,9 +288,9 @@ exports.config = {
       // This takes screenshots of failed tests. For more information see
       // https://www.npmjs.com/package/protractor-jasmine2-screenshot-reporter
       jasmine.getEnv().addReporter(new HtmlScreenshotReporter({
-        // Directory for screenshots
+        // Directory for screenshots.
         dest: '../protractor-screenshots',
-        // Function to build filenames of screenshots
+        // Function to build filenames of screenshots.
         pathBuilder: function(currentSpec) {
           return currentSpec.fullName;
         },
@@ -359,7 +359,7 @@ exports.config = {
     // Only execute the features or scenarios with tags matching @dev.
     // This may be an array of strings to specify multiple tags to include.
     tags: '@dev',
-    // How to format features (default: progress)
+    // How to format features (default: progress).
     format: 'summary'
   },
 

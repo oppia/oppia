@@ -63,7 +63,7 @@ describe('Editable question backend API service', function() {
       return deferred.promise;
     });
 
-    // Sample question object returnable from the backend
+    // Sample question object returnable from the backend.
     sampleDataResults = {
       question_dict: {
         id: '0',
@@ -236,7 +236,7 @@ describe('Editable question backend API service', function() {
       $httpBackend.expect('PUT', '/question_editor_handler/data/0').respond(
         questionWrapper);
 
-      // Send a request to update question
+      // Send a request to update question.
       EditableQuestionBackendApiService.updateQuestion(
         question.id, question.version, 'Question Data is updated', []
       ).then(successHandler, failHandler);

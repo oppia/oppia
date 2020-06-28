@@ -84,7 +84,7 @@ export class ExplorationDiffService {
   STATE_PROPERTY_UNCHANGED = 'unchanged';
   _maxId = 0;
 
-  // Functions to assign ids to states
+  // Functions to assign ids to states.
   _resetMaxId(): void {
     this._maxId = 0;
   }
@@ -120,7 +120,7 @@ export class ExplorationDiffService {
       stateData: IStateData,
       v1States: IStateObjectsDict,
       v2States: IStateObjectsDict): IProcessedStateIdsAndData {
-    // Ignore changes that were canceled out by later changes
+    // Ignore changes that were canceled out by later changes.
     for (let stateId in stateData) {
       if (stateData[stateId].stateProperty === this.STATE_PROPERTY_CHANGED &&
           v1States.hasOwnProperty(stateData[stateId].originalStateName) &&
@@ -131,7 +131,7 @@ export class ExplorationDiffService {
       }
     }
 
-    // Delete states not present in both v1 and v2
+    // Delete states not present in both v1 and v2.
     for (let stateId in stateData) {
       if (!v1States.hasOwnProperty(
         stateData[stateId].originalStateName) &&
@@ -141,7 +141,7 @@ export class ExplorationDiffService {
     }
 
     // Track whether terminal nodes in v1 or v2
-    // TODO(bhenning): Could show changes to terminal nodes in diff
+    // TODO(bhenning): Could show changes to terminal nodes in diff.
     let finalStateIds = [];
     for (let stateId in stateData) {
       let oldState = v1States[stateData[stateId].originalStateName];

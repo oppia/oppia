@@ -125,7 +125,7 @@ var ExplorationEditorTranslationTab = function() {
     by.css('.protractor-test-confirm-record'));
   var playRecordButton = element(
     by.css('.protractor-test-play-pause-audio-button'));
-  // Two such elements are in the DOM, but only the second is visible
+  // Two such elements are in the DOM, but only the second is visible.
   var uploadAudioButton = element.all(
     by.css('.protractor-test-upload-audio-button')).last();
   var audioUploadInput = element(

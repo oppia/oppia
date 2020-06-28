@@ -34,7 +34,7 @@ var AdminPage = function() {
   var roleSelect = element(by.css('.protractor-update-form-role-select'));
   var statusMessage = element(by.css('.protractor-test-status-message'));
 
-  // Viewing roles can be done by two methods: 1. By roles 2. By username
+  // Viewing roles can be done by two methods: 1. By roles 2. By username.
   var roleDropdown = element(by.css('.protractor-test-role-method'));
   var roleValueOption = element(by.css('.protractor-test-role-value'));
   var roleUsernameOption = element(by.css(
@@ -94,7 +94,7 @@ var AdminPage = function() {
         var title = await getExplorationTitleElement(explorationElement)
           .getText();
 
-        // We use match here in case there is whitespace around the name
+        // We use match here in case there is whitespace around the name.
         if (title.match(name)) {
           await getExplorationElementReloadButton(explorationElement).click();
           await general.acceptAlert();

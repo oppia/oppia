@@ -181,8 +181,8 @@ export class SpeechSynthesisChunkerService {
         if (element.attributes['text-with-value'] !== undefined) {
           const newTextContent = element.attributes[
             'text-with-value'].textContent.replace(/&quot;/g, '');
-          // newTextContent ends with a " character, so this is being ignored
-          // in the condition below.
+          // Variable newTextContent ends with a " character, so this is being
+          // ignored in the condition below.
           return newTextContent && newTextContent !== '"' ?
             newTextContent + ' ' : '';
         }

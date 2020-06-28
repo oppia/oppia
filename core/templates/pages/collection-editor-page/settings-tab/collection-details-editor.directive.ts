@@ -99,7 +99,7 @@ angular.module('oppia').directive('collectionDetailsEditor', [
               ctrl.collection, ctrl.displayedCollectionLanguage);
           };
 
-          // Normalize the tags for the collection
+          // Normalize the tags for the collection.
           var normalizeTags = function(tags) {
             for (var i = 0; i < tags.length; i++) {
               tags[i] = tags[i].trim().replace(/\s+/g, ' ');

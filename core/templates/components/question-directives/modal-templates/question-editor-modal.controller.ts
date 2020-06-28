@@ -182,7 +182,7 @@ angular.module('oppia').controller('QuestionEditorModalController', [
       $uibModalInstance.close(returnModalObject);
     };
     // Checking if Question contains all requirement to enable
-    // Save and Publish Question
+    // Save and Publish Question.
     $scope.isQuestionValid = function() {
       return QuestionValidationService.isQuestionValid(
         $scope.question, $scope.misconceptionsBySkill);

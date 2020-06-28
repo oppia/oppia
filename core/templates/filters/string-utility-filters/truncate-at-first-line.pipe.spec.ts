@@ -47,7 +47,7 @@ describe('Testing filters', function() {
     expect(truncateAtFirstLinePipe.transform('\n')).toEqual('');
     expect(truncateAtFirstLinePipe.transform('\n\n\n')).toEqual('');
 
-    // Windows
+    // ---- Windows ----
     expect(truncateAtFirstLinePipe.transform(
       'Single line\r\nWindows EOL')).toEqual('Single line...');
     expect(truncateAtFirstLinePipe.transform(
@@ -59,7 +59,7 @@ describe('Testing filters', function() {
     expect(truncateAtFirstLinePipe.transform(
       'Single line\x0D\u000AEOL')).toEqual('Single line...');
 
-    // Mac
+    // ---- Mac ----
     expect(truncateAtFirstLinePipe.transform(
       'Single line\rEOL')).toEqual('Single line...');
     expect(truncateAtFirstLinePipe.transform(
@@ -67,7 +67,7 @@ describe('Testing filters', function() {
     expect(truncateAtFirstLinePipe.transform(
       'Single line\x0DEOL')).toEqual('Single line...');
 
-    // Linux
+    // ---- Linux ----
     expect(truncateAtFirstLinePipe.transform(
       'Single line\nEOL')).toEqual('Single line...');
     expect(truncateAtFirstLinePipe.transform(
@@ -75,7 +75,7 @@ describe('Testing filters', function() {
     expect(truncateAtFirstLinePipe.transform(
       'Single line\x0AEOL')).toEqual('Single line...');
 
-    // Vertical Tab
+    // ---- Vertical Tab ----
     expect(truncateAtFirstLinePipe.transform(
       'Vertical Tab\vEOL')).toEqual('Vertical Tab...');
     expect(truncateAtFirstLinePipe.transform(
@@ -83,7 +83,7 @@ describe('Testing filters', function() {
     expect(truncateAtFirstLinePipe.transform(
       'Vertical Tab\x0BEOL')).toEqual('Vertical Tab...');
 
-    // Form Feed
+    // ---- Form Feed ----
     expect(truncateAtFirstLinePipe.transform(
       'Form Feed\fEOL')).toEqual('Form Feed...');
     expect(truncateAtFirstLinePipe.transform(
@@ -91,17 +91,17 @@ describe('Testing filters', function() {
     expect(truncateAtFirstLinePipe.transform(
       'Form Feed\x0CEOL')).toEqual('Form Feed...');
 
-    // Next Line
+    // ---- Next Line ----
     expect(truncateAtFirstLinePipe.transform(
       'Next Line\u0085EOL')).toEqual('Next Line...');
     expect(truncateAtFirstLinePipe.transform(
       'Next Line\x85EOL')).toEqual('Next Line...');
 
-    // Line Separator
+    // ---- Line Separator ----
     expect(truncateAtFirstLinePipe.transform(
       'Line Separator\u2028EOL')).toEqual('Line Separator...');
 
-    // Paragraph Separator
+    // ---- Paragraph Separator ----
     expect(truncateAtFirstLinePipe.transform(
       'Paragraph Separator\u2029EOL')).toEqual(
       'Paragraph Separator...');

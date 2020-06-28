@@ -50,7 +50,7 @@ describe('Exploration Correctness Feedback Service', function() {
     var isValidSpy = spyOn(
       ExplorationCorrectnessFeedbackService, '_isValid').and.callThrough();
 
-    // isEnabled() returns undefined in the first time.
+    // Function isEnabled() returns undefined in the first time.
     expect(ExplorationCorrectnessFeedbackService.isEnabled()).toBeFalsy();
 
     ExplorationCorrectnessFeedbackService.toggleCorrectnessFeedback();

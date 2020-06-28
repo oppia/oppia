@@ -218,14 +218,14 @@ describe('Playing the exploration', function() {
       await explorationPlayerPage.expectContentToMatch(
         await forms.toRichText('card 1'));
 
-      // Test continue button
+      // Test continue button.
       await explorationPlayerPage.submitAnswer('Continue', null);
       await explorationPlayerPage.expectExplorationToNotBeOver();
 
       await explorationPlayerPage.expectContentToMatch(
         await forms.toRichText('card 2'));
 
-      // Test back button
+      // Test back button.
       await waitFor.elementToBeClickable(
         backButton, 'Back button taking too long to be clickable');
       await backButton.click();
@@ -233,7 +233,7 @@ describe('Playing the exploration', function() {
       await explorationPlayerPage.expectContentToMatch(
         await forms.toRichText('card 1'));
 
-      // Test next button
+      // Test next button.
       await waitFor.elementToBeClickable(
         nextButton, 'Next button taking too long to be clickable');
       await nextButton.click();

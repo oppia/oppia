@@ -109,8 +109,8 @@ describe('Player transcript service', () => {
     pts.addNewCard(scof.createNewCard(
       'Third state', 'Content HTML',
       '<oppia-text-input-html></oppia-text-input-html>'));
-    // lastAnswer should be null as no answers were provided in the second
-    // state.
+    // Variable lastAnswer should be null as no answers were provided in the
+    // second state.
     lastAnswer = pts.getLastAnswerOnDisplayedCard(1);
     expect(lastAnswer).toEqual(null);
   });

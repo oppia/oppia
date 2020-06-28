@@ -108,7 +108,7 @@ export class CollectionRights {
   // collection rights. This is performed as a deep copy such that none of the
   // internal, bindable objects are changed within this collection rights.
   // Note that the collection nodes within this collection will be completely
-  // redefined as copies from the specified collection rights
+  // redefined as copies from the specified collection rights.
   copyFromCollectionRights(otherCollectionRights: CollectionRights): void {
     this._collectionId = otherCollectionRights.getCollectionId();
     this._canEdit = otherCollectionRights.canEdit();

@@ -748,7 +748,7 @@ angular.module('oppia').directive('conversationSkin', [
                     }
                     $scope.recommendedExplorationSummaries = nextStoryNode;
                     // TODO(#8521): Remove the use of $rootScope.$apply()
-                    // once the directive is migrated to angular
+                    // once the directive is migrated to angular.
                     $rootScope.$apply();
                   });
                 StoryViewerBackendApiService.recordChapterCompletion(
@@ -763,7 +763,7 @@ angular.module('oppia').directive('conversationSkin', [
                         });
                   }
                   // TODO(#8521): Remove the use of $rootScope.$apply()
-                  // once the directive is migrated to angular
+                  // once the directive is migrated to angular.
                   $rootScope.$apply();
                 });
               } else {
@@ -773,7 +773,7 @@ angular.module('oppia').directive('conversationSkin', [
                   function(summaries) {
                     $scope.recommendedExplorationSummaries = summaries;
                     // TODO(#8521): Remove the use of $rootScope.$apply()
-                    // once the directive is migrated to angular
+                    // once the directive is migrated to angular.
                     $rootScope.$apply();
                   });
               }
@@ -1013,7 +1013,7 @@ angular.module('oppia').directive('conversationSkin', [
                     if (isFinalQuestion) {
                       if (ExplorationPlayerStateService.
                         isInQuestionPlayerMode()) {
-                        // We will redirect to the results page here
+                        // We will redirect to the results page here.
                         $scope.questionSessionCompleted = true;
                       }
                       $scope.moveToExploration = true;

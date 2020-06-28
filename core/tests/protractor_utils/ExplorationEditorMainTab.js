@@ -160,7 +160,7 @@ var ExplorationEditorMainTab = function() {
    * Actions
    */
 
-  // TUTORIAL
+  // ---- TUTORIAL ----
 
   this.exitTutorial = async function() {
     // If the editor welcome modal shows up, exit it.
@@ -209,7 +209,7 @@ var ExplorationEditorMainTab = function() {
       'Save',
     ];
     for (const heading of tutorialTabHeadings) {
-    // await tutorialTabHeadings.forEach(async function(heading) {
+    // Use: await tutorialTabHeadings.forEach(async function(heading) {
       var tutorialTabHeadingElement = element(by.cssContainingText(
         '.popover-title', heading));
       await waitFor.visibilityOf(
@@ -239,7 +239,7 @@ var ExplorationEditorMainTab = function() {
       'Tutorial modal takes too long to appear');
   };
 
-  // RESPONSE EDITOR
+  // ---- RESPONSE EDITOR ----
 
   /**
    * This clicks the "add new response" button and then selects the rule type
@@ -485,7 +485,7 @@ var ExplorationEditorMainTab = function() {
     }
   };
 
-  // CONTENT
+  // ---- CONTENT ----
 
   // 'richTextInstructions' is a function that is sent a RichTextEditor which it
   // can then use to alter the state content, for example by calling
@@ -531,7 +531,7 @@ var ExplorationEditorMainTab = function() {
       richTextInstructions);
   };
 
-  // HINT
+  // ---- HINT ----
 
   this.addHint = async function(hint) {
     await addHintButton.click();
@@ -576,7 +576,7 @@ var ExplorationEditorMainTab = function() {
       'Add/Update Solution modal takes too long to close');
   };
 
-  // INTERACTIONS
+  // ---- INTERACTIONS ----
 
   this.deleteInteraction = async function() {
     await waitFor.elementToBeClickable(
@@ -723,7 +723,7 @@ var ExplorationEditorMainTab = function() {
     await richTextInstructions(feedbackEditor);
   };
 
-  // RULES
+  // ---- RULES ----
   var _getRuleDescription = function(interactionId, ruleName) {
     if (ruleTemplates.hasOwnProperty(interactionId)) {
       if (ruleTemplates[interactionId].hasOwnProperty(ruleName)) {
@@ -745,7 +745,7 @@ var ExplorationEditorMainTab = function() {
     // (from NumericInput).
     var parameterTypes = [];
     var re = /\|(.*?)\}/ig;
-    // Matched result = Array[|NonnegativeInt}, |NonnegativeInt}]
+    // Matched result = Array[|NonnegativeInt}, |NonnegativeInt}].
     var angularSelectors = ruleDescription.match(re);
     // Slicing first and last letter.
     if (angularSelectors) {
@@ -753,7 +753,7 @@ var ExplorationEditorMainTab = function() {
         parameterTypes.push(elem.toString().slice(1, -1));
       });
     }
-    // Expected sample output = Array[NonnegativeInt, NonnegativeInt]
+    // Expected sample output = Array[NonnegativeInt, NonnegativeInt].
     return parameterTypes;
   };
 
@@ -803,7 +803,7 @@ var ExplorationEditorMainTab = function() {
     // "is equal to {{a|NonnegativeInt}} and {{b|NonnegativeInt}}"
     // (from NumericInput).
     var re = /{{[a-z]+[\|](.*?)}}/ig;
-    // Matched result = Array[{{a|NonnegativeInt}}}, {{b|NonnegativeInt}}]
+    // Matched result = Array[{{a|NonnegativeInt}}}, {{b|NonnegativeInt}}].
     var placeholders = ruleDescription.match(re);
     var textArray = [];
     // Return as-is if string does not contain placeholders.
@@ -845,7 +845,7 @@ var ExplorationEditorMainTab = function() {
     await ruleDropdownElement.click();
   };
 
-  // STATE GRAPH
+  // ---- STATE GRAPH ----
 
   this.deleteState = async function(stateName) {
     await general.scrollToTop();

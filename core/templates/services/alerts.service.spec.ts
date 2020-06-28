@@ -46,9 +46,9 @@ describe('Alerts Service', function() {
 
     it('should delete a warning (no duplicates)', () => {
       const warning = 'Warning 1';
-      // Warning message to be deleted
+      // Warning message to be deleted.
       alertsService.addWarning(warning);
-      // Add a few other warning message
+      // Add a few other warning message.
       alertsService.addWarning('Warning 2');
       alertsService.addWarning('Warning 3');
 
@@ -59,7 +59,7 @@ describe('Alerts Service', function() {
       });
       expect(alertsService.warnings.length).toBe(2);
 
-      // Search for the deleted warning message
+      // Search for the deleted warning message.
       let found = false;
       for (let i = 0; i < alertsService.warnings.length; i++) {
         if (alertsService.warnings[i].content === warning) {
@@ -73,9 +73,9 @@ describe('Alerts Service', function() {
 
     it('should delete a warning (with duplicates)', () => {
       const warning = 'Warning 1';
-      // Warning message to be deleted
+      // Warning message to be deleted.
       alertsService.addWarning(warning);
-      // Add a few other warning message
+      // Add a few other warning message.
       alertsService.addWarning('Warning 2');
       alertsService.addWarning(warning);
       alertsService.addWarning('Warning 3');
@@ -87,7 +87,7 @@ describe('Alerts Service', function() {
       });
       expect(alertsService.warnings.length).toBe(2);
 
-      // Search for the deleted warning message
+      // Search for the deleted warning message.
       let found = false;
       for (let i = 0; i < alertsService.warnings.length; i++) {
         if (alertsService.warnings[i].content === warning) {
@@ -138,9 +138,9 @@ describe('Alerts Service', function() {
 
     it('should delete a message (no duplicates)', () => {
       const message = 'Info 1';
-      // Info Message to be deleted
+      // Info Message to be deleted.
       alertsService.addInfoMessage(message);
-      // Add a few other messages
+      // Add a few other messages.
       alertsService.addInfoMessage('Info 2');
       alertsService.addSuccessMessage('Success 1');
 
@@ -152,7 +152,7 @@ describe('Alerts Service', function() {
       });
       expect(alertsService.messages.length).toBe(2);
 
-      // Search for the message
+      // Search for the message.
       let found = false;
       for (let i = 0; i < alertsService.messages.length; i++) {
         if (alertsService.messages[i].content === message &&
@@ -167,9 +167,9 @@ describe('Alerts Service', function() {
 
     it('should delete a message (with duplicates)', () => {
       const message = 'Info 1';
-      // Info Message to be deleted
+      // Info Message to be deleted.
       alertsService.addInfoMessage(message);
-      // Add a few other messages
+      // Add a few other messages.
       alertsService.addInfoMessage('Info 2');
       alertsService.addSuccessMessage('Success 1');
       alertsService.addInfoMessage(message);
@@ -182,7 +182,7 @@ describe('Alerts Service', function() {
       });
       expect(alertsService.messages.length).toBe(2);
 
-      // Search for the message
+      // Search for the message.
       let found = false;
       for (let i = 0; i < alertsService.messages.length; i++) {
         if (alertsService.messages[i].content === message &&

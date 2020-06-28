@@ -36,7 +36,7 @@ exports.config = {
   //
   // If the chromeOnly option is specified, no Selenium server will be started,
   // and chromeDriver will be used directly (from the location specified in
-  // chromeDriver)
+  // chromeDriver).
 
   // The location of the selenium standalone server .jar file, relative
   // to the location of this config. If no other method of starting selenium
@@ -71,7 +71,7 @@ exports.config = {
 
   // The timeout for each script run on the browser. This should be longer
   // than the maximum time your application needs to stabilize between tasks.
-  // (Note that the hint tooltip has a 60-second timeout.)
+  // (Note that the hint tooltip has a 60-second timeout.).
   allScriptsTimeout: 180000,
 
   // ----- What tests to run -----
@@ -136,7 +136,7 @@ exports.config = {
     browserName: ''
   },
 
-  // Code to start browserstack local before start of test
+  // Code to start browserstack local before start of test.
   beforeLaunch: function() {
     var checkSuites = function() {
       // eslint-disable-next-line no-console
@@ -180,7 +180,7 @@ exports.config = {
     });
   },
 
-  // Code to stop browserstack local after end of test
+  // Code to stop browserstack local after end of test.
   afterLaunch: function() {
     return new Promise(function(resolve, reject) {
       exports.bs_local.stop(resolve);
@@ -199,7 +199,7 @@ exports.config = {
   baseUrl: 'http://localhost:9001',
 
   // Selector for the element housing the angular app - this defaults to
-  // body, but is necessary if ng-app is on a descendant of <body>
+  // body, but is necessary if ng-app is on a descendant of <body>.
   rootElement: 'body',
 
   onPrepare: function() {

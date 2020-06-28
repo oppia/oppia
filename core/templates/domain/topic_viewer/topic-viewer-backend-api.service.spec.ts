@@ -63,7 +63,7 @@ describe('Topic viewer backend API service', () => {
     topicViewerBackendApiService = TestBed.get(TopicViewerBackendApiService);
     readOnlyTopicObjectFactory = TestBed.get(ReadOnlyTopicObjectFactory);
 
-    // Sample topic object returnable from the backend
+    // Sample topic object returnable from the backend.
     sampleDataResults = {
       topic_name: 'topic_name',
       topic_id: 'topic_id',

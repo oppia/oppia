@@ -153,14 +153,14 @@ describe('Questions List Service', function() {
     expect(qls.getCurrentPageNumber()).toBe(0);
     expect(qls.isLastQuestionBatch()).toBe(true);
 
-    // Try to get questions again before incresing pagenumber
+    // Try to get questions again before incresing pagenumber.
     qls.getQuestionSummariesAsync(skillIds, true, true);
     req = httpTestingController.expectOne(
       '/questions_list_handler/1?cursor=');
     flushMicrotasks();
     httpTestingController.verify();
 
-    // Increase page number
+    // Increase page number.
     qls.incrementPageNumber();
     expect(qls.getCurrentPageNumber()).toBe(1);
     expect(qls.isLastQuestionBatch()).toBe(false);

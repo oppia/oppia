@@ -26,7 +26,7 @@ describe('AudioBarStatusService', () => {
   beforeEach(() => {
     audioBarStatusService = TestBed.get(AudioBarStatusService);
   });
-  // This is because by default the audio bar is collapsed
+  // This is because by default the audio bar is collapsed.
   it('should be collapsed by default', () => {
     expect(audioBarStatusService.isAudioBarExpanded()).toBe(false);
   });
