@@ -29,4 +29,4 @@ cron:
 - description: "Weekly Cloud Datastore Export"
   url: /cloud_datastore_export?namespace_id=&output_url_prefix=gs://oppia-export-backups
   target: cloud-datastore-admin
-  schedule: every monday 9:00
+  schedule: every monday 02:00
