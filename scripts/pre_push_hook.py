@@ -38,7 +38,7 @@ import shutil
 import subprocess
 import sys
 
-from . import common
+from scripts import common
 
 # `pre_push_hook.py` is symlinked into `/.git/hooks`, so we explicitly import
 # the current working directory so that Git knows where to find python_utils.
