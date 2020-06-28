@@ -16,8 +16,8 @@
  * @fileoverview Service for initializing Guppy instances.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
 const SYMBOLS_TO_REMOVE = [
   'norm', 'utf8', 'text', 'sym_name', 'eval', 'floor', 'factorial', 'sub',
@@ -35,9 +35,13 @@ export class GuppyConfigurationService {
       return;
     }
     // Remove symbols since they are not supported.
-    for (var symbol of SYMBOLS_TO_REMOVE) {
+    for (let symbol of SYMBOLS_TO_REMOVE) {
       Guppy.remove_global_symbol(symbol);
     }
+    Guppy.configure('buttons', ['controls']);
+    Guppy.configure(
+      'empty_content',
+      '\\color{grey}{\\text{\\small{Type a formula here.}}}');
     GuppyConfigurationService.serviceIsInitialized = true;
   }
 }
