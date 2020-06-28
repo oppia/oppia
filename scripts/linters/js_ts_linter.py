@@ -913,6 +913,107 @@ class JsTsLintChecksManager(python_utils.OBJECT):
 
         return summary_messages
 
+    def _check_comments(self):
+        """This function ensures that comments follow correct style. Below are
+        some formats of correct comment style:
+        1. A comment can end with the following symbols: ('.', '?', ';', ',',
+        '{', '^', ')', '}', '>'). Example: // Is this is comment?
+        2. If a line contain any of the following words or phrases('@ts-ignore',
+        '--params', 'eslint-disable', 'eslint-enable', 'http://', 'https://')
+        in the comment.
+        """
+        if self.verbose_mode_enabled:
+            python_utils.PRINT(
+                'Starting comment checks\n'
+                '----------------------------------------')
+        summary_messages = []
+        files_to_check = self.all_filepaths
+        allowed_terminating_punctuations = [
+            '.', '?', ';', ',', '{', '^', ')', '}', '>']
+
+        # We allow comments to not have a terminating punctuation if any of the
+        # below phrases appears at the beginning of the comment.
+        # Example: // eslint-disable max-len
+        # This comment will be excluded from this check.
+        allowed_start_phrases = [
+            '@ts-ignore', '--params', 'eslint-disable', 'eslint-enable']
+
+        # We allow comments to not have a terminating punctuation if any of the
+        # below phrases appears in the last word of a comment.
+        # Example: // Ref: https://some.link.com
+        # This comment will be excluded from this check.
+        allowed_end_phrases = ['http://', 'https://']
+
+        failed = False
+        with linter_utils.redirect_stdout(sys.stdout):
+            for filepath in files_to_check:
+                file_content = FILE_CACHE.readlines(filepath)
+                file_length = len(file_content)
+                for line_num in python_utils.RANGE(file_length):
+                    line = file_content[line_num].strip()
+                    next_line = ''
+                    previous_line = ''
+                    if line_num + 1 < file_length:
+                        next_line = file_content[line_num + 1].strip()
+
+                    # Exclude comment line containing heading.
+                    # Example: // ---- Heading ----
+                    # These types of comments will be excluded from this check.
+                    if (
+                            line.startswith('//') and line.endswith('-')
+                            and not (
+                                next_line.startswith('//') and
+                                previous_line.startswith('//'))):
+                        continue
+
+                    if line.startswith('//') and not next_line.startswith('//'):
+                        # Check if any of the allowed starting phrase is present
+                        # in comment and exclude that line from check.
+                        allowed_start_phrase_present = any(
+                            line.split()[1].startswith(word) for word in
+                            allowed_start_phrases)
+
+                        if allowed_start_phrase_present:
+                            continue
+
+                        # Check if any of the allowed ending phrase is present
+                        # in comment and exclude that line from check. Used 'in'
+                        # instead of 'startswith' because we have some comments
+                        # with urls inside the quotes.
+                        # Example: 'https://oppia.org'
+                        allowed_end_phrase_present = any(
+                            word in line.split()[-1] for word in
+                            allowed_end_phrases)
+
+                        if allowed_end_phrase_present:
+                            continue
+
+                        # Check that the comment ends with the proper
+                        # punctuation.
+                        last_char_is_invalid = line[-1] not in (
+                            allowed_terminating_punctuations)
+                        if last_char_is_invalid:
+                            failed = True
+                            summary_message = (
+                                '%s --> Line %s: Invalid punctuation used at '
+                                'the end of the comment.' % (
+                                    filepath, line_num + 1))
+                            summary_messages.append(summary_message)
+                            python_utils.PRINT(summary_message)
+                            python_utils.PRINT('')
+
+            if failed:
+                summary_message = (
+                    '%s Comments check failed, fix files that have bad '
+                    'comment formatting.' % linter_utils.FAILED_MESSAGE_PREFIX)
+            else:
+                summary_message = (
+                    '%s Comments check passed' % (
+                        linter_utils.SUCCESS_MESSAGE_PREFIX))
+            python_utils.PRINT(summary_message)
+            summary_messages.append(summary_message)
+        return summary_messages
+
     def perform_all_lint_checks(self):
         """Perform all the lint checks and returns the messages returned by all
         the checks.
@@ -945,6 +1046,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         sorted_dependencies_messages = self._check_sorted_dependencies()
         controller_dependency_messages = (
             self._match_line_breaks_in_controller_dependencies())
+        comments_style_messages = self._check_comments()
 
         # Clear temp compiled typescipt files.
         clean.delete_directory_tree(COMPILED_TYPESCRIPT_TMP_PATH)
@@ -953,7 +1055,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
             any_type_messages + extra_js_files_messages +
             http_requests_messages + js_and_ts_component_messages +
             directive_scope_messages + sorted_dependencies_messages +
-            controller_dependency_messages)
+            controller_dependency_messages + comments_style_messages)
         return all_messages
 
 
@@ -1028,7 +1130,7 @@ class ThirdPartyJsTsLintChecksManager(python_utils.OBJECT):
 
         if num_files_with_errors:
             for error in result_list:
-                python_utils.PRINT(error)
+                python_utils.PRINT(python_utils.convert_to_bytes(error))
                 summary_messages.append(error)
             summary_message = (
                 '%s %s JavaScript and Typescript files' % (
