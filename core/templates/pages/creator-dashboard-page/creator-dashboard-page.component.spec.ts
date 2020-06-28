@@ -305,47 +305,6 @@ describe('Creator dashboard controller', () => {
         })).toBe(1);
       });
 
-      it('should update screen width on window resize', function() {
-        var innerWidthSpy = spyOnProperty($window, 'innerWidth', 'get');
-        expect(ctrl.myExplorationsView).toBe('card');
-
-        innerWidthSpy.and.returnValue(480);
-        $window.dispatchEvent(resizeEvent);
-
-        expect(ctrl.myExplorationsView).toBe('card');
-        expect(ctrl.publishText).toBe(
-          'Publish the exploration to receive statistics.');
-
-        innerWidthSpy.and.returnValue(768);
-        $window.dispatchEvent(resizeEvent);
-
-        expect(ctrl.myExplorationsView).toBe('card');
-        expect(ctrl.publishText).toBe(
-          'This exploration is private. Publish it to receive statistics.');
-
-
-        $httpBackend.expect('POST', '/creatordashboardhandler/data').respond(
-          200);
-        ctrl.setMyExplorationsView('list');
-        $httpBackend.flush();
-
-        expect(ctrl.myExplorationsView).toBe('list');
-
-        innerWidthSpy.and.returnValue(480);
-        $window.dispatchEvent(resizeEvent);
-
-        expect(ctrl.myExplorationsView).toBe('card');
-        expect(ctrl.publishText).toBe(
-          'Publish the exploration to receive statistics.');
-
-        innerWidthSpy.and.returnValue(768);
-        $window.dispatchEvent(resizeEvent);
-
-        expect(ctrl.myExplorationsView).toBe('list');
-        expect(ctrl.publishText).toBe(
-          'This exploration is private. Publish it to receive statistics.');
-      });
-
       it('should set active thread from my suggestions list', function() {
         var threadId = 'exp1';
         var messages = [{

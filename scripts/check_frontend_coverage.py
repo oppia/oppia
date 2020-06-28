@@ -114,6 +114,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'copier.directive.ts',
     'correctness-footer.directive.ts',
     'create-activity-button.directive.ts',
+    'creator-dashboard-page.component.ts',
     'csrf-token.service.ts',
     'current-interaction.service.ts',
     'customize-interaction-modal.controller.ts',
