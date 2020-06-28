@@ -38,11 +38,10 @@ import shutil
 import subprocess
 import sys
 
-from scripts import common
-
 # `pre_push_hook.py` is symlinked into `/.git/hooks`, so we explicitly import
 # the current working directory so that Git knows where to find python_utils.
 sys.path.append(os.getcwd())
+from scripts import common  # isort:skip  # pylint: disable=wrong-import-position
 import python_utils  # isort:skip  # pylint: disable=wrong-import-position
 
 GitRef = collections.namedtuple(
