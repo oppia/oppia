@@ -112,6 +112,7 @@ angular.module('oppia').directive('mathExpressionContentEditor', [
           });
           ctrl.placeholderText = '\\frac{x}{y}';
           ctrl.alwaysEditable = ctrl.getAlwaysEditable();
+
           if (ctrl.alwaysEditable) {
             $scope.$watch('$ctrl.localValue.label', function(newValue) {
               ctrl.value.raw_latex = newValue;
