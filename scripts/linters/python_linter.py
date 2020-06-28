@@ -379,12 +379,15 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
                     current_files_to_lint + [config_pylint],
                     reporter=TextReporter(pylint_output), exit=False).linter
                 _trimmer(pylint_output.read())
-                # These lines invoke Pycodestyle and print its output
+                # These lines invoke Pycodestyle and print its outputvvvvvvvvvvvv
                 # to the target stdout.
                 style_guide = pycodestyle.StyleGuide(
                     config_file=config_pycodestyle)
                 pycodestyle_report = style_guide.check_files(
                     paths=current_files_to_lint)
+                python_utils.PRINT('HELLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLOOOOOOOOOOOOOOOOOOOOOOO')
+                python_utils.PRINT(pycodestyle_report.get_file_results())
+                python_utils.PRINT('HELLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLOOOOOOOOOOOOOOOOOOOOOOO')
 
             if pylinter.msg_status != 0 or pycodestyle_report.get_count() != 0:
                 summary_message = stdout.getvalue()
